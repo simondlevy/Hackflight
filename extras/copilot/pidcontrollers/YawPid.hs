@@ -23,18 +23,19 @@ import Utils(constrain_abs)
 
 yawController :: Stream Double -> Stream Double -> Stream Double -> PidController
 
-yawController kp ki windupMax = 
-    makePidController (yawFun kp ki windupMax) (YawState 0)
+yawController kp ki windupMax = makePidController (yawFun kp ki windupMax)
+
 
 yawFun :: Stream Double -> Stream Double -> Stream Double -> PidFun
-yawFun kp ki windupMax vehicleState demands controllerState =
 
-    -- Return updated demands and controller state
-    (Demands 0 0 0 (kp * error' + ki * errorIntegral), YawState errorIntegral)
+yawFun kp ki windupMax vehicleState demands =
+
+    -- Return updated demands
+    Demands 0 0 0 (kp * error' + ki * errorIntegral)
 
     -- Compute error as target minus actual
     where error' = (yaw demands) - (dpsi vehicleState)
 
           -- Accumualte error integral
           errorIntegral = constrain_abs (errI + error') windupMax
-          errI = [0] ++ (yawErrorIntegral controllerState)
+          errI = [0] ++ errorIntegral

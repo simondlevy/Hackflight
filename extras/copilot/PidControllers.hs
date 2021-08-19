@@ -20,29 +20,13 @@ import FullPidController(FullPidState)
 import VehicleState
 import Demands
 
-data PidState =
+type PidFun = VehicleState -> Demands -> Demands
 
-     AltHoldState { altErrorIntegral :: Stream Double,
-                    altTarget :: Stream Double,
-                    altInBand :: Stream Bool }
+data PidController = PidController { pidFun :: PidFun, pidDemands :: Demands }
 
-   | RateState { rateRollState :: FullPidState,
-                 ratePitchState :: FullPidState }
+makePidController :: PidFun -> PidController
 
-   | YawState { yawErrorIntegral :: Stream Double }
-
-   | NoState { }
-
-type PidFun = VehicleState -> Demands -> PidState -> (Demands, PidState)
-
-data PidController = PidController { pidFun :: PidFun,
-                                     pidState :: PidState,
-                                     pidDemands :: Demands }
-
-makePidController :: PidFun -> PidState -> PidController
-
-makePidController pidFun' pidState' =
-    PidController pidFun' pidState' zeroDemands
+makePidController pidFun' = PidController pidFun' zeroDemands
 
 pidUpdate :: VehicleState -> PidController -> PidController
 
@@ -50,8 +34,6 @@ pidUpdate vehicleState pidController =
 
     let pidFun' = pidFun pidController
 
-        (demands', pidState') = pidFun' vehicleState
-                                        (pidDemands pidController)
-                                        (pidState pidController)
+        demands' = pidFun' vehicleState (pidDemands pidController)
 
-    in PidController pidFun' pidState' demands'
+    in PidController pidFun' demands'
