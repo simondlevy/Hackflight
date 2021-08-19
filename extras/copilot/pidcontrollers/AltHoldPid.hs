@@ -47,7 +47,7 @@ altHoldFun kp
            vehicleState
            demands =
 
-    Demands (error' * kp + errorIntegral * ki) 0 0 0
+    Demands (error' * kp + errorIntegral' * ki) 0 0 0
 
     where
 
@@ -71,5 +71,5 @@ altHoldFun kp
          error' = targetVelocity + (dz vehicleState)
 
          -- Accumualte error integral
-         errorIntegral = constrain_abs (errI + error') windupMax
-         errI = [0] ++ errorIntegral
+         errorIntegral' = constrain_abs (errorIntegral + error') windupMax
+         errorIntegral = [0] ++ errorIntegral'
