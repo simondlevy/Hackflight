@@ -9,7 +9,6 @@
 {-# LANGUAGE RebindableSyntax #-}
 {-# LANGUAGE DataKinds        #-}
 
--- jmodule AltHoldPid(altHoldController)
 module AltHoldPid
 
 where
