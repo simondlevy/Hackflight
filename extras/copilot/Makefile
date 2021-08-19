@@ -6,7 +6,7 @@
 # MIT License
 
 HSRC = Hackflight.hs Receiver.hs Demands.hs VehicleState.hs Sensor.hs Utils.hs Mixer.hs \
-	   PidControllers.hs \
+	   PidController.hs \
 	   pidcontrollers/YawPid.hs \
 	   sensors/Gyrometer.hs sensors/Altimeter.hs sensors/Euler.hs
 

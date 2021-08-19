@@ -9,14 +9,13 @@
 {-# LANGUAGE RebindableSyntax #-}
 {-# LANGUAGE DataKinds        #-}
 
-module PidControllers
+module PidController
 
 where
 
 import Language.Copilot
 import Copilot.Compile.C99
 
-import FullPidController(FullPidState)
 import VehicleState
 import Demands
 

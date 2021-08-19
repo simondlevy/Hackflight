@@ -24,7 +24,7 @@ import Altimeter
 import Gyrometer
 import Euler
 
-import PidControllers
+import PidController
 import YawPid
 --import AltHoldPid
 

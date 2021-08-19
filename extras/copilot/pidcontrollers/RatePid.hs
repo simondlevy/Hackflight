@@ -11,7 +11,7 @@ module RatePid(rateController)
 where
 
 import VehicleState
-import PidControllers
+import PidController
 import FullPidController
 import Demands
 
