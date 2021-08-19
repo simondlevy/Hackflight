@@ -21,6 +21,12 @@ import PidControllers
 import Demands
 import Utils(constrain_abs)
 
+counter :: Stream Bool -> Stream Bool -> Stream Int32
+counter inc reset = cnt
+  where
+   cnt = if reset then 0 else if inc then z + 1 else z
+   z = [0] ++ cnt
+
 yawController :: Stream Double -> Stream Double -> Stream Double -> PidController
 
 yawController kp ki windupMax = 
@@ -29,12 +35,13 @@ yawController kp ki windupMax =
 yawFun :: Stream Double -> Stream Double -> Stream Double -> PidFun
 yawFun kp ki windupMax vehicleState demands controllerState =
 
-    -- Compute error as target minus actual
-    let error' = (yaw demands) - (dpsi vehicleState)
-
-        -- Accumualte error integral
-        errorIntegral = constrain_abs ((yawErrorIntegral controllerState) + error')
-                        windupMax
-
     -- Return updated demands and controller state
-    in (Demands 0 0 0 (kp * error' + ki * errorIntegral), YawState errorIntegral)
+    (Demands 0 0 0 (kp * error' + ki * errorIntegral), YawState errorIntegral)
+
+    -- Compute error as target minus actual
+    where error' = (yaw demands) - (dpsi vehicleState)
+
+          -- Accumualte error integral
+          errorIntegral = constrain_abs (z + error') windupMax
+          z = [0] ++ (yawErrorIntegral controllerState)
+
