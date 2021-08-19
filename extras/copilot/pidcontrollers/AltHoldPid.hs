@@ -49,9 +49,12 @@ altHoldFun kp
            demands
            controllerState =
 
-    let  
+    -- Return updated demands and controller state
+    (Demands (error' * kp + errorIntegral * ki) 0 0 0,
+     AltHoldState errorIntegral altTarget' inband)
 
-         -- NED => ENU
+    where
+
          altitude = -(z vehicleState)
 
          throttleDemand = throttle demands
@@ -74,7 +77,3 @@ altHoldFun kp
          -- Accumualte error integral
          errorIntegral = constrain_abs ((altErrorIntegral controllerState) + error')
                          windupMax
-
-    -- Return updated demands and controller state
-    in  (Demands (error' * kp + errorIntegral * ki) 0 0 0,
-         AltHoldState errorIntegral altTarget' inband)
