@@ -21,12 +21,6 @@ import PidControllers
 import Demands
 import Utils(constrain_abs)
 
-counter :: Stream Bool -> Stream Bool -> Stream Int32
-counter inc reset = cnt
-  where
-   cnt = if reset then 0 else if inc then z + 1 else z
-   z = [0] ++ cnt
-
 yawController :: Stream Double -> Stream Double -> Stream Double -> PidController
 
 yawController kp ki windupMax = 
@@ -44,4 +38,3 @@ yawFun kp ki windupMax vehicleState demands controllerState =
           -- Accumualte error integral
           errorIntegral = constrain_abs (errI + error') windupMax
           errI = [0] ++ (yawErrorIntegral controllerState)
-
