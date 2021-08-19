@@ -68,7 +68,7 @@ altHoldFun kp
 
          -- Compute error as altTarget velocity minus actual velocity, after
          -- negating actual to accommodate NED
-         error' = altTargetVelocity -- + (dz vehicleState)
+         error' = altTargetVelocity + (dz vehicleState)
 
          -- Accumualte error integral
          errorIntegral = 0 --constrain_abs ((altErrorIntegral controllerState) + error')
