@@ -60,8 +60,9 @@ altHoldFun kp
          -- Reset controller when moving into deadband
          altitudeTarget = if inband -- && not (altInBand controllerState)
                           then altitude
-                          else pidState0
-         pidState0 = [0] ++ altitudeTarget
+                          else altitudeTargetState
+         altitudeTargetState = [0] ++ altitudeTarget
+         pidState2 = [0] ++ throttleDemand
 
          targetVelocity = if inband
                              then altitudeTarget - altitude
@@ -72,5 +73,5 @@ altHoldFun kp
          error' = targetVelocity + (dz vehicleState)
 
          -- Accumualte error integral
-         errorIntegral = constrain_abs (pidState1 + error') windupMax
-         pidState1 = [0] ++ errorIntegral
+         errorIntegral = constrain_abs (errorIntegralState + error') windupMax
+         errorIntegralState = [0] ++ errorIntegral

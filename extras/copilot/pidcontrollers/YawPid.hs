@@ -37,5 +37,5 @@ yawFun kp ki windupMax vehicleState demands =
     where error' = (yaw demands) - (dpsi vehicleState)
 
           -- Accumualte error integral
-          errorIntegral = constrain_abs (pidState + error') windupMax
-          pidState = [0] ++ errorIntegral
+          errorIntegral = constrain_abs (errorIntegralState + error') windupMax
+          errorIntegralState = [0] ++ errorIntegral
