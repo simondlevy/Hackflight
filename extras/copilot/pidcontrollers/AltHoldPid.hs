@@ -71,5 +71,5 @@ altHoldFun kp
          error' = altTargetVelocity + (dz vehicleState)
 
          -- Accumualte error integral
-         errorIntegral = 0 --constrain_abs ((altErrorIntegral controllerState) + error')
-                         -- windupMax
+         errorIntegral = constrain_abs (errI + error') windupMax
+         errI = [0] ++ errorIntegral
