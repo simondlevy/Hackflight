@@ -58,17 +58,17 @@ altHoldFun kp
          inband = in_band throttleDemand stickDeadband
 
          -- Reset controller when moving into deadband
-         altTarget = altitude -- if inband && not (altInBand controllerState)
-                     -- then altitude
-                     -- else altTarget controllerState
+         altitudeTarget = altitude -- if inband && not (altInBand controllerState)
+                       -- then altitude
+                       -- else altTarget controllerState
 
-         altTargetVelocity = if inband
-                             then altTarget - altitude
+         targetVelocity = if inband
+                             then altitudeTarget - altitude
                              else pilotVelZMax * throttleDemand
 
          -- Compute error as altTarget velocity minus actual velocity, after
          -- negating actual to accommodate NED
-         error' = altTargetVelocity + (dz vehicleState)
+         error' = targetVelocity + (dz vehicleState)
 
          -- Accumualte error integral
          errorIntegral = constrain_abs (errI + error') windupMax
