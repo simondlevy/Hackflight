@@ -30,7 +30,6 @@ altHoldController ::    Stream Double
 
 altHoldController kp ki windupMax pilotVelZMax stickDeadband = 
     makePidController (altHoldFun kp ki windupMax pilotVelZMax stickDeadband)
-                      (AltHoldState 0 0 false)
 
 
 altHoldFun ::    Stream Double
@@ -46,12 +45,9 @@ altHoldFun kp
            pilotVelZMax
            stickDeadband
            vehicleState
-           demands
-           controllerState =
+           demands =
 
-    -- Return updated demands and controller state
-    (Demands (error' * kp + errorIntegral * ki) 0 0 0,
-     AltHoldState errorIntegral altTarget' inband)
+    Demands (error' * kp + errorIntegral * ki) 0 0 0
 
     where
 
@@ -62,9 +58,9 @@ altHoldFun kp
          inband = in_band throttleDemand stickDeadband
 
          -- Reset controller when moving into deadband
-         altTarget' = if inband && not (altInBand controllerState)
-                      then altitude
-                      else altTarget controllerState
+         altTarget' = altitude -- if inband && not (altInBand controllerState)
+                      -- then altitude
+                      -- else altTarget controllerState
 
          altTargetVelocity = if inband
                              then altTarget' - altitude
@@ -72,8 +68,8 @@ altHoldFun kp
 
          -- Compute error as altTarget velocity minus actual velocity, after
          -- negating actual to accommodate NED
-         error' = altTargetVelocity + (dz vehicleState)
+         error' = altTargetVelocity -- + (dz vehicleState)
 
          -- Accumualte error integral
-         errorIntegral = constrain_abs ((altErrorIntegral controllerState) + error')
-                         windupMax
+         errorIntegral = 0 --constrain_abs ((altErrorIntegral controllerState) + error')
+                         -- windupMax
