@@ -61,6 +61,7 @@ altHoldFun kp
          altitudeTarget' = altitude -- if inband && not (altInBand controllerState)
                        -- then altitude
                        -- else altTarget controllerState
+         altitudeTarget = [0] ++ altitudeTarget'
 
          targetVelocity = if inband
                              then altitudeTarget' - altitude
