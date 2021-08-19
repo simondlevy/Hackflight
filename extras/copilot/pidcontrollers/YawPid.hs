@@ -31,11 +31,11 @@ yawFun :: Stream Double -> Stream Double -> Stream Double -> PidFun
 yawFun kp ki windupMax vehicleState demands =
 
     -- Return updated demands
-    Demands 0 0 0 (kp * error' + ki * errorIntegral')
+    Demands 0 0 0 (kp * error' + ki * errorIntegral)
 
     -- Compute error as target minus actual
     where error' = (yaw demands) - (dpsi vehicleState)
 
           -- Accumualte error integral
-          errorIntegral' = constrain_abs (errorIntegral + error') windupMax
-          errorIntegral = [0] ++ errorIntegral'
+          errorIntegral = constrain_abs (pidState + error') windupMax
+          pidState = [0] ++ errorIntegral
