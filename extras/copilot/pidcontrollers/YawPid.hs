@@ -30,10 +30,11 @@ yawFun :: Stream Double -> Stream Double -> Stream Double -> PidFun
 yawFun kp ki windupMax vehicleState demands controllerState =
 
     -- Compute error as target minus actual
-    let err = (yaw demands) - (dpsi vehicleState)
+    let error' = (yaw demands) - (dpsi vehicleState)
 
         -- Accumualte error integral
-        errI = constrain_abs ((yawErrorIntegral controllerState) + err) windupMax
+        errorIntegral = constrain_abs ((yawErrorIntegral controllerState) + error')
+                        windupMax
 
     -- Return updated demands and controller state
-    in (Demands 0 0 0 (kp * err + ki * errI), YawState errI)
+    in (Demands 0 0 0 (kp * error' + ki * errorIntegral), YawState errorIntegral)
