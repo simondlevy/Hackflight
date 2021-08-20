@@ -14,12 +14,12 @@ module AltHoldPid
 where
 
 import Language.Copilot
-import Copilot.Compile.C99
 
 import VehicleState
 import PidController
 import Demands
 import Utils(constrain_abs, in_band)
+
 
 altHoldController ::    Stream Double
                      -> Stream Double
@@ -47,10 +47,12 @@ altHoldFun kp
            vehicleState
            demands =
 
+    -- Demands (error' * kp + errorIntegral * ki) 0 0 0
     Demands (error' * kp + errorIntegral * ki) 0 0 0
 
     where
 
+         -- NED => ENU
          altitude = -(z vehicleState)
 
          throttleDemand = throttle demands
@@ -61,12 +63,10 @@ altHoldFun kp
          altitudeTarget = if inband && not (in_band throttleDemandState stickDeadband)
                           then altitude
                           else altitudeTargetState
-         altitudeTargetState = [0] ++ altitudeTarget
-         throttleDemandState = [0] ++ throttleDemand
 
          targetVelocity = if inband
-                             then altitudeTarget - altitude
-                             else pilotVelZMax * throttleDemand
+                          then altitudeTarget - altitude
+                          else pilotVelZMax * throttleDemand
 
          -- Compute error as altTarget velocity minus actual velocity, after
          -- negating actual to accommodate NED
@@ -74,4 +74,8 @@ altHoldFun kp
 
          -- Accumualte error integral
          errorIntegral = constrain_abs (errorIntegralState + error') windupMax
+
+         -- Maintain state between calls
          errorIntegralState = [0] ++ errorIntegral
+         altitudeTargetState = [0] ++ altitudeTarget
+         throttleDemandState = [0] ++ throttleDemand

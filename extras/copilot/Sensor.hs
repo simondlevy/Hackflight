@@ -6,8 +6,6 @@
   MIT License
 --}
 
-{-# LANGUAGE DataKinds        #-}
-
 module Sensor
 
 where

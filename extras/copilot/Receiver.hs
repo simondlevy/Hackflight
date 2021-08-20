@@ -6,8 +6,6 @@
   MIT License
 --}
 
-{-# LANGUAGE RebindableSyntax #-}
-{-# LANGUAGE DataKinds        #-}
 
 module Receiver where
 

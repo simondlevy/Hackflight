@@ -44,7 +44,7 @@ spec = do
                           0.1 -- Ki
                           0.4 -- windupMax
 
-  let pidControllers = [yaw, altHold]
+  let pidControllers = [altHold]
 
   let mixer = QuadXAPMixer
 

@@ -47,6 +47,11 @@ void runMotors(double m1, double m2, double m3, double m4)
     udp_send_data(motor_client_socket, values, 4*sizeof(double));
 }
 
+void debug(double x)
+{
+    printf("%f\n", x);
+}
+
 // For debugging
 void showVehicleState(
         double x,

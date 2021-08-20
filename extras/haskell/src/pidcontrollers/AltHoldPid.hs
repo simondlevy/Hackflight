@@ -15,6 +15,8 @@ import PidControllers
 import Demands
 import Utils(constrain_abs, in_band)
 
+import Debugging
+
 altHoldController :: Double -> Double -> Double -> Double -> Double 
                      -> PidController
 
@@ -51,9 +53,11 @@ altHoldFun kp
                              then altTarget' - altitude
                              else pilotVelZMax * throttleDemand
 
+         dbg = debug "altTargetVelocity:" throttleDemand
+
          -- Compute error as altTarget velocity minus actual velocity, after
          -- negating actual to accommodate NED
-         err = altTargetVelocity + (dz vehicleState)
+         err = dbg + (dz vehicleState)
 
          -- Accumualte error integral
          errI = constrain_abs ((altErrorIntegral controllerState) + err) windupMax

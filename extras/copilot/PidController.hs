@@ -6,15 +6,12 @@
   MIT License
 --}
 
-{-# LANGUAGE RebindableSyntax #-}
-{-# LANGUAGE DataKinds        #-}
 
 module PidController
 
 where
 
 import Language.Copilot
-import Copilot.Compile.C99
 
 import VehicleState
 import Demands

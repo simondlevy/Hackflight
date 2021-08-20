@@ -7,14 +7,12 @@
 --}
 
 {-# LANGUAGE RebindableSyntax #-}
-{-# LANGUAGE DataKinds        #-}
 
 module Utils
 
 where
 
 import Language.Copilot
-import Copilot.Compile.C99
 import Prelude hiding ((>), (<), div)
 
 
