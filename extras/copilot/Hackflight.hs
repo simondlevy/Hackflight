@@ -66,6 +66,8 @@ spec = do
   -- Sum over the list of demands to get the final demands
   let demands = foldr addDemands zeroDemands (map pidDemands pidControllers'')
 
+  trigger "debug" true [arg (throttle demands)]
+
   let m1 = getMotor1 mixer demands
   let m2 = getMotor2 mixer demands
   let m3 = getMotor3 mixer demands
