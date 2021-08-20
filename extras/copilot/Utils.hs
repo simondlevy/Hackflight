@@ -13,7 +13,7 @@ module Utils
 where
 
 import Language.Copilot
-import Prelude hiding ((>), (<), div)
+import Prelude hiding ((>), (<), (&&), div)
 
 -- https://stackoverflow.com/a/4343542/6110522
 compose :: Foldable t => t (b -> b) -> b -> b
@@ -23,7 +23,7 @@ constrain_abs :: Stream Double -> Stream Double -> Stream Double
 constrain_abs v lim = if v < (-lim) then (-lim) else (if v > lim then lim else v)
 
 in_band :: Stream Double -> Stream Double -> Stream Bool
-in_band value band = abs value  < band
+in_band value band = value > (-band) && value < band
 
 deg2rad :: Stream Double -> Stream Double
 deg2rad d = d * pi / 180
