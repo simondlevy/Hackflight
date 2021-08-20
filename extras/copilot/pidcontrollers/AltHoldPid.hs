@@ -46,7 +46,7 @@ altHoldFun kp
            vehicleState
            demands =
 
-    Demands (error' * kp {-- + errorIntegral * ki --}) 0 0 0
+    Demands (error' * kp + errorIntegral * ki ) 0 0 0
 
     where
 
