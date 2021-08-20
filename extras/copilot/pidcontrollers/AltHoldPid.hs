@@ -59,9 +59,9 @@ altHoldFun kp
          inband = in_band throttleDemand stickDeadband
 
          -- Reset controller when moving into deadband
-         altitudeTarget = 5 --if inband && not (in_band throttleDemandState stickDeadband)
-                          --then altitude
-                          --else altitudeTargetState
+         altitudeTarget = if inband && not (in_band throttleDemandState stickDeadband)
+                          then altitude
+                          else altitudeTargetState
 
          targetVelocity = if inband
                           then altitudeTarget - altitude
