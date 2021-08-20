@@ -25,7 +25,7 @@ import Gyrometer
 import Euler
 
 import PidController
---import YawPid
+import YawPid
 import AltHoldPid
 
 spec = do
@@ -39,7 +39,12 @@ spec = do
                                   0.4  -- windupMax
                                   2.5  -- pilotVelZMax
                                   0.2  -- stickDeadband
-  let pidControllers = [altHold]
+
+  let yaw = yawController 2.0 -- Kp
+                          0.1 -- Ki
+                          0.4 -- windupMax
+
+  let pidControllers = [yaw, altHold]
 
   let mixer = QuadXAPMixer
 

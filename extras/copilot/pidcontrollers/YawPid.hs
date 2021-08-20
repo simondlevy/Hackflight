@@ -7,7 +7,6 @@
 --}
 
 {-# LANGUAGE RebindableSyntax #-}
-{-# LANGUAGE DataKinds        #-}
 
 module YawPid
 
@@ -30,10 +29,8 @@ yawFun :: Stream Double -> Stream Double -> Stream Double -> PidFun
 
 yawFun kp ki windupMax vehicleState demands =
 
-    -- Return updated demands
     Demands 0 0 0 (kp * error' + ki * errorIntegral)
 
-    -- Compute error as target minus actual
     where error' = (yaw demands) - (dpsi vehicleState)
 
           -- Accumualte error integral
