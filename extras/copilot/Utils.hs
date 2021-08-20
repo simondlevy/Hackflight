@@ -15,7 +15,6 @@ where
 import Language.Copilot
 import Prelude hiding ((>), (<), div)
 
-
 -- https://stackoverflow.com/a/4343542/6110522
 compose :: Foldable t => t (b -> b) -> b -> b
 compose = foldr (.) id
