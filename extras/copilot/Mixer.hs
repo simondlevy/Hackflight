@@ -11,22 +11,27 @@ module Mixer where
 import Language.Copilot
 
 import Demands
+import Utils(constrain)
 
 data Mixer = QuadXAPMixer 
 
 type MixerFun = Mixer -> Demands -> Stream Double
 
 getMotor1 :: MixerFun
-getMotor1 QuadXAPMixer demands = t - r - p + y where (t, r, p, y) = getDemands demands
+getMotor1 QuadXAPMixer demands = constrain (t - r - p + y)
+  where (t, r, p, y) = getDemands demands
 
 getMotor2 :: MixerFun
-getMotor2 QuadXAPMixer demands = t + r + p + y  where (t, r, p, y) = getDemands demands
+getMotor2 QuadXAPMixer demands = constrain (t + r + p + y)
+  where (t, r, p, y) = getDemands demands
 
 getMotor3 :: MixerFun
-getMotor3 QuadXAPMixer demands = t + r - p - y  where (t, r, p, y) = getDemands demands
+getMotor3 QuadXAPMixer demands = constrain (t + r - p - y)
+  where (t, r, p, y) = getDemands demands
 
 getMotor4 :: MixerFun
-getMotor4 QuadXAPMixer demands = t - r + p - y  where (t, r, p, y) = getDemands demands
+getMotor4 QuadXAPMixer demands = constrain (t - r + p - y)
+  where (t, r, p, y) = getDemands demands
 
 getDemands :: Demands -> (Stream Double, Stream Double, Stream Double, Stream Double)
 getDemands demands = (throttle demands, roll demands, pitch demands, yaw demands)

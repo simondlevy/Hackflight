@@ -46,7 +46,7 @@ altHoldFun kp
            vehicleState
            demands =
 
-    Demands (error' * kp + errorIntegral * ki) 0 0 0
+    Demands (error' * kp {-- + errorIntegral * ki --}) 0 0 0
 
     where
 
@@ -62,7 +62,7 @@ altHoldFun kp
                           then altitude
                           else altitudeTargetState
 
-         targetVelocity = if inband
+         targetVelocity = if false -- inband
                           then altitudeTarget - altitude
                           else pilotVelZMax * throttleDemand
 

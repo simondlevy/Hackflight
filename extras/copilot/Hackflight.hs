@@ -18,15 +18,15 @@ import Receiver
 import Demands
 import VehicleState
 import Mixer
-import Utils(compose)
+import Utils
 
 import Altimeter
 import Gyrometer
 import Euler
 
-import PidController
-import YawPid
-import AltHoldPid
+--import PidController
+--import YawPid
+--import AltHoldPid
 
 spec = do
 
@@ -34,39 +34,36 @@ spec = do
 
   let sensors = [euler, gyrometer, altimeter]
 
-  let altHold = altHoldController 0.75 -- Kp
-                                  1.5  -- Ki
-                                  0.4  -- windupMax
-                                  2.5  -- pilotVelZMax
-                                  0.2  -- stickDeadband
-
-  let yaw = yawController 2.0 -- Kp
-                          0.1 -- Ki
-                          0.4 -- windupMax
-
-  let pidControllers = [altHold]
-
   let mixer = QuadXAPMixer
+
+  let kp = 0.75
+  let ki =  1.5 
+  let windupMax = 0.4
+  let pilotVelZMax =  2.5
+  let stickDeadband = 0.2
 
   -- Main algorithm ---------------------------------------------
 
   -- Get the receiver demands
   let receiverDemands = Demands receiverThrottle receiverRoll receiverPitch receiverYaw
 
-  -- Inject the receiver demands into the PID controllers
-  let pidControllers' = map (\p -> PidController (pidFun p) receiverDemands)
-                            pidControllers
-
   -- Get the vehicle state by running the sensors
   let vehicleState = compose sensors zeroVehicleState
+  
+  let demands = receiverDemands
 
-  -- Map the PID update function to the pid controllers
-  let pidControllers'' = map (pidUpdate vehicleState) pidControllers'
+  -- NED => ENU
+  let altitude = -(z vehicleState)
 
-  -- Sum over the list of demands to get the final demands
-  let demands = foldr addDemands zeroDemands (map pidDemands pidControllers'')
+  let throttleDemand = throttle demands
 
-  trigger "debug" true [arg (throttle demands)]
+  let targetVelocity = pilotVelZMax * throttleDemand
+
+  -- Compute error as altTarget velocity minus actual velocity, after
+  -- negating actual to accommodate NED
+  let error' = targetVelocity + (dz vehicleState)
+
+  trigger "debug" true [arg error'] 
 
   let m1 = getMotor1 mixer demands
   let m2 = getMotor2 mixer demands
