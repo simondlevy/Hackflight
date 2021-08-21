@@ -17,46 +17,40 @@ import Copilot.Compile.C99
 
 import Utils(constrain_abs)
 
-data FullPidState = 
-
-    FullPidState { errorIntegral :: Stream Double,
-                   deltaError1 :: Stream Double,
-                   deltaError2 :: Stream Double,
-                   errorPrev :: Stream Double }
-
-initFullPidState :: FullPidState
-
-initFullPidState = FullPidState 0 0 0 0
-
 computeDemand :: Stream Double ->  -- kp
                  Stream Double ->  -- ki
                  Stream Double ->  -- kd
                  Stream Double ->  -- windupMax
                  Stream Double ->  -- valueMax
-                 FullPidState ->   
                  Stream Double ->  -- demand
                  Stream Double ->  -- value
-                 (Stream Double, FullPidState)
+                 Stream Double     -- new value
 
-computeDemand kp ki kd windupMax valueMax pidState demand value =
+computeDemand kp ki kd windupMax valueMax demand value =
 
-    let 
+    kp * error' + ki * errorIntegral + kd * errorDerivative
 
-        error' = demand - value
+    where 
 
-        --  Reset PID state on quick value change
-        reset = abs value > valueMax
+      error' = demand - value
 
-        errorIntegral' = if reset then 0 else
-               constrain_abs ((errorIntegral pidState) + error') windupMax
+      --  Reset PID state on quick value change
+      reset = abs value > valueMax
 
-        deltaError = if reset then 0 else error' - (errorPrev pidState)
+      errorIntegral = if reset then 0 else
+             constrain_abs (errorIntegralState + error') windupMax
 
-        deltaError1' = if reset then 0 else deltaError1 pidState
+      deltaError = if reset then 0 else error' - errorPrevState
 
-        -- Run a simple low-pass filter on the error derivative
-        errorDerivative = if reset then 0 else
-                          deltaError1' + (deltaError2 pidState) + deltaError
+      deltaError1 = if reset then 0 else deltaError1State
 
-    in (kp * error' + ki * errorIntegral' + kd * errorDerivative, 
-       FullPidState errorIntegral' deltaError  deltaError1' error')
+      -- Run a simple low-pass filter on the error derivative
+      errorDerivative = if reset then 0 else
+                        deltaError1 + deltaError2State + deltaError
+
+      -- Maintain controller state between calls
+      errorIntegralState = [0] ++ errorIntegral
+      errorPrevState = [0] ++ error'
+      deltaError1State = [0] ++ deltaError
+      deltaError2State = [0] ++ deltaError1
+

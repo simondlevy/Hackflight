@@ -74,7 +74,7 @@ altHoldFun kp
          -- Accumualte error integral
          errorIntegral = constrain_abs (errorIntegralState + error') windupMax
 
-         -- Maintain state between calls
+         -- Maintain controller state between calls
          errorIntegralState = [0] ++ errorIntegral
          altitudeTargetState = [0] ++ altitudeTarget
          throttleDemandState = [0] ++ throttleDemand
