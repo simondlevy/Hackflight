@@ -31,9 +31,10 @@ computeDemand :: Stream Double ->  -- kp
                  Stream Double ->  -- valueMax
                  Stream Double ->  -- demand
                  Stream Double ->  -- value
-                 Stream Double     -- new value
+                 FullPidState ->
+                 Stream Double  
 
-computeDemand kp ki kd windupMax valueMax demand value =
+computeDemand kp ki kd windupMax valueMax demand value _pidState =
 
     kp * error' + ki * errorIntegral + kd * errorDerivative
 
