@@ -13,7 +13,6 @@ module YawPid
 where
 
 import Language.Copilot
-import Copilot.Compile.C99
 
 import VehicleState
 import PidController

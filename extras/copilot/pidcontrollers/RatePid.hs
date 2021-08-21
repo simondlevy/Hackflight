@@ -6,6 +6,8 @@
   MIT License
 --}
 
+{-# LANGUAGE RebindableSyntax #-}
+
 module RatePid(rateController)
 
 where
