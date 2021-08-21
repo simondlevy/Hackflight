@@ -12,7 +12,7 @@ where
 
 import Language.Copilot
 
-import VehicleState
+import VehicleState(phi, theta)
 import PidController
 import Demands
 import Utils(deg2rad)

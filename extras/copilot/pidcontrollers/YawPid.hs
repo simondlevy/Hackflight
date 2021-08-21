@@ -14,7 +14,7 @@ where
 
 import Language.Copilot
 
-import VehicleState
+import VehicleState(dpsi)
 import PidController
 import Demands
 import Utils(constrain_abs)
