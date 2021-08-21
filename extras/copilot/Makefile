@@ -5,11 +5,23 @@
 #
 # MIT License
 
-HSRC = Main.hs Hackflight.hs Receiver.hs Demands.hs VehicleState.hs Sensor.hs \
-	   Utils.hs Mixer.hs PidController.hs \
-	   pidcontrollers/RatePid.hs pidcontrollers/YawPid.hs pidcontrollers/AltHoldPid.hs \
+HSRC = Main.hs \
+	   Hackflight.hs \
+	   Receiver.hs \
+	   Demands.hs \
+	   VehicleState.hs \
+	   Sensor.hs \
+	   Utils.hs \
+	   Mixer.hs \
+	   PidController.hs \
+	   pidcontrollers/RatePid.hs \
+	   pidcontrollers/YawPid.hs \
+	   pidcontrollers/AltHoldPid.hs \
 	   pidcontrollers/LevelPid.hs \
-	   sensors/Gyrometer.hs sensors/Altimeter.hs sensors/Euler.hs
+	   pidcontrollers/PosHoldPid.hs \
+	   sensors/Gyrometer.hs \
+	   sensors/Altimeter.hs \
+	   sensors/Euler.hs
 
 RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
