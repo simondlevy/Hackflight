@@ -28,9 +28,9 @@ opticalFlow :: Sensor
 opticalFlow vehicleState = 
 
   VehicleState (x      vehicleState)
-               (dx     vehicleState)
+               ((dx     vehicleState) + flowX)
                (y      vehicleState)
-               (dy     vehicleState)
+               ((dy     vehicleState) + flowY)
                (z      vehicleState) 
                (dz     vehicleState) 
                (phi    vehicleState)

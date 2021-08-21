@@ -69,17 +69,29 @@ int main (int argc, char *argv[])
                     telemetry_data,
                     sizeof(telemetry_data))) {
 
+            // Simulate altimeter/variometer
             altimeterZ = telemetry_data[5];
             altimeterDz = telemetry_data[6];
 
+            // XXX Get Euler angles directly for now; really want to simulate
+            // quaternion
             eulerX = telemetry_data[7];
             eulerY = telemetry_data[9];
             eulerZ = telemetry_data[11];
 
+            // Simulate gyrometer
             gyrometerX = telemetry_data[8];
             gyrometerY = telemetry_data[10];
             gyrometerZ = telemetry_data[12];
 
+            // Simulate optical flow by rotating earth-frame X,Y velocity into
+            // body frame
+            double dx = telemetry_data[2];
+            double dy = telemetry_data[4];
+            flowX = dx; // XXX
+            flowY = dy; // XXX
+            
+            // Simulate receiver
             receiverThrottle = telemetry_data[13];
             receiverRoll = telemetry_data[14];
             receiverPitch = telemetry_data[15];
@@ -87,7 +99,7 @@ int main (int argc, char *argv[])
 
             udp_set_timeout(telemetry_server_socket, 100);
 
-            // Calls Copilot
+            // Call Copilot
             step();
         }
 
