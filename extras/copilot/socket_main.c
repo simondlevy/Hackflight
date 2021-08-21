@@ -85,11 +85,14 @@ int main (int argc, char *argv[])
             gyrometerZ = telemetry_data[12];
 
             // Simulate optical flow by rotating earth-frame X,Y velocity into
-            // body frame
+            // body frame.  To keep it simple we ignore pitch and roll.
             double dx = telemetry_data[2];
             double dy = telemetry_data[4];
-            flowX = dx; // XXX
-            flowY = dy; // XXX
+            double psi = telemetry_data[11];
+            double cp = cos(psi);
+            double sp = sin(psi);
+            flowX = cp * dx + sp * dy;
+            flowY = cp * dy - sp * dx;
             
             // Simulate receiver
             receiverThrottle = telemetry_data[13];
