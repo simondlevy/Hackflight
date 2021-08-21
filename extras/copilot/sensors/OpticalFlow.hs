@@ -28,9 +28,9 @@ opticalFlow :: Sensor
 opticalFlow vehicleState = 
 
   VehicleState (x      vehicleState)
-               ((dx     vehicleState) + flowX)
+               ((dx     vehicleState) + dx')
                (y      vehicleState)
-               ((dy     vehicleState) + flowY)
+               ((dy     vehicleState) + dy')
                (z      vehicleState) 
                (dz     vehicleState) 
                (phi    vehicleState)
@@ -39,3 +39,9 @@ opticalFlow vehicleState =
                (dtheta vehicleState)
                (psi    vehicleState) 
                (dpsi   vehicleState)
+
+  where
+
+    -- XXX Rotate flow velocity from body frame to earth frame
+    dx' = flowX
+    dy' = flowY
