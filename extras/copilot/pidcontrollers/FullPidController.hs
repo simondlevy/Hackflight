@@ -17,6 +17,13 @@ import Copilot.Compile.C99
 
 import Utils(constrain_abs)
 
+data FullPidState = 
+
+    FullPidState { errorIntegral :: Stream Double,
+                   deltaError1 :: Stream Double,
+                   deltaError2 :: Stream Double,
+                   errorPrev :: Stream Double }
+
 computeDemand :: Stream Double ->  -- kp
                  Stream Double ->  -- ki
                  Stream Double ->  -- kd
