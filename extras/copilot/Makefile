@@ -21,7 +21,8 @@ HSRC = Main.hs \
 	   pidcontrollers/PosHoldPid.hs \
 	   sensors/Gyrometer.hs \
 	   sensors/Altimeter.hs \
-	   sensors/Euler.hs
+	   sensors/Euler.hs \
+	   sensors/OpticalFlow.hs
 
 RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 

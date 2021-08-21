@@ -16,10 +16,13 @@ import Copilot.Compile.C99
 
 import Mixer
 
+-- Sensors
 import Altimeter
 import Gyrometer
 import Euler
+import OpticalFlow
 
+-- PID controllers
 import RatePid
 import YawPid
 import LevelPid
@@ -30,7 +33,7 @@ import Hackflight
 
 spec = do
 
-  let sensors = [euler, gyrometer, altimeter]
+  let sensors = [euler, gyrometer, altimeter, opticalFlow]
 
   let rate = rateController 0.225    -- Kp
                             0.001875 -- Ki

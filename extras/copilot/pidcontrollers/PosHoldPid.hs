@@ -28,7 +28,8 @@ posHoldFun :: Stream Double -> Stream Double -> PidFun
 
 posHoldFun kp stickDeadband vehicleState demands =
 
-  Demands 0 pitchDemand rollDemand 0
+  -- Demands 0 rollDemand pitchDemand 0
+  Demands 0 rollDemand pitchDemand 0
 
   where
 
@@ -38,7 +39,7 @@ posHoldFun kp stickDeadband vehicleState demands =
 
     -- Rotate X, Y velocities into body frame
     p = psi vehicleState
-    cp = cos pi
+    cp = cos p
     sp = sin p
     dx' = dx vehicleState
     dy' = dy vehicleState
