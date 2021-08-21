@@ -50,31 +50,31 @@ altHoldFun kp
 
     where
 
-         -- NED => ENU
-         altitude = -(z vehicleState)
+       -- NED => ENU
+       altitude = -(z vehicleState)
 
-         throttleDemand = throttle demands
+       throttleDemand = throttle demands
 
-         -- inband = in_band throttleDemand stickDeadband
-         inband = in_band throttleDemand stickDeadband
+       -- inband = in_band throttleDemand stickDeadband
+       inband = in_band throttleDemand stickDeadband
 
-         -- Reset controller when moving into deadband
-         altitudeTarget = if inband && not (in_band throttleDemandState stickDeadband)
-                          then altitude
-                          else altitudeTargetState
+       -- Reset controller when moving into deadband
+       altitudeTarget = if inband && not (in_band throttleDemandState stickDeadband)
+                        then altitude
+                        else altitudeTargetState
 
-         targetVelocity = if inband
-                          then altitudeTarget - altitude
-                          else pilotVelZMax * throttleDemand
+       targetVelocity = if inband
+                        then altitudeTarget - altitude
+                        else pilotVelZMax * throttleDemand
 
-         -- Compute error as altTarget velocity minus actual velocity, after
-         -- negating actual to accommodate NED
-         error' = targetVelocity + (dz vehicleState)
+       -- Compute error as altTarget velocity minus actual velocity, after
+       -- negating actual to accommodate NED
+       error' = targetVelocity + (dz vehicleState)
 
-         -- Accumualte error integral
-         errorIntegral = constrain_abs (errorIntegralState + error') windupMax
+       -- Accumualte error integral
+       errorIntegral = constrain_abs (errorIntegralState + error') windupMax
 
-         -- Maintain controller state between calls
-         errorIntegralState = [0] ++ errorIntegral
-         altitudeTargetState = [0] ++ altitudeTarget
-         throttleDemandState = [0] ++ throttleDemand
+       -- Maintain controller state between calls
+       errorIntegralState = [0] ++ errorIntegral
+       altitudeTargetState = [0] ++ altitudeTarget
+       throttleDemandState = [0] ++ throttleDemand

@@ -10,20 +10,26 @@ module LevelPid(levelController)
 
 where
 
+import Language.Copilot
+
 import VehicleState
 import PidController
 import Demands
 import Utils(deg2rad)
 
-levelController :: Double -> Double -> PidController
+levelController :: Stream Double -> Stream Double -> PidController
 
 levelController kp maxAngleDegrees =
-    makePidController (levelFun kp maxAngleDegrees) NoState
+    makePidController (levelFun kp maxAngleDegrees)
 
-levelFun :: Double -> Double -> PidFun
-levelFun kp maxAngleDegrees vehicleState demands _controllerState =
+levelFun :: Stream Double -> Stream Double -> PidFun
+levelFun kp maxAngleDegrees vehicleState demands =
 
-    let 
+    -- Return updated demands and controller state
+    Demands 0 rollDemand pitchDemand 0
+
+    where 
+
         -- Maximum roll pitch demand is +/-0.5, so to convert demand to
         -- angle for error computation, we multiply by the following amount:
         demandScale = 2 * (deg2rad maxAngleDegrees)
@@ -36,5 +42,3 @@ levelFun kp maxAngleDegrees vehicleState demands _controllerState =
         pitchDemand = ((kp * demandScale * (pitch demands)) +
                        (theta vehicleState))
 
-    -- Return updated demands and controller state
-    in (Demands 0 rollDemand pitchDemand 0, NoState)
