@@ -37,6 +37,9 @@ double eulerZ = 0;
 double altimeterZ = 0;
 double altimeterDz = 0;
 
+double flowX = 0;
+double flowY = 0;
+
 // Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
 
@@ -45,29 +48,6 @@ void runMotors(double m1, double m2, double m3, double m4)
 {
     double values[4] = {m1, m2, m3, m4};
     udp_send_data(motor_client_socket, values, 4*sizeof(double));
-}
-
-void debug(double x)
-{
-    printf("%f\n", x);
-}
-
-// For debugging
-void showVehicleState(
-        double x,
-        double dx,
-        double y,
-        double dy,
-        double z,
-        double dz,
-        double phi,
-        double dphi,
-        double theta,
-        double dtheta,
-        double psi,
-        double dpsi)
-{
-    printf("z: %+3.3f  dz: %+3.3f\n", z, dz);
 }
 
 int main (int argc, char *argv[])
