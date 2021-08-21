@@ -28,6 +28,8 @@ import PidController
 import YawPid
 import AltHoldPid
 
+import Hackflight
+
 spec = do
 
   -- Initialization --------------------------------------------
