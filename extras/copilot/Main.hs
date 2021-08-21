@@ -22,7 +22,7 @@ import Euler
 
 import RatePid
 import YawPid
--- import LevelPid
+import LevelPid
 import AltHoldPid
 
 import Hackflight
@@ -41,8 +41,8 @@ spec = do
                           0.1 -- Ki
                           0.4 -- windupMax
 
-  -- let level = levelController 0.2 -- Kp
-  --                             45  -- maxAngleDegrees
+  let level = levelController 0.2 -- Kp
+                              45  -- maxAngleDegrees
 
   let altHold = altHoldController 0.75 -- Kp
                                   1.5  -- Ki
@@ -50,8 +50,7 @@ spec = do
                                   2.5  -- pilotVelZMax
                                   0.2  -- stickDeadband
 
-  -- let pidControllers = [rate, yaw, level, altHold]
-  let pidControllers = [rate, yaw, altHold]
+  let pidControllers = [rate, yaw, level, altHold]
 
   let mixer = QuadXAPMixer
 

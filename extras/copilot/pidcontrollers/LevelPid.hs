@@ -30,15 +30,13 @@ levelFun kp maxAngleDegrees vehicleState demands =
 
     where 
 
-        -- Maximum roll pitch demand is +/-0.5, so to convert demand to
-        -- angle for error computation, we multiply by the following amount:
-        demandScale = 2 * (deg2rad maxAngleDegrees)
+      -- Maximum roll pitch demand is +/-0.5, so to convert demand to
+      -- angle for error computation, we multiply by the following amount:
+      demandScale = 2 * (deg2rad maxAngleDegrees)
 
-        rollDemand = ((kp * demandScale * (roll demands)) -
-                     (phi vehicleState))
+      rollDemand = ((kp * demandScale * (roll demands)) - (phi vehicleState))
 
-        -- Pitch demand is nose-down positive, so we negate pitch-forward
-        -- vehicle state (nose-down negative) to reconcile them
-        pitchDemand = ((kp * demandScale * (pitch demands)) +
-                       (theta vehicleState))
+      -- Pitch demand is nose-down positive, so we negate pitch-forward
+      -- vehicle state (nose-down negative) to reconcile them
+      pitchDemand = ((kp * demandScale * (pitch demands)) + (theta vehicleState))
 
