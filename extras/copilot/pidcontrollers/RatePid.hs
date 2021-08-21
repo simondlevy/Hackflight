@@ -68,12 +68,22 @@ rateFun kp ki kd windupMax rateMax vehicleState demands =
                                 newErrorDelta + newErrorDelta1 + errorDelta2
 
         (rollDemand, rollError, rollErrorIntegral, rollErrorDelta, rollErrorDelta1) =
-            computeDemand (roll demands) (dphi vehicleState) rollErrorIntegralState rollErrorDelta1State rollErrorDelta2State rollErrorPrev
+            computeDemand (roll demands)
+                          (dphi vehicleState)
+                          rollErrorIntegralState
+                          rollErrorDelta1State
+                          rollErrorDelta2State
+                          rollErrorPrev
 
          -- Pitch demand is nose-down positive, so we negate pitch-forward
          -- (nose-down negative) to reconcile them
         (pitchDemand, pitchError, pitchErrorIntegral, pitchErrorDelta, pitchErrorDelta1) =
-            computeDemand (pitch demands) (-(dtheta vehicleState)) pitchErrorIntegralState pitchErrorDelta1State pitchErrorDelta2State pitchErrorPrev
+            computeDemand (pitch demands)
+                          (-(dtheta vehicleState))
+                          pitchErrorIntegralState
+                          pitchErrorDelta1State
+                          pitchErrorDelta2State
+                          pitchErrorPrev
 
         -- Maintain controller state between calls
 
