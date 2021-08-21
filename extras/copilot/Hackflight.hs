@@ -6,15 +6,10 @@
   MIT License
 --}
 
-{-# LANGUAGE RebindableSyntax #-}
-{-# LANGUAGE DataKinds        #-}
-
 module Hackflight where
 
-import Language.Copilot
-
 import Receiver
-import VehicleState
+import VehicleState(zeroVehicleState)
 import Sensor
 import PidController
 import Demands
