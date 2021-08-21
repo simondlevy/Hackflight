@@ -32,11 +32,11 @@ computeDemand :: Stream Double ->  -- kp
                  Stream Double ->  -- demand
                  Stream Double ->  -- value
                  FullPidState ->
-                 Stream Double  
+                 (Stream Double, FullPidState)
 
-computeDemand kp ki kd windupMax valueMax demand value _pidState =
+computeDemand kp ki kd windupMax valueMax demand value pidState =
 
-    kp * error' + ki * errorIntegral + kd * errorDerivative
+    (kp * error' + ki * errorIntegral' + kd * errorDerivative, newPidState)
 
     where 
 
@@ -45,20 +45,19 @@ computeDemand kp ki kd windupMax valueMax demand value _pidState =
       --  Reset PID state on quick value change
       reset = abs value > valueMax
 
-      errorIntegral = if reset then 0 else
-             constrain_abs (errorIntegralState + error') windupMax
+      errorIntegral' = if reset then 0 else
+             constrain_abs ((errorIntegral pidState) + error') windupMax
 
-      deltaError = if reset then 0 else error' - errorPrevState
+      deltaError = if reset then 0 else error' - (errorPrev pidState)
 
-      deltaError1 = if reset then 0 else deltaError1State
+      deltaError1' = if reset then 0 else (deltaError1 pidState)
 
       -- Run a simple low-pass filter on the error derivative
       errorDerivative = if reset then 0 else
-                        deltaError1 + deltaError2State + deltaError
+                        deltaError1' + (deltaError2 pidState) + deltaError
 
       -- Maintain controller state between calls
-      errorIntegralState = [0] ++ errorIntegral
-      errorPrevState = [0] ++ error'
-      deltaError1State = [0] ++ deltaError
-      deltaError2State = [0] ++ deltaError1
-
+      newPidState = FullPidState ([0] ++ errorIntegral')
+                                 ([0] ++ deltaError)
+                                 ([0] ++ deltaError1')
+                                 ([0] ++ error')
