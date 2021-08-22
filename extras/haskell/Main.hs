@@ -27,13 +27,12 @@ import RatePid
 import YawPid
 import LevelPid
 import AltHoldPid
-import PosHoldPid
 
 import Hackflight
 
 spec = do
 
-  let sensors = [euler, gyrometer, altimeter, opticalFlow]
+  let sensors = [euler, gyrometer, altimeter]
 
   let rate = rateController 0.225    -- Kp
                             0.001875 -- Ki
@@ -54,10 +53,7 @@ spec = do
                                   2.5  -- pilotVelZMax
                                   0.2  -- stickDeadband
 
-  let posHold = posHoldController 0.0 -- 0.1 -- Kp
-                                  0.2 -- stickDeadband
-
-  let pidControllers = [posHold, rate, yaw, level, altHold]
+  let pidControllers = [rate, yaw, level, altHold]
 
   let mixer = QuadXAPMixer
 
