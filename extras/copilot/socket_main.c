@@ -94,9 +94,10 @@ int main (int argc, char *argv[])
             flowX = cp * dx + sp * dy;
             flowY = cp * dy - sp * dx;
 
-            double dyy = flowX * sp + flowY * cp;
+            double dxx = cp * flowX - sp * flowY;
+            double dyy = sp * flowX + cp * flowY;
 
-            printf("%+3.3f (%+3.3f)\n", dyy, dy);
+            printf("%+3.3f (%+3.3f)\n", dxx, dx);
             
             // Simulate receiver
             receiverThrottle = telemetry_data[13];
