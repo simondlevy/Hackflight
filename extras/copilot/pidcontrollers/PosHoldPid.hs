@@ -33,14 +33,12 @@ posHoldFun kp stickDeadband vehicleState demands =
 
   where
 
-    compute demand error' = 
-      
-      if in_band demand stickDeadband then (-kp) * error' else 0
+    compute demand error' = if in_band demand stickDeadband then (-kp) * error' else 0
 
     -- Rotate X, Y velocities into body frame
-    p = psi vehicleState
-    cp = cos p
-    sp = sin p
+    psi' = psi vehicleState
+    cp = cos psi'
+    sp = sin psi'
     dx' = dx vehicleState
     dy' = dy vehicleState
 

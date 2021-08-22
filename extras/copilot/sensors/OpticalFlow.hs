@@ -42,6 +42,12 @@ opticalFlow vehicleState =
 
   where
 
-    -- XXX Rotate flow velocity from body frame to earth frame
-    dx' = flowX
-    dy' = flowY
+    -- Rotate flow velocity from body frame to earth frame
+    
+    -- psi' = psi vehicleState
+
+    -- cp = cos psi'
+    -- sp = sin psi'
+
+    dx' = flowX -- cp * flowX - sp * flowY
+    dy' = flowY -- sp * flowX + cp * flowY

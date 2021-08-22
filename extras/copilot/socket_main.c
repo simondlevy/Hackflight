@@ -91,14 +91,15 @@ int main (int argc, char *argv[])
             double psi = telemetry_data[11];
             double cp = cos(psi);
             double sp = sin(psi);
-            flowX = cp * dx + sp * dy;
-            flowY = cp * dy - sp * dx;
+            flowX = dx; // cp * dx + sp * dy;
+            flowY = dy; // cp * dy - sp * dx;
 
-            double dxx = cp * flowX - sp * flowY;
-            double dyy = sp * flowX + cp * flowY;
+            double flowXX = cp * dx + sp * dy;
+            double flowYY = cp * dy - sp * dx;
+            double dyy = flowXX * sp + flowYY * cp;
 
-            printf("%+3.3f (%+3.3f)\n", dxx, dx);
-            
+            printf("%+3.3f %+3.3f\n", dyy, dy);
+
             // Simulate receiver
             receiverThrottle = telemetry_data[13];
             receiverRoll = telemetry_data[14];
