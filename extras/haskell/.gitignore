@@ -1,3 +1,4 @@
-dist
+main
+hackflight.c
+hackflight.h
 *.o
-*.hi
