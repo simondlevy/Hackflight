@@ -54,7 +54,7 @@ spec = do
                                   2.5  -- pilotVelZMax
                                   0.2  -- stickDeadband
 
-  let posHold = posHoldController 0.1 -- Kp
+  let posHold = posHoldController 0.0 -- 0.1 -- Kp
                                   0.2 -- stickDeadband
 
   let pidControllers = [posHold, rate, yaw, level, altHold]
