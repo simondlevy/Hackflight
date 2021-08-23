@@ -28,13 +28,14 @@ double receiverRoll = 0;
 double receiverPitch = 0;
 double receiverYaw = 0;
 
+double quaternionW = 0;
+double quaternionX = 0;
+double quaternionY = 0;
+double quaternionZ = 0;
+
 double gyrometerX = 0;
 double gyrometerY = 0;
 double gyrometerZ = 0;
-
-double eulerX = 0;
-double eulerY = 0;
-double eulerZ = 0;
 
 double altimeterZ = 0;
 double altimeterDz = 0;
@@ -54,6 +55,52 @@ void runMotors(double m1, double m2, double m3, double m4)
     udp_send_data(motor_client_socket, values, 4*sizeof(double));
 }
 
+static void simulateAltimeter(double * telemetry_data)
+{
+    altimeterZ = telemetry_data[5];
+    altimeterDz = telemetry_data[6];
+}
+
+static void simulateGyrometer(double * telemetry_data)
+{
+    gyrometerX = telemetry_data[8];
+    gyrometerY = telemetry_data[10];
+    gyrometerZ = telemetry_data[12];
+}
+
+static void simulateOpticalFlow(double * telemetry_data)
+{
+    // Simulate optical flow by rotating earth-frame X,Y velocity into
+    // body frame.  To keep it simple we ignore pitch and roll.
+    double dx = telemetry_data[2];
+    double dy = telemetry_data[4];
+    double psi = telemetry_data[11];
+    double cp = cos(psi);
+    double sp = sin(psi);
+    flowX = cp * dx + sp * dy;
+    flowY = cp * dy - sp * dx;
+}
+
+static void simulateReceiver(double * telemetry_data)
+{
+    receiverThrottle = telemetry_data[13];
+    receiverRoll = telemetry_data[14];
+    receiverPitch = telemetry_data[15];
+    receiverYaw = telemetry_data[16];
+}
+
+static void simulateTime()
+{
+    static double start_time;
+    struct timeval tv = {};
+    gettimeofday(&tv, NULL);
+    double curr_time = (double)(tv.tv_sec + tv.tv_usec/1e6);
+    if (start_time == 0) {
+        start_time = curr_time;
+    }
+    time = curr_time - start_time;
+}
+
 int main (int argc, char *argv[])
 {
     udp_client_socket_init(&motor_client_socket, HOST, MOTOR_PORT, 0);
@@ -64,8 +111,6 @@ int main (int argc, char *argv[])
     printf("Hit the start button ...\n");
     fflush(stdout);
 
-    double start_time = 0;
-
     while (true) {
 
         double telemetry_data[17] = {};
@@ -75,45 +120,15 @@ int main (int argc, char *argv[])
                     telemetry_data,
                     sizeof(telemetry_data))) {
 
-            // Simulate altimeter/variometer
-            altimeterZ = telemetry_data[5];
-            altimeterDz = telemetry_data[6];
+            simulateAltimeter(telemetry_data);
 
-            // XXX Get Euler angles directly for now; really want to simulate
-            // quaternion
-            eulerX = telemetry_data[7];
-            eulerY = telemetry_data[9];
-            eulerZ = telemetry_data[11];
+            simulateGyrometer(telemetry_data);
 
-            // Simulate gyrometer
-            gyrometerX = telemetry_data[8];
-            gyrometerY = telemetry_data[10];
-            gyrometerZ = telemetry_data[12];
+            simulateOpticalFlow(telemetry_data);
 
-            // Simulate optical flow by rotating earth-frame X,Y velocity into
-            // body frame.  To keep it simple we ignore pitch and roll.
-            double dx = telemetry_data[2];
-            double dy = telemetry_data[4];
-            double psi = telemetry_data[11];
-            double cp = cos(psi);
-            double sp = sin(psi);
-            flowX = cp * dx + sp * dy;
-            flowY = cp * dy - sp * dx;
+            simulateReceiver(telemetry_data);
 
-            // Simulate receiver
-            receiverThrottle = telemetry_data[13];
-            receiverRoll = telemetry_data[14];
-            receiverPitch = telemetry_data[15];
-            receiverYaw = telemetry_data[16];
-
-            // Get current time, starting with 0
-            struct timeval tv = {};
-            gettimeofday(&tv, NULL);
-            double curr_time = (double)(tv.tv_sec + tv.tv_usec/1e6);
-            if (start_time == 0) {
-                start_time = curr_time;
-            }
-            time = curr_time - start_time;
+            simulateTime();
 
             udp_set_timeout(telemetry_server_socket, 100);
 

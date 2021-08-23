@@ -15,18 +15,28 @@ where
 import Language.Copilot
 
 import VehicleState
+import Sensor
 
-quat :: Stream (Array 4 Double)
-quat = extern "quatValues" Nothing
+quaternionW :: Stream Double
+quaternionW = extern "quaternionW" Nothing
 
-quatModifyState :: VehicleState
+quaternionX :: Stream Double
+quaternionX = extern "quaternionX" Nothing
 
-quatModifyState = VehicleState 0 0 0 0 0 0 0 0 theta 0 psi 0
+quaternionY :: Stream Double
+quaternionY = extern "quaternionY" Nothing
 
-  where qw = quat.!!0
-        qx = quat.!!1
-        qy = quat.!!2
-        qz = quat.!!3
+quaternionZ :: Stream Double
+quaternionZ = extern "quaternionZ" Nothing
+
+quaternion :: Sensor
+
+quatModifyState vehicleState  =
+
+  where qw = quaternionW
+        qx = quaternionX
+        qy = quaternionY
+        qz = quaternionZ
         phi = atan2 (2*(qw*qx+qy*qz)) (qw*qw-qx*qx-qy*qy+qz*qz)
         theta = asin (2*(qx*qz-qw*qy))
         psi = atan2 (2*(qx*qy+qw*qz)  qw*qw+qx*qx-qy*qy-qz*qz)
