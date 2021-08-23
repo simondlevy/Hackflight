@@ -18,9 +18,7 @@ import Demands
 import Utils(deg2rad)
 
 levelController :: Stream Double -> Stream Double -> PidController
-
-levelController kp maxAngleDegrees =
-    makePidController (levelFun kp maxAngleDegrees)
+levelController kp maxAngleDegrees = makePidController (levelFun kp maxAngleDegrees)
 
 levelFun :: Stream Double -> Stream Double -> PidFun
 levelFun kp maxAngleDegrees vehicleState demands =
@@ -39,4 +37,3 @@ levelFun kp maxAngleDegrees vehicleState demands =
       -- Pitch demand is nose-down positive, so we negate pitch-forward
       -- vehicle state (nose-down negative) to reconcile them
       pitchDemand = ((kp * demandScale * (pitch demands)) + (theta vehicleState))
-

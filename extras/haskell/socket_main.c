@@ -74,8 +74,6 @@ static void simulateQuaternion(double * telemetry_data)
     double the = telemetry_data[9];
     double psi = telemetry_data[11];
 
-    printf("%+3.3f => ", phi);
-
     // Pre-computation
     float cph = cos(phi/2);
     float cth = cos(the/2);
@@ -148,15 +146,6 @@ int main (int argc, char *argv[])
             simulateGyrometer(telemetry_data);
             simulateOpticalFlow(telemetry_data);
             simulateReceiver(telemetry_data);
-
-            double qw = quaternionW;
-            double qx = quaternionX;
-            double qy = quaternionY;
-            double qz = quaternionZ;
-            double phi = -atan2(2*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-            double the = asin(2*(qx*qz-qw*qy));
-            double psi = atan2(2*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
-            printf("%+3.3f\n", phi);
 
             simulateTime();
 
