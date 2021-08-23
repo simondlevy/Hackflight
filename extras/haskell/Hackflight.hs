@@ -35,6 +35,6 @@ hackflight sensors pidControllers =
         pidControllers'' = map (pidUpdate vehicleState) pidControllers'
 
         -- Sum over the list of demands to get the final demands
-        newDemands = foldr addDemands zeroDemands (map pidDemands pidControllers'')
+        newDemands = foldr addDemands receiverDemands (map pidDemands pidControllers'')
 
     in newDemands

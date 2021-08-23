@@ -52,6 +52,7 @@ static udp_socket_t motor_client_socket;
 void runMotors(double m1, double m2, double m3, double m4)
 {
     double values[4] = {m1, m2, m3, m4};
+    printf("%3.3f\n", m1);
     udp_send_data(motor_client_socket, values, 4*sizeof(double));
 }
 

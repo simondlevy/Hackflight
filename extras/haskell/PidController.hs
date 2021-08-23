@@ -22,7 +22,7 @@ data PidController = PidController { pidFun :: PidFun, pidDemands :: Demands }
 
 makePidController :: PidFun -> PidController
 
-makePidController pidFun' = PidController pidFun' zeroDemands
+makePidController pidFun' = PidController pidFun' (Demands 0 0 0 0)
 
 pidUpdate :: VehicleState -> PidController -> PidController
 

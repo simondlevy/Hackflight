@@ -43,7 +43,6 @@ altimeter vehicleState =
 
   where
 
-    altimeterDz = if time' > 0 then (altimeterZ - altimeterZ') / (time - time') else 0
-
+    altimeterDz = if time' > 0 then (altimeterZ - altimeterZ') / 0.0002 {-- (time - time') --} else 0
     altimeterZ' = [0] ++ altimeterZ
     time' = [0] ++ time
