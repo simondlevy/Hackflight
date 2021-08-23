@@ -68,6 +68,15 @@ static void simulateGyrometer(double * telemetry_data)
     gyrometerZ = telemetry_data[12];
 }
 
+static void simulateQuaternion(double * telemetry_data)
+{
+    double phi = telemetry_data[7];
+    double theta = telemetry_data[9];
+    double psi = telemetry_data[11];
+
+    printf("%+3.3f\n", psi);
+}
+
 static void simulateOpticalFlow(double * telemetry_data)
 {
     // Simulate optical flow by rotating earth-frame X,Y velocity into
@@ -121,11 +130,9 @@ int main (int argc, char *argv[])
                     sizeof(telemetry_data))) {
 
             simulateAltimeter(telemetry_data);
-
+            simulateQuaternion(telemetry_data);
             simulateGyrometer(telemetry_data);
-
             simulateOpticalFlow(telemetry_data);
-
             simulateReceiver(telemetry_data);
 
             simulateTime();
