@@ -13,6 +13,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <sys/time.h>
+
 #include "udp_sockets.h"
 #include "hackflight.h"
 
@@ -40,6 +42,8 @@ double altimeterDz = 0;
 double flowX = 0;
 double flowY = 0;
 
+double time = 0;
+
 // Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
 
@@ -59,6 +63,8 @@ int main (int argc, char *argv[])
 
     printf("Hit the start button ...\n");
     fflush(stdout);
+
+    double start_time = 0;
 
     while (true) {
 
@@ -91,18 +97,24 @@ int main (int argc, char *argv[])
             double psi = telemetry_data[11];
             double cp = cos(psi);
             double sp = sin(psi);
-
-
             flowX = cp * dx + sp * dy;
             flowY = cp * dy - sp * dx;
-            //flowX = dx;
-            //flowY = dy;
 
             // Simulate receiver
             receiverThrottle = telemetry_data[13];
             receiverRoll = telemetry_data[14];
             receiverPitch = telemetry_data[15];
             receiverYaw = telemetry_data[16];
+
+            // Get current time, starting with 0
+            struct timeval tv = {};
+            gettimeofday(&tv, NULL);
+            double curr_time = (double)(tv.tv_sec + tv.tv_usec/1e6);
+            if (start_time == 0) {
+                start_time = curr_time;
+            }
+            time = curr_time - start_time;
+            printf("%f\n", time);
 
             udp_set_timeout(telemetry_server_socket, 100);
 

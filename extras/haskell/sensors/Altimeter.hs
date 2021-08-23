@@ -6,6 +6,7 @@
   MIT License
 --}
 
+{-# LANGUAGE RebindableSyntax #-}
 {-# LANGUAGE DataKinds        #-}
 
 module Altimeter
@@ -17,11 +18,11 @@ import Language.Copilot
 import VehicleState
 import Sensor
 
+time :: Stream Double
+time  = extern "time" Nothing
+
 altimeterZ :: Stream Double
 altimeterZ = extern "altimeterZ" Nothing
-
-altimeterDz :: Stream Double
-altimeterDz = extern "altimeterDz" Nothing
 
 altimeter :: Sensor
 
@@ -39,3 +40,10 @@ altimeter vehicleState =
                (dtheta vehicleState)
                (psi    vehicleState)
                (dpsi   vehicleState)
+
+  where
+
+    altimeterDz = (altimeterZ - altimeterZ') / 0.0002 -- (time - time')
+
+    altimeterZ' = [0] ++ altimeterZ
+    time' = [0] ++ time
