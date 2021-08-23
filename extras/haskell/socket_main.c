@@ -114,7 +114,6 @@ int main (int argc, char *argv[])
                 start_time = curr_time;
             }
             time = curr_time - start_time;
-            printf("%f\n", time);
 
             udp_set_timeout(telemetry_server_socket, 100);
 
