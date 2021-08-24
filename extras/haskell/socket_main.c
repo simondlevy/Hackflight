@@ -23,33 +23,33 @@ static const uint16_t MOTOR_PORT = 5000;
 static const uint16_t TELEMETRY_PORT = 5001;
 
 // Avaiable to Copilot
-double receiverThrottle = 0;
-double receiverRoll = 0;
-double receiverPitch = 0;
-double receiverYaw = 0;
+double copilot_receiverThrottle = 0;
+double copilot_receiverRoll = 0;
+double copilot_receiverPitch = 0;
+double copilot_receiverYaw = 0;
 
-double quaternionW = 0;
-double quaternionX = 0;
-double quaternionY = 0;
-double quaternionZ = 0;
+double copilot_quaternionW = 0;
+double copilot_quaternionX = 0;
+double copilot_quaternionY = 0;
+double copilot_quaternionZ = 0;
 
-double gyrometerX = 0;
-double gyrometerY = 0;
-double gyrometerZ = 0;
+double copilot_gyrometerX = 0;
+double copilot_gyrometerY = 0;
+double copilot_gyrometerZ = 0;
 
-double altimeterZ = 0;
-double altimeterDz = 0;
+double copilot_altimeterZ = 0;
+double copilot_altimeterDz = 0;
 
-double flowX = 0;
-double flowY = 0;
+double copilot_flowX = 0;
+double copilot_flowY = 0;
 
-double time = 0;
+double copilot_time = 0;
 
 // Shared by main() and runMotors()
 static udp_socket_t motor_client_socket; 
 
 // Called by Copilot
-void runMotors(double m1, double m2, double m3, double m4)
+void copilot_runMotors(double m1, double m2, double m3, double m4)
 {
     double values[4] = {m1, m2, m3, m4};
     printf("%3.3f\n", m1);
@@ -58,15 +58,15 @@ void runMotors(double m1, double m2, double m3, double m4)
 
 static void simulateAltimeter(double * telemetry_data)
 {
-    altimeterZ = telemetry_data[5];
-    altimeterDz = telemetry_data[6];
+    copilot_altimeterZ = telemetry_data[5];
+    copilot_altimeterDz = telemetry_data[6];
 }
 
 static void simulateGyrometer(double * telemetry_data)
 {
-    gyrometerX = telemetry_data[8];
-    gyrometerY = telemetry_data[10];
-    gyrometerZ = telemetry_data[12];
+    copilot_gyrometerX = telemetry_data[8];
+    copilot_gyrometerY = telemetry_data[10];
+    copilot_gyrometerZ = telemetry_data[12];
 }
 
 static void simulateQuaternion(double * telemetry_data)
@@ -84,10 +84,10 @@ static void simulateQuaternion(double * telemetry_data)
     float sps = sin(psi/2);
 
     // Conversion
-    quaternionW = cph * cth * cps + sph * sth * sps;
-    quaternionX = cph * sth * sps - sph * cth * cps;
-    quaternionY = -cph * sth * cps - sph * cth * sps;
-    quaternionZ = cph * cth * sps - sph * sth * cps;
+    copilot_quaternionW = cph * cth * cps + sph * sth * sps;
+    copilot_quaternionX = cph * sth * sps - sph * cth * cps;
+    copilot_quaternionY = -cph * sth * cps - sph * cth * sps;
+    copilot_quaternionZ = cph * cth * sps - sph * sth * cps;
 }
 
 static void simulateOpticalFlow(double * telemetry_data)
@@ -99,16 +99,16 @@ static void simulateOpticalFlow(double * telemetry_data)
     double psi = telemetry_data[11];
     double cp = cos(psi);
     double sp = sin(psi);
-    flowX = cp * dx + sp * dy;
-    flowY = cp * dy - sp * dx;
+    copilot_flowX = cp * dx + sp * dy;
+    copilot_flowY = cp * dy - sp * dx;
 }
 
 static void simulateReceiver(double * telemetry_data)
 {
-    receiverThrottle = telemetry_data[13];
-    receiverRoll = telemetry_data[14];
-    receiverPitch = telemetry_data[15];
-    receiverYaw = telemetry_data[16];
+    copilot_receiverThrottle = telemetry_data[13];
+    copilot_receiverRoll = telemetry_data[14];
+    copilot_receiverPitch = telemetry_data[15];
+    copilot_receiverYaw = telemetry_data[16];
 }
 
 static void simulateTime()
@@ -120,7 +120,7 @@ static void simulateTime()
     if (start_time == 0) {
         start_time = curr_time;
     }
-    time = curr_time - start_time;
+    copilot_time = curr_time - start_time;
 }
 
 int main (int argc, char *argv[])
