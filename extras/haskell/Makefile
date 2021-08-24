@@ -26,6 +26,8 @@ HSRC = Main.hs \
 
 RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
+SIM = /mnt/d/Users/levys/Documents/Unreal\ Projects/MulticopterSim/Source/Copilot
+
 all: main
 
 main: socket_main.o udp_sockets.o hackflight.o
@@ -57,3 +59,7 @@ run: main
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
+
+copy: hackflight.c hackflight.h
+	cp hackflight.c $(SIM)
+	cp hackflight.h $(SIM)
