@@ -30,16 +30,16 @@ atan2' y x =
   else 0 -- undefined
 
 quaternionW :: Stream Double
-quaternionW = extern "quaternionW" Nothing
+quaternionW = extern "copilot_quaternionW" Nothing
 
 quaternionX :: Stream Double
-quaternionX = extern "quaternionX" Nothing
+quaternionX = extern "copilot_quaternionX" Nothing
 
 quaternionY :: Stream Double
-quaternionY = extern "quaternionY" Nothing
+quaternionY = extern "copilot_quaternionY" Nothing
 
 quaternionZ :: Stream Double
-quaternionZ = extern "quaternionZ" Nothing
+quaternionZ = extern "copilot_quaternionZ" Nothing
 
 quaternion :: Sensor
 

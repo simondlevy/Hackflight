@@ -19,10 +19,10 @@ import VehicleState
 import Sensor
 
 time :: Stream Double
-time  = extern "time" Nothing
+time  = extern "copilot_time" Nothing
 
 altimeterZ :: Stream Double
-altimeterZ = extern "altimeterZ" Nothing
+altimeterZ = extern "copilot_altimeterZ" Nothing
 
 altimeter :: Sensor
 

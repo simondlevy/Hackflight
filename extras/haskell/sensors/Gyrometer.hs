@@ -18,13 +18,13 @@ import VehicleState
 import Sensor
 
 gyrometerX :: Stream Double
-gyrometerX = extern "gyrometerX" Nothing
+gyrometerX = extern "copilot_gyrometerX" Nothing
 
 gyrometerY :: Stream Double
-gyrometerY = extern "gyrometerY" Nothing
+gyrometerY = extern "copilot_gyrometerY" Nothing
 
 gyrometerZ :: Stream Double
-gyrometerZ = extern "gyrometerZ" Nothing
+gyrometerZ = extern "copilot_gyrometerZ" Nothing
 
 gyrometer :: Sensor
 

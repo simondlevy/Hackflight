@@ -13,13 +13,13 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 receiverThrottle :: Stream Double
-receiverThrottle  = extern "receiverThrottle" Nothing
+receiverThrottle  = extern "copilot_receiverThrottle" Nothing
 
 receiverRoll :: Stream Double
-receiverRoll  = extern "receiverRoll" Nothing
+receiverRoll  = extern "copilot_receiverRoll" Nothing
 
 receiverPitch :: Stream Double
-receiverPitch  = extern "receiverPitch" Nothing
+receiverPitch  = extern "copilot_receiverPitch" Nothing
 
 receiverYaw :: Stream Double
-receiverYaw  = extern "receiverYaw" Nothing
+receiverYaw  = extern "copilot_receiverYaw" Nothing
