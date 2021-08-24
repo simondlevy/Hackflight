@@ -26,7 +26,7 @@ HSRC = Main.hs \
 
 RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
-SIM = /mnt/d/Users/levys/Documents/Unreal\ Projects/MulticopterSim/Source/Copilot
+SIM = /mnt/d/Users/levys/Documents/Unreal\ Projects/MulticopterSim/Source/CopilotModule
 
 all: main
 
