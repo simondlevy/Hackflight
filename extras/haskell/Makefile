@@ -44,12 +44,15 @@ hackflight.o: hackflight.c hackflight.h
 
 hackflight.c: $(HSRC)
 	$(RUNH)
+	tail -n +8 hackflight.c > tmp.c
+	cat header.c tmp.c > hackflight.c
+	rm tmp.c
 	
 hackflight.h: $(HSRC)
 	$(RUNH)
 
 clean:
-	rm -f main *.o hackflight.c hackflight.h *~
+	rm -f main *.o tmp.c hackflight.c hackflight.h *~
 
 edit:
 	vim socket_main.c
