@@ -62,7 +62,7 @@ spec = do
                                   0.2  -- stickDeadband
 
   -- let pidControllers = [rate, yaw, level, altHold]
-  let pidControllers = [rate, yaw, altHold]
+  let pidControllers = [rate, yaw, level, altHold]
 
   let mixer = QuadXAPMixer
 
@@ -78,7 +78,7 @@ spec = do
   trigger "copilot_runMotors" true [arg m1, arg m2, arg m3, arg m4]
 
   -- trigger "copilot_debugFlow" true [arg (dx vehicleState), arg (dy vehicleState)]
-  trigger "copilot_debugFlow" true [arg (psi vehicleState)]
+  -- trigger "copilot_debug" true [arg (psi vehicleState)]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
