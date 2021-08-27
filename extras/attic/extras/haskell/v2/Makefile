@@ -62,7 +62,3 @@ run: main
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
-
-copy: hackflight.c hackflight.h
-	cp hackflight.c $(SIM)/hackflight.cpp
-	cp hackflight.h $(SIM)

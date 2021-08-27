@@ -28,19 +28,7 @@ RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
 SIM = /mnt/d/Users/levys/Documents/Unreal\ Projects/MulticopterSim/Source/CopilotModule
 
-all: main
-
-main: socket_main.o udp_sockets.o hackflight.o
-	gcc -o main socket_main.o udp_sockets.o hackflight.o -lm
-
-socket_main.o: socket_main.c udp_sockets.h hackflight.h
-	gcc -Wall -std=c99 -c socket_main.c
-
-udp_sockets.o: udp_sockets.c udp_sockets.h
-	gcc -Wall -std=c99 -c udp_sockets.c
-
-hackflight.o: hackflight.c hackflight.h
-	gcc -Wall -std=c99 -c hackflight.c
+all: hackflight.h hackflight.c
 
 hackflight.c: $(HSRC)
 	$(RUNH)
@@ -52,13 +40,7 @@ hackflight.h: $(HSRC)
 	$(RUNH)
 
 clean:
-	rm -f main *.o tmp.c hackflight.c hackflight.h *~
-
-edit:
-	vim socket_main.c
-
-run: main
-	./main
+	rm -f tmp.c hackflight.c hackflight.h *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
