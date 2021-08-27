@@ -18,10 +18,10 @@ import VehicleState
 import Sensor
 
 flowX :: Stream Float
-flowX = extern "flowX" Nothing
+flowX = extern "copilot_flowX" Nothing
 
 flowY :: Stream Float
-flowY = extern "flowY" Nothing
+flowY = extern "copilot_flowY" Nothing
 
 opticalFlow :: Sensor
 

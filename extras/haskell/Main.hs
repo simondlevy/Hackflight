@@ -20,6 +20,7 @@ import Mixer
 import Gyrometer
 import Quaternion
 import Altimeter
+import OpticalFlow
 
 -- PID controllers
 import RatePid
@@ -29,10 +30,17 @@ import AltHoldPid
 
 import Hackflight
 
+import VehicleState
+
+flowX :: Stream Float
+flowX = extern "copilot_flowX" Nothing
+
+flowY :: Stream Float
+flowY = extern "copilot_flowY" Nothing
+
 spec = do
 
-  -- let sensors = [gyrometer, quaternion, altimeter]
-  let sensors = [gyrometer, quaternion, altimeter]
+  let sensors = [gyrometer, quaternion, altimeter, opticalFlow]
 
   let rate = rateController 0.225    -- Kp
                             0.001875 -- Ki
@@ -54,11 +62,11 @@ spec = do
                                   0.2  -- stickDeadband
 
   -- let pidControllers = [rate, yaw, level, altHold]
-  let pidControllers = [rate, yaw, level, altHold]
+  let pidControllers = [rate, yaw, altHold]
 
   let mixer = QuadXAPMixer
 
-  let demands = hackflight sensors pidControllers
+  let (vehicleState, demands) = hackflight sensors pidControllers
 
   -- Use the mixer to convert the demands into motor values
   let m1 = getMotor1 mixer demands
@@ -68,6 +76,9 @@ spec = do
 
   -- Send the motor values to the external C function
   trigger "copilot_runMotors" true [arg m1, arg m2, arg m3, arg m4]
+
+  -- trigger "copilot_debugFlow" true [arg (dx vehicleState), arg (dy vehicleState)]
+  trigger "copilot_debugFlow" true [arg (psi vehicleState)]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

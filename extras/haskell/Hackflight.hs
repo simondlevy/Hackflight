@@ -9,13 +9,13 @@
 module Hackflight where
 
 import Receiver
-import VehicleState(zeroVehicleState)
+import VehicleState
 import Sensor
 import PidController
 import Demands
 import Utils(compose)
 
-hackflight :: [Sensor] -> [PidController] -> Demands
+hackflight :: [Sensor] -> [PidController] -> (VehicleState, Demands)
 
 hackflight sensors pidControllers = 
 
@@ -37,4 +37,4 @@ hackflight sensors pidControllers =
         -- Sum over the list of demands to get the final demands
         newDemands = foldr addDemands receiverDemands (map pidDemands pidControllers'')
 
-    in newDemands
+    in (vehicleState, newDemands)
