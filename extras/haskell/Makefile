@@ -32,9 +32,6 @@ all: hackflight.h hackflight.c
 
 hackflight.c: $(HSRC)
 	$(RUNH)
-	tail -n +8 hackflight.c > tmp.c
-	cat header.c tmp.c > hackflight.c
-	rm tmp.c
 	
 hackflight.h: $(HSRC)
 	$(RUNH)
@@ -45,6 +42,11 @@ clean:
 commit:
 	git commit -a -m="More Haskell Copilot work"
 
-copy: hackflight.c hackflight.h
+copy: hackflight.cpp hackflight.h
 	cp hackflight.c $(SIM)/hackflight.cpp
 	cp hackflight.h $(SIM)
+
+hackflight.cpp: hackflight.c
+	tail -n +8 hackflight.c > tmp.c
+	cat header.c tmp.c > hackflight.c
+	rm tmp.c
