@@ -23,8 +23,6 @@ time  = extern "copilot_time" Nothing
 
 altimeterZ :: Stream Double
 altimeterZ = extern "copilot_altimeterZ" Nothing
-altimeterDz :: Stream Double
-altimeterDz = extern "copilot_altimeterDz" Nothing
 
 
 altimeter :: Sensor
@@ -36,10 +34,15 @@ altimeter vehicleState =
                (y      vehicleState)
                (dy     vehicleState)
                ((z     vehicleState) + altimeterZ)
-               ((dz    vehicleState) + altimeterDz)
+               ((dz    vehicleState) + ((altimeterZ - z') / (time - time')))
                (phi    vehicleState)
                (dphi   vehicleState)
                (theta  vehicleState)
                (dtheta vehicleState)
                (psi    vehicleState)
                (dpsi   vehicleState)
+
+  where 
+    
+    z' = [0] ++ altimeterZ
+    time' = [0] ++ time
