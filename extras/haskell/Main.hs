@@ -32,12 +32,6 @@ import Hackflight
 
 import VehicleState
 
-flowX :: Stream Float
-flowX = extern "copilot_flowX" Nothing
-
-flowY :: Stream Float
-flowY = extern "copilot_flowY" Nothing
-
 spec = do
 
   let sensors = [gyrometer, quaternion, altimeter, opticalFlow]
@@ -62,7 +56,7 @@ spec = do
                                   0.2  -- stickDeadband
 
   -- let pidControllers = [rate, yaw, level, altHold]
-  let pidControllers = [rate, yaw, level, altHold]
+  let pidControllers = [rate, yaw, altHold]
 
   let mixer = QuadXAPMixer
 
@@ -77,7 +71,7 @@ spec = do
   -- Send the motor values to the external C function
   trigger "copilot_runMotors" true [arg m1, arg m2, arg m3, arg m4]
 
-  trigger "copilot_debug" true [arg (psi vehicleState)]
+  trigger "copilot_debug" true [arg (phi vehicleState)]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

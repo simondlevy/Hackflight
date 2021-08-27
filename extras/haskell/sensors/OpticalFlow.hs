@@ -49,5 +49,6 @@ opticalFlow vehicleState =
     cp = cos psi'
     sp = sin psi'
 
-    dx' = flowX * cp - flowY * sp;
+    -- dx' = flowX * cp - flowY * sp;
+    dx' = psi'
     dy' = flowX * sp + flowY * cp;

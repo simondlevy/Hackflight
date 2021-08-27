@@ -32,9 +32,9 @@ zeroVehicleState :: VehicleState
 zeroVehicleState = VehicleState 0 0 0 0 0 0 0 0 0 0 0 0
 
 
-addStates :: VehicleState -> VehicleState -> VehicleState
+addVehicleStates :: VehicleState -> VehicleState -> VehicleState
 
-addStates v1 v2 = 
+addVehicleStates v1 v2 = 
     VehicleState ((x v1)      + (x v2))
                  ((dx v1)     + (dx v2))
                  ((y v1)      + (y v2))
