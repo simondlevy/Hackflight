@@ -19,14 +19,14 @@ import Prelude hiding ((>), (<), (&&), div)
 compose :: Foldable t => t (b -> b) -> b -> b
 compose = foldr (.) id
 
-constrain_abs :: Stream Double -> Stream Double -> Stream Double
+constrain_abs :: Stream Float -> Stream Float -> Stream Float
 constrain_abs v lim = if v < (-lim) then (-lim) else (if v > lim then lim else v)
 
-in_band :: Stream Double -> Stream Double -> Stream Bool
+in_band :: Stream Float -> Stream Float -> Stream Bool
 in_band value band = value > (-band) && value < band
 
-deg2rad :: Stream Double -> Stream Double
+deg2rad :: Stream Float -> Stream Float
 deg2rad d = d * pi / 180
 
-constrain :: Stream Double -> Stream Double
+constrain :: Stream Float -> Stream Float
 constrain x = if x < 0 then 0 else if x > 1 then 1 else x

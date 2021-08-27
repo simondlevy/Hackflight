@@ -19,12 +19,12 @@ import PidController
 import Demands
 import Utils(constrain_abs)
 
-yawController :: Stream Double -> Stream Double -> Stream Double -> PidController
+yawController :: Stream Float -> Stream Float -> Stream Float -> PidController
 
 yawController kp ki windupMax = makePidController (yawFun kp ki windupMax)
 
 
-yawFun :: Stream Double -> Stream Double -> Stream Double -> PidFun
+yawFun :: Stream Float -> Stream Float -> Stream Float -> PidFun
 
 yawFun kp ki windupMax vehicleState demands =
 

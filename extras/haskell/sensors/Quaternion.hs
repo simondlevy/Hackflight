@@ -20,7 +20,7 @@ import Sensor
 
 -- XXX eventually should be part of Copilot
 -- https://en.wikipedia.org/wiki/Atan2#Definition_and_computation
-atan2' :: Stream Double -> Stream Double -> Stream Double
+atan2' :: Stream Float -> Stream Float -> Stream Float
 atan2' y x = 
   if x > 0 then atan (y/x)
   else if x < 0 && y >= 0 then atan(y/x) + pi
@@ -29,16 +29,16 @@ atan2' y x =
   else if x == 0 && y < 0 then (-pi) 
   else 0 -- undefined
 
-quaternionW :: Stream Double
+quaternionW :: Stream Float
 quaternionW = extern "copilot_quaternionW" Nothing
 
-quaternionX :: Stream Double
+quaternionX :: Stream Float
 quaternionX = extern "copilot_quaternionX" Nothing
 
-quaternionY :: Stream Double
+quaternionY :: Stream Float
 quaternionY = extern "copilot_quaternionY" Nothing
 
-quaternionZ :: Stream Double
+quaternionZ :: Stream Float
 quaternionZ = extern "copilot_quaternionZ" Nothing
 
 quaternion :: Sensor

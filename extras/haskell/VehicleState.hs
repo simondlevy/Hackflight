@@ -12,18 +12,18 @@ module VehicleState where
 
 import Language.Copilot
 
-data VehicleState = VehicleState {       x :: Stream Double
-                                  ,     dx :: Stream Double
-                                  ,      y :: Stream Double
-                                  ,     dy :: Stream Double
-                                  ,      z :: Stream Double
-                                  ,     dz :: Stream Double
-                                  ,    phi :: Stream Double
-                                  ,   dphi :: Stream Double
-                                  ,  theta :: Stream Double
-                                  , dtheta :: Stream Double
-                                  ,    psi :: Stream Double
-                                  ,   dpsi :: Stream Double
+data VehicleState = VehicleState {       x :: Stream Float
+                                  ,     dx :: Stream Float
+                                  ,      y :: Stream Float
+                                  ,     dy :: Stream Float
+                                  ,      z :: Stream Float
+                                  ,     dz :: Stream Float
+                                  ,    phi :: Stream Float
+                                  ,   dphi :: Stream Float
+                                  ,  theta :: Stream Float
+                                  , dtheta :: Stream Float
+                                  ,    psi :: Stream Float
+                                  ,   dpsi :: Stream Float
 
                                  } deriving (Show)
 

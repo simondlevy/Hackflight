@@ -17,13 +17,13 @@ import Language.Copilot
 import VehicleState
 import Sensor
 
-gyrometerX :: Stream Double
+gyrometerX :: Stream Float
 gyrometerX = extern "copilot_gyrometerX" Nothing
 
-gyrometerY :: Stream Double
+gyrometerY :: Stream Float
 gyrometerY = extern "copilot_gyrometerY" Nothing
 
-gyrometerZ :: Stream Double
+gyrometerZ :: Stream Float
 gyrometerZ = extern "copilot_gyrometerZ" Nothing
 
 gyrometer :: Sensor

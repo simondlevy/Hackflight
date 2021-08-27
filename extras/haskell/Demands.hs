@@ -10,10 +10,10 @@ module Demands where
 
 import Language.Copilot
 
-data Demands = Demands { throttle :: Stream Double
-                       , roll :: Stream Double  
-                       , pitch :: Stream Double  
-                       , yaw :: Stream Double  
+data Demands = Demands { throttle :: Stream Float
+                       , roll :: Stream Float  
+                       , pitch :: Stream Float  
+                       , yaw :: Stream Float  
                      } deriving (Show)
 
 

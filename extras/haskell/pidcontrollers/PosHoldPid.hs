@@ -19,12 +19,12 @@ import PidController
 import Demands
 import Utils(in_band)
 
-posHoldController :: Stream Double -> Stream Double -> PidController
+posHoldController :: Stream Float -> Stream Float -> PidController
 
 posHoldController kp stickDeadband = makePidController (posHoldFun kp stickDeadband)
 
 
-posHoldFun :: Stream Double -> Stream Double -> PidFun
+posHoldFun :: Stream Float -> Stream Float -> PidFun
 
 posHoldFun kp stickDeadband vehicleState demands =
 

@@ -17,10 +17,10 @@ import PidController
 import Demands
 import Utils(deg2rad)
 
-levelController :: Stream Double -> Stream Double -> PidController
+levelController :: Stream Float -> Stream Float -> PidController
 levelController kp maxAngleDegrees = makePidController (levelFun kp maxAngleDegrees)
 
-levelFun :: Stream Double -> Stream Double -> PidFun
+levelFun :: Stream Float -> Stream Float -> PidFun
 levelFun kp maxAngleDegrees vehicleState demands =
 
     -- Return updated demands and controller state

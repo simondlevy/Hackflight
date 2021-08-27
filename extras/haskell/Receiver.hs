@@ -12,14 +12,14 @@ module Receiver where
 import Language.Copilot
 import Copilot.Compile.C99
 
-receiverThrottle :: Stream Double
+receiverThrottle :: Stream Float
 receiverThrottle  = extern "copilot_receiverThrottle" Nothing
 
-receiverRoll :: Stream Double
+receiverRoll :: Stream Float
 receiverRoll  = extern "copilot_receiverRoll" Nothing
 
-receiverPitch :: Stream Double
+receiverPitch :: Stream Float
 receiverPitch  = extern "copilot_receiverPitch" Nothing
 
-receiverYaw :: Stream Double
+receiverYaw :: Stream Float
 receiverYaw  = extern "copilot_receiverYaw" Nothing

@@ -15,7 +15,7 @@ import Utils(constrain)
 
 data Mixer = QuadXAPMixer 
 
-type MixerFun = Mixer -> Demands -> Stream Double
+type MixerFun = Mixer -> Demands -> Stream Float
 
 getMotor1 :: MixerFun
 getMotor1 QuadXAPMixer demands = constrain (t - r - p + y)
@@ -33,5 +33,5 @@ getMotor4 :: MixerFun
 getMotor4 QuadXAPMixer demands = constrain (t - r + p - y)
   where (t, r, p, y) = getDemands demands
 
-getDemands :: Demands -> (Stream Double, Stream Double, Stream Double, Stream Double)
+getDemands :: Demands -> (Stream Float, Stream Float, Stream Float, Stream Float)
 getDemands demands = (throttle demands, roll demands, pitch demands, yaw demands)

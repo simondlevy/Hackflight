@@ -19,22 +19,22 @@ import PidController
 import Demands
 import Utils(constrain_abs)
 
-rateController :: Stream Double  -- kp
-               -> Stream Double  -- ki
-               -> Stream Double  -- kd
-               -> Stream Double  -- windup max
-               -> Stream Double  -- rate max
+rateController :: Stream Float  -- kp
+               -> Stream Float  -- ki
+               -> Stream Float  -- kd
+               -> Stream Float  -- windup max
+               -> Stream Float  -- rate max
                -> PidController
 
 rateController kp ki kd windupMax rateMax = 
     makePidController (rateFun kp ki kd windupMax rateMax)
 
 
-rateFun :: Stream Double
-        -> Stream Double
-        -> Stream Double
-        -> Stream Double
-        -> Stream Double
+rateFun :: Stream Float
+        -> Stream Float
+        -> Stream Float
+        -> Stream Float
+        -> Stream Float
         -> PidFun
 
 rateFun kp ki kd windupMax rateMax vehicleState demands =

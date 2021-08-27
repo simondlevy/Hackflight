@@ -20,22 +20,22 @@ import Demands
 import Utils(constrain_abs, in_band)
 
 
-altHoldController :: Stream Double
-                  -> Stream Double
-                  -> Stream Double
-                  -> Stream Double
-                  -> Stream Double 
+altHoldController :: Stream Float
+                  -> Stream Float
+                  -> Stream Float
+                  -> Stream Float
+                  -> Stream Float 
                   -> PidController
 
 altHoldController kp ki windupMax pilotVelZMax stickDeadband = 
     makePidController (altHoldFun kp ki windupMax pilotVelZMax stickDeadband)
 
 
-altHoldFun :: Stream Double
-           -> Stream Double
-           -> Stream Double
-           -> Stream Double
-           -> Stream Double
+altHoldFun :: Stream Float
+           -> Stream Float
+           -> Stream Float
+           -> Stream Float
+           -> Stream Float
            -> PidFun
 
 altHoldFun kp

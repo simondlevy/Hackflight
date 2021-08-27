@@ -17,10 +17,10 @@ import Language.Copilot
 import VehicleState
 import Sensor
 
-flowX :: Stream Double
+flowX :: Stream Float
 flowX = extern "flowX" Nothing
 
-flowY :: Stream Double
+flowY :: Stream Float
 flowY = extern "flowY" Nothing
 
 opticalFlow :: Sensor
