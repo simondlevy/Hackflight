@@ -42,19 +42,27 @@ float copilot_quaternionX = 0;
 float copilot_quaternionY = 0;
 float copilot_quaternionZ = 0;
 
+static void reportMotor(float value, uint8_t index)
+{
+    Serial.print("m");
+    Serial.print(index);
+    Serial.print(": ");
+    Serial.print(value);
+    Serial.print("    ");
+}
+
 // Called by Copilot
 void copilot_runMotors(float m1, float m2, float m3, float m4)
 {
+    reportMotor(m1, 1);
+    reportMotor(m2, 2);
+    reportMotor(m3, 3);
+    reportMotor(m4, 4);
+  
+    Serial.println();
 }
 
-void setup(void)
-{
-    Serial.begin(115200);
-
-    Serial1.begin(115200);
-}
-
-void loop(void)
+static void runReceiver(void)
 {
     static const uint8_t CHANNELS = 8;
 
@@ -73,6 +81,18 @@ void loop(void)
         copilot_receiverPitch = values[2];
         copilot_receiverYaw = values[3];
     }
+}
+
+void setup(void)
+{
+    Serial.begin(115200);
+
+    Serial1.begin(115200);
+}
+
+void loop(void)
+{
+    runReceiver();
 
     // Run Copilot code
     step();
