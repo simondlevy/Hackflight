@@ -25,7 +25,7 @@ HSRC = Main.hs Receiver.hs \
 
 RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
-DST = /mnt/d/Users/levys/Documents/Arduino/libraries/Hackflight/examples/CopilotFull/
+DST = /mnt/d/Users/levys/Documents/Arduino/libraries/Hackflight/examples/Copilot
 
 all: copilot.h copilot.c
 
@@ -43,7 +43,8 @@ commit:
 
 copy: copilot.cpp copilot.h
 	cp copilot.c $(DST)/copilot.cpp
-	cp copilot.h $(DST)/copilot.h
+	sed -i 's/extern/EXTERN/g' copilot.h
+	cat ../header.h copilot.h > $(DST)/copilot.h
 
 copilot.cpp: copilot.c
 	tail -n +8 copilot.c > tmp.c
