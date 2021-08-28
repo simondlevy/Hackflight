@@ -98,12 +98,8 @@ static void runReceiver(void)
     }
 }
 
-void setup(void)
+static void startImu(void)
 {
-    Serial.begin(115200);
-
-    Serial1.begin(115200);
-
     Wire.begin();
     delay(100);
     if (!usfs.begin()) {
@@ -111,6 +107,17 @@ void setup(void)
             Serial.println(usfs.getErrorString());
         }
     }
+}
+
+void setup(void)
+{
+    // Serial comms
+    Serial.begin(115200);
+
+    // DSMX receiver
+    Serial1.begin(115200);
+
+    startImu(); 
 }
 
 void loop(void)
