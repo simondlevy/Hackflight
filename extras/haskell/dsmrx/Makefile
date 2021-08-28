@@ -26,8 +26,8 @@ commit:
 	git commit -a -m="More Haskell Copilot work"
 
 copy: copilot_dsmrx.cpp copilot_dsmrx.h
-	cp copilot_dsmrx.c $(DST)/copilot_copilot_dsmrx.cpp
-	cp copilot_dsmrx.h $(DST)/copilot_copilot_dsmrx.h
+	cp copilot_dsmrx.c $(DST)/copilot_dsmrx.cpp
+	cp copilot_dsmrx.h $(DST)/copilot_dsmrx.h
 
 copilot_dsmrx.cpp: copilot_dsmrx.c
 	tail -n +8 copilot_dsmrx.c > tmp.c
