@@ -9,7 +9,7 @@
 module Hackflight where
 
 import Receiver
-import VehicleState
+import State
 import Sensor
 import PidController
 import Demands
@@ -29,10 +29,10 @@ hackflight sensors pidControllers =
                           pidControllers
 
         -- Get the vehicle state by running the sensors
-        vehicleState = compose sensors zeroVehicleState
+        state = compose sensors zeroState
 
         -- Map the PID update function to the pid controllers
-        pidControllers'' = map (pidUpdate vehicleState) pidControllers'
+        pidControllers'' = map (pidUpdate state) pidControllers'
 
         -- Sum over the list of demands to get the final demands
         newDemands = foldr addDemands receiverDemands (map pidDemands pidControllers'')

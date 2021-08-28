@@ -14,7 +14,7 @@ where
 
 import Language.Copilot
 
-import VehicleState(dx, dy, psi)
+import State(dx, dy, psi)
 import PidController
 import Demands
 import Utils(in_band)
@@ -26,7 +26,7 @@ posHoldController kp stickDeadband = makePidController (posHoldFun kp stickDeadb
 
 posHoldFun :: Stream Float -> Stream Float -> PidFun
 
-posHoldFun kp stickDeadband vehicleState demands =
+posHoldFun kp stickDeadband state demands =
 
   -- Demands 0 rollDemand pitchDemand 0
   Demands 0 rollDemand pitchDemand 0
@@ -36,11 +36,11 @@ posHoldFun kp stickDeadband vehicleState demands =
     compute demand error' = if in_band demand stickDeadband then (-kp) * error' else 0
 
     -- Rotate X, Y velocities into body frame
-    psi' = psi vehicleState
+    psi' = psi state
     cp = cos psi'
     sp = sin psi'
-    dx' = dx vehicleState
-    dy' = dy vehicleState
+    dx' = dx state
+    dy' = dy state
 
     rollDemand = compute (roll demands) (cp * dy' - sp * dx')
 

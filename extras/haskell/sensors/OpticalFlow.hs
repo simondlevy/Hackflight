@@ -14,7 +14,7 @@ where
 
 import Language.Copilot
 
-import VehicleState
+import State
 import Sensor
 
 flowX :: Stream Float
@@ -25,26 +25,26 @@ flowY = extern "copilot_flowY" Nothing
 
 opticalFlow :: Sensor
 
-opticalFlow vehicleState = 
+opticalFlow state = 
 
-  VehicleState (x      vehicleState)
-               ((dx    vehicleState) + dx')
-               (y      vehicleState)
-               ((dy    vehicleState) + dy')
-               (z      vehicleState) 
-               (dz     vehicleState) 
-               (phi    vehicleState)
-               (dphi   vehicleState)
-               (theta  vehicleState)
-               (dtheta vehicleState)
-               (psi    vehicleState) 
-               (dpsi   vehicleState)
+  State (x      state)
+               ((dx    state) + dx')
+               (y      state)
+               ((dy    state) + dy')
+               (z      state) 
+               (dz     state) 
+               (phi    state)
+               (dphi   state)
+               (theta  state)
+               (dtheta state)
+               (psi    state) 
+               (dpsi   state)
 
   where
 
     -- Rotate flow velocity from body frame to earth frame
     
-    psi' = psi vehicleState
+    psi' = psi state
 
     cp = cos psi'
     sp = sin psi'

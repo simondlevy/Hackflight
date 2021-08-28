@@ -12,7 +12,7 @@ where
 
 import Language.Copilot
 
-import VehicleState(phi, theta)
+import State(phi, theta)
 import PidController
 import Demands
 import Utils(deg2rad)
@@ -21,7 +21,7 @@ levelController :: Stream Float -> Stream Float -> PidController
 levelController kp maxAngleDegrees = makePidController (levelFun kp maxAngleDegrees)
 
 levelFun :: Stream Float -> Stream Float -> PidFun
-levelFun kp maxAngleDegrees vehicleState demands =
+levelFun kp maxAngleDegrees state demands =
 
     -- Return updated demands and controller state
     Demands 0 rollDemand pitchDemand 0
@@ -32,8 +32,8 @@ levelFun kp maxAngleDegrees vehicleState demands =
       -- angle for error computation, we multiply by the following amount:
       demandScale = 2 * (deg2rad maxAngleDegrees)
 
-      rollDemand = ((kp * demandScale * (roll demands)) - (phi vehicleState))
+      rollDemand = ((kp * demandScale * (roll demands)) - (phi state))
 
       -- Pitch demand is nose-down positive, so we negate pitch-forward
       -- vehicle state (nose-down negative) to reconcile them
-      pitchDemand = ((kp * demandScale * (pitch demands)) + (theta vehicleState))
+      pitchDemand = ((kp * demandScale * (pitch demands)) + (theta state))

@@ -14,7 +14,7 @@ where
 
 import Language.Copilot
 
-import VehicleState
+import State
 import Sensor
 
 gyrometerX :: Stream Float
@@ -28,17 +28,17 @@ gyrometerZ = extern "copilot_gyrometerZ" Nothing
 
 gyrometer :: Sensor
 
-gyrometer vehicleState = 
+gyrometer state = 
 
-  VehicleState (x       vehicleState)
-               (dx      vehicleState)
-               (y       vehicleState)
-               (dy      vehicleState)
-               (z       vehicleState) 
-               (dz      vehicleState) 
-               (phi     vehicleState)
-               ((dphi   vehicleState) + gyrometerX)
-               (theta   vehicleState)
-               ((dtheta vehicleState) + gyrometerY)
-               (psi     vehicleState)
-               ((dpsi   vehicleState) + gyrometerZ)
+  State (x       state)
+               (dx      state)
+               (y       state)
+               (dy      state)
+               (z       state) 
+               (dz      state) 
+               (phi     state)
+               ((dphi   state) + gyrometerX)
+               (theta   state)
+               ((dtheta state) + gyrometerY)
+               (psi     state)
+               ((dpsi   state) + gyrometerZ)

@@ -15,7 +15,7 @@ where
 import Language.Copilot
 
 import PidController
-import VehicleState
+import State
 import Demands
 import Utils(constrain_abs, in_band)
 
@@ -43,7 +43,7 @@ altHoldFun kp
            windupMax
            pilotVelZMax
            stickDeadband
-           vehicleState
+           state
            demands =
 
     Demands (error' * kp + errorIntegral * ki ) 0 0 0
@@ -51,7 +51,7 @@ altHoldFun kp
     where
 
        -- NED => ENU
-       altitude = -(z vehicleState)
+       altitude = -(z state)
 
        throttleDemand = throttle demands
 
@@ -69,7 +69,7 @@ altHoldFun kp
 
        -- Compute error as altTarget velocity minus actual velocity, after
        -- negating actual to accommodate NED
-       error' = targetVelocity + (dz vehicleState)
+       error' = targetVelocity + (dz state)
 
        -- Accumualte error integral
        errorIntegral = constrain_abs (errorIntegralState + error') windupMax

@@ -19,24 +19,25 @@ import Mixer
 -- Sensors
 import Gyrometer
 import Quaternion
-import Altimeter
-import OpticalFlow
+-- import Altimeter
+-- import OpticalFlow
 
 -- PID controllers
 import RatePid
 import YawPid
 import LevelPid
-import AltHoldPid
-import PosHoldPid
+-- import AltHoldPid
+-- import PosHoldPid
 
 import Hackflight
 
-import VehicleState
+import State
 
 spec = do
 
   -- These sensors will be run right-to-left via composition
-  let sensors = [opticalFlow, gyrometer, quaternion, altimeter]
+  -- let sensors = [opticalFlow, gyrometer, quaternion, altimeter]
+  let sensors = [gyrometer, quaternion]
 
   let rate = rateController 0.225    -- Kp
                             0.001875 -- Ki
@@ -51,6 +52,7 @@ spec = do
   let level = levelController 0.2 -- Kp
                               45  -- maxAngleDegrees
 
+  {--
   let altHold = altHoldController 0.75 -- Kp
                                   1.5  -- Ki
                                   0.4  -- windupMax
@@ -59,9 +61,11 @@ spec = do
 
   let posHold = posHoldController 0.1 -- Kp
                                   0.2 -- stickDeadband
+  --}
 
   -- Pos-hold goes first so that it can access roll/pitch demands from receiver
-  let pidControllers = [posHold, rate, yaw, level, altHold]
+  -- let pidControllers = [posHold, rate, yaw, level, altHold]
+  let pidControllers = [rate, yaw, level]
 
   let mixer = QuadXAPMixer
 

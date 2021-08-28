@@ -15,7 +15,7 @@ where
 
 import Language.Copilot
 
-import VehicleState
+import State
 import Sensor
 
 time :: Stream Float
@@ -27,20 +27,20 @@ altimeterZ = extern "copilot_altimeterZ" Nothing
 
 altimeter :: Sensor
 
-altimeter vehicleState =
+altimeter state =
 
-  VehicleState (x      vehicleState)
-               (dx     vehicleState)
-               (y      vehicleState)
-               (dy     vehicleState)
-               ((z     vehicleState) + altimeterZ)
-               ((dz    vehicleState) + ((altimeterZ - z') / (time - time')))
-               (phi    vehicleState)
-               (dphi   vehicleState)
-               (theta  vehicleState)
-               (dtheta vehicleState)
-               (psi    vehicleState)
-               (dpsi   vehicleState)
+  State (x      state)
+               (dx     state)
+               (y      state)
+               (dy     state)
+               ((z     state) + altimeterZ)
+               ((dz    state) + ((altimeterZ - z') / (time - time')))
+               (phi    state)
+               (dphi   state)
+               (theta  state)
+               (dtheta state)
+               (psi    state)
+               (dpsi   state)
 
   where 
     

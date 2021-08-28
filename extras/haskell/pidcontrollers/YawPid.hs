@@ -14,7 +14,7 @@ where
 
 import Language.Copilot
 
-import VehicleState(dpsi)
+import State(dpsi)
 import PidController
 import Demands
 import Utils(constrain_abs)
@@ -26,13 +26,13 @@ yawController kp ki windupMax = makePidController (yawFun kp ki windupMax)
 
 yawFun :: Stream Float -> Stream Float -> Stream Float -> PidFun
 
-yawFun kp ki windupMax vehicleState demands =
+yawFun kp ki windupMax state demands =
 
     Demands 0 0 0 (kp * error' + ki * errorIntegral)
 
     where 
 
-      error' = (yaw demands) - (dpsi vehicleState)
+      error' = (yaw demands) - (dpsi state)
 
       -- Accumualte error integral
       errorIntegral = constrain_abs (errorIntegralState + error') windupMax

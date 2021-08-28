@@ -15,7 +15,7 @@ where
 
 import Language.Copilot
 
-import VehicleState
+import State
 import Sensor
 
 -- XXX eventually should be part of Copilot
@@ -43,20 +43,20 @@ quaternionZ = extern "copilot_quaternionZ" Nothing
 
 quaternion :: Sensor
 
-quaternion vehicleState  =
+quaternion state  =
 
-  VehicleState (x      vehicleState)
-               (dx     vehicleState)
-               (y      vehicleState)
-               (dy     vehicleState)
-               (z      vehicleState) 
-               (dz     vehicleState) 
-               ((phi   vehicleState) + phi')
-               (dphi   vehicleState) 
-               ((theta vehicleState) + theta')
-               (dtheta vehicleState)
-               ((psi   vehicleState) + psi')
-               (dpsi   vehicleState)
+  State (x      state)
+               (dx     state)
+               (y      state)
+               (dy     state)
+               (z      state) 
+               (dz     state) 
+               ((phi   state) + phi')
+               (dphi   state) 
+               ((theta state) + theta')
+               (dtheta state)
+               ((psi   state) + psi')
+               (dpsi   state)
 
   where 
 

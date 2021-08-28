@@ -13,10 +13,10 @@ where
 
 import Language.Copilot
 
-import VehicleState
+import State
 import Demands
 
-type PidFun = VehicleState -> Demands -> Demands
+type PidFun = State -> Demands -> Demands
 
 data PidController = PidController { pidFun :: PidFun, pidDemands :: Demands }
 
@@ -24,12 +24,12 @@ makePidController :: PidFun -> PidController
 
 makePidController pidFun' = PidController pidFun' (Demands 0 0 0 0)
 
-pidUpdate :: VehicleState -> PidController -> PidController
+pidUpdate :: State -> PidController -> PidController
 
-pidUpdate vehicleState pidController = 
+pidUpdate state pidController = 
 
     let pidFun' = pidFun pidController
 
-        demands' = pidFun' vehicleState (pidDemands pidController)
+        demands' = pidFun' state (pidDemands pidController)
 
     in PidController pidFun' demands'

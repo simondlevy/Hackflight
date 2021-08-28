@@ -9,7 +9,7 @@ HSRC = Main.hs \
 	   Hackflight.hs \
 	   Receiver.hs \
 	   Demands.hs \
-	   VehicleState.hs \
+	   State.hs \
 	   Sensor.hs \
 	   Utils.hs \
 	   Mixer.hs \

@@ -12,6 +12,6 @@ where
 
 import Language.Copilot
 
-import VehicleState
+import State
 
-type Sensor = VehicleState -> VehicleState
+type Sensor = State -> State

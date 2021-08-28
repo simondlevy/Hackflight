@@ -14,7 +14,7 @@ where
 
 import Language.Copilot
 
-import VehicleState(dphi, dtheta)
+import State(dphi, dtheta)
 import PidController
 import Demands
 import Utils(constrain_abs)
@@ -37,7 +37,7 @@ rateFun :: Stream Float
         -> Stream Float
         -> PidFun
 
-rateFun kp ki kd windupMax rateMax vehicleState demands =
+rateFun kp ki kd windupMax rateMax state demands =
 
     let
 
@@ -69,7 +69,7 @@ rateFun kp ki kd windupMax rateMax vehicleState demands =
 
         (rollDemand, rollError, rollErrorIntegral, rollErrorDelta, rollErrorDelta1) =
             computeDemand (roll demands)
-                          (dphi vehicleState)
+                          (dphi state)
                           rollErrorIntegralState
                           rollErrorDelta1State
                           rollErrorDelta2State
@@ -79,7 +79,7 @@ rateFun kp ki kd windupMax rateMax vehicleState demands =
          -- (nose-down negative) to reconcile them
         (pitchDemand, pitchError, pitchErrorIntegral, pitchErrorDelta, pitchErrorDelta1) =
             computeDemand (pitch demands)
-                          (-(dtheta vehicleState))
+                          (-(dtheta state))
                           pitchErrorIntegralState
                           pitchErrorDelta1State
                           pitchErrorDelta2State
