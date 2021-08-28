@@ -6,9 +6,11 @@
    MIT License
 */
 
-#include "copilot_hackflight.h"
+#include "copilot.h"
 
 #include <DSMRX.h>
+
+static DSM2048 receiver;
 
 // Used by Copilot ---------------------------------
 
@@ -41,6 +43,8 @@ void copilot_runMotors(float m1, float m2, float m3, float m4)
 void setup(void)
 {
     Serial.begin(115200);
+
+    Serial1.begin(115200);
 }
 
 void loop(void)
