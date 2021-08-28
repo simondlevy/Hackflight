@@ -52,4 +52,5 @@ void setup(void)
 
 void loop(void)
 {
+    step();
 }
