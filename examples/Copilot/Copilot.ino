@@ -8,10 +8,7 @@
 
 #include "copilot_hackflight.h"
 
-// XXX eventually most of this functionality should be in Haskell
-#include "HF_full.hpp"
-#include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
-
+#include <DSMRX.h>
 
 // Used by Copilot ---------------------------------
 
@@ -43,6 +40,7 @@ void copilot_runMotors(float m1, float m2, float m3, float m4)
 
 void setup(void)
 {
+    Serial.begin(115200);
 }
 
 void loop(void)
