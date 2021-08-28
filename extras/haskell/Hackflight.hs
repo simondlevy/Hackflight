@@ -13,6 +13,7 @@ import State
 import Sensor
 import PidController
 import Demands
+import Safety
 import Utils(compose)
 
 hackflight :: [Sensor] -> [PidController] -> Demands
