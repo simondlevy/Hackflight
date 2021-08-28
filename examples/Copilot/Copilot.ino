@@ -6,7 +6,12 @@
    MIT License
 */
 
-#include "hackflight.h"
+#include "copilot_hackflight.h"
+
+// XXX eventually most of this functionality should be in Haskell
+#include "HF_full.hpp"
+#include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
+
 
 // Used by Copilot ---------------------------------
 
@@ -31,19 +36,9 @@ float copilot_quaternionX = 0;
 float copilot_quaternionY = 0;
 float copilot_quaternionZ = 0;
 
-// Sent by Copilot to copilot_runMotors() -----------
-static float _m1;
-static float _m2;
-static float _m3;
-static float _m4;
-
 // Called by Copilot
 void copilot_runMotors(float m1, float m2, float m3, float m4)
 {
-    _m1 = m1;
-    _m2 = m2;
-    _m3 = m3;
-    _m4 = m4;
 }
 
 void setup(void)

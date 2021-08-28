@@ -43,8 +43,8 @@ commit:
 	git commit -a -m="More Haskell Copilot work"
 
 copy: hackflight.cpp hackflight.h
-	cp hackflight.c $(DST)/hackflight.cpp
-	cp hackflight.h $(DST)
+	cp hackflight.c $(DST)/copilot_hackflight.cpp
+	cp hackflight.h $(DST)/copilot_hackflight.h
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c
