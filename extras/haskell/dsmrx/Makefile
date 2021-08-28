@@ -5,7 +5,7 @@
 #
 # MIT License
 
-HSRC = Main.hs
+HSRC = Main.hs DsmxReceiver.hs
 
 RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
