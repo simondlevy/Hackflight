@@ -26,7 +26,11 @@ HSRC = Main.hs \
 
 RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
-SIM = /mnt/d/Users/levys/Documents/Unreal\ Projects/MulticopterSim/Source/CopilotModule
+TOP = /mnt/d/Users/levys
+
+SIM = $(TOP)/Documents/Unreal\ Projects/MulticopterSim/Source/CopilotModule
+
+ARDUINO = $(TOP)/Documents/Arduino/libraries/Hackflight/examples/Copilot
 
 all: hackflight.h hackflight.c
 
@@ -45,6 +49,8 @@ commit:
 copy: hackflight.cpp hackflight.h
 	cp hackflight.c $(SIM)/hackflight.cpp
 	cp hackflight.h $(SIM)
+	cp hackflight.c $(ARDUINO)/hackflight.cpp
+	cp hackflight.h $(ARDUINO)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c
