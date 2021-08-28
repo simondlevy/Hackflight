@@ -8,6 +8,21 @@
 
 #include "copilot.h"
 
+// IMU ---------------------------------------------
+
+#include <Wire.h>
+#include <USFS_Master.h>
+
+static const uint8_t  MAG_RATE       = 100;  // Hz
+static const uint16_t ACCEL_RATE     = 200;  // Hz
+static const uint16_t GYRO_RATE      = 200;  // Hz
+static const uint8_t  BARO_RATE      = 50;   // Hz
+static const uint8_t  Q_RATE_DIVISOR = 3;    // 1/3 gyro rate
+ 
+USFS_Master usfs = USFS_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
+
+// Receiver ----------------------------------------
+
 #include <DSMRX.h>
 
 static DSM2048 rx;
@@ -67,7 +82,7 @@ static void runReceiver(void)
     static const uint8_t CHANNELS = 8;
 
     if (rx.timedOut(micros())) {
-        Serial.println("*** TIMED OUT ***");
+        Serial.println("*** RECEIVER TIMED OUT ***");
     }
 
     else if (rx.gotNewFrame()) {
@@ -88,6 +103,14 @@ void setup(void)
     Serial.begin(115200);
 
     Serial1.begin(115200);
+
+    Wire.begin();
+    delay(100);
+    if (!usfs.begin()) {
+        while (true) {
+            Serial.println(usfs.getErrorString());
+        }
+    }
 }
 
 void loop(void)
