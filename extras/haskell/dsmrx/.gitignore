@@ -1,4 +1,3 @@
 main
-hackflight.c
-hackflight.h
-*.o
+*.c
+*.h

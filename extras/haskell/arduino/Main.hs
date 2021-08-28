@@ -64,4 +64,4 @@ spec = do
   trigger "copilot_runMotors" true [arg m1, arg m2, arg m3, arg m4]
 
 -- Compile the spec
-main = reify spec >>= compile "hackflight"
+main = reify spec >>= compile "copilot"

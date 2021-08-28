@@ -11,25 +11,25 @@ RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
 DST = /mnt/d/Users/levys/Documents/Arduino/libraries/Hackflight/examples/CopilotDsmrx/
 
-all: copilot_dsmrx.h copilot_dsmrx.c
+all: copilot.h copilot.c
 
-copilot_dsmrx.c: $(HSRC) Main.hs
+copilot.c: $(HSRC) Main.hs
 	$(RUNH)
 
-copilot_dsmrx.h: $(HSRC) Main.hs
+copilot.h: $(HSRC) Main.hs
 	$(RUNH)
 
 clean:
-	rm -f tmp.c *copilot_dsmrx.* *~
+	rm -f tmp.c *copilot.* *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
 
-copy: copilot_dsmrx.cpp copilot_dsmrx.h
-	cp copilot_dsmrx.c $(DST)/copilot_dsmrx.cpp
-	cp copilot_dsmrx.h $(DST)/copilot_dsmrx.h
+copy: copilot.cpp copilot.h
+	cp copilot.c $(DST)/copilot.cpp
+	cp copilot.h $(DST)/copilot.h
 
-copilot_dsmrx.cpp: copilot_dsmrx.c
-	tail -n +8 copilot_dsmrx.c > tmp.c
-	cat ../header.c tmp.c > copilot_dsmrx.c
+copilot.cpp: copilot.c
+	tail -n +8 copilot.c > tmp.c
+	cat ../header.c tmp.c > copilot.c
 	rm tmp.c

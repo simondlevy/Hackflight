@@ -21,4 +21,4 @@ spec = do
   trigger "copilot_reportReceiver" true []
 
 -- Compile the spec
-main = reify spec >>= compile "copilot_dsmrx"
+main = reify spec >>= compile "copilot"

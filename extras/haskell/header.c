@@ -1,4 +1,4 @@
-#include "copilot_hackflight.h"
+#include "copilot.h"
 
 #include <stdint.h>
 #include <stdbool.h>
