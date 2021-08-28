@@ -13,14 +13,7 @@ import VehicleState
 import Sensor
 import PidController
 import Demands
-
-getVehicleState ::  [Sensor] -> VehicleState -> VehicleState
-
-getVehicleState [] vehicleState = vehicleState 
-
-getVehicleState sensors vehicleState = 
-  addVehicleStates zeroVehicleState (getVehicleState (tail sensors) 
-                                                     ((head sensors) vehicleState))
+import Utils(compose)
 
 hackflight :: [Sensor] -> [PidController] -> (VehicleState, Demands)
 
@@ -36,7 +29,7 @@ hackflight sensors pidControllers =
                           pidControllers
 
         -- Get the vehicle state by running the sensors
-        vehicleState = getVehicleState sensors zeroVehicleState
+        vehicleState = compose sensors zeroVehicleState
 
         -- Map the PID update function to the pid controllers
         pidControllers'' = map (pidUpdate vehicleState) pidControllers'

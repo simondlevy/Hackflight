@@ -34,7 +34,8 @@ import VehicleState
 
 spec = do
 
-  let sensors = [gyrometer, quaternion, altimeter, opticalFlow]
+  -- These sensors will be run right-to-left via composition
+  let sensors = [opticalFlow, gyrometer, quaternion, altimeter]
 
   let rate = rateController 0.225    -- Kp
                             0.001875 -- Ki
@@ -71,7 +72,7 @@ spec = do
   -- Send the motor values to the external C function
   trigger "copilot_runMotors" true [arg m1, arg m2, arg m3, arg m4]
 
-  trigger "copilot_debug" true [arg (dx vehicleState)]
+  trigger "copilot_debug" true [arg (dy vehicleState)]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
