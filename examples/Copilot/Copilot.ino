@@ -22,9 +22,6 @@ bool copilot_receiverReady = true;
 bool copilot_receiverInArmedState = true;
 bool copilot_receiverInactive = false;
 
-float copilot_altimeterZ = 0;
-float copilot_altimeterDz = 0;
-
 float copilot_gyrometerX = 0;
 float copilot_gyrometerY = 0;
 float copilot_gyrometerZ = 0;
@@ -33,9 +30,6 @@ float copilot_quaternionW = 0;
 float copilot_quaternionX = 0;
 float copilot_quaternionY = 0;
 float copilot_quaternionZ = 0;
-
-float copilot_flowX = 0;
-float copilot_flowY = 0;
 
 // Sent by Copilot to copilot_runMotors() -----------
 static float _m1;
