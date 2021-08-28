@@ -10,7 +10,14 @@
 
 #include <DSMRX.h>
 
-static DSM2048 receiver;
+static DSM2048 rx;
+
+void serialEvent1(void)
+{
+    while (Serial1.available()) {
+        rx.handleSerialEvent(Serial1.read(), micros());
+    }
+}
 
 // Used by Copilot ---------------------------------
 
@@ -49,5 +56,24 @@ void setup(void)
 
 void loop(void)
 {
+    static const uint8_t CHANNELS = 8;
+
+    if (rx.timedOut(micros())) {
+        Serial.println("*** TIMED OUT ***");
+    }
+
+    else if (rx.gotNewFrame()) {
+
+        float values[CHANNELS];
+
+        rx.getChannelValuesNormalized(values, CHANNELS);
+
+        copilot_receiverThrottle = values[0];
+        copilot_receiverRoll = values[1];
+        copilot_receiverPitch = values[2];
+        copilot_receiverYaw = values[3];
+    }
+
+    // Run Copilot code
     step();
 }
