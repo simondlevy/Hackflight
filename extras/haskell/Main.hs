@@ -57,7 +57,7 @@ spec = do
                                   0.2  -- stickDeadband
 
   -- let pidControllers = [rate, yaw, level, altHold]
-  let pidControllers = [rate, yaw, altHold]
+  let pidControllers = [rate, yaw, level, altHold]
 
   let mixer = QuadXAPMixer
 
