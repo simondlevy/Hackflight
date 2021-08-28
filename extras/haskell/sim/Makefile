@@ -43,7 +43,8 @@ commit:
 
 copy: copilot.cpp copilot.h
 	cp copilot.c $(DST)/copilot.cpp
-	cp copilot.h $(DST)/copilot.h
+	sed -i 's/extern/EXTERN/g' copilot.h
+	cat ../header.h copilot.h > $(DST)/copilot.h
 
 copilot.cpp: copilot.c
 	tail -n +8 copilot.c > tmp.c

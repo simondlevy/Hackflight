@@ -1,3 +1,5 @@
+#define _EXTERN
+
 #include "copilot.h"
 
 #include <stdint.h>
