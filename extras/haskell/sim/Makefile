@@ -5,9 +5,8 @@
 #
 # MIT License
 
-HSRC = Main.hs \
+HSRC = Main.hs Receiver.hs \
        ../Hackflight.hs \
-	   ../Receiver.hs \
 	   ../Demands.hs \
 	   ../State.hs \
 	   ../Sensor.hs \
@@ -28,25 +27,25 @@ RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
 DST = /mnt/d/Users/levys/Documents/Unreal\ Projects/MulticopterSim/Source/CopilotModule
 
-all: hackflight.h hackflight.c
+all: copilot.h copilot.c
 
-hackflight.c: $(HSRC) Main.hs
+copilot.c: $(HSRC) Main.hs
 	$(RUNH)
 
-hackflight.h: $(HSRC) Main.hs
+copilot.h: $(HSRC) Main.hs
 	$(RUNH)
 
 clean:
-	rm -f tmp.c *hackflight.* *~
+	rm -f *.c *.h *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
 
-copy: hackflight.cpp hackflight.h
-	cp hackflight.c $(DST)/copilot_hackflight.cpp
-	cp hackflight.h $(DST)/copilot_hackflight.h
+copy: copilot.cpp copilot.h
+	cp copilot.c $(DST)/copilot.cpp
+	cp copilot.h $(DST)/copilot.h
 
-hackflight.cpp: hackflight.c
-	tail -n +8 hackflight.c > tmp.c
-	cat ../header.c tmp.c > hackflight.c
+copilot.cpp: copilot.c
+	tail -n +8 copilot.c > tmp.c
+	cat ../header.c tmp.c > copilot.c
 	rm tmp.c
