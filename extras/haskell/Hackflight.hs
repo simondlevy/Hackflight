@@ -19,9 +19,8 @@ getVehicleState ::  [Sensor] -> VehicleState -> VehicleState
 getVehicleState [] vehicleState = vehicleState 
 
 getVehicleState sensors vehicleState = 
-  addVehicleStates vehicleState' (getVehicleState (tail sensors) zeroVehicleState)
-  where
-    vehicleState' = (head sensors) vehicleState
+  addVehicleStates zeroVehicleState (getVehicleState (tail sensors) 
+                                                     ((head sensors) vehicleState))
 
 hackflight :: [Sensor] -> [PidController] -> (VehicleState, Demands)
 

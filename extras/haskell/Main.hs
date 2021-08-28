@@ -71,7 +71,7 @@ spec = do
   -- Send the motor values to the external C function
   trigger "copilot_runMotors" true [arg m1, arg m2, arg m3, arg m4]
 
-  trigger "copilot_debug" true [arg (phi vehicleState)]
+  trigger "copilot_debug" true [arg (dx vehicleState)]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
