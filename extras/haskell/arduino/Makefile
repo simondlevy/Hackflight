@@ -25,7 +25,10 @@ HSRC = Main.hs Receiver.hs \
 
 RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
-DST = /mnt/d/Users/levys/Documents/Arduino/libraries/Hackflight/examples/Copilot
+# TOP = /mnt/d/Users/levys
+TOP = $(HOME)
+
+DST = $(TOP)/Documents/Arduino/libraries/Hackflight/examples/Copilot
 
 all: copilot.h copilot.c
 
