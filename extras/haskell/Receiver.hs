@@ -53,39 +53,44 @@ makeReceiver channelMap demandScale =
   makeReceiverWithTrim channelMap (AxisTrim 0 0 0) demandScale
 
 getDemands :: Receiver -> Demands
-getDemands _receiver = Demands 0 0 0 0
+getDemands _receiver = 
+
+    let 
+      rawvals = (chan1, chan2, chan3, chan4, chan5, chan6, chan7, chan8)
+    in Demands 0 0 0 0
+
 
 receiverReady ::  Stream Bool
 receiverReady = receiverGotNewFrame
 
-receiverChannel1 :: Stream Float
-receiverChannel1  = extern "copilot_receiverChannel1" Nothing
+-- Externals -------------------------------------------------
 
-receiverChannel2 :: Stream Float
-receiverChannel2  = extern "copilot_receiverChannel2" Nothing
+chan1 :: Stream Float
+chan1  = extern "copilot_receiverChannel1" Nothing
 
-receiverChannel3 :: Stream Float
-receiverChannel3  = extern "copilot_receiverChannel3" Nothing
+chan2 :: Stream Float
+chan2  = extern "copilot_receiverChannel2" Nothing
 
-receiverChannel4 :: Stream Float
-receiverChannel4  = extern "copilot_receiverChannel4" Nothing
+chan3 :: Stream Float
+chan3  = extern "copilot_receiverChannel3" Nothing
 
-receiverChannel5 :: Stream Float
-receiverChannel5  = extern "copilot_receiverChannel5" Nothing
+chan4 :: Stream Float
+chan4  = extern "copilot_receiverChannel4" Nothing
 
-receiverChannel6 :: Stream Float
-receiverChannel6  = extern "copilot_receiverChannel6" Nothing
+chan5 :: Stream Float
+chan5  = extern "copilot_receiverChannel5" Nothing
 
-receiverChannel7 :: Stream Float
-receiverChannel7  = extern "copilot_receiverChannel7" Nothing
+chan6 :: Stream Float
+chan6  = extern "copilot_receiverChannel6" Nothing
 
-receiverChannel8 :: Stream Float
-receiverChannel8  = extern "copilot_receiverChannel8" Nothing
+chan7 :: Stream Float
+chan7  = extern "copilot_receiverChannel7" Nothing
+
+chan8 :: Stream Float
+chan8  = extern "copilot_receiverChannel8" Nothing
 
 receiverLostSignal :: Stream Bool
 receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
 
 receiverGotNewFrame :: Stream Bool
 receiverGotNewFrame  = extern "copilot_receiverGotNewFrame" Nothing
-
-
