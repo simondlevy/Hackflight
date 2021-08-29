@@ -36,13 +36,15 @@ data Receiver = Receiver {  throttleMargin :: Stream Float
                           , cyclicExpo :: Stream Float
                           , cyclicRate :: Stream Float
                           , auxTheshold :: Stream Float
+                          , demandScale :: Stream Float
 
                          } deriving (Show)
 
-makeReceiver :: Receiver
+makeReceiver :: Stream Float -> Receiver
 
-makeReceiver = Receiver 0.10 -- throttleMargin
-                        0.20 -- throttleExpo
-                        0.90 -- cyclicRate
-                        0.65 -- cyclicExpo
-                        0.40 -- auxThreshold
+makeReceiver demandScale' = Receiver 0.10 -- throttleMargin
+                                     0.20 -- throttleExpo
+                                     0.90 -- cyclicRate
+                                     0.65 -- cyclicExpo
+                                     0.40 -- auxThreshold
+                                     demandScale'
