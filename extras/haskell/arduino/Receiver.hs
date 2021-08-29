@@ -48,3 +48,6 @@ makeReceiver demandScale' = Receiver 0.10 -- throttleMargin
                                      0.65 -- cyclicExpo
                                      0.40 -- auxThreshold
                                      demandScale'
+
+adjustCommand :: Stream Float -> Stream Int8 -> Stream Float
+adjustCommand _command _channel = 0
