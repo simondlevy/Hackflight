@@ -29,6 +29,33 @@ receiverYaw  = extern "copilot_receiverYaw" Nothing
 receiverLostSignal :: Stream Bool
 receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
 
+receiverGotNewFrame :: Stream Bool
+receiverGotNewFrame  = extern "copilot_receiverGotNewFrame" Nothing
+
+receiverChannel1 :: Stream Float
+receiverChannel1  = extern "copilot_receiverChannel1" Nothing
+
+receiverChannel2 :: Stream Float
+receiverChannel2  = extern "copilot_receiverChannel2" Nothing
+
+receiverChannel3 :: Stream Float
+receiverChannel3  = extern "copilot_receiverChannel3" Nothing
+
+receiverChannel4 :: Stream Float
+receiverChannel4  = extern "copilot_receiverChannel4" Nothing
+
+receiverChannel5 :: Stream Float
+receiverChannel5  = extern "copilot_receiverChannel5" Nothing
+
+receiverChannel6 :: Stream Float
+receiverChannel6  = extern "copilot_receiverChannel6" Nothing
+
+receiverChannel7 :: Stream Float
+receiverChannel7  = extern "copilot_receiverChannel7" Nothing
+
+receiverChannel8 :: Stream Float
+receiverChannel8  = extern "copilot_receiverChannel8" Nothing
+
 -- Internals -------------------------------------------------
 
 data AxisTrim = AxisTrim {  rollTrim :: Stream Float
