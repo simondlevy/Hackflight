@@ -50,4 +50,9 @@ makeReceiver demandScale' = Receiver 0.10 -- throttleMargin
                                      demandScale'
 
 adjustCommand :: Stream Float -> Stream Int8 -> Stream Float
-adjustCommand _command _channel = 0
+
+adjustCommand command channel = 
+
+  let command2 = command / 2
+      
+  in command2
