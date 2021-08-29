@@ -1,5 +1,5 @@
 {--
-  Haskell Copilot support for Hackflight
+  Haskell Copilot support for RC receivers
 
   Copyright(C) 2021 on D.Levy
 
@@ -11,6 +11,8 @@ module Receiver where
 
 import Language.Copilot
 import Copilot.Compile.C99
+
+-- Externals --------------------------------------------------
 
 receiverThrottle :: Stream Float
 receiverThrottle  = extern "copilot_receiverThrottle" Nothing
@@ -27,11 +29,14 @@ receiverYaw  = extern "copilot_receiverYaw" Nothing
 receiverLostSignal :: Stream Bool
 receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
 
-receiverReady :: Stream Bool
-receiverReady  = extern "copilot_receiverReady" Nothing
+-- Internals -------------------------------------------------
 
-receiverInArmedState :: Stream Bool
-receiverInArmedState  = extern "copilot_receiverInArmedState" Nothing
+data Receiver = Receiver {  throttleMargin :: Stream Float
+                          , throttleExpo :: Stream Float
+                          , cyclicExpo :: Stream Float
+                          , cyclicRate :: Stream Float
+                          , auxTheshold :: Stream Float
 
-receiverInactive :: Stream Bool
-receiverInactive  = extern "copilot_receiverInactive" Nothing
+                         } deriving (Show)
+
+
