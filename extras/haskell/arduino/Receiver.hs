@@ -31,28 +31,30 @@ receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
 
 -- Internals -------------------------------------------------
 
+data ChannelMap = ChannelMap {  channelThrottle :: Stream Int8
+                              , channelRoll :: Stream Int8
+                              , channelPitch :: Stream Int8
+                              , channelYaw :: Stream Int8
+                              , channelAux1 :: Stream Int8
+                              , channelAux2 :: Stream Int8
+                             } deriving (Show)
+
 data Receiver = Receiver {  throttleMargin :: Stream Float
                           , throttleExpo :: Stream Float
                           , cyclicExpo :: Stream Float
                           , cyclicRate :: Stream Float
                           , auxTheshold :: Stream Float
                           , demandScale :: Stream Float
-
+                          , channelMap :: ChannelMap
                          } deriving (Show)
 
-makeReceiver :: Stream Float -> Receiver
+makeReceiver :: ChannelMap -> Stream Float -> Receiver
 
-makeReceiver demandScale' = Receiver 0.10 -- throttleMargin
-                                     0.20 -- throttleExpo
-                                     0.90 -- cyclicRate
-                                     0.65 -- cyclicExpo
-                                     0.40 -- auxThreshold
-                                     demandScale'
-
-adjustCommand :: Stream Float -> Stream Int8 -> Stream Float
-
-adjustCommand command channel = 
-
-  let command2 = command / 2
-      
-  in command2
+makeReceiver channelMap' demandScale' =
+    Receiver 0.10 -- throttleMargin
+             0.20 -- throttleExpo
+             0.90 -- cyclicRate
+             0.65 -- cyclicExpo
+             0.40 -- auxThreshold
+             demandScale'
+             channelMap'
