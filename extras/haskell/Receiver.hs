@@ -72,7 +72,6 @@ data Receiver = Receiver {  throttleMargin :: Stream Float
                          } deriving (Show)
 
 makeReceiverWithTrim :: ChannelMap -> AxisTrim -> Stream Float -> Receiver
-
 makeReceiverWithTrim channelMap axisTrim demandScale =
     Receiver 0.10 -- throttleMargin
              0.20 -- throttleExpo
@@ -84,10 +83,11 @@ makeReceiverWithTrim channelMap axisTrim demandScale =
              axisTrim
 
 makeReceiver :: ChannelMap -> Stream Float -> Receiver
-
 makeReceiver channelMap demandScale =
   makeReceiverWithTrim channelMap (AxisTrim 0 0 0) demandScale
 
 getDemands :: Receiver -> Demands
-
 getDemands _receiver = Demands 0 0 0 0
+
+receiverReady ::  Stream Bool
+receiverReady = receiverGotNewFrame

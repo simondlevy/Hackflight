@@ -5,25 +5,26 @@
 #
 # MIT License
 
-HSRC = Main.hs Receiver.hs \
-       ../Hackflight.hs \
-	   ../Demands.hs \
-	   ../State.hs \
-	   ../Sensor.hs \
-	   ../Utils.hs \
-	   ../Mixer.hs \
-	   ../PidController.hs \
-	   ../pidcontrollers/RatePid.hs \
-	   ../pidcontrollers/YawPid.hs \
-	   ../pidcontrollers/AltHoldPid.hs \
-	   ../pidcontrollers/LevelPid.hs \
-	   ../pidcontrollers/PosHoldPid.hs \
-	   ../sensors/Gyrometer.hs \
-	   ../sensors/Altimeter.hs \
-	   ../sensors/Quaternion.hs \
-	   ../sensors/OpticalFlow.hs
+HSRC = Main.hs \
+       Receiver.hs \
+       Hackflight.hs \
+       Demands.hs \
+       State.hs \
+       Sensor.hs \
+       Utils.hs \
+       Mixer.hs \
+       PidController.hs \
+       pidcontrollers/RatePid.hs \
+       pidcontrollers/YawPid.hs \
+       pidcontrollers/AltHoldPid.hs \
+       pidcontrollers/LevelPid.hs \
+       pidcontrollers/PosHoldPid.hs \
+       sensors/Gyrometer.hs \
+       sensors/Altimeter.hs \
+       sensors/Quaternion.hs \
+       sensors/OpticalFlow.hs
 
-RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
+RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
 # TOP = /mnt/d/Users/levys
 TOP = $(HOME)
