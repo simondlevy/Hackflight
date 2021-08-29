@@ -56,17 +56,17 @@ data Receiver = Receiver {  throttleMargin :: Stream Float
 
 makeReceiverWithTrim :: ChannelMap -> AxisTrim -> Stream Float -> Receiver
 
-makeReceiverWithTrim channelMap' axisTrim' demandScale' =
+makeReceiverWithTrim channelMap axisTrim demandScale =
     Receiver 0.10 -- throttleMargin
              0.20 -- throttleExpo
              0.90 -- cyclicRate
              0.65 -- cyclicExpo
              0.40 -- auxThreshold
-             demandScale'
-             channelMap'
-             axisTrim'
+             demandScale
+             channelMap
+             axisTrim
 
 makeReceiver :: ChannelMap -> Stream Float -> Receiver
 
-makeReceiver channelMap' demandScale' =
-  makeReceiverWithTrim channelMap' (AxisTrim 0 0 0) demandScale' 
+makeReceiver channelMap demandScale =
+  makeReceiverWithTrim channelMap (AxisTrim 0 0 0) demandScale
