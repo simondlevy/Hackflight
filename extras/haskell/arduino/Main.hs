@@ -55,10 +55,7 @@ spec = do
   let demands = hackflight sensors pidControllers
 
   -- Use the mixer to convert the demands into motor values
-  let m1 = getMotor1 mixer demands
-  let m2 = getMotor2 mixer demands
-  let m3 = getMotor3 mixer demands
-  let m4 = getMotor4 mixer demands
+  let (m1, m2, m3, m4) = getMotors mixer demands
 
   -- Send the motor values to the external C function
   trigger "copilot_runMotors" true [arg m1, arg m2, arg m3, arg m4]
