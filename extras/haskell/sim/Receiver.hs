@@ -23,15 +23,3 @@ receiverPitch  = extern "copilot_receiverPitch" Nothing
 
 receiverYaw :: Stream Float
 receiverYaw  = extern "copilot_receiverYaw" Nothing
-
-receiverLostSignal :: Stream Bool
-receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
-
-receiverReady :: Stream Bool
-receiverReady  = extern "copilot_receiverReady" Nothing
-
-receiverInArmedState :: Stream Bool
-receiverInArmedState  = extern "copilot_receiverInArmedState" Nothing
-
-receiverInactive :: Stream Bool
-receiverInactive  = extern "copilot_receiverInactive" Nothing

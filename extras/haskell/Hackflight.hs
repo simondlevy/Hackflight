@@ -36,6 +36,12 @@ hackflight sensors pidControllers =
         pidControllers'' = map (pidUpdate state) pidControllers'
 
         -- Sum over the list of demands to get the final demands
-        newDemands = foldr addDemands receiverDemands (map pidDemands pidControllers'')
+        demands = foldr addDemands receiverDemands (map pidDemands pidControllers'')
 
-    in newDemands
+        -- Map throttle from [-1,+1] to [0,1]
+        demands' = Demands (((throttle demands) + 1) / 2)
+                           (roll demands)
+                           (pitch demands)
+                           (yaw demands)
+
+    in demands'
