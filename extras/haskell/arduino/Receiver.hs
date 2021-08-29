@@ -31,6 +31,11 @@ receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
 
 -- Internals -------------------------------------------------
 
+data AxisTrim = AxisTrim {  rollTrim :: Stream Float
+                          , pitchTrim :: Stream Float
+                          , yawTrime :: Stream Float
+                         } deriving (Show)
+
 data ChannelMap = ChannelMap {  channelThrottle :: Stream Int8
                               , channelRoll :: Stream Int8
                               , channelPitch :: Stream Int8
@@ -46,11 +51,12 @@ data Receiver = Receiver {  throttleMargin :: Stream Float
                           , auxTheshold :: Stream Float
                           , demandScale :: Stream Float
                           , channelMap :: ChannelMap
+                          , axisTrim :: AxisTrim
                          } deriving (Show)
 
-makeReceiver :: ChannelMap -> Stream Float -> Receiver
+makeReceiverWithTrim :: ChannelMap -> AxisTrim -> Stream Float -> Receiver
 
-makeReceiver channelMap' demandScale' =
+makeReceiverWithTrim channelMap' axisTrim' demandScale' =
     Receiver 0.10 -- throttleMargin
              0.20 -- throttleExpo
              0.90 -- cyclicRate
@@ -58,3 +64,9 @@ makeReceiver channelMap' demandScale' =
              0.40 -- auxThreshold
              demandScale'
              channelMap'
+             axisTrim'
+
+makeReceiver :: ChannelMap -> Stream Float -> Receiver
+
+makeReceiver channelMap' demandScale' =
+  makeReceiverWithTrim channelMap' (AxisTrim 0 0 0) demandScale' 
