@@ -12,25 +12,9 @@ module Receiver where
 import Language.Copilot
 import Copilot.Compile.C99
 
+import Demands
+
 -- Externals --------------------------------------------------
-
-receiverThrottle :: Stream Float
-receiverThrottle  = extern "copilot_receiverThrottle" Nothing
-
-receiverRoll :: Stream Float
-receiverRoll  = extern "copilot_receiverRoll" Nothing
-
-receiverPitch :: Stream Float
-receiverPitch  = extern "copilot_receiverPitch" Nothing
-
-receiverYaw :: Stream Float
-receiverYaw  = extern "copilot_receiverYaw" Nothing
-
-receiverLostSignal :: Stream Bool
-receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
-
-receiverGotNewFrame :: Stream Bool
-receiverGotNewFrame  = extern "copilot_receiverGotNewFrame" Nothing
 
 receiverChannel1 :: Stream Float
 receiverChannel1  = extern "copilot_receiverChannel1" Nothing
@@ -55,6 +39,12 @@ receiverChannel7  = extern "copilot_receiverChannel7" Nothing
 
 receiverChannel8 :: Stream Float
 receiverChannel8  = extern "copilot_receiverChannel8" Nothing
+
+receiverLostSignal :: Stream Bool
+receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
+
+receiverGotNewFrame :: Stream Bool
+receiverGotNewFrame  = extern "copilot_receiverGotNewFrame" Nothing
 
 -- Internals -------------------------------------------------
 
@@ -97,3 +87,7 @@ makeReceiver :: ChannelMap -> Stream Float -> Receiver
 
 makeReceiver channelMap demandScale =
   makeReceiverWithTrim channelMap (AxisTrim 0 0 0) demandScale
+
+getDemands :: Receiver -> Demands
+
+getDemands _receiver = Demands 0 0 0 0

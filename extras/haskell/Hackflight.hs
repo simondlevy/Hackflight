@@ -16,14 +16,14 @@ import Demands
 import Safety
 import Utils(compose)
 
-hackflight :: [Sensor] -> [PidController] -> Demands
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Demands
 
-hackflight sensors pidControllers = 
+hackflight receiver sensors pidControllers = 
 
     let 
-
+ 
         -- Get receiver demands from external C functions
-        receiverDemands = Demands receiverThrottle receiverRoll receiverPitch receiverYaw
+        receiverDemands = getDemands receiver
 
         -- Inject the receiver demands into the PID controllers
         pidControllers' = map (\p -> PidController (pidFun p) receiverDemands)

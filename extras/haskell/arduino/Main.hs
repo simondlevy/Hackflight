@@ -14,6 +14,7 @@ module Main where
 import Language.Copilot
 import Copilot.Compile.C99
 
+import Receiver
 import Mixer
 
 -- Sensors
@@ -30,6 +31,8 @@ import Hackflight
 import State
 
 spec = do
+
+  let receiver = makeReceiver (ChannelMap 0 1 2 3 6 4) 4.0
 
   -- These sensors will be run right-to-left via composition
   let sensors = [gyrometer, quaternion]
@@ -52,7 +55,7 @@ spec = do
 
   let mixer = QuadXAPMixer
 
-  let demands = hackflight sensors pidControllers
+  let demands = hackflight receiver sensors pidControllers
 
   -- Use the mixer to convert the demands into motor values
   let (m1, m2, m3, m4) = getMotors mixer demands
