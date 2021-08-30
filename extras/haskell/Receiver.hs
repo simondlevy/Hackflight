@@ -69,13 +69,15 @@ getDemands receiver =
       adjustCommand command channelSelector = 
           command/2 * if (channelSelector channelMap') < 0 then -1 else 1
 
-      cyclicFun command = rcFun command
-                                          (cyclicExpo receiver)
-                                          (cyclicRate receiver)
+      cyclicFun command = rcFun command (cyclicExpo receiver) (cyclicRate receiver)
 
       rectify channelSelector = abs (channelSelector channelMap')
 
       rcFun x e r = (1 + e * (x*x -1)) * x * r
+
+      angleFun trimFun expoFun channel =
+          demandScale' * 
+            ((trimFun axisTrim') + adjustCommand (expoFun $ rectify channel) channel)
 
       throttleFun x = 
           let mid = 0.5
@@ -86,18 +88,12 @@ getDemands receiver =
 
       throttleDemand = throttleFun $ throttleChannel channelMap'
 
-      rollDemand = demandScale' *
-                   ((rollTrim axisTrim') + 
-                   adjustCommand (cyclicFun $ rectify rollChannel)rollChannel)
-       
-      pitchDemand = demandScale' *
-                   ((pitchTrim axisTrim') + 
-                   adjustCommand (cyclicFun $ rectify pitchChannel) pitchChannel)
- 
-      yawDemand = demandScale' *
-                   ((yawTrim axisTrim') + 
-                   adjustCommand (id $ rectify yawChannel) yawChannel)
+      rollDemand = angleFun rollTrim cyclicFun rollChannel
 
+      pitchDemand = angleFun pitchTrim cyclicFun pitchChannel
+
+      yawDemand = angleFun yawTrim id yawChannel
+ 
 receiverReady ::  Stream Bool
 receiverReady = receiverGotNewFrame
 
