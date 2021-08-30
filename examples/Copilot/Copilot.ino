@@ -40,6 +40,7 @@ static void reportMotor(float value, uint8_t index)
 // Called by Copilot
 void copilot_runMotors(float m1, float m2, float m3, float m4)
 {
+    return;
     reportMotor(m1, 1);
     reportMotor(m2, 2);
     reportMotor(m3, 3);
@@ -48,12 +49,17 @@ void copilot_runMotors(float m1, float m2, float m3, float m4)
     Serial.println();
 }
 
+void copilot_debug(float throttle)
+{
+    printf("%+3.3f\n", throttle);
+}
+
 static void runReceiver(void)
 {
     static const uint8_t CHANNELS = 8;
 
     if (rx.timedOut(micros())) {
-        Serial.println("*** RECEIVER TIMED OUT ***");
+        // copilot_receiverLostSignal = true;
     }
 
     else if (rx.gotNewFrame()) {
@@ -88,7 +94,7 @@ void setup(void)
     // DSMX receiver
     Serial1.begin(115200);
 
-    startImu(); 
+    // startImu(); 
 }
 
 void loop(void)

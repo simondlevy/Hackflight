@@ -93,9 +93,6 @@ getDemands receiver =
       pitchDemand = angleFun pitchTrim cyclicFun pitchChannel
 
       yawDemand = angleFun yawTrim id yawChannel
- 
-receiverReady ::  Stream Bool
-receiverReady = receiverGotNewFrame
 
 -- Externals -------------------------------------------------
 
@@ -125,6 +122,3 @@ chan8  = extern "copilot_receiverChannel8" Nothing
 
 receiverLostSignal :: Stream Bool
 receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
-
-receiverGotNewFrame :: Stream Bool
-receiverGotNewFrame  = extern "copilot_receiverGotNewFrame" Nothing
