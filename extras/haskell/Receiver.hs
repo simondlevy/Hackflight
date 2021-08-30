@@ -57,9 +57,27 @@ getDemands :: Receiver -> Demands
 getDemands receiver = 
 
     Demands 0 rollDemand 0 0
+
     where
+
       channelMap' = channelMap receiver
-      rollDemand = abs (rollChannel channelMap')
+
+      demandScale' = demandScale receiver
+
+      axisTrim' = axisTrim receiver
+
+      adjustCommand command channelSelector = 
+          command/2 * if (channelSelector channelMap') < 0 then -1 else 1
+
+      applyCyclicFunction command = rcFun command (cyclicExpo receiver) (cyclicRate receiver)
+
+      makePositiveCommand channelSelector = abs (channelSelector channelMap')
+
+      rcFun x e r = (1 + e * (x*x -1)) * x * r
+
+      rollDemand = demandScale' *
+                   ((rollTrim axisTrim') + 
+                   adjustCommand (applyCyclicFunction $ makePositiveCommand rollChannel) rollChannel)
        
 
 receiverReady ::  Stream Bool
