@@ -13,13 +13,7 @@
 #include <Wire.h>
 #include <USFS_Master.h>
 
-static const uint8_t  MAG_RATE       = 100;  // Hz
-static const uint16_t ACCEL_RATE     = 200;  // Hz
-static const uint16_t GYRO_RATE      = 200;  // Hz
-static const uint8_t  BARO_RATE      = 50;   // Hz
-static const uint8_t  Q_RATE_DIVISOR = 3;    // 1/3 gyro rate
- 
-USFS_Master usfs = USFS_Master(MAG_RATE, ACCEL_RATE, GYRO_RATE, BARO_RATE, Q_RATE_DIVISOR);
+static USFS_Master usfs;
 
 // Receiver ----------------------------------------
 
