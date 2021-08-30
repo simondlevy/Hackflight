@@ -56,7 +56,7 @@ makeReceiver channelMap demandScale =
 getDemands :: Receiver -> Demands
 getDemands receiver = 
 
-    Demands 0 rollDemand 0 0
+    Demands 0 rollDemand pitchDemand 0
 
     where
 
@@ -79,7 +79,10 @@ getDemands receiver =
                    ((rollTrim axisTrim') + 
                    adjustCommand (applyCyclicFunction $ makePositiveCommand rollChannel) rollChannel)
        
-
+      pitchDemand = demandScale' *
+                   ((pitchTrim axisTrim') + 
+                   adjustCommand (applyCyclicFunction $ makePositiveCommand pitchChannel) pitchChannel)
+ 
 receiverReady ::  Stream Bool
 receiverReady = receiverGotNewFrame
 
