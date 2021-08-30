@@ -67,8 +67,8 @@ getDemands receiver =
 
       axisTrim' = axisTrim receiver
 
-      adjustCommand command channelSelector = command
-          -- command/2 * if (channelSelector channelMap') < 0 then -1 else 1
+      adjustCommand command channelSelector =
+          command/2 * if (channelSelector channelMap') < 0 then -1 else 1
 
       cyclicFun command = rcFun command (cyclicExpo receiver) (cyclicRate receiver)
 
@@ -93,7 +93,7 @@ getDemands receiver =
 
       pitchDemand = angleFun pitchTrim cyclicFun pitchChannel
 
-      yawDemand = rectify yawChannel -- angleFun yawTrim id yawChannel
+      yawDemand = angleFun yawTrim id yawChannel
 
 -- Externals -------------------------------------------------
 
