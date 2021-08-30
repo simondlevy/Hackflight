@@ -6,6 +6,7 @@
   MIT License
 --}
 
+{-# LANGUAGE RebindableSyntax #-}
 
 module Receiver where
 
@@ -53,12 +54,13 @@ makeReceiver channelMap demandScale =
   makeReceiverWithTrim channelMap (AxisTrim 0 0 0) demandScale
 
 getDemands :: Receiver -> Demands
-getDemands _receiver = 
+getDemands receiver = 
 
-    let 
+    Demands 0 rollDemand 0 0
+    where
       rawvals = (chan1, chan2, chan3, chan4, chan5, chan6, chan7, chan8)
-    in Demands 0 0 0 0
-
+      rollDemand = 0 -- rawvals!!((channelRoll (channelMap receiver)))
+       
 
 receiverReady ::  Stream Bool
 receiverReady = receiverGotNewFrame
