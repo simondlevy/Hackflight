@@ -20,12 +20,12 @@ data AxisTrim = AxisTrim {  rollTrim :: Stream Float
                           , yawTrime :: Stream Float
                          } deriving (Show)
 
-data ChannelMap = ChannelMap {  channelThrottle :: Stream Float
-                              , channelRoll :: Stream Float
-                              , channelPitch :: Stream Float
-                              , channelYaw :: Stream Float
-                              , channelAux1 :: Stream Float
-                              , channelAux2 :: Stream Float
+data ChannelMap = ChannelMap {  throttleChannel :: Stream Float
+                              , rollChannel :: Stream Float
+                              , pitchChannel :: Stream Float
+                              , yawChannel :: Stream Float
+                              , aux1Channel :: Stream Float
+                              , aux2Channel :: Stream Float
                              } deriving (Show)
 
 data Receiver = Receiver {  throttleMargin :: Stream Float
@@ -58,7 +58,7 @@ getDemands receiver =
 
     Demands 0 rollDemand 0 0
     where
-      rollDemand = 0 -- rawvals!!((channelRoll (channelMap receiver)))
+      rollDemand = (rollChannel (channelMap receiver))
        
 
 receiverReady ::  Stream Bool
