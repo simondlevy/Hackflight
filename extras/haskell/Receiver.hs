@@ -58,7 +58,8 @@ getDemands receiver =
 
     Demands 0 rollDemand 0 0
     where
-      rollDemand = (rollChannel (channelMap receiver))
+      channelMap' = channelMap receiver
+      rollDemand = abs (rollChannel channelMap')
        
 
 receiverReady ::  Stream Bool
