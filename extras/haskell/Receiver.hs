@@ -10,6 +10,7 @@
 
 module Receiver where
 
+import Prelude hiding(abs, (>), (<))
 import Language.Copilot
 import Copilot.Compile.C99
 
@@ -66,18 +67,18 @@ getDemands receiver =
 
       axisTrim' = axisTrim receiver
 
-      adjustCommand command channelSelector = 
-          command/2 * if (channelSelector channelMap') < 0 then -1 else 1
+      adjustCommand command channelSelector = command
+          -- command/2 * if (channelSelector channelMap') < 0 then -1 else 1
 
       cyclicFun command = rcFun command (cyclicExpo receiver) (cyclicRate receiver)
 
-      rectify channelSelector = abs (channelSelector channelMap')
+      rectify channelSelector = let chanval = channelSelector channelMap'
+                                in if chanval < 0 then (-chanval) else chanval
 
       rcFun x e r = (1 + e * (x*x -1)) * x * r
 
       angleFun trimFun expoFun channel =
-          demandScale' * 
-            ((trimFun axisTrim') + adjustCommand (expoFun $ rectify channel) channel)
+          demandScale' * ((trimFun axisTrim') + adjustCommand (expoFun $ rectify channel) channel)
 
       throttleFun x = 
           let mid = 0.5
@@ -92,7 +93,7 @@ getDemands receiver =
 
       pitchDemand = angleFun pitchTrim cyclicFun pitchChannel
 
-      yawDemand = angleFun yawTrim id yawChannel
+      yawDemand = rectify yawChannel -- angleFun yawTrim id yawChannel
 
 -- Externals -------------------------------------------------
 

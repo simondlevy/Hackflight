@@ -37,7 +37,10 @@ spec = do
 
   let dbgDemands = getDemands receiver
 
-  trigger "copilot_debug" true [arg $ throttle dbgDemands]
+  trigger "copilot_debug" true [arg $ throttle dbgDemands
+                              , arg $ roll dbgDemands
+                              , arg $ pitch dbgDemands
+                              , arg $ yaw dbgDemands]
 
   -- These sensors will be run right-to-left via composition
   let sensors = [gyrometer, quaternion]

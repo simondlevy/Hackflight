@@ -49,9 +49,10 @@ void copilot_runMotors(float m1, float m2, float m3, float m4)
     Serial.println();
 }
 
-void copilot_debug(float throttle)
+void copilot_debug(float throttle, float roll, float pitch, float yaw)
 {
-    printf("%+3.3f\n", throttle);
+    printf("T: %+3.3f    R: %+3.3f    P: %+3.3f    Y: %+3.3f\n",
+            throttle, roll, pitch, yaw);
 }
 
 static void runReceiver(void)
