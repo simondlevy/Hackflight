@@ -40,7 +40,7 @@ copilot.h: $(HSRC) Main.hs
 	$(RUNH)
 
 clean:
-	rm -f *.c *.h *~
+	rm -f copilot.* tmp.c *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
@@ -48,9 +48,9 @@ commit:
 copy: copilot.cpp copilot.h
 	cp copilot.c $(DST)/copilot.cpp
 	sed -i 's/extern/EXTERN/g' copilot.h
-	cat ../header.h copilot.h > $(DST)/copilot.h
+	cat header.h copilot.h > $(DST)/copilot.h
 
 copilot.cpp: copilot.c
 	tail -n +8 copilot.c > tmp.c
-	cat ../header.c tmp.c > copilot.c
+	cat header.c tmp.c > copilot.c
 	rm tmp.c
