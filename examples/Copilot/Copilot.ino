@@ -68,10 +68,10 @@ static void runReceiver(void)
 
         rx.getChannelValuesNormalized(values, CHANNELS);
 
-        copilot_receiverThrottle = values[0];
-        copilot_receiverRoll = values[1];
-        copilot_receiverPitch = values[2];
-        copilot_receiverYaw = values[3];
+        copilot_receiverChannel1 = values[0];
+        copilot_receiverChannel2 = values[1];
+        copilot_receiverChannel3 = values[2];
+        copilot_receiverChannel4 = values[3];
     }
 }
 
