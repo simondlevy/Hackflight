@@ -17,7 +17,7 @@ import Demands
 
 data AxisTrim = AxisTrim {  rollTrim :: Stream Float
                           , pitchTrim :: Stream Float
-                          , yawTrime :: Stream Float
+                          , yawTrim :: Stream Float
                          } deriving (Show)
 
 data ChannelMap = ChannelMap {  throttleChannel :: Stream Float
@@ -56,7 +56,7 @@ makeReceiver channelMap demandScale =
 getDemands :: Receiver -> Demands
 getDemands receiver = 
 
-    Demands 0 rollDemand pitchDemand 0
+    Demands throttleDemand rollDemand pitchDemand yawDemand
 
     where
 
@@ -75,6 +75,15 @@ getDemands receiver =
 
       rcFun x e r = (1 + e * (x*x -1)) * x * r
 
+      throttleFun x = 
+          let mid = 0.5
+              tmp = (x + 1) / 2 - mid
+              y = if tmp > 0 then 1 - mid else (if tmp < 0 then mid else 1)
+              expo = (throttleExpo receiver)
+          in (mid + tmp*(1-expo + expo * (tmp*tmp) / (y*y))) * 2 - 1
+
+      throttleDemand = throttleFun $ throttleChannel channelMap'
+
       rollDemand = demandScale' *
                    ((rollTrim axisTrim') + 
                    adjustCommand (applyCyclicFunction $ makePositiveCommand rollChannel) rollChannel)
@@ -83,6 +92,10 @@ getDemands receiver =
                    ((pitchTrim axisTrim') + 
                    adjustCommand (applyCyclicFunction $ makePositiveCommand pitchChannel) pitchChannel)
  
+      yawDemand = demandScale' *
+                   ((yawTrim axisTrim') + 
+                   adjustCommand (makePositiveCommand yawChannel) yawChannel)
+
 receiverReady ::  Stream Bool
 receiverReady = receiverGotNewFrame
 
