@@ -49,10 +49,9 @@ void copilot_runMotors(float m1, float m2, float m3, float m4)
     Serial.println();
 }
 
-void copilot_debug(float throttle, float roll, float pitch, float yaw)
+void copilot_debug(float phi)
 {
-    printf("T: %+3.3f    R: %+3.3f    P: %+3.3f    Y: %+3.3f\n",
-            throttle, roll, pitch, yaw);
+    printf("Phi: %+3.3f\n", phi);
 }
 
 static void runReceiver(void)
@@ -78,7 +77,6 @@ static void runReceiver(void)
 
 static void startImu(void)
 {
-    Wire.begin();
     delay(100);
     if (!usfs.begin()) {
         while (true) {
@@ -87,20 +85,39 @@ static void startImu(void)
     }
 }
 
+static void runImu(void)
+{
+    usfs.checkEventStatus();
+
+    if (usfs.gotGyrometer()) {
+        usfs.readGyrometer(copilot_gyrometerX, copilot_gyrometerY, copilot_gyrometerZ);
+    }
+
+    if (usfs.gotQuaternion()) {
+        usfs.readQuaternion(copilot_quaternionW, copilot_quaternionX, copilot_quaternionY, copilot_quaternionZ);
+    }
+}
+
 void setup(void)
 {
+    // Start I^2C
+    Wire.begin();
+
     // Serial comms
     Serial.begin(115200);
 
     // DSMX receiver
     Serial1.begin(115200);
 
-    // startImu(); 
+    // IMU
+    startImu(); 
 }
 
 void loop(void)
 {
     runReceiver();
+
+    runImu();
 
     // Run Copilot code
     step();

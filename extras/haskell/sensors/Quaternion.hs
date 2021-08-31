@@ -46,17 +46,17 @@ quaternion :: Sensor
 quaternion state  =
 
   State (x      state)
-               (dx     state)
-               (y      state)
-               (dy     state)
-               (z      state) 
-               (dz     state) 
-               ((phi   state) + phi')
-               (dphi   state) 
-               ((theta state) + theta')
-               (dtheta state)
-               ((psi   state) + psi')
-               (dpsi   state)
+        (dx     state)
+        (y      state)
+        (dy     state)
+        (z      state) 
+        (dz     state) 
+        ((phi   state) + phi')
+        (dphi   state) 
+        ((theta state) + theta')
+        (dtheta state)
+        ((psi   state) + psi')
+        (dpsi   state)
 
   where 
 

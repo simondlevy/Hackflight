@@ -16,7 +16,7 @@ import Demands
 import Safety
 import Utils(compose)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Demands
+hackflight :: Receiver -> [Sensor] -> [PidController] -> (Demands, State)
 
 hackflight receiver sensors pidControllers = 
 
@@ -44,4 +44,4 @@ hackflight receiver sensors pidControllers =
                            (pitch demands)
                            (yaw demands)
 
-    in demands'
+    in (demands', state)
