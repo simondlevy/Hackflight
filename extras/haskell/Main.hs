@@ -33,7 +33,7 @@ import State
 
 spec = do
 
-  let receiver = makeReceiver (ChannelMap chan1 chan2 chan3 chan4 chan7 chan5) 4.0
+  let receiver = makeReceiver 4.0
 
   -- These sensors will be run right-to-left via composition
   let sensors = [gyrometer, quaternion]

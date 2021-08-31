@@ -21,38 +21,28 @@ data AxisTrim = AxisTrim {  rollTrim :: Stream Float
                           , yawTrim :: Stream Float
                          } deriving (Show)
 
-data ChannelMap = ChannelMap {  throttleChannel :: Stream Float
-                              , rollChannel :: Stream Float
-                              , pitchChannel :: Stream Float
-                              , yawChannel :: Stream Float
-                              , aux1Channel :: Stream Float
-                              , aux2Channel :: Stream Float
-                             } deriving (Show)
-
 data Receiver = Receiver {  throttleMargin :: Stream Float
                           , throttleExpo :: Stream Float
                           , cyclicExpo :: Stream Float
                           , cyclicRate :: Stream Float
                           , auxTheshold :: Stream Float
                           , demandScale :: Stream Float
-                          , channelMap :: ChannelMap
                           , axisTrim :: AxisTrim
                          } deriving (Show)
 
-makeReceiverWithTrim :: ChannelMap -> AxisTrim -> Stream Float -> Receiver
-makeReceiverWithTrim channelMap axisTrim demandScale =
+makeReceiverWithTrim :: AxisTrim -> Stream Float -> Receiver
+makeReceiverWithTrim axisTrim demandScale =
     Receiver 0.10 -- throttleMargin
              0.20 -- throttleExpo
              0.90 -- cyclicRate
              0.65 -- cyclicExpo
              0.40 -- auxThreshold
              demandScale
-             channelMap
              axisTrim
 
-makeReceiver :: ChannelMap -> Stream Float -> Receiver
-makeReceiver channelMap demandScale =
-  makeReceiverWithTrim channelMap (AxisTrim 0 0 0) demandScale
+makeReceiver :: Stream Float -> Receiver
+makeReceiver demandScale =
+  makeReceiverWithTrim (AxisTrim 0 0 0) demandScale
 
 getDemands :: Receiver -> Demands
 getDemands receiver = 
@@ -61,24 +51,21 @@ getDemands receiver =
 
     where
 
-      channelMap' = channelMap receiver
-
       demandScale' = demandScale receiver
 
       axisTrim' = axisTrim receiver
 
-      adjustCommand command channelSelector =
-          command/2 * if (channelSelector channelMap') < 0 then -1 else 1
+      adjustCommand command =
+          command/2 * if command < 0 then -1 else 1
 
       cyclicFun command = rcFun command (cyclicExpo receiver) (cyclicRate receiver)
 
-      rectify channelSelector = let chanval = channelSelector channelMap'
-                                in if chanval < 0 then (-chanval) else chanval
+      rectify x = if x < 0 then (-x) else x
 
       rcFun x e r = (1 + e * (x*x -1)) * x * r
 
-      angleFun trimFun expoFun channel =
-          demandScale' * ((trimFun axisTrim') + adjustCommand (expoFun $ rectify channel) channel)
+      angleFun trimFun expoFun command =
+          demandScale' * ((trimFun axisTrim') + adjustCommand (expoFun $ rectify command))
 
       throttleFun x = 
           let mid = 0.5
@@ -87,39 +74,33 @@ getDemands receiver =
               expo = (throttleExpo receiver)
           in (mid + tmp*(1-expo + expo * (tmp*tmp) / (y*y))) * 2 - 1
 
-      throttleDemand = throttleFun $ throttleChannel channelMap'
+      throttleDemand = throttleFun receiverThrottle
 
-      rollDemand = angleFun rollTrim cyclicFun rollChannel
+      rollDemand = angleFun rollTrim cyclicFun receiverRoll
 
-      pitchDemand = angleFun pitchTrim cyclicFun pitchChannel
+      pitchDemand = angleFun pitchTrim cyclicFun receiverPitch
 
-      yawDemand = angleFun yawTrim id yawChannel
+      yawDemand = angleFun yawTrim id receiverYaw
 
 -- Externals -------------------------------------------------
 
-chan1 :: Stream Float
-chan1  = extern "copilot_receiverChannel1" Nothing
+receiverThrottle :: Stream Float
+receiverThrottle  = extern "copilot_receiverThrottle" Nothing
 
-chan2 :: Stream Float
-chan2  = extern "copilot_receiverChannel2" Nothing
+receiverRoll :: Stream Float
+receiverRoll  = extern "copilot_receiverRoll" Nothing
 
-chan3 :: Stream Float
-chan3  = extern "copilot_receiverChannel3" Nothing
+receiverPitch :: Stream Float
+receiverPitch  = extern "copilot_receiverPitch" Nothing
 
-chan4 :: Stream Float
-chan4  = extern "copilot_receiverChannel4" Nothing
+receiverYaw :: Stream Float
+receiverYaw  = extern "copilot_receiverYaw" Nothing
 
-chan5 :: Stream Float
-chan5  = extern "copilot_receiverChannel5" Nothing
+receiverAux1 :: Stream Float
+receiverAux1  = extern "copilot_receiverAux1" Nothing
 
-chan6 :: Stream Float
-chan6  = extern "copilot_receiverChannel6" Nothing
-
-chan7 :: Stream Float
-chan7  = extern "copilot_receiverChannel7" Nothing
-
-chan8 :: Stream Float
-chan8  = extern "copilot_receiverChannel8" Nothing
+receiverAux2 :: Stream Float
+receiverAux2  = extern "copilot_receiverAux2" Nothing
 
 receiverLostSignal :: Stream Bool
 receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
