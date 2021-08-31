@@ -41,7 +41,7 @@ rateFun kp ki kd windupMax rateMax state demands =
 
     let
 
-        computeDemand demand value errorIntegral errorDelta1 errorDelta2 errorPrev =
+        computeDemand demand value errorIntegral errorDelta1 errorDelta2 error' =
                       
             (kp * newError + ki * newErrorIntegral + kd * errorDerivative, 
              newError,
@@ -59,7 +59,7 @@ rateFun kp ki kd windupMax rateMax state demands =
               newErrorIntegral = if reset then 0 else
                                  constrain_abs (errorIntegral + newError) windupMax
 
-              newErrorDelta = if reset then 0 else newError - errorPrev
+              newErrorDelta = if reset then 0 else newError - error'
 
               newErrorDelta1 = if reset then 0 else errorDelta1
 
@@ -70,32 +70,32 @@ rateFun kp ki kd windupMax rateMax state demands =
         (rollDemand, rollError, rollErrorIntegral, rollErrorDelta, rollErrorDelta1) =
             computeDemand (roll demands)
                           (dphi state)
-                          rollErrorIntegralState
-                          rollErrorDelta1State
-                          rollErrorDelta2State
-                          rollErrorPrev
+                          rollErrorIntegral'
+                          rollErrorDelta1'
+                          rollErrorDelta2'
+                          rollError'
 
          -- Pitch demand is nose-down positive, so we negate pitch-forward
          -- (nose-down negative) to reconcile them
         (pitchDemand, pitchError, pitchErrorIntegral, pitchErrorDelta, pitchErrorDelta1) =
             computeDemand (pitch demands)
                           (-(dtheta state))
-                          pitchErrorIntegralState
-                          pitchErrorDelta1State
-                          pitchErrorDelta2State
-                          pitchErrorPrev
+                          pitchErrorIntegral'
+                          pitchErrorDelta1'
+                          pitchErrorDelta2'
+                          pitchError'
 
         -- Maintain controller state between calls
 
-        rollErrorPrev = [0] ++ rollError
-        rollErrorIntegralState = [0] ++ rollErrorIntegral
-        rollErrorDelta1State = [0] ++ rollErrorDelta
-        rollErrorDelta2State = [0] ++ rollErrorDelta1
+        rollError' = [0] ++ rollError
+        rollErrorIntegral' = [0] ++ rollErrorIntegral
+        rollErrorDelta1' = [0] ++ rollErrorDelta
+        rollErrorDelta2' = [0] ++ rollErrorDelta1
 
-        pitchErrorPrev = [0] ++ pitchError
-        pitchErrorIntegralState = [0] ++ pitchErrorIntegral
-        pitchErrorDelta1State = [0] ++ pitchErrorDelta
-        pitchErrorDelta2State = [0] ++ pitchErrorDelta1
+        pitchError' = [0] ++ pitchError
+        pitchErrorIntegral' = [0] ++ pitchErrorIntegral
+        pitchErrorDelta1' = [0] ++ pitchErrorDelta
+        pitchErrorDelta2' = [0] ++ pitchErrorDelta1
         
     in Demands 0 rollDemand pitchDemand 0
 

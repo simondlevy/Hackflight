@@ -35,7 +35,7 @@ yawFun kp ki windupMax state demands =
       error' = (yaw demands) - (dpsi state)
 
       -- Accumualte error integral
-      errorIntegral = constrain_abs (errorIntegralState + error') windupMax
+      errorIntegral = constrain_abs (errorIntegral' + error') windupMax
 
       -- Maintain controller state between calls
-      errorIntegralState = [0] ++ errorIntegral
+      errorIntegral' = [0] ++ errorIntegral

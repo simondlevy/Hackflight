@@ -15,7 +15,7 @@ where
 import Language.Copilot
 
 import PidController
-import State
+import '
 import Demands
 import Utils(constrain_abs, in_band)
 
@@ -59,9 +59,9 @@ altHoldFun kp
        inband = in_band throttleDemand stickDeadband
 
        -- Reset controller when moving into deadband
-       altitudeTarget = if inband && not (in_band throttleDemandState stickDeadband)
+       altitudeTarget = if inband && not (in_band throttleDemand' stickDeadband)
                         then altitude
-                        else altitudeTargetState
+                        else altitudeTarget'
 
        targetVelocity = if inband
                         then altitudeTarget - altitude
@@ -72,9 +72,9 @@ altHoldFun kp
        error' = targetVelocity + (dz state)
 
        -- Accumualte error integral
-       errorIntegral = constrain_abs (errorIntegralState + error') windupMax
+       errorIntegral = constrain_abs (errorIntegral' + error') windupMax
 
        -- Maintain controller state between calls
-       errorIntegralState = [0] ++ errorIntegral
-       altitudeTargetState = [0] ++ altitudeTarget
-       throttleDemandState = [0] ++ throttleDemand
+       errorIntegral' = [0] ++ errorIntegral
+       altitudeTarget' = [0] ++ altitudeTarget
+       throttleDemand' = [0] ++ throttleDemand
