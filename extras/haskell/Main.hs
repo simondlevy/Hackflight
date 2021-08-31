@@ -56,7 +56,7 @@ spec = do
 
   let mixer = QuadXAPMixer
 
-  let (demands, state) = hackflight receiver sensors pidControllers
+  let demands = hackflight receiver sensors pidControllers
 
   -- Use the mixer to convert the demands into motor values
   let (m1, m2, m3, m4) = getMotors mixer demands
