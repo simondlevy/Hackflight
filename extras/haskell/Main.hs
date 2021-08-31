@@ -35,35 +35,33 @@ spec = do
 
   let receiver = makeReceiver (ChannelMap chan1 chan2 chan3 chan4 chan7 chan5) 4.0
 
-  let dbgDemands = getDemands receiver
-
-  trigger "copilot_debug" true [arg $ throttle dbgDemands
-                              , arg $ roll dbgDemands
-                              , arg $ pitch dbgDemands
-                              , arg $ yaw dbgDemands]
-
   -- These sensors will be run right-to-left via composition
   let sensors = [gyrometer, quaternion]
 
-  let rate = rateController 0.225    -- Kp
-                            0.001875 -- Ki
-                            0.375    -- Kd
-                            0.4      -- windupMax
-                            40       -- maxDegreesPerSecond
+  let ratePid = rateController 0.225    -- Kp
+                               0.001875 -- Ki
+                               0.375    -- Kd
+                               0.4      -- windupMax
+                               40       -- maxDegreesPerSecond
 
-  let yaw = yawController 2.0 -- Kp
-                          0.1 -- Ki
-                          0.4 -- windupMax
+  let yawPid = yawController 2.0 -- Kp
+                             0.1 -- Ki
+                             0.4 -- windupMax
 
-  let level = levelController 0.2 -- Kp
-                              45  -- maxAngleDegrees
+  let levelPid = levelController 0.2 -- Kp
+                                 45  -- maxAngleDegrees
 
   -- Pos-hold goes first so that it can access roll/pitch demands from receiver
-  let pidControllers = [rate, yaw, level]
+  let pidControllers = [ratePid, yawPid, levelPid]
 
   let mixer = QuadXAPMixer
 
   let demands = hackflight receiver sensors pidControllers
+
+  trigger "copilot_debug" true [arg $ throttle demands
+                              , arg $ roll demands
+                              , arg $ pitch demands
+                              , arg $ yaw demands]
 
   -- Use the mixer to convert the demands into motor values
   let (m1, m2, m3, m4) = getMotors mixer demands

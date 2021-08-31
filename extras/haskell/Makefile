@@ -26,10 +26,7 @@ HSRC = Main.hs \
 
 RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
-# TOP = /mnt/d/Users/levys
-TOP = $(HOME)
-
-DST = $(TOP)/Documents/Arduino/libraries/Hackflight/examples/Copilot
+DST = $(MYHOME)/Documents/Arduino/libraries/Hackflight/examples/Copilot
 
 all: copilot.h copilot.c
 
