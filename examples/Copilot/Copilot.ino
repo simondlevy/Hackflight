@@ -49,9 +49,9 @@ void copilot_runMotors(float m1, float m2, float m3, float m4)
     Serial.println();
 }
 
-void copilot_debug(float phi)
+void copilot_debug(float value)
 {
-    printf("Phi: %+3.3f\n", phi);
+    printf("%+3.3f\n", value);
 }
 
 static void runReceiver(void)

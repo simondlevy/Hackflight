@@ -37,8 +37,10 @@ gyrometer state =
                (z       state) 
                (dz      state) 
                (phi     state)
-               ((dphi   state) + gyrometerX)
+               ((dphi   state) + (deg2rad gyrometerX))
                (theta   state)
-               ((dtheta state) + gyrometerY)
+               ((dtheta state) + (deg2rad gyrometerY))
                (psi     state)
-               ((dpsi   state) + gyrometerZ)
+               ((dpsi   state) + (deg2rad gyrometerZ))
+
+  where deg2rad d = d * pi / 180

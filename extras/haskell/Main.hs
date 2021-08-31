@@ -58,7 +58,7 @@ spec = do
 
   let (demands, state) = hackflight receiver sensors pidControllers
 
-  trigger "copilot_debug" true [arg $ phi state]
+  trigger "copilot_debug" true [arg $ dphi state]
 
   -- Use the mixer to convert the demands into motor values
   let (m1, m2, m3, m4) = getMotors mixer demands
