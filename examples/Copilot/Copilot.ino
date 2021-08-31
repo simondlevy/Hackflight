@@ -28,25 +28,10 @@ void serialEvent1(void)
     }
 }
 
-static void reportMotor(float value, uint8_t index)
-{
-    Serial.print("m");
-    Serial.print(index);
-    Serial.print(": ");
-    Serial.print(value);
-    Serial.print("    ");
-}
-
 // Called by Copilot
 void copilot_runMotors(float m1, float m2, float m3, float m4)
 {
-    return;
-    reportMotor(m1, 1);
-    reportMotor(m2, 2);
-    reportMotor(m3, 3);
-    reportMotor(m4, 4);
-  
-    Serial.println();
+    printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
 }
 
 void copilot_debug(float value)
