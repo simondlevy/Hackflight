@@ -45,4 +45,5 @@ hackflight receiver sensors pidControllers mixer =
                            (pitch demands)
                            (yaw demands)
 
+    -- Apply mixer to demands to get motor values
     in mixer demands
