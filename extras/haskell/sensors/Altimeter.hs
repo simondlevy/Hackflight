@@ -17,9 +17,7 @@ import Language.Copilot
 
 import State
 import Sensor
-
-time :: Stream Float
-time  = extern "copilot_time" Nothing
+import Time
 
 altimeterZ :: Stream Float
 altimeterZ = extern "copilot_altimeterZ" Nothing

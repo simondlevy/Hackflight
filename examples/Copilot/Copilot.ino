@@ -8,14 +8,38 @@
 
 #include "copilot.h"
 
-// IMU ---------------------------------------------
+// IMU ------------------------------------------------------------------------
 
 #include <Wire.h>
 #include <USFS_Master.h>
 
 static USFS_Master usfs;
 
-// Receiver ----------------------------------------
+static void startImu(void)
+{
+    delay(100);
+    if (!usfs.begin()) {
+        while (true) {
+            Serial.println(usfs.getErrorString());
+        }
+    }
+}
+
+static void updateImu(void)
+{
+    usfs.checkEventStatus();
+
+    if (usfs.gotGyrometer()) {
+        usfs.readGyrometer(copilot_gyrometerX, copilot_gyrometerY, copilot_gyrometerZ);
+    }
+
+    if (usfs.gotQuaternion()) {
+        usfs.readQuaternion(copilot_quaternionW, copilot_quaternionX, copilot_quaternionY, copilot_quaternionZ);
+    }
+}
+
+
+// Receiver -------------------------------------------------------------------
 
 #include <DSMRX.h>
 
@@ -26,17 +50,6 @@ void serialEvent1(void)
     while (Serial1.available()) {
         rx.handleSerialEvent(Serial1.read(), micros());
     }
-}
-
-// Called by Copilot
-void copilot_runMotors(float m1, float m2, float m3, float m4)
-{
-    printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
-}
-
-void copilot_debug(float value)
-{
-    printf("%+3.3f\n", value);
 }
 
 static void runReceiver(void)
@@ -61,28 +74,34 @@ static void runReceiver(void)
     }
 }
 
-static void startImu(void)
+
+// Clock ---------------------------------------------------------------------
+
+static uint32_t time_usec;
+
+static void startClock(void)
 {
-    delay(100);
-    if (!usfs.begin()) {
-        while (true) {
-            Serial.println(usfs.getErrorString());
-        }
-    }
+    time_usec = micros();
 }
 
-static void runImu(void)
+static void updateClock(void)
 {
-    usfs.checkEventStatus();
 
-    if (usfs.gotGyrometer()) {
-        usfs.readGyrometer(copilot_gyrometerX, copilot_gyrometerY, copilot_gyrometerZ);
-    }
-
-    if (usfs.gotQuaternion()) {
-        usfs.readQuaternion(copilot_quaternionW, copilot_quaternionX, copilot_quaternionY, copilot_quaternionZ);
-    }
 }
+
+// Called by Copilot ----------------------------------------------------------
+
+void copilot_runMotors(float m1, float m2, float m3, float m4)
+{
+    printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
+}
+
+void copilot_debug(float value)
+{
+    printf("%+3.3f\n", value);
+}
+
+// Setup ------------------------------------------------------------------------
 
 void setup(void)
 {
@@ -97,13 +116,19 @@ void setup(void)
 
     // IMU
     startImu(); 
+
+    startClock();
 }
+
+// Loop --------------------------------------------------------------------------
 
 void loop(void)
 {
-    runReceiver();
+    updateClock();
 
-    runImu();
+    updateReceiver();
+
+    updateImu();
 
     // Run Copilot code
     step();
