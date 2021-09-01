@@ -36,10 +36,10 @@ hackflight receiver sensors pidControllers mixer =
                           pidControllers
 
         -- Get the vehicle state by running the sensors
-        state = compose sensors zeroState
+        vehicleState = compose sensors zeroState
 
         -- Map the PID update function to the pid controllers
-        pidControllers'' = map (pidUpdate state) pidControllers'
+        pidControllers'' = map (pidUpdate vehicleState) pidControllers'
 
         -- Sum over the list of demands to get the final demands
         demands = foldr addDemands receiverDemands (map pidDemands pidControllers'')
