@@ -17,10 +17,8 @@ import PidController
 import Demands
 import Mixer
 import Safety
+import Time
 import Utils(compose)
-
-time :: Stream Float
-time  = extern "copilot_time" Nothing
 
 hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> Motors
 
