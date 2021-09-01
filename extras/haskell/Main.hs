@@ -35,7 +35,6 @@ import Time
 
 spec = do
 
-{--
   let receiver = makeReceiver 4.0
 
   -- These sensors will be run right-to-left via composition
@@ -66,8 +65,6 @@ spec = do
                                     arg $ m2 motors,
                                     arg $ m3 motors,
                                     arg $ m4 motors]
-
---}
 
   -- Send the LED state to the external C function
   trigger "copilot_setLed" true [arg $ time < 5]

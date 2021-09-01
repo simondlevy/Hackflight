@@ -99,7 +99,7 @@ static void updateClock(void)
 
 void copilot_runMotors(float m1, float m2, float m3, float m4)
 {
-    printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
+    // printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
 }
 
 void copilot_setLed(bool on)
@@ -109,7 +109,7 @@ void copilot_setLed(bool on)
 
 void copilot_debug(float value)
 {
-    printf("%+3.3f\n", value);
+    // printf("%+3.3f\n", value);
 }
 
 // Setup ------------------------------------------------------------------------
