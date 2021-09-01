@@ -56,7 +56,7 @@ spec = do
 
   let mixer = quadXAPMixer
 
-  let motors = hackflight receiver sensors pidControllers mixer
+  let (motors, ledState) = hackflight receiver sensors pidControllers mixer
 
   -- Send the motor values to the external C function
   trigger "copilot_runMotors" true [arg $ m1 motors,

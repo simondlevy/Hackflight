@@ -20,7 +20,9 @@ import Safety
 import Time
 import Utils(compose)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> Motors
+type LedState = Stream Bool
+
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> (Motors, LedState)
 
 hackflight receiver sensors pidControllers mixer = 
 
@@ -49,4 +51,4 @@ hackflight receiver sensors pidControllers mixer =
                            (yaw demands)
 
     -- Apply mixer to demands to get motor values
-    in mixer demands
+    in ((mixer demands), false)
