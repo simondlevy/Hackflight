@@ -64,5 +64,9 @@ spec = do
                                     arg $ m3 motors,
                                     arg $ m4 motors]
 
+
+  -- Send the LED state to the external C function
+  trigger "copilot_setLed" true [arg ledState]
+ 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
