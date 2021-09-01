@@ -10,6 +10,8 @@ module Hackflight where
 
 import Language.Copilot
 
+import Prelude hiding((<))
+
 import Receiver
 import State
 import Sensor
@@ -50,5 +52,8 @@ hackflight receiver sensors pidControllers mixer =
                            (pitch demands)
                            (yaw demands)
 
+        -- Blink LED on startup
+        ledState = time < 1.0
+
     -- Apply mixer to demands to get motor values
-    in ((mixer demands), false)
+    in ((mixer demands), ledState)
