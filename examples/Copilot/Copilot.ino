@@ -8,6 +8,10 @@
 
 #include "copilot.h"
 
+// LED ------------------------------------------------------------------------
+
+static uint8_t LED_PIN = 13;
+
 // IMU ------------------------------------------------------------------------
 
 #include <Wire.h>
@@ -52,10 +56,8 @@ void serialEvent1(void)
     }
 }
 
-static void runReceiver(void)
+static void updateReceiver(void)
 {
-    static const uint8_t CHANNELS = 8;
-
     if (rx.timedOut(micros())) {
         // copilot_receiverLostSignal = true;
     }
@@ -77,7 +79,7 @@ static void runReceiver(void)
 
 // Clock ---------------------------------------------------------------------
 
-static uint32_t start_time_usec;
+static uint32_t start_time;
 
 static void startClock(void)
 {
@@ -96,6 +98,11 @@ void copilot_runMotors(float m1, float m2, float m3, float m4)
     printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
 }
 
+void copilot_setLed(bool on)
+{
+    digitalWrite(LED_PIN, on);
+}
+
 void copilot_debug(float value)
 {
     printf("%+3.3f\n", value);
@@ -105,8 +112,11 @@ void copilot_debug(float value)
 
 void setup(void)
 {
-    // Start I^2C
+    // I^2C
     Wire.begin();
+
+    // LED
+    pinMode(LED_PIN, OUTPUT);
 
     // Serial comms
     Serial.begin(115200);
@@ -117,6 +127,7 @@ void setup(void)
     // IMU
     startImu(); 
 
+    // Timing
     startClock();
 }
 

@@ -29,7 +29,10 @@ RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
 DST = $(MYHOME)/Documents/Arduino/libraries/Hackflight/examples/Copilot
 
-all: copilot.h copilot.c
+all: copilot.cpp copilot.h
+	cp copilot.c $(DST)/copilot.cpp
+	sed -i 's/extern/EXTERN/g' copilot.h
+	cat cfiles/header.h copilot.h > $(DST)/copilot.h
 
 copilot.c: $(HSRC) Main.hs
 	$(RUNH)
@@ -42,11 +45,6 @@ clean:
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
-
-copy: copilot.cpp copilot.h
-	cp copilot.c $(DST)/copilot.cpp
-	sed -i 's/extern/EXTERN/g' copilot.h
-	cat cfiles/header.h copilot.h > $(DST)/copilot.h
 
 copilot.cpp: copilot.c
 	tail -n +8 copilot.c > tmp.c
