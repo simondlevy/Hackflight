@@ -8,6 +8,8 @@
 
 module Hackflight where
 
+import Language.Copilot
+
 import Receiver
 import State
 import Sensor
@@ -16,6 +18,9 @@ import Demands
 import Mixer
 import Safety
 import Utils(compose)
+
+time :: Stream Float
+time  = extern "copilot_time" Nothing
 
 hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> Motors
 
