@@ -54,15 +54,15 @@ spec = do
   -- Pos-hold goes first so that it can access roll/pitch demands from receiver
   let pidControllers = [ratePid, yawPid, levelPid]
 
-  let mixer = QuadXAPMixer
+  let mixer = quadXAPMixer
 
-  let demands = hackflight receiver sensors pidControllers
-
-  -- Use the mixer to convert the demands into motor values
-  let (m1, m2, m3, m4) = getMotors mixer demands
+  let motors = hackflight receiver sensors pidControllers mixer
 
   -- Send the motor values to the external C function
-  trigger "copilot_runMotors" true [arg m1, arg m2, arg m3, arg m4]
+  trigger "copilot_runMotors" true [arg $ m1 motors,
+                                    arg $ m2 motors,
+                                    arg $ m3 motors,
+                                    arg $ m4 motors]
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"

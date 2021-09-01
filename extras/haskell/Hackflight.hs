@@ -13,12 +13,13 @@ import State
 import Sensor
 import PidController
 import Demands
+import Mixer
 import Safety
 import Utils(compose)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Demands
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> Motors
 
-hackflight receiver sensors pidControllers = 
+hackflight receiver sensors pidControllers mixer = 
 
     let 
  
@@ -44,4 +45,4 @@ hackflight receiver sensors pidControllers =
                            (pitch demands)
                            (yaw demands)
 
-    in demands'
+    in mixer demands

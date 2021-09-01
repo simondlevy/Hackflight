@@ -13,15 +13,21 @@ import Language.Copilot
 import Demands
 import Utils(constrain)
 
-data QuadXAPMixer = QuadXAPMixer
+data Motors = QuadMotors { m1 :: Stream Float
+                         , m2 :: Stream Float
+                         , m3 :: Stream Float
+                         , m4 :: Stream Float }
 
-getMotors :: QuadXAPMixer -> Demands -> (Stream Float, Stream Float, Stream Float, Stream Float)
+type Mixer = Demands -> Motors
 
-getMotors mixer demands = 
-  (  constrain (t - r - p + y)
-   , constrain (t + r + p + y)
-   , constrain (t + r - p - y)
-   , constrain (t - r + p - y) )
+quadXAPMixer :: Mixer
+
+quadXAPMixer demands =
+
+  QuadMotors  (constrain (t - r - p + y))
+              (constrain (t + r + p + y))
+              (constrain (t + r - p - y))
+              (constrain (t - r + p - y))
 
   where 
 
@@ -29,5 +35,3 @@ getMotors mixer demands =
     r = roll demands
     p = pitch demands
     y = yaw demands
-
-
