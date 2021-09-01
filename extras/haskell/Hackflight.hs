@@ -20,9 +20,8 @@ import Demands
 import Mixer
 import Safety
 import Time
+import LED
 import Utils(compose)
-
-type LedState = Stream Bool
 
 hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> (Motors, LedState)
 
