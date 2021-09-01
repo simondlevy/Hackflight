@@ -21,6 +21,8 @@ static USFS_Master usfs;
 
 static void startImu(void)
 {
+    return;
+
     delay(100);
     if (!usfs.begin()) {
         while (true) {
@@ -31,14 +33,16 @@ static void startImu(void)
 
 static void updateImu(void)
 {
+    return;
+
     usfs.checkEventStatus();
 
     if (usfs.gotGyrometer()) {
-        usfs.readGyrometer(copilot_gyrometerX, copilot_gyrometerY, copilot_gyrometerZ);
+        //usfs.readGyrometer(copilot_gyrometerX, copilot_gyrometerY, copilot_gyrometerZ);
     }
 
     if (usfs.gotQuaternion()) {
-        usfs.readQuaternion(copilot_quaternionW, copilot_quaternionX, copilot_quaternionY, copilot_quaternionZ);
+        //usfs.readQuaternion(copilot_quaternionW, copilot_quaternionX, copilot_quaternionY, copilot_quaternionZ);
     }
 }
 
@@ -68,10 +72,10 @@ static void updateReceiver(void)
     
         rx.getChannelValues(values);
 
-        copilot_receiverThrottle = values[0];
-        copilot_receiverRoll = values[1];
-        copilot_receiverPitch = values[2];
-        copilot_receiverYaw = values[3];
+        //copilot_receiverThrottle = values[0];
+        //copilot_receiverRoll = values[1];
+        //copilot_receiverPitch = values[2];
+        //copilot_receiverYaw = values[3];
 
     }
 }
