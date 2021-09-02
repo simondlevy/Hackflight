@@ -15,6 +15,7 @@ HSRC = Main.hs \
        Utils.hs \
        Mixer.hs \
        PidController.hs \
+       LED.hs \
        pidcontrollers/RatePid.hs \
        pidcontrollers/YawPid.hs \
        pidcontrollers/AltHoldPid.hs \
