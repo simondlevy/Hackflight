@@ -17,5 +17,4 @@ type LedState = Stream Bool
 ledState :: LedState
 
 -- Blink LED on startup
-ledState = time < 3.0
-
+ledState = time < 1.0

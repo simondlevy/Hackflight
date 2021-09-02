@@ -60,14 +60,14 @@ spec = do
 
   let (motors, ledState) = hackflight receiver sensors pidControllers mixer
 
-  -- Send the motor values to the external C function
+  -- Send the motor values using the external C function
   trigger "copilot_runMotors" true [arg $ m1 motors,
                                     arg $ m2 motors,
                                     arg $ m3 motors,
                                     arg $ m4 motors]
 
-  -- Send the LED state to the external C function
-  trigger "copilot_setLed" true [arg $ time < 5]
+  -- Send the LED using external C function
+  trigger "copilot_setLed" true [arg $ ledState]
  
 -- Compile the spec
 main = reify spec >>= compile "copilot"
