@@ -17,11 +17,10 @@ import Language.Copilot
 
 import State
 import Sensor
-import Time
+import Time(time_sec)
 
 altimeterZ :: Stream Float
 altimeterZ = extern "copilot_altimeterZ" Nothing
-
 
 altimeter :: Sensor
 
@@ -32,7 +31,7 @@ altimeter state =
                (y      state)
                (dy     state)
                ((z     state) + altimeterZ)
-               ((dz    state) + ((altimeterZ - z') / (time - time')))
+               ((dz    state) + ((altimeterZ - z') / (time_sec - time_sec')))
                (phi    state)
                (dphi   state)
                (theta  state)
@@ -43,4 +42,4 @@ altimeter state =
   where 
     
     z' = [0] ++ altimeterZ
-    time' = [0] ++ time
+    time_sec' = [0] ++ time_sec

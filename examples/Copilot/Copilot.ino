@@ -84,16 +84,18 @@ static void updateReceiver(void)
 
 // Clock ---------------------------------------------------------------------
 
-static uint32_t start_time;
+static uint32_t start_time_usec;
 
 static void startClock(void)
 {
-    start_time = micros();
+    start_time_usec = micros();
 }
 
 static void updateClock(void)
 {
-    copilot_time = (micros() - start_time) / 1e6;
+    //copilot_time_usec = micros();
+    //copilot_time_msec = millis();
+    copilot_time_sec = (micros() - start_time_usec) / 1e6;
 }
 
 // Called by Copilot ----------------------------------------------------------
