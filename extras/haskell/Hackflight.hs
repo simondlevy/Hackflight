@@ -30,8 +30,7 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
     -- Use receiver data to trap failsafe
     failsafe = receiverLostSignal || failsafe' where failsafe' = [False] ++ failsafe
 
-    motors = if (isTrue failsafe) then zeroMotors
-             else runArmed receiver sensors pidControllers mixer
+    motors = runArmed receiver sensors pidControllers mixer
 
     -- Blink LED on startup
     ledState = time_msec < 1000 && mod (div time_msec 50) 2 == 0
