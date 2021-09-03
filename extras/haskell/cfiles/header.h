@@ -3,3 +3,5 @@
 #else
 #define EXTERN
 #endif
+
+#include <stdint.h>

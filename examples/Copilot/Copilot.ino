@@ -94,7 +94,7 @@ static void startClock(void)
 static void updateClock(void)
 {
     //copilot_time_usec = micros();
-    //copilot_time_msec = millis();
+    copilot_time_msec = millis();
     copilot_time_sec = (micros() - start_time_usec) / 1e6;
 }
 
