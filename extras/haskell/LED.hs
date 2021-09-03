@@ -11,7 +11,7 @@ module LED where
 import Prelude hiding((<), (>), (&&), (||))
 import Language.Copilot
 
-import Time(time_sec, time_msec)
+import Time(time_msec)
 
 type LedState = Stream Bool
 
@@ -19,14 +19,14 @@ ledState :: LedState
 
 -- Blink LED on startup
 ledState = time_msec < 1000 && 
-           (  time_sec > 0.00 && time_sec < 0.05
-           || time_sec > 0.10 && time_sec < 0.15 
-           || time_sec > 0.20 && time_sec < 0.25 
-           || time_sec > 0.30 && time_sec < 0.35 
-           || time_sec > 0.40 && time_sec < 0.45 
-           || time_sec > 0.50 && time_sec < 0.55 
-           || time_sec > 0.60 && time_sec < 0.65 
-           || time_sec > 0.70 && time_sec < 0.75 
-           || time_sec > 0.80 && time_sec < 0.85 
-           || time_sec > 0.90 && time_sec < 0.95 
+           (  time_msec > 0 && time_msec < 50
+           || time_msec > 100 && time_msec < 150
+           || time_msec > 200 && time_msec < 250 
+           || time_msec > 300 && time_msec < 350 
+           || time_msec > 400 && time_msec < 450 
+           || time_msec > 500 && time_msec < 550 
+           || time_msec > 600 && time_msec < 650 
+           || time_msec > 700 && time_msec < 750 
+           || time_msec > 800 && time_msec < 850 
+           || time_msec > 900 && time_msec < 950 
            )
