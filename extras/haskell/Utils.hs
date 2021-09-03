@@ -30,3 +30,6 @@ deg2rad d = d * pi / 180
 
 constrain :: Stream Float -> Stream Float
 constrain x = if x < 0 then 0 else if x > 1 then 1 else x
+
+isTrue :: Stream Bool -> Bool
+isTrue true = True
