@@ -46,6 +46,8 @@ spec = do
                                0.4      -- windupMax
                                40       -- maxDegreesPerSecond
 
+  -- Set up some PID controllers
+
   let yawPid = yawController 2.0 -- Kp
                              0.1 -- Ki
                              0.4 -- windupMax
@@ -58,6 +60,7 @@ spec = do
 
   let mixer = quadXAPMixer
 
+  -- Run the main Hackflight algorithm, getting the motor spins and LED state
   let (motors, ledState) = hackflight receiver sensors pidControllers mixer
 
   -- Send the motor values using the external C function

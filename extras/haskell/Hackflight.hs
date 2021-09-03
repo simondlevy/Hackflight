@@ -16,7 +16,6 @@ import Sensor
 import PidController
 import Demands
 import Mixer
-import Safety
 import LED
 import Utils(compose)
 
@@ -25,6 +24,8 @@ hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> (Motors, LedSt
 hackflight receiver sensors pidControllers mixer = 
 
     let 
+
+        -- Use receiver data to check safety (armed, failsafe)
  
         -- Get receiver demands from external C functions
         receiverDemands = getDemands receiver
