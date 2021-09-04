@@ -27,17 +27,17 @@ altimeter :: Sensor
 altimeter state =
 
   State (x      state)
-               (dx     state)
-               (y      state)
-               (dy     state)
-               ((z     state) + altimeterZ)
-               ((dz    state) + ((altimeterZ - z') / (time_sec - time_sec')))
-               (phi    state)
-               (dphi   state)
-               (theta  state)
-               (dtheta state)
-               (psi    state)
-               (dpsi   state)
+        (dx     state)
+        (y      state)
+        (dy     state)
+        ((z     state) + altimeterZ)
+        ((dz    state) + ((altimeterZ - z') / (time_sec - time_sec')))
+        (phi    state)
+        (dphi   state)
+        (theta  state)
+        (dtheta state)
+        (psi    state)
+        (dpsi   state)
 
   where 
     

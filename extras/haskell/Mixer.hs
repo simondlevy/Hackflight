@@ -18,14 +18,11 @@ data Motors = QuadMotors { m1 :: Stream Float
                          , m3 :: Stream Float
                          , m4 :: Stream Float }
 
-zeroMotors :: Motors
-zeroMotors = QuadMotors 0 0 0 0
-
-type Mixer = Demands -> Motors
+type Mixer = Stream Bool -> Demands -> Motors
 
 quadXAPMixer :: Mixer
 
-quadXAPMixer demands =
+quadXAPMixer _ demands =
 
   QuadMotors  (constrain (t - r - p + y))
               (constrain (t + r + p + y))
