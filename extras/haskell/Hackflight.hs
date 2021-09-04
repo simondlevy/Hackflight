@@ -16,7 +16,6 @@ import Prelude hiding((||), (++), (<), (&&), (==), div, mod)
 
 import Receiver
 import State
-import Safety
 import Sensor
 import PidController
 import Demands

@@ -8,7 +8,6 @@
 HSRC = Main.hs \
        Receiver.hs \
        Hackflight.hs \
-       Safety.hs \
        Demands.hs \
        State.hs \
        Sensor.hs \
