@@ -6,6 +6,8 @@
   MIT License
 --}
 
+{-# LANGUAGE RebindableSyntax #-}
+
 module Mixer where
 
 import Language.Copilot
@@ -22,12 +24,12 @@ type Mixer = Stream Bool -> Demands -> Motors
 
 quadXAPMixer :: Mixer
 
-quadXAPMixer _ demands =
+quadXAPMixer  failsafe demands =
 
-  QuadMotors  (constrain (t - r - p + y))
-              (constrain (t + r + p + y))
-              (constrain (t + r - p - y))
-              (constrain (t - r + p - y))
+  QuadMotors  (if failsafe then 0 else (constrain (t - r - p + y)))
+              (if failsafe then 0 else (constrain (t + r + p + y)))
+              (if failsafe then 0 else (constrain (t + r - p - y)))
+              (if failsafe then 0 else (constrain (t - r + p - y)))
 
   where 
 
