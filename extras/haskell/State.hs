@@ -8,9 +8,15 @@
   MIT License
 --}
 
+{-# LANGUAGE RebindableSyntax #-}
+
 module State where
 
 import Language.Copilot
+
+import Prelude hiding((&&), (<))
+
+import Utils(rad2deg)
 
 data State = State {   x :: Stream Float
                 ,     dx :: Stream Float
@@ -30,6 +36,12 @@ data State = State {   x :: Stream Float
 zeroState :: State
 
 zeroState = State 0 0 0 0 0 0 0 0 0 0 0 0
+
+
+safeToArm :: State -> Stream Bool
+
+safeToArm (State _ _ _ _ _ _ phi _ theta _ _ _) = safe phi && safe theta
+  where safe angle = (abs (rad2deg angle)) < 25
 
 
 addStates :: State -> State -> State

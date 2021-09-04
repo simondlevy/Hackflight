@@ -28,6 +28,9 @@ in_band value band = value > (-band) && value < band
 deg2rad :: Stream Float -> Stream Float
 deg2rad d = d * pi / 180
 
+rad2deg :: Stream Float -> Stream Float
+rad2deg r = r * 180 / pi
+
 constrain :: Stream Float -> Stream Float
 constrain x = if x < 0 then 0 else if x > 1 then 1 else x
 

@@ -22,8 +22,6 @@ static USFS_Master usfs;
 
 static void startImu(void)
 {
-    return;
-
     delay(100);
     if (!usfs.begin()) {
         while (true) {
@@ -38,16 +36,18 @@ static void updateImu(void)
     usfs.checkEventStatus();
 
     if (usfs.gotGyrometer()) {
-        usfs.readGyrometer(copilot_gyrometerX,
-                           copilot_gyrometerY,
-                           copilot_gyrometerZ);
+        usfs.readGyrometer(
+                copilot_gyrometerX,
+                copilot_gyrometerY,
+                copilot_gyrometerZ);
     }
 
     if (usfs.gotQuaternion()) {
-        usfs.readQuaternion(copilot_quaternionW,
-                            copilot_quaternionX,
-                            copilot_quaternionY,
-                            copilot_quaternionZ);
+        usfs.readQuaternion(
+                copilot_quaternionW,
+                copilot_quaternionX,
+                copilot_quaternionY,
+                copilot_quaternionZ);
     }
 }
 
@@ -74,7 +74,7 @@ static void updateReceiver(void)
     else if (rx.gotNewFrame()) {
 
         float values[8] = {};
-    
+
         rx.getChannelValues(values);
 
         copilot_receiverThrottle = values[0];
@@ -104,7 +104,7 @@ static void updateClock(void)
 
 void copilot_runMotors(float m1, float m2, float m3, float m4)
 {
-    Debugger::printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
+    // Debugger::printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
 }
 
 void copilot_setLed(bool on)
@@ -112,9 +112,9 @@ void copilot_setLed(bool on)
     digitalWrite(LED_PIN, on);
 }
 
-void copilot_debug(bool value)
+void copilot_debug(float value)
 {
-    Debugger::printf("%d\n", value);
+    // Debugger::printf("%f\n", value);
 }
 
 static void powerPin(uint8_t id, uint8_t value)

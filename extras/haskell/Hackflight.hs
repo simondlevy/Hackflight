@@ -12,7 +12,7 @@ module Hackflight where
 
 import Language.Copilot
 
-import Prelude hiding((||), (++), (<), (&&), (==), div, mod)
+import Prelude hiding((||), (++), (<), (>), (&&), (==), div, mod, not)
 
 import Receiver
 import State
@@ -23,9 +23,10 @@ import Mixer
 import Utils(compose, isTrue)
 import Time(time_msec)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> (Motors, Stream Bool)
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
+    (Motors, Stream Bool, Stream Float)
 
-hackflight receiver sensors pidControllers mixer = (motors, ledState)
+hackflight receiver sensors pidControllers mixer = (motors, ledState, phi')
 
   where
 
@@ -40,6 +41,11 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
 
     -- Get the vehicle state by running the sensors
     vehicleState = compose sensors zeroState
+
+    phi' = phi vehicleState
+
+    -- Check level for arming
+    armed = not failsafe && safeToArm vehicleState
 
     -- Map the PID update function to the pid controllers
     pidControllers'' = map (pidUpdate vehicleState) pidControllers'
@@ -57,4 +63,5 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
     motors = mixer failsafe demands
 
     -- Blink LED on startup
-    ledState = time_msec < 2000 && mod (div time_msec 50) 2 == 0
+    ledState = (time_msec < 2000 && mod (div time_msec 50) 2 == 0) ||      
+               (time_msec > 2000 && armed)
