@@ -23,10 +23,9 @@ import Mixer
 import Utils(compose, isTrue)
 import Time(time_msec)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
-  (Motors, Stream Bool, Stream Bool)
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> (Motors, Stream Bool)
 
-hackflight receiver sensors pidControllers mixer = (motors, ledState, failsafe)
+hackflight receiver sensors pidControllers mixer = (motors, ledState)
 
   where
 

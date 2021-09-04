@@ -38,11 +38,16 @@ static void updateImu(void)
     usfs.checkEventStatus();
 
     if (usfs.gotGyrometer()) {
-        usfs.readGyrometer(copilot_gyrometerX, copilot_gyrometerY, copilot_gyrometerZ);
+        usfs.readGyrometer(copilot_gyrometerX,
+                           copilot_gyrometerY,
+                           copilot_gyrometerZ);
     }
 
     if (usfs.gotQuaternion()) {
-        usfs.readQuaternion(copilot_quaternionW, copilot_quaternionX, copilot_quaternionY, copilot_quaternionZ);
+        usfs.readQuaternion(copilot_quaternionW,
+                            copilot_quaternionX,
+                            copilot_quaternionY,
+                            copilot_quaternionZ);
     }
 }
 
@@ -99,7 +104,7 @@ static void updateClock(void)
 
 void copilot_runMotors(float m1, float m2, float m3, float m4)
 {
-    // Debugger::printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
+    Debugger::printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
 }
 
 void copilot_setLed(bool on)

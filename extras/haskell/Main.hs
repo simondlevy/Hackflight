@@ -61,7 +61,7 @@ spec = do
   let mixer = quadXAPMixer
 
   -- Run the main Hackflight algorithm, getting the motor spins and LED state
-  let (motors, ledState, failsafe) = hackflight receiver sensors pidControllers mixer
+  let (motors, ledState) = hackflight receiver sensors pidControllers mixer
 
   -- Send the motor values using the external C function
   trigger "copilot_runMotors" true [arg $ m1 motors,
@@ -69,7 +69,7 @@ spec = do
                                     arg $ m3 motors,
                                     arg $ m4 motors]
 
-  trigger "copilot_debug" true [arg failsafe]
+  -- trigger "copilot_debug" true [arg failsafe]
 
   -- Send the LED using external C function
   trigger "copilot_setLed" true [arg ledState]
