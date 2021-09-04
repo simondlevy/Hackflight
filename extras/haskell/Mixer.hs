@@ -32,7 +32,7 @@ quadXAPMixer  failsafe demands =
               (check $ t - r + p - y)
   where 
 
-    check x = if failsafe then 0 else constrain x
+    check x = if failsafe then 0.5 else constrain x
 
     t = throttle demands
     r = roll demands

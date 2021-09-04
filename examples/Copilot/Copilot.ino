@@ -11,7 +11,7 @@
 
 // LED ------------------------------------------------------------------------
 
-static uint8_t LED_PIN = 13;
+static uint8_t LED_PIN = 13; // Teensy 4.0
 
 // IMU ------------------------------------------------------------------------
 
@@ -27,23 +27,22 @@ static void startImu(void)
     delay(100);
     if (!usfs.begin()) {
         while (true) {
-            Serial.println(usfs.getErrorString());
+            Debugger::printf("%s\n", usfs.getErrorString());
+            delay(500);
         }
     }
 }
 
 static void updateImu(void)
 {
-    return;
-
     usfs.checkEventStatus();
 
     if (usfs.gotGyrometer()) {
-        //usfs.readGyrometer(copilot_gyrometerX, copilot_gyrometerY, copilot_gyrometerZ);
+        usfs.readGyrometer(copilot_gyrometerX, copilot_gyrometerY, copilot_gyrometerZ);
     }
 
     if (usfs.gotQuaternion()) {
-        //usfs.readQuaternion(copilot_quaternionW, copilot_quaternionX, copilot_quaternionY, copilot_quaternionZ);
+        usfs.readQuaternion(copilot_quaternionW, copilot_quaternionX, copilot_quaternionY, copilot_quaternionZ);
     }
 }
 
@@ -64,7 +63,7 @@ void serialEvent1(void)
 static void updateReceiver(void)
 {
     if (rx.timedOut(micros())) {
-        // copilot_receiverLostSignal = true;
+        copilot_receiverLostSignal = true;
     }
 
     else if (rx.gotNewFrame()) {
@@ -73,11 +72,10 @@ static void updateReceiver(void)
     
         rx.getChannelValues(values);
 
-        //copilot_receiverThrottle = values[0];
-        //copilot_receiverRoll = values[1];
-        //copilot_receiverPitch = values[2];
-        //copilot_receiverYaw = values[3];
-
+        copilot_receiverThrottle = values[0];
+        copilot_receiverRoll = values[1];
+        copilot_receiverPitch = values[2];
+        copilot_receiverYaw = values[3];
     }
 }
 
@@ -93,7 +91,6 @@ static void startClock(void)
 
 static void updateClock(void)
 {
-    //copilot_time_usec = micros();
     copilot_time_msec = millis();
     //copilot_time_sec = (micros() - start_time_usec) / 1e6;
 }
@@ -102,7 +99,7 @@ static void updateClock(void)
 
 void copilot_runMotors(float m1, float m2, float m3, float m4)
 {
-    Debugger::printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
+    // Debugger::printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
 }
 
 void copilot_setLed(bool on)
@@ -110,15 +107,26 @@ void copilot_setLed(bool on)
     digitalWrite(LED_PIN, on);
 }
 
-void copilot_debug(float value)
+void copilot_debug(bool value)
 {
-    Debugger::printf("%+3.3f\n", value);
+    Debugger::printf("%d\n", value);
 }
+
+static void powerPin(uint8_t id, uint8_t value)
+{
+    pinMode(id, OUTPUT);
+    digitalWrite(id, value);
+}
+
 
 // Setup ------------------------------------------------------------------------
 
 void setup(void)
 {
+    // Temporary Hack
+    powerPin(21, HIGH);
+    powerPin(22, LOW);
+
     // I^2C
     Wire.begin();
 
@@ -136,6 +144,8 @@ void setup(void)
 
     // Timing
     startClock();
+
+    delay(1000);
 }
 
 // Loop --------------------------------------------------------------------------

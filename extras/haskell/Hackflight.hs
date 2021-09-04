@@ -23,9 +23,10 @@ import Mixer
 import Utils(compose, isTrue)
 import Time(time_msec)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> (Motors, Stream Bool)
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
+  (Motors, Stream Bool, Stream Bool)
 
-hackflight receiver sensors pidControllers mixer = (motors, ledState)
+hackflight receiver sensors pidControllers mixer = (motors, ledState, failsafe)
 
   where
 
@@ -57,4 +58,4 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
     motors = mixer failsafe demands
 
     -- Blink LED on startup
-    ledState = time_msec < 1000 && mod (div time_msec 50) 2 == 0
+    ledState = time_msec < 2000 && mod (div time_msec 50) 2 == 0
