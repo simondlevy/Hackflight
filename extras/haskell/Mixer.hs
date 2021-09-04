@@ -26,12 +26,13 @@ quadXAPMixer :: Mixer
 
 quadXAPMixer  failsafe demands =
 
-  QuadMotors  (if failsafe then 0 else (constrain (t - r - p + y)))
-              (if failsafe then 0 else (constrain (t + r + p + y)))
-              (if failsafe then 0 else (constrain (t + r - p - y)))
-              (if failsafe then 0 else (constrain (t - r + p - y)))
-
+  QuadMotors  (check $ t - r - p + y)
+              (check $ t + r + p + y)
+              (check $ t + r - p - y)
+              (check $ t - r + p - y)
   where 
+
+    check x = if failsafe then 0 else constrain x
 
     t = throttle demands
     r = roll demands
