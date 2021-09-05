@@ -48,8 +48,6 @@ static void updateImu(void)
                 copilot_quaternionX,
                 copilot_quaternionY,
                 copilot_quaternionZ);
-
-        Serial.println(copilot_time_msec);
     }
 }
 
