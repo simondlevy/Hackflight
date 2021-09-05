@@ -28,8 +28,6 @@ data Receiver = Receiver {  throttleMargin :: Stream Float
                           , auxTheshold :: Stream Float
                           , demandScale :: Stream Float
                           , axisTrim :: AxisTrim
-                          , armed :: Stream Bool
-                          , failsafe :: Stream Bool
                          } deriving (Show)
 
 makeReceiverWithTrim :: AxisTrim -> Stream Float -> Receiver
@@ -41,8 +39,6 @@ makeReceiverWithTrim axisTrim demandScale =
              0.40 -- auxThreshold
              demandScale
              axisTrim
-             false -- armed
-             false -- failsafe
 
 makeReceiver :: Stream Float -> Receiver
 makeReceiver demandScale =

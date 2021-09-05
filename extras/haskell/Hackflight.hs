@@ -14,6 +14,7 @@ import Language.Copilot
 
 import Prelude hiding((||), (++), (<), (>), (&&), (==), div, mod, not)
 
+import Safety
 import Receiver
 import State
 import Sensor
@@ -32,9 +33,6 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
     -- Allow enough to for startup
     starting = time_msec < 5000
 
-    -- Use receiver data to trap failsafe
-    failsafe = receiverLostSignal || failsafe' where failsafe' = [False] ++ failsafe
-
     -- Get receiver demands from external C functions
     receiverDemands = getDemands receiver
 
@@ -43,19 +41,6 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
 
     -- Get the vehicle state by running the sensors
     vehicleState = compose sensors zeroState
-
-    -- Aux switch determines arming
-    auxState = receiverAux1 > 0
-
-    -- Aux switch must be off before we can arm
-    auxWasOff = (not starting) && (not auxState) || auxWasOff'
-                where auxWasOff' = [False] ++ auxWasOff
-
-    -- Arm after safety checks
-    armed = not failsafe
-            && safeToArm vehicleState
-            && auxState
-            && auxWasOff
 
     -- Map the PID update function to the pid controllers
     pidControllers'' = map (pidUpdate vehicleState) pidControllers'
@@ -69,8 +54,12 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
                        (pitch demands)
                        (yaw demands)
 
+    -- Get safety status
+    safety = getSafety starting vehicleState
+
     -- Apply mixer to demands to get motor values, returning motor values and LED state
-    motors = mixer armed failsafe demands
+    motors = mixer safety demands
 
     -- Blink LED on startup
-    ledState = (starting && mod (div time_msec 50) 2 == 0) || ((not starting) && armed)
+    ledState = (starting && mod (div time_msec 50) 2 == 0) ||
+               ((not starting) && (armed safety))

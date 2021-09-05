@@ -13,6 +13,7 @@ module Mixer where
 import Language.Copilot
 
 import Demands
+import Safety
 import Utils(constrain)
 
 data Motors = QuadMotors { m1 :: Stream Float
@@ -20,11 +21,11 @@ data Motors = QuadMotors { m1 :: Stream Float
                          , m3 :: Stream Float
                          , m4 :: Stream Float }
 
-type Mixer = Stream Bool -> Stream Bool -> Demands -> Motors
+type Mixer = Safety -> Demands -> Motors
 
 quadXAPMixer :: Mixer
 
-quadXAPMixer  armed failsafe demands =
+quadXAPMixer safety demands =
 
   QuadMotors  (check $ t - r - p + y)
               (check $ t + r + p + y)
@@ -32,7 +33,7 @@ quadXAPMixer  armed failsafe demands =
               (check $ t - r + p - y)
   where 
 
-    check x = if ((not armed) || failsafe) then 0 else constrain x
+    check x = if ((not (armed safety)) || (failsafe safety)) then 0 else constrain x
 
     t = throttle demands
     r = roll demands
