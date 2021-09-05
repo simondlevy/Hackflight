@@ -28,9 +28,7 @@ getSafety starting vehicleState = Safety armed failsafe
 
     -- Arm after safety checks
     armed = if failsafe then false 
-            else if receiverAux1 > 0 && receiverThrottleIsDown then true 
+            else if receiverAux1 > 0 && receiverThrottleIsDown && safeToArm vehicleState then true 
             else if receiverAux1 < 0 then false
             else armed' where armed' = [False] ++ armed
-
-    -- not failsafe && safeToArm vehicleState && auxState && auxWasOff
 
