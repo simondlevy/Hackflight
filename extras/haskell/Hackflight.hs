@@ -51,11 +51,11 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
     auxWasOff = (not starting) && (not auxState) || auxWasOff'
                 where auxWasOff' = [False] ++ auxWasOff
 
-    -- Avoid arming when throttle is up
-    throttleIsDown = (throttle receiverDemands) < 0.1
-
     -- Arm after safety checks
-    armed = not failsafe && safeToArm vehicleState && auxState && auxWasOff
+    armed = not failsafe
+            && safeToArm vehicleState
+            && auxState
+            && auxWasOff
 
     -- Map the PID update function to the pid controllers
     pidControllers'' = map (pidUpdate vehicleState) pidControllers'
@@ -70,7 +70,7 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
                        (yaw demands)
 
     -- Apply mixer to demands to get motor values, returning motor values and LED state
-    motors = mixer failsafe demands
+    motors = mixer armed failsafe demands
 
     -- Blink LED on startup
     ledState = (starting && mod (div time_msec 50) 2 == 0) || ((not starting) && armed)

@@ -86,6 +86,10 @@ getDemands receiver =
 
       yawDemand = angleFun yawTrim id receiverYaw
 
+-- a.k.a. inactive
+receiverThrottleIsDown :: Stream Bool
+receiverThrottleIsDown = receiverThrottle < (-0.995)
+
 -- Externals -------------------------------------------------
 
 receiverThrottle :: Stream Float
