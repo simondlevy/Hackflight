@@ -30,6 +30,7 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState, auxWasOff)
 
   where
 
+    -- Allow enough to for startup
     starting = time_msec < 5000
 
     -- Use receiver data to trap failsafe
@@ -48,7 +49,8 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState, auxWasOff)
     auxState = receiverAux1 > 0
 
     -- Aux switch must be off before we can arm
-    auxWasOff = (not starting) && (not auxState) || auxWasOff' where auxWasOff' = [False] ++ auxWasOff
+    auxWasOff = (not starting) && (not auxState) || auxWasOff'
+                where auxWasOff' = [False] ++ auxWasOff
 
     -- Arm after safety checks
     armed = not failsafe && safeToArm vehicleState && auxState && auxWasOff
