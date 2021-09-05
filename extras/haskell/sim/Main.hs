@@ -14,67 +14,62 @@ module Main where
 import Language.Copilot
 import Copilot.Compile.C99
 
+import Demands
+import Receiver
 import Mixer
 
 -- Sensors
 import Gyrometer
 import Quaternion
-import Altimeter
-import OpticalFlow
 
 -- PID controllers
 import RatePid
 import YawPid
 import LevelPid
-import AltHoldPid
-import PosHoldPid
 
 import Hackflight
 
 import State
 
+import Time
+
 spec = do
 
+  let receiver = makeReceiver 4.0
+
   -- These sensors will be run right-to-left via composition
-  let sensors = [opticalFlow, gyrometer, quaternion, altimeter]
+  let sensors = [gyrometer, quaternion]
 
-  let rate = rateController 0.225    -- Kp
-                            0.001875 -- Ki
-                            0.375    -- Kd
-                            0.4      -- windupMax
-                            40       -- maxDegreesPerSecond
+  let ratePid = rateController 0.225    -- Kp
+                               0.001875 -- Ki
+                               0.375    -- Kd
+                               0.4      -- windupMax
+                               40       -- maxDegreesPerSecond
 
-  let yaw = yawController 2.0 -- Kp
-                          0.1 -- Ki
-                          0.4 -- windupMax
+  -- Set up some PID controllers
 
-  let level = levelController 0.2 -- Kp
-                              45  -- maxAngleDegrees
+  let yawPid = yawController 2.0 -- Kp
+                             0.1 -- Ki
+                             0.4 -- windupMax
 
-  let altHold = altHoldController 0.75 -- Kp
-                                  1.5  -- Ki
-                                  0.4  -- windupMax
-                                  2.5  -- pilotVelZMax
-                                  0.2  -- stickDeadband
-
-  let posHold = posHoldController 0.1 -- Kp
-                                  0.2 -- stickDeadband
+  let levelPid = levelController 0.2 -- Kp
+                                 45  -- maxAngleDegrees
 
   -- Pos-hold goes first so that it can access roll/pitch demands from receiver
-  let pidControllers = [posHold, rate, yaw, level, altHold]
+  let pidControllers = [ratePid, yawPid, levelPid]
 
-  let mixer = QuadXAPMixer
+  let mixer = quadXAPMixer
 
-  let demands = hackflight sensors pidControllers
+  -- Run the main Hackflight algorithm, getting the motor spins and LED state
+  let (motors, ledState) = hackflight receiver sensors pidControllers mixer
 
-  -- Use the mixer to convert the demands into motor values
-  let m1 = getMotor1 mixer demands
-  let m2 = getMotor2 mixer demands
-  let m3 = getMotor3 mixer demands
-  let m4 = getMotor4 mixer demands
+  -- Send the motor values using the external C function
+  trigger "copilot_runMotors" true [arg $ m1 motors,
+                                    arg $ m2 motors,
+                                    arg $ m3 motors,
+                                    arg $ m4 motors]
 
-  -- Send the motor values to the external C function
-  trigger "copilot_runMotors" true [arg m1, arg m2, arg m3, arg m4]
+  -- trigger "copilot_debug" true [arg foo]
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"

@@ -5,29 +5,35 @@
 #
 # MIT License
 
-HSRC = Main.hs Receiver.hs \
+HSRC = Main.hs \
+	   ../Safety.hs \
+       ../Receiver.hs \
        ../Hackflight.hs \
-	   ../Demands.hs \
-	   ../State.hs \
-	   ../Sensor.hs \
-	   ../Utils.hs \
-	   ../Mixer.hs \
-	   ../PidController.hs \
-	   ../pidcontrollers/RatePid.hs \
-	   ../pidcontrollers/YawPid.hs \
-	   ../pidcontrollers/AltHoldPid.hs \
-	   ../pidcontrollers/LevelPid.hs \
-	   ../pidcontrollers/PosHoldPid.hs \
-	   ../sensors/Gyrometer.hs \
-	   ../sensors/Altimeter.hs \
-	   ../sensors/Quaternion.hs \
-	   ../sensors/OpticalFlow.hs
+       ../Demands.hs \
+       ../State.hs \
+       ../Sensor.hs \
+       ../Time.hs \
+       ../Utils.hs \
+       ../Mixer.hs \
+       ../PidController.hs \
+       ../pidcontrollers/RatePid.hs \
+       ../pidcontrollers/YawPid.hs \
+       ../pidcontrollers/AltHoldPid.hs \
+       ../pidcontrollers/LevelPid.hs \
+       ../pidcontrollers/PosHoldPid.hs \
+       ../sensors/Gyrometer.hs \
+       ../sensors/Altimeter.hs \
+       ../sensors/Quaternion.hs \
+       ../sensors/OpticalFlow.hs
 
 RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
-DST = /mnt/d/Users/levys/Documents/Unreal\ Projects/MulticopterSim/Source/CopilotModule
+DST = $(MYHOME)/Documents/Unreal\ Projects/MulticopterSim/Source/CopilotModule
 
-all: copilot.h copilot.c
+all: copilot.cpp copilot.h
+	cp copilot.c $(DST)/copilot.cpp
+	sed -i 's/extern/EXTERN/g' copilot.h
+	cat ../cfiles/header.h copilot.h > $(DST)/copilot.h
 
 copilot.c: $(HSRC) Main.hs
 	$(RUNH)
@@ -36,17 +42,12 @@ copilot.h: $(HSRC) Main.hs
 	$(RUNH)
 
 clean:
-	rm -f *.c *.h *~
+	rm -f copilot.* tmp.c *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
 
-copy: copilot.cpp copilot.h
-	cp copilot.c $(DST)/copilot.cpp
-	sed -i 's/extern/EXTERN/g' copilot.h
-	cat ../header.h copilot.h > $(DST)/copilot.h
-
 copilot.cpp: copilot.c
 	tail -n +8 copilot.c > tmp.c
-	cat ../header.c tmp.c > copilot.c
+	cat ../cfiles/header.c tmp.c > copilot.c
 	rm tmp.c
