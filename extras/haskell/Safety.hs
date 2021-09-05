@@ -26,12 +26,11 @@ getSafety starting vehicleState = Safety armed failsafe
     -- Use receiver data to trap failsafe
     failsafe = receiverLostSignal || failsafe' where failsafe' = [False] ++ failsafe
 
-    -- Aux switch determines arming
-    auxState = receiverAux1 > 0
-
-    -- Aux switch must be off before we can arm
-    auxWasOff = (not starting) && (not auxState) || auxWasOff'
-                where auxWasOff' = [False] ++ auxWasOff
-
     -- Arm after safety checks
-    armed = not failsafe && safeToArm vehicleState && auxState && auxWasOff
+    armed = if failsafe then false 
+            else if receiverAux1 > 0 && receiverThrottleIsDown then true 
+            else if receiverAux1 < 0 then false
+            else armed' where armed' = [False] ++ armed
+
+    -- not failsafe && safeToArm vehicleState && auxState && auxWasOff
+
