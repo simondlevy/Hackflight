@@ -113,9 +113,9 @@ void copilot_setLed(bool on)
     digitalWrite(LED_PIN, on);
 }
 
-void copilot_debug(float value)
+void copilot_debug(bool value)
 {
-    // Debugger::printf("%f\n", value);
+    Debugger::printf("%d\n", value);
 }
 
 static void powerPin(uint8_t id, uint8_t value)

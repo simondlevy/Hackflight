@@ -23,11 +23,14 @@ import Mixer
 import Utils(compose, isTrue)
 import Time(time_msec)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> (Motors, Stream Bool)
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
+    (Motors, Stream Bool, Stream Bool)
 
-hackflight receiver sensors pidControllers mixer = (motors, ledState)
+hackflight receiver sensors pidControllers mixer = (motors, ledState, auxWasOff)
 
   where
+
+    starting = time_msec < 5000
 
     -- Use receiver data to trap failsafe
     failsafe = receiverLostSignal || failsafe' where failsafe' = [False] ++ failsafe
@@ -41,8 +44,14 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
     -- Get the vehicle state by running the sensors
     vehicleState = compose sensors zeroState
 
-    -- Check level for arming
-    armed = not failsafe && safeToArm vehicleState && receiverAux1 > 0
+    -- Aux switch determines arming
+    auxState = receiverAux1 > 0
+
+    -- Aux switch must be off before we can arm
+    auxWasOff = (not starting) && (not auxState) || auxWasOff' where auxWasOff' = [False] ++ auxWasOff
+
+    -- Arm after safety checks
+    armed = not failsafe && safeToArm vehicleState && auxState && auxWasOff
 
     -- Map the PID update function to the pid controllers
     pidControllers'' = map (pidUpdate vehicleState) pidControllers'
@@ -60,6 +69,4 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
     motors = mixer failsafe demands
 
     -- Blink LED on startup
-    blinkTime = 5000
-    ledState = (time_msec < blinkTime && mod (div time_msec 50) 2 == 0) ||
-               (time_msec > blinkTime && armed)
+    ledState = (starting && mod (div time_msec 50) 2 == 0) || ((not starting) && armed)
