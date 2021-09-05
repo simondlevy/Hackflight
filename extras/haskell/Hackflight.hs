@@ -60,6 +60,6 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
     motors = mixer failsafe demands
 
     -- Blink LED on startup
-    blinkTime = 10000
+    blinkTime = 5000
     ledState = (time_msec < blinkTime && mod (div time_msec 50) 2 == 0) ||
                (time_msec > blinkTime && armed)
