@@ -18,13 +18,9 @@ HSRC = Main.hs \
        ../PidController.hs \
        ../pidcontrollers/RatePid.hs \
        ../pidcontrollers/YawPid.hs \
-       ../pidcontrollers/AltHoldPid.hs \
        ../pidcontrollers/LevelPid.hs \
-       ../pidcontrollers/PosHoldPid.hs \
        ../sensors/Gyrometer.hs \
-       ../sensors/Altimeter.hs \
-       ../sensors/Quaternion.hs \
-       ../sensors/OpticalFlow.hs
+       ../sensors/Quaternion.hs
 
 RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
