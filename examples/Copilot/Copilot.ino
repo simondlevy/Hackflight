@@ -25,7 +25,7 @@ static void startImu(void)
     delay(100);
     if (!usfs.begin()) {
         while (true) {
-            Debugger::printf("%s\n", usfs.getErrorString());
+            Serial.println(usfs.getErrorString());
             delay(500);
         }
     }
@@ -48,6 +48,8 @@ static void updateImu(void)
                 copilot_quaternionX,
                 copilot_quaternionY,
                 copilot_quaternionZ);
+
+        Serial.println(copilot_time_msec);
     }
 }
 
@@ -104,7 +106,7 @@ static void updateClock(void)
 
 void copilot_runMotors(float m1, float m2, float m3, float m4)
 {
-    // Debugger::printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
+    //Debugger::printf("m1: %3.3f   m2: %3.3f   m3: %3.3f   m4: %3.3f\n", m1, m2, m3, m4);
 }
 
 void copilot_setLed(bool on)
@@ -131,6 +133,7 @@ void setup(void)
     // Temporary Hack
     powerPin(21, HIGH);
     powerPin(22, LOW);
+    delay(100);
 
     // I^2C
     Wire.begin();
@@ -148,9 +151,9 @@ void setup(void)
     startImu(); 
 
     // Timing
-    startClock();
-
     delay(1000);
+
+    startClock();
 }
 
 // Loop --------------------------------------------------------------------------

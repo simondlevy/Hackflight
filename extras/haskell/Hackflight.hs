@@ -23,10 +23,9 @@ import Mixer
 import Utils(compose, isTrue)
 import Time(time_msec)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
-    (Motors, Stream Bool, Stream Float)
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> (Motors, Stream Bool)
 
-hackflight receiver sensors pidControllers mixer = (motors, ledState, phi')
+hackflight receiver sensors pidControllers mixer = (motors, ledState)
 
   where
 
@@ -41,8 +40,6 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState, phi')
 
     -- Get the vehicle state by running the sensors
     vehicleState = compose sensors zeroState
-
-    phi' = phi vehicleState
 
     -- Check level for arming
     armed = not failsafe && safeToArm vehicleState
@@ -63,5 +60,6 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState, phi')
     motors = mixer failsafe demands
 
     -- Blink LED on startup
-    ledState = (time_msec < 2000 && mod (div time_msec 50) 2 == 0) ||      
-               (time_msec > 2000 && armed)
+    blinkTime = 10000
+    ledState = (time_msec < blinkTime && mod (div time_msec 50) 2 == 0) ||
+               (time_msec > blinkTime && armed)
