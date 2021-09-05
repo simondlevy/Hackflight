@@ -42,7 +42,7 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState)
     vehicleState = compose sensors zeroState
 
     -- Check level for arming
-    armed = not failsafe && safeToArm vehicleState
+    armed = not failsafe && safeToArm vehicleState && receiverAux1 > 0
 
     -- Map the PID update function to the pid controllers
     pidControllers'' = map (pidUpdate vehicleState) pidControllers'
