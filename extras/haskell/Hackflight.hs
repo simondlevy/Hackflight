@@ -23,10 +23,9 @@ import Mixer
 import Utils(compose, isTrue)
 import Time(time_msec)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
-    (Motors, Stream Bool, Stream Bool)
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> (Motors, Stream Bool)
 
-hackflight receiver sensors pidControllers mixer = (motors, ledState, auxWasOff)
+hackflight receiver sensors pidControllers mixer = (motors, ledState)
 
   where
 
@@ -51,6 +50,9 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState, auxWasOff)
     -- Aux switch must be off before we can arm
     auxWasOff = (not starting) && (not auxState) || auxWasOff'
                 where auxWasOff' = [False] ++ auxWasOff
+
+    -- Avoid arming when throttle is up
+    throttleIsDown = (throttle receiverDemands) < 0.1
 
     -- Arm after safety checks
     armed = not failsafe && safeToArm vehicleState && auxState && auxWasOff
