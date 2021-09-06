@@ -40,7 +40,7 @@ spec = do
   let receiver = makeReceiver 4.0
 
   -- These sensors will be run right-to-left via composition
-  let sensors = [gyrometer, quaternion]
+  let sensors = [gyrometer, quaternion, altimeter]
 
   let ratePid = rateController 0.225    -- Kp
                                0.001875 -- Ki
@@ -64,7 +64,7 @@ spec = do
                                      0.2  -- stickDeadband
 
   -- Pos-hold goes first so that it can access roll/pitch demands from receiver
-  let pidControllers = [ratePid]
+  let pidControllers = [ratePid, yawPid, altHoldPid]
 
   let mixer = quadXAPMixer
 
