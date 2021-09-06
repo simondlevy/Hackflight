@@ -55,8 +55,8 @@ getDemands receiver =
 
       axisTrim' = axisTrim receiver
 
-      adjustCommand command =
-          command/2 * if command < 0 then -1 else 1
+      adjustCommand rectified original =
+          rectified/2 * if original < 0 then -1 else 1
 
       cyclicFun command = rcFun command (cyclicExpo receiver) (cyclicRate receiver)
 
@@ -65,7 +65,7 @@ getDemands receiver =
       rcFun x e r = (1 + e * (x*x -1)) * x * r
 
       angleFun trimFun expoFun command =
-          demandScale' * ((trimFun axisTrim') + adjustCommand (expoFun $ rectify command))
+          demandScale' * ((trimFun axisTrim') + adjustCommand (expoFun $ rectify command) command)
 
       throttleFun x = 
           let mid = 0.5

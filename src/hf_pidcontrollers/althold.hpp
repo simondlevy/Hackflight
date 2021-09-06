@@ -20,7 +20,7 @@ namespace hf {
 
         private: 
  
-            // Constants set in instructor ----------------
+            // Constants set in constructor ----------------
 
             float _Kp = 0;
             float _Ki = 0;
