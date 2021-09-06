@@ -113,17 +113,23 @@ void copilot_setLed(bool on)
     digitalWrite(LED_PIN, on);
 }
 
+void copilot_sendSerial(uint8_t byteval)
+{
+    Debugger::printf("0X%02X\n", byteval);
+}
+
 void copilot_debug(bool value)
 {
     Debugger::printf("%d\n", value);
 }
+
+// Temporary hack --------------------------------------------------------------
 
 static void powerPin(uint8_t id, uint8_t value)
 {
     pinMode(id, OUTPUT);
     digitalWrite(id, value);
 }
-
 
 // Setup ------------------------------------------------------------------------
 
