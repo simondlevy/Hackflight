@@ -19,7 +19,8 @@ type Byte = Stream Word8
 
 getSerialByte :: Serial -> State -> Demands -> Byte
 
-getSerialByte _serial _vehicleState _demands = 0
+getSerialByte _serial _vehicleState _demands = byteOut
+  where byteOut = serialByteIn
 
 serialByteIn :: Byte
-serialByteIn  = extern "copilot_serialByteIn" Nothing
+serialByteIn = extern "copilot_serialByte" Nothing

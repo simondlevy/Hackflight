@@ -101,6 +101,15 @@ static void updateClock(void)
     //copilot_time_sec = (micros() - start_time_usec) / 1e6;
 }
 
+// Serial comms ---------------------------------------------------------------
+
+static void updateSerial(void)
+{
+    if (Serial.available()) {
+        copilot_serialByte = Serial.read();
+    }
+}
+
 // Called by Copilot ----------------------------------------------------------
 
 void copilot_runMotors(float m1, float m2, float m3, float m4)
@@ -170,6 +179,8 @@ void loop(void)
     updateReceiver();
 
     updateImu();
+
+    updateSerial();
 
     // Run Copilot code
     step();
