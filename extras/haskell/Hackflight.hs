@@ -28,7 +28,8 @@ import Utils(compose, isTrue)
 hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> Serial ->
     (Motors, Stream Bool, Stream Word8)
 
-hackflight receiver sensors pidControllers mixer _serial = (motors, ledState, 0)
+hackflight receiver sensors pidControllers mixer serial =
+     (motors, led, serialByte)
 
   where
 
@@ -63,5 +64,8 @@ hackflight receiver sensors pidControllers mixer _serial = (motors, ledState, 0)
     motors = mixer safety demands
 
     -- Blink LED on startup
-    ledState = (starting && mod (div time_msec 50) 2 == 0) ||
+    led = (starting && mod (div time_msec 50) 2 == 0) ||
                ((not starting) && (armed safety))
+
+    -- Run serial comms
+    serialByte = getSerialByte serial vehicleState receiverDemands 

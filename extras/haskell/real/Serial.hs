@@ -10,4 +10,11 @@ module Serial where
 
 import Language.Copilot
 
+import State
+import Demands
+
 data Serial = Serial { }
+
+getSerialByte :: Serial -> State -> Demands -> Stream Word8
+
+getSerialByte _serial _vehicleState _demands = 0
