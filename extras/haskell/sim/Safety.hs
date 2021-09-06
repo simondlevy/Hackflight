@@ -6,23 +6,20 @@
   MIT License
 --}
 
-{-# LANGUAGE RebindableSyntax #-}
-
 module Safety where
 
 import Language.Copilot
 
-import Receiver
 import State
 
 data Safety = Safety { armed :: Stream Bool, failsafe :: Stream Bool }
 
 getSafety :: Stream Bool -> State -> Safety
 
-getSafety starting vehicleState = Safety armed failsafe
+getSafety _ _ = Safety armed failsafe
 
   where
 
-    failsafe = false
-
+    -- Simulation is always armed and never loses signal
     armed = true
+    failsafe = false

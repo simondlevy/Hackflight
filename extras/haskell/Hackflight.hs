@@ -21,12 +21,14 @@ import Sensor
 import PidController
 import Demands
 import Mixer
-import Utils(compose, isTrue)
 import Time(time_msec)
+import Serial
+import Utils(compose, isTrue)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> (Motors, Stream Bool)
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> Serial ->
+    (Motors, Stream Bool)
 
-hackflight receiver sensors pidControllers mixer = (motors, ledState)
+hackflight receiver sensors pidControllers mixer _serial = (motors, ledState)
 
   where
 
