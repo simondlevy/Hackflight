@@ -6,14 +6,15 @@
   MIT License
 --}
 
-{-# LANGUAGE RebindableSyntax #-}
-{-# LANGUAGE DataKinds        #-}
-
 module Main where
 
 import Language.Copilot
 import Copilot.Compile.C99
 
+-- Core
+import Hackflight
+import State
+import Time
 import Demands
 import Receiver
 import Mixer
@@ -30,11 +31,6 @@ import YawPid
 import LevelPid
 import AltHoldPid
 import PosHoldPid
-
--- Core
-import Hackflight
-import State
-import Time
 
 -- Serial comms (placeholder)
 import Serial

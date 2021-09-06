@@ -6,14 +6,15 @@
   MIT License
 --}
 
-{-# LANGUAGE RebindableSyntax #-}
-{-# LANGUAGE DataKinds        #-}
-
 module Main where
 
 import Language.Copilot
 import Copilot.Compile.C99
 
+-- Core
+import Hackflight
+import State
+import Time
 import Demands
 import Receiver
 import Mixer
@@ -27,11 +28,8 @@ import RatePid
 import YawPid
 import LevelPid
 
-import Hackflight
-
-import State
-
-import Time
+-- Serial comms
+import Serial
 
 spec = do
 
@@ -61,7 +59,7 @@ spec = do
   let mixer = quadXAPMixer
 
   -- Run the main Hackflight algorithm, getting the motor spins and LED state
-  let (motors, ledState) = hackflight receiver sensors pidControllers mixer
+  let (motors, ledState) = hackflight receiver sensors pidControllers mixer Serial
 
   -- Send the motor values using the external C function
   trigger "copilot_runMotors" true [arg $ m1 motors,
