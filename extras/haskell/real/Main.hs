@@ -71,6 +71,9 @@ spec = do
 
   -- Send the LED using external C function
   trigger "copilot_setLed" true [arg led]
+
+  -- Send and retrieve serial comms
+  trigger "copilot_sendSerial" true [arg byte]
  
 -- Compile the spec
 main = reify spec >>= compile "copilot"
