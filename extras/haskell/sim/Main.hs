@@ -64,12 +64,12 @@ spec = do
                                      0.2  -- stickDeadband
 
   -- Pos-hold goes first so that it can access roll/pitch demands from receiver
-  let pidControllers = [ratePid, yawPid, altHoldPid]
+  let pidControllers = [altHoldPid, ratePid, yawPid, levelPid]
 
   let mixer = quadXAPMixer
 
   -- Run the main Hackflight algorithm, getting the motor spins and LED state
-  let (motors, ledState, yawDemand) = hackflight receiver sensors pidControllers mixer
+  let (motors, _, rollDemand) = hackflight receiver sensors pidControllers mixer
 
   -- Send the motor values using the external C function
   trigger "copilot_runMotors" true [arg $ m1 motors,
@@ -77,7 +77,7 @@ spec = do
                                     arg $ m3 motors,
                                     arg $ m4 motors]
 
-  trigger "copilot_debug" true [arg yawDemand]
+  trigger "copilot_debug" true [arg rollDemand]
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"

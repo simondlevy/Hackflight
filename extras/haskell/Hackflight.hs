@@ -27,7 +27,7 @@ import Time(time_msec)
 hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
   (Motors, Stream Bool, Stream Float)
 
-hackflight receiver sensors pidControllers mixer = (motors, ledState, yawDemand)
+hackflight receiver sensors pidControllers mixer = (motors, ledState, rollDemand)
 
   where
 
@@ -65,4 +65,4 @@ hackflight receiver sensors pidControllers mixer = (motors, ledState, yawDemand)
     ledState = (starting && mod (div time_msec 50) 2 == 0) ||
                ((not starting) && (armed safety))
 
-    yawDemand = yaw demands'
+    rollDemand = roll demands'
