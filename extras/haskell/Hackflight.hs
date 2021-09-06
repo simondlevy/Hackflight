@@ -26,7 +26,7 @@ import Serial
 import Utils(compose, isTrue)
 
 hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> Serial ->
-    (Motors, Stream Bool, Stream Word8)
+    (Motors, Stream Bool, Byte)
 
 hackflight receiver sensors pidControllers mixer serial =
      (motors, led, serialByte)

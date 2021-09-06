@@ -15,6 +15,11 @@ import Demands
 
 data Serial = Serial { }
 
-getSerialByte :: Serial -> State -> Demands -> Stream Word8
+type Byte = Stream Word8
+
+getSerialByte :: Serial -> State -> Demands -> Byte
 
 getSerialByte _serial _vehicleState _demands = 0
+
+serialByteIn :: Byte
+serialByteIn  = extern "copilot_serialByteIn" Nothing
