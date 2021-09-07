@@ -14,6 +14,7 @@ import Language.Copilot
 
 import State
 import Demands
+import Parser
 
 data SerialGuard = SerialGuard { available :: Stream Bool, value :: Stream Word8 }
 

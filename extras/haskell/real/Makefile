@@ -8,6 +8,7 @@
 HSRC = Main.hs \
 	   Safety.hs \
 	   Serial.hs \
+	   Parser.hs \
        ../Receiver.hs \
        ../Hackflight.hs \
        ../Demands.hs \
