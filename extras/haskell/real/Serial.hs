@@ -15,10 +15,10 @@ import Demands
 
 data SerialGuard = SerialGuard { available :: Stream Bool, value :: Stream Word8 }
 
-getSerialOut :: SerialGuard -> State -> Demands -> SerialGuard
+getSerialOut :: State -> Demands -> SerialGuard
 
-getSerialOut _serialIn _vehicleState _demands = SerialGuard false 0
+getSerialOut _vehicleState _demands = SerialGuard false 0
 
 
-serialByteIn :: Byte
+serialByteIn :: Stream Word8
 serialByteIn = extern "copilot_serialByte" Nothing
