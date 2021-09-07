@@ -13,8 +13,8 @@ import Language.Copilot
 import State
 import Demands
 
-data Serial = Serial { }
+data SerialGuard = SerialGuard { available :: Stream Bool, value :: Stream Word8 }
 
-getSerialByte :: Serial -> State -> Demands -> Stream Word8
+getSerialOut :: SerialGuard -> State -> Demands -> SerialGuard
 
-getSerialByte _serial _vehicleState _demands = 0
+getSerialOut _serialIn _vehicleState _demands = SerialGuard false 0
