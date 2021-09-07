@@ -25,7 +25,9 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
 
   where 
 
-    parserState = if not serialAvailable then parserState'
+    parserState {--, direction --} =
+
+                  if not serialAvailable then parserState'
 
                   else if parserState == parserIdle && serialByteIn == 0x24 -- '$'
                       then parserHeaderStart
@@ -57,6 +59,7 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
                      
 
     parserState' = [0] ++ parserState :: Stream Word8
+    -- direction' = [0] ++ direction :: Stream Word8
 
     parserIdle        = 0
     parserHeaderStart = 1
