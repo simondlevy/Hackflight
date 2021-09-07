@@ -31,7 +31,16 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
 
 updateParser :: SerialGuard -> ParserState -> ParserState
 
-updateParser _serialGuard  _parserState = 0
+updateParser _serialGuard  _parserState = parserIdle
+
+  where
+
+    parserIdle        = 0
+    parserHeaderStart = 1
+    parserHeaderM     = 2
+    parserHeaderArrow = 3
+    parserHeaderSize  = 4
+    parserHeaderCmd   = 5
 
 ----------------------------------------------------------
 
