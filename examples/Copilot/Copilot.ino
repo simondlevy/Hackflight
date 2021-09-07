@@ -105,6 +105,8 @@ static void updateClock(void)
 
 static void updateSerial(void)
 {
+    copilot_serialAvailable = Serial.available();
+
     if (Serial.available()) {
         copilot_serialByte = Serial.read();
     }
