@@ -25,10 +25,10 @@ import Time(time_msec)
 import Serial
 import Utils(compose, isTrue)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> SerialGuard ->
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
     (Motors, Stream Bool, SerialGuard)
 
-hackflight receiver sensors pidControllers mixer serial = (motors, led, serialOut)
+hackflight receiver sensors pidControllers mixer = (motors, led, serialOut)
 
   where
 
@@ -67,4 +67,4 @@ hackflight receiver sensors pidControllers mixer serial = (motors, led, serialOu
                ((not starting) && (armed safety))
 
     -- Run serial comms
-    serialOut = getSerialOut serial vehicleState receiverDemands 
+    serialOut = getSerialOut vehicleState receiverDemands 

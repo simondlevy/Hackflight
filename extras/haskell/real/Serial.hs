@@ -13,14 +13,12 @@ import Language.Copilot
 import State
 import Demands
 
-data Serial = Serial { }
+data SerialGuard = SerialGuard { available :: Stream Bool, value :: Stream Word8 }
 
-type Byte = Stream Word8
+getSerialOut :: SerialGuard -> State -> Demands -> SerialGuard
 
-getSerialByte :: Serial -> State -> Demands -> Byte
+getSerialOut _serialIn _vehicleState _demands = SerialGuard false 0
 
-getSerialByte _serial _vehicleState _demands = byteOut
-  where byteOut = serialByteIn
 
 serialByteIn :: Byte
 serialByteIn = extern "copilot_serialByte" Nothing
