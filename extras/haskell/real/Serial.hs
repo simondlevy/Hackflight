@@ -25,6 +25,13 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
 
   where 
 
+    offset = 
+
+      if not serialAvailable then offset'
+      else if parserState == parserHeaderArrow then 0
+      else if parserState == parserHeaderCmd && offset' < dataSize then offset' + 1
+      else offset'
+
     dataSize = 
 
       if not serialAvailable then dataSize'
@@ -70,6 +77,7 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
     parserState' = [0] ++ parserState :: Stream Word8
     direction' = [0] ++ direction :: Stream Word8
     dataSize' = [0] ++ dataSize :: Stream Word8
+    offset' = [0] ++ offset :: Stream Word8
 
     -- Parser constants
     parserIdle        = 0
