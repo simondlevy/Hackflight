@@ -6,6 +6,8 @@
   MIT License
 --}
 
+{-# LANGUAGE RebindableSyntax #-}
+
 module Serial where
 
 import Language.Copilot
@@ -17,7 +19,13 @@ data SerialGuard = SerialGuard { available :: Stream Bool, value :: Stream Word8
 
 getSerialOut :: State -> Demands -> SerialGuard
 
-getSerialOut _vehicleState _demands = SerialGuard false 0
+getSerialOut _vehicleState _demands = SerialGuard available value
+
+  where 
+
+    available = serialAvailable
+
+    value = if available then serialByteIn else 0
 
 
 serialAvailable :: Stream Bool
