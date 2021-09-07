@@ -25,23 +25,15 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
 
   where 
 
-    parserState = updateParser (SerialGuard serialAvailable serialByteIn) parserState'
+    parserState = if not serialAvailable then parserState'
 
-    parserState' = [0] ++ parserState
+                  else if parserState == parserIdle && serialByteIn == 0x24 -- '$'
+                      then parserHeaderStart
 
-updateParser :: SerialGuard -> ParserState -> ParserState
+                  else parserIdle
+                     
 
-updateParser serialGuard  parserState = parserState'
-
-  where
-
-    parserState' = if not (available serialGuard)
-                        then parserState
-                   else if parserState == parserIdle && serialByte == 0x24 -- '$' 
-                        then parserHeaderStart
-                   else parserState
-
-    serialByte = value serialGuard
+    parserState' = [0] ++ parserState :: Stream Word8
 
     parserIdle        = 0
     parserHeaderStart = 1
@@ -49,6 +41,9 @@ updateParser serialGuard  parserState = parserState'
     parserHeaderArrow = 3
     parserHeaderSize  = 4
     parserHeaderCmd   = 5
+
+
+
 
 ----------------------------------------------------------
 
