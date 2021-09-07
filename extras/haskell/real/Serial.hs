@@ -20,5 +20,8 @@ getSerialOut :: State -> Demands -> SerialGuard
 getSerialOut _vehicleState _demands = SerialGuard false 0
 
 
+serialAvailable :: Stream Bool
+serialAvailable = extern "copilot_serialAvailable" Nothing
+
 serialByteIn :: Stream Word8
 serialByteIn = extern "copilot_serialByte" Nothing
