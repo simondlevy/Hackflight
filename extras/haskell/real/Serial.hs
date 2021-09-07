@@ -33,6 +33,26 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
                   else if parserState == parserHeaderStart && serialByteIn == 0x4D -- 'M'
                       then parserHeaderM
 
+                  else if parserState == parserHeaderM && serialByteIn == 0x3E -- '>'
+                      -- XXX
+                      then parserHeaderArrow
+
+                  else if parserState == parserHeaderM && serialByteIn == 0x3C -- '<'
+                      -- XXX
+                      then parserHeaderArrow
+
+                  else if parserState == parserHeaderArrow
+                      -- XXX
+                      then parserHeaderSize
+
+                  else if parserState == parserHeaderSize
+                      -- XXX
+                      then parserHeaderCmd
+
+                  else if parserState == parserHeaderCmd
+                      -- XXX
+                      then parserIdle
+
                   else parserIdle
                      
 
