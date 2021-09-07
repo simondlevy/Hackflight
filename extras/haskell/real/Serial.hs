@@ -35,7 +35,13 @@ updateParser serialGuard  parserState = parserState'
 
   where
 
-    parserState' = if (available serialGuard) then parserIdle else parserIdle
+    parserState' = if not (available serialGuard)
+                        then parserState
+                   else if parserState == parserIdle && serialByte == 0x24 -- '$' 
+                        then parserHeaderStart
+                   else parserState
+
+    serialByte = value serialGuard
 
     parserIdle        = 0
     parserHeaderStart = 1
