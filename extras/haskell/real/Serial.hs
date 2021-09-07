@@ -17,18 +17,23 @@ import Demands
 
 data SerialGuard = SerialGuard { available :: Stream Bool, value :: Stream Word8 }
 
-data ParserState = Idle | HeaderStart | HeaderM | HeaderArrow | HeaderSize | HeaderCmd
+type ParserState = Stream Word8
 
 getSerialOut :: State -> Demands -> SerialGuard
 
-getSerialOut _vehicleState _demands = SerialGuard available value
+getSerialOut _vehicleState _demands = SerialGuard false 0
 
   where 
 
-    available = false
+    parserState = updateParser (SerialGuard serialAvailable serialByteIn) parserState'
 
-    value = if available then serialByteIn else 0
+    parserState' = [0] ++ parserState
 
+updateParser :: SerialGuard -> ParserState -> ParserState
+
+updateParser _serialGuard  _parserState = 0
+
+----------------------------------------------------------
 
 serialAvailable :: Stream Bool
 serialAvailable = extern "copilot_serialAvailable" Nothing
