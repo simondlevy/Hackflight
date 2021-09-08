@@ -11,7 +11,7 @@ HSRC = Test.hs \
 RUNH = runhaskell -i.. Test.hs
 
 test : main.c test.c test.h
-	gcc -o test main.c test.c test.h
+	gcc -o test main.c test.c
 
 run: test
 	./test

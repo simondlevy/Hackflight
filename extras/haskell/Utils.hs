@@ -12,7 +12,7 @@ module Utils
 
 where
 
-import Language.Copilot
+import Language.Copilot hiding(xor)
 import Prelude hiding ((>), (<), (&&), div)
 
 -- https://stackoverflow.com/a/4343542/6110522
@@ -36,3 +36,6 @@ constrain x = if x < 0 then 0 else if x > 1 then 1 else x
 
 isTrue :: Stream Bool -> Bool
 isTrue true = True
+
+xor :: Stream Word8 -> Stream Word8 -> Stream Word8
+xor _a b = 0

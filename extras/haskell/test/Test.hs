@@ -8,16 +8,14 @@
 
 module Test where
 
-import Language.Copilot
+import Language.Copilot hiding(xor)
 import Copilot.Compile.C99
 
 import Utils
 
 spec = do
 
-  let x = deg2rad 0  
-
-  trigger "display" true [arg x]
+  trigger "display" true [arg $ xor 3 4]
 
 -- Compile the spec
 main = reify spec >>= compile "test"
