@@ -77,4 +77,4 @@ byte_xor a b = Byte (bit_xor (b7 a) (b7 b))
                     (bit_xor (b0 a) (b0 b))
 
 xor :: Stream Word8 -> Stream Word8 -> Stream Word8
-xor _a b = 0
+xor a b = byte_to_word8 (byte_xor (word8_to_byte a) (word8_to_byte b))
