@@ -6,8 +6,6 @@
    Additional libraries needed:
 
        https://github.com/simondlevy/RoboFirmwareToolkit
-       https://github.com/simondlevy/MPU
-       https://github.com/simondlevy/CrossPlatformDataBus
        https://github.com/ERROPiX/ESP32_AnalogWrite
 
     Copyright (C) 2021 Simon D. Levy
@@ -22,7 +20,7 @@
 #include "hf_pidcontrollers/level.hpp"
 
 #include "hf_receivers/mock.hpp"
-#include "hf_sensors/usfs.hpp"
+#include "hf_sensors/mpu6050.hpp"
 
 #include <RFT_full.hpp>
 #include <rft_boards/realboards/arduino_serial/tinypico.hpp>
@@ -60,13 +58,11 @@ static hf::LevelPid levelPid = hf::LevelPid(0.80);
 
 // Sensors =====================================================================
 
-static hf::USFS imu;
+static hf::MPU6050 imu;
 
 // Serial tasks ================================================================
 
 hf::SerialTask gcsTask;
-hf::SerialTask telemetryTask = hf::SerialTask(true);
-
 
 // Setup ==============================================================================
 
@@ -82,6 +78,9 @@ void setup(void)
     h.addClosedLoopController(&levelPid);
     h.addClosedLoopController(&ratePid);
     h.addClosedLoopController(&yawPid);
+
+    // Add serial tasks
+    h.addSerialTask(&gcsTask);
 
     // Start Hackflight firmware
     h.begin();
