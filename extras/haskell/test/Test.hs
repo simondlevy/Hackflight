@@ -15,7 +15,7 @@ import Utils
 
 spec = do
 
-  trigger "display" true [arg $ xor 3 4]
+  trigger "display" true [arg $ xor 37 128]
 
 -- Compile the spec
 main = reify spec >>= compile "test"

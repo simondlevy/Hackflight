@@ -13,7 +13,7 @@ module Utils
 where
 
 import Language.Copilot hiding(xor)
-import Prelude hiding ((>), (<), (&&), (==), (>>), div, mod, not)
+import Prelude hiding ((>), (<), (&&), (==), (>>), (/=), div, mod, not)
 
 -- https://stackoverflow.com/a/4343542/6110522
 compose :: Foldable t => t (b -> b) -> b -> b
@@ -63,18 +63,15 @@ byte_to_word8 byte =  128 * (if b7 byte then 1 else 0)
                     +   2 * (if b1 byte then 1 else 0)
                     +       (if b0 byte then 1 else 0)
 
-bit_xor :: Stream Bool -> Stream Bool -> Stream Bool
-bit_xor a b = if a then not b else b
-
 byte_xor :: Byte -> Byte -> Byte
-byte_xor a b = Byte (bit_xor (b7 a) (b7 b))
-                    (bit_xor (b6 a) (b6 b))
-                    (bit_xor (b5 a) (b5 b))
-                    (bit_xor (b4 a) (b4 b))
-                    (bit_xor (b3 a) (b3 b))
-                    (bit_xor (b2 a) (b2 b))
-                    (bit_xor (b1 a) (b1 b))
-                    (bit_xor (b0 a) (b0 b))
+byte_xor a b = Byte ((b7 a) /= (b7 b))
+                    ((b6 a) /= (b6 b))
+                    ((b5 a) /= (b5 b))
+                    ((b4 a) /= (b4 b))
+                    ((b3 a) /= (b3 b))
+                    ((b2 a) /= (b2 b))
+                    ((b1 a) /= (b1 b))
+                    ((b0 a) /= (b0 b))
 
 xor :: Stream Word8 -> Stream Word8 -> Stream Word8
 xor a b = byte_to_word8 (byte_xor (word8_to_byte a) (word8_to_byte b))
