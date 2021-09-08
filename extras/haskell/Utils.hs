@@ -34,8 +34,14 @@ rad2deg r = r * 180 / pi
 constrain :: Stream Float -> Stream Float
 constrain x = if x < 0 then 0 else if x > 1 then 1 else x
 
-isTrue :: Stream Bool -> Bool
-isTrue true = True
+data Byte = Byte {  b0 :: Stream Bool
+                  , b1 :: Stream Bool
+                  , b2 :: Stream Bool
+                  , b3 :: Stream Bool
+                  , b4 :: Stream Bool
+                  , b5 :: Stream Bool
+                  , b6 :: Stream Bool
+                  , b7 :: Stream Bool }
 
 xor :: Stream Word8 -> Stream Word8 -> Stream Word8
 xor _a b = 0
