@@ -13,6 +13,7 @@ module Utils
 where
 
 import Language.Copilot hiding(xor)
+import Copilot.Library.Stacks
 import Prelude hiding ((>), (<), (&&), (==), (>>), (/=), div, mod, not)
 
 -- https://stackoverflow.com/a/4343542/6110522
@@ -33,6 +34,8 @@ rad2deg r = r * 180 / pi
 
 constrain :: Stream Float -> Stream Float
 constrain x = if x < 0 then 0 else if x > 1 then 1 else x
+
+-----------------------------------------------------------------------------------------
 
 data Byte = Byte {  b7 :: Stream Bool
                   , b6 :: Stream Bool

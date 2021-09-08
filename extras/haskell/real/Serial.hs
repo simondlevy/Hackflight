@@ -52,13 +52,6 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
       else if parserState == parserHeaderArrow then serialByteIn
       else dataSize'
 
-    direction =
-
-      if not serialAvailable then direction'
-      else if parserState == parserHeaderM && serialByteIn == 0x3E then 0 -- '>'
-      else if parserState == parserHeaderM && serialByteIn == 0x3C then 1 -- '<'
-      else direction'
-
     parserState =
 
       if not serialAvailable then parserState'
@@ -81,15 +74,18 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
       else if parserState == parserHeaderSize
           then parserHeaderCmd
 
+      else if parserState == parserHeaderCmd && offset < dataSize
+          then parserHeaderCmd
+
       else if parserState == parserHeaderCmd
-          then parserIdle
+              && offset == dataSize
+              && checksum == serialByteIn
+          then parserHeaderCmd
 
       else parserIdle
-         
 
     -- Parser state variables
     parserState' = [0] ++ parserState :: Stream Word8
-    direction' = [0] ++ direction :: Stream Word8
     dataSize' = [0] ++ dataSize :: Stream Word8
     offset' = [0] ++ offset :: Stream Word8
     checksum' = [0] ++ checksum :: Stream Word8
@@ -102,9 +98,6 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
     parserHeaderArrow = 3
     parserHeaderSize  = 4
     parserHeaderCmd   = 5
-
-
-
 
 ----------------------------------------------------------
 
