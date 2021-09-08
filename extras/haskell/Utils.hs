@@ -56,5 +56,15 @@ word8_to_byte n = Byte (mod (div n 128) 2 == 0)
 bit_xor :: Stream Bool -> Stream Bool -> Stream Bool
 bit_xor a b = if a then not b else b
 
+byte_xor :: Byte -> Byte -> Byte
+byte_xor a b = Byte (bit_xor (b7 a) (b7 b))
+                    (bit_xor (b6 a) (b6 b))
+                    (bit_xor (b5 a) (b5 b))
+                    (bit_xor (b4 a) (b4 b))
+                    (bit_xor (b3 a) (b3 b))
+                    (bit_xor (b2 a) (b2 b))
+                    (bit_xor (b1 a) (b1 b))
+                    (bit_xor (b0 a) (b0 b))
+
 xor :: Stream Word8 -> Stream Word8 -> Stream Word8
 xor _a b = 0
