@@ -13,7 +13,7 @@ module Utils
 where
 
 import Language.Copilot hiding(xor)
-import Prelude hiding ((>), (<), (&&), div)
+import Prelude hiding ((>), (<), (&&), (==), (>>), div, mod, not)
 
 -- https://stackoverflow.com/a/4343542/6110522
 compose :: Foldable t => t (b -> b) -> b -> b
@@ -44,7 +44,17 @@ data Byte = Byte {  b7 :: Stream Bool
                   , b0 :: Stream Bool }
 
 word8_to_byte :: Stream Word8 -> Byte
-word8_to_byte n = Byte false false false false false false false false
+word8_to_byte n = Byte (mod (div n 128) 2 == 0)
+                       (mod (div n 64) 2 == 0)
+                       (mod (div n 32) 2 == 0)
+                       (mod (div n 16) 2 == 0)
+                       (mod (div n 8) 2 == 0)
+                       (mod (div n 4) 2 == 0)
+                       (mod (div n 2) 2 == 0)
+                       (mod n 2 == 0)
+
+bit_xor :: Stream Bool -> Stream Bool -> Stream Bool
+bit_xor a b = if a then not b else b
 
 xor :: Stream Word8 -> Stream Word8 -> Stream Word8
 xor _a b = 0
