@@ -23,7 +23,7 @@ import Demands
 import Mixer
 import Time(time_msec)
 import Serial
-import Utils(compose, isTrue)
+import Utils(compose)
 
 hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
     (Motors, Stream Bool, SerialGuard)

@@ -10,10 +10,11 @@
 
 module Serial where
 
-import Language.Copilot
+import Language.Copilot hiding(xor)
 
 import State
 import Demands
+import Utils(xor)
 
 data SerialGuard = SerialGuard { available :: Stream Bool, value :: Stream Word8 }
 
@@ -29,7 +30,7 @@ getSerialOut _vehicleState _demands = SerialGuard false 0
 
       if not serialAvailable then checksum'
       else if parserState == parserHeaderArrow then serialByteIn
-      -- else if parserState == parserHeaderSize then xor checksum' serialByteIn
+      else if parserState == parserHeaderSize then xor checksum' serialByteIn
       else checksum'
 
     offset = 
