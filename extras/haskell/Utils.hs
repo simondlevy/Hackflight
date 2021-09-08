@@ -43,5 +43,8 @@ data Byte = Byte {  b0 :: Stream Bool
                   , b6 :: Stream Bool
                   , b7 :: Stream Bool }
 
+word8_to_byte :: Stream Word8 -> Byte
+word8_to_byte n = Byte false false false false false false false false
+
 xor :: Stream Word8 -> Stream Word8 -> Stream Word8
 xor _a b = 0
