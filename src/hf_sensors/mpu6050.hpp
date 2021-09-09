@@ -105,11 +105,7 @@ namespace hf {
             uint8_t readByte(uint8_t address, uint8_t subAddress)
             {
                 uint8_t data; 
-                Wire.beginTransmission(address);
-                Wire.write(subAddress);	       
-                Wire.endTransmission(false);   
-                Wire.requestFrom(address, (uint8_t) 1); 
-                data = Wire.read();                    
+                readBytes(address, subAddress, 1, &data);
                 return data;                          
             }
 
