@@ -28,74 +28,9 @@ class MPU6050
 
         MPU6050(ascale_t ascale, gscale_t gscale)
         {
-            _ascale = ascale;
-            _gscale = gscale;
+            _aRes = getAres(ascale);
+            _gRes = getGres(gscale);
         }
-
-        float getGres() {
-
-            switch (_gscale)
-            {
-                // Possible gyro scales (and their register bit settings) are:
-                // 250 DPS (00), 500 DPS (01), 1000 DPS (10), and 2000 DPS  (11).
-                // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
-                case GFS_250DPS:
-                    return 250.0 / 32768.0;
-                    break;
-                case GFS_500DPS:
-                    return 500.0 / 32768.0;
-                    break;
-                case GFS_1000DPS:
-                    return 1000.0 / 32768.0;
-                    break;
-                case GFS_2000DPS:
-                    return 2000.0 / 32768.0;
-                    break;
-            }
-        }
-
-
-        float getAres() {
-            switch (_ascale)
-            {
-                // Possible accelerometer scales (and their register bit settings) are:
-                // 2 Gs (00), 4 Gs (01), 8 Gs (10), and 16 Gs  (11).
-                // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
-                case AFS_2G:
-                    return 2.0 / 32768.0;
-                    break;
-                case AFS_4G:
-                    return 4.0 / 32768.0;
-                    break;
-                case AFS_8G:
-                    return 8.0 / 32768.0;
-                    break;
-                case AFS_16G:
-                    return 16.0 / 32768.0;
-                    break;
-            }
-        }
-
-
-        void readAccelData(int16_t * destination)
-        {
-            uint8_t rawData[6]; 
-            readBytes(MPU6050_ADDRESS, ACCEL_XOUT_H, 6, &rawData[0]); 
-            destination[0] = (int16_t)((rawData[0] << 8) | rawData[1]) ;
-            destination[1] = (int16_t)((rawData[2] << 8) | rawData[3]) ;
-            destination[2] = (int16_t)((rawData[4] << 8) | rawData[5]) ;
-        }
-
-        void readGyroData(int16_t * destination)
-        {
-            uint8_t rawData[6];  
-            readBytes(MPU6050_ADDRESS, GYRO_XOUT_H, 6, &rawData[0]);
-            destination[0] = (int16_t)((rawData[0] << 8) | rawData[1]) ;
-            destination[1] = (int16_t)((rawData[2] << 8) | rawData[3]) ;
-            destination[2] = (int16_t)((rawData[4] << 8) | rawData[5]) ;
-        }
-
-
 
         void begin()
         {
@@ -139,6 +74,28 @@ class MPU6050
         {
             return (readByte(MPU6050_ADDRESS, INT_STATUS) & 0x01);
         }
+
+        void readData(float & ax, float &ay, float &az, float &gx, float &gy, float &gz)
+        {
+            int16_t accelCount[3] = {};  // Stores the 16-bit signed accelerometer sensor output
+
+            readAccelData(accelCount);  // Read the x/y/z adc values
+
+            // calculate the accleration value into actual g's
+            ax = (float)accelCount[0] * _aRes; // get actual g value, this depends on scale being set
+            ay = (float)accelCount[1] * _aRes;
+            az = (float)accelCount[2] * _aRes;
+
+            int16_t gyroCount[3] = {};  // Stores the 16-bit signed accelerometer sensor output
+
+            readGyroData(gyroCount);  // Read the x/y/z adc values
+
+            // Calculate the gyro value into actual degrees per second
+            gx = (float)gyroCount[0] * _gRes; // get actual gyro value, this depends on scale being set
+            gy = (float)gyroCount[1] * _gRes;
+            gz = (float)gyroCount[2] * _gRes;
+        }
+
     private:
 
         static const uint8_t  MPU6050_ADDRESS     = 0x68;  // Device address when ADO   = 1;
@@ -258,10 +215,74 @@ class MPU6050
         static const uint8_t  FIFO_R_W            = 0x74;
         static const uint8_t  WHO_AM_I_MPU6050    = 0x75; // Should return  = 0x68;
 
+        float _aRes = 0;
+        float _gRes = 0;
+
         ascale_t _ascale;
         gscale_t _gscale;
 
+        static float getGres(gscale_t gscale) {
 
+            switch (gscale)
+            {
+                // Possible gyro scales (and their register bit settings) are:
+                // 250 DPS (00), 500 DPS (01), 1000 DPS (10), and 2000 DPS  (11).
+                // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
+                case GFS_250DPS:
+                    return 250.0 / 32768.0;
+                    break;
+                case GFS_500DPS:
+                    return 500.0 / 32768.0;
+                    break;
+                case GFS_1000DPS:
+                    return 1000.0 / 32768.0;
+                    break;
+                case GFS_2000DPS:
+                    return 2000.0 / 32768.0;
+                    break;
+            }
+        }
+
+
+        static float getAres(ascale_t ascale) {
+
+            switch (ascale)
+            {
+                // Possible accelerometer scales (and their register bit settings) are:
+                // 2 Gs (00), 4 Gs (01), 8 Gs (10), and 16 Gs  (11).
+                // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
+                case AFS_2G:
+                    return 2.0 / 32768.0;
+                    break;
+                case AFS_4G:
+                    return 4.0 / 32768.0;
+                    break;
+                case AFS_8G:
+                    return 8.0 / 32768.0;
+                    break;
+                case AFS_16G:
+                    return 16.0 / 32768.0;
+                    break;
+            }
+        }
+
+        void readAccelData(int16_t * destination)
+        {
+            uint8_t rawData[6]; 
+            readBytes(MPU6050_ADDRESS, ACCEL_XOUT_H, 6, &rawData[0]); 
+            destination[0] = (int16_t)((rawData[0] << 8) | rawData[1]) ;
+            destination[1] = (int16_t)((rawData[2] << 8) | rawData[3]) ;
+            destination[2] = (int16_t)((rawData[4] << 8) | rawData[5]) ;
+        }
+
+        void readGyroData(int16_t * destination)
+        {
+            uint8_t rawData[6];  
+            readBytes(MPU6050_ADDRESS, GYRO_XOUT_H, 6, &rawData[0]);
+            destination[0] = (int16_t)((rawData[0] << 8) | rawData[1]) ;
+            destination[1] = (int16_t)((rawData[2] << 8) | rawData[3]) ;
+            destination[2] = (int16_t)((rawData[4] << 8) | rawData[5]) ;
+        }
 
         void writeByte(uint8_t address, uint8_t subAddress, uint8_t data)
         {
