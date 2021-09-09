@@ -66,10 +66,12 @@ void loop()
     Now = micros();
     deltat = ((Now - lastUpdate) / 1000000.0f); // set integration time by time elapsed since last filter update
     lastUpdate = Now;
+
     //    if(lastUpdate - firstUpdate > 10000000uL) {
     //      beta = 0.041; // decrease filter gain after stabilized
     //      zeta = 0.015; // increase gyro bias drift gain after stabilized
     //    }
+
     // Pass gyro rate as rad/s
     MadgwickQuaternionUpdate(ax, ay, az, gx * PI / 180.0f, gy * PI / 180.0f, gz * PI / 180.0f, deltat, beta, zeta, q);
 
@@ -91,26 +93,6 @@ void loop()
         Serial.print(pitch, 2);
         Serial.print(", ");
         Serial.println(roll, 2);
-
-        Serial.println(" x\t  y\t  z  ");
-
-        Serial.print((int)(1000 * ax)); Serial.print('\t');
-        Serial.print((int)(1000 * ay)); Serial.print('\t');
-        Serial.print((int)(1000 * az));
-        Serial.println(" mg");
-
-        Serial.print((int)(gx)); Serial.print('\t');
-        Serial.print((int)(gy)); Serial.print('\t');
-        Serial.print((int)(gz));
-        Serial.println(" o/s");
-
-        Serial.print((int)(yaw)); Serial.print('\t');
-        Serial.print((int)(pitch)); Serial.print('\t');
-        Serial.print((int)(roll));
-        Serial.println(" ypr");
-
-        Serial.print("rt: "); Serial.print(1.0f / deltat, 2); Serial.println(" Hz");
-
         count = millis();
     }
 }
