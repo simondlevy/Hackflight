@@ -9,7 +9,6 @@
  */
 
 #include <stdint.h>
-
 #include <Arduino.h>
 #include <Wire.h>
 
@@ -50,7 +49,7 @@ namespace hf {
 
         private:
 
-            static const uint8_t  MPU6050_ADDRESS = 0x68;  // Device address
+            static const uint8_t  MPU6050_ADDRESS = 0x68;  
 
             static const uint8_t  SMPLRT_DIV     = 0x19;
             static const uint8_t  CONFIG         = 0x1A;
@@ -58,13 +57,14 @@ namespace hf {
             static const uint8_t  ACCEL_CONFIG   = 0x1C;
             static const uint8_t  INT_PIN_CFG    = 0x37;
             static const uint8_t  INT_ENABLE     = 0x38;
-            static const uint8_t  DMP_INT_STATUS = 0x39;  // Check DMP interrupt;
+            static const uint8_t  DMP_INT_STATUS = 0x39; 
             static const uint8_t  INT_STATUS     = 0x3A;
             static const uint8_t  ACCEL_XOUT_H   = 0x3B;
             static const uint8_t  GYRO_XOUT_H    = 0x43;
-            static const uint8_t  PWR_MGMT_1     = 0x6B; // Device defaults to the SLEEP mode;
+            static const uint8_t  PWR_MGMT_1     = 0x6B;
 
-            // gyroscope measurement error in rads/s (start at 60 deg/s), then reduce after ~10 s to 3
+            // gyroscope measurement error in rads/s (start at 60 deg/s), then
+            // reduce after ~10 s to 3
             static constexpr float GYRO_ERROR = PI * (40.0f / 180.0f);     
 
             // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
@@ -84,7 +84,8 @@ namespace hf {
 
             uint32_t _usec = 0;
 
-            rft::MadgwickQuaternionFilter6DOF madgwick = rft::MadgwickQuaternionFilter6DOF(BETA, ZETA);
+            rft::MadgwickQuaternionFilter6DOF madgwick =
+                rft::MadgwickQuaternionFilter6DOF(BETA, ZETA);
 
             void readData(float &x, float &y, float &z, uint8_t rgstr, float res)
             {
@@ -97,33 +98,34 @@ namespace hf {
 
             void writeByte(uint8_t address, uint8_t subAddress, uint8_t data)
             {
-                Wire.beginTransmission(address);  // Initialize the Tx buffer
-                Wire.write(subAddress);           // Put slave register address in Tx buffer
-                Wire.write(data);                 // Put data in Tx buffer
-                Wire.endTransmission();           // Send the Tx buffer
+                Wire.beginTransmission(address);  
+                Wire.write(subAddress);           
+                Wire.write(data);                
+                Wire.endTransmission();         
             }
 
             uint8_t readByte(uint8_t address, uint8_t subAddress)
             {
-                uint8_t data; // `data` will store the register data
-                Wire.beginTransmission(address);         // Initialize the Tx buffer
-                Wire.write(subAddress);	                 // Put slave register address in Tx buffer
-                Wire.endTransmission(false);             // Send the Tx buffer, but send a restart to keep connection alive
-                Wire.requestFrom(address, (uint8_t) 1);  // Read one byte from slave register address
-                data = Wire.read();                      // Fill Rx buffer with result
-                return data;                             // Return data read from slave register
+                uint8_t data; 
+                Wire.beginTransmission(address);
+                Wire.write(subAddress);	       
+                Wire.endTransmission(false);   
+                Wire.requestFrom(address, (uint8_t) 1); 
+                data = Wire.read();                    
+                return data;                          
             }
 
-            void readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * dest)
+            void readBytes(uint8_t address, uint8_t subAddress, uint8_t count,
+                    uint8_t * dest)
             {
-                Wire.beginTransmission(address);   // Initialize the Tx buffer
-                Wire.write(subAddress);            // Put slave register address in Tx buffer
-                Wire.endTransmission(false);       // Send the Tx buffer, but send a restart to keep connection alive
+                Wire.beginTransmission(address);   
+                Wire.write(subAddress);            
+                Wire.endTransmission(false);       
                 uint8_t i = 0;
-                Wire.requestFrom(address, count);  // Read bytes from slave register address
+                Wire.requestFrom(address, count);  
                 while (Wire.available()) {
                     dest[i++] = Wire.read();
-                }         // Put read results in the Rx buffer
+                }         
             }
 
         protected:
@@ -131,40 +133,48 @@ namespace hf {
 
             void begin()
             {
-                // wake up device-don't need this here if using calibration function below
-                writeByte(MPU6050_ADDRESS, PWR_MGMT_1, 0x00); // Clear sleep mode bit (6), enable all sensors
-                delay(100); // Delay 100 ms for PLL to get established on x-axis gyro; should check for PLL ready interrupt
+                // Wake up device
+                writeByte(MPU6050_ADDRESS, PWR_MGMT_1, 0x00);
 
-                // get stable time source
-                writeByte(MPU6050_ADDRESS, PWR_MGMT_1, 0x01);  // Set clock source to be PLL with x-axis gyroscope reference, bits 2:0 = 001
+                // Delay 100 ms for PLL to get established on x-axis gyro;
+                // should check for PLL ready interrupt
+                delay(100); 
 
-                // Configure Gyro and Accelerometer
-                // Disable FSYNC and set accelerometer and gyro bandwidth to 44 and 42 Hz, respectively;
-                // DLPF_CFG = bits 2:0 = 010; this sets the sample rate at 1 kHz for both
-                // Maximum delay time is 4.9 ms corresponding to just over 200 Hz sample rate
+                // Get stable time source: set clock source to be PLL with
+                // x-axis gyroscope reference, bits 2:0 = 001
+                writeByte(MPU6050_ADDRESS, PWR_MGMT_1, 0x01);  
+
+                // Configure Gyro and Accelerometer Disable FSYNC and set
+                // accelerometer and gyro bandwidth to 44 and 42 Hz,
+                // respectively; DLPF_CFG = bits 2:0 = 010; this sets the
+                // sample rate at 1 kHz for both Maximum delay time is 4.9 ms
+                // corresponding to just over 200 Hz sample rate
                 writeByte(MPU6050_ADDRESS, CONFIG, 0x03);
 
                 // Set sample rate = gyroscope output rate/(1 + SMPLRT_DIV)
-                writeByte(MPU6050_ADDRESS, SMPLRT_DIV, 0x04);  // Use a 200 Hz rate; the same rate set in CONFIG above
+                // Use a 200 Hz rate; the same rate set in CONFIG above
+                writeByte(MPU6050_ADDRESS, SMPLRT_DIV, 0x04);  
 
                 // Set gyroscope full scale range
-                // Range selects FS_SEL and AFS_SEL are 0 - 3, so 2-bit values are left-shifted into positions 4:3
+                // Range selects FS_SEL and AFS_SEL are 0 - 3, so 2-bit values
+                // are left-shifted into positions 4:3
                 uint8_t c =  readByte(MPU6050_ADDRESS, GYRO_CONFIG);
-                writeByte(MPU6050_ADDRESS, GYRO_CONFIG, c & ~0xE0); // Clear self-test bits [7:5]
-                writeByte(MPU6050_ADDRESS, GYRO_CONFIG, c & ~0x18); // Clear AFS bits [4:3]
-                writeByte(MPU6050_ADDRESS, GYRO_CONFIG, c | _gscale << 3); // Set full scale range for the gyro
+                writeByte(MPU6050_ADDRESS, GYRO_CONFIG, c & ~0xE0); 
+                writeByte(MPU6050_ADDRESS, GYRO_CONFIG, c & ~0x18);
+                writeByte(MPU6050_ADDRESS, GYRO_CONFIG, c | _gscale << 3);
 
                 // Set accelerometer configuration
                 c =  readByte(MPU6050_ADDRESS, ACCEL_CONFIG);
-                writeByte(MPU6050_ADDRESS, ACCEL_CONFIG, c & ~0xE0); // Clear self-test bits [7:5]
-                writeByte(MPU6050_ADDRESS, ACCEL_CONFIG, c & ~0x18); // Clear AFS bits [4:3]
-                writeByte(MPU6050_ADDRESS, ACCEL_CONFIG, c | _ascale << 3); // Set full scale range for the accelerometer
+                writeByte(MPU6050_ADDRESS, ACCEL_CONFIG, c & ~0xE0); 
+                writeByte(MPU6050_ADDRESS, ACCEL_CONFIG, c & ~0x18);
+                writeByte(MPU6050_ADDRESS, ACCEL_CONFIG, c | _ascale << 3); 
 
-                // Configure Interrupts and Bypass Enable
-                // Set interrupt pin active high, push-pull, and clear on read of INT_STATUS, enable I2C_BYPASS_EN so additional chips
-                // can join the I2C bus and all can be controlled by the Arduino as master
+                // Configure Interrupts and Bypass Enable Set interrupt pin
+                // active high, push-pull, and clear on read of INT_STATUS,
+                // enable I2C_BYPASS_EN so additional chips can join the I2C
+                // bus and all can be controlled by the Arduino as master
                 writeByte(MPU6050_ADDRESS, INT_PIN_CFG, 0x22);
-                writeByte(MPU6050_ADDRESS, INT_ENABLE, 0x01);  // Enable data ready (bit 0) interrupt
+                writeByte(MPU6050_ADDRESS, INT_ENABLE, 0x01);
 
                 // Initialize clock for Madgwick filter
                 _usec = 0;
@@ -195,11 +205,18 @@ namespace hf {
                 _usec = usec;
 
                 // Use Madgwick filter to fuse accelerometer and gyrometer into quaternion
-                madgwick.update(ax, ay, az, gx * PI / 180.0f, gy * PI / 180.0f, gz * PI / 180.0f, deltat);
+                madgwick.update(ax, ay, az, gx * PI / 180.0f,
+                        gy * PI / 180.0f, gz * PI / 180.0f, deltat);
 
                 // Convert quaternion to Euler angles
-                rft::Filter::quat2euler(madgwick.q1, madgwick.q2, madgwick.q3, madgwick.q4, 
-                        hfstate->x[State::PHI], hfstate->x[State::THETA], hfstate->x[State::PSI]);
+                rft::Filter::quat2euler(
+                        madgwick.q1,
+                        madgwick.q2,
+                        madgwick.q3,
+                        madgwick.q4, 
+                        hfstate->x[State::PHI],
+                        hfstate->x[State::THETA],
+                        hfstate->x[State::PSI]);
 
                 // Adjust rotation so that nose-up is positive
                 hfstate->x[State::THETA] = -hfstate->x[State::THETA];
