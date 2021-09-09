@@ -80,24 +80,8 @@ class MPU6050
 
         void readData(float & ax, float &ay, float &az, float &gx, float &gy, float &gz)
         {
-
-            int16_t accelCount[3] = {};  // Stores the 16-bit signed accelerometer sensor output
-
-            readAccelData(accelCount);  // Read the x/y/z adc values
-
-            // calculate the accleration value into actual g's
-            ax = (float)accelCount[0] * _aRes; // get actual g value, this depends on scale being set
-            ay = (float)accelCount[1] * _aRes;
-            az = (float)accelCount[2] * _aRes;
-
-            int16_t gyroCount[3] = {};  // Stores the 16-bit signed accelerometer sensor output
-
-            readGyroData(gyroCount);  // Read the x/y/z adc values
-
-            // Calculate the gyro value into actual degrees per second
-            gx = (float)gyroCount[0] * _gRes; // get actual gyro value, this depends on scale being set
-            gy = (float)gyroCount[1] * _gRes;
-            gz = (float)gyroCount[2] * _gRes;
+            readData(ax, ay, az, ACCEL_XOUT_H, _aRes);
+            readData(gx, gy, gz, GYRO_XOUT_H, _gRes);
         }
 
     private:
@@ -225,22 +209,13 @@ class MPU6050
         float _aRes = 0;
         float _gRes = 0;
 
-        void readAccelData(int16_t * destination)
+        void readData(float &x, float &y, float &z, uint8_t rgstr, float res)
         {
             uint8_t rawData[6]; 
-            readBytes(MPU6050_ADDRESS, ACCEL_XOUT_H, 6, &rawData[0]); 
-            destination[0] = (int16_t)((rawData[0] << 8) | rawData[1]) ;
-            destination[1] = (int16_t)((rawData[2] << 8) | rawData[3]) ;
-            destination[2] = (int16_t)((rawData[4] << 8) | rawData[5]) ;
-        }
-
-        void readGyroData(int16_t * destination)
-        {
-            uint8_t rawData[6];  
-            readBytes(MPU6050_ADDRESS, GYRO_XOUT_H, 6, &rawData[0]);
-            destination[0] = (int16_t)((rawData[0] << 8) | rawData[1]) ;
-            destination[1] = (int16_t)((rawData[2] << 8) | rawData[3]) ;
-            destination[2] = (int16_t)((rawData[4] << 8) | rawData[5]) ;
+            readBytes(MPU6050_ADDRESS, rgstr, 6, &rawData[0]); 
+            x = (int16_t)((rawData[0] << 8) | rawData[1])  * res;
+            y = (int16_t)((rawData[2] << 8) | rawData[3])  * res;
+            z = (int16_t)((rawData[4] << 8) | rawData[5])  * res;
         }
 
         void writeByte(uint8_t address, uint8_t subAddress, uint8_t data)
