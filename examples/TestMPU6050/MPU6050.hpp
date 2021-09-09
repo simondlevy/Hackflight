@@ -16,7 +16,7 @@ enum Gscale {
     GFS_2000DPS
 };
 
-class MPU6050lib
+class MPU6050
 {
     public:
 

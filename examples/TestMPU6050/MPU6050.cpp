@@ -6,7 +6,7 @@
 int Gscale = GFS_250DPS;
 int Ascale = AFS_2G;
 
-float MPU6050lib::getGres() {
+float MPU6050::getGres() {
 
   switch (Gscale)
   {
@@ -28,7 +28,7 @@ float MPU6050lib::getGres() {
   }
 }
 
-float MPU6050lib::getAres() {
+float MPU6050::getAres() {
   switch (Ascale)
   {
     // Possible accelerometer scales (and their register bit settings) are:
@@ -50,7 +50,7 @@ float MPU6050lib::getAres() {
 }
 
 
-void MPU6050lib::readAccelData(int16_t * destination)
+void MPU6050::readAccelData(int16_t * destination)
 {
   uint8_t rawData[6];  // x/y/z accel register data stored here
   readBytes(MPU6050_ADDRESS, ACCEL_XOUT_H, 6, &rawData[0]);  // Read the six raw data registers into data array
@@ -59,7 +59,7 @@ void MPU6050lib::readAccelData(int16_t * destination)
   destination[2] = (int16_t)((rawData[4] << 8) | rawData[5]) ;
 }
 
-void MPU6050lib::readGyroData(int16_t * destination)
+void MPU6050::readGyroData(int16_t * destination)
 {
   uint8_t rawData[6];  // x/y/z gyro register data stored here
   readBytes(MPU6050_ADDRESS, GYRO_XOUT_H, 6, &rawData[0]);  // Read the six raw data registers sequentially into data array
@@ -68,7 +68,7 @@ void MPU6050lib::readGyroData(int16_t * destination)
   destination[2] = (int16_t)((rawData[4] << 8) | rawData[5]) ;
 }
 
-int16_t MPU6050lib::readTempData()
+int16_t MPU6050::readTempData()
 {
   uint8_t rawData[2];  // x/y/z gyro register data stored here
   readBytes(MPU6050_ADDRESS, TEMP_OUT_H, 2, &rawData[0]);  // Read the two raw data registers sequentially into data array
@@ -78,7 +78,7 @@ int16_t MPU6050lib::readTempData()
 
 
 // Configure the motion detection control for low power accelerometer mode
-void MPU6050lib::LowPowerAccelOnlyMPU6050()
+void MPU6050::LowPowerAccelOnlyMPU6050()
 {
 
   // The sensor has a high-pass filter necessary to invoke to allow the sensor motion detection algorithms work properly
@@ -130,7 +130,7 @@ void MPU6050lib::LowPowerAccelOnlyMPU6050()
 }
 
 
-void MPU6050lib::begin()
+void MPU6050::begin()
 {
   // wake up device-don't need this here if using calibration function below
   //  writeByte(MPU6050_ADDRESS, PWR_MGMT_1, 0x00); // Clear sleep mode bit (6), enable all sensors
@@ -170,7 +170,7 @@ void MPU6050lib::begin()
 
 // Function which accumulates gyro and accelerometer data after device initialization. It calculates the average
 // of the at-rest readings and then loads the resulting offsets into accelerometer and gyro bias registers.
-void MPU6050lib::calibrateMPU6050(float * dest1, float * dest2)
+void MPU6050::calibrateMPU6050(float * dest1, float * dest2)
 {
   uint8_t data[12]; // data array to hold accelerometer and gyro x, y, z, data
   uint16_t ii, packet_count, fifo_count;
@@ -319,7 +319,7 @@ void MPU6050lib::calibrateMPU6050(float * dest1, float * dest2)
 
 
 // Accelerometer and gyroscope self test; check calibration wrt factory settings
-void MPU6050lib::MPU6050SelfTest(float * destination) // Should return percent deviation from factory trim values, +/- 14 or less deviation is a pass
+void MPU6050::MPU6050SelfTest(float * destination) // Should return percent deviation from factory trim values, +/- 14 or less deviation is a pass
 {
   uint8_t rawData[4];
   uint8_t selfTest[6];
@@ -363,12 +363,12 @@ void MPU6050lib::MPU6050SelfTest(float * destination) // Should return percent d
 
 }
 
-bool MPU6050lib::dataReady(void)
+bool MPU6050::dataReady(void)
 {
     return (readByte(MPU6050_ADDRESS, INT_STATUS) & 0x01);
 }
 
-void MPU6050lib::writeByte(uint8_t address, uint8_t subAddress, uint8_t data)
+void MPU6050::writeByte(uint8_t address, uint8_t subAddress, uint8_t data)
 {
   Wire.beginTransmission(address);  // Initialize the Tx buffer
   Wire.write(subAddress);           // Put slave register address in Tx buffer
@@ -376,7 +376,7 @@ void MPU6050lib::writeByte(uint8_t address, uint8_t subAddress, uint8_t data)
   Wire.endTransmission();           // Send the Tx buffer
 }
 
-uint8_t MPU6050lib::readByte(uint8_t address, uint8_t subAddress)
+uint8_t MPU6050::readByte(uint8_t address, uint8_t subAddress)
 {
   uint8_t data; // `data` will store the register data
   Wire.beginTransmission(address);         // Initialize the Tx buffer
@@ -387,7 +387,7 @@ uint8_t MPU6050lib::readByte(uint8_t address, uint8_t subAddress)
   return data;                             // Return data read from slave register
 }
 
-void MPU6050lib::readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * dest)
+void MPU6050::readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * dest)
 {
   Wire.beginTransmission(address);   // Initialize the Tx buffer
   Wire.write(subAddress);            // Put slave register address in Tx buffer
