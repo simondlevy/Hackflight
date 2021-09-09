@@ -31,48 +31,12 @@ static uint32_t Now = 0;                                 // used to calculate in
 void setup()
 {
     Wire.begin();
+
     Serial.begin(115200);
 
-    // Read the WHO_AM_I register, this is a good test of communication
-    uint8_t c = mpu.readByte(MPU6050_ADDRESS, WHO_AM_I_MPU6050);  // Read WHO_AM_I register for MPU-6050
-    Serial.print("I AM ");
-    Serial.print(c, HEX);
-    Serial.print(" I Should Be ");
-    Serial.println(0x68, HEX);
+    mpu.initMPU6050();
 
-    if (c == 0x68) // WHO_AM_I should always be 0x68
-    {
-        Serial.println("MPU6050 is online...");
-
-        mpu.MPU6050SelfTest(SelfTest); // Start by performing self test and reporting values
-
-        if (SelfTest[0] < 1.0f && SelfTest[1] < 1.0f && SelfTest[2] < 1.0f && SelfTest[3] < 1.0f && SelfTest[4] < 1.0f && SelfTest[5] < 1.0f) {
-            Serial.println("Pass Selftest!");
-
-            mpu.calibrateMPU6050(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers
-            Serial.println("MPU6050 bias");
-            Serial.println(" x\t  y\t  z  ");
-            Serial.print((int)(1000 * accelBias[0])); Serial.print('\t');
-            Serial.print((int)(1000 * accelBias[1])); Serial.print('\t');
-            Serial.print((int)(1000 * accelBias[2]));
-            Serial.println(" mg");
-
-            Serial.print(gyroBias[0], 1); Serial.print('\t');
-            Serial.print(gyroBias[1], 1); Serial.print('\t');
-            Serial.print(gyroBias[2], 1);
-            Serial.println(" o/s");
-
-
-            mpu.initMPU6050();
-            Serial.println("MPU6050 initialized for active data mode...."); 
-        }
-        else
-        {
-            Serial.print("Could not connect to MPU6050: 0x");
-            Serial.println(c, HEX);
-            while (1) ; // Loop forever if communication doesn't happen
-        }
-    }
+    mpu.calibrateMPU6050(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers
 }
 
 void loop()
