@@ -88,6 +88,16 @@ namespace hf {
             int16_t gyro[3] = {};
             readImu(GYRO_XOUT_H, gyro);
 
+            // Convert the accleration values into g's
+            float ax = (float)accel[0] * aRes; 
+            float ay = (float)accel[1] * aRes; 
+            float az = (float)accel[2] * aRes; 
+
+            // Convert gyro to degrees per second
+            float gx = (float)gyro[0] * gRes; 
+            float gy = (float)gyro[1] * gRes;  
+            float gz = (float)gyro[2] * gRes;   
+
             Serial.println(gyro[0]);
 
         } // modifyState
