@@ -28,8 +28,11 @@ class MPU6050
 
         MPU6050(ascale_t ascale, gscale_t gscale)
         {
-            _aRes = getAres(ascale);
-            _gRes = getGres(gscale);
+            _ascale = ascale;
+            _gscale = gscale;
+
+            _aRes = (1 << ((uint8_t)ascale + 1)) / 32768.0;
+            _gRes = (250 * ((uint8_t)ascale + 1)) / 32768.0;
         }
 
         void begin()
@@ -77,6 +80,7 @@ class MPU6050
 
         void readData(float & ax, float &ay, float &az, float &gx, float &gy, float &gz)
         {
+
             int16_t accelCount[3] = {};  // Stores the 16-bit signed accelerometer sensor output
 
             readAccelData(accelCount);  // Read the x/y/z adc values
@@ -215,56 +219,11 @@ class MPU6050
         static const uint8_t  FIFO_R_W            = 0x74;
         static const uint8_t  WHO_AM_I_MPU6050    = 0x75; // Should return  = 0x68;
 
-        float _aRes = 0;
-        float _gRes = 0;
-
         ascale_t _ascale;
         gscale_t _gscale;
 
-        static float getGres(gscale_t gscale) {
-
-            switch (gscale)
-            {
-                // Possible gyro scales (and their register bit settings) are:
-                // 250 DPS (00), 500 DPS (01), 1000 DPS (10), and 2000 DPS  (11).
-                // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
-                case GFS_250DPS:
-                    return 250.0 / 32768.0;
-                    break;
-                case GFS_500DPS:
-                    return 500.0 / 32768.0;
-                    break;
-                case GFS_1000DPS:
-                    return 1000.0 / 32768.0;
-                    break;
-                case GFS_2000DPS:
-                    return 2000.0 / 32768.0;
-                    break;
-            }
-        }
-
-
-        static float getAres(ascale_t ascale) {
-
-            switch (ascale)
-            {
-                // Possible accelerometer scales (and their register bit settings) are:
-                // 2 Gs (00), 4 Gs (01), 8 Gs (10), and 16 Gs  (11).
-                // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
-                case AFS_2G:
-                    return 2.0 / 32768.0;
-                    break;
-                case AFS_4G:
-                    return 4.0 / 32768.0;
-                    break;
-                case AFS_8G:
-                    return 8.0 / 32768.0;
-                    break;
-                case AFS_16G:
-                    return 16.0 / 32768.0;
-                    break;
-            }
-        }
+        float _aRes = 0;
+        float _gRes = 0;
 
         void readAccelData(int16_t * destination)
         {
