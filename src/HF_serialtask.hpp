@@ -90,7 +90,7 @@ namespace hf {
                             sendFloat(c4);
                             sendFloat(c5);
                             sendFloat(c6);
-                            serialize8(_checksum);
+                            serialize8(_checksum_out);
                         } break;
 
                     case 122:
@@ -121,7 +121,7 @@ namespace hf {
                             sendFloat(dtheta);
                             sendFloat(psi);
                             sendFloat(dpsi);
-                            serialize8(_checksum);
+                            serialize8(_checksum_out);
                         } break;
 
                     case 123:
@@ -130,7 +130,7 @@ namespace hf {
                             handle_ACTUATOR_TYPE_Request(mtype);
                             prepareToSendBytes(1);
                             sendByte(mtype);
-                            serialize8(_checksum);
+                            serialize8(_checksum_out);
                         } break;
 
                     case 215:
