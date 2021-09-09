@@ -74,7 +74,7 @@ namespace hf {
 
         protected:
 
-            void dispatchMessage(uint8_t command) override
+            void dispatchMessage(uint8_t command, uint8_t * inBuf) override
             {
                 switch (command) {
 
@@ -142,16 +142,16 @@ namespace hf {
                     case 215:
                         {
                             float m1 = 0;
-                            memcpy(&m1,  &_inBuf[0], sizeof(float));
+                            memcpy(&m1,  &inBuf[0], sizeof(float));
 
                             float m2 = 0;
-                            memcpy(&m2,  &_inBuf[4], sizeof(float));
+                            memcpy(&m2,  &inBuf[4], sizeof(float));
 
                             float m3 = 0;
-                            memcpy(&m3,  &_inBuf[8], sizeof(float));
+                            memcpy(&m3,  &inBuf[8], sizeof(float));
 
                             float m4 = 0;
-                            memcpy(&m4,  &_inBuf[12], sizeof(float));
+                            memcpy(&m4,  &inBuf[12], sizeof(float));
 
                             handle_SET_MOTOR(m1, m2, m3, m4);
                         } break;
