@@ -8,8 +8,6 @@
    MIT License
  */
 
-#include <stdint.h>
-#include <Arduino.h>
 #include <Wire.h>
 
 namespace hf {
