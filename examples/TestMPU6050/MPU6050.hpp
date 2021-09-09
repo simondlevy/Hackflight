@@ -1,24 +1,28 @@
 #include <stdint.h>
 
-
-// Set initial input parameters
-enum Ascale {
-    AFS_2G = 0,
-    AFS_4G,
-    AFS_8G,
-    AFS_16G
-};
-
-enum Gscale {
-    GFS_250DPS = 0,
-    GFS_500DPS,
-    GFS_1000DPS,
-    GFS_2000DPS
-};
-
 class MPU6050
 {
     public:
+
+        typedef enum {
+
+            AFS_2G = 0,
+            AFS_4G,
+            AFS_8G,
+            AFS_16G
+
+        } ascale_t;
+
+        typedef enum {
+
+            GFS_250DPS = 0,
+            GFS_500DPS,
+            GFS_1000DPS,
+            GFS_2000DPS
+
+        } gscale_t;
+
+        MPU6050(ascale_t ascale, gscale_t gscale);
 
         float getGres();
 
@@ -27,7 +31,7 @@ class MPU6050
         void readAccelData(int16_t * destination);
 
         void readGyroData(int16_t * destination);
-        
+
         int16_t readTempData();
 
         void LowPowerAccelOnlyMPU6050();
@@ -158,6 +162,9 @@ class MPU6050
         static const uint8_t  FIFO_COUNTL         = 0x73;
         static const uint8_t  FIFO_R_W            = 0x74;
         static const uint8_t  WHO_AM_I_MPU6050    = 0x75; // Should return  = 0x68;
+
+        ascale_t _ascale;
+        gscale_t _gscale;
 
         void writeByte(uint8_t address, uint8_t subAddress, uint8_t data);
 
