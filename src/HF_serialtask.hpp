@@ -87,7 +87,7 @@ namespace hf {
                             float c5 = 0;
                             float c6 = 0;
                             handle_RECEIVER_Request(c1, c2, c3, c4, c5, c6);
-                            prepareToSendFloats(6);
+                            prepareToSendFloats(command, 6);
                             sendFloat(c1);
                             sendFloat(c2);
                             sendFloat(c3);
@@ -114,7 +114,7 @@ namespace hf {
                             handle_STATE_Request(x, dx, y, dy, z, dz,
                                                 phi, dphi, theta, dtheta,
                                                 psi, dpsi);
-                            prepareToSendFloats(12);
+                            prepareToSendFloats(command, 12);
                             sendFloat(x);
                             sendFloat(dx);
                             sendFloat(y);
@@ -134,7 +134,7 @@ namespace hf {
                         {
                             uint8_t mtype = 0;
                             handle_ACTUATOR_TYPE_Request(mtype);
-                            prepareToSendBytes(1);
+                            prepareToSendBytes(command, 1);
                             sendByte(mtype);
                             serialize8(_checksum_out);
                         } break;
