@@ -1,5 +1,5 @@
-#include "Arduino.h"
-#include "Wire.h"
+#include <stdint.h>
+
 // Using the GY-521 breakout board, I set ADO to 0 by grounding through a 4k7 resistor
 // Seven-bit device address is 110100 for ADO = 0 and 110101 for ADO = 1
 #define ADO 0
@@ -8,19 +8,20 @@
 #else
 #define MPU6050_ADDRESS 0x68  // Device address when ADO = 0
 #endif
+
 // Set initial input parameters
 enum Ascale {
-  AFS_2G = 0,
-  AFS_4G,
-  AFS_8G,
-  AFS_16G
+    AFS_2G = 0,
+    AFS_4G,
+    AFS_8G,
+    AFS_16G
 };
 
 enum Gscale {
-  GFS_250DPS = 0,
-  GFS_500DPS,
-  GFS_1000DPS,
-  GFS_2000DPS
+    GFS_250DPS = 0,
+    GFS_500DPS,
+    GFS_1000DPS,
+    GFS_2000DPS
 };
 
 #define XGOFFS_TC        0x00 // Bit 7 PWR_MODE, bits 6:1 XG_OFFS_TC, bit 0 OTP_BNK_VLD
@@ -140,17 +141,33 @@ enum Gscale {
 
 class MPU6050lib
 {
-public:
-float getGres();
-float getAres();
-void readAccelData(int16_t * destination);
-void readGyroData(int16_t * destination);
-int16_t readTempData();
-void LowPowerAccelOnlyMPU6050();
-void initMPU6050();
-void calibrateMPU6050(float * dest1, float * dest2);
-void MPU6050SelfTest(float * destination);
-void writeByte(uint8_t address, uint8_t subAddress, uint8_t data);
-uint8_t readByte(uint8_t address, uint8_t subAddress);
-void readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * dest);
+    public:
+
+        float getGres();
+
+        float getAres();
+
+        void readAccelData(int16_t * destination);
+
+        void readGyroData(int16_t * destination);
+        
+        int16_t readTempData();
+
+        void LowPowerAccelOnlyMPU6050();
+
+        void initMPU6050();
+
+        void calibrateMPU6050(float * dest1, float * dest2);
+
+        void MPU6050SelfTest(float * destination);
+
+        bool dataReady(void);
+
+    private:
+
+        void writeByte(uint8_t address, uint8_t subAddress, uint8_t data);
+
+        uint8_t readByte(uint8_t address, uint8_t subAddress);
+
+        void readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * dest);
 };

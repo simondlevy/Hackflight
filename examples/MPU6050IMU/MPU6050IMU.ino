@@ -32,7 +32,7 @@ void loop()
     static float ax, ay, az, gx, gy, gz;
 
     // If data ready bit set, all data registers have new data
-    if (mpu.readByte(MPU6050_ADDRESS, INT_STATUS) & 0x01) { // check if data ready interrupt
+    if (mpu.dataReady()) {
 
         int16_t accelCount[3] = {};  // Stores the 16-bit signed accelerometer sensor output
 

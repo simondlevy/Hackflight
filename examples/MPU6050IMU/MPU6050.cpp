@@ -1,4 +1,8 @@
 #include "MPU6050.h"
+
+#include <Arduino.h>
+#include <Wire.h>
+
 int Gscale = GFS_250DPS;
 int Ascale = AFS_2G;
 
@@ -356,6 +360,11 @@ void MPU6050lib::MPU6050SelfTest(float * destination) // Should return percent d
     destination[i] = 100.0 + 100.0 * ((float)selfTest[i] - factoryTrim[i]) / factoryTrim[i]; // Report percent differences
   }
 
+}
+
+bool MPU6050lib::dataReady(void)
+{
+    return (readByte(MPU6050_ADDRESS, INT_STATUS) & 0x01);
 }
 
 void MPU6050lib::writeByte(uint8_t address, uint8_t subAddress, uint8_t data)
