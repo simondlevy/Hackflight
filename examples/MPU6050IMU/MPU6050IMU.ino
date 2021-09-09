@@ -1,32 +1,20 @@
 #include <Wire.h>
 #include "MPU6050.h"
 
-#include "Madgwick.hpp"
+#include <RFT_filters.hpp>
 
 static MPU6050lib mpu;
 
-static float aRes, gRes; // scale resolutions per LSB for the sensors
-static int16_t accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
-static float ax, ay, az;       // Stores the real accel value in g's
-static int16_t gyroCount[3];   // Stores the 16-bit signed gyro sensor output
-static float gx, gy, gz;       // Stores the real gyro value in degrees per seconds
 static float gyroBias[3] = {0, 0, 0}, accelBias[3] = {0, 0, 0}; // Bias corrections for gyro and accelerometer
-static int16_t tempCount;   // Stores the real internal chip temperature in degrees Celsius
-static float temperature;
-static float SelfTest[6];
 static float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};            // vector to hold quaternion
-static uint32_t delt_t = 0; // used to control display output rate
-static uint32_t count = 0;  // used to control display output rate
-static float pitch, yaw, roll;
 
 // parameters for 6 DoF sensor fusion calculations
-static float GyroMeasError = PI * (40.0f / 180.0f);     // gyroscope measurement error in rads/s (start at 60 deg/s), then reduce after ~10 s to 3
-static float beta = sqrt(3.0f / 4.0f) * GyroMeasError;  // compute beta
-static float GyroMeasDrift = PI * (2.0f / 180.0f);      // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
-static float zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;  // compute zeta, the other free parameter in the Madgwick scheme usually set to a small or zero value
-static float deltat = 0.0f;                              // integration interval for both filter schemes
-static uint32_t lastUpdate = 0, firstUpdate = 0;         // used to calculate integration interval
-static uint32_t Now = 0;                                 // used to calculate integration interval
+static constexpr float GyroMeasError = PI * (40.0f / 180.0f);     // gyroscope measurement error in rads/s (start at 60 deg/s), then reduce after ~10 s to 3
+static constexpr float GyroMeasDrift = PI * (2.0f / 180.0f);      // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
+static constexpr float beta = sqrt(3.0f / 4.0f) * GyroMeasError;  // beta parameter for Madgwick quaternion filter
+static constexpr float zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;  // zeta parameter for Madgwick quaternion filter
+
+static rft::MadgwickQuaternionFilter6DOF madgwick = rft::MadgwickQuaternionFilter6DOF(beta, zeta);
 
 void setup()
 {
@@ -41,30 +29,37 @@ void setup()
 
 void loop()
 {
+    static float ax, ay, az, gx, gy, gz;
+
     // If data ready bit set, all data registers have new data
     if (mpu.readByte(MPU6050_ADDRESS, INT_STATUS) & 0x01) { // check if data ready interrupt
-        mpu.readAccelData(accelCount);  // Read the x/y/z adc values
-        aRes = mpu.getAres();
 
-        // Now we'll calculate the accleration value into actual g's
+        int16_t accelCount[3] = {};  // Stores the 16-bit signed accelerometer sensor output
+
+        mpu.readAccelData(accelCount);  // Read the x/y/z adc values
+
+        float aRes = mpu.getAres();
+
+        // calculate the accleration value into actual g's
         ax = (float)accelCount[0] * aRes; // get actual g value, this depends on scale being set
         ay = (float)accelCount[1] * aRes;
         az = (float)accelCount[2] * aRes;
 
+        int16_t gyroCount[3] = {};  // Stores the 16-bit signed accelerometer sensor output
+
         mpu.readGyroData(gyroCount);  // Read the x/y/z adc values
-        gRes = mpu.getGres();
+
+        float gRes = mpu.getGres();
 
         // Calculate the gyro value into actual degrees per second
         gx = (float)gyroCount[0] * gRes; // get actual gyro value, this depends on scale being set
         gy = (float)gyroCount[1] * gRes;
         gz = (float)gyroCount[2] * gRes;
-
-        tempCount = mpu.readTempData();  // Read the x/y/z adc values
-        temperature = ((float) tempCount) / 340. + 36.53; // Temperature in degrees Centigrade
     }
 
-    Now = micros();
-    deltat = ((Now - lastUpdate) / 1000000.0f); // set integration time by time elapsed since last filter update
+    static uint32_t lastUpdate;
+    uint32_t Now = micros();
+    float deltat = ((Now - lastUpdate) / 1000000.0f); // set integration time by time elapsed since last filter update
     lastUpdate = Now;
 
     //    if(lastUpdate - firstUpdate > 10000000uL) {
@@ -73,15 +68,22 @@ void loop()
     //    }
 
     // Pass gyro rate as rad/s
-    MadgwickQuaternionUpdate(ax, ay, az, gx * PI / 180.0f, gy * PI / 180.0f, gz * PI / 180.0f, deltat, beta, zeta, q);
+    // MadgwickQuaternionUpdate(ax, ay, az, gx * PI / 180.0f, gy * PI / 180.0f, gz * PI / 180.0f, deltat, beta, zeta, q);
+    madgwick.update(ax, ay, az, gx * PI / 180.0f, gy * PI / 180.0f, gz * PI / 180.0f, deltat);
 
     // Serial print and/or display at 0.5 s rate independent of data rates
-    delt_t = millis() - count;
+    static uint32_t count;
+    uint32_t delt_t = millis() - count;
     if (delt_t > 500) { // update LCD once per half-second independent of read rate
 
-        yaw   = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
-        pitch = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
-        roll  = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
+        float q0 = madgwick.q1;
+        float q1 = madgwick.q2;
+        float q2 = madgwick.q3;
+        float q3 = madgwick.q4;
+
+        float yaw   = atan2(2.0f * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3);
+        float pitch = -asin(2.0f * (q1 * q3 - q0 * q2));
+        float roll  = atan2(2.0f * (q0 * q1 + q2 * q3), q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3);
 
         pitch *= 180.0f / PI;
         yaw   *= 180.0f / PI;
