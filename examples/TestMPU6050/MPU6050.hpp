@@ -32,7 +32,7 @@ class MPU6050lib
 
         void LowPowerAccelOnlyMPU6050();
 
-        void initMPU6050();
+        void begin();
 
         void calibrateMPU6050(float * dest1, float * dest2);
 

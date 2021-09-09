@@ -1,4 +1,4 @@
-#include "MPU6050.h"
+#include "MPU6050.hpp"
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -7,6 +7,7 @@ int Gscale = GFS_250DPS;
 int Ascale = AFS_2G;
 
 float MPU6050lib::getGres() {
+
   switch (Gscale)
   {
     // Possible gyro scales (and their register bit settings) are:
@@ -129,7 +130,7 @@ void MPU6050lib::LowPowerAccelOnlyMPU6050()
 }
 
 
-void MPU6050lib::initMPU6050()
+void MPU6050lib::begin()
 {
   // wake up device-don't need this here if using calibration function below
   //  writeByte(MPU6050_ADDRESS, PWR_MGMT_1, 0x00); // Clear sleep mode bit (6), enable all sensors
