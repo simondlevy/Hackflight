@@ -58,7 +58,7 @@ static hf::LevelPid levelPid = hf::LevelPid(0.80);
 
 // Sensors =====================================================================
 
-static hf::MPU6050 imu;
+static hf::MPU6050 imu = hf::MPU6050(hf::MPU6050::AFS_2G, hf::MPU6050::GFS_250DPS);
 
 // Serial tasks ================================================================
 
