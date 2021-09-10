@@ -23,6 +23,8 @@ namespace hf {
 
         private:
 
+            uint8_t _inputBuffer[128] = {};
+
             // Store so we don't have to pass them on update
             State * _state = NULL;
             Receiver * _receiver = NULL;
@@ -74,32 +76,12 @@ namespace hf {
 
         protected:
 
-            void dispatchSetMessage(uint8_t command, uint8_t * inBuf) override
+            virtual void setInputBuffer(uint8_t index, uint8_t value) override
             {
-                switch (command) {
+                _inputBuffer[index] = value;
+            }
 
-                    case 215:
-                        {
-                            float m1 = 0;
-                            memcpy(&m1,  &inBuf[0], sizeof(float));
-
-                            float m2 = 0;
-                            memcpy(&m2,  &inBuf[4], sizeof(float));
-
-                            float m3 = 0;
-                            memcpy(&m3,  &inBuf[8], sizeof(float));
-
-                            float m4 = 0;
-                            memcpy(&m4,  &inBuf[12], sizeof(float));
-
-                            handle_SET_MOTOR(m1, m2, m3, m4);
-                        } break;
-
-                } // switch (command)
-
-            } // dispatchSetMessage 
-
-            void dispatchGetMessage(uint8_t command) override
+            void dispatchMessage(uint8_t command) override
             {
                 switch (command) {
 
@@ -162,6 +144,23 @@ namespace hf {
                             prepareToSendBytes(command, 1);
                             sendByte(mtype);
                             completeSend();
+                        } break;
+
+                    case 215:
+                        {
+                            float m1 = 0;
+                            memcpy(&m1,  &_inputBuffer[0], sizeof(float));
+
+                            float m2 = 0;
+                            memcpy(&m2,  &_inputBuffer[4], sizeof(float));
+
+                            float m3 = 0;
+                            memcpy(&m3,  &_inputBuffer[8], sizeof(float));
+
+                            float m4 = 0;
+                            memcpy(&m4,  &_inputBuffer[12], sizeof(float));
+
+                            handle_SET_MOTOR(m1, m2, m3, m4);
                         } break;
 
                 } // switch (command)
