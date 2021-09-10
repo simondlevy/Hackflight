@@ -74,7 +74,32 @@ namespace hf {
 
         protected:
 
-            void dispatchMessage(uint8_t command, uint8_t * inBuf) override
+            void dispatchSetMessage(uint8_t command, uint8_t * inBuf) override
+            {
+                switch (command) {
+
+                    case 215:
+                        {
+                            float m1 = 0;
+                            memcpy(&m1,  &inBuf[0], sizeof(float));
+
+                            float m2 = 0;
+                            memcpy(&m2,  &inBuf[4], sizeof(float));
+
+                            float m3 = 0;
+                            memcpy(&m3,  &inBuf[8], sizeof(float));
+
+                            float m4 = 0;
+                            memcpy(&m4,  &inBuf[12], sizeof(float));
+
+                            handle_SET_MOTOR(m1, m2, m3, m4);
+                        } break;
+
+                } // switch (command)
+
+            } // dispatchSetMessage 
+
+            void dispatchGetMessage(uint8_t command) override
             {
                 switch (command) {
 
@@ -139,26 +164,9 @@ namespace hf {
                             completeSend();
                         } break;
 
-                    case 215:
-                        {
-                            float m1 = 0;
-                            memcpy(&m1,  &inBuf[0], sizeof(float));
+                } // switch (command)
 
-                            float m2 = 0;
-                            memcpy(&m2,  &inBuf[4], sizeof(float));
-
-                            float m3 = 0;
-                            memcpy(&m3,  &inBuf[8], sizeof(float));
-
-                            float m4 = 0;
-                            memcpy(&m4,  &inBuf[12], sizeof(float));
-
-                            handle_SET_MOTOR(m1, m2, m3, m4);
-                        } break;
-
-                } // switch (_command)
-
-            } // dispatchMessage 
+            } // dispatchGetMessage 
 
             void init(
                     Receiver * receiver,
