@@ -19,12 +19,10 @@
 #include "hf_pidcontrollers/yaw.hpp"
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_sensors/usfs.hpp"
-#include "hf_sensors/vl53l1x.hpp"
-#include "hf_sensors/pmw3901.hpp"
 #include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
 
-#include <rft_boards/realboards/arduino_serial/arduino/teensy.hpp>
-#include <rft_motors/rotary/brushless.hpp>
+#include <rft_boards/realboards/arduino_serial/arduino/teensy40.hpp>
+#include <rft_motors/arduino/brushless.hpp>
 
 
 // Receiver ===========================================================================
@@ -40,10 +38,10 @@ static rft::Teensy40 board = rft::Teensy40(&Serial3); // Use Serial3 for telemet
 
 // Motors  ==============================================================================
 
-static rft::BrushlessMotor motor1 = rft::BrushlessMotor(5); 
-static rft::BrushlessMotor motor2 = rft::BrushlessMotor(8); 
-static rft::BrushlessMotor motor3 = rft::BrushlessMotor(9); 
-static rft::BrushlessMotor motor4 = rft::BrushlessMotor(11);
+static rft::ArduinoBrushlessMotor motor1 = rft::ArduinoBrushlessMotor(5); 
+static rft::ArduinoBrushlessMotor motor2 = rft::ArduinoBrushlessMotor(8); 
+static rft::ArduinoBrushlessMotor motor3 = rft::ArduinoBrushlessMotor(9); 
+static rft::ArduinoBrushlessMotor motor4 = rft::ArduinoBrushlessMotor(11);
 
 // Mixer ================================================================================
 
@@ -61,10 +59,7 @@ static hf::LevelPid levelPid = hf::LevelPid(0.40);
 
 // Sensors ==============================================================================
 
-static hf::UsfsGyrometer gyrometer;
-static hf::UsfsQuaternion quaternion; // not really a sensor, but we treat it like one!
-// static hf::Vl53l1xRangefinder rangefinder;
-// static hf::Pmw3901OpticalFlow flowSensor(38, &SPI1);
+static hf::USFS imu;
 
 // Setup ==============================================================================
 
@@ -77,11 +72,10 @@ void setup(void)
     // Start I^2C
     Wire.begin();
 
+    delay(100);
+
     // Add sensors
-    h.addSensor(&quaternion);
-    h.addSensor(&gyrometer);
-    // h.addSensor(&rangefinder);
-    // h.addSensor(&flowSensor);
+    h.addSensor(&imu);
 
     // Add PID controllers
     h.addClosedLoopController(&levelPid);
