@@ -74,6 +74,9 @@ static hf::Hackflight h(&board, &receiver, &mixer);
 
 void setup(void)
 {
+    // Debugging
+    Serial2.begin(115200);
+
     // Start I^2C
     Wire.begin(TWI_PINS_6_7);
 
