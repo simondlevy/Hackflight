@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="extras/media/haskell_logo.png" width=600>
+<img src="extras/media/haskell_logo2.png" width=600>
 </p>
 
 ## Intro
