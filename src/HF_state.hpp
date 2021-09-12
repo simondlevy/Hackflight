@@ -15,7 +15,7 @@ namespace hf {
     class State {
 
         friend class Hackflight;
-        friend class ClosedLoopTask;
+        friend class PidControlTask;
         friend class SerialTask;
 
 

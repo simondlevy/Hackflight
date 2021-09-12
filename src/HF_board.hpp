@@ -18,7 +18,7 @@ namespace hf {
         friend class Hackflight;
         friend class Debugger;
         friend class TimerTask;
-        friend class ClosedLoopTask;
+        friend class PidControlTask;
 
         protected:
 

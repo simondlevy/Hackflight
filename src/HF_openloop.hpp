@@ -17,7 +17,7 @@ namespace hf {
 
         friend class Hackflight;
         friend class SerialTask;
-        friend class ClosedLoopTask;
+        friend class PidControlTask;
 
         protected:
 

@@ -12,13 +12,12 @@
 
 #include "HF_board.hpp"
 #include "HF_openloop.hpp"
-#include "HF_closedloop.hpp"
+#include "HF_pidcontroller.hpp"
 #include "HF_receiver.hpp"
 #include "HF_sensor.hpp"
 #include "HF_mixer.hpp"
 #include "HF_parser.hpp"
-#include "HF_closedloop.hpp"
-#include "HF_closedlooptask.hpp"
+#include "HF_pidtask.hpp"
 #include "HF_serialtask.hpp"
 
 namespace hf {
@@ -40,7 +39,7 @@ namespace hf {
             uint8_t _sensor_count = 0;
 
             // Timer task for PID controllers
-            ClosedLoopTask _closedLoopTask;
+            PidControlTask _closedLoopTask;
 
             void startSensors(void) 
             {
@@ -121,7 +120,7 @@ namespace hf {
                 _sensors[_sensor_count++] = sensor;
             }
 
-            void addClosedLoopController(ClosedLoopController * controller,
+            void addPidController(PidController * controller,
                                          uint8_t modeIndex=0) 
             {
                 _closedLoopTask.addController(controller, modeIndex);

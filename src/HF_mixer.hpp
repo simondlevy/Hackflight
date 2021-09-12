@@ -21,7 +21,7 @@ namespace hf {
     class Mixer {
 
         friend class Hackflight;
-        friend class ClosedLoopTask;
+        friend class PidControlTask;
         friend class SerialTask;
 
         private:

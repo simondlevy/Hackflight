@@ -10,24 +10,29 @@
 
 #pragma once
 
-#include <hf_closedloop.hpp>
-
 #include "HF_state.hpp"
 
 namespace hf {
 
-    class PidController : public hf::ClosedLoopController {
+    class PidController {
 
-        friend class PidTask;
+        friend class PidControlTask;
 
         protected:
 
-            virtual void modifyDemands(hf::State * state, float * demands) override
+            uint8_t modeIndex = 0;
+
+            virtual bool shouldFlashLed(void)
             {
-                modifyDemands(((State *)state)->x, demands);
+                return false;
             }
 
             virtual void modifyDemands(float * state, float * demands) = 0;
+
+            virtual void resetOnInactivity(bool inactive)
+            { 
+                (void)inactive; 
+            }
 
     };  // class PidController
 

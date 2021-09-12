@@ -11,18 +11,18 @@
 #include "hf_timertask.hpp"
 #include "hf_state.hpp"
 #include "hf_openloop.hpp"
-#include "hf_closedloop.hpp"
+#include "hf_pidcontroller.hpp"
 
 namespace hf {
 
-    class ClosedLoopTask : public TimerTask {
+    class PidControlTask : public TimerTask {
 
         friend class Hackflight;
 
         private:
 
             // PID controllers
-            ClosedLoopController * _controllers[256] = {};
+            PidController * _controllers[256] = {};
             uint8_t _controller_count = 0;
 
         protected:
@@ -30,13 +30,13 @@ namespace hf {
             // For now, we keep all tasks the same.  At some point it might be
             // useful to investigate, e.g., faster updates for Rate PID than
             // for Level PID.
-            ClosedLoopTask(float freq=300)
+            PidControlTask(float freq=300)
                 : TimerTask(freq)
             {
                 _controller_count = 0;
             }
 
-            void addController(ClosedLoopController * controller,
+            void addController(PidController * controller,
                                uint8_t modeIndex) 
             {
                 controller->modeIndex = modeIndex;
@@ -67,7 +67,7 @@ namespace hf {
 
                 for (uint8_t k=0; k<_controller_count; ++k) {
 
-                    ClosedLoopController * controller = _controllers[k];
+                    PidController * controller = _controllers[k];
 
                     // Some controllers need to be reset based on inactivty
                     // (e.g., throttle down resets PID controller integral)
@@ -75,7 +75,7 @@ namespace hf {
 
                     if (controller->modeIndex <= modeIndex) {
 
-                        controller->modifyDemands(state, demands); 
+                        controller->modifyDemands(state->x, demands); 
 
                         if (controller->shouldFlashLed()) {
                             shouldFlash = true;
@@ -96,6 +96,6 @@ namespace hf {
 
              } // doTask
 
-    };  // ClosedLoopTask
+    };  // PidControlTask
 
 } // namespace hf
