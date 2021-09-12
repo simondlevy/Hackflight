@@ -17,6 +17,7 @@
 
 namespace hf {
 
+
     class SerialTask : public rft::SerialTask {
 
         friend class Hackflight;
@@ -30,8 +31,7 @@ namespace hf {
             Receiver * _receiver = NULL;
             rft::Actuator * _actuator = NULL;
 
-            void handle_RECEIVER_Request(float & c1, float & c2, float & c3,
-                    float & c4, float & c5, float & c6)
+             void handle_RECEIVER_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
                 c1 = _receiver->getRawval(0);
                 c2 = _receiver->getRawval(1);
@@ -39,13 +39,9 @@ namespace hf {
                 c4 = _receiver->getRawval(3);
                 c5 = _receiver->getRawval(4);
                 c6 = _receiver->getRawval(5);
-            }
+             }
 
-            void handle_STATE_Request(float & x, float & dx, float & y,
-                                      float & dy, float & z, float & dz,
-                                      float & phi, float & dphi,
-                                      float & theta, float & dtheta,
-                                      float & psi, float & dpsi)
+            void handle_STATE_Request(float & x, float & dx, float & y, float & dy, float & z, float & dz, float & phi, float & dphi, float & theta, float & dtheta, float & psi, float & dpsi)
             {
                 x = _state->x[State::X];
                 dx = _state->x[State::DX];
@@ -119,8 +115,7 @@ namespace hf {
                             float psi = 0;
                             float dpsi = 0;
                             handle_STATE_Request(x, dx, y, dy, z, dz,
-                                                phi, dphi, theta, dtheta,
-                                                psi, dpsi);
+                                    phi, dphi, theta, dtheta, psi, dpsi);
                             prepareToSendFloats(command, 12);
                             sendFloat(x);
                             sendFloat(dx);
@@ -163,7 +158,7 @@ namespace hf {
                             handle_SET_MOTOR(m1, m2, m3, m4);
                         } break;
 
-                } // switch (command)
+                } // switch (_command)
 
             } // dispatchMessage 
 
