@@ -7,8 +7,8 @@
 #pragma once
 
 #include "HF_board.hpp"
-#include "HF_debugger.hpp"
-#include "HF_actuator.hpp"
+#include "HF_mixer.hpp"
+#include "HF_mixer.hpp"
 #include "HF_parser.hpp"
 #include "HF_timertask.hpp"
 #include "HF_parser.hpp"
@@ -30,7 +30,7 @@ namespace hf {
 
             bool _useTelemetryPort = false;
 
-            void update(Board * board, Actuator * actuator, State * state)
+            void update(Board * board, Mixer * mixer, State * state)
             {
                 if (!TimerTask::ready(board)) {
                     return;
@@ -48,7 +48,7 @@ namespace hf {
 
                 // Support motor testing from GCS
                 if (!state->armed) {
-                    actuator->runDisarmed();
+                    mixer->runDisarmed();
                 }
             }
 
@@ -59,7 +59,7 @@ namespace hf {
             // Store so we don't have to pass them on update
             State * _state = NULL;
             Receiver * _receiver = NULL;
-            Actuator * _actuator = NULL;
+            Mixer * _mixer = NULL;
 
              void handle_RECEIVER_Request(
                      float & c1,
@@ -107,15 +107,15 @@ namespace hf {
 
             void handle_ACTUATOR_TYPE_Request(uint8_t & mtype)
             {
-                mtype = _actuator->getType();
+                mtype = _mixer->getType();
             }
 
             void handle_SET_MOTOR(float  m1, float  m2, float  m3, float  m4)
             {
-                _actuator->setMotorDisarmed(0, m1);
-                _actuator->setMotorDisarmed(1, m2);
-                _actuator->setMotorDisarmed(2, m3);
-                _actuator->setMotorDisarmed(3, m4);
+                _mixer->setMotorDisarmed(0, m1);
+                _mixer->setMotorDisarmed(1, m2);
+                _mixer->setMotorDisarmed(2, m3);
+                _mixer->setMotorDisarmed(3, m4);
             }
 
         protected:
@@ -212,11 +212,11 @@ namespace hf {
 
             void init(
                     Receiver * receiver,
-                    Actuator * actuator,
+                    Mixer * mixer,
                     State * state)
             {
                 _receiver = receiver;
-                _actuator = actuator;
+                _mixer = mixer;
                 _state = state;
             }
     public:

@@ -46,7 +46,7 @@ namespace hf {
 
             void update(Board * board,
                         OpenLoopController * olc,
-                        Actuator * actuator,
+                        Mixer * mixer,
                         State * state)
             {
                 if (!TimerTask::ready(board)) {
@@ -87,11 +87,11 @@ namespace hf {
                 board->flashLed(shouldFlash);
 
                 // Use updated demands to run motors, allowing
-                // actuator to choose whether it cares about
+                // mixer to choose whether it cares about
                 // open-loop controller being inactive (e.g.,
                 // throttle down)
                 if (!state->failsafe) {
-                    actuator->run(demands, state->armed && !olc->inactive());
+                    mixer->run(demands, state->armed && !olc->inactive());
                 }
 
              } // doTask

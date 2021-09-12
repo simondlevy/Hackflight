@@ -10,7 +10,7 @@
 
 #include "HF_demands.hpp"
 
-#include <hf_actuator.hpp>
+#include <hf_mixer.hpp>
 #include <hf_filters.hpp>
 #include <hf_motor.hpp>
 
@@ -18,9 +18,10 @@
 
 namespace hf {
 
-    class Mixer : public hf::Actuator {
+    class Mixer {
 
         friend class Hackflight;
+        friend class ClosedLoopTask;
         friend class SerialTask;
 
         private:
@@ -67,9 +68,7 @@ namespace hf {
                 return hf::Filter::constrainMinMax(value, 0, 1);
             }
 
-            // Actuator overrides ----------------------------------------------
-
-            void begin(void) override
+            void begin(void)
             {
                 // set disarmed motor values
                 for (uint8_t i = 0; i < _nmotors; i++) {
@@ -79,14 +78,14 @@ namespace hf {
             }
 
             // This is how we can spin the motors from the GCS
-            void runDisarmed(void) override
+            void runDisarmed(void)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, _disarmedValues[i]);
                 }
             }
 
-            void run(float * demands, bool safe) override
+            void run(float * demands, bool safe)
             {
                 // Don't run motors if its not safe: vehicle should be
                 // armed, with throttle above minimum
@@ -135,17 +134,19 @@ namespace hf {
                 }
             }
 
-            void cut(void) override
+            void cut(void) 
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, 0);
                 }
             }
 
-            virtual void setMotorDisarmed(uint8_t index, float value) override
+            void setMotorDisarmed(uint8_t index, float value)
             {
                 _disarmedValues[index] = value;
             }
+
+            virtual uint8_t getType(void) { return 0; }
 
     }; // class Mixer
 

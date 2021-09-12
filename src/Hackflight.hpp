@@ -106,11 +106,11 @@ namespace hf {
 
          public:
 
-            Hackflight( hf::Board * board, Receiver * receiver, hf::Mixer * actuator)
+            Hackflight( hf::Board * board, Receiver * receiver, hf::Mixer * mixer)
             {
                 _board = board;
                 _receiver = receiver;
-                _mixer = actuator;
+                _mixer = mixer;
 
                 _sensor_count = 0;
                 _serial_task_count = 0;
@@ -141,7 +141,7 @@ namespace hf {
                 // Initialize the open-loop controller
                 _receiver->begin();
 
-                // Start the actuator
+                // Start the mixer
                 _mixer->begin();
             }
 
