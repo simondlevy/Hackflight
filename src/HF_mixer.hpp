@@ -10,15 +10,15 @@
 
 #include "HF_demands.hpp"
 
-#include <RFT_actuator.hpp>
-#include <RFT_filters.hpp>
-#include <RFT_motor.hpp>
+#include <hf_actuator.hpp>
+#include <hf_filters.hpp>
+#include <hf_motor.hpp>
 
-#include <RFT_debugger.hpp>
+#include <hf_debugger.hpp>
 
 namespace hf {
 
-    class Mixer : public rft::Actuator {
+    class Mixer : public hf::Actuator {
 
         friend class Hackflight;
         friend class SerialTask;
@@ -36,8 +36,8 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            // XXX make a class for this, or migrate it to rft::Motor
-            rft::Motor * _motors[MAXMOTORS] = {};
+            // XXX make a class for this, or migrate it to hf::Motor
+            hf::Motor * _motors[MAXMOTORS] = {};
             float  _disarmedValues[MAXMOTORS];
 
             uint8_t _nmotors = 0;
@@ -56,7 +56,7 @@ namespace hf {
                 _nmotors = 0;
             }
 
-            void addMotor(rft::Motor * motor)
+            void addMotor(hf::Motor * motor)
             {
                 _motors[_nmotors++] = motor;
             }
@@ -64,7 +64,7 @@ namespace hf {
             virtual float constrainMotorValue(uint8_t index, float value)
             {
                 (void)index; // all motors behave the same by default
-                return rft::Filter::constrainMinMax(value, 0, 1);
+                return hf::Filter::constrainMinMax(value, 0, 1);
             }
 
             // Actuator overrides ----------------------------------------------

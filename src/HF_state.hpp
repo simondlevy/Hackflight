@@ -8,22 +8,27 @@
 
 #pragma once
 
-#include <RFT_state.hpp>
-#include <RFT_filters.hpp>
+#include <HF_filters.hpp>
 
 namespace hf {
 
-    class State : public rft::State {
+    class State {
 
         friend class Hackflight;
+        friend class ClosedLoopTask;
+        friend class SerialTask;
+
 
         private:
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25;
 
+            bool armed = false;
+            bool failsafe = false;
+
             bool safeAngle(uint8_t axis)
             {
-                return fabs(x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+                return fabs(x[axis]) < hf::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
         protected:
@@ -42,8 +47,8 @@ namespace hf {
             float x[SIZE];
 
             State(bool start_armed=false)
-                : rft::State(start_armed)
             {
+                armed = start_armed;
             }
 
 

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <RFT_filters.hpp>
+#include <hf_filters.hpp>
 
 #include "HF_pidcontroller.hpp"
 
@@ -62,7 +62,7 @@ namespace hf {
                 float error = demands[demand_axis] - angular_velocity;
 
                 // Compute I term
-                controller_state->errorI = rft::Filter::constrainAbs(controller_state->errorI + error, _windupMax);
+                controller_state->errorI = hf::Filter::constrainAbs(controller_state->errorI + error, _windupMax);
 
                 // Compute D term
                 float deltaError = error - controller_state->errorPrev;
@@ -97,7 +97,7 @@ namespace hf {
                 _Ki = Ki;
                 _Kd = Kd;
                 _windupMax = windupMax;
-                _rateMax = rft::Filter::deg2rad(rateMaxDegreesPerSecond);
+                _rateMax = hf::Filter::deg2rad(rateMaxDegreesPerSecond);
 
                 reset(&_rstate);
                 reset(&_pstate);

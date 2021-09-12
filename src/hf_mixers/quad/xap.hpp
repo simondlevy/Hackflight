@@ -23,10 +23,10 @@ namespace hf {
         public:
 
             MixerQuadXAP(
-                    rft::RotaryMotor * motor1,
-                    rft::RotaryMotor * motor2,
-                    rft::RotaryMotor * motor3,
-                    rft::RotaryMotor * motor4) 
+                    hf::RotaryMotor * motor1,
+                    hf::RotaryMotor * motor2,
+                    hf::RotaryMotor * motor3,
+                    hf::RotaryMotor * motor4) 
 
                 : MixerQuad(motor1, motor2, motor3, motor4)
             {

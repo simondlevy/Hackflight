@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include <RFT_sensor.hpp>
-#include <RFT_filters.hpp>
+#include <hf_sensor.hpp>
+#include <hf_filters.hpp>
 
 #include <PMW3901.h>
 
 namespace hf {
 
-    class Pmw3901OpticalFlow : public rft::Sensor, public PMW3901 {
+    class Pmw3901OpticalFlow : public hf::Sensor, public PMW3901 {
 
         friend class Hackflight;
 
@@ -26,7 +26,7 @@ namespace hf {
 
         protected:
 
-            virtual void modifyState(rft::State * state, float time) override
+            virtual void modifyState(hf::State * state, float time) override
             {
                 // State * hfstate = (State *)state;
 
@@ -35,7 +35,7 @@ namespace hf {
 
                 PMW3901::readMotionCount(&deltaX, &deltaY);
 
-                rft::Debugger::printf("%+04d  %+04d\n", deltaX, deltaY);
+                hf::Debugger::printf("%+04d  %+04d\n", deltaX, deltaY);
             }
 
             virtual void begin(void) override

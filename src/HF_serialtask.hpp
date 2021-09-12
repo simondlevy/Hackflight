@@ -6,21 +6,51 @@
 
 #pragma once
 
-#include <RFT_board.hpp>
-#include <RFT_debugger.hpp>
-#include <RFT_actuator.hpp>
-#include <RFT_parser.hpp>
-#include <RFT_serialtask.hpp>
-
+#include "HF_board.hpp"
+#include "HF_debugger.hpp"
+#include "HF_actuator.hpp"
+#include "HF_parser.hpp"
+#include "HF_timertask.hpp"
+#include "HF_parser.hpp"
+#include "HF_board.hpp"
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
+#include "hf_boards/realboard.hpp"
 
 namespace hf {
 
 
-    class SerialTask : public rft::SerialTask {
+    class SerialTask : public TimerTask, Parser {
 
         friend class Hackflight;
+
+        protected:
+
+            static constexpr float FREQ = 66;
+
+            bool _useTelemetryPort = false;
+
+            void update(Board * board, Actuator * actuator, State * state)
+            {
+                if (!TimerTask::ready(board)) {
+                    return;
+                }
+
+                RealBoard * realboard = (RealBoard *)board;
+
+                while (realboard->serialAvailable(_useTelemetryPort) > 0) {
+                    Parser::parse(realboard->serialRead(_useTelemetryPort));
+                }
+
+                while (Parser::availableBytes() > 0) {
+                    realboard->serialWrite(Parser::readByte(), _useTelemetryPort);
+                }
+
+                // Support motor testing from GCS
+                if (!state->armed) {
+                    actuator->runDisarmed();
+                }
+            }
 
         private:
 
@@ -29,9 +59,15 @@ namespace hf {
             // Store so we don't have to pass them on update
             State * _state = NULL;
             Receiver * _receiver = NULL;
-            rft::Actuator * _actuator = NULL;
+            Actuator * _actuator = NULL;
 
-             void handle_RECEIVER_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
+             void handle_RECEIVER_Request(
+                     float & c1,
+                     float & c2,
+                     float & c3,
+                     float & c4,
+                     float & c5,
+                     float & c6)
             {
                 c1 = _receiver->getRawval(0);
                 c2 = _receiver->getRawval(1);
@@ -41,7 +77,19 @@ namespace hf {
                 c6 = _receiver->getRawval(5);
              }
 
-            void handle_STATE_Request(float & x, float & dx, float & y, float & dy, float & z, float & dz, float & phi, float & dphi, float & theta, float & dtheta, float & psi, float & dpsi)
+            void handle_STATE_Request(
+                    float & x,
+                    float & dx,
+                    float & y,
+                    float & dy,
+                    float & z,
+                    float & dz,
+                    float & phi,
+                    float & dphi,
+                    float & theta,
+                    float & dtheta,
+                    float & psi,
+                    float & dpsi)
             {
                 x = _state->x[State::X];
                 dx = _state->x[State::DX];
@@ -164,7 +212,7 @@ namespace hf {
 
             void init(
                     Receiver * receiver,
-                    rft::Actuator * actuator,
+                    Actuator * actuator,
                     State * state)
             {
                 _receiver = receiver;
@@ -173,9 +221,10 @@ namespace hf {
             }
     public:
 
-            SerialTask(bool secondary=false)
-                : rft::SerialTask(secondary)
+            SerialTask(bool secondaryPort=false)
+                : TimerTask(FREQ)
             {
+                _useTelemetryPort = secondaryPort;
             }
 
         }; // class SerialTask

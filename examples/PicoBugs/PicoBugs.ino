@@ -12,7 +12,7 @@
    MIT License
  */
 
-#include "HF_full.hpp"
+#include "Hackflight.hpp"
 #include "hf_receivers/arduino/dsmx/dsmx_esp32_serial1.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"

@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include <RFT_sensor.hpp>
-#include <RFT_filters.hpp>
+#include <hf_sensor.hpp>
+#include <hf_filters.hpp>
 
 #include <VL53L1X.h>
 
 namespace hf {
 
-    class Vl53l1xRangefinder : public rft::Sensor {
+    class Vl53l1xRangefinder : public hf::Sensor {
 
         friend class Hackflight;
 
@@ -25,7 +25,7 @@ namespace hf {
 
             // Low-pass filter for altitude
             // XXX Should we also filter the velocity?
-            rft::LowPassFilter _lpf;
+            hf::LowPassFilter _lpf;
 
             float _period = 0;
 
@@ -35,7 +35,7 @@ namespace hf {
 
         protected:
 
-            virtual void modifyState(rft::State * state, float time) override
+            virtual void modifyState(hf::State * state, float time) override
             {
                 State * hfstate = (State *)state;
 

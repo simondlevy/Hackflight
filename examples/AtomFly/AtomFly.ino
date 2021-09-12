@@ -13,7 +13,7 @@
    MIT License
  */
 
-#include "HF_full.hpp"
+#include "Hackflight.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"
 #include "hf_pidcontrollers/yaw.hpp"

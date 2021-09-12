@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <RFT_sensor.hpp>
-#include <RFT_filters.hpp>
+#include <hf_sensor.hpp>
+#include <hf_filters.hpp>
 
 #include <USFS_Master.h>
 
@@ -27,7 +27,7 @@ namespace hf {
         https://emissarydrones.com/what-is-roll-pitch-and-yaw
     */
 
-    class USFS : public rft::Sensor {
+    class USFS : public hf::Sensor {
 
         friend class Hackflight;
 
@@ -48,7 +48,7 @@ namespace hf {
                 }
             }
 
-            virtual void modifyState(rft::State * state, float time)
+            virtual void modifyState(hf::State * state, float time)
             {
                 State * hfstate = (State *)state;
 
@@ -82,7 +82,7 @@ namespace hf {
 
                     _usfs.readQuaternion(qw, qx, qy, qz);
 
-                    rft::Filter::quat2euler(qw, qx, qy, qz, 
+                    hf::Filter::quat2euler(qw, qx, qy, qz, 
                             hfstate->x[State::PHI], hfstate->x[State::THETA], hfstate->x[State::PSI]);
 
                     // Adjust rotation so that nose-up is positive

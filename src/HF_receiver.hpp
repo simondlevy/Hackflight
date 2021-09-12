@@ -13,11 +13,11 @@
 
 #include "HF_demands.hpp"
 
-#include <RFT_openloop.hpp>
+#include <hf_openloop.hpp>
 
 namespace hf {
 
-    class Receiver : public rft::OpenLoopController {
+    class Receiver : public hf::OpenLoopController {
 
         friend class Hackflight;
         friend class SerialTask;
