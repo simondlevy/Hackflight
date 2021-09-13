@@ -32,9 +32,10 @@ namespace hf {
 
             void update(Board * board, Mixer * mixer, State * state)
             {
+                /*
                 if (!TimerTask::ready(board)) {
                     return;
-                }
+                }*/
 
                 RealBoard * realboard = (RealBoard *)board;
 
