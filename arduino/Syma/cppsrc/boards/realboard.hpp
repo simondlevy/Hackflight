@@ -39,8 +39,6 @@ namespace hf {
                 }
             }
 
-            virtual void setLed(bool isOn) = 0;
-
             virtual uint8_t serialAvailable(void) = 0;
 
             virtual uint8_t serialRead(void) = 0;
