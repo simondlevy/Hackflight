@@ -29,7 +29,7 @@ HSRC = Main.hs \
 
 RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
-DST = $(MYHOME)/Documents/Unreal\ Projects/MulticopterSim/Source/CopilotModule
+DST = $(MYHOME)/Documents/Hackflight/unreal/Source/CopilotModule
 
 all: copilot.cpp copilot.h
 	cp copilot.c $(DST)/copilot.cpp
