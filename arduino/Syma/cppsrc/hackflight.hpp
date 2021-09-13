@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "board.hpp"
 #include "pidcontroller.hpp"
 #include "receiver.hpp"
 #include "sensor.hpp"
@@ -28,7 +27,6 @@ namespace hf {
             static constexpr float   LED_STARTUP_FLASH_SECONDS = 1.0;
             static constexpr uint8_t LED_STARTUP_FLASH_COUNT   = 20;
 
-            Board * _board = NULL;
             Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;
 
@@ -53,7 +51,7 @@ namespace hf {
             void checkSensors(void)
             {
                 // Some sensors may need to know the current time
-                float time = _board->getTime();
+                float time = getTime();
 
                 for (uint8_t k=0; k<_sensor_count; ++k) {
                     _sensors[k]->modifyState(&_state, time);
@@ -107,9 +105,8 @@ namespace hf {
 
          public:
 
-            Hackflight( hf::Board * board, Receiver * receiver, hf::Mixer * mixer)
+            Hackflight(Receiver * receiver, hf::Mixer * mixer)
             {
-                _board = board;
                 _receiver = receiver;
                 _mixer = mixer;
 
@@ -145,9 +142,6 @@ namespace hf {
                 }
                 copilot_setLed(false);
 
-                 // Start the board
-                _board->begin();
-
                 // Initialize the sensors
                 startSensors();
 
@@ -161,14 +155,14 @@ namespace hf {
                 checkReceiver();
 
                 // Update PID controllers task
-                _closedLoopTask.update(_board, _receiver, _mixer, &_state);
+                _closedLoopTask.update(_receiver, _mixer, &_state);
 
                 // Check sensors
                 checkSensors();
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(_board, _mixer, &_state);
+                    _serial_tasks[k]->update(_mixer, &_state);
                 }
             }
 

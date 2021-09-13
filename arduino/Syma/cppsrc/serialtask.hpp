@@ -8,16 +8,13 @@
 
 #include "../copilot.h"
 
-#include "board.hpp"
 #include "mixer.hpp"
 #include "mixer.hpp"
 #include "parser.hpp"
 #include "timertask.hpp"
 #include "parser.hpp"
-#include "board.hpp"
 #include "state.hpp"
 #include "receiver.hpp"
-#include "boards/realboard.hpp"
 
 namespace hf {
 
@@ -30,10 +27,8 @@ namespace hf {
 
             static constexpr float FREQ = 66;
 
-            void update(Board * board, Mixer * mixer, State * state)
+            void update(Mixer * mixer, State * state)
             {
-                RealBoard * realboard = (RealBoard *)board;
-
                 if (copilot_serialAvailable) {
                     Parser::parse(copilot_serialByte);
                 }

@@ -31,7 +31,6 @@ namespace hf {
                 va_end(ap);
             }
 
-            // for boards that do not support floating-point vnsprintf
             static void printfloat(float val, uint8_t prec=3)
             {
                 uint16_t mul = 1;
@@ -53,9 +52,12 @@ namespace hf {
                 printf("\n");
             }
 
-        protected:
+        private:
 
-            static void outbuf(char * buf);
+            static void outbuf(char * buf)
+            {
+                Serial.print(buf);
+            }
 
         }; // class Debugger
 

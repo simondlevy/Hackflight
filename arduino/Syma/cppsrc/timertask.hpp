@@ -8,9 +8,10 @@
 
 #pragma once
 
-#include "board.hpp"
 #include "debugger.hpp"
 #include "state.hpp"
+
+#include "../copilot.h"
 
 namespace hf {
 
@@ -29,9 +30,9 @@ namespace hf {
                 _time = 0;
             }
 
-            bool ready(Board * board)
+            bool ready(void)
             {
-                float time = board->getTime();
+                float time = getTime();
 
                 if ((time - _time) > _period)
                 {

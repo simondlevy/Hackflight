@@ -20,7 +20,6 @@
 #include "copilot.h"
 
 #include "cppsrc/Hackflight.hpp"
-#include "cppsrc/boards/realboards/arduino_serial/arduino/ladybugfc.hpp"
 #include "cppsrc/receiver.hpp"
 #include "cppsrc/mixers/quad/xmw.hpp"
 #include "cppsrc/pidcontrollers/rate.hpp"
@@ -39,11 +38,6 @@ static constexpr float DEMAND_SCALE = 4.0f;
 static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.035};
 
 static hf::Receiver receiver = hf::Receiver(DEMAND_SCALE, SOFTWARE_TRIM);
-
-// Board =======================================================================
-
-// Bluetooth comms over Serial2
-static hf::LadybugFC board;
 
 // Motors  =====================================================================
 
@@ -72,7 +66,7 @@ hf::SerialTask gcsTask;
 
 // Hackflight object ===========================================================
 
-static hf::Hackflight h(&board, &receiver, &mixer);
+static hf::Hackflight h(&receiver, &mixer);
 
 // IMU ------------------------------------------------------------------------
 
@@ -182,6 +176,13 @@ void copilot_serialWrite(uint8_t b)
 void copilot_setLed(bool on)
 {
     digitalWrite(LED_PIN, on);
+}
+
+// XXX clock  ------------------------------------------------------------------
+
+float getTime(void)
+{
+    return micros() / 1.e6f;
 }
 
 // Setup =======================================================================
