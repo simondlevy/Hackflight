@@ -17,6 +17,8 @@
 
  */
 
+#include "copilot.h"
+
 #include "cppsrc/Hackflight.hpp"
 #include "cppsrc/hf_boards/realboards/arduino_serial/arduino/ladybugfc.hpp"
 #include "cppsrc/hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
@@ -82,10 +84,55 @@ void copilot_setLed(bool on)
     digitalWrite(LED_PIN, on);
 }
 
+// IMU ------------------------------------------------------------------------
+
+#include <Wire.h>
+#include <USFS_Master.h>
+
+static USFS_Master usfs;
+
+static void startImu(void)
+{
+    delay(100);
+    if (!usfs.begin()) {
+        while (true) {
+            Serial.println(usfs.getErrorString());
+            delay(500);
+        }
+    }
+}
+
+static void updateImu(void)
+{
+    usfs.checkEventStatus();
+
+    if (usfs.gotGyrometer()) {
+        usfs.readGyrometer(
+                copilot_gyrometerX,
+                copilot_gyrometerY,
+                copilot_gyrometerZ);
+    }
+
+    if (usfs.gotQuaternion()) {
+        usfs.readQuaternion(
+                copilot_quaternionW,
+                copilot_quaternionX,
+                copilot_quaternionY,
+                copilot_quaternionZ);
+    }
+}
+
+
 // Setup =======================================================================
 
 void setup(void)
 {
+    // I^2C
+    Wire.begin();
+
+    // IMU
+    startImu(); 
+
     // LED
     pinMode(LED_PIN, OUTPUT);
 
@@ -109,6 +156,7 @@ void setup(void)
 
 void loop(void)
 {
-    // Update Hackflight firmware
+    updateImu();
+
     h.update();
 }

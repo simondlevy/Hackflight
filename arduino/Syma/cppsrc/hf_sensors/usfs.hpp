@@ -40,13 +40,6 @@ namespace hf {
 
             void begin(void)
             {
-                // Start the USFS in master mode, no interrupt
-                if (!_usfs.begin()) {
-                    while (true) {
-                        Serial.println(_usfs.getErrorString());
-                        delay(100);
-                    }
-                }
             }
 
             virtual void modifyState(hf::State * state, float time)
@@ -55,44 +48,26 @@ namespace hf {
 
                 (void)time;
 
-                _usfs.checkEventStatus();
+                // Convert degrees / sec to radians / sec
+                hfstate->x[State::DPHI] = radians(copilot_gyrometerX);
+                hfstate->x[State::DTHETA] = radians(copilot_gyrometerY);
+                hfstate->x[State::DPSI] = radians(copilot_gyrometerZ);
 
-                if (_usfs.gotError()) {
-                    while (true) {
-                        Serial.print("ERROR: ");
-                        Serial.println(_usfs.getErrorString());
-                    }
-                }
+                hf::Filter::quat2euler(
+                        copilot_quaternionW,
+                        copilot_quaternionX,
+                        copilot_quaternionY,
+                        copilot_quaternionZ, 
+                        hfstate->x[State::PHI],
+                        hfstate->x[State::THETA],
+                        hfstate->x[State::PSI]);
 
-                if (_usfs.gotGyrometer()) {
+                // Adjust rotation so that nose-up is positive
+                hfstate->x[State::THETA] = -hfstate->x[State::THETA];
 
-                    float gx=0, gy=0, gz=0;
-
-                    // Returns degrees / sec
-                    _usfs.readGyrometer(gx, gy, gz);
-
-                    // Convert degrees / sec to radians / sec
-                    hfstate->x[State::DPHI] = radians(gx);
-                    hfstate->x[State::DTHETA] = radians(gy);
-                    hfstate->x[State::DPSI] = radians(gz);
-                }
-
-                if (_usfs.gotQuaternion()) {
-
-                    float qw=0, qx=0, qy=0, qz=0;
-
-                    _usfs.readQuaternion(qw, qx, qy, qz);
-
-                    hf::Filter::quat2euler(qw, qx, qy, qz, 
-                            hfstate->x[State::PHI], hfstate->x[State::THETA], hfstate->x[State::PSI]);
-
-                    // Adjust rotation so that nose-up is positive
-                    hfstate->x[State::THETA] = -hfstate->x[State::THETA];
-
-                    // Convert heading from [-pi,+pi] to [0,2*pi]
-                    if (hfstate->x[State::PSI] < 0) {
-                        hfstate->x[State::PSI] += 2*M_PI;
-                    }
+                // Convert heading from [-pi,+pi] to [0,2*pi]
+                if (hfstate->x[State::PSI] < 0) {
+                    hfstate->x[State::PSI] += 2*M_PI;
                 }
 
             } // modifyState
