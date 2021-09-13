@@ -64,7 +64,7 @@ namespace hf {
                     _mixer->cut();
                     _state.armed = false;
                     _state.failsafe = true;
-                    _board->showArmedStatus(false);
+                    copilot_setLed(false);
                     return;
                 }
 
@@ -98,7 +98,7 @@ namespace hf {
                 }
 
                 // Set LED based on arming status
-                _board->showArmedStatus(_state.armed);
+                copilot_setLed(_state.armed);
 
             } // checkReceiver
 

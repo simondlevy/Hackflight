@@ -53,11 +53,6 @@ namespace hf {
                 delay((uint32_t)(1000*sec));
             }
 
-            void showArmedStatus(bool armed)
-            {
-                setLed(armed);
-            }
-
             void flashLed(bool shouldflash)
             {
                 if (shouldflash) {
