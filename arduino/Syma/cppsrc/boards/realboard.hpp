@@ -31,16 +31,11 @@ namespace hf {
                 return micros() / 1.e6f;
             }
 
-            void delaySeconds(float sec)
-            {
-                delay((uint32_t)(1000*sec));
-            }
-
             void error(const char * errmsg) 
             {
                 while (true) {
                     Debugger::printf("%s\n", errmsg);
-                    delaySeconds(0.1);
+                    delay(100);
                 }
             }
 

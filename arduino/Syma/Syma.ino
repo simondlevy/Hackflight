@@ -74,13 +74,6 @@ hf::SerialTask gcsTask;
 
 static hf::Hackflight h(&board, &receiver, &mixer);
 
-// Copilot support =============================================================
-
-void copilot_setLed(bool on)
-{
-    digitalWrite(LED_PIN, on);
-}
-
 // IMU ------------------------------------------------------------------------
 
 #include <Wire.h>
@@ -170,6 +163,12 @@ void copilot_serialWrite(uint8_t b)
     Serial.write(b);
 }
 
+// LED ------------------------------------------------------------------------
+
+void copilot_setLed(bool on)
+{
+    digitalWrite(LED_PIN, on);
+}
 
 // Setup =======================================================================
 
