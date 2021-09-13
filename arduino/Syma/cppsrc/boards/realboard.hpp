@@ -50,8 +50,6 @@ namespace hf {
 
             virtual uint8_t serialRead(void) = 0;
 
-            virtual void serialWrite(uint8_t c) = 0;
-
     }; // class RealBoard
 
 } // namespace hf

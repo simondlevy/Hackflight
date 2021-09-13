@@ -43,7 +43,7 @@ namespace hf {
                 }
 
                 while (Parser::availableBytes() > 0) {
-                    realboard->serialWrite(Parser::readByte());
+                    copilot_serialWrite(Parser::readByte());
                 }
 
                 // Support motor testing from GCS

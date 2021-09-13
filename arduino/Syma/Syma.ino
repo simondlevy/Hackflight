@@ -163,6 +163,12 @@ static void updateReceiver(void)
     }
 }
 
+// Serial comms ----------------------------------------------------------------
+
+void copilot_serialWrite(uint8_t b)
+{
+    Serial.write(b);
+}
 
 
 // Setup =======================================================================
@@ -184,6 +190,8 @@ void setup(void)
     h.addPidController(&yawPid);
 
     h.addSerialTask(&gcsTask);
+
+    Serial.begin(115200);
 
     h.begin();
 }

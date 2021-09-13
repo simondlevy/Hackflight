@@ -30,16 +30,8 @@ namespace hf {
                 return Serial.read();
             }
 
-            void serialWrite(uint8_t byte)
-            {
-                Serial.write(byte);
-            }
-
             void begin(void)
             {
-                // Start serial communcation for GCS/debugging
-                Serial.begin(SERIAL_BAUD);
-
                 // This will blink the LED
                 RealBoard::begin();
             }
