@@ -22,7 +22,7 @@ namespace hf {
         public:
 
             LadybugFC(HardwareSerial * telemetryPort=NULL) 
-                : hf::ArduinoBoard(A4, telemetryPort) // LED on A4
+                : hf::ArduinoBoard(false, telemetryPort) 
             {
             }
 
