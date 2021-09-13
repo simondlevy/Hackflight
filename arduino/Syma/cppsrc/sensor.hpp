@@ -18,7 +18,7 @@ namespace hf {
 
         protected:
 
-            virtual void modifyState(State * state, float time) = 0;
+            virtual void modifyState(State * state) = 0;
 
             virtual void begin(void) { }
 

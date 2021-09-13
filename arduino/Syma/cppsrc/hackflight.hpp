@@ -50,11 +50,8 @@ namespace hf {
 
             void checkSensors(void)
             {
-                // Some sensors may need to know the current time
-                float time = getTime();
-
                 for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->modifyState(&_state, time);
+                    _sensors[k]->modifyState(&_state);
                 }
             }
 

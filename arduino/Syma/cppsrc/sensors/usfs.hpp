@@ -30,11 +30,9 @@ namespace hf {
             {
             }
 
-            virtual void modifyState(hf::State * state, float time)
+            virtual void modifyState(hf::State * state)
             {
                 State * hfstate = (State *)state;
-
-                (void)time;
 
                 // Convert degrees / sec to radians / sec
                 hfstate->x[State::DPHI] = radians(copilot_gyrometerX);

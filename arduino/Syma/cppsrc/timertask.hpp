@@ -32,7 +32,7 @@ namespace hf {
 
             bool ready(void)
             {
-                float time = getTime();
+                float time = copilot_time_sec;
 
                 if ((time - _time) > _period)
                 {

@@ -27,6 +27,6 @@ void copilot_serialWrite(uint8_t copilot_serialWrite_arg0);
 void step(void);
 
 
-EXTERN float getTime();
+EXTERN float copilot_time_sec;
 EXTERN bool copilot_serialAvailable;
 EXTERN uint8_t copilot_serialByte;

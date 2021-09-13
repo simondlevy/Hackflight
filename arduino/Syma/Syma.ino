@@ -178,11 +178,11 @@ void copilot_setLed(bool on)
     digitalWrite(LED_PIN, on);
 }
 
-// XXX clock  ------------------------------------------------------------------
+// clock  ----------------------------------------------------------------------
 
-float getTime(void)
+static void updateClock(void)
 {
-    return micros() / 1.e6f;
+    copilot_time_sec = micros() / 1.e6f;
 }
 
 // Setup =======================================================================
@@ -219,6 +219,8 @@ void loop(void)
     updateImu();
 
     updateSerial();
+
+    updateClock();
 
     h.update();
 }
