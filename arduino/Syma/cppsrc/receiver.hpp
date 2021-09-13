@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <math.h>
 
+#include "../copilot.h"
+
 #include "demands.hpp"
 #include "openloop.hpp"
 
@@ -32,11 +34,11 @@ namespace hf {
 
             float _demandScale = 0;
 
-            float adjustCommand(float command, uint8_t channel)
+            float adjustCommand(float command, float rawval)
             {
                 command /= 2;
 
-                if (rawvals[_channelMap[channel]] < 0) {
+                if (rawval < 0) {
                     command = -command;
                 }
 
@@ -46,11 +48,6 @@ namespace hf {
             float applyCyclicFunction(float command)
             {
                 return rcFun(command, CYCLIC_EXPO, CYCLIC_RATE);
-            }
-
-            float makePositiveCommand(uint8_t channel)
-            {
-                return fabs(rawvals[_channelMap[channel]]);
             }
 
             static float rcFun(float x, float e, float r)
@@ -67,13 +64,10 @@ namespace hf {
                 return (mid + tmp*(1-THROTTLE_EXPO + THROTTLE_EXPO * (tmp*tmp) / (y*y))) * 2 - 1;
             }
 
-        protected: 
-
             // maximum number of channels that any receiver will send (of which we'll use six)
             static const uint8_t MAXCHAN = 8;
 
-            uint8_t _aux1State = 0;
-            uint8_t _aux2State = 0;
+            uint8_t _auxState = 0;
 
             // channel indices
             enum {
@@ -85,39 +79,37 @@ namespace hf {
                 CHANNEL_AUX2
             };
 
-            uint8_t _channelMap[6] = {0};
-
-            // These must be overridden for each receiver
-            virtual bool gotNewFrame(void) = 0;
-            virtual void readRawvals(void) = 0;
-
-            // Software trim
             float _trimRoll = 0;
             float _trimPitch = 0;
             float _trimYaw = 0;
 
-            // Raw receiver values in [-1,+1]
-            float rawvals[MAXCHAN] = {0};  
-
             // Demands (throttle, roll, pitch, yaw)
             float _demands[4] = {};
 
-            float getRawval(uint8_t chan)
+        protected:
+
+            virtual void getDemands(float * demands) override
             {
-                return rawvals[_channelMap[chan]];
+                memcpy(demands, _demands, sizeof(_demands));
             }
+
+            virtual bool inactive(void) override
+            {
+                return copilot_receiverThrottle < -1 + THROTTLE_MARGIN;
+            }
+
+            virtual bool inArmedState(void) override
+            {
+                return _auxState > 0;
+            }
+
+        public:
 
             /**
               * channelMap: throttle, roll, pitch, yaw, aux, arm
               */
-            Receiver(const uint8_t channelMap[6],
-                     const float demandScale,
-                     const float trim[3] = NULL) 
+            Receiver(const float demandScale, const float trim[3] = NULL) 
             { 
-                for (uint8_t k=0; k<6; ++k) {
-                    _channelMap[k] = channelMap[k];
-                }
-
                 if (trim) {
                     _trimRoll  = trim[0];
                     _trimPitch = trim[1];
@@ -129,25 +121,22 @@ namespace hf {
 
             virtual bool ready(void) override
             {
-                // Wait till there's a new frame
-                if (!gotNewFrame()) return false;
-
-                // Read raw channel values
-                readRawvals();
-
                 // Convert raw [-1,+1] to absolute value
-                _demands[DEMANDS_ROLL]  = makePositiveCommand(CHANNEL_ROLL);
-                _demands[DEMANDS_PITCH] = makePositiveCommand(CHANNEL_PITCH);
-                _demands[DEMANDS_YAW]   = makePositiveCommand(CHANNEL_YAW);
+                _demands[DEMANDS_ROLL]  = fabs(copilot_receiverRoll);
+                _demands[DEMANDS_PITCH] = fabs(copilot_receiverPitch);
+                _demands[DEMANDS_YAW]   = fabs(copilot_receiverYaw);
 
                 // Apply expo nonlinearity to roll, pitch
                 _demands[DEMANDS_ROLL]  = applyCyclicFunction(_demands[DEMANDS_ROLL]);
                 _demands[DEMANDS_PITCH] = applyCyclicFunction(_demands[DEMANDS_PITCH]);
 
                 // Put sign back on command, yielding [-0.5,+0.5]
-                _demands[DEMANDS_ROLL]  = adjustCommand(_demands[DEMANDS_ROLL], CHANNEL_ROLL);
-                _demands[DEMANDS_PITCH] = adjustCommand(_demands[DEMANDS_PITCH], CHANNEL_PITCH);
-                _demands[DEMANDS_YAW]   = adjustCommand(_demands[DEMANDS_YAW], CHANNEL_YAW);
+                _demands[DEMANDS_ROLL] =
+                    adjustCommand(_demands[DEMANDS_ROLL], copilot_receiverRoll);
+                _demands[DEMANDS_PITCH] =
+                    adjustCommand(_demands[DEMANDS_PITCH], copilot_receiverPitch);
+                _demands[DEMANDS_YAW] =
+                    adjustCommand(_demands[DEMANDS_YAW], copilot_receiverYaw);
 
                 // Add in software trim
                 _demands[DEMANDS_ROLL]  += _trimRoll;
@@ -155,7 +144,7 @@ namespace hf {
                 _demands[DEMANDS_YAW]   += _trimYaw;
 
                 // Pass throttle demand through exponential function
-                _demands[DEMANDS_THROTTLE] = throttleFun(rawvals[_channelMap[CHANNEL_THROTTLE]]);
+                _demands[DEMANDS_THROTTLE] = throttleFun(copilot_receiverThrottle);
 
                 // Multiply by demand scale
                 _demands[DEMANDS_ROLL] *= _demandScale;
@@ -163,33 +152,12 @@ namespace hf {
                 _demands[DEMANDS_YAW] *= _demandScale;
 
                 // Store auxiliary switch state
-                _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > AUX_THRESHOLD ? 2 : 1) : 0;
-                _aux2State = getRawval(CHANNEL_AUX2) >= AUX_THRESHOLD ? 1 : 0;
+                _auxState = copilot_receiverAux1 >= 0.0 ? (copilot_receiverAux1 > AUX_THRESHOLD ? 2 : 1) : 0;
 
                 // Got a new frame
                 return true;
 
             }  // ready
-
-            virtual void getDemands(float * demands) override
-            {
-                memcpy(demands, _demands, sizeof(_demands));
-            }
-
-            virtual bool inactive(void) override
-            {
-                return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
-            }
-
-            virtual bool inArmedState(void) override
-            {
-                return _aux1State > 0;
-            }
-
-            virtual uint8_t getModeIndex(void) override
-            {
-                return _aux2State;
-            }
 
     }; // class Receiver
 

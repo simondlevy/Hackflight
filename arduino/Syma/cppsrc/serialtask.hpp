@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "../copilot.h"
+
 #include "board.hpp"
 #include "mixer.hpp"
 #include "mixer.hpp"
@@ -58,7 +60,6 @@ namespace hf {
 
             // Store so we don't have to pass them on update
             State * _state = NULL;
-            Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;
 
              void handle_RECEIVER_Request(
@@ -69,12 +70,12 @@ namespace hf {
                      float & c5,
                      float & c6)
             {
-                c1 = _receiver->getRawval(0);
-                c2 = _receiver->getRawval(1);
-                c3 = _receiver->getRawval(2);
-                c4 = _receiver->getRawval(3);
-                c5 = _receiver->getRawval(4);
-                c6 = _receiver->getRawval(5);
+                c1 = copilot_receiverThrottle;
+                c2 = copilot_receiverRoll;
+                c3 = copilot_receiverPitch;
+                c4 = copilot_receiverYaw;
+                c5 = copilot_receiverAux1;
+                c6 = 0;
              }
 
             void handle_STATE_Request(
@@ -210,12 +211,8 @@ namespace hf {
 
             } // dispatchMessage 
 
-            void init(
-                    Receiver * receiver,
-                    Mixer * mixer,
-                    State * state)
+            void init( Mixer * mixer, State * state)
             {
-                _receiver = receiver;
                 _mixer = mixer;
                 _state = state;
             }

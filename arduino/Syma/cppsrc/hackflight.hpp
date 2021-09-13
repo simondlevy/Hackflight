@@ -163,7 +163,7 @@ namespace hf {
 
             void addSerialTask(SerialTask * task)
             {
-                task->init(_receiver, _mixer, &_state);
+                task->init(_mixer, &_state);
                 _serial_tasks[_serial_task_count++] = task;
             }
 

@@ -21,7 +21,7 @@
 
 #include "cppsrc/Hackflight.hpp"
 #include "cppsrc/boards/realboards/arduino_serial/arduino/ladybugfc.hpp"
-#include "cppsrc/receivers/arduino/dsmx/dsmx_serial1.hpp"
+#include "cppsrc/receiver.hpp"
 #include "cppsrc/mixers/quad/xmw.hpp"
 #include "cppsrc/pidcontrollers/rate.hpp"
 #include "cppsrc/pidcontrollers/yaw.hpp"
@@ -35,12 +35,10 @@ static uint8_t LED_PIN = A4;
 
 // Receiver ===================================================================
 
-static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
 static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.035};
 
-static hf::DSMX_Receiver_Serial1 receiver = 
-    hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE, SOFTWARE_TRIM);  
+static hf::Receiver receiver = hf::Receiver(DEMAND_SCALE, SOFTWARE_TRIM);
 
 // Board =======================================================================
 
@@ -122,6 +120,40 @@ static void updateImu(void)
     }
 }
 
+// Receiver -------------------------------------------------------------------
+
+#include <DSMRX.h>
+
+static DSM2048 rx;
+
+void serialEvent1(void)
+{
+    while (Serial1.available()) {
+        rx.handleSerialEvent(Serial1.read(), micros());
+    }
+}
+
+static void updateReceiver(void)
+{
+    if (rx.timedOut(micros())) {
+        copilot_receiverLostSignal = true;
+    }
+
+    else if (rx.gotNewFrame()) {
+
+        float values[8] = {};
+
+        rx.getChannelValues(values);
+
+        copilot_receiverThrottle = values[0];
+        copilot_receiverRoll = values[1];
+        copilot_receiverPitch = values[2];
+        copilot_receiverYaw = values[3];
+        copilot_receiverAux1 = values[6];
+    }
+}
+
+
 
 // Setup =======================================================================
 
@@ -135,6 +167,9 @@ void setup(void)
 
     // LED
     pinMode(LED_PIN, OUTPUT);
+
+    // DSMX receiver
+    Serial1.begin(115200);
 
     // Add sensors
     h.addSensor(&imu);
@@ -156,6 +191,8 @@ void setup(void)
 
 void loop(void)
 {
+    updateReceiver();
+
     updateImu();
 
     h.update();
