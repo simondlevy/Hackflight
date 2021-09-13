@@ -81,11 +81,6 @@ namespace hf {
                 }
             }
 
-            virtual bool shouldFlashLed(void) override 
-            {
-                return true;
-            }
-
         public:
 
             AltitudeHoldPid(const float Kp = 0.75,

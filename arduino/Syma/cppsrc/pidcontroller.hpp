@@ -22,11 +22,6 @@ namespace hf {
 
             uint8_t modeIndex = 0;
 
-            virtual bool shouldFlashLed(void)
-            {
-                return false;
-            }
-
             virtual void modifyDemands(float * state, float * demands) = 0;
 
             virtual void resetOnInactivity(bool inactive)

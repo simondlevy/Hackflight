@@ -52,10 +52,6 @@ namespace hf {
                 float demands[4] = {};
                 receiver->getDemands(demands);
 
-                // Some controllers should cause LED to flash when they're
-                // active
-                bool shouldFlash = false;
-
                 for (uint8_t k=0; k<_controller_count; ++k) {
 
                     PidController * controller = _controllers[k];
@@ -65,14 +61,7 @@ namespace hf {
                     controller->resetOnInactivity(receiver->inactive());
 
                     controller->modifyDemands(state->x, demands); 
-
-                    if (controller->shouldFlashLed()) {
-                        shouldFlash = true;
-                    }
                 }
-
-                // Flash LED for certain controllers
-                board->flashLed(shouldFlash);
 
                 // Use updated demands to run motors, allowing
                 // mixer to choose whether it cares about
