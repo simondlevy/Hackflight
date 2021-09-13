@@ -14,15 +14,14 @@
 #include "../copilot.h"
 
 #include "demands.hpp"
-#include "openloop.hpp"
 
 namespace hf {
 
-    class Receiver : public hf::OpenLoopController {
+    class Receiver {
 
         friend class Hackflight;
         friend class SerialTask;
-        friend class PidTask;
+        friend class PidControlTask;
 
         private: 
 
@@ -88,17 +87,17 @@ namespace hf {
 
         protected:
 
-            virtual void getDemands(float * demands) override
+            void getDemands(float * demands)
             {
                 memcpy(demands, _demands, sizeof(_demands));
             }
 
-            virtual bool inactive(void) override
+            bool inactive(void)
             {
                 return copilot_receiverThrottle < -1 + THROTTLE_MARGIN;
             }
 
-            virtual bool inArmedState(void) override
+            bool inArmedState(void)
             {
                 return _auxState > 0;
             }
@@ -119,7 +118,7 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            virtual bool ready(void) override
+            void update(void)
             {
                 // Convert raw [-1,+1] to absolute value
                 _demands[DEMANDS_ROLL]  = fabs(copilot_receiverRoll);
@@ -153,9 +152,6 @@ namespace hf {
 
                 // Store auxiliary switch state
                 _auxState = copilot_receiverAux1 >= 0.0 ? (copilot_receiverAux1 > AUX_THRESHOLD ? 2 : 1) : 0;
-
-                // Got a new frame
-                return true;
 
             }  // ready
 

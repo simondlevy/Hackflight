@@ -125,6 +125,7 @@ static void updateImu(void)
 #include <DSMRX.h>
 
 static DSM2048 rx;
+static uint32_t timeouts;
 
 void serialEvent1(void)
 {
@@ -133,10 +134,20 @@ void serialEvent1(void)
     }
 }
 
+static void startReceiver(void)
+{
+    Serial1.begin(115200);
+
+    copilot_receiverLostSignal = false;
+}
+
 static void updateReceiver(void)
 {
     if (rx.timedOut(micros())) {
-        copilot_receiverLostSignal = true;
+        timeouts++;
+        if (timeouts > 10) {
+            copilot_receiverLostSignal = true;
+        }
     }
 
     else if (rx.gotNewFrame()) {
@@ -162,28 +173,21 @@ void setup(void)
     // I^2C
     Wire.begin();
 
-    // IMU
     startImu(); 
 
-    // LED
+    startReceiver();
+
     pinMode(LED_PIN, OUTPUT);
 
-    // DSMX receiver
-    Serial1.begin(115200);
-
-    // Add sensors
     h.addSensor(&imu);
 
-    // Add PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
     h.addPidController(&yawPid);
 
-    // Add serial tasks
     h.addSerialTask(&gcsTask);
     h.addSerialTask(&telemetryTask);
 
-    // Start Hackflight firmware
     h.begin();
 }
 

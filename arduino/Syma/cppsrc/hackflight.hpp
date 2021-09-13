@@ -11,7 +11,6 @@
 #pragma once
 
 #include "board.hpp"
-#include "openloop.hpp"
 #include "pidcontroller.hpp"
 #include "receiver.hpp"
 #include "sensor.hpp"
@@ -61,7 +60,7 @@ namespace hf {
             void checkReceiver(void)
             {
                 // Sync failsafe to open-loop-controller
-                if (_receiver->lostSignal() && _state.armed) {
+                if (copilot_receiverLostSignal && _state.armed) {
                     _mixer->cut();
                     _state.armed = false;
                     _state.failsafe = true;
@@ -69,8 +68,8 @@ namespace hf {
                     return;
                 }
 
-                // Check whether controller data is available
-                if (!_receiver->ready()) return;
+                // Update the receiver
+                _receiver->update();
 
                 // Disarm
                 if (_state.armed && !_receiver->inArmedState()) {
@@ -136,9 +135,6 @@ namespace hf {
 
                 // Initialize the sensors
                 startSensors();
-
-                // Initialize the open-loop controller
-                _receiver->begin();
 
                 // Start the mixer
                 _mixer->begin();

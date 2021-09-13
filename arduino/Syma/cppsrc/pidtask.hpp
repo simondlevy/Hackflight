@@ -10,7 +10,6 @@
 
 #include "timertask.hpp"
 #include "state.hpp"
-#include "openloop.hpp"
 #include "pidcontroller.hpp"
 
 namespace hf {
@@ -36,30 +35,22 @@ namespace hf {
                 _controller_count = 0;
             }
 
-            void addController(PidController * controller,
-                               uint8_t modeIndex) 
+            void addController(PidController * controller, uint8_t modeIndex) 
             {
                 controller->modeIndex = modeIndex;
 
                 _controllers[_controller_count++] = controller;
             }
 
-            void update(Board * board,
-                        OpenLoopController * olc,
-                        Mixer * mixer,
-                        State * state)
+            void update(Board * board, Receiver * receiver, Mixer * mixer, State * state)
             {
                 if (!TimerTask::ready(board)) {
                     return;
                 }
 
                 // Start with demands from open-loop controller
-                float demands[OpenLoopController::MAX_DEMANDS] = {};
-                olc->getDemands(demands);
-
-                // Each controller is associated with at least one auxiliary
-                // switch state
-                uint8_t modeIndex = olc->getModeIndex();
+                float demands[4] = {};
+                receiver->getDemands(demands);
 
                 // Some controllers should cause LED to flash when they're
                 // active
@@ -71,15 +62,12 @@ namespace hf {
 
                     // Some controllers need to be reset based on inactivty
                     // (e.g., throttle down resets PID controller integral)
-                    controller->resetOnInactivity(olc->inactive());
+                    controller->resetOnInactivity(receiver->inactive());
 
-                    if (controller->modeIndex <= modeIndex) {
+                    controller->modifyDemands(state->x, demands); 
 
-                        controller->modifyDemands(state->x, demands); 
-
-                        if (controller->shouldFlashLed()) {
-                            shouldFlash = true;
-                        }
+                    if (controller->shouldFlashLed()) {
+                        shouldFlash = true;
                     }
                 }
 
@@ -91,7 +79,7 @@ namespace hf {
                 // open-loop controller being inactive (e.g.,
                 // throttle down)
                 if (!state->failsafe) {
-                    mixer->run(demands, state->armed && !olc->inactive());
+                    mixer->run(demands, state->armed && !receiver->inactive());
                 }
 
              } // doTask
