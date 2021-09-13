@@ -43,7 +43,7 @@ static hf::Receiver receiver = hf::Receiver(DEMAND_SCALE, SOFTWARE_TRIM);
 // Board =======================================================================
 
 // Bluetooth comms over Serial2
-static hf::LadybugFC board = hf::LadybugFC(&Serial2);  
+static hf::LadybugFC board;
 
 // Motors  =====================================================================
 
@@ -69,7 +69,6 @@ static hf::USFS imu;
 // Serial tasks ================================================================
 
 hf::SerialTask gcsTask;
-hf::SerialTask telemetryTask = hf::SerialTask(true);
 
 // Hackflight object ===========================================================
 
@@ -185,7 +184,6 @@ void setup(void)
     h.addPidController(&yawPid);
 
     h.addSerialTask(&gcsTask);
-    h.addSerialTask(&telemetryTask);
 
     h.begin();
 }

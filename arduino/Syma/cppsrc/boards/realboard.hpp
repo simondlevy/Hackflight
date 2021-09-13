@@ -46,11 +46,11 @@ namespace hf {
 
             virtual void setLed(bool isOn) = 0;
 
-            virtual uint8_t serialAvailable(bool secondaryPort) = 0;
+            virtual uint8_t serialAvailable(void) = 0;
 
-            virtual uint8_t serialRead(bool secondaryPort) = 0;
+            virtual uint8_t serialRead(void) = 0;
 
-            virtual void serialWrite(uint8_t c, bool secondaryPort) = 0;
+            virtual void serialWrite(uint8_t c) = 0;
 
     }; // class RealBoard
 

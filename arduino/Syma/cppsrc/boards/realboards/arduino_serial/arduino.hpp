@@ -21,8 +21,8 @@ namespace hf {
 
         protected:
 
-            ArduinoBoard(bool ledInverted=false, HardwareSerial * telemetryPort=NULL)
-                : ArduinoSerial(telemetryPort)
+            ArduinoBoard(bool ledInverted=false)
+                : ArduinoSerial()
             {
                 _led_inverted= ledInverted;
             }

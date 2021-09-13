@@ -21,8 +21,8 @@ namespace hf {
 
         public:
 
-            LadybugFC(HardwareSerial * telemetryPort=NULL) 
-                : hf::ArduinoBoard(false, telemetryPort) 
+            LadybugFC() 
+                : hf::ArduinoBoard(false) 
             {
             }
 

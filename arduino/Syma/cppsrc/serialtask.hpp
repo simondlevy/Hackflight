@@ -30,8 +30,6 @@ namespace hf {
 
             static constexpr float FREQ = 66;
 
-            bool _useTelemetryPort = false;
-
             void update(Board * board, Mixer * mixer, State * state)
             {
                 if (!TimerTask::ready(board)) {
@@ -40,12 +38,12 @@ namespace hf {
 
                 RealBoard * realboard = (RealBoard *)board;
 
-                while (realboard->serialAvailable(_useTelemetryPort) > 0) {
-                    Parser::parse(realboard->serialRead(_useTelemetryPort));
+                while (realboard->serialAvailable() > 0) {
+                    Parser::parse(realboard->serialRead());
                 }
 
                 while (Parser::availableBytes() > 0) {
-                    realboard->serialWrite(Parser::readByte(), _useTelemetryPort);
+                    realboard->serialWrite(Parser::readByte());
                 }
 
                 // Support motor testing from GCS
@@ -218,10 +216,9 @@ namespace hf {
             }
     public:
 
-            SerialTask(bool secondaryPort=false)
+            SerialTask(void)
                 : TimerTask(FREQ)
             {
-                _useTelemetryPort = secondaryPort;
             }
 
         }; // class SerialTask
