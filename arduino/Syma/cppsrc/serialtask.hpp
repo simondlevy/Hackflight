@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../copilot.h"
+#include "../copilot_extra.h"
 
 #include "mixer.hpp"
 #include "mixer.hpp"

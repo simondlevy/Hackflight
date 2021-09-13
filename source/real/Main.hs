@@ -62,10 +62,10 @@ spec = do
   let (motors, led, serial) = hackflight receiver sensors pidControllers mixer
 
   -- Send the motor values using the external C function
-  trigger "copilot_runMotors" true [arg $ m1 motors,
-                                    arg $ m2 motors,
-                                    arg $ m3 motors,
-                                    arg $ m4 motors]
+  trigger "copilot_writeMotor" true [arg $ index (m1 motors), arg $ value (m1 motors)]
+  trigger "copilot_writeMotor" true [arg $ index (m2 motors), arg $ value (m2 motors)]
+  trigger "copilot_writeMotor" true [arg $ index (m3 motors), arg $ value (m3 motors)]
+  trigger "copilot_writeMotor" true [arg $ index (m4 motors), arg $ value (m4 motors)]
 
   -- trigger "copilot_debug" true [arg foo]
 
@@ -73,7 +73,7 @@ spec = do
   trigger "copilot_setLed" true [arg led]
 
   -- Send and retrieve serial comms
-  trigger "copilot_serialWrite" (available serial)  [arg (value serial)]
+  trigger "copilot_serialWrite" (available serial)  [arg (byte serial)]
  
 -- Compile the spec
 main = reify spec >>= compile "copilot"

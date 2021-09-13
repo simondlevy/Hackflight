@@ -10,8 +10,9 @@
 
 #include "demands.hpp"
 #include "filters.hpp"
-#include "motor.hpp"
 #include "debugger.hpp"
+
+#include "../copilot_extra.h"
 
 namespace hf {
 
@@ -35,28 +36,22 @@ namespace hf {
             static const uint8_t MAXMOTORS = 20;
 
             // XXX make a class for this, or migrate it to hf::Motor
-            hf::Motor * _motors[MAXMOTORS] = {};
             float  _disarmedValues[MAXMOTORS];
 
             uint8_t _nmotors = 0;
 
             void writeMotor(uint8_t index, float value)
             {
-                _motors[index]->write(value);
+                copilot_writeMotor(index, value);
             }
 
         protected:
 
             motorMixer_t motorDirections[MAXMOTORS];
 
-            Mixer(void)
+            Mixer(uint8_t nmotors)
             {
-                _nmotors = 0;
-            }
-
-            void addMotor(hf::Motor * motor)
-            {
-                _motors[_nmotors++] = motor;
+                _nmotors = nmotors;
             }
 
             virtual float constrainMotorValue(uint8_t index, float value)
@@ -70,7 +65,6 @@ namespace hf {
                 // set disarmed motor values
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     _disarmedValues[i] = 0;
-                    _motors[i]->begin();
                 }
             }
 

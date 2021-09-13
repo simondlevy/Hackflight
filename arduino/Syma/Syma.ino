@@ -17,18 +17,18 @@
 
  */
 
-#include "copilot.h"
+#include "copilot_extra.h"
 
 #include "cppsrc/Hackflight.hpp"
 #include "cppsrc/receiver.hpp"
-#include "cppsrc/mixers/quad/xmw.hpp"
+#include "cppsrc/mixers/quadxmw.hpp"
 #include "cppsrc/pidcontrollers/rate.hpp"
 #include "cppsrc/pidcontrollers/yaw.hpp"
 #include "cppsrc/pidcontrollers/level.hpp"
 #include "cppsrc/sensors/usfs.hpp"
 #include "cppsrc/motors/arduino/brushed.hpp"
 
-// LED ------------------------------------------------------------------------
+// LED =======================================================================
 
 static uint8_t LED_PIN = A4;
 
@@ -41,14 +41,28 @@ static hf::Receiver receiver = hf::Receiver(DEMAND_SCALE, SOFTWARE_TRIM);
 
 // Motors  =====================================================================
 
-static hf::ArduinoBrushedMotor motor1 = hf::ArduinoBrushedMotor(13);
-static hf::ArduinoBrushedMotor motor2 = hf::ArduinoBrushedMotor(A2);
-static hf::ArduinoBrushedMotor motor3 = hf::ArduinoBrushedMotor(3);
-static hf::ArduinoBrushedMotor motor4 = hf::ArduinoBrushedMotor(11);
+static hf::ArduinoBrushedMotor motors[4] = { hf::ArduinoBrushedMotor(13)
+                                           , hf::ArduinoBrushedMotor(A2)
+                                           , hf::ArduinoBrushedMotor(3)
+                                           , hf::ArduinoBrushedMotor(11)
+                                           };
+
+static void startMotors(void)
+{
+    motors[0].begin();
+    motors[1].begin();
+    motors[2].begin();
+    motors[3].begin();
+}
+
+void copilot_writeMotor(uint8_t index, float value)
+{
+    motors[index].write(value);
+}
 
 // Mixer =======================================================================
 
-static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(&motor1, &motor2, &motor3, &motor4);
+static hf::MixerQuadXMW mixer;
 
 // PID controllers =============================================================
 
@@ -194,6 +208,8 @@ void setup(void)
     startImu(); 
 
     startReceiver();
+
+    startMotors();
 
     pinMode(LED_PIN, OUTPUT);
 

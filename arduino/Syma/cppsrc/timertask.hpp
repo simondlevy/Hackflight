@@ -11,7 +11,7 @@
 #include "debugger.hpp"
 #include "state.hpp"
 
-#include "../copilot.h"
+#include "../copilot_extra.h"
 
 namespace hf {
 

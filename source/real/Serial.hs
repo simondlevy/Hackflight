@@ -16,7 +16,7 @@ import State
 import Demands
 import Utils(xor)
 
-data SerialGuard = SerialGuard { available :: Stream Bool, value :: Stream Word8 }
+data SerialGuard = SerialGuard { available :: Stream Bool, byte :: Stream Word8 }
 
 type ParserState = Stream Word8
 
