@@ -170,7 +170,6 @@ static void updateReceiver(void)
 
 void setup(void)
 {
-    // I^2C
     Wire.begin();
 
     startImu(); 

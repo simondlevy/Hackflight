@@ -29,12 +29,6 @@ namespace hf {
             void begin(void)
             {
                 hf::ArduinoBoard::begin();
-
-                // Start I^2C
-                Wire.begin();
-
-                // Hang a bit
-                delay(100);
             }
 
     }; // class LadybugFC
