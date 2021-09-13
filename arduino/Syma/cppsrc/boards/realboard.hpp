@@ -18,29 +18,12 @@ namespace hf {
 
         friend class SerialTask;
 
-        private:
-
-            static constexpr float   LED_STARTUP_FLASH_SECONDS = 1.0;
-            static constexpr uint8_t LED_STARTUP_FLASH_COUNT   = 20;
-            static constexpr float   LED_SLOWFLASH_SECONDS     = 0.25;
-
         protected:
 
             static const uint32_t SERIAL_BAUD = 115200;
 
             void begin(void)
             {
-                // Flash LED
-                float pauseSeconds = LED_STARTUP_FLASH_SECONDS /
-                                     LED_STARTUP_FLASH_COUNT;
-                setLed(false);
-                for (uint8_t i = 0; i < LED_STARTUP_FLASH_COUNT; i++) {
-                    setLed(true);
-                    delaySeconds(pauseSeconds);
-                    setLed(false);
-                    delaySeconds(pauseSeconds);
-                }
-                setLed(false);
             }
 
             float getTime(void)

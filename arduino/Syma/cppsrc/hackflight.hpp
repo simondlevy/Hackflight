@@ -25,6 +25,9 @@ namespace hf {
         
         private:
 
+            static constexpr float   LED_STARTUP_FLASH_SECONDS = 1.0;
+            static constexpr uint8_t LED_STARTUP_FLASH_COUNT   = 20;
+
             Board * _board = NULL;
             Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;
@@ -130,7 +133,19 @@ namespace hf {
                 // Supports automatic arming for simulator
                 _state.armed = armed;
 
-                // Start the board
+                // Flash LED
+                uint32_t pauseMsec = 1000 * LED_STARTUP_FLASH_SECONDS /
+                                     LED_STARTUP_FLASH_COUNT;
+                copilot_setLed(false);
+                for (uint8_t i = 0; i < LED_STARTUP_FLASH_COUNT; i++) {
+                    copilot_setLed(true);
+                    delay(pauseMsec);
+                    copilot_setLed(false);
+                    delay(pauseMsec);
+                }
+                copilot_setLed(false);
+
+                 // Start the board
                 _board->begin();
 
                 // Initialize the sensors
