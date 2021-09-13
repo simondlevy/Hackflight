@@ -20,14 +20,14 @@
 #include "copilot.h"
 
 #include "cppsrc/Hackflight.hpp"
-#include "cppsrc/hf_boards/realboards/arduino_serial/arduino/ladybugfc.hpp"
-#include "cppsrc/hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
-#include "cppsrc/hf_mixers/quad/xmw.hpp"
-#include "cppsrc/hf_pidcontrollers/rate.hpp"
-#include "cppsrc/hf_pidcontrollers/yaw.hpp"
-#include "cppsrc/hf_pidcontrollers/level.hpp"
-#include "cppsrc/hf_sensors/usfs.hpp"
-#include "cppsrc/hf_motors/arduino/brushed.hpp"
+#include "cppsrc/boards/realboards/arduino_serial/arduino/ladybugfc.hpp"
+#include "cppsrc/receivers/arduino/dsmx/dsmx_serial1.hpp"
+#include "cppsrc/mixers/quad/xmw.hpp"
+#include "cppsrc/pidcontrollers/rate.hpp"
+#include "cppsrc/pidcontrollers/yaw.hpp"
+#include "cppsrc/pidcontrollers/level.hpp"
+#include "cppsrc/sensors/usfs.hpp"
+#include "cppsrc/motors/arduino/brushed.hpp"
 
 // LED ------------------------------------------------------------------------
 
