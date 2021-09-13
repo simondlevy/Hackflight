@@ -73,7 +73,7 @@ spec = do
   trigger "copilot_setLed" true [arg led]
 
   -- Send and retrieve serial comms
-  trigger "copilot_sendSerial" (available serial)  [arg (value serial)]
+  trigger "copilot_serialWrite" (available serial)  [arg (value serial)]
  
 -- Compile the spec
 main = reify spec >>= compile "copilot"

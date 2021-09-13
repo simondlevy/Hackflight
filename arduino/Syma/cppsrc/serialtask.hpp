@@ -11,7 +11,6 @@
 #include "mixer.hpp"
 #include "mixer.hpp"
 #include "parser.hpp"
-#include "timertask.hpp"
 #include "parser.hpp"
 #include "state.hpp"
 #include "receiver.hpp"
@@ -19,7 +18,7 @@
 namespace hf {
 
 
-    class SerialTask : public TimerTask, Parser {
+    class SerialTask : public Parser {
 
         friend class Hackflight;
 
@@ -205,13 +204,6 @@ namespace hf {
                 _mixer = mixer;
                 _state = state;
             }
-    public:
-
-            SerialTask(void)
-                : TimerTask(FREQ)
-            {
-            }
-
         }; // class SerialTask
 
 } // namespace hf
