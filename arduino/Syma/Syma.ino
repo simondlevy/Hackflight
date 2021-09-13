@@ -27,6 +27,10 @@
 #include "cppsrc/hf_sensors/usfs.hpp"
 #include "cppsrc/hf_motors/arduino/brushed.hpp"
 
+// LED ------------------------------------------------------------------------
+
+static uint8_t LED_PIN = 13; // Teensy 4.0
+
 // Receiver ===================================================================
 
 static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
@@ -71,10 +75,20 @@ hf::SerialTask telemetryTask = hf::SerialTask(true);
 
 static hf::Hackflight h(&board, &receiver, &mixer);
 
+// Copilot support =============================================================
+
+void copilot_setLed(bool on)
+{
+    digitalWrite(LED_PIN, on);
+}
+
 // Setup =======================================================================
 
 void setup(void)
 {
+    // LED
+    pinMode(LED_PIN, OUTPUT);
+
     // Add sensors
     h.addSensor(&imu);
 

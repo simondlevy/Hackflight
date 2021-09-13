@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../arduino_serial.hpp"
+#include "../../../../copilot.h"
 
 namespace hf {
 
