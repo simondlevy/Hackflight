@@ -53,23 +53,6 @@ namespace hf {
                 delay((uint32_t)(1000*sec));
             }
 
-            void flashLed(bool shouldflash)
-            {
-                if (shouldflash) {
-
-                    static float _time;
-                    static bool state;
-
-                    float time = getTime();
-
-                    if (time-_time > LED_SLOWFLASH_SECONDS) {
-                        state = !state;
-                        setLed(state);
-                        _time = time;
-                    }
-                }
-            }
-
             void error(const char * errmsg) 
             {
                 while (true) {

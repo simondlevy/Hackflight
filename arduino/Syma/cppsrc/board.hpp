@@ -22,12 +22,8 @@ namespace hf {
 
         protected:
 
-            // --------------- Pure functionality ------------------------------
             virtual float getTime(void) = 0;
-
-            // ----------------- For real boards -------------------------------
             virtual void begin(void) { }
-            virtual void flashLed(bool shouldflash) { (void)shouldflash; }
 
     }; // class Board
 
