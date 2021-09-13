@@ -10,6 +10,7 @@
 
 #include "../HF_sensor.hpp"
 #include "../HF_filters.hpp"
+#include "../../copilot.h"
 
 #include <USFS_Master.h>
 
