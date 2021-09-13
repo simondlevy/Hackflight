@@ -32,15 +32,10 @@ namespace hf {
 
             void update(Board * board, Mixer * mixer, State * state)
             {
-                /*
-                if (!TimerTask::ready(board)) {
-                    return;
-                }*/
-
                 RealBoard * realboard = (RealBoard *)board;
 
-                while (realboard->serialAvailable() > 0) {
-                    Parser::parse(realboard->serialRead());
+                if (copilot_serialAvailable) {
+                    Parser::parse(copilot_serialByte);
                 }
 
                 while (Parser::availableBytes() > 0) {

@@ -158,6 +158,20 @@ static void updateReceiver(void)
 
 // Serial comms ----------------------------------------------------------------
 
+static void startSerial(void)
+{
+    Serial.begin(115200);
+}
+
+void updateSerial(void)
+{
+    copilot_serialAvailable = Serial.available();
+
+    if (copilot_serialAvailable) {
+        copilot_serialByte = Serial.read();
+    }
+}
+
 void copilot_serialWrite(uint8_t b)
 {
     Serial.write(b);
@@ -190,7 +204,7 @@ void setup(void)
 
     h.addSerialTask(&gcsTask);
 
-    Serial.begin(115200);
+    startSerial();
 
     h.begin();
 }
@@ -202,6 +216,8 @@ void loop(void)
     updateReceiver();
 
     updateImu();
+
+    updateSerial();
 
     h.update();
 }
