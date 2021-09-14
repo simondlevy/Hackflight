@@ -5,17 +5,10 @@
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "MainModule",
-			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"Engine"
-			]
-		},
-		{
 			"Name": "CopilotModule",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": ["Engine"]
 		}
 	]
 }
