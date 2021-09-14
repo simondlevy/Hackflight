@@ -1,5 +1,5 @@
 /*
- * Build script for CopilotModule
+ * Build script for HackflightSim
  *
  * Copyright (C) 2021 Simon D. Levy
  *
@@ -11,9 +11,9 @@ using UnrealBuildTool;
 using System;
 using System.IO;
 
-public class CopilotModule : ModuleRules
+public class HackflightSim : ModuleRules
 {
-    public CopilotModule(ReadOnlyTargetRules Target) : base(Target)
+    public HackflightSim(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 

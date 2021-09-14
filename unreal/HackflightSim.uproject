@@ -5,7 +5,7 @@
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "CopilotModule",
+			"Name": "HackflightSim",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": ["Engine"]

@@ -17,6 +17,6 @@ public class HackflightSimEditorTarget : TargetRules
 
         DefaultBuildSettings = BuildSettingsVersion.V2;
 
-		ExtraModuleNames.AddRange( new string[] { "CopilotModule" } );
+		ExtraModuleNames.AddRange( new string[] { "HackflightSim" } );
 	}
 }

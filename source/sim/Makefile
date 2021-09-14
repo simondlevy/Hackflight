@@ -1,5 +1,5 @@
 #
-# Makefile for Hackflight Copilot socket version
+# Makefile for Hackflight sim version
 #
 # Copyright (c) 2021 on D. Levy
 #
@@ -29,7 +29,7 @@ HSRC = Main.hs \
 
 RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
-DST = $(MYHOME)/Documents/Hackflight/unreal/Source/CopilotModule
+DST = $(MYHOME)/Documents/Hackflight/unreal/Source/HackflightSim
 
 all: copilot.cpp copilot.h
 	cp copilot.c $(DST)/copilot.cpp
