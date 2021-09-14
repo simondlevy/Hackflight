@@ -20,7 +20,7 @@
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 
 #include "Utils.hpp"
-#include "Dynamics.hpp"
+#include "../CopilotModule/Dynamics.hpp"
 #include "../CopilotModule/FlightManager.hpp"
 #include "Camera.hpp"
 
