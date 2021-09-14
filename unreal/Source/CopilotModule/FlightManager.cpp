@@ -17,7 +17,7 @@ static float _m3;
 static float _m4;
 
 // Called by Copilot
-void copilot_runMotors(float m1, float m2, float m3, float m4)
+void copilot_writeMotors(float m1, float m2, float m3, float m4)
 {
     _m1 = m1;
     _m2 = m2;

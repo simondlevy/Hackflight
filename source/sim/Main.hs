@@ -75,10 +75,11 @@ spec = do
   let (motors, _, _) = hackflight receiver sensors pidControllers mixer
 
   -- Send the motor values using the external C function
-  trigger "copilot_runMotors" true [arg $ m1 motors,
-                                    arg $ m2 motors,
-                                    arg $ m3 motors,
-                                    arg $ m4 motors]
+  trigger "copilot_writeMotors" true [arg $ value $ m1 motors,
+                                      arg $ value $ m2 motors,
+                                      arg $ value $ m3 motors,
+                                      arg $ value $ m4 motors]
+
 
   -- trigger "copilot_debug" true [arg ]
 
