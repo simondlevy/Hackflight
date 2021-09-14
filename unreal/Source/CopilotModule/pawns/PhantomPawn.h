@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "../../MainModule/vehicles/Phantom.hpp"
+#include "../vehicles/Phantom.hpp"
 #include "../FlightManager.h"
 
 #include <CoreMinimal.h>
