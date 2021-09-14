@@ -19,7 +19,5 @@ public class CopilotModule : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new string[] 
                 { "Core", "CoreUObject", "Engine", "InputCore", "Landscape" });
-
-        // PrivateDependencyModuleNames.AddRange(new string[] { "MainModule" });
     }
 }
