@@ -8,7 +8,7 @@
 
 #include "FlightManager.hpp"
 #include "Dynamics.hpp"
-#include "../MainModule/GameInput.hpp"
+#include "GameInput.hpp"
 
 class FCopilotFlightManager : public FFlightManager {
 
