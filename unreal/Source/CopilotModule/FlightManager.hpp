@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Dynamics.hpp"
-#include "../MainModule/Utils.hpp"
+#include "Utils.hpp"
 
 #include "Runtime/Core/Public/HAL/Runnable.h"
 

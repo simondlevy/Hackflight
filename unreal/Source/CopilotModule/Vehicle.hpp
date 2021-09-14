@@ -19,10 +19,10 @@
 #include "Runtime/Landscape/Classes/Landscape.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 
-#include "../MainModule/Utils.hpp"
+#include "Utils.hpp"
 #include "Dynamics.hpp"
 #include "FlightManager.hpp"
-#include "../MainModule/Camera.hpp"
+#include "Camera.hpp"
 
 #include <stdio.h>
 
