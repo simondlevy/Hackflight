@@ -21,7 +21,7 @@
 
 #include "Utils.hpp"
 #include "Dynamics.hpp"
-#include "FlightManager.hpp"
+#include "../CopilotModule/FlightManager.hpp"
 #include "Camera.hpp"
 
 #include <stdio.h>

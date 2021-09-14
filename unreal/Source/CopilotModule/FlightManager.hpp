@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "Dynamics.hpp"
-#include "Utils.hpp"
+#include "./MainModule/Dynamics.hpp"
+#include "../MainModule/Utils.hpp"
 
 #include "Runtime/Core/Public/HAL/Runnable.h"
 

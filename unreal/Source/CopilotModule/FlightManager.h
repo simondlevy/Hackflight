@@ -6,7 +6,7 @@
    MIT License
 */
 
-#include "../MainModule/FlightManager.hpp"
+#include "FlightManager.hpp"
 #include "../MainModule/Dynamics.hpp"
 #include "../MainModule/GameInput.hpp"
 
