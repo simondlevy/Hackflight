@@ -4,5 +4,5 @@
 
 #include <CoreMinimal.h>
 
-DECLARE_LOG_CATEGORY_EXTERN(LogMulticopterSim, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogHackflightSim, Log, All);
 
