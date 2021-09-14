@@ -1,5 +1,5 @@
 /*
- * Abstract camera class for MulticopterSim
+ * Abstract camera class for HackflightSim
  *
  * Copyright (C) 2019 Simon D. Levy
  *

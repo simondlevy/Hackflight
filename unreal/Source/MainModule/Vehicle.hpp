@@ -1,5 +1,5 @@
 /*
- * General support for vehicles in MulticopterSim
+ * General support for vehicles in HackflightSim
  *
  * This class peforms the following functions:
  *

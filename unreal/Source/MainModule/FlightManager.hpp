@@ -1,5 +1,5 @@
 /*
- * Abstract, threaded flight-management class for MulticopterSim
+ * Abstract, threaded flight-management class for HackflightSim
  *
  * Copyright (C) 2019 Simon D. Levy
  *
