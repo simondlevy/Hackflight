@@ -26,7 +26,7 @@ class APhantomPawn : public APawn {
         // Helper class
         Phantom _phantom;
 
-        FCopilotFlightManager * _flightManager = NULL;
+        FFlightManager * _flightManager = NULL;
 
     protected:
 

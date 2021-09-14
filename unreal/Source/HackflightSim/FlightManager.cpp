@@ -33,7 +33,7 @@ void copilot_debug(float value)
 }
 
 
-FCopilotFlightManager::FCopilotFlightManager(APawn * pawn, Dynamics * dynamics)
+FFlightManager::FFlightManager(APawn * pawn, Dynamics * dynamics)
     : FFlightManager(dynamics)
 {
     _gameInput = new GameInput(pawn);
@@ -41,11 +41,13 @@ FCopilotFlightManager::FCopilotFlightManager(APawn * pawn, Dynamics * dynamics)
     _ready = true;
 }
 
-FCopilotFlightManager::~FCopilotFlightManager()
+FFlightManager::~FFlightManager(void)
 {
+    delete _thread;
 }
 
-void FCopilotFlightManager::getReceiverDemands(void)
+
+void FFlightManager::getReceiverDemands(void)
 {
     // Get stick demands
     _gameInput->getJoystick(_joyvals);
@@ -58,14 +60,14 @@ void FCopilotFlightManager::getReceiverDemands(void)
 }
 
 
-void FCopilotFlightManager::getGyrometer(void)
+void FFlightManager::getGyrometer(void)
 {
     copilot_gyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
     copilot_gyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
     copilot_gyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
 }
 
-void FCopilotFlightManager::getQuaternion(void)
+void FFlightManager::getQuaternion(void)
 {
     FRotator rot = FRotator(
             FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA)),
@@ -81,7 +83,7 @@ void FCopilotFlightManager::getQuaternion(void)
     copilot_quaternionZ = quat.Z;
 }
 
-void FCopilotFlightManager::getOpticalFlow(void)
+void FFlightManager::getOpticalFlow(void)
 {
     double dx = _dynamics->x(Dynamics::STATE_X_DOT);
     double dy = _dynamics->x(Dynamics::STATE_Y_DOT);
@@ -95,7 +97,7 @@ void FCopilotFlightManager::getOpticalFlow(void)
     copilot_flowY = dy * cp - dx * sp;
 }
 
-void FCopilotFlightManager::getActuators(const double time, double * values)
+void FFlightManager::getActuators(const double time, double * values)
 {
     // Avoid null-pointer exceptions at startup, freeze after control
     // program halts
@@ -131,7 +133,7 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
     values[3] = _m4;
 }
 
-void FCopilotFlightManager::tick(void)
+void FFlightManager::tick(void)
 {
     // Get demands from keypad
     _gameInput->getKeypad(_joyvals);
