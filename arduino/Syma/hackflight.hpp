@@ -15,7 +15,7 @@
 #include "sensor.hpp"
 #include "mixer.hpp"
 #include "pidtask.hpp"
-#include "serialtask.hpp"
+#include "serial.hpp"
 
 namespace hf {
 

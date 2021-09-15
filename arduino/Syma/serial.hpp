@@ -1,5 +1,5 @@
 /*
-   Timer task for serial comms
+   Serial comms with parser
 
    MIT License
  */
