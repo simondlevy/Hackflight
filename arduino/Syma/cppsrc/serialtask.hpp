@@ -21,14 +21,15 @@ namespace hf {
 
         private:
 
-            static const uint8_t MAXMSG = 255;
-
-            static const int OUTBUF_SIZE = 128;
-
             uint8_t _outBufChecksum;
-            uint8_t _outBuf[OUTBUF_SIZE];
+            uint8_t _outBuf[128];
             uint8_t _outBufIndex;
             uint8_t _outBufSize;
+
+            uint8_t _payload[128] = {};
+
+            State * _state = NULL;
+            Mixer * _mixer = NULL;
 
             void serialize16(int16_t a)
             {
@@ -60,6 +61,63 @@ namespace hf {
             void addToOutBuf(uint8_t a)
             {
                 _outBuf[_outBufSize++] = a;
+            }
+
+            void handle_RECEIVER_Request(
+                    float & c1,
+                    float & c2,
+                    float & c3,
+                    float & c4,
+                    float & c5,
+                    float & c6)
+            {
+                c1 = copilot_receiverThrottle;
+                c2 = copilot_receiverRoll;
+                c3 = copilot_receiverPitch;
+                c4 = copilot_receiverYaw;
+                c5 = copilot_receiverAux1;
+                c6 = 0;
+            }
+
+            void handle_STATE_Request(
+                    float & x,
+                    float & dx,
+                    float & y,
+                    float & dy,
+                    float & z,
+                    float & dz,
+                    float & phi,
+                    float & dphi,
+                    float & theta,
+                    float & dtheta,
+                    float & psi,
+                    float & dpsi)
+            {
+                x = _state->x[State::X];
+                dx = _state->x[State::DX];
+                y = _state->x[State::Y];
+                dy = _state->x[State::DY];
+                z = _state->x[State::Z];
+                dz = _state->x[State::DZ];
+                phi = _state->x[State::PHI];
+                dphi = _state->x[State::DPHI];
+                theta = _state->x[State::THETA];
+                dtheta = _state->x[State::DTHETA];
+                psi = _state->x[State::PSI];
+                dpsi = _state->x[State::DPSI];
+            }
+
+            void handle_ACTUATOR_TYPE_Request(uint8_t & mtype)
+            {
+                mtype = _mixer->getType();
+            }
+
+            void handle_SET_MOTOR(float  m1, float  m2, float  m3, float  m4)
+            {
+                _mixer->setMotorDisarmed(0, m1);
+                _mixer->setMotorDisarmed(1, m2);
+                _mixer->setMotorDisarmed(2, m3);
+                _mixer->setMotorDisarmed(3, m4);
             }
 
         protected:
@@ -211,73 +269,6 @@ namespace hf {
                     mixer->runDisarmed();
                 }
             }
-
-        private:
-
-            uint8_t _payload[128] = {};
-
-            // Store so we don't have to pass them on update
-            State * _state = NULL;
-            Mixer * _mixer = NULL;
-
-            void handle_RECEIVER_Request(
-                    float & c1,
-                    float & c2,
-                    float & c3,
-                    float & c4,
-                    float & c5,
-                    float & c6)
-            {
-                c1 = copilot_receiverThrottle;
-                c2 = copilot_receiverRoll;
-                c3 = copilot_receiverPitch;
-                c4 = copilot_receiverYaw;
-                c5 = copilot_receiverAux1;
-                c6 = 0;
-            }
-
-            void handle_STATE_Request(
-                    float & x,
-                    float & dx,
-                    float & y,
-                    float & dy,
-                    float & z,
-                    float & dz,
-                    float & phi,
-                    float & dphi,
-                    float & theta,
-                    float & dtheta,
-                    float & psi,
-                    float & dpsi)
-            {
-                x = _state->x[State::X];
-                dx = _state->x[State::DX];
-                y = _state->x[State::Y];
-                dy = _state->x[State::DY];
-                z = _state->x[State::Z];
-                dz = _state->x[State::DZ];
-                phi = _state->x[State::PHI];
-                dphi = _state->x[State::DPHI];
-                theta = _state->x[State::THETA];
-                dtheta = _state->x[State::DTHETA];
-                psi = _state->x[State::PSI];
-                dpsi = _state->x[State::DPSI];
-            }
-
-            void handle_ACTUATOR_TYPE_Request(uint8_t & mtype)
-            {
-                mtype = _mixer->getType();
-            }
-
-            void handle_SET_MOTOR(float  m1, float  m2, float  m3, float  m4)
-            {
-                _mixer->setMotorDisarmed(0, m1);
-                _mixer->setMotorDisarmed(1, m2);
-                _mixer->setMotorDisarmed(2, m3);
-                _mixer->setMotorDisarmed(3, m4);
-            }
-
-        protected:
 
             void collectPayload(uint8_t index, uint8_t value)
             {
