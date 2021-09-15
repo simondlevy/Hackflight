@@ -45,7 +45,7 @@ class FFlightManager : public FRunnable {
         double _actuatorValues[100] = {}; 
 
         // For computing deltaT
-        double   _previousTime = 0;
+        double _previousTime = 0;
 
         /**
          * Flight-control method running repeatedly on its own thread.  
@@ -62,104 +62,29 @@ class FFlightManager : public FRunnable {
         Dynamics * _dynamics = NULL;
 
         // Constructor, called main thread
-        FFlightManager(Dynamics * dynamics) 
-        {
-            _thread = FRunnableThread::Create(this, TEXT("FThreadedManage"), 0, TPri_BelowNormal); 
-            _startTime = FPlatformTime::Seconds();
-            _count = 0;
+        FFlightManager(Dynamics * dynamics);
 
-            // Constant
-            _actuatorCount = dynamics->actuatorCount();
-
-            _dynamics = dynamics;
-
-            // For periodic update
-            _previousTime = 0;
-        }
-
-        uint32_t getFps(void)
-        {
-            return (uint32_t)(_count/(FPlatformTime::Seconds()-_startTime));
-        }
-
+        uint32_t getFps(void);
 
     public:
 
         FFlightManager(APawn * pawn, Dynamics * dynamics);
-		
+
         ~FFlightManager();
 
         void tick(void);
 
         // Called by VehiclePawn::Tick() method to get actuator value for
         // animation and sound
-        double actuatorValue(uint8_t index)
-        {
-            return _actuatorValues[index];
-        }
+        double actuatorValue(uint8_t index);
 
-        uint32_t getCount(void)
-        {
-            return _count;
-        }
+        uint32_t getCount(void);
 
-        static void stopThread(FFlightManager ** worker)
-        {
-            if (*worker) {
-                (*worker)->Stop();
-                delete *worker;
-            }
-
-            *worker = NULL;
-        }
+        static void stopThread(FFlightManager ** worker);
 
         // FRunnable interface.
-
-        virtual bool Init() override
-        {
-            _running = false;
-
-			return FRunnable::Init();
-        }
-
-        virtual uint32_t Run() override
-        {
-            // Initial wait before starting
-            FPlatformProcess::Sleep(0.5);
-
-            _running = true;
-
-            while (_running) {
-
-                // Get a high-fidelity current time value from the OS
-                double currentTime = FPlatformTime::Seconds() - _startTime;
-
-                // Update dynamics
-                _dynamics->update(_actuatorValues, currentTime - _previousTime);
-
-                // PID controller: update the flight manager (e.g.,
-                // HackflightManager) with the dynamics state, getting back the
-                // actuator values
-                this->getActuators(currentTime, _actuatorValues);
-
-                // Track previous time for deltaT
-                _previousTime = currentTime;
-
-                // Increment count for FPS reporting
-                _count++;
-            }
-
-            return 0;
-        }
-
-        virtual void Stop() override
-        {
-            _running = false;
-
-            // Final wait after stopping
-            FPlatformProcess::Sleep(0.03);
-
-            FRunnable::Stop();
-        }
+        virtual bool Init() override;
+        virtual uint32_t Run() override;
+        virtual void Stop() override;
 
 }; // class FFlightManager
