@@ -63,8 +63,8 @@ hackflight receiver sensors pidControllers mixer = (motors, led, serialOut)
     motors = mixer safety demands
 
     -- Blink LED on startup
-    led = (starting && mod (div time_msec 50) 2 == 0) ||
-               ((not starting) && (armed safety))
+    led = if time_msec < 5000 then (mod (div time_msec 50) 2 == 0)
+          else armed safety
 
     -- Run serial comms
     serialOut = getSerialOut vehicleState receiverDemands 
