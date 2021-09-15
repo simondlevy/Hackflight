@@ -89,7 +89,10 @@ namespace hf {
 
             void getDemands(float * demands)
             {
-                memcpy(demands, _demands, sizeof(_demands));
+                demands[0] = _demands[0];
+                demands[1] = _demands[1];
+                demands[2] = _demands[2];
+                demands[3] = _demands[3];
             }
 
             bool inactive(void)
