@@ -11,7 +11,7 @@
 #include "../sensor.hpp"
 #include "../filters.hpp"
 
-#include "../../copilot_extra.h"
+#include "../copilot_extra.h"
 
 #include <USFS_Master.h>
 
