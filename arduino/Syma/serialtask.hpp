@@ -138,11 +138,11 @@ namespace hf {
                 prepareToSend(type, count, 2);
             }
 
-            void sendShort(short src)
+            void sendFloat(float src)
             {
-                int16_t a;
-                memcpy(&a, &src, 2);
-                serialize16(a);
+                uint32_t a;
+                memcpy(&a, &src, 4);
+                serialize32(a);
             }
 
             void prepareToSendInts(uint8_t type, uint8_t count)
@@ -150,23 +150,9 @@ namespace hf {
                 prepareToSend(type, count, 4);
             }
 
-            void sendInt(int32_t src)
-            {
-                int32_t a;
-                memcpy(&a, &src, 4);
-                serialize32(a);
-            }
-
             void prepareToSendFloats(uint8_t type, uint8_t count)
             {
                 prepareToSend(type, count, 4);
-            }
-
-            void sendFloat(float src)
-            {
-                uint32_t a;
-                memcpy(&a, &src, 4);
-                serialize32(a);
             }
 
             void begin(void)
