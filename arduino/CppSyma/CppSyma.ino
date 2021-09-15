@@ -90,25 +90,17 @@ static hf::Hackflight h(&receiver, &mixer);
 void setup(void)
 {
     Wire.begin();
-
     startImu(); 
-
     startReceiver();
-
     startMotors();
-
     startLed(LED_PIN);
+    startSerial();
 
     h.addSensor(&imu);
-
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
     h.addPidController(&yawPid);
-
     h.addSerialTask(&gcsTask);
-
-    startSerial();
-
     h.begin();
 }
 
@@ -117,11 +109,8 @@ void setup(void)
 void loop(void)
 {
     updateReceiver();
-
     updateImu();
-
     updateSerial();
-
     updateClock();
 
     h.update();
