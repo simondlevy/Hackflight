@@ -26,9 +26,9 @@ import Serial
 import Utils(compose)
 
 hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
-    (Motors, Stream Bool, SerialGuard)
+    (Motors, Stream Bool, SerialGuard, Stream Bool)
 
-hackflight receiver sensors pidControllers mixer = (motors, led, serialOut)
+hackflight receiver sensors pidControllers mixer = (motors, led, serialOut, starting)
 
   where
 
@@ -65,3 +65,6 @@ hackflight receiver sensors pidControllers mixer = (motors, led, serialOut)
 
     -- Run serial comms
     serialOut = getSerialOut vehicleState receiverDemands 
+
+    -- Helps to init first time around
+    starting = [False] ++ true
