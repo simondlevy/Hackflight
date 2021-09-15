@@ -26,7 +26,7 @@ HSRC = Main.hs \
 RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
 DST = $(MYHOME)/Documents/Hackflight/arduino/Copilot
-DST2 = $(MYHOME)/Documents/Hackflight/arduino/Syma
+DST2 = $(MYHOME)/Documents/Hackflight/arduino/Syma/copilot
 
 all: copilot.cpp copilot.h
 	cp copilot.c $(DST)/copilot.cpp

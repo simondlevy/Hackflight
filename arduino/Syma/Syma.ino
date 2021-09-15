@@ -20,15 +20,14 @@
 #include "copilot_extra.h"
 #include "copilot_arduino.h"
 
-#include "Hackflight.hpp"
-#include "receiver.hpp"
-#include "mixers/quadxmw.hpp"
-#include "pidcontrollers/rate.hpp"
-#include "pidcontrollers/yaw.hpp"
-#include "pidcontrollers/level.hpp"
-#include "sensors/usfs.hpp"
-
-#include "motors/arduino/brushed.hpp"
+#include "cppsrc/Hackflight.hpp"
+#include "cppsrc/receiver.hpp"
+#include "cppsrc/mixers/quadxmw.hpp"
+#include "cppsrc/pidcontrollers/rate.hpp"
+#include "cppsrc/pidcontrollers/yaw.hpp"
+#include "cppsrc/pidcontrollers/level.hpp"
+#include "cppsrc/sensors/usfs.hpp"
+#include "cppsrc/motors/arduino/brushed.hpp"
 
 #include <Wire.h>
 
