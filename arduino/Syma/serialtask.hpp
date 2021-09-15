@@ -21,10 +21,7 @@ namespace hf {
 
         private:
 
-            uint8_t _outBuf[128];
             uint8_t _outBufChecksum;
-            uint8_t _outBufIndex;
-            uint8_t _outBufSize;
 
             State * _state = NULL;
             Mixer * _mixer = NULL;
@@ -45,20 +42,13 @@ namespace hf {
 
             void prepareToSend(uint8_t type, uint8_t count, uint8_t size)
             {
-                _outBufSize = 0;
-                _outBufIndex = 0;
                 _outBufChecksum = 0;
 
-                addToOutBuf('$');
-                addToOutBuf('M');
-                addToOutBuf('>');
+                copilot_serialWrite('$');
+                copilot_serialWrite('M');
+                copilot_serialWrite('>');
                 serialize8(count*size);
                 serialize8(type);
-            }
-
-            void addToOutBuf(uint8_t a)
-            {
-                _outBuf[_outBufSize++] = a;
             }
 
             void handle_RECEIVER_Request(
@@ -129,7 +119,7 @@ namespace hf {
 
             void serialize8(uint8_t a)
             {
-                addToOutBuf(a);
+                copilot_serialWrite(a);
                 _outBufChecksum ^= a;
             }
 
@@ -182,19 +172,6 @@ namespace hf {
             void begin(void)
             {
                 _outBufChecksum = 0;
-                _outBufIndex = 0;
-                _outBufSize = 0;
-            }
-
-            uint8_t availableBytes(void)
-            {
-                return _outBufSize;
-            }
-
-            uint8_t readByte(void)
-            {
-                _outBufSize--;
-                return _outBuf[_outBufIndex++];
             }
 
             void parse(uint8_t c)
@@ -256,10 +233,6 @@ namespace hf {
             {
                 if (copilot_serialAvailable) {
                     parse(copilot_serialByte);
-                }
-
-                while (availableBytes() > 0) {
-                    copilot_serialWrite(readByte());
                 }
 
                 // Support motor testing from GCS
