@@ -31,7 +31,7 @@ void APhantomPawn::PostInitializeComponents()
 // Called when the game starts or when spawned
 void APhantomPawn::BeginPlay()
 {
-    _flightManager = new FFlightManager(this, &dynamics);
+    _flightManager = new FDynamicsThread(this, &dynamics);
 
     vehicle.BeginPlay(_flightManager);
 
@@ -40,7 +40,7 @@ void APhantomPawn::BeginPlay()
 
 void APhantomPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    FFlightManager::stopThread(&_flightManager);
+    FDynamicsThread::stopThread(&_flightManager);
 
     Super::EndPlay(EndPlayReason);
 }

@@ -1,12 +1,12 @@
 /*
-   FlightManager class implementation
+   DynamicsThread class implementation
 
    Copyright(C) 2021 Simon D.Levy
 
    MIT License
  */
 
-#include "FlightManager.h"
+#include "DynamicsThread.h"
 
 #include "copilot.h"
 
@@ -31,7 +31,7 @@ void copilot_debug(float value)
 }
 
 
-FFlightManager::FFlightManager(APawn * pawn, Dynamics * dynamics)
+FDynamicsThread::FDynamicsThread(APawn * pawn, Dynamics * dynamics)
 {
     _thread = FRunnableThread::Create(this, TEXT("FThreadedManage"), 0, TPri_BelowNormal); 
     _startTime = FPlatformTime::Seconds();
@@ -49,27 +49,27 @@ FFlightManager::FFlightManager(APawn * pawn, Dynamics * dynamics)
     _ready = true;
 }
 
-FFlightManager::~FFlightManager(void)
+FDynamicsThread::~FDynamicsThread(void)
 {
     delete _thread;
 }
 
-uint32_t FFlightManager::getFps(void)
+uint32_t FDynamicsThread::getFps(void)
 {
     return (uint32_t)(_count/(FPlatformTime::Seconds()-_startTime));
 }
 
-double FFlightManager::actuatorValue(uint8_t index)
+double FDynamicsThread::actuatorValue(uint8_t index)
 {
     return _actuatorValues[index];
 }
 
-uint32_t FFlightManager::getCount(void)
+uint32_t FDynamicsThread::getCount(void)
 {
     return _count;
 }
 
-void FFlightManager::stopThread(FFlightManager ** worker)
+void FDynamicsThread::stopThread(FDynamicsThread ** worker)
 {
     if (*worker) {
         (*worker)->Stop();
@@ -79,7 +79,7 @@ void FFlightManager::stopThread(FFlightManager ** worker)
     *worker = NULL;
 }
 
-uint32_t FFlightManager::Run()
+uint32_t FDynamicsThread::Run()
 {
     // Initial wait before starting
     FPlatformProcess::Sleep(0.5);
@@ -110,14 +110,14 @@ uint32_t FFlightManager::Run()
 }
 
 
-bool FFlightManager::Init()
+bool FDynamicsThread::Init()
 {
     _running = false;
 
     return FRunnable::Init();
 }
 
-void FFlightManager::Stop()
+void FDynamicsThread::Stop()
 {
     _running = false;
 
@@ -128,7 +128,7 @@ void FFlightManager::Stop()
 }
 
 
-void FFlightManager::getReceiverDemands(void)
+void FDynamicsThread::getReceiverDemands(void)
 {
     // Get stick demands
     _gameInput->getJoystick(_joyvals);
@@ -141,14 +141,14 @@ void FFlightManager::getReceiverDemands(void)
 }
 
 
-void FFlightManager::getGyrometer(void)
+void FDynamicsThread::getGyrometer(void)
 {
     copilot_gyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
     copilot_gyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
     copilot_gyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
 }
 
-void FFlightManager::getQuaternion(void)
+void FDynamicsThread::getQuaternion(void)
 {
     FRotator rot = FRotator(
             FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA)),
@@ -164,7 +164,7 @@ void FFlightManager::getQuaternion(void)
     copilot_quaternionZ = quat.Z;
 }
 
-void FFlightManager::getOpticalFlow(void)
+void FDynamicsThread::getOpticalFlow(void)
 {
     double dx = _dynamics->x(Dynamics::STATE_X_DOT);
     double dy = _dynamics->x(Dynamics::STATE_Y_DOT);
@@ -178,7 +178,7 @@ void FFlightManager::getOpticalFlow(void)
     copilot_flowY = dy * cp - dx * sp;
 }
 
-void FFlightManager::getActuators(const double time, double * values)
+void FDynamicsThread::getActuators(const double time, double * values)
 {
     // Avoid null-pointer exceptions at startup, freeze after control
     // program halts
@@ -214,7 +214,7 @@ void FFlightManager::getActuators(const double time, double * values)
     values[3] = _m4;
 }
 
-void FFlightManager::tick(void)
+void FDynamicsThread::tick(void)
 {
     // Get demands from keypad
     _gameInput->getKeypad(_joyvals);

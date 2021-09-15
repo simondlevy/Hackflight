@@ -9,7 +9,7 @@
 #pragma once
 
 #include "../Vehicle.hpp"
-#include "../FlightManager.h"
+#include "../DynamicsThread.h"
 #include "../dynamics/fixedpitch/QuadXAP.hpp"
 
 #include <CoreMinimal.h>
@@ -51,7 +51,7 @@ class APhantomPawn : public APawn {
         };
 
 
-        FFlightManager * _flightManager = NULL;
+        FDynamicsThread * _flightManager = NULL;
 
         QuadXAPDynamics dynamics = QuadXAPDynamics(vparams, fparams);
 

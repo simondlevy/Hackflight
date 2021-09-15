@@ -1,5 +1,5 @@
 /*
- * Threaded flight-management class for HackflightSim
+ * Thread on which dynamics is run
  *
  * Copyright (C) 2019 Simon D. Levy
  *
@@ -14,7 +14,7 @@
 
 #include "Runtime/Core/Public/HAL/Runnable.h"
 
-class FFlightManager : public FRunnable {
+class FDynamicsThread : public FRunnable {
 
     private:
 
@@ -62,15 +62,15 @@ class FFlightManager : public FRunnable {
         Dynamics * _dynamics = NULL;
 
         // Constructor, called main thread
-        FFlightManager(Dynamics * dynamics);
+        FDynamicsThread(Dynamics * dynamics);
 
         uint32_t getFps(void);
 
     public:
 
-        FFlightManager(APawn * pawn, Dynamics * dynamics);
+        FDynamicsThread(APawn * pawn, Dynamics * dynamics);
 
-        ~FFlightManager();
+        ~FDynamicsThread();
 
         void tick(void);
 
@@ -80,11 +80,11 @@ class FFlightManager : public FRunnable {
 
         uint32_t getCount(void);
 
-        static void stopThread(FFlightManager ** worker);
+        static void stopThread(FDynamicsThread ** worker);
 
         // FRunnable interface.
         virtual bool Init() override;
         virtual uint32_t Run() override;
         virtual void Stop() override;
 
-}; // class FFlightManager
+}; // class FDynamicsThread
