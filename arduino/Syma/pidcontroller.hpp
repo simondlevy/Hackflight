@@ -16,11 +16,9 @@ namespace hf {
 
     class PidController {
 
-        friend class PidControlTask;
+        friend class Hackflight;
 
         protected:
-
-            uint8_t modeIndex = 0;
 
             virtual void modifyDemands(float * state, float * demands) = 0;
 

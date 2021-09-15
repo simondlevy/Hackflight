@@ -14,7 +14,6 @@
 #include "receiver.hpp"
 #include "sensor.hpp"
 #include "mixer.hpp"
-#include "pidtask.hpp"
 #include "serial.hpp"
 
 namespace hf {
@@ -37,8 +36,9 @@ namespace hf {
             Sensor * _sensors[256] = {};
             uint8_t _sensor_count = 0;
 
-            // Timer task for PID controllers
-            PidControlTask _closedLoopTask;
+            // PID controllers
+            PidController * _controllers[256] = {};
+            uint8_t _controller_count = 0;
 
             void startSensors(void) 
             {
@@ -99,6 +99,33 @@ namespace hf {
 
             } // checkReceiver
 
+            void updatePidControllers(void)
+            {
+                // Start with demands from open-loop controller
+                float demands[4] = {};
+                _receiver->getDemands(demands);
+
+                for (uint8_t k=0; k<_controller_count; ++k) {
+
+                    PidController * controller = _controllers[k];
+
+                    // Some controllers need to be reset based on inactivty
+                    // (e.g., throttle down resets PID controller integral)
+                    controller->resetOnInactivity(_receiver->inactive());
+
+                    controller->modifyDemands(_state.x, demands); 
+                }
+
+                // Use updated demands to run motors, allowing
+                // mixer to choose whether it cares about
+                // open-loop controller being inactive (e.g.,
+                // throttle down)
+                if (!_state.failsafe) {
+                    _mixer->run(demands, _state.armed && !_receiver->inactive());
+                }
+
+             } // doTask
+
          public:
 
             Hackflight(Receiver * receiver, hf::Mixer * mixer)
@@ -108,6 +135,7 @@ namespace hf {
 
                 _sensor_count = 0;
                 _serial_task_count = 0;
+                _controller_count = 0;
             }
 
             void addSensor(Sensor * sensor) 
@@ -115,10 +143,9 @@ namespace hf {
                 _sensors[_sensor_count++] = sensor;
             }
 
-            void addPidController(PidController * controller,
-                                         uint8_t modeIndex=0) 
+            void addPidController(PidController * controller)
             {
-                _closedLoopTask.addController(controller, modeIndex);
+                _controllers[_controller_count++] = controller;
             }
 
             void begin(bool armed=false)
@@ -151,7 +178,7 @@ namespace hf {
                 checkReceiver();
 
                 // Update PID controllers task
-                _closedLoopTask.update(_receiver, _mixer, &_state);
+                updatePidControllers();
 
                 // Check sensors
                 checkSensors();
