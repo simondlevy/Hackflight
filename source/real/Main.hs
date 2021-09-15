@@ -10,6 +10,7 @@ module Main where
 
 import Language.Copilot
 import Copilot.Compile.C99
+import Prelude hiding(not)
 
 -- Core
 import Hackflight
@@ -61,16 +62,16 @@ spec = do
   -- Run the main Hackflight algorithm, getting the motor spins and LED state
   let (motors, led, serial, starting) = hackflight receiver sensors pidControllers mixer
 
-  -- Send the motor values using the external C function
-  trigger "copilot_writeMotor" true [arg $ index (m1 motors), arg $ value (m1 motors)]
-  trigger "copilot_writeMotor" true [arg $ index (m2 motors), arg $ value (m2 motors)]
-  trigger "copilot_writeMotor" true [arg $ index (m3 motors), arg $ value (m3 motors)]
-  trigger "copilot_writeMotor" true [arg $ index (m4 motors), arg $ value (m4 motors)]
-
-  -- trigger "copilot_debug" true [arg foo]
-
+  trigger "copilot_startWire" starting []
+  
   -- Send the LED using external C function
-  trigger "copilot_setLed" true [arg led]
+  trigger "copilot_setLed" (not starting) [arg led]
+
+  -- Send the motor values using the external C function
+  trigger "copilot_writeMotor" (not starting) [arg $ index (m1 motors), arg $ value (m1 motors)]
+  trigger "copilot_writeMotor" (not starting) [arg $ index (m2 motors), arg $ value (m2 motors)]
+  trigger "copilot_writeMotor" (not starting) [arg $ index (m3 motors), arg $ value (m3 motors)]
+  trigger "copilot_writeMotor" (not starting) [arg $ index (m4 motors), arg $ value (m4 motors)]
 
   -- Send and retrieve serial comms
   trigger "copilot_serialWrite" (available serial)  [arg (byte serial)]

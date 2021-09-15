@@ -89,7 +89,8 @@ static hf::Hackflight h(&receiver, &mixer);
 
 void setup(void)
 {
-    Wire.begin();
+    copilot_startWire();
+
     startImu(); 
     startReceiver();
     startMotors();

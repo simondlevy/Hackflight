@@ -8,6 +8,8 @@
  */
 
 #include <Arduino.h>
+#include <Wire.h>
+
 #include "copilot_arduino.h"
 
 #define _EXTERN
@@ -73,4 +75,10 @@ void copilot_setLed(bool on)
 void updateClock(void)
 {
     copilot_time_sec = micros() / 1.e6f;
+}
+
+// I^2C  ---------------------------------------------------------------
+void copilot_startWire(void)
+{
+    Wire.begin();
 }
