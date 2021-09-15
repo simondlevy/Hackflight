@@ -35,7 +35,6 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            // XXX make a class for this, or migrate it to hf::Motor
             float  _disarmedValues[MAXMOTORS];
 
             uint8_t _nmotors = 0;
@@ -47,7 +46,7 @@ namespace hf {
 
         protected:
 
-            motorMixer_t motorDirections[MAXMOTORS];
+            motorMixer_t motorDirections[MAXMOTORS] = {};
 
             Mixer(uint8_t nmotors)
             {
