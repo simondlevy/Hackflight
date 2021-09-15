@@ -48,6 +48,11 @@ void copilot_collectSerialInput(uint8_t index, uint8_t value)
    serialInputBuffer[index] = value;
 }
 
+void copilot_convertFloat(float value)
+{
+    memcpy(&copilot_32bits, &value, 4);
+}
+
 // LED---------------------------------------------------------------
 
 static uint8_t _led_pin;

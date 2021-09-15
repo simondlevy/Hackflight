@@ -140,9 +140,8 @@ namespace hf {
 
             void sendFloat(float src)
             {
-                uint32_t a;
-                memcpy(&a, &src, 4);
-                serialize32(a);
+                copilot_convertFloat(src);
+                serialize32(copilot_32bits);
             }
 
             void prepareToSendInts(uint8_t type, uint8_t count)
