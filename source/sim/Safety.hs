@@ -14,9 +14,9 @@ import State
 
 data Safety = Safety { armed :: Stream Bool, failsafe :: Stream Bool }
 
-getSafety :: Stream Bool -> State -> Safety
+getSafety :: State -> Safety
 
-getSafety _ _ = Safety armed failsafe
+getSafety _ = Safety armed failsafe
 
   where
 

@@ -17,9 +17,9 @@ import State
 
 data Safety = Safety { armed :: Stream Bool, failsafe :: Stream Bool }
 
-getSafety :: Stream Bool -> State -> Safety
+getSafety :: State -> Safety
 
-getSafety starting vehicleState = Safety armed failsafe
+getSafety vehicleState = Safety armed failsafe
 
   where
 

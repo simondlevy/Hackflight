@@ -32,9 +32,6 @@ hackflight receiver sensors pidControllers mixer = (motors, led, serialOut)
 
   where
 
-    -- Allow enough to for startup
-    starting = time_msec < 5000
-
     -- Get receiver demands from external C functions
     receiverDemands = getDemands receiver
 
@@ -57,7 +54,7 @@ hackflight receiver sensors pidControllers mixer = (motors, led, serialOut)
                        (yaw demands)
 
     -- Get safety status
-    safety = getSafety starting vehicleState
+    safety = getSafety vehicleState
 
     -- Apply mixer to demands to get motor values, returning motor values and LED state
     motors = mixer safety demands
