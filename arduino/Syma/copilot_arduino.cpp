@@ -1,3 +1,12 @@
+/*
+   Arduino support for Haskell Copilot
+
+   Copyright (C) 2021 Simon D. Levy
+
+   MIT License
+
+ */
+
 #include <Arduino.h>
 #include "copilot_arduino.h"
 
