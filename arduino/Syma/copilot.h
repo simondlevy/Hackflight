@@ -21,10 +21,6 @@ EXTERN float copilot_receiverPitch;
 EXTERN float copilot_receiverYaw;
 EXTERN float copilot_gyrometerZ;
 EXTERN uint32_t copilot_time_msec;
-void copilot_writeMotor(uint8_t copilot_writeMotor_arg0, float copilot_writeMotor_arg1);
-void copilot_writeMotor(uint8_t copilot_writeMotor_arg0, float copilot_writeMotor_arg1);
-void copilot_writeMotor(uint8_t copilot_writeMotor_arg0, float copilot_writeMotor_arg1);
+
 void copilot_writeMotor(uint8_t copilot_writeMotor_arg0, float copilot_writeMotor_arg1);
 void copilot_setLed(bool copilot_setLed_arg0);
-void copilot_serialWrite(uint8_t copilot_serialWrite_arg0);
-void step(void);

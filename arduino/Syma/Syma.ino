@@ -186,6 +186,20 @@ void copilot_serialWrite(uint8_t b)
     Serial.write(b);
 }
 
+static uint8_t serialInputBuffer[128] = {};
+
+float copilot_getFloatFromSerialInput(uint8_t offset)
+{
+    float value = 0;
+    memcpy(&value,  &serialInputBuffer[offset], sizeof(float));
+    return value;
+}
+
+void copilot_collectSerialInput(uint8_t index, uint8_t value)
+{
+   serialInputBuffer[index] = value;
+}
+
 // LED ------------------------------------------------------------------------
 
 void copilot_setLed(bool on)

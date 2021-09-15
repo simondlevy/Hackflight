@@ -21,12 +21,10 @@ namespace hf {
 
         private:
 
-            uint8_t _outBufChecksum;
             uint8_t _outBuf[128];
+            uint8_t _outBufChecksum;
             uint8_t _outBufIndex;
             uint8_t _outBufSize;
-
-            uint8_t _payload[128] = {};
 
             State * _state = NULL;
             Mixer * _mixer = NULL;
@@ -244,7 +242,7 @@ namespace hf {
 
                 // Payload accumulation
                 if (in_payload) {
-                    collectPayload(index-1, c);
+                    copilot_collectSerialInput(index-1, c);
                 }
 
                 // Message dispatch
@@ -268,11 +266,6 @@ namespace hf {
                 if (!state->armed) {
                     mixer->runDisarmed();
                 }
-            }
-
-            void collectPayload(uint8_t index, uint8_t value)
-            {
-                _payload[index] = value;
             }
 
             void dispatchMessage(uint8_t command)
@@ -341,19 +334,13 @@ namespace hf {
 
                     case 215:
                         {
-                            float m1 = 0;
-                            memcpy(&m1,  &_payload[0], sizeof(float));
-
-                            float m2 = 0;
-                            memcpy(&m2,  &_payload[4], sizeof(float));
-
-                            float m3 = 0;
-                            memcpy(&m3,  &_payload[8], sizeof(float));
-
-                            float m4 = 0;
-                            memcpy(&m4,  &_payload[12], sizeof(float));
+                            float m1 = copilot_getFloatFromSerialInput(0);
+                            float m2 = copilot_getFloatFromSerialInput(4);
+                            float m3 = copilot_getFloatFromSerialInput(8);
+                            float m4 = copilot_getFloatFromSerialInput(12);
 
                             handle_SET_MOTOR(m1, m2, m3, m4);
+
                         } break;
 
                 } // switch (_command)
