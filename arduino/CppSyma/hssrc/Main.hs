@@ -14,6 +14,8 @@ import Prelude hiding(not)
 
 -- Core
 import Hackflight
+import Safety
+import Serial
 import State
 import Time
 import Demands
@@ -28,9 +30,6 @@ import Quaternion
 import RatePid
 import YawPid
 import LevelPid
-
--- Serial comms
-import Serial
 
 spec = do
 
@@ -60,7 +59,13 @@ spec = do
   let mixer = quadXAPMixer
 
   -- Run the main Hackflight algorithm, getting the motor spins and LED state
-  let (motors, led, serial, starting) = hackflight receiver sensors pidControllers mixer
+  let (motors, led, serial, starting) = hackflight
+                                        receiver
+                                        sensors
+                                        pidControllers
+                                        mixer
+                                        getSafetyReal
+                                        getSerialOutReal
 
   trigger "copilot_startWire" starting []
   

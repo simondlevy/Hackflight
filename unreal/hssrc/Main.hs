@@ -14,6 +14,7 @@ import Copilot.Compile.C99
 -- Core
 import Hackflight
 import Safety
+import Serial
 import State
 import Time
 import Demands
@@ -34,7 +35,6 @@ import AltHoldPid
 import PosHoldPid
 
 -- Serial comms (placeholder)
-import Serial
 
 spec = do
 
@@ -73,7 +73,12 @@ spec = do
   let mixer = quadXAPMixer
 
   -- Run the main Hackflight algorithm, getting the motor spins
-  let (motors, _, _, _) = hackflight receiver sensors pidControllers mixer getSafetySim getSerialOutSim
+  let (motors, _, _, _) = hackflight receiver
+                                     sensors
+                                     pidControllers
+                                     mixer
+                                     getSafetySim
+                                     getSerialOutSim
 
   -- Send the motor values using the external C function
   trigger "copilot_writeMotors" true [arg $ value $ m1 motors,
