@@ -8,7 +8,7 @@
 SRCDIR = $(MYHOME)/Documents/Hackflight/source
 
 SRC = Main.hs \
-      $(SRCDIR)/Led.hs \
+      $(SRCDIR)/Pin.hs \
       $(SRCDIR)/Safety.hs \
 	  $(SRCDIR)/Serial.hs \
       $(SRCDIR)/Receiver.hs \

@@ -1,15 +1,15 @@
 {--
-  LED
+  Micrcontroller pin
 
   Copyright(C) 2021 Simon D.Levy
 
   MIT License
 --}
 
-module Led where
+module Pin where
 
 import Language.Copilot
 
-data Led = Led { pin :: Stream Word8 }
+data Pin = Pin { pin :: Stream Word8 }
 
 

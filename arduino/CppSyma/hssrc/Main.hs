@@ -21,9 +21,7 @@ import Time
 import Demands
 import Receiver
 import Mixer
-
--- LED
-import Led
+import Pin
 
 -- Sensors
 import Gyrometer
@@ -36,7 +34,7 @@ import LevelPid
 
 spec = do
 
-  let led = Led 18
+  let led = Pin 18
 
   let receiver = makeReceiver 4.0
 
