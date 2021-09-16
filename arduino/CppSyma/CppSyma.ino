@@ -26,11 +26,17 @@
 #include "cppsrc/pidcontrollers/yaw.hpp"
 #include "cppsrc/pidcontrollers/level.hpp"
 #include "cppsrc/sensors/usfs.hpp"
-#include "cppsrc/motors/arduino/brushed.hpp"
 
 // LED =======================================================================
 
 static uint8_t LED_PIN = A4;
+
+// Motors =======================================================================
+
+static uint8_t MOTOR1_PIN = 13;
+static uint8_t MOTOR2_PIN = 16;
+static uint8_t MOTOR3_PIN = 3;
+static uint8_t MOTOR4_PIN = 11;
 
 // Receiver ===================================================================
 
@@ -38,27 +44,6 @@ static constexpr float DEMAND_SCALE = 4.0f;
 static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.035};
 
 static hf::Receiver receiver = hf::Receiver(DEMAND_SCALE, SOFTWARE_TRIM);
-
-// Motors  =====================================================================
-
-static hf::ArduinoBrushedMotor motors[4] = { hf::ArduinoBrushedMotor(13)
-                                           , hf::ArduinoBrushedMotor(A2)
-                                           , hf::ArduinoBrushedMotor(3)
-                                           , hf::ArduinoBrushedMotor(11)
-                                           };
-
-static void startMotors(void)
-{
-    motors[0].begin();
-    motors[1].begin();
-    motors[2].begin();
-    motors[3].begin();
-}
-
-void copilot_writeMotor(uint8_t index, float value)
-{
-    motors[index].write(value);
-}
 
 // Mixer =======================================================================
 
@@ -92,7 +77,10 @@ void setup(void)
     copilot_startLed(LED_PIN);
     copilot_startSerial();
 
-    startMotors();
+    copilot_startBrushedMotor(MOTOR1_PIN);
+    copilot_startBrushedMotor(MOTOR2_PIN);
+    copilot_startBrushedMotor(MOTOR3_PIN);
+    copilot_startBrushedMotor(MOTOR4_PIN);
 
     h.addSensor(&imu);
     h.addPidController(&levelPid);
@@ -111,5 +99,13 @@ void loop(void)
     copilot_updateSerial();
     copilot_updateClock();
 
-    h.update();
+    float motors[4] = {};
+
+    h.update(motors);
+
+    copilot_writeBrushedMotor(MOTOR1_PIN, motors[0]);
+    copilot_writeBrushedMotor(MOTOR2_PIN, motors[1]);
+    copilot_writeBrushedMotor(MOTOR3_PIN, motors[2]);
+    copilot_writeBrushedMotor(MOTOR4_PIN, motors[3]);
+
 }

@@ -36,6 +36,11 @@ spec = do
 
   let led = Pin 18
 
+  let motor1 = Pin 13
+  let motor2 = Pin 16
+  let motor3 = Pin 3
+  let motor4 = Pin 11
+
   let receiver = makeReceiver 4.0
 
   -- These sensors will be run right-to-left via composition
@@ -73,11 +78,16 @@ spec = do
   let looping = not starting
 
   -- Do some setup the first time around
-  trigger "copilot_startSerial" starting []     -- Serial comms
-  trigger "copilot_startLed" starting [arg $ pin led]     -- LED
-  trigger "copilot_startWire" starting []       -- I^2C
-  trigger "copilot_startUsfs" starting []       -- IMU
-  trigger "copilot_startDsmrx" starting []      -- Receiver
+  trigger "copilot_startSerial" starting []     
+  trigger "copilot_startLed" starting [arg $ pin led]     
+  trigger "copilot_startBrushedMotor" starting [arg $ pin led]
+  trigger "copilot_startWire" starting []
+  trigger "copilot_startUsfs" starting [] 
+  trigger "copilot_startDsmrx" starting [] 
+  trigger "copilot_startBrushedMotor" starting [arg $ pin motor1]
+  trigger "copilot_startBrushedMotor" starting [arg $ pin motor2]
+  trigger "copilot_startBrushedMotor" starting [arg $ pin motor3]
+  trigger "copilot_startBrushedMotor" starting [arg $ pin motor4]
   
   -- Send the LED using external C function during the looping phase
   trigger "copilot_setLed" looping [arg $ pin led, arg ledState]
@@ -89,10 +99,10 @@ spec = do
   trigger "copilot_updateClock" looping [] 
 
   -- Send the motor values using the external C function
-  trigger "copilot_writeMotor" looping [arg $ index (m1 motors), arg $ value (m1 motors)]
-  trigger "copilot_writeMotor" looping [arg $ index (m2 motors), arg $ value (m2 motors)]
-  trigger "copilot_writeMotor" looping [arg $ index (m3 motors), arg $ value (m3 motors)]
-  trigger "copilot_writeMotor" looping [arg $ index (m4 motors), arg $ value (m4 motors)]
+  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor1, arg $ value (m1 motors)]
+  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor2, arg $ value (m2 motors)]
+  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor3, arg $ value (m3 motors)]
+  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor4, arg $ value (m4 motors)]
 
   -- Send and retrieve serial comms
   trigger "copilot_serialWrite" (available serial)  [arg (byte serial)]

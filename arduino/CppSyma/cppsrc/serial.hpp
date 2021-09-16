@@ -214,7 +214,7 @@ namespace hf {
 
             } // parse
 
-            void update(Mixer * mixer, State * state)
+            void update(Mixer * mixer, State * state, float * motorsOut)
             {
                 if (copilot_serialAvailable) {
                     parse(copilot_serialByte);
@@ -222,7 +222,7 @@ namespace hf {
 
                 // Support motor testing from GCS
                 if (!state->armed) {
-                    mixer->runDisarmed();
+                    mixer->runDisarmed(motorsOut);
                 }
             }
 

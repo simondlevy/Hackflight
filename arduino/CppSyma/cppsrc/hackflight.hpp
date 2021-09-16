@@ -56,11 +56,11 @@ namespace hf {
                 }
             }
 
-            void checkReceiver(void)
+            void checkReceiver(float * motorsOut)
             {
                 // Sync failsafe to open-loop-controller
                 if (copilot_receiverLostSignal && _state.armed) {
-                    _mixer->cut();
+                    _mixer->cut(motorsOut);
                     _state.armed = false;
                     _state.failsafe = true;
                     copilot_setLed(_led_pin, false);
@@ -93,7 +93,7 @@ namespace hf {
 
                 // Cut motors on inactivity
                 if (_state.armed && _receiver->inactive()) {
-                    _mixer->cut();
+                    _mixer->cut(motorsOut);
                 }
 
                 // Set LED based on arming status
@@ -101,7 +101,7 @@ namespace hf {
 
             } // checkReceiver
 
-            void updatePidControllers(void)
+            void updatePidControllers(float * motorsOut)
             {
                 // Start with demands from open-loop controller
                 float demands[4] = {};
@@ -123,7 +123,9 @@ namespace hf {
                 // open-loop controller being inactive (e.g.,
                 // throttle down)
                 if (!_state.failsafe) {
-                    _mixer->run(demands, _state.armed && !_receiver->inactive());
+                    _mixer->run(demands,
+                            _state.armed && !_receiver->inactive(),
+                            motorsOut);
                 }
 
              } // doTask
@@ -175,20 +177,20 @@ namespace hf {
                 _mixer->begin();
             }
 
-            void update(void)
+            void update(float * motorsOut)
             {
                 // Grab control signal if available
-                checkReceiver();
+                checkReceiver(motorsOut);
 
                 // Update PID controllers task
-                updatePidControllers();
+                updatePidControllers(motorsOut);
 
                 // Check sensors
                 checkSensors();
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(_mixer, &_state);
+                    _serial_tasks[k]->update(_mixer, &_state, motorsOut);
                 }
             }
 

@@ -39,11 +39,6 @@ namespace hf {
 
             uint8_t _nmotors = 0;
 
-            void writeMotor(uint8_t index, float value)
-            {
-                copilot_writeMotor(index, value);
-            }
-
         protected:
 
             motorMixer_t motorDirections[MAXMOTORS] = {};
@@ -68,14 +63,14 @@ namespace hf {
             }
 
             // This is how we can spin the motors from the GCS
-            void runDisarmed(void)
+            void runDisarmed(float * motorsOut)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
-                    writeMotor(i, _disarmedValues[i]);
+                    motorsOut[i] =_disarmedValues[i]; 
                 }
             }
 
-            void run(float * demands, bool safe)
+            void run(float * demands, bool safe, float * motorsOut)
             {
                 // Don't run motors if its not safe: vehicle should be
                 // armed, with throttle above minimum
@@ -120,14 +115,14 @@ namespace hf {
                 }
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
-                    writeMotor(i, motorvals[i]);
+                    motorsOut[i] = motorvals[i];
                 }
             }
 
-            void cut(void) 
+            void cut(float * motorsOut) 
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
-                    writeMotor(i, 0);
+                    motorsOut[i] = 0;
                 }
             }
 
