@@ -63,7 +63,6 @@ namespace hf {
                     _mixer->cut(motorsOut);
                     _state.armed = false;
                     _state.failsafe = true;
-                    copilot_setLed(_led_pin, false);
                     return;
                 }
 
@@ -95,9 +94,6 @@ namespace hf {
                 if (_state.armed && _receiver->inactive()) {
                     _mixer->cut(motorsOut);
                 }
-
-                // Set LED based on arming status
-                copilot_setLed(_led_pin, _state.armed);
 
             } // checkReceiver
 
@@ -192,6 +188,8 @@ namespace hf {
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
                     _serial_tasks[k]->update(_mixer, &_state, motorsOut);
                 }
+
+                copilot_setLed(_led_pin, _state.armed);
             }
 
             void addSerialTask(SerialTask * task)

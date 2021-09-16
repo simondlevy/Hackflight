@@ -69,6 +69,7 @@ void copilot_setLed(uint8_t pin, bool on)
 
 void copilot_updateClock(void)
 {
+    copilot_time_msec = millis();
     copilot_time_sec = micros() / 1.e6f;
 }
 
