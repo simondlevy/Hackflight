@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "../copilot_extra.h"
+
 #include "pidcontroller.hpp"
 #include "receiver.hpp"
 #include "sensor.hpp"
@@ -161,7 +163,7 @@ namespace hf {
                 _mixer->begin();
             }
 
-            void update(float * motorsOut, bool & ledOut)
+            void update(float * motorsOut, bool & ledOut, serial_t & serialIn)
             {
                 // Grab control signal if available
                 checkReceiver(motorsOut);
@@ -174,7 +176,7 @@ namespace hf {
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(_mixer, &_state, motorsOut);
+                    _serial_tasks[k]->update(_mixer, &_state, motorsOut, serialIn);
                 }
 
                 uint32_t time_msec = copilot_time_msec;

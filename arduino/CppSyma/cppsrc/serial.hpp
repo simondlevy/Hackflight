@@ -159,7 +159,7 @@ namespace hf {
                 _outBufChecksum = 0;
             }
 
-            void parse(uint8_t c)
+            void parse(uint8_t c, serial_t & serialIn)
             {
                 enum {
                     IDLE,
@@ -202,9 +202,12 @@ namespace hf {
                     : parser_state == IN_PAYLOAD ? IDLE
                     : parser_state;
 
+                serialIn.avail = false;
+
                 // Payload accumulation
                 if (in_payload) {
-                    copilot_collectSerialInput(index-1, c);
+                    serialIn.avail = true;
+                    serialIn.value = c;
                 }
 
                 // Message dispatch
@@ -214,10 +217,10 @@ namespace hf {
 
             } // parse
 
-            void update(Mixer * mixer, State * state, float * motorsOut)
+            void update(Mixer * mixer, State * state, float * motorsOut, serial_t & serialIn)
             {
                 if (copilot_serialAvailable) {
-                    parse(copilot_serialByte);
+                    parse(copilot_serialByte, serialIn);
                 }
 
                 // Support motor testing from GCS

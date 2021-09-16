@@ -34,18 +34,24 @@ void copilot_updateSerial(void)
     }
 }
 
-static uint8_t serialInputBuffer[128] = {};
+static uint8_t _serialInputBuffer[128] = {};
+static uint8_t _serialInputIndex;
+
+void copilot_collectSerialInput(serial_t & serialIn)
+{
+   if (serialIn.avail) {
+      _serialInputBuffer[_serialInputIndex++] = serialIn.value;
+   }
+   else {
+       _serialInputIndex = 0;
+   }
+}
 
 float copilot_getFloatFromSerialInput(uint8_t offset)
 {
     float value = 0;
-    memcpy(&value,  &serialInputBuffer[offset], sizeof(float));
+    memcpy(&value,  &_serialInputBuffer[offset], sizeof(float));
     return value;
-}
-
-void copilot_collectSerialInput(uint8_t index, uint8_t value)
-{
-   serialInputBuffer[index] = value;
 }
 
 void copilot_convertFloat(float value)

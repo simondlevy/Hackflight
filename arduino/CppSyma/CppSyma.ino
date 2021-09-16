@@ -102,7 +102,11 @@ void loop(void)
     float motors[4] = {};
     bool led = false;
 
-    h.update(motors, led);
+    serial_t byteIn = {};
+
+    h.update(motors, led, byteIn);
+
+    copilot_collectSerialInput(byteIn);
 
     copilot_setLed(LED_PIN, led);
 
