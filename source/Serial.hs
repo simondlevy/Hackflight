@@ -20,9 +20,13 @@ data SerialGuard = SerialGuard { available :: Stream Bool, byte :: Stream Word8 
 
 type ParserState = Stream Word8
 
-getSerialOut :: State -> Demands -> SerialGuard
+type SerialOutFun = State -> Demands -> SerialGuard
 
-getSerialOut _vehicleState _demands = SerialGuard false 0
+getSerialOutSim :: SerialOutFun
+getSerialOutSim _vehicleState _demands = SerialGuard false 0
+
+getSerialOutReal :: SerialOutFun
+getSerialOutReal _vehicleState _demands = SerialGuard false 0
 
   where 
 

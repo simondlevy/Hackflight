@@ -25,10 +25,11 @@ import Time(time_msec)
 import Serial
 import Utils(compose)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer ->
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> SafetyFun -> SerialOutFun ->
     (Motors, Stream Bool, SerialGuard, Stream Bool)
 
-hackflight receiver sensors pidControllers mixer = (motors, led, serialOut, starting)
+hackflight receiver sensors pidControllers mixer safetyFun serialOutFun 
+  = (motors, led, serialOut, starting)
 
   where
 
@@ -54,7 +55,7 @@ hackflight receiver sensors pidControllers mixer = (motors, led, serialOut, star
                        (yaw demands)
 
     -- Get safety status
-    safety = getSafety vehicleState
+    safety = safetyFun vehicleState
 
     -- Apply mixer to demands to get motor values, returning motor values and LED state
     motors = mixer safety demands
@@ -64,7 +65,7 @@ hackflight receiver sensors pidControllers mixer = (motors, led, serialOut, star
           else armed safety
 
     -- Run serial comms
-    serialOut = getSerialOut vehicleState receiverDemands 
+    serialOut = serialOutFun vehicleState receiverDemands 
 
     -- Helps to init first time around
     starting = [False] ++ true
