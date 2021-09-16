@@ -154,18 +154,6 @@ namespace hf {
                 // Supports automatic arming for simulator
                 _state.armed = armed;
 
-                // Flash LED
-                uint32_t pauseMsec = 1000 * LED_STARTUP_FLASH_SECONDS /
-                                     LED_STARTUP_FLASH_COUNT;
-                copilot_setLed(_led_pin, false);
-                for (uint8_t i = 0; i < LED_STARTUP_FLASH_COUNT; i++) {
-                    copilot_setLed(_led_pin, true);
-                    delay(pauseMsec);
-                    copilot_setLed(_led_pin, false);
-                    delay(pauseMsec);
-                }
-                copilot_setLed(_led_pin, false);
-
                 // Initialize the sensors
                 startSensors();
 
@@ -189,7 +177,12 @@ namespace hf {
                     _serial_tasks[k]->update(_mixer, &_state, motorsOut);
                 }
 
-                ledOut = _state.armed;
+                uint32_t time_msec = copilot_time_msec;
+
+                ledOut = time_msec < 2000 ?
+                    ((time_msec / 50) % 2) == 0
+                    : _state.armed;
+
             }
 
             void addSerialTask(SerialTask * task)
