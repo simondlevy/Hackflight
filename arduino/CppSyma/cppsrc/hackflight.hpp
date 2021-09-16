@@ -28,6 +28,8 @@ namespace hf {
             Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;
 
+            uint8_t _led_pin = 0;
+
             State _state = {};
             SerialTask * _serial_tasks[10] = {};
             uint8_t _serial_task_count = 0;
@@ -61,7 +63,7 @@ namespace hf {
                     _mixer->cut();
                     _state.armed = false;
                     _state.failsafe = true;
-                    copilot_setLed(false);
+                    copilot_setLed(_led_pin, false);
                     return;
                 }
 
@@ -95,7 +97,7 @@ namespace hf {
                 }
 
                 // Set LED based on arming status
-                copilot_setLed(_state.armed);
+                copilot_setLed(_led_pin, _state.armed);
 
             } // checkReceiver
 
@@ -128,10 +130,11 @@ namespace hf {
 
          public:
 
-            Hackflight(Receiver * receiver, hf::Mixer * mixer)
+            Hackflight(Receiver * receiver, hf::Mixer * mixer, uint8_t ledPin)
             {
                 _receiver = receiver;
                 _mixer = mixer;
+                _led_pin = ledPin;
 
                 _sensor_count = 0;
                 _serial_task_count = 0;
@@ -156,14 +159,14 @@ namespace hf {
                 // Flash LED
                 uint32_t pauseMsec = 1000 * LED_STARTUP_FLASH_SECONDS /
                                      LED_STARTUP_FLASH_COUNT;
-                copilot_setLed(false);
+                copilot_setLed(_led_pin, false);
                 for (uint8_t i = 0; i < LED_STARTUP_FLASH_COUNT; i++) {
-                    copilot_setLed(true);
+                    copilot_setLed(_led_pin, true);
                     delay(pauseMsec);
-                    copilot_setLed(false);
+                    copilot_setLed(_led_pin, false);
                     delay(pauseMsec);
                 }
-                copilot_setLed(false);
+                copilot_setLed(_led_pin, false);
 
                 // Initialize the sensors
                 startSensors();

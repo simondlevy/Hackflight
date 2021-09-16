@@ -11,14 +11,12 @@
 #define _EXTERN
 #include "copilot.h"
 
-#include "copilot_arduino.h"
-
 #include <Wire.h>
 #include <USFS_Master.h>
 
 static USFS_Master _usfs;
 
-void startImu(void)
+void copilot_startUsfs(void)
 {
     delay(100);
     if (!_usfs.begin()) {
@@ -29,7 +27,7 @@ void startImu(void)
     }
 }
 
-void updateImu(void)
+void copilot_updateUsfs(void)
 {
     _usfs.checkEventStatus();
 

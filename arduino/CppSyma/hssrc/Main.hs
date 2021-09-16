@@ -22,6 +22,9 @@ import Demands
 import Receiver
 import Mixer
 
+-- LED
+import Led
+
 -- Sensors
 import Gyrometer
 import Quaternion
@@ -32,6 +35,8 @@ import YawPid
 import LevelPid
 
 spec = do
+
+  let led = Led 18
 
   let receiver = makeReceiver 4.0
 
@@ -59,24 +64,37 @@ spec = do
   let mixer = quadXAPMixer
 
   -- Run the main Hackflight algorithm, getting the motor spins and LED state
-  let (motors, led, serial, starting) = hackflight
-                                        receiver
-                                        sensors
-                                        pidControllers
-                                        mixer
-                                        getSafetyReal
-                                        getSerialOutReal
+  let (motors, ledState, serial, starting) = hackflight
+                                             receiver
+                                             sensors
+                                             pidControllers
+                                             mixer
+                                             getSafetyReal
+                                             getSerialOutReal
 
-  trigger "copilot_startWire" starting []
+  let looping = not starting
+
+  -- Do some setup the first time around
+  trigger "copilot_startSerial" starting []     -- Serial comms
+  trigger "copilot_startLed" starting [arg $ pin led]     -- LED
+  trigger "copilot_startWire" starting []       -- I^2C
+  trigger "copilot_startUsfs" starting []       -- IMU
+  trigger "copilot_startDsmrx" starting []      -- Receiver
   
-  -- Send the LED using external C function
-  trigger "copilot_setLed" (not starting) [arg led]
+  -- Send the LED using external C function during the looping phase
+  trigger "copilot_setLed" looping [arg $ pin led, arg ledState]
+
+  -- Update serial comms and clock during the looping phase
+  trigger "copilot_updateDsmrx" looping [] 
+  trigger "copilot_updateUsfs" looping [] 
+  trigger "copilot_updateSerial" looping [] 
+  trigger "copilot_updateClock" looping [] 
 
   -- Send the motor values using the external C function
-  trigger "copilot_writeMotor" (not starting) [arg $ index (m1 motors), arg $ value (m1 motors)]
-  trigger "copilot_writeMotor" (not starting) [arg $ index (m2 motors), arg $ value (m2 motors)]
-  trigger "copilot_writeMotor" (not starting) [arg $ index (m3 motors), arg $ value (m3 motors)]
-  trigger "copilot_writeMotor" (not starting) [arg $ index (m4 motors), arg $ value (m4 motors)]
+  trigger "copilot_writeMotor" looping [arg $ index (m1 motors), arg $ value (m1 motors)]
+  trigger "copilot_writeMotor" looping [arg $ index (m2 motors), arg $ value (m2 motors)]
+  trigger "copilot_writeMotor" looping [arg $ index (m3 motors), arg $ value (m3 motors)]
+  trigger "copilot_writeMotor" looping [arg $ index (m4 motors), arg $ value (m4 motors)]
 
   -- Send and retrieve serial comms
   trigger "copilot_serialWrite" (available serial)  [arg (byte serial)]

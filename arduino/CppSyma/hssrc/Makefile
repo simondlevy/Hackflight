@@ -8,6 +8,7 @@
 SRCDIR = $(MYHOME)/Documents/Hackflight/source
 
 SRC = Main.hs \
+      $(SRCDIR)/Led.hs \
       $(SRCDIR)/Safety.hs \
 	  $(SRCDIR)/Serial.hs \
       $(SRCDIR)/Receiver.hs \
@@ -31,6 +32,11 @@ all: copilot.cpp copilot.h
 	sed -i 's/extern/EXTERN/g' copilot.h
 	cat $(SRCDIR)/cfiles/header.h copilot.h > ../copilot.h
 
+copilot.cpp: copilot.c
+	tail -n +8 copilot.c > tmp.c
+	cat $(SRCDIR)/cfiles/header.c tmp.c > copilot.c
+	rm tmp.c
+
 copilot.c: $(SRC) Main.hs
 	$(RUNH)
 
@@ -43,7 +49,3 @@ clean:
 commit:
 	git commit -a -m="More Haskell Copilot work"
 
-copilot.cpp: copilot.c
-	tail -n +8 copilot.c > tmp.c
-	cat $(SRCDIR)/cfiles/header.c tmp.c > copilot.c
-	rm tmp.c

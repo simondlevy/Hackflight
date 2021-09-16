@@ -10,8 +10,6 @@
 #define _EXTERN
 #include "copilot.h"
 
-#include "copilot_arduino.h"
-
 #include <Arduino.h>
 #include <DSMRX.h>
 
@@ -25,14 +23,14 @@ void serialEvent1(void)
     }
 }
 
-void startReceiver(void)
+void copilot_startDsmrx(void)
 {
     Serial1.begin(115200);
 
     copilot_receiverLostSignal = false;
 }
 
-void updateReceiver(void)
+void copilot_updateDsmrx(void)
 {
     if (_rx.timedOut(micros())) {
         _timeouts++;

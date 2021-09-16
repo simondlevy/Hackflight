@@ -18,7 +18,6 @@
  */
 
 #include "copilot_extra.h"
-#include "copilot_arduino.h"
 
 #include "cppsrc/Hackflight.hpp"
 #include "cppsrc/receiver.hpp"
@@ -28,8 +27,6 @@
 #include "cppsrc/pidcontrollers/level.hpp"
 #include "cppsrc/sensors/usfs.hpp"
 #include "cppsrc/motors/arduino/brushed.hpp"
-
-#include <Wire.h>
 
 // LED =======================================================================
 
@@ -83,19 +80,19 @@ hf::SerialTask gcsTask;
 
 // Hackflight object ===========================================================
 
-static hf::Hackflight h(&receiver, &mixer);
+static hf::Hackflight h(&receiver, &mixer, LED_PIN);
 
 // Setup =======================================================================
 
 void setup(void)
 {
     copilot_startWire();
+    copilot_startUsfs(); 
+    copilot_startDsmrx();
+    copilot_startLed(LED_PIN);
+    copilot_startSerial();
 
-    startImu(); 
-    startReceiver();
     startMotors();
-    startLed(LED_PIN);
-    startSerial();
 
     h.addSensor(&imu);
     h.addPidController(&levelPid);
@@ -109,10 +106,10 @@ void setup(void)
 
 void loop(void)
 {
-    updateReceiver();
-    updateImu();
-    updateSerial();
-    updateClock();
+    copilot_updateDsmrx();
+    copilot_updateUsfs();
+    copilot_updateSerial();
+    copilot_updateClock();
 
     h.update();
 }

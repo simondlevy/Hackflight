@@ -10,14 +10,12 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#include "copilot_arduino.h"
-
 #define _EXTERN
 #include "copilot_extra.h"
 
 // Serial comms ---------------------------------------------------------------
 
-void startSerial(void)
+void copilot_startSerial(void)
 {
     Serial.begin(115200);
 }
@@ -27,7 +25,7 @@ void copilot_serialWrite(uint8_t b)
     Serial.write(b);
 }
 
-void updateSerial(void)
+void copilot_updateSerial(void)
 {
     copilot_serialAvailable = Serial.available();
 
@@ -57,22 +55,19 @@ void copilot_convertFloat(float value)
 
 // LED---------------------------------------------------------------
 
-static uint8_t _led_pin;
-
-void startLed(uint8_t pin)
+void copilot_startLed(uint8_t pin)
 {
     pinMode(pin, OUTPUT);
-    _led_pin = pin;
 }
 
-void copilot_setLed(bool on)
+void copilot_setLed(uint8_t pin, bool on)
 {
-    digitalWrite(_led_pin, on);
+    digitalWrite(pin, on);
 }
 
 // Clock ---------------------------------------------------------------
 
-void updateClock(void)
+void copilot_updateClock(void)
 {
     copilot_time_sec = micros() / 1.e6f;
 }
