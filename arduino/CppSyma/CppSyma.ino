@@ -100,8 +100,11 @@ void loop(void)
     copilot_updateClock();
 
     float motors[4] = {};
+    bool led = false;
 
-    h.update(motors);
+    h.update(motors, led);
+
+    copilot_setLed(LED_PIN, led);
 
     copilot_writeBrushedMotor(MOTOR1_PIN, motors[0]);
     copilot_writeBrushedMotor(MOTOR2_PIN, motors[1]);

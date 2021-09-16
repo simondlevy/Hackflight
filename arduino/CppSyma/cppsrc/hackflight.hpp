@@ -173,7 +173,7 @@ namespace hf {
                 _mixer->begin();
             }
 
-            void update(float * motorsOut)
+            void update(float * motorsOut, bool & ledOut)
             {
                 // Grab control signal if available
                 checkReceiver(motorsOut);
@@ -189,7 +189,7 @@ namespace hf {
                     _serial_tasks[k]->update(_mixer, &_state, motorsOut);
                 }
 
-                copilot_setLed(_led_pin, _state.armed);
+                ledOut = _state.armed;
             }
 
             void addSerialTask(SerialTask * task)
