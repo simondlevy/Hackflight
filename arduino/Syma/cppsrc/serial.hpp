@@ -110,8 +110,6 @@ namespace hf {
 
         protected:
 
-            static constexpr float FREQ = 66;
-
             void completeSend(void)
             {
                 serialize8(_outBufChecksum);
@@ -159,7 +157,7 @@ namespace hf {
                 _outBufChecksum = 0;
             }
 
-            void parse(uint8_t c, serial_t & serialIn)
+            void parse(uint8_t c, serial_t & serialByte)
             {
                 enum {
                     IDLE,
@@ -202,25 +200,30 @@ namespace hf {
                     : parser_state == IN_PAYLOAD ? IDLE
                     : parser_state;
 
-                serialIn.avail = false;
+                serialByte.status = 0; // assuming nothing
 
                 // Payload accumulation
                 if (in_payload) {
-                    serialIn.avail = true;
-                    serialIn.value = c;
+                    serialByte.status = 1;
+                    serialByte.value = c;
                 }
 
                 // Message dispatch
                 if (parser_state == IDLE && crc == c) {
-                    dispatchMessage(type);
+                    if (size > 0) {
+                        handleSerialInput(type);
+                    }
+                    else {
+                        sendSerialOutput(type);
+                    }
                 }
 
             } // parse
 
-            void update(Mixer * mixer, State * state, float * motorsOut, serial_t & serialIn)
+            void update(Mixer * mixer, State * state, float * motorsOut, serial_t & serialByte)
             {
                 if (copilot_serialAvailable) {
-                    parse(copilot_serialByte, serialIn);
+                    parse(copilot_serialByte, serialByte);
                 }
 
                 // Support motor testing from GCS
@@ -229,9 +232,9 @@ namespace hf {
                 }
             }
 
-            void dispatchMessage(uint8_t command)
+            void sendSerialOutput(uint8_t type)
             {
-                switch (command) {
+                switch (type) {
 
                     case 121:
                         {
@@ -242,7 +245,7 @@ namespace hf {
                             float c5 = 0;
                             float c6 = 0;
                             handle_RECEIVER_Request(c1, c2, c3, c4, c5, c6);
-                            prepareToSendFloats(command, 6);
+                            prepareToSendFloats(type, 6);
                             sendFloat(c1);
                             sendFloat(c2);
                             sendFloat(c3);
@@ -268,7 +271,7 @@ namespace hf {
                             float dpsi = 0;
                             handle_STATE_Request(x, dx, y, dy, z, dz,
                                     phi, dphi, theta, dtheta, psi, dpsi);
-                            prepareToSendFloats(command, 12);
+                            prepareToSendFloats(type, 12);
                             sendFloat(x);
                             sendFloat(dx);
                             sendFloat(y);
@@ -288,25 +291,33 @@ namespace hf {
                         {
                             uint8_t mtype = 0;
                             handle_ACTUATOR_TYPE_Request(mtype);
-                            prepareToSendBytes(command, 1);
+                            prepareToSendBytes(type, 1);
                             sendByte(mtype);
                             completeSend();
                         } break;
 
+                } // switch (type)
+
+            } // sendSerialOutput
+
+             void handleSerialInput(uint8_t type)
+            {
+                switch (type) {
+
                     case 215:
                         {
-                            float m1 = copilot_getFloatFromSerialInput(0);
-                            float m2 = copilot_getFloatFromSerialInput(4);
-                            float m3 = copilot_getFloatFromSerialInput(8);
-                            float m4 = copilot_getFloatFromSerialInput(12);
+                            float m1 = copilot_Input1;
+                            float m2 = copilot_Input2;
+                            float m3 = copilot_Input3;
+                            float m4 = copilot_Input4;
 
                             handle_SET_MOTOR(m1, m2, m3, m4);
 
                         } break;
 
-                } // switch (_command)
+                } // switch (type)
 
-            } // dispatchMessage 
+            } // handleSerialInput
 
             void init( Mixer * mixer, State * state)
             {

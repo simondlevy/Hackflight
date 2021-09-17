@@ -37,21 +37,30 @@ void copilot_updateSerial(void)
 static uint8_t _serialInputBuffer[128] = {};
 static uint8_t _serialInputIndex;
 
-void copilot_collectSerialInput(serial_t & serialIn)
+void copilot_handleSerialByte(serial_t & serialByte)
 {
-   if (serialIn.avail) {
-      _serialInputBuffer[_serialInputIndex++] = serialIn.value;
+   if (serialByte.status == 1) { // incomding data (e.g., set motors)
+
+      _serialInputBuffer[_serialInputIndex++] = serialByte.value;
+
+      switch (_serialInputIndex) {
+          case 4:
+              memcpy(&copilot_Input1, &_serialInputBuffer[0], sizeof(float));
+              break;
+          case 8:
+              memcpy(&copilot_Input2, &_serialInputBuffer[4], sizeof(float));
+              break;
+          case 12:
+              memcpy(&copilot_Input3, &_serialInputBuffer[8], sizeof(float));
+              break;
+          case 16:
+              memcpy(&copilot_Input4, &_serialInputBuffer[12], sizeof(float));
+              break;
+      }
    }
    else {
        _serialInputIndex = 0;
    }
-}
-
-float copilot_getFloatFromSerialInput(uint8_t offset)
-{
-    float value = 0;
-    memcpy(&value,  &_serialInputBuffer[offset], sizeof(float));
-    return value;
 }
 
 void copilot_convertFloat(float value)
