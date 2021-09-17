@@ -13,23 +13,46 @@ module Serial where
 import Language.Copilot hiding(xor)
 
 import State
-import Demands
+import Mixer
 import Utils(xor)
 
-data SerialGuard = SerialGuard { available :: Stream Bool, byte :: Stream Word8 }
 
+data SerialBuffer = SerialBuffer {  count    :: Stream Word8
+                                  , cmdid    :: Stream Word8
+                                  , output01 :: Stream Float
+                                  , output02 :: Stream Float
+                                  , output03 :: Stream Float
+                                  , output04 :: Stream Float
+                                  , output05 :: Stream Float
+                                  , output06 :: Stream Float
+                                  , output07 :: Stream Float
+                                  , output08 :: Stream Float
+                                  , output09 :: Stream Float
+                                  , output10 :: Stream Float
+                                  , output11 :: Stream Float
+                                  , output12 :: Stream Float
+                                  }
 type ParserState = Stream Word8
 
-type SerialOutFun = State -> Demands -> SerialGuard
+type ParserFun = Mixer -> State -> SerialBuffer
 
-getSerialOutSim :: SerialOutFun
-getSerialOutSim _vehicleState _demands = SerialGuard false 0
+parseSim :: ParserFun
+parseSim _ _ = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
-getSerialOutReal :: SerialOutFun
-getSerialOutReal _vehicleState _demands = SerialGuard false 0
+parseReal :: ParserFun
+parseReal mixer vehicleState = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
   where 
 
+    -- Parser state constants
+    parserIdle        = 0
+    parserHeaderStart = 1
+    parserHeaderM     = 2
+    parserHeaderArrow = 3
+    parserHeaderSize  = 4
+    parserHeaderCmd   = 5
+
+{--
     command = 
 
       if not serialAvailable then command'
@@ -95,13 +118,7 @@ getSerialOutReal _vehicleState _demands = SerialGuard false 0
     checksum' = [0] ++ checksum :: Stream Word8
     command' = [0] ++ command :: Stream Word8
 
-    -- Parser constants
-    parserIdle        = 0
-    parserHeaderStart = 1
-    parserHeaderM     = 2
-    parserHeaderArrow = 3
-    parserHeaderSize  = 4
-    parserHeaderCmd   = 5
+--}
 
 ----------------------------------------------------------
 

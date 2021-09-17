@@ -31,7 +31,7 @@ data State = State {   x :: Stream Float
                 ,    psi :: Stream Float
                 ,   dpsi :: Stream Float
 
-              } deriving (Show)
+              }
 
 zeroState :: State
 

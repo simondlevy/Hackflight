@@ -67,13 +67,13 @@ spec = do
   let mixer = quadXAPMixer
 
   -- Run the main Hackflight algorithm, getting the motor spins and LED state
-  let (motors, ledState, serial, starting) = hackflight
-                                             receiver
-                                             sensors
-                                             pidControllers
-                                             mixer
-                                             getSafetyReal
-                                             getSerialOutReal
+  let (motors, ledState, serialBuffer, starting) = hackflight
+                                                   receiver
+                                                   sensors
+                                                   pidControllers
+                                                   mixer
+                                                   getSafetyReal
+                                                   parseReal
 
   let looping = not starting
 
@@ -105,7 +105,6 @@ spec = do
   trigger "copilot_writeBrushedMotor" looping [arg $ pin motor4, arg $ value (m4 motors)]
 
   -- Send and retrieve serial comms
-  trigger "copilot_serialWrite" (available serial)  [arg (byte serial)]
  
 -- Compile the spec
 main = reify spec >>= compile "copilot"

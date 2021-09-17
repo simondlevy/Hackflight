@@ -25,11 +25,11 @@ import Time(time_msec)
 import Serial
 import Utils(compose)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> SafetyFun -> SerialOutFun ->
-    (Motors, Stream Bool, SerialGuard, Stream Bool)
+hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> SafetyFun -> ParserFun ->
+    (Motors, Stream Bool, SerialBuffer, Stream Bool)
 
-hackflight receiver sensors pidControllers mixer safetyFun serialOutFun 
-  = (motors, led, serialOut, starting)
+hackflight receiver sensors pidControllers mixer safetyFun parserFun 
+  = (motors, led, serialBuffer, starting)
 
   where
 
@@ -65,7 +65,7 @@ hackflight receiver sensors pidControllers mixer safetyFun serialOutFun
           else armed safety
 
     -- Run serial comms
-    serialOut = serialOutFun vehicleState receiverDemands 
+    serialBuffer = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
     -- Helps to init first time around
     starting = [False] ++ true
