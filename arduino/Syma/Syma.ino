@@ -105,7 +105,32 @@ void loop(void)
 
     h.update(motors, led, serial);
 
-    copilot_handleSerial(serial);
+
+    if (serial.count == 0) {
+        copilot_resetSerial();
+    }
+
+    if (serial.count == -1) {
+        copilot_handleSerialInput(serial.input);
+    }
+
+    if (serial.count > 0) {
+        copilot_sendSerialOutput(
+                serial.type,
+                serial.count,
+                serial.output01,
+                serial.output02,
+                serial.output03,
+                serial.output04,
+                serial.output05,
+                serial.output06,
+                serial.output07,
+                serial.output08,
+                serial.output09,
+                serial.output10,
+                serial.output11,
+                serial.output12);
+    }
 
     copilot_setLed(LED_PIN, led);
 

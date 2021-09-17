@@ -37,11 +37,9 @@ void copilot_updateSerial(void)
 static uint8_t _serialBuffer[128] = {};
 static uint8_t _serialInputIndex;
 
-void copilot_handleSerial(serial_t & serial)
+void copilot_handleSerialInput(uint8_t byte)
 {
-    if (serial.count == -1) { // incomding data (e.g., set motors)
-
-        _serialBuffer[_serialInputIndex++] = serial.input;
+        _serialBuffer[_serialInputIndex++] = byte;
 
         switch (_serialInputIndex) {
             case 4:
@@ -57,36 +55,53 @@ void copilot_handleSerial(serial_t & serial)
                 memcpy(&copilot_Input4, &_serialBuffer[12], sizeof(float));
                 break;
         }
+}
+
+void copilot_resetSerial(void)
+{
+    _serialInputIndex = 0;
+}
+
+void copilot_sendSerialOutput(
+        uint8_t type,
+        uint8_t count,
+        float v01,
+        float v02,
+        float v03,
+        float v04,
+        float v05,
+        float v06,
+        float v07,
+        float v08,
+        float v09,
+        float v10,
+        float v11,
+        float v12)
+
+{
+    Serial.write('$');
+    Serial.write('M');
+    Serial.write('>');
+
+    uint8_t size = count * 4; // all values are float
+
+    Serial.write(size);
+    Serial.write(type);
+
+    uint8_t crc = size ^ type;
+
+    float vals[12] = {v01, v02, v03, v04, v05, v06, v07, v08, v09, v10, v11, v12};
+
+    uint8_t * p = (uint8_t *)vals;
+
+    for (uint8_t k=0; k<size; ++k) {
+        uint8_t c = *p;
+        Serial.write(c);
+        crc ^= c;
+        p++;
     }
 
-    else if (serial.count > 0) { // outgoing message
-
-        Serial.write('$');
-        Serial.write('M');
-        Serial.write('>');
-
-        uint8_t size = serial.count * 4; // all values are float
-
-        Serial.write(size);
-        Serial.write(serial.type);
-
-        uint8_t crc = size ^ serial.type;
-
-        uint8_t * p = (uint8_t *)&serial.output01;
-
-        for (uint8_t k=0; k<size; ++k) {
-            uint8_t c = *p;
-            Serial.write(c);
-            crc ^= c;
-            p++;
-        }
-        
-        Serial.write(crc);
-    }
-
-    else {                      // no serial activity
-        _serialInputIndex = 0;
-    }
+    Serial.write(crc);
 }
 
 // LED---------------------------------------------------------------
