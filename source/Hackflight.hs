@@ -82,7 +82,6 @@ hackflightFull receiver sensors pidControllers mixer safetyFun parserFun
 
 -------------------------------------------------------------------------------------
 
-
 hackflightSim :: Receiver -> [Sensor] -> [PidController] -> Mixer -> Motors
 
 hackflightSim receiver sensors pidControllers mixer = motors

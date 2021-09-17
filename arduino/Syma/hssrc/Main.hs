@@ -67,7 +67,7 @@ spec = do
   let mixer = quadXAPMixer
 
   -- Run the main Hackflight algorithm, getting the motor spins and LED state
-  let (motors, ledState, serialBuffer, starting) = hackflight
+  let (motors, ledState, serialBuffer, starting) = hackflightFull
                                                    receiver
                                                    sensors
                                                    pidControllers
