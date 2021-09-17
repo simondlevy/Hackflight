@@ -51,63 +51,6 @@ namespace hf {
                 serialize8(type);
             }
 
-            void handle_RECEIVER_Request(
-                    float & c1,
-                    float & c2,
-                    float & c3,
-                    float & c4,
-                    float & c5,
-                    float & c6)
-            {
-                c1 = copilot_receiverThrottle;
-                c2 = copilot_receiverRoll;
-                c3 = copilot_receiverPitch;
-                c4 = copilot_receiverYaw;
-                c5 = copilot_receiverAux1;
-                c6 = 0;
-            }
-
-            void handle_STATE_Request(
-                    float & x,
-                    float & dx,
-                    float & y,
-                    float & dy,
-                    float & z,
-                    float & dz,
-                    float & phi,
-                    float & dphi,
-                    float & theta,
-                    float & dtheta,
-                    float & psi,
-                    float & dpsi)
-            {
-                x = _state->x[State::X];
-                dx = _state->x[State::DX];
-                y = _state->x[State::Y];
-                dy = _state->x[State::DY];
-                z = _state->x[State::Z];
-                dz = _state->x[State::DZ];
-                phi = _state->x[State::PHI];
-                dphi = _state->x[State::DPHI];
-                theta = _state->x[State::THETA];
-                dtheta = _state->x[State::DTHETA];
-                psi = _state->x[State::PSI];
-                dpsi = _state->x[State::DPSI];
-            }
-
-            void handle_ACTUATOR_TYPE_Request(uint8_t & mtype)
-            {
-                mtype = _mixer->getType();
-            }
-
-            void handle_SET_MOTOR(float  m1, float  m2, float  m3, float  m4)
-            {
-                _mixer->setMotorDisarmed(0, m1);
-                _mixer->setMotorDisarmed(1, m2);
-                _mixer->setMotorDisarmed(2, m3);
-                _mixer->setMotorDisarmed(3, m4);
-            }
-
         protected:
 
             void completeSend(void)
@@ -238,13 +181,12 @@ namespace hf {
 
                     case 121:
                         {
-                            float c1 = 0;
-                            float c2 = 0;
-                            float c3 = 0;
-                            float c4 = 0;
-                            float c5 = 0;
+                            float c1 = copilot_receiverThrottle;
+                            float c2 = copilot_receiverRoll;
+                            float c3 = copilot_receiverPitch;
+                            float c4 = copilot_receiverYaw;
+                            float c5 = copilot_receiverAux1;
                             float c6 = 0;
-                            handle_RECEIVER_Request(c1, c2, c3, c4, c5, c6);
                             prepareToSendFloats(type, 6);
                             sendFloat(c1);
                             sendFloat(c2);
@@ -257,20 +199,18 @@ namespace hf {
 
                     case 122:
                         {
-                            float x = 0;
-                            float dx = 0;
-                            float y = 0;
-                            float dy = 0;
-                            float z = 0;
-                            float dz = 0;
-                            float phi = 0;
-                            float dphi = 0;
-                            float theta = 0;
-                            float dtheta = 0;
-                            float psi = 0;
-                            float dpsi = 0;
-                            handle_STATE_Request(x, dx, y, dy, z, dz,
-                                    phi, dphi, theta, dtheta, psi, dpsi);
+                            float x = _state->x[State::X];
+                            float dx = _state->x[State::DX];
+                            float y = _state->x[State::Y];
+                            float dy = _state->x[State::DY];
+                            float z = _state->x[State::Z];
+                            float dz = _state->x[State::DZ];
+                            float phi = _state->x[State::PHI];
+                            float dphi = _state->x[State::DPHI];
+                            float theta = _state->x[State::THETA];
+                            float dtheta = _state->x[State::DTHETA];
+                            float psi = _state->x[State::PSI];
+                            float dpsi = _state->x[State::DPSI];
                             prepareToSendFloats(type, 12);
                             sendFloat(x);
                             sendFloat(dx);
@@ -289,8 +229,7 @@ namespace hf {
 
                     case 123:
                         {
-                            uint8_t mtype = 0;
-                            handle_ACTUATOR_TYPE_Request(mtype);
+                            uint8_t mtype = _mixer->getType();
                             prepareToSendBytes(type, 1);
                             sendByte(mtype);
                             completeSend();
@@ -300,7 +239,7 @@ namespace hf {
 
             } // sendSerialOutput
 
-             void handleSerialInput(uint8_t type)
+            void handleSerialInput(uint8_t type)
             {
                 switch (type) {
 
@@ -311,7 +250,10 @@ namespace hf {
                             float m3 = copilot_Input3;
                             float m4 = copilot_Input4;
 
-                            handle_SET_MOTOR(m1, m2, m3, m4);
+                            _mixer->setMotorDisarmed(0, m1);
+                            _mixer->setMotorDisarmed(1, m2);
+                            _mixer->setMotorDisarmed(2, m3);
+                            _mixer->setMotorDisarmed(3, m4);
 
                         } break;
 
@@ -325,6 +267,6 @@ namespace hf {
                 _state = state;
             }
 
-     }; // class SerialTask
+    }; // class SerialTask
 
 } // namespace hf
