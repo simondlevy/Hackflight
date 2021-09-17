@@ -19,9 +19,9 @@ namespace hf {
 
         friend class Hackflight;
 
-        private:
+        protected:
 
-            void parse(Mixer * mixer, State * vehicleState, uint8_t c, serial_t & serial)
+            void parse(Mixer * mixer, State * vehicleState, serial_t & serial)
             {
                 enum {
                     IDLE,
@@ -38,6 +38,9 @@ namespace hf {
                 static uint8_t crc;
                 static uint8_t size;
                 static uint8_t index;
+
+
+                uint8_t c = copilot_serialByte;
 
                 // Payload functions
                 size = parser_state == GOT_ARROW ? c : size;
@@ -150,20 +153,6 @@ namespace hf {
                 } // switch (type)
 
             } // handleSerialInput
-
-        protected:
-
-            void update(Mixer * mixer, State * state, float * motorsOut, serial_t & serial)
-            {
-                if (copilot_serialAvailable) {
-                    parse(mixer, state, copilot_serialByte, serial);
-                }
-
-                // Support motor testing from GCS
-                if (!state->armed) {
-                    mixer->runDisarmed(motorsOut);
-                }
-            }
 
     }; // class SerialTask
 

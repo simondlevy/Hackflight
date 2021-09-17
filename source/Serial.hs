@@ -39,12 +39,12 @@ parse mixer vehicleState = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
   where 
 
     -- Parser state constants
-    parserIdle        = 0
-    parserHeaderStart = 1
-    parserHeaderM     = 2
-    parserHeaderArrow = 3
-    parserHeaderSize  = 4
-    parserHeaderCmd   = 5
+    parserIdle      = 0
+    parserGotStart  = 1
+    parserGotM      = 2
+    parserGotArrow  = 3
+    parserGotSize   = 4
+    parserInPayload = 5
 
 {--
     command = 

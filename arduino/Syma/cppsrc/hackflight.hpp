@@ -33,8 +33,7 @@ namespace hf {
             uint8_t _led_pin = 0;
 
             State _state = {};
-            SerialTask * _serial_tasks[10] = {};
-            uint8_t _serial_task_count = 0;
+            SerialTask gcsTask = {};
 
             bool _safeToArm = false;
             Sensor * _sensors[256] = {};
@@ -137,7 +136,6 @@ namespace hf {
                 _led_pin = ledPin;
 
                 _sensor_count = 0;
-                _serial_task_count = 0;
                 _controller_count = 0;
             }
 
@@ -174,22 +172,18 @@ namespace hf {
                 // Check sensors
                 checkSensors();
 
-                // Update serial tasks
-                for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(_mixer, &_state, motorsOut, serial);
+                // Update serial task
+                gcsTask.parse(_mixer, &_state, serial);
+
+                // Support motor testing from GCS
+                if (!_state.armed) {
+                    _mixer->runDisarmed(motorsOut);
                 }
 
+                // Determine LED state
                 uint32_t time_msec = copilot_time_msec;
+                ledOut = time_msec < 2000 ?  ((time_msec / 50) % 2) == 0 : _state.armed;
 
-                ledOut = time_msec < 2000 ?
-                    ((time_msec / 50) % 2) == 0
-                    : _state.armed;
-
-            }
-
-            void addSerialTask(SerialTask * task)
-            {
-                _serial_tasks[_serial_task_count++] = task;
             }
 
     }; // class Hackflight

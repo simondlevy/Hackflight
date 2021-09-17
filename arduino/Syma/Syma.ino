@@ -59,9 +59,6 @@ static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static hf::USFS imu;
 
-// Serial tasks ================================================================
-
-hf::SerialTask gcsTask;
 
 // Hackflight object ===========================================================
 
@@ -86,7 +83,6 @@ void setup(void)
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
     h.addPidController(&yawPid);
-    h.addSerialTask(&gcsTask);
     h.begin();
 }
 
