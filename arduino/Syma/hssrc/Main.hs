@@ -13,7 +13,7 @@ import Copilot.Compile.C99
 import Prelude hiding(not)
 
 -- Core
-import Hackflight
+import HackflightFull
 import Safety
 import Serial
 import State
@@ -67,15 +67,10 @@ spec = do
   let mixer = quadXAPMixer
 
   -- Run the main Hackflight algorithm, getting the motor spins and LED state
-  let (motors, ledState, serialBuffer, starting) = hackflightFull
-                                                   receiver
-                                                   sensors
-                                                   pidControllers
-                                                   mixer
-                                                   getSafetyReal
-                                                   parseReal
-
-  let looping = not starting
+  let (motors, ledState, serialBuffer, starting) = hackflightFull receiver
+                                                                  sensors
+                                                                  pidControllers
+                                                                  mixer
 
   -- Do some setup the first time around
   trigger "copilot_startSerial" starting []     
@@ -89,6 +84,8 @@ spec = do
   trigger "copilot_startBrushedMotor" starting [arg $ pin motor3]
   trigger "copilot_startBrushedMotor" starting [arg $ pin motor4]
   
+  let looping = not starting
+
   -- Send the LED using external C function during the looping phase
   trigger "copilot_setLed" looping [arg $ pin led, arg ledState]
 

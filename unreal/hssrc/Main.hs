@@ -12,7 +12,7 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 -- Core
-import Hackflight
+import HackflightSim
 import Safety
 import Serial
 import State

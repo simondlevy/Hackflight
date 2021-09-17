@@ -12,6 +12,7 @@ HSRC = Main.hs \
 	   $(SRCDIR)/Serial.hs \
        $(SRCDIR)/Receiver.hs \
        $(SRCDIR)/Hackflight.hs \
+       $(SRCDIR)/HackflightSim.hs \
        $(SRCDIR)/Demands.hs \
        $(SRCDIR)/State.hs \
        $(SRCDIR)/Sensor.hs \

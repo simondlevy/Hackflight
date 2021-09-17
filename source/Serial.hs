@@ -32,15 +32,9 @@ data SerialBuffer = SerialBuffer {  count    :: Stream Word8
                                   , output11 :: Stream Float
                                   , output12 :: Stream Float
                                   }
-type ParserState = Stream Word8
+parse :: Mixer -> State -> SerialBuffer
 
-type ParserFun = Mixer -> State -> SerialBuffer
-
-parseSim :: ParserFun
-parseSim _ _ = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-
-parseReal :: ParserFun
-parseReal mixer vehicleState = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+parse mixer vehicleState = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
   where 
 
