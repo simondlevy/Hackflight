@@ -34,33 +34,59 @@ void copilot_updateSerial(void)
     }
 }
 
-static uint8_t _serialInputBuffer[128] = {};
+static uint8_t _serialBuffer[128] = {};
 static uint8_t _serialInputIndex;
 
-void copilot_handleSerialByte(serial_t & serialByte)
+void copilot_handleSerial(serial_t & serial)
 {
-   if (serialByte.status == 1) { // incomding data (e.g., set motors)
+    if (serial.count == -1) { // incomding data (e.g., set motors)
 
-      _serialInputBuffer[_serialInputIndex++] = serialByte.value;
+        _serialBuffer[_serialInputIndex++] = serial.input;
 
-      switch (_serialInputIndex) {
-          case 4:
-              memcpy(&copilot_Input1, &_serialInputBuffer[0], sizeof(float));
-              break;
-          case 8:
-              memcpy(&copilot_Input2, &_serialInputBuffer[4], sizeof(float));
-              break;
-          case 12:
-              memcpy(&copilot_Input3, &_serialInputBuffer[8], sizeof(float));
-              break;
-          case 16:
-              memcpy(&copilot_Input4, &_serialInputBuffer[12], sizeof(float));
-              break;
-      }
-   }
-   else {
-       _serialInputIndex = 0;
-   }
+        switch (_serialInputIndex) {
+            case 4:
+                memcpy(&copilot_Input1, &_serialBuffer[0], sizeof(float));
+                break;
+            case 8:
+                memcpy(&copilot_Input2, &_serialBuffer[4], sizeof(float));
+                break;
+            case 12:
+                memcpy(&copilot_Input3, &_serialBuffer[8], sizeof(float));
+                break;
+            case 16:
+                memcpy(&copilot_Input4, &_serialBuffer[12], sizeof(float));
+                break;
+        }
+    }
+
+    else if (serial.count > 0) { // outgoing message
+
+        Serial.write('$');
+        Serial.write('M');
+        Serial.write('>');
+
+        uint8_t size = serial.count * 4; // all values are float
+
+        Serial.write(size);
+        Serial.write(serial.type);
+
+        uint8_t crc = size ^ serial.type;
+
+        uint8_t * p = (uint8_t *)&serial.output01;
+
+        for (uint8_t k=0; k<size; ++k) {
+            uint8_t c = *p;
+            Serial.write(c);
+            crc ^= c;
+            p++;
+        }
+        
+        Serial.write(crc);
+    }
+
+    else {                      // no serial activity
+        _serialInputIndex = 0;
+    }
 }
 
 void copilot_convertFloat(float value)

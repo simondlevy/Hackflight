@@ -19,6 +19,8 @@ from motors import MotorsQuadXMW, MotorsCoaxial
 from receiver import Receiver
 from resources import resource_path
 
+from debugging import debug
+
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
 

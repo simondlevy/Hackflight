@@ -101,12 +101,11 @@ void loop(void)
 
     float motors[4] = {};
     bool led = false;
+    serial_t serial = {};
 
-    serial_t serialByte = {};
+    h.update(motors, led, serial);
 
-    h.update(motors, led, serialByte);
-
-    copilot_handleSerialByte(serialByte);
+    copilot_handleSerial(serial);
 
     copilot_setLed(LED_PIN, led);
 
@@ -114,5 +113,4 @@ void loop(void)
     copilot_writeBrushedMotor(MOTOR2_PIN, motors[1]);
     copilot_writeBrushedMotor(MOTOR3_PIN, motors[2]);
     copilot_writeBrushedMotor(MOTOR4_PIN, motors[3]);
-
 }

@@ -163,7 +163,7 @@ namespace hf {
                 _mixer->begin();
             }
 
-            void update(float * motorsOut, bool & ledOut, serial_t & serialIn)
+            void update(float * motorsOut, bool & ledOut, serial_t & serial)
             {
                 // Grab control signal if available
                 checkReceiver(motorsOut);
@@ -176,7 +176,7 @@ namespace hf {
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(_mixer, &_state, motorsOut, serialIn);
+                    _serial_tasks[k]->update(_mixer, &_state, motorsOut, serial);
                 }
 
                 uint32_t time_msec = copilot_time_msec;
@@ -189,7 +189,6 @@ namespace hf {
 
             void addSerialTask(SerialTask * task)
             {
-                task->init(_mixer, &_state);
                 _serial_tasks[_serial_task_count++] = task;
             }
 

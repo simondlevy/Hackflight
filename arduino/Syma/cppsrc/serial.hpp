@@ -21,86 +21,7 @@ namespace hf {
 
         private:
 
-            uint8_t _outBufChecksum;
-
-            State * _state = NULL;
-            Mixer * _mixer = NULL;
-
-            void serialize16(int16_t a)
-            {
-                serialize8(a & 0xFF);
-                serialize8((a >> 8) & 0xFF);
-            }
-
-            void serialize32(uint32_t a)
-            {
-                serialize8(a & 0xFF);
-                serialize8((a >> 8) & 0xFF);
-                serialize8((a >> 16) & 0xFF);
-                serialize8((a >> 24) & 0xFF);
-            }
-
-            void prepareToSend(uint8_t type, uint8_t count, uint8_t size)
-            {
-                _outBufChecksum = 0;
-
-                copilot_serialWrite('$');
-                copilot_serialWrite('M');
-                copilot_serialWrite('>');
-                serialize8(count*size);
-                serialize8(type);
-            }
-
-        protected:
-
-            void completeSend(void)
-            {
-                serialize8(_outBufChecksum);
-            }
-
-            void serialize8(uint8_t a)
-            {
-                copilot_serialWrite(a);
-                _outBufChecksum ^= a;
-            }
-
-            void prepareToSendBytes(uint8_t type, uint8_t count)
-            {
-                prepareToSend(type, count, 1);
-            }
-
-            void sendByte(uint8_t src)
-            {
-                serialize8(src);
-            }
-
-            void prepareToSendShorts(uint8_t type, uint8_t count)
-            {
-                prepareToSend(type, count, 2);
-            }
-
-            void sendFloat(float src)
-            {
-                copilot_convertFloat(src);
-                serialize32(copilot_32bits);
-            }
-
-            void prepareToSendInts(uint8_t type, uint8_t count)
-            {
-                prepareToSend(type, count, 4);
-            }
-
-            void prepareToSendFloats(uint8_t type, uint8_t count)
-            {
-                prepareToSend(type, count, 4);
-            }
-
-            void begin(void)
-            {
-                _outBufChecksum = 0;
-            }
-
-            void parse(uint8_t c, serial_t & serialByte)
+            void parse(Mixer * mixer, State * vehicleState, uint8_t c, serial_t & serial)
             {
                 enum {
                     IDLE,
@@ -143,117 +64,86 @@ namespace hf {
                     : parser_state == IN_PAYLOAD ? IDLE
                     : parser_state;
 
-                serialByte.status = 0; // assuming nothing
+                serial.count = 0; // assume nothing
+
+                digitalWrite(A4, true);
 
                 // Payload accumulation
                 if (in_payload) {
-                    serialByte.status = 1;
-                    serialByte.value = c;
+                    serial.count = -1; // incoming
+                    serial.input = c;
                 }
 
                 // Message dispatch
                 if (parser_state == IDLE && crc == c) {
+
                     if (size > 0) {
-                        handleSerialInput(type);
+                        handleSerialInput(mixer, type);
                     }
+
                     else {
-                        sendSerialOutput(type);
+
+                        prepareSerialOutput(vehicleState, mixer, type, serial);
                     }
                 }
 
             } // parse
 
-            void update(Mixer * mixer, State * state, float * motorsOut, serial_t & serialByte)
+            void prepareSerialOutput(State * vehicleState, Mixer * mixer, uint8_t type, serial_t & serial)
             {
-                if (copilot_serialAvailable) {
-                    parse(copilot_serialByte, serialByte);
-                }
+                serial.type = type;
 
-                // Support motor testing from GCS
-                if (!state->armed) {
-                    mixer->runDisarmed(motorsOut);
-                }
-            }
-
-            void sendSerialOutput(uint8_t type)
-            {
                 switch (type) {
 
                     case 121:
                         {
-                            float c1 = copilot_receiverThrottle;
-                            float c2 = copilot_receiverRoll;
-                            float c3 = copilot_receiverPitch;
-                            float c4 = copilot_receiverYaw;
-                            float c5 = copilot_receiverAux1;
-                            float c6 = 0;
-                            prepareToSendFloats(type, 6);
-                            sendFloat(c1);
-                            sendFloat(c2);
-                            sendFloat(c3);
-                            sendFloat(c4);
-                            sendFloat(c5);
-                            sendFloat(c6);
-                            completeSend();
+                            serial.count = 6;
+                            serial.output01 = copilot_receiverThrottle;
+                            serial.output02 = copilot_receiverRoll;
+                            serial.output03 = copilot_receiverPitch;
+                            serial.output04 = copilot_receiverYaw;
+                            serial.output05 = copilot_receiverAux1;
+                            serial.output06 = 0; // XXX we should support aux2
                         } break;
 
                     case 122:
                         {
-                            float x = _state->x[State::X];
-                            float dx = _state->x[State::DX];
-                            float y = _state->x[State::Y];
-                            float dy = _state->x[State::DY];
-                            float z = _state->x[State::Z];
-                            float dz = _state->x[State::DZ];
-                            float phi = _state->x[State::PHI];
-                            float dphi = _state->x[State::DPHI];
-                            float theta = _state->x[State::THETA];
-                            float dtheta = _state->x[State::DTHETA];
-                            float psi = _state->x[State::PSI];
-                            float dpsi = _state->x[State::DPSI];
-                            prepareToSendFloats(type, 12);
-                            sendFloat(x);
-                            sendFloat(dx);
-                            sendFloat(y);
-                            sendFloat(dy);
-                            sendFloat(z);
-                            sendFloat(dz);
-                            sendFloat(phi);
-                            sendFloat(dphi);
-                            sendFloat(theta);
-                            sendFloat(dtheta);
-                            sendFloat(psi);
-                            sendFloat(dpsi);
-                            completeSend();
+                            serial.count = 12;
+                            float * x = vehicleState->x;
+                            serial.output01 = x[State::X];
+                            serial.output02 = x[State::DX];
+                            serial.output03 = x[State::Y];
+                            serial.output04 = x[State::DY];
+                            serial.output05 = x[State::Z];
+                            serial.output06 = x[State::DZ];
+                            serial.output07 = x[State::PHI];
+                            serial.output08 = x[State::DPHI];
+                            serial.output09 = x[State::THETA];
+                            serial.output10 = x[State::DTHETA];
+                            serial.output11 = x[State::PSI];
+                            serial.output12 = x[State::DPSI];
                         } break;
 
                     case 123:
                         {
-                            uint8_t mtype = _mixer->getType();
-                            prepareToSendBytes(type, 1);
-                            sendByte(mtype);
-                            completeSend();
+                            serial.count = 1;
+                            serial.output01 = mixer->getType();
                         } break;
 
                 } // switch (type)
 
-            } // sendSerialOutput
+            } // prepareSerialOutput
 
-            void handleSerialInput(uint8_t type)
+            void handleSerialInput(Mixer * mixer, uint8_t type)
             {
                 switch (type) {
 
                     case 215:
                         {
-                            float m1 = copilot_Input1;
-                            float m2 = copilot_Input2;
-                            float m3 = copilot_Input3;
-                            float m4 = copilot_Input4;
-
-                            _mixer->setMotorDisarmed(0, m1);
-                            _mixer->setMotorDisarmed(1, m2);
-                            _mixer->setMotorDisarmed(2, m3);
-                            _mixer->setMotorDisarmed(3, m4);
+                            mixer->setMotorDisarmed(0, copilot_Input1);
+                            mixer->setMotorDisarmed(1, copilot_Input2);
+                            mixer->setMotorDisarmed(2, copilot_Input3);
+                            mixer->setMotorDisarmed(3, copilot_Input4);
 
                         } break;
 
@@ -261,10 +151,18 @@ namespace hf {
 
             } // handleSerialInput
 
-            void init( Mixer * mixer, State * state)
+        protected:
+
+            void update(Mixer * mixer, State * state, float * motorsOut, serial_t & serial)
             {
-                _mixer = mixer;
-                _state = state;
+                if (copilot_serialAvailable) {
+                    parse(mixer, state, copilot_serialByte, serial);
+                }
+
+                // Support motor testing from GCS
+                if (!state->armed) {
+                    mixer->runDisarmed(motorsOut);
+                }
             }
 
     }; // class SerialTask
