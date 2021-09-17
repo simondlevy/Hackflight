@@ -25,11 +25,9 @@ import Time(time_msec)
 import Serial
 import Utils(compose)
 
-hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> SafetyFun -> ParserFun ->
-    (Motors, Stream Bool, SerialBuffer, Stream Bool)
+hackflightPure :: Receiver -> [Sensor] -> [PidController] -> Mixer -> SafetyFun -> (Motors, Safety)
 
-hackflight receiver sensors pidControllers mixer safetyFun parserFun 
-  = (motors, led, serialBuffer, starting)
+hackflightPure receiver sensors pidControllers mixer safetyFun = (motors, safety)
 
   where
 
@@ -60,6 +58,18 @@ hackflight receiver sensors pidControllers mixer safetyFun parserFun
     -- Apply mixer to demands to get motor values, returning motor values and LED state
     motors = mixer safety demands
 
+-------------------------------------------------------------------------------------
+
+hackflightFull :: Receiver -> [Sensor] -> [PidController] -> Mixer -> SafetyFun -> ParserFun ->
+    (Motors, Stream Bool, SerialBuffer, Stream Bool)
+
+hackflightFull receiver sensors pidControllers mixer safetyFun parserFun 
+  = (motors, led, serialBuffer, starting)
+
+  where
+
+    (motors, safety) = hackflightPure receiver sensors pidControllers mixer safetyFun
+
     -- Blink LED on startup
     led = if time_msec < 5000 then (mod (div time_msec 50) 2 == 0)
           else armed safety
@@ -69,3 +79,12 @@ hackflight receiver sensors pidControllers mixer safetyFun parserFun
 
     -- Helps to init first time around
     starting = [False] ++ true
+
+-------------------------------------------------------------------------------------
+
+
+hackflightSim :: Receiver -> [Sensor] -> [PidController] -> Mixer -> Motors
+
+hackflightSim receiver sensors pidControllers mixer = motors
+   where
+     (motors, _) = hackflightPure receiver sensors pidControllers mixer getSafetySim
