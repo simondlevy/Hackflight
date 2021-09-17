@@ -55,4 +55,3 @@ typedef struct {
 
 void copilot_serialWrite(uint8_t copilot_serialWrite_arg0);
 void copilot_handleSerial(serial_t & b);
-void copilot_convertFloat(float value);

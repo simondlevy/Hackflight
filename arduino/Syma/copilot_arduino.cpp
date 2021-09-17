@@ -89,11 +89,6 @@ void copilot_handleSerial(serial_t & serial)
     }
 }
 
-void copilot_convertFloat(float value)
-{
-    memcpy(&copilot_32bits, &value, 4);
-}
-
 // LED---------------------------------------------------------------
 
 void copilot_startLed(uint8_t pin)
