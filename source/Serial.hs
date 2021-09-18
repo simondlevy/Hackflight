@@ -36,6 +36,9 @@ data SerialBuffer = SerialBuffer {  count   :: Stream Word8
                                   , outvals :: OutputValues 
                                  }
 
+emptyOutput :: OutputValues
+emptyOutput = OutputValues 0 0 0 0 0 0 0 0 0 0 0 0
+
 -- Parser state constants
 
 type ParserState = Stream Word8
@@ -109,7 +112,7 @@ parse mixer vehicleState = SerialBuffer count mtype input output
 
     input = 0
 
-    output = OutputValues 0 0 0 0 0 0 0 0 0 0 0 0
+    output = emptyOutput
 
 ----------------------------------------------------------
 
