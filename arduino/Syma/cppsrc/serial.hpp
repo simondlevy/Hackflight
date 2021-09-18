@@ -27,8 +27,6 @@ namespace hf {
                 uint8_t type,
                 serial_t & serial)
         {
-            serial.type = type;
-
             switch (type) {
 
                 case 121:
@@ -153,6 +151,8 @@ namespace hf {
 
                 // Message dispatch
                 if (ready) {
+
+                    serial.type = type;
 
                     if (size > 0) {
                         handleSerialInput(mixer, type);
