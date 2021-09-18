@@ -70,6 +70,10 @@ mtype2count mt = if mt == 121 then 6
 receiverValue :: Stream Word8 -> Stream Float
 receiverValue index =
   if index == 0 then receiverThrottle
+  else if index == 1 then receiverRoll
+  else if index == 2 then receiverPitch
+  else if index == 3 then receiverYaw
+  else if index == 4 then receiverAux1
   else 0
 
 getOutputValue :: Stream Bool -> State -> Stream Word8 -> Stream Word8 -> Stream Float
