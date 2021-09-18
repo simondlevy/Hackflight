@@ -102,6 +102,11 @@ getOutputValue ready vehicleState mixer msgtype index =
   else if msgtype == 123 then getMixerType mixer
   else 0
 
+type OutputValueAccessor = State -> Mixer -> Stream Word8 -> Stream Float
+
+vehicleStateAccessor :: OutputValueAccessor
+vehicleStateAccessor vehicleState _ index = vehicleStateValue vehicleState index
+
 -- Parser function
 
 parse :: Mixer -> State -> SerialBuffer
