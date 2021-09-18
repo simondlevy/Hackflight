@@ -61,12 +61,6 @@ pInPayload = 5
 
 -- Helper fucntions
 
-msgtype2count :: Stream Word8 -> Stream Word8
-msgtype2count mt = if mt == 121 then 6
-                 else if mt == 122 then 12
-                 else if mt == 123 then 1
-                 else 0
-
 receiverValue :: Stream Word8 -> Stream Float
 receiverValue index =
   if index == 0 then receiverThrottle
@@ -92,7 +86,14 @@ vehicleStateValue vehicleState index =
   else if index == 11 then dpsi vehicleState
   else 0
 
-getOutputValue :: Stream Bool -> State -> Mixer -> Stream Word8 -> Stream Word8 -> Stream Float
+getOutputSize :: Stream Word8 -> Stream Word8
+getOutputSize mt = if mt == 121 then 6
+                 else if mt == 122 then 12
+                 else if mt == 123 then 1
+                 else 0
+
+getOutputValue :: Stream Bool -> State -> Mixer -> Stream Word8 -> Stream Word8
+  -> Stream Float
 
 getOutputValue ready vehicleState mixer msgtype index = 
   if not ready then 0
@@ -140,9 +141,7 @@ parse mixer vehicleState = SerialBuffer count msgtype input output
 
     ready = pstate == pIdle && crc == c
 
-    count = if inPayload then -1
-            else if ready then msgtype2count msgtype
-            else 0
+    count = if inPayload then -1 else if ready then getOutputSize msgtype else 0
 
     input = if inPayload then c else 0
 
