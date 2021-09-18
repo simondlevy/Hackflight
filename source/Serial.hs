@@ -12,6 +12,7 @@ module Serial where
 
 import Language.Copilot hiding(xor)
 
+import Receiver
 import State
 import Mixer
 import Utils(xor)
@@ -66,11 +67,17 @@ mtype2count mt = if mt == 121 then 6
                  else if mt == 123 then 1
                  else 0
 
-outputValue :: Stream Bool -> State -> Stream Word8 -> Stream Word8 -> Stream Float
+receiverValue :: Stream Word8 -> Stream Float
+receiverValue index =
+  if index == 0 then receiverThrottle
+  else 0
 
-outputValue ready vehicleState mtype index = 
-  if not ready then 0 else 0
-  -- if ready and mtype == 121 then receiverValue index then  else 0
+getOutputValue :: Stream Bool -> State -> Stream Word8 -> Stream Word8 -> Stream Float
+
+getOutputValue ready vehicleState mtype index = 
+  if not ready then 0
+  else if mtype == 121 then receiverValue index
+  else 0
 
 -- Parser function
 
@@ -117,7 +124,7 @@ parse mixer vehicleState = SerialBuffer count mtype input output
 
     input = if inPayload then c else 0
 
-    v01 = outputValue ready vehicleState mtype 1
+    v01 = getOutputValue ready vehicleState mtype 0
     v02 = 0
     v03 = 0
     v04 = 0
