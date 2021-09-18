@@ -37,6 +37,12 @@ data SerialBuffer = SerialBuffer {  count   :: Stream Word8
                                   , outvals :: OutputValues 
                                  }
 
+data SerialMotors = SerialMotors {  mval1 :: Stream Float
+                                  , mval2 :: Stream Float
+                                  , mval3 :: Stream Float
+                                  , mval4 :: Stream Float
+                                 }
+                  
 -- Parser state constants
 
 type ParserState = Stream Word8
