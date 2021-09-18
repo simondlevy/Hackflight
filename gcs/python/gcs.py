@@ -187,10 +187,6 @@ class GCS(MspParser):
         if self.imu.running:
             self._send_state_request()
 
-    def handle_ACTUATOR_TYPE(self, atype):
-        dlog = self.motors_coaxial if atype == 1 else self.motors_quadxmw
-        dlog.start()
-
     def _add_pane(self):
 
         pane = tk.PanedWindow(self.frame, bg=BACKGROUND_COLOR)
@@ -253,11 +249,9 @@ class GCS(MspParser):
     def _motors_button_callback(self):
 
         self._clear()
-
-        self.comms.send_request(self.actuator_type_request)
-
         self.imu.stop()
         self.receiver.stop()
+        self.motors_quadxmw.start()
 
     def _clear(self):
 

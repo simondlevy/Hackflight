@@ -58,12 +58,6 @@ namespace hf {
                         serial.output12 = x[State::DPSI];
                     } break;
 
-                case 123:
-                    {
-                        serial.count = 1;
-                        serial.output01 = mixer->getType();
-                    } break;
-
             } // switch (type)
 
         } // prepareSerialOutput
@@ -89,7 +83,6 @@ namespace hf {
         {
             return mt == 121 ? 6
                  : mt == 122 ? 12
-                 : mt == 123 ? 1
                  : 0;
         }
 

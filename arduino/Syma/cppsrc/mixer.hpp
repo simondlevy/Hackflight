@@ -108,8 +108,6 @@ namespace hf {
                 }
             }
 
-            virtual uint8_t getType(void) { return 0; }
-
     }; // class Mixer
 
 } // namespace hf
