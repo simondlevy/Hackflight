@@ -89,7 +89,6 @@ vehicleStateValue vehicleState index =
 getOutputSize :: Stream Word8 -> Stream Word8
 getOutputSize msgtype = if msgtype == 121 then 6
                  else if msgtype == 122 then 12
-                 else if msgtype == 123 then 1
                  else 0
 
 getOutputValue :: Stream Bool -> State -> Mixer -> Stream Word8 -> Stream Word8
@@ -98,7 +97,6 @@ getOutputValue ready vehicleState mixer msgtype index =
   if not ready then 0
   else if msgtype == 121 then receiverValue index
   else if msgtype == 122 then vehicleStateValue vehicleState index
-  else if msgtype == 123 then getMixerType mixer
   else 0
 
 -- Parser function
