@@ -69,8 +69,6 @@ namespace hf {
 
                 serial.count = 0; // assume nothing
 
-                digitalWrite(A4, true);
-
                 // Payload accumulation
                 if (in_payload) {
                     serial.count = -1; // incoming

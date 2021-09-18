@@ -60,9 +60,7 @@ pInPayload = 5
 
 parse :: Mixer -> State -> SerialBuffer
 
--- parse mixer vehicleState = if serialAvailable then (SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0) else emptySerialBuffer 
-parse mixer vehicleState = emptySerialBuffer 
-
+parse mixer vehicleState = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
   where 
 
     c = serialByteIn
@@ -72,6 +70,9 @@ parse mixer vehicleState = emptySerialBuffer
 
     index = if pstate' == pInPayload then index' + 1 else  0
     index' = [0] ++ index
+
+    incoming = mtype' >= 200
+    inPayload = incoming && pstate == pInPayload
 
     mtype = if pstate' == pGotSize then c else mtype'
     mtype' = [0] ++ mtype
