@@ -32,87 +32,57 @@ data SerialBuffer = SerialBuffer {  count    :: Stream Word8
                                   , output11 :: Stream Float
                                   , output12 :: Stream Float
                                   }
+
+emptySerialBuffer :: SerialBuffer
+emptySerialBuffer = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+-- Parser state constants
+
+type ParserState = Stream Word8
+
+pIdle :: ParserState
+pIdle = 0
+
+pGotStart :: ParserState
+pGotStart = 1
+
+pGotM :: ParserState
+pGotM = 2
+
+pGotArrow :: ParserState
+pGotArrow = 3
+
+pGotSize :: ParserState
+pGotSize = 4
+
+pInPayload :: ParserState
+pInPayload = 5
+
 parse :: Mixer -> State -> SerialBuffer
 
-parse mixer vehicleState = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+-- parse mixer vehicleState = if serialAvailable then (SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0) else emptySerialBuffer 
+parse mixer vehicleState = emptySerialBuffer 
 
   where 
 
-    -- Parser state constants
-    parserIdle      = 0
-    parserGotStart  = 1
-    parserGotM      = 2
-    parserGotArrow  = 3
-    parserGotSize   = 4
-    parserInPayload = 5
+    c = serialByteIn
 
-{--
-    command = 
+    size = if pState' == pGotArrow then c else size'
+    size' = [0] ++ size
 
-      if not serialAvailable then command'
-      else if parserState == parserHeaderSize then serialByteIn
-      else command'
+    index = if pState' == pInPayload then index' + 1 else  0
+    index' = [0] ++ index
 
-    checksum = 
-
-      if not serialAvailable then checksum'
-      else if parserState == parserHeaderArrow then serialByteIn
-      else if parserState == parserHeaderSize then xor checksum' serialByteIn
-      else checksum'
-
-    offset = 
-
-      if not serialAvailable then offset'
-      else if parserState == parserHeaderArrow then 0
-      else if parserState == parserHeaderCmd && offset' < dataSize then offset' + 1
-      else offset'
-
-    dataSize = 
-
-      if not serialAvailable then dataSize'
-      else if parserState == parserHeaderArrow then serialByteIn
-      else dataSize'
-
-    parserState =
-
-      if not serialAvailable then parserState'
-
-      else if parserState == parserIdle && serialByteIn == 0x24 -- '$'
-          then parserHeaderStart
-
-      else if parserState == parserHeaderStart && serialByteIn == 0x4D -- 'M'
-          then parserHeaderM
-
-      else if parserState == parserHeaderM && serialByteIn == 0x3E -- '>'
-          then parserHeaderArrow
-
-      else if parserState == parserHeaderM && serialByteIn == 0x3C -- '<'
-          then parserHeaderArrow
-
-      else if parserState == parserHeaderArrow
-          then parserHeaderSize
-
-      else if parserState == parserHeaderSize
-          then parserHeaderCmd
-
-      else if parserState == parserHeaderCmd && offset < dataSize
-          then parserHeaderCmd
-
-      else if parserState == parserHeaderCmd
-              && offset == dataSize
-              && checksum == serialByteIn
-          then parserHeaderCmd
-
-      else parserIdle
-
-    -- Parser state variables
-    parserState' = [0] ++ parserState :: Stream Word8
-    dataSize' = [0] ++ dataSize :: Stream Word8
-    offset' = [0] ++ offset :: Stream Word8
-    checksum' = [0] ++ checksum :: Stream Word8
-    command' = [0] ++ command :: Stream Word8
-
---}
+    -- Parser state transition function
+    pState = if pState' == pIdle && c == 24 then pGotStart
+                  else if pState' == pGotStart && c == 77 then pGotM
+                  else if pState' == pGotM && (c == 60 || c == 62) then pGotArrow
+                  else if pState' == pGotArrow then pGotSize
+                  else if pState' == pGotSize then pInPayload
+                  else if pState' == pInPayload && index < size then pInPayload
+                  else if pState' == pInPayload then pIdle
+                  else pState'
+    pState' = [0] ++ pState
 
 ----------------------------------------------------------
 
