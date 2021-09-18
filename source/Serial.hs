@@ -97,9 +97,9 @@ getOutputSize msgtype = if msgtype == 121 then 6
                  else if msgtype == 122 then 12
                  else 0
 
-getOutputValue :: Stream Bool -> State -> Mixer -> Stream Word8 -> Stream Word8
+getOutputValue :: Stream Bool -> State -> Stream Word8 -> Stream Word8
   -> Stream Float
-getOutputValue ready vehicleState mixer msgtype index = 
+getOutputValue ready vehicleState msgtype index = 
   if not ready then 0
   else if msgtype == 121 then receiverValue index
   else if msgtype == 122 then vehicleStateValue vehicleState index
@@ -148,18 +148,18 @@ parse mixer vehicleState = SerialBuffer count msgtype input output
 
     count = if inPayload then -1 else if ready then getOutputSize msgtype else 0
 
-    v01 = getOutputValue ready vehicleState mixer msgtype 0
-    v02 = getOutputValue ready vehicleState mixer msgtype 1
-    v03 = getOutputValue ready vehicleState mixer msgtype 2
-    v04 = getOutputValue ready vehicleState mixer msgtype 3
-    v05 = getOutputValue ready vehicleState mixer msgtype 4
-    v06 = getOutputValue ready vehicleState mixer msgtype 5
-    v07 = getOutputValue ready vehicleState mixer msgtype 6
-    v08 = getOutputValue ready vehicleState mixer msgtype 7
-    v09 = getOutputValue ready vehicleState mixer msgtype 8
-    v10 = getOutputValue ready vehicleState mixer msgtype 9
-    v11 = getOutputValue ready vehicleState mixer msgtype 10
-    v12 = getOutputValue ready vehicleState mixer msgtype 11
+    v01 = getOutputValue ready vehicleState msgtype 0
+    v02 = getOutputValue ready vehicleState msgtype 1
+    v03 = getOutputValue ready vehicleState msgtype 2
+    v04 = getOutputValue ready vehicleState msgtype 3
+    v05 = getOutputValue ready vehicleState msgtype 4
+    v06 = getOutputValue ready vehicleState msgtype 5
+    v07 = getOutputValue ready vehicleState msgtype 6
+    v08 = getOutputValue ready vehicleState msgtype 7
+    v09 = getOutputValue ready vehicleState msgtype 8
+    v10 = getOutputValue ready vehicleState msgtype 9
+    v11 = getOutputValue ready vehicleState msgtype 10
+    v12 = getOutputValue ready vehicleState msgtype 11
 
     output = OutputValues v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11 v12
 
