@@ -32,7 +32,7 @@ data OutputValues = OutputValues {  v01 :: Stream Float
                                   }
  
 data SerialBuffer = SerialBuffer {  count   :: Stream Word8
-                                  , mtype   :: Stream Word8
+                                  , msgtype   :: Stream Word8
                                   , input   :: Stream Word8
                                   , outvals :: OutputValues 
                                  }
@@ -61,8 +61,8 @@ pInPayload = 5
 
 -- Helper fucntion
 
-mtype2count :: Stream Word8 -> Stream Word8
-mtype2count mt = if mt == 121 then 6
+msgtype2count :: Stream Word8 -> Stream Word8
+msgtype2count mt = if mt == 121 then 6
                  else if mt == 122 then 12
                  else if mt == 123 then 1
                  else 0
@@ -92,19 +92,20 @@ vehicleStateValue vehicleState index =
   else if index == 11 then dpsi vehicleState
   else 0
 
-getOutputValue :: Stream Bool -> State -> Stream Word8 -> Stream Word8 -> Stream Float
+getOutputValue :: Stream Bool -> State -> Mixer -> Stream Word8 -> Stream Word8 -> Stream Float
 
-getOutputValue ready vehicleState mtype index = 
+getOutputValue ready vehicleState mixer msgtype index = 
   if not ready then 0
-  else if mtype == 121 then receiverValue index
-  else if mtype == 122 then vehicleStateValue vehicleState index
+  else if msgtype == 121 then receiverValue index
+  else if msgtype == 122 then vehicleStateValue vehicleState index
+  else if msgtype == 123 then getMixerType mixer
   else 0
 
 -- Parser function
 
 parse :: Mixer -> State -> SerialBuffer
 
-parse mixer vehicleState = SerialBuffer count mtype input output
+parse mixer vehicleState = SerialBuffer count msgtype input output
 
   where 
 
@@ -116,11 +117,11 @@ parse mixer vehicleState = SerialBuffer count mtype input output
     index = if pstate' == pInPayload then index' + 1 else  0
     index' = [0] ++ index
 
-    incoming = mtype' >= 200
+    incoming = msgtype' >= 200
     inPayload = incoming && pstate == pInPayload
 
-    mtype = if pstate' == pGotSize then c else mtype'
-    mtype' = [0] ++ mtype
+    msgtype = if pstate' == pGotSize then c else msgtype'
+    msgtype' = [0] ++ msgtype
 
     crc = if pstate' == pGotArrow then c
           else if pstate' == pInPayload then xor crc' c
@@ -140,12 +141,12 @@ parse mixer vehicleState = SerialBuffer count mtype input output
     ready = pstate == pIdle && crc == c
 
     count = if inPayload then -1
-            else if pstate == pIdle && crc == c then mtype2count mtype
+            else if pstate == pIdle && crc == c then msgtype2count msgtype
             else 0
 
     input = if inPayload then c else 0
 
-    v01 = getOutputValue ready vehicleState mtype 0
+    v01 = getOutputValue ready vehicleState mixer msgtype 0
     v02 = 0
     v03 = 0
     v04 = 0
