@@ -16,23 +16,25 @@ import State
 import Mixer
 import Utils(xor)
 
-
-data SerialBuffer = SerialBuffer {  count  :: Stream Word8
-                                  , mtype    :: Stream Word8
-                                  , input    :: Stream Word8
-                                  , output01 :: Stream Float
-                                  , output02 :: Stream Float
-                                  , output03 :: Stream Float
-                                  , output04 :: Stream Float
-                                  , output05 :: Stream Float
-                                  , output06 :: Stream Float
-                                  , output07 :: Stream Float
-                                  , output08 :: Stream Float
-                                  , output09 :: Stream Float
-                                  , output10 :: Stream Float
-                                  , output11 :: Stream Float
-                                  , output12 :: Stream Float
+data OutputValues = OutputValues {  v01 :: Stream Float
+                                  , v02 :: Stream Float
+                                  , v03 :: Stream Float
+                                  , v04 :: Stream Float
+                                  , v05 :: Stream Float
+                                  , v06 :: Stream Float
+                                  , v07 :: Stream Float
+                                  , v08 :: Stream Float
+                                  , v09 :: Stream Float
+                                  , v10 :: Stream Float
+                                  , v11 :: Stream Float
+                                  , v12 :: Stream Float
                                   }
+ 
+data SerialBuffer = SerialBuffer {  count   :: Stream Word8
+                                  , mtype   :: Stream Word8
+                                  , input   :: Stream Word8
+                                  , outvals :: OutputValues 
+                                 }
 
 -- Parser state constants
 
@@ -56,29 +58,20 @@ pGotSize = 4
 pInPayload :: ParserState
 pInPayload = 5
 
+-- Helper fucntion
+
 mtype2count :: Stream Word8 -> Stream Word8
 mtype2count mt = if mt == 121 then 6
                  else if mt == 122 then 12
                  else if mt == 123 then 1
                  else 0
 
+-- Parser function
+
 parse :: Mixer -> State -> SerialBuffer
 
-parse mixer vehicleState = SerialBuffer count
-                                        mtype
-                                        input
-                                        out01
-                                        out02
-                                        out03
-                                        out04
-                                        out05
-                                        out06
-                                        out07
-                                        out08
-                                        out09
-                                        out10
-                                        out11
-                                        out12
+parse mixer vehicleState = SerialBuffer count mtype input output
+
   where 
 
     c = serialByteIn
@@ -116,18 +109,7 @@ parse mixer vehicleState = SerialBuffer count
 
     input = 0
 
-    out01 = 0
-    out02 = 0
-    out03 = 0
-    out04 = 0
-    out05 = 0
-    out06 = 0
-    out07 = 0
-    out08 = 0
-    out09 = 0
-    out10 = 0
-    out11 = 0
-    out12 = 0
+    output = OutputValues 0 0 0 0 0 0 0 0 0 0 0 0
 
 ----------------------------------------------------------
 
