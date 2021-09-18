@@ -111,7 +111,7 @@ parse mixer vehicleState = SerialBuffer count
     pstate' = [0] ++ pstate
 
     count = if inPayload then -1
-            --else if pstate == pIdle && crc == c then mtype2count mtype
+            else if pstate == pIdle && crc == c then mtype2count mtype
             else 0
 
     input = 0
