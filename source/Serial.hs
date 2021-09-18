@@ -147,17 +147,17 @@ parse mixer vehicleState = SerialBuffer count msgtype input output
     input = if inPayload then c else 0
 
     v01 = getOutputValue ready vehicleState mixer msgtype 0
-    v02 = 0
-    v03 = 0
-    v04 = 0
-    v05 = 0
-    v06 = 0
-    v07 = 0
-    v08 = 0
-    v09 = 0
-    v10 = 0
-    v11 = 0
-    v12 = 0
+    v02 = getOutputValue ready vehicleState mixer msgtype 1
+    v03 = getOutputValue ready vehicleState mixer msgtype 2
+    v04 = getOutputValue ready vehicleState mixer msgtype 3
+    v05 = getOutputValue ready vehicleState mixer msgtype 4
+    v06 = getOutputValue ready vehicleState mixer msgtype 5
+    v07 = getOutputValue ready vehicleState mixer msgtype 6
+    v08 = getOutputValue ready vehicleState mixer msgtype 7
+    v09 = getOutputValue ready vehicleState mixer msgtype 8
+    v10 = getOutputValue ready vehicleState mixer msgtype 9
+    v11 = getOutputValue ready vehicleState mixer msgtype 10
+    v12 = getOutputValue ready vehicleState mixer msgtype 11
 
     output = OutputValues v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11 v12
 
