@@ -36,9 +36,6 @@ data SerialBuffer = SerialBuffer {  count   :: Stream Word8
                                   , outvals :: OutputValues 
                                  }
 
-emptyOutput :: OutputValues
-emptyOutput = OutputValues 0 0 0 0 0 0 0 0 0 0 0 0
-
 -- Parser state constants
 
 type ParserState = Stream Word8
@@ -114,7 +111,20 @@ parse mixer vehicleState = SerialBuffer count mtype input output
 
     input = if inPayload then c else 0
 
-    output = emptyOutput
+    v01 = 0
+    v02 = 0
+    v03 = 0
+    v04 = 0
+    v05 = 0
+    v06 = 0
+    v07 = 0
+    v08 = 0
+    v09 = 0
+    v10 = 0
+    v11 = 0
+    v12 = 0
+
+    output = OutputValues v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11 v12
 
 ----------------------------------------------------------
 
