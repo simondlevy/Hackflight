@@ -107,6 +107,9 @@ type OutputValueAccessor = State -> Mixer -> Stream Word8 -> Stream Float
 vehicleStateAccessor :: OutputValueAccessor
 vehicleStateAccessor vehicleState _ index = vehicleStateValue vehicleState index
 
+mixerAccessor :: OutputValueAccessor
+mixerAccessor _ mixer index = getMixerType mixer
+
 -- Parser function
 
 parse :: Mixer -> State -> SerialBuffer
