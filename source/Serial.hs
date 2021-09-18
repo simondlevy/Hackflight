@@ -58,7 +58,21 @@ pInPayload = 5
 
 parse :: Mixer -> State -> SerialBuffer
 
-parse mixer vehicleState = SerialBuffer count mtype 0 0 0 0 0 0 0 0 0 0 0 0 0
+parse mixer vehicleState = SerialBuffer count
+                                        mtype
+                                        input
+                                        0
+                                        0
+                                        0
+                                        0
+                                        0
+                                        0
+                                        0
+                                        0
+                                        0
+                                        0
+                                        0
+                                        0
 
   where 
 
@@ -81,7 +95,6 @@ parse mixer vehicleState = SerialBuffer count mtype 0 0 0 0 0 0 0 0 0 0 0 0 0
           else 0
     crc' = [0] ++ crc
  
-    -- Parser state transition function
     pstate = if pstate' == pIdle && c == 24 then pGotStart
                   else if pstate' == pGotStart && c == 77 then pGotM
                   else if pstate' == pGotM && (c == 60 || c == 62) then pGotArrow
@@ -93,6 +106,8 @@ parse mixer vehicleState = SerialBuffer count mtype 0 0 0 0 0 0 0 0 0 0 0 0 0
     pstate' = [0] ++ pstate
 
     count = if inPayload then -1 else 0
+
+    input = 0
 
 ----------------------------------------------------------
 
