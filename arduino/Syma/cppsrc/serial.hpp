@@ -39,7 +39,6 @@ namespace hf {
                 static uint8_t size;
                 static uint8_t index;
 
-
                 uint8_t c = copilot_serialByte;
 
                 // Payload functions

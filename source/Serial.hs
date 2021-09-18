@@ -17,8 +17,9 @@ import Mixer
 import Utils(xor)
 
 
-data SerialBuffer = SerialBuffer {  count    :: Stream Word8
-                                  , cmdid    :: Stream Word8
+data SerialBuffer = SerialBuffer {  count  :: Stream Word8
+                                  , mtype    :: Stream Word8
+                                  , input    :: Stream Word8
                                   , output01 :: Stream Float
                                   , output02 :: Stream Float
                                   , output03 :: Stream Float
@@ -32,9 +33,6 @@ data SerialBuffer = SerialBuffer {  count    :: Stream Word8
                                   , output11 :: Stream Float
                                   , output12 :: Stream Float
                                   }
-
-emptySerialBuffer :: SerialBuffer
-emptySerialBuffer = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
 -- Parser state constants
 
@@ -60,7 +58,8 @@ pInPayload = 5
 
 parse :: Mixer -> State -> SerialBuffer
 
-parse mixer vehicleState = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+parse mixer vehicleState = SerialBuffer count mtype 0 0 0 0 0 0 0 0 0 0 0 0 0
+
   where 
 
     c = serialByteIn
@@ -92,6 +91,8 @@ parse mixer vehicleState = SerialBuffer 0 0 0 0 0 0 0 0 0 0 0 0 0 0
                   else if pstate' == pInPayload then pIdle
                   else pstate'
     pstate' = [0] ++ pstate
+
+    count = if inPayload then -1 else 0
 
 ----------------------------------------------------------
 
