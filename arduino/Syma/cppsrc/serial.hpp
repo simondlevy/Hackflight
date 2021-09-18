@@ -74,10 +74,10 @@ namespace hf {
 
                 case 215:
                     {
-                        mixer->setMotorDisarmed(0, copilot_input1);
-                        mixer->setMotorDisarmed(1, copilot_input2);
-                        mixer->setMotorDisarmed(2, copilot_input3);
-                        mixer->setMotorDisarmed(3, copilot_input4);
+                        motors[0] = copilot_input1;
+                        motors[1] = copilot_input2;
+                        motors[2] = copilot_input3;
+                        motors[3] = copilot_input4;
 
                     } break;
 
@@ -95,6 +95,8 @@ namespace hf {
 
 
         protected:
+
+        float motors[4] = {};
 
         void parse(Mixer * mixer, State * vehicleState, serial_t & serial)
         {

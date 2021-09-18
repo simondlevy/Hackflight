@@ -120,9 +120,7 @@ namespace hf {
                 // open-loop controller being inactive (e.g.,
                 // throttle down)
                 if (!_state.failsafe) {
-                    _mixer->run(demands,
-                            _state.armed && !_receiver->inactive(),
-                            motorsOut);
+                    _mixer->run(demands, _state.armed && !_receiver->inactive(), motorsOut);
                 }
 
              } // doTask
@@ -156,9 +154,6 @@ namespace hf {
 
                 // Initialize the sensors
                 startSensors();
-
-                // Start the mixer
-                _mixer->begin();
             }
 
             void update(float * motorsOut, bool & ledOut, serial_t & serial)
@@ -177,7 +172,10 @@ namespace hf {
 
                 // Support motor testing from GCS
                 if (!_state.armed) {
-                    _mixer->runDisarmed(motorsOut);
+                    motorsOut[0] = gcsTask.motors[0];
+                    motorsOut[1] = gcsTask.motors[1];
+                    motorsOut[2] = gcsTask.motors[2];
+                    motorsOut[3] = gcsTask.motors[3];
                 }
 
                 // Determine LED state

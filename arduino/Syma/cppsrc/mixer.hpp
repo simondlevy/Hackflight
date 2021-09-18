@@ -35,8 +35,6 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            float  _disarmedValues[MAXMOTORS];
-
             uint8_t _nmotors = 0;
 
         protected:
@@ -52,22 +50,6 @@ namespace hf {
             {
                 (void)index; // all motors behave the same by default
                 return hf::Filter::constrainMinMax(value, 0, 1);
-            }
-
-            void begin(void)
-            {
-                // set disarmed motor values
-                for (uint8_t i = 0; i < _nmotors; i++) {
-                    _disarmedValues[i] = 0;
-                }
-            }
-
-            // This is how we can spin the motors from the GCS
-            void runDisarmed(float * motorsOut)
-            {
-                for (uint8_t i = 0; i < _nmotors; i++) {
-                    motorsOut[i] =_disarmedValues[i]; 
-                }
             }
 
             void run(float * demands, bool safe, float * motorsOut)
@@ -124,11 +106,6 @@ namespace hf {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     motorsOut[i] = 0;
                 }
-            }
-
-            void setMotorDisarmed(uint8_t index, float value)
-            {
-                _disarmedValues[index] = value;
             }
 
             virtual uint8_t getType(void) { return 0; }
