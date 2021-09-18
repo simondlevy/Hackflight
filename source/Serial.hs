@@ -66,6 +66,10 @@ mtype2count mt = if mt == 121 then 6
                  else if mt == 123 then 1
                  else 0
 
+getOutputValue :: Stream Bool -> State -> Mixer -> Stream Word8 -> Stream Float
+
+getOutputValue ready vehicleState mixer mtype = 0
+
 -- Parser function
 
 parse :: Mixer -> State -> SerialBuffer
@@ -111,7 +115,7 @@ parse mixer vehicleState = SerialBuffer count mtype input output
 
     input = if inPayload then c else 0
 
-    v01 = 0
+    v01 = getOutputValue ready vehicleState mixer mtype
     v02 = 0
     v03 = 0
     v04 = 0
