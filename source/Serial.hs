@@ -94,21 +94,12 @@ getOutputSize mt = if mt == 121 then 6
 
 getOutputValue :: Stream Bool -> State -> Mixer -> Stream Word8 -> Stream Word8
   -> Stream Float
-
 getOutputValue ready vehicleState mixer msgtype index = 
   if not ready then 0
   else if msgtype == 121 then receiverValue index
   else if msgtype == 122 then vehicleStateValue vehicleState index
   else if msgtype == 123 then getMixerType mixer
   else 0
-
-type OutputValueAccessor = State -> Mixer -> Stream Word8 -> Stream Float
-
-vehicleStateAccessor :: OutputValueAccessor
-vehicleStateAccessor vehicleState _ index = vehicleStateValue vehicleState index
-
-mixerAccessor :: OutputValueAccessor
-mixerAccessor _ mixer index = getMixerType mixer
 
 -- Parser function
 
