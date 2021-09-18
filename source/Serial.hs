@@ -76,11 +76,28 @@ receiverValue index =
   else if index == 4 then receiverAux1
   else 0
 
+vehicleStateValue :: State -> Stream Word8 -> Stream Float
+vehicleStateValue vehicleState index =
+  if index == 0 then x vehicleState
+  else if index == 1 then dx vehicleState
+  else if index == 2 then y vehicleState
+  else if index == 3 then dy vehicleState
+  else if index == 4 then z vehicleState
+  else if index == 5 then dz vehicleState
+  else if index == 6 then phi vehicleState
+  else if index == 7 then dphi vehicleState
+  else if index == 8 then theta vehicleState
+  else if index == 9 then dtheta vehicleState
+  else if index == 10 then psi vehicleState
+  else if index == 11 then dpsi vehicleState
+  else 0
+
 getOutputValue :: Stream Bool -> State -> Stream Word8 -> Stream Word8 -> Stream Float
 
 getOutputValue ready vehicleState mtype index = 
   if not ready then 0
   else if mtype == 121 then receiverValue index
+  else if mtype == 122 then vehicleStateValue vehicleState index
   else 0
 
 -- Parser function
