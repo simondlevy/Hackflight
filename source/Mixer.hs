@@ -42,9 +42,3 @@ quadXAPMixer safety demands =
     r = roll demands
     p = pitch demands
     y = yaw demands
-
-
--- We use Float here instead of more sensible Word8 to keep
--- output datatypes uniform
-getMixerType :: Mixer -> Stream Float
-getMixerType quadXAPMixer = 0
