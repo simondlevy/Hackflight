@@ -59,7 +59,7 @@ pGotSize = 4
 pInPayload :: ParserState
 pInPayload = 5
 
--- Helper fucntion
+-- Helper fucntions
 
 msgtype2count :: Stream Word8 -> Stream Word8
 msgtype2count mt = if mt == 121 then 6
@@ -141,7 +141,7 @@ parse mixer vehicleState = SerialBuffer count msgtype input output
     ready = pstate == pIdle && crc == c
 
     count = if inPayload then -1
-            else if pstate == pIdle && crc == c then msgtype2count msgtype
+            else if ready then msgtype2count msgtype
             else 0
 
     input = if inPayload then c else 0
