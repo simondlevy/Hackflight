@@ -5,11 +5,11 @@
 #
 # MIT License
 
-SRCDIR = $(MYHOME)/Documents/Hackflight/source
+SRCDIR = ../../source
 
 HSRC = Main.hs \
-	   $(SRCDIR)/Safety.hs \
-	   $(SRCDIR)/Serial.hs \
+       $(SRCDIR)/Safety.hs \
+       $(SRCDIR)/Serial.hs \
        $(SRCDIR)/Receiver.hs \
        $(SRCDIR)/Hackflight.hs \
        $(SRCDIR)/HackflightSim.hs \
