@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="extras/media/haskell_logo2.png" width=600>
+<img src="media/haskell_logo2.png" width=600>
 </p>
 
 ## Intro
@@ -80,7 +80,7 @@ channel values,  we also provide a very simple &ldquo;Ground Control Station&rdq
 that allows you to connect to the board and see what's going on. Windows users
 can run this program directly: just clone the [HackflightGCS](https://github.com/simondlevy/HackflightGCS)
 repository and double-click on <b>hackflight.exe</b>.  Others can run the
-<b>hackflight.py</b> Python script in the <b>extras/gcs/python</b> folder.  To
+<b>hackflight.py</b> Python script in the <b>gcs/python</b> folder.  To
 run the Python script you'll need to install
 [MSPPG](https://github.com/simondlevy/RoboFirmwareToolkit/tree/master/extras/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
@@ -100,4 +100,4 @@ roll and pitch axes.   To support this arrangement in Hackflight, PID
 controllers for aux state 0 will also run in aux states 1 and 2, and PID
 controllers for aux state 1 will also run in aux state 2.
 
-<p align="center"> <img src="extras/media/pidcontrollers.png" width=600> </p>
+<p align="center"> <img src="media/pidcontrollers.png" width=600> </p>
