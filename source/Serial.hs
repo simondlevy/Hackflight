@@ -67,22 +67,30 @@ parse mixer vehicleState = emptySerialBuffer
 
     c = serialByteIn
 
-    size = if pState' == pGotArrow then c else size'
+    size = if pstate' == pGotArrow then c else size'
     size' = [0] ++ size
 
-    index = if pState' == pInPayload then index' + 1 else  0
+    index = if pstate' == pInPayload then index' + 1 else  0
     index' = [0] ++ index
 
+    mtype = if pstate' == pGotSize then c else mtype'
+    mtype' = [0] ++ mtype
+
+    crc = if pstate' == pGotArrow then c
+          else if pstate' == pInPayload then xor crc' c
+          else 0
+    crc' = [0] ++ crc
+ 
     -- Parser state transition function
-    pState = if pState' == pIdle && c == 24 then pGotStart
-                  else if pState' == pGotStart && c == 77 then pGotM
-                  else if pState' == pGotM && (c == 60 || c == 62) then pGotArrow
-                  else if pState' == pGotArrow then pGotSize
-                  else if pState' == pGotSize then pInPayload
-                  else if pState' == pInPayload && index < size then pInPayload
-                  else if pState' == pInPayload then pIdle
-                  else pState'
-    pState' = [0] ++ pState
+    pstate = if pstate' == pIdle && c == 24 then pGotStart
+                  else if pstate' == pGotStart && c == 77 then pGotM
+                  else if pstate' == pGotM && (c == 60 || c == 62) then pGotArrow
+                  else if pstate' == pGotArrow then pGotSize
+                  else if pstate' == pGotSize then pInPayload
+                  else if pstate' == pInPayload && index < size then pInPayload
+                  else if pstate' == pInPayload then pIdle
+                  else pstate'
+    pstate' = [0] ++ pstate
 
 ----------------------------------------------------------
 
