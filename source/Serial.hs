@@ -87,9 +87,9 @@ vehicleStateValue vehicleState index =
   else 0
 
 getOutputSize :: Stream Word8 -> Stream Word8
-getOutputSize mt = if mt == 121 then 6
-                 else if mt == 122 then 12
-                 else if mt == 123 then 1
+getOutputSize msgtype = if msgtype == 121 then 6
+                 else if msgtype == 122 then 12
+                 else if msgtype == 123 then 1
                  else 0
 
 getOutputValue :: Stream Bool -> State -> Mixer -> Stream Word8 -> Stream Word8
@@ -109,7 +109,7 @@ parse mixer vehicleState = SerialBuffer count msgtype input output
 
   where 
 
-    c = serialByteIn
+    c = if serialAvailable then serialByteIn else 0
 
     size = if pstate' == pGotArrow then c else size'
     size' = [0] ++ size
@@ -138,11 +138,11 @@ parse mixer vehicleState = SerialBuffer count msgtype input output
                   else pstate'
     pstate' = [0] ++ pstate
 
+    input = if inPayload then c else 0
+
     ready = pstate == pIdle && crc == c
 
     count = if inPayload then -1 else if ready then getOutputSize msgtype else 0
-
-    input = if inPayload then c else 0
 
     v01 = getOutputValue ready vehicleState mixer msgtype 0
     v02 = getOutputValue ready vehicleState mixer msgtype 1

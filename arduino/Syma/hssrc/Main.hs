@@ -10,7 +10,7 @@ module Main where
 
 import Language.Copilot
 import Copilot.Compile.C99
-import Prelude hiding(not)
+import Prelude hiding(not, (==), (<), (>))
 
 -- Core
 import HackflightFull
@@ -94,6 +94,28 @@ spec = do
   trigger "copilot_updateUsfs" looping [] 
   trigger "copilot_updateSerial" looping [] 
   trigger "copilot_updateClock" looping [] 
+
+  let serialCount = count serialBuffer
+  let serialOutVals = outvals serialBuffer
+
+  trigger "copilot_resetSerial" (serialCount == 0) []
+  trigger "copilot_handleSerialInput" (serialCount < 0) [arg $ input serialBuffer]
+  trigger "copilot_sendSerialOutput" (serialCount > 0)
+                                     [ arg $ msgtype serialBuffer
+                                     , arg $ serialCount
+                                     , arg $ v01 serialOutVals
+                                     , arg $ v02 serialOutVals
+                                     , arg $ v03 serialOutVals
+                                     , arg $ v04 serialOutVals
+                                     , arg $ v05 serialOutVals
+                                     , arg $ v06 serialOutVals
+                                     , arg $ v07 serialOutVals
+                                     , arg $ v08 serialOutVals
+                                     , arg $ v09 serialOutVals
+                                     , arg $ v10 serialOutVals
+                                     , arg $ v11 serialOutVals
+                                     , arg $ v12 serialOutVals
+                                     ]
 
   -- Send the motor values using the external C function
   trigger "copilot_writeBrushedMotor" looping [arg $ pin motor1, arg $ value (m1 motors)]

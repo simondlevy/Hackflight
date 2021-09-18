@@ -37,7 +37,7 @@ void copilot_updateSerial(void)
 static uint8_t _serialBuffer[128] = {};
 static uint8_t _serialInputIndex;
 
-void copilot_handleSerialInput(uint8_t byte)
+void copilot_handleSerialJnput(uint8_t byte)
 {
         _serialBuffer[_serialInputIndex++] = byte;
 
@@ -121,7 +121,7 @@ void copilot_setLed(uint8_t pin, bool on)
 void copilot_updateClock(void)
 {
     copilot_time_msec = millis();
-    copilot_time_sec = micros() / 1.e6f;
+    // copilot_time_sec = micros() / 1.e6f;
 }
 
 // I^2C  ---------------------------------------------------------------

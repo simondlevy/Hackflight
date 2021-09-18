@@ -101,13 +101,12 @@ void loop(void)
 
     h.update(motors, led, serial);
 
-
     if (serial.count == 0) {
         copilot_resetSerial();
     }
 
     if (serial.count == -1) {
-        copilot_handleSerialInput(serial.input);
+        copilot_handleSerialJnput(serial.input);
     }
 
     if (serial.count > 0) {
