@@ -74,10 +74,10 @@ namespace hf {
 
                 case 215:
                     {
-                        mixer->setMotorDisarmed(0, copilot_Input1);
-                        mixer->setMotorDisarmed(1, copilot_Input2);
-                        mixer->setMotorDisarmed(2, copilot_Input3);
-                        mixer->setMotorDisarmed(3, copilot_Input4);
+                        mixer->setMotorDisarmed(0, copilot_input1);
+                        mixer->setMotorDisarmed(1, copilot_input2);
+                        mixer->setMotorDisarmed(2, copilot_input3);
+                        mixer->setMotorDisarmed(3, copilot_input4);
 
                     } break;
 

@@ -43,16 +43,16 @@ void copilot_handleSerialJnput(uint8_t byte)
 
         switch (_serialInputIndex) {
             case 4:
-                memcpy(&copilot_Input1, &_serialBuffer[0], sizeof(float));
+                memcpy(&copilot_input1, &_serialBuffer[0], sizeof(float));
                 break;
             case 8:
-                memcpy(&copilot_Input2, &_serialBuffer[4], sizeof(float));
+                memcpy(&copilot_input2, &_serialBuffer[4], sizeof(float));
                 break;
             case 12:
-                memcpy(&copilot_Input3, &_serialBuffer[8], sizeof(float));
+                memcpy(&copilot_input3, &_serialBuffer[8], sizeof(float));
                 break;
             case 16:
-                memcpy(&copilot_Input4, &_serialBuffer[12], sizeof(float));
+                memcpy(&copilot_input4, &_serialBuffer[12], sizeof(float));
                 break;
         }
 }

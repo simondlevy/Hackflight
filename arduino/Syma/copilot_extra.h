@@ -2,10 +2,10 @@
 
 #include "copilot.h"
 
-EXTERN float copilot_Input1;
-EXTERN float copilot_Input2;
-EXTERN float copilot_Input3;
-EXTERN float copilot_Input4;
+EXTERN float copilot_input1;
+EXTERN float copilot_input2;
+EXTERN float copilot_input3;
+EXTERN float copilot_input4;
 
 typedef struct {
 
