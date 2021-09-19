@@ -1,5 +1,5 @@
 {--
-  Hackflight algorithm with safety and serial comms
+  Hackflight algorithm with serial comms
 
   Copyright(C) 2021 on D.Levy
 
