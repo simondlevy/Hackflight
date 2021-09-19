@@ -11,7 +11,7 @@
 #include <Wire.h>
 
 #define _EXTERN
-#include "copilot_extra.h"
+#include "copilot.h"
 
 // Serial comms ---------------------------------------------------------------
 

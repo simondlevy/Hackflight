@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../copilot_extra.h"
+#include "../copilot.h"
 
 #include "pidcontroller.hpp"
 #include "receiver.hpp"
@@ -23,9 +23,6 @@ namespace hf {
     class Hackflight {
         
         private:
-
-            static constexpr float   LED_STARTUP_FLASH_SECONDS = 1.0;
-            static constexpr uint8_t LED_STARTUP_FLASH_COUNT   = 20;
 
             Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;

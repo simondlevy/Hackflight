@@ -6,14 +6,34 @@
 
 #pragma once
 
-#include "../copilot_extra.h"
-
 #include "mixer.hpp"
 #include "mixer.hpp"
 #include "state.hpp"
 #include "receiver.hpp"
 
 namespace hf {
+
+    typedef struct {
+
+        int8_t count; // 0=nothing; -1=incoming; +=outgoing
+        uint8_t type;
+
+        uint8_t input;
+
+        float output01;
+        float output02;
+        float output03;
+        float output04;
+        float output05;
+        float output06;
+        float output07;
+        float output08;
+        float output09;
+        float output10;
+        float output11;
+        float output12;
+
+    } serial_t;
 
     class SerialTask {
 
@@ -82,8 +102,8 @@ namespace hf {
         static uint8_t mtype2count(uint8_t mt) 
         {
             return mt == 121 ? 6
-                 : mt == 122 ? 12
-                 : 0;
+                : mt == 122 ? 12
+                : 0;
         }
 
 

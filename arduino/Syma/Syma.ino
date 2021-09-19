@@ -17,8 +17,6 @@
 
  */
 
-#include "copilot_extra.h"
-
 #include "cppsrc/Hackflight.hpp"
 #include "cppsrc/receiver.hpp"
 #include "cppsrc/mixers/quadxmw.hpp"
@@ -97,7 +95,7 @@ void loop(void)
 
     float motors[4] = {};
     bool led = false;
-    serial_t serial = {};
+    hf::serial_t serial = {};
 
     h.update(motors, led, serial);
 

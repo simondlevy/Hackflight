@@ -11,8 +11,6 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "../copilot_extra.h"
-
 #include "demands.hpp"
 
 namespace hf {

@@ -12,8 +12,6 @@
 #include "filters.hpp"
 #include "debugger.hpp"
 
-#include "../copilot_extra.h"
-
 namespace hf {
 
     class Mixer {
