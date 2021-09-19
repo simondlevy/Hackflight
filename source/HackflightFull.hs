@@ -41,7 +41,7 @@ hackflightFull receiver sensors pidControllers mixer
     led = if time_msec < 5000 then (mod (div time_msec 50) 2 == 0) else armed safety
 
     -- Run serial comms
-    serialBuffer = parse mixer vehicleState
+    (serialBuffer, serialMotors) = parse mixer vehicleState
 
     -- Track whether we've just started
     starting = [False] ++ true

@@ -36,12 +36,6 @@ data SerialBuffer = SerialBuffer {  count   :: Stream Word8
                                   , input   :: Stream Word8
                                   , outvals :: OutputValues 
                                  }
-
-data SerialMotors = SerialMotors {  mval1 :: Stream Float
-                                  , mval2 :: Stream Float
-                                  , mval3 :: Stream Float
-                                  , mval4 :: Stream Float
-                                 }
                   
 -- Parser state constants
 
@@ -107,9 +101,9 @@ getOutputValue ready vehicleState msgtype index =
 
 -- Parser function
 
-parse :: Mixer -> State -> SerialBuffer
+parse :: Mixer -> State -> (SerialBuffer, Motors)
 
-parse mixer vehicleState = SerialBuffer count msgtype input output
+parse mixer vehicleState = (serialBuffer, motors)
 
   where 
 
@@ -148,6 +142,18 @@ parse mixer vehicleState = SerialBuffer count msgtype input output
 
     count = if inPayload then -1 else if ready then getOutputSize msgtype else 0
 
+    motor1 = if ready && msgtype == 215 then input1 else motor1'
+    motor1' = [0] ++ motor1
+
+    motor2 = if ready && msgtype == 215 then input2 else motor2'
+    motor2' = [0] ++ motor2
+
+    motor3 = if ready && msgtype == 215 then input3 else motor3'
+    motor3' = [0] ++ motor3
+
+    motor4 = if ready && msgtype == 215 then input4 else motor4'
+    motor4' = [0] ++ motor4
+
     v01 = getOutputValue ready vehicleState msgtype 0
     v02 = getOutputValue ready vehicleState msgtype 1
     v03 = getOutputValue ready vehicleState msgtype 2
@@ -161,7 +167,14 @@ parse mixer vehicleState = SerialBuffer count msgtype input output
     v11 = getOutputValue ready vehicleState msgtype 10
     v12 = getOutputValue ready vehicleState msgtype 11
 
-    output = OutputValues v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11 v12
+    outputBuffer = OutputValues v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11 v12
+
+    serialBuffer = SerialBuffer count msgtype input outputBuffer
+
+    motors = QuadMotors (Motor 0 motor1)
+                        (Motor 1 motor2)
+                        (Motor 2 motor3)
+                        (Motor 3 motor4) 
 
 ----------------------------------------------------------
 
@@ -170,3 +183,16 @@ serialAvailable = extern "copilot_serialAvailable" Nothing
 
 serialByteIn :: Stream Word8
 serialByteIn = extern "copilot_serialByte" Nothing
+
+input1 :: Stream Float
+input1 = extern "copilot_input1" Nothing
+
+input2 :: Stream Float
+input2 = extern "copilot_input2" Nothing
+
+input3 :: Stream Float
+input3 = extern "copilot_input3" Nothing
+
+input4 :: Stream Float
+input4 = extern "copilot_input4" Nothing
+
