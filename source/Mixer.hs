@@ -16,24 +16,23 @@ import Demands
 import Safety
 import Utils(constrain)
 
-data Motor = Motor {  index :: Stream Word8
-                    , value :: Stream Float }
-
-data Motors = QuadMotors { m1 :: Motor
-                         , m2 :: Motor
-                         , m3 :: Motor
-                         , m4 :: Motor }
+data Motors = QuadMotors { m1 :: Stream Float
+                         , m2 :: Stream Float
+                         , m3 :: Stream Float
+                         , m4 :: Stream Float }
 
 type Mixer = Safety -> Demands -> Motors
+
+-- addMotors :: Motors -> Motors -> Motors
 
 quadXAPMixer :: Mixer
 
 quadXAPMixer safety demands =
 
-  QuadMotors  (Motor 0 (check $ t - r - p + y))
-              (Motor 1 (check $ t + r + p + y))
-              (Motor 2 (check $ t + r - p - y))
-              (Motor 3 (check $ t - r + p - y))
+  QuadMotors (check $ t - r - p + y)
+             (check $ t + r + p + y)
+             (check $ t + r - p - y)
+             (check $ t - r + p - y)
   where 
 
     check x = if ((not (armed safety)) || (failsafe safety)) then 0 else constrain x

@@ -118,10 +118,10 @@ spec = do
                                      ]
 
   -- Send the motor values using the external C function
-  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor1, arg $ value (m1 motors)]
-  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor2, arg $ value (m2 motors)]
-  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor3, arg $ value (m3 motors)]
-  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor4, arg $ value (m4 motors)]
+  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor1, arg $ (m1 motors)]
+  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor2, arg $ (m2 motors)]
+  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor3, arg $ (m3 motors)]
+  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor4, arg $ (m4 motors)]
 
   -- Send and retrieve serial comms
  
