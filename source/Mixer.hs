@@ -21,6 +21,11 @@ data Motors = QuadMotors { m1 :: Stream Float
                          , m3 :: Stream Float
                          , m4 :: Stream Float }
 
+addMotors :: Motors -> Motors -> Motors
+
+addMotors (QuadMotors m11 m12 m13 m14) (QuadMotors m21 m22 m23 m24) 
+  = QuadMotors (m11 + m21) (m12 + m22) (m13 + m23) (m14 + m24)
+
 type Mixer = Safety -> Demands -> Motors
 
 -- addMotors :: Motors -> Motors -> Motors

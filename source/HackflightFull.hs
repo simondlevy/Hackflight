@@ -43,7 +43,8 @@ hackflightFull receiver sensors pidControllers mixer
     -- Run serial comms
     (serialBuffer, serialMotors) = parse mixer vehicleState
 
-    motors = mixerMotors
+    -- One set of motors will always be zero, so we can choose between them by adding
+    motors = addMotors mixerMotors serialMotors
 
     -- Track whether we've just started
     starting = [False] ++ true
