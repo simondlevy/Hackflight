@@ -142,16 +142,16 @@ parse mixer vehicleState = (serialBuffer, motors)
 
     count = if inPayload then -1 else if ready then getOutputSize msgtype else 0
 
-    motor1 = if ready && msgtype == 215 then input1 else motor1'
+    motorsReady = ready && msgtype == 215
+
+    motor1 = if motorsReady then input1 else motor1'
+    motor2 = if motorsReady then input2 else motor1'
+    motor3 = if motorsReady then input3 else motor1'
+    motor4 = if motorsReady then input4 else motor1'
+
     motor1' = [0] ++ motor1
-
-    motor2 = if ready && msgtype == 215 then input2 else motor2'
     motor2' = [0] ++ motor2
-
-    motor3 = if ready && msgtype == 215 then input3 else motor3'
     motor3' = [0] ++ motor3
-
-    motor4 = if ready && msgtype == 215 then input4 else motor4'
     motor4' = [0] ++ motor4
 
     v01 = getOutputValue ready vehicleState msgtype 0
