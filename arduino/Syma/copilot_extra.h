@@ -2,11 +2,6 @@
 
 #include "copilot.h"
 
-EXTERN float copilot_input1;
-EXTERN float copilot_input2;
-EXTERN float copilot_input3;
-EXTERN float copilot_input4;
-
 typedef struct {
 
     int8_t count; // 0=nothing; -1=incoming; +=outgoing
