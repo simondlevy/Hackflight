@@ -35,7 +35,8 @@ hackflightFull receiver sensors pidControllers mixer
   where
 
     -- Run core algorithm
-    (mixerMotors, vehicleState, safety) = hackflight receiver sensors pidControllers mixer getSafetyReal
+    (mixerMotors, vehicleState, safety) =
+      hackflight receiver sensors pidControllers mixer getSafetyReal
 
     -- Blink LED on startup, keep solid when armed
     led = if time_msec < 5000 then (mod (div time_msec 50) 2 == 0) else armed safety
