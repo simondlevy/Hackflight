@@ -75,15 +75,13 @@ spec = do
   -- Do some setup the first time around
   trigger "copilot_startSerial" starting []     
   trigger "copilot_startLed" starting [arg $ pin led]     
-  trigger "copilot_startBrushedMotor" starting [arg $ pin led]
   trigger "copilot_startWire" starting []
   trigger "copilot_startUsfs" starting [] 
   trigger "copilot_startDsmrx" starting [] 
-  trigger "copilot_startBrushedMotor" starting [arg $ pin motor1]
-  trigger "copilot_startBrushedMotor" starting [arg $ pin motor2]
-  trigger "copilot_startBrushedMotor" starting [arg $ pin motor3]
-  trigger "copilot_startBrushedMotor" starting [arg $ pin motor4]
-  
+  trigger "copilot_startBrushedMotors" starting [  arg $ pin motor1
+                                                 , arg $ pin motor2
+                                                 , arg $ pin motor3
+                                                 , arg $ pin motor4 ]
   let looping = not starting
 
   -- Send the LED using external C function during the looping phase
@@ -118,10 +116,11 @@ spec = do
                                      ]
 
   -- Send the motor values using the external C function
-  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor1, arg $ (m1 motors)]
-  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor2, arg $ (m2 motors)]
-  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor3, arg $ (m3 motors)]
-  trigger "copilot_writeBrushedMotor" looping [arg $ pin motor4, arg $ (m4 motors)]
+  trigger "copilot_writeBrushedMotors" looping [  arg $ pin motor1, arg $ (m1 motors),
+                                                  arg $ pin motor2, arg $ (m2 motors),
+                                                  arg $ pin motor3, arg $ (m3 motors),
+                                                  arg $ pin motor4, arg $ (m4 motors) ]
+ 
 
   -- Send and retrieve serial comms
  
