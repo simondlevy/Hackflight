@@ -95,10 +95,8 @@ spec = do
   let serialCount = count serialBuffer
   let serialOutVals = outvals serialBuffer
 
-  trigger "copilot_debug" true [arg $ incoming serialBuffer]
+  trigger "copilot_receiveSerialPayload" (incoming serialBuffer) [arg $ input serialBuffer]
 
-  trigger "copilot_resetSerial" (serialCount == 0) []
-  trigger "copilot_handleSerialInput" (serialCount < 0) [arg $ input serialBuffer]
   trigger "copilot_sendSerialOutput" (serialCount > 0)
                                      [ arg $ msgtype serialBuffer
                                      , arg $ serialCount

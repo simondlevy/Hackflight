@@ -31,9 +31,7 @@ data OutputValues = OutputValues {  v01 :: Stream Float
                                   , v12 :: Stream Float
                                   }
  
-data SerialBuffer = SerialBuffer {  byte :: Stream Word8
-                                  , pstate :: Stream Word8
-                                  , incoming :: Stream Bool 
+data SerialBuffer = SerialBuffer {  incoming :: Stream Bool 
                                   , count   :: Stream Word8
                                   , msgtype   :: Stream Word8
                                   , input   :: Stream Word8
@@ -172,7 +170,7 @@ parse mixer vehicleState = (serialBuffer, motors)
 
     outputBuffer = OutputValues v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11 v12
 
-    serialBuffer = SerialBuffer c pstate incoming count msgtype input outputBuffer
+    serialBuffer = SerialBuffer incoming count msgtype input outputBuffer
 
     motors = QuadMotors motor1 motor2 motor3 motor4
 

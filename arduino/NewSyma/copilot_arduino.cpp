@@ -44,34 +44,30 @@ void copilot_updateSerial(void)
     }
 }
 
-static uint8_t _serialBuffer[128] = {};
-static uint8_t _serialInputIndex;
-
-void copilot_handleSerialJnput(uint8_t byte)
+void copilot_receiveSerialPayload(uint8_t byte)
 {
-    debugger.printf("serial input\n");
+    uint8_t index = 0;
 
-    _serialBuffer[_serialInputIndex++] = byte;
+    static uint8_t _payload[256] = {};
 
-    switch (_serialInputIndex) {
+    debugger.printf("%x\n", byte);
+
+    _payload[0] = byte;
+
+    switch (index) {
         case 4:
-            memcpy(&copilot_input1, &_serialBuffer[0], sizeof(float));
+            memcpy(&copilot_input1, &_payload[0], sizeof(float));
             break;
         case 8:
-            memcpy(&copilot_input2, &_serialBuffer[4], sizeof(float));
+            memcpy(&copilot_input2, &_payload[4], sizeof(float));
             break;
         case 12:
-            memcpy(&copilot_input3, &_serialBuffer[8], sizeof(float));
+            memcpy(&copilot_input3, &_payload[8], sizeof(float));
             break;
         case 16:
-            memcpy(&copilot_input4, &_serialBuffer[12], sizeof(float));
+            memcpy(&copilot_input4, &_payload[12], sizeof(float));
             break;
     }
-}
-
-void copilot_resetSerial(void)
-{
-    _serialInputIndex = 0;
 }
 
 void copilot_sendSerialOutput(
