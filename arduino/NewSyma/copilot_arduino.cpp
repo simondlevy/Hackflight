@@ -11,22 +11,17 @@
 #include <Wire.h>
 
 #include "Debugger.hpp"
-static Debugger debugger = Debugger(&Serial2);
+Debugger debugger = Debugger(&Serial2);
 
 #define _EXTERN
 #include "copilot.h"
 
-void copilot_debug(uint8_t value)
-{
-    static uint8_t prev;
-    if (prev != value) {
-        debugger.printf("%d\n", value);
-        prev = value;
-    }
-}
-
-
 // Serial comms ---------------------------------------------------------------
+
+void copilot_debug(bool byte)
+{
+    debugger.printf("%d\n", byte);
+}
 
 void copilot_startSerial(void)
 {
@@ -54,6 +49,8 @@ static uint8_t _serialInputIndex;
 
 void copilot_handleSerialJnput(uint8_t byte)
 {
+    debugger.printf("serial input\n");
+
     _serialBuffer[_serialInputIndex++] = byte;
 
     switch (_serialInputIndex) {

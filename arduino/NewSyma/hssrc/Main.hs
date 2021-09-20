@@ -73,8 +73,6 @@ spec = do
                                                                   mixer
   let looping = not starting
 
-  trigger "copilot_debug" looping [arg $ byte serialBuffer]
-
   -- Do some setup the first time around
   trigger "copilot_startSerial" starting []     
   trigger "copilot_startLed" starting [arg $ pin led]     
@@ -96,6 +94,8 @@ spec = do
 
   let serialCount = count serialBuffer
   let serialOutVals = outvals serialBuffer
+
+  trigger "copilot_debug" true [arg $ incoming serialBuffer]
 
   trigger "copilot_resetSerial" (serialCount == 0) []
   trigger "copilot_handleSerialInput" (serialCount < 0) [arg $ input serialBuffer]
