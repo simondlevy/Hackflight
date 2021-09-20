@@ -39,7 +39,7 @@ hackflightFull receiver sensors pidControllers mixer
       hackflight receiver sensors pidControllers mixer getSafetyReal
 
     -- Blink LED on startup, keep solid when armed
-    led = if time_msec < 5000 then (mod (div time_msec 50) 2 == 0) else armed safety
+    led = if time_msec < 2000 then (mod (div time_msec 50) 2 == 0) else armed safety
 
     -- Run serial comms
     (serialBuffer, serialMotors) = parse mixer vehicleState
@@ -48,4 +48,5 @@ hackflightFull receiver sensors pidControllers mixer
     motors = addMotors mixerMotors serialMotors
 
     -- Track whether we've just started
-    starting = [False] ++ true
+    starting = not looping
+    looping = [False] ++ true

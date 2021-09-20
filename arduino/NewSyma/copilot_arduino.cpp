@@ -10,6 +10,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+#include "Debugger.hpp"
+
 #define _EXTERN
 #include "copilot.h"
 
@@ -109,6 +111,7 @@ void copilot_sendSerialOutput(
 void copilot_startLed(uint8_t pin)
 {
     pinMode(pin, OUTPUT);
+
 }
 
 void copilot_setLed(uint8_t pin, bool on)
