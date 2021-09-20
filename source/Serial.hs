@@ -31,7 +31,10 @@ data OutputValues = OutputValues {  v01 :: Stream Float
                                   , v12 :: Stream Float
                                   }
  
-data SerialBuffer = SerialBuffer {  count   :: Stream Word8
+data SerialBuffer = SerialBuffer {  byte :: Stream Word8
+                                  , pstate :: Stream Word8
+
+                                  , count   :: Stream Word8
                                   , msgtype   :: Stream Word8
                                   , input   :: Stream Word8
                                   , outvals :: OutputValues 
@@ -126,7 +129,7 @@ parse mixer vehicleState = (serialBuffer, motors)
           else 0
     crc' = [0] ++ crc
  
-    pstate = if pstate' == pIdle && c == 24 then pGotStart
+    pstate = if pstate' == pIdle && c == 36 then pGotStart
                   else if pstate' == pGotStart && c == 77 then pGotM
                   else if pstate' == pGotM && (c == 60 || c == 62) then pGotArrow
                   else if pstate' == pGotArrow then pGotSize
@@ -169,7 +172,7 @@ parse mixer vehicleState = (serialBuffer, motors)
 
     outputBuffer = OutputValues v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11 v12
 
-    serialBuffer = SerialBuffer count msgtype input outputBuffer
+    serialBuffer = SerialBuffer c pstate count msgtype input outputBuffer
 
     motors = QuadMotors motor1 motor2 motor3 motor4
 

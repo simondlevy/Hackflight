@@ -71,6 +71,9 @@ spec = do
                                                                   sensors
                                                                   pidControllers
                                                                   mixer
+  let looping = not starting
+
+  trigger "copilot_debug" looping [arg $ byte serialBuffer]
 
   -- Do some setup the first time around
   trigger "copilot_startSerial" starting []     
@@ -82,8 +85,6 @@ spec = do
                                                  , arg $ pin motor2
                                                  , arg $ pin motor3
                                                  , arg $ pin motor4 ]
-  let looping = not starting
-
   -- Send the LED using external C function during the looping phase
   trigger "copilot_setLed" looping [arg $ pin led, arg ledState]
 
@@ -120,9 +121,6 @@ spec = do
                                                   arg $ pin motor2, arg $ (m2 motors),
                                                   arg $ pin motor3, arg $ (m3 motors),
                                                   arg $ pin motor4, arg $ (m4 motors) ]
- 
-
-  -- Send and retrieve serial comms
  
 -- Compile the spec
 main = reify spec >>= compile "copilot"

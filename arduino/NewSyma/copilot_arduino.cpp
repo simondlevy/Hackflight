@@ -16,6 +16,16 @@ static Debugger debugger = Debugger(&Serial2);
 #define _EXTERN
 #include "copilot.h"
 
+void copilot_debug(uint8_t value)
+{
+    static uint8_t prev;
+    if (prev != value) {
+        debugger.printf("%d\n", value);
+        prev = value;
+    }
+}
+
+
 // Serial comms ---------------------------------------------------------------
 
 void copilot_startSerial(void)
@@ -36,7 +46,6 @@ void copilot_updateSerial(void)
 
     if (copilot_serialAvailable) {
         copilot_serialByte = Serial.read();
-        debugger.printf("%d\n", copilot_serialByte);
     }
 }
 
@@ -45,22 +54,22 @@ static uint8_t _serialInputIndex;
 
 void copilot_handleSerialJnput(uint8_t byte)
 {
-        _serialBuffer[_serialInputIndex++] = byte;
+    _serialBuffer[_serialInputIndex++] = byte;
 
-        switch (_serialInputIndex) {
-            case 4:
-                memcpy(&copilot_input1, &_serialBuffer[0], sizeof(float));
-                break;
-            case 8:
-                memcpy(&copilot_input2, &_serialBuffer[4], sizeof(float));
-                break;
-            case 12:
-                memcpy(&copilot_input3, &_serialBuffer[8], sizeof(float));
-                break;
-            case 16:
-                memcpy(&copilot_input4, &_serialBuffer[12], sizeof(float));
-                break;
-        }
+    switch (_serialInputIndex) {
+        case 4:
+            memcpy(&copilot_input1, &_serialBuffer[0], sizeof(float));
+            break;
+        case 8:
+            memcpy(&copilot_input2, &_serialBuffer[4], sizeof(float));
+            break;
+        case 12:
+            memcpy(&copilot_input3, &_serialBuffer[8], sizeof(float));
+            break;
+        case 16:
+            memcpy(&copilot_input4, &_serialBuffer[12], sizeof(float));
+            break;
+    }
 }
 
 void copilot_resetSerial(void)
