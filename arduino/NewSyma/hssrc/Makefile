@@ -32,6 +32,7 @@ RUNH = runhaskell -i$(SRCDIR) -i$(SRCDIR)/sensors -i$(SRCDIR)/pidcontrollers Mai
 all: copilot.cpp copilot.h
 	sed -i 's/extern/EXTERN/g' copilot.h
 	cat $(SRCDIR)/cfiles/header.h copilot.h > ../copilot.h
+	cat $(SRCDIR)/cfiles/header.h copilot.h > ../../Syma/copilot.h
 
 copilot.cpp: copilot.c
 	tail -n +8 copilot.c > tmp.c
