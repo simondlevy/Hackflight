@@ -36,7 +36,7 @@ all: copilot.cpp copilot.h
 
 copilot.cpp: copilot.c
 	tail -n +8 copilot.c > tmp.c
-	cat $(SRCDIR)/cfiles/header.c tmp.c > copilot.c
+	cat $(SRCDIR)/cfiles/header.c tmp.c > ../copilot.cpp
 	rm tmp.c
 
 copilot.c: $(SRC) Main.hs
