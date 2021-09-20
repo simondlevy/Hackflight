@@ -99,17 +99,12 @@ class MspParser(metaclass=abc.ABCMeta):
 
     @staticmethod
     def serialize_RECEIVER_Request():
-        msg = '$M<' + chr(0) + chr(121) + chr(121)
+        msg = '$M<' + chr(0) + chr(121)
         return bytes(msg, 'utf-8')
 
     @staticmethod
     def serialize_STATE_Request():
-        msg = '$M<' + chr(0) + chr(122) + chr(122)
-        return bytes(msg, 'utf-8')
-
-    @staticmethod
-    def serialize_ACTUATOR_TYPE_Request():
-        msg = '$M<' + chr(0) + chr(123) + chr(123)
+        msg = '$M<' + chr(0) + chr(122)
         return bytes(msg, 'utf-8')
 
     @staticmethod

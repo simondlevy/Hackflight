@@ -11,6 +11,7 @@
 #include <Wire.h>
 
 #include "Debugger.hpp"
+static Debugger debugger = Debugger(&Serial2);
 
 #define _EXTERN
 #include "copilot.h"
@@ -20,6 +21,8 @@
 void copilot_startSerial(void)
 {
     Serial.begin(115200);
+
+    debugger.begin();
 }
 
 void copilot_serialWrite(uint8_t b)
@@ -33,6 +36,7 @@ void copilot_updateSerial(void)
 
     if (copilot_serialAvailable) {
         copilot_serialByte = Serial.read();
+        debugger.printf("%d\n", copilot_serialByte);
     }
 }
 

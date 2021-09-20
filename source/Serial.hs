@@ -192,4 +192,3 @@ input3 = extern "copilot_input3" Nothing
 
 input4 :: Stream Float
 input4 = extern "copilot_input4" Nothing
-

@@ -116,8 +116,6 @@ class GCS(MspParser):
         # Set up parser's request strings
         self.state_request = MspParser.serialize_STATE_Request()
         self.rc_request = MspParser.serialize_RECEIVER_Request()
-        self.actuator_type_request = \
-            MspParser.serialize_ACTUATOR_TYPE_Request()
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
