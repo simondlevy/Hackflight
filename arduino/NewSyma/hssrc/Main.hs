@@ -95,11 +95,12 @@ spec = do
   let serialCount = count serialBuffer
   let serialOutVals = outvals serialBuffer
 
-  trigger "copilot_receiveSerialPayload" (incoming serialBuffer) [arg $ input serialBuffer]
+  -- trigger "copilot_receiveSerialPayload" (incoming serialBuffer) [arg $ input serialBuffer]
 
   trigger "copilot_sendSerialOutput" (serialCount > 0)
                                      [ arg $ msgtype serialBuffer
                                      , arg $ serialCount
+                                     , arg $ v00 serialOutVals
                                      , arg $ v01 serialOutVals
                                      , arg $ v02 serialOutVals
                                      , arg $ v03 serialOutVals
@@ -111,7 +112,6 @@ spec = do
                                      , arg $ v09 serialOutVals
                                      , arg $ v10 serialOutVals
                                      , arg $ v11 serialOutVals
-                                     , arg $ v12 serialOutVals
                                      ]
 
   -- Send the motor values using the external C function

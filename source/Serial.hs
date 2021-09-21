@@ -11,13 +11,33 @@
 module Serial where
 
 import Language.Copilot hiding(xor)
+import Copilot.Language.Operators.BitWise((.&.))
 
 import Receiver
 import State
 import Mixer
 import Utils(xor)
 
-data OutputValues = OutputValues {  v01 :: Stream Float
+data InputBytes = InputBytes {  b00 :: Stream Word8
+                              , b01 :: Stream Word8 
+                              , b02 :: Stream Word8 
+                              , b03 :: Stream Word8 
+                              , b04 :: Stream Word8 
+                              , b05 :: Stream Word8 
+                              , b06 :: Stream Word8 
+                              , b07 :: Stream Word8 
+                              , b08 :: Stream Word8 
+                              , b09 :: Stream Word8 
+                              , b10 :: Stream Word8 
+                              , b11 :: Stream Word8 
+                              , b12 :: Stream Word8 
+                              , b13 :: Stream Word8 
+                              , b14 :: Stream Word8 
+                              , b15 :: Stream Word8 
+                             }
+                            
+data OutputValues = OutputValues {  v00 :: Stream Float
+                                  , v01 :: Stream Float
                                   , v02 :: Stream Float
                                   , v03 :: Stream Float
                                   , v04 :: Stream Float
@@ -28,14 +48,13 @@ data OutputValues = OutputValues {  v01 :: Stream Float
                                   , v09 :: Stream Float
                                   , v10 :: Stream Float
                                   , v11 :: Stream Float
-                                  , v12 :: Stream Float
                                   }
  
 data SerialBuffer = SerialBuffer {  incoming :: Stream Bool 
-                                  , count   :: Stream Word8
-                                  , msgtype   :: Stream Word8
-                                  , input   :: Stream Word8
-                                  , outvals :: OutputValues 
+                                  , count    :: Stream Word8
+                                  , msgtype  :: Stream Word8
+                                  , inbytes  :: InputBytes
+                                  , outvals  :: OutputValues 
                                  }
                   
 -- Parser state constants
@@ -100,6 +119,16 @@ getOutputValue ready vehicleState msgtype index =
   else if msgtype == 122 then vehicleStateValue vehicleState index
   else 0
 
+bufferInput ::    Stream Bool   -- inPayload flag
+               -> Stream Word8  -- bufferIndex
+               -> Stream Word8  -- payloadIndex
+               -> Stream Word8  -- new byte
+               -> Stream Word8  -- old byte
+               -> Stream Word8  -- result
+
+bufferInput inPayload bufferIndex payloadIndex byte byte'
+  = if inPayload && bufferIndex == payloadIndex then byte else byte'
+
 -- Parser function
 
 parse :: Mixer -> State -> (SerialBuffer, Motors)
@@ -137,7 +166,38 @@ parse mixer vehicleState = (serialBuffer, motors)
                   else pstate'
     pstate' = [0] ++ pstate
 
-    input = if inPayload then c else 0
+    b00 = bufferInput inPayload 0 index c b00' 
+    b00' = [0] ++ b00
+    b01 = bufferInput inPayload 1 index c b01' 
+    b01' = [0] ++ b01
+    b02 = bufferInput inPayload 2 index c b02' 
+    b02' = [0] ++ b02
+    b03 = bufferInput inPayload 3 index c b04' 
+    b03' = [0] ++ b03
+    b04 = bufferInput inPayload 4 index c b04' 
+    b04' = [0] ++ b04
+    b05 = bufferInput inPayload 5 index c b05' 
+    b05' = [0] ++ b05
+    b06 = bufferInput inPayload 6 index c b06' 
+    b06' = [0] ++ b06
+    b07 = bufferInput inPayload 7 index c b07' 
+    b07' = [0] ++ b07
+    b08 = bufferInput inPayload 8 index c b08' 
+    b08' = [0] ++ b08
+    b09 = bufferInput inPayload 9 index c b09' 
+    b09' = [0] ++ b09
+    b10 = bufferInput inPayload 10 index c b10' 
+    b10' = [0] ++ b10
+    b11 = bufferInput inPayload 11 index c b11' 
+    b11' = [0] ++ b11
+    b12 = bufferInput inPayload 12 index c b12' 
+    b12' = [0] ++ b12
+    b13 = bufferInput inPayload 13 index c b13' 
+    b13' = [0] ++ b13
+    b14 = bufferInput inPayload 14 index c b14' 
+    b14' = [0] ++ b14
+    b15 = bufferInput inPayload 15 index c b15' 
+    b15' = [0] ++ b15
 
     ready = pstate == pIdle && crc == c
 
@@ -155,22 +215,25 @@ parse mixer vehicleState = (serialBuffer, motors)
     motor3' = [0] ++ motor3
     motor4' = [0] ++ motor4
 
-    v01 = getOutputValue ready vehicleState msgtype 0
-    v02 = getOutputValue ready vehicleState msgtype 1
-    v03 = getOutputValue ready vehicleState msgtype 2
-    v04 = getOutputValue ready vehicleState msgtype 3
-    v05 = getOutputValue ready vehicleState msgtype 4
-    v06 = getOutputValue ready vehicleState msgtype 5
-    v07 = getOutputValue ready vehicleState msgtype 6
-    v08 = getOutputValue ready vehicleState msgtype 7
-    v09 = getOutputValue ready vehicleState msgtype 8
-    v10 = getOutputValue ready vehicleState msgtype 9
-    v11 = getOutputValue ready vehicleState msgtype 10
-    v12 = getOutputValue ready vehicleState msgtype 11
+    v00 = getOutputValue ready vehicleState msgtype 0
+    v01 = getOutputValue ready vehicleState msgtype 1
+    v02 = getOutputValue ready vehicleState msgtype 2
+    v03 = getOutputValue ready vehicleState msgtype 3
+    v04 = getOutputValue ready vehicleState msgtype 4
+    v05 = getOutputValue ready vehicleState msgtype 5
+    v06 = getOutputValue ready vehicleState msgtype 6
+    v07 = getOutputValue ready vehicleState msgtype 7
+    v08 = getOutputValue ready vehicleState msgtype 8
+    v09 = getOutputValue ready vehicleState msgtype 9
+    v10 = getOutputValue ready vehicleState msgtype 10
+    v11 = getOutputValue ready vehicleState msgtype 11
 
-    outputBuffer = OutputValues v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11 v12
+    outputValues = OutputValues v00 v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11
 
-    serialBuffer = SerialBuffer incoming count msgtype input outputBuffer
+    inputBuffer = InputBytes b00 b01 b02 b04 b04 b05 b06 b07
+                             b08 b09 b10 b11 b12 b13 b14 b15
+
+    serialBuffer = SerialBuffer incoming count msgtype inputBuffer outputValues
 
     motors = QuadMotors motor1 motor2 motor3 motor4
 
