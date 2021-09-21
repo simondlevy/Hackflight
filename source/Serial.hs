@@ -18,6 +18,13 @@ import State
 import Mixer
 import Utils(xor)
 
+
+data InputWords = InputWords {  w00 :: Stream Word32
+                              , w01 :: Stream Word32 
+                              , w02 :: Stream Word32 
+                              , w03 :: Stream Word32 
+                             }
+
 data InputBytes = InputBytes {  b00 :: Stream Word8
                               , b01 :: Stream Word8 
                               , b02 :: Stream Word8 
@@ -129,6 +136,18 @@ bufferInput ::    Stream Bool   -- inPayload flag
 bufferInput inPayload bufferIndex payloadIndex byte byte'
   = if inPayload && bufferIndex == payloadIndex then byte else byte'
 
+bufferInput2 ::   Stream Bool   -- inPayload flag
+               -> Stream Word8  -- bufferIndex
+               -> Stream Word8  -- payloadIndex
+               -> Stream Word8  -- byte
+               -> Stream Word32 -- word
+               -> Stream Word32 -- new word
+
+bufferInput2 inPayload bufferIndex payloadIndex byte word
+  = if inPayload && bufferIndex == payloadIndex then word else word
+
+
+
 -- Parser function
 
 parse :: Mixer -> State -> (SerialBuffer, Motors)
@@ -168,13 +187,22 @@ parse mixer vehicleState = (serialBuffer, motors)
 
     pstate' = [0] ++ pstate
 
+    w00 = bufferInput2 inPayload 0 index c w00' 
+    w00' = [0] ++ w00
+    w01 = bufferInput2 inPayload 1 index c w01' 
+    w01' = [0] ++ w01
+    w02 = bufferInput2 inPayload 2 index c w02' 
+    w02' = [0] ++ w02
+    w03 = bufferInput2 inPayload 3 index c w03' 
+    w03' = [0] ++ w03
+
     b00 = bufferInput inPayload 0 index c b00' 
     b00' = [0] ++ b00
     b01 = bufferInput inPayload 1 index c b01' 
     b01' = [0] ++ b01
     b02 = bufferInput inPayload 2 index c b02' 
     b02' = [0] ++ b02
-    b03 = bufferInput inPayload 3 index c b04' 
+    b03 = bufferInput inPayload 3 index c b03' 
     b03' = [0] ++ b03
     b04 = bufferInput inPayload 4 index c b04' 
     b04' = [0] ++ b04
