@@ -11,7 +11,7 @@
 module Serial where
 
 import Language.Copilot hiding(xor)
-import Copilot.Language.Operators.BitWise((.&.))
+import Copilot.Language.Operators.BitWise((.|.), (.<<.))
 
 import Receiver
 import State
@@ -144,7 +144,9 @@ bufferInput2 ::   Stream Bool   -- inPayload flag
                -> Stream Word32 -- new word
 
 bufferInput2 inPayload bufferIndex payloadIndex byte word
-  = if inPayload && bufferIndex == payloadIndex then word else word
+  = if inPayload && (div bufferIndex 4) == payloadIndex
+    then word .|. (cast byte)
+    else word
 
 
 
