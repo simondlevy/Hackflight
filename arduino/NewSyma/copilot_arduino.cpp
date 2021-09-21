@@ -44,16 +44,14 @@ void copilot_updateSerial(void)
     }
 }
 
-void copilot_receiveSerialPayload(uint8_t byte)
+void copilot_handleSerialInput(
+        uint8_t b00, uint8_t b01, uint8_t b02, uint8_t b03,
+        uint8_t b04, uint8_t b05, uint8_t b06, uint8_t b07,
+        uint8_t b08, uint8_t b09, uint8_t b10, uint8_t b11,
+        uint8_t b12, uint8_t b13, uint8_t b14, uint8_t b15)
 {
-    uint8_t index = 0;
 
-    static uint8_t _payload[256] = {};
-
-    debugger.printf("%x\n", byte);
-
-    _payload[0] = byte;
-
+    /*
     switch (index) {
         case 4:
             memcpy(&copilot_input1, &_payload[0], sizeof(float));
@@ -68,23 +66,15 @@ void copilot_receiveSerialPayload(uint8_t byte)
             memcpy(&copilot_input4, &_payload[12], sizeof(float));
             break;
     }
+    */
 }
 
 void copilot_sendSerialOutput(
         uint8_t type,
         uint8_t count,
-        float v01,
-        float v02,
-        float v03,
-        float v04,
-        float v05,
-        float v06,
-        float v07,
-        float v08,
-        float v09,
-        float v10,
-        float v11,
-        float v12)
+        float v01, float v02, float v03, float v04,
+        float v05, float v06, float v07, float v08,
+        float v09, float v10, float v11, float v12)
 
 {
     Serial.write('$');

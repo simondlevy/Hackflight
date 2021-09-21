@@ -50,11 +50,11 @@ data OutputValues = OutputValues {  v00 :: Stream Float
                                   , v11 :: Stream Float
                                   }
  
-data SerialBuffer = SerialBuffer {  incoming :: Stream Bool 
-                                  , count    :: Stream Word8
-                                  , msgtype  :: Stream Word8
-                                  , inbytes  :: InputBytes
-                                  , outvals  :: OutputValues 
+data SerialBuffer = SerialBuffer {  inputReady :: Stream Bool 
+                                  , count      :: Stream Word8
+                                  , msgtype    :: Stream Word8
+                                  , inbytes    :: InputBytes
+                                  , outvals    :: OutputValues 
                                  }
                   
 -- Parser state constants
@@ -145,8 +145,7 @@ parse mixer vehicleState = (serialBuffer, motors)
     index = if pstate' == pInPayload then index' + 1 else  0
     index' = [0] ++ index
 
-    incoming = msgtype' >= 200
-    inPayload = incoming && pstate == pInPayload
+    inPayload = msgtype' >= 200 && pstate == pInPayload
 
     msgtype = if pstate' == pGotSize then c else msgtype'
     msgtype' = [0] ++ msgtype
@@ -164,6 +163,9 @@ parse mixer vehicleState = (serialBuffer, motors)
                   else if pstate' == pInPayload && index < size then pInPayload
                   else if pstate' == pInPayload then pIdle
                   else pstate'
+
+    inputReady = pstate' == pInPayload && pstate == pIdle
+
     pstate' = [0] ++ pstate
 
     b00 = bufferInput inPayload 0 index c b00' 
@@ -233,7 +235,7 @@ parse mixer vehicleState = (serialBuffer, motors)
     inputBuffer = InputBytes b00 b01 b02 b04 b04 b05 b06 b07
                              b08 b09 b10 b11 b12 b13 b14 b15
 
-    serialBuffer = SerialBuffer incoming count msgtype inputBuffer outputValues
+    serialBuffer = SerialBuffer inputReady count msgtype inputBuffer outputValues
 
     motors = QuadMotors motor1 motor2 motor3 motor4
 
