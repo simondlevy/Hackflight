@@ -47,6 +47,8 @@ void copilot_updateSerial(void)
 void copilot_handleSerialJnput(uint32_t w00, uint32_t w01, uint32_t w02, uint32_t w03)
 {
 
+    debugger.printf("x%02X x%02X x%02X x%02X\n", w00, w01, w02, w03);
+
     /*
     switch (index) {
         case 4:
