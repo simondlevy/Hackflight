@@ -72,10 +72,7 @@ void setup(void)
     copilot_startLed(LED_PIN);
     copilot_startSerial();
 
-    copilot_startBrushedMotor(MOTOR1_PIN);
-    copilot_startBrushedMotor(MOTOR2_PIN);
-    copilot_startBrushedMotor(MOTOR3_PIN);
-    copilot_startBrushedMotor(MOTOR4_PIN);
+    copilot_startBrushedMotors(MOTOR1_PIN,  MOTOR2_PIN, MOTOR3_PIN, MOTOR4_PIN);
 
     h.addSensor(&imu);
     h.addPidController(&levelPid);
@@ -99,36 +96,28 @@ void loop(void)
 
     h.update(motors, led, serial);
 
-    if (serial.count == 0) {
-        copilot_resetSerial();
-    }
-
     if (serial.count == -1) {
         copilot_handleSerialJnput(serial.input);
+    }
+
+    if (serial.count == 0) {
+        copilot_resetSerial();
     }
 
     if (serial.count > 0) {
         copilot_sendSerialOutput(
                 serial.type,
                 serial.count,
-                serial.output01,
-                serial.output02,
-                serial.output03,
-                serial.output04,
-                serial.output05,
-                serial.output06,
-                serial.output07,
-                serial.output08,
-                serial.output09,
-                serial.output10,
-                serial.output11,
-                serial.output12);
+                serial.output01, serial.output02, serial.output03, serial.output04,
+                serial.output05, serial.output06, serial.output07, serial.output08,
+                serial.output09, serial.output10, serial.output11, serial.output12);
     }
 
     copilot_setLed(LED_PIN, led);
 
-    copilot_writeBrushedMotor(MOTOR1_PIN, motors[0]);
-    copilot_writeBrushedMotor(MOTOR2_PIN, motors[1]);
-    copilot_writeBrushedMotor(MOTOR3_PIN, motors[2]);
-    copilot_writeBrushedMotor(MOTOR4_PIN, motors[3]);
+    copilot_writeBrushedMotors(
+        MOTOR1_PIN, motors[0],
+        MOTOR2_PIN, motors[1],
+        MOTOR3_PIN, motors[2],
+        MOTOR4_PIN, motors[3]);
 }

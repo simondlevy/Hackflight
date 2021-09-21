@@ -19,10 +19,10 @@ import Mixer
 import Utils(xor)
 
 
-data InputWords = InputWords {  w00 :: Stream Word32
-                              , w01 :: Stream Word32 
-                              , w02 :: Stream Word32 
-                              , w03 :: Stream Word32 
+data InputBytes = InputBytes {  b00 :: Stream Word8
+                              , b01 :: Stream Word8 
+                              , b02 :: Stream Word8 
+                              , b03 :: Stream Word8 
                              }
 
 data OutputValues = OutputValues {  v00 :: Stream Float
@@ -42,7 +42,7 @@ data OutputValues = OutputValues {  v00 :: Stream Float
 data SerialBuffer = SerialBuffer {  inputReady :: Stream Bool 
                                   , count      :: Stream Word8
                                   , msgtype    :: Stream Word8
-                                  , inwords    :: InputWords
+                                  , inbytes    :: InputBytes
                                   , outvals    :: OutputValues 
                                  }
                   
@@ -113,14 +113,12 @@ bufferInput ::   Stream Bool   -- inPayload flag
               -> Stream Word8  -- bufferIndex
               -> Stream Word8  -- payloadIndex
               -> Stream Word8  -- byte
-              -> Stream Word32 -- word
-              -> Stream Word32 -- new word
+              -> Stream Word8 
+              -> Stream Word8 
 
-bufferInput inPayload bufferIndex payloadIndex byte word
-  = if inPayload && (div payloadIndex 4) == bufferIndex
-    then word .|. ((cast byte) .<<. 0) -- ((mod payloadIndex 4) * 8))
-    else word
-
+bufferInput inPayload bufferIndex payloadIndex byte byte' =
+  if inPayload && (bufferIndex == payloadIndex) then byte
+  else byte'
 
 -- Parser function
 
@@ -161,14 +159,14 @@ parse mixer vehicleState = (serialBuffer, motors)
 
     pstate' = [0] ++ pstate
 
-    w00 = bufferInput inPayload 0 index c w00' 
-    w00' = [0] ++ w00
-    w01 = 0 -- bufferInput inPayload 1 index c w01' 
-    w01' = [0] ++ w01
-    w02 = 0 -- bufferInput inPayload 2 index c w02' 
-    w02' = [0] ++ w02
-    w03 = 0 -- bufferInput inPayload 3 index c w03' 
-    w03' = [0] ++ w03
+    b00 = bufferInput inPayload 0 index c b00' 
+    b00' = [0] ++ b00
+    b01 = bufferInput inPayload 1 index c b01' 
+    b01' = [0] ++ b01
+    b02 = bufferInput inPayload 2 index c b02' 
+    b02' = [0] ++ b02
+    b03 = bufferInput inPayload 3 index c b03' 
+    b03' = [0] ++ b03
 
     ready = pstate == pIdle && crc == c
 
@@ -201,7 +199,7 @@ parse mixer vehicleState = (serialBuffer, motors)
 
     outputValues = OutputValues v00 v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11
 
-    inputBuffer = InputWords w00 w01 w02 w03
+    inputBuffer = InputBytes b00 b01 b02 b03
 
     serialBuffer = SerialBuffer inputReady count msgtype inputBuffer outputValues
 

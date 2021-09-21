@@ -44,10 +44,17 @@ void copilot_updateSerial(void)
     }
 }
 
-void copilot_handleSerialJnput(uint32_t w00, uint32_t w01, uint32_t w02, uint32_t w03)
+void copilot_handleSerialJnput(uint8_t b00, uint8_t b01, uint8_t b02, uint8_t b03)
 {
 
-    debugger.printf("x%08X x%08X x%08X x%08X\n", w00, w01, w02, w03);
+    // debugger.printf("x%02X x%02X x%02X x%02X\n", b00, b01, b02, b03);
+
+    uint8_t buf[4] = { b00, b01, b02, b03 };
+
+    float input = 0;
+    memcpy(&input, buf, 4);
+    debugger.printf("%3.3f\n", input);
+
 
     /*
     switch (index) {
