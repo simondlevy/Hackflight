@@ -93,9 +93,27 @@ spec = do
   trigger "copilot_updateClock" looping [] 
 
   let serialCount = count serialBuffer
+  let serialInBytes = inbytes serialBuffer
   let serialOutVals = outvals serialBuffer
 
-  -- trigger "copilot_handleSerialInput" (incoming serialBuffer) [arg $ input serialBuffer]
+  trigger "copilot_handleSerialInput" (inputReady serialBuffer)
+                                      [  arg $ b00 serialInBytes
+                                       , arg $ b01 serialInBytes 
+                                       , arg $ b02 serialInBytes 
+                                       , arg $ b03 serialInBytes 
+                                       , arg $ b04 serialInBytes 
+                                       , arg $ b05 serialInBytes 
+                                       , arg $ b06 serialInBytes 
+                                       , arg $ b07 serialInBytes 
+                                       , arg $ b08 serialInBytes 
+                                       , arg $ b09 serialInBytes 
+                                       , arg $ b10 serialInBytes 
+                                       , arg $ b11 serialInBytes 
+                                       , arg $ b12 serialInBytes 
+                                       , arg $ b13 serialInBytes 
+                                       , arg $ b14 serialInBytes 
+                                       , arg $ b15 serialInBytes
+                                       ] 
 
   trigger "copilot_sendSerialOutput" (serialCount > 0)
                                      [ arg $ msgtype serialBuffer
