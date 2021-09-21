@@ -15,23 +15,29 @@ namespace hf {
 
     typedef struct {
 
+        float v01;
+        float v02;
+        float v03;
+        float v04;
+        float v05;
+        float v06;
+        float v07;
+        float v08;
+        float v09;
+        float v10;
+        float v11;
+        float v12;
+
+    } output_t;
+
+    typedef struct {
+
         int8_t count; // 0=nothing; -1=incoming; +=outgoing
         uint8_t type;
 
         uint8_t input;
 
-        float output01;
-        float output02;
-        float output03;
-        float output04;
-        float output05;
-        float output06;
-        float output07;
-        float output08;
-        float output09;
-        float output10;
-        float output11;
-        float output12;
+        output_t output;
 
     } serial_t;
 
@@ -52,30 +58,30 @@ namespace hf {
                 case 121:
                     {
                         serial.count = 6;
-                        serial.output01 = copilot_receiverThrottle;
-                        serial.output02 = copilot_receiverRoll;
-                        serial.output03 = copilot_receiverPitch;
-                        serial.output04 = copilot_receiverYaw;
-                        serial.output05 = copilot_receiverAux1;
-                        serial.output06 = 0; // XXX we should support aux2
+                        serial.output.v01 = copilot_receiverThrottle;
+                        serial.output.v02 = copilot_receiverRoll;
+                        serial.output.v03 = copilot_receiverPitch;
+                        serial.output.v04 = copilot_receiverYaw;
+                        serial.output.v05 = copilot_receiverAux1;
+                        serial.output.v06 = 0; // XXX we should support aux2
                     } break;
 
                 case 122:
                     {
                         serial.count = 12;
                         float * x = vehicleState->x;
-                        serial.output01 = x[State::X];
-                        serial.output02 = x[State::DX];
-                        serial.output03 = x[State::Y];
-                        serial.output04 = x[State::DY];
-                        serial.output05 = x[State::Z];
-                        serial.output06 = x[State::DZ];
-                        serial.output07 = x[State::PHI];
-                        serial.output08 = x[State::DPHI];
-                        serial.output09 = x[State::THETA];
-                        serial.output10 = x[State::DTHETA];
-                        serial.output11 = x[State::PSI];
-                        serial.output12 = x[State::DPSI];
+                        serial.output.v01 = x[State::X];
+                        serial.output.v02 = x[State::DX];
+                        serial.output.v03 = x[State::Y];
+                        serial.output.v04 = x[State::DY];
+                        serial.output.v05 = x[State::Z];
+                        serial.output.v06 = x[State::DZ];
+                        serial.output.v07 = x[State::PHI];
+                        serial.output.v08 = x[State::DPHI];
+                        serial.output.v09 = x[State::THETA];
+                        serial.output.v10 = x[State::DTHETA];
+                        serial.output.v11 = x[State::PSI];
+                        serial.output.v12 = x[State::DPSI];
                     } break;
 
             } // switch (type)

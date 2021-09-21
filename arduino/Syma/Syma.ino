@@ -108,9 +108,9 @@ void loop(void)
         copilot_sendSerialOutput(
                 serial.type,
                 serial.count,
-                serial.output01, serial.output02, serial.output03, serial.output04,
-                serial.output05, serial.output06, serial.output07, serial.output08,
-                serial.output09, serial.output10, serial.output11, serial.output12);
+                serial.output.v01, serial.output.v02, serial.output.v03, serial.output.v04,
+                serial.output.v05, serial.output.v06, serial.output.v07, serial.output.v08,
+                serial.output.v09, serial.output.v10, serial.output.v11, serial.output.v12);
     }
 
     copilot_setLed(LED_PIN, led);
