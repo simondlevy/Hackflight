@@ -44,11 +44,7 @@ void copilot_updateSerial(void)
     }
 }
 
-void copilot_handleSerialJnput( // sic
-        uint8_t b00, uint8_t b01, uint8_t b02, uint8_t b03,
-        uint8_t b04, uint8_t b05, uint8_t b06, uint8_t b07,
-        uint8_t b08, uint8_t b09, uint8_t b10, uint8_t b11,
-        uint8_t b12, uint8_t b13, uint8_t b14, uint8_t b15)
+void copilot_handleSerialJnput(uint32_t w00, uint32_t w01, uint32_t w02, uint32_t w03)
 {
 
     /*
