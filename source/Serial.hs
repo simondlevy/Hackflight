@@ -117,10 +117,10 @@ bufferInput ::   Stream Bool   -- inPayload flag
               -> Stream Word32 -- new word
 
 bufferInput inPayload bufferIndex payloadIndex byte word
-  = if inPayload && (div bufferIndex 4) == payloadIndex
-    then word .|. ((cast byte) .<<. (mod bufferIndex 4))
+  = if inPayload && (div payloadIndex 4) == bufferIndex
+    -- then word .|. ((cast byte) .<<. (mod bufferIndex 4))
+    then (cast byte)
     else word
-
 
 
 -- Parser function
@@ -164,11 +164,11 @@ parse mixer vehicleState = (serialBuffer, motors)
 
     w00 = bufferInput inPayload 0 index c w00' 
     w00' = [0] ++ w00
-    w01 = bufferInput inPayload 1 index c w01' 
+    w01 = 0 -- bufferInput inPayload 1 index c w01' 
     w01' = [0] ++ w01
-    w02 = bufferInput inPayload 2 index c w02' 
+    w02 = 0 -- bufferInput inPayload 2 index c w02' 
     w02' = [0] ++ w02
-    w03 = bufferInput inPayload 3 index c w03' 
+    w03 = 0 -- bufferInput inPayload 3 index c w03' 
     w03' = [0] ++ w03
 
     ready = pstate == pIdle && crc == c
