@@ -118,8 +118,7 @@ bufferInput ::   Stream Bool   -- inPayload flag
 
 bufferInput inPayload bufferIndex payloadIndex byte word
   = if inPayload && (div payloadIndex 4) == bufferIndex
-    -- then word .|. ((cast byte) .<<. (mod bufferIndex 4))
-    then (cast byte)
+    then word .|. ((cast byte) .<<. 0) -- ((mod payloadIndex 4) * 8))
     else word
 
 
