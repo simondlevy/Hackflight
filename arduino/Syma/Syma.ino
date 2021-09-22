@@ -19,6 +19,7 @@
 
 #include "cppsrc/Hackflight.hpp"
 #include "cppsrc/receiver.hpp"
+#include "cppsrc/serial.hpp"
 #include "cppsrc/mixers/quadxmw.hpp"
 #include "cppsrc/pidcontrollers/rate.hpp"
 #include "cppsrc/pidcontrollers/yaw.hpp"
@@ -92,25 +93,37 @@ void loop(void)
 
     float motors[4] = {};
     bool led = false;
-    hf::serial_t serial = {};
+    static hf::serial_t serial;
 
     h.update(motors, led, serial);
 
-    if (serial.count == -1) {
-        copilot_handleSerialJnput(serial.input);
-    }
-
-    if (serial.count == 0) {
-        copilot_resetSerial();
+    if (serial.input_ready) {
+        copilot_handleSerialInput(
+          serial.input.b00,
+          serial.input.b01,
+          serial.input.b02,
+          serial.input.b03,
+          serial.input.b04,
+          serial.input.b05,
+          serial.input.b06,
+          serial.input.b07,
+          serial.input.b08,
+          serial.input.b09,
+          serial.input.b10,
+          serial.input.b11,
+          serial.input.b12,
+          serial.input.b13,
+          serial.input.b14,
+          serial.input.b15);
     }
 
     if (serial.count > 0) {
         copilot_sendSerialOutput(
                 serial.type,
                 serial.count,
-                serial.output.v01, serial.output.v02, serial.output.v03, serial.output.v04,
-                serial.output.v05, serial.output.v06, serial.output.v07, serial.output.v08,
-                serial.output.v09, serial.output.v10, serial.output.v11, serial.output.v12);
+                serial.output.v00, serial.output.v01, serial.output.v02, serial.output.v03,
+                serial.output.v04, serial.output.v05, serial.output.v06, serial.output.v07,
+                serial.output.v08, serial.output.v09, serial.output.v10, serial.output.v11);
     }
 
     copilot_setLed(LED_PIN, led);

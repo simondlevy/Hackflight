@@ -10,6 +10,9 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+#include "Debugger.hpp"
+Debugger debugger = Debugger(&Serial2);
+
 #define _EXTERN
 #include "copilot.h"
 
@@ -18,6 +21,8 @@
 void copilot_startSerial(void)
 {
     Serial.begin(115200);
+
+    debugger.begin();
 }
 
 void copilot_serialWrite(uint8_t b)
@@ -33,33 +38,41 @@ void copilot_updateSerial(void)
         copilot_serialByte = Serial.read();
     }
 }
-
-static uint8_t _serialBuffer[128] = {};
-static uint8_t _serialInputIndex;
-
-void copilot_handleSerialJnput(uint8_t byte)
+static float float_from_bytes(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3)
 {
-        _serialBuffer[_serialInputIndex++] = byte;
-
-        switch (_serialInputIndex) {
-            case 4:
-                memcpy(&copilot_input1, &_serialBuffer[0], sizeof(float));
-                break;
-            case 8:
-                memcpy(&copilot_input2, &_serialBuffer[4], sizeof(float));
-                break;
-            case 12:
-                memcpy(&copilot_input3, &_serialBuffer[8], sizeof(float));
-                break;
-            case 16:
-                memcpy(&copilot_input4, &_serialBuffer[12], sizeof(float));
-                break;
-        }
+    float f = 0;
+    uint8_t b[4] = {b0, b1, b2, b3};
+    memcpy(&f, b, 4);
+    return f;
 }
 
-void copilot_resetSerial(void)
+void copilot_handleSerialInput(
+        uint8_t b00,
+        uint8_t b01,
+        uint8_t b02,
+        uint8_t b03,
+        uint8_t b04,
+        uint8_t b05,
+        uint8_t b06,
+        uint8_t b07,
+        uint8_t b08,
+        uint8_t b09,
+        uint8_t b10,
+        uint8_t b11,
+        uint8_t b12,
+        uint8_t b13,
+        uint8_t b14,
+        uint8_t b15)
 {
-    _serialInputIndex = 0;
+    copilot_input1 = float_from_bytes(b00, b01, b02, b03);
+    copilot_input2 = float_from_bytes(b04, b05, b06, b07);
+    copilot_input3 = float_from_bytes(b08, b09, b10, b11);
+    copilot_input4 = float_from_bytes(b12, b13, b14, b15);
+
+    /*
+    debugger.printf("%3.3f %3.3f %3.3f %3.3f\n",
+            copilot_input1, copilot_input2, copilot_input3, copilot_input4);
+            */
 }
 
 void copilot_sendSerialOutput(
