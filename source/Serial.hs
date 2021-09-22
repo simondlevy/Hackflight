@@ -111,14 +111,10 @@ getOutputValue ready vehicleState msgtype index =
 leftshift :: Stream Word32 -> Stream Word8 -> Stream Word8 -> Stream Word32
 leftshift w b n = w .|. ((cast b) .<<. n)
 
-guardshift :: Stream Bool
-           -> Stream Word8
-           -> Stream Word8
-           -> Stream Word8
-           -> Stream Word32
+getword :: Stream Bool -> Stream Word8 -> Stream Word8 -> Stream Word8 -> Stream Word32
            -> Stream Word32
 
-guardshift inpayload byte index start word =
+getword inpayload byte index start word =
   if (not inpayload) then 0
   else if index == start then leftshift word byte 0
   else if index == (start+1) then leftshift word byte 8
@@ -170,28 +166,17 @@ parse mixer vehicleState = (serial, motors)
 
     count = if ready then getOutputSize msgtype else 0
 
-    w00 = guardshift inPayload c index 1 w00'
+    w00 = getword inPayload c index 1 w00'
     w00' = [0] ++ w00
 
-    w01 = guardshift inPayload c index 5 w01'
+    w01 = getword inPayload c index 5 w01'
     w01' = [0] ++ w01
 
-    w02 = if (not inPayload) then 0
-          else if index == 9 then leftshift w02' c 0
-          else if index == 10 then leftshift w02' c 8
-          else if index == 11 then leftshift w02' c 16
-          else if index == 12 then leftshift w02' c 24
-          else w02'
+    w02 = getword inPayload c index 9 w02'
     w02' = [0] ++ w02
 
-    w03 = if (not inPayload) then 0
-          else if index == 13 then leftshift w03' c 0
-          else if index == 14 then leftshift w03' c 8
-          else if index == 15 then leftshift w03' c 16
-          else if index == 16 then leftshift w03' c 24
-          else w03'
+    w03 = getword inPayload c index 13 w03'
     w03' = [0] ++ w03
-
 
     motorsReady = ready && msgtype == 215
 
