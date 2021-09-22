@@ -186,8 +186,12 @@ namespace hf {
 
             // Payload functions
             size = parser_state == GOT_ARROW ? c : size;
+
             index = parser_state == IN_PAYLOAD ? index + 1 : 0;
+
+
             bool incoming = type >= 200;
+
             bool in_payload = incoming && parser_state == IN_PAYLOAD;
 
             // Command acquisition function

@@ -19,31 +19,43 @@ import Mixer
 import Utils(xor)
 
 
-data InputBytes = InputBytes {  b00 :: Stream Word8
-                              , b01 :: Stream Word8 
-                              , b02 :: Stream Word8 
-                              , b03 :: Stream Word8 
-                             }
+data Input = Input {  b00 :: Stream Word8
+                    , b01 :: Stream Word8 
+                    , b02 :: Stream Word8 
+                    , b03 :: Stream Word8 
+                    , b04 :: Stream Word8 
+                    , b05 :: Stream Word8 
+                    , b06 :: Stream Word8 
+                    , b07 :: Stream Word8 
+                    , b08 :: Stream Word8 
+                    , b09 :: Stream Word8 
+                    , b10 :: Stream Word8 
+                    , b11 :: Stream Word8 
+                    , b12 :: Stream Word8 
+                    , b13 :: Stream Word8 
+                    , b14 :: Stream Word8 
+                    , b15 :: Stream Word8 
+                   }
 
-data OutputValues = OutputValues {  v00 :: Stream Float
-                                  , v01 :: Stream Float
-                                  , v02 :: Stream Float
-                                  , v03 :: Stream Float
-                                  , v04 :: Stream Float
-                                  , v05 :: Stream Float
-                                  , v06 :: Stream Float
-                                  , v07 :: Stream Float
-                                  , v08 :: Stream Float
-                                  , v09 :: Stream Float
-                                  , v10 :: Stream Float
-                                  , v11 :: Stream Float
-                                  }
+data Output = Output {  v00 :: Stream Float
+                      , v01 :: Stream Float
+                      , v02 :: Stream Float
+                      , v03 :: Stream Float
+                      , v04 :: Stream Float
+                      , v05 :: Stream Float
+                      , v06 :: Stream Float
+                      , v07 :: Stream Float
+                      , v08 :: Stream Float
+                      , v09 :: Stream Float
+                      , v10 :: Stream Float
+                      , v11 :: Stream Float
+                     }
  
-data SerialBuffer = SerialBuffer {  inputReady :: Stream Bool 
-                                  , count      :: Stream Word8
+data Serial = Serial {  count      :: Stream Word8
                                   , msgtype    :: Stream Word8
-                                  , inbytes    :: InputBytes
-                                  , outvals    :: OutputValues 
+                                  , input      :: Input
+                                  , inputReady :: Stream Bool 
+                                  , output     :: Output 
                                  }
                   
 -- Parser state constants
@@ -117,14 +129,14 @@ bufferInput ::   Stream Bool   -- inPayload flag
               -> Stream Word8 
 
 bufferInput inPayload bufferIndex payloadIndex byte byte' =
-  if inPayload && (bufferIndex == payloadIndex) then byte
+  if inPayload && (bufferIndex == (payloadIndex-1)) then byte
   else byte'
 
 -- Parser function
 
-parse :: Mixer -> State -> (SerialBuffer, Motors)
+parse :: Mixer -> State -> (Serial, Motors)
 
-parse mixer vehicleState = (serialBuffer, motors)
+parse mixer vehicleState = (serial, motors)
 
   where 
 
@@ -136,7 +148,8 @@ parse mixer vehicleState = (serialBuffer, motors)
     index = if pstate' == pInPayload then index' + 1 else  0
     index' = [0] ++ index
 
-    inPayload = msgtype' >= 200 && pstate == pInPayload
+    incoming = msgtype >= 200
+    inPayload = incoming && pstate' == pInPayload
 
     msgtype = if pstate' == pGotSize then c else msgtype'
     msgtype' = [0] ++ msgtype
@@ -146,6 +159,8 @@ parse mixer vehicleState = (serialBuffer, motors)
           else 0
     crc' = [0] ++ crc
  
+    inputReady = pstate' == pInPayload && index == size
+
     pstate = if pstate' == pIdle && c == 36 then pGotStart
                   else if pstate' == pGotStart && c == 77 then pGotM
                   else if pstate' == pGotM && (c == 60 || c == 62) then pGotArrow
@@ -155,22 +170,44 @@ parse mixer vehicleState = (serialBuffer, motors)
                   else if pstate' == pInPayload then pIdle
                   else pstate'
 
-    inputReady = pstate' == pInPayload && pstate == pIdle
-
     pstate' = [0] ++ pstate
-
-    b00 = bufferInput inPayload 0 index c b00' 
-    b00' = [0] ++ b00
-    b01 = bufferInput inPayload 1 index c b01' 
-    b01' = [0] ++ b01
-    b02 = bufferInput inPayload 2 index c b02' 
-    b02' = [0] ++ b02
-    b03 = bufferInput inPayload 3 index c b03' 
-    b03' = [0] ++ b03
 
     ready = pstate == pIdle && crc == c
 
     count = if ready then getOutputSize msgtype else 0
+
+    b00  = bufferInput inPayload 0 index c b00' 
+    b00' = [0] ++ b00
+    b01  = bufferInput inPayload 1 index c b01' 
+    b01' = [0] ++ b01
+    b02  = bufferInput inPayload 2 index c b02' 
+    b02' = [0] ++ b02
+    b03  = bufferInput inPayload 3 index c b03' 
+    b03' = [0] ++ b03
+    b04  = bufferInput inPayload 4 index c b04' 
+    b04' = [0] ++ b04
+    b05  = bufferInput inPayload 5 index c b05' 
+    b05' = [0] ++ b05
+    b06  = bufferInput inPayload 6 index c b06' 
+    b06' = [0] ++ b06
+    b07  = bufferInput inPayload 7 index c b07' 
+    b07' = [0] ++ b07
+    b08  = bufferInput inPayload 8 index c b08' 
+    b08' = [0] ++ b08
+    b09  = bufferInput inPayload 9 index c b09' 
+    b09' = [0] ++ b09
+    b10  = bufferInput inPayload 10 index c b10' 
+    b10' = [0] ++ b10
+    b11  = bufferInput inPayload 11 index c b11' 
+    b11' = [0] ++ b11
+    b12  = bufferInput inPayload 12 index c b12' 
+    b12' = [0] ++ b12
+    b13  = bufferInput inPayload 13 index c b13' 
+    b13' = [0] ++ b13
+    b14  = bufferInput inPayload 14 index c b14' 
+    b14' = [0] ++ b14
+    b15  = bufferInput inPayload 15 index c b15' 
+    b15' = [0] ++ b15
 
     motorsReady = ready && msgtype == 215
 
@@ -197,11 +234,11 @@ parse mixer vehicleState = (serialBuffer, motors)
     v10 = getOutputValue ready vehicleState msgtype 10
     v11 = getOutputValue ready vehicleState msgtype 11
 
-    outputValues = OutputValues v00 v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11
+    output = Output v00 v01 v02 v03 v04 v05 v06 v07 v08 v09 v10 v11
 
-    inputBuffer = InputBytes b00 b01 b02 b03
+    input = Input b00 b01 b02 b03 b04 b05 b06 b07 b08 b09 b10 b11 b12 b13 b14 b15
 
-    serialBuffer = SerialBuffer inputReady count msgtype inputBuffer outputValues
+    serial = Serial count msgtype input inputReady output
 
     motors = QuadMotors motor1 motor2 motor3 motor4
 

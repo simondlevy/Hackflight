@@ -98,7 +98,7 @@ void loop(void)
     h.update(motors, led, serial);
 
     if (serial.input_ready) {
-        copilot_handleSerialInput(
+        copilot_handleSerialJnput(
           serial.input.b00,
           serial.input.b01,
           serial.input.b02,

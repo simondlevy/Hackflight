@@ -83,6 +83,7 @@ spec = do
                                                  , arg $ pin motor2
                                                  , arg $ pin motor3
                                                  , arg $ pin motor4 ]
+
   -- Send the LED using external C function during the looping phase
   trigger "copilot_setLed" looping [arg $ pin led, arg ledState]
 
@@ -93,31 +94,43 @@ spec = do
   trigger "copilot_updateClock" looping [] 
 
   let serialCount = count serialBuffer
-  let serialInBytes = inbytes serialBuffer
-  let serialOutVals = outvals serialBuffer
+  let serialIn = input serialBuffer
+  let serialOut = output serialBuffer
 
   trigger "copilot_handleSerialInput" (inputReady serialBuffer)
-                                      [  arg $ b00 serialInBytes
-                                       , arg $ b01 serialInBytes 
-                                       , arg $ b02 serialInBytes 
-                                       , arg $ b03 serialInBytes 
+                                      [  arg $ b00 serialIn
+                                       , arg $ b01 serialIn 
+                                       , arg $ b02 serialIn 
+                                       , arg $ b03 serialIn 
+                                       , arg $ b04 serialIn 
+                                       , arg $ b05 serialIn 
+                                       , arg $ b06 serialIn 
+                                       , arg $ b07 serialIn 
+                                       , arg $ b08 serialIn 
+                                       , arg $ b09 serialIn 
+                                       , arg $ b10 serialIn 
+                                       , arg $ b11 serialIn 
+                                       , arg $ b12 serialIn 
+                                       , arg $ b13 serialIn 
+                                       , arg $ b14 serialIn 
+                                       , arg $ b15 serialIn 
                                        ] 
 
   trigger "copilot_sendSerialOutput" (serialCount > 0)
                                      [ arg $ msgtype serialBuffer
                                      , arg $ serialCount
-                                     , arg $ v00 serialOutVals
-                                     , arg $ v01 serialOutVals
-                                     , arg $ v02 serialOutVals
-                                     , arg $ v03 serialOutVals
-                                     , arg $ v04 serialOutVals
-                                     , arg $ v05 serialOutVals
-                                     , arg $ v06 serialOutVals
-                                     , arg $ v07 serialOutVals
-                                     , arg $ v08 serialOutVals
-                                     , arg $ v09 serialOutVals
-                                     , arg $ v10 serialOutVals
-                                     , arg $ v11 serialOutVals
+                                     , arg $ v00 serialOut
+                                     , arg $ v01 serialOut
+                                     , arg $ v02 serialOut
+                                     , arg $ v03 serialOut
+                                     , arg $ v04 serialOut
+                                     , arg $ v05 serialOut
+                                     , arg $ v06 serialOut
+                                     , arg $ v07 serialOut
+                                     , arg $ v08 serialOut
+                                     , arg $ v09 serialOut
+                                     , arg $ v10 serialOut
+                                     , arg $ v11 serialOut
                                      ]
 
   -- Send the motor values using the external C function
