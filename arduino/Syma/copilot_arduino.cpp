@@ -38,6 +38,7 @@ void copilot_updateSerial(void)
         copilot_serialByte = Serial.read();
     }
 }
+
 static float float_from_bytes(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3)
 {
     float f = 0;
