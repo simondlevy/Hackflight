@@ -111,6 +111,15 @@ getOutputValue ready vehicleState msgtype index =
 leftshift :: Stream Word32 -> Stream Word8 -> Stream Word8 -> Stream Word32
 leftshift w b n = w .|. ((cast b) .<<. n)
 
+newshift :: Stream Bool -> Stream Word32 -> Stream Word8 -> Stream Word8 -> Stream Word8
+  -> Stream Word32
+
+newshift inpayload word byte index n =
+  if (not inpayload) then 0
+  else if index == 8 then leftshift word byte 0
+  else word .|. ((cast byte) .<<. n)
+
+
 -- Parser function
 
 parse :: Mixer -> State -> (Serial, Motors)
@@ -155,37 +164,35 @@ parse mixer vehicleState = (serial, motors)
 
     count = if ready then getOutputSize msgtype else 0
 
-    index1 = index - 1
-    
     w00 = if (not inPayload) then 0
-          else if index1 == 0 then leftshift w00' c 0
-          else if index1 == 1 then leftshift w00' c 8
-          else if index1 == 2 then leftshift w00' c 16
-          else if index1 == 3 then leftshift w00' c 24
+          else if index == 1 then leftshift w00' c 0
+          else if index == 2 then leftshift w00' c 8
+          else if index == 3 then leftshift w00' c 16
+          else if index == 4 then leftshift w00' c 24
           else w00'
     w00' = [0] ++ w00
 
     w01 = if (not inPayload) then 0
-          else if index1 == 4 then leftshift w01' c 0
-          else if index1 == 5 then leftshift w01' c 8
-          else if index1 == 6 then leftshift w01' c 16
-          else if index1 == 7 then leftshift w01' c 24
+          else if index == 5 then leftshift w01' c 0
+          else if index == 6 then leftshift w01' c 8
+          else if index == 7 then leftshift w01' c 16
+          else if index == 8 then leftshift w01' c 24
           else w01'
     w01' = [0] ++ w01
 
     w02 = if (not inPayload) then 0
-          else if index1 == 8 then leftshift w02' c 0
-          else if index1 == 9 then leftshift w02' c 8
-          else if index1 == 10 then leftshift w02' c 16
-          else if index1 == 11 then leftshift w02' c 24
+          else if index == 9 then leftshift w02' c 0
+          else if index == 10 then leftshift w02' c 8
+          else if index == 11 then leftshift w02' c 16
+          else if index == 12 then leftshift w02' c 24
           else w02'
     w02' = [0] ++ w02
 
     w03 = if (not inPayload) then 0
-          else if index1 == 12 then leftshift w03' c 0
-          else if index1 == 13 then leftshift w03' c 8
-          else if index1 == 14 then leftshift w03' c 16
-          else if index1 == 15 then leftshift w03' c 24
+          else if index == 13 then leftshift w03' c 0
+          else if index == 14 then leftshift w03' c 8
+          else if index == 15 then leftshift w03' c 16
+          else if index == 16 then leftshift w03' c 24
           else w03'
     w03' = [0] ++ w03
 
