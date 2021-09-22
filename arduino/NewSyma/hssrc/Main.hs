@@ -98,22 +98,10 @@ spec = do
   let serialOut = output serialBuffer
 
   trigger "copilot_handleSerialInput" (inputReady serialBuffer)
-                                      [  arg $ b00 serialIn
-                                       , arg $ b01 serialIn 
-                                       , arg $ b02 serialIn 
-                                       , arg $ b03 serialIn 
-                                       , arg $ b04 serialIn 
-                                       , arg $ b05 serialIn 
-                                       , arg $ b06 serialIn 
-                                       , arg $ b07 serialIn 
-                                       , arg $ b08 serialIn 
-                                       , arg $ b09 serialIn 
-                                       , arg $ b10 serialIn 
-                                       , arg $ b11 serialIn 
-                                       , arg $ b12 serialIn 
-                                       , arg $ b13 serialIn 
-                                       , arg $ b14 serialIn 
-                                       , arg $ b15 serialIn 
+                                      [  arg $ w00 serialIn
+                                       , arg $ w01 serialIn 
+                                       , arg $ w02 serialIn 
+                                       , arg $ w03 serialIn 
                                        ] 
 
   trigger "copilot_sendSerialOutput" (serialCount > 0)

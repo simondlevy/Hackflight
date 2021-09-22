@@ -48,29 +48,15 @@ static float float_from_bytes(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3)
 }
 
 void copilot_handleSerialJnput(
-        uint8_t b00,
-        uint8_t b01,
-        uint8_t b02,
-        uint8_t b03,
-        uint8_t b04,
-        uint8_t b05,
-        uint8_t b06,
-        uint8_t b07,
-        uint8_t b08,
-        uint8_t b09,
-        uint8_t b10,
-        uint8_t b11,
-        uint8_t b12,
-        uint8_t b13,
-        uint8_t b14,
-        uint8_t b15)
+        uint32_t w00,
+        uint32_t w01,
+        uint32_t w02,
+        uint32_t w03)
 {
-    debugger.printf("%x %x %x %x\n", b00, b01, b02, b03);
-
-    copilot_input1 = float_from_bytes(b00, b01, b02, b03);
-    copilot_input2 = float_from_bytes(b04, b05, b06, b07);
-    copilot_input3 = float_from_bytes(b08, b09, b10, b11);
-    copilot_input4 = float_from_bytes(b12, b13, b14, b15);
+    memcpy(&copilot_input1, &w00, 4);
+    memcpy(&copilot_input2, &w01, 4);
+    memcpy(&copilot_input3, &w02, 4);
+    memcpy(&copilot_input4, &w03, 4);
 }
 
 void copilot_sendSerialOutput(

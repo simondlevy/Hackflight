@@ -99,22 +99,10 @@ void loop(void)
 
     if (serial.input_ready) {
         copilot_handleSerialJnput(
-          serial.input.b00,
-          serial.input.b01,
-          serial.input.b02,
-          serial.input.b03,
-          serial.input.b04,
-          serial.input.b05,
-          serial.input.b06,
-          serial.input.b07,
-          serial.input.b08,
-          serial.input.b09,
-          serial.input.b10,
-          serial.input.b11,
-          serial.input.b12,
-          serial.input.b13,
-          serial.input.b14,
-          serial.input.b15);
+          serial.input.w00,
+          serial.input.w01,
+          serial.input.w02,
+          serial.input.w03);
     }
 
     if (serial.count > 0) {

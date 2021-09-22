@@ -36,22 +36,10 @@ namespace hf {
 
     typedef struct {
 
-        uint8_t b00;
-        uint8_t b01;
-        uint8_t b02;
-        uint8_t b03;
-        uint8_t b04;
-        uint8_t b05;
-        uint8_t b06;
-        uint8_t b07;
-        uint8_t b08;
-        uint8_t b09;
-        uint8_t b10;
-        uint8_t b11;
-        uint8_t b12;
-        uint8_t b13;
-        uint8_t b14;
-        uint8_t b15;
+        uint32_t w00;
+        uint32_t w01;
+        uint32_t w02;
+        uint32_t w03;
 
     } input_t;
 
@@ -140,22 +128,22 @@ namespace hf {
         {
             if (in_payload) {
                 switch (index) {
-                    case 0: input->b00 = b; break;
-                    case 1: input->b01 = b; break;
-                    case 2: input->b02 = b; break;
-                    case 3: input->b03 = b; break;
-                    case 4: input->b04 = b; break;
-                    case 5: input->b05 = b; break;
-                    case 6: input->b06 = b; break;
-                    case 7: input->b07 = b; break;
-                    case 8: input->b08 = b; break;
-                    case 9: input->b09 = b; break;
-                    case 10: input->b10 = b; break;
-                    case 11: input->b11 = b; break;
-                    case 12: input->b12 = b; break;
-                    case 13: input->b13 = b; break;
-                    case 14: input->b14 = b; break;
-                    case 15: input->b15 = b; break;
+                    case 0:  input->w00  = (uint32_t)b; break;
+                    case 1:  input->w00 |= (uint32_t)b << 8; break;
+                    case 2:  input->w00 |= (uint32_t)b << 16; break;
+                    case 3:  input->w00 |= (uint32_t)b << 24; break;
+                    case 4:  input->w01 =  (uint32_t)b; break;
+                    case 5:  input->w01 |= (uint32_t)b << 8; break;
+                    case 6:  input->w01 |= (uint32_t)b << 16; break;
+                    case 7:  input->w01 |= (uint32_t)b << 16; break;
+                    case 8:  input->w02 =  (uint32_t)b; break;
+                    case 9:  input->w02 |= (uint32_t)b << 8; break;
+                    case 10: input->w02 |= (uint32_t)b << 16; break;
+                    case 11: input->w02 |= (uint32_t)b << 24; break;
+                    case 12: input->w03 =  (uint32_t)b; break;
+                    case 13: input->w03 |= (uint32_t)b << 8; break;
+                    case 14: input->w03 |= (uint32_t)b << 16; break;
+                    case 15: input->w03 |= (uint32_t)b << 24; break;
                 }
             }
         }
