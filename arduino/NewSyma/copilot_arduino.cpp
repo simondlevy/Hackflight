@@ -74,14 +74,12 @@ void copilot_handleSerialJnput(
     // debugger.printf("%x %x %x %x\n", b00, b01, b02, b03);
 
     copilot_input1 = float_from_bytes(b00, b01, b02, b03);
-
-    debugger.printf("%+3.3f\n", copilot_input1);
-    
-    /*
     copilot_input2 = float_from_bytes(b04, b05, b06, b07);
     copilot_input3 = float_from_bytes(b08, b09, b10, b11);
     copilot_input4 = float_from_bytes(b12, b13, b14, b15);
-    */
+
+    debugger.printf("%+3.3f %+3.3f %+3.3f %+3.3f\n",
+            copilot_input1, copilot_input2, copilot_input3, copilot_input4);
 }
 
 void copilot_sendSerialOutput(
