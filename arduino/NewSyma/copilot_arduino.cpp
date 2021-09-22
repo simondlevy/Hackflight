@@ -11,7 +11,7 @@
 #include <Wire.h>
 
 #include "Debugger.hpp"
-Debugger debugger = Debugger(&Serial2);
+Debugger debugger; // = Debugger(&Serial2);
 
 #define _EXTERN
 #include "copilot.h"
@@ -27,7 +27,7 @@ void copilot_startSerial(void)
 {
     Serial.begin(115200);
 
-    debugger.begin();
+    //debugger.begin();
 }
 
 void copilot_serialWrite(uint8_t b)
@@ -59,15 +59,14 @@ void copilot_handleSerialJnput(
         uint32_t w03)
 {
 
-    // debugger.printf("%x %x %x %x\n", b00, b01, b02, b03);
 
     memcpy(&copilot_input1, &w00, 4);
     memcpy(&copilot_input2, &w01, 4);
     memcpy(&copilot_input3, &w02, 4);
     memcpy(&copilot_input4, &w03, 4);
 
-    debugger.printf("%3.3f %3.3f %3.3f %3.3f\n",
-            copilot_input1, copilot_input2, copilot_input3, copilot_input4);
+    //debugger.printf("%3.3f %3.3f %3.3f %3.3f\n",
+   //         copilot_input1, copilot_input2, copilot_input3, copilot_input4);
 }
 
 void copilot_sendSerialOutput(

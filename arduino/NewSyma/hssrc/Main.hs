@@ -122,10 +122,14 @@ spec = do
                                      ]
 
   -- Send the motor values using the external C function
-  trigger "copilot_writeBrushedMotors" looping [  arg $ pin motor1, arg $ (m1 motors),
-                                                  arg $ pin motor2, arg $ (m2 motors),
-                                                  arg $ pin motor3, arg $ (m3 motors),
-                                                  arg $ pin motor4, arg $ (m4 motors) ]
+  trigger "copilot_writeBrushedMotors"  looping  [  arg $ pin motor1, arg $ (m1 motors)
+                                                  , arg $ pin motor2, arg $ (m2 motors)
+                                                  , arg $ pin motor3, arg $ (m3 motors)
+                                                  , arg $ pin motor4, arg $ (m4 motors) ]
+
+  let ready = true
+
+  trigger "copilot_debug" true [arg $ ready]
  
 -- Compile the spec
 main = reify spec >>= compile "copilot"
