@@ -26,7 +26,7 @@ hackflightFull = (starting, looping, ledOn, motorsReady)
     starting = not looping
 
     -- This allows to set the motors periodically
-    motorsReady = ready 1 -- 66
+    motorsReady = ready 5 -- 66
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     ledOn = if time_msec < 100 then false 

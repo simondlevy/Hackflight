@@ -30,13 +30,13 @@ spec = do
   trigger "copilot_startSerial" starting []
 
   -- Set up the LED during the startup phase
-  trigger "copilot_startLed" starting [arg $ ledPin]
+  -- trigger "copilot_startLed" starting [arg $ ledPin]
 
   -- Update the time during the looping phase
-  trigger "copilot_updateTime" looping []
+  trigger "copilot_updateTime" true []
 
   -- Set the LED during the looping phase
-  trigger "copilot_setLed" looping [arg $ ledPin, arg ledOn]
+  -- trigger "copilot_setLed" looping [arg $ ledPin, arg ledOn]
 
   trigger "copilot_debug" (ready 1) []
 
