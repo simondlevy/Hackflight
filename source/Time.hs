@@ -11,20 +11,15 @@
 module Time where
 
 import Language.Copilot
-import Prelude hiding ((>), (-), (++), (==), (/))
+import Prelude hiding (div, (>), (==), (++))
 
-ready :: Stream Float -> Stream Bool
+ready :: Stream Word32 -> Stream Bool
+  
+ready freq = (micros == micros_prev) where
 
-ready freq = (time_sec == time_sec_prev) where
+  period = div 1000000 freq
+  micros_prev = if (micros - micros_prev') > period then micros else micros_prev'
+  micros_prev' = [0] ++ micros_prev
 
-  time_sec_prev = if (time_sec - time_sec_prev') > (1 / freq) then time_sec else time_sec_prev'
-  time_sec_prev' = [0] ++ time_sec_prev
-
-time_sec :: Stream Float
-time_sec  = extern "copilot_time_sec" Nothing
-
-time_msec :: Stream Word32
-time_msec  = extern "copilot_time_msec" Nothing
-
-time_usec :: Stream Word32
-time_usec  = extern "copilot_time_usec" Nothing
+micros :: Stream Word32
+micros  = extern "copilot_micros" Nothing

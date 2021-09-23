@@ -1,5 +1,5 @@
 {--
-  Hackflight algorithm with serial comms
+  Hackflight algorithm for microcontrollers
 
   Copyright(C) 2021 on D.Levy
 
@@ -29,6 +29,6 @@ hackflightFull = (starting, looping, ledOn, motorsReady)
     motorsReady = ready 5 -- 66
 
     -- Blink LED during first couple of seconds; keep it solid when armed
-    ledOn = if time_msec < 100 then false 
-            else if time_msec < 2000 then (mod (div time_msec 50) 2 == 0)
+    ledOn = if micros < 100000 then false 
+            else if micros < 2000000 then (mod (div micros 50000) 2 == 0)
             else false -- armed
