@@ -4,6 +4,9 @@ RUNH = runhaskell Timer.hs
 
 all: main
 
+run: main
+	./main
+
 main: main.c timer.c timer.h
 	gcc -o main main.c timer.c
 
