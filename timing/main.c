@@ -10,6 +10,11 @@ void tick(void)
     printf("%04d\n", t++);
 }
 
+void debug(float t, float p)
+{
+    printf("%f %f\n", t, p);
+}
+
 float copilot_time_sec;
 
 static double get_time(void)
@@ -29,13 +34,15 @@ int main(int argc, char ** argv)
 
         copilot_time_sec = (float)(get_time() - start);
 
+        /*
         time_sec_prev = (copilot_time_sec - time_sec_prev) > 1 ? copilot_time_sec : time_sec_prev;
 
         if (copilot_time_sec - time_sec_prev == 0) {
             printf("tick\n");
         }
+        */
 
-        // step();
+        step();
     }
 
     return 0;
