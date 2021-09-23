@@ -13,6 +13,7 @@ import Copilot.Compile.C99
 import Prelude hiding((&&))
 
 import HackflightFull
+import Time
 
 ledPin = 18 :: Stream Word8
 
@@ -25,20 +26,19 @@ spec = do
 
   let (starting, looping, ledOn, motorsReady) = hackflightFull
  
-  -- Always update the time
-  trigger "copilot_updateTime" true []
+  -- Set up serial comms during the startup phase
+  trigger "copilot_startSerial" starting []
 
   -- Set up the LED during the startup phase
   trigger "copilot_startLed" starting [arg $ ledPin]
 
-  -- Set up serial comms during the startup phase
-  trigger "copilot_startSerial" starting []
+  -- Update the time during the looping phase
+  trigger "copilot_updateTime" looping []
 
   -- Set the LED during the looping phase
   trigger "copilot_setLed" looping [arg $ ledPin, arg ledOn]
 
-
-  trigger "copilot_debug" looping [arg $ motorsReady]
+  trigger "copilot_debug" (ready 1) []
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
