@@ -8,7 +8,6 @@
 SRCDIR = ../../../source
 
 SRC = Main.hs \
-      $(SRCDIR)/Pin.hs \
       $(SRCDIR)/Safety.hs \
       $(SRCDIR)/Serial.hs \
       $(SRCDIR)/Receiver.hs \
