@@ -7,6 +7,8 @@
 
  */
 
+/*
+
 #define _EXTERN
 #include "copilot.h"
 
@@ -52,3 +54,4 @@ void copilot_updateDsmrx(void)
         copilot_receiverAux1 = values[6];
     }
 }
+*/

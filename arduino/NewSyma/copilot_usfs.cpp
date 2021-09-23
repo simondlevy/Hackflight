@@ -7,6 +7,7 @@
 
  */
 
+/*
 
 #define _EXTERN
 #include "copilot.h"
@@ -46,3 +47,5 @@ void copilot_updateUsfs(void)
                 copilot_quaternionZ);
     }
 }
+
+*/

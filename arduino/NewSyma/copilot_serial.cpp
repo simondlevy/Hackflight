@@ -1,5 +1,5 @@
 /*
-   Arduino support for Haskell Copilot
+   Arduino serial support for Haskell Copilot
 
    Copyright (C) 2021 Simon D. Levy
 
@@ -7,16 +7,15 @@
 
  */
 
+/*
+
 #include <Arduino.h>
-#include <Wire.h>
 
 #include "Debugger.hpp"
 Debugger debugger; // = Debugger(&Serial2);
 
 #define _EXTERN
 #include "copilot.h"
-
-// Serial comms ---------------------------------------------------------------
 
 void copilot_debug(bool byte)
 {
@@ -102,29 +101,4 @@ void copilot_sendSerialOutput(
     Serial.write(crc);
 }
 
-// LED---------------------------------------------------------------
-
-void copilot_startLed(uint8_t pin)
-{
-    pinMode(pin, OUTPUT);
-
-}
-
-void copilot_setLed(uint8_t pin, bool on)
-{
-    digitalWrite(pin, on);
-}
-
-// Clock ---------------------------------------------------------------
-
-void copilot_updateClock(void)
-{
-    copilot_time_msec = millis();
-    // copilot_time_sec = micros() / 1.e6f;
-}
-
-// I^2C  ---------------------------------------------------------------
-void copilot_startWire(void)
-{
-    Wire.begin();
-}
+*/
