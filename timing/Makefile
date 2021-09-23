@@ -1,20 +1,20 @@
-SRC = Heater.hs 
+SRC = Timer.hs 
 
-RUNH = runhaskell Heater.hs
+RUNH = runhaskell Timer.hs
 
 all: main
 
-main: main.c heater.c heater.h
-	gcc -o main main.c heater.c
+main: main.c timer.c timer.h
+	gcc -o main main.c timer.c
 
-heater.c: $(SRC) Heater.hs
+timer.c: $(SRC) Timer.hs
 	$(RUNH)
 
-heater.h: $(SRC) Heater.hs
+timer.h: $(SRC) Timer.hs
 	$(RUNH)
 
 clean:
-	rm -f main heater.* *~
+	rm -f main timer.* *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
