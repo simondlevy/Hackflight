@@ -10,12 +10,10 @@ module Main where
 
 import Language.Copilot
 import Copilot.Compile.C99
-import Prelude hiding(not, (==), (<), (>), (++))
 
 import HackflightFull
 
-ledPin :: Stream Word8
-ledPin = 18
+ledPin = 18 :: Stream Word8
 
 spec = do
 
@@ -28,6 +26,9 @@ spec = do
 
   -- Send the LED using external C function during the looping phase
   trigger "copilot_setLed" looping [arg $ ledPin, arg ledOn]
+
+  -- Send motor commands periodically
+  -- trigger "copilot_writeMotors" motorsReady []
  
 -- Compile the spec
 main = reify spec >>= compile "copilot"
