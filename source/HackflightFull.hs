@@ -25,7 +25,7 @@ hackflightFull = (starting, looping, ledOn, motorsReady)
     looping = not looping' where looping' = [False] ++ looping
     starting = not looping
 
-    -- This allows to set the motors periodically
+    -- This allows us to set the motors periodically
     motorsReady = ready 5 -- 66
 
     -- Blink LED during first couple of seconds; keep it solid when armed
