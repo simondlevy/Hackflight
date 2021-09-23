@@ -21,13 +21,13 @@ static double get_time(void)
 
 int main(int argc, char ** argv)
 {
-    float start = get_time();
+    double start = get_time();
 
     for ( ; ;) {
 
         // copilot_time_sec = get_time() - start;
 
-        printf("%f\n", get_time());
+        printf("%f\n", get_time() - start);
 
         //step();
     }
