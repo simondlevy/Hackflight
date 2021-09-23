@@ -10,15 +10,9 @@
 #include <Arduino.h>
 
 #include "Debugger.hpp"
-Debugger debugger; // = Debugger(&Serial2);
 
 #define _EXTERN
 #include "copilot.h"
-
-void copilot_debug(bool byte)
-{
-    debugger.printf("%d\n", byte);
-}
 
 void copilot_startSerial(void)
 {
@@ -28,6 +22,11 @@ void copilot_startSerial(void)
 void copilot_serialWrite(uint8_t b)
 {
     Serial.write(b);
+}
+
+void copilot_debug(bool value)
+{
+    // Serial.println(value);
 }
 
 /*

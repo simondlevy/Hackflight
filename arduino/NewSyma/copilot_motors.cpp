@@ -10,9 +10,6 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-#include "Debugger.hpp"
-static Debugger debugger;
-
 #define _EXTERN
 #include "copilot.h"
 
@@ -33,8 +30,6 @@ void copilot_startBrushedMotors(
         uint8_t m3pin,
         uint8_t m4pin)
 {
-    debugger.begin();
-
     startBrushedMotor(m1pin);
     startBrushedMotor(m2pin);
     startBrushedMotor(m3pin);
@@ -47,8 +42,6 @@ void copilot_writeBrushedMotors(
         uint8_t m3pin, float m3value,
         uint8_t m4pin, float m4value)
 {
-    debugger.printf("%3.3f %3.3f %3.3f %3.3f\n", m1value, m2value, m3value, m4value);
-
     writeBrushedMotor(m1pin, m1value);
     writeBrushedMotor(m2pin, m2value);
     writeBrushedMotor(m3pin, m3value);

@@ -34,23 +34,11 @@ spec = do
   -- Set up serial comms during the startup phase
   trigger "copilot_startSerial" starting []
 
-  -- Set up the motors during the startup phase
-  -- trigger "copilot_startBrushedMotors" starting [ arg m1pin
-  --                                               , arg m2pin
-  --                                               , arg m3pin
-  --                                               , arg m4pin ]
-
   -- Set the LED during the looping phase
   trigger "copilot_setLed" looping [arg $ ledPin, arg ledOn]
 
 
-  -- Send motor commands periodically during the looping phase
-  -- let m = 0 :: Stream Float
-  -- trigger "copilot_writeBrushedMotors" (looping && motorsReady)
-  --                                      [ arg m1pin,  arg m
-  --                                      , arg m2pin , arg m
-  --                                      , arg m3pin , arg m
-  --                                      , arg m4pin , arg m ]
+  trigger "copilot_debug" looping [arg $ motorsReady]
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
