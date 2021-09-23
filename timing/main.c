@@ -25,9 +25,17 @@ int main(int argc, char ** argv)
 
     for ( ; ;) {
 
+        static float time_sec_prev;
+
         copilot_time_sec = (float)(get_time() - start);
 
-        step();
+        time_sec_prev = (copilot_time_sec - time_sec_prev) > 1 ? copilot_time_sec : time_sec_prev;
+
+        if (copilot_time_sec - time_sec_prev == 0) {
+            printf("tick\n");
+        }
+
+        // step();
     }
 
     return 0;
