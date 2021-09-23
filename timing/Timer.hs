@@ -23,7 +23,7 @@ times = (time_sec, time_sec_prev) where
 
   time_sec_prev = if (time_sec - time_sec_prev') > 1 then time_sec else time_sec_prev'
   time_sec_prev' = [0] ++ time_sec_prev
-   
+
 spec = do
 
   let (t, p) = times
