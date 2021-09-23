@@ -25,11 +25,9 @@ int main(int argc, char ** argv)
 
     for ( ; ;) {
 
-        // copilot_time_sec = get_time() - start;
+        copilot_time_sec = (float)(get_time() - start);
 
-        printf("%f\n", get_time() - start);
-
-        //step();
+        step();
     }
 
     return 0;
