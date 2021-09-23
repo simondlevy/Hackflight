@@ -14,6 +14,6 @@
 
 void copilot_updateTime(void)
 {
-    // copilot_time_msec = millis();
-    copilot_time_sec = micros() / 1.e6f;
+    copilot_time_msec = millis();
+    //copilot_time_sec = micros() / 1.e6f;
 }

@@ -9,8 +9,6 @@
 
 #include <Arduino.h>
 
-#include "Debugger.hpp"
-
 #define _EXTERN
 #include "copilot.h"
 
