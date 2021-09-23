@@ -5,7 +5,7 @@ module Main where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Prelude hiding ((>), (-), (++))
+import Prelude hiding ((>), (-), (++), (==))
 
 time_sec :: Stream Float
 time_sec  = extern "copilot_time_sec" Nothing
@@ -28,7 +28,7 @@ spec = do
 
   let (t, p) = times
 
-  trigger "debug" true [arg t, arg p]
+  trigger "tick" (t == p) []
 
 -- Compile the spec
 main = reify spec >>= compile "timer"
