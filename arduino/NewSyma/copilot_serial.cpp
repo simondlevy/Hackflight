@@ -7,8 +7,6 @@
 
  */
 
-/*
-
 #include <Arduino.h>
 
 #include "Debugger.hpp"
@@ -25,8 +23,6 @@ void copilot_debug(bool byte)
 void copilot_startSerial(void)
 {
     Serial.begin(115200);
-
-    //debugger.begin();
 }
 
 void copilot_serialWrite(uint8_t b)
@@ -34,6 +30,7 @@ void copilot_serialWrite(uint8_t b)
     Serial.write(b);
 }
 
+/*
 void copilot_updateSerial(void)
 {
     copilot_serialAvailable = Serial.available();
@@ -100,5 +97,4 @@ void copilot_sendSerialOutput(
 
     Serial.write(crc);
 }
-
 */
