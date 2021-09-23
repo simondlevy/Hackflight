@@ -12,9 +12,7 @@ module HackflightFull where
 
 import Language.Copilot
 
-import Prelude hiding((||), (++), (<), (>), (&&), (==), div, mod, not)
-
-import Time(time_msec)
+import Time
 
 hackflightFull :: (Stream Bool, Stream Bool)
 
