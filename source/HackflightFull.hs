@@ -14,15 +14,16 @@ import Language.Copilot
 
 import Time
 
-hackflightFull :: (Stream Bool, Stream Bool, Stream Bool)
+hackflightFull :: (Stream Bool, Stream Bool, Stream Bool, Stream Bool)
 
-hackflightFull = (looping, ledOn, motorsReady)
+hackflightFull = (starting, looping, ledOn, motorsReady)
 
   where
 
     -- The looping flag will only be false on startup, so we
     -- can use it for initializtion in our main
     looping = not looping' where looping' = [False] ++ looping
+    starting = not looping
 
     -- This allows to set the motors periodically
     motorsReady = ready 2

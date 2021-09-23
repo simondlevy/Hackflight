@@ -19,11 +19,12 @@ ledPin = 18
 
 spec = do
 
-  let (looping, ledOn, motorsReady) = hackflightFull
+  let (starting, looping, ledOn, motorsReady) = hackflightFull
 
   trigger "copilot_updateTime" true []
 
-  trigger "copilot_startLed" (not looping) [arg $ ledPin]
+  -- Set up the LED during the starting phase
+  trigger "copilot_startLed" starting [arg $ ledPin]
 
   -- Send the LED using external C function during the looping phase
   trigger "copilot_setLed" looping [arg $ ledPin, arg ledOn]
