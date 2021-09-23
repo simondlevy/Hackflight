@@ -21,7 +21,7 @@ spec = do
 
   let (looping, ledState) = hackflightFull
 
-  trigger "copilot_updateClock" true []
+  trigger "copilot_updateTime" true []
 
   trigger "copilot_startLed" (not looping) [arg $ ledPin]
 
