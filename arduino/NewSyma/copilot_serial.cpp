@@ -24,7 +24,7 @@ void copilot_serialWrite(uint8_t b)
 
 void copilot_debug()
 {
-    Serial.println(millis());
+    //Serial.println(millis());
 }
 
 /*

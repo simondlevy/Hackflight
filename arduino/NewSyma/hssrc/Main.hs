@@ -38,7 +38,7 @@ spec = do
   -- Set the LED during the looping phase
   trigger "copilot_setLed" looping [arg $ ledPin, arg ledOn]
 
-  -- trigger "copilot_debug" (ready 1) []
+  trigger "copilot_debug" motorsReady []
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
