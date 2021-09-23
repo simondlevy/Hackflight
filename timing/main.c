@@ -5,9 +5,15 @@
 
 void tick(void)
 {
+    static uint32_t t;
+    printf("%04d\n", t++);
 }
 
 int main(int argc, char ** argv)
 {
+    for ( ; ;) {
+        step();
+    }
+
     return 0;
 } 
