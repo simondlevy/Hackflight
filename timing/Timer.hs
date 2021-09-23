@@ -10,7 +10,7 @@ time_sec  = extern "copilot_time_sec" Nothing
 
 spec = do
 
-  trigger "tick"  true []
+  trigger "tick"  (time_sec > 5) []
 
 -- Compile the spec
 main = reify spec >>= compile "timer"
