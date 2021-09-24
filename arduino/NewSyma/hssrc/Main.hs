@@ -52,6 +52,7 @@ spec = do
   -- Run full Hackflight algorithm
   let status = hackflightFull receiver sensors pidControllers mixer
 
+  -- Set LED
   trigger "copilot_setLed" true [arg $ ledOn status]
 
 -- Compile the spec

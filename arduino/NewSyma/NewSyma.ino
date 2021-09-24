@@ -40,5 +40,8 @@ void loop(void)
 {
     copilot_micros = micros();
 
+    copilot_updateReceiver();
+    copilot_updateImu();
+
     step();
 }

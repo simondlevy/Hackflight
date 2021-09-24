@@ -29,15 +29,15 @@ void copilot_startImu(void)
 
 void copilot_updateImu(void)
 {
-    /*
     _usfs.checkEventStatus();
 
+    /*
     if (_usfs.gotGyrometer()) {
         _usfs.readGyrometer(
                 copilot_gyrometerX,
                 copilot_gyrometerY,
                 copilot_gyrometerZ);
-    }
+    }*/
 
     if (_usfs.gotQuaternion()) {
         _usfs.readQuaternion(
@@ -46,5 +46,4 @@ void copilot_updateImu(void)
                 copilot_quaternionY,
                 copilot_quaternionZ);
     }
-    */
 }

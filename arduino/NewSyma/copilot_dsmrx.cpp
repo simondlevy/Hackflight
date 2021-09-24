@@ -35,7 +35,7 @@ void copilot_updateReceiver(void)
     if (_rx.timedOut(micros())) {
         _timeouts++;
         if (_timeouts > 200) {
-            //copilot_receiverLostSignal = true;
+            copilot_receiverLostSignal = true;
         }
     }
 
@@ -45,10 +45,10 @@ void copilot_updateReceiver(void)
 
         _rx.getChannelValues(values);
 
-        //copilot_receiverThrottle = values[0];
-        //copilot_receiverRoll = values[1];
-        //copilot_receiverPitch = values[2];
-        //copilot_receiverYaw = values[3];
-        //copilot_receiverAux1 = values[6];
+        copilot_receiverThrottle = values[0];
+        // copilot_receiverRoll = values[1];
+        // copilot_receiverPitch = values[2];
+        // copilot_receiverYaw = values[3];
+        copilot_receiverAux1 = values[6];
     }
 }
