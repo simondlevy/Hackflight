@@ -32,7 +32,7 @@ hackflightFull = FullStatus starting looping ledOn motorsReady
     starting = not looping
 
     -- This allows us to set the motors periodically
-    motorsReady = ready 5 -- 66
+    motorsReady = ready 66
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     ledOn = if micros < 100000 then false 
