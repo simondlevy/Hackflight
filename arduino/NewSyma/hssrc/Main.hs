@@ -56,17 +56,19 @@ pidControllers = [ratePid, yawPid, levelPid]
 mixer = quadXAPMixer
 
 spec = do
-
+  
+  -- Run full Hackflight algorithm
   let status = hackflightFull receiver sensors pidControllers mixer
- 
-  -- Set up serial comms during the startup phase
-  trigger "copilot_startSerial" (starting status) []
 
-  -- Set up the LED during the startup phase
+  -- Always update the time
+  trigger "copilot_updateTime" true []
+
+ -- Startup -------------------------------------------------
+ 
+  trigger "copilot_startSerial" (starting status) []
   trigger "copilot_startLed" (starting status) [arg $ ledPin]
 
-  -- Update the time during the looping phase
-  trigger "copilot_updateTime" true []
+  -- Loop --------------------------------------------------
 
   -- Set the LED during the looping phase
   trigger "copilot_setLed" (looping status) [arg $ ledPin, arg (ledOn status)]
