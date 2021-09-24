@@ -55,5 +55,12 @@ spec = do
   -- Set LED
   trigger "copilot_setLed" true [arg $ ledOn status]
 
+  -- Run motors
+  let ms = motors status
+  trigger "copilot_writeBrushedMotors" (motorsReady status) [  arg $ m1 ms
+                                                             , arg $ m2 ms
+                                                             , arg $ m3 ms
+                                                             , arg $ m4 ms ]
+
 -- Compile the spec
 main = reify spec >>= compile "copilot"
