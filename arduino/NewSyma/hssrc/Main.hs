@@ -43,7 +43,8 @@ yawPid = yawController 2.0 0.1 0.4
                         -- Kp  maxAngleDegrees
 levelPid = levelController 0.2 45 
 
-pidControllers = [ratePid, yawPid, levelPid] 
+-- pidControllers = [ratePid, yawPid, levelPid] 
+pidControllers = [] 
 
 mixer = quadXAPMixer
 

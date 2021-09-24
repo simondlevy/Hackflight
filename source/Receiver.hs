@@ -65,7 +65,8 @@ getDemands receiver =
       rcFun x e r = (1 + e * (x*x -1)) * x * r
 
       angleFun trimFun expoFun command =
-          demandScale' * ((trimFun axisTrim') + adjustCommand (expoFun $ rectify command) command)
+          demandScale' * ((trimFun axisTrim') + adjustCommand (expoFun $ rectify command)
+                                                              command)
 
       throttleFun x = 
           let mid = 0.5
@@ -78,7 +79,8 @@ getDemands receiver =
 
       rollDemand = angleFun rollTrim cyclicFun receiverRoll
 
-      pitchDemand = angleFun pitchTrim cyclicFun receiverPitch
+      -- Pitch is nose-up-positve, so we negate stick demand
+      pitchDemand = -(angleFun pitchTrim cyclicFun receiverPitch)
 
       yawDemand = angleFun yawTrim id receiverYaw
 
