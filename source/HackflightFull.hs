@@ -20,11 +20,17 @@ data FullStatus = FullStatus {  starting    :: Stream Bool
                               , motorsReady :: Stream Bool
                              }
 
-hackflightFull :: FullStatus
+hackflightFull :: {-- Receiver -> [Sensor] -> [PidController] -> Mixer -> --} FullStatus
 
-hackflightFull = FullStatus starting looping ledOn motorsReady
+
+hackflightFull {-- receiver sensors pidControllers Mixer --} =
+  FullStatus starting looping ledOn motorsReady
 
   where
+
+    -- Run core algorithm
+    -- (mixerMotors, vehicleState, safety) =
+    --   hackflight receiver sensors pidControllers mixer getSafetyReal
 
     -- The looping flag will only be false on startup, so we
     -- can use it for initializtion in our main

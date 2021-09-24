@@ -13,6 +13,7 @@ import Copilot.Compile.C99
 import Prelude hiding((&&))
 
 import HackflightFull
+import Receiver
 import Time
 
 ledPin = 18 :: Stream Word8
@@ -22,9 +23,12 @@ m2pin = 16 :: Stream Word8
 m3pin = 3  :: Stream Word8
 m4pin = 11 :: Stream Word8
 
+receiver = makeReceiver 4.0
+
+
 spec = do
 
-  let status = hackflightFull
+  let status = hackflightFull -- receiver sensors pidControllers mixer
  
   -- Set up serial comms during the startup phase
   trigger "copilot_startSerial" (starting status) []
