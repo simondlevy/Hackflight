@@ -24,3 +24,9 @@ void copilot_updateSerial();
 void copilot_startImu();
 
 void copilot_updateImu();
+
+void copilot_startBrushedMotors(
+        uint8_t m1pin,
+        uint8_t m2pin,
+        uint8_t m3pin,
+        uint8_t m4pin);

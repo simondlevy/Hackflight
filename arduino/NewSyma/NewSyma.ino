@@ -25,6 +25,12 @@
 
 static uint8_t LED_PIN = 18;
 
+static uint8_t MOTOR1_PIN = 13;
+static uint8_t MOTOR2_PIN = 16;
+static uint8_t MOTOR3_PIN = 3;
+static uint8_t MOTOR4_PIN = 11;
+
+
 void setup(void)
 {
     Serial.begin(115200);
@@ -34,6 +40,8 @@ void setup(void)
     copilot_startLed(LED_PIN);
     copilot_startReceiver();
     copilot_startImu();
+    
+    copilot_startBrushedMotors(MOTOR1_PIN, MOTOR2_PIN, MOTOR3_PIN, MOTOR4_PIN);
 }
 
 void loop(void)

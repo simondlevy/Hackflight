@@ -36,7 +36,7 @@ hackflightFull receiver sensors pidControllers mixer
       hackflight receiver sensors pidControllers mixer getSafetyReal
 
     -- This allows us to set the motors periodically
-    motorsReady = ready 66
+    motorsReady = ready 300 -- Hz
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     ledOn = if micros < 2000000 then (mod (div micros 50000) 2 == 0)
