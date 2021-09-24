@@ -7,7 +7,6 @@
 
  */
 
-/*
 
 #define _EXTERN
 #include "copilot.h"
@@ -30,6 +29,7 @@ void copilot_startUsfs(void)
 
 void copilot_updateUsfs(void)
 {
+    /*
     _usfs.checkEventStatus();
 
     if (_usfs.gotGyrometer()) {
@@ -46,6 +46,5 @@ void copilot_updateUsfs(void)
                 copilot_quaternionY,
                 copilot_quaternionZ);
     }
+    */
 }
-
-*/

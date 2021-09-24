@@ -18,13 +18,29 @@
  */
 
 #include "copilot.h"
+#include <Wire.h>
+// #include "copilot_usfs.h"
+
+static uint8_t LED_PIN = 18;
 
 void setup(void)
 {
-    // Everything is called by Copilot step() function
+    Serial.begin(115200);
+    Wire.begin();
+    delay(100);
+
+    void copilot_startUsfs(void);
+    void copilot_startLed(uint8_t pin);
+    void copilot_startDsmrx(void);
+
+    copilot_startLed(LED_PIN);
+    copilot_startUsfs();
+    copilot_startDsmrx();
 }
 
 void loop(void)
 {
+    copilot_micros = micros();
+
     step();
 }

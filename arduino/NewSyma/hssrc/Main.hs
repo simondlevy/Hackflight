@@ -11,7 +11,6 @@ module Main where
 -- Language
 import Language.Copilot
 import Copilot.Compile.C99
-import Prelude hiding((&&))
 
 -- Core
 import HackflightFull
@@ -28,14 +27,7 @@ import RatePid
 import YawPid
 import LevelPid
 
-ledPin = 18 :: Stream Word8
-
-m1pin = 13 :: Stream Word8
-m2pin = 16 :: Stream Word8
-m3pin = 3  :: Stream Word8
-m4pin = 11 :: Stream Word8
-
-receiver = makeReceiver 4.0
+receiver = makeReceiver 4.0 -- demand scale
 
 -- These sensors will be run right-to-left via composition
 sensors = [gyrometer, quaternion]
@@ -60,20 +52,7 @@ spec = do
   -- Run full Hackflight algorithm
   let status = hackflightFull receiver sensors pidControllers mixer
 
-  -- Always update the time
-  trigger "copilot_updateTime" true []
-
- -- Startup -------------------------------------------------
- 
-  trigger "copilot_startSerial" (starting status) []
-  trigger "copilot_startLed" (starting status) [arg $ ledPin]
-  trigger "copilot_startWire" (starting status) []
-
-  -- Loop --------------------------------------------------
-
-  trigger "copilot_setLed" (looping status) [arg $ ledPin, arg (ledOn status)]
-
-  trigger "copilot_debug" (motorsReady status) []
+  trigger "copilot_setLed" true [arg $ ledOn status]
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
