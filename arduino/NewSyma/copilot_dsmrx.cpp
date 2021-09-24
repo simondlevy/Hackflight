@@ -23,7 +23,7 @@ void serialEvent1(void)
     }
 }
 
-void copilot_startDsmrx(void)
+void copilot_startReceiver(void)
 {
     Serial1.begin(115200);
 

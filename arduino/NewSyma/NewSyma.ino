@@ -17,9 +17,11 @@
 
  */
 
-#include "copilot.h"
 #include <Wire.h>
-// #include "copilot_usfs.h"
+
+#include "copilot.h"
+
+#include "copilot_setup.h"
 
 static uint8_t LED_PIN = 18;
 
@@ -29,13 +31,9 @@ void setup(void)
     Wire.begin();
     delay(100);
 
-    void copilot_startUsfs(void);
-    void copilot_startLed(uint8_t pin);
-    void copilot_startDsmrx(void);
-
     copilot_startLed(LED_PIN);
-    copilot_startUsfs();
-    copilot_startDsmrx();
+    copilot_startReceiver();
+    copilot_startImu();
 }
 
 void loop(void)
