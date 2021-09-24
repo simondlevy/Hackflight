@@ -12,19 +12,23 @@ module HackflightFull where
 
 import Language.Copilot
 
+import Hackflight
+import Receiver
+import Sensor
+import PidController
+import Mixer
 import Time
 
 data FullStatus = FullStatus {  starting    :: Stream Bool
                               , looping     :: Stream Bool
                               , ledOn       :: Stream Bool
-                              , motorsReady :: Stream Bool
-                             }
+                              , motorsReady :: Stream Bool }
 
-hackflightFull :: {-- Receiver -> [Sensor] -> [PidController] -> Mixer -> --} FullStatus
+hackflightFull :: Receiver -> [Sensor] -> [PidController] -> Mixer
+  -> FullStatus
 
-
-hackflightFull {-- receiver sensors pidControllers Mixer --} =
-  FullStatus starting looping ledOn motorsReady
+hackflightFull receiver sensors pidControllers mixer
+  = FullStatus starting looping ledOn motorsReady
 
   where
 
