@@ -46,9 +46,9 @@ void copilot_updateReceiver(void)
         _rx.getChannelValues(values);
 
         copilot_receiverThrottle = values[0];
-        // copilot_receiverRoll = values[1];
-        // copilot_receiverPitch = values[2];
-        // copilot_receiverYaw = values[3];
-        copilot_receiverAux1 = values[6];
+        copilot_receiverRoll     = values[1];
+        copilot_receiverPitch    = values[2];
+        copilot_receiverYaw      = values[3];
+        copilot_receiverAux1     = values[6];
     }
 }
