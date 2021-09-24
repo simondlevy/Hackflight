@@ -14,9 +14,15 @@ import Language.Copilot
 
 import Time
 
-hackflightFull :: (Stream Bool, Stream Bool, Stream Bool, Stream Bool)
+data FullStatus = FullStatus {  starting    :: Stream Bool
+                              , looping     :: Stream Bool
+                              , ledOn       :: Stream Bool
+                              , motorsReady :: Stream Bool
+                             }
 
-hackflightFull = (starting, looping, ledOn, motorsReady)
+hackflightFull :: FullStatus
+
+hackflightFull = FullStatus starting looping ledOn motorsReady
 
   where
 

@@ -24,21 +24,21 @@ m4pin = 11 :: Stream Word8
 
 spec = do
 
-  let (starting, looping, ledOn, motorsReady) = hackflightFull
+  let status = hackflightFull
  
   -- Set up serial comms during the startup phase
-  trigger "copilot_startSerial" starting []
+  trigger "copilot_startSerial" (starting status) []
 
   -- Set up the LED during the startup phase
-  trigger "copilot_startLed" starting [arg $ ledPin]
+  trigger "copilot_startLed" (starting status) [arg $ ledPin]
 
   -- Update the time during the looping phase
   trigger "copilot_updateTime" true []
 
   -- Set the LED during the looping phase
-  trigger "copilot_setLed" looping [arg $ ledPin, arg ledOn]
+  trigger "copilot_setLed" (looping status) [arg $ ledPin, arg (ledOn status)]
 
-  trigger "copilot_debug" motorsReady []
+  trigger "copilot_debug" (motorsReady status) []
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
