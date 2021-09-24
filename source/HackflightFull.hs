@@ -48,4 +48,4 @@ hackflightFull receiver sensors pidControllers mixer
     -- Blink LED during first couple of seconds; keep it solid when armed
     ledOn = if micros < 100000 then false 
             else if micros < 2000000 then (mod (div micros 50000) 2 == 0)
-            else false -- armed
+            else armed safety
