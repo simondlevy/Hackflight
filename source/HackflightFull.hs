@@ -18,6 +18,7 @@ import Sensor
 import PidController
 import Mixer
 import Time
+import Safety
 
 data FullStatus = FullStatus {  starting    :: Stream Bool
                               , looping     :: Stream Bool
@@ -33,8 +34,8 @@ hackflightFull receiver sensors pidControllers mixer
   where
 
     -- Run core algorithm
-    -- (mixerMotors, vehicleState, safety) =
-    --   hackflight receiver sensors pidControllers mixer getSafetyReal
+    (mixerMotors, vehicleState, safety) =
+      hackflight receiver sensors pidControllers mixer getSafetyReal
 
     -- The looping flag will only be false on startup, so we
     -- can use it for initializtion in our main
