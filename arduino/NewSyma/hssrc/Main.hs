@@ -67,10 +67,10 @@ spec = do
  
   trigger "copilot_startSerial" (starting status) []
   trigger "copilot_startLed" (starting status) [arg $ ledPin]
+  trigger "copilot_startWire" (starting status) []
 
   -- Loop --------------------------------------------------
 
-  -- Set the LED during the looping phase
   trigger "copilot_setLed" (looping status) [arg $ ledPin, arg (ledOn status)]
 
   trigger "copilot_debug" (motorsReady status) []
