@@ -8,13 +8,24 @@
 
 module Main where
 
+-- Language
 import Language.Copilot
 import Copilot.Compile.C99
 import Prelude hiding((&&))
 
+-- Core
 import HackflightFull
 import Receiver
 import Time
+
+-- Sensors
+import Gyrometer
+import Quaternion
+
+-- PID controllers
+import RatePid
+import YawPid
+import LevelPid
 
 ledPin = 18 :: Stream Word8
 
@@ -25,6 +36,19 @@ m4pin = 11 :: Stream Word8
 
 receiver = makeReceiver 4.0
 
+-- These sensors will be run right-to-left via composition
+sensors = [gyrometer, quaternion]
+
+  -- Set up some PID controllers --------------------------
+
+                      -- Kp      Ki       Kd     windupMax maxDegreesPerSecond
+ratePid = rateController 0.225   0.001875 0.375  0.4       40       
+
+                    -- Kp  Ki  windupMax
+yawPid = yawController 2.0 0.1 0.4 
+
+                        -- Kp  maxAngleDegrees
+levelPid = levelController 0.2 45 
 
 spec = do
 
