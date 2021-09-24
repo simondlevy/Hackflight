@@ -27,7 +27,7 @@ void copilot_startImu(void)
     }
 }
 
-void copilot_updateUsfs(void)
+void copilot_updateImu(void)
 {
     /*
     _usfs.checkEventStatus();

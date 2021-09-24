@@ -30,7 +30,7 @@ void copilot_startReceiver(void)
     copilot_receiverLostSignal = false;
 }
 
-void copilot_updateDsmrx(void)
+void copilot_updateReceiver(void)
 {
     if (_rx.timedOut(micros())) {
         _timeouts++;

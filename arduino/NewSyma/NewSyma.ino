@@ -21,7 +21,7 @@
 
 #include "copilot.h"
 
-#include "copilot_setup.h"
+#include "copilot_arduino.h"
 
 static uint8_t LED_PIN = 18;
 
