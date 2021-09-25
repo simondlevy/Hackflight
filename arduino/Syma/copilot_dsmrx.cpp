@@ -32,14 +32,9 @@ void copilot_startReceiver(void)
 
 void copilot_updateReceiver(void)
 {
-    if (copilot_micros>4000000 && _rx.timedOut(micros())) {
-        _timeouts++;
-        if (_timeouts > 200) {
-            copilot_receiverLostSignal = true;
-        }
-    }
+    copilot_receiverLostSignal = _rx.timedOut(micros());
 
-    else if (_rx.gotNewFrame()) {
+    if (_rx.gotNewFrame()) {
 
         float values[8] = {};
 
