@@ -17,6 +17,7 @@
 #include "sensor.hpp"
 #include "mixer.hpp"
 #include "serial.hpp"
+#include "time.hpp"
 
 namespace hf {
 
@@ -30,7 +31,7 @@ namespace hf {
             uint8_t _led_pin = 0;
 
             State _state = {};
-            SerialTask gcsTask = {};
+            //SerialTask gcsTask = {};
 
             bool _safeToArm = false;
             Sensor * _sensors[256] = {};
@@ -153,7 +154,7 @@ namespace hf {
                 startSensors();
             }
 
-            void update(float * motorsOut, bool & ledOut, serial_t & serial)
+            void update(float * motorsOut, bool & ledOut, /*serial_t & serial,*/ bool & motorsReady)
             {
                 // Grab control signal if available
                 checkReceiver(motorsOut);
@@ -164,6 +165,7 @@ namespace hf {
                 // Check sensors
                 checkSensors();
 
+                /*
                 // Update serial task
                 gcsTask.parse(_mixer, &_state, serial);
 
@@ -174,10 +176,15 @@ namespace hf {
                     motorsOut[2] = gcsTask.motors[2];
                     motorsOut[3] = gcsTask.motors[3];
                 }
+                */
+
+                // This allows us to set the motors periodically
+                motorsReady = ready(300); // Hz;
+
 
                 // Determine LED state
-                uint32_t time_msec = copilot_time_msec;
-                ledOut = time_msec < 2000 ?  ((time_msec / 50) % 2) == 0 : _state.armed;
+                uint32_t time_msec = copilot_micros;
+                ledOut = time_msec < 2000000 ?  ((time_msec / 50000) % 2) == 0 : _state.armed;
 
             }
 

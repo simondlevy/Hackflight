@@ -17,6 +17,10 @@
 
  */
 
+#include <Wire.h>
+#include "copilot.h"
+#include "copilot_arduino.h"
+
 #include "cppsrc/Hackflight.hpp"
 #include "cppsrc/receiver.hpp"
 #include "cppsrc/serial.hpp"
@@ -67,12 +71,14 @@ static hf::Hackflight h(&receiver, &mixer, LED_PIN);
 
 void setup(void)
 {
-    copilot_startWire();
-    copilot_startUsfs(); 
-    copilot_startDsmrx();
-    copilot_startLed(LED_PIN);
-    copilot_startSerial();
+    Serial.begin(115200);
+    Wire.begin();
+    delay(100);
 
+    copilot_startLed(LED_PIN);
+    copilot_startReceiver();
+    copilot_startImu();
+    
     copilot_startBrushedMotors(MOTOR1_PIN,  MOTOR2_PIN, MOTOR3_PIN, MOTOR4_PIN);
 
     h.addSensor(&imu);
@@ -86,17 +92,20 @@ void setup(void)
 
 void loop(void)
 {
-    copilot_updateDsmrx();
-    copilot_updateUsfs();
-    copilot_updateSerial();
-    copilot_updateClock();
+
+    copilot_micros = micros();
+
+    copilot_updateReceiver();
+    copilot_updateImu();
 
     float motors[4] = {};
     bool led = false;
-    static hf::serial_t serial;
+    //static hf::serial_t serial;
+    bool motorsReady = false;
 
-    h.update(motors, led, serial);
+    h.update(motors, led, /*serial,*/ motorsReady);
 
+/*
     if (serial.input_ready) {
         copilot_handleSerialJnput(
           serial.input.w00,
@@ -113,12 +122,9 @@ void loop(void)
                 serial.output.v04, serial.output.v05, serial.output.v06, serial.output.v07,
                 serial.output.v08, serial.output.v09, serial.output.v10, serial.output.v11);
     }
+*/
 
-    copilot_setLed(LED_PIN, led);
+    copilot_setLed(led);
 
-    copilot_writeBrushedMotors(
-        MOTOR1_PIN, motors[0],
-        MOTOR2_PIN, motors[1],
-        MOTOR3_PIN, motors[2],
-        MOTOR4_PIN, motors[3]);
+    copilot_writeBrushedMotors( motors[0], motors[1], motors[2], motors[3]);
 }

@@ -4,6 +4,7 @@
    MIT License
  */
 
+/*
 #pragma once
 
 #include "mixer.hpp"
@@ -231,3 +232,4 @@ namespace hf {
     }; // class SerialTask
 
 } // namespace hf
+*/

@@ -1,5 +1,5 @@
 /*
-   Arduino support for Haskell Copilot
+   Arduino serial support for Haskell Copilot
 
    Copyright (C) 2021 Simon D. Levy
 
@@ -8,21 +8,13 @@
  */
 
 #include <Arduino.h>
-#include <Wire.h>
-
-#include "Debugger.hpp"
-Debugger debugger = Debugger(&Serial2);
 
 #define _EXTERN
 #include "copilot.h"
 
-// Serial comms ---------------------------------------------------------------
-
 void copilot_startSerial(void)
 {
     Serial.begin(115200);
-
-    debugger.begin();
 }
 
 void copilot_serialWrite(uint8_t b)
@@ -30,6 +22,12 @@ void copilot_serialWrite(uint8_t b)
     Serial.write(b);
 }
 
+void copilot_debug()
+{
+    //Serial.println(millis());
+}
+
+/*
 void copilot_updateSerial(void)
 {
     copilot_serialAvailable = Serial.available();
@@ -53,27 +51,23 @@ void copilot_handleSerialJnput(
         uint32_t w02,
         uint32_t w03)
 {
+
+
     memcpy(&copilot_input1, &w00, 4);
     memcpy(&copilot_input2, &w01, 4);
     memcpy(&copilot_input3, &w02, 4);
     memcpy(&copilot_input4, &w03, 4);
+
+    //debugger.printf("%3.3f %3.3f %3.3f %3.3f\n",
+   //         copilot_input1, copilot_input2, copilot_input3, copilot_input4);
 }
 
 void copilot_sendSerialOutput(
         uint8_t type,
         uint8_t count,
-        float v01,
-        float v02,
-        float v03,
-        float v04,
-        float v05,
-        float v06,
-        float v07,
-        float v08,
-        float v09,
-        float v10,
-        float v11,
-        float v12)
+        float v01, float v02, float v03, float v04,
+        float v05, float v06, float v07, float v08,
+        float v09, float v10, float v11, float v12)
 
 {
     Serial.write('$');
@@ -100,29 +94,4 @@ void copilot_sendSerialOutput(
 
     Serial.write(crc);
 }
-
-// LED---------------------------------------------------------------
-
-void copilot_startLed(uint8_t pin)
-{
-    pinMode(pin, OUTPUT);
-}
-
-void copilot_setLed(uint8_t pin, bool on)
-{
-    digitalWrite(pin, on);
-}
-
-// Clock ---------------------------------------------------------------
-
-void copilot_updateClock(void)
-{
-    copilot_time_msec = millis();
-    // copilot_time_sec = micros() / 1.e6f;
-}
-
-// I^2C  ---------------------------------------------------------------
-void copilot_startWire(void)
-{
-    Wire.begin();
-}
+*/

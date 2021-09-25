@@ -16,7 +16,7 @@
 
 static USFS_Master _usfs;
 
-void copilot_startUsfs(void)
+void copilot_startImu(void)
 {
     delay(100);
     if (!_usfs.begin()) {
@@ -27,7 +27,7 @@ void copilot_startUsfs(void)
     }
 }
 
-void copilot_updateUsfs(void)
+void copilot_updateImu(void)
 {
     _usfs.checkEventStatus();
 
