@@ -82,9 +82,9 @@ void setup(void)
     copilot_startBrushedMotors(MOTOR1_PIN,  MOTOR2_PIN, MOTOR3_PIN, MOTOR4_PIN);
 
     h.addSensor(&imu);
-    h.addPidController(&levelPid);
-    h.addPidController(&ratePid);
-    h.addPidController(&yawPid);
+    //h.addPidController(&levelPid);
+    //h.addPidController(&ratePid);
+    //h.addPidController(&yawPid);
     h.begin();
 }
 
