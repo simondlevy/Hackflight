@@ -31,7 +31,7 @@ getSafetyReal vehicleState = Safety armed failsafe
   where
 
     -- Use receiver data to trap failsafe
-    failsafe = receiverLostSignal || failsafe' where failsafe' = [False] ++ failsafe
+    failsafe = (armed' && receiverLostSignal) || failsafe' where 
 
     -- Arm after safety checks
     armed = if failsafe then false 
@@ -40,6 +40,7 @@ getSafetyReal vehicleState = Safety armed failsafe
                  && receiverThrottleIsDown
                  && safeToArm vehicleState then true 
 
-            else if receiverAux1 < 0 then false
+            else false
 
-            else armed' where armed' = [False] ++ armed
+    armed' = [False] ++ armed
+    failsafe' = [False] ++ failsafe
