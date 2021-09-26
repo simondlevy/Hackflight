@@ -40,7 +40,9 @@ getSafetyReal vehicleState = Safety armed failsafe
                  && receiverThrottleIsDown
                  && safeToArm vehicleState then true 
 
-            else false
+            else if armed' && receiverAux1 < 0 then false
+            
+            else armed'
 
     armed' = [False] ++ armed
     failsafe' = [False] ++ failsafe
