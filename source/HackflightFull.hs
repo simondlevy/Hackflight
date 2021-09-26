@@ -19,21 +19,23 @@ import PidController
 import Mixer
 import Time
 import Safety
+import Demands
 
 data FullStatus = FullStatus {  ledOn       :: Stream Bool
                               , motorsReady :: Stream Bool 
-                              , motors      :: Motors }
+                              , motors      :: Motors
+                              , demands     :: Demands }
 
 hackflightFull :: Receiver -> [Sensor] -> [PidController] -> Mixer
   -> FullStatus
 
 hackflightFull receiver sensors pidControllers mixer
-  = FullStatus ledOn motorsReady motors
+  = FullStatus ledOn motorsReady motors demands
 
   where
 
     -- Run core algorithm
-    (mixerMotors, vehicleState, safety) =
+    (mixerMotors, vehicleState, safety, demands) =
       hackflight receiver sensors pidControllers mixer getSafetyReal
 
     -- This allows us to set the motors periodically

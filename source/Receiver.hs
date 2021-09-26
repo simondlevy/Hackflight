@@ -79,8 +79,7 @@ getDemands receiver =
 
       rollDemand = angleFun rollTrim cyclicFun receiverRoll
 
-      -- Pitch is nose-up-positve, so we negate stick demand
-      pitchDemand = -(angleFun pitchTrim cyclicFun receiverPitch)
+      pitchDemand = angleFun pitchTrim cyclicFun receiverPitch
 
       yawDemand = angleFun yawTrim id receiverYaw
 

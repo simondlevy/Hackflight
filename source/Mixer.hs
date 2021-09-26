@@ -30,14 +30,15 @@ type Mixer = Safety -> Demands -> Motors
 
 -- addMotors :: Motors -> Motors -> Motors
 
-quadXAPMixer :: Mixer
+quadXMWMixer :: Mixer
 
-quadXAPMixer safety demands =
+quadXMWMixer safety demands =
 
-  QuadMotors (check $ t - r - p + y)
+  --                 Th  RR  PF  YR
+  QuadMotors (check $ t - r + p - y)
+             (check $ t - r - p + y)
              (check $ t + r + p + y)
              (check $ t + r - p - y)
-             (check $ t - r + p - y)
   where 
 
     check x = if ((not (armed safety)) || (failsafe safety)) then 0 else constrain x

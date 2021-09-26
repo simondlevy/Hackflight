@@ -27,6 +27,8 @@ import RatePid
 import YawPid
 import LevelPid
 
+import Demands
+
 receiver = makeReceiver 4.0 -- demand scale
 
 -- These sensors will be run right-to-left via composition
@@ -43,16 +45,17 @@ yawPid = yawController 2.0 0.1 0.4
                         -- Kp  maxAngleDegrees
 levelPid = levelController 0.2 45 
 
-pidControllers = [ratePid, yawPid, levelPid] 
+-- pidControllers = [{- ratePid, yawPid, levelPid --} ] 
+pidControllers = [] 
 
-mixer = quadXAPMixer
+mixer = quadXMWMixer
 
 spec = do
   
   -- Run full Hackflight algorithm
   let status = hackflightFull receiver sensors pidControllers mixer
 
-  -- trigger "copilot_debug" true [arg $ throttle]
+  -- trigger "copilot_debug" true [arg $ (pitch (demands status))]
 
   -- Set LED
   trigger "copilot_setLed" true [arg $ ledOn status]

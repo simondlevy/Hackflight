@@ -52,7 +52,7 @@ void copilot_writeBrushedMotors(
         float m3value,
         float m4value)
 {
-    //printf("%3.3f %3.3f %3.3f %3.3f\n", m1value, m2value, m3value, m4value);
+    // printf("%3.3f %3.3f %3.3f %3.3f\n", m1value, m2value, m3value, m4value);
 
     writeBrushedMotor(_m1pin, m1value);
     writeBrushedMotor(_m2pin, m2value);

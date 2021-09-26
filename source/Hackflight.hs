@@ -25,10 +25,10 @@ import Serial
 import Utils(compose)
 
 hackflight :: Receiver -> [Sensor] -> [PidController] -> Mixer -> SafetyFun
-  -> (Motors, State, Safety)
+  -> (Motors, State, Safety, Demands)
 
 hackflight receiver sensors pidControllers mixer safetyFun
-   = (motors, vehicleState, safety)
+   = (motors, vehicleState, safety, demands)
 
   where
 

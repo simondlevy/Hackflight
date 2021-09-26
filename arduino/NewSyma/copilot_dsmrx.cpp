@@ -45,5 +45,13 @@ void copilot_updateReceiver(void)
         copilot_receiverPitch    = values[2];
         copilot_receiverYaw      = values[3];
         copilot_receiverAux1     = values[6];
+
+        /*
+        printf("%f %f %f %f\n", 
+                copilot_receiverThrottle, 
+                copilot_receiverRoll,
+                copilot_receiverPitch, 
+                copilot_receiverYaw); */
+
     }
 }
