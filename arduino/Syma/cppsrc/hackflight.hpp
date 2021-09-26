@@ -113,6 +113,8 @@ namespace hf {
                     controller->modifyDemands(_state.x, demands); 
                 }
 
+                printf("%f\n", demands[0]);
+
                 // Use updated demands to run motors, allowing
                 // mixer to choose whether it cares about
                 // open-loop controller being inactive (e.g.,

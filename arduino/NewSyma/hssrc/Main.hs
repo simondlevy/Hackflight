@@ -44,7 +44,6 @@ yawPid = yawController 2.0 0.1 0.4
 levelPid = levelController 0.2 45 
 
 pidControllers = [ratePid, yawPid, levelPid] 
--- pidControllers = [] 
 
 mixer = quadXAPMixer
 
@@ -52,6 +51,8 @@ spec = do
   
   -- Run full Hackflight algorithm
   let status = hackflightFull receiver sensors pidControllers mixer
+
+  -- trigger "copilot_debug" true [arg $ throttle]
 
   -- Set LED
   trigger "copilot_setLed" true [arg $ ledOn status]

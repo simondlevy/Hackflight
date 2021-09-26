@@ -126,5 +126,5 @@ void loop(void)
 
     copilot_setLed(led);
 
-    copilot_writeBrushedMotors( motors[0], motors[1], motors[2], motors[3]);
+    copilot_writeBrushedMotors(motors[0], motors[1], motors[2], motors[3]);
 }

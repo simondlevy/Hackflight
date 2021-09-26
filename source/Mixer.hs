@@ -42,7 +42,7 @@ quadXAPMixer safety demands =
 
     check x = if ((not (armed safety)) || (failsafe safety)) then 0 else constrain x
 
-    t = throttle demands
+    t = ((throttle demands) + 1) / 2 -- Map throttle from [-1,+1] to [0,1]
     r = roll demands
     p = pitch demands
     y = yaw demands

@@ -22,9 +22,9 @@ void copilot_serialWrite(uint8_t b)
     Serial.write(b);
 }
 
-void copilot_debug()
+void copilot_debug(float value)
 {
-    //Serial.println(millis());
+    printf("%f\n", value);
 }
 
 /*
