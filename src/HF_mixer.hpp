@@ -97,6 +97,8 @@ namespace hf {
                 // Map throttle demand from [-1,+1] to [0,1]
                 demands[DEMANDS_THROTTLE] = (demands[DEMANDS_THROTTLE] + 1) / 2;
 
+                printf("%f\n", demands[DEMANDS_PITCH]);
+
                 float motorvals[MAXMOTORS];
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
