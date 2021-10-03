@@ -38,9 +38,6 @@ namespace hf {
             } controller_state_t;
 
 
-            controller_state_t _rstate = {};
-            controller_state_t _pstate = {};
-
             // Helpers ---------------------------------------------------
 
             void reset(controller_state_t * controller_state)
@@ -78,6 +75,9 @@ namespace hf {
 
             virtual void modifyDemands(float * state, float * demands) override
             {
+                static controller_state_t _rstate; 
+                static controller_state_t _pstate;
+
                 modifyDemand(state[State::DPHI], demands, DEMANDS_ROLL, &_rstate);
 
                 // Pitch demand is nose-down positive, so we negate
@@ -98,9 +98,6 @@ namespace hf {
                 _Kd = Kd;
                 _windupMax = windupMax;
                 _rateMax = rft::Filter::deg2rad(rateMaxDegreesPerSecond);
-
-                reset(&_rstate);
-                reset(&_pstate);
             }
 
     };  // class RatePid
