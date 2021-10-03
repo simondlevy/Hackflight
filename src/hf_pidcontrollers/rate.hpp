@@ -30,10 +30,10 @@ namespace hf {
 
             typedef struct {
 
-                float errorI;
-                float deltaError1;
-                float deltaError2;
-                float errorPrev;
+                float errI;
+                float errD1;
+                float errD2;
+                float errPrev;
 
             } controller_state_t;
 
@@ -55,20 +55,20 @@ namespace hf {
                     reset(controller_state);
                 }
 
-                // Compute error as difference between demand and angular velocity
-                float error = demands[demand_axis] - angular_velocity;
+                // Compute err as difference between demand and angular velocity
+                float err = demands[demand_axis] - angular_velocity;
 
                 // Compute I term
-                controller_state->errorI = rft::Filter::constrainAbs(controller_state->errorI + error, _windupMax);
+                controller_state->errI = rft::Filter::constrainAbs(controller_state->errI + err, _windupMax);
 
                 // Compute D term
-                float deltaError = error - controller_state->errorPrev;
-                float dterm = (controller_state->deltaError1 + controller_state->deltaError2 + deltaError) * _Kd; 
-                controller_state->deltaError2 = controller_state->deltaError1;
-                controller_state->deltaError1 = deltaError;
-                controller_state->errorPrev = error;
+                float errD = err - controller_state->errPrev;
+                float dterm = (controller_state->errD1 + controller_state->errD2 + errD) * _Kd; 
+                controller_state->errD2 = controller_state->errD1;
+                controller_state->errD1 = errD;
+                controller_state->errPrev = err;
 
-                demands[demand_axis] = _Kp * error + _Ki * controller_state->errorI + dterm;
+                demands[demand_axis] = _Kp * err + _Ki * controller_state->errI + dterm;
             }
 
         protected:
