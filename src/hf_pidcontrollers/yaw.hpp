@@ -25,23 +25,16 @@ namespace hf {
             float _windupMax = 0;
             float _rateMax = 0;
 
-            // Controller state ----------------------------------------
-            float _errorI = 0;
-
-            // Helper
-            void reset(void)
-            {
-                _errorI = 0;
-            }
-
             virtual void modifyDemands(float * state, float * demands) override
             {
+                static float _errorI;
+
                 // Compute error as difference between yaw demand and angular velocity
                 float error = demands[DEMANDS_YAW] - state[State::DPSI];
 
                 // Reset integral on quick angular velocity change
                 if (fabs(error) > _rateMax) {
-                    reset();
+                    _errorI = 0;
                 }
 
                 // Compute I term
@@ -50,13 +43,6 @@ namespace hf {
                 // Adjust yaw demand based on error
                 demands[DEMANDS_YAW] = _Kp * error + _Ki * _errorI;
              }
-
-            virtual void resetOnInactivity(bool inactive) override
-            {
-                if (inactive) {
-                    reset();
-                }
-            }
 
         public:
 
@@ -69,8 +55,6 @@ namespace hf {
                 _Ki = Ki;
                 _windupMax = windupMax;
                 _rateMax = rft::Filter::deg2rad(rateMaxDegreesPerSecond);
-
-                reset();
             }
 
     };  // class YawPid
