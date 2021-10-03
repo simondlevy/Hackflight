@@ -63,12 +63,15 @@ namespace hf {
 
                 // Compute D term
                 float errD = err - controller_state->errPrev;
-                float dterm = (controller_state->errD1 + controller_state->errD2 + errD) * _Kd; 
+
+                // Low-pass filter dterm
                 controller_state->errD2 = controller_state->errD1;
                 controller_state->errD1 = errD;
                 controller_state->errPrev = err;
 
-                demands[demand_axis] = _Kp * err + _Ki * controller_state->errI + dterm;
+                demands[demand_axis] = _Kp * err +
+                                       _Ki * controller_state->errI +
+                                       _Kd * (errD + controller_state->errD1 + controller_state->errD2);
             }
 
         protected:
