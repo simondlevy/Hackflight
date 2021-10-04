@@ -30,12 +30,6 @@ namespace hf {
 
             void update(float * demand, float   angvel, float * errI, float * errPrev)
             {
-                // Reset integral on quick angular velocity change
-                if (fabs(angvel) > _rateMax) {
-                    *errI = 0;
-                    *errPrev = 0;
-                }
-
                 // Compute err as difference between demand and angular velocity
                 float err = *demand - angvel;
 
