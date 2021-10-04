@@ -26,66 +26,67 @@ namespace hf {
             float _windupMax = 0;
             float _rateMax = 0;
 
-            // Controller state ----------------------------------------
-
-            typedef struct {
-
-                float errI;
-                float errD1;
-                float errD2;
-                float errPrev;
-
-            } controller_state_t;
-
-
             // Helpers ---------------------------------------------------
 
-            void reset(controller_state_t * controller_state)
+            void reset(float * errI, float * errD1, float * errD2, float * errPrev)
             {
-                memset(controller_state, 0, sizeof(controller_state_t));
+                *errI = 0;
+                *errD1 = 0;
+                *errD2 = 0;
+                *errPrev = 0;
             }
 
-            void modifyDemand(float angular_velocity,
-                              float * demands,
-                              uint8_t demand_axis,
-                              controller_state_t * controller_state)
+            void update(
+                    float * demand,
+                    float   angvel, 
+                    float * errI,
+                    float * errD1,
+                    float * errD2,
+                    float * errPrev)
             {
                 // Reset integral on quick angular velocity change
-                if (fabs(angular_velocity) > _rateMax) {
-                    reset(controller_state);
+                if (fabs(angvel) > _rateMax) {
+                    reset(errI, errD1, errD2, errPrev);
                 }
 
                 // Compute err as difference between demand and angular velocity
-                float err = demands[demand_axis] - angular_velocity;
+                float err = *demand - angvel;
 
                 // Compute I term
-                controller_state->errI = rft::Filter::constrainAbs(controller_state->errI + err, _windupMax);
+                *errI = rft::Filter::constrainAbs(*errI + err, _windupMax);
 
                 // Compute D term
-                float errD = err - controller_state->errPrev;
+                float errD = err - *errPrev;
 
                 // Low-pass filter dterm
-                controller_state->errD2 = controller_state->errD1;
-                controller_state->errD1 = errD;
-                controller_state->errPrev = err;
+                *errD2 = *errD1;
+                *errD1 = errD;
+                *errPrev = err;
 
-                demands[demand_axis] = _Kp * err +
-                                       _Ki * controller_state->errI +
-                                       _Kd * (errD + controller_state->errD1 + controller_state->errD2);
+                *demand = _Kp * err + _Ki * *errI + _Kd * (errD + *errD1 + *errD2);
             }
 
         protected:
 
             virtual void modifyDemands(float * state, float * demands) override
             {
-                static controller_state_t _rstate; 
-                static controller_state_t _pstate;
+                // Controller state
+                static float rollErrI;
+                static float rollErrD1;
+                static float rollErrD2;
+                static float rollErrPrev;
+                static float pitchErrI;
+                static float pitchErrD1;
+                static float pitchErrD2;
+                static float pitchErrPrev;
 
-                modifyDemand(state[State::DPHI], demands, DEMANDS_ROLL, &_rstate);
+                update(&demands[DEMANDS_ROLL], state[State::DPHI],
+                        &rollErrI, &rollErrD1, &rollErrD2, &rollErrPrev);
 
                 // Pitch demand is nose-down positive, so we negate
                 // pitch-forward rate (nose-down negative)
-                modifyDemand(-state[State::DTHETA], demands, DEMANDS_PITCH, &_pstate);
+                update(&demands[DEMANDS_PITCH], -state[State::DTHETA],
+                        &pitchErrI, &pitchErrD1, &pitchErrD2, &pitchErrPrev);
             }
 
         public:
