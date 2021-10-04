@@ -28,25 +28,12 @@ namespace hf {
 
             // Helpers ---------------------------------------------------
 
-            void reset(float * errI, float * errD1, float * errD2, float * errPrev)
-            {
-                *errI = 0;
-                *errD1 = 0;
-                *errD2 = 0;
-                *errPrev = 0;
-            }
-
-            void update(
-                    float * demand,
-                    float   angvel, 
-                    float * errI,
-                    float * errD1,
-                    float * errD2,
-                    float * errPrev)
+            void update(float * demand, float   angvel, float * errI, float * errPrev)
             {
                 // Reset integral on quick angular velocity change
                 if (fabs(angvel) > _rateMax) {
-                    reset(errI, errD1, errD2, errPrev);
+                    *errI = 0;
+                    *errPrev = 0;
                 }
 
                 // Compute err as difference between demand and angular velocity
@@ -58,12 +45,9 @@ namespace hf {
                 // Compute D term
                 float errD = err - *errPrev;
 
-                // Low-pass filter dterm
-                *errD2 = *errD1;
-                *errD1 = errD;
                 *errPrev = err;
 
-                *demand = _Kp * err + _Ki * *errI + _Kd * (errD + *errD1 + *errD2);
+                *demand = _Kp * err + _Ki * *errI + _Kd * errD;
             }
 
         protected:
@@ -72,21 +56,17 @@ namespace hf {
             {
                 // Controller state
                 static float rollErrI;
-                static float rollErrD1;
-                static float rollErrD2;
                 static float rollErrPrev;
                 static float pitchErrI;
-                static float pitchErrD1;
-                static float pitchErrD2;
                 static float pitchErrPrev;
 
                 update(&demands[DEMANDS_ROLL], state[State::DPHI],
-                        &rollErrI, &rollErrD1, &rollErrD2, &rollErrPrev);
+                        &rollErrI, &rollErrPrev);
 
                 // Pitch demand is nose-down positive, so we negate
                 // pitch-forward rate (nose-down negative)
                 update(&demands[DEMANDS_PITCH], -state[State::DTHETA],
-                        &pitchErrI, &pitchErrD1, &pitchErrD2, &pitchErrPrev);
+                        &pitchErrI, &pitchErrPrev);
             }
 
         public:
