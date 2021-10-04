@@ -24,7 +24,6 @@ namespace hf {
             float _Ki = 0;
             float _Kd = 0;
             float _windupMax = 0;
-            float _rateMax = 0;
 
             // Helpers ---------------------------------------------------
 
@@ -68,14 +67,12 @@ namespace hf {
             RatePid(const float Kp,
                     const float Ki,
                     const float Kd,
-                    const float windupMax=6.0,
-                    const float rateMaxDegreesPerSecond=40)
+                    const float windupMax=6.0)
             {
                 _Kp = Kp;
                 _Ki = Ki;
                 _Kd = Kd;
                 _windupMax = windupMax;
-                _rateMax = rft::Filter::deg2rad(rateMaxDegreesPerSecond);
             }
 
     };  // class RatePid
