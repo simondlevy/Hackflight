@@ -22,7 +22,6 @@ namespace hf {
 
             static constexpr float   LED_STARTUP_FLASH_SECONDS = 1.0;
             static constexpr uint8_t LED_STARTUP_FLASH_COUNT   = 20;
-            static constexpr float   LED_SLOWFLASH_SECONDS     = 0.25;
 
         public:
 
@@ -57,23 +56,6 @@ namespace hf {
             {
                 // Set LED to indicate armed
                 setLed(armed);
-            }
-
-            void flashLed(bool shouldflash)
-            {
-                if (shouldflash) {
-
-                    static float _time;
-                    static bool state;
-
-                    float time = getTime();
-
-                    if (time-_time > LED_SLOWFLASH_SECONDS) {
-                        state = !state;
-                        setLed(state);
-                        _time = time;
-                    }
-                }
             }
 
             void error(const char * errmsg) 

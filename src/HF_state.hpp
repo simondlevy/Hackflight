@@ -46,7 +46,6 @@ namespace hf {
                 return safeAngle(PHI) && safeAngle(THETA);
             }
 
-
     }; // class State
 
 } // namespace hf
