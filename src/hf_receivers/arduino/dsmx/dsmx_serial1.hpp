@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "hf_receivers/arduino/dsmx.hpp"
+#include "../dsmx.hpp"
 #include <DSMRX.h>
 
 static hf::DSMX_Receiver * _dsmx_rx;

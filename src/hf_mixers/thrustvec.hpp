@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <rft_motors/rotary.hpp>
-#include <rft_motors/servo.hpp>
+#include "../rft_motors/rotary.hpp"
+#include "../rft_motors/servo.hpp"
 
 #include "HF_mixer.hpp"
 

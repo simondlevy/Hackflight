@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "hf_mixers/quad.hpp"
+#include "../quad.hpp"
 
 namespace hf {
 

@@ -13,7 +13,7 @@
 
 #include "HF_demands.hpp"
 
-#include <RFT_openloop.hpp>
+#include "RFT_openloop.hpp"
 
 namespace hf {
 

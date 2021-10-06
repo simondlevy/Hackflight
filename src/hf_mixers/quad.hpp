@@ -10,7 +10,7 @@
 
 #include "HF_mixer.hpp"
 
-#include <rft_motors/rotary.hpp>
+#include "../rft_motors/rotary.hpp"
 
 namespace hf {
 

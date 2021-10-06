@@ -26,7 +26,7 @@
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_sensors/usfs.hpp"
 
-#include <rft_motors/arduino/brushed.hpp>
+#include "rft_motors/arduino/brushed.hpp"
 
 // Receiver ===================================================================
 

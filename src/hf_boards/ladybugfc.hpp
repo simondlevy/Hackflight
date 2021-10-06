@@ -12,9 +12,9 @@
 
 #include <Wire.h>
 
-#include <RFT_full.hpp>
+#include "RFT_full.hpp"
 
-#include <rft_boards/realboards/arduino_serial/arduino.hpp>
+#include "../rft_boards/realboards/arduino_serial/arduino.hpp"
 
 namespace hf {
 

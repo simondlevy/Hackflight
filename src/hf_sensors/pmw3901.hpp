@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <RFT_sensor.hpp>
-#include <RFT_filters.hpp>
+#include "../RFT_sensor.hpp"
+#include "../RFT_filters.hpp"
 
 #include <PMW3901.h>
 
