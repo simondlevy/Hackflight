@@ -18,7 +18,7 @@
  */
 
 #include "HF_full.hpp"
-#include "hf_boards/ladybugfc.hpp"
+#include "rft_boards/realboards/arduino_serial/arduino/ladybugfc.hpp"
 #include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"

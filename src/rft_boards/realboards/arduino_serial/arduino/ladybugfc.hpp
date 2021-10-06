@@ -14,7 +14,7 @@
 
 #include "RFT_full.hpp"
 
-#include "../rft_boards/realboards/arduino_serial/arduino.hpp"
+#include "../arduino.hpp"
 
 namespace hf {
 
