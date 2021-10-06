@@ -22,9 +22,6 @@ namespace hf {
 
         private:
 
-            // Safety
-            bool _safeToArm = false;
-
             // Sensors 
             Sensor * _sensors[256] = {};
             uint8_t _sensor_count = 0;
@@ -48,51 +45,6 @@ namespace hf {
                     _sensors[k]->modifyState((State *)state, time);
                 }
             }
-
-            void checkReceiver(State * state)
-            {
-                // Sync failsafe to open-loop-controller
-                if (_receiver->lostSignal() && state->armed) {
-                    _mixer->cut();
-                    state->armed = false;
-                    state->failsafe = true;
-                    _board->showArmedStatus(false);
-                    return;
-                }
-
-                // Check whether controller data is available
-                if (!_receiver->ready()) return;
-
-                // Disarm
-                if (state->armed && !_receiver->inArmedState()) {
-                    state->armed = false;
-                } 
-
-                // Avoid arming when controller is in armed state
-                if (!_safeToArm) {
-                    _safeToArm = !_receiver->inArmedState();
-                }
-
-                // Arm after lots of safety checks
-                if (_safeToArm
-                    && !state->armed
-                    && !state->failsafe 
-                    && state->safeToArm()
-                    && _receiver->inactive()
-                    && _receiver->inArmedState()
-                    ) {
-                    state->armed = true;
-                }
-
-                // Cut motors on inactivity
-                if (state->armed && _receiver->inactive()) {
-                    _mixer->cut();
-                }
-
-                // Set LED based on arming status
-                _board->showArmedStatus(state->armed);
-
-            } // checkReceiver
 
         protected:
 
@@ -134,8 +86,7 @@ namespace hf {
 
             void update(void)
             {
-                // Grab control signal if available
-                checkReceiver(&_state);
+                _receiver->ready();
 
                 // Update PID controllers task
                 _pidTask.update(_board, _receiver, _mixer, &_state);
