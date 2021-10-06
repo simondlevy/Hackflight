@@ -130,10 +130,10 @@ namespace hf {
 
         public:
 
-            virtual bool ready(void)
+            virtual void update(void)
             {
                 // Wait till there's a new frame
-                if (!gotNewFrame()) return false;
+                if (!gotNewFrame()) return;
 
                 // Read raw channel values
                 readRawvals();
@@ -169,10 +169,7 @@ namespace hf {
                 _aux1State = getRawval(CHANNEL_AUX1) >= 0.0 ? (getRawval(CHANNEL_AUX1) > AUX_THRESHOLD ? 2 : 1) : 0;
                 _aux2State = getRawval(CHANNEL_AUX2) >= AUX_THRESHOLD ? 1 : 0;
 
-                // Got a new frame
-                return true;
-
-            }  // ready
+            }  // update
 
             virtual void begin(void) 
             { 

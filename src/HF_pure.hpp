@@ -86,7 +86,7 @@ namespace hf {
 
             void update(void)
             {
-                _receiver->ready();
+                _receiver->update();
 
                 // Update PID controllers task
                 _pidTask.update(_board, _receiver, _mixer, &_state);
