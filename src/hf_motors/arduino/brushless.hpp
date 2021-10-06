@@ -14,7 +14,7 @@
 
 #include "../rotary.hpp"
 
-namespace rft {
+namespace hf {
 
     class ArduinoBrushlessMotor : public RotaryMotor {
 
@@ -48,4 +48,4 @@ namespace rft {
 
     }; // class BrushlessMotor
 
-} // namespace rft
+} // namespace hf

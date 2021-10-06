@@ -12,7 +12,7 @@
 
 #include <Servo.h>
 
-namespace rft {
+namespace hf {
 
     class ArduinoServoMotor : public ServoMotor {
 
@@ -40,4 +40,4 @@ namespace rft {
 
     }; // class ArduinoServoMotor
 
-} // namespace rft
+} // namespace hf

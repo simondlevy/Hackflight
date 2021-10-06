@@ -10,7 +10,7 @@
 
 #include "../RFT_board.hpp"
 #include "../RFT_debugger.hpp"
-#include "../RFT_filters.hpp"
+#include "../HF_filters.hpp"
 
 namespace rft {
 

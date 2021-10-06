@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "../RFT_filters.hpp"
+#include "../HF_filters.hpp"
 
 #include "../HF_pidcontroller.hpp"
 
@@ -38,7 +38,7 @@ namespace hf {
                 }
 
                 // Compute I term
-                _errorI = rft::Filter::constrainAbs(_errorI + error, _windupMax);
+                _errorI = Filter::constrainAbs(_errorI + error, _windupMax);
 
                 // Adjust yaw demand based on error
                 demands[DEMANDS_YAW] = _Kp * error + _Ki * _errorI;
@@ -54,7 +54,7 @@ namespace hf {
                 _Kp = Kp;
                 _Ki = Ki;
                 _windupMax = windupMax;
-                _rateMax = rft::Filter::deg2rad(rateMaxDegreesPerSecond);
+                _rateMax = Filter::deg2rad(rateMaxDegreesPerSecond);
             }
 
     };  // class YawPid

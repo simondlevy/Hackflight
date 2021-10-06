@@ -9,7 +9,7 @@
 #pragma once
 
 #include <RFT_sensor.hpp>
-#include <RFT_filters.hpp>
+#include <HF_filters.hpp>
 
 #include <USFS_Master.h>
 
@@ -82,7 +82,7 @@ namespace hf {
 
                     _usfs.readQuaternion(qw, qx, qy, qz);
 
-                    rft::Filter::quat2euler(qw, qx, qy, qz, 
+                    Filter::quat2euler(qw, qx, qy, qz, 
                             hfstate->x[State::PHI], hfstate->x[State::THETA], hfstate->x[State::PSI]);
 
                     // Adjust rotation so that nose-up is positive

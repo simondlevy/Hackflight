@@ -11,8 +11,8 @@
 #include "HF_demands.hpp"
 
 #include "RFT_actuator.hpp"
-#include "RFT_filters.hpp"
-#include "RFT_motor.hpp"
+#include "HF_filters.hpp"
+#include "HF_motor.hpp"
 
 #include "RFT_debugger.hpp"
 
@@ -37,7 +37,7 @@ namespace hf {
             static const uint8_t MAXMOTORS = 20;
 
             // XXX make a class for this, or migrate it to rft::Motor
-            rft::Motor * _motors[MAXMOTORS] = {};
+            Motor * _motors[MAXMOTORS] = {};
             float  _disarmedValues[MAXMOTORS];
 
             uint8_t _nmotors = 0;
@@ -56,7 +56,7 @@ namespace hf {
                 _nmotors = 0;
             }
 
-            void addMotor(rft::Motor * motor)
+            void addMotor(Motor * motor)
             {
                 _motors[_nmotors++] = motor;
             }
@@ -64,7 +64,7 @@ namespace hf {
             virtual float constrainMotorValue(uint8_t index, float value)
             {
                 (void)index; // all motors behave the same by default
-                return rft::Filter::constrainMinMax(value, 0, 1);
+                return Filter::constrainMinMax(value, 0, 1);
             }
 
             // Actuator overrides ----------------------------------------------

@@ -203,7 +203,7 @@ namespace hf {
                         gy * PI / 180.0f, gz * PI / 180.0f, deltat);
 
                 // Convert quaternion to Euler angles
-                rft::Filter::quat2euler(
+                Filter::quat2euler(
                         madgwick.q1,
                         madgwick.q2,
                         madgwick.q3,

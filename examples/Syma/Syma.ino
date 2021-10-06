@@ -26,7 +26,7 @@
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_sensors/usfs.hpp"
 
-#include "rft_motors/arduino/brushed.hpp"
+#include "hf_motors/arduino/brushed.hpp"
 
 // Receiver ===================================================================
 
@@ -44,10 +44,10 @@ static hf::LadybugFC board = hf::LadybugFC(&Serial2);
 
 // Motors  =====================================================================
 
-static rft::ArduinoBrushedMotor motor1 = rft::ArduinoBrushedMotor(13);
-static rft::ArduinoBrushedMotor motor2 = rft::ArduinoBrushedMotor(A2);
-static rft::ArduinoBrushedMotor motor3 = rft::ArduinoBrushedMotor(3);
-static rft::ArduinoBrushedMotor motor4 = rft::ArduinoBrushedMotor(11);
+static hf::ArduinoBrushedMotor motor1 = hf::ArduinoBrushedMotor(13);
+static hf::ArduinoBrushedMotor motor2 = hf::ArduinoBrushedMotor(A2);
+static hf::ArduinoBrushedMotor motor3 = hf::ArduinoBrushedMotor(3);
+static hf::ArduinoBrushedMotor motor4 = hf::ArduinoBrushedMotor(11);
 
 // Mixer =======================================================================
 

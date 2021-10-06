@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "../RFT_motor.hpp"
+#include "../HF_motor.hpp"
 
-namespace rft {
+namespace hf {
 
     class RotaryMotor : public Motor {
 
@@ -28,4 +28,4 @@ namespace rft {
 
     }; // class RotaryMotor
 
-} // namespace rft
+} // namespace hf

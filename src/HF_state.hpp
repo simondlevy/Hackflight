@@ -9,7 +9,7 @@
 #pragma once
 
 #include "RFT_state.hpp"
-#include "RFT_filters.hpp"
+#include "HF_filters.hpp"
 
 namespace hf {
 
@@ -23,7 +23,7 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+                return fabs(x[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
         protected:

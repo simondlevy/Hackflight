@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <RFT_filters.hpp>
+#include "HF_filters.hpp"
 
-namespace rft {
+namespace hf {
 
     class Motor {
 
