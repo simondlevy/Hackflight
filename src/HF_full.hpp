@@ -9,11 +9,7 @@
 #pragma once
 
 #include "HF_pure.hpp"
-
 #include "HF_serialtask.hpp"
-#include "HF_board.hpp"
-#include "HF_mixer.hpp"
-#include "HF_state.hpp"
 
 namespace hf {
 
