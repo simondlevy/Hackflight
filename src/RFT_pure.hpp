@@ -11,11 +11,12 @@
 #include "RFT_board.hpp"
 #include "RFT_sensor.hpp"
 #include "RFT_parser.hpp"
-#include "RFT_closedlooptask.hpp"
 
+#include "HF_pidtask.hpp"
 #include "HF_pidcontroller.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
+#include "HF_state.hpp"
 
 namespace rft {
 
@@ -31,7 +32,7 @@ namespace rft {
             uint8_t _sensor_count = 0;
 
             // Timer task for PID controllers
-            ClosedLoopTask _closedLoopTask;
+            hf::PidTask _pidTask;
 
             void startSensors(void) 
             {
@@ -133,7 +134,7 @@ namespace rft {
                 checkReceiver(state);
 
                 // Update PID controllers task
-                _closedLoopTask.update(_board, _receiver, _mixer, state);
+                _pidTask.update(_board, _receiver, _mixer, (hf::State *)state);
 
                 // Check sensors
                 checkSensors(state);
@@ -148,7 +149,7 @@ namespace rft {
 
             void addPidController(hf::PidController * controller) 
             {
-                _closedLoopTask.addController(controller);
+                _pidTask.addController(controller);
             }
 
     }; // class RFTPure

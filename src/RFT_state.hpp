@@ -12,11 +12,7 @@ namespace rft {
 
     class State {
 
-        friend class RFTPure;
-        friend class ClosedLoopTask;
-        friend class SerialTask;
-
-        protected:
+        public:
 
             bool armed = false;
             bool failsafe = false;

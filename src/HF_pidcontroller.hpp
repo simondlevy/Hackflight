@@ -20,12 +20,12 @@ namespace hf {
 
         public:
 
-            void modifyDemands(rft::State * state, float * demands)
+            void modifyDemands(State * state, float * demands)
             {
-                modifyDemands(((State *)state)->x, demands);
+                modifyDemands(state->x, demands);
             }
 
-            virtual void modifyDemands(float * state, float * demands) = 0;
+            virtual void modifyDemands(float * statevec, float * demands) = 0;
 
     };  // class PidController
 

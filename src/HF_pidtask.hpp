@@ -9,51 +9,46 @@
 #pragma once
 
 #include "RFT_timertask.hpp"
-#include "RFT_state.hpp"
 
+#include "HF_state.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 #include "HF_pidcontroller.hpp"
 
-namespace rft {
+namespace hf {
 
-    class ClosedLoopTask : public TimerTask {
-
-        friend class RFTPure;
+    class PidTask : public rft::TimerTask {
 
         private:
 
             // PID controllers
-            hf::PidController * _controllers[256] = {};
+            PidController * _controllers[256] = {};
             uint8_t _controller_count = 0;
 
-        protected:
+        public:
 
             // For now, we keep all tasks the same.  At some point it might be
             // useful to investigate, e.g., faster updates for Rate PID than
             // for Level PID.
-            ClosedLoopTask(float freq=300)
-                : TimerTask(freq)
+            PidTask(float freq=300)
+                : rft::TimerTask(freq)
             {
                 _controller_count = 0;
             }
 
-            void addController(hf::PidController * controller)
+            void addController(PidController * controller)
             {
                 _controllers[_controller_count++] = controller;
             }
 
-            void update(Board * board,
-                        hf::Receiver * receiver,
-                        hf::Mixer * mixer,
-                        State * state)
+            void update(rft::Board * board, Receiver * receiver, Mixer * mixer, State * state)
             {
-                if (!TimerTask::ready(board)) {
+                if (!rft::TimerTask::ready(board)) {
                     return;
                 }
 
                 // Start with demands from open-loop controller
-                float demands[hf::Receiver::MAX_DEMANDS] = {};
+                float demands[Receiver::MAX_DEMANDS] = {};
                 receiver->getDemands(demands);
 
                 // Apply PID controllers to demands
@@ -72,6 +67,6 @@ namespace rft {
 
              } // doTask
 
-    };  // ClosedLoopTask
+    };  // PidTask
 
-} // namespace rft
+} // namespace hf
