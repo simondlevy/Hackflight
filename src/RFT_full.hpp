@@ -11,6 +11,8 @@
 #include "RFT_pure.hpp"
 #include "RFT_serialtask.hpp"
 
+#include "HF_mixer.hpp"
+
 namespace rft {
 
     class RFTFull : public RFTPure {
@@ -23,8 +25,8 @@ namespace rft {
 
         protected:
 
-            RFTFull(Board * board, OpenLoopController * olc, Actuator * actuator)
-                : RFTPure(board, olc, actuator)
+            RFTFull(Board * board, OpenLoopController * olc, hf::Mixer * mixer)
+                : RFTPure(board, olc, mixer)
             {
                 _serial_task_count = 0;
             }
@@ -35,7 +37,7 @@ namespace rft {
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(_board, _actuator, state);
+                    _serial_tasks[k]->update(_board, _mixer, state);
                 }
             }
 

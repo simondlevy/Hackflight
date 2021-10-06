@@ -10,16 +10,14 @@
 
 #include "HF_demands.hpp"
 
-#include "RFT_actuator.hpp"
 #include "HF_filters.hpp"
 #include "HF_motor.hpp"
 
 namespace hf {
 
-    class Mixer : public rft::Actuator {
+    class Mixer {
 
         friend class Hackflight;
-        friend class SerialTask;
 
         private:
 
@@ -45,7 +43,7 @@ namespace hf {
                 _motors[index]->write(value);
             }
 
-        protected:
+        public:
 
             motorMixer_t motorDirections[MAXMOTORS];
 
@@ -65,9 +63,7 @@ namespace hf {
                 return Filter::constrainMinMax(value, 0, 1);
             }
 
-            // Actuator overrides ----------------------------------------------
-
-            void begin(void) override
+            void begin(void)
             {
                 // set disarmed motor values
                 for (uint8_t i = 0; i < _nmotors; i++) {
@@ -77,14 +73,14 @@ namespace hf {
             }
 
             // This is how we can spin the motors from the GCS
-            void runDisarmed(void) override
+            void runDisarmed(void)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, _disarmedValues[i]);
                 }
             }
 
-            void run(float * demands, bool safe) override
+            void run(float * demands, bool safe)
             {
                 // Don't run motors if its not safe: vehicle should be
                 // armed, with throttle above minimum
@@ -135,16 +131,21 @@ namespace hf {
                 }
             }
 
-            void cut(void) override
+            void cut(void)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, 0);
                 }
             }
 
-            virtual void setMotorDisarmed(uint8_t index, float value) override
+            virtual void setMotorDisarmed(uint8_t index, float value)
             {
                 _disarmedValues[index] = value;
+            }
+
+            virtual uint8_t getType(void) 
+            {
+                return 0;
             }
 
     }; // class Mixer

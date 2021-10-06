@@ -12,6 +12,8 @@
 #include "RFT_state.hpp"
 #include "RFT_openloop.hpp"
 
+#include "HF_mixer.hpp"
+
 namespace rft {
 
     class ClosedLoopTask : public TimerTask {
@@ -45,7 +47,7 @@ namespace rft {
 
             void update(Board * board,
                         OpenLoopController * olc,
-                        Actuator * actuator,
+                        hf::Mixer * mixer,
                         State * state)
             {
                 if (!TimerTask::ready(board)) {
@@ -86,11 +88,11 @@ namespace rft {
                 board->flashLed(shouldFlash);
 
                 // Use updated demands to run motors, allowing
-                // actuator to choose whether it cares about
+                // mixer to choose whether it cares about
                 // open-loop controller being inactive (e.g.,
                 // throttle down)
                 if (!state->failsafe) {
-                    actuator->run(demands, state->armed && !olc->inactive());
+                    mixer->run(demands, state->armed && !olc->inactive());
                 }
 
              } // doTask

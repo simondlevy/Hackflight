@@ -12,9 +12,10 @@
 #include "RFT_openloop.hpp"
 #include "RFT_closedloop.hpp"
 #include "RFT_sensor.hpp"
-#include "RFT_actuator.hpp"
 #include "RFT_parser.hpp"
 #include "RFT_closedlooptask.hpp"
+
+#include "HF_mixer.hpp"
 
 namespace rft {
 
@@ -53,7 +54,7 @@ namespace rft {
             {
                 // Sync failsafe to open-loop-controller
                 if (_olc->lostSignal() && state->armed) {
-                    _actuator->cut();
+                    _mixer->cut();
                     state->armed = false;
                     state->failsafe = true;
                     _board->showArmedStatus(false);
@@ -86,7 +87,7 @@ namespace rft {
 
                 // Cut motors on inactivity
                 if (state->armed && _olc->inactive()) {
-                    _actuator->cut();
+                    _mixer->cut();
                 }
 
                 // Set LED based on arming status
@@ -99,15 +100,15 @@ namespace rft {
             // Essentials
             Board * _board = NULL;
             OpenLoopController * _olc = NULL;
-            Actuator * _actuator = NULL;
+            hf::Mixer * _mixer = NULL;
 
             RFTPure(Board * board,
                     OpenLoopController * olc,
-                    Actuator * actuator)
+                    hf::Mixer * mixer)
             {
                 _board = board;
                 _olc = olc;
-                _actuator = actuator;
+                _mixer = mixer;
 
                 _sensor_count = 0;
             }
@@ -123,8 +124,8 @@ namespace rft {
                 // Initialize the open-loop controller
                 _olc->begin();
 
-                // Start the actuator
-                _actuator->begin();
+                // Start the mixer
+                _mixer->begin();
 
             } // begin
 
@@ -134,7 +135,7 @@ namespace rft {
                 checkOpenLoopController(state);
 
                 // Update PID controllers task
-                _closedLoopTask.update(_board, _olc, _actuator, state);
+                _closedLoopTask.update(_board, _olc, _mixer, state);
 
                 // Check sensors
                 checkSensors(state);

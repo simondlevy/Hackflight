@@ -10,8 +10,8 @@
 
 #include "RFT_pure.hpp"
 #include "RFT_board.hpp"
-#include "RFT_actuator.hpp"
 
+#include "HF_mixer.hpp"
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
 
@@ -27,8 +27,8 @@ namespace hf {
 
             HackflightPure(rft::Board * board,
                        Receiver * receiver,
-                       rft::Actuator * actuator)
-                : rft::RFTPure(board, receiver, actuator)
+                       Mixer * mixer)
+                : rft::RFTPure(board, receiver, mixer)
             {
             }
 

@@ -24,8 +24,8 @@ namespace hf {
 
         public:
 
-            HackflightFull(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
-                : rft::RFTFull(board, receiver, actuator)
+            HackflightFull(rft::Board * board, Receiver * receiver, Mixer * mixer)
+                : rft::RFTFull(board, receiver, mixer)
             {
             }
 
@@ -43,7 +43,7 @@ namespace hf {
             {
                 rft::RFTFull::addSerialTask(task);
 
-                task->init((Receiver *)_olc, _actuator, &_state);
+                task->init((Receiver *)_olc, _mixer, &_state);
             }
 
     }; // class Hackflight

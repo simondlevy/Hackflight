@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include <RFT_timertask.hpp>
-#include <RFT_actuator.hpp>
-#include <RFT_parser.hpp>
-#include <rft_boards/realboard.hpp>
+#include "RFT_timertask.hpp"
+#include "RFT_parser.hpp"
+#include "rft_boards/realboard.hpp"
+
+#include "HF_mixer.hpp"
 
 namespace rft {
 
@@ -31,7 +32,7 @@ namespace rft {
                 _useTelemetryPort = secondaryPort;
             }
 
-            void update(Board * board, Actuator * actuator, State * state)
+            void update(Board * board, hf::Mixer * mixer, State * state)
             {
                 if (!TimerTask::ready(board)) {
                     return;
@@ -50,7 +51,7 @@ namespace rft {
 
                 // Support motor testing from GCS
                 if (!state->armed) {
-                    actuator->runDisarmed();
+                    mixer->runDisarmed();
                 }
             }
 
