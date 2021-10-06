@@ -7,7 +7,6 @@
 #pragma once
 
 #include "RFT_board.hpp"
-#include "RFT_debugger.hpp"
 #include "RFT_actuator.hpp"
 #include "RFT_parser.hpp"
 #include "RFT_serialtask.hpp"

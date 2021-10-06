@@ -15,7 +15,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-namespace rft {
+namespace hf {
 
     class Debugger {
 
@@ -59,4 +59,4 @@ namespace rft {
 
         }; // class Debugger
 
-} // namespace rft
+} // namespace hf

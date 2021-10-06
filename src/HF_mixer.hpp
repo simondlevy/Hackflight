@@ -14,8 +14,6 @@
 #include "HF_filters.hpp"
 #include "HF_motor.hpp"
 
-#include "RFT_debugger.hpp"
-
 namespace hf {
 
     class Mixer : public rft::Actuator {

@@ -9,7 +9,7 @@
 #pragma once
 
 #include "../RFT_board.hpp"
-#include "../RFT_debugger.hpp"
+#include "../HF_debugger.hpp"
 #include "../HF_filters.hpp"
 
 namespace rft {
@@ -87,7 +87,7 @@ namespace rft {
             void error(const char * errmsg) 
             {
                 while (true) {
-                    Debugger::printf("%s\n", errmsg);
+                    hf::Debugger::printf("%s\n", errmsg);
                     delaySeconds(0.1);
                 }
             }

@@ -9,7 +9,6 @@
 #pragma once
 
 #include <RFT_timertask.hpp>
-#include <RFT_debugger.hpp>
 #include <RFT_actuator.hpp>
 #include <RFT_parser.hpp>
 #include <rft_boards/realboard.hpp>
