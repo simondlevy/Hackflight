@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "hf_boards/realboard.hpp"
 #include "HF_pure.hpp"
 #include "HF_serialtask.hpp"
 
@@ -31,7 +32,7 @@ namespace hf {
                     _mixer->cut();
                     state->armed = false;
                     state->failsafe = true;
-                    _board->showArmedStatus(false);
+                    ((RealBoard *) _board)->showArmedStatus(false);
                     return;
                 }
 
@@ -62,13 +63,13 @@ namespace hf {
                 }
 
                 // Set LED based on arming status
-                _board->showArmedStatus(state->armed);
+                ((RealBoard *)_board)->showArmedStatus(state->armed);
 
             } // checkSafety
 
         public:
 
-            HackflightFull(Board * board, Receiver * receiver, Mixer * mixer)
+            HackflightFull(RealBoard * board, Receiver * receiver, Mixer * mixer)
                 : HackflightPure(board, receiver, mixer)
             {
                 _serial_task_count = 0;

@@ -22,7 +22,6 @@ namespace hf {
 
             // ----------------- For real boards -------------------------------
             virtual void begin(void) { }
-            virtual void showArmedStatus(bool armed) { (void)armed; }
 
     }; // class Board
 
