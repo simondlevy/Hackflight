@@ -22,19 +22,8 @@ namespace hf {
 
         private:
 
-            // Sensors 
-            Sensor * _sensors[256] = {};
-            uint8_t _sensor_count = 0;
-
             // Timer task for PID controllers
             PidTask _pidTask;
-
-            void startSensors(void) 
-            {
-                for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->begin();
-                }
-            }
 
             void checkSensors(State * state)
             {
@@ -54,6 +43,9 @@ namespace hf {
             Mixer * _mixer = NULL;
             State _state = {};
 
+            // Sensors 
+            Sensor * _sensors[256] = {};
+            uint8_t _sensor_count = 0;
 
         public:
 
@@ -66,21 +58,9 @@ namespace hf {
                 _sensor_count = 0;
             }
 
-            void begin(bool armed=false)
+            void begin(void)
             {  
-                _state.armed = armed;
-
-                // Start the board
-                _board->begin();
-
-                // Initialize the sensors
-                startSensors();
-
-                // Initialize the open-loop controller
-                _receiver->begin();
-
-                // Start the mixer
-                _mixer->begin();
+                _state.armed = true;
 
             } // begin
 

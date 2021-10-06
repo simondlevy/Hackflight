@@ -67,6 +67,13 @@ namespace hf {
 
             } // checkSafety
 
+            void startSensors(void) 
+            {
+                for (uint8_t k=0; k<_sensor_count; ++k) {
+                    _sensors[k]->begin();
+                }
+            }
+
         public:
 
             HackflightFull(RealBoard * board, Receiver * receiver, Mixer * mixer)
@@ -74,6 +81,24 @@ namespace hf {
             {
                 _serial_task_count = 0;
             }
+
+            void begin(void)
+            {  
+                _state.armed = false;
+
+                // Start the board
+                _board->begin();
+
+                // Initialize the sensors
+                startSensors();
+
+                // Initialize the open-loop controller
+                _receiver->begin();
+
+                // Start the mixer
+                _mixer->begin();
+
+            } // begin
 
             void update(void)
             {
