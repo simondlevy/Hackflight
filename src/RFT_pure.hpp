@@ -9,12 +9,12 @@
 #pragma once
 
 #include "RFT_board.hpp"
-#include "RFT_openloop.hpp"
 #include "RFT_closedloop.hpp"
 #include "RFT_sensor.hpp"
 #include "RFT_parser.hpp"
 #include "RFT_closedlooptask.hpp"
 
+#include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 
 namespace rft {
@@ -50,10 +50,10 @@ namespace rft {
                 }
             }
 
-            void checkOpenLoopController(State * state)
+            void checkReceiver(State * state)
             {
                 // Sync failsafe to open-loop-controller
-                if (_olc->lostSignal() && state->armed) {
+                if (_receiver->lostSignal() && state->armed) {
                     _mixer->cut();
                     state->armed = false;
                     state->failsafe = true;
@@ -62,16 +62,16 @@ namespace rft {
                 }
 
                 // Check whether controller data is available
-                if (!_olc->ready()) return;
+                if (!_receiver->ready()) return;
 
                 // Disarm
-                if (state->armed && !_olc->inArmedState()) {
+                if (state->armed && !_receiver->inArmedState()) {
                     state->armed = false;
                 } 
 
                 // Avoid arming when controller is in armed state
                 if (!_safeToArm) {
-                    _safeToArm = !_olc->inArmedState();
+                    _safeToArm = !_receiver->inArmedState();
                 }
 
                 // Arm after lots of safety checks
@@ -79,35 +79,33 @@ namespace rft {
                     && !state->armed
                     && !state->failsafe 
                     && state->safeToArm()
-                    && _olc->inactive()
-                    && _olc->inArmedState()
+                    && _receiver->inactive()
+                    && _receiver->inArmedState()
                     ) {
                     state->armed = true;
                 }
 
                 // Cut motors on inactivity
-                if (state->armed && _olc->inactive()) {
+                if (state->armed && _receiver->inactive()) {
                     _mixer->cut();
                 }
 
                 // Set LED based on arming status
                 _board->showArmedStatus(state->armed);
 
-            } // checkOpenLoopController
+            } // checkReceiver
 
         protected:
 
             // Essentials
             Board * _board = NULL;
-            OpenLoopController * _olc = NULL;
+            hf::Receiver * _receiver = NULL;
             hf::Mixer * _mixer = NULL;
 
-            RFTPure(Board * board,
-                    OpenLoopController * olc,
-                    hf::Mixer * mixer)
+            RFTPure(Board * board, hf::Receiver * receiver, hf::Mixer * mixer)
             {
                 _board = board;
-                _olc = olc;
+                _receiver = receiver;
                 _mixer = mixer;
 
                 _sensor_count = 0;
@@ -122,7 +120,7 @@ namespace rft {
                 startSensors();
 
                 // Initialize the open-loop controller
-                _olc->begin();
+                _receiver->begin();
 
                 // Start the mixer
                 _mixer->begin();
@@ -132,10 +130,10 @@ namespace rft {
             void update(State * state)
             {
                 // Grab control signal if available
-                checkOpenLoopController(state);
+                checkReceiver(state);
 
                 // Update PID controllers task
-                _closedLoopTask.update(_board, _olc, _mixer, state);
+                _closedLoopTask.update(_board, _receiver, _mixer, state);
 
                 // Check sensors
                 checkSensors(state);

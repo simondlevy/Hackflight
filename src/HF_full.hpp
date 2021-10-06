@@ -43,7 +43,7 @@ namespace hf {
             {
                 rft::RFTFull::addSerialTask(task);
 
-                task->init((Receiver *)_olc, _mixer, &_state);
+                task->init(_receiver, _mixer, &_state);
             }
 
     }; // class Hackflight

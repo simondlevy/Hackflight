@@ -25,8 +25,8 @@ namespace rft {
 
         protected:
 
-            RFTFull(Board * board, OpenLoopController * olc, hf::Mixer * mixer)
-                : RFTPure(board, olc, mixer)
+            RFTFull(Board * board, hf::Receiver * receiver, hf::Mixer * mixer)
+                : RFTPure(board, receiver, mixer)
             {
                 _serial_task_count = 0;
             }

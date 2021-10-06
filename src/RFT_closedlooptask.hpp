@@ -10,8 +10,8 @@
 
 #include "RFT_timertask.hpp"
 #include "RFT_state.hpp"
-#include "RFT_openloop.hpp"
 
+#include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 
 namespace rft {
@@ -46,7 +46,7 @@ namespace rft {
             }
 
             void update(Board * board,
-                        OpenLoopController * olc,
+                        hf::Receiver * receiver,
                         hf::Mixer * mixer,
                         State * state)
             {
@@ -55,12 +55,12 @@ namespace rft {
                 }
 
                 // Start with demands from open-loop controller
-                float demands[OpenLoopController::MAX_DEMANDS] = {};
-                olc->getDemands(demands);
+                float demands[hf::Receiver::MAX_DEMANDS] = {};
+                receiver->getDemands(demands);
 
                 // Each controller is associated with at least one auxiliary
                 // switch state
-                uint8_t modeIndex = olc->getModeIndex();
+                uint8_t modeIndex = receiver->getModeIndex();
 
                 // Some controllers should cause LED to flash when they're
                 // active
@@ -72,7 +72,7 @@ namespace rft {
 
                     // Some controllers need to be reset based on inactivty
                     // (e.g., throttle down resets PID controller integral)
-                    controller->resetOnInactivity(olc->inactive());
+                    controller->resetOnInactivity(receiver->inactive());
 
                     if (controller->modeIndex <= modeIndex) {
 
@@ -92,7 +92,7 @@ namespace rft {
                 // open-loop controller being inactive (e.g.,
                 // throttle down)
                 if (!state->failsafe) {
-                    mixer->run(demands, state->armed && !olc->inactive());
+                    mixer->run(demands, state->armed && !receiver->inactive());
                 }
 
              } // doTask
