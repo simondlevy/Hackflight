@@ -29,7 +29,7 @@ namespace hf {
 
     class USFS : public rft::Sensor {
 
-        friend class Hackflight;
+        friend class HackflightFull;
 
         private:
 

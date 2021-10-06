@@ -14,7 +14,7 @@ namespace hf {
 
     class MPU6050 : public rft::Sensor {
 
-        friend class Hackflight;
+        friend class HackflightFull;
 
         public:
 

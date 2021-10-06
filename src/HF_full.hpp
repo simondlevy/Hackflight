@@ -16,7 +16,7 @@
 
 namespace hf {
 
-    class Hackflight: public rft::RFT {
+    class HackflightFull: public rft::RFTFull {
         
         private:
 
@@ -24,24 +24,24 @@ namespace hf {
 
         public:
 
-            Hackflight(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
-                : rft::RFT(board, receiver, actuator)
+            HackflightFull(rft::Board * board, Receiver * receiver, rft::Actuator * actuator)
+                : rft::RFTFull(board, receiver, actuator)
             {
             }
 
             void begin(void)
             {
-                rft::RFT::begin();
+                rft::RFTFull::begin();
             }
 
             void update(void)
             {
-                rft::RFT::update(&_state);
+                rft::RFTFull::update(&_state);
             }
 
             void addSerialTask(SerialTask * task)
             {
-                rft::RFT::addSerialTask(task);
+                rft::RFTFull::addSerialTask(task);
 
                 task->init((Receiver *)_olc, _actuator, &_state);
             }

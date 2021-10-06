@@ -70,7 +70,7 @@ hf::SerialTask telemetryTask = hf::SerialTask(true);
 
 // Hackflight object ===========================================================
 
-static hf::Hackflight h(&board, &receiver, &mixer);
+static hf::HackflightFull h(&board, &receiver, &mixer);
 
 // Setup =======================================================================
 

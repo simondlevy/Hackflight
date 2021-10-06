@@ -17,7 +17,7 @@ namespace hf {
 
     class Pmw3901OpticalFlow : public rft::Sensor, public PMW3901 {
 
-        friend class Hackflight;
+        friend class HackflightFull;
 
         private:
 

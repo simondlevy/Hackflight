@@ -13,7 +13,7 @@
 
 namespace rft {
 
-    class RFT : public RFTPure {
+    class RFTFull : public RFTPure {
 
         private:
 
@@ -23,7 +23,7 @@ namespace rft {
 
         protected:
 
-            RFT(Board * board, OpenLoopController * olc, Actuator * actuator)
+            RFTFull(Board * board, OpenLoopController * olc, Actuator * actuator)
                 : RFTPure(board, olc, actuator)
             {
                 _serial_task_count = 0;

@@ -15,7 +15,8 @@ namespace hf {
 
     class State : public rft::State {
 
-        friend class Hackflight;
+        friend class HackflightPure;
+        friend class HackflightFull;
 
         private:
 

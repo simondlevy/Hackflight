@@ -20,7 +20,7 @@ namespace hf {
 
     class SerialTask : public rft::SerialTask {
 
-        friend class Hackflight;
+        friend class HackflightFull;
 
         private:
 

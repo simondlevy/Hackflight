@@ -18,7 +18,7 @@ namespace rft {
 
     class SerialTask : public TimerTask, public Parser {
 
-        friend class RFT;
+        friend class RFTFull;
 
         protected:
 

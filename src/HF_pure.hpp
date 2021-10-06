@@ -17,7 +17,7 @@
 
 namespace hf {
 
-    class Hackflight : public rft::RFTPure {
+    class HackflightPure : public rft::RFTPure {
 
         protected:
 
@@ -25,7 +25,7 @@ namespace hf {
 
         public:
 
-            Hackflight(rft::Board * board,
+            HackflightPure(rft::Board * board,
                        Receiver * receiver,
                        rft::Actuator * actuator)
                 : rft::RFTPure(board, receiver, actuator)
