@@ -10,7 +10,7 @@
 
 #include "HF_board.hpp"
 
-namespace rft {
+namespace hf {
 
     class TimerTask {
 
@@ -27,7 +27,7 @@ namespace rft {
                 _time = 0;
             }
 
-            bool ready(hf::Board * board)
+            bool ready(Board * board)
             {
                 float time = board->getTime();
 
@@ -42,4 +42,4 @@ namespace rft {
 
     };  // TimerTask
 
-} // namespace rft
+} // namespace hf

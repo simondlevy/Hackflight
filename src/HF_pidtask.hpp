@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include "RFT_timertask.hpp"
-
+#include "HF_timertask.hpp"
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
@@ -17,7 +16,7 @@
 
 namespace hf {
 
-    class PidTask : public rft::TimerTask {
+    class PidTask : public TimerTask {
 
         private:
 
@@ -31,7 +30,7 @@ namespace hf {
             // useful to investigate, e.g., faster updates for Rate PID than
             // for Level PID.
             PidTask(float freq=300)
-                : rft::TimerTask(freq)
+                : TimerTask(freq)
             {
                 _controller_count = 0;
             }
@@ -43,7 +42,7 @@ namespace hf {
 
             void update(Board * board, Receiver * receiver, Mixer * mixer, State * state)
             {
-                if (!rft::TimerTask::ready(board)) {
+                if (!TimerTask::ready(board)) {
                     return;
                 }
 

@@ -6,17 +6,17 @@
 
 #pragma once
 
-#include "RFT_timertask.hpp"
 #include "RFT_parser.hpp"
 
-#include "hf_boards/realboard.hpp"
+#include "HF_timertask.hpp"
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
+#include "hf_boards/realboard.hpp"
 
 namespace hf {
 
-    class SerialTask : public rft::TimerTask, rft::Parser {
+    class SerialTask : public TimerTask, rft::Parser {
 
         friend class HackflightFull;
 
@@ -173,14 +173,14 @@ namespace hf {
             bool _useTelemetryPort = false;
 
             SerialTask(bool secondaryPort=false)
-                : rft::TimerTask(FREQ)
+                : TimerTask(FREQ)
             {
                 _useTelemetryPort = secondaryPort;
             }
 
             void update(Board * board, Mixer * mixer, State * state)
             {
-                if (!rft::TimerTask::ready(board)) {
+                if (!TimerTask::ready(board)) {
                     return;
                 }
 
