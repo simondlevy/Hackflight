@@ -13,6 +13,7 @@
 
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
+#include "HF_pidcontroller.hpp"
 
 namespace rft {
 
@@ -23,7 +24,7 @@ namespace rft {
         private:
 
             // PID controllers
-            ClosedLoopController * _controllers[256] = {};
+            hf::PidController * _controllers[256] = {};
             uint8_t _controller_count = 0;
 
         protected:
@@ -37,11 +38,8 @@ namespace rft {
                 _controller_count = 0;
             }
 
-            void addController(ClosedLoopController * controller,
-                               uint8_t modeIndex) 
+            void addController(hf::PidController * controller)
             {
-                controller->modeIndex = modeIndex;
-
                 _controllers[_controller_count++] = controller;
             }
 
@@ -58,18 +56,10 @@ namespace rft {
                 float demands[hf::Receiver::MAX_DEMANDS] = {};
                 receiver->getDemands(demands);
 
-                // Each controller is associated with at least one auxiliary
-                // switch state
-                uint8_t modeIndex = receiver->getModeIndex();
-
-
+                // Apply PID controllers to demands
                 for (uint8_t k=0; k<_controller_count; ++k) {
+                    _controllers[k]->modifyDemands(state, demands); 
 
-                    ClosedLoopController * controller = _controllers[k];
-
-                    // Some controllers need to be reset based on inactivty
-                    // (e.g., throttle down resets PID controller integral)
-                    controller->resetOnInactivity(receiver->inactive());
                 }
 
                 // Use updated demands to run motors, allowing

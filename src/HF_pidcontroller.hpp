@@ -10,19 +10,17 @@
 
 #pragma once
 
-#include "RFT_closedloop.hpp"
-
 #include "HF_state.hpp"
 
 namespace hf {
 
-    class PidController : public rft::ClosedLoopController {
+    class PidController {
 
         friend class PidTask;
 
-        protected:
+        public:
 
-            virtual void modifyDemands(rft::State * state, float * demands) override
+            void modifyDemands(rft::State * state, float * demands)
             {
                 modifyDemands(((State *)state)->x, demands);
             }

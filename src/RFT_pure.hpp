@@ -9,11 +9,11 @@
 #pragma once
 
 #include "RFT_board.hpp"
-#include "RFT_closedloop.hpp"
 #include "RFT_sensor.hpp"
 #include "RFT_parser.hpp"
 #include "RFT_closedlooptask.hpp"
 
+#include "HF_pidcontroller.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 
@@ -146,10 +146,9 @@ namespace rft {
                 _sensors[_sensor_count++] = sensor;
             }
 
-            void addClosedLoopController(ClosedLoopController * controller,
-                                         uint8_t modeIndex=0) 
+            void addPidController(hf::PidController * controller) 
             {
-                _closedLoopTask.addController(controller, modeIndex);
+                _closedLoopTask.addController(controller);
             }
 
     }; // class RFTPure

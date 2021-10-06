@@ -80,9 +80,9 @@ void setup(void)
     h.addSensor(&imu);
 
     // Add PID controllers
-    h.addClosedLoopController(&levelPid);
-    h.addClosedLoopController(&ratePid);
-    h.addClosedLoopController(&yawPid);
+    h.addPidController(&levelPid);
+    h.addPidController(&ratePid);
+    h.addPidController(&yawPid);
 
     // Add serial tasks
     h.addSerialTask(&gcsTask);
