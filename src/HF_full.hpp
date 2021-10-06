@@ -1,7 +1,5 @@
 /*
-   Hackflight algorithm for real vehicles
-
-   Supports adding serial communications tasks
+   Hackflight class supporting safety checks and serial communication
 
    Copyright (c) 2021 Simon D. Levy
 
@@ -10,42 +8,48 @@
 
 #pragma once
 
-#include "RFT_full.hpp"
+#include "HF_pure.hpp"
 
 #include "HF_serialtask.hpp"
+#include "HF_board.hpp"
+#include "HF_mixer.hpp"
+#include "HF_state.hpp"
 
 namespace hf {
 
-    class HackflightFull: public rft::RFTFull {
-        
+    class HackflightFull : public HackflightPure {
+
         private:
 
-            State _state = {};
+            // Serial tasks
+            SerialTask * _serial_tasks[10] = {};
+            uint8_t _serial_task_count = 0;
 
         public:
 
             HackflightFull(Board * board, Receiver * receiver, Mixer * mixer)
-                : rft::RFTFull(board, receiver, mixer)
+                : HackflightPure(board, receiver, mixer)
             {
-            }
-
-            void begin(void)
-            {
-                rft::RFTFull::begin();
+                _serial_task_count = 0;
             }
 
             void update(void)
             {
-                rft::RFTFull::update(&_state);
+                HackflightPure::update();
+
+                // Update serial tasks
+                for (uint8_t k=0; k<_serial_task_count; ++k) {
+                    _serial_tasks[k]->update(_board, _mixer, &_state);
+                }
             }
 
             void addSerialTask(SerialTask * task)
             {
-                rft::RFTFull::addSerialTask(task);
+                _serial_tasks[_serial_task_count++] = task;
 
                 task->init(_receiver, _mixer, &_state);
             }
 
-    }; // class Hackflight
+    }; // class HackflightFull
 
-}  // namespace hf
+} // namespace

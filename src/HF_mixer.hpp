@@ -32,7 +32,6 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            // XXX make a class for this, or migrate it to rft::Motor
             Motor * _motors[MAXMOTORS] = {};
             float  _disarmedValues[MAXMOTORS];
 

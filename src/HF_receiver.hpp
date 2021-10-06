@@ -18,7 +18,7 @@ namespace hf {
     class Receiver {
 
         friend class ClosedLoopTask;
-        friend class RFTPure;
+        friend class HackflightPure;
         friend class Hackflight;
         friend class SerialTask;
         friend class PidTask;

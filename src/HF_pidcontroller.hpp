@@ -1,8 +1,6 @@
 /*
    Abstract class for PID controllers
 
-   Acts as a go-between for RFT state and Hackflight state
-
    Copyright (c) 2021 Simon D. Levy
 
    MIT License

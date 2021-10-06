@@ -13,7 +13,7 @@
 
 #include "../arduino_serial.hpp"
 
-namespace rft {
+namespace hf {
 
     class TinyPico : public ArduinoSerial {
 
@@ -37,4 +37,4 @@ namespace rft {
 
     }; // class TinyPico
 
-} // namespace rft
+} // namespace hf
