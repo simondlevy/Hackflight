@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <string.h>
 
-namespace rft {
+namespace hf {
 
     class Parser {
 
@@ -196,4 +196,4 @@ namespace rft {
 
     }; // class Parser
 
-} // namespace rft
+} // namespace hf

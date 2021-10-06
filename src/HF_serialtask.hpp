@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include "RFT_parser.hpp"
-
+#include "HF_parser.hpp"
 #include "HF_timertask.hpp"
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
@@ -16,7 +15,7 @@
 
 namespace hf {
 
-    class SerialTask : public TimerTask, rft::Parser {
+    class SerialTask : public TimerTask, Parser {
 
         friend class HackflightFull;
 
@@ -187,10 +186,10 @@ namespace hf {
                 RealBoard * realboard = (RealBoard *)board;
 
                 while (realboard->serialAvailable(_useTelemetryPort) > 0) {
-                    rft::Parser::parse(realboard->serialRead(_useTelemetryPort));
+                    Parser::parse(realboard->serialRead(_useTelemetryPort));
                 }
 
-                while (rft::Parser::availableBytes() > 0) {
+                while (Parser::availableBytes() > 0) {
                     realboard->serialWrite(Parser::readByte(),
                                            _useTelemetryPort);
                 }
