@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "RFT_sensor.hpp"
 #include "RFT_parser.hpp"
 
+#include "HF_sensor.hpp"
 #include "HF_board.hpp"
 #include "HF_pidtask.hpp"
 #include "HF_pidcontroller.hpp"
@@ -28,7 +28,7 @@ namespace rft {
             bool _safeToArm = false;
 
             // Sensors 
-            Sensor * _sensors[256] = {};
+            hf::Sensor * _sensors[256] = {};
             uint8_t _sensor_count = 0;
 
             // Timer task for PID controllers
@@ -47,7 +47,7 @@ namespace rft {
                 float time = _board->getTime();
 
                 for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->modifyState(state, time);
+                    _sensors[k]->modifyState((hf::State *)state, time);
                 }
             }
 
@@ -142,7 +142,7 @@ namespace rft {
 
         public:
 
-            void addSensor(Sensor * sensor) 
+            void addSensor(hf::Sensor * sensor) 
             {
                 _sensors[_sensor_count++] = sensor;
             }

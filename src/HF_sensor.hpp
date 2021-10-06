@@ -8,15 +8,13 @@
 
 #pragma once
 
-#include "RFT_state.hpp"
+#include "HF_state.hpp"
 
-namespace rft {
+namespace hf {
 
     class Sensor {
 
-        friend class RFTPure;
-
-        protected:
+        public:
 
             virtual void modifyState(State * state, float time) = 0;
 
@@ -24,4 +22,4 @@ namespace rft {
 
     };  // class Sensor
 
-} // namespace rft
+} // namespace hf

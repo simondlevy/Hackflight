@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <RFT_sensor.hpp>
+#include <HF_sensor.hpp>
 #include <HF_filters.hpp>
 
 #include <USFS_Master.h>
@@ -27,7 +27,7 @@ namespace hf {
         https://emissarydrones.com/what-is-roll-pitch-and-yaw
     */
 
-    class USFS : public rft::Sensor {
+    class USFS : public Sensor {
 
         friend class HackflightFull;
 
@@ -48,10 +48,8 @@ namespace hf {
                 }
             }
 
-            virtual void modifyState(rft::State * state, float time)
+            virtual void modifyState(State * state, float time)
             {
-                State * hfstate = (State *)state;
-
                 (void)time;
 
                 _usfs.checkEventStatus();
@@ -71,9 +69,9 @@ namespace hf {
                     _usfs.readGyrometer(gx, gy, gz);
 
                     // Convert degrees / sec to radians / sec
-                    hfstate->x[State::DPHI] = radians(gx);
-                    hfstate->x[State::DTHETA] = radians(gy);
-                    hfstate->x[State::DPSI] = radians(gz);
+                    state->x[State::DPHI] = radians(gx);
+                    state->x[State::DTHETA] = radians(gy);
+                    state->x[State::DPSI] = radians(gz);
                 }
 
                 if (_usfs.gotQuaternion()) {
@@ -83,14 +81,14 @@ namespace hf {
                     _usfs.readQuaternion(qw, qx, qy, qz);
 
                     Filter::quat2euler(qw, qx, qy, qz, 
-                            hfstate->x[State::PHI], hfstate->x[State::THETA], hfstate->x[State::PSI]);
+                            state->x[State::PHI], state->x[State::THETA], state->x[State::PSI]);
 
                     // Adjust rotation so that nose-up is positive
-                    hfstate->x[State::THETA] = -hfstate->x[State::THETA];
+                    state->x[State::THETA] = -state->x[State::THETA];
 
                     // Convert heading from [-pi,+pi] to [0,2*pi]
-                    if (hfstate->x[State::PSI] < 0) {
-                        hfstate->x[State::PSI] += 2*M_PI;
+                    if (state->x[State::PSI] < 0) {
+                        state->x[State::PSI] += 2*M_PI;
                     }
                 }
 
