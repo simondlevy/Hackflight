@@ -64,14 +64,40 @@ A typical Arduino sketch for hackflight is written as follows:
 
 4. In the ```loop()``` function, call ```Hackflight::update()```
 
-## RoboFirmwareToolkit
+## Core C++ Classes
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_board.hpp">Board</a>
+class specifies an abstract (pure virtual) <tt>getTime()</tt> method that you must
+implement for a particular microcontroller or simulator.  
 
-Hackflight is built on top of
-[RoboFirmwareToolkit](https://github.com/simondlevy/RoboFirmwareToolkit) (RFT),
-a general-purpose toolkit for building robot firmware.  So before trying out Hackflight
-you should also install RFT.  It is also worth checking out the README for RFT in order
-to see some of the design principles supporting Hackflight (see also the note on PID
-controllers below.)
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_receiver.hpp">Receiver</a>
+class performs basic functions associated with R/C receivers, and specifies a set of abstract methods that you
+implement for a particular receiver (DSMX, SBUS, etc.).
+
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_mixer.hpp">Mixer</a>
+class is an abstract class that can be subclassed for various kinds of mixers; for example, a quadcopter
+mixer using the MultiWii motor layout.
+
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_pidcontroller.hpp">PidController</a>
+class specifies an abstract method <tt>modifyDemands()</tt> that inputs the vehicles's current state and
+outputs an array of floating-point values representing how that controller affects the demands. (For example,
+an altitude-hold controller for a quadcopter would use the 'copter's altitude
+and vertical velocity to adjust the throttle demand.)  If you're
+mathematically-minded, you can think of a PID controller as a function from a
+(<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
+<b><i>PidController</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i></b>
+
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_sensor.hpp">Sensor</a>
+class specifies abstract methods <tt>ready()</tt> for checking whether the sensor
+has new data avaiable, and  <tt>modifyState()</tt> for modifying the vehicle's
+state based on that data.  If you're mathematically-minded, you can think of a
+sensor as a function from states to states: <b><i>Sensor</i>: <i>State</i> &rarr;
+<i>State</i></b>
+
+Together, these classes interact as shown in the following diagram:
+
+<p align="center"> 
+<img src="extras/media/dataflow2.png" width=700>
+</p>
 
 ## Ground Control Station
 
@@ -82,7 +108,7 @@ can run this program directly: just clone the [HackflightGCS](https://github.com
 repository and double-click on <b>hackflight.exe</b>.  Others can run the
 <b>hackflight.py</b> Python script in the <b>extras/gcs/python</b> folder.  To
 run the Python script you'll need to install
-[MSPPG](https://github.com/simondlevy/RoboFirmwareToolkit/tree/master/extras/parser), a
+[MSPPG](https://github.com/simondlevy/Hackflight/tree/master/extras/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
 firmware. Follow the directions in that folder to install MSPPG for Python.
 

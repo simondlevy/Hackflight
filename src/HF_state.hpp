@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include <RFT_state.hpp>
-#include <RFT_filters.hpp>
+#include "HF_filters.hpp"
 
 namespace hf {
 
-    class State : public rft::State {
+    class State {
 
-        friend class Hackflight;
+        friend class HackflightPure;
+        friend class HackflightFull;
 
         private:
 
@@ -23,18 +23,13 @@ namespace hf {
 
             bool safeAngle(uint8_t axis)
             {
-                return fabs(x[axis]) < rft::Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+                return fabs(x[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
-
-        protected:
-
-            bool safeToArm(void)
-            {
-                return safeAngle(PHI) && safeAngle(THETA);
-            }
-
 
         public:
+
+            bool armed = false;
+            bool failsafe = false;
 
             // See Bouabdallah et al. (2004)
             enum {X, DX, Y, DY, Z, DZ, PHI, DPHI, THETA, DTHETA, PSI, DPSI, SIZE};
@@ -42,8 +37,13 @@ namespace hf {
             float x[SIZE];
 
             State(bool start_armed=false)
-                : rft::State(start_armed)
             {
+                armed = start_armed;
+            }
+
+            bool safeToArm(void)
+            {
+                return safeAngle(PHI) && safeAngle(THETA);
             }
 
 

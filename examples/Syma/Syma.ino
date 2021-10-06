@@ -18,7 +18,7 @@
  */
 
 #include "HF_full.hpp"
-#include "hf_boards/ladybugfc.hpp"
+#include "hf_boards/realboards/arduino_serial/arduino/ladybugfc.hpp"
 #include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"
@@ -26,7 +26,7 @@
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_sensors/usfs.hpp"
 
-#include <rft_motors/arduino/brushed.hpp>
+#include "hf_motors/arduino/brushed.hpp"
 
 // Receiver ===================================================================
 
@@ -44,10 +44,10 @@ static hf::LadybugFC board = hf::LadybugFC(&Serial2);
 
 // Motors  =====================================================================
 
-static rft::ArduinoBrushedMotor motor1 = rft::ArduinoBrushedMotor(13);
-static rft::ArduinoBrushedMotor motor2 = rft::ArduinoBrushedMotor(A2);
-static rft::ArduinoBrushedMotor motor3 = rft::ArduinoBrushedMotor(3);
-static rft::ArduinoBrushedMotor motor4 = rft::ArduinoBrushedMotor(11);
+static hf::ArduinoBrushedMotor motor1 = hf::ArduinoBrushedMotor(13);
+static hf::ArduinoBrushedMotor motor2 = hf::ArduinoBrushedMotor(A2);
+static hf::ArduinoBrushedMotor motor3 = hf::ArduinoBrushedMotor(3);
+static hf::ArduinoBrushedMotor motor4 = hf::ArduinoBrushedMotor(11);
 
 // Mixer =======================================================================
 
@@ -70,7 +70,7 @@ hf::SerialTask telemetryTask = hf::SerialTask(true);
 
 // Hackflight object ===========================================================
 
-static hf::Hackflight h(&board, &receiver, &mixer);
+static hf::HackflightFull h(&board, &receiver, &mixer);
 
 // Setup =======================================================================
 
@@ -80,9 +80,9 @@ void setup(void)
     h.addSensor(&imu);
 
     // Add PID controllers
-    h.addClosedLoopController(&levelPid);
-    h.addClosedLoopController(&ratePid);
-    h.addClosedLoopController(&yawPid);
+    h.addPidController(&levelPid);
+    h.addPidController(&ratePid);
+    h.addPidController(&yawPid);
 
     // Add serial tasks
     h.addSerialTask(&gcsTask);

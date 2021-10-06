@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "HF_pidcontroller.hpp"
+#include "../HF_pidcontroller.hpp"
 
-#include <RFT_filters.hpp>
+#include "../HF_filters.hpp"
 
 namespace hf {
 
@@ -51,7 +51,7 @@ namespace hf {
             {
                 _Kp = Kp;
 
-                _dmdscale = 2 * rft::Filter::deg2rad(maxAngleDegrees);
+                _dmdscale = 2 * Filter::deg2rad(maxAngleDegrees);
             }
 
     }; // class LevelPid

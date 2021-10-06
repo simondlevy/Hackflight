@@ -6,21 +6,18 @@
 
 #pragma once
 
-#include <RFT_board.hpp>
-#include <RFT_debugger.hpp>
-#include <RFT_actuator.hpp>
-#include <RFT_parser.hpp>
-#include <RFT_serialtask.hpp>
-
+#include "HF_parser.hpp"
+#include "HF_timertask.hpp"
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
+#include "HF_mixer.hpp"
+#include "hf_boards/realboard.hpp"
 
 namespace hf {
 
+    class SerialTask : public TimerTask, Parser {
 
-    class SerialTask : public rft::SerialTask {
-
-        friend class Hackflight;
+        friend class HackflightFull;
 
         private:
 
@@ -29,7 +26,7 @@ namespace hf {
             // Store so we don't have to pass them on update
             State * _state = NULL;
             Receiver * _receiver = NULL;
-            rft::Actuator * _actuator = NULL;
+            Mixer * _mixer = NULL;
 
              void handle_RECEIVER_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
@@ -59,15 +56,15 @@ namespace hf {
 
             void handle_ACTUATOR_TYPE_Request(uint8_t & mtype)
             {
-                mtype = _actuator->getType();
+                mtype = _mixer->getType();
             }
 
             void handle_SET_MOTOR(float  m1, float  m2, float  m3, float  m4)
             {
-                _actuator->setMotorDisarmed(0, m1);
-                _actuator->setMotorDisarmed(1, m2);
-                _actuator->setMotorDisarmed(2, m3);
-                _actuator->setMotorDisarmed(3, m4);
+                _mixer->setMotorDisarmed(0, m1);
+                _mixer->setMotorDisarmed(1, m2);
+                _mixer->setMotorDisarmed(2, m3);
+                _mixer->setMotorDisarmed(3, m4);
             }
 
         protected:
@@ -162,20 +159,45 @@ namespace hf {
 
             } // dispatchMessage 
 
-            void init(
-                    Receiver * receiver,
-                    rft::Actuator * actuator,
-                    State * state)
+            void init( Receiver * receiver, Mixer * mixer, State * state)
             {
                 _receiver = receiver;
-                _actuator = actuator;
+                _mixer = mixer;
                 _state = state;
             }
     public:
 
-            SerialTask(bool secondary=false)
-                : rft::SerialTask(secondary)
+            static constexpr float FREQ = 66;
+
+            bool _useTelemetryPort = false;
+
+            SerialTask(bool secondaryPort=false)
+                : TimerTask(FREQ)
             {
+                _useTelemetryPort = secondaryPort;
+            }
+
+            void update(Board * board, Mixer * mixer, State * state)
+            {
+                if (!TimerTask::ready(board)) {
+                    return;
+                }
+
+                RealBoard * realboard = (RealBoard *)board;
+
+                while (realboard->serialAvailable(_useTelemetryPort) > 0) {
+                    Parser::parse(realboard->serialRead(_useTelemetryPort));
+                }
+
+                while (Parser::availableBytes() > 0) {
+                    realboard->serialWrite(Parser::readByte(),
+                                           _useTelemetryPort);
+                }
+
+                // Support motor testing from GCS
+                if (!state->armed) {
+                    mixer->runDisarmed();
+                }
             }
 
         }; // class SerialTask

@@ -12,24 +12,24 @@
 
 #include <Wire.h>
 
-#include <RFT_full.hpp>
+#include "HF_full.hpp"
 
-#include <rft_boards/realboards/arduino_serial/arduino.hpp>
+#include "../arduino.hpp"
 
 namespace hf {
 
-    class LadybugFC : public rft::ArduinoBoard {
+    class LadybugFC : public ArduinoBoard {
 
         public:
 
             LadybugFC(HardwareSerial * telemetryPort=NULL) 
-                : rft::ArduinoBoard(A4, telemetryPort) // LED on A4
+                : ArduinoBoard(A4, telemetryPort) // LED on A4
             {
             }
 
             void begin(void)
             {
-                rft::ArduinoBoard::begin();
+                ArduinoBoard::begin();
 
                 // Start I^2C
                 Wire.begin();

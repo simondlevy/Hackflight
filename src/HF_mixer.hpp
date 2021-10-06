@@ -10,18 +10,14 @@
 
 #include "HF_demands.hpp"
 
-#include <RFT_actuator.hpp>
-#include <RFT_filters.hpp>
-#include <RFT_motor.hpp>
-
-#include <RFT_debugger.hpp>
+#include "HF_filters.hpp"
+#include "HF_motor.hpp"
 
 namespace hf {
 
-    class Mixer : public rft::Actuator {
+    class Mixer {
 
         friend class Hackflight;
-        friend class SerialTask;
 
         private:
 
@@ -36,8 +32,7 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            // XXX make a class for this, or migrate it to rft::Motor
-            rft::Motor * _motors[MAXMOTORS] = {};
+            Motor * _motors[MAXMOTORS] = {};
             float  _disarmedValues[MAXMOTORS];
 
             uint8_t _nmotors = 0;
@@ -47,7 +42,7 @@ namespace hf {
                 _motors[index]->write(value);
             }
 
-        protected:
+        public:
 
             motorMixer_t motorDirections[MAXMOTORS];
 
@@ -56,7 +51,7 @@ namespace hf {
                 _nmotors = 0;
             }
 
-            void addMotor(rft::Motor * motor)
+            void addMotor(Motor * motor)
             {
                 _motors[_nmotors++] = motor;
             }
@@ -64,12 +59,10 @@ namespace hf {
             virtual float constrainMotorValue(uint8_t index, float value)
             {
                 (void)index; // all motors behave the same by default
-                return rft::Filter::constrainMinMax(value, 0, 1);
+                return Filter::constrainMinMax(value, 0, 1);
             }
 
-            // Actuator overrides ----------------------------------------------
-
-            void begin(void) override
+            void begin(void)
             {
                 // set disarmed motor values
                 for (uint8_t i = 0; i < _nmotors; i++) {
@@ -79,14 +72,14 @@ namespace hf {
             }
 
             // This is how we can spin the motors from the GCS
-            void runDisarmed(void) override
+            void runDisarmed(void)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, _disarmedValues[i]);
                 }
             }
 
-            void run(float * demands, bool safe) override
+            void run(float * demands, bool safe)
             {
                 // Don't run motors if its not safe: vehicle should be
                 // armed, with throttle above minimum
@@ -137,16 +130,21 @@ namespace hf {
                 }
             }
 
-            void cut(void) override
+            void cut(void)
             {
                 for (uint8_t i = 0; i < _nmotors; i++) {
                     writeMotor(i, 0);
                 }
             }
 
-            virtual void setMotorDisarmed(uint8_t index, float value) override
+            virtual void setMotorDisarmed(uint8_t index, float value)
             {
                 _disarmedValues[index] = value;
+            }
+
+            virtual uint8_t getType(void) 
+            {
+                return 0;
             }
 
     }; // class Mixer

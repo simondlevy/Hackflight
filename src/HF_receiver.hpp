@@ -13,12 +13,12 @@
 
 #include "HF_demands.hpp"
 
-#include <RFT_openloop.hpp>
-
 namespace hf {
 
-    class Receiver : public rft::OpenLoopController {
+    class Receiver {
 
+        friend class ClosedLoopTask;
+        friend class HackflightPure;
         friend class Hackflight;
         friend class SerialTask;
         friend class PidTask;
@@ -128,7 +128,9 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            virtual bool ready(void) override
+        public:
+
+            virtual bool ready(void)
             {
                 // Wait till there's a new frame
                 if (!gotNewFrame()) return false;
@@ -172,24 +174,36 @@ namespace hf {
 
             }  // ready
 
-            virtual void getDemands(float * demands) override
-            {
-                memcpy(demands, _demands, sizeof(_demands));
+            virtual void begin(void) 
+            { 
             }
 
-            virtual bool inactive(void) override
-            {
-                return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
+            virtual bool lostSignal(void) 
+            { 
+                return false; 
             }
 
-            virtual bool inArmedState(void) override
+
+            static const uint8_t MAX_DEMANDS = 10; // arbitrary
+
+            virtual bool inArmedState(void)
             {
                 return _aux1State > 0;
             }
 
-            virtual uint8_t getModeIndex(void) override
+            void getDemands(float * demands)
+            {
+                memcpy(demands, _demands, sizeof(_demands));
+            }
+
+            virtual uint8_t getModeIndex(void)
             {
                 return _aux2State;
+            }
+
+            virtual bool inactive(void)
+            {
+                return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
             }
 
     }; // class Receiver

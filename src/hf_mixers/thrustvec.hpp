@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <rft_motors/rotary.hpp>
-#include <rft_motors/servo.hpp>
+#include "../hf_motors/rotary.hpp"
+#include "../hf_motors/servo.hpp"
 
 #include "HF_mixer.hpp"
 
@@ -20,10 +20,10 @@ namespace hf {
         public:
 
             MixerThrustVector(
-                    rft::RotaryMotor * rotor1,
-                    rft::RotaryMotor * rotor2,
-                    rft::ServoMotor * servo1,
-                    rft::ServoMotor * servo2)
+                    RotaryMotor * rotor1,
+                    RotaryMotor * rotor2,
+                    ServoMotor * servo1,
+                    ServoMotor * servo2)
             {
                 //                     Th   RR   PF  YR
                 motorDirections[0] = { +1,  0,   0, +1 };   // rotor 1

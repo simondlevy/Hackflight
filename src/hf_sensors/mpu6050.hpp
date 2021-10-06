@@ -12,9 +12,9 @@
 
 namespace hf {
 
-    class MPU6050 : public rft::Sensor {
+    class MPU6050 : public Sensor {
 
-        friend class Hackflight;
+        friend class HackflightFull;
 
         public:
 
@@ -82,8 +82,8 @@ namespace hf {
 
             uint32_t _usec = 0;
 
-            rft::MadgwickQuaternionFilter6DOF madgwick =
-                rft::MadgwickQuaternionFilter6DOF(BETA, ZETA);
+            MadgwickQuaternionFilter6DOF madgwick =
+                MadgwickQuaternionFilter6DOF(BETA, ZETA);
 
             void readData(float &x, float &y, float &z, uint8_t rgstr, float res)
             {
@@ -174,7 +174,7 @@ namespace hf {
                 _usec = 0;
             }
 
-            virtual void modifyState(rft::State * state, float time)
+            virtual void modifyState(State * state, float time)
             {
                 State * hfstate = (State *)state;
 
@@ -203,7 +203,7 @@ namespace hf {
                         gy * PI / 180.0f, gz * PI / 180.0f, deltat);
 
                 // Convert quaternion to Euler angles
-                rft::Filter::quat2euler(
+                Filter::quat2euler(
                         madgwick.q1,
                         madgwick.q2,
                         madgwick.q3,

@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "HF_pidcontroller.hpp"
+#include "../HF_pidcontroller.hpp"
 
 namespace hf {
 
@@ -70,7 +70,7 @@ namespace hf {
                 float error = targetVelocity - state[State::DZ];
 
                 // Compute I term, avoiding windup
-                _errorI = rft::Filter::constrainAbs(_errorI + error, _windupMax);
+                _errorI = Filter::constrainAbs(_errorI + error, _windupMax);
 
                 // Adjust throttle demand based on error
                 demands[DEMANDS_THROTTLE] = error * _Kp + _errorI * _Ki;
@@ -79,11 +79,6 @@ namespace hf {
                 if (didReset) {
                     _altitudeTarget = altitude;
                 }
-            }
-
-            virtual bool shouldFlashLed(void) override 
-            {
-                return true;
             }
 
         public:

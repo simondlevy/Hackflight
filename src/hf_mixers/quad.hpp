@@ -10,7 +10,7 @@
 
 #include "HF_mixer.hpp"
 
-#include <rft_motors/rotary.hpp>
+#include "../hf_motors/rotary.hpp"
 
 namespace hf {
 
@@ -19,10 +19,10 @@ namespace hf {
         protected:
 
             MixerQuad(
-                    rft::RotaryMotor * motor1,
-                    rft::RotaryMotor * motor2,
-                    rft::RotaryMotor * motor3,
-                    rft::RotaryMotor * motor4)
+                    RotaryMotor * motor1,
+                    RotaryMotor * motor2,
+                    RotaryMotor * motor3,
+                    RotaryMotor * motor4)
             {
                 Mixer::addMotor(motor1);
                 Mixer::addMotor(motor2);
