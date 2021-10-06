@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include "../RFT_board.hpp"
+#include "../HF_board.hpp"
 #include "../HF_debugger.hpp"
 #include "../HF_filters.hpp"
 
-namespace rft {
+namespace hf {
 
     class RealBoard : public Board {
 
@@ -24,7 +24,7 @@ namespace rft {
             static constexpr uint8_t LED_STARTUP_FLASH_COUNT   = 20;
             static constexpr float   LED_SLOWFLASH_SECONDS     = 0.25;
 
-        protected:
+        public:
 
             static const uint32_t SERIAL_BAUD = 115200;
 
@@ -94,4 +94,4 @@ namespace rft {
 
     }; // class RealBoard
 
-} // namespace rft
+} // namespace hf

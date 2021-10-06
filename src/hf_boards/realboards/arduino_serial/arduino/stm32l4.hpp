@@ -11,7 +11,7 @@
 #include <Wire.h>
 #include "../arduino.hpp"
 
-namespace rft {
+namespace hf {
 
     class STM32L4 : public ArduinoBoard {
 
@@ -25,4 +25,4 @@ namespace rft {
 
     }; // class STM32L4
 
-} // namespace rft
+} // namespace hf

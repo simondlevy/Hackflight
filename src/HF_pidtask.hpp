@@ -41,7 +41,7 @@ namespace hf {
                 _controllers[_controller_count++] = controller;
             }
 
-            void update(rft::Board * board, Receiver * receiver, Mixer * mixer, State * state)
+            void update(Board * board, Receiver * receiver, Mixer * mixer, State * state)
             {
                 if (!rft::TimerTask::ready(board)) {
                     return;

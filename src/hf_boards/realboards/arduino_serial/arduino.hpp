@@ -10,7 +10,7 @@
 
 #include "../arduino_serial.hpp"
 
-namespace rft {
+namespace hf {
 
     class ArduinoBoard : public ArduinoSerial {
 
@@ -65,4 +65,4 @@ namespace rft {
 
     }; // class ArduinoBoard
 
-} // namespace rft
+} // namespace hf

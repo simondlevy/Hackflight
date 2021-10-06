@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "RFT_board.hpp"
 #include "RFT_sensor.hpp"
 #include "RFT_parser.hpp"
 
+#include "HF_board.hpp"
 #include "HF_pidtask.hpp"
 #include "HF_pidcontroller.hpp"
 #include "HF_receiver.hpp"
@@ -99,11 +99,11 @@ namespace rft {
         protected:
 
             // Essentials
-            Board * _board = NULL;
+            hf::Board * _board = NULL;
             hf::Receiver * _receiver = NULL;
             hf::Mixer * _mixer = NULL;
 
-            RFTPure(Board * board, hf::Receiver * receiver, hf::Mixer * mixer)
+            RFTPure(hf::Board * board, hf::Receiver * receiver, hf::Mixer * mixer)
             {
                 _board = board;
                 _receiver = receiver;

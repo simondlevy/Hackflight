@@ -13,7 +13,7 @@
 
 #include "../realboard.hpp"
 
-namespace rft {
+namespace hf {
 
     class ArduinoSerial : public RealBoard {
 
@@ -75,7 +75,7 @@ namespace rft {
 
     }; // class ArduinoSerial
 
-} // namespace rft
+} // namespace hf
 
 void hf::Debugger::outbuf(char * buf)
     {

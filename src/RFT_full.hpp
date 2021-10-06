@@ -11,6 +11,7 @@
 #include "RFT_pure.hpp"
 #include "RFT_serialtask.hpp"
 
+#include "HF_board.hpp"
 #include "HF_mixer.hpp"
 
 namespace rft {
@@ -25,7 +26,7 @@ namespace rft {
 
         protected:
 
-            RFTFull(Board * board, hf::Receiver * receiver, hf::Mixer * mixer)
+            RFTFull(hf::Board * board, hf::Receiver * receiver, hf::Mixer * mixer)
                 : RFTPure(board, receiver, mixer)
             {
                 _serial_task_count = 0;

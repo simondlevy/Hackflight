@@ -10,8 +10,8 @@
 
 #include "RFT_timertask.hpp"
 #include "RFT_parser.hpp"
-#include "rft_boards/realboard.hpp"
 
+#include "hf_boards/realboard.hpp"
 #include "HF_mixer.hpp"
 
 namespace rft {
@@ -32,13 +32,13 @@ namespace rft {
                 _useTelemetryPort = secondaryPort;
             }
 
-            void update(Board * board, hf::Mixer * mixer, State * state)
+            void update(hf::Board * board, hf::Mixer * mixer, State * state)
             {
                 if (!TimerTask::ready(board)) {
                     return;
                 }
 
-                RealBoard * realboard = (RealBoard *)board;
+                hf::RealBoard * realboard = (hf::RealBoard *)board;
 
                 while (realboard->serialAvailable(_useTelemetryPort) > 0) {
                     Parser::parse(realboard->serialRead(_useTelemetryPort));

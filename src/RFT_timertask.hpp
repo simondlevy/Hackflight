@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "RFT_board.hpp"
+#include "HF_board.hpp"
 
 namespace rft {
 
@@ -27,7 +27,7 @@ namespace rft {
                 _time = 0;
             }
 
-            bool ready(Board * board)
+            bool ready(hf::Board * board)
             {
                 float time = board->getTime();
 

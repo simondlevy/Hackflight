@@ -9,7 +9,7 @@
 #pragma once
 
 #include "RFT_pure.hpp"
-#include "RFT_board.hpp"
+#include "HF_board.hpp"
 
 #include "HF_mixer.hpp"
 #include "HF_state.hpp"
@@ -25,9 +25,7 @@ namespace hf {
 
         public:
 
-            HackflightPure(rft::Board * board,
-                       Receiver * receiver,
-                       Mixer * mixer)
+            HackflightPure(Board * board, Receiver * receiver, Mixer * mixer)
                 : rft::RFTPure(board, receiver, mixer)
             {
             }

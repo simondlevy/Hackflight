@@ -11,16 +11,11 @@
 #include <stdarg.h>
 #include <stdint.h>
 
-namespace rft {
+namespace hf {
 
     class Board {
 
-        friend class RFTPure;
-        friend class Debugger;
-        friend class TimerTask;
-        friend class ClosedLoopTask;
-
-        protected:
+        public:
 
             // --------------- Pure functionality ------------------------------
             virtual float getTime(void) = 0;

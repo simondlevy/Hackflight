@@ -24,7 +24,7 @@ namespace hf {
 
         public:
 
-            HackflightFull(rft::Board * board, Receiver * receiver, Mixer * mixer)
+            HackflightFull(Board * board, Receiver * receiver, Mixer * mixer)
                 : rft::RFTFull(board, receiver, mixer)
             {
             }
