@@ -9,10 +9,11 @@
 #pragma once
 
 #include "RFT_pure.hpp"
-#include "RFT_serialtask.hpp"
 
+#include "HF_serialtask.hpp"
 #include "HF_board.hpp"
 #include "HF_mixer.hpp"
+#include "HF_state.hpp"
 
 namespace rft {
 
@@ -21,7 +22,7 @@ namespace rft {
         private:
 
             // Serial tasks
-            SerialTask * _serial_tasks[10] = {};
+            hf::SerialTask * _serial_tasks[10] = {};
             uint8_t _serial_task_count = 0;
 
         protected:
@@ -38,11 +39,11 @@ namespace rft {
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(_board, _mixer, state);
+                    _serial_tasks[k]->update(_board, _mixer, (hf::State *)state);
                 }
             }
 
-            void addSerialTask(SerialTask * task)
+            void addSerialTask(hf::SerialTask * task)
             {
                 _serial_tasks[_serial_task_count++] = task;
             }

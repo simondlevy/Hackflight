@@ -6,18 +6,17 @@
 
 #pragma once
 
-#include "HF_board.hpp"
+#include "RFT_timertask.hpp"
 #include "RFT_parser.hpp"
-#include "RFT_serialtask.hpp"
 
+#include "hf_boards/realboard.hpp"
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 
 namespace hf {
 
-
-    class SerialTask : public rft::SerialTask {
+    class SerialTask : public rft::TimerTask, rft::Parser {
 
         friend class HackflightFull;
 
@@ -169,9 +168,37 @@ namespace hf {
             }
     public:
 
-            SerialTask(bool secondary=false)
-                : rft::SerialTask(secondary)
+            static constexpr float FREQ = 66;
+
+            bool _useTelemetryPort = false;
+
+            SerialTask(bool secondaryPort=false)
+                : rft::TimerTask(FREQ)
             {
+                _useTelemetryPort = secondaryPort;
+            }
+
+            void update(Board * board, Mixer * mixer, State * state)
+            {
+                if (!rft::TimerTask::ready(board)) {
+                    return;
+                }
+
+                RealBoard * realboard = (RealBoard *)board;
+
+                while (realboard->serialAvailable(_useTelemetryPort) > 0) {
+                    rft::Parser::parse(realboard->serialRead(_useTelemetryPort));
+                }
+
+                while (rft::Parser::availableBytes() > 0) {
+                    realboard->serialWrite(Parser::readByte(),
+                                           _useTelemetryPort);
+                }
+
+                // Support motor testing from GCS
+                if (!state->armed) {
+                    mixer->runDisarmed();
+                }
             }
 
         }; // class SerialTask
