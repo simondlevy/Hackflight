@@ -64,15 +64,6 @@ A typical Arduino sketch for hackflight is written as follows:
 
 4. In the ```loop()``` function, call ```Hackflight::update()```
 
-## RoboFirmwareToolkit
-
-Hackflight is built on top of
-[RoboFirmwareToolkit](https://github.com/simondlevy/RoboFirmwareToolkit) (RFT),
-a general-purpose toolkit for building robot firmware.  So before trying out Hackflight
-you should also install RFT.  It is also worth checking out the README for RFT in order
-to see some of the design principles supporting Hackflight (see also the note on PID
-controllers below.)
-
 ## Ground Control Station
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
@@ -82,7 +73,7 @@ can run this program directly: just clone the [HackflightGCS](https://github.com
 repository and double-click on <b>hackflight.exe</b>.  Others can run the
 <b>hackflight.py</b> Python script in the <b>extras/gcs/python</b> folder.  To
 run the Python script you'll need to install
-[MSPPG](https://github.com/simondlevy/RoboFirmwareToolkit/tree/master/extras/parser), a
+[MSPPG](https://github.com/simondlevy/Hackflight/tree/master/extras/parser), a
 parser generator for the Multiwii Serial Protocol (MSP) messages used by the
 firmware. Follow the directions in that folder to install MSPPG for Python.
 
