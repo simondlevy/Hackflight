@@ -24,8 +24,6 @@ namespace rft {
             static constexpr uint8_t LED_STARTUP_FLASH_COUNT   = 20;
             static constexpr float   LED_SLOWFLASH_SECONDS     = 0.25;
 
-            bool _shouldFlash = false;
-
         protected:
 
             static const uint32_t SERIAL_BAUD = 115200;
@@ -43,8 +41,6 @@ namespace rft {
                     delaySeconds(pauseSeconds);
                 }
                 setLed(false);
-
-                _shouldFlash = false;
             }
 
             float getTime(void)
@@ -60,9 +56,7 @@ namespace rft {
             void showArmedStatus(bool armed)
             {
                 // Set LED to indicate armed
-                if (!_shouldFlash) {
-                    setLed(armed);
-                }
+                setLed(armed);
             }
 
             void flashLed(bool shouldflash)
@@ -80,8 +74,6 @@ namespace rft {
                         _time = time;
                     }
                 }
-
-                _shouldFlash = shouldflash;
             }
 
             void error(const char * errmsg) 

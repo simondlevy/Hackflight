@@ -20,11 +20,6 @@ namespace rft {
 
             uint8_t modeIndex = 0;
 
-            virtual bool shouldFlashLed(void)
-            {
-                return false;
-            }
-
             virtual void resetOnInactivity(bool inactive)
             { 
                 (void)inactive; 

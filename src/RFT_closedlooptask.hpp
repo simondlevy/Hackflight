@@ -62,9 +62,6 @@ namespace rft {
                 // switch state
                 uint8_t modeIndex = receiver->getModeIndex();
 
-                // Some controllers should cause LED to flash when they're
-                // active
-                bool shouldFlash = false;
 
                 for (uint8_t k=0; k<_controller_count; ++k) {
 
@@ -73,19 +70,7 @@ namespace rft {
                     // Some controllers need to be reset based on inactivty
                     // (e.g., throttle down resets PID controller integral)
                     controller->resetOnInactivity(receiver->inactive());
-
-                    if (controller->modeIndex <= modeIndex) {
-
-                        controller->modifyDemands(state, demands); 
-
-                        if (controller->shouldFlashLed()) {
-                            shouldFlash = true;
-                        }
-                    }
                 }
-
-                // Flash LED for certain controllers
-                board->flashLed(shouldFlash);
 
                 // Use updated demands to run motors, allowing
                 // mixer to choose whether it cares about
