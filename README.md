@@ -96,7 +96,7 @@ sensor as a function from states to states: <b><i>Sensor</i>: <i>State</i> &rarr
 Together, these classes interact as shown in the following diagram:
 
 <p align="center"> 
-<img src="extras/media/dataflow.png" width=700>
+<img src="extras/media/dataflow2.png" width=700>
 </p>
 
 ## Ground Control Station
