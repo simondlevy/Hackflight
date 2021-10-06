@@ -33,13 +33,13 @@ namespace rft {
                 _serial_task_count = 0;
             }
 
-            void update(State * state)
+            void update(hf::State * state)
             {
                 RFTPure::update(state);
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(_board, _mixer, (hf::State *)state);
+                    _serial_tasks[k]->update(_board, _mixer, state);
                 }
             }
 

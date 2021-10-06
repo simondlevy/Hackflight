@@ -41,7 +41,7 @@ namespace rft {
                 }
             }
 
-            void checkSensors(State * state)
+            void checkSensors(hf::State * state)
             {
                 // Some sensors may need to know the current time
                 float time = _board->getTime();
@@ -51,7 +51,7 @@ namespace rft {
                 }
             }
 
-            void checkReceiver(State * state)
+            void checkReceiver(hf::State * state)
             {
                 // Sync failsafe to open-loop-controller
                 if (_receiver->lostSignal() && state->armed) {
@@ -128,13 +128,13 @@ namespace rft {
 
             } // begin
 
-            void update(State * state)
+            void update(hf::State * state)
             {
                 // Grab control signal if available
                 checkReceiver(state);
 
                 // Update PID controllers task
-                _pidTask.update(_board, _receiver, _mixer, (hf::State *)state);
+                _pidTask.update(_board, _receiver, _mixer, state);
 
                 // Check sensors
                 checkSensors(state);
