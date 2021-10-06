@@ -64,6 +64,41 @@ A typical Arduino sketch for hackflight is written as follows:
 
 4. In the ```loop()``` function, call ```Hackflight::update()```
 
+## Core C++ Classes
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_board.hpp">Board</a>
+class specifies an abstract (pure virtual) <tt>getTime()</tt> method that you must
+implement for a particular microcontroller or simulator.  
+
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_receiver.hpp">Receiver</a>
+class performs basic functions associated with R/C receivers, and specifies a set of abstract methods that you
+implement for a particular receiver (DSMX, SBUS, etc.).
+
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_mixer.hpp">Mixer</a>
+class is an abstract class that can be subclassed for various kinds of mixers; for example, a quadcopter
+mixer using the MultiWii motor layout.
+
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_pidcontroller.hpp">PidController</a>
+class specifies an abstract method <tt>modifyDemands()</tt> that inputs the vehicles's current state and
+outputs an array of floating-point values representing how that controller affects the demands. (For example,
+an altitude-hold controller for a quadcopter would use the 'copter's altitude
+and vertical velocity to adjust the throttle demand.)  If you're
+mathematically-minded, you can think of a PID controller as a function from a
+(<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
+<b><i>PidController</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i></b>
+
+* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_sensor.hpp">Sensor</a>
+class specifies abstract methods <tt>ready()</tt> for checking whether the sensor
+has new data avaiable, and  <tt>modifyState()</tt> for modifying the vehicle's
+state based on that data.  If you're mathematically-minded, you can think of a
+sensor as a function from states to states: <b><i>Sensor</i>: <i>State</i> &rarr;
+<i>State</i></b>
+
+Together, these classes interact as shown in the following diagram:
+
+<p align="center"> 
+<img src="extras/media/dataflow.png" width=700>
+</p>
+
 ## Ground Control Station
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
