@@ -24,9 +24,8 @@
 #include "hf_pidcontrollers/rate.hpp"
 #include "hf_pidcontrollers/yaw.hpp"
 #include "hf_pidcontrollers/level.hpp"
-#include "hf_sensors/usfs.hpp"
-
 #include "hf_motors/arduino/brushed.hpp"
+#include "hf_sensors/usfs.hpp"
 
 // Receiver ===================================================================
 
@@ -97,5 +96,5 @@ void setup(void)
 void loop(void)
 {
     // Update Hackflight firmware
-    h.update();
+    h.update(micros());
 }

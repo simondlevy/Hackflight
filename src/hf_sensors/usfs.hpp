@@ -48,9 +48,9 @@ namespace hf {
                 }
             }
 
-            virtual void modifyState(State * state, float time)
+            virtual void modifyState(State * state, uint32_t time_usec)
             {
-                (void)time;
+                (void)time_usec;
 
                 _usfs.checkEventStatus();
 

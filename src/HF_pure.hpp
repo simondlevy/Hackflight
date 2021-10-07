@@ -25,13 +25,10 @@ namespace hf {
             // Timer task for PID controllers
             PidTask _pidTask;
 
-            void checkSensors(State * state)
+            void checkSensors(uint32_t time_usec, State * state)
             {
-                // Some sensors may need to know the current time
-                float time = _board->getTime();
-
                 for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->modifyState((State *)state, time);
+                    _sensors[k]->modifyState((State *)state, time_usec);
                 }
             }
 
@@ -64,15 +61,15 @@ namespace hf {
 
             } // begin
 
-            void update(void)
+            void update(uint32_t time_usec)
             {
                 _receiver->update();
 
                 // Update PID controllers task
-                _pidTask.update(_board, _receiver, _mixer, &_state);
+                _pidTask.update(time_usec, _board, _receiver, _mixer, &_state);
 
                 // Check sensors
-                checkSensors(&_state);
+                checkSensors(time_usec, &_state);
             }
 
             void addSensor(Sensor * sensor) 

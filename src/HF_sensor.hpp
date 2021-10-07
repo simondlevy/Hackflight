@@ -16,7 +16,7 @@ namespace hf {
 
         public:
 
-            virtual void modifyState(State * state, float time) = 0;
+            virtual void modifyState(State * state, uint32_t time_usec) = 0;
 
             virtual void begin(void) { }
 

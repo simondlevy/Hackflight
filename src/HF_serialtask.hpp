@@ -177,9 +177,9 @@ namespace hf {
                 _useTelemetryPort = secondaryPort;
             }
 
-            void update(Board * board, Mixer * mixer, State * state)
+            void update(uint32_t time_usec, Board * board, Mixer * mixer, State * state)
             {
-                if (!TimerTask::ready(board)) {
+                if (!TimerTask::ready(time_usec)) {
                     return;
                 }
 

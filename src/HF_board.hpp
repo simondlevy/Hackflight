@@ -17,9 +17,6 @@ namespace hf {
 
         public:
 
-            // --------------- Pure functionality ------------------------------
-            virtual float getTime(void) = 0;
-
             // ----------------- For real boards -------------------------------
             virtual void begin(void) { }
 

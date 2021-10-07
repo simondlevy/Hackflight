@@ -100,15 +100,15 @@ namespace hf {
 
             } // begin
 
-            void update(void)
+            void update(uint32_t time_usec)
             {
-                HackflightPure::update();
+                HackflightPure::update(time_usec);
 
                 checkSafety(&_state);
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(_board, _mixer, &_state);
+                    _serial_tasks[k]->update(time_usec, _board, _mixer, &_state);
                 }
             }
 

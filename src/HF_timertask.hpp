@@ -16,24 +16,22 @@ namespace hf {
 
         private:
 
-            float _period = 0;
-            float _time = 0;
+            uint32_t _period = 0;
+            uint32_t _time_prev = 0;
 
         protected:
 
-            TimerTask(float freq)
+            TimerTask(uint32_t freq)
             {
-                _period = 1 / freq;
-                _time = 0;
+                _period = 1000000 / freq;
+                _time_prev = 0;
             }
 
-            bool ready(Board * board)
+            bool ready(uint32_t time_usec)
             {
-                float time = board->getTime();
-
-                if ((time - _time) > _period)
+                if ((time_usec - _time_prev) > _period)
                 {
-                    _time = time;
+                    _time_prev = time_usec;
                     return true;
                 }
 

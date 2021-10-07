@@ -40,9 +40,9 @@ namespace hf {
                 _controllers[_controller_count++] = controller;
             }
 
-            void update(Board * board, Receiver * receiver, Mixer * mixer, State * state)
+            void update(uint32_t time_usec, Board * board, Receiver * receiver, Mixer * mixer, State * state)
             {
-                if (!TimerTask::ready(board)) {
+                if (!TimerTask::ready(time_usec)) {
                     return;
                 }
 
