@@ -171,15 +171,10 @@ namespace hf {
 
             }  // update
 
-            virtual void begin(void) 
-            { 
-            }
-
             virtual bool lostSignal(void) 
             { 
                 return false; 
             }
-
 
             static const uint8_t MAX_DEMANDS = 10; // arbitrary
 

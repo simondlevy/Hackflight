@@ -19,10 +19,6 @@ namespace hf {
 
         protected:
 
-            void begin(void)
-            {
-            }
-
             bool gotNewFrame(void)
             {
                 return _rx.gotNewFrame();

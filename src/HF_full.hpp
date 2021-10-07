@@ -85,9 +85,6 @@ namespace hf {
                 // Initialize the sensors
                 startSensors();
 
-                // Initialize the open-loop controller
-                _receiver->begin();
-
                 // Start the mixer
                 _mixer->begin();
 
