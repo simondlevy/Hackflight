@@ -18,7 +18,7 @@
  */
 
 #include "HF_full.hpp"
-#include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
+#include "hf_receivers/arduino/dsmx.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"
 #include "hf_pidcontrollers/yaw.hpp"
@@ -36,8 +36,16 @@ static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
 static constexpr float DEMAND_SCALE = 4.0f;
 static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.035};
 
-static hf::DSMX_Receiver_Serial1 receiver = 
-    hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE, SOFTWARE_TRIM);  
+static hf::DSMX_Receiver receiver = 
+    hf::DSMX_Receiver(CHANNEL_MAP, DEMAND_SCALE, SOFTWARE_TRIM);  
+
+void serialEvent1(void)
+{
+    while (Serial1.available()) {
+
+        receiver.handleSerialEvent(Serial1.read(), micros());
+    }
+}
 
 // Motors  =====================================================================
 
@@ -94,6 +102,7 @@ namespace hf {
 void setup(void)
 {
     Serial.begin(115200);
+    Serial1.begin(115200);
     pinMode(LED_PIN, OUTPUT);    
     Wire.begin();
     delay(100);
