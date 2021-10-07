@@ -9,7 +9,6 @@
 #pragma once
 
 #include "HF_sensor.hpp"
-#include "HF_board.hpp"
 #include "HF_pidtask.hpp"
 #include "HF_pidcontroller.hpp"
 #include "HF_receiver.hpp"
@@ -35,7 +34,6 @@ namespace hf {
         protected:
 
             // Essentials
-            Board * _board = NULL;
             Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;
             State _state = {};
@@ -46,12 +44,10 @@ namespace hf {
 
         public:
 
-            HackflightPure(Board * board, Receiver * receiver, Mixer * mixer)
+            HackflightPure(Receiver * receiver, Mixer * mixer)
             {
-                _board = board;
                 _receiver = receiver;
                 _mixer = mixer;
-
                 _sensor_count = 0;
             }
 
@@ -66,7 +62,7 @@ namespace hf {
                 _receiver->update();
 
                 // Update PID controllers task
-                _pidTask.update(time_usec, _board, _receiver, _mixer, &_state);
+                _pidTask.update(time_usec, _receiver, _mixer, &_state);
 
                 // Check sensors
                 checkSensors(time_usec, &_state);

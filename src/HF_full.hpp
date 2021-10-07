@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "hf_boards/realboard.hpp"
 #include "HF_pure.hpp"
 #include "HF_serialtask.hpp"
 
@@ -25,14 +24,14 @@ namespace hf {
             SerialTask * _serial_tasks[10] = {};
             uint8_t _serial_task_count = 0;
 
-            void checkSafety(State * state)
+            void checkSafety(State * state, bool * led)
             {
                 // Sync failsafe to open-loop-controller
                 if (_receiver->lostSignal() && state->armed) {
                     _mixer->cut();
                     state->armed = false;
                     state->failsafe = true;
-                    ((RealBoard *) _board)->showArmedStatus(false);
+                    *led = false;
                     return;
                 }
 
@@ -62,9 +61,6 @@ namespace hf {
                     _mixer->cut();
                 }
 
-                // Set LED based on arming status
-                ((RealBoard *)_board)->showArmedStatus(state->armed);
-
             } // checkSafety
 
             void startSensors(void) 
@@ -76,8 +72,8 @@ namespace hf {
 
         public:
 
-            HackflightFull(RealBoard * board, Receiver * receiver, Mixer * mixer)
-                : HackflightPure(board, receiver, mixer)
+            HackflightFull(Receiver * receiver, Mixer * mixer)
+                : HackflightPure(receiver, mixer)
             {
                 _serial_task_count = 0;
             }
@@ -85,9 +81,6 @@ namespace hf {
             void begin(void)
             {  
                 _state.armed = false;
-
-                // Start the board
-                _board->begin();
 
                 // Initialize the sensors
                 startSensors();
@@ -100,16 +93,18 @@ namespace hf {
 
             } // begin
 
-            void update(uint32_t time_usec)
+            void update(uint32_t time_usec, bool * led)
             {
                 HackflightPure::update(time_usec);
 
-                checkSafety(&_state);
+                checkSafety(&_state, led);
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(time_usec, _board, _mixer, &_state);
+                    _serial_tasks[k]->update(time_usec, _mixer, &_state);
                 }
+
+                *led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _state.armed;
             }
 
             void addSerialTask(SerialTask * task)

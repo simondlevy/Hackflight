@@ -18,7 +18,6 @@
  */
 
 #include "HF_full.hpp"
-#include "hf_boards/realboards/arduino_serial/arduino/ladybugfc.hpp"
 #include "hf_receivers/arduino/dsmx/dsmx_serial1.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"
@@ -26,6 +25,10 @@
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_motors/arduino/brushed.hpp"
 #include "hf_sensors/usfs.hpp"
+
+#include <Wire.h>
+
+static uint32_t LED_PIN = 18;
 
 // Receiver ===================================================================
 
@@ -35,11 +38,6 @@ static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.035};
 
 static hf::DSMX_Receiver_Serial1 receiver = 
     hf::DSMX_Receiver_Serial1(CHANNEL_MAP, DEMAND_SCALE, SOFTWARE_TRIM);  
-
-// Board =======================================================================
-
-// Bluetooth comms over Serial2
-static hf::LadybugFC board = hf::LadybugFC(&Serial2);  
 
 // Motors  =====================================================================
 
@@ -65,16 +63,41 @@ static hf::USFS imu;
 // Serial tasks ================================================================
 
 hf::SerialTask gcsTask;
-hf::SerialTask telemetryTask = hf::SerialTask(true);
 
 // Hackflight object ===========================================================
 
-static hf::HackflightFull h(&board, &receiver, &mixer);
+static hf::HackflightFull h(&receiver, &mixer);
+
+// Serial comms support ========================================================
+
+namespace hf {
+
+    bool serialAvailable(void)
+    {
+        return Serial.available();
+    }
+
+    uint8_t serialRead(void)
+    {
+        return Serial.read();
+    }
+
+    void serialWrite(uint8_t b)
+    {
+        Serial.write(b);
+    }
+
+} // namespace hf
 
 // Setup =======================================================================
 
 void setup(void)
 {
+    Serial.begin(115200);
+    pinMode(LED_PIN, OUTPUT);    
+    Wire.begin();
+    delay(100);
+
     // Add sensors
     h.addSensor(&imu);
 
@@ -85,7 +108,6 @@ void setup(void)
 
     // Add serial tasks
     h.addSerialTask(&gcsTask);
-    h.addSerialTask(&telemetryTask);
 
     // Start Hackflight firmware
     h.begin();
@@ -95,6 +117,7 @@ void setup(void)
 
 void loop(void)
 {
-    // Update Hackflight firmware
-    h.update(micros());
+    bool led = false;
+    h.update(micros(), &led);
+    digitalWrite(LED_PIN, led);
 }

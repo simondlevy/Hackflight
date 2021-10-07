@@ -11,7 +11,6 @@
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
-#include "hf_boards/realboard.hpp"
 
 namespace hf {
 
@@ -177,21 +176,22 @@ namespace hf {
                 _useTelemetryPort = secondaryPort;
             }
 
-            void update(uint32_t time_usec, Board * board, Mixer * mixer, State * state)
+            void update(uint32_t time_usec, Mixer * mixer, State * state)
             {
+                extern bool serialAvailable(void);
+                extern uint8_t serialRead(void);
+                extern void serialWrite(uint8_t);
+
                 if (!TimerTask::ready(time_usec)) {
                     return;
                 }
 
-                RealBoard * realboard = (RealBoard *)board;
-
-                while (realboard->serialAvailable(_useTelemetryPort) > 0) {
-                    Parser::parse(realboard->serialRead(_useTelemetryPort));
+                while (serialAvailable() > 0) {
+                    Parser::parse(serialRead());
                 }
 
                 while (Parser::availableBytes() > 0) {
-                    realboard->serialWrite(Parser::readByte(),
-                                           _useTelemetryPort);
+                    serialWrite(Parser::readByte());
                 }
 
                 // Support motor testing from GCS

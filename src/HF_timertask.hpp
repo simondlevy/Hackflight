@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "HF_board.hpp"
-
 namespace hf {
 
     class TimerTask {
