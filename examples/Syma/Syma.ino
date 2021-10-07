@@ -18,7 +18,7 @@
  */
 
 #include "HF_full.hpp"
-#include "hf_receivers/arduino/dsmx.hpp"
+#include "hf_receivers/dsmx.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"
 #include "hf_pidcontrollers/yaw.hpp"
@@ -127,6 +127,9 @@ void setup(void)
 void loop(void)
 {
     bool led = false;
+
     h.update(micros(), &led);
+
     digitalWrite(LED_PIN, led);
+
 }

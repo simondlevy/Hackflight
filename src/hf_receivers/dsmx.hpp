@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../../HF_receiver.hpp"
+#include "../HF_receiver.hpp"
 #include <DSMRX.h>
 
 namespace hf {
