@@ -19,17 +19,17 @@ namespace hf {
 
         protected:
 
-            bool gotNewFrame(void)
+            virtual bool gotNewFrame(void) override
             {
                 return _rx.gotNewFrame();
             }
 
-            void readRawvals(void)
+            virtual void readRawvals(void) override
             {
                 _rx.getChannelValues(rawvals, MAXCHAN);
             }
 
-            bool lostSignal(void)
+            virtual bool lostSignal(void) override
             {
                 return _rx.timedOut(micros());
             }
