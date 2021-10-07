@@ -58,7 +58,7 @@ A typical Arduino sketch for hackflight is written as follows:
 1. Construct a ```Hackflight``` objecting using a ```Board```, ```Receiver```, and
 ```Mixer``` object.
 
-2. Add sensors (```Gyrometer```, ```Quaternion```)
+2. Add sensors (```IMU```, ```Altimeter```)
 
 3. Add PID controllers (```Rate```, ```Level```)
 
