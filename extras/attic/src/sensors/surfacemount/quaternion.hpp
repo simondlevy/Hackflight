@@ -1,7 +1,7 @@
 /*
    Support for treating quaternion as a sensor
    
-   Supports IMUs like EM7180 SENtral Sensor Fusion solution, where 
+   Supports IMUs like USFS SENtral Sensor Fusion solution, where 
    quaternion is computed in hardware, and simulation platforms like
    UE4, where quaternion is provided by physics engine. For other IMUs 
    and simulators, you can use quaternion-filter classes in filters.hpp.

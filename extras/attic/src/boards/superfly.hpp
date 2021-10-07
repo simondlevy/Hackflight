@@ -1,7 +1,7 @@
 /*
    Superfly Hackable ESP8266 Flight Controller implementation of Hackflight Board routines
 
-   Uses EM7180 SENtral Sensor Hub in master mode mode
+   Uses USFS SENtral Sensor Hub in master mode mode
 
    Copyright (c) 2018 Simon D. Levy
 
@@ -70,7 +70,7 @@ namespace hf {
                 // Start I^2C
                 Wire.begin(0,2); // SDA (0), SCL (2) on ESP8266
 
-                // Hang a bit before starting up the EM7180
+                // Hang a bit before starting up the USFS
                 delay(100);
 
                 // Initialize the motors
