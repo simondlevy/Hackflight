@@ -98,7 +98,7 @@ namespace hf {
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(time_usec, _mixer, &_state);
+                    _serial_tasks[k]->update(time_usec, motorvals);
                 }
 
                 *led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _state.armed;

@@ -176,7 +176,7 @@ namespace hf {
                 _useTelemetryPort = secondaryPort;
             }
 
-            void update(uint32_t time_usec, Mixer * mixer, State * state)
+            void update(uint32_t time_usec, float * motorvals)
             {
                 extern bool serialAvailable(void);
                 extern uint8_t serialRead(void);
@@ -195,8 +195,8 @@ namespace hf {
                 }
 
                 // Support motor testing from GCS
-                if (!state->armed) {
-                    mixer->runDisarmed();
+                if (!_state->armed) {
+                    _mixer->runDisarmed();
                 }
             }
 
