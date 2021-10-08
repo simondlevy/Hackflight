@@ -18,16 +18,9 @@ namespace hf {
 
         protected:
 
-            MixerQuad(
-                    RotaryMotor * motor1,
-                    RotaryMotor * motor2,
-                    RotaryMotor * motor3,
-                    RotaryMotor * motor4)
+            MixerQuad(void)
+                : Mixer(4)
             {
-                Mixer::addMotor(motor1);
-                Mixer::addMotor(motor2);
-                Mixer::addMotor(motor3);
-                Mixer::addMotor(motor4);
             }
     };
 

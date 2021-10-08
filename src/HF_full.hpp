@@ -24,11 +24,11 @@ namespace hf {
             SerialTask * _serial_tasks[10] = {};
             uint8_t _serial_task_count = 0;
 
-            void checkSafety(State * state)
+            void checkSafety(State * state, float * motorvals)
             {
                 // Sync failsafe to open-loop-controller
                 if (copilot_receiverLostSignal && state->armed) {
-                    _mixer->cut();
+                    cutMotors(motorvals);
                     state->armed = false;
                     state->failsafe = true;
                     return;
@@ -57,10 +57,15 @@ namespace hf {
 
                 // Cut motors on inactivity
                 if (state->armed && _receiver->inactive()) {
-                    _mixer->cut();
+                    cutMotors(motorvals);
                 }
 
             } // checkSafety
+
+            void cutMotors(float * motorvals)
+            {
+                memset(motorvals, 0, 4*sizeof(float));  // XXX Support other than 4
+            }
 
             void startSensors(void) 
             {
@@ -84,16 +89,13 @@ namespace hf {
                 // Initialize the sensors
                 startSensors();
 
-                // Start the mixer
-                _mixer->begin();
-
             } // begin
 
             void update(uint32_t time_usec, float * motorvals, bool * led)
             {
                 HackflightPure::update(time_usec, motorvals);
 
-                checkSafety(&_state);
+                checkSafety(&_state, motorvals);
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {

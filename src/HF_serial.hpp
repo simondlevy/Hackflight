@@ -84,12 +84,12 @@ namespace hf {
                  mtype = mixer->getType();
              }
 
-             void handle_SET_MOTOR(float  m1, float  m2, float  m3, float  m4, Mixer * mixer)
+             void handle_SET_MOTOR(float  m1, float  m2, float  m3, float  m4, float * motorvals)
              {
-                 mixer->setMotorDisarmed(0, m1);
-                 mixer->setMotorDisarmed(1, m2);
-                 mixer->setMotorDisarmed(2, m3);
-                 mixer->setMotorDisarmed(3, m4);
+                 motorvals[0] = m1;
+                 motorvals[1] = m2;
+                 motorvals[2] = m3;
+                 motorvals[3] = m4;
              }
 
              void collectPayload(uint8_t index, uint8_t value)
@@ -97,7 +97,7 @@ namespace hf {
                  _payload[index] = value;
              }
 
-             void dispatchMessage(uint8_t command, State * state, Mixer * mixer)
+             void dispatchMessage(uint8_t command, State * state, Mixer * mixer, float * motorvals)
              {
                  switch (command) {
 
@@ -136,20 +136,8 @@ namespace hf {
                              float dpsi = 0;
                              handle_STATE_Request(
                                      state,
-                                     x,
-                                     dx,
-                                     y,
-                                     dy,
-                                     z,
-                                     dz,
-                                     phi,
-                                     dphi,
-                                     theta,
-                                     dtheta,
-                                     psi,
-                                     dpsi);
-                             prepareToSendFloats(command,
-                                     12);
+                                     x, dx, y, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi);
+                             prepareToSendFloats(command, 12);
                              sendFloat(x);
                              sendFloat(dx);
                              sendFloat(y);
@@ -188,7 +176,7 @@ namespace hf {
                              float m4 = 0;
                              memcpy(&m4,  &_payload[12], sizeof(float));
 
-                             handle_SET_MOTOR(m1, m2, m3, m4, mixer);
+                             handle_SET_MOTOR(m1, m2, m3, m4, motorvals);
                          } break;
 
                  } // switch (_command)
@@ -302,7 +290,7 @@ namespace hf {
                 return _outBuf[_outBufIndex++];
             }
 
-            void parse(uint8_t c, State * state, Mixer * mixer)
+            void parse(uint8_t c, State * state, Mixer * mixer, float * motorvals)
             {
                 enum {
                     IDLE,
@@ -352,7 +340,7 @@ namespace hf {
 
                 // Message dispatch
                 if (parser_state == IDLE && crc == c) {
-                    dispatchMessage(type, state, mixer);
+                    dispatchMessage(type, state, mixer, motorvals);
                 }
 
             } // parse
@@ -370,16 +358,11 @@ namespace hf {
                 }
 
                 while (serialAvailable() > 0) {
-                    parse(serialRead(), state, mixer);
+                    parse(serialRead(), state, mixer, motorvals);
                 }
 
                 while (availableBytes() > 0) {
                     serialWrite(readByte());
-                }
-
-                // Support motor testing from GCS
-                if (!state->armed) {
-                    mixer->runDisarmed();
                 }
             }
 

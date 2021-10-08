@@ -99,9 +99,25 @@ static hf::ArduinoBrushedMotor motor2 = hf::ArduinoBrushedMotor(A2);
 static hf::ArduinoBrushedMotor motor3 = hf::ArduinoBrushedMotor(3);
 static hf::ArduinoBrushedMotor motor4 = hf::ArduinoBrushedMotor(11);
 
+static void startMotors(void)
+{
+    motor1.begin();
+    motor2.begin();
+    motor3.begin();
+    motor4.begin();
+}
+
+static void runMotors(float * mvals)
+{
+    motor1.write(mvals[0]);
+    motor2.write(mvals[1]);
+    motor3.write(mvals[2]);
+    motor4.write(mvals[3]);
+}
+
 // Mixer =======================================================================
 
-static hf::MixerQuadXMW mixer = hf::MixerQuadXMW(&motor1, &motor2, &motor3, &motor4);
+static hf::MixerQuadXMW mixer;
 
 // PID controllers =============================================================
 
@@ -151,6 +167,7 @@ void setup(void)
     Wire.begin();
     delay(100);
     startReceiver();
+    startMotors();
     delay(100);
 
     // Add sensors
@@ -175,10 +192,13 @@ void loop(void)
     updateReceiver();
 
     bool led = false;
-    float motorvals[4] = {};
+    static float mvals[4];
 
-    h.update(micros(), motorvals, &led);
+    h.update(micros(), mvals, &led);
+
+    //printf("%3.3f  %3.3f  %3.3f  %3.3f\n", mvals[0], mvals[1], mvals[2], mvals[3]);
+
+    runMotors(mvals);
 
     digitalWrite(LED_PIN, led);
-
 }

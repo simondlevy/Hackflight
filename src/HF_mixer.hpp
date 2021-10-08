@@ -9,9 +9,7 @@
 #pragma once
 
 #include "HF_demands.hpp"
-
 #include "HF_filters.hpp"
-#include "HF_motor.hpp"
 
 namespace hf {
 
@@ -32,51 +30,23 @@ namespace hf {
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
-            Motor * _motors[MAXMOTORS] = {};
-            float  _disarmedValues[MAXMOTORS];
-
             uint8_t _nmotors = 0;
 
-            void writeMotor(uint8_t index, float value)
+        protected:
+
+            Mixer(uint8_t nmotors)
             {
-                _motors[index]->write(value);
+                _nmotors = nmotors;
             }
 
         public:
 
             motorMixer_t motorDirections[MAXMOTORS];
 
-            Mixer(void)
-            {
-                _nmotors = 0;
-            }
-
-            void addMotor(Motor * motor)
-            {
-                _motors[_nmotors++] = motor;
-            }
-
             virtual float constrainMotorValue(uint8_t index, float value)
             {
                 (void)index; // all motors behave the same by default
                 return Filter::constrainMinMax(value, 0, 1);
-            }
-
-            void begin(void)
-            {
-                // set disarmed motor values
-                for (uint8_t i = 0; i < _nmotors; i++) {
-                    _disarmedValues[i] = 0;
-                    _motors[i]->begin();
-                }
-            }
-
-            // This is how we can spin the motors from the GCS
-            void runDisarmed(void)
-            {
-                for (uint8_t i = 0; i < _nmotors; i++) {
-                    writeMotor(i, _disarmedValues[i]);
-                }
             }
 
             void run(float * demands, float * motorvals)
@@ -114,22 +84,6 @@ namespace hf {
                     // Keep motor values in appropriate interval
                     motorvals[i] = constrainMotorValue(i, motorvals[i]);
                 }
-
-                for (uint8_t i = 0; i < _nmotors; i++) {
-                    writeMotor(i, motorvals[i]);
-                }
-            }
-
-            void cut(void)
-            {
-                for (uint8_t i = 0; i < _nmotors; i++) {
-                    writeMotor(i, 0);
-                }
-            }
-
-            virtual void setMotorDisarmed(uint8_t index, float value)
-            {
-                _disarmedValues[index] = value;
             }
 
             virtual uint8_t getType(void) 

@@ -22,13 +22,8 @@ namespace hf {
 
         public:
 
-            MixerQuadXMW(
-                    RotaryMotor * motor1,
-                    RotaryMotor * motor2,
-                    RotaryMotor * motor3,
-                    RotaryMotor * motor4) 
-
-                : MixerQuad(motor1, motor2, motor3, motor4)
+            MixerQuadXMW(void)
+                : MixerQuad()
             {
                 //                     Th  RR  PF  YR
                 motorDirections[0] = { +1, -1, +1, -1 };    // 1 right rear

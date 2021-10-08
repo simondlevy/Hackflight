@@ -19,22 +19,14 @@ namespace hf {
 
         public:
 
-            MixerThrustVector(
-                    RotaryMotor * rotor1,
-                    RotaryMotor * rotor2,
-                    ServoMotor * servo1,
-                    ServoMotor * servo2)
+            MixerThrustVector(void)
+                : Mixer(4)
             {
                 //                     Th   RR   PF  YR
                 motorDirections[0] = { +1,  0,   0, +1 };   // rotor 1
                 motorDirections[1] = { +1,  0,   0, -1 };   // rotor 2
                 motorDirections[2] = {  0, +1,   0,  0 };   // servo 1
                 motorDirections[3] = {  0,  0 , +1,  0 };   // servo 2
-
-                Mixer::addMotor(rotor1);
-                Mixer::addMotor(rotor2);
-                Mixer::addMotor(servo1);
-                Mixer::addMotor(servo2);
              }
 
         protected:
