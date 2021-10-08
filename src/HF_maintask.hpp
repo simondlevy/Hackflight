@@ -58,7 +58,7 @@ namespace hf {
                 // mixer to choose whether it cares about
                 // open-loop controller being inactive (e.g.,
                 // throttle down)
-                if (ready && !state->failsafe) {
+                if (/*ready &&*/ !state->failsafe) {
                     mixer->run(demands, state->armed && !receiver->inactive());
                 }
 
