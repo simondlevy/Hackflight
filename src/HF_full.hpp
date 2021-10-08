@@ -24,14 +24,13 @@ namespace hf {
             SerialTask * _serial_tasks[10] = {};
             uint8_t _serial_task_count = 0;
 
-            void checkSafety(State * state, bool * led)
+            void checkSafety(State * state)
             {
                 // Sync failsafe to open-loop-controller
                 if (copilot_receiverLostSignal && state->armed) {
                     _mixer->cut();
                     state->armed = false;
                     state->failsafe = true;
-                    *led = false;
                     return;
                 }
 
@@ -94,11 +93,11 @@ namespace hf {
             {
                 HackflightPure::update(time_usec, motorvals);
 
-                checkSafety(&_state, led);
+                checkSafety(&_state);
 
                 // Update serial tasks
                 for (uint8_t k=0; k<_serial_task_count; ++k) {
-                    _serial_tasks[k]->update(time_usec, motorvals);
+                    _serial_tasks[k]->update(time_usec, &_state, _mixer, motorvals);
                 }
 
                 *led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _state.armed;
@@ -107,8 +106,6 @@ namespace hf {
             void addSerialTask(SerialTask * task)
             {
                 _serial_tasks[_serial_task_count++] = task;
-
-                task->init(_mixer, &_state);
             }
 
     }; // class HackflightFull

@@ -34,10 +34,6 @@ namespace hf {
 
             uint8_t _payload[128] = {};
 
-            // Store so we don't have to pass them on update
-            State * _state = NULL;
-            Mixer * _mixer = NULL;
-
              void handle_RECEIVER_Request(
                      float & c1,
                      float & c2,
@@ -54,7 +50,9 @@ namespace hf {
                 c6 = copilot_receiverAux2 ;
              }
 
-             void handle_STATE_Request(float & x,
+             void handle_STATE_Request(
+                     State * state,
+                     float & x,
                      float & dx,
                      float & y,
                      float & dy,
@@ -67,31 +65,31 @@ namespace hf {
                      float & psi,
                      float & dpsi)
              {
-                 x = _state->x[State::X];
-                 dx = _state->x[State::DX];
-                 y = _state->x[State::Y];
-                 dy = _state->x[State::DY];
-                 z = _state->x[State::Z];
-                 dz = _state->x[State::DZ];
-                 phi = _state->x[State::PHI];
-                 dphi = _state->x[State::DPHI];
-                 theta = _state->x[State::THETA];
-                 dtheta = _state->x[State::DTHETA];
-                 psi = _state->x[State::PSI];
-                 dpsi = _state->x[State::DPSI];
+                 x = state->x[State::X];
+                 dx = state->x[State::DX];
+                 y = state->x[State::Y];
+                 dy = state->x[State::DY];
+                 z = state->x[State::Z];
+                 dz = state->x[State::DZ];
+                 phi = state->x[State::PHI];
+                 dphi = state->x[State::DPHI];
+                 theta = state->x[State::THETA];
+                 dtheta = state->x[State::DTHETA];
+                 psi = state->x[State::PSI];
+                 dpsi = state->x[State::DPSI];
              }
 
-             void handle_ACTUATOR_TYPE_Request(uint8_t & mtype)
+             void handle_ACTUATOR_TYPE_Request(uint8_t & mtype, Mixer * mixer)
              {
-                 mtype = _mixer->getType();
+                 mtype = mixer->getType();
              }
 
-             void handle_SET_MOTOR(float  m1, float  m2, float  m3, float  m4)
+             void handle_SET_MOTOR(float  m1, float  m2, float  m3, float  m4, Mixer * mixer)
              {
-                 _mixer->setMotorDisarmed(0, m1);
-                 _mixer->setMotorDisarmed(1, m2);
-                 _mixer->setMotorDisarmed(2, m3);
-                 _mixer->setMotorDisarmed(3, m4);
+                 mixer->setMotorDisarmed(0, m1);
+                 mixer->setMotorDisarmed(1, m2);
+                 mixer->setMotorDisarmed(2, m3);
+                 mixer->setMotorDisarmed(3, m4);
              }
 
              void collectPayload(uint8_t index, uint8_t value)
@@ -99,7 +97,7 @@ namespace hf {
                  _payload[index] = value;
              }
 
-             void dispatchMessage(uint8_t command)
+             void dispatchMessage(uint8_t command, State * state, Mixer * mixer)
              {
                  switch (command) {
 
@@ -136,9 +134,22 @@ namespace hf {
                              float dtheta = 0;
                              float psi = 0;
                              float dpsi = 0;
-                             handle_STATE_Request(x, dx, y, dy, z, dz,
-                                     phi, dphi, theta, dtheta, psi, dpsi);
-                             prepareToSendFloats(command, 12);
+                             handle_STATE_Request(
+                                     state,
+                                     x,
+                                     dx,
+                                     y,
+                                     dy,
+                                     z,
+                                     dz,
+                                     phi,
+                                     dphi,
+                                     theta,
+                                     dtheta,
+                                     psi,
+                                     dpsi);
+                             prepareToSendFloats(command,
+                                     12);
                              sendFloat(x);
                              sendFloat(dx);
                              sendFloat(y);
@@ -151,75 +162,69 @@ namespace hf {
                              sendFloat(dtheta);
                              sendFloat(psi);
                              sendFloat(dpsi);
-                            completeSend();
-                        } break;
+                             completeSend();
+                         } break;
 
-                    case 123:
-                        {
-                            uint8_t mtype = 0;
-                            handle_ACTUATOR_TYPE_Request(mtype);
-                            prepareToSendBytes(command, 1);
-                            sendByte(mtype);
-                            completeSend();
-                        } break;
+                     case 123:
+                         {
+                             uint8_t mtype = 0;
+                             handle_ACTUATOR_TYPE_Request(mtype, mixer);
+                             prepareToSendBytes(command, 1);
+                             sendByte(mtype);
+                             completeSend();
+                         } break;
 
-                    case 215:
-                        {
-                            float m1 = 0;
-                            memcpy(&m1,  &_payload[0], sizeof(float));
+                     case 215:
+                         {
+                             float m1 = 0;
+                             memcpy(&m1,  &_payload[0], sizeof(float));
 
-                            float m2 = 0;
-                            memcpy(&m2,  &_payload[4], sizeof(float));
+                             float m2 = 0;
+                             memcpy(&m2,  &_payload[4], sizeof(float));
 
-                            float m3 = 0;
-                            memcpy(&m3,  &_payload[8], sizeof(float));
+                             float m3 = 0;
+                             memcpy(&m3,  &_payload[8], sizeof(float));
 
-                            float m4 = 0;
-                            memcpy(&m4,  &_payload[12], sizeof(float));
+                             float m4 = 0;
+                             memcpy(&m4,  &_payload[12], sizeof(float));
 
-                            handle_SET_MOTOR(m1, m2, m3, m4);
-                        } break;
+                             handle_SET_MOTOR(m1, m2, m3, m4, mixer);
+                         } break;
 
-                } // switch (_command)
+                 } // switch (_command)
 
-            } // dispatchMessage 
+             } // dispatchMessage 
 
-            void init(Mixer * mixer, State * state)
-            {
-                _mixer = mixer;
-                _state = state;
-            }
+             void serialize16(int16_t a)
+             {
+                 serialize8(a & 0xFF);
+                 serialize8((a >> 8) & 0xFF);
+             }
 
-            void serialize16(int16_t a)
-            {
-                serialize8(a & 0xFF);
-                serialize8((a >> 8) & 0xFF);
-            }
+             void serialize32(uint32_t a)
+             {
+                 serialize8(a & 0xFF);
+                 serialize8((a >> 8) & 0xFF);
+                 serialize8((a >> 16) & 0xFF);
+                 serialize8((a >> 24) & 0xFF);
+             }
 
-            void serialize32(uint32_t a)
-            {
-                serialize8(a & 0xFF);
-                serialize8((a >> 8) & 0xFF);
-                serialize8((a >> 16) & 0xFF);
-                serialize8((a >> 24) & 0xFF);
-            }
+             void prepareToSend(uint8_t type, uint8_t count, uint8_t size)
+             {
+                 _outBufSize = 0;
+                 _outBufIndex = 0;
+                 _outBufChecksum = 0;
 
-            void prepareToSend(uint8_t type, uint8_t count, uint8_t size)
-            {
-                _outBufSize = 0;
-                _outBufIndex = 0;
-                _outBufChecksum = 0;
+                 addToOutBuf('$');
+                 addToOutBuf('M');
+                 addToOutBuf('>');
+                 serialize8(count*size);
+                 serialize8(type);
+             }
 
-                addToOutBuf('$');
-                addToOutBuf('M');
-                addToOutBuf('>');
-                serialize8(count*size);
-                serialize8(type);
-            }
-
-            void addToOutBuf(uint8_t a)
-            {
-                _outBuf[_outBufSize++] = a;
+             void addToOutBuf(uint8_t a)
+             {
+                 _outBuf[_outBufSize++] = a;
             }
 
             void completeSend(void)
@@ -297,7 +302,7 @@ namespace hf {
                 return _outBuf[_outBufIndex++];
             }
 
-            void parse(uint8_t c)
+            void parse(uint8_t c, State * state, Mixer * mixer)
             {
                 enum {
                     IDLE,
@@ -347,14 +352,14 @@ namespace hf {
 
                 // Message dispatch
                 if (parser_state == IDLE && crc == c) {
-                    dispatchMessage(type);
+                    dispatchMessage(type, state, mixer);
                 }
 
             } // parse
 
     protected:
 
-            void update(uint32_t time_usec, float * motorvals)
+            void update(uint32_t time_usec, State * state, Mixer * mixer, float * motorvals)
             {
                 extern bool serialAvailable(void);
                 extern uint8_t serialRead(void);
@@ -365,7 +370,7 @@ namespace hf {
                 }
 
                 while (serialAvailable() > 0) {
-                    parse(serialRead());
+                    parse(serialRead(), state, mixer);
                 }
 
                 while (availableBytes() > 0) {
@@ -373,8 +378,8 @@ namespace hf {
                 }
 
                 // Support motor testing from GCS
-                if (!_state->armed) {
-                    _mixer->runDisarmed();
+                if (!state->armed) {
+                    mixer->runDisarmed();
                 }
             }
 
