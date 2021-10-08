@@ -27,18 +27,18 @@ namespace hf {
 
             // Helpers ---------------------------------------------------
 
-            void update(float * demand, float   angvel, float * errI, float * errPrev)
+            void update(float * demand, float   angvel, float * errI, float * errPrev, bool ready)
             {
                 // Compute err as difference between demand and angular velocity
                 float err = *demand - angvel;
 
                 // Compute I term
-                *errI = Filter::constrainAbs(*errI + err, _windupMax);
+                *errI = ready ? Filter::constrainAbs(*errI + err, _windupMax) : *errI;
 
                 // Compute D term
                 float errD = err - *errPrev;
 
-                *errPrev = err;
+                *errPrev = ready ? err : *errPrev;
 
                 *demand = _Kp * err + _Ki * *errI + _Kd * errD;
             }
@@ -47,8 +47,6 @@ namespace hf {
 
             virtual void modifyDemands(float * state, float * demands, bool ready) override
             {
-                if (!ready) return;
-
                 // Controller state
                 static float rollErrI;
                 static float rollErrPrev;
@@ -56,12 +54,12 @@ namespace hf {
                 static float pitchErrPrev;
 
                 update(&demands[DEMANDS_ROLL], state[State::DPHI],
-                        &rollErrI, &rollErrPrev);
+                        &rollErrI, &rollErrPrev, ready);
 
                 // Pitch demand is nose-down positive, so we negate
                 // pitch-forward rate (nose-down negative)
                 update(&demands[DEMANDS_PITCH], -state[State::DTHETA],
-                        &pitchErrI, &pitchErrPrev);
+                        &pitchErrI, &pitchErrPrev, ready);
             }
 
         public:
