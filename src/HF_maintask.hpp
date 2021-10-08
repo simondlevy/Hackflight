@@ -42,29 +42,28 @@ namespace hf {
 
             void update(uint32_t time_usec, Receiver * receiver, Mixer * mixer, State * state)
             {
-                if (!TimerTask::ready(time_usec)) {
-                    return;
-                }
-
                 // Start with demands from open-loop controller
                 float demands[Receiver::MAX_DEMANDS] = {};
                 receiver->getDemands(demands);
 
-                // Apply PID controllers to demands
-                for (uint8_t k=0; k<_controller_count; ++k) {
-                    _controllers[k]->modifyDemands(state, demands); 
+                if (TimerTask::ready(time_usec)) {
 
+                    // Apply PID controllers to demands
+                    for (uint8_t k=0; k<_controller_count; ++k) {
+                        _controllers[k]->modifyDemands(state, demands); 
+
+                    }
+
+                    // Use updated demands to run motors, allowing
+                    // mixer to choose whether it cares about
+                    // open-loop controller being inactive (e.g.,
+                    // throttle down)
+                    if (!state->failsafe) {
+                        mixer->run(demands, state->armed && !receiver->inactive());
+                    }
                 }
 
-                // Use updated demands to run motors, allowing
-                // mixer to choose whether it cares about
-                // open-loop controller being inactive (e.g.,
-                // throttle down)
-                if (!state->failsafe) {
-                    mixer->run(demands, state->armed && !receiver->inactive());
-                }
-
-             } // update
+            } // update
 
     };  // class MainTask
 
