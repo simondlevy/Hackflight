@@ -19,7 +19,7 @@ namespace hf {
 
         friend class ClosedLoopTask;
         friend class HackflightPure;
-        friend class Hackflight;
+        friend class HackflightFull;
         friend class SerialTask;
         friend class PidTask;
 
@@ -91,6 +91,11 @@ namespace hf {
             // These must be overridden for each receiver
             virtual bool gotNewFrame(void) = 0;
             virtual void readRawvals(void) = 0;
+
+            virtual bool lostSignal(void) 
+            { 
+                return false; 
+            }
 
             // Software trim
             float _trimRoll = 0;
@@ -171,14 +176,9 @@ namespace hf {
 
             }  // update
 
-            virtual bool lostSignal(void) 
-            { 
-                return false; 
-            }
-
             static const uint8_t MAX_DEMANDS = 10; // arbitrary
 
-            virtual bool inArmedState(void)
+            bool inArmedState(void)
             {
                 return _aux1State > 0;
             }
@@ -188,12 +188,7 @@ namespace hf {
                 memcpy(demands, _demands, sizeof(_demands));
             }
 
-            virtual uint8_t getModeIndex(void)
-            {
-                return _aux2State;
-            }
-
-            virtual bool inactive(void)
+            bool inactive(void)
             {
                 return getRawval(CHANNEL_THROTTLE) < -1 + THROTTLE_MARGIN;
             }
