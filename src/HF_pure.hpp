@@ -9,7 +9,7 @@
 #pragma once
 
 #include "HF_sensor.hpp"
-#include "HF_controltask.hpp"
+#include "HF_timer.hpp"
 #include "HF_pidcontroller.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
@@ -21,7 +21,11 @@ namespace hf {
 
         private:
 
-            ControlTask _controlTask;
+            Timer _timer = Timer(300);
+
+            // PID controllers
+            PidController * _controllers[256] = {};
+            uint8_t _controller_count = 0;
 
             void checkSensors(uint32_t time_usec, State * state)
             {
@@ -48,6 +52,7 @@ namespace hf {
                 _receiver = receiver;
                 _mixer = mixer;
                 _sensor_count = 0;
+                _controller_count = 0;
             }
 
             void begin(void)
@@ -60,8 +65,24 @@ namespace hf {
             {
                 _receiver->update();
 
-                // Update PID controllers task
-                _controlTask.update(time_usec, _receiver, _mixer, &_state);
+                // Start with demands from open-loop controller
+                float demands[Receiver::MAX_DEMANDS] = {};
+                _receiver->getDemands(demands);
+
+                bool ready = _timer.ready(time_usec);
+
+                // Apply PID controllers to demands
+                for (uint8_t k=0; k<_controller_count; ++k) {
+                    _controllers[k]->modifyDemands(_state.x, demands, ready); 
+
+                }
+
+                // Use updated demands to run motors, allowing mixer to choose
+                // whether it cares about open-loop controller being inactive
+                // (e.g., throttle down)
+                if (!_state.failsafe && _state.armed && !_receiver->inactive()) {
+                    _mixer->run(demands);
+                }
 
                 // Check sensors
                 checkSensors(time_usec, &_state);
@@ -74,7 +95,7 @@ namespace hf {
 
             void addPidController(PidController * controller) 
             {
-                _controlTask.addController(controller);
+                _controllers[_controller_count++] = controller;
             }
 
     }; // class HackflightPure

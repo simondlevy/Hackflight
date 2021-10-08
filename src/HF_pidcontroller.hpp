@@ -14,7 +14,7 @@ namespace hf {
 
     class PidController {
 
-        friend class ControlTask;
+        friend class HackflightPure;
 
         protected:
 
