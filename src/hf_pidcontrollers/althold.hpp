@@ -34,26 +34,19 @@ namespace hf {
 
             void modifyDemands(float * state, float * demands, bool ready) override
             {
-                // XXX 
-                if (!ready) return;
-
                 // Controller state ---------------------------
                 static float _errorI;         
                 static float _altitudeTarget; 
                 static bool _inBandPrev;  
 
-                bool didReset = false;
                 float altitude = state[State::Z];
 
                 // Is stick demand in deadband?
                 bool inBand = fabs(demands[DEMANDS_THROTTLE]) < _stickDeadband; 
 
-                // Reset controller when moving into deadband
-                if (inBand && !_inBandPrev) {
-                    _errorI = 0;
-                    didReset = true;
-                }
-                _inBandPrev = inBand;
+                bool newInBand = inBand && !_inBandPrev;
+
+                _inBandPrev = ready ? inBand : _inBandPrev;
 
                 // Target velocity is a setpoint inside deadband, scaled
                 // constant outside
@@ -66,15 +59,15 @@ namespace hf {
                 float error = targetVelocity - state[State::DZ];
 
                 // Compute I term, avoiding windup
-                _errorI = Filter::constrainAbs(_errorI + error, _windupMax);
+                _errorI = newInBand ? 0
+                    : ready ? Filter::constrainAbs(_errorI + error, _windupMax)
+                    : _errorI;
 
                 // Adjust throttle demand based on error
                 demands[DEMANDS_THROTTLE] = error * _Kp + _errorI * _Ki;
 
                 // If we re-entered deadband, we reset the target altitude.
-                if (didReset) {
-                    _altitudeTarget = altitude;
-                }
+                _altitudeTarget = (ready && newInBand) ? altitude : _altitudeTarget;
             }
 
         public:
@@ -91,11 +84,6 @@ namespace hf {
                 _windupMax = windupMax;
                 _pilotVelZMax = pilotVelZMax;
                 _stickDeadband = stickDeadband;
-
-                // Initialize state
-                _errorI = 0;
-                _inBandPrev = false;
-                _altitudeTarget = 0;
             }
 
     };  // class AltitudeHoldPid
