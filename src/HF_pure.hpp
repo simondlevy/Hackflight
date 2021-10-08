@@ -61,7 +61,7 @@ namespace hf {
 
             } // begin
 
-            void update(uint32_t time_usec)
+            void update(uint32_t time_usec, float * motorvals)
             {
                 // Start with demands from open-loop controller
                 float demands[Receiver::MAX_DEMANDS] = {};
@@ -78,7 +78,7 @@ namespace hf {
                 // whether it cares about open-loop controller being inactive
                 // (e.g., throttle down)
                 if (!_state.failsafe && _state.armed && !_receiver->inactive()) {
-                    _mixer->run(demands);
+                    _mixer->run(demands, motorvals);
                 }
 
                 // Check sensors

@@ -90,9 +90,9 @@ namespace hf {
 
             } // begin
 
-            void update(uint32_t time_usec, bool * led)
+            void update(uint32_t time_usec, float * motorvals, bool * led)
             {
-                HackflightPure::update(time_usec);
+                HackflightPure::update(time_usec, motorvals);
 
                 checkSafety(&_state, led);
 

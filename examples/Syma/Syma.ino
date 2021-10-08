@@ -172,11 +172,12 @@ void setup(void)
 
 void loop(void)
 {
-    bool led = false;
-
     updateReceiver();
 
-    h.update(micros(), &led);
+    bool led = false;
+    float motorvals[4] = {};
+
+    h.update(micros(), motorvals, &led);
 
     digitalWrite(LED_PIN, led);
 
