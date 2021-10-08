@@ -35,23 +35,23 @@ namespace hf {
             void modifyDemands(float * state, float * demands, bool ready) override
             {
                 // Controller state ---------------------------
-                static float _errorI;         
-                static float _altitudeTarget; 
-                static bool _inBandPrev;  
+                static float errorI_;         
+                static float altitudeTarget_; 
+                static bool inBand_;  
 
                 float altitude = state[State::Z];
 
                 // Is stick demand in deadband?
                 bool inBand = fabs(demands[DEMANDS_THROTTLE]) < _stickDeadband; 
 
-                bool newInBand = inBand && !_inBandPrev;
+                bool newInBand = inBand && !inBand_;
 
-                _inBandPrev = ready ? inBand : _inBandPrev;
+                inBand_ = ready ? inBand : inBand_;
 
                 // Target velocity is a setpoint inside deadband, scaled
                 // constant outside
                 float targetVelocity = inBand ?
-                    _altitudeTarget - altitude :
+                    altitudeTarget_ - altitude :
                     _pilotVelZMax *
                     demands[DEMANDS_THROTTLE];
 
@@ -59,15 +59,15 @@ namespace hf {
                 float error = targetVelocity - state[State::DZ];
 
                 // Compute I term, avoiding windup
-                _errorI = newInBand ? 0
-                    : ready ? Filter::constrainAbs(_errorI + error, _windupMax)
-                    : _errorI;
+                errorI_ = newInBand ? 0
+                    : ready ? Filter::constrainAbs(errorI_ + error, _windupMax)
+                    : errorI_;
 
                 // Adjust throttle demand based on error
-                demands[DEMANDS_THROTTLE] = error * _Kp + _errorI * _Ki;
+                demands[DEMANDS_THROTTLE] = error * _Kp + errorI_ * _Ki;
 
                 // If we re-entered deadband, we reset the target altitude.
-                _altitudeTarget = (ready && newInBand) ? altitude : _altitudeTarget;
+                altitudeTarget_ = (ready && newInBand) ? altitude : altitudeTarget_;
             }
 
         public:

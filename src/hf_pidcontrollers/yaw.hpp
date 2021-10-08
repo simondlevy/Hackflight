@@ -27,18 +27,18 @@ namespace hf {
 
             virtual void modifyDemands(float * state, float * demands, bool ready) override
             {
-                static float _errorI;
+                static float errorI_;
 
                 // Compute error as difference between yaw demand and angular velocity
                 float error = demands[DEMANDS_YAW] - state[State::DPSI];
 
                 // Compute I term
-                _errorI = fabs(error) > _rateMax ? 0
-                        : ready ? Filter::constrainAbs(_errorI + error, _windupMax)
-                        : _errorI;
+                errorI_ = fabs(error) > _rateMax ? 0
+                        : ready ? Filter::constrainAbs(errorI_ + error, _windupMax)
+                        : errorI_;
 
                 // Adjust yaw demand based on error
-                demands[DEMANDS_YAW] = _Kp * error + _Ki * _errorI;
+                demands[DEMANDS_YAW] = _Kp * error + _Ki * errorI_;
              }
 
         public:
