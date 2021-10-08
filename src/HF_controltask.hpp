@@ -54,12 +54,11 @@ namespace hf {
 
                 }
 
-                // Use updated demands to run motors, allowing
-                // mixer to choose whether it cares about
-                // open-loop controller being inactive (e.g.,
-                // throttle down)
-                if (/*ready &&*/ !state->failsafe) {
-                    mixer->run(demands, state->armed && !receiver->inactive());
+                // Use updated demands to run motors, allowing mixer to choose
+                // whether it cares about open-loop controller being inactive
+                // (e.g., throttle down)
+                if (!state->failsafe && state->armed && !receiver->inactive()) {
+                    mixer->run(demands);
                 }
 
             } // update

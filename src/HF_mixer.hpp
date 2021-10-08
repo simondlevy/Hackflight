@@ -79,14 +79,8 @@ namespace hf {
                 }
             }
 
-            void run(float * demands, bool safe)
+            void run(float * demands)
             {
-                // Don't run motors if its not safe: vehicle should be
-                // armed, with throttle above minimum
-                if (!safe) {
-                    return;
-                }
-
                 // Map throttle demand from [-1,+1] to [0,1]
                 demands[DEMANDS_THROTTLE] = (demands[DEMANDS_THROTTLE] + 1) / 2;
 
