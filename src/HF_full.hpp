@@ -108,7 +108,7 @@ namespace hf {
             {
                 _serial_tasks[_serial_task_count++] = task;
 
-                task->init(_receiver, _mixer, &_state);
+                task->init(_mixer, &_state);
             }
 
     }; // class HackflightFull

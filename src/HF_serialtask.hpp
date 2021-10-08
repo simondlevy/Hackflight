@@ -26,7 +26,6 @@ namespace hf {
 
             // Store so we don't have to pass them on update
             State * _state = NULL;
-            Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;
 
              void handle_RECEIVER_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
@@ -161,9 +160,8 @@ namespace hf {
 
             } // dispatchMessage 
 
-            void init( Receiver * receiver, Mixer * mixer, State * state)
+            void init(Mixer * mixer, State * state)
             {
-                _receiver = receiver;
                 _mixer = mixer;
                 _state = state;
             }
