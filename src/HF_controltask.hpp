@@ -1,5 +1,5 @@
 /*
-   Timer task for closed-loop controllers
+   Timed task for closed-loop controllers
 
    Copyright (c) 2021 Simon D. Levy
 
@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "HF_timertask.hpp"
+#include "HF_timer.hpp"
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
@@ -16,9 +16,12 @@
 
 namespace hf {
 
-    class ControlTask : public TimerTask {
+    class ControlTask {
 
         private:
+
+            // Timer
+            Timer timer = Timer(300);
 
             // PID controllers
             PidController * _controllers[256] = {};
@@ -26,11 +29,7 @@ namespace hf {
 
         public:
 
-            // For now, we keep all tasks the same.  At some point it might be
-            // useful to investigate, e.g., faster updates for Rate PID than
-            // for Level PID.
-            ControlTask(float freq=300)
-                : TimerTask(freq)
+            ControlTask()
             {
                 _controller_count = 0;
             }
@@ -46,7 +45,7 @@ namespace hf {
                 float demands[Receiver::MAX_DEMANDS] = {};
                 receiver->getDemands(demands);
 
-                bool ready = TimerTask::ready(time_usec);
+                bool ready = timer.ready(time_usec);
 
                 // Apply PID controllers to demands
                 for (uint8_t k=0; k<_controller_count; ++k) {

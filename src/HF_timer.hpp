@@ -1,5 +1,5 @@
 /*
-   Abstract class for timer tasks
+   Timer class for periodic activities
 
    Copyright (c) 2021 Simon D. Levy
 
@@ -10,16 +10,16 @@
 
 namespace hf {
 
-    class TimerTask {
+    class Timer {
 
         private:
 
             uint32_t _period = 0;
             uint32_t _time_usec;
 
-        protected:
+        public:
 
-            TimerTask(uint32_t freq)
+            Timer(uint32_t freq)
             {
                 _period = 1000000 / freq;
                 _time_usec = 0;
@@ -36,6 +36,6 @@ namespace hf {
                 return false;
              }
 
-    };  // TimerTask
+    };  // Timer
 
 } // namespace hf

@@ -7,20 +7,20 @@
 #pragma once
 
 #include "HF_parser.hpp"
-#include "HF_timertask.hpp"
+#include "HF_timer.hpp"
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 
 namespace hf {
 
-    class SerialTask : public TimerTask, Parser {
+    class SerialTask : public Parser {
 
         friend class HackflightFull;
 
         private:
 
-            static constexpr float FREQ = 66;
+            Timer timer = Timer(66);
 
             uint8_t _payload[128] = {};
 
@@ -172,7 +172,6 @@ namespace hf {
             bool _useTelemetryPort = false;
 
             SerialTask(bool secondaryPort=false)
-                : TimerTask(FREQ)
             {
                 _useTelemetryPort = secondaryPort;
             }
@@ -183,7 +182,7 @@ namespace hf {
                 extern uint8_t serialRead(void);
                 extern void serialWrite(uint8_t);
 
-                if (!TimerTask::ready(time_usec)) {
+                if (!timer.ready(time_usec)) {
                     return;
                 }
 
