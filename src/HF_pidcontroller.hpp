@@ -14,7 +14,7 @@ namespace hf {
 
     class PidController {
 
-        friend class MainTask;
+        friend class ControlTask;
 
         protected:
 

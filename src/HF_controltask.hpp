@@ -16,7 +16,7 @@
 
 namespace hf {
 
-    class MainTask : public TimerTask {
+    class ControlTask : public TimerTask {
 
         private:
 
@@ -29,7 +29,7 @@ namespace hf {
             // For now, we keep all tasks the same.  At some point it might be
             // useful to investigate, e.g., faster updates for Rate PID than
             // for Level PID.
-            MainTask(float freq=300)
+            ControlTask(float freq=300)
                 : TimerTask(freq)
             {
                 _controller_count = 0;
@@ -64,6 +64,6 @@ namespace hf {
 
             } // update
 
-    };  // class MainTask
+    };  // class ControlTask
 
 } // namespace hf
