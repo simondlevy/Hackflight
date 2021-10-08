@@ -28,23 +28,17 @@ namespace hf {
             float _stickDeadband = 0;
             float _pilotVelZMax = 0;
 
-            // Controller state ---------------------------
-
-            // Error integral
-            float _errorI = 0;
-
-            // Will be reset each time we re-enter deadband
-            float _altitudeTarget = 0;
-
-            // Tracks whether we just entered deadband
-            bool _inBandPrev = false;
-
             // --------------------------------------------
 
         protected:
 
             void modifyDemands(float * state, float * demands) override
             {
+                // Controller state ---------------------------
+                static float _errorI;         
+                static float _altitudeTarget; 
+                static bool _inBandPrev;  
+
                 bool didReset = false;
                 float altitude = state[State::Z];
 
@@ -62,9 +56,9 @@ namespace hf {
                 // Target velocity is a setpoint inside deadband, scaled
                 // constant outside
                 float targetVelocity = inBand ?
-                                       _altitudeTarget - altitude :
-                                       _pilotVelZMax *
-                                       demands[DEMANDS_THROTTLE];
+                    _altitudeTarget - altitude :
+                    _pilotVelZMax *
+                    demands[DEMANDS_THROTTLE];
 
                 // Compute error as scaled target minus actual
                 float error = targetVelocity - state[State::DZ];
@@ -84,10 +78,10 @@ namespace hf {
         public:
 
             AltitudeHoldPid(const float Kp = 0.75,
-                            const float Ki = 1.5,
-                            const float windupMax = 0.4,
-                            const float pilotVelZMax = 2.5,
-                            const float stickDeadband = 0.20)   
+                    const float Ki = 1.5,
+                    const float windupMax = 0.4,
+                    const float pilotVelZMax = 2.5,
+                    const float stickDeadband = 0.20)   
             {
                 // Store constants
                 _Kp = Kp;
