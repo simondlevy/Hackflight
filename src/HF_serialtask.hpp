@@ -20,6 +20,8 @@ namespace hf {
 
         private:
 
+            static constexpr float FREQ = 66;
+
             uint8_t _payload[128] = {};
 
             // Store so we don't have to pass them on update
@@ -37,7 +39,8 @@ namespace hf {
                 c6 = copilot_receiverAux2 ;
              }
 
-            void handle_STATE_Request(float & x, float & dx, float & y, float & dy, float & z, float & dz, float & phi, float & dphi, float & theta, float & dtheta, float & psi, float & dpsi)
+            void handle_STATE_Request(float & x, float & dx, float & y, float & dy, float & z, float & dz,
+                    float & phi, float & dphi, float & theta, float & dtheta, float & psi, float & dpsi)
             {
                 x = _state->x[State::X];
                 dx = _state->x[State::DX];
@@ -165,8 +168,6 @@ namespace hf {
                 _state = state;
             }
     public:
-
-            static constexpr float FREQ = 66;
 
             bool _useTelemetryPort = false;
 
