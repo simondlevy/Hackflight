@@ -9,7 +9,7 @@
 #pragma once
 
 #include "HF_sensor.hpp"
-#include "HF_pidtask.hpp"
+#include "HF_maintask.hpp"
 #include "HF_pidcontroller.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
@@ -21,8 +21,8 @@ namespace hf {
 
         private:
 
-            // Timer task for PID controllers
-            PidTask _pidTask;
+            // Main timer task
+            MainTask _mainTask;
 
             void checkSensors(uint32_t time_usec, State * state)
             {
@@ -62,7 +62,7 @@ namespace hf {
                 _receiver->update();
 
                 // Update PID controllers task
-                _pidTask.update(time_usec, _receiver, _mixer, &_state);
+                _mainTask.update(time_usec, _receiver, _mixer, &_state);
 
                 // Check sensors
                 checkSensors(time_usec, &_state);
@@ -75,7 +75,7 @@ namespace hf {
 
             void addPidController(PidController * controller) 
             {
-                _pidTask.addController(controller);
+                _mainTask.addController(controller);
             }
 
     }; // class HackflightPure
