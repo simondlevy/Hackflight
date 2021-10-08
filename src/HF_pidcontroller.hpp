@@ -14,16 +14,11 @@ namespace hf {
 
     class PidController {
 
-        friend class PidTask;
+        friend class MainTask;
 
-        public:
+        protected:
 
-            void modifyDemands(State * state, float * demands)
-            {
-                modifyDemands(state->x, demands);
-            }
-
-            virtual void modifyDemands(float * statevec, float * demands) = 0;
+            virtual void modifyDemands(float * statevec, float * demands, bool ready) = 0;
 
     };  // class PidController
 

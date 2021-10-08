@@ -45,8 +45,10 @@ namespace hf {
 
         protected:
 
-            virtual void modifyDemands(float * state, float * demands) override
+            virtual void modifyDemands(float * state, float * demands, bool ready) override
             {
+                if (!ready) return;
+
                 // Controller state
                 static float rollErrI;
                 static float rollErrPrev;

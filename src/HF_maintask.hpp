@@ -46,21 +46,20 @@ namespace hf {
                 float demands[Receiver::MAX_DEMANDS] = {};
                 receiver->getDemands(demands);
 
-                if (TimerTask::ready(time_usec)) {
+                bool ready = TimerTask::ready(time_usec);
 
-                    // Apply PID controllers to demands
-                    for (uint8_t k=0; k<_controller_count; ++k) {
-                        _controllers[k]->modifyDemands(state, demands); 
+                // Apply PID controllers to demands
+                for (uint8_t k=0; k<_controller_count; ++k) {
+                    _controllers[k]->modifyDemands(state->x, demands, ready); 
 
-                    }
+                }
 
-                    // Use updated demands to run motors, allowing
-                    // mixer to choose whether it cares about
-                    // open-loop controller being inactive (e.g.,
-                    // throttle down)
-                    if (!state->failsafe) {
-                        mixer->run(demands, state->armed && !receiver->inactive());
-                    }
+                // Use updated demands to run motors, allowing
+                // mixer to choose whether it cares about
+                // open-loop controller being inactive (e.g.,
+                // throttle down)
+                if (ready && !state->failsafe) {
+                    mixer->run(demands, state->armed && !receiver->inactive());
                 }
 
             } // update

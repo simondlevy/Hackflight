@@ -32,8 +32,11 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(float * state, float * demands) override
+            void modifyDemands(float * state, float * demands, bool ready) override
             {
+                // XXX 
+                if (!ready) return;
+
                 // Controller state ---------------------------
                 static float _errorI;         
                 static float _altitudeTarget; 
@@ -43,8 +46,7 @@ namespace hf {
                 float altitude = state[State::Z];
 
                 // Is stick demand in deadband?
-                bool inBand = fabs(demands[DEMANDS_THROTTLE]) <
-                    _stickDeadband; 
+                bool inBand = fabs(demands[DEMANDS_THROTTLE]) < _stickDeadband; 
 
                 // Reset controller when moving into deadband
                 if (inBand && !_inBandPrev) {

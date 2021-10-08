@@ -32,8 +32,10 @@ namespace hf {
 
         protected:
 
-            virtual void modifyDemands(float * state, float * demands) override
+            virtual void modifyDemands(float * state, float * demands, bool ready) override
             {
+                if (!ready) return;
+
                 demands[DEMANDS_ROLL] = 
                     _Kp * (demands[DEMANDS_ROLL] * _dmdscale 
                             - state[State::PHI]);
