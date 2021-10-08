@@ -34,7 +34,7 @@ namespace hf {
 
             virtual void modifyDemands(float * state, float * demands, bool ready) override
             {
-                if (!ready) return;
+                (void)ready;
 
                 demands[DEMANDS_ROLL] = 
                     _Kp * (demands[DEMANDS_ROLL] * _dmdscale 
