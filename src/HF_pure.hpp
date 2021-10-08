@@ -63,15 +63,12 @@ namespace hf {
 
             void update(uint32_t time_usec)
             {
-                _receiver->update();
-
                 // Start with demands from open-loop controller
                 float demands[Receiver::MAX_DEMANDS] = {};
                 _receiver->getDemands(demands);
 
+                // Periodically apply PID controllers to demands
                 bool ready = _timer.ready(time_usec);
-
-                // Apply PID controllers to demands
                 for (uint8_t k=0; k<_controller_count; ++k) {
                     _controllers[k]->modifyDemands(_state.x, demands, ready); 
 

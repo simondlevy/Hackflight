@@ -96,7 +96,7 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            void update(void)
+            void getDemands(float * demands)
             {
                 // Wait till there's a new frame
                 if (copilot_receiverGotNewFrame) return;
@@ -128,18 +128,16 @@ namespace hf {
                 _demands[DEMANDS_PITCH] *= _demandScale;
                 _demands[DEMANDS_YAW] *= _demandScale;
 
-            }  // update
+                memcpy(demands, _demands, sizeof(_demands));
+
+            } // getDemands
+
 
             static const uint8_t MAX_DEMANDS = 10; // arbitrary
 
             bool inArmedState(void)
             {
                 return copilot_receiverAux1 > 0;
-            }
-
-            void getDemands(float * demands)
-            {
-                memcpy(demands, _demands, sizeof(_demands));
             }
 
             bool inactive(void)
