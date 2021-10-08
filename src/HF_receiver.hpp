@@ -130,7 +130,7 @@ namespace hf {
 
         public:
 
-            virtual void update(void)
+            void update(void)
             {
                 // Wait till there's a new frame
                 if (!gotNewFrame()) return;
