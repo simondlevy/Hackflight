@@ -27,7 +27,7 @@ namespace hf {
             void checkSafety(State * state, bool * led)
             {
                 // Sync failsafe to open-loop-controller
-                if (_receiver->lostSignal() && state->armed) {
+                if (copilot_receiverLostSignal && state->armed) {
                     _mixer->cut();
                     state->armed = false;
                     state->failsafe = true;

@@ -29,12 +29,12 @@ namespace hf {
 
              void handle_RECEIVER_Request(float & c1, float & c2, float & c3, float & c4, float & c5, float & c6)
             {
-                c1 = _receiver->getRawval(0);
-                c2 = _receiver->getRawval(1);
-                c3 = _receiver->getRawval(2);
-                c4 = _receiver->getRawval(3);
-                c5 = _receiver->getRawval(4);
-                c6 = _receiver->getRawval(5);
+                c1 = copilot_receiverThrottle ;
+                c2 = copilot_receiverRoll ;
+                c3 = copilot_receiverPitch ;
+                c4 = copilot_receiverYaw ;
+                c5 = copilot_receiverAux1 ;
+                c6 = copilot_receiverAux2 ;
              }
 
             void handle_STATE_Request(float & x, float & dx, float & y, float & dy, float & z, float & dz, float & phi, float & dphi, float & theta, float & dtheta, float & psi, float & dpsi)
