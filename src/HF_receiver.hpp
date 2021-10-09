@@ -11,16 +11,9 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "HF_demands.hpp"
+#include "stream_receiver.h"
 
-extern bool copilot_receiverGotNewFrame;
-extern bool copilot_receiverLostSignal;
-extern float copilot_receiverThrottle;
-extern float copilot_receiverRoll;
-extern float copilot_receiverPitch;
-extern float copilot_receiverYaw;
-extern float copilot_receiverAux1;
-extern float copilot_receiverAux2;
+#include "HF_demands.hpp"
 
 namespace hf {
 
@@ -99,21 +92,21 @@ namespace hf {
             void getDemands(float * demands)
             {
                 // Wait till there's a new frame
-                if (copilot_receiverGotNewFrame) return;
+                if (stream_receiverGotNewFrame) return;
 
                 // Convert raw [-1,+1] to absolute value
-                _demands[DEMANDS_ROLL]  = fabs(copilot_receiverRoll);
-                _demands[DEMANDS_PITCH] = fabs(copilot_receiverPitch);
-                _demands[DEMANDS_YAW]   = fabs(copilot_receiverYaw);
+                _demands[DEMANDS_ROLL]  = fabs(stream_receiverRoll);
+                _demands[DEMANDS_PITCH] = fabs(stream_receiverPitch);
+                _demands[DEMANDS_YAW]   = fabs(stream_receiverYaw);
 
                 // Apply expo nonlinearity to roll, pitch
                 _demands[DEMANDS_ROLL]  = applyCyclicFunction(_demands[DEMANDS_ROLL]);
                 _demands[DEMANDS_PITCH] = applyCyclicFunction(_demands[DEMANDS_PITCH]);
 
                 // Put sign back on command, yielding [-0.5,+0.5]
-                adjustCommand(DEMANDS_ROLL, copilot_receiverRoll);
-                adjustCommand(DEMANDS_PITCH, copilot_receiverPitch);
-                adjustCommand(DEMANDS_YAW, copilot_receiverYaw);
+                adjustCommand(DEMANDS_ROLL, stream_receiverRoll);
+                adjustCommand(DEMANDS_PITCH, stream_receiverPitch);
+                adjustCommand(DEMANDS_YAW, stream_receiverYaw);
 
                 // Add in software trim
                 _demands[DEMANDS_ROLL]  += _trimRoll;
@@ -121,7 +114,7 @@ namespace hf {
                 _demands[DEMANDS_YAW]   += _trimYaw;
 
                 // Pass throttle demand through exponential function
-                _demands[DEMANDS_THROTTLE] = throttleFun(copilot_receiverThrottle);
+                _demands[DEMANDS_THROTTLE] = throttleFun(stream_receiverThrottle);
 
                 // Multiply by demand scale
                 _demands[DEMANDS_ROLL] *= _demandScale;
@@ -137,12 +130,12 @@ namespace hf {
 
             bool inArmedState(void)
             {
-                return copilot_receiverAux1 > 0;
+                return stream_receiverAux1 > 0;
             }
 
             bool inactive(void)
             {
-                return copilot_receiverThrottle < (-1 + THROTTLE_MARGIN);
+                return stream_receiverThrottle < (-1 + THROTTLE_MARGIN);
             }
 
     }; // class Receiver

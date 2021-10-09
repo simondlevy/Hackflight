@@ -11,6 +11,8 @@
 #include "HF_pure.hpp"
 #include "HF_serial.hpp"
 
+#include "stream_receiver.h"
+
 namespace hf {
 
     class HackflightFull : public HackflightPure {
@@ -27,7 +29,7 @@ namespace hf {
             void checkSafety(State * state, float * motorvals)
             {
                 // Sync failsafe to open-loop-controller
-                if (copilot_receiverLostSignal && state->armed) {
+                if (stream_receiverLostSignal && state->armed) {
                     cutMotors(motorvals);
                     state->armed = false;
                     state->failsafe = true;

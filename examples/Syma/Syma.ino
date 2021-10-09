@@ -26,8 +26,9 @@
 #include "hf_motors/arduino/brushed.hpp"
 #include "hf_sensors/usfs.hpp"
 
+#include "stream_receiver.h"
+
 #include <Wire.h>
-#include <DSMRX.h>
 #include <USFS_Master.h>
 
 // LED ========================================================================
@@ -36,62 +37,10 @@ static uint32_t LED_PIN = 18;
 
 // Receiver ===================================================================
 
-static constexpr float DEMAND_SCALE = 4.0f;
-static constexpr float SOFTWARE_TRIM[3] = {0, 0.05, 0.035};
+static constexpr float SCALE = 4.0f;
+static constexpr float TRIM[3] = {0, 0.05, 0.035};
 
-bool copilot_receiverGotNewFrame;
-bool copilot_receiverLostSignal;
-float copilot_receiverThrottle;
-float copilot_receiverRoll;
-float copilot_receiverPitch;
-float copilot_receiverYaw;
-float copilot_receiverAux1;
-float copilot_receiverAux2;
-
-static DSM2048 rx;
-
-static bool rxReady;
-
-static hf::Receiver receiver = hf::Receiver(DEMAND_SCALE, SOFTWARE_TRIM);  
-
-void serialEvent1(void)
-{
-    rxReady = true;
-
-    while (Serial1.available()) {
-
-        rx.handleSerialEvent(Serial1.read(), micros());
-    }
-}
-
-static void updateReceiver(void)
-{
-    if (rx.timedOut(micros())) {
-        if (rxReady) {
-            copilot_receiverLostSignal = true;
-        }
-    }
-
-    else if (rx.gotNewFrame()) {
-
-        float rawvals[8];
-
-        rx.getChannelValues(rawvals, 8);
-
-        copilot_receiverThrottle = rawvals[0];
-        copilot_receiverRoll     = rawvals[1];
-        copilot_receiverPitch    = rawvals[2];
-        copilot_receiverYaw      = rawvals[3];
-        copilot_receiverAux1     = rawvals[6];
-        copilot_receiverAux2     = rawvals[4];
-    }
-}
-
-static void startReceiver(void)
-{
-    Serial1.begin(115200);
-    copilot_receiverLostSignal = false;
-}
+static hf::Receiver receiver = hf::Receiver(SCALE, TRIM);
 
 // Motors  =====================================================================
 
@@ -241,7 +190,7 @@ void setup(void)
     startSerial();
     startLed();
     startI2C();
-    startReceiver();
+    stream_startReceiver();
     startMotors();
     startImu();
 
@@ -265,7 +214,7 @@ void setup(void)
 void loop(void)
 {
     updateImu();
-    updateReceiver();
+    stream_updateReceiver();
 
     bool led = false;
     static float mvals[4];

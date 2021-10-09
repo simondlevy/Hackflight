@@ -11,6 +11,8 @@
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 
+#include "stream_receiver.h"
+
 namespace hf {
 
     typedef struct {
@@ -51,13 +53,13 @@ namespace hf {
                      float & c5,
                      float & c6)
             {
-                c1 = copilot_receiverThrottle ;
-                c2 = copilot_receiverRoll ;
-                c3 = copilot_receiverPitch ;
-                c4 = copilot_receiverYaw ;
-                c5 = copilot_receiverAux1 ;
-                c6 = copilot_receiverAux2 ;
-             }
+                c1 = stream_receiverThrottle;
+                c2 = stream_receiverRoll;
+                c3 = stream_receiverPitch;
+                c4 = stream_receiverYaw;
+                c5 = stream_receiverAux1;
+                c6 = stream_receiverAux2;
+            }
 
              void handle_STATE_Request(
                      State * state,
