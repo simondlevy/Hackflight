@@ -13,20 +13,20 @@
 
 namespace hf {
 
-    typedef struct {
-
-        uint8_t checksum;
-        uint8_t values[128];
-        uint8_t index;
-        uint8_t size;
-
-    } serial_buffer_t;
-
     class SerialTask {
 
         friend class HackflightFull;
 
         private:
+
+            typedef struct {
+
+                uint8_t checksum;
+                uint8_t values[128];
+                uint8_t index;
+                uint8_t size;
+
+            } serial_buffer_t;
 
             static const uint8_t MAXMSG = 255;
 
