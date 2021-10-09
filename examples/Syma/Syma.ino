@@ -24,9 +24,10 @@
 #include "hf_pidcontrollers/yaw.hpp"
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_motors/arduino/brushed.hpp"
-#include "hf_sensors/usfs.hpp"
+#include "hf_sensors/imu.hpp"
 
 #include "stream_receiver.h"
+#include "stream_imu.h"
 
 #include <Wire.h>
 #include <USFS_Master.h>
@@ -77,62 +78,7 @@ static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 // IMU =========================================================================
 
-static hf::USFS imu;
-
-static USFS_Master usfs;
-
-bool copilot_usfsGotGyrometer;
-bool copilot_usfsGotQuaternion;
-float copilot_usfsGyrometerX;
-float copilot_usfsGyrometerY;
-float copilot_usfsGyrometerZ;
-float copilot_usfsQuaternionW;
-float copilot_usfsQuaternionX;
-float copilot_usfsQuaternionY;
-float copilot_usfsQuaternionZ;
-
-static void startImu(void)
-{
-    // Start the USFS in master mode, no interrupt
-    if (!usfs.begin()) {
-        while (true) {
-            Serial.println(usfs.getErrorString());
-            delay(100);
-        }
-    }
-}
-
-static void updateImu(void)
-{
-    usfs.checkEventStatus();
-
-    if (usfs.gotError()) {
-        while (true) {
-            Serial.print("ERROR: ");
-            Serial.println(usfs.getErrorString());
-        }
-    }
-
-    copilot_usfsGotGyrometer = usfs.gotGyrometer();
-
-    if (copilot_usfsGotGyrometer) {
-        // Returns degrees / sec
-        usfs.readGyrometer(
-             copilot_usfsGyrometerX,
-             copilot_usfsGyrometerY,
-             copilot_usfsGyrometerZ);
-    }
-
-    copilot_usfsGotQuaternion = usfs.gotQuaternion();
-
-    if (copilot_usfsGotQuaternion) {
-        usfs.readQuaternion(
-             copilot_usfsQuaternionW,
-             copilot_usfsQuaternionX,
-             copilot_usfsQuaternionY,
-             copilot_usfsQuaternionZ);
-    }
-}
+static hf::IMU imu;
 
 // Serial tasks ================================================================
 
@@ -192,7 +138,7 @@ void setup(void)
     startI2C();
     stream_startReceiver();
     startMotors();
-    startImu();
+    stream_startImu();
 
     // Add sensors
     h.addSensor(&imu);
@@ -213,7 +159,7 @@ void setup(void)
 
 void loop(void)
 {
-    updateImu();
+    stream_updateImu();
     stream_updateReceiver();
 
     bool led = false;

@@ -1,5 +1,5 @@
 /*
-   Support for Pesky Products Unltimate Sensor Fusion Solution IMU
+   Support for sensor-fusion IMUs
 
    Copyright (c) 2021 Simon D. Levy
 
@@ -11,15 +11,7 @@
 #include <HF_sensor.hpp>
 #include <HF_filters.hpp>
 
-extern bool  copilot_usfsGotGyrometer;
-extern bool  copilot_usfsGotQuaternion;
-extern float copilot_usfsGyrometerX;
-extern float copilot_usfsGyrometerY;
-extern float copilot_usfsGyrometerZ;
-extern float copilot_usfsQuaternionW;
-extern float copilot_usfsQuaternionX;
-extern float copilot_usfsQuaternionY;
-extern float copilot_usfsQuaternionZ;
+#include "../stream_imu.h"
 
 namespace hf {
 
@@ -35,7 +27,7 @@ namespace hf {
         https://emissarydrones.com/what-is-roll-pitch-and-yaw
     */
 
-    class USFS : public Sensor {
+    class IMU : public Sensor {
 
         friend class HackflightFull;
 
@@ -45,21 +37,21 @@ namespace hf {
             {
                 (void)time_usec;
 
-                if (copilot_usfsGotGyrometer) {
+                if (stream_imuGotGyrometer) {
 
                     // Convert degrees / sec to radians / sec
-                    state->x[State::DPHI]   = radians(copilot_usfsGyrometerX);
-                    state->x[State::DTHETA] = radians(copilot_usfsGyrometerY);
-                    state->x[State::DPSI]   = radians(copilot_usfsGyrometerZ);
+                    state->x[State::DPHI]   = radians(stream_imuGyrometerX);
+                    state->x[State::DTHETA] = radians(stream_imuGyrometerY);
+                    state->x[State::DPSI]   = radians(stream_imuGyrometerZ);
                 }
 
-                if (copilot_usfsGotQuaternion) {
+                if (stream_imuGotQuaternion) {
 
                     Filter::quat2euler(
-                            copilot_usfsQuaternionW,
-                            copilot_usfsQuaternionX,
-                            copilot_usfsQuaternionY,
-                            copilot_usfsQuaternionZ, 
+                            stream_imuQuaternionW,
+                            stream_imuQuaternionX,
+                            stream_imuQuaternionY,
+                            stream_imuQuaternionZ, 
                             state->x[State::PHI],
                             state->x[State::THETA],
                             state->x[State::PSI]);
@@ -75,6 +67,6 @@ namespace hf {
 
             } // modifyState
 
-    };  // class USFS
+    };  // class IMU
 
 } // namespace hf
