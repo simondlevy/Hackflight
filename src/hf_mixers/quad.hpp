@@ -10,8 +10,6 @@
 
 #include "HF_mixer.hpp"
 
-#include "../hf_motors/rotary.hpp"
-
 namespace hf {
 
     class MixerQuad : public Mixer {

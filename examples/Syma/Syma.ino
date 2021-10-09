@@ -23,14 +23,19 @@
 #include "hf_pidcontrollers/rate.hpp"
 #include "hf_pidcontrollers/yaw.hpp"
 #include "hf_pidcontrollers/level.hpp"
-#include "hf_motors/arduino/brushed.hpp"
 #include "hf_sensors/imu.hpp"
 
+#include "stream_motors.h"
 #include "stream_receiver.h"
 #include "stream_imu.h"
+#include "stream_led.h"
 
 #include <Wire.h>
 #include <USFS_Master.h>
+
+// Motors ========================================================================
+
+static const uint8_t MOTOR_PINS[4] = {13, 16, 3, 11};
 
 // LED ========================================================================
 
@@ -42,29 +47,6 @@ static constexpr float SCALE = 4.0f;
 static constexpr float TRIM[3] = {0, 0.05, 0.035};
 
 static hf::Receiver receiver = hf::Receiver(SCALE, TRIM);
-
-// Motors  =====================================================================
-
-static hf::ArduinoBrushedMotor motor1 = hf::ArduinoBrushedMotor(13);
-static hf::ArduinoBrushedMotor motor2 = hf::ArduinoBrushedMotor(A2);
-static hf::ArduinoBrushedMotor motor3 = hf::ArduinoBrushedMotor(3);
-static hf::ArduinoBrushedMotor motor4 = hf::ArduinoBrushedMotor(11);
-
-static void startMotors(void)
-{
-    motor1.begin();
-    motor2.begin();
-    motor3.begin();
-    motor4.begin();
-}
-
-static void runMotors(float * mvals)
-{
-    motor1.write(mvals[0]);
-    motor2.write(mvals[1]);
-    motor3.write(mvals[2]);
-    motor4.write(mvals[3]);
-}
 
 // Mixer =======================================================================
 
@@ -109,36 +91,19 @@ namespace hf {
 
 } // namespace hf
 
-static void startSerial(void)
-{
-    Serial.begin(115200);
-}
-
-// LED support =================================================================
-
-static void startLed(void)
-{
-    pinMode(LED_PIN, OUTPUT);    
-}
-
-// I^2C support ===============================================================
-
-static void startI2C(void)
-{
-    Wire.begin();
-    delay(100);
-}
-
 // Setup =======================================================================
 
 void setup(void)
 {
-    startSerial();
-    startLed();
-    startI2C();
+    Serial.begin(115200);
+
+    Wire.begin();
+    delay(100);
+
     stream_startReceiver();
-    startMotors();
     stream_startImu();
+    stream_startBrushedMotors(MOTOR_PINS);
+    stream_startLed(LED_PIN);
 
     // Add sensors
     h.addSensor(&imu);
@@ -162,14 +127,12 @@ void loop(void)
     stream_updateImu();
     stream_updateReceiver();
 
-    bool led = false;
-    static float mvals[4];
+    bool ledval = false;
+    static float motorvals[4];
 
-    h.update(micros(), mvals, &led);
+    h.update(micros(), motorvals, &ledval);
 
-    //printf("%3.3f  %3.3f  %3.3f  %3.3f\n", mvals[0], mvals[1], mvals[2], mvals[3]);
+    stream_writeBrushedMotors(MOTOR_PINS, motorvals);
 
-    runMotors(mvals);
-
-    digitalWrite(LED_PIN, led);
+    stream_writeLed(LED_PIN, ledval);
 }
