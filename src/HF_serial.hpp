@@ -357,7 +357,7 @@ namespace hf {
                     return;
                 }
 
-                while (serialAvailable() > 0) {
+                while (serialAvailable()) {
                     parse(serialRead(), state, mixer, motorvals);
                 }
 

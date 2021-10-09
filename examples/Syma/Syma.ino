@@ -139,6 +139,9 @@ static hf::HackflightFull h(&receiver, &mixer);
 
 // Serial comms support ========================================================
 
+uint8_t copilot_serialAvailable;
+
+
 namespace hf {
 
     bool serialAvailable(void)
