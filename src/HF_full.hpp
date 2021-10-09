@@ -67,13 +67,6 @@ namespace hf {
                 memset(motorvals, 0, 4*sizeof(float));  // XXX Support other than 4
             }
 
-            void startSensors(void) 
-            {
-                for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->begin();
-                }
-            }
-
         public:
 
             HackflightFull(Receiver * receiver, Mixer * mixer)
@@ -85,9 +78,6 @@ namespace hf {
             void begin(void)
             {  
                 _state.armed = false;
-
-                // Initialize the sensors
-                startSensors();
 
             } // begin
 
