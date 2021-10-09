@@ -13,6 +13,15 @@
 
 namespace hf {
 
+    typedef struct {
+
+        uint8_t checksum;
+        uint8_t values[128];
+        uint8_t index;
+        uint8_t size;
+
+    } serial_buffer_t;
+
     class SerialTask {
 
         friend class HackflightFull;
@@ -21,12 +30,7 @@ namespace hf {
 
             static const uint8_t MAXMSG = 255;
 
-            static const int OUTBUF_SIZE = 128;
-
-            uint8_t _outBufChecksum;
-            uint8_t _outBuf[OUTBUF_SIZE];
-            uint8_t _outBufIndex;
-            uint8_t _outBufSize;
+            serial_buffer_t _outbuf = {};
 
             bool _useTelemetryPort = false;
 
@@ -199,9 +203,9 @@ namespace hf {
 
              void prepareToSend(uint8_t type, uint8_t count, uint8_t size)
              {
-                 _outBufSize = 0;
-                 _outBufIndex = 0;
-                 _outBufChecksum = 0;
+                 _outbuf.size = 0;
+                 _outbuf.index = 0;
+                 _outbuf.checksum = 0;
 
                  addToOutBuf('$');
                  addToOutBuf('M');
@@ -212,18 +216,18 @@ namespace hf {
 
              void addToOutBuf(uint8_t a)
              {
-                 _outBuf[_outBufSize++] = a;
-            }
+                 _outbuf.values[_outbuf.size++] = a;
+             }
 
             void completeSend(void)
             {
-                serialize8(_outBufChecksum);
+                serialize8(_outbuf.checksum);
             }
 
             void serialize8(uint8_t a)
             {
                 addToOutBuf(a);
-                _outBufChecksum ^= a;
+                _outbuf.checksum ^= a;
             }
 
             void prepareToSendBytes(uint8_t type, uint8_t count)
@@ -274,20 +278,18 @@ namespace hf {
 
             void begin(void)
             {
-                _outBufChecksum = 0;
-                _outBufIndex = 0;
-                _outBufSize = 0;
+                memset(&_outbuf, 0, sizeof(_outbuf));
             }
 
             uint8_t availableBytes(void)
             {
-                return _outBufSize;
+                return _outbuf.size;
             }
 
             uint8_t readByte(void)
             {
-                _outBufSize--;
-                return _outBuf[_outBufIndex++];
+                _outbuf.size--;
+                return _outbuf.values[_outbuf.index++];
             }
 
             void parse(uint8_t c, State * state, Mixer * mixer, float * motorvals)
