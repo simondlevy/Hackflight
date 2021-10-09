@@ -358,20 +358,16 @@ namespace hf {
 
             void update(uint32_t time_usec, State * state, Mixer * mixer, float * motorvals)
             {
-                extern bool serialAvailable(void);
-                extern uint8_t serialRead(void);
-                extern void serialWrite(uint8_t);
-
                 if (!timer.ready(time_usec)) {
                     return;
                 }
 
-                while (serialAvailable()) {
-                    parse(serialRead(), state, mixer, motorvals);
+                while (Serial.available()) {
+                    parse(Serial.read(), state, mixer, motorvals);
                 }
 
                 while (availableBytes() > 0) {
-                    serialWrite(readByte());
+                    Serial.write(readByte());
                 }
             }
 

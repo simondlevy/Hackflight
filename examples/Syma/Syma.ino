@@ -31,67 +31,27 @@
 #include "stream_led.h"
 
 #include <Wire.h>
-#include <USFS_Master.h>
-
-// Motors ========================================================================
 
 static const uint8_t MOTOR_PINS[4] = {13, 16, 3, 11};
 
-// LED ========================================================================
-
 static uint32_t LED_PIN = 18;
-
-// Receiver ===================================================================
 
 static constexpr float SCALE = 4.0f;
 static constexpr float TRIM[3] = {0, 0.05, 0.035};
-
 static hf::Receiver receiver = hf::Receiver(SCALE, TRIM);
 
-// Mixer =======================================================================
 
 static hf::MixerQuadXMW mixer;
-
-// PID controllers =============================================================
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
-// IMU =========================================================================
-
 static hf::IMU imu;
-
-// Serial tasks ================================================================
 
 hf::SerialTask gcsTask;
 
-// Hackflight object ===========================================================
-
 static hf::HackflightFull h(&receiver, &mixer);
-
-// Serial comms support ========================================================
-
-namespace hf {
-
-    bool serialAvailable(void)
-    {
-        return Serial.available();
-    }
-
-    uint8_t serialRead(void)
-    {
-        return Serial.read();
-    }
-
-    void serialWrite(uint8_t b)
-    {
-        Serial.write(b);
-    }
-
-} // namespace hf
-
-// Setup =======================================================================
 
 void setup(void)
 {
@@ -119,8 +79,6 @@ void setup(void)
     // Start Hackflight firmware
     h.begin();
 }
-
-// Loop ======================================================================
 
 void loop(void)
 {
