@@ -13,6 +13,11 @@
 
 namespace hf {
 
+    typedef struct {
+        uint8_t size;
+        float values[32];
+    } serial_output_t;
+
     class SerialTask {
 
         friend class HackflightFull;
