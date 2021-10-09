@@ -11,7 +11,15 @@
 #include <HF_sensor.hpp>
 #include <HF_filters.hpp>
 
-#include <USFS_Master.h>
+extern bool  copilot_usfsGotGyrometer;
+extern bool  copilot_usfsGotQuaternion;
+extern float copilot_usfsGyrometerX;
+extern float copilot_usfsGyrometerY;
+extern float copilot_usfsGyrometerZ;
+extern float copilot_usfsQuaternionW;
+extern float copilot_usfsQuaternionX;
+extern float copilot_usfsQuaternionY;
+extern float copilot_usfsQuaternionZ;
 
 namespace hf {
 
@@ -31,57 +39,30 @@ namespace hf {
 
         friend class HackflightFull;
 
-        private:
-
-            USFS_Master _usfs;
-
         protected:
-
-            void begin(void)
-            {
-                // Start the USFS in master mode, no interrupt
-                if (!_usfs.begin()) {
-                    while (true) {
-                        Serial.println(_usfs.getErrorString());
-                        delay(100);
-                    }
-                }
-            }
 
             virtual void modifyState(State * state, uint32_t time_usec)
             {
                 (void)time_usec;
 
-                _usfs.checkEventStatus();
-
-                if (_usfs.gotError()) {
-                    while (true) {
-                        Serial.print("ERROR: ");
-                        Serial.println(_usfs.getErrorString());
-                    }
-                }
-
-                if (_usfs.gotGyrometer()) {
-
-                    float gx=0, gy=0, gz=0;
-
-                    // Returns degrees / sec
-                    _usfs.readGyrometer(gx, gy, gz);
+                if (copilot_usfsGotGyrometer) {
 
                     // Convert degrees / sec to radians / sec
-                    state->x[State::DPHI] = radians(gx);
-                    state->x[State::DTHETA] = radians(gy);
-                    state->x[State::DPSI] = radians(gz);
+                    state->x[State::DPHI]   = radians(copilot_usfsGyrometerX);
+                    state->x[State::DTHETA] = radians(copilot_usfsGyrometerY);
+                    state->x[State::DPSI]   = radians(copilot_usfsGyrometerZ);
                 }
 
-                if (_usfs.gotQuaternion()) {
+                if (copilot_usfsGotQuaternion) {
 
-                    float qw=0, qx=0, qy=0, qz=0;
-
-                    _usfs.readQuaternion(qw, qx, qy, qz);
-
-                    Filter::quat2euler(qw, qx, qy, qz, 
-                            state->x[State::PHI], state->x[State::THETA], state->x[State::PSI]);
+                    Filter::quat2euler(
+                            copilot_usfsQuaternionW,
+                            copilot_usfsQuaternionX,
+                            copilot_usfsQuaternionY,
+                            copilot_usfsQuaternionZ, 
+                            state->x[State::PHI],
+                            state->x[State::THETA],
+                            state->x[State::PSI]);
 
                     // Adjust rotation so that nose-up is positive
                     state->x[State::THETA] = -state->x[State::THETA];

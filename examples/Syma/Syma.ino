@@ -28,6 +28,7 @@
 
 #include <Wire.h>
 #include <DSMRX.h>
+#include <USFS_Master.h>
 
 // LED ========================================================================
 
@@ -125,9 +126,64 @@ static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
-// Sensors =====================================================================
+// IMU =========================================================================
 
 static hf::USFS imu;
+
+static USFS_Master usfs;
+
+bool copilot_usfsGotGyrometer;
+bool copilot_usfsGotQuaternion;
+float copilot_usfsGyrometerX;
+float copilot_usfsGyrometerY;
+float copilot_usfsGyrometerZ;
+float copilot_usfsQuaternionW;
+float copilot_usfsQuaternionX;
+float copilot_usfsQuaternionY;
+float copilot_usfsQuaternionZ;
+
+static void startImu(void)
+{
+    // Start the USFS in master mode, no interrupt
+    if (!usfs.begin()) {
+        while (true) {
+            Serial.println(usfs.getErrorString());
+            delay(100);
+        }
+    }
+}
+
+static void updateImu(void)
+{
+    usfs.checkEventStatus();
+
+    if (usfs.gotError()) {
+        while (true) {
+            Serial.print("ERROR: ");
+            Serial.println(usfs.getErrorString());
+        }
+    }
+
+    copilot_usfsGotGyrometer = usfs.gotGyrometer();
+
+    if (copilot_usfsGotGyrometer) {
+        // Returns degrees / sec
+        usfs.readGyrometer(
+             copilot_usfsGyrometerX,
+             copilot_usfsGyrometerY,
+             copilot_usfsGyrometerZ);
+    }
+
+    copilot_usfsGotQuaternion = usfs.gotQuaternion();
+
+    if (copilot_usfsGotQuaternion) {
+        usfs.readQuaternion(
+             copilot_usfsQuaternionW,
+             copilot_usfsQuaternionX,
+             copilot_usfsQuaternionY,
+             copilot_usfsQuaternionZ);
+    }
+}
 
 // Serial tasks ================================================================
 
@@ -138,9 +194,6 @@ hf::SerialTask gcsTask;
 static hf::HackflightFull h(&receiver, &mixer);
 
 // Serial comms support ========================================================
-
-uint8_t copilot_serialAvailable;
-
 
 namespace hf {
 
@@ -190,6 +243,7 @@ void setup(void)
     startI2C();
     startReceiver();
     startMotors();
+    startImu();
 
     // Add sensors
     h.addSensor(&imu);
@@ -210,6 +264,7 @@ void setup(void)
 
 void loop(void)
 {
+    updateImu();
     updateReceiver();
 
     bool led = false;
