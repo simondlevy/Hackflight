@@ -158,17 +158,35 @@ namespace hf {
 
 } // namespace hf
 
+static void startSerial(void)
+{
+    Serial.begin(115200);
+}
+
+// LED support =================================================================
+
+static void startLed(void)
+{
+    pinMode(LED_PIN, OUTPUT);    
+}
+
+// I^2C support ===============================================================
+
+static void startI2C(void)
+{
+    Wire.begin();
+    delay(100);
+}
+
 // Setup =======================================================================
 
 void setup(void)
 {
-    Serial.begin(115200);
-    pinMode(LED_PIN, OUTPUT);    
-    Wire.begin();
-    delay(100);
+    startSerial();
+    startLed();
+    startI2C();
     startReceiver();
     startMotors();
-    delay(100);
 
     // Add sensors
     h.addSensor(&imu);
