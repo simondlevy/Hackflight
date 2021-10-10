@@ -356,18 +356,21 @@ namespace hf {
 
     protected:
 
-            void update(uint32_t time_usec, State * state, Mixer * mixer, float * motorvals)
+            void update(
+                    uint32_t time_usec,
+                    State * state,
+                    Mixer * mixer,
+                    float * motorvals)
             {
-                if (!timer.ready(time_usec)) {
-                    return;
-                }
+                if (timer.ready(time_usec)) {
 
-                while (Serial.available()) {
-                    parse(Serial.read(), state, mixer, motorvals);
-                }
+                    while (Serial.available()) {
+                        parse(Serial.read(), state, mixer, motorvals);
+                    }
 
-                while (availableBytes() > 0) {
-                    Serial.write(readByte());
+                    while (availableBytes() > 0) {
+                        Serial.write(readByte());
+                    }
                 }
             }
 
@@ -378,6 +381,6 @@ namespace hf {
                 _useTelemetryPort = secondaryPort;
             }
 
-        }; // class SerialTask
+    }; // class SerialTask
 
 } // namespace hf

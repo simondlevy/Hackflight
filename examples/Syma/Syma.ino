@@ -24,6 +24,7 @@
 #include "hf_pidcontrollers/yaw.hpp"
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_sensors/imu.hpp"
+#include "hf_serial.hpp"
 
 #include "stream_motors.h"
 #include "stream_receiver.h"
@@ -48,6 +49,8 @@ static hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static hf::IMU imu;
+
+static hf::SerialTask serialTask;
 
 static hf::HackflightFull h(&receiver, &mixer);
 
@@ -82,8 +85,9 @@ void loop(void)
 
     bool ledval = false;
     static float motorvals[4];
+    bool serialReady = false;
 
-    h.update(micros(), motorvals, &ledval);
+    h.update(micros(), motorvals, &ledval, &serialTask);
 
     stream_writeBrushedMotors(MOTOR_PINS, motorvals);
 
