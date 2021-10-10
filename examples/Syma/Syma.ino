@@ -41,7 +41,6 @@ static constexpr float SCALE = 4.0f;
 static constexpr float TRIM[3] = {0, 0.05, 0.035};
 static hf::Receiver receiver = hf::Receiver(SCALE, TRIM);
 
-
 static hf::MixerQuadXMW mixer;
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
@@ -83,11 +82,11 @@ void loop(void)
 
     bool ledval = false;
     static float motorvals[4]; // XXX needs to be static
-    bool serialReady = false;
+    bool serialTaskReady = false;
 
-    h.update(micros(), motorvals, &ledval, &serialReady);
+    h.update(micros(), motorvals, &ledval, &serialTaskReady);
 
-    if (serialReady) {
+    if (serialTaskReady) {
 
         while (Serial.available()) {
             h.serialParse(Serial.read(), motorvals);
@@ -96,7 +95,6 @@ void loop(void)
         while (h.serialAvailable() > 0) {
             Serial.write(h.serialRead());
         }
-  
     }
 
     stream_writeBrushedMotors(MOTOR_PINS, motorvals);
