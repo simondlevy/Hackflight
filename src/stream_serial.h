@@ -18,9 +18,12 @@
 #include <stdint.h>
 
 EXTERN uint8_t stream_serialByte; 
+EXTERN bool stream_serialAvailable; 
 
 void stream_startSerial(void);
 
 void stream_serialWrite(uint8_t byte);
 
 void stream_serialRead(void);
+
+void stream_serialUpdate(void);

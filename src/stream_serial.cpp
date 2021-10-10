@@ -26,3 +26,8 @@ void stream_serialRead(void)
 {
     stream_serialByte = Serial.read();
 }
+
+void stream_serialUpdate(void)
+{
+    stream_serialAvailable = Serial.available();
+}
