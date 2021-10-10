@@ -18,13 +18,11 @@
  */
 
 #include "HF_full.hpp"
-#include "hf_receiver.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"
 #include "hf_pidcontrollers/yaw.hpp"
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_sensors/imu.hpp"
-#include "hf_serial.hpp"
 
 #include "stream_motors.h"
 #include "stream_receiver.h"
