@@ -19,15 +19,15 @@ namespace hf {
 
         private:
 
-            // Safety
-            bool _safeToArm = false;
-
             // Serial tasks
             SerialTask * _serial_tasks[10] = {};
             uint8_t _serial_task_count = 0;
 
             void checkSafety(State * state, float * motorvals)
             {
+                // Safety
+                static bool _safeToArm;
+
                 // Sync failsafe to open-loop-controller
                 if (stream_receiverLostSignal && state->armed) {
                     cutMotors(motorvals);
