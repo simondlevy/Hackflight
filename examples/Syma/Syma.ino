@@ -50,8 +50,6 @@ static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static hf::IMU imu;
 
-static hf::SerialTask serialTask;
-
 static hf::HackflightFull h(&receiver, &mixer);
 
 void setup(void)
@@ -84,10 +82,22 @@ void loop(void)
     stream_updateReceiver();
 
     bool ledval = false;
-    static float motorvals[4];
+    static float motorvals[4]; // XXX needs to be static
     bool serialReady = false;
 
-    h.update(micros(), motorvals, &ledval, &serialTask);
+    h.update(micros(), motorvals, &ledval, &serialReady);
+
+    if (serialReady) {
+
+        while (Serial.available()) {
+            h.serialParse(Serial.read(), motorvals);
+        }
+
+        while (h.serialAvailable() > 0) {
+            Serial.write(h.serialRead());
+        }
+  
+    }
 
     stream_writeBrushedMotors(MOTOR_PINS, motorvals);
 

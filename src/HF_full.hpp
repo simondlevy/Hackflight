@@ -19,6 +19,8 @@ namespace hf {
 
         private:
 
+            SerialTask serialTask;
+
             void checkSafety(State * state, float * motorvals)
             {
                 // Safety
@@ -82,16 +84,30 @@ namespace hf {
                     uint32_t time_usec,
                     float * motorvals,
                     bool * led,
-                    SerialTask * serialTask)
+                    bool * serialReady)
             {
                 HackflightPure::update(time_usec, motorvals);
 
-                // Update serial task
-                serialTask->update(time_usec, &_state, _mixer, motorvals);
+                *serialReady = serialTask.ready(time_usec);
 
                 checkSafety(&_state, motorvals);
 
                 *led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _state.armed;
+            }
+
+            void serialParse(uint8_t byte, float * motorvals)
+            {
+                serialTask.parse(byte, &_state, _mixer, motorvals);
+            }
+
+            uint8_t serialAvailable(void)
+            {
+                return serialTask.available();
+            }
+
+            uint8_t serialRead(void)
+            {
+                return serialTask.read();
             }
 
     }; // class HackflightFull

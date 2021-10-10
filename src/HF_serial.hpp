@@ -45,7 +45,9 @@ namespace hf {
 
             uint8_t _payload[128] = {};
 
-             void handle_RECEIVER_Request(
+            bool _ready = false;
+
+            void handle_RECEIVER_Request(
                      float & c1,
                      float & c2,
                      float & c3,
@@ -288,12 +290,14 @@ namespace hf {
                 memset(&_outbuf, 0, sizeof(_outbuf));
             }
 
-            uint8_t availableBytes(void)
+    protected:
+
+            uint8_t available(void)
             {
                 return _outbuf.size;
             }
 
-            uint8_t readByte(void)
+            uint8_t read(void)
             {
                 _outbuf.size--;
                 return _outbuf.values[_outbuf.index++];
@@ -354,24 +358,9 @@ namespace hf {
 
             } // parse
 
-    protected:
-
-            void update(
-                    uint32_t time_usec,
-                    State * state,
-                    Mixer * mixer,
-                    float * motorvals)
+            bool ready(uint32_t time_usec)
             {
-                if (timer.ready(time_usec)) {
-
-                    while (Serial.available()) {
-                        parse(Serial.read(), state, mixer, motorvals);
-                    }
-
-                    while (availableBytes() > 0) {
-                        Serial.write(readByte());
-                    }
-                }
+                return timer.ready(time_usec);
             }
 
     public:
@@ -379,6 +368,11 @@ namespace hf {
             SerialTask(bool secondaryPort=false)
             {
                 _useTelemetryPort = secondaryPort;
+            }
+
+            bool ready(void)
+            {
+                return _ready;
             }
 
     }; // class SerialTask
