@@ -52,7 +52,6 @@ static hf::HackflightFull h(&receiver, &mixer);
 void setup(void)
 {
     Serial.begin(115200);
-
     Wire.begin();
     delay(100);
 
@@ -75,8 +74,8 @@ void loop(void)
     stream_updateImu();
     stream_updateReceiver();
 
-    bool ledval = false;
     static float motorvals[4]; // XXX needs to be static
+    bool ledval = false;
     bool serialTaskReady = false;
 
     h.update(micros(), motorvals, &ledval, &serialTaskReady);
@@ -93,6 +92,5 @@ void loop(void)
     }
 
     stream_writeBrushedMotors(MOTOR_PINS, motorvals);
-
     stream_writeLed(LED_PIN, ledval);
 }
