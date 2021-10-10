@@ -72,13 +72,8 @@ namespace hf {
             HackflightFull(Receiver * receiver, Mixer * mixer)
                 : HackflightPure(receiver, mixer)
             {
-            }
-
-            void begin(void)
-            {  
                 _state.armed = false;
-
-            } // begin
+            }
 
             void update(
                     uint32_t time_usec,

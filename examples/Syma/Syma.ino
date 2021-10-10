@@ -70,9 +70,6 @@ void setup(void)
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
     h.addPidController(&yawPid);
-
-    // Start Hackflight firmware
-    h.begin();
 }
 
 void loop(void)
