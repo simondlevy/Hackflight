@@ -49,16 +49,14 @@ static hf::IMU imu;
 
 static hf::HackflightFull h(&receiver, &mixer);
 
+static bool running;
+
 void setup(void)
 {
     Serial.begin(115200);
     Wire.begin();
     delay(100);
-
-    stream_startReceiver();
-    stream_startImu();
-    stream_startBrushedMotors(MOTOR_PINS);
-    stream_startLed(LED_PIN);
+    running = false;
 
     // Add sensors
     h.addSensor(&imu);
@@ -71,6 +69,14 @@ void setup(void)
 
 void loop(void)
 {
+    if (!running) {
+        stream_startReceiver();
+        stream_startImu();
+        stream_startBrushedMotors(MOTOR_PINS);
+        stream_startLed(LED_PIN);
+        running = true;
+    }
+
     stream_updateImu();
     stream_updateReceiver();
 
