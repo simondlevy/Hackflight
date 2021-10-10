@@ -53,11 +53,6 @@ static bool running;
 
 void setup(void)
 {
-    Serial.begin(115200);
-    Wire.begin();
-    delay(100);
-    running = false;
-
     // Add sensors
     h.addSensor(&imu);
 
@@ -70,10 +65,17 @@ void setup(void)
 void loop(void)
 {
     if (!running) {
+
+        Serial.begin(115200);
+        Wire.begin();
+        delay(100);
+        running = false;
+
         stream_startReceiver();
         stream_startImu();
         stream_startBrushedMotors(MOTOR_PINS);
         stream_startLed(LED_PIN);
+
         running = true;
     }
 
