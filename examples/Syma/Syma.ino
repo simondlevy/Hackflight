@@ -24,12 +24,12 @@
 #include "hf_pidcontrollers/level.hpp"
 #include "hf_sensors/imu.hpp"
 
+#include "stream_serial.h"
+#include "stream_i2c.h"
 #include "stream_motors.h"
 #include "stream_receiver.h"
 #include "stream_imu.h"
 #include "stream_led.h"
-
-#include <Wire.h>
 
 static const uint8_t MOTOR_PINS[4] = {13, 16, 3, 11};
 
@@ -53,10 +53,7 @@ static bool running;
 
 void setup(void)
 {
-    // Add sensors
     h.addSensor(&imu);
-
-    // Add PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
     h.addPidController(&yawPid);
@@ -66,11 +63,8 @@ void loop(void)
 {
     if (!running) {
 
-        Serial.begin(115200);
-        Wire.begin();
-        delay(100);
-        running = false;
-
+        stream_startSerial();
+        stream_startI2C();
         stream_startReceiver();
         stream_startImu();
         stream_startBrushedMotors(MOTOR_PINS);
