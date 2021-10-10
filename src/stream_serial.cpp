@@ -14,3 +14,8 @@ void stream_startSerial(void)
 {
     Serial.begin(115200);
 }
+
+void stream_writeSerial(uint8_t byte)
+{
+    Serial.write(byte);
+}

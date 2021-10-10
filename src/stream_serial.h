@@ -7,5 +7,10 @@
 
  */
 
+#pragma once
+
+#include <stdint.h>
 
 void stream_startSerial(void);
+
+void stream_writeSerial(uint8_t byte);

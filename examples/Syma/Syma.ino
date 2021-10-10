@@ -89,7 +89,7 @@ void loop(void)
         }
 
         while (h.serialAvailable() > 0) {
-            Serial.write(h.serialRead());
+            stream_writeSerial(h.serialRead());
         }
     }
 
