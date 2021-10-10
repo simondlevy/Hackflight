@@ -7,7 +7,9 @@
 
  */
 
+#define NONEXTERN
 #include "stream_serial.h"
+
 #include <Arduino.h>
 
 void stream_startSerial(void)
@@ -15,7 +17,12 @@ void stream_startSerial(void)
     Serial.begin(115200);
 }
 
-void stream_writeSerial(uint8_t byte)
+void stream_serialWrite(uint8_t byte)
 {
     Serial.write(byte);
+}
+
+void stream_serialRead(void)
+{
+    stream_serialByte = Serial.read();
 }

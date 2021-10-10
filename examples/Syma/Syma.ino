@@ -85,11 +85,12 @@ void loop(void)
     if (serialTaskReady) {
 
         while (Serial.available()) {
-            h.serialParse(Serial.read(), motorvals);
+            stream_serialRead();
+            h.serialParse(stream_serialByte, motorvals);
         }
 
         while (h.serialAvailable() > 0) {
-            stream_writeSerial(h.serialRead());
+            stream_serialWrite(h.serialRead());
         }
     }
 
