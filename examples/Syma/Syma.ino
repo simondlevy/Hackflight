@@ -49,8 +49,6 @@ static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static hf::IMU imu;
 
-hf::SerialTask gcsTask;
-
 static hf::HackflightFull h(&receiver, &mixer);
 
 void setup(void)
@@ -72,9 +70,6 @@ void setup(void)
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
     h.addPidController(&yawPid);
-
-    // Add serial tasks
-    h.addSerialTask(&gcsTask);
 
     // Start Hackflight firmware
     h.begin();
