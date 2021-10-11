@@ -121,6 +121,6 @@ class MspParser(metaclass=abc.ABCMeta):
 
     @staticmethod
     def serialize_SET_MOTOR(m1, m2, m3, m4):
-        message_buffer = struct.pack('ffff', m1, m2, m3, m4)
+        message_buffer = struct.pack('BBBB', m1, m2, m3, m4)
         msg = [len(message_buffer), 215] + list(message_buffer)
         return bytes([ord('$'), ord('M'), ord('<')] + msg + [MspParser.crc8(msg)])

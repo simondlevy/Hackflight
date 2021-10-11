@@ -405,7 +405,7 @@ class GCS(MspParser):
     def sendMotorMessage(self, index, percent):
 
         values = [0]*4
-        values[index-1] = percent / 100.
+        values[index-1] = percent
 
         self.comms.send_message(MspParser.serialize_SET_MOTOR, values)
 

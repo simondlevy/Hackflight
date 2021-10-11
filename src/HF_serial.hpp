@@ -159,19 +159,13 @@ namespace hf {
 
                      case 215:
                          {
-                             float m1 = 0;
-                             memcpy(&m1,  &payload[0], sizeof(float));
-
-                             float m2 = 0;
-                             memcpy(&m2,  &payload[4], sizeof(float));
-
-                             float m3 = 0;
-                             memcpy(&m3,  &payload[8], sizeof(float));
-
-                             float m4 = 0;
-                             memcpy(&m4,  &payload[12], sizeof(float));
+                             float m1 = payload[0] / 100.;
+                             float m2 = payload[1] / 100.;
+                             float m3 = payload[2] / 100.;
+                             float m4 = payload[3] / 100.;
 
                              handle_SET_MOTOR(m1, m2, m3, m4, motorvals);
+
                          } break;
 
                  } // switch (_command)
