@@ -11,6 +11,8 @@
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 
+#include "IEEE754_binary_encoder/float.h"
+
 #include "stream_receiver.h"
 
 namespace hf {
@@ -178,18 +180,8 @@ namespace hf {
 
              } // dispatchMessage 
 
-             void serialize16(int16_t a)
+             void serialize32(uint8_t a[4])
              {
-                 serialize8(a & 0xFF);
-                 serialize8((a >> 8) & 0xFF);
-             }
-
-             void serialize32(uint32_t a)
-             {
-                 serialize8(a & 0xFF);
-                 serialize8((a >> 8) & 0xFF);
-                 serialize8((a >> 16) & 0xFF);
-                 serialize8((a >> 24) & 0xFF);
              }
 
              void prepareToSend(uint8_t type, uint8_t count, uint8_t size)
@@ -201,8 +193,8 @@ namespace hf {
                  addToOutBuf('$');
                  addToOutBuf('M');
                  addToOutBuf('>');
-                 serialize8(count*size);
-                 serialize8(type);
+                 serialize(count*size);
+                 serialize(type);
              }
 
              void addToOutBuf(uint8_t a)
@@ -212,10 +204,10 @@ namespace hf {
 
             void completeSend(void)
             {
-                serialize8(_outbuf.checksum);
+                serialize(_outbuf.checksum);
             }
 
-            void serialize8(uint8_t a)
+            void serialize(uint8_t a)
             {
                 addToOutBuf(a);
                 _outbuf.checksum ^= a;
@@ -228,31 +220,7 @@ namespace hf {
 
             void sendByte(uint8_t src)
             {
-                serialize8(src);
-            }
-
-            void prepareToSendShorts(uint8_t type, uint8_t count)
-            {
-                prepareToSend(type, count, 2);
-            }
-
-            void sendShort(short src)
-            {
-                int16_t a;
-                memcpy(&a, &src, 2);
-                serialize16(a);
-            }
-
-            void prepareToSendInts(uint8_t type, uint8_t count)
-            {
-                prepareToSend(type, count, 4);
-            }
-
-            void sendInt(int32_t src)
-            {
-                int32_t a;
-                memcpy(&a, &src, 4);
-                serialize32(a);
+                serialize(src);
             }
 
             void prepareToSendFloats(uint8_t type, uint8_t count)
@@ -262,12 +230,15 @@ namespace hf {
 
             void sendFloat(float src)
             {
-                uint32_t a;
-                memcpy(&a, &src, 4);
-                serialize32(a);
+                uint8_t a[4] = {};
+                memcpy(a, &src, 4);
+                serialize(a[0]);
+                serialize(a[1]);
+                serialize(a[2]);
+                serialize(a[3]);
             }
 
-    protected:
+        protected:
 
             uint8_t available(void)
             {
