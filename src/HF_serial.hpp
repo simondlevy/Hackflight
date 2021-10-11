@@ -256,14 +256,14 @@ namespace hf {
                 // Checksum transition function
                 crc = parser_state == 3 ? c
                     : parser_state == 4  ?  crc ^ c 
-                    : parser_state == 5 && incoming && index <= size ?  crc ^ c
+                    : incoming && index <= size ?  crc ^ c
                     : parser_state == 5  ?  crc
                     : 0;
 
                 if (parser_state == 0) {
                     Serial1.println();
                 }
-                Debugger::printf(&Serial1, "state: %d  c: %d   crc: %d\n", parser_state, c, crc);
+                Debugger::printf(&Serial1, "state: %d  c: %3d   crc: %d\n", parser_state, c, crc);
 
                 // Parser state transition function
                 parser_state
@@ -277,7 +277,9 @@ namespace hf {
                     : parser_state;
 
                 // Payload accumulation
-                if (in_payload) {
+                if (in_payload && index <= size) {
+                    Debugger::printf(&Serial1, "payload[%d] = %d\n", index-1, c);
+                    payload[index-1] = c;
                 }
 
                 // Message dispatch
