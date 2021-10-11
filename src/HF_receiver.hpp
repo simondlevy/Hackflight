@@ -121,7 +121,10 @@ namespace hf {
                 _demands[DEMANDS_PITCH] *= _demandScale;
                 _demands[DEMANDS_YAW] *= _demandScale;
 
-                memcpy(demands, _demands, sizeof(_demands));
+                demands[DEMANDS_THROTTLE] = _demands[DEMANDS_THROTTLE];
+                demands[DEMANDS_ROLL] = _demands[DEMANDS_ROLL];
+                demands[DEMANDS_PITCH] = _demands[DEMANDS_PITCH];
+                demands[DEMANDS_YAW] = _demands[DEMANDS_YAW];
 
             } // getDemands
 

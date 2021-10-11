@@ -178,10 +178,6 @@ namespace hf {
 
              } // dispatchMessage 
 
-             void serialize32(uint8_t a[4])
-             {
-             }
-
              void prepareToSerialize(uint8_t type, uint8_t count, uint8_t size)
              {
                  _outbuf.size = 0;
