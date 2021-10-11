@@ -10,6 +10,7 @@
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
+#include "HF_debugger.hpp"
 
 #include "stream_receiver.h"
 
@@ -84,12 +85,14 @@ namespace hf {
                  mtype = mixer->getType();
              }
 
-             void handle_SET_MOTOR(float  m1, float  m2, float  m3, float  m4, float * motorvals)
+             void handle_SET_MOTOR(uint8_t index, uint8_t percent, float * motorvals)
              {
-                 motorvals[0] = m1;
-                 motorvals[1] = m2;
-                 motorvals[2] = m3;
-                 motorvals[3] = m4;
+                 motorvals[0] = 0;
+                 motorvals[1] = 0;
+                 motorvals[2] = 0;
+                 motorvals[3] = 0;
+
+                 motorvals[index] = percent / 100.;
              }
 
              void dispatchMessage(uint8_t command, uint8_t * payload, State * state, Mixer * mixer, float * motorvals)
@@ -159,12 +162,10 @@ namespace hf {
 
                      case 215:
                          {
-                             float m1 = payload[0] / 100.;
-                             float m2 = payload[1] / 100.;
-                             float m3 = payload[2] / 100.;
-                             float m4 = payload[3] / 100.;
+                             uint8_t index = payload[0];
+                             uint8_t percent = payload[1];
 
-                             handle_SET_MOTOR(m1, m2, m3, m4, motorvals);
+                             handle_SET_MOTOR(index, percent, motorvals);
 
                          } break;
 
@@ -236,15 +237,6 @@ namespace hf {
 
             void parse(uint8_t c, State * state, Mixer * mixer, float * motorvals)
             {
-                enum {
-                    IDLE,
-                    GOT_START,
-                    GOT_M,
-                    GOT_ARROW,
-                    GOT_SIZE,
-                    IN_PAYLOAD
-                }; 
-
                 static uint8_t parser_state;
                 static uint8_t payload[128];
                 static uint8_t type;
@@ -253,37 +245,44 @@ namespace hf {
                 static uint8_t index;
 
                 // Payload functions
-                size = parser_state == GOT_ARROW ? c : size;
-                index = parser_state == IN_PAYLOAD ? index + 1 : 0;
+                size = parser_state == 3 ? c : size;
+                index = parser_state == 5 ? index + 1 : 0;
                 bool incoming = type >= 200;
-                bool in_payload = incoming && parser_state == IN_PAYLOAD;
+                bool in_payload = incoming && parser_state == 5;
 
                 // Command acquisition function
-                type = parser_state == GOT_SIZE ? c : type;
+                type = parser_state == 4 ? c : type;
 
                 // Checksum transition function
-                crc = parser_state == GOT_ARROW ? c
-                    : parser_state == IN_PAYLOAD  ?  crc ^ c 
+                crc = parser_state == 3 ? c
+                    : parser_state == 4  ?  crc ^ c 
+                    : parser_state == 5 && incoming && index <= size ?  crc ^ c
+                    : parser_state == 5  ?  crc
                     : 0;
+
+                if (parser_state == 0) {
+                    Serial1.println();
+                }
+                Debugger::printf(&Serial1, "state: %d  c: %d   crc: %d\n", parser_state, c, crc);
 
                 // Parser state transition function
                 parser_state
-                    = parser_state == IDLE && c == '$' ? GOT_START
-                    : parser_state == GOT_START && c == 'M' ? GOT_M
-                    : parser_state == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
-                    : parser_state == GOT_ARROW ? GOT_SIZE
-                    : parser_state == GOT_SIZE ? IN_PAYLOAD
-                    : parser_state == IN_PAYLOAD && index < size ? IN_PAYLOAD
-                    : parser_state == IN_PAYLOAD ? IDLE
+                    = parser_state == 0 && c == '$' ? 1
+                    : parser_state == 1 && c == 'M' ? 2
+                    : parser_state == 2 && (c == '<' || c == '>') ? 3
+                    : parser_state == 3 ? 4
+                    : parser_state == 4 ? 5
+                    : parser_state == 5 && index <= size ? 5
+                    : parser_state == 5 ? 0
                     : parser_state;
 
                 // Payload accumulation
                 if (in_payload) {
-                    payload[index-1] = c;
                 }
 
                 // Message dispatch
-                if (parser_state == IDLE && crc == c) {
+                if (parser_state == 0 && crc == c) {
+                    Debugger::printf(&Serial1, "Dispatch: %d\n", type);
                     dispatchMessage(type, payload, state, mixer, motorvals);
                 }
 
