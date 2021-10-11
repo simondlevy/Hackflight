@@ -34,8 +34,6 @@ namespace hf {
 
             Timer timer = Timer(66);
 
-            uint8_t _payload[128] = {};
-
             void handle_RECEIVER_Request(
                      float & c1,
                      float & c2,
@@ -94,12 +92,7 @@ namespace hf {
                  motorvals[3] = m4;
              }
 
-             void collectPayload(uint8_t index, uint8_t value)
-             {
-                 _payload[index] = value;
-             }
-
-             void dispatchMessage(uint8_t command, State * state, Mixer * mixer, float * motorvals)
+             void dispatchMessage(uint8_t command, uint8_t * payload, State * state, Mixer * mixer, float * motorvals)
              {
                  switch (command) {
 
@@ -167,16 +160,16 @@ namespace hf {
                      case 215:
                          {
                              float m1 = 0;
-                             memcpy(&m1,  &_payload[0], sizeof(float));
+                             memcpy(&m1,  &payload[0], sizeof(float));
 
                              float m2 = 0;
-                             memcpy(&m2,  &_payload[4], sizeof(float));
+                             memcpy(&m2,  &payload[4], sizeof(float));
 
                              float m3 = 0;
-                             memcpy(&m3,  &_payload[8], sizeof(float));
+                             memcpy(&m3,  &payload[8], sizeof(float));
 
                              float m4 = 0;
-                             memcpy(&m4,  &_payload[12], sizeof(float));
+                             memcpy(&m4,  &payload[12], sizeof(float));
 
                              handle_SET_MOTOR(m1, m2, m3, m4, motorvals);
                          } break;
@@ -299,7 +292,7 @@ namespace hf {
                 }; 
 
                 static uint8_t parser_state;
-
+                static uint8_t payload[128];
                 static uint8_t type;
                 static uint8_t crc;
                 static uint8_t size;
@@ -332,12 +325,12 @@ namespace hf {
 
                 // Payload accumulation
                 if (in_payload) {
-                    collectPayload(index-1, c);
+                    payload[index-1] = c;
                 }
 
                 // Message dispatch
                 if (parser_state == IDLE && crc == c) {
-                    dispatchMessage(type, state, mixer, motorvals);
+                    dispatchMessage(type, payload, state, mixer, motorvals);
                 }
 
             } // parse
