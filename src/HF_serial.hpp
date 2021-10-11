@@ -36,8 +36,6 @@ namespace hf {
 
             uint8_t _payload[128] = {};
 
-            bool _ready = false;
-
             void handle_RECEIVER_Request(
                      float & c1,
                      float & c2,
@@ -347,13 +345,6 @@ namespace hf {
             bool ready(uint32_t time_usec)
             {
                 return timer.ready(time_usec);
-            }
-
-    public:
-
-            bool ready(void)
-            {
-                return _ready;
             }
 
     }; // class SerialTask
