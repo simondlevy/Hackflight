@@ -15,11 +15,6 @@
 
 namespace hf {
 
-    typedef struct {
-        uint8_t size;
-        float values[32];
-    } serial_output_t;
-
     class SerialTask {
 
         friend class HackflightFull;
@@ -35,11 +30,7 @@ namespace hf {
 
             } serial_buffer_t;
 
-            static const uint8_t MAXMSG = 255;
-
             serial_buffer_t _outbuf = {};
-
-            bool _useTelemetryPort = false;
 
             Timer timer = Timer(66);
 
@@ -285,11 +276,6 @@ namespace hf {
                 serialize32(a);
             }
 
-            void begin(void)
-            {
-                memset(&_outbuf, 0, sizeof(_outbuf));
-            }
-
     protected:
 
             uint8_t available(void)
@@ -364,11 +350,6 @@ namespace hf {
             }
 
     public:
-
-            SerialTask(bool secondaryPort=false)
-            {
-                _useTelemetryPort = secondaryPort;
-            }
 
             bool ready(void)
             {
