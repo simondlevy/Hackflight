@@ -107,13 +107,13 @@ namespace hf {
                              float c5 = 0;
                              float c6 = 0;
                              handle_RECEIVER_Request(c1, c2, c3, c4, c5, c6);
-                             prepareToSendFloats(command, 6);
-                             sendFloat(c1);
-                             sendFloat(c2);
-                             sendFloat(c3);
-                             sendFloat(c4);
-                             sendFloat(c5);
-                             sendFloat(c6);
+                             prepareToSerializeFloats(command, 6);
+                             serializeFloat(c1);
+                             serializeFloat(c2);
+                             serializeFloat(c3);
+                             serializeFloat(c4);
+                             serializeFloat(c5);
+                             serializeFloat(c6);
                              completeSend();
                          } break;
 
@@ -134,19 +134,19 @@ namespace hf {
                              handle_STATE_Request(
                                      state,
                                      x, dx, y, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi);
-                             prepareToSendFloats(command, 12);
-                             sendFloat(x);
-                             sendFloat(dx);
-                             sendFloat(y);
-                             sendFloat(dy);
-                             sendFloat(z);
-                             sendFloat(dz);
-                             sendFloat(phi);
-                             sendFloat(dphi);
-                             sendFloat(theta);
-                             sendFloat(dtheta);
-                             sendFloat(psi);
-                             sendFloat(dpsi);
+                             prepareToSerializeFloats(command, 12);
+                             serializeFloat(x);
+                             serializeFloat(dx);
+                             serializeFloat(y);
+                             serializeFloat(dy);
+                             serializeFloat(z);
+                             serializeFloat(dz);
+                             serializeFloat(phi);
+                             serializeFloat(dphi);
+                             serializeFloat(theta);
+                             serializeFloat(dtheta);
+                             serializeFloat(psi);
+                             serializeFloat(dpsi);
                              completeSend();
                          } break;
 
@@ -154,8 +154,8 @@ namespace hf {
                          {
                              uint8_t mtype = 0;
                              handle_ACTUATOR_TYPE_Request(mtype, mixer);
-                             prepareToSendBytes(command, 1);
-                             sendByte(mtype);
+                             prepareToSerializeBytes(command, 1);
+                             serialize(mtype);
                              completeSend();
                          } break;
 
@@ -184,7 +184,7 @@ namespace hf {
              {
              }
 
-             void prepareToSend(uint8_t type, uint8_t count, uint8_t size)
+             void prepareToSerialize(uint8_t type, uint8_t count, uint8_t size)
              {
                  _outbuf.size = 0;
                  _outbuf.index = 0;
@@ -213,22 +213,17 @@ namespace hf {
                 _outbuf.checksum ^= a;
             }
 
-            void prepareToSendBytes(uint8_t type, uint8_t count)
+            void prepareToSerializeBytes(uint8_t type, uint8_t count)
             {
-                prepareToSend(type, count, 1);
+                prepareToSerialize(type, count, 1);
             }
 
-            void sendByte(uint8_t src)
+            void prepareToSerializeFloats(uint8_t type, uint8_t count)
             {
-                serialize(src);
+                prepareToSerialize(type, count, 4);
             }
 
-            void prepareToSendFloats(uint8_t type, uint8_t count)
-            {
-                prepareToSend(type, count, 4);
-            }
-
-            void sendFloat(float src)
+            void serializeFloat(float src)
             {
                 uint8_t a[4] = {};
                 memcpy(a, &src, 4);
