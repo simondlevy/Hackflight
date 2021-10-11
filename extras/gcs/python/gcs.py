@@ -19,6 +19,8 @@ from motors import MotorsQuadXMW, MotorsCoaxial
 from receiver import Receiver
 from resources import resource_path
 
+from debugging import debug
+
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
 
@@ -166,7 +168,12 @@ class GCS(MspParser):
     def handle_RECEIVER(self, c1, c2, c3, c4, c5, c6):
 
         # Display throttle as [0,1], other channels as [-1,+1]
-        self.rxchannels = c1/2.+.5, c2, c3, c4, c5, c6
+        self.rxchannels = (self._float(c1)/2.+.5,
+                           self._float(c2),
+                           self._float(c3),
+                           self._float(c4),
+                           self._float(c5),
+                           self._float(c6))
 
         # As soon as we handle the callback from one request, send another
         # request, if receiver dialog is running
@@ -176,7 +183,9 @@ class GCS(MspParser):
     def handle_STATE(self, _x, _dx, _y, _dy, _z,
                      _dz, phi, _dphi, theta, _dtheta, psi, _dpsi):
 
-        self.roll_pitch_yaw = phi, theta, psi
+        self.roll_pitch_yaw = (self._float(phi),
+                               self._float(theta),
+                               self._float(psi))
 
         self.gotimu = True
 
@@ -206,6 +215,10 @@ class GCS(MspParser):
         d = dialog(self)
         d.stop()
         return d
+
+    # unsigned int => signed float conversion
+    def _float(self, intval):
+        return intval / 1000 - 2
 
     # Callback for IMU button
     def _imu_callback(self):

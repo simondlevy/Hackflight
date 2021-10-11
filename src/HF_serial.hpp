@@ -11,8 +11,6 @@
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 
-#include "IEEE754_binary_encoder/float.h"
-
 #include "stream_receiver.h"
 
 namespace hf {
@@ -223,14 +221,14 @@ namespace hf {
                 prepareToSerialize(type, count, 4);
             }
 
-            void serializeFloat(float src)
+            void serializeFloat(float value)
             {
-                uint8_t a[4] = {};
-                memcpy(a, &src, 4);
-                serialize(a[0]);
-                serialize(a[1]);
-                serialize(a[2]);
-                serialize(a[3]);
+                uint32_t uintval = 1000 * (value + 2);
+
+                serialize(uintval & 0xFF);
+                serialize((uintval>>8) & 0xFF);
+                serialize((uintval>>16) & 0xFF);
+                serialize((uintval>>24) & 0xFF);
             }
 
         protected:
