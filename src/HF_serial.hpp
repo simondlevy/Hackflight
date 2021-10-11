@@ -247,8 +247,7 @@ namespace hf {
                 // Payload functions
                 size = parser_state == 3 ? c : size;
                 index = parser_state == 5 ? index + 1 : 0;
-                bool incoming = type >= 200;
-                bool in_payload = incoming && parser_state == 5;
+                bool in_payload = type >= 200 && parser_state == 5 && index <= size;
 
                 // Command acquisition function
                 type = parser_state == 4 ? c : type;
@@ -256,7 +255,7 @@ namespace hf {
                 // Checksum transition function
                 crc = parser_state == 3 ? c
                     : parser_state == 4  ?  crc ^ c 
-                    : incoming && index <= size ?  crc ^ c
+                    : in_payload ?  crc ^ c
                     : parser_state == 5  ?  crc
                     : 0;
 
@@ -272,12 +271,12 @@ namespace hf {
                     : parser_state == 2 && (c == '<' || c == '>') ? 3
                     : parser_state == 3 ? 4
                     : parser_state == 4 ? 5
-                    : parser_state == 5 && index <= size ? 5
+                    : parser_state == 5 && in_payload ? 5
                     : parser_state == 5 ? 0
                     : parser_state;
 
                 // Payload accumulation
-                if (in_payload && index <= size) {
+                if (in_payload) {
                     Debugger::printf(&Serial1, "payload[%d] = %d\n", index-1, c);
                     payload[index-1] = c;
                 }
