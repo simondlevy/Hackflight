@@ -52,7 +52,7 @@ namespace hf {
             }
 
              void handle_STATE_Request(
-                     State * state,
+                     state_t & state,
                      float & x,
                      float & dx,
                      float & y,
@@ -66,18 +66,18 @@ namespace hf {
                      float & psi,
                      float & dpsi)
              {
-                 x = state->x[State::X];
-                 dx = state->x[State::DX];
-                 y = state->x[State::Y];
-                 dy = state->x[State::DY];
-                 z = state->x[State::Z];
-                 dz = state->x[State::DZ];
-                 phi = state->x[State::PHI];
-                 dphi = state->x[State::DPHI];
-                 theta = state->x[State::THETA];
-                 dtheta = state->x[State::DTHETA];
-                 psi = state->x[State::PSI];
-                 dpsi = state->x[State::DPSI];
+                 x = state.x;
+                 dx = state.dx;
+                 y = state.y;
+                 dy = state.dy;
+                 z = state.z;
+                 dz = state.dz;
+                 phi = state.phi;
+                 dphi = state.dphi;
+                 theta = state.theta;
+                 dtheta = state.dtheta;
+                 psi = state.psi;
+                 dpsi = state.dpsi;
              }
 
              void handle_ACTUATOR_TYPE_Request(uint8_t & mtype, Mixer * mixer)
@@ -95,7 +95,7 @@ namespace hf {
                  motorvals[index-1] = percent / 100.;
              }
 
-             void dispatchMessage(uint8_t command, uint8_t * payload, State * state, Mixer * mixer, float * motorvals)
+             void dispatchMessage(uint8_t command, uint8_t * payload, state_t & state, Mixer * mixer, float * motorvals)
              {
                  switch (command) {
 
@@ -235,7 +235,7 @@ namespace hf {
                 return _outbuf.values[_outbuf.index++];
             }
 
-            void parse(uint8_t c, State * state, Mixer * mixer, float * motorvals)
+            void parse(uint8_t c, state_t & state, Mixer * mixer, float * motorvals)
             {
                 static uint8_t parser_state;
                 static uint8_t payload[128];

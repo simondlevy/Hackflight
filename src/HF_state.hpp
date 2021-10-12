@@ -12,6 +12,24 @@
 
 namespace hf {
 
+    typedef struct {
+
+        float x;
+        float dx;
+        float y;
+        float dy;
+        float z;
+        float dz;
+        float phi;
+        float dphi;
+        float theta;
+        float dtheta;
+        float psi;
+        float dpsi;
+
+    } state_t;
+
+
     class State {
 
         friend class HackflightPure;
@@ -21,9 +39,9 @@ namespace hf {
 
             static constexpr float MAX_ARMING_ANGLE_DEGREES = 25;
 
-            bool safeAngle(uint8_t axis)
+            bool safeAngle(float angle)
             {
-                return fabs(x[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+                return fabs(angle) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
         public:
@@ -31,10 +49,7 @@ namespace hf {
             bool armed = false;
             bool failsafe = false;
 
-            // See Bouabdallah et al. (2004)
-            enum {X, DX, Y, DY, Z, DZ, PHI, DPHI, THETA, DTHETA, PSI, DPSI, SIZE};
-
-            float x[SIZE];
+            state_t state;
 
             State(bool start_armed=false)
             {
@@ -43,7 +58,7 @@ namespace hf {
 
             bool safeToArm(void)
             {
-                return safeAngle(PHI) && safeAngle(THETA);
+                return safeAngle(state.phi) && safeAngle(state.theta);
             }
 
     }; // class State

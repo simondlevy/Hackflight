@@ -174,10 +174,8 @@ namespace hf {
                 _usec = 0;
             }
 
-            virtual void modifyState(State * state, float time)
+            virtual void modifyState(state_t & state, float time)
             {
-                State * hfstate = (State *)state;
-
                 (void)time;
 
                 // Check data ready
@@ -208,16 +206,16 @@ namespace hf {
                         madgwick.q2,
                         madgwick.q3,
                         madgwick.q4, 
-                        hfstate->x[State::PHI],
-                        hfstate->x[State::THETA],
-                        hfstate->x[State::PSI]);
+                        state.phi,
+                        state.theta,
+                        state.psi);
 
                 // Adjust rotation so that nose-up is positive
-                hfstate->x[State::THETA] = -hfstate->x[State::THETA];
+                state.theta = -state.theta;
 
                 // Convert heading from [-pi,+pi] to [0,2*pi]
-                if (hfstate->x[State::PSI] < 0) {
-                    hfstate->x[State::PSI] += 2*M_PI;
+                if (state.psi < 0) {
+                    state.psi += 2*M_PI;
                 }
 
             } // modifyState

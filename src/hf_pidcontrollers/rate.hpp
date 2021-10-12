@@ -45,7 +45,7 @@ namespace hf {
 
         protected:
 
-            virtual void modifyDemands(float * state, demands_t & demands, bool ready) override
+            virtual void modifyDemands(state_t & state, demands_t & demands, bool ready) override
             {
                 // Controller state
                 static float rollErrI_;
@@ -53,13 +53,11 @@ namespace hf {
                 static float pitchErrI_;
                 static float pitchErr_;
 
-                update(&demands.roll, state[State::DPHI],
-                        &rollErrI_, &rollErr_, ready);
+                update(&demands.roll, state.dphi, &rollErrI_, &rollErr_, ready);
 
                 // Pitch demand is nose-down positive, so we negate
                 // pitch-forward rate (nose-down negative)
-                update(&demands.pitch, -state[State::DTHETA],
-                        &pitchErrI_, &pitchErr_, ready);
+                update(&demands.pitch, -state.dtheta, &pitchErrI_, &pitchErr_, ready);
             }
 
         public:

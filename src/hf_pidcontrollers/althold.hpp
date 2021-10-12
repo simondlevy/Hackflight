@@ -32,14 +32,14 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(float * state, demands_t & demands, bool ready) override
+            void modifyDemands(state_t & state, demands_t & demands, bool ready) override
             {
                 // Controller state ---------------------------
                 static float errorI_;         
                 static float altitudeTarget_; 
                 static bool inBand_;  
 
-                float altitude = state[State::Z];
+                float altitude = state.z;
 
                 // Is stick demand in deadband?
                 bool inBand = fabs(demands.throttle) < _stickDeadband; 
@@ -54,7 +54,7 @@ namespace hf {
                     : _pilotVelZMax * demands.throttle;
 
                 // Compute error as scaled target minus actual
-                float error = targetVelocity - state[State::DZ];
+                float error = targetVelocity - state.dz;
 
                 // Compute I term, avoiding windup
                 errorI_ = newInBand ? 0

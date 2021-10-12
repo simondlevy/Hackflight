@@ -29,19 +29,17 @@ namespace hf {
 
             float _period = 0;
 
-            // Support using temporal first different to compute State::DZ
+            // Support using temporal first different to compute DZ
             float _dist_curr = 0;
             float _time_prev = 0;
 
         protected:
 
-            virtual void modifyState(State * state, float time) override
+            virtual void modifyState(state_t & state, float time) override
             {
-                State * hfstate = (State *)state;
+                state.dz = (_dist_curr - state.z) / _period;
 
-                hfstate->x[State::DZ] = (_dist_curr - hfstate->x[State::Z]) / _period;
-
-                hfstate->x[State::Z] = _dist_curr;
+                state.z = _dist_curr;
             }
 
             virtual void begin(void) override

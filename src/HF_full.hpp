@@ -92,7 +92,7 @@ namespace hf {
 
             void serialParse(uint8_t byte, float * motorvals)
             {
-                serialTask.parse(byte, &_state, _mixer, motorvals);
+                serialTask.parse(byte, _state.state, _mixer, motorvals);
             }
 
             uint8_t serialAvailable(void)

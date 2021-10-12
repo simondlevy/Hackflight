@@ -33,16 +33,16 @@ namespace hf {
 
         protected:
 
-            virtual void modifyState(State * state, uint32_t time_usec)
+            virtual void modifyState(state_t & state, uint32_t time_usec)
             {
                 (void)time_usec;
 
                 if (stream_imuGotGyrometer) {
 
                     // Convert degrees / sec to radians / sec
-                    state->x[State::DPHI]   = radians(stream_imuGyrometerX);
-                    state->x[State::DTHETA] = radians(stream_imuGyrometerY);
-                    state->x[State::DPSI]   = radians(stream_imuGyrometerZ);
+                    state.dphi   = radians(stream_imuGyrometerX);
+                    state.dtheta = radians(stream_imuGyrometerY);
+                    state.dpsi   = radians(stream_imuGyrometerZ);
                 }
 
                 if (stream_imuGotQuaternion) {
@@ -52,16 +52,16 @@ namespace hf {
                             stream_imuQuaternionX,
                             stream_imuQuaternionY,
                             stream_imuQuaternionZ, 
-                            state->x[State::PHI],
-                            state->x[State::THETA],
-                            state->x[State::PSI]);
+                            state.phi,
+                            state.theta,
+                            state.psi);
 
                     // Adjust rotation so that nose-up is positive
-                    state->x[State::THETA] = -state->x[State::THETA];
+                    state.theta = -state.theta;
 
                     // Convert heading from [-pi,+pi] to [0,2*pi]
-                    if (state->x[State::PSI] < 0) {
-                        state->x[State::PSI] += 2*M_PI;
+                    if (state.psi < 0) {
+                        state.psi += 2*M_PI;
                     }
                 }
 

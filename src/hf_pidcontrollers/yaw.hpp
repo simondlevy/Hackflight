@@ -25,12 +25,12 @@ namespace hf {
             float _windupMax = 0;
             float _rateMax = 0;
 
-            virtual void modifyDemands(float * state, demands_t & demands, bool ready) override
+            virtual void modifyDemands(state_t & state, demands_t & demands, bool ready) override
             {
                 static float errorI_;
 
                 // Compute error as difference between yaw demand and angular velocity
-                float error = demands.yaw - state[State::DPSI];
+                float error = demands.yaw - state.dpsi;
 
                 // Compute I term
                 errorI_ = fabs(error) > _rateMax ? 0

@@ -30,7 +30,7 @@ namespace hf {
             void checkSensors(uint32_t time_usec, State * state)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->modifyState((State *)state, time_usec);
+                    _sensors[k]->modifyState(_state.state, time_usec);
                 }
             }
 
@@ -70,7 +70,7 @@ namespace hf {
                 // Periodically apply PID controllers to demands
                 bool ready = _timer.ready(time_usec);
                 for (uint8_t k=0; k<_controller_count; ++k) {
-                    _controllers[k]->modifyDemands(_state.x, demands, ready); 
+                    _controllers[k]->modifyDemands(_state.state, demands, ready); 
 
                 }
 

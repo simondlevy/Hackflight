@@ -19,7 +19,7 @@ namespace hf {
 
         protected:
 
-            virtual void modifyDemands(float * statevec, demands_t & demands, bool ready) = 0;
+            virtual void modifyDemands(state_t & state, demands_t & demands, bool ready) = 0;
 
     };  // class PidController
 
