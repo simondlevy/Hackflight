@@ -8,6 +8,7 @@
  */
 
 #include "HF_full.hpp"
+#include "HF_debugger.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 
 #include "stream_serial.h"
@@ -67,6 +68,10 @@ void loop(void)
             stream_serialWrite(h.serialRead());
         }
     }
+
+    
+    hf::Debugger::printf(&Serial1, "%3.3f  %3.3f  %3.3f  %3.3f\n", 
+        motorvals[0], motorvals[1], motorvals[2], motorvals[3]);
 
     stream_writeLed(LED_PIN, ledval);
 }

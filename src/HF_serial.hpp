@@ -92,7 +92,7 @@ namespace hf {
                  motorvals[2] = 0;
                  motorvals[3] = 0;
 
-                 motorvals[index] = percent / 100.;
+                 motorvals[index-1] = percent / 100.;
              }
 
              void dispatchMessage(uint8_t command, uint8_t * payload, State * state, Mixer * mixer, float * motorvals)
@@ -259,10 +259,12 @@ namespace hf {
                     : parser_state == 5  ?  crc
                     : 0;
 
+                /*
                 if (parser_state == 0) {
                     Serial1.println();
                 }
                 Debugger::printf(&Serial1, "state: %d  c: %3d   crc: %d\n", parser_state, c, crc);
+                */
 
                 // Parser state transition function
                 parser_state
@@ -277,13 +279,13 @@ namespace hf {
 
                 // Payload accumulation
                 if (in_payload) {
-                    Debugger::printf(&Serial1, "payload[%d] = %d\n", index-1, c);
+                    // Debugger::printf(&Serial1, "payload[%d] = %d\n", index-1, c);
                     payload[index-1] = c;
                 }
 
                 // Message dispatch
                 if (parser_state == 0 && crc == c) {
-                    Debugger::printf(&Serial1, "Dispatch: %d\n", type);
+                    // Debugger::printf(&Serial1, "Dispatch: %d\n", type);
                     dispatchMessage(type, payload, state, mixer, motorvals);
                 }
 

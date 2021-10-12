@@ -35,8 +35,6 @@ class Comms:
 
         msg = serializer(*contents)
 
-        debug(msg[-1])
-
         self.port.write(msg)
 
     def send_request(self, request):
