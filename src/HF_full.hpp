@@ -20,7 +20,7 @@ namespace hf {
 
         private:
 
-            SerialTask _serialTask;
+            SerialComms _serialTask;
             Safety _safety;
 
             void checkSafety(state_t & state, motors_t & motors)

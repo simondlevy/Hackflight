@@ -15,7 +15,7 @@
 
 namespace hf {
 
-    class SerialTask {
+    class SerialComms {
 
         friend class HackflightFull;
 
@@ -294,6 +294,6 @@ namespace hf {
 
             } // parse
 
-    }; // class SerialTask
+    }; // class SerialComms
 
 } // namespace hf

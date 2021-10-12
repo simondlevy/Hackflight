@@ -19,7 +19,7 @@ namespace hf {
         friend class ClosedLoopTask;
         friend class HackflightPure;
         friend class HackflightFull;
-        friend class SerialTask;
+        friend class SerialComms;
         friend class PidTask;
 
         private: 
