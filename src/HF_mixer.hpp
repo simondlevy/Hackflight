@@ -20,7 +20,7 @@ namespace hf {
         private:
 
             // Custom mixer data per motor
-            typedef struct motorMixer_t {
+            typedef struct {
                 int8_t throttle; // T
                 int8_t roll; 	 // A
                 int8_t pitch;	 // E

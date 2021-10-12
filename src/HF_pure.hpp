@@ -65,7 +65,8 @@ namespace hf {
             {
                 // Start with demands from open-loop controller
                 float demands[Receiver::MAX_DEMANDS] = {};
-                _receiver->getDemands(demands);
+                demands_t dmnds = {};
+                _receiver->getDemands(demands, &dmnds);
 
                 // Periodically apply PID controllers to demands
                 bool ready = _timer.ready(time_usec);

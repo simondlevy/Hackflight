@@ -89,11 +89,8 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            void getDemands(float * demands)
+            void getDemands(float * demands, demands_t * dmds)
             {
-                // Wait till there's a new frame
-                if (stream_receiverGotNewFrame) return;
-
                 // Convert raw [-1,+1] to absolute value
                 _demands[DEMANDS_ROLL]  = fabs(stream_receiverRoll);
                 _demands[DEMANDS_PITCH] = fabs(stream_receiverPitch);

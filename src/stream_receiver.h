@@ -10,7 +10,6 @@
 #define EXTERN extern
 #endif
 
-EXTERN bool stream_receiverGotNewFrame;
 EXTERN bool stream_receiverLostSignal;
 EXTERN float stream_receiverThrottle;
 EXTERN float stream_receiverRoll;
