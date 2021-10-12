@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "HF_timer.hpp"
 #include "HF_state.hpp"
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
@@ -32,8 +31,6 @@ namespace hf {
             } serial_buffer_t;
 
             serial_buffer_t _outbuf = {};
-
-            Timer timer = Timer(66);
 
             void handle_RECEIVER_Request(
                      float & c1,
@@ -296,11 +293,6 @@ namespace hf {
                 }
 
             } // parse
-
-            bool ready(uint32_t time_usec)
-            {
-                return timer.ready(time_usec);
-            }
 
     }; // class SerialTask
 

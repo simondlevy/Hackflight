@@ -71,10 +71,7 @@ namespace hf {
                 }
 
                 // Use updated demands to run motors
-                motors.ready = !_state.failsafe && _state.armed && !_receiver->inactive();
-                if (!_state.failsafe && _state.armed && !_receiver->inactive()) {
-                    _mixer->run(demands, motors);
-                }
+                _mixer->run(demands, motors);
 
                 // Check sensors
                 checkSensors(time_usec, &_state);

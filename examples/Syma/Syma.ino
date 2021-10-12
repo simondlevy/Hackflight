@@ -80,24 +80,17 @@ void loop(void)
     bool serialTaskReady = false;
     hf::motors_t motors = {};
 
-    h.update(micros(), motors, ledval, serialTaskReady);
+    h.update(micros(), motors, ledval);
 
-    if (serialTaskReady) {
+    stream_serialUpdate();
 
-        while (true) {
-            stream_serialUpdate();
-            if (stream_serialAvailable) {
-                stream_serialRead();
-                h.serialParse(stream_serialByte, motors);
-            }
-            else {
-                break;
-            }
-        }
+    if (stream_serialAvailable) {
+        stream_serialRead();
+        h.serialParse(stream_serialByte, motors);
+    }
 
-        while (h.serialAvailable() > 0) {
-            stream_serialWrite(h.serialRead());
-        }
+    if (h.serialAvailable() > 0) {
+        stream_serialWrite(h.serialRead());
     }
 
     if (motors.ready) {

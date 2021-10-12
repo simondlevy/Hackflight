@@ -78,15 +78,11 @@ namespace hf {
                 _state.armed = false;
             }
 
-            void update(
-                    uint32_t time_usec,
-                    motors_t & motors,
-                    bool & led,
-                    bool & serialReady)
+            void update( uint32_t time_usec, motors_t & motors, bool & led)
             {
                 HackflightPure::update(time_usec, motors);
 
-                serialReady = serialTask.ready(time_usec);
+                motors.ready = _state.armed;
 
                 checkSafety(_state, motors);
 
