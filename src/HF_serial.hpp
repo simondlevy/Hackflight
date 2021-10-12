@@ -85,17 +85,17 @@ namespace hf {
                  mtype = mixer->getType();
              }
 
-             void handle_SET_MOTOR(uint8_t index, uint8_t percent, float * motorvals)
+             void handle_SET_MOTOR(uint8_t index, uint8_t percent, motors_t & motors)
              {
-                 motorvals[0] = 0;
-                 motorvals[1] = 0;
-                 motorvals[2] = 0;
-                 motorvals[3] = 0;
+                 motors.values[0] = 0;
+                 motors.values[1] = 0;
+                 motors.values[2] = 0;
+                 motors.values[3] = 0;
 
-                 motorvals[index-1] = percent / 100.;
+                 motors.values[index-1] = percent / 100.;
              }
 
-             void dispatchMessage(uint8_t command, uint8_t * payload, state_t & state, Mixer * mixer, float * motorvals)
+             void dispatchMessage(uint8_t command, uint8_t * payload, state_t & state, Mixer * mixer, motors_t & motors)
              {
                  switch (command) {
 
@@ -165,7 +165,7 @@ namespace hf {
                              uint8_t index = payload[0];
                              uint8_t percent = payload[1];
 
-                             handle_SET_MOTOR(index, percent, motorvals);
+                             handle_SET_MOTOR(index, percent, motors);
 
                          } break;
 
@@ -235,7 +235,7 @@ namespace hf {
                 return _outbuf.values[_outbuf.index++];
             }
 
-            void parse(uint8_t c, state_t & state, Mixer * mixer, float * motorvals)
+            void parse(uint8_t c, state_t & state, Mixer * mixer, motors_t & motors)
             {
                 static uint8_t parser_state;
                 static uint8_t payload[128];
@@ -286,7 +286,7 @@ namespace hf {
                 // Message dispatch
                 if (parser_state == 0 && crc == c) {
                     // Debugger::printf(&Serial1, "Dispatch: %d\n", type);
-                    dispatchMessage(type, payload, state, mixer, motorvals);
+                    dispatchMessage(type, payload, state, mixer, motors);
                 }
 
             } // parse

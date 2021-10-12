@@ -9,6 +9,7 @@
 #pragma once
 
 #include "HF_demands.hpp"
+#include "HF_motors.hpp"
 #include "HF_filters.hpp"
 
 namespace hf {
@@ -25,12 +26,20 @@ namespace hf {
                 int8_t roll; 	 // A
                 int8_t pitch;	 // E
                 int8_t yaw;	     // R
-            } motorMixer_t;
+            } mixer_t;
 
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
             uint8_t _nmotors = 0;
+
+            static float motorfun(demands_t & demands, mixer_t & mix)
+            {
+                return demands.throttle * mix.throttle + 
+                       demands.roll     * mix.roll +     
+                       demands.pitch    * mix.pitch +   
+                       demands.yaw      * mix.yaw;      
+            }
 
         protected:
 
@@ -41,7 +50,7 @@ namespace hf {
 
         public:
 
-            motorMixer_t motorDirections[MAXMOTORS];
+            mixer_t motorDirections[MAXMOTORS];
 
             virtual float constrainMotorValue(uint8_t index, float value)
             {
@@ -49,36 +58,38 @@ namespace hf {
                 return Filter::constrainMinMax(value, 0, 1);
             }
 
-            void run(demands_t & demands, float * motorvals)
+            void run(demands_t & demands, motors_t & motors)
             {
                 // Map throttle demand from [-1,+1] to [0,1]
                 demands.throttle = (demands.throttle + 1) / 2;
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
 
-                    motorvals[i] = 
+                    motors.values[i] = 
                         (demands.throttle * motorDirections[i].throttle + 
                          demands.roll     * motorDirections[i].roll +     
                          demands.pitch    * motorDirections[i].pitch +   
                          demands.yaw      * motorDirections[i].yaw);      
                 }
 
-                float maxMotor = motorvals[0];
+                float maxMotor = motors.values[0];
 
-                for (uint8_t i = 1; i < _nmotors; i++)
-                    if (motorvals[i] > maxMotor)
-                        maxMotor = motorvals[i];
+                for (uint8_t i = 1; i < _nmotors; i++) {
+                    if (motors.values[i] > maxMotor) {
+                        maxMotor = motors.values[i];
+                    }
+                }
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
 
                     // This is a way to still have good gyro corrections if at
                     // least one motor reaches its max
                     if (maxMotor > 1) {
-                        motorvals[i] -= maxMotor - 1;
+                        motors.values[i] -= maxMotor - 1;
                     }
 
                     // Keep motor values in appropriate interval
-                    motorvals[i] = constrainMotorValue(i, motorvals[i]);
+                    motors.values[i] = constrainMotorValue(i, motors.values[i]);
                 }
             }
 

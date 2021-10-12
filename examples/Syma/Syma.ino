@@ -76,11 +76,11 @@ void loop(void)
     stream_updateImu();
     stream_updateReceiver();
 
-    static float motorvals[4]; // XXX needs to be static
     bool ledval = false;
     bool serialTaskReady = false;
+    static hf::motors_t motors = {};
 
-    h.update(micros(), motorvals, &ledval, &serialTaskReady);
+    h.update(micros(), motors, ledval, serialTaskReady);
 
     if (serialTaskReady) {
 
@@ -88,7 +88,7 @@ void loop(void)
             stream_serialUpdate();
             if (stream_serialAvailable) {
                 stream_serialRead();
-                h.serialParse(stream_serialByte, motorvals);
+                h.serialParse(stream_serialByte, motors);
             }
             else {
                 break;
@@ -100,6 +100,6 @@ void loop(void)
         }
     }
 
-    stream_writeBrushedMotors(MOTOR_PINS, motorvals);
+    stream_writeBrushedMotors(MOTOR_PINS, motors.values);
     stream_writeLed(LED_PIN, ledval);
 }

@@ -21,22 +21,22 @@ namespace hf {
 
             SerialTask serialTask;
 
-            void checkSafety(State * state, float * motorvals)
+            void checkSafety(State & state, motors_t & motors)
             {
                 // Safety
                 static bool _safeToArm;
 
                 // Sync failsafe to open-loop-controller
-                if (stream_receiverLostSignal && state->armed) {
-                    cutMotors(motorvals);
-                    state->armed = false;
-                    state->failsafe = true;
+                if (stream_receiverLostSignal && state.armed) {
+                    cutMotors(motors);
+                    state.armed = false;
+                    state.failsafe = true;
                     return;
                 }
 
                 // Disarm
-                if (state->armed && !_receiver->inArmedState()) {
-                    state->armed = false;
+                if (state.armed && !_receiver->inArmedState()) {
+                    state.armed = false;
                 } 
 
                 // Avoid arming when controller is in armed state
@@ -46,25 +46,28 @@ namespace hf {
 
                 // Arm after lots of safety checks
                 if (_safeToArm
-                    && !state->armed
-                    && !state->failsafe 
-                    && state->safeToArm()
+                    && !state.armed
+                    && !state.failsafe 
+                    && state.safeToArm()
                     && _receiver->inactive()
                     && _receiver->inArmedState()
                     ) {
-                    state->armed = true;
+                    state.armed = true;
                 }
 
                 // Cut motors on inactivity
-                if (state->armed && _receiver->inactive()) {
-                    cutMotors(motorvals);
+                if (state.armed && _receiver->inactive()) {
+                    cutMotors(motors);
                 }
 
             } // checkSafety
 
-            void cutMotors(float * motorvals)
+            static void cutMotors(motors_t & motors)
             {
-                memset(motorvals, 0, 4*sizeof(float));  // XXX Support other than 4
+                motors.values[0] = 0;
+                motors.values[1] = 0;
+                motors.values[2] = 0;
+                motors.values[3] = 0;
             }
 
         public:
@@ -77,22 +80,22 @@ namespace hf {
 
             void update(
                     uint32_t time_usec,
-                    float * motorvals,
-                    bool * led,
-                    bool * serialReady)
+                    motors_t & motors,
+                    bool & led,
+                    bool & serialReady)
             {
-                HackflightPure::update(time_usec, motorvals);
+                HackflightPure::update(time_usec, motors);
 
-                *serialReady = serialTask.ready(time_usec);
+                serialReady = serialTask.ready(time_usec);
 
-                checkSafety(&_state, motorvals);
+                checkSafety(_state, motors);
 
-                *led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _state.armed;
+                led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _state.armed;
             }
 
-            void serialParse(uint8_t byte, float * motorvals)
+            void serialParse(uint8_t byte, motors_t & motors)
             {
-                serialTask.parse(byte, _state.state, _mixer, motorvals);
+                serialTask.parse(byte, _state.state, _mixer, motors);
             }
 
             uint8_t serialAvailable(void)

@@ -14,6 +14,7 @@
 #include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 #include "HF_state.hpp"
+#include "HF_motors.hpp"
 
 namespace hf {
 
@@ -56,7 +57,7 @@ namespace hf {
                 _state.armed = startarmed;
             }
 
-            void update(uint32_t time_usec, float * motorvals)
+            void update(uint32_t time_usec, motors_t & motors)
             {
                 // Start with demands from open-loop controller
                 demands_t demands = {};
@@ -69,11 +70,10 @@ namespace hf {
 
                 }
 
-                // Use updated demands to run motors, allowing mixer to choose
-                // whether it cares about open-loop controller being inactive
-                // (e.g., throttle down)
+                // Use updated demands to run motors
+                motors.ready = !_state.failsafe && _state.armed && !_receiver->inactive();
                 if (!_state.failsafe && _state.armed && !_receiver->inactive()) {
-                    _mixer->run(demands, motorvals);
+                    _mixer->run(demands, motors);
                 }
 
                 // Check sensors
