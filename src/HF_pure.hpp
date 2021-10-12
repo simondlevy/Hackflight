@@ -28,10 +28,10 @@ namespace hf {
             PidController * _controllers[256] = {};
             uint8_t _controller_count = 0;
 
-            void checkSensors(uint32_t time_usec, State * state)
+            void checkSensors(uint32_t time_usec, state_t & state)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->modifyState(_state.state, time_usec);
+                    _sensors[k]->modifyState(state, time_usec);
                 }
             }
 
@@ -40,7 +40,7 @@ namespace hf {
             // Essentials
             Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;
-            State _state = {};
+            state_t _state = {};
 
             // Sensors 
             Sensor * _sensors[256] = {};
@@ -48,13 +48,12 @@ namespace hf {
 
         public:
 
-            HackflightPure(Receiver * receiver, Mixer * mixer, bool startarmed=false)
+            HackflightPure(Receiver * receiver, Mixer * mixer)
             {
                 _receiver = receiver;
                 _mixer = mixer;
                 _sensor_count = 0;
                 _controller_count = 0;
-                _state.armed = startarmed;
             }
 
             void update(uint32_t time_usec, motors_t & motors)
@@ -66,7 +65,7 @@ namespace hf {
                 // Periodically apply PID controllers to demands
                 bool ready = _timer.ready(time_usec);
                 for (uint8_t k=0; k<_controller_count; ++k) {
-                    _controllers[k]->modifyDemands(_state.state, demands, ready); 
+                    _controllers[k]->modifyDemands(_state, demands, ready); 
 
                 }
 
@@ -74,7 +73,7 @@ namespace hf {
                 _mixer->run(demands, motors);
 
                 // Check sensors
-                checkSensors(time_usec, &_state);
+                checkSensors(time_usec, _state);
             }
 
             void addSensor(Sensor * sensor) 

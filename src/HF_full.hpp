@@ -9,6 +9,7 @@
 #pragma once
 
 #include "HF_pure.hpp"
+#include "HF_safety.hpp"
 #include "HF_serial.hpp"
 
 #include "stream_receiver.h"
@@ -19,48 +20,59 @@ namespace hf {
 
         private:
 
-            SerialTask serialTask;
+            SerialTask _serialTask;
+            Safety _safety;
 
-            void checkSafety(State & state, motors_t & motors)
+            void checkSafety(state_t & state, motors_t & motors)
             {
                 // Safety
-                static bool _safeToArm;
+                static bool safeToArm_;
 
-                // Sync failsafe to open-loop-controller
-                if (stream_receiverLostSignal && state.armed) {
+                // Check failsafe
+                if (stream_receiverLostSignal && _safety.armed) {
                     cutMotors(motors);
-                    state.armed = false;
-                    state.failsafe = true;
+                    motors.ready = true;
+                    _safety.armed = false;
+                    _safety.failsafe = true;
                     return;
                 }
 
                 // Disarm
-                if (state.armed && !_receiver->inArmedState()) {
-                    state.armed = false;
+                if (_safety.armed && !_receiver->inArmedState()) {
+                    cutMotors(motors);
+                    motors.ready = true;
+                    _safety.armed = false;
                 } 
 
                 // Avoid arming when controller is in armed state
-                if (!_safeToArm) {
-                    _safeToArm = !_receiver->inArmedState();
+                if (!safeToArm_) {
+                    safeToArm_ = !_receiver->inArmedState();
                 }
 
                 // Arm after lots of safety checks
-                if (_safeToArm
-                    && !state.armed
-                    && !state.failsafe 
-                    && state.safeToArm()
+                if (safeToArm_
+                    && !_safety.armed
+                    && !_safety.failsafe 
+                    && Safety::safeToArm(state)
                     && _receiver->inactive()
                     && _receiver->inArmedState()
                     ) {
-                    state.armed = true;
+                    _safety.armed = true;
+                    motors.ready = true;
                 }
 
-                // Cut motors on inactivity
-                if (state.armed && _receiver->inactive()) {
+                // Cut motors on throttle down
+                if (_safety.armed && _receiver->inactive()) {
                     cutMotors(motors);
+                    motors.ready = true;
                 }
 
-            } // checkSafety
+                // Run motors when armed and throttle up
+                if (_safety.armed && !_receiver->inactive()) {
+                    motors.ready = true;
+                }
+
+             } // checkSafety
 
             static void cutMotors(motors_t & motors)
             {
@@ -75,33 +87,31 @@ namespace hf {
             HackflightFull(Receiver * receiver, Mixer * mixer)
                 : HackflightPure(receiver, mixer)
             {
-                _state.armed = false;
+                _safety.armed = false;
             }
 
             void update( uint32_t time_usec, motors_t & motors, bool & led)
             {
                 HackflightPure::update(time_usec, motors);
 
-                motors.ready = _state.armed;
-
                 checkSafety(_state, motors);
 
-                led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _state.armed;
+                led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _safety.armed;
             }
 
             void serialParse(uint8_t byte, motors_t & motors)
             {
-                serialTask.parse(byte, _state.state, _mixer, motors);
+                _serialTask.parse(byte, _state, _mixer, motors);
             }
 
             uint8_t serialAvailable(void)
             {
-                return serialTask.available();
+                return _serialTask.available();
             }
 
             uint8_t serialRead(void)
             {
-                return serialTask.read();
+                return _serialTask.read();
             }
 
     }; // class HackflightFull
