@@ -64,9 +64,8 @@ namespace hf {
             void update(uint32_t time_usec, float * motorvals)
             {
                 // Start with demands from open-loop controller
-                float demands[Receiver::MAX_DEMANDS] = {};
-                demands_t dmnds = {};
-                _receiver->getDemands(demands, &dmnds);
+                demands_t demands = {};
+                _receiver->getDemands(demands);
 
                 // Periodically apply PID controllers to demands
                 bool ready = _timer.ready(time_usec);

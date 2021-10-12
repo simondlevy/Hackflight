@@ -17,11 +17,4 @@ namespace hf {
         float yaw;
     } demands_t;
 
-    enum {
-        DEMANDS_THROTTLE,
-        DEMANDS_ROLL,
-        DEMANDS_PITCH,
-        DEMANDS_YAW,
-    };
-
 } // namespace hf

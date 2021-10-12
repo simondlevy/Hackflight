@@ -32,13 +32,15 @@ namespace hf {
 
             float _demandScale = 0;
 
-            void adjustCommand(float * demands, uint8_t index, float rawval)
+            float adjustCommand(float demand, float rawval)
             {
-                demands[index] /= 2;
+                demand /= 2;
 
                 if (rawval < 0) {
-                    demands[index] = -demands[index];
+                    demand = -demand;
                 }
+
+                return demand;
             }
 
             float applyCyclicFunction(float command)
@@ -83,37 +85,36 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            void getDemands(float * demands, demands_t * dmds)
+            void getDemands(demands_t & demands)
             {
                 // Convert raw [-1,+1] to absolute value
-                demands[DEMANDS_ROLL]  = fabs(stream_receiverRoll);
-                demands[DEMANDS_PITCH] = fabs(stream_receiverPitch);
-                demands[DEMANDS_YAW]   = fabs(stream_receiverYaw);
+                demands.roll = fabs(stream_receiverRoll);
+                demands.pitch = fabs(stream_receiverPitch);
+                demands.yaw  = fabs(stream_receiverYaw);
 
                 // Apply expo nonlinearity to roll, pitch
-                demands[DEMANDS_ROLL]  = applyCyclicFunction(demands[DEMANDS_ROLL]);
-                demands[DEMANDS_PITCH] = applyCyclicFunction(demands[DEMANDS_PITCH]);
+                demands.roll  = applyCyclicFunction(demands.roll);
+                demands.pitch = applyCyclicFunction(demands.pitch);
 
                 // Put sign back on command, yielding [-0.5,+0.5]
-                adjustCommand(demands, DEMANDS_ROLL, stream_receiverRoll);
-                adjustCommand(demands, DEMANDS_PITCH, stream_receiverPitch);
-                adjustCommand(demands, DEMANDS_YAW, stream_receiverYaw);
+                demands.roll  = adjustCommand(demands.roll,  stream_receiverRoll);
+                demands.pitch = adjustCommand(demands.pitch, stream_receiverPitch);
+                demands.yaw   = adjustCommand(demands.yaw,   stream_receiverYaw);
 
                 // Add in software trim
-                demands[DEMANDS_ROLL]  += _trimRoll;
-                demands[DEMANDS_PITCH] += _trimPitch;
-                demands[DEMANDS_YAW]   += _trimYaw;
+                demands.roll  += _trimRoll;
+                demands.pitch += _trimPitch;
+                demands.yaw   += _trimYaw;
 
                 // Pass throttle demand through exponential function
-                demands[DEMANDS_THROTTLE] = throttleFun(stream_receiverThrottle);
+                demands.throttle = throttleFun(stream_receiverThrottle);
 
                 // Multiply by demand scale
-                demands[DEMANDS_ROLL] *= _demandScale;
-                demands[DEMANDS_PITCH] *= _demandScale;
-                demands[DEMANDS_YAW] *= _demandScale;
+                demands.roll  *= _demandScale;
+                demands.pitch *= _demandScale;
+                demands.yaw   *= _demandScale;
 
             } // getDemands
-
 
             static const uint8_t MAX_DEMANDS = 10; // arbitrary
 

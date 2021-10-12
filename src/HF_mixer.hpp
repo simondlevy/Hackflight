@@ -49,22 +49,18 @@ namespace hf {
                 return Filter::constrainMinMax(value, 0, 1);
             }
 
-            void run(float * demands, float * motorvals)
+            void run(demands_t & demands, float * motorvals)
             {
                 // Map throttle demand from [-1,+1] to [0,1]
-                demands[DEMANDS_THROTTLE] = (demands[DEMANDS_THROTTLE] + 1) / 2;
+                demands.throttle = (demands.throttle + 1) / 2;
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
 
                     motorvals[i] = 
-                        (demands[DEMANDS_THROTTLE] *
-                         motorDirections[i].throttle + 
-                         demands[DEMANDS_ROLL] * 
-                         motorDirections[i].roll +     
-                         demands[DEMANDS_PITCH]
-                         * motorDirections[i].pitch +   
-                         demands[DEMANDS_YAW]
-                         * motorDirections[i].yaw);      
+                        (demands.throttle * motorDirections[i].throttle + 
+                         demands.roll     * motorDirections[i].roll +     
+                         demands.pitch    * motorDirections[i].pitch +   
+                         demands.yaw      * motorDirections[i].yaw);      
                 }
 
                 float maxMotor = motorvals[0];

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "HF_demands.hpp"
 #include "HF_state.hpp"
 
 namespace hf {
@@ -18,7 +19,7 @@ namespace hf {
 
         protected:
 
-            virtual void modifyDemands(float * statevec, float * demands, bool ready) = 0;
+            virtual void modifyDemands(float * statevec, demands_t & demands, bool ready) = 0;
 
     };  // class PidController
 

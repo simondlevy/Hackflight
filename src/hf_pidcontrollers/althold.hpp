@@ -32,7 +32,7 @@ namespace hf {
 
         protected:
 
-            void modifyDemands(float * state, float * demands, bool ready) override
+            void modifyDemands(float * state, demands_t & demands, bool ready) override
             {
                 // Controller state ---------------------------
                 static float errorI_;         
@@ -42,7 +42,7 @@ namespace hf {
                 float altitude = state[State::Z];
 
                 // Is stick demand in deadband?
-                bool inBand = fabs(demands[DEMANDS_THROTTLE]) < _stickDeadband; 
+                bool inBand = fabs(demands.throttle) < _stickDeadband; 
 
                 bool newInBand = inBand && !inBand_;
 
@@ -50,10 +50,8 @@ namespace hf {
 
                 // Target velocity is a setpoint inside deadband, scaled
                 // constant outside
-                float targetVelocity = inBand ?
-                    altitudeTarget_ - altitude :
-                    _pilotVelZMax *
-                    demands[DEMANDS_THROTTLE];
+                float targetVelocity = inBand ?  altitudeTarget_ - altitude
+                    : _pilotVelZMax * demands.throttle;
 
                 // Compute error as scaled target minus actual
                 float error = targetVelocity - state[State::DZ];
@@ -64,7 +62,7 @@ namespace hf {
                     : errorI_;
 
                 // Adjust throttle demand based on error
-                demands[DEMANDS_THROTTLE] = error * _Kp + errorI_ * _Ki;
+                demands.throttle = error * _Kp + errorI_ * _Ki;
 
                 // If we re-entered deadband, we reset the target altitude.
                 altitudeTarget_ = (ready && newInBand) ? altitude : altitudeTarget_;
