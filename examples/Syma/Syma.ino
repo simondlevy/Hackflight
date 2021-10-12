@@ -36,7 +36,7 @@ static const uint8_t MOTOR_PINS[4] = {13, 16, 3, 11};
 static uint32_t LED_PIN = 18;
 
 static constexpr float SCALE = 4.0f;
-static constexpr float TRIM[3] = {0, 0.05, 0.035};
+static constexpr float TRIM[3] = {0, 0.05, 0.045};
 static hf::Receiver receiver = hf::Receiver(SCALE, TRIM);
 
 static hf::MixerQuadXMW mixer;
