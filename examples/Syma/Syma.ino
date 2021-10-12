@@ -78,7 +78,7 @@ void loop(void)
 
     bool ledval = false;
     bool serialTaskReady = false;
-    static hf::motors_t motors = {};
+    hf::motors_t motors = {};
 
     h.update(micros(), motors, ledval, serialTaskReady);
 
@@ -100,6 +100,9 @@ void loop(void)
         }
     }
 
-    stream_writeBrushedMotors(MOTOR_PINS, motors.values);
+    if (motors.ready) {
+        stream_writeBrushedMotors(MOTOR_PINS, motors.values);
+    }
+
     stream_writeLed(LED_PIN, ledval);
 }

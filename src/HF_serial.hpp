@@ -244,6 +244,12 @@ namespace hf {
                 static uint8_t size;
                 static uint8_t index;
 
+                motors.ready = true;
+                motors.values[0] = 0;
+                motors.values[1] = 0;
+                motors.values[2] = 0;
+                motors.values[3] = 0;
+
                 // Payload functions
                 size = parser_state == 3 ? c : size;
                 index = parser_state == 5 ? index + 1 : 0;
