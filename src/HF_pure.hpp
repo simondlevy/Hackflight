@@ -47,19 +47,14 @@ namespace hf {
 
         public:
 
-            HackflightPure(Receiver * receiver, Mixer * mixer)
+            HackflightPure(Receiver * receiver, Mixer * mixer, bool startarmed=false)
             {
                 _receiver = receiver;
                 _mixer = mixer;
                 _sensor_count = 0;
                 _controller_count = 0;
+                _state.armed = startarmed;
             }
-
-            void begin(void)
-            {  
-                _state.armed = true;
-
-            } // begin
 
             void update(uint32_t time_usec, float * motorvals)
             {
