@@ -30,6 +30,19 @@ namespace hf {
 
                 bool failsafe = stream_receiverLostSignal && _safety.armed;
 
+                bool disarm = _safety.armed && !_receiver->inArmedState();
+
+                bool throttleDown = _safety.armed && _receiver->inactive();
+
+                bool running = _safety.armed && !_receiver->inactive();
+
+                bool ready = safeToArm_
+                    && !_safety.armed
+                    && !_safety.failsafe 
+                    && Safety::safeToArm(state)
+                    && _receiver->inactive()
+                    && _receiver->inArmedState();
+
                 // Check failsafe
                 if (failsafe) {
                     cutMotors(motors);
@@ -40,7 +53,7 @@ namespace hf {
                 }
 
                 // Disarm
-                if (_safety.armed && !_receiver->inArmedState()) {
+                if (disarm) {
                     cutMotors(motors);
                     motors.ready = true;
                     _safety.armed = false;
@@ -52,25 +65,19 @@ namespace hf {
                 }
 
                 // Arm after lots of safety checks
-                if (safeToArm_
-                    && !_safety.armed
-                    && !_safety.failsafe 
-                    && Safety::safeToArm(state)
-                    && _receiver->inactive()
-                    && _receiver->inArmedState()
-                    ) {
+                if (ready) {
                     _safety.armed = true;
                     motors.ready = true;
                 }
 
                 // Cut motors on throttle down
-                if (_safety.armed && _receiver->inactive()) {
+                if (throttleDown) {
                     cutMotors(motors);
                     motors.ready = true;
                 }
 
                 // Run motors when armed and throttle up
-                if (_safety.armed && !_receiver->inactive()) {
+                if (running) {
                     motors.ready = true;
                 }
 
