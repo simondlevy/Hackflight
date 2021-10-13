@@ -66,7 +66,7 @@ class MspParser(metaclass=abc.ABCMeta):
                 # message received, process
                 self.dispatchMessage()
             else:
-                print("code: " + str(self.message_id) + " - crc failed")
+                debug("code: " + str(self.message_id) + " - crc failed")
             # Reset variables
             self.message_length_received = 0
             self.state = 0

@@ -265,10 +265,11 @@ class GCS(MspParser):
 
         self._clear()
 
-        self.comms.send_request(self.actuator_type_request)
+        #self.comms.send_request(self.actuator_type_request)
 
         self.imu.stop()
         self.receiver.stop()
+        self.motors_quadxmw.start()
 
     def _clear(self):
 
