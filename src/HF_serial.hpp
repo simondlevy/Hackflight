@@ -12,6 +12,7 @@
 #include "HF_debugger.hpp"
 
 #include "stream_receiver.h"
+#include "stream_serial.h"
 
 namespace hf {
 
@@ -232,8 +233,12 @@ namespace hf {
                 return _outbuf.values[_outbuf.index++];
             }
 
-            void parse(uint8_t c, state_t & state, Mixer * mixer, motors_t & motors)
+            void parse(state_t & state, Mixer * mixer, motors_t & motors)
             {
+                if (!stream_serialAvailable) return;
+
+                uint8_t c = stream_serialByte;
+
                 static uint8_t parser_state;
                 static uint8_t payload[128];
                 static uint8_t type;

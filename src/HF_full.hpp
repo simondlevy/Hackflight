@@ -99,9 +99,9 @@ namespace hf {
                 led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _safety.armed;
             }
 
-            void serialParse(uint8_t byte, motors_t & motors)
+            void serialParse(motors_t & motors)
             {
-                _serialTask.parse(byte, _state, _mixer, motors);
+                _serialTask.parse(_state, _mixer, motors);
             }
 
             uint8_t serialAvailable(void)

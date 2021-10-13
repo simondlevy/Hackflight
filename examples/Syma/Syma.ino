@@ -88,9 +88,7 @@ void loop(void)
         stream_serialRead();
     }
 
-    if (stream_serialAvailable) {
-        h.serialParse(stream_serialByte, motors);
-    }
+    h.serialParse(motors);
 
     if (h.serialAvailable() > 0) {
         stream_serialWrite(h.serialRead());
