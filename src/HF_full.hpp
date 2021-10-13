@@ -43,7 +43,9 @@ namespace hf {
                     && _receiver->inactive()
                     && _receiver->inArmedState();
 
-                bool cut = failsafe | disarm | throttleDown; 
+                bool cut = failsafe || disarm || throttleDown; 
+
+                motors.ready = failsafe || disarm || ready || throttleDown || running ? true : motors.ready;
                 
                 motors.values[0] = cut ? 0 : motors.values[0];
                 motors.values[1] = cut ? 0 : motors.values[1];
@@ -52,7 +54,6 @@ namespace hf {
 
                 // Check failsafe
                 if (failsafe) {
-                    motors.ready = true;
                     _safety.armed = false;
                     _safety.failsafe = true;
                     return;
@@ -60,7 +61,6 @@ namespace hf {
 
                 // Disarm
                 if (disarm) {
-                    motors.ready = true;
                     _safety.armed = false;
                 } 
 
@@ -72,17 +72,6 @@ namespace hf {
                 // Arm after lots of safety checks
                 if (ready) {
                     _safety.armed = true;
-                    motors.ready = true;
-                }
-
-                // Cut motors on throttle down
-                if (throttleDown) {
-                    motors.ready = true;
-                }
-
-                // Run motors when armed and throttle up
-                if (running) {
-                    motors.ready = true;
                 }
 
              } // checkSafety
