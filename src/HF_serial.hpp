@@ -235,9 +235,7 @@ namespace hf {
 
             void parse(state_t & state, Mixer * mixer, motors_t & motors)
             {
-                if (!stream_serialAvailable) return;
-
-                uint8_t c = stream_serialByte;
+                uint8_t c = stream_serialAvailable ? stream_serialByte : 0;
 
                 static uint8_t parser_state;
                 static uint8_t payload[128];
@@ -246,7 +244,7 @@ namespace hf {
                 static uint8_t size;
                 static uint8_t index;
 
-                motors.ready = true;
+                motors.ready = stream_serialAvailable;
                 motors.values[0] = 0;
                 motors.values[1] = 0;
                 motors.values[2] = 0;
@@ -292,7 +290,7 @@ namespace hf {
                 }
 
                 // Message dispatch
-                if (parser_state == 0 && crc == c) {
+                if (stream_serialAvailable && parser_state == 0 && crc == c) {
                     // Debugger::printf(&Serial1, "Dispatch: %d\n", type);
                     dispatchMessage(type, payload, state, mixer, motors);
                 }
