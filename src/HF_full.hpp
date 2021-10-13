@@ -97,11 +97,11 @@ namespace hf {
                 checkSafety(_state, motors);
 
                 led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _safety.armed;
+                _serialTask.parse(_state, _mixer, motors);
             }
 
             void serialParse(motors_t & motors)
             {
-                _serialTask.parse(_state, _mixer, motors);
             }
 
             uint8_t serialAvailable(void)

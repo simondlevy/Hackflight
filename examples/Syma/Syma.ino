@@ -81,7 +81,6 @@ void loop(void)
     hf::motors_t motors = {};
 
     h.update(micros(), motors, ledval);
-    h.serialParse(motors);
 
     stream_serialUpdate();
 
