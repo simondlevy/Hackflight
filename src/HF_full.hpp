@@ -43,9 +43,15 @@ namespace hf {
                     && _receiver->inactive()
                     && _receiver->inArmedState();
 
+                bool cut = failsafe | disarm | throttleDown; 
+                
+                motors.values[0] = cut ? 0 : motors.values[0];
+                motors.values[1] = cut ? 0 : motors.values[1];
+                motors.values[2] = cut ? 0 : motors.values[2];
+                motors.values[3] = cut ? 0 : motors.values[3];
+
                 // Check failsafe
                 if (failsafe) {
-                    cutMotors(motors);
                     motors.ready = true;
                     _safety.armed = false;
                     _safety.failsafe = true;
@@ -54,7 +60,6 @@ namespace hf {
 
                 // Disarm
                 if (disarm) {
-                    cutMotors(motors);
                     motors.ready = true;
                     _safety.armed = false;
                 } 
@@ -72,7 +77,6 @@ namespace hf {
 
                 // Cut motors on throttle down
                 if (throttleDown) {
-                    cutMotors(motors);
                     motors.ready = true;
                 }
 
@@ -82,14 +86,6 @@ namespace hf {
                 }
 
              } // checkSafety
-
-            static void cutMotors(motors_t & motors)
-            {
-                motors.values[0] = 0;
-                motors.values[1] = 0;
-                motors.values[2] = 0;
-                motors.values[3] = 0;
-            }
 
         public:
 
