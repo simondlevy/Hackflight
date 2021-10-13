@@ -9,7 +9,7 @@
 #pragma once
 
 #include "HF_state.hpp"
-#include "HF_filters.hpp"
+#include "HF_utils.hpp"
 
 namespace hf {
 
@@ -23,7 +23,7 @@ namespace hf {
 
             static bool safeAngle(float angle)
             {
-                return fabs(angle) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
+                return fabs(angle) < deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
         public:

@@ -9,7 +9,7 @@
 #pragma once
 
 #include <HF_sensor.hpp>
-#include <HF_filters.hpp>
+#include <HF_utils.hpp>
 
 #include "../stream_imu.h"
 
@@ -46,7 +46,7 @@ namespace hf {
                 float phi = 0;
                 float theta = 0;
                 float psi = 0;
-                Filter::quat2euler(
+                quat2euler(
                         stream_imuQuaternionW,
                         stream_imuQuaternionX,
                         stream_imuQuaternionY,

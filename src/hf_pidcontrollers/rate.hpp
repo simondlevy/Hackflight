@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "../HF_filters.hpp"
+#include "../HF_utils.hpp"
 
 #include "../HF_pidcontroller.hpp"
 
@@ -33,7 +33,7 @@ namespace hf {
                 float err = *demand - angvel;
 
                 // Compute I term
-                *errI = ready ? Filter::constrainAbs(*errI + err, _windupMax) : *errI;
+                *errI = ready ? constrainAbs(*errI + err, _windupMax) : *errI;
 
                 // Compute D term
                 float errD = err - *errPrev;

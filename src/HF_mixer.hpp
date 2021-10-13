@@ -10,7 +10,7 @@
 
 #include "HF_demands.hpp"
 #include "HF_motors.hpp"
-#include "HF_filters.hpp"
+#include "HF_utils.hpp"
 
 namespace hf {
 
@@ -55,7 +55,7 @@ namespace hf {
             virtual float constrainMotorValue(uint8_t index, float value)
             {
                 (void)index; // all motors behave the same by default
-                return Filter::constrainMinMax(value, 0, 1);
+                return constrainMinMax(value, 0, 1);
             }
 
             void run(demands_t & demands, motors_t & motors)

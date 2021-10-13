@@ -10,7 +10,7 @@
 
 #include "../HF_pidcontroller.hpp"
 
-#include "../HF_filters.hpp"
+#include "../HF_utils.hpp"
 
 namespace hf {
 
@@ -49,7 +49,7 @@ namespace hf {
             {
                 _Kp = Kp;
 
-                _dmdscale = 2 * Filter::deg2rad(maxAngleDegrees);
+                _dmdscale = 2 * deg2rad(maxAngleDegrees);
             }
 
     }; // class LevelPid

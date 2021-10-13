@@ -58,7 +58,7 @@ namespace hf {
 
                 // Compute I term, avoiding windup
                 errorI_ = newInBand ? 0
-                    : ready ? Filter::constrainAbs(errorI_ + error, _windupMax)
+                    : ready ? constrainAbs(errorI_ + error, _windupMax)
                     : errorI_;
 
                 // Adjust throttle demand based on error

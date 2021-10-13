@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "../HF_filters.hpp"
+#include "../HF_utils.hpp"
 
 #include "../HF_pidcontroller.hpp"
 
@@ -34,7 +34,7 @@ namespace hf {
 
                 // Compute I term
                 errorI_ = fabs(error) > _rateMax ? 0
-                        : ready ? Filter::constrainAbs(errorI_ + error, _windupMax)
+                        : ready ? constrainAbs(errorI_ + error, _windupMax)
                         : errorI_;
 
                 // Adjust yaw demand based on error
@@ -51,7 +51,7 @@ namespace hf {
                 _Kp = Kp;
                 _Ki = Ki;
                 _windupMax = windupMax;
-                _rateMax = Filter::deg2rad(rateMaxDegreesPerSecond);
+                _rateMax = deg2rad(rateMaxDegreesPerSecond);
             }
 
     };  // class YawPid
