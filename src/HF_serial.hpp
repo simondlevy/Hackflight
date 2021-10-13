@@ -278,9 +278,8 @@ namespace hf {
                     : parser_state;
 
                 // Payload accumulation
-                if (in_payload) {
-                    payload[index-1] = c;
-                }
+                uint8_t pindex = in_payload ? index - 1 : 0;
+                payload[pindex] = in_payload ? c : payload[pindex];
 
                 // Message dispatch
                 if (stream_serialAvailable && parser_state == 0 && crc == c) {
