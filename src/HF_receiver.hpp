@@ -36,9 +36,7 @@ namespace hf {
             {
                 demand /= 2;
 
-                if (rawval < 0) {
-                    demand = -demand;
-                }
+                demand = rawval < 0 ? -demand : demand;
 
                 return demand;
             }
@@ -76,11 +74,9 @@ namespace hf {
 
             Receiver(const float demandScale, const float trim[3] = NULL) 
             { 
-                if (trim) {
-                    _trimRoll  = trim[0];
-                    _trimPitch = trim[1];
-                    _trimYaw   = trim[2];
-                }
+                _trimRoll  = trim ? trim[0] : 0;
+                _trimPitch = trim ? trim[1] : 0;
+                _trimYaw   = trim ? trim[2] : 0;
 
                 _demandScale = demandScale;
             }

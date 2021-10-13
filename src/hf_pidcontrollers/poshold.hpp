@@ -31,22 +31,20 @@ namespace hf {
 
             void modifyDemands(state_t & state, demands_t & demands) override
             {
-                // Run controller only if roll and pitch are small
-                if (inband(demands.pitch) && inband(demands.roll)) {
+                bool ready = inband(demands.pitch) && inband(demands.roll);
 
-                    // Get heading for rotating world-coordinate velocities
-                    // into body coordinates
-                    float psi = state.psi;
+                // Get heading for rotating world-coordinate velocities
+                // into body coordinates
+                float psi = state.psi;
 
-                    float cpsi = cos(psi);
-                    float spsi = sin(psi);
+                float cpsi = cos(psi);
+                float spsi = sin(psi);
 
-                    float dx = state.dx;
-                    float dy = state.dy;
+                float dx = state.dx;
+                float dy = state.dy;
 
-                    demands.roll  = -_Kp * (cpsi * dy - spsi * dx);
-                    demands.pitch = -_Kp * (cpsi * dx + spsi * dy);
-                }
+                demands.roll  = ready ? -_Kp * (cpsi * dy - spsi * dx) : demands.roll;
+                demands.pitch = ready ? -_Kp * (cpsi * dx + spsi * dy) : demands.pitch;
             }
 
         public:
