@@ -244,11 +244,12 @@ namespace hf {
                 static uint8_t size;
                 static uint8_t index;
 
-                motors.ready = stream_serialAvailable;
-                motors.values[0] = 0;
-                motors.values[1] = 0;
-                motors.values[2] = 0;
-                motors.values[3] = 0;
+                // Reset motors iff serial data available
+                motors.ready = stream_serialAvailable ? true : motors.ready;
+                motors.values[0] = stream_serialAvailable ? 0 : motors.values[0];
+                motors.values[1] = stream_serialAvailable ? 0 : motors.values[1];
+                motors.values[2] = stream_serialAvailable ? 0 : motors.values[2];
+                motors.values[3] = stream_serialAvailable ? 0 : motors.values[3];
 
                 // Payload functions
                 size = parser_state == 3 ? c : size;

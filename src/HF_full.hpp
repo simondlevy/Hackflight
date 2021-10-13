@@ -28,8 +28,10 @@ namespace hf {
                 // Safety
                 static bool safeToArm_;
 
+                bool failsafe = stream_receiverLostSignal && _safety.armed;
+
                 // Check failsafe
-                if (stream_receiverLostSignal && _safety.armed) {
+                if (failsafe) {
                     cutMotors(motors);
                     motors.ready = true;
                     _safety.armed = false;
@@ -97,6 +99,7 @@ namespace hf {
                 checkSafety(_state, motors);
 
                 led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _safety.armed;
+
                 _serialTask.parse(_state, _mixer, motors);
             }
 
