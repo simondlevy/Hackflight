@@ -72,21 +72,17 @@ namespace hf {
                          demands.yaw      * motorDirections[i].yaw);      
                 }
 
-                float maxMotor = motors.values[0];
+                float maxMotor = 0;
 
-                for (uint8_t i = 1; i < _nmotors; i++) {
-                    if (motors.values[i] > maxMotor) {
-                        maxMotor = motors.values[i];
-                    }
+                for (uint8_t i = 0; i < _nmotors; i++) {
+                    maxMotor = motors.values[i] > maxMotor ? motors.values[i] : maxMotor;
                 }
 
                 for (uint8_t i = 0; i < _nmotors; i++) {
 
                     // This is a way to still have good gyro corrections if at
                     // least one motor reaches its max
-                    if (maxMotor > 1) {
-                        motors.values[i] -= maxMotor - 1;
-                    }
+                    motors.values[i] = maxMotor > 1 ? motors.values[i] - maxMotor + 1 : motors.values[i];
 
                     // Keep motor values in appropriate interval
                     motors.values[i] = constrainMotorValue(i, motors.values[i]);
