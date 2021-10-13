@@ -83,19 +83,20 @@ namespace hf {
                  mtype = mixer->getType();
              }
 
-             void handle_SET_MOTOR(uint8_t index, uint8_t percent, motors_t & motors)
+             void handle_SET_MOTOR(bool ready, uint8_t index, uint8_t percent, motors_t & motors)
              {
-                 motors.values[0] = 0;
-                 motors.values[1] = 0;
-                 motors.values[2] = 0;
-                 motors.values[3] = 0;
+                 motors.values[0] = ready ? 0 : motors.values[0];
+                 motors.values[1] = ready ? 0 : motors.values[1];
+                 motors.values[2] = ready ? 0 : motors.values[2];
+                 motors.values[3] = ready ? 0 : motors.values[3];
 
-                 motors.values[index-1] = percent / 100.;
+                 uint8_t mindex = ready ? index - 1 : 0;
+                 motors.values[mindex] = ready ? percent / 100. : motors.values[mindex];
              }
 
-             void dispatchMessage(uint8_t command, uint8_t * payload, state_t & state, Mixer * mixer, motors_t & motors)
+             void dispatchMessage(bool ready, uint8_t type, uint8_t * payload, state_t & state, Mixer * mixer, motors_t & motors)
              {
-                 switch (command) {
+                 switch (type) {
 
                      case 121:
                          {
@@ -106,14 +107,14 @@ namespace hf {
                              float c5 = 0;
                              float c6 = 0;
                              handle_RECEIVER_Request(c1, c2, c3, c4, c5, c6);
-                             prepareToSerializeFloats(command, 6);
-                             serializeFloat(c1);
-                             serializeFloat(c2);
-                             serializeFloat(c3);
-                             serializeFloat(c4);
-                             serializeFloat(c5);
-                             serializeFloat(c6);
-                             completeSend();
+                             prepareToSerializeFloats(ready, type, 6);
+                             serializeFloat(ready, c1);
+                             serializeFloat(ready, c2);
+                             serializeFloat(ready, c3);
+                             serializeFloat(ready, c4);
+                             serializeFloat(ready, c5);
+                             serializeFloat(ready, c6);
+                             completeSend(ready);
                          } break;
 
                      case 122:
@@ -133,29 +134,29 @@ namespace hf {
                              handle_STATE_Request(
                                      state,
                                      x, dx, y, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi);
-                             prepareToSerializeFloats(command, 12);
-                             serializeFloat(x);
-                             serializeFloat(dx);
-                             serializeFloat(y);
-                             serializeFloat(dy);
-                             serializeFloat(z);
-                             serializeFloat(dz);
-                             serializeFloat(phi);
-                             serializeFloat(dphi);
-                             serializeFloat(theta);
-                             serializeFloat(dtheta);
-                             serializeFloat(psi);
-                             serializeFloat(dpsi);
-                             completeSend();
+                             prepareToSerializeFloats(ready, type, 12);
+                             serializeFloat(ready, x);
+                             serializeFloat(ready, dx);
+                             serializeFloat(ready, y);
+                             serializeFloat(ready, dy);
+                             serializeFloat(ready, z);
+                             serializeFloat(ready, dz);
+                             serializeFloat(ready, phi);
+                             serializeFloat(ready, dphi);
+                             serializeFloat(ready, theta);
+                             serializeFloat(ready, dtheta);
+                             serializeFloat(ready, psi);
+                             serializeFloat(ready, dpsi);
+                             completeSend(ready);
                          } break;
 
                      case 123:
                          {
                              uint8_t mtype = 0;
                              handle_ACTUATOR_TYPE_Request(mtype, mixer);
-                             prepareToSerializeBytes(command, 1);
-                             serialize(mtype);
-                             completeSend();
+                             prepareToSerializeBytes(ready, type, 1);
+                             serialize(ready, mtype);
+                             completeSend(ready );
                          } break;
 
                      case 215:
@@ -163,61 +164,63 @@ namespace hf {
                              uint8_t index = payload[0];
                              uint8_t percent = payload[1];
 
-                             handle_SET_MOTOR(index, percent, motors);
+                             handle_SET_MOTOR(ready, index, percent, motors);
 
                          } break;
 
-                 } // switch (_command)
+                 } // switch (type)
 
              } // dispatchMessage 
 
-             void prepareToSerialize(uint8_t type, uint8_t count, uint8_t size)
+             void prepareToSerialize(bool ready, uint8_t type, uint8_t count, uint8_t size)
              {
-                 _outbuf.size = 0;
-                 _outbuf.index = 0;
-                 _outbuf.checksum = 0;
+                 _outbuf.size = ready ? 0 : _outbuf.size;
+                 _outbuf.index = ready ? 0 : _outbuf.index;
+                 _outbuf.checksum = ready ? 0 : _outbuf.checksum;
 
-                 addToOutBuf('$');
-                 addToOutBuf('M');
-                 addToOutBuf('>');
-                 serialize(count*size);
-                 serialize(type);
+                 addToOutBuf(ready, '$');
+                 addToOutBuf(ready, 'M');
+                 addToOutBuf(ready, '>');
+                 serialize(ready, count*size);
+                 serialize(ready, type);
              }
 
-             void addToOutBuf(uint8_t a)
+             void addToOutBuf(bool ready, uint8_t a)
              {
-                 _outbuf.values[_outbuf.size++] = a;
+                 _outbuf.values[_outbuf.size] = ready ? a : _outbuf.values[_outbuf.size];
+
+                 _outbuf.size = ready ? _outbuf.size + 1 : _outbuf.size;
              }
 
-            void completeSend(void)
+            void completeSend(bool ready)
             {
-                serialize(_outbuf.checksum);
+                serialize(ready, _outbuf.checksum);
             }
 
-            void serialize(uint8_t a)
+            void serialize(bool ready, uint8_t a)
             {
-                addToOutBuf(a);
-                _outbuf.checksum ^= a;
+                addToOutBuf(ready, a);
+                _outbuf.checksum = ready ? _outbuf.checksum ^ a : _outbuf.checksum;
             }
 
-            void prepareToSerializeBytes(uint8_t type, uint8_t count)
+            void prepareToSerializeBytes(bool ready, uint8_t type, uint8_t count)
             {
-                prepareToSerialize(type, count, 1);
+                prepareToSerialize(ready, type, count, 1);
             }
 
-            void prepareToSerializeFloats(uint8_t type, uint8_t count)
+            void prepareToSerializeFloats(bool ready, uint8_t type, uint8_t count)
             {
-                prepareToSerialize(type, count, 4);
+                prepareToSerialize(ready, type, count, 4);
             }
 
-            void serializeFloat(float value)
+            void serializeFloat(bool ready, float value)
             {
                 uint32_t uintval = 1000 * (value + 2);
 
-                serialize(uintval & 0xFF);
-                serialize((uintval>>8) & 0xFF);
-                serialize((uintval>>16) & 0xFF);
-                serialize((uintval>>24) & 0xFF);
+                serialize(ready, uintval & 0xFF);
+                serialize(ready, (uintval>>8) & 0xFF);
+                serialize(ready, (uintval>>16) & 0xFF);
+                serialize(ready, (uintval>>24) & 0xFF);
             }
 
         protected:
@@ -233,7 +236,7 @@ namespace hf {
                 return _outbuf.values[_outbuf.index++];
             }
 
-            void parse(state_t & state, Mixer * mixer, motors_t & motors, bool & ready)
+            void parse(state_t & state, Mixer * mixer, motors_t & motors)
             {
                 uint8_t c = stream_serialByte;
 
@@ -282,10 +285,8 @@ namespace hf {
                 payload[pindex] = in_payload ? c : payload[pindex];
 
                 // Message dispatch
-                ready = stream_serialAvailable && parser_state == 0 && crc == c;
-                if (ready) {
-                    dispatchMessage(type, payload, state, mixer, motors);
-                }
+                bool ready = stream_serialAvailable && parser_state == 0 && crc == c;
+                dispatchMessage(ready, type, payload, state, mixer, motors);
 
             } // parse
 

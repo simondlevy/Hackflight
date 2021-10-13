@@ -77,10 +77,9 @@ void loop(void)
     stream_updateReceiver();
 
     bool ledval = false;
-    bool serialReady = false;
     hf::motors_t motors = {};
 
-    h.update(micros(), motors, ledval, serialReady);
+    h.update(micros(), motors, ledval);
 
     stream_serialUpdate();
 

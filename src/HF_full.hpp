@@ -63,7 +63,7 @@ namespace hf {
                 _safety.armed = false;
             }
 
-            void update( uint32_t time_usec, motors_t & motors, bool & led, bool & serialReady)
+            void update( uint32_t time_usec, motors_t & motors, bool & led)
             {
                 HackflightPure::update(time_usec, motors);
 
@@ -71,7 +71,7 @@ namespace hf {
 
                 led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _safety.armed;
 
-                _serial.parse(_state, _mixer, motors, serialReady);
+                _serial.parse(_state, _mixer, motors);
             }
 
             uint8_t serialAvailable(void)
