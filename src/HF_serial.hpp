@@ -233,7 +233,7 @@ namespace hf {
                 return _outbuf.values[_outbuf.index++];
             }
 
-            void parse(state_t & state, Mixer * mixer, motors_t & motors)
+            void parse(state_t & state, Mixer * mixer, motors_t & motors, bool & ready)
             {
                 uint8_t c = stream_serialByte;
 
@@ -282,7 +282,8 @@ namespace hf {
                 payload[pindex] = in_payload ? c : payload[pindex];
 
                 // Message dispatch
-                if (stream_serialAvailable && parser_state == 0 && crc == c) {
+                ready = stream_serialAvailable && parser_state == 0 && crc == c;
+                if (ready) {
                     dispatchMessage(type, payload, state, mixer, motors);
                 }
 
