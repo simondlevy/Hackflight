@@ -52,26 +52,17 @@ namespace hf {
                 motors.values[2] = cut ? 0 : motors.values[2];
                 motors.values[3] = cut ? 0 : motors.values[3];
 
+                _safety.armed = failsafe || disarm ? false : ready ? true : _safety.armed;
+
                 // Check failsafe
                 if (failsafe) {
-                    _safety.armed = false;
                     _safety.failsafe = true;
                     return;
                 }
 
-                // Disarm
-                if (disarm) {
-                    _safety.armed = false;
-                } 
-
                 // Avoid arming when controller is in armed state
                 if (!safeToArm_) {
                     safeToArm_ = !_receiver->inArmedState();
-                }
-
-                // Arm after lots of safety checks
-                if (ready) {
-                    _safety.armed = true;
                 }
 
              } // checkSafety
