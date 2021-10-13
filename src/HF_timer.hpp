@@ -27,13 +27,11 @@ namespace hf {
 
             bool ready(uint32_t time_usec)
             {
-                if ((time_usec - _time_usec) > _period)
-                {
-                    _time_usec = time_usec;
-                    return true;
-                }
+                bool tick = (time_usec - _time_usec) > _period;
 
-                return false;
+                _time_usec = tick ? time_usec : _time_usec;
+
+                return tick;
              }
 
     };  // Timer
