@@ -37,33 +37,32 @@ namespace hf {
             {
                 (void)time_usec;
 
-                if (stream_imuGotGyrometer) {
+                // Convert degrees / sec to radians / sec
+                state.dphi   = stream_imuGotGyrometer ? radians(stream_imuGyrometerX) : state.dphi;
+                state.dtheta = stream_imuGotGyrometer ? radians(stream_imuGyrometerY) : state.dtheta;
+                state.dpsi   = stream_imuGotGyrometer ? radians(stream_imuGyrometerZ) : state.dpsi;
 
-                    // Convert degrees / sec to radians / sec
-                    state.dphi   = radians(stream_imuGyrometerX);
-                    state.dtheta = radians(stream_imuGyrometerY);
-                    state.dpsi   = radians(stream_imuGyrometerZ);
-                }
+                // Convert quaternion to Euler angles
+                float phi = 0;
+                float theta = 0;
+                float psi = 0;
+                Filter::quat2euler(
+                        stream_imuQuaternionW,
+                        stream_imuQuaternionX,
+                        stream_imuQuaternionY,
+                        stream_imuQuaternionZ, 
+                        phi,
+                        theta,
+                        psi);
 
-                if (stream_imuGotQuaternion) {
 
-                    Filter::quat2euler(
-                            stream_imuQuaternionW,
-                            stream_imuQuaternionX,
-                            stream_imuQuaternionY,
-                            stream_imuQuaternionZ, 
-                            state.phi,
-                            state.theta,
-                            state.psi);
+                state.phi = stream_imuGotQuaternion ? phi : state.phi;
 
-                    // Adjust rotation so that nose-up is positive
-                    state.theta = -state.theta;
+                // Adjust rotation so that nose-up is positive
+                state.theta = stream_imuGotQuaternion ? -theta : state.theta;
 
-                    // Convert heading from [-pi,+pi] to [0,2*pi]
-                    if (state.psi < 0) {
-                        state.psi += 2*M_PI;
-                    }
-                }
+                // Convert heading from [-pi,+pi] to [0,2*pi]
+                state.psi = stream_imuGotQuaternion ? (psi < 0 ? psi + 2*M_PI : psi) : state.psi;
 
             } // modifyState
 
