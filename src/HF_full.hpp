@@ -25,9 +25,6 @@ namespace hf {
 
             void checkSafety(state_t & state, motors_t & motors)
             {
-                // Safety
-                static bool safeToArm_;
-
                 bool failsafe = stream_receiverLostSignal && _safety.armed;
 
                 bool disarm = _safety.armed && !_receiver->inArmedState();
@@ -36,34 +33,25 @@ namespace hf {
 
                 bool running = _safety.armed && !_receiver->inactive();
 
-                bool ready = safeToArm_
-                    && !_safety.armed
-                    && !_safety.failsafe 
-                    && Safety::safeToArm(state)
-                    && _receiver->inactive()
-                    && _receiver->inArmedState();
+                // Arm after lots of safety checks
+                bool arm = !_safety.armed
+                        && !_safety.failsafe 
+                        && Safety::safeToArm(state)
+                        && _receiver->inactive()
+                        && _receiver->inArmedState();
 
                 bool cut = failsafe || disarm || throttleDown; 
 
-                motors.ready = failsafe || disarm || ready || throttleDown || running ? true : motors.ready;
+                motors.ready = failsafe || disarm || arm || throttleDown || running ? true : motors.ready;
                 
                 motors.values[0] = cut ? 0 : motors.values[0];
                 motors.values[1] = cut ? 0 : motors.values[1];
                 motors.values[2] = cut ? 0 : motors.values[2];
                 motors.values[3] = cut ? 0 : motors.values[3];
 
-                _safety.armed = failsafe || disarm ? false : ready ? true : _safety.armed;
+                _safety.armed = failsafe || disarm ? false : arm ? true : _safety.armed;
 
-                // Check failsafe
-                if (failsafe) {
-                    _safety.failsafe = true;
-                    return;
-                }
-
-                // Avoid arming when controller is in armed state
-                if (!safeToArm_) {
-                    safeToArm_ = !_receiver->inArmedState();
-                }
+                _safety.failsafe = failsafe ? true : _safety.failsafe;
 
              } // checkSafety
 
@@ -84,10 +72,6 @@ namespace hf {
                 led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _safety.armed;
 
                 _serialTask.parse(_state, _mixer, motors);
-            }
-
-            void serialParse(motors_t & motors)
-            {
             }
 
             uint8_t serialAvailable(void)
