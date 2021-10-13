@@ -81,14 +81,13 @@ void loop(void)
     hf::motors_t motors = {};
 
     h.update(micros(), motors, ledval);
+    h.serialParse(motors);
 
     stream_serialUpdate();
 
     if (stream_serialAvailable) {
         stream_serialRead();
     }
-
-    h.serialParse(motors);
 
     if (h.serialAvailable() > 0) {
         stream_serialWrite(h.serialRead());
