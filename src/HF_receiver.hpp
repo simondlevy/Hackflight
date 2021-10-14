@@ -86,20 +86,22 @@ namespace hf {
                 // Pass throttle demand through exponential function
                 demands.throttle = throttleFun(stream_receiverThrottle);
 
-                // Convert raw [-1,+1] to absolute value
-                // Apply expo nonlinearity to roll, pitch
-                // Put sign back on command, yielding [-0.5,+0.5]
-                // Add in software trim
-                // Multiply by demand scale
-
+                // For roll, pitch:
+                // 1. Convert raw [-1,+1] to absolute value
+                // 2.Apply expo nonlinearity to roll, pitch
+                // 3. Put sign back on command, yielding [-0.5,+0.5]
+                // 4. Add in software trim
+                // 5. Multiply by demand scale
                 
                 demands.roll   = (adjustCommand(applyCyclicFunction(fabs(stream_receiverRoll)), stream_receiverRoll)   + _trimRoll) *_demandScale;
                 demands.pitch  = (adjustCommand(applyCyclicFunction(fabs(stream_receiverPitch)), stream_receiverPitch) + _trimPitch) *_demandScale;
 
-                demands.yaw  = fabs(stream_receiverYaw);
-                demands.yaw   = adjustCommand(demands.yaw,   stream_receiverYaw);
-                demands.yaw   += _trimYaw;
-                demands.yaw   *= _demandScale;
+                // For yaw:
+                // 1. Convert raw [-1,+1] to absolute value
+                // 2. Put sign back on command, yielding [-0.5,+0.5]
+                // 3. Add in software trim
+                // 4. Multiply by demand scale
+                 demands.yaw   = (adjustCommand(fabs(stream_receiverYaw),   stream_receiverYaw) +_trimYaw) * _demandScale;
 
             } // getDemands
 
