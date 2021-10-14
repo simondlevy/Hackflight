@@ -83,31 +83,27 @@ namespace hf {
 
             void getDemands(demands_t & demands)
             {
-                // Convert raw [-1,+1] to absolute value
-                demands.roll = fabs(stream_receiverRoll);
-                demands.pitch = fabs(stream_receiverPitch);
-                demands.yaw  = fabs(stream_receiverYaw);
-
-                // Apply expo nonlinearity to roll, pitch
-                demands.roll  = applyCyclicFunction(demands.roll);
-                demands.pitch = applyCyclicFunction(demands.pitch);
-
-                // Put sign back on command, yielding [-0.5,+0.5]
-                demands.roll  = adjustCommand(demands.roll,  stream_receiverRoll);
-                demands.pitch = adjustCommand(demands.pitch, stream_receiverPitch);
-                demands.yaw   = adjustCommand(demands.yaw,   stream_receiverYaw);
-
-                // Add in software trim
-                demands.roll  += _trimRoll;
-                demands.pitch += _trimPitch;
-                demands.yaw   += _trimYaw;
-
                 // Pass throttle demand through exponential function
                 demands.throttle = throttleFun(stream_receiverThrottle);
 
+                // Convert raw [-1,+1] to absolute value
+                // Apply expo nonlinearity to roll, pitch
+                // Put sign back on command, yielding [-0.5,+0.5]
+                // Add in software trim
                 // Multiply by demand scale
-                demands.roll  *= _demandScale;
+
+                
+                demands.roll  = (adjustCommand(applyCyclicFunction(fabs(stream_receiverRoll)), stream_receiverRoll) + _trimRoll) *_demandScale;
+
+                demands.pitch = fabs(stream_receiverPitch);
+                demands.pitch = applyCyclicFunction(demands.pitch);
+                demands.pitch = adjustCommand(demands.pitch, stream_receiverPitch);
                 demands.pitch *= _demandScale;
+                demands.pitch += _trimPitch;
+
+                demands.yaw  = fabs(stream_receiverYaw);
+                demands.yaw   = adjustCommand(demands.yaw,   stream_receiverYaw);
+                demands.yaw   += _trimYaw;
                 demands.yaw   *= _demandScale;
 
             } // getDemands
