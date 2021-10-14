@@ -93,13 +93,8 @@ namespace hf {
                 // Multiply by demand scale
 
                 
-                demands.roll  = (adjustCommand(applyCyclicFunction(fabs(stream_receiverRoll)), stream_receiverRoll) + _trimRoll) *_demandScale;
-
-                demands.pitch = fabs(stream_receiverPitch);
-                demands.pitch = applyCyclicFunction(demands.pitch);
-                demands.pitch = adjustCommand(demands.pitch, stream_receiverPitch);
-                demands.pitch *= _demandScale;
-                demands.pitch += _trimPitch;
+                demands.roll   = (adjustCommand(applyCyclicFunction(fabs(stream_receiverRoll)), stream_receiverRoll)   + _trimRoll) *_demandScale;
+                demands.pitch  = (adjustCommand(applyCyclicFunction(fabs(stream_receiverPitch)), stream_receiverPitch) + _trimPitch) *_demandScale;
 
                 demands.yaw  = fabs(stream_receiverYaw);
                 demands.yaw   = adjustCommand(demands.yaw,   stream_receiverYaw);
