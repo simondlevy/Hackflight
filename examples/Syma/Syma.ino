@@ -80,6 +80,10 @@ void loop(void)
         step();
     }
 
+}
+
+void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd)
+{
     stream_updateImu();
     stream_updateReceiver();
 
@@ -103,10 +107,5 @@ void loop(void)
     }
 
     stream_writeLed(LED_PIN, ledval);
-}
-
-
-void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd)
-{
-    hf::Debugger::printf("%f   %f  %f  %f\n", tdmd, rdmd, pdmd, ydmd);
+    // hf::Debugger::printf("%f   %f  %f  %f\n", tdmd, rdmd, pdmd, ydmd);
 }
