@@ -18,6 +18,7 @@
  */
 
 #include "HF_full.hpp"
+#include "HF_debugger.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"
 #include "hf_pidcontrollers/yaw.hpp"
@@ -30,6 +31,8 @@
 #include "stream_receiver.h"
 #include "stream_imu.h"
 #include "stream_led.h"
+
+#include "copilot.h"
 
 static const uint8_t MOTOR_PINS[4] = {13, 16, 3, 11};
 
@@ -73,6 +76,10 @@ void loop(void)
         running = true;
     }
 
+    else {
+        step();
+    }
+
     stream_updateImu();
     stream_updateReceiver();
 
@@ -96,4 +103,10 @@ void loop(void)
     }
 
     stream_writeLed(LED_PIN, ledval);
+}
+
+
+void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd)
+{
+    hf::Debugger::printf("%f   %f  %f  %f\n", tdmd, rdmd, pdmd, ydmd);
 }

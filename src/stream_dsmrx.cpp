@@ -14,6 +14,9 @@
 #include <Arduino.h>
 #include <DSMRX.h>
 
+#define _EXTERN
+#include "copilot.h"
+
 #define NONEXTERN
 #include "stream_receiver.h"
 

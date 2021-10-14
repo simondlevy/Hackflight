@@ -32,6 +32,16 @@ namespace hf {
                 va_end(ap);
             }
 
+            static void printf(const char * fmt, ...)
+            {
+                va_list ap;
+                va_start(ap, fmt);
+                char buf[200];
+                vsnprintf(buf, 200, fmt, ap); 
+                Serial.print(buf);
+                va_end(ap);
+            }
+
     }; // class Debugger
 
 } // namespace hf

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "stream_receiver.h"
+#include "copilot.h"
 
 #include "HF_demands.hpp"
 

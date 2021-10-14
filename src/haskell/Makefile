@@ -5,11 +5,19 @@
 #
 # MIT License
 
-HSRC = Main.hs
+HSRC = Main.hs \
+       Receiver.hs \
+       Demands.hs
 
-RUNH = runhaskell Main.hs
+RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
-all: copilot.c copilot.h
+DSTDIR = ..
+
+all: copilot.cpp copilot.h
+	cp copilot.c $(DSTDIR)/copilot.cpp
+	rm copilot.c
+	sed -i 's/extern/EXTERN/g' copilot.h
+	cat cfiles/header.h copilot.h > $(DSTDIR)/copilot.h
 
 copilot.c: $(HSRC) Main.hs
 	$(RUNH)
@@ -19,3 +27,11 @@ copilot.h: $(HSRC) Main.hs
 
 clean:
 	rm -f copilot.* tmp.c *~
+
+commit:
+	git commit -a -m="More Haskell Copilot work"
+
+copilot.cpp: copilot.c
+	tail -n +8 copilot.c > tmp.c
+	cat cfiles/header.c tmp.c > copilot.c
+	rm tmp.c

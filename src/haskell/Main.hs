@@ -11,9 +11,23 @@ module Main where
 import Language.Copilot
 import Copilot.Compile.C99
 
+-- Core
+import Demands
+import Receiver
+
+------------------------------------------------------------
+
+receiver = makeReceiverWithTrim (AxisTrim 0.0 0.05 0.045) 4.0
+
 spec = do
 
-  trigger "copilot_writeMotors" true []
+  let demands = getDemands receiver
+
+  -- Send the motor values using the external C function
+  trigger "stream_runHackflight" true [  arg $ throttle demands
+                                       , arg $ roll demands
+                                       , arg $ pitch demands
+                                       , arg $ yaw demands ]
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
