@@ -15,6 +15,7 @@
 #include "HF_mixer.hpp"
 #include "HF_state.hpp"
 #include "HF_motors.hpp"
+#include "HF_debugger.hpp"
 
 namespace hf {
 
@@ -56,11 +57,13 @@ namespace hf {
                 _controller_count = 0;
             }
 
-            void update(uint32_t time_usec, motors_t & motors)
+            void update(uint32_t time_usec, float tdmd, motors_t & motors)
             {
                 // Start with demands from open-loop controller
                 demands_t demands = {};
                 _receiver->getDemands(demands);
+
+                Debugger::printf("%+3.3f  %+3.3f\n", demands.throttle, tdmd);
 
                 // Periodically apply PID controllers to demands
                 bool ready = _timer.ready(time_usec);

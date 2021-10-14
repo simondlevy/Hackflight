@@ -90,7 +90,7 @@ void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd)
     bool ledval = false;
     hf::motors_t motors = {};
 
-    h.update(micros(), motors, ledval);
+    h.update(micros(), tdmd, motors, ledval);
 
     stream_serialUpdate();
 
@@ -107,5 +107,4 @@ void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd)
     }
 
     stream_writeLed(LED_PIN, ledval);
-    // hf::Debugger::printf("%f   %f  %f  %f\n", tdmd, rdmd, pdmd, ydmd);
 }

@@ -63,9 +63,9 @@ namespace hf {
                 _safety.armed = false;
             }
 
-            void update( uint32_t time_usec, motors_t & motors, bool & led)
+            void update( uint32_t time_usec, float tdmd, motors_t & motors, bool & led)
             {
-                HackflightPure::update(time_usec, motors);
+                HackflightPure::update(time_usec, tdmd, motors);
 
                 checkSafety(_state, motors);
 
