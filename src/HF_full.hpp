@@ -82,7 +82,7 @@ namespace hf {
                         state_phi, state_theta, state_psi,
                         motors);
 
-                //Debugger::printf("%+3.3f %+3.3f\n", _state.psi, state_psi);
+                // Debugger::printf("%+3.3f %+3.3f\n", _state.theta, state_theta);
 
                 checkSafety(_state, rxarmed, rxtdown, motors);
 

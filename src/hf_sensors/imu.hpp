@@ -42,28 +42,6 @@ namespace hf {
                 state.dtheta = stream_imuGotGyrometer ? radians(stream_imuGyrometerY) : state.dtheta;
                 state.dpsi   = stream_imuGotGyrometer ? radians(stream_imuGyrometerZ) : state.dpsi;
 
-                // Convert quaternion to Euler angles
-                float phi = 0;
-                float theta = 0;
-                float psi = 0;
-                quat2euler(
-                        stream_imuQuaternionW,
-                        stream_imuQuaternionX,
-                        stream_imuQuaternionY,
-                        stream_imuQuaternionZ, 
-                        phi,
-                        theta,
-                        psi);
-
-
-                state.phi = stream_imuGotQuaternion ? phi : state.phi;
-
-                // Adjust rotation so that nose-up is positive
-                state.theta = stream_imuGotQuaternion ? -theta : state.theta;
-
-                // Convert heading from [-pi,+pi] to [0,2*pi]
-                state.psi = stream_imuGotQuaternion ? (psi < 0 ? psi + 2*M_PI : psi) : state.psi;
-
             } // modifyState
 
     };  // class IMU

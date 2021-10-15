@@ -70,6 +70,10 @@ namespace hf {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
                     _sensors[k]->modifyState(_state, time_usec);
                 }
+
+                _state.phi = state_phi;
+                _state.theta = state_theta;
+                _state.psi = state_psi;
             }
 
             void addSensor(Sensor * sensor) 
