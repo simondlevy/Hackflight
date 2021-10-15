@@ -11,6 +11,7 @@
 #include "HF_pure.hpp"
 #include "HF_safety.hpp"
 #include "HF_serial.hpp"
+#include "HF_debugger.hpp"
 
 #include "stream_receiver.h"
 
@@ -23,22 +24,22 @@ namespace hf {
             SerialComms _serial;
             Safety _safety;
 
-            void checkSafety(state_t & state, motors_t & motors)
+            void checkSafety(state_t & state, bool receiverInArmedState, bool receiverThrottleIsDown,  motors_t & motors)
             {
                 bool failsafe = stream_receiverLostSignal && _safety.armed;
 
-                bool disarm = _safety.armed && !_receiver->inArmedState();
+                bool disarm = _safety.armed && !receiverInArmedState;
 
-                bool throttleDown = _safety.armed && _receiver->inactive();
+                bool throttleDown = _safety.armed && receiverThrottleIsDown;
 
-                bool running = _safety.armed && !_receiver->inactive();
+                bool running = _safety.armed && !receiverThrottleIsDown;
 
                 // Arm after lots of safety checks
                 bool arm = !_safety.armed
                         && !_safety.failsafe 
                         && Safety::safeToArm(state)
-                        && _receiver->inactive()
-                        && _receiver->inArmedState();
+                        && receiverThrottleIsDown
+                        && receiverInArmedState;
 
                 bool cut = failsafe || disarm || throttleDown; 
 
@@ -53,21 +54,21 @@ namespace hf {
 
                 _safety.failsafe = failsafe ? true : _safety.failsafe;
 
-             } // checkSafety
+             }
 
         public:
 
-            HackflightFull(Receiver * receiver, Mixer * mixer)
-                : HackflightPure(receiver, mixer)
+            HackflightFull(Mixer * mixer)
+                : HackflightPure(mixer)
             {
                 _safety.armed = false;
             }
 
-            void update( uint32_t time_usec, float tdmd, float rdmd, float pdmd, float ydmd, motors_t & motors, bool & led)
+            void update(uint32_t time_usec, float tdmd, float rdmd, float pdmd, float ydmd, bool rxarmed, bool rxtdown, motors_t & motors, bool & led)
             {
                 HackflightPure::update(time_usec, tdmd, rdmd, pdmd, ydmd, motors);
 
-                checkSafety(_state, motors);
+                checkSafety(_state, rxarmed, rxtdown, motors);
 
                 led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _safety.armed;
 

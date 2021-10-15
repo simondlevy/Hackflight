@@ -7,9 +7,10 @@
 #pragma once
 
 #include "HF_state.hpp"
-#include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 #include "HF_debugger.hpp"
+
+#include "copilot.h"
 
 #include "stream_receiver.h"
 #include "stream_serial.h"

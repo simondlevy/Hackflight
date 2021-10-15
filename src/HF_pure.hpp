@@ -11,7 +11,6 @@
 #include "HF_sensor.hpp"
 #include "HF_timer.hpp"
 #include "HF_pidcontroller.hpp"
-#include "HF_receiver.hpp"
 #include "HF_mixer.hpp"
 #include "HF_state.hpp"
 #include "HF_motors.hpp"
@@ -39,7 +38,6 @@ namespace hf {
         protected:
 
             // Essentials
-            Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;
             state_t _state = {};
 
@@ -49,9 +47,8 @@ namespace hf {
 
         public:
 
-            HackflightPure(Receiver * receiver, Mixer * mixer)
+            HackflightPure(Mixer * mixer)
             {
-                _receiver = receiver;
                 _mixer = mixer;
                 _sensor_count = 0;
                 _controller_count = 0;
@@ -60,10 +57,7 @@ namespace hf {
             void update(uint32_t time_usec, float tdmd, float rdmd, float pdmd, float ydmd, motors_t & motors)
             {
                 // Start with demands from open-loop controller
-                demands_t demands = {};
-                _receiver->getDemands(demands);
-
-                Debugger::printf("%+3.3f  %+3.3f\n", demands.yaw, ydmd);
+                demands_t demands = {tdmd, rdmd, pdmd, ydmd};
 
                 // Periodically apply PID controllers to demands
                 bool ready = _timer.ready(time_usec);

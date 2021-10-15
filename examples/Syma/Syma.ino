@@ -38,10 +38,6 @@ static const uint8_t MOTOR_PINS[4] = {13, 16, 3, 11};
 
 static uint32_t LED_PIN = 18;
 
-static constexpr float SCALE = 4.0f;
-static constexpr float TRIM[3] = {0, 0.05, 0.045};
-static hf::Receiver receiver = hf::Receiver(SCALE, TRIM);
-
 static hf::MixerQuadXMW mixer;
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
@@ -50,7 +46,7 @@ static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static hf::IMU imu;
 
-static hf::HackflightFull h(&receiver, &mixer);
+static hf::HackflightFull h(&mixer);
 
 static bool running;
 
@@ -82,7 +78,7 @@ void loop(void)
 
 }
 
-void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd)
+void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd, bool rxarmed, bool rxtdown)
 {
     stream_updateImu();
     stream_updateReceiver();
@@ -90,7 +86,7 @@ void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd)
     bool ledval = false;
     hf::motors_t motors = {};
 
-    h.update(micros(), tdmd, rdmd, pdmd, ydmd, motors, ledval);
+    h.update(micros(), tdmd, rdmd, pdmd, ydmd, rxarmed, rxtdown, motors, ledval);
 
     stream_serialUpdate();
 

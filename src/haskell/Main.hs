@@ -10,6 +10,7 @@ module Main where
 
 import Language.Copilot
 import Copilot.Compile.C99
+import Prelude hiding((<), (>))
 
 -- Core
 import Demands
@@ -27,7 +28,9 @@ spec = do
   trigger "stream_runHackflight" true [  arg $ throttle demands
                                        , arg $ roll demands
                                        , arg $ pitch demands
-                                       , arg $ yaw demands ]
-
+                                       , arg $ yaw demands 
+                                       , arg $ receiverAux1 > 0
+                                       , arg $ (throttle demands) < (-0.995)
+                                      ]
 -- Compile the spec
 main = reify spec >>= compile "copilot"

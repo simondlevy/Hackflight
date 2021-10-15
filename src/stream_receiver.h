@@ -10,14 +10,7 @@
 #define EXTERN extern
 #endif
 
-/*
-EXTERN float stream_receiverThrottle;
-EXTERN float stream_receiverRoll;
-EXTERN float stream_receiverPitch;
-EXTERN float stream_receiverYaw;
-*/
 EXTERN bool stream_receiverLostSignal;
-EXTERN float stream_receiverAux1;
 EXTERN float stream_receiverAux2;
 
 void stream_startReceiver(void);

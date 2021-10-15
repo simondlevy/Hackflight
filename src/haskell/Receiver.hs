@@ -77,10 +77,6 @@ getDemands receiver =
 
       scale = demandScale receiver
 
--- a.k.a. inactive
-receiverThrottleIsDown :: SBool
-receiverThrottleIsDown = receiverThrottle < (-0.995)
-
 -- Externals -------------------------------------------------
 
 receiverThrottle :: SFloat
