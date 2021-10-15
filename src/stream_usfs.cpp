@@ -12,6 +12,9 @@
 
  */
 
+#define _EXTERN
+#include "copilot.h"
+
 #define NONEXTERN
 #include "stream_imu.h"
 
@@ -21,7 +24,7 @@
 
 static USFS_Master usfs;
 
-void stream_startImu(void)
+void stream_startJmu(void) // sic
 {
     // Start the USFS in master mode, no interrupt
     if (!usfs.begin()) {

@@ -60,25 +60,13 @@ void setup(void)
 
 void loop(void)
 {
-    if (!running) {
-
-        stream_startSerial();
-        stream_startI2C();
-        stream_startReceiver();
-        stream_startImu();
-        stream_startBrushedMotors(MOTOR_PINS);
-        stream_startLed(LED_PIN);
-
-        running = true;
-    }
-
-    else {
-        step();
-    }
-
+    step();
 }
 
-void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd, bool rxarmed, bool rxtdown)
+void stream_runHackflight(
+        float tdmd, float rdmd, float pdmd, float ydmd,
+        bool rxarmed, bool rxtdown,
+        float state_phi)
 {
     stream_updateImu();
     stream_updateReceiver();
@@ -86,7 +74,11 @@ void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd, bool r
     bool ledval = false;
     hf::motors_t motors = {};
 
-    h.update(micros(), tdmd, rdmd, pdmd, ydmd, rxarmed, rxtdown, motors, ledval);
+    h.update(micros(),
+            tdmd, rdmd, pdmd, ydmd,
+            rxarmed, rxtdown,
+            state_phi,
+            motors, ledval);
 
     stream_serialUpdate();
 

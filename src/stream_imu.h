@@ -20,10 +20,6 @@ EXTERN bool stream_imuGotQuaternion;
 EXTERN float stream_imuGyrometerX;
 EXTERN float stream_imuGyrometerY;
 EXTERN float stream_imuGyrometerZ;
-EXTERN float stream_imuQuaternionW;
-EXTERN float stream_imuQuaternionX;
-EXTERN float stream_imuQuaternionY;
-EXTERN float stream_imuQuaternionZ;
 
 void stream_startImu(void);
 void stream_updateImu(void);
