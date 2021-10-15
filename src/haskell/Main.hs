@@ -38,6 +38,7 @@ sensors = [gyrometer, quaternion]
 
 spec = do
 
+  -- Make flags for startup, loop
   let count = (z::Stream Word64) + 1 where z = [0] ++ count
   let running = count > 1
   let starting = not running
@@ -47,6 +48,7 @@ spec = do
   -- Get the vehicle state by composing the sensor functions over the initial state
   let  state = compose sensors zeroState
 
+  -- Do some stuff at startup
   trigger "stream_startSerial" starting []
   trigger "stream_startI2C" starting []
   trigger "stream_startReceiver" starting []
