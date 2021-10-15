@@ -40,7 +40,7 @@ quaternion state  =
     qx = quaternionX
     qy = quaternionY
     qz = quaternionZ
-    phi' = -(atan2' (2*(qw*qx+qy*qz)) (qw*qw-qx*qx-qy*qy+qz*qz))
+    phi' = atan2' (2*(qw*qx+qy*qz)) (qw*qw-qx*qx-qy*qy+qz*qz)
     theta' = asin (2*(qx*qz-qw*qy))
     psi' = atan2' (2*(qx*qy+qw*qz))  (qw*qw+qx*qx-qy*qy-qz*qz)
 

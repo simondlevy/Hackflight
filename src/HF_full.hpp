@@ -78,6 +78,8 @@ namespace hf {
             {
                 HackflightPure::update(time_usec, tdmd, rdmd, pdmd, ydmd, motors);
 
+                Debugger::printf("%+3.3f %+3.3f\n", _state.phi, state_phi);
+
                 checkSafety(_state, rxarmed, rxtdown, motors);
 
                 led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _safety.armed;
