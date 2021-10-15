@@ -37,10 +37,10 @@ gyrometer state =
 ----------------------------------------------------------------------
 
 gyrometerX :: Stream Float
-gyrometerX = extern "copilot_gyrometerX" Nothing
+gyrometerX = extern "stream_imuGyrometerX" Nothing
 
 gyrometerY :: Stream Float
-gyrometerY = extern "copilot_gyrometerY" Nothing
+gyrometerY = extern "stream_imuGyrometerY" Nothing
 
 gyrometerZ :: Stream Float
-gyrometerZ = extern "copilot_gyrometerZ" Nothing
+gyrometerZ = extern "stream_imuGyrometerZ" Nothing

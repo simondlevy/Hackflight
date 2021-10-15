@@ -69,6 +69,9 @@ spec = do
                                           , arg $ phi state
                                           , arg $ theta state
                                           , arg $ psi state
+                                          , arg $ dphi state
+                                          , arg $ dtheta state
+                                          , arg $ dpsi state
                                          ]
 
 -- Compile the spec

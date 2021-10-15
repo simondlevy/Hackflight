@@ -17,6 +17,3 @@
 
 EXTERN bool stream_imuGotGyrometer;
 EXTERN bool stream_imuGotQuaternion;
-EXTERN float stream_imuGyrometerX;
-EXTERN float stream_imuGyrometerY;
-EXTERN float stream_imuGyrometerZ;
