@@ -72,13 +72,13 @@ namespace hf {
                     float ydmd,
                     bool rxarmed,
                     bool rxtdown,
-                    float state_phi,
+                    float state_phi, float state_theta,
                     motors_t & motors,
                     bool & led)
             {
                 HackflightPure::update(time_usec, tdmd, rdmd, pdmd, ydmd, motors);
 
-                Debugger::printf("%+3.3f %+3.3f\n", _state.phi, state_phi);
+                Debugger::printf("%+3.3f %+3.3f\n", _state.theta, state_theta);
 
                 checkSafety(_state, rxarmed, rxtdown, motors);
 

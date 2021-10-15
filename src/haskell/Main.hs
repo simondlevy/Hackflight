@@ -67,6 +67,7 @@ spec = do
                                           , arg $ receiverAux1 > 0
                                           , arg $ (throttle demands) < (-0.995)
                                           , arg $ phi state
+                                          , arg $ theta state
                                          ]
 
 -- Compile the spec
