@@ -26,10 +26,7 @@
 #include "hf_sensors/imu.hpp"
 
 #include "stream_serial.h"
-#include "stream_i2c.h"
 #include "stream_motors.h"
-#include "stream_receiver.h"
-#include "stream_imu.h"
 #include "stream_led.h"
 
 #include "copilot.h"
