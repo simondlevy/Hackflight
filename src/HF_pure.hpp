@@ -28,13 +28,6 @@ namespace hf {
             PidController * _controllers[256] = {};
             uint8_t _controller_count = 0;
 
-            void checkSensors(uint32_t time_usec, state_t & state)
-            {
-                for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->modifyState(state, time_usec);
-                }
-            }
-
         protected:
 
             // Essentials
@@ -54,7 +47,11 @@ namespace hf {
                 _controller_count = 0;
             }
 
-            void update(uint32_t time_usec, float tdmd, float rdmd, float pdmd, float ydmd, motors_t & motors)
+            void update(
+                    uint32_t time_usec,
+                    float tdmd, float rdmd, float pdmd,float ydmd,
+                    float state_phi, float state_theta, float state_psi,
+                    motors_t & motors)
             {
                 // Start with demands from open-loop controller
                 demands_t demands = {tdmd, rdmd, pdmd, ydmd};
@@ -69,8 +66,10 @@ namespace hf {
                 // Use updated demands to run motors
                 _mixer->run(demands, motors);
 
-                // Check sensors
-                checkSensors(time_usec, _state);
+                // Run sensors
+                for (uint8_t k=0; k<_sensor_count; ++k) {
+                    _sensors[k]->modifyState(_state, time_usec);
+                }
             }
 
             void addSensor(Sensor * sensor) 

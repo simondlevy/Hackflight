@@ -10,7 +10,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-void stream_startJ2C(void) // sic
+void stream_startI2C(void)
 {
     Wire.begin();
     delay(100);

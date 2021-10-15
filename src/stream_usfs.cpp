@@ -24,7 +24,7 @@
 
 static USFS_Master usfs;
 
-void stream_startJmu(void) // sic
+void stream_startImu(void)
 {
     // Start the USFS in master mode, no interrupt
     if (!usfs.begin()) {
@@ -35,7 +35,7 @@ void stream_startJmu(void) // sic
     }
 }
 
-void stream_updateJmu(void) // sic
+void stream_updateImu(void)
 {
     usfs.checkEventStatus();
 

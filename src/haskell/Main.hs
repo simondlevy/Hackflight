@@ -68,6 +68,7 @@ spec = do
                                           , arg $ (throttle demands) < (-0.995)
                                           , arg $ phi state
                                           , arg $ theta state
+                                          , arg $ psi state
                                          ]
 
 -- Compile the spec

@@ -63,8 +63,7 @@ void loop(void)
 void stream_runHackflight(
         float tdmd, float rdmd, float pdmd, float ydmd,
         bool rxarmed, bool rxtdown,
-        float state_phi,
-        float state_theta)
+        float state_phi, float state_theta, float state_psi)
 {
     bool ledval = false;
     hf::motors_t motors = {};
@@ -72,7 +71,7 @@ void stream_runHackflight(
     h.update(micros(),
             tdmd, rdmd, pdmd, ydmd,
             rxarmed, rxtdown,
-            state_phi, state_theta,
+            state_phi, state_theta, state_psi,
             motors, ledval);
 
     stream_serialUpdate();

@@ -12,7 +12,9 @@ module Quaternion
 
 where
 
-import Language.Copilot
+import Language.Copilot hiding(atan2)
+import Copilot.Language.Stream
+import Prelude hiding(atan2)
 
 import State
 import Sensor
@@ -40,22 +42,9 @@ quaternion state  =
     qx = quaternionX
     qy = quaternionY
     qz = quaternionZ
-    phi' = atan2' (2*(qw*qx+qy*qz)) (qw*qw-qx*qx-qy*qy+qz*qz)
+    phi' = atan2 (2*(qw*qx+qy*qz)) (qw*qw-qx*qx-qy*qy+qz*qz)
     theta' = -(asin (2*(qx*qz-qw*qy)))
-    psi' = atan2' (2*(qx*qy+qw*qz))  (qw*qw+qx*qx-qy*qy-qz*qz)
-
-----------------------------------------------------------------------
-
--- XXX eventually should be part of Copilot
--- https://en.wikipedia.org/wiki/Atan2#Definition_and_computation
-atan2' :: Stream Float -> Stream Float -> Stream Float
-atan2' y x = 
-  if x > 0 then atan (y/x)
-  else if x < 0 && y >= 0 then atan(y/x) + pi
-  else if x < 0 && y < 0 then atan(y/x) - pi
-  else if x == 0 && y > 0 then pi
-  else if x == 0 && y < 0 then (-pi) 
-  else 0 -- undefined
+    psi' = atan2 (2*(qx*qy+qw*qz))  (qw*qw+qx*qx-qy*qy-qz*qz)
 
 ----------------------------------------------------------------------
 
