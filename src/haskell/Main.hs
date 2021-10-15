@@ -56,7 +56,10 @@ spec = do
   trigger "stream_startBrushedMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
   trigger "stream_startLed" starting [arg led_pin]
 
-  -- Send the motor values using the external C function
+  -- Do some other stuff in loop
+  trigger "stream_updateImu" running []
+  trigger "stream_updateReceiver" running []
+
   trigger "stream_runHackflight" running [  arg $ throttle demands
                                           , arg $ roll demands
                                           , arg $ pitch demands

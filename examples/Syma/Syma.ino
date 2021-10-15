@@ -68,9 +68,6 @@ void stream_runHackflight(
         bool rxarmed, bool rxtdown,
         float state_phi)
 {
-    stream_updateImu();
-    stream_updateReceiver();
-
     bool ledval = false;
     hf::motors_t motors = {};
 

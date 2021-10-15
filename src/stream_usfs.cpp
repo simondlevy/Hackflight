@@ -35,7 +35,7 @@ void stream_startJmu(void) // sic
     }
 }
 
-void stream_updateImu(void)
+void stream_updateJmu(void) // sic
 {
     usfs.checkEventStatus();
 

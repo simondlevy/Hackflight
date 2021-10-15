@@ -12,6 +12,3 @@
 
 EXTERN bool stream_receiverLostSignal;
 EXTERN float stream_receiverAux2;
-
-void stream_startReceiver(void);
-void stream_updateReceiver(void);
