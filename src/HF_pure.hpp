@@ -57,13 +57,13 @@ namespace hf {
                 _controller_count = 0;
             }
 
-            void update(uint32_t time_usec, float tdmd, motors_t & motors)
+            void update(uint32_t time_usec, float tdmd, float rdmd, float pdmd, float ydmd, motors_t & motors)
             {
                 // Start with demands from open-loop controller
                 demands_t demands = {};
                 _receiver->getDemands(demands);
 
-                Debugger::printf("%+3.3f  %+3.3f\n", demands.throttle, tdmd);
+                Debugger::printf("%+3.3f  %+3.3f\n", demands.yaw, ydmd);
 
                 // Periodically apply PID controllers to demands
                 bool ready = _timer.ready(time_usec);

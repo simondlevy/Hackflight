@@ -90,7 +90,7 @@ void stream_runHackflight(float tdmd, float rdmd, float pdmd, float ydmd)
     bool ledval = false;
     hf::motors_t motors = {};
 
-    h.update(micros(), tdmd, motors, ledval);
+    h.update(micros(), tdmd, rdmd, pdmd, ydmd, motors, ledval);
 
     stream_serialUpdate();
 

@@ -42,7 +42,7 @@ namespace hf {
                 return demand;
             }
 
-            float applyCyclicFunction(float command)
+            float cyclicFun(float command)
             {
                 return rcFun(command, CYCLIC_EXPO, CYCLIC_RATE);
             }
@@ -94,8 +94,8 @@ namespace hf {
                 // 4. Add in software trim
                 // 5. Multiply by demand scale
                 
-                demands.roll   = (adjustCommand(applyCyclicFunction(fabs(stream_receiverRoll)), stream_receiverRoll)   + _trimRoll) *_demandScale;
-                demands.pitch  = (adjustCommand(applyCyclicFunction(fabs(stream_receiverPitch)), stream_receiverPitch) + _trimPitch) *_demandScale;
+                demands.roll   = (adjustCommand(cyclicFun(fabs(stream_receiverRoll)), stream_receiverRoll) + _trimRoll) *_demandScale;
+                demands.pitch  = (adjustCommand(cyclicFun(fabs(stream_receiverPitch)), stream_receiverPitch) + _trimPitch) *_demandScale;
 
                 // For yaw:
                 // 1. Convert raw [-1,+1] to absolute value

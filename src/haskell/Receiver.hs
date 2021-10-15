@@ -35,8 +35,8 @@ makeReceiverWithTrim :: AxisTrim -> SFloat -> Receiver
 makeReceiverWithTrim axisTrim demandScale =
     Receiver 0.10 -- throttleMargin
              0.20 -- throttleExpo
-             0.90 -- cyclicRate
              0.65 -- cyclicExpo
+             0.90 -- cyclicRate
              0.40 -- auxThreshold
              demandScale
              axisTrim
@@ -52,22 +52,19 @@ getDemands receiver =
 
     where
 
-      demandScale' = demandScale receiver
+      throttleDemand = throttleFun receiverThrottle
 
-      axisTrim' = axisTrim receiver
+      rollDemand = ((adjustCommand (cyclicFun $ abs receiverRoll) receiverRoll) + (rollTrim trim)) * scale
 
-      adjustCommand rectified original =
-          rectified/2 * if original < 0 then -1 else 1
+      pitchDemand = ((adjustCommand (cyclicFun $ abs receiverPitch) receiverPitch) + (pitchTrim trim)) * scale
+
+      yawDemand = ((adjustCommand  (abs receiverYaw)  receiverYaw) + (yawTrim trim)) * scale
 
       cyclicFun command = rcFun command (cyclicExpo receiver) (cyclicRate receiver)
+ 
+      rcFun x e r = (1 + e*(x*x - 1)) * x * r
 
-      rectify x = if x < 0 then (-x) else x
-
-      rcFun x e r = (1 + e * (x*x -1)) * x * r
-
-      angleFun trimFun expoFun command =
-          demandScale' * ((trimFun axisTrim') + adjustCommand (expoFun $ rectify command)
-                                                              command)
+      adjustCommand demand rawval = if rawval < 0 then -demand/2 else demand/2
 
       throttleFun x = 
           let mid = 0.5
@@ -76,13 +73,9 @@ getDemands receiver =
               expo = (throttleExpo receiver)
           in (mid + tmp*(1-expo + expo * (tmp*tmp) / (y*y))) * 2 - 1
 
-      throttleDemand = throttleFun receiverThrottle
+      trim = axisTrim receiver
 
-      rollDemand = angleFun rollTrim cyclicFun receiverRoll
-
-      pitchDemand = angleFun pitchTrim cyclicFun receiverPitch
-
-      yawDemand = angleFun yawTrim id receiverYaw
+      scale = demandScale receiver
 
 -- a.k.a. inactive
 receiverThrottleIsDown :: SBool
