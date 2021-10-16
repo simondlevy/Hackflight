@@ -41,6 +41,14 @@ led_pin = 18 :: SWord8
 
 receiver = makeReceiverWithTrim (AxisTrim 0.0 0.05 0.045) 4.0
 
+-- PID controllers are applied last-to-first.  Pos-hold is last in list
+-- so that it will can access to the unmodifed receiver demands.
+pidfuns = [  
+             levelController 0.2 -- Kp
+           , yawController 1.0625 0.005625 -- Kp, Ki
+           , rateController 0.225  0.001875 0.375 -- Kp, Ki, Kd 
+          ]
+
 sensors = [gyrometer, quaternion]
 
 spec = do
