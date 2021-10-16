@@ -29,11 +29,11 @@ quaternion state  =
         (dy     state)
         (z      state) 
         (dz     state) 
-        ((phi   state) + phi')
+        phi'
         (dphi   state) 
-        ((theta state) + theta')
+        theta'
         (dtheta state)
-        ((psi   state) + psi')
+        psi'
         (dpsi   state)
 
   where 

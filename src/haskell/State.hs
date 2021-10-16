@@ -32,11 +32,6 @@ data State = State {   x :: SFloat
 
               }
 
-zeroState :: State
-
-zeroState = State 0 0 0 0 0 0 0 0 0 0 0 0
-
-
 safeToArm :: State -> SBool
 
 safeToArm (State _ _ _ _ _ _ phi _ theta _ _ _) = safe phi && safe theta
