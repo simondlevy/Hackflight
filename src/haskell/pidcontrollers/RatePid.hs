@@ -24,7 +24,7 @@ rateMaxDps = 40 :: SFloat
 
 rateController :: SFloat -> SFloat -> SFloat -> PidFun
 
-rateController kp ki kd (state, demands) = (state, demands')
+rateController kp ki kd (state, ready, demands) = (state, ready, demands')
 
   where
 
@@ -32,13 +32,12 @@ rateController kp ki kd (state, demands) = (state, demands')
 
     update op dmdfun stfun dmd' err' errI' = 
 
-      let dmd = dmdfun demands
-          err = op dmd (stfun state)
-          errI = constrain_abs (err + errI') windupMax
-          errD = (err - err')
-          newdmd = dmd + kp * err + ki * errI + kd * errD
+      let err = op (dmdfun demands) (stfun state)
+          errI = if ready then constrain_abs (err + errI') windupMax else errI'
+          errD = err - err'
+          demand = kp * err + ki * errI + kd * errD
 
-      in (newdmd, err, errI, errD)
+      in (demand, err, errI, errD)
 
     (rollDemand, rollError, rollErrorI, rollErrorD)  =
       update (-) roll dphi rollDemand' rollError' rollErrorI'

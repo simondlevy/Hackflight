@@ -50,19 +50,7 @@ namespace hf {
                     float pidtdmd, float pidrdmd, float pidpdmd, float pidydmd,
                     motors_t & motors)
             {
-                // Start with demands from receiver
-                demands_t demands = {rxtdmd, rxrdmd, rxpdmd, rxydmd};
-
-                demands.roll = pidrdmd;
-                demands.pitch = pidpdmd;
-                demands.yaw = pidydmd;
-
-                // Periodically apply PID controllers to get demands
-                for (uint8_t k=0; k<_controller_count; ++k) {
-                    _controllers[k]->modifyDemands(_state, demands, pready); 
-                }
-
-                //Debugger::printf("%+3.3f  %+3.3f\n", demands.yaw, pidydmd);
+                demands_t demands = {rxtdmd, pidrdmd, pidpdmd, pidydmd};
 
                 // Use updated demands to run motors
                 _mixer->run(demands, motors);
