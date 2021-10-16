@@ -24,7 +24,7 @@ dpsMax = 40 :: SFloat -- deg/sec
 
 yawController :: SFloat -> SFloat -> PidFun
 
-yawController kp ki (state, demands, ready) = demands'
+yawController kp ki (state, ready, demands) = (state, ready, demands')
 
   where 
 

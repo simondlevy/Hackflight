@@ -25,7 +25,7 @@ import Utils
 
 hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Demands, SBool, Demands, SBool)
 
-hackflight receiver sensors pidfuns = (state, rdemands, pready, pdmds, led)
+hackflight receiver sensors pidfuns = (state, rdemands, pready, pdemands, led)
 
   where
 
@@ -37,7 +37,8 @@ hackflight receiver sensors pidfuns = (state, rdemands, pready, pdmds, led)
 
     -- Periodically update PID controls to modify demands
     pready = timerReady 300 -- Hz
-    pdmds = Demands 0 0 0 0
+    pdemands = Demands 0 0 0 0
+    -- (_, demands) = compose pidfuns (state, rdemands, ready)
 
     -- Check safety (arming / failsafe)
     (armed, failsafe, mready, cut) = safety rdemands state

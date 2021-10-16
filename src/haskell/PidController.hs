@@ -17,4 +17,5 @@ import State
 import Demands
 import Utils
 
-type PidFun = (State, Demands, SBool) -> Demands
+-- Passing and returning a tuple allows us to compose PID control functions
+type PidFun = (State, SBool, Demands) -> (State, SBool, Demands)
