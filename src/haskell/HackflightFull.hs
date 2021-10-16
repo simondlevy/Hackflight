@@ -19,6 +19,7 @@ import State
 import Sensor
 import Demands
 import PidController
+import Safety
 import Utils
 
 hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Demands)

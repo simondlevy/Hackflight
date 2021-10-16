@@ -9,6 +9,7 @@ HSRC = Main.hs \
        HackflightFull.hs \
        Receiver.hs \
        Demands.hs \
+       Safety.hs \
 	   sensors/Gyrometer.hs \
 	   sensors/Quaternion.hs \
        pidcontrollers/RatePid.hs \
