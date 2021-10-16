@@ -48,7 +48,7 @@ namespace hf {
                     float state_dphi, float state_dtheta, float state_dpsi,
                     motors_t & motors)
             {
-                // Start with demands from open-loop controller
+                // Start with demands from receiver
                 demands_t demands = {tdmd, rdmd, pdmd, ydmd};
 
                 // Periodically apply PID controllers to demands
