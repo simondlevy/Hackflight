@@ -53,6 +53,13 @@ void loop(void)
     step();
 }
 
+void stream_debugTimer(bool value)
+{
+    if (value) {
+        Serial.println(millis());
+    }
+}
+
 void stream_runHackflight(
         float tdmd,
         float rdmd,

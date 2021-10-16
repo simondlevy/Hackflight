@@ -32,6 +32,8 @@ import LevelPid(levelController)
 -- Misc
 import Utils
 
+import Time
+
 m1_pin = 13 :: SWord8 
 m2_pin = 16 :: SWord8 
 m3_pin = 3  :: SWord8 
@@ -73,6 +75,8 @@ spec = do
   trigger "stream_updateReceiver" running []
   trigger "stream_updateTime" running []
   trigger "stream_writeLed" running [arg led_pin, arg led]
+
+  trigger "stream_debugTimer" running [arg $ timerReady 2]
 
   trigger "stream_runHackflight" running [  arg $ throttle demands
                                           , arg $ roll demands

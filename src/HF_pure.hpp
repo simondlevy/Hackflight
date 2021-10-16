@@ -51,7 +51,7 @@ namespace hf {
                 // Start with demands from receiver
                 demands_t demands = {tdmd, rdmd, pdmd, ydmd};
 
-                // Periodically apply PID controllers to demands
+                // Periodically apply PID controllers to get demands
                 bool ready = _timer.ready(time_usec);
                 for (uint8_t k=0; k<_controller_count; ++k) {
                     _controllers[k]->modifyDemands(_state, demands, ready); 

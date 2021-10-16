@@ -35,6 +35,9 @@ hackflight receiver sensors pidfuns = (state, demands, led)
     -- Get the vehicle state by composing the sensor functions over the initial state
     state = compose sensors state'
 
+    -- Periodically update PID controls to get demands
+    -- ready = timerReady 300 -- Hz
+
     -- Check safety (arming / failsafe)
     (armed, failsafe, mready, cut) = safety demands state
 
