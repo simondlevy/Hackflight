@@ -23,23 +23,24 @@ import Safety
 import Time
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Demands, SBool, SBool)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Demands, SBool, Demands, SBool)
 
-hackflight receiver sensors pidfuns = (state, demands, pready, led)
+hackflight receiver sensors pidfuns = (state, rdemands, pready, pdmds, led)
 
   where
 
     -- Get receiver demands from external C functions
-    demands = getDemands receiver
+    rdemands = getDemands receiver
 
     -- Get the vehicle state by composing the sensor functions over the initial state
     state = compose sensors state'
 
     -- Periodically update PID controls to modify demands
     pready = timerReady 300 -- Hz
+    pdmds = Demands 0 0 0 0
 
     -- Check safety (arming / failsafe)
-    (armed, failsafe, mready, cut) = safety demands state
+    (armed, failsafe, mready, cut) = safety rdemands state
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed

@@ -36,6 +36,7 @@ yawController kp ki (state, demands, ready) = demands'
             else if ready then constrain_abs (errI + err)  windupMax
             else [0] ++ errI
 
+    -- Adjust yaw demand based on error
     demands' = Demands (throttle demands)
                        (roll demands)
                        (pitch demands)

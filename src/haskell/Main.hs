@@ -55,7 +55,7 @@ spec = do
   let running = count > 1
   let starting = not running
 
-  let  (state, demands, pready, led) = hackflight receiver sensors pidfuns
+  let  (state, rdemands, pready, pdemands, led) = hackflight receiver sensors pidfuns
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
@@ -71,12 +71,12 @@ spec = do
   trigger "stream_updateTime" running []
   trigger "stream_writeLed" running [arg led_pin, arg led]
 
-  trigger "stream_runHackflight" running [  arg $ throttle demands
-                                          , arg $ roll demands
-                                          , arg $ pitch demands
-                                          , arg $ yaw demands 
+  trigger "stream_runHackflight" running [  arg $ throttle rdemands
+                                          , arg $ roll rdemands
+                                          , arg $ pitch rdemands
+                                          , arg $ yaw rdemands 
                                           , arg $ receiverAux1 > 0
-                                          , arg $ (throttle demands) < (-0.995)
+                                          , arg $ (throttle rdemands) < (-0.995)
                                           , arg $ phi state
                                           , arg $ theta state
                                           , arg $ psi state
@@ -84,7 +84,11 @@ spec = do
                                           , arg $ dtheta state
                                           , arg $ dpsi state
                                           , arg pready
-                                         ]
+                                          , arg $ throttle pdemands
+                                          , arg $ roll pdemands
+                                          , arg $ pitch pdemands
+                                          , arg $ yaw pdemands 
+                                         ] 
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
