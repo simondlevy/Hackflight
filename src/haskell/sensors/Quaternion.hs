@@ -18,6 +18,7 @@ import Prelude hiding(atan2)
 
 import State
 import Sensor
+import Utils
 
 quaternion :: Sensor
 
@@ -44,14 +45,14 @@ quaternion state  =
 
 ----------------------------------------------------------------------
 
-qw :: Stream Float
+qw :: SFloat
 qw = extern "stream_imuQuaternionW" Nothing
 
-qx :: Stream Float
+qx :: SFloat
 qx = extern "stream_imuQuaternionX" Nothing
 
-qy :: Stream Float
+qy :: SFloat
 qy = extern "stream_imuQuaternionY" Nothing
 
-qz :: Stream Float
+qz :: SFloat
 qz = extern "stream_imuQuaternionZ" Nothing
