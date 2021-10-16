@@ -6,6 +6,7 @@
 # MIT License
 
 HSRC = Main.hs \
+       Hackflight.hs \
        Receiver.hs \
        Demands.hs \
 	   sensors/Gyrometer.hs \

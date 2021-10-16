@@ -15,6 +15,7 @@ import Copilot.Compile.C99
 import Prelude hiding((<), (>), (++), not)
 
 -- Core
+import Hackflight
 import Receiver
 import Demands
 import State
@@ -43,10 +44,7 @@ spec = do
   let running = count > 1
   let starting = not running
 
-  let demands = getDemands receiver
-
-  -- Get the vehicle state by composing the sensor functions over the initial state
-  let  state = compose sensors zeroState
+  let  (state, demands) = hackflight receiver sensors
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
