@@ -21,17 +21,17 @@ angleMax = 45 :: SFloat
 
 levelController :: SFloat -> PidFun
 
-levelController kp (state, demands) = (state, demands')
+levelController kp (state, ready, demands) = (state, ready, demands')
 
     where
 
       demands' = Demands (throttle demands) rollDemand pitchDemand (yaw demands)
 
-      rollDemand = ((kp * demandScale * (roll demands)) - (phi state))
+      rollDemand = kp * ((roll demands) * dmdscale - (phi state))
 
       -- Pitch demand is nose-down positive, so we negate pitch-forward
       -- vehicle state (nose-down negative) to reconcile them
-      pitchDemand = ((kp * demandScale * (pitch demands)) + (theta state))
+      pitchDemand = kp * ((pitch demands) * dmdscale + (theta state))
 
       -- angle for error computation, we multiply by the following amount:
-      demandScale = 2 * (deg2rad angleMax)
+      dmdscale = 2 * (deg2rad angleMax)

@@ -53,6 +53,8 @@ namespace hf {
                 // Start with demands from receiver
                 demands_t demands = {rxtdmd, rxrdmd, rxpdmd, rxydmd};
 
+                demands.roll = pidrdmd;
+                demands.pitch = pidpdmd;
                 demands.yaw = pidydmd;
 
                 // Periodically apply PID controllers to get demands

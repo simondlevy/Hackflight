@@ -27,7 +27,7 @@ import Quaternion
 -- PID controllers
 --import RatePid(rateController)
 import YawPid(yawController)
---import LevelPid(levelController)
+import LevelPid(levelController)
 
 -- Misc
 import Utils
@@ -41,9 +41,9 @@ led_pin = 18 :: SWord8
 
 receiver = makeReceiverWithTrim (AxisTrim 0.0 0.05 0.045) 4.0
 
--- PID controllers are applied last-to-first.  Pos-hold is last in list
--- so that it will can access to the unmodifed receiver demands.
+-- PID controllers are applied last-to-first
 pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
+           , levelController 0.2 -- Kp
           ]
 
 sensors = [gyrometer, quaternion]
