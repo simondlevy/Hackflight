@@ -53,14 +53,14 @@ namespace hf {
                 // Start with demands from receiver
                 demands_t demands = {rxtdmd, rxrdmd, rxpdmd, rxydmd};
 
+                demands.yaw = pidydmd;
+
                 // Periodically apply PID controllers to get demands
                 for (uint8_t k=0; k<_controller_count; ++k) {
                     _controllers[k]->modifyDemands(_state, demands, pready); 
                 }
 
                 //Debugger::printf("%+3.3f  %+3.3f\n", demands.yaw, pidydmd);
-
-                demands.yaw = pidydmd;
 
                 // Use updated demands to run motors
                 _mixer->run(demands, motors);
