@@ -43,14 +43,15 @@ namespace hf {
 
             void update(
                     uint32_t time_usec,
-                    float tdmd, float rdmd, float pdmd,float ydmd,
+                    float rxtdmd, float rxrdmd, float rxpdmd,float rxydmd,
                     float state_phi, float state_theta, float state_psi,
                     float state_dphi, float state_dtheta, float state_dpsi,
                     bool pready,
+                    float pidtdmd, float pidrdmd, float pidpdmd, float pidydmd,
                     motors_t & motors)
             {
                 // Start with demands from receiver
-                demands_t demands = {tdmd, rdmd, pdmd, ydmd};
+                demands_t demands = {rxtdmd, rxrdmd, rxpdmd, rxydmd};
 
                 // Periodically apply PID controllers to get demands
                 for (uint8_t k=0; k<_controller_count; ++k) {

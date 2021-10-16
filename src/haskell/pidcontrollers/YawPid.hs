@@ -33,12 +33,16 @@ yawController kp ki (state, ready, demands) = (state, ready, demands')
 
     -- Accumulate I term, resetting on large yaw jump
     errI = if abs err > (deg2rad dpsMax) then 0
-            else if ready then constrain_abs (errI + err)  windupMax
-            else [0] ++ errI
+           else if ready then constrain_abs (errI' + err)  windupMax
+           else errI'
 
     -- Adjust yaw demand based on error
     demands' = Demands (throttle demands)
                        (roll demands)
                        (pitch demands)
                        (kp * err + ki * errI)
+
+    -- Maintain error integral between iterations
+    errI' = [0] ++ errI
+
 

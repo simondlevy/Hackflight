@@ -89,6 +89,10 @@ void stream_runHackflight(
             state_dtheta,
             state_dpsi,
             pready,
+            pidtdmd,
+            pidrdmd,
+            pidpdmd,
+            pidydmd,
             motors);
 
     stream_serialUpdate();
