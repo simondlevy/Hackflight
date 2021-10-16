@@ -30,11 +30,11 @@ quaternion state  =
         (dy     state)
         (z      state) 
         (dz     state) 
-        phi'
+        (if qavail then phi' else (phi state))
         (dphi   state) 
-        theta'
+        (if qavail then theta' else (theta state))
         (dtheta state)
-        psi'
+        (if qavail then psi' else (psi state))
         (dpsi   state)
 
   where 
@@ -44,6 +44,9 @@ quaternion state  =
     psi' = atan2 (2*(qx*qy+qw*qz))  (qw*qw+qx*qx-qy*qy-qz*qz)
 
 ----------------------------------------------------------------------
+
+qavail :: SBool
+qavail = extern "stream_imuGotQuaternion" Nothing
 
 qw :: SFloat
 qw = extern "stream_imuQuaternionW" Nothing

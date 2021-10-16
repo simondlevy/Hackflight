@@ -16,4 +16,3 @@
 #endif
 
 EXTERN bool stream_imuGotGyrometer;
-EXTERN bool stream_imuGotQuaternion;
