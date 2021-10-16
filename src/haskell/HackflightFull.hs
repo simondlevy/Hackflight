@@ -1,5 +1,5 @@
 {--
-  Hackflight algorithm for microcontrollers
+  Hackflight core algorithm
 
   Copyright(C) 2021 on D.Levy
 
@@ -12,24 +12,38 @@ module HackflightFull where
 
 import Language.Copilot
 
-import Hackflight
-import Time
+import Prelude hiding((!!), (||), (++), (<), (>), (&&), (==), div, mod, not)
+
 import Receiver
+import State
 import Sensor
-import PidController
-import Mixer
-import Safety
 import Demands
 import Utils
 
-hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> (Motors, SBool)
+hackflight :: Receiver -> [Sensor] -> (State, Demands)
 
-hackflightFull receiver sensors pidfuns mixer = (motors, ledOn)
+hackflight receiver sensors = (state, demands)
 
   where
 
-    -- Run core algorithm
-    (motors, isArmed) = hackflight receiver sensors pidfuns mixer getSafetyReal
+    -- Get receiver demands from external C functions
+    demands = getDemands receiver
+
+    -- Get the vehicle state by composing the sensor functions over the initial state
+    state = compose sensors state'
 
     -- Blink LED during first couple of seconds; keep it solid when armed
-    ledOn = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else isArmed
+    -- ledOn = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else isArmed
+
+    state' = State ([0] ++ (x state))
+                   ([0] ++ (dx state))
+                   ([0] ++ (y state))
+                   ([0] ++ (dy state))
+                   ([0] ++ (z state))
+                   ([0] ++ (dz state))
+                   ([0] ++ (phi state))
+                   ([0] ++ (dphi state))
+                   ([0] ++ (theta state))
+                   ([0] ++ (dtheta state))
+                   ([0] ++ (psi state))
+                   ([0] ++ (dpsi state))

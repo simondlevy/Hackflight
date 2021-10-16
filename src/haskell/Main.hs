@@ -15,7 +15,7 @@ import Copilot.Compile.C99
 import Prelude hiding((<), (>), (++), not)
 
 -- Core
-import Hackflight
+import HackflightFull
 import Receiver
 import Demands
 import State

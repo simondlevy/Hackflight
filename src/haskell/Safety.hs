@@ -13,37 +13,37 @@ module Safety where
 import Language.Copilot
 
 import Receiver
+import Demands
 import State
 import Utils
 
-data Safety = Safety { armed :: SBool, failsafe :: SBool }
+safety :: Demands -> State -> (SBool, SBool, SBool, SBool)
 
-type SafetyFun = State -> Safety
-
-getSafetySim :: SafetyFun
-
--- Simulation is always armed and never loses signal
-getSafetySim _ = Safety true false
-
-getSafetyReal :: SafetyFun
-
-getSafetyReal vehicleState = Safety armed failsafe
+safety demands state = (armed, failsafe, mready, cut)
 
   where
 
-    -- Use receiver data to trap failsafe
-    failsafe = (armed' && receiverLostSignal) || failsafe' where 
+    throttleIsDown = (throttle demands) < (-0.995)
 
-    -- Arm after safety checks
-    armed = if failsafe then false 
+    aux1IsDown = receiverAux1 > 0
 
-            else if receiverAux1 > 0
-                 && receiverThrottleIsDown
-                 && safeToArm vehicleState then true 
+    disarm = armed' && not aux1IsDown
 
-            else if armed' && receiverAux1 < 0 then false
-            
-            else armed'
+    inArmingState = armed' && throttleIsDown
+
+    running = armed' && not throttleIsDown
+
+    -- Arm after lots of safety checks
+    arm = not armed' && not failsafe' && safeToArm state && throttleIsDown && aux1IsDown
+
+    cut = failsafe || disarm || inArmingState
+
+    mready = if failsafe || disarm || arm || inArmingState || running then true else mready'
+
+    armed = if failsafe' || disarm then false else if arm then true else armed'
+
+    failsafe = if failsafe' then true else failsafe'
 
     armed' = [False] ++ armed
     failsafe' = [False] ++ failsafe
+    mready' = [False] ++ mready
