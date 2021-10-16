@@ -30,7 +30,7 @@ namespace hf {
 
                 bool disarm = _safety.armed && !receiverInArmedState;
 
-                bool throttleDown = _safety.armed && receiverThrottleIsDown;
+                bool armedThrottleDown = _safety.armed && receiverThrottleIsDown;
 
                 bool running = _safety.armed && !receiverThrottleIsDown;
 
@@ -41,9 +41,9 @@ namespace hf {
                         && receiverThrottleIsDown
                         && receiverInArmedState;
 
-                bool cut = failsafe || disarm || throttleDown; 
+                bool cut = failsafe || disarm || armedThrottleDown; 
 
-                motors.ready = failsafe || disarm || arm || throttleDown || running ? true : motors.ready;
+                motors.ready = failsafe || disarm || arm || armedThrottleDown || running ? true : motors.ready;
                 
                 motors.values[0] = cut ? 0 : motors.values[0];
                 motors.values[1] = cut ? 0 : motors.values[1];
