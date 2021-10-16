@@ -24,18 +24,20 @@ dpsMax = 40 :: SFloat -- deg/sec
 
 yawController :: SFloat -> SFloat -> PidFun
 
-yawController kp ki (state, demands) = (state, demands')
+yawController kp ki (state, demands, ready) = demands'
 
   where 
 
-    demands' = Demands (throttle demands) (roll demands) (pitch demands) yawDemand
+    -- Compute error as difference between yaw demand and angular velocity
+    err = (yaw demands) - (dpsi state)
 
-    yawDemand = kp * yawError + ki * yawErrorI
+    -- Accumulate I term, resetting on large yaw jump
+    errI = if abs err > (deg2rad dpsMax) then 0
+            else if ready then constrain_abs (errI + err)  windupMax
+            else [0] ++ errI
 
-    yawError = (yaw demands) - (dpsi state)
+    demands' = Demands (throttle demands)
+                       (roll demands)
+                       (pitch demands)
+                       (kp * err + ki * errI)
 
-    -- Accumualte error integral
-    yawErrorI = constrain_abs (yawErrorI' + yawError) windupMax
-
-    -- Maintain controller state between calls, resetting on quick change
-    yawErrorI' = if (abs yawError) > (deg2rad dpsMax) then 0 else [0] ++ yawErrorI

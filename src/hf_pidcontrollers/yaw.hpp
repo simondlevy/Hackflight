@@ -32,7 +32,7 @@ namespace hf {
                 // Compute error as difference between yaw demand and angular velocity
                 float error = demands.yaw - state.dpsi;
 
-                // Compute I term
+                // Accumulate I term, resetting on large yaw jump
                 errorI_ = fabs(error) > _rateMax ? 0
                         : ready ? constrainAbs(errorI_ + error, _windupMax)
                         : errorI_;

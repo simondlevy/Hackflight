@@ -25,9 +25,9 @@ import Gyrometer
 import Quaternion
 
 -- PID controllers
-import RatePid(rateController)
+--import RatePid(rateController)
 import YawPid(yawController)
-import LevelPid(levelController)
+--import LevelPid(levelController)
 
 -- Misc
 import Utils
@@ -43,10 +43,7 @@ receiver = makeReceiverWithTrim (AxisTrim 0.0 0.05 0.045) 4.0
 
 -- PID controllers are applied last-to-first.  Pos-hold is last in list
 -- so that it will can access to the unmodifed receiver demands.
-pidfuns = [  
-             levelController 0.2 -- Kp
-           , yawController 1.0625 0.005625 -- Kp, Ki
-           , rateController 0.225  0.001875 0.375 -- Kp, Ki, Kd 
+pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
           ]
 
 sensors = [gyrometer, quaternion]

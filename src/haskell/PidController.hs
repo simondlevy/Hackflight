@@ -15,5 +15,6 @@ import Language.Copilot
 
 import State
 import Demands
+import Utils
 
-type PidFun = (State, Demands) -> (State, Demands)
+type PidFun = (State, Demands, SBool) -> Demands
