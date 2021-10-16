@@ -24,6 +24,12 @@ import State
 import Gyrometer
 import Quaternion
 
+-- PID controllers
+import RatePid(rateController)
+import YawPid(yawController)
+import LevelPid(levelController)
+
+-- Misc
 import Utils
 
 m1_pin = 13 :: SWord8 

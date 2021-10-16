@@ -10,7 +10,10 @@ HSRC = Main.hs \
        Receiver.hs \
        Demands.hs \
 	   sensors/Gyrometer.hs \
-	   sensors/Quaternion.hs
+	   sensors/Quaternion.hs \
+       pidcontrollers/RatePid.hs \
+       pidcontrollers/YawPid.hs \
+       pidcontrollers/LevelPid.hs
 
 RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
