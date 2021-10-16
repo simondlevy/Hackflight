@@ -38,24 +38,20 @@ quaternion state  =
 
   where 
 
-    qw = quaternionW
-    qx = quaternionX
-    qy = quaternionY
-    qz = quaternionZ
     phi' = atan2 (2*(qw*qx+qy*qz)) (qw*qw-qx*qx-qy*qy+qz*qz)
     theta' = -(asin (2*(qx*qz-qw*qy)))
     psi' = atan2 (2*(qx*qy+qw*qz))  (qw*qw+qx*qx-qy*qy-qz*qz)
 
 ----------------------------------------------------------------------
 
-quaternionW :: Stream Float
-quaternionW = extern "stream_imuQuaternionW" Nothing
+qw :: Stream Float
+qw = extern "stream_imuQuaternionW" Nothing
 
-quaternionX :: Stream Float
-quaternionX = extern "stream_imuQuaternionX" Nothing
+qx :: Stream Float
+qx = extern "stream_imuQuaternionX" Nothing
 
-quaternionY :: Stream Float
-quaternionY = extern "stream_imuQuaternionY" Nothing
+qy :: Stream Float
+qy = extern "stream_imuQuaternionY" Nothing
 
-quaternionZ :: Stream Float
-quaternionZ = extern "stream_imuQuaternionZ" Nothing
+qz :: Stream Float
+qz = extern "stream_imuQuaternionZ" Nothing
