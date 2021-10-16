@@ -23,7 +23,6 @@
 #include "hf_pidcontrollers/rate.hpp"
 #include "hf_pidcontrollers/yaw.hpp"
 #include "hf_pidcontrollers/level.hpp"
-#include "hf_sensors/imu.hpp"
 
 #include "stream_serial.h"
 #include "stream_motors.h"
@@ -41,15 +40,12 @@ static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
 static hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
-static hf::IMU imu;
-
 static hf::HackflightFull h(&mixer);
 
 static bool running;
 
 void setup(void)
 {
-    h.addSensor(&imu);
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
     h.addPidController(&yawPid);

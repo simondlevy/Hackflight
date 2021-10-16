@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "HF_sensor.hpp"
 #include "HF_timer.hpp"
 #include "HF_pidcontroller.hpp"
 #include "HF_mixer.hpp"
@@ -34,16 +33,11 @@ namespace hf {
             Mixer * _mixer = NULL;
             state_t _state = {};
 
-            // Sensors 
-            Sensor * _sensors[256] = {};
-            uint8_t _sensor_count = 0;
-
         public:
 
             HackflightPure(Mixer * mixer)
             {
                 _mixer = mixer;
-                _sensor_count = 0;
                 _controller_count = 0;
             }
 
@@ -67,12 +61,6 @@ namespace hf {
                 // Use updated demands to run motors
                 _mixer->run(demands, motors);
 
-                // Run sensors
-                /*
-                for (uint8_t k=0; k<_sensor_count; ++k) {
-                    _sensors[k]->modifyState(_state, time_usec);
-                }*/
-
                 _state.phi = state_phi;
                 _state.theta = state_theta;
                 _state.psi = state_psi;
@@ -80,11 +68,6 @@ namespace hf {
                 _state.dphi = state_dphi;
                 _state.dtheta = state_dtheta;
                 _state.dpsi = state_dpsi;
-            }
-
-            void addSensor(Sensor * sensor) 
-            {
-                _sensors[_sensor_count++] = sensor;
             }
 
             void addPidController(PidController * controller) 
