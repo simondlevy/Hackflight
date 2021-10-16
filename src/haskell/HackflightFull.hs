@@ -18,11 +18,12 @@ import Receiver
 import State
 import Sensor
 import Demands
+import PidController
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> (State, Demands)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Demands)
 
-hackflight receiver sensors = (state, demands)
+hackflight receiver sensors pidfuns = (state, demands)
 
   where
 
