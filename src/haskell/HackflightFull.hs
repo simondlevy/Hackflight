@@ -34,6 +34,9 @@ hackflight receiver sensors pidfuns = (state, demands)
     -- Get the vehicle state by composing the sensor functions over the initial state
     state = compose sensors state'
 
+    -- Check safety (arming / failsafe)
+    (armed, failsafe, mready, cut) = safety demands state
+
     -- Blink LED during first couple of seconds; keep it solid when armed
     -- ledOn = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else isArmed
 
