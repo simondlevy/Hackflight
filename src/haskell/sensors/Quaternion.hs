@@ -30,14 +30,16 @@ quaternion state  =
         (dy     state)
         (z      state) 
         (dz     state) 
-        (if qavail then phi' else (phi state))
+        (update phi' phi)
         (dphi   state) 
-        (if qavail then theta' else (theta state))
+        (update theta' theta)
         (dtheta state)
-        (if qavail then psi' else (psi state))
+        (update psi' psi)
         (dpsi   state)
 
   where 
+
+    update newval old = if qavail then newval else (old state)
 
     phi' = atan2 (2*(qw*qx+qy*qz)) (qw*qw-qx*qx-qy*qy+qz*qz)
     theta' = -(asin (2*(qx*qz-qw*qy)))

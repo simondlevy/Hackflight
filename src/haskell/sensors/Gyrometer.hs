@@ -14,6 +14,7 @@ import Language.Copilot
 
 import State
 import Sensor
+import Utils
 
 gyrometer :: Sensor
 
