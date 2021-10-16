@@ -53,13 +53,6 @@ void loop(void)
     step();
 }
 
-void stream_debugTimer(bool value)
-{
-    if (value) {
-        Serial.println(millis());
-    }
-}
-
 void stream_runHackflight(
         float tdmd,
         float rdmd,
@@ -72,7 +65,8 @@ void stream_runHackflight(
         float state_psi,
         float state_dphi,
         float state_dtheta,
-        float state_dpsi)
+        float state_dpsi, 
+        bool pready)
 {
     hf::motors_t motors = {};
 
@@ -89,6 +83,7 @@ void stream_runHackflight(
             state_dphi,
             state_dtheta,
             state_dpsi,
+            pready,
             motors);
 
     stream_serialUpdate();

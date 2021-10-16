@@ -46,15 +46,15 @@ namespace hf {
                     float tdmd, float rdmd, float pdmd,float ydmd,
                     float state_phi, float state_theta, float state_psi,
                     float state_dphi, float state_dtheta, float state_dpsi,
+                    bool pready,
                     motors_t & motors)
             {
                 // Start with demands from receiver
                 demands_t demands = {tdmd, rdmd, pdmd, ydmd};
 
                 // Periodically apply PID controllers to get demands
-                bool ready = _timer.ready(time_usec);
                 for (uint8_t k=0; k<_controller_count; ++k) {
-                    _controllers[k]->modifyDemands(_state, demands, ready); 
+                    _controllers[k]->modifyDemands(_state, demands, pready); 
 
                 }
 

@@ -78,6 +78,7 @@ namespace hf {
                     float state_dphi,
                     float state_dtheta,
                     float state_dpsi,
+                    bool pready,
                     motors_t & motors)
             {
                 HackflightPure::update(
@@ -92,6 +93,7 @@ namespace hf {
                         state_dphi,
                         state_dtheta,
                         state_dpsi,
+                        pready,
                         motors);
 
                 checkSafety(_state, rxarmed, rxtdown, motors);

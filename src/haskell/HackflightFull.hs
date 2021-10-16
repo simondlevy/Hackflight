@@ -23,9 +23,9 @@ import Safety
 import Time
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Demands, SBool)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Demands, SBool, SBool)
 
-hackflight receiver sensors pidfuns = (state, demands, led)
+hackflight receiver sensors pidfuns = (state, demands, pready, led)
 
   where
 
@@ -35,8 +35,8 @@ hackflight receiver sensors pidfuns = (state, demands, led)
     -- Get the vehicle state by composing the sensor functions over the initial state
     state = compose sensors state'
 
-    -- Periodically update PID controls to get demands
-    -- ready = timerReady 300 -- Hz
+    -- Periodically update PID controls to modify demands
+    pready = timerReady 300 -- Hz
 
     -- Check safety (arming / failsafe)
     (armed, failsafe, mready, cut) = safety demands state
