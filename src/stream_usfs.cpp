@@ -15,9 +15,6 @@
 #define _EXTERN
 #include "copilot.h"
 
-#define NONEXTERN
-#include "stream_imu.h"
-
 #include <Arduino.h>
 #include <Wire.h>
 #include <USFS_Master.h>

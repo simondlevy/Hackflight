@@ -6,6 +6,8 @@
   MIT License
 --}
 
+{-# LANGUAGE RebindableSyntax #-}
+
 module Gyrometer
 
 where
@@ -27,21 +29,28 @@ gyrometer state =
         (z       state) 
         (dz      state) 
         (phi     state)
-        ((dphi   state) + (deg2rad gyrometerX))
+        (update gx dphi)
         (theta   state)
-        ((dtheta state) + (deg2rad gyrometerY))
+        (update gy dtheta)
         (psi     state)
-        ((dpsi   state) + (deg2rad gyrometerZ))
+        (update gz dpsi)
 
-  where deg2rad d = d * pi / 180
+  where 
+
+    update newval old = if gavail then (deg2rad newval) else (old state)
+
+    deg2rad d = d * pi / 180
 
 ----------------------------------------------------------------------
 
-gyrometerX :: Stream Float
-gyrometerX = extern "stream_imuGyrometerX" Nothing
+gavail :: SBool
+gavail = extern "stream_imuGotGyrometer" Nothing
 
-gyrometerY :: Stream Float
-gyrometerY = extern "stream_imuGyrometerY" Nothing
+gx :: SFloat
+gx = extern "stream_imuGyrometerX" Nothing
 
-gyrometerZ :: Stream Float
-gyrometerZ = extern "stream_imuGyrometerZ" Nothing
+gy :: SFloat
+gy = extern "stream_imuGyrometerY" Nothing
+
+gz :: SFloat
+gz = extern "stream_imuGyrometerZ" Nothing

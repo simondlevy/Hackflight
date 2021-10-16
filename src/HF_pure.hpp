@@ -51,6 +51,7 @@ namespace hf {
                     uint32_t time_usec,
                     float tdmd, float rdmd, float pdmd,float ydmd,
                     float state_phi, float state_theta, float state_psi,
+                    float state_dphi, float state_dtheta, float state_dpsi,
                     motors_t & motors)
             {
                 // Start with demands from open-loop controller
@@ -67,13 +68,18 @@ namespace hf {
                 _mixer->run(demands, motors);
 
                 // Run sensors
+                /*
                 for (uint8_t k=0; k<_sensor_count; ++k) {
                     _sensors[k]->modifyState(_state, time_usec);
-                }
+                }*/
 
                 _state.phi = state_phi;
                 _state.theta = state_theta;
                 _state.psi = state_psi;
+
+                _state.dphi = state_dphi;
+                _state.dtheta = state_dtheta;
+                _state.dpsi = state_dpsi;
             }
 
             void addSensor(Sensor * sensor) 

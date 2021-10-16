@@ -11,7 +11,7 @@
 #include <HF_sensor.hpp>
 #include <HF_utils.hpp>
 
-#include "../stream_imu.h"
+#include "../copilot.h"
 
 namespace hf {
 
