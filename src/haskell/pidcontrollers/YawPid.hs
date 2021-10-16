@@ -44,5 +44,3 @@ yawController kp ki (state, ready, demands) = (state, ready, demands')
 
     -- Maintain error integral between iterations
     errI' = [0] ++ errI
-
-

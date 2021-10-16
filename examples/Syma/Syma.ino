@@ -21,7 +21,6 @@
 #include "HF_debugger.hpp"
 #include "hf_mixers/quad/xmw.hpp"
 #include "hf_pidcontrollers/rate.hpp"
-#include "hf_pidcontrollers/yaw.hpp"
 #include "hf_pidcontrollers/level.hpp"
 
 #include "stream_serial.h"
@@ -34,7 +33,6 @@ static const uint8_t MOTOR_PINS[4] = {13, 16, 3, 11};
 static hf::MixerQuadXMW mixer;
 
 static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
-static hf::YawPid yawPid = hf::YawPid(1.0625, 0.005625f);
 static hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 static hf::HackflightFull h(&mixer);
@@ -45,7 +43,6 @@ void setup(void)
 {
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
-    h.addPidController(&yawPid);
 }
 
 void loop(void)

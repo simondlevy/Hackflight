@@ -36,7 +36,7 @@ hackflight receiver sensors pidfuns = (state, rdemands, pready, pdemands, led)
     state = compose sensors state'
 
     -- Periodically update PID controls to modify demands
-    pready = timerReady 300 -- Hz
+    pready = timerReady 300
     (_, _, pdemands) = compose pidfuns (state, pready, rdemands)
 
     -- Check safety (arming / failsafe)
