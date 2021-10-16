@@ -26,13 +26,10 @@
 
 #include "stream_serial.h"
 #include "stream_motors.h"
-#include "stream_led.h"
 
 #include "copilot.h"
 
 static const uint8_t MOTOR_PINS[4] = {13, 16, 3, 11};
-
-static uint32_t LED_PIN = 18;
 
 static hf::MixerQuadXMW mixer;
 
@@ -70,7 +67,6 @@ void stream_runHackflight(
         float state_dtheta,
         float state_dpsi)
 {
-    bool ledval = false;
     hf::motors_t motors = {};
 
     h.update(micros(),
@@ -86,8 +82,7 @@ void stream_runHackflight(
             state_dphi,
             state_dtheta,
             state_dpsi,
-            motors,
-            ledval);
+            motors);
 
     stream_serialUpdate();
 
@@ -102,6 +97,4 @@ void stream_runHackflight(
     if (motors.ready) {
         stream_writeBrushedMotors(MOTOR_PINS, motors.values);
     }
-
-    stream_writeLed(LED_PIN, ledval);
 }

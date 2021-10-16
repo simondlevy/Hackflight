@@ -78,8 +78,7 @@ namespace hf {
                     float state_dphi,
                     float state_dtheta,
                     float state_dpsi,
-                    motors_t & motors,
-                    bool & led)
+                    motors_t & motors)
             {
                 HackflightPure::update(
                         time_usec,
@@ -95,11 +94,7 @@ namespace hf {
                         state_dpsi,
                         motors);
 
-                // Debugger::printf("%+3.3f %+3.3f\n", _state.dpsi, state_dpsi);
-
                 checkSafety(_state, rxarmed, rxtdown, motors);
-
-                led = time_usec < 2000000 ? (time_usec / 50000) % 2 == 0 : _safety.armed;
 
                 _serial.parse(_state, _mixer, motors);
             }

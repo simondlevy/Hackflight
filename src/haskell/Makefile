@@ -10,6 +10,7 @@ HSRC = Main.hs \
        Receiver.hs \
        Demands.hs \
        Safety.hs \
+       Time.hs \
 	   sensors/Gyrometer.hs \
 	   sensors/Quaternion.hs \
        pidcontrollers/RatePid.hs \

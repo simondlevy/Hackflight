@@ -1,8 +1,9 @@
 /*
-   Hackflight sketch for LEDs
+   Streaming support for LEDs
+
+   Copyright (c) 2021 Simon D. Levy
 
    MIT License
-
  */
 
 #include <Arduino.h>

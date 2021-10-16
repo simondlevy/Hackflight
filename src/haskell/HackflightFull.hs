@@ -20,11 +20,12 @@ import Sensor
 import Demands
 import PidController
 import Safety
+import Time
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Demands)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Demands, SBool)
 
-hackflight receiver sensors pidfuns = (state, demands)
+hackflight receiver sensors pidfuns = (state, demands, led)
 
   where
 
@@ -38,7 +39,7 @@ hackflight receiver sensors pidfuns = (state, demands)
     (armed, failsafe, mready, cut) = safety demands state
 
     -- Blink LED during first couple of seconds; keep it solid when armed
-    -- ledOn = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else isArmed
+    led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
 
     state' = State ([0] ++ (x state))
                    ([0] ++ (dx state))

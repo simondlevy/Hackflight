@@ -58,7 +58,7 @@ spec = do
   let running = count > 1
   let starting = not running
 
-  let  (state, demands) = hackflight receiver sensors pidfuns
+  let  (state, demands, led) = hackflight receiver sensors pidfuns
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
@@ -71,6 +71,8 @@ spec = do
   -- Do some other stuff in loop
   trigger "stream_updateImu" running []
   trigger "stream_updateReceiver" running []
+  trigger "stream_updateTime" running []
+  trigger "stream_writeLed" running [arg led_pin, arg led]
 
   trigger "stream_runHackflight" running [  arg $ throttle demands
                                           , arg $ roll demands
