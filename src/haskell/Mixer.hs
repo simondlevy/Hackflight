@@ -26,9 +26,9 @@ data Spins = Spins { s1 :: Demands
                    , s3 :: Demands
                    , s4 :: Demands }
 
-runMixer :: Demands -> Spins -> Motors
+mix :: Demands -> Spins -> Motors
 
-runMixer demands spins = Motors m1 m2 m3 m4 where
+mix demands spins = Motors m1 m2 m3 m4 where
 
   -- Map throttle demand from [-1,+1] to [0,1]
   t = ((throttle demands) + 1) / 2
@@ -69,29 +69,15 @@ quadXMWSpins = Spins (Demands p n p n)
                      (Demands p p p p)
                      (Demands p p n n)
 
+quadXAPSpins :: Spins 
+
+quadXAPSpins = Spins (Demands p n n p)
+                     (Demands p p p p)
+                     (Demands p p n n)
+                     (Demands p n p n)
+
 type Mixer = Demands -> Motors
 
 quadXMWMixer :: Mixer
 
-quadXMWMixer demands =
-
-  --                 Th  RR  PF  YR
-  Motors (t - r + p - y)
-         (t - r - p + y)
-         (t + r + p + y)
-         (t + r - p - y)
-  where 
-
-    t = ((throttle demands) + 1) / 2 -- Map throttle from [-1,+1] to [0,1]
-    r = roll demands
-    p = pitch demands
-    y = yaw demands
-
-{--
-quadXAPMixer demands =
-
-  Motors (t - r - p + y)
-         (t + r + p + y)
-         (t + r - p - y)
-         (t - r + p - y)
---}
+quadXMWMixer demands = mix demands quadXMWSpins 
