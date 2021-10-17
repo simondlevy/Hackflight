@@ -61,7 +61,7 @@ spec = do
   let running = count > 1
   let starting = not running
 
-  let  (state, mready, cut, pdemands, led) = hackflight receiver sensors pidfuns mixer
+  let  (state, mready, cut, pdemands, motors, led) = hackflight receiver sensors pidfuns mixer
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
