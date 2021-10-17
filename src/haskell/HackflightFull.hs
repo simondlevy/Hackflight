@@ -21,6 +21,7 @@ import Demands
 import PidController
 import Safety
 import Time
+import Mixer
 import Utils
 
 hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, SBool, SBool, Demands, SBool)

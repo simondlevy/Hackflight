@@ -9,11 +9,16 @@ HSRC = Main.hs \
        HackflightFull.hs \
        Receiver.hs \
        Demands.hs \
+       PidController.hs \
        Safety.hs \
        Time.hs \
+       Mixer.hs \
+       Utils.hs \
 	   sensors/Gyrometer.hs \
 	   sensors/Quaternion.hs \
-       pidcontrollers/YawPid.hs
+       pidcontrollers/RatePid.hs \
+       pidcontrollers/YawPid.hs \
+       pidcontrollers/LevelPid.hs
 
 RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
