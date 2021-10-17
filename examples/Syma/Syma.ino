@@ -20,7 +20,6 @@
 #include "HF_full.hpp"
 #include "HF_debugger.hpp"
 #include "hf_mixers/quad/xmw.hpp"
-#include "hf_pidcontrollers/rate.hpp"
 
 #include "stream_serial.h"
 #include "stream_motors.h"
@@ -31,15 +30,12 @@ static const uint8_t MOTOR_PINS[4] = {13, 16, 3, 11};
 
 static hf::MixerQuadXMW mixer;
 
-static hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375);
-
 static hf::HackflightFull h(&mixer);
 
 static bool running;
 
 void setup(void)
 {
-    h.addPidController(&ratePid);
 }
 
 void loop(void)
@@ -48,45 +44,29 @@ void loop(void)
 }
 
 void stream_runHackflight(
-        float rxtdmd,
-        float rxrdmd,
-        float rxrxpdmd,
-        float rxydmd,
         bool rxarmed,
         bool rxtdown,
         float state_phi,
         float state_theta,
         float state_psi,
-        float state_dphi,
-        float state_dtheta,
-        float state_dpsi, 
-        bool pready,
-        float pidtdmd,
-        float pidrdmd,
-        float pidpdmd,
-        float pidydmd)
+        float tdmd,
+        float rdmd,
+        float pdmd,
+        float ydmd)
 
 {
     hf::motors_t motors = {};
 
-    h.update(micros(),
-            rxtdmd,
-            rxrdmd,
-            rxrxpdmd,
-            rxydmd,
+    h.update(
             rxarmed,
             rxtdown,
             state_phi,
             state_theta,
             state_psi,
-            state_dphi,
-            state_dtheta,
-            state_dpsi,
-            pready,
-            pidtdmd,
-            pidrdmd,
-            pidpdmd,
-            pidydmd,
+            tdmd,
+            rdmd,
+            pdmd,
+            ydmd,
             motors);
 
     stream_serialUpdate();

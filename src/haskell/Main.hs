@@ -72,19 +72,12 @@ spec = do
   trigger "stream_updateTime" running []
   trigger "stream_writeLed" running [arg led_pin, arg led]
 
-  trigger "stream_runHackflight" running [  arg $ throttle rdemands
-                                          , arg $ roll rdemands
-                                          , arg $ pitch rdemands
-                                          , arg $ yaw rdemands 
-                                          , arg $ receiverAux1 > 0
+  trigger "stream_runHackflight" running [  
+                                            arg $ receiverAux1 > 0
                                           , arg $ (throttle rdemands) < (-0.995)
                                           , arg $ phi state
                                           , arg $ theta state
                                           , arg $ psi state
-                                          , arg $ dphi state
-                                          , arg $ dtheta state
-                                          , arg $ dpsi state
-                                          , arg pready
                                           , arg $ throttle pdemands
                                           , arg $ roll pdemands
                                           , arg $ pitch pdemands

@@ -65,46 +65,24 @@ namespace hf {
             }
 
             void update(
-                    uint32_t time_usec,
-                    float rxtdmd,
-                    float rxrdmd,
-                    float rxpdmd,
-                    float rxydmd,
                     bool rxarmed,
                     bool rxtdown,
                     float state_phi,
                     float state_theta,
                     float state_psi,
-                    float state_dphi,
-                    float state_dtheta,
-                    float state_dpsi,
-                    bool pready,
-                    float pidtdmd,
-                    float pidrdmd,
-                    float pidpdmd,
-                    float pidydmd,
+                    float tdmd,
+                    float rdmd,
+                    float pdmd,
+                    float ydmd,
                     motors_t & motors)
             {
-                HackflightPure::update(
-                        time_usec,
-                        rxtdmd,
-                        rxrdmd,
-                        rxpdmd,
-                        rxydmd,
-                        state_phi,
-                        state_theta,
-                        state_psi,
-                        state_dphi,
-                        state_dtheta,
-                        state_dpsi,
-                        pready,
-                        pidtdmd,
-                        pidrdmd,
-                        pidpdmd,
-                        pidydmd,
-                        motors);
+                HackflightPure::update(tdmd, rdmd, pdmd, ydmd, motors);
 
                 checkSafety(_state, rxarmed, rxtdown, motors);
+
+                _state.phi = state_phi;
+                _state.theta = state_theta;
+                _state.psi = state_psi;
 
                 _serial.parse(_state, _mixer, motors);
             }
