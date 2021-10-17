@@ -29,6 +29,9 @@ import RatePid(rateController)
 import YawPid(yawController)
 import LevelPid(levelController)
 
+-- Mixer
+import Mixer(quadXMWMixer)
+
 -- Misc
 import Utils
 
@@ -41,13 +44,15 @@ led_pin = 18 :: SWord8
 
 receiver = makeReceiverWithTrim (AxisTrim 0.0 0.05 0.045) 4.0
 
+sensors = [gyrometer, quaternion]
+
 -- PID controllers are applied last-to-first
 pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
            , rateController 0.225  0.001875 0.375 -- Kp, Ki, Kd 
            , levelController 0.2 -- Kp
           ]
 
-sensors = [gyrometer, quaternion]
+mixer = quadXMWMixer
 
 spec = do
 
@@ -56,7 +61,7 @@ spec = do
   let running = count > 1
   let starting = not running
 
-  let  (state, mready, cut, pdemands, led) = hackflight receiver sensors pidfuns
+  let  (state, mready, cut, pdemands, led) = hackflight receiver sensors pidfuns mixer
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []

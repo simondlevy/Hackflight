@@ -24,9 +24,10 @@ import Time
 import Mixer
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, SBool, SBool, Demands, SBool)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> Mixer
+  -> (State, SBool, SBool, Demands, SBool)
 
-hackflight receiver sensors pidfuns = (state, mready, mcut , pdemands, led)
+hackflight receiver sensors pidfuns mixer = (state, mready, mcut , pdemands, led)
 
   where
 
