@@ -11,6 +11,7 @@
 module Mixer where
 
 import Language.Copilot
+import Prelude hiding((>), (<))
 
 import Demands
 import Utils
@@ -36,14 +37,26 @@ runMixer demands spins = Motors m1 m2 m3 m4 where
   p = pitch demands
   y = yaw demands
 
-  m1 = motor s1
-  m2 = motor s2
-  m3 = motor s3
-  m4 = motor s4
+  m1' = motor s1
+  m2' = motor s2
+  m3' = motor s3
+  m4' = motor s4
+
+  maxmotor = fmax (fmax (fmax m1' m2') m3') m4'
+
+  -- This is a way to still have good gyro corrections if at least one motor reaches
+  -- its max
+  m1 = constrain $ cap m1'
+  m2 = constrain $ cap m2'
+  m3 = constrain $ cap m3'
+  m4 = constrain $ cap m4'
 
   motor spin = let s = spin spins in
     t * (throttle s)+ r * (roll s) + p * (pitch s) + y * (yaw s)
 
+  cap m = if m > maxmotor then m - maxmotor + 1 else m
+
+  constrain m = if m < 0 then 0 else if m > 1 then 1 else m
 
 type Mixer = Demands -> Motors
 
