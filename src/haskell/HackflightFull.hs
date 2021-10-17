@@ -44,7 +44,8 @@ hackflight receiver sensors pidfuns mixer = (state, mready, mcut , pdemands, mot
     -- Check safety (arming / failsafe)
     (armed, failsafe, mready, mcut) = safety rdemands state
 
-    motors = QuadMotors 0 0 0 0
+    -- Run mixer on demands to get motor values
+    motors = mixer pdemands
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed

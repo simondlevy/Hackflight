@@ -20,14 +20,19 @@ data Motors = QuadMotors { m1 :: SFloat
                          , m3 :: SFloat
                          , m4 :: SFloat }
 
-addMotors :: Motors -> Motors -> Motors
+runMixer :: Demands -> Motors
 
-addMotors (QuadMotors m11 m12 m13 m14) (QuadMotors m21 m22 m23 m24) 
-  = QuadMotors (m11 + m21) (m12 + m22) (m13 + m23) (m14 + m24)
+runMixer demands = QuadMotors m1 m2 m3 m4 where
+
+  -- Map throttle demand from [-1,+1] to [0,1]
+  t = ((throttle demands) + 1) / 2
+
+  m1 = 0
+  m2 = 0
+  m3 = 0
+  m4 = 0
 
 type Mixer = Demands -> Motors
-
--- addMotors :: Motors -> Motors -> Motors
 
 quadXMWMixer :: Mixer
 

@@ -30,7 +30,7 @@ import YawPid(yawController)
 import LevelPid(levelController)
 
 -- Mixer
-import Mixer(quadXMWMixer)
+import Mixer(quadXMWMixer, m1, m2, m3, m4)
 
 -- Misc
 import Utils
@@ -87,6 +87,10 @@ spec = do
                                           , arg $ roll pdemands
                                           , arg $ pitch pdemands
                                           , arg $ yaw pdemands 
+                                          , arg $ m1 motors
+                                          , arg $ m2 motors
+                                          , arg $ m3 motors
+                                          , arg $ m4 motors
                                          ] 
 
 -- Compile the spec
