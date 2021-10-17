@@ -58,6 +58,17 @@ runMixer demands spins = Motors m1 m2 m3 m4 where
 
   constrain m = if m < 0 then 0 else if m > 1 then 1 else m
 
+
+p = 1 :: SFloat 
+n = -1 :: SFloat
+
+quadXMWSpins :: Spins 
+
+quadXMWSpins = Spins (Demands p n p n)
+                     (Demands p n n p)
+                     (Demands p p p p)
+                     (Demands p p n n)
+
 type Mixer = Demands -> Motors
 
 quadXMWMixer :: Mixer
@@ -66,9 +77,9 @@ quadXMWMixer demands =
 
   --                 Th  RR  PF  YR
   Motors (t - r + p - y)
-             (t - r - p + y)
-             (t + r + p + y)
-             (t + r - p - y)
+         (t - r - p + y)
+         (t + r + p + y)
+         (t + r - p - y)
   where 
 
     t = ((throttle demands) + 1) / 2 -- Map throttle from [-1,+1] to [0,1]
@@ -76,18 +87,11 @@ quadXMWMixer demands =
     p = pitch demands
     y = yaw demands
 
-quadXAPMixer :: Mixer
-
+{--
 quadXAPMixer demands =
 
-  --                 Th  RR  PF  YR
   Motors (t - r - p + y)
-             (t + r + p + y)
-             (t + r - p - y)
-             (t - r + p - y)
-  where 
-
-    t = ((throttle demands) + 1) / 2 -- Map throttle from [-1,+1] to [0,1]
-    r = roll demands
-    p = pitch demands
-    y = yaw demands
+         (t + r + p + y)
+         (t + r - p - y)
+         (t - r + p - y)
+--}
