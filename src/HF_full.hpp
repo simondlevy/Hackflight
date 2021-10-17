@@ -22,51 +22,17 @@ namespace hf {
         private:
 
             SerialComms _serial;
-            Safety _safety;
-
-            void checkSafety(state_t & state, bool receiverInArmedState, bool receiverThrottleIsDown,  motors_t & motors)
-            {
-                bool failsafe = stream_receiverLostSignal && _safety.armed;
-
-                bool disarm = _safety.armed && !receiverInArmedState;
-
-                bool armedThrottleDown = _safety.armed && receiverThrottleIsDown;
-
-                bool running = _safety.armed && !receiverThrottleIsDown;
-
-                // Arm after lots of safety checks
-                bool arm = !_safety.armed
-                        && !_safety.failsafe 
-                        && Safety::safeToArm(state)
-                        && receiverThrottleIsDown
-                        && receiverInArmedState;
-
-                bool cut = failsafe || disarm || armedThrottleDown; 
-
-                motors.ready = failsafe || disarm || arm || armedThrottleDown || running ? true : motors.ready;
-                
-                motors.values[0] = cut ? 0 : motors.values[0];
-                motors.values[1] = cut ? 0 : motors.values[1];
-                motors.values[2] = cut ? 0 : motors.values[2];
-                motors.values[3] = cut ? 0 : motors.values[3];
-
-                _safety.armed = failsafe || disarm ? false : arm ? true : _safety.armed;
-
-                _safety.failsafe = failsafe ? true : _safety.failsafe;
-
-             }
 
         public:
 
             HackflightFull(Mixer * mixer)
                 : HackflightPure(mixer)
             {
-                _safety.armed = false;
             }
 
             void update(
-                    bool rxarmed,
-                    bool rxtdown,
+                    bool mready,
+                    bool mcut,
                     float state_phi,
                     float state_theta,
                     float state_psi,
@@ -78,7 +44,11 @@ namespace hf {
             {
                 HackflightPure::update(tdmd, rdmd, pdmd, ydmd, motors);
 
-                checkSafety(_state, rxarmed, rxtdown, motors);
+                motors.ready = mready;
+                motors.values[0] = mcut ? 0 : motors.values[0];
+                motors.values[1] = mcut ? 0 : motors.values[1];
+                motors.values[2] = mcut ? 0 : motors.values[2];
+                motors.values[3] = mcut ? 0 : motors.values[3];
 
                 _state.phi = state_phi;
                 _state.theta = state_theta;

@@ -23,9 +23,7 @@ safety demands state = (armed, failsafe, mready, cut)
 
   where
 
-    throttleIsDown = (throttle demands) < (-0.995)
-
-    aux1IsDown = receiverAux1 > 0
+    failsafe = if failsafe' then true else armed' && receiverLostSignal
 
     disarm = armed' && not aux1IsDown
 
@@ -38,12 +36,12 @@ safety demands state = (armed, failsafe, mready, cut)
 
     cut = failsafe || disarm || armedThrottleDown
 
-    mready = if failsafe || disarm || arm || armedThrottleDown || running then true else mready'
+    mready = failsafe || disarm || arm || armedThrottleDown || running
 
     armed = if failsafe' || disarm then false else if arm then true else armed'
 
-    failsafe = if failsafe' then true else failsafe'
+    throttleIsDown = (throttle demands) < (-0.995)
+    aux1IsDown = receiverAux1 > 0
 
     armed' = [False] ++ armed
     failsafe' = [False] ++ failsafe
-    mready' = [False] ++ mready

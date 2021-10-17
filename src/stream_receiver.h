@@ -10,5 +10,4 @@
 #define EXTERN extern
 #endif
 
-EXTERN bool stream_receiverLostSignal;
 EXTERN float stream_receiverAux2;

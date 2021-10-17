@@ -34,7 +34,6 @@ void serialEvent1(void)
     }
 }
 
-
 void stream_startReceiver(void)
 {
     Serial1.begin(115200);

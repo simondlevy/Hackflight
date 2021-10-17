@@ -56,7 +56,7 @@ spec = do
   let running = count > 1
   let starting = not running
 
-  let  (state, rdemands, pdemands, led) = hackflight receiver sensors pidfuns
+  let  (state, mready, cut, pdemands, led) = hackflight receiver sensors pidfuns
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
@@ -73,8 +73,8 @@ spec = do
   trigger "stream_writeLed" running [arg led_pin, arg led]
 
   trigger "stream_runHackflight" running [  
-                                            arg $ receiverAux1 > 0
-                                          , arg $ (throttle rdemands) < (-0.995)
+                                            arg $ mready
+                                          , arg $ cut
                                           , arg $ phi state
                                           , arg $ theta state
                                           , arg $ psi state

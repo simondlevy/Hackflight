@@ -44,8 +44,8 @@ void loop(void)
 }
 
 void stream_runHackflight(
-        bool rxarmed,
-        bool rxtdown,
+        bool mready,
+        bool mcut,
         float state_phi,
         float state_theta,
         float state_psi,
@@ -58,8 +58,8 @@ void stream_runHackflight(
     hf::motors_t motors = {};
 
     h.update(
-            rxarmed,
-            rxtdown,
+            mready,
+            mcut,
             state_phi,
             state_theta,
             state_psi,
@@ -78,6 +78,14 @@ void stream_runHackflight(
     if (h.serialAvailable() > 0) {
         stream_serialWrite(h.serialRead());
     }
+
+    /*
+    hf::Debugger::printf("%d | %3.3f %3.3f %3.3f %3.3f\n",
+            motors.ready,
+            motors.values[0],
+            motors.values[1],
+            motors.values[2],
+            motors.values[3]);*/
 
     if (motors.ready) {
         stream_writeBrushedMotors(MOTOR_PINS, motors.values);

@@ -23,9 +23,9 @@ import Safety
 import Time
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Demands, Demands, SBool)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, SBool, SBool, Demands, SBool)
 
-hackflight receiver sensors pidfuns = (state, rdemands, pdemands, led)
+hackflight receiver sensors pidfuns = (state, mready, mcut , pdemands, led)
 
   where
 
@@ -39,7 +39,7 @@ hackflight receiver sensors pidfuns = (state, rdemands, pdemands, led)
     (_, _, pdemands) = compose pidfuns (state, timerReady 300, rdemands)
 
     -- Check safety (arming / failsafe)
-    (armed, failsafe, mready, cut) = safety rdemands state
+    (armed, failsafe, mready, mcut) = safety rdemands state
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
