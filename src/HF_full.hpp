@@ -9,7 +9,6 @@
 #pragma once
 
 #include "HF_pure.hpp"
-#include "HF_safety.hpp"
 #include "HF_serial.hpp"
 #include "HF_debugger.hpp"
 
