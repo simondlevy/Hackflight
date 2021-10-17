@@ -20,10 +20,10 @@ data Motors = Motors { m1 :: SFloat
                      , m3 :: SFloat
                      , m4 :: SFloat }
 
-data Spins = Spins { s1 :: SFloat
-                   , s2 :: SFloat
-                   , s3 :: SFloat
-                   , s4 :: SFloat }
+data Spins = Spins { s1 :: Demands
+                   , s2 :: Demands
+                   , s3 :: Demands
+                   , s4 :: Demands }
 
 runMixer :: Demands -> Spins -> Motors
 
@@ -31,11 +31,19 @@ runMixer demands spins = Motors m1 m2 m3 m4 where
 
   -- Map throttle demand from [-1,+1] to [0,1]
   t = ((throttle demands) + 1) / 2
+  
+  r = roll demands
+  p = pitch demands
+  y = yaw demands
 
-  m1 = (s1 spins)
-  m2 = 0
-  m3 = 0
-  m4 = 0
+  m1 = motor s1
+  m2 = motor s2
+  m3 = motor s3
+  m4 = motor s4
+
+  motor spin = let s = spin spins in
+    t * (throttle s)+ r * (roll s) + p * (pitch s) + y * (yaw s)
+
 
 type Mixer = Demands -> Motors
 
