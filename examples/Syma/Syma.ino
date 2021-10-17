@@ -73,7 +73,7 @@ void stream_runHackflight(
             ydmd,
             motors);
 
-    hf::Debugger::printf("%3.3f %3.3f\n", motors.values[0], m1);
+    //hf::Debugger::printf("%3.3f %3.3f\n", motors.values[0], m1);
 
     stream_serialUpdate();
 

@@ -20,20 +20,12 @@ namespace hf {
 
         private:
 
-            // Custom mixer data per motor
-            typedef struct {
-                int8_t throttle; // T
-                int8_t roll; 	 // A
-                int8_t pitch;	 // E
-                int8_t yaw;	     // R
-            } mixer_t;
-
             // Arbitrary
             static const uint8_t MAXMOTORS = 20;
 
             uint8_t _nmotors = 0;
 
-            static float motorfun(demands_t & demands, mixer_t & mix)
+            static float motorfun(demands_t & demands, demands_t & mix)
             {
                 return demands.throttle * mix.throttle + 
                        demands.roll     * mix.roll +     
@@ -50,7 +42,7 @@ namespace hf {
 
         public:
 
-            mixer_t motorDirections[MAXMOTORS];
+            demands_t spins[MAXMOTORS];
 
             virtual float constrainMotorValue(uint8_t index, float value)
             {
@@ -66,10 +58,10 @@ namespace hf {
                 for (uint8_t i = 0; i < _nmotors; i++) {
 
                     motors.values[i] = 
-                        (demands.throttle * motorDirections[i].throttle + 
-                         demands.roll     * motorDirections[i].roll +     
-                         demands.pitch    * motorDirections[i].pitch +   
-                         demands.yaw      * motorDirections[i].yaw);      
+                        (demands.throttle * spins[i].throttle + 
+                         demands.roll     * spins[i].roll +     
+                         demands.pitch    * spins[i].pitch +   
+                         demands.yaw      * spins[i].yaw);      
                 }
 
                 float maxMotor = 0;
