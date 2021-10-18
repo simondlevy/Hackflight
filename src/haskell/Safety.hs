@@ -34,7 +34,8 @@ safety demands state = (armed, failsafe, mready, cut)
 
     cut = failsafe || armedThrottleDown
 
-    mready = cut || arm || (armed' && not throttleIsDown)
+    -- mready = cut || arm || (armed' && not throttleIsDown)
+    mready = cut || (armed' && not throttleIsDown)
 
     armed = if failsafe' || disarm then false else if arm then true else armed'
 
