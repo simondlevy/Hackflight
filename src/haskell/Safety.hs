@@ -29,14 +29,12 @@ safety demands state = (armed, failsafe, mready, cut)
 
     armedThrottleDown = armed' && throttleIsDown
 
-    running = armed' && not throttleIsDown
-
     -- Arm after lots of safety checks
     arm = not armed' && not failsafe' && safeToArm state && throttleIsDown && aux1IsDown
 
     cut = failsafe || disarm || armedThrottleDown
 
-    mready = failsafe || disarm || arm || armedThrottleDown || running
+    mready = cut || arm || (armed' && not throttleIsDown)
 
     armed = if failsafe' || disarm then false else if arm then true else armed'
 
