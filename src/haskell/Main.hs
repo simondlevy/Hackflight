@@ -78,15 +78,11 @@ spec = do
   trigger "stream_writeLed" running [arg led_pin, arg led]
 
   trigger "stream_runHackflight" running [  
-                                            arg $ mready
-                                          , arg $ cut
-                                          , arg $ phi state
+                                            arg $ phi state
                                           , arg $ theta state
                                           , arg $ psi state
-                                          , arg $ throttle pdemands
-                                          , arg $ roll pdemands
-                                          , arg $ pitch pdemands
-                                          , arg $ yaw pdemands 
+                                          , arg $ mready
+                                          , arg $ cut
                                           , arg $ m1 motors
                                           , arg $ m2 motors
                                           , arg $ m3 motors

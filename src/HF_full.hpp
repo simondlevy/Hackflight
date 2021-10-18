@@ -30,24 +30,22 @@ namespace hf {
             }
 
             void update(
-                    bool mready,
-                    bool mcut,
                     float state_phi,
                     float state_theta,
                     float state_psi,
-                    float tdmd,
-                    float rdmd,
-                    float pdmd,
-                    float ydmd,
+                    bool mready,
+                    bool mcut,
+                    float m1,
+                    float m2,
+                    float m3,
+                    float m4,
                     motors_t & motors)
             {
-                HackflightPure::update(tdmd, rdmd, pdmd, ydmd, motors);
-
                 motors.ready = mready;
-                motors.values[0] = mcut ? 0 : motors.values[0];
-                motors.values[1] = mcut ? 0 : motors.values[1];
-                motors.values[2] = mcut ? 0 : motors.values[2];
-                motors.values[3] = mcut ? 0 : motors.values[3];
+                motors.values[0] = mcut ? 0 : m1;
+                motors.values[1] = mcut ? 0 : m2;
+                motors.values[2] = mcut ? 0 : m3;
+                motors.values[3] = mcut ? 0 : m4;
 
                 _state.phi = state_phi;
                 _state.theta = state_theta;

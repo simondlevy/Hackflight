@@ -44,15 +44,11 @@ void loop(void)
 }
 
 void stream_runHackflight(
-        bool mready,
-        bool mcut,
         float state_phi,
         float state_theta,
         float state_psi,
-        float tdmd,
-        float rdmd,
-        float pdmd,
-        float ydmd, 
+        bool mready,
+        bool mcut,
         float m1,
         float m2,
         float m3,
@@ -61,18 +57,16 @@ void stream_runHackflight(
     hf::motors_t motors = {};
 
     h.update(
-            mready,
-            mcut,
             state_phi,
             state_theta,
             state_psi,
-            tdmd,
-            rdmd,
-            pdmd,
-            ydmd,
+            mready,
+            mcut,
+            m1,
+            m2,
+            m3,
+            m4,
             motors);
-
-    //hf::Debugger::printf("%3.3f %3.3f\n", motors.values[0], m1);
 
     stream_serialUpdate();
 
