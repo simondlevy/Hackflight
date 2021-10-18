@@ -30,7 +30,7 @@ import YawPid(yawController)
 import LevelPid(levelController)
 
 -- Mixer
-import Mixer(quadXMWMixer, m1, m2, m3, m4)
+import Mixer
 
 -- Misc
 import Utils
@@ -52,7 +52,7 @@ pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
            , levelController 0.2 -- Kp
           ]
 
-mixer = quadXMWMixer
+-- mixer = quadXMWMixer
 
 spec = do
 
@@ -61,7 +61,7 @@ spec = do
   let running = count > 1
   let starting = not running
 
-  let  (state, mready, cut, pdemands, motors, led) = hackflight receiver sensors pidfuns mixer
+  let  (state, mready, cut, pdemands, motors, led) = hackflight receiver sensors pidfuns
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []

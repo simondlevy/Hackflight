@@ -44,12 +44,6 @@ namespace hf {
 
             demands_t spins[MAXMOTORS];
 
-            virtual float constrainMotorValue(uint8_t index, float value)
-            {
-                (void)index; // all motors behave the same by default
-                return constrainMinMax(value, 0, 1);
-            }
-
             void run(demands_t & demands, motors_t & motors)
             {
                 // Map throttle demand from [-1,+1] to [0,1]
@@ -76,12 +70,10 @@ namespace hf {
 
                     // This is a way to still have good gyro corrections if at
                     // least one motor reaches its max
-                    motors.values[i] = maxMotor > 1 ?
-                                       motors.values[i] - maxMotor + 1 :
-                                       motors.values[i];
+                    motors.values[i] = maxMotor > 1 ?  motors.values[i] - maxMotor + 1 : motors.values[i];
 
                     // Keep motor values in appropriate interval
-                    motors.values[i] = constrainMotorValue(i, motors.values[i]);
+                    motors.values[i] = constrainMinMax(motors.values[i], 0, 1);
                 }
             }
 

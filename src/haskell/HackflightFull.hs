@@ -24,10 +24,10 @@ import Time
 import Mixer
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> Mixer
+hackflight :: Receiver -> [Sensor] -> [PidFun]
   -> (State, SBool, SBool, Demands, Motors, SBool)
 
-hackflight receiver sensors pidfuns mixer = (state, mready, mcut , pdemands, motors, led)
+hackflight receiver sensors pidfuns = (state, mready, mcut , pdemands, motors, led)
 
   where
 
@@ -45,7 +45,7 @@ hackflight receiver sensors pidfuns mixer = (state, mready, mcut , pdemands, mot
     (armed, failsafe, mready, mcut) = safety rdemands state
 
     -- Run mixer on demands to get motor values
-    motors = mixer pdemands
+    motors = mix pdemands
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
