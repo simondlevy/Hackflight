@@ -135,9 +135,9 @@ class SerialComms {
 
     public:
 
-        uint8_t available(void)
+        bool available(void)
         {
-            return _outbuf.size;
+            return _outbuf.size > 0;
         }
 
         uint8_t read(void)

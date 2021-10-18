@@ -65,10 +65,9 @@ void stream_run(
         stream_serialRead();
     }
 
-    if (serial.available() > 0) {
+    if (serial.available()) {
         stream_serialWrite(serial.read());
     }
-
 
     if (motors.ready) {
         static const uint8_t motor_pins[4] = {m1_pin, m2_pin, m3_pin, m4_pin};
