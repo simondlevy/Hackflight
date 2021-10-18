@@ -158,7 +158,7 @@ class SerialComms {
             static uint8_t index;
 
             // Reset motors iff serial data available
-            motors.ready = stream_serialAvailable ? true : motors.ready;
+            motors.running = stream_serialAvailable ? true : motors.running;
             motors.values[0] = stream_serialAvailable ? 0 : motors.values[0];
             motors.values[1] = stream_serialAvailable ? 0 : motors.values[1];
             motors.values[2] = stream_serialAvailable ? 0 : motors.values[2];

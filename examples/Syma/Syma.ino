@@ -51,7 +51,7 @@ void stream_run(
         float m4)
 {
     motors_t motors = {};
-    motors.ready = mrunning;
+    motors.running = mrunning;
     motors.values[0] = mzero ? 0 : m1;
     motors.values[1] = mzero ? 0 : m2;
     motors.values[2] = mzero ? 0 : m3;
@@ -69,7 +69,7 @@ void stream_run(
         stream_serialWrite(serial.read());
     }
 
-    if (motors.ready) {
+    if (motors.running) {
         static const uint8_t motor_pins[4] = {m1_pin, m2_pin, m3_pin, m4_pin};
         stream_writeBrushedMotors(motor_pins, motors.values);
     }

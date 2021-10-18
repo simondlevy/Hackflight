@@ -9,6 +9,6 @@
 #pragma once
 
 typedef struct {
-    bool ready;
+    bool running;
     float values[4];
 } motors_t;
