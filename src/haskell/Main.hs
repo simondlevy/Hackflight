@@ -77,16 +77,20 @@ spec = do
   trigger "stream_updateTime" running []
   trigger "stream_writeLed" running [arg led_pin, arg led]
 
-  trigger "stream_runHackflight" running [  
-                                            arg $ phi state
-                                          , arg $ theta state
-                                          , arg $ psi state
-                                          , arg $ mready
-                                          , arg $ cut
-                                          , arg $ m1 motors
-                                          , arg $ m2 motors
-                                          , arg $ m3 motors
-                                          , arg $ m4 motors
-                                         ] 
+  trigger "stream_run" running [  
+                                  arg $ phi state
+                                , arg $ theta state
+                                , arg $ psi state
+                                , arg $ mready
+                                , arg $ cut
+                                , arg $ m1_pin
+                                , arg $ m2_pin
+                                , arg $ m3_pin
+                                , arg $ m4_pin
+                                , arg $ m1 motors
+                                , arg $ m2 motors
+                                , arg $ m3 motors
+                                , arg $ m4 motors
+                               ] 
 -- Compile the spec
 main = reify spec >>= compile "copilot"

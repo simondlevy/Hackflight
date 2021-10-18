@@ -17,22 +17,14 @@
 
  */
 
-#include "HF_full.hpp"
-#include "HF_debugger.hpp"
-#include "hf_mixers/quad/xmw.hpp"
+#include "serial.hpp"
 
 #include "stream_serial.h"
 #include "stream_motors.h"
 
 #include "copilot.h"
 
-static const uint8_t MOTOR_PINS[4] = {13, 16, 3, 11};
-
-static hf::MixerQuadXMW mixer;
-
-static hf::HackflightFull h(&mixer);
-
-static bool running;
+static SerialComms serial;
 
 void setup(void)
 {
@@ -43,30 +35,29 @@ void loop(void)
     step();
 }
 
-void stream_runHackflight(
+void stream_run(
         float state_phi,
         float state_theta,
         float state_psi,
         bool mready,
         bool mcut,
+        uint8_t m1_pin,
+        uint8_t m2_pin,
+        uint8_t m3_pin,
+        uint8_t m4_pin,
         float m1,
         float m2,
         float m3,
         float m4)
 {
-    hf::motors_t motors = {};
+    motors_t motors = {};
+    motors.ready = mready;
+    motors.values[0] = mcut ? 0 : m1;
+    motors.values[1] = mcut ? 0 : m2;
+    motors.values[2] = mcut ? 0 : m3;
+    motors.values[3] = mcut ? 0 : m4;
 
-    h.update(
-            state_phi,
-            state_theta,
-            state_psi,
-            mready,
-            mcut,
-            m1,
-            m2,
-            m3,
-            m4,
-            motors);
+    serial.parse(state_phi, state_theta, state_psi, motors);
 
     stream_serialUpdate();
 
@@ -74,12 +65,13 @@ void stream_runHackflight(
         stream_serialRead();
     }
 
-    if (h.serialAvailable() > 0) {
-        stream_serialWrite(h.serialRead());
+    if (serial.available() > 0) {
+        stream_serialWrite(serial.read());
     }
 
 
     if (motors.ready) {
-        stream_writeBrushedMotors(MOTOR_PINS, motors.values);
+        static const uint8_t motor_pins[4] = {m1_pin, m2_pin, m3_pin, m4_pin};
+        stream_writeBrushedMotors(motor_pins, motors.values);
     }
 }
