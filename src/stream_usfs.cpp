@@ -12,6 +12,7 @@
 
  */
 
+
 #define _EXTERN
 #include "copilot.h"
 

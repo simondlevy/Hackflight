@@ -57,8 +57,8 @@ pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
 spec = do
 
   -- Make flags for startup, loop
-  let count = (z::Stream Word64) + 1 where z = [0] ++ count
-  let running = count > 1
+  let flipflop = not flipflop' where flipflop' = [False] ++ flipflop
+  let running = if not flipflop then true else running' where running' = [False] ++ running
   let starting = not running
 
   let (state, mrunning, pdemands, motors, led) = hackflight receiver sensors pidfuns
@@ -91,5 +91,6 @@ spec = do
                                 , arg $ m3 motors
                                 , arg $ m4 motors
                                ] 
+
 -- Compile the spec
 main = reify spec >>= compile "copilot"
