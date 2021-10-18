@@ -11,6 +11,7 @@
 #include "HF_demands.hpp"
 #include "HF_motors.hpp"
 #include "HF_utils.hpp"
+#include "HF_debugger.hpp"
 
 namespace hf {
 
@@ -56,24 +57,6 @@ namespace hf {
                          demands.roll     * spins[i].roll +     
                          demands.pitch    * spins[i].pitch +   
                          demands.yaw      * spins[i].yaw);      
-                }
-
-                float maxMotor = 0;
-
-                for (uint8_t i = 0; i < _nmotors; i++) {
-                    maxMotor = motors.values[i] > maxMotor ?
-                                 motors.values[i] :
-                                 maxMotor;
-                }
-
-                for (uint8_t i = 0; i < _nmotors; i++) {
-
-                    // This is a way to still have good gyro corrections if at
-                    // least one motor reaches its max
-                    motors.values[i] = maxMotor > 1 ?  motors.values[i] - maxMotor + 1 : motors.values[i];
-
-                    // Keep motor values in appropriate interval
-                    motors.values[i] = constrainMinMax(motors.values[i], 0, 1);
                 }
             }
 

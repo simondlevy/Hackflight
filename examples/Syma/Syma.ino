@@ -57,7 +57,6 @@ void stream_runHackflight(
         float m2,
         float m3,
         float m4)
-
 {
     hf::motors_t motors = {};
 

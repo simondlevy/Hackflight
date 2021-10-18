@@ -61,7 +61,7 @@ spec = do
   let running = count > 1
   let starting = not running
 
-  let  (state, mready, cut, pdemands, motors, led) = hackflight receiver sensors pidfuns
+  let (state, mready, cut, pdemands, motors, led) = hackflight receiver sensors pidfuns
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
@@ -92,6 +92,5 @@ spec = do
                                           , arg $ m3 motors
                                           , arg $ m4 motors
                                          ] 
-
 -- Compile the spec
 main = reify spec >>= compile "copilot"
