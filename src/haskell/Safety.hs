@@ -32,7 +32,7 @@ safety demands state = (armed, failsafe, mready, cut)
     -- Arm after lots of safety checks
     arm = not armed' && not failsafe' && safeToArm state && throttleIsDown && aux1IsDown
 
-    cut = failsafe || disarm || armedThrottleDown
+    cut = failsafe || armedThrottleDown
 
     mready = cut || arm || (armed' && not throttleIsDown)
 
