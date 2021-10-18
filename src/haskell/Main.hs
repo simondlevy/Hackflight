@@ -61,7 +61,7 @@ spec = do
   let running = count > 1
   let starting = not running
 
-  let (state, mrunning, mzero, pdemands, motors, led) = hackflight receiver sensors pidfuns
+  let (state, mrunning, pdemands, motors, led) = hackflight receiver sensors pidfuns
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
@@ -82,7 +82,6 @@ spec = do
                                 , arg $ theta state
                                 , arg $ psi state
                                 , arg $ mrunning
-                                , arg $ mzero
                                 , arg $ m1_pin
                                 , arg $ m2_pin
                                 , arg $ m3_pin

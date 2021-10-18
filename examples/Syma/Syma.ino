@@ -40,7 +40,6 @@ void stream_run(
         float state_theta,
         float state_psi,
         bool mrunning,
-        bool mzero,
         uint8_t m1_pin,
         uint8_t m2_pin,
         uint8_t m3_pin,
@@ -52,10 +51,10 @@ void stream_run(
 {
     motors_t motors = {};
     motors.running = mrunning;
-    motors.values[0] = mzero ? 0 : m1;
-    motors.values[1] = mzero ? 0 : m2;
-    motors.values[2] = mzero ? 0 : m3;
-    motors.values[3] = mzero ? 0 : m4;
+    motors.values[0] = m1;
+    motors.values[1] = m2;
+    motors.values[2] = m3;
+    motors.values[3] = m4;
 
     serial.parse(state_phi, state_theta, state_psi, motors);
 

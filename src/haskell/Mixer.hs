@@ -21,9 +21,9 @@ data Motors = Motors { m1 :: SFloat
                      , m3 :: SFloat
                      , m4 :: SFloat }
 
-mix :: Demands -> Motors
+mix :: SBool -> Demands -> Motors
 
-mix demands = Motors m1 m2 m3 m4 where
+mix zeroed demands = Motors m1 m2 m3 m4 where
 
   -- Map throttle demand from [-1,+1] to [0,1]
   t = ((throttle demands) + 1) / 2
@@ -32,7 +32,9 @@ mix demands = Motors m1 m2 m3 m4 where
   p = pitch demands
   y = yaw demands
 
-  m1 = t - r + p  - y
-  m2 = t - r - p  + y
-  m3 = t + r + p  + y
-  m4 = t + r - p  - y
+  m1 = saferun $ t - r + p  - y
+  m2 = saferun $ t - r - p  + y
+  m3 = saferun $ t + r + p  + y
+  m4 = saferun $ t + r - p  - y
+
+  saferun m = if zeroed then 0 else m
