@@ -19,27 +19,34 @@ import Utils
 
 safety :: Demands -> State -> (SBool, SBool, SBool, SBool)
 
-safety demands state = (armed, failsafe, mready, cut)
+safety demands state = (armed, failsafe, mrunning, mzero)
 
   where
 
+    -- Trip failsafe if armed and receiver lost signal
     failsafe = if failsafe' then true else armed' && receiverLostSignal
 
-    disarm = armed' && not aux1IsDown
+    -- Set motors to zero if failsafe tripped or if armed with throttle down
+    mzero = failsafe || (armed' && throttleIsDown)
 
-    armedThrottleDown = armed' && throttleIsDown
+    -- Motors are ready to run if they are zeroed-out or if throttle is up in armed state
+    mrunning = mzero || (armed' && not throttleIsDown)
 
-    -- Arm after lots of safety checks
-    arm = not armed' && not failsafe' && safeToArm state && throttleIsDown && aux1IsDown
+    armed = if failsafe' then false  -- never armed once failsafe trips
 
-    cut = failsafe || armedThrottleDown
+            else if armed' && not aux1IsDown then false -- disarm if armed and aux1 is up
 
-    -- mready = cut || arm || (armed' && not throttleIsDown)
-    mready = cut || (armed' && not throttleIsDown)
+            -- arm after lots of safety checks
+            else if (not armed' &&
+                     not failsafe' &&
+                     safeToArm state &&
+                     throttleIsDown &&
+                     aux1IsDown) then true
 
-    armed = if failsafe' || disarm then false else if arm then true else armed'
+            else armed'
 
     throttleIsDown = (throttle demands) < (-0.995)
+
     aux1IsDown = receiverAux1 > 0
 
     armed' = [False] ++ armed
