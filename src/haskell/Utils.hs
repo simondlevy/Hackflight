@@ -25,6 +25,9 @@ type SBool = Stream Bool
 fmax :: SFloat -> SFloat -> SFloat
 fmax a b = if a > b then a else b
 
+fmin :: SFloat -> SFloat -> SFloat
+fmin a b = if a < b then a else b
+
 -- https://stackoverflow.com/a/4343542/6110522
 compose :: Foldable t => t (b -> b) -> b -> b
 compose = foldr (.) id

@@ -26,6 +26,7 @@ DSTDIR = ..
 
 all: copilot.cpp copilot.h
 	cp copilot.c $(DSTDIR)/copilot.cpp
+	wc -c copilot.c
 	rm copilot.c
 	sed -i 's/extern/EXTERN/g' copilot.h
 	cat cfiles/header.h copilot.h > $(DSTDIR)/copilot.h

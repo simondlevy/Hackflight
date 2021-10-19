@@ -17,7 +17,9 @@
 
  */
 
-#include "serial.hpp"
+#include "parser.hpp"
+
+#include "debugger.hpp"
 
 #include "stream_serial.h"
 #include "stream_motors.h"
@@ -55,6 +57,9 @@ void stream_run(
     motors.values[1] = m2;
     motors.values[2] = m3;
     motors.values[3] = m4;
+
+    //Debugger::printf("%+3.3f %+3.3f %+3.3f %+3.3f | %+3.3f\n", 
+    //        m1, m2, m3, m4, mmax);
 
     serial.parse(state_phi, state_theta, state_psi, motors);
 
