@@ -22,7 +22,6 @@
 #include "debugger.hpp"
 
 #include "stream_serial.h"
-#include "stream_motors.h"
 
 #include "copilot.h"
 
@@ -45,20 +44,11 @@ void stream_run(
         uint8_t m2_pin,
         uint8_t m3_pin,
         uint8_t m4_pin,
-        float m1,
-        float m2,
-        float m3,
-        float m4)
+        float m1_val,
+        float m2_val,
+        float m3_val,
+        float m4_val)
 {
-    motors_t motors = {};
-    motors.values[0] = m1;
-    motors.values[1] = m2;
-    motors.values[2] = m3;
-    motors.values[3] = m4;
-
-    //Debugger::printf("%+3.3f %+3.3f %+3.3f %+3.3f | %+3.3f\n", 
-    //        m1, m2, m3, m4, mmax);
-
     /*
     parser.parse(state_phi, state_theta, state_psi, motors);
 
@@ -72,6 +62,8 @@ void stream_run(
         stream_serialWrite(parser.read());
     }*/
 
+    void stream_writeBrushedMotors(const uint8_t * pins, float * values, const uint8_t count=4);
     static const uint8_t motor_pins[4] = {m1_pin, m2_pin, m3_pin, m4_pin};
-    stream_writeBrushedMotors(motor_pins, motors.values);
+    float motor_values[4] = {m1_val, m2_val, m3_val, m4_val};
+    stream_writeBrushedMotors(motor_pins, motor_values);
 }
