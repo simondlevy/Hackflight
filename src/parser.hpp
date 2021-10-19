@@ -28,8 +28,8 @@ class Parser {
 
         serial_buffer_t _outbuf = {};
 
-        void dispatchMessage(bool ready, uint8_t type, uint8_t * payload, float phi, float theta, float psi, motors_t & motors)
-        {
+        void dispatchMessage(bool ready, uint8_t type, uint8_t * payload, float
+                phi, float theta, float psi, motors_t & motors) {
             switch (type) {
 
                 case 121:
