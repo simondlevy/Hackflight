@@ -24,9 +24,9 @@ import Time
 import Mixer
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, SBool, Demands, Motors, SBool)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Motors, SBool)
 
-hackflight receiver sensors pidfuns = (state, mrunning, pdemands, motors, led)
+hackflight receiver sensors pidfuns = (state, motors, led)
 
   where
 
@@ -41,7 +41,7 @@ hackflight receiver sensors pidfuns = (state, mrunning, pdemands, motors, led)
     (_, _, pdemands) = compose pidfuns (state, timerReady 300, rdemands)
 
     -- Check safety (arming / failsafe)
-    (armed, failsafe, mrunning, mzero) = safety rdemands state
+    (armed, failsafe, mzero) = safety rdemands state
 
     -- Run mixer on demands to get motor values
     motors = mix mzero pdemands

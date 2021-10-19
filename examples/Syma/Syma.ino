@@ -41,7 +41,6 @@ void stream_run(
         float state_phi,
         float state_theta,
         float state_psi,
-        bool mrunning,
         uint8_t m1_pin,
         uint8_t m2_pin,
         uint8_t m3_pin,
@@ -52,7 +51,6 @@ void stream_run(
         float m4)
 {
     motors_t motors = {};
-    motors.running = mrunning;
     motors.values[0] = m1;
     motors.values[1] = m2;
     motors.values[2] = m3;
@@ -61,8 +59,7 @@ void stream_run(
     //Debugger::printf("%+3.3f %+3.3f %+3.3f %+3.3f | %+3.3f\n", 
     //        m1, m2, m3, m4, mmax);
 
-    bool gotSerialMotors = false;
-
+    /*
     parser.parse(state_phi, state_theta, state_psi, motors);
 
     stream_serialUpdate();
@@ -73,10 +70,8 @@ void stream_run(
 
     if (parser.available()) {
         stream_serialWrite(parser.read());
-    }
+    }*/
 
-    if (motors.running) {
-        static const uint8_t motor_pins[4] = {m1_pin, m2_pin, m3_pin, m4_pin};
-        stream_writeBrushedMotors(motor_pins, motors.values);
-    }
+    static const uint8_t motor_pins[4] = {m1_pin, m2_pin, m3_pin, m4_pin};
+    stream_writeBrushedMotors(motor_pins, motors.values);
 }
