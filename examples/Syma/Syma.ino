@@ -26,7 +26,7 @@
 
 #include "copilot.h"
 
-static SerialComms serial;
+static Parser parser;
 
 void setup(void)
 {
@@ -61,7 +61,9 @@ void stream_run(
     //Debugger::printf("%+3.3f %+3.3f %+3.3f %+3.3f | %+3.3f\n", 
     //        m1, m2, m3, m4, mmax);
 
-    serial.parse(state_phi, state_theta, state_psi, motors);
+    bool gotSerialMotors = false;
+
+    parser.parse(state_phi, state_theta, state_psi, motors);
 
     stream_serialUpdate();
 
@@ -69,8 +71,8 @@ void stream_run(
         stream_serialRead();
     }
 
-    if (serial.available()) {
-        stream_serialWrite(serial.read());
+    if (parser.available()) {
+        stream_serialWrite(parser.read());
     }
 
     if (motors.running) {

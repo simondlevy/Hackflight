@@ -13,7 +13,7 @@
 #include "stream_receiver.h"
 #include "stream_serial.h"
 
-class SerialComms {
+class Parser {
 
     private:
 
@@ -200,4 +200,4 @@ class SerialComms {
 
         } // parse
 
-}; // class SerialComms
+}; // class Parser
