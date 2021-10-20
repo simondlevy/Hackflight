@@ -40,6 +40,7 @@ void stream_run(
         float state_phi,
         float state_theta,
         float state_psi,
+        bool armed,
         uint8_t m1_pin,
         uint8_t m2_pin,
         uint8_t m3_pin,
@@ -49,8 +50,7 @@ void stream_run(
         float m3_val,
         float m4_val)
 {
-    /*
-    parser.parse(state_phi, state_theta, state_psi, motors);
+    parser.parse(state_phi, state_theta, state_psi, armed, m1_val, m2_val, m3_val, m4_val);
 
     stream_serialUpdate();
 
@@ -60,10 +60,13 @@ void stream_run(
 
     if (parser.available()) {
         stream_serialWrite(parser.read());
-    }*/
+    }
 
     void stream_writeBrushedMotors(const uint8_t * pins, float * values, const uint8_t count=4);
+
     static const uint8_t motor_pins[4] = {m1_pin, m2_pin, m3_pin, m4_pin};
+
     float motor_values[4] = {m1_val, m2_val, m3_val, m4_val};
+
     stream_writeBrushedMotors(motor_pins, motor_values);
 }

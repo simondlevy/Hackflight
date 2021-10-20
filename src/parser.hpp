@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "motors.hpp"
-
 #include "copilot.h"
 
 #include "stream_receiver.h"
@@ -28,8 +26,12 @@ class Parser {
 
         serial_buffer_t _outbuf = {};
 
-        void dispatchMessage(bool ready, uint8_t type, uint8_t * payload, float
-                phi, float theta, float psi, motors_t & motors) {
+        void dispatchMessage(
+                bool ready, uint8_t type, uint8_t * payload, 
+                float phi, float theta, float psi, 
+                float &m1, float &m2, float &m3, float &m4)
+        {
+
             switch (type) {
 
                 case 121:
@@ -65,16 +67,13 @@ class Parser {
                 case 215:
                     {
                         uint8_t index = payload[0];
-                        uint8_t percent = payload[1];
 
-                        motors.values[0] = ready ? 0 : motors.values[0];
-                        motors.values[1] = ready ? 0 : motors.values[1];
-                        motors.values[2] = ready ? 0 : motors.values[2];
-                        motors.values[3] = ready ? 0 : motors.values[3];
+                        float value =  payload[1] / 100.;
 
-                        uint8_t mindex = ready ? index - 1 : 0;
-
-                        motors.values[mindex] = ready ? percent / 100. : motors.values[mindex];
+                        m1 = ready ? (index == 1 ?  value : 0) : m1;
+                        m2 = ready ? (index == 2 ?  value : 0) : m2;
+                        m3 = ready ? (index == 3 ?  value : 0) : m3;
+                        m4 = ready ? (index == 4 ?  value : 0) : m4;
 
                     } break;
 
@@ -146,7 +145,8 @@ class Parser {
             return _outbuf.values[_outbuf.index++];
         }
 
-        void parse(float phi, float theta, float psi, motors_t & motors)
+        void parse(float phi, float theta, float psi, bool armed,
+                float & m1, float &m2, float &m3, float &m4)
         {
             uint8_t c = stream_serialByte;
 
@@ -156,13 +156,6 @@ class Parser {
             static uint8_t crc;
             static uint8_t size;
             static uint8_t index;
-
-            // Reset motors iff serial data available
-            motors.running = stream_serialAvailable ? true : motors.running;
-            motors.values[0] = stream_serialAvailable ? 0 : motors.values[0];
-            motors.values[1] = stream_serialAvailable ? 0 : motors.values[1];
-            motors.values[2] = stream_serialAvailable ? 0 : motors.values[2];
-            motors.values[3] = stream_serialAvailable ? 0 : motors.values[3];
 
             // Payload functions
             size = parser_state == 3 ? c : size;
@@ -196,7 +189,17 @@ class Parser {
 
             // Message dispatch
             bool ready = stream_serialAvailable && parser_state == 0 && crc == c;
-            dispatchMessage(ready, type, payload, phi, theta, psi, motors);
+            static float m1_;
+            static float m2_;
+            static float m3_;
+            static float m4_;
+            dispatchMessage(ready, type, payload, phi, theta, psi, m1_, m2_, m3_, m4_);
+
+            // Set motors iff in disarmed mode
+            m1 = armed ? m1 : m1_;
+            m2 = armed ? m2 : m2_;
+            m3 = armed ? m3 : m3_;
+            m4 = armed ? m4 : m4_;
 
         } // parse
 

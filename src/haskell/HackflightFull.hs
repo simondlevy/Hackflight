@@ -24,9 +24,9 @@ import Time
 import Mixer
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, Motors, SBool)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, SBool, Motors, SBool)
 
-hackflight receiver sensors pidfuns = (state, motors, led)
+hackflight receiver sensors pidfuns = (state, armed', motors, led)
 
   where
 
@@ -48,3 +48,5 @@ hackflight receiver sensors pidfuns = (state, motors, led)
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
+
+    armed' = [False] ++ armed
