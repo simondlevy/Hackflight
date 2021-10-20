@@ -150,50 +150,50 @@ class Parser {
         {
             uint8_t c = stream_serialByte;
 
-            static uint8_t parser_state;
-            static uint8_t payload[128];
-            static uint8_t type;
-            static uint8_t crc;
-            static uint8_t size;
-            static uint8_t index;
+            static uint8_t parser_state_;
+            static uint8_t payload_[128];
+            static uint8_t type_;
+            static uint8_t crc_;
+            static uint8_t size_;
+            static uint8_t index_;
 
             // Payload functions
-            size = parser_state == 3 ? c : size;
-            index = parser_state == 5 ? index + 1 : 0;
-            bool in_payload = type >= 200 && parser_state == 5 && index <= size;
+            size_ = parser_state_ == 3 ? c : size_;
+            index_ = parser_state_ == 5 ? index_ + 1 : 0;
+            bool in_payload = type_ >= 200 && parser_state_ == 5 && index_ <= size_;
 
             // Command acquisition function
-            type = parser_state == 4 ? c : type;
+            type_ = parser_state_ == 4 ? c : type_;
 
             // Checksum transition function
-            crc = parser_state == 3 ? c
-                : parser_state == 4  ?  crc ^ c 
-                : in_payload ?  crc ^ c
-                : parser_state == 5  ?  crc
+            crc_ = parser_state_ == 3 ? c
+                : parser_state_ == 4  ?  crc_ ^ c 
+                : in_payload ?  crc_ ^ c
+                : parser_state_ == 5  ?  crc_
                 : 0;
 
             // Parser state transition function
-            parser_state
-                = parser_state == 0 && c == '$' ? 1
-                : parser_state == 1 && c == 'M' ? 2
-                : parser_state == 2 && (c == '<' || c == '>') ? 3
-                : parser_state == 3 ? 4
-                : parser_state == 4 ? 5
-                : parser_state == 5 && in_payload ? 5
-                : parser_state == 5 ? 0
-                : parser_state;
+            parser_state_
+                = parser_state_ == 0 && c == '$' ? 1
+                : parser_state_ == 1 && c == 'M' ? 2
+                : parser_state_ == 2 && (c == '<' || c == '>') ? 3
+                : parser_state_ == 3 ? 4
+                : parser_state_ == 4 ? 5
+                : parser_state_ == 5 && in_payload ? 5
+                : parser_state_ == 5 ? 0
+                : parser_state_;
 
             // Payload accumulation
-            uint8_t pindex = in_payload ? index - 1 : 0;
-            payload[pindex] = in_payload ? c : payload[pindex];
+            uint8_t pindex = in_payload ? index_ - 1 : 0;
+            payload_[pindex] = in_payload ? c : payload_[pindex];
 
             // Message dispatch
-            bool ready = stream_serialAvailable && parser_state == 0 && crc == c;
+            bool ready = stream_serialAvailable && parser_state_ == 0 && crc_ == c;
             static float m1_;
             static float m2_;
             static float m3_;
             static float m4_;
-            dispatchMessage(ready, type, payload, phi, theta, psi, m1_, m2_, m3_, m4_);
+            dispatchMessage(ready, type_, payload_, phi, theta, psi, m1_, m2_, m3_, m4_);
 
             // Set motors iff in disarmed mode
             m1 = armed ? m1 : m1_;
