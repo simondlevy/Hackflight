@@ -49,4 +49,6 @@ hackflight receiver sensors pidfuns = (state, armed', motors, led)
     -- Blink LED during first couple of seconds; keep it solid when armed
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
 
+    -- Track previous value of arming state to support shutting of motors on
+    -- disarm and setting them over serial connection from GCS
     armed' = [False] ++ armed
