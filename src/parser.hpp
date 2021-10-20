@@ -18,16 +18,16 @@ class Parser {
         typedef struct {
 
             uint8_t checksum;
-            uint8_t values[128];
+            uint8_t payload[128];
             uint8_t index;
             uint8_t size;
 
         } serial_buffer_t;
 
-        serial_buffer_t _outbuf = {};
+        serial_buffer_t _buffer = {};
 
         void dispatchMessage(
-                bool ready, uint8_t type, uint8_t * payload, 
+                bool ready, uint8_t type,
                 float phi, float theta, float psi, 
                 float &m1, float &m2, float &m3, float &m4)
         {
@@ -66,9 +66,9 @@ class Parser {
 
                 case 215:
                     {
-                        uint8_t index = payload[0];
+                        uint8_t index = _buffer.payload[0];
 
-                        float value =  payload[1] / 100.;
+                        float value =  _buffer.payload[1] / 100.;
 
                         m1 = ready ? (index == 1 ?  value : 0) : m1;
                         m2 = ready ? (index == 2 ?  value : 0) : m2;
@@ -83,9 +83,9 @@ class Parser {
 
         void prepareToSerialize(bool ready, uint8_t type, uint8_t count, uint8_t size)
         {
-            _outbuf.size = ready ? 0 : _outbuf.size;
-            _outbuf.index = ready ? 0 : _outbuf.index;
-            _outbuf.checksum = ready ? 0 : _outbuf.checksum;
+            _buffer.size = ready ? 0 : _buffer.size;
+            _buffer.index = ready ? 0 : _buffer.index;
+            _buffer.checksum = ready ? 0 : _buffer.checksum;
 
             addToOutBuf(ready, '$');
             addToOutBuf(ready, 'M');
@@ -96,20 +96,20 @@ class Parser {
 
         void addToOutBuf(bool ready, uint8_t a)
         {
-            _outbuf.values[_outbuf.size] = ready ? a : _outbuf.values[_outbuf.size];
+            _buffer.payload[_buffer.size] = ready ? a : _buffer.payload[_buffer.size];
 
-            _outbuf.size = ready ? _outbuf.size + 1 : _outbuf.size;
+            _buffer.size = ready ? _buffer.size + 1 : _buffer.size;
         }
 
         void completeSend(bool ready)
         {
-            serialize(ready, _outbuf.checksum);
+            serialize(ready, _buffer.checksum);
         }
 
         void serialize(bool ready, uint8_t a)
         {
             addToOutBuf(ready, a);
-            _outbuf.checksum = ready ? _outbuf.checksum ^ a : _outbuf.checksum;
+            _buffer.checksum = ready ? _buffer.checksum ^ a : _buffer.checksum;
         }
 
         void prepareToSerializeBytes(bool ready, uint8_t type, uint8_t count)
@@ -136,13 +136,13 @@ class Parser {
 
         bool available(void)
         {
-            return _outbuf.size > 0;
+            return _buffer.size > 0;
         }
 
         uint8_t read(void)
         {
-            _outbuf.size--;
-            return _outbuf.values[_outbuf.index++];
+            _buffer.size--;
+            return _buffer.payload[_buffer.index++];
         }
 
         void parse(float phi, float theta, float psi, bool armed,
@@ -151,7 +151,6 @@ class Parser {
             uint8_t c = stream_serialByte;
 
             static uint8_t parser_state_;
-            static uint8_t payload_[128];
             static uint8_t type_;
             static uint8_t crc_;
             static uint8_t size_;
@@ -185,7 +184,7 @@ class Parser {
 
             // Payload accumulation
             uint8_t pindex = in_payload ? index_ - 1 : 0;
-            payload_[pindex] = in_payload ? c : payload_[pindex];
+            _buffer.payload[pindex] = in_payload ? c : _buffer.payload[pindex];
 
             // Message dispatch
             bool ready = stream_serialAvailable && parser_state_ == 0 && crc_ == c;
@@ -193,7 +192,7 @@ class Parser {
             static float m2_;
             static float m3_;
             static float m4_;
-            dispatchMessage(ready, type_, payload_, phi, theta, psi, m1_, m2_, m3_, m4_);
+            dispatchMessage(ready, type_, phi, theta, psi, m1_, m2_, m3_, m4_);
 
             // Set motors iff in disarmed mode
             m1 = armed ? m1 : m1_;
