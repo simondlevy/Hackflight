@@ -25,8 +25,6 @@
 
 #include "copilot.h"
 
-static Parser parser;
-
 void setup(void)
 {
 }
@@ -50,7 +48,9 @@ void stream_run(
         float m3_val,
         float m4_val)
 {
-    parser.parse(state_phi, state_theta, state_psi, armed, m1_val, m2_val, m3_val, m4_val);
+    static serial_buffer_t serial_buffer;
+
+    parser_parse(serial_buffer, state_phi, state_theta, state_psi, armed, m1_val, m2_val, m3_val, m4_val);
 
     stream_serialUpdate();
 
@@ -58,8 +58,8 @@ void stream_run(
         stream_serialRead();
     }
 
-    if (parser.available()) {
-        stream_serialWrite(parser.read());
+    if (parser_available(serial_buffer)) {
+        stream_serialWrite(parser_read(serial_buffer));
     }
 
     void stream_writeBrushedMotors(const uint8_t * pins, float * values, const uint8_t count=4);
