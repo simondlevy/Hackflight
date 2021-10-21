@@ -19,6 +19,7 @@ import HackflightFull
 import Receiver
 import Demands
 import State
+import Mixer
 
 -- Sensors
 import Gyrometer
@@ -29,8 +30,8 @@ import RatePid(rateController)
 import YawPid(yawController)
 import LevelPid(levelController)
 
--- Mixer
-import Mixer
+-- Serial comms
+import Parser
 
 -- Misc
 import Utils

@@ -40,6 +40,17 @@ typedef struct {
 
 } serial_buffer_t;
 
+static void set_new_buffer(serial_buffer_t & buff, bool ready, uint8_t size, uint8_t byte)
+{
+    switch (size) {
+
+        case 0:
+            buff.byte00 = ready ? byte : buff.byte00;
+            break;
+
+    }
+}
+
 static void addToOutBuf(
         uint8_t * buffer,
         serial_buffer_t & outbuf,
@@ -48,6 +59,7 @@ static void addToOutBuf(
         uint8_t byte)
 {
     buffer[buffer_size] = ready ? byte : buffer[buffer_size];
+    set_new_buffer(outbuf, ready, buffer_size, byte);
     buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 

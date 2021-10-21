@@ -14,13 +14,5 @@ module Parser where
 import Language.Copilot hiding(xor)
 import Copilot.Language.Operators.BitWise((.|.), (.<<.))
 
+import Serial
 import Utils
-
-buffer :: Stream (Array 128 Word8)
-buffer = extern "stream_buffer" Nothing
-
-serialAvailable :: Stream Bool
-serialAvailable = extern "stream_serialAvailable" Nothing
-
-serialByteIn :: Stream Word8
-serialByteIn = extern "stream_serialByte" Nothing

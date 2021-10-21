@@ -11,6 +11,8 @@ HSRC = Main.hs \
        Demands.hs \
        PidController.hs \
        Safety.hs \
+       Parser.hs \
+       Serial.hs \
        Time.hs \
        Mixer.hs \
        Utils.hs \
