@@ -13,7 +13,6 @@
 
 typedef struct {
 
-    uint8_t checksum;
     uint8_t payload[128];
     uint8_t index;
 
@@ -26,52 +25,47 @@ static void addToOutBuf(serial_buffer_t & buffer, uint8_t & buffer_size, bool re
     buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 
-static void serialize(serial_buffer_t & buffer, uint8_t & buffer_size, bool ready, uint8_t a)
+static void serialize(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t a)
 {
     addToOutBuf(buffer, buffer_size, ready, a);
-    buffer.checksum = ready ? buffer.checksum ^ a : buffer.checksum;
+    buffer_checksum = ready ? buffer_checksum ^ a : buffer_checksum;
 }
 
-static void prepareToSerialize(serial_buffer_t & buffer, uint8_t & buffer_size, bool ready, uint8_t type, uint8_t count, uint8_t size)
+static void prepareToSerialize(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t type, uint8_t count, uint8_t size)
 {
     buffer_size = ready ? 0 : buffer_size;
     buffer.index = ready ? 0 : buffer.index;
-    buffer.checksum = ready ? 0 : buffer.checksum;
+    buffer_checksum = ready ? 0 : buffer_checksum;
 
     addToOutBuf(buffer, buffer_size, ready, '$');
     addToOutBuf(buffer, buffer_size, ready, 'M');
     addToOutBuf(buffer, buffer_size, ready, '>');
-    serialize(buffer, buffer_size, ready, count*size);
-    serialize(buffer, buffer_size, ready, type);
+    serialize(buffer, buffer_size, buffer_checksum, ready, count*size);
+    serialize(buffer, buffer_size, buffer_checksum, ready, type);
 }
 
-static void completeSend(serial_buffer_t & buffer, uint8_t & buffer_size, bool ready)
+static void completeSend(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready)
 {
-    serialize(buffer, buffer_size, ready, buffer.checksum);
+    serialize(buffer, buffer_size, buffer_checksum, ready, buffer_checksum);
 }
 
-static void prepareToSerializeBytes(serial_buffer_t & buffer, uint8_t & buffer_size, bool ready, uint8_t type, uint8_t count)
+static void prepareToSerializeFloats(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t type, uint8_t count)
 {
-    prepareToSerialize(buffer, buffer_size, ready, type, count, 1);
+    prepareToSerialize(buffer, buffer_size, buffer_checksum, ready, type, count, 4);
 }
 
-static void prepareToSerializeFloats(serial_buffer_t & buffer, uint8_t & buffer_size, bool ready, uint8_t type, uint8_t count)
-{
-    prepareToSerialize(buffer, buffer_size, ready, type, count, 4);
-}
-
-static void serializeFloat(serial_buffer_t & buffer, uint8_t & buffer_size, bool ready, float value)
+static void serializeFloat(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, float value)
 {
     uint32_t uintval = 1000 * (value + 2);
 
-    serialize(buffer, buffer_size, ready, uintval & 0xFF);
-    serialize(buffer, buffer_size, ready, (buffer, uintval>>8) & 0xFF);
-    serialize(buffer, buffer_size, ready, (buffer, uintval>>16) & 0xFF);
-    serialize(buffer, buffer_size, ready, (buffer, uintval>>24) & 0xFF);
+    serialize(buffer, buffer_size, buffer_checksum, ready, uintval & 0xFF);
+    serialize(buffer, buffer_size, buffer_checksum, ready, (buffer, uintval>>8) & 0xFF);
+    serialize(buffer, buffer_size, buffer_checksum, ready, (buffer, uintval>>16) & 0xFF);
+    serialize(buffer, buffer_size, buffer_checksum, ready, (buffer, uintval>>24) & 0xFF);
 }
 
 static void dispatchMessage(
-        serial_buffer_t & buffer, uint8_t & buffer_size,
+        serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum,
         bool ready, uint8_t type,
         float phi, float theta, float psi, 
         float &m1, float &m2, float &m3, float &m4)
@@ -80,33 +74,33 @@ static void dispatchMessage(
 
         case 121:
             {
-                prepareToSerializeFloats(buffer, buffer_size, ready, type, 6);
-                serializeFloat(buffer, buffer_size, ready, stream_receiverThrottle);
-                serializeFloat(buffer, buffer_size, ready, stream_receiverRoll);
-                serializeFloat(buffer, buffer_size, ready, stream_receiverPitch);
-                serializeFloat(buffer, buffer_size, ready, stream_receiverYaw);
-                serializeFloat(buffer, buffer_size, ready, stream_receiverAux1);
-                serializeFloat(buffer, buffer_size, ready,stream_receiverAux2);
-                completeSend(buffer, buffer_size, ready);
+                prepareToSerializeFloats(buffer, buffer_size, buffer_checksum, ready, type, 6);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_receiverThrottle);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_receiverRoll);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_receiverPitch);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_receiverYaw);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_receiverAux1);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready,stream_receiverAux2);
+                completeSend(buffer, buffer_size, buffer_checksum, ready);
 
             } break;
 
         case 122:
             {
-                prepareToSerializeFloats(buffer, buffer_size, ready, type, 12);
-                serializeFloat(buffer, buffer_size, ready, 0);
-                serializeFloat(buffer, buffer_size, ready, 0);
-                serializeFloat(buffer, buffer_size, ready, 0);
-                serializeFloat(buffer, buffer_size, ready, 0);
-                serializeFloat(buffer, buffer_size, ready, 0);
-                serializeFloat(buffer, buffer_size, ready, 0);
-                serializeFloat(buffer, buffer_size, ready, phi);
-                serializeFloat(buffer, buffer_size, ready, 0);
-                serializeFloat(buffer, buffer_size, ready, theta);
-                serializeFloat(buffer, buffer_size, ready, 0);
-                serializeFloat(buffer, buffer_size, ready, psi);
-                serializeFloat(buffer, buffer_size, ready, 0);
-                completeSend(buffer, buffer_size, ready);
+                prepareToSerializeFloats(buffer, buffer_size, buffer_checksum, ready, type, 12);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, phi);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, theta);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, psi);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
+                completeSend(buffer, buffer_size, buffer_checksum, ready);
 
             } break;
 
@@ -140,6 +134,7 @@ void parser_parse(
     static uint8_t size_;
     static uint8_t index_;
     static uint8_t buffer_size_;
+    static uint8_t buffer_checksum_;
 
     // Payload functions
     size_ = parser_state_ == 3 ? c : size_;
@@ -177,7 +172,7 @@ void parser_parse(
     static float m2_;
     static float m3_;
     static float m4_;
-    dispatchMessage(buffer, buffer_size_, ready, type_, phi, theta, psi, m1_, m2_, m3_, m4_);
+    dispatchMessage(buffer, buffer_size_, buffer_checksum_, ready, type_, phi, theta, psi, m1_, m2_, m3_, m4_);
 
     // Set motors iff in disarmed mode
     m1 = armed ? m1 : m1_;
