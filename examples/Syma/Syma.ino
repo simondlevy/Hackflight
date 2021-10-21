@@ -49,8 +49,9 @@ void stream_run(
         float m4_val)
 {
     static serial_buffer_t serial_buffer;
+    uint8_t buffer_size = 0;
 
-    parser_parse(serial_buffer, state_phi, state_theta, state_psi, armed, m1_val, m2_val, m3_val, m4_val);
+    parser_parse(serial_buffer, buffer_size, state_phi, state_theta, state_psi, armed, m1_val, m2_val, m3_val, m4_val);
 
     stream_serialUpdate();
 
@@ -58,8 +59,8 @@ void stream_run(
         stream_serialRead();
     }
 
-    if (parser_available(serial_buffer)) {
-        stream_serialWrite(parser_read(serial_buffer));
+    if (buffer_size > 0) {
+        stream_serialWrite(parser_read(serial_buffer, buffer_size));
     }
 
     void stream_writeBrushedMotors(
