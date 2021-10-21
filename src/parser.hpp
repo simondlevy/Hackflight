@@ -11,19 +11,35 @@
 #include "stream_receiver.h"
 #include "stream_serial.h"
 
-static void addToOutBuf(uint8_t * buffer, uint8_t & buffer_size, bool ready, uint8_t byte)
+static void addToOutBuf(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        bool ready,
+        uint8_t byte)
 {
     buffer[buffer_size] = ready ? byte : buffer[buffer_size];
     buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 
-static void serialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t byte)
+static void serialize(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready,
+        uint8_t byte)
 {
     addToOutBuf(buffer, buffer_size, ready, byte);
     buffer_checksum = ready ? buffer_checksum ^ byte : buffer_checksum;
 }
 
-static void prepareToSerialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t type, uint8_t count, uint8_t size)
+static void prepareToSerialize(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready,
+        uint8_t type,
+        uint8_t count,
+        uint8_t size)
 {
     buffer_size = ready ? 0 : buffer_size;
     buffer_checksum = ready ? 0 : buffer_checksum;
@@ -35,17 +51,32 @@ static void prepareToSerialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t 
     serialize(buffer, buffer_size, buffer_checksum, ready, type);
 }
 
-static void completeSend(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready)
+static void completeSend(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready)
 {
     serialize(buffer, buffer_size, buffer_checksum, ready, buffer_checksum);
 }
 
-static void prepareToSerializeFloats(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t type, uint8_t count)
+static void prepareToSerializeFloats(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready,
+        uint8_t type,
+        uint8_t count)
 {
     prepareToSerialize(buffer, buffer_size, buffer_checksum, ready, type, count, 4);
 }
 
-static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, float value)
+static void serializeFloat(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready,
+        float value)
 {
     uint32_t uintval = 1000 * (value + 2);
 
@@ -56,10 +87,18 @@ static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & bu
 }
 
 static void dispatchMessage(
-        uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum,
-        bool ready, uint8_t type,
-        float phi, float theta, float psi, 
-        float &m1, float &m2, float &m3, float &m4)
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready,
+        uint8_t type,
+        float phi,
+        float theta,
+        float psi,
+        float &m1,
+        float &m2,
+        float &m3,
+        float &m4)
 {
     switch (type) {
 
@@ -113,9 +152,17 @@ static void dispatchMessage(
 
 
 void parser_parse(
-        uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_index,
-        float phi, float theta, float psi, bool armed,
-        float & m1, float &m2, float &m3, float &m4)
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_index,
+        float phi,
+        float theta,
+        float psi,
+        bool armed,
+        float & m1,
+        float &m2,
+        float &m3,
+        float &m4)
 {
     uint8_t byte = stream_serialByte;
 
