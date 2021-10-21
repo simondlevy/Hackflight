@@ -160,9 +160,9 @@ void parser_parse(
         float psi,
         bool armed,
         float & m1,
-        float &m2,
-        float &m3,
-        float &m4)
+        float & m2,
+        float & m3,
+        float & m4)
 {
     uint8_t byte = stream_serialByte;
 
