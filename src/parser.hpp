@@ -14,7 +14,6 @@
 typedef struct {
 
     uint8_t payload[128];
-    uint8_t index;
 
 } serial_buffer_t;
 
@@ -120,7 +119,7 @@ static void dispatchMessage(
 
 
 void parser_parse(
-        serial_buffer_t & buffer, uint8_t & buffer_size,
+        serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_index,
         float phi, float theta, float psi, bool armed,
         float & m1, float &m2, float &m3, float &m4)
 {
@@ -166,7 +165,7 @@ void parser_parse(
 
     // Message dispatch
     bool ready = stream_serialAvailable && parser_state_ == 0 && crc_ == c;
-    buffer.index = ready ? 0 : buffer.index;
+    buffer_index = ready ? 0 : buffer_index;
     static float m1_;
     static float m2_;
     static float m3_;
@@ -182,10 +181,10 @@ void parser_parse(
     buffer_size = buffer_size_;
 }
 
-uint8_t parser_read(serial_buffer_t & buffer, uint8_t & buffer_size)
+uint8_t parser_read(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_index)
 {
     buffer_size--;
-    uint8_t retval = buffer.payload[buffer.index];
-    buffer.index++;
+    uint8_t retval = buffer.payload[buffer_index];
+    buffer_index++;
     return retval;
 }
