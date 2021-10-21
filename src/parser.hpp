@@ -115,10 +115,10 @@ static void serializeFloat(
 {
     uint32_t uintval = 1000 * (value + 2);
 
-    serialize(buffer, outbuf, buffer_size, buffer_checksum, ready, uintval & 0xFF);
-    serialize(buffer, outbuf, buffer_size, buffer_checksum, ready, (buffer, uintval>>8) & 0xFF);
-    serialize(buffer, outbuf, buffer_size, buffer_checksum, ready, (buffer, uintval>>16) & 0xFF);
-    serialize(buffer, outbuf, buffer_size, buffer_checksum, ready, (buffer, uintval>>24) & 0xFF);
+    serialize(buffer, outbuf, buffer_size, buffer_checksum, ready, uintval     & 0xFF);
+    serialize(buffer, outbuf, buffer_size, buffer_checksum, ready, uintval>>8  & 0xFF);
+    serialize(buffer, outbuf, buffer_size, buffer_checksum, ready, uintval>>16 & 0xFF);
+    serialize(buffer, outbuf, buffer_size, buffer_checksum, ready, uintval>>24 & 0xFF);
 }
 
 static void dispatchMessage(
