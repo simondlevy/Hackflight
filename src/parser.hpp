@@ -184,7 +184,6 @@ void parser_parse(
     m2 = armed ? m2 : m2_;
     m3 = armed ? m3 : m3_;
     m4 = armed ? m4 : m4_;
-
 }
 
 bool parser_available(serial_buffer_t & buffer)

@@ -62,11 +62,9 @@ void stream_run(
         stream_serialWrite(parser_read(serial_buffer));
     }
 
-    void stream_writeBrushedMotors(const uint8_t * pins, float * values, const uint8_t count=4);
+    void stream_writeBrushedMotors(
+            uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin,
+            float m1_val, float m2_val, float m3_val, float m4_val);
 
-    static const uint8_t motor_pins[4] = {m1_pin, m2_pin, m3_pin, m4_pin};
-
-    float motor_values[4] = {m1_val, m2_val, m3_val, m4_val};
-
-    stream_writeBrushedMotors(motor_pins, motor_values);
+    stream_writeBrushedMotors(m1_pin, m2_pin, m3_pin, m4_pin, m1_val, m2_val, m3_val, m4_val);
 }
