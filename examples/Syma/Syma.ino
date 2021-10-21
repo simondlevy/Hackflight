@@ -18,11 +18,8 @@
  */
 
 #include "parser.hpp"
-
 #include "debugger.hpp"
-
 #include "stream_serial.h"
-
 #include "copilot.h"
 
 void setup(void)
@@ -52,7 +49,18 @@ void stream_run(
     static uint8_t buffer_index;
     uint8_t buffer_size = 0;
 
-    parser_parse(serial_buffer, buffer_size, buffer_index, state_phi, state_theta, state_psi, armed, m1_val, m2_val, m3_val, m4_val);
+    parser_parse(
+            serial_buffer,
+            buffer_size,
+            buffer_index,
+            state_phi,
+            state_theta,
+            state_psi,
+            armed,
+            m1_val,
+            m2_val,
+            m3_val,
+            m4_val);
 
     stream_serialUpdate();
 

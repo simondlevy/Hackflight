@@ -87,7 +87,7 @@ class MspParser(metaclass=abc.ABCMeta):
             self.handle_RECEIVER(*struct.unpack('=IIIIII', self.message_buffer))
 
         if self.message_id == 122:
-            self.handle_STATE(*struct.unpack('=IIIIIIIIIIII', self.message_buffer))
+            self.handle_STATE(*struct.unpack('=III', self.message_buffer))
 
         if self.message_id == 123:
             self.handle_ACTUATOR_TYPE(*struct.unpack('=B', self.message_buffer))

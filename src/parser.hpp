@@ -117,19 +117,10 @@ static void dispatchMessage(
 
         case 122:
             {
-                prepareToSerializeFloats(buffer, buffer_size, buffer_checksum, ready, type, 12);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
+                prepareToSerializeFloats(buffer, buffer_size, buffer_checksum, ready, type, 3);
                 serializeFloat(buffer, buffer_size, buffer_checksum, ready, phi);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
                 serializeFloat(buffer, buffer_size, buffer_checksum, ready, theta);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
                 serializeFloat(buffer, buffer_size, buffer_checksum, ready, psi);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, 0);
                 completeSend(buffer, buffer_size, buffer_checksum, ready);
 
             } break;
@@ -147,7 +138,6 @@ static void dispatchMessage(
             } break;
 
     } // switch (type)
-
 } 
 
 

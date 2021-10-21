@@ -180,8 +180,7 @@ class GCS(MspParser):
         if self.receiver.running:
             self._send_rc_request()
 
-    def handle_STATE(self, _x, _dx, _y, _dy, _z,
-                     _dz, phi, _dphi, theta, _dtheta, psi, _dpsi):
+    def handle_STATE(self, phi, theta, psi):
 
         self.roll_pitch_yaw = (self._float(phi),
                                self._float(theta),
