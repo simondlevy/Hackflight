@@ -16,7 +16,6 @@ typedef struct {
     uint8_t checksum;
     uint8_t payload[128];
     uint8_t index;
-    uint8_t size;
 
 } serial_buffer_t;
 
