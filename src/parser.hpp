@@ -21,7 +21,6 @@ typedef struct {
 static void addToOutBuf(serial_buffer_t & buffer, uint8_t & buffer_size, bool ready, uint8_t a)
 {
     buffer.payload[buffer_size] = ready ? a : buffer.payload[buffer_size];
-
     buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 
@@ -34,7 +33,6 @@ static void serialize(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t &
 static void prepareToSerialize(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t type, uint8_t count, uint8_t size)
 {
     buffer_size = ready ? 0 : buffer_size;
-    buffer.index = ready ? 0 : buffer.index;
     buffer_checksum = ready ? 0 : buffer_checksum;
 
     addToOutBuf(buffer, buffer_size, ready, '$');
@@ -168,6 +166,7 @@ void parser_parse(
 
     // Message dispatch
     bool ready = stream_serialAvailable && parser_state_ == 0 && crc_ == c;
+    buffer.index = ready ? 0 : buffer.index;
     static float m1_;
     static float m2_;
     static float m3_;
