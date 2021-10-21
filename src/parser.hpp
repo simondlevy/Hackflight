@@ -185,5 +185,7 @@ void parser_parse(
 uint8_t parser_read(serial_buffer_t & buffer, uint8_t & buffer_size)
 {
     buffer_size--;
-    return buffer.payload[buffer.index++];
+    uint8_t retval = buffer.payload[buffer.index];
+    buffer.index++;
+    return retval;
 }
