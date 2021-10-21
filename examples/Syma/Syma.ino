@@ -48,7 +48,7 @@ void stream_run(
         float m3_val,
         float m4_val)
 {
-    static serial_buffer_t serial_buffer;
+    static uint8_t serial_buffer[128];
     static uint8_t buffer_index;
     uint8_t buffer_size = 0;
 

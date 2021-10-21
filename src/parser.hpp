@@ -11,25 +11,19 @@
 #include "stream_receiver.h"
 #include "stream_serial.h"
 
-typedef struct {
-
-    uint8_t payload[128];
-
-} serial_buffer_t;
-
-static void addToOutBuf(serial_buffer_t & buffer, uint8_t & buffer_size, bool ready, uint8_t a)
+static void addToOutBuf(uint8_t * buffer, uint8_t & buffer_size, bool ready, uint8_t a)
 {
-    buffer.payload[buffer_size] = ready ? a : buffer.payload[buffer_size];
+    buffer[buffer_size] = ready ? a : buffer[buffer_size];
     buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 
-static void serialize(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t a)
+static void serialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t a)
 {
     addToOutBuf(buffer, buffer_size, ready, a);
     buffer_checksum = ready ? buffer_checksum ^ a : buffer_checksum;
 }
 
-static void prepareToSerialize(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t type, uint8_t count, uint8_t size)
+static void prepareToSerialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t type, uint8_t count, uint8_t size)
 {
     buffer_size = ready ? 0 : buffer_size;
     buffer_checksum = ready ? 0 : buffer_checksum;
@@ -41,17 +35,17 @@ static void prepareToSerialize(serial_buffer_t & buffer, uint8_t & buffer_size, 
     serialize(buffer, buffer_size, buffer_checksum, ready, type);
 }
 
-static void completeSend(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready)
+static void completeSend(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready)
 {
     serialize(buffer, buffer_size, buffer_checksum, ready, buffer_checksum);
 }
 
-static void prepareToSerializeFloats(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t type, uint8_t count)
+static void prepareToSerializeFloats(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, uint8_t type, uint8_t count)
 {
     prepareToSerialize(buffer, buffer_size, buffer_checksum, ready, type, count, 4);
 }
 
-static void serializeFloat(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, float value)
+static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum, bool ready, float value)
 {
     uint32_t uintval = 1000 * (value + 2);
 
@@ -62,7 +56,7 @@ static void serializeFloat(serial_buffer_t & buffer, uint8_t & buffer_size, uint
 }
 
 static void dispatchMessage(
-        serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_checksum,
+        uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_checksum,
         bool ready, uint8_t type,
         float phi, float theta, float psi, 
         float &m1, float &m2, float &m3, float &m4)
@@ -103,8 +97,8 @@ static void dispatchMessage(
 
         case 215:
             {
-                uint8_t index = buffer.payload[0];
-                float value =  buffer.payload[1] / 100.;
+                uint8_t index = buffer[0];
+                float value =  buffer[1] / 100.;
 
                 m1 = ready ? (index == 1 ?  value : 0) : m1;
                 m2 = ready ? (index == 2 ?  value : 0) : m2;
@@ -119,7 +113,7 @@ static void dispatchMessage(
 
 
 void parser_parse(
-        serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_index,
+        uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_index,
         float phi, float theta, float psi, bool armed,
         float & m1, float &m2, float &m3, float &m4)
 {
@@ -161,7 +155,7 @@ void parser_parse(
 
     // Payload accumulation
     uint8_t pindex = in_payload ? index_ - 1 : 0;
-    buffer.payload[pindex] = in_payload ? c : buffer.payload[pindex];
+    buffer[pindex] = in_payload ? c : buffer[pindex];
 
     // Message dispatch
     bool ready = stream_serialAvailable && parser_state_ == 0 && crc_ == c;
@@ -181,10 +175,10 @@ void parser_parse(
     buffer_size = buffer_size_;
 }
 
-uint8_t parser_read(serial_buffer_t & buffer, uint8_t & buffer_size, uint8_t & buffer_index)
+uint8_t parser_read(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_index)
 {
     buffer_size--;
-    uint8_t retval = buffer.payload[buffer_index];
+    uint8_t retval = buffer[buffer_index];
     buffer_index++;
     return retval;
 }
