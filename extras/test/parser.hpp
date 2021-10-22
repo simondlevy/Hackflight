@@ -91,8 +91,8 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
 }
 
 void parse(
-        uint8_t input_byte,
-        bool & avail,
+        uint8_t in_byte,
+        bool & out_avail,
         uint8_t & out)
 {
     static parser_state_t _pstate;
@@ -104,29 +104,29 @@ void parse(
   
     // Parser state transition function
     _pstate
-        = _pstate == P_IDLE && input_byte == '$' ? P_GOT_DOLLAR
-        : _pstate == P_GOT_DOLLAR && input_byte == 'M' ? P_GOT_M
-        : _pstate == P_GOT_M && (input_byte == '<' || input_byte == '>') ? P_GOT_DIRECTION 
+        = _pstate == P_IDLE && in_byte == '$' ? P_GOT_DOLLAR
+        : _pstate == P_GOT_DOLLAR && in_byte == 'M' ? P_GOT_M
+        : _pstate == P_GOT_M && (in_byte == '<' || in_byte == '>') ? P_GOT_DIRECTION 
         : _pstate == P_GOT_DIRECTION ? P_GOT_SIZE
         : _pstate == P_GOT_SIZE ? P_GOT_TYPE
         : _pstate == P_GOT_TYPE && _size > 0 ? P_IN_PAYLOAD
-        : _pstate == P_GOT_TYPE && input_byte == _crc ? P_GOT_CRC
+        : _pstate == P_GOT_TYPE && in_byte == _crc ? P_GOT_CRC
         : _pstate == P_GOT_CRC && _index <= _count ? P_GOT_CRC
         : P_IDLE;
 
-    _size = _pstate == P_GOT_SIZE ? input_byte
+    _size = _pstate == P_GOT_SIZE ? in_byte
           : _pstate == P_IDLE ? 0
           : _size;
 
-    _type = _pstate == P_GOT_TYPE ? input_byte
+    _type = _pstate == P_GOT_TYPE ? in_byte
           : _pstate == P_IDLE ? 0
           : _type;
 
-    _crc = _pstate == P_GOT_SIZE || _pstate == P_GOT_TYPE ?  _crc ^ input_byte 
+    _crc = _pstate == P_GOT_SIZE || _pstate == P_GOT_TYPE ?  _crc ^ in_byte 
          : _pstate == P_IDLE  ? 0
          : _crc;
 
-    _count = _pstate == P_GOT_TYPE ? 6 + type2size(input_byte)
+    _count = _pstate == P_GOT_TYPE ? 6 + type2size(in_byte)
            : _pstate == P_GOT_CRC ? _count
            : 0;
 
@@ -134,7 +134,7 @@ void parse(
            : _pstate == P_IDLE ? 0
            : _index;
 
-    avail = _pstate == P_GOT_CRC && _index <= _count;
+    out_avail = _pstate == P_GOT_CRC && _index <= _count;
 
-    out = avail ? getbyte(_type, _index, _count) : 0;
+    out = out_avail ? getbyte(_type, _index, _count) : 0;
 }
