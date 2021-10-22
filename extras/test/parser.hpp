@@ -44,8 +44,6 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
   
     static float phi = 1.5, theta = -0.6, psi = 2.7;
 
-    avail = count_ > 0;
-
     // Parser state transition function
     pstate_
         = pstate_ == P_IDLE && in == '$' ? P_GOT_DOLLAR
@@ -69,5 +67,6 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
            : pstate_ == P_GOT_CRC ? count_ - 1
            : 0;
 
+    avail = count_ > 0;
     out = 0x99;
 }
