@@ -1,7 +1,7 @@
 all: test
 
-test: test.cpp parser.hpp
-	g++ -o test test.cpp
+test: main.cpp parser.hpp
+	g++ -o test main.cpp
 
 run: test
 	./test
