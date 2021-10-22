@@ -22,19 +22,21 @@ typedef enum {
 
 } parser_state_t;
 
-static uint8_t type2count(uint8_t type)
+static uint8_t type2size(uint8_t type)
 {
-    return 6 + (type == 121 ? 24 : type == 122 ? 12 : 0);
+    return type == 121 ? 24 : type == 122 ? 12 : 0;
 }
 
 static uint8_t getbyte(uint8_t msgtype, uint8_t count)
 {
     const float phi = 1.5, theta = -0.6, psi = 2.7;
 
-    return   count == 1 ? (uint8_t)'$'
-           : count == 2 ? (uint8_t)'M'
-           : count == 3 ? (uint8_t)'>'
-           : 0;
+    static uint8_t _crc;
+
+    uint8_t byte = count == 1 ? (uint8_t)'$'
+                 : count == 2 ? (uint8_t)'M'
+                 : count == 3 ? (uint8_t)'>'
+                 : 0;
 }
 
 void parse(uint8_t in, bool & avail, uint8_t & out)
@@ -57,18 +59,27 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
         : _pstate == P_GOT_CRC && _index <= _count ? P_GOT_CRC
         : P_IDLE;
 
-    _size = _pstate == P_GOT_SIZE ? in : _pstate == P_IDLE ? 0 : _size;
+    _size = _pstate == P_GOT_SIZE ? in
+          : _pstate == P_IDLE ? 0
+          : _size;
 
-    _type = _pstate == P_GOT_TYPE ? in : _pstate == P_IDLE ? 0 : _type;
+    _type = _pstate == P_GOT_TYPE ? in
+          : _pstate == P_IDLE ? 0
+          : _type;
 
     _crc = _pstate == P_GOT_SIZE || _pstate == P_GOT_TYPE ?  _crc ^ in 
          : _pstate == P_IDLE  ? 0
          : _crc;
 
-    _count = _pstate == P_GOT_TYPE ? type2count(in) : _pstate == P_GOT_CRC ? _count : 0;
+    _count = _pstate == P_GOT_TYPE ? 6 + type2size(in)
+           : _pstate == P_GOT_CRC ? _count
+           : 0;
 
-    _index = _pstate == P_GOT_CRC ? _index + 1 : _pstate == P_IDLE ? 0 : _index;
+    _index = _pstate == P_GOT_CRC ? _index + 1
+           : _pstate == P_IDLE ? 0
+           : _index;
 
     avail = _pstate == P_GOT_CRC && _index <= _count;
+
     out = avail ? getbyte(_type, _index) : 0;
 }
