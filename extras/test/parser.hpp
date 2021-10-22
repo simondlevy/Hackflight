@@ -27,14 +27,9 @@ static uint8_t type2size(uint8_t type)
     return type == 121 ? 24 : type == 122 ? 12 : 0;
 }
 
-static uint32_t float2word(float value)
-{
-    return (uint32_t)(1000 * (value + 2));
-}
-
 static uint8_t float2byte(float value, uint8_t index)
 {
-    uint32_t uintval = float2word(value);
+    uint32_t uintval = (uint32_t)(1000 * (value + 2));
     return (uintval >> ((index%4)*8)) & 0xFF;
 }
 
