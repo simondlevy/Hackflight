@@ -91,7 +91,7 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
 }
 
 void parse(
-        uint8_t in,
+        uint8_t input_byte,
         bool & avail,
         uint8_t & out)
 {
@@ -104,29 +104,29 @@ void parse(
   
     // Parser state transition function
     _pstate
-        = _pstate == P_IDLE && in == '$' ? P_GOT_DOLLAR
-        : _pstate == P_GOT_DOLLAR && in == 'M' ? P_GOT_M
-        : _pstate == P_GOT_M && (in == '<' || in == '>') ? P_GOT_DIRECTION 
+        = _pstate == P_IDLE && input_byte == '$' ? P_GOT_DOLLAR
+        : _pstate == P_GOT_DOLLAR && input_byte == 'M' ? P_GOT_M
+        : _pstate == P_GOT_M && (input_byte == '<' || input_byte == '>') ? P_GOT_DIRECTION 
         : _pstate == P_GOT_DIRECTION ? P_GOT_SIZE
         : _pstate == P_GOT_SIZE ? P_GOT_TYPE
         : _pstate == P_GOT_TYPE && _size > 0 ? P_IN_PAYLOAD
-        : _pstate == P_GOT_TYPE && in == _crc ? P_GOT_CRC
+        : _pstate == P_GOT_TYPE && input_byte == _crc ? P_GOT_CRC
         : _pstate == P_GOT_CRC && _index <= _count ? P_GOT_CRC
         : P_IDLE;
 
-    _size = _pstate == P_GOT_SIZE ? in
+    _size = _pstate == P_GOT_SIZE ? input_byte
           : _pstate == P_IDLE ? 0
           : _size;
 
-    _type = _pstate == P_GOT_TYPE ? in
+    _type = _pstate == P_GOT_TYPE ? input_byte
           : _pstate == P_IDLE ? 0
           : _type;
 
-    _crc = _pstate == P_GOT_SIZE || _pstate == P_GOT_TYPE ?  _crc ^ in 
+    _crc = _pstate == P_GOT_SIZE || _pstate == P_GOT_TYPE ?  _crc ^ input_byte 
          : _pstate == P_IDLE  ? 0
          : _crc;
 
-    _count = _pstate == P_GOT_TYPE ? 6 + type2size(in)
+    _count = _pstate == P_GOT_TYPE ? 6 + type2size(input_byte)
            : _pstate == P_GOT_CRC ? _count
            : 0;
 
