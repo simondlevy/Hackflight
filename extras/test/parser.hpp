@@ -106,6 +106,7 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
         : _pstate == P_GOT_M && (in == '<' || in == '>') ? P_GOT_DIRECTION 
         : _pstate == P_GOT_DIRECTION ? P_GOT_SIZE
         : _pstate == P_GOT_SIZE ? P_GOT_TYPE
+        : _pstate == P_GOT_TYPE && _size > 0 ? P_IN_PAYLOAD
         : _pstate == P_GOT_TYPE && in == _crc ? P_GOT_CRC
         : _pstate == P_GOT_CRC && _index <= _count ? P_GOT_CRC
         : P_IDLE;
