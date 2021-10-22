@@ -144,8 +144,8 @@ void parser_parse(
         uint8_t * buffer,
         uint8_t & buffer_size,
         uint8_t & buffer_index,
-        bool input_available,
-        uint8_t input_byte,
+        bool in_avail,
+        uint8_t in_byte,
         float phi,
         float theta,
         float psi,
@@ -164,25 +164,25 @@ void parser_parse(
     static uint8_t buffer_checksum_;
 
     // Payload functions
-    size_ = parser_state_ == 3 ? input_byte : size_;
+    size_ = parser_state_ == 3 ? in_byte : size_;
     index_ = parser_state_ == 5 ? index_ + 1 : 0;
     bool in_payload = type_ >= 200 && parser_state_ == 5 && index_ <= size_;
 
     // Command acquisition function
-    type_ = parser_state_ == 4 ? input_byte : type_;
+    type_ = parser_state_ == 4 ? in_byte : type_;
 
     // Checksum transition function
-    crc_ = parser_state_ == 3 ? input_byte
-        : parser_state_ == 4  ?  crc_ ^ input_byte 
-        : in_payload ?  crc_ ^ input_byte
+    crc_ = parser_state_ == 3 ? in_byte
+        : parser_state_ == 4  ?  crc_ ^ in_byte 
+        : in_payload ?  crc_ ^ in_byte
         : parser_state_ == 5  ?  crc_
         : 0;
 
     // Parser state transition function
     parser_state_
-        = parser_state_ == 0 && input_byte == '$' ? 1
-        : parser_state_ == 1 && input_byte == 'M' ? 2
-        : parser_state_ == 2 && (input_byte == '<' || input_byte == '>') ? 3
+        = parser_state_ == 0 && in_byte == '$' ? 1
+        : parser_state_ == 1 && in_byte == 'M' ? 2
+        : parser_state_ == 2 && (in_byte == '<' || in_byte == '>') ? 3
         : parser_state_ == 3 ? 4
         : parser_state_ == 4 ? 5
         : parser_state_ == 5 && in_payload ? 5
@@ -191,10 +191,10 @@ void parser_parse(
 
     // Incoming payload accumulation
     uint8_t pindex = in_payload ? index_ - 1 : 0;
-    buffer[pindex] = in_payload ? input_byte : buffer[pindex];
+    buffer[pindex] = in_payload ? in_byte : buffer[pindex];
 
     // Message dispatch
-    bool ready = input_available && parser_state_ == 0 && crc_ == input_byte;
+    bool ready = in_avail && parser_state_ == 0 && crc_ == in_byte;
     buffer_index = ready ? 0 : buffer_index;
     static float m1_;
     static float m2_;
