@@ -28,6 +28,8 @@ void parse(uint8_t byte)
 {
     static parser_state_t pstate_;
 
+    static float phi = 1.5, theta = -0.6, psi = 2.7;
+
     // Parser state transition function
     pstate_
         = pstate_ == P_IDLE && byte == '$' ? P_GOT_DOLLAR
