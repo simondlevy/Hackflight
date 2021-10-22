@@ -27,7 +27,12 @@ static uint8_t type2size(uint8_t type)
     return type == 121 ? 24 : type == 122 ? 12 : 0;
 }
 
-static uint8_t getbyte(uint8_t msgtype, uint8_t index)
+static uint8_t val2byte(uint8_t msgtype, uint8_t index)
+{
+    return 0;
+}
+
+static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
 {
     const float phi = 1.5, theta = -0.6, psi = 2.7;
 
@@ -38,7 +43,8 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t index)
                  : index == 3 ? (uint8_t)'>'
                  : index == 4 ? type2size(msgtype)
                  : index == 5 ? msgtype
-                 : 0;
+                 : index == count ? _crc
+                 : val2byte(msgtype, index);
 }
 
 void parse(uint8_t in, bool & avail, uint8_t & out)
@@ -83,5 +89,5 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
 
     avail = _pstate == P_GOT_CRC && _index <= _count;
 
-    out = avail ? getbyte(_type, _index) : 0;
+    out = avail ? getbyte(_type, _index, _count) : 0;
 }
