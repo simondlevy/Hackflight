@@ -29,6 +29,7 @@ static uint8_t type2size(uint8_t type)
 
 static uint8_t val2byte(uint8_t msgtype, uint8_t index)
 {
+    printf("index: %d\n", index);
     return 0;
 }
 
@@ -44,7 +45,7 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
                  : index == 4 ? type2size(msgtype)
                  : index == 5 ? msgtype
                  : index == count ? _crc
-                 : val2byte(msgtype, index);
+                 : val2byte(msgtype, index-6);
 }
 
 void parse(uint8_t in, bool & avail, uint8_t & out)
