@@ -42,10 +42,15 @@ void parse(uint8_t byte)
 
     static uint8_t size_;
     static uint8_t type_;
+    static uint8_t crc_;
 
     size_ = pstate_ == P_GOT_SIZE ? byte : pstate_ == P_IDLE ? 0 : size_;
 
     type_ = pstate_ == P_GOT_TYPE ? byte : pstate_ == P_IDLE ? 0 : type_;
+
+    crc_ = pstate_ == P_GOT_SIZE ? byte : pstate_ == P_GOT_TYPE ? crc_ ^ byte : crc_;
     
-    if (type_ > 0) printf("%d\n", type_);
+    if (pstate_ == P_GOT_CRC) {
+        printf("%d %d\n", byte, crc_);
+    }
 }
