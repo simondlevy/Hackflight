@@ -53,6 +53,8 @@ void stream_run(
             serial_buffer,
             buffer_size,
             buffer_index,
+            stream_serialAvailable,
+            stream_serialByte,
             state_phi,
             state_theta,
             state_psi,

@@ -90,7 +90,10 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
      return byte;
 }
 
-void parse(uint8_t in, bool & avail, uint8_t & out)
+void parse(
+        uint8_t in,
+        bool & avail,
+        uint8_t & out)
 {
     static parser_state_t _pstate;
     static uint8_t _size;

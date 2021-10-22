@@ -9,7 +9,6 @@
 #include "copilot.h"
 
 #include "stream_receiver.h"
-#include "stream_serial.h"
 
 static void addToOutBuf(
         uint8_t * buffer,
@@ -145,6 +144,8 @@ void parser_parse(
         uint8_t * buffer,
         uint8_t & buffer_size,
         uint8_t & buffer_index,
+        bool input_available,
+        uint8_t input_byte,
         float phi,
         float theta,
         float psi,
@@ -154,8 +155,6 @@ void parser_parse(
         float & m3,
         float & m4)
 {
-    uint8_t byte = stream_serialByte;
-
     static uint8_t parser_state_;
     static uint8_t type_;
     static uint8_t crc_;
@@ -165,25 +164,25 @@ void parser_parse(
     static uint8_t buffer_checksum_;
 
     // Payload functions
-    size_ = parser_state_ == 3 ? byte : size_;
+    size_ = parser_state_ == 3 ? input_byte : size_;
     index_ = parser_state_ == 5 ? index_ + 1 : 0;
     bool in_payload = type_ >= 200 && parser_state_ == 5 && index_ <= size_;
 
     // Command acquisition function
-    type_ = parser_state_ == 4 ? byte : type_;
+    type_ = parser_state_ == 4 ? input_byte : type_;
 
     // Checksum transition function
-    crc_ = parser_state_ == 3 ? byte
-        : parser_state_ == 4  ?  crc_ ^ byte 
-        : in_payload ?  crc_ ^ byte
+    crc_ = parser_state_ == 3 ? input_byte
+        : parser_state_ == 4  ?  crc_ ^ input_byte 
+        : in_payload ?  crc_ ^ input_byte
         : parser_state_ == 5  ?  crc_
         : 0;
 
     // Parser state transition function
     parser_state_
-        = parser_state_ == 0 && byte == '$' ? 1
-        : parser_state_ == 1 && byte == 'M' ? 2
-        : parser_state_ == 2 && (byte == '<' || byte == '>') ? 3
+        = parser_state_ == 0 && input_byte == '$' ? 1
+        : parser_state_ == 1 && input_byte == 'M' ? 2
+        : parser_state_ == 2 && (input_byte == '<' || input_byte == '>') ? 3
         : parser_state_ == 3 ? 4
         : parser_state_ == 4 ? 5
         : parser_state_ == 5 && in_payload ? 5
@@ -192,10 +191,10 @@ void parser_parse(
 
     // Incoming payload accumulation
     uint8_t pindex = in_payload ? index_ - 1 : 0;
-    buffer[pindex] = in_payload ? byte : buffer[pindex];
+    buffer[pindex] = in_payload ? input_byte : buffer[pindex];
 
     // Message dispatch
-    bool ready = stream_serialAvailable && parser_state_ == 0 && crc_ == byte;
+    bool ready = input_available && parser_state_ == 0 && crc_ == input_byte;
     buffer_index = ready ? 0 : buffer_index;
     static float m1_;
     static float m2_;
