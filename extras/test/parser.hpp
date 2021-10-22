@@ -24,7 +24,7 @@ typedef enum {
 } parser_state_t;
 
 
-void parser_parse(uint8_t byte)
+void parse(uint8_t byte)
 {
     static parser_state_t parser_state_;
 
