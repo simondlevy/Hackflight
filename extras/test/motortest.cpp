@@ -13,35 +13,23 @@
 int main(int argc, char ** argv)
 {
     const uint8_t msgtype = 215;
+    const uint8_t msgsize = 2;
+    const uint8_t mindex = 1;
+    const uint8_t mvalue = 52;
 
     bool avail = 0;
     uint8_t byte = 0;
 
+    uint8_t crc = msgsize ^ msgtype ^ mindex ^ mvalue;
+
     parse('$', avail, byte);       // sentinel byte 1
     parse('M', avail, byte);       // sentinel byte 2
     parse('<', avail, byte);       // msg direction
-    parse(2, avail, byte);         // msg size
+    parse(msgsize, avail, byte);         
     parse(msgtype, avail, byte); 
-
-    exit(0);
-
-    parse(0^msgtype, avail, byte); // CRC
-
-    uint8_t count = 0;
-
-    while (avail) {
-        if (count > 4 && count < 29) {
-            static int32_t intval;
-            uint8_t k = (count - 5) % 4;
-            intval |= (byte << k*8);
-            if (k == 3) {
-                printf("%f\n", intval/1000.-2);
-                intval = 0;
-            }
-        }
-        parse(0, avail, byte);
-        count++;
-    }
+    parse(mindex, avail, byte);   
+    parse(mvalue, avail, byte);
+    parse(crc, avail, byte);
 
     return 0;
 }

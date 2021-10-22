@@ -9,13 +9,13 @@ rxtest: rxtest.cpp parser.hpp
 motortest: motortest.cpp parser.hpp
 	g++ -Wall -o motortest motortest.cpp
 
-state: statetest
+stest: statetest
 	./statetest
 
-rx: rxtest
+rtest: rxtest
 	./rxtest
 
-motor: motortest
+mtest: motortest
 	./motortest
 
 clean:
