@@ -27,6 +27,11 @@ static uint8_t type2size(uint8_t type)
     return type == 121 ? 24 : type == 122 ? 12 : 0;
 }
 
+static uint32_t float2word(float value)
+{
+    return (uint32_t)(1000 * (value + 2));
+}
+
 static uint8_t state2byte(uint8_t index)
 {
     const float phi = 1.5;
@@ -37,9 +42,9 @@ static uint8_t state2byte(uint8_t index)
                 : index < 8 ? theta
                 : psi;
 
-    printf("%f\n", value);
+    uint32_t uintval = float2word(value);
 
-    return 0;
+    return (uintval >> (index%4)) & 0xFF;
 }
 
 static uint8_t val2byte(uint8_t msgtype, uint8_t index)
