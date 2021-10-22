@@ -32,6 +32,12 @@ static uint32_t float2word(float value)
     return (uint32_t)(1000 * (value + 2));
 }
 
+static uint8_t float2byte(float value, uint8_t index)
+{
+    uint32_t uintval = float2word(value);
+    return (uintval >> ((index%4)*8)) & 0xFF;
+}
+
 static uint8_t state2byte(uint8_t index)
 {
     const float phi = 1.5;
@@ -42,16 +48,33 @@ static uint8_t state2byte(uint8_t index)
                 : index < 8 ? theta
                 : psi;
 
-    uint32_t uintval = float2word(value);
+    return float2byte(value, index);
+}
 
-    // printf("%+3.3f  %d  x%08X\n", value, uintval, uintval);
+static uint8_t rx2byte(uint8_t index)
+{
+    const float c1 = 0.1;
+    const float c2 = 0.2;
+    const float c3 = 0.3;
+    const float c4 = 0.4;
+    const float c5 = 0.5;
+    const float c6 = 0.6;
 
-    return (uintval >> ((index%4)*8)) & 0xFF;
+    float value = index < 4  ? c1 
+                : index < 8  ? c2
+                : index < 12 ? c3
+                : index < 16 ? c4
+                : index < 20 ? c5
+                : c6;
+
+    return float2byte(value, index);
 }
 
 static uint8_t val2byte(uint8_t msgtype, uint8_t index)
 {
-    return msgtype == 122 ? state2byte(index) : 0;
+    return  msgtype == 121 ? rx2byte(index)
+          : msgtype == 122 ? state2byte(index)
+          : 0;
 }
 
 static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
