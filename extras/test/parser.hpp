@@ -18,7 +18,8 @@ typedef enum {
     P_GOT_DIRECTION, // 3
     P_GOT_SIZE,      // 4
     P_GOT_TYPE,      // 5
-    P_GOT_CRC        // 6
+    P_GOT_CRC,       // 6
+    P_SENDING        // 7
 
 } parser_state_t;
 
@@ -26,6 +27,9 @@ typedef enum {
 void parse(uint8_t byte)
 {
     static parser_state_t pstate_;
+    static uint8_t size_;
+    static uint8_t type_;
+    static uint8_t crc_;
 
     static float phi = 1.5, theta = -0.6, psi = 2.7;
 
@@ -39,17 +43,13 @@ void parse(uint8_t byte)
         : pstate_ == P_GOT_TYPE ? P_GOT_CRC
         : P_IDLE;
 
-    static uint8_t size_;
-    static uint8_t type_;
-    static uint8_t crc_;
-
     size_ = pstate_ == P_GOT_SIZE ? byte : pstate_ == P_IDLE ? 0 : size_;
 
     type_ = pstate_ == P_GOT_TYPE ? byte : pstate_ == P_IDLE ? 0 : type_;
 
-    crc_ = pstate_ == P_GOT_SIZE ? byte : pstate_ == P_GOT_TYPE ? crc_ ^ byte : crc_;
-    
-    if (pstate_ == P_GOT_CRC) {
-        printf("%d %d\n", byte, crc_);
-    }
+    crc_ = pstate_ == P_GOT_SIZE || pstate_ == P_GOT_TYPE ?  crc_ ^ byte 
+         : pstate_ == P_IDLE  ? 0
+         : crc_;
+
+    printf("%d %d %d\n", byte, pstate_, crc_);
 }
