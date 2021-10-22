@@ -10,9 +10,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-extern float stream_statePhi;
-extern float stream_stateTheta;
-extern float stream_statePsi;
 
 extern float stream_receiverThrottle;
 extern float stream_receiverRoll;
@@ -45,11 +42,11 @@ static uint8_t float2byte(float value, uint8_t index)
     return (uintval >> ((index%4)*8)) & 0xFF;
 }
 
-static uint8_t state2byte(uint8_t index)
+static uint8_t state2byte(uint8_t index, float state_phi, float state_theta, float state_psi)
 {
-    float value = index < 4 ? stream_statePhi
-                : index < 8 ? stream_stateTheta
-                : stream_statePsi;
+    float value = index < 4 ? state_phi
+                : index < 8 ? state_theta
+                : state_psi;
 
     return float2byte(value, index);
 }
@@ -66,14 +63,14 @@ static uint8_t rx2byte(uint8_t index)
     return float2byte(value, index);
 }
 
-static uint8_t val2byte(uint8_t msgtype, uint8_t index)
+static uint8_t val2byte(uint8_t msgtype, uint8_t index, float state_phi, float state_theta, float state_psi)
 {
     return  msgtype == 121 ? rx2byte(index)
-          : msgtype == 122 ? state2byte(index)
+          : msgtype == 122 ? state2byte(index, state_phi, state_theta, state_psi)
           : 0;
 }
 
-static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
+static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count, float state_phi, float state_theta, float state_psi)
 {
     static uint8_t _crc;
 
@@ -83,7 +80,7 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
                  : index == 4 ? type2size(msgtype)
                  : index == 5 ? msgtype
                  : index == count ? _crc
-                 : val2byte(msgtype, index-6);
+                 : val2byte(msgtype, index-6, state_phi, state_theta, state_psi);
 
      _crc = index > 3 ? _crc ^ byte : 0;
 
@@ -94,6 +91,9 @@ void parse(
         uint8_t in_byte,
         bool & out_avail,
         uint8_t & out_byte,
+        float state_phi,
+        float state_theta,
+        float state_psi,
         bool armed,
         float & m1,
         float & m2,
@@ -141,5 +141,5 @@ void parse(
 
     out_avail = _pstate == P_GOT_CRC && _index <= _count;
 
-    out_byte = out_avail ? getbyte(_type, _index, _count) : 0;
+    out_byte = out_avail ? getbyte(_type, _index, _count, state_phi, state_theta, state_psi) : 0;
 }
