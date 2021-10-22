@@ -31,40 +31,45 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t count)
 {
     static float phi = 1.5, theta = -0.6, psi = 2.7;
 
-    return 0;
+    return count == 0 ? (uint8_t)'M' : 0;
 }
 
 void parse(uint8_t in, bool & avail, uint8_t & out)
 {
-    static parser_state_t pstate_;
-    static uint8_t size_;
-    static uint8_t type_;
-    static uint8_t crc_;
-    static uint8_t count_;
+    static parser_state_t _pstate;
+    static uint8_t _size;
+    static uint8_t _type;
+    static uint8_t _crc;
+    static uint8_t _count;
+    static uint8_t _index;
   
     // Parser state transition function
-    pstate_
-        = pstate_ == P_IDLE && in == '$' ? P_GOT_DOLLAR
-        : pstate_ == P_GOT_DOLLAR && in == 'M' ? P_GOT_M
-        : pstate_ == P_GOT_M && (in == '<' || in == '>') ? P_GOT_DIRECTION 
-        : pstate_ == P_GOT_DIRECTION ? P_GOT_SIZE
-        : pstate_ == P_GOT_SIZE ? P_GOT_TYPE
-        : pstate_ == P_GOT_TYPE && in == crc_ ? P_GOT_CRC
-        : pstate_ == P_GOT_CRC && count_ > 0 ? P_GOT_CRC
+    _pstate
+        = _pstate == P_IDLE && in == '$' ? P_GOT_DOLLAR
+        : _pstate == P_GOT_DOLLAR && in == 'M' ? P_GOT_M
+        : _pstate == P_GOT_M && (in == '<' || in == '>') ? P_GOT_DIRECTION 
+        : _pstate == P_GOT_DIRECTION ? P_GOT_SIZE
+        : _pstate == P_GOT_SIZE ? P_GOT_TYPE
+        : _pstate == P_GOT_TYPE && in == _crc ? P_GOT_CRC
+        : _pstate == P_GOT_CRC && _index <= _count ? P_GOT_CRC
         : P_IDLE;
 
-    size_ = pstate_ == P_GOT_SIZE ? in : pstate_ == P_IDLE ? 0 : size_;
+    _size = _pstate == P_GOT_SIZE ? in : _pstate == P_IDLE ? 0 : _size;
 
-    type_ = pstate_ == P_GOT_TYPE ? in : pstate_ == P_IDLE ? 0 : type_;
+    _type = _pstate == P_GOT_TYPE ? in : _pstate == P_IDLE ? 0 : _type;
 
-    crc_ = pstate_ == P_GOT_SIZE || pstate_ == P_GOT_TYPE ?  crc_ ^ in 
-         : pstate_ == P_IDLE  ? 0
-         : crc_;
+    _crc = _pstate == P_GOT_SIZE || _pstate == P_GOT_TYPE ?  _crc ^ in 
+         : _pstate == P_IDLE  ? 0
+         : _crc;
 
-    count_ = pstate_ == P_GOT_TYPE ? type2count(in) + 2
-           : pstate_ == P_GOT_CRC ? count_ - 1
-           : 0;
+    _count = _pstate == P_GOT_TYPE ? type2count(in) : _pstate == P_GOT_CRC ? _count : 0;
 
-    avail = count_ > 0;
-    out = avail ? getbyte(type_, count_) : 0;
+    _index = _pstate == P_GOT_CRC ? _index + 1 : _pstate == P_IDLE ? 0 : _index;
+
+    //printf("%d %d %d | %d\n", _pstate, _count, _index, _index<=_count);
+
+    //if (_pstate == P_GOT_CRC && _index < _count) printf("%d\n", _index);
+
+    avail = _index <= _count;
+    out = avail ? getbyte(_type, _index) : 0;
 }
