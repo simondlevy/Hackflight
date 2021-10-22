@@ -27,16 +27,21 @@ static uint8_t type2size(uint8_t type)
     return type == 121 ? 24 : type == 122 ? 12 : 0;
 }
 
+static uint8_t state2byte(uint8_t index)
+{
+    const float phi = 1.5, theta = -0.6, psi = 2.7;
+
+    return 0;
+}
+
 static uint8_t val2byte(uint8_t msgtype, uint8_t index)
 {
-    printf("index: %d\n", index);
-    return 0;
+    return msgtype == 122 ? state2byte(index)
+             : 0;
 }
 
 static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
 {
-    const float phi = 1.5, theta = -0.6, psi = 2.7;
-
     static uint8_t _crc;
 
     uint8_t byte = index == 1 ? (uint8_t)'$'
