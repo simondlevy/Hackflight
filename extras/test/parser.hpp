@@ -65,7 +65,7 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
                  : index == count ? _crc
                  : val2byte(msgtype, index-6);
 
-     _crc = index;
+     _crc = index > 3 ? _crc ^ byte : 0;
 
      return byte;
 }
