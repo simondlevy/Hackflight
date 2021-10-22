@@ -22,6 +22,10 @@
 #include "stream_serial.h"
 #include "copilot.h"
 
+float stream_statePhi;
+float stream_stateTheta;
+float stream_statePsi;
+
 void setup(void)
 {
 }
@@ -49,15 +53,14 @@ void stream_run(
     static uint8_t buffer_index;
     uint8_t buffer_size = 0;
 
+    stream_statePhi = state_phi;
+    stream_stateTheta = state_theta;
+    stream_statePsi = state_psi;
+
     parser_parse(
             serial_buffer,
             buffer_size,
             buffer_index,
-            stream_serialAvailable,
-            stream_serialByte,
-            state_phi,
-            state_theta,
-            state_psi,
             armed,
             m1_val,
             m2_val,

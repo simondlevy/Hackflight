@@ -9,6 +9,11 @@
 #include "copilot.h"
 
 #include "stream_receiver.h"
+#include "stream_serial.h"
+
+extern float stream_statePhi;
+extern float stream_stateTheta;
+extern float stream_statePsi;
 
 static void addToOutBuf(
         uint8_t * buffer,
@@ -91,9 +96,6 @@ static void dispatchMessage(
         uint8_t & buffer_checksum,
         bool ready,
         uint8_t type,
-        float phi,
-        float theta,
-        float psi,
         float &m1,
         float &m2,
         float &m3,
@@ -117,9 +119,9 @@ static void dispatchMessage(
         case 122:
             {
                 prepareToSerializeFloats(buffer, buffer_size, buffer_checksum, ready, type, 3);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, phi);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, theta);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, psi);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_statePhi);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_stateTheta);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_statePsi);
                 completeSend(buffer, buffer_size, buffer_checksum, ready);
 
             } break;
@@ -144,11 +146,6 @@ void parser_parse(
         uint8_t * buffer,
         uint8_t & buffer_size,
         uint8_t & buffer_index,
-        bool in_avail,
-        uint8_t in_byte,
-        float phi,
-        float theta,
-        float psi,
         bool armed,
         float & m1,
         float & m2,
@@ -164,25 +161,25 @@ void parser_parse(
     static uint8_t buffer_checksum_;
 
     // Payload functions
-    size_ = parser_state_ == 3 ? in_byte : size_;
+    size_ = parser_state_ == 3 ? stream_serialByte : size_;
     index_ = parser_state_ == 5 ? index_ + 1 : 0;
     bool in_payload = type_ >= 200 && parser_state_ == 5 && index_ <= size_;
 
     // Command acquisition function
-    type_ = parser_state_ == 4 ? in_byte : type_;
+    type_ = parser_state_ == 4 ? stream_serialByte : type_;
 
     // Checksum transition function
-    crc_ = parser_state_ == 3 ? in_byte
-        : parser_state_ == 4  ?  crc_ ^ in_byte 
-        : in_payload ?  crc_ ^ in_byte
+    crc_ = parser_state_ == 3 ? stream_serialByte
+        : parser_state_ == 4  ?  crc_ ^ stream_serialByte 
+        : in_payload ?  crc_ ^ stream_serialByte
         : parser_state_ == 5  ?  crc_
         : 0;
 
     // Parser state transition function
     parser_state_
-        = parser_state_ == 0 && in_byte == '$' ? 1
-        : parser_state_ == 1 && in_byte == 'M' ? 2
-        : parser_state_ == 2 && (in_byte == '<' || in_byte == '>') ? 3
+        = parser_state_ == 0 && stream_serialByte == '$' ? 1
+        : parser_state_ == 1 && stream_serialByte == 'M' ? 2
+        : parser_state_ == 2 && (stream_serialByte == '<' || stream_serialByte == '>') ? 3
         : parser_state_ == 3 ? 4
         : parser_state_ == 4 ? 5
         : parser_state_ == 5 && in_payload ? 5
@@ -191,16 +188,16 @@ void parser_parse(
 
     // Incoming payload accumulation
     uint8_t pindex = in_payload ? index_ - 1 : 0;
-    buffer[pindex] = in_payload ? in_byte : buffer[pindex];
+    buffer[pindex] = in_payload ? stream_serialByte : buffer[pindex];
 
     // Message dispatch
-    bool ready = in_avail && parser_state_ == 0 && crc_ == in_byte;
+    bool ready = stream_serialAvailable && parser_state_ == 0 && crc_ == stream_serialByte;
     buffer_index = ready ? 0 : buffer_index;
     static float m1_;
     static float m2_;
     static float m3_;
     static float m4_;
-    dispatchMessage(buffer, buffer_size_, buffer_checksum_, ready, type_, phi, theta, psi, m1_, m2_, m3_, m4_);
+    dispatchMessage(buffer, buffer_size_, buffer_checksum_, ready, type_, m1_, m2_, m3_, m4_);
 
     // Set motors iff in disarmed mode
     m1 = armed ? m1 : m1_;
