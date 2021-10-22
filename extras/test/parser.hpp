@@ -29,7 +29,7 @@ static uint8_t type2size(uint8_t type)
 
 static uint8_t state2byte(uint8_t index)
 {
-    const float phi = 1.5, theta = -0.6, psi = 2.7;
+    const float state = {1.5, -0.6, 2.7};
 
     return 0;
 }
