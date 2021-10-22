@@ -24,7 +24,7 @@ int main(int argc, char ** argv)
     parse(0^msgtype, avail, byte); // CRC
 
     while (avail) {
-        printf("0x%02X\n", byte);
+        //printf("0x%02X\n", byte);
         parse(0, avail, byte);
     }
 

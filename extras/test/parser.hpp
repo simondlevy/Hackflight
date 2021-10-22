@@ -33,6 +33,12 @@ static uint8_t state2byte(uint8_t index)
     const float theta = -0.6;
     const float psi = 2.7;
 
+    float value = index < 4 ? phi 
+                : index < 8 ? theta
+                : psi;
+
+    printf("%f\n", value);
+
     return 0;
 }
 
