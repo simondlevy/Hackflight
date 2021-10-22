@@ -29,7 +29,7 @@ static uint8_t type2count(uint8_t type)
 
 static uint8_t getbyte(uint8_t msgtype, uint8_t count)
 {
-    static float phi = 1.5, theta = -0.6, psi = 2.7;
+    const float phi = 1.5, theta = -0.6, psi = 2.7;
 
     return   count == 1 ? (uint8_t)'$'
            : count == 2 ? (uint8_t)'M'
