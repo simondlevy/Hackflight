@@ -6,5 +6,8 @@ test: main.cpp parser.hpp
 run: test
 	./test
 
+count: test
+	./test | wc -lc
+
 clean:
 	rm -f test *~

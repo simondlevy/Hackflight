@@ -26,9 +26,9 @@ static uint8_t type2count(uint8_t type)
 {
     switch (type) {
         case 121:
-            return 24;
+            return 6 * 4 + 6;
         case 122:
-            return 12;
+            return 3 * 4 + 6;
     }
 
     return 0;
@@ -52,7 +52,7 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
         : pstate_ == P_GOT_DIRECTION ? P_GOT_SIZE
         : pstate_ == P_GOT_SIZE ? P_GOT_TYPE
         : pstate_ == P_GOT_TYPE && in == crc_ ? P_GOT_CRC
-        : pstate_ == P_GOT_CRC && count_ >= 0 ? P_GOT_CRC
+        : pstate_ == P_GOT_CRC && count_ > 0 ? P_GOT_CRC
         : P_IDLE;
 
     size_ = pstate_ == P_GOT_SIZE ? in : pstate_ == P_IDLE ? 0 : size_;
@@ -63,10 +63,10 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
          : pstate_ == P_IDLE  ? 0
          : crc_;
 
-    count_ = pstate_ == P_GOT_TYPE ? type2count(in) 
+    count_ = pstate_ == P_GOT_TYPE ? type2count(in) + 2
            : pstate_ == P_GOT_CRC ? count_ - 1
            : 0;
 
     avail = count_ > 0;
-    out = 0x99;
+    out = avail ? 0x99 : 0;
 }
