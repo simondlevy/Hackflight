@@ -93,7 +93,7 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
 void parse(
         uint8_t in_byte,
         bool & out_avail,
-        uint8_t & out)
+        uint8_t & out_byte)
 {
     static parser_state_t _pstate;
     static uint8_t _size;
@@ -136,5 +136,5 @@ void parse(
 
     out_avail = _pstate == P_GOT_CRC && _index <= _count;
 
-    out = out_avail ? getbyte(_type, _index, _count) : 0;
+    out_byte = out_avail ? getbyte(_type, _index, _count) : 0;
 }
