@@ -14,6 +14,7 @@ int main(int argc, char ** argv)
     parse(36);
     parse(77);
     parse(60);
+    parse(0);
 
     return 0;
 }
