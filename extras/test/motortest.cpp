@@ -12,7 +12,7 @@
 
 int main(int argc, char ** argv)
 {
-    const uint8_t msgtype = 121;
+    const uint8_t msgtype = 215;
 
     bool avail = 0;
     uint8_t byte = 0;
@@ -20,8 +20,11 @@ int main(int argc, char ** argv)
     parse('$', avail, byte);       // sentinel byte 1
     parse('M', avail, byte);       // sentinel byte 2
     parse('<', avail, byte);       // msg direction
-    parse(0, avail, byte);         // msg size
+    parse(2, avail, byte);         // msg size
     parse(msgtype, avail, byte); 
+
+    exit(0);
+
     parse(0^msgtype, avail, byte); // CRC
 
     uint8_t count = 0;
