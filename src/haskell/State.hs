@@ -29,7 +29,6 @@ data State = State {   x :: SFloat
                 , dtheta :: SFloat
                 ,    psi :: SFloat
                 ,   dpsi :: SFloat
-
               }
 
 safeToArm :: State -> SBool

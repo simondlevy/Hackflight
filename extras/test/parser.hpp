@@ -27,17 +27,17 @@ static uint8_t type2size(uint8_t type)
     return type == 121 ? 24 : type == 122 ? 12 : 0;
 }
 
-static uint8_t getbyte(uint8_t msgtype, uint8_t count)
+static uint8_t getbyte(uint8_t msgtype, uint8_t index)
 {
     const float phi = 1.5, theta = -0.6, psi = 2.7;
 
     static uint8_t _crc;
 
-    uint8_t byte = count == 1 ? (uint8_t)'$'
-                 : count == 2 ? (uint8_t)'M'
-                 : count == 3 ? (uint8_t)'>'
-                 : count == 4 ? type2size(msgtype)
-                 : count == 5 ? msgtype
+    uint8_t byte = index == 1 ? (uint8_t)'$'
+                 : index == 2 ? (uint8_t)'M'
+                 : index == 3 ? (uint8_t)'>'
+                 : index == 4 ? type2size(msgtype)
+                 : index == 5 ? msgtype
                  : 0;
 }
 
