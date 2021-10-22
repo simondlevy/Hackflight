@@ -38,5 +38,5 @@ void parse(uint8_t byte)
         : parser_state_ == P_GOT_TYPE ? P_GOT_CRC
         : P_IDLE;
 
-    printf("Got %c; in state %d\n", byte, (uint8_t)parser_state_);
+    printf("%d\n", (uint8_t)parser_state_);
 }

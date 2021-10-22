@@ -11,10 +11,11 @@
 
 int main(int argc, char ** argv)
 {
-    parse(36);
-    parse(77);
-    parse(60);
+    parse('$');
+    parse('M');
+    parse('<');
     parse(0);
+    parse(215);
 
     return 0;
 }
