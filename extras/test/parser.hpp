@@ -1,0 +1,42 @@
+/*
+   Timer task for serial comms
+
+   MIT License
+ */
+
+#pragma once
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+
+typedef enum {
+
+    P_IDLE,          // 0
+    P_GOT_DOLLAR,    // 1
+    P_GOT_M,         // 2
+    P_GOT_DIRECTION, // 3
+    P_GOT_SIZE,      // 4
+    P_GOT_TYPE,      // 5
+    P_IN_PAYLOAD,    // 6
+    P_GOT_CRC        // 7
+
+} parser_state_t;
+
+
+void parser_parse(uint8_t byte)
+{
+    static parser_state_t parser_state_;
+
+    // Parser state transition function
+    parser_state_
+        = parser_state_ == P_IDLE && byte == '$' ? P_GOT_DOLLAR
+        : parser_state_ == P_GOT_DOLLAR && byte == 'M' ? P_GOT_M
+        : parser_state_ == P_GOT_M && (byte == '<' || byte == '>') ? P_GOT_DIRECTION 
+        : parser_state_ == P_GOT_DIRECTION ? P_GOT_SIZE
+        : parser_state_ == P_GOT_SIZE ? P_GOT_TYPE
+        : parser_state_ == P_GOT_TYPE ? P_GOT_CRC
+        : P_IDLE;
+
+    printf("Got %c; in state %d\n", byte, (uint8_t)parser_state_);
+}
