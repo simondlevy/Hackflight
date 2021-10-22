@@ -23,9 +23,12 @@ int main(int argc, char ** argv)
     parse(msgtype, avail, byte); 
     parse(0^msgtype, avail, byte); // CRC
 
+    uint8_t count = 0;
+
     while (avail) {
-        printf("0x%02X\n", byte);
+        if (count > 4 && count < 17) printf("%02d: 0x%02X\n", count-5, byte);
         parse(0, avail, byte);
+        count++;
     }
 
     return 0;
