@@ -65,7 +65,9 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
                  : index == count ? _crc
                  : val2byte(msgtype, index-6);
 
-    _crc = 0x99; //index > 3 ? _crc ^ byte : 0;
+     _crc = index;
+
+     return byte;
 }
 
 void parse(uint8_t in, bool & avail, uint8_t & out)
