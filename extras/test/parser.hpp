@@ -34,7 +34,7 @@ static uint8_t type2count(uint8_t type)
     return 0;
 }
 
-void parse(uint8_t byte)
+void parse(uint8_t in, bool & avail, uint8_t & out)
 {
     static parser_state_t pstate_;
     static uint8_t size_;
@@ -46,27 +46,27 @@ void parse(uint8_t byte)
 
     // Parser state transition function
     pstate_
-        = pstate_ == P_IDLE && byte == '$' ? P_GOT_DOLLAR
-        : pstate_ == P_GOT_DOLLAR && byte == 'M' ? P_GOT_M
-        : pstate_ == P_GOT_M && (byte == '<' || byte == '>') ? P_GOT_DIRECTION 
+        = pstate_ == P_IDLE && in == '$' ? P_GOT_DOLLAR
+        : pstate_ == P_GOT_DOLLAR && in == 'M' ? P_GOT_M
+        : pstate_ == P_GOT_M && (in == '<' || in == '>') ? P_GOT_DIRECTION 
         : pstate_ == P_GOT_DIRECTION ? P_GOT_SIZE
         : pstate_ == P_GOT_SIZE ? P_GOT_TYPE
-        : pstate_ == P_GOT_TYPE && byte == crc_ ? P_GOT_CRC
+        : pstate_ == P_GOT_TYPE && in == crc_ ? P_GOT_CRC
         : P_IDLE;
 
-    size_ = pstate_ == P_GOT_SIZE ? byte : pstate_ == P_IDLE ? 0 : size_;
+    size_ = pstate_ == P_GOT_SIZE ? in : pstate_ == P_IDLE ? 0 : size_;
 
-    type_ = pstate_ == P_GOT_TYPE ? byte : pstate_ == P_IDLE ? 0 : type_;
+    type_ = pstate_ == P_GOT_TYPE ? in : pstate_ == P_IDLE ? 0 : type_;
 
-    crc_ = pstate_ == P_GOT_SIZE || pstate_ == P_GOT_TYPE ?  crc_ ^ byte 
+    crc_ = pstate_ == P_GOT_SIZE || pstate_ == P_GOT_TYPE ?  crc_ ^ in 
          : pstate_ == P_IDLE  ? 0
          : crc_;
 
-    count_ = pstate_ == P_GOT_TYPE ? type2count(byte) 
+    count_ = pstate_ == P_GOT_TYPE ? type2count(in) 
            : pstate_ == P_IDLE ? 0
            : count_;
 
-    //printf("%d %d\n", pstate_, byte);
+    //printf("%d %d\n", pstate_, in);
 
     printf("%d\n", count_);
 }

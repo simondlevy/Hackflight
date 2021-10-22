@@ -13,12 +13,15 @@ int main(int argc, char ** argv)
 {
     const uint8_t msgtype = 122;
 
-    parse('$');   // sentinel byte 1
-    parse('M');   // sentinel byte 2
-    parse('<');   // msg direction
-    parse(0);     // msg size
-    parse(msgtype); 
-    parse(0^msgtype); // CRC
+    bool avail = 0;
+    uint8_t byte = 0;
+
+    parse('$', avail, byte);   // sentinel byte 1
+    parse('M', avail, byte);   // sentinel byte 2
+    parse('<', avail, byte);   // msg direction
+    parse(0, avail, byte);     // msg size
+    parse(msgtype, avail, byte); 
+    parse(0^msgtype, avail, byte); // CRC
 
     return 0;
 }
