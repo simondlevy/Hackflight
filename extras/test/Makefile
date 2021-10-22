@@ -1,13 +1,16 @@
-all: test
+all: statetest rxtest
 
-test: main.cpp parser.hpp
-	g++ -Wall -o test main.cpp
+statetest: statetest.cpp parser.hpp
+	g++ -Wall -o statetest statetest.cpp
 
-run: test
-	./test
+rxtest: rxtest.cpp parser.hpp
+	g++ -Wall -o rxtest rxtest.cpp
 
-count: test
-	./test | wc -lc
+state: statetest
+	./statetest
+
+rx: rxtest
+	./rxtest
 
 clean:
 	rm -f test *~

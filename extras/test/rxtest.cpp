@@ -12,7 +12,7 @@
 
 int main(int argc, char ** argv)
 {
-    const uint8_t msgtype = 122;
+    const uint8_t msgtype = 121;
 
     bool avail = 0;
     uint8_t byte = 0;
@@ -27,10 +27,9 @@ int main(int argc, char ** argv)
     uint8_t count = 0;
 
     while (avail) {
-        if (count > 4 && count < 17 /*29*/) {
+        if (count > 4 && count < 29) {
             static int32_t intval;
             uint8_t k = (count - 5) % 4;
-            //printf("%02d: 0x%02X\n", k, byte);
             intval |= (byte << k*8);
             if (k == 3) {
                 printf("%f\n", intval/1000.-2);
