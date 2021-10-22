@@ -22,6 +22,17 @@ typedef enum {
 
 } parser_state_t;
 
+static uint8_t type2count(uint8_t type)
+{
+    switch (type) {
+        case 121:
+            return 24;
+        case 122:
+            return 12;
+    }
+
+    return 0;
+}
 
 void parse(uint8_t byte)
 {
@@ -29,7 +40,8 @@ void parse(uint8_t byte)
     static uint8_t size_;
     static uint8_t type_;
     static uint8_t crc_;
-
+    static uint8_t count_;
+  
     static float phi = 1.5, theta = -0.6, psi = 2.7;
 
     // Parser state transition function
@@ -50,5 +62,11 @@ void parse(uint8_t byte)
          : pstate_ == P_IDLE  ? 0
          : crc_;
 
-    printf("%d %d %d\n", byte, pstate_, crc_);
+    count_ = pstate_ == P_GOT_TYPE ? type2count(byte) 
+           : pstate_ == P_IDLE ? 0
+           : count_;
+
+    //printf("%d %d\n", pstate_, byte);
+
+    printf("%d\n", count_);
 }
