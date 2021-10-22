@@ -18,7 +18,8 @@ typedef enum {
     P_GOT_DIRECTION, // 3
     P_GOT_SIZE,      // 4
     P_GOT_TYPE,      // 5
-    P_GOT_CRC        // 6
+    P_IN_PAYLOAD,    // 6
+    P_GOT_CRC        // 7
 
 } parser_state_t;
 
