@@ -28,7 +28,7 @@ int main(int argc, char ** argv)
     while (avail) {
         if (count > 4 && count < 17) {
             uint8_t k = count - 5;
-            printf("%02d: 0x%02X\n", k, byte);
+            printf("%02d: 0x%02X\n", k%4, byte);
         }
         parse(0, avail, byte);
         count++;
