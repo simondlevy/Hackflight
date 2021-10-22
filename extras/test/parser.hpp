@@ -93,7 +93,12 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
 void parse(
         uint8_t in_byte,
         bool & out_avail,
-        uint8_t & out_byte)
+        uint8_t & out_byte,
+        bool armed,
+        float & m1,
+        float & m2,
+        float & m3,
+        float & m4)
 {
     static parser_state_t _pstate;
     static uint8_t _size;

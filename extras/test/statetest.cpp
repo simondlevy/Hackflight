@@ -28,12 +28,19 @@ int main(int argc, char ** argv)
     bool avail = 0;
     uint8_t byte = 0;
 
-    parse('$', avail, byte);       // sentinel byte 1
-    parse('M', avail, byte);       // sentinel byte 2
-    parse('<', avail, byte);       // msg direction
-    parse(0, avail, byte);         // msg size
-    parse(msgtype, avail, byte); 
-    parse(0^msgtype, avail, byte); // CRC
+    bool armed = false;
+
+    float m1 = 0;
+    float m2 = 0;
+    float m3 = 0;
+    float m4 = 0;
+
+    parse('$', avail, byte, armed, m1, m2, m3, m4);       // sentinel byte 1
+    parse('M', avail, byte, armed, m1, m2, m3, m4);       // sentinel byte 2
+    parse('<', avail, byte, armed, m1, m2, m3, m4);       // msg direction
+    parse(0, avail, byte, armed, m1, m2, m3, m4);         // msg size
+    parse(msgtype, avail, byte, armed, m1, m2, m3, m4); 
+    parse(0^msgtype, avail, byte, armed, m1, m2, m3, m4); // CRC
 
     uint8_t count = 0;
 
@@ -47,7 +54,7 @@ int main(int argc, char ** argv)
                 intval = 0;
             }
         }
-        parse(0, avail, byte);
+        parse(0, avail, byte, armed, m1, m2, m3, m4);
         count++;
     }
 
