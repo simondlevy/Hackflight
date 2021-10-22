@@ -26,17 +26,19 @@ typedef enum {
 
 void parse(uint8_t byte)
 {
-    static parser_state_t parser_state_;
+    static parser_state_t pstate_;
 
     // Parser state transition function
-    parser_state_
-        = parser_state_ == P_IDLE && byte == '$' ? P_GOT_DOLLAR
-        : parser_state_ == P_GOT_DOLLAR && byte == 'M' ? P_GOT_M
-        : parser_state_ == P_GOT_M && (byte == '<' || byte == '>') ? P_GOT_DIRECTION 
-        : parser_state_ == P_GOT_DIRECTION ? P_GOT_SIZE
-        : parser_state_ == P_GOT_SIZE ? P_GOT_TYPE
-        : parser_state_ == P_GOT_TYPE ? P_GOT_CRC
+    pstate_
+        = pstate_ == P_IDLE && byte == '$' ? P_GOT_DOLLAR
+        : pstate_ == P_GOT_DOLLAR && byte == 'M' ? P_GOT_M
+        : pstate_ == P_GOT_M && (byte == '<' || byte == '>') ? P_GOT_DIRECTION 
+        : pstate_ == P_GOT_DIRECTION ? P_GOT_SIZE
+        : pstate_ == P_GOT_SIZE ? P_GOT_TYPE
+        : pstate_ == P_GOT_TYPE ? P_GOT_CRC
         : P_IDLE;
 
-    printf("%d\n", (uint8_t)parser_state_);
+    static uint8_t size_;
+
+    printf("%d\n", (uint8_t)pstate_);
 }
