@@ -44,6 +44,8 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
   
     static float phi = 1.5, theta = -0.6, psi = 2.7;
 
+    avail = count_ > 0;
+
     // Parser state transition function
     pstate_
         = pstate_ == P_IDLE && in == '$' ? P_GOT_DOLLAR
@@ -52,7 +54,7 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
         : pstate_ == P_GOT_DIRECTION ? P_GOT_SIZE
         : pstate_ == P_GOT_SIZE ? P_GOT_TYPE
         : pstate_ == P_GOT_TYPE && in == crc_ ? P_GOT_CRC
-        : pstate_ == P_GOT_CRC && count_ > 0 ? P_GOT_CRC
+        : pstate_ == P_GOT_CRC && count_ >= 0 ? P_GOT_CRC
         : P_IDLE;
 
     size_ = pstate_ == P_GOT_SIZE ? in : pstate_ == P_IDLE ? 0 : size_;
@@ -67,6 +69,5 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
            : pstate_ == P_GOT_CRC ? count_ - 1
            : 0;
 
-    avail = count_ > 0;
-    out = avail ? 1 : 0;
+    out = 0x99;
 }
