@@ -10,6 +10,17 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+extern float stream_statePhi;
+extern float stream_stateTheta;
+extern float stream_statePsi;
+
+extern float stream_receiverThrottle;
+extern float stream_receiverRoll;
+extern float stream_receiverPitch;
+extern float stream_receiverYaw;
+extern float stream_receiverAux1;
+extern float stream_receiverAux2;
+
 typedef enum {
 
     P_IDLE,          // 0
@@ -36,32 +47,21 @@ static uint8_t float2byte(float value, uint8_t index)
 
 static uint8_t state2byte(uint8_t index)
 {
-    const float phi = 1.5;
-    const float theta = -0.6;
-    const float psi = 2.7;
-
-    float value = index < 4 ? phi 
-                : index < 8 ? theta
-                : psi;
+    float value = index < 4 ? stream_statePhi
+                : index < 8 ? stream_stateTheta
+                : stream_statePsi;
 
     return float2byte(value, index);
 }
 
 static uint8_t rx2byte(uint8_t index)
 {
-    const float c1 = 0.1;
-    const float c2 = 0.2;
-    const float c3 = 0.3;
-    const float c4 = 0.4;
-    const float c5 = 0.5;
-    const float c6 = 0.6;
-
-    float value = index < 4  ? c1 
-                : index < 8  ? c2
-                : index < 12 ? c3
-                : index < 16 ? c4
-                : index < 20 ? c5
-                : c6;
+    float value = index < 4  ? stream_receiverThrottle
+                : index < 8  ? stream_receiverRoll
+                : index < 12 ? stream_receiverPitch
+                : index < 16 ? stream_receiverYaw
+                : index < 20 ? stream_receiverAux1
+                : stream_receiverAux2;
 
     return float2byte(value, index);
 }

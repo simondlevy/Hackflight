@@ -10,6 +10,17 @@
 
 #include "parser.hpp"
 
+float stream_statePhi = 1.5;
+float stream_stateTheta = -0.6;
+float stream_statePsi = 2.7;
+
+float stream_receiverThrottle = 0.1;
+float stream_receiverRoll = 0.2;
+float stream_receiverPitch = 0.3;
+float stream_receiverYaw = 0.4;
+float stream_receiverAux1 = 0.5;
+float stream_receiverAux2 = 0.6;
+
 int main(int argc, char ** argv)
 {
     const uint8_t msgtype = 122;
