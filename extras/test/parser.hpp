@@ -52,6 +52,7 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
         : pstate_ == P_GOT_DIRECTION ? P_GOT_SIZE
         : pstate_ == P_GOT_SIZE ? P_GOT_TYPE
         : pstate_ == P_GOT_TYPE && in == crc_ ? P_GOT_CRC
+        : pstate_ == P_GOT_CRC && count_ > 0 ? P_GOT_CRC
         : P_IDLE;
 
     size_ = pstate_ == P_GOT_SIZE ? in : pstate_ == P_IDLE ? 0 : size_;
@@ -63,10 +64,9 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
          : crc_;
 
     count_ = pstate_ == P_GOT_TYPE ? type2count(in) 
-           : pstate_ == P_IDLE ? 0
-           : count_;
+           : pstate_ == P_GOT_CRC ? count_ - 1
+           : 0;
 
-    //printf("%d %d\n", pstate_, in);
-
-    printf("%d\n", count_);
+    avail = count_ > 0;
+    out = avail ? 1 : 0;
 }
