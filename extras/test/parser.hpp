@@ -24,12 +24,12 @@ typedef enum {
 
 static uint8_t type2count(uint8_t type)
 {
-    switch (type) {
-        case 121:
-            return 6 * 4 + 6;
-        case 122:
-            return 3 * 4 + 6;
-    }
+    return 6 + (type == 121 ? 24 : type == 122 ? 12 : 0);
+}
+
+static uint8_t msgbyte(uint8_t msgtype, uint8_t count)
+{
+    static float phi = 1.5, theta = -0.6, psi = 2.7;
 
     return 0;
 }
@@ -42,8 +42,6 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
     static uint8_t crc_;
     static uint8_t count_;
   
-    static float phi = 1.5, theta = -0.6, psi = 2.7;
-
     // Parser state transition function
     pstate_
         = pstate_ == P_IDLE && in == '$' ? P_GOT_DOLLAR
@@ -68,5 +66,5 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
            : 0;
 
     avail = count_ > 0;
-    out = avail ? 0x99 : 0;
+    out = avail ? msgbyte(type_, count_) : 0;
 }
