@@ -6,4 +6,5 @@ test: test.cpp parser.hpp
 run: test
 	./test
 
-cleanup: rm -f test *~
+clean:
+	rm -f test *~
