@@ -37,6 +37,7 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t count)
                  : count == 2 ? (uint8_t)'M'
                  : count == 3 ? (uint8_t)'>'
                  : count == 4 ? type2size(msgtype)
+                 : count == 5 ? msgtype
                  : 0;
 }
 
