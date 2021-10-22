@@ -40,5 +40,7 @@ void parse(uint8_t byte)
 
     static uint8_t size_;
 
+    size_ = pstate_ == P_GOT_SIZE ? byte : pstate_ == P_IDLE ? 0 : pstate_;
+
     printf("%d\n", (uint8_t)pstate_);
 }
