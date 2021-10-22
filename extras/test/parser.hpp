@@ -27,7 +27,7 @@ static uint8_t type2count(uint8_t type)
     return 6 + (type == 121 ? 24 : type == 122 ? 12 : 0);
 }
 
-static uint8_t msgbyte(uint8_t msgtype, uint8_t count)
+static uint8_t getbyte(uint8_t msgtype, uint8_t count)
 {
     static float phi = 1.5, theta = -0.6, psi = 2.7;
 
@@ -66,5 +66,5 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
            : 0;
 
     avail = count_ > 0;
-    out = avail ? msgbyte(type_, count_) : 0;
+    out = avail ? getbyte(type_, count_) : 0;
 }
