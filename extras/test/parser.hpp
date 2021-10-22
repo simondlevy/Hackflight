@@ -31,7 +31,7 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t count)
 {
     static float phi = 1.5, theta = -0.6, psi = 2.7;
 
-    return count == 0 ? (uint8_t)'M' : 0;
+    return count == 1 ? (uint8_t)'M' : 0;
 }
 
 void parse(uint8_t in, bool & avail, uint8_t & out)
