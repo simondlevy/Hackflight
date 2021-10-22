@@ -31,7 +31,9 @@ static uint8_t getbyte(uint8_t msgtype, uint8_t count)
 {
     static float phi = 1.5, theta = -0.6, psi = 2.7;
 
-    return count == 1 ? (uint8_t)'M' : 0;
+    return   count == 1 ? (uint8_t)'$'
+           : count == 2 ? (uint8_t)'M'
+           : 0;
 }
 
 void parse(uint8_t in, bool & avail, uint8_t & out)
@@ -68,5 +70,4 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
 
     avail = _pstate == P_GOT_CRC && _index <= _count;
     out = avail ? getbyte(_type, _index) : 0;
-    //printf("%d %d %d | %d\n", _pstate, _count, _index, avail);
 }
