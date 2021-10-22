@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "parser.hpp"
 
@@ -27,13 +28,13 @@ int main(int argc, char ** argv)
 
     while (avail) {
         if (count > 4 && count < 17) {
-            static uint32_t word;
+            static int32_t intval;
             uint8_t k = (count - 5) % 4;
             printf("%02d: 0x%02X\n", k, byte);
-            word |= (byte << k*8);
+            intval |= (byte << k*8);
             if (k == 3) {
-                printf("0x%08X\n", word);
-                word = 0;
+                //printf("%f\n", intval/1000.-2);
+                intval = 0;
             }
         }
         parse(0, avail, byte);

@@ -44,13 +44,14 @@ static uint8_t state2byte(uint8_t index)
 
     uint32_t uintval = float2word(value);
 
-    return (uintval >> (index%4)) & 0xFF;
+    // printf("%+3.3f  %d  x%08X\n", value, uintval, uintval);
+
+    return (uintval >> ((index%4)*8)) & 0xFF;
 }
 
 static uint8_t val2byte(uint8_t msgtype, uint8_t index)
 {
-    return msgtype == 122 ? state2byte(index)
-             : 0;
+    return msgtype == 122 ? state2byte(index) : 0;
 }
 
 static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count)
