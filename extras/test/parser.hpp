@@ -66,10 +66,7 @@ void parse(uint8_t in, bool & avail, uint8_t & out)
 
     _index = _pstate == P_GOT_CRC ? _index + 1 : _pstate == P_IDLE ? 0 : _index;
 
-    //printf("%d %d %d | %d\n", _pstate, _count, _index, _index<=_count);
-
-    //if (_pstate == P_GOT_CRC && _index < _count) printf("%d\n", _index);
-
-    avail = _index <= _count;
+    avail = _pstate == P_GOT_CRC && _index <= _count;
     out = avail ? getbyte(_type, _index) : 0;
+    //printf("%d %d %d | %d\n", _pstate, _count, _index, avail);
 }

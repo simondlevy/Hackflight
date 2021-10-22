@@ -23,11 +23,8 @@ int main(int argc, char ** argv)
     parse(msgtype, avail, byte); 
     parse(0^msgtype, avail, byte); // CRC
 
-    while (true) {
+    while (avail) {
         parse(0, avail, byte);
-        if (!avail) {
-            break;
-        }
         printf("0x%02X\n", byte);
     }
 
