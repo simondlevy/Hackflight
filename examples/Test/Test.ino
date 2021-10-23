@@ -29,16 +29,15 @@ void stream_run(
     stream_serialUpdate();
 
     if (stream_serialAvailable) {
-
         stream_serialRead();
+    }
 
-        bool avail = 0;
-        uint8_t byte = 0;
-        uint8_t motor_index = 0;
-        uint8_t motor_percent = 0;
+    bool avail = false;
+    uint8_t byte = 0;
 
-        parse(stream_serialByte, avail, byte, state_phi, state_theta, state_psi);
+    parse(stream_serialByte, state_phi, state_theta, state_psi, avail, byte);
 
-        Serial1.println(avail);
+    if (avail) {
+        Serial1.println(byte);
     }
 }
