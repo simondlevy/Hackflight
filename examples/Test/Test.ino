@@ -30,6 +30,7 @@ void stream_run(
 
     if (stream_serialAvailable) {
         stream_serialRead();
+        Debugger::printf(Serial1, "In:  x%02X\n", stream_serialByte);
     }
 
     bool avail = false;
@@ -38,7 +39,7 @@ void stream_run(
     parse(stream_serialByte, state_phi, state_theta, state_psi, avail, byte);
 
     if (avail) {
-        //Serial1.println(byte);
+        Debugger::printf(Serial1, "Out: x%02X\n", byte);
         stream_serialWrite(byte);
     }
 }

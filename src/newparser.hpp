@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "debugger.hpp"
 
 extern float stream_receiverThrottle;
 extern float stream_receiverRoll;
@@ -104,7 +105,9 @@ void parse(
     static uint8_t _crc;
     static uint8_t _count;
     static uint8_t _index;
-  
+
+    Debugger::printf(Serial1, "state: %d\n", (uint8_t)_pstate);
+
     // Parser state transition function
     _pstate = _pstate == P_IDLE && in_byte == '$' ? P_GOT_DOLLAR
             : _pstate == P_GOT_DOLLAR && in_byte == 'M' ? P_GOT_M
@@ -144,8 +147,4 @@ void parse(
     out_avail = _pstate == P_GOT_CRC && _index <= _count;
 
     out_byte = out_avail ? getbyte(_type, _index, _count, state_phi, state_theta, state_psi) : 0;
-
-    bool got_payload = _pstate == P_IN_PAYLOAD && _index == _count + 1 && in_byte == _crc;
-
-    bool in_motor_payload = _pstate == P_IN_PAYLOAD && _type == 215; 
 }

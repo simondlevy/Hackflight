@@ -20,13 +20,13 @@ class Debugger {
 
     public:
 
-        static void printf(HardwareSerial * serial, const char * fmt, ...)
+        static void printf(HardwareSerial & serial, const char * fmt, ...)
         {
             va_list ap;
             va_start(ap, fmt);
             char buf[200];
             vsnprintf(buf, 200, fmt, ap); 
-            serial->print(buf);
+            serial.print(buf);
             va_end(ap);
         }
 

@@ -23,7 +23,7 @@ void stream_updateReceiver(void)
     stream_receiverThrottle = -1;
     stream_receiverLostSignal = false;
 
-    stream_receiverRoll = 0;
-    stream_receiverPitch = 0;
+    stream_receiverRoll = 0.2;
+    stream_receiverPitch = -0.1; 
     stream_receiverYaw = 0;
 }
