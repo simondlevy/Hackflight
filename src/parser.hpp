@@ -11,10 +11,6 @@
 #include "stream_receiver.h"
 #include "stream_serial.h"
 
-extern float stream_statePhi;
-extern float stream_stateTheta;
-extern float stream_statePsi;
-
 static void addToOutBuf(
         uint8_t * buffer,
         uint8_t & buffer_size,
@@ -94,6 +90,9 @@ static void dispatchMessage(
         uint8_t * buffer,
         uint8_t & buffer_size,
         uint8_t & buffer_checksum,
+        float state_phi,
+        float state_theta,
+        float state_psi,
         bool ready,
         uint8_t type,
         float &m1,
@@ -119,9 +118,9 @@ static void dispatchMessage(
         case 122:
             {
                 prepareToSerializeFloats(buffer, buffer_size, buffer_checksum, ready, type, 3);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_statePhi);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_stateTheta);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_statePsi);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, state_phi);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, state_theta);
+                serializeFloat(buffer, buffer_size, buffer_checksum, ready, state_psi);
                 completeSend(buffer, buffer_size, buffer_checksum, ready);
 
             } break;
@@ -146,6 +145,9 @@ void parser_parse(
         uint8_t * buffer,
         uint8_t & buffer_size,
         uint8_t & buffer_index,
+        float state_phi,
+        float state_theta,
+        float state_psi,
         bool armed,
         float & m1,
         float & m2,
@@ -197,7 +199,19 @@ void parser_parse(
     static float m2_;
     static float m3_;
     static float m4_;
-    dispatchMessage(buffer, buffer_size_, buffer_checksum_, ready, type_, m1_, m2_, m3_, m4_);
+    dispatchMessage(
+            buffer,
+            buffer_size_,
+            buffer_checksum_,
+            state_phi,
+            state_theta,
+            state_psi,
+            ready,
+            type_,
+            m1_,
+            m2_,
+            m3_,
+            m4_);
 
     // Set motors iff in disarmed mode
     m1 = armed ? m1 : m1_;
