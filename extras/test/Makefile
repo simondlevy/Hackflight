@@ -19,4 +19,4 @@ mtest: motortest
 	./motortest
 
 clean:
-	rm -f test *~
+	rm -f *test *~
