@@ -131,9 +131,11 @@ void parse(
           : _pstate == P_IDLE ? 0
           : _type;
 
-    _crc = _pstate == P_GOT_SIZE || _pstate == P_GOT_TYPE || _pstate == P_IN_PAYLOAD ?  _crc ^ in_byte 
-         : _pstate == P_IDLE  ? 0
-         : _crc;
+    _crc =  _pstate == P_GOT_SIZE ? _crc ^ in_byte 
+          : _pstate == P_GOT_TYPE ? _crc ^ in_byte 
+          : _pstate == P_IN_PAYLOAD && _index < _count ?  _crc ^ in_byte 
+          : _pstate == P_IDLE  ? 0
+          : _crc;
 
     _count = _pstate == P_IN_PAYLOAD ? type2size(_type)
            : _pstate == P_GOT_TYPE ? 6 + type2size(_type)
@@ -145,7 +147,7 @@ void parse(
            : _pstate == P_IDLE ? 0
            : _index;
 
-    //printf("%03d %03d %03d\n", _pstate, in_byte, _crc);
+    printf("%03d %03d %03d\n", _pstate, in_byte, _crc);
 
     out_avail = _pstate == P_GOT_CRC && _index <= _count;
 
