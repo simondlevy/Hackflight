@@ -33,7 +33,10 @@ typedef enum {
 
 static uint8_t type2size(uint8_t type)
 {
-    return type == 121 ? 24 : type == 122 ? 12 : 0;
+    return type == 121 ? 24
+         : type == 122 ? 12
+         : type == 215 ? 2
+         : 0;
 }
 
 static uint8_t float2byte(float value, uint8_t index)
@@ -132,7 +135,8 @@ void parse(
          : _pstate == P_IDLE  ? 0
          : _crc;
 
-    _count = _pstate == P_GOT_TYPE ? 6 + type2size(_type)
+    _count = _pstate == P_IN_PAYLOAD ? type2size(_type)
+           : _pstate == P_GOT_TYPE ? 6 + type2size(_type)
            : _pstate == P_GOT_CRC ? _count
            : 0;
 
@@ -141,7 +145,7 @@ void parse(
            : _pstate == P_IDLE ? 0
            : _index;
 
-    // printf("%03d %03d %03d\n", _pstate, in_byte, _crc);
+    printf("%03d %03d %03d\n", _pstate, in_byte, _crc);
 
     out_avail = _pstate == P_GOT_CRC && _index <= _count;
 
