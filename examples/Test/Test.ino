@@ -38,6 +38,7 @@ void stream_run(
     parse(stream_serialByte, state_phi, state_theta, state_psi, avail, byte);
 
     if (avail) {
-        Serial1.println(byte);
+        //Serial1.println(byte);
+        stream_serialWrite(byte);
     }
 }
