@@ -22,6 +22,10 @@
 #include "stream_serial.h"
 #include "copilot.h"
 
+void stream_writeBrushedMotors(
+        uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin,
+        float m1_val, float m2_val, float m3_val, float m4_val);
+
 void setup(void)
 {
 }
@@ -40,14 +44,16 @@ void stream_run(
         uint8_t m2_pin,
         uint8_t m3_pin,
         uint8_t m4_pin,
-        float m1_val,
-        float m2_val,
-        float m3_val,
-        float m4_val)
+        float m1_flying,
+        float m2_flying,
+        float m3_flying,
+        float m4_flying)
 {
     static uint8_t serial_buffer[128];
     static uint8_t buffer_index;
     uint8_t buffer_size = 0;
+    uint8_t gcs_motor_index = 0;
+    uint8_t gcs_motor_percent = 0;
 
     parser_parse(
             serial_buffer,
@@ -56,11 +62,8 @@ void stream_run(
             state_phi,
             state_theta,
             state_psi,
-            armed,
-            m1_val,
-            m2_val,
-            m3_val,
-            m4_val);
+            gcs_motor_index,
+            gcs_motor_percent);
 
     stream_serialUpdate();
 
@@ -72,9 +75,10 @@ void stream_run(
         stream_serialWrite(parser_read(serial_buffer, buffer_size, buffer_index));
     }
 
-    void stream_writeBrushedMotors(
-            uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin,
-            float m1_val, float m2_val, float m3_val, float m4_val);
+    float m1_val = armed ? m1_flying : gcs_motor_index == 1 ? gcs_motor_percent/100. : 0;
+    float m2_val = armed ? m2_flying : gcs_motor_index == 2 ? gcs_motor_percent/100. : 0;
+    float m3_val = armed ? m3_flying : gcs_motor_index == 3 ? gcs_motor_percent/100. : 0;
+    float m4_val = armed ? m4_flying : gcs_motor_index == 4 ? gcs_motor_percent/100. : 0;
 
     stream_writeBrushedMotors(m1_pin, m2_pin, m3_pin, m4_pin, m1_val, m2_val, m3_val, m4_val);
 }

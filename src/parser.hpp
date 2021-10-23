@@ -86,61 +86,6 @@ static void serializeFloat(
     serialize(buffer, buffer_size, buffer_checksum, ready, uintval>>24 & 0xFF);
 }
 
-static void dispatchMessage(
-        uint8_t * buffer,
-        uint8_t & buffer_size,
-        uint8_t & buffer_checksum,
-        float state_phi,
-        float state_theta,
-        float state_psi,
-        bool ready,
-        uint8_t type,
-        float &m1,
-        float &m2,
-        float &m3,
-        float &m4)
-{
-    switch (type) {
-
-        case 121:
-            {
-                prepareToSerializeFloats(buffer, buffer_size, buffer_checksum, ready, type, 6);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_receiverThrottle);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_receiverRoll);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_receiverPitch);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_receiverYaw);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, stream_receiverAux1);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready,stream_receiverAux2);
-                completeSend(buffer, buffer_size, buffer_checksum, ready);
-
-            } break;
-
-        case 122:
-            {
-                prepareToSerializeFloats(buffer, buffer_size, buffer_checksum, ready, type, 3);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, state_phi);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, state_theta);
-                serializeFloat(buffer, buffer_size, buffer_checksum, ready, state_psi);
-                completeSend(buffer, buffer_size, buffer_checksum, ready);
-
-            } break;
-
-        case 215:
-            {
-                uint8_t index = buffer[0];
-                float value =  buffer[1] / 100.;
-
-                m1 = ready ? (index == 1 ?  value : 0) : m1;
-                m2 = ready ? (index == 2 ?  value : 0) : m2;
-                m3 = ready ? (index == 3 ?  value : 0) : m3;
-                m4 = ready ? (index == 4 ?  value : 0) : m4;
-
-            } break;
-
-    } // switch (type)
-} 
-
-
 void parser_parse(
         uint8_t * buffer,
         uint8_t & buffer_size,
@@ -148,11 +93,8 @@ void parser_parse(
         float state_phi,
         float state_theta,
         float state_psi,
-        bool armed,
-        float & m1,
-        float & m2,
-        float & m3,
-        float & m4)
+        uint8_t & motor_index,
+        uint8_t & motor_percent)
 {
     static uint8_t parser_state_;
     static uint8_t type_;
@@ -161,6 +103,9 @@ void parser_parse(
     static uint8_t index_;
     static uint8_t buffer_size_;
     static uint8_t buffer_checksum_;
+
+    motor_index = 0;
+    motor_percent = 0;
 
     // Payload functions
     size_ = parser_state_ == 3 ? stream_serialByte : size_;
@@ -195,29 +140,40 @@ void parser_parse(
     // Message dispatch
     bool ready = stream_serialAvailable && parser_state_ == 0 && crc_ == stream_serialByte;
     buffer_index = ready ? 0 : buffer_index;
-    static float m1_;
-    static float m2_;
-    static float m3_;
-    static float m4_;
-    dispatchMessage(
-            buffer,
-            buffer_size_,
-            buffer_checksum_,
-            state_phi,
-            state_theta,
-            state_psi,
-            ready,
-            type_,
-            m1_,
-            m2_,
-            m3_,
-            m4_);
 
-    // Set motors iff in disarmed mode
-    m1 = armed ? m1 : m1_;
-    m2 = armed ? m2 : m2_;
-    m3 = armed ? m3 : m3_;
-    m4 = armed ? m4 : m4_;
+    switch (type_) {
+
+        case 121:
+            {
+                prepareToSerializeFloats(buffer, buffer_size_, buffer_checksum_, ready, type_, 6);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverThrottle);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverRoll);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverPitch);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverYaw);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverAux1);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready,stream_receiverAux2);
+                completeSend(buffer, buffer_size_, buffer_checksum_, ready);
+
+            } break;
+
+        case 122:
+            {
+                prepareToSerializeFloats(buffer, buffer_size_, buffer_checksum_, ready, type_, 3);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, state_phi);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, state_theta);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, state_psi);
+                completeSend(buffer, buffer_size_, buffer_checksum_, ready);
+
+            } break;
+
+        case 215:
+            {
+                motor_index = buffer[0];
+                motor_percent = buffer[1];
+
+            } break;
+
+    } // switch (type)
 
     buffer_size = buffer_size_;
 }
