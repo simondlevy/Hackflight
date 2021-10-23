@@ -36,7 +36,7 @@ import Parser
 -- Misc
 import Utils
 
-led_pin = 18 :: SWord8 
+led_pin = 13 :: SWord8 
 
 receiver = makeReceiver 4.0
 
@@ -65,6 +65,8 @@ spec = do
 
   -- Do some other stuff in loop
   trigger "stream_updateTime" running []
+  trigger "stream_updateImu" running []
+  trigger "stream_updateReceiver" running []
   trigger "stream_writeLed" running [arg led_pin, arg led]
 
   trigger "stream_run" running [  arg $ phi state

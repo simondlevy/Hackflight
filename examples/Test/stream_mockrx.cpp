@@ -14,10 +14,9 @@
 #include "stream_receiver.h"
 
 
-void stream_startReceiver(void)
-{
-}
-
 void stream_updateReceiver(void)
 {
+    stream_receiverAux1 = -1;
+    stream_receiverThrottle = -1;
+    stream_receiverLostSignal = false;
 }
