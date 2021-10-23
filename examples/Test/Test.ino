@@ -7,11 +7,11 @@
 
 #include "newparser.hpp"
 #include "debugger.hpp"
-#include "stream_serial.h"
 #include "copilot.h"
 
 void setup(void)
 {
+    Serial1.begin(115200);
 }
 
 void loop(void)
@@ -25,4 +25,5 @@ void stream_run(
         float state_psi,
         bool armed)
 {
+    Serial1.println(millis());
 }
