@@ -38,7 +38,10 @@ int main(int argc, char ** argv)
     float m3 = 0;
     float m4 = 0;
 
+    //              2        215        1        52 
     uint8_t crc = msgsize ^ msgtype ^ mindex ^ mvalue;
+
+    printf("CRC = %d\n", crc);
 
     parse('$', avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);       // sentinel byte 1
     parse('M', avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);       // sentinel byte 2
