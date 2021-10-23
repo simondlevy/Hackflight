@@ -106,6 +106,8 @@ void parse(
     static uint8_t _crc;
     static uint8_t _count;
     static uint8_t _index;
+    static uint8_t _motor_index;
+    static uint8_t _motor_percent;
   
     // Parser state transition function
     _pstate = _pstate == P_IDLE && in_byte == '$' ? P_GOT_DOLLAR
@@ -143,9 +145,17 @@ void parse(
            : _pstate == P_IDLE ? 0
            : _index;
 
-    // printf("%03d %03d %03d\n", _pstate, in_byte, _crc);
-
     out_avail = _pstate == P_GOT_CRC && _index <= _count;
 
     out_byte = out_avail ? getbyte(_type, _index, _count, state_phi, state_theta, state_psi) : 0;
+
+    bool got_payload = _pstate == P_IN_PAYLOAD && _index == _count + 1 && in_byte == _crc;
+
+    bool in_motor_payload = _pstate == P_IN_PAYLOAD && _type == 215; 
+
+    _motor_index   = in_motor_payload && _index == 1 ? in_byte : _motor_index;
+    _motor_percent = in_motor_payload && _index == 2 ? in_byte : _motor_percent;
+
+    motor_index = got_payload ? _motor_index : 0;
+    motor_percent = got_payload ? _motor_percent : 0;
 }

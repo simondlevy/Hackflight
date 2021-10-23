@@ -37,16 +37,29 @@ int main(int argc, char ** argv)
     //              2        215        1        52 
     uint8_t crc = msgsize ^ msgtype ^ mindex ^ mvalue;
 
-    printf("CRC = %d\n", crc);
-
     parse('$', avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);       // sentinel byte 1
+    printf("%d %d\n", motor_index, motor_percent);
+
     parse('M', avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);       // sentinel byte 2
+    printf("%d %d\n", motor_index, motor_percent);
+
     parse('<', avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);       // msg direction
+    printf("%d %d\n", motor_index, motor_percent);
+
     parse(msgsize, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);         
+    printf("%d %d\n", motor_index, motor_percent);
+
     parse(msgtype, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent); 
+    printf("%d %d\n", motor_index, motor_percent);
+
     parse(mindex, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);   
+    printf("%d %d\n", motor_index, motor_percent);
+
     parse(mvalue, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);
+    printf("%d %d\n", motor_index, motor_percent);
+
     parse(crc, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);
+    printf("%d %d\n", motor_index, motor_percent);
 
     return 0;
 }
