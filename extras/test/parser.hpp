@@ -94,14 +94,11 @@ void parse(
         uint8_t in_byte,
         bool & out_avail,
         uint8_t & out_byte,
-        bool armed,
         float state_phi,
         float state_theta,
         float state_psi,
-        float & m1,
-        float & m2,
-        float & m3,
-        float & m4)
+        uint8_t & motor_index,
+        uint8_t & motor_percent)
 {
     static parser_state_t _pstate;
     static uint8_t _size;
@@ -146,7 +143,7 @@ void parse(
            : _pstate == P_IDLE ? 0
            : _index;
 
-    printf("%03d %03d %03d\n", _pstate, in_byte, _crc);
+    // printf("%03d %03d %03d\n", _pstate, in_byte, _crc);
 
     out_avail = _pstate == P_GOT_CRC && _index <= _count;
 

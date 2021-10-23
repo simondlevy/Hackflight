@@ -31,26 +31,22 @@ int main(int argc, char ** argv)
     bool avail = 0;
     uint8_t byte = 0;
 
-    bool armed = false;
-
-    float m1 = 0;
-    float m2 = 0;
-    float m3 = 0;
-    float m4 = 0;
+    uint8_t motor_index = 0;
+    uint8_t motor_percent = 0;
 
     //              2        215        1        52 
     uint8_t crc = msgsize ^ msgtype ^ mindex ^ mvalue;
 
     printf("CRC = %d\n", crc);
 
-    parse('$', avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);       // sentinel byte 1
-    parse('M', avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);       // sentinel byte 2
-    parse('<', avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);       // msg direction
-    parse(msgsize, avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);         
-    parse(msgtype, avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4); 
-    parse(mindex, avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);   
-    parse(mvalue, avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);
-    parse(crc, avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);
+    parse('$', avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);       // sentinel byte 1
+    parse('M', avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);       // sentinel byte 2
+    parse('<', avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);       // msg direction
+    parse(msgsize, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);         
+    parse(msgtype, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent); 
+    parse(mindex, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);   
+    parse(mvalue, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);
+    parse(crc, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);
 
     return 0;
 }

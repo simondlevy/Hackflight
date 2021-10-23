@@ -28,19 +28,15 @@ int main(int argc, char ** argv)
     bool avail = 0;
     uint8_t byte = 0;
 
-    bool armed = false;
+    uint8_t motor_index = 0;
+    uint8_t motor_percent = 0;
 
-    float m1 = 0;
-    float m2 = 0;
-    float m3 = 0;
-    float m4 = 0;
-
-    parse('$', avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);       // sentinel byte 1
-    parse('M', avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);       // sentinel byte 2
-    parse('<', avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);       // msg direction
-    parse(0, avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);         // msg size
-    parse(msgtype, avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4); 
-    parse(0^msgtype, avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4); // CRC
+    parse('$', avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);       // sentinel byte 1
+    parse('M', avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);       // sentinel byte 2
+    parse('<', avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);       // msg direction
+    parse(0, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);         // msg size
+    parse(msgtype, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent); 
+    parse(0^msgtype, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent); // CRC
 
     uint8_t count = 0;
 
@@ -54,7 +50,7 @@ int main(int argc, char ** argv)
                 intval = 0;
             }
         }
-        parse(0, avail, byte, armed, state_phi, state_theta, state_psi, m1, m2, m3, m4);
+        parse(0, avail, byte, state_phi, state_theta, state_psi, motor_index, motor_percent);
         count++;
     }
 
