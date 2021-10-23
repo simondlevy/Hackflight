@@ -1,5 +1,5 @@
 {--
-  Haskell Copilot support for Hackflight
+  Haskell Copilot support for Hackflight on Syma quadcopter
 
   Copyright(C) 2021 on D.Levy
 
@@ -8,7 +8,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module Main where
+module Syma where
 
 import Language.Copilot
 import Copilot.Compile.C99

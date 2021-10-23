@@ -5,7 +5,7 @@
 #
 # MIT License
 
-HSRC = Main.hs \
+HSRC = Syma.hs \
        HackflightFull.hs \
        Receiver.hs \
        Demands.hs \
@@ -22,7 +22,7 @@ HSRC = Main.hs \
        pidcontrollers/YawPid.hs \
        pidcontrollers/LevelPid.hs
 
-RUNH = runhaskell -isensors -ipidcontrollers Main.hs
+RUNH = runhaskell -isensors -ipidcontrollers Syma.hs
 
 DSTDIR = ..
 
@@ -33,10 +33,10 @@ all: copilot.cpp copilot.h
 	sed -i 's/extern/EXTERN/g' copilot.h
 	cat cfiles/header.h copilot.h > $(DSTDIR)/copilot.h
 
-copilot.c: $(HSRC) Main.hs
+copilot.c: $(HSRC) Syma.hs
 	$(RUNH)
 
-copilot.h: $(HSRC) Main.hs
+copilot.h: $(HSRC) Syma.hs
 	$(RUNH)
 
 clean:
