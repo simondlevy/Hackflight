@@ -96,9 +96,7 @@ void parse(
         uint8_t & out_byte,
         float state_phi,
         float state_theta,
-        float state_psi,
-        uint8_t & motor_index,
-        uint8_t & motor_percent)
+        float state_psi)
 {
     static parser_state_t _pstate;
     static uint8_t _size;
@@ -106,8 +104,6 @@ void parse(
     static uint8_t _crc;
     static uint8_t _count;
     static uint8_t _index;
-    static uint8_t _motor_index;
-    static uint8_t _motor_percent;
   
     // Parser state transition function
     _pstate = _pstate == P_IDLE && in_byte == '$' ? P_GOT_DOLLAR
@@ -152,10 +148,4 @@ void parse(
     bool got_payload = _pstate == P_IN_PAYLOAD && _index == _count + 1 && in_byte == _crc;
 
     bool in_motor_payload = _pstate == P_IN_PAYLOAD && _type == 215; 
-
-    _motor_index   = in_motor_payload && _index == 1 ? in_byte : _motor_index;
-    _motor_percent = in_motor_payload && _index == 2 ? in_byte : _motor_percent;
-
-    motor_index = got_payload ? _motor_index : 0;
-    motor_percent = got_payload ? _motor_percent : 0;
 }

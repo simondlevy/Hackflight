@@ -13,10 +13,17 @@
 #define NONEXTERN
 #include "stream_receiver.h"
 
+float stream_receiverRoll;
+float stream_receiverPitch;
+float stream_receiverYaw;
 
 void stream_updateReceiver(void)
 {
     stream_receiverAux1 = -1;
     stream_receiverThrottle = -1;
     stream_receiverLostSignal = false;
+
+    stream_receiverRoll = 0;
+    stream_receiverPitch = 0;
+    stream_receiverYaw = 0;
 }
