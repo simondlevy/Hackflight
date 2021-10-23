@@ -5,7 +5,7 @@
 
  */
 
-//#include "parser.hpp"
+#include "newparser.hpp"
 #include "debugger.hpp"
 #include "stream_serial.h"
 #include "copilot.h"
