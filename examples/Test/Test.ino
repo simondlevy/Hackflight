@@ -5,7 +5,7 @@
 
  */
 
-#include "oldparser.hpp"
+#include "newparser.hpp"
 #include "debugger.hpp"
 #include "stream_serial.h"
 #include "copilot.h"
@@ -31,10 +31,10 @@ void stream_run(
     uint8_t buffer_size = 0;
 
     bool avail = 0;
-    uint8_t byte = 0;
+    uint8_t bite = 0;
 
-    uint8_t gcs_motor_index = 0;
-    uint8_t gcs_motor_percent = 0;
+    uint8_t motor_index = 0;
+    uint8_t motor_percent = 0;
 
     stream_serialUpdate();
 
@@ -49,8 +49,8 @@ void stream_run(
             state_phi,
             state_theta,
             state_psi,
-            gcs_motor_index,
-            gcs_motor_percent);
+            motor_index,
+            motor_percent);
 
     if (buffer_size > 0) {
         stream_serialWrite(parser_read(serial_buffer, buffer_size, buffer_index));

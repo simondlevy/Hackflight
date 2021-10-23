@@ -6,156 +6,186 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdio.h>
+#include "copilot.h"
 
+#include "stream_receiver.h"
+#include "stream_serial.h"
 
-extern float stream_receiverThrottle;
 extern float stream_receiverRoll;
 extern float stream_receiverPitch;
 extern float stream_receiverYaw;
-extern float stream_receiverAux1;
-extern float stream_receiverAux2;
 
-typedef enum {
-
-    P_IDLE,          // 0
-    P_GOT_DOLLAR,    // 1
-    P_GOT_M,         // 2
-    P_GOT_DIRECTION, // 3
-    P_GOT_SIZE,      // 4
-    P_GOT_TYPE,      // 5
-    P_IN_PAYLOAD,    // 6
-    P_GOT_CRC        // 7
-
-} parser_state_t;
-
-static uint8_t type2size(uint8_t type)
+static void addToOutBuf(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        bool ready,
+        uint8_t byte)
 {
-    return type == 121 ? 24
-         : type == 122 ? 12
-         : type == 215 ? 2
-         : 0;
+    buffer[buffer_size] = ready ? byte : buffer[buffer_size];
+    buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 
-static uint8_t float2byte(float value, uint8_t index)
+static void serialize(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready,
+        uint8_t byte)
 {
-    uint32_t uintval = (uint32_t)(1000 * (value + 2));
-    return (uintval >> ((index%4)*8)) & 0xFF;
+    addToOutBuf(buffer, buffer_size, ready, byte);
+    buffer_checksum = ready ? buffer_checksum ^ byte : buffer_checksum;
 }
 
-static uint8_t state2byte(uint8_t index, float state_phi, float state_theta, float state_psi)
+static void prepareToSerialize(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready,
+        uint8_t type,
+        uint8_t count,
+        uint8_t size)
 {
-    float value = index < 4 ? state_phi
-                : index < 8 ? state_theta
-                : state_psi;
+    buffer_size = ready ? 0 : buffer_size;
+    buffer_checksum = ready ? 0 : buffer_checksum;
 
-    return float2byte(value, index);
+    addToOutBuf(buffer, buffer_size, ready, '$');
+    addToOutBuf(buffer, buffer_size, ready, 'M');
+    addToOutBuf(buffer, buffer_size, ready, '>');
+    serialize(buffer, buffer_size, buffer_checksum, ready, count*size);
+    serialize(buffer, buffer_size, buffer_checksum, ready, type);
 }
 
-static uint8_t rx2byte(uint8_t index)
+static void completeSend(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready)
 {
-    float value = index < 4  ? stream_receiverThrottle
-                : index < 8  ? stream_receiverRoll
-                : index < 12 ? stream_receiverPitch
-                : index < 16 ? stream_receiverYaw
-                : index < 20 ? stream_receiverAux1
-                : stream_receiverAux2;
-
-    return float2byte(value, index);
+    serialize(buffer, buffer_size, buffer_checksum, ready, buffer_checksum);
 }
 
-static uint8_t val2byte(uint8_t msgtype, uint8_t index, float state_phi, float state_theta, float state_psi)
+static void prepareToSerializeFloats(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready,
+        uint8_t type,
+        uint8_t count)
 {
-    return  msgtype == 121 ? rx2byte(index)
-          : msgtype == 122 ? state2byte(index, state_phi, state_theta, state_psi)
-          : 0;
+    prepareToSerialize(buffer, buffer_size, buffer_checksum, ready, type, count, 4);
 }
 
-static uint8_t getbyte(uint8_t msgtype, uint8_t index, uint8_t count, float state_phi, float state_theta, float state_psi)
+static void serializeFloat(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_checksum,
+        bool ready,
+        float value)
 {
-    static uint8_t _crc;
+    uint32_t uintval = 1000 * (value + 2);
 
-    uint8_t byte = index == 1 ? (uint8_t)'$'
-                 : index == 2 ? (uint8_t)'M'
-                 : index == 3 ? (uint8_t)'>'
-                 : index == 4 ? type2size(msgtype)
-                 : index == 5 ? msgtype
-                 : index == count ? _crc
-                 : val2byte(msgtype, index-6, state_phi, state_theta, state_psi);
-
-     _crc = index > 3 ? _crc ^ byte : 0;
-
-     return byte;
+    serialize(buffer, buffer_size, buffer_checksum, ready, uintval     & 0xFF);
+    serialize(buffer, buffer_size, buffer_checksum, ready, uintval>>8  & 0xFF);
+    serialize(buffer, buffer_size, buffer_checksum, ready, uintval>>16 & 0xFF);
+    serialize(buffer, buffer_size, buffer_checksum, ready, uintval>>24 & 0xFF);
 }
 
-void parse(
-        uint8_t in_byte,
-        bool & out_avail,
-        uint8_t & out_byte,
+void parser_parse(
+        uint8_t * buffer,
+        uint8_t & buffer_size,
+        uint8_t & buffer_index,
         float state_phi,
         float state_theta,
         float state_psi,
         uint8_t & motor_index,
         uint8_t & motor_percent)
 {
-    static parser_state_t _pstate;
-    static uint8_t _size;
-    static uint8_t _type;
-    static uint8_t _crc;
-    static uint8_t _count;
-    static uint8_t _index;
-    static uint8_t _motor_index;
-    static uint8_t _motor_percent;
-  
+    static uint8_t parser_state_;
+    static uint8_t type_;
+    static uint8_t crc_;
+    static uint8_t size_;
+    static uint8_t index_;
+    static uint8_t buffer_size_;
+    static uint8_t buffer_checksum_;
+
+    motor_index = 0;
+    motor_percent = 0;
+
+    // Payload functions
+    size_ = parser_state_ == 3 ? stream_serialByte : size_;
+    index_ = parser_state_ == 5 ? index_ + 1 : 0;
+    bool in_payload = type_ >= 200 && parser_state_ == 5 && index_ <= size_;
+
+    // Command acquisition function
+    type_ = parser_state_ == 4 ? stream_serialByte : type_;
+
+    // Checksum transition function
+    crc_ = parser_state_ == 3 ? stream_serialByte
+        : parser_state_ == 4  ?  crc_ ^ stream_serialByte 
+        : in_payload ?  crc_ ^ stream_serialByte
+        : parser_state_ == 5  ?  crc_
+        : 0;
+
     // Parser state transition function
-    _pstate = _pstate == P_IDLE && in_byte == '$' ? P_GOT_DOLLAR
-            : _pstate == P_GOT_DOLLAR && in_byte == 'M' ? P_GOT_M
-            : _pstate == P_GOT_M && (in_byte == '<' || in_byte == '>') ? P_GOT_DIRECTION 
-            : _pstate == P_GOT_DIRECTION ? P_GOT_SIZE
-            : _pstate == P_GOT_SIZE ? P_GOT_TYPE
-            : _pstate == P_GOT_TYPE && _size > 0 ? P_IN_PAYLOAD
-            : _pstate == P_GOT_TYPE && in_byte == _crc ? P_GOT_CRC
-            : _pstate == P_GOT_CRC && _index <= _count ? P_GOT_CRC
-            : _pstate == P_IN_PAYLOAD && _index <= _count ? P_IN_PAYLOAD
-            : P_IDLE;
+    parser_state_
+        = parser_state_ == 0 && stream_serialByte == '$' ? 1
+        : parser_state_ == 1 && stream_serialByte == 'M' ? 2
+        : parser_state_ == 2 && (stream_serialByte == '<' || stream_serialByte == '>') ? 3
+        : parser_state_ == 3 ? 4
+        : parser_state_ == 4 ? 5
+        : parser_state_ == 5 && in_payload ? 5
+        : parser_state_ == 5 ? 0
+        : parser_state_;
 
-    _size = _pstate == P_GOT_SIZE ? in_byte
-          : _pstate == P_IDLE ? 0
-          : _size;
+    // Incoming payload accumulation
+    uint8_t pindex = in_payload ? index_ - 1 : 0;
+    buffer[pindex] = in_payload ? stream_serialByte : buffer[pindex];
 
-    _type = _pstate == P_GOT_TYPE ? in_byte
-          : _pstate == P_IDLE ? 0
-          : _type;
+    // Message dispatch
+    bool ready = stream_serialAvailable && parser_state_ == 0 && crc_ == stream_serialByte;
+    buffer_index = ready ? 0 : buffer_index;
 
-    _crc =  _pstate == P_GOT_SIZE ? _crc ^ in_byte 
-          : _pstate == P_GOT_TYPE ? _crc ^ in_byte 
-          : _pstate == P_IN_PAYLOAD && _index < _count ?  _crc ^ in_byte 
-          : _pstate == P_IDLE  ? 0
-          : _crc;
+    switch (type_) {
 
-    _count = _pstate == P_IN_PAYLOAD ? type2size(_type)
-           : _pstate == P_GOT_TYPE ? 6 + type2size(_type)
-           : _pstate == P_GOT_CRC ? _count
-           : 0;
+        case 121:
+            {
+                prepareToSerializeFloats(buffer, buffer_size_, buffer_checksum_, ready, type_, 6);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverThrottle);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverRoll);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverPitch);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverYaw);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverAux1);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready,stream_receiverAux2);
+                completeSend(buffer, buffer_size_, buffer_checksum_, ready);
 
-    _index = _pstate == P_GOT_CRC ? _index + 1
-           : _pstate == P_IN_PAYLOAD ? _index + 1
-           : _pstate == P_IDLE ? 0
-           : _index;
+            } break;
 
-    out_avail = _pstate == P_GOT_CRC && _index <= _count;
+        case 122:
+            {
+                prepareToSerializeFloats(buffer, buffer_size_, buffer_checksum_, ready, type_, 3);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, state_phi);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, state_theta);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, state_psi);
+                completeSend(buffer, buffer_size_, buffer_checksum_, ready);
 
-    out_byte = out_avail ? getbyte(_type, _index, _count, state_phi, state_theta, state_psi) : 0;
+            } break;
 
-    bool got_payload = _pstate == P_IN_PAYLOAD && _index == _count + 1 && in_byte == _crc;
+        case 215:
+            {
+                motor_index = buffer[0];
+                motor_percent = buffer[1];
 
-    bool in_motor_payload = _pstate == P_IN_PAYLOAD && _type == 215; 
+            } break;
 
-    _motor_index   = in_motor_payload && _index == 1 ? in_byte : _motor_index;
-    _motor_percent = in_motor_payload && _index == 2 ? in_byte : _motor_percent;
+    } // switch (type)
 
-    motor_index = got_payload ? _motor_index : 0;
-    motor_percent = got_payload ? _motor_percent : 0;
+    buffer_size = buffer_size_;
+}
+
+uint8_t parser_read(uint8_t * buffer, uint8_t & buffer_size, uint8_t & buffer_index)
+{
+    buffer_size--;
+    uint8_t retval = buffer[buffer_index];
+    buffer_index++;
+    return retval;
 }
