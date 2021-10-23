@@ -111,17 +111,16 @@ void parse(
     static uint8_t _index;
   
     // Parser state transition function
-    _pstate
-        = _pstate == P_IDLE && in_byte == '$' ? P_GOT_DOLLAR
-        : _pstate == P_GOT_DOLLAR && in_byte == 'M' ? P_GOT_M
-        : _pstate == P_GOT_M && (in_byte == '<' || in_byte == '>') ? P_GOT_DIRECTION 
-        : _pstate == P_GOT_DIRECTION ? P_GOT_SIZE
-        : _pstate == P_GOT_SIZE ? P_GOT_TYPE
-        : _pstate == P_GOT_TYPE && _size > 0 ? P_IN_PAYLOAD
-        : _pstate == P_GOT_TYPE && in_byte == _crc ? P_GOT_CRC
-        : _pstate == P_GOT_CRC && _index <= _count ? P_GOT_CRC
-        : _pstate == P_IN_PAYLOAD && _index <= _count ? P_IN_PAYLOAD
-        : P_IDLE;
+    _pstate = _pstate == P_IDLE && in_byte == '$' ? P_GOT_DOLLAR
+            : _pstate == P_GOT_DOLLAR && in_byte == 'M' ? P_GOT_M
+            : _pstate == P_GOT_M && (in_byte == '<' || in_byte == '>') ? P_GOT_DIRECTION 
+            : _pstate == P_GOT_DIRECTION ? P_GOT_SIZE
+            : _pstate == P_GOT_SIZE ? P_GOT_TYPE
+            : _pstate == P_GOT_TYPE && _size > 0 ? P_IN_PAYLOAD
+            : _pstate == P_GOT_TYPE && in_byte == _crc ? P_GOT_CRC
+            : _pstate == P_GOT_CRC && _index <= _count ? P_GOT_CRC
+            : _pstate == P_IN_PAYLOAD && _index <= _count ? P_IN_PAYLOAD
+            : P_IDLE;
 
     _size = _pstate == P_GOT_SIZE ? in_byte
           : _pstate == P_IDLE ? 0
