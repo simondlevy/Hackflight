@@ -19,11 +19,21 @@ float stream_receiverYaw;
 
 void stream_updateReceiver(void)
 {
+    static float _x;
+    static int8_t _dir;
+
+    _dir = _dir == 0 ? +1
+          : _x > .05 ? -1
+          : _x < -.05 ? +1
+          : _dir;
+
+    _x += .0001 * _dir;
+
     stream_receiverAux1 = -1;
     stream_receiverThrottle = -1;
     stream_receiverLostSignal = false;
 
     stream_receiverRoll = 0.2;
-    stream_receiverPitch = -0.1; 
+    stream_receiverPitch = _x; 
     stream_receiverYaw = 0;
 }
