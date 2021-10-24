@@ -77,6 +77,7 @@ void parser_parse(
         float state_theta,
         float state_psi,
         bool & data_available,
+        uint8_t & data_byte,
         uint8_t & motor_index,
         uint8_t & motor_percent)
 {
