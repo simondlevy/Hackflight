@@ -15,22 +15,22 @@
 //extern float stream_receiverPitch;
 //extern float stream_receiverYaw;
 
-static uint8_t buffer[128];
 static uint8_t buffer_size;
 
-static void addToOutBuf(bool ready, uint8_t byte)
+static void addToOutBuf(uint8_t * buffer, bool ready, uint8_t byte)
 {
     buffer[buffer_size] = ready ? byte : buffer[buffer_size];
     buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 
-static void serialize( uint8_t & crc_out, bool ready, uint8_t byte)
+static void serialize(uint8_t * buffer, uint8_t & crc_out, bool ready, uint8_t byte)
 {
-    addToOutBuf(ready, byte);
+    addToOutBuf(buffer, ready, byte);
     crc_out = ready ? crc_out ^ byte : crc_out;
 }
 
 static void prepareToSerialize(
+        uint8_t * buffer,
         uint8_t & crc_out,
         bool ready,
         uint8_t type,
@@ -40,35 +40,36 @@ static void prepareToSerialize(
     buffer_size = ready ? 0 : buffer_size;
     crc_out = ready ? 0 : crc_out;
 
-    addToOutBuf(ready, '$');
-    addToOutBuf(ready, 'M');
-    addToOutBuf(ready, '>');
-    serialize(crc_out, ready, count*size);
-    serialize(crc_out, ready, type);
+    addToOutBuf(buffer, ready, '$');
+    addToOutBuf(buffer, ready, 'M');
+    addToOutBuf(buffer, ready, '>');
+    serialize(buffer, crc_out, ready, count*size);
+    serialize(buffer, crc_out, ready, type);
 }
 
-static void completeSend( uint8_t & crc_out, bool ready)
+static void completeSend(uint8_t * buffer, uint8_t & crc_out, bool ready)
 {
-    serialize(crc_out, ready, crc_out);
+    serialize(buffer, crc_out, ready, crc_out);
 }
 
 static void prepareToSerializeFloats(
+        uint8_t * buffer,
         uint8_t & crc_out,
         bool ready,
         uint8_t type,
         uint8_t count)
 {
-    prepareToSerialize(crc_out, ready, type, count, 4);
+    prepareToSerialize(buffer, crc_out, ready, type, count, 4);
 }
 
-static void serializeFloat( uint8_t & crc_out, bool ready, float value)
+static void serializeFloat(uint8_t * buffer, uint8_t & crc_out, bool ready, float value)
 {
     uint32_t uintval = 1000 * (value + 2);
 
-    serialize(crc_out, ready, uintval     & 0xFF);
-    serialize(crc_out, ready, uintval>>8  & 0xFF);
-    serialize(crc_out, ready, uintval>>16 & 0xFF);
-    serialize(crc_out, ready, uintval>>24 & 0xFF);
+    serialize(buffer, crc_out, ready, uintval     & 0xFF);
+    serialize(buffer, crc_out, ready, uintval>>8  & 0xFF);
+    serialize(buffer, crc_out, ready, uintval>>16 & 0xFF);
+    serialize(buffer, crc_out, ready, uintval>>24 & 0xFF);
 }
 
 void parse(
@@ -86,6 +87,7 @@ void parse(
     static uint8_t _input_size;
     static uint8_t _payload_index;
     static uint8_t _crc_out;
+    static uint8_t _buffer[128];
     static uint8_t _buffer_index;
 
     motor_index = 0;
@@ -119,7 +121,7 @@ void parse(
 
     // Incoming payload accumulation
     uint8_t pindex = in_payload ? _payload_index - 1 : 0;
-    buffer[pindex] = in_payload ? stream_serialByte : buffer[pindex];
+    _buffer[pindex] = in_payload ? stream_serialByte : _buffer[pindex];
 
     // Message dispatch
     bool ready = stream_serialAvailable && _parser_state == 0 && _crc_in == stream_serialByte;
@@ -129,31 +131,31 @@ void parse(
 
         case 121:
             {
-                prepareToSerializeFloats(_crc_out, ready, _msgtype, 6);
-                serializeFloat(_crc_out, ready, stream_receiverThrottle);
-                serializeFloat(_crc_out, ready, stream_receiverRoll);
-                serializeFloat(_crc_out, ready, stream_receiverPitch);
-                serializeFloat(_crc_out, ready, stream_receiverYaw);
-                serializeFloat(_crc_out, ready, stream_receiverAux1);
-                serializeFloat(_crc_out, ready, stream_receiverAux2);
-                completeSend(_crc_out, ready);
+                prepareToSerializeFloats(_buffer, _crc_out, ready, _msgtype, 6);
+                serializeFloat(_buffer, _crc_out, ready, stream_receiverThrottle);
+                serializeFloat(_buffer, _crc_out, ready, stream_receiverRoll);
+                serializeFloat(_buffer, _crc_out, ready, stream_receiverPitch);
+                serializeFloat(_buffer, _crc_out, ready, stream_receiverYaw);
+                serializeFloat(_buffer, _crc_out, ready, stream_receiverAux1);
+                serializeFloat(_buffer, _crc_out, ready, stream_receiverAux2);
+                completeSend(_buffer, _crc_out, ready);
 
             } break;
 
         case 122:
             {
-                prepareToSerializeFloats(_crc_out, ready, _msgtype, 3);
-                serializeFloat(_crc_out, ready, state_phi);
-                serializeFloat(_crc_out, ready, state_theta);
-                serializeFloat(_crc_out, ready, state_psi);
-                completeSend(_crc_out, ready);
+                prepareToSerializeFloats(_buffer, _crc_out, ready, _msgtype, 3);
+                serializeFloat(_buffer, _crc_out, ready, state_phi);
+                serializeFloat(_buffer, _crc_out, ready, state_theta);
+                serializeFloat(_buffer, _crc_out, ready, state_psi);
+                completeSend(_buffer, _crc_out, ready);
 
             } break;
 
         case 215:
             {
-                motor_index = buffer[0];
-                motor_percent = buffer[1];
+                motor_index = _buffer[0];
+                motor_percent = _buffer[1];
 
             } break;
 
@@ -162,7 +164,7 @@ void parse(
     data_available = buffer_size > 0;
     if (data_available) {
         buffer_size--;
-        data_byte = buffer[_buffer_index];
+        data_byte = _buffer[_buffer_index];
         _buffer_index++;
     }
 }
