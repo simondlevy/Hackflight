@@ -16,7 +16,6 @@
 //extern float stream_receiverYaw;
 
 static uint8_t buffer[128];
-static uint8_t buffer_index;
 static uint8_t buffer_size;
 
 static void addToOutBuf(bool ready, uint8_t byte)
@@ -87,6 +86,7 @@ void parse(
     static uint8_t _input_size;
     static uint8_t _payload_index;
     static uint8_t _crc_out;
+    static uint8_t _buffer_index;
 
     motor_index = 0;
     motor_percent = 0;
@@ -123,7 +123,7 @@ void parse(
 
     // Message dispatch
     bool ready = stream_serialAvailable && _parser_state == 0 && _crc_in == stream_serialByte;
-    buffer_index = ready ? 0 : buffer_index;
+    _buffer_index = ready ? 0 : _buffer_index;
 
     switch (_msgtype) {
 
@@ -162,7 +162,7 @@ void parse(
     data_available = buffer_size > 0;
     if (data_available) {
         buffer_size--;
-        data_byte = buffer[buffer_index];
-        buffer_index++;
+        data_byte = buffer[_buffer_index];
+        _buffer_index++;
     }
 }
