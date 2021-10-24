@@ -25,51 +25,51 @@ static void addToOutBuf(bool ready, uint8_t byte)
     buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 
-static void serialize( uint8_t & buffer_checksum, bool ready, uint8_t byte)
+static void serialize( uint8_t & _crc_out, bool ready, uint8_t byte)
 {
     addToOutBuf(ready, byte);
-    buffer_checksum = ready ? buffer_checksum ^ byte : buffer_checksum;
+    _crc_out = ready ? _crc_out ^ byte : _crc_out;
 }
 
 static void prepareToSerialize(
-        uint8_t & buffer_checksum,
+        uint8_t & _crc_out,
         bool ready,
         uint8_t type,
         uint8_t count,
         uint8_t size)
 {
     buffer_size = ready ? 0 : buffer_size;
-    buffer_checksum = ready ? 0 : buffer_checksum;
+    _crc_out = ready ? 0 : _crc_out;
 
     addToOutBuf(ready, '$');
     addToOutBuf(ready, 'M');
     addToOutBuf(ready, '>');
-    serialize(buffer_checksum, ready, count*size);
-    serialize(buffer_checksum, ready, type);
+    serialize(_crc_out, ready, count*size);
+    serialize(_crc_out, ready, type);
 }
 
-static void completeSend( uint8_t & buffer_checksum, bool ready)
+static void completeSend( uint8_t & _crc_out, bool ready)
 {
-    serialize(buffer_checksum, ready, buffer_checksum);
+    serialize(_crc_out, ready, _crc_out);
 }
 
 static void prepareToSerializeFloats(
-        uint8_t & buffer_checksum,
+        uint8_t & _crc_out,
         bool ready,
         uint8_t type,
         uint8_t count)
 {
-    prepareToSerialize(buffer_checksum, ready, type, count, 4);
+    prepareToSerialize(_crc_out, ready, type, count, 4);
 }
 
-static void serializeFloat( uint8_t & buffer_checksum, bool ready, float value)
+static void serializeFloat( uint8_t & _crc_out, bool ready, float value)
 {
     uint32_t uintval = 1000 * (value + 2);
 
-    serialize(buffer_checksum, ready, uintval     & 0xFF);
-    serialize(buffer_checksum, ready, uintval>>8  & 0xFF);
-    serialize(buffer_checksum, ready, uintval>>16 & 0xFF);
-    serialize(buffer_checksum, ready, uintval>>24 & 0xFF);
+    serialize(_crc_out, ready, uintval     & 0xFF);
+    serialize(_crc_out, ready, uintval>>8  & 0xFF);
+    serialize(_crc_out, ready, uintval>>16 & 0xFF);
+    serialize(_crc_out, ready, uintval>>24 & 0xFF);
 }
 
 void parse(
@@ -81,72 +81,72 @@ void parse(
         uint8_t & motor_index,
         uint8_t & motor_percent)
 {
-    static uint8_t parser_state_;
-    static uint8_t type_;
-    static uint8_t crc_;
-    static uint8_t size_;
-    static uint8_t index_;
-    static uint8_t buffer_checksum_;
+    static uint8_t _parser_state;
+    static uint8_t _type;
+    static uint8_t _crc_in;
+    static uint8_t _size;
+    static uint8_t _index;
+    static uint8_t _crc_out_;
 
     motor_index = 0;
     motor_percent = 0;
 
     // Payload functions
-    size_ = parser_state_ == 3 ? stream_serialByte : size_;
-    index_ = parser_state_ == 5 ? index_ + 1 : 0;
-    bool in_payload = type_ >= 200 && parser_state_ == 5 && index_ <= size_;
+    _size = _parser_state == 3 ? stream_serialByte : _size;
+    _index = _parser_state == 5 ? _index + 1 : 0;
+    bool in_payload = _type >= 200 && _parser_state == 5 && _index <= _size;
 
     // Command acquisition function
-    type_ = parser_state_ == 4 ? stream_serialByte : type_;
+    _type = _parser_state == 4 ? stream_serialByte : _type;
 
     // Checksum transition function
-    crc_ = parser_state_ == 3 ? stream_serialByte
-        : parser_state_ == 4  ?  crc_ ^ stream_serialByte 
-        : in_payload ?  crc_ ^ stream_serialByte
-        : parser_state_ == 5  ?  crc_
+    _crc_in = _parser_state == 3 ? stream_serialByte
+        : _parser_state == 4  ?  _crc_in ^ stream_serialByte 
+        : in_payload ?  _crc_in ^ stream_serialByte
+        : _parser_state == 5  ?  _crc_in
         : 0;
 
     // Parser state transition function
-    parser_state_
-        = parser_state_ == 0 && stream_serialByte == '$' ? 1
-        : parser_state_ == 1 && stream_serialByte == 'M' ? 2
-        : parser_state_ == 2 && (stream_serialByte == '<' || stream_serialByte == '>') ? 3
-        : parser_state_ == 3 ? 4
-        : parser_state_ == 4 ? 5
-        : parser_state_ == 5 && in_payload ? 5
-        : parser_state_ == 5 ? 0
-        : parser_state_;
+    _parser_state
+        = _parser_state == 0 && stream_serialByte == '$' ? 1
+        : _parser_state == 1 && stream_serialByte == 'M' ? 2
+        : _parser_state == 2 && (stream_serialByte == '<' || stream_serialByte == '>') ? 3
+        : _parser_state == 3 ? 4
+        : _parser_state == 4 ? 5
+        : _parser_state == 5 && in_payload ? 5
+        : _parser_state == 5 ? 0
+        : _parser_state;
 
     // Incoming payload accumulation
-    uint8_t pindex = in_payload ? index_ - 1 : 0;
+    uint8_t pindex = in_payload ? _index - 1 : 0;
     buffer[pindex] = in_payload ? stream_serialByte : buffer[pindex];
 
     // Message dispatch
-    bool ready = stream_serialAvailable && parser_state_ == 0 && crc_ == stream_serialByte;
+    bool ready = stream_serialAvailable && _parser_state == 0 && _crc_in == stream_serialByte;
     buffer_index = ready ? 0 : buffer_index;
 
-    switch (type_) {
+    switch (_type) {
 
         case 121:
             {
-                prepareToSerializeFloats(buffer_checksum_, ready, type_, 6);
-                serializeFloat(buffer_checksum_, ready, stream_receiverThrottle);
-                serializeFloat(buffer_checksum_, ready, stream_receiverRoll);
-                serializeFloat(buffer_checksum_, ready, stream_receiverPitch);
-                serializeFloat(buffer_checksum_, ready, stream_receiverYaw);
-                serializeFloat(buffer_checksum_, ready, stream_receiverAux1);
-                serializeFloat(buffer_checksum_, ready, stream_receiverAux2);
-                completeSend(buffer_checksum_, ready);
+                prepareToSerializeFloats(_crc_out_, ready, _type, 6);
+                serializeFloat(_crc_out_, ready, stream_receiverThrottle);
+                serializeFloat(_crc_out_, ready, stream_receiverRoll);
+                serializeFloat(_crc_out_, ready, stream_receiverPitch);
+                serializeFloat(_crc_out_, ready, stream_receiverYaw);
+                serializeFloat(_crc_out_, ready, stream_receiverAux1);
+                serializeFloat(_crc_out_, ready, stream_receiverAux2);
+                completeSend(_crc_out_, ready);
 
             } break;
 
         case 122:
             {
-                prepareToSerializeFloats(buffer_checksum_, ready, type_, 3);
-                serializeFloat(buffer_checksum_, ready, state_phi);
-                serializeFloat(buffer_checksum_, ready, state_theta);
-                serializeFloat(buffer_checksum_, ready, state_psi);
-                completeSend(buffer_checksum_, ready);
+                prepareToSerializeFloats(_crc_out_, ready, _type, 3);
+                serializeFloat(_crc_out_, ready, state_phi);
+                serializeFloat(_crc_out_, ready, state_theta);
+                serializeFloat(_crc_out_, ready, state_psi);
+                completeSend(_crc_out_, ready);
 
             } break;
 
