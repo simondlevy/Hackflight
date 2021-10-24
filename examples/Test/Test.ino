@@ -30,9 +30,6 @@ void stream_run(
     static uint8_t buffer_index;
     uint8_t buffer_size = 0;
 
-    bool avail = 0;
-    uint8_t bite = 0;
-
     uint8_t motor_index = 0;
     uint8_t motor_percent = 0;
 

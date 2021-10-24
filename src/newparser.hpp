@@ -149,20 +149,28 @@ void parser_parse(
 
         case 121:
             {
-                prepareToSerializeFloats(buffer, buffer_size_, buffer_checksum_, ready, type_, 6);
-                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverThrottle);
-                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverRoll);
-                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverPitch);
-                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverYaw);
-                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, stream_receiverAux1);
-                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready,stream_receiverAux2);
+                prepareToSerializeFloats(buffer, buffer_size_, buffer_checksum_,
+                        ready, type_, 6);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready,
+                        stream_receiverThrottle);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready,
+                        stream_receiverRoll);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready,
+                        stream_receiverPitch);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready,
+                        stream_receiverYaw);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready,
+                        stream_receiverAux1);
+                serializeFloat(buffer, buffer_size_, buffer_checksum_, ready,
+                        stream_receiverAux2);
                 completeSend(buffer, buffer_size_, buffer_checksum_, ready);
 
             } break;
 
         case 122:
             {
-                prepareToSerializeFloats(buffer, buffer_size_, buffer_checksum_, ready, type_, 3);
+                prepareToSerializeFloats(buffer, buffer_size_, buffer_checksum_, ready,
+                        type_, 3);
                 serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, state_phi);
                 serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, state_theta);
                 serializeFloat(buffer, buffer_size_, buffer_checksum_, ready, state_psi);
