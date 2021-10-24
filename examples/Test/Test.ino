@@ -33,17 +33,16 @@ void stream_run( float state_phi, float state_theta, float state_psi, bool armed
     uint8_t motor_index = 0;
     uint8_t motor_percent = 0;
 
-    parser_parse(
-            state_phi,
-            state_theta,
-            state_psi,
-            data_available,
-            data_byte,
-            motor_index,
-            motor_percent);
+    parse(state_phi,
+          state_theta,
+          state_psi,
+          data_available,
+          data_byte,
+          motor_index,
+          motor_percent);
 
     if (data_available) {
-        stream_serialWrite(parser_read());
+        stream_serialWrite(data_byte);
     }
 
     delay(10);

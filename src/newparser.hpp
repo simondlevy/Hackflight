@@ -72,7 +72,7 @@ static void serializeFloat( uint8_t & buffer_checksum, bool ready, float value)
     serialize(buffer_checksum, ready, uintval>>24 & 0xFF);
 }
 
-void parser_parse(
+void parse(
         float state_phi,
         float state_theta,
         float state_psi,
@@ -160,12 +160,9 @@ void parser_parse(
     } // switch (type)
 
     data_available = buffer_size > 0;
-}
-
-uint8_t parser_read(void)
-{
-    buffer_size--;
-    uint8_t retval = buffer[buffer_index];
-    buffer_index++;
-    return retval;
+    if (data_available) {
+        buffer_size--;
+        data_byte = buffer[buffer_index];
+        buffer_index++;
+    }
 }
