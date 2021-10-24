@@ -82,22 +82,22 @@ void parse(
         uint8_t & motor_percent)
 {
     static uint8_t _parser_state;
-    static uint8_t _type;
+    static uint8_t _msgtype;
     static uint8_t _crc_in;
-    static uint8_t _size;
-    static uint8_t _index;
+    static uint8_t _input_size;
+    static uint8_t _payload_index;
     static uint8_t _crc_out;
 
     motor_index = 0;
     motor_percent = 0;
 
     // Payload functions
-    _size = _parser_state == 3 ? stream_serialByte : _size;
-    _index = _parser_state == 5 ? _index + 1 : 0;
-    bool in_payload = _type >= 200 && _parser_state == 5 && _index <= _size;
+    _input_size = _parser_state == 3 ? stream_serialByte : _input_size;
+    _payload_index = _parser_state == 5 ? _payload_index + 1 : 0;
+    bool in_payload = _msgtype >= 200 && _parser_state == 5 && _payload_index <= _input_size;
 
     // Command acquisition function
-    _type = _parser_state == 4 ? stream_serialByte : _type;
+    _msgtype = _parser_state == 4 ? stream_serialByte : _msgtype;
 
     // Checksum transition function
     _crc_in = _parser_state == 3 ? stream_serialByte
@@ -118,18 +118,18 @@ void parse(
         : _parser_state;
 
     // Incoming payload accumulation
-    uint8_t pindex = in_payload ? _index - 1 : 0;
+    uint8_t pindex = in_payload ? _payload_index - 1 : 0;
     buffer[pindex] = in_payload ? stream_serialByte : buffer[pindex];
 
     // Message dispatch
     bool ready = stream_serialAvailable && _parser_state == 0 && _crc_in == stream_serialByte;
     buffer_index = ready ? 0 : buffer_index;
 
-    switch (_type) {
+    switch (_msgtype) {
 
         case 121:
             {
-                prepareToSerializeFloats(_crc_out, ready, _type, 6);
+                prepareToSerializeFloats(_crc_out, ready, _msgtype, 6);
                 serializeFloat(_crc_out, ready, stream_receiverThrottle);
                 serializeFloat(_crc_out, ready, stream_receiverRoll);
                 serializeFloat(_crc_out, ready, stream_receiverPitch);
@@ -142,7 +142,7 @@ void parse(
 
         case 122:
             {
-                prepareToSerializeFloats(_crc_out, ready, _type, 3);
+                prepareToSerializeFloats(_crc_out, ready, _msgtype, 3);
                 serializeFloat(_crc_out, ready, state_phi);
                 serializeFloat(_crc_out, ready, state_theta);
                 serializeFloat(_crc_out, ready, state_psi);
