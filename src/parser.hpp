@@ -25,51 +25,51 @@ static void addToOutBuf(bool ready, uint8_t byte)
     buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 
-static void serialize( uint8_t & _crc_out, bool ready, uint8_t byte)
+static void serialize( uint8_t & crc_out, bool ready, uint8_t byte)
 {
     addToOutBuf(ready, byte);
-    _crc_out = ready ? _crc_out ^ byte : _crc_out;
+    crc_out = ready ? crc_out ^ byte : crc_out;
 }
 
 static void prepareToSerialize(
-        uint8_t & _crc_out,
+        uint8_t & crc_out,
         bool ready,
         uint8_t type,
         uint8_t count,
         uint8_t size)
 {
     buffer_size = ready ? 0 : buffer_size;
-    _crc_out = ready ? 0 : _crc_out;
+    crc_out = ready ? 0 : crc_out;
 
     addToOutBuf(ready, '$');
     addToOutBuf(ready, 'M');
     addToOutBuf(ready, '>');
-    serialize(_crc_out, ready, count*size);
-    serialize(_crc_out, ready, type);
+    serialize(crc_out, ready, count*size);
+    serialize(crc_out, ready, type);
 }
 
-static void completeSend( uint8_t & _crc_out, bool ready)
+static void completeSend( uint8_t & crc_out, bool ready)
 {
-    serialize(_crc_out, ready, _crc_out);
+    serialize(crc_out, ready, crc_out);
 }
 
 static void prepareToSerializeFloats(
-        uint8_t & _crc_out,
+        uint8_t & crc_out,
         bool ready,
         uint8_t type,
         uint8_t count)
 {
-    prepareToSerialize(_crc_out, ready, type, count, 4);
+    prepareToSerialize(crc_out, ready, type, count, 4);
 }
 
-static void serializeFloat( uint8_t & _crc_out, bool ready, float value)
+static void serializeFloat( uint8_t & crc_out, bool ready, float value)
 {
     uint32_t uintval = 1000 * (value + 2);
 
-    serialize(_crc_out, ready, uintval     & 0xFF);
-    serialize(_crc_out, ready, uintval>>8  & 0xFF);
-    serialize(_crc_out, ready, uintval>>16 & 0xFF);
-    serialize(_crc_out, ready, uintval>>24 & 0xFF);
+    serialize(crc_out, ready, uintval     & 0xFF);
+    serialize(crc_out, ready, uintval>>8  & 0xFF);
+    serialize(crc_out, ready, uintval>>16 & 0xFF);
+    serialize(crc_out, ready, uintval>>24 & 0xFF);
 }
 
 void parse(
@@ -86,7 +86,7 @@ void parse(
     static uint8_t _crc_in;
     static uint8_t _size;
     static uint8_t _index;
-    static uint8_t _crc_out_;
+    static uint8_t _crc_out;
 
     motor_index = 0;
     motor_percent = 0;
@@ -129,24 +129,24 @@ void parse(
 
         case 121:
             {
-                prepareToSerializeFloats(_crc_out_, ready, _type, 6);
-                serializeFloat(_crc_out_, ready, stream_receiverThrottle);
-                serializeFloat(_crc_out_, ready, stream_receiverRoll);
-                serializeFloat(_crc_out_, ready, stream_receiverPitch);
-                serializeFloat(_crc_out_, ready, stream_receiverYaw);
-                serializeFloat(_crc_out_, ready, stream_receiverAux1);
-                serializeFloat(_crc_out_, ready, stream_receiverAux2);
-                completeSend(_crc_out_, ready);
+                prepareToSerializeFloats(_crc_out, ready, _type, 6);
+                serializeFloat(_crc_out, ready, stream_receiverThrottle);
+                serializeFloat(_crc_out, ready, stream_receiverRoll);
+                serializeFloat(_crc_out, ready, stream_receiverPitch);
+                serializeFloat(_crc_out, ready, stream_receiverYaw);
+                serializeFloat(_crc_out, ready, stream_receiverAux1);
+                serializeFloat(_crc_out, ready, stream_receiverAux2);
+                completeSend(_crc_out, ready);
 
             } break;
 
         case 122:
             {
-                prepareToSerializeFloats(_crc_out_, ready, _type, 3);
-                serializeFloat(_crc_out_, ready, state_phi);
-                serializeFloat(_crc_out_, ready, state_theta);
-                serializeFloat(_crc_out_, ready, state_psi);
-                completeSend(_crc_out_, ready);
+                prepareToSerializeFloats(_crc_out, ready, _type, 3);
+                serializeFloat(_crc_out, ready, state_phi);
+                serializeFloat(_crc_out, ready, state_theta);
+                serializeFloat(_crc_out, ready, state_psi);
+                completeSend(_crc_out, ready);
 
             } break;
 
