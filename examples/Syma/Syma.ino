@@ -17,7 +17,7 @@
 
  */
 
-#include "parser.hpp"
+#include "newparser.hpp"
 #include "debugger.hpp"
 #include "stream_serial.h"
 #include "copilot.h"
@@ -49,21 +49,18 @@ void stream_run(
         float m3_flying,
         float m4_flying)
 {
-    static uint8_t serial_buffer[128];
-    static uint8_t buffer_index;
-    uint8_t buffer_size = 0;
+    bool data_available = false;
+    uint8_t data_byte = 0;
     uint8_t gcs_motor_index = 0;
     uint8_t gcs_motor_percent = 0;
 
-    parser_parse(
-            serial_buffer,
-            buffer_size,
-            buffer_index,
-            state_phi,
-            state_theta,
-            state_psi,
-            gcs_motor_index,
-            gcs_motor_percent);
+    parse(state_phi,
+          state_theta,
+          state_psi,
+          data_available,
+          data_byte,
+          gcs_motor_index,
+          gcs_motor_percent);
 
     stream_serialUpdate();
 
@@ -71,8 +68,8 @@ void stream_run(
         stream_serialRead();
     }
 
-    if (buffer_size > 0) {
-        stream_serialWrite(parser_read(serial_buffer, buffer_size, buffer_index));
+    if (data_available) {
+        stream_serialWrite(data_byte);
     }
 
     float m1_val = armed ? m1_flying : gcs_motor_index == 1 ? gcs_motor_percent/100. : 0;

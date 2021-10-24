@@ -11,9 +11,9 @@
 #include "stream_receiver.h"
 #include "stream_serial.h"
 
-extern float stream_receiverRoll;
-extern float stream_receiverPitch;
-extern float stream_receiverYaw;
+//extern float stream_receiverRoll;
+//extern float stream_receiverPitch;
+//extern float stream_receiverYaw;
 
 static uint8_t buffer[128];
 static uint8_t buffer_index;
