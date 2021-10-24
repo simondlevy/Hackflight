@@ -26,8 +26,6 @@ void stream_run(
         float state_psi,
         bool armed)
 {
-    static uint8_t serial_buffer[128];
-    static uint8_t buffer_index;
     uint8_t buffer_size = 0;
 
     uint8_t motor_index = 0;
@@ -40,9 +38,7 @@ void stream_run(
     }
 
     parser_parse(
-            serial_buffer,
             buffer_size,
-            buffer_index,
             state_phi,
             state_theta,
             state_psi,
@@ -50,7 +46,7 @@ void stream_run(
             motor_percent);
 
     if (buffer_size > 0) {
-        stream_serialWrite(parser_read(serial_buffer, buffer_size, buffer_index));
+        stream_serialWrite(parser_read(buffer_size));
     }
 
     delay(10);
