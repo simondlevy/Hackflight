@@ -12,62 +12,51 @@
 module Parser where
 
 import Language.Copilot hiding(xor)
-import Copilot.Language.Operators.BitWise((.|.), (.<<.))
+import Prelude hiding((==), (>=), (<=), (&&), (||), (++), not)
 
 import Serial
 import Utils
 
-parse :: SBool -> SBool -> (SBool, SBool, SWord8, SWord8)
+parse :: SBool -> SWord8 -> (SBool, SBool, SWord8, SWord8)
 
 parse avail byte = (sending, receiving, pindex, msgtype) where
 
-  sending = false
-  receiving = false
-  pindex = 0
-  msgtype = 0
+  -- Payload handling
+  input_size = if state == 3 then byte else input_size'
+  payload_index = if state == 5 then payload_index' + 1 else 0
 
-{--
+  receiving = msgtype >= 200 && state == 5 && payload_index <= input_size
 
-    static uint8_t _parser_state;
-    static uint8_t _input_size;
-    static uint8_t _payload_index;
-    static uint8_t _msgtype;
-    static uint8_t _crc_in;
+  -- Command acquisition function
+  msgtype = if state == 4 then byte else msgtype'
 
-    // Payload functions
-    _input_size = _parser_state == 3 ? byte : _input_size;
-    _payload_index = _parser_state == 5 ? _payload_index + 1 : 0;
-    receiving = _msgtype >= 200
-             && _parser_state == 5
-             && _payload_index <= _input_size;
+  -- Checksum transition function
+  crc_in = if state == 3 then byte
+      else if state == 4  then  xor crc_in byte 
+      else if receiving then xor crc_in byte
+      else if state == 5  then crc_in'
+      else 0
 
-    // Command acquisition function
-    _msgtype = _parser_state == 4 ? byte : _msgtype;
+  -- Parser state transition function
+  state  = if state' == 0 && byte == 36 then 1
+      else if state' == 1 && byte == 77 then 2
+      else if state' == 2 && (byte == 60 || byte == 62) then 3
+      else if state' == 3 then 4
+      else if state' == 4 then 5
+      else if state' == 5 && receiving then 5
+      else if state' == 5 then 0
+      else state' :: SWord8
 
-    // Checksum transition function
-    _crc_in = _parser_state == 3 ? byte
-        : _parser_state == 4  ?  _crc_in ^ byte 
-        : receiving ?  _crc_in ^ byte
-        : _parser_state == 5  ?  _crc_in
-        : 0;
+  incoming = msgtype >= 200
 
-    // Parser state transition function
-    _parser_state
-        = _parser_state == 0 && byte == '$' ? 1
-        : _parser_state == 1 && byte == 'M' ? 2
-        : _parser_state == 2 && (byte == '<' || byte == '>') ? 3
-        : _parser_state == 3 ? 4
-        : _parser_state == 4 ? 5
-        : _parser_state == 5 && receiving ? 5
-        : _parser_state == 5 ? 0
-        : _parser_state;
+  sending = avail && state == 0 && crc_in == byte && not incoming
 
-    msgtype = _msgtype;
+  pindex = if receiving then payload_index - 1 else 0
 
-    uint8_t incoming = _msgtype >= 200;
+  -- State variables
+  input_size'    = [0] ++ input_size
+  state'         = [0] ++ state
+  payload_index' = [0] ++ payload_index
+  crc_in'        = [0] ++ crc_in
+  msgtype'       = [0] ++ msgtype
 
-    sending = avail && _parser_state == 0 && _crc_in == byte && !incoming;
-
-    pindex = receiving ? _payload_index - 1 : 0;
-}
---}

@@ -45,7 +45,7 @@ void parse(bool avail, uint8_t byte,
 
     msgtype = _msgtype;
 
-    uint8_t incoming = _msgtype >= 200;
+    bool incoming = _msgtype >= 200;
 
     sending = avail && _parser_state == 0 && _crc_in == byte && !incoming;
 
