@@ -25,8 +25,6 @@ parse :: SBool -> SWord8 -> ParserState
 
 parse avail byte = ParserState sending receiving index msgtype where
 
-  index = 0
-
   -- Parser state transition function
   state  = if state' == 0 && byte == 36 then 1
       else if state' == 1 && byte == 77 then 2
