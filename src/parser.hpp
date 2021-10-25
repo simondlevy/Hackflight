@@ -148,9 +148,10 @@ void parse(
     motor_percent = _msgtype == 215 ? _buffer[1] : 0;
 
     data_available = _buffer_size > 0;
-    if (data_available) {
-        _buffer_size--;
-        data_byte = _buffer[_buffer_index];
-        _buffer_index++;
-    }
+
+    _buffer_size = data_available ? _buffer_size - 1 : _buffer_size;
+
+    data_byte = data_available ? _buffer[_buffer_index] : 0;
+
+    _buffer_index = data_available ? _buffer_index + 1 : _buffer_index;
 }
