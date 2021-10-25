@@ -24,6 +24,11 @@ static void addToOutBuf(uint8_t * buffer, uint8_t & buffer_size, bool ready, uin
     buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 
+static void setOutBuf(uint8_t * buffer, uint8_t index, bool ready, uint8_t byte)
+{
+    buffer[index] = ready ? byte : buffer[index];
+}
+
 static void serialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, bool ready, uint8_t byte)
 {
     addToOutBuf(buffer, buffer_size, ready, byte);
@@ -38,12 +43,13 @@ static void prepareToSerialize(
         uint8_t type,
         uint8_t msgsize)
 {
-    buffer_size = ready ? 0 : buffer_size;
+    setOutBuf(buffer, 0, ready, '$');
+    setOutBuf(buffer, 1, ready, 'M');
+    setOutBuf(buffer, 2, ready, '>');
+
+    buffer_size = ready ? 3 : buffer_size;
     crc_out = ready ? 0 : crc_out;
 
-    addToOutBuf(buffer, buffer_size, ready, '$');
-    addToOutBuf(buffer, buffer_size, ready, 'M');
-    addToOutBuf(buffer, buffer_size, ready, '>');
     serialize(buffer, buffer_size, crc_out, ready, msgsize);
     serialize(buffer, buffer_size, crc_out, ready, type);
 }
