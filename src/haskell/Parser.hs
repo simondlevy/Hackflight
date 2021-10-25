@@ -17,14 +17,14 @@ import Prelude hiding((==), (>=), (<=), (&&), (||), (++), not)
 import Serial
 import Utils
 
-data ParseState = ParseState { sending   :: SBool
-                             , receiving :: SBool
-                             , pindex    :: SWord8
-                             , msgtype   :: SWord8 }
+data ParserState = ParserState { sending   :: SBool
+                               , receiving :: SBool
+                               , pindex    :: SWord8
+                               , msgtype   :: SWord8 }
 
-parse :: SBool -> SWord8 -> ParseState
+parse :: SBool -> SWord8 -> ParserState
 
-parse avail byte = ParseState sending receiving pindex msgtype where
+parse avail byte = ParserState sending receiving pindex msgtype where
 
   -- Payload handling
   input_size = if state == 3 then byte else input_size'

@@ -1,5 +1,5 @@
 {--
-  Hackflight core algorithm
+  Hackflight core algorithm plus led and serial parsing
 
   Copyright(C) 2021 on D.Levy
 
@@ -24,12 +24,14 @@ import Parser
 import Utils
 
 hackflight :: Receiver -> [Sensor] -> [PidFun]
-  -> (State, SBool, Motors, SBool)
+  -> (State, SBool, Motors, SBool, ParserState)
 
 hackflight receiver sensors pidfuns
-  = (state, armed', motors, led)
+  = (state, armed', motors, led, pstate)
 
   where
+
+    pstate = ParserState false false 0 0
 
     -- Get receiver demands from external C functions
     rdemands = getDemands receiver
