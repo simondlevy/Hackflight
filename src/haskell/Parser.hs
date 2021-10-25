@@ -48,17 +48,15 @@ parse avail byte = ParserState sending receiving index msgtype where
   receiving = msgtype >= 200 && state == 5 && payload_index <= input_size
 
   incoming = msgtype >= 200
-{--
-
 
   -- Checksum transition function
   crc_in = if state == 3 then byte
-      else if state == 4  then  xor crc_in byte 
-      else if receiving then xor crc_in byte
+      else if state == 4  then  xor crc_in' byte 
+      else if receiving then xor crc_in' byte
       else if state == 5  then crc_in'
       else 0
 
-
+{--
   sending = avail && state == 0 && crc_in == byte && not incoming
 
   index = if receiving then payload_index - 1 else 0
@@ -72,3 +70,4 @@ parse avail byte = ParserState sending receiving index msgtype where
   input_size'    = [0] ++ input_size
   payload_index' = [0] ++ payload_index :: SWord8
   msgtype'       = [0] ++ msgtype :: SWord8
+  crc_in'        = [0] ++ crc_in :: SWord8
