@@ -94,7 +94,12 @@ spec = do
                                 , arg $ m1 motors
                                 , arg $ m2 motors
                                 , arg $ m3 motors
-                                , arg $ m4 motors ]
+                                , arg $ m4 motors
+                                , arg $ sending pstate
+                                , arg $ receiving pstate
+                                , arg $ index pstate
+                                , arg $ msgtype pstate
+                               ]
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"

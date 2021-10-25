@@ -18,12 +18,12 @@ import Utils
 
 data ParserState = ParserState { sending   :: SBool
                                , receiving :: SBool
-                               , pindex    :: SWord8
+                               , index     :: SWord8
                                , msgtype   :: SWord8 }
 
 parse :: SBool -> SWord8 -> ParserState
 
-parse avail byte = ParserState sending receiving pindex msgtype where
+parse avail byte = ParserState sending receiving index msgtype where
 
   -- Payload handling
   input_size = if state == 3 then byte else input_size'
@@ -55,7 +55,7 @@ parse avail byte = ParserState sending receiving pindex msgtype where
 
   sending = avail && state == 0 && crc_in == byte && not incoming
 
-  pindex = if receiving then payload_index - 1 else 0
+  index = if receiving then payload_index - 1 else 0
 
   -- State variables
   input_size'    = [0] ++ input_size

@@ -72,7 +72,11 @@ void stream_run(
         float m1_flying,
         float m2_flying,
         float m3_flying,
-        float m4_flying)
+        float m4_flying,
+        bool  sending_,
+        bool  receiving_,
+        uint8_t index_,
+        uint8_t msgtype_)
 {
     static uint8_t _buffer[128];
     static uint8_t _buffer_size;
@@ -81,13 +85,13 @@ void stream_run(
 
     bool sending = false;
     bool receiving = false;
-    uint8_t pindex = 0;
+    uint8_t index = 0;
     uint8_t msgtype = 0;
 
     parse(stream_serialAvailable, stream_serialByte,
-          sending, receiving, pindex, msgtype);
+          sending, receiving, index, msgtype);
 
-    _buffer[pindex] = receiving ? stream_serialByte : _buffer[pindex];
+    _buffer[index] = receiving ? stream_serialByte : _buffer[index];
 
     _buffer_index = sending ? 0 : _buffer_index;
 
