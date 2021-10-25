@@ -135,11 +135,13 @@ void parse(
 
     _buffer_index = ready ? 0 : _buffer_index;
 
+    prepareToSerializeFloats(_buffer, _buffer_size, _crc_out, ready, _msgtype, 
+            _msgtype == 121 ? 6 : _msgtype == 122 ? 3 : 0);
+
     switch (_msgtype) {
 
         case 121:
             {
-                prepareToSerializeFloats(_buffer, _buffer_size, _crc_out, ready, _msgtype, 6);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverThrottle);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverRoll);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverPitch);
@@ -151,7 +153,6 @@ void parse(
 
         case 122:
             {
-                prepareToSerializeFloats(_buffer, _buffer_size, _crc_out, ready, _msgtype, 3);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, state_phi);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, state_theta);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, state_psi);
