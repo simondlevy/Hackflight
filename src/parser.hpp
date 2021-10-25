@@ -48,11 +48,6 @@ static void prepareToSerialize(
     serialize(buffer, buffer_size, crc_out, ready, type);
 }
 
-static void completeSend(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, bool ready)
-{
-    serialize(buffer, buffer_size, crc_out, ready, crc_out);
-}
-
 static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, bool ready, float value)
 {
     uint32_t uintval = 1000 * (value + 2);
@@ -144,7 +139,7 @@ void parse(
 
     serializeFloat(_buffer, _buffer_size, _crc_out, sendrc, stream_receiverAux2);
 
-    completeSend(_buffer, _buffer_size, _crc_out, ready);
+    serialize(_buffer, _buffer_size, _crc_out, ready, _crc_out);
 
     motor_index = _msgtype == 215 ? _buffer[0] : 0;
     motor_percent = _msgtype == 215 ? _buffer[1] : 0;
