@@ -36,8 +36,7 @@ static void prepareToSerialize(
         uint8_t & crc_out,
         bool ready,
         uint8_t type,
-        uint8_t count,
-        uint8_t size)
+        uint8_t msgsize)
 {
     buffer_size = ready ? 0 : buffer_size;
     crc_out = ready ? 0 : crc_out;
@@ -45,7 +44,7 @@ static void prepareToSerialize(
     addToOutBuf(buffer, buffer_size, ready, '$');
     addToOutBuf(buffer, buffer_size, ready, 'M');
     addToOutBuf(buffer, buffer_size, ready, '>');
-    serialize(buffer, buffer_size, crc_out, ready, count*size);
+    serialize(buffer, buffer_size, crc_out, ready, msgsize);
     serialize(buffer, buffer_size, crc_out, ready, type);
 }
 
@@ -126,7 +125,7 @@ void parse(
 
     uint8_t outsize = _msgtype == 121 ? 6 : _msgtype == 122 ? 3 : 0;
 
-    prepareToSerialize(_buffer, _buffer_size, _crc_out, ready, _msgtype, outsize, 4);
+    prepareToSerialize(_buffer, _buffer_size, _crc_out, ready, _msgtype, outsize*4);
 
     serializeFloat(_buffer, _buffer_size, _crc_out, ready,
             _msgtype == 121 ? stream_receiverThrottle : _msgtype == 122 ? state_phi : 0);
