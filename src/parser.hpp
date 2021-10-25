@@ -15,7 +15,7 @@ void parse(bool avail, uint8_t byte,
     static uint8_t _type;
     static uint8_t _crc;
 
-    bool incoming = _type >= 200;
+    bool incoming = _size > 0;
 
     _size = _state == 3 ? byte : _size;
 
