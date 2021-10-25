@@ -46,6 +46,8 @@ parse avail byte = ParserState sending receiving index msgtype where
   msgtype = if state == 4 then byte else msgtype'
 
   receiving = msgtype >= 200 && state == 5 && payload_index <= input_size
+
+  incoming = msgtype >= 200
 {--
 
 
@@ -56,7 +58,6 @@ parse avail byte = ParserState sending receiving index msgtype where
       else if state == 5  then crc_in'
       else 0
 
-  incoming = msgtype >= 200
 
   sending = avail && state == 0 && crc_in == byte && not incoming
 
