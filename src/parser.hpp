@@ -35,14 +35,14 @@ static void prepareToSerialize(
         uint8_t & buffer_size,
         uint8_t & crc_out,
         bool ready,
-        uint8_t type,
+        uint8_t msgtype,
         uint8_t msgsize)
 {
     buffer_size = ready ? 3 : buffer_size;
     crc_out = ready ? 0 : crc_out;
 
     serialize(buffer, buffer_size, crc_out, ready, msgsize);
-    serialize(buffer, buffer_size, crc_out, ready, type);
+    serialize(buffer, buffer_size, crc_out, ready, msgtype);
 }
 
 static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, bool ready, float value)
