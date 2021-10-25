@@ -77,7 +77,12 @@ spec = do
   trigger "stream_run" running [  arg $ phi vstate
                                 , arg $ theta vstate
                                 , arg $ psi vstate
-                                , arg armed ]
+                                , arg armed 
+                                , arg $ sending pstate
+                                , arg $ receiving pstate
+                                , arg $ index pstate
+                                , arg $ msgtype pstate
+                               ]
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
