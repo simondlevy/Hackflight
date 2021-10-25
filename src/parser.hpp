@@ -144,21 +144,16 @@ void parse(
     serializeFloat(_buffer, _buffer_size, _crc_out, ready,
             _msgtype == 121 ? stream_receiverRoll : _msgtype == 122 ? state_theta : 0);
 
-
     serializeFloat(_buffer, _buffer_size, _crc_out, ready,
             _msgtype == 121 ? stream_receiverPitch : _msgtype == 122 ? state_psi : 0);
 
-    switch (_msgtype) {
+    bool sendrc = ready && _msgtype == 121;
 
-        case 121:
-            {
-                serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverYaw);
-                serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverAux1);
-                serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverAux2);
+    serializeFloat(_buffer, _buffer_size, _crc_out, sendrc, stream_receiverYaw);
 
-            } break;
+    serializeFloat(_buffer, _buffer_size, _crc_out, sendrc, stream_receiverAux1);
 
-    } // switch (type)
+    serializeFloat(_buffer, _buffer_size, _crc_out, sendrc, stream_receiverAux2);
 
     completeSend(_buffer, _buffer_size, _crc_out, ready);
 
