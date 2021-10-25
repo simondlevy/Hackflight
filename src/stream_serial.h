@@ -9,16 +9,7 @@
 
 #pragma once
 
-#ifdef NONEXTERN
-#define EXTERN
-#else
-#define EXTERN extern
-#endif
-
 #include <stdint.h>
-
-EXTERN uint8_t stream_serialByte; 
-EXTERN bool stream_serialAvailable; 
 
 void stream_startSerial(void);
 

@@ -7,10 +7,10 @@
 
  */
 
-#define NONEXTERN
-#include "stream_serial.h"
-
 #include <Arduino.h>
+
+extern uint8_t stream_serialByte; 
+extern bool stream_serialAvailable; 
 
 void stream_startSerial(void)
 {

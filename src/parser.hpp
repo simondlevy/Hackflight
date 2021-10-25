@@ -15,12 +15,12 @@ void parse(bool avail, uint8_t byte,
     static uint8_t _msgtype;
     static uint8_t _crc_in;
 
+    bool incoming = _msgtype >= 200;
+
     // Payload functions
     _input_size = _parser_state == 3 ? byte : _input_size;
     _payload_index = _parser_state == 5 ? _payload_index + 1 : 0;
-    receiving = _msgtype >= 200
-             && _parser_state == 5
-             && _payload_index <= _input_size;
+    receiving = incoming && _parser_state == 5 && _payload_index <= _input_size;
 
     // Command acquisition function
     _msgtype = _parser_state == 4 ? byte : _msgtype;
@@ -44,8 +44,6 @@ void parse(bool avail, uint8_t byte,
         : _parser_state;
 
     msgtype = _msgtype;
-
-    bool incoming = _msgtype >= 200;
 
     sending = avail && _parser_state == 0 && _crc_in == byte && !incoming;
 

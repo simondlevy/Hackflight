@@ -17,11 +17,12 @@
 
  */
 
+#include "copilot.h"
+
+#include "stream_serial.h"
 #include "parser.hpp"
 #include "debugger.hpp"
-#include "stream_serial.h"
 #include "stream_receiver.h"
-#include "copilot.h"
 
 void stream_writeBrushedMotors(
         uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin,
