@@ -54,17 +54,6 @@ static void completeSend(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_
     serialize(buffer, buffer_size, crc_out, ready, crc_out);
 }
 
-static void prepareToSerializeFloats(
-        uint8_t * buffer,
-        uint8_t & buffer_size,
-        uint8_t & crc_out,
-        bool ready,
-        uint8_t type,
-        uint8_t count)
-{
-    prepareToSerialize(buffer, buffer_size, crc_out, ready, type, count, 4);
-}
-
 static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, bool ready, float value)
 {
     uint32_t uintval = 1000 * (value + 2);
@@ -135,8 +124,9 @@ void parse(
 
     _buffer_index = ready ? 0 : _buffer_index;
 
-    prepareToSerializeFloats(_buffer, _buffer_size, _crc_out, ready, _msgtype, 
-            _msgtype == 121 ? 6 : _msgtype == 122 ? 3 : 0);
+    uint8_t outsize = _msgtype == 121 ? 6 : _msgtype == 122 ? 3 : 0;
+
+    prepareToSerialize(_buffer, _buffer_size, _crc_out, ready, _msgtype, outsize, 4);
 
     serializeFloat(_buffer, _buffer_size, _crc_out, ready,
             _msgtype == 121 ? stream_receiverThrottle : _msgtype == 122 ? state_phi : 0);
