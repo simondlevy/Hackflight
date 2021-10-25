@@ -31,6 +31,7 @@ import YawPid(yawController)
 import LevelPid(levelController)
 
 -- Serial comms
+import Serial
 import Parser
 
 -- Misc
@@ -57,8 +58,12 @@ spec = do
   let running = if not flipflop then true else running' where running' = [False] ++ running
   let starting = not running
 
-  let (state, armed, motors, led) = hackflight receiver sensors pidfuns
-
+  -- Run the Hackflight algorithm
+  let (vstate, armed, motors, led, pstate) = hackflight receiver
+                                                        sensors
+                                                        pidfuns
+                                                        serialAvailable
+                                                        serialByteIn
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
   trigger "stream_startLed" starting [arg led_pin]
@@ -69,9 +74,9 @@ spec = do
   trigger "stream_updateReceiver" running []
   trigger "stream_writeLed" running [arg led_pin, arg led]
 
-  trigger "stream_run" running [  arg $ phi state
-                                , arg $ theta state
-                                , arg $ psi state
+  trigger "stream_run" running [  arg $ phi vstate
+                                , arg $ theta vstate
+                                , arg $ psi vstate
                                 , arg armed ]
 
 -- Compile the spec
