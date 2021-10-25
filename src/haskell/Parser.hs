@@ -22,9 +22,9 @@ data ParseState = ParseState { sending   :: SBool
                              , pindex    :: SWord8
                              , msgtype   :: SWord8 }
 
-parse :: SBool -> SWord8 -> (SBool, SBool, SWord8, SWord8)
+parse :: SBool -> SWord8 -> ParseState
 
-parse avail byte = (sending, receiving, pindex, msgtype) where
+parse avail byte = ParseState sending receiving pindex msgtype where
 
   -- Payload handling
   input_size = if state == 3 then byte else input_size'
