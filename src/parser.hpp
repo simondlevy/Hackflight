@@ -43,10 +43,6 @@ static void prepareToSerialize(
         uint8_t type,
         uint8_t msgsize)
 {
-    setOutBuf(buffer, 0, ready, '$');
-    setOutBuf(buffer, 1, ready, 'M');
-    setOutBuf(buffer, 2, ready, '>');
-
     buffer_size = ready ? 3 : buffer_size;
     crc_out = ready ? 0 : crc_out;
 
@@ -125,6 +121,10 @@ void parse(
     _buffer_index = ready ? 0 : _buffer_index;
 
     uint8_t outsize = _msgtype == 121 ? 6 : _msgtype == 122 ? 3 : 0;
+
+    setOutBuf(_buffer, 0, ready, '$');
+    setOutBuf(_buffer, 1, ready, 'M');
+    setOutBuf(_buffer, 2, ready, '>');
 
     prepareToSerialize(_buffer, _buffer_size, _crc_out, ready, _msgtype, outsize*4);
 
