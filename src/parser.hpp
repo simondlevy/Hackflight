@@ -44,15 +44,10 @@ static void prepareToSerialize(
         uint8_t msgsize)
 {
     buffer_size = ready ? 3 : buffer_size;
-
-    //serialize(buffer, buffer_size, ready, msgsize);
-    //serialize(buffer, buffer_size, ready, msgtype);
-
     buffer[buffer_size] = ready ? msgsize : buffer[buffer_size];
-    buffer_size = ready ? buffer_size + 1 : buffer_size;
-
+    buffer_size = ready ? 4 : buffer_size;
     buffer[buffer_size] = ready ? msgtype : buffer[buffer_size];
-    buffer_size = ready ? buffer_size + 1 : buffer_size;
+    buffer_size = ready ? 5 : buffer_size;
 }
 
 static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, bool ready, float value)
