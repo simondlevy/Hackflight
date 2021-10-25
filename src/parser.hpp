@@ -10,6 +10,7 @@
 
 #include "stream_receiver.h"
 #include "stream_serial.h"
+#include "buffer.h"
 
 #include "debugger.hpp"
 #ifndef stream_receiverRoll
