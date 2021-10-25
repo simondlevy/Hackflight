@@ -14,7 +14,6 @@ module Parser where
 import Language.Copilot hiding(xor)
 import Prelude hiding((==), (>=), (<=), (&&), (||), (++), not)
 
-import Serial
 import Utils
 
 data ParserState = ParserState { sending   :: SBool

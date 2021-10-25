@@ -31,6 +31,7 @@ import YawPid(yawController)
 import LevelPid(levelController)
 
 -- Serial comms
+import Serial
 import Parser
 
 -- Misc
