@@ -64,7 +64,8 @@ spec = do
   let starting = not running
 
   -- Run the Hackflight algorithm
-  let (vstate, armed, motors, led, pstate) = hackflight receiver sensors pidfuns serialAvailable serialByteIn
+  let (vstate, armed, motors, led, pstate) =
+    hackflight receiver sensors pidfuns serialAvailable serialByteIn
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
