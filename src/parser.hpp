@@ -138,24 +138,23 @@ void parse(
     prepareToSerializeFloats(_buffer, _buffer_size, _crc_out, ready, _msgtype, 
             _msgtype == 121 ? 6 : _msgtype == 122 ? 3 : 0);
 
+    serializeFloat(_buffer, _buffer_size, _crc_out, ready,
+            _msgtype == 121 ? stream_receiverThrottle : _msgtype == 122 ? state_phi : 0);
+
+    serializeFloat(_buffer, _buffer_size, _crc_out, ready,
+            _msgtype == 121 ? stream_receiverRoll : _msgtype == 122 ? state_theta : 0);
+
+
+    serializeFloat(_buffer, _buffer_size, _crc_out, ready,
+            _msgtype == 121 ? stream_receiverPitch : _msgtype == 122 ? state_psi : 0);
+
     switch (_msgtype) {
 
         case 121:
             {
-                serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverThrottle);
-                serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverRoll);
-                serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverPitch);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverYaw);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverAux1);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverAux2);
-
-            } break;
-
-        case 122:
-            {
-                serializeFloat(_buffer, _buffer_size, _crc_out, ready, state_phi);
-                serializeFloat(_buffer, _buffer_size, _crc_out, ready, state_theta);
-                serializeFloat(_buffer, _buffer_size, _crc_out, ready, state_psi);
 
             } break;
 
