@@ -26,10 +26,9 @@ void parse(bool avail, uint8_t byte,
     _msgtype = _parser_state == 4 ? byte : _msgtype;
 
     // Checksum transition function
-    _crc_in = _parser_state == 3 ? byte
-        : _parser_state == 4  ?  _crc_in ^ byte 
-        : receiving ?  _crc_in ^ byte
+    _crc_in = _parser_state == 4 ? byte
         : _parser_state == 5  ?  _crc_in
+        : receiving ?  _crc_in ^ byte
         : 0;
 
     // Parser state transition function
