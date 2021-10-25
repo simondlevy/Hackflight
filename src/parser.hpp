@@ -25,15 +25,9 @@ static void setOutBuf(uint8_t * buffer, uint8_t index, bool ready, uint8_t byte)
 
 static void serialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, bool ready, uint8_t byte)
 {
-    buffer[buffer_size] = ready ? byte : buffer[buffer_size];
+    setOutBuf(buffer, buffer_size, ready, byte);
     buffer_size = ready ? buffer_size + 1 : buffer_size;
     crc_out = ready ? crc_out ^ byte : crc_out;
-}
-
-static void serialize(uint8_t * buffer, uint8_t & buffer_size, bool ready, uint8_t byte)
-{
-    buffer[buffer_size] = ready ? byte : buffer[buffer_size];
-    buffer_size = ready ? buffer_size + 1 : buffer_size;
 }
 
 static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, bool ready, float value)
