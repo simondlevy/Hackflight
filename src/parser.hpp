@@ -115,13 +115,13 @@ void parse(
 
     _buffer_index = ready ? 0 : _buffer_index;
 
-    uint8_t outsize = _msgtype == 121 ? 6 : _msgtype == 122 ? 3 : 0;
+    uint8_t outsize = 4 * (_msgtype == 121 ? 6 : _msgtype == 122 ? 3 : 0);
 
     setOutBuf(_buffer, 0, ready, '$');
     setOutBuf(_buffer, 1, ready, 'M');
     setOutBuf(_buffer, 2, ready, '>');
 
-    prepareToSerialize(_buffer, _buffer_size, _crc_out, ready, _msgtype, outsize*4);
+    prepareToSerialize(_buffer, _buffer_size, _crc_out, ready, _msgtype, outsize);
 
     serializeFloat(_buffer, _buffer_size, _crc_out, ready,
             _msgtype == 121 ? stream_receiverThrottle : _msgtype == 122 ? state_phi : 0);
