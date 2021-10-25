@@ -142,7 +142,6 @@ void parse(
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverYaw);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverAux1);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, stream_receiverAux2);
-                completeSend(_buffer, _buffer_size, _crc_out, ready);
 
             } break;
 
@@ -152,11 +151,12 @@ void parse(
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, state_phi);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, state_theta);
                 serializeFloat(_buffer, _buffer_size, _crc_out, ready, state_psi);
-                completeSend(_buffer, _buffer_size, _crc_out, ready);
 
             } break;
 
     } // switch (type)
+
+    completeSend(_buffer, _buffer_size, _crc_out, ready && (_msgtype == 121 || _msgtype == 122));
 
     motor_index = _msgtype == 215 ? _buffer[0] : 0;
     motor_percent = _msgtype == 215 ? _buffer[1] : 0;
