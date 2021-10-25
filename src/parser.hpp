@@ -19,29 +19,29 @@ extern float stream_receiverPitch;
 extern float stream_receiverYaw;
 #endif
 
-static void setOutBuf(uint8_t * buffer, buffer_t & buff, uint8_t index, bool ready, uint8_t byte)
+static void setOutBuf(uint8_t * buffer, buffer_t & buff, uint8_t index, bool sending, uint8_t byte)
 {
-    buffer[index] = ready ? byte : buffer[index];
-    setbuff(buff, ready, index, byte);
+    buffer[index] = sending ? byte : buffer[index];
+    setbuff(buff, sending, index, byte);
 }
 
 static void serialize(uint8_t * buffer, buffer_t & buff,
-        uint8_t & buffer_size, uint8_t & crc_out, bool ready, uint8_t byte)
+        uint8_t & buffer_size, uint8_t & crc_out, bool sending, uint8_t byte)
 {
-    setOutBuf(buffer, buff, buffer_size, ready, byte);
-    buffer_size = ready ? buffer_size + 1 : buffer_size;
-    crc_out = ready ? crc_out ^ byte : crc_out;
+    setOutBuf(buffer, buff, buffer_size, sending, byte);
+    buffer_size = sending ? buffer_size + 1 : buffer_size;
+    crc_out = sending ? crc_out ^ byte : crc_out;
 }
 
 static void serializeFloat(uint8_t * buffer, buffer_t & buff,
-        uint8_t & buffer_size, uint8_t & crc_out, bool ready, float value)
+        uint8_t & buffer_size, uint8_t & crc_out, bool sending, float value)
 {
     uint32_t uintval = 1000 * (value + 2);
 
-    serialize(buffer, buff, buffer_size, crc_out, ready, uintval     & 0xFF);
-    serialize(buffer, buff, buffer_size, crc_out, ready, uintval>>8  & 0xFF);
-    serialize(buffer, buff, buffer_size, crc_out, ready, uintval>>16 & 0xFF);
-    serialize(buffer, buff, buffer_size, crc_out, ready, uintval>>24 & 0xFF);
+    serialize(buffer, buff, buffer_size, crc_out, sending, uintval     & 0xFF);
+    serialize(buffer, buff, buffer_size, crc_out, sending, uintval>>8  & 0xFF);
+    serialize(buffer, buff, buffer_size, crc_out, sending, uintval>>16 & 0xFF);
+    serialize(buffer, buff, buffer_size, crc_out, sending, uintval>>24 & 0xFF);
 }
 
 void parse(
@@ -71,7 +71,7 @@ void parse(
     // Payload functions
     _input_size = _parser_state == 3 ? stream_serialByte : _input_size;
     _payload_index = _parser_state == 5 ? _payload_index + 1 : 0;
-    bool in_payload = _msgtype >= 200 && _parser_state == 5 && _payload_index <= _input_size;
+    bool receiving = _msgtype >= 200 && _parser_state == 5 && _payload_index <= _input_size;
 
     // Command acquisition function
     _msgtype = _parser_state == 4 ? stream_serialByte : _msgtype;
@@ -79,7 +79,7 @@ void parse(
     // Checksum transition function
     _crc_in = _parser_state == 3 ? stream_serialByte
         : _parser_state == 4  ?  _crc_in ^ stream_serialByte 
-        : in_payload ?  _crc_in ^ stream_serialByte
+        : receiving ?  _crc_in ^ stream_serialByte
         : _parser_state == 5  ?  _crc_in
         : 0;
 
@@ -90,51 +90,51 @@ void parse(
         : _parser_state == 2 && (stream_serialByte == '<' || stream_serialByte == '>') ? 3
         : _parser_state == 3 ? 4
         : _parser_state == 4 ? 5
-        : _parser_state == 5 && in_payload ? 5
+        : _parser_state == 5 && receiving ? 5
         : _parser_state == 5 ? 0
         : _parser_state;
 
     // Incoming payload accumulation
-    uint8_t pindex = in_payload ? _payload_index - 1 : 0;
-    _buffer[pindex] = in_payload ? stream_serialByte : _buffer[pindex];
-    setbuff(_buff, in_payload, pindex, stream_serialByte);
+    uint8_t pindex = receiving ? _payload_index - 1 : 0;
+    _buffer[pindex] = receiving ? stream_serialByte : _buffer[pindex];
+    setbuff(_buff, receiving, pindex, stream_serialByte);
 
     // Message dispatch
-    bool ready = stream_serialAvailable
+    bool sending = stream_serialAvailable
               && _parser_state == 0
               && _crc_in == stream_serialByte
               && (_msgtype == 121 || _msgtype == 122);
 
-    _buffer_index = ready ? 0 : _buffer_index;
+    _buffer_index = sending ? 0 : _buffer_index;
 
     uint8_t outsize = 4 * (_msgtype == 121 ? 6 : _msgtype == 122 ? 3 : 0);
 
-    setOutBuf(_buffer, _buff, 0, ready, '$');
-    setOutBuf(_buffer, _buff, 1, ready, 'M');
-    setOutBuf(_buffer, _buff, 2, ready, '>');
+    setOutBuf(_buffer, _buff, 0, sending, '$');
+    setOutBuf(_buffer, _buff, 1, sending, 'M');
+    setOutBuf(_buffer, _buff, 2, sending, '>');
 
-    _buffer_size = ready ? 3 : _buffer_size;
-    _buffer[_buffer_size] = ready ? outsize : _buffer[_buffer_size];
-    setbuff(_buff, ready, _buffer_size, outsize);
+    _buffer_size = sending ? 3 : _buffer_size;
+    _buffer[_buffer_size] = sending ? outsize : _buffer[_buffer_size];
+    setbuff(_buff, sending, _buffer_size, outsize);
 
-    _buffer_size = ready ? 4 : _buffer_size;
-    _buffer[_buffer_size] = ready ? _msgtype : _buffer[_buffer_size];
-    setbuff(_buff, ready, _buffer_size, _msgtype);
+    _buffer_size = sending ? 4 : _buffer_size;
+    _buffer[_buffer_size] = sending ? _msgtype : _buffer[_buffer_size];
+    setbuff(_buff, sending, _buffer_size, _msgtype);
 
-    _buffer_size = ready ? 5 : _buffer_size;
+    _buffer_size = sending ? 5 : _buffer_size;
 
-    _crc_out = ready ? outsize ^ _msgtype : 0;
+    _crc_out = sending ? outsize ^ _msgtype : 0;
 
-    serializeFloat(_buffer, _buff, _buffer_size, _crc_out, ready,
+    serializeFloat(_buffer, _buff, _buffer_size, _crc_out, sending,
             _msgtype == 121 ? stream_receiverThrottle : _msgtype == 122 ? state_phi : 0);
 
-    serializeFloat(_buffer, _buff, _buffer_size, _crc_out, ready,
+    serializeFloat(_buffer, _buff, _buffer_size, _crc_out, sending,
             _msgtype == 121 ? stream_receiverRoll : _msgtype == 122 ? state_theta : 0);
 
-    serializeFloat(_buffer, _buff, _buffer_size, _crc_out, ready,
+    serializeFloat(_buffer, _buff, _buffer_size, _crc_out, sending,
             _msgtype == 121 ? stream_receiverPitch : _msgtype == 122 ? state_psi : 0);
 
-    bool sendrc = ready && _msgtype == 121;
+    bool sendrc = sending && _msgtype == 121;
 
     serializeFloat(_buffer, _buff, _buffer_size, _crc_out, sendrc, stream_receiverYaw);
 
@@ -142,7 +142,7 @@ void parse(
 
     serializeFloat(_buffer, _buff, _buffer_size, _crc_out, sendrc, stream_receiverAux2);
 
-    serialize(_buffer, _buff, _buffer_size, _crc_out, ready, _crc_out);
+    serialize(_buffer, _buff, _buffer_size, _crc_out, sending, _crc_out);
 
     motor_index = _msgtype == 215 ? _buffer[0] : 0;
     motor_percent = _msgtype == 215 ? _buffer[1] : 0;
