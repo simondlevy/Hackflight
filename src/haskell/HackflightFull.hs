@@ -22,9 +22,11 @@ import Time
 import Mixer
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State, SBool, Motors, SBool)
+hackflight :: Receiver -> [Sensor] -> [PidFun]
+  -> (State, SBool, Motors, SBool)
 
-hackflight receiver sensors pidfuns = (state, armed', motors, led)
+hackflight receiver sensors pidfuns
+  = (state, armed', motors, led)
 
   where
 

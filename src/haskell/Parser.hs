@@ -17,6 +17,11 @@ import Prelude hiding((==), (>=), (<=), (&&), (||), (++), not)
 import Serial
 import Utils
 
+data ParseState = ParseState { sending   :: SBool
+                             , receiving :: SBool
+                             , pindex    :: SWord8
+                             , msgtype   :: SWord8 }
+
 parse :: SBool -> SWord8 -> (SBool, SBool, SWord8, SWord8)
 
 parse avail byte = (sending, receiving, pindex, msgtype) where
