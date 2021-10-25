@@ -33,7 +33,7 @@ parse avail byte = ParserState sending receiving index msgtype where
       else if state' == 4 then 5
       -- else if state' == 5 && receiving then 5
       else if state' == 5 then 0
-      else state' :: SWord8
+      else state'
 
   -- Payload handling
   input_size = if state == 3 then byte else input_size'
@@ -42,7 +42,7 @@ parse avail byte = ParserState sending receiving index msgtype where
   -- Command acquisition function
   msgtype = if state == 4 then byte else msgtype'
 
-  receiving = msgtype >= 200 && state == 5 && payload_index <= input_size
+  receiving = msgtype >= 200 && state' == 5 && payload_index <= input_size
 
   incoming = msgtype >= 200
 
@@ -58,7 +58,7 @@ parse avail byte = ParserState sending receiving index msgtype where
   index = if receiving then payload_index - 1 else 0
 
   -- State variables
-  state'         = [0] ++ state
+  state'         = [0] ++ state :: SWord8
   input_size'    = [0] ++ input_size
   payload_index' = [0] ++ payload_index :: SWord8
   msgtype'       = [0] ++ msgtype :: SWord8
