@@ -8,8 +8,6 @@
 
 typedef struct {
 
-    uint8_t index;
-
     uint8_t byte00;
     uint8_t byte01;
     uint8_t byte02;
@@ -50,7 +48,7 @@ static void _set(uint8_t & oldval, uint8_t index, uint8_t target, uint8_t newval
     oldval = ready && (index == target) ? newval : oldval;
 }
 
-void setbuff(buffer_t & buff, uint8_t index, uint8_t value, bool ready)
+void setbuff(buffer_t & buff, bool ready, uint8_t index, uint8_t value)
 {
     _set(buff.byte00, index, value, 0, ready);
     _set(buff.byte01, index, value, 1, ready);
