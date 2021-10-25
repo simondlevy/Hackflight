@@ -83,6 +83,9 @@ spec = do
   trigger "stream_updateTime" running []
   trigger "stream_writeLed" running [arg led_pin, arg led]
 
+  trigger "stream_serialUpdate" running []
+  trigger "stream_serialRead" serialAvailable []
+
   trigger "stream_run" running [  arg $ phi vstate
                                 , arg $ theta vstate
                                 , arg $ psi vstate

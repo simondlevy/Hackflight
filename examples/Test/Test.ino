@@ -124,17 +124,9 @@ void stream_run(
 
     _buffer_index = data_available ? _buffer_index + 1 : _buffer_index;
 
-    stream_serialUpdate();
-
-    if (stream_serialAvailable) {
-        stream_serialRead();
-    }
-
     if (data_available) {
         stream_serialWrite(data_byte);
     }
-
-
 
     delay(10);
 }
