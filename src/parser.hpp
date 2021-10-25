@@ -97,7 +97,7 @@ void parse(
     // Incoming payload accumulation
     uint8_t pindex = in_payload ? _payload_index - 1 : 0;
     _buffer[pindex] = in_payload ? stream_serialByte : _buffer[pindex];
-    setbuff(_buff, in_payload, _payload_index, stream_serialByte);
+    setbuff(_buff, in_payload, pindex, stream_serialByte);
 
     // Message dispatch
     bool ready = stream_serialAvailable
