@@ -20,6 +20,7 @@ import PidController
 import Safety
 import Time
 import Mixer
+import Parser
 import Utils
 
 hackflight :: Receiver -> [Sensor] -> [PidFun]
