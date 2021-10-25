@@ -11,9 +11,12 @@
 #include "stream_receiver.h"
 #include "stream_serial.h"
 
-//extern float stream_receiverRoll;
-//extern float stream_receiverPitch;
-//extern float stream_receiverYaw;
+#include "debugger.hpp"
+#ifndef stream_receiverRoll
+extern float stream_receiverRoll;
+extern float stream_receiverPitch;
+extern float stream_receiverYaw;
+#endif
 
 static void addToOutBuf(uint8_t * buffer, uint8_t & buffer_size, bool ready, uint8_t byte)
 {
@@ -153,14 +156,10 @@ void parse(
 
             } break;
 
-        case 215:
-            {
-                motor_index = _buffer[0];
-                motor_percent = _buffer[1];
-
-            } break;
-
     } // switch (type)
+
+    motor_index = _msgtype == 215 ? _buffer[0] : 0;
+    motor_percent = _msgtype == 215 ? _buffer[1] : 0;
 
     data_available = _buffer_size > 0;
     if (data_available) {
