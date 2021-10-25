@@ -25,6 +25,12 @@ parse :: SBool -> SWord8 -> ParserState
 
 parse avail byte = ParserState sending receiving index msgtype where
 
+  sending = false
+  receiving = false
+  index = 0
+  msgtype = 0
+
+{--
   -- Payload handling
   input_size = if state == 3 then byte else input_size'
   payload_index = if state == 5 then payload_index' + 1 else 0
@@ -63,4 +69,5 @@ parse avail byte = ParserState sending receiving index msgtype where
   payload_index' = [0] ++ payload_index
   crc_in'        = [0] ++ crc_in
   msgtype'       = [0] ++ msgtype
+--}
 

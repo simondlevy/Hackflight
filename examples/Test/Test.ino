@@ -72,6 +72,8 @@ void stream_run(
     parse(stream_serialAvailable, stream_serialByte,
           sending, receiving, index, msgtype);
 
+    Debugger::printf(Serial1, "%d %d\n", sending, sending_);
+
     _buffer[index] = receiving ? stream_serialByte : _buffer[index];
 
     _buffer_index = sending ? 0 : _buffer_index;

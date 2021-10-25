@@ -27,24 +27,22 @@ hackflight :: Receiver -> [Sensor] -> [PidFun] -> SBool -> SWord8
   -> (State, SBool, Motors, SBool, ParserState)
 
 hackflight receiver sensors pidfuns avail byte
-  = (state, armed', motors, led, pstate)
+  = (vstate, armed', motors, led, pstate)
 
   where
-
-    pstate = ParserState false false 0 0
 
     -- Get receiver demands from external C functions
     rdemands = getDemands receiver
 
     -- Get the vehicle state by composing the sensor functions over the current state
-    state = compose sensors (state' state)
+    vstate = compose sensors (state' vstate)
 
     -- Periodically get the demands by composing the PID controllers over the receiver
     -- demands
-    (_, _, pdemands) = compose pidfuns (state, timerReady 300, rdemands)
+    (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
 
     -- Check safety (arming / failsafe)
-    (armed, failsafe, mzero) = safety rdemands state
+    (armed, failsafe, mzero) = safety rdemands vstate
 
     -- Run mixer on demands to get motor values
     motors = mix mzero pdemands
@@ -55,3 +53,7 @@ hackflight receiver sensors pidfuns avail byte
     -- Track previous value of arming state to support shutting of motors on
     -- disarm and setting them over serial connection from GCS
     armed' = [False] ++ armed
+
+    -- Run parser
+    pstate = parse avail byte
+
