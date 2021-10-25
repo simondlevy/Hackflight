@@ -12,8 +12,6 @@ module HackflightFull where
 
 import Language.Copilot
 
-import Prelude hiding((!!), (||), (++), (<), (>), (&&), (==), div, mod, not)
-
 import Receiver
 import State
 import Sensor
