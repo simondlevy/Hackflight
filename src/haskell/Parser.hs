@@ -12,7 +12,7 @@
 module Parser where
 
 import Language.Copilot hiding(xor)
-import Prelude hiding((==), (>=), (<=), (&&), (||), (++), not)
+import Prelude hiding((==), (>=), (<=), (&&), (||), (++), (+), not)
 
 import Utils
 
@@ -42,9 +42,9 @@ parse avail byte = ParserState sending receiving index msgtype where
 
   -- Payload handling
   input_size = if state == 3 then byte else input_size'
+  payload_index = if state == 5 then payload_index' + 1 else 0
 
 {--
-  payload_index = if state == 5 then payload_index' + 1 else 0
 
   receiving = msgtype >= 200 && state == 5 && payload_index <= input_size
 
@@ -64,7 +64,6 @@ parse avail byte = ParserState sending receiving index msgtype where
 
   index = if receiving then payload_index - 1 else 0
 
-  payload_index' = [0] ++ payload_index
   crc_in'        = [0] ++ crc_in
   msgtype'       = [0] ++ msgtype
 --}
@@ -72,3 +71,4 @@ parse avail byte = ParserState sending receiving index msgtype where
   -- State variables
   state'         = [0] ++ state
   input_size'    = [0] ++ input_size
+  payload_index' = [0] ++ payload_index :: SWord8
