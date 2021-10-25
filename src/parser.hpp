@@ -33,16 +33,16 @@ static void serialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out
 static void prepareToSerialize(
         uint8_t * buffer,
         uint8_t & buffer_size,
-        uint8_t & crc_out,
         bool ready,
         uint8_t msgtype,
         uint8_t msgsize)
 {
     buffer_size = ready ? 3 : buffer_size;
-    crc_out = ready ? 0 : crc_out;
 
-    serialize(buffer, buffer_size, crc_out, ready, msgsize);
-    serialize(buffer, buffer_size, crc_out, ready, msgtype);
+    uint8_t tmp = 0;
+
+    serialize(buffer, buffer_size, tmp, ready, msgsize);
+    serialize(buffer, buffer_size, tmp, ready, msgtype);
 }
 
 static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, bool ready, float value)
@@ -121,7 +121,9 @@ void parse(
     setOutBuf(_buffer, 1, ready, 'M');
     setOutBuf(_buffer, 2, ready, '>');
 
-    prepareToSerialize(_buffer, _buffer_size, _crc_out, ready, _msgtype, outsize);
+    prepareToSerialize(_buffer, _buffer_size, ready, _msgtype, outsize);
+
+    _crc_out = ready ? outsize ^ _msgtype : 0;
 
     serializeFloat(_buffer, _buffer_size, _crc_out, ready,
             _msgtype == 121 ? stream_receiverThrottle : _msgtype == 122 ? state_phi : 0);
