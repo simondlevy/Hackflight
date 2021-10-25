@@ -63,7 +63,7 @@ spec = do
   let running = if not flipflop then true else running' where running' = [False] ++ running
   let starting = not running
 
-  let (state, armed, motors, led, pstate) = hackflight receiver sensors pidfuns
+  let (state, armed, motors, led, pstate) = hackflight receiver sensors pidfuns false 0
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []

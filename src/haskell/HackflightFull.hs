@@ -23,10 +23,10 @@ import Mixer
 import Parser
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun]
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> SBool -> SWord8
   -> (State, SBool, Motors, SBool, ParserState)
 
-hackflight receiver sensors pidfuns
+hackflight receiver sensors pidfuns avail byte
   = (state, armed', motors, led, pstate)
 
   where
