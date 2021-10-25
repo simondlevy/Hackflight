@@ -128,7 +128,11 @@ void parse(
     _buffer[pindex] = in_payload ? stream_serialByte : _buffer[pindex];
 
     // Message dispatch
-    bool ready = stream_serialAvailable && _parser_state == 0 && _crc_in == stream_serialByte;
+    bool ready = stream_serialAvailable
+              && _parser_state == 0
+              && _crc_in == stream_serialByte
+              && (_msgtype == 121 || _msgtype == 122);
+
     _buffer_index = ready ? 0 : _buffer_index;
 
     switch (_msgtype) {
@@ -156,7 +160,7 @@ void parse(
 
     } // switch (type)
 
-    completeSend(_buffer, _buffer_size, _crc_out, ready && (_msgtype == 121 || _msgtype == 122));
+    completeSend(_buffer, _buffer_size, _crc_out, ready);
 
     motor_index = _msgtype == 215 ? _buffer[0] : 0;
     motor_percent = _msgtype == 215 ? _buffer[1] : 0;
