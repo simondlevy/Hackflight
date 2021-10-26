@@ -135,15 +135,10 @@ void stream_run(
     uint8_t motor_index = msgtype == 215 ? _buffer[0] : 0;
     uint8_t motor_percent = msgtype == 215 ? _buffer[1] : 0;
 
-    uint8_t data_available = _buffer_size > 0;
-
-    _buffer_size = data_available ? _buffer_size - 1 : _buffer_size;
-
-    uint8_t data_byte = data_available ? _buffer[_buffer_index] : 0;
-
-    _buffer_index = data_available ? _buffer_index + 1 : _buffer_index;
-
-    if (data_available) {
+    if (_buffer_size > 0) {
+        _buffer_size = _buffer_size - 1;
+        uint8_t data_byte = _buffer[_buffer_index];
+        _buffer_index = _buffer_index + 1;
         stream_serialWrite(data_byte);
     }
 
