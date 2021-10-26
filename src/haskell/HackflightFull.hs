@@ -20,14 +20,13 @@ import PidController
 import Safety
 import Time
 import Mixer
-import Parser
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> SBool -> SWord8
-  -> (State, SBool, Motors, SBool, ParserState)
+hackflight :: Receiver -> [Sensor] -> [PidFun]
+  -> (State, SBool, Motors, SBool)
 
-hackflight receiver sensors pidfuns avail byte
-  = (vstate, armed', motors, led, pstate)
+hackflight receiver sensors pidfuns 
+  = (vstate, armed', motors, led)
 
   where
 
@@ -53,7 +52,3 @@ hackflight receiver sensors pidfuns avail byte
     -- Track previous value of arming state to support shutting of motors on
     -- disarm and setting them over serial connection from GCS
     armed' = [False] ++ armed
-
-    -- Run parser
-    pstate = parse avail byte
-

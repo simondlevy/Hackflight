@@ -182,6 +182,8 @@ class GCS(MspParser):
 
     def handle_STATE(self, phi, theta, psi):
 
+        debug('Got state')
+
         self.roll_pitch_yaw = (self._float(phi),
                                self._float(theta),
                                self._float(psi))
@@ -191,6 +193,7 @@ class GCS(MspParser):
         # As soon as we handle the callback from one request, send another
         # request, if IMU dialog is running
         if self.imu.running:
+            debug('Sending back')
             self._send_state_request()
 
     def handle_ACTUATOR_TYPE(self, atype):

@@ -49,8 +49,6 @@ pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
            , levelController 0.2 -- Kp
           ]
 
--- mixer = quadXMWMixer
-
 spec = do
 
   -- Make flags for startup, loop
@@ -59,11 +57,8 @@ spec = do
   let starting = not running
 
   -- Run the Hackflight algorithm
-  let (vstate, armed, motors, led, pstate) = hackflight receiver
-                                                        sensors
-                                                        pidfuns
-                                                        serialAvailable
-                                                        serialByteIn
+  let (vstate, armed, motors, led) = hackflight receiver sensors pidfuns
+
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
   trigger "stream_startLed" starting [arg led_pin]
@@ -77,14 +72,13 @@ spec = do
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" serialAvailable []
 
+  let pstate = parse serialByteIn
+
   trigger "stream_run" running [  arg $ phi vstate
                                 , arg $ theta vstate
                                 , arg $ psi vstate
                                 , arg armed 
                                 , arg $ sending pstate
-                                , arg $ receiving pstate
-                                , arg $ index pstate
-                                , arg $ msgtype pstate
                                ]
 
 -- Compile the spec

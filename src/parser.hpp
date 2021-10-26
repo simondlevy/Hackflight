@@ -6,8 +6,14 @@
 
 #pragma once
 
-void parse(bool avail, uint8_t byte,
-        bool & sending, bool & receiving, uint8_t & pindex, uint8_t & msgtype)
+void parse(
+          bool avail
+        , uint8_t byte
+        , bool & sending
+        , bool & receiving
+        , uint8_t & pindex
+        , uint8_t & msgtype
+        )
 {
     static uint8_t _state;
     static uint8_t _size;

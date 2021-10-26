@@ -64,11 +64,8 @@ spec = do
   let starting = not running
 
   -- Run the Hackflight algorithm
-  let (vstate, armed, motors, led, pstate) = hackflight receiver
-                                                        sensors
-                                                        pidfuns
-                                                        serialAvailable
-                                                        serialByteIn
+  let (vstate, armed, motors, led) = hackflight receiver sensors pidfuns
+
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
   trigger "stream_startI2C" starting []
@@ -98,10 +95,8 @@ spec = do
                                 , arg $ m2 motors
                                 , arg $ m3 motors
                                 , arg $ m4 motors
-                                , arg $ sending pstate
-                                , arg $ receiving pstate
-                                , arg $ index pstate
-                                , arg $ msgtype pstate
+                                , arg $ serialAvailable
+                                , arg $ serialByteIn
                                ]
 
 -- Compile the spec
