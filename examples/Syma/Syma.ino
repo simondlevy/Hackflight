@@ -18,38 +18,16 @@
  */
 
 #include "copilot.h"
-
 #include "stream_serial.h"
+#include "stream_receiver.h"
+
+#include "serial.hpp"
 #include "parser.hpp"
 #include "debugger.hpp"
-#include "stream_receiver.h"
 
 void stream_writeBrushedMotors(
         uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin,
         float m1_val, float m2_val, float m3_val, float m4_val);
-
-static void setOutBuf(uint8_t * buffer, uint8_t index, uint8_t byte)
-{
-    buffer[index] = byte;
-}
-
-static void serialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, uint8_t byte)
-{
-    setOutBuf(buffer, buffer_size, byte);
-    buffer_size = buffer_size + 1;
-    crc_out ^= byte;
-}
-
-static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, float value)
-{
-    uint32_t uintval = 1000 * (value + 2);
-
-    serialize(buffer, buffer_size, crc_out, uintval     & 0xFF);
-    serialize(buffer, buffer_size, crc_out, uintval>>8  & 0xFF);
-    serialize(buffer, buffer_size, crc_out, uintval>>16 & 0xFF);
-    serialize(buffer, buffer_size, crc_out, uintval>>24 & 0xFF);
-}
-
 
 void setup(void)
 {
@@ -76,66 +54,27 @@ void stream_run(
         bool serialAvail,
         uint8_t serialByte)
 {
-    static uint8_t _outbuff[128];
-    static uint8_t _inbuff[128];
-    static uint8_t _outbuff_size;
-    static uint8_t _outbuff_index;
-    static uint8_t _crc_out;
-
     bool sending = false;
     bool receiving = false;
-    uint8_t index = 0;
+    uint8_t inbuff_index = 0;
     uint8_t msgtype = 0;
 
-    parse(serialAvail, serialByte, sending, receiving, index, msgtype);
+    parse(serialAvail, serialByte, sending, receiving, inbuff_index, msgtype);
+
+    static uint8_t _inbuff[128];
 
     if (receiving) {
-        _inbuff[index] = serialByte;
+        _inbuff[inbuff_index] = serialByte;
     }
 
     if (sending) {
-
-        setOutBuf(_outbuff, 0, '$');
-        setOutBuf(_outbuff, 1, 'M');
-        setOutBuf(_outbuff, 2, '>');
-
-        _outbuff_index = 0;
-
-        uint8_t outsize = 4 * (msgtype == 121 ? 6 : msgtype == 122 ? 3 : 0);
-
-        _outbuff[3] = outsize;
-        _outbuff[4] = msgtype;
-
-        _outbuff_size = 5;
-        _crc_out = outsize ^ msgtype;
-
-        serializeFloat(_outbuff, _outbuff_size, _crc_out,
-                msgtype == 121 ? stream_receiverThrottle : msgtype == 122 ? state_phi : 0);
-
-        serializeFloat(_outbuff, _outbuff_size, _crc_out,
-                msgtype == 121 ? stream_receiverRoll : msgtype == 122 ? state_theta : 0);
-
-        serializeFloat(_outbuff, _outbuff_size, _crc_out,
-                msgtype == 121 ? stream_receiverPitch : msgtype == 122 ? state_psi : 0);
-
-        if (msgtype == 121) {
-            serializeFloat(_outbuff, _outbuff_size, _crc_out, stream_receiverYaw);
-            serializeFloat(_outbuff, _outbuff_size, _crc_out, stream_receiverAux1);
-            serializeFloat(_outbuff, _outbuff_size, _crc_out, stream_receiverAux2);
-        }
-
-        serialize(_outbuff, _outbuff_size, _crc_out, _crc_out);
+        handleSerialInput(msgtype, state_phi, state_theta, state_psi);
     }
+
+    updateSerialOutput();
 
     uint8_t motor_index = msgtype == 215 ? _inbuff[0] : 0;
     uint8_t motor_percent = msgtype == 215 ? _inbuff[1] : 0;
-
-    if (_outbuff_size > 0) {
-        _outbuff_size = _outbuff_size - 1;
-        uint8_t data_byte = _outbuff[_outbuff_index];
-        _outbuff_index = _outbuff_index + 1;
-        stream_serialWrite(data_byte);
-    }
 
     float m1_val = armed ? m1_flying : motor_index == 1 ? motor_percent/100. : 0;
     float m2_val = armed ? m2_flying : motor_index == 2 ? motor_percent/100. : 0;
