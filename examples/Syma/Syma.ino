@@ -89,9 +89,13 @@ void stream_run(
 
     parse(serialAvail, serialByte, sending, receiving, index, msgtype);
 
-    _buffer[index] = receiving ? serialByte : _buffer[index];
+    if (receiving) {
+        _buffer[index] = serialByte;
+    }
 
-    _buffer_index = sending ? 0 : _buffer_index;
+    if (sending) {
+        _buffer_index = 0;
+    }
 
     setOutBuf(_buffer, 0, sending, '$');
     setOutBuf(_buffer, 1, sending, 'M');
