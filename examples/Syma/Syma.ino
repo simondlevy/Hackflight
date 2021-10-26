@@ -28,27 +28,26 @@ void stream_writeBrushedMotors(
         uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin,
         float m1_val, float m2_val, float m3_val, float m4_val);
 
-static void setOutBuf(uint8_t * buffer, uint8_t index, bool sending, uint8_t byte)
+static void setOutBuf(uint8_t * buffer, uint8_t index, uint8_t byte)
 {
-    buffer[index] = sending ? byte : buffer[index];
+    buffer[index] = byte;
 }
 
-static void serialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, bool sending, uint8_t byte)
+static void serialize(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, uint8_t byte)
 {
-    setOutBuf(buffer, buffer_size, sending, byte);
-    buffer_size = sending ? buffer_size + 1 : buffer_size;
-    crc_out = sending ? crc_out ^ byte : crc_out;
+    setOutBuf(buffer, buffer_size, byte);
+    buffer_size = buffer_size + 1;
+    crc_out ^= byte;
 }
 
-static void serializeFloat(uint8_t * buffer, 
-        uint8_t & buffer_size, uint8_t & crc_out, bool sending, float value)
+static void serializeFloat(uint8_t * buffer, uint8_t & buffer_size, uint8_t & crc_out, float value)
 {
     uint32_t uintval = 1000 * (value + 2);
 
-    serialize(buffer, buffer_size, crc_out, sending, uintval     & 0xFF);
-    serialize(buffer, buffer_size, crc_out, sending, uintval>>8  & 0xFF);
-    serialize(buffer, buffer_size, crc_out, sending, uintval>>16 & 0xFF);
-    serialize(buffer, buffer_size, crc_out, sending, uintval>>24 & 0xFF);
+    serialize(buffer, buffer_size, crc_out, uintval     & 0xFF);
+    serialize(buffer, buffer_size, crc_out, uintval>>8  & 0xFF);
+    serialize(buffer, buffer_size, crc_out, uintval>>16 & 0xFF);
+    serialize(buffer, buffer_size, crc_out, uintval>>24 & 0xFF);
 }
 
 
@@ -94,43 +93,38 @@ void stream_run(
     }
 
     if (sending) {
+
+        setOutBuf(_buffer, 0, '$');
+        setOutBuf(_buffer, 1, 'M');
+        setOutBuf(_buffer, 2, '>');
+
         _buffer_index = 0;
+
+        uint8_t outsize = 4 * (msgtype == 121 ? 6 : msgtype == 122 ? 3 : 0);
+
+        _buffer[3] = outsize;
+        _buffer[4] = msgtype;
+
+        _buffer_size = 5;
+        _crc_out = outsize ^ msgtype;
+
+        serializeFloat(_buffer, _buffer_size, _crc_out,
+                msgtype == 121 ? stream_receiverThrottle : msgtype == 122 ? state_phi : 0);
+
+        serializeFloat(_buffer, _buffer_size, _crc_out,
+                msgtype == 121 ? stream_receiverRoll : msgtype == 122 ? state_theta : 0);
+
+        serializeFloat(_buffer, _buffer_size, _crc_out,
+                msgtype == 121 ? stream_receiverPitch : msgtype == 122 ? state_psi : 0);
+
+        if (msgtype == 121) {
+            serializeFloat(_buffer, _buffer_size, _crc_out, stream_receiverYaw);
+            serializeFloat(_buffer, _buffer_size, _crc_out, stream_receiverAux1);
+            serializeFloat(_buffer, _buffer_size, _crc_out, stream_receiverAux2);
+        }
+
+        serialize(_buffer, _buffer_size, _crc_out, _crc_out);
     }
-
-    setOutBuf(_buffer, 0, sending, '$');
-    setOutBuf(_buffer, 1, sending, 'M');
-    setOutBuf(_buffer, 2, sending, '>');
-
-    uint8_t outsize = 4 * (msgtype == 121 ? 6 : msgtype == 122 ? 3 : 0);
-
-    _buffer_size = sending ? 3 : _buffer_size;
-    _buffer[_buffer_size] = sending ? outsize : _buffer[_buffer_size];
-
-    _buffer_size = sending ? 4 : _buffer_size;
-    _buffer[_buffer_size] = sending ? msgtype : _buffer[_buffer_size];
-
-    _buffer_size = sending ? 5 : _buffer_size;
-
-    _crc_out = sending ? outsize ^ msgtype : 0;
-
-    serializeFloat(_buffer, _buffer_size, _crc_out, sending,
-            msgtype == 121 ? stream_receiverThrottle : msgtype == 122 ? state_phi : 0);
-
-    serializeFloat(_buffer, _buffer_size, _crc_out, sending,
-            msgtype == 121 ? stream_receiverRoll : msgtype == 122 ? state_theta : 0);
-
-    serializeFloat(_buffer, _buffer_size, _crc_out, sending,
-            msgtype == 121 ? stream_receiverPitch : msgtype == 122 ? state_psi : 0);
-
-    bool sendrc = sending && msgtype == 121;
-
-    serializeFloat(_buffer, _buffer_size, _crc_out, sendrc, stream_receiverYaw);
-
-    serializeFloat(_buffer, _buffer_size, _crc_out, sendrc, stream_receiverAux1);
-
-    serializeFloat(_buffer, _buffer_size, _crc_out, sendrc, stream_receiverAux2);
-
-    serialize(_buffer, _buffer_size, _crc_out, sending, _crc_out);
 
     uint8_t motor_index = msgtype == 215 ? _buffer[0] : 0;
     uint8_t motor_percent = msgtype == 215 ? _buffer[1] : 0;
