@@ -12,26 +12,27 @@
 module Parser where
 
 import Language.Copilot hiding(xor)
-import Prelude hiding((==), (&&), (||), (++), (>))
+import Prelude hiding((==), (&&), (||), (++), (>), (<))
 
 import Utils
 
-parse1 :: SBool -> SWord8 -> (SWord8, SWord8, SWord8, SWord8, SBool, SBool)
+parse :: SBool -> SWord8 -> (SWord8, SWord8, SWord8, SWord8, SBool, SBool)
 
-parse1 avail byte = (size, msgtype, crc, state, sending, receiving) where
+parse avail byte = (size, msgtype, crc, state, sending, receiving) where
 
   state  = if state' == 0 && byte == 36 then 1
       else if state' == 1 && byte == 77 then 2
       else if state' == 2 && (byte == 60 || byte == 62) then 3
       else if state' == 3 then 4
       else if state' == 4 then 5
+      -- else if state' == 5 then if (size > 0 && index < size) then 5 else 6
       else if state' == 5 then 6
-      else if state' == 6 then 0
-      else state'
+      else 0
 
   size = if state == 4 then byte else size'
   msgtype = if state == 5 then byte else msgtype'
   receiving = if state == 4 then size > 0 else if state == 5 then receiving' else false
+  index = if state' == 4 then 0 else if state' == 5 then index' + 1 else 0
   crc = if state == 6 then byte else crc'
 
   sending = avail && state == 6 && crc == byte && size == 0
@@ -41,15 +42,5 @@ parse1 avail byte = (size, msgtype, crc, state, sending, receiving) where
   size'      = [0] ++ size :: SWord8
   msgtype'   = [0] ++ msgtype :: SWord8
   receiving' = [False] ++ receiving
+  index'     = [0] ++ index :: SWord8
   crc'       = [0] ++ crc :: SWord8
-
-
-
-
-
-
-
-
-
-
-
