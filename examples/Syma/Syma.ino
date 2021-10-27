@@ -59,13 +59,15 @@ void stream_run(
     uint8_t inbuff_index = 0;
     uint8_t msgtype = 0;
 
-    parse(serialAvail, serialByte, sending, receiving, inbuff_index, msgtype);
+    //parse(serialAvail, serialByte, sending, receiving, inbuff_index, msgtype);
+    parse1(serialAvail, serialByte, sending, msgtype);
 
+    /*
     static uint8_t _inbuff[128];
 
     if (receiving) {
         _inbuff[inbuff_index] = serialByte;
-    }
+    }*/
 
     if (sending) {
         handleSerialInput(msgtype, state_phi, state_theta, state_psi);
@@ -73,6 +75,7 @@ void stream_run(
 
     updateSerialOutput();
 
+    /*
     uint8_t motor_index = msgtype == 215 ? _inbuff[0] : 0;
     uint8_t motor_percent = msgtype == 215 ? _inbuff[1] : 0;
 
@@ -82,4 +85,5 @@ void stream_run(
     float m4_val = armed ? m4_flying : motor_index == 4 ? motor_percent/100. : 0;
 
     stream_writeBrushedMotors(m1_pin, m2_pin, m3_pin, m4_pin, m1_val, m2_val, m3_val, m4_val);
+    */
 }

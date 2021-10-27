@@ -20,5 +20,5 @@ import Utils
 serialAvailable :: Stream Bool
 serialAvailable = extern "stream_serialAvailable" Nothing
 
-serialByteIn :: Stream Word8
-serialByteIn = extern "stream_serialByte" Nothing
+serialByte :: Stream Word8
+serialByte = extern "stream_serialByte" Nothing

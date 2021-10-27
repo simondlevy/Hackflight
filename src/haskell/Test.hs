@@ -72,13 +72,16 @@ spec = do
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" serialAvailable []
 
-  let pstate = parse serialByteIn
+  let (psize, msgtype, crc, pstate, sending) = parse1 serialAvailable serialByte
 
-  trigger "stream_run" running [  arg $ phi vstate
-                                , arg $ theta vstate
-                                , arg $ psi vstate
-                                , arg armed 
-                                , arg $ sending pstate
+  trigger "stream_run" running [  
+                                  arg serialAvailable
+                                , arg serialByte
+                                , arg pstate 
+                                , arg psize 
+                                , arg msgtype 
+                                , arg crc 
+                                , arg sending 
                                ]
 
 -- Compile the spec
