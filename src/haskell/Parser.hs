@@ -31,7 +31,6 @@ parse avail byte = (size, msgtype, crc, state, sending, receiving) where
   size = if state == 4 then byte else size'
   msgtype = if state == 5 then byte else msgtype'
   receiving = if state == 4 then size > 0 else if state == 5 then receiving' else false
-  index = if state' == 4 then 0 else if state' == 5 then index' + 1 else 0
   crc = if state == 6 then byte else crc'
 
   sending = avail && state == 6 && crc == byte && size == 0

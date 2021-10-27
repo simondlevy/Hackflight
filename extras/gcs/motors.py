@@ -53,6 +53,8 @@ class MotorScale(object):
 
     def callback(self, valstr):
 
+        debug('callback')
+
         try:
             self.dialog.gcs.sendMotorMessage(self.index, int(valstr))
         except Exception:  # at startup
@@ -319,6 +321,7 @@ class MotorsCoaxial(Motors):
 
     def _cut_motors(self):
         try:
+            debug('cut motors')
             self.gcs.sendMotorMessage(1, 0)
             self.gcs.sendMotorMessage(2, 0)
             self.gcs.sendMotorMessage(3, 0)
