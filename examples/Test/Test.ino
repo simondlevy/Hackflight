@@ -5,10 +5,18 @@
 
  */
 
+#include "serial.hpp"
 #include "debugger.hpp"
 #include "stream_serial.h"
 #include "stream_receiver.h"
 #include "copilot.h"
+
+//float stream_receiverThrottle;
+//float stream_receiverRoll;
+//float stream_receiverPitch;
+//float stream_receiverYaw;
+//float stream_receiverAux1;
+//float stream_receiverAux2;
 
 void setup(void)
 {
@@ -33,11 +41,22 @@ void stream_run(
         uint8_t crc,
         bool sending)
 {
+    /*
     if (avail) {
         Debugger::printf(Serial1,
                 "byte=x%02x  state=%d size=%d msgtype=%d crc=x%02x sending=%d\n",
                 byteval, pstate, psize, msgtype, crc, sending);
+    }*/
+
+    static float state_phi;
+    static float state_theta;
+    static float state_psi;
+
+    if (sending) {
+        handleSerialInput(msgtype, state_phi, state_theta, state_psi);
     }
+
+    updateSerialOutput();
 
     delay(10);
 }

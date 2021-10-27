@@ -18,7 +18,6 @@
  */
 
 #include "copilot.h"
-#include "stream_serial.h"
 #include "stream_receiver.h"
 
 #include "serial.hpp"

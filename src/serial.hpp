@@ -9,6 +9,15 @@
 
 #pragma once
 
+#include "stream_serial.h"
+
+extern float stream_receiverThrottle;
+extern float stream_receiverRoll;
+extern float stream_receiverPitch;
+extern float stream_receiverYaw;
+extern float stream_receiverAux1;
+extern float stream_receiverAux2;
+
 static uint8_t _outbuff[128];
 static uint8_t _outbuff_size;
 static uint8_t _outbuff_index;
