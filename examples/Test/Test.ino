@@ -39,14 +39,14 @@ void stream_run(
         uint8_t psize,
         uint8_t msgtype,
         uint8_t crc,
-        bool sending)
+        bool sending,
+        bool receiving)
 {
-    /*
     if (avail) {
         Debugger::printf(Serial1,
-                "byte=x%02x  state=%d size=%d msgtype=%d crc=x%02x sending=%d\n",
-                byteval, pstate, psize, msgtype, crc, sending);
-    }*/
+                "byte=x%02x state=%d size=%d msgtype=%d crc=x%02x sending=%d receiving=%d\n",
+                byteval, pstate, psize, msgtype, crc, sending, receiving);
+    }
 
     static float state_phi;
     static float state_theta;
