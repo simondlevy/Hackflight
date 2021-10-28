@@ -55,20 +55,25 @@ void stream_run(
         bool sending,
         uint8_t payindex)
 {
-    static uint8_t _inbuff[128];
+    static uint8_t motor_index;
+    static uint8_t motor_percent;
 
     if (sending) {
         handleSerialInput(msgtype, state_phi, state_theta, state_psi);
     }
 
-    else if (msgtype == 215 && (payindex == 1 && parserbyte > 0 || payindex == 2)) {
-        _inbuff[payindex] = parserbyte;
+    else if (msgtype == 215) {
+
+        if (payindex == 1) {
+            motor_index = parserbyte;
+        }
+
+        if (payindex == 2) {
+            motor_percent = parserbyte;
+        }
     }
 
     updateSerialOutput();
-
-    uint8_t motor_index = msgtype == 215 ? _inbuff[0] : 0;
-    uint8_t motor_percent = msgtype == 215 ? _inbuff[1] : 0;
 
     float m1_val = armed ? m1_flying : motor_index == 1 ? motor_percent/100. : 0;
     float m2_val = armed ? m2_flying : motor_index == 2 ? motor_percent/100. : 0;
