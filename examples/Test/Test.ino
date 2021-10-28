@@ -42,14 +42,15 @@ void stream_run(
         bool sending,
         bool receiving)
 {
+    /*
     if (avail) {
         Debugger::printf(Serial1,
                 "byte=%03d state=%d size=%d msgtype=%d crc=x%02x sending=%d receiving=%d\n",
                 byteval, pstate, psize, msgtype, crc, sending, receiving);
     }
-
+    */
     if (receiving) {
-        //Debugger::printf(Serial1, "byte=x%02x msgtype=%d\n", byteval, msgtype);
+        Debugger::printf(Serial1, "byte=%d msgtype=%d\n", byteval, msgtype);
     }
 
     static float state_phi = -0.1;
