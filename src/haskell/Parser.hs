@@ -39,7 +39,7 @@ parse avail byte = (msgtype, sending, index, state, size, crc) where
           else if msgtype >= 200 then index' + 1
           else index'
 
-  crc = if state == 5 then byte else if state == 0 then 0 else crc'
+  crc = if size == 0 then byte else if state == 0 then 0 else crc'
 
   sending = avail && state == 6 && crc == byte && size == 0
 
