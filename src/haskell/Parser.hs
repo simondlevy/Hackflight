@@ -43,7 +43,7 @@ parse avail byte = (msgtype, sending, index, state, size, crc) where
 
   checked = state == 6 && crc == byte
 
-  sending = avail && checked && size == 0
+  sending = avail && checked && msgtype' < 200
 
   -- State variables
   state'     = [0] ++ state :: SWord8
