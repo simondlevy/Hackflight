@@ -41,9 +41,9 @@ parse avail byte = (msgtype, sending, index, state, size, crc) where
 
   crc = if state < 4 then 0 else if state == 6 then crc' else xor crc' byte
 
-  checked = crc == byte
+  checked = state == 6 && crc == byte
 
-  sending = avail && state == 6 && crc == byte && size == 0
+  sending = avail && checked && size == 0
 
   -- State variables
   state'     = [0] ++ state :: SWord8
