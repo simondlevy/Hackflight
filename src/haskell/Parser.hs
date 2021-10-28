@@ -16,9 +16,9 @@ import Prelude hiding((==), (&&), (||), (++), (>), (<), (>=))
 
 import Utils
 
-parse :: SBool -> SWord8 -> (SWord8, SWord8, SBool, SWord8)
+parse :: SBool -> SWord8 -> (SWord8, SBool, SWord8)
 
-parse avail byte = (byte, msgtype, sending, index) where
+parse avail byte = (msgtype, sending, index) where
 
   state  = if state' == 0 && byte == 36 then 1
       else if state' == 1 && byte == 77 then 2
@@ -29,7 +29,7 @@ parse avail byte = (byte, msgtype, sending, index) where
       else if state' == 5 then 6
       else 0
 
-  size = if state == 4 then byte + 2 -- helps with countdown
+  size = if state == 4 then byte + 2 -- adding 2 helps with countdown
          else if size' > 0 then size' - 1
          else 0
 
