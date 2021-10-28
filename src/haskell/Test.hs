@@ -60,7 +60,7 @@ spec = do
   let (vstate, armed, motors, led) = hackflight receiver sensors pidfuns
 
   -- Run the serial comms parser
-  let (byte, msgtype, sending, index) = parse serialAvailable serialByte
+  let (msgtype, sending, index, pstate, psize, crc) = parse serialAvailable serialByte
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
@@ -80,6 +80,9 @@ spec = do
                                 , arg msgtype 
                                 , arg sending 
                                 , arg index 
+                                , arg pstate 
+                                , arg psize 
+                                , arg crc 
                                ]
 
 -- Compile the spec
