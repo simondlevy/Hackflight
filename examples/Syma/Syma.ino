@@ -21,8 +21,6 @@
 #include "stream_receiver.h"
 
 #include "serial.hpp"
-#include "parser.hpp"
-#include "debugger.hpp"
 
 void stream_writeBrushedMotors(
         uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin,
