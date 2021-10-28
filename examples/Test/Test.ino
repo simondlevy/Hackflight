@@ -44,7 +44,7 @@ void stream_run(
 {
     if (avail) {
         Debugger::printf(Serial1,
-                "byte=x%02x state=%d size=%d msgtype=%d crc=x%02x sending=%d receiving=%d\n",
+                "byte=%03d state=%d size=%d msgtype=%d crc=x%02x sending=%d receiving=%d\n",
                 byteval, pstate, psize, msgtype, crc, sending, receiving);
     }
 

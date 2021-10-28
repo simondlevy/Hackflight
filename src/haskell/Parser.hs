@@ -25,12 +25,18 @@ parse avail byte = (size, msgtype, crc, state, sending, receiving) where
       else if state' == 2 && (byte == 60 || byte == 62) then 3
       else if state' == 3 then 4
       else if state' == 4 then 5
+      else if state' == 5 && size' == 0 then 6
       else if state' == 5 then 6
       else 0
 
-  size = if state == 4 then byte else size'
+  size = if state == 4 then byte + 2
+         else if size' > 0 then size' - 1
+         else 0
+
   msgtype = if state == 5 then byte else msgtype'
-  receiving = if state == 4 then size > 0 else if state == 5 then receiving' else false
+
+  receiving = state' > 4 && size > 0
+
   crc = if state == 6 then byte else crc'
 
   sending = avail && state == 6 && crc == byte && size == 0
@@ -39,5 +45,4 @@ parse avail byte = (size, msgtype, crc, state, sending, receiving) where
   state'     = [0] ++ state :: SWord8
   size'      = [0] ++ size :: SWord8
   msgtype'   = [0] ++ msgtype :: SWord8
-  receiving' = [False] ++ receiving
   crc'       = [0] ++ crc :: SWord8
