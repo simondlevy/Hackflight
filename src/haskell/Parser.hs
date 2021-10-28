@@ -35,7 +35,7 @@ parse avail byte = (byte, msgtype, sending, index) where
 
   msgtype = if state == 5 then byte else msgtype'
 
-  index = if state' < 4 then 0
+  index = if state' < 5 then 0
           else if msgtype >= 200 then index' + 1
           else index'
 
