@@ -50,24 +50,19 @@ void stream_run(
         float m2_flying,
         float m3_flying,
         float m4_flying,
-        bool serialAvail,
-        uint8_t serialByte)
+        uint8_t parserbyte,
+        uint8_t msgtype,
+        bool sending,
+        uint8_t payindex)
 {
-    bool sending = false;
-    bool receiving = false;
-    uint8_t inbuff_index = 0;
-    uint8_t msgtype = 0;
-
-    parse(serialAvail, serialByte, sending, receiving, inbuff_index, msgtype);
-
     static uint8_t _inbuff[128];
-
-    if (receiving) {
-        _inbuff[inbuff_index] = serialByte;
-    }
 
     if (sending) {
         handleSerialInput(msgtype, state_phi, state_theta, state_psi);
+    }
+
+    else if (msgtype == 215 && (payindex == 1 && parserbyte > 0 || payindex == 2)) {
+        _inbuff[payindex] = parserbyte;
     }
 
     updateSerialOutput();
