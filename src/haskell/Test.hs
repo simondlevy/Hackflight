@@ -75,14 +75,10 @@ spec = do
   let (byte, msgtype, sending, index) = parse serialAvailable serialByte
 
   trigger "stream_run" running [  
-                                  arg serialAvailable
-                                , arg serialByte
-                                , arg pstate 
-                                , arg psize 
+                                  arg serialByte
                                 , arg msgtype 
-                                , arg crc 
                                 , arg sending 
-                                , arg receiving 
+                                , arg index 
                                ]
 
 -- Compile the spec

@@ -31,10 +31,6 @@ void stream_run(
         bool sending,
         uint8_t payload_index)
 {
-    if (receiving) {
-        Debugger::printf(Serial1, "byte=%d msgtype=%d\n", byteval, msgtype);
-    }
-
     static float state_phi = -0.1;
     float state_theta = 0.2;
     static float state_psi;
@@ -42,6 +38,12 @@ void stream_run(
     if (sending) {
         handleSerialInput(msgtype, state_phi, state_theta, state_psi);
     }
+
+    else if (payload_index > 0) {
+        Debugger::printf(Serial1, "byte=%03d msgtype=%03d index=%d\n",
+                byteval, msgtype, payload_index);
+    }
+
 
     updateSerialOutput();
 

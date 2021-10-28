@@ -12,7 +12,7 @@
 module Parser where
 
 import Language.Copilot hiding(xor)
-import Prelude hiding((==), (&&), (||), (++), (>), (<))
+import Prelude hiding((==), (&&), (||), (++), (>), (<), (>=))
 
 import Utils
 
@@ -35,7 +35,9 @@ parse avail byte = (byte, msgtype, sending, index) where
 
   msgtype = if state == 5 then byte else msgtype'
 
-  index = if state' == 0 then 0 else if size > 0 then index' + 1 else index'
+  index = if state' < 4 then 0
+          else if msgtype >= 200 then index' + 1
+          else index'
 
   crc = if state == 6 then byte else crc'
 
