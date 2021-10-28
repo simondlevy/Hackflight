@@ -25,11 +25,11 @@ parse avail byte = (msgtype, sending, index, state, size, crc) where
       else if state' == 2 && (byte == 60 || byte == 62) then 3
       else if state' == 3 then 4
       else if state' == 4 then 5
-      -- else if state' == 5 && size' > 0 then 5
-      else if state' == 5 then 6
+      else if msgtype' < 200 && state' == 5 then 6
+      else if state' == 5 && size' > 0 then 5
       else 0
 
-  size = if state == 4 then byte + 2 -- adding 2 helps with countdown
+  size = if state == 4 then byte + 2
          else if size' > 0 then size' - 1
          else 0
 
@@ -39,7 +39,9 @@ parse avail byte = (msgtype, sending, index, state, size, crc) where
           else if msgtype >= 200 then index' + 1
           else index'
 
-  crc = if size == 0 then byte else if state == 0 then 0 else crc'
+  crc = if state < 4 then 0 else if state == 6 then crc' else xor crc' byte
+
+  checked = crc == byte
 
   sending = avail && state == 6 && crc == byte && size == 0
 
