@@ -11,13 +11,6 @@
 #include "stream_receiver.h"
 #include "copilot.h"
 
-//float stream_receiverThrottle;
-//float stream_receiverRoll;
-//float stream_receiverPitch;
-//float stream_receiverYaw;
-//float stream_receiverAux1;
-//float stream_receiverAux2;
-
 void setup(void)
 {
     Serial1.begin(115200);
@@ -33,22 +26,11 @@ void loop(void)
 }
 
 void stream_run(
-        bool avail,
         uint8_t byteval,
-        uint8_t pstate,
-        uint8_t psize,
         uint8_t msgtype,
-        uint8_t crc,
         bool sending,
-        bool receiving)
+        uint8_t payload_index)
 {
-    /*
-    if (avail) {
-        Debugger::printf(Serial1,
-                "byte=%03d state=%d size=%d msgtype=%d crc=x%02x sending=%d receiving=%d\n",
-                byteval, pstate, psize, msgtype, crc, sending, receiving);
-    }
-    */
     if (receiving) {
         Debugger::printf(Serial1, "byte=%d msgtype=%d\n", byteval, msgtype);
     }
