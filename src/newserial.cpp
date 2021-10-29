@@ -44,7 +44,7 @@ void stream_handleSerialRequest(
       , float state_theta
       , float state_psi)
 {
-    static uint8_t _crc_out;
+    uint8_t crc_out = 0;
 
     _outbuff_index = 0;
 
@@ -58,24 +58,24 @@ void stream_handleSerialRequest(
     _outbuff[4] = msgtype;
 
     _outbuff_size = 5;
-    _crc_out = outsize ^ msgtype;
+    crc_out = outsize ^ msgtype;
 
     if (msgtype == 122) {
-        serializeFloat(_crc_out, state_phi);
-        serializeFloat(_crc_out, state_theta);
-        serializeFloat(_crc_out, state_psi);
+        serializeFloat(crc_out, state_phi);
+        serializeFloat(crc_out, state_theta);
+        serializeFloat(crc_out, state_psi);
     }
 
     if (msgtype == 121) {
-        serializeFloat(_crc_out, stream_receiverThrottle);
-        serializeFloat(_crc_out, stream_receiverRoll);
-        serializeFloat(_crc_out, stream_receiverPitch);
-        serializeFloat(_crc_out, stream_receiverYaw);
-        serializeFloat(_crc_out, stream_receiverAux1);
-        serializeFloat(_crc_out, stream_receiverAux2);
+        serializeFloat(crc_out, stream_receiverThrottle);
+        serializeFloat(crc_out, stream_receiverRoll);
+        serializeFloat(crc_out, stream_receiverPitch);
+        serializeFloat(crc_out, stream_receiverYaw);
+        serializeFloat(crc_out, stream_receiverAux1);
+        serializeFloat(crc_out, stream_receiverAux2);
     }
 
-    serialize(_crc_out, _crc_out);
+    serialize(crc_out, crc_out);
 }
 
 void stream_updateSerialOutput(void)
