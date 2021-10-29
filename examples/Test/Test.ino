@@ -33,6 +33,7 @@ void stream_run(
         , uint8_t pstate
         , uint8_t psize
         , uint8_t crc
+        , bool checked
         )
 {
     static float state_phi = -0.1;
@@ -46,8 +47,9 @@ void stream_run(
         if (pbyte == 0x24) {
             Debugger::printf(Serial1, "\n");
         }
-        Debugger::printf(Serial1, "byte=%03d state=%d size=%d crc=%03d\n",
-                pbyte, pstate, psize, crc);
+        Debugger::printf(Serial1,
+                "byte=%03d state=%d size=%d crc=%03d checked=%d\n",
+                pbyte, pstate, psize, crc, checked);
     }
 
     if (sending) {
