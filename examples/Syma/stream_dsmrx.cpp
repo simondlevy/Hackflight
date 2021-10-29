@@ -17,9 +17,6 @@
 #define _EXTERN
 #include "copilot.h"
 
-#define NONEXTERN
-#include "stream_receiver.h"
-
 static DSM2048 rx;
 
 static bool rxReady;

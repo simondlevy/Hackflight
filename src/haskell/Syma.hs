@@ -48,11 +48,6 @@ receiver = makeReceiverWithTrim (AxisTrim 0.0 0.05 0.045) 4.0
 
 sensors = [gyrometer, quaternion]
 
--- MSP serial header bytes
-bx24 = 0x24 :: SWord8
-bx4D = 0x4D :: SWord8
-bx3C = 0x3C :: SWord8
-
 -- PID controllers are applied last-to-first
 pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
            , rateController 0.225  0.001875 0.375 -- Kp, Ki, Kd 
@@ -95,19 +90,9 @@ spec = do
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" serialAvailable []
 
-  -- Transmit serial header if sending
+  let paysize = if msgtype == 121 then 6 else if msgtype == 122 then 3 else 0 :: SWord8
 
-  let outsize = 4 * (if msgtype == 121 then 6
-                     else if msgtype == 122 then 3
-                     else 0) :: SWord8
-
-  let crc = xor outsize msgtype
-
-  trigger "stream_serialSendHeader" sending [ arg bx24
-                                            , arg bx4D
-                                            , arg bx3C
-                                            , arg outsize
-                                            , arg msgtype]
+  let outsize = 4 * paysize
 
   let val00 = if msgtype == 121 then receiverThrottle
               else if msgtype == 122 then (phi vstate)
@@ -125,12 +110,20 @@ spec = do
   let val04 = if msgtype == 121 then receiverAux1 else 0
   let val05 = if msgtype == 121 then receiverAux2 else 0
 
-  trigger "stream_serialSendPayload" sending [ arg crc
-                                             , arg msgtype
-                                             , arg $ phi vstate
-                                             , arg $ theta vstate
-                                             , arg $ psi vstate
-                                             ]
+  trigger "stream_serialSend" sending [ arg (0x24::SWord8)        -- '$'
+                                      , arg (0x4D::SWord8)        -- 'M'
+                                      , arg (0x3E::SWord8)        -- '>'
+                                      , arg outsize
+                                      , arg msgtype
+                                      , arg $ xor outsize msgtype -- CRC
+                                      , arg paysize
+                                      , arg $ val00
+                                      , arg $ val01
+                                      , arg $ val02
+                                      , arg $ val03
+                                      , arg $ val04
+                                      , arg $ val05
+                                      ]
 
   let motor_index = if msgtype == 215 && payindex == 1 then serialByte
                     else motor_index' where motor_index' = [0] ++ motor_index

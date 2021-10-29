@@ -16,13 +16,6 @@
 extern uint8_t stream_serialByte; 
 extern bool stream_serialAvailable; 
 
-extern float stream_receiverThrottle;
-extern float stream_receiverRoll;
-extern float stream_receiverPitch;
-extern float stream_receiverYaw;
-extern float stream_receiverAux1;
-extern float stream_receiverAux2;
-
 static void serialize(uint8_t & crc, uint8_t byte)
 {
     stream_serialWrite(byte);
@@ -52,15 +45,6 @@ void stream_serialWrite(uint8_t byte)
     Serial.write(byte);
 }
 
-void stream_serialSendHeader(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4)
-{
-    Serial.write(b0);
-    Serial.write(b1);
-    Serial.write(b2);
-    Serial.write(b3);
-    Serial.write(b4);
-}
-
 void stream_serialRead(void)
 {
     stream_serialByte = Serial.read();
@@ -71,27 +55,34 @@ void stream_serialUpdate(void)
     stream_serialAvailable = Serial.available();
 }
 
-void stream_serialSendPayload(
-        uint8_t crc
-      , uint8_t msgtype
-      , float state_phi
-      , float state_theta
-      , float state_psi)
+void stream_serialSend(
+        uint8_t hdr0
+      , uint8_t hdr1
+      , uint8_t hdr2
+      , uint8_t hdr3
+      , uint8_t hdr4
+      , uint8_t crc
+      , uint8_t size
+      , float val00
+      , float val01
+      , float val02
+      , float val03
+      , float val04
+      , float val05
+      )
 {
-    if (msgtype == 122) {
-        serializeFloat(crc, state_phi);
-        serializeFloat(crc, state_theta);
-        serializeFloat(crc, state_psi);
-    }
+    stream_serialWrite(hdr0);
+    stream_serialWrite(hdr1);
+    stream_serialWrite(hdr2);
+    stream_serialWrite(hdr3);
+    stream_serialWrite(hdr4);
 
-    if (msgtype == 121) {
-        serializeFloat(crc, stream_receiverThrottle);
-        serializeFloat(crc, stream_receiverRoll);
-        serializeFloat(crc, stream_receiverPitch);
-        serializeFloat(crc, stream_receiverYaw);
-        serializeFloat(crc, stream_receiverAux1);
-        serializeFloat(crc, stream_receiverAux2);
-    }
+    if (size > 0) serializeFloat(crc, val00);
+    if (size > 1) serializeFloat(crc, val01);
+    if (size > 2) serializeFloat(crc, val02);
+    if (size > 3) serializeFloat(crc, val03);
+    if (size > 4) serializeFloat(crc, val04);
+    if (size > 5) serializeFloat(crc, val05);
 
     serialize(crc, crc);
 }
