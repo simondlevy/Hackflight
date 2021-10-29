@@ -11,6 +11,7 @@ import abc
 
 from debugging import debug
 
+
 class MspParser(metaclass=abc.ABCMeta):
 
     def __init__(self):
@@ -84,20 +85,23 @@ class MspParser(metaclass=abc.ABCMeta):
     def dispatchMessage(self):
 
         if self.message_id == 121:
-            self.handle_RECEIVER(*struct.unpack('=IIIIII', self.message_buffer))
+            self.handle_RECEIVER(*struct.unpack('=ffffff',
+                                                self.message_buffer))
 
         if self.message_id == 122:
-            self.handle_STATE(*struct.unpack('=III', self.message_buffer))
+            self.handle_STATE(*struct.unpack('=fff', self.message_buffer))
 
         if self.message_id == 123:
-            self.handle_ACTUATOR_TYPE(*struct.unpack('=B', self.message_buffer))
+            self.handle_ACTUATOR_TYPE(*struct.unpack('=B',
+                                                     self.message_buffer))
 
     @abc.abstractmethod
     def handle_RECEIVER(self, c1, c2, c3, c4, c5, c6):
         return
 
     @abc.abstractmethod
-    def handle_STATE(self, x, dx, y, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
+    def handle_STATE(self, x, dx, y, dy, z, dz,
+                     phi, dphi, theta, dtheta, psi, dpsi):
         return
 
     @abc.abstractmethod
@@ -123,4 +127,5 @@ class MspParser(metaclass=abc.ABCMeta):
     def serialize_SET_MOTOR(index, percent):
         message_buffer = struct.pack('BB', index, percent)
         msg = [len(message_buffer), 215] + list(message_buffer)
-        return bytes([ord('$'), ord('M'), ord('<')] + msg + [MspParser.crc8(msg)])
+        return bytes([ord('$'), ord('M'), ord('<')] + msg +
+                     [MspParser.crc8(msg)])

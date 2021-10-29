@@ -10,7 +10,7 @@ import tkinter as tk
 from math import sqrt
 from dialog import Dialog
 from resources import resource_path
-from debugging import debug
+
 
 class MotorScale(object):
 
@@ -49,7 +49,7 @@ class MotorScale(object):
     def stop(self):
 
         self.hide()
-        self.callback('0') # ensures current motor turned off on exit
+        self.callback('0')  # ensures current motor turned off on exit
 
     def callback(self, valstr):
 

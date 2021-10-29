@@ -9,6 +9,8 @@
 
 #include <Arduino.h>
 
+#include <string.h>
+
 #include "stream_serial.h"
 
 extern uint8_t stream_serialByte; 
@@ -29,7 +31,9 @@ static void serialize(uint8_t & crc, uint8_t byte)
 
 static void serializeFloat(uint8_t & crc, float value)
 {
-    uint32_t uintval = 1000 * (value + 2);
+    uint32_t uintval = 0;
+
+    memcpy(&uintval, &value, 4);
 
     serialize(crc, uintval     & 0xFF);
     serialize(crc, uintval>>8  & 0xFF);

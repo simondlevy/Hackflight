@@ -9,8 +9,6 @@ MIT License
 from serial import Serial
 from threading import Thread
 
-from debugging import debug
-
 BAUD = 115200
 
 

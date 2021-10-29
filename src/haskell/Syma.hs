@@ -12,7 +12,7 @@ module Syma where
 
 import Language.Copilot hiding(xor)
 import Copilot.Compile.C99
-import Prelude hiding((++), (==), (&&), (/), not, xor)
+import Prelude hiding((++), (==), (&&), (/), (*), (+), not, xor)
 
 -- Core
 import Hackflight
@@ -108,7 +108,23 @@ spec = do
                                             , arg bx3C
                                             , arg outsize
                                             , arg msgtype]
-  
+
+  let val00 = if msgtype == 121 then receiverThrottle
+              else if msgtype == 122 then (phi vstate)
+              else 0
+
+  let val01 = if msgtype == 121 then receiverRoll
+              else if msgtype == 122 then (theta vstate)
+              else 0
+
+  let val02 = if msgtype == 121 then receiverPitch
+              else if msgtype == 122 then (psi vstate)
+              else 0
+
+  let val03 = if msgtype == 121 then receiverYaw else 0
+  let val04 = if msgtype == 121 then receiverAux1 else 0
+  let val05 = if msgtype == 121 then receiverAux2 else 0
+
   trigger "stream_serialSendPayload" sending [ arg crc
                                              , arg msgtype
                                              , arg $ phi vstate
