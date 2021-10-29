@@ -37,34 +37,22 @@ void stream_run(
     float state_theta = 0.2;
     static float state_psi;
 
-    static uint8_t motor_index;
-    static uint8_t motor_percent;
+    static uint8_t _motor_index;
+    static uint8_t _motor_percent;
 
     if (sending) {
         handleSerialInput(msgtype, state_phi, state_theta, state_psi);
     }
 
-    else if (msgtype == 215) {
-
-        if (payindex == 1) {
-            motor_index = paybyte;
-        }
-
-        if (payindex == 2) {
-            motor_percent = paybyte;
-        }
-    }
+    _motor_index   = msgtype == 215 && payindex == 1 ? paybyte : _motor_index;
+    _motor_percent = msgtype == 215 && payindex == 2 ? paybyte : _motor_percent;
 
     updateSerialOutput();
 
-    if (msgtype == 215 && checked) {
-        //Debugger::printf(Serial1, "m%d: %d\n", motor_index, motor_percent);
-    }
-
-    float m1_val = motor_index == 1 ? motor_percent/100. : 0;
-    float m2_val = motor_index == 2 ? motor_percent/100. : 0;
-    float m3_val = motor_index == 3 ? motor_percent/100. : 0;
-    float m4_val = motor_index == 4 ? motor_percent/100. : 0;
+    float m1_val = _motor_index == 1 ? _motor_percent/100. : 0;
+    float m2_val = _motor_index == 2 ? _motor_percent/100. : 0;
+    float m3_val = _motor_index == 3 ? _motor_percent/100. : 0;
+    float m4_val = _motor_index == 4 ? _motor_percent/100. : 0;
 
     Debugger::printf(Serial1, "m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f\n",
               m1_val, m2_val, m3_val, m4_val);
