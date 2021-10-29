@@ -20,7 +20,7 @@ parse :: SBool -> SWord8 -> (SWord8, SBool, SWord8, SWord8, SWord8, SWord8, SBoo
 
 parse avail byte = (msgtype, sending, index, state, size, crc, checked) where
 
-  state  = byte == 36 then 1
+  state  = if byte == 36 then 1
       else if state' == 1 && byte == 77 then 2
       else if state' == 2 && (byte == 60 || byte == 62) then 3
       else if state' == 3 then 4
@@ -34,8 +34,9 @@ parse avail byte = (msgtype, sending, index, state, size, crc, checked) where
          else if size' > 0 then size' - 1
          else 0
 
-  msgtype = if state == 5 && msgtype' == 0 then byte
-            else if state == 0 then 0
+  msgtype = if state == 5 && msgtype' > 0 then msgtype'
+            else if state == 5 then byte
+            else if state == 4 then 0
             else msgtype'
 
   index = if state' < 5 then 0

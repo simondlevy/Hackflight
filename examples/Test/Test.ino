@@ -48,8 +48,8 @@ void stream_run(
             Debugger::printf(Serial1, "\n");
         }
         Debugger::printf(Serial1,
-                "byte=%03d state=%d size=%d crc=%03d checked=%d\n",
-                pbyte, pstate, psize, crc, checked);
+                "byte=%03d state=%d msgtype=%d, sending=%d\n",
+                pbyte, pstate, msgtype, sending);
     }
 
     if (sending) {
