@@ -75,6 +75,14 @@ spec = do
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" serialAvailable []
 
+  trigger "stream_handleSerialInput" sending [  arg msgtype
+                                              , arg $ phi vstate
+                                              , arg $ theta vstate
+                                              , arg $ psi vstate
+                                             ]
+
+  trigger "stream_updateSerialOutput" true []
+
   trigger "stream_run" running [  
                                   arg msgtype 
                                 , arg sending 
