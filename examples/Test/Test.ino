@@ -11,10 +11,6 @@
 void setup(void)
 {
     Serial1.begin(115200);
-
-    for (uint8_t k=0; k<10; ++k) {
-        Serial1.println();
-    }
 }
 
 void loop(void)
@@ -25,6 +21,5 @@ void loop(void)
 void stream_debug(float m1, float m2, float m3, float m4)
 {
     Debugger::printf(Serial1, "m1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f\n", m1, m2, m3, m4);
-
     delay(5);
 }
