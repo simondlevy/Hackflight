@@ -12,7 +12,7 @@
 module Parser where
 
 import Language.Copilot hiding(xor)
-import Prelude hiding((==), (&&), (||), (++), (>), (<), (>=))
+import Prelude hiding((==), (&&), (||), (++), (>), (<), not)
 
 import Utils
 
@@ -20,12 +20,14 @@ parse :: SBool -> SWord8 -> (SWord8, SBool, SWord8, SBool)
 
 parse avail byte = (msgtype, sending, payindex, checked) where
 
+  iscommand = msgtype' < 200
+
   state  = if byte == 36 then 1
       else if state' == 1 && byte == 77 then 2
       else if state' == 2 && (byte == 60 || byte == 62) then 3
       else if state' == 3 then 4
       else if state' == 4 then 5
-      else if state' == 5 && msgtype' < 200 then 6
+      else if state' == 5 && iscommand then 6
       else if state' == 5 && size' > 1 then 5
       else if state' == 5 && size' == 1 then 6
       else 0
@@ -39,14 +41,14 @@ parse avail byte = (msgtype, sending, payindex, checked) where
             else msgtype'
 
   payindex = if state' < 5 then 0
-             else if msgtype >= 200 then payindex' + 1
+             else if not iscommand then payindex' + 1
              else payindex'
 
   crc = if state < 4 then 0 else if state == 6 then crc' else xor crc' byte
 
   checked = state == 6 && crc == byte
 
-  sending = avail && checked && msgtype' < 200
+  sending = avail && checked && iscommand
 
   -- State variables
   state'     = [0] ++ state :: SWord8
