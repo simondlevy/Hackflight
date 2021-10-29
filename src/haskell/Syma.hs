@@ -54,7 +54,11 @@ pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
            , levelController 0.2 -- Kp
           ]
 
--- mixer = quadXMWMixer
+motorfun :: Bool -> SFloat -> SWord8 -> SWord8 -> SWord8 -> SFloat
+motorfun armed flying_value index target percent =
+  if armed then flying_value
+  else if index == target then (unsafeCast percent) / 100
+  else 0
 
 spec = do
 
@@ -86,6 +90,23 @@ spec = do
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" serialAvailable []
 
+  trigger "stream_handleSerialInput" sending [  arg msgtype
+                                              , arg $ phi vstate
+                                              , arg $ theta vstate
+                                              , arg $ psi vstate
+                                             ]
+
+  trigger "stream_updateSerialOutput" true []
+
+  let motor_index = if msgtype == 215 && payindex == 1 then serialByte
+                    else motor_index' where motor_index' = [0] ++ motor_index
+
+  let motor_percent = if msgtype == 215 && payindex == 2 then serialByte
+                      else motor_percent' where motor_percent' = [0] ++ motor_percent
+
+  let m1_val = motorfun armed (m1 motors) motor_index 1 motor_percent
+
+{--
   trigger "stream_run" running [  arg $ phi vstate
                                 , arg $ theta vstate
                                 , arg $ psi vstate
@@ -104,6 +125,7 @@ spec = do
                                 , arg payindex
                                 , arg checked
                                ]
+--}
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
