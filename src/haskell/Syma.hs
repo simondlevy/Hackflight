@@ -90,13 +90,11 @@ spec = do
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" serialAvailable []
 
-  trigger "stream_handleSerialRequest" sending [  arg msgtype
-                                              , arg $ phi vstate
-                                              , arg $ theta vstate
-                                              , arg $ psi vstate
+  trigger "stream_handleSerialRequest" sending [ arg msgtype
+                                               , arg $ phi vstate
+                                               , arg $ theta vstate
+                                               , arg $ psi vstate
                                              ]
-
-  trigger "stream_updateSerialOutput" true []
 
   let motor_index = if msgtype == 215 && payindex == 1 then serialByte
                     else motor_index' where motor_index' = [0] ++ motor_index

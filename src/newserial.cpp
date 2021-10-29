@@ -18,13 +18,9 @@ extern float stream_receiverYaw;
 extern float stream_receiverAux1;
 extern float stream_receiverAux2;
 
-static uint8_t _outbuff[128];
-static uint8_t _outbuff_size;
-static uint8_t _outbuff_index;
-
 static void serialize(uint8_t & crc_out, uint8_t byte)
 {
-    _outbuff[_outbuff_size++] = byte;
+    stream_serialWrite(byte);
     crc_out ^= byte;
 }
 
@@ -46,18 +42,15 @@ void stream_handleSerialRequest(
 {
     uint8_t crc_out = 0;
 
-    _outbuff_index = 0;
-
-    _outbuff[0] = '$';
-    _outbuff[1] = 'M';
-    _outbuff[2] = '>';
+    stream_serialWrite('$');
+    stream_serialWrite('M');
+    stream_serialWrite('>');
 
     uint8_t outsize = 4 * (msgtype == 121 ? 6 : msgtype == 122 ? 3 : 0);
 
-    _outbuff[3] = outsize;
-    _outbuff[4] = msgtype;
+    stream_serialWrite(outsize);
+    stream_serialWrite(msgtype);
 
-    _outbuff_size = 5;
     crc_out = outsize ^ msgtype;
 
     if (msgtype == 122) {
@@ -76,14 +69,4 @@ void stream_handleSerialRequest(
     }
 
     serialize(crc_out, crc_out);
-}
-
-void stream_updateSerialOutput(void)
-{
-    if (_outbuff_size > 0) {
-        _outbuff_size = _outbuff_size - 1;
-        uint8_t data_byte = _outbuff[_outbuff_index];
-        _outbuff_index = _outbuff_index + 1;
-        stream_serialWrite(data_byte);
-    }
 }
