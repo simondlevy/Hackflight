@@ -38,7 +38,7 @@ static void serializeFloat(uint8_t & crc_out, float value)
     serialize(crc_out, uintval>>24 & 0xFF);
 }
 
-void stream_handleSerialInput(
+void stream_handleSerialRequest(
         uint8_t msgtype
       , float state_phi
       , float state_theta
