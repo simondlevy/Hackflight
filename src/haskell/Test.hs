@@ -12,7 +12,7 @@ module Test where
 
 import Language.Copilot
 import Copilot.Compile.C99
-import Prelude hiding((++), (==), (&&), not)
+import Prelude hiding((++), (==), (&&), not, (/))
 
 -- Core
 import Hackflight
@@ -49,6 +49,9 @@ pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
            , levelController 0.2 -- Kp
           ]
 
+motorfun :: SWord8 -> SWord8 -> SWord8 -> SFloat
+motorfun index target percent = if index == target then (unsafeCast percent) / 100 else 0
+
 spec = do
 
   -- Make flags for startup, loop
@@ -83,13 +86,18 @@ spec = do
 
   trigger "stream_updateSerialOutput" true []
 
-  let motor_index   = if msgtype == 215 && payindex == 1 then serialByte
-                      else motor_index' where motor_index' = [0] ++ motor_index
+  let motor_index = if msgtype == 215 && payindex == 1 then serialByte
+                    else motor_index' where motor_index' = [0] ++ motor_index
 
   let motor_percent = if msgtype == 215 && payindex == 2 then serialByte
                       else motor_percent' where motor_percent' = [0] ++ motor_percent
 
-  trigger "stream_run" running [arg motor_index, arg motor_percent] 
+  let m1_val = motorfun motor_index 1 motor_percent
+  let m2_val = motorfun motor_index 2 motor_percent
+  let m3_val = motorfun motor_index 3 motor_percent
+  let m4_val = motorfun motor_index 4 motor_percent
+
+  trigger "stream_debug" running [arg m1_val, arg m2_val, arg m3_val, arg m4_val]
   
 
 -- Compile the spec
