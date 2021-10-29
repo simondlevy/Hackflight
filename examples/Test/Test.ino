@@ -26,13 +26,10 @@ void loop(void)
 }
 
 void stream_run(
-          uint8_t pbyte
-        , uint8_t msgtype
+          uint8_t msgtype
         , bool sending
+        , uint8_t paybyte
         , uint8_t payindex
-        , uint8_t pstate
-        , uint8_t psize
-        , uint8_t crc
         , bool checked
         )
 {
@@ -43,16 +40,6 @@ void stream_run(
     static uint8_t motor_index;
     static uint8_t motor_percent;
 
-    /*
-    if (pbyte != 0xff) {
-        if (pbyte == 0x24) {
-            Debugger::printf(Serial1, "\n");
-        }
-        Debugger::printf(Serial1,
-                "byte=%03d state=%d msgtype=%d, sending=%d\n",
-                pbyte, pstate, msgtype, sending);
-    }
-    */
     if (sending) {
         handleSerialInput(msgtype, state_phi, state_theta, state_psi);
     }
@@ -60,11 +47,11 @@ void stream_run(
     else if (msgtype == 215) {
 
         if (payindex == 1) {
-            motor_index = pbyte;
+            motor_index = paybyte;
         }
 
         if (payindex == 2) {
-            motor_percent = pbyte;
+            motor_percent = paybyte;
         }
     }
 

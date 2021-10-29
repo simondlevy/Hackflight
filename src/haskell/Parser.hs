@@ -16,9 +16,9 @@ import Prelude hiding((==), (&&), (||), (++), (>), (<), (>=))
 
 import Utils
 
-parse :: SBool -> SWord8 -> (SWord8, SBool, SWord8, SWord8, SWord8, SWord8, SBool)
+parse :: SBool -> SWord8 -> (SWord8, SBool, SWord8, SBool)
 
-parse avail byte = (msgtype, sending, index, state, size, crc, checked) where
+parse avail byte = (msgtype, sending, payindex, checked) where
 
   state  = if byte == 36 then 1
       else if state' == 1 && byte == 77 then 2
@@ -38,9 +38,9 @@ parse avail byte = (msgtype, sending, index, state, size, crc, checked) where
             else if state == 5 && msgtype' == 0 then byte
             else msgtype'
 
-  index = if state' < 5 then 0
-          else if msgtype >= 200 then index' + 1
-          else index'
+  payindex = if state' < 5 then 0
+             else if msgtype >= 200 then payindex' + 1
+             else payindex'
 
   crc = if state < 4 then 0 else if state == 6 then crc' else xor crc' byte
 
@@ -50,7 +50,7 @@ parse avail byte = (msgtype, sending, index, state, size, crc, checked) where
 
   -- State variables
   state'     = [0] ++ state :: SWord8
-  size'      = [0] ++ size :: SWord8
-  msgtype'   = [0] ++ msgtype :: SWord8
-  crc'       = [0] ++ crc :: SWord8
-  index'     = [0] ++ index :: SWord8
+  size'      = [0] ++ size
+  msgtype'   = [0] ++ msgtype
+  crc'       = [0] ++ crc
+  payindex'  = [0] ++ payindex :: SWord8
