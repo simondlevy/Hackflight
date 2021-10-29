@@ -43,6 +43,7 @@ void stream_run(
     static uint8_t motor_index;
     static uint8_t motor_percent;
 
+    /*
     if (pbyte != 0xff) {
         if (pbyte == 0x24) {
             Debugger::printf(Serial1, "\n");
@@ -51,7 +52,7 @@ void stream_run(
                 "byte=%03d state=%d msgtype=%d, sending=%d\n",
                 pbyte, pstate, msgtype, sending);
     }
-
+    */
     if (sending) {
         handleSerialInput(msgtype, state_phi, state_theta, state_psi);
     }
@@ -70,7 +71,7 @@ void stream_run(
     updateSerialOutput();
 
     if (msgtype == 215 && checked) {
-        //Debugger::printf(Serial1, "m%d: %d\n", motor_index, motor_percent);
+        Debugger::printf(Serial1, "m%d: %d\n", motor_index, motor_percent);
     }
 
     /*
