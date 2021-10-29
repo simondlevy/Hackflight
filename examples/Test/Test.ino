@@ -69,6 +69,10 @@ void stream_run(
 
     updateSerialOutput();
 
+    if (msgtype == 215 && checked) {
+        //Debugger::printf(Serial1, "m%d: %d\n", motor_index, motor_percent);
+    }
+
     /*
     float m1_val = motor_index == 1 ? motor_percent/100. : 0;
     float m2_val = motor_index == 2 ? motor_percent/100. : 0;
