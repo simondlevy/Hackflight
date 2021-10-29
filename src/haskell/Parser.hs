@@ -29,7 +29,7 @@ parse avail byte = (msgtype, sending, index, state, size, crc) where
       else if state' == 5 && size' > 0 then 5
       else 0
 
-  size = if state == 4 then byte + 2
+  size = if state == 4 then byte + 3
          else if size' > 0 then size' - 1
          else 0
 
