@@ -1,5 +1,5 @@
 {--
-  Hackflight core algorithm plus led and serial parsing
+  Hackflight core algorithm
 
   Copyright(C) 2021 on D.Levy
 
@@ -8,7 +8,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module HackflightFull where
+module Hackflight where
 
 import Language.Copilot
 

@@ -14,6 +14,7 @@ module Serial where
 import Language.Copilot
 import Prelude hiding((++), (==), take, drop)
 
+import Receiver
 import Utils
 
 

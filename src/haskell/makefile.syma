@@ -3,7 +3,7 @@
 # MIT License
 
 HSRC = Syma.hs \
-       HackflightFull.hs \
+       Hackflight.hs \
        Receiver.hs \
        Demands.hs \
        PidController.hs \

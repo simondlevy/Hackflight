@@ -38,11 +38,11 @@ static void serializeFloat(uint8_t & crc_out, float value)
     serialize(crc_out, uintval>>24 & 0xFF);
 }
 
-static void handleSerialInput(
+void handleSerialInput(
         uint8_t msgtype
-        , float state_phi
-        , float state_theta
-        , float state_psi)
+      , float state_phi
+      , float state_theta
+      , float state_psi)
 {
     static uint8_t _crc_out;
 
