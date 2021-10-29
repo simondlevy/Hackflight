@@ -10,9 +10,9 @@
 
 module Syma where
 
-import Language.Copilot
+import Language.Copilot hiding(xor)
 import Copilot.Compile.C99
-import Prelude hiding((++), (==), (&&), not, (/))
+import Prelude hiding((++), (==), (&&), (/), not, xor)
 
 -- Core
 import Hackflight
@@ -101,10 +101,16 @@ spec = do
                      else if msgtype == 122 then 3
                      else 0) :: SWord8
 
-  trigger "stream_serialSendHeader" sending [arg bx24, arg bx4D, arg bx3C, arg outsize, arg msgtype]
-  
+  let crc = xor outsize msgtype
 
-  trigger "stream_serialSendPayload" sending [ arg msgtype
+  trigger "stream_serialSendHeader" sending [ arg bx24
+                                            , arg bx4D
+                                            , arg bx3C
+                                            , arg outsize
+                                            , arg msgtype]
+  
+  trigger "stream_serialSendPayload" sending [ arg crc
+                                             , arg msgtype
                                              , arg $ phi vstate
                                              , arg $ theta vstate
                                              , arg $ psi vstate

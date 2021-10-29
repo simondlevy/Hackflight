@@ -21,20 +21,20 @@ extern float stream_receiverYaw;
 extern float stream_receiverAux1;
 extern float stream_receiverAux2;
 
-static void serialize(uint8_t & crc_out, uint8_t byte)
+static void serialize(uint8_t & crc, uint8_t byte)
 {
     stream_serialWrite(byte);
-    crc_out ^= byte;
+    crc ^= byte;
 }
 
-static void serializeFloat(uint8_t & crc_out, float value)
+static void serializeFloat(uint8_t & crc, float value)
 {
     uint32_t uintval = 1000 * (value + 2);
 
-    serialize(crc_out, uintval     & 0xFF);
-    serialize(crc_out, uintval>>8  & 0xFF);
-    serialize(crc_out, uintval>>16 & 0xFF);
-    serialize(crc_out, uintval>>24 & 0xFF);
+    serialize(crc, uintval     & 0xFF);
+    serialize(crc, uintval>>8  & 0xFF);
+    serialize(crc, uintval>>16 & 0xFF);
+    serialize(crc, uintval>>24 & 0xFF);
 }
 
 
@@ -68,31 +68,26 @@ void stream_serialUpdate(void)
 }
 
 void stream_serialSendPayload(
-        uint8_t msgtype
+        uint8_t crc
+      , uint8_t msgtype
       , float state_phi
       , float state_theta
       , float state_psi)
 {
-    uint8_t crc_out = 0;
-
-    uint8_t outsize = 4 * (msgtype == 121 ? 6 : msgtype == 122 ? 3 : 0);
-
-    crc_out = outsize ^ msgtype;
-
     if (msgtype == 122) {
-        serializeFloat(crc_out, state_phi);
-        serializeFloat(crc_out, state_theta);
-        serializeFloat(crc_out, state_psi);
+        serializeFloat(crc, state_phi);
+        serializeFloat(crc, state_theta);
+        serializeFloat(crc, state_psi);
     }
 
     if (msgtype == 121) {
-        serializeFloat(crc_out, stream_receiverThrottle);
-        serializeFloat(crc_out, stream_receiverRoll);
-        serializeFloat(crc_out, stream_receiverPitch);
-        serializeFloat(crc_out, stream_receiverYaw);
-        serializeFloat(crc_out, stream_receiverAux1);
-        serializeFloat(crc_out, stream_receiverAux2);
+        serializeFloat(crc, stream_receiverThrottle);
+        serializeFloat(crc, stream_receiverRoll);
+        serializeFloat(crc, stream_receiverPitch);
+        serializeFloat(crc, stream_receiverYaw);
+        serializeFloat(crc, stream_receiverAux1);
+        serializeFloat(crc, stream_receiverAux2);
     }
 
-    serialize(crc_out, crc_out);
+    serialize(crc, crc);
 }
