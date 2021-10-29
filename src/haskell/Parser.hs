@@ -34,9 +34,8 @@ parse avail byte = (msgtype, sending, index, state, size, crc, checked) where
          else if size' > 0 then size' - 1
          else 0
 
-  msgtype = if state == 5 && msgtype' > 0 then msgtype'
-            else if state == 5 then byte
-            else if state == 4 then 0
+  msgtype = if state == 4 then 0
+            else if state == 5 && msgtype' == 0 then byte
             else msgtype'
 
   index = if state' < 5 then 0
