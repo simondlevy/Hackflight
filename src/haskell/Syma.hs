@@ -12,7 +12,7 @@ module Syma where
 
 import Language.Copilot
 import Copilot.Compile.C99
-import Prelude hiding((<), (>), (++), not)
+import Prelude hiding((++), (==), (&&), not, (/))
 
 -- Core
 import Hackflight
@@ -54,7 +54,7 @@ pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
            , levelController 0.2 -- Kp
           ]
 
-motorfun :: Bool -> SFloat -> SWord8 -> SWord8 -> SWord8 -> SFloat
+motorfun :: SBool -> SFloat -> SWord8 -> SWord8 -> SWord8 -> SFloat
 motorfun armed flying_value index target percent =
   if armed then flying_value
   else if index == target then (unsafeCast percent) / 100
@@ -105,27 +105,14 @@ spec = do
                       else motor_percent' where motor_percent' = [0] ++ motor_percent
 
   let m1_val = motorfun armed (m1 motors) motor_index 1 motor_percent
+  let m2_val = motorfun armed (m2 motors) motor_index 2 motor_percent
+  let m3_val = motorfun armed (m3 motors) motor_index 3 motor_percent
+  let m4_val = motorfun armed (m4 motors) motor_index 4 motor_percent
 
-{--
-  trigger "stream_run" running [  arg $ phi vstate
-                                , arg $ theta vstate
-                                , arg $ psi vstate
-                                , arg armed
-                                , arg m1_pin
-                                , arg m2_pin
-                                , arg m3_pin
-                                , arg m4_pin
-                                , arg $ m1 motors
-                                , arg $ m2 motors
-                                , arg $ m3 motors
-                                , arg $ m4 motors
-                                , arg msgtype
-                                , arg sending
-                                , arg serialByte
-                                , arg payindex
-                                , arg checked
-                               ]
---}
+  trigger "stream_writeBrushedMotors" true [
+        arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin,
+        arg m1_val, arg m2_val, arg m3_val, arg m4_val]
+
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
