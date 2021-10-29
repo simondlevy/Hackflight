@@ -12,7 +12,7 @@ module Test where
 
 import Language.Copilot
 import Copilot.Compile.C99
-import Prelude hiding((<), (>), (++), not)
+import Prelude hiding((++), (==), (&&), not)
 
 -- Core
 import Hackflight
@@ -83,13 +83,14 @@ spec = do
 
   trigger "stream_updateSerialOutput" true []
 
-  trigger "stream_run" running [  
-                                  arg msgtype 
-                                , arg sending 
-                                , arg serialByte
-                                , arg payindex 
-                                , arg checked 
-                               ]
+  let motor_index   = if msgtype == 215 && payindex == 1 then serialByte
+                      else motor_index' where motor_index' = [0] ++ motor_index
+
+  let motor_percent = if msgtype == 215 && payindex == 2 then serialByte
+                      else motor_percent' where motor_percent' = [0] ++ motor_percent
+
+  trigger "stream_run" running [arg motor_index, arg motor_percent] 
+  
 
 -- Compile the spec
 main = reify spec >>= compile "copilot"
