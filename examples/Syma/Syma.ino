@@ -48,35 +48,28 @@ void stream_run(
         float m2_flying,
         float m3_flying,
         float m4_flying,
-        uint8_t parserbyte,
         uint8_t msgtype,
         bool sending,
-        uint8_t payindex)
+        uint8_t paybyte,
+        uint8_t payindex,
+        bool checked)
 {
-    static uint8_t motor_index;
-    static uint8_t motor_percent;
+    static uint8_t _motor_index;
+    static uint8_t _motor_percent;
 
     if (sending) {
         handleSerialInput(msgtype, state_phi, state_theta, state_psi);
     }
 
-    else if (msgtype == 215) {
-
-        if (payindex == 1) {
-            motor_index = parserbyte;
-        }
-
-        if (payindex == 2) {
-            motor_percent = parserbyte;
-        }
-    }
+    _motor_index   = msgtype == 215 && payindex == 1 ? paybyte : _motor_index;
+    _motor_percent = msgtype == 215 && payindex == 2 ? paybyte : _motor_percent;
 
     updateSerialOutput();
 
-    float m1_val = armed ? m1_flying : motor_index == 1 ? motor_percent/100. : 0;
-    float m2_val = armed ? m2_flying : motor_index == 2 ? motor_percent/100. : 0;
-    float m3_val = armed ? m3_flying : motor_index == 3 ? motor_percent/100. : 0;
-    float m4_val = armed ? m4_flying : motor_index == 4 ? motor_percent/100. : 0;
+    float m1_val = armed ? m1_flying : _motor_index == 1 ? _motor_percent/100. : 0;
+    float m2_val = armed ? m2_flying : _motor_index == 2 ? _motor_percent/100. : 0;
+    float m3_val = armed ? m3_flying : _motor_index == 3 ? _motor_percent/100. : 0;
+    float m4_val = armed ? m4_flying : _motor_index == 4 ? _motor_percent/100. : 0;
 
     stream_writeBrushedMotors(m1_pin, m2_pin, m3_pin, m4_pin, m1_val, m2_val, m3_val, m4_val);
 }
