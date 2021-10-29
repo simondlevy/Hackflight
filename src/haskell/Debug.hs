@@ -1,5 +1,5 @@
 {--
-  Haskell Copilot support for Hackflight test sketch
+  Haskell Serial debugging support for Hackflight
 
   Copyright(C) 2021 on D.Levy
 
@@ -8,7 +8,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module Test where
+module Debug where
 
 import Language.Copilot
 import Copilot.Compile.C99
