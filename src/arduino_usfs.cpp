@@ -1,11 +1,6 @@
 /*
    Streaming support for USFS IMU
 
-   Additional libraries needed:
-
-       https://github.com/simondlevy/USFS
-       https://github.com/simondlevy/CrossPlatformDataBus
-
    Copyright (C) 2021 Simon D. Levy
 
    MIT License
@@ -21,7 +16,7 @@
 
 static USFS_Master usfs;
 
-void stream_startImu(void)
+void stream_startUsfs(void)
 {
     // Start the USFS in master mode, no interrupt
     if (!usfs.begin()) {
@@ -32,7 +27,7 @@ void stream_startImu(void)
     }
 }
 
-void stream_updateImu(void)
+void stream_updateUsfs(void)
 {
     usfs.checkEventStatus();
 

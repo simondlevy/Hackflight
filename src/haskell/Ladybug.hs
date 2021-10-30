@@ -1,5 +1,5 @@
 {--
-  Support for Hackflight on Ladybug quadcopter
+  Support for Ladybug flight controller quadcopter with DSMX receiver
 
   Copyright(C) 2021 on D.Levy
 
@@ -76,19 +76,21 @@ spec = do
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
   trigger "stream_startI2C" starting []
-  trigger "stream_startReceiver" starting []
-  trigger "stream_startImu" starting []
+  trigger "stream_startDsmrx" starting []
+  trigger "stream_startUsfs" starting []
   trigger "stream_startBrushedMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
   trigger "stream_startLed" starting [arg led_pin]
 
   -- Do some other stuff in loop
-  trigger "stream_updateImu" running []
-  trigger "stream_updateReceiver" running []
+  trigger "stream_updateUsfs" running []
+  trigger "stream_updateDsmrx" running []
   trigger "stream_updateTime" running []
   trigger "stream_writeLed" running [arg led_pin, arg led]
 
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" serialAvailable []
+
+  -- Serial comms ---------------------------------------------------------------------
 
   let paysize = if msgtype == 121 then 6 else if msgtype == 122 then 3 else 0 :: SWord8
 

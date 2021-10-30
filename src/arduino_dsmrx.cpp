@@ -1,9 +1,5 @@
 /*
-   Haskell Copilot support for Spketrum DSMX receiver
-
-   Additional libraries needed:
-
-       https://github.com/simondlevy/SpektrumDSM 
+   Arduino support for Spketrum DSMX receiver
 
    Copyright (C) 2021 Simon D. Levy
 
@@ -31,13 +27,13 @@ void serialEvent1(void)
     }
 }
 
-void stream_startReceiver(void)
+void stream_startDsmrx(void)
 {
     Serial1.begin(115200);
     stream_receiverLostSignal = false;
 }
 
-void stream_updateReceiver(void)
+void stream_updateDsmrx(void)
 {
     if (rx.timedOut(micros())) {
         if (rxReady) {
