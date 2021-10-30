@@ -9,7 +9,7 @@
 #include <Arduino.h>
 
 #define _EXTERN
-#include "copilot.h"
+#include "hackflight.h"
 
 void stream_updateTime(void)
 {

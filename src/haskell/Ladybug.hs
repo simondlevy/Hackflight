@@ -144,4 +144,4 @@ spec = do
 
 
 -- Compile the spec
-main = reify spec >>= compile "copilot"
+main = reify spec >>= compile "hackflight"

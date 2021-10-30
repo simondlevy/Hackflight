@@ -9,7 +9,7 @@
 
 
 #define _EXTERN
-#include "copilot.h"
+#include "hackflight.h"
 
 #include <Arduino.h>
 #include <USFS_Master.h>

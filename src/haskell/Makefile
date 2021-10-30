@@ -23,26 +23,26 @@ RUNH = runhaskell -isensors -ipidcontrollers Ladybug.hs
 
 DSTDIR = ..
 
-all: copilot.cpp copilot.h
-	cp copilot.c $(DSTDIR)/copilot.cpp
-	wc -c copilot.c
-	rm copilot.c
-	sed -i 's/extern/EXTERN/g' copilot.h
-	cat cfiles/header.h copilot.h > $(DSTDIR)/copilot.h
+all: hackflight.cpp hackflight.h
+	cp hackflight.c $(DSTDIR)/hackflight.cpp
+	wc -c hackflight.c
+	rm hackflight.c
+	sed -i 's/extern/EXTERN/g' hackflight.h
+	cat cfiles/header.h hackflight.h > $(DSTDIR)/hackflight.h
 
-copilot.c: $(HSRC) Ladybug.hs
+hackflight.c: $(HSRC) Ladybug.hs
 	$(RUNH)
 
-copilot.h: $(HSRC) Ladybug.hs
+hackflight.h: $(HSRC) Ladybug.hs
 	$(RUNH)
 
 clean:
-	rm -f copilot.* ../copilot.* *~
+	rm -f hackflight.* ../hackflight.* *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
 
-copilot.cpp: copilot.c
-	tail -n +8 copilot.c > tmp.c
-	cat cfiles/header.c tmp.c > copilot.c
+hackflight.cpp: hackflight.c
+	tail -n +8 hackflight.c > tmp.c
+	cat cfiles/header.c tmp.c > hackflight.c
 	rm tmp.c

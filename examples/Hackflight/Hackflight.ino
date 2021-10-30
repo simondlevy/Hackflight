@@ -7,7 +7,7 @@
 
  */
 
-#include "copilot.h"
+#include "hackflight.h"
 
 void setup(void)
 {

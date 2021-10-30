@@ -11,7 +11,7 @@
 #include <DSMRX.h>
 
 #define _EXTERN
-#include "copilot.h"
+#include "hackflight.h"
 
 static DSM2048 rx;
 
