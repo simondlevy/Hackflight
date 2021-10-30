@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="extras/media/logo.png" width=450>
+<img src="extras/media/logo2.png" width=450>
 </p>
 
 <h2>Note: this branch of Hackflight is for development using Haskell.  The
