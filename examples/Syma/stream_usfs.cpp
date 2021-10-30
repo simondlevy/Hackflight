@@ -17,7 +17,6 @@
 #include "copilot.h"
 
 #include <Arduino.h>
-#include <Wire.h>
 #include <USFS_Master.h>
 
 static USFS_Master usfs;
