@@ -2,7 +2,7 @@
 #
 # MIT License
 
-HSRC = Syma.hs \
+HSRC = Ladybug.hs \
        Hackflight.hs \
        Receiver.hs \
        Demands.hs \
@@ -19,7 +19,7 @@ HSRC = Syma.hs \
        pidcontrollers/YawPid.hs \
        pidcontrollers/LevelPid.hs
 
-RUNH = runhaskell -isensors -ipidcontrollers Syma.hs
+RUNH = runhaskell -isensors -ipidcontrollers Ladybug.hs
 
 DSTDIR = ..
 
@@ -30,10 +30,10 @@ all: copilot.cpp copilot.h
 	sed -i 's/extern/EXTERN/g' copilot.h
 	cat cfiles/header.h copilot.h > $(DSTDIR)/copilot.h
 
-copilot.c: $(HSRC) Syma.hs
+copilot.c: $(HSRC) Ladybug.hs
 	$(RUNH)
 
-copilot.h: $(HSRC) Syma.hs
+copilot.h: $(HSRC) Ladybug.hs
 	$(RUNH)
 
 clean:

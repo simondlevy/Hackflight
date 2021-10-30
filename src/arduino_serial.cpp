@@ -1,5 +1,5 @@
 /*
-   Hackflight stream-based serial support
+   Arduino serial support
 
    Copyright (C) 2021 Simon D. Levy
 

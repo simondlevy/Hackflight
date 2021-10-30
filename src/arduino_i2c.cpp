@@ -1,5 +1,5 @@
 /*
-   Hackflight stream-based I^2C support
+   Arduino I^2C support
 
    Copyright (C) 2021 Simon D. Levy
 

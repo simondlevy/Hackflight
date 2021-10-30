@@ -1,5 +1,5 @@
 /*
-   Streaming support for LEDs
+   Arduino LED support
 
    Copyright (c) 2021 Simon D. Levy
 

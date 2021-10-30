@@ -1,5 +1,5 @@
 /*
-   Hackflight sketch for motors
+   Arduino motor support
 
    MIT License
 

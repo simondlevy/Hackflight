@@ -1,5 +1,5 @@
 /*
-   Streaming support for time
+   Arduino time support
 
    Copyright (c) 2021 Simon D. Levy
 
