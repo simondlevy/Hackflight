@@ -2,8 +2,8 @@
 <img src="extras/media/logo.png" width=450>
 </p>
 
-## Note: this branch of Hackflight is for development using Haskell.  The
-## orginal branch using C++ is [here](https://github.com/simondlevy/Hackflight/tree/cpp).
+<h1>Note: this branch of Hackflight is for development using Haskell.  The
+original branch using C++ is [here](https://github.com/simondlevy/Hackflight/tree/cpp).</h1>
 
 ## Intro
 
