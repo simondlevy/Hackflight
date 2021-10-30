@@ -1,5 +1,5 @@
 /*
-   Hackflight stream-based serial support
+   Platform-independent support for serial comms that can't be done in Haskell
 
    Copyright (C) 2021 Simon D. Levy
 
@@ -7,16 +7,12 @@
 
  */
 
-#include <Arduino.h>
-
+#include <stdint.h>
 #include <string.h>
 
-#include "stream_serial.h"
+void stream_serialWrite(uint8_t byte);
 
-extern uint8_t stream_serialByte; 
-extern bool stream_serialAvailable; 
-
-static void serialize(uint8_t & crc, uint8_t byte)
+static void serializeByte(uint8_t & crc, uint8_t byte)
 {
     stream_serialWrite(byte);
     crc ^= byte;
@@ -28,31 +24,10 @@ static void serializeFloat(uint8_t & crc, float value)
 
     memcpy(&uintval, &value, 4);
 
-    serialize(crc, uintval     & 0xFF);
-    serialize(crc, uintval>>8  & 0xFF);
-    serialize(crc, uintval>>16 & 0xFF);
-    serialize(crc, uintval>>24 & 0xFF);
-}
-
-
-void stream_startSerial(void)
-{
-    Serial.begin(115200);
-}
-
-void stream_serialWrite(uint8_t byte)
-{
-    Serial.write(byte);
-}
-
-void stream_serialRead(void)
-{
-    stream_serialByte = Serial.read();
-}
-
-void stream_serialUpdate(void)
-{
-    stream_serialAvailable = Serial.available();
+    serializeByte(crc, uintval     & 0xFF);
+    serializeByte(crc, uintval>>8  & 0xFF);
+    serializeByte(crc, uintval>>16 & 0xFF);
+    serializeByte(crc, uintval>>24 & 0xFF);
 }
 
 void stream_serialSend(
@@ -84,5 +59,5 @@ void stream_serialSend(
     if (size > 4) serializeFloat(crc, val04);
     if (size > 5) serializeFloat(crc, val05);
 
-    serialize(crc, crc);
+    serializeByte(crc, crc);
 }
