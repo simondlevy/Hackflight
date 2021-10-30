@@ -2,7 +2,7 @@
 <img src="extras/media/logo.png" width=450>
 </p>
 
-<font color='blue'>
+<font color="blue">
 Note: this branch of Hackflight is for development using Haskell.  The
 orginal branch using C++ is <a =href="https://github.com/simondlevy/Hackflight/tree/cpp">here</a>
 </font>
