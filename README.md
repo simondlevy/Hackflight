@@ -8,7 +8,7 @@ original branch using C++ is <a href="https://github.com/simondlevy/Hackflight/t
 
 ## Intro
 
-Hackflight is a simple, platform-independent, header-only C++ toolkit for
+Hackflight is a simple, platform-independent, header-only software toolkit for
 building multirotor flight controllers.  It is geared toward people like
 me who want to tinker with flight-control firmware, and use it to teach
 students about ideas like inertial measurement and PID tuning.  <b>If you are
@@ -47,61 +47,6 @@ simpler code based on standard units:
 * Barometric pressure in Pascals
 * Stick demands in the interval [-1,+1]
 * Motor demands in [0,1]
-
-## Design principles
-
-Thanks to some help from [Sytelus](https://github.com/sytelus), the core
-Hackflight
-[firmware](https://github.com/simondlevy/hackflight/tree/master/src)
-adheres to standard practices for C++, notably, short, simple methods and
-minimal use of compiler macros like <b>#ifdef</b> that can make it difficult to
-follow what the code is doing.  
-
-A typical Arduino sketch for hackflight is written as follows:
-
-1. Construct a ```Hackflight``` objecting using a ```Board```, ```Receiver```, and
-```Mixer``` object.
-
-2. Add sensors (```IMU```, ```Altimeter```)
-
-3. Add PID controllers (```Rate```, ```Level```)
-
-4. In the ```loop()``` function, call ```Hackflight::update()```
-
-## Core C++ Classes
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_board.hpp">Board</a>
-class specifies an abstract (pure virtual) <tt>getTime()</tt> method that you must
-implement for a particular microcontroller or simulator.  
-
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_receiver.hpp">Receiver</a>
-class performs basic functions associated with R/C receivers, and specifies a set of abstract methods that you
-implement for a particular receiver (DSMX, SBUS, etc.).
-
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_mixer.hpp">Mixer</a>
-class is an abstract class that can be subclassed for various kinds of mixers; for example, a quadcopter
-mixer using the MultiWii motor layout.
-
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_pidcontroller.hpp">PidController</a>
-class specifies an abstract method <tt>modifyDemands()</tt> that inputs the vehicles's current state and
-outputs an array of floating-point values representing how that controller affects the demands. (For example,
-an altitude-hold controller for a quadcopter would use the 'copter's altitude
-and vertical velocity to adjust the throttle demand.)  If you're
-mathematically-minded, you can think of a PID controller as a function from a
-(<i>State</i>, <i>Demands</i>) pair to <i>Demands</i>:
-<b><i>PidController</i>: <i>State</i> &times; <i>Demands</i> &rarr; <i>Demands</i></b>
-
-* The <a href="https://github.com/simondlevy/Hackflight/blob/master/src/HF_sensor.hpp">Sensor</a>
-class specifies abstract methods <tt>ready()</tt> for checking whether the sensor
-has new data avaiable, and  <tt>modifyState()</tt> for modifying the vehicle's
-state based on that data.  If you're mathematically-minded, you can think of a
-sensor as a function from states to states: <b><i>Sensor</i>: <i>State</i> &rarr;
-<i>State</i></b>
-
-Together, these classes interact as shown in the following diagram:
-
-<p align="center"> 
-<img src="extras/media/dataflow2.png" width=700>
-</p>
 
 ## Ground Control Station
 
