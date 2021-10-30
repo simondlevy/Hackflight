@@ -37,7 +37,7 @@ copilot.h: $(HSRC) Ladybug.hs
 	$(RUNH)
 
 clean:
-	rm -f copilot.* *~
+	rm -f copilot.* ../copilot.* *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
