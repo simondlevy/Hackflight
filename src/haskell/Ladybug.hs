@@ -69,7 +69,7 @@ spec = do
   let starting = not running
 
   -- Run the Hackflight algorithm
-  let (vstate, armed, motors, led) = hackflight receiver sensors pidfuns
+  let (vstate, armed, motors, led) = hackflightFull receiver sensors pidfuns
 
   -- Run the serial comms parser
   let (msgtype, sending, payindex, checked) = parse serialAvailable serialByte

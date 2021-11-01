@@ -1,5 +1,5 @@
 {--
-  Hackflight core algorithm
+  Hackflight core algorithms
 
   Copyright(C) 2021 on D.Levy
 
@@ -22,11 +22,9 @@ import Time
 import Mixer
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun]
-  -> (State, SBool, Motors, SBool)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (Demands, Demands, State)
 
-hackflight receiver sensors pidfuns 
-  = (vstate, armed', motors, led)
+hackflight receiver sensors pidfuns = (rdemands, pdemands, vstate)
 
   where
 
@@ -39,6 +37,16 @@ hackflight receiver sensors pidfuns
     -- Periodically get the demands by composing the PID controllers over the receiver
     -- demands
     (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
+
+
+
+hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> (State, SBool, Motors, SBool)
+
+hackflightFull receiver sensors pidfuns = (vstate, armed', motors, led)
+
+  where
+
+    (rdemands, pdemands, vstate) = hackflight receiver sensors pidfuns
 
     -- Check safety (arming / failsafe)
     (armed, failsafe, mzero) = safety rdemands vstate
