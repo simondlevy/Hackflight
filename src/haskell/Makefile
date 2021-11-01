@@ -10,6 +10,7 @@ HSRC = Ladybug.hs \
        Safety.hs \
        Parser.hs \
        Serial.hs \
+       Messages.hs \
        Time.hs \
        Mixer.hs \
        Utils.hs \

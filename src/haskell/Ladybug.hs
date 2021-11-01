@@ -33,6 +33,7 @@ import LevelPid(levelController)
 -- Serial comms
 import Serial
 import Parser
+import Messages
 
 -- Misc
 import Utils
@@ -92,25 +93,9 @@ spec = do
 
   -- Serial comms ---------------------------------------------------------------------
 
-  let paysize = if msgtype == 121 then 6 else if msgtype == 122 then 3 else 0 :: SWord8
+  let (paysize, val00, val01, val02, val03, val04, val05) = payload msgtype vstate
 
   let outsize = 4 * paysize
-
-  let val00 = if msgtype == 121 then receiverThrottle
-              else if msgtype == 122 then (phi vstate)
-              else 0
-
-  let val01 = if msgtype == 121 then receiverRoll
-              else if msgtype == 122 then (theta vstate)
-              else 0
-
-  let val02 = if msgtype == 121 then receiverPitch
-              else if msgtype == 122 then (psi vstate)
-              else 0
-
-  let val03 = if msgtype == 121 then receiverYaw else 0
-  let val04 = if msgtype == 121 then receiverAux1 else 0
-  let val05 = if msgtype == 121 then receiverAux2 else 0
 
   trigger "stream_serialSend" sending [ arg (0x24::SWord8)        -- '$'
                                       , arg (0x4D::SWord8)        -- 'M'
