@@ -2,26 +2,13 @@
 
 # About
 
-g is a simple multicopter flight simulator using Unreal Engine 4.  It runs on Windows.
-
-I began this project using the [V-REP platform](https://github.com/simondlevy/Hackflight-VREP) but switched to
-UnrealEngine after seeing the kinds of beautiful, real-time simulations that
-Microsoft was able to get with its
-[AirSim](https://github.com/Microsoft/AirSim) program. 
-
-g differs from AirSim in a few important ways:
-* g can be used with the same simple flight-control 
-[firmware](https://github.com/simondlevy/Hackflight/tree/master/src) that we fly on our real-world 
-[quadcopters](http://diydrones.com/profiles/blogs/flight-of-the-ladybug).
-* g is tiny, under 2,000 lines of code.
-* g focuses exclusively on multirotor firmware, whereas AirSim
-  supports deep learning and different kinds of vehicles.
+HackflightSim is a simple multicopter flight simulator using Unreal Engine 4.  It runs on Windows.
 
 # Prerequisites
 
 ## Hardware
 
-I am currently developing g on an HP Z440 workstation with 32GB
+I am currently developing HackflightSim on an HP Z440 workstation with 32GB
 RAM and NVIDIA GeForce GTX 1080 Ti. It may however be possible to develop on a
 less &ldquo;loaded&rdquo; machine &ndash; see
 [here](https://docs.unrealengine.com/latest/INT/GettingStarted/RecommendedSpecifications/)
@@ -57,12 +44,12 @@ point-of-view.
 
 # C++ development with Hackflight
 
-Although g is designed to work with any flight-control software
+Although HackflightSim is designed to work with any flight-control software
 you like, it easiest to get started with the
 [Hackflight](https://github.com/simondlevy/Hackflight) software. 
 
 For a realistic flying experience, you will also likely want some sort of game
-controller or R/C transmitter.  g currently supports the following controllers
+controller or R/C transmitter.  HackflightSim currently supports the following controllers
 through the [Joystick](https://github.com/simondlevy/g/blob/master/Source/MainModule/joystick/Joystick.h) class:
 
 * PS4 controller
@@ -76,18 +63,18 @@ through the [Joystick](https://github.com/simondlevy/g/blob/master/Source/MainMo
 * Spektrum transmitter with WS1000 wireless simulator dongle
 * Great Planes RealFlight Interlink
 
-If you don't have a controller, g will use input from the numeric keypad on your keyboard (make sure
+If you don't have a controller, HackflightSim will use input from the numeric keypad on your keyboard (make sure
 that NumLock is turned on!)
 The key mappings are based on those used in [Microsoft Flight Simulator](https://www.flightsimbooks.com/flightsimhandbook/keyboardcontrols.php#:~:text=Microsoft%20Flight%20Simulator%20Handbook%20%20%20Control%20,%20Keypad%202%20%2043%20more%20rows%20i).
 
-To get g working with Hackflight, you should do the following:
+To get HackflightSim working with Hackflight, you should do the following:
 
 1. Clone the [Hackflight](https://github.com/simondlevy/Hackflight) 
 and [RoboFirmwareToolkit](https://github.com/simondlevy/RoboFirmwareToolkit) 
 (RFT) repositories into your 
 <b>DocumentsArduino/libraries</b> folder, first creating that folder if it
 doesn't already exist.  (You don't need to install Arduino; this is simply
-where g looks for the Hackflight firmware.)
+where HackflightSim looks for the Hackflight firmware.)
 
 2. Double-click <b>use_hackflight.bat</b>
 
@@ -138,7 +125,7 @@ Then follow the directions in
 
 # Design principles
 
-The core of g is the abstract C++ 
+The core of HackflightSim is the abstract C++ 
 [FlightManager](https://github.com/simondlevy/g/blob/master/Source/MainModule/FlightManager.hpp) 
 class. This class provides support for running the vehicle dynamics and the PID control
 regime (e.g., Hackflight) on its own thread, after it first disables the
