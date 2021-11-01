@@ -22,7 +22,7 @@ HSRC = Ladybug.hs \
 
 RUNH = runhaskell -isensors -ipidcontrollers Ladybug.hs
 
-DSTDIR = ..
+DSTDIR = ../arduino/Hackflight
 
 all: hackflight.cpp hackflight.h
 	cp hackflight.c $(DSTDIR)/hackflight.cpp
