@@ -23,7 +23,7 @@ stickDeadband = 0.2 :: SFloat
 
 posHoldController :: Stream Float -> PidFun
 
-posHoldController kp (state, demands) = (state, demands')
+posHoldController kp (state, ready, demands) = (state, ready, demands')
 
   where
 

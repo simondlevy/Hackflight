@@ -16,7 +16,7 @@ import Language.Copilot
 
 import State
 import Sensor
-import Time(time)
+import Time(micros)
 
 altimeter :: Sensor
 
@@ -37,6 +37,7 @@ altimeter state =
 
   where 
 
+    time = (unsafeCast micros) / 1000000.0 
     z' = [0] ++ altimeterZ
     time' = [0] ++ time
 

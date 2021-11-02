@@ -39,6 +39,8 @@ import Messages
 -- Misc
 import Utils
 
+------------------------------------------------------------
+
 m1_pin = 13 :: SWord8 
 m2_pin = 16 :: SWord8 
 m3_pin = 3  :: SWord8 
@@ -56,11 +58,15 @@ pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
            , levelController 0.2 -- Kp
           ]
 
+------------------------------------------------------------
+
 motorfun :: SBool -> SFloat -> SWord8 -> SWord8 -> SWord8 -> SFloat
 motorfun armed flying_value index target percent =
   if armed then flying_value
   else if index == target then (unsafeCast percent) / 100
   else 0
+
+------------------------------------------------------------
 
 spec = do
 

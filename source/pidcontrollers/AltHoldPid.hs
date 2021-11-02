@@ -25,7 +25,7 @@ stickDeadband = 0.2 :: SFloat
 
 altHoldController :: Stream Float -> Stream Float -> PidFun
 
-altHoldController kp ki (state, demands) = (state, demands')
+altHoldController kp ki (state, ready, demands) = (state, ready, demands')
 
   where
 
