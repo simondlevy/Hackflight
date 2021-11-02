@@ -22,9 +22,9 @@ import Time
 import Mixer
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (Demands, Demands, State)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (Demands, State, Demands)
 
-hackflight receiver sensors pidfuns = (rdemands, pdemands, vstate)
+hackflight receiver sensors pidfuns = (rdemands, vstate, pdemands)
 
   where
 
@@ -38,7 +38,7 @@ hackflight receiver sensors pidfuns = (rdemands, pdemands, vstate)
     -- demands
     (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
 
-
+-------------------------------------------------------------------------------
 
 hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> (State, SBool, Motors, SBool)
 
@@ -46,7 +46,7 @@ hackflightFull receiver sensors pidfuns = (vstate, armed', motors, led)
 
   where
 
-    (rdemands, pdemands, vstate) = hackflight receiver sensors pidfuns
+    (rdemands, vstate, pdemands) = hackflight receiver sensors pidfuns
 
     -- Check safety (arming / failsafe)
     (armed, failsafe, mzero) = safety rdemands vstate
@@ -60,3 +60,16 @@ hackflightFull receiver sensors pidfuns = (vstate, armed', motors, led)
     -- Track previous value of arming state to support shutting of motors on
     -- disarm and setting them over serial connection from GCS
     armed' = [False] ++ armed
+
+-------------------------------------------------------------------------------
+
+hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> Motors
+
+hackflightSim receiver sensors pidfuns = motors
+
+  where
+
+    (_, _, pdemands) = hackflight receiver sensors pidfuns
+
+    -- false = not zeroing-out motors
+    motors = mix false pdemands

@@ -126,6 +126,5 @@ spec = do
         arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin,
         arg m1_val, arg m2_val, arg m3_val, arg m4_val]
 
-
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
