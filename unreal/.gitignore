@@ -2,8 +2,7 @@ DerivedDataCache/
 Binaries/
 Intermediate/
 Saved/
-Source/FlightManager/
-MulticopterSim.sln
+*.sln
 *.csv
 *.swp
 *.VC.db
