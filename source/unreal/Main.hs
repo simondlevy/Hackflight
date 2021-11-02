@@ -58,10 +58,10 @@ spec = do
   let motors = hackflightSim receiver sensors pidfuns
 
   -- Send the motor values using the external C function
-  trigger "hackflight_writeMotors" true [  arg $ m1 motors
-                                      , arg $ m2 motors
-                                      , arg $ m3 motors
-                                      , arg $ m4 motors ]
+  trigger "stream_writeMotors" true [  arg $ m1 motors
+                                     , arg $ m2 motors
+                                     , arg $ m3 motors
+                                     , arg $ m4 motors ]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
