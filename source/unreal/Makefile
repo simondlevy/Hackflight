@@ -6,48 +6,48 @@
 # MIT License
 
 HSRC = Main.hs \
-       HackflightSim.hs \
-       Safety.hs \
-       Receiver.hs \
-       Hackflight.hs \
-       Demands.hs \
-       State.hs \
-       Sensor.hs \
-       Time.hs \
-       Utils.hs \
-       Mixer.hs \
-       PidController.hs \
-       pidcontrollers/AltHoldPid.hs \
-       pidcontrollers/RatePid.hs \
-       pidcontrollers/YawPid.hs \
-       pidcontrollers/LevelPid.hs \
-       sensors/Gyrometer.hs \
-       sensors/Altimeter.hs \
-       sensors/Quaternion.hs \
-       sensors/OpticalFlow.hs
+       ../Hackflight.hs \
+       ../Safety.hs \
+       ../Receiver.hs \
+       ../Hackflight.hs \
+       ../Demands.hs \
+       ../State.hs \
+       ../Sensor.hs \
+       ../Time.hs \
+       ../Utils.hs \
+       ../Mixer.hs \
+       ../PidController.hs \
+       ../pidcontrollers/AltHoldPid.hs \
+       ../pidcontrollers/RatePid.hs \
+       ../pidcontrollers/YawPid.hs \
+       ../pidcontrollers/LevelPid.hs \
+       ../sensors/Gyrometer.hs \
+       ../sensors/Altimeter.hs \
+       ../sensors/Quaternion.hs \
+       ../sensors/OpticalFlow.hs
 
-RUNH = runhaskell -isensors -ipidcontrollers Main.hs
+RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
-DSTDIR = ../../Source/CopilotModule/
+DSTDIR = ../../unreal/Source/CopilotModule/
 
-all: copilot.cpp copilot.h
-	cp copilot.c $(DSTDIR)/copilot.cpp
-	sed -i 's/extern/EXTERN/g' copilot.h
-	cat cfiles/header.h copilot.h > $(DSTDIR)/copilot.h
+all: hackflight.cpp hackflight.h
+	cp hackflight.c $(DSTDIR)/hackflight.cpp
+	sed -i 's/extern/EXTERN/g' hackflight.h
+	cat ../cfiles/header.h hackflight.h > $(DSTDIR)/hackflight.h
 
-copilot.c: $(HSRC) Main.hs
+hackflight.c: $(HSRC) Main.hs
 	$(RUNH)
 
-copilot.h: $(HSRC) Main.hs
+hackflight.h: $(HSRC) Main.hs
 	$(RUNH)
 
 clean:
-	rm -f copilot.* tmp.c *~
+	rm -f hackflight.* tmp.c *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
 
-copilot.cpp: copilot.c
-	tail -n +8 copilot.c > tmp.c
-	cat cfiles/header.c tmp.c > copilot.c
+hackflight.cpp: hackflight.c
+	tail -n +8 hackflight.c > tmp.c
+	cat ../cfiles/header.c tmp.c > hackflight.c
 	rm tmp.c

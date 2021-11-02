@@ -12,7 +12,7 @@ module Ladybug where
 
 import Language.Copilot hiding(xor)
 import Copilot.Compile.C99
-import Prelude hiding((++), (==), (&&), (/), (*), (+), not, xor)
+import Prelude hiding((++), (==), (&&), (/), (*), xor)
 
 -- Core
 import Hackflight
@@ -20,6 +20,7 @@ import Receiver
 import Demands
 import State
 import Mixer
+import Time
 
 -- Sensors
 import Gyrometer
@@ -63,10 +64,8 @@ motorfun armed flying_value index target percent =
 
 spec = do
 
-  -- Make flags for startup, loop
-  let flipflop = not flipflop' where flipflop' = [False] ++ flipflop
-  let running = if not flipflop then true else running' where running' = [False] ++ running
-  let starting = not running
+  -- Get flags for startup, loop
+  let (running, starting) = runstate
 
   -- Run the Hackflight algorithm
   let (vstate, armed, motors, led) = hackflightFull receiver sensors pidfuns

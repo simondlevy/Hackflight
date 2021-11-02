@@ -6,6 +6,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+
+static bool stream_imuGotQuaternion_cpy;
+static float stream_imuQuaternionW_cpy;
+static float stream_imuQuaternionX_cpy;
+static float stream_imuQuaternionY_cpy;
+static float stream_imuQuaternionZ_cpy;
+static float stream_receiverAux1_cpy;
 static float stream_receiverThrottle_cpy;
 static bool stream_receiverLostSignal_cpy;
 static uint8_t stream_serialByte_cpy;
