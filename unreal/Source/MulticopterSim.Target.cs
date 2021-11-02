@@ -19,7 +19,7 @@ public class MulticopterSimTarget : TargetRules
 
 		ExtraModuleNames.AddRange( new string[] { 
                 "MainModule", 
-                "QuickstartModule"
+                "CopilotModule"
                 } );
 	}
 }

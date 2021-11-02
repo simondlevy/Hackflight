@@ -37,7 +37,7 @@ to build the project.
 5. In VisualStudio, hit the F5 key to build the project and launch UnrealEditor.
 
 6. In UnrealEditor, select one of the maps in <b>Content/g/Maps</b>. Then open the
-<b>Content/C++ Classes/QuickstartModule/pawns</b> folder and drag one of the
+<b>Content/C++ Classes/CopilotModule/pawns</b> folder and drag one of the
 vehicle pawns into the map. Click the play button and you'll see the vehicle
 take off to an altitude of 10 meters.  You can use the spacebar to switch your
 point-of-view.
@@ -85,20 +85,20 @@ file and select <b>Generate Visual Studio project file</b> to generate a <b>.sln
 to build the project.
 
 5. In Visual Studio, edit the file
-   [g/Source/HackflightModule/HackflightModule.Build.cs](https://github.com/simondlevy/MulticopterSim/blob/master/Source//HackflightModule/HackflightModule.Build.cs#L16-L17)
+   [g/Source/CopilotModule/CopilotModule.Build.cs](https://github.com/simondlevy/MulticopterSim/blob/master/Source//CopilotModule/CopilotModule.Build.cs#L16-L17)
    to reflect where you installed Hackflight / RFT.
 
 6. In VisualStudio, hit the F5 key to build the project and launch UnrealEditor.
 
 7. In UnrealEditor, select one of the maps in <b>Content/g/Maps</b>. Then open the
-<b>Content/C++ Classes/HackflightModule/pawns</b> folder and drag one of the
+<b>Content/C++ Classes/CopilotModule/pawns</b> folder and drag one of the
 vehicle pawns into the map. Click the play button and you're ready to take off!
 
 ## OpenCV
 
 After you build the Hackflight module, the <b>Content/C++ Classes/Hackflight/pawns</b> folder will contain a
 pawn that will run OpenCV edge detection.  By sub-classing the
-[OpenCVCamera](https://github.com/simondlevy/g/blob/master/Source/HackflightModule/OpenCVCamera.hpp)
+[OpenCVCamera](https://github.com/simondlevy/g/blob/master/Source/CopilotModule/OpenCVCamera.hpp)
 class you can run different kinds of machine-vision algorithms.
 
 # Support for other programming languages / packages

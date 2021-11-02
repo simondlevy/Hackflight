@@ -1,5 +1,5 @@
 /*
-* Class declaration for DJI Phantom pawn class using UDP sockets
+* Class declaration for DJI Phantom pawn class using Haskell Copilot
 *
 * Copyright (C) 2019 Simon D. Levy
 *
@@ -9,8 +9,7 @@
 #pragma once
 
 #include "../../MainModule/vehicles/Phantom.hpp"
-
-#include "../FlightManager.hpp"
+#include "../FlightManager.h"
 
 #include <CoreMinimal.h>
 #include <GameFramework/Pawn.h>
@@ -26,6 +25,8 @@ class APhantomPawn : public APawn {
 
         // Helper class
         Phantom _phantom;
+
+        FCopilotFlightManager * _flightManager = NULL;
 
     protected:
 

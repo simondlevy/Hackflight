@@ -1,5 +1,5 @@
 /*
- * Build script for QuickstartModule
+ * Build script for CopilotModule
  *
  * Copyright (C) 2021 Simon D. Levy
  *
@@ -11,9 +11,9 @@ using UnrealBuildTool;
 using System;
 using System.IO;
 
-public class QuickstartModule : ModuleRules
+public class CopilotModule : ModuleRules
 {
-    public QuickstartModule(ReadOnlyTargetRules Target) : base(Target)
+    public CopilotModule(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
