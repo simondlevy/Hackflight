@@ -27,7 +27,8 @@ altimeter state =
         (y      state)
         (dy     state)
         ((z     state) + altimeterZ)
-        ((dz    state) + ((altimeterZ - z') / ((time - time') / time)))
+        -- ((dz    state) + ((altimeterZ - z') / (time - time')))
+        ((dz    state) + (altimeterZ - z'))
         (phi    state)
         (dphi   state)
         (theta  state)
@@ -37,9 +38,9 @@ altimeter state =
 
   where 
 
-    time = (unsafeCast micros) / 1000000.0 
+    -- time = (unsafeCast micros) / 1000000.0 
     z' = [0] ++ altimeterZ
-    time' = [0] ++ time
+    -- time' = [0] ++ time
 
 --------------------------------------------------------------------------
 

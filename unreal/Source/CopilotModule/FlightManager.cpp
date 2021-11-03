@@ -121,7 +121,7 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
     getOpticalFlow();
 
     // Share the altimeter value
-    // stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
+    //stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
 
     // Run Copilot, triggering stream_runMotors
     step();

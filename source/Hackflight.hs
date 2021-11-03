@@ -40,9 +40,11 @@ hackflight receiver sensors pidfuns = (rdemands, vstate, pdemands)
 
 -------------------------------------------------------------------------------
 
-hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> (State, SBool, Motors, SBool)
+hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> Mixer
+  -> (State, SBool, Motors, SBool)
 
-hackflightFull receiver sensors pidfuns = (vstate, armed', motors, led)
+hackflightFull receiver sensors pidfuns mixer
+  = (vstate, armed', motors, led)
 
   where
 
@@ -52,7 +54,7 @@ hackflightFull receiver sensors pidfuns = (vstate, armed', motors, led)
     (armed, failsafe, mzero) = safety rdemands vstate
 
     -- Run mixer on demands to get motor values
-    motors = mix mzero pdemands
+    motors = mixer mzero pdemands
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
@@ -63,13 +65,15 @@ hackflightFull receiver sensors pidfuns = (vstate, armed', motors, led)
 
 -------------------------------------------------------------------------------
 
-hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> (Demands, Demands, Motors)
+hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> Mixer
+  -> (Demands, Demands, Motors)
 
-hackflightSim receiver sensors pidfuns = (rdemands, pdemands, motors)
+hackflightSim receiver sensors pidfuns mixer
+  = (rdemands, pdemands, motors)
 
   where
 
     (rdemands, _, pdemands) = hackflight receiver sensors pidfuns
 
     -- false = not zeroing-out motors
-    motors = mix false pdemands
+    motors = mixer false pdemands
