@@ -55,13 +55,18 @@ pidfuns = [
 spec = do
 
   -- Run the main Hackflight algorithm, getting the motor spins
-  let motors = hackflightSim receiver sensors pidfuns
+  let (rdemands, pdemands, motors) = hackflightSim receiver sensors pidfuns
 
   -- Send the motor values using the external C function
   trigger "stream_writeMotors" true [  arg $ m1 motors
                                      , arg $ m2 motors
                                      , arg $ m3 motors
                                      , arg $ m4 motors ]
+
+  trigger "stream_debugReceiver" true [  arg $ throttle rdemands
+                                       , arg $ roll rdemands
+                                       , arg $ pitch rdemands
+                                       , arg $ yaw rdemands ]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

@@ -63,13 +63,13 @@ hackflightFull receiver sensors pidfuns = (vstate, armed', motors, led)
 
 -------------------------------------------------------------------------------
 
-hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> Motors
+hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> (Demands, Demands, Motors)
 
-hackflightSim receiver sensors pidfuns = motors
+hackflightSim receiver sensors pidfuns = (rdemands, pdemands, motors)
 
   where
 
-    (_, _, pdemands) = hackflight receiver sensors pidfuns
+    (rdemands, _, pdemands) = hackflight receiver sensors pidfuns
 
     -- false = not zeroing-out motors
     motors = mix false pdemands

@@ -16,6 +16,11 @@ static float _m2;
 static float _m3;
 static float _m4;
 
+void stream_debugReceiver(float t, float r, float p, float y)
+{
+    debugline("t: %+3.3f  r: %+3.3f  p: %+3.3f  y: %+3.3f", t, r, p, y);
+}
+
 // Called by Copilot
 void stream_writeMotors(float m1, float m2, float m3, float m4)
 {
@@ -24,7 +29,7 @@ void stream_writeMotors(float m1, float m2, float m3, float m4)
     _m3 = m3;
     _m4 = m4;
 
-    //debugline("m1: %+3.3f  m2: %+3.3f  m3: %+3.3f  m4: %+3.3f", m1, m2, m3, m4);
+//    debugline("m1: %+3.3f  m2: %+3.3f  m3: %+3.3f  m4: %+3.3f", m1, m2, m3, m4);
 }
 
 void stream_debug(float value)
