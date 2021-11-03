@@ -43,11 +43,11 @@ sensors = [gyrometer, quaternion, altimeter, opticalFlow]
 -- PID controllers are applied last-to-first.  Pos-hold is last in list
 -- so that it will can access to the unmodifed receiver demands.
 pidfuns = [  
-             altHoldController 0.75 1.5   -- Kp, Ki
-           , levelController 0.2 -- Kp
-           , yawController 1.0625 0.005625 -- Kp, Ki
-           , rateController 0.225  0.001875 0.375 -- Kp, Ki, Kd 
-           , posHoldController 0.1  -- Kp
+           --  altHoldController 0.75 1.5   -- Kp, Ki
+           --, levelController 0.2 -- Kp
+           --, yawController 1.0625 0.005625 -- Kp, Ki
+           --, rateController 0.225  0.001875 0.375 -- Kp, Ki, Kd 
+           --, posHoldController 0.1  -- Kp
           ]
 
 ------------------------------------------------------------
@@ -63,10 +63,10 @@ spec = do
                                      , arg $ m3 motors
                                      , arg $ m4 motors ]
 
-  trigger "stream_debugReceiver" true [  arg $ throttle rdemands
-                                       , arg $ roll rdemands
-                                       , arg $ pitch rdemands
-                                       , arg $ yaw rdemands ]
+  trigger "stream_debugDemands" true [  arg $ throttle pdemands
+                                      , arg $ roll pdemands
+                                      , arg $ pitch pdemands
+                                      , arg $ yaw pdemands ]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

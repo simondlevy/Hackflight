@@ -16,7 +16,7 @@ static float _m2;
 static float _m3;
 static float _m4;
 
-void stream_debugReceiver(float t, float r, float p, float y)
+void stream_debugDemands(float t, float r, float p, float y)
 {
     debugline("t: %+3.3f  r: %+3.3f  p: %+3.3f  y: %+3.3f", t, r, p, y);
 }
@@ -65,9 +65,9 @@ void FCopilotFlightManager::getReceiverDemands(void)
 
 void FCopilotFlightManager::getGyrometer(void)
 {
-    stream_imuGyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
-    stream_imuGyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
-    stream_imuGyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
+    //stream_imuGyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
+    //stream_imuGyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
+    //stream_imuGyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
 }
 
 void FCopilotFlightManager::getQuaternion(void)
@@ -80,10 +80,10 @@ void FCopilotFlightManager::getQuaternion(void)
 
     FQuat quat = rot.Quaternion();
 
-    stream_imuQuaternionW = quat.W;
-    stream_imuQuaternionX = quat.X;
-    stream_imuQuaternionY = quat.Y;
-    stream_imuQuaternionZ = quat.Z;
+    //stream_imuQuaternionW = quat.W;
+    //stream_imuQuaternionX = quat.X;
+    //stream_imuQuaternionY = quat.Y;
+    //stream_imuQuaternionZ = quat.Z;
 }
 
 void FCopilotFlightManager::getOpticalFlow(void)
@@ -96,8 +96,8 @@ void FCopilotFlightManager::getOpticalFlow(void)
     double sp = sin(psi);
 
     // Rotate inertial velocity into body frame, ignoring roll and pitch fow now
-    stream_flowX = dx * cp + dy * sp;
-    stream_flowY = dy * cp - dx * sp;
+    // stream_flowX = dx * cp + dy * sp;
+    // stream_flowY = dy * cp - dx * sp;
 }
 
 void FCopilotFlightManager::getActuators(const double time, double * values)
@@ -121,7 +121,7 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
     getOpticalFlow();
 
     // Share the altimeter value
-    stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
+    // stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
 
     // Run Copilot, triggering stream_runMotors
     step();
