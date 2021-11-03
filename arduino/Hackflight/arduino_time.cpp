@@ -14,4 +14,6 @@
 void stream_updateTime(void)
 {
     stream_micros = micros();
+
+    // stream_time = stream_micros / 1e6;
 }

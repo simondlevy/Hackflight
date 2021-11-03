@@ -16,7 +16,7 @@ import Language.Copilot
 
 import State
 import Sensor
-import Time(micros)
+import Time
 
 altimeter :: Sensor
 
@@ -27,8 +27,7 @@ altimeter state =
         (y      state)
         (dy     state)
         ((z     state) + altimeterZ)
-        -- ((dz    state) + ((altimeterZ - z') / (time - time')))
-        ((dz    state) + (altimeterZ - z'))
+        ((dz    state) + ((altimeterZ - z') / (time - time')))
         (phi    state)
         (dphi   state)
         (theta  state)
@@ -38,9 +37,8 @@ altimeter state =
 
   where 
 
-    -- time = (unsafeCast micros) / 1000000.0 
     z' = [0] ++ altimeterZ
-    -- time' = [0] ++ time
+    time' = [0] ++ time
 
 --------------------------------------------------------------------------
 

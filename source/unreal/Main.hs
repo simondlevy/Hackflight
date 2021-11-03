@@ -43,9 +43,9 @@ sensors = [gyrometer, quaternion, altimeter, opticalFlow]
 -- PID controllers are applied last-to-first.  Pos-hold is last in list
 -- so that it will can access to the unmodifed receiver demands.
 pidfuns = [  
-           -- altHoldController 0.75 1.5   -- Kp, Ki
+           altHoldController 0.75 1.5   -- Kp, Ki
            --  levelController 0.2 -- Kp
-           yawController 1.0625 0.005625 -- Kp, Ki
+           -- yawController 1.0625 0.005625 -- Kp, Ki
            --, rateController 0.225  0.001875 0.375 -- Kp, Ki, Kd 
            -- , posHoldController 0.1  -- Kp
           ]
