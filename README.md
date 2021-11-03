@@ -32,7 +32,7 @@ Hackflight is currently working on the following platforms:
 * [Butterfly DIY](https://diydrones.com/profiles/blogs/hackhawk-ii-an-arduino-compatible-brushless-flight-controller)
 brushless flight controller (components from from Tlera Corp. and Pesky Products)
 
-* [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine4
+* [HackflightSim](https://github.com/simondlevy/Hackflight/unreal) flight simulator based on UnrealEngine4
 
 ## Standard units
 
