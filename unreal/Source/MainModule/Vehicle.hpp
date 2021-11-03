@@ -1,5 +1,5 @@
 /*
- * General support for vehicles in MulticopterSim
+ * General support for vehicles in HackflightSim
  *
  * This class peforms the following functions:
  *
@@ -32,7 +32,7 @@
 #define DECLARE_STATIC_MESH(structname, assetstr, objname)   \
     struct structname {                                             \
         ConstructorHelpers::FObjectFinderOptional<UStaticMesh> mesh;   \
-        structname() : mesh(TEXT("/Game/MulticopterSim/Meshes/" assetstr)) { } \
+        structname() : mesh(TEXT("/Game/HackflightSim/Meshes/" assetstr)) { } \
     };                                                                     \
     static structname objname;
 
@@ -298,7 +298,7 @@ class Vehicle {
 
             // Get sound cue from Contents
             static ConstructorHelpers::FObjectFinder<USoundCue> soundCue(
-                    TEXT("/Game/MulticopterSim/Audio/MotorSoundCue"));
+                    TEXT("/Game/HackflightSim/Audio/MotorSoundCue"));
 
             // Store a reference to the Cue asset - we'll need it later.
             _soundCue = soundCue.Object;
