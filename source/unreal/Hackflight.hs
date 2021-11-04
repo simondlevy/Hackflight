@@ -14,7 +14,6 @@ import Language.Copilot
 
 import Prelude hiding((!!), (||), (++), (<), (>), (&&), (==), div, mod, not)
 
-import Safety
 import Receiver
 import State
 import Sensor
@@ -23,9 +22,9 @@ import Demands
 import Mixer
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> SafetyFun -> (Motors, SBool)
+hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> Motors
 
-hackflight receiver sensors pidfuns mixer safetyFun = (motors, isArmed)
+hackflightSim receiver sensors pidfuns mixer = motors
 
   where
 
@@ -39,10 +38,5 @@ hackflight receiver sensors pidfuns mixer safetyFun = (motors, isArmed)
     -- receiver demands.
     (_, demands) = compose pidfuns (state, receiverDemands)
 
-    -- Get safety status
-    safety = safetyFun state
-
     -- Apply mixer to demands to get motor values, returning motor values and LED state
-    motors = mixer safety demands
-
-    isArmed = armed safety
+    motors = mixer demands

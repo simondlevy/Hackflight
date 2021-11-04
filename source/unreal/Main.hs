@@ -12,7 +12,7 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 -- Core
-import HackflightSim
+import Hackflight
 import State
 import Demands
 import Receiver

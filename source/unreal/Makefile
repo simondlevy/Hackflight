@@ -6,8 +6,7 @@
 # MIT License
 
 HSRC = Main.hs \
-       HackflightSim.hs \
-       Safety.hs \
+       Hackflight.hs \
        ../Receiver.hs \
        Hackflight.hs \
        ../Demands.hs \

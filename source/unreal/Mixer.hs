@@ -13,7 +13,6 @@ module Mixer where
 import Language.Copilot
 
 import Demands
-import Safety
 import Utils
 
 data Motors = QuadMotors { m1 :: SFloat
@@ -21,45 +20,18 @@ data Motors = QuadMotors { m1 :: SFloat
                          , m3 :: SFloat
                          , m4 :: SFloat }
 
-type Mixer = Safety -> Demands -> Motors
+type Mixer = Demands -> Motors
 
-quadXMWMixer :: Mixer
-
-quadXMWMixer safety demands =
+quadXAPMixer demands =
 
   --                 Th  RR  PF  YR
-  QuadMotors (check $ t - r + p - y)
-             (check $ t - r - p + y)
-             (check $ t + r + p + y)
-             (check $ t + r - p - y)
+  QuadMotors (constrain $ t - r - p + y)
+             (constrain $ t + r + p + y)
+             (constrain $ t + r - p - y)
+             (constrain $ t - r + p - y)
   where 
 
     t = ((throttle demands) + 1) / 2 -- Map throttle from [-1,+1] to [0,1]
     r = roll demands
     p = pitch demands
     y = yaw demands
-
-    check x = if (armed safety) && (not $ failsafe safety) && (t > 0)
-              then constrain x
-              else 0
-
-quadXAPMixer :: Mixer
-
-quadXAPMixer safety demands =
-
-  --                 Th  RR  PF  YR
-  QuadMotors (check $ t - r - p + y)
-             (check $ t + r + p + y)
-             (check $ t + r - p - y)
-             (check $ t - r + p - y)
-  where 
-
-    t = ((throttle demands) + 1) / 2 -- Map throttle from [-1,+1] to [0,1]
-    r = roll demands
-    p = pitch demands
-    y = yaw demands
-
-    check x = if (armed safety) && (not $ failsafe safety) && (t > 0)
-              then constrain x
-              else 0
-
