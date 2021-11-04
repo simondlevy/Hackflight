@@ -23,7 +23,7 @@ HSRC = Main.hs \
        ../sensors/Gyrometer.hs \
        ../sensors/Quaternion.hs \
        sensors/Altimeter.hs \
-       sensors/OpticalFlow.hs
+       ../sensors/OpticalFlow.hs
 
 RUNH = runhaskell -i.. -isensors -i../sensors -ipidcontrollers Main.hs
 
