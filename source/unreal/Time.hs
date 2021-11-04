@@ -27,7 +27,7 @@ ready freq = (micros == micros_prev) where
 --}
 
 micros :: SWord32
-micros  = extern "copilot_micros" Nothing
+micros  = extern "stream_micros" Nothing
 
 time :: SFloat
-time  = extern "copilot_time" Nothing
+time  = extern "stream_time" Nothing

@@ -30,24 +30,24 @@ RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
 DSTDIR = ../../unreal/Source/CopilotModule/
 
-all: copilot.cpp copilot.h
-	cp copilot.c $(DSTDIR)/copilot.cpp
-	sed -i 's/extern/EXTERN/g' copilot.h
-	cat cfiles/header.h copilot.h > $(DSTDIR)/copilot.h
+all: hackflight.cpp hackflight.h
+	cp hackflight.c $(DSTDIR)/hackflight.cpp
+	sed -i 's/extern/EXTERN/g' hackflight.h
+	cat cfiles/header.h hackflight.h > $(DSTDIR)/hackflight.h
 
-copilot.c: $(HSRC) Main.hs
+hackflight.c: $(HSRC) Main.hs
 	$(RUNH)
 
-copilot.h: $(HSRC) Main.hs
+hackflight.h: $(HSRC) Main.hs
 	$(RUNH)
 
 clean:
-	rm -f copilot.* tmp.c *~
+	rm -f hackflight.* tmp.c *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
 
-copilot.cpp: copilot.c
-	tail -n +8 copilot.c > tmp.c
-	cat cfiles/header.c tmp.c > copilot.c
+hackflight.cpp: hackflight.c
+	tail -n +8 hackflight.c > tmp.c
+	cat cfiles/header.c tmp.c > hackflight.c
 	rm tmp.c

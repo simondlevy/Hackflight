@@ -8,16 +8,16 @@
 
 #include "FlightManager.h"
 
-#include "copilot.h"
+#include "hackflight.h"
 
-// Sent by Copilot to copilot_runMotors() -----------
+// Sent by Copilot to stream_runMotors() -----------
 static float _m1;
 static float _m2;
 static float _m3;
 static float _m4;
 
 // Called by Copilot
-void copilot_writeMotors(float m1, float m2, float m3, float m4)
+void stream_writeMotors(float m1, float m2, float m3, float m4)
 {
     _m1 = m1;
     _m2 = m2;
@@ -27,7 +27,7 @@ void copilot_writeMotors(float m1, float m2, float m3, float m4)
     //debugline("m1: %+3.3f  m2: %+3.3f  m3: %+3.3f  m4: %+3.3f", m1, m2, m3, m4);
 }
 
-void copilot_debug(float value)
+void stream_debug(float value)
 {
     debugline("%+3.3f", value);
 }
@@ -51,18 +51,18 @@ void FCopilotFlightManager::getReceiverDemands(void)
     _gameInput->getJoystick(_joyvals);
 
     // Share the stick demands
-    copilot_receiverThrottle = _joyvals[0];
-    copilot_receiverRoll     = _joyvals[1];
-    copilot_receiverPitch    = _joyvals[2];
-    copilot_receiverYaw      = _joyvals[3];
+    stream_receiverThrottle = _joyvals[0];
+    stream_receiverRoll     = _joyvals[1];
+    stream_receiverPitch    = _joyvals[2];
+    stream_receiverYaw      = _joyvals[3];
 }
 
 
 void FCopilotFlightManager::getGyrometer(void)
 {
-    copilot_gyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
-    copilot_gyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
-    copilot_gyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
+    stream_gyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
+    stream_gyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
+    stream_gyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
 }
 
 void FCopilotFlightManager::getQuaternion(void)
@@ -75,10 +75,10 @@ void FCopilotFlightManager::getQuaternion(void)
 
     FQuat quat = rot.Quaternion();
 
-    copilot_quaternionW = quat.W;
-    copilot_quaternionX = quat.X;
-    copilot_quaternionY = quat.Y;
-    copilot_quaternionZ = quat.Z;
+    stream_quaternionW = quat.W;
+    stream_quaternionX = quat.X;
+    stream_quaternionY = quat.Y;
+    stream_quaternionZ = quat.Z;
 }
 
 void FCopilotFlightManager::getOpticalFlow(void)
@@ -91,8 +91,8 @@ void FCopilotFlightManager::getOpticalFlow(void)
     double sp = sin(psi);
 
     // Rotate inertial velocity into body frame, ignoring roll and pitch fow now
-    copilot_flowX = dx * cp + dy * sp;
-    copilot_flowY = dy * cp - dx * sp;
+    stream_flowX = dx * cp + dy * sp;
+    stream_flowY = dy * cp - dx * sp;
 }
 
 void FCopilotFlightManager::getActuators(const double time, double * values)
@@ -104,7 +104,7 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
     }
 
     // Share the current time with Copilot
-    copilot_time = time; 
+    stream_time = time; 
 
     // Share stick demands with Copilot
     getReceiverDemands();
@@ -119,9 +119,9 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
     getOpticalFlow();
 
     // Share the altimeter value
-    copilot_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
+    stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
 
-    // Run Copilot, triggering copilot_runMotors
+    // Run Copilot, triggering stream_runMotors
     step();
 
     // Get updated motor values

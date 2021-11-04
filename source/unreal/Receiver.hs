@@ -91,22 +91,22 @@ receiverThrottleIsDown = receiverThrottle < (-0.995)
 -- Externals -------------------------------------------------
 
 receiverThrottle :: SFloat
-receiverThrottle  = extern "copilot_receiverThrottle" Nothing
+receiverThrottle  = extern "stream_receiverThrottle" Nothing
 
 receiverRoll :: SFloat
-receiverRoll  = extern "copilot_receiverRoll" Nothing
+receiverRoll  = extern "stream_receiverRoll" Nothing
 
 receiverPitch :: SFloat
-receiverPitch  = extern "copilot_receiverPitch" Nothing
+receiverPitch  = extern "stream_receiverPitch" Nothing
 
 receiverYaw :: SFloat
-receiverYaw  = extern "copilot_receiverYaw" Nothing
+receiverYaw  = extern "stream_receiverYaw" Nothing
 
 receiverAux1 :: SFloat
-receiverAux1  = extern "copilot_receiverAux1" Nothing
+receiverAux1  = extern "stream_receiverAux1" Nothing
 
 receiverAux2 :: SFloat
-receiverAux2  = extern "copilot_receiverAux2" Nothing
+receiverAux2  = extern "stream_receiverAux2" Nothing
 
 receiverLostSignal :: SBool
-receiverLostSignal  = extern "copilot_receiverLostSignal" Nothing
+receiverLostSignal  = extern "stream_receiverLostSignal" Nothing

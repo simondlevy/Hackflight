@@ -1,6 +1,6 @@
 #define _EXTERN
 
-#include "copilot.h"
+#include "hackflight.h"
 
 #include <stdbool.h>
 #include <string.h>

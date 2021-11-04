@@ -60,13 +60,13 @@ atan2' y x =
 ----------------------------------------------------------------------
 
 quaternionW :: Stream Float
-quaternionW = extern "copilot_quaternionW" Nothing
+quaternionW = extern "stream_quaternionW" Nothing
 
 quaternionX :: Stream Float
-quaternionX = extern "copilot_quaternionX" Nothing
+quaternionX = extern "stream_quaternionX" Nothing
 
 quaternionY :: Stream Float
-quaternionY = extern "copilot_quaternionY" Nothing
+quaternionY = extern "stream_quaternionY" Nothing
 
 quaternionZ :: Stream Float
-quaternionZ = extern "copilot_quaternionZ" Nothing
+quaternionZ = extern "stream_quaternionZ" Nothing

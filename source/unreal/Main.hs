@@ -59,13 +59,11 @@ spec = do
   -- Run the main Hackflight algorithm, getting the motor spins
   let motors = hackflightSim receiver sensors pidfuns mixer
 
-  -- trigger "copilot_debug" true [arg $ roll pdemands]
-
   -- Send the motor values using the external C function
-  trigger "copilot_writeMotors" true [  arg $ m1 motors
-                                      , arg $ m2 motors
-                                      , arg $ m3 motors
-                                      , arg $ m4 motors ]
+  trigger "stream_writeMotors" true [  arg $ m1 motors
+                                     , arg $ m2 motors
+                                     , arg $ m3 motors
+                                     , arg $ m4 motors ]
 
 -- Compile the spec
-main = reify spec >>= compile "copilot"
+main = reify spec >>= compile "hackflight"
