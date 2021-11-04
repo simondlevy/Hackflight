@@ -20,12 +20,12 @@ HSRC = Main.hs \
        pidcontrollers/RatePid.hs \
        pidcontrollers/YawPid.hs \
        pidcontrollers/LevelPid.hs \
-       sensors/Gyrometer.hs \
+       ../sensors/Gyrometer.hs \
        sensors/Altimeter.hs \
        sensors/Quaternion.hs \
        sensors/OpticalFlow.hs
 
-RUNH = runhaskell -i.. -isensors -ipidcontrollers Main.hs
+RUNH = runhaskell -i.. -isensors -i../sensors -ipidcontrollers Main.hs
 
 DSTDIR = ../../unreal/Source/CopilotModule/
 

@@ -60,9 +60,9 @@ void FCopilotFlightManager::getReceiverDemands(void)
 
 void FCopilotFlightManager::getGyrometer(void)
 {
-    stream_gyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
-    stream_gyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
-    stream_gyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
+    stream_imuGyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
+    stream_imuGyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
+    stream_imuGyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
 }
 
 void FCopilotFlightManager::getQuaternion(void)
@@ -120,6 +120,8 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
 
     // Share the altimeter value
     stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
+
+    stream_imuGotGyrometer = true;
 
     // Run Copilot, triggering stream_runMotors
     step();
