@@ -1,5 +1,5 @@
 /*
- * Abstract camera class for HackflightSim
+ * Abstract camera class for MulticopterSim
  *
  * Copyright (C) 2019 Simon D. Levy
  *
@@ -91,40 +91,40 @@ class Camera {
                 cameraTextureObjects[RES_COUNT][MAX_CAMERAS] =
             { 
                 {
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_640x480_1")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_640x480_2")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_640x480_3")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_640x480_4")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_640x480_5")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_640x480_6")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_640x480_7")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_640x480_8")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_640x480_9")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_640x480_10")) 
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_640x480_1")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_640x480_2")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_640x480_3")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_640x480_4")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_640x480_5")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_640x480_6")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_640x480_7")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_640x480_8")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_640x480_9")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_640x480_10")) 
                 },
                 {
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1280x720_1")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1280x720_2")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1280x720_3")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1280x720_4")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1280x720_5")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1280x720_6")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1280x720_7")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1280x720_8")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1280x720_9")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1280x720_10")) 
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1280x720_1")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1280x720_2")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1280x720_3")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1280x720_4")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1280x720_5")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1280x720_6")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1280x720_7")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1280x720_8")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1280x720_9")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1280x720_10")) 
                 },
                 {
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1920x1080_1")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1920x1080_2")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1920x1080_3")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1920x1080_4")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1920x1080_5")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1920x1080_6")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1920x1080_7")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1920x1080_8")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1920x1080_9")),
-                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/HackflightSim/RenderTargets/renderTarget_1920x1080_10")) 
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1920x1080_1")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1920x1080_2")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1920x1080_3")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1920x1080_4")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1920x1080_5")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1920x1080_6")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1920x1080_7")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1920x1080_8")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1920x1080_9")),
+                    ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>(TEXT("/Game/MulticopterSim/RenderTargets/renderTarget_1920x1080_10")) 
                 }
             };
 

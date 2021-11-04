@@ -1,5 +1,5 @@
 /*
-   HackflightSim FlightManager class implementation using Haskell Copilot
+   MulticopterSim FlightManager class implementation using Haskell Copilot
 
    Copyright(C) 2021 Simon D.Levy
 

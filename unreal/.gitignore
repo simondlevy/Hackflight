@@ -1,7 +1,9 @@
-DerivedDataCache/
+Content/
 Binaries/
+Build/
 Intermediate/
 Saved/
+Source/FlightManager/
 *.sln
 *.csv
 *.swp
@@ -12,23 +14,7 @@ Saved/
 .idea
 .kdev4
 .vscode
-Extras/joytest/windows/Debug/
-Extras/joytest/windows/Release/
-Build/
-WindowsNoEditor/
-Extras/joytest/windows/x64/
 *~
-Content/Desert*
-Content/StarterContent/
-Content/AdvancedGlassPack/
-Content/Desert_Landscape/
-Content/MarsLandscape/
-Content/MulitcopterSim/Decals/
-Content/HackflightSim/Maps/Jezero*
-Content/MulitcopterSim/Meshes/Target/Frame.uasset
-Content/MulitcopterSim/Meshes/Target/Prop.uasset
-Content/Realistic_Dynamic_SkySystem/
-Content/UltraDynamicSky/
 RDS_System.png
 RDS_System_192.png
 

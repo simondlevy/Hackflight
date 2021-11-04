@@ -47,5 +47,3 @@ void stream_startBrushedMotors(uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, u
     startBrushedMotor(m3_pin);
     startBrushedMotor(m4_pin);
 }
-
-

@@ -1,5 +1,5 @@
 /*
-* On-Screen Display for HackflightSim
+* On-Screen Display for MulticopterSim
 *
 * Copyright (C) 2018 Simon D. Levy
 *

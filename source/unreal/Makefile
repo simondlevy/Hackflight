@@ -6,48 +6,48 @@
 # MIT License
 
 HSRC = Main.hs \
-       ../Hackflight.hs \
-       ../Safety.hs \
-       ../Receiver.hs \
-       ../Hackflight.hs \
-       ../Demands.hs \
-       ../State.hs \
-       ../Sensor.hs \
-       ../Time.hs \
-       ../Utils.hs \
-       ../Mixer.hs \
-       ../PidController.hs \
-       ../pidcontrollers/AltHoldPid.hs \
-       ../pidcontrollers/RatePid.hs \
-       ../pidcontrollers/YawPid.hs \
-       ../pidcontrollers/LevelPid.hs \
-       ../sensors/Gyrometer.hs \
-       ../sensors/Altimeter.hs \
-       ../sensors/Quaternion.hs \
-       ../sensors/OpticalFlow.hs
+       HackflightSim.hs \
+       Safety.hs \
+       Receiver.hs \
+       Hackflight.hs \
+       Demands.hs \
+       State.hs \
+       Sensor.hs \
+       Time.hs \
+       Utils.hs \
+       Mixer.hs \
+       PidController.hs \
+       pidcontrollers/AltHoldPid.hs \
+       pidcontrollers/RatePid.hs \
+       pidcontrollers/YawPid.hs \
+       pidcontrollers/LevelPid.hs \
+       sensors/Gyrometer.hs \
+       sensors/Altimeter.hs \
+       sensors/Quaternion.hs \
+       sensors/OpticalFlow.hs
 
-RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
+RUNH = runhaskell -isensors -ipidcontrollers Main.hs
 
 DSTDIR = ../../unreal/Source/CopilotModule/
 
-all: hackflight.cpp hackflight.h
-	cp hackflight.c $(DSTDIR)/hackflight.cpp
-	sed -i 's/extern/EXTERN/g' hackflight.h
-	cat ../cfiles/header.h hackflight.h > $(DSTDIR)/hackflight.h
+all: copilot.cpp copilot.h
+	cp copilot.c $(DSTDIR)/copilot.cpp
+	sed -i 's/extern/EXTERN/g' copilot.h
+	cat cfiles/header.h copilot.h > $(DSTDIR)/copilot.h
 
-hackflight.c: $(HSRC) Main.hs
+copilot.c: $(HSRC) Main.hs
 	$(RUNH)
 
-hackflight.h: $(HSRC) Main.hs
+copilot.h: $(HSRC) Main.hs
 	$(RUNH)
 
 clean:
-	rm -f hackflight.* tmp.c *~
+	rm -f copilot.* tmp.c *~
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
 
-hackflight.cpp: hackflight.c
-	tail -n +8 hackflight.c > tmp.c
-	cat ../cfiles/header.c tmp.c > hackflight.c
+copilot.cpp: copilot.c
+	tail -n +8 copilot.c > tmp.c
+	cat cfiles/header.c tmp.c > copilot.c
 	rm tmp.c
