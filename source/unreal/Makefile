@@ -14,7 +14,7 @@ HSRC = Main.hs \
        State.hs \
        ../Sensor.hs \
        ../Time.hs \
-       Utils.hs \
+       ../Utils.hs \
        Mixer.hs \
        PidController.hs \
        pidcontrollers/AltHoldPid.hs \
