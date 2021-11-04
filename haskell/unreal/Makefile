@@ -10,7 +10,7 @@ HSRC = Main.hs \
        ../Receiver.hs \
        Hackflight.hs \
        ../Demands.hs \
-       State.hs \
+       ../State.hs \
        ../Sensor.hs \
        ../Time.hs \
        ../Utils.hs \

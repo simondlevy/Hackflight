@@ -29,14 +29,15 @@ hackflightSim receiver sensors pidfuns mixer = motors
   where
 
     -- Get receiver demands from external C functions
-    receiverDemands = getDemands receiver
+    rdemands = getDemands receiver
 
-    -- Get the vehicle state by composing the sensor functions over the initial state
-    state = compose sensors zeroState
+    -- Get the vehicle state by composing the sensor functions over the current state
+    -- vstate = compose sensors (state' vstate)
+    vstate = compose sensors (State 0 0 0 0 0 0 0 0 0 0 0 0)
 
     -- Get the demands by composing the PID control functions over the vehicle state and
     -- receiver demands.
-    (_, demands) = compose pidfuns (state, receiverDemands)
+    (_, demands) = compose pidfuns (vstate, rdemands)
 
     -- Apply mixer to demands to get motor values, returning motor values and LED state
     motors = mixer demands
