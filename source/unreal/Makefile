@@ -8,7 +8,7 @@
 HSRC = Main.hs \
        HackflightSim.hs \
        Safety.hs \
-       Receiver.hs \
+       ../Receiver.hs \
        Hackflight.hs \
        ../Demands.hs \
        State.hs \
