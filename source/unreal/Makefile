@@ -12,7 +12,7 @@ HSRC = Main.hs \
        Hackflight.hs \
        ../Demands.hs \
        State.hs \
-       Sensor.hs \
+       ../Sensor.hs \
        ../Time.hs \
        Utils.hs \
        Mixer.hs \
