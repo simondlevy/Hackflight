@@ -10,7 +10,7 @@ HSRC = Main.hs \
        Safety.hs \
        Receiver.hs \
        Hackflight.hs \
-       Demands.hs \
+       ../Demands.hs \
        State.hs \
        Sensor.hs \
        Time.hs \
@@ -26,7 +26,7 @@ HSRC = Main.hs \
        sensors/Quaternion.hs \
        sensors/OpticalFlow.hs
 
-RUNH = runhaskell -isensors -ipidcontrollers Main.hs
+RUNH = runhaskell -i.. -isensors -ipidcontrollers Main.hs
 
 DSTDIR = ../../unreal/Source/CopilotModule/
 
