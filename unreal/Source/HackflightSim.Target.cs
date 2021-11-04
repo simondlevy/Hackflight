@@ -1,5 +1,5 @@
 /*
-* MulticopterSimEditor.Target.cs: Edtor Target script for MulticopterSim
+* HackflightSim.Target.cs: Target script for HackflightSim
 *
 * Copyright (C) 2018 Simon D. Levy
 *
@@ -9,11 +9,11 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class MulticopterSimEditorTarget : TargetRules
+public class HackflightSimTarget : TargetRules
 {
-	public MulticopterSimEditorTarget(TargetInfo Target) : base(Target)
+	public HackflightSimTarget(TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Editor;
+		Type = TargetType.Game;
 
         DefaultBuildSettings = BuildSettingsVersion.V2;
 
