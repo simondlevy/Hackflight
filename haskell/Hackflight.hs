@@ -54,7 +54,7 @@ hackflightFull receiver sensors pidfuns mixer
     (armed, failsafe, mzero) = safety rdemands vstate
 
     -- Run mixer on demands to get motor values
-    motors = mixer mzero pdemands
+    motors = mixer (\m -> if mzero then 0 else m) pdemands
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
@@ -63,24 +63,3 @@ hackflightFull receiver sensors pidfuns mixer
     -- disarm and setting them over serial connection from GCS
     armed' = [False] ++ armed
 
--------------------------------------------------------------------------------
-
-hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> Motors
-
-hackflightSim receiver sensors pidfuns mixer = motors
-
-  where
-
-    -- Get receiver demands from external C functions
-    rdemands = getDemands receiver
-
-    -- Get the vehicle state by composing the sensor functions over the current state
-    -- vstate = compose sensors (state' vstate)
-    vstate = compose sensors (State 0 0 0 0 0 0 0 0 0 0 0 0)
-
-    -- Get the demands by composing the PID control functions over the vehicle state and
-    -- receiver demands.
-    (_, demands) = compose pidfuns (vstate, rdemands)
-
-    -- Apply mixer to demands to get motor values, returning motor values and LED state
-    motors = mixer demands
