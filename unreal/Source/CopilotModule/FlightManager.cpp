@@ -75,10 +75,10 @@ void FCopilotFlightManager::getQuaternion(void)
 
     FQuat quat = rot.Quaternion();
 
-    stream_quaternionW = quat.W;
-    stream_quaternionX = quat.X;
-    stream_quaternionY = quat.Y;
-    stream_quaternionZ = quat.Z;
+    stream_imuQuaternionW = quat.W;
+    stream_imuQuaternionX = -quat.X;  // note negation
+    stream_imuQuaternionY = -quat.Y;  // note negation
+    stream_imuQuaternionZ = quat.Z;
 }
 
 void FCopilotFlightManager::getOpticalFlow(void)
@@ -121,7 +121,9 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
     // Share the altimeter value
     stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
 
+    // Flag the simulated IMU data as available
     stream_imuGotGyrometer = true;
+    stream_imuGotQuaternion = true;
 
     // Run Copilot, triggering stream_runMotors
     step();
