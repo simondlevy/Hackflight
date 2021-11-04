@@ -13,7 +13,7 @@ HSRC = Main.hs \
        ../Demands.hs \
        State.hs \
        Sensor.hs \
-       Time.hs \
+       ../Time.hs \
        Utils.hs \
        Mixer.hs \
        PidController.hs \
