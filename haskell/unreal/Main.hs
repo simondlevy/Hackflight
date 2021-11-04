@@ -50,14 +50,12 @@ pidfuns = [
            , posHoldController 0.1  -- Kp
           ]
 
-mixer = quadXAPMixer
-
 ------------------------------------------------------------
 
 spec = do
 
   -- Run the main Hackflight algorithm, getting the motor spins
-  let motors = hackflightSim receiver sensors pidfuns mixer
+  let motors = hackflightSim receiver sensors pidfuns quadxap
 
   -- Send the motor values using the external C function
   trigger "stream_writeMotors" true [  arg $ m1 motors
