@@ -12,14 +12,9 @@
 module Serial where
 
 import Language.Copilot
-import Prelude hiding((++), (==), take, drop)
 
-import Receiver
-import Utils
+stream_serialAvailable :: Stream Bool
+stream_serialAvailable = extern "stream_serialAvailable" Nothing
 
-
-serialAvailable :: Stream Bool
-serialAvailable = extern "stream_serialAvailable" Nothing
-
-serialByte :: Stream Word8
-serialByte = extern "stream_serialByte" Nothing
+stream_serialByte :: Stream Word8
+stream_serialByte = extern "stream_serialByte" Nothing

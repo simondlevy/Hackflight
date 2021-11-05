@@ -34,7 +34,6 @@ import LevelPid(levelController)
 -- Serial comms
 import Serial
 import Parser
-import Messages
 
 -- Misc
 import Utils
@@ -65,11 +64,8 @@ spec = do
   -- Get flags for startup, loop
   let (running, starting) = runstate
 
-  -- Run the Hackflight algorithm
-  let (vstate, armed, motors, led) = hackflightFull receiver sensors pidfuns quadxmw
-
-  -- Run the serial comms parser
-  let (msgtyp, sending, payindex, checked) = parse serialAvailable serialByte
+  -- Run the full Hackflight algorithm
+  let (msgbuff, motors, led) = hackflightFull receiver sensors pidfuns quadxmw
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
@@ -84,44 +80,31 @@ spec = do
   trigger "stream_updateDsmrx" running []
   trigger "stream_updateTime" running []
   trigger "stream_writeLed" running [arg led_pin, arg led]
-
   trigger "stream_serialUpdate" running []
-  trigger "stream_serialRead" serialAvailable []
+  trigger "stream_serialRead" stream_serialAvailable []
 
-  -- Serial comms ---------------------------------------------------------------------
+  -- Send message to GCS if indicated
 
-  let msgbuffer = message msgtyp vstate
-
-  trigger "stream_serialSend" sending [ 
-                                        arg $ hdr0 msgbuffer
-                                      , arg $ hdr1 msgbuffer
-                                      , arg $ hdr2 msgbuffer
-                                      , arg $ outsize msgbuffer
-                                      , arg $ msgtype msgbuffer
-                                      , arg $ crc msgbuffer
-                                      , arg $ paysize msgbuffer
-                                      , arg $ val00 msgbuffer
-                                      , arg $ val01 msgbuffer
-                                      , arg $ val02 msgbuffer
-                                      , arg $ val03 msgbuffer
-                                      , arg $ val04 msgbuffer
-                                      , arg $ val05 msgbuffer
+  trigger "stream_serialSend" (sending msgbuff) [ 
+                                        arg $ hdr0 msgbuff
+                                      , arg $ hdr1 msgbuff
+                                      , arg $ hdr2 msgbuff
+                                      , arg $ outsize msgbuff
+                                      , arg $ msgtype msgbuff
+                                      , arg $ crc msgbuff
+                                      , arg $ paysize msgbuff
+                                      , arg $ val00 msgbuff
+                                      , arg $ val01 msgbuff
+                                      , arg $ val02 msgbuff
+                                      , arg $ val03 msgbuff
+                                      , arg $ val04 msgbuff
+                                      , arg $ val05 msgbuff
                                       ]
-
-  let motor_index = if msgtyp == 215 && payindex == 1 then serialByte
-                    else motor_index' where motor_index' = [0] ++ motor_index
-
-  let motor_percent = if msgtyp == 215 && payindex == 2 then serialByte
-                      else motor_percent' where motor_percent' = [0] ++ motor_percent
-
-  let m1_val = motorfun armed (m1 motors) motor_index 1 motor_percent
-  let m2_val = motorfun armed (m2 motors) motor_index 2 motor_percent
-  let m3_val = motorfun armed (m3 motors) motor_index 3 motor_percent
-  let m4_val = motorfun armed (m4 motors) motor_index 4 motor_percent
+  -- Run motors
 
   trigger "stream_writeBrushedMotors" true [
         arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin,
-        arg m1_val, arg m2_val, arg m3_val, arg m4_val]
+        arg $ m1 motors, arg $ m2 motors, arg $ m3 motors, arg $ m4 motors]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

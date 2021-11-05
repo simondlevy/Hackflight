@@ -18,7 +18,8 @@ import Messages
 import State
 import Utils
 
-data MessageBuffer = MessageBuffer {  hdr0    :: SWord8 -- '$' (0x24)
+data MessageBuffer = MessageBuffer {  sending :: SBool
+                                    , hdr0    :: SWord8 -- '$' (0x24)
                                     , hdr1    :: SWord8 -- 'M' (0x4D)
                                     , hdr2    :: SWord8 -- '>' (0x3E)
                                     , outsize :: SWord8 
@@ -33,15 +34,16 @@ data MessageBuffer = MessageBuffer {  hdr0    :: SWord8 -- '$' (0x24)
                                     , val05   :: SFloat
                                     }
 
-message :: SWord8 -> State -> MessageBuffer
+message :: SBool -> SWord8 -> State -> MessageBuffer
 
-message msgtype vstate =
+message sending msgtype vstate =
 
   let (paysize, val00, val01, val02, val03, val04, val05) = payload msgtype vstate
 
       outsize = 4 * paysize
 
-  in MessageBuffer  0x24
+  in MessageBuffer  sending
+                    0x24
                     0x4D
                     0x3E 
                     outsize 
