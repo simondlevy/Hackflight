@@ -1,16 +1,20 @@
 /*
-   HackflightSim FlightManager class implementation using Haskell Copilot
+ * HackflightSim FlightManager class definition
+ *
+ * Copyright (C) 2019 Simon D. Levy
+ *
+ * MIT License
+ */
 
-   Copyright(C) 2021 Simon D.Levy
+#pragma once
 
-   MIT License
-*/
-
-#include "FlightManager.hpp"
 #include "Dynamics.hpp"
+#include "Utils.hpp"
 #include "GameInput.hpp"
 
-class FCopilotFlightManager : public FFlightManager {
+#include "Runtime/Core/Public/HAL/Runnable.h"
+
+class FFlightManager : public FRunnable {
 
     private:
 
@@ -27,14 +31,61 @@ class FCopilotFlightManager : public FFlightManager {
         void getQuaternion(void);
         void getOpticalFlow(void);
 
+        FRunnableThread * _thread = NULL;
+
+        bool _running = false;
+
+        // Start-time offset so timing begins at zero
+        double _startTime = 0;
+
+        // For FPS reporting
+        uint32_t _count;
+
+        // Current actuator values from getActuators() method
+        double _actuatorValues[100] = {}; 
+
+        // For computing deltaT
+        double   _previousTime = 0;
+
+        /**
+         * Flight-control method running repeatedly on its own thread.  
+         * @param time current time in seconds (input)
+         * @param values actuator values returned by your controller (output)
+         *
+         */
+        void getActuators(const double time, double * values);
+
+    protected:
+
+        uint8_t _actuatorCount = 0;
+
+        Dynamics * _dynamics = NULL;
+
+        // Constructor, called main thread
+        FFlightManager(Dynamics * dynamics);
+
     public:
 
-        FCopilotFlightManager(APawn * pawn, Dynamics * dynamics);
-		
-        ~FCopilotFlightManager();
+        FFlightManager(APawn * pawn, Dynamics * dynamics);
 
-        virtual void getActuators(const double time, double * values) override;
+        ~FFlightManager(void);
 
         void tick(void);
 
-}; // FCopilotFlightManager
+        // Called by VehiclePawn::Tick() method to get actuator value for
+        // animation and sound
+        double actuatorValue(uint8_t index);
+
+        uint32_t getCount(void);
+
+        static void stopThread(FFlightManager ** worker);
+
+        // FRunnable interface.
+
+        virtual bool Init() override;
+
+        virtual uint32_t Run() override;
+
+        virtual void Stop() override;
+
+}; // class FFlightManager

@@ -1,5 +1,5 @@
 /*
-* Class declaration for DJI Phantom pawn class using Haskell Copilot
+* Class declaration for DJI Phantom pawn class using Haskell 
 *
 * Copyright (C) 2019 Simon D. Levy
 *
@@ -26,7 +26,7 @@ class APhantomPawn : public APawn {
         // Helper class
         Phantom _phantom;
 
-        FCopilotFlightManager * _flightManager = NULL;
+        FFlightManager * _flightManager = NULL;
 
     protected:
 

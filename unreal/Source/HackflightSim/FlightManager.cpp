@@ -1,5 +1,5 @@
 /*
-   HackflightSim FlightManager class implementation using Haskell Copilot
+   HackflightSim FlightManager implementation
 
    Copyright(C) 2021 Simon D.Levy
 
@@ -7,16 +7,15 @@
 */
 
 #include "FlightManager.h"
-
 #include "hackflight.h"
 
-// Sent by Copilot to stream_runMotors() -----------
+// Sent by  to stream_runMotors() -----------
 static float _m1;
 static float _m2;
 static float _m3;
 static float _m4;
 
-// Called by Copilot
+// Called by Haskell
 void stream_writeMotors(float m1, float m2, float m3, float m4)
 {
     _m1 = m1;
@@ -32,7 +31,7 @@ void stream_debug(float value)
     debugline("%+3.3f", value);
 }
 
-FCopilotFlightManager::FCopilotFlightManager(APawn * pawn, Dynamics * dynamics)
+FFlightManager::FFlightManager(APawn * pawn, Dynamics * dynamics)
     : FFlightManager(dynamics)
 {
     _gameInput = new GameInput(pawn);
@@ -40,11 +39,28 @@ FCopilotFlightManager::FCopilotFlightManager(APawn * pawn, Dynamics * dynamics)
     _ready = true;
 }
 
-FCopilotFlightManager::~FCopilotFlightManager()
+FFlightManager::FFlightManager(Dynamics * dynamics) 
 {
+    _thread = FRunnableThread::Create(this, TEXT("FThreadedManage"), 0, TPri_BelowNormal); 
+    _startTime = FPlatformTime::Seconds();
+    _count = 0;
+
+    // Constant
+    _actuatorCount = dynamics->actuatorCount();
+
+    _dynamics = dynamics;
+
+    // For periodic update
+    _previousTime = 0;
 }
 
-void FCopilotFlightManager::getReceiverDemands(void)
+
+FFlightManager::~FFlightManager()
+{
+    delete _thread;
+}
+
+void FFlightManager::getReceiverDemands(void)
 {
     // Get stick demands
     _gameInput->getJoystick(_joyvals);
@@ -57,14 +73,14 @@ void FCopilotFlightManager::getReceiverDemands(void)
 }
 
 
-void FCopilotFlightManager::getGyrometer(void)
+void FFlightManager::getGyrometer(void)
 {
     stream_imuGyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
     stream_imuGyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
     stream_imuGyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
 }
 
-void FCopilotFlightManager::getQuaternion(void)
+void FFlightManager::getQuaternion(void)
 {
     FRotator rot = FRotator(
             FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA)),
@@ -80,7 +96,7 @@ void FCopilotFlightManager::getQuaternion(void)
     stream_imuQuaternionZ = quat.Z;
 }
 
-void FCopilotFlightManager::getOpticalFlow(void)
+void FFlightManager::getOpticalFlow(void)
 {
     double dx = _dynamics->x(Dynamics::STATE_X_DOT);
     double dy = _dynamics->x(Dynamics::STATE_Y_DOT);
@@ -94,7 +110,7 @@ void FCopilotFlightManager::getOpticalFlow(void)
     stream_flowY = dy * cp - dx * sp;
 }
 
-void FCopilotFlightManager::getActuators(const double time, double * values)
+void FFlightManager::getActuators(const double time, double * values)
 {
     // Avoid null-pointer exceptions at startup, freeze after control
     // program halts
@@ -102,10 +118,10 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
         return;
     }
 
-    // Share the current time with Copilot
+    // Share the current time with 
     stream_time = time; 
 
-    // Share stick demands with Copilot
+    // Share stick demands with 
     getReceiverDemands();
 
     // Share the gyrometer values
@@ -124,7 +140,7 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
     stream_imuGotGyrometer = true;
     stream_imuGotQuaternion = true;
 
-    // Run Copilot, triggering stream_runMotors
+    // Run , triggering stream_runMotors
     step();
 
     // Get updated motor values
@@ -134,8 +150,77 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
     values[3] = _m4;
 }
 
-void FCopilotFlightManager::tick(void)
+void FFlightManager::tick(void)
 {
     // Get demands from keypad
     _gameInput->getKeypad(_joyvals);
 }
+
+double FFlightManager::actuatorValue(uint8_t index)
+{
+    return _actuatorValues[index];
+}
+
+uint32_t FFlightManager::getCount(void)
+{
+    return _count;
+}
+
+void FFlightManager::stopThread(FFlightManager ** worker)
+{
+    if (*worker) {
+        (*worker)->Stop();
+        delete *worker;
+    }
+
+    *worker = NULL;
+}
+
+bool FFlightManager::Init() 
+{
+    _running = false;
+
+    return FRunnable::Init();
+}
+
+uint32_t FFlightManager::Run()
+{
+    // Initial wait before starting
+    FPlatformProcess::Sleep(0.5);
+
+    _running = true;
+
+    while (_running) {
+
+        // Get a high-fidelity current time value from the OS
+        double currentTime = FPlatformTime::Seconds() - _startTime;
+
+        // Update dynamics
+        _dynamics->update(_actuatorValues, currentTime - _previousTime);
+
+        // PID controller: update the flight manager (e.g.,
+        // HackflightManager) with the dynamics state, getting back the
+        // actuator values
+        this->getActuators(currentTime, _actuatorValues);
+
+        // Track previous time for deltaT
+        _previousTime = currentTime;
+
+        // Increment count for FPS reporting
+        _count++;
+    }
+
+    return 0;
+}
+
+void FFlightManager::Stop()
+{
+    _running = false;
+
+    // Final wait after stopping
+    FPlatformProcess::Sleep(0.03);
+
+    FRunnable::Stop();
+}
+
+

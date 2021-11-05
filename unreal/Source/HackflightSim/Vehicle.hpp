@@ -21,7 +21,7 @@
 
 #include "Utils.hpp"
 #include "Dynamics.hpp"
-#include "FlightManager.hpp"
+#include "FlightManager.h"
 #include "Camera.hpp"
 
 #include <stdio.h>
