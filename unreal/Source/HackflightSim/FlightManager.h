@@ -55,17 +55,13 @@ class FFlightManager : public FRunnable {
          */
         void getActuators(const double time, double * values);
 
-    protected:
-
         uint8_t _actuatorCount = 0;
 
         Dynamics * _dynamics = NULL;
 
-        // Constructor, called main thread
-        FFlightManager(Dynamics * dynamics);
-
     public:
 
+        // Constructor, called main thread
         FFlightManager(APawn * pawn, Dynamics * dynamics);
 
         ~FFlightManager(void);

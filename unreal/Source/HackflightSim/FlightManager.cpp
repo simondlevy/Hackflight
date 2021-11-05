@@ -32,14 +32,6 @@ void stream_debug(float value)
 }
 
 FFlightManager::FFlightManager(APawn * pawn, Dynamics * dynamics)
-    : FFlightManager(dynamics)
-{
-    _gameInput = new GameInput(pawn);
-
-    _ready = true;
-}
-
-FFlightManager::FFlightManager(Dynamics * dynamics) 
 {
     _thread = FRunnableThread::Create(this, TEXT("FThreadedManage"), 0, TPri_BelowNormal); 
     _startTime = FPlatformTime::Seconds();
@@ -52,8 +44,10 @@ FFlightManager::FFlightManager(Dynamics * dynamics)
 
     // For periodic update
     _previousTime = 0;
-}
+    _gameInput = new GameInput(pawn);
 
+    _ready = true;
+}
 
 FFlightManager::~FFlightManager()
 {
