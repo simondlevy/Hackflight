@@ -14,7 +14,46 @@ module Parser where
 import Language.Copilot hiding(xor)
 import Prelude hiding((==), (&&), (||), (++), (>), (<), not)
 
+import Messages
+import State
 import Utils
+
+data MessageBuffer = MessageBuffer {  hdr0    :: SWord8 -- '$' (0x24)
+                                    , hdr1    :: SWord8 -- 'M' (0x4D)
+                                    , hdr2    :: SWord8 -- '>' (0x3E)
+                                    , outsize :: SWord8 
+                                    , msgtype :: SWord8 
+                                    , crc     :: SWord8 
+                                    , paysize :: SWord8 
+                                    , val00   :: SFloat  
+                                    , val01   :: SFloat
+                                    , val02   :: SFloat
+                                    , val03   :: SFloat
+                                    , val04   :: SFloat
+                                    , val05   :: SFloat
+                                    }
+
+message :: SWord8 -> State -> MessageBuffer
+
+message msgtype vstate =
+
+  let (paysize, val00, val01, val02, val03, val04, val05) = payload msgtype vstate
+
+      outsize = 4 * paysize
+
+  in MessageBuffer  0x24
+                    0x4D
+                    0x3E 
+                    outsize 
+                    msgtype
+                    (xor outsize msgtype)
+                    paysize
+                    val00
+                    val01
+                    val02
+                    val03
+                    val04
+                    val05
 
 parse :: SBool -> SWord8 -> (SWord8, SBool, SWord8, SBool)
 

@@ -77,7 +77,7 @@ spec = do
   let (vstate, armed, motors, led) = hackflightFull receiver sensors pidfuns quadxmw
 
   -- Run the serial comms parser
-  let (msgtype, sending, payindex, checked) = parse serialAvailable serialByte
+  let (msgtyp, sending, payindex, checked) = parse serialAvailable serialByte
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
@@ -98,29 +98,28 @@ spec = do
 
   -- Serial comms ---------------------------------------------------------------------
 
-  let (paysize, val00, val01, val02, val03, val04, val05) = payload msgtype vstate
+  let msgbuffer = message msgtyp vstate
 
-  let outsize = 4 * paysize
-
-  trigger "stream_serialSend" sending [ arg (0x24::SWord8)        -- '$'
-                                      , arg (0x4D::SWord8)        -- 'M'
-                                      , arg (0x3E::SWord8)        -- '>'
-                                      , arg outsize
-                                      , arg msgtype
-                                      , arg $ xor outsize msgtype -- CRC
-                                      , arg paysize
-                                      , arg $ val00
-                                      , arg $ val01
-                                      , arg $ val02
-                                      , arg $ val03
-                                      , arg $ val04
-                                      , arg $ val05
+  trigger "stream_serialSend" sending [ 
+                                        arg $ hdr0 msgbuffer
+                                      , arg $ hdr1 msgbuffer
+                                      , arg $ hdr2 msgbuffer
+                                      , arg $ outsize msgbuffer
+                                      , arg $ msgtype msgbuffer
+                                      , arg $ crc msgbuffer
+                                      , arg $ paysize msgbuffer
+                                      , arg $ val00 msgbuffer
+                                      , arg $ val01 msgbuffer
+                                      , arg $ val02 msgbuffer
+                                      , arg $ val03 msgbuffer
+                                      , arg $ val04 msgbuffer
+                                      , arg $ val05 msgbuffer
                                       ]
 
-  let motor_index = if msgtype == 215 && payindex == 1 then serialByte
+  let motor_index = if msgtyp == 215 && payindex == 1 then serialByte
                     else motor_index' where motor_index' = [0] ++ motor_index
 
-  let motor_percent = if msgtype == 215 && payindex == 2 then serialByte
+  let motor_percent = if msgtyp == 215 && payindex == 2 then serialByte
                       else motor_percent' where motor_percent' = [0] ++ motor_percent
 
   let m1_val = motorfun armed (m1 motors) motor_index 1 motor_percent
