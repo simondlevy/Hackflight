@@ -60,11 +60,9 @@ void FCopilotFlightManager::getReceiverDemands(void)
 
 void FCopilotFlightManager::getGyrometer(void)
 {
-    /*
-    stream_imuGyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
-    stream_imuGyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
+    //stream_imuGyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
+    //stream_imuGyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
     stream_imuGyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
-    */
 }
 
 void FCopilotFlightManager::getQuaternion(void)
@@ -126,7 +124,7 @@ void FCopilotFlightManager::getActuators(const double time, double * values)
     stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
 
     // Flag the simulated IMU data as available
-    //stream_imuGotGyrometer = true;
+    stream_imuGotGyrometer = true;
     //stream_imuGotQuaternion = true;
 
     // Run Copilot, triggering stream_runMotors
