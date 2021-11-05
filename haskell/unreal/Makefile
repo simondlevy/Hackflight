@@ -32,7 +32,7 @@ DSTDIR = ../../unreal/Source/CopilotModule/
 all: hackflight.cpp hackflight.h
 	cp hackflight.c $(DSTDIR)/hackflight.cpp
 	sed -i 's/extern/EXTERN/g' hackflight.h
-	cat cfiles/header.h hackflight.h > $(DSTDIR)/hackflight.h
+	cat ../cfiles/header.h hackflight.h > $(DSTDIR)/hackflight.h
 
 hackflight.c: $(HSRC) Main.hs
 	$(RUNH)
@@ -48,5 +48,5 @@ commit:
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c
-	cat cfiles/header.c tmp.c > hackflight.c
+	cat ../cfiles/header.c tmp.c > hackflight.c
 	rm tmp.c
