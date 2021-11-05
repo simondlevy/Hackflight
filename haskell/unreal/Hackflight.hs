@@ -21,6 +21,7 @@ import PidController
 import Demands
 import Mixer
 import Utils
+import Time
 
 hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> Motors
 
@@ -37,7 +38,7 @@ hackflightSim receiver sensors pidfuns mixer = motors
 
     -- Get the demands by composing the PID control functions over the vehicle state and
     -- receiver demands.
-    (_, pdemands) = compose pidfuns (vstate, rdemands)
+    (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
 
     -- Apply mixer to demands to get motor values, returning motor values and LED state
     motors = mixer (\m -> constrain m) pdemands

@@ -15,17 +15,14 @@ HSRC = Main.hs \
        ../Time.hs \
        ../Utils.hs \
        ../Mixer.hs \
-       PidController.hs \
-       pidcontrollers/AltHoldPid.hs \
-       pidcontrollers/RatePid.hs \
-       pidcontrollers/YawPid.hs \
-       pidcontrollers/LevelPid.hs \
+       ../PidController.hs \
+       ../pidcontrollers/AltHoldPid.hs \
        ../sensors/Gyrometer.hs \
        ../sensors/Quaternion.hs \
        ../sensors/Altimeter.hs \
        ../sensors/OpticalFlow.hs
 
-RUNH = runhaskell -i.. -i../sensors -ipidcontrollers Main.hs
+RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
 DSTDIR = ../../unreal/Source/CopilotModule/
 

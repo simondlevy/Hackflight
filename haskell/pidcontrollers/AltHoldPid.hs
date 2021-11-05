@@ -40,7 +40,8 @@ altHoldController kp ki (state, ready, demands) = (state, ready, demands')
     -- Accumualte error integral
     errI = constrain_abs (errI' + err) windupMax
 
-    targetVelocity = if inband then altitudeTarget - altitude else pilotVelZMax * (throttle demands)
+    targetVelocity = if inband then altitudeTarget - altitude
+                     else pilotVelZMax * (throttle demands)
 
     -- Reset controller when moving into deadband
     altitudeTarget = if inband && not (in_band throttleDemand' stickDeadband)
