@@ -20,16 +20,15 @@ import PidController
 import Safety
 import Time
 import Mixers
+import Motors
 import Parser
 import Serial
 import Utils
 
--------------------------------------------------------------------------------
-
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State -> State) -> Mixer -> (SFloat -> SFloat)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> StateFun -> MixerFun -> SafetyFun
   -> (Demands, State, Demands, Motors)
 
-hackflight receiver sensors pidfuns statefun mixer mixfun
+hackflight receiver sensors pidfuns statefun mixer safefun
   = (rdemands, vstate, pdemands, motors)
 
   where
@@ -45,11 +44,11 @@ hackflight receiver sensors pidfuns statefun mixer mixfun
     (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
 
     -- Run mixer on demands to get motor values
-    motors = mixer mixfun pdemands
+    motors = mixer safefun pdemands
 
 -------------------------------------------------------------------------------
 
-hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> Mixer
+hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> MixerFun
   -> (MessageBuffer, Motors, SBool)
 
 hackflightFull receiver sensors pidfuns mixer
@@ -86,30 +85,19 @@ hackflightFull receiver sensors pidfuns mixer
     motor_percent = if msgtyp == 215 && payindex == 2 then stream_serialByte
                     else motor_percent' where motor_percent' = [0] ++ motor_percent
 
-    motorfun armed flying_value index target percent =
-      if armed then flying_value
-      else if index == target then (unsafeCast percent) / 100
-      else 0
-
     -- Set motors based on arming state and whether we have GCS input
-    -- XXX Should work for more than quad
-    m1_val = motorfun armed (m1 motors') motor_index 1 motor_percent
-    m2_val = motorfun armed (m2 motors') motor_index 2 motor_percent
-    m3_val = motorfun armed (m3 motors') motor_index 3 motor_percent
-    m4_val = motorfun armed (m4 motors') motor_index 4 motor_percent
-
-    motors = QuadMotors m1_val m2_val m3_val m4_val
+    motors = quadFun motors' armed motor_index motor_percent
 
 -------------------------------------------------------------------------------
 
-hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> Motors
+hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> MixerFun -> Motors
 
 hackflightSim receiver sensors pidfuns mixer = motors
 
   where
 
-    (_, _, _, motors) = hackflight receiver sensors pidfuns statefun mixer mixfun
+    (_, _, _, motors) = hackflight receiver sensors pidfuns statefun mixer safefun
 
-    mixfun = \m -> constrain m
+    safefun = \m -> constrain m
 
     statefun = \_ -> State 0 0 0 0 0 0 0 0 0 0 0 0

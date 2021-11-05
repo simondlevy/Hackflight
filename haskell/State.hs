@@ -17,6 +17,8 @@ import Prelude hiding((&&), (<), (++))
 
 import Utils
 
+type StateFun = State -> State
+
 data State = State {   x :: SFloat
                 ,     dx :: SFloat
                 ,      y :: SFloat

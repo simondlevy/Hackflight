@@ -18,6 +18,7 @@ import Demands
 import Receiver
 import Time
 import Mixers
+import Motors
 
 -- Sensors
 import Gyrometer
