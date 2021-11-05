@@ -20,7 +20,17 @@ import PidController
 import Safety
 import Time
 import Mixers
+import Parser
 import Utils
+
+motorfun :: SBool -> SFloat -> SWord8 -> SWord8 -> SWord8 -> SFloat
+motorfun armed flying_value index target percent =
+  if armed then flying_value
+  else if index == target then (unsafeCast percent) / 100
+  else 0
+
+------------------------------------------------------------
+
 
 hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State -> State) -> Mixer -> (SFloat -> SFloat)
   -> (Demands, State, Demands, Motors)

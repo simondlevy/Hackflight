@@ -60,14 +60,6 @@ pidfuns = [  yawController 1.0625 0.005625 -- Kp, Ki
 
 ------------------------------------------------------------
 
-motorfun :: SBool -> SFloat -> SWord8 -> SWord8 -> SWord8 -> SFloat
-motorfun armed flying_value index target percent =
-  if armed then flying_value
-  else if index == target then (unsafeCast percent) / 100
-  else 0
-
-------------------------------------------------------------
-
 spec = do
 
   -- Get flags for startup, loop
