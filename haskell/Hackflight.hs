@@ -22,9 +22,11 @@ import Time
 import Mixer
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> (Demands, State, Demands)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State -> State) -> Mixer -> (SFloat -> SFloat)
+  -> (Demands, State, Demands, Motors)
 
-hackflight receiver sensors pidfuns = (rdemands, vstate, pdemands)
+hackflight receiver sensors pidfuns statefun mixer mixfun
+  = (rdemands, vstate, pdemands, motors)
 
   where
 
@@ -32,11 +34,14 @@ hackflight receiver sensors pidfuns = (rdemands, vstate, pdemands)
     rdemands = getDemands receiver
 
     -- Get the vehicle state by composing the sensor functions over the current state
-    vstate = compose sensors (state' vstate)
+    vstate = compose sensors (statefun vstate)
 
     -- Periodically get the demands by composing the PID controllers over the receiver
     -- demands
     (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
+
+    -- Run mixer on demands to get motor values
+    motors = mixer mixfun pdemands
 
 -------------------------------------------------------------------------------
 
@@ -48,13 +53,14 @@ hackflightFull receiver sensors pidfuns mixer
 
   where
 
-    (rdemands, vstate, pdemands) = hackflight receiver sensors pidfuns
-
     -- Check safety (arming / failsafe)
     (armed, failsafe, mzero) = safety rdemands vstate
 
-    -- Run mixer on demands to get motor values
-    motors = mixer (\m -> if mzero then 0 else m) pdemands
+    -- Disables motors on failsafe, throttle-down, ...
+    safemix = \m -> if mzero then 0 else m
+
+    -- Run the core Hackflight algorithm
+    (rdemands, vstate, pdemands, motors) = hackflight receiver sensors pidfuns state' mixer safemix
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
@@ -71,16 +77,8 @@ hackflightSim receiver sensors pidfuns mixer = motors
 
   where
 
-    -- Get receiver demands from external C functions
-    rdemands = getDemands receiver
+    (_, _, _, motors) = hackflight receiver sensors pidfuns statefun mixer mixfun
 
-    -- Get the vehicle state by composing the sensor functions over the current state
-    -- vstate = compose sensors (state' vstate)
-    vstate = compose sensors (State 0 0 0 0 0 0 0 0 0 0 0 0)
+    mixfun = \m -> constrain m
 
-    -- Get the demands by composing the PID control functions over the vehicle state and
-    -- receiver demands.
-    (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
-
-    -- Apply mixer to demands to get motor values, returning motor values and LED state
-    motors = mixer (\m -> constrain m) pdemands
+    statefun = \_ -> State 0 0 0 0 0 0 0 0 0 0 0 0
