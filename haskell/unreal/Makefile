@@ -6,9 +6,8 @@
 # MIT License
 
 HSRC = Main.hs \
-       Hackflight.hs \
+       ../Hackflight.hs \
        ../Receiver.hs \
-       Hackflight.hs \
        ../Demands.hs \
        ../State.hs \
        ../Sensor.hs \

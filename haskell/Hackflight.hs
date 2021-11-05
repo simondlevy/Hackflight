@@ -63,3 +63,24 @@ hackflightFull receiver sensors pidfuns mixer
     -- disarm and setting them over serial connection from GCS
     armed' = [False] ++ armed
 
+-------------------------------------------------------------------------------
+
+hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> Motors
+
+hackflightSim receiver sensors pidfuns mixer = motors
+
+  where
+
+    -- Get receiver demands from external C functions
+    rdemands = getDemands receiver
+
+    -- Get the vehicle state by composing the sensor functions over the current state
+    -- vstate = compose sensors (state' vstate)
+    vstate = compose sensors (State 0 0 0 0 0 0 0 0 0 0 0 0)
+
+    -- Get the demands by composing the PID control functions over the vehicle state and
+    -- receiver demands.
+    (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
+
+    -- Apply mixer to demands to get motor values, returning motor values and LED state
+    motors = mixer (\m -> constrain m) pdemands
