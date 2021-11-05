@@ -17,7 +17,7 @@ import State
 import Demands
 import Receiver
 import Time
-import Mixer
+import Mixers
 
 -- Sensors
 import Gyrometer

@@ -19,7 +19,7 @@ import Hackflight
 import Receiver
 import Demands
 import State
-import Mixer
+import Mixers
 import Time
 
 -- Sensors

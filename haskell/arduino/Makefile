@@ -12,7 +12,7 @@ HSRC = Ladybug.hs \
        ../Serial.hs \
        ../Messages.hs \
        ../Time.hs \
-       ../Mixer.hs \
+       ../Mixers.hs \
        ../Utils.hs \
 	   ../sensors/Gyrometer.hs \
 	   ../sensors/Quaternion.hs \

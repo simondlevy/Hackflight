@@ -13,7 +13,7 @@ HSRC = Main.hs \
        ../Sensor.hs \
        ../Time.hs \
        ../Utils.hs \
-       ../Mixer.hs \
+       ../Mixers.hs \
        ../PidController.hs \
        ../pidcontrollers/AltHoldPid.hs \
        ../pidcontrollers/YawPid.hs \

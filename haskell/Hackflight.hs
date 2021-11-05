@@ -19,7 +19,7 @@ import Demands
 import PidController
 import Safety
 import Time
-import Mixer
+import Mixers
 import Utils
 
 hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State -> State) -> Mixer -> (SFloat -> SFloat)

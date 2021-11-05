@@ -1,5 +1,5 @@
 {--
-  Mixer type
+  Mixer types
 
   Copyright(C) 2021 Simon D.Levy
 
@@ -8,7 +8,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module Mixer where
+module Mixers where
 
 import Language.Copilot
 
