@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "../vehicles/Phantom.hpp"
+#include "Phantom.hpp"
 #include "../DynamicsThread.h"
 
 #include <CoreMinimal.h>
