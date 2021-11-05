@@ -26,14 +26,6 @@ import Utils
 
 -------------------------------------------------------------------------------
 
-motorfun :: SBool -> SFloat -> SWord8 -> SWord8 -> SWord8 -> SFloat
-motorfun armed flying_value index target percent =
-  if armed then flying_value
-  else if index == target then (unsafeCast percent) / 100
-  else 0
-
--------------------------------------------------------------------------------
-
 hackflight :: Receiver -> [Sensor] -> [PidFun] -> (State -> State) -> Mixer -> (SFloat -> SFloat)
   -> (Demands, State, Demands, Motors)
 
@@ -93,6 +85,11 @@ hackflightFull receiver sensors pidfuns mixer
                   else motor_index' where motor_index' = [0] ++ motor_index
     motor_percent = if msgtyp == 215 && payindex == 2 then stream_serialByte
                     else motor_percent' where motor_percent' = [0] ++ motor_percent
+
+    motorfun armed flying_value index target percent =
+      if armed then flying_value
+      else if index == target then (unsafeCast percent) / 100
+      else 0
 
     -- Set motors based on arming state and whether we have GCS input
     -- XXX Should work for more than quad
