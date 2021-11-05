@@ -37,11 +37,8 @@ import PosHoldPid(posHoldController)
 
 receiver = makeReceiver 4.0
 
--- sensors = [gyrometer, quaternion, altimeter, opticalFlow]
 sensors = [gyrometer, quaternion, altimeter, opticalFlow]
 
--- PID controllers are applied last-to-first.  Pos-hold is last in list
--- so that it will can access to the unmodifed receiver demands.
 pidfuns = [  
              altHoldController 0.75 1.5   -- Kp, Ki
            , levelController 0.2 -- Kp
