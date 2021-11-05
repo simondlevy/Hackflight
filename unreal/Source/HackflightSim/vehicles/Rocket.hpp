@@ -72,7 +72,7 @@ class Rocket {
         };
 
         // Threaded worker for flight control
-        FFlightManager * _flightManager = NULL;
+        FDyanmicsThread * _flightManager = NULL;
 
         void addRotor(UStaticMesh* mesh, float z)
         {
@@ -121,7 +121,7 @@ class Rocket {
             _vehicle->PostInitializeComponents();
         }
 
-        void BeginPlay(FFlightManager * flightManager)
+        void BeginPlay(FDyanmicsThread * flightManager)
         {
             _flightManager = flightManager;
 
@@ -130,7 +130,7 @@ class Rocket {
 
         void EndPlay(void)
         {
-            FFlightManager::stopThread(&_flightManager);
+            FDyanmicsThread::stopThread(&_flightManager);
         }
 
         void Tick(float DeltaSeconds)

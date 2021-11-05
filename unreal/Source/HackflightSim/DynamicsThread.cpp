@@ -1,12 +1,12 @@
 /*
-   HackflightSim FlightManager implementation
+   HackflightSim DynamicsThread implementation
 
    Copyright(C) 2021 Simon D.Levy
 
    MIT License
 */
 
-#include "FlightManager.h"
+#include "DynamicsThread.h"
 #include "hackflight.h"
 
 // Sent by  to stream_runMotors() -----------
@@ -31,7 +31,7 @@ void stream_debug(float value)
     debugline("%+3.3f", value);
 }
 
-FFlightManager::FFlightManager(APawn * pawn, Dynamics * dynamics)
+FDyanmicsThread::FDyanmicsThread(APawn * pawn, Dynamics * dynamics)
 {
     _thread = FRunnableThread::Create(this, TEXT("FThreadedManage"), 0, TPri_BelowNormal); 
     _startTime = FPlatformTime::Seconds();
@@ -49,12 +49,12 @@ FFlightManager::FFlightManager(APawn * pawn, Dynamics * dynamics)
     _ready = true;
 }
 
-FFlightManager::~FFlightManager()
+FDyanmicsThread::~FDyanmicsThread()
 {
     delete _thread;
 }
 
-void FFlightManager::getReceiverDemands(void)
+void FDyanmicsThread::getReceiverDemands(void)
 {
     // Get stick demands
     _gameInput->getJoystick(_joyvals);
@@ -67,14 +67,14 @@ void FFlightManager::getReceiverDemands(void)
 }
 
 
-void FFlightManager::getGyrometer(void)
+void FDyanmicsThread::getGyrometer(void)
 {
     stream_imuGyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
     stream_imuGyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
     stream_imuGyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
 }
 
-void FFlightManager::getQuaternion(void)
+void FDyanmicsThread::getQuaternion(void)
 {
     FRotator rot = FRotator(
             FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA)),
@@ -90,7 +90,7 @@ void FFlightManager::getQuaternion(void)
     stream_imuQuaternionZ = quat.Z;
 }
 
-void FFlightManager::getOpticalFlow(void)
+void FDyanmicsThread::getOpticalFlow(void)
 {
     double dx = _dynamics->x(Dynamics::STATE_X_DOT);
     double dy = _dynamics->x(Dynamics::STATE_Y_DOT);
@@ -104,7 +104,7 @@ void FFlightManager::getOpticalFlow(void)
     stream_flowY = dy * cp - dx * sp;
 }
 
-void FFlightManager::getActuators(const double time, double * values)
+void FDyanmicsThread::getActuators(const double time, double * values)
 {
     // Avoid null-pointer exceptions at startup, freeze after control
     // program halts
@@ -144,23 +144,23 @@ void FFlightManager::getActuators(const double time, double * values)
     values[3] = _m4;
 }
 
-void FFlightManager::tick(void)
+void FDyanmicsThread::tick(void)
 {
     // Get demands from keypad
     _gameInput->getKeypad(_joyvals);
 }
 
-double FFlightManager::actuatorValue(uint8_t index)
+double FDyanmicsThread::actuatorValue(uint8_t index)
 {
     return _actuatorValues[index];
 }
 
-uint32_t FFlightManager::getCount(void)
+uint32_t FDyanmicsThread::getCount(void)
 {
     return _count;
 }
 
-void FFlightManager::stopThread(FFlightManager ** worker)
+void FDyanmicsThread::stopThread(FDyanmicsThread ** worker)
 {
     if (*worker) {
         (*worker)->Stop();
@@ -170,14 +170,14 @@ void FFlightManager::stopThread(FFlightManager ** worker)
     *worker = NULL;
 }
 
-bool FFlightManager::Init() 
+bool FDyanmicsThread::Init() 
 {
     _running = false;
 
     return FRunnable::Init();
 }
 
-uint32_t FFlightManager::Run()
+uint32_t FDyanmicsThread::Run()
 {
     // Initial wait before starting
     FPlatformProcess::Sleep(0.5);
@@ -207,7 +207,7 @@ uint32_t FFlightManager::Run()
     return 0;
 }
 
-void FFlightManager::Stop()
+void FDyanmicsThread::Stop()
 {
     _running = false;
 

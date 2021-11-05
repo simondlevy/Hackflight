@@ -21,7 +21,7 @@
 
 #include "Utils.hpp"
 #include "Dynamics.hpp"
-#include "FlightManager.h"
+#include "DynamicsThread.h"
 #include "Camera.hpp"
 
 #include <stdio.h>
@@ -217,7 +217,7 @@ class Vehicle {
 	    UStaticMeshComponent* _rotorMeshComponents[Dynamics::MAX_ROTORS] = {};
 
         // Threaded worker for running flight control
-        class FFlightManager* _flightManager = NULL;
+        class FDyanmicsThread* _flightManager = NULL;
 
         // Circular buffer for moving average of rotor values
         TCircularBuffer<float>* _rotorBuffer = NULL;
@@ -388,7 +388,7 @@ class Vehicle {
         {
         }
 
-        void BeginPlay(FFlightManager* flightManager)
+        void BeginPlay(FDyanmicsThread* flightManager)
         {
             _flightManager = flightManager;
 

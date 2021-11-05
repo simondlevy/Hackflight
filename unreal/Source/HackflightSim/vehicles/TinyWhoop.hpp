@@ -65,7 +65,7 @@ class TinyWhoop {
     private:
 
         // Threaded worker for flight control
-        FFlightManager * _flightManager = NULL;
+        FDyanmicsThread * _flightManager = NULL;
 
         // Adds simulated motor barrel to frame
         void addMotor(UStaticMesh * motorMesh, uint8_t id)
@@ -119,7 +119,7 @@ class TinyWhoop {
             vehicle.PostInitializeComponents();
         }
 
-        void BeginPlay(FFlightManager * flightManager)
+        void BeginPlay(FDyanmicsThread * flightManager)
         {
             _flightManager = flightManager;
 
@@ -128,7 +128,7 @@ class TinyWhoop {
 
         void EndPlay(void)
         {
-            FFlightManager::stopThread(&_flightManager);
+            FDyanmicsThread::stopThread(&_flightManager);
         }
 
         void Tick(float DeltaSeconds)

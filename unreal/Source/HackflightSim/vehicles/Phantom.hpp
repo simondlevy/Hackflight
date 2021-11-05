@@ -54,7 +54,7 @@ class Phantom {
     private:
 
         // Threaded worker for flight control
-        FFlightManager * _flightManager = NULL;
+        FDyanmicsThread * _flightManager = NULL;
 
     public:
 
@@ -76,7 +76,7 @@ class Phantom {
             vehicle.PostInitializeComponents();
         }
 
-        void BeginPlay(FFlightManager * flightManager)
+        void BeginPlay(FDyanmicsThread * flightManager)
         {
             _flightManager = flightManager;
 
@@ -85,7 +85,7 @@ class Phantom {
 
         void EndPlay(void)
         {
-            FFlightManager::stopThread(&_flightManager);
+            FDyanmicsThread::stopThread(&_flightManager);
         }
 
         void Tick(float DeltaSeconds)
