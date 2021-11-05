@@ -15,23 +15,23 @@ import Language.Copilot
 import Demands
 import Utils
 
-data Motors = Motors { m1 :: SFloat
-                     , m2 :: SFloat
-                     , m3 :: SFloat
-                     , m4 :: SFloat }
+data Motors = QuadMotors { m1 :: SFloat
+                         , m2 :: SFloat
+                         , m3 :: SFloat
+                         , m4 :: SFloat }
 
 type Mixer = (SFloat -> SFloat) -> Demands -> Motors
 
+dmds :: Demands -> (SFloat, SFloat, SFloat, SFloat)
+
+-- Map throttle demand from [-1,+1] to [0,1]
+dmds demands = (((throttle demands) + 1) / 2, roll demands, pitch demands, yaw demands )
+
 quadxmw :: Mixer
 
-quadxmw fun demands = Motors m1 m2 m3 m4 where
+quadxmw fun demands = QuadMotors m1 m2 m3 m4 where
 
-  -- Map throttle demand from [-1,+1] to [0,1]
-  t = ((throttle demands) + 1) / 2
-  
-  r = roll demands
-  p = pitch demands
-  y = yaw demands
+  (t, r, p, y) = dmds demands
 
   m1 = fun $ t - r + p  - y
   m2 = fun $ t - r - p  + y
@@ -40,14 +40,9 @@ quadxmw fun demands = Motors m1 m2 m3 m4 where
 
 quadxap :: Mixer
 
-quadxap fun demands = Motors m1 m2 m3 m4 where
+quadxap fun demands = QuadMotors m1 m2 m3 m4 where
 
-  -- Map throttle demand from [-1,+1] to [0,1]
-  t = ((throttle demands) + 1) / 2
-  
-  r = roll demands
-  p = pitch demands
-  y = yaw demands
+  (t, r, p, y) = dmds demands
 
   m1 = fun $ t - r - p  + y
   m2 = fun $ t + r + p  + y
