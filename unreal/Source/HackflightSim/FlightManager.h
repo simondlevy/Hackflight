@@ -6,9 +6,9 @@
    MIT License
 */
 
-#include "../MainModule/FlightManager.hpp"
-#include "../MainModule/Dynamics.hpp"
-#include "../MainModule/GameInput.hpp"
+#include "FlightManager.hpp"
+#include "Dynamics.hpp"
+#include "GameInput.hpp"
 
 class FCopilotFlightManager : public FFlightManager {
 

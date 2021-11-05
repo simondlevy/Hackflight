@@ -4,16 +4,16 @@
 
 #include <CoreMinimal.h>
 #include <GameFramework/GameModeBase.h>
-#include "MainModuleGameModeBase.generated.h"
+#include "HackflightSimGameModeBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class AMainModuleGameModeBase : public AGameModeBase
+class AHackflightSimGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
 public:
-	AMainModuleGameModeBase();
+	AHackflightSimGameModeBase();
 };

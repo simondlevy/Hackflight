@@ -1,5 +1,5 @@
 /*
- * Build script for MainModule
+ * Build script for HackflightSim
  *
  * Copyright (C) 2018 Simon D. Levy
  *
@@ -11,13 +11,13 @@ using UnrealBuildTool;
 using System;
 using System.IO;
 
-public class MainModule : ModuleRules
+public class HackflightSim : ModuleRules
 {
-    public MainModule(ReadOnlyTargetRules Target) : base(Target)
+    public HackflightSim(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicDependencyModuleNames.AddRange(new string[] 
-                { "Core", "CoreUObject", "Engine", "InputCore" });
+                { "Core", "CoreUObject", "Engine", "InputCore", "Landscape" });
     }
 }

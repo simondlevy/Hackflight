@@ -28,7 +28,7 @@ HSRC = Main.hs \
 
 RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Main.hs
 
-DSTDIR = ../../unreal/Source/CopilotModule/
+DSTDIR = ../../unreal/Source/HackflightSim/
 
 all: hackflight.cpp hackflight.h
 	cp hackflight.c $(DSTDIR)/hackflight.cpp

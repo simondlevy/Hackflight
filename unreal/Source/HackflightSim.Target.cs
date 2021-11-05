@@ -14,12 +14,7 @@ public class HackflightSimTarget : TargetRules
 	public HackflightSimTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-
         DefaultBuildSettings = BuildSettingsVersion.V2;
-
-		ExtraModuleNames.AddRange( new string[] { 
-                "MainModule", 
-                "CopilotModule"
-                } );
+		ExtraModuleNames.Add("HackflightSim");
 	}
 }

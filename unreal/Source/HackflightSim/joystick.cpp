@@ -7,7 +7,7 @@
  */
 
 
-#include "../MainModule/Joystick.h"
+#include "Joystick.h"
 
 #undef TEXT
 #include <shlwapi.h>
