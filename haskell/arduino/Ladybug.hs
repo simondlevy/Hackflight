@@ -85,7 +85,6 @@ spec = do
   trigger "stream_serialRead" stream_serialAvailable []
 
   -- Send message to GCS if indicated
-
   trigger "stream_serialSend" (sending msgbuff) [ 
                                         arg $ hdr0 msgbuff
                                       , arg $ hdr1 msgbuff
@@ -102,7 +101,6 @@ spec = do
                                       , arg $ val05 msgbuff
                                       ]
   -- Run motors
-
   trigger "stream_writeBrushedMotors" true [
         arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin,
         arg $ m1 motors, arg $ m2 motors, arg $ m3 motors, arg $ m4 motors]

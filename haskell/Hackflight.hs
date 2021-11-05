@@ -25,7 +25,7 @@ import Parser
 import Serial
 import Utils
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> StateFun -> MixerFun -> SafetyFun
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> StateFun -> Mixer -> SafetyFun
   -> (Demands, State, Demands, Motors)
 
 hackflight receiver sensors pidfuns statefun mixer safefun
@@ -44,11 +44,11 @@ hackflight receiver sensors pidfuns statefun mixer safefun
     (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
 
     -- Run mixer on demands to get motor values
-    motors = mixer safefun pdemands
+    motors = (mixerfun mixer) safefun pdemands
 
 -------------------------------------------------------------------------------
 
-hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> MixerFun
+hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> Mixer
   -> (MessageBuffer, Motors, SBool)
 
 hackflightFull receiver sensors pidfuns mixer
@@ -86,11 +86,10 @@ hackflightFull receiver sensors pidfuns mixer
                     else motor_percent' where motor_percent' = [0] ++ motor_percent
 
     -- Set motors based on arming state and whether we have GCS input
-    motors = quadFun motors' armed motor_index motor_percent
+    motors = (motorfun mixer) motors' armed motor_index motor_percent
 
 -------------------------------------------------------------------------------
-
-hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> MixerFun -> Motors
+hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> Motors
 
 hackflightSim receiver sensors pidfuns mixer = motors
 
