@@ -19,7 +19,9 @@ HSRC = Ladybug.hs \
 	   ../sensors/Quaternion.hs \
        ../pidcontrollers/RatePid.hs \
        ../pidcontrollers/YawPid.hs \
-       ../pidcontrollers/LevelPid.hs
+       ../pidcontrollers/LevelPid.hs \
+	   ../cfiles/motors.c \
+	   ../cfiles/serial.c
 
 RUNH = runhaskell -i.. -i../sensors -i../pidcontrollers Ladybug.hs
 
@@ -31,6 +33,8 @@ all: hackflight.cpp hackflight.h
 	rm hackflight.c
 	sed -i 's/extern/EXTERN/g' hackflight.h
 	cat ../cfiles/header.h hackflight.h > $(DSTDIR)/hackflight.h
+	cp ../cfiles/motors.c $(DSTDIR)/motors.cpp
+	cp ../cfiles/serial.c $(DSTDIR)/serial.cpp
 
 hackflight.c: $(HSRC) Ladybug.hs
 	$(RUNH)
