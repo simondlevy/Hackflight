@@ -10,12 +10,18 @@
 
 APhantomPawn::APhantomPawn()
 {
-    _phantom.build(this);
+    vehicle.buildFull(this, FrameStatics.mesh.Get());
+
+    // Add propellers
+    addRotor(PropCCWStatics.mesh.Get(), +1, +1);
+    addRotor(PropCCWStatics.mesh.Get(), -1, -1);
+    addRotor(PropCWStatics.mesh.Get(), +1, -1);
+    addRotor(PropCWStatics.mesh.Get(), -1, +1);
 }
 
 void APhantomPawn::PostInitializeComponents()
 {
-    _phantom.PostInitializeComponents();
+    vehicle.PostInitializeComponents();
 
     Super::PostInitializeComponents();
 }
@@ -23,16 +29,16 @@ void APhantomPawn::PostInitializeComponents()
 // Called when the game starts or when spawned
 void APhantomPawn::BeginPlay()
 {
-    _flightManager = new FDyanmicsThread(this, &_phantom.dynamics);
+    _flightManager = new FDyanmicsThread(this, &dynamics);
 
-    _phantom.BeginPlay(_flightManager);
+    vehicle.BeginPlay(_flightManager);
 
     Super::BeginPlay();
 }
 
 void APhantomPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    _phantom.EndPlay();
+    FDyanmicsThread::stopThread(&_flightManager);
 
     Super::EndPlay(EndPlayReason);
 }
@@ -40,9 +46,16 @@ void APhantomPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
 // Called automatically on main thread
 void APhantomPawn::Tick(float DeltaSeconds)
 {
-    _phantom.Tick(DeltaSeconds);
+    vehicle.Tick(DeltaSeconds);
 
     Super::Tick(DeltaSeconds);
 
     _flightManager->tick();
 }
+
+void APhantomPawn::addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy)
+{
+    vehicle.addRotor(mesh, dx*0.12, dy*0.12, 0.16);
+}
+
+

@@ -22,9 +22,12 @@ DECLARE_STATIC_MESH(FFrameStatics, "Phantom/Frame.Frame", FrameStatics)
 DECLARE_STATIC_MESH(FPropCWStatics, "Phantom/PropCW.PropCW", PropCWStatics)
 DECLARE_STATIC_MESH(FPropCCWStatics, "Phantom/PropCCW.PropCCW", PropCCWStatics)
 
-class Phantom {
+UCLASS(Config=Game)
+class APhantomPawn : public APawn {
 
     private:
+
+        GENERATED_BODY()
 
         Dynamics::vehicle_params_t vparams = {
 
@@ -47,76 +50,9 @@ class Phantom {
             0.350   // l arm length [m]
         };
 
-    public:
-
-        QuadXAPDynamics dynamics = QuadXAPDynamics(vparams, fparams);
-
-        Vehicle vehicle = Vehicle(&dynamics);
-
-    private:
-
-        // Threaded worker for flight control
         FDyanmicsThread * _flightManager = NULL;
 
-    public:
-
-        void build(APawn * pawn)
-        {
-            vehicle.buildFull(pawn, FrameStatics.mesh.Get());
-
-            // Add propellers
-            addRotor(PropCCWStatics.mesh.Get(), +1, +1);
-            addRotor(PropCCWStatics.mesh.Get(), -1, -1);
-            addRotor(PropCWStatics.mesh.Get(), +1, -1);
-            addRotor(PropCWStatics.mesh.Get(), -1, +1);
-
-            _flightManager = NULL;
-        }
-
-        void PostInitializeComponents()
-        {
-            vehicle.PostInitializeComponents();
-        }
-
-        void BeginPlay(FDyanmicsThread * flightManager)
-        {
-            _flightManager = flightManager;
-
-            vehicle.BeginPlay(flightManager);
-        }
-
-        void EndPlay(void)
-        {
-            FDyanmicsThread::stopThread(&_flightManager);
-        }
-
-        void Tick(float DeltaSeconds)
-        {
-            vehicle.Tick(DeltaSeconds);
-        }
-
-        void addCamera(Camera * camera)
-        {
-            vehicle.addCamera(camera);
-        }
-
-        void addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy)
-        {
-            vehicle.addRotor(mesh, dx*0.12, dy*0.12, 0.16);
-        }
-
-}; // class Phantom 
-UCLASS(Config=Game)
-class APhantomPawn : public APawn {
-
-    private:
-
-        GENERATED_BODY()
-
-        // Helper class
-        Phantom _phantom;
-
-        FDyanmicsThread * _flightManager = NULL;
+        void addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy);
 
     protected:
 
@@ -133,6 +69,10 @@ class APhantomPawn : public APawn {
         // virtual void NotifyHit(...) override
 
     public:	
+
+        QuadXAPDynamics dynamics = QuadXAPDynamics(vparams, fparams);
+
+        Vehicle vehicle = Vehicle(&dynamics);
 
         APhantomPawn();
 
