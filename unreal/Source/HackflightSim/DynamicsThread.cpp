@@ -9,13 +9,21 @@
 #include "DynamicsThread.h"
 #include "hackflight.h"
 
+// Dynamics
+static Dynamics * _dynamics;
+
+// Joystick (RC transmitter, game controller) or keypad
+static GameInput * _gameInput;
+static double _joyvals[4];
+
 // Sent by  to stream_runMotors() -----------
 static float _m1;
 static float _m2;
 static float _m3;
 static float _m4;
 
-// Called by Haskell
+// Called by Haskell Copilot --------------------------------------------------
+
 void stream_writeMotors(float m1, float m2, float m3, float m4)
 {
     _m1 = m1;
@@ -26,12 +34,64 @@ void stream_writeMotors(float m1, float m2, float m3, float m4)
     //debugline("m1: %+3.3f  m2: %+3.3f  m3: %+3.3f  m4: %+3.3f", m1, m2, m3, m4);
 }
 
+void stream_getReceiverDemands(void)
+{
+    // Get stick demands
+    _gameInput->getJoystick(_joyvals);
+
+    // Share the stick demands
+    stream_receiverThrottle = _joyvals[0];
+    stream_receiverRoll     = _joyvals[1];
+    stream_receiverPitch    = _joyvals[2];
+    stream_receiverYaw      = _joyvals[3];
+}
+
+
+void stream_getGyrometer(void)
+{
+    stream_imuGyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
+    stream_imuGyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
+    stream_imuGyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
+}
+
+void stream_getQuaternion(void)
+{
+    FRotator rot = FRotator(
+            FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA)),
+            FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI)),
+            FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI))
+            );
+
+    FQuat quat = rot.Quaternion();
+
+    stream_imuQuaternionW = quat.W;
+    stream_imuQuaternionX = -quat.X;  // note negation
+    stream_imuQuaternionY = -quat.Y;  // note negation
+    stream_imuQuaternionZ = quat.Z;
+}
+
+void stream_getOpticalFlow(void)
+{
+    double dx = _dynamics->x(Dynamics::STATE_X_DOT);
+    double dy = _dynamics->x(Dynamics::STATE_Y_DOT);
+
+    double psi = _dynamics->x(Dynamics::STATE_PSI);
+    double cp = cos(psi);
+    double sp = sin(psi);
+
+    // Rotate inertial velocity into body frame, ignoring roll and pitch fow now
+    stream_flowX = dx * cp + dy * sp;
+    stream_flowY = dy * cp - dx * sp;
+}
+
 void stream_debug(float value)
 {
     debugline("%+3.3f", value);
 }
 
-FDyanmicsThread::FDyanmicsThread(APawn * pawn, Dynamics * dynamics)
+// FDynamicsThread methods -----------------------------------------------------
+
+FDynamicsThread::FDynamicsThread(APawn * pawn, Dynamics * dynamics)
 {
     _thread = FRunnableThread::Create(this, TEXT("FThreadedManage"), 0, TPri_BelowNormal); 
     _startTime = FPlatformTime::Seconds();
@@ -49,62 +109,12 @@ FDyanmicsThread::FDyanmicsThread(APawn * pawn, Dynamics * dynamics)
     _ready = true;
 }
 
-FDyanmicsThread::~FDyanmicsThread()
+FDynamicsThread::~FDynamicsThread()
 {
     delete _thread;
 }
 
-void FDyanmicsThread::getReceiverDemands(void)
-{
-    // Get stick demands
-    _gameInput->getJoystick(_joyvals);
-
-    // Share the stick demands
-    stream_receiverThrottle = _joyvals[0];
-    stream_receiverRoll     = _joyvals[1];
-    stream_receiverPitch    = _joyvals[2];
-    stream_receiverYaw      = _joyvals[3];
-}
-
-
-void FDyanmicsThread::getGyrometer(void)
-{
-    stream_imuGyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
-    stream_imuGyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
-    stream_imuGyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
-}
-
-void FDyanmicsThread::getQuaternion(void)
-{
-    FRotator rot = FRotator(
-            FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA)),
-            FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI)),
-            FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI))
-            );
-
-    FQuat quat = rot.Quaternion();
-
-    stream_imuQuaternionW = quat.W;
-    stream_imuQuaternionX = -quat.X;  // note negation
-    stream_imuQuaternionY = -quat.Y;  // note negation
-    stream_imuQuaternionZ = quat.Z;
-}
-
-void FDyanmicsThread::getOpticalFlow(void)
-{
-    double dx = _dynamics->x(Dynamics::STATE_X_DOT);
-    double dy = _dynamics->x(Dynamics::STATE_Y_DOT);
-
-    double psi = _dynamics->x(Dynamics::STATE_PSI);
-    double cp = cos(psi);
-    double sp = sin(psi);
-
-    // Rotate inertial velocity into body frame, ignoring roll and pitch fow now
-    stream_flowX = dx * cp + dy * sp;
-    stream_flowY = dy * cp - dx * sp;
-}
-
-void FDyanmicsThread::getActuators(const double time, double * values)
+void FDynamicsThread::getActuators(const double time, double * values)
 {
     // Avoid null-pointer exceptions at startup, freeze after control
     // program halts
@@ -116,16 +126,16 @@ void FDyanmicsThread::getActuators(const double time, double * values)
     stream_time = time; 
 
     // Share stick demands with 
-    getReceiverDemands();
+    stream_getReceiverDemands();
 
     // Share the gyrometer values
-    getGyrometer();
+    stream_getGyrometer();
 
     // Share the quaternion values
-    getQuaternion();
+    stream_getQuaternion();
 
     // Share the optical flow values
-    getOpticalFlow();
+    stream_getOpticalFlow();
 
     // Share the altimeter value
     stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
@@ -134,7 +144,7 @@ void FDyanmicsThread::getActuators(const double time, double * values)
     stream_imuGotGyrometer = true;
     stream_imuGotQuaternion = true;
 
-    // Run , triggering stream_runMotors
+    // Run Copilot, triggering stream_runMotors
     step();
 
     // Get updated motor values
@@ -144,23 +154,23 @@ void FDyanmicsThread::getActuators(const double time, double * values)
     values[3] = _m4;
 }
 
-void FDyanmicsThread::tick(void)
+void FDynamicsThread::tick(void)
 {
     // Get demands from keypad
     _gameInput->getKeypad(_joyvals);
 }
 
-double FDyanmicsThread::actuatorValue(uint8_t index)
+double FDynamicsThread::actuatorValue(uint8_t index)
 {
     return _actuatorValues[index];
 }
 
-uint32_t FDyanmicsThread::getCount(void)
+uint32_t FDynamicsThread::getCount(void)
 {
     return _count;
 }
 
-void FDyanmicsThread::stopThread(FDyanmicsThread ** worker)
+void FDynamicsThread::stopThread(FDynamicsThread ** worker)
 {
     if (*worker) {
         (*worker)->Stop();
@@ -170,14 +180,14 @@ void FDyanmicsThread::stopThread(FDyanmicsThread ** worker)
     *worker = NULL;
 }
 
-bool FDyanmicsThread::Init() 
+bool FDynamicsThread::Init() 
 {
     _running = false;
 
     return FRunnable::Init();
 }
 
-uint32_t FDyanmicsThread::Run()
+uint32_t FDynamicsThread::Run()
 {
     // Initial wait before starting
     FPlatformProcess::Sleep(0.5);
@@ -207,7 +217,7 @@ uint32_t FDyanmicsThread::Run()
     return 0;
 }
 
-void FDyanmicsThread::Stop()
+void FDynamicsThread::Stop()
 {
     _running = false;
 

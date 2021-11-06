@@ -217,7 +217,7 @@ class Vehicle {
 	    UStaticMeshComponent* _rotorMeshComponents[Dynamics::MAX_ROTORS] = {};
 
         // Threaded worker for running flight control
-        class FDyanmicsThread* _flightManager = NULL;
+        class FDynamicsThread* _flightManager = NULL;
 
         // Circular buffer for moving average of rotor values
         TCircularBuffer<float>* _rotorBuffer = NULL;
@@ -388,7 +388,7 @@ class Vehicle {
         {
         }
 
-        void BeginPlay(FDyanmicsThread* flightManager)
+        void BeginPlay(FDynamicsThread* flightManager)
         {
             _flightManager = flightManager;
 

@@ -14,22 +14,12 @@
 
 #include "Runtime/Core/Public/HAL/Runnable.h"
 
-class FDyanmicsThread : public FRunnable {
+class FDynamicsThread : public FRunnable {
 
     private:
 
-        // Joystick (RC transmitter, game controller) or keypad
-        GameInput * _gameInput = NULL;
-        double _joyvals[4] = {};
-
         // For guarding thread
         bool _ready = false;
-
-        // Helpers
-        void getReceiverDemands(void);
-        void getGyrometer(void);
-        void getQuaternion(void);
-        void getOpticalFlow(void);
 
         FRunnableThread * _thread = NULL;
 
@@ -57,14 +47,12 @@ class FDyanmicsThread : public FRunnable {
 
         uint8_t _actuatorCount = 0;
 
-        Dynamics * _dynamics = NULL;
-
     public:
 
         // Constructor, called main thread
-        FDyanmicsThread(APawn * pawn, Dynamics * dynamics);
+        FDynamicsThread(APawn * pawn, Dynamics * dynamics);
 
-        ~FDyanmicsThread(void);
+        ~FDynamicsThread(void);
 
         void tick(void);
 
@@ -74,7 +62,7 @@ class FDyanmicsThread : public FRunnable {
 
         uint32_t getCount(void);
 
-        static void stopThread(FDyanmicsThread ** worker);
+        static void stopThread(FDynamicsThread ** worker);
 
         // FRunnable interface.
 
@@ -84,4 +72,4 @@ class FDyanmicsThread : public FRunnable {
 
         virtual void Stop() override;
 
-}; // class FDyanmicsThread
+}; // class FDynamicsThread
