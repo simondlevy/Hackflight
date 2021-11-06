@@ -140,6 +140,18 @@ bool stream_getReceiverDemands_guard(void) {
   return true;
 }
 
+bool stream_getGyrometer_guard(void) {
+  return true;
+}
+
+bool stream_getQuaternion_guard(void) {
+  return true;
+}
+
+bool stream_getOpticalFlow_guard(void) {
+  return true;
+}
+
 bool stream_writeMotors_guard(void) {
   return true;
 }
@@ -192,6 +204,15 @@ void step(void) {
   (stream_imuGyrometerZ_cpy) = (stream_imuGyrometerZ);
   if ((stream_getReceiverDemands_guard)()) {
     {(stream_getReceiverDemands)();}
+  };
+  if ((stream_getGyrometer_guard)()) {
+    {(stream_getGyrometer)();}
+  };
+  if ((stream_getQuaternion_guard)()) {
+    {(stream_getQuaternion)();}
+  };
+  if ((stream_getOpticalFlow_guard)()) {
+    {(stream_getOpticalFlow)();}
   };
   if ((stream_writeMotors_guard)()) {
     {(stream_writeMotors)(((stream_writeMotors_arg0)()), ((stream_writeMotors_arg1)()), ((stream_writeMotors_arg2)()), ((stream_writeMotors_arg3)()));}

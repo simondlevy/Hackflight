@@ -27,5 +27,8 @@ EXTERN float stream_imuGyrometerY;
 EXTERN float stream_receiverYaw;
 EXTERN float stream_imuGyrometerZ;
 void stream_getReceiverDemands(void);
+void stream_getGyrometer(void);
+void stream_getQuaternion(void);
+void stream_getOpticalFlow(void);
 void stream_writeMotors(float stream_writeMotors_arg0, float stream_writeMotors_arg1, float stream_writeMotors_arg2, float stream_writeMotors_arg3);
 void step(void);

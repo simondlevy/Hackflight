@@ -125,18 +125,6 @@ void FDynamicsThread::getActuators(const double time, double * values)
     // Share the current time with 
     stream_time = time; 
 
-    // Share stick demands with 
-    //stream_getReceiverDemands();
-
-    // Share the gyrometer values
-    stream_getGyrometer();
-
-    // Share the quaternion values
-    stream_getQuaternion();
-
-    // Share the optical flow values
-    stream_getOpticalFlow();
-
     // Share the altimeter value
     stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
 
