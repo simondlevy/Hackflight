@@ -8,14 +8,13 @@ original repository using C++ is now <a href="https://github.com/simondlevy/Hack
 
 ## Intro
 
-Hackflight is a simple, platform-independent, header-only software toolkit for
-building multirotor flight controllers.  It is geared toward people like
-me who want to tinker with flight-control firmware, and use it to teach
-students about ideas like inertial measurement and PID tuning.  <b>If you are
-in the 99% percent of users who just want to get your vehicle flying without
-getting into firmware hacking, I recommend
-[Betaflight](http://betaflight.com/)</b> (great for getting started when
-you're on a budget) <b>or the [Ardupilot](http://copter.ardupilot.org)
+Hackflight is a simple only software toolkit for building multirotor flight
+controllers.  It is geared toward people like me who want to tinker with
+flight-control firmware, and use it to teach students about ideas like inertial
+measurement and PID tuning.  <b>If you are in the 99% percent of users who just
+want to get your vehicle flying without getting into firmware hacking, I
+recommend [Betaflight](http://betaflight.com/)</b> (great for getting started
+when you're on a budget) <b>or the [Ardupilot](http://copter.ardupilot.org)
 system</b> (for sophisticated mission planning with waypoint navigation and the
 like).  In addition to big user communities and loads of great features, these
 platforms have safety mechanisms that Hackflight lacks, which will help avoid
@@ -25,12 +24,7 @@ injury to you and damage to your vehicle.
 
 Hackflight is currently working on the following platforms:
 
-* [TinyPICO](https://www.tinypico.com)
-
 * [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) from Tlera Corp
-
-* [Butterfly DIY](https://diydrones.com/profiles/blogs/hackhawk-ii-an-arduino-compatible-brushless-flight-controller)
-brushless flight controller (components from from Tlera Corp. and Pesky Products)
 
 * [HackflightSim](https://github.com/simondlevy/Hackflight/tree/master/unreal) flight simulator based on UnrealEngine4
 
