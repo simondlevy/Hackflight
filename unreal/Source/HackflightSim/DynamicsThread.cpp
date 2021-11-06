@@ -126,7 +126,7 @@ void FDynamicsThread::getActuators(const double time, double * values)
     stream_time = time; 
 
     // Share stick demands with 
-    stream_getReceiverDemands();
+    //stream_getReceiverDemands();
 
     // Share the gyrometer values
     stream_getGyrometer();

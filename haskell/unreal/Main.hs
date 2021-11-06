@@ -55,6 +55,9 @@ spec = do
   -- Run the main Hackflight algorithm, getting the motor spins
   let motors = hackflightSim receiver sensors pidfuns quadxap
 
+  -- Call some C routines
+  trigger "stream_getReceiverDemands" true []
+
   -- Send the motor values using the external C function
   trigger "stream_writeMotors" true [  arg $ m1 motors
                                      , arg $ m2 motors

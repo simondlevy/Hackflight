@@ -6,7 +6,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <math.h>
 
 static float stream_receiverThrottle_cpy;
 static float stream_altimeterZ_cpy;
@@ -137,6 +136,10 @@ float s10_gen(void) {
   return (((abs)((((((stream_receiverYaw_cpy) < ((float)(0.0))) ? ((float)(0.0)) - (((abs)((stream_receiverYaw_cpy))) / ((float)(2.0))) : (((abs)((stream_receiverYaw_cpy))) / ((float)(2.0)))) * ((float)(4.0))) - ((stream_imuGotGyrometer_cpy) ? ((stream_imuGyrometerZ_cpy) * ((float)(3.1415927410125732))) / ((float)(180.0)) : ((float)(0.0)))))) > (((float)(125.66371154785156)) / ((float)(180.0)))) ? (float)(0.0) : (((stream_micros_cpy) == ((((stream_micros_cpy) - ((s5_get)((0)))) > (((uint32_t)(1000000)) / ((uint32_t)(300)))) ? stream_micros_cpy : ((s5_get)((0))))) ? ((((s10_get)((0))) + (((((stream_receiverYaw_cpy) < ((float)(0.0))) ? ((float)(0.0)) - (((abs)((stream_receiverYaw_cpy))) / ((float)(2.0))) : (((abs)((stream_receiverYaw_cpy))) / ((float)(2.0)))) * ((float)(4.0))) - ((stream_imuGotGyrometer_cpy) ? ((stream_imuGyrometerZ_cpy) * ((float)(3.1415927410125732))) / ((float)(180.0)) : ((float)(0.0))))) < ((float)(-6.0))) ? (float)(-6.0) : (((((s10_get)((0))) + (((((stream_receiverYaw_cpy) < ((float)(0.0))) ? ((float)(0.0)) - (((abs)((stream_receiverYaw_cpy))) / ((float)(2.0))) : (((abs)((stream_receiverYaw_cpy))) / ((float)(2.0)))) * ((float)(4.0))) - ((stream_imuGotGyrometer_cpy) ? ((stream_imuGyrometerZ_cpy) * ((float)(3.1415927410125732))) / ((float)(180.0)) : ((float)(0.0))))) > ((float)(6.0))) ? (float)(6.0) : (((s10_get)((0))) + (((((stream_receiverYaw_cpy) < ((float)(0.0))) ? ((float)(0.0)) - (((abs)((stream_receiverYaw_cpy))) / ((float)(2.0))) : (((abs)((stream_receiverYaw_cpy))) / ((float)(2.0)))) * ((float)(4.0))) - ((stream_imuGotGyrometer_cpy) ? ((stream_imuGyrometerZ_cpy) * ((float)(3.1415927410125732))) / ((float)(180.0)) : ((float)(0.0)))))) : ((s10_get)((0))));
 }
 
+bool stream_getReceiverDemands_guard(void) {
+  return true;
+}
+
 bool stream_writeMotors_guard(void) {
   return true;
 }
@@ -187,6 +190,9 @@ void step(void) {
   (stream_imuGyrometerY_cpy) = (stream_imuGyrometerY);
   (stream_receiverYaw_cpy) = (stream_receiverYaw);
   (stream_imuGyrometerZ_cpy) = (stream_imuGyrometerZ);
+  if ((stream_getReceiverDemands_guard)()) {
+    {(stream_getReceiverDemands)();}
+  };
   if ((stream_writeMotors_guard)()) {
     {(stream_writeMotors)(((stream_writeMotors_arg0)()), ((stream_writeMotors_arg1)()), ((stream_writeMotors_arg2)()), ((stream_writeMotors_arg3)()));}
   };
