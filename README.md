@@ -9,7 +9,7 @@ original repository using C++ is now <a href="https://github.com/simondlevy/Hack
 ## Intro
 
 Hackflight is a Haskell-based software toolkit for building multirotor flight
-controllers and simulator.  It is geared toward people like me who want to tinker with
+controllers and simulators.  It is geared toward people like me who want to tinker with
 flight-control firmware, and use it to teach students about ideas like inertial
 measurement and PID tuning.  <b>If you are in the 99% percent of users who just
 want to get your vehicle flying without getting into firmware hacking, I
