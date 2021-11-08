@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="extras/media/logo2.png" width=450>
+<img src="media/logo2.png" width=450>
 </p>
 
 <h2>Note: This repository is for development using Haskell.  The
@@ -69,4 +69,4 @@ roll and pitch axes.   To support this arrangement in Hackflight, PID
 controllers for aux state 0 will also run in aux states 1 and 2, and PID
 controllers for aux state 1 will also run in aux state 2.
 
-<p align="center"> <img src="extras/media/pidcontrollers.png" width=600> </p>
+<p align="center"> <img src="media/pidcontrollers.png" width=600> </p>
