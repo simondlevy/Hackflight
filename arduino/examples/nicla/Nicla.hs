@@ -1,5 +1,5 @@
 {--
-  Support for Ladybug flight controller with DSMX receiver
+  Support for Nicla Sense ME flight controller with DSMX receiver
 
   Copyright(C) 2021 on D.Levy
 
