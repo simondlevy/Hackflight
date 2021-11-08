@@ -47,7 +47,7 @@ all: hackflight.cpp
 	cp $(CPPDIR)/arduino_motors.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_serial.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_time.cpp $(DSTDIR)
-	cp $(CPPDIR)/nicla_bhy2.cpp $(DSTDIR)
+	cp $(CPPDIR)/arduino_bhy2.cpp $(DSTDIR)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c
