@@ -1,4 +1,4 @@
-<a href="https://www.youtube.com/watch?v=mobemDcX9ew"><img src="IndoorScene.png" width=500></a>
+<a href="https://www.youtube.com/watch?v=mobemDcX9ew"><img src="media/IndoorScene.png" width=500></a>
 
 # About
 
