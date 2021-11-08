@@ -8,7 +8,7 @@ ROOT = ../../..
 HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
 
-HSRC = Ladybug.hs \
+HSRC = Nicla.hs \
        $(HDIR)/Hackflight.hs \
        $(HDIR)/Receiver.hs \
        $(HDIR)/Demands.hs \
@@ -43,19 +43,19 @@ all: hackflight.cpp
 	cp $(CDIR)/serial.c $(DSTDIR)/serial.cpp
 	cp $(CPPDIR)/arduino_dsmrx.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_i2c.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_led.cpp $(DSTDIR)
+	cp $(CPPDIR)/nicla_led.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_motors.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_serial.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_time.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_usfs.cpp $(DSTDIR)
+	cp $(CPPDIR)/nicla_bhy2.cpp $(DSTDIR)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c
 	cat $(CDIR)/header.c tmp.c > hackflight.c
 	rm tmp.c
 
-hackflight.c: $(HSRC) Ladybug.hs
-	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Ladybug.hs
+hackflight.c: $(HSRC) Nicla.hs
+	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Nicla.hs
 
 clean:
 	rm -f $(DSTDIR)/*.h $(DSTDIR)/*.cpp

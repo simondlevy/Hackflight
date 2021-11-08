@@ -41,12 +41,12 @@ import Utils
 
 ------------------------------------------------------------
 
-m1_pin = 13 :: SWord8 
-m2_pin = 16 :: SWord8 
-m3_pin = 3  :: SWord8 
-m4_pin = 11 :: SWord8 
+--m1_pin = 13 :: SWord8 
+--m2_pin = 16 :: SWord8 
+--m3_pin = 3  :: SWord8 
+--m4_pin = 11 :: SWord8 
 
-led_pin = 18 :: SWord8 
+--led_pin = 18 :: SWord8 
 
 receiver = makeReceiverWithTrim (AxisTrim 0.0 0.05 0.045) 4.0
 
@@ -72,15 +72,15 @@ spec = do
   trigger "stream_startSerial" starting []
   trigger "stream_startI2C" starting []
   trigger "stream_startDsmrx" starting []
-  trigger "stream_startUsfs" starting []
-  trigger "stream_startBrushedMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
-  trigger "stream_startLed" starting [arg led_pin]
+  trigger "stream_startBhy2" starting []
+  -- trigger "stream_startBrushedMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
+  trigger "stream_startNiclaLed" starting []
 
   -- Do some other stuff in loop
   trigger "stream_updateUsfs" running []
   trigger "stream_updateDsmrx" running []
   trigger "stream_updateTime" running []
-  trigger "stream_writeLed" running [arg led_pin, arg led]
+  trigger "stream_writeNiclaLed" running [arg led]
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" stream_serialAvailable []
 
@@ -101,9 +101,9 @@ spec = do
                                       , arg $ val05 msgbuff
                                       ]
   -- Run motors
-  trigger "stream_writeBrushedMotors" true [
-        arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin,
-        arg $ m1 motors, arg $ m2 motors, arg $ m3 motors, arg $ m4 motors]
+  --trigger "stream_writeBrushedMotors" true [
+  --      arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin,
+  --      arg $ m1 motors, arg $ m2 motors, arg $ m3 motors, arg $ m4 motors]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
