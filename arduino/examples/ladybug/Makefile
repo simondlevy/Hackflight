@@ -58,7 +58,7 @@ hackflight.h: $(HSRC) Ladybug.hs
 	$(RUNH)
 
 clean:
-	rm -f hackflight.* ../hackflight.* *~
+	rm -f $(DSTDIR)/*.h $(DSTDIR)/*.cpp
 
 commit:
 	git commit -a -m="More Haskell Copilot work"
