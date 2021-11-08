@@ -29,12 +29,11 @@ HSRC = Ladybug.hs \
 	   $(CDIR)/motors.c \
 	   $(CDIR)/serial.c
 
-RUNH = runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Ladybug.hs
 
 DSTDIR = ../../Hackflight
 CPPDIR = ../../cpp
 
-all: hackflight.cpp hackflight.h
+all: hackflight.cpp
 	cp hackflight.c $(DSTDIR)/hackflight.cpp
 	wc -c hackflight.c
 	rm hackflight.c
@@ -52,10 +51,7 @@ all: hackflight.cpp hackflight.h
 	cp $(CPPDIR)/arduino_usfs.cpp $(DSTDIR)
 
 hackflight.c: $(HSRC) Ladybug.hs
-	$(RUNH)
-
-hackflight.h: $(HSRC) Ladybug.hs
-	$(RUNH)
+	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Ladybug.hs
 
 clean:
 	rm -f $(DSTDIR)/*.h $(DSTDIR)/*.cpp
