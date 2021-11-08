@@ -35,7 +35,6 @@ CPPDIR = ../../cpp
 
 all: hackflight.cpp
 	cp hackflight.c $(DSTDIR)/hackflight.cpp
-	wc -c hackflight.c
 	rm hackflight.c
 	sed -i 's/extern/EXTERN/g' hackflight.h
 	cat $(CDIR)/header.h hackflight.h > $(DSTDIR)/hackflight.h
@@ -50,16 +49,13 @@ all: hackflight.cpp
 	cp $(CPPDIR)/arduino_time.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_usfs.cpp $(DSTDIR)
 
+hackflight.cpp: hackflight.c
+	tail -n +8 hackflight.c > tmp.c
+	cat $(CDIR)/header.c tmp.c > hackflight.c
+	rm tmp.c
+
 hackflight.c: $(HSRC) Ladybug.hs
 	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Ladybug.hs
 
 clean:
 	rm -f $(DSTDIR)/*.h $(DSTDIR)/*.cpp
-
-commit:
-	git commit -a -m="More Haskell Copilot work"
-
-hackflight.cpp: hackflight.c
-	tail -n +8 hackflight.c > tmp.c
-	cat $(CDIR)/header.c tmp.c > hackflight.c
-	rm tmp.c

@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+
 EXTERN float stream_receiverThrottle;
 EXTERN float stream_altimeterZ;
 EXTERN float stream_time;
