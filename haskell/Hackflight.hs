@@ -71,7 +71,8 @@ hackflightFull receiver sensors pidfuns mixer
                                                        safemix
 
     -- Blink LED during first couple of seconds; keep it solid when armed
-    led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
+    -- led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
+    led = if micros < 4000000 then (mod (div micros 50000) 2 == 0) else armed
 
     -- Run the serial comms parser
     (msgtyp, sending, payindex, _checked) = parse stream_serialAvailable stream_serialByte
