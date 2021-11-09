@@ -6,7 +6,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <math.h>
 
 static float stream_receiverThrottle_cpy;
 static float stream_altimeterZ_cpy;

@@ -211,21 +211,26 @@ class Dynamics {
 
             // y'
             _dxdt[2] = _x[STATE_Y_DOT];                                                     
+
             // y''
             _dxdt[3] = accelNED[1];
 
             // z'
             _dxdt[4] = _x[STATE_Z_DOT];                                                     
+
             // z''
             _dxdt[5] = netz;                                                                       
+
             // phi'
             _dxdt[6] = phidot;                                                                    
+
             // phi''
             _dxdt[7] = psidot * thedot * (Iy - Iz) / Ix - Jr / Ix * thedot *
                 omega + u2 / Ix;
 
             // theta'
             _dxdt[8] = thedot;                                                                    
+
             // theta''
             _dxdt[9] = -(psidot * phidot * (Iz - Ix) / Iy + Jr / Iy * phidot *
                     omega + u3 / Iy);
