@@ -10,6 +10,7 @@ HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
 
 HSRC = Main.hs \
+	   Dynamics.hs \
        $(HDIR)/Hackflight.hs \
        $(HDIR)/Receiver.hs \
        $(HDIR)/Demands.hs \

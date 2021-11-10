@@ -86,5 +86,9 @@ void stream_updateMpu9250(void)
     int16_t gy=-(Buf[10]<<8 | Buf[11]);
     int16_t gz=Buf[12]<<8 | Buf[13];
 
-    printf("%d %d %d\n", ax, ay, az);
+    uint8_t ready = 0;
+    I2Cread(MPU9250_ADDRESS, 0x3A, 1, &ready);
+
+    printf("%d\n", ready);
+    //printf("%d %d %d\n", ax, ay, az);
 }

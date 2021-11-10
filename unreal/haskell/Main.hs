@@ -19,6 +19,7 @@ import Receiver
 import Time
 import Mixers
 import Motors
+import Dynamics
 
 -- Sensors
 import Gyrometer
