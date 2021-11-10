@@ -10,12 +10,11 @@ HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
 
 HSRC = Main.hs \
-	   Dynamics.hs \
+	   $(HDIR)/Dynamics.hs \
        $(HDIR)/Hackflight.hs \
        $(HDIR)/Receiver.hs \
        $(HDIR)/Demands.hs \
        $(HDIR)/State.hs \
-       $(HDIR)/Sensor.hs \
        $(HDIR)/Time.hs \
        $(HDIR)/Utils.hs \
        $(HDIR)/Mixers.hs \
@@ -25,11 +24,7 @@ HSRC = Main.hs \
        $(HDIR)/pidcontrollers/YawPid.hs \
        $(HDIR)/pidcontrollers/RatePid.hs \
        $(HDIR)/pidcontrollers/LevelPid.hs \
-       $(HDIR)/pidcontrollers/PosHoldPid.hs \
-       $(HDIR)/sensors/Gyrometer.hs \
-       $(HDIR)/sensors/Quaternion.hs \
-       $(HDIR)/sensors/Altimeter.hs \
-       $(HDIR)/sensors/OpticalFlow.hs
+       $(HDIR)/pidcontrollers/PosHoldPid.hs
 
 
 DSTDIR = ../Source/HackflightSim/

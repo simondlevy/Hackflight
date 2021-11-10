@@ -33,7 +33,7 @@ class FDynamicsThread : public FRunnable {
         double _actuatorValues[100] = {}; 
 
         // For computing deltaT
-        double   _previousTime = 0;
+        double _previousTime = 0;
 
     public:
 
