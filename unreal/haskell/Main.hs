@@ -52,35 +52,20 @@ pidfuns = [
 
 ------------------------------------------------------------
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> StateFun -> Mixer -> SafetyFun
-  -> (Demands, State, Demands, Motors)
-
-hackflight receiver sensors pidfuns statefun mixer safefun
-  = (rdemands, vstate, pdemands, motors)
-
-  where
-
-    -- Get receiver demands from external C functions
-    rdemands = getDemands receiver
-
-    -- Get the vehicle state by composing the sensor functions over the current state
-    vstate = compose sensors (statefun vstate)
-
-    -- Periodically get the demands by composing the PID controllers over the receiver
-    -- demands
-    (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
-
-    -- Run mixer on demands to get motor values
-    motors = (mixerfun mixer) safefun pdemands
-
-
 spec = do
 
-  let motorfun = \m -> constrain m
+  -- Get receiver demands from external C functions
+  let rdemands = getDemands receiver
 
-  let statefun = \_ -> State 0 0 0 0 0 0 0 0 0 0 0 0
+  -- Get the vehicle state by composing the sensor functions over the current state
+  let vstate = compose sensors (State 0 0 0 0 0 0 0 0 0 0 0 0)
 
-  let (_, _, _, motors) = hackflight receiver sensors pidfuns statefun quadxap motorfun
+  -- Periodically get the demands by composing the PID controllers over the receiver
+  -- demands
+  let (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
+
+  -- Run mixer on demands to get motor values
+  let motors = (mixerfun quadxap) constrain pdemands
 
   -- Call some C routines for open-loop control and sensing
   trigger "stream_getReceiverDemands" true []
