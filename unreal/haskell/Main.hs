@@ -12,7 +12,6 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 -- Core
-import Hackflight
 import State
 import Demands
 import Receiver
@@ -23,6 +22,7 @@ import Dynamics
 import Utils
 
 -- Sensors
+import Sensor
 import Gyrometer
 import Quaternion
 import Altimeter
@@ -51,6 +51,28 @@ pidfuns = [
           ]
 
 ------------------------------------------------------------
+
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> StateFun -> Mixer -> SafetyFun
+  -> (Demands, State, Demands, Motors)
+
+hackflight receiver sensors pidfuns statefun mixer safefun
+  = (rdemands, vstate, pdemands, motors)
+
+  where
+
+    -- Get receiver demands from external C functions
+    rdemands = getDemands receiver
+
+    -- Get the vehicle state by composing the sensor functions over the current state
+    vstate = compose sensors (statefun vstate)
+
+    -- Periodically get the demands by composing the PID controllers over the receiver
+    -- demands
+    (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
+
+    -- Run mixer on demands to get motor values
+    motors = (mixerfun mixer) safefun pdemands
+
 
 spec = do
 

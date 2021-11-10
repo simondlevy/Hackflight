@@ -25,52 +25,28 @@ import Parser
 import Serial
 import Utils
 
--- Core algorithm ------------------------------------------------------------------------
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> StateFun -> Mixer -> SafetyFun
-  -> (Demands, State, Demands, Motors)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> (MessageBuffer, Motors, SBool)
 
-hackflight receiver sensors pidfuns statefun mixer safefun
-  = (rdemands, vstate, pdemands, motors)
+hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
 
   where
 
     -- Get receiver demands from external C functions
     rdemands = getDemands receiver
 
-    -- Get the vehicle state by composing the sensor functions over the current state
-    vstate = compose sensors (statefun vstate)
+    -- Get the vehicle state by composing the sensor functions over the previous state
+    vstate = compose sensors (state' vstate)
+
+    -- Check safety (arming / failsafe)
+    (armed, failsafe, mzero) = safety rdemands vstate
 
     -- Periodically get the demands by composing the PID controllers over the receiver
     -- demands
     (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
 
     -- Run mixer on demands to get motor values
-    motors = (mixerfun mixer) safefun pdemands
-
--- Full algorithm (LED, safety) ----------------------------------------------------------
-
-hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> Mixer
-  -> (MessageBuffer, Motors, SBool)
-
-hackflightFull receiver sensors pidfuns mixer
-  = (msgbuff, motors, led)
-
-  where
-
-    -- Check safety (arming / failsafe)
-    (armed, failsafe, mzero) = safety rdemands vstate
-
-    -- Disables motors on failsafe, throttle-down, ...
-    safemix = \m -> if mzero then 0 else m
-
-    -- Run the core Hackflight algorithm
-    (rdemands, vstate, pdemands, motors') = hackflight receiver
-                                                       sensors
-                                                       pidfuns
-                                                       state'
-                                                       mixer
-                                                       safemix
+    motors' = (mixerfun mixer) (\m -> if mzero then 0 else m) pdemands
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     -- led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
