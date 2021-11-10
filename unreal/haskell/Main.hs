@@ -54,11 +54,11 @@ pidfuns = [
 
 spec = do
 
-  let safefun = \m -> constrain m
+  let motorfun = \m -> constrain m
 
   let statefun = \_ -> State 0 0 0 0 0 0 0 0 0 0 0 0
 
-  let (_, _, _, motors) = hackflight receiver sensors pidfuns statefun quadxap safefun
+  let (_, _, _, motors) = hackflight receiver sensors pidfuns statefun quadxap motorfun
 
   -- Call some C routines for open-loop control and sensing
   trigger "stream_getReceiverDemands" true []
