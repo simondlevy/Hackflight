@@ -13,8 +13,10 @@ module Serial where
 
 import Language.Copilot
 
-stream_serialAvailable :: Stream Bool
+import Utils
+
+stream_serialAvailable :: SBool
 stream_serialAvailable = extern "stream_serialAvailable" Nothing
 
-stream_serialByte :: Stream Word8
+stream_serialByte :: SWord8
 stream_serialByte = extern "stream_serialByte" Nothing

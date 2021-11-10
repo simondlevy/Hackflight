@@ -21,13 +21,6 @@ import Motors
 import Dynamics
 import Utils
 
--- Sensors
-import Sensor
-import Gyrometer
-import Quaternion
-import Altimeter
-import OpticalFlow
-
 -- PID controllers
 import PidController
 import RatePid(rateController)
@@ -38,9 +31,7 @@ import PosHoldPid(posHoldController)
 
 ------------------------------------------------------------
 
-receiver = makeReceiver 4.0
-
-sensors = [gyrometer, quaternion, altimeter, opticalFlow]
+receiver = makeReceiver 4.0 -- demand scale
 
 pidfuns = [  
              altHoldController 0.75 1.5   -- Kp, Ki
@@ -57,8 +48,19 @@ spec = do
   -- Get receiver demands from external C functions
   let rdemands = getDemands receiver
 
-  -- Get the vehicle state by composing the sensor functions over the current state
-  let state = compose sensors (State 0 0 0 0 0 0 0 0 0 0 0 0)
+  -- Get vehicle state directly from simulation dynamics
+  let state = State 0 -- X
+                    stream_stateDx
+                    0 -- Y
+                    stream_stateDy
+                    0 -- Z
+                    stream_stateDz
+                    stream_statePhi
+                    stream_stateDphi
+                    stream_stateTheta
+                    stream_stateDtheta
+                    stream_statePsi
+                    stream_stateDpsi
 
   -- Periodically get the demands by composing the PID controllers over the receiver
   -- demands
@@ -67,11 +69,8 @@ spec = do
   -- Run mixer on demands to get motor values
   let motors = (mixerfun quadxap) constrain pdemands
 
-  -- Call some C routines for open-loop control and sensing
+  -- Call some C routines for getting receiver demands
   trigger "stream_getReceiverDemands" true []
-  trigger "stream_getGyrometer" true []
-  trigger "stream_getQuaternion" true []
-  trigger "stream_getOpticalFlow" true []
 
   -- Send the motor values using the external C function
   trigger "stream_writeMotors" true [  arg $ m1 motors
@@ -81,3 +80,30 @@ spec = do
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
+
+stream_stateDx :: SFloat
+stream_stateDx = extern "stream_stateDx" Nothing
+
+stream_stateDy :: SFloat
+stream_stateDy = extern "stream_stateDy" Nothing
+
+stream_stateDz :: SFloat
+stream_stateDz = extern "stream_stateDz" Nothing
+
+stream_statePhi :: SFloat
+stream_statePhi = extern "stream_statePhi" Nothing
+
+stream_stateDphi :: SFloat
+stream_stateDphi = extern "stream_stateDphi" Nothing
+
+stream_stateTheta :: SFloat
+stream_stateTheta = extern "stream_stateTheta" Nothing
+
+stream_stateDtheta :: SFloat
+stream_stateDtheta = extern "stream_stateDtheta" Nothing
+
+stream_statePsi :: SFloat
+stream_statePsi = extern "stream_statePsi" Nothing
+
+stream_stateDpsi :: SFloat
+stream_stateDpsi = extern "stream_stateDpsi" Nothing

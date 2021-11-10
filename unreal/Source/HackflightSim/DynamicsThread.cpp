@@ -47,43 +47,6 @@ void stream_getReceiverDemands(void)
 }
 
 
-void stream_getGyrometer(void)
-{
-    stream_imuGyrometerX = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI_DOT)); 
-    stream_imuGyrometerY = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA_DOT)); 
-    stream_imuGyrometerZ = FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI_DOT)); 
-}
-
-void stream_getQuaternion(void)
-{
-    FRotator rot = FRotator(
-            FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_THETA)),
-            FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PSI)),
-            FMath::RadiansToDegrees(_dynamics->x(Dynamics::STATE_PHI))
-            );
-
-    FQuat quat = rot.Quaternion();
-
-    stream_imuQuaternionW = quat.W;
-    stream_imuQuaternionX = -quat.X;  // note negation
-    stream_imuQuaternionY = -quat.Y;  // note negation
-    stream_imuQuaternionZ = quat.Z;
-}
-
-void stream_getOpticalFlow(void)
-{
-    double dx = _dynamics->x(Dynamics::STATE_X_DOT);
-    double dy = _dynamics->x(Dynamics::STATE_Y_DOT);
-
-    double psi = _dynamics->x(Dynamics::STATE_PSI);
-    double cp = cos(psi);
-    double sp = sin(psi);
-
-    // Rotate inertial velocity into body frame, ignoring roll and pitch fow now
-    stream_flowX = dx * cp + dy * sp;
-    stream_flowY = dy * cp - dx * sp;
-}
-
 void stream_debug(float value)
 {
     debugline("%+3.3f", value);
@@ -122,18 +85,19 @@ void FDynamicsThread::getActuators(const double time, double * values)
         return;
     }
 
-    // Share the current time with 
-    stream_time = time; 
-
-    // Share the altimeter value
-    stream_altimeterZ = _dynamics->x(Dynamics::STATE_Z); 
-
-    // Flag the simulated IMU data as available
-    stream_imuGotGyrometer = true;
-    stream_imuGotQuaternion = true;
-
     // Run Copilot, triggering stream_runMotors
     step();
+
+    // Get state from dynamics
+    stream_stateDx     = _dynamics->x(Dynamics::STATE_X_DOT);
+    stream_stateDy     = _dynamics->x(Dynamics::STATE_Y_DOT);
+    stream_stateDz     = _dynamics->x(Dynamics::STATE_Z_DOT);
+    stream_statePhi    = _dynamics->x(Dynamics::STATE_PHI);
+    stream_stateDphi   = _dynamics->x(Dynamics::STATE_PHI_DOT);
+    stream_stateTheta  = _dynamics->x(Dynamics::STATE_THETA);
+    stream_stateDtheta = _dynamics->x(Dynamics::STATE_THETA_DOT);
+    stream_statePsi    = _dynamics->x(Dynamics::STATE_PSI);
+    stream_stateDpsi   = _dynamics->x(Dynamics::STATE_PSI_DOT);
 
     // Get updated motor values
     values[0] = _m1;
