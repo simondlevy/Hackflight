@@ -77,35 +77,6 @@ FDynamicsThread::~FDynamicsThread()
     delete _thread;
 }
 
-void FDynamicsThread::getActuators(const double time, double * values)
-{
-    // Avoid null-pointer exceptions at startup, freeze after control
-    // program halts
-    if (!_ready) {
-        return;
-    }
-
-    // Run Copilot, triggering stream_writeMotors
-    step();
-
-    // Get state from dynamics
-    stream_stateDx     = _dynamics->x(Dynamics::STATE_X_DOT);
-    stream_stateDy     = _dynamics->x(Dynamics::STATE_Y_DOT);
-    stream_stateDz     = _dynamics->x(Dynamics::STATE_Z_DOT);
-    stream_statePhi    = _dynamics->x(Dynamics::STATE_PHI);
-    stream_stateDphi   = _dynamics->x(Dynamics::STATE_PHI_DOT);
-    stream_stateTheta  = _dynamics->x(Dynamics::STATE_THETA);
-    stream_stateDtheta = _dynamics->x(Dynamics::STATE_THETA_DOT);
-    stream_statePsi    = _dynamics->x(Dynamics::STATE_PSI);
-    stream_stateDpsi   = _dynamics->x(Dynamics::STATE_PSI_DOT);
-
-    // Get updated motor values
-    values[0] = _m1;
-    values[1] = _m2;
-    values[2] = _m3;
-    values[3] = _m4;
-}
-
 void FDynamicsThread::tick(void)
 {
     // Get demands from keypad
@@ -154,10 +125,31 @@ uint32_t FDynamicsThread::Run()
         // Update dynamics
         _dynamics->update(_actuatorValues, currentTime - _previousTime);
 
-        // PID controller: update the flight manager (e.g.,
-        // HackflightManager) with the dynamics state, getting back the
-        // actuator values
-        this->getActuators(currentTime, _actuatorValues);
+        // Avoid null-pointer exceptions at startup, freeze after control
+        // program halts
+        if (!_ready) {
+            return 0;
+        }
+
+        // Run Copilot, triggering stream_writeMotors
+        step();
+
+        // Get state from dynamics
+        stream_stateDx     = _dynamics->x(Dynamics::STATE_X_DOT);
+        stream_stateDy     = _dynamics->x(Dynamics::STATE_Y_DOT);
+        stream_stateDz     = _dynamics->x(Dynamics::STATE_Z_DOT);
+        stream_statePhi    = _dynamics->x(Dynamics::STATE_PHI);
+        stream_stateDphi   = _dynamics->x(Dynamics::STATE_PHI_DOT);
+        stream_stateTheta  = _dynamics->x(Dynamics::STATE_THETA);
+        stream_stateDtheta = _dynamics->x(Dynamics::STATE_THETA_DOT);
+        stream_statePsi    = _dynamics->x(Dynamics::STATE_PSI);
+        stream_stateDpsi   = _dynamics->x(Dynamics::STATE_PSI_DOT);
+
+        // Get updated motor values
+        _actuatorValues[0] = _m1;
+        _actuatorValues[1] = _m2;
+        _actuatorValues[2] = _m3;
+        _actuatorValues[3] = _m4;
 
         // Track previous time for deltaT
         _previousTime = currentTime;

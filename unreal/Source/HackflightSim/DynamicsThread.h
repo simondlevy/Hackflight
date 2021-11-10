@@ -31,19 +31,11 @@ class FDynamicsThread : public FRunnable {
         // For FPS reporting
         uint32_t _count;
 
-        // Current actuator values from getActuators() method
+        // Current actuator values from Run() method
         double _actuatorValues[100] = {}; 
 
         // For computing deltaT
         double   _previousTime = 0;
-
-        /**
-         * Flight-control method running repeatedly on its own thread.  
-         * @param time current time in seconds (input)
-         * @param values actuator values returned by your controller (output)
-         *
-         */
-        void getActuators(const double time, double * values);
 
         uint8_t _actuatorCount = 0;
 
