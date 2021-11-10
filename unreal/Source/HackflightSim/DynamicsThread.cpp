@@ -16,7 +16,7 @@ static Dynamics * _dynamics;
 static GameInput * _gameInput;
 static double _joyvals[4];
 
-// Sent by  to stream_runMotors() -----------
+// Sent by to stream_writeMotors() -----------
 static float _m1;
 static float _m2;
 static float _m3;
@@ -85,7 +85,7 @@ void FDynamicsThread::getActuators(const double time, double * values)
         return;
     }
 
-    // Run Copilot, triggering stream_runMotors
+    // Run Copilot, triggering stream_writeMotors
     step();
 
     // Get state from dynamics
