@@ -20,6 +20,7 @@ import Time
 import Mixers
 import Motors
 import Dynamics
+import Utils
 
 -- Sensors
 import Gyrometer
@@ -53,8 +54,11 @@ pidfuns = [
 
 spec = do
 
-  -- Run the main Hackflight algorithm, getting the motor spins
-  let motors = hackflightSim receiver sensors pidfuns quadxap
+  let safefun = \m -> constrain m
+
+  let statefun = \_ -> State 0 0 0 0 0 0 0 0 0 0 0 0
+
+  let (_, _, _, motors) = hackflight receiver sensors pidfuns statefun quadxap safefun
 
   -- Call some C routines for open-loop control and sensing
   trigger "stream_getReceiverDemands" true []

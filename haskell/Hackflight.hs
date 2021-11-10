@@ -1,5 +1,5 @@
 {--
-  Hackflight core algorithms
+  Hackflight main algorithms
 
   Copyright(C) 2021 on D.Levy
 
@@ -25,6 +25,8 @@ import Parser
 import Serial
 import Utils
 
+-- Core algorithm ------------------------------------------------------------------------
+
 hackflight :: Receiver -> [Sensor] -> [PidFun] -> StateFun -> Mixer -> SafetyFun
   -> (Demands, State, Demands, Motors)
 
@@ -46,7 +48,7 @@ hackflight receiver sensors pidfuns statefun mixer safefun
     -- Run mixer on demands to get motor values
     motors = (mixerfun mixer) safefun pdemands
 
--------------------------------------------------------------------------------
+-- Full algorithm (LED, safety) ----------------------------------------------------------
 
 hackflightFull :: Receiver -> [Sensor] -> [PidFun] -> Mixer
   -> (MessageBuffer, Motors, SBool)
@@ -88,16 +90,3 @@ hackflightFull receiver sensors pidfuns mixer
 
     -- Set motors based on arming state and whether we have GCS input
     motors = (motorfun mixer) motors' armed motor_index motor_percent
-
--------------------------------------------------------------------------------
-hackflightSim :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> Motors
-
-hackflightSim receiver sensors pidfuns mixer = motors
-
-  where
-
-    (_, _, _, motors) = hackflight receiver sensors pidfuns statefun mixer safefun
-
-    safefun = \m -> constrain m
-
-    statefun = \_ -> State 0 0 0 0 0 0 0 0 0 0 0 0
