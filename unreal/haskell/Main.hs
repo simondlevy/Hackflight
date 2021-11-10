@@ -58,11 +58,11 @@ spec = do
   let rdemands = getDemands receiver
 
   -- Get the vehicle state by composing the sensor functions over the current state
-  let vstate = compose sensors (State 0 0 0 0 0 0 0 0 0 0 0 0)
+  let state = compose sensors (State 0 0 0 0 0 0 0 0 0 0 0 0)
 
   -- Periodically get the demands by composing the PID controllers over the receiver
   -- demands
-  let (_, _, pdemands) = compose pidfuns (vstate, timerReady 300, rdemands)
+  let (_, _, pdemands) = compose pidfuns (state, timerReady 300, rdemands)
 
   -- Run mixer on demands to get motor values
   let motors = (mixerfun quadxap) constrain pdemands
