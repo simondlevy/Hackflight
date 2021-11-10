@@ -18,11 +18,9 @@ class FDynamicsThread : public FRunnable {
 
     private:
 
-        // For guarding thread
-        bool _ready = false;
-
+        // Thread and guards
         FRunnableThread * _thread = NULL;
-
+        bool _ready = false;
         bool _running = false;
 
         // Start-time offset so timing begins at zero
@@ -36,8 +34,6 @@ class FDynamicsThread : public FRunnable {
 
         // For computing deltaT
         double   _previousTime = 0;
-
-        uint8_t _actuatorCount = 0;
 
     public:
 

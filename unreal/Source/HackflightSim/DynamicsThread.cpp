@@ -60,9 +60,6 @@ FDynamicsThread::FDynamicsThread(APawn * pawn, Dynamics * dynamics)
     _startTime = FPlatformTime::Seconds();
     _count = 0;
 
-    // Constant
-    _actuatorCount = dynamics->actuatorCount();
-
     _dynamics = dynamics;
 
     // For periodic update
