@@ -1,12 +1,12 @@
 {--
-  Haskell Copilot support for Hackflight
+  Haskell Copilot support DJI Phantom simulation
 
   Copyright(C) 2021 on D.Levy
 
   MIT License
 --}
 
-module Main where
+module Phantom where
 
 import Language.Copilot
 import Copilot.Compile.C99
@@ -41,6 +41,26 @@ pidfuns = [
            , posHoldController 0.1  -- Kp
           ]
 
+vparams = VehicleParams
+
+            -- Estimated
+            2e-06 -- d drag cofficient [T=d*w^2]
+
+            -- https:--www.dji.com/phantom-4/info
+            1.380  -- m mass [kg]
+
+            -- Estimated
+            2      -- Ix [kg*m^2] 
+            2      -- Iy [kg*m^2] 
+            3      -- Iz [kg*m^2] 
+            38e-04 -- Jr prop inertial [kg*m^2] 
+            15000-- maxrpm
+
+wparams = WorldParams
+
+            9.80665  -- g graviational constant
+            1.225    -- rho air density 
+ 
 ------------------------------------------------------------
 
 hackflight :: Receiver -> [PidFun] -> Mixer -> Motors
@@ -53,7 +73,7 @@ hackflight receiver pidfuns mixer = motors
     rdemands = getDemands receiver
 
     -- Get vehicle state directly from simulation dynamics
-    state = dynamics stream_time (motors' motors)
+    state = dynamics stream_time wparams vparams (motors' motors)
 
     -- Periodically get the demands by composing the PID controllers over the previous
   -- state and the current receiver demands

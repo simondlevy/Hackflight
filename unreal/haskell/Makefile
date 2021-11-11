@@ -1,5 +1,5 @@
 #
-# Makefile for Hackflight sim version
+# Makefile for HackflightSim DJI Phantom example
 #
 # Copyright (c) 2021 on D. Levy
 #
@@ -9,7 +9,7 @@ ROOT = ../..
 HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
 
-HSRC = Main.hs \
+HSRC = Phantom.hs \
 	   $(HDIR)/Dynamics.hs \
        $(HDIR)/Hackflight.hs \
        $(HDIR)/Receiver.hs \
@@ -41,8 +41,8 @@ hackflight.cpp: hackflight.c
 	cat $(CDIR)/header.c tmp.c > hackflight.c
 	rm tmp.c
 
-hackflight.c: $(HSRC) Main.hs
-	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Main.hs
+hackflight.c: $(HSRC) Phantom.hs
+	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Phantom.hs
 
 clean:
 	rm -f hackflight.* tmp.c *~

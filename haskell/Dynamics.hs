@@ -41,16 +41,18 @@ data WorldParams = WorldParams {  g :: SDouble   -- gravitational constant
 
 data VehicleParams = VehicleParams { d :: SDouble -- drag coefficient [T=d*w^2]
                                    , m :: SDouble -- mass [k]
-                                   , ix -- [kg*m^2] 
-                                   , iy -- [kg*m^2] 
-                                   , iz -- [kg*m^2] 
-                                   , jr -- rotor inertial [kg*m^2] 
+                                   , ix :: SDouble -- [kg*m^2] 
+                                   , iy :: SDouble -- [kg*m^2] 
+                                   , iz :: SDouble -- [kg*m^2] 
+                                   , jr :: SDouble -- rotor inertial [kg*m^2] 
                                    , maxrpm :: SWord16
                                    }
 
-dynamics :: SDouble -> Motors -> State
+dynamics :: SDouble -> WorldParams -> VehicleParams -> Motors -> State
 
-dynamics time _motors = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
+dynamics time _wparams _vparams _motors 
+   = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
+
   dt = time - time'
 
   x = 0
