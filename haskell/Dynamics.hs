@@ -100,6 +100,8 @@ dynamics wparams vparams fpparams mixer motors
   -- We're airborne once net downward acceleration goes below zero
   netz = accelNedZ + (g wparams)
 
+  airborne = false
+
   bodyZToInertial bodyZ phi theta psi = (x, y, z) where
 
     cph = cos phi
@@ -143,6 +145,8 @@ dynamics wparams vparams fpparams mixer motors
   dpsi'   = [0] ++ dpsi
 
   time' = [0] ++ stream_time
+
+  airborne' = [False] ++ airborne
 
 stream_time :: SFloat
 stream_time = extern "stream_time" Nothing
