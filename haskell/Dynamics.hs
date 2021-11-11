@@ -86,8 +86,17 @@ dynamics wparams vparams fpparams mixer motors
   u4 = (d vparams) * (y1*omegas2_m1 + y2*omegas2_m2 + y3*omegas2_m3 + y4*omegas2_m4)
   omega =  (y1*omegas_m1 + y2*omegas_m2 + y3*omegas_m3 + y4*omegas_m4)
 
+  -- Compute roll and pitch forces
+  lb = (l fpparams) * (b fpparams)
+  rs = rspins mixer
+  u2 = lb * ((s1 rs)*omegas2_m1 + (s2 rs)*omegas2_m2 + (s3 rs)*omegas2_m3 + (s4 rs)*omegas2_m4)
+  ps = pspins mixer
+  u3 = lb * ((s1 ps)*omegas2_m1 + (s2 ps)*omegas2_m2 + (s3 ps)*omegas2_m3 + (s4 ps)*omegas2_m4)
+
+  -- XXX currently just grabbing state from C++ Dynamics class ---------------------------------------
+
   x = 0
-  dx = if stream_time > 0 then stream_stateDx else stream_stateDx -- XXX to force stream_time for now
+  dx = if stream_time > 0 then stream_stateDx else stream_stateDx -- force stream_time
   y = 0
   dy = stream_stateDy
   z = 0
