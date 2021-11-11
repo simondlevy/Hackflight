@@ -62,8 +62,6 @@ FDynamicsThread::FDynamicsThread(APawn * pawn, Dynamics * dynamics)
 
     _dynamics = dynamics;
 
-    // For periodic update
-    _previousTime = 0;
     _gameInput = new GameInput(pawn);
 
     _ready = true;
@@ -120,7 +118,7 @@ uint32_t FDynamicsThread::Run()
         double currentTime = FPlatformTime::Seconds() - _startTime;
 
         // Update dynamics
-        _dynamics->update(_actuatorValues, currentTime - _previousTime);
+        _dynamics->update(_actuatorValues, currentTime);
 
         // Avoid null-pointer exceptions at startup, freeze after control
         // program halts
@@ -147,9 +145,6 @@ uint32_t FDynamicsThread::Run()
         _actuatorValues[1] = _m2;
         _actuatorValues[2] = _m3;
         _actuatorValues[3] = _m4;
-
-        // Track previous time for deltaT
-        _previousTime = currentTime;
 
         // Increment count for FPS reporting
         _count++;

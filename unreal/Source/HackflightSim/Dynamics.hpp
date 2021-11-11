@@ -331,10 +331,15 @@ class Dynamics {
          *
          * @param actuators values in interval [0,1] (rotors) or [-0.5,+0.5]
                   (servos)
-         * @param dt time in seconds since previous update
+         * @param current time in seconds
          */
-        void update(double * actuators, double dt) 
+        void update(double * actuators, double time) 
         {
+            // Compute deltaT from current time minus previous
+            static double _time;
+            double dt = time - _time;
+            _time = time;
+
             // Implement Equation 6 -------------------------------------------
 
             // Radians per second of rotors, and squared radians per second

@@ -32,9 +32,6 @@ class FDynamicsThread : public FRunnable {
         // Current actuator values from Run() method
         double _actuatorValues[100] = {}; 
 
-        // For computing deltaT
-        double _previousTime = 0;
-
     public:
 
         // Constructor, called main thread
