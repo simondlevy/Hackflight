@@ -46,12 +46,13 @@ mix sfun demands mixer = Quad m1 m2 m3 m4 where
 
 quadxmw = Mixer quadfun rspins pspins yspins where
 
-    rspins = Spins (-1) (-1) 1   1
-    pspins = Spins   1  (-1) 1 (-1)
-    yspins = Spins (-1)   1  1 (-1)
+    rspins = Spins (-1) (-1) (1) (1)
+    pspins = Spins (1)  (-1) (1) (-1)
+    yspins = Spins (-1) (1)  (1) (-1)
 
 quadxap = Mixer quadfun rspins pspins yspins where
 
-    rspins = Spins (-1)  1   1  (-1)
-    pspins = Spins (-1)  1 (-1)   1
-    yspins = Spins   1   1 (-1) (-1)
+    rspins = Spins (-1) (1) (1)  (-1)
+    pspins = Spins (-1) (1) (-1) (1)
+    yspins = Spins (1)  (1) (-1) (-1)
+
