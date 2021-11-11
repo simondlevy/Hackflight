@@ -35,25 +35,50 @@ import State
 import Motors
 import Utils
 
-data WorldParams = WorldParams {  g :: SDouble   -- gravitational constant
-                                , rho :: SDouble -- air density
+data WorldParams = WorldParams {  g :: SFloat   -- gravitational constant
+                                , rho :: SFloat -- air density
                                }
 
-data VehicleParams = VehicleParams { d :: SDouble -- drag coefficient [T=d*w^2]
-                                   , m :: SDouble -- mass [k]
-                                   , ix :: SDouble -- [kg*m^2] 
-                                   , iy :: SDouble -- [kg*m^2] 
-                                   , iz :: SDouble -- [kg*m^2] 
-                                   , jr :: SDouble -- rotor inertial [kg*m^2] 
+data VehicleParams = VehicleParams { d :: SFloat -- drag coefficient [T=d*w^2]
+                                   , m :: SFloat -- mass [k]
+                                   , ix :: SFloat -- [kg*m^2] 
+                                   , iy :: SFloat -- [kg*m^2] 
+                                   , iz :: SFloat -- [kg*m^2] 
+                                   , jr :: SFloat -- rotor inertial [kg*m^2] 
                                    , maxrpm :: SWord16
                                    }
 
-dynamics :: WorldParams -> VehicleParams -> Motors -> State
+data FixedPitchParams = FixedPitchParams { b :: SFloat -- thrust coefficient [F=b*w^2]
+                                         , l :: SFloat -- arm length [m]
+                                         }
 
-dynamics _wparams _vparams _motors 
+dynamics :: WorldParams -> VehicleParams -> FixedPitchParams -> Motors -> State
+
+dynamics wparams vparams fpparams motors 
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
   dt = stream_time - time'
+
+  -- Convert fractional motor speed to radians per second
+  rps m = (m motors) * pi / 30
+  omegas_m1 = rps m1
+  omegas_m2 = rps m2
+  omegas_m3 = rps m3
+  omegas_m4 = rps m4
+
+  -- Thrust is squared rad/sec scaled by air density
+  thrust omega = (rho wparams) * omega **2
+  omegas2_m1 = thrust omegas_m1
+  omegas2_m2 = thrust omegas_m2
+  omegas2_m3 = thrust omegas_m3
+  omegas2_m4 = thrust omegas_m4
+
+  -- Thrust coefficient is constant for fixed-pitch rotors, variable for collective-pitch
+  u1 = (b fpparams)  * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4)
+
+  -- Newton's third law (action/reaction) tells us that yaw is opposite to net rotor spin
+  --u4 = (d vparams) * (omegas2[i] * -getrotordirection(i))
+  -- omega += omegas[i] * -getRotorDirection(i);
 
   x = 0
   dx = if stream_time > 0 then stream_stateDx else stream_stateDx -- XXX to force stream_time for now
@@ -70,7 +95,7 @@ dynamics _wparams _vparams _motors
 
   time' = [0] ++ stream_time
 
-stream_time :: SDouble
+stream_time :: SFloat
 stream_time = extern "stream_time" Nothing
 
 stream_stateDx :: SFloat

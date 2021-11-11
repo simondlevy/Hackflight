@@ -62,11 +62,16 @@ wparams = WorldParams
             9.80665  -- g graviational constant
             1.225    -- rho air density 
 
+fpparams = FixedPitchParams
+
+            5e-06   -- b thrust coefficient [F=b*w^2]
+            0.350   -- l arm length [m]
+
 ------------------------------------------------------------
 
 spec = do
 
-  let motors = hackflight receiver wparams vparams pidfuns quadxap
+  let motors = hackflight receiver wparams vparams fpparams pidfuns quadxap
 
   -- Call some C routines for getting receiver demands
   trigger "stream_getReceiverDemands" true []

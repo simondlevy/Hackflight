@@ -13,7 +13,7 @@ EXTERN float stream_receiverThrottle;
 EXTERN float stream_stateDz;
 EXTERN float stream_statePsi;
 EXTERN float stream_stateDy;
-EXTERN double stream_time;
+EXTERN float stream_time;
 EXTERN float stream_stateDx;
 EXTERN float stream_stateDphi;
 EXTERN uint32_t stream_micros;
