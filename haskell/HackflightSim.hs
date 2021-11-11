@@ -33,7 +33,7 @@ hackflight receiver wparams vparams fpparams pidfuns mixer = motors
     rdemands = getDemands receiver
 
     -- Get vehicle state directly from simulation dynamics
-    state = dynamics wparams vparams fpparams (motors' motors)
+    state = dynamics wparams vparams fpparams mixer (motors' motors)
 
     -- Periodically get the demands by composing the PID controllers over the previous
   -- state and the current receiver demands

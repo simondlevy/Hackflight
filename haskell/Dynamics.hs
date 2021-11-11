@@ -53,9 +53,9 @@ data FixedPitchParams = FixedPitchParams { b :: SFloat -- thrust coefficient [F=
                                          , l :: SFloat -- arm length [m]
                                          }
 
-dynamics :: WorldParams -> VehicleParams -> FixedPitchParams -> Motors -> State
+dynamics :: WorldParams -> VehicleParams -> FixedPitchParams -> Mixer -> Motors -> State
 
-dynamics wparams vparams fpparams motors 
+dynamics wparams vparams fpparams mixer motors 
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
   dt = stream_time - time'
@@ -78,8 +78,13 @@ dynamics wparams vparams fpparams motors
   u1 = (b fpparams)  * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4)
 
   -- Newton's third law (action/reaction) tells us that yaw is opposite to net rotor spin
-  --u4 = (d vparams) * (omegas2[i] * -getrotordirection(i))
-  -- omega += omegas[i] * -getRotorDirection(i);
+  ys = yspins mixer
+  y1 = -(s1 ys)
+  y2 = -(s2 ys)
+  y3 = -(s3 ys)
+  y4 = -(s4 ys)
+  u4 = (d vparams) * (y1*omegas2_m1 + y2*omegas2_m2 + y3*omegas2_m3 + y4*omegas2_m4)
+  omega =  (y1*omegas_m1 + y2*omegas_m2 + y3*omegas_m3 + y4*omegas_m4)
 
   x = 0
   dx = if stream_time > 0 then stream_stateDx else stream_stateDx -- XXX to force stream_time for now
