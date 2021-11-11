@@ -26,3 +26,51 @@
  --}
 
 module Dynamics where
+
+import Language.Copilot
+
+import State
+import Motors
+import Utils
+
+dynamics :: Motors -> State
+
+dynamics _motors = State 0 -- X
+                   stream_stateDx
+                   0 -- Y
+                   stream_stateDy
+                   0 -- Z
+                   stream_stateDz
+                   stream_statePhi
+                   stream_stateDphi
+                   stream_stateTheta
+                   stream_stateDtheta
+                   stream_statePsi
+                   stream_stateDpsi
+
+stream_stateDx :: SFloat
+stream_stateDx = extern "stream_stateDx" Nothing
+
+stream_stateDy :: SFloat
+stream_stateDy = extern "stream_stateDy" Nothing
+
+stream_stateDz :: SFloat
+stream_stateDz = extern "stream_stateDz" Nothing
+
+stream_statePhi :: SFloat
+stream_statePhi = extern "stream_statePhi" Nothing
+
+stream_stateDphi :: SFloat
+stream_stateDphi = extern "stream_stateDphi" Nothing
+
+stream_stateTheta :: SFloat
+stream_stateTheta = extern "stream_stateTheta" Nothing
+
+stream_stateDtheta :: SFloat
+stream_stateDtheta = extern "stream_stateDtheta" Nothing
+
+stream_statePsi :: SFloat
+stream_statePsi = extern "stream_statePsi" Nothing
+
+stream_stateDpsi :: SFloat
+stream_stateDpsi = extern "stream_stateDpsi" Nothing

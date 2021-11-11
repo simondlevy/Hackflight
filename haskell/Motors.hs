@@ -36,3 +36,10 @@ quadFun motors armed index percent = QuadMotors m1val m2val m3val m4val where
   m2val = motorval armed (m2 motors) index 2 percent
   m3val = motorval armed (m3 motors) index 3 percent
   m4val = motorval armed (m4 motors) index 4 percent
+
+motors' :: Motors -> Motors
+
+motors' (QuadMotors m1 m2 m3 m4) = QuadMotors ([0] ++ m1)
+                                              ([1] ++ m1)
+                                              ([2] ++ m2)
+                                              ([3] ++ m3)

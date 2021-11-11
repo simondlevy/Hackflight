@@ -43,31 +43,30 @@ pidfuns = [
 
 ------------------------------------------------------------
 
+hackflight :: Receiver -> [PidFun] -> Mixer -> Motors
+
+hackflight receiver pidfuns mixer = motors
+
+  where
+
+    -- Get receiver demands from external C functions
+    rdemands = getDemands receiver
+
+    -- Get vehicle state directly from simulation dynamics
+    state = dynamics (motors' motors)
+
+    -- Periodically get the demands by composing the PID controllers over the previous
+  -- state and the current receiver demands
+    (_, _, pdemands) = compose pidfuns ((state' state), timerReady 300, rdemands)
+
+    -- Run mixer on demands to get motor values
+    motors = (mixerfun mixer) constrain pdemands
+
+------------------------------------------------------------
+
 spec = do
 
-  -- Get receiver demands from external C functions
-  let rdemands = getDemands receiver
-
-  -- Get vehicle state directly from simulation dynamics
-  let state = State 0 -- X
-                    stream_stateDx
-                    0 -- Y
-                    stream_stateDy
-                    0 -- Z
-                    stream_stateDz
-                    stream_statePhi
-                    stream_stateDphi
-                    stream_stateTheta
-                    stream_stateDtheta
-                    stream_statePsi
-                    stream_stateDpsi
-
-  -- Periodically get the demands by composing the PID controllers over the receiver
-  -- demands
-  let (_, _, pdemands) = compose pidfuns (state, timerReady 300, rdemands)
-
-  -- Run mixer on demands to get motor values
-  let motors = (mixerfun quadxap) constrain pdemands
+  let motors = hackflight receiver pidfuns quadxap
 
   -- Call some C routines for getting receiver demands
   trigger "stream_getReceiverDemands" true []
@@ -80,30 +79,3 @@ spec = do
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
-
-stream_stateDx :: SFloat
-stream_stateDx = extern "stream_stateDx" Nothing
-
-stream_stateDy :: SFloat
-stream_stateDy = extern "stream_stateDy" Nothing
-
-stream_stateDz :: SFloat
-stream_stateDz = extern "stream_stateDz" Nothing
-
-stream_statePhi :: SFloat
-stream_statePhi = extern "stream_statePhi" Nothing
-
-stream_stateDphi :: SFloat
-stream_stateDphi = extern "stream_stateDphi" Nothing
-
-stream_stateTheta :: SFloat
-stream_stateTheta = extern "stream_stateTheta" Nothing
-
-stream_stateDtheta :: SFloat
-stream_stateDtheta = extern "stream_stateDtheta" Nothing
-
-stream_statePsi :: SFloat
-stream_statePsi = extern "stream_statePsi" Nothing
-
-stream_stateDpsi :: SFloat
-stream_stateDpsi = extern "stream_stateDpsi" Nothing
