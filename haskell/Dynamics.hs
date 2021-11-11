@@ -97,7 +97,15 @@ dynamics wparams vparams fpparams mixer motors
   -- inertial frame.  Negate to use NED.
   accelNed = bodyZToInertial ((-u1) / (m vparams)) phi' theta' psi'
 
-  bodyZToInertial bodyZ phi theta psi = (0, 0, 0)
+  bodyZToInertial bodyZ phi theta psi = (0, 0, 0) where
+
+    cph = cos phi
+    sph = sin phi
+    cth = cos theta
+    sth = sin theta
+    cps = cos psi
+    sps = sin psi
+
 
   -- XXX currently just grabbing state from C++ Dynamics class ---------------------------
 
