@@ -117,6 +117,26 @@ dynamics wparams vparams fpparams mixer motors
     y = bodyZ * (cph * sps * sth - cps * sph)
     z = bodyZ * (cph * cth)
 
+    -- Implement Equation 12 computing temporal first derivative of state.
+
+    ix' = (ix vparams)
+    iy' = (iy vparams)
+    iz' = (iz vparams)
+    jr' = (jr vparams)
+
+    -- _dxdt[0] = _x[STATE_X_DOT];
+    -- _dxdt[1] = accelNED[0];
+    -- _dxdt[2] = _x[STATE_Y_DOT];                                                     
+    -- _dxdt[3] = accelNED[1];
+    -- _dxdt[4] = _x[STATE_Z_DOT];                                                     
+    -- _dxdt[5] = netz;                                                                       
+    -- _dxdt[6] = dphi';                                                                    
+    -- _dxdt[7] = psidot * dtheta' * (Iy - Iz) / Ix - Jr / Ix * dtheta' * omega + u2 / Ix;
+    -- _dxdt[8] = dtheta';                                                                    
+    -- _dxdt[9] = -(psidot * dphi' * (Iz - Ix) / Iy + Jr / Iy * dphi' * omega + u3 / Iy);
+    -- _dxdt[10] = psidot;                                                 
+    -- _dxdt[11] = dtheta' * dphi' * (Ix - Iy) / Iz + u4 / Iz; 
+
   -- XXX currently just grabbing state from C++ Dynamics class ---------------------------
 
   x = 0
