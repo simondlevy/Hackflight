@@ -9,7 +9,7 @@ HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
 
 HSRC = Ladybug.hs \
-       $(HDIR)/Hackflight.hs \
+       $(HDIR)/HackflightFull.hs \
        $(HDIR)/Receiver.hs \
        $(HDIR)/Demands.hs \
        $(HDIR)/PidController.hs \

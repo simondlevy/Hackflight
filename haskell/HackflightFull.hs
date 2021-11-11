@@ -1,5 +1,5 @@
 {--
-  Hackflight main algorithms
+  Hackflight full algorithm
 
   Copyright(C) 2021 on D.Levy
 
@@ -8,7 +8,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module Hackflight where
+module HackflightFull where
 
 import Language.Copilot
 

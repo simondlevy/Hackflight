@@ -12,6 +12,7 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 -- Core
+import HackflightSim
 import State
 import Demands
 import Receiver
@@ -60,36 +61,12 @@ wparams = WorldParams
 
             9.80665  -- g graviational constant
             1.225    -- rho air density 
- 
-------------------------------------------------------------
-
-hackflight :: Receiver -> [PidFun] -> Mixer -> Motors
-
-hackflight receiver pidfuns mixer = motors
-
-  where
-
-    -- Get receiver demands from external C functions
-    rdemands = getDemands receiver
-
-    -- Get vehicle state directly from simulation dynamics
-    state = dynamics stream_time wparams vparams (motors' motors)
-
-    -- Periodically get the demands by composing the PID controllers over the previous
-  -- state and the current receiver demands
-    (_, _, pdemands) = compose pidfuns ((state' state), timerReady 300, rdemands)
-
-    -- Run mixer on demands to get motor values
-    motors = (mixerfun mixer) constrain pdemands
-
-stream_time :: SDouble
-stream_time = extern "stream_time" Nothing
 
 ------------------------------------------------------------
 
 spec = do
 
-  let motors = hackflight receiver pidfuns quadxap
+  let motors = hackflight receiver wparams vparams pidfuns quadxap
 
   -- Call some C routines for getting receiver demands
   trigger "stream_getReceiverDemands" true []

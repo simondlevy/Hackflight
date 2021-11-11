@@ -48,15 +48,15 @@ data VehicleParams = VehicleParams { d :: SDouble -- drag coefficient [T=d*w^2]
                                    , maxrpm :: SWord16
                                    }
 
-dynamics :: SDouble -> WorldParams -> VehicleParams -> Motors -> State
+dynamics :: WorldParams -> VehicleParams -> Motors -> State
 
-dynamics time _wparams _vparams _motors 
+dynamics _wparams _vparams _motors 
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
-  dt = time - time'
+  dt = stream_time - time'
 
   x = 0
-  dx = if time > 0 then stream_stateDx else stream_stateDx
+  dx = if stream_time > 0 then stream_stateDx else stream_stateDx -- XXX to force stream_time for now
   y = 0
   dy = stream_stateDy
   z = 0
@@ -68,7 +68,10 @@ dynamics time _wparams _vparams _motors
   psi = stream_statePsi
   dpsi = stream_stateDpsi
 
-  time' = [0] ++ time
+  time' = [0] ++ stream_time
+
+stream_time :: SDouble
+stream_time = extern "stream_time" Nothing
 
 stream_stateDx :: SFloat
 stream_stateDx = extern "stream_stateDx" Nothing

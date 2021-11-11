@@ -14,7 +14,7 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 -- Core
-import Hackflight
+import HackflightFull
 import Receiver
 import Demands
 import State

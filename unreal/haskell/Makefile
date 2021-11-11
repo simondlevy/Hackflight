@@ -11,7 +11,7 @@ CDIR = $(ROOT)/c
 
 HSRC = Phantom.hs \
 	   $(HDIR)/Dynamics.hs \
-       $(HDIR)/Hackflight.hs \
+       $(HDIR)/HackflightSim.hs \
        $(HDIR)/Receiver.hs \
        $(HDIR)/Demands.hs \
        $(HDIR)/State.hs \
