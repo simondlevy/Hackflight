@@ -93,7 +93,13 @@ dynamics wparams vparams fpparams mixer motors
   ps = pspins mixer
   u3 = lb * ((s1 ps)*omegas2_m1 + (s2 ps)*omegas2_m2 + (s3 ps)*omegas2_m3 + (s4 ps)*omegas2_m4)
 
-  -- XXX currently just grabbing state from C++ Dynamics class ---------------------------------------
+  -- Use the current Euler angles to rotate the orthogonal thrust vector into the 
+  -- inertial frame.  Negate to use NED.
+  accelNed = bodyZToInertial ((-u1) / (m vparams)) phi' theta' psi'
+
+  bodyZToInertial bodyZ phi theta psi = (0, 0, 0)
+
+  -- XXX currently just grabbing state from C++ Dynamics class ---------------------------
 
   x = 0
   dx = if stream_time > 0 then stream_stateDx else stream_stateDx -- force stream_time
@@ -107,6 +113,19 @@ dynamics wparams vparams fpparams mixer motors
   dtheta = stream_stateDtheta
   psi = stream_statePsi
   dpsi = stream_stateDpsi
+
+  x'      = [0] ++ x
+  dx'     = [0] ++ dx
+  y'      = [0] ++ y
+  dy'     = [0] ++ dy
+  z'      = [0] ++ z
+  dz'     = [0] ++ dz
+  phi'    = [0] ++ phi
+  dphi'   = [0] ++ dphi
+  theta'  = [0] ++ theta
+  dtheta' = [0] ++ dtheta
+  psi'    = [0] ++ psi
+  dpsi'   = [0] ++ dpsi
 
   time' = [0] ++ stream_time
 
