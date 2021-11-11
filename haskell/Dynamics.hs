@@ -30,6 +30,7 @@
 module Dynamics where
 
 import Language.Copilot
+import Prelude hiding((<), (>), (++), (&&), not)
 
 import State
 import Mixers
@@ -100,7 +101,7 @@ dynamics wparams vparams fpparams mixer motors
   -- We're airborne once net downward acceleration goes below zero
   netz = accelNedZ + (g wparams)
 
-  airborne = false
+  airborne = if not airborne && netz < 0 then true else airborne'
 
   bodyZToInertial bodyZ phi theta psi = (x, y, z) where
 
