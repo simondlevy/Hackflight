@@ -32,6 +32,7 @@ module Dynamics where
 import Language.Copilot
 
 import State
+import Mixers
 import Motors
 import Utils
 
@@ -52,9 +53,9 @@ data FixedPitchParams = FixedPitchParams { b :: SFloat -- thrust coefficient [F=
                                          , l :: SFloat -- arm length [m]
                                          }
 
-dynamics :: WorldParams -> VehicleParams -> FixedPitchParams -> Motors -> State
+dynamics :: WorldParams -> VehicleParams -> FixedPitchParams -> Mixer -> Motors -> State
 
-dynamics wparams vparams fpparams motors 
+dynamics wparams vparams fpparams mixer motors 
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
   dt = stream_time - time'
@@ -77,11 +78,48 @@ dynamics wparams vparams fpparams motors
   u1 = (b fpparams)  * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4)
 
   -- Newton's third law (action/reaction) tells us that yaw is opposite to net rotor spin
-  --u4 = (d vparams) * (omegas2[i] * -getrotordirection(i))
-  -- omega += omegas[i] * -getRotorDirection(i);
+  ys = yspins mixer
+  y1 = -(s1 ys)
+  y2 = -(s2 ys)
+  y3 = -(s3 ys)
+  y4 = -(s4 ys)
+  u4 = (d vparams) * (y1*omegas2_m1 + y2*omegas2_m2 + y3*omegas2_m3 + y4*omegas2_m4)
+  omega =  (y1*omegas_m1 + y2*omegas_m2 + y3*omegas_m3 + y4*omegas_m4)
+
+  -- Compute roll and pitch forces
+  lb = (l fpparams) * (b fpparams)
+  rs = rspins mixer
+  u2 = lb * ((s1 rs)*omegas2_m1 + (s2 rs)*omegas2_m2 + (s3 rs)*omegas2_m3 + (s4 rs)*omegas2_m4)
+  ps = pspins mixer
+  u3 = lb * ((s1 ps)*omegas2_m1 + (s2 ps)*omegas2_m2 + (s3 ps)*omegas2_m3 + (s4 ps)*omegas2_m4)
+
+  -- Use the current Euler angles to rotate the orthogonal thrust vector into the 
+  -- inertial frame.  Negate to use NED.
+  (accelNedX, accelNedY, accelNedZ) = bodyZToInertial ((-u1) / (m vparams)) phi' theta' psi'
+
+  -- We're airborne once net downward acceleration goes below zero
+  netz = accelNedZ + (g wparams)
+
+  airborne = false
+
+  bodyZToInertial bodyZ phi theta psi = (x, y, z) where
+
+    cph = cos phi
+    sph = sin phi
+    cth = cos theta
+    sth = sin theta
+    cps = cos psi
+    sps = sin psi
+
+    -- This is the rightmost column of the body-to-inertial rotation matrix
+    x = bodyZ * (sph * sps + cph * cps * sth)
+    y = bodyZ * (cph * sps * sth - cps * sph)
+    z = bodyZ * (cph * cth)
+
+  -- XXX currently just grabbing state from C++ Dynamics class ---------------------------
 
   x = 0
-  dx = if stream_time > 0 then stream_stateDx else stream_stateDx -- XXX to force stream_time for now
+  dx = if stream_time > 0 then stream_stateDx else stream_stateDx -- force stream_time
   y = 0
   dy = stream_stateDy
   z = 0
@@ -93,7 +131,22 @@ dynamics wparams vparams fpparams motors
   psi = stream_statePsi
   dpsi = stream_stateDpsi
 
+  x'      = [0] ++ x
+  dx'     = [0] ++ dx
+  y'      = [0] ++ y
+  dy'     = [0] ++ dy
+  z'      = [0] ++ z
+  dz'     = [0] ++ dz
+  phi'    = [0] ++ phi
+  dphi'   = [0] ++ dphi
+  theta'  = [0] ++ theta
+  dtheta' = [0] ++ dtheta
+  psi'    = [0] ++ psi
+  dpsi'   = [0] ++ dpsi
+
   time' = [0] ++ stream_time
+
+  airborne' = [False] ++ airborne
 
 stream_time :: SFloat
 stream_time = extern "stream_time" Nothing

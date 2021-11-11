@@ -46,23 +46,24 @@ hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
     (_, _, pdemands) = compose pidfuns (state, timerReady 300, rdemands)
 
     -- Run mixer on demands to get motor values
-    motors' = (mixerfun mixer) (\m -> if cut then 0 else m) pdemands
+    motors' = mix (\m -> if cut then 0 else m) pdemands mixer
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     -- led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
     led = if micros < 4000000 then (mod (div micros 50000) 2 == 0) else armed
 
     -- Run the serial comms parser
-    (msgtyp, sending, payindex, _checked) = parse stream_serialAvailable stream_serialByte
+    (msgtype, sending, payindex, _checked) = parse stream_serialAvailable stream_serialByte
 
     -- Convert the message into a buffer to send to GCS
-    msgbuff = message sending msgtyp state
+    msgbuff = message sending msgtype state
 
     -- Check for incoming SET_MOTOR messages from GCS
-    motor_index = if msgtyp == 215 && payindex == 1 then stream_serialByte
+    motor_index = if msgtype == 215 && payindex == 1 then stream_serialByte
                   else motor_index' where motor_index' = [0] ++ motor_index
-    motor_percent = if msgtyp == 215 && payindex == 2 then stream_serialByte
+    motor_percent = if msgtype == 215 && payindex == 2 then stream_serialByte
                     else motor_percent' where motor_percent' = [0] ++ motor_percent
 
     -- Set motors based on arming state and whether we have GCS input
     motors = (motorfun mixer) motors' armed motor_index motor_percent
+
