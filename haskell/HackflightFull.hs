@@ -46,7 +46,7 @@ hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
     (_, _, pdemands) = compose pidfuns (state, timerReady 300, rdemands)
 
     -- Run mixer on demands to get motor values
-    motors' = (mixerfun mixer) (\m -> if cut then 0 else m) pdemands
+    motors' = mix (\m -> if cut then 0 else m) pdemands mixer
 
     -- Blink LED during first couple of seconds; keep it solid when armed
     -- led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
@@ -66,3 +66,4 @@ hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
 
     -- Set motors based on arming state and whether we have GCS input
     motors = (motorfun mixer) motors' armed motor_index motor_percent
+

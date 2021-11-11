@@ -32,6 +32,7 @@ module Dynamics where
 import Language.Copilot
 
 import State
+import Mixers
 import Motors
 import Utils
 

@@ -40,4 +40,4 @@ hackflight receiver wparams vparams fpparams pidfuns mixer = motors
     (_, _, pdemands) = compose pidfuns ((state' state), timerReady 300, rdemands)
 
     -- Run mixer on demands to get motor values
-    motors = (mixerfun mixer) constrain pdemands
+    motors = mix constrain pdemands mixer
