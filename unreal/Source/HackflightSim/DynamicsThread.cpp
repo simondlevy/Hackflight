@@ -114,11 +114,11 @@ uint32_t FDynamicsThread::Run()
 
     while (_running) {
 
-        // Get a high-fidelity current time value from the OS
-        double currentTime = FPlatformTime::Seconds() - _startTime;
+        // Get a current time the OS
+        stream_time = FPlatformTime::Seconds() - _startTime;
 
         // Update dynamics
-        _dynamics->update(_actuatorValues, currentTime);
+        _dynamics->update(_actuatorValues, stream_time);
 
         // Avoid null-pointer exceptions at startup, freeze after control
         // program halts

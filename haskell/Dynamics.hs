@@ -25,6 +25,8 @@
   MIT License
  --}
 
+{-# LANGUAGE RebindableSyntax #-}
+
 module Dynamics where
 
 import Language.Copilot
@@ -33,20 +35,38 @@ import State
 import Motors
 import Utils
 
-dynamics :: Motors -> State
+data WorldParams = WorldParams {  g :: SDouble   -- gravitational constant
+                                , rho :: SDouble -- air density
+                               }
 
-dynamics _motors = State 0 -- X
-                   stream_stateDx
-                   0 -- Y
-                   stream_stateDy
-                   0 -- Z
-                   stream_stateDz
-                   stream_statePhi
-                   stream_stateDphi
-                   stream_stateTheta
-                   stream_stateDtheta
-                   stream_statePsi
-                   stream_stateDpsi
+data VehicleParams = VehicleParams { d :: SDouble -- drag coefficient [T=d*w^2]
+                                   , m :: SDouble -- mass [k]
+                                   , ix -- [kg*m^2] 
+                                   , iy -- [kg*m^2] 
+                                   , iz -- [kg*m^2] 
+                                   , jr -- rotor inertial [kg*m^2] 
+                                   , maxrpm :: SWord16
+                                   }
+
+dynamics :: SDouble -> Motors -> State
+
+dynamics time _motors = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
+  dt = time - time'
+
+  x = 0
+  dx = if time > 0 then stream_stateDx else stream_stateDx
+  y = 0
+  dy = stream_stateDy
+  z = 0
+  dz = stream_stateDz
+  phi = stream_statePhi
+  dphi = stream_stateDphi
+  theta = stream_stateTheta
+  dtheta = stream_stateDtheta
+  psi = stream_statePsi
+  dpsi = stream_stateDpsi
+
+  time' = [0] ++ time
 
 stream_stateDx :: SFloat
 stream_stateDx = extern "stream_stateDx" Nothing

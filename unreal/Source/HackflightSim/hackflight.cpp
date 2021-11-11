@@ -11,6 +11,7 @@ static float stream_receiverThrottle_cpy;
 static float stream_stateDz_cpy;
 static float stream_statePsi_cpy;
 static float stream_stateDy_cpy;
+static double stream_time_cpy;
 static float stream_stateDx_cpy;
 static float stream_stateDphi_cpy;
 static uint32_t stream_micros_cpy;
@@ -165,7 +166,7 @@ float s6_gen(void) {
 }
 
 float s7_gen(void) {
-  return stream_stateDx_cpy;
+  return ((stream_time_cpy) > ((double)(0.0))) ? stream_stateDx_cpy : (stream_stateDx_cpy);
 }
 
 float s8_gen(void) {
@@ -260,6 +261,7 @@ void step(void) {
   (stream_stateDz_cpy) = (stream_stateDz);
   (stream_statePsi_cpy) = (stream_statePsi);
   (stream_stateDy_cpy) = (stream_stateDy);
+  (stream_time_cpy) = (stream_time);
   (stream_stateDx_cpy) = (stream_stateDx);
   (stream_stateDphi_cpy) = (stream_stateDphi);
   (stream_micros_cpy) = (stream_micros);

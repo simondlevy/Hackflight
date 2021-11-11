@@ -18,7 +18,9 @@ import Copilot.Library.Stacks
 import Prelude hiding ((>), (<), (&&), (==), (>>), (/=), div, mod, not)
 
 type SFloat = Stream Float
+type SDouble = Stream Double
 type SWord8 = Stream Word8
+type SWord16 = Stream Word16
 type SWord32 = Stream Word32
 type SBool = Stream Bool
 

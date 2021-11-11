@@ -53,7 +53,7 @@ hackflight receiver pidfuns mixer = motors
     rdemands = getDemands receiver
 
     -- Get vehicle state directly from simulation dynamics
-    state = dynamics (motors' motors)
+    state = dynamics stream_time (motors' motors)
 
     -- Periodically get the demands by composing the PID controllers over the previous
   -- state and the current receiver demands
@@ -61,6 +61,9 @@ hackflight receiver pidfuns mixer = motors
 
     -- Run mixer on demands to get motor values
     motors = (mixerfun mixer) constrain pdemands
+
+stream_time :: SDouble
+stream_time = extern "stream_time" Nothing
 
 ------------------------------------------------------------
 
