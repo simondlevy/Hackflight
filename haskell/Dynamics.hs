@@ -95,7 +95,10 @@ dynamics wparams vparams fpparams mixer motors
 
   -- Use the current Euler angles to rotate the orthogonal thrust vector into the 
   -- inertial frame.  Negate to use NED.
-  accelNed = bodyZToInertial ((-u1) / (m vparams)) phi' theta' psi'
+  (accelNedX, accelNedY, accelNedZ) = bodyZToInertial ((-u1) / (m vparams)) phi' theta' psi'
+
+  -- We're airborne once net downward acceleration goes below zero
+  netz = accelNedZ + (g wparams)
 
   bodyZToInertial bodyZ phi theta psi = (x, y, z) where
 
