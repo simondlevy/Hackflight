@@ -117,17 +117,27 @@ dynamics wparams vparams fpparams mixer motors
     y = bodyZ * (cph * sps * sth - cps * sph)
     z = bodyZ * (cph * cth)
 
-    -- Implement Equation 12 computing temporal first derivative of state.
+    -- Convenient abbreviations
 
     ix' = (ix vparams)
     iy' = (iy vparams)
     iz' = (iz vparams)
     jr' = (jr vparams)
 
-    newx  = update x' dx' 
-    newdx = update dx' accelNedX
-    newy  = update y' dy'
-    newdy = update dy' accelNedY
+    -- Implement Equation 12 computing temporal first derivative of state.
+
+    newx      = update x' dx' 
+    newdx     = update dx' accelNedX
+    newy      = update y' dy'
+    newdy     = update dy' accelNedY
+    newz      = update z' dz'
+    newdz     = update dz' netz
+    newphi    = update phi' dphi'
+    newdphi   = update dphi' (dpsi'*dtheta'*(iy'-iz')/ix'-jr'/ix'*dtheta'*omega+u2/ix')
+    newtheta  = update theta' dtheta'
+    newdtheta = update dtheta' (-(dpsi'*dphi'*(iz'-ix')/iy'+jr'/iy'*dphi'*omega+u3/iy'))
+    newpsi    = update psi' dpsi'
+    newdpsi   = update dpsi'(dtheta'*dphi'*(ix'-iy')/iz'+u4/iz')
 
     update oldval deriv = if airborne then oldval + dt * deriv else oldval
 
