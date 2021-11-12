@@ -125,7 +125,6 @@ dynamics wparams vparams fpparams mixer motors
     jr' = (jr vparams)
 
     -- Implement Equation 12 computing temporal first derivative of state.
-
     newx      = update x' dx' 
     newdx     = update dx' accelNedX
     newy      = update y' dy'

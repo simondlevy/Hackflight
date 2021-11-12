@@ -119,9 +119,6 @@ class Dynamics {
         // Flag for whether we're airborne and can update dynamics
         bool _airborne = false;
 
-        // Inertial-frame acceleration
-        double _inertialAccel[3] = {};
-
         // y = Ax + b helper for frame-of-reference conversion methods
         static void dot(double A[3][3], double x[3], double y[3])
         {
@@ -205,9 +202,6 @@ class Dynamics {
             _x[STATE_PHI_DOT] = 0;
             _x[STATE_THETA_DOT] = 0;
             _x[STATE_PSI_DOT] = 0;
-
-            // Initialize inertial frame acceleration in NED coordinates
-            bodyZToInertial(-_wparams.g, rotation, _inertialAccel);
 
             // We usuall start on ground, but can start in air for testing
             _airborne = airborne;
@@ -364,12 +358,6 @@ class Dynamics {
                 _x[9] += dt * (-(psidot * phidot * (Iz - Ix) / Iy + Jr / Iy * phidot * omega + u3 / Iy));
                 _x[10] += dt * psidot;                                                 
                 _x[11] += dt * (thedot * phidot * (Ix - Iy) / Iz + u4 / Iz); 
-
-                // Once airborne, inertial-frame acceleration is same as NED
-                // acceleration
-                _inertialAccel[0] = accelNED[0];
-                _inertialAccel[1] = accelNED[1];
-                _inertialAccel[2] = accelNED[2];
             }
             else {
                 //"fly" to agl=0
