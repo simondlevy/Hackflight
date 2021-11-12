@@ -176,74 +176,6 @@ class Dynamics {
         // rotorCount.
         uint8_t _actuatorCount = 0;
 
-        /**
-         * Implements Equation 12 computing temporal first derivative of state.
-         * Should fill _dxdx[0..11] with appropriate values.
-         * @param accelNED acceleration in NED inertial frame
-         * @param netz accelNED[2] with gravitational constant added in
-         * @param omega net torque from rotors
-         * @param u2 roll force
-         * @param u3 pitch force
-         * @param u4 yaw force
-         * @param dxdt output state derivative
-         */
-        void computeStateDerivative(double accelNED[3],
-                                    double netz,
-                                    double omega,
-                                    double u2,
-                                    double u3,
-                                    double u4,
-                                    double * dxdt)
-        {
-            double phidot = _x[STATE_PHI_DOT];
-            double thedot = _x[STATE_THETA_DOT];
-            double psidot = _x[STATE_PSI_DOT];
-
-            double Ix = _vparams.Ix;
-            double Iy = _vparams.Iy;
-            double Iz = _vparams.Iz;
-            double Jr = _vparams.Jr;
-
-            // x'
-            dxdt[0] = _x[STATE_X_DOT];
-            
-            // x''
-            dxdt[1] = accelNED[0];
-
-            // y'
-            dxdt[2] = _x[STATE_Y_DOT];                                                     
-
-            // y''
-            dxdt[3] = accelNED[1];
-
-            // z'
-            dxdt[4] = _x[STATE_Z_DOT];                                                     
-
-            // z''
-            dxdt[5] = netz;                                                                       
-
-            // phi'
-            dxdt[6] = phidot;                                                                    
-
-            // phi''
-            dxdt[7] = psidot * thedot * (Iy - Iz) / Ix - Jr / Ix * thedot *
-                omega + u2 / Ix;
-
-            // theta'
-            dxdt[8] = thedot;                                                                    
-
-            // theta''
-            dxdt[9] = -(psidot * phidot * (Iz - Ix) / Iy + Jr / Iy * phidot *
-                    omega + u3 / Iy);
-
-            // psi'
-            dxdt[10] = psidot;                                                 
-
-            // psi''
-            dxdt[11] = thedot * phidot * (Ix - Iy) / Iz + u4 / Iz; 
-        }
-
-
     public:
 
         /**
@@ -406,19 +338,31 @@ class Dynamics {
                 _airborne = netz < 0;
             }
 
+            double phidot = _x[STATE_PHI_DOT];
+            double thedot = _x[STATE_THETA_DOT];
+            double psidot = _x[STATE_PSI_DOT];
+
+            double Ix = _vparams.Ix;
+            double Iy = _vparams.Iy;
+            double Iz = _vparams.Iz;
+            double Jr = _vparams.Jr;
+
             // Once airborne, we can update dynamics
             if (_airborne) {
 
-                double dxdt[12] = {};
-
-                // Compute the state derivatives using Equation 12
-                computeStateDerivative(accelNED, netz, omega, u2, u3, u4, dxdt);
-
-                // Compute state as first temporal integral of first temporal
-                // derivative
-                for (uint8_t i = 0; i < 12; ++i) {
-                    _x[i] += dt * dxdt[i];
-                }
+                // Compute the state derivatives using Equation 12, and integrate them
+                // to get the updated state
+                _x[0] += dt * _x[STATE_X_DOT];
+                _x[1] += dt * accelNED[0];
+                _x[2] += dt * _x[STATE_Y_DOT];                                                
+                _x[4] += dt * _x[STATE_Z_DOT];                                                
+                _x[5] += dt * netz; 
+                _x[6] += dt * phidot;
+                _x[7] += dt * (psidot * thedot * (Iy - Iz) / Ix - Jr / Ix * thedot * omega + u2 / Ix);
+                _x[8] += dt * thedot;
+                _x[9] += dt * (-(psidot * phidot * (Iz - Ix) / Iy + Jr / Iy * phidot * omega + u3 / Iy));
+                _x[10] += dt * psidot;                                                 
+                _x[11] += dt * (thedot * phidot * (Ix - Iy) / Iz + u4 / Iz); 
 
                 // Once airborne, inertial-frame acceleration is same as NED
                 // acceleration
