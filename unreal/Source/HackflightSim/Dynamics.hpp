@@ -355,10 +355,11 @@ class Dynamics {
                 _x[0] += dt * _x[STATE_X_DOT];
                 _x[1] += dt * accelNED[0];
                 _x[2] += dt * _x[STATE_Y_DOT];                                                
+                _x[3] += dt * accelNED[1];
                 _x[4] += dt * _x[STATE_Z_DOT];                                                
                 _x[5] += dt * netz; 
                 _x[6] += dt * phidot;
-                _x[7] += dt * (psidot * thedot * (Iy - Iz) / Ix - Jr / Ix * thedot * omega + u2 / Ix);
+                _x[7] += dt * (psidot * thedot *(Iy - Iz) / Ix - Jr / Ix * thedot * omega + u2 / Ix);
                 _x[8] += dt * thedot;
                 _x[9] += dt * (-(psidot * phidot * (Iz - Ix) / Iy + Jr / Iy * phidot * omega + u3 / Iy));
                 _x[10] += dt * psidot;                                                 

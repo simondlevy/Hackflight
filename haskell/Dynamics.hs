@@ -124,18 +124,13 @@ dynamics wparams vparams fpparams mixer motors
     iz' = (iz vparams)
     jr' = (jr vparams)
 
-    -- _dxdt[0] = _x[STATE_X_DOT];
-    -- _dxdt[1] = accelNED[0];
-    -- _dxdt[2] = _x[STATE_Y_DOT];                                                     
-    -- _dxdt[3] = accelNED[1];
-    -- _dxdt[4] = _x[STATE_Z_DOT];                                                     
-    -- _dxdt[5] = netz;                                                                       
-    -- _dxdt[6] = dphi';                                                                    
-    -- _dxdt[7] = psidot * dtheta' * (Iy - Iz) / Ix - Jr / Ix * dtheta' * omega + u2 / Ix;
-    -- _dxdt[8] = dtheta';                                                                    
-    -- _dxdt[9] = -(psidot * dphi' * (Iz - Ix) / Iy + Jr / Iy * dphi' * omega + u3 / Iy);
-    -- _dxdt[10] = psidot;                                                 
-    -- _dxdt[11] = dtheta' * dphi' * (Ix - Iy) / Iz + u4 / Iz; 
+    newx  = update x' dx' 
+    newdx = update dx' accelNedX
+    newy  = update y' dy'
+    newdy = update dy' accelNedY
+
+    update oldval deriv = if airborne then oldval + dt * deriv else oldval
+
 
   -- XXX currently just grabbing state from C++ Dynamics class ---------------------------
 
