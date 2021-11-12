@@ -163,9 +163,8 @@ class Dynamics {
         // Height above ground, set by kinematics
         double _agl = 0;
 
-        // state vector (see Eqn. 11) and its first temporal derivative
+        // state vector (see Eqn. 11)
         double _x[12] = {};
-        double _dxdt[12] = {};
 
         // quad, hexa, octo, etc.
         uint8_t _rotorCount = 0;
@@ -186,13 +185,15 @@ class Dynamics {
          * @param u2 roll force
          * @param u3 pitch force
          * @param u4 yaw force
+         * @param dxdt output state derivative
          */
         void computeStateDerivative(double accelNED[3],
                                     double netz,
                                     double omega,
                                     double u2,
                                     double u3,
-                                    double u4)
+                                    double u4,
+                                    double * dxdt)
         {
             double phidot = _x[STATE_PHI_DOT];
             double thedot = _x[STATE_THETA_DOT];
@@ -204,42 +205,42 @@ class Dynamics {
             double Jr = _vparams.Jr;
 
             // x'
-            _dxdt[0] = _x[STATE_X_DOT];
+            dxdt[0] = _x[STATE_X_DOT];
             
             // x''
-            _dxdt[1] = accelNED[0];
+            dxdt[1] = accelNED[0];
 
             // y'
-            _dxdt[2] = _x[STATE_Y_DOT];                                                     
+            dxdt[2] = _x[STATE_Y_DOT];                                                     
 
             // y''
-            _dxdt[3] = accelNED[1];
+            dxdt[3] = accelNED[1];
 
             // z'
-            _dxdt[4] = _x[STATE_Z_DOT];                                                     
+            dxdt[4] = _x[STATE_Z_DOT];                                                     
 
             // z''
-            _dxdt[5] = netz;                                                                       
+            dxdt[5] = netz;                                                                       
 
             // phi'
-            _dxdt[6] = phidot;                                                                    
+            dxdt[6] = phidot;                                                                    
 
             // phi''
-            _dxdt[7] = psidot * thedot * (Iy - Iz) / Ix - Jr / Ix * thedot *
+            dxdt[7] = psidot * thedot * (Iy - Iz) / Ix - Jr / Ix * thedot *
                 omega + u2 / Ix;
 
             // theta'
-            _dxdt[8] = thedot;                                                                    
+            dxdt[8] = thedot;                                                                    
 
             // theta''
-            _dxdt[9] = -(psidot * phidot * (Iz - Ix) / Iy + Jr / Iy * phidot *
+            dxdt[9] = -(psidot * phidot * (Iz - Ix) / Iy + Jr / Iy * phidot *
                     omega + u3 / Iy);
 
             // psi'
-            _dxdt[10] = psidot;                                                 
+            dxdt[10] = psidot;                                                 
 
             // psi''
-            _dxdt[11] = thedot * phidot * (Ix - Iy) / Iz + u4 / Iz; 
+            dxdt[11] = thedot * phidot * (Ix - Iy) / Iz + u4 / Iz; 
         }
 
 
@@ -408,13 +409,15 @@ class Dynamics {
             // Once airborne, we can update dynamics
             if (_airborne) {
 
+                double dxdt[12] = {};
+
                 // Compute the state derivatives using Equation 12
-                computeStateDerivative(accelNED, netz, omega, u2, u3, u4);
+                computeStateDerivative(accelNED, netz, omega, u2, u3, u4, dxdt);
 
                 // Compute state as first temporal integral of first temporal
                 // derivative
                 for (uint8_t i = 0; i < 12; ++i) {
-                    _x[i] += dt * _dxdt[i];
+                    _x[i] += dt * dxdt[i];
                 }
 
                 // Once airborne, inertial-frame acceleration is same as NED
