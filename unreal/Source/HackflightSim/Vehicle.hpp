@@ -459,8 +459,10 @@ class Vehicle {
                 grabImages();
 
                 animateActuators();
+                
+                double aglval = agl();
 
-                _dynamics->setAgl(agl());
+                _dynamicsThread->setAgl(aglval);
             }
         }
 

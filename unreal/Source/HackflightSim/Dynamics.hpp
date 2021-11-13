@@ -163,29 +163,17 @@ class Dynamics {
 
     public:
 
-
-        /**
-         * Sets height above ground level (AGL).
-         * This method can be called by the kinematic visualization.
-         */
-        void setAgl(double agl)
-        {
-            _agl = agl;
-        }
-
         /**
          * Updates state.
-         *
-         * @param actuators values in interval [0,1] (rotors) or [-0.5,+0.5]
-                  (servos)
-         * @param current time in seconds
          */
-        void update(double * actuators, double time) 
+        void update(double * actuators, double agl, double time) 
         {
             // Compute deltaT from current time minus previous
             static double _time;
             double dt = time - _time;
             _time = time;
+
+            _agl = agl;
 
             // Implement Equation 6 -------------------------------------------
 

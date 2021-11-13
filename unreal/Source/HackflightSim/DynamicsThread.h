@@ -32,6 +32,9 @@ class FDynamicsThread : public FRunnable {
         // Current actuator values from Run() method
         double _actuatorValues[100] = {}; 
 
+        // Set by kinematics
+        float _agl;
+
     public:
 
         // Constructor, called main thread
@@ -40,6 +43,8 @@ class FDynamicsThread : public FRunnable {
         ~FDynamicsThread(void);
 
         void tick(void);
+
+        void setAgl(double agl);
 
         // Called by VehiclePawn::Tick() method to get actuator value for
         // animation and sound

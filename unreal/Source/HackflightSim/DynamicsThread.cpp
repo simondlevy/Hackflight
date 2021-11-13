@@ -118,7 +118,7 @@ uint32_t FDynamicsThread::Run()
         stream_time = FPlatformTime::Seconds() - _startTime;
 
         // Update dynamics
-        _dynamics->update(_actuatorValues, stream_time);
+        _dynamics->update(_actuatorValues, _agl, stream_time);
 
         // Avoid null-pointer exceptions at startup, freeze after control
         // program halts
@@ -161,4 +161,9 @@ void FDynamicsThread::Stop()
     FPlatformProcess::Sleep(0.03);
 
     FRunnable::Stop();
+}
+        
+void FDynamicsThread::setAgl(double agl)
+{
+    _agl = agl;
 }
