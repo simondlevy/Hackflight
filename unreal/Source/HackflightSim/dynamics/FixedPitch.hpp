@@ -33,7 +33,7 @@ class FixedPitchDynamics : public Dynamics {
     protected:
 
         FixedPitchDynamics(uint8_t nmotors, Dynamics::vehicle_params_t &vparams, fixed_pitch_params_t &fparams)
-            : Dynamics(nmotors, vparams)
+            : Dynamics(vparams)
         {
             memcpy(&_fparams, &fparams, sizeof(fixed_pitch_params_t));
         }
@@ -56,7 +56,7 @@ class FixedPitchDynamics : public Dynamics {
             roll = 0;
             pitch = 0;
 
-            for (uint8_t i=0; i<_rotorCount; ++i) {
+            for (uint8_t i=0; i<4; ++i) {
                 roll += _fparams.l * _fparams.b * omegas2[i] * getRotorRollContribution(i);
                 pitch += _fparams.l * _fparams.b * omegas2[i] * getRotorPitchContribution(i);
             }

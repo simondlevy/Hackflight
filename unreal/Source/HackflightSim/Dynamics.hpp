@@ -39,11 +39,6 @@
 
 class Dynamics {
 
-    public:
-
-        // arbitrary; avoids dynamic allocation
-        static const uint8_t MAX_ROTORS = 20; 
-
     private:
 
         typedef struct {
@@ -53,7 +48,7 @@ class Dynamics {
 
         } world_params_t; 
 
-        /* XXX static constexpr*/ world_params_t EARTH_PARAMS = { 
+        world_params_t EARTH_PARAMS = { 
             9.80665,  // g graviational constant
             1.225 // rho air density 
         };
@@ -99,13 +94,8 @@ class Dynamics {
         vehicle_params_t _vparams;
         world_params_t _wparams;
 
-        Dynamics(uint8_t actuatorCount, vehicle_params_t & vparams)
+        Dynamics(vehicle_params_t & vparams)
         {
-            _actuatorCount = actuatorCount;
-
-            // can be overridden for thrust-vectoring
-            _rotorCount = actuatorCount; 
-
             memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
 
             // Default to Earth params (can be overridden by setWorldParams())
@@ -163,16 +153,6 @@ class Dynamics {
         // state vector (see Eqn. 11)
         double _x[12] = {};
 
-        // quad, hexa, octo, etc.
-        uint8_t _rotorCount = 0;
-
-        // For coaxials we have five actuators: two rotors, plus collective
-        // pitch, cyclic roll, and cyclic pitch.  For thrust vectoring, we have
-        // four actuators: two rotors and two servos.
-        // For standard multirotors (e.g., quadcopter), actuatorCount =
-        // rotorCount.
-        uint8_t _actuatorCount = 0;
-
     public:
 
 
@@ -194,34 +174,6 @@ class Dynamics {
                                          double & pitch) = 0;
 
         /**
-         * Gets actuator count set by constructor.
-         * @return actuator count
-         */
-        uint8_t actuatorCount(void)
-        {
-            return _actuatorCount;
-        }
-
-        /**
-         * Gets rotor count set by constructor.
-         * @return rotor count
-         */
-        uint8_t rotorCount(void)
-        {
-            return _rotorCount;
-        }
-
-
-        /**
-          * Sets world parameters (currently just gravity and air density)
-          */
-        void setWorldParams(double g, double rho)
-        {
-            _wparams.g = g;
-            _wparams.rho = rho;
-        }
-
-        /**
          * Updates state.
          *
          * @param actuators values in interval [0,1] (rotors) or [-0.5,+0.5]
@@ -238,11 +190,11 @@ class Dynamics {
             // Implement Equation 6 -------------------------------------------
 
             // Radians per second of rotors, and squared radians per second
-            double omegas[MAX_ROTORS] = {};
-            double omegas2[MAX_ROTORS] = {};
+            double omegas[20] = {};
+            double omegas2[20] = {};
 
             double u1 = 0, u4 = 0, omega = 0;
-            for (unsigned int i = 0; i < _rotorCount; ++i) {
+            for (unsigned int i = 0; i < 4; ++i) {
 
                 // Convert fractional speed to radians per second
                 omegas[i] = actuators[i] * _vparams.maxrpm * M_PI / 30;  

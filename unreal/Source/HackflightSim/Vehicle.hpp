@@ -212,7 +212,7 @@ class Vehicle {
 
         UStaticMeshComponent* _frameMeshComponent = NULL;
 
-	    UStaticMeshComponent* _rotorMeshComponents[Dynamics::MAX_ROTORS] = {};
+	    UStaticMeshComponent* _rotorMeshComponents[20] = {};
 
         // Threaded worker for running flight control
         class FDynamicsThread* _flightManager = NULL;
