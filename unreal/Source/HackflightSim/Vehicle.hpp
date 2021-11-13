@@ -225,7 +225,8 @@ class Vehicle {
         uint8_t _rotorCount = 0;
 
         // Also set in constructor, but purely for visual effect
-        int8_t _rotorDirections[Dynamics::MAX_ROTORS] = {};
+        // XXX Shoudl get this from mixer
+        int8_t _rotorDirections[4] = {-1, -1, +1, +1};
 
         virtual void animateActuators(void)
         {
@@ -262,7 +263,6 @@ class Vehicle {
                                                    smoothedRotorMean);
             }
         }
-
 
     public:
 
@@ -373,11 +373,6 @@ class Vehicle {
         Vehicle(Dynamics* dynamics)
         {
             _dynamics = dynamics;
-            _rotorCount = dynamics->rotorCount();
-
-            for (uint8_t i = 0; i < dynamics->rotorCount(); ++i) {
-                _rotorDirections[i] = dynamics->getRotorDirection(i);
-            }
 
             _flightManager = NULL;
         }
@@ -397,25 +392,6 @@ class Vehicle {
 
             // Change view to player camera on start
             _playerController->SetViewTargetWithBlend(_pawn);
-
-
-            // Check landscape for world parameters
-            for (TActorIterator<ALandscape> LandscapeItr(_pawn->GetWorld());
-                 LandscapeItr;
-                 ++LandscapeItr) {
-
-                for (FName Tag : LandscapeItr->Tags) {
-
-                    FString tag = Tag.ToString();
-                    if (tag.Contains("g=") && tag.Contains("rho=")) {
-                        float g = 0, rho = 0;
-                        if (sscanf_s(TCHAR_TO_ANSI(*tag),
-                                    "g=%f rho=%f", &g, &rho) == 2) {
-                            _dynamics->setWorldParams(g, rho);
-                        }
-                    }
-                }
-            }
 
             // Make sure a map has been selected
             _mapSelected = false;
@@ -448,13 +424,6 @@ class Vehicle {
 
             // Get vehicle ground-truth rotation to initialize flight manager
             FRotator startRotation = _pawn->GetActorRotation();
-
-            // Initialize dynamics with initial rotation
-            double rotation[3] = {
-                FMath::DegreesToRadians(startRotation.Roll),
-                FMath::DegreesToRadians(startRotation.Pitch),
-                FMath::DegreesToRadians(startRotation.Yaw) };
-            _dynamics->init(rotation);
 
             // Find the first cine camera in the viewport
             _groundCamera = NULL;

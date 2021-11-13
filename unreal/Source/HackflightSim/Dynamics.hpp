@@ -175,38 +175,6 @@ class Dynamics {
 
     public:
 
-        /**
-         * Initializes kinematic pose, with flag for whether we're airbone
-         * (helps with testing gravity).
-         *
-         * @param rotation initial rotation
-         * @param airborne allows us to start on the ground (default) or in the
-         * air (e.g., gravity test)
-         */
-        void init(double rotation[3], bool airborne = false)
-        {
-            // Always start at location (0,0,0)
-            _x[STATE_X] = 0;
-            _x[STATE_Y] = 0;
-            _x[STATE_Z] = 0;
-
-            _x[STATE_PHI] = rotation[0];
-            _x[STATE_THETA] = rotation[1];
-            _x[STATE_PSI] = rotation[2];
-
-            // Initialize velocities and airborne flag
-            _airborne = airborne;
-            _x[STATE_X_DOT] = 0;
-            _x[STATE_Y_DOT] = 0;
-            _x[STATE_Z_DOT] = 0;
-            _x[STATE_PHI_DOT] = 0;
-            _x[STATE_THETA_DOT] = 0;
-            _x[STATE_PSI_DOT] = 0;
-
-            // We usuall start on ground, but can start in air for testing
-            _airborne = airborne;
-        }
-
 
         /**
          * Sets height above ground level (AGL).
