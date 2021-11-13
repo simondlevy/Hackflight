@@ -23,17 +23,17 @@ import Dynamics
 import Utils
 
 
-hackflight :: Receiver -> WorldParams -> VehicleParams -> FixedPitchParams -> [PidFun] -> Mixer -> Motors
+hackflight :: Receiver -> WorldParams -> VehicleParams -> FixedPitchParams -> [PidFun] -> SFloat -> Mixer -> Motors
 
-hackflight receiver wparams vparams fpparams pidfuns mixer = motors
+hackflight receiver wparams vparams fpparams pidfuns time mixer = motors
 
   where
 
     -- Get receiver demands from external C functions
     rdemands = getDemands receiver
 
-    -- Get vehicle state directly from simulation dynamics
-    state = dynamics wparams vparams fpparams mixer (motors' motors)
+    -- Get vehicle state directly from simulation dynamics, instead of sensors
+    state = dynamics wparams vparams fpparams time mixer (motors' motors)
 
     -- Periodically get the demands by composing the PID controllers over the previous
   -- state and the current receiver demands

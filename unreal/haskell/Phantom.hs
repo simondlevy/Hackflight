@@ -71,7 +71,7 @@ fpparams = FixedPitchParams
 
 spec = do
 
-  let motors = hackflight receiver wparams vparams fpparams pidfuns quadxap
+  let motors = hackflight receiver wparams vparams fpparams pidfuns stream_time quadxap
 
   -- Call some C routines for getting receiver demands
   trigger "stream_getReceiverDemands" true []
@@ -82,5 +82,11 @@ spec = do
                                      , arg $ m3 motors
                                      , arg $ m4 motors ]
 
--- Compile the spec
+------------------------------------------------------------
+
+stream_time :: SFloat
+stream_time = extern "stream_time" Nothing
+
+------------------------------------------------------------
+
 main = reify spec >>= compile "hackflight"

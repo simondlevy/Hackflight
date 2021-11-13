@@ -37,6 +37,8 @@ import Mixers
 import Motors
 import Utils
 
+----------------------------------------------------------------------------------------
+
 data WorldParams = WorldParams {  g :: SFloat   -- gravitational constant
                                 , rho :: SFloat -- air density
                                }
@@ -54,12 +56,12 @@ data FixedPitchParams = FixedPitchParams { b :: SFloat -- thrust coefficient [F=
                                          , l :: SFloat -- arm length [m]
                                          }
 
-dynamics :: WorldParams -> VehicleParams -> FixedPitchParams -> Mixer -> Motors -> State
+dynamics :: WorldParams -> VehicleParams -> FixedPitchParams -> SFloat -> Mixer -> Motors -> State
 
-dynamics wparams vparams fpparams mixer motors 
+dynamics wparams vparams fpparams time mixer motors 
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
-  dt = stream_time - time'
+  dt = time - time'
 
   -- Convert fractional motor speed to radians per second
   rps m = (m motors) * pi / 30
@@ -101,7 +103,7 @@ dynamics wparams vparams fpparams mixer motors
   -- We're airborne once net downward acceleration goes below zero
   netz = accelNedZ + (g wparams)
 
-  airborne = if not airborne && netz < 0 then true else airborne'
+  airborne = if not airborne' && netz < 0 then true else airborne'
 
   bodyZToInertial bodyZ phi theta psi = (x, y, z) where
 
@@ -144,7 +146,7 @@ dynamics wparams vparams fpparams mixer motors
   -- XXX currently just grabbing state from C++ Dynamics class ---------------------------
 
   x = 0
-  dx = if stream_time > 0 then stream_stateDx else stream_stateDx -- force stream_time
+  dx = if time > 0 then stream_stateDx else stream_stateDx -- force stream_time
   y = 0
   dy = stream_stateDy
   z = 0
@@ -169,12 +171,9 @@ dynamics wparams vparams fpparams mixer motors
   psi'    = [0] ++ psi
   dpsi'   = [0] ++ dpsi
 
-  time' = [0] ++ stream_time
+  time' = [0] ++ time
 
   airborne' = [False] ++ airborne
-
-stream_time :: SFloat
-stream_time = extern "stream_time" Nothing
 
 stream_stateDx :: SFloat
 stream_stateDx = extern "stream_stateDx" Nothing
