@@ -55,7 +55,7 @@ class Vehicle {
         float rotorStartAngle(float rotorX, float rotorY)
         {
             FVector vehicleCenter = _pawn->GetActorLocation();
-            double theta = -atan2((rotorY - vehicleCenter.Y),
+            float theta = -atan2((rotorY - vehicleCenter.Y),
                                   (rotorX - vehicleCenter.X));
             return FMath::RadiansToDegrees(M_PI / 2 - theta) + 57.5;
         }
@@ -460,7 +460,7 @@ class Vehicle {
 
                 animateActuators();
                 
-                double aglval = agl();
+                float aglval = agl();
 
                 _dynamicsThread->setAgl(aglval);
             }
