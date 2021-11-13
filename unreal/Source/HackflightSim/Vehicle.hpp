@@ -52,8 +52,6 @@ class Vehicle {
         } view_t;
         view_t _view = VIEW_CHASE;
 
-        uint8_t _nrotors = 0;
-
         float rotorStartAngle(float rotorX, float rotorY)
         {
             FVector vehicleCenter = _pawn->GetActorLocation();
@@ -224,7 +222,7 @@ class Vehicle {
         uint32_t _bufferIndex = 0;
 
         // Starts at zero and increases each time we add a rotor
-        uint8_t _rotorCount;
+        uint8_t _rotorCount = 0;
 
         // Also set in constructor, but purely for visual effect
         int8_t _rotorDirections[Dynamics::MAX_ROTORS] = {};
@@ -233,7 +231,7 @@ class Vehicle {
         {
             // Compute the sum of the rotor values
             float rotorSum = 0;
-            for (uint8_t j = 0; j < _nrotors; ++j) {
+            for (uint8_t j = 0; j < _rotorCount; ++j) {
                 rotorSum += _flightManager->actuatorValue(j);
             }
 
@@ -245,7 +243,7 @@ class Vehicle {
 
             // Add mean to circular buffer for moving average
             _bufferIndex = _rotorBuffer->GetNextIndex(_bufferIndex);
-            (*_rotorBuffer)[_bufferIndex] = rotorSum / _nrotors;
+            (*_rotorBuffer)[_bufferIndex] = rotorSum / _rotorCount;
 
             // Compute the mean rotor value over the buffer frames
             float smoothedRotorMean = 0;
@@ -375,7 +373,7 @@ class Vehicle {
         Vehicle(Dynamics* dynamics)
         {
             _dynamics = dynamics;
-            _nrotors = dynamics->rotorCount();
+            _rotorCount = dynamics->rotorCount();
 
             for (uint8_t i = 0; i < dynamics->rotorCount(); ++i) {
                 _rotorDirections[i] = dynamics->getRotorDirection(i);
