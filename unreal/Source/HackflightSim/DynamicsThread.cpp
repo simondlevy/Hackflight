@@ -162,5 +162,3 @@ void FDynamicsThread::Stop()
 
     FRunnable::Stop();
 }
-
-

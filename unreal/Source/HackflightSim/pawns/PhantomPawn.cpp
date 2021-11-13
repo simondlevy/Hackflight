@@ -29,16 +29,16 @@ void APhantomPawn::PostInitializeComponents()
 // Called when the game starts or when spawned
 void APhantomPawn::BeginPlay()
 {
-    _flightManager = new FDynamicsThread(this, &dynamics);
+    _dynamicsThread = new FDynamicsThread(this, &dynamics);
 
-    vehicle.BeginPlay(_flightManager);
+    vehicle.BeginPlay(_dynamicsThread);
 
     Super::BeginPlay();
 }
 
 void APhantomPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    FDynamicsThread::stopThread(&_flightManager);
+    FDynamicsThread::stopThread(&_dynamicsThread);
 
     Super::EndPlay(EndPlayReason);
 }
@@ -50,7 +50,7 @@ void APhantomPawn::Tick(float DeltaSeconds)
 
     Super::Tick(DeltaSeconds);
 
-    _flightManager->tick();
+    _dynamicsThread->tick();
 }
 
 void APhantomPawn::addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy)

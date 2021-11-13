@@ -50,7 +50,7 @@ class APhantomPawn : public APawn {
             0.350   // l arm length [m]
         };
 
-        FDynamicsThread * _flightManager = NULL;
+        FDynamicsThread * _dynamicsThread = NULL;
 
         void addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy);
 
