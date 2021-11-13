@@ -153,6 +153,14 @@ class Dynamics {
         // state vector (see Eqn. 11)
         double _x[12] = {};
 
+        // Different for each vehicle
+        virtual int8_t getRotorDirection(uint8_t i) = 0;
+        virtual double getThrustCoefficient(double * actuators) = 0;
+        virtual void computeRollAndPitch(double * actuators,
+                                         double * omegas2,
+                                         double & roll,
+                                         double & pitch) = 0;
+
     public:
 
 
@@ -164,14 +172,6 @@ class Dynamics {
         {
             _agl = agl;
         }
-
-        // Different for each vehicle
-        virtual int8_t getRotorDirection(uint8_t i) = 0;
-        virtual double getThrustCoefficient(double * actuators) = 0;
-        virtual void computeRollAndPitch(double * actuators,
-                                         double * omegas2,
-                                         double & roll,
-                                         double & pitch) = 0;
 
         /**
          * Updates state.
