@@ -24,13 +24,13 @@ class FDynamicsThread : public FRunnable {
         bool _running = false;
 
         // Start-time offset so timing begins at zero
-        double _startTime = 0;
+        float _startTime = 0;
 
         // For FPS reporting
         uint32_t _count;
 
         // Current actuator values from Run() method
-        double _actuatorValues[100] = {}; 
+        float _actuatorValues[100] = {}; 
 
         // Set by kinematics
         float _agl;
@@ -44,11 +44,11 @@ class FDynamicsThread : public FRunnable {
 
         void tick(void);
 
-        void setAgl(double agl);
+        void setAgl(float agl);
 
         // Called by VehiclePawn::Tick() method to get actuator value for
         // animation and sound
-        double actuatorValue(uint8_t index);
+        float actuatorValue(uint8_t index);
 
         uint32_t getCount(void);
 

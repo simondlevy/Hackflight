@@ -21,8 +21,8 @@ class FixedPitchDynamics : public Dynamics {
          */
         typedef struct {
 
-            double b;  // thrust coefficient [F=b*w^2]
-            double l;  // arm length [m]
+            float b;  // thrust coefficient [F=b*w^2]
+            float l;  // arm length [m]
 
         } fixed_pitch_params_t; 
 
@@ -39,7 +39,7 @@ class FixedPitchDynamics : public Dynamics {
         }
 
 
-        virtual double getThrustCoefficient(double * actuators) override
+        virtual float getThrustCoefficient(float * actuators) override
         {
             // Thrust coefficient is constant for fixed-pitch rotors
 
@@ -48,7 +48,7 @@ class FixedPitchDynamics : public Dynamics {
             return _fparams.b;
         }
 
-        virtual void computeRollAndPitch(double * actuators, double * omegas2, double & roll, double & pitch) override
+        virtual void computeRollAndPitch(float * actuators, float * omegas2, float & roll, float & pitch) override
         {
             // We've already used actuators to compute omegas2
             (void)actuators;

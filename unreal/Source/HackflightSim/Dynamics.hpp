@@ -43,8 +43,8 @@ class Dynamics {
 
         typedef struct {
 
-            double g;  // gravitational constant
-            double rho;  // air density
+            float g;  // gravitational constant
+            float rho;  // air density
 
         } world_params_t; 
 
@@ -60,12 +60,12 @@ class Dynamics {
          */
         typedef struct {
 
-            double d;  // drag coefficient [T=d*w^2]
-            double m;  // mass [kg]
-            double Ix; // [kg*m^2] 
-            double Iy; // [kg*m^2] 
-            double Iz; // [kg*m^2] 
-            double Jr; // rotor inertial [kg*m^2] 
+            float d;  // drag coefficient [T=d*w^2]
+            float m;  // mass [kg]
+            float Ix; // [kg*m^2] 
+            float Iy; // [kg*m^2] 
+            float Iz; // [kg*m^2] 
+            float Jr; // rotor inertial [kg*m^2] 
             uint16_t maxrpm; // maxrpm
 
         } vehicle_params_t; 
@@ -110,7 +110,7 @@ class Dynamics {
         bool _airborne = false;
 
         // y = Ax + b helper for frame-of-reference conversion methods
-        static void dot(double A[3][3], double x[3], double y[3])
+        static void dot(float A[3][3], float x[3], float y[3])
         {
             for (uint8_t j = 0; j < 3; ++j) {
                 y[j] = 0;
@@ -121,24 +121,24 @@ class Dynamics {
         }
 
         // bodyToInertial method optimized for body X=Y=0
-        static void bodyZToInertial(double bodyZ,
-                                    const double rotation[3],
-                                    double inertial[3])
+        static void bodyZToInertial(float bodyZ,
+                                    const float rotation[3],
+                                    float inertial[3])
         {
-            double phi = rotation[0];
-            double theta = rotation[1];
-            double psi = rotation[2];
+            float phi = rotation[0];
+            float theta = rotation[1];
+            float psi = rotation[2];
 
-            double cph = cos(phi);
-            double sph = sin(phi);
-            double cth = cos(theta);
-            double sth = sin(theta);
-            double cps = cos(psi);
-            double sps = sin(psi);
+            float cph = cos(phi);
+            float sph = sin(phi);
+            float cth = cos(theta);
+            float sth = sin(theta);
+            float cps = cos(psi);
+            float sps = sin(psi);
 
             // This is the rightmost column of the body-to-inertial rotation
             // matrix
-            double R[3] = { sph * sps + cph * cps * sth,
+            float R[3] = { sph * sps + cph * cps * sth,
                 cph * sps * sth - cps * sph,
                 cph * cth };
 
@@ -148,29 +148,29 @@ class Dynamics {
         }
 
         // Height above ground, set by kinematics
-        double _agl = 0;
+        float _agl = 0;
 
         // state vector (see Eqn. 11)
-        double _x[12] = {};
+        float _x[12] = {};
 
         // Different for each vehicle
         virtual int8_t getRotorDirection(uint8_t i) = 0;
-        virtual double getThrustCoefficient(double * actuators) = 0;
-        virtual void computeRollAndPitch(double * actuators,
-                                         double * omegas2,
-                                         double & roll,
-                                         double & pitch) = 0;
+        virtual float getThrustCoefficient(float * actuators) = 0;
+        virtual void computeRollAndPitch(float * actuators,
+                                         float * omegas2,
+                                         float & roll,
+                                         float & pitch) = 0;
 
     public:
 
         /**
          * Updates state.
          */
-        void update(double * actuators, double agl, double time) 
+        void update(float * actuators, float agl, float time) 
         {
             // Compute deltaT from current time minus previous
-            static double _time;
-            double dt = time - _time;
+            static float _time;
+            float dt = time - _time;
             _time = time;
 
             _agl = agl;
@@ -178,10 +178,10 @@ class Dynamics {
             // Implement Equation 6 -------------------------------------------
 
             // Radians per second of rotors, and squared radians per second
-            double omegas[20] = {};
-            double omegas2[20] = {};
+            float omegas[20] = {};
+            float omegas2[20] = {};
 
-            double u1 = 0, u4 = 0, omega = 0;
+            float u1 = 0, u4 = 0, omega = 0;
             for (unsigned int i = 0; i < 4; ++i) {
 
                 // Convert fractional speed to radians per second
@@ -202,19 +202,19 @@ class Dynamics {
             
             // Compute roll, pitch, yaw forces (different method for
             // fixed-pitch blades vs. variable-pitch)
-            double u2 = 0, u3 = 0;
+            float u2 = 0, u3 = 0;
             computeRollAndPitch(actuators, omegas2, u2, u3);
 
             // ----------------------------------------------------------------
 
             // Use the current Euler angles to rotate the orthogonal thrust
             // vector into the inertial frame.  Negate to use NED.
-            double euler[3] = { _x[6], _x[8], _x[10] };
-            double accelNED[3] = {};
+            float euler[3] = { _x[6], _x[8], _x[10] };
+            float accelNED[3] = {};
             bodyZToInertial(-u1 / _vparams.m, euler, accelNED);
 
             // We're airborne once net downward acceleration goes below zero
-            double netz = accelNED[2] + _wparams.g;
+            float netz = accelNED[2] + _wparams.g;
 
             // If we're airborne, check for low AGL on descent
             if (_airborne) {
@@ -240,14 +240,14 @@ class Dynamics {
                 _airborne = netz < 0;
             }
 
-            double phidot = _x[STATE_PHI_DOT];
-            double thedot = _x[STATE_THETA_DOT];
-            double psidot = _x[STATE_PSI_DOT];
+            float phidot = _x[STATE_PHI_DOT];
+            float thedot = _x[STATE_THETA_DOT];
+            float psidot = _x[STATE_PSI_DOT];
 
-            double Ix = _vparams.Ix;
-            double Iy = _vparams.Iy;
-            double Iz = _vparams.Iz;
-            double Jr = _vparams.Jr;
+            float Ix = _vparams.Ix;
+            float Iy = _vparams.Iy;
+            float Iz = _vparams.Iz;
+            float Jr = _vparams.Jr;
 
             // Once airborne, we can update dynamics
             if (_airborne) {
@@ -269,7 +269,7 @@ class Dynamics {
             }
             else {
                 //"fly" to agl=0
-                double vz = 5 * _agl;
+                float vz = 5 * _agl;
                 _x[STATE_Z] += vz * dt;
             }
 
@@ -278,7 +278,7 @@ class Dynamics {
         /**
          * State-vector accessor
          */
-        double x(uint8_t k)
+        float x(uint8_t k)
         {
             return _x[k];
         }

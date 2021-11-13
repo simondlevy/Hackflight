@@ -14,7 +14,7 @@ static Dynamics * _dynamics;
 
 // Joystick (RC transmitter, game controller) or keypad
 static GameInput * _gameInput;
-static double _joyvals[4];
+static float _joyvals[4];
 
 // Sent by to stream_writeMotors() -----------
 static float _m1;
@@ -78,7 +78,7 @@ void FDynamicsThread::tick(void)
     _gameInput->getKeypad(_joyvals);
 }
 
-double FDynamicsThread::actuatorValue(uint8_t index)
+float FDynamicsThread::actuatorValue(uint8_t index)
 {
     return _actuatorValues[index];
 }
@@ -163,7 +163,7 @@ void FDynamicsThread::Stop()
     FRunnable::Stop();
 }
         
-void FDynamicsThread::setAgl(double agl)
+void FDynamicsThread::setAgl(float agl)
 {
     _agl = agl;
 }

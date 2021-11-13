@@ -29,12 +29,12 @@ class GameInput {
             _keypad = new Keypad(pawn);
 		}
 
-		void getJoystick(double * rawvals)
+		void getJoystick(float * rawvals)
 		{
 		    _joystick->poll(rawvals);
  		}
 
-        void getKeypad(double * rawvals)
+        void getKeypad(float * rawvals)
         {
             _keypad->tick(rawvals);
         }

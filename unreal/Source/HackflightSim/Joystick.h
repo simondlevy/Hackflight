@@ -46,7 +46,7 @@ class IJoystick
         static const uint16_t PRODUCT_F310             = 0xc216;
         static const uint16_t PRODUCT_PS4              = 0x09cc;
 
-        static constexpr double AUX1_MID = 0.3f; // positve but less than 0.5
+        static constexpr float AUX1_MID = 0.3f; // positve but less than 0.5
 
         uint16_t _productId = 0;
 
@@ -54,19 +54,19 @@ class IJoystick
 
         bool _isGameController = false;
 
-        static void getAxes4(double axes[6],
+        static void getAxes4(float axes[6],
                              DWORD axis0,
                              DWORD axis1,
                              DWORD axis2,
                              DWORD axis3)
         {
-            axes[0] = (double)axis0;
-            axes[1] = (double)axis1;
-            axes[2] = (double)axis2;
-            axes[3] = (double)axis3;
+            axes[0] = (float)axis0;
+            axes[1] = (float)axis1;
+            axes[2] = (float)axis2;
+            axes[3] = (float)axis3;
         }
 
-        static void getAxes5(double axes[6],
+        static void getAxes5(float axes[6],
                              uint8_t & naxes,
                              DWORD axis0,
                              DWORD axis1,
@@ -76,7 +76,7 @@ class IJoystick
         {
             naxes = 5;
             getAxes4(axes, axis0, axis1, axis2, axis3);
-            axes[4] = (double)axis4;
+            axes[4] = (float)axis4;
         }
 
     protected:
@@ -97,10 +97,10 @@ class IJoystick
                            uint8_t rgt,
                            uint8_t bot,
                            uint8_t lft,
-                           double * axes)
+                           float * axes)
         {
-            static double _aux1 = 0;
-            static double _aux2 = -1;
+            static float _aux1 = 0;
+            static float _aux2 = -1;
 
             static bool _down;
 
@@ -171,7 +171,7 @@ class IJoystick
             }
         }
 
-        void poll(double axes[6])
+        void poll(float axes[6])
         {
             uint32_t xpos = 0; 
             uint32_t ypos = 0;

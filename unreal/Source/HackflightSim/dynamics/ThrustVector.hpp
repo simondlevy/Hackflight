@@ -17,12 +17,12 @@ class ThrustVectorDynamics : public Dynamics {
     private:
 
         // arbitrary for now
-        static constexpr double THRUST_COEFFICIENT = 1.75E-05;
+        static constexpr float THRUST_COEFFICIENT = 1.75E-05;
 
         // radians
-        double _nozzleMaxAngle = 0;
+        float _nozzleMaxAngle = 0;
 
-        double computeNozzle(double * motorvals, double * omegas2, uint8_t axis)
+        float computeNozzle(float * motorvals, float * omegas2, uint8_t axis)
         {
             return THRUST_COEFFICIENT * (omegas2[0] + omegas2[1]) * sin(motorvals[axis] * _nozzleMaxAngle);
         }
@@ -31,7 +31,7 @@ class ThrustVectorDynamics : public Dynamics {
 
         // Dynamics method overrides
 
-        virtual void computeRollAndPitch(double * motorvals, double * omegas2, double & roll, double & pitch) override
+        virtual void computeRollAndPitch(float * motorvals, float * omegas2, float & roll, float & pitch) override
         {
             roll = computeNozzle(motorvals, omegas2, 2);
             pitch = computeNozzle(motorvals, omegas2, 3);
@@ -44,7 +44,7 @@ class ThrustVectorDynamics : public Dynamics {
             return dir[i];
         }
 
-        virtual double getThrustCoefficient(double * motorvals)
+        virtual float getThrustCoefficient(float * motorvals)
         {
             (void)motorvals;
 
@@ -53,7 +53,7 @@ class ThrustVectorDynamics : public Dynamics {
 
     public:	
 
-        ThrustVectorDynamics(Dynamics::vehicle_params_t &vparams, double nozzleMaxAngle)
+        ThrustVectorDynamics(Dynamics::vehicle_params_t &vparams, float nozzleMaxAngle)
             : Dynamics(4, vparams)
         {
             _rotorCount = 2;

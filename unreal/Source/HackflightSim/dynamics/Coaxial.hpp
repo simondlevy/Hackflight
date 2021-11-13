@@ -23,24 +23,24 @@ class CoaxialDynamics : public Dynamics {
     private:
 
         
-        static constexpr double FAKE_COLLECTIVE = 5.E-06; // XXX
+        static constexpr float FAKE_COLLECTIVE = 5.E-06; // XXX
 
-        static constexpr double CYCLIC_COEFFICIENT = 1.0;
+        static constexpr float CYCLIC_COEFFICIENT = 1.0;
 
-        static double computeCyclic(double * actuators, uint8_t axis)
+        static float computeCyclic(float * actuators, uint8_t axis)
         {
             return CYCLIC_COEFFICIENT * actuators[axis];
         }
 
     protected:
 
-        virtual double getThrustCoefficient(double * actuators) override
+        virtual float getThrustCoefficient(float * actuators) override
         {
             (void)actuators;
             return FAKE_COLLECTIVE;
         }
 
-        virtual void computeRollAndPitch(double * actuators, double * omegas2, double & roll, double & pitch) override
+        virtual void computeRollAndPitch(float * actuators, float * omegas2, float & roll, float & pitch) override
         {
             // For a coaxial, rotor speeds do not determine roll and pitch
             (void)omegas2;
