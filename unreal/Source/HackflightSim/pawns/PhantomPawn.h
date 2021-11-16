@@ -72,7 +72,7 @@ class APhantomPawn : public APawn {
 
         QuadXAPDynamics dynamics = QuadXAPDynamics(vparams, fparams);
 
-        Vehicle vehicle = Vehicle(&dynamics);
+        Vehicle vehicle;
 
         APhantomPawn();
 

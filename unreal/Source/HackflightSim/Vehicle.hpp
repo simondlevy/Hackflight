@@ -20,11 +20,13 @@
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 
 #include "Utils.hpp"
-#include "Dynamics.hpp"
 #include "DynamicsThread.h"
 #include "Camera.hpp"
 
 #include <stdio.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #define SPRINTF sprintf_s
 
@@ -112,17 +114,15 @@ class Vehicle {
         // Retrieves kinematics from dynamics computed in another thread
         void updateKinematics(void)
         {
+            float x = 0, y = 0, z = 0, phi = 0, theta = 0, psi = 0;
+            _dynamicsThread->getPose(x, y, z, phi, theta, psi);
+
             // Set vehicle pose in animation
-            _pawn->SetActorLocation(_startLocation +
-                100 * FVector(_dynamics->x(Dynamics::STATE_X), 
-                              _dynamics->x(Dynamics::STATE_Y),
-                              -_dynamics->x(Dynamics::STATE_Z))); // for NED
+            _pawn->SetActorLocation(_startLocation + 100 * FVector(x, y, -z)); // NED
 
             _pawn->SetActorRotation(
                     FMath::RadiansToDegrees(
-                        FRotator(_dynamics->x(Dynamics::STATE_THETA),
-                            _dynamics->x(Dynamics::STATE_PSI),
-                            _dynamics->x(Dynamics::STATE_PHI))));
+                        FRotator(theta, psi, phi))); // note order
         }
 
         void grabImages(void)
@@ -362,19 +362,6 @@ class Vehicle {
 
             // Increment the camera count for next time
             _cameras[_cameraCount++] = camera;
-        }
-
-        Vehicle(void)
-        {
-            _dynamics = NULL;
-            _dynamicsThread = NULL;
-        }
-
-        Vehicle(Dynamics* dynamics)
-        {
-            _dynamics = dynamics;
-
-            _dynamicsThread = NULL;
         }
 
         virtual ~Vehicle(void)

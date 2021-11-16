@@ -22,6 +22,10 @@ static float _m2;
 static float _m3;
 static float _m4;
 
+static float _x;
+static float _y;
+static float _z;
+
 // Called by Haskell Copilot --------------------------------------------------
 
 void stream_writeMotors(float m1, float m2, float m3, float m4)
@@ -131,15 +135,19 @@ uint32_t FDynamicsThread::Run()
         step();
 
         // Get state from dynamics
-        stream_stateDx     = _dynamics->x(Dynamics::STATE_X_DOT);
-        stream_stateDy     = _dynamics->x(Dynamics::STATE_Y_DOT);
-        stream_stateDz     = _dynamics->x(Dynamics::STATE_Z_DOT);
-        stream_statePhi    = _dynamics->x(Dynamics::STATE_PHI);
-        stream_stateDphi   = _dynamics->x(Dynamics::STATE_PHI_DOT);
-        stream_stateTheta  = _dynamics->x(Dynamics::STATE_THETA);
-        stream_stateDtheta = _dynamics->x(Dynamics::STATE_THETA_DOT);
-        stream_statePsi    = _dynamics->x(Dynamics::STATE_PSI);
-        stream_stateDpsi   = _dynamics->x(Dynamics::STATE_PSI_DOT);
+        stream_stateDx     = state.dx;
+        stream_stateDy     = state.dy;
+        stream_stateDz     = state.dz;
+        stream_statePhi    = state.phi;
+        stream_stateDphi   = state.dphi;
+        stream_stateTheta  = state.theta;
+        stream_stateDtheta = state.dtheta;
+        stream_statePsi    = state.psi;
+        stream_stateDpsi   = state.dpsi;
+
+        _x = state.x;
+        _y = state.y;
+        _z = state.z;
 
         // Get updated motor values
         _actuatorValues[0] = _m1;
@@ -167,4 +175,18 @@ void FDynamicsThread::Stop()
 void FDynamicsThread::setAgl(float agl)
 {
     _agl = agl;
+}
+        
+
+void FDynamicsThread::getPose(float & x, float & y, float & z, float & phi, float & theta, float & psi)
+{
+    x = _x;
+    y = _y;
+    z = _z;
+
+    debugline("Z: %f", z);
+
+    phi   = stream_statePhi;
+    theta = stream_stateTheta;
+    psi   = stream_statePsi;
 }

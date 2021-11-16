@@ -62,4 +62,6 @@ class FDynamicsThread : public FRunnable {
 
         virtual void Stop() override;
 
+        void getPose(float & x, float & y, float & z, float & phi, float & theta, float & psi);
+
 }; // class FDynamicsThread
