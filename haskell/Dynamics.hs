@@ -61,89 +61,7 @@ dynamics :: WorldParams -> VehicleParams -> FixedPitchParams -> SFloat -> Mixer 
 dynamics wparams vparams fpparams time mixer motors 
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
-  dt = time - time'
-
-  -- Convert fractional motor speed to radians per second
-  rps m = (m motors) * pi / 30
-  omegas_m1 = rps m1
-  omegas_m2 = rps m2
-  omegas_m3 = rps m3
-  omegas_m4 = rps m4
-
-  -- Thrust is squared rad/sec scaled by air density
-  thrust omega = (rho wparams) * omega **2
-  omegas2_m1 = thrust omegas_m1
-  omegas2_m2 = thrust omegas_m2
-  omegas2_m3 = thrust omegas_m3
-  omegas2_m4 = thrust omegas_m4
-
-  -- Thrust coefficient is constant for fixed-pitch rotors, variable for collective-pitch
-  u1 = (b fpparams)  * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4)
-
-  -- Newton's third law (action/reaction) tells us that yaw is opposite to net rotor spin
-  ys = yspins mixer
-  y1 = -(s1 ys)
-  y2 = -(s2 ys)
-  y3 = -(s3 ys)
-  y4 = -(s4 ys)
-  u4 = (d vparams) * (y1*omegas2_m1 + y2*omegas2_m2 + y3*omegas2_m3 + y4*omegas2_m4)
-  omega =  (y1*omegas_m1 + y2*omegas_m2 + y3*omegas_m3 + y4*omegas_m4)
-
-  -- Compute roll and pitch forces
-  lb = (l fpparams) * (b fpparams)
-  rs = rspins mixer
-  u2 = lb * ((s1 rs)*omegas2_m1 + (s2 rs)*omegas2_m2 + (s3 rs)*omegas2_m3 + (s4 rs)*omegas2_m4)
-  ps = pspins mixer
-  u3 = lb * ((s1 ps)*omegas2_m1 + (s2 ps)*omegas2_m2 + (s3 ps)*omegas2_m3 + (s4 ps)*omegas2_m4)
-
-  -- Use the current Euler angles to rotate the orthogonal thrust vector into the 
-  -- inertial frame.  Negate to use NED.
-  (accelNedX, accelNedY, accelNedZ) = bodyZToInertial ((-u1) / (m vparams)) phi' theta' psi'
-
-  -- We're airborne once net downward acceleration goes below zero
-  netz = accelNedZ + (g wparams)
-
-  airborne = if not airborne' && netz < 0 then true else airborne'
-
-  bodyZToInertial bodyZ phi theta psi = (x, y, z) where
-
-    cph = cos phi
-    sph = sin phi
-    cth = cos theta
-    sth = sin theta
-    cps = cos psi
-    sps = sin psi
-
-    -- This is the rightmost column of the body-to-inertial rotation matrix
-    x = bodyZ * (sph * sps + cph * cps * sth)
-    y = bodyZ * (cph * sps * sth - cps * sph)
-    z = bodyZ * (cph * cth)
-
-    -- Convenient abbreviations
-
-    ix' = (ix vparams)
-    iy' = (iy vparams)
-    iz' = (iz vparams)
-    jr' = (jr vparams)
-
-    -- Implement Equation 12 computing temporal first derivative of state.
-    newx      = update x' dx' 
-    newdx     = update dx' accelNedX
-    newy      = update y' dy'
-    newdy     = update dy' accelNedY
-    newz      = update z' dz'
-    newdz     = update dz' netz
-    newphi    = update phi' dphi'
-    newdphi   = update dphi' (dpsi'*dtheta'*(iy'-iz')/ix'-jr'/ix'*dtheta'*omega+u2/ix')
-    newtheta  = update theta' dtheta'
-    newdtheta = update dtheta' (-(dpsi'*dphi'*(iz'-ix')/iy'+jr'/iy'*dphi'*omega+u3/iy'))
-    newpsi    = update psi' dpsi'
-    newdpsi   = update dpsi'(dtheta'*dphi'*(ix'-iy')/iz'+u4/iz')
-
-    update oldval deriv = if airborne then oldval + dt * deriv else oldval
-
-
-  -- XXX currently just grabbing state from C++ Dynamics class ---------------------------
+  -- XXX currently just grabbing state from C++ Dynamics class
 
   x = 0
   dx = if time > 0 then stream_stateDx else stream_stateDx -- force stream_time
@@ -157,23 +75,6 @@ dynamics wparams vparams fpparams time mixer motors
   dtheta = stream_stateDtheta
   psi = stream_statePsi
   dpsi = stream_stateDpsi
-
-  x'      = [0] ++ x
-  dx'     = [0] ++ dx
-  y'      = [0] ++ y
-  dy'     = [0] ++ dy
-  z'      = [0] ++ z
-  dz'     = [0] ++ dz
-  phi'    = [0] ++ phi
-  dphi'   = [0] ++ dphi
-  theta'  = [0] ++ theta
-  dtheta' = [0] ++ dtheta
-  psi'    = [0] ++ psi
-  dpsi'   = [0] ++ dpsi
-
-  time' = [0] ++ time
-
-  airborne' = [False] ++ airborne
 
 stream_stateDx :: SFloat
 stream_stateDx = extern "stream_stateDx" Nothing
