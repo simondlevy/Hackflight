@@ -184,8 +184,6 @@ void FDynamicsThread::getPose(float & x, float & y, float & z, float & phi, floa
     y = _y;
     z = _z;
 
-    debugline("Z: %f", z);
-
     phi   = stream_statePhi;
     theta = stream_stateTheta;
     psi   = stream_statePsi;

@@ -276,6 +276,7 @@ class Dynamics {
                 state.dpsi   = _state.dpsi + dt * (dtheta * dphi * (Ix - Iy) / Iz + u4 / Iz); 
             }
             else {
+                
                 // "fly" to agl=0
                 state.z = _state.z + (5 * agl) * dt;
             }
