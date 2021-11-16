@@ -183,12 +183,14 @@ class Dynamics {
         /**
          * Updates state.
          */
-        void update(float * motors, float agl, float time) 
+        void update(float * motors, state_t & state, float agl, float time) 
         {
-            // Compute deltaT from current time minus previous
+            // Local state
+            static state_t _state;
             static float _time;
+
+            // Compute deltaT from current time minus previous
             float dt = time - _time;
-            _time = time;
 
             _agl = agl;
 
@@ -289,6 +291,9 @@ class Dynamics {
                 float vz = 5 * _agl;
                 _x[STATE_Z] += vz * dt;
             }
+
+            // Maintain state between calls
+            _time = time;
 
         } // update
 

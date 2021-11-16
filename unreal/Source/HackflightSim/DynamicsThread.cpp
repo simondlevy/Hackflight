@@ -117,8 +117,9 @@ uint32_t FDynamicsThread::Run()
         // Get a current time the OS
         stream_time = FPlatformTime::Seconds() - _startTime;
 
-        // Update dynamics
-        _dynamics->update(_actuatorValues, _agl, stream_time);
+        // Update dynamics to get current vehicle state
+        Dynamics::state_t state = {};
+        _dynamics->update(_actuatorValues, state, _agl, stream_time);
 
         // Avoid null-pointer exceptions at startup, freeze after control
         // program halts
