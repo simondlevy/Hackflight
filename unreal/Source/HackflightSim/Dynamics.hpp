@@ -293,6 +293,7 @@ class Dynamics {
             }
 
             // Maintain state between calls
+            memcpy(&_state, &state, sizeof(state_t));
             _time = time;
 
         } // update
