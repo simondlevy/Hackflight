@@ -42,7 +42,7 @@ int main(int argc, char ** argv)
 
         agl = -state.z;
 
-        printf("%f\n", agl);
+        printf("t=%f  z=%f\n", t, state.z);
     }
 
     return 0;
