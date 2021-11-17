@@ -22,6 +22,10 @@ Dynamics::fixed_pitch_params_t fpparams = {
     0.350   // l arm length [m]
 };
 
+void stream_run(void)
+{
+}
+
 int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
