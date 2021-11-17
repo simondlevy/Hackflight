@@ -26,7 +26,9 @@ int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
 
-    float motors[4] = {0, 0, 0, 0};
+    const float M = 0.6;
+
+    float motors[4] = {M, M, M, M};
 
     Dynamics::state_t state = {};
 
