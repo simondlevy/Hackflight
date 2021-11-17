@@ -72,24 +72,12 @@ class Dynamics {
 
         } vehicle_params_t; 
 
-        /**
-         * Position map for state vector
-         */
-        enum {
-            STATE_X,
-            STATE_X_DOT,
-            STATE_Y,
-            STATE_Y_DOT,
-            STATE_Z,
-            STATE_Z_DOT,
-            STATE_PHI,
-            STATE_PHI_DOT,
-            STATE_THETA,
-            STATE_THETA_DOT,
-            STATE_PSI,
-            STATE_PSI_DOT,
-            STATE_SIZE
-        };
+        typedef struct {
+
+            float b;  // thrust coefficient [F=b*w^2]
+            float l;  // arm length [m]
+
+        } fixed_pitch_params_t; 
 
         typedef struct {
 
@@ -108,14 +96,15 @@ class Dynamics {
 
         } state_t;
 
-    protected:
-
         vehicle_params_t _vparams;
         world_params_t _wparams;
+        fixed_pitch_params_t _fpparams;
 
-        Dynamics(vehicle_params_t & vparams)
+        Dynamics(vehicle_params_t & vparams, fixed_pitch_params_t & fpparams)
         {
             memcpy(&_vparams, &vparams, sizeof(vehicle_params_t));
+
+            memcpy(&_fpparams, &fpparams, sizeof(fixed_pitch_params_t));
 
             // Default to Earth params (can be overridden by setWorldParams())
             memcpy(&_wparams, &EARTH_PARAMS, sizeof(world_params_t));
@@ -139,14 +128,6 @@ class Dynamics {
             inertialZ = bodyZ * (cph * cth);
         }
 
-        // Different for each vehicle
-        virtual int8_t getRotorDirection(uint8_t i) = 0;
-        virtual float getThrustCoefficient(float * motors) = 0;
-        virtual void computeRollAndPitch(float * motors,
-                                         float * omegas2,
-                                         float & roll,
-                                         float & pitch) = 0;
-
         static float integrate(float val, float dval, float dt, bool airborne, bool lowagl)
         {
             return lowagl ? 0 : val + dt * (airborne ? dval : 0);
@@ -164,40 +145,46 @@ class Dynamics {
             static float _time;
             static bool _airborne;
 
+            // Parameter abbreviations
+            float Ix     = _vparams.Ix;
+            float Iy     = _vparams.Iy;
+            float Iz     = _vparams.Iz;
+            float Jr     = _vparams.Jr;
+            float d      = _vparams.d;
+            float maxrpm = _vparams.maxrpm;
+            float rho    = _wparams.rho;
+            float b      = _fpparams.b;
+            float l      = _fpparams.l;
+
+            // State abbreviations
+            float dphi   = _state.dphi;
+            float dtheta = _state.dtheta;
+            float dpsi   = _state.dpsi;
+
             // Compute deltaT from current time minus previous
             float dt = time - _time;
 
-            // Implement Equation 6 -------------------------------------------
+            // Convert fractional speed to radians per second
+            float omegas_m1 = motors[0] * maxrpm * M_PI / 30;
+            float omegas_m2 = motors[1] * maxrpm * M_PI / 30;
+            float omegas_m3 = motors[2] * maxrpm * M_PI / 30;
+            float omegas_m4 = motors[3] * maxrpm * M_PI / 30;
 
-            // Radians per second of rotors, and squared radians per second
-            float omegas[20] = {};
-            float omegas2[20] = {};
+            // Thrust is squared rad/sec scaled by air density
+            float omegas2_m1 = rho * omegas_m1 * omegas_m1;
+            float omegas2_m2 = rho * omegas_m2 * omegas_m2;
+            float omegas2_m3 = rho * omegas_m3 * omegas_m3;
+            float omegas2_m4 = rho * omegas_m4 * omegas_m4;
 
-            float u1 = 0, u4 = 0, omega = 0;
-            for (unsigned int i = 0; i < 4; ++i) {
+            // Newton's Third Law (action/reaction) tells us that yaw is
+            // opposite to net rotor spin
+            float omega = omegas_m1 + omegas_m2 - omegas_m3 - omegas_m4;
 
-                // Convert fractional speed to radians per second
-                omegas[i] = motors[i] * _vparams.maxrpm * M_PI / 30;  
-
-                // Thrust is squared rad/sec scaled by air density
-                omegas2[i] = _wparams.rho * omegas[i] * omegas[i]; 
-
-                // Thrust coefficient is constant for fixed-pitch rotors,
-                // variable for collective-pitch
-                u1 += getThrustCoefficient(motors) * omegas2[i];                  
-
-                // Newton's Third Law (action/reaction) tells us that yaw is
-                // opposite to net rotor spin
-                u4 += _vparams.d * omegas2[i] * -getRotorDirection(i);
-                omega += omegas[i] * -getRotorDirection(i);
-            }
-            
-            // Compute roll, pitch, yaw forces (different method for
-            // fixed-pitch blades vs. variable-pitch)
-            float u2 = 0, u3 = 0;
-            computeRollAndPitch(motors, omegas2, u2, u3);
-
-            // ----------------------------------------------------------------
+             // Implement Equation 6 -------------------------------------------
+            float u1 = b *     ( omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4);
+            float u2 = l * b * (-omegas2_m1 + omegas2_m2 + omegas2_m3 - omegas2_m4);
+            float u3 = l * b * (-omegas2_m1 + omegas2_m2 - omegas2_m3 + omegas2_m4);
+            float u4 = b *     ( omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4);
 
             // Use the current Euler angles to rotate the orthogonal thrust
             // vector into the inertial frame.  Negate to use NED.
@@ -212,15 +199,6 @@ class Dynamics {
             bool lowagl = _airborne && agl <= 0 && netz >= 0;
 
             bool airborne = !_airborne && netz <=0 ? true : lowagl ? false : _airborne; 
-
-            float dphi   = _state.dphi;
-            float dtheta = _state.dtheta;
-            float dpsi   = _state.dpsi;
-
-            float Ix = _vparams.Ix;
-            float Iy = _vparams.Iy;
-            float Iz = _vparams.Iz;
-            float Jr = _vparams.Jr;
 
             // Apply Equation 5 to get second derivatives of Euler angles
             float ddphi   = dpsi * dtheta *(Iy - Iz) / Ix - Jr / Ix * dtheta * omega + u2 / Ix;

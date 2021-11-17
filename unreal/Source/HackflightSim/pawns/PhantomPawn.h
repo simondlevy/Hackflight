@@ -10,7 +10,7 @@
 
 #include "../Vehicle.hpp"
 #include "../DynamicsThread.h"
-#include "../dynamics/fixedpitch/QuadXAP.hpp"
+#include "../Dynamics.hpp"
 
 #include <CoreMinimal.h>
 #include <GameFramework/Pawn.h>
@@ -45,7 +45,7 @@ class APhantomPawn : public APawn {
             15000,   // maxrpm
         };
 
-        FixedPitchDynamics::fixed_pitch_params_t fparams = {
+        Dynamics::fixed_pitch_params_t fpparams = {
             5.E-06, // b thrust coefficient [F=b*w^2]
             0.350   // l arm length [m]
         };
@@ -70,7 +70,7 @@ class APhantomPawn : public APawn {
 
     public:	
 
-        QuadXAPDynamics dynamics = QuadXAPDynamics(vparams, fparams);
+        Dynamics dynamics = Dynamics(vparams, fpparams);
 
         Vehicle vehicle;
 
