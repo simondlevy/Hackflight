@@ -121,17 +121,6 @@ class Dynamics {
             memcpy(&_wparams, &EARTH_PARAMS, sizeof(world_params_t));
         }        
 
-        // y = Ax + b helper for frame-of-reference conversion methods
-        static void dot(float A[3][3], float x[3], float y[3])
-        {
-            for (uint8_t j = 0; j < 3; ++j) {
-                y[j] = 0;
-                for (uint8_t k = 0; k < 3; ++k) {
-                    y[j] += A[j][k] * x[k];
-                }
-            }
-        }
-
         // bodyToInertial method optimized for body X=Y=0
         static void bodyZToInertial(float bodyZ,
                                     const float phi, const float theta, const float psi,
