@@ -147,6 +147,11 @@ class Dynamics {
                                          float & roll,
                                          float & pitch) = 0;
 
+        static float integrate(float val, float dval, float dt, bool airborne, bool lowagl)
+        {
+            return lowagl ? 0 : val + dt * (airborne ? dval : 0);
+        }
+
     public:
 
         /**
@@ -225,21 +230,21 @@ class Dynamics {
             // Compute the state derivatives using Equation 12, and integrate them
             // to get the updated state
 
-            state.x      = lowagl ? 0 : _state.x  + dt * (airborne ? _state.dx : 0);
-            state.dx     = lowagl ? 0 : _state.dx + dt * (airborne ? accelNedX : 0);
-            state.y      = lowagl ? 0 : _state.y  + dt * (airborne ? _state.dy : 0);
-            state.dy     = lowagl ? 0 : _state.dy + dt * (airborne ? accelNedY : 0);
+            state.x      = integrate(_state.x,  _state.dx, dt, airborne, lowagl);
+            state.dx     = integrate(_state.dx, accelNedX, dt, airborne, lowagl);
+            state.y      = integrate(_state.y,  _state.dy, dt, airborne, lowagl);
+            state.dy     = integrate(_state.dy, accelNedY, dt, airborne, lowagl);
 
             // Special Z-axis handling for low AGL
             state.z      = _state.z + (lowagl ? agl : 0) + dt * (_airborne ? _state.dz : 5 * agl);
-            state.dz     = lowagl ? 0 : _state.dz + (_airborne ? dt * netz : 0);
 
-            state.phi    = lowagl ? 0 : _state.phi    + dt * (_airborne ? _state.dphi : 0);
-            state.dphi   = lowagl ? 0 : _state.dphi   + dt * (_airborne ? ddphi : 0);
-            state.theta  = lowagl ? 0 : _state.theta  + dt * (_airborne ? _state.dtheta : 0);
-            state.dtheta = lowagl ? 0 : _state.dtheta + dt * (_airborne ? -ddtheta : 0);
-            state.psi    = lowagl ? 0 : _state.psi    + dt * (_airborne ? _state.dpsi : 0);
-            state.dpsi   = lowagl ? 0 : _state.dpsi   + dt * (_airborne ? ddpsi : 0);
+            state.dz     = integrate(_state.dz,     netz,          dt, airborne, lowagl);
+            state.phi    = integrate(_state.phi,    _state.dphi,   dt, airborne, lowagl);
+            state.dphi   = integrate(_state.dphi,   ddphi,         dt, airborne, lowagl);
+            state.theta  = integrate(_state.theta,  _state.dtheta, dt, airborne, lowagl);
+            state.dtheta = integrate(_state.dtheta, -ddtheta,      dt, airborne, lowagl);
+            state.psi    = integrate(_state.psi,    _state.dpsi,   dt, airborne, lowagl);
+            state.dpsi   = integrate(_state.dpsi,   ddpsi,         dt, airborne, lowagl);
        
             // Maintain state between calls
             memcpy(&_state, &state, sizeof(state_t));
