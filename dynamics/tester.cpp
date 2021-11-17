@@ -39,6 +39,8 @@ int main(int argc, char ** argv)
         dynamics.update(motors, state, agl, t);
 
         agl = -state.z;
+
+        printf("%f\n", agl);
     }
 
     return 0;
