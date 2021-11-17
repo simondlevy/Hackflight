@@ -26,7 +26,16 @@ int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
 
+    float motors[4] = {0, 0, 0, 0};
+
     Dynamics::state_t state = {};
+
+    for (int k=0; k<1000; ++k) {
+
+        float t = k / 1000.;
+
+        printf("%f\n", t);
+    }
 
     return 0;
 }
