@@ -217,23 +217,30 @@ class Dynamics {
             float Iz = _vparams.Iz;
             float Jr = _vparams.Jr;
 
+            // Apply Equation 5 to get second derivatives of Euler angles
+            float ddphi   = dpsi * dtheta *(Iy - Iz) / Ix - Jr / Ix * dtheta * omega + u2 / Ix;
+            float ddtheta = dpsi * dphi * (Iz - Ix) / Iy + Jr / Iy * dphi * omega + u3 / Iy;
+            float ddpsi   = dtheta * dphi * (Ix - Iy) / Iz + u4 / Iz; 
+
             // Compute the state derivatives using Equation 12, and integrate them
             // to get the updated state
+
             state.x      = lowagl ? 0 : _state.x  + dt * (airborne ? _state.dx : 0);
             state.dx     = lowagl ? 0 : _state.dx + dt * (airborne ? accelNedX : 0);
             state.y      = lowagl ? 0 : _state.y  + dt * (airborne ? _state.dy : 0);
             state.dy     = lowagl ? 0 : _state.dy + dt * (airborne ? accelNedY : 0);
 
+            // Special Z-axis handling for low AGL
             state.z      = _state.z + (lowagl ? agl : 0) + dt * (_airborne ? _state.dz : 5 * agl);
             state.dz     = lowagl ? 0 : _state.dz + (_airborne ? dt * netz : 0);
 
             state.phi    = lowagl ? 0 : _state.phi    + dt * (_airborne ? _state.dphi : 0);
-            state.dphi   = lowagl ? 0 : _state.dphi   + dt * (_airborne ? (dpsi * dtheta *(Iy - Iz) / Ix - Jr / Ix * dtheta * omega + u2 / Ix) : 0);
+            state.dphi   = lowagl ? 0 : _state.dphi   + dt * (_airborne ? ddphi : 0);
             state.theta  = lowagl ? 0 : _state.theta  + dt * (_airborne ? _state.dtheta : 0);
-            state.dtheta = lowagl ? 0 : _state.dtheta + dt * (_airborne ? (-(dpsi * dphi * (Iz - Ix) / Iy + Jr / Iy * dphi * omega + u3 / Iy)) : 0);
+            state.dtheta = lowagl ? 0 : _state.dtheta + dt * (_airborne ? -ddtheta : 0);
             state.psi    = lowagl ? 0 : _state.psi    + dt * (_airborne ? _state.dpsi : 0);
-            state.dpsi   = lowagl ? 0 : _state.dpsi   + dt * (_airborne ? (dtheta * dphi * (Ix - Iy) / Iz + u4 / Iz) : 0);
-        
+            state.dpsi   = lowagl ? 0 : _state.dpsi   + dt * (_airborne ? ddpsi : 0);
+       
             // Maintain state between calls
             memcpy(&_state, &state, sizeof(state_t));
             _time = time;
