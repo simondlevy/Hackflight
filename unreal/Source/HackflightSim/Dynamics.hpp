@@ -134,13 +134,9 @@ class Dynamics {
 
         // bodyToInertial method optimized for body X=Y=0
         static void bodyZToInertial(float bodyZ,
-                                    const float rotation[3],
-                                    float inertial[3])
+                                    const float phi, const float theta, const float psi,
+                                    float & inertialX, float & inertialY, float & inertialZ)
         {
-            float phi = rotation[0];
-            float theta = rotation[1];
-            float psi = rotation[2];
-
             float cph = cos(phi);
             float sph = sin(phi);
             float cth = cos(theta);
@@ -148,15 +144,10 @@ class Dynamics {
             float cps = cos(psi);
             float sps = sin(psi);
 
-            // This is the rightmost column of the body-to-inertial rotation
-            // matrix
-            float R[3] = { sph * sps + cph * cps * sth,
-                cph * sps * sth - cps * sph,
-                cph * cth };
-
-            for (uint8_t i = 0; i < 3; ++i) {
-                inertial[i] = bodyZ * R[i];
-            }
+            // This is the rightmost column of the body-to-inertial rotation matrix
+            inertialX = bodyZ * (sph * sps + cph * cps * sth);
+            inertialY = bodyZ * (cph * sps * sth - cps * sph);
+            inertialZ = bodyZ * (cph * cth);
         }
 
         // Different for each vehicle
@@ -216,18 +207,17 @@ class Dynamics {
 
             // Use the current Euler angles to rotate the orthogonal thrust
             // vector into the inertial frame.  Negate to use NED.
-            float euler[3] = { _state.phi, _state.theta, _state.psi };
-            float accelNED[3] = {};
-            bodyZToInertial(-u1 / _vparams.m, euler, accelNED);
+            float accelNedX = 0, accelNedY = 0, accelNedZ = 0;
+            bodyZToInertial(-u1 / _vparams.m,
+                    _state.phi, _state.theta, _state.psi,
+                    accelNedX, accelNedY, accelNedZ);
 
             // We're airborne once net downward acceleration goes below zero
-            float netz = accelNED[2] + _wparams.g;
+            float netz = accelNedZ + _wparams.g;
 
             bool lowagl = _airborne && agl <= 0 && netz >= 0;
 
-            bool airborne = !_airborne && netz <=0 ? true
-                           : lowagl ? false 
-                           : _airborne; 
+            bool airborne = !_airborne && netz <=0 ? true : lowagl ? false : _airborne; 
 
             float dphi   = _state.dphi;
             float dtheta = _state.dtheta;
@@ -240,10 +230,10 @@ class Dynamics {
 
             // Compute the state derivatives using Equation 12, and integrate them
             // to get the updated state
-            state.x      = lowagl ? 0 : _state.x  + dt * (airborne ? _state.dx   : 0);
-            state.dx     = lowagl ? 0 : _state.dx + dt * (airborne ? accelNED[0] : 0);
-            state.y      = lowagl ? 0 : _state.y  + dt * (airborne ? _state.dy   : 0);
-            state.dy     = lowagl ? 0 : _state.dy + dt * (airborne ? accelNED[1] : 0);
+            state.x      = lowagl ? 0 : _state.x  + dt * (airborne ? _state.dx : 0);
+            state.dx     = lowagl ? 0 : _state.dx + dt * (airborne ? accelNedX : 0);
+            state.y      = lowagl ? 0 : _state.y  + dt * (airborne ? _state.dy : 0);
+            state.dy     = lowagl ? 0 : _state.dy + dt * (airborne ? accelNedY : 0);
 
             state.z      = _state.z + (lowagl ? agl : 0) + dt * (_airborne ? _state.dz : 5 * agl);
             state.dz     = lowagl ? 0 : _state.dz + (_airborne ? dt * netz : 0);
