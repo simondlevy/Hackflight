@@ -150,8 +150,10 @@ class Dynamics {
             float Iy     = _vparams.Iy;
             float Iz     = _vparams.Iz;
             float Jr     = _vparams.Jr;
+            float m      = _vparams.m;
             float d      = _vparams.d;
             float maxrpm = _vparams.maxrpm;
+            float g      = _wparams.g;
             float rho    = _wparams.rho;
             float b      = _fpparams.b;
             float l      = _fpparams.l;
@@ -189,12 +191,12 @@ class Dynamics {
             // Use the current Euler angles to rotate the orthogonal thrust
             // vector into the inertial frame.  Negate to use NED.
             float accelNedX = 0, accelNedY = 0, accelNedZ = 0;
-            bodyZToInertial(-u1 / _vparams.m,
+            bodyZToInertial(-u1 / m,
                     _state.phi, _state.theta, _state.psi,
                     accelNedX, accelNedY, accelNedZ);
 
             // We're airborne once net downward acceleration goes below zero
-            float netz = accelNedZ + _wparams.g;
+            float netz = accelNedZ + g;
 
             bool lowagl = _airborne && agl <= 0 && netz >= 0;
 
