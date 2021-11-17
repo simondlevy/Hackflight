@@ -30,11 +30,15 @@ int main(int argc, char ** argv)
 
     Dynamics::state_t state = {};
 
+    float agl = 0;
+
     for (int k=0; k<1000; ++k) {
 
         float t = k / 1000.;
 
-        printf("%f\n", t);
+        dynamics.update(motors, state, agl, t);
+
+        agl = -state.z;
     }
 
     return 0;
