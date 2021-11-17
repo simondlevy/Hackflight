@@ -1,4 +1,5 @@
-INCDIR = ../unreal/Source/HackflightSim/
+CPPDIR = ../unreal/Source/HackflightSim/
+HSDIR = ../haskell/
 
 all: test
 
@@ -8,8 +9,8 @@ test: tester
 tester: tester.o
 	g++ -o tester tester.o
 
-tester.o: tester.cpp 
-	g++ -c -I$(INCDIR) tester.cpp
+tester.o: tester.cpp $(CPPDIR)/Dynamics.hpp
+	g++ -c -I$(CPPDIR) tester.cpp
 
 edit:
 	vim tester.cpp
