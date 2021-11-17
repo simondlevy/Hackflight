@@ -26,5 +26,7 @@ int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
 
+    Dynamics::state_t state = {};
+
     return 0;
 }
