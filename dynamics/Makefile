@@ -23,6 +23,3 @@ edit:
 
 clean: 
 	rm -f tester haskell.* *.o *~
-
-commit:
-	git commit -a -m="More dynamics testing" && git push $(GIT)/hackflight.git
