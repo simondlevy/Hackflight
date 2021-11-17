@@ -223,30 +223,11 @@ class Dynamics {
             // We're airborne once net downward acceleration goes below zero
             float netz = accelNED[2] + _wparams.g;
 
-            // If we're airborne, check for low AGL on descent
-            if (_airborne) {
+            bool lowagl = _airborne && agl <= 0 && netz >= 0;
 
-                if (agl <= 0 && netz >= 0) {
-
-                    _airborne = false;
-                    
-                    state.dx = 0;
-                    state.dy = 0;
-                    state.z = _state.z + agl;
-                    state.dz = 0;
-                    state.phi = 0;
-                    state.dphi = 0;
-                    state.theta = 0;
-                    state.dtheta = 0;
-                    state.dpsi = 0;
-                }
-            }
-
-            // If we're not airborne, we become airborne when downward
-            // acceleration has become negative
-            else {
-                _airborne = netz < 0;
-            }
+            bool airborne = !_airborne && netz <=0 ? true
+                           : lowagl ? false 
+                           : _airborne; 
 
             float dphi   = _state.dphi;
             float dtheta = _state.dtheta;
@@ -257,33 +238,27 @@ class Dynamics {
             float Iz = _vparams.Iz;
             float Jr = _vparams.Jr;
 
-            // Once airborne, we can update dynamics
-            if (_airborne) {
+            // Compute the state derivatives using Equation 12, and integrate them
+            // to get the updated state
+            state.x      = lowagl ? 0 : _state.x  + dt * (airborne ? _state.dx   : 0);
+            state.dx     = lowagl ? 0 : _state.dx + dt * (airborne ? accelNED[0] : 0);
+            state.y      = lowagl ? 0 : _state.y  + dt * (airborne ? _state.dy   : 0);
+            state.dy     = lowagl ? 0 : _state.dy + dt * (airborne ? accelNED[1] : 0);
 
-                // Compute the state derivatives using Equation 12, and integrate them
-                // to get the updated state
-                state.x      = _state.x + dt * _state.dx;
-                state.dx     = _state.dx + dt * accelNED[0];
-                state.y      = _state.y + dt * _state.dy;
-                state.dy     = _state.dy + dt * accelNED[1];
-                state.z      = _state.z + dt * _state.dz;
-                state.dz     = _state.dz + dt * netz;
-                state.phi    = _state.phi + dt * _state.dphi;
-                state.dphi   = _state.dphi + dt * (dpsi * dtheta *(Iy - Iz) / Ix - Jr / Ix * dtheta * omega + u2 / Ix);
-                state.theta  = _state.theta + dt * _state.dtheta;
-                state.dtheta = _state.dtheta + dt * (-(dpsi * dphi * (Iz - Ix) / Iy + Jr / Iy * dphi * omega + u3 / Iy));
-                state.psi    = _state.psi + dt * _state.dpsi;
-                state.dpsi   = _state.dpsi + dt * (dtheta * dphi * (Ix - Iy) / Iz + u4 / Iz); 
-            }
-            else {
-                
-                // "fly" to agl=0
-                state.z = _state.z + (5 * agl) * dt;
-            }
+            state.z      = _state.z + (lowagl ? agl : 0) + dt * (_airborne ? _state.dz : 5 * agl);
+            state.dz     = lowagl ? 0 : _state.dz + (_airborne ? dt * netz : 0);
 
+            state.phi    = lowagl ? 0 : _state.phi    + dt * (_airborne ? _state.dphi : 0);
+            state.dphi   = lowagl ? 0 : _state.dphi   + dt * (_airborne ? (dpsi * dtheta *(Iy - Iz) / Ix - Jr / Ix * dtheta * omega + u2 / Ix) : 0);
+            state.theta  = lowagl ? 0 : _state.theta  + dt * (_airborne ? _state.dtheta : 0);
+            state.dtheta = lowagl ? 0 : _state.dtheta + dt * (_airborne ? (-(dpsi * dphi * (Iz - Ix) / Iy + Jr / Iy * dphi * omega + u3 / Iy)) : 0);
+            state.psi    = lowagl ? 0 : _state.psi    + dt * (_airborne ? _state.dpsi : 0);
+            state.dpsi   = lowagl ? 0 : _state.dpsi   + dt * (_airborne ? (dtheta * dphi * (Ix - Iy) / Iz + u4 / Iz) : 0);
+        
             // Maintain state between calls
             memcpy(&_state, &state, sizeof(state_t));
             _time = time;
+            _airborne = airborne;
 
         } // update
 
