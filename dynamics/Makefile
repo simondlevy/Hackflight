@@ -9,7 +9,7 @@ test: tester
 tester: tester.o haskell.o
 	g++ -o tester tester.o haskell.o
 
-tester.o: tester.cpp $(CPPDIR)/Dynamics.hpp 
+tester.o: tester.cpp $(CPPDIR)/Dynamics.hpp haskell.c
 	g++ -c -I$(CPPDIR) tester.cpp
 
 haskell.o: haskell.c

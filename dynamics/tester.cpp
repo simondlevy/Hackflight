@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <Dynamics.hpp>
+#include "haskell.h"
 
 Dynamics::vehicle_params_t vparams = {
 
@@ -43,6 +44,8 @@ int main(int argc, char ** argv)
         float t = k / 1000.;
 
         dynamics.update(motors, state, agl, t);
+
+        step();
 
         agl = -state.z;
 
