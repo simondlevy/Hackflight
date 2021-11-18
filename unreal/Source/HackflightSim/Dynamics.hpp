@@ -185,7 +185,7 @@ class Dynamics {
             float u1 = b * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4);
             float u2 = l*b * (-omegas2_m1 + omegas2_m2 + omegas2_m3 - omegas2_m4);
             float u3 = l*b * (-omegas2_m1 + omegas2_m2 - omegas2_m3 + omegas2_m4);
-            float u4 = b * ( omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4);
+            float u4 = d * (omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4);
 
             // Use the current Euler angles to rotate the orthogonal thrust
             // vector into the inertial frame.  Negate to use NED.
