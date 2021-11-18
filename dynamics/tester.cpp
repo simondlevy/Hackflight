@@ -2,6 +2,9 @@
 #include <Dynamics.hpp>
 #include "haskell.h"
 
+float stream_time;
+float stream_agl;
+
 Dynamics::vehicle_params_t vparams = {
 
     // Estimated
@@ -23,7 +26,7 @@ Dynamics::fixed_pitch_params_t fpparams = {
     0.350   // l arm length [m]
 };
 
-void stream_run(void)
+void stream_debug(float value)
 {
 }
 
@@ -37,19 +40,19 @@ int main(int argc, char ** argv)
 
     Dynamics::state_t state = {};
 
-    float agl = 0;
+    stream_agl = 0;
 
     for (int k=0; k<1000; ++k) {
 
-        float t = k / 1000.;
+        stream_time = k / 1000.;
 
-        dynamics.update(motors, state, agl, t);
+        dynamics.update(motors, state, stream_agl, stream_time);
 
         step();
 
-        agl = -state.z;
+        stream_agl = -state.z;
 
-        printf("t=%f  z=%f\n", t, state.z);
+        printf("t=%f  z=%f\n", stream_time, state.z);
     }
 
     return 0;
