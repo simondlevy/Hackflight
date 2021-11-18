@@ -33,7 +33,7 @@ fpparams = FixedPitchParams
             5e-06   -- b thrust coefficient [F=b*w^2]
             0.350   -- l arm length [m]
 
-mval = 0
+mval = 0.6
 
 motors = Quad mval mval mval mval
 

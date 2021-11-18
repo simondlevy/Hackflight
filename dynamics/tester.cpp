@@ -37,7 +37,7 @@ int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
 
-    const float M = 0;
+    const float M = 0.6;
 
     float motors[4] = {M, M, M, M};
 
@@ -45,7 +45,7 @@ int main(int argc, char ** argv)
 
     stream_agl = 0;
 
-    for (int k=0; k<1000; ++k) {
+    for (int k=0; k<10; ++k) {
 
         stream_time = k / 1000.;
 
@@ -55,7 +55,8 @@ int main(int argc, char ** argv)
 
         stream_agl = -state.z;
 
-        printf("t=%f  z=%f | %f\n", stream_time, state.z, _z);
+        printf("t=%f  z=%+6.6f | %+6.6f\n",
+                stream_time, state.z, _z);
     }
 
     return 0;
