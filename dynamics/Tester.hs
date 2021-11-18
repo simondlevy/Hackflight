@@ -41,8 +41,13 @@ spec = do
 
     let (state, val) = dynamics wparams vparams fpparams motors time agl
 
-    trigger "stream_debug" true [arg $ z state]
-
+    trigger "stream_debug" true [  arg $ x state
+                                 , arg $ y state
+                                 , arg $ z state
+                                 , arg $ phi state
+                                 , arg $ theta state
+                                 , arg $ psi state
+                                ]
 time :: SFloat
 time = extern "stream_time" Nothing
 
