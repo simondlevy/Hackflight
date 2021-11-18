@@ -37,7 +37,7 @@ int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
 
-    const float M = 0.6;
+    const float M = 0;
 
     float motors[4] = {M, M, M, M};
 
