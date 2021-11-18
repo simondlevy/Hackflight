@@ -26,11 +26,11 @@ Dynamics::fixed_pitch_params_t fpparams = {
     0.350   // l arm length [m]
 };
 
-static float dt;
+static float _z;
 
 void stream_debug(float value)
 {
-    printf("\ths dt: %f\n", value);
+    _z = value;
 }
 
 int main(int argc, char ** argv)
@@ -55,7 +55,7 @@ int main(int argc, char ** argv)
 
         step();
 
-        //printf("t=%f  z=%+6.6f | %+6.6f\n", stream_time, state.z, _z);
+        printf("t=%f  z=%+6.6f | %+6.6f\n", stream_time, state.z, _z);
     }
 
     return 0;

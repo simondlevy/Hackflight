@@ -41,7 +41,7 @@ spec = do
 
     let (state, val) = dynamics wparams vparams fpparams motors time agl
 
-    trigger "stream_debug" true [arg $ val]
+    trigger "stream_debug" true [arg $ z state]
 
 time :: SFloat
 time = extern "stream_time" Nothing
