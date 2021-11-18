@@ -33,15 +33,15 @@ fpparams = FixedPitchParams
             5e-06   -- b thrust coefficient [F=b*w^2]
             0.350   -- l arm length [m]
 
-mval = 0.6
+mval = 1.0
 
-motors = Quad 0.6 0.5 0.6 0.5
+motors = Quad mval mval mval mval
 
 spec = do
 
-    let (state, _) = dynamics wparams vparams fpparams motors time agl
+    let (state, val) = dynamics wparams vparams fpparams motors time agl
 
-    trigger "stream_debug" true [arg $ z state]
+    trigger "stream_debug" true [arg $ val]
 
 time :: SFloat
 time = extern "stream_time" Nothing

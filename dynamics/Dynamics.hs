@@ -62,10 +62,10 @@ dynamics ::    WorldParams
             -> Motors
             -> SFloat
             -> SFloat
-            -> (State, SBool)
+            -> (State, SFloat)
 
 dynamics wparams vparams fpparams motors time agl
-   = (State x dx y dy z dz phi dphi theta dtheta psi dpsi, airborne') where
+   = (State x dx y dy z dz phi dphi theta dtheta psi dpsi, dt) where
 
   -- Parameter abbreviations
   b'      = b fpparams

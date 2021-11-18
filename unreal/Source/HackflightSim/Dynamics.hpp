@@ -164,6 +164,8 @@ class Dynamics {
             // Compute deltaT from current time minus previous
             float dt = time - _time;
 
+            printf("cpp dt: %f", dt);
+
             // Convert fractional speed to radians per second
             float omegas_m1 = motors[0] * maxrpm * M_PI / 30;
             float omegas_m2 = motors[1] * maxrpm * M_PI / 30;

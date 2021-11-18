@@ -26,18 +26,20 @@ Dynamics::fixed_pitch_params_t fpparams = {
     0.350   // l arm length [m]
 };
 
-static float _z;
+static float dt;
 
 void stream_debug(float value)
 {
-    _z = value;
+    printf("\ths dt: %f\n", value);
 }
 
 int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
 
-    float motors[4] = {0.6, 0.5, 0.6, 0.5};
+    float M = 1.0;
+
+    float motors[4] = {M, M, M, M};
 
     Dynamics::state_t state = {};
 
@@ -49,12 +51,11 @@ int main(int argc, char ** argv)
 
         dynamics.update(motors, state, stream_agl, stream_time);
 
-        step();
-
         stream_agl = -state.z;
 
-        printf("t=%f  z=%+6.6f | %+6.6f\n",
-                stream_time, state.z, _z);
+        step();
+
+        //printf("t=%f  z=%+6.6f | %+6.6f\n", stream_time, state.z, _z);
     }
 
     return 0;
