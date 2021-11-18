@@ -80,7 +80,7 @@ dynamics wparams vparams fpparams motors time agl
   b'      = b fpparams
   l'      = l fpparams
 
-  -- Compute deltaT
+  -- Compute deltaT, avoiding initial startup spike
   dt = if time' > 0 then time - time' else 0
 
   -- Convert fractional motor speed to radians per second
@@ -100,10 +100,10 @@ dynamics wparams vparams fpparams motors time agl
   -- Newton's Third Law (action/reaction) tells us that yaw is opposite to net rotor spin
   omega = omegas_m1 + omegas_m2 - omegas_m3 - omegas_m4
 
-  -- Implement Equation 6
+  -- Implement Equation 6 to get thrust, roll, pitch, and yaw forces
   u1 = b' * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4)
   u2 = l' * b' * (-(omegas2_m1) + omegas2_m2 + omegas2_m3 - omegas2_m4)
-  u3 = l' * b' * (-(omegas2_m1) + omegas2_m2 - omegas2_m3 + omegas2_m4)
+  u3 = 0 --l' * b' * (-(omegas2_m1) + omegas2_m2 - omegas2_m3 + omegas2_m4)
   u4 = d' * (omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4)
 
   -- Use the current Euler angles to rotate the orthogonal thrust vector into the 
@@ -112,10 +112,10 @@ dynamics wparams vparams fpparams motors time agl
 
   -- We're airborne once net downward acceleration goes below zero
   netz = accelNedZ + g'
-
-  lowagl = airborne' && agl <= 0 && netz >= 0
-
   airborne = if not airborne' && netz < 0 then true else if lowagl then false else airborne'
+
+  -- Track low AGL to support landing on ground in simulator
+  lowagl = airborne' && agl <= 0 && netz >= 0
 
   -- Apply Equation 5 to get second derivatives of Euler angles
   ddphi   = dpsi' * dtheta' *(iy' - iz') / ix' - jr' / ix' * dtheta' * omega + u2 / ix'
@@ -124,15 +124,11 @@ dynamics wparams vparams fpparams motors time agl
 
   -- Compute the state derivatives using Equation 12, and integrate them
   -- to get the updated state
-
+  integrate val dval = if lowagl then 0 else val + dt * (if airborne then dval else 0)
   x      = integrate x'  dx' 
   dx     = integrate dx' accelNedX
   y      = integrate y'  dy'
   dy     = integrate dy' accelNedY
-
-  -- Special Z-axis handling for low AGL
-  z      = z' + (if lowagl then agl else 0) + dt * (if airborne' then dz' else 5 * agl)
-
   dz     = integrate dz'     netz          
   phi    = integrate phi'    dphi'
   dphi   = integrate dphi'   ddphi        
@@ -141,6 +137,9 @@ dynamics wparams vparams fpparams motors time agl
   psi    = integrate psi'    dpsi'
   dpsi   = integrate dpsi'   ddpsi
  
+  -- Special Z-axis handling for low AGL
+  z      = z' + (if lowagl then agl else 0) + dt * (if airborne' then dz' else 5 * agl)
+
   x'      = [0] ++ x
   dx'     = [0] ++ dx
   y'      = [0] ++ y
@@ -157,7 +156,7 @@ dynamics wparams vparams fpparams motors time agl
   time' = [0] ++ time
   airborne' = [False] ++ airborne
 
--- Helpers ---------------------------------------------------------------------
+-- Frame-of-reference conversion ------------------
 
   bodyZToInertial bodyZ = (x, y, z) where
 
@@ -173,5 +172,4 @@ dynamics wparams vparams fpparams motors time agl
     y = bodyZ * (cph * sps * sth - cps * sph)
     z = bodyZ * (cph * cth)
 
-  integrate val dval = if lowagl then 0 else val + dt * (if airborne then dval else 0)
 
