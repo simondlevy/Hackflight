@@ -2,6 +2,7 @@
 #include <Dynamics.hpp>
 #include "haskell.h"
 
+float stream_motorval;
 float stream_time;
 float stream_agl;
 
@@ -47,9 +48,9 @@ int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
 
-    float M = 1.0;
+    stream_motorval = 1.0;
 
-    float motors[4] = {M, M, M, M};
+    float motors[4] = {stream_motorval, stream_motorval, stream_motorval, stream_motorval};
 
     Dynamics::state_t state = {};
 
@@ -65,7 +66,7 @@ int main(int argc, char ** argv)
 
         step();
 
-        printf("t=%f  x=%+6.6f | %+6.6f\n", stream_time, state.z, _z);
+        printf("t=%f  x=%+6.6f | %+6.6f\n", stream_time, state.phi, _phi);
     }
 
     return 0;

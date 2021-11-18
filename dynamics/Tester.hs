@@ -35,7 +35,7 @@ fpparams = FixedPitchParams
 
 mval = 1.0
 
-motors = Quad mval mval mval mval
+motors = Quad stream_mval stream_mval stream_mval stream_mval
 
 spec = do
 
@@ -48,6 +48,9 @@ spec = do
                                  , arg $ theta state
                                  , arg $ psi state
                                 ]
+stream_mval :: SFloat
+stream_mval = extern "stream_motorval" Nothing
+
 time :: SFloat
 time = extern "stream_time" Nothing
 
