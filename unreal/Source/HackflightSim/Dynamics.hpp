@@ -181,7 +181,7 @@ class Dynamics {
             float omega = omegas_m1 + omegas_m2 - omegas_m3 - omegas_m4;
 
              // Implement Equation 6 -------------------------------------------
-            float u1 = b *     ( omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4);
+            float u1 = b * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4);
             float u2 = l * b * (-omegas2_m1 + omegas2_m2 + omegas2_m3 - omegas2_m4);
             float u3 = l * b * (-omegas2_m1 + omegas2_m2 - omegas2_m3 + omegas2_m4);
             float u4 = b *     ( omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4);
