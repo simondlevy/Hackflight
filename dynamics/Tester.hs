@@ -35,7 +35,7 @@ fpparams = FixedPitchParams
 
 mval = 0.6
 
-motors = Quad mval mval mval mval
+motors = Quad 0.6 0.5 0.6 0.5
 
 spec = do
 

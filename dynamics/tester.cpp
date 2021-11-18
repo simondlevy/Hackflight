@@ -37,15 +37,13 @@ int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
 
-    const float M = 0.6;
-
-    float motors[4] = {M, M, M, M};
+    float motors[4] = {0.6, 0.5, 0.6, 0.5};
 
     Dynamics::state_t state = {};
 
     stream_agl = 0;
 
-    for (int k=0; k<10; ++k) {
+    for (int k=0; k<20; ++k) {
 
         stream_time = k / 1000.;
 
