@@ -81,7 +81,8 @@ dynamics wparams vparams fpparams motors time agl
   rho'    = rho wparams
 
   -- Compute deltaT
-  dt = if time' > 0 then time - time' else 0
+  -- dt = if time' > 0 then time - time' else 0
+  dt = time - time'
 
   -- Convert fractional motor speed to radians per second
   rps m = (m motors) * maxrpm' * pi / 30
