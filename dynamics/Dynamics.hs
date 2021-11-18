@@ -123,24 +123,25 @@ dynamics wparams vparams fpparams motors time agl
   ddtheta = dpsi' * dphi' * (iz' - ix') / iy' + jr' / iy' * dphi' * omega + u3 / iy'
   ddpsi   = dtheta * dphi' * (ix' - iy') / iz' + u4 / iz'
 
-  x = 0
-  dx = 0
+  -- Compute the state derivatives using Equation 12, and integrate them
+  -- to get the updated state
 
-  y = 0
-  dy = 0
+  x      = integrate x'  dx' 
+  dx     = integrate dx' accelNedX
+  y      = integrate y'  dy'
+  dy     = integrate dy' accelNedY
 
-  z   = z' + (if lowagl then agl else 0) + dt * (if airborne' then dz' else 5 * agl)
-  dz  = if lowagl then 0 else dz' + (if airborne' then dt * netz else 0)
+  -- Special Z-axis handling for low AGL
+  z      = z' + (if lowagl then agl else 0) + dt * (if airborne' then dz' else 5 * agl)
 
-  phi    = if lowagl then 0 else phi' + (if airborne' then dt * dphi' else 0)
-  dphi   = if lowagl then 0 else dphi' + (if airborne then dt * (dtheta' * dpsi' * (iy' - iz') / ix' - jr' / ix' * dtheta' * omega + u2 / ix') else 0)
-
-  theta    = if lowagl then 0 else theta' + (if airborne' then dt * dtheta' else 0)
-  dtheta   = if lowagl then 0 else dtheta' + (if airborne then dt * (dpsi' * dpsi' *(iz' - ix') / iy' + jr' / iy' * dphi' * omega + u3 / iy') else 0)
-
-  psi = psi' + (if airborne' then dt * dpsi' else 0)
-  dpsi = if lowagl then 0 else dpsi' + (if airborne' then dt * (dtheta' * dphi' * (ix' - iy') / iz' + u4 / iz') else 0) 
-
+  dz     = integrate dz'     netz          
+  phi    = integrate phi'    dphi'
+  dphi   = integrate dphi'   ddphi        
+  theta  = integrate theta'  dtheta'
+  dtheta = integrate dtheta' (-ddtheta)
+  psi    = integrate psi'    dpsi'
+  dpsi   = integrate dpsi'   ddpsi
+ 
   x'      = [0] ++ x
   dx'     = [0] ++ dx
   y'      = [0] ++ y
@@ -157,7 +158,9 @@ dynamics wparams vparams fpparams motors time agl
   time' = [0] ++ time
   airborne' = [False] ++ airborne
 
------------------------------------------------------------------------
+-- Helpers ---------------------------------------------------------------------
+
+  integrate val dval = if lowagl then 0 else val + dt * (if airborne then dval else 0)
 
   bodyZToInertial bodyZ phi theta psi = (x, y, z) where
 
