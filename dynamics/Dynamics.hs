@@ -109,7 +109,7 @@ dynamics wparams vparams fpparams motors time agl
 
   -- Use the current Euler angles to rotate the orthogonal thrust vector into the 
   -- inertial frame.  Negate to use NED.
-  (accelNedX, accelNedY, accelNedZ) = bodyZToInertial ((-u1)/m') phi' theta' psi'
+  (accelNedX, accelNedY, accelNedZ) = bodyZToInertial ((-u1)/m')
 
   -- We're airborne once net downward acceleration goes below zero
   netz = accelNedZ + g'
@@ -160,14 +160,14 @@ dynamics wparams vparams fpparams motors time agl
 
 -- Helpers ---------------------------------------------------------------------
 
-  bodyZToInertial bodyZ phi theta psi = (x, y, z) where
+  bodyZToInertial bodyZ = (x, y, z) where
 
-    cph = cos phi
-    sph = sin phi
-    cth = cos theta
-    sth = sin theta
-    cps = cos psi
-    sps = sin psi
+    cph = cos phi'
+    sph = sin phi'
+    cth = cos theta'
+    sth = sin theta'
+    cps = cos psi'
+    sps = sin psi'
 
     -- This is the rightmost column of the body-to-inertial rotation matrix
     x = bodyZ * (sph * sps + cph * cps * sth)
