@@ -27,7 +27,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module Dynamics where
+module NewDynamics where
 
 import Language.Copilot
 import Prelude hiding((<), (>), (<=), (>=), (++), (&&), not)

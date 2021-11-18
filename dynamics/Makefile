@@ -6,6 +6,9 @@ all: tester
 test: tester
 	./tester
 
+run: tester
+	./tester
+
 tester: tester.o haskell.o
 	g++ -o tester tester.o haskell.o
 
@@ -15,7 +18,7 @@ tester.o: tester.cpp $(CPPDIR)/Dynamics.hpp haskell.c
 haskell.o: haskell.c
 	g++ -c haskell.c
 
-haskell.c: Tester.hs $(HSDIR)/Dynamics.hs
+haskell.c: Tester.hs $(HSDIR)/NewDynamics.hs
 	runhaskell -i$(HSDIR) Tester.hs
 
 edit:
