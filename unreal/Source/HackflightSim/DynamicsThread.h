@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "Dynamics.hpp"
 #include "Utils.hpp"
 #include "GameInput.hpp"
 
@@ -38,7 +37,7 @@ class FDynamicsThread : public FRunnable {
     public:
 
         // Constructor, called main thread
-        FDynamicsThread(APawn * pawn, Dynamics * dynamics);
+        FDynamicsThread(APawn * pawn);
 
         ~FDynamicsThread(void);
 

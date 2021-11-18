@@ -205,9 +205,6 @@ class Vehicle {
 
         UAudioComponent* _audioComponent = NULL;
 
-        // Set in constructor
-        Dynamics* _dynamics = NULL;
-
         APawn* _pawn = NULL;
 
         UStaticMeshComponent* _frameMeshComponent = NULL;

@@ -10,7 +10,6 @@
 
 #include "../Vehicle.hpp"
 #include "../DynamicsThread.h"
-#include "../Dynamics.hpp"
 
 #include <CoreMinimal.h>
 #include <GameFramework/Pawn.h>
@@ -28,27 +27,6 @@ class APhantomPawn : public APawn {
     private:
 
         GENERATED_BODY()
-
-        Dynamics::vehicle_params_t vparams = {
-
-            // Estimated
-            2.E-06, // d drag cofficient [T=d*w^2]
-
-            // https://www.dji.com/phantom-4/info
-            1.380,  // m mass [kg]
-
-            // Estimated
-            2,      // Ix [kg*m^2] 
-            2,      // Iy [kg*m^2] 
-            3,      // Iz [kg*m^2] 
-            3.8E-03, // Jr prop inertial [kg*m^2] 
-            15000,   // maxrpm
-        };
-
-        Dynamics::fixed_pitch_params_t fpparams = {
-            5.E-06, // b thrust coefficient [F=b*w^2]
-            0.350   // l arm length [m]
-        };
 
         FDynamicsThread * _dynamicsThread = NULL;
 
@@ -69,8 +47,6 @@ class APhantomPawn : public APawn {
         // virtual void NotifyHit(...) override
 
     public:	
-
-        Dynamics dynamics = Dynamics(vparams, fpparams);
 
         Vehicle vehicle;
 

@@ -102,7 +102,7 @@ dynamics wparams vparams fpparams motors time agl
 
   -- Implement Equation 6 to get thrust, roll, pitch, and yaw forces
   u1 = b' * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4)
-  u2 = l' * b' * (-(omegas2_m1) + omegas2_m2 + omegas2_m3 - omegas2_m4)
+  u2 = 0 --l' * b' * (-(omegas2_m1) + omegas2_m2 + omegas2_m3 - omegas2_m4)
   u3 = 0 --l' * b' * (-(omegas2_m1) + omegas2_m2 - omegas2_m3 + omegas2_m4)
   u4 = d' * (omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4)
 
@@ -171,5 +171,3 @@ dynamics wparams vparams fpparams motors time agl
     x = bodyZ * (sph * sps + cph * cps * sth)
     y = bodyZ * (cph * sps * sth - cps * sph)
     z = bodyZ * (cph * cth)
-
-

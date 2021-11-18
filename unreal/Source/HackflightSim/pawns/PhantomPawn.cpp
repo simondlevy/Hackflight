@@ -29,7 +29,7 @@ void APhantomPawn::PostInitializeComponents()
 // Called when the game starts or when spawned
 void APhantomPawn::BeginPlay()
 {
-    _dynamicsThread = new FDynamicsThread(this, &dynamics);
+    _dynamicsThread = new FDynamicsThread(this);
 
     vehicle.BeginPlay(_dynamicsThread);
 

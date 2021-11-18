@@ -9,9 +9,6 @@
 #include "DynamicsThread.h"
 #include "hackflight.h"
 
-// Dynamics
-static Dynamics * _dynamics;
-
 // Joystick (RC transmitter, game controller) or keypad
 static GameInput * _gameInput;
 static float _joyvals[4];
@@ -72,13 +69,11 @@ void stream_debug(float value)
 
 // FDynamicsThread methods -----------------------------------------------------
 
-FDynamicsThread::FDynamicsThread(APawn * pawn, Dynamics * dynamics)
+FDynamicsThread::FDynamicsThread(APawn * pawn)
 {
     _thread = FRunnableThread::Create(this, TEXT("FThreadedManage"), 0, TPri_BelowNormal); 
     _startTime = FPlatformTime::Seconds();
     _count = 0;
-
-    _dynamics = dynamics;
 
     _gameInput = new GameInput(pawn);
 
