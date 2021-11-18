@@ -66,7 +66,7 @@ int main(int argc, char ** argv)
 
         step();
 
-        printf("t=%f  x=%+6.6f | %+6.6f\n", stream_time, state.phi, _phi);
+        printf("t=%f  x=%+6.6f | %+6.6f\n", stream_time, state.z, _z);
     }
 
     return 0;
