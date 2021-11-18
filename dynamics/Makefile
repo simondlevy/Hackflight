@@ -18,7 +18,7 @@ tester.o: tester.cpp $(CPPDIR)/Dynamics.hpp haskell.c
 haskell.o: haskell.c
 	g++ -c haskell.c
 
-haskell.c: Tester.hs $(HSDIR)/NewDynamics.hs
+haskell.c: Tester.hs Dynamics.hs
 	runhaskell -i$(HSDIR) Tester.hs
 
 edit:

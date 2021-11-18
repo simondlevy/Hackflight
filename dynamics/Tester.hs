@@ -3,7 +3,7 @@ module Tester where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import NewDynamics
+import Dynamics
 
 
 spec = do
