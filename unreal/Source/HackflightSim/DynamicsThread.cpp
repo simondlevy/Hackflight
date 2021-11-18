@@ -16,19 +16,23 @@ static Dynamics * _dynamics;
 static GameInput * _gameInput;
 static float _joyvals[4];
 
-// Sent by to stream_writeMotors() -----------
+// Sent by stream_setMotors() -----------
 static float _m1;
 static float _m2;
 static float _m3;
 static float _m4;
 
+// Sent by stream_setPose() -----------
 static float _x;
 static float _y;
 static float _z;
+static float _phi;
+static float _theta;
+static float _psi;
 
 // Called by Haskell Copilot --------------------------------------------------
 
-void stream_writeMotors(float m1, float m2, float m3, float m4)
+void stream_setMotors(float m1, float m2, float m3, float m4)
 {
     _m1 = m1;
     _m2 = m2;
@@ -36,6 +40,16 @@ void stream_writeMotors(float m1, float m2, float m3, float m4)
     _m4 = m4;
 
     //debugline("m1: %+3.3f  m2: %+3.3f  m3: %+3.3f  m4: %+3.3f", m1, m2, m3, m4);
+}
+
+void stream_setPose(float x, float y, float z, float phi, float theta, float psi)
+{
+    _x = x;
+    _y = y;
+    _z = z;
+    _phi = phi;
+    _theta = theta;
+    _psi = psi;
 }
 
 void stream_getReceiverDemands(void)
@@ -118,12 +132,8 @@ uint32_t FDynamicsThread::Run()
 
     while (_running) {
 
-        // Get a current time the OS
+        // Get current time from the OS, sharing it with Haskell
         stream_time = FPlatformTime::Seconds() - _startTime;
-
-        // Update dynamics to get current vehicle state
-        Dynamics::state_t state = {};
-        _dynamics->update(_actuatorValues, state, _agl, stream_time);
 
         // Avoid null-pointer exceptions at startup, freeze after control
         // program halts
@@ -133,21 +143,6 @@ uint32_t FDynamicsThread::Run()
 
         // Run Copilot, triggering stream_writeMotors
         step();
-
-        // Get state from dynamics
-        stream_stateDx     = state.dx;
-        stream_stateDy     = state.dy;
-        stream_stateDz     = state.dz;
-        stream_statePhi    = state.phi;
-        stream_stateDphi   = state.dphi;
-        stream_stateTheta  = state.theta;
-        stream_stateDtheta = state.dtheta;
-        stream_statePsi    = state.psi;
-        stream_stateDpsi   = state.dpsi;
-
-        _x = state.x;
-        _y = state.y;
-        _z = state.z;
 
         // Get updated motor values
         _actuatorValues[0] = _m1;
@@ -175,6 +170,7 @@ void FDynamicsThread::Stop()
 void FDynamicsThread::setAgl(float agl)
 {
     _agl = agl;
+    stream_agl = agl;
 }
         
 
@@ -183,8 +179,7 @@ void FDynamicsThread::getPose(float & x, float & y, float & z, float & phi, floa
     x = _x;
     y = _y;
     z = _z;
-
-    phi   = stream_statePhi;
-    theta = stream_stateTheta;
-    psi   = stream_statePsi;
+    phi   = _phi;
+    theta = _theta;
+    psi   = _psi;
 }

@@ -71,21 +71,39 @@ fpparams = FixedPitchParams
 
 spec = do
 
-  let motors = hackflight receiver wparams vparams fpparams pidfuns stream_time quadxap
+  let (state, motors) = hackflight receiver
+                                   wparams
+                                   vparams
+                                   fpparams
+                                   pidfuns
+                                   quadxap
+                                   stream_time 
+                                   stream_agl
 
   -- Call some C routines for getting receiver demands
   trigger "stream_getReceiverDemands" true []
 
-  -- Send the motor values using the external C function
-  trigger "stream_writeMotors" true [  arg $ m1 motors
-                                     , arg $ m2 motors
-                                     , arg $ m3 motors
-                                     , arg $ m4 motors ]
+  -- Set the motor values using the external C function
+  trigger "stream_setMotors" true [  arg $ m1 motors
+                                   , arg $ m2 motors
+                                   , arg $ m3 motors
+                                   , arg $ m4 motors ]
+
+  -- Send the vehicle pose using the external C function
+  trigger "stream_setPose" true [  arg $ x state
+                                 , arg $ y state
+                                 , arg $ z state
+                                 , arg $ phi state
+                                 , arg $ theta state
+                                 , arg $ psi state ]
 
 ------------------------------------------------------------
 
 stream_time :: SFloat
 stream_time = extern "stream_time" Nothing
+
+stream_agl :: SFloat
+stream_agl = extern "stream_agl" Nothing
 
 ------------------------------------------------------------
 
