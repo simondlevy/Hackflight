@@ -68,17 +68,17 @@ dynamics wparams vparams fpparams motors time agl
    = (State x dx y dy z dz phi dphi theta dtheta psi dpsi, dt) where
 
   -- Parameter abbreviations
-  b'      = b fpparams
-  l'      = l fpparams
-  d'      = d vparams
-  m'      = m vparams
   ix'     = ix vparams
   iy'     = iy vparams
   iz'     = iz vparams
   jr'     = jr vparams
+  m'      = m vparams
+  d'      = d vparams
   maxrpm' = maxrpm vparams
   g'      = g wparams
   rho'    = rho wparams
+  b'      = b fpparams
+  l'      = l fpparams
 
   -- Compute deltaT
   -- dt = if time' > 0 then time - time' else 0

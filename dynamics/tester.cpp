@@ -51,10 +51,10 @@ int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
 
-    stream_m1 = 1.0;
-    stream_m2 = 1.0;
-    stream_m3 = 1.0;
-    stream_m4 = 1.0;
+    stream_m1 = 0.6;
+    stream_m2 = 0.6;
+    stream_m3 = 0.4;
+    stream_m4 = 0.4;
 
     float motors[4] = {stream_m1, stream_m2, stream_m3, stream_m4};
 
@@ -62,7 +62,7 @@ int main(int argc, char ** argv)
 
     stream_agl = 0;
 
-    for (int k=0; k<20; ++k) {
+    for (int k=0; k<10; ++k) {
 
         stream_time = k / 1000.;
 
@@ -72,7 +72,7 @@ int main(int argc, char ** argv)
 
         step();
 
-        printf("t=%f  x=%+6.6f | %+6.6f\n", stream_time, state.z, _z);
+        printf("t=%f  x=%+6.6f | %+6.6f\n", stream_time, state.psi, _psi);
     }
 
     return 0;
