@@ -160,8 +160,6 @@ dynamics wparams vparams fpparams motors time agl
 
 -- Helpers ---------------------------------------------------------------------
 
-  integrate val dval = if lowagl then 0 else val + dt * (if airborne then dval else 0)
-
   bodyZToInertial bodyZ phi theta psi = (x, y, z) where
 
     cph = cos phi
@@ -175,3 +173,6 @@ dynamics wparams vparams fpparams motors time agl
     x = bodyZ * (sph * sps + cph * cps * sth)
     y = bodyZ * (cph * sps * sth - cps * sph)
     z = bodyZ * (cph * cth)
+
+  integrate val dval = if lowagl then 0 else val + dt * (if airborne then dval else 0)
+
