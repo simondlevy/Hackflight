@@ -2,7 +2,10 @@
 #include <Dynamics.hpp>
 #include "haskell.h"
 
-float stream_motorval;
+float stream_m1;
+float stream_m2;
+float stream_m3;
+float stream_m4;
 float stream_time;
 float stream_agl;
 
@@ -48,9 +51,12 @@ int main(int argc, char ** argv)
 {
     Dynamics dynamics = Dynamics(vparams, fpparams);
 
-    stream_motorval = 1.0;
+    stream_m1 = 1.0;
+    stream_m2 = 1.0;
+    stream_m3 = 1.0;
+    stream_m4 = 1.0;
 
-    float motors[4] = {stream_motorval, stream_motorval, stream_motorval, stream_motorval};
+    float motors[4] = {stream_m1, stream_m2, stream_m3, stream_m4};
 
     Dynamics::state_t state = {};
 

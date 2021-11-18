@@ -33,9 +33,7 @@ fpparams = FixedPitchParams
             5e-06   -- b thrust coefficient [F=b*w^2]
             0.350   -- l arm length [m]
 
-mval = 1.0
-
-motors = Quad stream_mval stream_mval stream_mval stream_mval
+motors = Quad stream_m1 stream_m2 stream_m3 stream_m4
 
 spec = do
 
@@ -48,8 +46,17 @@ spec = do
                                  , arg $ theta state
                                  , arg $ psi state
                                 ]
-stream_mval :: SFloat
-stream_mval = extern "stream_motorval" Nothing
+stream_m1 :: SFloat
+stream_m1 = extern "stream_m1" Nothing
+
+stream_m2 :: SFloat
+stream_m2 = extern "stream_m2" Nothing
+
+stream_m3 :: SFloat
+stream_m3 = extern "stream_m3" Nothing
+
+stream_m4 :: SFloat
+stream_m4 = extern "stream_m4" Nothing
 
 time :: SFloat
 time = extern "stream_time" Nothing
