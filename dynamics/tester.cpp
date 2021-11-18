@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include <Dynamics.hpp>
+
+#include "Dynamics.hpp"
 #include "haskell.h"
 
 float stream_m1;

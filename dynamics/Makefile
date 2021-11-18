@@ -1,4 +1,3 @@
-CPPDIR = ../unreal/Source/HackflightSim/
 HSDIR = ../haskell/
 
 all: tester
@@ -12,8 +11,8 @@ run: tester
 tester: tester.o haskell.o
 	g++ -o tester tester.o haskell.o
 
-tester.o: tester.cpp $(CPPDIR)/Dynamics.hpp haskell.c
-	g++ -c -I$(CPPDIR) tester.cpp
+tester.o: tester.cpp Dynamics.hpp haskell.c
+	g++ -c tester.cpp
 
 haskell.o: haskell.c
 	g++ -c haskell.c
