@@ -23,15 +23,15 @@ vparams = VehicleParams
             3.8e-03 -- Jr prop inertial [kg*m^2] 
             15000   -- maxrpm
 
-wparams = WorldParams
-
-            9.80665  -- g graviational constant
-            1.225    -- rho air density 
-
 fpparams = FixedPitchParams
 
             5e-06   -- b thrust coefficient [F=b*w^2]
             0.350   -- l arm length [m]
+
+wparams = WorldParams
+
+            9.80665  -- g graviational constant
+            1.225    -- rho air density 
 
 motors = Quad stream_m1 stream_m2 stream_m3 stream_m4
 

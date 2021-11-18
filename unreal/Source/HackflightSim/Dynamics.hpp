@@ -43,14 +43,14 @@ class Dynamics {
 
         typedef struct {
 
-            float g;  // gravitational constant
+            float g;    // gravitational constant
             float rho;  // air density
 
         } world_params_t; 
 
         world_params_t EARTH_PARAMS = { 
-            9.80665,  // g graviational constant
-            1.225 // rho air density 
+            9.80665,    // g graviational constant
+            1.225       // rho air density 
         };
 
     public:
@@ -110,8 +110,12 @@ class Dynamics {
 
         // bodyToInertial method optimized for body X=Y=0
         static void bodyZToInertial(float bodyZ,
-                                    const float phi, const float theta, const float psi,
-                                    float & inertialX, float & inertialY, float & inertialZ)
+                                    const float phi,
+                                    const float theta,
+                                    const float psi,
+                                    float & inertialX,
+                                    float & inertialY,
+                                    float & inertialZ)
         {
             float cph = cos(phi);
             float sph = sin(phi);
@@ -120,13 +124,15 @@ class Dynamics {
             float cps = cos(psi);
             float sps = sin(psi);
 
-            // This is the rightmost column of the body-to-inertial rotation matrix
+            // This is the rightmost column of the body-to-inertial rotation
+            // matrix
             inertialX = bodyZ * (sph * sps + cph * cps * sth);
             inertialY = bodyZ * (cph * sps * sth - cps * sph);
             inertialZ = bodyZ * (cph * cth);
         }
 
-        static float integrate(float val, float dval, float dt, bool airborne, bool lowagl)
+        static float integrate(
+                float val, float dval, float dt, bool airborne, bool lowagl)
         {
             return lowagl ? 0 : val + dt * (airborne ? dval : 0);
         }
@@ -156,11 +162,6 @@ class Dynamics {
             float b      = _fpparams.b;
             float l      = _fpparams.l;
 
-            // State abbreviations
-            float dphi   = _state.dphi;
-            float dtheta = _state.dtheta;
-            float dpsi   = _state.dpsi;
-
             // Compute deltaT from current time minus previous
             float dt = time - _time;
 
@@ -182,9 +183,9 @@ class Dynamics {
 
              // Implement Equation 6 -------------------------------------------
             float u1 = b * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4);
-            float u2 = l * b * (-omegas2_m1 + omegas2_m2 + omegas2_m3 - omegas2_m4);
-            float u3 = l * b * (-omegas2_m1 + omegas2_m2 - omegas2_m3 + omegas2_m4);
-            float u4 = b *     ( omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4);
+            float u2 = l*b * (-omegas2_m1 + omegas2_m2 + omegas2_m3 - omegas2_m4);
+            float u3 = l*b * (-omegas2_m1 + omegas2_m2 - omegas2_m3 + omegas2_m4);
+            float u4 = b * ( omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4);
 
             // Use the current Euler angles to rotate the orthogonal thrust
             // vector into the inertial frame.  Negate to use NED.
@@ -201,9 +202,9 @@ class Dynamics {
             bool airborne = !_airborne && netz <=0 ? true : lowagl ? false : _airborne; 
 
             // Apply Equation 5 to get second derivatives of Euler angles
-            float ddphi   = dpsi * dtheta *(Iy - Iz) / Ix - Jr / Ix * dtheta * omega + u2 / Ix;
-            float ddtheta = dpsi * dphi * (Iz - Ix) / Iy + Jr / Iy * dphi * omega + u3 / Iy;
-            float ddpsi   = dtheta * dphi * (Ix - Iy) / Iz + u4 / Iz; 
+            float ddphi   = _state.dpsi * _state.dtheta *(Iy - Iz) / Ix - Jr / Ix * _state.dtheta * omega + u2 / Ix;
+            float ddtheta = _state.dpsi * _state.dphi * (Iz - Ix) / Iy + Jr / Iy * _state.dphi * omega + u3 / Iy;
+            float ddpsi   = _state.dtheta * _state.dphi * (Ix - Iy) / Iz + u4 / Iz; 
 
             // Compute the state derivatives using Equation 12, and integrate them
             // to get the updated state
