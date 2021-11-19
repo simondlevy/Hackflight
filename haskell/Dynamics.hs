@@ -59,12 +59,13 @@ data FixedPitchParams = FixedPitchParams { b :: SFloat -- thrust coefficient [F=
 dynamics ::    WorldParams
             -> VehicleParams
             -> FixedPitchParams
+            -> Mixer
             -> Motors
             -> SFloat
             -> SFloat
             -> State
 
-dynamics wparams vparams fpparams motors time agl
+dynamics wparams vparams fpparams mixer motors time agl
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
   -- Parameter abbreviations
