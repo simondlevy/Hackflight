@@ -62,10 +62,10 @@ dynamics ::    WorldParams
             -> Motors
             -> SFloat
             -> SFloat
-            -> State
+            -> (State, SFloat)
 
 dynamics wparams vparams fpparams motors time agl
-   = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
+   = (State x dx y dy z dz phi dphi theta dtheta psi dpsi, omegas_m3) where
 
   -- Parameter abbreviations
   ix'     = ix vparams
@@ -82,6 +82,8 @@ dynamics wparams vparams fpparams motors time agl
 
   -- Compute deltaT, avoiding initial startup spike
   dt = if time' > 0 then time - time' else 0
+
+  motors3 = m3 motors
 
   -- Convert fractional motor speed to radians per second
   rps m = (m motors) * maxrpm' * pi / 30
@@ -102,8 +104,8 @@ dynamics wparams vparams fpparams motors time agl
 
   -- Implement Equation 6 to get thrust, roll, pitch, and yaw forces
   u1 = b' * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4)
-  u2 = 0 --l' * b' * (-(omegas2_m1) + omegas2_m2 + omegas2_m3 - omegas2_m4)
-  u3 = 0 --l' * b' * (-(omegas2_m1) + omegas2_m2 - omegas2_m3 + omegas2_m4)
+  u2 = l' * b' * (-(omegas2_m1) + omegas2_m2 + omegas2_m3 - omegas2_m4)
+  u3 = l' * b' * (-(omegas2_m1) + omegas2_m2 - omegas2_m3 + omegas2_m4)
   u4 = d' * (omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4)
 
   -- Use the current Euler angles to rotate the orthogonal thrust vector into the 

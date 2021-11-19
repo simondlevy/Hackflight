@@ -31,9 +31,9 @@ hackflight :: Receiver
            -> Mixer
            -> SFloat
            -> SFloat
-           -> (State, Motors)
+           -> (State, Motors, SFloat)
 
-hackflight receiver wparams vparams fpparams pidfuns mixer time agl = (state, motors)
+hackflight receiver wparams vparams fpparams pidfuns mixer time agl = (state, motors, val)
 
   where
 
@@ -41,7 +41,7 @@ hackflight receiver wparams vparams fpparams pidfuns mixer time agl = (state, mo
     rdemands = getDemands receiver
 
     -- Get vehicle state directly from simulation dynamics, instead of sensors
-    state = dynamics wparams vparams fpparams (motors' motors) time agl
+    (state,val) = dynamics wparams vparams fpparams (motors' motors) time agl
 
     -- Periodically get the demands by composing the PID controllers over the previous
   -- state and the current receiver demands

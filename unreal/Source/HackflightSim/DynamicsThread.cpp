@@ -6,8 +6,11 @@
    MIT License
 */
 
+
 #include "DynamicsThread.h"
 #include "hackflight.h"
+
+#include "../../../dynamics/Dynamics.hpp"
 
 // Joystick (RC transmitter, game controller) or keypad
 static GameInput * _gameInput;
@@ -27,6 +30,33 @@ static float _phi;
 static float _theta;
 static float _psi;
 
+// XXX Debugging -------------------------------------------------------------
+
+Dynamics::vehicle_params_t vparams = {
+
+    // Estimated
+    2.E-06, // d drag cofficient [T=d*w^2]
+
+    // https://www.dji.com/phantom-4/info
+    1.380,  // m mass [kg]
+
+    // Estimated
+    2,      // Ix [kg*m^2] 
+    2,      // Iy [kg*m^2] 
+    3,      // Iz [kg*m^2] 
+    3.8E-03, // Jr prop inertial [kg*m^2] 
+    15000,// maxrpm
+};
+
+Dynamics::fixed_pitch_params_t fpparams = {
+    5.E-06, // b thrust coefficient [F=b*w^2]
+    0.350   // l arm length [m]
+};
+
+Dynamics _dynamics = Dynamics(vparams, fpparams);
+
+static float _cppval;
+
 // Called by Haskell Copilot --------------------------------------------------
 
 void stream_setMotors(float m1, float m2, float m3, float m4)
@@ -36,7 +66,7 @@ void stream_setMotors(float m1, float m2, float m3, float m4)
     _m3 = m3;
     _m4 = m4;
 
-    //debugline("m1: %+3.3f  m2: %+3.3f  m3: %+3.3f  m4: %+3.3f", m1, m2, m3, m4);
+    // debugline("m1: %+3.3f  m2: %+3.3f  m3: %+3.3f  m4: %+3.3f", m1, m2, m3, m4);
 }
 
 void stream_setPose(float x, float y, float z, float phi, float theta, float psi)
@@ -62,9 +92,9 @@ void stream_getReceiverDemands(void)
 }
 
 
-void stream_debug(float value)
+void stream_debug(float hsval)
 {
-    debugline("%+3.3f", value);
+    debugline("%f   %f | %3.3f", hsval, _cppval, abs(hsval-_cppval));
 }
 
 // FDynamicsThread methods -----------------------------------------------------
@@ -93,7 +123,7 @@ void FDynamicsThread::tick(void)
 
 float FDynamicsThread::actuatorValue(uint8_t index)
 {
-    return _actuatorValues[index];
+    return _motorValues[index];
 }
 
 uint32_t FDynamicsThread::getCount(void)
@@ -140,10 +170,13 @@ uint32_t FDynamicsThread::Run()
         step();
 
         // Get updated motor values
-        _actuatorValues[0] = _m1;
-        _actuatorValues[1] = _m2;
-        _actuatorValues[2] = _m3;
-        _actuatorValues[3] = _m4;
+        _motorValues[0] = _m1;
+        _motorValues[1] = _m2;
+        _motorValues[2] = _m3;
+        _motorValues[3] = _m4;
+
+        Dynamics::state_t state = {};
+        _dynamics.update(_motorValues, state, _agl, stream_time, _cppval);
 
         // Increment count for FPS reporting
         _count++;
@@ -161,13 +194,13 @@ void FDynamicsThread::Stop()
 
     FRunnable::Stop();
 }
-        
+
 void FDynamicsThread::setAgl(float agl)
 {
     _agl = agl;
     stream_agl = agl;
 }
-        
+
 
 void FDynamicsThread::getPose(float & x, float & y, float & z, float & phi, float & theta, float & psi)
 {

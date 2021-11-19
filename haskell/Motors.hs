@@ -44,7 +44,4 @@ quadfun motors armed index percent = Quad m1val m2val m3val m4val where
 
 motors' :: Motors -> Motors
 
-motors' (Quad m1 m2 m3 m4) = Quad ([0] ++ m1)
-                                              ([1] ++ m1)
-                                              ([2] ++ m2)
-                                              ([3] ++ m3)
+motors' (Quad m1 m2 m3 m4) = Quad ([0] ++ m1) ([0] ++ m2) ([0] ++ m3) ([0] ++ m4)

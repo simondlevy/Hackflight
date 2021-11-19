@@ -29,7 +29,7 @@ class FDynamicsThread : public FRunnable {
         uint32_t _count;
 
         // Current actuator values from Run() method
-        float _actuatorValues[100] = {}; 
+        float _motorValues[4] = {}; 
 
         // Set by kinematics
         float _agl;

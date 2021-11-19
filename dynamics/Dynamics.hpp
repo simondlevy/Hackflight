@@ -142,7 +142,7 @@ class Dynamics {
         /**
          * Updates state.
          */
-        void update(float * motors, state_t & state, float agl, float time) 
+        void update(float * motors, state_t & state, float agl, float time, float & value) 
         {
             // Local state
             static state_t _state;
@@ -163,13 +163,15 @@ class Dynamics {
             float l      = _fpparams.l;
 
             // Compute deltaT from current time minus previous
-            float dt = time - _time;
+            float dt = _time > 0 ? time - _time : 0;
 
             // Convert fractional speed to radians per second
             float omegas_m1 = motors[0] * maxrpm * M_PI / 30;
             float omegas_m2 = motors[1] * maxrpm * M_PI / 30;
             float omegas_m3 = motors[2] * maxrpm * M_PI / 30;
             float omegas_m4 = motors[3] * maxrpm * M_PI / 30;
+
+            value = motors[2];
 
             // Thrust is squared rad/sec scaled by air density
             float omegas2_m1 = rho * omegas_m1 * omegas_m1;
