@@ -26,7 +26,7 @@ Hackflight is currently working on the following platforms:
 
 * [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) from Tlera Corp
 
-* [HackflightSim](https://github.com/simondlevy/Hackflight/tree/master/unreal) flight simulator based on UnrealEngine4
+* [HackflightSim](https://github.com/simondlevy/Hackflight/tree/master/sim) flight simulator based on UnrealEngine4
 
 ## Standard units
 
