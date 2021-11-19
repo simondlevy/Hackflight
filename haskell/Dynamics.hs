@@ -83,8 +83,6 @@ dynamics wparams vparams fpparams motors time agl
   -- Compute deltaT, avoiding initial startup spike
   dt = if time' > 0 then time - time' else 0
 
-  motors3 = m3 motors
-
   -- Convert fractional motor speed to radians per second
   rps m = (m motors) * maxrpm' * pi / 30
   omegas_m1 = rps m1
