@@ -62,10 +62,10 @@ dynamics ::    WorldParams
             -> Motors
             -> SFloat
             -> SFloat
-            -> (State, SFloat)
+            -> State
 
 dynamics wparams vparams fpparams motors time agl
-   = (State x dx y dy z dz phi dphi theta dtheta psi dpsi, omegas_m3) where
+   = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
   -- Parameter abbreviations
   ix'     = ix vparams
