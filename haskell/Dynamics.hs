@@ -133,6 +133,7 @@ dynamics wparams vparams fpparams mixer motors time agl
   -- Special Z-axis handling for low AGL
   z      = z' + (if lowagl then agl else 0) + dt * (if airborne' then dz' else 5 * agl)
 
+  -- Track vehicle state between iterations
   x'      = [0] ++ x
   dx'     = [0] ++ dx
   y'      = [0] ++ y
@@ -146,6 +147,7 @@ dynamics wparams vparams fpparams mixer motors time agl
   psi'    = [0] ++ psi
   dpsi'   = [0] ++ dpsi
 
+  -- Track time and airborne between iterations
   time' = [0] ++ time
   airborne' = [False] ++ airborne
 
