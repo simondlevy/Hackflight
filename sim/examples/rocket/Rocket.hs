@@ -51,21 +51,18 @@ vparams = VehicleParams
             1.380  -- m mass [kg]
 
             -- Estimated
-            2      -- Ix [kg*m^2] 
-            2      -- Iy [kg*m^2] 
-            3      -- Iz [kg*m^2] 
-            38e-04 -- Jr prop inertial [kg*m^2] 
-            15000-- maxrpm
+            2       -- Ix [kg*m^2] 
+            2       -- Iy [kg*m^2] 
+            3       -- Iz [kg*m^2] 
+            3.8e-03 -- Jr prop inertial [kg*m^2] 
+            15000   -- maxrpm
 
 wparams = WorldParams
 
             9.80665  -- g graviational constant
             1.225    -- rho air density 
 
-fpparams = FixedPitchParams
-
-            5e-06   -- b thrust coefficient [F=b*w^2]
-            0.350   -- l arm length [m]
+nozzleAngle = 45.0 -- [deg]
 
 ------------------------------------------------------------
 
@@ -76,7 +73,7 @@ spec = do
                                    vparams
                                    fpparams
                                    pidfuns
-                                   QuadXAP
+                                   (SimMixer ThrustVector nozzleAngle)
                                    stream_time 
                                    stream_agl
 

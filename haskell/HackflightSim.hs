@@ -18,6 +18,7 @@ import Demands
 import PidController
 import Time
 import Mixers
+import SimMixers
 import Motors
 import Dynamics
 import Utils

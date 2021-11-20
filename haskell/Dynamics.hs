@@ -33,7 +33,7 @@ import Language.Copilot
 import Prelude hiding((<), (>), (<=), (>=), (++), (&&), not)
 
 import State
-import Mixers
+import SimMixers
 import Motors
 import Utils
 
@@ -53,8 +53,7 @@ data VehicleParams = VehicleParams { d :: SFloat  -- drag coefficient [T=d*w^2]
                                    , maxrpm :: SFloat
                                    }
 
-dynamics :: WorldParams -> VehicleParams -> SimMixer -> Motors -> SFloat -> SFloat
-            -> State
+dynamics :: WorldParams -> VehicleParams -> SimMixer -> Motors -> SFloat -> SFloat -> State
 
 dynamics wparams vparams mixer motors time agl
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where

@@ -18,6 +18,7 @@ import Demands
 import Receiver
 import Time
 import Mixers
+import SimMixers
 import Motors
 import Dynamics
 import Utils
@@ -51,12 +52,12 @@ vparams = VehicleParams
             1.380  -- m mass [kg]
 
             -- Estimated
-            2      -- Ix [kg*m^2] 
-            2      -- Iy [kg*m^2] 
-            3      -- Iz [kg*m^2] 
-            38e-04 -- Jr prop inertial [kg*m^2] 
-            5e-06  -- b thrust coefficient [F=b*w^2]
-            15000  -- maxrpm
+            2       -- Ix [kg*m^2] 
+            2       -- Iy [kg*m^2] 
+            3       -- Iz [kg*m^2] 
+            3.8e-03 -- Jr prop inertial [kg*m^2] 
+            5e-06   -- b thrust coefficient [F=b*w^2]
+            15000   -- maxrpm
 
 wparams = WorldParams
 
