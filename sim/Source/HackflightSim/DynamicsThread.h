@@ -25,9 +25,6 @@ class FDynamicsThread : public FRunnable {
         // Start-time offset so timing begins at zero
         float _startTime = 0;
 
-        // For FPS reporting
-        uint32_t _count;
-
         // Current actuator values from Run() method
         float _motorValues[4] = {}; 
 
@@ -48,8 +45,6 @@ class FDynamicsThread : public FRunnable {
         // Called by VehiclePawn::Tick() method to get actuator value for
         // animation and sound
         float actuatorValue(uint8_t index);
-
-        uint32_t getCount(void);
 
         static void stopThread(FDynamicsThread ** worker);
 

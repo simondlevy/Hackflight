@@ -73,7 +73,6 @@ FDynamicsThread::FDynamicsThread(APawn * pawn)
 {
     _thread = FRunnableThread::Create(this, TEXT("FThreadedManage"), 0, TPri_BelowNormal); 
     _startTime = FPlatformTime::Seconds();
-    _count = 0;
 
     _gameInput = new GameInput(pawn);
 
@@ -94,11 +93,6 @@ void FDynamicsThread::tick(void)
 float FDynamicsThread::actuatorValue(uint8_t index)
 {
     return _motorValues[index];
-}
-
-uint32_t FDynamicsThread::getCount(void)
-{
-    return _count;
 }
 
 void FDynamicsThread::stopThread(FDynamicsThread ** worker)
@@ -144,9 +138,6 @@ uint32_t FDynamicsThread::Run()
         _motorValues[1] = _m2;
         _motorValues[2] = _m3;
         _motorValues[3] = _m4;
-
-        // Increment count for FPS reporting
-        _count++;
     }
 
     return 0;
