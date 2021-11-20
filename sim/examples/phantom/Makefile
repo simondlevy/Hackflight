@@ -5,7 +5,7 @@
 #
 # MIT License
 
-ROOT = ../..
+ROOT = ../../..
 HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
 
@@ -27,7 +27,7 @@ HSRC = Phantom.hs \
        $(HDIR)/pidcontrollers/PosHoldPid.hs
 
 
-DSTDIR = ../Source/HackflightSim/
+DSTDIR = ../../Source/HackflightSim/
 
 all: hackflight.cpp
 	cp hackflight.c $(DSTDIR)/hackflight.cpp

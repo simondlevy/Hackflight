@@ -152,7 +152,6 @@ dynamics wparams vparams fpparams mixer motors time agl
   airborne' = [False] ++ airborne
 
 -- Frame-of-reference conversion ------------------
-
   bodyZToInertial bodyZ = (x, y, z) where
 
     cph = cos phi'
