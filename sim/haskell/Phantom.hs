@@ -86,10 +86,10 @@ spec = do
   -- trigger "stream_debug" true [ arg val ]
 
   -- Set the motor values using the external C function
-  trigger "stream_setMotors" true [  arg $ m1 motors
-                                   , arg $ m2 motors
-                                   , arg $ m3 motors
-                                   , arg $ m4 motors ]
+  trigger "stream_setMotorsQuad" true [  arg $ m1 motors
+                                       , arg $ m2 motors
+                                       , arg $ m3 motors
+                                       , arg $ m4 motors ]
 
   -- Send the vehicle pose using the external C function
   trigger "stream_setPose" true [  arg $ x state

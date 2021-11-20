@@ -30,7 +30,7 @@ static float _psi;
 
 // Called by Haskell Copilot --------------------------------------------------
 
-void stream_setMotors(float m1, float m2, float m3, float m4)
+void stream_setMotorsQuad(float m1, float m2, float m3, float m4)
 {
     _m1 = m1;
     _m2 = m2;
