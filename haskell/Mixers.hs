@@ -18,7 +18,7 @@ import Utils
 
 type SafetyFun = SFloat -> SFloat
 
-data Mixer = QuadXAP | QuadXMW
+data Mixer =  QuadXAP | QuadXMW 
 
 motorfun :: Mixer -> MotorFun
 motorfun QuadXMW = quadfun
@@ -49,11 +49,15 @@ mix sfun demands QuadXMW = Quad m1 m2 m3 m4 where
 
 -- For simulation dynamics --------------------------------------
 
+data SimMixer =  SimMixer {  mixer :: Mixer
+                           , l :: SFloat -- arm length [m]
+                          }
+
 rps :: SFloat -> SFloat -> SFloat
 rps motorval maxrpm = motorval * maxrpm * pi / 30
 
-getRPS :: Motors -> Mixer -> SFloat -> Motors
-getRPS motors QuadXAP maxrpm = Quad r1 r2 r3 r4 where
+getRPS :: Motors -> SimMixer -> SFloat -> Motors
+getRPS motors (SimMixer QuadXAP _) maxrpm = Quad r1 r2 r3 r4 where
   r1 = rps (m1 motors) maxrpm
   r2 = rps (m2 motors) maxrpm
   r3 = rps (m3 motors) maxrpm
@@ -62,8 +66,8 @@ getRPS motors QuadXAP maxrpm = Quad r1 r2 r3 r4 where
 thrust :: SFloat -> SFloat -> SFloat
 thrust rpsval rho = rho * rpsval**2
 
-getThrusts :: Motors -> Mixer -> SFloat -> Motors
-getThrusts motors QuadXAP rho = Quad t1 t2 t3 t4 where
+getThrusts :: Motors -> SimMixer -> SFloat -> Motors
+getThrusts motors (SimMixer QuadXAP _) rho = Quad t1 t2 t3 t4 where
   t1 = thrust (m1 motors) rho
   t2 = thrust (m2 motors) rho
   t3 = thrust (m3 motors) rho
@@ -71,17 +75,17 @@ getThrusts motors QuadXAP rho = Quad t1 t2 t3 t4 where
 
 dmds :: Demands -> (SFloat, SFloat, SFloat, SFloat)
 
-getTorque :: Motors -> Mixer -> SFloat
-getTorque motors QuadXAP = (m1 motors) + (m2 motors) - (m3 motors) - (m4 motors)
+getTorque :: Motors -> SimMixer -> SFloat
+getTorque motors (SimMixer QuadXAP _) = (m1 motors) + (m2 motors) - (m3 motors) - (m4 motors)
 
-getThrust :: Motors -> Mixer -> SFloat
-getThrust motors QuadXAP = (m1 motors) + (m2 motors) + (m3 motors) + (m4 motors)
+getThrust :: Motors -> SimMixer -> SFloat
+getThrust motors (SimMixer QuadXAP _) = (m1 motors) + (m2 motors) + (m3 motors) + (m4 motors)
 
-getRoll :: Motors -> Mixer -> SFloat
-getRoll motors QuadXAP = (m2 motors) + (m3 motors) - (m1 motors) - (m4 motors)
+getRoll :: Motors -> SimMixer -> SFloat
+getRoll motors (SimMixer QuadXAP l) = l * ((m2 motors) + (m3 motors) - (m1 motors) - (m4 motors))
 
-getPitch :: Motors -> Mixer -> SFloat
-getPitch motors QuadXAP = (m2 motors) + (m4 motors) - (m1 motors) - (m3 motors)
+getPitch :: Motors -> SimMixer -> SFloat
+getPitch motors (SimMixer QuadXAP l) = l * ((m2 motors) + (m4 motors) - (m1 motors) - (m3 motors))
 
-getYaw :: Motors -> Mixer -> SFloat
-getYaw motors QuadXAP = (m1 motors) + (m2 motors) - (m3 motors) - (m4 motors)
+getYaw :: Motors -> SimMixer -> SFloat
+getYaw motors (SimMixer QuadXAP _) = (m1 motors) + (m2 motors) - (m3 motors) - (m4 motors)

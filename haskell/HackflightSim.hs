@@ -22,18 +22,16 @@ import Motors
 import Dynamics
 import Utils
 
-
 hackflight :: Receiver
            -> WorldParams
            -> VehicleParams
-           -> FixedPitchParams
            -> [PidFun]
-           -> Mixer
+           -> SimMixer
            -> SFloat
            -> SFloat
            -> (State, Motors)
 
-hackflight receiver wparams vparams fpparams pidfuns mixer time agl = (state, motors)
+hackflight receiver wparams vparams pidfuns simmixer time agl = (state, motors)
 
   where
 
@@ -41,11 +39,11 @@ hackflight receiver wparams vparams fpparams pidfuns mixer time agl = (state, mo
     rdemands = getDemands receiver
 
     -- Get vehicle state directly from simulation dynamics, instead of sensors
-    state = dynamics wparams vparams fpparams mixer (motors' motors) time agl
+    state = dynamics wparams vparams simmixer (motors' motors) time agl
 
     -- Periodically get the demands by composing the PID controllers over the previous
   -- state and the current receiver demands
     (_, _, pdemands) = compose pidfuns ((state' state), timerReady 300, rdemands)
 
     -- Run mixer on demands to get motor values
-    motors = mix constrain pdemands mixer
+    motors = mix constrain pdemands (mixer simmixer)

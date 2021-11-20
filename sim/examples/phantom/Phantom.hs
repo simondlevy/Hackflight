@@ -55,17 +55,15 @@ vparams = VehicleParams
             2      -- Iy [kg*m^2] 
             3      -- Iz [kg*m^2] 
             38e-04 -- Jr prop inertial [kg*m^2] 
-            15000-- maxrpm
+            5e-06  -- b thrust coefficient [F=b*w^2]
+            15000  -- maxrpm
 
 wparams = WorldParams
 
             9.80665  -- g graviational constant
             1.225    -- rho air density 
 
-fpparams = FixedPitchParams
-
-            5e-06   -- b thrust coefficient [F=b*w^2]
-            0.350   -- l arm length [m]
+armLength = 0.350    -- [m]
 
 ------------------------------------------------------------
 
@@ -74,9 +72,8 @@ spec = do
   let (state, motors) = hackflight receiver
                                    wparams
                                    vparams
-                                   fpparams
                                    pidfuns
-                                   QuadXAP
+                                   (SimMixer QuadXAP armLength)
                                    stream_time 
                                    stream_agl
 

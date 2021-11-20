@@ -43,29 +43,20 @@ data WorldParams = WorldParams {  g :: SFloat   -- gravitational constant
                                 , rho :: SFloat -- air density
                                }
 
-data VehicleParams = VehicleParams { d :: SFloat -- drag coefficient [T=d*w^2]
-                                   , m :: SFloat -- mass [k]
+data VehicleParams = VehicleParams { d :: SFloat  -- drag coefficient [T=d*w^2]
+                                   , m :: SFloat  -- mass [k]
                                    , ix :: SFloat -- [kg*m^2] 
                                    , iy :: SFloat -- [kg*m^2] 
                                    , iz :: SFloat -- [kg*m^2] 
                                    , jr :: SFloat -- rotor inertial [kg*m^2] 
+                                   , b :: SFloat  -- thrust coefficient [F=b*w^2]
                                    , maxrpm :: SFloat
                                    }
 
-data FixedPitchParams = FixedPitchParams { b :: SFloat -- thrust coefficient [F=b*w^2]
-                                         , l :: SFloat -- arm length [m]
-                                         }
-
-dynamics ::    WorldParams
-            -> VehicleParams
-            -> FixedPitchParams
-            -> Mixer
-            -> Motors
-            -> SFloat
-            -> SFloat
+dynamics :: WorldParams -> VehicleParams -> SimMixer -> Motors -> SFloat -> SFloat
             -> State
 
-dynamics wparams vparams fpparams mixer motors time agl
+dynamics wparams vparams mixer motors time agl
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
   -- Parameter abbreviations
@@ -75,11 +66,10 @@ dynamics wparams vparams fpparams mixer motors time agl
   jr'     = jr vparams
   m'      = m vparams
   d'      = d vparams
+  b'      = b vparams
   maxrpm' = maxrpm vparams
   g'      = g wparams
   rho'    = rho wparams
-  b'      = b fpparams
-  l'      = l fpparams
 
   -- Compute deltaT, avoiding initial startup spike
   dt = if time' > 0 then time - time' else 0
@@ -94,10 +84,10 @@ dynamics wparams vparams fpparams mixer motors time agl
   omega = getTorque omegas mixer
 
   -- Implement Equation 6 to get thrust, roll, pitch, and yaw forces
-  u1 = b' *    getThrust omegas2 mixer
-  u2 = l'*b' * getRoll omegas2 mixer
-  u3 = l'*b' * getPitch omegas2 mixer
-  u4 = d' *    getYaw omegas2 mixer
+  u1 = b' * getThrust omegas2 mixer
+  u2 = b' * getRoll omegas2 mixer
+  u3 = b' * getPitch omegas2 mixer
+  u4 = d' * getYaw omegas2 mixer
 
   -- Use the current Euler angles to rotate the orthogonal thrust vector into the 
   -- inertial frame.  Negate to use NED.
