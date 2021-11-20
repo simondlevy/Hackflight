@@ -14,21 +14,16 @@
 static GameInput * _gameInput;
 static float _joyvals[4];
 
-// Sent by stream_setMotors() -----------
+// Called by Haskell Copilot --------------------------------------------------
+
 static float _m1;
 static float _m2;
 static float _m3;
 static float _m4;
-
-// Sent by stream_setPose() -----------
-static float _x;
-static float _y;
-static float _z;
-static float _phi;
-static float _theta;
-static float _psi;
-
-// Called by Haskell Copilot --------------------------------------------------
+static float _m5;
+static float _m6;
+static float _m7;
+static float _m8;
 
 void stream_setMotorsQuad(float m1, float m2, float m3, float m4)
 {
@@ -36,9 +31,14 @@ void stream_setMotorsQuad(float m1, float m2, float m3, float m4)
     _m2 = m2;
     _m3 = m3;
     _m4 = m4;
-
-    // debugline("m1: %+3.3f  m2: %+3.3f  m3: %+3.3f  m4: %+3.3f", m1, m2, m3, m4);
 }
+
+static float _x;
+static float _y;
+static float _z;
+static float _phi;
+static float _theta;
+static float _psi;
 
 void stream_setPose(float x, float y, float z, float phi, float theta, float psi)
 {
@@ -134,6 +134,10 @@ uint32_t FDynamicsThread::Run()
         _motorValues[1] = _m2;
         _motorValues[2] = _m3;
         _motorValues[3] = _m4;
+        _motorValues[4] = _m5;
+        _motorValues[5] = _m6;
+        _motorValues[6] = _m7;
+        _motorValues[7] = _m8;
     }
 
     return 0;
