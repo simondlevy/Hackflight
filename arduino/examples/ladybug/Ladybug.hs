@@ -65,7 +65,7 @@ spec = do
   let (running, starting) = runstate
 
   -- Run the full Hackflight algorithm
-  let (msgbuff, motors, led) = hackflight receiver sensors pidfuns quadxmw
+  let (msgbuff, motors, led) = hackflight receiver sensors pidfuns QuadXMW
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []

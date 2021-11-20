@@ -28,7 +28,7 @@ hackflight :: Receiver
            -> VehicleParams
            -> FixedPitchParams
            -> [PidFun]
-           -> NewMixer
+           -> Mixer
            -> SFloat
            -> SFloat
            -> (State, Motors)
@@ -48,4 +48,4 @@ hackflight receiver wparams vparams fpparams pidfuns mixer time agl = (state, mo
     (_, _, pdemands) = compose pidfuns ((state' state), timerReady 300, rdemands)
 
     -- Run mixer on demands to get motor values
-    motors = newmix constrain pdemands mixer
+    motors = mix constrain pdemands mixer

@@ -49,7 +49,6 @@ hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
     motors' = mix (\m -> if cut then 0 else m) pdemands mixer
 
     -- Blink LED during first couple of seconds; keep it solid when armed
-    -- led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
     led = if micros < 4000000 then (mod (div micros 50000) 2 == 0) else armed
 
     -- Run the serial comms parser

@@ -9,7 +9,7 @@
       title     = {Design and Control of an Indoor Micro Quadrotor},
       booktitle = {Proceedings of the 2004 {IEEE} International Conference on
                    Robotics and Automation, {ICRA} 2004, April 26 - May 1,
-                   2004, New Orleans, LA, {USA}},
+                   2004,  Orleans, LA, {USA}},
       pages     = {4393--4398},
       year      = {2004},
       crossref  = {DBLP:conf/icra/2004},
@@ -59,7 +59,7 @@ data FixedPitchParams = FixedPitchParams { b :: SFloat -- thrust coefficient [F=
 dynamics ::    WorldParams
             -> VehicleParams
             -> FixedPitchParams
-            -> NewMixer
+            -> Mixer
             -> Motors
             -> SFloat
             -> SFloat
@@ -94,10 +94,10 @@ dynamics wparams vparams fpparams mixer motors time agl
   omega = getTorque omegas mixer
 
   -- Implement Equation 6 to get thrust, roll, pitch, and yaw forces
-  u1 = b' * getThrust omegas2 mixer
-  u2 = l' * b' * getRoll omegas2 mixer
-  u3 = l' * b' * getPitch omegas2 mixer
-  u4 = d' * getYaw omegas2 mixer
+  u1 = b' *    getThrust omegas2 mixer
+  u2 = l'*b' * getRoll omegas2 mixer
+  u3 = l'*b' * getPitch omegas2 mixer
+  u4 = d' *    getYaw omegas2 mixer
 
   -- Use the current Euler angles to rotate the orthogonal thrust vector into the 
   -- inertial frame.  Negate to use NED.

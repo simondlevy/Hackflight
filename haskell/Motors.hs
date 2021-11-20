@@ -19,11 +19,6 @@ data Motors = Quad { m1 :: SFloat
                    , m3 :: SFloat
                    , m4 :: SFloat }
 
-data Spins = Spins { s1 :: SFloat
-                   , s2 :: SFloat
-                   , s3 :: SFloat
-                   , s4 :: SFloat }
-
 type MotorFun = Motors -> SBool -> SWord8 -> SWord8 -> Motors
 
 motorval :: SBool -> SFloat -> SWord8 -> SWord8 -> SWord8  -> SFloat
