@@ -28,9 +28,6 @@ class FDynamicsThread : public FRunnable {
         // Current actuator values from Run() method
         float _motorValues[4] = {}; 
 
-        // Set by kinematics
-        float _agl;
-
     public:
 
         // Constructor, called main thread

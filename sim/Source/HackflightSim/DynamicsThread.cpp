@@ -63,10 +63,6 @@ void stream_getReceiverDemands(void)
 }
 
 
-void stream_debug(float hsval)
-{
-}
-
 // FDynamicsThread methods -----------------------------------------------------
 
 FDynamicsThread::FDynamicsThread(APawn * pawn)
@@ -155,10 +151,8 @@ void FDynamicsThread::Stop()
 
 void FDynamicsThread::setAgl(float agl)
 {
-    _agl = agl;
     stream_agl = agl;
 }
-
 
 void FDynamicsThread::getPose(float & x, float & y, float & z, float & phi, float & theta, float & psi)
 {
