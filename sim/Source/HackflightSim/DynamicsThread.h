@@ -41,7 +41,7 @@ class FDynamicsThread : public FRunnable {
 
         // Called by VehiclePawn::Tick() method to get actuator value for
         // animation and sound
-        float actuatorValue(uint8_t index);
+        float getActuatorValue(uint8_t index);
 
         static void stopThread(FDynamicsThread ** worker);
 

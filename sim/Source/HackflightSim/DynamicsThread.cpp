@@ -86,7 +86,7 @@ void FDynamicsThread::tick(void)
     _gameInput->getKeypad(_joyvals);
 }
 
-float FDynamicsThread::actuatorValue(uint8_t index)
+float FDynamicsThread::getActuatorValue(uint8_t index)
 {
     return _motorValues[index];
 }

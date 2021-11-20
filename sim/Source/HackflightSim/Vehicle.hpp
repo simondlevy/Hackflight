@@ -230,7 +230,7 @@ class Vehicle {
             // Compute the sum of the rotor values
             float rotorSum = 0;
             for (uint8_t j = 0; j < _rotorCount; ++j) {
-                rotorSum += _dynamicsThread->actuatorValue(j);
+                rotorSum += _dynamicsThread->getActuatorValue(j);
             }
 
             // Rotate rotors. For visual effect, we can ignore actual rotor
