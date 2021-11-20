@@ -66,8 +66,16 @@ getYaw motors NewQuadXAP = (m1 motors) + (m2 motors) - (m3 motors) - (m4 motors)
 -- Map throttle demand from [-1,+1] to [0,1]
 dmds demands = (((throttle demands) + 1) / 2, roll demands, pitch demands, yaw demands )
 
-mix :: SafetyFun -> Demands -> Mixer -> Motors
+newmix :: SafetyFun -> Demands -> NewMixer -> Motors
+newmix sfun demands NewQuadXAP = Quad m1 m2 m3 m4 where
 
+  (t, r, p, y) = dmds demands
+
+  m1 = sfun $ t - r - p + y
+  m2 = sfun $ t + r + p + y
+  m3 = sfun $ t + r - p - y
+  m4 = sfun $ t - r + p - y
+ 
 mix sfun demands mixer = Quad m1 m2 m3 m4 where
 
   (t, r, p, y) = dmds demands
