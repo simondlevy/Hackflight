@@ -77,6 +77,7 @@ spec = do
                                    fpparams
                                    pidfuns
                                    quadxap
+                                   NewQuadXAP
                                    stream_time 
                                    stream_agl
 

@@ -24,7 +24,44 @@ data Mixer = Mixer { motorfun :: MotorFun
                    , yspins :: Spins
                    }
 
+data NewMixer = NewQuadXAP | NewQuadXMW
+
+rps :: SFloat -> SFloat -> SFloat
+rps motorval maxrpm = motorval * maxrpm * pi / 30
+
+getRPS :: Motors -> NewMixer -> SFloat -> Motors
+getRPS motors NewQuadXAP maxrpm = Quad r1 r2 r3 r4 where
+  r1 = rps (m1 motors) maxrpm
+  r2 = rps (m2 motors) maxrpm
+  r3 = rps (m3 motors) maxrpm
+  r4 = rps (m4 motors) maxrpm
+
+thrust :: SFloat -> SFloat -> SFloat
+thrust rpsval rho = rho * rpsval**2
+
+getThrusts :: Motors -> NewMixer -> SFloat -> Motors
+getThrusts motors NewQuadXAP rho = Quad t1 t2 t3 t4 where
+  t1 = thrust (m1 motors) rho
+  t2 = thrust (m2 motors) rho
+  t3 = thrust (m3 motors) rho
+  t4 = thrust (m4 motors) rho
+
 dmds :: Demands -> (SFloat, SFloat, SFloat, SFloat)
+
+getTorque :: Motors -> NewMixer -> SFloat
+getTorque motors NewQuadXAP = (m1 motors) + (m2 motors) - (m3 motors) - (m4 motors)
+
+getThrust :: Motors -> NewMixer -> SFloat
+getThrust motors NewQuadXAP = (m1 motors) + (m2 motors) + (m3 motors) + (m4 motors)
+
+getRoll :: Motors -> NewMixer -> SFloat
+getRoll motors NewQuadXAP = (m2 motors) + (m3 motors) - (m1 motors) - (m4 motors)
+
+getPitch :: Motors -> NewMixer -> SFloat
+getPitch motors NewQuadXAP = (m2 motors) + (m4 motors) - (m1 motors) - (m3 motors)
+
+getYaw :: Motors -> NewMixer -> SFloat
+getYaw motors NewQuadXAP = (m1 motors) + (m2 motors) - (m3 motors) - (m4 motors)
 
 -- Map throttle demand from [-1,+1] to [0,1]
 dmds demands = (((throttle demands) + 1) / 2, roll demands, pitch demands, yaw demands )

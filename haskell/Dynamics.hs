@@ -60,12 +60,13 @@ dynamics ::    WorldParams
             -> VehicleParams
             -> FixedPitchParams
             -> Mixer
+            -> NewMixer
             -> Motors
             -> SFloat
             -> SFloat
             -> State
 
-dynamics wparams vparams fpparams mixer motors time agl
+dynamics wparams vparams fpparams mixer newmixer motors time agl
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
   -- Parameter abbreviations
@@ -85,27 +86,35 @@ dynamics wparams vparams fpparams mixer motors time agl
   dt = if time' > 0 then time - time' else 0
 
   -- Convert fractional motor speed to radians per second
-  rps m = (m motors) * maxrpm' * pi / 30
-  omegas_m1 = rps m1
-  omegas_m2 = rps m2
-  omegas_m3 = rps m3
-  omegas_m4 = rps m4
+  --rps m = (m motors) * maxrpm' * pi / 30
+  --omegas_m1 = rps m1
+  --omegas_m2 = rps m2
+  --omegas_m3 = rps m3
+  --omegas_m4 = rps m4
+  omegas = getRPS motors newmixer maxrpm'
 
   -- Thrust is squared rad/sec scaled by air density
-  thrust o = rho' * o**2
-  omegas2_m1 = thrust omegas_m1
-  omegas2_m2 = thrust omegas_m2
-  omegas2_m3 = thrust omegas_m3
-  omegas2_m4 = thrust omegas_m4
+  --thrust o = rho' * o**2
+  --omegas2_m1 = thrust omegas_m1
+  --omegas2_m2 = thrust omegas_m2
+  --omegas2_m3 = thrust omegas_m3
+  --omegas2_m4 = thrust omegas_m4
+  omegas2 = getThrusts omegas newmixer rho'
 
   -- Newton's Third Law (action/reaction) tells us that yaw is opposite to net rotor spin
-  omega = omegas_m1 + omegas_m2 - omegas_m3 - omegas_m4
+  --omega = omegas_m1 + omegas_m2 - omegas_m3 - omegas_m4
+  omega = getTorque omegas newmixer
 
   -- Implement Equation 6 to get thrust, roll, pitch, and yaw forces
-  u1 = b' * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4)
-  u2 = l' * b' * (-(omegas2_m1) + omegas2_m2 + omegas2_m3 - omegas2_m4)
-  u3 = l' * b' * (-(omegas2_m1) + omegas2_m2 - omegas2_m3 + omegas2_m4)
-  u4 = d' * (omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4)
+  -- u1 = b' * (omegas2_m1 + omegas2_m2 + omegas2_m3 + omegas2_m4)
+  -- u2 = l' * b' * (-(omegas2_m1) + omegas2_m2 + omegas2_m3 - omegas2_m4)
+  -- u3 = l' * b' * (-(omegas2_m1) + omegas2_m2 - omegas2_m3 + omegas2_m4)
+  -- u4 = d' * (omegas2_m1 + omegas2_m2 - omegas2_m3 - omegas2_m4)
+  u1 = b' * getThrust omegas2 newmixer
+  u2 = l' * b' * getRoll omegas2 newmixer
+  u3 = l' * b' * getPitch omegas2 newmixer
+  u4 = d' * getYaw omegas2 newmixer
+
 
   -- Use the current Euler angles to rotate the orthogonal thrust vector into the 
   -- inertial frame.  Negate to use NED.
