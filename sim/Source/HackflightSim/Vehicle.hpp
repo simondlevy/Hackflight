@@ -221,9 +221,8 @@ class Vehicle {
         // Starts at zero and increases each time we add a rotor
         uint8_t _rotorCount = 0;
 
-        // Also set in constructor, but purely for visual effect
-        // XXX Shoudl get this from mixer
-        int8_t _rotorDirections[4] = {-1, -1, +1, +1};
+        // Set in addRotor()
+        int8_t _rotorDirections[100] = {};
 
         virtual void animateActuators(void)
         {
@@ -592,20 +591,26 @@ class Vehicle {
             return meshComponent;
         }
 
-        UStaticMeshComponent * addRotor(UStaticMesh* rotorMesh,
-                float x, float y, float z, float angle)
+        UStaticMeshComponent * addRotor(
+                UStaticMesh* rotorMesh,
+                float x,
+                float y,
+                float z,
+                float angle, 
+                int8_t direction)
         {
             UStaticMeshComponent * rotorMeshComponent =
                 addComponent(rotorMesh, makeName("Rotor", _rotorCount, "Mesh"),
                         x, y, z, angle);
             _rotorMeshComponents[_rotorCount] = rotorMeshComponent;
+            _rotorDirections[_rotorCount] = direction;
             _rotorCount++;
             return rotorMeshComponent;
         }
 
-        void addRotor(UStaticMesh* rotorMesh, float x, float y, float z)
+        void addRotor(UStaticMesh* rotorMesh, float x, float y, float z, int8_t dir)
         {
-            addRotor(rotorMesh, x, y, z, rotorStartAngle(x,y));
+            addRotor(rotorMesh, x, y, z, rotorStartAngle(x,y), dir);
         }
 
         virtual void setRotorRotation(uint8_t index, float angle)

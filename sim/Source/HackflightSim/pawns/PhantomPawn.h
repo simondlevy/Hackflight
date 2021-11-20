@@ -30,7 +30,7 @@ class APhantomPawn : public APawn {
 
         FDynamicsThread * _dynamicsThread = NULL;
 
-        void addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy);
+        void addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy, int8_t dir);
 
     protected:
 

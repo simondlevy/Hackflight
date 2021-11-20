@@ -13,10 +13,15 @@ APhantomPawn::APhantomPawn()
     vehicle.buildFull(this, FrameStatics.mesh.Get());
 
     // Add propellers
-    addRotor(PropCCWStatics.mesh.Get(), +1, +1);
-    addRotor(PropCCWStatics.mesh.Get(), -1, -1);
-    addRotor(PropCWStatics.mesh.Get(), +1, -1);
-    addRotor(PropCWStatics.mesh.Get(), -1, +1);
+    addRotor(PropCCWStatics.mesh.Get(), +1, +1, -1);
+    addRotor(PropCCWStatics.mesh.Get(), -1, -1, -1);
+    addRotor(PropCWStatics.mesh.Get(),  +1, -1, +1);
+    addRotor(PropCWStatics.mesh.Get(),  -1, +1, +1);
+}
+
+void APhantomPawn::addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy, int8_t dir)
+{
+    vehicle.addRotor(mesh, dx*0.12, dy*0.12, 0.16, dir);
 }
 
 void APhantomPawn::PostInitializeComponents()
@@ -52,10 +57,3 @@ void APhantomPawn::Tick(float DeltaSeconds)
 
     _dynamicsThread->tick();
 }
-
-void APhantomPawn::addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy)
-{
-    vehicle.addRotor(mesh, dx*0.12, dy*0.12, 0.16);
-}
-
-
