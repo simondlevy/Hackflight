@@ -33,6 +33,7 @@ import Language.Copilot
 import Prelude hiding((<), (>), (<=), (>=), (++), (&&), not)
 
 import State
+import Demands
 import SimMixers
 import Motors
 import Utils
@@ -52,6 +53,11 @@ data VehicleParams = VehicleParams { d :: SFloat  -- drag coefficient [T=d*w^2]
                                    , b :: SFloat  -- thrust coefficient [F=b*w^2]
                                    , maxrpm :: SFloat
                                    }
+
+-------------------------------------------------------------------------------------
+
+type Unmixer = Motors -> Demands
+
 
 -------------------------------------------------------------------------------------
 

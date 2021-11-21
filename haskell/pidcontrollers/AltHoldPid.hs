@@ -23,7 +23,7 @@ windupMax = 0.4 :: SFloat
 pilotVelZMax = 2.5 :: SFloat
 stickDeadband = 0.2 :: SFloat
 
-altHoldController :: Stream Float -> Stream Float -> PidFun
+altHoldController :: SFloat -> SFloat -> PidFun
 
 altHoldController kp ki (state, ready, demands) = (state, ready, demands')
 
