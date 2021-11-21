@@ -24,7 +24,8 @@ HSRC = Phantom.hs \
        $(HDIR)/pidcontrollers/YawPid.hs \
        $(HDIR)/pidcontrollers/RatePid.hs \
        $(HDIR)/pidcontrollers/LevelPid.hs \
-       $(HDIR)/pidcontrollers/PosHoldPid.hs
+       $(HDIR)/pidcontrollers/PosHoldPid.hs \
+       $(HDIR)/dynamics/QuadXAP.hs
 
 
 DSTDIR = ../../Source/HackflightSim/
@@ -42,7 +43,7 @@ hackflight.cpp: hackflight.c
 	rm tmp.c
 
 hackflight.c: $(HSRC) Phantom.hs
-	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Phantom.hs
+	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers -i$(HDIR)/dynamics Phantom.hs
 
 clean:
 	rm -f hackflight.* tmp.c *~

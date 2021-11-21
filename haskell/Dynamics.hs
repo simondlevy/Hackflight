@@ -58,7 +58,6 @@ data VehicleParams = VehicleParams { d :: SFloat  -- drag coefficient [T=d*w^2]
 
 type Unmixer = Motors -> Demands
 
-
 -------------------------------------------------------------------------------------
 
 dynamics :: WorldParams -> VehicleParams -> SimMixer -> Motors -> SFloat -> SFloat -> State
