@@ -28,7 +28,7 @@ quadXapUnmixer l motors = Demands t r p y where
   y = l * ((m1 motors) + (m2 motors) - (m3 motors) - (m4 motors))
 
 
-quadXapRps :: SFloat -> Motors -> Motors
+quadXapRps :: RpsFun
 
 quadXapRps maxrpm (Quad m1 m2 m3 m4) = Quad rps1 rps2 rps3 rps4 where
 
@@ -38,7 +38,7 @@ quadXapRps maxrpm (Quad m1 m2 m3 m4) = Quad rps1 rps2 rps3 rps4 where
   rps4 = rps maxrpm m4
 
 
-quadXapThrust :: SFloat -> Motors -> Motors
+quadXapThrust :: ThrustFun
 
 quadXapThrust rho (Quad rps1 rps2 rps3 rps4) = Quad thrust1 thrust2 thrust3 thrust4 where
 

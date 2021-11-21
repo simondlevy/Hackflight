@@ -58,11 +58,20 @@ data VehicleParams = VehicleParams { d :: SFloat  -- drag coefficient [T=d*w^2]
 
 type Unmixer = Motors -> Demands
 
+type RpsFun = SFloat -> Motors -> Motors
+
+type ThrustFun = SFloat -> Motors -> Motors
+
 rps :: SFloat -> SFloat -> SFloat
 rps motorval maxrpm = motorval * maxrpm * pi / 30
 
 thrust :: SFloat -> SFloat -> SFloat
 thrust rpsval rho = rho * rpsval**2
+
+data FrameDynamics = FrameDynamics {  unmixer :: Unmixer
+                                    , rpsfun :: RpsFun
+                                    , thrutfun :: ThrustFun
+                                   }
 
 -------------------------------------------------------------------------------------
 
