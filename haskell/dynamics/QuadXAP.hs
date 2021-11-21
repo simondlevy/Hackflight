@@ -25,3 +25,7 @@ quadXapUnmixer l motors = Demands t r p y where
   r = l * ((m2 motors) + (m3 motors) - (m1 motors) - (m4 motors))
   p = l * ((m2 motors) + (m4 motors) - (m1 motors) - (m3 motors))
   y = l * ((m1 motors) + (m2 motors) - (m3 motors) - (m4 motors))
+
+quadXapRps :: Motors -> Motors
+
+quadXapRps (Quad m1 m2 m3 m4) = Quad 0 0 0 0
