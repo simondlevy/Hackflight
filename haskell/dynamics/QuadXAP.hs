@@ -46,3 +46,8 @@ quadXapThrust rho (Quad rps1 rps2 rps3 rps4) = Quad thrust1 thrust2 thrust3 thru
   thrust2 = thrust rps2 rho
   thrust3 = thrust rps3 rho
   thrust4 = thrust rps4 rho
+
+
+quadXapDynamics :: SFloat -> FrameDynamics
+
+quadXapDynamics l = FrameDynamics (quadXapUnmixer l) quadXapRps quadXapThrust
