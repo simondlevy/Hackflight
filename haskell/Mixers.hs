@@ -18,7 +18,7 @@ import Utils
 
 type SafetyFun = SFloat -> SFloat
 
-data Mixer =  QuadXAP | QuadXMW 
+data Mixer =  QuadXAP | QuadXMW | ThrustVector
 
 motorfun :: Mixer -> MotorFun
 motorfun QuadXMW = quadfun
@@ -46,3 +46,12 @@ mix sfun demands QuadXMW = Quad m1 m2 m3 m4 where
   m2 = sfun $ t - r - p + y
   m3 = sfun $ t + r + p + y
   m4 = sfun $ t + r - p - y
+
+mix sfun demands ThrustVector = Quad r1 r2 s1 s2 where
+
+  (t, r, p, y) = dmds demands
+
+  r1 = sfun $ t + y
+  r2 = sfun $ t - y
+  s1 = sfun $ r
+  s2 = sfun $ p
