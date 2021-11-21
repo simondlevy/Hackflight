@@ -14,6 +14,7 @@ import Language.Copilot
 
 import Dynamics
 import Demands
+import Mixers
 import Motors
 import Utils
 
@@ -48,6 +49,14 @@ quadXapThrust rho (Quad rps1 rps2 rps3 rps4) = Quad thrust1 thrust2 thrust3 thru
   thrust4 = thrust rps4 rho
 
 
+quadXapTorque :: TorqueFun
+
+quadXapTorque motors = (m1 motors) + (m2 motors) - (m3 motors) - (m4 motors)
+
 quadXapDynamics :: SFloat -> FrameDynamics
 
-quadXapDynamics l = FrameDynamics (quadXapUnmixer l) quadXapRps quadXapThrust
+quadXapDynamics l = FrameDynamics QuadXAP
+                                  (quadXapUnmixer l)
+                                  quadXapRps
+                                  quadXapThrust
+                                  quadXapTorque

@@ -34,7 +34,7 @@ import Prelude hiding((<), (>), (<=), (>=), (++), (&&), not)
 
 import State
 import Demands
-import SimMixers
+import Mixers
 import Motors
 import Utils
 
@@ -62,22 +62,27 @@ type RpsFun = SFloat -> Motors -> Motors
 
 type ThrustFun = SFloat -> Motors -> Motors
 
+type TorqueFun = Motors -> SFloat
+
 rps :: SFloat -> SFloat -> SFloat
 rps motorval maxrpm = motorval * maxrpm * pi / 30
 
 thrust :: SFloat -> SFloat -> SFloat
 thrust rpsval rho = rho * rpsval**2
 
-data FrameDynamics = FrameDynamics {  unmixer :: Unmixer
+data FrameDynamics = FrameDynamics {  mixer :: Mixer
+                                    , unmixer :: Unmixer
                                     , rpsfun :: RpsFun
-                                    , thrutfun :: ThrustFun
+                                    , thrustfun :: ThrustFun
+                                    , torquefun :: TorqueFun
                                    }
 
 -------------------------------------------------------------------------------------
 
-dynamics :: WorldParams -> VehicleParams -> SimMixer -> Motors -> SFloat -> SFloat -> State
+dynamics :: WorldParams -> VehicleParams -> FrameDynamics -> Motors -> SFloat -> SFloat
+   -> State
 
-dynamics wparams vparams mixer motors time agl
+dynamics wparams vparams fdynamics motors time agl
    = State x dx y dy z dz phi dphi theta dtheta psi dpsi where
 
   -- Parameter abbreviations
@@ -96,19 +101,21 @@ dynamics wparams vparams mixer motors time agl
   dt = if time' > 0 then time - time' else 0
 
   -- Convert fractional motor speed to radians per second
-  omegas = getRPS motors mixer maxrpm'
+  omegas = (rpsfun fdynamics) maxrpm' motors
 
   -- Thrust is squared rad/sec scaled by air density
-  omegas2 = getThrusts omegas mixer rho'
+  -- omegas2 = getThrusts omegas mixer rho'
+  omegas2 = (thrustfun fdynamics) rho' omegas
 
   -- Newton's Third Law (action/reaction) tells us that yaw is opposite to net rotor spin
-  omega = getTorque omegas mixer
+  omega = (torquefun fdynamics) omegas
 
   -- Implement Equation 6 to get thrust, roll, pitch, and yaw forces
-  u1 = b' * getThrust omegas2 mixer
-  u2 = b' * getRoll omegas2 mixer
-  u3 = b' * getPitch omegas2 mixer
-  u4 = d' * getYaw omegas2 mixer
+  forces = (unmixer fdynamics) omegas2
+  u1 = b' * (throttle forces)
+  u2 = b' * (roll forces)
+  u3 = b' * (pitch forces)
+  u4 = d' * (yaw forces)
 
   -- Use the current Euler angles to rotate the orthogonal thrust vector into the 
   -- inertial frame.  Negate to use NED.

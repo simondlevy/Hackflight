@@ -18,7 +18,6 @@ import Demands
 import Receiver
 import Time
 import Mixers
-import SimMixers
 import QuadXAP
 import Motors
 import Dynamics
@@ -65,7 +64,7 @@ wparams = WorldParams
             9.80665  -- g graviational constant
             1.225    -- rho air density 
 
-armLength = 0.350    -- [m]
+l = 0.350  -- arm length [m]
 
 ------------------------------------------------------------
 
@@ -75,7 +74,7 @@ spec = do
                                    wparams
                                    vparams
                                    pidfuns
-                                   (SimMixer QuadXAP armLength)
+                                   (quadXapDynamics l)
                                    stream_time 
                                    stream_agl
 
