@@ -13,7 +13,9 @@ module QuadXAP where
 import Language.Copilot
 
 import Dynamics
+import Demands
+import Utils
 
 quadXapUnmixer :: SFloat -> Unmixer
 
-quadXapUnmixer l = Demands 0 0 0 0
+quadXapUnmixer l motors = Demands 0 0 0 0
