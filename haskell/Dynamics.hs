@@ -53,6 +53,8 @@ data VehicleParams = VehicleParams { d :: SFloat  -- drag coefficient [T=d*w^2]
                                    , maxrpm :: SFloat
                                    }
 
+-------------------------------------------------------------------------------------
+
 dynamics :: WorldParams -> VehicleParams -> SimMixer -> Motors -> SFloat -> SFloat -> State
 
 dynamics wparams vparams mixer motors time agl
