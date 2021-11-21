@@ -21,7 +21,7 @@ quadXapUnmixer :: SFloat -> Unmixer
 
 quadXapUnmixer l motors = Demands t r p y where
 
-  t = (m1 motors) + (m2 motors) + (m3 motors) + (m4 motors)
-  r = 0
-  p = 0
-  y = 0
+  t = l * ((m1 motors) + (m2 motors) + (m3 motors) + (m4 motors))
+  r = l * ((m2 motors) + (m3 motors) - (m1 motors) - (m4 motors))
+  p = l * ((m2 motors) + (m4 motors) - (m1 motors) - (m3 motors))
+  y = l * ((m1 motors) + (m2 motors) - (m3 motors) - (m4 motors))
