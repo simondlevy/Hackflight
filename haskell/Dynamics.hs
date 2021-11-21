@@ -58,6 +58,12 @@ data VehicleParams = VehicleParams { d :: SFloat  -- drag coefficient [T=d*w^2]
 
 type Unmixer = Motors -> Demands
 
+rps :: SFloat -> SFloat -> SFloat
+rps motorval maxrpm = motorval * maxrpm * pi / 30
+
+thrust :: SFloat -> SFloat -> SFloat
+thrust rpsval rho = rho * rpsval**2
+
 -------------------------------------------------------------------------------------
 
 dynamics :: WorldParams -> VehicleParams -> SimMixer -> Motors -> SFloat -> SFloat -> State
