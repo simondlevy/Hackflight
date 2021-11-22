@@ -1,5 +1,5 @@
 /*
-* Class declaration for DJI Phantom pawn class using Haskell 
+* Class declaration for thrust-vectoring rocket class using Haskell 
 *
 * Copyright (C) 2021 Simon D. Levy
 *
@@ -14,23 +14,19 @@
 #include <CoreMinimal.h>
 #include <GameFramework/Pawn.h>
 
-#include "PhantomPawn.generated.h"
+#include "RocketPawn.generated.h"
 
 // Structures to hold static mesh initializations
-DECLARE_STATIC_MESH(FFrameStatics, "Phantom/Frame.Frame", FrameStatics)
-DECLARE_STATIC_MESH(FPropCWStatics, "Phantom/PropCW.PropCW", PropCWStatics)
-DECLARE_STATIC_MESH(FPropCCWStatics, "Phantom/PropCCW.PropCCW", PropCCWStatics)
+DECLARE_STATIC_MESH(FFrameStatics, "Rocket/Body.Body", FrameStatics)
 
 UCLASS(Config=Game)
-class APhantomPawn : public APawn {
+class ARocketPawn : public APawn {
 
     private:
 
         GENERATED_BODY()
 
         FDynamicsThread * _dynamicsThread = NULL;
-
-        void addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy, int8_t dir);
 
     protected:
 
@@ -48,6 +44,6 @@ class APhantomPawn : public APawn {
 
         Vehicle vehicle;
 
-        APhantomPawn();
+        ARocketPawn();
 
-}; // APhantomPawn
+}; // ARocketPawn
