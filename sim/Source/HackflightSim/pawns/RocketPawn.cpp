@@ -11,6 +11,10 @@
 ARocketPawn::ARocketPawn()
 {
     vehicle.buildFull(this, FrameStatics.mesh.Get());
+
+    // Add rotors
+    addRotor(RotorTopStatics.mesh.Get(), ROTOR_TOP_Z, -1);
+    addRotor(RotorBottomStatics.mesh.Get(), ROTOR_BOTTOM_Z, +1);
 }
 
 void ARocketPawn::PostInitializeComponents()
@@ -45,4 +49,9 @@ void ARocketPawn::Tick(float DeltaSeconds)
     Super::Tick(DeltaSeconds);
 
     _dynamicsThread->tick();
+}
+
+void ARocketPawn::addRotor(UStaticMesh* mesh, float z, int8_t dir)
+{
+    vehicle.addRotor(mesh, 0, 0, z, dir);
 }

@@ -18,6 +18,9 @@
 
 // Structures to hold static mesh initializations
 DECLARE_STATIC_MESH(FFrameStatics, "Rocket/Body.Body", FrameStatics)
+DECLARE_STATIC_MESH(FRotorTopStatics, "Rocket/RotorTop.RotorTop", RotorTopStatics)
+DECLARE_STATIC_MESH(FRotorBottomStatics, "Rocket/RotorBottom.RotorBottom", RotorBottomStatics)
+DECLARE_STATIC_MESH(FNozzleStatics, "Rocket/Nozzle.Nozzle", NozzleStatics)
 
 UCLASS(Config=Game)
 class ARocketPawn : public APawn {
@@ -26,7 +29,12 @@ class ARocketPawn : public APawn {
 
         GENERATED_BODY()
 
+        static constexpr double ROTOR_TOP_Z    =  0.70;
+        static constexpr double ROTOR_BOTTOM_Z =  0.60;
+
         FDynamicsThread * _dynamicsThread = NULL;
+
+        void addRotor(UStaticMesh* mesh, float z, int8_t dir);
 
     protected:
 
