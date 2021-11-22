@@ -104,7 +104,6 @@ dynamics wparams vparams fdynamics motors time agl
   omegas = (rpsfun fdynamics) maxrpm' motors
 
   -- Thrust is squared rad/sec scaled by air density
-  -- omegas2 = getThrusts omegas mixer rho'
   omegas2 = (thrustfun fdynamics) rho' omegas
 
   -- Newton's Third Law (action/reaction) tells us that yaw is opposite to net rotor spin
