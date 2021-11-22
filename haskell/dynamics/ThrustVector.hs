@@ -25,7 +25,7 @@ thrustVectorUnmixer maxAngle motors = Demands t r p y where
 
   nozzle mval = t * sin (mval * (deg2rad maxAngle))
 
-  -- m1, m2 = rotors
+  -- m1, m2 = rotors; m3, m4 = servos
   m1val = m1 motors
   m2val = m2 motors
 
@@ -37,6 +37,7 @@ thrustVectorUnmixer maxAngle motors = Demands t r p y where
 
 thrustVectorRps :: RpsFun
 
+-- Pass servo motors m3, m4 thru
 thrustVectorRps maxrpm (Quad m1 m2 m3 m4) = Quad rps1 rps2 m3 m4 where
 
   rps1 = rps maxrpm m1
@@ -45,6 +46,7 @@ thrustVectorRps maxrpm (Quad m1 m2 m3 m4) = Quad rps1 rps2 m3 m4 where
 
 thrustVectorThrust :: ThrustFun
 
+-- Pass servo motors m3, m4 thru
 thrustVectorThrust rho (Quad rps1 rps2 m3 m4) = Quad thrust1 thrust2 m3 m4 where
 
   thrust1 = thrust rps1 rho

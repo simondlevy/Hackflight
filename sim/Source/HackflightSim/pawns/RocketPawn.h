@@ -46,7 +46,7 @@ class ARocketPawn : public APawn {
             static constexpr float NOZZLE_Z =  0.15;
 
             // XXX should come from Haskell dynamics
-            static constexpr float NOZZLE_MAX_ANGLE = 45; 
+            static constexpr float NOZZLE_MAX_ANGLE = 90; //45; 
 
             ARocketPawn * pawn = NULL;
 

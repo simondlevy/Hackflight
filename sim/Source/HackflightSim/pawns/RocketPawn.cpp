@@ -78,8 +78,8 @@ void ARocketPawn::NozzleVehicle::animateActuators(void)
 {
     Vehicle::animateActuators();
 
-    float phi = pawn->dynamicsThread->getActuatorValue(3);
-    float theta = pawn->dynamicsThread->getActuatorValue(2);
+    float phi = pawn->dynamicsThread->getActuatorValue(2);
+    float theta = pawn->dynamicsThread->getActuatorValue(3);
 
-    nozzleMeshComponent->SetRelativeRotation(NOZZLE_MAX_ANGLE*FRotator(-theta, 0, -phi));
+    nozzleMeshComponent->SetRelativeRotation(NOZZLE_MAX_ANGLE*FRotator(theta, 0, -phi));
 }

@@ -31,6 +31,8 @@ void stream_setMotorsQuad(float m1, float m2, float m3, float m4)
     _m2 = m2;
     _m3 = m3;
     _m4 = m4;
+
+    //debugline("m1=%+3.3f   m2=%+3.3f   m3=%+3.3f   m4=%+3.3f", m1, m2, m3, m4);
 }
 
 static float _x;

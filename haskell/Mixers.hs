@@ -53,5 +53,5 @@ mix sfun demands ThrustVector = Quad r1 r2 s1 s2 where
 
   r1 = sfun $ t + y
   r2 = sfun $ t - y
-  s1 = sfun $ r
-  s2 = sfun $ p
+  s1 = r
+  s2 = p
