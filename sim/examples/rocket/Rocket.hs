@@ -18,6 +18,7 @@ import Demands
 import Receiver
 import Time
 import Mixers
+import ThrustVector
 import Motors
 import Dynamics
 import Utils
@@ -55,6 +56,7 @@ vparams = VehicleParams
             2       -- Iy [kg*m^2] 
             3       -- Iz [kg*m^2] 
             3.8e-03 -- Jr prop inertial [kg*m^2] 
+            5e-06   -- b thrust coefficient [F=b*w^2] ??? XXX ???
             15000   -- maxrpm
 
 wparams = WorldParams
@@ -71,9 +73,8 @@ spec = do
   let (state, motors) = hackflight receiver
                                    wparams
                                    vparams
-                                   fpparams
                                    pidfuns
-                                   (SimMixer ThrustVector nozzleAngle)
+                                   (thrustVectorDynamics nozzleAngle)
                                    stream_time 
                                    stream_agl
 
