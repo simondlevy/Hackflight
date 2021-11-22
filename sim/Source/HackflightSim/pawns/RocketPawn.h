@@ -17,7 +17,7 @@
 #include "RocketPawn.generated.h"
 
 // Structures to hold static mesh initializations
-DECLARE_STATIC_MESH(FFrameStatics, "Rocket/Body.Body", FrameStatics)
+DECLARE_STATIC_MESH(FBodyStatics, "Rocket/Body.Body", BodyStatics)
 DECLARE_STATIC_MESH(FRotorTopStatics, "Rocket/RotorTop.RotorTop", RotorTopStatics)
 DECLARE_STATIC_MESH(FRotorBottomStatics, "Rocket/RotorBottom.RotorBottom", RotorBottomStatics)
 DECLARE_STATIC_MESH(FNozzleStatics, "Rocket/Nozzle.Nozzle", NozzleStatics)
@@ -32,9 +32,29 @@ class ARocketPawn : public APawn {
         static constexpr double ROTOR_TOP_Z    =  0.70;
         static constexpr double ROTOR_BOTTOM_Z =  0.60;
 
-        FDynamicsThread * _dynamicsThread = NULL;
+        FDynamicsThread * dynamicsThread = NULL;
 
         void addRotor(UStaticMesh* mesh, float z, int8_t dir);
+
+        float meshHeightMeters(UStaticMesh * mesh);
+
+        // A private class to support animating the nozzle
+        class NozzleVehicle : public Vehicle {
+
+            friend class ARocketPawn;
+
+            static constexpr float NOZZLE_Z =  0.15;
+
+            // XXX should come from Haskell dynamics
+            static constexpr float NOZZLE_MAX_ANGLE = 45; 
+
+            ARocketPawn * pawn = NULL;
+
+            UStaticMeshComponent * nozzleMeshComponent = NULL;
+
+            virtual void animateActuators(void) override;
+
+        };
 
     protected:
 
@@ -50,7 +70,7 @@ class ARocketPawn : public APawn {
 
     public:	
 
-        Vehicle vehicle;
+        NozzleVehicle vehicle;
 
         ARocketPawn();
 

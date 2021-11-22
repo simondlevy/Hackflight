@@ -10,11 +10,27 @@
 
 ARocketPawn::ARocketPawn()
 {
-    vehicle.buildFull(this, FrameStatics.mesh.Get());
+    // Get height of barrel for dynamics
+    float barrelHeight = meshHeightMeters(BodyStatics.mesh.Get());
+
+    // Create vehicle body object
+    vehicle.buildFull(this, BodyStatics.mesh.Get());
 
     // Add rotors
     addRotor(RotorTopStatics.mesh.Get(), ROTOR_TOP_Z, -1);
     addRotor(RotorBottomStatics.mesh.Get(), ROTOR_BOTTOM_Z, +1);
+
+    // Add nozzle
+    vehicle.nozzleMeshComponent =
+        vehicle.addComponent(NozzleStatics.mesh.Get(),
+                FName("Nozzle"), 0, 0, NozzleVehicle::NOZZLE_Z, 0);
+}
+
+float ARocketPawn::meshHeightMeters(UStaticMesh * mesh) 
+{
+    FBox box = mesh->GetBoundingBox();
+
+    return (box.Max.Z - box.Min.Z) / 100; // cm => m
 }
 
 void ARocketPawn::PostInitializeComponents()
@@ -27,16 +43,18 @@ void ARocketPawn::PostInitializeComponents()
 // Called when the game starts or when spawned
 void ARocketPawn::BeginPlay()
 {
-    _dynamicsThread = new FDynamicsThread(this);
+    dynamicsThread = new FDynamicsThread(this);
 
-    vehicle.BeginPlay(_dynamicsThread);
+    vehicle.BeginPlay(dynamicsThread);
+
+    vehicle.pawn = this;
 
     Super::BeginPlay();
 }
 
 void ARocketPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    FDynamicsThread::stopThread(&_dynamicsThread);
+    FDynamicsThread::stopThread(&dynamicsThread);
 
     Super::EndPlay(EndPlayReason);
 }
@@ -48,10 +66,20 @@ void ARocketPawn::Tick(float DeltaSeconds)
 
     Super::Tick(DeltaSeconds);
 
-    _dynamicsThread->tick();
+    dynamicsThread->tick();
 }
 
 void ARocketPawn::addRotor(UStaticMesh* mesh, float z, int8_t dir)
 {
     vehicle.addRotor(mesh, 0, 0, z, dir);
+}
+
+void ARocketPawn::NozzleVehicle::animateActuators(void)
+{
+    Vehicle::animateActuators();
+
+    float phi = pawn->dynamicsThread->getActuatorValue(3);
+    float theta = pawn->dynamicsThread->getActuatorValue(2);
+
+    nozzleMeshComponent->SetRelativeRotation(NOZZLE_MAX_ANGLE*FRotator(-theta, 0, -phi));
 }
