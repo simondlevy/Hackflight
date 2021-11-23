@@ -9,6 +9,8 @@
 
 void startBrushedMotor(uint8_t pin);
 void writeBrushedMotor(uint8_t pin, float val);
+void startBrushlessMotor(uint8_t pin);
+void writeBrushlessMotor(uint8_t pin, float val);
 
 // This is a way to still have good gyro corrections if at
 // least one motor reaches its max
@@ -46,4 +48,34 @@ void stream_startBrushedMotors(uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, u
     startBrushedMotor(m2_pin);
     startBrushedMotor(m3_pin);
     startBrushedMotor(m4_pin);
+}
+
+void stream_writeBrushlessMotors(
+        uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin,
+        float m1_val, float m2_val, float m3_val, float m4_val)
+{
+    void writeBrushlessMotor(uint8_t pin, float value);
+
+    float max = m1_val;
+    if (m2_val > m1_val) max = m2_val;
+    if (m3_val > m2_val) max = m3_val;
+    if (m4_val > m3_val) max = m4_val;
+
+    m1_val = scale(m1_val, max);
+    m2_val = scale(m2_val, max);
+    m3_val = scale(m3_val, max);
+    m4_val = scale(m4_val, max);
+
+    writeBrushlessMotor(m1_pin, m1_val);
+    writeBrushlessMotor(m2_pin, m2_val);
+    writeBrushlessMotor(m3_pin, m3_val);
+    writeBrushlessMotor(m4_pin, m4_val);
+}
+
+void stream_startBrushlessMotors(uint8_t m1_pin, uint8_t m2_pin, uint8_t m3_pin, uint8_t m4_pin)
+{
+    startBrushlessMotor(m1_pin);
+    startBrushlessMotor(m2_pin);
+    startBrushlessMotor(m3_pin);
+    startBrushlessMotor(m4_pin);
 }

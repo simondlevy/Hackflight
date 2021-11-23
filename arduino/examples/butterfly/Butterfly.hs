@@ -1,5 +1,5 @@
 {--
-  Support for Butterfly flight controller with DSMX receiver
+  Support for Butterfly flight controller with USFS IMU and DSMX receiver
 
   Copyright(C) 2021 on D.Levy
 
@@ -40,14 +40,14 @@ import Utils
 
 ------------------------------------------------------------
 
-m1_pin = 13 :: SWord8 
-m2_pin = 16 :: SWord8 
-m3_pin = 3  :: SWord8 
-m4_pin = 11 :: SWord8 
+m1_pin = 3 :: SWord8 
+m2_pin = 4 :: SWord8 
+m3_pin = 5  :: SWord8 
+m4_pin = 8 :: SWord8 
 
-led_pin = 18 :: SWord8 
+led_pin = 13 :: SWord8 
 
-receiver = makeReceiverWithTrim (AxisTrim 0.0 0.05 0.045) 4.0
+receiver = makeReceiver 4.0
 
 sensors = [gyrometer, quaternion]
 
@@ -72,7 +72,7 @@ spec = do
   trigger "stream_startI2C" starting []
   trigger "stream_startDsmrx" starting []
   trigger "stream_startUsfs" starting []
-  trigger "stream_startBrushedMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
+  trigger "stream_startBrushlessMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
   trigger "stream_startLed" starting [arg led_pin]
 
   -- Do some other stuff in loop
