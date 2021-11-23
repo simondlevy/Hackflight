@@ -17,6 +17,24 @@ AIngenuityPawn::AIngenuityPawn()
     addRotor(PropCCWStatics.mesh.Get(), -1, -1, -1);
     addRotor(PropCWStatics.mesh.Get(),  +1, -1, +1);
     addRotor(PropCWStatics.mesh.Get(),  -1, +1, +1);
+
+    // Add mast, solar panel, antenna
+    vehicle.addComponent(MastStatics.mesh.Get(), makeName("Mast", 1, "Mesh"));
+    vehicle.addComponent(SolarPanelStatics.mesh.Get(), makeName("SolarPanel", 1, "Mesh"), 0, 0, 0.34);
+    vehicle.addComponent(AntennaStatics.mesh.Get(), makeName("Antenna", 1, "Mesh"));
+
+    // Add legs
+    addLeg(1, Leg1BracketStatics.mesh.Get(), Leg1TopStatics.mesh.Get(), Leg1BottomStatics.mesh.Get());
+    addLeg(2, Leg2BracketStatics.mesh.Get(), Leg2TopStatics.mesh.Get(), Leg2BottomStatics.mesh.Get());
+    addLeg(3, Leg3BracketStatics.mesh.Get(), Leg3TopStatics.mesh.Get(), Leg3BottomStatics.mesh.Get());
+    addLeg(4, Leg4BracketStatics.mesh.Get(), Leg4TopStatics.mesh.Get(), Leg4BottomStatics.mesh.Get());
+}
+
+void AIngenuityPawn::addLeg(uint8_t index, UStaticMesh * bracketMesh, UStaticMesh * topMesh, UStaticMesh * bottomMesh)
+{
+    vehicle.addComponent(bracketMesh, makeName("LegBracket", index, "Mesh"));
+    vehicle.addComponent(topMesh,     makeName("LegTop", index, "Mesh"));
+    vehicle.addComponent(bottomMesh,  makeName("LegBottom", index, "Mesh"));
 }
 
 void AIngenuityPawn::addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy, int8_t dir)
