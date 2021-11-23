@@ -28,6 +28,11 @@ Hackflight is currently working on the following platforms:
 
 * [HackflightSim](https://github.com/simondlevy/Hackflight/tree/master/sim) flight simulator based on UnrealEngine4
 
+## Design philosophy
+
+<img src="media/dataflow.png">
+
+
 ## Standard units
 
 By supporting floating-point operations, these platforms allow us to write
