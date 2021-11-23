@@ -18,7 +18,7 @@ import Demands
 import Receiver
 import Time
 import Mixers
-import QuadXAP
+import Coaxial
 import Motors
 import Dynamics
 import Utils
@@ -59,12 +59,11 @@ vparams = VehicleParams
             5e-06   -- b thrust coefficient [F=b*w^2]
             15000   -- maxrpm
 
+-- XXX should use Mars constants
 wparams = WorldParams
 
             9.80665  -- g graviational constant
             1.225    -- rho air density 
-
-l = 0.350  -- arm length [m]
 
 ------------------------------------------------------------
 
@@ -74,7 +73,7 @@ spec = do
                                    wparams
                                    vparams
                                    pidfuns
-                                   (quadXapDynamics l)
+                                   coaxialDynamics
                                    stream_time 
                                    stream_agl
 

@@ -25,7 +25,7 @@ HSRC = Ingenuity.hs \
        $(HDIR)/pidcontrollers/RatePid.hs \
        $(HDIR)/pidcontrollers/LevelPid.hs \
        $(HDIR)/pidcontrollers/PosHoldPid.hs \
-       $(HDIR)/dynamics/QuadXAP.hs
+       $(HDIR)/dynamics/Coaxial.hs
 
 
 DSTDIR = ../../Source/HackflightSim/
