@@ -61,8 +61,8 @@ vparams = VehicleParams
 
 wparams = WorldParams
 
-            9.80665  -- g graviational constant
-            1.225    -- rho air density 
+            9.80665  -- g graviational constant [m/s^2]
+            1.225    -- rho air density [kg/m^3]
 
 l = 0.350  -- arm length [m]
 

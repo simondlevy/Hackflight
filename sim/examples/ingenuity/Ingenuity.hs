@@ -57,13 +57,12 @@ vparams = VehicleParams
             3       -- Iz [kg*m^2] 
             3.8e-03 -- Jr prop inertial [kg*m^2] 
             5e-06   -- b thrust coefficient [F=b*w^2]
-            15000   -- maxrpm
+            60000   -- maxrpm
 
--- XXX should use Mars constants
 wparams = WorldParams
 
-            9.80665  -- g graviational constant
-            1.225    -- rho air density 
+            3.72076  -- g graviational constant [m/s^3]
+            0.020    -- rho air density  [kg/m^3]
 
 ------------------------------------------------------------
 
