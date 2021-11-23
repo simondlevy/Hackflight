@@ -10,7 +10,7 @@
 
 AIngenuityPawn::AIngenuityPawn()
 {
-    vehicle.buildFull(this, FrameStatics.mesh.Get());
+    vehicle.buildFull(this, BodyStatics.mesh.Get());
 
     // Add propellers
     addRotor(PropCCWStatics.mesh.Get(), +1, +1, -1);
