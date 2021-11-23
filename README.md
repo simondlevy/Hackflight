@@ -51,22 +51,19 @@ principle still applies; e.g.:
 C++, Hackflight has since been translated to Haskell, thanks to the
 [Haskell Copilot DSL](https://copilot-language.github.io/).  By compiling Haskell
 to constant-memory C code, Copilot allows the sensor-fusion, control, and
-safety algorithms to be written in Haskell, with the back-end code written in C/C++
-to run on microncontrollers.  
+safety algorithms to be written in Haskell, with the back-end microcontroller 
+and simulation code written in C/C++.  Following the Copilot approach, incoming
+data (receiver demands, raw sensor values) are treated as *streams* set by the
+C++ code:
 
-## Standard units
+```
+```
 
-By supporting floating-point operations, these platforms allow us to write
-simpler code based on standard units:
+Outgoing data (motor demands) are set by the Haskell code and passed 
+to the C++ code via the Copilot ```trigger``` mechanism:
 
-* Distances in meters
-* Time in seconds
-* Quaternions in the interval [-1,+1]
-* Euler angles in radians
-* Accelerometer values in Gs
-* Barometric pressure in Pascals
-* Stick demands in the interval [-1,+1]
-* Motor demands in [0,1]
+```
+```
 
 ## Ground Control Station
 
