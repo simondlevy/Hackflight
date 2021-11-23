@@ -47,6 +47,13 @@ principle still applies; e.g.:
   mix :: SafetyFun -> Demands -> Mixer -> Motors
 ```
 
+[Originally](https://github.com/simondlevy/HackflightCPP) written in
+C++, Hackflight has since been translated to Haskell, thanks to the
+[Haskell Copilot DSL](https://copilot-language.github.io/).  By compiling Haskell
+to constant-memory C code, Copilot allows the sensor-fusion, control, and
+safety algorithms to be written in Haskell, with the back-end code written in C/C++
+to run on microncontrollers.  
+
 ## Standard units
 
 By supporting floating-point operations, these platforms allow us to write
