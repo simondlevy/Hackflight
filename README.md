@@ -34,7 +34,11 @@ As shown in the figure below, Hackflight follows the design principles of
 functional programming languages like Haskell: each component in the system is
 a function from one type of object to another.  For example, a PID controller is
 a function from State and Demands to Demands.  A mixer is a function from Demands
-to Motor values.  Things are a bit more complicated in the actual code, where
+to Motor values.  
+
+<img src="media/dataflow.png">
+
+Things are a bit more complicated in the actual code, where
 issues like safety and mixer types have to be taken into account, but the general
 principle still applies; e.g.:
 
@@ -42,9 +46,6 @@ principle still applies; e.g.:
 ```
   mix :: SafetyFun -> Demands -> Mixer -> Motors
 ```
-
-<img src="media/dataflow.png">
-
 
 ## Standard units
 
