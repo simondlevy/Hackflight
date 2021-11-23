@@ -12,11 +12,9 @@ AIngenuityPawn::AIngenuityPawn()
 {
     vehicle.buildFull(this, BodyStatics.mesh.Get());
 
-    // Add propellers
-    addRotor(PropCCWStatics.mesh.Get(), +1, +1, -1);
-    addRotor(PropCCWStatics.mesh.Get(), -1, -1, -1);
-    addRotor(PropCWStatics.mesh.Get(),  +1, -1, +1);
-    addRotor(PropCWStatics.mesh.Get(),  -1, +1, +1);
+    // Add rotors
+    addRotor(RotorTopStatics.mesh.Get(), .250, +1);
+    addRotor(RotorBottomStatics.mesh.Get(), .170, -1);
 
     // Add mast, solar panel, antenna
     vehicle.addComponent(MastStatics.mesh.Get(), makeName("Mast", 1, "Mesh"));
@@ -37,9 +35,9 @@ void AIngenuityPawn::addLeg(uint8_t index, UStaticMesh * bracketMesh, UStaticMes
     vehicle.addComponent(bottomMesh,  makeName("LegBottom", index, "Mesh"));
 }
 
-void AIngenuityPawn::addRotor(UStaticMesh * mesh, int8_t dx, int8_t dy, int8_t dir)
+void AIngenuityPawn::addRotor(UStaticMesh * mesh, float z, int8_t dir)
 {
-    vehicle.addRotor(mesh, dx*0.12, dy*0.12, 0.16, dir);
+    vehicle.addRotor(mesh, 0, 0, z, dir);
 }
 
 void AIngenuityPawn::PostInitializeComponents()
