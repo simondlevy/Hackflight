@@ -79,7 +79,7 @@ spec = do
   trigger "stream_updateUsfs" running []
   trigger "stream_updateDsmrx" running []
   trigger "stream_updateTime" running []
-  trigger "stream_writeLed" running [arg led_pin, arg led]
+  trigger "stream_writeLed" running [arg led_pin, arg $ not led] -- LED is active low
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" stream_serialAvailable []
 
