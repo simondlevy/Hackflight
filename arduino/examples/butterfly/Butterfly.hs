@@ -1,5 +1,5 @@
 {--
-  Support for Butterfly flight controller with USFS IMU and DSMX receiver
+  Support for Butterfly flight controller with piggyback USFS IMU and DSMX receiver
 
   Copyright(C) 2021 on D.Levy
 
@@ -72,7 +72,7 @@ spec = do
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
-  trigger "stream_startI2C" starting []
+  trigger "stream_startI2C_STM32L4_PINS_6_7" starting []
   trigger "stream_startDsmrx" starting []
   trigger "stream_startUsfs" starting []
   trigger "stream_startBrushlessMotors" starting [
