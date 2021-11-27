@@ -40,6 +40,9 @@ import Utils
 
 ------------------------------------------------------------
 
+pwm_min = 140 :: SWord16
+pwm_max = 265 :: SWord16
+
 m1_pin = 3 :: SWord8 
 m2_pin = 4 :: SWord8 
 m3_pin = 5  :: SWord8 
@@ -72,7 +75,14 @@ spec = do
   trigger "stream_startI2C" starting []
   trigger "stream_startDsmrx" starting []
   trigger "stream_startUsfs" starting []
-  trigger "stream_startBrushlessMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
+  trigger "stream_startBrushlessMotors" starting [
+                                                    arg pwm_min
+                                                  , arg m1_pin
+                                                  , arg m2_pin
+                                                  , arg m3_pin
+                                                  , arg m4_pin
+                                                 ]
+
   trigger "stream_startLed" starting [arg led_pin]
 
   -- Do some other stuff in loop
@@ -100,9 +110,18 @@ spec = do
                                       , arg $ val05 msgbuff
                                       ]
   -- Run motors
-  trigger "stream_writeBrushedMotors" true [
-        arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin,
-        arg $ m1 motors, arg $ m2 motors, arg $ m3 motors, arg $ m4 motors]
+  trigger "stream_writeBrushlessMotors" true [
+                                              arg pwm_min
+                                            , arg pwm_max
+                                            , arg m1_pin
+                                            , arg m2_pin
+                                            , arg m3_pin
+                                            , arg m4_pin
+                                            , arg $ m1 motors
+                                            , arg $ m2 motors
+                                            , arg $ m3 motors
+                                            , arg $ m4 motors
+                                           ]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

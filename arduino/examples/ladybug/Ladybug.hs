@@ -72,7 +72,7 @@ spec = do
   trigger "stream_startI2C" starting []
   trigger "stream_startDsmrx" starting []
   trigger "stream_startUsfs" starting []
-  trigger "stream_startBrushlessMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
+  trigger "stream_startBrushedMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
   trigger "stream_startLed" starting [arg led_pin]
 
   -- Do some other stuff in loop
@@ -101,8 +101,15 @@ spec = do
                                       ]
   -- Run motors
   trigger "stream_writeBrushedMotors" true [
-        arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin,
-        arg $ m1 motors, arg $ m2 motors, arg $ m3 motors, arg $ m4 motors]
+                                              arg m1_pin
+                                            , arg m2_pin
+                                            , arg m3_pin
+                                            , arg m4_pin
+                                            , arg $ m1 motors
+                                            , arg $ m2 motors
+                                            , arg $ m3 motors
+                                            , arg $ m4 motors
+                                           ]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
