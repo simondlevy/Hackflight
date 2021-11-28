@@ -42,7 +42,7 @@ all: hackflight.cpp
 	cp $(CDIR)/motors.c $(DSTDIR)/motors.cpp
 	cp $(CDIR)/serial.c $(DSTDIR)/serial.cpp
 	cp $(CPPDIR)/arduino_dsmrx.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_i2c.cpp $(DSTDIR)
+	cp $(CPPDIR)/arduino_i2c_stm32l4.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_led.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_motors.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_serial.cpp $(DSTDIR)

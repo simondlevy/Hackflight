@@ -15,3 +15,9 @@ void stream_startI2C(void)
     Wire.begin();
     delay(100);
 }
+
+void stream_startI2C_STM32L4_PINS_6_7(void)
+{
+    Wire.begin(TWI_PINS_6_7);
+    delay(100);
+}
