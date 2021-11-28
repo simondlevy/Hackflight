@@ -1,9 +1,10 @@
 # HackflightSim
-<font size="+8">Description</font>
 
 <a href="https://www.youtube.com/watch?v=mobemDcX9ew"><img src="media/IndoorScene.png" width=500></a>
 
-# About
+<a href="https://www.youtube.com/watch?v="h6107MBgQ98><img src="media/Mars.png" width=500></a>
+
+## About
 
 HackflightSim is a simple multicopter flight simulator using Unreal Engine 4.  It runs on Windows.
 
