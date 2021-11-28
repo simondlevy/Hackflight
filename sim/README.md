@@ -1,8 +1,8 @@
 # HackflightSim
 
-<a href="https://www.youtube.com/watch?v=mobemDcX9ew"><img src="media/IndoorScene.png" width=500></a>
+<a href="https://www.youtube.com/watch?v=mobemDcX9ew"><img src="media/IndoorScene.png" height=300></a>
 
-<a href="https://www.youtube.com/watch?v=h6107MBgQ98"><img src="media/Mars.png" width=500 align=right></a>
+<a href="https://www.youtube.com/watch?v=h6107MBgQ98"><img src="media/Mars.png" height=300 align=right></a>
 
 ## About
 
