@@ -20,8 +20,10 @@ void loop() {
     }
 
     for (uint8_t k=0; k<16; ++k) {
-        txvals[k] = val;
+        txvals[k] = 172;
     }
+
+    txvals[4] = val;
 
     val += dir;
 
