@@ -1,46 +1,65 @@
 #include <sbus.h>
+#include <DSMRX.h>
 
-SbusTx sbus_tx(&Serial1);
+static const uint8_t SBUS_CHANNELS = 16;
+static const uint16_t SBUS_MIN = 172;
+static const uint16_t SBUS_MAX = 1811;
 
-static uint16_t SBUS_MIN = 172;
-static uint16_t SBUS_MAX = 1811;
+static const uint8_t DSMX_CHANNELS = 8;
+
+SbusTx sbus_out(&Serial1);
+
+DSM2048 dsmx_in;
+
+void serialEvent2(void)
+{
+    while (Serial2.available()) {
+        dsmx_in.handleSerialEvent(Serial2.read(), micros());
+    }
+}
+
+static uint16_t scale(float txval)
+{
+    return ((txval + 1) / 2) * (SBUS_MAX - SBUS_MIN) + SBUS_MIN;
+}
 
 void setup() {
 
-  sbus_tx.Begin();
+    sbus_out.Begin();
+
+    Serial.begin(115000);
+    Serial2.begin(115000);
 }
 
 void loop() {
 
-    std::array<uint16_t, 16> txvals;
+    static float dsmxvals[DSMX_CHANNELS];
 
-    static uint16_t val;
-    static int8_t dir;
-
-    if (!val) {
-        val = SBUS_MIN;
-        dir = +1;
+    if (dsmx_in.timedOut(micros())) {
+        Serial.println("*** TIMED OUT ***");
     }
 
-    for (uint8_t k=0; k<16; ++k) {
-        txvals[k] = SBUS_MIN;
+    else if (dsmx_in.gotNewFrame()) {
+
+        dsmx_in.getChannelValues(dsmxvals, DSMX_CHANNELS);
     }
 
-    txvals[4] = val;
+    std::array<uint16_t, SBUS_CHANNELS> sbusvals;
 
-    val += dir;
+    sbusvals[0] = scale(dsmxvals[0]);
+    sbusvals[1] = scale(dsmxvals[1]);
+    sbusvals[2] = scale(dsmxvals[2]);
+    sbusvals[3] = scale(dsmxvals[3]);
+    sbusvals[4] = scale(dsmxvals[7]);
 
-    if (val == SBUS_MAX) {
-        dir = -1;
+    for (uint8_t k=5; k<SBUS_CHANNELS; ++k) {
+        sbusvals[k] = SBUS_MIN;
     }
-    
-    if (val == SBUS_MIN) {
-        dir = +1;
-    }
-     sbus_tx.tx_channels(txvals);
 
-    sbus_tx.Write();
+    sbus_out.tx_channels(sbusvals);
 
-    delay(10);
+    sbus_out.Write();
+
+    delay(5);
 }
 
