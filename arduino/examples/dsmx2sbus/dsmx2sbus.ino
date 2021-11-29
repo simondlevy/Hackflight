@@ -50,7 +50,7 @@ void loop() {
     sbusvals[1] = scale(dsmxvals[1]);
     sbusvals[2] = scale(dsmxvals[2]);
     sbusvals[3] = scale(dsmxvals[3]);
-    sbusvals[4] = scale(dsmxvals[7]);
+    sbusvals[4] = scale(dsmxvals[6]);
 
     for (uint8_t k=5; k<SBUS_CHANNELS; ++k) {
         sbusvals[k] = SBUS_MIN;
