@@ -7,7 +7,13 @@ while True:
 
     try:
 
-        print('x%02X' % ord(port.read(1)))
+        byte = ord(port.read(1))
+
+        if byte == 0xFE:
+            print('===============================')
+
+        print('x%02X' % byte)
+
         stdout.flush()
 
     except KeyboardInterrupt:
