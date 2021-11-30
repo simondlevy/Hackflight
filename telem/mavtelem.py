@@ -1,4 +1,5 @@
 from serial import Serial
+from sys import stdout
 
 port = Serial('COM69', 115200)
 
@@ -6,8 +7,8 @@ while True:
 
     try:
 
-        # print('x%02X' % port.read(1).decode())
-        print(port.read(1))
+        print('x%02X' % ord(port.read(1)))
+        stdout.flush()
 
     except KeyboardInterrupt:
 
