@@ -7,34 +7,66 @@ from sys import stdout
 
 class MyParser(MspParser):
 
-    def __init__(self, port, cmd):
+    def __init__(self):
 
         MspParser.__init__(self)
 
-        self.port = port
-        self.cmd = cmd
-
     def handle_ATTITUDE(self, angx, angy, heading):
-        print(angx, angy, heading)
-        self.port.write(self.cmd)
+        pass
 
-# PORT = 'COM31'
 PORT = '/dev/ttyS31'
+
+MOTORVAL = 1200
 
 port = Serial(PORT, 115200, timeout=1)
 
-cmd = MspParser.serialize_ATTITUDE_Request()
+cmd = MspParser.serialize_SET_MOTOR(MOTORVAL, 
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL,
+                                    MOTORVAL
+                                   )
 
-parser = MyParser(port, cmd)
-
-port.write(cmd)
+parser = MyParser()
 
 while True:
 
     try:
-        byte = port.read(1)
+        port.write(cmd)
 
     except KeyboardInterrupt:
         break
 
-    parser.parse(byte)
+    sleep(.001)
+
+cmd = MspParser.serialize_SET_MOTOR(0, 
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                   )
+
+
+port.write(cmd)
