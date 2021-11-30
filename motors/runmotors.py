@@ -3,70 +3,46 @@
 from parser import MspParser
 from serial import Serial
 from time import sleep
-from sys import stdout
+
+PORT = '/dev/ttyS31'
+
 
 class MyParser(MspParser):
 
-    def __init__(self):
+    def __init__(self, port):
 
         MspParser.__init__(self)
+
+        self.port = port
 
     def handle_ATTITUDE(self, angx, angy, heading):
         pass
 
-PORT = '/dev/ttyS31'
+    def set_motors(self, m1val, m2val, m3val, m4val):
+
+        cmd = self.serialize_SET_MOTOR(m1val, m2val, m3val, m4val,
+                                       1000, 1000, 1000, 1000,
+                                       1000, 1000, 1000, 1000,
+                                       1000, 1000, 1000, 1000)
+
+        self.port.write(cmd)
+
 
 MOTORVAL = 1200
 
 port = Serial(PORT, 115200, timeout=1)
 
-cmd = MspParser.serialize_SET_MOTOR(MOTORVAL, 
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL,
-                                    MOTORVAL
-                                   )
-
-parser = MyParser()
+parser = MyParser(port)
 
 while True:
 
     try:
-        port.write(cmd)
+
+        parser.set_motors(MOTORVAL, MOTORVAL, MOTORVAL, MOTORVAL)
 
     except KeyboardInterrupt:
         break
 
     sleep(.001)
 
-cmd = MspParser.serialize_SET_MOTOR(0, 
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0
-                                   )
-
-
-port.write(cmd)
+parser.set_motors(1000, 1000, 1000, 1000)
