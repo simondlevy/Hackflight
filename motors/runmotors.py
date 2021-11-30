@@ -38,7 +38,7 @@ while True:
 
     try:
 
-        parser.set_motors(MOTORVAL, MOTORVAL, MOTORVAL, MOTORVAL)
+        parser.set_motors(1000, MOTORVAL, 1000, MOTORVAL)
 
     except KeyboardInterrupt:
         break
