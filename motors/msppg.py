@@ -203,7 +203,7 @@ class Python_Emitter(CodeEmitter):
     def emit(self):
 
         # Open output file
-        self.output = self._openw('mspparser.py')
+        self.output = self._openw('parser.py')
 
         # Emit header
         self.output.write('#  MSP Parser subclass and message builders')
