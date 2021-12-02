@@ -14,7 +14,6 @@
 #include "hackflight.h"
 
 static DSM2048 rx;
-
 static bool rxReady;
 
 void serialEvent1(void)
