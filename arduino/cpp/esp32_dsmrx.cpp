@@ -6,6 +6,7 @@
  * MIT license
  */
 
+#include <Arduino.h>
 #include <DSMRX.h>
 
 static const uint8_t DSMX_RX_PIN    = 4;

@@ -8,9 +8,9 @@
 
 #include <TinyPICO.h>
 
-void stream_writeLed(const uint8_t pin, bool value)
+void stream_writeLed(bool value)
 {
     static TinyPICO tp;
 
-    tp.DotStar_SetPixelColor(0, isOn?255:0, 0);
+    tp.DotStar_SetPixelColor(0, value?255:0, 0);
 }

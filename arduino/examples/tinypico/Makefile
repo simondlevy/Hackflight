@@ -44,7 +44,7 @@ all: hackflight.cpp
 	cp $(CPPDIR)/arduino_i2c.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_serial.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_time.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_usfs.cpp $(DSTDIR)
+	cp $(CPPDIR)/arduino_usfs_nogyro.cpp $(DSTDIR)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c
