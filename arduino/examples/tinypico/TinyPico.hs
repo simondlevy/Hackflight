@@ -14,7 +14,7 @@ import Language.Copilot
 import Copilot.Compile.C99
 
 -- Core
-import HackflightFull
+import HackflightProxy
 import Receiver
 import Demands
 import State
@@ -39,14 +39,7 @@ import Utils
 
 ------------------------------------------------------------
 
-m1_pin = 13 :: SWord8 
-m2_pin = 16 :: SWord8 
-m3_pin = 3  :: SWord8 
-m4_pin = 11 :: SWord8 
-
-led_pin = 18 :: SWord8 
-
-receiver = makeReceiverWithTrim (AxisTrim 0.0 0.05 0.045) 4.0
+receiver = makeReceiver 4.0
 
 sensors = [gyrometer, quaternion]
 
@@ -63,8 +56,8 @@ spec = do
   -- Get flags for startup, loop
   let (running, starting) = runstate
 
-  -- Run the full Hackflight algorithm
-  let (msgbuff, motors, led) = hackflight receiver sensors pidfuns QuadXMW
+  -- Run the full Hackflight proxy algorithm
+  let (demands, msgbuff, led) = hackflight receiver sensors pidfuns
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []

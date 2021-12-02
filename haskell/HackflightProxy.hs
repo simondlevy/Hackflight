@@ -8,7 +8,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module HackflightFull where
+module HackflightProxy where
 
 import Language.Copilot
 
@@ -19,16 +19,14 @@ import Demands
 import PidController
 import Safety
 import Time
-import Mixers
-import Motors
 import Parser
 import Serial
 import Utils
 
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> (Demands, MessageBuffer, SBool)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> (Demands, MessageBuffer, SBool)
 
-hackflight receiver sensors pidfuns mixer = (pdemands, msgbuff, led)
+hackflight receiver sensors pidfuns = (pdemands, msgbuff, led)
 
   where
 
