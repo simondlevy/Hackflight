@@ -10,15 +10,15 @@
 #include <DSMRX.h>
 
 static const uint8_t  SBUS_CHANNELS = 16;
-static const uint16_t SBUS_MIN = 172;
-static const uint16_t SBUS_MAX = 1811;
+static const uint16_t SBUS_MIN      = 172;
+static const uint16_t SBUS_MAX      = 1811;
 
-static const uint8_t SBUS_RX_PIN = 21; // unused
-static const uint8_t SBUS_TX_PIN = 22; 
+static const uint8_t SBUS_RX_PIN    = 15; // unused
+static const uint8_t SBUS_TX_PIN    = 27; 
 
-static const uint8_t DSMX_RX_PIN = 4;
-static const uint8_t DSMX_TX_PIN = 14; // unused
-static const uint8_t DSMX_CHANNELS = 8;
+static const uint8_t DSMX_RX_PIN    = 4;
+static const uint8_t DSMX_TX_PIN    = 14; // unused
+static const uint8_t DSMX_CHANNELS  = 8;
 
 SbusTx sbus_out(&Serial1, SBUS_RX_PIN, SBUS_TX_PIN);
 
@@ -57,7 +57,7 @@ void loop() {
     static float dsmxvals[DSMX_CHANNELS];
 
     if (dsmx_in.timedOut(micros())) {
-        Serial.println("*** TIMED OUT ***");
+        Serial.println("*** DSMX TIMED OUT ***");
     }
 
     else if (dsmx_in.gotNewFrame()) {
@@ -72,8 +72,6 @@ void loop() {
     sbusvals[2] = scale(dsmxvals[2]);
     sbusvals[3] = scale(dsmxvals[3]);
     sbusvals[4] = scale(dsmxvals[6]);
-
-    Serial.println(dsmxvals[6]);
 
     for (uint8_t k=5; k<SBUS_CHANNELS; ++k) {
         sbusvals[k] = SBUS_MIN;
