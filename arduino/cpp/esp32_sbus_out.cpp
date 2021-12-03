@@ -12,7 +12,7 @@ static const uint8_t  SBUS_CHANNELS = 16;
 static const uint16_t SBUS_MIN      = 172;
 static const uint16_t SBUS_MAX      = 1811;
 
-SbusTx sbus_out(&Serial1);
+SbusTx sbus_out(&Serial2);
 
 static uint16_t scale(float txval)
 {

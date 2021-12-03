@@ -39,7 +39,7 @@ all: hackflight.cpp
 	cat $(CDIR)/header.h hackflight.h > $(DSTDIR)/hackflight.h
 	rm hackflight.h
 	cp $(CPPDIR)/esp32_dsmrx.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_sbus_out.cpp $(DSTDIR)
+	cp $(CPPDIR)/esp32_sbus_out.cpp $(DSTDIR)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c
