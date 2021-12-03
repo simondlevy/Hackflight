@@ -38,13 +38,8 @@ all: hackflight.cpp
 	sed -i 's/extern/EXTERN/g' hackflight.h
 	cat $(CDIR)/header.h hackflight.h > $(DSTDIR)/hackflight.h
 	rm hackflight.h
-	cp $(CDIR)/serial.c $(DSTDIR)/serial.cpp
 	cp $(CPPDIR)/esp32_dsmrx.cpp $(DSTDIR)
-	cp $(CPPDIR)/tinypico_led.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_i2c.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_serial.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_time.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_usfs_nogyro.cpp $(DSTDIR)
+	cp $(CPPDIR)/arduino_sbus_out.cpp $(DSTDIR)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c

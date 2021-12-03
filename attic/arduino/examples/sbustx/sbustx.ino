@@ -12,15 +12,15 @@ static const uint8_t  SBUS_CHANNELS = 16;
 static const uint16_t SBUS_MIN = 172;
 static const uint16_t SBUS_MAX = 1811;
 
-SbusTx sbus_out(&Serial1
-#ifdef ESP32
-        , 4, 14
-#endif
-        );
+SbusTx sbus_out(&Serial1);
 
 void setup() {
 
-    sbus_out.Begin();
+    sbus_out.Begin(
+#ifdef ESP32
+          4, 14
+#endif
+        );
 
     Serial.begin(115000);
 }
@@ -61,4 +61,3 @@ void loop() {
 
     delay(5);
 }
-
