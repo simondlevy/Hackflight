@@ -97,5 +97,11 @@ receiverAux1  = extern "stream_receiverAux1" Nothing
 receiverAux2 :: SFloat
 receiverAux2  = extern "stream_receiverAux2" Nothing
 
-receiverLostSignal :: SBool
-receiverLostSignal  = extern "stream_receiverLostSignal" Nothing
+receiverReady :: SBool
+receiverReady  = extern "stream_receiverReady" Nothing
+
+receiverTimedOut :: SBool
+receiverTimedOut  = extern "stream_receiverTimedOut" Nothing
+
+receiverGotNewFrame :: SBool
+receiverGotNewFrame  = extern "stream_receiverGotNewFrame" Nothing

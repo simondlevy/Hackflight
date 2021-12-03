@@ -75,9 +75,11 @@ spec = do
   trigger "stream_startBrushedMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
   trigger "stream_startLed" starting [arg led_pin]
 
+  trigger "stream_updateDsmrx" running []
+  trigger "stream_getDsmrx" receiverGotNewFrame []
+
   -- Do some other stuff in loop
   trigger "stream_updateUsfs" running []
-  trigger "stream_updateDsmrx" running []
   trigger "stream_updateTime" running []
   trigger "stream_writeLed" running [arg led_pin, arg led]
   trigger "stream_serialUpdate" running []

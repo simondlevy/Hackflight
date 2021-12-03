@@ -14,11 +14,10 @@
 #include "hackflight.h"
 
 static DSM2048 rx;
-static bool rxReady;
 
 void serialEvent1(void)
 {
-    rxReady = true;
+    stream_receiverReady = true;
 
     while (Serial1.available()) {
 
@@ -29,28 +28,24 @@ void serialEvent1(void)
 void stream_startDsmrx(void)
 {
     Serial1.begin(115200);
-    stream_receiverLostSignal = false;
 }
 
 void stream_updateDsmrx(void)
 {
-    if (rx.timedOut(micros())) {
-        if (rxReady) {
-            stream_receiverLostSignal = true;
-        }
-    }
+    stream_receiverTimedOut = rx.timedOut(micros());
+    stream_receiverGotNewFrame = rx.gotNewFrame();
+}
 
-    else if (rx.gotNewFrame()) {
+void stream_getDsmrx(void)
+{
+    float rawvals[8];
 
-        float rawvals[8];
+    rx.getChannelValues(rawvals, 8);
 
-        rx.getChannelValues(rawvals, 8);
-
-        stream_receiverThrottle = rawvals[0];
-        stream_receiverRoll     = rawvals[1];
-        stream_receiverPitch    = rawvals[2];
-        stream_receiverYaw      = rawvals[3];
-        stream_receiverAux1     = rawvals[6];
-        stream_receiverAux2     = rawvals[4];
-    }
+    stream_receiverThrottle = rawvals[0];
+    stream_receiverRoll     = rawvals[1];
+    stream_receiverPitch    = rawvals[2];
+    stream_receiverYaw      = rawvals[3];
+    stream_receiverAux1     = rawvals[6];
+    stream_receiverAux2     = rawvals[4];
 }

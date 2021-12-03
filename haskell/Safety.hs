@@ -23,8 +23,8 @@ safety demands state = (armed, failsafe, mzero)
 
   where
 
-    -- Trip failsafe if armed and receiver lost signal
-    failsafe = if failsafe' then true else armed' && receiverLostSignal
+    -- Trip failsafe if armed and receiver timed out
+    failsafe = if failsafe' then true else armed' && receiverReady && receiverTimedOut
 
     -- Set motors to zero if disarmed or failsafe tripped or if armed with throttle down
     mzero = not armed' || failsafe || (armed' && throttleIsDown)
