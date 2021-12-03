@@ -13,6 +13,8 @@ module TinyPico where
 import Language.Copilot
 import Copilot.Compile.C99
 
+import Prelude hiding ((/), (*), (+), (-))
+
 import Time
 import Receiver
 import Utils
@@ -25,8 +27,11 @@ dsmx_in_tx_pin = 14 :: SWord8 -- unused
 sbus_out_rx_pin = 15 :: SWord8 -- unused 
 sbus_out_tx_pin = 27 :: SWord8 
 
-sbus_min = 172  :: SWord16
-sbus_max = 1811 :: SWord16
+sbus_min = 172  :: SFloat
+sbus_max = 1811 :: SFloat
+
+scale :: SFloat -> SFloat
+scale val = ((val + 1) / 2) * (sbus_max - sbus_min) + sbus_min
 
 ------------------------------------------------------------
 
@@ -42,17 +47,26 @@ spec = do
   -- Do some other stuff in loop
   trigger "stream_updateDsmrx" running []
   trigger "stream_getDsmrx" receiverGotNewFrame []
-  trigger "stream_writeSbus" running [  arg sbus_min
-                                      , arg sbus_max
-                                      , arg receiverThrottle
-                                      , arg receiverRoll
-                                      , arg receiverPitch
-                                      , arg receiverYaw
-                                      , arg receiverAux1
+  trigger "stream_writeSbus" running [  arg $ scale receiverThrottle  
+                                      , arg $ scale receiverRoll  
+                                      , arg $ scale receiverPitch  
+                                      , arg $ scale receiverYaw  
+                                      , arg $ scale receiverAux1
+                                      , arg $ scale receiverAux2
+                                      , arg sbus_min
+                                      , arg sbus_min
+                                      , arg sbus_min
+                                      , arg sbus_min
+                                      , arg sbus_min
+                                      , arg sbus_min
+                                      , arg sbus_min
+                                      , arg sbus_min
+                                      , arg sbus_min
+                                      , arg sbus_min
                                      ]
 
   -- XXX ignore these varaibles for now
-  trigger "stream_ignore" running [arg receiverTimedOut, arg receiverAux2]
+  trigger "stream_ignore" running [arg receiverTimedOut]
 
 
 -- Compile the spec

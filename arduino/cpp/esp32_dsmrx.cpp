@@ -55,6 +55,3 @@ void stream_getDsmrx(void)
     stream_receiverAux2     = rawvals[4];
 }
 
-void stream_ignore(bool timedOut, float aux2)
-{
-}

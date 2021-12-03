@@ -10,38 +10,52 @@
 
 SbusTx sbus_out(&Serial2);
 
-static uint16_t scale(float txval, uint16_t sbus_min, uint16_t sbus_max)
-{
-    return ((txval + 1) / 2) * (sbus_max - sbus_min) + sbus_min;
-}
-
 void stream_startSbusOut(uint8_t rxpin, uint8_t txpin) {
 
     sbus_out.Begin(rxpin, txpin);
 }
 
 void stream_writeSbus(
-        uint16_t sbus_min,
-        uint16_t sbus_max,
-        float thr,
-        float rol,
-        float pit,
-        float yaw,
-        float aux) {
-
+        float ch01,
+        float ch02,
+        float ch03,
+        float ch04,
+        float ch05,
+        float ch06,
+        float ch07,
+        float ch08,
+        float ch09,
+        float ch10,
+        float ch11,
+        float ch12,
+        float ch13,
+        float ch14,
+        float ch15,
+        float ch16)
+{
     std::array<uint16_t, 16> sbusvals;
 
-    sbusvals[0] = scale(thr, sbus_min, sbus_max);
-    sbusvals[1] = scale(rol, sbus_min, sbus_max);
-    sbusvals[2] = scale(pit, sbus_min, sbus_max);
-    sbusvals[3] = scale(yaw, sbus_min, sbus_max);
-    sbusvals[4] = scale(aux, sbus_min, sbus_max);
-
-    for (uint8_t k=5; k<16; ++k) {
-        sbusvals[k] = sbus_min;
-    }
+    sbusvals[0] = (uint16_t)ch01;
+    sbusvals[1] = (uint16_t)ch02;
+    sbusvals[2] = (uint16_t)ch03;
+    sbusvals[3] = (uint16_t)ch04;
+    sbusvals[4] = (uint16_t)ch05;
+    sbusvals[5] = (uint16_t)ch06;
+    sbusvals[6] = (uint16_t)ch07;
+    sbusvals[7] = (uint16_t)ch08;
+    sbusvals[8] = (uint16_t)ch09;
+    sbusvals[9] = (uint16_t)ch10;
+    sbusvals[10] = (uint16_t)ch11;
+    sbusvals[11] = (uint16_t)ch12;
+    sbusvals[12] = (uint16_t)ch13;
+    sbusvals[13] = (uint16_t)ch14;
+    sbusvals[14] = (uint16_t)ch15;
+    sbusvals[15] = (uint16_t)ch16;
 
     sbus_out.tx_channels(sbusvals);
     sbus_out.Write();
 }
 
+void stream_ignore(bool timedOut)
+{
+}
