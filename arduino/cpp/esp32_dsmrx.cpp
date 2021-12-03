@@ -9,10 +9,6 @@
 #include <Arduino.h>
 #include <DSMRX.h>
 
-static const uint8_t DSMX_RX_PIN    = 4;
-static const uint8_t DSMX_TX_PIN    = 14; // unused
-static const uint8_t DSMX_CHANNELS  = 8;
-
 #define _EXTERN
 #include "hackflight.h"
 
@@ -32,34 +28,33 @@ static void coreTask(void * params)
     } 
 }
 
-void stream_startDsmrx(void)
+void stream_startDsmrx(uint8_t rxpin, uint8_t txpin)
 {
-    Serial1.begin(115000, SERIAL_8N1, DSMX_RX_PIN, DSMX_TX_PIN);
+    Serial1.begin(115000, SERIAL_8N1, rxpin, txpin);
     TaskHandle_t task;
     xTaskCreatePinnedToCore(coreTask, "Task", 10000, NULL, 1, &task, 0); 
-    stream_receiverLostSignal = false;
 }
 
 void stream_updateDsmrx(void)
 {
-    if (rx.timedOut(micros())) {
-        if (rxReady) {
-            stream_receiverLostSignal = true;
-        }
-    }
-
-    else if (rx.gotNewFrame()) {
-
-        float rawvals[8];
-
-        rx.getChannelValues(rawvals, 8);
-
-        stream_receiverThrottle = rawvals[0];
-        stream_receiverRoll     = rawvals[1];
-        stream_receiverPitch    = rawvals[2];
-        stream_receiverYaw      = rawvals[3];
-        stream_receiverAux1     = rawvals[6];
-        stream_receiverAux2     = rawvals[4];
-    }
+    stream_receiverTimedOut = rx.timedOut(micros());
+    stream_receiverGotNewFrame = rx.gotNewFrame();
 }
 
+void stream_getDsmrx(void)
+{
+    float rawvals[8];
+
+    rx.getChannelValues(rawvals, 8);
+
+    stream_receiverThrottle = rawvals[0];
+    stream_receiverRoll     = rawvals[1];
+    stream_receiverPitch    = rawvals[2];
+    stream_receiverYaw      = rawvals[3];
+    stream_receiverAux1     = rawvals[6];
+    stream_receiverAux2     = rawvals[4];
+}
+
+void stream_ignore(bool timedOut, float aux2)
+{
+}
