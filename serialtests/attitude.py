@@ -18,7 +18,7 @@ class MyParser(MspParser):
         print(angx, angy, heading)
         self.port.write(self.cmd)
 
-PORT = '/dev/ttyS31'
+PORT = '/dev/ttyS69'
 
 port = Serial(PORT, 115200, timeout=1)
 
