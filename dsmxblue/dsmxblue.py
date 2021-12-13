@@ -8,16 +8,15 @@ MIT License
 '''
 
 import pygame
+import socket
 
 JSID = 0
 
-'''
-Axis = 0 yaw
-Axis = 1 throttle
-Axis = 2 roll
-Axis = 4 aux1
-Axis = 5 pitch
-'''
+sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+
+exit(0)
+
+# Axes: 0=yaw 1=throttle 2=roll 4=aux1 5=pitch
 
 pygame.init()
 pygame.joystick.init()
