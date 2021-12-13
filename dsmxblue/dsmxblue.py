@@ -11,6 +11,14 @@ import pygame
 
 JSID = 0
 
+'''
+Axis = 0 yaw
+Axis = 1 throttle
+Axis = 2 roll
+Axis = 4 aux1
+Axis = 5 pitch
+'''
+
 pygame.init()
 pygame.joystick.init()
 joystick = pygame.joystick.Joystick(JSID)
@@ -21,6 +29,6 @@ while True:
 
     try:
         pygame.event.pump()
-        print(joystick.get_axis(0))
+        print(joystick.get_axis(5))
     except KeyboardInterrupt:
         break
