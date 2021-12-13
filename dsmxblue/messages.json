@@ -1,0 +1,10 @@
+{
+  "SET_NORMAL_RC": 
+  [{"ID": 204},
+   {"thr": "float"},
+   {"rol": "float"},
+   {"pit": "float"},
+   {"yaw": "float"},
+   {"aux1": "float"},
+   {"aux2": "float"}]
+ }
