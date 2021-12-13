@@ -19,7 +19,9 @@ sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFC
 
 sock.connect((BLADDR, BLPORT))
 
-exit(0)
+while True:
+
+    sock.send(input('Send something > ').encode('utf8'))
 
 # Axes: 0=yaw 1=throttle 2=roll 4=aux1 5=pitch
 
