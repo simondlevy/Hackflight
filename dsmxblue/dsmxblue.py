@@ -10,7 +10,7 @@ MIT License
 import pygame
 import socket
 
-from parser import MspParser
+# from parser import MspParser
 
 JSID = 0
 
@@ -21,13 +21,8 @@ sock = socket.socket(socket.AF_BLUETOOTH,
                      socket.SOCK_STREAM,
                      socket.BTPROTO_RFCOMM)
 
-sock.connect((BLADDR, BLPORT))
-
-while True:
-
-    sock.send(input('Send something > ').encode('utf8'))
-
-# Axes: 0=yaw 1=throttle 2=roll 4=aux1 5=pitch
+# sock.connect((BLADDR, BLPORT))
+# sock.send(input('Send something > ').encode('utf8'))
 
 pygame.init()
 pygame.joystick.init()
@@ -39,6 +34,16 @@ while True:
 
     try:
         pygame.event.pump()
-        print(joystick.get_axis(5))
+
+        t, r, p, y, a1, a2 = (joystick.get_axis(1),
+                              joystick.get_axis(2),
+                              joystick.get_axis(3),
+                              joystick.get_axis(0),
+                              joystick.get_axis(7),
+                              joystick.get_axis(4))
+
+        print('t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f  a1=%+3.3f  a2=%+3.3f' %
+                (t, r, p, y, a1, a2))
+
     except KeyboardInterrupt:
         break
