@@ -12,7 +12,12 @@ import socket
 
 JSID = 0
 
+BLADDR = '50:02:91:A1:1E:9A'
+BLPORT = 1
+
 sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+
+sock.connect((BLADDR, BLPORT))
 
 exit(0)
 
