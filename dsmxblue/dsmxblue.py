@@ -21,8 +21,7 @@ sock = socket.socket(socket.AF_BLUETOOTH,
                      socket.SOCK_STREAM,
                      socket.BTPROTO_RFCOMM)
 
-# sock.connect((BLADDR, BLPORT))
-# sock.send(input('Send something > ').encode('utf8'))
+sock.connect((BLADDR, BLPORT))
 
 pygame.init()
 pygame.joystick.init()
@@ -44,6 +43,10 @@ while True:
 
         print('t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f  a1=%+3.3f  a2=%+3.3f' %
               (t, r, p, y, a1, a2))
+
+        msg = MspParser.serialize_SET_NORMAL_RC(t, r, p, y, a1, a2)
+
+        sock.send(msg)
 
     except KeyboardInterrupt:
         break
