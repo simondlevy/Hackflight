@@ -9,6 +9,7 @@ MIT License
 
 import pygame
 import socket
+from time import sleep
 
 from mspparser import MspParser
 
@@ -27,11 +28,12 @@ pygame.init()
 pygame.joystick.init()
 joystick = pygame.joystick.Joystick(JSID)
 joystick.init()
-joystick.get_axis(JSID)
 
 while True:
 
     try:
+
+        '''
         pygame.event.pump()
 
         t, r, p, y, a1, a2 = (joystick.get_axis(1),
@@ -43,8 +45,11 @@ while True:
 
         print('t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f  a1=%+3.3f  a2=%+3.3f' %
               (t, r, p, y, a1, a2))
+        '''
 
-        msg = MspParser.serialize_SET_NORMAL_RC(t, r, p, y, a1, a2)
+        t, r, y, p, a1, a2 = 0.5, 0, 0, 0, 0, 0
+
+        msg = MspParser.serialize_SET_NORMAL_RC(t)
 
         sock.send(msg)
 

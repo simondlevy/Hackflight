@@ -119,6 +119,8 @@ class Parser {
             virtual void collectPayload(uint8_t index, uint8_t value) = 0;
             virtual void dispatchMessage(uint8_t type) = 0;
 
+    public:
+
             void begin(void)
             {
                 _outBufChecksum = 0;
@@ -179,6 +181,8 @@ class Parser {
                     : parser_state == IN_PAYLOAD && index < size ? IN_PAYLOAD
                     : parser_state == IN_PAYLOAD ? IDLE
                     : parser_state;
+
+                printf("x%02X: %d\n", c, parser_state);
 
                 // Payload accumulation
                 if (in_payload) {
