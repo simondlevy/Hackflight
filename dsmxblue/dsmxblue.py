@@ -10,7 +10,7 @@ MIT License
 import pygame
 import socket
 
-# from parser import MspParser
+from mspparser import MspParser
 
 JSID = 0
 
@@ -43,7 +43,7 @@ while True:
                               joystick.get_axis(4))
 
         print('t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f  a1=%+3.3f  a2=%+3.3f' %
-                (t, r, p, y, a1, a2))
+              (t, r, p, y, a1, a2))
 
     except KeyboardInterrupt:
         break

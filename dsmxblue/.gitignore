@@ -1,2 +1,4 @@
-parser.py
+*.pyc
+__pycache__/
+mspparser.py
 serialtask.hpp
