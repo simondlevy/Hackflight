@@ -15,7 +15,8 @@ import Copilot.Compile.C99
 
 import Time
 
--- Serial comms
+-- Comms
+import Bluetooth
 import Serial
 import Parser
 
@@ -30,7 +31,7 @@ spec = do
   let (running, starting) = runstate
 
   -- Run the serial comms parser
-  let (msgtype, _, _payindex, _) = parse stream_serial1Available stream_serial1Byte
+  let (msgtype, _, _payindex, _) = parse stream_bluetoothAvailable stream_bluetoothByte
 
   -- Check for incoming SET_NORMAL_RC messages from GCS
   --motor_index = if msgtype == 204 && payindex == 1 then stream_serialByte
@@ -40,13 +41,13 @@ spec = do
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
-  trigger "stream_startSerial1" starting []
+  trigger "stream_startBluetooth" starting []
 
   -- Do some other stuff in loop
   -- trigger "stream_updateTime" running []
   trigger "stream_writeLed" running [arg true]
-  trigger "stream_serial1Update" running []
-  trigger "stream_serial1Read" stream_serial1Available []
+  trigger "stream_bluetoothUpdate" running []
+  trigger "stream_bluetoothRead" stream_bluetoothAvailable []
 
   trigger "stream_debug_uint8" running [arg msgtype]
 
