@@ -6,11 +6,13 @@
 
 SKETCH = TinyPICO
 ROOT = ../../../..
+
 HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
-CPPDIR = $(ROOT)/arduino/cpp
+ADIR = $(ROOT)/arduino
+CPPDIR = $(ADIR)/cpp
 
-HSRC = TinyPICO.hs \
+HSRC = $(SKETCH).hs \
        $(HDIR)/Parser.hs \
        $(HDIR)/Serial.hs \
        $(HDIR)/Time.hs \
@@ -23,19 +25,19 @@ all: hackflight.cpp
 	sed -i 's/extern/EXTERN/g' hackflight.h
 	cat $(CDIR)/header.h hackflight.h > $(SKETCH)/hackflight.h
 	rm hackflight.h
-	cp ../../Hackflight.ino $(SKETCH)/$(SKETCH).ino
+	cp $(ADIR)/Hackflight.ino $(SKETCH)/$(SKETCH).ino
 	cp $(CDIR)/serial.c $(SKETCH)/serial.cpp
 	cp $(CPPDIR)/tinypico_led.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
-	cp $(CPPDIR)/arduino_time.cpp $(SKETCH)
+	# cp $(CPPDIR)/arduino_time.cpp $(SKETCH)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c
 	cat $(CDIR)/header.c tmp.c > hackflight.c
 	rm tmp.c
 
-hackflight.c: $(HSRC) TinyPICO.hs
-	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers TinyPICO.hs
+hackflight.c: $(HSRC) $(SKETCH).hs
+	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers $(SKETCH).hs
 
 clean:
 	rm -f $(SKETCH)/*.h $(SKETCH)/*.cpp

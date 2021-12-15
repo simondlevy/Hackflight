@@ -34,7 +34,8 @@ HSRC = $(SKETCH).hs \
 	   $(CDIR)/serial.c
 
 all: hackflight.cpp
-	mkdir -p $(SKETCH)
+	rm -rf $(SKETCH)
+	mkdir $(SKETCH)
 	cp hackflight.c $(SKETCH)/hackflight.cpp
 	rm hackflight.c
 	sed -i 's/extern/EXTERN/g' hackflight.h

@@ -33,8 +33,8 @@ spec = do
   trigger "stream_startSerial" starting []
 
   -- Do some other stuff in loop
-  trigger "stream_updateTime" running []
-  trigger "stream_writeLed" running []
+  -- trigger "stream_updateTime" running []
+  trigger "stream_writeLed" running [arg true]
   trigger "stream_serialUpdate" running []
   trigger "stream_serial1Read" stream_serialAvailable []
 
