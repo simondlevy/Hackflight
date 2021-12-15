@@ -1,5 +1,5 @@
 /*
-   Arduino serial support
+   Arduino Serial support
 
    Copyright (C) 2021 Simon D. Levy
 

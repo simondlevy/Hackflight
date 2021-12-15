@@ -19,7 +19,8 @@ HSRC = $(SKETCH).hs \
        $(HDIR)/Utils.hs
 
 all: hackflight.cpp
-	mkdir -p $(SKETCH)
+	rm -rf $(SKETCH)
+	mkdir $(SKETCH)
 	cp hackflight.c $(SKETCH)/hackflight.cpp
 	rm hackflight.c
 	sed -i 's/extern/EXTERN/g' hackflight.h
@@ -29,6 +30,8 @@ all: hackflight.cpp
 	cp $(CDIR)/serial.c $(SKETCH)/serial.cpp
 	cp $(CPPDIR)/tinypico_led.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_serial1.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_debug.cpp $(SKETCH)
 	# cp $(CPPDIR)/arduino_time.cpp $(SKETCH)
 
 hackflight.cpp: hackflight.c
