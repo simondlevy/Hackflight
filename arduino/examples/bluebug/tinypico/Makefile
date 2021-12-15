@@ -4,33 +4,18 @@
 #
 # MIT License
 
-ROOT = ../../..
+ROOT = ../../../..
 HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
 
-HSRC = Bluebug.hs \
-       $(HDIR)/HackflightFull.hs \
-       $(HDIR)/Receiver.hs \
-       $(HDIR)/Demands.hs \
-       $(HDIR)/PidController.hs \
-       $(HDIR)/Safety.hs \
+HSRC = TinyPICO.hs \
        $(HDIR)/Parser.hs \
        $(HDIR)/Serial.hs \
-       $(HDIR)/Messages.hs \
        $(HDIR)/Time.hs \
-       $(HDIR)/Mixers.hs \
-       $(HDIR)/Motors.hs \
-       $(HDIR)/Utils.hs \
-	   $(HDIR)/sensors/Gyrometer.hs \
-	   $(HDIR)/sensors/Quaternion.hs \
-       $(HDIR)/pidcontrollers/RatePid.hs \
-       $(HDIR)/pidcontrollers/YawPid.hs \
-       $(HDIR)/pidcontrollers/LevelPid.hs \
-	   $(CDIR)/motors.c \
-	   $(CDIR)/serial.c
+       $(HDIR)/Utils.hs
 
 
-DSTDIR = ../../Hackflight
+DSTDIR = TinyPICO
 CPPDIR = ../../cpp
 
 all: hackflight.cpp

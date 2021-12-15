@@ -7,6 +7,8 @@
 ROOT = ../../..
 HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
+CPPDIR = $(ROOT)/arduino/cpp
+DSTDIR = Ladybug
 
 HSRC = Ladybug.hs \
        $(HDIR)/HackflightFull.hs \
@@ -28,10 +30,6 @@ HSRC = Ladybug.hs \
        $(HDIR)/pidcontrollers/LevelPid.hs \
 	   $(CDIR)/motors.c \
 	   $(CDIR)/serial.c
-
-
-DSTDIR = Ladybug
-CPPDIR = ../../cpp
 
 all: hackflight.cpp
 	mkdir -p $(DSTDIR)
@@ -60,4 +58,4 @@ hackflight.c: $(HSRC) Ladybug.hs
 	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Ladybug.hs
 
 clean:
-	rm -f $(DSTDIR)/*.h $(DSTDIR)/*.cpp
+	rm -rf $(DSTDIR)
