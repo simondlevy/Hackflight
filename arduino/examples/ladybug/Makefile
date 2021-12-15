@@ -4,13 +4,13 @@
 #
 # MIT License
 
+SKETCH = Ladybug
 ROOT = ../../..
 HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
 CPPDIR = $(ROOT)/arduino/cpp
-DSTDIR = Ladybug
 
-HSRC = Ladybug.hs \
+HSRC = $(SKETCH).hs \
        $(HDIR)/HackflightFull.hs \
        $(HDIR)/Receiver.hs \
        $(HDIR)/Demands.hs \
@@ -32,30 +32,30 @@ HSRC = Ladybug.hs \
 	   $(CDIR)/serial.c
 
 all: hackflight.cpp
-	mkdir -p $(DSTDIR)
-	cp hackflight.c $(DSTDIR)/hackflight.cpp
+	mkdir -p $(SKETCH)
+	cp hackflight.c $(SKETCH)/hackflight.cpp
 	rm hackflight.c
 	sed -i 's/extern/EXTERN/g' hackflight.h
-	cat $(CDIR)/header.h hackflight.h > $(DSTDIR)/hackflight.h
+	cat $(CDIR)/header.h hackflight.h > $(SKETCH)/hackflight.h
 	rm hackflight.h
-	cp $(CDIR)/motors.c $(DSTDIR)/motors.cpp
-	cp $(CDIR)/serial.c $(DSTDIR)/serial.cpp
-	cp $(CPPDIR)/arduino_dsmrx.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_i2c.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_led.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_motors.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_serial.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_time.cpp $(DSTDIR)
-	cp $(CPPDIR)/arduino_usfs.cpp $(DSTDIR)
-	cp ../../Hackflight.ino $(DSTDIR)/Ladybug.ino
+	cp $(CDIR)/motors.c $(SKETCH)/motors.cpp
+	cp $(CDIR)/serial.c $(SKETCH)/serial.cpp
+	cp $(CPPDIR)/arduino_dsmrx.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_i2c.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_led.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_motors.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_time.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_usfs.cpp $(SKETCH)
+	cp ../../Hackflight.ino $(SKETCH)/$(SKETCH).ino
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c
 	cat $(CDIR)/header.c tmp.c > hackflight.c
 	rm tmp.c
 
-hackflight.c: $(HSRC) Ladybug.hs
-	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Ladybug.hs
+hackflight.c: $(HSRC) $(SKETCH).hs
+	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers $(SKETCH).hs
 
 clean:
-	rm -rf $(DSTDIR)
+	rm -rf $(SKETCH)
