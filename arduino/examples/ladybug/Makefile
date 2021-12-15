@@ -6,9 +6,11 @@
 
 SKETCH = Ladybug
 ROOT = ../../..
+
 HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
-CPPDIR = $(ROOT)/arduino/cpp
+ADIR = $(ROOT)/arduino
+CPPDIR = $(ADIR)/cpp
 
 HSRC = $(SKETCH).hs \
        $(HDIR)/HackflightFull.hs \
@@ -38,6 +40,7 @@ all: hackflight.cpp
 	sed -i 's/extern/EXTERN/g' hackflight.h
 	cat $(CDIR)/header.h hackflight.h > $(SKETCH)/hackflight.h
 	rm hackflight.h
+	cp $(ADIR)/Hackflight.ino $(SKETCH)/$(SKETCH).ino
 	cp $(CDIR)/motors.c $(SKETCH)/motors.cpp
 	cp $(CDIR)/serial.c $(SKETCH)/serial.cpp
 	cp $(CPPDIR)/arduino_dsmrx.cpp $(SKETCH)
@@ -47,7 +50,6 @@ all: hackflight.cpp
 	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_time.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_usfs.cpp $(SKETCH)
-	cp ../../Hackflight.ino $(SKETCH)/$(SKETCH).ino
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c

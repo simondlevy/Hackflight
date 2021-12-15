@@ -31,7 +31,6 @@ spec = do
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
-  trigger "stream_startLed" starting [arg led_pin]
 
   -- Do some other stuff in loop
   trigger "stream_updateTime" running []
