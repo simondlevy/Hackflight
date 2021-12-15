@@ -30,10 +30,11 @@ HSRC = Ladybug.hs \
 	   $(CDIR)/serial.c
 
 
-DSTDIR = ../../Hackflight
+DSTDIR = Ladybug
 CPPDIR = ../../cpp
 
 all: hackflight.cpp
+	mkdir -p $(DSTDIR)
 	cp hackflight.c $(DSTDIR)/hackflight.cpp
 	rm hackflight.c
 	sed -i 's/extern/EXTERN/g' hackflight.h
@@ -48,6 +49,7 @@ all: hackflight.cpp
 	cp $(CPPDIR)/arduino_serial.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_time.cpp $(DSTDIR)
 	cp $(CPPDIR)/arduino_usfs.cpp $(DSTDIR)
+	cp ../../Hackflight.ino $(DSTDIR)/Ladybug.ino
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c

@@ -10,6 +10,7 @@ MIT License
 import pygame
 import socket
 from time import sleep
+from sys import stdout
 
 from mspparser import MspParser
 
@@ -47,11 +48,17 @@ while True:
               (t, r, p, y, a1, a2))
         '''
 
-        t, r, y, p, a1, a2 = 0.5, 0, 0, 0, 0, 0
+        t, r, y, p, a1, a2 = 0.75, 0, 0, 0, 0, 0
 
         msg = MspParser.serialize_SET_NORMAL_RC(t)
 
         sock.send(msg)
+
+        for b in msg:
+            print('x%02X' % b)
+        print()
+        stdout.flush()
+        sleep(1)
 
     except KeyboardInterrupt:
         break

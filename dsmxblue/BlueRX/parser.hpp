@@ -182,7 +182,7 @@ class Parser {
                     : parser_state == IN_PAYLOAD ? IDLE
                     : parser_state;
 
-                printf("x%02X: %d\n", c, parser_state);
+                printf("x%02X: %d | x%02x\n", c, parser_state, crc);
 
                 // Payload accumulation
                 if (in_payload) {
@@ -191,6 +191,7 @@ class Parser {
 
                 // Message dispatch
                 if (parser_state == IDLE && crc == c) {
+                    printf("dispatch: %d\n", type);
                     dispatchMessage(type);
                 }
 
