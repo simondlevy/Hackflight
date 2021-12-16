@@ -31,7 +31,7 @@ spec = do
   let (running, starting) = runstate
 
   -- Run the serial comms parser
-  let (msgtype, _, _payindex, _) = parse stream_bluetoothAvailable stream_bluetoothByte
+  let (msgtype, _, payindex, checked) = parse stream_bluetoothAvailable stream_bluetoothByte
 
   -- Check for incoming SET_NORMAL_RC messages from GCS
   --motor_index = if msgtype == 204 && payindex == 1 then stream_serialByte
@@ -49,7 +49,7 @@ spec = do
   trigger "stream_bluetoothUpdate" running []
   trigger "stream_bluetoothRead" stream_bluetoothAvailable []
 
-  trigger "stream_debug_uint8" running [arg msgtype]
+  trigger "stream_debug" (payindex > 0) [arg checked, arg msgtype, arg payindex, arg stream_bluetoothByte]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

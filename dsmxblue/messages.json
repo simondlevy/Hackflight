@@ -1,5 +1,5 @@
 {
-  "SET_NORMAL_RC": 
+  "SET_RC": 
   [{"ID": 204},
-   {"thr": "float"}]
+   {"thr": "short"}]
  }

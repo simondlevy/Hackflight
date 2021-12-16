@@ -48,9 +48,9 @@ while True:
               (t, r, p, y, a1, a2))
         '''
 
-        t, r, y, p, a1, a2 = 0.75, 0, 0, 0, 0, 0
+        t, r, y, p, a1, a2 = 1500, 0, 0, 0, 0, 0
 
-        msg = MspParser.serialize_SET_NORMAL_RC(t)
+        msg = MspParser.serialize_SET_RC(t)
 
         sock.send(msg)
 
