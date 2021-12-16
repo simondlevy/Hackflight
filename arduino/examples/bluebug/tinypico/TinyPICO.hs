@@ -12,6 +12,7 @@ module Bluebug where
 
 import Language.Copilot
 import Copilot.Compile.C99
+import Copilot.Language.Operators.BitWise((.<<.), (.|.))
 
 import Time
 
@@ -23,6 +24,8 @@ import Parser
 -- Misc
 import Utils
 
+s8 = 8 :: SWord8
+
 ------------------------------------------------------------
 
 spec = do
@@ -30,8 +33,16 @@ spec = do
   -- Get flags for startup, loop
   let (running, starting) = runstate
 
+  -- Shorthand
+  let byte = stream_bluetoothByte
+
   -- Run the serial comms parser
-  let (msgtype, _, payindex, checked) = parse stream_bluetoothAvailable stream_bluetoothByte
+  let (msgtype, _, payindex, checked) = parse stream_bluetoothAvailable byte
+
+  let chan1 = if payindex == 1 then cast byte
+              else if payindex == 2 then chan1' .|. ((cast byte) .<<. s8)
+              else chan1'
+              where chan1' = [0] ++ chan1 :: SWord16
 
   -- Check for incoming SET_NORMAL_RC messages from GCS
   --motor_index = if msgtype == 204 && payindex == 1 then stream_serialByte
@@ -49,7 +60,9 @@ spec = do
   trigger "stream_bluetoothUpdate" running []
   trigger "stream_bluetoothRead" stream_bluetoothAvailable []
 
-  trigger "stream_debug" (payindex > 0) [arg checked, arg msgtype, arg payindex, arg stream_bluetoothByte]
+  -- trigger "stream_debug" checked [arg chan1]
+  trigger "stream_debug" (payindex == 2) [arg chan1]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
+

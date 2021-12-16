@@ -9,12 +9,12 @@
 
 #include <Arduino.h>
 
-void stream_debug(bool checked, uint8_t msgtype, uint8_t index, uint8_t byte)
+void stream_debug(uint16_t value)
 {
-    printf("checked: %d | msgtype: %d | index: %d | byte: x%02X\n", 
-            checked, msgtype, index, byte);
+    printf("x%04x\n", value);
+}
 
-    if (checked) {
-        printf("\n");
-    }
+void stream_debug2(uint8_t index, uint8_t byte)
+{
+    printf("%d  x%02X\n", index, byte);
 }
