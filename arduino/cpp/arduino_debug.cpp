@@ -18,7 +18,7 @@ void stream_debug(uint8_t byte)
     printf("x%02X\t", byte);
 }
 
-void stream_debug2(uint8_t index, uint8_t byte)
+void stream_debug2(uint16_t value)
 {
-    printf("%d  x%02X\n", index, byte);
+    printf("%d\n", value);
 }

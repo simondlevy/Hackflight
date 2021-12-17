@@ -53,9 +53,8 @@ spec = do
   trigger "stream_bluetoothRead" (running && stream_bluetoothAvailable) []
 
 
-  -- trigger "stream_debug" checked [arg chan1]
-  -- trigger "stream_debug" (payindex == 2) [arg chan1]
-  trigger "stream_debug" (running && avail) [arg byte]
+  trigger "stream_debug2" checked [arg chan1]
+  -- trigger "stream_debug" (running && avail) [arg byte]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
