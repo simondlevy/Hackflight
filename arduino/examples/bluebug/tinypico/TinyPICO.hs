@@ -37,6 +37,12 @@ spec = do
   -- Run the serial comms parser
   let (msgtype, _, payindex, checked) = parse avail byte
 
+  let chan1 = if payindex == 1 then cast byte
+              else if payindex == 2 then chan1' .|. ((cast byte) .<<. s8)
+              else chan1'
+              where chan1' = [0] ++ chan1 :: SWord16
+                    s8 = 8 :: SWord8
+
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
   trigger "stream_startBluetooth" starting []
