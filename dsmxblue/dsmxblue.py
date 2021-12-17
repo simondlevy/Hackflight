@@ -44,7 +44,7 @@ while True:
 
         # print('t=%4d  r=%4d  p=%4d  y=%4d  a1=%4d  a2=%4d'% (t, r, p, y, a1, a2))
 
-        msg = MspParser.serialize_SET_RC(t, r)
+        msg = MspParser.serialize_SET_RC(t, r, p, y, a1, a2)
 
         sock.send(msg)
 

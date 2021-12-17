@@ -1,7 +1,10 @@
 {
   "SET_RC": 
   [{"ID": 204},
-   {"thr": "short"},
-   {"rol": "short"}
-  ]
+   {"c1": "short"},
+   {"c2": "short"},
+   {"c3": "short"},
+   {"c4": "short"},
+   {"c5": "short"},
+   {"c6": "short"} ]
  }
