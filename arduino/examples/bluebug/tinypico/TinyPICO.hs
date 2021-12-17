@@ -43,6 +43,12 @@ spec = do
               where chan1' = [0] ++ chan1 :: SWord16
                     s8 = 8 :: SWord8
 
+  let chan2 = if payindex == 3 then cast byte
+              else if payindex == 4 then chan2' .|. ((cast byte) .<<. s8)
+              else chan2'
+              where chan2' = [0] ++ chan2 :: SWord16
+                    s8 = 8 :: SWord8
+
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
   trigger "stream_startBluetooth" starting []
@@ -53,8 +59,8 @@ spec = do
   trigger "stream_bluetoothRead" (running && stream_bluetoothAvailable) []
 
 
-  trigger "stream_debug2" checked [arg chan1]
-  -- trigger "stream_debug" (running && avail) [arg byte]
+  trigger "stream_debug2" checked [arg chan1, arg chan2]
+  --trigger "stream_debug" (running && avail) [arg byte]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
