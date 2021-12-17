@@ -23,31 +23,28 @@ sock = socket.socket(socket.AF_BLUETOOTH,
                      socket.SOCK_STREAM,
                      socket.BTPROTO_RFCOMM)
 
-sock.connect((BLADDR, BLPORT))
+# sock.connect((BLADDR, BLPORT))
 
 pygame.init()
 pygame.joystick.init()
 joystick = pygame.joystick.Joystick(JSID)
 joystick.init()
 
+def scale(axis):
+
+    return int(1000 * (1 + (joystick.get_axis(axis)+1)/2))
+
 while True:
 
     try:
 
-        '''
         pygame.event.pump()
 
-        t, r, p, y, a1, a2 = (joystick.get_axis(1),
-                              joystick.get_axis(2),
-                              joystick.get_axis(3),
-                              joystick.get_axis(0),
-                              joystick.get_axis(7),
-                              joystick.get_axis(4))
+        t, r, p, y, a1, a2 = scale(1), scale(2), scale(3), scale(0), scale(7), scale(4)
 
-        print('t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f  a1=%+3.3f  a2=%+3.3f' %
-              (t, r, p, y, a1, a2))
+        print('t=%4d  r=%4d  p=%4d  y=%4d  a1=%4d  a2=%4d'% (t, r, p, y, a1, a2))
+
         '''
-
         t, r, y, p, a1, a2 = 1500, 0, 0, 0, 0, 0
 
         msg = MspParser.serialize_SET_RC(t)
@@ -59,6 +56,7 @@ while True:
         print()
         stdout.flush()
         sleep(1)
+        '''
 
     except KeyboardInterrupt:
         break
