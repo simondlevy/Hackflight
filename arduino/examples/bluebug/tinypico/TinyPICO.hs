@@ -34,15 +34,22 @@ spec = do
   let (running, starting) = runstate
 
   -- Shorthand
+  let avail = stream_bluetoothAvailable
   let byte = stream_bluetoothByte
 
   -- Run the serial comms parser
-  let (msgtype, _, payindex, checked) = parse stream_bluetoothAvailable byte
+  let (msgtype, _, payindex, checked) = parse avail byte
 
+  let chan1 = if payindex == 1 then byte
+              else chan1'
+              where chan1' = [0] ++ chan1 :: SWord8
+
+{--
   let chan1 = if payindex == 1 then cast byte
               else if payindex == 2 then chan1' .|. ((cast byte) .<<. s8)
               else chan1'
               where chan1' = [0] ++ chan1 :: SWord16
+--}
 
   -- Check for incoming SET_NORMAL_RC messages from GCS
   --motor_index = if msgtype == 204 && payindex == 1 then stream_serialByte
@@ -60,9 +67,10 @@ spec = do
   trigger "stream_bluetoothUpdate" running []
   trigger "stream_bluetoothRead" stream_bluetoothAvailable []
 
+
   -- trigger "stream_debug" checked [arg chan1]
   -- trigger "stream_debug" (payindex == 2) [arg chan1]
-  trigger "stream_debug" checked [arg chan1]
+  trigger "stream_debug" avail [arg byte]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

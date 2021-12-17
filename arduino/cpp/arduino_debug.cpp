@@ -9,9 +9,9 @@
 
 #include <Arduino.h>
 
-void stream_debug(uint16_t value)
+void stream_debug(uint8_t byte)
 {
-    printf("x%04x\n", value);
+    printf("%d\n", byte);
 }
 
 void stream_debug2(uint8_t index, uint8_t byte)
