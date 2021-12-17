@@ -11,7 +11,11 @@
 
 void stream_debug(uint8_t byte)
 {
-    printf("%d\n", byte);
+    if (byte == '$') {
+        printf("\n");
+    }
+
+    printf("x%02X\t", byte);
 }
 
 void stream_debug2(uint8_t index, uint8_t byte)
