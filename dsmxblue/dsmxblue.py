@@ -32,8 +32,7 @@ joystick.init()
 
 def scale(axis):
 
-    # return int(1000 * (1 + (joystick.get_axis(axis)+1)/2))
-    return int(256 * (joystick.get_axis(axis)+1) / 2)
+    return int(1000 * (1 + (joystick.get_axis(axis)+1)/2))
 
 while True:
 
