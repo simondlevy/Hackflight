@@ -34,6 +34,9 @@ spec = do
   let avail = stream_bluetoothAvailable
   let byte = stream_bluetoothByte
 
+  -- Run the serial comms parser
+  let (msgtype, _, payindex, checked) = parse avail byte
+
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
   trigger "stream_startBluetooth" starting []
