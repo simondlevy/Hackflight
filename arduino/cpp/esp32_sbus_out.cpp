@@ -10,12 +10,12 @@
 
 SbusTx sbus_out(&Serial2);
 
-void stream_startSbusOut(uint8_t rxpin, uint8_t txpin) {
+void stream_sbusOutStart(uint8_t rxpin, uint8_t txpin) {
 
     sbus_out.Begin(rxpin, txpin);
 }
 
-void stream_writeSbus(
+void stream_sbusWrite(
         float ch01,
         float ch02,
         float ch03,

@@ -12,7 +12,7 @@ extern bool stream_bluetoothAvailable;
 
 static BluetoothSerial SerialBT;
 
-void stream_startBluetooth(void)
+void stream_bluetoothStart(void)
 {
     SerialBT.begin("ESP32test3"); //Bluetooth device name
 }

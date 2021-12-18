@@ -68,24 +68,24 @@ spec = do
   let (msgbuff, motors, led) = hackflight receiver sensors pidfuns QuadXMW
 
   -- Do some stuff at startup
-  trigger "stream_startSerial" starting []
-  trigger "stream_startSerial1" starting []
-  trigger "stream_startI2C" starting []
-  trigger "stream_startUsfs" starting []
-  trigger "stream_startBrushedMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
-  trigger "stream_startLed" starting [arg led_pin]
+  trigger "stream_serialStart" starting []
+  trigger "stream_serial1Start" starting []
+  trigger "stream_i2cStart" starting []
+  trigger "stream_usfsStart" starting []
+  trigger "stream_brushedMotorsStart" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
+  trigger "stream_ledStart" starting [arg led_pin]
 
   -- Update UART
-  trigger "stream_startSerial1" starting []
+  trigger "stream_serial1Update" running []
 
   -- Update IMU
-  trigger "stream_updateUsfs" running []
+  trigger "stream_usfsUpdate" running []
 
   -- Update time
-  trigger "stream_updateTime" running []
+  trigger "stream_timeUpdate" running []
 
   -- Update LED
-  trigger "stream_writeLed" running [arg led_pin, arg led]
+  trigger "stream_ledWrite" running [arg led_pin, arg led]
 
   -- Communicate with GCS
   trigger "stream_serialUpdate" running []
@@ -106,7 +106,7 @@ spec = do
                                       , arg $ val05 msgbuff
                                       ]
   -- Run motors
-  trigger "stream_writeBrushedMotors" true [
+  trigger "stream_brushedMotorsWrite" true [
                                               arg m1_pin
                                             , arg m2_pin
                                             , arg m3_pin

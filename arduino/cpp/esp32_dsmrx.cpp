@@ -28,20 +28,20 @@ static void coreTask(void * params)
     } 
 }
 
-void stream_startDsmrx(uint8_t rxpin, uint8_t txpin)
+void stream_dsmrxStart(uint8_t rxpin, uint8_t txpin)
 {
     Serial1.begin(115000, SERIAL_8N1, rxpin, txpin);
     TaskHandle_t task;
     xTaskCreatePinnedToCore(coreTask, "Task", 10000, NULL, 1, &task, 0); 
 }
 
-void stream_updateDsmrx(void)
+void stream_dsmrxUpdate(void)
 {
     stream_receiverTimedOut = rx.timedOut(micros());
     stream_receiverGotNewFrame = rx.gotNewFrame();
 }
 
-void stream_getDsmrx(void)
+void stream_dsmrxGet(void)
 {
     float rawvals[8];
 
@@ -54,4 +54,3 @@ void stream_getDsmrx(void)
     stream_receiverAux1     = rawvals[6];
     stream_receiverAux2     = rawvals[4];
 }
-

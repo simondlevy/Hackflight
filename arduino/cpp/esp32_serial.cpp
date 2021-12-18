@@ -12,7 +12,7 @@
 extern uint8_t stream_serialByte; 
 extern bool stream_serialAvailable; 
 
-void stream_startSerial1(uint8_t rxpin, uint8_t txpin)
+void stream_serial1Start(uint8_t rxpin, uint8_t txpin)
 {
     Serial1.begin(115200, SERIAL_8N1, rxpin, txpin);
 }

@@ -58,9 +58,9 @@ spec = do
   -- let chan6 = getChannel byte payindex 6 chan6' where chan6' = [0] ++ chan6 
 
   -- At startup, initiate serial debugging, UART, and Bluetooth
-  trigger "stream_startSerial" starting []
-  trigger "stream_startSerial1" starting [ arg rx_pin, arg tx_pin]
-  trigger "stream_startBluetooth" starting []
+  trigger "stream_serialStart" starting []
+  trigger "stream_serial1Start" starting [ arg rx_pin, arg tx_pin]
+  trigger "stream_bluetoothStart" starting []
 
   -- In loop, update Bluetooth
   trigger "stream_bluetoothUpdate" running []

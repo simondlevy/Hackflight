@@ -25,18 +25,18 @@ void serialEvent1(void)
     }
 }
 
-void stream_startDsmrx(void)
+void stream_dsmrxStart(void)
 {
     Serial1.begin(115200);
 }
 
-void stream_updateDsmrx(void)
+void stream_dsmrxUpdate(void)
 {
     stream_receiverTimedOut = rx.timedOut(micros());
     stream_receiverGotNewFrame = rx.gotNewFrame();
 }
 
-void stream_getDsmrx(void)
+void stream_dsmrxGet(void)
 {
     float rawvals[8];
 

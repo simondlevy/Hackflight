@@ -41,13 +41,13 @@ spec = do
   let (running, starting) = runstate
 
   -- Do some stuff at startup
-  trigger "stream_startDsmrx" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
-  trigger "stream_startSbusOut" starting [ arg sbus_out_rx_pin, arg sbus_out_tx_pin]
+  trigger "stream_dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
+  trigger "stream_sbusOutStart" starting [ arg sbus_out_rx_pin, arg sbus_out_tx_pin]
 
   -- Do some other stuff in loop
-  trigger "stream_updateDsmrx" running []
-  trigger "stream_getDsmrx" receiverGotNewFrame []
-  trigger "stream_writeSbus" running [  arg $ scale receiverThrottle  
+  trigger "stream_dsmrxUpdate" running []
+  trigger "stream_dsmrxGet" receiverGotNewFrame []
+  trigger "stream_sbusWrite" running [  arg $ scale receiverThrottle  
                                       , arg $ scale receiverRoll  
                                       , arg $ scale receiverPitch  
                                       , arg $ scale receiverYaw  

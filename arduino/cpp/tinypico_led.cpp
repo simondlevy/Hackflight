@@ -8,7 +8,7 @@
 
 #include <TinyPICO.h>
 
-void stream_writeLed(bool value)
+void stream_ledWrite(bool value)
 {
     static TinyPICO tp;
 
