@@ -1,5 +1,5 @@
 {--
-  Support for Ladybug flight controller with DSMX receiver
+  Support for Ladybug flight controller getting RX messages over UART
 
   Copyright(C) 2021 on D.Levy
 
@@ -69,24 +69,27 @@ spec = do
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
+  trigger "stream_startSerial1" starting []
   trigger "stream_startI2C" starting []
-  trigger "stream_startDsmrx" starting []
   trigger "stream_startUsfs" starting []
   trigger "stream_startBrushedMotors" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
   trigger "stream_startLed" starting [arg led_pin]
 
-  -- Update receiver in loop
-  trigger "stream_updateDsmrx" running []
-  trigger "stream_getDsmrx" receiverGotNewFrame []
+  -- Update UART
+  trigger "stream_startSerial1" starting []
 
-  -- Do some other stuff in loop
+  -- Update IMU
   trigger "stream_updateUsfs" running []
+
+  -- Update time
   trigger "stream_updateTime" running []
+
+  -- Update LED
   trigger "stream_writeLed" running [arg led_pin, arg led]
+
+  -- Communicate with GCS
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" stream_serialAvailable []
-
-  -- Send message to GCS if indicated
   trigger "stream_serialSend" (sending msgbuff) [ 
                                         arg $ hdr0 msgbuff
                                       , arg $ hdr1 msgbuff

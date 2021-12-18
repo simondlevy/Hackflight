@@ -33,7 +33,6 @@ all: hackflight.cpp
 	cp $(CPPDIR)/esp32_serial.cpp $(SKETCH)
 	cp $(CPPDIR)/esp32_bluetooth.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_debug.cpp $(SKETCH)
-	# cp $(CPPDIR)/arduino_time.cpp $(SKETCH)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c

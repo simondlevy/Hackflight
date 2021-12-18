@@ -45,37 +45,36 @@ spec = do
   -- Get flags for startup, loop
   let (running, starting) = runstate
 
-  -- Shorthand
-  let avail = stream_bluetoothAvailable
-  let byte = stream_bluetoothByte
-
   -- Run the serial comms parser
-  let (msgtype, _, payindex, checked) = parse avail byte
+  -- let (msgtype, _, payindex, checked) = parse stream_bluetoothAvailable
+  --                                             stream_bluetoothByte
 
   -- Get channel values
-  let chan1 = getChannel byte payindex 1 chan1' where chan1' = [0] ++ chan1 
-  let chan2 = getChannel byte payindex 2 chan2' where chan2' = [0] ++ chan2 
-  let chan3 = getChannel byte payindex 3 chan3' where chan3' = [0] ++ chan3 
-  let chan4 = getChannel byte payindex 4 chan4' where chan4' = [0] ++ chan4 
-  let chan5 = getChannel byte payindex 5 chan5' where chan5' = [0] ++ chan5 
-  let chan6 = getChannel byte payindex 6 chan6' where chan6' = [0] ++ chan6 
+  -- let chan1 = getChannel byte payindex 1 chan1' where chan1' = [0] ++ chan1 
+  -- let chan2 = getChannel byte payindex 2 chan2' where chan2' = [0] ++ chan2 
+  -- let chan3 = getChannel byte payindex 3 chan3' where chan3' = [0] ++ chan3 
+  -- let chan4 = getChannel byte payindex 4 chan4' where chan4' = [0] ++ chan4 
+  -- let chan5 = getChannel byte payindex 5 chan5' where chan5' = [0] ++ chan5 
+  -- let chan6 = getChannel byte payindex 6 chan6' where chan6' = [0] ++ chan6 
 
-  -- Do some stuff at startup
+  -- At startup, initiate serial debugging, UART, and Bluetooth
   trigger "stream_startSerial" starting []
   trigger "stream_startSerial1" starting [ arg rx_pin, arg tx_pin]
   trigger "stream_startBluetooth" starting []
 
-  -- Do some other stuff in loop
+  -- In loop, update Bluetooth
   trigger "stream_bluetoothUpdate" running []
   trigger "stream_bluetoothRead" (running && stream_bluetoothAvailable) []
 
-  trigger "stream_debug" checked [  arg chan1
-                                  , arg chan2
-                                  , arg chan3
-                                  , arg chan4
-                                  , arg chan5
-                                  , arg chan6]
+  -- For now, just relay bytes from Bluetooth to UART
+  trigger "stream_serial1Write" stream_bluetoothAvailable [arg stream_bluetoothByte]
+
+  -- trigger "stream_debug" checked [  arg chan1
+  --                                 , arg chan2
+  --                                 , arg chan3
+  --                                , arg chan4
+  --                                , arg chan5
+  --                                , arg chan6]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
-
