@@ -33,3 +33,16 @@ void stream_serial1Update(void)
 {
     stream_serial1Available = Serial1.available();
 }
+
+void stream_serial1Debug(void)
+{
+    static bool running;
+
+    if (running) {
+        printf("x%02X\n", Serial1.read());
+    }
+    else {
+        Serial1.begin(115200);
+        running = true;
+    }
+}

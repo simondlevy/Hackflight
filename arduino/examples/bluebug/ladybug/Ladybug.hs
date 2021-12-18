@@ -28,12 +28,14 @@ spec = do
 
   -- Do some stuff at startup
   trigger "stream_serialStart" starting []
-  trigger "stream_serial1Start" starting []
+  --trigger "stream_serial1Start" starting []
 
   -- Update UART
-  trigger "stream_serial1Update" running []
+  --trigger "stream_serial1Update" running []
 
-  trigger "stream_debug" (running && stream_serial1Available) [arg stream_serial1Byte]
+  --trigger "stream_debug" (running && stream_serial1Available) [arg stream_serial1Byte]
+
+  trigger "stream_serial1Debug" true []
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
