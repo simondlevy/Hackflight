@@ -86,7 +86,7 @@ spec = do
   trigger "stream_serialUpdate" running []
   trigger "stream_serialRead" stream_serialAvailable []
 
-  -- Send message to GCS if indicated
+  -- Send reply to GCS if indicated
   trigger "stream_serialSend" (sending msgbuff) [ 
                                         arg $ hdr0 msgbuff
                                       , arg $ hdr1 msgbuff

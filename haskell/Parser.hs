@@ -34,9 +34,9 @@ data MessageBuffer = MessageBuffer {  sending :: SBool
                                     , val05   :: SFloat
                                     }
 
-message :: SBool -> SWord8 -> State -> MessageBuffer
+reply :: SBool -> SWord8 -> State -> MessageBuffer
 
-message sending msgtype vstate =
+reply sending msgtype vstate =
 
   let (paysize, val00, val01, val02, val03, val04, val05) = payload msgtype vstate
 

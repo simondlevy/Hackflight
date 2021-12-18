@@ -50,11 +50,11 @@ hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
     -- Blink LED during first couple of seconds; keep it solid when armed
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
 
-    -- Run the serial comms parser
+    -- Run the serial comms parser checking for data requests
     (msgtype, sending, payindex, _checked) = parse stream_serialAvailable stream_serialByte
 
-    -- Convert the message into a buffer to send to GCS
-    msgbuff = message sending msgtype state
+    -- Reply with a message to GCS if indicated
+    msgbuff = reply sending msgtype state
 
     -- Check for incoming SET_MOTOR messages from GCS
     motor_index = if msgtype == 215 && payindex == 1 then stream_serialByte
