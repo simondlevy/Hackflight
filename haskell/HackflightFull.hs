@@ -41,8 +41,7 @@ hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
     -- Check safety (arming / failsafe)
     (armed, failsafe, cut) = safety rdemands state
 
-    -- Periodically get the demands by composing the PID controllers over the receiver
-    -- demands
+    -- Periodically get demands by composing PID controllers over receiver demands
     (_, _, pdemands) = compose pidfuns (state, timerReady 300, rdemands)
 
     -- Run mixer on demands to get motor values
@@ -65,4 +64,3 @@ hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
 
     -- Set motors based on arming state and whether we have GCS input
     motors = (motorfun mixer) motors' armed motor_index motor_percent
-
