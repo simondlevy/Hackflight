@@ -30,6 +30,7 @@ all: hackflight.cpp
 	cp $(CDIR)/serial.c $(SKETCH)/serial.cpp
 	cp $(CPPDIR)/tinypico_led.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
+	cp $(CPPDIR)/esp32_serial.cpp $(SKETCH)
 	cp $(CPPDIR)/esp32_bluetooth.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_debug.cpp $(SKETCH)
 	# cp $(CPPDIR)/arduino_time.cpp $(SKETCH)

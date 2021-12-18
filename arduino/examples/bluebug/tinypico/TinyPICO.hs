@@ -23,7 +23,11 @@ import Parser
 -- Misc
 import Utils
 
-------------------------------------------------------------
+-- Pins
+rx_pin = 4 :: SWord8
+tx_pin = 14 :: SWord8
+
+-- Helper
 
 getChannel :: SWord8 -> SWord8 -> SWord8 -> SWord16 -> SWord16
 
@@ -34,7 +38,7 @@ getChannel byte payindex tgtindex chanval' = chanval where
                 where k = tgtindex * 2 - 1
                       s8 = 8 :: SWord8
 
-------------------------------------------------------------
+-- Main
 
 spec = do
 
@@ -58,10 +62,10 @@ spec = do
 
   -- Do some stuff at startup
   trigger "stream_startSerial" starting []
+  trigger "stream_startSerial1" starting [ arg rx_pin, arg tx_pin]
   trigger "stream_startBluetooth" starting []
 
   -- Do some other stuff in loop
-  -- trigger "stream_updateTime" running []
   trigger "stream_bluetoothUpdate" running []
   trigger "stream_bluetoothRead" (running && stream_bluetoothAvailable) []
 
