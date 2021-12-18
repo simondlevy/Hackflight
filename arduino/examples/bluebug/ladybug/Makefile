@@ -42,15 +42,10 @@ all: hackflight.cpp
 	cat $(CDIR)/header.h hackflight.h > $(SKETCH)/hackflight.h
 	rm hackflight.h
 	cp $(ADIR)/Hackflight.ino $(SKETCH)/$(SKETCH).ino
-	cp $(CDIR)/motors.c $(SKETCH)/motors.cpp
 	cp $(CDIR)/serial.c $(SKETCH)/serial.cpp
-	cp $(CPPDIR)/arduino_dsmrx.cpp $(SKETCH)
-	cp $(CPPDIR)/arduino_i2c.cpp $(SKETCH)
-	cp $(CPPDIR)/arduino_led.cpp $(SKETCH)
-	cp $(CPPDIR)/arduino_motors.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
-	cp $(CPPDIR)/arduino_time.cpp $(SKETCH)
-	cp $(CPPDIR)/arduino_usfs.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_serial1.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_debug.cpp $(SKETCH)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c

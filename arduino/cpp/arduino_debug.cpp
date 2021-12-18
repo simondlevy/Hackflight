@@ -9,7 +9,13 @@
 
 #include <Arduino.h>
 
-void stream_debug(
+void stream_debug(uint8_t byte)
+{
+    static uint32_t count;
+    printf("%05d: x%02X\n", count++, byte);
+}
+
+void stream_debug_rc(
         uint16_t c1,
         uint16_t c2,
         uint16_t c3,

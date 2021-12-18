@@ -67,7 +67,8 @@ spec = do
   trigger "stream_bluetoothRead" (running && stream_bluetoothAvailable) []
 
   -- For now, just relay bytes from Bluetooth to UART
-  trigger "stream_serial1Write" stream_bluetoothAvailable [arg stream_bluetoothByte]
+  trigger "stream_serial1Write" (running && stream_bluetoothAvailable) [arg stream_bluetoothByte]
+
 
   -- trigger "stream_debug" checked [  arg chan1
   --                                 , arg chan2
