@@ -12,7 +12,8 @@ SbusTx sbus_out(&Serial2);
 
 void stream_sbusOutStart(uint8_t rxpin, uint8_t txpin) {
 
-    sbus_out.Begin(rxpin, txpin);
+    Serial.begin(115200);
+    //sbus_out.Begin(rxpin, txpin);
 }
 
 void stream_sbusWrite(
@@ -52,8 +53,10 @@ void stream_sbusWrite(
     sbusvals[14] = (uint16_t)ch15;
     sbusvals[15] = (uint16_t)ch16;
 
-    sbus_out.tx_channels(sbusvals);
-    sbus_out.Write();
+    //sbus_out.tx_channels(sbusvals);
+    //sbus_out.Write();
+
+    Serial.println(sbusvals[0]);
 }
 
 void stream_ignore(bool timedOut)

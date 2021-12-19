@@ -37,7 +37,7 @@ void stream_dsmrxStart(uint8_t rxpin, uint8_t txpin)
 
 void stream_dsmrxUpdate(void)
 {
-    stream_receiverTimedOut = rx.timedOut(micros());
+    // stream_receiverTimedOut = rx.timedOut(micros());
     stream_receiverGotNewFrame = rx.gotNewFrame();
 }
 

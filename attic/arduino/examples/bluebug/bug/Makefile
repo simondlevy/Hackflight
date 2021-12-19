@@ -4,7 +4,7 @@
 #
 # MIT License
 
-SKETCH = Ladybug
+SKETCH = Bug
 ROOT = ../../../..
 
 HDIR = $(ROOT)/haskell
@@ -12,7 +12,7 @@ CDIR = $(ROOT)/c
 ADIR = $(ROOT)/arduino
 CPPDIR = $(ADIR)/cpp
 
-HSRC = Ladybug.hs \
+HSRC = Bug.hs \
        $(HDIR)/HackflightFull.hs \
        $(HDIR)/Receiver.hs \
        $(HDIR)/Demands.hs \
@@ -52,8 +52,8 @@ hackflight.cpp: hackflight.c
 	cat $(CDIR)/header.c tmp.c > hackflight.c
 	rm tmp.c
 
-hackflight.c: $(HSRC) Ladybug.hs
-	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Ladybug.hs
+hackflight.c: $(HSRC) Bug.hs
+	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers Bug.hs
 
 clean:
-	rm -f $(SKETCH)/*.h $(SKETCH)/*.cpp
+	rm -rf $(SKETCH)

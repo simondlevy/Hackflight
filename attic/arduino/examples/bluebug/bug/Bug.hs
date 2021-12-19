@@ -1,5 +1,5 @@
 {--
-  Support for Ladybug flight controller getting RX messages over UART
+  Support for Bug flight controller getting RX messages over UART
 
   Copyright(C) 2021 on D.Levy
 
@@ -8,7 +8,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module Ladybug where
+module Bug where
 
 import Language.Copilot
 import Copilot.Compile.C99

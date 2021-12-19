@@ -4,7 +4,7 @@
 #
 # MIT License
 
-SKETCH = TinyPICO
+SKETCH = Blue
 ROOT = ../../../..
 
 HDIR = $(ROOT)/haskell
@@ -43,4 +43,4 @@ hackflight.c: $(HSRC) $(SKETCH).hs
 	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers $(SKETCH).hs
 
 clean:
-	rm -f $(SKETCH)/*.h $(SKETCH)/*.cpp
+	rm -rf $(SKETCH)

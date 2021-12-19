@@ -1,5 +1,5 @@
 {--
-  TinyPICO Support for Bluebug flight controller
+  Blue Support for Bluebug flight controller
 
   Copyright(C) 2021 on D.Levy
 
@@ -8,7 +8,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module TinyPICO where
+module Blue where
 
 import Language.Copilot
 import Copilot.Compile.C99

@@ -64,10 +64,10 @@ spec = do
                                       , arg sbus_min
                                       , arg sbus_min
                                      ]
+--}
 
   -- XXX ignore these varaibles for now
-  trigger "stream_ignore" running [arg receiverTimedOut]
-
+  -- trigger "stream_ignore" running [arg receiverTimedOut]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

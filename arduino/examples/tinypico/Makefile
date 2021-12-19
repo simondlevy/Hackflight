@@ -4,9 +4,13 @@
 #
 # MIT License
 
+SKETCH = TinyPico
 ROOT = ../../..
+
 HDIR = $(ROOT)/haskell
 CDIR = $(ROOT)/c
+ADIR = $(ROOT)/arduino
+CPPDIR = $(ADIR)/cpp
 
 HSRC = TinyPico.hs \
        $(HDIR)/HackflightProxy.hs \
@@ -29,17 +33,17 @@ HSRC = TinyPico.hs \
 	   $(CDIR)/serial.c
 
 
-DSTDIR = ../../Hackflight
-CPPDIR = ../../cpp
-
 all: hackflight.cpp
-	cp hackflight.c $(DSTDIR)/hackflight.cpp
+	rm -rf $(SKETCH)
+	mkdir $(SKETCH)
+	cp hackflight.c $(SKETCH)/hackflight.cpp
 	rm hackflight.c
 	sed -i 's/extern/EXTERN/g' hackflight.h
-	cat $(CDIR)/header.h hackflight.h > $(DSTDIR)/hackflight.h
+	cat $(CDIR)/header.h hackflight.h > $(SKETCH)/hackflight.h
 	rm hackflight.h
-	cp $(CPPDIR)/esp32_dsmrx.cpp $(DSTDIR)
-	cp $(CPPDIR)/esp32_sbus_out.cpp $(DSTDIR)
+	cp $(ADIR)/Hackflight.ino $(SKETCH)/$(SKETCH).ino
+	cp $(CPPDIR)/esp32_dsmrx.cpp $(SKETCH)
+	cp $(CPPDIR)/esp32_sbus_out.cpp $(SKETCH)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c
@@ -47,7 +51,7 @@ hackflight.cpp: hackflight.c
 	rm tmp.c
 
 hackflight.c: $(HSRC) TinyPico.hs
-	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers TinyPico.hs
+	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers $(SKETCH).hs
 
 clean:
-	rm -f $(DSTDIR)/*.h $(DSTDIR)/*.cpp
+	rm -rf $(SKETCH)
