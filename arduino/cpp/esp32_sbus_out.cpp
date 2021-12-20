@@ -57,7 +57,8 @@ void stream_sbusWrite(
     //sbus_out.tx_channels(sbusvals);
     //sbus_out.Write();
 
-    Debugger::printf("%04d\n", sbusvals[0]);
+    Debugger::printf("t=%04d  r=%04d  p=%04d  y=%04d  a1=%04d  a2=%04d\n",
+            sbusvals[0], sbusvals[1], sbusvals[2], sbusvals[3], sbusvals[4], sbusvals[5]);
 }
 
 void stream_ignore(bool timedOut)
