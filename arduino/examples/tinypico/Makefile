@@ -44,6 +44,7 @@ all: hackflight.cpp
 	cp $(ADIR)/Hackflight.ino $(SKETCH)/$(SKETCH).ino
 	cp $(CPPDIR)/esp32_dsmrx.cpp $(SKETCH)
 	cp $(CPPDIR)/esp32_sbus_out.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_debugger.hpp $(SKETCH)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c

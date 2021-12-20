@@ -7,6 +7,7 @@
  */
 
 #include <sbus.h>
+#include "arduino_debugger.hpp"
 
 SbusTx sbus_out(&Serial2);
 
@@ -56,7 +57,7 @@ void stream_sbusWrite(
     //sbus_out.tx_channels(sbusvals);
     //sbus_out.Write();
 
-    Serial.println(sbusvals[0]);
+    Debugger::printf("%04d\n", sbusvals[0]);
 }
 
 void stream_ignore(bool timedOut)
