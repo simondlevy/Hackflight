@@ -8,21 +8,22 @@
 #include <Wire.h>
 
 
-// REPLACE WITH THE MAC Address of your receiver 
-uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+// REPLACE WITH THE MAC Address of your sender 
+uint8_t broadcastAddress[] = {0x50, 0x02, 0x91, 0xA1, 0xAB, 0xD4};
 
+/*
 // Callback when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
   Serial.print("\r\nLast Packet Send Status:\t");
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-}
+}*/
 
 // Callback when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
   Serial.print("Bytes received: ");
-  Serial.println(len);
+  Serial.println(sizeof(incomingData));
 }
  
 void setup()
@@ -41,7 +42,7 @@ void setup()
 
   // Once ESPNow is successfully Init, we will register for Send CB to
   // get the status of Trasnmitted packet
-  esp_now_register_send_cb(OnDataSent);
+  //esp_now_register_send_cb(OnDataSent);
   
   // Register peer
   esp_now_peer_info_t peerInfo;
@@ -54,12 +55,14 @@ void setup()
     Serial.println("Failed to add peer");
     return;
   }
+
   // Register for a callback function that will be called when data is received
   esp_now_register_recv_cb(OnDataRecv);
 }
  
 void loop()
 {
+    /*
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)
           &BME280Readings, sizeof(BME280Readings));
@@ -71,5 +74,5 @@ void loop()
     Serial.println("Error sending the data");
   }
   
-  delay(1000);
+  delay(1000);*/
 }

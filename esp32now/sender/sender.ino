@@ -9,7 +9,8 @@
 
 
 // REPLACE WITH THE MAC Address of your receiver 
-uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t broadcastAddress[] = {0xD8, 0xA0, 0x1D, 0x46, 0xDF, 0x60};
+
 
 // Callback when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
@@ -18,12 +19,13 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }
 
+/*
 // Callback when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
   Serial.print("Bytes received: ");
   Serial.println(len);
-}
+}*/
  
 void setup()
 {
@@ -54,15 +56,18 @@ void setup()
     Serial.println("Failed to add peer");
     return;
   }
+
   // Register for a callback function that will be called when data is received
-  esp_now_register_recv_cb(OnDataRecv);
+  //esp_now_register_recv_cb(OnDataRecv);
 }
  
 void loop()
 {
+  static const char * message = "hello";
+
   // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)
-          &BME280Readings, sizeof(BME280Readings));
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)message,
+          sizeof(message));
    
   if (result == ESP_OK) {
     Serial.println("Sent with success");
