@@ -9,7 +9,7 @@
 
 
 // REPLACE WITH THE MAC Address of your sender 
-uint8_t broadcastAddress[] = {0x50, 0x02, 0x91, 0xA1, 0xAB, 0xD4};
+uint8_t senderAddress[] = {0x50, 0x02, 0x91, 0xA1, 0xAB, 0xD4};
 
 /*
 // Callback when data is sent
@@ -23,7 +23,7 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
   Serial.print("Bytes received: ");
-  Serial.println(sizeof(incomingData));
+  Serial.println(len);
 }
  
 void setup()
@@ -46,7 +46,7 @@ void setup()
   
   // Register peer
   esp_now_peer_info_t peerInfo;
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  memcpy(peerInfo.peer_addr, senderAddress, 6);
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
   
@@ -64,7 +64,7 @@ void loop()
 {
     /*
   // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)
+  esp_err_t result = esp_now_send(senderAddress, (uint8_t *)
           &BME280Readings, sizeof(BME280Readings));
    
   if (result == ESP_OK) {

@@ -4,12 +4,12 @@
 
 #include <esp_now.h>
 #include <WiFi.h>
-
 #include <Wire.h>
 
+#include <string.h>
 
 // REPLACE WITH THE MAC Address of your receiver 
-uint8_t broadcastAddress[] = {0xD8, 0xA0, 0x1D, 0x46, 0xDF, 0x60};
+uint8_t receiverAddress[] = {0xD8, 0xA0, 0x1D, 0x46, 0xDF, 0x60};
 
 
 // Callback when data is sent
@@ -47,7 +47,7 @@ void setup()
   
   // Register peer
   esp_now_peer_info_t peerInfo;
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  memcpy(peerInfo.peer_addr, receiverAddress, 6);
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
   
@@ -63,11 +63,11 @@ void setup()
  
 void loop()
 {
-  static const char * message = "hello";
+  static const char * message = "hello how are you";
 
   // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)message,
-          sizeof(message));
+  esp_err_t result = esp_now_send(receiverAddress, (uint8_t *)message,
+          strlen(message));
    
   if (result == ESP_OK) {
     Serial.println("Sent with success");
