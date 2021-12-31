@@ -29,10 +29,12 @@ void setup(void)
 
 void loop(void)
 {
-    printf("THR=%04d   ROL=%04d   PIT=%04d\n",
+    printf("THR=%04d   ROL=%04d   PIT=%04d   YAW=%04d\n",
             analogRead(THR_PIN),
             analogRead(ROL_PIN),
-            analogRead(PIT_PIN)); 
+            analogRead(PIT_PIN),
+            analogRead(YAW_PIN)
+            ); 
   //Serial.println(digitalRead(AU1_PIN));
   //Serial.println(digitalRead(AU2_PIN));
 
