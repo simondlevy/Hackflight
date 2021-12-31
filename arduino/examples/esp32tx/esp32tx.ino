@@ -29,7 +29,8 @@ void setup(void)
 
 void loop(void)
 {
-    printf("THR=%04d\n", analogRead(THR_PIN)); 
+    printf("THR=%04d   ROL=%04d\n",
+            analogRead(THR_PIN), analogRead(ROL_PIN)); 
   //Serial.println(analogRead(THR_PIN)); 
   //Serial.println(digitalRead(AU1_PIN));
   //Serial.println(digitalRead(AU2_PIN));
