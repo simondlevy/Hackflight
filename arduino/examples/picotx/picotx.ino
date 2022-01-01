@@ -15,6 +15,8 @@ static const uint8_t YAW_PIN = 15;
 static const uint8_t AU1_PIN = 14;
 static const uint8_t AU2_PIN =  4;
 
+static const uint8_t USB_PIN = 9;
+
 static TinyPICO tp;
 
 void setup(void)
@@ -28,16 +30,30 @@ void setup(void)
 void loop(void)
 {
     static uint32_t batteryCount;
-    static bool battery;
 
     // Smoothe-out fluctuations in battery detection
     batteryCount = tp.IsChargingBattery() ? batteryCount + 1 : 0;
 
-    Serial.println(batteryCount>10);
+    bool battery = batteryCount > 10;
+
+    bool usb = digitalRead(USB_PIN);
+
+    // Charging
+    if (battery && usb) {
+        tp.DotStar_SetPixelColor(255, 0, 0);
+    }
+
+    // Normal operation
+    if (battery && !usb) {
+        tp.DotStar_SetPixelColor(0, 255, 0);
+    }
+
+    if (!battery) {
+        tp.DotStar_SetPixelColor(0, 0, 255);
+    }
 
     /*
     if (battery) {
-        tp.DotStar_SetPixelColor(255, 0, 0);
     }
     else {
         tp.DotStar_SetPixelColor(0, 255, 0);
