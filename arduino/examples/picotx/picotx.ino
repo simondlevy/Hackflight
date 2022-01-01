@@ -49,17 +49,12 @@ void loop(void)
 
     power_state_t powerState = battery ? (usb ? POWER_CHARGING : POWER_BATTERY) : POWER_USB;
 
+    uint8_t red = powerState == POWER_CHARGING ? 255 : 0;
+    uint8_t green = powerState == POWER_BATTERY ? 255 : 0;
+
     if (powerState != powerStatePrev) {
-        switch (powerState) {
-            case POWER_CHARGING:
-                tp.DotStar_SetPixelColor(255, 0, 0);
-                break;
-            case POWER_BATTERY:
-                tp.DotStar_SetPixelColor(0, 255, 0);
-                break;
-            default:
-                tp.DotStar_SetPixelColor(0, 0, 0);
-        }
+
+        tp.DotStar_SetPixelColor(red, green, 0);
     }
 
     powerStatePrev = powerState;
