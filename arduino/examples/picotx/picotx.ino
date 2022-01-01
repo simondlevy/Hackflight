@@ -49,26 +49,30 @@ void loop(void)
 
     power_state_t powerState = battery ? (usb ? POWER_CHARGING : POWER_BATTERY) : POWER_USB;
 
-    switch (powerState) {
-        case POWER_CHARGING:
-            tp.DotStar_SetPixelColor(255, 0, 0);
-            break;
-        case POWER_BATTERY:
-            tp.DotStar_SetPixelColor(0, 255, 0);
-            break;
-        default:
-            tp.DotStar_SetPixelColor(0, 0, 0);
+    if (powerState != powerStatePrev) {
+        switch (powerState) {
+            case POWER_CHARGING:
+                tp.DotStar_SetPixelColor(255, 0, 0);
+                break;
+            case POWER_BATTERY:
+                tp.DotStar_SetPixelColor(0, 255, 0);
+                break;
+            default:
+                tp.DotStar_SetPixelColor(0, 0, 0);
+        }
     }
+
+    powerStatePrev = powerState;
 
     /*
        printf("THR=%04d   ROL=%04d   PIT=%04d   YAW=%04d   AU1=%d   AU2=%d\n",
        analogRead(THR_PIN),
        analogRead(ROL_PIN),
        analogRead(PIT_PIN),
-            analogRead(YAW_PIN),
-            digitalRead(AU1_PIN),
-            digitalRead(AU2_PIN)
-          );*/
+       analogRead(YAW_PIN),
+       digitalRead(AU1_PIN),
+       digitalRead(AU2_PIN)
+       );*/
 
     delay(10);
 }
