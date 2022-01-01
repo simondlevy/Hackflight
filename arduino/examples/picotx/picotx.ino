@@ -45,7 +45,7 @@ void loop(void)
     // Smoothe-out fluctuations in battery detection
     batteryCount = tp.IsChargingBattery() ? batteryCount + 1 : 0;
 
-    bool battery = batteryCount > 10;
+    bool battery = batteryCount > 5;
 
     bool usb = digitalRead(USB_PIN);
 
@@ -71,5 +71,5 @@ void loop(void)
        digitalRead(AU2_PIN)
        );*/
 
-    delay(10);
+    delay(5);
 }
