@@ -1,5 +1,5 @@
 /*
-   ESP32-based transmitter
+   TinyPICO-based transmitter
 
    Copyright (c) Simon D. Levy 2021
 
