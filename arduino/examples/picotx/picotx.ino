@@ -23,29 +23,26 @@ void setup(void)
     pinMode(AU2_PIN, INPUT_PULLUP);
 
     Serial.begin(115200);
-
-    tp.DotStar_SetPixelColor(0, 255, 0);
 }
 
 void loop(void)
 {
-    static uint32_t chargingCount;
-    static bool charging;
+    static uint32_t batteryCount;
+    static bool battery;
 
-    chargingCount = tp.IsChargingBattery() ? chargingCount + 1 : 0;
+    // Smoothe-out fluctuations in battery detection
+    batteryCount = tp.IsChargingBattery() ? batteryCount + 1 : 0;
 
-    charging = chargingCount > 10;
+    Serial.println(batteryCount>10);
 
-    Serial.println(charging);
-
-    if (charging) {
+    /*
+    if (battery) {
         tp.DotStar_SetPixelColor(255, 0, 0);
     }
     else {
         tp.DotStar_SetPixelColor(0, 255, 0);
     }
 
-    /*
        printf("THR=%04d   ROL=%04d   PIT=%04d   YAW=%04d   AU1=%d   AU2=%d\n",
        analogRead(THR_PIN),
        analogRead(ROL_PIN),
