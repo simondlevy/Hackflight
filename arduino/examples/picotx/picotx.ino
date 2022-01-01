@@ -49,7 +49,7 @@ void loop(void)
     }
 
     if (!battery) {
-        tp.DotStar_SetPixelColor(0, 0, 255);
+        tp.DotStar_SetPixelColor(0, 0, 0);
     }
 
     /*
