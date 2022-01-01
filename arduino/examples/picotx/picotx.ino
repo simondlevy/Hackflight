@@ -19,6 +19,14 @@ static const uint8_t USB_PIN = 9;
 
 static TinyPICO tp;
 
+typedef enum {
+
+    POWER_USB,
+    POWER_BATTERY,
+    POWER_CHARGING
+
+} power_state_t;
+
 void setup(void)
 {
     pinMode(AU1_PIN, INPUT_PULLUP);
@@ -30,6 +38,7 @@ void setup(void)
 void loop(void)
 {
     static uint32_t batteryCount;
+    static power_state_t powerStatePrev;
 
     // Smoothe-out fluctuations in battery detection
     batteryCount = tp.IsChargingBattery() ? batteryCount + 1 : 0;
@@ -38,27 +47,20 @@ void loop(void)
 
     bool usb = digitalRead(USB_PIN);
 
-    // Charging
-    if (battery && usb) {
-        tp.DotStar_SetPixelColor(255, 0, 0);
-    }
+    power_state_t powerState = battery ? (usb ? POWER_CHARGING : POWER_BATTERY) : POWER_USB;
 
-    // Normal operation
-    if (battery && !usb) {
-        tp.DotStar_SetPixelColor(0, 255, 0);
-    }
-
-    if (!battery) {
-        tp.DotStar_SetPixelColor(0, 0, 0);
+    switch (powerState) {
+        case POWER_CHARGING:
+            tp.DotStar_SetPixelColor(255, 0, 0);
+            break;
+        case POWER_BATTERY:
+            tp.DotStar_SetPixelColor(0, 255, 0);
+            break;
+        default:
+            tp.DotStar_SetPixelColor(0, 0, 0);
     }
 
     /*
-    if (battery) {
-    }
-    else {
-        tp.DotStar_SetPixelColor(0, 255, 0);
-    }
-
        printf("THR=%04d   ROL=%04d   PIT=%04d   YAW=%04d   AU1=%d   AU2=%d\n",
        analogRead(THR_PIN),
        analogRead(ROL_PIN),
