@@ -32,6 +32,8 @@ void setup(void)
     pinMode(AU1_PIN, INPUT_PULLUP);
     pinMode(AU2_PIN, INPUT_PULLUP);
 
+    tp.DotStar_SetPixelColor(0, 255, 0);
+
     Serial.begin(115200);
 }
 
