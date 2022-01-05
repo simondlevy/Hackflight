@@ -9,7 +9,7 @@
 #include <TinyPICO.h>
 
 //static const uint8_t THR_PIN = 25;
-//static const uint8_t ROL_PIN = 26;
+static const uint8_t ROL_PIN = A0;
 //static const uint8_t PIT_PIN = 27;
 //static const uint8_t YAW_PIN = 15;
 static const uint8_t AU1_PIN = 13;
@@ -35,6 +35,32 @@ void setup(void)
     //tp.DotStar_SetPixelColor(0, 255, 0);
 
     Serial.begin(115200);
+}
+
+static void fun(uint16_t val)
+{
+    int16_t MAXOUT = 100;
+    int16_t MIDPOINT = 200;
+    int16_t DEADBAND = 20;
+
+    static const uint8_t LPF_SIZE = 5;
+
+    static uint16_t lpfbuff[LPF_SIZE];
+    static uint8_t lpfidx;
+
+    lpfbuff[lpfidx] = val;
+    lpfidx = (lpfidx + 1) % LPF_SIZE;
+
+    uint32_t sum = 0;
+    for (uint8_t k=0; k<LPF_SIZE; ++k) {
+        sum += lpfbuff[k];
+    }
+    sum /= LPF_SIZE;
+
+    printf("0 500 %d %d %d %d\n",
+            sum, MIDPOINT, MIDPOINT-DEADBAND, MIDPOINT+DEADBAND);
+
+    //return x < (MIDPOINT-DEADBAND) ? -100 : x > (MIDPOINT + DEADBAND) ? +100 : 0;
 }
 
 void loop(void)
@@ -71,8 +97,12 @@ void loop(void)
     digitalRead(AU2_PIN)
     );
 
-*/
+    printf("ROL=%04d   AU1=%d\n",
+            analogRead(ROL_PIN),
+            digitalRead(AU1_PIN));
 
-    printf("AU1=%d\n", digitalRead(AU1_PIN));
-    delay(5);
+*/
+    fun(analogRead(ROL_PIN));
+
+    //delay(5);
 }
