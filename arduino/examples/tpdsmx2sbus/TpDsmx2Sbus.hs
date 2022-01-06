@@ -8,7 +8,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module TinyPico where
+module TpDsmx2Sbus where
 
 import Language.Copilot
 import Copilot.Compile.C99

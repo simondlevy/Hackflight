@@ -4,7 +4,7 @@
 #
 # MIT License
 
-SKETCH = TinyPico
+SKETCH = TpDsmx2Sbus
 ROOT = ../../..
 
 HDIR = $(ROOT)/haskell
@@ -12,7 +12,7 @@ CDIR = $(ROOT)/c
 ADIR = $(ROOT)/arduino
 CPPDIR = $(ADIR)/cpp
 
-HSRC = TinyPico.hs \
+HSRC = $(SKETCH).hs \
        $(HDIR)/HackflightProxy.hs \
        $(HDIR)/Receiver.hs \
        $(HDIR)/Demands.hs \
@@ -51,7 +51,7 @@ hackflight.cpp: hackflight.c
 	cat $(CDIR)/header.c tmp.c > hackflight.c
 	rm tmp.c
 
-hackflight.c: $(HSRC) TinyPico.hs
+hackflight.c: $(HSRC) $(SKETCH).hs
 	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers $(SKETCH).hs
 
 clean:
