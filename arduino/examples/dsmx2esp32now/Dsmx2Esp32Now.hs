@@ -24,6 +24,13 @@ import Utils
 dsmx_in_rx_pin = 4  :: SWord8  
 dsmx_in_tx_pin = 14 :: SWord8 -- unused
 
+rx_mac1 = 0x98 :: SWord8
+rx_mac2 = 0xCD :: SWord8
+rx_mac3 = 0xAC :: SWord8
+rx_mac4 = 0xD3 :: SWord8
+rx_mac5 = 0x42 :: SWord8
+rx_mac6 = 0xE0 :: SWord8
+
 ------------------------------------------------------------
 
 spec = do
@@ -34,6 +41,7 @@ spec = do
   -- Do some stuff at startup
   trigger "stream_serialStart" starting []
   trigger "stream_dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
+  trigger "stream_esp32nowStart" starting []
 
   -- Do some other stuff in loop
   trigger "stream_dsmrxUpdate" running []

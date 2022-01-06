@@ -5,9 +5,6 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-#include <Wire.h>
-
-
 // REPLACE WITH THE MAC Address of your sender 
 uint8_t senderAddress[] = {0x98, 0xCD, 0xAC, 0xD3, 0x42, 0x3C};
 
