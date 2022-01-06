@@ -9,7 +9,7 @@
 #include <string.h>
 
 // REPLACE WITH THE MAC Address of your receiver 
-uint8_t receiverAddress[] = {0xD8, 0xA0, 0x1D, 0x46, 0xDF, 0x60};
+uint8_t receiverAddress[] = {0x98, 0xCD, 0xAC, 0xD3, 0x42, 0xE0};
 
 
 // Callback when data is sent
