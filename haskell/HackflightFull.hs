@@ -22,6 +22,7 @@ import Time
 import Mixers
 import Motors
 import Parser
+import Messages
 import Serial
 import Utils
 
@@ -57,10 +58,7 @@ hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
     msgbuff = reply sending msgtype state
 
     -- Check for incoming SET_MOTOR messages from GCS
-    motor_index = if msgtype == 215 && payindex == 1 then stream_serialByte
-                  else motor_index' where motor_index' = [0] ++ motor_index
-    motor_percent = if msgtype == 215 && payindex == 2 then stream_serialByte
-                    else motor_percent' where motor_percent' = [0] ++ motor_percent
+    (motor_index, motor_percent) = getMotors msgtype payindex stream_serialByte
 
     -- Set motors based on arming state and whether we have GCS input
     motors = (motorfun mixer) motors' armed motor_index motor_percent

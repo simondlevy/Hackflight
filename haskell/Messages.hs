@@ -1,5 +1,7 @@
 {--
-  MSP messages
+  Code for specific MSP messages
+
+  See https://www.hamishmb.com/multiwii/wiki/index.php?title=Multiwii_Serial_Protocol
 
   Copyright(C) 2021 on D.Levy
 
@@ -12,7 +14,7 @@ module Messages where
 
 import Language.Copilot hiding(xor)
 import Copilot.Compile.C99
-import Prelude hiding((==))
+import Prelude hiding((==), (&&), (++))
 
 import Receiver
 import State
@@ -39,3 +41,13 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
   val03 = if msgtype == 121 then receiverYaw else 0
   val04 = if msgtype == 121 then receiverAux1 else 0
   val05 = if msgtype == 121 then receiverAux2 else 0
+
+getMotors :: SWord8 -> SWord8 -> SWord8 -> (SWord8, SWord8)
+
+getMotors msgtype payindex byte = (motor_index, motor_percent) where
+
+  motor_index = if msgtype == 215 && payindex == 1 then byte
+                else motor_index' where motor_index' = [0] ++ motor_index
+
+  motor_percent = if msgtype == 215 && payindex == 2 then byte
+                  else motor_percent' where motor_percent' = [0] ++ motor_percent
