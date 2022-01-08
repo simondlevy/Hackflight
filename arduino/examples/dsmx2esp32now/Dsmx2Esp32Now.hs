@@ -13,7 +13,7 @@ module Dsmx2Esp32Now where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Prelude hiding ((/), (*), (+), (-))
+import Prelude hiding ((/), (*), (+), (-), (==), (++))
 
 import Time
 import Receiver
@@ -39,25 +39,43 @@ spec = do
   let (running, starting) = runstate
 
   -- Do some stuff at startup
+
+
   trigger "serialStart" starting []
-  trigger "dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
+
+  --trigger "dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
+
   trigger "esp32nowStart" starting []
-  trigger "esp32nowRegisterPeer" starting [  arg rx_mac1
-                                           , arg rx_mac2
-                                           , arg rx_mac3
-                                           , arg rx_mac4
-                                           , arg rx_mac5
-                                           , arg rx_mac6 ] 
+
+  trigger "esp32nowAddPeer" starting [  arg rx_mac1
+                                      , arg rx_mac2
+                                      , arg rx_mac3
+                                      , arg rx_mac4
+                                      , arg rx_mac5
+                                      , arg rx_mac6 ] 
+
+  let foo = if foo' == 100 then 0 else foo' + 1 where foo' = [0] ++ foo :: SWord8
+
   -- Do some other stuff in loop
-  trigger "dsmrxUpdate" running []
-  trigger "dsmrxGet" receiverGotNewFrame []
-  trigger "debug" running [  arg receiverThrottle
-                           , arg receiverRoll
-                           , arg receiverPitch
-                           , arg receiverYaw
-                           , arg receiverAux1
-                           , arg receiverAux2
-                          ]
+  --trigger "dsmrxUpdate" running []
+  --trigger "dsmrxGet" receiverGotNewFrame []
+  trigger "esp32nowSend" running [ arg rx_mac1
+                                 , arg rx_mac2
+                                 , arg rx_mac3
+                                 , arg rx_mac4
+                                 , arg rx_mac5
+                                 , arg rx_mac6 
+                                 , arg foo ]
+
+{--
+  trigger "esp32nowSend" running [  arg receiverThrottle
+                                  , arg receiverRoll
+                                  , arg receiverPitch
+                                  , arg receiverYaw
+                                  , arg receiverAux1
+                                  , arg receiverAux2
+                                 ]
+--}
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

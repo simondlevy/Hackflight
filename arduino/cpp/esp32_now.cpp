@@ -21,7 +21,7 @@ void esp32nowStart(void)
     }
 }
 
-void esp32nowRegisterPeer(
+void esp32nowAddPeer(
         uint8_t mac1,
         uint8_t mac2,
         uint8_t mac3,
@@ -30,7 +30,7 @@ void esp32nowRegisterPeer(
         uint8_t mac6)
 {
     // Register peer
-    esp_now_peer_info_t peerInfo;
+    esp_now_peer_info_t peerInfo = {};
     uint8_t peerAddress[6] = {mac1, mac2, mac3, mac4, mac5, mac6};
     memcpy(peerInfo.peer_addr, peerAddress, 6);
     peerInfo.channel = 0;  
@@ -40,4 +40,17 @@ void esp32nowRegisterPeer(
     if (esp_now_add_peer(&peerInfo) != ESP_OK){
         Debugger::reportForever("Failed to add peer");
     }
+}
+
+void esp32nowSend(
+        uint8_t rxmac1,
+        uint8_t rxmac2,
+        uint8_t rxmac3,
+        uint8_t rxmac4,
+        uint8_t rxmac5,
+        uint8_t rxmac6,
+        uint8_t foo)
+{
+    uint8_t rxAddress[6] = {rxmac1, rxmac2, rxmac3, rxmac4, rxmac5, rxmac6};
+    esp_err_t result = esp_now_send(rxAddress, &foo, 1);
 }
