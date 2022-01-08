@@ -42,7 +42,12 @@ spec = do
   trigger "serialStart" starting []
   trigger "dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
   trigger "esp32nowStart" starting []
-
+  trigger "esp32nowRegisterPeer" starting [  arg rx_mac1
+                                           , arg rx_mac2
+                                           , arg rx_mac3
+                                           , arg rx_mac4
+                                           , arg rx_mac5
+                                           , arg rx_mac6 ] 
   -- Do some other stuff in loop
   trigger "dsmrxUpdate" running []
   trigger "dsmrxGet" receiverGotNewFrame []
