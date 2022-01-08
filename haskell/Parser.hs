@@ -18,22 +18,6 @@ import Messages
 import State
 import Utils
 
-data MessageBuffer = MessageBuffer {  sending :: SBool
-                                    , hdr0    :: SWord8 -- '$' (0x24)
-                                    , hdr1    :: SWord8 -- 'M' (0x4D)
-                                    , hdr2    :: SWord8 -- '>' (0x3E)
-                                    , outsize :: SWord8 
-                                    , msgtype :: SWord8 
-                                    , crc     :: SWord8 
-                                    , paysize :: SWord8 
-                                    , val00   :: SFloat  
-                                    , val01   :: SFloat
-                                    , val02   :: SFloat
-                                    , val03   :: SFloat
-                                    , val04   :: SFloat
-                                    , val05   :: SFloat
-                                    }
-
 reply :: SBool -> SWord8 -> State -> MessageBuffer
 
 reply sending msgtype vstate =

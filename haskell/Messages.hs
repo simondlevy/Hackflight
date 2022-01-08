@@ -20,6 +20,22 @@ import Receiver
 import State
 import Utils
 
+data MessageBuffer = MessageBuffer {  sending :: SBool
+                                    , hdr0    :: SWord8 -- '$' (0x24)
+                                    , hdr1    :: SWord8 -- 'M' (0x4D)
+                                    , hdr2    :: SWord8 -- '>' (0x3E)
+                                    , outsize :: SWord8 
+                                    , msgtype :: SWord8 
+                                    , crc     :: SWord8 
+                                    , paysize :: SWord8 
+                                    , val00   :: SFloat  
+                                    , val01   :: SFloat
+                                    , val02   :: SFloat
+                                    , val03   :: SFloat
+                                    , val04   :: SFloat
+                                    , val05   :: SFloat
+                                    }
+
 payload :: SWord8 -> State -> (SWord8, SFloat, SFloat, SFloat, SFloat, SFloat, SFloat)
 
 payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) where
@@ -51,3 +67,8 @@ getMotors msgtype payindex byte = (motor_index, motor_percent) where
 
   motor_percent = if msgtype == 215 && payindex == 2 then byte
                   else motor_percent' where motor_percent' = [0] ++ motor_percent
+
+rxmessage :: SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> MessageBuffer
+
+rxmessage thr rol pit yaw aux1 aux2 = MessageBuffer true 0 0 0 0 0 0 0 0 0 0 0 0 0
+

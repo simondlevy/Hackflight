@@ -20,6 +20,7 @@ import Demands
 import State
 import Mixers
 import Motors
+import Messages
 import Time
 
 -- Sensors
@@ -87,7 +88,6 @@ spec = do
   trigger "serialRead" serialAvailable []
 
   -- Send reply to GCS if indicated
-
   trigger "serialSend" (sending msgbuff) [ 
                                         arg $ hdr0 msgbuff
                                       , arg $ hdr1 msgbuff
@@ -103,28 +103,6 @@ spec = do
                                       , arg $ val04 msgbuff
                                       , arg $ val05 msgbuff
                                       ]
-{--
-  trigger "serialSendHeader" (sending msgbuff) [ 
-                                        arg $ hdr0 msgbuff
-                                      , arg $ hdr1 msgbuff
-                                      , arg $ hdr2 msgbuff
-                                      , arg $ outsize msgbuff
-                                      , arg $ msgtype msgbuff
-                                      ]
-
-  trigger "serialSendPayload" (sending msgbuff) [ 
-                                        arg $ paysize msgbuff
-                                      , arg $ crc msgbuff
-                                      , arg $ val00 msgbuff
-                                      , arg $ val01 msgbuff
-                                      , arg $ val02 msgbuff
-                                      , arg $ val03 msgbuff
-                                      , arg $ val04 msgbuff
-                                      , arg $ val05 msgbuff
-                                      ]
-
-  trigger "serialSendChecksum" (sending msgbuff) [arg $ crc msgbuff]
---}
 
   -- Run motors
   trigger "brushedMotorsWrite" true [

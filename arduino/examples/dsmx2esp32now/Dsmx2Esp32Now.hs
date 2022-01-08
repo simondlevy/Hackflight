@@ -17,6 +17,8 @@ import Prelude hiding ((/), (*), (+), (-), (==), (++))
 
 import Time
 import Receiver
+import Messages
+import Parser
 import Utils
 
 ------------------------------------------------------------
@@ -54,7 +56,12 @@ spec = do
                                       , arg rx_mac5
                                       , arg rx_mac6 ] 
 
-  let foo = if foo' == 100 then 0 else foo' + 1 where foo' = [0] ++ foo :: SWord8
+  let msgbuff = rxmessage receiverThrottle
+                          receiverRoll
+                          receiverPitch
+                          receiverYaw
+                          receiverAux1
+                          receiverAux2
 
   -- Do some other stuff in loop
   --trigger "dsmrxUpdate" running []
@@ -65,17 +72,20 @@ spec = do
                                  , arg rx_mac4
                                  , arg rx_mac5
                                  , arg rx_mac6 
-                                 , arg foo ]
-
-{--
-  trigger "esp32nowSend" running [  arg receiverThrottle
-                                  , arg receiverRoll
-                                  , arg receiverPitch
-                                  , arg receiverYaw
-                                  , arg receiverAux1
-                                  , arg receiverAux2
+                                 , arg $ hdr0 msgbuff
+                                 , arg $ hdr1 msgbuff
+                                 , arg $ hdr2 msgbuff
+                                 , arg $ outsize msgbuff
+                                 , arg $ msgtype msgbuff
+                                 , arg $ crc msgbuff
+                                 , arg $ paysize msgbuff
+                                 , arg $ val00 msgbuff
+                                 , arg $ val01 msgbuff
+                                 , arg $ val02 msgbuff
+                                 , arg $ val03 msgbuff
+                                 , arg $ val04 msgbuff
+                                 , arg $ val05 msgbuff
                                  ]
---}
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
