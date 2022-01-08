@@ -7,22 +7,22 @@
 
 #include <BluetoothSerial.h>
 
-extern uint8_t stream_bluetoothByte; 
-extern bool stream_bluetoothAvailable; 
+extern uint8_t bluetoothByte; 
+extern bool bluetoothAvailable; 
 
 static BluetoothSerial SerialBT;
 
-void stream_bluetoothStart(void)
+void bluetoothStart(void)
 {
     SerialBT.begin("ESP32test3"); //Bluetooth device name
 }
 
-bool stream_bluetoothUpdate(void)
+bool bluetoothUpdate(void)
 {
-    stream_bluetoothAvailable = SerialBT.available();
+    bluetoothAvailable = SerialBT.available();
 }
 
-void stream_bluetoothRead(void)
+void bluetoothRead(void)
 {
-    stream_bluetoothByte = SerialBT.read();
+    bluetoothByte = SerialBT.read();
 }

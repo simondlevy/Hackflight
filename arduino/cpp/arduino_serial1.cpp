@@ -11,30 +11,30 @@
 
 #include <string.h>
 
-extern uint8_t stream_serial1Byte; 
-extern bool stream_serial1Available; 
+extern uint8_t serial1Byte; 
+extern bool serial1Available; 
 
-void stream_serial1Start(void)
+void serial1Start(void)
 {
     Serial1.begin(115200);
 }
 
-void stream_serial1Write(uint8_t byte)
+void serial1Write(uint8_t byte)
 {
     Serial1.write(byte);
 }
 
-void stream_serial1Read(void)
+void serial1Read(void)
 {
-    stream_serial1Byte = Serial1.read();
+    serial1Byte = Serial1.read();
 }
 
-void stream_serial1Update(void)
+void serial1Update(void)
 {
-    stream_serial1Available = Serial1.available();
+    serial1Available = Serial1.available();
 }
 
-void stream_serial1Debug(void)
+void serial1Debug(void)
 {
     static bool running;
 

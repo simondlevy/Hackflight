@@ -44,13 +44,13 @@ gyrometer state =
 ----------------------------------------------------------------------
 
 gavail :: SBool
-gavail = extern "stream_imuGotGyrometer" Nothing
+gavail = extern "imuGotGyrometer" Nothing
 
 gx :: SFloat
-gx = extern "stream_imuGyrometerX" Nothing
+gx = extern "imuGyrometerX" Nothing
 
 gy :: SFloat
-gy = extern "stream_imuGyrometerY" Nothing
+gy = extern "imuGyrometerY" Nothing
 
 gz :: SFloat
-gz = extern "stream_imuGyrometerZ" Nothing
+gz = extern "imuGyrometerZ" Nothing

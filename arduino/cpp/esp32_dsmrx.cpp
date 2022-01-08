@@ -28,29 +28,29 @@ static void coreTask(void * params)
     } 
 }
 
-void stream_dsmrxStart(uint8_t rxpin, uint8_t txpin)
+void dsmrxStart(uint8_t rxpin, uint8_t txpin)
 {
     Serial1.begin(115000, SERIAL_8N1, rxpin, txpin);
     TaskHandle_t task;
     xTaskCreatePinnedToCore(coreTask, "Task", 10000, NULL, 1, &task, 0); 
 }
 
-void stream_dsmrxUpdate(void)
+void dsmrxUpdate(void)
 {
-    // stream_receiverTimedOut = rx.timedOut(micros());
-    stream_receiverGotNewFrame = rx.gotNewFrame();
+    // receiverTimedOut = rx.timedOut(micros());
+    receiverGotNewFrame = rx.gotNewFrame();
 }
 
-void stream_dsmrxGet(void)
+void dsmrxGet(void)
 {
     float rawvals[8];
 
     rx.getChannelValues(rawvals, 8);
 
-    stream_receiverThrottle = rawvals[0];
-    stream_receiverRoll     = rawvals[1];
-    stream_receiverPitch    = rawvals[2];
-    stream_receiverYaw      = rawvals[3];
-    stream_receiverAux1     = rawvals[6];
-    stream_receiverAux2     = rawvals[4];
+    receiverThrottle = rawvals[0];
+    receiverRoll     = rawvals[1];
+    receiverPitch    = rawvals[2];
+    receiverYaw      = rawvals[3];
+    receiverAux1     = rawvals[6];
+    receiverAux2     = rawvals[4];
 }

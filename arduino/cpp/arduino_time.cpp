@@ -11,9 +11,9 @@
 #define _EXTERN
 #include "hackflight.h"
 
-void stream_timeUpdate(void)
+void timeUpdate(void)
 {
-    stream_micros = micros();
+    micros = micros();
 
-    // stream_time = stream_micros / 1e6;
+    // time = micros / 1e6;
 }

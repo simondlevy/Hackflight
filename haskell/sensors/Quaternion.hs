@@ -48,16 +48,16 @@ quaternion state  =
 ----------------------------------------------------------------------
 
 qavail :: SBool
-qavail = extern "stream_imuGotQuaternion" Nothing
+qavail = extern "imuGotQuaternion" Nothing
 
 qw :: SFloat
-qw = extern "stream_imuQuaternionW" Nothing
+qw = extern "imuQuaternionW" Nothing
 
 qx :: SFloat
-qx = extern "stream_imuQuaternionX" Nothing
+qx = extern "imuQuaternionX" Nothing
 
 qy :: SFloat
-qy = extern "stream_imuQuaternionY" Nothing
+qy = extern "imuQuaternionY" Nothing
 
 qz :: SFloat
-qz = extern "stream_imuQuaternionZ" Nothing
+qz = extern "imuQuaternionZ" Nothing

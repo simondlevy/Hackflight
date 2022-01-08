@@ -68,26 +68,26 @@ spec = do
   let (msgbuff, motors, led) = hackflight receiver sensors pidfuns QuadXMW
 
   -- Do some stuff at startup
-  trigger "stream_serialStart" starting []
-  trigger "stream_i2cStart" starting []
-  trigger "stream_dsmrxStart" starting []
-  trigger "stream_usfsStart" starting []
-  trigger "stream_brushedMotorsStart" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
-  trigger "stream_ledStart" starting [arg led_pin]
+  trigger "serialStart" starting []
+  trigger "i2cStart" starting []
+  trigger "dsmrxStart" starting []
+  trigger "usfsStart" starting []
+  trigger "brushedMotorsStart" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
+  trigger "ledStart" starting [arg led_pin]
 
   -- Update receiver in loop
-  trigger "stream_dsmrxUpdate" running []
-  trigger "stream_dsmrxGet" receiverGotNewFrame []
+  trigger "dsmrxUpdate" running []
+  trigger "dsmrxGet" receiverGotNewFrame []
 
   -- Do some other stuff in loop
-  trigger "stream_usfsUpdate" running []
-  trigger "stream_timeUpdate" running []
-  trigger "stream_ledWrite" running [arg led_pin, arg led]
-  trigger "stream_serialUpdate" running []
-  trigger "stream_serialRead" stream_serialAvailable []
+  trigger "usfsUpdate" running []
+  trigger "timeUpdate" running []
+  trigger "ledWrite" running [arg led_pin, arg led]
+  trigger "serialUpdate" running []
+  trigger "serialRead" serialAvailable []
 
   -- Send reply to GCS if indicated
-  trigger "stream_serialSend" (sending msgbuff) [ 
+  trigger "serialSend" (sending msgbuff) [ 
                                         arg $ hdr0 msgbuff
                                       , arg $ hdr1 msgbuff
                                       , arg $ hdr2 msgbuff
@@ -103,7 +103,7 @@ spec = do
                                       , arg $ val05 msgbuff
                                       ]
   -- Run motors
-  trigger "stream_brushedMotorsWrite" true [
+  trigger "brushedMotorsWrite" true [
                                               arg m1_pin
                                             , arg m2_pin
                                             , arg m3_pin

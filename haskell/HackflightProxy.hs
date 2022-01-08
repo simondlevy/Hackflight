@@ -47,7 +47,7 @@ hackflight receiver sensors pidfuns = (pdemands, msgbuff, led)
     led = if micros < 2000000 then (mod (div micros 50000) 2 == 0) else armed
 
     -- Run the serial comms parser
-    (msgtype, sending, payindex, _checked) = parse stream_serialAvailable stream_serialByte
+    (msgtype, sending, payindex, _checked) = parse serialAvailable serialByte
 
     -- Convert the message into a buffer to send to GCS
     msgbuff = message sending msgtype state

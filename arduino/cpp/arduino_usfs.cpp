@@ -15,7 +15,7 @@
 
 static USFS_Master usfs;
 
-void stream_usfsStart(void)
+void usfsStart(void)
 {
     // Start the USFS in master mode, no interrupt
     if (!usfs.begin()) {
@@ -26,7 +26,7 @@ void stream_usfsStart(void)
     }
 }
 
-void stream_usfsUpdate(void)
+void usfsUpdate(void)
 {
     usfs.checkEventStatus();
 
@@ -37,23 +37,23 @@ void stream_usfsUpdate(void)
         }
     }
 
-    stream_imuGotGyrometer = usfs.gotGyrometer();
+    imuGotGyrometer = usfs.gotGyrometer();
 
-    if (stream_imuGotGyrometer) {
+    if (imuGotGyrometer) {
         // Returns degrees / sec
         usfs.readGyrometer(
-             stream_imuGyrometerX,
-             stream_imuGyrometerY,
-             stream_imuGyrometerZ);
+             imuGyrometerX,
+             imuGyrometerY,
+             imuGyrometerZ);
     }
 
-    stream_imuGotQuaternion = usfs.gotQuaternion();
+    imuGotQuaternion = usfs.gotQuaternion();
 
-    if (stream_imuGotQuaternion) {
+    if (imuGotQuaternion) {
         usfs.readQuaternion(
-             stream_imuQuaternionW,
-             stream_imuQuaternionX,
-             stream_imuQuaternionY,
-             stream_imuQuaternionZ);
+             imuQuaternionW,
+             imuQuaternionX,
+             imuQuaternionY,
+             imuQuaternionZ);
     }
 }

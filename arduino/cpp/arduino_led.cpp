@@ -8,12 +8,12 @@
 
 #include <Arduino.h>
 
-void stream_ledStart(const uint8_t pin)
+void ledStart(const uint8_t pin)
 {
     pinMode(pin, OUTPUT);
 }
 
-void stream_ledWrite(const uint8_t pin, bool value)
+void ledWrite(const uint8_t pin, bool value)
 {
     digitalWrite(pin, value);
 }

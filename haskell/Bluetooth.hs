@@ -15,8 +15,8 @@ import Language.Copilot
 
 import Utils
 
-stream_bluetoothAvailable :: SBool
-stream_bluetoothAvailable = extern "stream_bluetoothAvailable" Nothing
+bluetoothAvailable :: SBool
+bluetoothAvailable = extern "bluetoothAvailable" Nothing
 
-stream_bluetoothByte :: SWord8
-stream_bluetoothByte = extern "stream_bluetoothByte" Nothing
+bluetoothByte :: SWord8
+bluetoothByte = extern "bluetoothByte" Nothing

@@ -10,7 +10,7 @@
 #include <WiFi.h>
 #include "arduino_debugger.hpp"
 
-void stream_esp32nowStart(void)
+void esp32nowStart(void)
 {
     // Set device as a Wi-Fi Station
     WiFi.mode(WIFI_STA);
@@ -21,7 +21,7 @@ void stream_esp32nowStart(void)
     }
 }
 
-void stream_esp32nowRegisterPeer(
+void esp32nowRegisterPeer(
         uint8_t mac1,
         uint8_t mac2,
         uint8_t mac3,

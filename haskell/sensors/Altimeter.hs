@@ -43,4 +43,4 @@ altimeter state =
 --------------------------------------------------------------------------
 
 altimeterZ :: Stream Float
-altimeterZ = extern "stream_altimeterZ" Nothing
+altimeterZ = extern "altimeterZ" Nothing

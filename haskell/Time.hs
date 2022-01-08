@@ -32,7 +32,7 @@ runstate = (running, starting) where
   starting = not running
 
 micros :: SWord32
-micros  = extern "stream_micros" Nothing
+micros  = extern "micros" Nothing
 
 time :: SFloat
-time  = extern "stream_time" Nothing
+time  = extern "time" Nothing

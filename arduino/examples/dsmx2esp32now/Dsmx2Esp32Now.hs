@@ -39,13 +39,13 @@ spec = do
   let (running, starting) = runstate
 
   -- Do some stuff at startup
-  trigger "stream_serialStart" starting []
-  trigger "stream_dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
-  trigger "stream_esp32nowStart" starting []
+  trigger "serialStart" starting []
+  trigger "dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
+  trigger "esp32nowStart" starting []
 
   -- Do some other stuff in loop
-  trigger "stream_dsmrxUpdate" running []
-  trigger "stream_dsmrxGet" receiverGotNewFrame []
+  trigger "dsmrxUpdate" running []
+  trigger "dsmrxGet" receiverGotNewFrame []
   trigger "debug" running [  arg receiverThrottle
                            , arg receiverRoll
                            , arg receiverPitch

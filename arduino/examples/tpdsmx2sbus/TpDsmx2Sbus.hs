@@ -41,13 +41,13 @@ spec = do
   let (running, starting) = runstate
 
   -- Do some stuff at startup
-  trigger "stream_dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
-  trigger "stream_sbusOutStart" starting [ arg sbus_out_rx_pin, arg sbus_out_tx_pin]
+  trigger "dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
+  trigger "sbusOutStart" starting [ arg sbus_out_rx_pin, arg sbus_out_tx_pin]
 
   -- Do some other stuff in loop
-  trigger "stream_dsmrxUpdate" running []
-  trigger "stream_dsmrxGet" receiverGotNewFrame []
-  trigger "stream_sbusWrite" running [  arg $ scale receiverThrottle  
+  trigger "dsmrxUpdate" running []
+  trigger "dsmrxGet" receiverGotNewFrame []
+  trigger "sbusWrite" running [  arg $ scale receiverThrottle  
                                       , arg $ scale receiverRoll  
                                       , arg $ scale receiverPitch  
                                       , arg $ scale receiverYaw  
@@ -67,7 +67,7 @@ spec = do
 --}
 
   -- XXX ignore these varaibles for now
-  -- trigger "stream_ignore" running [arg receiverTimedOut]
+  -- trigger "ignore" running [arg receiverTimedOut]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

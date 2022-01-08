@@ -80,28 +80,28 @@ getDemands receiver =
 -- Externals -------------------------------------------------
 
 receiverThrottle :: SFloat
-receiverThrottle  = extern "stream_receiverThrottle" Nothing
+receiverThrottle  = extern "receiverThrottle" Nothing
 
 receiverRoll :: SFloat
-receiverRoll  = extern "stream_receiverRoll" Nothing
+receiverRoll  = extern "receiverRoll" Nothing
 
 receiverPitch :: SFloat
-receiverPitch  = extern "stream_receiverPitch" Nothing
+receiverPitch  = extern "receiverPitch" Nothing
 
 receiverYaw :: SFloat
-receiverYaw  = extern "stream_receiverYaw" Nothing
+receiverYaw  = extern "receiverYaw" Nothing
 
 receiverAux1 :: SFloat
-receiverAux1  = extern "stream_receiverAux1" Nothing
+receiverAux1  = extern "receiverAux1" Nothing
 
 receiverAux2 :: SFloat
-receiverAux2  = extern "stream_receiverAux2" Nothing
+receiverAux2  = extern "receiverAux2" Nothing
 
 receiverReady :: SBool
-receiverReady  = extern "stream_receiverReady" Nothing
+receiverReady  = extern "receiverReady" Nothing
 
 receiverTimedOut :: SBool
-receiverTimedOut  = extern "stream_receiverTimedOut" Nothing
+receiverTimedOut  = extern "receiverTimedOut" Nothing
 
 receiverGotNewFrame :: SBool
-receiverGotNewFrame  = extern "stream_receiverGotNewFrame" Nothing
+receiverGotNewFrame  = extern "receiverGotNewFrame" Nothing
