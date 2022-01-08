@@ -10,11 +10,11 @@
 #include <stdint.h>
 #include <string.h>
 
-void stream_serialWrite(uint8_t byte);
+void serialWrite(uint8_t byte);
 
 static void serializeByte(uint8_t & crc, uint8_t byte)
 {
-    stream_serialWrite(byte);
+    serialWrite(byte);
     crc ^= byte;
 }
 
@@ -30,7 +30,7 @@ static void serializeFloat(uint8_t & crc, float value)
     serializeByte(crc, uintval>>24 & 0xFF);
 }
 
-void stream_serialSend(
+void serialSend(
         uint8_t hdr0
       , uint8_t hdr1
       , uint8_t hdr2
@@ -46,11 +46,11 @@ void stream_serialSend(
       , float val05
       )
 {
-    stream_serialWrite(hdr0);
-    stream_serialWrite(hdr1);
-    stream_serialWrite(hdr2);
-    stream_serialWrite(hdr3);
-    stream_serialWrite(hdr4);
+    serialWrite(hdr0);
+    serialWrite(hdr1);
+    serialWrite(hdr2);
+    serialWrite(hdr3);
+    serialWrite(hdr4);
 
     if (size > 0) serializeFloat(crc, val00);
     if (size > 1) serializeFloat(crc, val01);

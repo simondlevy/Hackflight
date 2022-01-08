@@ -20,7 +20,7 @@ static float scale(float val, float max)
     return val < 0 ? 0 : val > 1 ? 1 : val;
 }
 
-void stream_brushedMotorsWrite(
+void brushedMotorsWrite(
         uint8_t m1_pin,
         uint8_t m2_pin,
         uint8_t m3_pin,
@@ -46,7 +46,7 @@ void stream_brushedMotorsWrite(
     brushedMotorWrite(m4_pin, m4_val);
 }
 
-void stream_brushedMotorsStart(
+void brushedMotorsStart(
         uint8_t m1_pin,
         uint8_t m2_pin,
         uint8_t m3_pin,
@@ -58,7 +58,7 @@ void stream_brushedMotorsStart(
     brushedMotorStart(m4_pin);
 }
 
-void stream_brushlessMotorsWrite(
+void brushlessMotorsWrite(
         uint16_t pwm_min,
         uint16_t pwm_max,
         uint8_t m1_pin,
@@ -86,7 +86,7 @@ void stream_brushlessMotorsWrite(
     brushlessMotorWrite(pwm_min, pwm_max, m4_pin, m4_val);
 }
 
-void stream_brushlessMotorsStart( uint16_t pwm_min,
+void brushlessMotorsStart( uint16_t pwm_min,
         uint8_t m1_pin,
         uint8_t m2_pin,
         uint8_t m3_pin,

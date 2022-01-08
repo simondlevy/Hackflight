@@ -13,7 +13,5 @@
 
 void timeUpdate(void)
 {
-    micros = micros();
-
-    // time = micros / 1e6;
+    usec = micros();
 }
