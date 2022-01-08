@@ -36,6 +36,22 @@ data MessageBuffer = MessageBuffer {  sending :: SBool
                                     , val05   :: SFloat
                                     }
 
+mkmessage ::   SBool
+            -> SWord8
+            -> SWord8
+            -> SWord8
+            -> SWord8
+            -> SFloat
+            -> SFloat
+            -> SFloat
+            -> SFloat
+            -> SFloat
+            -> SFloat
+            -> MessageBuffer
+
+mkmessage sending outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
+  MessageBuffer sending 0x24 0x4D 0x3E outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
+
 payload :: SWord8 -> State -> (SWord8, SFloat, SFloat, SFloat, SFloat, SFloat, SFloat)
 
 payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) where
