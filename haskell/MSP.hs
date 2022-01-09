@@ -65,9 +65,10 @@ mkresponse ::  SWord8  -- outsize
             -> Message
 
 mkresponse outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
-  Message 0x24 0x4D 0x3E outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
+  mkmessage 0x3E outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
 
-mkcommand ::  SWord8  -- outsize
+{--
+mkcommand ::   SWord8  -- outsize
             -> SWord8  -- msgtype
             -> SWord8  -- crc
             -> SWord8  -- paysize
@@ -80,5 +81,6 @@ mkcommand ::  SWord8  -- outsize
             -> Message
 
 mkcommand outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
-  Message 0x24 0x4D 0x3C outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
+  mkmessage outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
+--}
 

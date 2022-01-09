@@ -56,7 +56,7 @@ spec = do
                                       , arg rx_mac5
                                       , arg rx_mac6 ] 
 
-  let msgbuff = rxmessage receiverThrottle
+  let message = rxmessage receiverThrottle
                           receiverRoll
                           receiverPitch
                           receiverYaw
@@ -72,19 +72,19 @@ spec = do
                                  , arg rx_mac4
                                  , arg rx_mac5
                                  , arg rx_mac6 
-                                 , arg $ hdr0 msgbuff
-                                 , arg $ hdr1 msgbuff
-                                 , arg $ hdr2 msgbuff
-                                 , arg $ outsize msgbuff
-                                 , arg $ msgtype msgbuff
-                                 , arg $ crc msgbuff
-                                 , arg $ paysize msgbuff
-                                 , arg $ val00 msgbuff
-                                 , arg $ val01 msgbuff
-                                 , arg $ val02 msgbuff
-                                 , arg $ val03 msgbuff
-                                 , arg $ val04 msgbuff
-                                 , arg $ val05 msgbuff
+                                 , arg $ hdr0 message
+                                 , arg $ hdr1 message
+                                 , arg $ hdr2 message
+                                 , arg $ outsize message
+                                 , arg $ msgtype message
+                                 , arg $ crc message
+                                 , arg $ paysize message
+                                 , arg $ val00 message
+                                 , arg $ val01 message
+                                 , arg $ val02 message
+                                 , arg $ val03 message
+                                 , arg $ val04 message
+                                 , arg $ val05 message
                                  ]
 
 -- Compile the spec
