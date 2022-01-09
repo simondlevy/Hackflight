@@ -107,15 +107,15 @@ spec = do
 
   -- Run motors
   trigger "brushedMotorsWrite" true [
-                                              arg m1_pin
-                                            , arg m2_pin
-                                            , arg m3_pin
-                                            , arg m4_pin
-                                            , arg $ m1 motors
-                                            , arg $ m2 motors
-                                            , arg $ m3 motors
-                                            , arg $ m4 motors
-                                           ]
+                                      arg m1_pin
+                                    , arg m2_pin
+                                    , arg m3_pin
+                                    , arg m4_pin
+                                    , arg $ m1 motors
+                                    , arg $ m2 motors
+                                    , arg $ m3 motors
+                                    , arg $ m4 motors
+                                    ]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
