@@ -30,8 +30,9 @@ static void serializeFloat(uint8_t & crc, float value)
     serializeByte(crc, uintval>>24 & 0xFF);
 }
 
-void serialSend(
-          uint8_t hdr0
+void serializeBytes(
+          void (*sendfun)(uint8_t)
+        , uint8_t hdr0
         , uint8_t hdr1
         , uint8_t hdr2
         , uint8_t hdr3
@@ -60,4 +61,38 @@ void serialSend(
     if (size > 5) serializeFloat(crc, val05);
 
     serializeByte(crc, crc);
+}
+
+void serialSend(
+          uint8_t hdr0
+        , uint8_t hdr1
+        , uint8_t hdr2
+        , uint8_t hdr3
+        , uint8_t hdr4
+        , uint8_t crc
+        , uint8_t size
+        , float val00
+        , float val01
+        , float val02
+        , float val03
+        , float val04
+        , float val05
+        )
+{
+    serializeBytes(
+            serialWrite,
+            hdr0,
+            hdr1,
+            hdr2,
+            hdr3,
+            hdr4,
+            crc,
+            size,
+            val00,
+            val01,
+            val02,
+            val03,
+            val04,
+            val05);
+
 }
