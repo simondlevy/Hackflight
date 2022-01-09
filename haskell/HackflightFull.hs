@@ -22,6 +22,7 @@ import Time
 import Mixers
 import Motors
 import Parser
+import MSP
 import Messages
 import Serial
 import Utils

@@ -14,6 +14,7 @@ module Parser where
 import Language.Copilot hiding(xor)
 import Prelude hiding((==), (&&), (||), (++), (>), (<), not)
 
+import MSP
 import Messages
 import State
 import Utils
