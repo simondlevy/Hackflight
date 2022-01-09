@@ -17,6 +17,7 @@ import Prelude hiding ((/), (*), (+), (-), (==), (++))
 
 import Time
 import Receiver
+import MSP
 import Messages
 import Parser
 import Utils
