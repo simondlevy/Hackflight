@@ -67,13 +67,8 @@ spec = do
   -- Do some other stuff in loop
   --trigger "dsmrxUpdate" running []
   --trigger "dsmrxGet" receiverGotNewFrame []
-  trigger "esp32nowSend" running [ arg rx_mac1
-                                 , arg rx_mac2
-                                 , arg rx_mac3
-                                 , arg rx_mac4
-                                 , arg rx_mac5
-                                 , arg rx_mac6 
-                                 , arg $ hdr0 message
+  trigger "esp32nowSend" running [
+                                   arg $ hdr0 message
                                  , arg $ hdr1 message
                                  , arg $ hdr2 message
                                  , arg $ outsize message

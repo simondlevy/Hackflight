@@ -66,7 +66,8 @@ spec = do
   -- Get flags for startup, loop
   let (running, starting) = runstate
 
-  -- Run the full Hackflight algorithm
+  -- Run the full Hackflight algorithm.  The "sending" flag will be true when
+  -- the algorithm is ready to send data.
   let (message, sending, motors, led) = hackflight receiver sensors pidfuns QuadXMW
 
   -- Do some stuff at startup
