@@ -88,7 +88,8 @@ spec = do
   trigger "serialUpdate" running []
   trigger "serialRead" serialAvailable []
 
-  -- Send reply to GCS if indicated
+  -- Send reply to GCS if indicated.  C function serialSend() computes
+  -- remaining CRC from floats before sending.
   trigger "serialSend" sending [ 
                                  arg $ hdr0 message
                                , arg $ hdr1 message
