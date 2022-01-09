@@ -66,7 +66,7 @@ spec = do
   let (running, starting) = runstate
 
   -- Run the full Hackflight algorithm
-  let (msgbuff, motors, led) = hackflight receiver sensors pidfuns QuadXMW
+  let (message, sending, motors, led) = hackflight receiver sensors pidfuns QuadXMW
 
   -- Do some stuff at startup
   trigger "serialStart" starting []
@@ -88,21 +88,21 @@ spec = do
   trigger "serialRead" serialAvailable []
 
   -- Send reply to GCS if indicated
-  trigger "serialSend" (sending msgbuff) [ 
-                                        arg $ hdr0 msgbuff
-                                      , arg $ hdr1 msgbuff
-                                      , arg $ hdr2 msgbuff
-                                      , arg $ outsize msgbuff
-                                      , arg $ msgtype msgbuff
-                                      , arg $ crc msgbuff
-                                      , arg $ paysize msgbuff
-                                      , arg $ val00 msgbuff
-                                      , arg $ val01 msgbuff
-                                      , arg $ val02 msgbuff
-                                      , arg $ val03 msgbuff
-                                      , arg $ val04 msgbuff
-                                      , arg $ val05 msgbuff
-                                      ]
+  trigger "serialSend" sending [ 
+                                 arg $ hdr0 message
+                               , arg $ hdr1 message
+                               , arg $ hdr2 message
+                               , arg $ outsize message
+                               , arg $ msgtype message
+                               , arg $ crc message
+                               , arg $ paysize message
+                               , arg $ val00 message
+                               , arg $ val01 message
+                               , arg $ val02 message
+                               , arg $ val03 message
+                               , arg $ val04 message
+                               , arg $ val05 message
+                               ]
 
   -- Run motors
   trigger "brushedMotorsWrite" true [

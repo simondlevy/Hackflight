@@ -20,37 +20,51 @@ import Receiver
 import State
 import Utils
 
-data MessageBuffer = MessageBuffer {  sending :: SBool
-                                    , hdr0    :: SWord8 -- '$' (0x24)
-                                    , hdr1    :: SWord8 -- 'M' (0x4D)
-                                    , hdr2    :: SWord8 -- '>' (0x3E)
-                                    , outsize :: SWord8 
-                                    , msgtype :: SWord8 
-                                    , crc     :: SWord8 
-                                    , paysize :: SWord8 
-                                    , val00   :: SFloat  
-                                    , val01   :: SFloat
-                                    , val02   :: SFloat
-                                    , val03   :: SFloat
-                                    , val04   :: SFloat
-                                    , val05   :: SFloat
-                                    }
+-- Use floats for every payload
+data Message = Message {  hdr0    :: SWord8 -- '$' (0x24)
+                        , hdr1    :: SWord8 -- 'M' (0x4D)
+                        , hdr2    :: SWord8 -- '>' (0x3E)
+                        , outsize :: SWord8 
+                        , msgtype :: SWord8 
+                        , crc     :: SWord8 
+                        , paysize :: SWord8 
+                        , val00   :: SFloat  
+                        , val01   :: SFloat
+                        , val02   :: SFloat
+                        , val03   :: SFloat
+                        , val04   :: SFloat
+                        , val05   :: SFloat
+                        }
 
-mkmessage ::   SBool
+mkmessage ::   SWord8
             -> SWord8
             -> SWord8
             -> SWord8
-            -> SWord8
             -> SFloat
             -> SFloat
             -> SFloat
             -> SFloat
             -> SFloat
             -> SFloat
-            -> MessageBuffer
+            -> Message
 
-mkmessage sending outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
-  MessageBuffer sending 0x24 0x4D 0x3E outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
+mkmessage outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
+  Message 0x24 0x4D 0x3E outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
+
+mkresponse ::  SWord8  -- outsize
+            -> SWord8  -- msgtype
+            -> SWord8  -- crc
+            -> SWord8  -- paysize
+            -> SFloat  -- v00
+            -> SFloat  -- v01
+            -> SFloat  -- v02
+            -> SFloat  -- v03
+            -> SFloat  -- v04
+            -> SFloat  -- v05
+            -> Message
+
+mkresponse outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
+  Message 0x24 0x4D 0x3E outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
 
 payload :: SWord8 -> State -> (SWord8, SFloat, SFloat, SFloat, SFloat, SFloat, SFloat)
 
@@ -84,7 +98,7 @@ getMotors msgtype payindex byte = (motor_index, motor_percent) where
   motor_percent = if msgtype == 215 && payindex == 2 then byte
                   else motor_percent' where motor_percent' = [0] ++ motor_percent
 
-rxmessage :: SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> MessageBuffer
+rxmessage :: SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> Message
 
-rxmessage thr rol pit yaw aux1 aux2 = MessageBuffer true 0 0 0 0 0 0 0 0 0 0 0 0 0
+rxmessage thr rol pit yaw aux1 aux2 = Message 0 0 0 0 0 0 0 0 0 0 0 0 0
 

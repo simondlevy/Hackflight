@@ -27,9 +27,9 @@ import Serial
 import Utils
 
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> (MessageBuffer, Motors, SBool)
+hackflight :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> (Message, SBool, Motors, SBool)
 
-hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
+hackflight receiver sensors pidfuns mixer = (message, sending, motors, led)
 
   where
 
@@ -55,7 +55,7 @@ hackflight receiver sensors pidfuns mixer = (msgbuff, motors, led)
     (msgtype, sending, payindex, _checked) = parse serialAvailable serialByte
 
     -- Reply with a message to GCS if indicated
-    msgbuff = reply sending msgtype state
+    message = reply msgtype state
 
     -- Check for incoming SET_MOTOR messages from GCS
     (motor_index, motor_percent) = getMotors msgtype payindex serialByte
