@@ -23,7 +23,7 @@ import Utils
 -- Use floats for every payload
 data Message = Message {  hdr0    :: SWord8 -- '$' (0x24)
                         , hdr1    :: SWord8 -- 'M' (0x4D)
-                        , hdr2    :: SWord8 -- '>' (0x3E)
+                        , hdr2    :: SWord8 -- '>' (0x3E) or '<' (0x3C)
                         , outsize :: SWord8 
                         , msgtype :: SWord8 
                         , crc     :: SWord8 
@@ -40,6 +40,7 @@ mkmessage ::   SWord8
             -> SWord8
             -> SWord8
             -> SWord8
+            -> SWord8
             -> SFloat
             -> SFloat
             -> SFloat
@@ -48,8 +49,8 @@ mkmessage ::   SWord8
             -> SFloat
             -> Message
 
-mkmessage outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
-  Message 0x24 0x4D 0x3E outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
+mkmessage direction outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
+  Message 0x24 0x4D direction outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
 
 mkresponse ::  SWord8  -- outsize
             -> SWord8  -- msgtype
