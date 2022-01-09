@@ -12,12 +12,9 @@
 
 module MSP where
 
-import Language.Copilot hiding(xor)
+import Language.Copilot
 import Copilot.Compile.C99
-import Prelude hiding((==), (&&), (++))
 
-import Receiver
-import State
 import Utils
 
 -- Use floats for every payload

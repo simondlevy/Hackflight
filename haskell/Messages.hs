@@ -12,7 +12,7 @@
 
 module Messages where
 
-import Language.Copilot hiding(xor)
+import Language.Copilot
 import Copilot.Compile.C99
 import Prelude hiding((==), (&&), (++))
 
