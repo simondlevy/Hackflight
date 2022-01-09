@@ -67,6 +67,21 @@ mkresponse ::  SWord8  -- outsize
 mkresponse outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
   Message 0x24 0x4D 0x3E outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
 
+mkcommand ::  SWord8  -- outsize
+            -> SWord8  -- msgtype
+            -> SWord8  -- crc
+            -> SWord8  -- paysize
+            -> SFloat  -- v00
+            -> SFloat  -- v01
+            -> SFloat  -- v02
+            -> SFloat  -- v03
+            -> SFloat  -- v04
+            -> SFloat  -- v05
+            -> Message
+
+mkcommand outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
+  Message 0x24 0x4D 0x3C outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
+
 payload :: SWord8 -> State -> (SWord8, SFloat, SFloat, SFloat, SFloat, SFloat, SFloat)
 
 payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) where
