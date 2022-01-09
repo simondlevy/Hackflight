@@ -54,5 +54,5 @@ getMotors msgtype payindex byte = (motor_index, motor_percent) where
                   else motor_percent' where motor_percent' = [0] ++ motor_percent
 
 rxmessage :: SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> Message
-rxmessage thr rol pit yaw aux1 aux2 = mkcommand 0 0 0 0 0 0 0 0 0 0
+rxmessage thr rol pit yaw aux1 aux2 = mkcommand 0 0 0 0 thr rol pit yaw aux1 aux2
 
