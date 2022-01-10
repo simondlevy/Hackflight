@@ -37,30 +37,6 @@ data Message' = Message' {  hdr0'    :: SWord8 -- '$' (0x24)
                           , b10'     :: SWord8 
                           , b11'     :: SWord8 
                           , b12'     :: SWord8 
-                          , b13'     :: SWord8 
-                          , b14'     :: SWord8 
-                          , b15'     :: SWord8 
-                          , b16'     :: SWord8 
-                          , b17'     :: SWord8 
-                          , b18'     :: SWord8 
-                          , b19'     :: SWord8 
-                          , b20'     :: SWord8 
-                          , b21'     :: SWord8 
-                          , b22'     :: SWord8 
-                          , b23'     :: SWord8 
-                          , b24'     :: SWord8 
-                          , b25'     :: SWord8 
-                          , b26'     :: SWord8 
-                          , b27'     :: SWord8 
-                          , b28'     :: SWord8 
-                          , b29'     :: SWord8 
-                          , b30'     :: SWord8 
-                          , b31'     :: SWord8 
-                          , b32'     :: SWord8 
-                          , b33'     :: SWord8 
-                          , b34'     :: SWord8 
-                          , b35'     :: SWord8 
-                          , b36'     :: SWord8 
                          }
 
 -- Use floats for every payload
