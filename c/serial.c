@@ -12,22 +12,22 @@
 
 void serialWrite(uint8_t byte);
 
-static void serializeByte(uint8_t & crc, uint8_t byte)
+static void serializeByte(void (*sendfun)(uint8_t), uint8_t & crc, uint8_t byte)
 {
-    serialWrite(byte);
+    sendfun(byte);
     crc ^= byte;
 }
 
-static void serializeFloat(uint8_t & crc, float value)
+static void serializeFloat(void (*sendfun)(uint8_t), uint8_t & crc, float value)
 {
     uint32_t uintval = 0;
 
     memcpy(&uintval, &value, 4);
 
-    serializeByte(crc, uintval     & 0xFF);
-    serializeByte(crc, uintval>>8  & 0xFF);
-    serializeByte(crc, uintval>>16 & 0xFF);
-    serializeByte(crc, uintval>>24 & 0xFF);
+    serializeByte(sendfun, crc, uintval     & 0xFF);
+    serializeByte(sendfun, crc, uintval>>8  & 0xFF);
+    serializeByte(sendfun, crc, uintval>>16 & 0xFF);
+    serializeByte(sendfun, crc, uintval>>24 & 0xFF);
 }
 
 void serializeBytes(
@@ -47,18 +47,18 @@ void serializeBytes(
         , float val05
         )
 {
-    serialWrite(hdr0);
-    serialWrite(hdr1);
-    serialWrite(hdr2);
-    serialWrite(hdr3);
-    serialWrite(hdr4);
+    sendfun(hdr0);
+    sendfun(hdr1);
+    sendfun(hdr2);
+    sendfun(hdr3);
+    sendfun(hdr4);
 
-    if (size > 0) serializeFloat(crc, val00);
-    if (size > 1) serializeFloat(crc, val01);
-    if (size > 2) serializeFloat(crc, val02);
-    if (size > 3) serializeFloat(crc, val03);
-    if (size > 4) serializeFloat(crc, val04);
-    if (size > 5) serializeFloat(crc, val05);
+    if (size > 0) serializeFloat(sendfun, crc, val00);
+    if (size > 1) serializeFloat(sendfun, crc, val01);
+    if (size > 2) serializeFloat(sendfun, crc, val02);
+    if (size > 3) serializeFloat(sendfun, crc, val03);
+    if (size > 4) serializeFloat(sendfun, crc, val04);
+    if (size > 5) serializeFloat(sendfun, crc, val05);
 
     serializeByte(crc, crc);
 }
