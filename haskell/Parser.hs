@@ -27,7 +27,7 @@ reply msgtype vstate =
 
       outsize = 4 * paysize
 
-  in mkresponse outsize msgtype (xor outsize msgtype) paysize v00 v01 v02 v03 v04 v05
+  in MSP.mkresponse outsize msgtype (xor outsize msgtype) paysize v00 v01 v02 v03 v04 v05
 
 parse :: SBool -> SWord8 -> (SWord8, SBool, SWord8, SBool)
 
