@@ -53,10 +53,10 @@ hackflight receiver sensors pidfuns mixer = (message, sending, motors, led)
     led = if c_usec < 2000000 then (mod (div c_usec 50000) 2 == 0) else armed
 
     -- Run the serial comms parser checking for data requests
-    (msgtype, sending, payindex, _checked) = parse c_serialAvailable c_serialByte
+    (msgtype, sending, payindex, _checked) = Parser.parse c_serialAvailable c_serialByte
 
     -- Reply with a message to GCS if indicated
-    message = reply msgtype state
+    message = Parser.reply msgtype state
 
     -- Check for incoming SET_MOTOR messages from GCS
     (motor_index, motor_percent) = getMotors msgtype payindex c_serialByte
