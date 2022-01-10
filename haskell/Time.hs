@@ -17,11 +17,11 @@ import Prelude hiding(div, (++), (>), (==), not)
 import Utils
 
 timerReady :: SWord32 -> SBool
-timerReady freq = (usec == usec') where
+timerReady freq = (c_usec == usec') where
 
   period = div 1000000 freq
 
-  usec' = if (usec - usec'') > period then usec else usec''
+  usec' = if (c_usec - usec'') > period then c_usec else usec''
 
   usec'' = [0] ++ usec'
 
@@ -31,8 +31,8 @@ runstate = (running, starting) where
   running = if not flipflop then true else running' where running' = [False] ++ running
   starting = not running
 
-usec :: SWord32
-usec  = extern "usec" Nothing
+c_usec :: SWord32
+c_usec  = extern "usec" Nothing
 
-time :: SFloat
-time  = extern "time" Nothing
+c_time :: SFloat
+c_time  = extern "time" Nothing

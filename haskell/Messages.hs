@@ -27,21 +27,21 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
 
   paysize = if msgtype == 121 then 6 else if msgtype == 122 then 3 else 0 :: SWord8
 
-  val00 = if msgtype == 121 then receiverThrottle
+  val00 = if msgtype == 121 then c_receiverThrottle
           else if msgtype == 122 then (phi vstate)
           else 0
 
-  val01 = if msgtype == 121 then receiverRoll
+  val01 = if msgtype == 121 then c_receiverRoll
           else if msgtype == 122 then (theta vstate)
           else 0
 
-  val02 = if msgtype == 121 then receiverPitch
+  val02 = if msgtype == 121 then c_receiverPitch
           else if msgtype == 122 then (psi vstate)
           else 0
 
-  val03 = if msgtype == 121 then receiverYaw else 0
-  val04 = if msgtype == 121 then receiverAux1 else 0
-  val05 = if msgtype == 121 then receiverAux2 else 0
+  val03 = if msgtype == 121 then c_receiverYaw else 0
+  val04 = if msgtype == 121 then c_receiverAux1 else 0
+  val05 = if msgtype == 121 then c_receiverAux2 else 0
 
 getMotors :: SWord8 -> SWord8 -> SWord8 -> (SWord8, SWord8)
 

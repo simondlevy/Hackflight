@@ -52,13 +52,13 @@ getDemands receiver =
 
     where
 
-      throttleDemand = throttleFun receiverThrottle
+      throttleDemand = throttleFun c_receiverThrottle
 
-      rollDemand = ((adjustCommand (cyclicFun $ abs receiverRoll) receiverRoll) + (rollTrim trim)) * scale
+      rollDemand = ((adjustCommand (cyclicFun $ abs c_receiverRoll) c_receiverRoll) + (rollTrim trim)) * scale
 
-      pitchDemand = ((adjustCommand (cyclicFun $ abs receiverPitch) receiverPitch) + (pitchTrim trim)) * scale
+      pitchDemand = ((adjustCommand (cyclicFun $ abs c_receiverPitch) c_receiverPitch) + (pitchTrim trim)) * scale
 
-      yawDemand = ((adjustCommand  (abs receiverYaw)  receiverYaw) + (yawTrim trim)) * scale
+      yawDemand = ((adjustCommand  (abs c_receiverYaw)  c_receiverYaw) + (yawTrim trim)) * scale
 
       cyclicFun command = rcFun command (cyclicExpo receiver) (cyclicRate receiver)
  
@@ -79,29 +79,29 @@ getDemands receiver =
 
 -- Externals -------------------------------------------------
 
-receiverThrottle :: SFloat
-receiverThrottle  = extern "receiverThrottle" Nothing
+c_receiverThrottle :: SFloat
+c_receiverThrottle  = extern "receiverThrottle" Nothing
 
-receiverRoll :: SFloat
-receiverRoll  = extern "receiverRoll" Nothing
+c_receiverRoll :: SFloat
+c_receiverRoll  = extern "receiverRoll" Nothing
 
-receiverPitch :: SFloat
-receiverPitch  = extern "receiverPitch" Nothing
+c_receiverPitch :: SFloat
+c_receiverPitch  = extern "receiverPitch" Nothing
 
-receiverYaw :: SFloat
-receiverYaw  = extern "receiverYaw" Nothing
+c_receiverYaw :: SFloat
+c_receiverYaw  = extern "receiverYaw" Nothing
 
-receiverAux1 :: SFloat
-receiverAux1  = extern "receiverAux1" Nothing
+c_receiverAux1 :: SFloat
+c_receiverAux1  = extern "receiverAux1" Nothing
 
-receiverAux2 :: SFloat
-receiverAux2  = extern "receiverAux2" Nothing
+c_receiverAux2 :: SFloat
+c_receiverAux2  = extern "receiverAux2" Nothing
 
-receiverReady :: SBool
-receiverReady  = extern "receiverReady" Nothing
+c_receiverReady :: SBool
+c_receiverReady  = extern "receiverReady" Nothing
 
-receiverTimedOut :: SBool
-receiverTimedOut  = extern "receiverTimedOut" Nothing
+c_receiverTimedOut :: SBool
+c_receiverTimedOut  = extern "receiverTimedOut" Nothing
 
-receiverGotNewFrame :: SBool
-receiverGotNewFrame  = extern "receiverGotNewFrame" Nothing
+c_receiverGotNewFrame :: SBool
+c_receiverGotNewFrame  = extern "receiverGotNewFrame" Nothing

@@ -15,14 +15,14 @@ import Language.Copilot
 
 import Utils
 
-serialAvailable :: SBool
-serialAvailable = extern "serialAvailable" Nothing
+c_serialAvailable :: SBool
+c_serialAvailable = extern "serialAvailable" Nothing
 
-serialByte :: SWord8
-serialByte = extern "serialByte" Nothing
+c_serialByte :: SWord8
+c_serialByte = extern "serialByte" Nothing
 
-serial1Available :: SBool
-serial1Available = extern "serial1Available" Nothing
+c_serial1Available :: SBool
+c_serial1Available = extern "serial1Available" Nothing
 
-serial1Byte :: SWord8
-serial1Byte = extern "serial1Byte" Nothing
+c_serial1Byte :: SWord8
+c_serial1Byte = extern "serial1Byte" Nothing

@@ -46,13 +46,13 @@ spec = do
 
   -- Do some other stuff in loop
   trigger "dsmrxUpdate" running []
-  trigger "dsmrxGet" receiverGotNewFrame []
-  trigger "sbusWrite" running [  arg $ scale receiverThrottle  
-                                      , arg $ scale receiverRoll  
-                                      , arg $ scale receiverPitch  
-                                      , arg $ scale receiverYaw  
-                                      , arg $ scale receiverAux1
-                                      , arg $ scale receiverAux2
+  trigger "dsmrxGet" c_receiverGotNewFrame []
+  trigger "sbusWrite" running [  arg $ scale c_receiverThrottle  
+                                      , arg $ scale c_receiverRoll  
+                                      , arg $ scale c_receiverPitch  
+                                      , arg $ scale c_receiverYaw  
+                                      , arg $ scale c_receiverAux1
+                                      , arg $ scale c_receiverAux2
                                       , arg sbus_min
                                       , arg sbus_min
                                       , arg sbus_min

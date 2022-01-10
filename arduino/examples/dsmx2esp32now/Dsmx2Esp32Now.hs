@@ -57,12 +57,12 @@ spec = do
                                       , arg rx_mac5
                                       , arg rx_mac6 ] 
 
-  let message = rxmessage receiverThrottle
-                          receiverRoll
-                          receiverPitch
-                          receiverYaw
-                          receiverAux1
-                          receiverAux2
+  let message = rxmessage c_receiverThrottle
+                          c_receiverRoll
+                          c_receiverPitch
+                          c_receiverYaw
+                          c_receiverAux1
+                          c_receiverAux2
 
   -- Do some other stuff in loop
   --trigger "dsmrxUpdate" running []

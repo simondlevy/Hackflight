@@ -15,8 +15,8 @@ import Language.Copilot
 
 import Utils
 
-bluetoothAvailable :: SBool
-bluetoothAvailable = extern "bluetoothAvailable" Nothing
+c_bluetoothAvailable :: SBool
+c_bluetoothAvailable = extern "bluetoothAvailable" Nothing
 
-bluetoothByte :: SWord8
-bluetoothByte = extern "bluetoothByte" Nothing
+c_bluetoothByte :: SWord8
+c_bluetoothByte = extern "bluetoothByte" Nothing

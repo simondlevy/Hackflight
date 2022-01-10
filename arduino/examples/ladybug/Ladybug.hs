@@ -80,14 +80,14 @@ spec = do
 
   -- Update receiver in loop
   trigger "dsmrxUpdate" running []
-  trigger "dsmrxGet" receiverGotNewFrame []
+  trigger "dsmrxGet" c_receiverGotNewFrame []
 
   -- Do some other stuff in loop
   trigger "usfsUpdate" running []
   trigger "timeUpdate" running []
   trigger "ledWrite" running [arg led_pin, arg led]
   trigger "serialUpdate" running []
-  trigger "serialRead" serialAvailable []
+  trigger "serialRead" c_serialAvailable []
 
   -- Send reply to GCS if indicated.  C function serialSend() computes
   -- remaining CRC from floats before sending.
