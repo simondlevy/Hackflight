@@ -17,28 +17,6 @@ import Copilot.Compile.C99
 
 import Utils
 
-
-data Message' = Message' {  hdr0'    :: SWord8 -- '$' (0x24)
-                          , hdr1'    :: SWord8 -- 'M' (0x4D)
-                          , hdr2'    :: SWord8 -- '>' (0x3E) or '<' (0x3C)
-                          , outsize' :: SWord8 
-                          , msgtype' :: SWord8 
-                          , crc'     :: SWord8 
-                          , paysize' :: SWord8 
-                          , b01'     :: SWord8 
-                          , b02'     :: SWord8 
-                          , b03'     :: SWord8 
-                          , b04'     :: SWord8 
-                          , b05'     :: SWord8 
-                          , b06'     :: SWord8 
-                          , b07'     :: SWord8 
-                          , b08'     :: SWord8 
-                          , b09'     :: SWord8 
-                          , b10'     :: SWord8 
-                          , b11'     :: SWord8 
-                          , b12'     :: SWord8 
-                         }
-
 -- Use floats for every payload
 data Message = Message {  hdr0    :: SWord8 -- '$' (0x24)
                         , hdr1    :: SWord8 -- 'M' (0x4D)
