@@ -9,6 +9,8 @@ MIT License
 from serial import Serial
 from threading import Thread
 
+from debugging import debug
+
 BAUD = 115200
 
 
@@ -45,8 +47,8 @@ class Comms:
             try:
                 byte = self.port.read(1)
                 self.gcs.parse(byte)
-            except Exception:
-                None
+            except Exception as e:
+                debug(e)
 
     def start(self):
 
