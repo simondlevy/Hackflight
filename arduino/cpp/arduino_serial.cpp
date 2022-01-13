@@ -44,9 +44,13 @@ void serial2Start(void)
     Serial2.begin(115200);
 }
 
-void serial2Debug(uint8_t mindex, uint16_t mvalue)
+void serial2Debug(float v1, float v2, float v3, float v4)
 {
-    Serial2.print(mindex);
-    Serial2.print(": ");
-    Serial2.println(mvalue);
+    Serial2.print(v1);
+    Serial2.print("    ");
+    Serial2.print(v2);
+    Serial2.print("    ");
+    Serial2.print(v3);
+    Serial2.print("    ");
+    Serial2.println(v4);
 }

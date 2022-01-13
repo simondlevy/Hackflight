@@ -63,7 +63,7 @@ spec = do
 
   -- Run the full Hackflight algorithm.  The "sending" flag will be true when
   -- the algorithm is ready to send data.
-  let (message, sending, motors, led, mindex, mvalue) = hackflight receiver sensors pidfuns QuadXMW
+  let (message, sending, motors, led, m1val, m2val, m3val, m4val) = hackflight receiver sensors pidfuns QuadXMW
 
   -- Do some stuff at startup
   trigger "serialStart" starting []
@@ -113,7 +113,7 @@ spec = do
                                     , arg $ m4 motors
                                     ]
 
-  trigger "serial2Debug" (running && mindex == 4) [arg mindex, arg mvalue]
+  trigger "serial2Debug" running [arg m1val, arg m2val, arg m3val, arg m4val]
 
 
 -- Compile the spec

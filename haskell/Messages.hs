@@ -61,16 +61,15 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
 
   rxscale x = 1000 + 1000 * (x + 1) / 2
 
---getMotors :: SWord8 -> SWord8 -> SWord8 -> (SFloat, SFloat, SFloat, SFloat)
-getMotors :: SWord8 -> SWord8 -> SWord8 -> (SWord8, SWord16)
--- getMotors msgtype payindex byte = (m1, m2, m3, m4) where
-getMotors msgtype payindex byte = (mindex, mvalue) where
+----------------------------------------------------------------------------
+
+getMotors :: SWord8 -> SWord8 -> SWord8 -> (SFloat, SFloat, SFloat, SFloat)
+
+getMotors msgtype payindex byte = (m1, m2, m3, m4) where
 
   mindex = div payindex 2
 
-  -- m1 = if msgtype == 214 && payindex == 1 then unsafeCast mvalue
-  --      else m1' where m1' = [0] ++ m1
-  m1 = 0
+  m1 = if mindex == 1 then (unsafeCast mvalue) else m1' where m1' = [0] ++ m1
   m2 = 0
   m3 = 0
   m4 = 0
@@ -80,5 +79,3 @@ getMotors msgtype payindex byte = (mindex, mvalue) where
   b' = [0] ++ b
   mvalue = if mod payindex 2 == 0 then b' .|. b.<<.(8::SWord8)
            else  mvalue' where mvalue' = [0] ++ mvalue :: SWord16
-
-
