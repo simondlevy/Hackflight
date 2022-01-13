@@ -174,7 +174,7 @@ class GCS(MspParser):
 
     def handle_ATTITUDE(self, angx, angy, heading):
 
-        self.roll_pitch_yaw = radians(angx)/10, radians(angy)/10, heading
+        self.roll_pitch_yaw = radians(angx)/10, radians(angy)/10, radians(heading)
 
         self.gotimu = True
 

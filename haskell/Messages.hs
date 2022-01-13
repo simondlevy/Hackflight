@@ -36,7 +36,7 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
           else 0
 
   val02 = if msgtype == 105 then c_receiverPitch
-          else if msgtype == 108 then (psi vstate)
+          else if msgtype == 108 then rad2deg (psi vstate)
           else 0
 
   val03 = if msgtype == 105 then c_receiverYaw else 0
