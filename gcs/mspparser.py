@@ -84,48 +84,35 @@ class MspParser(metaclass=abc.ABCMeta):
 
     def dispatchMessage(self):
 
-        if self.message_id == 121:
-            self.handle_RECEIVER(*struct.unpack('=ffffff',
+        if self.message_id == 105:
+            self.handle_RC(*struct.unpack('=ffffff',
                                                 self.message_buffer))
 
-        if self.message_id == 122:
-            self.handle_STATE(*struct.unpack('=fff', self.message_buffer))
-
-        if self.message_id == 123:
-            self.handle_ACTUATOR_TYPE(*struct.unpack('=B',
-                                                     self.message_buffer))
+        if self.message_id == 108:
+            self.handle_ATTITUDE(*struct.unpack('=fff', self.message_buffer))
 
     @abc.abstractmethod
-    def handle_RECEIVER(self, c1, c2, c3, c4, c5, c6):
+    def handle_RC(self, c1, c2, c3, c4, c5, c6):
         return
 
     @abc.abstractmethod
-    def handle_STATE(self, x, dx, y, dy, z, dz,
+    def handle_ATTITUDE(self, x, dx, y, dy, z, dz,
                      phi, dphi, theta, dtheta, psi, dpsi):
         return
 
-    @abc.abstractmethod
-    def handle_ACTUATOR_TYPE(self, mtype):
-        return
-
     @staticmethod
-    def serialize_RECEIVER_Request():
-        msg = '$M<' + chr(0) + chr(121) + chr(121)
+    def serialize_RC_Request():
+        msg = '$M<' + chr(0) + chr(105) + chr(105)
         return bytes(msg, 'utf-8')
 
     @staticmethod
-    def serialize_STATE_Request():
-        msg = '$M<' + chr(0) + chr(122) + chr(122)
-        return bytes(msg, 'utf-8')
-
-    @staticmethod
-    def serialize_ACTUATOR_TYPE_Request():
-        msg = '$M<' + chr(0) + chr(123) + chr(123)
+    def serialize_ATTITUDE_Request():
+        msg = '$M<' + chr(0) + chr(108) + chr(108)
         return bytes(msg, 'utf-8')
 
     @staticmethod
     def serialize_SET_MOTOR(index, percent):
         message_buffer = struct.pack('BB', index, percent)
-        msg = [len(message_buffer), 215] + list(message_buffer)
+        msg = [len(message_buffer), 214] + list(message_buffer)
         return bytes([ord('$'), ord('M'), ord('<')] + msg +
                      [MspParser.crc8(msg)])

@@ -44,7 +44,6 @@ class Comms:
         while self.running:
             try:
                 byte = self.port.read(1)
-                debug('%02X' % byte)
                 self.gcs.parse(byte)
             except Exception:
                 None

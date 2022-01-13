@@ -112,10 +112,8 @@ class GCS(MspParser):
         self._show_splash()
 
         # Set up parser's request strings
-        self.state_request = MspParser.serialize_STATE_Request()
-        self.rc_request = MspParser.serialize_RECEIVER_Request()
-        self.actuator_type_request = \
-            MspParser.serialize_ACTUATOR_TYPE_Request()
+        self.state_request = MspParser.serialize_ATTITUDE_Request()
+        self.rc_request = MspParser.serialize_RC_Request()
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
@@ -163,7 +161,7 @@ class GCS(MspParser):
 
         self.root.after(delay_msec, task)
 
-    def handle_RECEIVER(self, c1, c2, c3, c4, c5, c6):
+    def handle_RC(self, c1, c2, c3, c4, c5, c6):
 
         # Scale throttle from [-1,+1] to [0,1]
         self.rxchannels = (c1+1)/2, c2, c3, c4, c5, c6
@@ -173,7 +171,7 @@ class GCS(MspParser):
         if self.receiver.running:
             self._send_rc_request()
 
-    def handle_STATE(self, phi, theta, psi):
+    def handle_ATTITUDE(self, phi, theta, psi):
 
         self.roll_pitch_yaw = phi, theta, psi
 
@@ -183,10 +181,6 @@ class GCS(MspParser):
         # request, if IMU dialog is running
         if self.imu.running:
             self._send_state_request()
-
-    def handle_ACTUATOR_TYPE(self, atype):
-        dlog = self.motors_coaxial if atype == 1 else self.motors_quadxmw
-        dlog.start()
 
     def _add_pane(self):
 
@@ -254,8 +248,6 @@ class GCS(MspParser):
     def _motors_button_callback(self):
 
         self._clear()
-
-        # self.comms.send_request(self.actuator_type_request)
 
         self.imu.stop()
         self.receiver.stop()
