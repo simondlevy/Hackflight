@@ -171,9 +171,9 @@ class GCS(MspParser):
         if self.receiver.running:
             self._send_rc_request()
 
-    def handle_ATTITUDE(self, angx, angy, psi):
+    def handle_ATTITUDE(self, angx, angy, heading):
 
-        self.roll_pitch_yaw = angx, angy, psi
+        self.roll_pitch_yaw = angx, angy, heading
 
         self.gotimu = True
 
