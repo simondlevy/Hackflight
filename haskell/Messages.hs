@@ -78,6 +78,7 @@ getMotors msgtype payindex byte = (mindex, mvalue) where
   -- Make a 16-bit motor value from two-byte pairs
   b = cast byte :: SWord16
   b' = [0] ++ b
-  mvalue = if mod payindex 2 == 1 then b else  b' .|. b.<<.(8::SWord8) :: SWord16
+  mvalue = if mod payindex 2 == 0 then b' .|. b.<<.(8::SWord8)
+           else  mvalue' where mvalue' = [0] ++ mvalue :: SWord16
 
 
