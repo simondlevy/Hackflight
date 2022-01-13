@@ -69,10 +69,13 @@ getMotors msgtype payindex byte = (m1, m2, m3, m4) where
 
   mindex = div payindex 2
 
-  m1 = if mindex == 1 then (unsafeCast mvalue) else m1' where m1' = [0] ++ m1
+  -- m1 = if mindex == 1 then (unsafeCast mvalue) else m1' where m1' = [0] ++ m1
   m2 = if mindex == 2 then (unsafeCast mvalue) else m2' where m2' = [0] ++ m2
   m3 = if mindex == 3 then (unsafeCast mvalue) else m3' where m3' = [0] ++ m3
   m4 = if mindex == 4 then (unsafeCast mvalue) else m4' where m4' = [0] ++ m4
+
+  m1 = getmval 1 m1' where m1' = [0] ++ m1
+  getmval idx oldval = if mindex == idx then (unsafeCast mvalue) else oldval :: SFloat
 
   -- Make a 16-bit motor value from two-byte pairs
   b = cast byte :: SWord16
