@@ -21,16 +21,24 @@ import Safety
 import Time
 import Mixers
 import Motors
-import Parser
 import MSP
 import Messages
 import Serial
 import Utils
 
 
-hackflight :: Receiver -> [Sensor] -> [PidFun] -> Mixer -> (Message, SBool, Motors, SBool)
+hackflight :: Receiver ->
+              [Sensor] ->
+              [PidFun] ->
+              Mixer ->
+              (Message, SBool, Motors, SBool, SWord8, SWord16)
 
-hackflight receiver sensors pidfuns mixer = (message, sending, motors, led)
+hackflight receiver sensors pidfuns mixer = (message,
+                                             sending,
+                                             motors,
+                                             led,
+                                             mindex,
+                                             mvalue)
 
   where
 
@@ -53,13 +61,14 @@ hackflight receiver sensors pidfuns mixer = (message, sending, motors, led)
     led = if c_usec < 2000000 then (mod (div c_usec 50000) 2 == 0) else armed
 
     -- Run the serial comms parser checking for data requests
-    (msgtype, sending, payindex, _checked) = Parser.parse c_serialAvailable c_serialByte
+    (msgtype, sending, payindex, _checked) = MSP.parse c_serialAvailable c_serialByte
 
     -- Reply with a message to GCS if indicated
-    message = Parser.reply msgtype state
+    message = MSP.reply msgtype state
 
     -- Check for incoming SET_MOTOR messages from GCS
-    (motor_index, motor_percent) = getMotors msgtype payindex c_serialByte
+    -- (m1, m2, m3, m4) = Messages.getMotors msgtype payindex c_serialByte
+    (mindex, mvalue) = Messages.getMotors msgtype payindex c_serialByte
 
     -- Set motors based on arming state and whether we have GCS input
-    motors = (motorfun mixer) motors' armed motor_index motor_percent
+    motors = (motorfun mixer) motors' armed 0 0 0 0 -- m1 m2 m3 m4

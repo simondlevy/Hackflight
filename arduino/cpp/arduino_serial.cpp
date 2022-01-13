@@ -38,3 +38,15 @@ void serialUpdate(void)
 {
     serialAvailable = Serial.available();
 }
+
+void serial2Start(void)
+{
+    Serial2.begin(115200);
+}
+
+void serial2Debug(uint8_t mindex, uint16_t mvalue)
+{
+    Serial2.print(mindex);
+    Serial2.print(": ");
+    Serial2.println(mvalue);
+}

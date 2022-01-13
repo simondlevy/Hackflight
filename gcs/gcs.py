@@ -390,14 +390,9 @@ class GCS(MspParser):
 
         button['state'] = 'disabled'
 
-    def sendMotorMessage(self, index, percent):
+    def sendMotorMessage(self, m1, m2, m3, m4):
 
-        self.comms.send_message(MspParser.serialize_SET_MOTOR,
-                                (index, percent))
-
-    def sendMotorMessage2(self, m1, m2, m3, m4):
-
-        debug((m1, m2, m3, m4))
+        self.comms.send_message(MspParser.serialize_SET_MOTOR, (m1, m2, m3, m4))
 
     def _show_splash(self):
 

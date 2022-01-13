@@ -53,14 +53,11 @@ class MotorScale(object):
 
     def callback(self, valstr):
 
+        motors = [1000]*4
+        motors[self.index-1] += 10 * int(valstr) 
+
         try:
-            self.dialog.gcs.sendMotorMessage(self.index, int(valstr))
-
-            motors = [1000]*4
-
-            motors[self.index-1] += 10 * int(valstr) 
-
-            self.dialog.gcs.sendMotorMessage2(*motors)
+            self.dialog.gcs.sendMotorMessage(*motors)
 
         except Exception:  # at startup
             pass
@@ -326,10 +323,6 @@ class MotorsCoaxial(Motors):
 
     def _cut_motors(self):
         try:
-            self.gcs.sendMotorMessage(1, 0)
-            self.gcs.sendMotorMessage(2, 0)
-            self.gcs.sendMotorMessage(3, 0)
-            self.gcs.sendMotorMessage(4, 0)
-            self.gcs.sendMotorMessage2(0, 0, 0, 0)
+            self.gcs.sendMotorMessage(0, 0, 0, 0)
         except Exception:
             return

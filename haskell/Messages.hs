@@ -1,5 +1,5 @@
 {--
-  Code for specific MSP messages
+  Code for MSP messages
 
   See https://www.hamishmb.com/multiwii/wiki/index.php?title=Multiwii_Serial_Protocol
 
@@ -14,12 +14,28 @@ module Messages where
 
 import Language.Copilot
 import Copilot.Compile.C99
-import Prelude hiding((==), (&&), (++))
+import Prelude hiding((==), (&&), (++), mod, div)
 
-import MSP
 import Receiver
 import State
 import Utils
+
+----------------------------------------------------------------------------
+
+-- Use floats for every payload
+data Message = Message {  
+                          direction :: SWord8 -- '>' (0x3E) or '<' (0x3C)
+                        , paysize   :: SWord8 
+                        , msgtype   :: SWord8 
+                        , v1        :: SFloat
+                        , v2        :: SFloat
+                        , v3        :: SFloat
+                        , v4        :: SFloat
+                        , v5        :: SFloat
+                        , v6        :: SFloat
+                        }
+
+----------------------------------------------------------------------------
 
 payload :: SWord8 -> State -> (SWord8, SFloat, SFloat, SFloat, SFloat, SFloat, SFloat)
 
@@ -45,12 +61,23 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
 
   rxscale x = 1000 + 1000 * (x + 1) / 2
 
-getMotors :: SWord8 -> SWord8 -> SWord8 -> (SWord8, SWord8)
+--getMotors :: SWord8 -> SWord8 -> SWord8 -> (SFloat, SFloat, SFloat, SFloat)
+getMotors :: SWord8 -> SWord8 -> SWord8 -> (SWord8, SWord16)
+-- getMotors msgtype payindex byte = (m1, m2, m3, m4) where
+getMotors msgtype payindex byte = (mindex, mvalue) where
 
-getMotors msgtype payindex byte = (motor_index, motor_percent) where
+  mindex = div payindex 2
 
-  motor_index = if msgtype == 214 && payindex == 1 then byte
-                else motor_index' where motor_index' = [0] ++ motor_index
+  -- m1 = if msgtype == 214 && payindex == 1 then unsafeCast mvalue
+  --      else m1' where m1' = [0] ++ m1
+  m1 = 0
+  m2 = 0
+  m3 = 0
+  m4 = 0
 
-  motor_percent = if msgtype == 214 && payindex == 2 then byte
-                  else motor_percent' where motor_percent' = [0] ++ motor_percent
+  -- Make a 16-bit motor value from two-byte pairs
+  b = cast byte :: SWord16
+  b' = [0] ++ b
+  mvalue = if mod payindex 2 == 1 then b else  b' .|. b.<<.(8::SWord8) :: SWord16
+
+

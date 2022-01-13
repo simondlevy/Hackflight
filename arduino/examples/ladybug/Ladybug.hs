@@ -23,6 +23,8 @@ import Motors
 import MSP
 import Messages
 import Time
+import Serial
+import Utils
 
 -- Sensors
 import Gyrometer
@@ -32,13 +34,6 @@ import Quaternion
 import RatePid(rateController)
 import YawPid(yawController)
 import LevelPid(levelController)
-
--- Serial comms
-import Serial
-import Parser
-
--- Misc
-import Utils
 
 ------------------------------------------------------------
 
@@ -68,7 +63,7 @@ spec = do
 
   -- Run the full Hackflight algorithm.  The "sending" flag will be true when
   -- the algorithm is ready to send data.
-  let (message, sending, motors, led) = hackflight receiver sensors pidfuns QuadXMW
+  let (message, sending, motors, led, mindex, mvalue) = hackflight receiver sensors pidfuns QuadXMW
 
   -- Do some stuff at startup
   trigger "serialStart" starting []
@@ -77,6 +72,9 @@ spec = do
   trigger "usfsStart" starting []
   trigger "brushedMotorsStart" starting [arg m1_pin, arg m2_pin, arg m3_pin, arg m4_pin]
   trigger "ledStart" starting [arg led_pin]
+
+  -- Debugging
+  trigger "serial2Start" starting []
 
   -- Update receiver in loop
   trigger "dsmrxUpdate" running []
@@ -114,6 +112,9 @@ spec = do
                                     , arg $ m3 motors
                                     , arg $ m4 motors
                                     ]
+
+  trigger "serial2Debug" (running && mindex == 1) [arg mindex, arg mvalue]
+
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

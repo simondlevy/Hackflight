@@ -31,3 +31,13 @@ void serial1Update(void)
 {
     serialAvailable = Serial1.available();
 }
+
+void serial2Start(uint8_t rxpin, uint8_t txpin)
+{
+    Serial2.begin(115200, SERIAL_8N1, rxpin, txpin);
+}
+
+void serial2Debug(uint16_t value)
+{
+    Serial2.println(value);
+}

@@ -7,9 +7,8 @@
 #  MIT License
 
 import struct
-import abc
 
-from debugging import debug
+import abc
 
 
 class MspParser(metaclass=abc.ABCMeta):
@@ -67,7 +66,7 @@ class MspParser(metaclass=abc.ABCMeta):
                 # message received, process
                 self.dispatchMessage()
             else:
-                debug("code: " + str(self.message_id) + " - crc failed")
+                print("code: " + str(self.message_id) + " - crc failed")
             # Reset variables
             self.message_length_received = 0
             self.state = 0
@@ -90,6 +89,8 @@ class MspParser(metaclass=abc.ABCMeta):
         if self.message_id == 108:
             self.handle_ATTITUDE(*struct.unpack('=hhh', self.message_buffer))
 
+        return
+
     @abc.abstractmethod
     def handle_RC(self, c1, c2, c3, c4, c5, c6):
         return
@@ -109,8 +110,7 @@ class MspParser(metaclass=abc.ABCMeta):
         return bytes(msg, 'utf-8')
 
     @staticmethod
-    def serialize_SET_MOTOR(index, percent):
-        message_buffer = struct.pack('BB', index, percent)
+    def serialize_SET_MOTOR(m1, m2, m3, m4):
+        message_buffer = struct.pack('hhhh', m1, m2, m3, m4)
         msg = [len(message_buffer), 214] + list(message_buffer)
-        return bytes([ord('$'), ord('M'), ord('<')] + msg +
-                     [MspParser.crc8(msg)])
+        return bytes([ord('$'), ord('M'), ord('<')] + msg + [MspParser.crc8(msg)])

@@ -18,7 +18,6 @@ HSRC = $(SKETCH).hs \
        $(HDIR)/Demands.hs \
        $(HDIR)/PidController.hs \
        $(HDIR)/Safety.hs \
-       $(HDIR)/Parser.hs \
        $(HDIR)/Serial.hs \
        $(HDIR)/Messages.hs \
        $(HDIR)/Time.hs \

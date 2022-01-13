@@ -19,23 +19,20 @@ data Motors = Quad { m1 :: SFloat
                    , m3 :: SFloat
                    , m4 :: SFloat }
 
-type MotorFun = Motors -> SBool -> SWord8 -> SWord8 -> Motors
+type MotorFun = Motors -> SBool -> SFloat -> SFloat -> SFloat -> SFloat -> Motors
 
-motorval :: SBool -> SFloat -> SWord8 -> SWord8 -> SWord8  -> SFloat
+motorval :: SBool -> SFloat -> SFloat -> SFloat
 
-motorval armed flyval index target percent =
-  if armed then flyval
-  else if index == target then (unsafeCast percent) / 100
-  else 0
+motorval armed flyval gcsval = if armed then flyval else gcsval
 
 quadfun :: MotorFun
 
-quadfun motors armed index percent = Quad m1val m2val m3val m4val where
+quadfun motors armed m1gcs m2gcs m3gcs m4gcs = Quad m1val m2val m3val m4val where
 
-  m1val = motorval armed (m1 motors) index 1 percent
-  m2val = motorval armed (m2 motors) index 2 percent
-  m3val = motorval armed (m3 motors) index 3 percent
-  m4val = motorval armed (m4 motors) index 4 percent
+  m1val = motorval armed (m1 motors) m1gcs
+  m2val = motorval armed (m2 motors) m2gcs
+  m3val = motorval armed (m3 motors) m3gcs
+  m4val = motorval armed (m4 motors) m4gcs
 
 motors' :: Motors -> Motors
 
