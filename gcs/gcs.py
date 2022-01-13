@@ -169,6 +169,7 @@ class GCS(MspParser):
         c3 = 2 * (c3 - 1000) / 1000 - 1
         c4 = 2 * (c4 - 1000) / 1000 - 1
         c5 = 2 * (c5 - 1000) / 1000 - 1
+        c6 = 2 * (c6 - 1000) / 1000 - 1
 
         # Scale throttle from [-1,+1] to [0,1]
         self.rxchannels = (c1+1)/2, c2, c3, c4, c5, c6
