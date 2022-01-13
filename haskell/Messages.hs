@@ -39,7 +39,7 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
           else if msgtype == 108 then rad2deg (psi vstate)
           else 0
 
-  val03 = if msgtype == 105 then c_receiverYaw else 0
+  val03 = if msgtype == 105 then rxscale c_receiverYaw else 0
   val04 = if msgtype == 105 then c_receiverAux1 else 0
   val05 = if msgtype == 105 then c_receiverAux2 else 0
 
