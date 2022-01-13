@@ -32,7 +32,7 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
           else 0
 
   val01 = if msgtype == 105 then c_receiverRoll
-          else if msgtype == 108 then (theta vstate)
+          else if msgtype == 108 then 10 * (rad2deg (theta vstate))
           else 0
 
   val02 = if msgtype == 105 then c_receiverPitch
