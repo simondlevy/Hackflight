@@ -11,6 +11,7 @@ from comms import Comms
 from serial.tools.list_ports import comports
 import os
 import tkinter as tk
+from numpy import radians
 
 from mspparser import MspParser
 
@@ -173,7 +174,7 @@ class GCS(MspParser):
 
     def handle_ATTITUDE(self, angx, angy, heading):
 
-        self.roll_pitch_yaw = angx, angy, heading
+        self.roll_pitch_yaw = radians(angx), angy, heading
 
         self.gotimu = True
 
