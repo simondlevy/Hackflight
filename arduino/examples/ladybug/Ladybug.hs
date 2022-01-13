@@ -113,7 +113,7 @@ spec = do
                                     , arg $ m4 motors
                                     ]
 
-  trigger "serial2Debug" (running && mindex == 3) [arg mindex, arg mvalue]
+  trigger "serial2Debug" (running && mindex == 4) [arg mindex, arg mvalue]
 
 
 -- Compile the spec
