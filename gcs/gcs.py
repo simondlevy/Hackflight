@@ -14,11 +14,11 @@ import tkinter as tk
 from numpy import radians
 
 from mspparser import MspParser
-
 from imu import IMU
 from motors import MotorsQuadXMW, MotorsCoaxial
 from receiver import Receiver
 from resources import resource_path
+from debugging import debug
 
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
@@ -164,7 +164,9 @@ class GCS(MspParser):
 
     def handle_RC(self, c1, c2, c3, c4, c5, c6):
 
-        c2 /= 1000
+        debug(c2)
+
+        c2 = 2 * (c2 - 1000) / 1000 - 1
 
         # Scale throttle from [-1,+1] to [0,1]
         self.rxchannels = (c1+1)/2, c2, c3, c4, c5, c6
