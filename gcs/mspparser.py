@@ -96,8 +96,7 @@ class MspParser(metaclass=abc.ABCMeta):
         return
 
     @abc.abstractmethod
-    def handle_ATTITUDE(self, x, dx, y, dy, z, dz,
-                     phi, dphi, theta, dtheta, psi, dpsi):
+    def handle_ATTITUDE(self, angx, angy, heading):
         return
 
     @staticmethod
