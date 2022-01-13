@@ -164,9 +164,8 @@ class GCS(MspParser):
 
     def handle_RC(self, c1, c2, c3, c4, c5, c6):
 
-        debug(c2)
-
         c2 = 2 * (c2 - 1000) / 1000 - 1
+        c3 = 2 * (c3 - 1000) / 1000 - 1
 
         # Scale throttle from [-1,+1] to [0,1]
         self.rxchannels = (c1+1)/2, c2, c3, c4, c5, c6
