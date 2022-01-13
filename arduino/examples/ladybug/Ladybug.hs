@@ -92,19 +92,15 @@ spec = do
   -- Send reply to GCS if indicated.  C function serialSend() computes
   -- remaining CRC from floats before sending.
   trigger "serialSend" sending [ 
-                                 arg $ hdr0 message
-                               , arg $ hdr1 message
-                               , arg $ hdr2 message
-                               , arg $ outsize message
-                               , arg $ msgtype message
-                               , arg $ crc message
+                                 arg $ direction message
                                , arg $ paysize message
-                               , arg $ val00 message
-                               , arg $ val01 message
-                               , arg $ val02 message
-                               , arg $ val03 message
-                               , arg $ val04 message
-                               , arg $ val05 message
+                               , arg $ msgtype message
+                               , arg $ v1 message
+                               , arg $ v2 message
+                               , arg $ v3 message
+                               , arg $ v4 message
+                               , arg $ v5 message
+                               , arg $ v6 message
                                ]
 
   -- Run motors

@@ -18,64 +18,41 @@ import Copilot.Compile.C99
 import Utils
 
 -- Use floats for every payload
-data Message = Message {  hdr0    :: SWord8 -- '$' (0x24)
-                        , hdr1    :: SWord8 -- 'M' (0x4D)
-                        , hdr2    :: SWord8 -- '>' (0x3E) or '<' (0x3C)
-                        , outsize :: SWord8 
-                        , msgtype :: SWord8 
-                        , crc     :: SWord8 
-                        , paysize :: SWord8 
-                        , val00   :: SFloat  
-                        , val01   :: SFloat
-                        , val02   :: SFloat
-                        , val03   :: SFloat
-                        , val04   :: SFloat
-                        , val05   :: SFloat
+data Message = Message {  
+                          direction :: SWord8 -- '>' (0x3E) or '<' (0x3C)
+                        , paysize   :: SWord8 
+                        , msgtype   :: SWord8 
+                        , v1        :: SFloat
+                        , v2        :: SFloat
+                        , v3        :: SFloat
+                        , v4        :: SFloat
+                        , v5        :: SFloat
+                        , v6        :: SFloat
                         }
 
-mkmessage ::   SWord8
-            -> SWord8
-            -> SWord8
-            -> SWord8
-            -> SWord8
-            -> SFloat
-            -> SFloat
-            -> SFloat
-            -> SFloat
-            -> SFloat
-            -> SFloat
+mkresponse ::  SWord8  -- size
+            -> SWord8  -- type
+            -> SFloat  -- v1
+            -> SFloat  -- v2
+            -> SFloat  -- v3
+            -> SFloat  -- v4
+            -> SFloat  -- v5
+            -> SFloat  -- v6
             -> Message
 
-mkmessage direction outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
-  Message 0x24 0x4D direction outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
+mkresponse size msgtype v1 v2 v3 v4 v5 v6 =
+  Message 0x3E size msgtype v1 v2 v3 v4 v5 v6
 
-mkresponse ::  SWord8  -- outsize
-            -> SWord8  -- msgtype
-            -> SWord8  -- crc
-            -> SWord8  -- paysize
-            -> SFloat  -- v00
-            -> SFloat  -- v01
-            -> SFloat  -- v02
-            -> SFloat  -- v03
-            -> SFloat  -- v04
-            -> SFloat  -- v05
+mkcommand ::   SWord8  -- size
+            -> SWord8  -- type
+            -> SFloat  -- v1
+            -> SFloat  -- v2
+            -> SFloat  -- v3
+            -> SFloat  -- v4
+            -> SFloat  -- v5
+            -> SFloat  -- v6
             -> Message
 
-mkresponse outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
-  mkmessage 0x3E outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
-
-mkcommand ::   SWord8  -- outsize
-            -> SWord8  -- msgtype
-            -> SWord8  -- crc
-            -> SWord8  -- paysize
-            -> SFloat  -- v00
-            -> SFloat  -- v01
-            -> SFloat  -- v02
-            -> SFloat  -- v03
-            -> SFloat  -- v04
-            -> SFloat  -- v05
-            -> Message
-
-mkcommand outsize msgtype crc paysize v00 v01 v02 v03 v04 v05 =
-  mkmessage 0x3C outsize msgtype crc paysize v00 v01 v02 v03 v04 v05
+mkcommand size msgtype v1 v2 v3 v4 v5 v6 =
+  Message 0x3C size msgtype v1 v2 v3 v4 v5 v6
 

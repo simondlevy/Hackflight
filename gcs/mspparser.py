@@ -85,11 +85,10 @@ class MspParser(metaclass=abc.ABCMeta):
     def dispatchMessage(self):
 
         if self.message_id == 105:
-            self.handle_RC(*struct.unpack('=ffffff',
-                                                self.message_buffer))
+            self.handle_RC(*struct.unpack('=hhhhhh', self.message_buffer))
 
         if self.message_id == 108:
-            self.handle_ATTITUDE(*struct.unpack('=fff', self.message_buffer))
+            self.handle_ATTITUDE(*struct.unpack('=hhh', self.message_buffer))
 
     @abc.abstractmethod
     def handle_RC(self, c1, c2, c3, c4, c5, c6):

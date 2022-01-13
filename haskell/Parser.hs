@@ -23,11 +23,9 @@ reply :: SWord8 -> State -> Message
 
 reply msgtype vstate =
 
-  let (paysize, v00, v01, v02, v03, v04, v05) = payload msgtype vstate
+  let (paysize, v1, v2, v3, v4, v5, v6) = payload msgtype vstate
 
-      outsize = 4 * paysize
-
-  in MSP.mkresponse outsize msgtype (xor outsize msgtype) paysize v00 v01 v02 v03 v04 v05
+  in MSP.mkresponse paysize msgtype v1 v2 v3 v4 v5 v6
 
 parse :: SBool -> SWord8 -> (SWord8, SBool, SWord8, SBool)
 

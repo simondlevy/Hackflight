@@ -18,46 +18,42 @@ static void serializeByte(uint8_t & crc, uint8_t byte)
     crc ^= byte;
 }
 
-static void serializeFloat(uint8_t & crc, float value)
+static void serializeFloat(uint8_t & crc, float floatval)
 {
-    uint32_t uintval = 0;
+    int16_t intval = (int16_t)floatval;
 
-    memcpy(&uintval, &value, 4);
-
-    serializeByte(crc, uintval     & 0xFF);
-    serializeByte(crc, uintval>>8  & 0xFF);
-    serializeByte(crc, uintval>>16 & 0xFF);
-    serializeByte(crc, uintval>>24 & 0xFF);
+    serializeByte(crc, intval     & 0xFF);
+    serializeByte(crc, intval>>8  & 0xFF);
 }
 
 void serialSend(
-          uint8_t hdr0
-        , uint8_t hdr1
-        , uint8_t hdr2
-        , uint8_t hdr3
-        , uint8_t hdr4
-        , uint8_t crc
-        , uint8_t size
-        , float val00
-        , float val01
-        , float val02
-        , float val03
-        , float val04
-        , float val05
+          uint8_t direction
+        , uint8_t size  
+        , uint8_t type  
+        , float v1
+        , float v2
+        , float v3
+        , float v4
+        , float v5
+        , float v6
         )
 {
-    serialWrite(hdr0);
-    serialWrite(hdr1);
-    serialWrite(hdr2);
-    serialWrite(hdr3);
-    serialWrite(hdr4);
+    serialWrite('$');
+    serialWrite('M');
+    serialWrite(direction);
+    serialWrite(size);
+    serialWrite(type);
 
-    if (size > 0) serializeFloat(crc, val00);
-    if (size > 1) serializeFloat(crc, val01);
-    if (size > 2) serializeFloat(crc, val02);
-    if (size > 3) serializeFloat(crc, val03);
-    if (size > 4) serializeFloat(crc, val04);
-    if (size > 5) serializeFloat(crc, val05);
+    uint8_t crc = size ^ type;
+
+    uint8_t nvals = size / 2;
+
+    if (nvals > 0) serializeFloat(crc, v1);
+    if (nvals > 1) serializeFloat(crc, v2);
+    if (nvals > 2) serializeFloat(crc, v3);
+    if (nvals > 3) serializeFloat(crc, v4);
+    if (nvals > 4) serializeFloat(crc, v5);
+    if (nvals > 5) serializeFloat(crc, v6);
 
     serializeByte(crc, crc);
 }

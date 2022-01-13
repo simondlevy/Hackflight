@@ -25,7 +25,7 @@ payload :: SWord8 -> State -> (SWord8, SFloat, SFloat, SFloat, SFloat, SFloat, S
 
 payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) where
 
-  paysize = if msgtype == 105 then 6 else if msgtype == 108 then 3 else 0 :: SWord8
+  paysize = if msgtype == 105 then 12 else if msgtype == 108 then 6 else 0 :: SWord8
 
   val00 = if msgtype == 105 then rxscale c_receiverThrottle
           else if msgtype == 108 then 10 * (rad2deg (phi vstate))
@@ -54,7 +54,3 @@ getMotors msgtype payindex byte = (motor_index, motor_percent) where
 
   motor_percent = if msgtype == 214 && payindex == 2 then byte
                   else motor_percent' where motor_percent' = [0] ++ motor_percent
-
-rxmessage :: SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> Message
-rxmessage thr rol pit yaw aux1 aux2 = mkcommand 0 213 0 0 thr rol pit yaw aux1 aux2
-
