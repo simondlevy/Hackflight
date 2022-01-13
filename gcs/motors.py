@@ -55,6 +55,13 @@ class MotorScale(object):
 
         try:
             self.dialog.gcs.sendMotorMessage(self.index, int(valstr))
+
+            motors = [0]*4
+
+            motors[self.index-1] = int(valstr)
+
+            self.dialog.gcs.sendMotorMessage2(*motors)
+
         except Exception:  # at startup
             pass
 
@@ -323,5 +330,6 @@ class MotorsCoaxial(Motors):
             self.gcs.sendMotorMessage(2, 0)
             self.gcs.sendMotorMessage(3, 0)
             self.gcs.sendMotorMessage(4, 0)
+            self.gcs.sendMotorMessage2(0, 0, 0, 0)
         except Exception:
             return

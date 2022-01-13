@@ -395,6 +395,10 @@ class GCS(MspParser):
         self.comms.send_message(MspParser.serialize_SET_MOTOR,
                                 (index, percent))
 
+    def sendMotorMessage2(self, m1, m2, m3, m4):
+
+        debug((m1, m2, m3, m4))
+
     def _show_splash(self):
 
         self.splash = self.canvas.create_image(SPLASH_LOCATION,
