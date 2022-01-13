@@ -56,9 +56,9 @@ class MotorScale(object):
         try:
             self.dialog.gcs.sendMotorMessage(self.index, int(valstr))
 
-            motors = [0]*4
+            motors = [1000]*4
 
-            motors[self.index-1] = int(valstr)
+            motors[self.index-1] += 10 * int(valstr) 
 
             self.dialog.gcs.sendMotorMessage2(*motors)
 
