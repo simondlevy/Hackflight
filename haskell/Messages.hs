@@ -70,7 +70,7 @@ getMotors msgtype payindex byte = (m1, m2, m3, m4) where
   mindex = div payindex 2
 
   m1 = if mindex == 1 then (unsafeCast mvalue) else m1' where m1' = [0] ++ m1
-  m2 = 0
+  m2 = if mindex == 2 then (unsafeCast mvalue) else m2' where m2' = [0] ++ m2
   m3 = 0
   m4 = 0
 
