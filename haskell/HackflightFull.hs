@@ -31,23 +31,22 @@ hackflight :: Receiver ->
               [Sensor] ->
               [PidFun] ->
               Mixer ->
-              (Message,
-               SBool,
-               Motors,
-               SBool,
-               SFloat,
-               SFloat,
-               SFloat,
-               SFloat)
+              (Message, SBool , Motors , SBool
+               -- , SFloat
+               -- , SFloat
+               -- , SFloat
+               -- , SFloat
+              )
 
-hackflight receiver sensors pidfuns mixer = (message,
-                                             sending,
-                                             motors,
-                                             led,
-                                             m1val,
-                                             m2val,
-                                             m3val,
-                                             m4val)
+hackflight receiver sensors pidfuns mixer = (  message
+                                             , sending
+                                             , motors
+                                             , led
+                                             -- , m1
+                                             -- , m2
+                                             -- , m3
+                                             -- , m4
+                                             )
 
   where
 
@@ -76,8 +75,7 @@ hackflight receiver sensors pidfuns mixer = (message,
     message = MSP.reply msgtype state
 
     -- Check for incoming SET_MOTOR messages from GCS
-    -- (m1, m2, m3, m4) = Messages.getMotors msgtype payindex c_serialByte
-    (m1val, m2val, m3val, m4val) = Messages.getMotors msgtype payindex c_serialByte
+    (m1, m2, m3, m4) = Messages.getMotors msgtype payindex c_serialByte
 
     -- Set motors based on arming state and whether we have GCS input
-    motors = (motorfun mixer) motors' armed 0 0 0 0 -- m1 m2 m3 m4
+    motors = (motorfun mixer) motors' armed m1 m2 m3 m4
