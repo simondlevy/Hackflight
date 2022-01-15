@@ -47,12 +47,10 @@ void dsmrxGet(void)
 
     rx.getChannelValues(rawvals, 8);
 
-    /*
     receiverThrottle = rawvals[0];
     receiverRoll     = rawvals[1];
     receiverPitch    = rawvals[2];
     receiverYaw      = rawvals[3];
     receiverAux1     = rawvals[6];
     receiverAux2     = rawvals[4];
-    */
 }

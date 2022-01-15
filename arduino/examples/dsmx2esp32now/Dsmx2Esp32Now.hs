@@ -40,12 +40,11 @@ spec = do
   -- Get flags for startup, loop
   let (running, starting) = runstate
 
-  -- Do some stuff at startup
-
+  -- Do some stuff at startup ----------------------------------------
 
   trigger "serialStart" starting []
 
-  --trigger "dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
+  trigger "dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
 
   trigger "esp32nowStart" starting []
 
@@ -56,16 +55,19 @@ spec = do
                                       , arg rx_mac5
                                       , arg rx_mac6 ] 
 
-  let message = Messages.rxmessage c_receiverThrottle
-                          c_receiverRoll
-                          c_receiverPitch
-                          c_receiverYaw
-                          c_receiverAux1
-                          c_receiverAux2
+  let message = Messages.rxmessage Receiver.c_receiverThrottle
+                                   Receiver.c_receiverRoll
+                                   Receiver.c_receiverPitch
+                                   Receiver.c_receiverYaw
+                                   Receiver.c_receiverAux1
+                                   Receiver.c_receiverAux2
 
-  -- Do some other stuff in loop
-  --trigger "dsmrxUpdate" running []
-  --trigger "dsmrxGet" receiverGotNewFrame []
+  -- Do some other stuff in loop -------------------------------------
+
+  trigger "dsmrxUpdate" running []
+
+  trigger "dsmrxGet" c_receiverGotNewFrame []
+
   trigger "commsSend" true [ 
                              arg $ direction message
                            , arg $ paysize message
@@ -77,7 +79,6 @@ spec = do
                            , arg $ v5 message
                            , arg $ v6 message
                            ]
-
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
