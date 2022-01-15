@@ -10,8 +10,8 @@
 #include <Arduino.h>
 #include <stdint.h>
 
-void commsWrite(uint8_t byte)
+void commsWrite(uint8_t * buff, uint8_t size)
 {
-    Serial.write(byte);
+    Serial.write(buff, size);
 }
 

@@ -10,11 +10,17 @@
 #include <stdint.h>
 #include <string.h>
 
-void commsWrite(uint8_t byte);
+static uint8_t buffer[256];
+static uint8_t bufidx;
+
+static void putbuf(uint8_t byte)
+{
+    buffer[bufidx++] = byte;
+}
 
 static void serializeByte(uint8_t & crc, uint8_t byte)
 {
-    commsWrite(byte);
+    putbuf(byte);
     crc ^= byte;
 }
 
@@ -38,11 +44,13 @@ void commsSend(
         , float v6
         )
 {
-    commsWrite('$');
-    commsWrite('M');
-    commsWrite(direction);
-    commsWrite(size);
-    commsWrite(type);
+    bufidx = 0;
+
+    putbuf('$');
+    putbuf('M');
+    putbuf(direction);
+    putbuf(size);
+    putbuf(type);
 
     uint8_t crc = size ^ type;
 
@@ -56,4 +64,7 @@ void commsSend(
     if (nvals > 5) serializeFloat(crc, v6);
 
     serializeByte(crc, crc);
+
+    void commsWrite(uint8_t *, uint8_t);
+    commsWrite(buffer, bufidx);
 }

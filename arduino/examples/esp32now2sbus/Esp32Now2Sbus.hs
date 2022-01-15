@@ -1,7 +1,7 @@
 {--
-  DSMX receiver input to ESP32NOW output
+  Support for flight controller with DSMX receiver input to ESP32NOW output
 
-  Copyright(C) 2022 on D.Levy
+  Copyright(C) 2021 on D.Levy
 
   MIT License
 --}
@@ -23,11 +23,9 @@ import Utils
 
 ------------------------------------------------------------
 
--- Pins for DSMX receiver input
 dsmx_in_rx_pin = 4  :: SWord8  
 dsmx_in_tx_pin = 14 :: SWord8 -- unused
 
--- MAC address of receiver peer
 rx_mac1 = 0x98 :: SWord8
 rx_mac2 = 0xCD :: SWord8
 rx_mac3 = 0xAC :: SWord8
@@ -70,26 +68,17 @@ spec = do
 
   trigger "dsmrxGet" c_receiverGotNewFrame []
 
-  trigger "esp32nowPrepareToSend" true [ 
-                                         arg rx_mac1
-                                       , arg rx_mac2
-                                       , arg rx_mac3
-                                       , arg rx_mac4
-                                       , arg rx_mac5
-                                       , arg rx_mac6
-                                       ]
-
-  trigger "commsSend" true [
-                              arg $ direction message
-                            , arg $ paysize message
-                            , arg $ msgtype message
-                            , arg $ v1 message
-                            , arg $ v2 message
-                            , arg $ v3 message
-                            , arg $ v4 message
-                            , arg $ v5 message
-                            , arg $ v6 message
-                            ]
+  trigger "commsSend" true [ 
+                             arg $ direction message
+                           , arg $ paysize message
+                           , arg $ msgtype message
+                           , arg $ v1 message
+                           , arg $ v2 message
+                           , arg $ v3 message
+                           , arg $ v4 message
+                           , arg $ v5 message
+                           , arg $ v6 message
+                           ]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

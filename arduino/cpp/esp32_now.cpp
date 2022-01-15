@@ -42,8 +42,25 @@ void esp32nowAddPeer(
     }
 }
 
-void commsWrite(uint8_t byte)
+static uint8_t rxaddr[6];
+
+void esp32nowPrepareToSend(
+        uint8_t mac1,
+        uint8_t mac2,
+        uint8_t mac3,
+        uint8_t mac4,
+        uint8_t mac5,
+        uint8_t mac6)
 {
-    //uint8_t rxAddress[6] = {rxmac1, rxmac2, rxmac3, rxmac4, rxmac5, rxmac6};
-    //esp_err_t result = esp_now_send(rxAddress, &foo, 1);
+    rxaddr[0] = mac1;
+    rxaddr[1] = mac2;
+    rxaddr[2] = mac3;
+    rxaddr[3] = mac4;
+    rxaddr[4] = mac5;
+    rxaddr[5] = mac6;
+}
+
+void commsWrite(uint8_t * buff, uint8_t size)
+{
+    esp_err_t result = esp_now_send(rxaddr, buff, size);
 }
