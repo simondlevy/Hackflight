@@ -10,7 +10,11 @@ uint8_t senderAddress[] = {0x98, 0xCD, 0xAC, 0xD3, 0x42, 0x3C};
 
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
-  Serial.println(len);
+    for (uint8_t k=0; k<len; ++k) {
+        printf("%02X\n", incomingData[k]);
+    }
+
+    delay(1);
 }
  
 void setup()
@@ -49,4 +53,5 @@ void setup()
  
 void loop()
 {
+    delay(1);
 }
