@@ -66,17 +66,17 @@ spec = do
   -- Do some other stuff in loop
   --trigger "dsmrxUpdate" running []
   --trigger "dsmrxGet" receiverGotNewFrame []
-  trigger "serialSend" true [ 
-                               arg $ direction message
-                             , arg $ paysize message
-                             , arg $ msgtype message
-                             , arg $ v1 message
-                             , arg $ v2 message
-                             , arg $ v3 message
-                             , arg $ v4 message
-                             , arg $ v5 message
-                             , arg $ v6 message
-                             ]
+  trigger "commsSend" true [ 
+                             arg $ direction message
+                           , arg $ paysize message
+                           , arg $ msgtype message
+                           , arg $ v1 message
+                           , arg $ v2 message
+                           , arg $ v3 message
+                           , arg $ v4 message
+                           , arg $ v5 message
+                           , arg $ v6 message
+                           ]
 
 
 -- Compile the spec
