@@ -63,6 +63,21 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
 
 ----------------------------------------------------------------------------
 
+rxmessage :: SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> Message
+
+rxmessage c1 c2 c3 c4 c5 c6 = Message 0x3E
+                                      12
+                                      200
+                                      (scale c1) 
+                                      (scale c2) 
+                                      (scale c3) 
+                                      (scale c4) 
+                                      (scale c5) 
+                                      (scale c6)  where
+  scale c = 1000 * (1 + (c + 1) / 2)
+
+----------------------------------------------------------------------------
+
 getMotors :: SWord8 -> SWord8 -> SWord8 -> (SFloat, SFloat, SFloat, SFloat)
 
 getMotors msgtype payindex byte = (m1, m2, m3, m4) where

@@ -30,7 +30,7 @@ HSRC = $(SKETCH).hs \
        $(HDIR)/pidcontrollers/YawPid.hs \
        $(HDIR)/pidcontrollers/LevelPid.hs \
 	   $(CDIR)/motors.c \
-	   $(CDIR)/serial.c
+	   $(CDIR)/comms.c
 
 all: hackflight.cpp
 	rm -rf $(SKETCH)
@@ -42,8 +42,9 @@ all: hackflight.cpp
 	rm hackflight.h
 	cp $(ADIR)/Hackflight.ino $(SKETCH)/$(SKETCH).ino
 	cp $(CDIR)/motors.c $(SKETCH)/motors.cpp
-	cp $(CDIR)/serial.c $(SKETCH)/serial.cpp
+	cp $(CDIR)/comms.c $(SKETCH)/comms.cpp
 	cp $(CPPDIR)/arduino_dsmrx.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_comms.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_i2c.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_led.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_motors.cpp $(SKETCH)

@@ -10,11 +10,11 @@
 #include <stdint.h>
 #include <string.h>
 
-void serialWrite(uint8_t byte);
+void commsWrite(uint8_t byte);
 
 static void serializeByte(uint8_t & crc, uint8_t byte)
 {
-    serialWrite(byte);
+    commsWrite(byte);
     crc ^= byte;
 }
 
@@ -26,7 +26,7 @@ static void serializeFloat(uint8_t & crc, float floatval)
     serializeByte(crc, intval>>8  & 0xFF);
 }
 
-void serialSend(
+void commsSend(
           uint8_t direction
         , uint8_t size  
         , uint8_t type  
@@ -38,11 +38,11 @@ void serialSend(
         , float v6
         )
 {
-    serialWrite('$');
-    serialWrite('M');
-    serialWrite(direction);
-    serialWrite(size);
-    serialWrite(type);
+    commsWrite('$');
+    commsWrite('M');
+    commsWrite(direction);
+    commsWrite(size);
+    commsWrite(type);
 
     uint8_t crc = size ^ type;
 

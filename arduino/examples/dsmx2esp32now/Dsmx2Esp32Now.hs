@@ -19,7 +19,6 @@ import Time
 import Receiver
 import MSP
 import Messages
-import Parser
 import Utils
 
 ------------------------------------------------------------
@@ -57,7 +56,7 @@ spec = do
                                       , arg rx_mac5
                                       , arg rx_mac6 ] 
 
-  let message = rxmessage c_receiverThrottle
+  let message = Messages.rxmessage c_receiverThrottle
                           c_receiverRoll
                           c_receiverPitch
                           c_receiverYaw
@@ -67,21 +66,18 @@ spec = do
   -- Do some other stuff in loop
   --trigger "dsmrxUpdate" running []
   --trigger "dsmrxGet" receiverGotNewFrame []
-  trigger "esp32nowSend" running [
-                                   arg $ hdr0 message
-                                 , arg $ hdr1 message
-                                 , arg $ hdr2 message
-                                 , arg $ outsize message
-                                 , arg $ msgtype message
-                                 , arg $ crc message
-                                 , arg $ paysize message
-                                 , arg $ val00 message
-                                 , arg $ val01 message
-                                 , arg $ val02 message
-                                 , arg $ val03 message
-                                 , arg $ val04 message
-                                 , arg $ val05 message
-                                 ]
+  trigger "serialSend" true [ 
+                               arg $ direction message
+                             , arg $ paysize message
+                             , arg $ msgtype message
+                             , arg $ v1 message
+                             , arg $ v2 message
+                             , arg $ v3 message
+                             , arg $ v4 message
+                             , arg $ v5 message
+                             , arg $ v6 message
+                             ]
+
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

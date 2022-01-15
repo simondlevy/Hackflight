@@ -42,21 +42,7 @@ void esp32nowAddPeer(
     }
 }
 
-void esp32nowSend(
-          uint8_t hdr0
-        , uint8_t hdr1
-        , uint8_t hdr2
-        , uint8_t hdr3
-        , uint8_t hdr4
-        , uint8_t crc
-        , uint8_t size
-        , float val00
-        , float val01
-        , float val02
-        , float val03
-        , float val04
-        , float val05
-        )
+void commsWrite(uint8_t byte)
 {
     //uint8_t rxAddress[6] = {rxmac1, rxmac2, rxmac3, rxmac4, rxmac5, rxmac6};
     //esp_err_t result = esp_now_send(rxAddress, &foo, 1);

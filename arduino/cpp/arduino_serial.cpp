@@ -24,11 +24,6 @@ void serialWrite(uint8_t byte)
     Serial.write(byte);
 }
 
-void serialWrite(uint8_t * buf, uint8_t size)
-{
-    Serial.write(buf, size);
-}
-
 void serialRead(void)
 {
     serialByte = Serial.read();
@@ -37,20 +32,4 @@ void serialRead(void)
 void serialUpdate(void)
 {
     serialAvailable = Serial.available();
-}
-
-void serial2Start(void)
-{
-    Serial2.begin(115200);
-}
-
-void serial2Debug(float v1, float v2, float v3, float v4)
-{
-    Serial2.print(v1);
-    Serial2.print("    ");
-    Serial2.print(v2);
-    Serial2.print("    ");
-    Serial2.print(v3);
-    Serial2.print("    ");
-    Serial2.println(v4);
 }

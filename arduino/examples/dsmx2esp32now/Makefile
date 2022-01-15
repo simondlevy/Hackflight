@@ -18,7 +18,7 @@ HSRC = $(SKETCH).hs \
        $(HDIR)/Demands.hs \
        $(HDIR)/PidController.hs \
        $(HDIR)/Safety.hs \
-       $(HDIR)/Parser.hs \
+	   $(HDIR)/MSP.hs \
        $(HDIR)/Serial.hs \
        $(HDIR)/Messages.hs \
        $(HDIR)/Time.hs \
@@ -45,7 +45,7 @@ all: hackflight.cpp
 	# cp $(CPPDIR)/esp32_dsmrx.cpp $(SKETCH)
 	cp $(CPPDIR)/esp32_now.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_debugger.hpp $(SKETCH)
-	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
+	cp $(CDIR)/serial.c $(SKETCH)/serial.cpp
 	cp tmp.cpp $(SKETCH)
 
 hackflight.cpp: hackflight.c
