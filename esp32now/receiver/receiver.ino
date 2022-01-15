@@ -8,18 +8,9 @@
 // REPLACE WITH THE MAC Address of your sender 
 uint8_t senderAddress[] = {0x98, 0xCD, 0xAC, 0xD3, 0x42, 0x3C};
 
-/*
-// Callback when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
-{
-  Serial.print("\r\nLast Packet Send Status:\t");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-}*/
-
-// Callback when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
-  Serial.print(*incomingData, HEX);
+  Serial.println(len);
 }
  
 void setup()
@@ -58,17 +49,4 @@ void setup()
  
 void loop()
 {
-    /*
-  // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(senderAddress, (uint8_t *)
-          &BME280Readings, sizeof(BME280Readings));
-   
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
-  }
-  else {
-    Serial.println("Error sending the data");
-  }
-  
-  delay(1000);*/
 }
