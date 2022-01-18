@@ -8,10 +8,11 @@
 // REPLACE WITH THE MAC Address of your sender 
 uint8_t senderAddress[] = {0x98, 0xCD, 0xAC, 0xD3, 0x42, 0x3C};
 
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
+static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
     for (uint8_t k=0; k<len; ++k) {
-        printf("%02X\n", incomingData[k]);
+        uint8_t byte = incomingData[k];
+        printf("%s%02X ", byte==0x24 ? "\n" : "", byte);
     }
 
     delay(1);

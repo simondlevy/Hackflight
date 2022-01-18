@@ -1,5 +1,5 @@
 {--
-  Support for flight controller with DSMX receiver input to ESP32NOW output
+  Support for flight controller with ESP32NOW receiver input to SBUS output
 
   Copyright(C) 2021 on D.Levy
 
@@ -8,7 +8,7 @@
 
 {-# LANGUAGE RebindableSyntax #-}
 
-module Dsmx2Esp32Now where
+module Esp32Now2Sbus where
 
 import Language.Copilot
 import Copilot.Compile.C99
@@ -23,15 +23,12 @@ import Utils
 
 ------------------------------------------------------------
 
-dsmx_in_rx_pin = 4  :: SWord8  
-dsmx_in_tx_pin = 14 :: SWord8 -- unused
-
-rx_mac1 = 0x98 :: SWord8
-rx_mac2 = 0xCD :: SWord8
-rx_mac3 = 0xAC :: SWord8
-rx_mac4 = 0xD3 :: SWord8
-rx_mac5 = 0x42 :: SWord8
-rx_mac6 = 0xE0 :: SWord8
+tx_mac1 = 0x98 :: SWord8
+tx_mac2 = 0xCD :: SWord8
+tx_mac3 = 0xAC :: SWord8
+tx_mac4 = 0xD3 :: SWord8
+tx_mac5 = 0x42 :: SWord8
+tx_mac6 = 0x3C :: SWord8
 
 ------------------------------------------------------------
 
@@ -42,31 +39,16 @@ spec = do
 
   -- Do some stuff at startup ----------------------------------------
 
-  trigger "serialStart" starting []
-
-  trigger "dsmrxStart" starting [ arg dsmx_in_rx_pin, arg dsmx_in_tx_pin]
-
   trigger "esp32nowStart" starting []
 
-  trigger "esp32nowAddPeer" starting [  arg rx_mac1
-                                      , arg rx_mac2
-                                      , arg rx_mac3
-                                      , arg rx_mac4
-                                      , arg rx_mac5
-                                      , arg rx_mac6 ] 
-
-  let message = Messages.rxmessage Receiver.c_receiverThrottle
-                                   Receiver.c_receiverRoll
-                                   Receiver.c_receiverPitch
-                                   Receiver.c_receiverYaw
-                                   Receiver.c_receiverAux1
-                                   Receiver.c_receiverAux2
+  trigger "esp32nowAddPeer" starting [  arg tx_mac1
+                                      , arg tx_mac2
+                                      , arg tx_mac3
+                                      , arg tx_mac4
+                                      , arg tx_mac5
+                                      , arg tx_mac6 ] 
 
   -- Do some other stuff in loop -------------------------------------
-
-  trigger "dsmrxUpdate" running []
-
-  trigger "dsmrxGet" c_receiverGotNewFrame []
 
   trigger "commsSend" true [ 
                              arg $ direction message
