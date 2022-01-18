@@ -10,7 +10,16 @@
 #include <WiFi.h>
 #include "arduino_debugger.hpp"
 
-void esp32nowStart(void)
+static void _data_receive_callback(const uint8_t * macaddr, const uint8_t *data, int len)
+{
+    for (uint8_t k=0; k<len; ++k) {
+        uint8_t byte = data[k];
+        printf("%s%02X ", byte==0x24 ? "\n" : "", byte);
+    }
+
+    delay(1);
+}
+ void esp32nowStart(void)
 {
     // Set device as a Wi-Fi Station
     WiFi.mode(WIFI_STA);
@@ -58,6 +67,11 @@ void esp32nowPrepareToSend(
     rxaddr[3] = mac4;
     rxaddr[4] = mac5;
     rxaddr[5] = mac6;
+}
+
+void esp32nowRegisterReceiveCallback(void)
+{
+  esp_now_register_recv_cb(_data_receive_callback);
 }
 
 void commsWrite(uint8_t * buff, uint8_t size)

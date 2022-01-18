@@ -48,19 +48,10 @@ spec = do
                                       , arg tx_mac5
                                       , arg tx_mac6 ] 
 
+  trigger "esp32nowRegisterReceiveCallback" starting []
+
   -- Do some other stuff in loop -------------------------------------
 
-  trigger "commsSend" true [ 
-                             arg $ direction message
-                           , arg $ paysize message
-                           , arg $ msgtype message
-                           , arg $ v1 message
-                           , arg $ v2 message
-                           , arg $ v3 message
-                           , arg $ v4 message
-                           , arg $ v5 message
-                           , arg $ v6 message
-                           ]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

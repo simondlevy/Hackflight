@@ -1,10 +1,10 @@
-# Makefile for Ladbyug Flight Controller with DSMX receiver
+# Makefile for Esp32Now2Sbus transducer
 #
-# Copyright (c) 2021 Simon D. Levy
+# Copyright (c) 2022 Simon D. Levy
 #
 # MIT License
 
-SKETCH = Dsmx2Esp32Now
+SKETCH = Esp32Now2Sbus
 ROOT = ../../..
 
 HDIR = $(ROOT)/haskell
@@ -33,7 +33,6 @@ all: hackflight.cpp
 	cp $(CDIR)/comms.c $(SKETCH)/comms.cpp
 	cp $(CPPDIR)/arduino_debugger.hpp $(SKETCH)
 	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
-	cp $(CPPDIR)/esp32_dsmrx.cpp $(SKETCH)
 	cp $(CPPDIR)/esp32_now.cpp $(SKETCH)
 
 hackflight.cpp: hackflight.c
