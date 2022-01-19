@@ -35,7 +35,7 @@ tx_mac4 = 0xD3 :: SWord8
 tx_mac5 = 0x42 :: SWord8
 tx_mac6 = 0x3C :: SWord8
 
-delayMsec = 1 :: SWord32
+delayUsec = 1 :: SWord32
 
 ------------------------------------------------------------
 
@@ -65,7 +65,7 @@ spec = do
 
   trigger "esp32nowDebug" running []
 
-  trigger "delayMsec" running [arg delayMsec]
+  trigger "delayUsec" running [arg delayUsec]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

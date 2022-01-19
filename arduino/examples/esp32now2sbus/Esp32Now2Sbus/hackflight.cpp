@@ -76,11 +76,11 @@ bool esp32nowDebug_guard(void) {
   return (!(!((s0_get)((0))))) ? true : ((s1_get)((0)));
 }
 
-bool delayMsec_guard(void) {
+bool delayUsec_guard(void) {
   return (!(!((s0_get)((0))))) ? true : ((s1_get)((0)));
 }
 
-uint32_t delayMsec_arg0(void) {
+uint32_t delayUsec_arg0(void) {
   return (uint32_t)(1);
 }
 
@@ -105,8 +105,8 @@ void step(void) {
   if ((esp32nowDebug_guard)()) {
     {(esp32nowDebug)();}
   };
-  if ((delayMsec_guard)()) {
-    {(delayMsec)(((delayMsec_arg0)()));}
+  if ((delayUsec_guard)()) {
+    {(delayUsec)(((delayUsec_arg0)()));}
   };
   (s0_tmp) = ((s0_gen)());
   (s1_tmp) = ((s1_gen)());
