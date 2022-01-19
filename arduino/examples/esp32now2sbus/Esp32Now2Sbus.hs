@@ -23,12 +23,19 @@ import Utils
 
 ------------------------------------------------------------
 
+c_esp32nowByte :: SWord8
+c_esp32nowByte = extern "esp32nowByte" Nothing
+
+------------------------------------------------------------
+
 tx_mac1 = 0x98 :: SWord8
 tx_mac2 = 0xCD :: SWord8
 tx_mac3 = 0xAC :: SWord8
 tx_mac4 = 0xD3 :: SWord8
 tx_mac5 = 0x42 :: SWord8
 tx_mac6 = 0x3C :: SWord8
+
+delayMsec = 1 :: SWord32
 
 ------------------------------------------------------------
 
@@ -38,6 +45,8 @@ spec = do
   let (running, starting) = runstate
 
   -- Do some stuff at startup ----------------------------------------
+
+  trigger "serialStart" starting []
 
   trigger "esp32nowStart" starting []
 
@@ -52,6 +61,11 @@ spec = do
 
   -- Do some other stuff in loop -------------------------------------
 
+  trigger "esp32nowRead" running []
+
+  trigger "esp32nowDebug" running []
+
+  trigger "delayMsec" running [arg delayMsec]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
