@@ -12,3 +12,8 @@ void delayMsec(uint32_t msec)
 {
     delay(msec);
 }
+
+void delayUsec(uint32_t usec)
+{
+    delayMicroseconds(usec);
+}

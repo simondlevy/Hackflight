@@ -24,7 +24,7 @@ static void _data_receive_callback(const uint8_t * macaddr, const uint8_t *data,
 
     _msglen = len;
 
-    delay(1);
+    delayMicroseconds(1);
 }
 
 void esp32nowRead(void)
