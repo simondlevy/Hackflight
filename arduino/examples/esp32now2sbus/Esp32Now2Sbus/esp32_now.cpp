@@ -11,24 +11,19 @@
 #include <WiFi.h>
 #include "arduino_debugger.hpp"
 
-extern uint8_t esp32nowByte; 
-extern bool esp32nowAvailable; 
+#define _EXTERN
+#include "hackflight.h"
 
-
-static uint8_t _buffer[256];
+static uint8_t _msg[256];
 static uint8_t _msglen;
 
 static void _data_receive_callback(const uint8_t * macaddr, const uint8_t *data, int len)
 {
-    memcpy(_buffer, data, len);
+    memcpy(_msg, data, len);
 
     _msglen = len;
 
     delayMicroseconds(1);
-}
-
-void esp32nowRead(void)
-{
 }
 
 void esp32nowStart(void)
@@ -91,7 +86,14 @@ void commsWrite(uint8_t * buff, uint8_t size)
     esp_err_t result = esp_now_send(rxaddr, buff, size);
 }
 
-void esp32nowDebug(void)
+void esp32nowRead(void)
 {
-    Debugger::printf("%d\n", _msglen);
+    static uint8_t _msgidx;
+    esp32nowByte = _msg[_msgidx++];
+    _msgidx %= 18;
+}
+
+void esp32nowDebug(uint8_t byte)
+{
+    Debugger::printf("%d\n", byte);
 }

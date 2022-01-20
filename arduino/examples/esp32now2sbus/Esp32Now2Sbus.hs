@@ -13,7 +13,7 @@ module Esp32Now2Sbus where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Prelude hiding ((/), (*), (+), (-), (==), (++))
+import Prelude hiding ((/), (*), (+), (-), (==), (++), (&&))
 
 import Time
 import Receiver
@@ -61,11 +61,13 @@ spec = do
 
   -- Do some other stuff in loop -------------------------------------
 
+  let (msgtype, _, _, checked) = MSP.parse true c_esp32nowByte
+
   trigger "esp32nowRead" running []
 
-  trigger "esp32nowDebug" running []
-
   trigger "delayUsec" running [arg delayUsec]
+
+  trigger "esp32nowDebug" (running && checked) [arg msgtype]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
