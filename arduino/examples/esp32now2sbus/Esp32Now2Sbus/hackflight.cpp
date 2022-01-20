@@ -13,13 +13,11 @@ static bool s1[(1)] = {(false)};
 static uint8_t s4[(1)] = {((uint8_t)(0))};
 static uint8_t s3[(1)] = {((uint8_t)(0))};
 static uint8_t s2[(1)] = {((uint8_t)(0))};
-static uint8_t s5[(1)] = {((uint8_t)(0))};
 static size_t s0_idx = (0);
 static size_t s1_idx = (0);
 static size_t s4_idx = (0);
 static size_t s3_idx = (0);
 static size_t s2_idx = (0);
-static size_t s5_idx = (0);
 
 bool s0_get(size_t x) {
   return (s0)[((s0_idx) + (x)) % (1)];
@@ -41,10 +39,6 @@ uint8_t s2_get(size_t x) {
   return (s2)[((s2_idx) + (x)) % (1)];
 }
 
-uint8_t s5_get(size_t x) {
-  return (s5)[((s5_idx) + (x)) % (1)];
-}
-
 bool s0_gen(void) {
   return !((s0_get)((0)));
 }
@@ -63,10 +57,6 @@ uint8_t s3_gen(void) {
 
 uint8_t s2_gen(void) {
   return ((esp32nowByte_cpy) == ((uint8_t)(36))) ? (uint8_t)(1) : (((((s2_get)((0))) == ((uint8_t)(1))) && ((esp32nowByte_cpy) == ((uint8_t)(77)))) ? (uint8_t)(2) : (((((s2_get)((0))) == ((uint8_t)(2))) && (((esp32nowByte_cpy) == ((uint8_t)(60))) || ((esp32nowByte_cpy) == ((uint8_t)(62))))) ? (uint8_t)(3) : ((((s2_get)((0))) == ((uint8_t)(3))) ? (uint8_t)(4) : ((((s2_get)((0))) == ((uint8_t)(4))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s3_get)((0))) < ((uint8_t)(200)))) ? (uint8_t)(6) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) > ((uint8_t)(1)))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) == ((uint8_t)(1)))) ? (uint8_t)(6) : ((uint8_t)(0)))))))));
-}
-
-uint8_t s5_gen(void) {
-  return ((((esp32nowByte_cpy) == ((uint8_t)(36))) ? (uint8_t)(1) : (((((s2_get)((0))) == ((uint8_t)(1))) && ((esp32nowByte_cpy) == ((uint8_t)(77)))) ? (uint8_t)(2) : (((((s2_get)((0))) == ((uint8_t)(2))) && (((esp32nowByte_cpy) == ((uint8_t)(60))) || ((esp32nowByte_cpy) == ((uint8_t)(62))))) ? (uint8_t)(3) : ((((s2_get)((0))) == ((uint8_t)(3))) ? (uint8_t)(4) : ((((s2_get)((0))) == ((uint8_t)(4))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s3_get)((0))) < ((uint8_t)(200)))) ? (uint8_t)(6) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) > ((uint8_t)(1)))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) == ((uint8_t)(1)))) ? (uint8_t)(6) : ((uint8_t)(0)))))))))) < ((uint8_t)(4))) ? (uint8_t)(0) : (((((esp32nowByte_cpy) == ((uint8_t)(36))) ? (uint8_t)(1) : (((((s2_get)((0))) == ((uint8_t)(1))) && ((esp32nowByte_cpy) == ((uint8_t)(77)))) ? (uint8_t)(2) : (((((s2_get)((0))) == ((uint8_t)(2))) && (((esp32nowByte_cpy) == ((uint8_t)(60))) || ((esp32nowByte_cpy) == ((uint8_t)(62))))) ? (uint8_t)(3) : ((((s2_get)((0))) == ((uint8_t)(3))) ? (uint8_t)(4) : ((((s2_get)((0))) == ((uint8_t)(4))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s3_get)((0))) < ((uint8_t)(200)))) ? (uint8_t)(6) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) > ((uint8_t)(1)))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) == ((uint8_t)(1)))) ? (uint8_t)(6) : ((uint8_t)(0)))))))))) == ((uint8_t)(6))) ? (s5_get)((0)) : ((((s5_get)((0))) | (esp32nowByte_cpy)) & (~(((s5_get)((0))) & (esp32nowByte_cpy)))));
 }
 
 bool serialStart_guard(void) {
@@ -122,7 +112,7 @@ uint32_t delayUsec_arg0(void) {
 }
 
 bool esp32nowDebug_guard(void) {
-  return ((!(!((s0_get)((0))))) ? true : ((s1_get)((0)))) && (((((esp32nowByte_cpy) == ((uint8_t)(36))) ? (uint8_t)(1) : (((((s2_get)((0))) == ((uint8_t)(1))) && ((esp32nowByte_cpy) == ((uint8_t)(77)))) ? (uint8_t)(2) : (((((s2_get)((0))) == ((uint8_t)(2))) && (((esp32nowByte_cpy) == ((uint8_t)(60))) || ((esp32nowByte_cpy) == ((uint8_t)(62))))) ? (uint8_t)(3) : ((((s2_get)((0))) == ((uint8_t)(3))) ? (uint8_t)(4) : ((((s2_get)((0))) == ((uint8_t)(4))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s3_get)((0))) < ((uint8_t)(200)))) ? (uint8_t)(6) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) > ((uint8_t)(1)))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) == ((uint8_t)(1)))) ? (uint8_t)(6) : ((uint8_t)(0)))))))))) == ((uint8_t)(6))) && ((((((esp32nowByte_cpy) == ((uint8_t)(36))) ? (uint8_t)(1) : (((((s2_get)((0))) == ((uint8_t)(1))) && ((esp32nowByte_cpy) == ((uint8_t)(77)))) ? (uint8_t)(2) : (((((s2_get)((0))) == ((uint8_t)(2))) && (((esp32nowByte_cpy) == ((uint8_t)(60))) || ((esp32nowByte_cpy) == ((uint8_t)(62))))) ? (uint8_t)(3) : ((((s2_get)((0))) == ((uint8_t)(3))) ? (uint8_t)(4) : ((((s2_get)((0))) == ((uint8_t)(4))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s3_get)((0))) < ((uint8_t)(200)))) ? (uint8_t)(6) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) > ((uint8_t)(1)))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) == ((uint8_t)(1)))) ? (uint8_t)(6) : ((uint8_t)(0)))))))))) < ((uint8_t)(4))) ? (uint8_t)(0) : (((((esp32nowByte_cpy) == ((uint8_t)(36))) ? (uint8_t)(1) : (((((s2_get)((0))) == ((uint8_t)(1))) && ((esp32nowByte_cpy) == ((uint8_t)(77)))) ? (uint8_t)(2) : (((((s2_get)((0))) == ((uint8_t)(2))) && (((esp32nowByte_cpy) == ((uint8_t)(60))) || ((esp32nowByte_cpy) == ((uint8_t)(62))))) ? (uint8_t)(3) : ((((s2_get)((0))) == ((uint8_t)(3))) ? (uint8_t)(4) : ((((s2_get)((0))) == ((uint8_t)(4))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s3_get)((0))) < ((uint8_t)(200)))) ? (uint8_t)(6) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) > ((uint8_t)(1)))) ? (uint8_t)(5) : (((((s2_get)((0))) == ((uint8_t)(5))) && (((s4_get)((0))) == ((uint8_t)(1)))) ? (uint8_t)(6) : ((uint8_t)(0)))))))))) == ((uint8_t)(6))) ? (s5_get)((0)) : ((((s5_get)((0))) | (esp32nowByte_cpy)) & (~(((s5_get)((0))) & (esp32nowByte_cpy)))))) == (esp32nowByte_cpy)));
+  return (!(!((s0_get)((0))))) ? true : ((s1_get)((0)));
 }
 
 uint8_t esp32nowDebug_arg0(void) {
@@ -135,7 +125,6 @@ void step(void) {
   uint8_t s4_tmp;
   uint8_t s3_tmp;
   uint8_t s2_tmp;
-  uint8_t s5_tmp;
   (esp32nowByte_cpy) = (esp32nowByte);
   if ((serialStart_guard)()) {
     {(serialStart)();}
@@ -163,17 +152,14 @@ void step(void) {
   (s4_tmp) = ((s4_gen)());
   (s3_tmp) = ((s3_gen)());
   (s2_tmp) = ((s2_gen)());
-  (s5_tmp) = ((s5_gen)());
   ((s0)[s0_idx]) = (s0_tmp);
   ((s1)[s1_idx]) = (s1_tmp);
   ((s4)[s4_idx]) = (s4_tmp);
   ((s3)[s3_idx]) = (s3_tmp);
   ((s2)[s2_idx]) = (s2_tmp);
-  ((s5)[s5_idx]) = (s5_tmp);
   (s0_idx) = (((s0_idx) + (1)) % (1));
   (s1_idx) = (((s1_idx) + (1)) % (1));
   (s4_idx) = (((s4_idx) + (1)) % (1));
   (s3_idx) = (((s3_idx) + (1)) % (1));
   (s2_idx) = (((s2_idx) + (1)) % (1));
-  (s5_idx) = (((s5_idx) + (1)) % (1));
 }

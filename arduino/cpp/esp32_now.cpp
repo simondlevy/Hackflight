@@ -90,10 +90,10 @@ void esp32nowRead(void)
 {
     static uint8_t _msgidx;
     esp32nowByte = _msg[_msgidx++];
-    _msgidx %= 18;
+    _msgidx = _msglen > 0 ? _msgidx % _msglen : 0;
 }
 
-void esp32nowDebug(uint8_t byte)
+void esp32nowDebug(uint8_t msgtype)
 {
-    Debugger::printf("%d\n", byte);
+    Debugger::printf("%d\n", msgtype);
 }
