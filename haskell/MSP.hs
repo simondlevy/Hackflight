@@ -62,12 +62,13 @@ reply msgtype vstate =
 
 --------------------------------------------------------
 
-parse :: SBool -> SWord8 -> (SWord8, SBool, SWord8, SBool)
+parse :: SWord8 -> (SWord8, SWord8, SBool, SBool)
 
-parse avail byte = (msgtype, sending, payindex, checked) where
+parse byte = (msgtype, payindex, checked, isrequest) where
 
   isrequest = msgtype' < 200
 
+  -- parser state-transition function
   state  = if byte == 36 then 1
       else if state' == 1 && byte == 77 then 2
       else if state' == 2 && (byte == 60 || byte == 62) then 3
@@ -93,8 +94,6 @@ parse avail byte = (msgtype, sending, payindex, checked) where
   crc = if state < 4 then 0 else if state == 6 then crc' else xor crc' byte
 
   checked = state == 6 && crc == byte
-
-  sending = avail && checked && isrequest
 
   -- State variables
   state'     = [0] ++ state :: SWord8

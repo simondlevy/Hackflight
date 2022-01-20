@@ -31,22 +31,9 @@ hackflight :: Receiver ->
               [Sensor] ->
               [PidFun] ->
               Mixer ->
-              (Message, SBool , Motors , SBool
-               -- , SFloat
-               -- , SFloat
-               -- , SFloat
-               -- , SFloat
-              )
+              (Message, SBool , Motors , SBool)
 
-hackflight receiver sensors pidfuns mixer = (  message
-                                             , sending
-                                             , motors
-                                             , led
-                                             -- , m1
-                                             -- , m2
-                                             -- , m3
-                                             -- , m4
-                                             )
+hackflight receiver sensors pidfuns mixer = (message , sending , motors , led)
 
   where
 
@@ -69,7 +56,8 @@ hackflight receiver sensors pidfuns mixer = (  message
     led = if c_usec < 2000000 then (mod (div c_usec 50000) 2 == 0) else armed
 
     -- Run the serial comms parser checking for data requests
-    (msgtype, sending, payindex, _checked) = MSP.parse c_serialAvailable c_serialByte
+    (msgtype, payindex, checked, isrequest) = MSP.parse c_serialByte
+    sending = c_serialAvailable && checked && isrequest
 
     -- Reply with a message to GCS if indicated
     message = MSP.reply msgtype state

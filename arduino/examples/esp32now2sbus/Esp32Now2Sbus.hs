@@ -61,14 +61,13 @@ spec = do
 
   -- Do some other stuff in loop -------------------------------------
 
-  let (msgtype, _, _, checked) = MSP.parse true c_esp32nowByte
+  let (msgtype, payindex, checked, _) = MSP.parse c_esp32nowByte
 
   trigger "esp32nowRead" running []
 
   trigger "delayUsec" running [arg delayUsec]
 
   trigger "esp32nowDebug" (running && checked) [arg msgtype]
-  -- trigger "esp32nowDebug" running [arg msgtype]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
