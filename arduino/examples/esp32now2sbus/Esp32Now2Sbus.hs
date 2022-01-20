@@ -67,8 +67,8 @@ spec = do
 
   trigger "delayUsec" running [arg delayUsec]
 
-  -- trigger "esp32nowDebug" (running && checked) [arg msgtype]
-  trigger "esp32nowDebug" running [arg msgtype]
+  trigger "esp32nowDebug" (running && checked) [arg msgtype]
+  -- trigger "esp32nowDebug" running [arg msgtype]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"
