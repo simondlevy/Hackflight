@@ -63,6 +63,8 @@ spec = do
 
   let (msgtype, payindex, checked, _) = MSP.parse c_esp32nowByte
 
+  let (c1, c2, c3, c4, c5, c6) = Messages.getChannels msgtype payindex c_esp32nowByte
+
   trigger "esp32nowRead" running []
 
   trigger "delayUsec" running [arg delayUsec]

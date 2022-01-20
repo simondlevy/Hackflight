@@ -22,7 +22,7 @@ import Utils
 
 ----------------------------------------------------------------------------
 
--- Use floats for every payload
+-- Use floats for every outgoing payload
 data Message = Message {  
                           direction :: SWord8 -- '>' (0x3E) or '<' (0x3C)
                         , paysize   :: SWord8 
@@ -98,3 +98,29 @@ getMotors msgtype payindex byte = (m1, m2, m3, m4) where
   b' = [0] ++ b
   mvalue = if mod payindex 2 == 0 then b' .|. b.<<.(8::SWord8)
            else  mvalue' where mvalue' = [0] ++ mvalue :: SWord16
+
+----------------------------------------------------------------------------
+
+getChannels :: SWord8 -> SWord8 -> SWord8
+                -> (SFloat, SFloat, SFloat, SFloat, SFloat, SFloat)
+
+getChannels msgtype payindex byte = (c1, c2, c3, c4, c5, c6) where
+
+  cindex = div payindex 2
+
+  c1 = getcval 1 c1' where c1' = [0] ++ c1
+  c2 = getcval 2 c2' where c2' = [0] ++ c2
+  c3 = getcval 3 c3' where c3' = [0] ++ c3
+  c4 = getcval 4 c4' where c4' = [0] ++ c4
+  c5 = getcval 5 c5' where c5' = [0] ++ c5
+  c6 = getcval 6 c6' where c6' = [0] ++ c6
+
+  getcval idx oldval = if cindex == idx
+                       then ((unsafeCast cvalue) - 1000) / 1000
+                       else oldval :: SFloat
+
+  -- Make a 16-bit motor value from two-byte pairs
+  b = cast byte :: SWord16
+  b' = [0] ++ b
+  cvalue = if mod payindex 2 == 0 then b' .|. b.<<.(8::SWord8)
+           else  cvalue' where cvalue' = [0] ++ cvalue :: SWord16
