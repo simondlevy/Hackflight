@@ -78,6 +78,18 @@ rxmessage c1 c2 c3 c4 c5 c6 = Message 0x3E
 
 ----------------------------------------------------------------------------
 
+makeval :: SWord8 -> SWord8 -> SWord16
+
+makeval byte  payindex = value
+
+  -- Make a 16-bit motor value from two-byte pairs
+  b = cast byte :: SWord16
+  b' = [0] ++ b
+  value = if mod payindex 2 == 0 then b' .|. b.<<.(8::SWord8)
+           else  value' where value' = [0] ++ value :: SWord16
+
+----------------------------------------------------------------------------
+
 getMotors :: SWord8 -> SWord8 -> SWord8 -> (SFloat, SFloat, SFloat, SFloat)
 
 getMotors msgtype payindex byte = (m1, m2, m3, m4) where
@@ -93,11 +105,7 @@ getMotors msgtype payindex byte = (m1, m2, m3, m4) where
                        then ((unsafeCast mvalue) - 1000) / 1000
                        else oldval :: SFloat
 
-  -- Make a 16-bit motor value from two-byte pairs
-  b = cast byte :: SWord16
-  b' = [0] ++ b
-  mvalue = if mod payindex 2 == 0 then b' .|. b.<<.(8::SWord8)
-           else  mvalue' where mvalue' = [0] ++ mvalue :: SWord16
+  mvalue = makeval byte payindex
 
 ----------------------------------------------------------------------------
 
