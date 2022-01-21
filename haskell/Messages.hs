@@ -102,7 +102,7 @@ getMotors msgtype payindex byte = (m1, m2, m3, m4) where
 ----------------------------------------------------------------------------
 
 getChannels :: SWord8 -> SWord8 -> SWord8
-                -> (SFloat, SFloat, SFloat, SFloat, SFloat, SFloat)
+                -> (SWord16, SWord16, SWord16, SWord16, SWord16, SWord16)
 
 getChannels msgtype payindex byte = (c1, c2, c3, c4, c5, c6) where
 
@@ -115,9 +115,7 @@ getChannels msgtype payindex byte = (c1, c2, c3, c4, c5, c6) where
   c5 = getcval 5 c5' where c5' = [0] ++ c5
   c6 = getcval 6 c6' where c6' = [0] ++ c6
 
-  getcval idx oldval = if cindex == idx
-                       then ((unsafeCast cvalue) - 1000) / 1000
-                       else oldval :: SFloat
+  getcval idx oldval = if cindex == idx then cvalue else oldval
 
   -- Make a 16-bit motor value from two-byte pairs
   b = cast byte :: SWord16

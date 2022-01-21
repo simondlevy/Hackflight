@@ -93,7 +93,13 @@ void esp32nowRead(void)
     _msgidx = _msglen > 0 ? _msgidx % _msglen : 0;
 }
 
-void esp32nowDebug(float c1, float c2, float c3, float c4, float c5, float c6)
+void esp32nowDebug(
+        uint16_t c1,
+        uint16_t c2,
+        uint16_t c3,
+        uint16_t c4,
+        uint16_t c5,
+        uint16_t c6)
 {
-    Debugger::printf("%f  %f  %f  %f  %f  %f\n", c1, c2, c3, c4, c5, c6);
+    Debugger::printf("%d  %d  %d  %d  %d  %d\n", c1, c2, c3, c4, c5, c6);
 }
