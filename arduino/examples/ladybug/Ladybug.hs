@@ -63,7 +63,7 @@ spec = do
 
   -- Run the full Hackflight algorithm.  The "sending" flag will be true when
   -- the algorithm is ready to send data.
-  let (message, sending, motors, led {--, m1val, m2val, m3val, m4val--}) = hackflight receiver sensors pidfuns QuadXMW
+  let (message, sending, motors, led) = hackflight receiver sensors pidfuns QuadXMW
 
   -- Do some stuff at startup
   trigger "serialStart" starting []
@@ -79,6 +79,7 @@ spec = do
   -- Update receiver in loop
   trigger "dsmrxUpdate" running []
   trigger "dsmrxGet" c_receiverGotNewFrame []
+  trigger "dsmrxGetInt" c_receiverGotNewFrame []
 
   -- Do some other stuff in loop
   trigger "usfsUpdate" running []
@@ -87,18 +88,17 @@ spec = do
   trigger "serialUpdate" running []
   trigger "serialRead" c_serialAvailable []
 
-  -- Send reply to GCS if indicated.  C function serialSend() computes
-  -- remaining CRC from floats before sending.
+  -- Send reply to GCS if indicated
   trigger "commsSend" sending [ 
                                 arg $ direction message
                               , arg $ paysize message
                               , arg $ msgtype message
-                              , arg $ v1 message
-                              , arg $ v2 message
-                              , arg $ v3 message
-                              , arg $ v4 message
-                              , arg $ v5 message
-                              , arg $ v6 message
+                              , arg $ f1 message
+                              , arg $ f2 message
+                              , arg $ f3 message
+                              , arg $ f4 message
+                              , arg $ f5 message
+                              , arg $ f6 message
                               ]
 
   -- Run motors

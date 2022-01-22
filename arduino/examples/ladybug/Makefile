@@ -51,6 +51,7 @@ all: hackflight.cpp
 	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_time.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_usfs.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_debugger.hpp $(SKETCH)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c

@@ -13,6 +13,8 @@
 #define _EXTERN
 #include "hackflight.h"
 
+#include "arduino_debugger.hpp"
+
 static DSM2048 rx;
 
 void serialEvent1(void)
@@ -36,6 +38,21 @@ void dsmrxUpdate(void)
     receiverGotNewFrame = rx.gotNewFrame();
 }
 
+void dsmrxGetInt(void)
+{
+    uint16_t rawvals[8];
+
+    rx.getChannelValues(rawvals, 8);
+
+    /*
+    int_receiverThrottle = rawvals[0];
+    int_receiverRoll     = rawvals[1];
+    int_receiverPitch    = rawvals[2];
+    int_receiverYaw      = rawvals[3];
+    int_receiverAux1     = rawvals[6];
+    int_receiverAux2     = rawvals[4];
+    */
+}
 void dsmrxGet(void)
 {
     float rawvals[8];
