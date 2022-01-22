@@ -13,6 +13,8 @@
 static uint8_t buffer[256];
 static uint8_t bufidx;
 
+void commsWrite(uint8_t *, uint8_t);
+
 static void putbuf(uint8_t byte)
 {
     buffer[bufidx++] = byte;
@@ -31,6 +33,28 @@ static void serializeFloat(uint8_t & crc, float floatval)
     serializeByte(crc, intval     & 0xFF);
     serializeByte(crc, intval>>8  & 0xFF);
 }
+
+void commsSendAttitude(float angx , float angy , float heading)
+{
+    bufidx = 0;
+
+    putbuf('$');
+    putbuf('M');
+    putbuf('>');
+    putbuf(6);
+    putbuf(108);
+
+    uint8_t crc = 6 ^ 108;
+
+    serializeFloat(crc, angx);
+    serializeFloat(crc, angy);
+    serializeFloat(crc, heading);
+
+    serializeByte(crc, crc);
+
+    commsWrite(buffer, bufidx);
+}
+
 
 void commsSend(
           uint8_t direction
@@ -65,6 +89,5 @@ void commsSend(
 
     serializeByte(crc, crc);
 
-    void commsWrite(uint8_t *, uint8_t);
     commsWrite(buffer, bufidx);
 }

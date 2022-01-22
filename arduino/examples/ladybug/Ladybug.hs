@@ -88,8 +88,15 @@ spec = do
   trigger "serialUpdate" running []
   trigger "serialRead" c_serialAvailable []
 
-  -- Send reply to GCS if indicated
-  trigger "commsSend" sending [ 
+  -- Sepcial handing for attitude messages
+  let isatt = (msgtype message) == 108 :: SBool
+  trigger "commsSendAttitude" (sending && isatt)
+                             [  arg $ f1 message
+                              , arg $ f2 message
+                              , arg $ f3 message
+                             ]
+
+  trigger "commsSend" (sending && not isatt) [ 
                                 arg $ direction message
                               , arg $ paysize message
                               , arg $ msgtype message
