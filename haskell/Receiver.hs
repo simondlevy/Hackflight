@@ -55,8 +55,6 @@ getDemands receiver =
 
     where
 
-      throttleFloat = intscale c_int_receiverThrottle
-
       throttleDemand = throttleFun c_receiverThrottle
 
       rollDemand = ((adjustCommand (cyclicFun $ abs c_receiverRoll) c_receiverRoll) + (rollTrim trim)) * scale
@@ -96,12 +94,6 @@ c_receiverPitch  = extern "receiverPitch" Nothing
 c_receiverYaw :: SFloat
 c_receiverYaw  = extern "receiverYaw" Nothing
 
-c_receiverAux1 :: SFloat
-c_receiverAux1  = extern "receiverAux1" Nothing
-
-c_receiverAux2 :: SFloat
-c_receiverAux2  = extern "receiverAux2" Nothing
-
 c_receiverReady :: SBool
 c_receiverReady  = extern "receiverReady" Nothing
 
@@ -111,20 +103,8 @@ c_receiverTimedOut  = extern "receiverTimedOut" Nothing
 c_receiverGotNewFrame :: SBool
 c_receiverGotNewFrame  = extern "receiverGotNewFrame" Nothing
 
-c_int_receiverThrottle :: SWord16
-c_int_receiverThrottle  = extern "int_receiverThrottle" Nothing
+c_receiverAux1 :: SWord16
+c_receiverAux1  = extern "receiverAux1" Nothing
 
-c_int_receiverRoll :: SWord16
-c_int_receiverRoll  = extern "int_receiverRoll" Nothing
-
-c_int_receiverPitch :: SWord16
-c_int_receiverPitch  = extern "int_receiverPitch" Nothing
-
-c_int_receiverYaw :: SWord16
-c_int_receiverYaw  = extern "int_receiverYaw" Nothing
-
-c_int_receiverAux1 :: SWord16
-c_int_receiverAux1  = extern "int_receiverAux1" Nothing
-
-c_int_receiverAux2 :: SWord16
-c_int_receiverAux2  = extern "int_receiverAux2" Nothing
+c_receiverAux2 :: SWord16
+c_receiverAux2  = extern "receiverAux2" Nothing
