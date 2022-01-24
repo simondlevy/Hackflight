@@ -53,7 +53,7 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
 
   paysize = if msgtype == 105 then 12 else if msgtype == 108 then 6 else 0 :: SWord8
 
-  val00 = if msgtype == 105 then rxscale c_receiverThrottle
+  val00 = if msgtype == 105 then unsafeCast c_receiverThrottle
           else if msgtype == 108 then 10 * (rad2deg (phi vstate))
           else 0
 

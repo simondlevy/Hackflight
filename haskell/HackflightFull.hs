@@ -31,14 +31,14 @@ hackflight :: Receiver ->
               [Sensor] ->
               [PidFun] ->
               Mixer ->
-              (Message, SBool , Motors , SBool)
+              (Message, SBool , Motors , SBool, SFloat)
 
-hackflight receiver sensors pidfuns mixer = (message , sending , motors , led)
+hackflight receiver sensors pidfuns mixer = (message , sending , motors , led, newval)
 
   where
 
     -- Get receiver demands from external C functions
-    rdemands = getDemands receiver
+    (rdemands, newval) = getDemands receiver
 
     -- Get the vehicle state by composing the sensor functions over the previous state
     state = compose sensors (state' state)

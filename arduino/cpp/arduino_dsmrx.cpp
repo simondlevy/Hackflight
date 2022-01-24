@@ -73,6 +73,7 @@ void dsmrxGet(void)
     receiverAux2     = irawvals[4];
 }
 
-void ignore(uint16_t t, uint16_t r, uint16_t p, uint16_t y, uint16_t a1, uint16_t a2)
+void checkReceiver(float orig, float newThrottle)
 {
+    //Debugger::printf("%f  %f\n", orig, newThrottle);
 }

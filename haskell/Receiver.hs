@@ -46,12 +46,12 @@ makeReceiver demandScale =
   makeReceiverWithTrim (AxisTrim 0 0 0) demandScale
 
 intscale :: SWord16 -> SFloat
-intscale x = ((unsafeCast x) - 512) / 512
+intscale x = 2 * (((unsafeCast x) - 1000) / 1000) - 1
 
-getDemands :: Receiver -> Demands
+getDemands :: Receiver -> (Demands, SFloat)
 getDemands receiver = 
 
-    Demands throttleDemand rollDemand pitchDemand yawDemand
+    (Demands throttleDemand rollDemand pitchDemand yawDemand, 0)
 
     where
 
@@ -90,6 +90,8 @@ c_receiverPitch  = extern "receiverPitch" Nothing
 
 c_receiverYaw :: SFloat
 c_receiverYaw  = extern "receiverYaw" Nothing
+
+-----------------------------------------------
 
 c_receiverReady :: SBool
 c_receiverReady  = extern "receiverReady" Nothing

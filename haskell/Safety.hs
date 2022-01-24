@@ -42,7 +42,8 @@ safety demands state = (armed, failsafe, mzero)
 
             else armed'
 
-    throttleIsDown = (throttle demands) < (-0.995)
+    -- throttleIsDown = (throttle demands) < (-0.995)
+    throttleIsDown = c_receiverThrottle < 1005
 
     aux1IsDown = c_receiverAux1 > 1500
 
