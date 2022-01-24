@@ -31,18 +31,6 @@ data Message =  Message { direction :: SWord8 -- '>' (0x3E) or '<' (0x3C)
                         , f4        :: SFloat
                         , f5        :: SFloat
                         , f6        :: SFloat
-                        , b01       :: SWord8
-                        , b02       :: SWord8
-                        , b03       :: SWord8
-                        , b04       :: SWord8
-                        , b05       :: SWord8
-                        , b06       :: SWord8
-                        , b07       :: SWord8
-                        , b08       :: SWord8
-                        , b09       :: SWord8
-                        , b10       :: SWord8
-                        , b11       :: SWord8
-                        , b12       :: SWord8
                        }
 
 ----------------------------------------------------------------------------
@@ -73,16 +61,7 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
 
 rxmessage :: SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> Message
 
-rxmessage c1 c2 c3 c4 c5 c6 = (Message 0x3E 12 200 v1 v2 v3 v4 v5 v6
-                                       0 0 0 0 0 0 0 0 0 0 0 0) where
-  v1 = scale c1
-  v2 = scale c2
-  v3 = scale c3
-  v4 = scale c4
-  v5 = scale c5
-  v6 = scale c6
-
-  scale c = 1000 * (1 + (c + 1) / 2)
+rxmessage c1 c2 c3 c4 c5 c6 = Message 0x3E 12 200 c1 c2 c3 c4 c5 c6 where
 
 ----------------------------------------------------------------------------
 
