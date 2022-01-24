@@ -57,15 +57,14 @@ void dsmrxGet(void)
 {
     float frawvals[8];
     rx.getChannelValues(frawvals, 8);
-    receiverThrottle = frawvals[0];
     receiverRoll     = frawvals[1];
     receiverPitch    = frawvals[2];
     receiverYaw      = frawvals[3];
 
     uint16_t irawvals[8];
     rx.getChannelValues(irawvals, 8);
+    receiverThrottle = irawvals[0];
     /*
-    int_receiverThrottle = irawvals[0];
     int_receiverRoll     = irawvals[1];
     int_receiverPitch    = irawvals[2];
     int_receiverYaw      = irawvals[3];

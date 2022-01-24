@@ -55,7 +55,7 @@ getDemands receiver =
 
     where
 
-      throttleDemand = throttleFun c_receiverThrottle
+      throttleDemand = throttleFun (intscale c_receiverThrottle)
 
       rollDemand = ((adjustCommand (cyclicFun $ abs c_receiverRoll) c_receiverRoll) + (rollTrim trim)) * scale
 
@@ -82,9 +82,6 @@ getDemands receiver =
 
 -- Externals -------------------------------------------------
 
-c_receiverThrottle :: SFloat
-c_receiverThrottle  = extern "receiverThrottle" Nothing
-
 c_receiverRoll :: SFloat
 c_receiverRoll  = extern "receiverRoll" Nothing
 
@@ -102,6 +99,9 @@ c_receiverTimedOut  = extern "receiverTimedOut" Nothing
 
 c_receiverGotNewFrame :: SBool
 c_receiverGotNewFrame  = extern "receiverGotNewFrame" Nothing
+
+c_receiverThrottle :: SWord16
+c_receiverThrottle  = extern "receiverThrottle" Nothing
 
 c_receiverAux1 :: SWord16
 c_receiverAux1  = extern "receiverAux1" Nothing
