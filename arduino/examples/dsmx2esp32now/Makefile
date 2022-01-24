@@ -33,7 +33,7 @@ all: hackflight.cpp
 	cp $(CDIR)/comms.c $(SKETCH)/comms.cpp
 	cp $(CPPDIR)/arduino_debugger.hpp $(SKETCH)
 	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
-	cp $(CPPDIR)/esp32_dsmrx.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_dsmrx.cpp $(SKETCH)
 	cp $(CPPDIR)/esp32_now.cpp $(SKETCH)
 
 hackflight.cpp: hackflight.c

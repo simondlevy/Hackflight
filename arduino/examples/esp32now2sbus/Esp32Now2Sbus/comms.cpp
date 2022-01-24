@@ -10,8 +10,12 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "arduino_debugger.hpp"
+
 static uint8_t buffer[256];
 static uint8_t bufidx;
+
+void commsWrite(uint8_t *, uint8_t);
 
 static void putbuf(uint8_t byte)
 {
@@ -32,7 +36,29 @@ static void serializeFloat(uint8_t & crc, float floatval)
     serializeByte(crc, intval>>8  & 0xFF);
 }
 
-void serialSend(
+void commsSendAttitude(float angx , float angy , float heading)
+{
+    bufidx = 0;
+
+    putbuf('$');
+    putbuf('M');
+    putbuf('>');
+    putbuf(6);
+    putbuf(108);
+
+    uint8_t crc = 6 ^ 108;
+
+    serializeFloat(crc, angx);
+    serializeFloat(crc, angy);
+    serializeFloat(crc, heading);
+
+    serializeByte(crc, crc);
+
+    commsWrite(buffer, bufidx);
+}
+
+
+void commsSend(
           uint8_t direction
         , uint8_t size  
         , uint8_t type  
@@ -63,8 +89,9 @@ void serialSend(
     if (nvals > 4) serializeFloat(crc, v5);
     if (nvals > 5) serializeFloat(crc, v6);
 
+    Debugger::printf("%f %f %f %f %f %f\n", v1, v2, v3, v4, v5, v6);
+
     serializeByte(crc, crc);
 
-    void commsWrite(uint8_t *, uint8_t);
     commsWrite(buffer, bufidx);
 }

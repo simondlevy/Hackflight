@@ -35,6 +35,7 @@ all: hackflight.cpp
 	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_delay.cpp $(SKETCH)
 	cp $(CPPDIR)/esp32_now.cpp $(SKETCH)
+	cp $(CPPDIR)/esp32_now_receiver.cpp $(SKETCH)
 
 hackflight.cpp: hackflight.c
 	tail -n +8 hackflight.c > tmp.c

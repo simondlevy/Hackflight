@@ -3,6 +3,8 @@
 
   See https://www.hamishmb.com/multiwii/wiki/index.php?title=Multiwii_Serial_Protocol
 
+  We use floating-point values for the payloads of all messages.
+
   Copyright(C) 2021 on D.Levy
 
   MIT License
@@ -56,12 +58,6 @@ payload msgtype vstate = (paysize, val00, val01, val02, val03, val04, val05) whe
   val03 = if msgtype == 105 then unsafeCast c_receiverYaw else 0
   val04 = if msgtype == 105 then unsafeCast c_receiverAux1 else 0
   val05 = if msgtype == 105 then unsafeCast c_receiverAux2 else 0
-
-----------------------------------------------------------------------------
-
-rxmessage :: SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> SFloat -> Message
-
-rxmessage c1 c2 c3 c4 c5 c6 = Message 0x3E 12 200 c1 c2 c3 c4 c5 c6 where
 
 ----------------------------------------------------------------------------
 

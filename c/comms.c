@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "arduino_debugger.hpp"
+
 static uint8_t buffer[256];
 static uint8_t bufidx;
 
@@ -86,6 +88,8 @@ void commsSend(
     if (nvals > 3) serializeFloat(crc, v4);
     if (nvals > 4) serializeFloat(crc, v5);
     if (nvals > 5) serializeFloat(crc, v6);
+
+    Debugger::printf("%f %f %f %f %f %f\n", v1, v2, v3, v4, v5, v6);
 
     serializeByte(crc, crc);
 

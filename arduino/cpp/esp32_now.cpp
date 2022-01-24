@@ -14,18 +14,6 @@
 #define _EXTERN
 #include "hackflight.h"
 
-static uint8_t _msg[256];
-static uint8_t _msglen;
-
-static void _data_receive_callback(const uint8_t * macaddr, const uint8_t *data, int len)
-{
-    memcpy(_msg, data, len);
-
-    _msglen = len;
-
-    delayMicroseconds(1);
-}
-
 void esp32nowStart(void)
 {
     // Set device as a Wi-Fi Station
@@ -76,21 +64,9 @@ void esp32nowPrepareToSend(
     rxaddr[5] = mac6;
 }
 
-void esp32nowRegisterReceiveCallback(void)
-{
-  esp_now_register_recv_cb(_data_receive_callback);
-}
-
 void commsWrite(uint8_t * buff, uint8_t size)
 {
     esp_err_t result = esp_now_send(rxaddr, buff, size);
-}
-
-void esp32nowRead(void)
-{
-    static uint8_t _msgidx;
-    esp32nowByte = _msg[_msgidx++];
-    _msgidx = _msglen > 0 ? _msgidx % _msglen : 0;
 }
 
 void esp32nowDebug(
