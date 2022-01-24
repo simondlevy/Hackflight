@@ -38,42 +38,16 @@ void dsmrxUpdate(void)
     receiverGotNewFrame = rx.gotNewFrame();
 }
 
-void dsmrxGetInt(void)
+void dsmrxGet(void)
 {
     uint16_t rawvals[8];
 
     rx.getChannelValues(rawvals, 8);
 
-    /*
-    int_receiverThrottle = rawvals[0];
-    int_receiverRoll     = rawvals[1];
-    int_receiverPitch    = rawvals[2];
-    int_receiverYaw      = rawvals[3];
-    int_receiverAux1     = rawvals[6];
-    int_receiverAux2     = rawvals[4];
-    */
-}
-void dsmrxGet(void)
-{
-    float frawvals[8];
-    rx.getChannelValues(frawvals, 8);
-    receiverRoll     = frawvals[1];
-    receiverPitch    = frawvals[2];
-    receiverYaw      = frawvals[3];
-
-    uint16_t irawvals[8];
-    rx.getChannelValues(irawvals, 8);
-    receiverThrottle = irawvals[0];
-    /*
-    int_receiverRoll     = irawvals[1];
-    int_receiverPitch    = irawvals[2];
-    int_receiverYaw      = irawvals[3];
-    */
-    receiverAux1     = irawvals[6];
-    receiverAux2     = irawvals[4];
-}
-
-void checkReceiver(float orig, float newThrottle)
-{
-    //Debugger::printf("%f  %f\n", orig, newThrottle);
+    receiverThrottle = rawvals[0];
+    receiverRoll     = rawvals[1];
+    receiverPitch    = rawvals[2];
+    receiverYaw      = rawvals[3];
+    receiverAux1     = rawvals[6];
+    receiverAux2     = rawvals[4];
 }

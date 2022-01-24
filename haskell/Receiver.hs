@@ -48,20 +48,24 @@ makeReceiver demandScale =
 intscale :: SWord16 -> SFloat
 intscale x = 2 * (((unsafeCast x) - 1000) / 1000) - 1
 
-getDemands :: Receiver -> (Demands, SFloat)
+getDemands :: Receiver -> Demands
 getDemands receiver = 
 
-    (Demands throttleDemand rollDemand pitchDemand yawDemand, 0)
+    Demands throttleDemand rollDemand pitchDemand yawDemand
 
     where
 
       throttleDemand = throttleFun (intscale c_receiverThrottle)
 
-      rollDemand = ((adjustCommand (cyclicFun $ abs c_receiverRoll) c_receiverRoll) + (rollTrim trim)) * scale
+      rxroll = intscale c_receiverRoll
+      rxpitch = intscale c_receiverPitch
+      rxyaw = intscale c_receiverYaw
 
-      pitchDemand = ((adjustCommand (cyclicFun $ abs c_receiverPitch) c_receiverPitch) + (pitchTrim trim)) * scale
+      rollDemand = ((adjustCommand (cyclicFun $ abs rxroll) rxroll) + (rollTrim trim)) * scale
 
-      yawDemand = ((adjustCommand  (abs c_receiverYaw)  c_receiverYaw) + (yawTrim trim)) * scale
+      pitchDemand = ((adjustCommand (cyclicFun $ abs rxpitch) rxpitch) + (pitchTrim trim)) * scale
+
+      yawDemand = ((adjustCommand  (abs rxyaw) rxyaw) + (yawTrim trim)) * scale
 
       cyclicFun command = rcFun command (cyclicExpo receiver) (cyclicRate receiver)
  
@@ -82,17 +86,6 @@ getDemands receiver =
 
 -- Externals -------------------------------------------------
 
-c_receiverRoll :: SFloat
-c_receiverRoll  = extern "receiverRoll" Nothing
-
-c_receiverPitch :: SFloat
-c_receiverPitch  = extern "receiverPitch" Nothing
-
-c_receiverYaw :: SFloat
-c_receiverYaw  = extern "receiverYaw" Nothing
-
------------------------------------------------
-
 c_receiverReady :: SBool
 c_receiverReady  = extern "receiverReady" Nothing
 
@@ -104,6 +97,15 @@ c_receiverGotNewFrame  = extern "receiverGotNewFrame" Nothing
 
 c_receiverThrottle :: SWord16
 c_receiverThrottle  = extern "receiverThrottle" Nothing
+
+c_receiverRoll :: SWord16
+c_receiverRoll  = extern "receiverRoll" Nothing
+
+c_receiverPitch :: SWord16
+c_receiverPitch  = extern "receiverPitch" Nothing
+
+c_receiverYaw :: SWord16
+c_receiverYaw  = extern "receiverYaw" Nothing
 
 c_receiverAux1 :: SWord16
 c_receiverAux1  = extern "receiverAux1" Nothing
