@@ -72,14 +72,3 @@ void dsmrxGet(void)
     receiverAux1     = rawvals[6];
     receiverAux2     = rawvals[4];
 }
-
-void dump(uint16_t t,
-          uint16_t r, 
-          uint16_t p, 
-          uint16_t y, 
-          uint16_t a1, 
-          uint16_t a2)
-{
-    Debugger::printf("%04d %04d %04d %04d %04d %04d\n", t, r, p, y, a1, a2);
-}
-

@@ -77,5 +77,6 @@ void esp32nowDebug(
         uint16_t c5,
         uint16_t c6)
 {
-    Debugger::printf("%d  %d  %d  %d  %d  %d\n", c1, c2, c3, c4, c5, c6);
+    Debugger::printf("%04d  %04d  %04d  %04d  %04d  %04d\n",
+            c1, c2, c3, c4, c5, c6);
 }

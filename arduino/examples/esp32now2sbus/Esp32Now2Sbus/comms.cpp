@@ -89,8 +89,6 @@ void commsSend(
     if (nvals > 4) serializeFloat(crc, v5);
     if (nvals > 5) serializeFloat(crc, v6);
 
-    Debugger::printf("%f %f %f %f %f %f\n", v1, v2, v3, v4, v5, v6);
-
     serializeByte(crc, crc);
 
     commsWrite(buffer, bufidx);
