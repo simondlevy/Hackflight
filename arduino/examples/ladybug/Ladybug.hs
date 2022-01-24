@@ -87,24 +87,16 @@ spec = do
   trigger "serialUpdate" running []
   trigger "serialRead" c_serialAvailable []
 
-  -- Sepcial handing for attitude messages
-  let isatt = (msgtype message) == 108 :: SBool
-  trigger "commsSendAttitude" (sending && isatt)
-                             [  arg $ f1 message
-                              , arg $ f2 message
-                              , arg $ f3 message
-                             ]
-
-  trigger "commsSend" (sending && not isatt) [ 
+  trigger "commsSend" sending [ 
                                 arg $ direction message
                               , arg $ paysize message
                               , arg $ msgtype message
-                              , arg $ f1 message
-                              , arg $ f2 message
-                              , arg $ f3 message
-                              , arg $ f4 message
-                              , arg $ f5 message
-                              , arg $ f6 message
+                              , arg $ v1 message
+                              , arg $ v2 message
+                              , arg $ v3 message
+                              , arg $ v4 message
+                              , arg $ v5 message
+                              , arg $ v6 message
                               ]
 
   -- Run motors

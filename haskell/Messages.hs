@@ -25,12 +25,12 @@ import Utils
 data Message =  Message { direction :: SWord8 -- '>' (0x3E) or '<' (0x3C)
                         , paysize   :: SWord8 
                         , msgtype   :: SWord8 
-                        , f1        :: SFloat
-                        , f2        :: SFloat
-                        , f3        :: SFloat
-                        , f4        :: SFloat
-                        , f5        :: SFloat
-                        , f6        :: SFloat
+                        , v1        :: SFloat
+                        , v2        :: SFloat
+                        , v3        :: SFloat
+                        , v4        :: SFloat
+                        , v5        :: SFloat
+                        , v6        :: SFloat
                        }
 
 ----------------------------------------------------------------------------
