@@ -13,7 +13,7 @@ module Esp32Now2Sbus where
 import Language.Copilot
 import Copilot.Compile.C99
 
-import Prelude hiding ((/), (*), (+), (-), (==), (++), (&&))
+import Prelude hiding ((/), (*), (+), (-), (==), (++), (&&), div)
 
 import Time
 import Receiver
@@ -23,9 +23,23 @@ import Utils
 
 ------------------------------------------------------------
 
+scale :: SWord16 -> SWord16
+
+scale c = y + div ((c - a) * (z - y)) (b - a) where
+  a = 1000
+  b = 2000
+  y = 172
+  z = 1811
+
+------------------------------------------------------------
+
+sbus_out_rx_pin = 15 :: SWord8 -- unused 
+sbus_out_tx_pin = 27 :: SWord8 
+
+------------------------------------------------------------
+
 c_esp32nowByte :: SWord8
 c_esp32nowByte = extern "esp32nowByte" Nothing
-
 ------------------------------------------------------------
 
 tx_mac1 = 0x98 :: SWord8
@@ -59,6 +73,8 @@ spec = do
 
   trigger "esp32nowRegisterReceiveCallback" starting []
 
+  trigger "sbusOutStart" starting [ arg sbus_out_rx_pin, arg sbus_out_tx_pin]
+
   -- Do some other stuff in loop -------------------------------------
 
   let (msgtype, payindex, checked, _) = MSP.parse c_esp32nowByte
@@ -69,12 +85,13 @@ spec = do
 
   trigger "delayUsec" running [arg delayUsec]
 
-  trigger "esp32nowDebug" (running && checked) [ arg c1
-                                               , arg c2
-                                               , arg c3
-                                               , arg c4
-                                               , arg c5
-                                               , arg c6 ]
+  trigger "sbusWrite" (running && checked)
+                      [  arg $ scale c1
+                       , arg $ scale c2
+                       , arg $ scale c3
+                       , arg $ scale c4
+                       , arg $ scale c5
+                       , arg $ scale c6 ]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

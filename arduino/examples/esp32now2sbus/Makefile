@@ -34,6 +34,7 @@ all: hackflight.cpp
 	cp $(CPPDIR)/arduino_debugger.hpp $(SKETCH)
 	cp $(CPPDIR)/arduino_serial.cpp $(SKETCH)
 	cp $(CPPDIR)/arduino_delay.cpp $(SKETCH)
+	cp $(CPPDIR)/arduino_sbus_out.cpp $(SKETCH)
 	cp $(CPPDIR)/esp32_now.cpp $(SKETCH)
 	cp $(CPPDIR)/esp32_now_receiver.cpp $(SKETCH)
 

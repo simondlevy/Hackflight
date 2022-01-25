@@ -28,12 +28,20 @@ dsmx_in_rx_pin = 4  :: SWord8
 dsmx_in_tx_pin = 14 :: SWord8 -- unused
 
 -- MAC address of receiver peer
-rx_mac1 = 0x98 :: SWord8
-rx_mac2 = 0xCD :: SWord8
-rx_mac3 = 0xAC :: SWord8
-rx_mac4 = 0xD3 :: SWord8
-rx_mac5 = 0x42 :: SWord8
-rx_mac6 = 0xE0 :: SWord8
+
+rx_mac1 = 0x50 :: SWord8
+rx_mac2 = 0x02 :: SWord8
+rx_mac3 = 0x91 :: SWord8
+rx_mac4 = 0xA1 :: SWord8
+rx_mac5 = 0x1E :: SWord8
+rx_mac6 = 0x98 :: SWord8
+
+-- rx_mac1 = 0x98 :: SWord8
+-- rx_mac2 = 0xCD :: SWord8
+-- rx_mac3 = 0xAC :: SWord8
+-- rx_mac4 = 0xD3 :: SWord8
+-- rx_mac5 = 0x42 :: SWord8
+-- rx_mac6 = 0xE0 :: SWord8
 
 floatcast :: SWord16 -> SFloat
 floatcast w = unsafeCast w
