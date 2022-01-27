@@ -42,12 +42,12 @@ c_esp32nowByte :: SWord8
 c_esp32nowByte = extern "esp32nowByte" Nothing
 ------------------------------------------------------------
 
-tx_mac1 = 0x98 :: SWord8
-tx_mac2 = 0xCD :: SWord8
-tx_mac3 = 0xAC :: SWord8
-tx_mac4 = 0xD3 :: SWord8
-tx_mac5 = 0x42 :: SWord8
-tx_mac6 = 0x3C :: SWord8
+tx_mac1 = 0xD8 :: SWord8
+tx_mac2 = 0xA0 :: SWord8
+tx_mac3 = 0x1D :: SWord8
+tx_mac4 = 0x46 :: SWord8
+tx_mac5 = 0xDF :: SWord8
+tx_mac6 = 0x60 :: SWord8
 
 delayUsec = 1 :: SWord32
 
@@ -83,8 +83,6 @@ spec = do
 
   trigger "esp32nowRead" running []
 
-  trigger "delayUsec" running [arg delayUsec]
-
   trigger "sbusWrite" (running && checked)
                       [  arg $ scale c1
                        , arg $ scale c2
@@ -92,6 +90,8 @@ spec = do
                        , arg $ scale c4
                        , arg $ scale c5
                        , arg $ scale c6 ]
+
+  trigger "delayUsec" running [arg delayUsec]
 
 -- Compile the spec
 main = reify spec >>= compile "hackflight"

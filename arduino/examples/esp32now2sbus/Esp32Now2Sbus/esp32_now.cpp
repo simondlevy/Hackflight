@@ -68,15 +68,3 @@ void commsWrite(uint8_t * buff, uint8_t size)
 {
     esp_err_t result = esp_now_send(rxaddr, buff, size);
 }
-
-void esp32nowDebug(
-        uint16_t c1,
-        uint16_t c2,
-        uint16_t c3,
-        uint16_t c4,
-        uint16_t c5,
-        uint16_t c6)
-{
-    Debugger::printf("%04d  %04d  %04d  %04d  %04d  %04d\n",
-            c1, c2, c3, c4, c5, c6);
-}

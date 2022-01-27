@@ -36,28 +36,6 @@ static void serializeFloat(uint8_t & crc, float floatval)
     serializeByte(crc, intval>>8  & 0xFF);
 }
 
-void commsSendAttitude(float angx , float angy , float heading)
-{
-    bufidx = 0;
-
-    putbuf('$');
-    putbuf('M');
-    putbuf('>');
-    putbuf(6);
-    putbuf(108);
-
-    uint8_t crc = 6 ^ 108;
-
-    serializeFloat(crc, angx);
-    serializeFloat(crc, angy);
-    serializeFloat(crc, heading);
-
-    serializeByte(crc, crc);
-
-    commsWrite(buffer, bufidx);
-}
-
-
 void commsSend(
           uint8_t direction
         , uint8_t size  
