@@ -9,8 +9,6 @@ MIT License
 from serial import Serial
 from threading import Thread
 
-from debugging import debug
-
 BAUD = 115200
 
 
@@ -35,7 +33,8 @@ class Comms:
 
         msg = serializer(*contents)
 
-        self.port.write(msg)
+        if self.port.isOpen():
+            self.port.write(msg)
 
     def send_request(self, request):
 
@@ -47,8 +46,8 @@ class Comms:
             try:
                 byte = self.port.read(1)
                 self.gcs.parse(byte)
-            except Exception as e:
-                debug(e)
+            except Exception:
+                None
 
     def start(self):
 

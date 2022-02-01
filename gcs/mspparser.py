@@ -89,8 +89,6 @@ class MspParser(metaclass=abc.ABCMeta):
         if self.message_id == 108:
             self.handle_ATTITUDE(*struct.unpack('=hhh', self.message_buffer))
 
-        return
-
     @abc.abstractmethod
     def handle_RC(self, c1, c2, c3, c4, c5, c6):
         return

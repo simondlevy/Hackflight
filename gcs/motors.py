@@ -11,6 +11,7 @@ from math import sqrt
 from dialog import Dialog
 from resources import resource_path
 
+from debugging import debug
 
 class MotorScale(object):
 
@@ -53,14 +54,10 @@ class MotorScale(object):
 
     def callback(self, valstr):
 
-        motors = [1000]*4
-        motors[self.index-1] += 10 * int(valstr) 
-
-        try:
-            self.dialog.gcs.sendMotorMessage(*motors)
-
-        except Exception:  # at startup
-            pass
+        if self.dialog.gcs is not None: # Guard at startup
+            motors = [1000] * 4
+            motors[self.index-1] = int(1000 * (1 +  float(valstr)/100))
+            self.dialog.gcs.sendMotorMessage(motors)
 
     def setValue(self, value):
 
@@ -323,6 +320,9 @@ class MotorsCoaxial(Motors):
 
     def _cut_motors(self):
         try:
-            self.gcs.sendMotorMessage(0, 0, 0, 0)
+            self.gcs.sendMotorMessage(1, 0)
+            self.gcs.sendMotorMessage(2, 0)
+            self.gcs.sendMotorMessage(3, 0)
+            self.gcs.sendMotorMessage(4, 0)
         except Exception:
             return

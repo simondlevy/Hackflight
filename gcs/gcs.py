@@ -11,13 +11,15 @@ from comms import Comms
 from serial.tools.list_ports import comports
 import os
 import tkinter as tk
-from numpy import radians
+from numpy import radians as rad
 
 from mspparser import MspParser
+
 from imu import IMU
 from motors import MotorsQuadXMW, MotorsCoaxial
 from receiver import Receiver
 from resources import resource_path
+
 from debugging import debug
 
 DISPLAY_WIDTH = 800
@@ -113,7 +115,7 @@ class GCS(MspParser):
         self._show_splash()
 
         # Set up parser's request strings
-        self.state_request = MspParser.serialize_ATTITUDE_Request()
+        self.attitude_request = MspParser.serialize_ATTITUDE_Request()
         self.rc_request = MspParser.serialize_RC_Request()
 
         # No messages yet
@@ -164,12 +166,19 @@ class GCS(MspParser):
 
     def handle_RC(self, c1, c2, c3, c4, c5, c6):
 
-        # Scale channel values from [1000,2000] to [-1,+1]
-        c1, c2, c3, c4, c5, c6 = tuple(map(lambda x: 2 * (x - 1000) / 1000 - 1,
-                                           (c1, c2, c3, c4, c5, c6)))
-         
+        def norm(x):
+
+            MIN = 987
+            MAX = 2011
+
+            return (x - MIN) / (MAX - MIN)
+
+        def scale(x):
+
+            return 2 * norm(x) - 1
+
         # Scale throttle from [-1,+1] to [0,1]
-        self.rxchannels = (c1+1)/2, c2, c3, c4, c5, c6
+        self.rxchannels = norm(c1), scale(c2), scale(c3), scale(c4), scale(c5), scale(c6)
 
         # As soon as we handle the callback from one request, send another
         # request, if receiver dialog is running
@@ -178,14 +187,14 @@ class GCS(MspParser):
 
     def handle_ATTITUDE(self, angx, angy, heading):
 
-        self.roll_pitch_yaw = radians(angx)/10, radians(angy)/10, radians(heading)
+        self.roll_pitch_yaw = rad(angx/10), -rad(angy/10), rad(heading)
 
         self.gotimu = True
 
         # As soon as we handle the callback from one request, send another
-        # request, if IMU dialog is running
+        # request, if receiver dialog is running
         if self.imu.running:
-            self._send_state_request()
+            self._send_attitude_request()
 
     def _add_pane(self):
 
@@ -217,12 +226,12 @@ class GCS(MspParser):
         self.motors_quadxmw.stop()
         self.motors_coaxial.stop()
         self.receiver.stop()
-        self._send_state_request()
+        self._send_attitude_request()
         self.imu.start()
 
     def _start(self):
 
-        self._send_state_request()
+        self._send_attitude_request()
         self.imu.start()
 
         self.gotimu = False
@@ -240,9 +249,9 @@ class GCS(MspParser):
             self._disable_button(self.button_receiver)
 
     # Sends state request to FC
-    def _send_state_request(self):
+    def _send_attitude_request(self):
 
-        self.comms.send_request(self.state_request)
+        self.comms.send_request(self.attitude_request)
 
     # Sends RC request to FC
     def _send_rc_request(self):
@@ -253,6 +262,8 @@ class GCS(MspParser):
     def _motors_button_callback(self):
 
         self._clear()
+
+        # self.comms.send_request(self.actuator_type_request)
 
         self.imu.stop()
         self.receiver.stop()
@@ -390,9 +401,10 @@ class GCS(MspParser):
 
         button['state'] = 'disabled'
 
-    def sendMotorMessage(self, m1, m2, m3, m4):
+    def sendMotorMessage(self, motors):
 
-        self.comms.send_message(MspParser.serialize_SET_MOTOR, (m1, m2, m3, m4))
+        if self.comms is not None: # Guard at startup
+                self.comms.send_message(MspParser.serialize_SET_MOTOR, (motors[0], motors[1], motors[2], motors[3]))
 
     def _show_splash(self):
 
