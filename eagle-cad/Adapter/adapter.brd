@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.1.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="no" altdistance="5" altunitdist="mil" altunit="mil"/>
+<grid distance="9.84251969" unitdist="mil" unit="mil" style="lines" multiple="1" display="no" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -147,27 +147,39 @@
 </layers>
 <board>
 <plain>
-<wire x1="9.6" y1="0" x2="43.8" y2="0.1" width="0" layer="20"/>
-<wire x1="43.8" y1="0.1" x2="44.1" y2="48.1" width="0" layer="20"/>
-<wire x1="44.1" y1="48.1" x2="9.9" y2="48" width="0" layer="20"/>
-<wire x1="9.9" y1="48" x2="9.6" y2="0" width="0" layer="20"/>
-<text x="23.6" y="44.6" size="1.9304" layer="25">USB</text>
-<text x="32.6" y="20.2" size="2.54" layer="26" rot="MR0">-</text>
+<text x="13.45" y="50.25" size="1.9304" layer="26" rot="MR0">USB</text>
+<wire x1="0.2" y1="53.55" x2="20.55" y2="53.55" width="0.1524" layer="20"/>
+<wire x1="20.55" y1="53.55" x2="20.55" y2="3.29" width="0.1524" layer="20"/>
+<wire x1="20.55" y1="3.29" x2="0.2" y2="3.29" width="0.1524" layer="20"/>
+<wire x1="0.2" y1="3.29" x2="0.2" y2="53.55" width="0.1524" layer="20"/>
+<text x="16.4" y="28.75" size="0.8128" layer="26" rot="MR0">GND</text>
+<text x="15.9" y="11.75" size="0.8128" layer="26" rot="MR0">5V</text>
+<text x="15.9" y="14" size="0.8128" layer="26" rot="MR0">GND</text>
+<text x="15.9" y="16.75" size="0.8128" layer="26" rot="MR0">VBAT</text>
+<text x="4.15" y="7.25" size="0.8128" layer="25">GD</text>
+<text x="6.65" y="7.25" size="0.8128" layer="25">VB</text>
+<text x="11.65" y="7.25" size="0.8128" layer="25">SB</text>
+<text x="4.15" y="28.75" size="0.8128" layer="25">SBUS</text>
+<text x="13.15" y="16.75" size="0.8128" layer="25">VBAT</text>
+<text x="13.4" y="14" size="0.8128" layer="25">GND</text>
+<text x="14.65" y="11.75" size="0.8128" layer="25">5V</text>
+<text x="4.15" y="46.5" size="0.8128" layer="25">5V</text>
+<text x="5.4" y="46.5" size="0.8128" layer="26" rot="MR0">5V</text>
+<text x="6.65" y="49" size="0.8128" layer="26" rot="MR0">GND</text>
+<text x="4.15" y="49" size="0.8128" layer="25">GND</text>
+<text x="13.9" y="28.75" size="0.8128" layer="25">GND</text>
+<text x="7.15" y="28.75" size="0.8128" layer="26" rot="MR0">SBUS</text>
 </plain>
 <libraries>
 <library name="wirepad">
 <description>&lt;b&gt;Single Pads&lt;/b&gt;&lt;p&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
 <packages>
-<package name="5-2,5">
-<description>&lt;b&gt;THROUGH-HOLE PAD&lt;/b&gt;</description>
-<wire x1="1.524" y1="2.794" x2="-1.524" y2="2.794" width="0.1524" layer="21"/>
-<wire x1="-1.524" y1="-2.794" x2="-1.524" y2="2.794" width="0.1524" layer="21"/>
-<wire x1="-1.524" y1="-2.794" x2="1.524" y2="-2.794" width="0.1524" layer="21"/>
-<wire x1="1.524" y1="2.794" x2="1.524" y2="-2.794" width="0.1524" layer="21"/>
-<smd name="1" x="0" y="0" dx="2.54" dy="5.08" layer="1"/>
-<text x="-1.778" y="-2.54" size="1.27" layer="25" ratio="10" rot="R90">&gt;NAME</text>
-<text x="-0.1" y="2.8" size="0.0254" layer="27">&gt;VALUE</text>
+<package name="SMD1,27-2,54">
+<description>&lt;b&gt;SMD PAD&lt;/b&gt;</description>
+<smd name="1" x="0" y="0" dx="1.27" dy="2.54" layer="1"/>
+<text x="0" y="0" size="0.0254" layer="27">&gt;VALUE</text>
+<text x="-0.8" y="-2.4" size="1.27" layer="25" rot="R90">&gt;NAME</text>
 </package>
 </packages>
 </library>
@@ -431,52 +443,59 @@ design rules under a new name.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="GND" library="wirepad" package="5-2,5" value="WIREPADSMD5-2,5" x="35.127490625" y="5.1442875" smashed="yes">
-<attribute name="VALUE" x="35.027490625" y="7.9442875" size="0.0254" layer="27"/>
+<element name="J1" library="SparkFun-Connectors" package="1X10_NO_SILK" value="" x="17.7" y="29.2" smashed="yes" rot="MR90">
+<attribute name="VALUE" x="15.668" y="27.93" size="0.6096" layer="28" font="vector" ratio="20" rot="MR90"/>
 </element>
-<element name="VBAT" library="wirepad" package="5-2,5" value="WIREPADSMD5-2,5" x="28.177490625" y="5.02508125" smashed="yes">
-<attribute name="VALUE" x="28.077490625" y="7.82508125" size="0.0254" layer="27"/>
+<element name="J2" library="SparkFun-Connectors" package="1X10_NO_SILK" value="" x="2.779040625" y="29.2" smashed="yes" rot="MR90">
+<attribute name="VALUE" x="0.747040625" y="27.93" size="0.6096" layer="28" font="vector" ratio="20" rot="MR90"/>
 </element>
-<element name="J1" library="SparkFun-Connectors" package="1X10_NO_SILK" value="" x="18.743490625" y="43.993071875" smashed="yes" rot="MR270">
-<attribute name="VALUE" x="20.775490625" y="45.263071875" size="0.6096" layer="28" font="vector" ratio="20" rot="MR270"/>
+<element name="J3" library="SparkFun-Connectors" package="1X03_NO_SILK" value="" x="17.195209375" y="11.96935625" smashed="yes" rot="R90">
+<attribute name="VALUE" x="19.227209375" y="10.69935625" size="0.6096" layer="27" font="vector" ratio="20" rot="R90"/>
 </element>
-<element name="J2" library="SparkFun-Connectors" package="1X10_NO_SILK" value="" x="33.979040625" y="43.97908125" smashed="yes" rot="MR270">
-<attribute name="VALUE" x="36.011040625" y="45.24908125" size="0.6096" layer="28" font="vector" ratio="20" rot="MR270"/>
+<element name="GND" library="wirepad" package="SMD1,27-2,54" value="" x="4.83" y="5.73" smashed="yes">
+<attribute name="VALUE" x="4.83" y="5.73" size="0.0254" layer="27"/>
 </element>
-<element name="J3" library="SparkFun-Connectors" package="1X03_NO_SILK" value="" x="33.195209375" y="15.92935625" smashed="yes" rot="R270">
-<attribute name="VALUE" x="31.163209375" y="17.19935625" size="0.6096" layer="27" font="vector" ratio="20" rot="R270"/>
+<element name="VBAT" library="wirepad" package="SMD1,27-2,54" value="" x="7.37" y="5.73" smashed="yes">
+<attribute name="VALUE" x="7.37" y="5.73" size="0.0254" layer="27"/>
 </element>
-<element name="GND1" library="wirepad" package="5-2,5" value="WIREPADSMD5-2,5" x="18.8" y="5.1" smashed="yes" rot="R180">
-<attribute name="VALUE" x="18.9" y="2.3" size="0.0254" layer="27" rot="R180"/>
+<element name="SBUS" library="wirepad" package="SMD1,27-2,54" value="" x="12.45" y="5.73" smashed="yes">
+<attribute name="VALUE" x="12.45" y="5.73" size="0.0254" layer="27"/>
+</element>
+<element name="PAD1" library="wirepad" package="SMD1,27-2,54" value="" x="9.91" y="5.73" smashed="yes">
+<attribute name="VALUE" x="9.91" y="5.73" size="0.0254" layer="27"/>
 </element>
 </elements>
 <signals>
 <signal name="GND">
 <polygon width="0.1524" layer="1">
-<vertex x="-0.25" y="65"/>
-<vertex x="55.4" y="65"/>
-<vertex x="55.4" y="-0.25"/>
-<vertex x="-0.25" y="-0.25"/>
+<vertex x="-0.65" y="54.45"/>
+<vertex x="22.15" y="54.45"/>
+<vertex x="22.15" y="2.29"/>
+<vertex x="-0.65" y="2.29"/>
 </polygon>
-<contactref element="J1" pad="2"/>
-<contactref element="J2" pad="10"/>
 <contactref element="J3" pad="2"/>
 <contactref element="GND" pad="1"/>
-<wire x1="33.979040625" y1="21.11908125" x2="18.743490625" y2="41.453071875" width="0" layer="19" extent="1-1"/>
-<wire x1="33.195209375" y1="13.38935625" x2="33.979040625" y2="21.11908125" width="0" layer="19" extent="1-1"/>
-<wire x1="35.127490625" y1="5.1442875" x2="33.195209375" y2="13.38935625" width="0" layer="19" extent="1-1"/>
+<contactref element="J1" pad="1"/>
+<contactref element="J2" pad="9"/>
+<wire x1="17.7" y1="29.2" x2="17.7" y2="20.6969375" width="0.254" layer="16"/>
+<wire x1="17.7" y1="20.6969375" x2="18.8636125" y2="19.533325" width="0.254" layer="16"/>
+<wire x1="18.8636125" y1="19.533325" x2="18.8636125" y2="16.177759375" width="0.254" layer="16"/>
+<wire x1="18.8636125" y1="16.177759375" x2="17.195209375" y2="14.50935625" width="0.254" layer="16"/>
+<wire x1="13.7" y1="25.2" x2="13.7" y2="19.2" width="0.3048" layer="1"/>
+<wire x1="13.7" y1="19.2" x2="4.5" y2="10" width="0.254" layer="1"/>
+<wire x1="4.5" y1="10" x2="4.5" y2="6.06" width="0.254" layer="1"/>
+<wire x1="4.5" y1="6.06" x2="4.83" y2="5.73" width="0.1524" layer="1"/>
+<wire x1="17.7" y1="29.2" x2="13.7" y2="25.2" width="0.254" layer="1"/>
 </signal>
 <signal name="5V">
-<contactref element="J1" pad="3"/>
 <contactref element="J3" pad="1"/>
-<wire x1="18.743490625" y1="38.913071875" x2="18.843490625" y2="39.013071875" width="0.1524" layer="16"/>
-<wire x1="33.195209375" y1="15.92935625" x2="18.743490625" y2="38.913071875" width="0" layer="19" extent="1-1"/>
+<contactref element="J2" pad="8"/>
+<wire x1="17.195209375" y1="11.96935625" x2="8" y2="23.5" width="0.254" layer="16"/>
+<wire x1="8" y1="23.5" x2="8" y2="40.25" width="0.254" layer="16"/>
+<wire x1="8" y1="40.25" x2="2.779040625" y2="46.98" width="0.254" layer="16"/>
 </signal>
 <signal name="3V3">
 <contactref element="J1" pad="4"/>
-</signal>
-<signal name="M1">
-<contactref element="J1" pad="10"/>
 </signal>
 <signal name="M2">
 <contactref element="J1" pad="9"/>
@@ -484,40 +503,21 @@ design rules under a new name.</description>
 <signal name="M3">
 <contactref element="J1" pad="8"/>
 </signal>
-<signal name="M4">
-<contactref element="J1" pad="7"/>
-</signal>
-<signal name="SCL">
-<contactref element="J2" pad="5"/>
-</signal>
-<signal name="SDA">
-<contactref element="J2" pad="6"/>
-</signal>
-<signal name="SS">
-<contactref element="J2" pad="4"/>
-</signal>
-<signal name="SCK">
-<contactref element="J2" pad="3"/>
-</signal>
-<signal name="MISO">
-<contactref element="J2" pad="2"/>
-</signal>
-<signal name="MOSI">
-<contactref element="J2" pad="1"/>
-</signal>
-<signal name="RX1">
-<contactref element="J2" pad="7"/>
-</signal>
 <signal name="VBAT">
 <contactref element="J3" pad="3"/>
 <contactref element="VBAT" pad="1"/>
-<wire x1="28.177490625" y1="5.02508125" x2="33.195209375" y2="10.84935625" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="TX1">
-<contactref element="J2" pad="8"/>
+<wire x1="17.195209375" y1="17.04935625" x2="7.25" y2="7.104146875" width="0.254" layer="1"/>
+<wire x1="7.25" y1="7.104146875" x2="7.25" y2="6.25" width="0.254" layer="1"/>
+<wire x1="7.25" y1="6.25" x2="7.37" y2="5.73" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="SBUS">
-<contactref element="GND1" pad="1"/>
+<contactref element="SBUS" pad="1"/>
+<contactref element="J2" pad="1"/>
+<wire x1="12.45" y1="5.73" x2="12.45" y2="9.95" width="0.254" layer="1"/>
+<wire x1="12.45" y1="9.95" x2="12.5" y2="10" width="0.1524" layer="1"/>
+<wire x1="12.5" y1="10" x2="12.5" y2="9.75" width="0.1524" layer="1"/>
+<via x="12.5" y="9.75" extent="1-16" drill="0.35"/>
+<wire x1="12.5" y1="9.75" x2="2.779040625" y2="29.2" width="0.254" layer="16"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
