@@ -17,7 +17,6 @@ import Copilot.Compile.C99
 import HackflightFull
 import Receiver
 import Demands
-import State
 import Mixers
 import Motors
 import MSP
