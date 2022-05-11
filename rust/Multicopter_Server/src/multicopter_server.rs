@@ -27,19 +27,26 @@ impl MulticopterServer {
 }
 
 impl MulticopterServer {
+    // Method to initialize it with specified variables
     pub fn new(host: String,
            motor_port: u32,
            telemetry_port: u32,
            image_port: u32,
            image_rows: u32,
            image_cols: u32) -> MulticopterServer {
-        MulticopterServer {host, motor_port, telemetry_port,
-                           image_port, image_rows, image_cols, done:false}
+            MulticopterServer {host, motor_port, telemetry_port,
+                               image_port, image_rows, image_cols,
+                               done:false}
     }
 }
 
 impl MulticopterServer {
     pub fn is_done(self) -> bool {
         self.done
+    }
+
+    pub fn start() -> ! {
+        loop {
+        }
     }
 }
