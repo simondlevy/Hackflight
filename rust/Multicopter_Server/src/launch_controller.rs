@@ -8,22 +8,30 @@ pub struct LaunchController {
 
 impl LaunchController {
     pub fn new (Kp: f32, Ki: f32) -> LaunchController {
+        // First 3 are cocnstants, last 2 are values modified in flight
         LaunchController {Kp, Ki, wind_up_max:10.0,
                           integral_error:0.0, tprev:0.0}
     }
 
     pub fn get_demands(mut self, target: f32, alt: f32, vel: f32, t: f32) -> (f32, f32, f32, f32) {
+        // Calculate dzdt setpoint and error
         let vel_error = (target - alt) - vel;
+        // Compute dt
         let dt = t - self.tprev;
 
+        // Update error integral and error derivative
         self.integral_error += vel_error * dt;
         self.integral_error = constrain_abs(self.integral_error + vel_error * dt, self.wind_up_max);
+        // Store time for first difference
         self.tprev = t;
+        // Always compute throttle demand for altitude hold
         let throttle = self.Kp * vel_error + self.Ki * self.integral_error;
+        // Don't mess with roll and yaw for now
         let roll = 0.0;
         let yaw = 0.0;
         let mut pitch = 0.0;
 
+        // Pitch forward slightly for one second after level-off
         if 2.0 < t && t < 3.25 {
             pitch = 0.001;
         }
