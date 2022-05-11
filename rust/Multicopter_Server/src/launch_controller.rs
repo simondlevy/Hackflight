@@ -1,15 +1,15 @@
 pub struct LaunchController {
-    Kp: f32,
-    Ki: f32,
+    kp: f32,
+    ki: f32,
     wind_up_max: f32,
     integral_error: f32,
     tprev: f32
 }
 
 impl LaunchController {
-    pub fn new (Kp: f32, Ki: f32) -> LaunchController {
-        // First 3 are cocnstants, last 2 are values modified in flight
-        LaunchController {Kp, Ki, wind_up_max:10.0,
+    pub fn new (kp: f32, ki: f32) -> LaunchController {
+        // First 3 are constants, last 2 are values modified in flight
+        LaunchController {kp, ki, wind_up_max:10.0,
                           integral_error:0.0, tprev:0.0}
     }
 
@@ -25,7 +25,7 @@ impl LaunchController {
         // Store time for first difference
         self.tprev = t;
         // Always compute throttle demand for altitude hold
-        let throttle = self.Kp * vel_error + self.Ki * self.integral_error;
+        let throttle = self.kp * vel_error + self.ki * self.integral_error;
         // Don't mess with roll and yaw for now
         let roll = 0.0;
         let yaw = 0.0;
