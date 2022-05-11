@@ -44,6 +44,9 @@ impl MulticopterServer {
     pub fn is_done(self) -> bool {
         self.done
     }
+    pub fn get_host(self) -> String {
+        self.host
+    }
 
     pub fn start(self) {
         // start the motor_client_socket
