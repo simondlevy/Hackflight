@@ -6,7 +6,8 @@ pub struct MulticopterServer {
     telemetry_port: u32,
     image_port: u32,
     image_rows: u32,
-    image_cols: u32
+    image_cols: u32,
+    done: bool
 }
 
 // Initialize constants see Bouabdallah (2004)
@@ -33,6 +34,12 @@ impl MulticopterServer {
            image_rows: u32,
            image_cols: u32) -> MulticopterServer {
         MulticopterServer {host, motor_port, telemetry_port,
-                           image_port, image_rows, image_cols}
+                           image_port, image_rows, image_cols, done:false}
+    }
+}
+
+impl MulticopterServer {
+    pub fn is_done(self) -> bool {
+        self.done
     }
 }
