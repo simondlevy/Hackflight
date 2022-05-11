@@ -45,8 +45,19 @@ impl MulticopterServer {
         self.done
     }
 
-    pub fn start() -> ! {
-        loop {
+    pub fn start(self) {
+        // start the motor_client_socket
+        let mut motor_client_addr = self.host.clone();
+        motor_client_addr.push_str(":");
+        motor_client_addr.push_str(&self.motor_port.to_string());
+        let motor_client_socket = UdpSocket::bind(motor_client_addr);
+        
+        //start the telemetry socket
+        let mut tele_server_addr = self.host.clone();
+        tele_server_addr.push_str(":");
+        tele_server_addr.push_str(&self.telemetry_port.to_string());
+        let tele_server_socket = UdpSocket::bind(tele_server_addr);
+        while !self.done {
         }
     }
 }
