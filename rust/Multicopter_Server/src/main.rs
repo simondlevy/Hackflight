@@ -14,7 +14,6 @@ use mixers::Mixer;
 A Tester main for testing and so that i don't get yelled at by cargo
 */
 fn main() {
-    let a = MulticopterServer::new(String::from("host"), 1, 2, 3, 4, 5);
-    let b = LaunchController::new(0.0, 0.0);
-    let d = Mixer::new_phantom_mixer();
+    let phantom_mixer = Mixer::new_phantom_mixer();
+    let copter = LaunchCopter::new(phantom_mixer);
 }
