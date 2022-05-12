@@ -1,4 +1,5 @@
 use std::net::{UdpSocket};
+use std::error::Error;
 
 // Initialize constants see Bouabdallah (2004)
 pub const STATE_X: u8 = 0;
@@ -15,8 +16,7 @@ pub const STATE_PSI: u8 = 10;
 pub const STATE_DPSI: u8 = 11;
 
 pub struct MulticopterServer {
-    host: String,
-    motor_port: u32,
+    host: String, motor_port: u32,
     telemetry_port: u32,
     image_port: u32,
     image_rows: u32,
@@ -43,9 +43,6 @@ impl MulticopterServer {
     pub fn is_done(self) -> bool {
         self.done
     }
-    pub fn get_host(self) -> String {
-        self.host
-    }
 
     pub fn start(self) {
         // start the motor_client_socket
@@ -61,5 +58,28 @@ impl MulticopterServer {
         let tele_server_socket = UdpSocket::bind(tele_server_addr);
         while !self.done {
         }
+    }
+}
+
+impl MulticopterServer {
+    fn run_threadetry(telemetry_server_socket: UdpSocket,
+                      motor_client_socket: UdpSocket) -> ! {
+        loop {
+            let mut buf = [0;17];
+            let (values, src) = telemetry_server_socket.recv_from(&mut buf).expect("Crap");
+            let telemetry = &mut buf[..values];
+            let motor_values = MulticopterServer::get_motors();
+            // Convert to bytes to send it over
+            for mut item in telemetry.iter() {
+                item.to_ne_bytes();
+            }
+            motor_client_socket.send(telemetry);
+        }
+    }
+}
+
+impl MulticopterServer {
+    pub fn get_motors() -> [f32; 4] {
+        [0.6, 0.6, 0.6, 0.6]
     }
 }
