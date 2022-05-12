@@ -1,5 +1,6 @@
 use std::net::{UdpSocket};
 use std::error::Error;
+use std::{thread, time};
 
 // Initialize constants see Bouabdallah (2004)
 pub const STATE_X: u8 = 0;
@@ -49,13 +50,18 @@ impl MulticopterServer {
         let mut motor_client_addr = self.host.clone();
         motor_client_addr.push_str(":");
         motor_client_addr.push_str(&self.motor_port.to_string());
-        let motor_client_socket = UdpSocket::bind(motor_client_addr);
+        let motor_client_socket = UdpSocket::bind(motor_client_addr).unwrap();
         
         //start the telemetry socket
         let mut tele_server_addr = self.host.clone();
         tele_server_addr.push_str(":");
         tele_server_addr.push_str(&self.telemetry_port.to_string());
-        let tele_server_socket = UdpSocket::bind(tele_server_addr);
+        let tele_server_socket = UdpSocket::bind(tele_server_addr).unwrap();
+
+        //Start up the thread
+        thread::spawn(|| {
+            MulticopterServer::run_threadetry(tele_server_socket, motor_client_socket);
+        });
         while !self.done {
         }
     }
@@ -74,6 +80,7 @@ impl MulticopterServer {
                 item.to_ne_bytes();
             }
             motor_client_socket.send(telemetry);
+            thread::sleep(time::Duration::from_millis(10));
         }
     }
 }
