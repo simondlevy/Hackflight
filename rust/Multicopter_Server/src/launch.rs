@@ -1,8 +1,7 @@
 use crate::multicopter_server::{MulticopterServer, STATE_Z, STATE_DZ};
-
 use crate::launch_controller::LaunchController;
-
 use crate::mixers::Mixer;
+
 
 pub struct LaunchCopter {
     mixer: Mixer,
