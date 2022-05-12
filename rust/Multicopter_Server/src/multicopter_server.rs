@@ -1,5 +1,19 @@
 use std::net::{UdpSocket};
 
+// Initialize constants see Bouabdallah (2004)
+pub const STATE_X: u8 = 0;
+pub const STATE_DX: u8 = 1;
+pub const STATE_Y: u8 = 2;
+pub const STATE_DY: u8 = 3;
+pub const STATE_Z: u8 = 4;
+pub const STATE_DZ: u8 = 5;
+pub const STATE_PHI: u8 = 6;
+pub const STATE_DPHI: u8 = 7;
+pub const STATE_THETA: u8 = 8;
+pub const STATE_DTHETA: u8 = 9;
+pub const STATE_PSI: u8 = 10;
+pub const STATE_DPSI: u8 = 11;
+
 pub struct MulticopterServer {
     host: String,
     motor_port: u32,
@@ -10,21 +24,6 @@ pub struct MulticopterServer {
     done: bool
 }
 
-// Initialize constants see Bouabdallah (2004)
-impl MulticopterServer {
-    const STATE_X: u8 = 0;
-    const STATE_DX: u8 = 1;
-    const STATE_Y: u8 = 2;
-    const STATE_DY: u8 = 3;
-    const STATE_Z: u8 = 4;
-    const STATE_DZ: u8 = 5;
-    const STATE_PHI: u8 = 6;
-    const STATE_DPHI: u8 = 7;
-    const STATE_THETA: u8 = 8;
-    const STATE_DTHETA: u8 = 9;
-    const STATE_PSI: u8 = 10;
-    const STATE_DPSI: u8 = 11;
-}
 
 impl MulticopterServer {
     // Method to initialize it with specified variables

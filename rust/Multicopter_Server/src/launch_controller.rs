@@ -9,8 +9,8 @@ pub struct LaunchController {
 impl LaunchController {
     pub fn new (kp: f32, ki: f32) -> LaunchController {
         // First 3 are constants, last 2 are values modified in flight
-        LaunchController {kp, ki, wind_up_max:10.0,
-                          integral_error:0.0, tprev:0.0}
+        LaunchController{kp, ki, wind_up_max:10.0,
+                         integral_error:0.0, tprev:0.0}
     }
 
     pub fn get_demands(mut self, target: f32, alt: f32, vel: f32, t: f32) -> (f32, f32, f32, f32) {
