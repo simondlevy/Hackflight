@@ -63,6 +63,7 @@ impl MulticopterServer {
             MulticopterServer::run_threadetry(tele_server_socket, motor_client_socket);
         });
         while !self.done {
+            // TODO image accepting stuff
         }
     }
 }

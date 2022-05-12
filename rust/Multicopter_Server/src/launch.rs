@@ -29,7 +29,6 @@ impl LaunchCopter {
         // Extract altitude from stat. Altitude is in NED coordinates, so we
         // negate it to use as input to PID controller.
         // TODO Replace magic numbers with STATE_Z and STATE_DZ
-        // let z = -state.4;
         let z = -state.4;
         let dzdt = -state.5;
 
