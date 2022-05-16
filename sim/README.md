@@ -35,7 +35,7 @@ for the minimum requirements recommended by Unreal Engine.
 1. Unreal Engine 4 (UE4). I am attempting to use the latest version, which as of the time of this
 writing is UE4.26.1. To install UE4, follow these [instructions](https://docs.unrealengine.com/en-US/GettingStarted/Installation/index.html).
 
-2. Windows Subsystem for Linux
+2. [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/about)
 
 3. [Haskell](https://www.haskell.org/)
 
