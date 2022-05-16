@@ -50,10 +50,8 @@ doesn't exist.
 2. Open up a Linux terminaln (via WSL) and do:<br>
    ```cd ~/Documents/Unreal Projects/Hackflight/sim/examples/phantom```<br>
    ```make```
-   
-. Double-click <b>use_quickstart.bat</b>
-   
-. Right-click on the <b>HackflightSim.uproject</b> 
+      
+3. Right-click on the <b>HackflightSim.uproject</b> 
 file and select <b>Generate Visual Studio project file</b> to generate a <b>.sln</b> file
 
 . Double-click on the resulting <b>HackflightSim.sln</b> file to launch VisualStudio.  The first time
