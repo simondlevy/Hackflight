@@ -47,8 +47,8 @@ writing is UE4.26.1. To install UE4, follow these [instructions](https://docs.un
 <b>Documents/Unreal Projects</b> folder, first creating that folder if it
 doesn't exist.
 
-2. Open up a Linux terminaln (via WSL) and do:
-   ```cd ~/Documents/Unreal Projects/Hackflight/sim/examples/phantom```
+2. Open up a Linux terminaln (via WSL) and do:<br>
+   ```cd ~/Documents/Unreal Projects/Hackflight/sim/examples/phantom```<br>
    ```make```
    
 . Double-click <b>use_quickstart.bat</b>
