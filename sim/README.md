@@ -37,22 +37,24 @@ writing is UE4.26.1. To install UE4, follow these [instructions](https://docs.un
 
 # Quickstart
 
-1. Clone this repostitory (HackflightSim) into your
+1. Clone this repostitory (Hackflight) into your
 <b>Documents/Unreal Projects</b> folder, first creating that folder if it
 doesn't exist.
 
-2. Double-click <b>use_quickstart.bat</b>
+2. Install Haskell and the [Haskell Copilot DSL](https://copilot-language.github.io/) on your computer.
+
+. Double-click <b>use_quickstart.bat</b>
    
-3. Right-click on the <b>HackflightSim.uproject</b> 
+. Right-click on the <b>HackflightSim.uproject</b> 
 file and select <b>Generate Visual Studio project file</b> to generate a <b>.sln</b> file
 
-4. Double-click on the resulting <b>HackflightSim.sln</b> file to launch VisualStudio.  The first time
+. Double-click on the resulting <b>HackflightSim.sln</b> file to launch VisualStudio.  The first time
 you do this, you may have to wait a few minutes while Visual Studio parses up all of the UE4 files needed
 to build the project.
 
-5. In VisualStudio, hit the F5 key to build the project and launch UnrealEditor.
+. In VisualStudio, hit the F5 key to build the project and launch UnrealEditor.
 
-6. In UnrealEditor, select one of the maps in <b>Content/HackflightSim/Maps</b>. Then open the
+. In UnrealEditor, select one of the maps in <b>Content/HackflightSim/Maps</b>. Then open the
 <b>Content/C++ Classes/QuickstartModule/pawns</b> folder and drag one of the
 vehicle pawns into the map. Click the play button and you'll see the vehicle
 take off to an altitude of 10 meters.  You can use the spacebar to switch your
