@@ -14,6 +14,10 @@
 static GameInput * _gameInput;
 static float _joyvals[4];
 
+float stream_receiverThrottle;
+float stream_receiverRoll;
+float stream_receiverPitch;
+float stream_receiverYaw;
 // Called by Haskell Copilot --------------------------------------------------
 
 static float _m1;
