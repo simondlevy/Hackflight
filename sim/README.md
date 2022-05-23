@@ -50,6 +50,8 @@ doesn't exist.
 2. Open up a Linux terminaln (via WSL) and do:<br>
    ```cd ~/Documents/Unreal Projects/Hackflight/sim/examples/phantom```<br>
    ```make```
+   ```./Phantom```
+   ```make```
       
 3. Back in <b>Hackflight/sim</b>, right-click on the <b>HackflightSim.uproject</b> 
 file and select <b>Generate Visual Studio project file</b> to generate a <b>.sln</b> file

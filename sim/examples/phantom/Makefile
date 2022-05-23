@@ -43,7 +43,7 @@ hackflight.cpp: hackflight.c
 	rm tmp.c
 
 hackflight.c: $(HSRC) Phantom.hs
-	runhaskell -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers -i$(HDIR)/dynamics Phantom.hs
+	ghc -i$(HDIR) -i$(HDIR)/sensors -i$(HDIR)/pidcontrollers -i$(HDIR)/dynamics Phantom.hs -package copilot-language -package copilot-libraries -package copilot-c99
 
 clean:
 	rm -f hackflight.* tmp.c *~

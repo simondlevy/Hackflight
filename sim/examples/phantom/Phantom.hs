@@ -6,7 +6,6 @@
   MIT License
 --}
 
-module Phantom where
 
 import Language.Copilot
 import Copilot.Compile.C99
