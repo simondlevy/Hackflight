@@ -1,5 +1,5 @@
 ::
-:: clean.bat Windows cleanup script for MulticopterSim
+:: clean.bat Windows cleanup script for HackflightSim
 ::
 :: Copyright (C) 2020 Simon D. Levy
 ::
