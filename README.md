@@ -1,69 +1,33 @@
 <p align="center"> 
-<img src="media/logo2.png" width=450>
+<img src="media/logo.png" width=450>
 </p>
 
-<h2>Note: This repository is for development using Haskell.  The
-original repository using C++ is now <a href="https://github.com/simondlevy/HackflightCPP">here</a>.
-</h2>
+<h2>For the Ladybug Flight Controller, use <a href="https://github.com/simondlevy/LadbyguFC">this repository</a>.</h2>
+
+<h2>For the Haskell version use <a href="https://github.com/simondlevy/Hackflight/tree/haskell">this branch</a>.</h2>
 
 ## Intro
 
-Hackflight is a Haskell-based software toolkit for building multirotor flight
+Hackflight is a software toolkit for building multirotor flight
 controllers and simulators.  It is geared toward people like me who want to tinker with
 flight-control firmware, and use it to teach students about ideas like inertial
 measurement and PID tuning.  <b>If you are in the 99% percent of users who just
 want to get your vehicle flying without getting into firmware hacking, I
 recommend [Betaflight](http://betaflight.com/)</b> (great for getting started
-when you're on a budget) <b>or the [Ardupilot](http://copter.ardupilot.org)
-system</b> (for sophisticated mission planning with waypoint navigation and the
-like).  In addition to big user communities and loads of great features, these
-platforms have safety mechanisms that Hackflight lacks, which will help avoid
-injury to you and damage to your vehicle.
+when you're on a budget, and the origin of much of the code in Hackflight)
+<b>or the [Ardupilot](http://copter.ardupilot.org) system</b> (for
+sophisticated mission planning with waypoint navigation and the like).  In
+addition to big user communities and loads of great features, these platforms
+have safety mechanisms that Hackflight lacks, which will help avoid injury to
+you and damage to your vehicle.
 
 ## Supported platforms
 
 Hackflight is currently working on the following platforms:
 
-* [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller/) from Tlera Corp
+* [STM32F405 AIO flight controller](https://www.racedayquads.com/products/geprc-f4-v1-4-2-4s-aio-toothpick-whoop-flight-controller-w-12a-4in1-esc)
 
-* [HackflightSim](https://github.com/simondlevy/Hackflight/tree/master/sim) flight simulator based on UnrealEngine4
-
-## Design philosophy
-
-As shown in the figure below, Hackflight follows the design principles of
-functional programming languages like Haskell: each component in the system is
-a function from one type of object to another.  For example, a PID controller is
-a function from State and Demands to Demands.  A mixer is a function from Demands
-to Motor values.  
-
-<img src="media/dataflow.png">
-
-Things are a bit more complicated in the actual code, where
-issues like safety and mixer types have to be taken into account, but the general
-principle still applies; e.g.:
-
-
-```
-  mix :: SafetyFun -> Demands -> Mixer -> Motors
-```
-
-[Originally](https://github.com/simondlevy/HackflightCPP) written in
-C++, Hackflight has since been translated to Haskell, thanks to the
-[Haskell Copilot DSL](https://copilot-language.github.io/).  By compiling Haskell
-to constant-memory C code, Copilot allows the sensor-fusion, control, and
-safety algorithms to be written in Haskell, with the back-end microcontroller 
-and simulation code written in C/C++.  Following the Copilot approach, incoming
-data (receiver demands, raw sensor values) are treated as *streams* set by the
-C++ code:
-
-```
-```
-
-Outgoing data (motor demands) are set by the Haskell code and passed 
-to the C++ code via the Copilot ```trigger``` mechanism:
-
-```
-```
+* [MulticopterSim](https://github.com/simondlevy/Hackflight/tree/master/sim) flight simulator based on UnrealEngine4
 
 ## Ground Control Station
 

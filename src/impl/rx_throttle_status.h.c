@@ -1,0 +1,1036 @@
+/*
+Copyright (c) 2022 Simon D. Levy
+
+This file is part of Hackflight.
+
+Hackflight is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+Hackflight. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+#include "arming.h"
+#include "datatypes.h"
+#include "dt.h"
+#include "failsafe.h"
+#include "filter.h"
+#include "filter_pt3.h"
+#include "led.h"
+#include "maths.h"
+#include "motor.h"
+#include "pwm.h"
+#include "ratepid_struct.h"
+#include "rx.h"
+#include "rx_rates.h"
+#include "rx_throttle_status.h"
+#include "scale.h"
+#include "time.h"
+
+#define THROTTLE_LOOKUP_LENGTH 12
+
+static const uint32_t FAILSAFE_POWER_ON_DELAY_US = (1000 * 1000 * 5);
+
+// Minimum rc smoothing cutoff frequency
+static const uint16_t RC_SMOOTHING_CUTOFF_MIN_HZ = 15;    
+
+// The value to use for "auto" when interpolated feedforward is enabled
+static uint16_t       RC_SMOOTHING_FEEDFORWARD_INITIAL_HZ = 100;   
+
+// Guard time to wait after retraining to prevent retraining again too quickly
+static const uint16_t RC_SMOOTHING_FILTER_RETRAINING_DELAY_MS = 2000;  
+
+// Number of rx frame rate samples to average during frame rate changes
+static const uint8_t  RC_SMOOTHING_FILTER_RETRAINING_SAMPLES = 20;    
+
+// Time to wait after power to let the PID loop stabilize before starting
+// average frame rate calculation
+static const uint16_t RC_SMOOTHING_FILTER_STARTUP_DELAY_MS = 5000;  
+
+// Additional time to wait after receiving first valid rx frame before initial training starts
+static const uint16_t RC_SMOOTHING_FILTER_TRAINING_DELAY_MS = 1000;  
+
+// Number of rx frame rate samples to average during initial training
+static const uint8_t  RC_SMOOTHING_FILTER_TRAINING_SAMPLES = 50;    
+
+// Look for samples varying this much from the current detected frame rate to
+// initiate retraining
+static const uint8_t  RC_SMOOTHING_RX_RATE_CHANGE_PERCENT = 20;    
+
+// 65.5ms or 15.26hz
+static const uint32_t RC_SMOOTHING_RX_RATE_MAX_US = 65500; 
+
+// 0.950ms to fit 1kHz without an issue
+static const uint32_t RC_SMOOTHING_RX_RATE_MIN_US = 950;   
+
+static const float    COMMAND_DIVIDER   = 500;
+static const uint32_t DELAY_15_HZ       = 1000000 / 15;
+
+static const uint32_t NEED_SIGNAL_MAX_DELAY_US = 1000000 / 10;
+
+static const uint16_t MAX_INVALID__PULSE_TIME     = 300;
+static const uint16_t RATE_LIMIT                  = 1998;
+static const float    THR_EXPO8                   = 0;
+static const float    THR_MID8                    = 50;
+static const float    YAW_COMMAND_DIVIDER         = 500;
+
+// minimum PWM pulse width which is considered valid
+static const uint16_t PWM_PULSE_MIN   = 750;   
+
+// maximum PWM pulse width which is considered valid
+static const uint16_t PWM_PULSE_MAX   = 2250;  
+
+typedef enum {
+    RX_FAILSAFE_MODE_AUTO = 0,
+    RX_FAILSAFE_MODE_HOLD,
+    RX_FAILSAFE_MODE_SET,
+    RX_FAILSAFE_MODE_INVALID
+} rxFailsafeChannelMode_e;
+
+typedef enum {
+    MODELOGIC_OR = 0,
+    MODELOGIC_AND
+} modeLogic_e;
+
+typedef enum {
+    // ARM flag
+    BOXARM = 0,
+    CHECKBOX_ITEM_COUNT
+} boxId_e;
+
+typedef struct rxFailsafeChannelConfig_s {
+    uint8_t mode; 
+    uint8_t step;
+} rxFailsafeChannelConfig_t;
+
+typedef struct rxChannelRangeConfig_s {
+    uint16_t min;
+    uint16_t max;
+} rxChannelRangeConfig_t;
+
+
+typedef enum {
+    RX_STATE_CHECK,
+    RX_STATE_PROCESS,
+    RX_STATE_MODES,
+    RX_STATE_UPDATE,
+    RX_STATE_COUNT
+} rxState_e;
+
+typedef struct rxSmoothingFilter_s {
+
+    uint8_t     autoSmoothnessFactorSetpoint;
+    uint32_t    averageFrameTimeUs;
+    uint8_t     autoSmoothnessFactorThrottle;
+    uint16_t    feedforwardCutoffFrequency;
+    uint8_t     ffCutoffSetting;
+    pt3Filter_t filter[4];
+    pt3Filter_t filterDeflection[2];
+    bool        filterInitialized;
+    uint16_t    setpointCutoffFrequency;
+    uint8_t     setpointCutoffSetting;
+    uint16_t    throttleCutoffFrequency;
+    uint8_t     throttleCutoffSetting;
+    float       trainingSum;
+    uint32_t    trainingCount;
+    uint16_t    trainingMax;
+    uint16_t    trainingMin;
+
+} rxSmoothingFilter_t;
+
+typedef struct {
+
+    rxSmoothingFilter_t smoothingFilter;
+
+    bool        auxiliaryProcessingRequired;
+    bool        calculatedCutoffs;
+    uint16_t    channelData[18];
+    float       command[4];
+    bool        dataProcessingRequired;
+    float       dataToSmooth[4];
+    timeDelta_t frameTimeDeltaUs;
+    bool        gotNewData;
+    bool        inFailsafeMode;
+    bool        initializedFilter;
+    bool        initializedThrottleTable;
+    uint32_t    invalidPulsePeriod[18];
+    bool        isRateValid;
+    timeUs_t    lastFrameTimeUs;
+    timeUs_t    lastRxTimeUs;
+    int16_t     lookupThrottleRc[THROTTLE_LOOKUP_LENGTH];
+    uint32_t    needSignalBefore;
+    timeUs_t    nextUpdateAtUs;
+    float       oldRcCommand[3];
+    timeUs_t    previousFrameTimeUs;
+    float       raw[18];
+    uint32_t    refreshPeriod;
+    bool        signalReceived;
+    rxState_e   state;
+    timeMs_t    validFrameTimeMs;
+
+} rx_t;
+
+// Steps are 25 apart a value of 0 corresponds to a channel value of 900 or
+// less a value of 48 corresponds to a channel value of 2100 or more 48 steps
+// between 900 and 2100
+typedef struct channelRange_s {
+    uint8_t startStep;
+    uint8_t endStep;
+} channelRange_t;
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+// ---------------------------------------------------------------------------------
+
+static float pt3FilterGain(float f_cut, float dT)
+{
+    const float order = 3.0f;
+    const float orderCutoffCorrection = 1 / sqrtf(powf(2, 1.0f / order) - 1);
+    float RC = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
+    // float RC = 1 / (2 * 1.961459177f * M_PI * f_cut);
+    // where 1.961459177 = 1 / sqrt( (2^(1 / order) - 1) ) and order is 3
+    return dT / (RC + dT);
+}
+
+static void pt3FilterInit(pt3Filter_t *filter, float k)
+{
+    filter->state = 0.0f;
+    filter->state1 = 0.0f;
+    filter->state2 = 0.0f;
+    filter->k = k;
+}
+
+static void pt3FilterUpdateCutoff(pt3Filter_t *filter, float k)
+{
+    filter->k = k;
+}
+
+// ---------------------------------------------------------------------------------
+
+static inline int32_t cmp32(uint32_t a, uint32_t b) { return (int32_t)(a-b); }
+
+static uint8_t rxfail_step_to_channel_value(uint8_t step)
+{
+    return (PWM_PULSE_MIN + 25 * step);
+}
+
+static bool isPulseValid(uint16_t pulseDuration)
+{
+    return  pulseDuration >= 885 && pulseDuration <= 2115;
+}
+
+static uint16_t getFailValue(float * rcData, uint8_t channel)
+{
+    rxFailsafeChannelConfig_t rxFailsafeChannelConfigs[18];
+
+    for (int i = 0; i < 18; i++) {
+        rxFailsafeChannelConfigs[i].step = 30;
+    }
+    rxFailsafeChannelConfigs[3].step = 5;
+    for (int i = 0; i < 4; i++) {
+        rxFailsafeChannelConfigs[i].mode = 0;
+    }
+    for (int i = 4; i < 18; i++) {
+        rxFailsafeChannelConfigs[i].mode = 1;
+    }
+
+    const rxFailsafeChannelConfig_t *channelFailsafeConfig =
+        &rxFailsafeChannelConfigs[channel];
+
+    switch (channelFailsafeConfig->mode) {
+        case RX_FAILSAFE_MODE_AUTO:
+            return channel == ROLL || channel == PITCH || channel == YAW ? 1500 : 885;
+        case RX_FAILSAFE_MODE_INVALID:
+        case RX_FAILSAFE_MODE_HOLD:
+            return rcData[channel];
+        case RX_FAILSAFE_MODE_SET:
+            return rxfail_step_to_channel_value(channelFailsafeConfig->step);
+    }
+
+    return 0;
+}
+
+static float applyRxChannelRangeConfiguraton(float sample, const rxChannelRangeConfig_t *range)
+{
+    // Avoid corruption of channel with a value of PPM_RCVR_TIMEOUT
+    if (sample == 0) {
+        return 0;
+    }
+
+    sample = scaleRangef(sample, range->min, range->max, PWM_MIN, PWM_MAX);
+    sample = constrainf(sample, PWM_PULSE_MIN, PWM_PULSE_MAX);
+
+    return sample;
+}
+
+// Determine a cutoff frequency based on smoothness factor and calculated average rx frame time
+static int calcAutoSmoothingCutoff(int avgRxFrameTimeUs, uint8_t autoSmoothnessFactor)
+{
+    if (avgRxFrameTimeUs > 0) {
+        const float cutoffFactor = 1.5f / (1.0f + (autoSmoothnessFactor / 10.0f));
+        float cutoff = (1 / (avgRxFrameTimeUs * 1e-6f));  // link frequency
+        cutoff = cutoff * cutoffFactor;
+        return lrintf(cutoff);
+    } else {
+        return 0;
+    }
+}
+
+static void rcSmoothingResetAccumulation(rxSmoothingFilter_t *smoothingFilter)
+{
+    smoothingFilter->trainingSum = 0;
+    smoothingFilter->trainingCount = 0;
+    smoothingFilter->trainingMin = UINT16_MAX;
+    smoothingFilter->trainingMax = 0;
+}
+
+// rxPoll
+static void readChannelsApplyRanges(rx_t * rx, float raw[])
+{
+    const uint8_t rcmap[18] = {1, 2, 3, 0, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    rxChannelRangeConfig_t  rxChannelRangeConfigs[4];
+
+    for (uint8_t i=0; i<4; ++i) {
+        rxChannelRangeConfigs[i].min = PWM_MIN;
+        rxChannelRangeConfigs[i].max = PWM_MAX;
+    }
+
+    for (int channel = 0; channel < 18; channel++) {
+
+        const uint8_t rawChannel = channel < 8 ? rcmap[channel] : channel;
+
+        // sample the channel
+        float sample = rxDevConvertValue(rx->channelData, rawChannel);
+
+        // apply the rx calibration
+        if (channel < 4) {
+            //sample = applyRxChannelRangeConfiguraton(sample, rxChannelRangeConfigs(channel));
+            sample = applyRxChannelRangeConfiguraton(sample, &rxChannelRangeConfigs[channel]);
+        }
+
+        raw[channel] = sample;
+    }
+}
+
+// rxPoll
+static void detectAndApplySignalLossBehaviour(rx_t * rx, timeUs_t currentTimeUs, float raw[])
+{
+    uint32_t currentTimeMs = currentTimeUs/ 1000;
+
+    bool useValueFromRx = rx->signalReceived && !rx->inFailsafeMode;
+
+    bool flightChannelsValid = true;
+
+    for (int channel = 0; channel < 18; channel++) {
+
+        float sample = raw[channel];
+
+        bool validPulse = useValueFromRx && isPulseValid(sample);
+
+        if (validPulse) {
+            rx->invalidPulsePeriod[channel] = currentTimeMs + MAX_INVALID__PULSE_TIME;
+        } else {
+            if (cmp32(currentTimeMs, rx->invalidPulsePeriod[channel]) < 0) {
+                // skip to next channel to hold channel value MAX_INVALID__PULSE_TIME
+                continue;           
+            } else {
+                sample = getFailValue(raw, channel);   // after that apply rxfail value
+                if (channel < 4) {
+                    flightChannelsValid = false;
+                }
+            }
+        }
+
+        raw[channel] = sample;
+    }
+
+    if (flightChannelsValid) {
+        failsafeOnValidDataReceived();
+    } else {
+        rx->inFailsafeMode = true;
+        failsafeOnValidDataFailed();
+        for (int channel = 0; channel < 18; channel++) {
+            raw[channel] = getFailValue(raw, channel);
+        }
+    }
+}
+
+
+// rxPoll
+static int16_t lookupThrottle(rx_t * rx, int32_t tmp)
+{
+    if (!rx->initializedThrottleTable) {
+        for (int i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
+            const int16_t tmp2 = 10 * i - THR_MID8;
+            uint8_t y = tmp2 > 0 ?  100 - THR_MID8 : tmp2 < 0 ?  THR_MID8 : 1;
+            rx->lookupThrottleRc[i] = 10 * THR_MID8 + tmp2 * (100 - THR_EXPO8 + (int32_t)
+                    THR_EXPO8 * (tmp2 * tmp2) / (y * y)) / 10;
+            rx->lookupThrottleRc[i] = PWM_MIN + (PWM_MAX - PWM_MIN) *
+                rx->lookupThrottleRc[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
+        }
+    }
+
+    rx->initializedThrottleTable = true;
+
+    const int32_t tmp3 = tmp / 100;
+    // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
+    return rx->lookupThrottleRc[tmp3] + (tmp - tmp3 * 100) *
+        (rx->lookupThrottleRc[tmp3 + 1] - rx->lookupThrottleRc[tmp3]) / 100;
+}
+
+// rxPoll
+static void updateCommands(rx_t * rx, float raw[])
+{
+    for (int axis = 0; axis < 3; axis++) {
+        // non coupled PID reduction scaler used in PID controller 1 and PID controller 2.
+
+        float tmp = fminf(fabs(raw[axis] - 1500), 500);
+        if (axis == ROLL || axis == PITCH) {
+            if (tmp > 0) {
+                tmp -= 0;
+            } else {
+                tmp = 0;
+            }
+            rx->command[axis] = tmp;
+        } else {
+            if (tmp > 0) {
+                tmp -= 0;
+            } else {
+                tmp = 0;
+            }
+            rx->command[axis] = -tmp; 
+        }
+        if (raw[axis] < 1500) {
+            rx->command[axis] = -rx->command[axis];
+        }
+    }
+
+    int32_t tmp;
+    tmp = constrain(raw[THROTTLE], 1050, PWM_MAX);
+    tmp = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
+
+    rx->command[THROTTLE] = lookupThrottle(rx, tmp);
+}
+
+// rxPoll
+static bool calculateChannelsAndUpdateFailsafe(rx_t * rx, timeUs_t currentTimeUs, float raw[])
+{
+    if (rx->auxiliaryProcessingRequired) {
+        rx->auxiliaryProcessingRequired = false;
+    }
+
+    if (!rx->dataProcessingRequired) {
+        return false;
+    }
+
+    rx->dataProcessingRequired = false;
+    rx->nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
+
+    readChannelsApplyRanges(rx, raw);
+    detectAndApplySignalLossBehaviour(rx, currentTimeUs, raw);
+
+    return true;
+}
+
+// rxPoll
+static timeDelta_t getFrameDelta(rx_t * rx, timeUs_t currentTimeUs, timeDelta_t *frameAgeUs)
+{
+    timeUs_t frameTimeUs = rx->lastFrameTimeUs;
+
+    *frameAgeUs = cmpTimeUs(currentTimeUs, frameTimeUs);
+
+    const timeDelta_t deltaUs = cmpTimeUs(frameTimeUs, rx->previousFrameTimeUs);
+    if (deltaUs) {
+        rx->frameTimeDeltaUs = deltaUs;
+        rx->previousFrameTimeUs = frameTimeUs;
+    }
+
+    return rx->frameTimeDeltaUs;
+}
+
+// rxPoll
+static bool processData(rx_t * rx, float raw[], timeUs_t currentTimeUs, bool * armed)
+{
+    timeDelta_t frameAgeUs;
+
+    timeDelta_t refreshPeriodUs = getFrameDelta(rx, currentTimeUs, &frameAgeUs);
+
+    if (!refreshPeriodUs || cmpTimeUs(currentTimeUs, rx->lastRxTimeUs) <= frameAgeUs) {
+
+        // calculate a delta here if not supplied by the protocol
+        refreshPeriodUs = cmpTimeUs(currentTimeUs, rx->lastRxTimeUs); 
+    }
+
+    rx->lastRxTimeUs = currentTimeUs;
+
+    rx->isRateValid =
+        ((uint32_t)refreshPeriodUs >= RC_SMOOTHING_RX_RATE_MIN_US && (uint32_t)refreshPeriodUs <=
+            RC_SMOOTHING_RX_RATE_MAX_US);
+
+    rx->refreshPeriod = constrain(refreshPeriodUs, RC_SMOOTHING_RX_RATE_MIN_US,
+            RC_SMOOTHING_RX_RATE_MAX_US);
+
+    if (currentTimeUs > FAILSAFE_POWER_ON_DELAY_US && !failsafeIsMonitoring()) {
+        failsafeStartMonitoring();
+    }
+
+    failsafeUpdateState(raw, armed);
+
+    const throttleStatus_e throttleStatus = rxCalculateThrottleStatus(raw);
+
+    return throttleStatus == THROTTLE_LOW;
+}
+
+static void ratePidFeedforwardLpfInit(rate_pid_t * pid, uint16_t filterCutoff)
+{
+    if (filterCutoff > 0) {
+        pid->feedforwardLpfInitialized = true;
+        for (uint8_t axis = 0; axis <= 2; axis++) {
+            pt3FilterInit(&pid->feedforwardPt3[axis], pt3FilterGain(filterCutoff, DT()));
+        }
+    }
+}
+
+static void ratePidFeedforwardLpfUpdate(rate_pid_t * pid, uint16_t filterCutoff)
+{
+    if (filterCutoff > 0) {
+        for (uint8_t axis = 0; axis <= 2; axis++) {
+            pt3FilterUpdateCutoff(&pid->feedforwardPt3[axis],
+                    pt3FilterGain(filterCutoff, DT()));
+        }
+    }
+}
+
+
+// rxGetDemands
+static void setSmoothingFilterCutoffs(rate_pid_t * ratepid, rxSmoothingFilter_t *smoothingFilter)
+{
+    const float dT = GYRO_PERIOD() * 1e-6f;
+    uint16_t oldCutoff = smoothingFilter->setpointCutoffFrequency;
+
+    if (smoothingFilter->setpointCutoffSetting == 0) {
+        smoothingFilter->setpointCutoffFrequency =
+            fmaxf(RC_SMOOTHING_CUTOFF_MIN_HZ,
+                    calcAutoSmoothingCutoff(smoothingFilter->averageFrameTimeUs,
+                        smoothingFilter->autoSmoothnessFactorSetpoint)); }
+    if (smoothingFilter->throttleCutoffSetting == 0) {
+        smoothingFilter->throttleCutoffFrequency =
+            fmaxf(RC_SMOOTHING_CUTOFF_MIN_HZ,
+                    calcAutoSmoothingCutoff(smoothingFilter->averageFrameTimeUs,
+                        smoothingFilter->autoSmoothnessFactorThrottle));
+    }
+
+    // initialize or update the Setpoint filter
+    if ((smoothingFilter->setpointCutoffFrequency != oldCutoff) ||
+            !smoothingFilter->filterInitialized) {
+        for (int i = 0; i < 4; i++) {
+            if (i < THROTTLE) { // Throttle handled by smoothing command
+                if (!smoothingFilter->filterInitialized) {
+                    pt3FilterInit(&smoothingFilter->filter[i],
+                            pt3FilterGain(smoothingFilter->setpointCutoffFrequency,
+                                dT)); } else {
+                        pt3FilterUpdateCutoff(&smoothingFilter->filter[i],
+                                pt3FilterGain(smoothingFilter->setpointCutoffFrequency,
+                                    dT)); }
+            } else {
+                if (!smoothingFilter->filterInitialized) {
+                    pt3FilterInit(&smoothingFilter->filter[i],
+                            pt3FilterGain(smoothingFilter->throttleCutoffFrequency,
+                                dT)); } else {
+                        pt3FilterUpdateCutoff(&smoothingFilter->filter[i],
+                                pt3FilterGain(smoothingFilter->throttleCutoffFrequency,
+                                    dT)); }
+            }
+        }
+
+        // initialize or update the Level filter
+        for (int i = 0; i < 2; i++) {
+            if (!smoothingFilter->filterInitialized) {
+                pt3FilterInit(&smoothingFilter->filterDeflection[i],
+                        pt3FilterGain(smoothingFilter->setpointCutoffFrequency,
+                            dT)); } else {
+                    pt3FilterUpdateCutoff(&smoothingFilter->filterDeflection[i],
+                            pt3FilterGain(smoothingFilter->setpointCutoffFrequency,
+                                dT)); }
+        }
+    }
+
+    // update or initialize the FF filter
+    oldCutoff = smoothingFilter->feedforwardCutoffFrequency;
+    if (smoothingFilter->ffCutoffSetting == 0) {
+        smoothingFilter->feedforwardCutoffFrequency =
+            fmaxf(RC_SMOOTHING_CUTOFF_MIN_HZ,
+                    calcAutoSmoothingCutoff(smoothingFilter->averageFrameTimeUs,
+                        smoothingFilter->autoSmoothnessFactorSetpoint)); }
+    if (!smoothingFilter->filterInitialized) {
+        ratePidFeedforwardLpfInit(ratepid, smoothingFilter->feedforwardCutoffFrequency);
+    } else if (smoothingFilter->feedforwardCutoffFrequency != oldCutoff) {
+        ratePidFeedforwardLpfUpdate(ratepid, smoothingFilter->feedforwardCutoffFrequency);
+    }
+}
+
+
+// rxGetDemands
+static bool rcSmoothingAccumulateSample(rxSmoothingFilter_t *smoothingFilter, int rxFrameTimeUs)
+{
+    smoothingFilter->trainingSum += rxFrameTimeUs;
+    smoothingFilter->trainingCount++;
+    smoothingFilter->trainingMax = fmaxf(smoothingFilter->trainingMax, rxFrameTimeUs);
+    smoothingFilter->trainingMin = fminf(smoothingFilter->trainingMin, rxFrameTimeUs);
+
+    // if we've collected enough samples then calculate the average and reset the accumulation
+    uint32_t sampleLimit = (smoothingFilter->filterInitialized) ?
+        RC_SMOOTHING_FILTER_RETRAINING_SAMPLES :
+        RC_SMOOTHING_FILTER_TRAINING_SAMPLES;
+
+    if (smoothingFilter->trainingCount >= sampleLimit) {
+        // Throw out high and low samples
+        smoothingFilter->trainingSum = smoothingFilter->trainingSum -
+            smoothingFilter->trainingMin - smoothingFilter->trainingMax; 
+
+        smoothingFilter->averageFrameTimeUs = lrintf(smoothingFilter->trainingSum /
+                (smoothingFilter->trainingCount - 2));
+        rcSmoothingResetAccumulation(smoothingFilter);
+        return true;
+    }
+    return false;
+}
+
+
+// rxGetDemands
+static bool rcSmoothingAutoCalculate(rxSmoothingFilter_t * smoothingFilter)
+{
+    // if any rc smoothing cutoff is 0 (auto) then we need to calculate cutoffs
+    if ((smoothingFilter->setpointCutoffSetting == 0) ||
+            (smoothingFilter->ffCutoffSetting == 0) ||
+            (smoothingFilter->throttleCutoffSetting == 0)) {
+        return true;
+    }
+    return false;
+}
+
+// rxGetDemands
+static void processSmoothingFilter(
+        timeUs_t currentTimeUs,
+        rx_t * rx,
+        rate_pid_t * ratepid,
+        float setpointRate[3],
+        float rawSetpoint[3])
+{
+
+
+    // first call initialization
+    if (!rx->initializedFilter) {
+
+        rx->smoothingFilter.filterInitialized = false;
+        rx->smoothingFilter.averageFrameTimeUs = 0;
+        rx->smoothingFilter.autoSmoothnessFactorSetpoint = 30;
+        rx->smoothingFilter.autoSmoothnessFactorThrottle = 30;
+        rx->smoothingFilter.setpointCutoffSetting = 0;
+        rx->smoothingFilter.throttleCutoffSetting = 0;
+        rx->smoothingFilter.ffCutoffSetting = 0;
+        rcSmoothingResetAccumulation(&rx->smoothingFilter);
+        rx->smoothingFilter.setpointCutoffFrequency =
+            rx->smoothingFilter.setpointCutoffSetting;
+        rx->smoothingFilter.throttleCutoffFrequency =
+            rx->smoothingFilter.throttleCutoffSetting;
+        if (rx->smoothingFilter.ffCutoffSetting == 0) {
+            // calculate and use an initial derivative cutoff until the RC interval is known
+            const float cutoffFactor =
+                1.5f / (1.0f + (rx->smoothingFilter.autoSmoothnessFactorSetpoint / 10.0f));
+            float ffCutoff = RC_SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
+            rx->smoothingFilter.feedforwardCutoffFrequency = lrintf(ffCutoff);
+        } else {
+            rx->smoothingFilter.feedforwardCutoffFrequency =
+                rx->smoothingFilter.ffCutoffSetting;
+        }
+
+        rx->calculatedCutoffs = rcSmoothingAutoCalculate(&rx->smoothingFilter);
+
+        // if we don't need to calculate cutoffs dynamically then the filters
+        // can be initialized now
+        if (!rx->calculatedCutoffs) {
+            setSmoothingFilterCutoffs(ratepid, &rx->smoothingFilter);
+            rx->smoothingFilter.filterInitialized = true;
+        }
+    }
+
+    rx->initializedFilter = true;
+
+    if (rx->gotNewData) {
+        // for auto calculated filters we need to examine each rx frame interval
+        if (rx->calculatedCutoffs) {
+            const timeMs_t currentTimeMs = currentTimeUs / 1000;
+
+            // If the filter cutoffs in auto mode, and we have good rx data,
+            // then determine the average rx frame rate and use that to
+            // calculate the filter cutoff frequencies
+
+            // skip during FC initialization
+            if ((currentTimeMs > RC_SMOOTHING_FILTER_STARTUP_DELAY_MS)) {
+                if (rx->signalReceived && rx->isRateValid) {
+
+                    // set the guard time expiration if it's not set
+                    if (rx->validFrameTimeMs == 0) {
+                        rx->validFrameTimeMs =
+                            currentTimeMs + (rx->smoothingFilter.filterInitialized ?
+                                RC_SMOOTHING_FILTER_RETRAINING_DELAY_MS :
+                                RC_SMOOTHING_FILTER_TRAINING_DELAY_MS);
+                    } else {
+                    }
+
+                    // if the guard time has expired then process the rx frame time
+                    if (currentTimeMs > rx->validFrameTimeMs) {
+                        bool accumulateSample = true;
+
+                        // During initial training process all samples.  During
+                        // retraining check samples to determine if they vary
+                        // by more than the limit percentage.
+                        if (rx->smoothingFilter.filterInitialized) {
+                            const float percentChange =
+                                fabs((rx->refreshPeriod - rx->smoothingFilter.averageFrameTimeUs) /
+                                        (float)rx->smoothingFilter.averageFrameTimeUs) * 100;
+                            if (percentChange < RC_SMOOTHING_RX_RATE_CHANGE_PERCENT) {
+                                // We received a sample that wasn't more than
+                                // the limit percent so reset the accumulation
+                                // During retraining we need a contiguous block
+                                // of samples that are all significantly
+                                // different than the current average
+                                rcSmoothingResetAccumulation(&rx->smoothingFilter);
+                                accumulateSample = false;
+                            }
+                        }
+
+                        // accumlate the sample into the average
+                        if (accumulateSample) { if
+                            (rcSmoothingAccumulateSample(&rx->smoothingFilter,
+                                                         rx->refreshPeriod)) {
+                                // the required number of samples were
+                                // collected so set the filter cutoffs, but
+                                // only if smoothing is active
+                                setSmoothingFilterCutoffs(ratepid, &rx->smoothingFilter);
+                                rx->smoothingFilter.filterInitialized = true;
+                                rx->validFrameTimeMs = 0;
+                            }
+                        }
+
+                    }
+                } else {
+                    // we have either stopped receiving rx samples (failsafe?)
+                    // or the sample time is unreasonable so reset the
+                    // accumulation
+                    rcSmoothingResetAccumulation(&rx->smoothingFilter);
+                }
+            }
+        }
+        // Get new values to be smoothed
+        for (int i = 0; i < 4; i++) {
+            rx->dataToSmooth[i] = i == THROTTLE ? rx->command[i] : rawSetpoint[i];
+        }
+    }
+
+    // each pid loop, apply the last received channel value to the filter, if
+    // initialised - thanks @klutvott
+    for (int i = 0; i < 4; i++) {
+        float *dst = i == THROTTLE ? &rx->command[i] : &setpointRate[i];
+        if (rx->smoothingFilter.filterInitialized) {
+            *dst = pt3FilterApply(&rx->smoothingFilter.filter[i], rx->dataToSmooth[i]);
+        } else {
+            // If filter isn't initialized yet, as in smoothing off, use the
+            // actual unsmoothed rx channel data
+            *dst = rx->dataToSmooth[i];
+        }
+    }
+}
+static bool isAux1Set(float raw[])
+{
+    return raw[4] > 1200;
+}
+
+static void resetTryingToArm(uint8_t * tryingToArm)
+{
+    *tryingToArm = ARMING_DELAYED_DISARMED;
+}
+
+void rxUpdateArmingStatus(
+        timeUs_t currentTimeUs,
+        float raw[],
+        bool imuIsLevel,
+        bool calibrating,
+        bool armed)
+{
+    if (armed) {
+        ledSet(true);
+    } else {
+
+        // Check if the power on arming grace time has elapsed
+        if ((armingGetDisableFlags() & ARMING_DISABLED_BOOT_GRACE_TIME) &&
+                (currentTimeUs >= 5000000)
+                && (!motorIsProtocolDshot() || motorDshotStreamingCommandsAreEnabled())
+           ) {
+            // If so, unset the grace time arming disable flag
+            armingUnsetDisabled(ARMING_DISABLED_BOOT_GRACE_TIME);
+        }
+
+        if (rxCalculateThrottleStatus(raw) != THROTTLE_LOW) {
+            armingSetDisabled(ARMING_DISABLED_THROTTLE);
+        } else {
+            armingUnsetDisabled(ARMING_DISABLED_THROTTLE);
+        }
+
+        if (!imuIsLevel) {
+            armingSetDisabled(ARMING_DISABLED_ANGLE);
+        } else {
+            armingUnsetDisabled(ARMING_DISABLED_ANGLE);
+        }
+
+        if (calibrating) {
+            armingSetDisabled(ARMING_DISABLED_CALIBRATING);
+        } else {
+            armingUnsetDisabled(ARMING_DISABLED_CALIBRATING);
+        }
+
+        armingUnsetDisabled(ARMING_DISABLED_RPMFILTER);
+
+        motorCheckDshotBitbangStatus();
+
+        armingUnsetDisabled(ARMING_DISABLED_ACC_CALIBRATION);
+
+        if (!motorIsProtocolEnabled()) {
+            armingSetDisabled(ARMING_DISABLED_MOTOR_PROTOCOL);
+        }
+
+        // If arming is disabled and the ARM switch is on
+        if (armingIsDisabled() && isAux1Set(raw)) {
+            armingSetDisabled(ARMING_DISABLED_ARM_SWITCH);
+        } else if (!isAux1Set(raw)) {
+            armingUnsetDisabled(ARMING_DISABLED_ARM_SWITCH);
+        }
+
+        if (armingIsDisabled()) {
+            ledWarningFlash();
+        } else {
+            ledWarningDisable();
+        }
+
+        ledWarningUpdate();
+    }
+}
+
+static void tryArm(
+        timeUs_t currentTimeUs,
+        uint8_t * tryingToArm,
+        float raw[],
+        bool imuIsLevel,
+        bool calibrating,
+        bool * armed)
+{
+    rxUpdateArmingStatus(currentTimeUs, raw, imuIsLevel, calibrating, *armed);
+
+    if (!armingIsDisabled()) {
+        if (*armed) {
+            return;
+        }
+
+        if (!motorCheckDshotReady(currentTimeUs, tryingToArm)) {
+            return;
+        }
+
+        *armed = true;
+
+        resetTryingToArm(tryingToArm);
+
+    } else {
+        resetTryingToArm(tryingToArm);
+    }
+}
+
+void rxProcessDataModes(
+        timeUs_t currentTimeUs,
+        bool signalReceived,
+        float raw[],
+        bool imuIsLevel,
+        bool calibrating,
+        bool * armed)
+{
+    static uint8_t disarmTicks;
+    static bool doNotRepeat;
+    static uint8_t tryingToArm;
+
+    if (isAux1Set(raw)) {
+        disarmTicks = 0;
+        // Arming via ARM BOX
+        tryArm(currentTimeUs, &tryingToArm, raw, imuIsLevel, calibrating, armed); 
+    } else {
+        resetTryingToArm(&tryingToArm);
+        // Disarming via ARM BOX
+        if (*armed && signalReceived && !failsafeIsActive()  ) {
+            disarmTicks++;
+            if (disarmTicks > 3) {
+                armingDisarm(*armed);
+                *armed = false;
+            }
+        }
+    }
+
+    if (!(*armed || doNotRepeat || armingIsDisabled())) {
+        doNotRepeat = true;
+    }
+}
+
+static rx_t _rx;
+
+// Called from hackflight.c::adjustRxDynamicPriority()
+bool rxCheck(timeUs_t currentTimeUs)
+{
+    bool signalReceived = false;
+    bool useDataDrivenProcessing = true;
+
+    if (_rx.state != RX_STATE_CHECK) {
+        return true;
+    }
+
+    const uint8_t frameStatus = rxDevCheck(_rx.channelData, &_rx.lastFrameTimeUs);
+
+    if (frameStatus & RX_FRAME_COMPLETE) {
+        _rx.inFailsafeMode = (frameStatus & RX_FRAME_FAILSAFE) != 0;
+        bool rxFrameDropped = (frameStatus & RX_FRAME_DROPPED) != 0;
+        signalReceived = !(_rx.inFailsafeMode || rxFrameDropped);
+        if (signalReceived) {
+            _rx.needSignalBefore = currentTimeUs + NEED_SIGNAL_MAX_DELAY_US;
+        }
+    }
+
+    if (frameStatus & RX_FRAME_PROCESSING_REQUIRED) {
+        _rx.auxiliaryProcessingRequired = true;
+    }
+
+    if (signalReceived) {
+        _rx.signalReceived = true;
+    } else if (currentTimeUs >= _rx.needSignalBefore) {
+        _rx.signalReceived = false;
+    }
+
+    if ((signalReceived && useDataDrivenProcessing) ||
+            cmpTimeUs(currentTimeUs, _rx.nextUpdateAtUs) > 0) {
+        _rx.dataProcessingRequired = true;
+    }
+
+    return _rx.dataProcessingRequired || _rx.auxiliaryProcessingRequired; // data driven or 50Hz
+}
+
+void rxPoll(
+        timeUs_t currentTimeUs,
+        bool imuIsLevel,
+        bool calibrating,
+        rx_axes_t * rxax,
+        bool * pidItermResetReady,
+        bool * pidItermResetValue,
+        bool * armed,
+        bool * gotNewData)
+{
+    *pidItermResetReady = false;
+
+    _rx.gotNewData = false;
+
+    switch (_rx.state) {
+        default:
+        case RX_STATE_CHECK:
+            _rx.state = RX_STATE_PROCESS;
+            break;
+
+        case RX_STATE_PROCESS:
+            if (!calculateChannelsAndUpdateFailsafe(&_rx, currentTimeUs, _rx.raw)) {
+                _rx.state = RX_STATE_CHECK;
+                break;
+            }
+            *pidItermResetReady = true;
+            *pidItermResetValue = processData(&_rx, _rx.raw, currentTimeUs, armed);
+            _rx.state = RX_STATE_MODES;
+            break;
+
+        case RX_STATE_MODES:
+            rxProcessDataModes(currentTimeUs, _rx.signalReceived, _rx.raw, imuIsLevel,
+                    calibrating, armed);
+            _rx.state = RX_STATE_UPDATE;
+            break;
+
+        case RX_STATE_UPDATE:
+            _rx.gotNewData = true;
+            updateCommands(&_rx, _rx.raw);
+            rxUpdateArmingStatus(currentTimeUs, _rx.raw, imuIsLevel, calibrating, *armed);
+            _rx.state = RX_STATE_CHECK;
+            break;
+    }
+
+    rxax->demands.throttle = _rx.raw[3];
+    rxax->demands.roll     = _rx.raw[0];
+    rxax->demands.pitch    = _rx.raw[1];
+    rxax->demands.yaw      = _rx.raw[2];
+    rxax->aux1             = _rx.raw[4];
+    rxax->aux2             = _rx.raw[5];
+
+    *gotNewData = _rx.gotNewData;
+}
+
+// Runs in fast (inner, core) loop
+void rxGetDemands(timeUs_t currentTimeUs, rate_pid_t * ratepid, demands_t * demands)
+{
+    float rawSetpoint[3] = {0};
+    float setpointRate[3] = {0};
+
+    if (_rx.gotNewData) {
+
+        for (int axis = 0; axis <= 2; axis++) {
+
+            _rx.oldRcCommand[axis] = _rx.command[axis];
+
+            float angleRate;
+
+            // scale _rx.commandf to range [-1.0, 1.0]
+            float commandf;
+            if (axis == 2) {
+                commandf = _rx.command[axis] / YAW_COMMAND_DIVIDER;
+            } else {
+                commandf = _rx.command[axis] / COMMAND_DIVIDER;
+            }
+
+            const float commandfAbs = fabsf(commandf);
+
+            angleRate = rxApplyRates(commandf, commandfAbs);
+
+            rawSetpoint[axis] = constrainf(angleRate, -1.0f * RATE_LIMIT, 1.0f * RATE_LIMIT);
+        }
+    }
+
+    processSmoothingFilter(currentTimeUs, &_rx, ratepid, setpointRate, rawSetpoint);
+
+    // Find min and max throttle based on conditions. Throttle has to be known before mixing
+    demands->throttle =
+        constrainf((_rx.command[3] - PWM_MIN) / (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
+    
+    demands->roll  = setpointRate[0];
+    demands->pitch = setpointRate[1];
+    demands->yaw   = setpointRate[2];
+
+    _rx.gotNewData = false;
+}
+
+#if defined(__cplusplus)
+}
+#endif
