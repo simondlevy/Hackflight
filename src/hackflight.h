@@ -91,7 +91,7 @@ static task_t _attitudeTask;
 
 // RX polling task ------------------------------------------------------------
 
-static task_t _rxTask;
+static task_t    _rxTask;
 static rx_axes_t _rx_axes;
 
 static void task_rx(uint32_t time)
@@ -130,8 +130,8 @@ static void task_rx(uint32_t time)
 
 // Task support ----------------------------------------------------------------
 
-static task_t tasks[20];
-static uint8_t task_count;
+static task_t  _tasks[20];
+static uint8_t _task_count;
 
 // Core tasks: gyro, rate PID, mixer, motors ----------------------------------
 
@@ -169,7 +169,7 @@ static void initTask(task_t * task, void (*fun)(uint32_t time), uint32_t rate)
 
 static void hackflightAddTask(void (*fun)(uint32_t time), uint32_t rate)
 {
-    initTask(&tasks[task_count++], fun, rate);
+    initTask(&_tasks[_task_count++], fun, rate);
 }
 
 // Initialization -------------------------------------------------------------

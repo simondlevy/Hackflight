@@ -235,8 +235,8 @@ static void checkDynamicTasks(int32_t schedLoopRemainingCycles, uint32_t nextTar
 
     timeUs_t currentTimeUs = timeMicros();
 
-    for (uint8_t k=0; k<task_count; ++k) {
-        task_t * task = &tasks[k];
+    for (uint8_t k=0; k<_task_count; ++k) {
+        task_t * task = &_tasks[k];
         adjustDynamicPriority(task, currentTimeUs);
         updateDynamicTask(task, &selectedTask, &selectedTaskDynamicPriority);
     }
