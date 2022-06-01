@@ -18,6 +18,15 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include "datatypes.h"
+
+void altHoldController(vehicle_state_t * vstate, demands_t * demands)
+{
+
+    static constexpr float Kp = 0.75;
+    static constexpr float Ki = 1.5;
+}
+
 /*
 altHoldController kp ki (state, ready, demands) = (state, ready, demands')
 
