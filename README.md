@@ -27,7 +27,7 @@ Hackflight is currently working on the following platforms:
 
 * [STM32F405 AIO flight controller](https://www.racedayquads.com/products/geprc-f4-v1-4-2-4s-aio-toothpick-whoop-flight-controller-w-12a-4in1-esc)
 
-* [MulticopterSim](https://github.com/simondlevy/Hackflight/tree/master/sim) flight simulator based on UnrealEngine4
+* [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine
 
 ## Ground Control Station
 
