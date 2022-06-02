@@ -293,10 +293,9 @@ static void ratePidInit(rate_pid_t * pid)
 static void ratePidUpdate(
         timeUs_t currentTimeUs,
         rate_pid_t * pid,
-        demands_t * demandsIn,
+        demands_t * demands,
         bool zeroThrottleItermReset,
-        vehicle_state_t * state,
-        demands_t * demandsOut)
+        vehicle_state_t * state)
 {
     // gradually scale back integration when above windup point
     float dynCi = DT();
@@ -324,7 +323,7 @@ static void ratePidUpdate(
                     gyroRateDterm[axis]);
     }
 
-    float pidSetpoints[3] = { demandsIn->roll, demandsIn->pitch, demandsIn->yaw };
+    float pidSetpoints[3] = { demands->roll, demands->pitch, demands->yaw };
 
     // ----------PID controller----------
     for (uint8_t axis = 0; axis <= 2; ++axis) {
@@ -474,12 +473,11 @@ static void ratePidUpdate(
         }
     }
 
-    demandsOut->throttle = demandsIn->throttle;
-    demandsOut->roll     = pid->data[0].Sum;
-    demandsOut->pitch    = pid->data[1].Sum;
-    demandsOut->yaw      = pid->data[2].Sum;
+    demands->roll  = pid->data[0].Sum;
+    demands->pitch = pid->data[1].Sum;
+    demands->yaw   = pid->data[2].Sum;
 
-    updateDynLpfCutoffs(pid, currentTimeUs, demandsIn->throttle);
+    updateDynLpfCutoffs(pid, currentTimeUs, demands->throttle);
 }
 
 #if defined(__cplusplus)

@@ -32,6 +32,8 @@ static float constrainAbs(float v, float lim)
 
 void altHoldController(vehicle_state_t * vstate, demands_t * demands)
 {
+    debugPrintf("%f", demands->throttle);
+    return;
 
     static constexpr float Kp             = 0.75;
     static constexpr float Ki             = 1.5;

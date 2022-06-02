@@ -63,6 +63,7 @@ static const uint32_t ATTITUDE_TASK_RATE = 100;
 // Data shared among tasks -----------------------------------------------------
 
 static bool            _armed;
+static demands_t       _demands;
 static bool            _gyro_is_calibrating;
 static float           _mspmotors[4];
 static bool            _pid_zero_throttle_iterm_reset;
@@ -128,11 +129,6 @@ static void task_rx(uint32_t time)
     }
 }
 
-// Task support ----------------------------------------------------------------
-
-static task_t  _tasks[20];
-static uint8_t _task_count;
-
 // Core tasks: gyro, rate PID, mixer, motors ----------------------------------
 
 static void hackflightRunCoreTasks(void)
@@ -141,25 +137,25 @@ static void hackflightRunCoreTasks(void)
 
     timeUs_t currentTimeUs = timeMicros();
 
-    demands_t demands = {0};
-    rxGetDemands(currentTimeUs, &_ratepid, &demands);
+    rxGetDemands(currentTimeUs, &_ratepid, &_demands);
 
-    demands_t new_demands = {0};
     ratePidUpdate(
             currentTimeUs,
             &_ratepid,
-            &demands,
+            &_demands,
             _pid_zero_throttle_iterm_reset,
-            &_state,
-            &new_demands);
+            &_state);
 
     float mixmotors[4] = {0};
-    mixerRun(&new_demands, mixmotors);
+    mixerRun(&_demands, mixmotors);
 
     motorWrite(_armed ? mixmotors : _mspmotors);
 }
 
 // General task support -------------------------------------------------------
+
+static task_t  _tasks[20];
+static uint8_t _task_count;
 
 static void initTask(task_t * task, void (*fun)(uint32_t time), uint32_t rate)
 {
