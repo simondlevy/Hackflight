@@ -30,11 +30,8 @@ static float constrainAbs(float v, float lim)
     return v < -lim ? -lim : v > +lim ? +lim : v;
 }
 
-void altHoldController(vehicle_state_t * vstate, demands_t * demands)
+void altHoldRunController(vehicle_state_t * vstate, demands_t * demands)
 {
-    debugPrintf("%f", demands->throttle);
-    return;
-
     static constexpr float Kp             = 0.75;
     static constexpr float Ki             = 1.5;
     static constexpr float PILOT_VELZ_MAX = 2.5;
@@ -49,7 +46,10 @@ void altHoldController(vehicle_state_t * vstate, demands_t * demands)
     // NED => ENU
     float altitude = -vstate->z;
 
-    bool inband = inBand(demands->throttle, STICK_DEADBAND);
+    // Scale throttle [0,1] => [-1,+1] to support deadband
+    bool inband = inBand(2*demands->throttle-1, STICK_DEADBAND);
+
+    debugPrintf("%d", inband);
 
     // Reset controller when moving into deadband
     float altitudeTarget = inband &&  !inBand(_throttleDemand, STICK_DEADBAND) ?
@@ -69,7 +69,7 @@ void altHoldController(vehicle_state_t * vstate, demands_t * demands)
     float errI = constrainAbs(_errI + err, WINDUP_MAX);
 
     // Implement PI control
-    demands->throttle =  Kp * err + Ki * errI;
+    //demands->throttle =  Kp * err + Ki * errI;
 
     // Maintain controller state for next iteration
     _errI = errI;
