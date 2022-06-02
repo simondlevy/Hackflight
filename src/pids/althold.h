@@ -20,44 +20,57 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "datatypes.h"
 
+static bool inBand(float value, float band) 
+{
+    return value > -band && value < band;
+}
+
+static float constrainAbs(float v, float lim)
+{
+    return v < -lim ? -lim : v > +lim ? +lim : v;
+}
+
 void altHoldController(vehicle_state_t * vstate, demands_t * demands)
 {
 
-    static constexpr float Kp = 0.75;
-    static constexpr float Ki = 1.5;
+    static constexpr float Kp             = 0.75;
+    static constexpr float Ki             = 1.5;
+    static constexpr float PILOT_VELZ_MAX = 2.5;
+    static constexpr float STICK_DEADBAND = 0.2;
+    static constexpr float WINDUP_MAX     = 0.4;
+
+    // Controller state
+    static float _altitudeTarget;
+    static float _errI;
+    static float _throttleDemand;
+
+    // NED => ENU
+    float altitude = -vstate->z;
+
+    bool inband = inBand(demands->throttle, STICK_DEADBAND);
+
+    // Reset controller when moving into deadband
+    float altitudeTarget = inband &&  !inBand(_throttleDemand, STICK_DEADBAND) ?
+        altitude :
+        _altitudeTarget;
+
+    // Hold altitude in band; scale throttle out of band
+    float targetVelocity = inband ?
+        altitudeTarget - altitude :
+        PILOT_VELZ_MAX * demands->throttle;
+
+    // Compute error as altTarget velocity minus actual velocity, after
+    // negating actual to accommodate NED
+    float err = targetVelocity + vstate->dz;
+
+    // Accumualte error integral
+    float errI = constrainAbs(_errI + err, WINDUP_MAX);
+
+    // Implement PI control
+    demands->throttle =  Kp * err + Ki * errI;
+
+    // Maintain controller state for next iteration
+    _errI = errI;
+    _altitudeTarget = altitudeTarget;
+    _throttleDemand = demands->throttle;
 }
-
-/*
-altHoldController kp ki (state, ready, demands) = (state, ready, demands')
-
-  where
-
-    demands' = Demands throttleDemand (roll demands) (pitch demands) (yaw demands)
-
-    throttleDemand =  kp * err + ki * errI
-
-    -- Compute error as altTarget velocity minus actual velocity, after
-    -- negating actual to accommodate NED
-    err = targetVelocity + (dz state)
-
-    -- Accumualte error integral
-    errI = constrain_abs (errI' + err) windupMax
-
-    targetVelocity = if inband then altitudeTarget - altitude
-                     else pilotVelZMax * (throttle demands)
-
-    -- Reset controller when moving into deadband
-    altitudeTarget = if inband && not (in_band throttleDemand' stickDeadband)
-                     then altitude
-                     else altitudeTarget'
-    -- NED => ENU
-    altitude = -(z state)
-
-    -- inband = in_band throttleDemand stickDeadband
-    inband = in_band (throttle demands) stickDeadband
-
-    -- Controller state
-    errI' = [0] ++ errI
-    altitudeTarget' = [0] ++ altitudeTarget
-    throttleDemand' = [0] ++ throttleDemand
-    */
