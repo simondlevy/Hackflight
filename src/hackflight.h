@@ -151,10 +151,10 @@ static void hackflightRunCoreTasks(void)
 
     ratePidUpdate(
             currentTimeUs,
-            &_ratepid,
             &_demands,
-            _pid_zero_throttle_iterm_reset,
-            &_state);
+            &_ratepid,
+            &_state,
+            _pid_zero_throttle_iterm_reset);
 
     float mixmotors[4] = {0};
     mixerRun(&_demands, mixmotors);
@@ -184,7 +184,7 @@ static void hackflightInit(void)
 {
     ratePidInit(&_ratepid);
 
-    hackflightAddPidController(ratePidUpdateFoo);
+    hackflightAddPidController(ratePidUpdate);
 
     initTask(&_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
     initTask(&_rxTask,  task_rx,  RX_TASK_RATE);

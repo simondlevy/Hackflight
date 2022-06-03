@@ -107,11 +107,3 @@ typedef void (*pid_fun_t)(
         , vehicle_state_t * vstate
         , bool reset
         );
-/*
-   typedef void (*pid_fun_t)(
-   uint32_t usec,
-   void * data,
-   vehicle_state_t * vstate,
-   bool reset,
-   demands_t * demands
-        ); */
