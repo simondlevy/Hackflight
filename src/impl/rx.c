@@ -32,7 +32,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "maths.h"
 #include "motor.h"
 #include "pwm.h"
-#include "ratepid_struct.h"
 #include "rx.h"
 #include "rx_rates.h"
 #include "rx_throttle_status.h"
