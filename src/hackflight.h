@@ -163,10 +163,7 @@ static void hackflightRunCoreTasks(void)
     motorWrite(_armed ? mixmotors : _mspmotors);
 }
 
-// Times task support -------------------------------------------------------
-
-static task_t  _tasks[20];
-static uint8_t _task_count;
+// Timed task support -------------------------------------------------------
 
 static void initTask(task_t * task, void (*fun)(uint32_t time), uint32_t rate)
 {
@@ -174,9 +171,14 @@ static void initTask(task_t * task, void (*fun)(uint32_t time), uint32_t rate)
     task->desiredPeriodUs = 1000000 / rate;
 }
 
-static void hackflightAddTask(void (*fun)(uint32_t time), uint32_t rate)
+// Sensor support ------------------------------------------------------------
+
+static task_t  _sensor_tasks[20];
+static uint8_t _sensor_task_count;
+
+static void hackflightAddSensor(void (*fun)(uint32_t time), uint32_t rate)
 {
-    initTask(&_tasks[_task_count++], fun, rate);
+    initTask(&_sensor_tasks[_sensor_task_count++], fun, rate);
 }
 
 // Initialization -------------------------------------------------------------

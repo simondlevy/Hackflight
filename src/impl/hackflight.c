@@ -235,8 +235,8 @@ static void checkDynamicTasks(int32_t schedLoopRemainingCycles, uint32_t nextTar
 
     timeUs_t currentTimeUs = timeMicros();
 
-    for (uint8_t k=0; k<_task_count; ++k) {
-        task_t * task = &_tasks[k];
+    for (uint8_t k=0; k<_sensor_task_count; ++k) {
+        task_t * task = &_sensor_tasks[k];
         adjustDynamicPriority(task, currentTimeUs);
         updateDynamicTask(task, &selectedTask, &selectedTaskDynamicPriority);
     }
@@ -302,7 +302,7 @@ void hackflightFullInit(void)
 
     hackflightInit();
 
-    hackflightAddTask(imuAccelTask, ACCEL_RATE);
+    hackflightAddSensor(imuAccelTask, ACCEL_RATE);
 
     initTask(&_mspTask, task_msp, MSP_TASK_RATE);
 
