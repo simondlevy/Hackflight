@@ -30,7 +30,13 @@ static float constrainAbs(float v, float lim)
     return v < -lim ? -lim : v > +lim ? +lim : v;
 }
 
-void altHoldRunController(vehicle_state_t * vstate, demands_t * demands)
+void altHoldPidUpdate(
+        uint32_t currentTimeUs
+        , demands_t * demands
+        , void * data
+        , vehicle_state_t * vstate
+        , bool reset
+        )
 {
     static constexpr float Kp             = 0.75;
     static constexpr float Ki             = 1.5;
@@ -38,41 +44,45 @@ void altHoldRunController(vehicle_state_t * vstate, demands_t * demands)
     static constexpr float STICK_DEADBAND = 0.2;
     static constexpr float WINDUP_MAX     = 0.4;
 
-    // Controller state
+    static bool _inBandPrev;
+    static float _errorI;
     static float _altitudeTarget;
-    static float _errI;
-    static float _throttleDemand;
 
-    // NED => ENU
-    float altitude = -vstate->z;
+    bool didReset = false;
 
-    // Scale throttle [0,1] => [-1,+1] to support deadband
-    bool inband = inBand(2*demands->throttle-1, STICK_DEADBAND);
+    float altitude = vstate->z;
 
-    debugPrintf("%d", inband);
+    float throttle = 2 * demands->throttle - 1; // [0,1] => [-1,+1]
+
+    // Is stick demand in deadband?
+    bool inBand = fabs(throttle) < STICK_DEADBAND; 
+
+    debugPrintf("throttle: %+3.3f   inband: %d", throttle, inBand);
 
     // Reset controller when moving into deadband
-    float altitudeTarget = inband &&  !inBand(_throttleDemand, STICK_DEADBAND) ?
-        altitude :
-        _altitudeTarget;
+    if (reset || (inBand && !_inBandPrev)) {
+        _errorI = 0;
+        didReset = true;
+    }
+    _inBandPrev = inBand;
 
-    // Hold altitude in band; scale throttle out of band
-    float targetVelocity = inband ?
-        altitudeTarget - altitude :
-        PILOT_VELZ_MAX * demands->throttle;
+    // Target velocity is a setpoint inside deadband, scaled
+    // constant outside
+    float targetVelocity = inBand ?
+        _altitudeTarget - altitude :
+        PILOT_VELZ_MAX * throttle;
 
-    // Compute error as altTarget velocity minus actual velocity, after
-    // negating actual to accommodate NED
-    float err = targetVelocity + vstate->dz;
+    // Compute error as scaled target minus actual
+    float error = targetVelocity - vstate->dz;
 
-    // Accumualte error integral
-    float errI = constrainAbs(_errI + err, WINDUP_MAX);
+    // Compute I term, avoiding windup
+    _errorI = constrainAbs(_errorI + error, WINDUP_MAX);
 
-    // Implement PI control
-    //demands->throttle =  Kp * err + Ki * errI;
+    // Adjust throttle demand based on error
+    //demands->throttle = error * Kp + _errorI * Ki;
 
-    // Maintain controller state for next iteration
-    _errI = errI;
-    _altitudeTarget = altitudeTarget;
-    _throttleDemand = demands->throttle;
+    // If we re-entered deadband, we reset the target altitude.
+    if (didReset) {
+        _altitudeTarget = altitude;
+    }
 }
