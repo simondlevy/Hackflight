@@ -291,12 +291,15 @@ static void ratePidInit(rate_pid_t * pid)
 }
 
 static void ratePidUpdate(
-        timeUs_t currentTimeUs,
-        rate_pid_t * pid,
-        demands_t * demands,
-        bool zeroThrottleItermReset,
-        vehicle_state_t * state)
+        uint32_t currentTimeUs
+        , demands_t * demands
+        , void * data
+        , vehicle_state_t * vstate
+        , bool reset
+        )
 {
+    rate_pid_t * pid = (rate_pid_t *)data;
+
     // gradually scale back integration when above windup point
     float dynCi = DT();
     const float itermWindupPointInv = 1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
@@ -304,7 +307,7 @@ static void ratePidUpdate(
         dynCi *= constrainf(itermWindupPointInv, 0.0f, 1.0f);
     }
 
-    float gyroRates[3] = {state->dphi, state->dtheta, state->dpsi};
+    float gyroRates[3] = {vstate->dphi, vstate->dtheta, vstate->dpsi};
 
     // Precalculate gyro deta for D-term here, this allows loop unrolling
     float gyroRateDterm[3];
@@ -467,7 +470,7 @@ static void ratePidUpdate(
     // Disable PID control if at zero throttle or if gyro overflow detected
     // This may look very innefficient, but it is done on purpose to always
     // show real CPU usage as in flight
-    if (zeroThrottleItermReset) {
+    if (reset) {
         for (uint8_t axis = 0; axis < 3; axis++) {
             pid->data[axis].I = 0.0f;
         }

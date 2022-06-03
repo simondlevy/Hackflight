@@ -90,6 +90,18 @@ static void task_attitude(uint32_t time)
 
 static task_t _attitudeTask;
 
+// PID controller support -----------------------------------------------------
+
+static pid_controller_t _pid_controllers[10];
+static uint8_t          _pid_count;
+
+static void hackflightAddPidController(pid_fun_t fun, void * data)
+{
+    _pid_controllers[_pid_count].fun = fun;
+    _pid_controllers[_pid_count].data = data;
+    _pid_count++;
+}
+
 // RX polling task ------------------------------------------------------------
 
 static task_t    _rxTask;
@@ -129,7 +141,7 @@ static void task_rx(uint32_t time)
     }
 }
 
-// Core tasks: gyro, rate PID, mixer, motors ----------------------------------
+// Core tasks: gyro, PID controllers, mixer, motors ------------------------
 
 static void hackflightRunCoreTasks(void)
 {
@@ -139,12 +151,11 @@ static void hackflightRunCoreTasks(void)
 
     rxGetDemands(currentTimeUs, &_ratepid, &_demands);
 
-    ratePidUpdate(
-            currentTimeUs,
-            &_ratepid,
-            &_demands,
-            _pid_zero_throttle_iterm_reset,
-            &_state);
+    for (uint8_t k=0; k<_pid_count; ++k) {
+        pid_controller_t pid = _pid_controllers[k];
+        pid.fun(currentTimeUs, &_demands, pid.data,
+                &_state, _pid_zero_throttle_iterm_reset);
+    }
 
     float mixmotors[4] = {0};
     mixerRun(&_demands, mixmotors);
@@ -152,10 +163,7 @@ static void hackflightRunCoreTasks(void)
     motorWrite(_armed ? mixmotors : _mspmotors);
 }
 
-// General task support -------------------------------------------------------
-
-static task_t  _tasks[20];
-static uint8_t _task_count;
+// Timed task support -------------------------------------------------------
 
 static void initTask(task_t * task, void (*fun)(uint32_t time), uint32_t rate)
 {
@@ -163,9 +171,14 @@ static void initTask(task_t * task, void (*fun)(uint32_t time), uint32_t rate)
     task->desiredPeriodUs = 1000000 / rate;
 }
 
-static void hackflightAddTask(void (*fun)(uint32_t time), uint32_t rate)
+// Sensor support ------------------------------------------------------------
+
+static task_t  _sensor_tasks[20];
+static uint8_t _sensor_task_count;
+
+static void hackflightAddSensor(void (*fun)(uint32_t time), uint32_t rate)
 {
-    initTask(&_tasks[_task_count++], fun, rate);
+    initTask(&_sensor_tasks[_sensor_task_count++], fun, rate);
 }
 
 // Initialization -------------------------------------------------------------
@@ -173,6 +186,8 @@ static void hackflightAddTask(void (*fun)(uint32_t time), uint32_t rate)
 static void hackflightInit(void)
 {
     ratePidInit(&_ratepid);
+
+    hackflightAddPidController(ratePidUpdate, &_ratepid);
 
     initTask(&_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
     initTask(&_rxTask,  task_rx,  RX_TASK_RATE);
