@@ -141,7 +141,7 @@ static void task_rx(uint32_t time)
     }
 }
 
-// Core tasks: gyro, rate PID, mixer, motors ----------------------------------
+// Core tasks: gyro, PID controllers, mixer, motors ------------------------
 
 static void hackflightRunCoreTasks(void)
 {
@@ -151,12 +151,11 @@ static void hackflightRunCoreTasks(void)
 
     rxGetDemands(currentTimeUs, &_ratepid, &_demands);
 
-    ratePidUpdate(
-            currentTimeUs,
-            &_demands,
-            &_ratepid,
-            &_state,
-            _pid_zero_throttle_iterm_reset);
+    for (uint8_t k=0; k<_pid_count; ++k) {
+        pid_controller_t pid = _pid_controllers[k];
+        pid.fun(currentTimeUs, &_demands, pid.data,
+                &_state, _pid_zero_throttle_iterm_reset);
+    }
 
     float mixmotors[4] = {0};
     mixerRun(&_demands, mixmotors);
