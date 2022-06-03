@@ -1,4 +1,4 @@
 To build GCS executable for Windows, run the following command
 in Windows (not Ubuntu):
 
-pyinstaller --onefile gcs.py
+pyinstaller --onefile gcs.py --windowed command
