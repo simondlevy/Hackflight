@@ -38,8 +38,8 @@ void altHoldPidUpdate(
         , bool reset
         )
 {
-    static constexpr float Kp             = 0.75;
-    static constexpr float Ki             = 1.5;
+    static constexpr float Kp             = 7.5e-2;
+    static constexpr float Ki             = 0;
     static constexpr float PILOT_VELZ_MAX = 2.5;
     static constexpr float STICK_DEADBAND = 0.2;
     static constexpr float WINDUP_MAX     = 0.4;
@@ -48,23 +48,27 @@ void altHoldPidUpdate(
     static float _errorI;
     static float _altitudeTarget;
 
-    bool didReset = false;
+    bool gotNewTarget = false;
 
-    float altitude = vstate->z;
+    // NED => ENU
+    float altitude = -vstate->z;
 
     float throttle = 2 * demands->throttle - 1; // [0,1] => [-1,+1]
 
     // Is stick demand in deadband?
     bool inBand = fabs(throttle) < STICK_DEADBAND; 
 
-    debugPrintf("throttle: %+3.3f   inband: %d", throttle, inBand);
-
     // Reset controller when moving into deadband
-    if (reset || (inBand && !_inBandPrev)) {
+    if (inBand && !_inBandPrev) {
         _errorI = 0;
-        didReset = true;
+        gotNewTarget = true;
     }
     _inBandPrev = inBand;
+
+    if (reset) {
+        _errorI = 0;
+        _altitudeTarget = 0;
+    }
 
     // Target velocity is a setpoint inside deadband, scaled
     // constant outside
@@ -79,10 +83,12 @@ void altHoldPidUpdate(
     _errorI = constrainAbs(_errorI + error, WINDUP_MAX);
 
     // Adjust throttle demand based on error
-    //demands->throttle = error * Kp + _errorI * Ki;
+    demands->throttle = ((error * Kp + _errorI * Ki) + 1) / 2; // [-1,+1] => [0,1]
+
+    debugPrintf("%f", demands->throttle);
 
     // If we re-entered deadband, we reset the target altitude.
-    if (didReset) {
+    if (gotNewTarget) {
         _altitudeTarget = altitude;
     }
 }
