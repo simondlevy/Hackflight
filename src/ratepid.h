@@ -292,9 +292,11 @@ static void ratePidInit(rate_pid_t * pid)
 
 static void ratePidUpdateFoo(
         uint32_t currentTimeUs
+        , void * data
         )
 {
     (void)currentTimeUs;
+    (void)data;
 }
 
 static void ratePidUpdate(
