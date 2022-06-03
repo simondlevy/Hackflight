@@ -92,13 +92,14 @@ static task_t _attitudeTask;
 
 // PID controller support -----------------------------------------------------
 
-static pid_fun_t _pid_funs[10];
-static pid_controller_t pid_controllers[10];
-static uint8_t   _pid_count;
+static pid_controller_t _pid_controllers[10];
+static uint8_t          _pid_count;
 
-static void hackflightAddPidController(pid_fun_t fun)
+static void hackflightAddPidController(pid_fun_t fun, void * data)
 {
-    _pid_funs[_pid_count++] = fun;
+    _pid_controllers[_pid_count].fun = fun;
+    _pid_controllers[_pid_count].data = data;
+    _pid_count++;
 }
 
 // RX polling task ------------------------------------------------------------
@@ -185,7 +186,7 @@ static void hackflightInit(void)
 {
     ratePidInit(&_ratepid);
 
-    hackflightAddPidController(ratePidUpdate);
+    hackflightAddPidController(ratePidUpdate, &_ratepid);
 
     initTask(&_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
     initTask(&_rxTask,  task_rx,  RX_TASK_RATE);
