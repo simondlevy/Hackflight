@@ -228,6 +228,16 @@ static void updateDynamicTask(task_t * task, task_t ** selected, uint16_t * sele
     }
 }
 
+static void adjustAndUpdateTask(
+        task_t * task,
+        uint32_t currentTimeUs,
+        task_t ** selectedTask,
+        uint16_t * selectedTaskDynamicPriority)
+{
+    adjustDynamicPriority(task, currentTimeUs);
+    updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
+}
+
 static void checkDynamicTasks(int32_t schedLoopRemainingCycles, uint32_t nextTargetCycles)
 {
     task_t *selectedTask = NULL;
@@ -237,18 +247,17 @@ static void checkDynamicTasks(int32_t schedLoopRemainingCycles, uint32_t nextTar
 
     for (uint8_t k=0; k<_sensor_task_count; ++k) {
         task_t * task = &_sensor_tasks[k];
-        adjustDynamicPriority(task, currentTimeUs);
-        updateDynamicTask(task, &selectedTask, &selectedTaskDynamicPriority);
+        adjustAndUpdateTask(task, currentTimeUs,&selectedTask, &selectedTaskDynamicPriority);
     }
 
     adjustRxDynamicPriority(&_rxTask, currentTimeUs);
     updateDynamicTask(&_rxTask, &selectedTask, &selectedTaskDynamicPriority);
 
-    adjustDynamicPriority(&_attitudeTask, currentTimeUs);
-    updateDynamicTask(&_attitudeTask, &selectedTask, &selectedTaskDynamicPriority);
+    adjustAndUpdateTask(&_attitudeTask, currentTimeUs,
+            &selectedTask, &selectedTaskDynamicPriority);
 
-    adjustDynamicPriority(&_mspTask, currentTimeUs);
-    updateDynamicTask(&_mspTask, &selectedTask, &selectedTaskDynamicPriority);
+    adjustAndUpdateTask(&_mspTask, currentTimeUs,
+            &selectedTask, &selectedTaskDynamicPriority);
 
     if (selectedTask) {
 
