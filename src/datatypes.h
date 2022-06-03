@@ -107,3 +107,8 @@ typedef void (*pid_fun_t)(
         , vehicle_state_t * vstate
         , bool reset
         );
+
+typedef struct {
+    pid_fun_t fun;
+    void * data;
+} pid_controller_t;
