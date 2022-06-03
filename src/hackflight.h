@@ -90,6 +90,16 @@ static void task_attitude(uint32_t time)
 
 static task_t _attitudeTask;
 
+// PID controller support -----------------------------------------------------
+
+static pid_fun_t _pid_funs[10];
+static uint8_t   _pid_count;
+
+static void hackflightAddPidController(pid_fun_t fun)
+{
+    _pid_funs[_pid_count++] = fun;
+}
+
 // RX polling task ------------------------------------------------------------
 
 static task_t    _rxTask;
@@ -152,7 +162,7 @@ static void hackflightRunCoreTasks(void)
     motorWrite(_armed ? mixmotors : _mspmotors);
 }
 
-// General task support -------------------------------------------------------
+// Times task support -------------------------------------------------------
 
 static task_t  _tasks[20];
 static uint8_t _task_count;
@@ -173,6 +183,8 @@ static void hackflightAddTask(void (*fun)(uint32_t time), uint32_t rate)
 static void hackflightInit(void)
 {
     ratePidInit(&_ratepid);
+
+    hackflightAddPidController(ratePidUpdateFoo);
 
     initTask(&_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
     initTask(&_rxTask,  task_rx,  RX_TASK_RATE);

@@ -101,9 +101,13 @@ typedef struct {
 } vehicle_state_t;
 
 typedef void (*pid_fun_t)(
+        uint32_t usec
+        );
+/*
+typedef void (*pid_fun_t)(
         uint32_t usec,
         void * data,
         vehicle_state_t * vstate,
         bool reset,
         demands_t * demands
-        );
+        ); */

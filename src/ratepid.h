@@ -290,13 +290,22 @@ static void ratePidInit(rate_pid_t * pid)
     }
 }
 
+static void ratePidUpdateFoo(
+        uint32_t currentTimeUs
+        )
+{
+    (void)currentTimeUs;
+}
+
 static void ratePidUpdate(
         timeUs_t currentTimeUs,
-        rate_pid_t * pid,
+        void * data,
         demands_t * demands,
         bool zeroThrottleItermReset,
         vehicle_state_t * state)
 {
+    rate_pid_t * pid = (rate_pid_t *)data;
+
     // gradually scale back integration when above windup point
     float dynCi = DT();
     const float itermWindupPointInv = 1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
