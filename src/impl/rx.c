@@ -515,8 +515,6 @@ static void ratePidFeedforwardLpfUpdate(rate_pid_t * pid, uint16_t filterCutoff)
     }
 }
 
-
-// rxGetDemands
 static void setSmoothingFilterCutoffs(rate_pid_t * ratepid, rxSmoothingFilter_t *smoothingFilter)
 {
     const float dT = GYRO_PERIOD() * 1e-6f;
@@ -584,7 +582,6 @@ static void setSmoothingFilterCutoffs(rate_pid_t * ratepid, rxSmoothingFilter_t 
 }
 
 
-// rxGetDemands
 static bool rcSmoothingAccumulateSample(rxSmoothingFilter_t *smoothingFilter, int rxFrameTimeUs)
 {
     smoothingFilter->trainingSum += rxFrameTimeUs;
@@ -611,7 +608,6 @@ static bool rcSmoothingAccumulateSample(rxSmoothingFilter_t *smoothingFilter, in
 }
 
 
-// rxGetDemands
 static bool rcSmoothingAutoCalculate(rxSmoothingFilter_t * smoothingFilter)
 {
     // if any rc smoothing cutoff is 0 (auto) then we need to calculate cutoffs
@@ -623,7 +619,6 @@ static bool rcSmoothingAutoCalculate(rxSmoothingFilter_t * smoothingFilter)
     return false;
 }
 
-// rxGetDemands
 static void processSmoothingFilter(
         timeUs_t currentTimeUs,
         rx_t * rx,
