@@ -143,12 +143,14 @@ extern "C" {
         filter->k = k;
     }
 
-    static float applyFeedforwardLimit( float value, float currentPidSetpoint, float maxRateLimit) {
+    static float applyFeedforwardLimit(float value, float currentPidSetpoint,
+            float maxRateLimit) {
 
         if (value * currentPidSetpoint > 0.0f) {
             if (fabsf(currentPidSetpoint) <= maxRateLimit) {
                 value = constrainf(value, (-maxRateLimit -
-                            currentPidSetpoint) * KP(), (maxRateLimit - currentPidSetpoint) * KP());
+                            currentPidSetpoint) * KP(),
+                        (maxRateLimit - currentPidSetpoint) * KP());
             } else {
                 value = 0;
             }
@@ -157,7 +159,8 @@ extern "C" {
         return value;
     }
 
-    static float accelerationLimit(rate_pid_t * pid, uint8_t axis, float currentPidSetpoint)
+    static float accelerationLimit(rate_pid_t * pid, uint8_t axis,
+            float currentPidSetpoint)
     {
         const float currentVelocity = currentPidSetpoint - pid->previousSetpoint[axis];
 
@@ -180,15 +183,17 @@ extern "C" {
             float *itermErrorRate,
             float *currentPidSetpoint)
     {
-        const float setpointLpf = pt1FilterApply(&pid->windupLpf[axis], *currentPidSetpoint);
+        const float setpointLpf =
+            pt1FilterApply(&pid->windupLpf[axis], *currentPidSetpoint);
+
         const float setpointHpf = fabsf(*currentPidSetpoint - setpointLpf);
 
         if (axis < 2) {
 
             const float itermRelaxFactor =
                 fmaxf(0, 1 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD);
-            const bool isDecreasingI =
-                ((iterm > 0) && (*itermErrorRate < 0)) || ((iterm < 0) && (*itermErrorRate > 0));
+            const bool isDecreasingI = ((iterm > 0) && (*itermErrorRate < 0)) ||
+                ((iterm < 0) && (*itermErrorRate > 0));
             if (isDecreasingI) {
                 // Do Nothing, use the precalculed itermErrorRate
             } else {
@@ -251,7 +256,7 @@ extern "C" {
         }
     }
 
-    // ======================================================================================
+    // ==================================================================================
 
     static void ratePidInit(rate_pid_t * pid)
     {
@@ -286,7 +291,8 @@ extern "C" {
         // won't work because the filter wasn't initialized.
         for (uint8_t axis = 0; axis <= 2; axis++) {
             pt2FilterInit(&pid->dMinRange[axis], pt2FilterGain(D_MIN_RANGE_HZ, DT()));
-            pt2FilterInit(&pid->dMinLowpass[axis], pt2FilterGain(D_MIN_LOWPASS_HZ, DT()));
+            pt2FilterInit(&pid->dMinLowpass[axis],
+                    pt2FilterGain(D_MIN_LOWPASS_HZ, DT()));
         }
     }
 
@@ -349,7 +355,8 @@ extern "C" {
             float itermErrorRate = errorRate;
             float uncorrectedSetpoint = currentPidSetpoint;
 
-            applyItermRelax(pid, axis, previousIterm, &itermErrorRate, &currentPidSetpoint);
+            applyItermRelax(pid, axis, previousIterm, &itermErrorRate,
+                    &currentPidSetpoint);
             errorRate = currentPidSetpoint - gyroRate;
             float setpointCorrection = currentPidSetpoint - uncorrectedSetpoint;
 
@@ -370,9 +377,10 @@ extern "C" {
             // if launch control is active override the iterm gains and apply iterm
             // windup protection to all axes
             float Ki = KI() * ((axis == 2 && !USE_INTEGRATED_YAW) ? 2.5 : 1);
-            float axisDynCi = (axis == 2) ? dynCi : DT(); // only apply windup protection to yaw
+            float axisDynCi = (axis == 2) ? dynCi : DT(); // check windup for yaw only
 
-            pid->data[axis].I = constrainf(previousIterm + (Ki * axisDynCi) * itermErrorRate,
+            pid->data[axis].I =
+                constrainf(previousIterm + (Ki * axisDynCi) * itermErrorRate,
                     -ITERM_LIMIT, ITERM_LIMIT);
 
             // -----calculate pidSetpointDelta
@@ -387,8 +395,8 @@ extern "C" {
                 // This is done to avoid DTerm spikes that occur with dynamically
                 // calculated deltaT whenever another task causes the PID
                 // loop execution to be delayed.
-                const float delta =
-                    -(gyroRateDterm[axis] - pid->previousGyroRateDterm[axis]) * FREQUENCY();
+                const float delta = -(gyroRateDterm[axis] -
+                        pid->previousGyroRateDterm[axis]) * FREQUENCY();
 
                 float preTpaD = KD() * delta;
 
@@ -404,7 +412,8 @@ extern "C" {
                         D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
                     float dMinGyroFactor = pt2FilterApply(&pid->dMinRange[axis], delta);
                     dMinGyroFactor = fabsf(dMinGyroFactor) * d_min_gyro_gain;
-                    const float d_min_setpoint_gain = D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
+                    const float d_min_setpoint_gain =
+                        D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
                         D_MIN_ADVANCE * FREQUENCY() / (100 * D_MIN_LOWPASS_HZ);
                     const float dMinSetpointFactor =
                         (fabsf(pidSetpointDelta)) * d_min_setpoint_gain;
@@ -429,7 +438,8 @@ extern "C" {
 
             // -----calculate feedforward component
             // include abs control correction in feedforward
-            pidSetpointDelta += setpointCorrection - pid->previousSetpointCorrection[axis];
+            pidSetpointDelta += setpointCorrection -
+                pid->previousSetpointCorrection[axis];
             pid->previousSetpointCorrection[axis] = setpointCorrection;
 
             // no feedforward in launch control
@@ -443,7 +453,8 @@ extern "C" {
                 float feedforwardMaxRateLimit =
                     feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
 
-                bool shouldApplyFeedforwardLimits = feedforwardMaxRateLimit != 0.0f && axis < 2;
+                bool shouldApplyFeedforwardLimits =
+                    feedforwardMaxRateLimit != 0.0f && axis < 2;
 
                 pid->data[axis].F = shouldApplyFeedforwardLimits ?
                     applyFeedforwardLimit(feedForward, currentPidSetpoint,
@@ -457,7 +468,10 @@ extern "C" {
 
             // calculating the PID sum
             const float pidSum =
-                pid->data[axis].P + pid->data[axis].I + pid->data[axis].D + pid->data[axis].F;
+                pid->data[axis].P +
+                pid->data[axis].I +
+                pid->data[axis].D +
+                pid->data[axis].F;
             if (axis == 2 && USE_INTEGRATED_YAW) {
                 pid->data[axis].Sum += pidSum * DT() * 100.0f;
                 pid->data[axis].Sum -= pid->data[axis].Sum *
