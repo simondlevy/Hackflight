@@ -93,6 +93,7 @@ static task_t _attitudeTask;
 // PID controller support -----------------------------------------------------
 
 static pid_fun_t _pid_funs[10];
+static pid_controller_t pid_controllers[10];
 static uint8_t   _pid_count;
 
 static void hackflightAddPidController(pid_fun_t fun)
