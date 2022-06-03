@@ -292,11 +292,17 @@ static void ratePidInit(rate_pid_t * pid)
 
 static void ratePidUpdateFoo(
         uint32_t currentTimeUs
+        , demands_t * demands
         , void * data
+        , vehicle_state_t * vstate
+        , bool reset
         )
 {
     (void)currentTimeUs;
     (void)data;
+    (void)demands;
+    (void)vstate;
+    (void)reset;
 }
 
 static void ratePidUpdate(

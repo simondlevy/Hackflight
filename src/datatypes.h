@@ -102,7 +102,10 @@ typedef struct {
 
 typedef void (*pid_fun_t)(
         uint32_t usec
+        , demands_t * demands
         , void * data
+        , vehicle_state_t * vstate
+        , bool reset
         );
 /*
    typedef void (*pid_fun_t)(
