@@ -70,7 +70,6 @@ static bool            _pid_zero_throttle_iterm_reset;
 static rate_pid_t      _ratepid;
 static vehicle_state_t _state;
 
-
 // Attitude task --------------------------------------------------------------
 
 static void task_attitude(uint32_t time)

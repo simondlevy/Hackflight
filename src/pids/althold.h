@@ -38,6 +38,7 @@ void altHoldPidUpdate(
         , bool reset
         )
 {
+    static constexpr float ALTITUDE_MIN   = 1.0;
     static constexpr float Kp             = 7.5e-3;
     static constexpr float Ki             = 0;
     static constexpr float PILOT_VELZ_MAX = 2.5;
@@ -50,34 +51,37 @@ void altHoldPidUpdate(
 
     float  throttle = *(float *)data;
 
-    /*
-    bool gotNewTarget = false;
-
     // NED => ENU
     float altitude = -vstate->z;
 
-    float throttle = 2 * demands->throttle - 1; // [0,1] => [-1,+1]
+    float sthrottle = 2 * throttle - 1; // [0,1] => [-1,+1]
 
     // Is stick demand in deadband?
-    bool inBand = fabs(throttle) < STICK_DEADBAND; 
+    bool inBand = fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
-    // Reset controller when moving into deadband
-    if (inBand && !_inBandPrev) {
-        _errorI = 0;
-        gotNewTarget = true;
-    }
+    // Reset controller when moving into deadband above a minimum altitude
+    bool gotNewTarget = inBand && !_inBandPrev;
+    _errorI = gotNewTarget || reset ? 0 : _errorI;
+        
     _inBandPrev = inBand;
 
     if (reset) {
-        _errorI = 0;
         _altitudeTarget = 0;
     }
+
+    _altitudeTarget = gotNewTarget ? altitude : _altitudeTarget;
+
+    debugPrintf("t=%f  st=%f  a=%f  ib=%d tgt=%f",
+            throttle, sthrottle, altitude, inBand, _altitudeTarget);
 
     // Target velocity is a setpoint inside deadband, scaled
     // constant outside
     float targetVelocity = inBand ?
         _altitudeTarget - altitude :
-        PILOT_VELZ_MAX * throttle;
+        PILOT_VELZ_MAX * sthrottle;
+
+    //if (inBand) debugPrintf("%f: %f  %f  %f",
+    //        throttle, altitude, _altitudeTarget, targetVelocity);
 
     // Compute error as scaled target minus actual
     float error = targetVelocity - vstate->dz;
@@ -87,14 +91,8 @@ void altHoldPidUpdate(
 
     float correction = error * Kp + _errorI * Ki;
 
-    debugPrintf("%d:  %f  %f", inBand, _altitudeTarget, correction);
+    //if (inBand) debugPrintf("%f  %f  %f", altitude, _altitudeTarget, correction);
 
     // Adjust throttle demand based on error
-    demands->throttle -= correction; //((error * Kp + _errorI * Ki) + 1) / 2; // [-1,+1] => [0,1]
-
-    // If we re-entered deadband, we reset the target altitude.
-    if (gotNewTarget) {
-        _altitudeTarget = altitude;
-    }
-    */
+    //demands->throttle += correction; //((error * Kp + _errorI * Ki) + 1) / 2; // [-1,+1] => [0,1]
 }
