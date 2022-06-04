@@ -38,7 +38,7 @@ void altHoldPidUpdate(
         , bool reset
         )
 {
-    static constexpr float Kp             = 7.5e-2;
+    static constexpr float Kp             = 7.5e-3;
     static constexpr float Ki             = 0;
     static constexpr float PILOT_VELZ_MAX = 2.5;
     static constexpr float STICK_DEADBAND = 0.2;
@@ -48,6 +48,9 @@ void altHoldPidUpdate(
     static float _errorI;
     static float _altitudeTarget;
 
+    float  throttle = *(float *)data;
+
+    /*
     bool gotNewTarget = false;
 
     // NED => ENU
@@ -82,13 +85,16 @@ void altHoldPidUpdate(
     // Compute I term, avoiding windup
     _errorI = constrainAbs(_errorI + error, WINDUP_MAX);
 
-    // Adjust throttle demand based on error
-    demands->throttle = ((error * Kp + _errorI * Ki) + 1) / 2; // [-1,+1] => [0,1]
+    float correction = error * Kp + _errorI * Ki;
 
-    debugPrintf("%f", demands->throttle);
+    debugPrintf("%d:  %f  %f", inBand, _altitudeTarget, correction);
+
+    // Adjust throttle demand based on error
+    demands->throttle -= correction; //((error * Kp + _errorI * Ki) + 1) / 2; // [-1,+1] => [0,1]
 
     // If we re-entered deadband, we reset the target altitude.
     if (gotNewTarget) {
         _altitudeTarget = altitude;
     }
+    */
 }

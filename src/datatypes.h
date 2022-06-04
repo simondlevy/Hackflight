@@ -64,10 +64,12 @@ typedef struct {
 } rx_axes_t;
 
 typedef enum rc_alias {
-    ROLL = 0,
+    THROTTLE,
+    ROLL,
     PITCH,
     YAW,
-    THROTTLE
+    AUX1,
+    AUX2
 } rc_alias_e;
 
 typedef enum {

@@ -300,7 +300,7 @@ static void rcSmoothingResetAccumulation(rxSmoothingFilter_t *smoothingFilter)
 // rxPoll
 static void readChannelsApplyRanges(rx_t * rx, float raw[])
 {
-    const uint8_t rcmap[18] = {1, 2, 3, 0, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    const uint8_t rcmap[18] = {0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     rxChannelRangeConfig_t  rxChannelRangeConfigs[4];
 
@@ -318,8 +318,8 @@ static void readChannelsApplyRanges(rx_t * rx, float raw[])
 
         // apply the rx calibration
         if (channel < 4) {
-            //sample = applyRxChannelRangeConfiguraton(sample, rxChannelRangeConfigs(channel));
-            sample = applyRxChannelRangeConfiguraton(sample, &rxChannelRangeConfigs[channel]);
+            sample = applyRxChannelRangeConfiguraton(sample,
+                    &rxChannelRangeConfigs[channel]);
         }
 
         raw[channel] = sample;
@@ -327,7 +327,8 @@ static void readChannelsApplyRanges(rx_t * rx, float raw[])
 }
 
 // rxPoll
-static void detectAndApplySignalLossBehaviour(rx_t * rx, timeUs_t currentTimeUs, float raw[])
+static void detectAndApplySignalLossBehaviour(rx_t * rx, timeUs_t currentTimeUs,
+        float raw[])
 {
     uint32_t currentTimeMs = currentTimeUs/ 1000;
 
@@ -395,9 +396,9 @@ static int16_t lookupThrottle(rx_t * rx, int32_t tmp)
 // rxPoll
 static void updateCommands(rx_t * rx, float raw[])
 {
-    for (int axis = 0; axis < 3; axis++) {
-        // non coupled PID reduction scaler used in PID controller 1 and PID controller 2.
-
+    for (int axis=ROLL; axis<=YAW; axis++) {
+        // non coupled PID reduction scaler used in PID controller 1 and PID
+        // controller 2.
         float tmp = fminf(fabs(raw[axis] - 1500), 500);
         if (axis == ROLL || axis == PITCH) {
             if (tmp > 0) {
@@ -427,7 +428,8 @@ static void updateCommands(rx_t * rx, float raw[])
 }
 
 // rxPoll
-static bool calculateChannelsAndUpdateFailsafe(rx_t * rx, timeUs_t currentTimeUs, float raw[])
+static bool calculateChannelsAndUpdateFailsafe(rx_t * rx, timeUs_t currentTimeUs,
+        float raw[])
 {
     if (rx->auxiliaryProcessingRequired) {
         rx->auxiliaryProcessingRequired = false;
@@ -499,8 +501,9 @@ static void ratePidFeedforwardLpfInit(rate_pid_t * pid, uint16_t filterCutoff)
 {
     if (filterCutoff > 0) {
         pid->feedforwardLpfInitialized = true;
-        for (uint8_t axis = 0; axis <= 2; axis++) {
-            pt3FilterInit(&pid->feedforwardPt3[axis], pt3FilterGain(filterCutoff, DT()));
+        for (uint8_t axis=ROLL; axis<=YAW; axis++) {
+            pt3FilterInit(&pid->feedforwardPt3[axis],
+                    pt3FilterGain(filterCutoff, DT()));
         }
     }
 }
@@ -508,14 +511,15 @@ static void ratePidFeedforwardLpfInit(rate_pid_t * pid, uint16_t filterCutoff)
 static void ratePidFeedforwardLpfUpdate(rate_pid_t * pid, uint16_t filterCutoff)
 {
     if (filterCutoff > 0) {
-        for (uint8_t axis = 0; axis <= 2; axis++) {
+        for (uint8_t axis=ROLL; axis<=YAW; axis++) {
             pt3FilterUpdateCutoff(&pid->feedforwardPt3[axis],
                     pt3FilterGain(filterCutoff, DT()));
         }
     }
 }
 
-static void setSmoothingFilterCutoffs(rate_pid_t * ratepid, rxSmoothingFilter_t *smoothingFilter)
+static void setSmoothingFilterCutoffs(rate_pid_t * ratepid,
+        rxSmoothingFilter_t *smoothingFilter)
 {
     const float dT = GYRO_PERIOD() * 1e-6f;
     uint16_t oldCutoff = smoothingFilter->setpointCutoffFrequency;
@@ -536,7 +540,7 @@ static void setSmoothingFilterCutoffs(rate_pid_t * ratepid, rxSmoothingFilter_t 
     if ((smoothingFilter->setpointCutoffFrequency != oldCutoff) ||
             !smoothingFilter->filterInitialized) {
         for (int i = 0; i < 4; i++) {
-            if (i < THROTTLE) { // Throttle handled by smoothing command
+            if (i != THROTTLE) { // Throttle handled by smoothing command
                 if (!smoothingFilter->filterInitialized) {
                     pt3FilterInit(&smoothingFilter->filter[i],
                             pt3FilterGain(smoothingFilter->setpointCutoffFrequency,
@@ -577,12 +581,14 @@ static void setSmoothingFilterCutoffs(rate_pid_t * ratepid, rxSmoothingFilter_t 
     if (!smoothingFilter->filterInitialized) {
         ratePidFeedforwardLpfInit(ratepid, smoothingFilter->feedforwardCutoffFrequency);
     } else if (smoothingFilter->feedforwardCutoffFrequency != oldCutoff) {
-        ratePidFeedforwardLpfUpdate(ratepid, smoothingFilter->feedforwardCutoffFrequency);
+        ratePidFeedforwardLpfUpdate(ratepid,
+                smoothingFilter->feedforwardCutoffFrequency);
     }
 }
 
 
-static bool rcSmoothingAccumulateSample(rxSmoothingFilter_t *smoothingFilter, int rxFrameTimeUs)
+static bool rcSmoothingAccumulateSample(rxSmoothingFilter_t *smoothingFilter,
+        int rxFrameTimeUs)
 {
     smoothingFilter->trainingSum += rxFrameTimeUs;
     smoothingFilter->trainingCount++;
@@ -644,9 +650,10 @@ static void processSmoothingFilter(
         rx->smoothingFilter.throttleCutoffFrequency =
             rx->smoothingFilter.throttleCutoffSetting;
         if (rx->smoothingFilter.ffCutoffSetting == 0) {
-            // calculate and use an initial derivative cutoff until the RC interval is known
-            const float cutoffFactor =
-                1.5f / (1.0f + (rx->smoothingFilter.autoSmoothnessFactorSetpoint / 10.0f));
+            // calculate and use an initial derivative cutoff until the RC
+            // interval is known
+            const float cutoffFactor = 1.5f /
+                (1.0f + (rx->smoothingFilter.autoSmoothnessFactorSetpoint / 10.0f));
             float ffCutoff = RC_SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
             rx->smoothingFilter.feedforwardCutoffFrequency = lrintf(ffCutoff);
         } else {
@@ -697,8 +704,10 @@ static void processSmoothingFilter(
                         // by more than the limit percentage.
                         if (rx->smoothingFilter.filterInitialized) {
                             const float percentChange =
-                                fabs((rx->refreshPeriod - rx->smoothingFilter.averageFrameTimeUs) /
-                                        (float)rx->smoothingFilter.averageFrameTimeUs) * 100;
+                                fabs((rx->refreshPeriod -
+                                            rx->smoothingFilter.averageFrameTimeUs) /
+                                        (float)rx->smoothingFilter.averageFrameTimeUs) *
+                                100;
                             if (percentChange < RC_SMOOTHING_RX_RATE_CHANGE_PERCENT) {
                                 // We received a sample that wasn't more than
                                 // the limit percent so reset the accumulation
@@ -925,7 +934,8 @@ bool rxCheck(timeUs_t currentTimeUs)
         _rx.dataProcessingRequired = true;
     }
 
-    return _rx.dataProcessingRequired || _rx.auxiliaryProcessingRequired; // data driven or 50Hz
+    // data driven or 50Hz
+    return _rx.dataProcessingRequired || _rx.auxiliaryProcessingRequired; 
 }
 
 void rxPoll(
@@ -967,17 +977,18 @@ void rxPoll(
         case RX_STATE_UPDATE:
             _rx.gotNewData = true;
             updateCommands(&_rx, _rx.raw);
-            rxUpdateArmingStatus(currentTimeUs, _rx.raw, imuIsLevel, calibrating, *armed);
+            rxUpdateArmingStatus(currentTimeUs, _rx.raw, imuIsLevel, calibrating,
+                    *armed);
             _rx.state = RX_STATE_CHECK;
             break;
     }
 
-    rxax->demands.throttle = _rx.raw[3];
-    rxax->demands.roll     = _rx.raw[0];
-    rxax->demands.pitch    = _rx.raw[1];
-    rxax->demands.yaw      = _rx.raw[2];
-    rxax->aux1             = _rx.raw[4];
-    rxax->aux2             = _rx.raw[5];
+    rxax->demands.throttle = _rx.raw[THROTTLE];
+    rxax->demands.roll     = _rx.raw[ROLL];
+    rxax->demands.pitch    = _rx.raw[PITCH];
+    rxax->demands.yaw      = _rx.raw[YAW];
+    rxax->aux1             = _rx.raw[AUX1];
+    rxax->aux2             = _rx.raw[AUX2];
 
     *gotNewData = _rx.gotNewData;
 }
@@ -990,7 +1001,7 @@ void rxGetDemands(timeUs_t currentTimeUs, rate_pid_t * ratepid, demands_t * dema
 
     if (_rx.gotNewData) {
 
-        for (int axis = 0; axis <= 2; axis++) {
+        for (int axis=ROLL; axis<=YAW; axis++) {
 
             _rx.oldRcCommand[axis] = _rx.command[axis];
 
@@ -998,7 +1009,7 @@ void rxGetDemands(timeUs_t currentTimeUs, rate_pid_t * ratepid, demands_t * dema
 
             // scale _rx.commandf to range [-1.0, 1.0]
             float commandf;
-            if (axis == 2) {
+            if (axis == YAW) {
                 commandf = _rx.command[axis] / YAW_COMMAND_DIVIDER;
             } else {
                 commandf = _rx.command[axis] / COMMAND_DIVIDER;
@@ -1008,19 +1019,21 @@ void rxGetDemands(timeUs_t currentTimeUs, rate_pid_t * ratepid, demands_t * dema
 
             angleRate = rxApplyRates(commandf, commandfAbs);
 
-            rawSetpoint[axis] = constrainf(angleRate, -1.0f * RATE_LIMIT, 1.0f * RATE_LIMIT);
+            rawSetpoint[axis] =
+                constrainf(angleRate, -1.0f * RATE_LIMIT, 1.0f * RATE_LIMIT);
         }
     }
 
     processSmoothingFilter(currentTimeUs, &_rx, ratepid, setpointRate, rawSetpoint);
 
-    // Find min and max throttle based on conditions. Throttle has to be known before mixing
+    // Find min and max throttle based on conditions. Throttle has to be known
+    // before mixing
     demands->throttle =
-        constrainf((_rx.command[3] - PWM_MIN) / (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
+        constrainf((_rx.command[THROTTLE] - PWM_MIN) / (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
     
-    demands->roll  = setpointRate[0];
-    demands->pitch = setpointRate[1];
-    demands->yaw   = setpointRate[2];
+    demands->roll  = setpointRate[ROLL];
+    demands->pitch = setpointRate[PITCH];
+    demands->yaw   = setpointRate[YAW];
 
     _rx.gotNewData = false;
 }
