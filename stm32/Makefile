@@ -123,6 +123,7 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             board.c \
+            main.c \
             $(IMPL_DIR)/accel.c \
             $(IMPL_DIR)/arming.c \
             $(IMPL_DIR)/debug.c \
@@ -131,7 +132,6 @@ COMMON_SRC = \
             $(IMPL_DIR)/hackflight.c \
             $(IMPL_DIR)/imu.c \
             $(IMPL_DIR)/led.c \
-            $(IMPL_DIR)/main.c \
             $(IMPL_DIR)/maths.c \
             $(IMPL_DIR)/msp.c \
             $(IMPL_DIR)/rx.c \
@@ -215,6 +215,7 @@ CFLAGS     += $(ARCH_FLAGS) \
               $(addprefix -I,$(INCLUDE_DIRS)) \
               -std=gnu11 \
               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
+			  -Wno-unused-function \
               -ffunction-sections \
               -fdata-sections \
               -fno-common \
