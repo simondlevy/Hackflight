@@ -300,8 +300,6 @@ static void rcSmoothingResetAccumulation(rxSmoothingFilter_t *smoothingFilter)
 // rxPoll
 static void readChannelsApplyRanges(rx_t * rx, float raw[])
 {
-    const uint8_t rcmap[18] = {0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
     rxChannelRangeConfig_t  rxChannelRangeConfigs[4];
 
     for (uint8_t i=0; i<4; ++i) {
@@ -309,12 +307,10 @@ static void readChannelsApplyRanges(rx_t * rx, float raw[])
         rxChannelRangeConfigs[i].max = PWM_MAX;
     }
 
-    for (int channel = 0; channel < 18; channel++) {
-
-        const uint8_t rawChannel = channel < 8 ? rcmap[channel] : channel;
+    for (uint8_t channel=0; channel<18; ++channel) {
 
         // sample the channel
-        float sample = rxDevConvertValue(rx->channelData, rawChannel);
+        float sample = rxDevConvertValue(rx->channelData, channel);
 
         // apply the rx calibration
         if (channel < 4) {
