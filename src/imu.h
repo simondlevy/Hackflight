@@ -56,6 +56,8 @@ void imuAccelTask(uint32_t time);
 
 void imuAccumulateGyro(float * adcf);
 
+void imuGetEulerAngles(timeUs_t time, vehicle_state_t * vstate, bool armed);
+
 void imuGetQuaternion(uint32_t time, bool armed, quaternion_t * quat);
 
 void imuInit(void);

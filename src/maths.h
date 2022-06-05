@@ -55,7 +55,17 @@ static inline float constrainf(float amt, float low, float high)
         return amt;
 }
 
-void alignSensorViaRotation(float *dest);
+static void alignSensorViaRotation(float *dest)
+{
+    const float x = dest[0];
+    const float y = dest[1];
+    const float z = dest[2];
+
+    // 270 degrees
+    dest[0] = -y;
+    dest[1] = x;
+    dest[2] = z;
+}
 
 #if defined(__cplusplus)
 }

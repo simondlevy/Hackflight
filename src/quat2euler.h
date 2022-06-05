@@ -50,18 +50,6 @@ static void quat2euler(quaternion_t * quat, vehicle_state_t * state, rotation_t 
     rot->r22 = r22;
 }
 
-void alignSensorViaRotation(float *dest)
-{
-    const float x = dest[0];
-    const float y = dest[1];
-    const float z = dest[2];
-
-    // 270 degrees
-    dest[0] = -y;
-    dest[1] = x;
-    dest[2] = z;
-}
-
 #if defined(__cplusplus)
 }
 #endif

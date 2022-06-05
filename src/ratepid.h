@@ -267,7 +267,7 @@ static float pidLevel(float currentSetpoint, float currentAngle)
     float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
     angle = constrainf(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
     float errorAngle = angle - (currentAngle / 10);
-    return currentSetpoint; // errorAngle * KP_LEVEL / 10;
+    return errorAngle * LEVEL_P / 10;
 }
 
 // ==================================================================================
@@ -349,6 +349,7 @@ static void ratePidInit(rate_pid_t * pid)
         float pidSetpoints[3] = { demands->roll, demands->pitch, demands->yaw };
         float currentAngles[3] = { vstate->phi, vstate->theta, vstate->psi };
 
+
         // ----------PID controller----------
         for (uint8_t axis = 0; axis <= 2; ++axis) {
 
@@ -359,7 +360,7 @@ static void ratePidInit(rate_pid_t * pid)
                 currentPidSetpoint = accelerationLimit(pid, axis, currentPidSetpoint);
             }
 
-            if (axis != 2) {
+            if (axis == 0/*!= 2*/) {
                 currentPidSetpoint = pidLevel(currentPidSetpoint, currentAngles[axis]);
             }
 

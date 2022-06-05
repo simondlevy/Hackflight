@@ -74,17 +74,7 @@ static vehicle_state_t _state;
 
 static void task_attitude(uint32_t time)
 {
-    (void)time;
-
-    quaternion_t quat = {0};
-
-    imuGetQuaternion(time, _armed, &quat);
-
-    rotation_t rot = {0};
-
-    quat2euler(&quat, &_state, &rot);
-
-    imuUpdateFusion(time, &quat, &rot);
+    imuGetEulerAngles(time, &_state, _armed);
 }
 
 static task_t _attitudeTask;

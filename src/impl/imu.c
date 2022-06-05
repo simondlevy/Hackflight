@@ -27,6 +27,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "gyro.h"
 #include "imu.h"
 #include "maths.h"
+#include "quat2euler.h"
 #include "time.h"
 #include "utils.h"
 
@@ -215,6 +216,19 @@ void imuAccumulateGyro(float * adcf)
     }
 }
 
+void imuGetEulerAngles(timeUs_t time, vehicle_state_t * vstate, bool armed)
+{
+    quaternion_t quat = {0};
+
+    imuGetQuaternion(time, armed, &quat);
+
+    rotation_t rot = {0};
+
+    quat2euler(&quat, vstate, &rot);
+
+    imuUpdateFusion(time, &quat, &rot);
+}
+
 void imuGetQuaternion(uint32_t time, bool armed, quaternion_t * quat)
 {
     imu_fusion_t fusion = {0};
@@ -232,8 +246,8 @@ void imuGetQuaternion(uint32_t time, bool armed, quaternion_t * quat)
     float dt = deltaT * 1e-6;
 
     gyro_reset_t new_gyro_reset = {0};
-    bool resetActive1 = checkReset(time, useAcc, &gyroAvg, armed, &_fusion_prev.gyroReset,
-            &new_gyro_reset);
+    bool resetActive1 = checkReset(time, useAcc, &gyroAvg, armed,
+            &_fusion_prev.gyroReset, &new_gyro_reset);
 
     bool resetActive = armed ?  false : resetActive1;
 
@@ -244,7 +258,8 @@ void imuGetQuaternion(uint32_t time, bool armed, quaternion_t * quat)
     // Scale the kP to generally converge faster when disarmed.
     float kpgain = resetActive ? ATTITUDE_RESET_KP_GAIN : DCM_KP * (!armed ? 10 : 1);
 
-    mahony(dt, &gyroAvg, &accelAvg, useAcc, kpgain, &_fusion_prev.rot, &_fusion_prev.quat, quat);
+    mahony(dt, &gyroAvg, &accelAvg, useAcc, kpgain,
+            &_fusion_prev.rot, &_fusion_prev.quat, quat);
 }
 
 void imuUpdateFusion(timeUs_t time, quaternion_t * quat, rotation_t * rot)
