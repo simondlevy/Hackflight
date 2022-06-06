@@ -309,11 +309,11 @@ extern "C" {
     }
 
     static void anglePidUpdate(
-            uint32_t currentTimeUs
-            , demands_t * demands
-            , void * data
-            , vehicle_state_t * vstate
-            , bool reset
+            uint32_t currentTimeUs,
+            demands_t * demands,
+            void * data,
+            vehicle_state_t * vstate,
+            bool reset
             )
     {
         angle_pid_t * pid = (angle_pid_t *)data;

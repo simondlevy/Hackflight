@@ -1,20 +1,20 @@
 /*
-Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2022 Simon D. Levy
 
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -52,17 +52,17 @@ typedef struct {
 extern "C" {
 #endif
 
-void imuAccelTask(uint32_t time);
+    void imuAccelTask(uint32_t time);
 
-void imuAccumulateGyro(float * adcf);
+    void imuAccumulateGyro(float * adcf);
 
-void imuGetEulerAngles(timeUs_t time, vehicle_state_t * vstate, bool armed);
+    void imuGetEulerAngles(timeUs_t time, vehicle_state_t * vstate, bool armed);
 
-void imuGetQuaternion(uint32_t time, bool armed, quaternion_t * quat);
+    void imuGetQuaternion(uint32_t time, bool armed, quaternion_t * quat);
 
-void imuInit(void);
+    void imuInit(void);
 
-void imuUpdateFusion(timeUs_t time, quaternion_t * quat, rotation_t * rot);
+    void imuUpdateFusion(timeUs_t time, quaternion_t * quat, rotation_t * rot);
 
 #if defined(__cplusplus)
 }

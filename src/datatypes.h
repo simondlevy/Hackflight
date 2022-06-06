@@ -1,27 +1,30 @@
 /*
-   Copyright (c) 2022 Simon D. Levy
+Copyright (c) 2022 Simon D. Levy
 
-   This file is part of Hackflight.
+This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+Hackflight is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along with
-   Hackflight. If not, see <https://www.gnu.org/licenses/>.
- */
+You should have received a copy of the GNU General Public License along with
+Hackflight. If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "pids/angle_struct.h"
+
 typedef uint32_t timeUs_t;
+
 typedef int32_t timeDelta_t;
 
 typedef struct {
@@ -106,11 +109,17 @@ typedef struct {
 } vehicle_state_t;
 
 typedef void (*pid_fun_t)(
+        uint32_t usec,
+        demands_t * demands,
+        void * data,
+        vehicle_state_t * vstate,
+        bool reset
+        );
+
+
+typedef void (*task_fun_t)(
+        void * hackflight,
         uint32_t usec
-        , demands_t * demands
-        , void * data
-        , vehicle_state_t * vstate
-        , bool reset
         );
 
 typedef struct {
@@ -118,10 +127,11 @@ typedef struct {
     void * data;
 } pid_controller_t;
 
+
 typedef struct {
 
     // For both hardware and sim implementations
-    void (*fun)(uint32_t time);
+    void (*fun)(void * hackflight, uint32_t time);
     timeDelta_t desiredPeriodUs;        // target period of execution
     timeUs_t lastExecutedAtUs;          // last time of invocation
 
@@ -135,19 +145,19 @@ typedef struct {
 
 typedef struct {
 
-    //angle_pid_t      anglepid;
+    angle_pid_t      anglepid;
     bool             armed;
-    //task_t           attitudeTask;
-    //demands_t        demands;
+    task_t           attitudeTask;
+    demands_t        demands;
     bool             gyro_is_calibrating;
     float            mspmotors[4];
     pid_controller_t pid_controllers[10];
     uint8_t          pid_count;
     bool             pid_zero_throttle_iterm_reset;
-    //task_t           rxTask;
-    //rx_axes_t        rx_axes;
-    //task_t           sensor_tasks[20];
+    task_t           rxTask;
+    rx_axes_t        rx_axes;
+    task_t           sensor_tasks[20];
     uint8_t          sensor_task_count;
-    //vehicle_state_t  state;
+    vehicle_state_t  state;
 
 } hackflight_t;
