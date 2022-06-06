@@ -33,24 +33,6 @@
 #include "rx.h"
 #include "time.h"
 
-// Task structure --------------------------------------------------------------
-
-typedef struct {
-
-
-    // For both hardware and sim implementations
-    void (*fun)(uint32_t time);
-    timeDelta_t desiredPeriodUs;        // target period of execution
-    timeUs_t lastExecutedAtUs;          // last time of invocation
-
-    // For hardware impelmentations
-    uint16_t dynamicPriority;           // when last executed, to avoid task starvation
-    uint16_t taskAgeCycles;
-    timeUs_t lastSignaledAtUs;          // time of invocation event for event-driven tasks
-    timeUs_t anticipatedExecutionTime;  // Fixed point expectation of next execution time
-
-} task_t;
-
 // Arming safety  -------------------------------------------------------------
 
 static const float MAX_ARMING_ANGLE = 25;
