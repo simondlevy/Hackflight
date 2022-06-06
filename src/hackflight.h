@@ -65,7 +65,7 @@ static void task_rx(void * hackflight, uint32_t time)
 {
     hackflight_t * hf = (hackflight_t *)hackflight;
 
-    bool calibrating = hf->gyro_is_calibrating; // || acc.calibrating != 0;
+    bool calibrating = hf->gyroIsCalibrating; // || acc.calibrating != 0;
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
@@ -101,7 +101,7 @@ static void task_rx(void * hackflight, uint32_t time)
 
 static void hackflightRunCoreTasks(hackflight_t * hf)
 {
-    gyroReadScaled(&hf->vstate, &hf->gyro_is_calibrating);
+    gyroReadScaled(hf);
 
     timeUs_t currentTimeUs = timeMicros();
 

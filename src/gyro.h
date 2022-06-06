@@ -34,7 +34,7 @@ extern "C" {
 
 // For both hardware and sim implementations -----------------------------------------
 
-void gyroReadScaled(vehicle_state_t * state, bool * isCalibrating);
+void gyroReadScaled(hackflight_t * hf);
 
 #if defined(__cplusplus)
 }

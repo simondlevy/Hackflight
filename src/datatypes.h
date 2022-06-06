@@ -157,7 +157,7 @@ typedef struct {
     bool             armed;
     task_t           attitudeTask;
     demands_t        demands;
-    bool             gyro_is_calibrating;
+    bool             gyroIsCalibrating;
     float            mspmotors[4];
     pid_controller_t pid_controllers[10];
     uint8_t          pid_count;

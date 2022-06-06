@@ -266,10 +266,10 @@ void gyroInit(void)
 }
 
 
-void gyroReadScaled(vehicle_state_t * state, bool * isCalibrating)
+void gyroReadScaled(hackflight_t * hf)
 {
     if (gyroIsReady()) {
-        gyroUpdate(state, isCalibrating);
+        gyroUpdate(&hf->vstate, &hf->gyroIsCalibrating);
     }
 }
 
