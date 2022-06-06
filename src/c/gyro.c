@@ -32,11 +32,6 @@ extern "C" {
     static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
     static const uint16_t LPF2_STATIC_HZ                 = 500;
 
-    enum {
-        FILTER_LPF1 = 0,
-        FILTER_LPF2
-    };
-
     typedef union {
         pt1Filter_t pt1FilterState;
         biquadFilter_t biquadFilterState;

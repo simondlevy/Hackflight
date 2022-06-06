@@ -191,6 +191,11 @@ typedef struct {
 
 // Filters ----------------------------------------------------------------------
 
+enum {
+    FILTER_LPF1 = 0,
+    FILTER_LPF2
+};
+
 typedef enum {
     FILTER_LPF,    // 2nd order Butterworth section
     FILTER_NOTCH,
