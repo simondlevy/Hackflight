@@ -28,8 +28,8 @@
 #include "maths.h"
 #include "mixer.h"
 #include "motor.h"
+#include "pids/angle.h"
 #include "quat2euler.h"
-#include "ratepid.h"
 #include "rx.h"
 #include "time.h"
 
@@ -67,7 +67,7 @@ static demands_t       _demands;
 static bool            _gyro_is_calibrating;
 static float           _mspmotors[4];
 static bool            _pid_zero_throttle_iterm_reset;
-static rate_pid_t      _ratepid;
+static rate_pid_t      _anglepid;
 static vehicle_state_t _state;
 
 // Attitude task --------------------------------------------------------------
@@ -138,7 +138,7 @@ static void hackflightRunCoreTasks(void)
 
     timeUs_t currentTimeUs = timeMicros();
 
-    rxGetDemands(currentTimeUs, &_ratepid, &_demands);
+    rxGetDemands(currentTimeUs, &_anglepid, &_demands);
 
     for (uint8_t k=0; k<_pid_count; ++k) {
         pid_controller_t pid = _pid_controllers[k];
@@ -174,9 +174,9 @@ static void hackflightAddSensor(void (*fun)(uint32_t time), uint32_t rate)
 
 static void hackflightInit(void)
 {
-    ratePidInit(&_ratepid);
+    anglePidInit(&_anglepid);
 
-    hackflightAddPidController(ratePidUpdate, &_ratepid);
+    hackflightAddPidController(anglePidUpdate, &_anglepid);
 
     initTask(&_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
     initTask(&_rxTask,  task_rx,  RX_TASK_RATE);

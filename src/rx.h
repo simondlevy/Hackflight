@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#include "ratepid_struct.h"
+#include "pids/angle_pid_struct.h"
 #include "time.h"
 
 #if defined(__cplusplus)

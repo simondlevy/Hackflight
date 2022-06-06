@@ -35,7 +35,7 @@
 #include "filter_pt3.h"
 #include "gyro.h"
 #include "maths.h"
-#include "ratepid_struct.h"
+#include "angle_pid_struct.h"
 #include "rx_rates.h"
 #include "sensors.h"
 #include "time.h"
@@ -272,7 +272,7 @@ static float levelPid(float currentSetpoint, float currentAngle)
 
 // ==================================================================================
 
-static void ratePidInit(rate_pid_t * pid)
+static void anglePidInit(rate_pid_t * pid)
 {
     // to allow an initial zero throttle to set the filter cutoff
     pid->dynLpfPreviousQuantizedThrottle = -1;  
@@ -310,7 +310,7 @@ static void ratePidInit(rate_pid_t * pid)
         }
     }
 
-    static void ratePidUpdate(
+    static void anglePidUpdate(
             uint32_t currentTimeUs
             , demands_t * demands
             , void * data
