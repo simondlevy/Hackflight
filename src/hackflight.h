@@ -155,6 +155,7 @@ static void hackflightAddSensor(void (*fun)(uint32_t time), uint32_t rate)
 // Initialization -------------------------------------------------------------
 
 static void hackflightInit(
+        hackflight_t * hf,
         float rate_p,
         float rate_i,
         float rate_d,
@@ -162,6 +163,8 @@ static void hackflightInit(
         float level_p
         )
 {
+    (void)hf;
+
     anglePidInit(&_anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
 
     hackflightAddPidController(anglePidUpdate, &_anglepid);
