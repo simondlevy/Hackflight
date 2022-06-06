@@ -21,6 +21,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "datatypes.h"
 #include "filter.h"
 #include "maths.h"
 #include "utils.h"
