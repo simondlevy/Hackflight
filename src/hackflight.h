@@ -73,6 +73,13 @@ static void hackflightAddPidController(pid_fun_t fun, void * data)
     _pid_count++;
 }
 
+static void hackflightAddPidController2(hackflight_t * hf, pid_fun_t fun, void * data)
+{
+    hf->pid_controllers[hf->pid_count].fun = fun;
+    hf->pid_controllers[hf->pid_count].data = data;
+    hf->pid_count++;
+}
+
 // RX polling task ------------------------------------------------------------
 
 static task_t    _rxTask;
@@ -155,7 +162,7 @@ static void hackflightAddSensor(void (*fun)(uint32_t time), uint32_t rate)
 // Initialization -------------------------------------------------------------
 
 static void hackflightInit(
-        hackflight_t * hackflight,
+        hackflight_t * hf,
         float rate_p,
         float rate_i,
         float rate_d,
@@ -163,10 +170,8 @@ static void hackflightInit(
         float level_p
         )
 {
-    (void)hackflight;
-
     anglePidInit(&_anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
-    anglePidInit(&hackflight->anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
+    anglePidInit(&hf->anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
 
     hackflightAddPidController(anglePidUpdate, &_anglepid);
 
