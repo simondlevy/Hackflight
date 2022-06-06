@@ -23,31 +23,6 @@
 
 #include "datatypes.h"
 
-
-typedef struct pt1Filter_s {
-    float state;
-    float k;
-} pt1Filter_t;
-
-typedef struct {
-    float state;
-    float state1;
-    float k;
-} pt2Filter_t;
-
-typedef struct {
-    float state;
-    float state1;
-    float state2;
-    float k;
-} pt3Filter_t;
-
-typedef struct {
-    float b0, b1, b2, a1, a2;
-    float x1, x2, y1, y2;
-    float weight;
-} biquadFilter_t;
-
 static float pt1FilterApply(pt1Filter_t *filter, float input)
 {
     filter->state = filter->state + filter->k * (input - filter->state);

@@ -21,8 +21,33 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "filter.h"
 #include "time.h"
+
+// Filtering ------------------------------------------------------------------
+
+typedef struct pt1Filter_s {
+    float state;
+    float k;
+} pt1Filter_t;
+
+typedef struct {
+    float state;
+    float state1;
+    float k;
+} pt2Filter_t;
+
+typedef struct {
+    float state;
+    float state1;
+    float state2;
+    float k;
+} pt3Filter_t;
+
+typedef struct {
+    float b0, b1, b2, a1, a2;
+    float x1, x2, y1, y2;
+    float weight;
+} biquadFilter_t;
 
 // PID control ----------------------------------------------------------------
 
