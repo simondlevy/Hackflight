@@ -88,7 +88,7 @@ static const uint8_t RATE_I = 80;
 static const uint8_t RATE_D = 40;
 static const uint8_t RATE_F = 120;
 
-static const uint8_t LEVEL_P = 30;
+static const uint8_t LEVEL_P = 0;//30;
 
 static CONST float FREQUENCY() {return 1.0f / DT(); }
 
@@ -267,7 +267,7 @@ static float levelPid(float currentSetpoint, float currentAngle)
     float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
     angle = constrainf(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
     float errorAngle = angle - (currentAngle / 10);
-    return errorAngle * LEVEL_P / 10;
+    return LEVEL_P > 0 ? errorAngle * LEVEL_P / 10 : currentSetpoint;
 }
 
 // ==================================================================================
