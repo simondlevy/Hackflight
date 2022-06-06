@@ -20,16 +20,22 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 
 #include <accel.h>
+#include <datatypes.h>
 #include <imu.h>
 
-void hackflightFullInit(void (*accel_fun)(uint32_t time), uint32_t accel_rate);
+void hackflightFullInit(
+        hackflight_t * hackflight,
+        void (*accel_fun)(uint32_t time),
+        uint32_t accel_rate);
 
 void hackflightStep(void);
 
 int main(void)
 {
+    hackflight_t hackflight;
+
     // STM32 boards have traditional accel/gyro combo
-    hackflightFullInit(imuAccelTask, ACCEL_RATE);
+    hackflightFullInit(&hackflight, imuAccelTask, ACCEL_RATE);
 
     while (true) {
         hackflightStep();
