@@ -157,6 +157,7 @@ extern "C" {
     }
 
     static void checkCoreTasks(
+            hackflight_t * hf,
             int32_t schedLoopRemainingCycles,
             uint32_t nowCycles,
             uint32_t nextTargetCycles)
@@ -170,7 +171,7 @@ extern "C" {
             schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
         }
 
-        hackflightRunCoreTasks();
+        hackflightRunCoreTasks(hf);
 
         // CPU busy
         if (cmpTimeCycles(_nextTimingCycles, nowCycles) < 0) {
@@ -355,10 +356,8 @@ extern "C" {
         _desiredPeriodCycles = GYRO_PERIOD();
     }
 
-    void hackflightStep(hackflight_t * hackflight)
+    void hackflightStep(hackflight_t * hf)
     {
-        (void)hackflight;
-
         // Realtime gyro/filtering/PID tasks get complete priority
         uint32_t nowCycles = systemGetCycleCounter();
 
@@ -384,7 +383,7 @@ extern "C" {
 
         // Once close to the timing boundary, poll for its arrival
         if (schedLoopRemainingCycles < _schedLoopStartCycles) {
-            checkCoreTasks(schedLoopRemainingCycles, nowCycles, nextTargetCycles);
+            checkCoreTasks(hf, schedLoopRemainingCycles, nowCycles, nextTargetCycles);
         }
 
         schedLoopRemainingCycles =
