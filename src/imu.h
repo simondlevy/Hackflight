@@ -52,7 +52,7 @@ typedef struct {
 extern "C" {
 #endif
 
-    void imuAccelTask(uint32_t time);
+    void imuAccelTask(void * hackflight, uint32_t time);
 
     void imuAccumulateGyro(float * adcf);
 

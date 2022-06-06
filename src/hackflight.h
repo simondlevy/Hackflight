@@ -155,3 +155,14 @@ static void hackflightInit(
 
     rxDevInit();
 }
+
+// Hardare version -------------------------------------------------------------
+
+void hackflightFullInit(
+        hackflight_t * hackflight,
+        task_fun_t accelFun,
+        uint32_t accel_rate);
+
+void hackflightStep(hackflight_t * hackflight);
+
+

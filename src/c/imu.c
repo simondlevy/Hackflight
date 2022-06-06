@@ -194,9 +194,11 @@ static imu_fusion_t _fusion_prev = {
     {0, 0, false}   // gyroReset quietPeriodEnd, resetTimeEnd, resetCompleted
 };
 
-void imuAccelTask(uint32_t time)
+void imuAccelTask(void * hackflight, uint32_t time)
 {
     (void)time;
+    (void)hackflight;
+
     accelUpdate(&_accel_accum);
 }
 
