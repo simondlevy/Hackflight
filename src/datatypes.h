@@ -172,6 +172,23 @@ typedef struct {
     int m_n;
 } stdev_t;
 
+typedef enum {
+    FILTER_LPF,    // 2nd order Butterworth section
+    FILTER_NOTCH,
+    FILTER_BPF,
+} biquadFilterType_e;
+
+typedef enum {
+    FILTER_PT1 = 0,
+    FILTER_BIQUAD,
+    FILTER_PT2,
+    FILTER_PT3,
+} lowpassFilterType_e;
+
+struct filter_s;
+typedef struct filter_s filter_t;
+typedef float (*filterApplyFnPtr)(filter_t *filter, float input);
+
 typedef struct {
 
     imu_sensor_t     accelAccum;
