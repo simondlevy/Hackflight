@@ -19,6 +19,7 @@
 #pragma once
 
 #include "datatypes.h"
+#include "althold_struct.h"
 
 static bool inBand(float value, float band) 
 {
@@ -30,7 +31,12 @@ static float constrainAbs(float v, float lim)
     return v < -lim ? -lim : v > +lim ? +lim : v;
 }
 
-void altHoldPidUpdate(
+static void altHoldPidInit(alt_hold_pid_t * pid, float * rawThrottle)
+{
+    pid->rawThrottle = rawThrottle;
+}
+
+static void altHoldPidUpdate(
         uint32_t currentTimeUs
         , demands_t * demands
         , void * data

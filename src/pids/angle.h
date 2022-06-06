@@ -35,7 +35,7 @@
 #include "filter_pt3.h"
 #include "gyro.h"
 #include "maths.h"
-#include "angle_pid_struct.h"
+#include "angle_struct.h"
 #include "rx_rates.h"
 #include "sensors.h"
 #include "time.h"
