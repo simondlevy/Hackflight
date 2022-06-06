@@ -20,8 +20,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 
-#include "datatypes.h"
-
 typedef struct fp_rotationMatrix_s {
     float m[3][3];              // matrix
 } fp_rotationMatrix_t;
