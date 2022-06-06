@@ -23,6 +23,9 @@
 
 typedef struct {
 
+    float kp;
+    float ki;
+
     float * rawThrottle;
 
-} alt_hold_pid_t;
+} alt_pid_t;

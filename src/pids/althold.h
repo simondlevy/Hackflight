@@ -31,8 +31,14 @@ static float constrainAbs(float v, float lim)
     return v < -lim ? -lim : v > +lim ? +lim : v;
 }
 
-static void altHoldPidInit(alt_hold_pid_t * pid, float * rawThrottle)
+static void altHoldPidInit(
+        alt_pid_t * pid,
+        const float kp,
+        const float ki,
+        float * rawThrottle)
 {
+    pid->kp = kp;
+    pid->ki = ki;
     pid->rawThrottle = rawThrottle;
 }
 
@@ -45,8 +51,6 @@ static void altHoldPidUpdate(
         )
 {
     static constexpr float ALTITUDE_MIN   = 1.0;
-    static constexpr float Kp             = 0.75;
-    static constexpr float Ki             = 1.5;
     static constexpr float PILOT_VELZ_MAX = 2.5;
     static constexpr float STICK_DEADBAND = 0.2;
     static constexpr float WINDUP_MAX     = 0.4;
@@ -55,7 +59,8 @@ static void altHoldPidUpdate(
     static float _errorI;
     static float _altitudeTarget;
 
-    float  throttle = *(float *)data;
+    alt_pid_t * pid = (alt_pid_t *)data;
+    float  throttle = *(pid->rawThrottle);
 
     // NED => ENU
     float altitude = vstate->z;
@@ -89,7 +94,7 @@ static void altHoldPidUpdate(
     // Compute I term, avoiding windup
     _errorI = constrainAbs(_errorI + error, WINDUP_MAX);
 
-    float correction = error * Kp + _errorI * Ki;
+    float correction = error * pid->kp + _errorI * pid->ki;
 
     // Adjust throttle demand based on error
     demands->throttle += correction;
