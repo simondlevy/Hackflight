@@ -149,6 +149,8 @@ typedef struct {
     pid_controller_t pid_controllers[10];
     uint8_t          pid_count;
     bool             pid_zero_throttle_iterm_reset;
+    task_t           rxTask;
+    rx_axes_t        rx_axes;
     task_t           sensor_tasks[20];
     uint8_t          sensor_task_count;
     vehicle_state_t  state;

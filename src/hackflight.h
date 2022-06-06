@@ -185,6 +185,7 @@ static void hackflightInit(
     initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
 
     initTask(&_rxTask,  task_rx,  RX_TASK_RATE);
+    initTask(&hf->rxTask,  task_rx,  RX_TASK_RATE);
 
     rxDevInit();
 }
