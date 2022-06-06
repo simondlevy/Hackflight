@@ -131,6 +131,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
     timeUs_t currentTimeUs = timeMicros();
 
     rxGetDemands(currentTimeUs, &_anglepid, &_demands);
+    rxGetDemands(currentTimeUs, &hf->anglepid, &hf->demands);
 
     for (uint8_t k=0; k<_pid_count; ++k) {
         pid_controller_t pid = _pid_controllers[k];
