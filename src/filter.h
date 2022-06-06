@@ -58,4 +58,11 @@ static void pt1FilterInit(pt1Filter_t *filter, float k)
     filter->k = k;
 }
 
-
+// rx.c, ratepid.h
+static float pt3FilterApply(pt3Filter_t *filter, float input)
+{
+    filter->state1 = filter->state1 + filter->k * (input - filter->state1);
+    filter->state2 = filter->state2 + filter->k * (filter->state1 - filter->state2);
+    filter->state = filter->state + filter->k * (filter->state2 - filter->state);
+    return filter->state;
+}

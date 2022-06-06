@@ -27,7 +27,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dt.h"
 #include "failsafe.h"
 #include "filter.h"
-#include "filter_pt3.h"
 #include "led.h"
 #include "maths.h"
 #include "motor.h"

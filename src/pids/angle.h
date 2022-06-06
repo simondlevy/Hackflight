@@ -31,7 +31,6 @@
 #include "dt.h"
 #include "filter.h"
 #include "filter_impl.h"
-#include "filter_pt3.h"
 #include "gyro.h"
 #include "maths.h"
 #include "angle_struct.h"
