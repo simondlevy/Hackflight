@@ -55,4 +55,4 @@ typedef struct {
     pt1Filter_t    ptermYawLowpass;
     pt1Filter_t    windupLpf[3];
 
-} rate_pid_t;
+} angle_pid_t;

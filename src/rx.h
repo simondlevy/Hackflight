@@ -31,7 +31,7 @@ extern "C" {
 
     void rxDevInit(void);
 
-    void rxGetDemands(timeUs_t currentTimeUs, rate_pid_t * ratepid, demands_t * demands);
+    void rxGetDemands(timeUs_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands);
 
     void rxPoll(
             timeUs_t currentTimeUs,

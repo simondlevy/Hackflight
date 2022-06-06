@@ -163,7 +163,7 @@ extern "C" {
         return value;
     }
 
-    static float accelerationLimit(rate_pid_t * pid, uint8_t axis,
+    static float accelerationLimit(angle_pid_t * pid, uint8_t axis,
             float currentPidSetpoint)
     {
         const float currentVelocity = currentPidSetpoint - pid->previousSetpoint[axis];
@@ -181,7 +181,7 @@ extern "C" {
     }
 
     static void applyItermRelax(
-            rate_pid_t * pid,
+            angle_pid_t * pid,
             const int axis,
             const float iterm,
             float *itermErrorRate,
@@ -207,7 +207,7 @@ extern "C" {
     }
 
     static float applyRcSmoothingFeedforwardFilter(
-            rate_pid_t * pid, int axis, float pidSetpointDelta)
+            angle_pid_t * pid, int axis, float pidSetpointDelta)
     {
         float ret = pidSetpointDelta;
         if (pid->feedforwardLpfInitialized) {
@@ -224,7 +224,7 @@ extern "C" {
         return (dynLpfMax - dynLpfMin) * curve + dynLpfMin;
     }
 
-    static void pidDynLpfDTermUpdate(rate_pid_t * pid, float throttle)
+    static void pidDynLpfDTermUpdate(angle_pid_t * pid, float throttle)
     {
         const uint16_t dyn_lpf_min = DTERM_LPF1_DYN_MIN_HZ;
         const uint16_t dyn_lpf_max = DTERM_LPF1_DYN_MAX_HZ;
@@ -238,7 +238,7 @@ extern "C" {
     }
 
     static void updateDynLpfCutoffs(
-            rate_pid_t * pid,
+            angle_pid_t * pid,
             timeUs_t currentTimeUs,
             float throttle)
     {
@@ -272,7 +272,7 @@ static float levelPid(float currentSetpoint, float currentAngle)
 
 // ==================================================================================
 
-static void anglePidInit(rate_pid_t * pid)
+static void anglePidInit(angle_pid_t * pid)
 {
     // to allow an initial zero throttle to set the filter cutoff
     pid->dynLpfPreviousQuantizedThrottle = -1;  
@@ -318,7 +318,7 @@ static void anglePidInit(rate_pid_t * pid)
             , bool reset
             )
     {
-        rate_pid_t * pid = (rate_pid_t *)data;
+        angle_pid_t * pid = (angle_pid_t *)data;
 
         // gradually scale back integration when above windup point
         float dynCi = DT();

@@ -67,7 +67,7 @@ static demands_t       _demands;
 static bool            _gyro_is_calibrating;
 static float           _mspmotors[4];
 static bool            _pid_zero_throttle_iterm_reset;
-static rate_pid_t      _anglepid;
+static angle_pid_t      _anglepid;
 static vehicle_state_t _state;
 
 // Attitude task --------------------------------------------------------------
