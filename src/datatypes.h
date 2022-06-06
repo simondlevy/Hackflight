@@ -152,6 +152,23 @@ typedef struct {
 
 typedef struct {
 
+    uint32_t quietPeriodEnd;
+    uint32_t resetTimeEnd;
+    bool resetCompleted;
+
+} gyro_reset_t;
+
+typedef struct {
+
+    uint32_t time;
+    quaternion_t quat;
+    rotation_t rot;
+    gyro_reset_t gyroReset;
+
+} imu_fusion_t;
+
+typedef struct {
+
     imu_sensor_t     accelAccum;
     angle_pid_t      anglepid;
     bool             armed;
