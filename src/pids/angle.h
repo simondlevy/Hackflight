@@ -309,13 +309,16 @@ extern "C" {
     }
 
     static void anglePidUpdate(
-            uint32_t currentTimeUs
-            , demands_t * demands
-            , void * data
-            , vehicle_state_t * vstate
-            , bool reset
+            void * ignore,
+            uint32_t currentTimeUs,
+            demands_t * demands,
+            void * data,
+            vehicle_state_t * vstate,
+            bool reset
             )
     {
+        (void)ignore;
+
         angle_pid_t * pid = (angle_pid_t *)data;
 
         // gradually scale back integration when above windup point

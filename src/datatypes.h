@@ -109,11 +109,18 @@ typedef struct {
 } vehicle_state_t;
 
 typedef void (*pid_fun_t)(
+        void * hackflight,
+        uint32_t usec,
+        demands_t * demands,
+        void * data,
+        vehicle_state_t * vstate,
+        bool reset
+        );
+
+
+typedef void (*task_fun_t)(
+        void * hackflight,
         uint32_t usec
-        , demands_t * demands
-        , void * data
-        , vehicle_state_t * vstate
-        , bool reset
         );
 
 typedef struct {
@@ -124,9 +131,8 @@ typedef struct {
 
 typedef struct {
 
-
     // For both hardware and sim implementations
-    void (*fun)(uint32_t time);
+    void (*fun)(void * hackflight, uint32_t time);
     timeDelta_t desiredPeriodUs;        // target period of execution
     timeUs_t lastExecutedAtUs;          // last time of invocation
 

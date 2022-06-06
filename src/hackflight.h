@@ -42,38 +42,17 @@ static const float MAX_ARMING_ANGLE = 25;
 static const uint32_t RX_TASK_RATE       = 33;
 static const uint32_t ATTITUDE_TASK_RATE = 100;
 
-// Data shared among tasks -----------------------------------------------------
-
-static bool            _armed;
-static demands_t       _demands;
-static bool            _gyro_is_calibrating;
-static float           _mspmotors[4];
-static bool            _pid_zero_throttle_iterm_reset;
-static angle_pid_t      _anglepid;
-static vehicle_state_t _state;
-
 // Attitude task --------------------------------------------------------------
 
-static void task_attitude(uint32_t time)
+static void task_attitude(void * hackflight, uint32_t time)
 {
-    imuGetEulerAngles(time, &_state, _armed);
+    hackflight_t * hf = (hackflight_t *)hackflight;
+    imuGetEulerAngles(time, &hf->state, hf->armed);
 }
-
-static task_t _attitudeTask;
 
 // PID controller support -----------------------------------------------------
 
-static pid_controller_t _pid_controllers[10];
-static uint8_t          _pid_count;
-
-static void hackflightAddPidController(pid_fun_t fun, void * data)
-{
-    _pid_controllers[_pid_count].fun = fun;
-    _pid_controllers[_pid_count].data = data;
-    _pid_count++;
-}
-
-static void hackflightAddPidController2(hackflight_t * hf, pid_fun_t fun, void * data)
+static void hackflightAddPidController(hackflight_t * hf, pid_fun_t fun, void * data)
 {
     hf->pid_controllers[hf->pid_count].fun = fun;
     hf->pid_controllers[hf->pid_count].data = data;
@@ -82,12 +61,11 @@ static void hackflightAddPidController2(hackflight_t * hf, pid_fun_t fun, void *
 
 // RX polling task ------------------------------------------------------------
 
-static task_t    _rxTask;
-static rx_axes_t _rx_axes;
-
-static void task_rx(uint32_t time)
+static void task_rx(void * hackflight, uint32_t time)
 {
-    bool calibrating = _gyro_is_calibrating; // || acc.calibrating != 0;
+    hackflight_t * hf = (hackflight_t *)hackflight;
+
+    bool calibrating = hf->gyro_is_calibrating; // || acc.calibrating != 0;
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
@@ -97,8 +75,8 @@ static void task_rx(uint32_t time)
 
     bool gotNewData = false;
 
-    bool shallowAngle = fabsf(_state.phi) < max_arming_angle &&
-        fabsf(_state.theta) < max_arming_angle;
+    bool shallowAngle = fabsf(hf->state.phi) < max_arming_angle &&
+        fabsf(hf->state.theta) < max_arming_angle;
 
     rxPoll(
             time,
@@ -107,15 +85,15 @@ static void task_rx(uint32_t time)
             &rxax,
             &pidItermResetReady,
             &pidItermResetValue,
-            &_armed,
+            &hf->armed,
             &gotNewData);
 
     if (pidItermResetReady) {
-        _pid_zero_throttle_iterm_reset = pidItermResetValue;
+        hf->pid_zero_throttle_iterm_reset = pidItermResetValue;
     }
 
     if (gotNewData) {
-        memcpy(&_rx_axes, &rxax, sizeof(rx_axes_t));
+        memcpy(&hf->rx_axes, &rxax, sizeof(rx_axes_t));
     }
 }
 
@@ -123,31 +101,27 @@ static void task_rx(uint32_t time)
 
 static void hackflightRunCoreTasks(hackflight_t * hf)
 {
-    (void)hf;
-
-    gyroReadScaled(&_state, &_gyro_is_calibrating);
     gyroReadScaled(&hf->state, &hf->gyro_is_calibrating);
 
     timeUs_t currentTimeUs = timeMicros();
 
-    rxGetDemands(currentTimeUs, &_anglepid, &_demands);
     rxGetDemands(currentTimeUs, &hf->anglepid, &hf->demands);
 
-    for (uint8_t k=0; k<_pid_count; ++k) {
-        pid_controller_t pid = _pid_controllers[k];
-        pid.fun(currentTimeUs, &_demands, pid.data,
-                &_state, _pid_zero_throttle_iterm_reset);
+    for (uint8_t k=0; k<hf->pid_count; ++k) {
+        pid_controller_t pid = hf->pid_controllers[k];
+        pid.fun(hf, currentTimeUs, &hf->demands, pid.data,
+                &hf->state, hf->pid_zero_throttle_iterm_reset);
     }
 
     float mixmotors[4] = {0};
-    mixerRun(&_demands, mixmotors);
+    mixerRun(&hf->demands, mixmotors);
 
-    motorWrite(_armed ? mixmotors : _mspmotors);
+    motorWrite(hf->armed ? mixmotors : hf->mspmotors);
 }
 
 // Timed task support -------------------------------------------------------
 
-static void initTask(task_t * task, void (*fun)(uint32_t time), uint32_t rate)
+static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
 {
     task->fun = fun;
     task->desiredPeriodUs = 1000000 / rate;
@@ -155,15 +129,7 @@ static void initTask(task_t * task, void (*fun)(uint32_t time), uint32_t rate)
 
 // Sensor support ------------------------------------------------------------
 
-static task_t  _sensor_tasks[20];
-static uint8_t _sensor_task_count;
-
-static void hackflightAddSensor(void (*fun)(uint32_t time), uint32_t rate)
-{
-    initTask(&_sensor_tasks[_sensor_task_count++], fun, rate);
-}
-
-static void hackflightAddSensor2(hackflight_t * hf, void (*fun)(uint32_t time), uint32_t rate)
+static void hackflightAddSensor( hackflight_t * hf, task_fun_t fun, uint32_t rate)
 {
     initTask(&hf->sensor_tasks[hf->sensor_task_count++], fun, rate);
 }
@@ -179,17 +145,13 @@ static void hackflightInit(
         float level_p
         )
 {
-    anglePidInit(&_anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
     anglePidInit(&hf->anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
 
-    hackflightAddPidController(anglePidUpdate, &_anglepid);
-    hackflightAddPidController2(hf, anglePidUpdate, &_anglepid);
+    hackflightAddPidController(hf, anglePidUpdate, &hf->anglepid);
 
-    initTask(&_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
     initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
 
-    initTask(&_rxTask,  task_rx,  RX_TASK_RATE);
-    initTask(&hf->rxTask,  task_rx,  RX_TASK_RATE);
+    initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
 
     rxDevInit();
 }

@@ -75,11 +75,12 @@ extern "C" {
 
     static const uint32_t MSP_TASK_RATE = 100;
 
-    static void task_msp(uint32_t time)
+    static void task_msp(void * hackflight, uint32_t time)
     {
         (void)time;
 
-        mspUpdate(&_state, &_rx_axes, _armed, _mspmotors);
+        hackflight_t * hf = (hackflight_t *)hackflight;
+        mspUpdate(&hf->state, &hf->rx_axes, hf->armed, hf->mspmotors);
     }
 
     static task_t _mspTask;
@@ -90,8 +91,8 @@ extern "C" {
 
     static void adjustDynamicPriority(task_t * task, timeUs_t currentTimeUs) 
     {
-        // Task is time-driven, dynamicPriority is last execution age (measured in desiredPeriods)
-        // Task age is calculated from last execution
+        // Task is time-driven, dynamicPriority is last execution age (measured
+        // in desiredPeriods). Task age is calculated from last execution.
         task->taskAgeCycles =
             (cmpTimeUs(currentTimeUs, task->lastExecutedAtUs) / task->desiredPeriodUs);
         if (task->taskAgeCycles > 0) {
@@ -134,13 +135,13 @@ extern "C" {
 
     static uint32_t _nextTimingCycles;
 
-    static void executeTask(task_t *task, timeUs_t currentTimeUs)
+    static void executeTask(hackflight_t * hf, task_t *task, timeUs_t currentTimeUs)
     {
         task->lastExecutedAtUs = currentTimeUs;
         task->dynamicPriority = 0;
 
         uint32_t time = timeMicros();
-        task->fun(currentTimeUs);
+        task->fun(hf, currentTimeUs);
 
         timeUs_t taskExecutionTimeUs = timeMicros() - time;
 
@@ -243,7 +244,9 @@ extern "C" {
         updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
     }
 
-    static void checkDynamicTasks(int32_t schedLoopRemainingCycles,
+    static void checkDynamicTasks(
+            hackflight_t * hf,
+            int32_t schedLoopRemainingCycles,
             uint32_t nextTargetCycles)
     {
         task_t *selectedTask = NULL;
@@ -251,16 +254,16 @@ extern "C" {
 
         timeUs_t currentTimeUs = timeMicros();
 
-        for (uint8_t k=0; k<_sensor_task_count; ++k) {
-            task_t * task = &_sensor_tasks[k];
+        for (uint8_t k=0; k<hf->sensor_task_count; ++k) {
+            task_t * task = &hf->sensor_tasks[k];
             adjustAndUpdateTask(task, currentTimeUs,&selectedTask,
                     &selectedTaskDynamicPriority);
         }
 
-        adjustRxDynamicPriority(&_rxTask, currentTimeUs);
-        updateDynamicTask(&_rxTask, &selectedTask, &selectedTaskDynamicPriority);
+        adjustRxDynamicPriority(&hf->rxTask, currentTimeUs);
+        updateDynamicTask(&hf->rxTask, &selectedTask, &selectedTaskDynamicPriority);
 
-        adjustAndUpdateTask(&_attitudeTask, currentTimeUs,
+        adjustAndUpdateTask(&hf->attitudeTask, currentTimeUs,
                 &selectedTask, &selectedTaskDynamicPriority);
 
         adjustAndUpdateTask(&_mspTask, currentTimeUs,
@@ -281,7 +284,7 @@ extern "C" {
 
             if (taskRequiredTimeCycles < schedLoopRemainingCycles) {
                 uint32_t antipatedEndCycles = nowCycles + taskRequiredTimeCycles;
-                executeTask(selectedTask, currentTimeUs);
+                executeTask(hf, selectedTask, currentTimeUs);
                 nowCycles = systemGetCycleCounter();
                 int32_t cyclesOverdue = cmpTimeCycles(nowCycles, antipatedEndCycles);
 
@@ -303,8 +306,8 @@ extern "C" {
     // ----------------------------------------------------------------------------
 
     void hackflightFullInit(
-        hackflight_t * hackflight,
-        void (*accel_fun)(uint32_t time),
+        hackflight_t * hf,
+        task_fun_t accel_fun,
          uint32_t accel_rate)
     {
         // Tuning constants for angle PID controller
@@ -326,10 +329,10 @@ extern "C" {
         armingSetDisabled(7);
         failsafeReset();
 
-        hackflightInit(hackflight, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
+        hackflightInit(hf, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
 
         // accel_fun can be traditional accelerometer, or hardware-fusion quaternion
-        hackflightAddSensor(accel_fun, accel_rate);
+        hackflightAddSensor(hf, accel_fun, accel_rate);
 
         initTask(&_mspTask, task_msp, MSP_TASK_RATE);
 
@@ -391,7 +394,7 @@ extern "C" {
 
         if ((schedLoopRemainingCycles >
                     (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US))) {
-            checkDynamicTasks(schedLoopRemainingCycles, nextTargetCycles);
+            checkDynamicTasks(hf, schedLoopRemainingCycles, nextTargetCycles);
         }
     }
 
