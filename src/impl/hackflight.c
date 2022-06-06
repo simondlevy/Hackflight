@@ -304,11 +304,11 @@ extern "C" {
     void hackflightFullInit(void (*accel_fun)(uint32_t time), uint32_t accel_rate)
     {
         // Tuning constants for angle PID controller
-        static const float RATE_P  = 45 * 0.032029;
-        static const float RATE_I  = 80 * 0.244381;
-        static const float RATE_D  = 40 * 0.000529;
-        static const float RATE_F  = 0.013754 * (120 / 100.);
-        static const float LEVEL_P = 0; /*30*/ 
+        static const float RATE_P  = 1.441305;
+        static const float RATE_I  = 19.55048;
+        static const float RATE_D  = 0.021160;
+        static const float RATE_F  = 0.0165048;
+        static const float LEVEL_P = 0 /*3.0*/;
 
         void boardInit(void);
         boardInit();

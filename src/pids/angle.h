@@ -251,7 +251,7 @@ extern "C" {
         float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
         angle = constrainf(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
         float errorAngle = angle - (currentAngle / 10);
-        return pid->k_level_p > 0 ? errorAngle * pid->k_level_p / 10 : currentSetpoint;
+        return pid->k_level_p > 0 ? errorAngle * pid->k_level_p : currentSetpoint;
     }
 
     // ==================================================================================
