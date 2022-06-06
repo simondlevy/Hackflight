@@ -184,8 +184,6 @@ static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
 
 // ======================================================================================
 
-static imu_sensor_t _gyro_accum;
-
 static imu_fusion_t _fusion_prev = {
     0,              // time
     {1, 0, 0, 0},   // quaternion
@@ -204,23 +202,21 @@ void imuAccelTask(void * hackflight, uint32_t time)
 
 void imuAccumulateGyro(hackflight_t * hf, float * adcf)
 {
-    (void)hf;
-
     static float _adcf[3];
 
     // integrate using trapezium rule to avoid bias
-    _gyro_accum.values.x += 0.5f * (_adcf[0] + adcf[0]) * GYRO_PERIOD();
-    _gyro_accum.values.y += 0.5f * (_adcf[1] + adcf[1]) * GYRO_PERIOD();
-    _gyro_accum.values.z += 0.5f * (_adcf[2] + adcf[2]) * GYRO_PERIOD();
+    hf->gyroAccum.values.x += 0.5f * (_adcf[0] + adcf[0]) * GYRO_PERIOD();
+    hf->gyroAccum.values.y += 0.5f * (_adcf[1] + adcf[1]) * GYRO_PERIOD();
+    hf->gyroAccum.values.z += 0.5f * (_adcf[2] + adcf[2]) * GYRO_PERIOD();
 
-    _gyro_accum.count++;
+    hf->gyroAccum.count++;
 
     for (int axis = 0; axis < 3; axis++) {
         _adcf[axis] = adcf[axis];
     }
 }
 
-void imuGetEulerAngles( hackflight_t * hf, timeUs_t time)
+void imuGetEulerAngles(hackflight_t * hf, timeUs_t time)
 {
     quaternion_t quat = {0};
 
@@ -230,7 +226,7 @@ void imuGetEulerAngles( hackflight_t * hf, timeUs_t time)
 
     quat2euler(&quat, &hf->vstate, &rot);
 
-    imuUpdateFusion(time, &quat, &rot);
+    imuUpdateFusion(hf, time, &quat, &rot);
 }
 
 void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
@@ -240,7 +236,7 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     timeDelta_t deltaT = time - _fusion_prev.time;
 
     axes_t gyroAvg = {0};
-    getAverage(&_gyro_accum, GYRO_PERIOD(), &gyroAvg);
+    getAverage(&hf->gyroAccum, GYRO_PERIOD(), &gyroAvg);
 
     axes_t accelAvg = {0};
     getAverage(&hf->accelAccum, 1, &accelAvg);
@@ -268,12 +264,12 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
             &_fusion_prev.rot, &_fusion_prev.quat, quat);
 }
 
-void imuUpdateFusion(timeUs_t time, quaternion_t * quat, rotation_t * rot)
+void imuUpdateFusion(hackflight_t * hf, timeUs_t time, quaternion_t * quat, rotation_t * rot)
 {
     imu_fusion_t fusion;
     fusion.time = time;
     memcpy(&fusion.quat, quat, sizeof(quaternion_t));
     memcpy(&fusion.rot, rot, sizeof(rotation_t));
     memcpy(&_fusion_prev, &fusion, sizeof(imu_fusion_t));
-    memset(&_gyro_accum, 0, sizeof(imu_sensor_t));
+    memset(&hf->gyroAccum, 0, sizeof(imu_sensor_t));
 }

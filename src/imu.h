@@ -55,7 +55,10 @@ extern "C" {
 
     void imuInit(void);
 
-    void imuUpdateFusion(timeUs_t time, quaternion_t * quat, rotation_t * rot);
+    void imuUpdateFusion(hackflight_t * hf,
+            timeUs_t time,
+            quaternion_t * quat,
+            rotation_t * rot);
 
 #if defined(__cplusplus)
 }
