@@ -166,6 +166,7 @@ static void hackflightInit(
     (void)hackflight;
 
     anglePidInit(&_anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
+    anglePidInit(&hackflight->anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
 
     hackflightAddPidController(anglePidUpdate, &_anglepid);
 
