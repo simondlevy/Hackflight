@@ -153,6 +153,9 @@ static void hackflightInit(
 
     initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
 
+    // Initialize quaternion in upright position
+    hf->imuFusionPrev.quat.w = 1;
+
     rxDevInit();
 }
 

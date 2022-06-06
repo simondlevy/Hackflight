@@ -176,6 +176,7 @@ typedef struct {
     demands_t        demands;
     imu_sensor_t     gyroAccum;
     bool             gyroIsCalibrating;
+    imu_fusion_t     imuFusionPrev;
     float            mspmotors[4];
     pid_controller_t pid_controllers[10];
     uint8_t          pid_count;
