@@ -28,7 +28,7 @@ void hackflightFullInit(
         void (*accel_fun)(uint32_t time),
         uint32_t accel_rate);
 
-void hackflightStep(void);
+void hackflightStep(hackflight_t * hackflight);
 
 int main(void)
 {
@@ -38,7 +38,7 @@ int main(void)
     hackflightFullInit(&hackflight, imuAccelTask, ACCEL_RATE);
 
     while (true) {
-        hackflightStep();
+        hackflightStep(&hackflight);
     }
 
     return 0;

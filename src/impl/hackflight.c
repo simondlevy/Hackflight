@@ -355,8 +355,10 @@ extern "C" {
         _desiredPeriodCycles = GYRO_PERIOD();
     }
 
-    void hackflightStep(void)
+    void hackflightStep(hackflight_t * hackflight)
     {
+        (void)hackflight;
+
         // Realtime gyro/filtering/PID tasks get complete priority
         uint32_t nowCycles = systemGetCycleCounter();
 
