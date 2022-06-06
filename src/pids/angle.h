@@ -30,7 +30,6 @@
 #include "debug.h"
 #include "dt.h"
 #include "filter.h"
-#include "filter_impl.h"
 #include "gyro.h"
 #include "maths.h"
 #include "angle_struct.h"

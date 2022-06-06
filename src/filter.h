@@ -19,6 +19,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <math.h>
 
 #include "datatypes.h"
 
@@ -65,4 +66,11 @@ static float pt3FilterApply(pt3Filter_t *filter, float input)
     filter->state2 = filter->state2 + filter->k * (filter->state1 - filter->state2);
     filter->state = filter->state + filter->k * (filter->state2 - filter->state);
     return filter->state;
+}
+
+// PT1 Low Pass filter
+static float pt1FilterGain(float f_cut, float dT)
+{
+    float RC = 1 / (2 * M_PI * f_cut);
+    return dT / (RC + dT);
 }
