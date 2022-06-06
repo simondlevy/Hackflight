@@ -260,7 +260,7 @@ extern "C" {
         }
     }
 
-static float pidLevel(float currentSetpoint, float currentAngle)
+static float levelPid(float currentSetpoint, float currentAngle)
 {
     // calculate error angle and limit the angle to the max inclination
     // rcDeflection in [-1.0, 1.0]
@@ -349,7 +349,6 @@ static void ratePidInit(rate_pid_t * pid)
         float pidSetpoints[3] = { demands->roll, demands->pitch, demands->yaw };
         float currentAngles[3] = { vstate->phi, vstate->theta, vstate->psi };
 
-
         // ----------PID controller----------
         for (uint8_t axis = 0; axis <= 2; ++axis) {
 
@@ -360,8 +359,8 @@ static void ratePidInit(rate_pid_t * pid)
                 currentPidSetpoint = accelerationLimit(pid, axis, currentPidSetpoint);
             }
 
-            if (axis == 0/*!= 2*/) {
-                currentPidSetpoint = pidLevel(currentPidSetpoint, currentAngles[axis]);
+            if (axis != 2) {
+                currentPidSetpoint = levelPid(currentPidSetpoint, currentAngles[axis]);
             }
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
