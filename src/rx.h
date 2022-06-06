@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#include "pids/angle_struct.h"
+#include "datatypes.h"
 #include "time.h"
 
 #if defined(__cplusplus)

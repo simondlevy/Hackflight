@@ -21,8 +21,48 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "pids/angle_struct.h"
+#include "filter.h"
+#include "time.h"
 
+// PID control ----------------------------------------------------------------
+
+typedef struct pidAxisData_s {
+    float P;
+    float I;
+    float D;
+    float F;
+    float Sum;
+} pidAxisData_t;
+
+typedef union dtermLowpass_u {
+    biquadFilter_t biquadFilter;
+    pt1Filter_t    pt1Filter;
+    pt2Filter_t    pt2Filter;
+    pt3Filter_t    pt3Filter;
+} dtermLowpass_t;
+
+typedef struct {
+    pidAxisData_t  data[3];
+    pt2Filter_t    dMinLowpass[3];
+    pt2Filter_t    dMinRange[3];
+    dtermLowpass_t dtermLowpass[3];
+    dtermLowpass_t dtermLowpass2[3];
+    int32_t        dynLpfPreviousQuantizedThrottle;  
+    bool           feedforwardLpfInitialized;
+    pt3Filter_t    feedforwardPt3[3];
+    float          k_rate_p;
+    float          k_rate_i;
+    float          k_rate_d;
+    float          k_rate_f;
+    float          k_level_p;
+    timeUs_t       lastDynLpfUpdateUs;
+    float          previousSetpointCorrection[3];
+    float          previousGyroRateDterm[3];
+    float          previousSetpoint[3];
+    pt1Filter_t    ptermYawLowpass;
+    pt1Filter_t    windupLpf[3];
+
+} angle_pid_t;
 // Time -----------------------------------------------------------------------
 
 typedef uint32_t timeUs_t;

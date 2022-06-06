@@ -32,7 +32,6 @@
 #include "filter.h"
 #include "gyro.h"
 #include "maths.h"
-#include "angle_struct.h"
 #include "rx_rates.h"
 #include "sensors.h"
 #include "time.h"
