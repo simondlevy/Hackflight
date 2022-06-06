@@ -32,38 +32,6 @@ extern "C" {
     static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
     static const uint16_t LPF2_STATIC_HZ                 = 500;
 
-    typedef union {
-        pt1Filter_t pt1FilterState;
-        biquadFilter_t biquadFilterState;
-        pt2Filter_t pt2FilterState;
-        pt3Filter_t pt3FilterState;
-    } gyroLowpassFilter_t;
-
-    typedef struct {
-
-        float dps[3];          // aligned, calibrated, scaled, but unfiltered data from sensor
-        float dps_filtered[3]; // filtered gyro data
-        float dps_filtered_prev[3];
-        uint8_t sampleCount;   // gyro sensor sample counter
-        float sampleSum[3];    // summed samples used for downsampling
-
-        // if true then downsample using gyro lowpass 2, otherwise use averaging
-        bool downsampleFilterEnabled;      
-
-        gyroCalibration_t calibration;
-
-        // lowpass gyro soft filter
-        filterApplyFnPtr lowpassFilterApplyFn;
-        gyroLowpassFilter_t lowpassFilter[3];
-
-        // lowpass2 gyro soft filter
-        filterApplyFnPtr lowpass2FilterApplyFn;
-        gyroLowpassFilter_t lowpass2Filter[3];
-
-        float zero[3];
-
-    } gyro_t;
-
     static int32_t gyroCalculateCalibratingCycles(void)
     {
         return (CALIBRATION_DURATION * 10000) / GYRO_PERIOD();
