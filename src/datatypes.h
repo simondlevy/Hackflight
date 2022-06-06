@@ -142,6 +142,7 @@ typedef struct {
 
     angle_pid_t      anglepid;
     bool             armed;
+    task_t           attitudeTask;
     demands_t        demands;
     bool             gyro_is_calibrating;
     float            mspmotors[4];
