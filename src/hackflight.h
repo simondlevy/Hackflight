@@ -159,6 +159,11 @@ static void hackflightAddSensor(void (*fun)(uint32_t time), uint32_t rate)
     initTask(&_sensor_tasks[_sensor_task_count++], fun, rate);
 }
 
+static void hackflightAddSensor2(hackflight_t * hf, void (*fun)(uint32_t time), uint32_t rate)
+{
+    initTask(&hf->sensor_tasks[hf->sensor_task_count++], fun, rate);
+}
+
 // Initialization -------------------------------------------------------------
 
 static void hackflightInit(
