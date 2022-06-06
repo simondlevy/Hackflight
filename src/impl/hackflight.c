@@ -303,6 +303,13 @@ extern "C" {
 
     void hackflightFullInit(void (*accel_fun)(uint32_t time), uint32_t accel_rate)
     {
+        // Tuning constants for angle PID controller
+        static const float RATE_P  = 45 * 0.032029;
+        static const float RATE_I  = 80 * 0.244381;
+        static const float RATE_D  = 40 * 0.000529;
+        static const float RATE_F  = 0.013754 * (120 / 100.);
+        static const float LEVEL_P = 0; /*30*/ 
+
         void boardInit(void);
         boardInit();
 
@@ -315,7 +322,7 @@ extern "C" {
         armingSetDisabled(7);
         failsafeReset();
 
-        hackflightInit();
+        hackflightInit(RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
 
         // accel_fun can be traditional accelerometer, or hardware-fusion quaternion
         hackflightAddSensor(accel_fun, accel_rate);

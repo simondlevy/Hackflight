@@ -48,6 +48,11 @@ typedef struct {
     int32_t        dynLpfPreviousQuantizedThrottle;  
     bool           feedforwardLpfInitialized;
     pt3Filter_t    feedforwardPt3[3];
+    float          k_rate_p;
+    float          k_rate_i;
+    float          k_rate_d;
+    float          k_rate_f;
+    float          k_level_p;
     timeUs_t       lastDynLpfUpdateUs;
     float          previousSetpointCorrection[3];
     float          previousGyroRateDterm[3];

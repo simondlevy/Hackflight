@@ -45,13 +45,6 @@ static const uint16_t DYN_LPF_THROTTLE_UPDATE_DELAY_US = 5000;
 
 static const uint16_t DYN_LPF_THROTTLE_STEPS = 100;
 
-// Scaling factors for Pids for better tunable range in configurator for
-// betaflight pid controller. The scaling is based on legacy pid controller or
-// previous float
-static const float PTERM_SCALE = 0.032029;
-static const float ITERM_SCALE = 0.244381;
-static const float DTERM_SCALE = 0.000529;
-
 // The constant scale factor to replace the Kd component of the feedforward calculation.
 // This value gives the same "feel" as the previous Kd default of 26 (26 * DTERM_SCALE)
 static const float FEEDFORWARD_SCALE = 0.013754;
@@ -83,19 +76,7 @@ static const uint8_t FEEDFORWARD_MAX_RATE_LIMIT = 90;
 static const uint8_t DYN_LPF_CURVE_EXPO = 5;
 
 
-static const uint8_t RATE_P = 45;
-static const uint8_t RATE_I = 80;
-static const uint8_t RATE_D = 40;
-static const uint8_t RATE_F = 120;
-
-static const uint8_t LEVEL_P = 0;//30;
-
 static CONST float FREQUENCY() {return 1.0f / DT(); }
-
-static CONST float RATE_KP() { return PTERM_SCALE * RATE_P; }
-static CONST float RATE_KI() { return ITERM_SCALE * RATE_I; }
-static CONST float RATE_KD() { return DTERM_SCALE * RATE_D; }
-static CONST float RATE_KF() { return FEEDFORWARD_SCALE * (RATE_F / 100.0f); }
 
 // Scale factors to make best use of range with D_LPF debugging, aiming for max
 // +/-16K as debug values are 16 bit
@@ -147,14 +128,17 @@ extern "C" {
         filter->k = k;
     }
 
-    static float applyFeedforwardLimit(float value, float currentPidSetpoint,
+    static float applyFeedforwardLimit(
+            angle_pid_t * pid,
+            float value,
+            float currentPidSetpoint,
             float maxRateLimit) {
 
         if (value * currentPidSetpoint > 0.0f) {
             if (fabsf(currentPidSetpoint) <= maxRateLimit) {
                 value = constrainf(value, (-maxRateLimit -
-                            currentPidSetpoint) * RATE_KP(),
-                        (maxRateLimit - currentPidSetpoint) * RATE_KP());
+                            currentPidSetpoint) * pid->k_rate_p,
+                        (maxRateLimit - currentPidSetpoint) * pid->k_rate_p);
             } else {
                 value = 0;
             }
@@ -260,24 +244,38 @@ extern "C" {
         }
     }
 
-static float levelPid(float currentSetpoint, float currentAngle)
-{
-    // calculate error angle and limit the angle to the max inclination
-    // rcDeflection in [-1.0, 1.0]
-    float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
-    angle = constrainf(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
-    float errorAngle = angle - (currentAngle / 10);
-    return LEVEL_P > 0 ? errorAngle * LEVEL_P / 10 : currentSetpoint;
-}
+    static float levelPid(angle_pid_t * pid, float currentSetpoint, float currentAngle)
+    {
+        // calculate error angle and limit the angle to the max inclination
+        // rcDeflection in [-1.0, 1.0]
+        float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
+        angle = constrainf(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
+        float errorAngle = angle - (currentAngle / 10);
+        return pid->k_level_p > 0 ? errorAngle * pid->k_level_p / 10 : currentSetpoint;
+    }
 
-// ==================================================================================
+    // ==================================================================================
 
-static void anglePidInit(angle_pid_t * pid)
-{
-    // to allow an initial zero throttle to set the filter cutoff
-    pid->dynLpfPreviousQuantizedThrottle = -1;  
+    static void anglePidInit(
+            angle_pid_t * pid,
+            float rate_p,
+            float rate_i,
+            float rate_d,
+            float rate_f,
+            float level_p
+            )
+    {
+        // set constants
+        pid->k_rate_p = rate_p;
+        pid->k_rate_i = rate_i;
+        pid->k_rate_d = rate_d;
+        pid->k_rate_f = rate_f;
+        pid->k_level_p = level_p;
 
-        //1st Dterm Lowpass Filter
+        // to allow an initial zero throttle to set the filter cutoff
+        pid->dynLpfPreviousQuantizedThrottle = -1;  
+
+        // 1st Dterm Lowpass Filter
         uint16_t dterm_lpf1_init_hz = DTERM_LPF1_DYN_MIN_HZ;
 
         dterm_lpf1_init_hz = DTERM_LPF1_DYN_MIN_HZ;
@@ -287,7 +285,7 @@ static void anglePidInit(angle_pid_t * pid)
                     pt1FilterGain(dterm_lpf1_init_hz, DT()));
         }
 
-        //2nd Dterm Lowpass Filter
+        // 2nd Dterm Lowpass Filter
         for (uint8_t axis = 0; axis <= 2; axis++) {
             pt1FilterInit(&pid->dtermLowpass2[axis].pt1Filter,
                     pt1FilterGain(DTERM_LPF2_HZ, DT()));
@@ -360,7 +358,8 @@ static void anglePidInit(angle_pid_t * pid)
             }
 
             if (axis != 2) {
-                currentPidSetpoint = levelPid(currentPidSetpoint, currentAngles[axis]);
+                currentPidSetpoint =
+                    levelPid(pid, currentPidSetpoint, currentAngles[axis]);
             }
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
@@ -386,7 +385,7 @@ static void anglePidInit(angle_pid_t * pid)
 
             // -----calculate P component
             filterApplyFnPtr ptermYawLowpassApplyFn = (filterApplyFnPtr)pt1FilterApply;
-            pid->data[axis].P = RATE_KP() * errorRate;
+            pid->data[axis].P = pid->k_rate_p * errorRate;
             if (axis == 2) {
                 pid->data[axis].P = ptermYawLowpassApplyFn((filter_t *)
                         &pid->ptermYawLowpass, pid->data[axis].P);
@@ -395,19 +394,19 @@ static void anglePidInit(angle_pid_t * pid)
             // -----calculate I component
             // if launch control is active override the iterm gains and apply iterm
             // windup protection to all axes
-            float Ki = RATE_KI() * ((axis == 2 && !USE_INTEGRATED_YAW) ? 2.5 : 1);
+            float Ki = pid->k_rate_i * ((axis == 2 && !USE_INTEGRATED_YAW) ? 2.5 : 1);
             float axisDynCi = (axis == 2) ? dynCi : DT(); // check windup for yaw only
 
             pid->data[axis].I =
                 constrainf(previousIterm + (Ki * axisDynCi) * itermErrorRate,
-                    -ITERM_LIMIT, ITERM_LIMIT);
+                        -ITERM_LIMIT, ITERM_LIMIT);
 
             // -----calculate pidSetpointDelta
             float pidSetpointDelta = 0;
             float feedforwardMaxRate = rxApplyRates(1, 1);
 
             // -----calculate D component
-            if ((axis < 2 && RATE_KD() > 0)) {
+            if ((axis < 2 && pid->k_rate_d > 0)) {
 
                 // Divide rate change by dT to get differential (ie dr/dt).
                 // dT is fixed and calculated from the target PID loop time
@@ -417,13 +416,14 @@ static void anglePidInit(angle_pid_t * pid)
                 const float delta = -(gyroRateDterm[axis] -
                         pid->previousGyroRateDterm[axis]) * FREQUENCY();
 
-                float preTpaD = RATE_KD() * delta;
+                float preTpaD = pid->k_rate_d * delta;
 
                 float dMinFactor = 1.0f;
 
                 float dMinPercent = axis == 2 ?
                     0 :
-                    D_MIN > 0 && D_MIN < RATE_D ? D_MIN / (float)(RATE_D) :
+                    D_MIN > 0 && D_MIN < pid->k_rate_d ?
+                    D_MIN / pid->k_rate_d :
                     0;
 
                 if (dMinPercent > 0) {
@@ -462,7 +462,7 @@ static void anglePidInit(angle_pid_t * pid)
             pid->previousSetpointCorrection[axis] = setpointCorrection;
 
             // no feedforward in launch control
-            float feedforwardGain = RATE_KF();
+            float feedforwardGain = pid->k_rate_f;
             if (feedforwardGain > 0) {
                 // halve feedforward in Level mode since stick sensitivity is
                 // weaker by about half transition now calculated in feedforward.c
@@ -476,7 +476,7 @@ static void anglePidInit(angle_pid_t * pid)
                     feedforwardMaxRateLimit != 0.0f && axis < 2;
 
                 pid->data[axis].F = shouldApplyFeedforwardLimits ?
-                    applyFeedforwardLimit(feedForward, currentPidSetpoint,
+                    applyFeedforwardLimit(pid, feedForward, currentPidSetpoint,
                             feedforwardMaxRateLimit) :
                     feedForward;
                 pid->data[axis].F =
