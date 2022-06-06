@@ -243,9 +243,13 @@ extern "C" {
         updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
     }
 
-    static void checkDynamicTasks(int32_t schedLoopRemainingCycles,
+    static void checkDynamicTasks(
+            hackflight_t * hf,
+            int32_t schedLoopRemainingCycles,
             uint32_t nextTargetCycles)
     {
+        (void)hf; // XXX
+
         task_t *selectedTask = NULL;
         uint16_t selectedTaskDynamicPriority = 0;
 
@@ -391,7 +395,7 @@ extern "C" {
 
         if ((schedLoopRemainingCycles >
                     (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US))) {
-            checkDynamicTasks(schedLoopRemainingCycles, nextTargetCycles);
+            checkDynamicTasks(hf, schedLoopRemainingCycles, nextTargetCycles);
         }
     }
 

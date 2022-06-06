@@ -49,7 +49,7 @@ static demands_t       _demands;
 static bool            _gyro_is_calibrating;
 static float           _mspmotors[4];
 static bool            _pid_zero_throttle_iterm_reset;
-static angle_pid_t      _anglepid;
+static angle_pid_t     _anglepid;
 static vehicle_state_t _state;
 
 // Attitude task --------------------------------------------------------------
@@ -63,14 +63,11 @@ static task_t _attitudeTask;
 
 // PID controller support -----------------------------------------------------
 
-static pid_controller_t _pid_controllers[10];
-static uint8_t          _pid_count;
-
-static void hackflightAddPidController(pid_fun_t fun, void * data)
+static void hackflightAddPidController(hackflight_t * hf, pid_fun_t fun, void * data)
 {
-    _pid_controllers[_pid_count].fun = fun;
-    _pid_controllers[_pid_count].data = data;
-    _pid_count++;
+    hf->pid_controllers[hf->pid_count].fun = fun;
+    hf->pid_controllers[hf->pid_count].data = data;
+    hf->pid_count++;
 }
 
 // RX polling task ------------------------------------------------------------
@@ -116,18 +113,16 @@ static void task_rx(uint32_t time)
 
 static void hackflightRunCoreTasks(hackflight_t * hf)
 {
-    (void)hf;
-
     gyroReadScaled(&_state, &_gyro_is_calibrating);
 
     timeUs_t currentTimeUs = timeMicros();
 
     rxGetDemands(currentTimeUs, &_anglepid, &_demands);
 
-    for (uint8_t k=0; k<_pid_count; ++k) {
-        pid_controller_t pid = _pid_controllers[k];
+    for (uint8_t k=0; k<hf->pid_count; ++k) {
+        pid_controller_t pid = hf->pid_controllers[k];
         pid.fun(currentTimeUs, &_demands, pid.data,
-                &_state, _pid_zero_throttle_iterm_reset);
+                &_state, hf->pid_zero_throttle_iterm_reset);
     }
 
     float mixmotors[4] = {0};
@@ -169,7 +164,7 @@ static void hackflightInit(
 
     anglePidInit(&_anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
 
-    hackflightAddPidController(anglePidUpdate, &_anglepid);
+    hackflightAddPidController(hf, anglePidUpdate, &_anglepid);
 
     initTask(&_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
     initTask(&_rxTask,  task_rx,  RX_TASK_RATE);
