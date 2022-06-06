@@ -21,6 +21,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "pids/angle_struct.h"
+
 typedef uint32_t timeUs_t;
 
 typedef int32_t timeDelta_t;
@@ -136,8 +138,14 @@ typedef struct {
 
 } task_t;
 
-/*
 typedef struct {
 
+    bool            armed;
+    demands_t       demands;
+    bool            gyro_is_calibrating;
+    float           mspmotors[4];
+    bool            pid_zero_throttle_iterm_reset;
+    angle_pid_t     anglepid;
+    vehicle_state_t state;
+
 } hackflight_t;
-*/
