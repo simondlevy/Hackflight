@@ -126,6 +126,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
     (void)hf;
 
     gyroReadScaled(&_state, &_gyro_is_calibrating);
+    gyroReadScaled(&hf->state, &hf->gyro_is_calibrating);
 
     timeUs_t currentTimeUs = timeMicros();
 
