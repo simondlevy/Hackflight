@@ -145,6 +145,13 @@ typedef struct {
 
 typedef struct {
 
+    axes_t values;
+    uint32_t count;
+
+} imu_sensor_t;
+
+typedef struct {
+
     angle_pid_t      anglepid;
     bool             armed;
     task_t           attitudeTask;

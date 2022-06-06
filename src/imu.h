@@ -26,13 +26,6 @@
 
 typedef struct {
 
-    axes_t values;
-    uint32_t count;
-
-} imu_sensor_t;
-
-typedef struct {
-
     uint32_t quietPeriodEnd;
     uint32_t resetTimeEnd;
     bool resetCompleted;
