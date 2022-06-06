@@ -129,7 +129,7 @@ static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
 
 // Sensor support ------------------------------------------------------------
 
-static void hackflightAddSensor( hackflight_t * hf, task_fun_t fun, uint32_t rate)
+static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
 {
     initTask(&hf->sensor_tasks[hf->sensor_task_count++], fun, rate);
 }
