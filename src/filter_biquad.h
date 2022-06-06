@@ -25,6 +25,8 @@
 #include "maths.h"
 #include "utils.h"
 
+static const float BIQUAD_Q = 0.7071067811865475;     // quality factor - 2nd order Butterworth = 1/sqrt(2)
+
 static void biquadFilterUpdate(biquadFilter_t *filter, float filterFreq, uint32_t refreshRate, float Q, biquadFilterType_e filterType, float weight)
 {
     // setup variables

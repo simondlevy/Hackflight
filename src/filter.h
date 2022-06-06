@@ -23,8 +23,6 @@
 
 #include "datatypes.h"
 
-static const float BIQUAD_Q = 0.7071067811865475;     // quality factor - 2nd order Butterworth = 1/sqrt(2)
-
 
 typedef struct pt1Filter_s {
     float state;
