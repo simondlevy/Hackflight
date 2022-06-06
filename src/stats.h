@@ -19,10 +19,7 @@
 #include <stdint.h>
 #include <math.h>
 
-typedef struct {
-    float m_oldM, m_newM, m_oldS, m_newS;
-    int m_n;
-} stdev_t;
+#include "datatypes.h"
 
 #if defined(__cplusplus)
 extern "C" {

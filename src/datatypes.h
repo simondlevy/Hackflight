@@ -168,6 +168,11 @@ typedef struct {
 } imu_fusion_t;
 
 typedef struct {
+    float m_oldM, m_newM, m_oldS, m_newS;
+    int m_n;
+} stdev_t;
+
+typedef struct {
 
     imu_sensor_t     accelAccum;
     angle_pid_t      anglepid;
@@ -188,3 +193,4 @@ typedef struct {
     vehicle_state_t  vstate;
 
 } hackflight_t;
+
