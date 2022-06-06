@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "accel.h"
 #include "arming.h"
 #include "datatypes.h"
-#include "filter_biquad.h"
+#include "filter.h"
 #include "maths.h"
 #include "utils.h"
 
