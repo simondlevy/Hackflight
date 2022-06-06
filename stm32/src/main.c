@@ -32,7 +32,7 @@ void hackflightStep(hackflight_t * hackflight);
 
 int main(void)
 {
-    hackflight_t hackflight;
+    hackflight_t hackflight = {0};
 
     // STM32 boards have traditional accel/gyro combo
     hackflightFullInit(&hackflight, imuAccelTask, ACCEL_RATE);
