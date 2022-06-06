@@ -18,7 +18,6 @@
 
 #include "datatypes.h"
 #include "filter.h"
-#include "filter_pt1.h"
 #include "filter_impl.h"
 #include "gyro.h"
 #include "imu.h"
