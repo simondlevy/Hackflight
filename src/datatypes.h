@@ -182,10 +182,14 @@ typedef struct {
 
 } imu_fusion_t;
 
+// Stats ------------------------------------------------------------------------
+
 typedef struct {
     float m_oldM, m_newM, m_oldS, m_newS;
     int m_n;
 } stdev_t;
+
+// Filters ------------------------------------------------------------------------
 
 typedef enum {
     FILTER_LPF,    // 2nd order Butterworth section
@@ -203,6 +207,8 @@ typedef enum {
 struct filter_s;
 typedef struct filter_s filter_t;
 typedef float (*filterApplyFnPtr)(filter_t *filter, float input);
+
+// Hackflight ------------------------------------------------------------------------
 
 typedef struct {
 
