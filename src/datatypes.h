@@ -21,6 +21,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
+typedef uint32_t timeUs_t;
+
+typedef int32_t timeDelta_t;
+
 typedef struct {
 
     float w;
@@ -114,3 +118,26 @@ typedef struct {
     pid_fun_t fun;
     void * data;
 } pid_controller_t;
+
+
+typedef struct {
+
+
+    // For both hardware and sim implementations
+    void (*fun)(uint32_t time);
+    timeDelta_t desiredPeriodUs;        // target period of execution
+    timeUs_t lastExecutedAtUs;          // last time of invocation
+
+    // For hardware impelmentations
+    uint16_t dynamicPriority;           // when last executed, to avoid task starvation
+    uint16_t taskAgeCycles;
+    timeUs_t lastSignaledAtUs;          // time of invocation event for event-driven tasks
+    timeUs_t anticipatedExecutionTime;  // Fixed point expectation of next execution time
+
+} task_t;
+
+/*
+typedef struct {
+
+} hackflight_t;
+*/
