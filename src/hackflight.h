@@ -174,6 +174,7 @@ static void hackflightInit(
     anglePidInit(&hf->anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
 
     hackflightAddPidController(anglePidUpdate, &_anglepid);
+    hackflightAddPidController2(hf, anglePidUpdate, &_anglepid);
 
     initTask(&_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
     initTask(&_rxTask,  task_rx,  RX_TASK_RATE);
