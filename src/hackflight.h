@@ -114,8 +114,10 @@ static void task_rx(uint32_t time)
 
 // Core tasks: gyro, PID controllers, mixer, motors ------------------------
 
-static void hackflightRunCoreTasks(void)
+static void hackflightRunCoreTasks(hackflight_t * hf)
 {
+    (void)hf;
+
     gyroReadScaled(&_state, &_gyro_is_calibrating);
 
     timeUs_t currentTimeUs = timeMicros();
