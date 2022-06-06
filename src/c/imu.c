@@ -184,13 +184,6 @@ static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
 
 // ======================================================================================
 
-static imu_fusion_t _fusion_prev = {
-    0,              // time
-    {1, 0, 0, 0},   // quaternion
-    {0,0,0},        // rotation
-    {0, 0, false}   // gyroReset quietPeriodEnd, resetTimeEnd, resetCompleted
-};
-
 void imuAccelTask(void * hackflight, uint32_t time)
 {
     (void)time;
@@ -231,9 +224,7 @@ void imuGetEulerAngles(hackflight_t * hf, timeUs_t time)
 
 void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
-    imu_fusion_t fusion = {0};
-
-    timeDelta_t deltaT = time - _fusion_prev.time;
+    timeDelta_t deltaT = time - hf->imuFusionPrev.time;
 
     axes_t gyroAvg = {0};
     getAverage(&hf->gyroAccum, GYRO_PERIOD(), &gyroAvg);
@@ -245,14 +236,16 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 
     float dt = deltaT * 1e-6;
 
+    imu_fusion_t * fusionPrev = &hf->imuFusionPrev;
+
     gyro_reset_t new_gyro_reset = {0};
     bool resetActive1 = checkReset(time, useAcc, &gyroAvg, hf->armed,
-            &_fusion_prev.gyroReset, &new_gyro_reset);
+            &fusionPrev->gyroReset, &new_gyro_reset);
 
     bool resetActive = hf->armed ?  false : resetActive1;
 
     if (!hf->armed) {
-        memcpy(&fusion.gyroReset, &new_gyro_reset, sizeof(gyro_reset_t));
+        memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyro_reset_t));
     }
 
     // Scale the kP to generally converge faster when disarmed.
@@ -261,7 +254,7 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
         DCM_KP * (!hf->armed ? 10 : 1);
 
     mahony(dt, &gyroAvg, &accelAvg, useAcc, kpgain,
-            &_fusion_prev.rot, &_fusion_prev.quat, quat);
+            &fusionPrev->rot, &fusionPrev->quat, quat);
 }
 
 void imuUpdateFusion(hackflight_t * hf, timeUs_t time, quaternion_t * quat, rotation_t * rot)
@@ -270,6 +263,6 @@ void imuUpdateFusion(hackflight_t * hf, timeUs_t time, quaternion_t * quat, rota
     fusion.time = time;
     memcpy(&fusion.quat, quat, sizeof(quaternion_t));
     memcpy(&fusion.rot, rot, sizeof(rotation_t));
-    memcpy(&_fusion_prev, &fusion, sizeof(imu_fusion_t));
+    memcpy(&hf->imuFusionPrev, &fusion, sizeof(imu_fusion_t));
     memset(&hf->gyroAccum, 0, sizeof(imu_sensor_t));
 }
