@@ -202,8 +202,10 @@ void imuAccelTask(void * hackflight, uint32_t time)
     accelUpdate(&hf->accelAccum);
 }
 
-void imuAccumulateGyro(float * adcf)
+void imuAccumulateGyro(hackflight_t * hf, float * adcf)
 {
+    (void)hf;
+
     static float _adcf[3];
 
     // integrate using trapezium rule to avoid bias
@@ -231,7 +233,7 @@ void imuGetEulerAngles( hackflight_t * hf, timeUs_t time)
     imuUpdateFusion(time, &quat, &rot);
 }
 
-void imuGetQuaternion( hackflight_t * hf, uint32_t time, quaternion_t * quat)
+void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
     imu_fusion_t fusion = {0};
 

@@ -172,7 +172,7 @@ static void performGyroCalibration(gyro_t * gyro)
 
 static gyro_t _gyro;
 
-static void gyroUpdate(vehicle_state_t * state, bool * is_calibrating)
+static void gyroUpdate(hackflight_t * hf)
 {
     bool calibrationComplete = _gyro.calibration.cyclesRemaining <= 0;
 
@@ -240,14 +240,15 @@ static void gyroUpdate(vehicle_state_t * state, bool * is_calibrating)
 
 
     // Used for quaternion filter; stubbed otherwise
-    imuAccumulateGyro(_gyro.dps_filtered);
+    imuAccumulateGyro(hf, _gyro.dps_filtered);
 
-    state->dphi   = _gyro.dps_filtered[0];
-    state->dtheta = _gyro.dps_filtered[1];
-    state->dpsi   = _gyro.dps_filtered[2];
+    hf->vstate.dphi   = _gyro.dps_filtered[0];
+    hf->vstate.dtheta = _gyro.dps_filtered[1];
+    hf->vstate.dpsi   = _gyro.dps_filtered[2];
 
-    *is_calibrating = !calibrationComplete;
-}
+    hf->gyroIsCalibrating = !calibrationComplete;
+
+} // gyroUpdate
 
 // ============================================================================
 
@@ -269,7 +270,7 @@ void gyroInit(void)
 void gyroReadScaled(hackflight_t * hf)
 {
     if (gyroIsReady()) {
-        gyroUpdate(&hf->vstate, &hf->gyroIsCalibrating);
+        gyroUpdate(hf);
     }
 }
 
