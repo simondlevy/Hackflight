@@ -140,12 +140,14 @@ typedef struct {
 
 typedef struct {
 
-    bool            armed;
-    demands_t       demands;
-    bool            gyro_is_calibrating;
-    float           mspmotors[4];
-    bool            pid_zero_throttle_iterm_reset;
-    angle_pid_t     anglepid;
-    vehicle_state_t state;
+    bool             armed;
+    demands_t        demands;
+    bool             gyro_is_calibrating;
+    float            mspmotors[4];
+    pid_controller_t pid_controllers[10];
+    uint8_t          pid_count;
+    bool             pid_zero_throttle_iterm_reset;
+    angle_pid_t      anglepid;
+    vehicle_state_t  state;
 
 } hackflight_t;
