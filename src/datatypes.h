@@ -109,7 +109,6 @@ typedef struct {
 } vehicle_state_t;
 
 typedef void (*pid_fun_t)(
-        void * hackflight,
         uint32_t usec,
         demands_t * demands,
         void * data,

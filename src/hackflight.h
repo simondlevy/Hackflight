@@ -109,7 +109,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
     for (uint8_t k=0; k<hf->pid_count; ++k) {
         pid_controller_t pid = hf->pid_controllers[k];
-        pid.fun(hf, currentTimeUs, &hf->demands, pid.data,
+        pid.fun(currentTimeUs, &hf->demands, pid.data,
                 &hf->state, hf->pid_zero_throttle_iterm_reset);
     }
 

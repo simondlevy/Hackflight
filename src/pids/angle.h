@@ -309,7 +309,6 @@ extern "C" {
     }
 
     static void anglePidUpdate(
-            void * ignore,
             uint32_t currentTimeUs,
             demands_t * demands,
             void * data,
@@ -317,8 +316,6 @@ extern "C" {
             bool reset
             )
     {
-        (void)ignore;
-
         angle_pid_t * pid = (angle_pid_t *)data;
 
         // gradually scale back integration when above windup point
