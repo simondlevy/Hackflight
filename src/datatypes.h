@@ -23,26 +23,12 @@
 
 #include "pids/angle_struct.h"
 
-typedef uint32_t timeUs_t;
+// Time -----------------------------------------------------------------------
 
+typedef uint32_t timeUs_t;
 typedef int32_t timeDelta_t;
 
-typedef struct {
-
-    float w;
-    float x;
-    float y;
-    float z;
-
-} quaternion_t;
-
-typedef struct {
-
-    float r20;
-    float r21;
-    float r22;
-
-} rotation_t;
+// Demands ------------------------------------------------------------------------
 
 typedef struct {
 
@@ -53,6 +39,8 @@ typedef struct {
 
 } demands_t;
 
+// Axes ------------------------------------------------------------------------
+
 typedef struct {
 
     float x;
@@ -60,6 +48,8 @@ typedef struct {
     float z;
 
 } axes_t;
+
+// Receiver ------------------------------------------------------------------------
 
 typedef struct {
 
@@ -91,6 +81,8 @@ typedef enum {
     THROTTLE_HIGH
 } throttleStatus_e;
 
+// Vehicle state ------------------------------------------------------------------------
+
 typedef struct {
 
     float x;
@@ -108,6 +100,8 @@ typedef struct {
 
 } vehicle_state_t;
 
+// PID control ------------------------------------------------------------------------
+
 typedef void (*pid_fun_t)(
         uint32_t usec,
         demands_t * demands,
@@ -117,16 +111,18 @@ typedef void (*pid_fun_t)(
         );
 
 
-typedef void (*task_fun_t)(
-        void * hackflight,
-        uint32_t usec
-        );
-
 typedef struct {
     pid_fun_t fun;
     void * data;
 } pid_controller_t;
 
+
+// Tasks ------------------------------------------------------------------------
+
+typedef void (*task_fun_t)(
+        void * hackflight,
+        uint32_t usec
+        );
 
 typedef struct {
 
@@ -142,6 +138,25 @@ typedef struct {
     timeUs_t anticipatedExecutionTime;  // Fixed point expectation of next execution time
 
 } task_t;
+
+// IMU ------------------------------------------------------------------------
+
+typedef struct {
+
+    float w;
+    float x;
+    float y;
+    float z;
+
+} quaternion_t;
+
+typedef struct {
+
+    float r20;
+    float r21;
+    float r22;
+
+} rotation_t;
 
 typedef struct {
 
