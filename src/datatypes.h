@@ -189,7 +189,7 @@ typedef struct {
     int m_n;
 } stdev_t;
 
-// Filters ------------------------------------------------------------------------
+// Filters ----------------------------------------------------------------------
 
 typedef enum {
     FILTER_LPF,    // 2nd order Butterworth section
@@ -208,7 +208,15 @@ struct filter_s;
 typedef struct filter_s filter_t;
 typedef float (*filterApplyFnPtr)(filter_t *filter, float input);
 
-// Hackflight ------------------------------------------------------------------------
+// Gyro ------------------------------------------------------------------------
+
+typedef struct {
+    float sum[3];
+    stdev_t var[3];
+    int32_t cyclesRemaining;
+} gyroCalibration_t;
+
+// Hackflight ------------------------------------------------------------------
 
 typedef struct {
 

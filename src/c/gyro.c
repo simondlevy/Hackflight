@@ -47,18 +47,12 @@ extern "C" {
     } gyroLowpassFilter_t;
 
     typedef struct {
-        float sum[3];
-        stdev_t var[3];
-        int32_t cyclesRemaining;
-    } gyroCalibration_t;
 
-    typedef struct {
-
-        float dps[3];         // aligned, calibrated, scaled, but unfiltered data from sensor
-        float dps_filtered[3];        // filtered gyro data
+        float dps[3];          // aligned, calibrated, scaled, but unfiltered data from sensor
+        float dps_filtered[3]; // filtered gyro data
         float dps_filtered_prev[3];
-        uint8_t sampleCount;  // gyro sensor sample counter
-        float sampleSum[3];   // summed samples used for downsampling
+        uint8_t sampleCount;   // gyro sensor sample counter
+        float sampleSum[3];    // summed samples used for downsampling
 
         // if true then downsample using gyro lowpass 2, otherwise use averaging
         bool downsampleFilterEnabled;      
