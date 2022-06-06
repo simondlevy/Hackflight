@@ -80,7 +80,7 @@ extern "C" {
         (void)time;
 
         hackflight_t * hf = (hackflight_t *)hackflight;
-        mspUpdate(&hf->state, &hf->rx_axes, hf->armed, hf->mspmotors);
+        mspUpdate(&hf->vstate, &hf->rx_axes, hf->armed, hf->mspmotors);
     }
 
     static task_t _mspTask;

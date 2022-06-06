@@ -49,9 +49,9 @@ extern "C" {
 
     void imuAccumulateGyro(float * adcf);
 
-    void imuGetEulerAngles(timeUs_t time, vehicle_state_t * vstate, bool armed);
+    void imuGetEulerAngles(hackflight_t * hf, timeUs_t time);
 
-    void imuGetQuaternion(uint32_t time, bool armed, quaternion_t * quat);
+    void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat);
 
     void imuInit(void);
 

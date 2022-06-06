@@ -47,7 +47,7 @@ static const uint32_t ATTITUDE_TASK_RATE = 100;
 static void task_attitude(void * hackflight, uint32_t time)
 {
     hackflight_t * hf = (hackflight_t *)hackflight;
-    imuGetEulerAngles(time, &hf->state, hf->armed);
+    imuGetEulerAngles(hf, time);
 }
 
 // PID controller support -----------------------------------------------------
@@ -75,8 +75,8 @@ static void task_rx(void * hackflight, uint32_t time)
 
     bool gotNewData = false;
 
-    bool shallowAngle = fabsf(hf->state.phi) < max_arming_angle &&
-        fabsf(hf->state.theta) < max_arming_angle;
+    bool shallowAngle = fabsf(hf->vstate.phi) < max_arming_angle &&
+        fabsf(hf->vstate.theta) < max_arming_angle;
 
     rxPoll(
             time,
@@ -101,7 +101,7 @@ static void task_rx(void * hackflight, uint32_t time)
 
 static void hackflightRunCoreTasks(hackflight_t * hf)
 {
-    gyroReadScaled(&hf->state, &hf->gyro_is_calibrating);
+    gyroReadScaled(&hf->vstate, &hf->gyro_is_calibrating);
 
     timeUs_t currentTimeUs = timeMicros();
 
@@ -110,7 +110,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
     for (uint8_t k=0; k<hf->pid_count; ++k) {
         pid_controller_t pid = hf->pid_controllers[k];
         pid.fun(currentTimeUs, &hf->demands, pid.data,
-                &hf->state, hf->pid_zero_throttle_iterm_reset);
+                &hf->vstate, hf->pid_zero_throttle_iterm_reset);
     }
 
     float mixmotors[4] = {0};

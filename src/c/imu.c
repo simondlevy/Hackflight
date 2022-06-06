@@ -1,20 +1,20 @@
 /*
-Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2022 Simon D. Levy
 
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -184,7 +184,6 @@ static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
 
 // ======================================================================================
 
-static imu_sensor_t _accel_accum;
 static imu_sensor_t _gyro_accum;
 
 static imu_fusion_t _fusion_prev = {
@@ -197,9 +196,10 @@ static imu_fusion_t _fusion_prev = {
 void imuAccelTask(void * hackflight, uint32_t time)
 {
     (void)time;
-    (void)hackflight;
 
-    accelUpdate(&_accel_accum);
+    hackflight_t * hf = (hackflight_t *)hackflight;
+
+    accelUpdate(&hf->accelAccum);
 }
 
 void imuAccumulateGyro(float * adcf)
@@ -218,20 +218,20 @@ void imuAccumulateGyro(float * adcf)
     }
 }
 
-void imuGetEulerAngles(timeUs_t time, vehicle_state_t * vstate, bool armed)
+void imuGetEulerAngles( hackflight_t * hf, timeUs_t time)
 {
     quaternion_t quat = {0};
 
-    imuGetQuaternion(time, armed, &quat);
+    imuGetQuaternion(hf, time, &quat);
 
     rotation_t rot = {0};
 
-    quat2euler(&quat, vstate, &rot);
+    quat2euler(&quat, &hf->vstate, &rot);
 
     imuUpdateFusion(time, &quat, &rot);
 }
 
-void imuGetQuaternion(uint32_t time, bool armed, quaternion_t * quat)
+void imuGetQuaternion( hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
     imu_fusion_t fusion = {0};
 
@@ -241,24 +241,26 @@ void imuGetQuaternion(uint32_t time, bool armed, quaternion_t * quat)
     getAverage(&_gyro_accum, GYRO_PERIOD(), &gyroAvg);
 
     axes_t accelAvg = {0};
-    getAverage(&_accel_accum, 1, &accelAvg);
+    getAverage(&hf->accelAccum, 1, &accelAvg);
 
     bool useAcc = isAccelHealthy(&accelAvg);
 
     float dt = deltaT * 1e-6;
 
     gyro_reset_t new_gyro_reset = {0};
-    bool resetActive1 = checkReset(time, useAcc, &gyroAvg, armed,
+    bool resetActive1 = checkReset(time, useAcc, &gyroAvg, hf->armed,
             &_fusion_prev.gyroReset, &new_gyro_reset);
 
-    bool resetActive = armed ?  false : resetActive1;
+    bool resetActive = hf->armed ?  false : resetActive1;
 
-    if (!armed) {
+    if (!hf->armed) {
         memcpy(&fusion.gyroReset, &new_gyro_reset, sizeof(gyro_reset_t));
     }
 
     // Scale the kP to generally converge faster when disarmed.
-    float kpgain = resetActive ? ATTITUDE_RESET_KP_GAIN : DCM_KP * (!armed ? 10 : 1);
+    float kpgain = resetActive ?
+        ATTITUDE_RESET_KP_GAIN :
+        DCM_KP * (!hf->armed ? 10 : 1);
 
     mahony(dt, &gyroAvg, &accelAvg, useAcc, kpgain,
             &_fusion_prev.rot, &_fusion_prev.quat, quat);

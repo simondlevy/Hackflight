@@ -152,6 +152,7 @@ typedef struct {
 
 typedef struct {
 
+    imu_sensor_t     accelAccum;
     angle_pid_t      anglepid;
     bool             armed;
     task_t           attitudeTask;
@@ -165,6 +166,6 @@ typedef struct {
     rx_axes_t        rx_axes;
     task_t           sensor_tasks[20];
     uint8_t          sensor_task_count;
-    vehicle_state_t  state;
+    vehicle_state_t  vstate;
 
 } hackflight_t;
