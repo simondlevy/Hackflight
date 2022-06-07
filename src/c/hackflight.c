@@ -306,9 +306,9 @@ extern "C" {
     // ----------------------------------------------------------------------------
 
     void hackflightFullInit(
-        hackflight_t * hf,
-        task_fun_t accel_fun,
-         uint32_t accel_rate)
+            hackflight_t * hf,
+            task_fun_t accel_fun,
+            uint32_t accel_rate)
     {
         // Tuning constants for angle PID controller
         static const float RATE_P  = 1.441305;
@@ -320,7 +320,7 @@ extern "C" {
         void boardInit(void);
         boardInit();
 
-        gyroInit();
+        gyroInit(hf);
         imuInit();
         ledInit();
         ledFlash(10, 50);

@@ -43,7 +43,7 @@ extern "C" {
 // For hardware impelmentations ------------------------------------------------------
 
 void     gyroDevInit(void);
-void     gyroInit(void);
+void     gyroInit(hackflight_t * hf);
 uint32_t gyroInterruptTime(void);
 bool     gyroIsReady(void);
 int16_t  gyroReadRaw(uint8_t k);

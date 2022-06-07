@@ -43,7 +43,11 @@ extern "C" {
         return input;
     }
 
-    static bool initLowpassFilterLpf(gyro_t * gyro, int slot, uint16_t lpfHz, uint32_t looptime)
+    static bool initLowpassFilterLpf(
+            gyro_t * gyro,
+            int slot,
+            uint16_t lpfHz,
+            uint32_t looptime)
     {
         filterApplyFnPtr *lowpassFilterApplyFn;
         gyroLowpassFilter_t *lowpassFilter = NULL;
@@ -111,7 +115,8 @@ extern "C" {
                 const float stddev = devStandardDeviation(&gyro->calibration.var[axis]);
 
                 // check deviation and startover in case the model was moved
-                if (MOVEMENT_CALIBRATION_THRESHOLD && stddev > MOVEMENT_CALIBRATION_THRESHOLD) {
+                if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
+                        MOVEMENT_CALIBRATION_THRESHOLD) {
                     setCalibrationCycles(gyro);
                     return;
                 }
@@ -125,46 +130,46 @@ extern "C" {
         --gyro->calibration.cyclesRemaining;
     }
 
-    static gyro_t _gyro;
-
     static void gyroUpdate(hackflight_t * hf)
     {
-        bool calibrationComplete = _gyro.calibration.cyclesRemaining <= 0;
+        gyro_t * gyro = &hf->gyro;
+
+        bool calibrationComplete = gyro->calibration.cyclesRemaining <= 0;
 
         static float _adc[3];
 
         if (calibrationComplete) {
             // move 16-bit gyro data into floats to avoid overflows in calculations
 
-            _adc[0] = gyroReadRaw(0) - _gyro.zero[0];
-            _adc[1] = gyroReadRaw(1) - _gyro.zero[1];
-            _adc[2] = gyroReadRaw(2) - _gyro.zero[2];
+            _adc[0] = gyroReadRaw(0) - gyro->zero[0];
+            _adc[1] = gyroReadRaw(1) - gyro->zero[1];
+            _adc[2] = gyroReadRaw(2) - gyro->zero[2];
 
             alignSensorViaRotation(_adc);
         } else {
-            performGyroCalibration(&_gyro);
+            performGyroCalibration(gyro);
         }
 
         if (calibrationComplete) {
-            _gyro.dps[0] = _adc[0] * gyroScale();
-            _gyro.dps[1] = _adc[1] * gyroScale();
-            _gyro.dps[2] = _adc[2] * gyroScale();
+            gyro->dps[0] = _adc[0] * gyroScale();
+            gyro->dps[1] = _adc[1] * gyroScale();
+            gyro->dps[2] = _adc[2] * gyroScale();
         }
 
-        if (_gyro.downsampleFilterEnabled) {
+        if (gyro->downsampleFilterEnabled) {
             // using gyro lowpass 2 filter for downsampling
-            _gyro.sampleSum[0] =
-                _gyro.lowpass2FilterApplyFn((filter_t *)&_gyro.lowpass2Filter[0], _gyro.dps[0]);
-            _gyro.sampleSum[1] =
-                _gyro.lowpass2FilterApplyFn((filter_t *)&_gyro.lowpass2Filter[1], _gyro.dps[1]);
-            _gyro.sampleSum[2] =
-                _gyro.lowpass2FilterApplyFn((filter_t *)&_gyro.lowpass2Filter[2], _gyro.dps[2]);
+            gyro->sampleSum[0] = gyro->lowpass2FilterApplyFn(
+                    (filter_t *)&gyro->lowpass2Filter[0], gyro->dps[0]);
+            gyro->sampleSum[1] = gyro->lowpass2FilterApplyFn(
+                    (filter_t *)&gyro->lowpass2Filter[1], gyro->dps[1]);
+            gyro->sampleSum[2] = gyro->lowpass2FilterApplyFn(
+                    (filter_t *)&gyro->lowpass2Filter[2], gyro->dps[2]);
         } else {
             // using simple averaging for downsampling
-            _gyro.sampleSum[0] += _gyro.dps[0];
-            _gyro.sampleSum[1] += _gyro.dps[1];
-            _gyro.sampleSum[2] += _gyro.dps[2];
-            _gyro.sampleCount++;
+            gyro->sampleSum[0] += gyro->dps[0];
+            gyro->sampleSum[1] += gyro->dps[1];
+            gyro->sampleSum[2] += gyro->dps[2];
+            gyro->sampleCount++;
         }
 
 
@@ -172,34 +177,34 @@ extern "C" {
 
             // downsample the individual gyro samples
             float dps_filtered = 0;
-            if (_gyro.downsampleFilterEnabled) {
+            if (gyro->downsampleFilterEnabled) {
                 // using gyro lowpass 2 filter for downsampling
-                dps_filtered = _gyro.sampleSum[axis];
+                dps_filtered = gyro->sampleSum[axis];
             } else {
                 // using simple average for downsampling
-                if (_gyro.sampleCount) {
-                    dps_filtered = _gyro.sampleSum[axis] / _gyro.sampleCount;
+                if (gyro->sampleCount) {
+                    dps_filtered = gyro->sampleSum[axis] / gyro->sampleCount;
                 }
-                _gyro.sampleSum[axis] = 0;
+                gyro->sampleSum[axis] = 0;
             }
 
             // apply static notch filters and software lowpass filters
             dps_filtered =
-                _gyro.lowpassFilterApplyFn((filter_t *)&_gyro.lowpassFilter[axis],
+                gyro->lowpassFilterApplyFn((filter_t *)&gyro->lowpassFilter[axis],
                         dps_filtered);
 
-            _gyro.dps_filtered[axis] = dps_filtered;
+            gyro->dps_filtered[axis] = dps_filtered;
         }
 
-        _gyro.sampleCount = 0;
+        gyro->sampleCount = 0;
 
 
         // Used for quaternion filter; stubbed otherwise
-        imuAccumulateGyro(hf, _gyro.dps_filtered);
+        imuAccumulateGyro(hf, gyro->dps_filtered);
 
-        hf->vstate.dphi   = _gyro.dps_filtered[0];
-        hf->vstate.dtheta = _gyro.dps_filtered[1];
-        hf->vstate.dpsi   = _gyro.dps_filtered[2];
+        hf->vstate.dphi   = gyro->dps_filtered[0];
+        hf->vstate.dtheta = gyro->dps_filtered[1];
+        hf->vstate.dpsi   = gyro->dps_filtered[2];
 
         hf->gyroIsCalibrating = !calibrationComplete;
 
@@ -207,18 +212,20 @@ extern "C" {
 
     // ============================================================================
 
-    void gyroInit(void)
+    void gyroInit(hackflight_t * hf)
     {
-        initLowpassFilterLpf(&_gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ, GYRO_PERIOD());
+        gyro_t * gyro = &hf->gyro;
 
-        _gyro.downsampleFilterEnabled = initLowpassFilterLpf(
-                &_gyro,
+        initLowpassFilterLpf(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ, GYRO_PERIOD());
+
+        gyro->downsampleFilterEnabled = initLowpassFilterLpf(
+                gyro,
                 FILTER_LPF2,
                 LPF2_STATIC_HZ,
                 GYRO_PERIOD()
                 );
 
-        setCalibrationCycles(&_gyro); // start calibrating
+        setCalibrationCycles(gyro); // start calibrating
     }
 
 

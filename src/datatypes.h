@@ -327,6 +327,7 @@ typedef struct {
     bool             armed;
     task_t           attitudeTask;
     demands_t        demands;
+    gyro_t           gyro;
     imu_sensor_t     gyroAccum;
     bool             gyroIsCalibrating;
     imu_fusion_t     imuFusionPrev;
