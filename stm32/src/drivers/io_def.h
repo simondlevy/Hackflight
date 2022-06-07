@@ -16,7 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "utils.h"
+#include "macros.h"
 
 // return ioTag_t for given pinid
 // tag for NONE must be false

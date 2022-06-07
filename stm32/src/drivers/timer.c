@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <math.h>
 
 #include "timer.h"
-#include "utils.h"
+#include "macros.h"
 
 #include "platform.h"
 #include "atomic.h"

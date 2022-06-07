@@ -17,7 +17,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "io_types.h"
-#include "utils.h"
+#include "macros.h"
 
 #define STATUS_LED_NUMBER 3
 

@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "io_impl.h"
 #include "rcc.h"
 
-#include "utils.h"
+#include "macros.h"
 
 // io ports defs are stored in array by index now
 struct ioPortDef_s {

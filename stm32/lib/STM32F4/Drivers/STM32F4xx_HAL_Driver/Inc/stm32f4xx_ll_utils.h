@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    stm32f4xx_ll_utils.h
+  * @file    stm32f4xx_ll_macros.h
   * @author  MCD Application Team
   * @version V1.7.1
   * @date    14-April-2017

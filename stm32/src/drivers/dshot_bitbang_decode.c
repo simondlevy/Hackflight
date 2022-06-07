@@ -21,7 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 
 #include <maths.h>
-#include "utils.h"
+#include "macros.h"
 #include "dshot.h"
 #include "dshot_bitbang_decode.h"
 

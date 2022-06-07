@@ -21,7 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "datatypes.h"
 #include "filter.h"
 #include "maths.h"
-#include "utils.h"
+#include "macros.h"
 
 // static const uint16_t CALIBRATING_ACC_CYCLES = 400;
 static const uint16_t LPF_CUTOFF_HZ = 10;

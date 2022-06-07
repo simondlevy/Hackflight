@@ -21,7 +21,7 @@
 #include "datatypes.h"
 #include "serial.h"
 #include "time.h"
-#include "utils.h"
+#include "macros.h"
 
 /*
  * Observations

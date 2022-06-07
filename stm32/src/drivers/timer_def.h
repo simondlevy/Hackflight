@@ -17,7 +17,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "platform.h"
-#include "utils.h"
+#include "macros.h"
 
 // allow conditional definition of DMA related members
 # define DEF_TIM_DMA_COND(...) __VA_ARGS__

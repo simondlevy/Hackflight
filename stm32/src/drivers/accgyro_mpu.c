@@ -23,7 +23,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <maths.h>
 #include <system.h>
 #include <time.h>
-#include "utils.h"
+#include "macros.h"
 
 #include "accgyro_mpu.h"
 #include "atomic.h"

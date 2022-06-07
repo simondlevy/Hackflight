@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "platform.h"
 
-#include "utils.h"
+#include "macros.h"
 
 #include "dma.h"
 #include "dma_reqmap.h"

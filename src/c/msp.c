@@ -28,7 +28,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "serial.h"
 #include "system.h"
 #include "time.h"
-#include "utils.h"
+#include "macros.h"
 
 #define MAX_MSP_PORT_COUNT 3
 #define MSP_PORT_INBUF_SIZE 192
