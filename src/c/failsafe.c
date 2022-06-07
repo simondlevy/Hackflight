@@ -21,7 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "arming.h"
 #include "failsafe.h"
-#include "rx_throttle_status.h"
+#include "rx.h"
 #include "time.h"
 
 static const uint32_t MILLIS_PER_TENTH_SECOND    =   100;
