@@ -118,24 +118,7 @@ extern "C" {
         }
     }
 
-    static int32_t _schedLoopStartCycles;
-    static int32_t _schedLoopStartMinCycles;
-    static int32_t _schedLoopStartMaxCycles;
-    static uint32_t _schedLoopStartDeltaDownCycles;
-    static uint32_t _schedLoopStartDeltaUpCycles;
-
-    static int32_t _taskGuardCycles;
-    static int32_t _taskGuardMinCycles;
-    static int32_t _taskGuardMaxCycles;
-    static uint32_t _taskGuardDeltaDownCycles;
-    static uint32_t _taskGuardDeltaUpCycles;
-
-    static int32_t _desiredPeriodCycles;
-    static uint32_t _lastTargetCycles;
-
-    static uint32_t _nextTimingCycles;
-
-    static void executeTask(hackflight_t * hf, task_t *task, timeUs_t currentTimeUs)
+   static void executeTask(hackflight_t * hf, task_t *task, timeUs_t currentTimeUs)
     {
         task->lastExecutedAtUs = currentTimeUs;
         task->dynamicPriority = 0;
@@ -163,8 +146,10 @@ extern "C" {
             uint32_t nowCycles,
             uint32_t nextTargetCycles)
     {
-        if (_schedLoopStartCycles > _schedLoopStartMinCycles) {
-            _schedLoopStartCycles -= _schedLoopStartDeltaDownCycles;
+        scheduler_t * scheduler = &hf->scheduler;
+
+        if (scheduler->loopStartCycles > scheduler->loopStartMinCycles) {
+            scheduler->loopStartCycles -= scheduler->loopStartDeltaDownCycles;
         }
 
         while (schedLoopRemainingCycles > 0) {
@@ -175,10 +160,10 @@ extern "C" {
         hackflightRunCoreTasks(hf);
 
         // CPU busy
-        if (cmpTimeCycles(_nextTimingCycles, nowCycles) < 0) {
-            _nextTimingCycles += systemClockMicrosToCycles(1000000);
+        if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
+            scheduler->nextTimingCycles += systemClockMicrosToCycles(1000000);
         }
-        _lastTargetCycles = nextTargetCycles;
+        scheduler->lastTargetCycles = nextTargetCycles;
 
         // Bring the scheduler into lock with the gyro
         // Track the actual gyro rate over given number of cycle times and set the
@@ -194,7 +179,7 @@ extern "C" {
         if (gyroInterruptTime() >= _terminalGyroRateCount) {
             // Calculate the number of clock cycles on average between gyro interrupts
             uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-            _desiredPeriodCycles = sampleCycles / GYRO_RATE_COUNT;
+            scheduler->desiredPeriodCycles = sampleCycles / GYRO_RATE_COUNT;
             _sampleRateStartCycles = nowCycles;
             _terminalGyroRateCount += GYRO_RATE_COUNT;
         }
@@ -204,9 +189,9 @@ extern "C" {
         static int32_t _gyroSkewAccum;
 
         int32_t gyroSkew = cmpTimeCycles(nextTargetCycles, gyroSyncTime()) %
-            _desiredPeriodCycles;
-        if (gyroSkew > (_desiredPeriodCycles / 2)) {
-            gyroSkew -= _desiredPeriodCycles;
+            scheduler->desiredPeriodCycles;
+        if (gyroSkew > (scheduler->desiredPeriodCycles / 2)) {
+            gyroSkew -= scheduler->desiredPeriodCycles;
         }
 
         _gyroSkewAccum += gyroSkew;
@@ -219,7 +204,7 @@ extern "C" {
             _terminalGyroLockCount += GYRO_LOCK_COUNT;
 
             // Move the desired start time of the gyroSampleTask
-            _lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
+            scheduler->lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
 
             _gyroSkewAccum = 0;
         }
@@ -279,8 +264,10 @@ extern "C" {
             uint32_t nowCycles = systemGetCycleCounter();
             schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
+            scheduler_t * scheduler = &hf->scheduler;
+
             // Allow a little extra time
-            taskRequiredTimeCycles += _taskGuardCycles;
+            taskRequiredTimeCycles += scheduler->taskGuardCycles;
 
             if (taskRequiredTimeCycles < schedLoopRemainingCycles) {
                 uint32_t antipatedEndCycles = nowCycles + taskRequiredTimeCycles;
@@ -288,12 +275,13 @@ extern "C" {
                 nowCycles = systemGetCycleCounter();
                 int32_t cyclesOverdue = cmpTimeCycles(nowCycles, antipatedEndCycles);
 
-                if ((cyclesOverdue > 0) || (-cyclesOverdue < _taskGuardMinCycles)) {
-                    if (_taskGuardCycles < _taskGuardMaxCycles) {
-                        _taskGuardCycles += _taskGuardDeltaUpCycles;
+                if ((cyclesOverdue > 0) ||
+                        (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
+                    if (scheduler->taskGuardCycles < scheduler->taskGuardMaxCycles) {
+                        scheduler->taskGuardCycles += scheduler->taskGuardDeltaUpCycles;
                     }
-                } else if (_taskGuardCycles > _taskGuardMinCycles) {
-                    _taskGuardCycles -= _taskGuardDeltaDownCycles;
+                } else if (scheduler->taskGuardCycles > scheduler->taskGuardMinCycles) {
+                    scheduler->taskGuardCycles -= scheduler->taskGuardDeltaDownCycles;
                 }
             } else if (selectedTask->taskAgeCycles > TASK_AGE_EXPEDITE_COUNT) {
                 // If a task has been unable to run, then reduce it's recorded
@@ -336,27 +324,34 @@ extern "C" {
 
         initTask(&_mspTask, task_msp, MSP_TASK_RATE);
 
-        _schedLoopStartCycles = systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-        _schedLoopStartMinCycles = systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-        _schedLoopStartMaxCycles = systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
-        _schedLoopStartDeltaDownCycles =
+        scheduler_t * scheduler = &hf->scheduler;
+
+        scheduler->loopStartCycles =
+            systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+        scheduler->loopStartMinCycles =
+            systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+        scheduler->loopStartMaxCycles =
+            systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
+        scheduler->loopStartDeltaDownCycles =
             systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
-        _schedLoopStartDeltaUpCycles =
+        scheduler->loopStartDeltaUpCycles =
             systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
 
-        _taskGuardMinCycles = systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
-        _taskGuardMaxCycles = systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
-        _taskGuardCycles = _taskGuardMinCycles;
-        _taskGuardDeltaDownCycles =
+        scheduler->taskGuardMinCycles =
+            systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
+        scheduler->taskGuardMaxCycles =
+            systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
+        scheduler->taskGuardCycles = scheduler->taskGuardMinCycles;
+        scheduler->taskGuardDeltaDownCycles =
             systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
-        _taskGuardDeltaUpCycles =
+        scheduler->taskGuardDeltaUpCycles =
             systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
 
-        _lastTargetCycles = systemGetCycleCounter();
+        scheduler->lastTargetCycles = systemGetCycleCounter();
 
-        _nextTimingCycles = _lastTargetCycles;
+        scheduler->nextTimingCycles = scheduler->lastTargetCycles;
 
-        _desiredPeriodCycles = GYRO_PERIOD();
+        scheduler->desiredPeriodCycles = GYRO_PERIOD();
     }
 
     void hackflightStep(hackflight_t * hf)
@@ -364,28 +359,31 @@ extern "C" {
         // Realtime gyro/filtering/PID tasks get complete priority
         uint32_t nowCycles = systemGetCycleCounter();
 
-        uint32_t nextTargetCycles = _lastTargetCycles + _desiredPeriodCycles;
+        scheduler_t * scheduler = &hf->scheduler;
+
+        uint32_t nextTargetCycles =
+            scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
         int32_t schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
-        if (schedLoopRemainingCycles < -_desiredPeriodCycles) {
+        if (schedLoopRemainingCycles < -scheduler->desiredPeriodCycles) {
             // A task has so grossly overrun that at entire gyro cycle has been
             // skipped This is most likely to occur when connected to the
             // configurator via USB as the serial task is non-deterministic Recover
             // as best we can, advancing scheduling by a whole number of cycles
-            nextTargetCycles += _desiredPeriodCycles * (1 +
-                    (schedLoopRemainingCycles / -_desiredPeriodCycles));
+            nextTargetCycles += scheduler->desiredPeriodCycles * (1 +
+                    (schedLoopRemainingCycles / -scheduler->desiredPeriodCycles));
             schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
         }
 
         // Tune out the time lost between completing the last task execution and
         // re-entering the scheduler
-        if ((schedLoopRemainingCycles < _schedLoopStartMinCycles) &&
-                (_schedLoopStartCycles < _schedLoopStartMaxCycles)) {
-            _schedLoopStartCycles += _schedLoopStartDeltaUpCycles;
+        if ((schedLoopRemainingCycles < scheduler->loopStartMinCycles) &&
+                (scheduler->loopStartCycles < scheduler->loopStartMaxCycles)) {
+            scheduler->loopStartCycles += scheduler->loopStartDeltaUpCycles;
         }
 
         // Once close to the timing boundary, poll for its arrival
-        if (schedLoopRemainingCycles < _schedLoopStartCycles) {
+        if (schedLoopRemainingCycles < scheduler->loopStartCycles) {
             checkCoreTasks(hf, schedLoopRemainingCycles, nowCycles, nextTargetCycles);
         }
 
