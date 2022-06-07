@@ -1,20 +1,20 @@
 /*
-Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2022 Simon D. Levy
 
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,7 +28,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "serial.h"
 #include "system.h"
 #include "time.h"
-#include "macros.h"
 
 #define MAX_MSP_PORT_COUNT 3
 #define MSP_PORT_INBUF_SIZE 192
@@ -40,6 +39,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define MSP_RC        105    
 #define MSP_ATTITUDE  108    
 #define MSP_SET_MOTOR 214    
+
+#define ARRAYEND(x) (&(x)[ARRAYLEN(x)])
+#define ARRAYLEN(x) (sizeof(x) / sizeof((x)[0]))
 
 static int16_t rad2degi(float rad)
 {
@@ -190,23 +192,23 @@ static bool processOutCommand(
 
     switch (cmdMSP) {
 
-    case MSP_RC:
-        sbufWriteU16(dst, rxax->demands.throttle); 
-        sbufWriteU16(dst, rxax->demands.roll);
-        sbufWriteU16(dst, rxax->demands.pitch);
-        sbufWriteU16(dst, rxax->demands.yaw);
-        sbufWriteU16(dst, rxax->aux1);
-        sbufWriteU16(dst, rxax->aux2);
-        break;
+        case MSP_RC:
+            sbufWriteU16(dst, rxax->demands.throttle); 
+            sbufWriteU16(dst, rxax->demands.roll);
+            sbufWriteU16(dst, rxax->demands.pitch);
+            sbufWriteU16(dst, rxax->demands.yaw);
+            sbufWriteU16(dst, rxax->aux1);
+            sbufWriteU16(dst, rxax->aux2);
+            break;
 
-    case MSP_ATTITUDE:
-        sbufWriteU16(dst, 10 * rad2degi(vstate->phi));
-        sbufWriteU16(dst, 10 * rad2degi(vstate->theta));
-        sbufWriteU16(dst, rad2degi(vstate->psi));
-        break;
+        case MSP_ATTITUDE:
+            sbufWriteU16(dst, 10 * rad2degi(vstate->phi));
+            sbufWriteU16(dst, 10 * rad2degi(vstate->theta));
+            sbufWriteU16(dst, rad2degi(vstate->psi));
+            break;
 
-    default:
-        unsupportedCommand = true;
+        default:
+            unsupportedCommand = true;
     }
     return !unsupportedCommand;
 }
@@ -216,15 +218,15 @@ static mspResult_e processInCommand(int16_t cmdMSP, sbuf_t *src, float * motors)
 {
     switch (cmdMSP) {
 
-    case MSP_SET_MOTOR:
-        for (int i = 0; i < 4; i++) {
-            motors[i] = motorConvertFromExternal(sbufReadU16(src));
-        }
-        break;
+        case MSP_SET_MOTOR:
+            for (int i = 0; i < 4; i++) {
+                motors[i] = motorConvertFromExternal(sbufReadU16(src));
+            }
+            break;
 
-    default:
-        // we do not know how to handle the (valid) message, indicate error MSP $M!
-        return MSP_RESULT_ERROR;
+        default:
+            // we do not know how to handle the (valid) message, indicate error MSP $M!
+            return MSP_RESULT_ERROR;
     }
     return MSP_RESULT_ACK;
 }

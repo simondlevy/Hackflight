@@ -29,7 +29,6 @@
 #include "maths.h"
 #include "quat2euler.h"
 #include "time.h"
-#include "macros.h"
 
 // Constants ---------------------------------------------------------------------------
 

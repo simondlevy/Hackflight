@@ -1,6 +1,4 @@
 /*
-   Copyright (c) 2022 Simon D. Levy
-
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify it under the
@@ -24,7 +22,6 @@
 #define NOOP do {} while (0)
 
 #define ARRAYLEN(x) (sizeof(x) / sizeof((x)[0]))
-#define ARRAYEND(x) (&(x)[ARRAYLEN(x)])
 
 #define CONST_CAST(type, value) ((type)(value))
 
