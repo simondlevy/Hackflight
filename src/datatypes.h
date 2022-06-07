@@ -318,6 +318,29 @@ typedef struct {
 
 } gyro_t;
 
+// Scheduling ------------------------------------------------------------------
+
+typedef struct {
+
+    int32_t loopStartCycles;
+    int32_t loopStartMinCycles;
+    int32_t loopStartMaxCycles;
+    uint32_t loopStartDeltaDownCycles;
+    uint32_t loopStartDeltaUpCycles;
+
+    int32_t taskGuardCycles;
+    int32_t taskGuardMinCycles;
+    int32_t taskGuardMaxCycles;
+    uint32_t taskGuardDeltaDownCycles;
+    uint32_t taskGuardDeltaUpCycles;
+
+    int32_t desiredPeriodCycles;
+    uint32_t lastTargetCycles;
+
+    uint32_t nextTimingCycles;
+
+} scheduler_t;
+
 // Hackflight ------------------------------------------------------------------
 
 typedef struct {
@@ -337,6 +360,7 @@ typedef struct {
     bool             pid_zero_throttle_iterm_reset;
     task_t           rxTask;
     rx_axes_t        rx_axes;
+    scheduler_t      scheduler;
     task_t           sensor_tasks[20];
     uint8_t          sensor_task_count;
     vehicle_state_t  vstate;
