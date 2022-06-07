@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <stdbool.h>
 #include <math.h>
 
 #include "datatypes.h"

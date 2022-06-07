@@ -18,16 +18,21 @@
 
 #pragma once
 
-#include <stdint.h>
-
 #include "datatypes.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-    static inline timeDelta_t cmpTimeUs(timeUs_t a, timeUs_t b) { return (timeDelta_t)(a - b); }
-    static inline int32_t cmpTimeCycles(uint32_t a, uint32_t b) { return (int32_t)(a - b); }
+    static inline timeDelta_t cmpTimeUs(timeUs_t a, timeUs_t b)
+    {
+        return (timeDelta_t)(a - b);
+    }
+
+    static inline int32_t cmpTimeCycles(uint32_t a, uint32_t b)
+    {
+        return (int32_t)(a - b);
+    }
 
     void delayMicroseconds(timeUs_t us);
     void delayMillis(timeMs_t ms);

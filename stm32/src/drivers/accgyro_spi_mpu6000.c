@@ -17,7 +17,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <gyro_scale.h>
 #include <maths.h>
 #include <system.h>
 #include <time.h>
@@ -28,6 +27,12 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "exti.h"
 #include "io.h"
 #include "systemdev.h"
+
+// 16.384 dps/lsb scalefactor for 2000dps sensors
+#define GYRO_SCALE_2000DPS (2000.0f / (1 << 15))   
+
+// 8.192 dps/lsb scalefactor for 4000dps sensors
+#define GYRO_SCALE_4000DPS (4000.0f / (1 << 15))   
 
 // RF = Register Flag
 #define MPU_RF_DATA_RDY_EN (1 << 0)
