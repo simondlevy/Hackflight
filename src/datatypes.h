@@ -86,8 +86,8 @@ typedef struct {
     float          previousSetpoint[3];
     pt1Filter_t    ptermYawLowpass;
     pt1Filter_t    windupLpf[3];
-
 } angle_pid_t;
+
 // Time -----------------------------------------------------------------------
 
 typedef uint32_t timeUs_t;
@@ -96,32 +96,26 @@ typedef int32_t timeDelta_t;
 // Demands ------------------------------------------------------------------------
 
 typedef struct {
-
     float throttle;
     float roll;
     float pitch;
     float yaw;
-
 } demands_t;
 
 // Axes ------------------------------------------------------------------------
 
 typedef struct {
-
     float x;
     float y;
     float z;
-
 } axes_t;
 
 // Receiver ------------------------------------------------------------------------
 
 typedef struct {
-
     demands_t demands;
     float aux1;
     float aux2;
-
 } rx_axes_t;
 
 typedef enum rc_alias {
@@ -149,7 +143,6 @@ typedef enum {
 // Vehicle state ------------------------------------------------------------------------
 
 typedef struct {
-
     float x;
     float dx;
     float y;
@@ -162,7 +155,6 @@ typedef struct {
     float dtheta;
     float psi;
     float dpsi;
-
 } vehicle_state_t;
 
 // PID control ------------------------------------------------------------------------
@@ -207,44 +199,34 @@ typedef struct {
 // IMU ------------------------------------------------------------------------
 
 typedef struct {
-
     float w;
     float x;
     float y;
     float z;
-
 } quaternion_t;
 
 typedef struct {
-
     float r20;
     float r21;
     float r22;
-
 } rotation_t;
 
 typedef struct {
-
     axes_t values;
     uint32_t count;
-
 } imu_sensor_t;
 
 typedef struct {
-
     uint32_t quietPeriodEnd;
     uint32_t resetTimeEnd;
     bool resetCompleted;
-
 } gyro_reset_t;
 
 typedef struct {
-
     uint32_t time;
     quaternion_t quat;
     rotation_t rot;
     gyro_reset_t gyroReset;
-
 } imu_fusion_t;
 
 // Stats ------------------------------------------------------------------------
@@ -294,7 +276,6 @@ typedef union {
 } gyroLowpassFilter_t;
 
 typedef struct {
-
     float dps[3];          // aligned, calibrated, scaled, but unfiltered data from sensor
     float dps_filtered[3]; // filtered gyro data
     float dps_filtered_prev[3];
@@ -315,13 +296,11 @@ typedef struct {
     gyroLowpassFilter_t lowpass2Filter[3];
 
     float zero[3];
-
 } gyro_t;
 
 // Scheduling ------------------------------------------------------------------
 
 typedef struct {
-
     int32_t loopStartCycles;
     int32_t loopStartMinCycles;
     int32_t loopStartMaxCycles;
@@ -338,13 +317,11 @@ typedef struct {
     uint32_t lastTargetCycles;
 
     uint32_t nextTimingCycles;
-
 } scheduler_t;
 
 // Hackflight ------------------------------------------------------------------
 
 typedef struct {
-
     imu_sensor_t     accelAccum;
     angle_pid_t      anglepid;
     bool             armed;
@@ -365,6 +342,5 @@ typedef struct {
     task_t           sensorTasks[20];
     uint8_t          sensorTaskCount;
     vehicle_state_t  vstate;
-
 } hackflight_t;
 
