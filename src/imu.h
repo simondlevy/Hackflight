@@ -18,11 +18,7 @@
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "datatypes.h"
-#include "time.h"
 
 #if defined(__cplusplus)
 extern "C" {

@@ -1,20 +1,20 @@
 /*
-Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2022 Simon D. Levy
 
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -63,7 +63,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 /*
 http://resnet.uoregon.edu/~gurney_j/jmpc/bitwise.html
-*/
+ */
 #define BITCOUNT(x) (((BX_(x)+(BX_(x)>>4)) & 0x0F0F0F0F) % 255)
 #define BX_(x) ((x) - (((x)>>1)&0x77777777) - (((x)>>2)&0x33333333) - (((x)>>3)&0x11111111))
 
@@ -79,22 +79,13 @@ http://resnet.uoregon.edu/~gurney_j/jmpc/bitwise.html
 #define LOG2_64BIT(v) \
     (32*((v)/2L>>31 > 0) \
      + LOG2_32BIT((v)*1L >>16*((v)/2L>>31 > 0) \
-                         >>16*((v)/2L>>31 > 0)))
+         >>16*((v)/2L>>31 > 0)))
 #define LOG2(v) LOG2_64BIT(v)
 
 // non ISO variant from linux kernel; checks ptr type, but triggers 'ISO C forbids braced-groups within expressions [-Wpedantic]'
 //  __extension__ is here to disable this warning
 #define container_of(ptr, type, member)  ( __extension__ ({     \
-        const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
-        (type *)( (char *)__mptr - offsetof(type,member) );}))
+            const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
+            (type *)( (char *)__mptr - offsetof(type,member) );}))
 
 static inline int16_t cmp16(uint16_t a, uint16_t b) { return (int16_t)(a-b); }
-
-// using memcpy_fn will force memcpy function call, instead of inlining it. In most cases function call takes fewer instructions
-//  than inlined version (inlining is cheaper for very small moves < 8 bytes / 2 store instructions)
-void * memcpy_fn ( void * destination, const void * source, size_t num ) asm("memcpy");
-
-
-#define FALLTHROUGH __attribute__ ((fallthrough))
-
-

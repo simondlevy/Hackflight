@@ -1,20 +1,20 @@
 /*
-Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2022 Simon D. Levy
 
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -70,7 +70,7 @@ typedef enum {
     SERIAL_BIDIR_PP        = 1 << 4,
     SERIAL_BIDIR_NOPULL    = 1 << 5, // disable pulls in BIDIR RX mode
     SERIAL_BIDIR_PP_PD     = 1 << 6, // PP mode, normall inverted, but with PullDowns, to fix 
-                                     // SA after bidir issue fixed (#10220)
+    // SA after bidir issue fixed (#10220)
 
 } portOptions_e;
 
@@ -118,46 +118,46 @@ typedef enum {
 extern "C" {
 #endif
 
-typedef void (*serialReceiveCallbackPtr)
-    (uint8_t data, void *rxCallbackData, timeUs_t currentTimeUs);
+    typedef void (*serialReceiveCallbackPtr)
+        (uint8_t data, void *rxCallbackData, timeUs_t currentTimeUs);
 
-void serialBeginWrite(void * port);
+    void serialBeginWrite(void * port);
 
-void serialEndWrite(void * port);
+    void serialEndWrite(void * port);
 
-void serialInit(bool softserialEnabled, serialPortIdentifier_e serialPortToDisable);
+    void serialInit(bool softserialEnabled, serialPortIdentifier_e serialPortToDisable);
 
-bool serialIsTransmitBufferEmpty(void * port);
+    bool serialIsTransmitBufferEmpty(void * port);
 
-void * serialOpenPort(
-        serialPortIdentifier_e identifier,
-        serialPortFunction_e function,
-        serialReceiveCallbackPtr rxCallback,
-        void *rxCallbackData,
-        uint32_t baudRate,
-        portMode_e mode,
-        portOptions_e options);
+    void * serialOpenPort(
+            serialPortIdentifier_e identifier,
+            serialPortFunction_e function,
+            serialReceiveCallbackPtr rxCallback,
+            void *rxCallbackData,
+            uint32_t baudRate,
+            portMode_e mode,
+            portOptions_e options);
 
-void serialOpenPortSbus(
-        serialPortIdentifier_e identifier,
-        serialReceiveCallbackPtr rxCallback,
-        void *rxCallbackData);
+    void serialOpenPortSbus(
+            serialPortIdentifier_e identifier,
+            serialReceiveCallbackPtr rxCallback,
+            void *rxCallbackData);
 
-void * serialOpenPortUsb(void);
+    void * serialOpenPortUsb(void);
 
-uint8_t serialRead(void  * p);
+    uint8_t serialRead(void  * p);
 
-uint32_t serialRxBytesWaiting(void * port);
+    uint32_t serialRxBytesWaiting(void * port);
 
-void serialSetDebugPort(void * port);
+    void serialSetDebugPort(void * port);
 
-uint32_t serialTxBytesFree(void * port);
+    uint32_t serialTxBytesFree(void * port);
 
-void serialWaitForPortToFinishTransmitting(void * port);
+    void serialWaitForPortToFinishTransmitting(void * port);
 
-void serialWrite(void * port, uint8_t c);
+    void serialWrite(void * port, uint8_t c);
 
-void serialWriteBuf(void * port, const uint8_t *data, uint32_t count);
+    void serialWriteBuf(void * port, const uint8_t *data, uint32_t count);
 
 #if defined(__cplusplus)
 }

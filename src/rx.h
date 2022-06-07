@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <stdint.h>
-
 #include "datatypes.h"
 #include "time.h"
 

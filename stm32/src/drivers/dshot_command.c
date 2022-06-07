@@ -38,6 +38,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define DSHOT_BEEP_DELAY_US 100000
 #define DSHOT_MAX_COMMANDS 3
 
+#define FALLTHROUGH __attribute__ ((fallthrough))
+
 typedef enum {
     DSHOT_COMMAND_STATE_IDLEWAIT,   // waiting for motors to go idle
     DSHOT_COMMAND_STATE_STARTDELAY, // initial delay period before a sequence of commands

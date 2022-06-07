@@ -16,7 +16,6 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
 #include <math.h>
 
 #include "datatypes.h"
