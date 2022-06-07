@@ -21,7 +21,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "time.h"
+// Time -----------------------------------------------------------------------
+
+// time difference, 32 bits always sufficient
+typedef int32_t timeDelta_t;
+
+// millisecond time
+typedef uint32_t timeMs_t ;
+
+// microsecond time
+typedef uint32_t timeUs_t;
 
 // Filtering ------------------------------------------------------------------
 
