@@ -355,6 +355,7 @@ typedef struct {
     bool             gyroIsCalibrating;
     imu_fusion_t     imuFusionPrev;
     float            mspmotors[4];
+    task_t           mspTask;
     pid_controller_t pid_controllers[10];
     uint8_t          pid_count;
     bool             pid_zero_throttle_iterm_reset;

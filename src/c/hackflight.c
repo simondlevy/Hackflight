@@ -83,8 +83,6 @@ extern "C" {
         mspUpdate(&hf->vstate, &hf->rx_axes, hf->armed, hf->mspmotors);
     }
 
-    static task_t _mspTask;
-
     // Support for dynamically scheduled tasks ---------------------------------------
 
     static timeDelta_t taskNextStateTime;
@@ -251,7 +249,7 @@ extern "C" {
         adjustAndUpdateTask(&hf->attitudeTask, currentTimeUs,
                 &selectedTask, &selectedTaskDynamicPriority);
 
-        adjustAndUpdateTask(&_mspTask, currentTimeUs,
+        adjustAndUpdateTask(&hf->mspTask, currentTimeUs,
                 &selectedTask, &selectedTaskDynamicPriority);
 
         if (selectedTask) {
@@ -322,7 +320,7 @@ extern "C" {
         // accel_fun can be traditional accelerometer, or hardware-fusion quaternion
         hackflightAddSensor(hf, accel_fun, accel_rate);
 
-        initTask(&_mspTask, task_msp, MSP_TASK_RATE);
+        initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 
         scheduler_t * scheduler = &hf->scheduler;
 
