@@ -80,7 +80,7 @@ extern "C" {
         (void)time;
 
         hackflight_t * hf = (hackflight_t *)hackflight;
-        mspUpdate(&hf->vstate, &hf->rx_axes, hf->armed, hf->mspmotors);
+        mspUpdate(&hf->vstate, &hf->rxAxes, hf->armed, hf->mspMotors);
     }
 
     // Support for dynamically scheduled tasks ---------------------------------------
@@ -237,8 +237,8 @@ extern "C" {
 
         timeUs_t currentTimeUs = timeMicros();
 
-        for (uint8_t k=0; k<hf->sensor_task_count; ++k) {
-            task_t * task = &hf->sensor_tasks[k];
+        for (uint8_t k=0; k<hf->sensorTaskCount; ++k) {
+            task_t * task = &hf->sensorTasks[k];
             adjustAndUpdateTask(task, currentTimeUs,&selectedTask,
                     &selectedTaskDynamicPriority);
         }

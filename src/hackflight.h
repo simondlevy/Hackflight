@@ -54,9 +54,9 @@ static void task_attitude(void * hackflight, uint32_t time)
 
 static void hackflightAddPidController(hackflight_t * hf, pid_fun_t fun, void * data)
 {
-    hf->pid_controllers[hf->pid_count].fun = fun;
-    hf->pid_controllers[hf->pid_count].data = data;
-    hf->pid_count++;
+    hf->pidControllers[hf->pidCount].fun = fun;
+    hf->pidControllers[hf->pidCount].data = data;
+    hf->pidCount++;
 }
 
 // RX polling task ------------------------------------------------------------
@@ -89,11 +89,11 @@ static void task_rx(void * hackflight, uint32_t time)
             &gotNewData);
 
     if (pidItermResetReady) {
-        hf->pid_zero_throttle_iterm_reset = pidItermResetValue;
+        hf->pidZeroThrottleItermReset = pidItermResetValue;
     }
 
     if (gotNewData) {
-        memcpy(&hf->rx_axes, &rxax, sizeof(rx_axes_t));
+        memcpy(&hf->rxAxes, &rxax, sizeof(rx_axes_t));
     }
 }
 
@@ -107,16 +107,16 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
     rxGetDemands(currentTimeUs, &hf->anglepid, &hf->demands);
 
-    for (uint8_t k=0; k<hf->pid_count; ++k) {
-        pid_controller_t pid = hf->pid_controllers[k];
+    for (uint8_t k=0; k<hf->pidCount; ++k) {
+        pid_controller_t pid = hf->pidControllers[k];
         pid.fun(currentTimeUs, &hf->demands, pid.data,
-                &hf->vstate, hf->pid_zero_throttle_iterm_reset);
+                &hf->vstate, hf->pidZeroThrottleItermReset);
     }
 
     float mixmotors[4] = {0};
     mixerRun(&hf->demands, mixmotors);
 
-    motorWrite(hf->armed ? mixmotors : hf->mspmotors);
+    motorWrite(hf->armed ? mixmotors : hf->mspMotors);
 }
 
 // Timed task support -------------------------------------------------------
@@ -131,7 +131,7 @@ static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
 
 static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
 {
-    initTask(&hf->sensor_tasks[hf->sensor_task_count++], fun, rate);
+    initTask(&hf->sensorTasks[hf->sensorTaskCount++], fun, rate);
 }
 
 // Initialization -------------------------------------------------------------

@@ -354,16 +354,16 @@ typedef struct {
     imu_sensor_t     gyroAccum;
     bool             gyroIsCalibrating;
     imu_fusion_t     imuFusionPrev;
-    float            mspmotors[4];
+    float            mspMotors[4];
     task_t           mspTask;
-    pid_controller_t pid_controllers[10];
-    uint8_t          pid_count;
-    bool             pid_zero_throttle_iterm_reset;
+    pid_controller_t pidControllers[10];
+    uint8_t          pidCount;
+    bool             pidZeroThrottleItermReset;
     task_t           rxTask;
-    rx_axes_t        rx_axes;
+    rx_axes_t        rxAxes;
     scheduler_t      scheduler;
-    task_t           sensor_tasks[20];
-    uint8_t          sensor_task_count;
+    task_t           sensorTasks[20];
+    uint8_t          sensorTaskCount;
     vehicle_state_t  vstate;
 
 } hackflight_t;
