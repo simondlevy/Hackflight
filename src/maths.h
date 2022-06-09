@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <math.h>
 #include <stdint.h>
 
 typedef struct fp_rotationMatrix_s {
@@ -64,6 +65,16 @@ extern "C" {
         dest[1] = x;
         dest[2] = z;
     }
+
+static float invSqrt(float x)
+{
+    return 1.0f / sqrtf(x);
+}
+
+static float sq(float x)
+{
+    return x * x;
+}
 
 #if defined(__cplusplus)
 }

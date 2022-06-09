@@ -123,6 +123,7 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             board.c \
+            imu.c \
             main.c \
             $(IMPL_DIR)/accel.c \
             $(IMPL_DIR)/arming.c \
