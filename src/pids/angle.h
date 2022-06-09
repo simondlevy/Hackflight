@@ -21,16 +21,12 @@
 #include <string.h>
 #include <math.h>
 
-#include "arming.h"
 #include "const.h"
 #include "datatypes.h"
 #include "debug.h"
 #include "dt.h"
 #include "filter.h"
-#include "maths.h"
 #include "rx.h"
-#include "sensors.h"
-#include "time.h"
 
 // minimum of 5ms between updates
 static const uint16_t DYN_LPF_THROTTLE_UPDATE_DELAY_US = 5000; 
