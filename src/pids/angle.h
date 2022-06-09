@@ -21,7 +21,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "accel.h"
 #include "arming.h"
 #include "const.h"
 #include "datatypes.h"
