@@ -91,7 +91,7 @@ static float invSqrt(float x)
     return 1.0f / sqrtf(x);
 }
 
-static float sq(float x)
+static float square(float x)
 {
     return x * x;
 }

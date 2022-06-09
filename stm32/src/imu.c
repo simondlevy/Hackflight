@@ -83,7 +83,7 @@ static void mahony(
     float az = accel->z;
 
     // Use measured acceleration vector
-    float recipAccNorm = sq(ax) + sq(ay) + sq(az);
+    float recipAccNorm = square(ax) + square(ay) + square(az);
 
     bool goodAcc = useAcc && recipAccNorm > 0.01;
 
@@ -116,7 +116,7 @@ static void mahony(
         quat_old->z + quat_old->w * gz1 + quat_old->x * gy1 - quat_old->y * gx1;
 
     // Normalise quaternion
-    float recipNorm = invSqrt(sq(qw) + sq(qx) + sq(qy) + sq(qz));
+    float recipNorm = invSqrt(square(qw) + square(qx) + square(qy) + square(qz));
     quat_new->w = qw * recipNorm;
     quat_new->x = qx * recipNorm;
     quat_new->y = qy * recipNorm;
@@ -126,7 +126,7 @@ static void mahony(
 static bool isAccelHealthy(axes_t *accAvg)
 {
     float accMagnitudeSq =
-        sq(accAvg->x) + sq(accAvg->y) + sq(accAvg->z) * sq(1.0f/ACCEL_1G);
+        square(accAvg->x) + square(accAvg->y) + square(accAvg->z) * square(1.0f/ACCEL_1G);
 
     // Accept accel readings only in range 0.9g - 1.1g
     return (0.81f < accMagnitudeSq) && (accMagnitudeSq < 1.21f);
