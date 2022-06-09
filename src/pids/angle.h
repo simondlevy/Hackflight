@@ -21,7 +21,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "const.h"
 #include "datatypes.h"
 #include "debug.h"
 #include "dt.h"

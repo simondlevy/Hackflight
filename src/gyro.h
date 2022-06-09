@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "const.h"
 #include "datatypes.h"
 
 static CONST uint32_t GYRO_RATE = 8000;
