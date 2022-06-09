@@ -38,11 +38,11 @@ static void mixerRun(demands_t * demands, float * motors)
 
     // Calculate and Limit the PID sum
     float roll = 
-        constrainf(demands->roll, -PIDSUM_LIMIT, PIDSUM_LIMIT) / PID_MIXER_SCALING;
+        constrain_f(demands->roll, -PIDSUM_LIMIT, PIDSUM_LIMIT) / PID_MIXER_SCALING;
     float pitch =
-        constrainf(demands->pitch, -PIDSUM_LIMIT, PIDSUM_LIMIT) / PID_MIXER_SCALING;
+        constrain_f(demands->pitch, -PIDSUM_LIMIT, PIDSUM_LIMIT) / PID_MIXER_SCALING;
     float yaw = 
-        -constrainf(demands->yaw, -PIDSUM_LIMIT_YAW, PIDSUM_LIMIT_YAW) / PID_MIXER_SCALING;
+        -constrain_f(demands->yaw, -PIDSUM_LIMIT_YAW, PIDSUM_LIMIT_YAW) / PID_MIXER_SCALING;
 
     // reduce throttle to offset additional motor output
     float throttle = demands->throttle;
@@ -71,7 +71,7 @@ static void mixerRun(demands_t * demands, float * motors)
         }
     } else {
         if (throttle > 0.5f) {
-            throttle = constrainf(throttle, -motorMixMin, 1.0f - motorMixMax);
+            throttle = constrain_f(throttle, -motorMixMin, 1.0f - motorMixMax);
         }
     }
 
@@ -88,9 +88,9 @@ static void mixerRun(demands_t * demands, float * motors)
                     motorValueDisarmed() :
                     motorOutput; 
             }
-            motorOutput = constrainf(motorOutput, motorValueDisarmed(), motorValueHigh());
+            motorOutput = constrain_f(motorOutput, motorValueDisarmed(), motorValueHigh());
         } else {
-            motorOutput = constrainf(motorOutput, motorValueLow(), motorValueHigh());
+            motorOutput = constrain_f(motorOutput, motorValueLow(), motorValueHigh());
         }
         motors[i] = motorOutput;
     }

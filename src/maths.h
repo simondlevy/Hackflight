@@ -34,7 +34,7 @@ extern "C" {
     float atan2_approx(float y, float x);
     float acos_approx(float x);
 
-    static inline int constrain(int amt, int low, int high)
+    static inline int constrain_f_i32(float amt, int32_t low, int32_t high)
     {
         if (amt < low)
             return low;
@@ -44,7 +44,27 @@ extern "C" {
             return amt;
     }
 
-    static inline float constrainf(float amt, float low, float high)
+    static inline int constrain_u16_u16(uint16_t amt, uint16_t low, uint16_t high)
+    {
+        if (amt < low)
+            return low;
+        else if (amt > high)
+            return high;
+        else
+            return amt;
+    }
+
+    static inline int constrain_i32_u32(int32_t amt, uint32_t low, uint32_t high)
+    {
+        if (amt < (int32_t)low)
+            return low;
+        else if (amt > (int32_t)high)
+            return high;
+        else
+            return amt;
+    }
+
+    static inline float constrain_f(float amt, float low, float high)
     {
         if (amt < low)
             return low;

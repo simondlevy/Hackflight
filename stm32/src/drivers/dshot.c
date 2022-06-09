@@ -51,7 +51,7 @@ float dshotConvertFromExternal(uint16_t externalValue)
 {
     float motorValue;
 
-    externalValue = constrain(externalValue, PWM_MIN, PWM_MAX);
+    externalValue = constrain_u16_u16(externalValue, PWM_MIN, PWM_MAX);
 
     motorValue = (externalValue == PWM_MIN) ? DSHOT_CMD_MOTOR_STOP : scaleRangef(externalValue, PWM_MIN + 1, PWM_MAX, DSHOT_MIN_THROTTLE, DSHOT_MAX_THROTTLE);
 

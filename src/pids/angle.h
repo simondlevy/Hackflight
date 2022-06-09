@@ -130,7 +130,7 @@ extern "C" {
 
         if (value * currentPidSetpoint > 0.0f) {
             if (fabsf(currentPidSetpoint) <= maxRateLimit) {
-                value = constrainf(value, (-maxRateLimit -
+                value = constrain_f(value, (-maxRateLimit -
                             currentPidSetpoint) * pid->k_rate_p,
                         (maxRateLimit - currentPidSetpoint) * pid->k_rate_p);
             } else {
@@ -243,7 +243,7 @@ extern "C" {
         // calculate error angle and limit the angle to the max inclination
         // rcDeflection in [-1.0, 1.0]
         float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
-        angle = constrainf(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
+        angle = constrain_f(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
         float errorAngle = angle - (currentAngle / 10);
         return pid->k_level_p > 0 ? errorAngle * pid->k_level_p : currentSetpoint;
     }
@@ -316,7 +316,7 @@ extern "C" {
         float dynCi = DT();
         const float itermWindupPointInv = 1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
         if (itermWindupPointInv > 1.0f) {
-            dynCi *= constrainf(itermWindupPointInv, 0.0f, 1.0f);
+            dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
         }
 
         float gyroRates[3] = {vstate->dphi, vstate->dtheta, vstate->dpsi};
@@ -392,7 +392,7 @@ extern "C" {
             float axisDynCi = (axis == 2) ? dynCi : DT(); // check windup for yaw only
 
             pid->data[axis].I =
-                constrainf(previousIterm + (Ki * axisDynCi) * itermErrorRate,
+                constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
                         -ITERM_LIMIT, ITERM_LIMIT);
 
             // -----calculate pidSetpointDelta

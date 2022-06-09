@@ -266,7 +266,7 @@ extern "C" {
         }
 
         sample = scaleRangef(sample, range->min, range->max, PWM_MIN, PWM_MAX);
-        sample = constrainf(sample, PWM_PULSE_MIN, PWM_PULSE_MAX);
+        sample = constrain_f(sample, PWM_PULSE_MIN, PWM_PULSE_MAX);
 
         return sample;
     }
@@ -411,8 +411,7 @@ extern "C" {
             }
         }
 
-        int32_t tmp;
-        tmp = constrain(raw[THROTTLE], 1050, PWM_MAX);
+        int32_t tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
         tmp = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
         rx->command[THROTTLE] = lookupThrottle(rx, tmp);
@@ -474,7 +473,7 @@ extern "C" {
             ((uint32_t)refreshPeriodUs >= RC_SMOOTHING_RX_RATE_MIN_US && (uint32_t)refreshPeriodUs <=
              RC_SMOOTHING_RX_RATE_MAX_US);
 
-        rx->refreshPeriod = constrain(refreshPeriodUs, RC_SMOOTHING_RX_RATE_MIN_US,
+        rx->refreshPeriod = constrain_i32_u32(refreshPeriodUs, RC_SMOOTHING_RX_RATE_MIN_US,
                 RC_SMOOTHING_RX_RATE_MAX_US);
 
         if (currentTimeUs > FAILSAFE_POWER_ON_DELAY_US && !failsafeIsMonitoring()) {
@@ -1011,7 +1010,7 @@ extern "C" {
             angleRate = rxApplyRates(commandf, commandfAbs);
 
             rawSetpoint[axis] =
-                constrainf(angleRate, -1.0f * RATE_LIMIT, 1.0f * RATE_LIMIT);
+                constrain_f(angleRate, -1.0f * RATE_LIMIT, 1.0f * RATE_LIMIT);
         }
     }
 
@@ -1020,7 +1019,7 @@ extern "C" {
     // Find min and max throttle based on conditions. Throttle has to be known
     // before mixing
     demands->throttle =
-        constrainf((_rx.command[THROTTLE] - PWM_MIN) / (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
+        constrain_f((_rx.command[THROTTLE] - PWM_MIN) / (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
     
     demands->roll  = setpointRate[ROLL];
     demands->pitch = setpointRate[PITCH];
