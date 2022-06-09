@@ -61,7 +61,7 @@ typedef struct motorDevice_s {
     uint8_t       count;
     bool          initialized;
     bool          enabled;
-    timeMs_t      motorEnableTimeMs;
+    uint32_t      motorEnableTimeMs;
 } motorDevice_t;
 
 void     motorInit(uint8_t count);
@@ -80,7 +80,7 @@ void motorDisable(void);
 void motorEnable(void);
 bool motorIsEnabled(void);
 bool motorIsMotorEnabled(uint8_t index);
-timeMs_t motorGetMotorEnableTimeMs(void);
+uint32_t motorGetMotorEnableTimeMs(void);
 void motorShutdown(void); // Replaces stopPwmAllMotors
 
 struct motorDevConfig_s;

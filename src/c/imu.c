@@ -57,7 +57,7 @@ void imuAccumulateGyro(hackflight_t * hf, float * adcf)
     }
 }
 
-void imuGetEulerAngles(hackflight_t * hf, timeUs_t time)
+void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 {
     quaternion_t quat = {0};
 
@@ -70,7 +70,7 @@ void imuGetEulerAngles(hackflight_t * hf, timeUs_t time)
     imuUpdateFusion(hf, time, &quat, &rot);
 }
 
-void imuUpdateFusion(hackflight_t * hf, timeUs_t time, quaternion_t * quat, rotation_t * rot)
+void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
 {
     imu_fusion_t fusion;
     fusion.time = time;

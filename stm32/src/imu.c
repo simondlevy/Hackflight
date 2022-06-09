@@ -133,7 +133,7 @@ static bool isAccelHealthy(axes_t *accAvg)
 }
 
 static bool checkReset(
-        timeUs_t currentTimeUs,
+        uint32_t currentTimeUs,
         bool useAcc,
         axes_t *gyroAvg,
         bool armed,
@@ -141,7 +141,7 @@ static bool checkReset(
         gyro_reset_t * status_new)
 {
     // Just disarmed; start the gyro quiet period
-    timeUs_t quietPeriodEnd = armed ?
+    uint32_t quietPeriodEnd = armed ?
         currentTimeUs + ATTITUDE_RESET_QUIET_TIME :
         status_old->quietPeriodEnd; 
 
@@ -152,7 +152,7 @@ static bool checkReset(
     bool tmp = (resetTimeEnd > 0 || quietPeriodEnd > 0 || resetCompleted) &&
         (bigGyro(gyroAvg->x) || bigGyro(gyroAvg->y) || bigGyro(gyroAvg->z) || !useAcc);
 
-    timeUs_t quietPeriodEnd1 = tmp ? 
+    uint32_t quietPeriodEnd1 = tmp ? 
         currentTimeUs + ATTITUDE_RESET_QUIET_TIME :
         quietPeriodEnd;
 
@@ -180,7 +180,7 @@ static bool checkReset(
 
 void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
-    timeDelta_t deltaT = time - hf->imuFusionPrev.time;
+    int32_t deltaT = time - hf->imuFusionPrev.time;
 
     axes_t gyroAvg = {0};
     getAverage(&hf->gyroAccum, GYRO_PERIOD(), &gyroAvg);

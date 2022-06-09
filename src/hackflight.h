@@ -103,7 +103,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 {
     gyroReadScaled(hf);
 
-    timeUs_t currentTimeUs = timeMicros();
+    uint32_t currentTimeUs = timeMicros();
 
     rxGetDemands(currentTimeUs, &hf->anglepid, &hf->demands);
 

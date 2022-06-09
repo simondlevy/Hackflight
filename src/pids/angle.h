@@ -217,7 +217,7 @@ extern "C" {
 
     static void updateDynLpfCutoffs(
             angle_pid_t * pid,
-            timeUs_t currentTimeUs,
+            uint32_t currentTimeUs,
             float throttle)
     {
         if (cmpTimeUs(currentTimeUs, pid->lastDynLpfUpdateUs) >=

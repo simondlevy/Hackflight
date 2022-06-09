@@ -85,9 +85,9 @@ extern "C" {
 
     // Support for dynamically scheduled tasks ---------------------------------------
 
-    static timeDelta_t taskNextStateTime;
+    static int32_t taskNextStateTime;
 
-    static void adjustDynamicPriority(task_t * task, timeUs_t currentTimeUs) 
+    static void adjustDynamicPriority(task_t * task, uint32_t currentTimeUs) 
     {
         // Task is time-driven, dynamicPriority is last execution age (measured
         // in desiredPeriods). Task age is calculated from last execution.
@@ -99,7 +99,7 @@ extern "C" {
     }
 
     // Increase priority for RX task
-    static void adjustRxDynamicPriority(task_t * task, timeUs_t currentTimeUs) 
+    static void adjustRxDynamicPriority(task_t * task, uint32_t currentTimeUs) 
     {
         if (task->dynamicPriority > 0) {
             task->taskAgeCycles = 1 + (cmpTimeUs(currentTimeUs,
@@ -116,7 +116,7 @@ extern "C" {
         }
     }
 
-   static void executeTask(hackflight_t * hf, task_t *task, timeUs_t currentTimeUs)
+   static void executeTask(hackflight_t * hf, task_t *task, uint32_t currentTimeUs)
     {
         task->lastExecutedAtUs = currentTimeUs;
         task->dynamicPriority = 0;
@@ -124,7 +124,7 @@ extern "C" {
         uint32_t time = timeMicros();
         task->fun(hf, currentTimeUs);
 
-        timeUs_t taskExecutionTimeUs = timeMicros() - time;
+        uint32_t taskExecutionTimeUs = timeMicros() - time;
 
         // Update estimate of expected task duration
         taskNextStateTime = -1;
@@ -235,7 +235,7 @@ extern "C" {
         task_t *selectedTask = NULL;
         uint16_t selectedTaskDynamicPriority = 0;
 
-        timeUs_t currentTimeUs = timeMicros();
+        uint32_t currentTimeUs = timeMicros();
 
         for (uint8_t k=0; k<hf->sensorTaskCount; ++k) {
             task_t * task = &hf->sensorTasks[k];
@@ -254,7 +254,7 @@ extern "C" {
 
         if (selectedTask) {
 
-            timeDelta_t taskRequiredTimeUs =
+            int32_t taskRequiredTimeUs =
                 selectedTask->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT;
             int32_t taskRequiredTimeCycles =
                 (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);

@@ -35,10 +35,10 @@ extern "C" {
 
     void rxDevInit(void);
 
-    void rxGetDemands(timeUs_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands);
+    void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands);
 
     void rxPoll(
-            timeUs_t currentTimeUs,
+            uint32_t currentTimeUs,
             bool imuIsLevel,
             bool calibrating,
             rx_axes_t * rxax,
@@ -69,14 +69,14 @@ static throttleStatus_e rxCalculateThrottleStatus(float * rcData)
 
 // For hardware impelmentations ------------------------------------------------------
 
-bool rxCheck(timeUs_t currentTimeUs);
+bool rxCheck(uint32_t currentTimeUs);
 
-uint8_t rxDevCheck(uint16_t * channelData, timeUs_t * frameTimeUs);
+uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs);
 
 float rxDevConvertValue(uint16_t * channelData, uint8_t chan);
 
 void rxProcessDataModes(
-        timeUs_t currentTimeUs,
+        uint32_t currentTimeUs,
         bool signalReceived,
         float raw[],
         bool imuIsLevel,
@@ -84,7 +84,7 @@ void rxProcessDataModes(
         bool * armed);
 
 void rxUpdateArmingStatus(
-        timeUs_t currentTimeUs,
+        uint32_t currentTimeUs,
         float raw[],
         bool imuIsLevel,
         bool calibrating,

@@ -70,7 +70,7 @@ BB_OUTPUT_BUFFER_ATTRIBUTE uint32_t bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_L
 BB_INPUT_BUFFER_ATTRIBUTE uint16_t bbInputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 
 uint8_t bbPuPdMode;
-FAST_DATA_ZERO_INIT timeUs_t dshotFrameUs;
+FAST_DATA_ZERO_INIT uint32_t dshotFrameUs;
 
 
 const timerHardware_t bbTimerHardware[] = {
@@ -82,7 +82,7 @@ const timerHardware_t bbTimerHardware[] = {
 };
 
 static FAST_DATA_ZERO_INIT motorDevice_t bbDevice;
-static FAST_DATA_ZERO_INIT timeUs_t lastSendUs;
+static FAST_DATA_ZERO_INIT uint32_t lastSendUs;
 
 
 // DMA GPIO output buffer formatting

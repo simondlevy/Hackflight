@@ -119,7 +119,7 @@ extern "C" {
 #endif
 
     typedef void (*serialReceiveCallbackPtr)
-        (uint8_t data, void *rxCallbackData, timeUs_t currentTimeUs);
+        (uint8_t data, void *rxCallbackData, uint32_t currentTimeUs);
 
     void serialBeginWrite(void * port);
 

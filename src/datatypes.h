@@ -21,17 +21,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Time -----------------------------------------------------------------------
-
-// time difference, 32 bits always sufficient
-typedef int32_t timeDelta_t;
-
-// millisecond time
-typedef uint32_t timeMs_t ;
-
-// microsecond time
-typedef uint32_t timeUs_t;
-
 // Filtering ------------------------------------------------------------------
 
 typedef struct pt1Filter_s {
@@ -89,7 +78,7 @@ typedef struct {
     float          k_rate_d;
     float          k_rate_f;
     float          k_level_p;
-    timeUs_t       lastDynLpfUpdateUs;
+    uint32_t       lastDynLpfUpdateUs;
     float          previousSetpointCorrection[3];
     float          previousGyroRateDterm[3];
     float          previousSetpoint[3];
@@ -99,8 +88,8 @@ typedef struct {
 
 // Time -----------------------------------------------------------------------
 
-typedef uint32_t timeUs_t;
-typedef int32_t timeDelta_t;
+typedef uint32_t uint32_t;
+typedef int32_t int32_t;
 
 // Demands ------------------------------------------------------------------------
 
@@ -194,14 +183,14 @@ typedef struct {
 
     // For both hardware and sim implementations
     void (*fun)(void * hackflight, uint32_t time);
-    timeDelta_t desiredPeriodUs;        // target period of execution
-    timeUs_t lastExecutedAtUs;          // last time of invocation
+    int32_t desiredPeriodUs;        // target period of execution
+    uint32_t lastExecutedAtUs;          // last time of invocation
 
     // For hardware impelmentations
     uint16_t dynamicPriority;           // when last executed, to avoid task starvation
     uint16_t taskAgeCycles;
-    timeUs_t lastSignaledAtUs;          // time of invocation event for event-driven tasks
-    timeUs_t anticipatedExecutionTime;  // Fixed point expectation of next execution time
+    uint32_t lastSignaledAtUs;          // time of invocation event for event-driven tasks
+    uint32_t anticipatedExecutionTime;  // Fixed point expectation of next execution time
 
 } task_t;
 

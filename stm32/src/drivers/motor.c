@@ -255,7 +255,7 @@ bool motorIsMotorEnabled(uint8_t index)
     return motorDevice->vTable.isMotorEnabled(index);
 }
 
-timeMs_t motorGetMotorEnableTimeMs(void)
+uint32_t motorGetMotorEnableTimeMs(void)
 {
     return motorDevice->motorEnableTimeMs;
 }

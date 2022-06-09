@@ -71,7 +71,7 @@ typedef struct dshotTelemetryState_s {
 
 extern dshotTelemetryState_t dshotTelemetryState;
 
-void updateDshotTelemetryQuality(dshotTelemetryQuality_t *qualityStats, bool packetValid, timeMs_t currentTimeMs);
+void updateDshotTelemetryQuality(dshotTelemetryQuality_t *qualityStats, bool packetValid, uint32_t currentTimeMs);
 
 bool isDshotMotorTelemetryActive(uint8_t motorIndex);
 bool isDshotTelemetryActive(void);

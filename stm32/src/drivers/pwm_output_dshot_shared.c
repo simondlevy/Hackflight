@@ -160,10 +160,10 @@ static uint32_t decodeTelemetryPacket(uint32_t buffer[], uint32_t count)
     if (!useDshotTelemetry) {
         return true;
     }
-    const timeMs_t currentTimeMs = millis();
-    const timeUs_t currentUs = micros();
+    const uint32_t currentTimeMs = millis();
+    const uint32_t currentUs = micros();
     for (int i = 0; i < dshotPwmDevice.count; i++) {
-        timeDelta_t usSinceInput = cmpTimeUs(currentUs, inputStampUs);
+        int32_t usSinceInput = cmpTimeUs(currentUs, inputStampUs);
         if (usSinceInput >= 0 && usSinceInput < dmaMotors[i].dshotTelemetryDeadtimeUs) {
             return false;
         }

@@ -162,7 +162,7 @@ typedef enum {
 
 typedef struct mspPort_s {
     void *                    port; // null when port unused.
-    timeMs_t                  lastActivityMs;
+    uint32_t                  lastActivityMs;
     mspPendingSystemRequest_e pendingRequest;
     mspState_e                state;
     mspPacketType_e           packetType;

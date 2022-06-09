@@ -50,12 +50,12 @@ typedef enum {
 typedef struct dshotCommandControl_s {
     dshotCommandState_e state;
     uint32_t nextCommandCycleDelay;
-    timeUs_t delayAfterCommandUs;
+    uint32_t delayAfterCommandUs;
     uint8_t repeats;
     uint8_t command[MAX_SUPPORTED_MOTORS];
 } dshotCommandControl_t;
 
-static timeUs_t dshotCommandPidLoopTimeUs = 125; // default to 8KHz (125us) loop to prevent possible div/0
+static uint32_t dshotCommandPidLoopTimeUs = 125; // default to 8KHz (125us) loop to prevent possible div/0
                                                  // gets set to the actual value when the PID loop is initialized
 static dshotCommandControl_t commandQueue[DSHOT_MAX_COMMANDS + 1];
 static uint8_t commandQueueHead;
@@ -110,7 +110,7 @@ static  bool dshotCommandQueueUpdate(void)
     return false;
 }
 
-static  uint32_t dshotCommandCyclesFromTime(timeUs_t delayUs)
+static  uint32_t dshotCommandCyclesFromTime(uint32_t delayUs)
 {
     // Find the minimum number of motor output cycles needed to
     // provide at least delayUs time delay
@@ -175,7 +175,7 @@ void dshotCommandWrite(uint8_t index, uint8_t motorCount, uint8_t command, dshot
     }
 
     uint8_t repeats = 1;
-    timeUs_t delayAfterCommandUs = DSHOT_COMMAND_DELAY_US;
+    uint32_t delayAfterCommandUs = DSHOT_COMMAND_DELAY_US;
 
     switch (command) {
     case DSHOT_CMD_SPIN_DIRECTION_1:
@@ -201,7 +201,7 @@ void dshotCommandWrite(uint8_t index, uint8_t motorCount, uint8_t command, dshot
         for (; repeats; repeats--) {
             delayMicroseconds(DSHOT_COMMAND_DELAY_US);
 
-            timeUs_t timeoutUs = micros() + 1000;
+            uint32_t timeoutUs = micros() + 1000;
             while (!motorGetVTable().updateStart() &&
                    cmpTimeUs(timeoutUs, micros()) > 0);
             for (uint8_t i = 0; i < motorDeviceCount(); i++) {

@@ -86,7 +86,7 @@ typedef struct motorDmaOutput_s {
     uint32_t iocfg;
     DMA_InitTypeDef   dmaInitStruct;
     volatile bool isInput;
-    timeDelta_t dshotTelemetryDeadtimeUs;
+    int32_t dshotTelemetryDeadtimeUs;
     uint8_t dmaInputLen;
     TIM_OCInitTypeDef ocInitStruct;
     TIM_ICInitTypeDef icInitStruct;

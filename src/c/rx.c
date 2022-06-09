@@ -154,25 +154,25 @@ typedef struct {
     float       command[4];
     bool        dataProcessingRequired;
     float       dataToSmooth[4];
-    timeDelta_t frameTimeDeltaUs;
+    int32_t frameTimeDeltaUs;
     bool        gotNewData;
     bool        inFailsafeMode;
     bool        initializedFilter;
     bool        initializedThrottleTable;
     uint32_t    invalidPulsePeriod[18];
     bool        isRateValid;
-    timeUs_t    lastFrameTimeUs;
-    timeUs_t    lastRxTimeUs;
+    uint32_t    lastFrameTimeUs;
+    uint32_t    lastRxTimeUs;
     int16_t     lookupThrottleRc[THROTTLE_LOOKUP_LENGTH];
     uint32_t    needSignalBefore;
-    timeUs_t    nextUpdateAtUs;
+    uint32_t    nextUpdateAtUs;
     float       oldRcCommand[3];
-    timeUs_t    previousFrameTimeUs;
+    uint32_t    previousFrameTimeUs;
     float       raw[18];
     uint32_t    refreshPeriod;
     bool        signalReceived;
     rxState_e   state;
-    timeMs_t    validFrameTimeMs;
+    uint32_t    validFrameTimeMs;
 
 } rx_t;
 
@@ -318,7 +318,7 @@ extern "C" {
     }
 
     // rxPoll
-    static void detectAndApplySignalLossBehaviour(rx_t * rx, timeUs_t currentTimeUs,
+    static void detectAndApplySignalLossBehaviour(rx_t * rx, uint32_t currentTimeUs,
             float raw[])
     {
         uint32_t currentTimeMs = currentTimeUs/ 1000;
@@ -419,7 +419,7 @@ extern "C" {
     }
 
     // rxPoll
-    static bool calculateChannelsAndUpdateFailsafe(rx_t * rx, timeUs_t currentTimeUs,
+    static bool calculateChannelsAndUpdateFailsafe(rx_t * rx, uint32_t currentTimeUs,
             float raw[])
     {
         if (rx->auxiliaryProcessingRequired) {
@@ -440,13 +440,13 @@ extern "C" {
     }
 
     // rxPoll
-    static timeDelta_t getFrameDelta(rx_t * rx, timeUs_t currentTimeUs, timeDelta_t *frameAgeUs)
+    static int32_t getFrameDelta(rx_t * rx, uint32_t currentTimeUs, int32_t *frameAgeUs)
     {
-        timeUs_t frameTimeUs = rx->lastFrameTimeUs;
+        uint32_t frameTimeUs = rx->lastFrameTimeUs;
 
         *frameAgeUs = cmpTimeUs(currentTimeUs, frameTimeUs);
 
-        const timeDelta_t deltaUs = cmpTimeUs(frameTimeUs, rx->previousFrameTimeUs);
+        const int32_t deltaUs = cmpTimeUs(frameTimeUs, rx->previousFrameTimeUs);
         if (deltaUs) {
             rx->frameTimeDeltaUs = deltaUs;
             rx->previousFrameTimeUs = frameTimeUs;
@@ -456,11 +456,11 @@ extern "C" {
     }
 
     // rxPoll
-    static bool processData(rx_t * rx, float raw[], timeUs_t currentTimeUs, bool * armed)
+    static bool processData(rx_t * rx, float raw[], uint32_t currentTimeUs, bool * armed)
     {
-        timeDelta_t frameAgeUs;
+        int32_t frameAgeUs;
 
-        timeDelta_t refreshPeriodUs = getFrameDelta(rx, currentTimeUs, &frameAgeUs);
+        int32_t refreshPeriodUs = getFrameDelta(rx, currentTimeUs, &frameAgeUs);
 
         if (!refreshPeriodUs || cmpTimeUs(currentTimeUs, rx->lastRxTimeUs) <= frameAgeUs) {
 
@@ -617,7 +617,7 @@ extern "C" {
     }
 
     static void processSmoothingFilter(
-            timeUs_t currentTimeUs,
+            uint32_t currentTimeUs,
             rx_t * rx,
             angle_pid_t * ratepid,
             float setpointRate[3],
@@ -667,7 +667,7 @@ extern "C" {
         if (rx->gotNewData) {
             // for auto calculated filters we need to examine each rx frame interval
             if (rx->calculatedCutoffs) {
-                const timeMs_t currentTimeMs = currentTimeUs / 1000;
+                const uint32_t currentTimeMs = currentTimeUs / 1000;
 
                 // If the filter cutoffs in auto mode, and we have good rx data,
                 // then determine the average rx frame rate and use that to
@@ -762,7 +762,7 @@ extern "C" {
     }
 
     void rxUpdateArmingStatus(
-            timeUs_t currentTimeUs,
+            uint32_t currentTimeUs,
             float raw[],
             bool imuIsLevel,
             bool calibrating,
@@ -827,7 +827,7 @@ extern "C" {
     }
 
     static void tryArm(
-            timeUs_t currentTimeUs,
+            uint32_t currentTimeUs,
             uint8_t * tryingToArm,
             float raw[],
             bool imuIsLevel,
@@ -855,7 +855,7 @@ extern "C" {
     }
 
     void rxProcessDataModes(
-            timeUs_t currentTimeUs,
+            uint32_t currentTimeUs,
             bool signalReceived,
             float raw[],
             bool imuIsLevel,
@@ -890,7 +890,7 @@ extern "C" {
     static rx_t _rx;
 
     // Called from hackflight.c::adjustRxDynamicPriority()
-    bool rxCheck(timeUs_t currentTimeUs)
+    bool rxCheck(uint32_t currentTimeUs)
     {
         bool signalReceived = false;
         bool useDataDrivenProcessing = true;
@@ -930,7 +930,7 @@ extern "C" {
     }
 
     void rxPoll(
-            timeUs_t currentTimeUs,
+            uint32_t currentTimeUs,
             bool imuIsLevel,
             bool calibrating,
             rx_axes_t * rxax,
@@ -985,7 +985,7 @@ extern "C" {
     }
 
     // Runs in fast (inner, core) loop
-    void rxGetDemands(timeUs_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands)
+    void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands)
     {
         float rawSetpoint[3] = {0};
         float setpointRate[3] = {0};

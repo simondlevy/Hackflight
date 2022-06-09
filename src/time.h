@@ -24,9 +24,9 @@
 extern "C" {
 #endif
 
-    static inline timeDelta_t cmpTimeUs(timeUs_t a, timeUs_t b)
+    static inline int32_t cmpTimeUs(uint32_t a, uint32_t b)
     {
-        return (timeDelta_t)(a - b);
+        return (int32_t)(a - b);
     }
 
     static inline int32_t cmpTimeCycles(uint32_t a, uint32_t b)
@@ -34,16 +34,16 @@ extern "C" {
         return (int32_t)(a - b);
     }
 
-    void delayMicroseconds(timeUs_t us);
-    void delayMillis(timeMs_t ms);
+    void delayMicroseconds(uint32_t us);
+    void delayMillis(uint32_t ms);
 
-    timeUs_t microsISR(void);
+    uint32_t microsISR(void);
 
-    timeUs_t timeMicros(void);
-    timeMs_t timeMillis(void);
+    uint32_t timeMicros(void);
+    uint32_t timeMillis(void);
 
     uint32_t ticks(void);
-    timeDelta_t ticks_diff_us(uint32_t begin, uint32_t end);
+    int32_t ticks_diff_us(uint32_t begin, uint32_t end);
 
 #if defined(__cplusplus)
 }

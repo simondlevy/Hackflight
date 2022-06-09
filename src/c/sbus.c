@@ -95,7 +95,7 @@ typedef union sbusFrame_u {
 
 typedef struct sbusFrameData_s {
     sbusFrame_t frame;
-    timeUs_t startAtUs;
+    uint32_t startAtUs;
     uint8_t position;
     bool done;
 } sbusFrameData_t;
@@ -148,13 +148,13 @@ static uint8_t sbusChannelsDecode(uint16_t * channelData, const sbusChannels_t *
 static sbusFrameData_t _frameData;
 
 // Receive ISR callback
-static void sbusDataReceive(uint8_t c, void *data, timeUs_t currentTimeUs)
+static void sbusDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
 {
     (void)data;
 
-    const timeUs_t nowUs = currentTimeUs;
+    const uint32_t nowUs = currentTimeUs;
 
-    const timeDelta_t sbusFrameTime = cmpTimeUs(nowUs, _frameData.startAtUs);
+    const int32_t sbusFrameTime = cmpTimeUs(nowUs, _frameData.startAtUs);
 
     if (sbusFrameTime > (long)(TIME_NEEDED_PER_FRAME + 500)) {
         _frameData.position = 0;
@@ -179,7 +179,7 @@ static void sbusDataReceive(uint8_t c, void *data, timeUs_t currentTimeUs)
 
 // Public API ==================================================================
 
-uint8_t rxDevCheck(uint16_t * channelData, timeUs_t * frameTimeUs)
+uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
 {
     if (!_frameData.done) {
         return RX_FRAME_PENDING;

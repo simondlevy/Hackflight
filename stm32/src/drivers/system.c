@@ -209,17 +209,17 @@ void systemReboot(void)
     systemResetToBootloader(BOOTLOADER_REQUEST_ROM);
 }
 
-void delayMillis(timeMs_t ms)
+void delayMillis(uint32_t ms)
 {
     delay(ms);
 }
 
-timeUs_t timeMicros(void)
+uint32_t timeMicros(void)
 {
     return micros();
 }
 
-timeMs_t timeMillis(void)
+uint32_t timeMillis(void)
 {
     return millis();
 }

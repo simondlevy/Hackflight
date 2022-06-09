@@ -105,7 +105,7 @@ uint16_t motorGetDshotTelemetry(uint8_t index)
 
 FAST_DATA_ZERO_INIT dshotTelemetryQuality_t dshotTelemetryQuality[MAX_SUPPORTED_MOTORS];
 
-void updateDshotTelemetryQuality(dshotTelemetryQuality_t *qualityStats, bool packetValid, timeMs_t currentTimeMs)
+void updateDshotTelemetryQuality(dshotTelemetryQuality_t *qualityStats, bool packetValid, uint32_t currentTimeMs)
 {
     uint8_t statsBucketIndex = (currentTimeMs / DSHOT_TELEMETRY_QUALITY_BUCKET_MS) % DSHOT_TELEMETRY_QUALITY_BUCKET_COUNT;
     if (statsBucketIndex != qualityStats->lastBucketIndex) {
@@ -174,7 +174,7 @@ float motorValueLow(void)
     return DSHOT_MIN_THROTTLE + 0.045 * DSHOT_RANGE;
 }
 
-bool motorCheckDshotReady(timeUs_t currentTimeUs, uint8_t * tryingToArm)
+bool motorCheckDshotReady(uint32_t currentTimeUs, uint8_t * tryingToArm)
 {
     if (currentTimeUs  < DSHOT_BEACON_GUARD_DELAY_US) {
         if (*tryingToArm == ARMING_DELAYED_DISARMED) {

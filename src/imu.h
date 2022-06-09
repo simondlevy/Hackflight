@@ -28,14 +28,14 @@ extern "C" {
 
     void imuAccumulateGyro(hackflight_t * hf, float * adcf);
 
-    void imuGetEulerAngles(hackflight_t * hf, timeUs_t time);
+    void imuGetEulerAngles(hackflight_t * hf, uint32_t time);
 
     void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat);
 
     void imuInit(void);
 
     void imuUpdateFusion(hackflight_t * hf,
-            timeUs_t time,
+            uint32_t time,
             quaternion_t * quat,
             rotation_t * rot);
 
