@@ -145,7 +145,7 @@ extern "C" {
 
     void * serialOpenPortUsb(void);
 
-    uint8_t serialRead(void  * p);
+    uint8_t serialRead(void  * port);
 
     uint32_t serialRxBytesWaiting(void * port);
 
