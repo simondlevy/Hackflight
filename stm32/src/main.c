@@ -50,7 +50,7 @@ int main(void)
     OverclockRebootIfNecessary(0);
     timerInit();
     serialUartPinConfigure();
-    serialInit(false, -1);
+    serialInit(-1);
     motorInit(4);
     inverterInit();
     spiPinConfigure();

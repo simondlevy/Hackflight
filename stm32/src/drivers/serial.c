@@ -24,7 +24,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "platform.h"
 #include "serialdev.h"
-#include "serial_softserial.h"
 #include "serial_uart.h"
 #include "serial_usb_vcp.h"
 #include "systemdev.h"
@@ -79,7 +78,7 @@ void serialEndWrite(void * p)
         port->vTable->endWrite(port);
 }
 
-void serialInit(bool softserialEnabled, serialPortIdentifier_e serialPortToDisable)
+void serialInit(serialPortIdentifier_e serialPortToDisable)
 {
     memset(&_serialPortUsageList, 0, sizeof(_serialPortUsageList));
 
@@ -100,15 +99,6 @@ void serialInit(bool softserialEnabled, serialPortIdentifier_e serialPortToDisab
             }
         }
 
-        else if ((_serialPortUsageList[index].identifier == SERIAL_PORT_SOFTSERIAL1
-            && !(softserialEnabled && (IO_TAG_TX[RESOURCE_SOFT_OFFSET + SOFTSERIAL1] ||
-                IO_TAG_RX[RESOURCE_SOFT_OFFSET + SOFTSERIAL1]))
-           ) || (_serialPortUsageList[index].identifier == SERIAL_PORT_SOFTSERIAL2
-            && !(softserialEnabled && (IO_TAG_TX[RESOURCE_SOFT_OFFSET + SOFTSERIAL2] ||
-                IO_TAG_RX[RESOURCE_SOFT_OFFSET + SOFTSERIAL2]))
-            )) {
-            _serialPortUsageList[index].identifier = SERIAL_PORT_NONE;
-        }
     }
 }
 
@@ -152,14 +142,6 @@ void * serialOpenPort(
                     rxCallback, rxCallbackData, baudRate, mode, options);
             break;
 
-        case SERIAL_PORT_SOFTSERIAL1:
-            serialPort = openSoftSerial(SOFTSERIAL1, rxCallback, rxCallbackData,
-                    baudRate, mode, options);
-            break;
-        case SERIAL_PORT_SOFTSERIAL2:
-            serialPort = openSoftSerial(SOFTSERIAL2, rxCallback, rxCallbackData,
-                    baudRate, mode, options);
-            break;
         default:
             break;
     }

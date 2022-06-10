@@ -15,7 +15,8 @@ void serialEndWrite(void * port)
 
 bool serialIsTransmitBufferEmpty(void * port)
 {
-    return false;
+    // Always use Serial
+    return Serial.availableForWrite() > 0;
 }
 
 void serialOpenPortSbus(
@@ -23,7 +24,10 @@ void serialOpenPortSbus(
         serialReceiveCallbackPtr rxCallback,
         void * rxCallbackData)
 {
+    // Always use Serial1
     (void)identifier;
+    Serial1.begin(115200);
+
     (void)rxCallback;
     (void)rxCallbackData;
 }

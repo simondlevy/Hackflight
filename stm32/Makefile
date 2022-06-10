@@ -160,7 +160,6 @@ COMMON_SRC = \
             drivers/timer_common.c \
             drivers/timer.c \
             drivers/pwm_output.c \
-            drivers/serial_softserial.c \
             drivers/accgyro_spi_mpu6000.c \
             drivers/flash.c
 

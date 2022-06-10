@@ -125,7 +125,7 @@ extern "C" {
 
     void serialEndWrite(void * port);
 
-    void serialInit(bool softserialEnabled, serialPortIdentifier_e serialPortToDisable);
+    void serialInit(serialPortIdentifier_e serialPortToDisable);
 
     bool serialIsTransmitBufferEmpty(void * port);
 
