@@ -18,6 +18,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include "maths.h"
 #include "datatypes.h"
 
 #if defined(__cplusplus)

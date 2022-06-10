@@ -21,14 +21,9 @@
 #include <string.h>
 #include <math.h>
 
-#include "accel.h"
 #include "datatypes.h"
-#include "deg2rad.h"
-#include "gyro.h"
 #include "imu.h"
-#include "maths.h"
 #include "quat2euler.h"
-#include "time.h"
 
 void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 {
