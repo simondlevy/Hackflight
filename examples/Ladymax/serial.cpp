@@ -19,17 +19,13 @@ bool serialIsTransmitBufferEmpty(void * port)
     return Serial.availableForWrite() > 0;
 }
 
-void serialOpenPortSbus(
-        serialPortIdentifier_e identifier,
-        serialReceiveCallbackPtr rxCallback,
-        void * rxCallbackData)
+void serialOpenPortSbus( serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
 {
     // Always use Serial1
     (void)identifier;
     Serial1.begin(115200);
 
     (void)rxCallback;
-    (void)rxCallbackData;
 }
 
 void * serialOpenPortUsb(void)

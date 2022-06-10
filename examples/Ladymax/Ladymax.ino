@@ -2,6 +2,7 @@
 #include <Wire.h>
 
 #include <hackflight.h>
+#include <serial.h>
 
 static hackflight_t hf;
 
@@ -11,7 +12,8 @@ void setup(void)
     delay(100);
     Serial.begin(115200);
 
-    hackflightFullInit(&hf);
+    // Always use Serial1 for receiver, no no need to specify
+    hackflightFullInit(&hf, SERIAL_PORT_NONE);
 }
 
 void loop(void)
