@@ -30,9 +30,3 @@ serialPort_t *openSoftSerial(
         uint32_t baud,
         portMode_e mode,
         portOptions_e options);
-
-uint32_t softSerialRxBytesWaiting(const serialPort_t *instance);
-uint32_t softSerialTxBytesFree(const serialPort_t *instance);
-uint8_t softSerialReadByte(serialPort_t *instance);
-void softSerialSetBaudRate(serialPort_t *s, uint32_t baudRate);
-bool isSoftSerialTransmitBufferEmpty(const serialPort_t *s);
