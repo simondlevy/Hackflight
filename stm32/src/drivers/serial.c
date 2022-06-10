@@ -165,7 +165,7 @@ uint8_t serialRead(void * p)
     return port->vTable->serialRead(port);
 }
 
-uint32_t serialRxBytesWaiting(void * p)
+uint32_t serialBytesAvailable(void * p)
 {
     serialPort_t * port = (serialPort_t *)p;
 

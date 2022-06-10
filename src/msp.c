@@ -560,12 +560,12 @@ void mspUpdate(
 
         mspPostProcessFnPtr mspPostProcessFn = NULL;
 
-        if (serialRxBytesWaiting(mspPort->port)) {
+        if (serialBytesAvailable(mspPort->port)) {
             // There are bytes incoming - abort pending request
             mspPort->lastActivityMs = timeMillis();
             mspPort->pendingRequest = MSP_PENDING_NONE;
 
-            while (serialRxBytesWaiting(mspPort->port)) {
+            while (serialBytesAvailable(mspPort->port)) {
                 const uint8_t c = serialRead(mspPort->port);
                 const bool consumed = serialProcessReceivedData(mspPort, c);
 

@@ -144,7 +144,7 @@ extern "C" {
 
     uint8_t serialRead(void  * port);
 
-    uint32_t serialRxBytesWaiting(void * port);
+    uint32_t serialBytesAvailable(void * port);
 
     void serialSetDebugPort(void * port);
 

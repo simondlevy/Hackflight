@@ -44,19 +44,22 @@ void * serialOpenPortUsb(void)
     return &Serial;
 }
 
-uint8_t serialRead(void  * p)
+uint8_t serialRead(void  * port)
 {
-    return p == &Serial ? 
+    return port == &Serial ? 
         Serial.read() :
-        p == &Serial1 ?
+        port == &Serial1 ?
         Serial1.read() :
         0;
 }
 
-uint32_t serialRxBytesWaiting(void * port)
+uint32_t serialBytesAvailable(void * port)
 {
-    (void)port;
-    return 0;
+    return port == &Serial ? 
+        Serial.available() :
+        port == &Serial1 ?
+        Serial1.available() :
+        0;
 }
 
 uint32_t serialTxBytesFree(void * port)
