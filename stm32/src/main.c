@@ -23,9 +23,49 @@
 #include <datatypes.h>
 #include <hackflight.h>
 #include <imu.h>
+#include <serial.h>
+
+#include "drivers/bus_spi.h"
+#include "drivers/dshot_command.h"
+#include "drivers/exti.h"
+#include "drivers/flash.h"
+#include "drivers/inverter.h"
+#include "drivers/io.h"
+#include "drivers/light_led.h"
+#include "drivers/motordev.h"
+#include "drivers/pinio.h"
+#include "drivers/serialdev.h"
+#include "drivers/serial_uart.h"
+#include "drivers/systemdev.h"
+#include "drivers/timer.h"
+#include "drivers/usb_io.h"
+
 
 int main(void)
 {
+    systemInit();
+    ioInitGlobal();
+    extiInit();
+    systemClockSetHSEValue(8000000);
+    OverclockRebootIfNecessary(0);
+    timerInit();
+    serialUartPinConfigure();
+    serialInit(false, -1);
+    motorInit(4);
+    inverterInit();
+    spiPinConfigure();
+    spiPreInit();
+    spiInit(0x07); // mask for devices 0,1,2
+    dshotSetPidLoopTime(GYRO_PERIOD());
+    pinioInit();
+    usbCableDetectInit();
+    flashInit();
+    timerStart();
+    spiInitBusDMA();
+    motorPostInit();
+    motorEnable();
+    systemInitUnusedPins();
+
     hackflight_t hf = {0};
 
     hackflightFullInit(&hf);

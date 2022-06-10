@@ -297,8 +297,6 @@ void hackflightFullInit(hackflight_t * hf)
     static const float RATE_F  = 0.0165048;
     static const float LEVEL_P = 0 /*3.0*/;
 
-    boardInit();
-
     gyroInit(hf);
     imuInit();
     ledInit();

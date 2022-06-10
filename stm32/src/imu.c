@@ -238,6 +238,12 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
             &fusionPrev->rot, &fusionPrev->quat, quat);
 }
 
+void imuInit(void)
+{
+    gyroDevInit();
+    accelInit();
+}
+
 void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
 {
     imu_fusion_t fusion;
