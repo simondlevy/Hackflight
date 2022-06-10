@@ -62,12 +62,6 @@ uint32_t serialBytesAvailable(void * port)
         0;
 }
 
-uint32_t serialTxBytesFree(void * port)
-{
-    (void)port;
-    return 0;
-}
-
 void serialWaitForPortToFinishTransmitting(void * port)
 {
     (void)port;

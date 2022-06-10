@@ -148,8 +148,6 @@ extern "C" {
 
     void serialSetDebugPort(void * port);
 
-    uint32_t serialTxBytesFree(void * port);
-
     void serialWaitForPortToFinishTransmitting(void * port);
 
     void serialWrite(void * port, uint8_t c);
