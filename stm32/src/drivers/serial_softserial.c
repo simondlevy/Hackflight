@@ -170,11 +170,7 @@ static void onSerialTimerOverflow(timerOvrHandlerRec_t *cbRec, captureCompare_t 
     UNUSED(capture);
     softSerial_t *self = container_of(cbRec, softSerial_t, overCb);
 
-    //if (self->port.mode & MODE_TX)
-    //    processTxState(self);
-
-    if (self->port.mode & MODE_RX)
-        processRxState(self);
+    processRxState(self);
 }
 
 static void onSerialRxPinChange(timerCCHandlerRec_t *cbRec, captureCompare_t capture)
@@ -225,21 +221,6 @@ static void onSerialRxPinChange(timerCCHandlerRec_t *cbRec, captureCompare_t cap
     } else {
         self->rxEdge = TRAILING;
         timerChConfigIC(self->timerHardware, inverted ? ICPOLARITY_RISING : ICPOLARITY_FALLING, 0);
-    }
-}
-
-
-
-static void setTxSignal(softSerial_t *softSerial, uint8_t state)
-{
-    if (softSerial->port.options & SERIAL_INVERTED) {
-        state = !state;
-    }
-
-    if (state) {
-        IOHi(softSerial->txIO);
-    } else {
-        IOLo(softSerial->txIO);
     }
 }
 
@@ -427,11 +408,6 @@ serialPort_t *openSoftSerial(softSerialPortIndex_e portIndex, serialReceiveCallb
     } else {
         softSerial->timerMode = TIMER_MODE_SINGLE;
         timerChConfigCallbacks(softSerial->timerHardware, &softSerial->edgeCb, &softSerial->overCb);
-    }
-
-    if (!(options & SERIAL_BIDIR)) {
-        serialOutputPortActivate(softSerial);
-        setTxSignal(softSerial, ENABLE);
     }
 
     serialInputPortActivate(softSerial);
