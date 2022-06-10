@@ -121,10 +121,6 @@ extern "C" {
     typedef void (*serialReceiveCallbackPtr)
         (uint8_t data, void *rxCallbackData, uint32_t currentTimeUs);
 
-    void serialBeginWrite(void * port);
-
-    void serialEndWrite(void * port);
-
     void serialInit(serialPortIdentifier_e serialPortToDisable);
 
     bool serialIsTransmitBufferEmpty(void * port);

@@ -388,11 +388,9 @@ static int serialSendFrame(
     const int totalFrameLength = hdrLen + dataLen + crcLen;
 
     // Transmit frame
-    serialBeginWrite(msp->port);
     serialWriteBuf(msp->port, hdr, hdrLen);
     serialWriteBuf(msp->port, data, dataLen);
     serialWriteBuf(msp->port, crc, crcLen);
-    serialEndWrite(msp->port);
 
     return totalFrameLength;
 }

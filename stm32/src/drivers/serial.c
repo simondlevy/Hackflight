@@ -62,22 +62,6 @@ static const serialPortIdentifier_e serialPortIdentifiers[SERIAL_PORT_COUNT] = {
 
 // ----------------------------------------------------------------------------
 
-void serialBeginWrite(void * p)
-{
-    serialPort_t * port = (serialPort_t *)p;
-
-    if (port->vTable->beginWrite)
-        port->vTable->beginWrite(port);
-}
-
-void serialEndWrite(void * p)
-{
-    serialPort_t * port = (serialPort_t *)p;
-
-    if (port->vTable->endWrite)
-        port->vTable->endWrite(port);
-}
-
 void serialInit(serialPortIdentifier_e serialPortToDisable)
 {
     memset(&_serialPortUsageList, 0, sizeof(_serialPortUsageList));

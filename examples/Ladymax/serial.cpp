@@ -11,17 +11,6 @@ void serialEvent1(void)
     }
 }
 
-void serialBeginWrite(void * port)
-{
-    (void)port;
-}
-
-void serialEndWrite(void * port)
-{
-    (void)port;
-}
-
-
 bool serialIsTransmitBufferEmpty(void * port)
 {
     // Always use Serial
