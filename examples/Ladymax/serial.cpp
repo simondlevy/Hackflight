@@ -46,8 +46,11 @@ void * serialOpenPortUsb(void)
 
 uint8_t serialRead(void  * p)
 {
-    (void)p;
-    return 0;
+    return p == &Serial ? 
+        Serial.read() :
+        p == &Serial1 ?
+        Serial1.read() :
+        0;
 }
 
 uint32_t serialRxBytesWaiting(void * port)
