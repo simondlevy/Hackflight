@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "board.h"
 #include "gyro.h"
 #include "hackflight.h"
 #include "led.h"
@@ -296,7 +297,6 @@ void hackflightFullInit(hackflight_t * hf)
     static const float RATE_F  = 0.0165048;
     static const float LEVEL_P = 0 /*3.0*/;
 
-    void boardInit(void);
     boardInit();
 
     gyroInit(hf);
