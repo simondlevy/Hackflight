@@ -33,10 +33,18 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #define MAX_SOFTSERIAL_PORTS 2
 
+#define STOP_BIT_MASK (1 << 0)
+#define START_BIT_MASK (1 << (RX_TOTAL_BITS - 1))
+
 typedef enum {
     TIMER_MODE_SINGLE,
     TIMER_MODE_DUAL,
 } timerMode_e;
+
+enum {
+    TRAILING,
+    LEADING
+};
 
 #define ICPOLARITY_RISING true
 #define ICPOLARITY_FALLING false
@@ -79,8 +87,148 @@ static const struct serialPortVTable softSerialVTable; // Forward
 
 static softSerial_t softSerialPorts[MAX_SOFTSERIAL_PORTS];
 
-void onSerialTimerOverflow(timerOvrHandlerRec_t *cbRec, captureCompare_t capture);
-void onSerialRxPinChange(timerCCHandlerRec_t *cbRec, captureCompare_t capture);
+static void applyChangedBits(softSerial_t *softSerial)
+{
+    if (softSerial->rxEdge == TRAILING) {
+        uint8_t bitToSet;
+        for (bitToSet = softSerial->rxLastLeadingEdgeAtBitIndex; bitToSet < softSerial->rxBitIndex; bitToSet++) {
+            softSerial->internalRxBuffer |= 1 << bitToSet;
+        }
+    }
+}
+
+static void extractAndStoreRxByte(softSerial_t *softSerial)
+{
+    if ((softSerial->port.mode & MODE_RX) == 0) {
+        return;
+    }
+
+    uint8_t haveStartBit = (softSerial->internalRxBuffer & START_BIT_MASK) == 0;
+    uint8_t haveStopBit = (softSerial->internalRxBuffer & STOP_BIT_MASK) == 1;
+
+    if (!haveStartBit || !haveStopBit) {
+        softSerial->receiveErrors++;
+        return;
+    }
+
+    uint8_t rxByte = (softSerial->internalRxBuffer >> 1) & 0xFF;
+
+    if (softSerial->port.rxCallback) {
+        softSerial->port.rxCallback(rxByte, softSerial->port.rxCallbackData, microsISR());
+    } else {
+        softSerial->port.rxBuffer[softSerial->port.rxBufferHead] = rxByte;
+        softSerial->port.rxBufferHead = (softSerial->port.rxBufferHead + 1) % softSerial->port.rxBufferSize;
+    }
+}
+
+static void serialEnableCC(softSerial_t *softSerial)
+{
+    TIM_CCxCmd(softSerial->timerHardware->tim, softSerial->timerHardware->channel, TIM_CCx_Enable);
+}
+
+
+void prepareForNextRxByte(softSerial_t *softSerial)
+{
+    // prepare for next byte
+    softSerial->rxBitIndex = 0;
+    softSerial->isSearchingForStartBit = true;
+    if (softSerial->rxEdge == LEADING) {
+        softSerial->rxEdge = TRAILING;
+        timerChConfigIC(softSerial->timerHardware, (softSerial->port.options & SERIAL_INVERTED) ? ICPOLARITY_RISING : ICPOLARITY_FALLING, 0);
+        serialEnableCC(softSerial);
+    }
+}
+
+
+static void processRxState(softSerial_t *softSerial)
+{
+    if (softSerial->isSearchingForStartBit) {
+        return;
+    }
+
+    softSerial->rxBitIndex++;
+
+    if (softSerial->rxBitIndex == RX_TOTAL_BITS - 1) {
+        applyChangedBits(softSerial);
+        return;
+    }
+
+    if (softSerial->rxBitIndex == RX_TOTAL_BITS) {
+
+        if (softSerial->rxEdge == TRAILING) {
+            softSerial->internalRxBuffer |= STOP_BIT_MASK;
+        }
+
+        extractAndStoreRxByte(softSerial);
+        prepareForNextRxByte(softSerial);
+    }
+}
+
+
+static void onSerialTimerOverflow(timerOvrHandlerRec_t *cbRec, captureCompare_t capture)
+{
+    UNUSED(capture);
+    softSerial_t *self = container_of(cbRec, softSerial_t, overCb);
+
+    //if (self->port.mode & MODE_TX)
+    //    processTxState(self);
+
+    if (self->port.mode & MODE_RX)
+        processRxState(self);
+}
+
+static void onSerialRxPinChange(timerCCHandlerRec_t *cbRec, captureCompare_t capture)
+{
+    UNUSED(capture);
+
+    softSerial_t *self = container_of(cbRec, softSerial_t, edgeCb);
+    bool inverted = self->port.options & SERIAL_INVERTED;
+
+    if ((self->port.mode & MODE_RX) == 0) {
+        return;
+    }
+
+    if (self->isSearchingForStartBit) {
+        // Synchronize the bit timing so that it will interrupt at the center
+        // of the bit period.
+
+        TIM_SetCounter(self->timerHardware->tim, self->timerHardware->tim->ARR / 2);
+
+        // For a mono-timer full duplex configuration, this may clobber the
+        // transmission because the next callback to the onSerialTimerOverflow
+        // will happen too early causing transmission errors.
+        // For a dual-timer configuration, there is no problem.
+
+        if ((self->timerMode != TIMER_MODE_DUAL) && self->isTransmittingData) {
+            self->transmissionErrors++;
+        }
+
+        timerChConfigIC(self->timerHardware, inverted ? ICPOLARITY_FALLING : ICPOLARITY_RISING, 0);
+        self->rxEdge = LEADING;
+
+        self->rxBitIndex = 0;
+        self->rxLastLeadingEdgeAtBitIndex = 0;
+        self->internalRxBuffer = 0;
+        self->isSearchingForStartBit = false;
+        return;
+    }
+
+    if (self->rxEdge == LEADING) {
+        self->rxLastLeadingEdgeAtBitIndex = self->rxBitIndex;
+    }
+
+    applyChangedBits(self);
+
+    if (self->rxEdge == TRAILING) {
+        self->rxEdge = LEADING;
+        timerChConfigIC(self->timerHardware, inverted ? ICPOLARITY_FALLING : ICPOLARITY_RISING, 0);
+    } else {
+        self->rxEdge = TRAILING;
+        timerChConfigIC(self->timerHardware, inverted ? ICPOLARITY_RISING : ICPOLARITY_FALLING, 0);
+    }
+}
+
+
 
 static void setTxSignal(softSerial_t *softSerial, uint8_t state)
 {
@@ -93,11 +241,6 @@ static void setTxSignal(softSerial_t *softSerial, uint8_t state)
     } else {
         IOLo(softSerial->txIO);
     }
-}
-
-static void serialEnableCC(softSerial_t *softSerial)
-{
-    TIM_CCxCmd(softSerial->timerHardware->tim, softSerial->timerHardware->channel, TIM_CCx_Enable);
 }
 
 static void serialInputPortActivate(softSerial_t *softSerial)
@@ -295,291 +438,3 @@ serialPort_t *openSoftSerial(softSerialPortIndex_e portIndex, serialReceiveCallb
 
     return &softSerial->port;
 }
-
-
-/*
- * Serial Engine
- */
-
-void processTxState(softSerial_t *softSerial)
-{
-    uint8_t mask;
-
-    if (!softSerial->isTransmittingData) {
-        if (isSoftSerialTransmitBufferEmpty((serialPort_t *)softSerial)) {
-            // Transmit buffer empty.
-            // Start listening if not already in if half-duplex
-            if (!softSerial->rxActive && softSerial->port.options & SERIAL_BIDIR) {
-                serialOutputPortDeActivate(softSerial);
-                serialInputPortActivate(softSerial);
-            }
-            return;
-        }
-
-        // data to send
-        uint8_t byteToSend = softSerial->port.txBuffer[softSerial->port.txBufferTail++];
-        if (softSerial->port.txBufferTail >= softSerial->port.txBufferSize) {
-            softSerial->port.txBufferTail = 0;
-        }
-
-        // build internal buffer, MSB = Stop Bit (1) + data bits (MSB to LSB) + start bit(0) LSB
-        softSerial->internalTxBuffer = (1 << (TX_TOTAL_BITS - 1)) | (byteToSend << 1);
-        softSerial->bitsLeftToTransmit = TX_TOTAL_BITS;
-        softSerial->isTransmittingData = true;
-
-        if (softSerial->rxActive && (softSerial->port.options & SERIAL_BIDIR)) {
-            // Half-duplex: Deactivate receiver, activate transmitter
-            serialInputPortDeActivate(softSerial);
-            serialOutputPortActivate(softSerial);
-
-            // Start sending on next bit timing, as port manipulation takes time,
-            // and continuing here may cause bit period to decrease causing sampling errors
-            // at the receiver under high rates.
-            // Note that there will be (little less than) 1-bit delay; take it as "turn around time".
-            // XXX We may be able to reload counter and continue. (Future work.)
-            return;
-        }
-    }
-
-    if (softSerial->bitsLeftToTransmit) {
-        mask = softSerial->internalTxBuffer & 1;
-        softSerial->internalTxBuffer >>= 1;
-
-        setTxSignal(softSerial, mask);
-        softSerial->bitsLeftToTransmit--;
-        return;
-    }
-
-    softSerial->isTransmittingData = false;
-}
-
-enum {
-    TRAILING,
-    LEADING
-};
-
-void applyChangedBits(softSerial_t *softSerial)
-{
-    if (softSerial->rxEdge == TRAILING) {
-        uint8_t bitToSet;
-        for (bitToSet = softSerial->rxLastLeadingEdgeAtBitIndex; bitToSet < softSerial->rxBitIndex; bitToSet++) {
-            softSerial->internalRxBuffer |= 1 << bitToSet;
-        }
-    }
-}
-
-void prepareForNextRxByte(softSerial_t *softSerial)
-{
-    // prepare for next byte
-    softSerial->rxBitIndex = 0;
-    softSerial->isSearchingForStartBit = true;
-    if (softSerial->rxEdge == LEADING) {
-        softSerial->rxEdge = TRAILING;
-        timerChConfigIC(softSerial->timerHardware, (softSerial->port.options & SERIAL_INVERTED) ? ICPOLARITY_RISING : ICPOLARITY_FALLING, 0);
-        serialEnableCC(softSerial);
-    }
-}
-
-#define STOP_BIT_MASK (1 << 0)
-#define START_BIT_MASK (1 << (RX_TOTAL_BITS - 1))
-
-void extractAndStoreRxByte(softSerial_t *softSerial)
-{
-    if ((softSerial->port.mode & MODE_RX) == 0) {
-        return;
-    }
-
-    uint8_t haveStartBit = (softSerial->internalRxBuffer & START_BIT_MASK) == 0;
-    uint8_t haveStopBit = (softSerial->internalRxBuffer & STOP_BIT_MASK) == 1;
-
-    if (!haveStartBit || !haveStopBit) {
-        softSerial->receiveErrors++;
-        return;
-    }
-
-    uint8_t rxByte = (softSerial->internalRxBuffer >> 1) & 0xFF;
-
-    if (softSerial->port.rxCallback) {
-        softSerial->port.rxCallback(rxByte, softSerial->port.rxCallbackData, microsISR());
-    } else {
-        softSerial->port.rxBuffer[softSerial->port.rxBufferHead] = rxByte;
-        softSerial->port.rxBufferHead = (softSerial->port.rxBufferHead + 1) % softSerial->port.rxBufferSize;
-    }
-}
-
-void processRxState(softSerial_t *softSerial)
-{
-    if (softSerial->isSearchingForStartBit) {
-        return;
-    }
-
-    softSerial->rxBitIndex++;
-
-    if (softSerial->rxBitIndex == RX_TOTAL_BITS - 1) {
-        applyChangedBits(softSerial);
-        return;
-    }
-
-    if (softSerial->rxBitIndex == RX_TOTAL_BITS) {
-
-        if (softSerial->rxEdge == TRAILING) {
-            softSerial->internalRxBuffer |= STOP_BIT_MASK;
-        }
-
-        extractAndStoreRxByte(softSerial);
-        prepareForNextRxByte(softSerial);
-    }
-}
-
-void onSerialTimerOverflow(timerOvrHandlerRec_t *cbRec, captureCompare_t capture)
-{
-    UNUSED(capture);
-    softSerial_t *self = container_of(cbRec, softSerial_t, overCb);
-
-    if (self->port.mode & MODE_TX)
-        processTxState(self);
-
-    if (self->port.mode & MODE_RX)
-        processRxState(self);
-}
-
-void onSerialRxPinChange(timerCCHandlerRec_t *cbRec, captureCompare_t capture)
-{
-    UNUSED(capture);
-
-    softSerial_t *self = container_of(cbRec, softSerial_t, edgeCb);
-    bool inverted = self->port.options & SERIAL_INVERTED;
-
-    if ((self->port.mode & MODE_RX) == 0) {
-        return;
-    }
-
-    if (self->isSearchingForStartBit) {
-        // Synchronize the bit timing so that it will interrupt at the center
-        // of the bit period.
-
-        TIM_SetCounter(self->timerHardware->tim, self->timerHardware->tim->ARR / 2);
-
-        // For a mono-timer full duplex configuration, this may clobber the
-        // transmission because the next callback to the onSerialTimerOverflow
-        // will happen too early causing transmission errors.
-        // For a dual-timer configuration, there is no problem.
-
-        if ((self->timerMode != TIMER_MODE_DUAL) && self->isTransmittingData) {
-            self->transmissionErrors++;
-        }
-
-        timerChConfigIC(self->timerHardware, inverted ? ICPOLARITY_FALLING : ICPOLARITY_RISING, 0);
-        self->rxEdge = LEADING;
-
-        self->rxBitIndex = 0;
-        self->rxLastLeadingEdgeAtBitIndex = 0;
-        self->internalRxBuffer = 0;
-        self->isSearchingForStartBit = false;
-        return;
-    }
-
-    if (self->rxEdge == LEADING) {
-        self->rxLastLeadingEdgeAtBitIndex = self->rxBitIndex;
-    }
-
-    applyChangedBits(self);
-
-    if (self->rxEdge == TRAILING) {
-        self->rxEdge = LEADING;
-        timerChConfigIC(self->timerHardware, inverted ? ICPOLARITY_FALLING : ICPOLARITY_RISING, 0);
-    } else {
-        self->rxEdge = TRAILING;
-        timerChConfigIC(self->timerHardware, inverted ? ICPOLARITY_RISING : ICPOLARITY_FALLING, 0);
-    }
-}
-
-
-/*
- * Standard serial driver API
- */
-
-uint32_t softSerialRxBytesWaiting(const serialPort_t *instance)
-{
-    if ((instance->mode & MODE_RX) == 0) {
-        return 0;
-    }
-
-    softSerial_t *s = (softSerial_t *)instance;
-
-    return (s->port.rxBufferHead - s->port.rxBufferTail) & (s->port.rxBufferSize - 1);
-}
-
-uint32_t softSerialTxBytesFree(const serialPort_t *instance)
-{
-    if ((instance->mode & MODE_TX) == 0) {
-        return 0;
-    }
-
-    softSerial_t *s = (softSerial_t *)instance;
-
-    uint8_t bytesUsed = (s->port.txBufferHead - s->port.txBufferTail) & (s->port.txBufferSize - 1);
-
-    return (s->port.txBufferSize - 1) - bytesUsed;
-}
-
-uint8_t softSerialReadByte(serialPort_t *instance)
-{
-    uint8_t ch;
-
-    if ((instance->mode & MODE_RX) == 0) {
-        return 0;
-    }
-
-    if (softSerialRxBytesWaiting(instance) == 0) {
-        return 0;
-    }
-
-    ch = instance->rxBuffer[instance->rxBufferTail];
-    instance->rxBufferTail = (instance->rxBufferTail + 1) % instance->rxBufferSize;
-    return ch;
-}
-
-void softSerialWriteByte(serialPort_t *s, uint8_t ch)
-{
-    if ((s->mode & MODE_TX) == 0) {
-        return;
-    }
-
-    s->txBuffer[s->txBufferHead] = ch;
-    s->txBufferHead = (s->txBufferHead + 1) % s->txBufferSize;
-}
-
-void softSerialSetBaudRate(serialPort_t *s, uint32_t baudRate)
-{
-    softSerial_t *softSerial = (softSerial_t *)s;
-
-    softSerial->port.baudRate = baudRate;
-
-    serialTimerConfigureTimebase(softSerial->timerHardware, baudRate);
-}
-
-void softSerialSetMode(serialPort_t *instance, portMode_e mode)
-{
-    instance->mode = mode;
-}
-
-bool isSoftSerialTransmitBufferEmpty(const serialPort_t *instance)
-{
-    return instance->txBufferHead == instance->txBufferTail;
-}
-
-static const struct serialPortVTable softSerialVTable = {
-    .serialWrite = softSerialWriteByte,
-    .serialTotalRxWaiting = softSerialRxBytesWaiting,
-    .serialTotalTxFree = softSerialTxBytesFree,
-    .serialRead = softSerialReadByte,
-    .serialSetBaudRate = softSerialSetBaudRate,
-    .isSerialTransmitBufferEmpty = isSoftSerialTransmitBufferEmpty,
-    .setMode = softSerialSetMode,
-    .setCtrlLineStateCb = NULL,
-    .setBaudRateCb = NULL,
-    .writeBuf = NULL,
-    .beginWrite = NULL,
-    .endWrite = NULL
-};
