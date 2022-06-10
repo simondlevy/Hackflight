@@ -44,6 +44,10 @@ static const uint32_t ATTITUDE_TASK_RATE = 100;
 
 // Attitude task --------------------------------------------------------------
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 static void task_attitude(void * hackflight, uint32_t time)
 {
     hackflight_t * hf = (hackflight_t *)hackflight;
@@ -164,3 +168,7 @@ static void hackflightInit(
 void hackflightFullInit(hackflight_t * hackflight);
 
 void hackflightStep(hackflight_t * hackflight);
+
+#if defined(__cplusplus)
+}
+#endif

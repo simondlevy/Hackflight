@@ -14,7 +14,6 @@ FLASH_SIZE ?=
 ROOT         := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 STM_SRC_DIR  := $(ROOT)/src
 SRC_DIR      := $(ROOT)/../src
-IMPL_DIR     := $(SRC_DIR)/c
 OBJECT_DIR   := $(ROOT)/obj
 CMSIS_DIR    := $(ROOT)/lib/CMSIS
 INCLUDE_DIRS := $(STM_SRC_DIR) \
@@ -126,18 +125,18 @@ COMMON_SRC = \
             board.c \
             imu.c \
             main.c \
-            $(IMPL_DIR)/arming.c \
-            $(IMPL_DIR)/debug.c \
-            $(IMPL_DIR)/failsafe.c \
-            $(IMPL_DIR)/gyro.c \
-            $(IMPL_DIR)/hackflight.c \
-            $(IMPL_DIR)/imu.c \
-            $(IMPL_DIR)/led.c \
-            $(IMPL_DIR)/maths.c \
-            $(IMPL_DIR)/msp.c \
-            $(IMPL_DIR)/rx.c \
-            $(IMPL_DIR)/sbus.c \
-            $(addprefix pg/, $(notdir $(wildcard $(STM_IMPL_DIR)/pg/*.c))) \
+            $(SRC_DIR)/arming.c \
+            $(SRC_DIR)/debug.c \
+            $(SRC_DIR)/failsafe.c \
+            $(SRC_DIR)/gyro.c \
+            $(SRC_DIR)/hackflight.c \
+            $(SRC_DIR)/imu.c \
+            $(SRC_DIR)/led.c \
+            $(SRC_DIR)/maths.c \
+            $(SRC_DIR)/msp.c \
+            $(SRC_DIR)/rx.c \
+            $(SRC_DIR)/sbus.c \
+            $(addprefix pg/, $(notdir $(wildcard $(STM_SRC_DIR)/pg/*.c))) \
             $(addprefix common/,$(notdir $(wildcard $(STM_SRC_DIR)/common/*.c))) \
             $(addprefix config/,$(notdir $(wildcard $(STM_SRC_DIR)/config/*.c))) \
             drivers/dshot.c \
