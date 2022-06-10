@@ -10,7 +10,6 @@ void setup(void)
 {
     Wire.begin();
     delay(100);
-    Serial.begin(115200);
 
     // Always use Serial1 for receiver, no no need to specify
     hackflightFullInit(&hf, SERIAL_PORT_NONE);

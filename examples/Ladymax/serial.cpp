@@ -2,6 +2,8 @@
  
 #include <serial.h>
 
+serialReceiveCallbackPtr _rxCallback;
+
 void serialBeginWrite(void * port)
 {
     (void)port;
@@ -25,12 +27,14 @@ void serialOpenPortSbus( serialPortIdentifier_e identifier, serialReceiveCallbac
     (void)identifier;
     Serial1.begin(115200);
 
-    (void)rxCallback;
+    _rxCallback = rxCallback;
 }
 
 void * serialOpenPortUsb(void)
 {
-    return NULL;
+    Serial.begin(115200);
+
+    return &Serial;
 }
 
 uint8_t serialRead(void  * p)
