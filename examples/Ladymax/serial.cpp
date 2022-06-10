@@ -4,6 +4,13 @@
 
 serialReceiveCallbackPtr _rxCallback;
 
+void serialEvent1(void)
+{
+    while (Serial1.available()) {
+        _rxCallback(Serial1.read(), NULL, micros());
+    }
+}
+
 void serialBeginWrite(void * port)
 {
     (void)port;
