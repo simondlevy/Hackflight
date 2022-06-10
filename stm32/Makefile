@@ -122,10 +122,10 @@ endif
 
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
+            accel.c \
             board.c \
             imu.c \
             main.c \
-            $(IMPL_DIR)/accel.c \
             $(IMPL_DIR)/arming.c \
             $(IMPL_DIR)/debug.c \
             $(IMPL_DIR)/failsafe.c \

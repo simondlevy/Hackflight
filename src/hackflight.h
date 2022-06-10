@@ -167,5 +167,3 @@ void hackflightFullInit(
         uint32_t accel_rate);
 
 void hackflightStep(hackflight_t * hackflight);
-
-
