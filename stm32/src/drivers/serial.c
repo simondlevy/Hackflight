@@ -212,16 +212,13 @@ void serialWriteBuf(void * p, const uint8_t *data, uint32_t count)
     }
 }
 
-void serialOpenPortSbus(
-    serialPortIdentifier_e identifier,
-    serialReceiveCallbackPtr rxCallback,
-    void *rxCallbackData)
+void serialOpenPortSbus(serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
 {
     serialOpenPort(
             identifier,
             FUNCTION_RX_SERIAL,
             rxCallback,
-            rxCallbackData,
+            NULL,
             100000,
             MODE_RX,
             SERIAL_STOPBITS_2 | SERIAL_PARITY_EVEN | SERIAL_INVERTED);

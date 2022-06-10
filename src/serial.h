@@ -138,10 +138,7 @@ extern "C" {
             portMode_e mode,
             portOptions_e options);
 
-    void serialOpenPortSbus(
-            serialPortIdentifier_e identifier,
-            serialReceiveCallbackPtr rxCallback,
-            void *rxCallbackData);
+    void serialOpenPortSbus( serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback);
 
     void * serialOpenPortUsb(void);
 

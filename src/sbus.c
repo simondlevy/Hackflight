@@ -203,5 +203,5 @@ float rxDevConvertValue(uint16_t * channelData, uint8_t chan)
 
 void rxDevInit(serialPortIdentifier_e port)
 {
-    serialOpenPortSbus(port, sbusDataReceive, NULL);
+    serialOpenPortSbus(port, sbusDataReceive);
 }
