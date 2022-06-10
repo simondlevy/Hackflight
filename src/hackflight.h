@@ -161,9 +161,6 @@ static void hackflightInit(
 
 // Hardare version -------------------------------------------------------------
 
-void hackflightFullInit(
-        hackflight_t * hackflight,
-        task_fun_t accelFun,
-        uint32_t accel_rate);
+void hackflightFullInit(hackflight_t * hackflight);
 
 void hackflightStep(hackflight_t * hackflight);

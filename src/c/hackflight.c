@@ -291,10 +291,7 @@ extern "C" {
 
     // ----------------------------------------------------------------------------
 
-    void hackflightFullInit(
-            hackflight_t * hf,
-            task_fun_t accel_fun,
-            uint32_t accel_rate)
+    void hackflightFullInit(hackflight_t * hf)
     {
         // Tuning constants for angle PID controller
         static const float RATE_P  = 1.441305;
@@ -316,9 +313,6 @@ extern "C" {
         failsafeReset();
 
         hackflightInit(hf, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
-
-        // accel_fun can be traditional accelerometer, or hardware-fusion quaternion
-        hackflightAddSensor(hf, accel_fun, accel_rate);
 
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 
