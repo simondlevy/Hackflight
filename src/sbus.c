@@ -201,7 +201,7 @@ float rxDevConvertValue(uint16_t * channelData, uint8_t chan)
     return (5 * (float)channelData[chan] / 8) + 880;
 }
 
-void rxDevInit(void)
+void rxDevInit(serialPortIdentifier_e port)
 {
-    serialOpenPortSbus(SERIAL_PORT_USART3, sbusDataReceive, NULL);
+    serialOpenPortSbus(port, sbusDataReceive, NULL);
 }

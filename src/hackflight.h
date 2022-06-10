@@ -142,14 +142,15 @@ static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate
 
 static void hackflightInit(
         hackflight_t * hf,
-        float rate_p,
-        float rate_i,
-        float rate_d,
-        float rate_f,
-        float level_p
+        serialPortIdentifier_e rxPort,
+        float rateP,
+        float rateI,
+        float rateD,
+        float rateF,
+        float levelP
         )
 {
-    anglePidInit(&hf->anglepid, rate_p, rate_i, rate_d, rate_f, level_p);
+    anglePidInit(&hf->anglepid, rateP, rateI, rateD, rateF, levelP);
 
     hackflightAddPidController(hf, anglePidUpdate, &hf->anglepid);
 
@@ -160,12 +161,12 @@ static void hackflightInit(
     // Initialize quaternion in upright position
     hf->imuFusionPrev.quat.w = 1;
 
-    rxDevInit();
+    rxDevInit(rxPort);
 }
 
 // Hardare version -------------------------------------------------------------
 
-void hackflightFullInit(hackflight_t * hackflight);
+void hackflightFullInit(hackflight_t * hackflight, serialPortIdentifier_e rxPort);
 
 void hackflightStep(hackflight_t * hackflight);
 

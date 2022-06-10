@@ -21,6 +21,7 @@
 #include <math.h>
 
 #include "datatypes.h"
+#include "serial.h"
 #include "time.h"
 
 static const uint8_t RC_EXPO = 0;
@@ -33,7 +34,7 @@ extern "C" {
 
     // For both hardware and sim implementations -----------------------------------------
 
-    void rxDevInit(void);
+    void rxDevInit(serialPortIdentifier_e port);
 
     void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands);
 

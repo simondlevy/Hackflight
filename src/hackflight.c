@@ -288,7 +288,7 @@ static void checkDynamicTasks(
 
 // ----------------------------------------------------------------------------
 
-void hackflightFullInit(hackflight_t * hf)
+void hackflightFullInit(hackflight_t * hf, serialPortIdentifier_e rxPort)
 {
     // Tuning constants for angle PID controller
     static const float RATE_P  = 1.441305;
@@ -306,7 +306,7 @@ void hackflightFullInit(hackflight_t * hf)
     armingSetDisabled(7);
     failsafeReset();
 
-    hackflightInit(hf, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
+    hackflightInit(hf, rxPort, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
 
     initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 

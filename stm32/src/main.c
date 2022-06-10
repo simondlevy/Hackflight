@@ -68,7 +68,7 @@ int main(void)
 
     hackflight_t hf = {0};
 
-    hackflightFullInit(&hf);
+    hackflightFullInit(&hf, SERIAL_PORT_USART3);
 
     // STM32 boards have traditional accel/gyro combo
     hackflightAddSensor(&hf, imuAccelTask, ACCEL_RATE);
