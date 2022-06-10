@@ -4,6 +4,7 @@
 
 #include <imu.h>
 
+static USFSMAX usfsmax;
 
 void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
