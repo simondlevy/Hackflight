@@ -39,35 +39,50 @@ static const uint32_t QUAT_RATE = 500;
 
 static USFSMAX usfsmax;
 
-// Host DRDY interrupt handler
-static volatile bool _dataReady = true;
+static volatile bool _gotInterrupt = true;
 static void handleInterrupt()
 {
-    _dataReady = true;
+    _gotInterrupt = true;
 }
-
-static quaternion_t _quat;
 
 static void quaternionTask(void * hackflight, uint32_t usec)
 {
     (void)hackflight;
     (void)usec;
 
-    if (_dataReady) {
-        _dataReady = false;
+    static float quat[4];
+
+    if (usfsmax.gotQuat()) {
+        usfsmax.readQuat(quat);
     }
 }
 
 //-----------------------------------------------------------------------------
 
+static uint32_t _gyro_interrupt_time;
+
 uint32_t gyroInterruptTime(void)
 {
-    return 0;
+    return _gyro_interrupt_time;
 }
 
+// Called in the fast inner loop
 bool gyroIsReady(void)
 {
-    return false;
+    bool ready = false;
+
+    if (_gotInterrupt) {
+
+        usfsmax.update();
+
+        ready = usfsmax.gotGyro();
+
+        _gotInterrupt = false;
+
+        _gyro_interrupt_time = ready ? micros() : _gyro_interrupt_time;
+    }
+
+    return ready;
 }
 
 int16_t gyroReadRaw(uint8_t k)
@@ -76,11 +91,6 @@ int16_t gyroReadRaw(uint8_t k)
 }
 
 float gyroScale(void)
-{
-    return 0;
-}
-
-int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
 {
     return 0;
 }
@@ -115,6 +125,11 @@ void imuInit(hackflight_t * hf)
 
 // Unused ---------------------------------------------------------------------
 
+int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
+{
+    return 0;
+}
+
 void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
 {
     (void)hf;
@@ -122,9 +137,8 @@ void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rota
     (void)quat;
     (void)rot;
 }
-    
-void imuAccumulateGyro(hackflight_t * hf, float * adcf)
+
+void imuAccumulateGyro(gyro_t * gyro)
 {
-    (void)hf;
-    (void)adcf;
+    (void)gyro;
 }
