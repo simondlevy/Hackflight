@@ -53,6 +53,25 @@ bool motorIsProtocolEnabled(void)
     return false;
 }
 
+float motorValueDisarmed(void)
+{
+    return 0;
+}
+
+float motorValueHigh(void)
+{
+    return 1;
+}
+
+float motorValueLow(void)
+{
+    return 0;
+}
+
 void motorStop(void)
+{
+}
+
+void motorWrite(float *values)
 {
 }

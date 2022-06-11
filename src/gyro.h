@@ -32,19 +32,18 @@ extern "C" {
 
     void gyroReadScaled(hackflight_t * hf);
 
+
+    // For hardware impelmentations ------------------------------------------------------
+
+    void     gyroDevInit(void);
+    void     gyroInit(hackflight_t * hf);
+    uint32_t gyroInterruptTime(void);
+    bool     gyroIsReady(void);
+    int16_t  gyroReadRaw(uint8_t k);
+    float    gyroScale(void);
+    uint32_t gyroSyncTime(void);
+
 #if defined(__cplusplus)
 }
 #endif
-
-// For hardware impelmentations ------------------------------------------------------
-
-void     gyroDevInit(void);
-void     gyroInit(hackflight_t * hf);
-uint32_t gyroInterruptTime(void);
-bool     gyroIsReady(void);
-int16_t  gyroReadRaw(uint8_t k);
-float    gyroScale(void);
-uint32_t gyroSyncTime(void);
-
-
 

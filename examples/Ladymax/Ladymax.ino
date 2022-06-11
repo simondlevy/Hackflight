@@ -20,9 +20,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <Wire.h>
 
 #include <hackflight.h>
-#include <serial.h>
 
-static hackflight_t hf;
+static hackflight_t _hf;
 
 void setup(void)
 {
@@ -30,10 +29,11 @@ void setup(void)
     delay(100);
 
     // Always use Serial1 for receiver, no no need to specify
-    hackflightFullInit(&hf, SERIAL_PORT_NONE);
+    hackflightFullInit(&_hf, SERIAL_PORT_NONE);
 }
 
 void loop(void)
 {
+    hackflightStep(&_hf);
 }
 

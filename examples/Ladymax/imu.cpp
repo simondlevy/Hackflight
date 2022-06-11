@@ -52,7 +52,44 @@ static void quaternionTask(void * hackflight, uint32_t usec)
 {
     (void)hackflight;
     (void)usec;
+
+    if (_dataReady) {
+        _dataReady = false;
+    }
 }
+
+//-----------------------------------------------------------------------------
+
+void gyroDevInit(void)
+{
+}
+
+uint32_t gyroInterruptTime(void)
+{
+    return 0;
+}
+
+bool gyroIsReady(void)
+{
+    return false;
+}
+
+int16_t gyroReadRaw(uint8_t k)
+{
+    return 0;
+}
+
+float gyroScale(void)
+{
+    return 0;
+}
+
+uint32_t gyroSyncTime(void)
+{
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
 
 void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
@@ -82,10 +119,18 @@ void imuInit(hackflight_t * hf)
     hackflightAddSensor(hf, quaternionTask, QUAT_RATE);
 }
 
+// Unused ---------------------------------------------------------------------
+
 void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
 {
     (void)hf;
     (void)time;
     (void)quat;
     (void)rot;
+}
+    
+void imuAccumulateGyro(hackflight_t * hf, float * adcf)
+{
+    (void)hf;
+    (void)adcf;
 }
