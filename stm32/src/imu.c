@@ -187,19 +187,19 @@ void imuAccelTask(void * hackflight, uint32_t time)
     accelUpdate(&hf->accelAccum);
 }
 
-void imuAccumulateGyro(hackflight_t * hf, float * adcf)
+void imuAccumulateGyro(gyro_t * gyro)
 {
     static float _adcf[3];
 
     // integrate using trapezium rule to avoid bias
-    hf->gyroAccum.values.x += 0.5f * (_adcf[0] + adcf[0]) * GYRO_PERIOD();
-    hf->gyroAccum.values.y += 0.5f * (_adcf[1] + adcf[1]) * GYRO_PERIOD();
-    hf->gyroAccum.values.z += 0.5f * (_adcf[2] + adcf[2]) * GYRO_PERIOD();
+    gyro->accum.values.x += 0.5f * (_adcf[0] + gyro->dps_filtered[0]) * GYRO_PERIOD();
+    gyro->accum.values.y += 0.5f * (_adcf[1] + gyro->dps_filtered[1]) * GYRO_PERIOD();
+    gyro->accum.values.z += 0.5f * (_adcf[2] + gyro->dps_filtered[2]) * GYRO_PERIOD();
 
-    hf->gyroAccum.count++;
+    gyro->accum.count++;
 
     for (int axis = 0; axis < 3; axis++) {
-        _adcf[axis] = adcf[axis];
+        _adcf[axis] = gyro->dps_filtered[axis];
     }
 }
 
@@ -220,7 +220,7 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     int32_t deltaT = time - hf->imuFusionPrev.time;
 
     axes_t gyroAvg = {0};
-    getAverage(&hf->gyroAccum, GYRO_PERIOD(), &gyroAvg);
+    getAverage(&hf->gyro.accum, GYRO_PERIOD(), &gyroAvg);
 
     axes_t accelAvg = {0};
     getAverage(&hf->accelAccum, 1, &accelAvg);
@@ -264,5 +264,5 @@ void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rota
     memcpy(&fusion.quat, quat, sizeof(quaternion_t));
     memcpy(&fusion.rot, rot, sizeof(rotation_t));
     memcpy(&hf->imuFusionPrev, &fusion, sizeof(imu_fusion_t));
-    memset(&hf->gyroAccum, 0, sizeof(imu_sensor_t));
+    memset(&hf->gyro.accum, 0, sizeof(imu_sensor_t));
 }

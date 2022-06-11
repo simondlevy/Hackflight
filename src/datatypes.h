@@ -282,11 +282,13 @@ typedef union {
 } gyroLowpassFilter_t;
 
 typedef struct {
-    float dps[3];          // aligned, calibrated, scaled, but unfiltered data from sensor
-    float dps_filtered[3]; // filtered gyro data
-    float dps_filtered_prev[3];
-    uint8_t sampleCount;   // gyro sensor sample counter
-    float sampleSum[3];    // summed samples used for downsampling
+    imu_sensor_t accum;
+    float        dps[3];          // aligned, calibrated, scaled, but unfiltered data from sensor
+    float        dps_filtered[3]; // filtered gyro data
+    float        dps_filtered_prev[3];
+    uint8_t      sampleCount;   // gyro sensor sample counter
+    float        sampleSum[3];    // summed samples used for downsampling
+    bool         isCalibrating;
 
     // if true then downsample using gyro lowpass 2, otherwise use averaging
     bool downsampleFilterEnabled;      
@@ -334,8 +336,6 @@ typedef struct {
     task_t           attitudeTask;
     demands_t        demands;
     gyro_t           gyro;
-    imu_sensor_t     gyroAccum;
-    bool             gyroIsCalibrating;
     imu_fusion_t     imuFusionPrev;
     float            mspMotors[4];
     task_t           mspTask;

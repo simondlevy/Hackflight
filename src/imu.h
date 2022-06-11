@@ -26,7 +26,7 @@ extern "C" {
 
     void    imuAccelTask(void * hackflight, uint32_t time);
 
-    void    imuAccumulateGyro(hackflight_t * hf, float * adcf);
+    void    imuAccumulateGyro(gyro_t * gyro);
 
     void    imuGetEulerAngles(hackflight_t * hf, uint32_t time);
 

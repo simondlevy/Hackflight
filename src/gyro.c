@@ -126,9 +126,28 @@ static void performGyroCalibration(gyro_t * gyro)
     --gyro->calibration.cyclesRemaining;
 }
 
-static void gyroUpdate(hackflight_t * hf)
+// ============================================================================
+
+void gyroInit(hackflight_t * hf)
 {
     gyro_t * gyro = &hf->gyro;
+
+    initLowpassFilterLpf(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ, GYRO_PERIOD());
+
+    gyro->downsampleFilterEnabled = initLowpassFilterLpf(
+            gyro,
+            FILTER_LPF2,
+            LPF2_STATIC_HZ,
+            GYRO_PERIOD()
+            );
+
+    setCalibrationCycles(gyro); // start calibrating
+}
+
+
+void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate)
+{
+    if (!gyroIsReady()) return;
 
     bool calibrationComplete = gyro->calibration.cyclesRemaining <= 0;
 
@@ -196,38 +215,12 @@ static void gyroUpdate(hackflight_t * hf)
 
 
     // Used for quaternion filter; stubbed otherwise
-    imuAccumulateGyro(hf, gyro->dps_filtered);
+    imuAccumulateGyro(gyro);
 
-    hf->vstate.dphi   = gyro->dps_filtered[0];
-    hf->vstate.dtheta = gyro->dps_filtered[1];
-    hf->vstate.dpsi   = gyro->dps_filtered[2];
+    vstate->dphi   = gyro->dps_filtered[0];
+    vstate->dtheta = gyro->dps_filtered[1];
+    vstate->dpsi   = gyro->dps_filtered[2];
 
-    hf->gyroIsCalibrating = !calibrationComplete;
+    gyro->isCalibrating = !calibrationComplete;
 
-} // gyroUpdate
-
-// ============================================================================
-
-void gyroInit(hackflight_t * hf)
-{
-    gyro_t * gyro = &hf->gyro;
-
-    initLowpassFilterLpf(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ, GYRO_PERIOD());
-
-    gyro->downsampleFilterEnabled = initLowpassFilterLpf(
-            gyro,
-            FILTER_LPF2,
-            LPF2_STATIC_HZ,
-            GYRO_PERIOD()
-            );
-
-    setCalibrationCycles(gyro); // start calibrating
-}
-
-
-void gyroReadScaled(hackflight_t * hf)
-{
-    if (gyroIsReady()) {
-        gyroUpdate(hf);
-    }
 }
