@@ -40,11 +40,13 @@ static const uint32_t QUAT_RATE = 500;
 static USFSMAX usfsmax;
 
 // Host DRDY interrupt handler
-static volatile bool dataReady = true;
+static volatile bool _dataReady = true;
 static void handleInterrupt()
 {
-    dataReady = true;
+    _dataReady = true;
 }
+
+static quaternion_t _quat;
 
 static void quaternionTask(void * hackflight, uint32_t usec)
 {
