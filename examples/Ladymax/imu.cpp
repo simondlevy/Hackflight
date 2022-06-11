@@ -57,8 +57,6 @@ static void quaternionTask(void * hackflight, uint32_t usec)
     }
 }
 
-//-----------------------------------------------------------------------------
-
 static uint32_t _gyro_interrupt_time;
 
 uint32_t gyroInterruptTime(void)
@@ -92,7 +90,7 @@ int16_t gyroReadRaw(uint8_t k)
 
 float gyroScale(void)
 {
-    return 0;
+    return usfsmax.dpsPerCount();
 }
 
 void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
