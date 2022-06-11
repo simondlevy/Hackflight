@@ -203,6 +203,18 @@ void imuAccumulateGyro(hackflight_t * hf, float * adcf)
     }
 }
 
+int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
+{
+    int32_t gyroSkew = cmpTimeCycles(nextTargetCycles, gyroSyncTime()) % desiredPeriodCycles;
+
+    if (gyroSkew > (desiredPeriodCycles / 2)) {
+        gyroSkew -= desiredPeriodCycles;
+    }
+
+    return gyroSkew;
+}
+
+
 void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
     int32_t deltaT = time - hf->imuFusionPrev.time;
