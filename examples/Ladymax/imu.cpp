@@ -45,15 +45,15 @@ static void handleInterrupt()
     _gotInterrupt = true;
 }
 
+static float _quat[4];
+
 static void quaternionTask(void * hackflight, uint32_t usec)
 {
     (void)hackflight;
     (void)usec;
 
-    static float quat[4];
-
     if (usfsmax.gotQuat()) {
-        usfsmax.readQuat(quat);
+        usfsmax.readQuat(_quat);
     }
 }
 
@@ -99,7 +99,11 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
     (void)hf;
     (void)time;
-    (void)quat;
+
+    quat->w = _quat[0];
+    quat->x = _quat[1];
+    quat->y = _quat[2];
+    quat->z = _quat[3];
 }
 
 void imuInit(hackflight_t * hf)
