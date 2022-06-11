@@ -60,10 +60,6 @@ static void quaternionTask(void * hackflight, uint32_t usec)
 
 //-----------------------------------------------------------------------------
 
-void gyroDevInit(void)
-{
-}
-
 uint32_t gyroInterruptTime(void)
 {
     return 0;
