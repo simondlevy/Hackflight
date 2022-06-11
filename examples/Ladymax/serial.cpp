@@ -17,7 +17,7 @@ bool serialIsTransmitBufferEmpty(void * port)
     return Serial.availableForWrite() > 0;
 }
 
-void serialOpenPortSbus( serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
+void serialOpenPortSbus(serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
 {
     // Always use Serial1
     (void)identifier;
@@ -53,13 +53,20 @@ uint32_t serialBytesAvailable(void * port)
 
 void serialWrite(void * port, uint8_t c)
 {
-    (void)port;
-    (void)c;
-}
+    if (port == &Serial) {
+        Serial.write(c);
+    }
+    else if (port == &Serial1) {
+        Serial1.write(c);
+    }
+ }
 
 void serialWriteBuf(void * port, const uint8_t *data, uint32_t count)
 {
-    (void)port;
-    (void)data;
-    (void)count;
+    if (port == &Serial) {
+        Serial.write(data, count);
+    }
+    else if (port == &Serial1) {
+        Serial1.write(data, count);
+    }
 }
