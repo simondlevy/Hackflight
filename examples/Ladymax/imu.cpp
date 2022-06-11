@@ -37,7 +37,7 @@ static const uint8_t INT_PIN = 10;
 
 static const uint32_t QUAT_RATE = 500;
 
-static USFSMAX usfsmax;
+static USFSMAX _usfsmax;
 
 static volatile bool _gotInterrupt = true;
 static void handleInterrupt()
@@ -54,8 +54,8 @@ static void quaternionTask(void * hackflight, uint32_t usec)
     (void)hackflight;
     (void)usec;
 
-    if (usfsmax.gotQuat()) {
-        usfsmax.readQuat(_quat);
+    if (_usfsmax.gotQuat()) {
+        _usfsmax.readQuat(_quat);
     }
 }
 
@@ -74,8 +74,8 @@ bool gyroIsReady(void)
     if (_gotInterrupt) {
 
         ready = true; // interrupt is driven by gyro
-        usfsmax.update();
-        usfsmax.readGyroAdc(_gyro_adc);
+        _usfsmax.update();
+        _usfsmax.readGyroAdc(_gyro_adc);
         _gotInterrupt = false;
         _gyro_interrupt_time = micros();
     }
@@ -90,7 +90,7 @@ int16_t gyroReadRaw(uint8_t k)
 
 float gyroScale(void)
 {
-    return usfsmax.gyroDpsPerCount();
+    return _usfsmax.gyroDpsPerCount();
 }
 
 void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
@@ -106,10 +106,10 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 
 void imuInit(hackflight_t * hf)
 {
-    usfsmax.setGeoMag(M_V, M_H, MAG_DECLINATION);
+    _usfsmax.setGeoMag(M_V, M_H, MAG_DECLINATION);
     Wire.setClock(100000);      
     delay(100);
-    usfsmax.begin();
+    _usfsmax.begin();
     Wire.setClock(I2C_CLOCK); 
     delay(100);
     pinMode(INT_PIN, INPUT);
