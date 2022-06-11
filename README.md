@@ -29,10 +29,11 @@ Hackflight is currently working on the following platforms:
 
 * [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine
 
-Simulators can use just the <b>.h</b> files in the <b>src</b> directory, which contain the
+Simulators can use just the <b>.h</b> files in the
+[src](https://github.com/simondlevy/Hackflight/tree/master/src) directory, which contain the
 basic control algorithms (open-loop control / PID control).  Real flight
-controllers use the code in the <b>.c</b> files located in the <b>src</b>
-directory and in the <b>stm32/src</b> directory.
+controllers use the code in the <b>.c</b> files located in that directory
+directory and in the [stm32/src](https://github.com/simondlevy/Hackflight/tree/master/stm32/src) directory.
 
 ## Ground Control Station
 
