@@ -581,7 +581,6 @@ void mspUpdate(
             }
 
             if (mspPostProcessFn) {
-                serialWaitForPortToFinishTransmitting(mspPort->port);
                 mspPostProcessFn(mspPort->port);
             }
         } else {

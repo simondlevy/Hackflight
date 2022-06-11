@@ -163,15 +163,6 @@ uint32_t serialTxBytesFree(void * p)
     return port->vTable->serialTotalTxFree(port);
 }
 
-void serialWaitForPortToFinishTransmitting(void * p)
-{
-    serialPort_t * port = (serialPort_t *)p;
-
-    while (!serialIsTransmitBufferEmpty(port)) {
-        delay(10);
-    };
-}
-
 void serialWrite(void * p, uint8_t ch)
 {
     serialPort_t * port = (serialPort_t *)p;

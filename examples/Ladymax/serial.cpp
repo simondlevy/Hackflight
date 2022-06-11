@@ -51,11 +51,6 @@ uint32_t serialBytesAvailable(void * port)
         0;
 }
 
-void serialWaitForPortToFinishTransmitting(void * port)
-{
-    (void)port;
-}
-
 void serialWrite(void * port, uint8_t c)
 {
     (void)port;
