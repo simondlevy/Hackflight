@@ -1,7 +1,26 @@
+/*
+Copyright (c) 2022 Simon D. Levy
+
+This file is part of Hackflight.
+
+Hackflight is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+Hackflight. If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include <Arduino.h>
 #include <Wire.h>
 #include <USFSMAX.h>
 
+#include <hackflight.h>
 #include <imu.h>
 
 // Geomagnetic field data for Lexington, Virginia on 8 June 2022.
@@ -16,6 +35,8 @@ static const uint32_t I2C_CLOCK = 1000000;
 // Interrupt pin
 static const uint8_t INT_PIN = 10;
 
+static const uint32_t QUAT_RATE = 500;
+
 static USFSMAX usfsmax;
 
 // Host DRDY interrupt handler
@@ -25,6 +46,12 @@ static void handleInterrupt()
     dataReady = true;
 }
 
+static void quaternionTask(void * hackflight, uint32_t usec)
+{
+    (void)hackflight;
+    (void)usec;
+}
+
 void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
     (void)hf;
@@ -32,7 +59,7 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     (void)quat;
 }
 
-void imuInit(void)
+void imuInit(hackflight_t * hf)
 {
     usfsmax.setGeoMag(M_V, M_H, MAG_DECLINATION);
 
@@ -50,6 +77,7 @@ void imuInit(void)
 
     attachInterrupt(INT_PIN, handleInterrupt, RISING);        
 
+    hackflightAddSensor(hf, quaternionTask, QUAT_RATE);
 }
 
 void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)

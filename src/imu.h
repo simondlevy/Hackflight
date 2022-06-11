@@ -32,7 +32,7 @@ extern "C" {
 
     void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat);
 
-    void imuInit(void);
+    void imuInit(hackflight_t * hf);
 
     void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot);
 

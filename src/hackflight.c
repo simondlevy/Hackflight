@@ -298,7 +298,7 @@ void hackflightFullInit(hackflight_t * hf, serialPortIdentifier_e rxPort)
     static const float LEVEL_P = 0 /*3.0*/;
 
     gyroInit(hf);
-    imuInit();
+    imuInit(hf);
     ledInit();
     ledFlash(10, 50);
     failsafeInit();
