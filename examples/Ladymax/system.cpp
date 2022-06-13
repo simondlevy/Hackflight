@@ -10,8 +10,7 @@ void delayMillis(uint32_t msec)
 
 uint32_t systemClockMicrosToCycles(uint32_t usec)
 {
-    (void)usec;
-    return 0;
+    return microsecondsToClockCycles(usec);
 }
 
 uint32_t systemGetCycleCounter(void)
