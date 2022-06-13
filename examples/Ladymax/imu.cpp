@@ -35,8 +35,6 @@ static const uint32_t I2C_CLOCK = 1000000;
 // Interrupt pin
 static const uint8_t INT_PIN = 10;
 
-static const uint32_t QUAT_RATE = 500;
-
 static USFSMAX _usfsmax;
 
 static volatile bool _gotInterrupt = true;
@@ -48,16 +46,6 @@ static void handleInterrupt()
 static float _quat[4];
 
 static int16_t _gyro_adc[3];
-
-static void quaternionTask(void * hackflight, uint32_t usec)
-{
-    (void)hackflight;
-    (void)usec;
-
-    if (_usfsmax.gotQuat()) {
-        _usfsmax.readQuat(_quat);
-    }
-}
 
 static uint32_t _gyro_interrupt_time;
 
@@ -78,6 +66,10 @@ bool gyroIsReady(void)
         _usfsmax.readGyroAdc(_gyro_adc);
         _gotInterrupt = false;
         _gyro_interrupt_time = micros();
+
+        if (_usfsmax.gotQuat()) {
+            _usfsmax.readQuat(_quat);
+        }
     }
 
     return ready;
@@ -98,6 +90,8 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     (void)hf;
     (void)time;
 
+    //printf("%f  %f  %f  %f\n", _quat[0], _quat[1], _quat[2], _quat[3]);
+
     quat->w = _quat[0];
     quat->x = _quat[1];
     quat->y = _quat[2];
@@ -114,7 +108,6 @@ void imuInit(hackflight_t * hf)
     delay(100);
     pinMode(INT_PIN, INPUT);
     attachInterrupt(INT_PIN, handleInterrupt, RISING);        
-    hackflightAddSensor(hf, quaternionTask, QUAT_RATE);
 }
 
 // Unused ---------------------------------------------------------------------
