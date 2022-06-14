@@ -50,6 +50,8 @@ extern "C" {
 
 static void task_attitude(void * hackflight, uint32_t time)
 {
+    // uint32_t count; debugPrintf("task_attitude: %d\n", count++);
+
     hackflight_t * hf = (hackflight_t *)hackflight;
     imuGetEulerAngles(hf, time);
 }
@@ -67,6 +69,8 @@ static void hackflightAddPidController(hackflight_t * hf, pid_fun_t fun, void * 
 
 static void task_rx(void * hackflight, uint32_t time)
 {
+    //static uint32_t count; debugPrintf("task_rx: %d\n", count++);
+
     hackflight_t * hf = (hackflight_t *)hackflight;
 
     bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;

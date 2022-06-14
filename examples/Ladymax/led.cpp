@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <led.h>
 
-static const uint8_t PIN = 13;
+static const uint8_t PIN = A4;
 
 static bool _on;
 

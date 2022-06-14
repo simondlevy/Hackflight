@@ -30,10 +30,19 @@ void setup(void)
 
     // Always use Serial1 for receiver, no no need to specify
     hackflightFullInit(&_hf, SERIAL_PORT_NONE);
+
+    // Setup system clock ------------------------------------
+
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+
+    __O uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
+    *(DWTLAR) = 0xC5ACCE55;
+    
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
 
 void loop(void)
 {
     hackflightStep(&_hf);
 }
-

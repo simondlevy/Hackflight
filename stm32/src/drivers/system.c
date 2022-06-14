@@ -27,7 +27,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "nvic.h"
 #include "resource.h"
 #include "systemdev.h"
-#include "time.h"
 
 // See "ARM CoreSight Architecture Specification"
 // B2.3.10  "LSR and LAR, Software Lock Status Register and Software Lock Access Register"

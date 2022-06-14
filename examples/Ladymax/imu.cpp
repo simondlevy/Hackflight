@@ -61,6 +61,8 @@ bool gyroIsReady(void)
 
     if (_gotInterrupt) {
 
+        //printf("%8d: %f  %f  %f  %f\n", count++, _quat[0], _quat[1], _quat[2], _quat[3]);
+
         ready = true; // interrupt is driven by gyro
         _usfsmax.update();
         _usfsmax.readGyroAdc(_gyro_adc);
@@ -89,8 +91,6 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
     (void)hf;
     (void)time;
-
-    //printf("%f  %f  %f  %f\n", _quat[0], _quat[1], _quat[2], _quat[3]);
 
     quat->w = _quat[0];
     quat->x = _quat[1];

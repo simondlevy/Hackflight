@@ -22,6 +22,7 @@
 
 #include "board.h"
 #include "gyro.h"
+#include "debug.h"
 #include "hackflight.h"
 #include "led.h"
 #include "msp.h"
@@ -338,10 +339,10 @@ void hackflightFullInit(hackflight_t * hf, serialPortIdentifier_e rxPort)
 
 void hackflightStep(hackflight_t * hf)
 {
+    scheduler_t * scheduler = &hf->scheduler;
+
     // Realtime gyro/filtering/PID tasks get complete priority
     uint32_t nowCycles = systemGetCycleCounter();
-
-    scheduler_t * scheduler = &hf->scheduler;
 
     uint32_t nextTargetCycles =
         scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
@@ -371,6 +372,14 @@ void hackflightStep(hackflight_t * hf)
 
     schedLoopRemainingCycles =
         cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
+
+    /*
+    debugPrintf("%10d %10d %10d: %d\n",
+            nextTargetCycles,
+            systemGetCycleCounter(),
+            schedLoopRemainingCycles,
+            schedLoopRemainingCycles > (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US));
+            */
 
     if ((schedLoopRemainingCycles >
                 (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US))) {
