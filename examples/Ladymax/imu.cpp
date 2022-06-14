@@ -100,12 +100,16 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 
 void imuInit(hackflight_t * hf)
 {
+    _usfsmax.setGyroOdr(USFSMAX::ACC_GYRO_6660_HZ);
+    _usfsmax.setQuatDiv(6);
     _usfsmax.setGeoMag(M_V, M_H, MAG_DECLINATION);
     Wire.setClock(100000);      
     delay(100);
+
     _usfsmax.begin();
     Wire.setClock(I2C_CLOCK); 
     delay(100);
+
     pinMode(INT_PIN, INPUT);
     attachInterrupt(INT_PIN, handleInterrupt, RISING);        
 }

@@ -370,11 +370,10 @@ void hackflightStep(hackflight_t * hf)
         checkCoreTasks(hf, schedLoopRemainingCycles, nowCycles, nextTargetCycles);
     }
 
-    schedLoopRemainingCycles =
-        cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
+    schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     /*
-    debugPrintf("%10d %10d %10d: %d\n",
+    debugPrintf("%10u %10u %10d: %u\n",
             nextTargetCycles,
             systemGetCycleCounter(),
             schedLoopRemainingCycles,
