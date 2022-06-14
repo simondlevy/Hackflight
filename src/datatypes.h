@@ -325,6 +325,10 @@ typedef struct {
     uint32_t lastTargetCycles;
 
     uint32_t nextTimingCycles;
+
+    int32_t guardMargin;
+    uint32_t clockRate;
+
 } scheduler_t;
 
 // Hackflight ------------------------------------------------------------------

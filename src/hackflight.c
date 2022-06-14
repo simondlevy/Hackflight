@@ -157,7 +157,7 @@ static void checkCoreTasks(
 
     // CPU busy
     if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
-        scheduler->nextTimingCycles += systemClockMicrosToCycles(1000000);
+        scheduler->nextTimingCycles += scheduler->clockRate;
     }
     scheduler->lastTargetCycles = nextTargetCycles;
 
@@ -335,6 +335,10 @@ void hackflightFullInit(hackflight_t * hf, serialPortIdentifier_e rxPort)
     scheduler->nextTimingCycles = scheduler->lastTargetCycles;
 
     scheduler->desiredPeriodCycles = GYRO_PERIOD();
+
+    scheduler->guardMargin = (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
+
+    scheduler->clockRate = systemClockMicrosToCycles(1000000);
 }
 
 void hackflightStep(hackflight_t * hf)
@@ -380,8 +384,7 @@ void hackflightStep(hackflight_t * hf)
             schedLoopRemainingCycles > (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US));
             */
 
-    if ((schedLoopRemainingCycles >
-                (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US))) {
+    if (schedLoopRemainingCycles > scheduler->guardMargin) {
         checkDynamicTasks(hf, schedLoopRemainingCycles, nextTargetCycles);
     }
 }
