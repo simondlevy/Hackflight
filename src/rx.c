@@ -201,9 +201,9 @@ static float pt3FilterGain(float f_cut, float dT)
 
 static void pt3FilterInit(pt3Filter_t *filter, float k)
 {
-    filter->state = 0.0f;
-    filter->state1 = 0.0f;
-    filter->state2 = 0.0f;
+    filter->state = 0;
+    filter->state1 = 0;
+    filter->state2 = 0;
     filter->k = k;
 }
 
@@ -618,7 +618,7 @@ static void processSmoothingFilter(
         uint32_t currentTimeUs,
         rx_t * rx,
         angle_pid_t * ratepid,
-        float setpointRate[3],
+        float setpointRate[4],
         float rawSetpoint[3])
 {
 
@@ -986,7 +986,7 @@ void rxPoll(
 void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands)
 {
     float rawSetpoint[3] = {0};
-    float setpointRate[3] = {0};
+    float setpointRate[4] = {0};
 
     if (_rx.gotNewData) {
 

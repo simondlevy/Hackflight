@@ -48,6 +48,8 @@ static int16_t _gyro_adc[3];
 
 static uint32_t _gyro_interrupt_time;
 
+extern "C" {
+
 uint32_t gyroInterruptTime(void)
 {
     return _gyro_interrupt_time;
@@ -132,3 +134,5 @@ void imuAccumulateGyro(gyro_t * gyro)
 {
     (void)gyro;
 }
+
+} // extern "C"
