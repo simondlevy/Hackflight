@@ -25,6 +25,7 @@
 #include "failsafe.h"
 #include "gyro.h"
 #include "imu.h"
+#include "init_task.h"
 #include "maths.h"
 #include "mixer.h"
 #include "motor.h"
@@ -124,14 +125,6 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
     mixerRun(&hf->demands, mixmotors);
 
     motorWrite(hf->armed ? mixmotors : hf->mspMotors);
-}
-
-// Timed task support -------------------------------------------------------
-
-static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
-{
-    task->fun = fun;
-    task->desiredPeriodUs = 1000000 / rate;
 }
 
 // Initialization -------------------------------------------------------------

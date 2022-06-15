@@ -37,7 +37,15 @@ typedef enum {
     SENSOR_ACC = 1 << 1,
 } sensors_e;
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
 {
     initTask(&hf->sensorTasks[hf->sensorTaskCount++], fun, rate);
 }
+
+#if defined(__cplusplus)
+}
+#endif

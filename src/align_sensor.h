@@ -24,6 +24,7 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
     static void alignSensorViaRotation(float *dest)
     {
         const float x = dest[0];
