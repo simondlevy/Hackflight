@@ -20,7 +20,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <Wire.h>
 #include <USFSMAX.h>
 
-#include <hackflight.h>
 #include <imu.h>
 
 // Geomagnetic field data for Lexington, Virginia on 8 June 2022.

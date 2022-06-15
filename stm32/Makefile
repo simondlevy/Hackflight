@@ -203,14 +203,12 @@ CC_SPEED_OPTIMISATION   := $(OPTIMISATION_BASE) $(OPTIMISE_SPEED)
 CC_SIZE_OPTIMISATION    := $(OPTIMISATION_BASE) $(OPTIMISE_SIZE)
 CC_NO_OPTIMISATION      := 
 
-#NO_UNUSED_FUNCTION = -Wno-unused-function
-
 CFLAGS     += $(ARCH_FLAGS) \
               $(addprefix -D,$(OPTIONS)) \
               $(addprefix -I,$(INCLUDE_DIRS)) \
               -std=gnu11 \
               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
-			  $(NO_UNUSED_FUNCTION) \
+			  -Wno-unused-function \
               -ffunction-sections \
               -fdata-sections \
               -fno-common \

@@ -73,6 +73,10 @@ static const uint32_t GYRO_LOCK_COUNT = 50; //400;
 
 static const uint32_t MSP_TASK_RATE = 100;
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 static void task_msp(void * hackflight, uint32_t time)
 {
     (void)time;
@@ -390,3 +394,7 @@ void hackflightStep(hackflight_t * hf)
         checkDynamicTasks(hf, schedLoopRemainingCycles, nextTargetCycles);
     }
 }
+
+#if defined(__cplusplus)
+}
+#endif
