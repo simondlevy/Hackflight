@@ -21,8 +21,10 @@
 
 #include <accel.h>
 #include <datatypes.h>
-#include <hackflight.h>
+#include <gyro_rate.h>
+#include <hackflight_full.h>
 #include <imu.h>
+#include <sensors.h>
 #include <serial.h>
 
 #include "drivers/bus_spi.h"

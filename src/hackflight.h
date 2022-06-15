@@ -29,7 +29,6 @@
 #include "mixer.h"
 #include "motor.h"
 #include "pids/angle.h"
-#include "quat2euler.h"
 #include "rx.h"
 #include "time.h"
 
@@ -135,13 +134,6 @@ static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
     task->desiredPeriodUs = 1000000 / rate;
 }
 
-// Sensor support ------------------------------------------------------------
-
-static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
-{
-    initTask(&hf->sensorTasks[hf->sensorTaskCount++], fun, rate);
-}
-
 // Initialization -------------------------------------------------------------
 
 static void hackflightInit(
@@ -167,12 +159,6 @@ static void hackflightInit(
 
     rxDevInit(rxPort);
 }
-
-// Hardare version -------------------------------------------------------------
-
-void hackflightFullInit(hackflight_t * hackflight, serialPortIdentifier_e rxPort);
-
-void hackflightStep(hackflight_t * hackflight);
 
 #if defined(__cplusplus)
 }

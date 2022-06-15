@@ -24,10 +24,6 @@
 #include "serial.h"
 #include "time.h"
 
-static const uint8_t RC_EXPO = 0;
-static const uint8_t RC_RATE = 7;
-static const uint8_t RATE    = 67;
-
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -47,18 +43,6 @@ extern "C" {
             bool * pidItermResetValue,
             bool * armed,
             bool * gotNewData);
-
-static float rxApplyRates(float commandf, const float commandfAbs)
-{
-    float expof = RC_EXPO / 100.0f;
-    expof = commandfAbs * (powf(commandf, 5) * expof + commandf * (1 - expof));
-
-    const float centerSensitivity = RC_RATE * 10.0f;
-    const float stickMovement = fmaxf(0, RATE * 10.0f - centerSensitivity);
-    const float angleRate = commandf * centerSensitivity + stickMovement * expof;
-
-    return angleRate;
-}
 
 static throttleStatus_e rxCalculateThrottleStatus(float * rcData)
 {

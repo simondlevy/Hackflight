@@ -17,6 +17,7 @@
  */
 
 #include "accel.h"
+#include "align_sensor.h"
 #include "arming.h"
 #include "datatypes.h"
 #include "filter.h"

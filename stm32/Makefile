@@ -203,17 +203,14 @@ CC_SPEED_OPTIMISATION   := $(OPTIMISATION_BASE) $(OPTIMISE_SPEED)
 CC_SIZE_OPTIMISATION    := $(OPTIMISATION_BASE) $(OPTIMISE_SIZE)
 CC_NO_OPTIMISATION      := 
 
-#
-# Added after GCC version update, remove once the warnings have been fixed
-#
-TEMPORARY_FLAGS :=
+NO_UNUSED_FUNCTION = -Wno-unused-function
 
 CFLAGS     += $(ARCH_FLAGS) \
               $(addprefix -D,$(OPTIONS)) \
               $(addprefix -I,$(INCLUDE_DIRS)) \
               -std=gnu11 \
               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
-			  -Wno-unused-function \
+			  $(NO_UNUSED_FUNCTION) \
               -ffunction-sections \
               -fdata-sections \
               -fno-common \

@@ -27,7 +27,6 @@
 #include "gyro.h"
 #include "imu.h"
 #include "maths.h"
-#include "quat2euler.h"
 #include "time.h"
 
 // Constants -------------------------------------------------------------------
@@ -45,6 +44,16 @@ static const float ATTITUDE_RESET_GYRO_LIMIT  = 15;
 static const uint32_t ATTITUDE_RESET_QUIET_TIME  = 250000;  
 
 // Helpers ---------------------------------------------------------------------
+
+static float invSqrt(float x)
+{
+    return 1.0f / sqrtf(x);
+}
+
+static float square(float x)
+{
+    return x * x;
+}
 
 static bool bigGyro(float val)
 {

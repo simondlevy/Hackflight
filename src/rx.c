@@ -30,6 +30,7 @@
 #include "motor.h"
 #include "pwm.h"
 #include "rx.h"
+#include "rx_rate.h"
 #include "scale.h"
 #include "time.h"
 

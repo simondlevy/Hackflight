@@ -31,8 +31,6 @@ extern "C" {
 
     float sin_approx(float x);
     float cos_approx(float x);
-    float atan2_approx(float y, float x);
-    float acos_approx(float x);
 
     static inline int constrain_f_i32(float amt, int32_t low, int32_t high)
     {
@@ -73,28 +71,6 @@ extern "C" {
         else
             return amt;
     }
-
-    static void alignSensorViaRotation(float *dest)
-    {
-        const float x = dest[0];
-        const float y = dest[1];
-        const float z = dest[2];
-
-        // 270 degrees
-        dest[0] = -y;
-        dest[1] = x;
-        dest[2] = z;
-    }
-
-static float invSqrt(float x)
-{
-    return 1.0f / sqrtf(x);
-}
-
-static float square(float x)
-{
-    return x * x;
-}
 
 #if defined(__cplusplus)
 }

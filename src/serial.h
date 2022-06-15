@@ -21,7 +21,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <time.h>
+#include "datatypes.h"
+#include "time.h"
 
 typedef enum {
     BAUD_AUTO = 0,
@@ -93,26 +94,6 @@ typedef enum {
     FUNCTION_LIDAR_TF            = (1 << 15), // 32768
     FUNCTION_FRSKY_OSD           = (1 << 16), // 65536
 } serialPortFunction_e;
-
-typedef enum {
-    SERIAL_PORT_ALL = -2,
-    SERIAL_PORT_NONE = -1,
-    SERIAL_PORT_USART1 = 0,
-    SERIAL_PORT_USART2,
-    SERIAL_PORT_USART3,
-    SERIAL_PORT_UART4,
-    SERIAL_PORT_UART5,
-    SERIAL_PORT_USART6,
-    SERIAL_PORT_USART7,
-    SERIAL_PORT_USART8,
-    SERIAL_PORT_UART9,
-    SERIAL_PORT_USART10,
-    SERIAL_PORT_USB_VCP = 20,
-    SERIAL_PORT_SOFTSERIAL1 = 30,
-    SERIAL_PORT_SOFTSERIAL2,
-    SERIAL_PORT_LPUART1 = 40,
-    SERIAL_PORT_IDENTIFIER_MAX = SERIAL_PORT_LPUART1,
-} serialPortIdentifier_e;
 
 #if defined(__cplusplus)
 extern "C" {

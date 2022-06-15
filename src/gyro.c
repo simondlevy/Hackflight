@@ -16,6 +16,7 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "align_sensor.h"
 #include "datatypes.h"
 #include "filter.h"
 #include "gyro.h"

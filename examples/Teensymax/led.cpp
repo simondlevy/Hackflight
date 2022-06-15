@@ -16,28 +16,27 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include <Arduino.h>
 
-#include "init_task.h"
+#include <led.h>
 
-typedef struct int16_flightDynamicsTrims_s {
-    int16_t roll;
-    int16_t pitch;
-    int16_t yaw;
-    int16_t calibrationCompleted;
-} flightDynamicsTrims_def_t;
+static const uint8_t PIN = 13;
 
-typedef union flightDynamicsTrims_u {
-    int16_t raw[4];
-    flightDynamicsTrims_def_t values;
-} flightDynamicsTrims_t;
+static bool _on;
 
-typedef enum {
-    SENSOR_GYRO = 1 << 0, // always present
-    SENSOR_ACC = 1 << 1,
-} sensors_e;
-
-static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
+void ledInit(void)
 {
-    initTask(&hf->sensorTasks[hf->sensorTaskCount++], fun, rate);
+    pinMode(PIN, OUTPUT);
+}
+
+void ledSet(bool on)
+{
+    digitalWrite(PIN, on);
+    _on = on;
+}
+
+void ledToggle(void)
+{
+    _on = !_on;
+    ledSet(_on);
 }

@@ -66,8 +66,8 @@ static const uint32_t TASK_AGE_EXPEDITE_COUNT =   1;
 static const float    TASK_AGE_EXPEDITE_SCALE =   0.9; 
 
 // Gyro interrupt counts over which to measure loop time and skew
-static const uint32_t GYRO_RATE_COUNT = 25000;
-static const uint32_t GYRO_LOCK_COUNT = 400;
+static const uint32_t GYRO_RATE_COUNT = 10000;//25000;
+static const uint32_t GYRO_LOCK_COUNT = 50; //400;
 
 // MSP task ---------------------------------------------------------------------
 
@@ -350,6 +350,7 @@ void hackflightStep(hackflight_t * hf)
 
     uint32_t nextTargetCycles =
         scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
+
     int32_t schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
     if (schedLoopRemainingCycles < -scheduler->desiredPeriodCycles) {
@@ -377,11 +378,12 @@ void hackflightStep(hackflight_t * hf)
     schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     /*
-    debugPrintf("%10u %10u %10d: %u\n",
+    debugPrintf("%10u %10u [%10d %10d]: %u\n",
             nextTargetCycles,
             systemGetCycleCounter(),
             schedLoopRemainingCycles,
-            schedLoopRemainingCycles > (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US));
+            scheduler->guardMargin,
+            schedLoopRemainingCycles > scheduler->guardMargin);
             */
 
     if (schedLoopRemainingCycles > scheduler->guardMargin) {

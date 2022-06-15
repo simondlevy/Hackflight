@@ -25,7 +25,7 @@
 #include "debug.h"
 #include "dt.h"
 #include "filter.h"
-#include "rx.h"
+#include "rx_rate.h"
 
 // minimum of 5ms between updates
 static const uint16_t DYN_LPF_THROTTLE_UPDATE_DELAY_US = 5000; 
