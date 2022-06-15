@@ -132,8 +132,17 @@ typedef struct rxSmoothingFilter_s {
     uint8_t     autoSmoothnessFactorThrottle;
     uint16_t    feedforwardCutoffFrequency;
     uint8_t     ffCutoffSetting;
+
     pt3Filter_t filter[4];
     pt3Filter_t filterDeflection[2];
+
+    pt3Filter_t filterRoll;
+    pt3Filter_t filterPitch;
+    pt3Filter_t filterYaw;
+
+    pt3Filter_t filterDeflctionRoll;
+    pt3Filter_t filterDeflctionPitch;
+
     bool        filterInitialized;
     uint16_t    setpointCutoffFrequency;
     uint8_t     setpointCutoffSetting;
@@ -230,14 +239,14 @@ static uint16_t getFailValue(float * rcData, uint8_t channel)
 {
     rxFailsafeChannelConfig_t rxFailsafeChannelConfigs[18];
 
-    for (int i = 0; i < 18; i++) {
+    for (uint8_t i = 0; i < 18; i++) {
         rxFailsafeChannelConfigs[i].step = 30;
     }
     rxFailsafeChannelConfigs[3].step = 5;
-    for (int i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < 4; i++) {
         rxFailsafeChannelConfigs[i].mode = 0;
     }
-    for (int i = 4; i < 18; i++) {
+    for (uint8_t i = 4; i < 18; i++) {
         rxFailsafeChannelConfigs[i].mode = 1;
     }
 
@@ -326,7 +335,7 @@ static void detectAndApplySignalLossBehaviour(rx_t * rx, uint32_t currentTimeUs,
 
     bool flightChannelsValid = true;
 
-    for (int channel = 0; channel < 18; channel++) {
+    for (uint8_t channel = 0; channel < 18; channel++) {
 
         float sample = raw[channel];
 
@@ -354,7 +363,7 @@ static void detectAndApplySignalLossBehaviour(rx_t * rx, uint32_t currentTimeUs,
     } else {
         rx->inFailsafeMode = true;
         failsafeOnValidDataFailed();
-        for (int channel = 0; channel < 18; channel++) {
+        for (uint8_t channel = 0; channel < 18; channel++) {
             raw[channel] = getFailValue(raw, channel);
         }
     }
@@ -365,7 +374,7 @@ static void detectAndApplySignalLossBehaviour(rx_t * rx, uint32_t currentTimeUs,
 static int16_t lookupThrottle(rx_t * rx, int32_t tmp)
 {
     if (!rx->initializedThrottleTable) {
-        for (int i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
+        for (uint8_t i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
             const int16_t tmp2 = 10 * i - THR_MID8;
             uint8_t y = tmp2 > 0 ?  100 - THR_MID8 : tmp2 < 0 ?  THR_MID8 : 1;
             rx->lookupThrottleRc[i] = 10 * THR_MID8 + tmp2 * (100 - THR_EXPO8 + (int32_t)
@@ -386,7 +395,7 @@ static int16_t lookupThrottle(rx_t * rx, int32_t tmp)
 // rxPoll
 static void updateCommands(rx_t * rx, float raw[])
 {
-    for (int axis=ROLL; axis<=YAW; axis++) {
+    for (uint8_t axis=ROLL; axis<=YAW; axis++) {
         // non coupled PID reduction scaler used in PID controller 1 and PID
         // controller 2.
         float tmp = fminf(fabs(raw[axis] - 1500), 500);
@@ -491,8 +500,7 @@ static void ratePidFeedforwardLpfInit(angle_pid_t * pid, uint16_t filterCutoff)
     if (filterCutoff > 0) {
         pid->feedforwardLpfInitialized = true;
         for (uint8_t axis=ROLL; axis<=YAW; axis++) {
-            pt3FilterInit(&pid->feedforwardPt3[axis],
-                    pt3FilterGain(filterCutoff, DT()));
+            pt3FilterInit(&pid->feedforwardPt3[axis], pt3FilterGain(filterCutoff, DT()));
         }
     }
 }
@@ -528,7 +536,7 @@ static void setSmoothingFilterCutoffs(angle_pid_t * ratepid,
     // initialize or update the Setpoint filter
     if ((smoothingFilter->setpointCutoffFrequency != oldCutoff) ||
             !smoothingFilter->filterInitialized) {
-        for (int i = 0; i < 4; i++) {
+        for (uint8_t i = 0; i < 4; i++) {
             if (i != THROTTLE) { // Throttle handled by smoothing command
                 if (!smoothingFilter->filterInitialized) {
                     pt3FilterInit(&smoothingFilter->filter[i],
@@ -549,7 +557,7 @@ static void setSmoothingFilterCutoffs(angle_pid_t * ratepid,
         }
 
         // initialize or update the Level filter
-        for (int i = 0; i < 2; i++) {
+        for (uint8_t i = 0; i < 2; i++) {
             if (!smoothingFilter->filterInitialized) {
                 pt3FilterInit(&smoothingFilter->filterDeflection[i],
                         pt3FilterGain(smoothingFilter->setpointCutoffFrequency,
@@ -731,14 +739,14 @@ static void processSmoothingFilter(
             }
         }
         // Get new values to be smoothed
-        for (int i = 0; i < 4; i++) {
+        for (uint8_t i = 0; i < 4; i++) {
             rx->dataToSmooth[i] = i == THROTTLE ? rx->command[i] : rawSetpoint[i];
         }
     }
 
     // each pid loop, apply the last received channel value to the filter, if
     // initialised - thanks @klutvott
-    for (int i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < 4; i++) {
         float *dst = i == THROTTLE ? &rx->command[i] : &setpointRate[i];
         if (rx->smoothingFilter.filterInitialized) {
             *dst = pt3FilterApply(&rx->smoothingFilter.filter[i], rx->dataToSmooth[i]);
@@ -990,7 +998,7 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
 
     if (_rx.gotNewData) {
 
-        for (int axis=ROLL; axis<=YAW; axis++) {
+        for (uint8_t axis=ROLL; axis<=YAW; axis++) {
 
             _rx.oldRcCommand[axis] = _rx.command[axis];
 
