@@ -165,7 +165,7 @@ typedef struct {
     float       command[4];
     bool        dataProcessingRequired;
     float       dataToSmooth[4];
-    int32_t frameTimeDeltaUs;
+    int32_t     frameTimeDeltaUs;
     bool        gotNewData;
     bool        inFailsafeMode;
     bool        initializedFilter;
@@ -300,10 +300,21 @@ static void rcSmoothingResetAccumulation(rxSmoothingFilter_t *smoothingFilter)
     smoothingFilter->trainingMax = 0;
 }
 
+static void initChannelRangeConfig(rxChannelRangeConfig_t  * config)
+{
+    config->min = PWM_MIN;
+    config->max = PWM_MAX;
+}
+
 // rxPoll
 static void readChannelsApplyRanges(rx_t * rx, float raw[])
 {
-    rxChannelRangeConfig_t  rxChannelRangeConfigs[4];
+    rxChannelRangeConfig_t rxChannelRangeConfigThrottle;
+    rxChannelRangeConfig_t rxChannelRangeConfigRoll;
+    rxChannelRangeConfig_t rxChannelRangeConfigPitch;
+    rxChannelRangeConfig_t rxChannelRangeConfigYaw;
+
+    rxChannelRangeConfig_t rxChannelRangeConfigs[4];
 
     for (uint8_t i=0; i<4; ++i) {
         rxChannelRangeConfigs[i].min = PWM_MIN;
