@@ -18,7 +18,7 @@
 
 #include "align_sensor.h"
 #include "datatypes.h"
-#include "filter.h"
+#include "pt1_filter.h"
 #include "gyro.h"
 #include "imu.h"
 #include "maths.h"

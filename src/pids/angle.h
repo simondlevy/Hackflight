@@ -24,7 +24,8 @@
 #include "datatypes.h"
 #include "debug.h"
 #include "dt.h"
-#include "filter.h"
+#include "pt1_filter.h"
+#include "pt3_filter.h"
 #include "rx_rate.h"
 
 // minimum of 5ms between updates
