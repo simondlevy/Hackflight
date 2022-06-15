@@ -44,10 +44,6 @@ extern "C" {
             bool * armed,
             bool * gotNewData);
 
-static throttleStatus_e rxCalculateThrottleStatus(float * rcData)
-{
-    return (rcData[THROTTLE] < 1050) ?  THROTTLE_LOW : THROTTLE_HIGH;
-}
 #if defined(__cplusplus)
 }
 #endif
