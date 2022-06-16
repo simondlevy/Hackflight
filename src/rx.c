@@ -35,6 +35,7 @@
 #include "scale.h"
 #include "time.h"
 
+#define CHANNEL_COUNT 18
 #define THROTTLE_LOOKUP_LENGTH 12
 
 static const uint32_t FAILSAFE_POWER_ON_DELAY_US = (1000 * 1000 * 5);
@@ -159,8 +160,9 @@ typedef struct {
 
     bool        auxiliaryProcessingRequired;
     bool        calculatedCutoffs;
-    uint16_t    channelData[18];
+    uint16_t    channelData[CHANNEL_COUNT];
     float       command[4];
+    demands_t   commands;
     bool        dataProcessingRequired;
     demands_t   dataToSmooth;
     int32_t     frameTimeDeltaUs;
@@ -168,7 +170,7 @@ typedef struct {
     bool        inFailsafeMode;
     bool        initializedFilter;
     bool        initializedThrottleTable;
-    uint32_t    invalidPulsePeriod[18];
+    uint32_t    invalidPulsePeriod[CHANNEL_COUNT];
     bool        isRateValid;
     uint32_t    lastFrameTimeUs;
     uint32_t    lastRxTimeUs;
@@ -176,7 +178,7 @@ typedef struct {
     uint32_t    needSignalBefore;
     uint32_t    nextUpdateAtUs;
     uint32_t    previousFrameTimeUs;
-    float       raw[18];
+    float       raw[CHANNEL_COUNT];
     uint32_t    refreshPeriod;
     bool        signalReceived;
     rxState_e   state;
@@ -234,16 +236,16 @@ static bool isPulseValid(uint16_t pulseDuration)
 
 static uint16_t getFailValue(float * rcData, uint8_t channel)
 {
-    rxFailsafeChannelConfig_t rxFailsafeChannelConfigs[18];
+    rxFailsafeChannelConfig_t rxFailsafeChannelConfigs[CHANNEL_COUNT];
 
-    for (uint8_t i = 0; i < 18; i++) {
+    for (uint8_t i = 0; i < CHANNEL_COUNT; i++) {
         rxFailsafeChannelConfigs[i].step = 30;
     }
     rxFailsafeChannelConfigs[3].step = 5;
     for (uint8_t i = 0; i < 4; i++) {
         rxFailsafeChannelConfigs[i].mode = 0;
     }
-    for (uint8_t i = 4; i < 18; i++) {
+    for (uint8_t i = 4; i < CHANNEL_COUNT; i++) {
         rxFailsafeChannelConfigs[i].mode = 1;
     }
 
@@ -316,7 +318,7 @@ static void readChannelsApplyRanges(rx_t * rx, float raw[])
     initChannelRangeConfig(&rxChannelRangeConfigPitch);
     initChannelRangeConfig(&rxChannelRangeConfigYaw);
 
-    for (uint8_t channel=0; channel<18; ++channel) {
+    for (uint8_t channel=0; channel<CHANNEL_COUNT; ++channel) {
 
         // sample the channel
         float sample = rxDevConvertValue(rx->channelData, channel);
@@ -351,7 +353,7 @@ static void detectAndApplySignalLossBehaviour(rx_t * rx, uint32_t currentTimeUs,
 
     bool flightChannelsValid = true;
 
-    for (uint8_t channel = 0; channel < 18; channel++) {
+    for (uint8_t channel = 0; channel < CHANNEL_COUNT; channel++) {
 
         float sample = raw[channel];
 
@@ -379,7 +381,7 @@ static void detectAndApplySignalLossBehaviour(rx_t * rx, uint32_t currentTimeUs,
     } else {
         rx->inFailsafeMode = true;
         failsafeOnValidDataFailed();
-        for (uint8_t channel = 0; channel < 18; channel++) {
+        for (uint8_t channel = 0; channel < CHANNEL_COUNT; channel++) {
             raw[channel] = getFailValue(raw, channel);
         }
     }
@@ -415,19 +417,17 @@ static void updateCommands(rx_t * rx, float raw[])
         // non coupled PID reduction scaler used in PID controller 1 and PID
         // controller 2.
         float tmp = fminf(fabs(raw[axis] - 1500), 500);
+
         if (axis == ROLL || axis == PITCH) {
-            if (tmp > 0) {
-                tmp -= 0;
-            } else {
-                tmp = 0;
-            }
+
+            tmp = tmp < 0 ? 0 : tmp;
+
             rx->command[axis] = tmp;
+
         } else {
-            if (tmp > 0) {
-                tmp -= 0;
-            } else {
-                tmp = 0;
-            }
+
+            tmp = tmp < 0 ? 0 : tmp;
+
             rx->command[axis] = -tmp; 
         }
         if (raw[axis] < 1500) {
