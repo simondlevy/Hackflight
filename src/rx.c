@@ -1055,7 +1055,7 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
 
             float angleRate = rxApplyRates(commandf, commandfAbs);
 
-            rawSetpoint[axis] = constrain_f(angleRate, -1.0f * RATE_LIMIT, 1.0f * RATE_LIMIT);
+            rawSetpoint[axis] = constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
 
             /*
             rawSetpoint[axis] = getRawSetpoint(_rx.command[axis], axis==YAW ?
