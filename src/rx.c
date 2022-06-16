@@ -1025,8 +1025,10 @@ void rxPoll(
     *gotNewData = _rx.gotNewData;
 }
 
-static float getRawSetpoint(float commandf)
+static float getRawSetpoint(float command, float divider)
 {
+    float commandf = command / divider;
+
     float commandfAbs = fabsf(commandf);
 
     float angleRate = rxApplyRates(commandf, commandfAbs);
@@ -1047,9 +1049,12 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
         for (uint8_t axis=ROLL; axis<=YAW; axis++) {
 
             // scale _rx.commandf to range [-1.0, 1.0]
-            float commandf = _rx.command[axis] / (axis == YAW ? YAW_COMMAND_DIVIDER : COMMAND_DIVIDER);
 
-            rawSetpoint[axis] = getRawSetpoint(commandf);
+
+            // float commandf = _rx.command[axis] / (axis == YAW ? YAW_COMMAND_DIVIDER : COMMAND_DIVIDER);
+
+            rawSetpoint[axis] = getRawSetpoint(_rx.command[axis],
+                   axis == YAW ? YAW_COMMAND_DIVIDER : COMMAND_DIVIDER);
         }
     }
 
