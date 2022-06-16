@@ -427,26 +427,6 @@ static void updateCommands(rx_t * rx, float raw[])
         // controller 2.
 
         rx->command[axis] = updateCommand(raw[axis], axis == YAW ? -1 : +1);
-
-        /*
-        float tmp = fminf(fabs(raw[axis] - 1500), 500);
-
-        if (axis == ROLL || axis == PITCH) {
-
-            tmp = tmp < 0 ? 0 : tmp;
-
-            rx->command[axis] = tmp;
-
-        } else {
-
-            tmp = tmp < 0 ? 0 : tmp;
-
-            rx->command[axis] = -tmp; 
-        }
-        if (raw[axis] < 1500) {
-            rx->command[axis] = -rx->command[axis];
-        }
-        */
     }
 
     int32_t tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
@@ -1045,6 +1025,11 @@ void rxPoll(
     *gotNewData = _rx.gotNewData;
 }
 
+/*
+static float getDemand(float command, float divider)
+{
+}*/
+
 // Runs in fast (inner, core) loop
 void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands)
 {
@@ -1057,8 +1042,6 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
 
         for (uint8_t axis=ROLL; axis<=YAW; axis++) {
 
-            float angleRate;
-
             // scale _rx.commandf to range [-1.0, 1.0]
             float commandf;
             if (axis == YAW) {
@@ -1067,9 +1050,9 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
                 commandf = _rx.command[axis] / COMMAND_DIVIDER;
             }
 
-            const float commandfAbs = fabsf(commandf);
+            float commandfAbs = fabsf(commandf);
 
-            angleRate = rxApplyRates(commandf, commandfAbs);
+            float angleRate = rxApplyRates(commandf, commandfAbs);
 
             rawSetpoint[axis] =
                 constrain_f(angleRate, -1.0f * RATE_LIMIT, 1.0f * RATE_LIMIT);
