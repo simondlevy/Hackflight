@@ -1039,7 +1039,7 @@ static float getRawSetpoint(float command, float divider)
 // Runs in fast (inner, core) loop
 void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands)
 {
-    float rawSetpoint[3] = {0};
+    float rawSetpoint[4] = {0};
     float setpointRate[4] = {0};
 
     if (_rx.gotNewData) {
@@ -1049,12 +1049,6 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
         rawSetpoint[ROLL]  = getRawSetpoint(_rx.command[ROLL], COMMAND_DIVIDER);
         rawSetpoint[PITCH] = getRawSetpoint(_rx.command[PITCH], COMMAND_DIVIDER);
         rawSetpoint[YAW]   = getRawSetpoint(_rx.command[YAW], YAW_COMMAND_DIVIDER);
-
-        /*
-        for (uint8_t axis=YAW; axis<=YAW; axis++) {
-            rawSetpoint[axis] = getRawSetpoint(_rx.command[axis],
-                    axis == YAW ? YAW_COMMAND_DIVIDER : COMMAND_DIVIDER);
-        }*/
     }
 
     processSmoothingFilter(currentTimeUs, &_rx, ratepid, setpointRate, rawSetpoint);
