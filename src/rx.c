@@ -410,12 +410,25 @@ static int16_t lookupThrottle(rx_t * rx, int32_t tmp)
         (rx->lookupThrottleRc[tmp3 + 1] - rx->lookupThrottleRc[tmp3]) / 100;
 }
 
+static float updateCommand(float raw, float sgn)
+{
+    float tmp = fminf(fabs(raw - 1500), 500);
+
+    float cmd = tmp * sgn;
+
+    return raw < 1500 ? -cmd : cmd;
+}
+
 // rxPoll
 static void updateCommands(rx_t * rx, float raw[])
 {
     for (uint8_t axis=ROLL; axis<=YAW; axis++) {
         // non coupled PID reduction scaler used in PID controller 1 and PID
         // controller 2.
+
+        rx->command[axis] = updateCommand(raw[axis], axis == YAW ? -1 : +1);
+
+        /*
         float tmp = fminf(fabs(raw[axis] - 1500), 500);
 
         if (axis == ROLL || axis == PITCH) {
@@ -433,12 +446,12 @@ static void updateCommands(rx_t * rx, float raw[])
         if (raw[axis] < 1500) {
             rx->command[axis] = -rx->command[axis];
         }
+        */
     }
 
     int32_t tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
     int32_t tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
-    rx->command[THROTTLE] = lookupThrottle(rx, tmp2);
     rx->commands.throttle = lookupThrottle(rx, tmp2);
 }
 
