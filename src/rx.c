@@ -309,17 +309,15 @@ static void initChannelRangeConfig(rxChannelRangeConfig_t  * config)
 // rxPoll
 static void readChannelsApplyRanges(rx_t * rx, float raw[])
 {
-    rxChannelRangeConfig_t rxChannelRangeConfigThrottle;
-    rxChannelRangeConfig_t rxChannelRangeConfigRoll;
-    rxChannelRangeConfig_t rxChannelRangeConfigPitch;
-    rxChannelRangeConfig_t rxChannelRangeConfigYaw;
+    rxChannelRangeConfig_t rxChannelRangeConfigThrottle = {0};
+    rxChannelRangeConfig_t rxChannelRangeConfigRoll = {0};
+    rxChannelRangeConfig_t rxChannelRangeConfigPitch = {0};
+    rxChannelRangeConfig_t rxChannelRangeConfigYaw = {0};
 
-    rxChannelRangeConfig_t rxChannelRangeConfigs[4];
-
-    for (uint8_t i=0; i<4; ++i) {
-        rxChannelRangeConfigs[i].min = PWM_MIN;
-        rxChannelRangeConfigs[i].max = PWM_MAX;
-    }
+    initChannelRangeConfig(&rxChannelRangeConfigThrottle);
+    initChannelRangeConfig(&rxChannelRangeConfigRoll);
+    initChannelRangeConfig(&rxChannelRangeConfigPitch);
+    initChannelRangeConfig(&rxChannelRangeConfigYaw);
 
     for (uint8_t channel=0; channel<18; ++channel) {
 
@@ -327,9 +325,19 @@ static void readChannelsApplyRanges(rx_t * rx, float raw[])
         float sample = rxDevConvertValue(rx->channelData, channel);
 
         // apply the rx calibration
-        if (channel < 4) {
-            sample = applyRxChannelRangeConfiguraton(sample,
-                    &rxChannelRangeConfigs[channel]);
+        switch (channel) {
+            case 0:
+                sample = applyRxChannelRangeConfiguraton(sample, &rxChannelRangeConfigThrottle);
+                break;
+            case 1:
+                sample = applyRxChannelRangeConfiguraton(sample, &rxChannelRangeConfigRoll);
+                break;
+            case 2:
+                sample = applyRxChannelRangeConfiguraton(sample, &rxChannelRangeConfigPitch);
+                break;
+            case 3:
+                sample = applyRxChannelRangeConfiguraton(sample, &rxChannelRangeConfigYaw);
+                break;
         }
 
         raw[channel] = sample;

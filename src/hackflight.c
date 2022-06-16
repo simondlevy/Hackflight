@@ -66,8 +66,8 @@ static const uint32_t TASK_AGE_EXPEDITE_COUNT =   1;
 static const float    TASK_AGE_EXPEDITE_SCALE =   0.9; 
 
 // Gyro interrupt counts over which to measure loop time and skew
-static const uint32_t GYRO_RATE_COUNT = 10000;//25000;
-static const uint32_t GYRO_LOCK_COUNT = 50; //400;
+static const uint32_t GYRO_RATE_COUNT = 25000;
+static const uint32_t GYRO_LOCK_COUNT = 400;
 
 // MSP task ---------------------------------------------------------------------
 
