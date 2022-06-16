@@ -72,7 +72,6 @@ static const uint32_t RC_SMOOTHING_RX_RATE_MAX_US = 65500;
 // 0.950ms to fit 1kHz without an issue
 static const uint32_t RC_SMOOTHING_RX_RATE_MIN_US = 950;   
 
-static const float    COMMAND_DIVIDER   = 500;
 static const uint32_t DELAY_15_HZ       = 1000000 / 15;
 
 static const uint32_t NEED_SIGNAL_MAX_DELAY_US = 1000000 / 10;
@@ -81,6 +80,7 @@ static const uint16_t MAX_INVALID__PULSE_TIME     = 300;
 static const uint16_t RATE_LIMIT                  = 1998;
 static const float    THR_EXPO8                   = 0;
 static const float    THR_MID8                    = 50;
+static const float    COMMAND_DIVIDER             = 500;
 static const float    YAW_COMMAND_DIVIDER         = 500;
 
 // minimum PWM pulse width which is considered valid
@@ -1025,15 +1025,13 @@ void rxPoll(
     *gotNewData = _rx.gotNewData;
 }
 
-static float getRawSetpoint(float command, float divider)
+static float getRawSetpoint(float commandf)
 {
-    float commandf = command / divider;
-
     float commandfAbs = fabsf(commandf);
 
     float angleRate = rxApplyRates(commandf, commandfAbs);
 
-    return constrain_f(angleRate, -RATE_LIMIT, +RATE_LIMIT);
+    return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
 }
 
 // Runs in fast (inner, core) loop
@@ -1051,17 +1049,7 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
             // scale _rx.commandf to range [-1.0, 1.0]
             float commandf = _rx.command[axis] / (axis == YAW ? YAW_COMMAND_DIVIDER : COMMAND_DIVIDER);
 
-            float commandfAbs = fabsf(commandf);
-
-            float angleRate = rxApplyRates(commandf, commandfAbs);
-
-            rawSetpoint[axis] = constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
-
-            /*
-            rawSetpoint[axis] = getRawSetpoint(_rx.command[axis], axis==YAW ?
-                    YAW_COMMAND_DIVIDER :
-                    COMMAND_DIVIDER);
-                    */
+            rawSetpoint[axis] = getRawSetpoint(commandf);
         }
     }
 
