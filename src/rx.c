@@ -1046,16 +1046,15 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
 
         _rx.previousFrameTimeUs = 0;
 
-        for (uint8_t axis=ROLL; axis<=YAW; axis++) {
+        rawSetpoint[ROLL]  = getRawSetpoint(_rx.command[ROLL], COMMAND_DIVIDER);
+        rawSetpoint[PITCH] = getRawSetpoint(_rx.command[PITCH], COMMAND_DIVIDER);
+        rawSetpoint[YAW]   = getRawSetpoint(_rx.command[YAW], YAW_COMMAND_DIVIDER);
 
-            // scale _rx.commandf to range [-1.0, 1.0]
-
-
-            // float commandf = _rx.command[axis] / (axis == YAW ? YAW_COMMAND_DIVIDER : COMMAND_DIVIDER);
-
+        /*
+        for (uint8_t axis=YAW; axis<=YAW; axis++) {
             rawSetpoint[axis] = getRawSetpoint(_rx.command[axis],
-                   axis == YAW ? YAW_COMMAND_DIVIDER : COMMAND_DIVIDER);
-        }
+                    axis == YAW ? YAW_COMMAND_DIVIDER : COMMAND_DIVIDER);
+        }*/
     }
 
     processSmoothingFilter(currentTimeUs, &_rx, ratepid, setpointRate, rawSetpoint);
