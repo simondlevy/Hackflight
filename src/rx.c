@@ -436,9 +436,10 @@ static void updateCommands(rx_t * rx, float raw[])
     }
 
     int32_t tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
-    tmp = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
+    int32_t tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
-    rx->command[THROTTLE] = lookupThrottle(rx, tmp);
+    rx->command[THROTTLE] = lookupThrottle(rx, tmp2);
+    rx->commands.throttle = lookupThrottle(rx, tmp2);
 }
 
 // rxPoll
@@ -780,7 +781,7 @@ static void processSmoothingFilter(
             }
         }
 
-        rx->dataToSmooth.throttle = rx->command[0];
+        rx->dataToSmooth.throttle = rx->commands.throttle;
         rx->dataToSmooth.roll = rawSetpoint[1];
         rx->dataToSmooth.pitch = rawSetpoint[2];
         rx->dataToSmooth.yaw = rawSetpoint[3];
@@ -789,7 +790,7 @@ static void processSmoothingFilter(
     // Each pid loop, apply the last received channel value to the filter, if
     // initialised - thanks @klutvott
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterThrottle,
-            rx->dataToSmooth.throttle, &rx->command[0]);
+            rx->dataToSmooth.throttle, &rx->commands.throttle);
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterRoll,
             rx->dataToSmooth.roll, &setpointRate[1]);
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterPitch,
@@ -1067,7 +1068,7 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
     // Find min and max throttle based on conditions. Throttle has to be known
     // before mixing
     demands->throttle =
-        constrain_f((_rx.command[THROTTLE] - PWM_MIN) / (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
+        constrain_f((_rx.commands.throttle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
 
     demands->roll  = setpointRate[ROLL];
     demands->pitch = setpointRate[PITCH];
