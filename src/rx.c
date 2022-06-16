@@ -133,15 +133,13 @@ typedef struct rxSmoothingFilter_s {
     uint16_t    feedforwardCutoffFrequency;
     uint8_t     ffCutoffSetting;
 
-    pt3Filter_t filter[4];
-    pt3Filter_t filterDeflection[2];
-
+    pt3Filter_t filterThrottle;
     pt3Filter_t filterRoll;
     pt3Filter_t filterPitch;
     pt3Filter_t filterYaw;
 
-    pt3Filter_t filterDeflctionRoll;
-    pt3Filter_t filterDeflctionPitch;
+    pt3Filter_t filterDeflectionRoll;
+    pt3Filter_t filterDeflectionPitch;
 
     bool        filterInitialized;
     uint16_t    setpointCutoffFrequency;
@@ -534,6 +532,51 @@ static void ratePidFeedforwardLpfUpdate(angle_pid_t * pid, uint16_t filterCutoff
     }
 }
 
+static void smoothingFilterInit(
+        rxSmoothingFilter_t * smoothingFilter,
+        pt3Filter_t * filter,
+        float setpointCutoffFrequency,
+        float dT)
+{
+    if (!smoothingFilter->filterInitialized) {
+        pt3FilterInit(filter, pt3FilterGain(setpointCutoffFrequency, dT)); 
+    } else {
+        pt3FilterUpdateCutoff(filter, pt3FilterGain(setpointCutoffFrequency, dT)); 
+    }
+}
+
+static void smoothingFilterInitRollPitchYaw(
+        rxSmoothingFilter_t * smoothingFilter,
+        pt3Filter_t * filter,
+        float dT)
+{
+    smoothingFilterInit(smoothingFilter, filter, smoothingFilter->setpointCutoffFrequency, dT);
+}
+
+static void levelFilterInit(rxSmoothingFilter_t * smoothingFilter, pt3Filter_t * filter, float dT)
+{
+    if (!smoothingFilter->filterInitialized) {
+        pt3FilterInit(filter, pt3FilterGain(smoothingFilter->setpointCutoffFrequency, dT)); 
+    } else {
+        pt3FilterUpdateCutoff(filter, pt3FilterGain(smoothingFilter->setpointCutoffFrequency, dT)); 
+    }
+}
+
+static void smoothingFilterApply(
+        rxSmoothingFilter_t * smoothingFilter,
+        pt3Filter_t * filter,
+        float dataToSmooth,
+        float * dst)
+{
+    if (smoothingFilter->filterInitialized) {
+        *dst = pt3FilterApply(filter, dataToSmooth);
+    } else {
+        // If filter isn't initialized yet, as in smoothing off, use the
+        // actual unsmoothed rx channel data
+        *dst = dataToSmooth;
+    }
+}
+
 static void setSmoothingFilterCutoffs(angle_pid_t * ratepid,
         rxSmoothingFilter_t *smoothingFilter)
 {
@@ -555,36 +598,16 @@ static void setSmoothingFilterCutoffs(angle_pid_t * ratepid,
     // initialize or update the Setpoint filter
     if ((smoothingFilter->setpointCutoffFrequency != oldCutoff) ||
             !smoothingFilter->filterInitialized) {
-        for (uint8_t i = 0; i < 4; i++) {
-            if (i != THROTTLE) { // Throttle handled by smoothing command
-                if (!smoothingFilter->filterInitialized) {
-                    pt3FilterInit(&smoothingFilter->filter[i],
-                            pt3FilterGain(smoothingFilter->setpointCutoffFrequency,
-                                dT)); } else {
-                        pt3FilterUpdateCutoff(&smoothingFilter->filter[i],
-                                pt3FilterGain(smoothingFilter->setpointCutoffFrequency,
-                                    dT)); }
-            } else {
-                if (!smoothingFilter->filterInitialized) {
-                    pt3FilterInit(&smoothingFilter->filter[i],
-                            pt3FilterGain(smoothingFilter->throttleCutoffFrequency,
-                                dT)); } else {
-                        pt3FilterUpdateCutoff(&smoothingFilter->filter[i],
-                                pt3FilterGain(smoothingFilter->throttleCutoffFrequency,
-                                    dT)); }
-            }
-        }
 
-        // initialize or update the Level filter
-        for (uint8_t i = 0; i < 2; i++) {
-            if (!smoothingFilter->filterInitialized) {
-                pt3FilterInit(&smoothingFilter->filterDeflection[i],
-                        pt3FilterGain(smoothingFilter->setpointCutoffFrequency,
-                            dT)); } else {
-                    pt3FilterUpdateCutoff(&smoothingFilter->filterDeflection[i],
-                            pt3FilterGain(smoothingFilter->setpointCutoffFrequency,
-                                dT)); }
-        }
+        smoothingFilterInit(smoothingFilter, &smoothingFilter->filterThrottle,
+                smoothingFilter->throttleCutoffFrequency, dT);
+
+        smoothingFilterInitRollPitchYaw(smoothingFilter, &smoothingFilter->filterRoll, dT);
+        smoothingFilterInitRollPitchYaw(smoothingFilter, &smoothingFilter->filterPitch, dT);
+        smoothingFilterInitRollPitchYaw(smoothingFilter, &smoothingFilter->filterYaw, dT);
+
+        levelFilterInit(smoothingFilter, &smoothingFilter->filterDeflectionRoll, dT);
+        levelFilterInit(smoothingFilter, &smoothingFilter->filterDeflectionPitch, dT);
     }
 
     // update or initialize the FF filter
@@ -763,19 +786,18 @@ static void processSmoothingFilter(
         }
     }
 
-    // each pid loop, apply the last received channel value to the filter, if
+    // Each pid loop, apply the last received channel value to the filter, if
     // initialised - thanks @klutvott
-    for (uint8_t i = 0; i < 4; i++) {
-        float *dst = i == THROTTLE ? &rx->command[i] : &setpointRate[i];
-        if (rx->smoothingFilter.filterInitialized) {
-            *dst = pt3FilterApply(&rx->smoothingFilter.filter[i], rx->dataToSmooth[i]);
-        } else {
-            // If filter isn't initialized yet, as in smoothing off, use the
-            // actual unsmoothed rx channel data
-            *dst = rx->dataToSmooth[i];
-        }
-    }
+    smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterThrottle,
+            rx->dataToSmooth[0], &rx->command[0]);
+    smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterRoll,
+            rx->dataToSmooth[1], &setpointRate[1]);
+    smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterPitch,
+            rx->dataToSmooth[2], &setpointRate[2]);
+    smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterYaw,
+            rx->dataToSmooth[3], &setpointRate[3]);
 }
+
 static bool isAux1Set(float raw[])
 {
     return raw[4] > 1200;
