@@ -175,7 +175,6 @@ typedef struct {
     int16_t     lookupThrottleRc[THROTTLE_LOOKUP_LENGTH];
     uint32_t    needSignalBefore;
     uint32_t    nextUpdateAtUs;
-    float       oldRcCommand[3];
     uint32_t    previousFrameTimeUs;
     float       raw[18];
     uint32_t    refreshPeriod;
@@ -1040,9 +1039,9 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
 
     if (_rx.gotNewData) {
 
-        for (uint8_t axis=ROLL; axis<=YAW; axis++) {
+        _rx.previousFrameTimeUs = 0;
 
-            _rx.oldRcCommand[axis] = _rx.command[axis];
+        for (uint8_t axis=ROLL; axis<=YAW; axis++) {
 
             float angleRate;
 
