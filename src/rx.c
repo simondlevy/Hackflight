@@ -1025,10 +1025,16 @@ void rxPoll(
     *gotNewData = _rx.gotNewData;
 }
 
-/*
-static float getDemand(float command, float divider)
+static float getRawSetpoint(float command, float divider)
 {
-}*/
+    float commandf = command / divider;
+
+    float commandfAbs = fabsf(commandf);
+
+    float angleRate = rxApplyRates(commandf, commandfAbs);
+
+    return constrain_f(angleRate, -RATE_LIMIT, +RATE_LIMIT);
+}
 
 // Runs in fast (inner, core) loop
 void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands)
@@ -1043,19 +1049,19 @@ void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * dem
         for (uint8_t axis=ROLL; axis<=YAW; axis++) {
 
             // scale _rx.commandf to range [-1.0, 1.0]
-            float commandf;
-            if (axis == YAW) {
-                commandf = _rx.command[axis] / YAW_COMMAND_DIVIDER;
-            } else {
-                commandf = _rx.command[axis] / COMMAND_DIVIDER;
-            }
+            float commandf = _rx.command[axis] / (axis == YAW ? YAW_COMMAND_DIVIDER : COMMAND_DIVIDER);
 
             float commandfAbs = fabsf(commandf);
 
             float angleRate = rxApplyRates(commandf, commandfAbs);
 
-            rawSetpoint[axis] =
-                constrain_f(angleRate, -1.0f * RATE_LIMIT, 1.0f * RATE_LIMIT);
+            rawSetpoint[axis] = constrain_f(angleRate, -1.0f * RATE_LIMIT, 1.0f * RATE_LIMIT);
+
+            /*
+            rawSetpoint[axis] = getRawSetpoint(_rx.command[axis], axis==YAW ?
+                    YAW_COMMAND_DIVIDER :
+                    COMMAND_DIVIDER);
+                    */
         }
     }
 
