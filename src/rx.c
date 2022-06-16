@@ -162,7 +162,7 @@ typedef struct {
     uint16_t    channelData[18];
     float       command[4];
     bool        dataProcessingRequired;
-    float       dataToSmooth[4];
+    demands_t   dataToSmooth;
     int32_t     frameTimeDeltaUs;
     bool        gotNewData;
     bool        inFailsafeMode;
@@ -780,22 +780,23 @@ static void processSmoothingFilter(
                 }
             }
         }
-        // Get new values to be smoothed
-        for (uint8_t i = 0; i < 4; i++) {
-            rx->dataToSmooth[i] = i == THROTTLE ? rx->command[i] : rawSetpoint[i];
-        }
+
+        rx->dataToSmooth.throttle = rx->command[0];
+        rx->dataToSmooth.roll = rawSetpoint[1];
+        rx->dataToSmooth.pitch = rawSetpoint[2];
+        rx->dataToSmooth.yaw = rawSetpoint[3];
     }
 
     // Each pid loop, apply the last received channel value to the filter, if
     // initialised - thanks @klutvott
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterThrottle,
-            rx->dataToSmooth[0], &rx->command[0]);
+            rx->dataToSmooth.throttle, &rx->command[0]);
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterRoll,
-            rx->dataToSmooth[1], &setpointRate[1]);
+            rx->dataToSmooth.roll, &setpointRate[1]);
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterPitch,
-            rx->dataToSmooth[2], &setpointRate[2]);
+            rx->dataToSmooth.pitch, &setpointRate[2]);
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterYaw,
-            rx->dataToSmooth[3], &setpointRate[3]);
+            rx->dataToSmooth.yaw, &setpointRate[3]);
 }
 
 static bool isAux1Set(float raw[])
