@@ -285,7 +285,6 @@ typedef struct {
     imu_sensor_t accum;
     float        dps[3];          // aligned, calibrated, scaled, but unfiltered data from sensor
     float        dps_filtered[3]; // filtered gyro data
-    float        dps_filtered_prev[3];
     uint8_t      sampleCount;   // gyro sensor sample counter
     float        sampleSum[3];    // summed samples used for downsampling
     bool         isCalibrating;
