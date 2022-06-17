@@ -509,9 +509,9 @@ static void ratePidFeedforwardLpfInit(angle_pid_t * pid, uint16_t filterCutoff)
 {
     if (filterCutoff > 0) {
         pid->feedforwardLpfInitialized = true;
-        for (uint8_t axis=ROLL; axis<=YAW; axis++) {
-            pt3FilterInit(&pid->feedforwardPt3[axis], pt3FilterGain(filterCutoff, DT()));
-        }
+        pt3FilterInit(&pid->feedforwardPt3[0], pt3FilterGain(filterCutoff, DT()));
+        pt3FilterInit(&pid->feedforwardPt3[1], pt3FilterGain(filterCutoff, DT()));
+        pt3FilterInit(&pid->feedforwardPt3[2], pt3FilterGain(filterCutoff, DT()));
     }
 }
 
