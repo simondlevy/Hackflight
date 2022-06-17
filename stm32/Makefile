@@ -122,7 +122,7 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             accel.c \
-            imu.c \
+            imu_fusion.c \
             main.c \
             $(SRC_DIR)/arming.c \
             $(SRC_DIR)/debug.c \
