@@ -381,15 +381,6 @@ void hackflightStep(hackflight_t * hf)
 
     int32_t newLoopRemainingCyles = cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
-    /*
-    debugPrintf("%5u %10u %10u %10d: %u\n",
-            scheduler->desiredPeriodCycles,
-            systemGetCycleCounter(),
-            newLoopRemainingCyles,
-            scheduler->guardMargin,
-            newLoopRemainingCyles > scheduler->guardMargin);
-            */
-
     if (newLoopRemainingCyles > scheduler->guardMargin) {
         checkDynamicTasks(hf, newLoopRemainingCyles, nextTargetCycles);
     }
