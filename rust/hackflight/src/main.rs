@@ -36,6 +36,29 @@ struct VehicleState
 }
 
 
+// Serial ports ----------------------------------------------------------------
+
+
+enum SerialPortIdentifier
+{
+    SerialPortAll = -2,
+    SerialPortNone = -1,
+    SerialPortUsart1 = 0,
+    SerialPortUsart2,
+    SerialPortUsart3,
+    SerialPortUsart4,
+    SerialPortUsart5,
+    SerialPortUsart6,
+    SerialPortUsart7,
+    SerialPortUsart8,
+    SerialPortUsart9,
+    SerialPortUsart10,
+    SerialPortUsbVcp = 20,
+    SerialPortSoftSerial1 = 30,
+    SerialPortSoftSerial2,
+    SerialPortLpUart1 = 40,
+}
+
 // Scheduling ------------------------------------------------------------------
 
 struct Scheduler
