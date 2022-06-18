@@ -63,19 +63,19 @@ busStatus_e mpuIntcallback(uint32_t arg)
 
 static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
-    gyroDev_t *gyro = container_of(cb, gyroDev_t, exti);
+    gyroDev_t *gyroDev = container_of(cb, gyroDev_t, exti);
 
     // Ideally we'd use a time to capture such information, but unfortunately
     // the port used for EXTI interrupt does not have an associated timer
     uint32_t nowCycles = systemGetCycleCounter();
-    int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, gyro->gyroLastEXTI);
+    int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, gyroDev->gyroLastEXTI);
     // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
-    if ((gyro->gyroShortPeriod == 0) || (gyroLastPeriod < gyro->gyroShortPeriod)) {
-        gyro->gyroSyncEXTI = gyro->gyroLastEXTI + gyro->gyroDmaMaxDuration;
+    if ((gyroDev->gyroShortPeriod == 0) || (gyroLastPeriod < gyroDev->gyroShortPeriod)) {
+        gyroDev->gyroSyncEXTI = gyroDev->gyroLastEXTI + gyroDev->gyroDmaMaxDuration;
     }
-    gyro->gyroLastEXTI = nowCycles;
+    gyroDev->gyroLastEXTI = nowCycles;
 
-    gyro->detectedEXTI++;
+    gyroDev->detectedEXTI++;
 }
 
 static void mpuIntExtiInit(gyroDev_t *gyro)
