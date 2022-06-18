@@ -338,7 +338,7 @@ void hackflightFullInit(hackflight_t * hf, serialPortIdentifier_e rxPort)
 
     scheduler->nextTimingCycles = scheduler->lastTargetCycles;
 
-    scheduler->desiredPeriodCycles = GYRO_PERIOD();
+    scheduler->desiredPeriodCycles = (int32_t)systemClockMicrosToCycles(GYRO_PERIOD());
 
     scheduler->guardMargin = (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
 
@@ -382,8 +382,8 @@ void hackflightStep(hackflight_t * hf)
     int32_t newLoopRemainingCyles = cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     /*
-    debugPrintf("%10u %10u %10d %10d: %u\n",
-            nextTargetCycles,
+    debugPrintf("%5u %10u %10u %10d: %u\n",
+            scheduler->desiredPeriodCycles,
             systemGetCycleCounter(),
             newLoopRemainingCyles,
             scheduler->guardMargin,

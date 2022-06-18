@@ -50,7 +50,7 @@ static uint32_t _gyro_interrupt_count;
 
 extern "C" {
 
-uint32_t gyroInterruptTime(void)
+uint32_t gyroInterruptCount(void)
 {
     return _gyro_interrupt_count;
 }
