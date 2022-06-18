@@ -104,20 +104,20 @@ DEVICE_FLAGS    += -DHSE_VALUE=$(HSE_VALUE)
 
 MCU_COMMON_SRC = \
             startup/system_stm32f4xx.c \
-            drivers/accgyro_mpu.c \
-            drivers/bus_spi_stdperiph.c \
-            drivers/dma_stm32f4xx.c \
-            drivers/dshot_bitbang.c \
-            drivers/dshot_bitbang_decode.c \
-            drivers/dshot_bitbang_stdperiph.c \
-            drivers/inverter.c \
-            drivers/pwm_output_dshot.c \
-            drivers/pwm_output_dshot_shared.c \
-            drivers/serial_uart_stdperiph.c \
-            drivers/serial_uart_stm32f4xx.c \
-            drivers/system_stm32f4xx.c \
-            drivers/timer_stm32f4xx.c \
-            drivers/persistent.c
+            accgyro_mpu.c \
+            bus_spi_stdperiph.c \
+            dma_stm32f4xx.c \
+            dshot_bitbang.c \
+            dshot_bitbang_decode.c \
+            dshot_bitbang_stdperiph.c \
+            inverter.c \
+            pwm_output_dshot.c \
+            pwm_output_dshot_shared.c \
+            serial_uart_stdperiph.c \
+            serial_uart_stm32f4xx.c \
+            system_stm32f4xx.c \
+            timer_stm32f4xx.c \
+            persistent.c
 
 VCP_SRC = \
             vcpf4/stm32f4xx_it.c \
@@ -125,8 +125,8 @@ VCP_SRC = \
             vcpf4/usbd_desc.c \
             vcpf4/usbd_usr.c \
             vcpf4/usbd_cdc_vcp.c \
-            drivers/serial_usb_vcp.c \
-            drivers/usb_io.c
+            serial_usb_vcp.c \
+            usb_io.c
 
 DSP_LIB := $(ROOT)/lib/CMSIS/DSP
 DEVICE_FLAGS += -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1 -DUNALIGNED_SUPPORT_DISABLE -DARM_MATH_CM4

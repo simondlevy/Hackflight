@@ -317,9 +317,9 @@
 #include <string.h>
 #include "stm32f4xx.h"
 #include "system_stm32f4xx.h"
-#include "drivers/systemdev.h"
-#include "drivers/platform.h"
-#include "drivers/persistent.h"
+#include "systemdev.h"
+#include "platform.h"
+#include "persistent.h"
 
 #define ARRAYLEN(x) (sizeof(x) / sizeof((x)[0]))
 

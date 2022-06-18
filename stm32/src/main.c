@@ -27,20 +27,20 @@
 #include <sensors.h>
 #include <serial.h>
 
-#include "drivers/bus_spi.h"
-#include "drivers/dshot_command.h"
-#include "drivers/exti.h"
-#include "drivers/flash.h"
-#include "drivers/inverter.h"
-#include "drivers/io.h"
-#include "drivers/light_led.h"
-#include "drivers/motordev.h"
-#include "drivers/pinio.h"
-#include "drivers/serialdev.h"
-#include "drivers/serial_uart.h"
-#include "drivers/systemdev.h"
-#include "drivers/timer.h"
-#include "drivers/usb_io.h"
+#include "bus_spi.h"
+#include "dshot_command.h"
+#include "exti.h"
+#include "flash.h"
+#include "inverter.h"
+#include "io.h"
+#include "light_led.h"
+#include "motordev.h"
+#include "pinio.h"
+#include "serialdev.h"
+#include "serial_uart.h"
+#include "systemdev.h"
+#include "timer.h"
+#include "usb_io.h"
 
 
 int main(void)

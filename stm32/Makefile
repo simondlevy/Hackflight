@@ -121,9 +121,6 @@ endif
 
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
-            accel.c \
-            imu_fusion.c \
-            main.c \
             $(SRC_DIR)/arming.c \
             $(SRC_DIR)/debug.c \
             $(SRC_DIR)/failsafe.c \
@@ -135,33 +132,36 @@ COMMON_SRC = \
             $(SRC_DIR)/msp.c \
             $(SRC_DIR)/rx.c \
             $(SRC_DIR)/sbus.c \
+            accel.c \
+            accgyro_spi_mpu6000.c \
+            imu_fusion.c \
+            main.c \
+            dshot.c \
+            dshot_dpwm.c \
+            dshot_command.c \
+            bus.c \
+            bus_spi.c \
+            bus_spi_config.c \
+            bus_spi_pinconfig.c \
+            dma_common.c \
+            dma_reqmap.c \
+            exti.c \
+            flash.c \
+            io.c \
+            light_led.c \
+            motor.c \
+            pinio.c \
+            rcc.c \
+            serial.c \
+            serial_uart.c \
+            serial_uart_pinconfig.c \
+            system.c \
+            timer_common.c \
+            timer.c \
+            pwm_output.c \
             $(addprefix pg/, $(notdir $(wildcard $(STM_SRC_DIR)/pg/*.c))) \
             $(addprefix common/,$(notdir $(wildcard $(STM_SRC_DIR)/common/*.c))) \
-            $(addprefix config/,$(notdir $(wildcard $(STM_SRC_DIR)/config/*.c))) \
-            drivers/dshot.c \
-            drivers/dshot_dpwm.c \
-            drivers/dshot_command.c \
-            drivers/bus.c \
-            drivers/bus_spi.c \
-            drivers/bus_spi_config.c \
-            drivers/bus_spi_pinconfig.c \
-            drivers/dma_common.c \
-            drivers/dma_reqmap.c \
-            drivers/exti.c \
-            drivers/io.c \
-            drivers/light_led.c \
-            drivers/motor.c \
-            drivers/pinio.c \
-            drivers/rcc.c \
-            drivers/serial.c \
-            drivers/serial_uart.c \
-            drivers/serial_uart_pinconfig.c \
-            drivers/system.c \
-            drivers/timer_common.c \
-            drivers/timer.c \
-            drivers/pwm_output.c \
-            drivers/accgyro_spi_mpu6000.c \
-            drivers/flash.c
+            $(addprefix config/,$(notdir $(wildcard $(STM_SRC_DIR)/config/*.c)))
 
 COMMON_DEVICE_SRC =  $(CMSIS_SRC) $(DEVICE_STDPERIPH_SRC)
 COMMON_SRC := $(COMMON_SRC) $(COMMON_DEVICE_SRC)

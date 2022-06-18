@@ -25,7 +25,7 @@
 #include "usb_bsp.h"
 #include "usbd_conf.h"
 #include "stm32f4xx_conf.h"
-#include "../drivers/nvic.h"
+#include "../nvic.h"
 
 void USB_OTG_BSP_ConfigVBUS(USB_OTG_CORE_HANDLE *pdev) {
     (void)pdev;

@@ -57,13 +57,13 @@ static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;
 // Some tasks have occasional peaks in execution time so normal moving average
 // duration estimation doesn't work Decay the estimated max task duration by
 // 1/(1 << TASK_EXEC_TIME_SHIFT) on every invocation
-static const uint32_t TASK_EXEC_TIME_SHIFT =   7;
+static const uint32_t TASK_EXEC_TIME_SHIFT = 7;
 
 // Make aged tasks more schedulable
-static const uint32_t TASK_AGE_EXPEDITE_COUNT =   1;   
+static const uint32_t TASK_AGE_EXPEDITE_COUNT = 1;   
 
 // By scaling their expected execution time
-static const float    TASK_AGE_EXPEDITE_SCALE =   0.9; 
+static const float TASK_AGE_EXPEDITE_SCALE = 0.9; 
 
 // Gyro interrupt counts over which to measure loop time and skew
 static const uint32_t GYRO_RATE_COUNT = 25000;
@@ -349,11 +349,11 @@ void hackflightStep(hackflight_t * hf)
 {
     scheduler_t * scheduler = &hf->scheduler;
 
-    // Realtime gyro/filtering/PID tasks get complete priority
-    uint32_t nowCycles = systemGetCycleCounter();
-
     uint32_t nextTargetCycles =
         scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
+
+    // Realtime gyro/filtering/PID tasks get complete priority
+    uint32_t nowCycles = systemGetCycleCounter();
 
     int32_t loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
@@ -379,19 +379,19 @@ void hackflightStep(hackflight_t * hf)
         checkCoreTasks(hf, loopRemainingCycles, nowCycles, nextTargetCycles);
     }
 
-    loopRemainingCycles = cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
+    int32_t newLoopRemainingCyles = cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     /*
-    debugPrintf("%10u %10u [%10d %10d]: %u\n",
+    debugPrintf("%10u %10u %10d %10d: %u\n",
             nextTargetCycles,
             systemGetCycleCounter(),
-            loopRemainingCycles,
+            newLoopRemainingCyles,
             scheduler->guardMargin,
-            loopRemainingCycles > scheduler->guardMargin);
+            newLoopRemainingCyles > scheduler->guardMargin);
             */
 
-    if (loopRemainingCycles > scheduler->guardMargin) {
-        checkDynamicTasks(hf, loopRemainingCycles, nextTargetCycles);
+    if (newLoopRemainingCyles > scheduler->guardMargin) {
+        checkDynamicTasks(hf, newLoopRemainingCyles, nextTargetCycles);
     }
 }
 
