@@ -319,6 +319,11 @@ void gyroDevInit(void)
     gyroDev.initFn(&gyroDev);
 }
 
+uint32_t gyroDevGetRate(void)
+{
+    return 8000;
+}
+
 float gyroScale(void)
 {
     return gyroDev.scale;

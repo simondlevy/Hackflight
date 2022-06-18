@@ -19,10 +19,7 @@
 #pragma once
 
 #include "datatypes.h"
-
-static CONST uint32_t GYRO_RATE = 8000;
-
-static CONST uint32_t GYRO_PERIOD() { return 1000000 / GYRO_RATE; }
+#include "gyro_rate.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -35,6 +32,7 @@ extern "C" {
     // For hardware impelmentations ------------------------------------------------------
 
     void     gyroDevInit(void);
+    uint32_t gyroDevGetRate(void);
     void     gyroInit(hackflight_t * hf);
     uint32_t gyroInterruptCount(void);
     bool     gyroIsReady(void);
