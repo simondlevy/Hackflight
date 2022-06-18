@@ -16,11 +16,20 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-struct Data1 
+struct VehicleState 
 {
-    a: i32,
-    b: f64,
-    c: String
+    x:      f32,
+    dx:     f32,
+    y:      f32,
+    dy:     f32,
+    z:      f32,
+    dz:     f32,
+    phi:    f32,
+    dphi:   f32,
+    theta:  f32,
+    dtheta: f32,
+    psi:    f32,
+    dpsi:   f32
 }
 
 fn main() {
