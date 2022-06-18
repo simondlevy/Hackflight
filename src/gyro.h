@@ -36,7 +36,7 @@ extern "C" {
 
     void     gyroDevInit(void);
     void     gyroInit(hackflight_t * hf);
-    uint32_t gyroInterruptTime(void);
+    uint32_t gyroInterruptCount(void);
     bool     gyroIsReady(void);
     int16_t  gyroReadRaw(uint8_t k);
     float    gyroScale(void);

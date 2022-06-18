@@ -46,13 +46,13 @@ static float _quat[4];
 
 static int16_t _gyro_adc[3];
 
-static uint32_t _gyro_interrupt_time;
+static uint32_t _gyro_interrupt_count;
 
 extern "C" {
 
 uint32_t gyroInterruptTime(void)
 {
-    return _gyro_interrupt_time;
+    return _gyro_interrupt_count;
 }
 
 // Called in the fast inner loop
@@ -68,7 +68,7 @@ bool gyroIsReady(void)
         _usfsmax.update();
         _usfsmax.readGyroAdc(_gyro_adc);
         _gotInterrupt = false;
-        _gyro_interrupt_time = micros();
+        _gyro_interrupt_count++;
 
         if (_usfsmax.gotQuat()) {
             _usfsmax.readQuat(_quat);

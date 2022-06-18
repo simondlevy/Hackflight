@@ -172,11 +172,11 @@ static void checkCoreTasks(
     static int32_t _sampleRateStartCycles;
 
     if ((_terminalGyroRateCount == 0)) {
-        _terminalGyroRateCount = gyroInterruptTime() + GYRO_RATE_COUNT;
+        _terminalGyroRateCount = gyroInterruptCount() + GYRO_RATE_COUNT;
         _sampleRateStartCycles = nowCycles;
     }
 
-    if (gyroInterruptTime() >= _terminalGyroRateCount) {
+    if (gyroInterruptCount() >= _terminalGyroRateCount) {
         // Calculate the number of clock cycles on average between gyro interrupts
         uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
         scheduler->desiredPeriodCycles = sampleCycles / GYRO_RATE_COUNT;
@@ -193,10 +193,10 @@ static void checkCoreTasks(
     _gyroSkewAccum += gyroSkew;
 
     if ((_terminalGyroLockCount == 0)) {
-        _terminalGyroLockCount = gyroInterruptTime() + GYRO_LOCK_COUNT;
+        _terminalGyroLockCount = gyroInterruptCount() + GYRO_LOCK_COUNT;
     }
 
-    if (gyroInterruptTime() >= _terminalGyroLockCount) {
+    if (gyroInterruptCount() >= _terminalGyroLockCount) {
         _terminalGyroLockCount += GYRO_LOCK_COUNT;
 
         // Move the desired start time of the gyroSampleTask
@@ -381,12 +381,14 @@ void hackflightStep(hackflight_t * hf)
 
     int32_t newLoopRemainingCyles = cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
+    /*
     debugPrintf("%10u %10u %10d %10d: %u\n",
             nextTargetCycles,
             systemGetCycleCounter(),
             newLoopRemainingCyles,
             scheduler->guardMargin,
             newLoopRemainingCyles > scheduler->guardMargin);
+            */
 
     if (newLoopRemainingCyles > scheduler->guardMargin) {
         checkDynamicTasks(hf, newLoopRemainingCyles, nextTargetCycles);

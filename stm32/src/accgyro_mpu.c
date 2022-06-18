@@ -324,7 +324,7 @@ float gyroScale(void)
     return gyroDev.scale;
 }
 
-uint32_t gyroInterruptTime(void)
+uint32_t gyroInterruptCount(void)
 {
     return gyroDev.detectedEXTI;
 }
