@@ -142,7 +142,7 @@ static void executeTask(hackflight_t * hf, task_t *task, uint32_t currentTimeUs)
 
 static void checkCoreTasks(
         hackflight_t * hf,
-        int32_t schedLoopRemainingCycles,
+        int32_t loopRemainingCycles,
         uint32_t nowCycles,
         uint32_t nextTargetCycles)
 {
@@ -152,9 +152,9 @@ static void checkCoreTasks(
         scheduler->loopStartCycles -= scheduler->loopStartDeltaDownCycles;
     }
 
-    while (schedLoopRemainingCycles > 0) {
+    while (loopRemainingCycles > 0) {
         nowCycles = systemGetCycleCounter();
-        schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+        loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
     }
 
     hackflightRunCoreTasks(hf);
@@ -227,7 +227,7 @@ static void adjustAndUpdateTask(
 
 static void checkDynamicTasks(
         hackflight_t * hf,
-        int32_t schedLoopRemainingCycles,
+        int32_t loopRemainingCycles,
         uint32_t nextTargetCycles)
 {
     task_t *selectedTask = NULL;
@@ -258,14 +258,14 @@ static void checkDynamicTasks(
             (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
 
         uint32_t nowCycles = systemGetCycleCounter();
-        schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+        loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
         scheduler_t * scheduler = &hf->scheduler;
 
         // Allow a little extra time
         taskRequiredTimeCycles += scheduler->taskGuardCycles;
 
-        if (taskRequiredTimeCycles < schedLoopRemainingCycles) {
+        if (taskRequiredTimeCycles < loopRemainingCycles) {
             uint32_t antipatedEndCycles = nowCycles + taskRequiredTimeCycles;
             executeTask(hf, selectedTask, currentTimeUs);
             nowCycles = systemGetCycleCounter();
@@ -355,43 +355,43 @@ void hackflightStep(hackflight_t * hf)
     uint32_t nextTargetCycles =
         scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
 
-    int32_t schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+    int32_t loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
-    if (schedLoopRemainingCycles < -scheduler->desiredPeriodCycles) {
+    if (loopRemainingCycles < -scheduler->desiredPeriodCycles) {
         // A task has so grossly overrun that at entire gyro cycle has been
         // skipped This is most likely to occur when connected to the
         // configurator via USB as the serial task is non-deterministic Recover
         // as best we can, advancing scheduling by a whole number of cycles
         nextTargetCycles += scheduler->desiredPeriodCycles * (1 +
-                (schedLoopRemainingCycles / -scheduler->desiredPeriodCycles));
-        schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+                (loopRemainingCycles / -scheduler->desiredPeriodCycles));
+        loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
     }
 
     // Tune out the time lost between completing the last task execution and
     // re-entering the scheduler
-    if ((schedLoopRemainingCycles < scheduler->loopStartMinCycles) &&
+    if ((loopRemainingCycles < scheduler->loopStartMinCycles) &&
             (scheduler->loopStartCycles < scheduler->loopStartMaxCycles)) {
         scheduler->loopStartCycles += scheduler->loopStartDeltaUpCycles;
     }
 
     // Once close to the timing boundary, poll for its arrival
-    if (schedLoopRemainingCycles < scheduler->loopStartCycles) {
-        checkCoreTasks(hf, schedLoopRemainingCycles, nowCycles, nextTargetCycles);
+    if (loopRemainingCycles < scheduler->loopStartCycles) {
+        checkCoreTasks(hf, loopRemainingCycles, nowCycles, nextTargetCycles);
     }
 
-    schedLoopRemainingCycles = cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
+    loopRemainingCycles = cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     /*
     debugPrintf("%10u %10u [%10d %10d]: %u\n",
             nextTargetCycles,
             systemGetCycleCounter(),
-            schedLoopRemainingCycles,
+            loopRemainingCycles,
             scheduler->guardMargin,
-            schedLoopRemainingCycles > scheduler->guardMargin);
+            loopRemainingCycles > scheduler->guardMargin);
             */
 
-    if (schedLoopRemainingCycles > scheduler->guardMargin) {
-        checkDynamicTasks(hf, schedLoopRemainingCycles, nextTargetCycles);
+    if (loopRemainingCycles > scheduler->guardMargin) {
+        checkDynamicTasks(hf, loopRemainingCycles, nextTargetCycles);
     }
 }
 
