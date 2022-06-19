@@ -21,7 +21,7 @@
 #include <math.h>
 
 #include "arming.h"
-#include "core_rate.h"
+#include "core_dt.h"
 #include "datatypes.h"
 #include "failsafe.h"
 #include "led.h"

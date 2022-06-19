@@ -23,7 +23,7 @@
 
 #include "datatypes.h"
 #include "debug.h"
-#include "core_rate.h"
+#include "core_dt.h"
 #include "pt1_filter.h"
 #include "pt3_filter.h"
 #include "rx_rate.h"

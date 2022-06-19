@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include "datatypes.h" // for CONST
+#include "core_rate.h"
 
-//static CONST uint32_t CORE_RATE = 8000;
-static CONST uint32_t CORE_RATE = 10000;
-
-static CONST uint32_t CORE_PERIOD() { return 1000000 / CORE_RATE; }
+static CONST float CORE_DT() { return CORE_PERIOD() * 1e-6f; }
