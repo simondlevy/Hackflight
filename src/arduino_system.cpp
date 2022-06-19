@@ -13,11 +13,6 @@ uint32_t systemClockMicrosToCycles(uint32_t usec)
     return microsecondsToClockCycles(usec);
 }
 
-uint32_t systemGetCycleCounter(void)
-{
-    return DWT->CYCCNT;
-}
-
 void systemReboot(void)
 {
     // unsued

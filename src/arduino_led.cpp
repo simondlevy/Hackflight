@@ -18,60 +18,25 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <Arduino.h>
 
-#include <motor.h>
+#include "led.h"
 
-void motorCheckDshotBitbangStatus(void)
+static bool _on;
+static uint8_t _pin;
+
+void ledInit(uint8_t pin)
 {
+    _pin = pin;
+    pinMode(_pin, OUTPUT);
 }
 
-bool motorCheckDshotReady(uint32_t currentTime, uint8_t * tryingToArm)
+void ledSet(bool on)
 {
-    (void)currentTime;
-    (void)tryingToArm;
-    return false;
+    digitalWrite(_pin, on);
+    _on = on;
 }
 
-float motorConvertFromExternal(uint16_t externalValue)
+void ledToggle(void)
 {
-    (void)externalValue;
-    return 0;
-}
-
-bool motorDshotStreamingCommandsAreEnabled(void)
-{
-    return false;
-}
-
-
-bool motorIsProtocolDshot(void)
-{
-    return false;
-}
-
-bool motorIsProtocolEnabled(void)
-{
-    return false;
-}
-
-float motorValueDisarmed(void)
-{
-    return 0;
-}
-
-float motorValueHigh(void)
-{
-    return 1;
-}
-
-float motorValueLow(void)
-{
-    return 0;
-}
-
-void motorStop(void)
-{
-}
-
-void motorWrite(float *values)
-{
+    _on = !_on;
+    ledSet(_on);
 }

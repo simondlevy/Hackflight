@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <Arduino.h>
 #include <Wire.h>
 
-#include <hackflight.h>
+#include <hackflight_full.h>
 
 static hackflight_t _hf;
 
@@ -29,7 +29,7 @@ void setup(void)
     delay(100);
 
     // Always use Serial1 for receiver, no no need to specify
-    hackflightFullInit(&_hf, SERIAL_PORT_NONE);
+    hackflightInitFull(&_hf, SERIAL_PORT_NONE, A4);
 
     // Setup system clock ------------------------------------
 

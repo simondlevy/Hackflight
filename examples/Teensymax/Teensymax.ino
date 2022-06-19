@@ -29,7 +29,7 @@ void setup(void)
     delay(100);
 
     // Always use Serial1 for receiver, no no need to specify
-    hackflightFullInit(&_hf, SERIAL_PORT_NONE);
+    hackflightInitFull(&_hf, SERIAL_PORT_NONE, 13);
 }
 
 void loop(void)
