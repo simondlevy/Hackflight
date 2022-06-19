@@ -132,6 +132,7 @@ COMMON_SRC = \
             $(SRC_DIR)/msp.c \
             $(SRC_DIR)/rx.c \
             $(SRC_DIR)/sbus.c \
+            $(SRC_DIR)/stm32_clock.c \
             accel.c \
             accgyro_spi_mpu6000.c \
             imu_fusion.c \

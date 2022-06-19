@@ -20,6 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <Wire.h>
 
 #include <hackflight_full.h>
+#include <stm32_clock.h>
 
 static hackflight_t _hf;
 
@@ -31,15 +32,7 @@ void setup(void)
     // Always use Serial1 for receiver, no no need to specify
     hackflightInitFull(&_hf, SERIAL_PORT_NONE, A4);
 
-    // Setup system clock ------------------------------------
-
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-
-    __O uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
-    *(DWTLAR) = 0xC5ACCE55;
-    
-    DWT->CYCCNT = 0;
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+    stm32_startCycleCounter();
 }
 
 void loop(void)

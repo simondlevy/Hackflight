@@ -32,8 +32,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 // B2.3.10  "LSR and LAR, Software Lock Status Register and Software Lock Access Register"
 // "E1.2.11  LAR, Lock Access Register"
 
-#define DWT_LAR_UNLOCK_VALUE 0xC5ACCE55
-
 // cycles per microsecond
 static uint32_t usTicks = 0;
 // current uptime for 1kHz systick timer. will rollover after 49 days. hopefully we won't care.
@@ -52,11 +50,8 @@ void systemCycleCounterInit(void)
 
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 
-    __O uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
-    *(DWTLAR) = DWT_LAR_UNLOCK_VALUE;
-
-    DWT->CYCCNT = 0;
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+    void stm32_startCycleCounter(void);
+    stm32_startCycleCounter();
 }
 
 // SysTick
@@ -118,11 +113,6 @@ uint32_t micros(void)
     } while (ms != sysTickUptime || cycle_cnt > sysTickValStamp);
 
     return (ms * 1000) + (usTicks * 1000 - cycle_cnt) / usTicks;
-}
-
-uint32_t systemGetCycleCounter(void)
-{
-    return DWT->CYCCNT;
 }
 
 uint32_t systemClockMicrosToCycles(uint32_t micros)
