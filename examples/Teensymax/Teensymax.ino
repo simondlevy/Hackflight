@@ -20,6 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <Wire.h>
 
 #include <hackflight_full.h>
+#include <teensy_clock.h>
 
 static hackflight_t _hf;
 
@@ -27,6 +28,8 @@ void setup(void)
 {
     Wire.begin();
     delay(100);
+
+    teensy_startCycleCounter();
 
     // Always use Serial1 for receiver, no no need to specify
     hackflightInitFull(&_hf, SERIAL_PORT_NONE, 13);

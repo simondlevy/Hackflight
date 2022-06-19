@@ -14,36 +14,4 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if defined(STM32F4) ||  defined(STM32L432xx) || defined(STM32L433xx) || defined(STM32L442xx) || defined(STM32L443xx)
-
-#if defined(ARDUINO)
-#include <Arduino.h>
-#else
-#include "stm32f4xx.h"
-#endif
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-    void stm32_startCycleCounter(void)
-    {
-        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-
-        __O uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
-        *(DWTLAR) = 0xC5ACCE55;
-
-        DWT->CYCCNT = 0;
-        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-    }
-
-    uint32_t systemGetCycleCounter(void)
-    {
-        return DWT->CYCCNT;
-    }
-
-#if defined(__cplusplus)
-}
-#endif
-
-#endif
+void teensy_startCycleCounter(void);
