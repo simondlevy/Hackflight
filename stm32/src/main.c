@@ -20,8 +20,8 @@
 #include <stdbool.h>
 
 #include <accel.h>
+#include <core_rate.h>
 #include <datatypes.h>
-#include <gyro_rate.h>
 #include <hackflight_full.h>
 #include <imu.h>
 #include <sensors.h>
@@ -57,7 +57,7 @@ int main(void)
     spiPinConfigure();
     spiPreInit();
     spiInit(0x07); // mask for devices 0,1,2
-    dshotSetPidLoopTime(GYRO_PERIOD());
+    dshotSetPidLoopTime(CORE_PERIOD());
     pinioInit();
     usbCableDetectInit();
     flashInit();

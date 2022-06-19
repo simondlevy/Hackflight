@@ -23,7 +23,7 @@
 
 #include "datatypes.h"
 #include "debug.h"
-#include "dt.h"
+#include "core_rate.h"
 #include "pt1_filter.h"
 #include "pt3_filter.h"
 #include "rx_rate.h"
@@ -64,7 +64,7 @@ static const uint8_t FEEDFORWARD_MAX_RATE_LIMIT = 90;
 static const uint8_t DYN_LPF_CURVE_EXPO = 5;
 
 
-static CONST float FREQUENCY() {return 1.0f / DT(); }
+static CONST float FREQUENCY() {return 1.0f / CORE_DT(); }
 
 // Scale factors to make best use of range with D_LPF debugging, aiming for max
 // +/-16K as debug values are 16 bit
@@ -89,8 +89,8 @@ static const float LEVEL_ANGLE_LIMIT = 45;
 extern "C" {
 #endif
 
-    static CONST float MAX_VELOCITY_CYCLIC() { return RATE_ACCEL_LIMIT * 100 * DT(); }
-    static CONST float MAX_VELOCITY_YAW()    { return YAW_RATE_ACCEL_LIMIT * 100 * DT(); }
+    static CONST float MAX_VELOCITY_CYCLIC() { return RATE_ACCEL_LIMIT * 100 * CORE_DT(); }
+    static CONST float MAX_VELOCITY_YAW()    { return YAW_RATE_ACCEL_LIMIT * 100 * CORE_DT(); }
 
     static float pt2FilterApply(pt2Filter_t *filter, float input)
     {
@@ -204,7 +204,7 @@ extern "C" {
             dynLpfCutoffFreq(throttle, dyn_lpf_min, dyn_lpf_max, DYN_LPF_CURVE_EXPO);
 
         for (uint8_t axis = 0; axis < 3; axis++) {
-            pid->dtermLowpass[axis].pt1Filter.k = pt1FilterGain(cutoffFreq, DT());
+            pid->dtermLowpass[axis].pt1Filter.k = pt1FilterGain(cutoffFreq, CORE_DT());
 
         }
     }
@@ -270,19 +270,19 @@ extern "C" {
 
         for (uint8_t axis = 0; axis <= 2; axis++) {
             pt1FilterInit(&pid->dtermLowpass[axis].pt1Filter,
-                    pt1FilterGain(dterm_lpf1_init_hz, DT()));
+                    pt1FilterGain(dterm_lpf1_init_hz, CORE_DT()));
         }
 
         // 2nd Dterm Lowpass Filter
         for (uint8_t axis = 0; axis <= 2; axis++) {
             pt1FilterInit(&pid->dtermLowpass2[axis].pt1Filter,
-                    pt1FilterGain(DTERM_LPF2_HZ, DT()));
+                    pt1FilterGain(DTERM_LPF2_HZ, CORE_DT()));
         }
 
-        pt1FilterInit(&pid->ptermYawLowpass, pt1FilterGain(YAW_LOWPASS_HZ, DT()));
+        pt1FilterInit(&pid->ptermYawLowpass, pt1FilterGain(YAW_LOWPASS_HZ, CORE_DT()));
 
         for (int i = 0; i < 3; i++) {
-            pt1FilterInit(&pid->windupLpf[i], pt1FilterGain(ITERM_RELAX_CUTOFF, DT()));
+            pt1FilterInit(&pid->windupLpf[i], pt1FilterGain(ITERM_RELAX_CUTOFF, CORE_DT()));
         }
 
         // Initialize the filters for all axis even if the d_min[axis] value is 0
@@ -290,9 +290,9 @@ extern "C" {
         // in-flight adjustments and transition from 0 to > 0 in flight the feature
         // won't work because the filter wasn't initialized.
         for (uint8_t axis = 0; axis <= 2; axis++) {
-            pt2FilterInit(&pid->dMinRange[axis], pt2FilterGain(D_MIN_RANGE_HZ, DT()));
+            pt2FilterInit(&pid->dMinRange[axis], pt2FilterGain(D_MIN_RANGE_HZ, CORE_DT()));
             pt2FilterInit(&pid->dMinLowpass[axis],
-                    pt2FilterGain(D_MIN_LOWPASS_HZ, DT()));
+                    pt2FilterGain(D_MIN_LOWPASS_HZ, CORE_DT()));
         }
     }
 
@@ -307,7 +307,7 @@ extern "C" {
         angle_pid_t * pid = (angle_pid_t *)data;
 
         // gradually scale back integration when above windup point
-        float dynCi = DT();
+        float dynCi = CORE_DT();
         const float itermWindupPointInv = 1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
         if (itermWindupPointInv > 1.0f) {
             dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
@@ -383,7 +383,7 @@ extern "C" {
             // if launch control is active override the iterm gains and apply iterm
             // windup protection to all axes
             float Ki = pid->k_rate_i * ((axis == 2 && !USE_INTEGRATED_YAW) ? 2.5 : 1);
-            float axisDynCi = (axis == 2) ? dynCi : DT(); // check windup for yaw only
+            float axisDynCi = (axis == 2) ? dynCi : CORE_DT(); // check windup for yaw only
 
             pid->data[axis].I =
                 constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
@@ -480,9 +480,9 @@ extern "C" {
                 pid->data[axis].D +
                 pid->data[axis].F;
             if (axis == 2 && USE_INTEGRATED_YAW) {
-                pid->data[axis].Sum += pidSum * DT() * 100.0f;
+                pid->data[axis].Sum += pidSum * CORE_DT() * 100.0f;
                 pid->data[axis].Sum -= pid->data[axis].Sum *
-                    INTEGRATED_YAW_RELAX / 100000.0f * DT() / 0.000125f;
+                    INTEGRATED_YAW_RELAX / 100000.0f * CORE_DT() / 0.000125f;
             } else {
                 pid->data[axis].Sum = pidSum;
             }

@@ -66,7 +66,7 @@ static const uint32_t TASK_AGE_EXPEDITE_COUNT = 1;
 static const float TASK_AGE_EXPEDITE_SCALE = 0.9; 
 
 // Gyro interrupt counts over which to measure loop time and skew
-static const uint32_t GYRO_RATE_COUNT = 25000;
+static const uint32_t CORE_RATE_COUNT = 25000;
 static const uint32_t GYRO_LOCK_COUNT = 400;
 
 // MSP task ---------------------------------------------------------------------
@@ -172,16 +172,16 @@ static void checkCoreTasks(
     static int32_t _sampleRateStartCycles;
 
     if ((_terminalGyroRateCount == 0)) {
-        _terminalGyroRateCount = gyroInterruptCount() + GYRO_RATE_COUNT;
+        _terminalGyroRateCount = gyroInterruptCount() + CORE_RATE_COUNT;
         _sampleRateStartCycles = nowCycles;
     }
 
     if (gyroInterruptCount() >= _terminalGyroRateCount) {
         // Calculate the number of clock cycles on average between gyro interrupts
         uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-        scheduler->desiredPeriodCycles = sampleCycles / GYRO_RATE_COUNT;
+        scheduler->desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
         _sampleRateStartCycles = nowCycles;
-        _terminalGyroRateCount += GYRO_RATE_COUNT;
+        _terminalGyroRateCount += CORE_RATE_COUNT;
     }
 
     // Track the actual gyro rate over given number of cycle times and remove skew
@@ -338,7 +338,7 @@ void hackflightInitFull(hackflight_t * hf, serialPortIdentifier_e rxPort, uint8_
 
     scheduler->nextTimingCycles = scheduler->lastTargetCycles;
 
-    scheduler->desiredPeriodCycles = (int32_t)systemClockMicrosToCycles(GYRO_PERIOD());
+    scheduler->desiredPeriodCycles = (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
 
     scheduler->guardMargin = (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
 

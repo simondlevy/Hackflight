@@ -21,8 +21,8 @@
 #include <math.h>
 
 #include "arming.h"
+#include "core_rate.h"
 #include "datatypes.h"
-#include "dt.h"
 #include "failsafe.h"
 #include "led.h"
 #include "maths.h"
@@ -509,9 +509,9 @@ static void ratePidFeedforwardLpfInit(angle_pid_t * pid, uint16_t filterCutoff)
 {
     if (filterCutoff > 0) {
         pid->feedforwardLpfInitialized = true;
-        pt3FilterInit(&pid->feedforwardPt3[0], pt3FilterGain(filterCutoff, DT()));
-        pt3FilterInit(&pid->feedforwardPt3[1], pt3FilterGain(filterCutoff, DT()));
-        pt3FilterInit(&pid->feedforwardPt3[2], pt3FilterGain(filterCutoff, DT()));
+        pt3FilterInit(&pid->feedforwardPt3[0], pt3FilterGain(filterCutoff, CORE_DT()));
+        pt3FilterInit(&pid->feedforwardPt3[1], pt3FilterGain(filterCutoff, CORE_DT()));
+        pt3FilterInit(&pid->feedforwardPt3[2], pt3FilterGain(filterCutoff, CORE_DT()));
     }
 }
 
@@ -520,7 +520,7 @@ static void ratePidFeedforwardLpfUpdate(angle_pid_t * pid, uint16_t filterCutoff
     if (filterCutoff > 0) {
         for (uint8_t axis=ROLL; axis<=YAW; axis++) {
             pt3FilterUpdateCutoff(&pid->feedforwardPt3[axis],
-                    pt3FilterGain(filterCutoff, DT()));
+                    pt3FilterGain(filterCutoff, CORE_DT()));
         }
     }
 }
@@ -573,7 +573,7 @@ static void smoothingFilterApply(
 static void setSmoothingFilterCutoffs(angle_pid_t * ratepid,
         rxSmoothingFilter_t *smoothingFilter)
 {
-    const float dT = GYRO_PERIOD() * 1e-6f;
+    const float dT = CORE_PERIOD() * 1e-6f;
     uint16_t oldCutoff = smoothingFilter->setpointCutoffFrequency;
 
     if (smoothingFilter->setpointCutoffSetting == 0) {

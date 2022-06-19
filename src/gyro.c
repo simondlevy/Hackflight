@@ -17,6 +17,7 @@
  */
 
 #include "align_sensor.h"
+#include "core_rate.h"
 #include "datatypes.h"
 #include "pt1_filter.h"
 #include "gyro.h"
@@ -35,7 +36,7 @@ extern "C" {
 
 static int32_t gyroCalculateCalibratingCycles(void)
 {
-    return (CALIBRATION_DURATION * 10000) / GYRO_PERIOD();
+    return (CALIBRATION_DURATION * 10000) / CORE_PERIOD();
 }
 
 static float nullFilterApply(filter_t *filter, float input)
@@ -137,13 +138,13 @@ void gyroInit(hackflight_t * hf)
 {
     gyro_t * gyro = &hf->gyro;
 
-    initLowpassFilterLpf(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ, GYRO_PERIOD());
+    initLowpassFilterLpf(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ, CORE_PERIOD());
 
     gyro->downsampleFilterEnabled = initLowpassFilterLpf(
             gyro,
             FILTER_LPF2,
             LPF2_STATIC_HZ,
-            GYRO_PERIOD()
+            CORE_PERIOD()
             );
 
     setCalibrationCycles(gyro); // start calibrating

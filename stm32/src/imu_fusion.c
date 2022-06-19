@@ -22,6 +22,7 @@
 #include <math.h>
 
 #include "accel.h"
+#include "core_rate.h"
 #include "datatypes.h"
 #include "deg2rad.h"
 #include "gyro.h"
@@ -201,9 +202,9 @@ void imuAccumulateGyro(gyro_t * gyro)
     static float _adcf[3];
 
     // integrate using trapezium rule to avoid bias
-    gyro->accum.values.x += 0.5f * (_adcf[0] + gyro->dps_filtered[0]) * GYRO_PERIOD();
-    gyro->accum.values.y += 0.5f * (_adcf[1] + gyro->dps_filtered[1]) * GYRO_PERIOD();
-    gyro->accum.values.z += 0.5f * (_adcf[2] + gyro->dps_filtered[2]) * GYRO_PERIOD();
+    gyro->accum.values.x += 0.5f * (_adcf[0] + gyro->dps_filtered[0]) * CORE_PERIOD();
+    gyro->accum.values.y += 0.5f * (_adcf[1] + gyro->dps_filtered[1]) * CORE_PERIOD();
+    gyro->accum.values.z += 0.5f * (_adcf[2] + gyro->dps_filtered[2]) * CORE_PERIOD();
 
     gyro->accum.count++;
 
@@ -229,7 +230,7 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     int32_t deltaT = time - hf->imuFusionPrev.time;
 
     axes_t gyroAvg = {0};
-    getAverage(&hf->gyro.accum, GYRO_PERIOD(), &gyroAvg);
+    getAverage(&hf->gyro.accum, CORE_PERIOD(), &gyroAvg);
 
     axes_t accelAvg = {0};
     getAverage(&hf->accelAccum, 1, &accelAvg);

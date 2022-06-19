@@ -19,7 +19,6 @@
 #pragma once
 
 #include "datatypes.h"
-#include "gyro_rate.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -32,7 +31,6 @@ extern "C" {
     // For hardware impelmentations ------------------------------------------------------
 
     void     gyroDevInit(void);
-    uint32_t gyroDevGetRate(void);
     void     gyroInit(hackflight_t * hf);
     uint32_t gyroInterruptCount(void);
     bool     gyroIsReady(void);

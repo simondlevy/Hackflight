@@ -20,6 +20,9 @@
 
 #include "datatypes.h"
 
-static CONST uint32_t GYRO_RATE = 8000;
+//static CONST uint32_t CORE_RATE = 8000;
+static CONST uint32_t CORE_RATE = 10000;
 
-static CONST uint32_t GYRO_PERIOD() { return 1000000 / GYRO_RATE; }
+static CONST uint32_t CORE_PERIOD() { return 1000000 / CORE_RATE; }
+
+static CONST float CORE_DT() { return CORE_PERIOD() * 1e-6f; }
