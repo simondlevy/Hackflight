@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 void ledFlash(uint8_t reps, uint16_t delayMs);
-void ledInit(void);
+void ledInit(uint8_t pin);
 void ledWarningDisable(void);
 void ledWarningUpdate(void);
 void ledWarningFlash(void);

@@ -17,26 +17,22 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "led.h"
 
 #include "io.h"
-#include "light_led.h"
 
-static IO_t leds[STATUS_LED_NUMBER];
+static IO_t led;
 
-void ledInit(void)
+void ledInit(uint8_t pin)
 {
-    leds[0] = IOGetByTag(37);
-    IOInit(leds[0], OWNER_LED, RESOURCE_INDEX(0));
-    IOConfigGPIO(leds[0], IOCFG_OUT_PP);
-
-    leds[1] = IO_NONE;
-    leds[2] = IO_NONE;
+    led = IOGetByTag(pin);
+    IOInit(led, OWNER_LED, RESOURCE_INDEX(0));
+    IOConfigGPIO(led, IOCFG_OUT_PP);
 }
 
 void ledToggle(void)
 {
-    IOToggle(leds[0]);
+    IOToggle(led);
 }
 
 void ledSet(bool on)
 {
-    IOWrite(leds[0], !on);
+    IOWrite(led, !on);
 }

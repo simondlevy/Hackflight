@@ -148,7 +148,7 @@ COMMON_SRC = \
             exti.c \
             flash.c \
             io.c \
-            light_led.c \
+            leddev.c \
             motor.c \
             pinio.c \
             rcc.c \

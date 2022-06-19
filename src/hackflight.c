@@ -289,7 +289,7 @@ static void checkDynamicTasks(
 
 // ----------------------------------------------------------------------------
 
-void hackflightFullInit(hackflight_t * hf, serialPortIdentifier_e rxPort)
+void hackflightInitFull(hackflight_t * hf, serialPortIdentifier_e rxPort, uint8_t ledPin)
 {
     // Tuning constants for angle PID controller
     static const float RATE_P  = 1.441305;
@@ -300,7 +300,7 @@ void hackflightFullInit(hackflight_t * hf, serialPortIdentifier_e rxPort)
 
     gyroInit(hf);
     imuInit(hf);
-    ledInit();
+    ledInit(ledPin);
     ledFlash(10, 50);
     failsafeInit();
     mspInit();
