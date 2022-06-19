@@ -26,7 +26,6 @@
 extern "C" {
 #endif
 
-
     void stm32_startCycleCounter(void)
     {
         CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
