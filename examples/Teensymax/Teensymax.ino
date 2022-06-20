@@ -32,7 +32,7 @@ void setup(void)
     teensy_startCycleCounter();
 
     // Always use Serial1 for receiver, no no need to specify
-    hackflightInitFull(&_hf, SERIAL_PORT_NONE, 13);
+    hackflightInitFull(&_hf, SERIAL_PORT_NONE, 23, 13);
 }
 
 void loop(void)
