@@ -37,10 +37,19 @@ bool serialIsTransmitBufferEmpty(void * port)
 
 void serialOpenPortSbus(serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
 {
-    // Always use Serial1
     (void)identifier;
-    Serial1.begin(100000, SERIAL_SBUS);
 
+    // Always use Serial1
+#if defined(TEENSYSUINO)
+    Serial1.begin(100000, SERIAL_8E2_RXINV_TXINV);
+#elif defined(STM32L496xx) || defined(STM32L476xx) || defined(STM32L433xx) || defined(STM32L432xx)
+    Serial1.begin(100000, SERIAL_SBUS);
+#elif defined(ESP32)
+    Serial1.begin(100000, SERIAL_8E2, rxpin, txpin, true);
+#else
+    Serial1.begin(100000, SERIAL_8E2);
+#endif
+ 
     _rxCallback = rxCallback;
 }
 
