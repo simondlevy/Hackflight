@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include "datatypes.h"
+#include "debug.h"
 #include "serial.h"
 #include "time.h"
 

@@ -39,7 +39,7 @@ void serialOpenPortSbus(serialPortIdentifier_e identifier, serialReceiveCallback
 {
     // Always use Serial1
     (void)identifier;
-    Serial1.begin(115200);
+    Serial1.begin(100000, SERIAL_SBUS);
 
     _rxCallback = rxCallback;
 }
