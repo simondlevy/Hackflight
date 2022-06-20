@@ -1,29 +1,86 @@
 /*
-Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2022 Simon D. Levy
 
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <strings.h>
 
 #include "arming.h"
+#include "failsafe.h"
 #include "led.h"
 #include "motor.h"
 #include "rx_throttle_status.h"
 
 static arming_t status;
+
+static void resetTryingToArm(uint8_t * tryingToArm)
+{
+    *tryingToArm = ARMING_DELAYED_DISARMED;
+}
+
+
+void armingCheck(
+        uint32_t currentTimeUs,
+        bool signalReceived,
+        float raw[],
+        bool imuIsLevel,
+        bool calibrating,
+        bool * armed)
+{
+    static uint8_t _disarmTicks;
+    static bool _doNotRepeat;
+    static uint8_t _tryingToArm;
+
+    if (isAux1Set(raw)) {
+        _disarmTicks = 0;
+
+        armingUpdateStatus(currentTimeUs, raw, imuIsLevel, calibrating, *armed);
+
+        if (!armingIsDisabled()) {
+            if (*armed) {
+                return;
+            }
+
+            if (!motorCheckDshotReady(currentTimeUs, &_tryingToArm)) {
+                return;
+            }
+
+            *armed = true;
+
+            resetTryingToArm(&_tryingToArm);
+
+        } else {
+            resetTryingToArm(&_tryingToArm);
+        }
+
+    } else {
+        resetTryingToArm(&_tryingToArm);
+        if (*armed && signalReceived && !failsafeIsActive()  ) {
+            _disarmTicks++;
+            if (_disarmTicks > 3) {
+                armingDisarm(*armed);
+                *armed = false;
+            }
+        }
+    }
+
+    if (!(*armed || _doNotRepeat || armingIsDisabled())) {
+        _doNotRepeat = true;
+    }
+}
 
 void armingDisarm(bool armed)
 {
@@ -45,34 +102,6 @@ bool armingIsDisabled(void)
 void armingSetDisabled(uint8_t flag)
 {
     status.disabledFlags |= (1 << flag);
-}
-
-void armingTryArm(
-        uint32_t currentTimeUs,
-        uint8_t * tryingToArm,
-        float raw[],
-        bool imuIsLevel,
-        bool calibrating,
-        bool * armed)
-{
-    armingUpdateStatus(currentTimeUs, raw, imuIsLevel, calibrating, *armed);
-
-    if (!armingIsDisabled()) {
-        if (*armed) {
-            return;
-        }
-
-        if (!motorCheckDshotReady(currentTimeUs, tryingToArm)) {
-            return;
-        }
-
-        *armed = true;
-
-        resetTryingToArm(tryingToArm);
-
-    } else {
-        resetTryingToArm(tryingToArm);
-    }
 }
 
 void armingUpdateStatus(

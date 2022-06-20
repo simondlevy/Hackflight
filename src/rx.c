@@ -790,37 +790,6 @@ static void processSmoothingFilter(
             rx->dataToSmooth.yaw, &setpointRate[3]);
 }
 
-static void processDataModes(
-        uint32_t currentTimeUs,
-        bool signalReceived,
-        float raw[],
-        bool imuIsLevel,
-        bool calibrating,
-        bool * armed)
-{
-    static uint8_t disarmTicks;
-    static bool doNotRepeat;
-    static uint8_t tryingToArm;
-
-    if (isAux1Set(raw)) {
-        disarmTicks = 0;
-        armingTryArm(currentTimeUs, &tryingToArm, raw, imuIsLevel, calibrating, armed); 
-    } else {
-        resetTryingToArm(&tryingToArm);
-        if (*armed && signalReceived && !failsafeIsActive()  ) {
-            disarmTicks++;
-            if (disarmTicks > 3) {
-                armingDisarm(*armed);
-                *armed = false;
-            }
-        }
-    }
-
-    if (!(*armed || doNotRepeat || armingIsDisabled())) {
-        doNotRepeat = true;
-    }
-}
-
 // ----------------------------------------------------------------------------
 
 static rx_t _rx;
@@ -896,7 +865,7 @@ void rxPoll(
             break;
 
         case RX_STATE_MODES:
-            processDataModes(currentTimeUs, _rx.signalReceived, _rx.raw, imuIsLevel,
+            armingCheck(currentTimeUs, _rx.signalReceived, _rx.raw, imuIsLevel,
                     calibrating, armed);
             _rx.state = RX_STATE_UPDATE;
             break;
