@@ -32,17 +32,17 @@ static void resetTryingToArm(uint8_t * tryingToArm)
     *tryingToArm = ARMING_DELAYED_DISARMED;
 }
 
-static uint8_t getDisableFlags(void)
+static bool readyToArm(void)
 {
-    return ffs(_status.disabledFlags);
+    return 
+        _status.acc_done_calibrating &&
+        _status.angle_okay &&
+        _status.arming_switch_okay &&
+        _status.gyro_done_calibrating &&
+        _status.dshot_bitbang_okay &&
+        _status.rx_failsafe_okay &&
+        _status.throttle_is_down;
 }
-
-static bool isDisabled(void)
-{
-    return _status.disabledFlags != 0;
-}
-
-
 void armingCheck(
         uint32_t currentTimeUs,
         bool signalReceived,
@@ -56,16 +56,18 @@ void armingCheck(
     static uint8_t _tryingToArm;
 
     if (isAux1Set(raw)) {
+
         _disarmTicks = 0;
 
         armingUpdateStatus(currentTimeUs, raw, imuIsLevel, calibrating, *armed);
 
-        if (!isDisabled()) {
+        if (readyToArm()) {
+
             if (*armed) {
                 return;
             }
 
-            if (!motorCheckDshotReady(currentTimeUs, &_tryingToArm)) {
+            if (!motorIsReady(currentTimeUs, &_tryingToArm)) {
                 return;
             }
 
@@ -78,17 +80,32 @@ void armingCheck(
         }
 
     } else {
+
         resetTryingToArm(&_tryingToArm);
-        if (*armed && signalReceived && !failsafeIsActive()  ) {
-            _disarmTicks++;
-            if (_disarmTicks > 3) {
-                armingDisarm(*armed);
+
+        /*
+        static uint32_t _count;
+        debugPrintf("COUNT=%6d ARMED:=%d SIGNAL=%d FAILSAFE=%d\n",
+                _count++, *armed, signalReceived, failsafeIsActive());
+                */
+
+        if (*armed) {
+            armingDisarm(*armed);
+            *armed = false;
+        }
+
+        /*
+           if (*armed && signalReceived && !failsafeIsActive()  ) {
+           _disarmTicks++;
+           if (_disarmTicks > 3) {
+           armingDisarm(*armed);
                 *armed = false;
             }
-        }
+        }*/
+
     }
 
-    if (!(*armed || _doNotRepeat || isDisabled())) {
+    if (!(*armed || _doNotRepeat || !readyToArm())) {
         _doNotRepeat = true;
     }
 }
@@ -100,15 +117,6 @@ void armingDisarm(bool armed)
     }
 }
 
-void armingSetDisabled(uint8_t flag)
-{
-    _status.disabledFlags |= (1 << flag);
-}
-
-void armingSetEnabled(uint8_t flag)
-{
-    _status.disabledFlags &= ~(1 << flag);
-}
 
 void armingUpdateStatus(
         uint32_t currentTimeUs,
@@ -121,53 +129,33 @@ void armingUpdateStatus(
         ledSet(true);
     } else {
 
-        //debugPrintf("flags: %02X  mask %02X\n", getDisableFlags(), ARMING_DISABLED_BOOT_GRACE_TIME);
-
         // Check if the power on arming grace time has elapsed
-        if ((getDisableFlags() & ARMING_DISABLED_BOOT_GRACE_TIME) &&
-                (currentTimeUs >= 5000000) &&
+        if (readyToArm() &&
+                currentTimeUs >= 5000000 &&
                 (!motorIsProtocolDshot() || motorDshotStreamingCommandsAreEnabled())
            ) {
             // If so, unset the grace time arming disable flag
-            armingSetEnabled(ARMING_DISABLED_BOOT_GRACE_TIME);
+            _status.boot_grace_time_done = true;
         }
 
-        if (rxCalculateThrottleStatus(raw) != THROTTLE_LOW) {
-            armingSetDisabled(ARMING_DISABLED_THROTTLE);
-        } else {
-            armingSetEnabled(ARMING_DISABLED_THROTTLE);
-        }
+        _status.throttle_is_down = rxCalculateThrottleStatus(raw) == THROTTLE_LOW;
 
-        if (!imuIsLevel) {
-            armingSetDisabled(ARMING_DISABLED_ANGLE);
-        } else {
-            armingSetEnabled(ARMING_DISABLED_ANGLE);
-        }
+        _status.angle_okay = imuIsLevel;
 
-        if (calibrating) {
-            armingSetDisabled(ARMING_DISABLED_CALIBRATING);
-        } else {
-            armingSetEnabled(ARMING_DISABLED_CALIBRATING);
-        }
-
-        armingSetEnabled(ARMING_DISABLED_RPMFILTER);
+        _status.gyro_done_calibrating = !calibrating;
 
         motorCheckDshotBitbangStatus();
 
-        armingSetEnabled(ARMING_DISABLED_ACC_CALIBRATION);
-
-        if (!motorIsProtocolEnabled()) {
-            armingSetDisabled(ARMING_DISABLED_MOTOR_PROTOCOL);
-        }
+        _status.acc_done_calibrating = true;
 
         // If arming is disabled and the ARM switch is on
-        if (isDisabled() && isAux1Set(raw)) {
-            armingSetDisabled(ARMING_DISABLED_ARM_SWITCH);
+        if (!readyToArm() && isAux1Set(raw)) {
+            _status.arming_switch_okay = false;
         } else if (!isAux1Set(raw)) {
-            armingSetEnabled(ARMING_DISABLED_ARM_SWITCH);
+            _status.arming_switch_okay = true;
         }
 
-        if (isDisabled()) {
+        if (!readyToArm()) {
             ledWarningFlash();
         } else {
             ledWarningDisable();
@@ -176,3 +164,14 @@ void armingUpdateStatus(
         ledWarningUpdate();
     }
 }
+
+void armingSetDshotBitbang(bool okay)
+{
+    _status.dshot_bitbang_okay = okay;
+}
+
+void armingSetRxFailsafe(bool okay)
+{
+    _status.rx_failsafe_okay= okay;
+}
+

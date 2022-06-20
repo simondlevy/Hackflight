@@ -20,6 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 #include "arming.h"
+#include "debug.h"
 #include "failsafe.h"
 #include "rx.h"
 #include "rx_throttle_status.h"
@@ -111,18 +112,22 @@ bool failsafeIsReceivingRxData(void)
 void failsafeOnValidDataReceived(void)
 {
     failsafeState.validRxDataReceivedAt = timeMillis();
-    if ((failsafeState.validRxDataReceivedAt - failsafeState.validRxDataFailedAt) > failsafeState.rxDataRecoveryPeriod) {
-        failsafeState.rxLinkState = FAILSAFE_RXLINK_UP;
-        armingSetEnabled(ARMING_DISABLED_RX_FAILSAFE);
+    if ((failsafeState.validRxDataReceivedAt -
+                failsafeState.validRxDataFailedAt) >
+            failsafeState.rxDataRecoveryPeriod) { failsafeState.rxLinkState =
+        FAILSAFE_RXLINK_UP;
+        armingSetRxFailsafe(true);
     }
 }
 
 void failsafeOnValidDataFailed(void)
 {
-    armingSetDisabled(ARMING_DISABLED_RX_FAILSAFE); // To prevent arming with no RX link
+    armingSetRxFailsafe(false);
     failsafeState.validRxDataFailedAt = timeMillis();
-    if ((failsafeState.validRxDataFailedAt - failsafeState.validRxDataReceivedAt) > failsafeState.rxDataFailurePeriod) {
-        failsafeState.rxLinkState = FAILSAFE_RXLINK_DOWN;
+    if ((failsafeState.validRxDataFailedAt -
+                failsafeState.validRxDataReceivedAt) >
+            failsafeState.rxDataFailurePeriod) { failsafeState.rxLinkState =
+        FAILSAFE_RXLINK_DOWN;
     }
 }
 
@@ -203,7 +208,6 @@ void failsafeUpdateState(float * rcData, bool * armed)
             case FAILSAFE_LANDING:
                 break;
             case FAILSAFE_LANDED:
-                armingSetDisabled(ARMING_DISABLED_FAILSAFE); 
                 armingDisarm(*armed);
                 *armed = false;
                 failsafeState.receivingRxDataPeriod = timeMillis() +
@@ -220,7 +224,6 @@ void failsafeUpdateState(float * rcData, bool * armed)
                         // rx link is good now, when arming via ARM switch, it
                         // must be OFF first
                         if (!*armed) {
-                            armingSetEnabled(ARMING_DISABLED_FAILSAFE);
                             failsafeState.phase = FAILSAFE_RX_LOSS_RECOVERED;
                             reprocessState = true;
                         }

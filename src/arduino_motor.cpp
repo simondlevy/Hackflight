@@ -18,17 +18,19 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <Arduino.h>
 
+#include <arming.h>
 #include <motor.h>
 
 void motorCheckDshotBitbangStatus(void)
 {
+    armingSetDshotBitbang(true);
 }
 
-bool motorCheckDshotReady(uint32_t currentTime, uint8_t * tryingToArm)
+bool motorIsReady(uint32_t currentTime, uint8_t * tryingToArm)
 {
     (void)currentTime;
     (void)tryingToArm;
-    return false;
+    return true;
 }
 
 float motorConvertFromExternal(uint16_t externalValue)

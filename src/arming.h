@@ -22,39 +22,22 @@
 #include <stdbool.h>
 
 typedef struct {
-    uint32_t disabledFlags;
+
+    bool acc_done_calibrating;
+    bool angle_okay;
+    bool arming_switch_okay;
+    bool gyro_done_calibrating;
+    bool boot_grace_time_done;
+    bool dshot_bitbang_okay;
+    bool rx_failsafe_okay;
+    bool throttle_is_down;
+
 } arming_t;
 
 enum {
     ARMING_DELAYED_DISARMED = 0,
     ARMING_DELAYED_NORMAL = 1,
     ARMING_DELAYED_LAUNCH_CONTROL = 3,
-};
-
-// Arming disable flags are listed in the order of importance
-enum {
-    ARMING_DISABLED_NO_GYRO         ,
-    ARMING_DISABLED_FAILSAFE        ,
-    ARMING_DISABLED_RX_FAILSAFE     ,
-    ARMING_DISABLED_BAD_RX_RECOVERY ,
-    ARMING_DISABLED_BOXFAILSAFE     ,
-    ARMING_DISABLED_THROTTLE        ,
-    ARMING_DISABLED_ANGLE           ,
-    ARMING_DISABLED_BOOT_GRACE_TIME ,
-    ARMING_DISABLED_NO_PREARM        ,
-    ARMING_DISABLED_CALIBRATING     ,
-    ARMING_DISABLED_CLI             ,
-    ARMING_DISABLED_CMS_MENU        ,
-    ARMING_DISABLED_BST             ,
-    ARMING_DISABLED_MSP             ,
-    ARMING_DISABLED_PARALYZE        ,
-    ARMING_DISABLED_RESC            ,
-    ARMING_DISABLED_RPMFILTER       ,
-    ARMING_DISABLED_REBOOT_REQUIRED ,
-    ARMING_DISABLED_DSHOT_BITBANG   ,
-    ARMING_DISABLED_ACC_CALIBRATION ,
-    ARMING_DISABLED_MOTOR_PROTOCOL  ,
-    ARMING_DISABLED_ARM_SWITCH
 };
 
 #if defined(__cplusplus)
@@ -71,16 +54,15 @@ extern "C" {
 
     void  armingDisarm(bool armed);
 
-    void  armingSetDisabled(uint8_t flag);
-
-    void  armingSetEnabled(uint8_t flag);
-
     void  armingUpdateStatus(
             uint32_t currentTimeUs,
             float raw[],
             bool imuIsLevel,
             bool calibrating,
             bool armed);
+
+    void armingSetDshotBitbang(bool enabled);
+    void armingSetRxFailsafe(bool enabled);
 
 #if defined(__cplusplus)
 }

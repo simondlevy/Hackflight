@@ -309,7 +309,6 @@ void hackflightInitFull(
     ledFlash(10, 50);
     failsafeInit();
     mspInit();
-    armingSetDisabled(ARMING_DISABLED_NO_PREARM);
     failsafeReset();
 
     hackflightInit(hf, rxPort, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
