@@ -31,6 +31,16 @@ static void resetTryingToArm(uint8_t * tryingToArm)
     *tryingToArm = ARMING_DELAYED_DISARMED;
 }
 
+static uint8_t armingGetDisableFlags(void)
+{
+    return ffs(status.disabledFlags);
+}
+
+static bool armingIsDisabled(void)
+{
+    return status.disabledFlags != 0;
+}
+
 
 void armingCheck(
         uint32_t currentTimeUs,
@@ -87,16 +97,6 @@ void armingDisarm(bool armed)
     if (armed) {
         motorStop();
     }
-}
-
-uint8_t armingGetDisableFlags(void)
-{
-    return ffs(status.disabledFlags);
-}
-
-bool armingIsDisabled(void)
-{
-    return status.disabledFlags != 0;
 }
 
 void armingSetDisabled(uint8_t flag)

@@ -61,7 +61,7 @@ enum {
 extern "C" {
 #endif
 
-    void   armingCheck(
+    void armingCheck(
             uint32_t currentTimeUs,
             bool signalReceived,
             float raw[],
@@ -69,17 +69,13 @@ extern "C" {
             bool calibrating,
             bool * armed);
 
-    void    armingDisarm(bool armed);
+    void  armingDisarm(bool armed);
 
-    uint8_t armingGetDisableFlags(void);
+    void  armingSetDisabled(uint8_t flag);
 
-    bool    armingIsDisabled(void);
+    void  armingUnsetDisabled(uint8_t flag);
 
-    void    armingSetDisabled(uint8_t flag);
-
-    void    armingUnsetDisabled(uint8_t flag);
-
-    void    armingUpdateStatus(
+    void  armingUpdateStatus(
             uint32_t currentTimeUs,
             float raw[],
             bool imuIsLevel,
