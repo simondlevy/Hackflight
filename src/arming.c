@@ -19,26 +19,27 @@
 #include <strings.h>
 
 #include "arming.h"
+#include "debug.h"
 #include "failsafe.h"
 #include "led.h"
 #include "motor.h"
 #include "rx_throttle_status.h"
 
-static arming_t status;
+static arming_t _status;
 
 static void resetTryingToArm(uint8_t * tryingToArm)
 {
     *tryingToArm = ARMING_DELAYED_DISARMED;
 }
 
-static uint8_t armingGetDisableFlags(void)
+static uint8_t getDisableFlags(void)
 {
-    return ffs(status.disabledFlags);
+    return ffs(_status.disabledFlags);
 }
 
-static bool armingIsDisabled(void)
+static bool isDisabled(void)
 {
-    return status.disabledFlags != 0;
+    return _status.disabledFlags != 0;
 }
 
 
@@ -59,7 +60,7 @@ void armingCheck(
 
         armingUpdateStatus(currentTimeUs, raw, imuIsLevel, calibrating, *armed);
 
-        if (!armingIsDisabled()) {
+        if (!isDisabled()) {
             if (*armed) {
                 return;
             }
@@ -87,7 +88,7 @@ void armingCheck(
         }
     }
 
-    if (!(*armed || _doNotRepeat || armingIsDisabled())) {
+    if (!(*armed || _doNotRepeat || isDisabled())) {
         _doNotRepeat = true;
     }
 }
@@ -101,12 +102,12 @@ void armingDisarm(bool armed)
 
 void armingSetDisabled(uint8_t flag)
 {
-    status.disabledFlags |= (1 << flag);
+    _status.disabledFlags |= (1 << flag);
 }
 
 void armingSetEnabled(uint8_t flag)
 {
-    status.disabledFlags &= ~(1 << flag);
+    _status.disabledFlags &= ~(1 << flag);
 }
 
 void armingUpdateStatus(
@@ -120,10 +121,12 @@ void armingUpdateStatus(
         ledSet(true);
     } else {
 
+        //debugPrintf("flags: %02X  mask %02X\n", getDisableFlags(), ARMING_DISABLED_BOOT_GRACE_TIME);
+
         // Check if the power on arming grace time has elapsed
-        if ((armingGetDisableFlags() & ARMING_DISABLED_BOOT_GRACE_TIME) &&
-                (currentTimeUs >= 5000000)
-                && (!motorIsProtocolDshot() || motorDshotStreamingCommandsAreEnabled())
+        if ((getDisableFlags() & ARMING_DISABLED_BOOT_GRACE_TIME) &&
+                (currentTimeUs >= 5000000) &&
+                (!motorIsProtocolDshot() || motorDshotStreamingCommandsAreEnabled())
            ) {
             // If so, unset the grace time arming disable flag
             armingSetEnabled(ARMING_DISABLED_BOOT_GRACE_TIME);
@@ -158,13 +161,13 @@ void armingUpdateStatus(
         }
 
         // If arming is disabled and the ARM switch is on
-        if (armingIsDisabled() && isAux1Set(raw)) {
+        if (isDisabled() && isAux1Set(raw)) {
             armingSetDisabled(ARMING_DISABLED_ARM_SWITCH);
         } else if (!isAux1Set(raw)) {
             armingSetEnabled(ARMING_DISABLED_ARM_SWITCH);
         }
 
-        if (armingIsDisabled()) {
+        if (isDisabled()) {
             ledWarningFlash();
         } else {
             ledWarningDisable();

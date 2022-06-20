@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "arming.h"
 #include "board.h"
 #include "gyro.h"
 #include "debug.h"
@@ -308,7 +309,7 @@ void hackflightInitFull(
     ledFlash(10, 50);
     failsafeInit();
     mspInit();
-    armingSetDisabled(7);
+    armingSetDisabled(ARMING_DISABLED_NO_PREARM);
     failsafeReset();
 
     hackflightInit(hf, rxPort, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
