@@ -56,14 +56,6 @@ uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs);
 
 float rxDevConvertValue(uint16_t * channelData, uint8_t chan);
 
-void rxProcessDataModes(
-        uint32_t currentTimeUs,
-        bool signalReceived,
-        float raw[],
-        bool imuIsLevel,
-        bool calibrating,
-        bool * armed);
-
 void rxUpdateArmingStatus(
         uint32_t currentTimeUs,
         float raw[],

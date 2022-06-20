@@ -50,8 +50,6 @@ extern "C" {
 
 static void task_attitude(void * hackflight, uint32_t time)
 {
-    // uint32_t count; debugPrintf("task_attitude: %d\n", count++);
-
     hackflight_t * hf = (hackflight_t *)hackflight;
     imuGetEulerAngles(hf, time);
 }
@@ -69,26 +67,23 @@ static void hackflightAddPidController(hackflight_t * hf, pid_fun_t fun, void * 
 
 static void task_rx(void * hackflight, uint32_t time)
 {
-    //static uint32_t count; debugPrintf("task_rx: %d\n", count++);
-
     hackflight_t * hf = (hackflight_t *)hackflight;
 
     bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
-    float max_arming_angle = deg2rad(MAX_ARMING_ANGLE);
-
     rx_axes_t rxax = {0};
 
     bool gotNewData = false;
 
-    bool shallowAngle = fabsf(hf->vstate.phi) < max_arming_angle &&
-        fabsf(hf->vstate.theta) < max_arming_angle;
+    bool imuIsLevel =
+        fabsf(hf->vstate.phi) < hf->maxArmingAngle &&
+        fabsf(hf->vstate.theta) < hf->maxArmingAngle;
 
     rxPoll(
             time,
-            shallowAngle, 
+            imuIsLevel, 
             calibrating,
             &rxax,
             &pidItermResetReady,
@@ -151,6 +146,8 @@ static void hackflightInit(
     hf->imuFusionPrev.quat.w = 1;
 
     rxDevInit(rxPort);
+
+    hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 }
 
 #if defined(__cplusplus)

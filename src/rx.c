@@ -895,7 +895,7 @@ static void tryArm(
     }
 }
 
-void rxProcessDataModes(
+static void processDataModes(
         uint32_t currentTimeUs,
         bool signalReceived,
         float raw[],
@@ -927,6 +927,8 @@ void rxProcessDataModes(
         doNotRepeat = true;
     }
 }
+
+// ----------------------------------------------------------------------------
 
 static rx_t _rx;
 
@@ -1001,7 +1003,7 @@ void rxPoll(
             break;
 
         case RX_STATE_MODES:
-            rxProcessDataModes(currentTimeUs, _rx.signalReceived, _rx.raw, imuIsLevel,
+            processDataModes(currentTimeUs, _rx.signalReceived, _rx.raw, imuIsLevel,
                     calibrating, armed);
             _rx.state = RX_STATE_UPDATE;
             break;

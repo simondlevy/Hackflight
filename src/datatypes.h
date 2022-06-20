@@ -362,6 +362,7 @@ typedef struct {
     demands_t        demands;
     gyro_t           gyro;
     imu_fusion_t     imuFusionPrev;
+    float            maxArmingAngle;
     float            mspMotors[4];
     task_t           mspTask;
     pid_controller_t pidControllers[10];
