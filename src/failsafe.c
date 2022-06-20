@@ -113,7 +113,7 @@ void failsafeOnValidDataReceived(void)
     failsafeState.validRxDataReceivedAt = timeMillis();
     if ((failsafeState.validRxDataReceivedAt - failsafeState.validRxDataFailedAt) > failsafeState.rxDataRecoveryPeriod) {
         failsafeState.rxLinkState = FAILSAFE_RXLINK_UP;
-        armingUnsetDisabled(ARMING_DISABLED_RX_FAILSAFE);
+        armingSetEnabled(ARMING_DISABLED_RX_FAILSAFE);
     }
 }
 
@@ -220,7 +220,7 @@ void failsafeUpdateState(float * rcData, bool * armed)
                         // rx link is good now, when arming via ARM switch, it
                         // must be OFF first
                         if (!*armed) {
-                            armingUnsetDisabled(ARMING_DISABLED_FAILSAFE);
+                            armingSetEnabled(ARMING_DISABLED_FAILSAFE);
                             failsafeState.phase = FAILSAFE_RX_LOSS_RECOVERED;
                             reprocessState = true;
                         }

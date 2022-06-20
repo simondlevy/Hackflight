@@ -73,7 +73,7 @@ extern "C" {
 
     void  armingSetDisabled(uint8_t flag);
 
-    void  armingUnsetDisabled(uint8_t flag);
+    void  armingSetEnabled(uint8_t flag);
 
     void  armingUpdateStatus(
             uint32_t currentTimeUs,

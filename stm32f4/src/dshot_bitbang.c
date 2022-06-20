@@ -577,7 +577,7 @@ void motorCheckDshotBitbangStatus(void)
     if (dshotBitbangGetStatus() != DSHOT_BITBANG_STATUS_OK) {
         armingSetDisabled(ARMING_DISABLED_DSHOT_BITBANG);
     } else {
-        armingUnsetDisabled(ARMING_DISABLED_DSHOT_BITBANG);
+        armingSetEnabled(ARMING_DISABLED_DSHOT_BITBANG);
     }
 }
 

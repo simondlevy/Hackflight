@@ -19,6 +19,7 @@
 #include "align_sensor.h"
 #include "core_rate.h"
 #include "datatypes.h"
+#include "debug.h"
 #include "pt1_filter.h"
 #include "gyro.h"
 #include "imu.h"
@@ -98,7 +99,7 @@ static void setCalibrationCycles(gyro_t * gyro)
     gyro->calibration.cyclesRemaining = gyroCalculateCalibratingCycles();
 }
 
-static void performGyroCalibration(gyro_t * gyro)
+static void calibrate(gyro_t * gyro)
 {
     for (int axis = 0; axis < 3; axis++) {
         // Reset g[axis] at start of calibration
@@ -167,7 +168,7 @@ void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate)
 
         alignSensorViaRotation(_adc);
     } else {
-        performGyroCalibration(gyro);
+        calibrate(gyro);
     }
 
     if (calibrationComplete) {
@@ -227,7 +228,6 @@ void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate)
     vstate->dpsi   = gyro->dps_filtered[2];
 
     gyro->isCalibrating = !calibrationComplete;
-
 }
 
 #if defined(__cplusplus)

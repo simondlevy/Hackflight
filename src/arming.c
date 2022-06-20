@@ -121,32 +121,32 @@ void armingUpdateStatus(
                 && (!motorIsProtocolDshot() || motorDshotStreamingCommandsAreEnabled())
            ) {
             // If so, unset the grace time arming disable flag
-            armingUnsetDisabled(ARMING_DISABLED_BOOT_GRACE_TIME);
+            armingSetEnabled(ARMING_DISABLED_BOOT_GRACE_TIME);
         }
 
         if (rxCalculateThrottleStatus(raw) != THROTTLE_LOW) {
             armingSetDisabled(ARMING_DISABLED_THROTTLE);
         } else {
-            armingUnsetDisabled(ARMING_DISABLED_THROTTLE);
+            armingSetEnabled(ARMING_DISABLED_THROTTLE);
         }
 
         if (!imuIsLevel) {
             armingSetDisabled(ARMING_DISABLED_ANGLE);
         } else {
-            armingUnsetDisabled(ARMING_DISABLED_ANGLE);
+            armingSetEnabled(ARMING_DISABLED_ANGLE);
         }
 
         if (calibrating) {
             armingSetDisabled(ARMING_DISABLED_CALIBRATING);
         } else {
-            armingUnsetDisabled(ARMING_DISABLED_CALIBRATING);
+            armingSetEnabled(ARMING_DISABLED_CALIBRATING);
         }
 
-        armingUnsetDisabled(ARMING_DISABLED_RPMFILTER);
+        armingSetEnabled(ARMING_DISABLED_RPMFILTER);
 
         motorCheckDshotBitbangStatus();
 
-        armingUnsetDisabled(ARMING_DISABLED_ACC_CALIBRATION);
+        armingSetEnabled(ARMING_DISABLED_ACC_CALIBRATION);
 
         if (!motorIsProtocolEnabled()) {
             armingSetDisabled(ARMING_DISABLED_MOTOR_PROTOCOL);
@@ -156,7 +156,7 @@ void armingUpdateStatus(
         if (armingIsDisabled() && isAux1Set(raw)) {
             armingSetDisabled(ARMING_DISABLED_ARM_SWITCH);
         } else if (!isAux1Set(raw)) {
-            armingUnsetDisabled(ARMING_DISABLED_ARM_SWITCH);
+            armingSetEnabled(ARMING_DISABLED_ARM_SWITCH);
         }
 
         if (armingIsDisabled()) {
@@ -169,7 +169,7 @@ void armingUpdateStatus(
     }
 }
 
-void armingUnsetDisabled(uint8_t flag)
+void armingSetEnabled(uint8_t flag)
 {
     status.disabledFlags &= ~(1 << flag);
 }
