@@ -27,6 +27,7 @@ extern "C" {
 void hackflightInitFull(
         hackflight_t * hackflight,
         serialPortIdentifier_e rxPort,
+        uint8_t imuInterruptPin,
         uint8_t ledPin);
 
 void hackflightStep(hackflight_t * hackflight);

@@ -31,9 +31,6 @@ static const float MAG_DECLINATION = -9.17417;
 
 static const uint32_t I2C_CLOCK = 1000000;
 
-// Interrupt pin
-static const uint8_t INT_PIN = 23;
-
 static USFSMAX _usfsmax;
 
 static volatile bool _gotInterrupt = true;
@@ -99,7 +96,7 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     quat->z = _quat[3];
 }
 
-void imuInit(hackflight_t * hf)
+void imuInit(hackflight_t * hf, uint8_t interruptPin)
 {
     _usfsmax.setGyroOdr(USFSMAX::ACC_GYRO_6660_HZ);
     _usfsmax.setQuatDiv(6);
@@ -111,8 +108,8 @@ void imuInit(hackflight_t * hf)
     Wire.setClock(I2C_CLOCK); 
     delay(100);
 
-    pinMode(INT_PIN, INPUT);
-    attachInterrupt(INT_PIN, handleInterrupt, RISING);        
+    pinMode(interruptPin, INPUT);
+    attachInterrupt(interruptPin, handleInterrupt, RISING);        
 }
 
 // Unused ---------------------------------------------------------------------

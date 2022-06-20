@@ -30,7 +30,7 @@ void setup(void)
     delay(100);
 
     // Always use Serial1 for receiver, no no need to specify
-    hackflightInitFull(&_hf, SERIAL_PORT_NONE, A4);
+    hackflightInitFull(&_hf, SERIAL_PORT_NONE, 5, A4);
 
     stm32_startCycleCounter();
 }
