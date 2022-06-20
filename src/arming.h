@@ -1,20 +1,20 @@
 /*
-Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2022 Simon D. Levy
 
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -61,11 +61,30 @@ enum {
 extern "C" {
 #endif
 
-void    armingDisarm(bool armed);
-uint8_t armingGetDisableFlags(void);
-bool    armingIsDisabled(void);
-void    armingSetDisabled(uint8_t flag);
-void    armingUnsetDisabled(uint8_t flag);
+    void    armingDisarm(bool armed);
+
+    uint8_t armingGetDisableFlags(void);
+
+    bool    armingIsDisabled(void);
+
+    void    armingSetDisabled(uint8_t flag);
+
+    void    armingTryArm(
+            uint32_t currentTimeUs,
+            uint8_t * tryingToArm,
+            float raw[],
+            bool imuIsLevel,
+            bool calibrating,
+            bool * armed);
+
+    void    armingUnsetDisabled(uint8_t flag);
+
+    void    armingUpdateStatus(
+            uint32_t currentTimeUs,
+            float raw[],
+            bool imuIsLevel,
+            bool calibrating,
+            bool armed);
 
 #if defined(__cplusplus)
 }

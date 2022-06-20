@@ -664,8 +664,6 @@ static void processSmoothingFilter(
         float setpointRate[4],
         float rawSetpoint[3])
 {
-
-
     // first call initialization
     if (!rx->initializedFilter) {
 
@@ -792,109 +790,6 @@ static void processSmoothingFilter(
             rx->dataToSmooth.yaw, &setpointRate[3]);
 }
 
-static bool isAux1Set(float raw[])
-{
-    return raw[4] > 1200;
-}
-
-static void resetTryingToArm(uint8_t * tryingToArm)
-{
-    *tryingToArm = ARMING_DELAYED_DISARMED;
-}
-
-void rxUpdateArmingStatus(
-        uint32_t currentTimeUs,
-        float raw[],
-        bool imuIsLevel,
-        bool calibrating,
-        bool armed)
-{
-    if (armed) {
-        ledSet(true);
-    } else {
-
-        // Check if the power on arming grace time has elapsed
-        if ((armingGetDisableFlags() & ARMING_DISABLED_BOOT_GRACE_TIME) &&
-                (currentTimeUs >= 5000000)
-                && (!motorIsProtocolDshot() || motorDshotStreamingCommandsAreEnabled())
-           ) {
-            // If so, unset the grace time arming disable flag
-            armingUnsetDisabled(ARMING_DISABLED_BOOT_GRACE_TIME);
-        }
-
-        if (rxCalculateThrottleStatus(raw) != THROTTLE_LOW) {
-            armingSetDisabled(ARMING_DISABLED_THROTTLE);
-        } else {
-            armingUnsetDisabled(ARMING_DISABLED_THROTTLE);
-        }
-
-        if (!imuIsLevel) {
-            armingSetDisabled(ARMING_DISABLED_ANGLE);
-        } else {
-            armingUnsetDisabled(ARMING_DISABLED_ANGLE);
-        }
-
-        if (calibrating) {
-            armingSetDisabled(ARMING_DISABLED_CALIBRATING);
-        } else {
-            armingUnsetDisabled(ARMING_DISABLED_CALIBRATING);
-        }
-
-        armingUnsetDisabled(ARMING_DISABLED_RPMFILTER);
-
-        motorCheckDshotBitbangStatus();
-
-        armingUnsetDisabled(ARMING_DISABLED_ACC_CALIBRATION);
-
-        if (!motorIsProtocolEnabled()) {
-            armingSetDisabled(ARMING_DISABLED_MOTOR_PROTOCOL);
-        }
-
-        // If arming is disabled and the ARM switch is on
-        if (armingIsDisabled() && isAux1Set(raw)) {
-            armingSetDisabled(ARMING_DISABLED_ARM_SWITCH);
-        } else if (!isAux1Set(raw)) {
-            armingUnsetDisabled(ARMING_DISABLED_ARM_SWITCH);
-        }
-
-        if (armingIsDisabled()) {
-            ledWarningFlash();
-        } else {
-            ledWarningDisable();
-        }
-
-        ledWarningUpdate();
-    }
-}
-
-static void tryArm(
-        uint32_t currentTimeUs,
-        uint8_t * tryingToArm,
-        float raw[],
-        bool imuIsLevel,
-        bool calibrating,
-        bool * armed)
-{
-    rxUpdateArmingStatus(currentTimeUs, raw, imuIsLevel, calibrating, *armed);
-
-    if (!armingIsDisabled()) {
-        if (*armed) {
-            return;
-        }
-
-        if (!motorCheckDshotReady(currentTimeUs, tryingToArm)) {
-            return;
-        }
-
-        *armed = true;
-
-        resetTryingToArm(tryingToArm);
-
-    } else {
-        resetTryingToArm(tryingToArm);
-    }
-}
-
 static void processDataModes(
         uint32_t currentTimeUs,
         bool signalReceived,
@@ -909,11 +804,9 @@ static void processDataModes(
 
     if (isAux1Set(raw)) {
         disarmTicks = 0;
-        // Arming via ARM BOX
-        tryArm(currentTimeUs, &tryingToArm, raw, imuIsLevel, calibrating, armed); 
+        armingTryArm(currentTimeUs, &tryingToArm, raw, imuIsLevel, calibrating, armed); 
     } else {
         resetTryingToArm(&tryingToArm);
-        // Disarming via ARM BOX
         if (*armed && signalReceived && !failsafeIsActive()  ) {
             disarmTicks++;
             if (disarmTicks > 3) {
@@ -1011,7 +904,7 @@ void rxPoll(
         case RX_STATE_UPDATE:
             _rx.gotNewData = true;
             updateCommands(&_rx, _rx.raw);
-            rxUpdateArmingStatus(currentTimeUs, _rx.raw, imuIsLevel, calibrating,
+            armingUpdateStatus(currentTimeUs, _rx.raw, imuIsLevel, calibrating,
                     *armed);
             _rx.state = RX_STATE_CHECK;
             break;

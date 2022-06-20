@@ -26,6 +26,16 @@
 extern "C" {
 #endif
 
+static bool isAux1Set(float raw[])
+{
+    return raw[4] > 1200;
+}
+
+static void resetTryingToArm(uint8_t * tryingToArm)
+{
+    *tryingToArm = ARMING_DELAYED_DISARMED;
+}
+
 static throttleStatus_e rxCalculateThrottleStatus(float * rcData)
 {
     return (rcData[THROTTLE] < 1050) ?  THROTTLE_LOW : THROTTLE_HIGH;
