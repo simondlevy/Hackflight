@@ -104,6 +104,11 @@ void armingSetDisabled(uint8_t flag)
     status.disabledFlags |= (1 << flag);
 }
 
+void armingSetEnabled(uint8_t flag)
+{
+    status.disabledFlags &= ~(1 << flag);
+}
+
 void armingUpdateStatus(
         uint32_t currentTimeUs,
         float raw[],
@@ -168,9 +173,3 @@ void armingUpdateStatus(
         ledWarningUpdate();
     }
 }
-
-void armingSetEnabled(uint8_t flag)
-{
-    status.disabledFlags &= ~(1 << flag);
-}
-
