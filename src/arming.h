@@ -46,7 +46,6 @@ extern "C" {
 
     void armingCheck(
             uint32_t currentTimeUs,
-            bool signalReceived,
             float raw[],
             bool imuIsLevel,
             bool calibrating,

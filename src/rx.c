@@ -865,8 +865,7 @@ void rxPoll(
             break;
 
         case RX_STATE_MODES:
-            armingCheck(currentTimeUs, _rx.signalReceived, _rx.raw, imuIsLevel,
-                    calibrating, armed);
+            armingCheck(currentTimeUs, _rx.raw, imuIsLevel, calibrating, armed);
             _rx.state = RX_STATE_UPDATE;
             break;
 

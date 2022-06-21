@@ -43,21 +43,18 @@ static bool readyToArm(void)
         _status.rx_failsafe_okay &&
         _status.throttle_is_down;
 }
+
 void armingCheck(
         uint32_t currentTimeUs,
-        bool signalReceived,
         float raw[],
         bool imuIsLevel,
         bool calibrating,
         bool * armed)
 {
-    static uint8_t _disarmTicks;
     static bool _doNotRepeat;
     static uint8_t _tryingToArm;
 
     if (isAux1Set(raw)) {
-
-        _disarmTicks = 0;
 
         armingUpdateStatus(currentTimeUs, raw, imuIsLevel, calibrating, *armed);
 
