@@ -35,9 +35,6 @@
 #include "scale.h"
 #include "time.h"
 
-#define CHANNEL_COUNT 18
-#define THROTTLE_LOOKUP_LENGTH 12
-
 static const uint32_t FAILSAFE_POWER_ON_DELAY_US = (1000 * 1000 * 5);
 
 // Minimum rc smoothing cutoff frequency
@@ -88,112 +85,6 @@ static const uint16_t PWM_PULSE_MIN   = 750;
 
 // maximum PWM pulse width which is considered valid
 static const uint16_t PWM_PULSE_MAX   = 2250;  
-
-typedef enum {
-    RX_FAILSAFE_MODE_AUTO = 0,
-    RX_FAILSAFE_MODE_HOLD,
-    RX_FAILSAFE_MODE_SET,
-    RX_FAILSAFE_MODE_INVALID
-} rxFailsafeChannelMode_e;
-
-typedef enum {
-    MODELOGIC_OR = 0,
-    MODELOGIC_AND
-} modeLogic_e;
-
-typedef enum {
-    // ARM flag
-    BOXARM = 0,
-    CHECKBOX_ITEM_COUNT
-} boxId_e;
-
-typedef struct rxFailsafeChannelConfig_s {
-    uint8_t mode; 
-    uint8_t step;
-} rxFailsafeChannelConfig_t;
-
-typedef struct rxChannelRangeConfig_s {
-    uint16_t min;
-    uint16_t max;
-} rxChannelRangeConfig_t;
-
-
-typedef enum {
-    RX_STATE_CHECK,
-    RX_STATE_PROCESS,
-    RX_STATE_MODES,
-    RX_STATE_UPDATE,
-    RX_STATE_COUNT
-} rxState_e;
-
-typedef struct rxSmoothingFilter_s {
-
-    uint8_t     autoSmoothnessFactorSetpoint;
-    uint32_t    averageFrameTimeUs;
-    uint8_t     autoSmoothnessFactorThrottle;
-    uint16_t    feedforwardCutoffFrequency;
-    uint8_t     ffCutoffSetting;
-
-    pt3Filter_t filterThrottle;
-    pt3Filter_t filterRoll;
-    pt3Filter_t filterPitch;
-    pt3Filter_t filterYaw;
-
-    pt3Filter_t filterDeflectionRoll;
-    pt3Filter_t filterDeflectionPitch;
-
-    bool        filterInitialized;
-    uint16_t    setpointCutoffFrequency;
-    uint8_t     setpointCutoffSetting;
-    uint16_t    throttleCutoffFrequency;
-    uint8_t     throttleCutoffSetting;
-    float       trainingSum;
-    uint32_t    trainingCount;
-    uint16_t    trainingMax;
-    uint16_t    trainingMin;
-
-} rxSmoothingFilter_t;
-
-typedef struct {
-
-    rxSmoothingFilter_t smoothingFilter;
-
-    bool        auxiliaryProcessingRequired;
-    bool        calculatedCutoffs;
-    uint16_t    channelData[CHANNEL_COUNT];
-    float       command[4];
-    demands_t   commands;
-    bool        dataProcessingRequired;
-    demands_t   dataToSmooth;
-    int32_t     frameTimeDeltaUs;
-    bool        gotNewData;
-    bool        inFailsafeMode;
-    bool        initializedFilter;
-    bool        initializedThrottleTable;
-    uint32_t    invalidPulsePeriod[CHANNEL_COUNT];
-    bool        isRateValid;
-    uint32_t    lastFrameTimeUs;
-    uint32_t    lastRxTimeUs;
-    int16_t     lookupThrottleRc[THROTTLE_LOOKUP_LENGTH];
-    uint32_t    needSignalBefore;
-    uint32_t    nextUpdateAtUs;
-    uint32_t    previousFrameTimeUs;
-    float       raw[CHANNEL_COUNT];
-    uint32_t    refreshPeriod;
-    bool        signalReceived;
-    rxState_e   state;
-    uint32_t    validFrameTimeMs;
-
-} rx_t;
-
-// Steps are 25 apart a value of 0 corresponds to a channel value of 900 or
-// less a value of 48 corresponds to a channel value of 2100 or more 48 steps
-// between 900 and 2100
-typedef struct channelRange_s {
-    uint8_t startStep;
-    uint8_t endStep;
-} channelRange_t;
-
 
 // ---------------------------------------------------------------------------------
 
