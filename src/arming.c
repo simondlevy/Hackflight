@@ -83,26 +83,10 @@ void armingCheck(
 
         resetTryingToArm(&_tryingToArm);
 
-        /*
-        static uint32_t _count;
-        debugPrintf("COUNT=%6d ARMED:=%d SIGNAL=%d FAILSAFE=%d\n",
-                _count++, *armed, signalReceived, failsafeIsActive());
-                */
-
         if (*armed) {
             armingDisarm(*armed);
             *armed = false;
         }
-
-        /*
-           if (*armed && signalReceived && !failsafeIsActive()  ) {
-           _disarmTicks++;
-           if (_disarmTicks > 3) {
-           armingDisarm(*armed);
-                *armed = false;
-            }
-        }*/
-
     }
 
     if (!(*armed || _doNotRepeat || !readyToArm())) {
