@@ -46,14 +46,10 @@ extern "C" {
 
     void  armingDisarm(bool armed);
 
-    void  armingUpdateStatus(
-            uint32_t currentTimeUs,
-            float raw[],
-            bool imuIsLevel,
-            bool calibrating,
-            bool armed);
+    void  armingUpdateStatus(float raw[], bool imuIsLevel, bool calibrating, bool armed);
 
     void armingSetDshotBitbang(bool enabled);
+
     void armingSetRxFailsafe(bool enabled);
 
 #if defined(__cplusplus)

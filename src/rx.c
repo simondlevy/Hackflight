@@ -870,8 +870,7 @@ void rxPoll(
         case RX_STATE_UPDATE:
             _rx.gotNewData = true;
             updateCommands(&_rx, _rx.raw);
-            armingUpdateStatus(currentTimeUs, _rx.raw, imuIsLevel, calibrating,
-                    *armed);
+            armingUpdateStatus(_rx.raw, imuIsLevel, calibrating, *armed);
             _rx.state = RX_STATE_CHECK;
             break;
     }

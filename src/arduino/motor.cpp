@@ -38,12 +38,6 @@ float motorConvertFromExternal(uint16_t externalValue)
     return 0;
 }
 
-bool motorDshotStreamingCommandsAreEnabled(void)
-{
-    return false;
-}
-
-
 bool motorIsProtocolDshot(void)
 {
     return false;

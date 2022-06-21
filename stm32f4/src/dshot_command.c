@@ -141,12 +141,6 @@ static bool allMotorsAreIdle(void)
     return true;
 }
 
-bool motorDshotStreamingCommandsAreEnabled(void)
-{
-    return motorIsEnabled() && motorGetMotorEnableTimeMs() &&
-        millis() > motorGetMotorEnableTimeMs() + DSHOT_PROTOCOL_DETECTION_DELAY_MS;
-}
-
 static bool dshotCommandsAreEnabled(dshotCommandType_e commandType)
 {
     bool ret = false;
@@ -157,7 +151,9 @@ static bool dshotCommandsAreEnabled(dshotCommandType_e commandType)
 
         break;
     case DSHOT_CMD_TYPE_INLINE:
-        ret = motorDshotStreamingCommandsAreEnabled();
+        ret = motorIsEnabled() &&
+            motorGetMotorEnableTimeMs() &&
+            millis() > motorGetMotorEnableTimeMs() + DSHOT_PROTOCOL_DETECTION_DELAY_MS;
 
         break;
     default:

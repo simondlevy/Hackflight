@@ -50,7 +50,7 @@ void armingCheck(
 
     if (rxAux1IsSet(raw)) {
 
-        armingUpdateStatus(currentTimeUs, raw, imuIsLevel, calibrating, *armed);
+        armingUpdateStatus(raw, imuIsLevel, calibrating, *armed);
 
         if (readyToArm()) {
 
@@ -87,12 +87,7 @@ void armingDisarm(bool armed)
 }
 
 
-void armingUpdateStatus(
-        uint32_t currentTimeUs,
-        float raw[],
-        bool imuIsLevel,
-        bool calibrating,
-        bool armed)
+void armingUpdateStatus( float raw[], bool imuIsLevel, bool calibrating, bool armed)
 {
     if (armed) {
         ledSet(true);

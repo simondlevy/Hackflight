@@ -32,7 +32,6 @@ extern "C" {
 void     motorCheckDshotBitbangStatus(void);
 bool     motorIsReady(uint32_t currentTime);
 float    motorConvertFromExternal(uint16_t externalValue);
-bool     motorDshotStreamingCommandsAreEnabled(void);
 uint16_t motorGetDshotTelemetry(uint8_t motorIndex);
 int16_t  motorGetDshotTelemetryMotorInvalidPercent(uint8_t motorIndex);
 bool     motorIsProtocolDshot(void);
