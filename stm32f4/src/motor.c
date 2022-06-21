@@ -201,11 +201,6 @@ void motorUpdateCompleteNull(void)
 {
 }
 
-bool motorIsProtocolEnabled(void)
-{
-    return motorProtocolEnabled;
-}
-
 bool motorIsProtocolDshot(void)
 {
     return motorProtocolDshot;

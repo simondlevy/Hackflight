@@ -43,11 +43,6 @@ bool motorIsProtocolDshot(void)
     return false;
 }
 
-bool motorIsProtocolEnabled(void)
-{
-    return false;
-}
-
 float motorValueDisarmed(void)
 {
     return 0;

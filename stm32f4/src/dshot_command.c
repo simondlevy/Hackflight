@@ -166,8 +166,9 @@ static bool dshotCommandsAreEnabled(dshotCommandType_e commandType)
 
 void dshotCommandWrite(uint8_t index, uint8_t motorCount, uint8_t command, dshotCommandType_e commandType)
 {
-    if (!motorIsProtocolDshot() || !dshotCommandsAreEnabled(commandType) || (command > DSHOT_MAX_COMMAND) || dshotCommandQueueFull()) {
-        return;
+    if (!dshotCommandsAreEnabled(commandType) ||
+            (command > DSHOT_MAX_COMMAND) ||
+            dshotCommandQueueFull()) { return;
     }
 
     uint8_t repeats = 1;
