@@ -21,6 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "datatypes.h"
 #include "time.h"
 
 #define MAX_SUPPORTED_MOTORS 8
@@ -29,7 +30,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 extern "C" {
 #endif
 
-void     motorCheckDshotBitbangStatus(void);
+void     motorCheckDshotBitbangStatus(arming_t * arming);
 bool     motorIsReady(uint32_t currentTime);
 float    motorConvertFromExternal(uint16_t externalValue);
 uint16_t motorGetDshotTelemetry(uint8_t motorIndex);

@@ -21,36 +21,32 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct {
-
-    bool acc_done_calibrating;
-    bool angle_okay;
-    bool arming_switch_okay;
-    bool gyro_done_calibrating;
-    bool dshot_bitbang_okay;
-    bool rx_failsafe_okay;
-    bool throttle_is_down;
-
-} arming_t;
+#include "datatypes.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
     void armingCheck(
+            arming_t * arming,
             uint32_t currentTimeUs,
             float raw[],
             bool imuIsLevel,
-            bool calibrating,
-            bool * armed);
+            bool calibrating);
 
-    void  armingDisarm(bool armed);
+    void  armingDisarm(arming_t * arming);
 
-    void  armingUpdateStatus(float raw[], bool imuIsLevel, bool calibrating, bool armed);
+    bool  armingIsArmed(arming_t * arming);
 
-    void armingSetDshotBitbangOkay(bool enabled);
+    void  armingUpdateStatus(
+            arming_t * arming,
+            float raw[],
+            bool imuIsLevel,
+            bool calibrating);
 
-    void armingSetRxFailsafe(bool enabled);
+    void armingSetDshotBitbangOkay(arming_t * arming, bool enabled);
+
+    void armingSetRxFailsafe(arming_t * arming, bool enabled);
 
 #if defined(__cplusplus)
 }

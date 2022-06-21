@@ -83,7 +83,7 @@ static void task_msp(void * hackflight, uint32_t time)
     (void)time;
 
     hackflight_t * hf = (hackflight_t *)hackflight;
-    mspUpdate(&hf->vstate, &hf->rxAxes, hf->armed, hf->mspMotors);
+    mspUpdate(&hf->vstate, &hf->rxAxes, armingIsArmed(&hf->arming), hf->mspMotors);
 }
 
 // Support for dynamically scheduled tasks ---------------------------------------

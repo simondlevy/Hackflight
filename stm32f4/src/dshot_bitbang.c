@@ -1,18 +1,18 @@
 /*
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <stdint.h>
 #include <math.h>
@@ -32,8 +32,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dshot_command.h"
 #include "motordev.h"
 #include "nvic.h"
-#include "pwm_output.h" // XXX for pwmOutputPort_t motors[]; should go away with refactoring
-#include "dshot_dpwm.h" // XXX for motorDmaOutput_t *getMotorDmaOutput(uint8_t index); should go away with refactoring
+#include "pwm_output.h" 
+#include "dshot_dpwm.h"
 #include "dshot_bitbang_decode.h"
 #include "systemdev.h"
 #include <time.h>
@@ -66,8 +66,10 @@ dshotBitbangStatus_e bbStatus;
 #define BB_OUTPUT_BUFFER_ATTRIBUTE
 #define BB_INPUT_BUFFER_ATTRIBUTE
 
-BB_OUTPUT_BUFFER_ATTRIBUTE uint32_t bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
-BB_INPUT_BUFFER_ATTRIBUTE uint16_t bbInputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
+BB_OUTPUT_BUFFER_ATTRIBUTE uint32_t
+  bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
+BB_INPUT_BUFFER_ATTRIBUTE uint16_t
+  bbInputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 
 uint8_t bbPuPdMode;
 FAST_DATA_ZERO_INIT uint32_t dshotFrameUs;
@@ -193,12 +195,15 @@ static bbPort_t *bbAllocateMotorPort(int portIndex)
     return bbPort;
 }
 
-const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(int8_t timerNumber, uint16_t timerChannel)
+const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(
+        int8_t timerNumber,
+        uint16_t timerChannel)
 {
     for (int index = 0; index < usedMotorPorts; index++) {
         const timerHardware_t *bitbangTimer = bbPorts[index].timhw;
-        if (bitbangTimer && timerGetTIMNumber(bitbangTimer->tim) == timerNumber && bitbangTimer->channel == timerChannel && bbPorts[index].owner.owner) {
-            return bitbangTimer;
+        if (bitbangTimer && timerGetTIMNumber(bitbangTimer->tim) == timerNumber
+                && bitbangTimer->channel == timerChannel &&
+                bbPorts[index].owner.owner) { return bitbangTimer;
         }
     }
 
@@ -222,13 +227,13 @@ const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer)
 static uint32_t getDshotBaseFrequency(g_motorPwmProtocolTypes_e pwmProtocolType)
 {
     switch (pwmProtocolType) {
-    case(PWM_TYPE_DSHOT600):
-        return MOTOR_DSHOT600_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
-    case(PWM_TYPE_DSHOT300):
-        return MOTOR_DSHOT300_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
-    default:
-    case(PWM_TYPE_DSHOT150):
-        return MOTOR_DSHOT150_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
+        case(PWM_TYPE_DSHOT600):
+            return MOTOR_DSHOT600_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
+        case(PWM_TYPE_DSHOT300):
+            return MOTOR_DSHOT300_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
+        default:
+        case(PWM_TYPE_DSHOT150):
+            return MOTOR_DSHOT150_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
     }
 }
 
@@ -271,13 +276,15 @@ static void bbFindPacerTimer(void)
             const timerHardware_t *timer = &bbTimerHardware[timerIndex];
             int timNumber = timerGetTIMNumber(timer->tim);
             if ((USE_BITBANGED_TIMER == DSHOT_BITBANGED_TIMER_TIM1 && timNumber != 1)
-                || (USE_BITBANGED_TIMER == DSHOT_BITBANGED_TIMER_TIM8 && timNumber != 8)) {
+                    || (USE_BITBANGED_TIMER == DSHOT_BITBANGED_TIMER_TIM8 && timNumber != 8)) {
                 continue;
             }
             bool timerConflict = false;
             for (int channel = 0; channel < CC_CHANNELS_PER_TIMER; channel++) {
-                const timerHardware_t *timer = timerGetAllocatedByNumberAndChannel(timNumber, CC_CHANNEL_FROM_INDEX(channel));
-                const resourceOwner_e timerOwner = timerGetOwner(timer)->owner;
+                const timerHardware_t *timer =
+                    timerGetAllocatedByNumberAndChannel(timNumber,
+                            CC_CHANNEL_FROM_INDEX(channel)); const
+                    resourceOwner_e timerOwner = timerGetOwner(timer)->owner;
                 if (timerOwner != OWNER_FREE && timerOwner != OWNER_DSHOT_BITBANG) {
                     timerConflict = true;
                     break;
@@ -297,8 +304,9 @@ static void bbFindPacerTimer(void)
             }
 
             dmaoptValue_t dmaopt = dmaGetOptionByTimer(timer);
-            const dmaChannelSpec_t *dmaChannelSpec = dmaGetChannelSpecByTimerValue(timer->tim, timer->channel, dmaopt);
-            dmaResource_t *dma = dmaChannelSpec->ref;
+            const dmaChannelSpec_t *dmaChannelSpec =
+                dmaGetChannelSpecByTimerValue(timer->tim, timer->channel,
+                        dmaopt); dmaResource_t *dma = dmaChannelSpec->ref;
             dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(dma);
             if (dmaGetOwner(dmaIdentifier)->owner == OWNER_FREE) {
                 bbPorts[bbPortIndex].timhw = timer;
@@ -342,12 +350,15 @@ static bool bbMotorConfig(IO_t io, uint8_t motorIndex, g_motorPwmProtocolTypes_e
 
         if (bbPort) {
             const timerHardware_t *timhw = bbPort->timhw;
-            const dmaChannelSpec_t *dmaChannelSpec = dmaGetChannelSpecByTimerValue(timhw->tim, timhw->channel, dmaGetOptionByTimer(timhw));
-            bbPort->dmaResource = dmaChannelSpec->ref;
+            const dmaChannelSpec_t *dmaChannelSpec =
+                dmaGetChannelSpecByTimerValue(timhw->tim, timhw->channel,
+                        dmaGetOptionByTimer(timhw)); bbPort->dmaResource =
+                dmaChannelSpec->ref;
             bbPort->dmaChannel = dmaChannelSpec->channel;
         }
 
-        if (!bbPort || !dmaAllocate(dmaGetIdentifier(bbPort->dmaResource), bbPort->owner.owner, bbPort->owner.resourceIndex)) {
+        if (!bbPort || !dmaAllocate(dmaGetIdentifier(bbPort->dmaResource),
+                    bbPort->owner.owner, bbPort->owner.resourceIndex)) {
             bbDevice.vTable.write = motorWriteNull;
             bbDevice.vTable.updateStart = motorUpdateStartNull;
             bbDevice.vTable.updateComplete = motorUpdateCompleteNull;
@@ -358,10 +369,12 @@ static bool bbMotorConfig(IO_t io, uint8_t motorIndex, g_motorPwmProtocolTypes_e
         bbPort->gpio = IO_GPIO(io);
 
         bbPort->portOutputCount = MOTOR_DSHOT_BUF_LENGTH;
-        bbPort->portOutputBuffer = &bbOutputBuffer[(bbPort - bbPorts) * MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH];
+        bbPort->portOutputBuffer = &bbOutputBuffer[(bbPort - bbPorts) *
+            MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH];
 
         bbPort->portInputCount = DSHOT_BB_PORT_IP_BUF_LENGTH;
-        bbPort->portInputBuffer = &bbInputBuffer[(bbPort - bbPorts) * DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH];
+        bbPort->portInputBuffer = &bbInputBuffer[(bbPort - bbPorts) *
+            DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH];
 
         bbTimebaseSetup(bbPort, pwmProtocolType);
         bbTIM_TimeBaseInit(bbPort, bbPort->outputARR);
@@ -491,10 +504,12 @@ static void bbPostInit()
 {
     bbFindPacerTimer();
 
-    for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex < motorCount; motorIndex++) {
+    for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex <
+            motorCount; motorIndex++) {
 
-        if (!bbMotorConfig(bbMotors[motorIndex].io, motorIndex, MOTOR_PWM_PROTOCOL, bbMotors[motorIndex].output)) {
-            return NULL;
+        if (!bbMotorConfig(bbMotors[motorIndex].io, motorIndex,
+                    MOTOR_PWM_PROTOCOL, bbMotors[motorIndex].output)) { return
+            NULL;
         }
 
 
@@ -554,7 +569,8 @@ motorDevice_t *dshotBitbangDevInit(uint8_t count)
         bbMotors[motorIndex].pinIndex = pinIndex;
         bbMotors[motorIndex].io = io;
         bbMotors[motorIndex].output = output;
-        bbMotors[motorIndex].iocfg = IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, bbPuPdMode);
+        bbMotors[motorIndex].iocfg = IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz,
+                GPIO_OType_PP, bbPuPdMode);
 
         IOInit(io, OWNER_MOTOR, RESOURCE_INDEX(motorIndex));
         IOConfigGPIO(io, bbMotors[motorIndex].iocfg);
@@ -572,8 +588,8 @@ motorDevice_t *dshotBitbangDevInit(uint8_t count)
 }
 
 
-void motorCheckDshotBitbangStatus(void)
+void motorCheckDshotBitbangStatus(arming_t * arming)
 {
-    armingSetDshotBitbangOkay(dshotBitbangGetStatus() == DSHOT_BITBANG_STATUS_OK);
+    armingSetDshotBitbangOkay(arming, dshotBitbangGetStatus() == DSHOT_BITBANG_STATUS_OK);
 }
 

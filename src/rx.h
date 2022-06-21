@@ -39,9 +39,9 @@ extern "C" {
             bool imuIsLevel,
             bool calibrating,
             rx_axes_t * rxax,
+            arming_t * arming,
             bool * pidItermResetReady,
             bool * pidItermResetValue,
-            bool * armed,
             bool * gotNewData);
 
 #if defined(__cplusplus)

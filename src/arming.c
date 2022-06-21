@@ -25,36 +25,34 @@
 #include "motor.h"
 #include "rx_status.h"
 
-static arming_t _status;
-
-static bool readyToArm(void)
+static bool readyToArm(arming_t * arming)
 {
     return 
-        _status.acc_done_calibrating &&
-        _status.angle_okay &&
-        _status.arming_switch_okay &&
-        _status.gyro_done_calibrating &&
-        _status.rx_failsafe_okay &&
-        _status.throttle_is_down &&
-        _status.dshot_bitbang_okay;
+        arming->acc_done_calibrating &&
+        arming->angle_okay &&
+        arming->arming_switch_okay &&
+        arming->gyro_done_calibrating &&
+        arming->rx_failsafe_okay &&
+        arming->throttle_is_down &&
+        arming->dshot_bitbang_okay;
 }
 
 void armingCheck(
+        arming_t * arming,
         uint32_t currentTimeUs,
         float raw[],
         bool imuIsLevel,
-        bool calibrating,
-        bool * armed)
+        bool calibrating)
 {
     static bool _doNotRepeat;
 
     if (rxAux1IsSet(raw)) {
 
-        armingUpdateStatus(raw, imuIsLevel, calibrating, *armed);
+        armingUpdateStatus(arming, raw, imuIsLevel, calibrating);
 
-        if (readyToArm()) {
+        if (readyToArm(arming)) {
 
-            if (*armed) {
+            if (arming->is_armed) {
                 return;
             }
 
@@ -62,55 +60,61 @@ void armingCheck(
                 return;
             }
 
-            *armed = true;
+            arming->is_armed = true;
 
         }
 
     } else {
 
-        if (*armed) {
-            armingDisarm(*armed);
-            *armed = false;
+        if (arming->is_armed) {
+            armingDisarm(arming);
+            arming->is_armed = false;
         }
     }
 
-    if (!(*armed || _doNotRepeat || !readyToArm())) {
+    if (!(arming->is_armed || _doNotRepeat || !readyToArm(arming))) {
         _doNotRepeat = true;
     }
 }
 
-void armingDisarm(bool armed)
+void armingDisarm(arming_t * arming)
 {
-    if (armed) {
+    if (arming->is_armed) {
         motorStop();
     }
+
+    arming->is_armed = false;
 }
 
-
-void armingUpdateStatus( float raw[], bool imuIsLevel, bool calibrating, bool armed)
+bool armingIsArmed(arming_t * arming)
 {
-    if (armed) {
+    return arming->is_armed;
+}
+
+void armingUpdateStatus(arming_t * arming,  float raw[], bool imuIsLevel, bool calibrating)
+{
+    if (arming->is_armed) {
         ledSet(true);
     } else {
 
-        _status.throttle_is_down = rxThrottleIsDown(raw);
+        arming->throttle_is_down = rxThrottleIsDown(raw);
 
-        _status.angle_okay = imuIsLevel;
+        arming->angle_okay = imuIsLevel;
 
-        _status.gyro_done_calibrating = !calibrating;
+        arming->gyro_done_calibrating = !calibrating;
 
-        motorCheckDshotBitbangStatus();
+        motorCheckDshotBitbangStatus(arming);
 
-        _status.acc_done_calibrating = true;
+        arming->acc_done_calibrating = true;
 
         // If arming is disabled and the ARM switch is on
-        if (!readyToArm() && rxAux1IsSet(raw)) {
-            _status.arming_switch_okay = false;
+        if (!readyToArm(arming) && rxAux1IsSet(raw)) {
+            arming->arming_switch_okay = false;
         } else if (!rxAux1IsSet(raw)) {
-            _status.arming_switch_okay = true;
+            arming->arming_switch_okay = true;
         }
 
-        if (!readyToArm()) {
+        if (!readyToArm(arming)) {
             ledWarningFlash();
         } else {
             ledWarningDisable();
@@ -120,13 +124,12 @@ void armingUpdateStatus( float raw[], bool imuIsLevel, bool calibrating, bool ar
     }
 }
 
-void armingSetDshotBitbangOkay(bool okay)
+void armingSetDshotBitbangOkay(arming_t * arming, bool okay)
 {
-    _status.dshot_bitbang_okay = okay;
+    arming->dshot_bitbang_okay = okay;
 }
 
-void armingSetRxFailsafe(bool okay)
+void armingSetRxFailsafe(arming_t * arming, bool okay)
 {
-    _status.rx_failsafe_okay= okay;
+    arming->rx_failsafe_okay= okay;
 }
-

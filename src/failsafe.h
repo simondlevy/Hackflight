@@ -70,12 +70,12 @@ extern "C" {
 void failsafeInit(void);
 void failsafeReset(void);
 void failsafeStartMonitoring(void);
-void failsafeUpdateState(float * rcData, bool * armed);
+void failsafeUpdateState(float * rcData, arming_t * arming);
 bool failsafeIsMonitoring(void);
 bool failsafeIsActive(void);
 bool failsafeIsReceivingRxData(void);
-void failsafeOnValidDataReceived(void);
-void failsafeOnValidDataFailed(void);
+void failsafeOnValidDataReceived(arming_t * arming);
+void failsafeOnValidDataFailed(arming_t * arming);
 
 #if defined(__cplusplus)
 }

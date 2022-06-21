@@ -344,7 +344,10 @@ static void readChannelsApplyRanges(rx_t * rx, float raw[])
 }
 
 // rxPoll
-static void detectAndApplySignalLossBehaviour(rx_t * rx, uint32_t currentTimeUs,
+static void detectAndApplySignalLossBehaviour(
+        rx_t * rx,
+        arming_t * arming,
+        uint32_t currentTimeUs,
         float raw[])
 {
     uint32_t currentTimeMs = currentTimeUs/ 1000;
@@ -377,10 +380,10 @@ static void detectAndApplySignalLossBehaviour(rx_t * rx, uint32_t currentTimeUs,
     }
 
     if (flightChannelsValid) {
-        failsafeOnValidDataReceived();
+        failsafeOnValidDataReceived(arming);
     } else {
         rx->inFailsafeMode = true;
-        failsafeOnValidDataFailed();
+        failsafeOnValidDataFailed(arming);
         for (uint8_t channel = 0; channel < CHANNEL_COUNT; channel++) {
             raw[channel] = getFailValue(raw, channel);
         }
@@ -436,7 +439,10 @@ static void updateCommands(rx_t * rx, float raw[])
 }
 
 // rxPoll
-static bool calculateChannelsAndUpdateFailsafe(rx_t * rx, uint32_t currentTimeUs,
+static bool calculateChannelsAndUpdateFailsafe(
+        rx_t * rx,
+        arming_t * arming,
+        uint32_t currentTimeUs,
         float raw[])
 {
     if (rx->auxiliaryProcessingRequired) {
@@ -451,7 +457,7 @@ static bool calculateChannelsAndUpdateFailsafe(rx_t * rx, uint32_t currentTimeUs
     rx->nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
 
     readChannelsApplyRanges(rx, raw);
-    detectAndApplySignalLossBehaviour(rx, currentTimeUs, raw);
+    detectAndApplySignalLossBehaviour(rx, arming, currentTimeUs, raw);
 
     return true;
 }
@@ -473,7 +479,7 @@ static int32_t getFrameDelta(rx_t * rx, uint32_t currentTimeUs, int32_t *frameAg
 }
 
 // rxPoll
-static bool processData(rx_t * rx, float raw[], uint32_t currentTimeUs, bool * armed)
+static bool processData(rx_t * rx, float raw[], uint32_t currentTimeUs, arming_t * arming)
 {
     int32_t frameAgeUs;
 
@@ -498,7 +504,7 @@ static bool processData(rx_t * rx, float raw[], uint32_t currentTimeUs, bool * a
         failsafeStartMonitoring();
     }
 
-    failsafeUpdateState(raw, armed);
+    failsafeUpdateState(raw, arming);
 
     return rxThrottleIsDown(raw);
 }
@@ -837,9 +843,9 @@ void rxPoll(
         bool imuIsLevel,
         bool calibrating,
         rx_axes_t * rxax,
+        arming_t * arming,
         bool * pidItermResetReady,
         bool * pidItermResetValue,
-        bool * armed,
         bool * gotNewData)
 {
     *pidItermResetReady = false;
@@ -853,24 +859,24 @@ void rxPoll(
             break;
 
         case RX_STATE_PROCESS:
-            if (!calculateChannelsAndUpdateFailsafe(&_rx, currentTimeUs, _rx.raw)) {
+            if (!calculateChannelsAndUpdateFailsafe(&_rx, arming, currentTimeUs, _rx.raw)) {
                 _rx.state = RX_STATE_CHECK;
                 break;
             }
             *pidItermResetReady = true;
-            *pidItermResetValue = processData(&_rx, _rx.raw, currentTimeUs, armed);
+            *pidItermResetValue = processData(&_rx, _rx.raw, currentTimeUs, arming);
             _rx.state = RX_STATE_MODES;
             break;
 
         case RX_STATE_MODES:
-            armingCheck(currentTimeUs, _rx.raw, imuIsLevel, calibrating, armed);
+            armingCheck(arming, currentTimeUs, _rx.raw, imuIsLevel, calibrating);
             _rx.state = RX_STATE_UPDATE;
             break;
 
         case RX_STATE_UPDATE:
             _rx.gotNewData = true;
             updateCommands(&_rx, _rx.raw);
-            armingUpdateStatus(_rx.raw, imuIsLevel, calibrating, *armed);
+            armingUpdateStatus(arming, _rx.raw, imuIsLevel, calibrating);
             _rx.state = RX_STATE_CHECK;
             break;
     }

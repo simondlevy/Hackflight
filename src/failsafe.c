@@ -109,20 +109,20 @@ bool failsafeIsReceivingRxData(void)
     return (failsafeState.rxLinkState == FAILSAFE_RXLINK_UP);
 }
 
-void failsafeOnValidDataReceived(void)
+void failsafeOnValidDataReceived(arming_t * arming)
 {
     failsafeState.validRxDataReceivedAt = timeMillis();
     if ((failsafeState.validRxDataReceivedAt -
                 failsafeState.validRxDataFailedAt) >
             failsafeState.rxDataRecoveryPeriod) { failsafeState.rxLinkState =
         FAILSAFE_RXLINK_UP;
-        armingSetRxFailsafe(true);
+        armingSetRxFailsafe(arming, true);
     }
 }
 
-void failsafeOnValidDataFailed(void)
+void failsafeOnValidDataFailed(arming_t * arming)
 {
-    armingSetRxFailsafe(false);
+    armingSetRxFailsafe(arming, false);
     failsafeState.validRxDataFailedAt = timeMillis();
     if ((failsafeState.validRxDataFailedAt -
                 failsafeState.validRxDataReceivedAt) >
@@ -131,7 +131,7 @@ void failsafeOnValidDataFailed(void)
     }
 }
 
-void failsafeUpdateState(float * rcData, bool * armed)
+void failsafeUpdateState(float * rcData, arming_t * arming)
 {
     if (!failsafeIsMonitoring()) {
         return;
@@ -150,7 +150,7 @@ void failsafeUpdateState(float * rcData, bool * armed)
 
         switch (failsafeState.phase) {
             case FAILSAFE_IDLE:
-                if (armed) {
+                if (armingIsArmed(arming)) {
                     // Track throttle command below minimum time
                     if (!rxThrottleIsDown(rcData)) {
                         failsafeState.throttleLowPeriod =
@@ -208,8 +208,7 @@ void failsafeUpdateState(float * rcData, bool * armed)
             case FAILSAFE_LANDING:
                 break;
             case FAILSAFE_LANDED:
-                armingDisarm(*armed);
-                *armed = false;
+                armingDisarm(arming);
                 failsafeState.receivingRxDataPeriod = timeMillis() +
                     failsafeState.receivingRxDataPeriodPreset; // set required
                 failsafeState.phase = FAILSAFE_RX_LOSS_MONITORING;
@@ -223,7 +222,7 @@ void failsafeUpdateState(float * rcData, bool * armed)
                     if (timeMillis() > failsafeState.receivingRxDataPeriod) {
                         // rx link is good now, when arming via ARM switch, it
                         // must be OFF first
-                        if (!*armed) {
+                        if (!armingIsArmed(arming)) {
                             failsafeState.phase = FAILSAFE_RX_LOSS_RECOVERED;
                             reprocessState = true;
                         }

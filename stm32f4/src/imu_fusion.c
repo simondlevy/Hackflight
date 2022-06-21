@@ -22,6 +22,7 @@
 #include <math.h>
 
 #include "accel.h"
+#include "arming.h"
 #include "core_rate.h"
 #include "datatypes.h"
 #include "deg2rad.h"
@@ -242,19 +243,25 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     imu_fusion_t * fusionPrev = &hf->imuFusionPrev;
 
     gyro_reset_t new_gyro_reset = {0};
-    bool resetActive1 = checkReset(time, useAcc, &gyroAvg, hf->armed,
-            &fusionPrev->gyroReset, &new_gyro_reset);
 
-    bool resetActive = hf->armed ?  false : resetActive1;
+    bool resetActive1 = checkReset(
+            time,
+            useAcc,
+            &gyroAvg,
+            armingIsArmed(&hf->arming),
+            &fusionPrev->gyroReset,
+            &new_gyro_reset);
 
-    if (!hf->armed) {
+    bool resetActive = armingIsArmed(&hf->arming) ?  false : resetActive1;
+
+    if (!armingIsArmed(&hf->arming)) {
         memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyro_reset_t));
     }
 
     // Scale the kP to generally converge faster when disarmed.
     float kpgain = resetActive ?
         ATTITUDE_RESET_KP_GAIN :
-        DCM_KP * (!hf->armed ? 10 : 1);
+        DCM_KP * (!armingIsArmed(&hf->arming) ? 10 : 1);
 
     mahony(dt, &gyroAvg, &accelAvg, useAcc, kpgain,
             &fusionPrev->rot, &fusionPrev->quat, quat);

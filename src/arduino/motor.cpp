@@ -21,9 +21,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <arming.h>
 #include <motor.h>
 
-void motorCheckDshotBitbangStatus(void)
+void motorCheckDshotBitbangStatus(arming_t * arming)
 {
-    armingSetDshotBitbangOkay(true);
+    armingSetDshotBitbangOkay(arming, true);
 }
 
 bool motorIsReady(uint32_t currentTime)
