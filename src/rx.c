@@ -111,8 +111,6 @@ static void pt3FilterUpdateCutoff(pt3Filter_t *filter, float k)
     filter->k = k;
 }
 
-// ---------------------------------------------------------------------------------
-
 static inline int32_t cmp32(uint32_t a, uint32_t b) { return (int32_t)(a-b); }
 
 static uint8_t rxfail_step_to_channel_value(uint8_t step)
@@ -685,6 +683,17 @@ static void processSmoothingFilter(
             rx->dataToSmooth.yaw, &setpointRate[3]);
 }
 
+static float getRawSetpoint(float command, float divider)
+{
+    float commandf = command / divider;
+
+    float commandfAbs = fabsf(commandf);
+
+    float angleRate = rxApplyRates(commandf, commandfAbs);
+
+    return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
+}
+
 // ----------------------------------------------------------------------------
 
 static rx_t _rx;
@@ -780,17 +789,6 @@ void rxPoll(
     rxax->aux2             = _rx.raw[AUX2];
 
     *gotNewData = _rx.gotNewData;
-}
-
-static float getRawSetpoint(float command, float divider)
-{
-    float commandf = command / divider;
-
-    float commandfAbs = fabsf(commandf);
-
-    float angleRate = rxApplyRates(commandf, commandfAbs);
-
-    return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
 }
 
 // Runs in fast (inner, core) loop
