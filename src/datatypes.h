@@ -141,11 +141,6 @@ typedef enum {
     RX_FRAME_DROPPED = (1 << 3)
 } rxFrameState_e;
 
-typedef enum {
-    THROTTLE_LOW = 0,
-    THROTTLE_HIGH
-} throttleStatus_e;
-
 // Vehicle state ------------------------------------------------------------------------
 
 typedef struct {

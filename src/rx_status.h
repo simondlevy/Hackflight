@@ -26,15 +26,16 @@
 extern "C" {
 #endif
 
-static bool isAux1Set(float raw[])
+static bool rxAux1IsSet(float raw[])
 {
     return raw[4] > 1200;
 }
 
-static throttleStatus_e rxCalculateThrottleStatus(float * rcData)
+static bool rxThrottleIsDown(float raw[])
 {
-    return (rcData[THROTTLE] < 1050) ?  THROTTLE_LOW : THROTTLE_HIGH;
+    return raw[THROTTLE] < 1050;
 }
+
 #if defined(__cplusplus)
 }
 #endif

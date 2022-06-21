@@ -31,7 +31,7 @@
 #include "pwm.h"
 #include "rx.h"
 #include "rx_rate.h"
-#include "rx_throttle_status.h"
+#include "rx_status.h"
 #include "scale.h"
 #include "time.h"
 
@@ -500,9 +500,7 @@ static bool processData(rx_t * rx, float raw[], uint32_t currentTimeUs, bool * a
 
     failsafeUpdateState(raw, armed);
 
-    const throttleStatus_e throttleStatus = rxCalculateThrottleStatus(raw);
-
-    return throttleStatus == THROTTLE_LOW;
+    return rxThrottleIsDown(raw);
 }
 
 static void ratePidFeedforwardLpfInit(angle_pid_t * pid, uint16_t filterCutoff)

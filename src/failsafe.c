@@ -23,7 +23,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "debug.h"
 #include "failsafe.h"
 #include "rx.h"
-#include "rx_throttle_status.h"
+#include "rx_status.h"
 #include "time.h"
 
 static const uint32_t MILLIS_PER_TENTH_SECOND    =   100;
@@ -152,7 +152,7 @@ void failsafeUpdateState(float * rcData, bool * armed)
             case FAILSAFE_IDLE:
                 if (armed) {
                     // Track throttle command below minimum time
-                    if (THROTTLE_HIGH == rxCalculateThrottleStatus(rcData)) {
+                    if (!rxThrottleIsDown(rcData)) {
                         failsafeState.throttleLowPeriod =
                             timeMillis() + 100 * MILLIS_PER_TENTH_SECOND;
                     }

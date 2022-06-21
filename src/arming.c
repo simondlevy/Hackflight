@@ -23,14 +23,9 @@
 #include "failsafe.h"
 #include "led.h"
 #include "motor.h"
-#include "rx_throttle_status.h"
+#include "rx_status.h"
 
 static arming_t _status;
-
-static void resetTryingToArm(uint8_t * tryingToArm)
-{
-    *tryingToArm = ARMING_DELAYED_DISARMED;
-}
 
 static bool readyToArm(void)
 {
@@ -52,9 +47,8 @@ void armingCheck(
         bool * armed)
 {
     static bool _doNotRepeat;
-    static uint8_t _tryingToArm;
 
-    if (isAux1Set(raw)) {
+    if (rxAux1IsSet(raw)) {
 
         armingUpdateStatus(currentTimeUs, raw, imuIsLevel, calibrating, *armed);
 
@@ -64,21 +58,15 @@ void armingCheck(
                 return;
             }
 
-            if (!motorIsReady(currentTimeUs, &_tryingToArm)) {
+            if (!motorIsReady(currentTimeUs)) {
                 return;
             }
 
             *armed = true;
 
-            resetTryingToArm(&_tryingToArm);
-
-        } else {
-            resetTryingToArm(&_tryingToArm);
         }
 
     } else {
-
-        resetTryingToArm(&_tryingToArm);
 
         if (*armed) {
             armingDisarm(*armed);
@@ -110,13 +98,7 @@ void armingUpdateStatus(
         ledSet(true);
     } else {
 
-        // Check if the power on arming grace time has elapsed
-        if (readyToArm() &&
-                currentTimeUs >= 5000000 &&
-                (!motorIsProtocolDshot() || motorDshotStreamingCommandsAreEnabled())
-           )
-
-        _status.throttle_is_down = rxCalculateThrottleStatus(raw) == THROTTLE_LOW;
+        _status.throttle_is_down = rxThrottleIsDown(raw);
 
         _status.angle_okay = imuIsLevel;
 
@@ -127,9 +109,9 @@ void armingUpdateStatus(
         _status.acc_done_calibrating = true;
 
         // If arming is disabled and the ARM switch is on
-        if (!readyToArm() && isAux1Set(raw)) {
+        if (!readyToArm() && rxAux1IsSet(raw)) {
             _status.arming_switch_okay = false;
-        } else if (!isAux1Set(raw)) {
+        } else if (!rxAux1IsSet(raw)) {
             _status.arming_switch_okay = true;
         }
 

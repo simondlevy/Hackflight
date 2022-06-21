@@ -33,11 +33,6 @@ typedef struct {
 
 } arming_t;
 
-enum {
-    ARMING_DELAYED_DISARMED = 0,
-    ARMING_DELAYED_NORMAL = 1
-};
-
 #if defined(__cplusplus)
 extern "C" {
 #endif

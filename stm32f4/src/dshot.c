@@ -174,14 +174,7 @@ float motorValueLow(void)
     return DSHOT_MIN_THROTTLE + 0.045 * DSHOT_RANGE;
 }
 
-bool motorIsReady(uint32_t currentTimeUs, uint8_t * tryingToArm)
+bool motorIsReady(uint32_t currentTimeUs)
 {
-    if (currentTimeUs  < DSHOT_BEACON_GUARD_DELAY_US) {
-        if (*tryingToArm == ARMING_DELAYED_DISARMED) {
-            *tryingToArm = ARMING_DELAYED_NORMAL;
-        }
-        return false;
-    }
-
-    return true;
+    return currentTimeUs >= DSHOT_BEACON_GUARD_DELAY_US;
 }

@@ -26,10 +26,9 @@ void motorCheckDshotBitbangStatus(void)
     armingSetDshotBitbang(true);
 }
 
-bool motorIsReady(uint32_t currentTime, uint8_t * tryingToArm)
+bool motorIsReady(uint32_t currentTime)
 {
     (void)currentTime;
-    (void)tryingToArm;
     return true;
 }
 
