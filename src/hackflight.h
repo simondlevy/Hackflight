@@ -82,6 +82,7 @@ static void task_rx(void * hackflight, uint32_t time)
         fabsf(hf->vstate.theta) < hf->maxArmingAngle;
 
     rxPoll(
+            &hf->rx,
             time,
             imuIsLevel, 
             calibrating,
@@ -108,7 +109,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
     uint32_t currentTimeUs = timeMicros();
 
-    rxGetDemands(currentTimeUs, &hf->anglepid, &hf->demands);
+    rxGetDemands(&hf->rx, currentTimeUs, &hf->anglepid, &hf->demands);
 
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pid_controller_t pid = hf->pidControllers[k];

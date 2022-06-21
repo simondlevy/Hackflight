@@ -32,9 +32,14 @@ extern "C" {
 
     void rxDevInit(serialPortIdentifier_e port);
 
-    void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands);
+    void rxGetDemands(
+            rx_t * rx,
+            uint32_t currentTimeUs,
+            angle_pid_t * ratepid,
+            demands_t * demands);
 
     void rxPoll(
+            rx_t * rx,
             uint32_t currentTimeUs,
             bool imuIsLevel,
             bool calibrating,
@@ -50,18 +55,8 @@ extern "C" {
 
 // For hardware impelmentations ------------------------------------------------------
 
-bool rxCheck(uint32_t currentTimeUs);
+bool rxCheck(rx_t * rx, uint32_t currentTimeUs);
 
 uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs);
 
 float rxDevConvertValue(uint16_t * channelData, uint8_t chan);
-
-void rxUpdateArmingStatus(
-        uint32_t currentTimeUs,
-        float raw[],
-        bool imuIsLevel,
-        bool calibrating,
-        bool armed);
-
-
-

@@ -696,49 +696,48 @@ static float getRawSetpoint(float command, float divider)
 
 // ----------------------------------------------------------------------------
 
-static rx_t _rx;
-
 // Called from hackflight.c::adjustRxDynamicPriority()
-bool rxCheck(uint32_t currentTimeUs)
+bool rxCheck(rx_t * rx, uint32_t currentTimeUs)
 {
     bool signalReceived = false;
     bool useDataDrivenProcessing = true;
 
-    if (_rx.state != RX_STATE_CHECK) {
+    if (rx->state != RX_STATE_CHECK) {
         return true;
     }
 
-    const uint8_t frameStatus = rxDevCheck(_rx.channelData, &_rx.lastFrameTimeUs);
+    const uint8_t frameStatus = rxDevCheck(rx->channelData, &rx->lastFrameTimeUs);
 
     if (frameStatus & RX_FRAME_COMPLETE) {
-        _rx.inFailsafeMode = (frameStatus & RX_FRAME_FAILSAFE) != 0;
+        rx->inFailsafeMode = (frameStatus & RX_FRAME_FAILSAFE) != 0;
         bool rxFrameDropped = (frameStatus & RX_FRAME_DROPPED) != 0;
-        signalReceived = !(_rx.inFailsafeMode || rxFrameDropped);
+        signalReceived = !(rx->inFailsafeMode || rxFrameDropped);
         if (signalReceived) {
-            _rx.needSignalBefore = currentTimeUs + NEED_SIGNAL_MAX_DELAY_US;
+            rx->needSignalBefore = currentTimeUs + NEED_SIGNAL_MAX_DELAY_US;
         }
     }
 
     if (frameStatus & RX_FRAME_PROCESSING_REQUIRED) {
-        _rx.auxiliaryProcessingRequired = true;
+        rx->auxiliaryProcessingRequired = true;
     }
 
     if (signalReceived) {
-        _rx.signalReceived = true;
-    } else if (currentTimeUs >= _rx.needSignalBefore) {
-        _rx.signalReceived = false;
+        rx->signalReceived = true;
+    } else if (currentTimeUs >= rx->needSignalBefore) {
+        rx->signalReceived = false;
     }
 
     if ((signalReceived && useDataDrivenProcessing) ||
-            cmpTimeUs(currentTimeUs, _rx.nextUpdateAtUs) > 0) {
-        _rx.dataProcessingRequired = true;
+            cmpTimeUs(currentTimeUs, rx->nextUpdateAtUs) > 0) {
+        rx->dataProcessingRequired = true;
     }
 
     // data driven or 50Hz
-    return _rx.dataProcessingRequired || _rx.auxiliaryProcessingRequired; 
+    return rx->dataProcessingRequired || rx->auxiliaryProcessingRequired; 
 }
 
 void rxPoll(
+        rx_t * rx,
         uint32_t currentTimeUs,
         bool imuIsLevel,
         bool calibrating,
@@ -750,72 +749,76 @@ void rxPoll(
 {
     *pidItermResetReady = false;
 
-    _rx.gotNewData = false;
+    rx->gotNewData = false;
 
-    switch (_rx.state) {
+    switch (rx->state) {
         default:
         case RX_STATE_CHECK:
-            _rx.state = RX_STATE_PROCESS;
+            rx->state = RX_STATE_PROCESS;
             break;
 
         case RX_STATE_PROCESS:
-            if (!calculateChannelsAndUpdateFailsafe(&_rx, arming, currentTimeUs, _rx.raw)) {
-                _rx.state = RX_STATE_CHECK;
+            if (!calculateChannelsAndUpdateFailsafe(rx, arming, currentTimeUs, rx->raw)) {
+                rx->state = RX_STATE_CHECK;
                 break;
             }
             *pidItermResetReady = true;
-            *pidItermResetValue = processData(&_rx, _rx.raw, currentTimeUs, arming);
-            _rx.state = RX_STATE_MODES;
+            *pidItermResetValue = processData(rx, rx->raw, currentTimeUs, arming);
+            rx->state = RX_STATE_MODES;
             break;
 
         case RX_STATE_MODES:
-            armingCheck(arming, currentTimeUs, _rx.raw, imuIsLevel, calibrating);
-            _rx.state = RX_STATE_UPDATE;
+            armingCheck(arming, currentTimeUs, rx->raw, imuIsLevel, calibrating);
+            rx->state = RX_STATE_UPDATE;
             break;
 
         case RX_STATE_UPDATE:
-            _rx.gotNewData = true;
-            updateCommands(&_rx, _rx.raw);
-            armingUpdateStatus(arming, _rx.raw, imuIsLevel, calibrating);
-            _rx.state = RX_STATE_CHECK;
+            rx->gotNewData = true;
+            updateCommands(rx, rx->raw);
+            armingUpdateStatus(arming, rx->raw, imuIsLevel, calibrating);
+            rx->state = RX_STATE_CHECK;
             break;
     }
 
-    rxax->demands.throttle = _rx.raw[THROTTLE];
-    rxax->demands.roll     = _rx.raw[ROLL];
-    rxax->demands.pitch    = _rx.raw[PITCH];
-    rxax->demands.yaw      = _rx.raw[YAW];
-    rxax->aux1             = _rx.raw[AUX1];
-    rxax->aux2             = _rx.raw[AUX2];
+    rxax->demands.throttle = rx->raw[THROTTLE];
+    rxax->demands.roll     = rx->raw[ROLL];
+    rxax->demands.pitch    = rx->raw[PITCH];
+    rxax->demands.yaw      = rx->raw[YAW];
+    rxax->aux1             = rx->raw[AUX1];
+    rxax->aux2             = rx->raw[AUX2];
 
-    *gotNewData = _rx.gotNewData;
+    *gotNewData = rx->gotNewData;
 }
 
 // Runs in fast (inner, core) loop
-void rxGetDemands(uint32_t currentTimeUs, angle_pid_t * ratepid, demands_t * demands)
+void rxGetDemands(
+        rx_t * rx,
+        uint32_t currentTimeUs,
+        angle_pid_t * ratepid,
+        demands_t * demands)
 {
     float rawSetpoint[4] = {0};
     float setpointRate[4] = {0};
 
-    if (_rx.gotNewData) {
+    if (rx->gotNewData) {
 
-        _rx.previousFrameTimeUs = 0;
+        rx->previousFrameTimeUs = 0;
 
-        rawSetpoint[ROLL]  = getRawSetpoint(_rx.command[ROLL], COMMAND_DIVIDER);
-        rawSetpoint[PITCH] = getRawSetpoint(_rx.command[PITCH], COMMAND_DIVIDER);
-        rawSetpoint[YAW]   = getRawSetpoint(_rx.command[YAW], YAW_COMMAND_DIVIDER);
+        rawSetpoint[ROLL]  = getRawSetpoint(rx->command[ROLL], COMMAND_DIVIDER);
+        rawSetpoint[PITCH] = getRawSetpoint(rx->command[PITCH], COMMAND_DIVIDER);
+        rawSetpoint[YAW]   = getRawSetpoint(rx->command[YAW], YAW_COMMAND_DIVIDER);
     }
 
-    processSmoothingFilter(currentTimeUs, &_rx, ratepid, setpointRate, rawSetpoint);
+    processSmoothingFilter(currentTimeUs, rx, ratepid, setpointRate, rawSetpoint);
 
     // Find min and max throttle based on conditions. Throttle has to be known
     // before mixing
     demands->throttle =
-        constrain_f((_rx.commands.throttle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
+        constrain_f((rx->commands.throttle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
 
     demands->roll  = setpointRate[ROLL];
     demands->pitch = setpointRate[PITCH];
     demands->yaw   = setpointRate[YAW];
 
-    _rx.gotNewData = false;
+    rx->gotNewData = false;
 }

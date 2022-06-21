@@ -102,14 +102,14 @@ static void adjustDynamicPriority(task_t * task, uint32_t currentTimeUs)
 }
 
 // Increase priority for RX task
-static void adjustRxDynamicPriority(task_t * task, uint32_t currentTimeUs) 
+static void adjustRxDynamicPriority(rx_t * rx, task_t * task, uint32_t currentTimeUs) 
 {
     if (task->dynamicPriority > 0) {
         task->taskAgeCycles = 1 + (cmpTimeUs(currentTimeUs,
                     task->lastSignaledAtUs) / task->desiredPeriodUs);
         task->dynamicPriority = 1 + task->taskAgeCycles;
     } else  {
-        if (rxCheck(currentTimeUs)) {
+        if (rxCheck(rx, currentTimeUs)) {
             task->lastSignaledAtUs = currentTimeUs;
             task->taskAgeCycles = 1;
             task->dynamicPriority = 2;
@@ -242,7 +242,7 @@ static void checkDynamicTasks(
                 &selectedTaskDynamicPriority);
     }
 
-    adjustRxDynamicPriority(&hf->rxTask, currentTimeUs);
+    adjustRxDynamicPriority(&hf->rx, &hf->rxTask, currentTimeUs);
     updateDynamicTask(&hf->rxTask, &selectedTask, &selectedTaskDynamicPriority);
 
     adjustAndUpdateTask(&hf->attitudeTask, currentTimeUs,
