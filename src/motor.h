@@ -31,9 +31,9 @@ extern "C" {
 #endif
 
 void     motorCheckDshotBitbangStatus(arming_t * arming);
-bool     motorIsReady(uint32_t currentTime);
 float    motorConvertFromExternal(uint16_t externalValue);
 bool     motorIsProtocolDshot(void);
+bool     motorIsReady(uint32_t currentTime);
 float    motorValueDisarmed(void);
 float    motorValueHigh(void);
 float    motorValueLow(void);
