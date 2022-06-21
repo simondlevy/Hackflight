@@ -574,6 +574,6 @@ motorDevice_t *dshotBitbangDevInit(uint8_t count)
 
 void motorCheckDshotBitbangStatus(void)
 {
-    armingSetDshotBitbang(dshotBitbangGetStatus() == DSHOT_BITBANG_STATUS_OK);
+    armingSetDshotBitbangOkay(dshotBitbangGetStatus() == DSHOT_BITBANG_STATUS_OK);
 }
 

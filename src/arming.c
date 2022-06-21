@@ -34,9 +34,9 @@ static bool readyToArm(void)
         _status.angle_okay &&
         _status.arming_switch_okay &&
         _status.gyro_done_calibrating &&
-        _status.dshot_bitbang_okay &&
         _status.rx_failsafe_okay &&
-        _status.throttle_is_down;
+        _status.throttle_is_down &&
+        _status.dshot_bitbang_okay;
 }
 
 void armingCheck(
@@ -120,7 +120,7 @@ void armingUpdateStatus( float raw[], bool imuIsLevel, bool calibrating, bool ar
     }
 }
 
-void armingSetDshotBitbang(bool okay)
+void armingSetDshotBitbangOkay(bool okay)
 {
     _status.dshot_bitbang_okay = okay;
 }

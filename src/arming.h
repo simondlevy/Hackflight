@@ -48,7 +48,7 @@ extern "C" {
 
     void  armingUpdateStatus(float raw[], bool imuIsLevel, bool calibrating, bool armed);
 
-    void armingSetDshotBitbang(bool enabled);
+    void armingSetDshotBitbangOkay(bool enabled);
 
     void armingSetRxFailsafe(bool enabled);
 

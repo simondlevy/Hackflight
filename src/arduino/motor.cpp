@@ -23,7 +23,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 void motorCheckDshotBitbangStatus(void)
 {
-    armingSetDshotBitbang(true);
+    armingSetDshotBitbangOkay(true);
 }
 
 bool motorIsReady(uint32_t currentTime)
