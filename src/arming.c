@@ -114,10 +114,7 @@ void armingUpdateStatus(
         if (readyToArm() &&
                 currentTimeUs >= 5000000 &&
                 (!motorIsProtocolDshot() || motorDshotStreamingCommandsAreEnabled())
-           ) {
-            // If so, unset the grace time arming disable flag
-            _status.boot_grace_time_done = true;
-        }
+           )
 
         _status.throttle_is_down = rxCalculateThrottleStatus(raw) == THROTTLE_LOW;
 

@@ -27,7 +27,6 @@ typedef struct {
     bool angle_okay;
     bool arming_switch_okay;
     bool gyro_done_calibrating;
-    bool boot_grace_time_done;
     bool dshot_bitbang_okay;
     bool rx_failsafe_okay;
     bool throttle_is_down;
@@ -36,8 +35,7 @@ typedef struct {
 
 enum {
     ARMING_DELAYED_DISARMED = 0,
-    ARMING_DELAYED_NORMAL = 1,
-    ARMING_DELAYED_LAUNCH_CONTROL = 3,
+    ARMING_DELAYED_NORMAL = 1
 };
 
 #if defined(__cplusplus)
