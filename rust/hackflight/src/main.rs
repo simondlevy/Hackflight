@@ -332,16 +332,16 @@ enum RxFrameState
     RxFrameDropped = (1 << 3)
 }
 
-/*
 #[allow(dead_code)]
-enum 
+enum RxFailsafeChannelMode
 {
-    RX_FAILSAFE_MODE_AUTO = 0,
-    RX_FAILSAFE_MODE_HOLD,
-    RX_FAILSAFE_MODE_SET,
-    RX_FAILSAFE_MODE_INVALID
-} rxFailsafeChannelMode_e;
+    RxFailsafeModeAuto,
+    RxFailsafeModeHold,
+    RxFailsafeModeSet,
+    RxFailsafeModeInvalid
+} 
 
+/*
 #[allow(dead_code)]
 enum 
 {
