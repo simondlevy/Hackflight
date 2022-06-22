@@ -341,21 +341,14 @@ enum RxFailsafeChannelMode
     RxFailsafeModeInvalid
 } 
 
-/*
 #[allow(dead_code)]
-enum 
+enum ModeLogic
 {
-    MODELOGIC_OR = 0,
-    MODELOGIC_AND
-} modeLogic_e;
+    ModeLogicOr,
+    ModeLogicAnd
+}
 
-#[allow(dead_code)]
-enum 
-{
-    // ARM flag
-    BOXARM = 0,
-    CHECKBOX_ITEM_COUNT
-} boxId_e;
+/*
 
 #[allow(dead_code)]
 struct rxFailsafeChannelConfig_s 
