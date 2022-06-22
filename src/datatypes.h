@@ -249,9 +249,9 @@ typedef union {
 
 typedef struct {
     imu_sensor_t accum;
-    float        dps[3];          // aligned, calibrated, scaled, but unfiltered data from sensor
-    float        dps_filtered[3]; // filtered gyro data
-    uint8_t      sampleCount;   // gyro sensor sample counter
+    float        dps[3];          // aligned, calibrated, scaled, unfiltered
+    float        dps_filtered[3]; // filtered 
+    uint8_t      sampleCount;     // sample counter
     float        sampleSum[3];    // summed samples used for downsampling
     bool         isCalibrating;
 

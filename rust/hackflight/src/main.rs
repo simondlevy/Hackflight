@@ -226,42 +226,53 @@ struct GyroCalibration
     y: CalibrationAxis,
     z: CalibrationAxis,
 
-    cycles_remaining : i32
+    cycles_remaining: i32
 
 }
 
-/*
+/* XXX
 typedef union {
     pt1Filter_t pt1FilterState;
     biquadFilter_t biquadFilterState;
     pt2Filter_t pt2FilterState;
     pt3Filter_t pt3FilterState;
 } gyroLowpassFilter_t;
+*/
 
-typedef struct {
-    imu_sensor_t accum;
-    float        dps[3];          // aligned, calibrated, scaled, but unfiltered data from sensor
-    float        dps_filtered[3]; // filtered gyro data
-    uint8_t      sampleCount;   // gyro sensor sample counter
-    float        sampleSum[3];    // summed samples used for downsampling
-    bool         isCalibrating;
+#[allow(dead_code)]
+struct GyroAxis
+{
+    dps : f32,          // aligned, calibrated, scaled, unfiltered
+    dps_filtered : f32, // filtered
+    sample_count : u8,  // gyro sensor sample counter
+    sample_sum : f32,   // summed samples used for downsampling
+    zero: f32,
+    //gyroLowpassFilter_t lowpassFilter : GyroLowpassFilter,
+    //gyroLowpassFilter_t lowpass2Filter : GyroLowpassFilter,
+}
+
+#[allow(dead_code)]
+struct Gyro 
+{
+    x : GyroAxis,
+    y : GyroAxis,
+    z : GyroAxis,
+
+    accum : ImuSensor,
+
+    is_calibrating : bool,
 
     // if true then downsample using gyro lowpass 2, otherwise use averaging
-    bool downsampleFilterEnabled;      
+    downsample_filter_enabled : bool,      
 
-    gyroCalibration_t calibration;
+    calibration: GyroCalibration,
 
     // lowpass gyro soft filter
-    filterApplyFnPtr lowpassFilterApplyFn;
-    gyroLowpassFilter_t lowpassFilter[3];
+    // lowpass_filter_apply_fn : FilterApplyFn,
 
     // lowpass2 gyro soft filter
-    filterApplyFnPtr lowpass2FilterApplyFn;
-    gyroLowpassFilter_t lowpass2Filter[3];
-
-    float zero[3];
-} gyro_t;
-*/
+    // lowpass2_filter_apply_fn : FilterApplyFn
+}
 
 // Serial ports ----------------------------------------------------------------
 
