@@ -59,7 +59,7 @@ struct BiquadFilter
     weigh: f32
 } 
 
-// PID control ----------------------------------------------------------------
+// Angle PID control ------------------------------------------------------------
 
 #[allow(dead_code)]
 struct PidAxisData
@@ -103,7 +103,7 @@ struct AnglePid
     last_dyn_lpf_update_us: u32
 }
 
-// Demands ------------------------------------------------------------------------
+// Demands ----------------------------------------------------------------------
 
 #[allow(dead_code)]
 struct Demands 
@@ -114,7 +114,7 @@ struct Demands
     yaw: f32
 } 
 
-// Axes ------------------------------------------------------------------------
+// Axes -------------------------------------------------------------------------
 
 #[allow(dead_code)]
 struct Axes 
@@ -124,7 +124,7 @@ struct Axes
     z: f32
 }
 
-// Vehicle state ------------------------------------------------------------------------
+// Vehicle state ----------------------------------------------------------------
 
 #[allow(dead_code)]
 struct VehicleState 
@@ -141,6 +141,69 @@ struct VehicleState
     dtheta: f32,
     psi: f32,
     dpsi: f32
+}
+
+// General PID control ---------------------------------------------------------
+// XXX
+
+// Tasks ------------------------------------------------------------------------
+// XXX
+
+
+// IMU ------------------------------------------------------------------------
+
+#[allow(dead_code)]
+struct Quaternion
+{
+    w: f32,
+    x: f32,
+    y: f32,
+    z: f32
+} 
+
+#[allow(dead_code)]
+struct Rotation
+{
+    r20: f32,
+    r21: f32,
+    r22: f32
+}
+
+#[allow(dead_code)]
+struct ImuSensor
+{
+    values: Axes,
+    count: u32
+}
+
+#[allow(dead_code)]
+struct GyroReset
+{
+    quiet_period_end: u32,
+    reset_time_end: u32,
+    reset_completed: bool
+}
+
+#[allow(dead_code)]
+struct ImuFusion
+{
+    time: u32,
+    quat: Quaternion,
+    rot: Rotation,
+    gyro_reset: GyroReset
+}
+
+
+// Stats ------------------------------------------------------------------------
+
+#[allow(dead_code)]
+struct StdDev
+{
+    m_old_m: f32,
+    m_new_m: f32,
+    m_old_s: f32,
+    m_new_s: f32,
+    m_n : i32 // XXX should be u32 ?
 }
 
 

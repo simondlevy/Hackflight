@@ -3,14 +3,15 @@
 
    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+   Hackflight is free software: you can redistribute it and/or modify it under
+   the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
@@ -55,7 +56,7 @@ typedef struct {
     float weight;
 } biquadFilter_t;
 
-// PID control ----------------------------------------------------------------
+// Angle PID control ----------------------------------------------------------
 
 typedef struct pidAxisData_s {
     float P;
@@ -94,7 +95,7 @@ typedef struct {
     pt1Filter_t    windupLpf[3];
 } angle_pid_t;
 
-// Demands ------------------------------------------------------------------------
+// Demands ----------------------------------------------------------------------
 
 typedef struct {
     float throttle;
@@ -111,7 +112,7 @@ typedef struct {
     float z;
 } axes_t;
 
-// Vehicle state ------------------------------------------------------------------------
+// Vehicle state ----------------------------------------------------------------
 
 typedef struct {
     float x;
@@ -128,7 +129,7 @@ typedef struct {
     float dpsi;
 } vehicle_state_t;
 
-// PID control ------------------------------------------------------------------------
+// General PID control ---------------------------------------------------------
 
 typedef void (*pid_fun_t)(
         uint32_t usec,
@@ -204,7 +205,7 @@ typedef struct {
 
 typedef struct {
     float m_oldM, m_newM, m_oldS, m_newS;
-    int m_n;
+    int m_n; // XXX should be uint32_t ?
 } stdev_t;
 
 // Filters ----------------------------------------------------------------------
