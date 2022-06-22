@@ -103,7 +103,28 @@ struct AnglePid
     last_dyn_lpf_update_us: u32
 }
 
-/// Vehicle state ------------------------------------------------------------------------
+// Demands ------------------------------------------------------------------------
+
+#[allow(dead_code)]
+struct Demands 
+{
+    throttle: f32,
+    roll: f32,
+    pitch: f32,
+    yaw: f32
+} 
+
+// Axes ------------------------------------------------------------------------
+
+#[allow(dead_code)]
+struct Axes 
+{
+    x: f32,
+    y: f32,
+    z: f32
+}
+
+//// Vehicle state ------------------------------------------------------------------------
 
 #[allow(dead_code)]
 struct VehicleState 
