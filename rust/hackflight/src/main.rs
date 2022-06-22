@@ -297,6 +297,22 @@ enum SerialPortIdentifier
     SerialPortLpUart1 = 40,
 }
 
+// Arming ---------------------------------------------------------------------
+
+#[allow(dead_code)]
+struct Arming
+{
+
+    acc_done_calibrating: bool,
+    angle_okay: bool,
+    arming_switch_okay: bool,
+    gyro_done_calibrating: bool,
+    dshot_bitbang_okay: bool,
+    is_armed: bool,
+    rx_failsafe_okay: bool,
+    throttle_is_down: bool
+}
+
 // Scheduling ------------------------------------------------------------------
 
 #[allow(dead_code)]
