@@ -302,7 +302,6 @@ enum SerialPortIdentifier
 #[allow(dead_code)]
 struct Arming
 {
-
     acc_done_calibrating: bool,
     angle_okay: bool,
     arming_switch_okay: bool,
@@ -323,6 +322,15 @@ struct RxAxes
     aux2 : f32
 }
 
+#[allow(dead_code)]
+enum RxFrameState
+{
+    RxFramePending = 0,
+    RxFrameComplete = (1 << 0),
+    RxFrameFailsafe = (1 << 1),
+    RxFrameProcessingRequired = (1 << 2),
+    RxFrameDropped = (1 << 3)
+}
 
 // Scheduling ------------------------------------------------------------------
 
