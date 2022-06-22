@@ -1,4 +1,6 @@
 /*
+   DID YOU REMEMOVE THE ROTORS FIRST?
+
    Copyright (c) 2022 Simon D. Levy
 
    This file is part of Hackflight.
@@ -16,30 +18,39 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+static uint8_t PIN = 13;
 
-#include <stdint.h>
-#include <stdbool.h>
+static float  val;
+static int8_t dir;
 
-#include "datatypes.h"
-#include "time.h"
+//static rft::ArduinoBrushedMotor motor = rft::ArduinoBrushedMotor(PIN);
 
-#define MAX_SUPPORTED_MOTORS 8
+void setup(void)
+{
+    // Initialize the motor
+    //motor.begin();
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
+    // Start with motor off, increasing
+    val = 0;
+    dir = +1;
 
-    void  motorCheckDshotBitbangStatus(arming_t * arming);
-    float motorConvertFromExternal(uint16_t externalValue);
-    bool  motorIsProtocolDshot(void);
-    bool  motorIsReady(uint32_t currentTime);
-    float motorValueDisarmed(void);
-    float motorValueHigh(void);
-    float motorValueLow(void);
-    void  motorStop(void);
-    void  motorWrite(float *values);
-
-#if defined(__cplusplus)
+    delay(1000);
 }
-#endif
+
+void loop(void)
+{
+    //motor.write(val);
+
+    val += dir * .001;
+
+    // stop halfway
+    if (val >= 0.25) {
+        dir = -1;
+    }
+
+    if (val <= 0) {
+        dir = +1;
+    }
+
+    delay(10);
+}
