@@ -17,6 +17,44 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Filtering ------------------------------------------------------------------
+
+struct Pt1Filter {
+    state: f32,
+    k: f32
+}
+
+struct Pt2Filter
+{
+    state: f32,
+    state1: f32,
+    k: f32
+} 
+
+struct Pt3Filter
+{
+    state: f32,
+    state1: f32,
+    state2: f32,
+    k: f32
+}
+
+struct BiquadFilter
+{
+    b0: f32,
+    b1: f32,
+    b2: f32,
+    a1: f32,
+    a2: f32,
+
+    x1: f32,
+    x2: f32,
+    y1: f32,
+    y2: f32,
+
+    weigh: f32
+} 
+
 // Vehicle state ------------------------------------------------------------------------
 
 struct VehicleState 
