@@ -111,31 +111,6 @@ typedef struct {
     float z;
 } axes_t;
 
-// Receiver ------------------------------------------------------------------------
-
-typedef struct {
-    demands_t demands;
-    float aux1;
-    float aux2;
-} rx_axes_t;
-
-typedef enum rc_alias {
-    THROTTLE,
-    ROLL,
-    PITCH,
-    YAW,
-    AUX1,
-    AUX2
-} rc_alias_e;
-
-typedef enum {
-    RX_FRAME_PENDING = 0,
-    RX_FRAME_COMPLETE = (1 << 0),
-    RX_FRAME_FAILSAFE = (1 << 1),
-    RX_FRAME_PROCESSING_REQUIRED = (1 << 2),
-    RX_FRAME_DROPPED = (1 << 3)
-} rxFrameState_e;
-
 // Vehicle state ------------------------------------------------------------------------
 
 typedef struct {
@@ -362,6 +337,29 @@ typedef struct {
 
 #define CHANNEL_COUNT 18
 #define THROTTLE_LOOKUP_LENGTH 12
+
+typedef struct {
+    demands_t demands;
+    float aux1;
+    float aux2;
+} rx_axes_t;
+
+typedef enum rc_alias {
+    THROTTLE,
+    ROLL,
+    PITCH,
+    YAW,
+    AUX1,
+    AUX2
+} rc_alias_e;
+
+typedef enum {
+    RX_FRAME_PENDING = 0,
+    RX_FRAME_COMPLETE = (1 << 0),
+    RX_FRAME_FAILSAFE = (1 << 1),
+    RX_FRAME_PROCESSING_REQUIRED = (1 << 2),
+    RX_FRAME_DROPPED = (1 << 3)
+} rxFrameState_e;
 
 typedef enum {
     RX_FAILSAFE_MODE_AUTO = 0,
