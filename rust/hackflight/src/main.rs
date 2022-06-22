@@ -313,6 +313,17 @@ struct Arming
     throttle_is_down: bool
 }
 
+// Receiver --------------------------------------------------------------------
+
+#[allow(dead_code)]
+struct RxAxes
+{
+    demands : Demands,
+    aux1 : f32,
+    aux2 : f32
+}
+
+
 // Scheduling ------------------------------------------------------------------
 
 #[allow(dead_code)]
