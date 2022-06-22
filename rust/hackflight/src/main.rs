@@ -71,15 +71,21 @@ struct PidAxisData
     sum: f32
 }
 
-/*
-union dtermLowpass_u
+#[allow(dead_code)]
+struct AnglePidAxis
 {
-    biquadFilter_t biquadFilter,
-    pt1Filter_t    pt1Filter,
-    pt2Filter_t    pt2Filter,
-    pt3Filter_t    pt3Filter,
-} dtermLowpass_t,
-*/
+    data : PidAxisData,
+    d_min_lowpass : Pt2Filter,
+    d_min_range : Pt2Filter,
+    dterm_lowpass : Pt1Filter,
+    dterm_lowpass2: Pt1Filter,
+    windup_lpf :Pt1Filter,
+    pterm_yaw_lowpass :Pt1Filter,
+    previous_setpoint_correction : f32,
+    previous_gyro_rate_dterm : f32,
+    previous_setpoint : f32,
+    feedforward_pt3: Pt3Filter,
+}
 
 #[allow(dead_code)]
 struct AnglePid
@@ -87,8 +93,8 @@ struct AnglePid
     // pidAxisData_t  data[3],
     // pt2Filter_t    dMinLowpass[3],
     // pt2Filter_t    dMinRange[3],
-    // dtermLowpass_t dtermLowpass[3],
-    // dtermLowpass_t dtermLowpass2[3],
+    // pt1Filter_t    dtermLowpass[3],
+    // pt1Filter_t    dtermLowpass2[3],
     // pt1Filter_t    windupLpf[3],
     // pt1Filter_t    ptermYawLowpass,
     // float          previousSetpointCorrection[3],
@@ -110,18 +116,18 @@ struct AnglePid
 #[allow(dead_code)]
 struct VehicleState 
 {
-    x:      f32,
-    dx:     f32,
-    y:      f32,
-    dy:     f32,
-    z:      f32,
-    dz:     f32,
-    phi:    f32,
-    dphi:   f32,
-    theta:  f32,
+    x: f32,
+    dx: f32,
+    y:  f32,
+    dy: f32,
+    z: f32,
+    dz: f32,
+    phi: f32,
+    dphi: f32,
+    theta: f32,
     dtheta: f32,
-    psi:    f32,
-    dpsi:   f32
+    psi: f32,
+    dpsi: f32
 }
 
 
