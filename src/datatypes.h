@@ -369,17 +369,6 @@ typedef enum {
     RX_FAILSAFE_MODE_INVALID
 } rxFailsafeChannelMode_e;
 
-typedef enum {
-    MODELOGIC_OR = 0,
-    MODELOGIC_AND
-} modeLogic_e;
-
-typedef enum {
-    // ARM flag
-    BOXARM = 0,
-    CHECKBOX_ITEM_COUNT
-} boxId_e;
-
 typedef struct rxFailsafeChannelConfig_s {
     uint8_t mode; 
     uint8_t step;
