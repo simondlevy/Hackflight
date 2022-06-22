@@ -231,7 +231,7 @@ struct GyroCalibration
 }
 
 /* XXX
-typedef union {
+union {
     pt1Filter_t pt1FilterState;
     biquadFilter_t biquadFilterState;
     pt2Filter_t pt2FilterState;
@@ -331,6 +331,85 @@ enum RxFrameState
     RxFrameProcessingRequired = (1 << 2),
     RxFrameDropped = (1 << 3)
 }
+
+/*
+#[allow(dead_code)]
+enum 
+{
+    RX_FAILSAFE_MODE_AUTO = 0,
+    RX_FAILSAFE_MODE_HOLD,
+    RX_FAILSAFE_MODE_SET,
+    RX_FAILSAFE_MODE_INVALID
+} rxFailsafeChannelMode_e;
+
+#[allow(dead_code)]
+enum 
+{
+    MODELOGIC_OR = 0,
+    MODELOGIC_AND
+} modeLogic_e;
+
+#[allow(dead_code)]
+enum 
+{
+    // ARM flag
+    BOXARM = 0,
+    CHECKBOX_ITEM_COUNT
+} boxId_e;
+
+#[allow(dead_code)]
+struct rxFailsafeChannelConfig_s 
+{
+    uint8_t mode; 
+    uint8_t step;
+}
+
+#[allow(dead_code)]
+struct rxChannelRangeConfig_s 
+{
+    uint16_t min;
+    uint16_t max;
+}
+
+#[allow(dead_code)]
+enum 
+{
+    RX_STATE_CHECK,
+    RX_STATE_PROCESS,
+    RX_STATE_MODES,
+    RX_STATE_UPDATE,
+    RX_STATE_COUNT
+} rxState_e;
+
+#[allow(dead_code)]
+struct rxSmoothingFilter_s 
+{
+    uint8_t     autoSmoothnessFactorSetpoint;
+    uint32_t    averageFrameTimeUs;
+    uint8_t     autoSmoothnessFactorThrottle;
+    uint16_t    feedforwardCutoffFrequency;
+    uint8_t     ffCutoffSetting;
+
+    pt3Filter_t filterThrottle;
+    pt3Filter_t filterRoll;
+    pt3Filter_t filterPitch;
+    pt3Filter_t filterYaw;
+
+    pt3Filter_t filterDeflectionRoll;
+    pt3Filter_t filterDeflectionPitch;
+
+    bool        filterInitialized;
+    uint16_t    setpointCutoffFrequency;
+    uint8_t     setpointCutoffSetting;
+    uint16_t    throttleCutoffFrequency;
+    uint8_t     throttleCutoffSetting;
+    float       trainingSum;
+    uint32_t    trainingCount;
+    uint16_t    trainingMax;
+    uint16_t    trainingMin;
+
+}
+*/
 
 // Scheduling ------------------------------------------------------------------
 
