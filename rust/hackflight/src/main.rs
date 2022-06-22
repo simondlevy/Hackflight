@@ -17,7 +17,7 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// Filtering ------------------------------------------------------------------
+// Filtering -------------------------------------------------------------------
 
 #[allow(dead_code)]
 struct Pt1Filter {
@@ -59,7 +59,7 @@ struct BiquadFilter
     weigh: f32
 } 
 
-// Angle PID control ------------------------------------------------------------
+// Angle PID control -----------------------------------------------------------
 
 #[allow(dead_code)]
 struct PidAxisData
@@ -103,7 +103,7 @@ struct AnglePid
     last_dyn_lpf_update_us: u32
 }
 
-// Demands ----------------------------------------------------------------------
+// Demands ---------------------------------------------------------------------
 
 #[allow(dead_code)]
 struct Demands 
@@ -114,7 +114,7 @@ struct Demands
     yaw: f32
 } 
 
-// Axes -------------------------------------------------------------------------
+// Axes ------------------------------------------------------------------------
 
 #[allow(dead_code)]
 struct Axes 
@@ -124,7 +124,7 @@ struct Axes
     z: f32
 }
 
-// Vehicle state ----------------------------------------------------------------
+// Vehicle state ---------------------------------------------------------------
 
 #[allow(dead_code)]
 struct VehicleState 
@@ -146,11 +146,11 @@ struct VehicleState
 // General PID control ---------------------------------------------------------
 // XXX
 
-// Tasks ------------------------------------------------------------------------
+// Tasks -----------------------------------------------------------------------
 // XXX
 
 
-// IMU ------------------------------------------------------------------------
+// IMU -------------------------------------------------------------------------
 
 #[allow(dead_code)]
 struct Quaternion
@@ -194,7 +194,7 @@ struct ImuFusion
 }
 
 
-// Stats ------------------------------------------------------------------------
+// Stats -----------------------------------------------------------------------
 
 #[allow(dead_code)]
 struct StdDev
@@ -206,6 +206,62 @@ struct StdDev
     m_n : i32 // XXX should be u32 ?
 }
 
+
+// Filters ---------------------------------------------------------------------
+// XXX
+
+// Gyro ------------------------------------------------------------------------
+
+#[allow(dead_code)]
+struct CalibrationAxis
+{
+    sum: f32,
+    var: StdDev
+}
+
+#[allow(dead_code)]
+struct GyroCalibration
+{
+    x: CalibrationAxis,
+    y: CalibrationAxis,
+    z: CalibrationAxis,
+
+    cycles_remaining : i32
+
+}
+
+/*
+typedef union {
+    pt1Filter_t pt1FilterState;
+    biquadFilter_t biquadFilterState;
+    pt2Filter_t pt2FilterState;
+    pt3Filter_t pt3FilterState;
+} gyroLowpassFilter_t;
+
+typedef struct {
+    imu_sensor_t accum;
+    float        dps[3];          // aligned, calibrated, scaled, but unfiltered data from sensor
+    float        dps_filtered[3]; // filtered gyro data
+    uint8_t      sampleCount;   // gyro sensor sample counter
+    float        sampleSum[3];    // summed samples used for downsampling
+    bool         isCalibrating;
+
+    // if true then downsample using gyro lowpass 2, otherwise use averaging
+    bool downsampleFilterEnabled;      
+
+    gyroCalibration_t calibration;
+
+    // lowpass gyro soft filter
+    filterApplyFnPtr lowpassFilterApplyFn;
+    gyroLowpassFilter_t lowpassFilter[3];
+
+    // lowpass2 gyro soft filter
+    filterApplyFnPtr lowpass2FilterApplyFn;
+    gyroLowpassFilter_t lowpass2Filter[3];
+
+    float zero[3];
+} gyro_t;
+*/
 
 // Serial ports ----------------------------------------------------------------
 
