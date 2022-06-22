@@ -94,11 +94,6 @@ typedef struct {
     pt1Filter_t    windupLpf[3];
 } angle_pid_t;
 
-// Time -----------------------------------------------------------------------
-
-typedef uint32_t uint32_t;
-typedef int32_t int32_t;
-
 // Demands ------------------------------------------------------------------------
 
 typedef struct {

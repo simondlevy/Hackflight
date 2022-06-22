@@ -90,17 +90,9 @@ struct AnglePidAxis
 #[allow(dead_code)]
 struct AnglePid
 {
-    // pidAxisData_t  data[3],
-    // pt2Filter_t    dMinLowpass[3],
-    // pt2Filter_t    dMinRange[3],
-    // pt1Filter_t    dtermLowpass[3],
-    // pt1Filter_t    dtermLowpass2[3],
-    // pt1Filter_t    windupLpf[3],
-    // pt1Filter_t    ptermYawLowpass,
-    // float          previousSetpointCorrection[3],
-    // float          previousGyroRateDterm[3],
-    // float          previousSetpoint[3],
-    // pt3Filter_t    feedforwardPt3[3],
+    axis_x : AnglePidAxis,
+    axis_y : AnglePidAxis,
+    axis_z : AnglePidAxis,
     dyn_lpf_previous_quantized_throttle : i32,  
     feedforward_lpf_initialized : bool,
     k_rate_p: f32,
