@@ -74,57 +74,33 @@ static uint16_t motorConvertToExternalNull(float value)
     return 0;
 }
 
-static const motorVTable_t motorNullVTable = {
-    .postInit = motorPostInitNull,
-    .enable = motorEnableNull,
-    .disable = motorDisableNull,
-    .isMotorEnabled = motorIsEnabledNull,
-    .updateStart = motorUpdateStartNull,
-    .write = motorWriteNull,
-    .writeInt = motorWriteIntNull,
-    .updateComplete = motorUpdateCompleteNull,
-    .convertExternalToMotor = motorConvertFromExternalNull,
-    .convertMotorToExternal = motorConvertToExternalNull,
-    .shutdown = motorShutdownNull,
-};
-
-static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
-
 // =============================================================================
 
-void motorShutdown(void)
+void motorPostInitNull(void)
 {
-    motorDevice->vTable.shutdown();
-    motorDevice->enabled = false;
-    motorDevice->motorEnableTimeMs = 0;
-    motorDevice->initialized = false;
-    delayMicroseconds(1500);
 }
 
-void motorWrite(float *values)
+bool motorUpdateStartNull(void)
 {
-    if (motorDevice->enabled) {
-        if (!motorDevice->vTable.updateStart()) {
-            return;
-        }
-        for (int i = 0; i < motorDevice->count; i++) {
-            motorDevice->vTable.write(i, values[i]);
-        }
-        motorDevice->vTable.updateComplete();
-    }
+    return true;
 }
 
-unsigned motorDeviceCount(void)
+void motorWriteNull(uint8_t index, float value)
 {
-    return motorDevice->count;
+    UNUSED(index);
+    UNUSED(value);
 }
 
-motorVTable_t motorGetVTable(void)
+void motorUpdateCompleteNull(void)
 {
-    return motorDevice->vTable;
 }
 
-//bool checkMotorProtocolEnabled(const motorDevConfig_t *motorDevConfig, bool *isProtocolDshot)
+bool motorIsProtocolDshot(void)
+{
+    return motorProtocolDshot;
+}
+
+
 bool checkMotorProtocolEnabled(bool *isProtocolDshot)
 {
     //(void)motorDevConfig;
@@ -162,6 +138,48 @@ bool checkMotorProtocolEnabled(bool *isProtocolDshot)
     return enabled;
 }
 
+float getDigitalIdleOffset(void)
+{
+    uint16_t digitalIdleOffsetValue = 450;
+    return CONVERT_PARAMETER_TO_PERCENT(digitalIdleOffsetValue * 0.01f);
+}
+
+// ----------------------------------------------------------------------------
+
+static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
+
+void motorShutdown(void)
+{
+    motorDevice->vTable.shutdown();
+    motorDevice->enabled = false;
+    motorDevice->motorEnableTimeMs = 0;
+    motorDevice->initialized = false;
+    delayMicroseconds(1500);
+}
+
+void motorWrite(float *values)
+{
+    if (motorDevice->enabled) {
+        if (!motorDevice->vTable.updateStart()) {
+            return;
+        }
+        for (int i = 0; i < motorDevice->count; i++) {
+            motorDevice->vTable.write(i, values[i]);
+        }
+        motorDevice->vTable.updateComplete();
+    }
+}
+
+unsigned motorDeviceCount(void)
+{
+    return motorDevice->count;
+}
+
+motorVTable_t motorGetVTable(void)
+{
+    return motorDevice->vTable;
+}
+
 float motorConvertFromExternal(uint16_t externalValue)
 {
     return motorDevice->vTable.convertExternalToMotor(externalValue);
@@ -177,31 +195,7 @@ void motorPostInit()
     motorDevice->vTable.postInit();
 }
 
-void motorPostInitNull(void)
-{
-}
-
-bool motorUpdateStartNull(void)
-{
-    return true;
-}
-
-void motorWriteNull(uint8_t index, float value)
-{
-    UNUSED(index);
-    UNUSED(value);
-}
-
-void motorUpdateCompleteNull(void)
-{
-}
-
-bool motorIsProtocolDshot(void)
-{
-    return motorProtocolDshot;
-}
-
-void motorInit(uint8_t motorCount) {
+void * motorInit(uint8_t motorCount) {
 
     motorProtocolEnabled = checkMotorProtocolEnabled(&motorProtocolDshot);
 
@@ -213,6 +207,8 @@ void motorInit(uint8_t motorCount) {
     motorDevice->initialized = true;
     motorDevice->motorEnableTimeMs = 0;
     motorDevice->enabled = false;
+
+    return (void *)motorDevice;
 }
 
 void motorDisable(void)
@@ -245,8 +241,3 @@ uint32_t motorGetMotorEnableTimeMs(void)
     return motorDevice->motorEnableTimeMs;
 }
 
-float getDigitalIdleOffset(void)
-{
-    uint16_t digitalIdleOffsetValue = 450;
-    return CONVERT_PARAMETER_TO_PERCENT(digitalIdleOffsetValue * 0.01f);
-}

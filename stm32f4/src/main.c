@@ -52,7 +52,7 @@ int main(void)
     timerInit();
     serialUartPinConfigure();
     serialInit(-1);
-    motorInit(4);
+    void * motorDevice = motorInit(4);
     inverterInit();
     spiPinConfigure();
     spiPreInit();
@@ -70,7 +70,7 @@ int main(void)
     hackflight_t hf = {0};
 
     // 0 = dummy value for IMU interrupt pin; 37 = LED pin
-    hackflightInitFull(&hf, SERIAL_PORT_USART3, 0, 37);
+    hackflightInitFull(&hf, motorDevice, SERIAL_PORT_USART3, 0, 37);
 
     // STM32 boards have traditional accel/gyro combo
     hackflightAddSensor(&hf, imuAccelTask, ACCEL_RATE);

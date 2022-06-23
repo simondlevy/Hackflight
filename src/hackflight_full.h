@@ -26,6 +26,7 @@ extern "C" {
 
 void hackflightInitFull(
         hackflight_t * hackflight,
+        void * motorDevice,
         serialPortIdentifier_e rxPort,
         uint8_t imuInterruptPin,
         uint8_t ledPin);

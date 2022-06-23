@@ -460,6 +460,7 @@ typedef struct {
     gyro_t           gyro;
     imu_fusion_t     imuFusionPrev;
     float            maxArmingAngle;
+    void *           motorDevice;
     float            mspMotors[4];
     task_t           mspTask;
     pid_controller_t pidControllers[10];

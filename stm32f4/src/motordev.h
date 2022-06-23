@@ -64,7 +64,6 @@ typedef struct motorDevice_s {
     uint32_t      motorEnableTimeMs;
 } motorDevice_t;
 
-void     motorInit(uint8_t count);
 void     motorPostInitNull();
 void     motorWriteNull(uint8_t index, float value);
 bool     motorUpdateStartNull(void);
