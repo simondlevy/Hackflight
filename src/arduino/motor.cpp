@@ -32,9 +32,11 @@ bool motorIsReady(uint32_t currentTime)
     return true;
 }
 
-float motorConvertFromExternal(uint16_t externalValue)
+float motorConvertFromExternal(void * motorDevice, uint16_t externalValue)
 {
     (void)externalValue;
+    (void)motorDevice;
+
     return 0;
 }
 
@@ -64,12 +66,14 @@ float motorValueLow(void)
     return 0;
 }
 
-void motorStop(void)
+void motorStop(void * motorDevice)
 {
+    (void)motorDevice;
 }
 
-void motorWrite(float *values)
+void motorWrite(void * motorDevice, float *values)
 {
+    (void)motorDevice;
 }
 
 void motorWriteBrushed(uint8_t pin, float value)

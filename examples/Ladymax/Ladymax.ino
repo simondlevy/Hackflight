@@ -29,8 +29,10 @@ void setup(void)
     Wire.begin();
     delay(100);
 
+    void * motorDevice = NULL;
+
     // Always use Serial1 for receiver, no no need to specify
-    hackflightInitFull(&_hf, SERIAL_PORT_NONE, 5, A4);
+    hackflightInitFull(&_hf, motorDevice, SERIAL_PORT_NONE, 5, A4);
 
     stm32_startCycleCounter();
 }
