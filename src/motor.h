@@ -32,6 +32,7 @@ extern "C" {
 
     void  motorCheckDshotBitbangStatus(arming_t * arming);
     float motorConvertFromExternal(uint16_t externalValue);
+    void  motorInitBrushed(uint8_t pin);
     bool  motorIsProtocolDshot(void);
     bool  motorIsReady(uint32_t currentTime);
     float motorValueDisarmed(void);

@@ -38,6 +38,12 @@ float motorConvertFromExternal(uint16_t externalValue)
     return 0;
 }
 
+void  motorInitBrushed(uint8_t pin)
+{
+    analogWriteFrequency(pin, 10000);
+    analogWrite(pin, 0);
+}
+
 bool motorIsProtocolDshot(void)
 {
     return false;
