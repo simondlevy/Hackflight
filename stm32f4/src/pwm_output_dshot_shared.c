@@ -206,20 +206,6 @@ bool isDshotMotorTelemetryActive(uint8_t motorIndex)
     return dshotTelemetryState.motorState[motorIndex].telemetryActive;
 }
 
-bool isDshotTelemetryActive(void)
-{
-    const unsigned motorCount = motorDeviceCount();
-    if (motorCount) {
-        for (unsigned i = 0; i < motorCount; i++) {
-            if (!isDshotMotorTelemetryActive(i)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    return false;
-}
-
 int16_t motorGetDshotTelemetryMotorInvalidPercent(uint8_t motorIndex)
 {
     int16_t invalidPercent = 0;

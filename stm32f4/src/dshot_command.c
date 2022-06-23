@@ -129,9 +129,9 @@ static dshotCommandControl_t* addCommand()
     return control;
 }
 
-static bool allMotorsAreIdle(void)
+static bool allMotorsAreIdle(uint8_t motorCount)
 {
-    for (unsigned i = 0; i < motorDeviceCount(); i++) {
+    for (unsigned i = 0; i < motorCount; i++) {
         const motorDmaOutput_t *motor = getMotorDmaOutput(i);
         if (motor->protocolControl.value) {
             return false;
@@ -164,7 +164,11 @@ static bool dshotCommandsAreEnabled(dshotCommandType_e commandType)
     return ret;
 }
 
-void dshotCommandWrite(uint8_t index, uint8_t motorCount, uint8_t command, dshotCommandType_e commandType)
+void dshotCommandWrite(
+        uint8_t index,
+        uint8_t motorCount,
+        uint8_t command,
+        dshotCommandType_e commandType)
 {
     if (!dshotCommandsAreEnabled(commandType) ||
             (command > DSHOT_MAX_COMMAND) ||
@@ -201,7 +205,7 @@ void dshotCommandWrite(uint8_t index, uint8_t motorCount, uint8_t command, dshot
             uint32_t timeoutUs = micros() + 1000;
             while (!motorGetVTable().updateStart() &&
                    cmpTimeUs(timeoutUs, micros()) > 0);
-            for (uint8_t i = 0; i < motorDeviceCount(); i++) {
+            for (uint8_t i = 0; i < motorCount; i++) {
                 if ((i == index) || (index == ALL_MOTORS)) {
                     motorDmaOutput_t *const motor = getMotorDmaOutput(i);
                     motor->protocolControl.requestTelemetry = true;
@@ -224,13 +228,16 @@ void dshotCommandWrite(uint8_t index, uint8_t motorCount, uint8_t command, dshot
                     commandControl->command[i] = DSHOT_CMD_MOTOR_STOP;
                 }
             }
-            if (allMotorsAreIdle()) {
+            if (allMotorsAreIdle(motorCount)) {
                 // we can skip the motors idle wait state
                 commandControl->state = DSHOT_COMMAND_STATE_STARTDELAY;
-                commandControl->nextCommandCycleDelay = dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
+                commandControl->nextCommandCycleDelay =
+                    dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
             } else {
                 commandControl->state = DSHOT_COMMAND_STATE_IDLEWAIT;
-                commandControl->nextCommandCycleDelay = 0;  // will be set after idle wait completes
+
+                // will be set after idle wait completes
+                commandControl->nextCommandCycleDelay = 0;  
             }
         }
     }
@@ -242,10 +249,11 @@ uint8_t dshotCommandGetCurrent(uint8_t index)
 }
 
 // This function is used to synchronize the dshot command output timing with
-// the normal motor output timing tied to the PID loop frequency. A "true" result
-// allows the motor output to be sent, "false" means delay until next loop. So take
-// the example of a dshot command that needs to repeat 10 times at 1ms intervals.
-// If we have a 8KHz PID loop we'll end up sending the dshot command every 8th motor output.
+// the normal motor output timing tied to the PID loop frequency. A "true"
+// result allows the motor output to be sent, "false" means delay until next
+// loop. So take the example of a dshot command that needs to repeat 10 times
+// at 1ms intervals.  If we have a 8KHz PID loop we'll end up sending the dshot
+// command every 8th motor output.
  bool dshotCommandOutputIsEnabled(uint8_t motorCount)
 {
     UNUSED(motorCount);
@@ -253,7 +261,7 @@ uint8_t dshotCommandGetCurrent(uint8_t index)
     dshotCommandControl_t* command = &commandQueue[commandQueueTail];
     switch (command->state) {
     case DSHOT_COMMAND_STATE_IDLEWAIT:
-        if (allMotorsAreIdle()) {
+        if (allMotorsAreIdle(motorCount)) {
             command->state = DSHOT_COMMAND_STATE_STARTDELAY;
             command->nextCommandCycleDelay = dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
         }
