@@ -32,6 +32,7 @@ void mspUpdate(
         vehicle_state_t * state,
         rx_axes_t *rxaxes,
         bool armed,
+        void * motorDevice,
         float * motors);
 
 #if defined(__cplusplus)

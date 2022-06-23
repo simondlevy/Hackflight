@@ -133,6 +133,7 @@ typedef mspResult_e (*mspProcessCommandFnPtr)(
         mspPostProcessFnPtr *mspPostProcessFn,
         vehicle_state_t * vstate,
         rx_axes_t * rxax,
+        void * motorDevice,
         float * motors);
 
 typedef void (*mspProcessReplyFnPtr)(mspPacket_t *cmd);
@@ -214,18 +215,23 @@ static bool processOutCommand(
 }
 
 
-static mspResult_e processInCommand(int16_t cmdMSP, sbuf_t *src, float * motors)
+static mspResult_e processInCommand(
+        int16_t cmdMSP,
+        sbuf_t *src,
+        void * motorDevice,
+        float * motors)
 {
     switch (cmdMSP) {
 
         case MSP_SET_MOTOR:
             for (int i = 0; i < 4; i++) {
-                motors[i] = motorConvertFromExternal(sbufReadU16(src));
+                motors[i] = motorConvertFromExternal(motorDevice, sbufReadU16(src));
             }
             break;
 
         default:
-            // we do not know how to handle the (valid) message, indicate error MSP $M!
+            // we do not know how to handle the (valid) message, indicate error
+            // MSP $M!
             return MSP_RESULT_ERROR;
     }
     return MSP_RESULT_ACK;
@@ -241,6 +247,7 @@ static mspResult_e fcProcessCommand(
         mspPostProcessFnPtr *mspPostProcessFn,
         vehicle_state_t * vstate,
         rx_axes_t * rxax,
+        void * motorDevice,
         float * motors) {
 
     //(void)srcDesc;
@@ -257,7 +264,7 @@ static mspResult_e fcProcessCommand(
         ret = MSP_RESULT_ACK;
     } 
     else {
-        ret = processInCommand(cmdMSP, src, motors);
+        ret = processInCommand(cmdMSP, src, motorDevice, motors);
     }
     reply->result = ret;
     return ret;
@@ -434,6 +441,7 @@ static mspPostProcessFnPtr serialProcessReceivedCommand(
         mspProcessCommandFnPtr mspProcessCommandFn,
         vehicle_state_t * vstate,
         rx_axes_t * rxax,
+        void * motorDevice,
         float * motors)
 {
     static uint8_t mspSerialOutBuf[MSP_PORT_OUTBUF_SIZE];
@@ -460,6 +468,7 @@ static mspPostProcessFnPtr serialProcessReceivedCommand(
             &mspPostProcessFn,
             vstate,
             rxax,
+            motorDevice,
             motors);
 
     if (status != MSP_RESULT_NO_REPLY) {
@@ -495,7 +504,9 @@ static void processPendingRequest(mspPort_t * mspPort)
     }
 }
 
-static void serialProcessReceivedReply(mspPort_t *msp, mspProcessReplyFnPtr mspProcessReplyFn)
+static void serialProcessReceivedReply(
+        mspPort_t *msp,
+        mspProcessReplyFnPtr mspProcessReplyFn)
 {
     mspPacket_t reply = {
         .buf = {
@@ -511,7 +522,7 @@ static void serialProcessReceivedReply(mspPort_t *msp, mspProcessReplyFnPtr mspP
     msp->state = MSP_IDLE;
 }
 
-// ============================================================================================
+// =============================================================================
 
 static bool _debugging;
 
@@ -531,6 +542,7 @@ void mspUpdate(
         vehicle_state_t * vstate,
         rx_axes_t *rxaxes,
         bool armed,
+        void * motorDevice,
         float * motors)
 {
     // Sync debugging to MSP update
@@ -570,6 +582,7 @@ void mspUpdate(
                                     fcProcessCommand,
                                     vstate,
                                     rxaxes,
+                                    motorDevice,
                                     motors);
                     } else if (mspPort->packetType == MSP_PACKET_REPLY) {
                         serialProcessReceivedReply(mspPort, fcProcessReply);

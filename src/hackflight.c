@@ -84,7 +84,7 @@ extern "C" {
 
         hackflight_t * hf = (hackflight_t *)hackflight;
         mspUpdate(&hf->vstate, &hf->rxAxes, armingIsArmed(&hf->arming),
-                hf->mspMotors);
+                hf->motorDevice, hf->mspMotors);
     }
 
     // Support for dynamically scheduled tasks ---------------------------------

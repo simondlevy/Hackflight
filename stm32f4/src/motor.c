@@ -123,14 +123,16 @@ motorVTable_t motorGetVTable(void * motorDevice_void)
     return motorDevice->vTable;
 }
 
+float motorConvertFromExternal(void * motorDevice_void, uint16_t externalValue)
+{
+    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+
+    return motorDevice->vTable.convertExternalToMotor(externalValue);
+}
+
 // ----------------------------------------------------------------------------
 
 static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
-
-float motorConvertFromExternal(uint16_t externalValue)
-{
-    return motorDevice->vTable.convertExternalToMotor(externalValue);
-}
 
 uint16_t motorConvertToExternal(float motorValue)
 {
