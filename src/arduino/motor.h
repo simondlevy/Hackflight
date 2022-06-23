@@ -16,29 +16,6 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
-#include <Wire.h>
+typedef struct {
 
-#include <hackflight_full.h>
-#include <stm32_clock.h>
-#include <arduino/motor.h>
-
-static hackflight_t _hf;
-
-void setup(void)
-{
-    Wire.begin();
-    delay(100);
-
-    void * motorDevice = NULL;
-
-    // Always use Serial1 for receiver, no no need to specify
-    hackflightInitFull(&_hf, motorDevice, SERIAL_PORT_NONE, 5, A4);
-
-    stm32_startCycleCounter();
-}
-
-void loop(void)
-{
-    hackflightStep(&_hf);
-}
+} quad_motor_t;
