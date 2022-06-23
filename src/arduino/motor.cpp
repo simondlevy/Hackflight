@@ -19,6 +19,7 @@
 #include <Arduino.h>
 
 #include <arming.h>
+#include <debug.h>
 #include <motor.h>
 
 void motorCheckDshotBitbangStatus(arming_t * arming)
@@ -73,7 +74,9 @@ void motorStop(void * motorDevice)
 
 void motorWrite(void * motorDevice, float *values)
 {
-    (void)motorDevice;
+    uint8_t * pins = (uint8_t *)motorDevice;
+
+    debugPrintf("%d %d %d %d\n", pins[0], pins[1], pins[2], pins[3]);
 }
 
 void motorWriteBrushed(uint8_t pin, float value)
