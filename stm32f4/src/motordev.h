@@ -71,8 +71,9 @@ void     motorUpdateCompleteNull(void);
 void     motorPostInit();
 uint16_t motorConvertToExternal(float motorValue);
 
-struct motorDevConfig_s; // XXX Shouldn't be needed once pwm_output* is really cleaned up.
-unsigned motorDeviceCount(void);
+// XXX Shouldn't be needed once pwm_output* is really cleaned up.
+struct motorDevConfig_s; 
+
 motorVTable_t motorGetVTable(void);
 bool motorCheckProtocolEnabled(bool *protocolIsDshot);
 void motorDisable(void);

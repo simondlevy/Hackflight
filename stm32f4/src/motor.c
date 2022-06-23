@@ -118,11 +118,6 @@ void motorWrite(float *values)
     }
 }
 
-unsigned motorDeviceCount(void)
-{
-    return motorDevice->count;
-}
-
 motorVTable_t motorGetVTable(void)
 {
     return motorDevice->vTable;
