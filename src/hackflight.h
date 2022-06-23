@@ -87,6 +87,7 @@ static void task_rx(void * hackflight, uint32_t time)
             imuIsLevel, 
             calibrating,
             &rxax,
+            hf->motorDevice,
             &hf->arming,
             &pidItermResetReady,
             &pidItermResetValue,
@@ -120,7 +121,8 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
     float mixmotors[4] = {0};
     mixerRun(&hf->demands, mixmotors);
 
-    motorWrite(armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
+    motorWrite(hf->motorDevice,
+            armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
 }
 
 // Initialization -------------------------------------------------------------

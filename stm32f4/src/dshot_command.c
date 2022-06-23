@@ -321,8 +321,10 @@ bool dshotCommandOutputIsEnabled(uint8_t motorCount)
     return true;
 }
 
-void motorStop(void)
+void motorStop(void * motorDevice)
 {
+    (void)motorDevice;
+
     commandWrite(ALL_MOTORS, 4, DSHOT_CMD_SPIN_DIRECTION_NORMAL,
             DSHOT_CMD_TYPE_INLINE);
 }

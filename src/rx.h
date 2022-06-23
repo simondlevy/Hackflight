@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-    // For both hardware and sim implementations -----------------------------------------
+    // For both hardware and sim implementations -------------------------------
 
     void rxDevInit(serialPortIdentifier_e port);
 
@@ -44,6 +44,7 @@ extern "C" {
             bool imuIsLevel,
             bool calibrating,
             rx_axes_t * rxax,
+            void * motorDevice,
             arming_t * arming,
             bool * pidItermResetReady,
             bool * pidItermResetValue,
@@ -53,7 +54,7 @@ extern "C" {
 }
 #endif
 
-// For hardware impelmentations ------------------------------------------------------
+// For hardware impelmentations ------------------------------------------------
 
 bool rxCheck(rx_t * rx, uint32_t currentTimeUs);
 

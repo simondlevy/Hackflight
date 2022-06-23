@@ -70,7 +70,7 @@ extern "C" {
 void failsafeInit(void);
 void failsafeReset(void);
 void failsafeStartMonitoring(void);
-void failsafeUpdateState(float * rcData, arming_t * arming);
+void failsafeUpdateState(float * rcData, void * motorDevice, arming_t * arming);
 bool failsafeIsMonitoring(void);
 bool failsafeIsActive(void);
 bool failsafeIsReceivingRxData(void);

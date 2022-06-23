@@ -1,20 +1,20 @@
 /*
-Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2022 Simon D. Levy
 
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -38,7 +38,8 @@ static const uint32_t PERIOD_RXDATA_RECOVERY     =   200;    // millis
 /*
  * Usage:
  *
- * failsafeInit() and failsafeReset() must be called before the other methods are used.
+ * failsafeInit() and failsafeReset() must be called before the other methods
+ * are used.
  *
  * failsafeInit() and failsafeReset() can be called in any order.
  * failsafeInit() should only be called once.
@@ -54,12 +55,15 @@ const char * const failsafeProcedureNames[FAILSAFE_PROCEDURE_COUNT] = {
 };
 
 /*
- * Should called when the failsafe config needs to be changed - e.g. a different profile has been selected.
+ * Should called when the failsafe config needs to be changed - e.g. a
+ * different profile has been selected.
  */
 void failsafeReset(void)
 {
-    failsafeState.rxDataFailurePeriod = PERIOD_RXDATA_FAILURE + 4 * MILLIS_PER_TENTH_SECOND;
-    failsafeState.rxDataRecoveryPeriod = PERIOD_RXDATA_RECOVERY + 20 * MILLIS_PER_TENTH_SECOND;
+    failsafeState.rxDataFailurePeriod =
+        PERIOD_RXDATA_FAILURE + 4 * MILLIS_PER_TENTH_SECOND;
+    failsafeState.rxDataRecoveryPeriod =
+        PERIOD_RXDATA_RECOVERY + 20 * MILLIS_PER_TENTH_SECOND;
     failsafeState.validRxDataReceivedAt = 0;
     failsafeState.validRxDataFailedAt = 0;
     failsafeState.throttleLowPeriod = 0;
@@ -99,7 +103,8 @@ static void failsafeActivate(void)
 
     failsafeState.phase = FAILSAFE_LANDING;
 
-    failsafeState.landingShouldBeFinishedAt = timeMillis() + 10 * MILLIS_PER_TENTH_SECOND;
+    failsafeState.landingShouldBeFinishedAt =
+        timeMillis() + 10 * MILLIS_PER_TENTH_SECOND;
 
     failsafeState.events++;
 }
@@ -131,7 +136,7 @@ void failsafeOnValidDataFailed(arming_t * arming)
     }
 }
 
-void failsafeUpdateState(float * rcData, arming_t * arming)
+void failsafeUpdateState(float * rcData, void * motorDevice, arming_t * arming)
 {
     if (!failsafeIsMonitoring()) {
         return;
@@ -166,7 +171,8 @@ void failsafeUpdateState(float * rcData, arming_t * arming)
 
                         // skip auto-landing procedure
                         failsafeState.phase = FAILSAFE_LANDED;      
-                        failsafeState.receivingRxDataPeriodPreset = PERIOD_OF_1_SECONDS();    
+                        failsafeState.receivingRxDataPeriodPreset =
+                            PERIOD_OF_1_SECONDS();    
                         // require 1 seconds of valid rxData
                         reprocessState = true;
                     } else if (!receivingRxData) {
@@ -178,7 +184,8 @@ void failsafeUpdateState(float * rcData, arming_t * arming)
 
                             // skip auto-landing procedure
                             failsafeState.phase = FAILSAFE_LANDED;      
-                            failsafeState.receivingRxDataPeriodPreset = PERIOD_OF_3_SECONDS(); 
+                            failsafeState.receivingRxDataPeriodPreset =
+                                PERIOD_OF_3_SECONDS(); 
                             // require 3 seconds of valid rxData
                         } else {
                             failsafeState.phase = FAILSAFE_RX_LOSS_DETECTED;
@@ -208,7 +215,7 @@ void failsafeUpdateState(float * rcData, arming_t * arming)
             case FAILSAFE_LANDING:
                 break;
             case FAILSAFE_LANDED:
-                armingDisarm(arming);
+                armingDisarm(arming, motorDevice);
                 failsafeState.receivingRxDataPeriod = timeMillis() +
                     failsafeState.receivingRxDataPeriodPreset; // set required
                 failsafeState.phase = FAILSAFE_RX_LOSS_MONITORING;
@@ -237,9 +244,8 @@ void failsafeUpdateState(float * rcData, arming_t * arming)
                 // Entering IDLE with the requirement that throttle first must
                 // be at min_check for failsafe_throttle_low_delay period.
                 // This is to prevent that JustDisarm is activated on the next
-                // iteration.
-                // Because that would have the effect of shutting down failsafe
-                // handling on intermittent connections.
+                // iteration.  Because that would have the effect of shutting
+                // down failsafe handling on intermittent connections.
                 failsafeState.throttleLowPeriod = timeMillis() + 100 *
                     MILLIS_PER_TENTH_SECOND;
                 failsafeState.phase = FAILSAFE_IDLE;

@@ -103,10 +103,10 @@ float motorGetDigitalIdOffset(void)
 
 // ----------------------------------------------------------------------------
 
-static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
-
-void motorWrite(float *values)
+void motorWrite(void * motorDevice_void, float *values)
 {
+    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+
     if (motorDevice->enabled) {
         if (!motorDevice->vTable.updateStart()) {
             return;
@@ -117,6 +117,8 @@ void motorWrite(float *values)
         motorDevice->vTable.updateComplete();
     }
 }
+
+static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
 
 motorVTable_t motorGetVTable(void)
 {

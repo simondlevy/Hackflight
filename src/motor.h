@@ -39,8 +39,8 @@ extern "C" {
     float   motorValueDisarmed(void);
     float   motorValueHigh(void);
     float   motorValueLow(void);
-    void    motorStop(void);
-    void    motorWrite(float *values);
+    void    motorStop(void * motorDevice);
+    void    motorWrite(void * motorDevice, float *values);
 
 #if defined(__cplusplus)
 }

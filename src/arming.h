@@ -29,12 +29,13 @@ extern "C" {
 
     void armingCheck(
             arming_t * arming,
+            void * motorDevice,
             uint32_t currentTimeUs,
             float raw[],
             bool imuIsLevel,
             bool calibrating);
 
-    void  armingDisarm(arming_t * arming);
+    void  armingDisarm(arming_t * arming, void * motorDevice);
 
     bool  armingIsArmed(arming_t * arming);
 

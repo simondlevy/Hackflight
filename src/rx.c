@@ -8,9 +8,10 @@
    Foundation, either version 3 of the License, or (at your option) any later
    version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
@@ -53,7 +54,8 @@ static const uint8_t  RC_SMOOTHING_FILTER_RETRAINING_SAMPLES = 20;
 // average frame rate calculation
 static const uint16_t RC_SMOOTHING_FILTER_STARTUP_DELAY_MS = 5000;  
 
-// Additional time to wait after receiving first valid rx frame before initial training starts
+// Additional time to wait after receiving first valid rx frame before initial
+// training starts
 static const uint16_t RC_SMOOTHING_FILTER_TRAINING_DELAY_MS = 1000;  
 
 // Number of rx frame rate samples to average during initial training
@@ -86,7 +88,7 @@ static const uint16_t PWM_PULSE_MIN   = 750;
 // maximum PWM pulse width which is considered valid
 static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-// ---------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 static float pt3FilterGain(float f_cut, float dT)
 {
@@ -143,7 +145,9 @@ static uint16_t getFailValue(float * rcData, uint8_t channel)
 
     switch (channelFailsafeConfig->mode) {
         case RX_FAILSAFE_MODE_AUTO:
-            return channel == ROLL || channel == PITCH || channel == YAW ? 1500 : 885;
+            return channel == ROLL || channel == PITCH || channel == YAW ?
+                1500 :
+                885;
         case RX_FAILSAFE_MODE_INVALID:
         case RX_FAILSAFE_MODE_HOLD:
             return rcData[channel];
@@ -154,7 +158,9 @@ static uint16_t getFailValue(float * rcData, uint8_t channel)
     return 0;
 }
 
-static float applyRxChannelRangeConfiguraton(float sample, const rxChannelRangeConfig_t *range)
+static float applyRxChannelRangeConfiguraton(
+        float sample,
+        const rxChannelRangeConfig_t *range)
 {
     // Avoid corruption of channel with a value of PPM_RCVR_TIMEOUT
     if (sample == 0) {
@@ -167,8 +173,11 @@ static float applyRxChannelRangeConfiguraton(float sample, const rxChannelRangeC
     return sample;
 }
 
-// Determine a cutoff frequency based on smoothness factor and calculated average rx frame time
-static int calcAutoSmoothingCutoff(int avgRxFrameTimeUs, uint8_t autoSmoothnessFactor)
+// Determine a cutoff frequency based on smoothness factor and calculated
+// average rx frame time
+static int calcAutoSmoothingCutoff(
+        int avgRxFrameTimeUs,
+        uint8_t autoSmoothnessFactor)
 {
     if (avgRxFrameTimeUs > 0) {
         const float cutoffFactor = 1.5f / (1.0f + (autoSmoothnessFactor / 10.0f));
@@ -215,16 +224,20 @@ static void readChannelsApplyRanges(rx_t * rx, float raw[])
         // apply the rx calibration
         switch (channel) {
             case 0:
-                sample = applyRxChannelRangeConfiguraton(sample, &rxChannelRangeConfigThrottle);
+                sample =applyRxChannelRangeConfiguraton(sample,
+                        &rxChannelRangeConfigThrottle);
                 break;
             case 1:
-                sample = applyRxChannelRangeConfiguraton(sample, &rxChannelRangeConfigRoll);
+                sample = applyRxChannelRangeConfiguraton(sample,
+                        &rxChannelRangeConfigRoll);
                 break;
             case 2:
-                sample = applyRxChannelRangeConfiguraton(sample, &rxChannelRangeConfigPitch);
+                sample = applyRxChannelRangeConfiguraton(sample,
+                        &rxChannelRangeConfigPitch);
                 break;
             case 3:
-                sample = applyRxChannelRangeConfiguraton(sample, &rxChannelRangeConfigYaw);
+                sample = applyRxChannelRangeConfiguraton(sample,
+                        &rxChannelRangeConfigYaw);
                 break;
         }
 
@@ -255,10 +268,11 @@ static void detectAndApplySignalLossBehaviour(
             rx->invalidPulsePeriod[channel] = currentTimeMs + MAX_INVALID__PULSE_TIME;
         } else {
             if (cmp32(currentTimeMs, rx->invalidPulsePeriod[channel]) < 0) {
-                // skip to next channel to hold channel value MAX_INVALID__PULSE_TIME
+                // skip to next channel to hold channel value
+                // MAX_INVALID__PULSE_TIME
                 continue;           
             } else {
-                sample = getFailValue(raw, channel);   // after that apply rxfail value
+                sample = getFailValue(raw, channel); // after that apply rxfail value
                 if (channel < 4) {
                     flightChannelsValid = false;
                 }
@@ -287,7 +301,8 @@ static int16_t lookupThrottle(rx_t * rx, int32_t tmp)
         for (uint8_t i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
             const int16_t tmp2 = 10 * i - THR_MID8;
             uint8_t y = tmp2 > 0 ?  100 - THR_MID8 : tmp2 < 0 ?  THR_MID8 : 1;
-            rx->lookupThrottleRc[i] = 10 * THR_MID8 + tmp2 * (100 - THR_EXPO8 + (int32_t)
+            rx->lookupThrottleRc[i] =
+                10 * THR_MID8 + tmp2 * (100 - THR_EXPO8 + (int32_t)
                     THR_EXPO8 * (tmp2 * tmp2) / (y * y)) / 10;
             rx->lookupThrottleRc[i] = PWM_MIN + (PWM_MAX - PWM_MIN) *
                 rx->lookupThrottleRc[i] / 1000; // [MINTHROTTLE;MAXTHROTTLE]
@@ -368,7 +383,12 @@ static int32_t getFrameDelta(rx_t * rx, uint32_t currentTimeUs, int32_t *frameAg
 }
 
 // rxPoll
-static bool processData(rx_t * rx, float raw[], uint32_t currentTimeUs, arming_t * arming)
+static bool processData(
+        rx_t * rx,
+        void * motorDevice,
+        float raw[],
+        uint32_t currentTimeUs,
+        arming_t * arming)
 {
     int32_t frameAgeUs;
 
@@ -383,17 +403,18 @@ static bool processData(rx_t * rx, float raw[], uint32_t currentTimeUs, arming_t
     rx->lastRxTimeUs = currentTimeUs;
 
     rx->isRateValid =
-        ((uint32_t)refreshPeriodUs >= RC_SMOOTHING_RX_RATE_MIN_US && (uint32_t)refreshPeriodUs <=
-         RC_SMOOTHING_RX_RATE_MAX_US);
+        ((uint32_t)refreshPeriodUs >= RC_SMOOTHING_RX_RATE_MIN_US &&
+         (uint32_t)refreshPeriodUs <= RC_SMOOTHING_RX_RATE_MAX_US);
 
-    rx->refreshPeriod = constrain_i32_u32(refreshPeriodUs, RC_SMOOTHING_RX_RATE_MIN_US,
+    rx->refreshPeriod =
+        constrain_i32_u32(refreshPeriodUs, RC_SMOOTHING_RX_RATE_MIN_US,
             RC_SMOOTHING_RX_RATE_MAX_US);
 
     if (currentTimeUs > FAILSAFE_POWER_ON_DELAY_US && !failsafeIsMonitoring()) {
         failsafeStartMonitoring();
     }
 
-    failsafeUpdateState(raw, arming);
+    failsafeUpdateState(raw, motorDevice, arming);
 
     return rxThrottleIsDown(raw);
 }
@@ -402,9 +423,12 @@ static void ratePidFeedforwardLpfInit(angle_pid_t * pid, uint16_t filterCutoff)
 {
     if (filterCutoff > 0) {
         pid->feedforwardLpfInitialized = true;
-        pt3FilterInit(&pid->feedforwardPt3[0], pt3FilterGain(filterCutoff, CORE_DT()));
-        pt3FilterInit(&pid->feedforwardPt3[1], pt3FilterGain(filterCutoff, CORE_DT()));
-        pt3FilterInit(&pid->feedforwardPt3[2], pt3FilterGain(filterCutoff, CORE_DT()));
+        pt3FilterInit(&pid->feedforwardPt3[0],
+                pt3FilterGain(filterCutoff, CORE_DT()));
+        pt3FilterInit(&pid->feedforwardPt3[1],
+                pt3FilterGain(filterCutoff, CORE_DT()));
+        pt3FilterInit(&pid->feedforwardPt3[2],
+                pt3FilterGain(filterCutoff, CORE_DT()));
     }
 }
 
@@ -436,15 +460,21 @@ static void smoothingFilterInitRollPitchYaw(
         pt3Filter_t * filter,
         float dT)
 {
-    smoothingFilterInit(smoothingFilter, filter, smoothingFilter->setpointCutoffFrequency, dT);
+    smoothingFilterInit(smoothingFilter, filter,
+            smoothingFilter->setpointCutoffFrequency, dT);
 }
 
-static void levelFilterInit(rxSmoothingFilter_t * smoothingFilter, pt3Filter_t * filter, float dT)
+static void levelFilterInit(
+        rxSmoothingFilter_t * smoothingFilter,
+        pt3Filter_t * filter,
+        float dT)
 {
     if (!smoothingFilter->filterInitialized) {
-        pt3FilterInit(filter, pt3FilterGain(smoothingFilter->setpointCutoffFrequency, dT)); 
+        pt3FilterInit(filter,
+                pt3FilterGain(smoothingFilter->setpointCutoffFrequency, dT)); 
     } else {
-        pt3FilterUpdateCutoff(filter, pt3FilterGain(smoothingFilter->setpointCutoffFrequency, dT)); 
+        pt3FilterUpdateCutoff(filter,
+                pt3FilterGain(smoothingFilter->setpointCutoffFrequency, dT)); 
     }
 }
 
@@ -488,12 +518,16 @@ static void setSmoothingFilterCutoffs(angle_pid_t * ratepid,
         smoothingFilterInit(smoothingFilter, &smoothingFilter->filterThrottle,
                 smoothingFilter->throttleCutoffFrequency, dT);
 
-        smoothingFilterInitRollPitchYaw(smoothingFilter, &smoothingFilter->filterRoll, dT);
-        smoothingFilterInitRollPitchYaw(smoothingFilter, &smoothingFilter->filterPitch, dT);
-        smoothingFilterInitRollPitchYaw(smoothingFilter, &smoothingFilter->filterYaw, dT);
+        smoothingFilterInitRollPitchYaw(smoothingFilter,
+                &smoothingFilter->filterRoll, dT);
+        smoothingFilterInitRollPitchYaw(smoothingFilter,
+                &smoothingFilter->filterPitch, dT);
+        smoothingFilterInitRollPitchYaw(smoothingFilter,
+                &smoothingFilter->filterYaw, dT);
 
         levelFilterInit(smoothingFilter, &smoothingFilter->filterDeflectionRoll, dT);
-        levelFilterInit(smoothingFilter, &smoothingFilter->filterDeflectionPitch, dT);
+        levelFilterInit(smoothingFilter, &smoothingFilter->filterDeflectionPitch,
+                dT);
     }
 
     // update or initialize the FF filter
@@ -504,7 +538,8 @@ static void setSmoothingFilterCutoffs(angle_pid_t * ratepid,
                     calcAutoSmoothingCutoff(smoothingFilter->averageFrameTimeUs,
                         smoothingFilter->autoSmoothnessFactorSetpoint)); }
     if (!smoothingFilter->filterInitialized) {
-        ratePidFeedforwardLpfInit(ratepid, smoothingFilter->feedforwardCutoffFrequency);
+        ratePidFeedforwardLpfInit(ratepid,
+                smoothingFilter->feedforwardCutoffFrequency);
     } else if (smoothingFilter->feedforwardCutoffFrequency != oldCutoff) {
         ratePidFeedforwardLpfUpdate(ratepid,
                 smoothingFilter->feedforwardCutoffFrequency);
@@ -517,10 +552,13 @@ static bool rcSmoothingAccumulateSample(rxSmoothingFilter_t *smoothingFilter,
 {
     smoothingFilter->trainingSum += rxFrameTimeUs;
     smoothingFilter->trainingCount++;
-    smoothingFilter->trainingMax = fmaxf(smoothingFilter->trainingMax, rxFrameTimeUs);
-    smoothingFilter->trainingMin = fminf(smoothingFilter->trainingMin, rxFrameTimeUs);
+    smoothingFilter->trainingMax =
+        fmaxf(smoothingFilter->trainingMax, rxFrameTimeUs);
+    smoothingFilter->trainingMin =
+        fminf(smoothingFilter->trainingMin, rxFrameTimeUs);
 
-    // if we've collected enough samples then calculate the average and reset the accumulation
+    // if we've collected enough samples then calculate the average and reset
+    // the accumulation
     uint32_t sampleLimit = (smoothingFilter->filterInitialized) ?
         RC_SMOOTHING_FILTER_RETRAINING_SAMPLES :
         RC_SMOOTHING_FILTER_TRAINING_SAMPLES;
@@ -742,6 +780,7 @@ void rxPoll(
         bool imuIsLevel,
         bool calibrating,
         rx_axes_t * rxax,
+        void * motorDevice,
         arming_t * arming,
         bool * pidItermResetReady,
         bool * pidItermResetValue,
@@ -758,17 +797,20 @@ void rxPoll(
             break;
 
         case RX_STATE_PROCESS:
-            if (!calculateChannelsAndUpdateFailsafe(rx, arming, currentTimeUs, rx->raw)) {
+            if (!calculateChannelsAndUpdateFailsafe(rx, arming, currentTimeUs,
+                        rx->raw)) {
                 rx->state = RX_STATE_CHECK;
                 break;
             }
             *pidItermResetReady = true;
-            *pidItermResetValue = processData(rx, rx->raw, currentTimeUs, arming);
+            *pidItermResetValue = processData(rx, motorDevice, rx->raw,
+                    currentTimeUs, arming);
             rx->state = RX_STATE_MODES;
             break;
 
         case RX_STATE_MODES:
-            armingCheck(arming, currentTimeUs, rx->raw, imuIsLevel, calibrating);
+            armingCheck(arming, motorDevice, currentTimeUs, rx->raw, imuIsLevel,
+                    calibrating);
             rx->state = RX_STATE_UPDATE;
             break;
 

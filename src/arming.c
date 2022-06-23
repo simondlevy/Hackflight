@@ -39,6 +39,7 @@ static bool readyToArm(arming_t * arming)
 
 void armingCheck(
         arming_t * arming,
+        void * motorDevice,
         uint32_t currentTimeUs,
         float raw[],
         bool imuIsLevel,
@@ -67,7 +68,7 @@ void armingCheck(
     } else {
 
         if (arming->is_armed) {
-            armingDisarm(arming);
+            armingDisarm(arming, motorDevice);
             arming->is_armed = false;
         }
     }
@@ -77,10 +78,10 @@ void armingCheck(
     }
 }
 
-void armingDisarm(arming_t * arming)
+void armingDisarm(arming_t * arming, void * motorDevice)
 {
     if (arming->is_armed) {
-        motorStop();
+        motorStop(motorDevice);
     }
 
     arming->is_armed = false;
@@ -91,7 +92,11 @@ bool armingIsArmed(arming_t * arming)
     return arming->is_armed;
 }
 
-void armingUpdateStatus(arming_t * arming,  float raw[], bool imuIsLevel, bool calibrating)
+void armingUpdateStatus(
+        arming_t * arming,
+        float raw[],
+        bool imuIsLevel,
+        bool calibrating)
 {
     if (arming->is_armed) {
         ledSet(true);
