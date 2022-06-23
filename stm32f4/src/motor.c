@@ -35,21 +35,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 static bool motorProtocolEnabled = false;
 static bool motorProtocolDshot = false;
 
-static bool motorEnableNull(void)
-{
-    return false;
-}
-
-static void motorDisableNull(void)
-{
-}
-
-static bool motorIsEnabledNull(uint8_t index)
-{
-    UNUSED(index);
-
-    return false;
-}
 
 static void motorWriteIntNull(uint8_t index, uint16_t value)
 {
