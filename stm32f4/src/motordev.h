@@ -69,7 +69,6 @@ void     motorWriteNull(uint8_t index, float value);
 bool     motorUpdateStartNull(void);
 void     motorUpdateCompleteNull(void);
 void     motorPostInit();
-uint16_t motorConvertToExternal(float motorValue);
 
 // XXX Shouldn't be needed once pwm_output* is really cleaned up.
 struct motorDevConfig_s; 
