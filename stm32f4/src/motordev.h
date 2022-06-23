@@ -74,7 +74,7 @@ uint16_t motorConvertToExternal(float motorValue);
 // XXX Shouldn't be needed once pwm_output* is really cleaned up.
 struct motorDevConfig_s; 
 
-motorVTable_t motorGetVTable(void);
+motorVTable_t motorGetVTable(void * motorDevice);
 bool motorCheckProtocolEnabled(bool *protocolIsDshot);
 void motorDisable(void);
 void motorEnable(void);

@@ -171,6 +171,7 @@ static bool dshotCommandsAreEnabled(dshotCommandType_e commandType)
 }
 
 static void commandWrite(
+        void * motorDevice,
         uint8_t index,
         uint8_t motorCount,
         uint8_t command,
@@ -209,17 +210,17 @@ static void commandWrite(
             delayMicroseconds(DSHOT_COMMAND_DELAY_US);
 
             uint32_t timeoutUs = micros() + 1000;
-            while (!motorGetVTable().updateStart() &&
+            while (!motorGetVTable(motorDevice).updateStart() &&
                     cmpTimeUs(timeoutUs, micros()) > 0);
             for (uint8_t i = 0; i < motorCount; i++) {
                 if ((i == index) || (index == ALL_MOTORS)) {
                     motorDmaOutput_t *const motor = getMotorDmaOutput(i);
                     motor->protocolControl.requestTelemetry = true;
-                    motorGetVTable().writeInt(i, command);
+                    motorGetVTable(motorDevice).writeInt(i, command);
                 }
             }
 
-            motorGetVTable().updateComplete();
+            motorGetVTable(motorDevice).updateComplete();
         }
         delayMicroseconds(delayAfterCommandUs);
     } else if (commandType == DSHOT_CMD_TYPE_INLINE) {
@@ -323,8 +324,6 @@ bool dshotCommandOutputIsEnabled(uint8_t motorCount)
 
 void motorStop(void * motorDevice)
 {
-    (void)motorDevice;
-
-    commandWrite(ALL_MOTORS, 4, DSHOT_CMD_SPIN_DIRECTION_NORMAL,
+    commandWrite(motorDevice, ALL_MOTORS, 4, DSHOT_CMD_SPIN_DIRECTION_NORMAL,
             DSHOT_CMD_TYPE_INLINE);
 }

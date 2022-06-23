@@ -101,8 +101,6 @@ float motorGetDigitalIdOffset(void)
     return CONVERT_PARAMETER_TO_PERCENT(digitalIdleOffsetValue * 0.01f);
 }
 
-// ----------------------------------------------------------------------------
-
 void motorWrite(void * motorDevice_void, float *values)
 {
     motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
@@ -118,12 +116,16 @@ void motorWrite(void * motorDevice_void, float *values)
     }
 }
 
-static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
-
-motorVTable_t motorGetVTable(void)
+motorVTable_t motorGetVTable(void * motorDevice_void)
 {
+    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+
     return motorDevice->vTable;
 }
+
+// ----------------------------------------------------------------------------
+
+static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
 
 float motorConvertFromExternal(uint16_t externalValue)
 {
