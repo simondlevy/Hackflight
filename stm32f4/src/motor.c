@@ -35,30 +35,16 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 static bool motorProtocolEnabled = false;
 static bool motorProtocolDshot = false;
 
-void motorPostInitNull(void)
+float motorGetDigitalIdOffset(void)
 {
-}
-
-bool motorUpdateStartNull(void)
-{
-    return true;
-}
-
-void motorWriteNull(uint8_t index, float value)
-{
-    UNUSED(index);
-    UNUSED(value);
-}
-
-void motorUpdateCompleteNull(void)
-{
+    uint16_t digitalIdleOffsetValue = 450;
+    return CONVERT_PARAMETER_TO_PERCENT(digitalIdleOffsetValue * 0.01f);
 }
 
 bool motorIsProtocolDshot(void)
 {
     return motorProtocolDshot;
 }
-
 
 bool motorCheckProtocolEnabled(bool *isProtocolDshot)
 {
@@ -95,10 +81,81 @@ bool motorCheckProtocolEnabled(bool *isProtocolDshot)
     return enabled;
 }
 
-float motorGetDigitalIdOffset(void)
+float motorConvertFromExternal(void * motorDevice_void, uint16_t externalValue)
 {
-    uint16_t digitalIdleOffsetValue = 450;
-    return CONVERT_PARAMETER_TO_PERCENT(digitalIdleOffsetValue * 0.01f);
+    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+
+    return motorDevice->vTable.convertExternalToMotor(externalValue);
+}
+
+void motorEnable(void * motorDevice_void)
+{
+    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+
+    if (motorDevice->initialized && motorDevice->vTable.enable()) {
+        motorDevice->enabled = true;
+        motorDevice->motorEnableTimeMs = millis();
+    }
+}
+
+uint32_t motorGetEnableTimeMs(void * motorDevice_void)
+{
+    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+
+    return motorDevice->motorEnableTimeMs;
+}
+
+motorVTable_t motorGetVTable(void * motorDevice_void)
+{
+    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+
+    return motorDevice->vTable;
+}
+
+void * motorInit(uint8_t motorCount) {
+
+    motorProtocolEnabled = motorCheckProtocolEnabled(&motorProtocolDshot);
+
+    memset(motors, 0, sizeof(motors));
+
+    static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
+
+    motorDevice = dshotBitbangDevInit(motorCount);
+
+    motorDevice->count = motorCount;
+    motorDevice->initialized = true;
+    motorDevice->motorEnableTimeMs = 0;
+    motorDevice->enabled = false;
+
+    return (void *)motorDevice;
+}
+
+
+bool motorIsEnabled(void * motorDevice_void)
+{
+    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+
+    return motorDevice->enabled;
+}
+
+void motorPostInit(void * motorDevice_void)
+{
+    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+
+    motorDevice->vTable.postInit();
+}
+
+void motorPostInitNull(void)
+{
+}
+
+void motorUpdateCompleteNull(void)
+{
+}
+
+bool motorUpdateStartNull(void)
+{
+    return true;
 }
 
 void motorWrite(void * motorDevice_void, float *values)
@@ -116,67 +173,8 @@ void motorWrite(void * motorDevice_void, float *values)
     }
 }
 
-motorVTable_t motorGetVTable(void * motorDevice_void)
+void motorWriteNull(uint8_t index, float value)
 {
-    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
-
-    return motorDevice->vTable;
+    UNUSED(index);
+    UNUSED(value);
 }
-
-float motorConvertFromExternal(void * motorDevice_void, uint16_t externalValue)
-{
-    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
-
-    return motorDevice->vTable.convertExternalToMotor(externalValue);
-}
-
-void motorPostInit(void * motorDevice_void)
-{
-    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
-
-    motorDevice->vTable.postInit();
-}
-
-// ----------------------------------------------------------------------------
-
-static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
-
-void * motorInit(uint8_t motorCount) {
-
-    motorProtocolEnabled = motorCheckProtocolEnabled(&motorProtocolDshot);
-
-    memset(motors, 0, sizeof(motors));
-
-    motorDevice = dshotBitbangDevInit(motorCount);
-
-    motorDevice->count = motorCount;
-    motorDevice->initialized = true;
-    motorDevice->motorEnableTimeMs = 0;
-    motorDevice->enabled = false;
-
-    return (void *)motorDevice;
-}
-
-void motorEnable(void)
-{
-    if (motorDevice->initialized && motorDevice->vTable.enable()) {
-        motorDevice->enabled = true;
-        motorDevice->motorEnableTimeMs = millis();
-    }
-}
-
-bool motorIsEnabled(void)
-{
-    return motorDevice->enabled;
-}
-
-bool motorIsMotorEnabled(uint8_t index)
-{
-    return motorDevice->vTable.isMotorEnabled(index);
-}
-
-uint32_t motorGetMotorEnableTimeMs(void)
-{
-    return motorDevice->motorEnableTimeMs;
-}
-

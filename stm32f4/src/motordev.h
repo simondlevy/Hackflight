@@ -70,15 +70,13 @@ bool     motorUpdateStartNull(void);
 void     motorUpdateCompleteNull(void);
 void     motorPostInit(void * motorDevice);
 
-// XXX Shouldn't be needed once pwm_output* is really cleaned up.
 struct motorDevConfig_s; 
 
 motorVTable_t motorGetVTable(void * motorDevice);
-bool motorCheckProtocolEnabled(bool *protocolIsDshot);
-void motorEnable(void);
-bool motorIsEnabled(void);
-bool motorIsMotorEnabled(uint8_t index);
-uint32_t motorGetMotorEnableTimeMs(void);
+bool          motorCheckProtocolEnabled(bool *protocolIsDshot);
+void          motorEnable(void * motorDevice);
+bool          motorIsEnabled(void * motorDevice);
+uint32_t      motorGetEnableTimeMs(void * motorDevice);
 
 struct motorDevConfig_s;
 typedef struct motorDevConfig_s motorDevConfig_t;

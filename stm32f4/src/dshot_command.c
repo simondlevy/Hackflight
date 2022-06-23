@@ -146,20 +146,22 @@ static bool allMotorsAreIdle(uint8_t motorCount)
     return true;
 }
 
-static bool dshotCommandsAreEnabled(dshotCommandType_e commandType)
+static bool commandsAreEnabled(
+        void * motorDevice,
+        dshotCommandType_e commandType)
 {
     bool ret = false;
 
     switch (commandType) {
         case DSHOT_CMD_TYPE_BLOCKING:
-            ret = !motorIsEnabled();
+            ret = !motorIsEnabled(motorDevice);
 
             break;
         case DSHOT_CMD_TYPE_INLINE:
-            ret = motorIsEnabled() &&
-                motorGetMotorEnableTimeMs() &&
-                millis() >
-                  motorGetMotorEnableTimeMs() + DSHOT_PROTOCOL_DETECTION_DELAY_MS;
+            ret = motorIsEnabled(motorDevice) &&
+                motorGetEnableTimeMs(motorDevice) &&
+                millis() > motorGetEnableTimeMs(motorDevice) +
+                DSHOT_PROTOCOL_DETECTION_DELAY_MS;
 
             break;
         default:
@@ -177,7 +179,7 @@ static void commandWrite(
         uint8_t command,
         dshotCommandType_e commandType)
 {
-    if (!dshotCommandsAreEnabled(commandType) ||
+    if (!commandsAreEnabled(motorDevice, commandType) ||
             (command > DSHOT_MAX_COMMAND) ||
             dshotCommandQueueFull()) { return;
     }

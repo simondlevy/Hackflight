@@ -64,7 +64,7 @@ int main(void)
     timerStart();
     spiInitBusDMA();
     motorPostInit(motorDevice);
-    motorEnable();
+    motorEnable(motorDevice);
     systemInitUnusedPins();
 
     hackflight_t hf = {0};
