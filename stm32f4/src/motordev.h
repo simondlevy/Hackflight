@@ -68,7 +68,7 @@ void     motorPostInitNull();
 void     motorWriteNull(uint8_t index, float value);
 bool     motorUpdateStartNull(void);
 void     motorUpdateCompleteNull(void);
-void     motorPostInit();
+void     motorPostInit(void * motorDevice);
 
 // XXX Shouldn't be needed once pwm_output* is really cleaned up.
 struct motorDevConfig_s; 

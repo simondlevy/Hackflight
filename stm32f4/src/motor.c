@@ -130,14 +130,16 @@ float motorConvertFromExternal(void * motorDevice_void, uint16_t externalValue)
     return motorDevice->vTable.convertExternalToMotor(externalValue);
 }
 
+void motorPostInit(void * motorDevice_void)
+{
+    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+
+    motorDevice->vTable.postInit();
+}
+
 // ----------------------------------------------------------------------------
 
 static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
-
-void motorPostInit()
-{
-    motorDevice->vTable.postInit();
-}
 
 void * motorInit(uint8_t motorCount) {
 

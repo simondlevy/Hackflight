@@ -63,7 +63,7 @@ int main(void)
     flashInit();
     timerStart();
     spiInitBusDMA();
-    motorPostInit();
+    motorPostInit(motorDevice);
     motorEnable();
     systemInitUnusedPins();
 
