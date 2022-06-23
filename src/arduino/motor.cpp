@@ -71,3 +71,8 @@ void motorStop(void)
 void motorWrite(float *values)
 {
 }
+
+void motorWriteBrushed(uint8_t pin, float value)
+{
+    analogWrite(pin, (uint8_t)(value * 255));
+}
