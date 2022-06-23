@@ -51,10 +51,6 @@ static bool motorIsEnabledNull(uint8_t index)
     return false;
 }
 
-static void motorShutdownNull(void)
-{
-}
-
 static void motorWriteIntNull(uint8_t index, uint16_t value)
 {
     UNUSED(index);
@@ -103,8 +99,6 @@ bool motorIsProtocolDshot(void)
 
 bool checkMotorProtocolEnabled(bool *isProtocolDshot)
 {
-    //(void)motorDevConfig;
-
     bool enabled = false;
     bool isDshot = false;
 
@@ -147,15 +141,6 @@ float getDigitalIdleOffset(void)
 // ----------------------------------------------------------------------------
 
 static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
-
-void motorShutdown(void)
-{
-    motorDevice->vTable.shutdown();
-    motorDevice->enabled = false;
-    motorDevice->motorEnableTimeMs = 0;
-    motorDevice->initialized = false;
-    delayMicroseconds(1500);
-}
 
 void motorWrite(float *values)
 {

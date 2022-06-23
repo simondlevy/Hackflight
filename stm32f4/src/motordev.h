@@ -80,7 +80,6 @@ void motorEnable(void);
 bool motorIsEnabled(void);
 bool motorIsMotorEnabled(uint8_t index);
 uint32_t motorGetMotorEnableTimeMs(void);
-void motorShutdown(void); // Replaces stopPwmAllMotors
 
 struct motorDevConfig_s;
 typedef struct motorDevConfig_s motorDevConfig_t;
