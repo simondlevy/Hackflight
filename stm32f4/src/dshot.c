@@ -43,7 +43,7 @@ static const uint32_t DSHOT_BEACON_GUARD_DELAY_US = 1200000;
 void dshotInitEndpoints(float outputLimit, float *outputLow, float *outputHigh, float *disarm) {
     float outputLimitOffset = DSHOT_RANGE * (1 - outputLimit);
     *disarm = DSHOT_CMD_MOTOR_STOP;
-    *outputLow = DSHOT_MIN_THROTTLE + getDigitalIdleOffset() * DSHOT_RANGE;
+    *outputLow = DSHOT_MIN_THROTTLE + motorGetDigitalIdOffset() * DSHOT_RANGE;
     *outputHigh = DSHOT_MAX_THROTTLE - outputLimitOffset;
 }
 

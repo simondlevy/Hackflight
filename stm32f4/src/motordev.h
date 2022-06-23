@@ -74,7 +74,7 @@ uint16_t motorConvertToExternal(float motorValue);
 struct motorDevConfig_s; // XXX Shouldn't be needed once pwm_output* is really cleaned up.
 unsigned motorDeviceCount(void);
 motorVTable_t motorGetVTable(void);
-bool checkMotorProtocolEnabled(bool *protocolIsDshot);
+bool motorCheckProtocolEnabled(bool *protocolIsDshot);
 void motorDisable(void);
 void motorEnable(void);
 bool motorIsEnabled(void);
@@ -84,4 +84,4 @@ uint32_t motorGetMotorEnableTimeMs(void);
 struct motorDevConfig_s;
 typedef struct motorDevConfig_s motorDevConfig_t;
 
-float getDigitalIdleOffset(void);
+float motorGetDigitalIdOffset(void);

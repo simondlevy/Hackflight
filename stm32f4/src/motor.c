@@ -35,28 +35,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 static bool motorProtocolEnabled = false;
 static bool motorProtocolDshot = false;
 
-
-static void motorWriteIntNull(uint8_t index, uint16_t value)
-{
-    UNUSED(index);
-    UNUSED(value);
-}
-
-
-static float motorConvertFromExternalNull(uint16_t value)
-{
-    UNUSED(value);
-    return 0.0f ;
-}
-
-static uint16_t motorConvertToExternalNull(float value)
-{
-    UNUSED(value);
-    return 0;
-}
-
-// =============================================================================
-
 void motorPostInitNull(void)
 {
 }
@@ -82,7 +60,7 @@ bool motorIsProtocolDshot(void)
 }
 
 
-bool checkMotorProtocolEnabled(bool *isProtocolDshot)
+bool motorCheckProtocolEnabled(bool *isProtocolDshot)
 {
     bool enabled = false;
     bool isDshot = false;
@@ -117,7 +95,7 @@ bool checkMotorProtocolEnabled(bool *isProtocolDshot)
     return enabled;
 }
 
-float getDigitalIdleOffset(void)
+float motorGetDigitalIdOffset(void)
 {
     uint16_t digitalIdleOffsetValue = 450;
     return CONVERT_PARAMETER_TO_PERCENT(digitalIdleOffsetValue * 0.01f);
@@ -167,7 +145,7 @@ void motorPostInit()
 
 void * motorInit(uint8_t motorCount) {
 
-    motorProtocolEnabled = checkMotorProtocolEnabled(&motorProtocolDshot);
+    motorProtocolEnabled = motorCheckProtocolEnabled(&motorProtocolDshot);
 
     memset(motors, 0, sizeof(motors));
 
