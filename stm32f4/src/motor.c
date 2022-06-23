@@ -32,8 +32,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #define CONVERT_PARAMETER_TO_PERCENT(param) (0.01f * param)
 
-static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
-
 static bool motorProtocolEnabled = false;
 static bool motorProtocolDshot = false;
 
@@ -90,13 +88,9 @@ static const motorVTable_t motorNullVTable = {
     .shutdown = motorShutdownNull,
 };
 
-static motorDevice_t motorNullDevice = {
-    .initialized = false,
-    .enabled = false,
-};
+static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
 
-
-// ======================================================================================
+// =============================================================================
 
 void motorShutdown(void)
 {
@@ -106,6 +100,7 @@ void motorShutdown(void)
     motorDevice->initialized = false;
     delayMicroseconds(1500);
 }
+
 void motorWrite(float *values)
 {
     if (motorDevice->enabled) {
@@ -214,15 +209,10 @@ void motorInit(uint8_t motorCount) {
 
     motorDevice = dshotBitbangDevInit(motorCount);
 
-    if (motorDevice) {
-        motorDevice->count = motorCount;
-        motorDevice->initialized = true;
-        motorDevice->motorEnableTimeMs = 0;
-        motorDevice->enabled = false;
-    } else {
-        motorNullDevice.vTable = motorNullVTable;
-        motorDevice = &motorNullDevice;
-    }
+    motorDevice->count = motorCount;
+    motorDevice->initialized = true;
+    motorDevice->motorEnableTimeMs = 0;
+    motorDevice->enabled = false;
 }
 
 void motorDisable(void)
