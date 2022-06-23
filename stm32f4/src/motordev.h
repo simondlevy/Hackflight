@@ -75,7 +75,6 @@ struct motorDevConfig_s;
 
 motorVTable_t motorGetVTable(void * motorDevice);
 bool motorCheckProtocolEnabled(bool *protocolIsDshot);
-void motorDisable(void);
 void motorEnable(void);
 bool motorIsEnabled(void);
 bool motorIsMotorEnabled(uint8_t index);

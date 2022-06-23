@@ -157,13 +157,6 @@ void * motorInit(uint8_t motorCount) {
     return (void *)motorDevice;
 }
 
-void motorDisable(void)
-{
-    motorDevice->vTable.disable();
-    motorDevice->enabled = false;
-    motorDevice->motorEnableTimeMs = 0;
-}
-
 void motorEnable(void)
 {
     if (motorDevice->initialized && motorDevice->vTable.enable()) {
