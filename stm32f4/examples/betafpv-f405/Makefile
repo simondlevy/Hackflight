@@ -88,7 +88,7 @@ FATFS_SRC       = $(notdir $(wildcard $(FATFS_DIR)/*.c))
 CSOURCES        := $(shell find $(STM_SRC_DIR) -name '*.c')
 
 # start specific includes
-include STM32F4.mk
+include ../../STM32F4.mk
 
 # Configure default flash sizes for the targets (largest size specified gets hit first) if flash not specified already.
 ifeq ($(TARGET_FLASH_SIZE),)
