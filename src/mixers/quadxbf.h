@@ -37,14 +37,23 @@ static axes_t mixerQuadXbfAxes[] = {
     { +1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-static void mixerQuadXbfFun(float roll, float pitch, float yaw, float * motors)
+static void fixedPitchMix(
+        float roll,
+        float pitch,
+        float yaw,
+        axes_t axes[],
+        uint8_t motorCount, 
+        float motors[])
 {
-    axes_t * axes = mixerQuadXbfAxes;
-
-    for (int i=0; i<4; i++) {
+    for (int i=0; i<motorCount; i++) {
         float mix = roll * axes[i].x + pitch * axes[i].y + yaw * axes[i].z;
         motors[i] = mix;
     }
+}
+
+static void mixerQuadXbfFun(float roll, float pitch, float yaw, float * motors)
+{
+    fixedPitchMix(roll, pitch, yaw, mixerQuadXbfAxes, 4, motors);
 }
 
 static mixer_t mixerQuadXbf = { 4 , mixerQuadXbfFun };
