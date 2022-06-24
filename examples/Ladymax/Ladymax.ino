@@ -20,6 +20,7 @@
 #include <Wire.h>
 
 #include <hackflight_full.h>
+#include <motor.h>
 #include <stm32_clock.h>
 
 static hackflight_t _hf;
@@ -31,8 +32,10 @@ void setup(void)
 
     static uint8_t motorPins[4] = {13, 16, 3, 11};
 
+    motorInitBrushed(motorPins);
+
     // Always use Serial1 for receiver, no no need to specify
-    hackflightInitFull(&_hf, (void *)&motorPins, SERIAL_PORT_NONE, 5, A4);
+    hackflightInitFull(&_hf, (void *)&motorPins, SERIAL_PORT_NONE, 5, 18);
 
     stm32_startCycleCounter();
 }

@@ -19,16 +19,16 @@
  */
 
 static uint8_t PIN = 13;
+static uint8_t MAXVAL = 100;
 
-static float  val;
+static int8_t val;
 static int8_t dir;
-
-//static rft::ArduinoBrushedMotor motor = rft::ArduinoBrushedMotor(PIN);
 
 void setup(void)
 {
     // Initialize the motor
-    //motor.begin();
+    analogWriteFrequency(PIN, 10000);
+    analogWrite(PIN, 0);
 
     // Start with motor off, increasing
     val = 0;
@@ -39,16 +39,16 @@ void setup(void)
 
 void loop(void)
 {
-    //motor.write(val);
+    analogWrite(PIN, val);
 
-    val += dir * .001;
+    val += dir;
 
     // stop halfway
-    if (val >= 0.25) {
+    if (val == MAXVAL) {
         dir = -1;
     }
 
-    if (val <= 0) {
+    if (val == 0) {
         dir = +1;
     }
 

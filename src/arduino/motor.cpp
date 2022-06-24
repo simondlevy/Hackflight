@@ -21,6 +21,7 @@
 #include <arming.h>
 #include <debug.h>
 #include <motor.h>
+#include <pwm.h>
 
 void motorCheckDshotBitbangStatus(arming_t * arming)
 {
@@ -38,13 +39,15 @@ float motorConvertFromExternal(void * motorDevice, uint16_t externalValue)
     (void)externalValue;
     (void)motorDevice;
 
-    return 0;
+    return (externalValue - PWM_MIN) / (float)(PWM_MAX - PWM_MIN);
 }
 
-void  motorInitBrushed(uint8_t pin)
+void  motorInitBrushed(uint8_t * pins)
 {
-    analogWriteFrequency(pin, 10000);
-    analogWrite(pin, 0);
+    for (uint8_t k=0; k<4; ++k) {
+        analogWriteFrequency(pins[k], 10000);
+        analogWrite(pins[k], 0);
+    }
 }
 
 bool motorIsProtocolDshot(void)
@@ -76,10 +79,7 @@ void motorWrite(void * motorDevice, float *values)
 {
     uint8_t * pins = (uint8_t *)motorDevice;
 
-    debugPrintf("%d %d %d %d\n", pins[0], pins[1], pins[2], pins[3]);
-}
-
-void motorWriteBrushed(uint8_t pin, float value)
-{
-    analogWrite(pin, (uint8_t)(value * 255));
+    for (uint8_t k=0; k<4; ++k) {
+        analogWrite(pins[k], (uint8_t)(values[k] * 255));
+    }
 }
