@@ -451,13 +451,12 @@ typedef struct {
 
 // Mixer -----------------------------------------------------------------------
 
-typedef void (*mixerFun)(demands_t * demands, float * motors);
+typedef void (*mixfun_t)(float roll, float pitch, float yaw, float * motors);
 
 typedef struct {
 
     uint8_t motorCount;
-
-    axes_t * axes;
+    mixfun_t fun;
 
 } mixer_t;
 

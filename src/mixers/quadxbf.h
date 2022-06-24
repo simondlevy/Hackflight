@@ -37,18 +37,14 @@ static axes_t mixerQuadXbfAxes[] = {
     { +1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-static mixer_t mixerQuadXbf = { 4 , mixerQuadXbfAxes};
-
-static void mixerQuadXbfFun(demands_t * demands, float * motors)
+static void mixerQuadXbfFun(float roll, float pitch, float yaw, float * motors)
 {
     axes_t * axes = mixerQuadXbfAxes;
 
     for (int i=0; i<4; i++) {
-
-        float mix =
-            demands->roll * axes[i].x + 
-            demands->pitch * axes[i].y + 
-            demands->yaw * axes[i].z;
+        float mix = roll * axes[i].x + pitch * axes[i].y + yaw * axes[i].z;
         motors[i] = mix;
     }
 }
+
+static mixer_t mixerQuadXbf = { 4 , mixerQuadXbfFun };

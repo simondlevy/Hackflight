@@ -35,9 +35,6 @@ extern "C" {
 
     static void mixerRun(mixer_t * mixer, demands_t * demands, float * motors)
     {
-        axes_t * axes = mixer->axes;
-        uint8_t motorCount = mixer->motorCount;
-
         // Calculate and Limit the PID sum
         float roll = constrain_f(demands->roll, -PIDSUM_LIMIT, PIDSUM_LIMIT) /
             PID_MIXER_SCALING;
@@ -49,14 +46,14 @@ extern "C" {
         // reduce throttle to offset additional motor output
         float throttle = demands->throttle;
 
-        // Find roll/pitch/yaw desired output
         float mix[MAX_SUPPORTED_MOTORS];
+
+        mixer->fun(roll, pitch, yaw, mix);
+
+        // Find roll/pitch/yaw desired output
         float mixMax = 0, mixMin = 0;
 
-        for (int i = 0; i < motorCount; i++) {
-
-            mix[i] = roll * axes[i].x + pitch * axes[i].y + yaw * axes[i].z;
-        }
+        uint8_t motorCount = mixer->motorCount;
 
         for (int i = 0; i < motorCount; i++) {
 
