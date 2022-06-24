@@ -26,7 +26,7 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "datatypes.h"
+#include "mixers/fixedpitch.h"
 
 // Quad X configuration with Betaflight numbering
 static axes_t mixerQuadXbfAxes[] = {
@@ -36,20 +36,6 @@ static axes_t mixerQuadXbfAxes[] = {
     { +1.0f, +1.0f, +1.0f },          // REAR_L
     { +1.0f, -1.0f, -1.0f },          // FRONT_L
 };
-
-static void fixedPitchMix(
-        float roll,
-        float pitch,
-        float yaw,
-        axes_t axes[],
-        uint8_t motorCount, 
-        float motors[])
-{
-    for (int i=0; i<motorCount; i++) {
-        float mix = roll * axes[i].x + pitch * axes[i].y + yaw * axes[i].z;
-        motors[i] = mix;
-    }
-}
 
 static void mixerQuadXbfFun(float roll, float pitch, float yaw, float * motors)
 {

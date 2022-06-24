@@ -1,5 +1,7 @@
+#pragma once
+
 /*
-   Copyright (c) 2022 Simon D. Levy
+   Common mixer function for fixed-pitch vehicles
 
    This file is part of Hackflight.
 
@@ -16,33 +18,18 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
-#include <Wire.h>
+#include "datatypes.h"
 
-#include <hackflight_full.h>
-#include <mixers/fixedpitch/quadxbf.h>
-#include <motor.h>
-#include <stm32_clock.h>
-
-static hackflight_t _hf;
-
-void setup(void)
+static void fixedPitchMix(
+        float roll,
+        float pitch,
+        float yaw,
+        axes_t axes[],
+        uint8_t motorCount, 
+        float motors[])
 {
-    Wire.begin();
-    delay(100);
-
-    static uint8_t motorPins[4] = {13, 16, 3, 11};
-
-    motorInitBrushed(motorPins);
-
-    // Always use Serial1 for receiver, no no need to specify
-    hackflightInitFull(&_hf, &mixerQuadXbf, (void *)&motorPins,
-            SERIAL_PORT_NONE, 5, 18);
-
-    stm32_startCycleCounter();
-}
-
-void loop(void)
-{
-    hackflightStep(&_hf);
+    for (int i=0; i<motorCount; i++) {
+        float mix = roll * axes[i].x + pitch * axes[i].y + yaw * axes[i].z;
+        motors[i] = mix;
+    }
 }
