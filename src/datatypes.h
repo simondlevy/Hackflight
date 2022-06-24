@@ -157,14 +157,14 @@ typedef struct {
 
     // For both hardware and sim implementations
     void (*fun)(void * hackflight, uint32_t time);
-    int32_t desiredPeriodUs;        // target period of execution
-    uint32_t lastExecutedAtUs;          // last time of invocation
+    int32_t desiredPeriodUs;            
+    uint32_t lastExecutedAtUs;          
 
     // For hardware impelmentations
-    uint16_t dynamicPriority;           // when last executed, to avoid task starvation
+    uint16_t dynamicPriority;          
     uint16_t taskAgeCycles;
-    uint32_t lastSignaledAtUs;          // time of invocation event for event-driven tasks
-    uint32_t anticipatedExecutionTime;  // Fixed point expectation of next execution time
+    uint32_t lastSignaledAtUs;         
+    uint32_t anticipatedExecutionTime;
 
 } task_t;
 
@@ -449,9 +449,18 @@ typedef struct {
 } rx_t;
 
 
+// Mixer -----------------------------------------------------------------------
+
+typedef struct {
+
+    uint8_t motorCount;
+
+} mixer_t;
+
 // Hackflight ------------------------------------------------------------------
 
 typedef struct {
+
     imu_sensor_t     accelAccum;
     arming_t         arming;
     angle_pid_t      anglepid;
@@ -460,6 +469,7 @@ typedef struct {
     gyro_t           gyro;
     imu_fusion_t     imuFusionPrev;
     float            maxArmingAngle;
+    mixer_t          mixer;
     void *           motorDevice;
     float            mspMotors[4];
     task_t           mspTask;
@@ -473,5 +483,6 @@ typedef struct {
     task_t           sensorTasks[10];
     uint8_t          sensorTaskCount;
     vehicle_state_t  vstate;
+
 } hackflight_t;
 
