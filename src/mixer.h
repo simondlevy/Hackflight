@@ -16,8 +16,11 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <stdbool.h>
 
+#include "debug.h"
 #include "failsafe.h"
 #include "maths.h"
 #include "motor.h"
