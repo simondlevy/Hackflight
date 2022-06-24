@@ -38,3 +38,9 @@ static axes_t mixerQuadXbfAxes[] = {
 };
 
 static mixer_t mixerQuadXbf = { 4 , mixerQuadXbfAxes};
+
+static void mixerQuadXbfFun(demands_t * demands, float * motors)
+{
+    (void)demands;
+    (void)motors;
+}
