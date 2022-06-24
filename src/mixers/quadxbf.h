@@ -37,4 +37,4 @@ static axes_t mixerQuadXbfAxes[] = {
     { +1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-// static mixer_t mixerQuadXbf = { 4 , mixerQuadXbfAxes};
+static mixer_t mixerQuadXbf = { 4 , mixerQuadXbfAxes};

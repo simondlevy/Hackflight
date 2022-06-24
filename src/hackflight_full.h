@@ -25,7 +25,8 @@ extern "C" {
 #endif
 
 void hackflightInitFull(
-        hackflight_t * hackflight,
+        hackflight_t * hf,
+        mixer_t * mixer,
         void * motorDevice,
         serialPortIdentifier_e rxPort,
         uint8_t imuInterruptPin,

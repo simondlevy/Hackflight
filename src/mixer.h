@@ -22,8 +22,6 @@
 #include "maths.h"
 #include "motor.h"
 
-#include "mixers/quadxbf.h"
-
 static const float    PID_MIXER_SCALING = 1000;
 static const uint16_t PIDSUM_LIMIT_YAW  = 400;
 static const uint16_t PIDSUM_LIMIT      = 500;
@@ -32,9 +30,10 @@ static const uint16_t PIDSUM_LIMIT      = 500;
 extern "C" {
 #endif
 
-    static void mixerRun(demands_t * demands, float * motors)
+    static void mixerRun(mixer_t * mixer, demands_t * demands, float * motors)
     {
-        axes_t * activeMixer = mixerQuadXbfAxes;
+        axes_t * axes = mixer->axes;
+        uint8_t motorCount = mixer->motorCount;
 
         // Calculate and Limit the PID sum
         float roll = constrain_f(demands->roll, -PIDSUM_LIMIT, PIDSUM_LIMIT) /
@@ -51,12 +50,12 @@ extern "C" {
         float motorMix[MAX_SUPPORTED_MOTORS];
         float motorMixMax = 0, motorMixMin = 0;
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < motorCount; i++) {
 
             float mix =
-                roll * activeMixer[i].x + 
-                pitch * activeMixer[i].y + 
-                yaw * activeMixer[i].z;
+                roll * axes[i].x + 
+                pitch * axes[i].y + 
+                yaw * axes[i].z;
 
             if (mix > motorMixMax) {
                 motorMixMax = mix;
@@ -69,7 +68,7 @@ extern "C" {
         float motorRange = motorMixMax - motorMixMin;
 
         if (motorRange > 1.0f) {
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < motorCount; i++) {
                 motorMix[i] /= motorRange;
             }
         } else {
@@ -81,7 +80,7 @@ extern "C" {
         // Now add in the desired throttle, but keep in a range that doesn't
         // clip adjusted roll/pitch/yaw. This could move throttle down, but
         // also up for those low throttle flips.
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < motorCount; i++) {
             float motorOutput = motorMix[i] + throttle;
             motorOutput = motorValueLow() +
                 (motorValueHigh() - motorValueLow()) * motorOutput;

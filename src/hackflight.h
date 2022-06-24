@@ -119,7 +119,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
     }
 
     float mixmotors[4] = {0};
-    mixerRun(&hf->demands, mixmotors);
+    mixerRun(hf->mixer, &hf->demands, mixmotors);
 
     motorWrite(hf->motorDevice,
             armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
@@ -129,6 +129,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
 static void hackflightInit(
         hackflight_t * hf,
+        mixer_t * mixer,
         serialPortIdentifier_e rxPort,
         float rateP,
         float rateI,
@@ -137,6 +138,8 @@ static void hackflightInit(
         float levelP
         )
 {
+    hf->mixer = mixer;
+
     anglePidInit(&hf->anglepid, rateP, rateI, rateD, rateF, levelP);
 
     hackflightAddPidController(hf, anglePidUpdate, &hf->anglepid);

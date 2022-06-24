@@ -298,6 +298,7 @@ extern "C" {
 
     void hackflightInitFull(
             hackflight_t * hf,
+            mixer_t * mixer,
             void * motorDevice,
             serialPortIdentifier_e rxPort,
             uint8_t imuInterruptPin,
@@ -320,7 +321,7 @@ extern "C" {
 
         hf->motorDevice = motorDevice;
 
-        hackflightInit(hf, rxPort, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
+        hackflightInit(hf, mixer, rxPort, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
 
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 
