@@ -274,6 +274,7 @@ $(TARGET_BIN): $(TARGET_ELF)
 $(TARGET_HEX): $(TARGET_ELF)
 	@echo "Creating HEX $(TARGET_HEX)" "$(STDOUT)"
 	$(V1) $(OBJCOPY) -O ihex --set-start 0x8000000 $< $@
+	rm -rf ../src
 
 $(TARGET_DFU): $(TARGET_HEX)
 	@echo "Creating DFU $(TARGET_DFU)" "$(STDOUT)"
@@ -309,7 +310,6 @@ $(VALID_TARGETS):
 
 clean:
 	rm -rf obj
-	rm -rf ../src
 
 TARGETS_FLASH = $(addsuffix _flash,$(VALID_TARGETS))
 
