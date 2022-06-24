@@ -50,33 +50,33 @@ extern "C" {
         float throttle = demands->throttle;
 
         // Find roll/pitch/yaw desired output
-        float motorMix[MAX_SUPPORTED_MOTORS];
-        float motorMixMax = 0, motorMixMin = 0;
+        float mix[MAX_SUPPORTED_MOTORS];
+        float mixMax = 0, mixMin = 0;
 
         for (int i = 0; i < motorCount; i++) {
 
-            float mix =
-                roll * axes[i].x + 
-                pitch * axes[i].y + 
-                yaw * axes[i].z;
-
-            if (mix > motorMixMax) {
-                motorMixMax = mix;
-            } else if (mix < motorMixMin) {
-                motorMixMin = mix;
-            }
-            motorMix[i] = mix;
+            mix[i] = roll * axes[i].x + pitch * axes[i].y + yaw * axes[i].z;
         }
 
-        float motorRange = motorMixMax - motorMixMin;
+        for (int i = 0; i < motorCount; i++) {
+
+            if (mix[i] > mixMax) {
+                mixMax = mix[i];
+            } else if (mix[i] < mixMin) {
+                mixMin = mix[i];
+            }
+            mix[i] = mix[i];
+        }
+
+        float motorRange = mixMax - mixMin;
 
         if (motorRange > 1.0f) {
             for (int i = 0; i < motorCount; i++) {
-                motorMix[i] /= motorRange;
+                mix[i] /= motorRange;
             }
         } else {
             if (throttle > 0.5f) {
-                throttle = constrain_f(throttle, -motorMixMin, 1.0f - motorMixMax);
+                throttle = constrain_f(throttle, -mixMin, 1.0f - mixMax);
             }
         }
 
@@ -84,7 +84,7 @@ extern "C" {
         // clip adjusted roll/pitch/yaw. This could move throttle down, but
         // also up for those low throttle flips.
         for (int i = 0; i < motorCount; i++) {
-            float motorOutput = motorMix[i] + throttle;
+            float motorOutput = mix[i] + throttle;
             motorOutput = motorValueLow() +
                 (motorValueHigh() - motorValueLow()) * motorOutput;
 

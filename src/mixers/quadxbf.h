@@ -2,15 +2,15 @@
 
 /*
    Mixer values for quad-X frames using Betaflight motor layout:
-  
-      4cw   2ccw
-         \ /
-          ^
-         / \
-      3ccw  1cw
-  
+
+   4cw   2ccw
+   \ /
+   ^
+   / \
+   3ccw  1cw
+
    Copyright (C) 2022 Simon D. Levy
-  
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify it under the
@@ -24,7 +24,7 @@
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
-  */
+ */
 
 #include "datatypes.h"
 
@@ -41,6 +41,14 @@ static mixer_t mixerQuadXbf = { 4 , mixerQuadXbfAxes};
 
 static void mixerQuadXbfFun(demands_t * demands, float * motors)
 {
-    (void)demands;
-    (void)motors;
+    axes_t * axes = mixerQuadXbfAxes;
+
+    for (int i=0; i<4; i++) {
+
+        float mix =
+            demands->roll * axes[i].x + 
+            demands->pitch * axes[i].y + 
+            demands->yaw * axes[i].z;
+        motors[i] = mix;
+    }
 }
