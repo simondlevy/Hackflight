@@ -112,7 +112,7 @@ motorVTable_t motorGetVTable(void * motorDevice_void)
     return motorDevice->vTable;
 }
 
-void * motorInit(uint8_t motorCount) {
+void * motorInitDshot(uint8_t motorCount) {
 
     motorProtocolEnabled = motorCheckProtocolEnabled(&motorProtocolDshot);
 
