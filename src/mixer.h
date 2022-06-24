@@ -34,7 +34,7 @@ extern "C" {
 
     static void mixerRun(demands_t * demands, float * motors)
     {
-        axes_t * activeMixer = mixerQuadXBF;
+        axes_t * activeMixer = mixerQuadXbfAxes;
 
         // Calculate and Limit the PID sum
         float roll = constrain_f(demands->roll, -PIDSUM_LIMIT, PIDSUM_LIMIT) /

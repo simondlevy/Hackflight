@@ -4,20 +4,14 @@ TARGET    ?= STM32F405
 # SERIAL_DEVICE ?= /dev/ttyACM0
 SERIAL_DEVICE ?= COM30
 
-# Compile-time options
-OPTIONS   ?=
-
-# Flash size (KB).  Some low-end chips actually have more flash than advertised, use this to override.
-FLASH_SIZE ?=
-
 # Working directories
-ROOT         := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+ROOT         := ../..
+OBJECT_DIR   := ./obj
 STM_SRC_DIR  := $(ROOT)/src
-SRC_DIR      := $(ROOT)/../src
-OBJECT_DIR   := $(ROOT)/obj
+HSRC_DIR     := $(ROOT)/../src
 CMSIS_DIR    := $(ROOT)/lib/CMSIS
 INCLUDE_DIRS := $(STM_SRC_DIR) \
-	            $(ROOT)/../src \
+	            $(HSRC_DIR) \
                 $(STM_SRC_DIR)/startup
 LINKER_DIR   := $(ROOT)/link
 
@@ -94,7 +88,7 @@ FATFS_SRC       = $(notdir $(wildcard $(FATFS_DIR)/*.c))
 CSOURCES        := $(shell find $(STM_SRC_DIR) -name '*.c')
 
 # start specific includes
-include $(ROOT)/STM32F4.mk
+include STM32F4.mk
 
 # Configure default flash sizes for the targets (largest size specified gets hit first) if flash not specified already.
 ifeq ($(TARGET_FLASH_SIZE),)
@@ -121,18 +115,18 @@ endif
 
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
-            $(SRC_DIR)/arming.c \
-            $(SRC_DIR)/debug.c \
-            $(SRC_DIR)/failsafe.c \
-            $(SRC_DIR)/gyro.c \
-            $(SRC_DIR)/hackflight.c \
-            $(SRC_DIR)/imu.c \
-            $(SRC_DIR)/led.c \
-            $(SRC_DIR)/maths.c \
-            $(SRC_DIR)/msp.c \
-            $(SRC_DIR)/rx.c \
-            $(SRC_DIR)/sbus.c \
-            $(SRC_DIR)/stm32_clock.c \
+            $(HSRC_DIR)/arming.c \
+            $(HSRC_DIR)/debug.c \
+            $(HSRC_DIR)/failsafe.c \
+            $(HSRC_DIR)/gyro.c \
+            $(HSRC_DIR)/hackflight.c \
+            $(HSRC_DIR)/imu.c \
+            $(HSRC_DIR)/led.c \
+            $(HSRC_DIR)/maths.c \
+            $(HSRC_DIR)/msp.c \
+            $(HSRC_DIR)/rx.c \
+            $(HSRC_DIR)/sbus.c \
+            $(HSRC_DIR)/stm32_clock.c \
             accel.c \
             accgyro_spi_mpu6000.c \
             imu_fusion.c \
@@ -205,7 +199,6 @@ CC_SIZE_OPTIMISATION    := $(OPTIMISATION_BASE) $(OPTIMISE_SIZE)
 CC_NO_OPTIMISATION      := 
 
 CFLAGS     += $(ARCH_FLAGS) \
-              $(addprefix -D,$(OPTIONS)) \
               $(addprefix -I,$(INCLUDE_DIRS)) \
               -std=gnu11 \
               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
@@ -316,6 +309,7 @@ $(VALID_TARGETS):
 
 clean:
 	rm -rf obj
+	rm -rf ../src
 
 TARGETS_FLASH = $(addsuffix _flash,$(VALID_TARGETS))
 

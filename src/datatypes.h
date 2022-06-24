@@ -455,6 +455,8 @@ typedef struct {
 
     uint8_t motorCount;
 
+    axes_t * axes;
+
 } mixer_t;
 
 // Hackflight ------------------------------------------------------------------
