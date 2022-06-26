@@ -28,16 +28,16 @@
 
 #include "mixers/fixedpitch.h"
 
-// Quad X configuration with Betaflight numbering
-static axes_t mixerQuadXbfAxes[] = {
-    //  rol   pit    yaw
-    { -1.0f, +1.0f, -1.0f },          // REAR_R
-    { -1.0f, -1.0f, +1.0f },          // FRONT_R
-    { +1.0f, +1.0f, +1.0f },          // REAR_L
-    { +1.0f, -1.0f, -1.0f },          // FRONT_L
-};
-
-static void mixerQuadXbf(float roll, float pitch, float yaw, float * motors)
+static void mixerQuadXbf(float throttle, float roll, float pitch, float yaw,
+        float * motors)
 {
-    fixedPitchMix(roll, pitch, yaw, mixerQuadXbfAxes, 4, motors);
+    static axes_t mixerQuadXbfAxes[] = {
+        //  rol   pit    yaw
+        { -1.0f, +1.0f, -1.0f },          // REAR_R
+        { -1.0f, -1.0f, +1.0f },          // FRONT_R
+        { +1.0f, +1.0f, +1.0f },          // REAR_L
+        { +1.0f, -1.0f, -1.0f },          // FRONT_L
+    };
+
+    fixedPitchMix(throttle, roll, pitch, yaw, mixerQuadXbfAxes, 4, motors);
 }

@@ -27,7 +27,6 @@
 #include "imu.h"
 #include "init_task.h"
 #include "maths.h"
-#include "mixer.h"
 #include "motor.h"
 #include "pids/angle.h"
 #include "rx.h"
@@ -41,6 +40,12 @@ static const float MAX_ARMING_ANGLE = 25;
 
 static const uint32_t RX_TASK_RATE       = 33;
 static const uint32_t ATTITUDE_TASK_RATE = 100;
+
+// PID-limiting constants -----------------------------------------------------
+
+static const float    PID_MIXER_SCALING = 1000;
+static const uint16_t PIDSUM_LIMIT_YAW  = 400;
+static const uint16_t PIDSUM_LIMIT      = 500;
 
 // Attitude task --------------------------------------------------------------
 
@@ -126,14 +131,12 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
     float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
     // Calculate and Limit the PID sum
-    mixerRun(
-            hf->mixer,
+    hf->mixer(
             hf->demands.throttle,
             constrain_demand(hf->demands.roll, PIDSUM_LIMIT, PID_MIXER_SCALING),
             constrain_demand(hf->demands.pitch, PIDSUM_LIMIT, PID_MIXER_SCALING),
             -constrain_demand(hf->demands.yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING),
-            mixmotors,
-            4); // XXX
+            mixmotors);
 
     motorWrite(hf->motorDevice,
             armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
