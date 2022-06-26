@@ -71,7 +71,7 @@ int main(void)
     hackflight_t hf = {0};
 
     // 0 = dummy value for IMU interrupt pin; 37 = LED pin
-    hackflightInitFull(&hf, &mixerQuadXbf, motorDevice,
+    hackflightInitFull(&hf, mixerQuadXbf, motorDevice,
             SERIAL_PORT_USART3, 0, 37);
 
     // STM32 boards have traditional accel/gyro combo

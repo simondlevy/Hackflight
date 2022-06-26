@@ -129,7 +129,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
 static void hackflightInit(
         hackflight_t * hf,
-        mixer_t * mixer,
+        mixer_t mixer,
         serialPortIdentifier_e rxPort,
         float rateP,
         float rateI,

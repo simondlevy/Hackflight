@@ -298,7 +298,7 @@ extern "C" {
 
     void hackflightInitFull(
             hackflight_t * hf,
-            mixer_t * mixer,
+            mixer_t mixer,
             void * motorDevice,
             serialPortIdentifier_e rxPort,
             uint8_t imuInterruptPin,

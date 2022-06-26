@@ -37,9 +37,7 @@ static axes_t mixerQuadXbfAxes[] = {
     { +1.0f, -1.0f, -1.0f },          // FRONT_L
 };
 
-static void mixerQuadXbfFun(float roll, float pitch, float yaw, float * motors)
+static void mixerQuadXbf(float roll, float pitch, float yaw, float * motors)
 {
     fixedPitchMix(roll, pitch, yaw, mixerQuadXbfAxes, 4, motors);
 }
-
-static mixer_t mixerQuadXbf = { 4 , mixerQuadXbfFun };

@@ -451,14 +451,7 @@ typedef struct {
 
 // Mixer -----------------------------------------------------------------------
 
-typedef void (*mixfun_t)(float roll, float pitch, float yaw, float * motors);
-
-typedef struct {
-
-    uint8_t motorCount;
-    mixfun_t fun;
-
-} mixer_t;
+typedef void (*mixer_t)(float roll, float pitch, float yaw, float * motors);
 
 // Hackflight ------------------------------------------------------------------
 
@@ -472,7 +465,7 @@ typedef struct {
     gyro_t           gyro;
     imu_fusion_t     imuFusionPrev;
     float            maxArmingAngle;
-    mixer_t *        mixer;
+    mixer_t          mixer;
     void *           motorDevice;
     float            mspMotors[4];
     task_t           mspTask;
