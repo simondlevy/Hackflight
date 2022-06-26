@@ -36,7 +36,7 @@ void setup(void)
     motorInitBrushed(motorPins);
 
     // Always use Serial1 for receiver, no no need to specify
-    hackflightInitFull(&_hf, &mixerQuadXbf, (void *)&motorPins,
+    hackflightInitFull(&_hf, mixerQuadXbf, (void *)&motorPins,
             SERIAL_PORT_NONE, 5, 18);
 
     stm32_startCycleCounter();
