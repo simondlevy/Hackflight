@@ -33,27 +33,21 @@ static const uint16_t PIDSUM_LIMIT      = 500;
 extern "C" {
 #endif
 
-    static void mixerRun(mixer_t mixer, demands_t * demands, float * motors)
+    static void mixerRun(
+            mixer_t mixer,
+            float throttle,
+            float roll,
+            float pitch,
+            float yaw,
+            float * motors,
+            uint8_t motorCount)
     {
-        // Calculate and Limit the PID sum
-        float roll = constrain_f(demands->roll, -PIDSUM_LIMIT, PIDSUM_LIMIT) /
-            PID_MIXER_SCALING;
-        float pitch = constrain_f(demands->pitch, -PIDSUM_LIMIT, PIDSUM_LIMIT) /
-            PID_MIXER_SCALING;
-        float yaw = -constrain_f(demands->yaw, -PIDSUM_LIMIT_YAW, PIDSUM_LIMIT_YAW) /
-            PID_MIXER_SCALING;
-
-        // reduce throttle to offset additional motor output
-        float throttle = demands->throttle;
-
         float mix[MAX_SUPPORTED_MOTORS];
 
         mixer(roll, pitch, yaw, mix);
 
         // Find roll/pitch/yaw desired output
         float mixMax = 0, mixMin = 0;
-
-        uint8_t motorCount = 4; // XXX
 
         for (int i = 0; i < motorCount; i++) {
 

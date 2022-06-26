@@ -104,6 +104,11 @@ static void task_rx(void * hackflight, uint32_t time)
 
 // Core tasks: gyro, PID controllers, mixer, motors ------------------------
 
+static float constrain_demand(float demand, float limit, float scaling)
+{
+    return constrain_f(demand, -limit, +limit) / scaling;
+}
+
 static void hackflightRunCoreTasks(hackflight_t * hf)
 {
     gyroReadScaled(&hf->gyro, &hf->vstate);
@@ -118,8 +123,17 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
                 &hf->vstate, hf->pidZeroThrottleItermReset);
     }
 
-    float mixmotors[4] = {0};
-    mixerRun(hf->mixer, &hf->demands, mixmotors);
+    float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
+
+    // Calculate and Limit the PID sum
+    mixerRun(
+            hf->mixer,
+            hf->demands.throttle,
+            constrain_demand(hf->demands.roll, PIDSUM_LIMIT, PID_MIXER_SCALING),
+            constrain_demand(hf->demands.pitch, PIDSUM_LIMIT, PID_MIXER_SCALING),
+            -constrain_demand(hf->demands.yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING),
+            mixmotors,
+            4); // XXX
 
     motorWrite(hf->motorDevice,
             armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
