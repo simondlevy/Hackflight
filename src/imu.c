@@ -300,7 +300,7 @@ int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
 }
 
 
-void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
+static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
     int32_t deltaT = time - hf->imuFusionPrev.time;
 
@@ -364,7 +364,7 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 {
     quaternion_t quat = {0};
 
-    imuGetQuaternion(hf, time, &quat);
+    getQuaternion(hf, time, &quat);
 
     rotation_t rot = {0};
 
