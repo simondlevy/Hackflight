@@ -117,10 +117,6 @@ static void quat2euler(quaternion_t * quat, vehicle_state_t * state, rotation_t 
     rot->r22 = r22;
 }
 
-#if defined(__cplusplus)
-}
-#endif
-
 static float invSqrt(float x)
 {
     return 1.0f / sqrtf(x);
@@ -372,3 +368,9 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 
     imuUpdateFusion(hf, time, &quat, &rot);
 }
+
+#if defined(__cplusplus)
+}
+#endif
+
+

@@ -63,6 +63,11 @@ calibrating--;
 }
  */
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+
 // Computes a biquadFilter_t filter in direct form 2 on a sample (higher
 // precision but can't handle changes in coefficients
 static float biquadFilterApply(biquadFilter_t *filter, float input)
@@ -198,3 +203,9 @@ void accelUpdate(imu_sensor_t * accum)
     accum->values.z += adc[2];
     accum->count++;
 }
+
+#if defined(__cplusplus)
+}
+#endif
+
+
