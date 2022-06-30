@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "accel.h"
 #include "arming.h"
 #include "board.h"
 #include "gyro.h"
@@ -322,6 +323,8 @@ extern "C" {
         hf->motorDevice = motorDevice;
 
         hackflightInit(hf, mixer, rxPort, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
+
+        hackflightAddSensor(hf, imuAccelTask, ACCEL_RATE);
 
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 

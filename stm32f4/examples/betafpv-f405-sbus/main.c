@@ -73,9 +73,6 @@ int main(void)
     hackflightInitFull(&hf, mixerQuadXbf, motorDevice,
             SERIAL_PORT_USART3, 0, 37);
 
-    // STM32 boards have traditional accel/gyro combo
-    hackflightAddSensor(&hf, imuAccelTask, ACCEL_RATE);
-
     while (true) {
         hackflightStep(&hf);
     }
