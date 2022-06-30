@@ -27,10 +27,6 @@
 
 extern "C" {
 
-    void accelInit(void)
-    {
-    }
-
     bool accelIsReady(void)
     {
         return false;
@@ -40,10 +36,6 @@ extern "C" {
     {
         (void)axis;
         return 0;
-    }
-
-    void gyroDevInit(void)
-    {
     }
 
     uint32_t gyroInterruptCount(void)
@@ -70,6 +62,12 @@ extern "C" {
     uint32_t gyroSyncTime(void)
     {
         return 0;
+    }
+
+    void imuInit(hackflight_t * hf, uint8_t interruptPin)
+    {
+        (void)hf;
+        (void)interruptPin;
     }
 
 } // extern "C"

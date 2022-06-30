@@ -337,16 +337,7 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
             &fusionPrev->rot, &fusionPrev->quat, quat);
 }
 
-void imuInit(hackflight_t * hf, uint8_t interruptPin)
-{
-    (void)hf;
-    (void)interruptPin;
-
-    gyroDevInit();
-    accelInit();
-}
-
-void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
+void updateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
 {
     imu_fusion_t fusion;
     fusion.time = time;
@@ -366,7 +357,7 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 
     quat2euler(&quat, &hf->vstate, &rot);
 
-    imuUpdateFusion(hf, time, &quat, &rot);
+    updateFusion(hf, time, &quat, &rot);
 }
 
 #if defined(__cplusplus)
