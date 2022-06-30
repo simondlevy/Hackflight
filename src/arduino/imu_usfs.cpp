@@ -38,6 +38,7 @@ extern "C" {
 
     float accelRead(uint8_t axis) 
     {
+        (void)axis;
         return 0;
     }
 
@@ -57,6 +58,7 @@ extern "C" {
 
     int16_t gyroReadRaw(uint8_t k)
     {
+        (void)k;
         return 0;
     }
 
