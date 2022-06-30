@@ -142,7 +142,13 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
             armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
 }
 
-// Initialization -------------------------------------------------------------
+// ============================================================================
+
+static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
+{
+    initTask(&hf->sensorTasks[hf->sensorTaskCount++], fun, rate);
+}
+
 
 static void hackflightInit(
         hackflight_t * hf,

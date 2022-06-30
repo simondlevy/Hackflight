@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "datatypes.h"
+#include "hackflight.h"
 
 #if defined(__cplusplus)
 extern "C" {

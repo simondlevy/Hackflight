@@ -26,7 +26,6 @@
 #include <hackflight_full.h>
 #include <imu.h>
 #include <mixers/fixedpitch/quadxbf.h>
-#include <sensors.h>
 #include <serial.h>
 
 #include "bus_spi.h"
