@@ -129,7 +129,7 @@ COMMON_SRC = \
             $(HSRC_DIR)/sbus.c \
             $(HSRC_DIR)/stm32_clock.c \
             accel.c \
-            accgyro_spi_mpu6000.c \
+            imu_mpu6000.c \
             imu_fusion.c \
             dshot.c \
             dshot_dpwm.c \

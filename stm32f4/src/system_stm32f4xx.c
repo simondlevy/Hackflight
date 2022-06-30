@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "platform.h"
 
-#include "accgyro_mpu.h"
+#include "imu_mpu.h"
 #include "exti.h"
 #include "nvic.h"
 #include "systemdev.h"

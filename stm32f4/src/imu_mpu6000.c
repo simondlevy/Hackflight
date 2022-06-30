@@ -22,7 +22,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <time.h>
 
 #include "platform.h"
-#include "accgyro_mpu.h"
+#include "imu_mpu.h"
 #include "bus_spi.h"
 #include "exti.h"
 #include "io.h"
