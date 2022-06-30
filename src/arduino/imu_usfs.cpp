@@ -63,7 +63,6 @@ static void interruptHandler()
     _gyroSyncTime = micros();
 }
 
-
 extern "C" {
 
     bool accelIsReady(void)
@@ -97,7 +96,7 @@ extern "C" {
 
             _accelIsReady = usfsEventStatusIsAccelerometer(eventStatus);
 
-            if (accelIsReady()) {
+            if (_accelIsReady) {
                 usfsReadAccelerometer(_accelCount);
             }
 

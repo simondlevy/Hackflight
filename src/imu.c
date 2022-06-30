@@ -237,7 +237,7 @@ static bool checkReset(
         currentTimeUs + ATTITUDE_RESET_QUIET_TIME :
         quietPeriodEnd;
 
-    bool resetTimeEnd1 = tmp ? 0 : resetTimeEnd;
+    uint32_t resetTimeEnd1 = tmp ? 0 : resetTimeEnd;
 
     bool tmp1 = resetTimeEnd1 > 0;
     bool tmp2 = currentTimeUs >= resetTimeEnd1;
