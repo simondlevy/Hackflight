@@ -25,6 +25,36 @@
 
 #include <imu.h>
 
+// Set to 0 for polling version
+static const uint8_t INTERRUPT_PIN = 0 /*12*/; 
+
+static const uint8_t ACCEL_BANDWIDTH = 3;
+static const uint8_t GYRO_BANDWIDTH  = 3;
+static const uint8_t QUAT_DIVISOR    = 1;
+static const uint8_t MAG_RATE        = 100;
+static const uint8_t ACCEL_RATE      = 20; // Multiply by 10 to get actual rate
+static const uint8_t GYRO_RATE       = 100; // Multiply by 10 to get actual rate
+static const uint8_t BARO_RATE       = 50;
+
+static const uint16_t ACCEL_SCALE = 8;
+static const uint16_t GYRO_SCALE  = 2000;
+static const uint16_t MAG_SCALE   = 1000;
+
+static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
+                                        USFS_INTERRUPT_ERROR |
+                                        USFS_INTERRUPT_ACCEL |
+                                        USFS_INTERRUPT_GYRO;
+
+static const uint8_t REPORT_HZ = 2;
+
+static volatile bool _gotNewData;
+
+static void interruptHandler()
+{
+    _gotNewData = true;
+}
+
+
 extern "C" {
 
     bool accelIsReady(void)
@@ -67,7 +97,33 @@ extern "C" {
     void imuInit(hackflight_t * hf, uint8_t interruptPin)
     {
         (void)hf;
-        (void)interruptPin;
+
+        Wire.setClock(400000); 
+        delay(1000);
+
+        usfsReportChipId();        
+
+        usfsLoadFirmware(); 
+
+        usfsBegin(
+                ACCEL_BANDWIDTH,
+                GYRO_BANDWIDTH,
+                ACCEL_SCALE,
+                GYRO_SCALE,
+                MAG_SCALE,
+                QUAT_DIVISOR,
+                MAG_RATE,
+                ACCEL_RATE,
+                GYRO_RATE,
+                BARO_RATE,
+                INTERRUPT_ENABLE,
+                true); 
+
+        pinMode(interruptPin, INPUT);
+        attachInterrupt(interruptPin, interruptHandler, RISING);  
+
+        // Clear interrupts
+        usfsCheckStatus();
     }
 
 } // extern "C"
