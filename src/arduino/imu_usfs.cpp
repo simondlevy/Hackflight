@@ -47,11 +47,20 @@ static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
 
 static const uint8_t REPORT_HZ = 2;
 
+static bool _accelIsReady;
+static int16_t _accelCount[3];
+static int16_t _gyroCount[3];
 static volatile bool _gotNewData;
+
+static volatile uint32_t _gyroInterruptCount;
+static volatile uint32_t _gyroSyncTime;
+
 
 static void interruptHandler()
 {
     _gotNewData = true;
+    _gyroInterruptCount++;
+    _gyroSyncTime = micros();
 }
 
 
@@ -59,39 +68,62 @@ extern "C" {
 
     bool accelIsReady(void)
     {
-        return false;
+        return _accelIsReady;
     }
 
     float accelRead(uint8_t axis) 
     {
-        (void)axis;
-        return 0;
+        return (float)_accelCount[axis];
     }
 
     uint32_t gyroInterruptCount(void)
     {
-        return 0;
+        return _gyroInterruptCount;
     }
 
     bool gyroIsReady(void)
     {
-        return false;
+        bool result = false;
+
+        if (_gotNewData) { 
+
+            _gotNewData = false;  
+
+            uint8_t eventStatus = usfsCheckStatus(); 
+
+            if (usfsEventStatusIsError(eventStatus)) { 
+                usfsReportError(eventStatus);
+            }
+
+            _accelIsReady = usfsEventStatusIsAccelerometer(eventStatus);
+
+            if (accelIsReady()) {
+                usfsReadAccelerometer(_accelCount);
+            }
+
+            if (usfsEventStatusIsGyrometer(eventStatus)) { 
+                usfsReadGyrometer(_gyroCount);
+                result = true;
+            }
+
+        } 
+
+        return result;
     }
 
     int16_t gyroReadRaw(uint8_t k)
     {
-        (void)k;
-        return 0;
+        return _gyroCount[k];
     }
 
     float gyroScale(void)
     {
-        return 0;
+        return 0.153;
     }
 
     uint32_t gyroSyncTime(void)
     {
-        return 0;
+        return _gyroSyncTime;
     }
 
     void imuInit(hackflight_t * hf, uint8_t interruptPin)
