@@ -64,7 +64,7 @@ static const uint8_t FEEDFORWARD_MAX_RATE_LIMIT = 90;
 static const uint8_t DYN_LPF_CURVE_EXPO = 5;
 
 
-static CONST float FREQUENCY() {return 1.0f / CORE_DT(); }
+static float FREQUENCY() {return 1.0f / CORE_DT(); }
 
 // Scale factors to make best use of range with D_LPF debugging, aiming for max
 // +/-16K as debug values are 16 bit
@@ -89,8 +89,8 @@ static const float LEVEL_ANGLE_LIMIT = 45;
 extern "C" {
 #endif
 
-    static CONST float MAX_VELOCITY_CYCLIC() { return RATE_ACCEL_LIMIT * 100 * CORE_DT(); }
-    static CONST float MAX_VELOCITY_YAW()    { return YAW_RATE_ACCEL_LIMIT * 100 * CORE_DT(); }
+    static float MAX_VELOCITY_CYCLIC() { return RATE_ACCEL_LIMIT * 100 * CORE_DT(); }
+    static float MAX_VELOCITY_YAW()    { return YAW_RATE_ACCEL_LIMIT * 100 * CORE_DT(); }
 
     static float pt2FilterApply(pt2Filter_t *filter, float input)
     {

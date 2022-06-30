@@ -20,4 +20,4 @@
 
 #include "core_rate.h"
 
-static CONST float CORE_DT() { return CORE_PERIOD() * 1e-6f; }
+static float CORE_DT() { return CORE_PERIOD() * 1e-6f; }

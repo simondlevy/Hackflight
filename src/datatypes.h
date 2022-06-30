@@ -22,14 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Cross-platform support ------------------------------------------------------
-
-#ifdef __cplusplus
-#define CONST const
-#else
-#define CONST 
-#endif
-
 // Filtering ------------------------------------------------------------------
 
 typedef struct pt1Filter_s {
