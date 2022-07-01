@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "hackflight.h"
+#include "datatypes.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -30,6 +30,7 @@ void hackflightInitFull(
         void * motorDevice,
         serialPortIdentifier_e rxPort,
         uint8_t imuInterruptPin,
+        imu_align_fun imuAlign,
         uint8_t ledPin);
 
 void hackflightStep(hackflight_t * hackflight);

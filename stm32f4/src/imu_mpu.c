@@ -19,7 +19,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <string.h>
 
-#include <accel.h>
 #include <maths.h>
 #include <system.h>
 #include <time.h>
@@ -367,4 +366,13 @@ uint16_t gyroSetSampleRate(gyroDev_t *gyro)
     gyro->accSampleRateHz = 1000;
 
     return 8000;
+}
+
+void imuInit(hackflight_t * hf, uint8_t interruptPin)
+{
+    (void)hf;
+    (void)interruptPin;
+
+    gyroDevInit();
+    accelInit();
 }

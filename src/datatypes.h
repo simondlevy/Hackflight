@@ -22,14 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Cross-platform support ------------------------------------------------------
-
-#ifdef __cplusplus
-#define CONST const
-#else
-#define CONST 
-#endif
-
 // Filtering ------------------------------------------------------------------
 
 typedef struct pt1Filter_s {
@@ -201,7 +193,9 @@ typedef struct {
     gyro_reset_t gyroReset;
 } imu_fusion_t;
 
-// Stats ------------------------------------------------------------------------
+typedef void (*imu_align_fun)(axes_t * axes);
+
+ // Stats ------------------------------------------------------------------------
 
 typedef struct {
     float m_oldM, m_newM, m_oldS, m_newS;
@@ -464,6 +458,7 @@ typedef struct {
     task_t           attitudeTask;
     demands_t        demands;
     gyro_t           gyro;
+    imu_align_fun    imuAlignFun;
     imu_fusion_t     imuFusionPrev;
     float            maxArmingAngle;
     mixer_t          mixer;

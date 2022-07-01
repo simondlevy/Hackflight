@@ -302,6 +302,7 @@ extern "C" {
             void * motorDevice,
             serialPortIdentifier_e rxPort,
             uint8_t imuInterruptPin,
+            imu_align_fun imuAlign,
             uint8_t ledPin)
     {
         // Tuning constants for angle PID controller
@@ -311,13 +312,15 @@ extern "C" {
         static const float RATE_F  = 0.0165048;
         static const float LEVEL_P = 0 /*3.0*/;
 
+        mspInit();
         gyroInit(hf);
         imuInit(hf, imuInterruptPin);
         ledInit(ledPin);
         ledFlash(10, 50);
         failsafeInit();
-        mspInit();
         failsafeReset();
+
+        hf->imuAlignFun = imuAlign;
 
         hf->motorDevice = motorDevice;
 

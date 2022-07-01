@@ -20,6 +20,7 @@
 #include <Wire.h>
 
 #include <hackflight_full.h>
+#include <imu_alignment/rotate_0.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <motor.h>
 #include <stm32_clock.h>
@@ -36,8 +37,14 @@ void setup(void)
     motorInitBrushed(motorPins);
 
     // Always use Serial1 for receiver, no no need to specify
-    hackflightInitFull(&_hf, mixerQuadXbf, (void *)&motorPins,
-            SERIAL_PORT_NONE, 5, 18);
+    hackflightInitFull(
+            &_hf,
+            mixerQuadXbf,
+            (void *)&motorPins,
+            SERIAL_PORT_NONE,
+            12,  // IMU interrupt pin
+            imuRotate0,
+            18); // LED pin
 
     stm32_startCycleCounter();
 }

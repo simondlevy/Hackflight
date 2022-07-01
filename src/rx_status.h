@@ -26,11 +26,6 @@
 extern "C" {
 #endif
 
-static bool rxAux1IsSet(float raw[])
-{
-    return raw[4] > 1200;
-}
-
 static bool rxThrottleIsDown(float raw[])
 {
     return raw[THROTTLE] < 1050;

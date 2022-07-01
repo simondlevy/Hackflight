@@ -20,11 +20,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <accel.h>
 #include <core_rate.h>
 #include <datatypes.h>
 #include <hackflight_full.h>
 #include <imu.h>
+#include <imu_alignment/rotate_270.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <serial.h>
 
@@ -69,12 +69,14 @@ int main(void)
 
     hackflight_t hf = {0};
 
-    // 0 = dummy value for IMU interrupt pin; 37 = LED pin
-    hackflightInitFull(&hf, mixerQuadXbf, motorDevice,
-            SERIAL_PORT_USART3, 0, 37);
-
-    // STM32 boards have traditional accel/gyro combo
-    hackflightAddSensor(&hf, imuAccelTask, ACCEL_RATE);
+    hackflightInitFull(
+            &hf,
+            mixerQuadXbf,
+            motorDevice,
+            SERIAL_PORT_USART3, // RX port
+            0,                  // dummy value for IMU interrupt pin
+            imuRotate270,
+            37);                // LED pin
 
     while (true) {
         hackflightStep(&hf);

@@ -18,22 +18,20 @@
 
 #pragma once
 
+#include <math.h>
 #include <stdint.h>
-#include <stdbool.h>
 
-#include "imu.h"
-
-static const uint16_t ACCEL_1G   = 2048;
-static const uint16_t ACCEL_RATE = 1000;
+#include "datatypes.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-    void  accelInit(void);
-    bool  accelIsReady(void);
-    float accelRead(uint8_t axis) ;
-    void  accelUpdate(imu_sensor_t * accel);
+    static void imuRotate0(axes_t * axes)
+    {
+        axes->y = -axes->y;
+        axes->z = -axes->z;
+    }
 
 #if defined(__cplusplus)
 }

@@ -78,7 +78,7 @@ static void task_rx(void * hackflight, uint32_t time)
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
-    rx_axes_t rxax = {0};
+    rx_axes_t rxax = {{0, 0, 0, 0}, 0, 0};
 
     bool gotNewData = false;
 
@@ -116,7 +116,7 @@ static float constrain_demand(float demand, float limit, float scaling)
 
 static void hackflightRunCoreTasks(hackflight_t * hf)
 {
-    gyroReadScaled(&hf->gyro, &hf->vstate);
+    gyroReadScaled(&hf->gyro, hf->imuAlignFun, &hf->vstate);
 
     uint32_t currentTimeUs = timeMicros();
 

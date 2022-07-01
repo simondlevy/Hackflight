@@ -21,20 +21,19 @@
 #include <math.h>
 #include <stdint.h>
 
+#include "datatypes.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-    static void alignSensorViaRotation(float *dest)
+    static void imuRotate270(axes_t * axes)
     {
-        const float x = dest[0];
-        const float y = dest[1];
-        const float z = dest[2];
+        float x = axes->x;
+        float y = axes->y;
 
-        // 270 degrees
-        dest[0] = -y;
-        dest[1] = x;
-        dest[2] = z;
+        axes->x = -y;
+        axes->y = x;
     }
 
 #if defined(__cplusplus)
