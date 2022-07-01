@@ -193,7 +193,9 @@ typedef struct {
     gyro_reset_t gyroReset;
 } imu_fusion_t;
 
-// Stats ------------------------------------------------------------------------
+typedef void (*imu_align_t)(axes_t * axes);
+
+ // Stats ------------------------------------------------------------------------
 
 typedef struct {
     float m_oldM, m_newM, m_oldS, m_newS;
