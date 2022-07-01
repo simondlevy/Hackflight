@@ -159,9 +159,9 @@ static void mahony(
     float gy = deg2rad(gyro->y);
     float gz = deg2rad(gyro->z);
 
-    float ax = accel->x;
-    float ay = accel->y;
-    float az = accel->z;
+    float ax = 0;//accel->x;
+    float ay = 0;//accel->y;
+    float az = 0;//accel->z;
 
     // Use measured acceleration vector
     float recipAccNorm = square(ax) + square(ay) + square(az);

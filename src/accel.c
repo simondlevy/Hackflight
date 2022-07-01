@@ -179,9 +179,9 @@ void accelUpdate(imu_align_fun align, imu_sensor_t * accum)
         return;
     }
 
-    adc.x = accelRead(0);
-    adc.y = accelRead(1);
-    adc.z = accelRead(2);
+    adc.x = 0;//accelRead(0);
+    adc.y = 0;//accelRead(1);
+    adc.z = 0;//accelRead(2);
 
     adc.x = biquadFilterApply(&filter[0], adc.x);
     adc.y = biquadFilterApply(&filter[1], adc.y);
