@@ -193,10 +193,7 @@ typedef struct {
     gyro_reset_t gyroReset;
 } imu_fusion_t;
 
-typedef struct {
-    uint8_t interruptPin;
-    void (*align)(axes_t * axes);
-} imu_t;
+typedef void (*imu_align_fun)(axes_t * axes);
 
  // Stats ------------------------------------------------------------------------
 
@@ -461,6 +458,7 @@ typedef struct {
     task_t           attitudeTask;
     demands_t        demands;
     gyro_t           gyro;
+    imu_align_fun    imuAlignFun;
     imu_fusion_t     imuFusionPrev;
     float            maxArmingAngle;
     mixer_t          mixer;

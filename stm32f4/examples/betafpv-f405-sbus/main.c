@@ -70,15 +70,13 @@ int main(void)
 
     hackflight_t hf = {0};
 
-    // 0 = dummy value for IMU interrupt pin
-    imu_t imu = {0, imuRotate270}; 
-
     hackflightInitFull(
             &hf,
             mixerQuadXbf,
             motorDevice,
             SERIAL_PORT_USART3, // RX port
-            &imu,
+            0,                  // dummy value for IMU interrupt pin
+            imuRotate270,
             37);                // LED pin
 
     while (true) {

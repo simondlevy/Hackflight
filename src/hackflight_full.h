@@ -29,7 +29,8 @@ void hackflightInitFull(
         mixer_t mixer,
         void * motorDevice,
         serialPortIdentifier_e rxPort,
-        imu_t * imu,
+        uint8_t imuInterruptPin,
+        imu_align_fun imuAlign,
         uint8_t ledPin);
 
 void hackflightStep(hackflight_t * hackflight);
