@@ -302,7 +302,7 @@ extern "C" {
             mixer_t mixer,
             void * motorDevice,
             serialPortIdentifier_e rxPort,
-            uint8_t imuInterruptPin,
+            imu_t * imu,
             uint8_t ledPin)
     {
         // Tuning constants for angle PID controller
@@ -314,11 +314,10 @@ extern "C" {
 
         mspInit();
         gyroInit(hf);
-        imuInit(hf, imuInterruptPin);
+        imuInit(hf, imu->interruptPin);
         ledInit(ledPin);
         ledFlash(10, 50);
         failsafeInit();
-        //mspInit();
         failsafeReset();
 
         hf->motorDevice = motorDevice;
