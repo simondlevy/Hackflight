@@ -25,6 +25,7 @@
 #include <datatypes.h>
 #include <hackflight_full.h>
 #include <imu.h>
+#include <imu_alignment/rotate_270.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <serial.h>
 
