@@ -21,20 +21,22 @@
 #include <math.h>
 #include <stdint.h>
 
+#include "datatypes.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-    static void alignImu(float *dest)
+    static void alignImu(axes_t * axes)
     {
-        const float x = dest[0];
-        const float y = dest[1];
-        const float z = dest[2];
+        const float x = axes->x;
+        const float y = axes->y;
+        const float z = axes->z;
 
         // 270 degrees
-        dest[0] = -y;
-        dest[1] = x;
-        dest[2] = z;
+        axes->x = -y;
+        axes->y = x;
+        axes->z = z;
     }
 
 #if defined(__cplusplus)

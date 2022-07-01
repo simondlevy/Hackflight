@@ -158,25 +158,25 @@ void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate)
 
     bool calibrationComplete = gyro->calibration.cyclesRemaining <= 0;
 
-    static float _adc[3];
+    static axes_t _adc;
 
     if (calibrationComplete) {
         // move 16-bit gyro data into floats to avoid overflows in calculations
 
-        _adc[0] = gyroReadRaw(0) - gyro->zero[0];
-        _adc[1] = gyroReadRaw(1) - gyro->zero[1];
-        _adc[2] = gyroReadRaw(2) - gyro->zero[2];
+        _adc.x = gyroReadRaw(0) - gyro->zero[0];
+        _adc.y = gyroReadRaw(1) - gyro->zero[1];
+        _adc.z = gyroReadRaw(2) - gyro->zero[2];
 
-        alignImu(_adc);
+        alignImu(&_adc);
 
     } else {
         calibrate(gyro);
     }
 
     if (calibrationComplete) {
-        gyro->dps[0] = _adc[0] * gyroScale();
-        gyro->dps[1] = _adc[1] * gyroScale();
-        gyro->dps[2] = _adc[2] * gyroScale();
+        gyro->dps[0] = _adc.x * gyroScale();
+        gyro->dps[1] = _adc.y * gyroScale();
+        gyro->dps[2] = _adc.z * gyroScale();
     }
 
     if (gyro->downsampleFilterEnabled) {

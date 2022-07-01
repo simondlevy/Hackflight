@@ -159,7 +159,7 @@ static void biquadFilterInitLPF(biquadFilter_t *filter, float filterFreq, uint32
 
 void accelUpdate(imu_sensor_t * accum)
 {
-    static float adc[3];
+    static axes_t adc;
     static bool initialized;
     static biquadFilter_t filter[3];
     // static flightDynamicsTrims_t * trims;
@@ -180,15 +180,15 @@ void accelUpdate(imu_sensor_t * accum)
         return;
     }
 
-    for (int k = 0; k < 3; k++) {
-        adc[k] = accelRead(k);
-    }
+    adc.x = accelRead(0);
+    adc.y = accelRead(1);
+    adc.z = accelRead(2);
 
-    for (int k = 0; k < 3; k++) {
-        adc[k] = biquadFilterApply(&filter[k], adc[k]);
-    }
+    adc.x = biquadFilterApply(&filter[0], adc.x);
+    adc.y = biquadFilterApply(&filter[1], adc.y);
+    adc.z = biquadFilterApply(&filter[2], adc.z);
 
-    alignImu(adc);
+    alignImu(&adc);
 
     // if (calibrating != 0) {
     //     calibrate(acc, adc);
@@ -198,9 +198,9 @@ void accelUpdate(imu_sensor_t * accum)
     // adc[1] -= acc->trims->raw[1];
     // adc[2] -= acc->trims->raw[2];
 
-    accum->values.x += adc[0];
-    accum->values.y += adc[1];
-    accum->values.z += adc[2];
+    accum->values.x += adc.x;
+    accum->values.y += adc.y;
+    accum->values.z += adc.z;
     accum->count++;
 }
 
