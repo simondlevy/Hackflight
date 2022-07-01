@@ -40,17 +40,6 @@ static const float atanPolyCoef5  = 0.05030176425872175f;
 static const float atanPolyCoef6  = 0.1471039133652469f;
 static const float atanPolyCoef7  = 0.6444640676891548f;
 
-// Other constants
-
-// 500ms - Time to wait for attitude to converge at high gain
-static const uint32_t  ATTITUDE_RESET_ACTIVE_TIME = 500000;  
-
-// 15 deg/sec - gyro limit for quiet period
-static const float ATTITUDE_RESET_GYRO_LIMIT  = 15;      
-
-// 250ms - gyro quiet period after disarm before attitude reset
-static const uint32_t ATTITUDE_RESET_QUIET_TIME  = 250000;  
-
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -194,16 +183,12 @@ int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
     return gyroSkew;
 }
 
-
 static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
     int32_t deltaT = time - hf->imuFusionPrev.time;
 
     axes_t gyroAvg = {0,0,0};
     getAverage(&hf->gyro.accum, CORE_PERIOD(), &gyroAvg);
-
-    axes_t accelAvg = {0,0,0};
-    getAverage(&hf->accelAccum, 1, &accelAvg);
 
     float dt = deltaT * 1e-6;
 
