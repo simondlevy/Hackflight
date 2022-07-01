@@ -46,9 +46,6 @@ static const float atanPolyCoef7  = 0.6444640676891548f;
 // 500ms - Time to wait for attitude to converge at high gain
 static const uint32_t  ATTITUDE_RESET_ACTIVE_TIME = 500000;  
 
-// dcmKpGain value to use during attitude reset
-static const float ATTITUDE_RESET_KP_GAIN = 2;       
-
 // 15 deg/sec - gyro limit for quiet period
 static const float ATTITUDE_RESET_GYRO_LIMIT  = 15;      
 
@@ -132,9 +129,6 @@ static bool bigGyro(float val)
     return fabsf(val) > ATTITUDE_RESET_GYRO_LIMIT;
 }
 
-// DCM filter proportional gain ( x 10000)
-static const float DCM_KP = 0.25; 
-
 static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
 {
     uint32_t denom = sensor->count * period;
@@ -147,10 +141,6 @@ static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
 static void mahony(
         float dt,
         axes_t * gyro,
-        axes_t * accel,
-        bool useAcc,
-        float dcmKpGain,
-        rotation_t * rot,
         quaternion_t * quat_old,
         quaternion_t * quat_new)
 {
@@ -159,32 +149,10 @@ static void mahony(
     float gy = deg2rad(gyro->y);
     float gz = deg2rad(gyro->z);
 
-    float ax = 0;//accel->x;
-    float ay = 0;//accel->y;
-    float az = 0;//accel->z;
-
-    // Use measured acceleration vector
-    float recipAccNorm = square(ax) + square(ay) + square(az);
-
-    bool goodAcc = useAcc && recipAccNorm > 0.01;
-
-    float recipAccNormInv = goodAcc ? invSqrt(recipAccNorm) : 0;
-
-    // Normalise accelerometer measurement
-    float ax1 = goodAcc ? ax * recipAccNormInv : ax;
-    float ay1 = goodAcc ? ay * recipAccNormInv : ay;
-    float az1 = goodAcc ? az * recipAccNormInv : az;
-
-    // Raw heading error is sum of cross product between estimated direction
-    // and measured direction of gravity
-    float ex = goodAcc ? ay1 * rot->r22 - az1 * rot->r21 : 0;
-    float ey = goodAcc ? az1 * rot->r20 - ax1 * rot->r22 : 0;
-    float ez = goodAcc ? ax1 * rot->r21 - ay1 * rot->r20 : 0;
-
     // Apply proportional and integral feedback, then integrate rate-of-change
-    float gx1 = (gx + dcmKpGain * ex) * dt / 2;
-    float gy1 = (gy + dcmKpGain * ey) * dt / 2;
-    float gz1 = (gz + dcmKpGain * ez) * dt / 2;
+    float gx1 = gx * dt / 2;
+    float gy1 = gy * dt / 2;
+    float gz1 = gz * dt / 2;
 
     // Update quaternion
     float qw =
@@ -306,35 +274,17 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     axes_t accelAvg = {0,0,0};
     getAverage(&hf->accelAccum, 1, &accelAvg);
 
-    bool useAcc = isAccelHealthy(&accelAvg);
-
     float dt = deltaT * 1e-6;
 
     imu_fusion_t * fusionPrev = &hf->imuFusionPrev;
 
     gyro_reset_t new_gyro_reset = {0};
 
-    bool resetActive1 = checkReset(
-            time,
-            useAcc,
-            &gyroAvg,
-            armingIsArmed(&hf->arming),
-            &fusionPrev->gyroReset,
-            &new_gyro_reset);
-
-    bool resetActive = armingIsArmed(&hf->arming) ?  false : resetActive1;
-
     if (!armingIsArmed(&hf->arming)) {
         memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyro_reset_t));
     }
 
-    // Scale the kP to generally converge faster when disarmed.
-    float kpgain = resetActive ?
-        ATTITUDE_RESET_KP_GAIN :
-        DCM_KP * (!armingIsArmed(&hf->arming) ? 10 : 1);
-
-    mahony(dt, &gyroAvg, &accelAvg, useAcc, kpgain,
-            &fusionPrev->rot, &fusionPrev->quat, quat);
+    mahony(dt, &gyroAvg, &fusionPrev->quat, quat);
 }
 
 void updateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
