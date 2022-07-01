@@ -20,7 +20,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <accel.h>
 #include <core_rate.h>
 #include <datatypes.h>
 #include <hackflight_full.h>

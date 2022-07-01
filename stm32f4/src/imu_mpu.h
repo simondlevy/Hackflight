@@ -16,8 +16,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <accel.h>
-//#include <gyro.h>
 #include <maths.h>
 #include <time.h>
 

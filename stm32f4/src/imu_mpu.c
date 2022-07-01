@@ -19,7 +19,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <string.h>
 
-#include <accel.h>
 #include <maths.h>
 #include <system.h>
 #include <time.h>

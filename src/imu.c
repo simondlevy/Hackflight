@@ -21,7 +21,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "accel.h"
 #include "arming.h"
 #include "core_rate.h"
 #include "datatypes.h"
@@ -124,11 +123,6 @@ static float square(float x)
     return x * x;
 }
 
-static bool bigGyro(float val)
-{
-    return fabsf(val) > ATTITUDE_RESET_GYRO_LIMIT;
-}
-
 static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
 {
     uint32_t denom = sensor->count * period;
@@ -171,70 +165,7 @@ static void mahony(
     quat_new->y = qy * recipNorm;
     quat_new->z = qz * recipNorm;
 }
-
-static bool isAccelHealthy(axes_t *accAvg)
-{
-    float accMagnitudeSq =
-        square(accAvg->x) + square(accAvg->y) + square(accAvg->z) * square(1.0f/ACCEL_1G);
-
-    // Accept accel readings only in range 0.9g - 1.1g
-    return (0.81f < accMagnitudeSq) && (accMagnitudeSq < 1.21f);
-}
-
-static bool checkReset(
-        uint32_t currentTimeUs,
-        bool useAcc,
-        axes_t *gyroAvg,
-        bool armed,
-        gyro_reset_t * status_old,
-        gyro_reset_t * status_new)
-{
-    // Just disarmed; start the gyro quiet period
-    uint32_t quietPeriodEnd = armed ?
-        currentTimeUs + ATTITUDE_RESET_QUIET_TIME :
-        status_old->quietPeriodEnd; 
-
-    uint32_t resetTimeEnd = armed ? 0 : status_old->resetTimeEnd;
-
-    bool resetCompleted = armed ? false : status_old->resetCompleted;
-
-    bool tmp = (resetTimeEnd > 0 || quietPeriodEnd > 0 || resetCompleted) &&
-        (bigGyro(gyroAvg->x) || bigGyro(gyroAvg->y) || bigGyro(gyroAvg->z) || !useAcc);
-
-    uint32_t quietPeriodEnd1 = tmp ? 
-        currentTimeUs + ATTITUDE_RESET_QUIET_TIME :
-        quietPeriodEnd;
-
-    uint32_t resetTimeEnd1 = tmp ? 0 : resetTimeEnd;
-
-    bool tmp1 = resetTimeEnd1 > 0;
-    bool tmp2 = currentTimeUs >= resetTimeEnd1;
-    bool tmp3 = quietPeriodEnd1 > 0 && currentTimeUs >= quietPeriodEnd1;
-    bool tmp4 = tmp1 && tmp2;
-
-    status_new->resetCompleted = tmp4 ? true : resetCompleted;
-
-    status_new->quietPeriodEnd = tmp4 || tmp3 ? 0 : quietPeriodEnd1;
-
-    status_new->resetTimeEnd = tmp1 ?
-        (tmp2 ? 0 : resetTimeEnd) :
-        tmp3 ?
-        currentTimeUs + ATTITUDE_RESET_ACTIVE_TIME :
-        resetTimeEnd1;
-
-    return tmp1 && !tmp2;
-}
-
 // =============================================================================
-
-void imuAccelTask(void * hackflight, uint32_t time)
-{
-    (void)time;
-
-    hackflight_t * hf = (hackflight_t *)hackflight;
-
-    accelUpdate(hf->imuAlignFun, &hf->accelAccum);
-}
 
 void imuAccumulateGyro(gyro_t * gyro)
 {
