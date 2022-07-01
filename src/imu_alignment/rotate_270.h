@@ -29,14 +29,11 @@ extern "C" {
 
     static void imuRotate270(axes_t * axes)
     {
-        const float x = axes->x;
-        const float y = axes->y;
-        const float z = axes->z;
+        float x = axes->x;
+        float y = axes->y;
 
-        // 270 degrees
         axes->x = -y;
         axes->y = x;
-        axes->z = z;
     }
 
 #if defined(__cplusplus)
