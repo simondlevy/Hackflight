@@ -16,7 +16,7 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "align_sensor.h"
+#include "imu_align.h"
 #include "core_rate.h"
 #include "datatypes.h"
 #include "debug.h"
@@ -167,7 +167,8 @@ void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate)
         _adc[1] = gyroReadRaw(1) - gyro->zero[1];
         _adc[2] = gyroReadRaw(2) - gyro->zero[2];
 
-        alignSensorViaRotation(_adc);
+        alignImu(_adc);
+
     } else {
         calibrate(gyro);
     }

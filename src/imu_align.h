@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-    static void alignSensorViaRotation(float *dest)
+    static void alignImu(float *dest)
     {
         const float x = dest[0];
         const float y = dest[1];

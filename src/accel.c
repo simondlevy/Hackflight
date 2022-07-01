@@ -17,7 +17,7 @@
  */
 
 #include "accel.h"
-#include "align_sensor.h"
+#include "imu_align.h"
 #include "arming.h"
 #include "datatypes.h"
 #include "maths.h"
@@ -188,7 +188,7 @@ void accelUpdate(imu_sensor_t * accum)
         adc[k] = biquadFilterApply(&filter[k], adc[k]);
     }
 
-    alignSensorViaRotation(adc);
+    alignImu(adc);
 
     // if (calibrating != 0) {
     //     calibrate(acc, adc);
