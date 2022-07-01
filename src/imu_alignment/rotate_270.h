@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-    static void alignImu(axes_t * axes)
+    static void imuRotate270(axes_t * axes)
     {
         const float x = axes->x;
         const float y = axes->y;
