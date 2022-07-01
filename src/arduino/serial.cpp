@@ -31,6 +31,8 @@ void serialEvent1(void)
 
 bool serialIsTransmitBufferEmpty(void * port)
 {
+    (void)port;
+
     // Always use Serial
     return Serial.availableForWrite() > 0;
 }
