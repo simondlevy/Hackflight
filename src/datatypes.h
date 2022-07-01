@@ -452,7 +452,6 @@ typedef void (*mixer_t)(float throttle, float roll, float pitch, float yaw,
 
 typedef struct {
 
-    imu_sensor_t     accelAccum;
     arming_t         arming;
     angle_pid_t      anglepid;
     task_t           attitudeTask;

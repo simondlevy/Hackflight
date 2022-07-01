@@ -25,30 +25,25 @@
 
 #include <imu.h>
 
-// Set to 0 for polling version
-static const uint8_t INTERRUPT_PIN = 0 /*12*/; 
+static const uint8_t  GYRO_RATE_TENTH = 100;  // Multiply by 10 to get actual rate
+static const uint16_t GYRO_SCALE      = 2000; // DPS
 
-static const uint8_t ACCEL_BANDWIDTH = 3;
-static const uint8_t GYRO_BANDWIDTH  = 3;
-static const uint8_t QUAT_DIVISOR    = 1;
-static const uint8_t MAG_RATE        = 100;
-static const uint8_t ACCEL_RATE      = 20; // Multiply by 10 to get actual rate
-static const uint8_t GYRO_RATE       = 100; // Multiply by 10 to get actual rate
-static const uint8_t BARO_RATE       = 50;
-
-static const uint16_t ACCEL_SCALE = 8;
-static const uint16_t GYRO_SCALE  = 2000;
-static const uint16_t MAG_SCALE   = 1000;
+// Arbitrary; unused
+static const uint8_t  ACCEL_BANDWIDTH  = 3;
+static const uint8_t  GYRO_BANDWIDTH   = 3;
+static const uint8_t  QUAT_DIVISOR     = 1;
+static const uint8_t  MAG_RATE         = 100;
+static const uint8_t  ACCEL_RATE_TENTH = 20; // Multiply by 10 to get actual rate
+static const uint8_t  BARO_RATE        = 50;
+static const uint16_t ACCEL_SCALE      = 8;
+static const uint16_t MAG_SCALE        = 1000;
 
 static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
                                         USFS_INTERRUPT_ERROR |
-                                        USFS_INTERRUPT_ACCEL |
                                         USFS_INTERRUPT_GYRO;
 
 static const uint8_t REPORT_HZ = 2;
 
-static bool _accelIsReady;
-static int16_t _accelAdc[3];
 static int16_t _gyroAdc[3];
 static volatile bool _gotNewData;
 
@@ -64,16 +59,6 @@ static void interruptHandler()
 }
 
 extern "C" {
-
-    bool accelIsReady(void)
-    {
-        return _accelIsReady;
-    }
-
-    float accelRead(uint8_t axis) 
-    {
-        return (float)_accelAdc[axis];
-    }
 
     uint32_t gyroInterruptCount(void)
     {
@@ -92,12 +77,6 @@ extern "C" {
 
             if (usfsEventStatusIsError(eventStatus)) { 
                 usfsReportError(eventStatus);
-            }
-
-            _accelIsReady = usfsEventStatusIsAccelerometer(eventStatus);
-
-            if (_accelIsReady) {
-                usfsReadAccelerometer(_accelAdc);
             }
 
             if (usfsEventStatusIsGyrometer(eventStatus)) { 
@@ -132,8 +111,6 @@ extern "C" {
         Wire.setClock(400000); 
         delay(1000);
 
-        usfsReportChipId();        
-
         usfsLoadFirmware(); 
 
         usfsBegin(
@@ -144,11 +121,10 @@ extern "C" {
                 MAG_SCALE,
                 QUAT_DIVISOR,
                 MAG_RATE,
-                ACCEL_RATE,
-                GYRO_RATE,
+                ACCEL_RATE_TENTH,
+                GYRO_RATE_TENTH,
                 BARO_RATE,
-                INTERRUPT_ENABLE,
-                true); 
+                INTERRUPT_ENABLE);
 
         pinMode(interruptPin, INPUT);
         attachInterrupt(interruptPin, interruptHandler, RISING);  

@@ -25,6 +25,7 @@
 #include "maths.h"
 #include "stats.h"
 #include "system.h"
+#include "time.h"
 
 static const uint32_t CALIBRATION_DURATION           = 1250000;
 static const uint16_t LPF1_DYN_MIN_HZ                = 250;
@@ -193,7 +194,6 @@ void gyroReadScaled(gyro_t * gyro, imu_align_fun align, vehicle_state_t * vstate
         gyro->sampleSum[2] += gyro->dps[2];
         gyro->sampleCount++;
     }
-
 
     for (int axis = 0; axis < 3; axis++) {
 
