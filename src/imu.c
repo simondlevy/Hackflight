@@ -265,7 +265,7 @@ void imuAccelTask(void * hackflight, uint32_t time)
 
     hackflight_t * hf = (hackflight_t *)hackflight;
 
-    accelUpdate(&hf->accelAccum);
+    accelUpdate(hf->imuAlignFun, &hf->accelAccum);
 }
 
 void imuAccumulateGyro(gyro_t * gyro)

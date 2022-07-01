@@ -16,7 +16,6 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "imu_align.h"
 #include "core_rate.h"
 #include "datatypes.h"
 #include "debug.h"
@@ -152,7 +151,7 @@ void gyroInit(hackflight_t * hf)
     setCalibrationCycles(gyro); // start calibrating
 }
 
-void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate)
+void gyroReadScaled(gyro_t * gyro, imu_align_fun align, vehicle_state_t * vstate)
 {
     if (!gyroIsReady()) return;
 
@@ -167,7 +166,7 @@ void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate)
         _adc.y = gyroReadRaw(1) - gyro->zero[1];
         _adc.z = gyroReadRaw(2) - gyro->zero[2];
 
-        alignImu(&_adc);
+        align(&_adc);
 
     } else {
         calibrate(gyro);

@@ -33,7 +33,7 @@ extern "C" {
     void  accelInit(void);
     bool  accelIsReady(void);
     float accelRead(uint8_t axis) ;
-    void  accelUpdate(imu_sensor_t * accel);
+    void  accelUpdate(imu_align_fun align, imu_sensor_t * accum);
 
 #if defined(__cplusplus)
 }

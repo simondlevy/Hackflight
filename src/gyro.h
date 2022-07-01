@@ -26,7 +26,7 @@ extern "C" {
 
     // For both hardware and sim implementations -----------------------------------------
 
-    void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate);
+    void gyroReadScaled(gyro_t * gyro, imu_align_fun align, vehicle_state_t * vstate);
 
     // For hardware impelmentations ------------------------------------------------------
 

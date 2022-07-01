@@ -17,7 +17,6 @@
  */
 
 #include "accel.h"
-#include "imu_align.h"
 #include "arming.h"
 #include "datatypes.h"
 #include "maths.h"
@@ -157,7 +156,7 @@ static void biquadFilterInitLPF(biquadFilter_t *filter, float filterFreq, uint32
 
 // ============================================================================
 
-void accelUpdate(imu_sensor_t * accum)
+void accelUpdate(imu_align_fun align, imu_sensor_t * accum)
 {
     static axes_t adc;
     static bool initialized;
@@ -188,7 +187,7 @@ void accelUpdate(imu_sensor_t * accum)
     adc.y = biquadFilterApply(&filter[1], adc.y);
     adc.z = biquadFilterApply(&filter[2], adc.z);
 
-    alignImu(&adc);
+    align(&adc);
 
     // if (calibrating != 0) {
     //     calibrate(acc, adc);
