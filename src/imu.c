@@ -226,7 +226,7 @@ static bool checkReset(
         currentTimeUs + ATTITUDE_RESET_QUIET_TIME :
         status_old->quietPeriodEnd; 
 
-    bool resetTimeEnd = armed ? 0 : status_old->resetTimeEnd;
+    uint32_t resetTimeEnd = armed ? 0 : status_old->resetTimeEnd;
 
     bool resetCompleted = armed ? false : status_old->resetCompleted;
 
@@ -300,10 +300,10 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
     int32_t deltaT = time - hf->imuFusionPrev.time;
 
-    axes_t gyroAvg = {0};
+    axes_t gyroAvg = {0,0,0};
     getAverage(&hf->gyro.accum, CORE_PERIOD(), &gyroAvg);
 
-    axes_t accelAvg = {0};
+    axes_t accelAvg = {0,0,0};
     getAverage(&hf->accelAccum, 1, &accelAvg);
 
     bool useAcc = isAccelHealthy(&accelAvg);
@@ -349,11 +349,11 @@ void updateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotatio
 
 void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 {
-    quaternion_t quat = {0};
+    quaternion_t quat = {0,0,0,0};
 
     getQuaternion(hf, time, &quat);
 
-    rotation_t rot = {0};
+    rotation_t rot = {0,0,0};
 
     quat2euler(&quat, &hf->vstate, &rot);
 
