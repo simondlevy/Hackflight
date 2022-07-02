@@ -60,21 +60,22 @@ static void dsmxDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
 
 // Public API ==================================================================
 
-uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs)
+uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
 {
     (void)channelData;
     (void)frameTimeUs;
+    printf("complete: %d\n", _rcFrameComplete);
     return 0;;
 }
 
-float rxDevConvertValueDsmx(uint16_t * channelData, uint8_t chan)
+float rxDevConvertValue(uint16_t * channelData, uint8_t chan)
 {
     (void)channelData;
     (void)chan;
     return 0;
 }
 
-void rxDevInitDsmx(serialPortIdentifier_e port)
+void rxDevInit(serialPortIdentifier_e port)
 {
     serialOpenPortDsmx(port, dsmxDataReceive);
 }

@@ -183,6 +183,7 @@ static void sbusDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
 
 // Public API ==================================================================
 
+#if 0
 uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
 {
     if (!_frameData.done) {
@@ -209,3 +210,4 @@ void rxDevInit(serialPortIdentifier_e port)
 {
     serialOpenPortSbus(port, sbusDataReceive);
 }
+#endif
