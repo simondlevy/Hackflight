@@ -26,6 +26,7 @@
 #include <imu.h>
 #include <imu_alignment/rotate_270.h>
 #include <mixers/fixedpitch/quadxbf.h>
+#include <rx/sbus.h>
 #include <serial.h>
 
 #include "bus_spi.h"
@@ -71,9 +72,12 @@ int main(void)
 
     hackflightInitFull(
             &hf,
+            rxDevInitSbus,
+            rxDevCheckSbus,
+            rxDevConvertSbus,
+            SERIAL_PORT_USART3, // RX port
             mixerQuadXbf,
             motorDevice,
-            SERIAL_PORT_USART3, // RX port
             0,                  // dummy value for IMU interrupt pin
             imuRotate270,
             37);                // LED pin
