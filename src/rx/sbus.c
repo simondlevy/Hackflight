@@ -80,7 +80,9 @@ struct sbusFrame_s {
     uint8_t syncByte;
     sbusChannels_t channels;
     /**
-     * The endByte is 0x00 on FrSky and some futaba RX's, on Some SBUS2 RX's the value indicates the telemetry byte that is sent after every 4th sbus frame.
+     * The endByte is 0x00 on FrSky and some futaba RX's, on Some SBUS2 RX's
+     * the value indicates the telemetry byte that is sent after every 4th sbus
+     * frame.
      *
      * See https://github.com/cleancleanissues/590#issuecomment-101027349
      * and
@@ -139,7 +141,8 @@ static uint8_t sbusChannelsDecode(uint16_t * channelData, const sbusChannels_t *
     }
 
     if (channels->flags & FLAG_SIGNAL_LOSS) {
-        // The received data is a repeat of the last valid data so can be considered complete.
+        // The received data is a repeat of the last valid data so can be
+        // considered complete.
         return RX_FRAME_COMPLETE | RX_FRAME_DROPPED;
     }
 

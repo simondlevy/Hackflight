@@ -23,12 +23,39 @@
 #include "serial.h"
 #include "time.h"
 
+#define FRAME_SIZE 16
+
+static const uint16_t FRAME_INTERVAL = 5000;
+
+static volatile uint8_t _spekFrame[FRAME_SIZE];
+static bool _rcFrameComplete;
+static uint32_t _lastRcFrameTimeUs;
+
 // Receive ISR callback
 static void dsmxDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
 {
-    (void)c;
     (void)data;
-    (void)currentTimeUs;
+
+    static uint32_t _spekTimeLast;
+    static uint8_t _spekFramePosition;
+
+    const uint32_t spekTimeInterval = cmpTimeUs(currentTimeUs, _spekTimeLast);
+
+    _spekTimeLast = currentTimeUs;
+
+    if (spekTimeInterval > FRAME_INTERVAL) {
+        _spekFramePosition = 0;
+    }
+
+    if (_spekFramePosition < FRAME_SIZE) {
+        _spekFrame[_spekFramePosition++] = (uint8_t)c;
+        if (_spekFramePosition < FRAME_SIZE) {
+            _rcFrameComplete = false;
+        } else {
+            _lastRcFrameTimeUs = currentTimeUs;
+            _rcFrameComplete = true;
+        }
+    }
 }
 
 // Public API ==================================================================
