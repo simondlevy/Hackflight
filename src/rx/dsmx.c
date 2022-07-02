@@ -26,8 +26,9 @@
 #define FRAME_SIZE 16
 
 // Support DSMX2048 only
-static const uint8_t CHAN_SHIFT = 3;
-static const uint8_t CHAN_MASK  = 0x07;
+static const uint8_t  CHAN_SHIFT = 3;
+static const uint8_t  CHAN_MASK  = 0x07;
+static const uint16_t CHAN_RESOLUTION = 2048;
 static const uint8_t MAX_CHANNELS = 8;
 
 static const uint16_t FRAME_INTERVAL = 5000;
@@ -94,11 +95,8 @@ uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
 
 float rxDevConvertValue(uint16_t * channelData, uint8_t chan)
 {
-    (void)chan;
-
-    printf("%d\n", channelData[0]);
-
-    return 0;
+    // [0,CHAN_RESOLUTION] -> [1000,2000]
+    return 1000 * (1 + channelData[chan] / (float)CHAN_RESOLUTION);
 }
 
 void rxDevInit(serialPortIdentifier_e port)

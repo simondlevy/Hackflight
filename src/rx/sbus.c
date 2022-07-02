@@ -203,6 +203,7 @@ uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
 
 float rxDevConvertValue(uint16_t * channelData, uint8_t chan)
 {
+    // [172,1811] -> [1000,2000]
     return (5 * (float)channelData[chan] / 8) + 880;
 }
 
