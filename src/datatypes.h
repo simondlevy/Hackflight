@@ -450,7 +450,7 @@ typedef struct {
 
     float (*devConvertValue)(uint16_t * channelData, uint8_t chan);
 
-}; rx_impl_t;
+} rx_impl_t;
 
 // Mixer -----------------------------------------------------------------------
 
