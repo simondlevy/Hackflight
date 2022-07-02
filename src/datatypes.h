@@ -442,6 +442,15 @@ typedef struct {
 
 } rx_t;
 
+typedef struct {
+
+    bool (*check)(rx_t * rx, uint32_t currentTimeUs);
+
+    uint8_t (*devCheck)(uint16_t * channelData, uint32_t * frameTimeUs);
+
+    float (*devConvertValue)(uint16_t * channelData, uint8_t chan);
+
+}; rx_impl_t;
 
 // Mixer -----------------------------------------------------------------------
 
