@@ -109,7 +109,7 @@ extern "C" {
         (void)hf;
 
         Wire.setClock(400000); 
-        delay(1000);
+        delay(100);
 
         usfsLoadFirmware(); 
 
