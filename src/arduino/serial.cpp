@@ -37,6 +37,18 @@ bool serialIsTransmitBufferEmpty(void * port)
     return Serial.availableForWrite() > 0;
 }
 
+void serialOpenPortDsmx(
+        serialPortIdentifier_e identifier,
+        serialReceiveCallbackPtr rxCallback)
+{
+    (void)identifier;
+
+    // Always use Serial1
+    Serial1.begin(115200);
+ 
+    _rxCallback = rxCallback;
+}
+
 void serialOpenPortSbus(
         serialPortIdentifier_e identifier,
         serialReceiveCallbackPtr rxCallback)
