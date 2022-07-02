@@ -115,7 +115,9 @@ extern "C" {
             portMode_e mode,
             portOptions_e options);
 
-    void serialOpenPortSbus( serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback);
+    void serialOpenPortDsmx(serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback);
+
+    void serialOpenPortSbus(serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback);
 
     void * serialOpenPortUsb(void);
 
