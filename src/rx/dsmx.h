@@ -22,12 +22,14 @@
 extern "C" {
 #endif
 
+    void rxDevInitDsmx(serialPortIdentifier_e port);
+
     uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs);
 
     float rxDevConvertDsmx(uint16_t * channelData, uint8_t chan);
 
-    void rxDevInitDsmx(serialPortIdentifier_e port);
-
 #if defined(__cplusplus)
 }
 #endif
+
+rx_dev_funs_t dsmxDeviceFuns = { rxDevInitDsmx, rxDevCheckDsmx, rxDevConvertDsmx };

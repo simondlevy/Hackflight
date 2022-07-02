@@ -26,9 +26,7 @@ extern "C" {
 
 void hackflightInitFull(
         hackflight_t * hf,
-        rx_dev_init_fun rxDevInitFun,
-        rx_dev_check_fun rxDevCheckFun,
-        rx_dev_convert_fun rxDevConvertFun,
+        rx_dev_funs_t * rxDeviceFuns,
         serialPortIdentifier_e rxDevPort,
         mixer_t mixer,
         void * motorDevice,

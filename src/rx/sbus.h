@@ -22,12 +22,14 @@
 extern "C" {
 #endif
 
+    void rxDevInitSbus(serialPortIdentifier_e port);
+
     uint8_t rxDevCheckSbus(uint16_t * channelData, uint32_t * frameTimeUs);
 
     float rxDevConvertSbus(uint16_t * channelData, uint8_t chan);
 
-    void rxDevInitSbus(serialPortIdentifier_e port);
-
 #if defined(__cplusplus)
 }
 #endif
+
+rx_dev_funs_t sbusDeviceFuns = { rxDevInitSbus, rxDevCheckSbus, rxDevConvertSbus };

@@ -416,6 +416,14 @@ typedef float   (*rx_dev_convert_fun)(uint16_t * channelData, uint8_t chan);
 
 typedef struct {
 
+    rx_dev_init_fun init;
+    rx_dev_check_fun check;
+    rx_dev_convert_fun convert;
+
+} rx_dev_funs_t;
+
+typedef struct {
+
     rxSmoothingFilter_t smoothingFilter;
 
     bool               auxiliaryProcessingRequired;

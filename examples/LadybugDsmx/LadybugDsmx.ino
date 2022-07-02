@@ -40,9 +40,7 @@ void setup(void)
     // Always use Serial1 for receiver, no no need to specify
     hackflightInitFull(
             &_hf,
-            rxDevInitDsmx,
-            rxDevCheckDsmx,
-            rxDevConvertDsmx,
+            &dsmxDeviceFuns,
             SERIAL_PORT_NONE,
             mixerQuadXbf,
             (void *)&motorPins,

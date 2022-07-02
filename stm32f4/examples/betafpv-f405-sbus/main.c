@@ -72,9 +72,7 @@ int main(void)
 
     hackflightInitFull(
             &hf,
-            rxDevInitSbus,
-            rxDevCheckSbus,
-            rxDevConvertSbus,
+            &sbusDeviceFuns,
             SERIAL_PORT_USART3, // RX port
             mixerQuadXbf,
             motorDevice,
