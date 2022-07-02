@@ -410,47 +410,44 @@ typedef struct rxSmoothingFilter_s {
 
 } rxSmoothingFilter_t;
 
+typedef void    (*rx_dev_init_fun)(serialPortIdentifier_e port);
+typedef uint8_t (*rx_dev_check_fun)(uint16_t * channelData, uint32_t * frameTimeUs);
+typedef float   (*rx_dev_convert_fun)(uint16_t * channelData, uint8_t chan);
+
 typedef struct {
 
     rxSmoothingFilter_t smoothingFilter;
 
-    bool        auxiliaryProcessingRequired;
-    bool        calculatedCutoffs;
-    uint16_t    channelData[CHANNEL_COUNT];
-    float       command[4];
-    demands_t   commands;
-    bool        dataProcessingRequired;
-    demands_t   dataToSmooth;
-    int32_t     frameTimeDeltaUs;
-    bool        gotNewData;
-    bool        inFailsafeMode;
-    bool        initializedFilter;
-    bool        initializedThrottleTable;
-    uint32_t    invalidPulsePeriod[CHANNEL_COUNT];
-    bool        isRateValid;
-    uint32_t    lastFrameTimeUs;
-    uint32_t    lastRxTimeUs;
-    int16_t     lookupThrottleRc[THROTTLE_LOOKUP_LENGTH];
-    uint32_t    needSignalBefore;
-    uint32_t    nextUpdateAtUs;
-    uint32_t    previousFrameTimeUs;
-    float       raw[CHANNEL_COUNT];
-    uint32_t    refreshPeriod;
-    bool        signalReceived;
-    rxState_e   state;
-    uint32_t    validFrameTimeMs;
+    bool               auxiliaryProcessingRequired;
+    bool               calculatedCutoffs;
+    uint16_t           channelData[CHANNEL_COUNT];
+    float              command[4];
+    demands_t          commands;
+    bool               dataProcessingRequired;
+    demands_t          dataToSmooth;
+    rx_dev_check_fun   devCheck;
+    rx_dev_convert_fun devConvert;
+    int32_t            frameTimeDeltaUs;
+    bool               gotNewData;
+    bool               inFailsafeMode;
+    bool               initializedFilter;
+    bool               initializedThrottleTable;
+    uint32_t           invalidPulsePeriod[CHANNEL_COUNT];
+    bool               isRateValid;
+    uint32_t           lastFrameTimeUs;
+    uint32_t           lastRxTimeUs;
+    int16_t            lookupThrottleRc[THROTTLE_LOOKUP_LENGTH];
+    uint32_t           needSignalBefore;
+    uint32_t           nextUpdateAtUs;
+    uint32_t           previousFrameTimeUs;
+    float              raw[CHANNEL_COUNT];
+    uint32_t           refreshPeriod;
+    bool               signalReceived;
+    rxState_e          state;
+    uint32_t           validFrameTimeMs;
 
 } rx_t;
 
-typedef struct {
-
-    bool (*check)(rx_t * rx, uint32_t currentTimeUs);
-
-    uint8_t (*devCheck)(uint16_t * channelData, uint32_t * frameTimeUs);
-
-    float (*devConvertValue)(uint16_t * channelData, uint8_t chan);
-
-} rx_impl_t;
 
 // Mixer -----------------------------------------------------------------------
 

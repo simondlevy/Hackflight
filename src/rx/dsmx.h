@@ -16,27 +16,17 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 #include "datatypes.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-void hackflightInitFull(
-        hackflight_t * hf,
-        rx_dev_init_fun rxDevInitFun,
-        rx_dev_check_fun rxDevCheckFun,
-        rx_dev_convert_fun rxDevConvertFun,
-        serialPortIdentifier_e rxDevPort,
-        mixer_t mixer,
-        void * motorDevice,
-        uint8_t imuInterruptPin,
-        imu_align_fun imuAlign,
-        uint8_t ledPin);
+    uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs);
 
-void hackflightStep(hackflight_t * hackflight);
+    float rxDevConvertDsmx(uint16_t * channelData, uint8_t chan);
+
+    void rxDevInitDsmx(serialPortIdentifier_e port);
 
 #if defined(__cplusplus)
 }

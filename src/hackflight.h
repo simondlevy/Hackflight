@@ -146,8 +146,9 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
 static void hackflightInit(
         hackflight_t * hf,
-        mixer_t mixer,
+        rx_dev_init_fun rxDevInitFun,
         serialPortIdentifier_e rxPort,
+        mixer_t mixer,
         float rateP,
         float rateI,
         float rateD,
@@ -168,7 +169,7 @@ static void hackflightInit(
     // Initialize quaternion in upright position
     hf->imuFusionPrev.quat.w = 1;
 
-    rxDevInit(rxPort);
+    rxDevInitFun(rxPort);
 
     hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 }

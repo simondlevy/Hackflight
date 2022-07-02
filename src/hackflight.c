@@ -298,9 +298,12 @@ extern "C" {
 
     void hackflightInitFull(
             hackflight_t * hf,
+            rx_dev_init_fun rxDevInitFun,
+            rx_dev_check_fun rxDevCheckFun,
+            rx_dev_convert_fun rxDevConvertFun,
+            serialPortIdentifier_e rxDevPort,
             mixer_t mixer,
             void * motorDevice,
-            serialPortIdentifier_e rxPort,
             uint8_t imuInterruptPin,
             imu_align_fun imuAlign,
             uint8_t ledPin)
@@ -320,11 +323,15 @@ extern "C" {
         failsafeInit();
         failsafeReset();
 
+        hf->rx.devCheck = rxDevCheckFun;
+        hf->rx.devConvert = rxDevConvertFun;
+
         hf->imuAlignFun = imuAlign;
 
         hf->motorDevice = motorDevice;
 
-        hackflightInit(hf, mixer, rxPort, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
+        hackflightInit(hf, rxDevInitFun, rxDevPort, mixer,
+                RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
 
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 

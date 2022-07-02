@@ -60,4 +60,4 @@ bool rxCheck(rx_t * rx, uint32_t currentTimeUs);
 
 uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs);
 
-float rxDevConvertValue(uint16_t * channelData, uint8_t chan);
+float rxDevConvert(uint16_t * channelData, uint8_t chan);

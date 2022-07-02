@@ -66,7 +66,7 @@ static void dsmxDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
 
 // Public API ==================================================================
 
-uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
+uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs)
 {
     uint8_t result = RX_FRAME_PENDING;
 
@@ -93,13 +93,13 @@ uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
     return result;
 }
 
-float rxDevConvertValue(uint16_t * channelData, uint8_t chan)
+float rxDevConvertDsmx(uint16_t * channelData, uint8_t chan)
 {
     // [0,CHAN_RESOLUTION] -> [1000,2000]
     return 1000 * (1 + channelData[chan] / (float)CHAN_RESOLUTION);
 }
 
-void rxDevInit(serialPortIdentifier_e port)
+void rxDevInitDsmx(serialPortIdentifier_e port)
 {
     serialOpenPortDsmx(port, dsmxDataReceive);
 }

@@ -23,6 +23,7 @@
 #include <imu_alignment/rotate_0.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <motor.h>
+#include <rx/dsmx.h>
 #include <stm32_clock.h>
 
 static hackflight_t _hf;
@@ -39,9 +40,12 @@ void setup(void)
     // Always use Serial1 for receiver, no no need to specify
     hackflightInitFull(
             &_hf,
+            rxDevInitDsmx,
+            rxDevCheckDsmx,
+            rxDevConvertDsmx,
+            SERIAL_PORT_NONE,
             mixerQuadXbf,
             (void *)&motorPins,
-            SERIAL_PORT_NONE,
             12,  // IMU interrupt pin
             imuRotate0,
             18); // LED pin

@@ -183,8 +183,7 @@ static void sbusDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
 
 // Public API ==================================================================
 
-#if 0
-uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
+uint8_t rxDevCheckSbus(uint16_t * channelData, uint32_t * frameTimeUs)
 {
     if (!_frameData.done) {
         return RX_FRAME_PENDING;
@@ -201,14 +200,13 @@ uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
     return frameStatus;
 }
 
-float rxDevConvertValue(uint16_t * channelData, uint8_t chan)
+float rxDevConvertSbus(uint16_t * channelData, uint8_t chan)
 {
     // [172,1811] -> [1000,2000]
     return (5 * (float)channelData[chan] / 8) + 880;
 }
 
-void rxDevInit(serialPortIdentifier_e port)
+void rxDevInitSbus(serialPortIdentifier_e port)
 {
     serialOpenPortSbus(port, sbusDataReceive);
 }
-#endif

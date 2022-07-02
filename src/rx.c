@@ -219,7 +219,7 @@ static void readChannelsApplyRanges(rx_t * rx, float raw[])
     for (uint8_t channel=0; channel<CHANNEL_COUNT; ++channel) {
 
         // sample the channel
-        float sample = rxDevConvertValue(rx->channelData, channel);
+        float sample = rx->devConvert(rx->channelData, channel);
 
         // apply the rx calibration
         switch (channel) {
@@ -744,7 +744,7 @@ bool rxCheck(rx_t * rx, uint32_t currentTimeUs)
         return true;
     }
 
-    const uint8_t frameStatus = rxDevCheck(rx->channelData, &rx->lastFrameTimeUs);
+    const uint8_t frameStatus = rx->devCheck(rx->channelData, &rx->lastFrameTimeUs);
 
     if (frameStatus & RX_FRAME_COMPLETE) {
         rx->inFailsafeMode = (frameStatus & RX_FRAME_FAILSAFE) != 0;
