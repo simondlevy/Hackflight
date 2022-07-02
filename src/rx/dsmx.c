@@ -25,11 +25,16 @@
 
 #define FRAME_SIZE 16
 
+// Support DSMX2048 only
+static const uint8_t CHAN_SHIFT = 3;
+static const uint8_t CHAN_MASK  = 0x07;
+static const uint8_t MAX_CHANNELS = 8;
+
 static const uint16_t FRAME_INTERVAL = 5000;
 
-static volatile uint8_t _spekFrame[FRAME_SIZE];
-static bool _rcFrameComplete;
-static uint32_t _lastRcFrameTimeUs;
+static volatile uint8_t _frame[FRAME_SIZE];
+static bool _frameComplete;
+static uint32_t _lastFrameTimeUs;
 
 // Receive ISR callback
 static void dsmxDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
@@ -37,23 +42,23 @@ static void dsmxDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
     (void)data;
 
     static uint32_t _spekTimeLast;
-    static uint8_t _spekFramePosition;
+    static uint8_t _framePosition;
 
     const uint32_t spekTimeInterval = cmpTimeUs(currentTimeUs, _spekTimeLast);
 
     _spekTimeLast = currentTimeUs;
 
     if (spekTimeInterval > FRAME_INTERVAL) {
-        _spekFramePosition = 0;
+        _framePosition = 0;
     }
 
-    if (_spekFramePosition < FRAME_SIZE) {
-        _spekFrame[_spekFramePosition++] = (uint8_t)c;
-        if (_spekFramePosition < FRAME_SIZE) {
-            _rcFrameComplete = false;
+    if (_framePosition < FRAME_SIZE) {
+        _frame[_framePosition++] = (uint8_t)c;
+        if (_framePosition < FRAME_SIZE) {
+            _frameComplete = false;
         } else {
-            _lastRcFrameTimeUs = currentTimeUs;
-            _rcFrameComplete = true;
+            _lastFrameTimeUs = currentTimeUs;
+            _frameComplete = true;
         }
     }
 }
@@ -62,16 +67,37 @@ static void dsmxDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
 
 uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
 {
-    (void)channelData;
-    (void)frameTimeUs;
-    printf("complete: %d\n", _rcFrameComplete);
-    return 0;;
+    uint8_t result = RX_FRAME_PENDING;
+
+    if (_frameComplete) {
+
+        _frameComplete = false;
+
+        *frameTimeUs = _lastFrameTimeUs;
+
+        for (int b = 3; b < FRAME_SIZE; b += 2) {
+
+            const uint8_t channel = 0x0F & (_frame[b - 1] >> CHAN_SHIFT);
+
+            if (channel < MAX_CHANNELS) {
+
+                channelData[channel] =
+                    ((uint32_t)(_frame[b - 1] & CHAN_MASK) << 8) + _frame[b];
+            }
+        }
+
+        result = RX_FRAME_COMPLETE;
+    }
+
+    return result;
 }
 
 float rxDevConvertValue(uint16_t * channelData, uint8_t chan)
 {
-    (void)channelData;
     (void)chan;
+
+    printf("%d\n", channelData[0]);
+
     return 0;
 }
 
