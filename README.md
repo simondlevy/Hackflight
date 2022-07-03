@@ -2,10 +2,6 @@
 <img src="media/logo.png" width=450>
 </p>
 
-<h2>For the Ladybug Flight Controller, use <a href="https://github.com/simondlevy/LadybugFC">this repository</a>.</h2>
-
-<h2>For the Haskell version use <a href="https://github.com/simondlevy/Hackflight/tree/haskell">this branch</a>.</h2>
-
 ## Intro
 
 Hackflight is a software toolkit for building multirotor flight
