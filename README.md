@@ -49,9 +49,10 @@ which contain code for real-time scheduling and for reading from physical sensor
 Although previously implemented in C++, Hackflight has shifted toward a focus on functional-style
 programming in C. For example, instead of having a Receiver class that gets subclassed for different
 kinds of receivers (SBUS, DSMX), you pass the appropriate device-access
-functions to the the code that retrieve the raw values from the receiver.  More generally, Hackflight
-attempts to maintain a simple relationship between the code and the flight-control flow diagram shown
-below:
+functions to the the code that retrieve the raw values from the receiver.  
+
+More generally, Hackflight attempts to maintain a simple relationship between
+the code and the elements of the flight-control flow diagram shown below:
 
 <p align="center"> 
 <img src="media/dataflow2.png" width=700>
