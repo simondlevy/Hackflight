@@ -76,7 +76,7 @@ uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs)
 
         *frameTimeUs = _lastFrameTimeUs;
 
-        for (int b = 3; b < FRAME_SIZE; b += 2) {
+        for (int b=3; b<FRAME_SIZE; b+=2) {
 
             const uint8_t channel = 0x0F & (_frame[b - 1] >> CHAN_SHIFT);
 
@@ -95,7 +95,10 @@ uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs)
 
 float rxDevConvertDsmx(uint16_t * channelData, uint8_t chan)
 {
-    return 1000 * (1 + (channelData[chan] - 1) / (float)(CHAN_RESOLUTION-1));
+    // XXX ignore channel 6 for now (problems with transmitter)
+    uint16_t chanval = chan == 5 ? 1 : channelData[chan];
+
+    return 1000 * (1 + (chanval - 1) / (float)(CHAN_RESOLUTION-1));
 }
 
 void rxDevInitDsmx(serialPortIdentifier_e port)
