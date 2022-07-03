@@ -21,9 +21,17 @@ addition to big user communities and loads of great features, these platforms
 have safety mechanisms that Hackflight lacks, which will help avoid injury to
 you and damage to your vehicle.
 
+
 ## Supported platforms
 
-Hackflight is currently working on the following platforms:
+To make it easy to develop flight firmware using Arduino-compatible
+microcontrollers, Hackflight is laid out as an Arduino library; however,
+this does not limit your ability to use it on other hardware platforms 
+and simulators.
+
+Currently, Hackflight has been tested on the following platforms:
+
+* [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller) from Tlera Corp.
 
 * [STM32F405 AIO flight controller](https://betafpv.com/products/f405-20a-aio-2-4s-brushless-flight-controllerblheli_s-v3)
 
@@ -35,6 +43,19 @@ basic control algorithms (open-loop control / PID control).  Real flight
 controllers use the code in the <b>.c</b> files located in that directory
 directory and in the [stm32/src](https://github.com/simondlevy/Hackflight/tree/master/stm32/src) directory,
 which contain code for real-time scheduling and for reading from physical sensors and R/C receivers.
+
+## Design principles
+
+Although previously implemented in C++, Hackflight has shifted toward a focus on functional-style
+programming in C; e.g., instead of having a Receiver class that gets subclassed for different
+kinds of receivers (SBUS, DSMX), you pass the appropriate device-access
+functions to the the code that retrieve the raw values from the receiver.  More generally, Hackflight
+attempts to maintain a simple relationship between the code and the flight-control flow diagram shown
+below:
+
+<p align="center"> 
+<img src="media/dataflow2.png" width=700>
+</p>
 
 ## Ground Control Station
 
