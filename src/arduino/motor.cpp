@@ -82,4 +82,6 @@ void motorWrite(void * motorDevice, float *values)
     for (uint8_t k=0; k<4; ++k) {
         analogWrite(pins[k], (uint8_t)(values[k] * 255));
     }
+
+    //printf("%f %f %f %f\n", values[0], values[1], values[2], values[3]);
 }
