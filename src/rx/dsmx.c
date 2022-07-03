@@ -95,8 +95,7 @@ uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs)
 
 float rxDevConvertDsmx(uint16_t * channelData, uint8_t chan)
 {
-    // [0,CHAN_RESOLUTION] -> [1000,2000]
-    return 1000 * (1 + channelData[chan] / (float)CHAN_RESOLUTION);
+    return 1000 * (1 + (channelData[chan] - 1) / (float)(CHAN_RESOLUTION-1));
 }
 
 void rxDevInitDsmx(serialPortIdentifier_e port)

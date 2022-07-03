@@ -30,6 +30,15 @@
 #include "rx.h"
 #include "system.h"
 
+// Tuning constants for angle PID controller ----------------------------------
+
+static const float RATE_P  = 1.441305;
+static const float RATE_I  = 19.55048;
+static const float RATE_D  = 0.021160;
+static const float RATE_F  = 0.0165048;
+static const float LEVEL_P = 0.0; // 3.0;
+
+
 // Scheduling constants -------------------------------------------------------
 
 // Wait at start of scheduler loop if gyroSampleTask is nearly due
@@ -306,13 +315,6 @@ extern "C" {
             imu_align_fun imuAlign,
             uint8_t ledPin)
     {
-        // Tuning constants for angle PID controller
-        static const float RATE_P  = 1.441305;
-        static const float RATE_I  = 19.55048;
-        static const float RATE_D  = 0.021160;
-        static const float RATE_F  = 0.0165048;
-        static const float LEVEL_P = 0 /*3.0*/;
-
         mspInit();
         gyroInit(hf);
         imuInit(hf, imuInterruptPin);
