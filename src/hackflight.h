@@ -146,17 +146,12 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
 static void hackflightInit(
         hackflight_t * hf,
-        mixer_t mixer,
-        float rateP,
-        float rateI,
-        float rateD,
-        float rateF,
-        float levelP
-        )
+        anglePidConstants_t * anglePidConstants,
+        mixer_t mixer)
 {
     hf->mixer = mixer;
 
-    anglePidInit(&hf->anglepid, rateP, rateI, rateD, rateF, levelP);
+    anglePidInit(&hf->anglepid, anglePidConstants);
 
     hackflightAddPidController(hf, anglePidUpdate, &hf->anglepid);
 

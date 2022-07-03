@@ -32,12 +32,6 @@
 
 // Tuning constants for angle PID controller ----------------------------------
 
-static const float RATE_P  = 1.441305;
-static const float RATE_I  = 19.55048;
-static const float RATE_D  = 0.021160;
-static const float RATE_F  = 0.0165048;
-static const float LEVEL_P = 0.0; // 3.0;
-
 
 // Scheduling constants -------------------------------------------------------
 
@@ -309,6 +303,7 @@ extern "C" {
             hackflight_t * hf,
             rx_dev_funs_t * rxDeviceFuns,
             serialPortIdentifier_e rxDevPort,
+            anglePidConstants_t * anglePidConstants,
             mixer_t mixer,
             void * motorDevice,
             uint8_t imuInterruptPin,
@@ -332,7 +327,7 @@ extern "C" {
 
         hf->motorDevice = motorDevice;
 
-        hackflightInit(hf, mixer, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
+        hackflightInit(hf, anglePidConstants, mixer);
 
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 

@@ -66,26 +66,30 @@ typedef union dtermLowpass_u {
 } dtermLowpass_t;
 
 typedef struct {
-    pidAxisData_t  data[3];
-    pt2Filter_t    dMinLowpass[3];
-    pt2Filter_t    dMinRange[3];
-    dtermLowpass_t dtermLowpass[3];
-    dtermLowpass_t dtermLowpass2[3];
-    int32_t        dynLpfPreviousQuantizedThrottle;  
-    bool           feedforwardLpfInitialized;
-    pt3Filter_t    feedforwardPt3[3];
-    float          k_rate_p;
-    float          k_rate_i;
-    float          k_rate_d;
-    float          k_rate_f;
-    float          k_level_p;
-    uint32_t       lastDynLpfUpdateUs;
-    float          previousSetpointCorrection[3];
-    float          previousGyroRateDterm[3];
-    float          previousSetpoint[3];
-    pt1Filter_t    ptermYawLowpass;
-    pt1Filter_t    windupLpf[3];
-} angle_pid_t;
+    float k_rate_p;
+    float k_rate_i;
+    float k_rate_d;
+    float k_rate_f;
+    float k_level_p;
+} anglePidConstants_t;
+
+typedef struct {
+    anglePidConstants_t constants;
+    pidAxisData_t       data[3];
+    pt2Filter_t         dMinLowpass[3];
+    pt2Filter_t         dMinRange[3];
+    dtermLowpass_t      dtermLowpass[3];
+    dtermLowpass_t      dtermLowpass2[3];
+    int32_t             dynLpfPreviousQuantizedThrottle;  
+    bool                feedforwardLpfInitialized;
+    pt3Filter_t         feedforwardPt3[3];
+    uint32_t            lastDynLpfUpdateUs;
+    float               previousSetpointCorrection[3];
+    float               previousGyroRateDterm[3];
+    float               previousSetpoint[3];
+    pt1Filter_t         ptermYawLowpass;
+    pt1Filter_t         windupLpf[3];
+} anglePid_t;
 
 // Demands ----------------------------------------------------------------------
 
@@ -467,7 +471,7 @@ typedef void (*mixer_t)(float throttle, float roll, float pitch, float yaw,
 typedef struct {
 
     arming_t         arming;
-    angle_pid_t      anglepid;
+    anglePid_t      anglepid;
     task_t           attitudeTask;
     demands_t        demands;
     gyro_t           gyro;

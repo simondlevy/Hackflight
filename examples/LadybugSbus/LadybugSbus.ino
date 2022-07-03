@@ -35,13 +35,21 @@ void setup(void)
 
     static uint8_t motorPins[4] = {13, 16, 3, 11};
 
-    motorInitBrushed(motorPins);
+    static anglePidConstants_t anglePidConstants = {
+        1.441305,     // Rate Kp
+        19.55048,     // Rate Ki
+        0.021160,     // Rate Kd
+        0.0165048,    // Rate Kf
+        0.0}; // 3.0, // Level Kp
+
+     motorInitBrushed(motorPins);
 
     // Always use Serial1 for receiver, no no need to specify
     hackflightInitFull(
             &_hf,
             &sbusDeviceFuns,
             SERIAL_PORT_NONE,
+            &anglePidConstants,
             mixerQuadXbf,
             (void *)&motorPins,
             12,  // IMU interrupt pin

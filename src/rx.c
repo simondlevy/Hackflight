@@ -419,7 +419,7 @@ static bool processData(
     return rxThrottleIsDown(raw);
 }
 
-static void ratePidFeedforwardLpfInit(angle_pid_t * pid, uint16_t filterCutoff)
+static void ratePidFeedforwardLpfInit(anglePid_t * pid, uint16_t filterCutoff)
 {
     if (filterCutoff > 0) {
         pid->feedforwardLpfInitialized = true;
@@ -432,7 +432,7 @@ static void ratePidFeedforwardLpfInit(angle_pid_t * pid, uint16_t filterCutoff)
     }
 }
 
-static void ratePidFeedforwardLpfUpdate(angle_pid_t * pid, uint16_t filterCutoff)
+static void ratePidFeedforwardLpfUpdate(anglePid_t * pid, uint16_t filterCutoff)
 {
     if (filterCutoff > 0) {
         for (uint8_t axis=ROLL; axis<=YAW; axis++) {
@@ -493,7 +493,7 @@ static void smoothingFilterApply(
     }
 }
 
-static void setSmoothingFilterCutoffs(angle_pid_t * ratepid,
+static void setSmoothingFilterCutoffs(anglePid_t * ratepid,
         rxSmoothingFilter_t *smoothingFilter)
 {
     const float dT = CORE_PERIOD() * 1e-6f;
@@ -591,7 +591,7 @@ static bool rcSmoothingAutoCalculate(rxSmoothingFilter_t * smoothingFilter)
 static void processSmoothingFilter(
         uint32_t currentTimeUs,
         rx_t * rx,
-        angle_pid_t * ratepid,
+        anglePid_t * ratepid,
         float setpointRate[4],
         float rawSetpoint[3])
 {
@@ -836,7 +836,7 @@ void rxPoll(
 void rxGetDemands(
         rx_t * rx,
         uint32_t currentTimeUs,
-        angle_pid_t * ratepid,
+        anglePid_t * ratepid,
         demands_t * demands)
 {
     float rawSetpoint[4] = {0};

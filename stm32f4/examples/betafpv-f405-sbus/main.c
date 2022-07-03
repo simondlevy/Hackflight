@@ -68,12 +68,20 @@ int main(void)
     motorEnable(motorDevice);
     systemInitUnusedPins();
 
+    static anglePidConstants_t anglePidConstants = {
+        1.441305,     // Rate Kp
+        19.55048,     // Rate Ki
+        0.021160,     // Rate Kd
+        0.0165048,    // Rate Kf
+        0.0}; // 3.0; // Level Kp
+
     hackflight_t hf = {0};
 
     hackflightInitFull(
             &hf,
             &sbusDeviceFuns,
             SERIAL_PORT_USART3, // RX port
+            &anglePidConstants,
             mixerQuadXbf,
             motorDevice,
             0,                  // dummy value for IMU interrupt pin
