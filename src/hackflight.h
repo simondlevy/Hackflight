@@ -116,7 +116,7 @@ static float constrain_demand(float demand, float limit, float scaling)
 
 static void hackflightRunCoreTasks(hackflight_t * hf)
 {
-    gyroReadScaled(&hf->gyro, hf->imuAlignFun, &hf->vstate);
+    gyroReadScaled(hf, &hf->vstate);
 
     uint32_t currentTimeUs = timeMicros();
 
@@ -146,8 +146,6 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
 static void hackflightInit(
         hackflight_t * hf,
-        rx_dev_init_fun rxDevInitFun,
-        serialPortIdentifier_e rxPort,
         mixer_t mixer,
         float rateP,
         float rateI,
@@ -168,8 +166,6 @@ static void hackflightInit(
 
     // Initialize quaternion in upright position
     hf->imuFusionPrev.quat.w = 1;
-
-    rxDevInitFun(rxPort);
 
     hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 }

@@ -324,12 +324,13 @@ extern "C" {
         hf->rx.devCheck = rxDeviceFuns->check;
         hf->rx.devConvert = rxDeviceFuns->convert;
 
+        rxDeviceFuns->init(rxDevPort);
+
         hf->imuAlignFun = imuAlign;
 
         hf->motorDevice = motorDevice;
 
-        hackflightInit(hf, rxDeviceFuns->init, rxDevPort, mixer,
-                RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
+        hackflightInit(hf, mixer, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
 
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 

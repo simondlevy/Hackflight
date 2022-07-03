@@ -152,9 +152,11 @@ void gyroInit(hackflight_t * hf)
     setCalibrationCycles(gyro); // start calibrating
 }
 
-void gyroReadScaled(gyro_t * gyro, imu_align_fun align, vehicle_state_t * vstate)
+void gyroReadScaled(hackflight_t * hf, vehicle_state_t * vstate)
 {
     if (!gyroIsReady()) return;
+
+    gyro_t * gyro = &hf->gyro;
 
     bool calibrationComplete = gyro->calibration.cyclesRemaining <= 0;
 
@@ -167,7 +169,7 @@ void gyroReadScaled(gyro_t * gyro, imu_align_fun align, vehicle_state_t * vstate
         _adc.y = gyroReadRaw(1) - gyro->zero[1];
         _adc.z = gyroReadRaw(2) - gyro->zero[2];
 
-        align(&_adc);
+        hf->imuAlignFun(&_adc);
 
     } else {
         calibrate(gyro);
