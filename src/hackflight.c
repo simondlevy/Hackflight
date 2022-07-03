@@ -3,14 +3,15 @@
 
    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+   Hackflight is free software: you can redistribute it and/or modify it under
+   the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
@@ -123,7 +124,10 @@ extern "C" {
         }
     }
 
-    static void executeTask(hackflight_t * hf, task_t *task, uint32_t currentTimeUs)
+    static void executeTask(
+            hackflight_t * hf,
+            task_t *task,
+            uint32_t currentTimeUs)
     {
         task->lastExecutedAtUs = currentTimeUs;
         task->dynamicPriority = 0;
@@ -170,9 +174,8 @@ extern "C" {
         }
         scheduler->lastTargetCycles = nextTargetCycles;
 
-        // Bring the scheduler into lock with the gyro
-        // Track the actual gyro rate over given number of cycle times and set the
-        // expected timebase
+        // Bring the scheduler into lock with the gyro Track the actual gyro
+        // rate over given number of cycle times and set the expected timebase
         static uint32_t _terminalGyroRateCount;
         static int32_t _sampleRateStartCycles;
 
@@ -182,14 +185,16 @@ extern "C" {
         }
 
         if (gyroInterruptCount() >= _terminalGyroRateCount) {
-            // Calculate number of clock cycles on average between gyro interrupts
+            // Calculate number of clock cycles on average between gyro
+            // interrupts
             uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
             scheduler->desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
             _sampleRateStartCycles = nowCycles;
             _terminalGyroRateCount += CORE_RATE_COUNT;
         }
 
-        // Track actual gyro rate over given number of cycle times and remove skew
+        // Track actual gyro rate over given number of cycle times and remove
+        // skew
         static uint32_t _terminalGyroLockCount;
         static int32_t _gyroSkewAccum;
 
@@ -248,7 +253,8 @@ extern "C" {
         }
 
         adjustRxDynamicPriority(&hf->rx, &hf->rxTask, currentTimeUs);
-        updateDynamicTask(&hf->rxTask, &selectedTask, &selectedTaskDynamicPriority);
+        updateDynamicTask(&hf->rxTask, &selectedTask,
+                &selectedTaskDynamicPriority);
 
         adjustAndUpdateTask(&hf->attitudeTask, currentTimeUs,
                 &selectedTask, &selectedTaskDynamicPriority);
@@ -272,14 +278,17 @@ extern "C" {
             taskRequiredTimeCycles += scheduler->taskGuardCycles;
 
             if (taskRequiredTimeCycles < loopRemainingCycles) {
-                uint32_t antipatedEndCycles = nowCycles + taskRequiredTimeCycles;
+                uint32_t antipatedEndCycles =
+                    nowCycles + taskRequiredTimeCycles;
                 executeTask(hf, selectedTask, currentTimeUs);
                 nowCycles = systemGetCycleCounter();
-                int32_t cyclesOverdue = cmpTimeCycles(nowCycles, antipatedEndCycles);
+                int32_t cyclesOverdue =
+                    cmpTimeCycles(nowCycles, antipatedEndCycles);
 
                 if ((cyclesOverdue > 0) ||
                         (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
-                    if (scheduler->taskGuardCycles < scheduler->taskGuardMaxCycles) {
+                    if (scheduler->taskGuardCycles <
+                            scheduler->taskGuardMaxCycles) {
                         scheduler->taskGuardCycles +=
                             scheduler->taskGuardDeltaUpCycles;
                     }
@@ -291,12 +300,13 @@ extern "C" {
             } else if (selectedTask->taskAgeCycles > TASK_AGE_EXPEDITE_COUNT) {
                 // If a task has been unable to run, then reduce it's recorded
                 // estimated run time to ensure it's ultimate scheduling
-                selectedTask->anticipatedExecutionTime *= TASK_AGE_EXPEDITE_SCALE;
+                selectedTask->anticipatedExecutionTime *= 
+                    TASK_AGE_EXPEDITE_SCALE;
             }
         }
     }
 
-    // ----------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     void hackflightInitFull(
             hackflight_t * hf,
@@ -381,8 +391,9 @@ extern "C" {
         if (loopRemainingCycles < -scheduler->desiredPeriodCycles) {
             // A task has so grossly overrun that at entire gyro cycle has been
             // skipped This is most likely to occur when connected to the
-            // configurator via USB as the serial task is non-deterministic Recover
-            // as best we can, advancing scheduling by a whole number of cycles
+            // configurator via USB as the serial task is non-deterministic
+            // Recover as best we can, advancing scheduling by a whole number
+            // of cycles
             nextTargetCycles += scheduler->desiredPeriodCycles * (1 +
                     (loopRemainingCycles / -scheduler->desiredPeriodCycles));
             loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);

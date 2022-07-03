@@ -49,7 +49,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 busStatus_e mpuIntcallback(uint32_t arg)
 {
     gyroDev_t *gyro = (gyroDev_t *)arg;
-    int32_t gyroDmaDuration = cmpTimeCycles(systemGetCycleCounter(), gyro->gyroLastEXTI);
+    int32_t gyroDmaDuration =
+        cmpTimeCycles(systemGetCycleCounter(), gyro->gyroLastEXTI);
 
     if (gyroDmaDuration > gyro->gyroDmaMaxDuration) {
         gyro->gyroDmaMaxDuration = gyroDmaDuration;
@@ -69,8 +70,10 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
     uint32_t nowCycles = systemGetCycleCounter();
     int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, gyroDev->gyroLastEXTI);
     // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
-    if ((gyroDev->gyroShortPeriod == 0) || (gyroLastPeriod < gyroDev->gyroShortPeriod)) {
-        gyroDev->gyroSyncEXTI = gyroDev->gyroLastEXTI + gyroDev->gyroDmaMaxDuration;
+    if ((gyroDev->gyroShortPeriod == 0) ||
+            (gyroLastPeriod < gyroDev->gyroShortPeriod)) {
+        gyroDev->gyroSyncEXTI =
+            gyroDev->gyroLastEXTI + gyroDev->gyroDmaMaxDuration;
     }
     gyroDev->gyroLastEXTI = nowCycles;
 
@@ -96,7 +99,8 @@ bool mpuAccRead(accDev_t *acc)
 {
     uint8_t data[6];
 
-    const bool ack = busReadRegisterBuffer(&acc->gyro->dev, MPU_RA_ACCEL_XOUT_H, data, 6);
+    const bool ack =
+        busReadRegisterBuffer(&acc->gyro->dev, MPU_RA_ACCEL_XOUT_H, data, 6);
     if (!ack) {
         return false;
     }
@@ -318,9 +322,9 @@ void gyroDevInit(void)
     gyroDev.initFn(&gyroDev);
 }
 
-float gyroScale(void)
+uint16_t gyroScaleDps(void)
 {
-    return gyroDev.scale;
+    return gyroDev.scaleDps;
 }
 
 uint32_t gyroInterruptCount(void)

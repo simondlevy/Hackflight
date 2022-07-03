@@ -3,17 +3,15 @@
 
    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+   Hackflight is free software: you can redistribute it and/or modify it under
+   the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY
-   {
-   }
-   without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY without even the implied warranty of MERCHANTABILITY or FITNESS
+   FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+   details.
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
@@ -25,8 +23,8 @@
 
 #include <imu.h>
 
-static const uint8_t  GYRO_RATE_TENTH = 100;  // Multiply by 10 to get actual rate
-static const uint16_t GYRO_SCALE      = 2000; // DPS
+static const uint8_t  GYRO_RATE_TENTH = 100;   // 1/10th actual rate
+static const uint16_t GYRO_SCALE_DPS  = 2000;
 
 // Arbitrary; unused
 static const uint8_t  ACCEL_BANDWIDTH  = 3;
@@ -94,9 +92,9 @@ extern "C" {
         return _gyroAdc[k];
     }
 
-    float gyroScale(void)
+    uint16_t gyroScaleDps(void)
     {
-        return 0.153;
+        return GYRO_SCALE_DPS;
     }
 
     uint32_t gyroSyncTime(void)
@@ -117,7 +115,7 @@ extern "C" {
                 ACCEL_BANDWIDTH,
                 GYRO_BANDWIDTH,
                 ACCEL_SCALE,
-                GYRO_SCALE,
+                GYRO_SCALE_DPS,
                 MAG_SCALE,
                 QUAT_DIVISOR,
                 MAG_RATE,

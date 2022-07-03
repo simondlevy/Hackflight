@@ -72,7 +72,7 @@ typedef struct gyroDev_s {
     sensorGyroReadDataFuncPtr temperatureFn;                  // read temperature if available
     extiCallbackRec_t exti;
     extDevice_t dev;
-    float scale;                                             // scalefactor
+    uint16_t scaleDps;
     int16_t adcRaw[3];                                       // raw data from sensor
     int16_t temperature;
     mpuDetectionResult_t mpuDetectionResult;

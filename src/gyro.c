@@ -163,6 +163,7 @@ void gyroReadScaled(hackflight_t * hf, vehicle_state_t * vstate)
     static axes_t _adc;
 
     if (calibrationComplete) {
+
         // move 16-bit gyro data into floats to avoid overflows in calculations
 
         _adc.x = gyroReadRaw(0) - gyro->zero[0];
@@ -176,9 +177,9 @@ void gyroReadScaled(hackflight_t * hf, vehicle_state_t * vstate)
     }
 
     if (calibrationComplete) {
-        gyro->dps[0] = _adc.x * gyroScale();
-        gyro->dps[1] = _adc.y * gyroScale();
-        gyro->dps[2] = _adc.z * gyroScale();
+        gyro->dps[0] = _adc.x * (gyroScaleDps() / 32768.);
+        gyro->dps[1] = _adc.y * (gyroScaleDps() / 32768.);
+        gyro->dps[2] = _adc.z * (gyroScaleDps() / 32768.);
     }
 
     if (gyro->downsampleFilterEnabled) {
