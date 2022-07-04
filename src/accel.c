@@ -19,6 +19,7 @@
 #include "accel.h"
 #include "arming.h"
 #include "datatypes.h"
+#include "debug.h"
 #include "maths.h"
 
 // static const uint16_t CALIBRATING_ACC_CYCLES = 400;

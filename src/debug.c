@@ -218,6 +218,8 @@ void debugFlush(void)
     while (!serialIsTransmitBufferEmpty(printfSerialPort));
 }
 
+#if defined(__cplusplus)
+#else
 void debugPrintf(const char *fmt, ...)
 {
     va_list va;
@@ -226,6 +228,7 @@ void debugPrintf(const char *fmt, ...)
     va_end(va);
     mspTriggerDebugging();
 }
+#endif
 
 void debugSetPort(void * p)
 {

@@ -22,12 +22,11 @@ extern "C" {
 
 void debugFlush(void);
 
-void debugPrintf(const char *fmt, ...);
-
 void debugSetPort(void * p);
 
-int printf(const char * fmt, ...);
- 
 #if defined(__cplusplus)
+#define debugPrintf printf
 }
+#else
+void debugPrintf(const char *fmt, ...);
 #endif
