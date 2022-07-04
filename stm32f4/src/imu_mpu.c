@@ -288,7 +288,7 @@ bool accelIsReady(void)
     return accelDev.readFn(&accelDev);
 }
 
-float accelRead(uint8_t k) 
+float accelReadRaw(uint8_t k) 
 {
     return accelDev.ADCRaw[k];
 }

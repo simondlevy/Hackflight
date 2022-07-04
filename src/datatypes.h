@@ -185,13 +185,13 @@ typedef struct {
     uint32_t quietPeriodEnd;
     uint32_t resetTimeEnd;
     bool resetCompleted;
-} gyro_reset_t;
+} gyroReset_t;
 
 typedef struct {
     uint32_t time;
     quaternion_t quat;
     rotation_t rot;
-    gyro_reset_t gyroReset;
+    gyroReset_t gyroReset;
 } imuFusion_t;
 
 typedef void (*imuAlignFun_t)(axes_t * axes);
@@ -338,7 +338,7 @@ typedef struct {
     demands_t demands;
     float aux1;
     float aux2;
-} rx_axes_t;
+} rxAxes_t;
 
 typedef enum rc_alias {
     THROTTLE,
@@ -347,7 +347,7 @@ typedef enum rc_alias {
     YAW,
     AUX1,
     AUX2
-} rc_alias_e;
+} rcAlias_e;
 
 typedef enum {
     RX_FRAME_PENDING = 0,
@@ -468,7 +468,6 @@ typedef void (*mixer_t)(float throttle, float roll, float pitch, float yaw,
 typedef struct {
 
     imuSensor_t    accum;
-    float          adc[3];
     biquadFilter_t filter[3];
 
 } accel_t;
@@ -495,7 +494,7 @@ typedef struct {
     bool             pidZeroThrottleItermReset;
     rx_t             rx;
     task_t           rxTask;
-    rx_axes_t        rxAxes;
+    rxAxes_t        rxAxes;
     scheduler_t      scheduler;
     task_t           sensorTasks[10];
     uint8_t          sensorTaskCount;

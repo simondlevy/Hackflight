@@ -96,7 +96,7 @@ static void task_rx(void * hackflight, uint32_t time)
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
-    rx_axes_t rxax = {{0, 0, 0, 0}, 0, 0};
+    rxAxes_t rxax = {{0, 0, 0, 0}, 0, 0};
 
     bool gotNewData = false;
 
@@ -121,7 +121,7 @@ static void task_rx(void * hackflight, uint32_t time)
     }
 
     if (gotNewData) {
-        memcpy(&hf->rxAxes, &rxax, sizeof(rx_axes_t));
+        memcpy(&hf->rxAxes, &rxax, sizeof(rxAxes_t));
     }
 }
 

@@ -16,17 +16,20 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
 void debugFlush(void);
 
+void debugPrintf(const char *fmt, ...);
+
 void debugSetPort(void * p);
 
 #if defined(__cplusplus)
-#define debugPrintf printf
 }
-#else
-void debugPrintf(const char *fmt, ...);
 #endif
+
+

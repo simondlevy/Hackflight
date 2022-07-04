@@ -21,6 +21,7 @@
 #include "datatypes.h"
 #include "debug.h"
 #include "maths.h"
+#include "time.h"
 
 // static const uint16_t CALIBRATING_ACC_CYCLES = 400;
 static const uint16_t LPF_CUTOFF_HZ = 10;
@@ -91,8 +92,9 @@ static void biquadFilterUpdate(
 
     switch (filterType) {
         case FILTER_LPF:
-            // 2nd order Butterworth (with Q=1/sqrt(2)) / Butterworth biquad section with Q
-            // described in http://www.ti.com/lit/an/slaa447/slaa447.pdf
+            // 2nd order Butterworth (with Q=1/sqrt(2)) / Butterworth biquad
+            // section with Q described in
+            // http://www.ti.com/lit/an/slaa447/slaa447.pdf
             filter->b1 = 1 - cs;
             filter->b0 = filter->b1 * 0.5f;
             filter->b2 = filter->b0;
@@ -184,15 +186,19 @@ void  accelUpdate(void * hackflight, uint32_t usec)
         return;
      }
 
-    for (int k = 0; k < 3; k++) {
-        accel->adc[k] = accelRead(k);
-    }
+    // debugPrintf("%d\n", (int)accelReadRaw(0));
 
-    for (int k = 0; k < 3; k++) {
-        accel->adc[k] = biquadFilterApply(&accel->filter[k], accel->adc[k]);
-    }
+    static axes_t _adc;
 
-    //alignSensorViaRotation(adc);
+    _adc.x = accelReadRaw(0);
+    _adc.y = accelReadRaw(1);
+    _adc.z = accelReadRaw(2);
+
+    _adc.x = biquadFilterApply(&accel->filter[0], _adc.x);
+    _adc.y = biquadFilterApply(&accel->filter[1], _adc.y);
+    _adc.z = biquadFilterApply(&accel->filter[2], _adc.z);
+
+    hf->imuAlignFun(&_adc);
 
     // if (calibrating != 0) {
     //     calibrate(acc, adc);
@@ -202,10 +208,9 @@ void  accelUpdate(void * hackflight, uint32_t usec)
     // adc[1] -= acc->trims->raw[1];
     // adc[2] -= acc->trims->raw[2];
 
-
     imuSensor_t * accum = &accel->accum;
-    accum->values.x += accel->adc[0];
-    accum->values.y += accel->adc[1];
-    accum->values.z += accel->adc[2];
+    accum->values.x += _adc.x;
+    accum->values.y += _adc.y;
+    accum->values.z += _adc.z;
     accum->count++;
 }

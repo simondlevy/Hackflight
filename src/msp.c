@@ -132,7 +132,7 @@ typedef mspResult_e (*mspProcessCommandFnPtr)(
         mspPacket_t *reply,
         mspPostProcessFnPtr *mspPostProcessFn,
         vehicleState_t * vstate,
-        rx_axes_t * rxax,
+        rxAxes_t * rxax,
         void * motorDevice,
         float * motors);
 
@@ -187,7 +187,7 @@ static bool processOutCommand(
         int16_t cmdMSP,
         sbuf_t *dst,
         vehicleState_t * vstate,
-        rx_axes_t * rxax)
+        rxAxes_t * rxax)
 {
     bool unsupportedCommand = false;
 
@@ -246,7 +246,7 @@ static mspResult_e fcProcessCommand(
         mspPacket_t *reply,
         mspPostProcessFnPtr *mspPostProcessFn,
         vehicleState_t * vstate,
-        rx_axes_t * rxax,
+        rxAxes_t * rxax,
         void * motorDevice,
         float * motors) {
 
@@ -440,7 +440,7 @@ static mspPostProcessFnPtr serialProcessReceivedCommand(
         mspPort_t *msp,
         mspProcessCommandFnPtr mspProcessCommandFn,
         vehicleState_t * vstate,
-        rx_axes_t * rxax,
+        rxAxes_t * rxax,
         void * motorDevice,
         float * motors)
 {
@@ -540,7 +540,7 @@ void mspTriggerDebugging(void)
 
 void mspUpdate(
         vehicleState_t * vstate,
-        rx_axes_t *rxaxes,
+        rxAxes_t *rxaxes,
         bool armed,
         void * motorDevice,
         float * motors)

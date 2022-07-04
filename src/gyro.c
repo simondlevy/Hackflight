@@ -154,7 +154,9 @@ void gyroInit(hackflight_t * hf)
 
 void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
 {
-    if (!gyroIsReady()) return;
+    if (!gyroIsReady()) {
+        return;
+    }
 
     gyro_t * gyro = &hf->gyro;
 
@@ -165,7 +167,6 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
     if (calibrationComplete) {
 
         // move 16-bit gyro data into floats to avoid overflows in calculations
-
         _adc.x = gyroReadRaw(0) - gyro->zero[0];
         _adc.y = gyroReadRaw(1) - gyro->zero[1];
         _adc.z = gyroReadRaw(2) - gyro->zero[2];

@@ -200,10 +200,10 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 
     imuFusion_t * fusionPrev = &hf->imuFusionPrev;
 
-    gyro_reset_t new_gyro_reset = {0};
+    gyroReset_t new_gyro_reset = {0};
 
     if (!armingIsArmed(&hf->arming)) {
-        memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyro_reset_t));
+        memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyroReset_t));
     }
 
     mahony(dt, &gyroAvg, &fusionPrev->quat, quat);

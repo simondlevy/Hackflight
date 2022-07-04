@@ -30,12 +30,12 @@ static const uint16_t ACCEL_RATE = 1000;
 extern "C" {
 #endif
 
-    void  accelInit(hackflight_t * hackflight);
-    void  accelUpdate(void * hackflight, uint32_t usec);
+    void accelInit(hackflight_t * hackflight);
+    void accelUpdate(void * hackflight, uint32_t usec);
 
     // Hardware-dependent
     bool  accelIsReady(void);
-    float accelRead(uint8_t axis) ;
+    float accelReadRaw(uint8_t axis) ;
 
 #if defined(__cplusplus)
 }

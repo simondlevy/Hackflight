@@ -38,13 +38,16 @@ static const uint16_t MAG_SCALE        = 1000;
 
 static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
                                         USFS_INTERRUPT_ERROR |
-                                        USFS_INTERRUPT_GYRO;
+                                        USFS_INTERRUPT_GYRO |
+                                        USFS_INTERRUPT_ACCEL;
 
 static const uint8_t REPORT_HZ = 2;
 
+static bool _accelIsReady;
+static int16_t _accelAdc[3];
 static int16_t _gyroAdc[3];
-static volatile bool _gotNewData;
 
+static volatile bool _gotNewData;
 static volatile uint32_t _gyroInterruptCount;
 static volatile uint32_t _gyroSyncTime;
 
@@ -60,13 +63,12 @@ extern "C" {
 
     bool accelIsReady(void)
     {
-        return false;
+        return _accelIsReady;
     }
 
-    float accelRead(uint8_t axis)
+    float accelReadRaw(uint8_t axis)
     {
-        (void)axis;
-        return 0;
+        return _accelAdc[axis];
     }
 
     uint32_t gyroInterruptCount(void)
@@ -77,6 +79,8 @@ extern "C" {
     bool gyroIsReady(void)
     {
         bool result = false;
+
+        _accelIsReady = false;
 
         if (_gotNewData) { 
 
@@ -91,6 +95,11 @@ extern "C" {
             if (usfsEventStatusIsGyrometer(eventStatus)) { 
                 usfsReadGyrometer(_gyroAdc);
                 result = true;
+            }
+
+            if (usfsEventStatusIsAccelerometer(eventStatus)) { 
+                usfsReadAccelerometer(_accelAdc);
+                _accelIsReady = true;
             }
 
         } 
