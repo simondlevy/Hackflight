@@ -46,7 +46,7 @@ static void altHoldPidUpdate(
         uint32_t currentTimeUs
         , demands_t * demands
         , void * data
-        , vehicle_state_t * vstate
+        , vehicleState_t * vstate
         , bool reset
         )
 {

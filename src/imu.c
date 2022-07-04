@@ -76,7 +76,10 @@ static float atan2_approx(float y, float x)
     return res;
 }
 
-static void quat2euler(quaternion_t * quat, vehicle_state_t * state, rotation_t * rot)
+static void quat2euler(
+        quaternion_t * quat,
+        vehicleState_t * state,
+        rotation_t * rot)
 {
     float qw = quat->w;
     float qx = quat->x;
@@ -112,7 +115,7 @@ static float square(float x)
     return x * x;
 }
 
-static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
+static void getAverage(imuSensor_t * sensor, uint32_t period, axes_t * avg)
 {
     uint32_t denom = sensor->count * period;
 
@@ -161,9 +164,12 @@ void imuAccumulateGyro(gyro_t * gyro)
     static float _adcf[3];
 
     // integrate using trapezium rule to avoid bias
-    gyro->accum.values.x += 0.5f * (_adcf[0] + gyro->dps_filtered[0]) * CORE_PERIOD();
-    gyro->accum.values.y += 0.5f * (_adcf[1] + gyro->dps_filtered[1]) * CORE_PERIOD();
-    gyro->accum.values.z += 0.5f * (_adcf[2] + gyro->dps_filtered[2]) * CORE_PERIOD();
+    gyro->accum.values.x +=
+        0.5f * (_adcf[0] + gyro->dps_filtered[0]) * CORE_PERIOD();
+    gyro->accum.values.y +=
+        0.5f * (_adcf[1] + gyro->dps_filtered[1]) * CORE_PERIOD();
+    gyro->accum.values.z +=
+        0.5f * (_adcf[2] + gyro->dps_filtered[2]) * CORE_PERIOD();
 
     gyro->accum.count++;
 
@@ -192,7 +198,7 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 
     float dt = deltaT * 1e-6;
 
-    imu_fusion_t * fusionPrev = &hf->imuFusionPrev;
+    imuFusion_t * fusionPrev = &hf->imuFusionPrev;
 
     gyro_reset_t new_gyro_reset = {0};
 
@@ -203,14 +209,18 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     mahony(dt, &gyroAvg, &fusionPrev->quat, quat);
 }
 
-void updateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
+void updateFusion(
+        hackflight_t * hf,
+        uint32_t time,
+        quaternion_t * quat,
+        rotation_t * rot)
 {
-    imu_fusion_t fusion;
+    imuFusion_t fusion;
     fusion.time = time;
     memcpy(&fusion.quat, quat, sizeof(quaternion_t));
     memcpy(&fusion.rot, rot, sizeof(rotation_t));
-    memcpy(&hf->imuFusionPrev, &fusion, sizeof(imu_fusion_t));
-    memset(&hf->gyro.accum, 0, sizeof(imu_sensor_t));
+    memcpy(&hf->imuFusionPrev, &fusion, sizeof(imuFusion_t));
+    memset(&hf->gyro.accum, 0, sizeof(imuSensor_t));
 }
 
 void imuGetEulerAngles(hackflight_t * hf, uint32_t time)

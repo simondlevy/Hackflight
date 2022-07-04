@@ -24,12 +24,6 @@
 extern "C" {
 #endif
 
-static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
-{
-    task->fun = fun;
-    task->desiredPeriodUs = 1000000 / rate;
-}
-
 #if defined(__cplusplus)
 }
 #endif

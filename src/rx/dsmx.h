@@ -32,4 +32,4 @@ extern "C" {
 }
 #endif
 
-rx_dev_funs_t dsmxDeviceFuns = { rxDevInitDsmx, rxDevCheckDsmx, rxDevConvertDsmx };
+rxDevFuns_t dsmxDeviceFuns = { rxDevInitDsmx, rxDevCheckDsmx, rxDevConvertDsmx };

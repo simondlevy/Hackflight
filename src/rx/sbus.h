@@ -32,4 +32,4 @@ extern "C" {
 }
 #endif
 
-rx_dev_funs_t sbusDeviceFuns = { rxDevInitSbus, rxDevCheckSbus, rxDevConvertSbus };
+rxDevFuns_t sbusDeviceFuns = { rxDevInitSbus, rxDevCheckSbus, rxDevConvertSbus };

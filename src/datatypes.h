@@ -123,7 +123,7 @@ typedef struct {
     float dtheta;
     float psi;
     float dpsi;
-} vehicle_state_t;
+} vehicleState_t;
 
 // General PID control ---------------------------------------------------------
 
@@ -131,7 +131,7 @@ typedef void (*pid_fun_t)(
         uint32_t usec,
         demands_t * demands,
         void * data,
-        vehicle_state_t * vstate,
+        vehicleState_t * vstate,
         bool reset
         );
 
@@ -139,20 +139,17 @@ typedef void (*pid_fun_t)(
 typedef struct {
     pid_fun_t fun;
     void * data;
-} pid_controller_t;
+} pidController_t;
 
 
 // Tasks ------------------------------------------------------------------------
 
-typedef void (*task_fun_t)(
-        void * hackflight,
-        uint32_t usec
-        );
+typedef void (*task_fun_t)(void * hackflight, uint32_t usec);
 
 typedef struct {
 
     // For both hardware and sim implementations
-    void (*fun)(void * hackflight, uint32_t time);
+    void (*fun)(void * hackflight, uint32_t usec);
     int32_t desiredPeriodUs;            
     uint32_t lastExecutedAtUs;          
 
@@ -182,7 +179,7 @@ typedef struct {
 typedef struct {
     axes_t values;
     uint32_t count;
-} imu_sensor_t;
+} imuSensor_t;
 
 typedef struct {
     uint32_t quietPeriodEnd;
@@ -195,7 +192,7 @@ typedef struct {
     quaternion_t quat;
     rotation_t rot;
     gyro_reset_t gyroReset;
-} imu_fusion_t;
+} imuFusion_t;
 
 typedef void (*imu_align_fun)(axes_t * axes);
 
@@ -246,7 +243,7 @@ typedef union {
 } gyroLowpassFilter_t;
 
 typedef struct {
-    imu_sensor_t accum;
+    imuSensor_t accum;
     float        dps[3];          // aligned, calibrated, scaled, unfiltered
     float        dps_filtered[3]; // filtered 
     uint8_t      sampleCount;     // sample counter
@@ -424,7 +421,7 @@ typedef struct {
     rx_dev_check_fun check;
     rx_dev_convert_fun convert;
 
-} rx_dev_funs_t;
+} rxDevFuns_t;
 
 typedef struct {
 
@@ -466,23 +463,32 @@ typedef struct {
 typedef void (*mixer_t)(float throttle, float roll, float pitch, float yaw,
         float * motors);
 
+// Accelerometer ---------------------------------------------------------------
+
+typedef struct {
+
+    imuSensor_t accum;
+
+} accel_t;
+
 // Hackflight ------------------------------------------------------------------
 
 typedef struct {
 
+    accel_t          accel;
     arming_t         arming;
-    anglePid_t      anglepid;
+    anglePid_t       anglepid;
     task_t           attitudeTask;
     demands_t        demands;
     gyro_t           gyro;
     imu_align_fun    imuAlignFun;
-    imu_fusion_t     imuFusionPrev;
+    imuFusion_t     imuFusionPrev;
     float            maxArmingAngle;
     mixer_t          mixer;
     void *           motorDevice;
     float            mspMotors[4];
     task_t           mspTask;
-    pid_controller_t pidControllers[10];
+    pidController_t pidControllers[10];
     uint8_t          pidCount;
     bool             pidZeroThrottleItermReset;
     rx_t             rx;
@@ -491,7 +497,7 @@ typedef struct {
     scheduler_t      scheduler;
     task_t           sensorTasks[10];
     uint8_t          sensorTaskCount;
-    vehicle_state_t  vstate;
+    vehicleState_t  vstate;
 
 } hackflight_t;
 

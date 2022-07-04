@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "accel.h"
 #include "arming.h"
 #include "gyro.h"
 #include "debug.h"
@@ -29,9 +30,6 @@
 #include "msp.h"
 #include "rx.h"
 #include "system.h"
-
-// Tuning constants for angle PID controller ----------------------------------
-
 
 // Scheduling constants -------------------------------------------------------
 
@@ -310,7 +308,7 @@ extern "C" {
 
     void hackflightInitFull(
             hackflight_t * hf,
-            rx_dev_funs_t * rxDeviceFuns,
+            rxDevFuns_t * rxDeviceFuns,
             serialPortIdentifier_e rxDevPort,
             anglePidConstants_t * anglePidConstants,
             mixer_t mixer,
@@ -326,6 +324,8 @@ extern "C" {
         ledFlash(10, 50);
         failsafeInit();
         failsafeReset();
+
+        hackflightAddSensor(hf, accelUpdate, ACCEL_RATE);
 
         hf->rx.devCheck = rxDeviceFuns->check;
         hf->rx.devConvert = rxDeviceFuns->convert;

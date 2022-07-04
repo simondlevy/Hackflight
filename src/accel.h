@@ -18,9 +18,23 @@
 
 #pragma once
 
-#include "hackflight.h"
+#include <stdint.h>
+#include <stdbool.h>
 
-static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
-{
-    initTask(&hf->sensorTasks[hf->sensorTaskCount++], fun, rate);
+#include "imu.h"
+
+static const uint16_t ACCEL_1G   = 2048;
+static const uint16_t ACCEL_RATE = 1000;
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+    void  accelInit(void);
+    bool  accelIsReady(void);
+    float accelRead(uint8_t axis) ;
+    void  accelUpdate(void * hackflight, uint32_t usec);
+
+#if defined(__cplusplus)
 }
+#endif

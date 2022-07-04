@@ -53,13 +53,31 @@ static const uint16_t PIDSUM_LIMIT      = 500;
 extern "C" {
 #endif
 
+// General task support -------------------------------------------------------
+
+static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
+{
+    task->fun = fun;
+    task->desiredPeriodUs = 1000000 / rate;
+}
+
+// General sensor support ------------------------------------------------------
+
+static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
+{
+    initTask(&hf->sensorTasks[hf->sensorTaskCount++], fun, rate);
+}
+
+// Attitude estimation --------------------------------------------------------
+
 static void task_attitude(void * hackflight, uint32_t time)
 {
     hackflight_t * hf = (hackflight_t *)hackflight;
+
     imuGetEulerAngles(hf, time);
 }
 
-// PID controller support -----------------------------------------------------
+// PID controller support ------------------------------------------------------
 
 static void hackflightAddPidController(hackflight_t * hf, pid_fun_t fun, void * data)
 {
@@ -68,7 +86,7 @@ static void hackflightAddPidController(hackflight_t * hf, pid_fun_t fun, void * 
     hf->pidCount++;
 }
 
-// RX polling task ------------------------------------------------------------
+// RX polling task -------------------------------------------------------------
 
 static void task_rx(void * hackflight, uint32_t time)
 {
@@ -123,7 +141,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
     rxGetDemands(&hf->rx, currentTimeUs, &hf->anglepid, &hf->demands);
 
     for (uint8_t k=0; k<hf->pidCount; ++k) {
-        pid_controller_t pid = hf->pidControllers[k];
+        pidController_t pid = hf->pidControllers[k];
         pid.fun(currentTimeUs, &hf->demands, pid.data,
                 &hf->vstate, hf->pidZeroThrottleItermReset);
     }

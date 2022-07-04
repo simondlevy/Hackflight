@@ -152,7 +152,7 @@ void gyroInit(hackflight_t * hf)
     setCalibrationCycles(gyro); // start calibrating
 }
 
-void gyroReadScaled(hackflight_t * hf, vehicle_state_t * vstate)
+void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
 {
     if (!gyroIsReady()) return;
 
