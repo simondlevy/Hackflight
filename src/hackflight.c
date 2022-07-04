@@ -314,10 +314,11 @@ extern "C" {
             mixer_t mixer,
             void * motorDevice,
             uint8_t imuInterruptPin,
-            imu_align_fun imuAlign,
+            imuAlignFun_t imuAlign,
             uint8_t ledPin)
     {
         mspInit();
+        accelInit(hf);
         gyroInit(hf);
         imuInit(hf, imuInterruptPin);
         ledInit(ledPin);

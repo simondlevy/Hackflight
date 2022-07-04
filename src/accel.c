@@ -155,38 +155,41 @@ static void biquadFilterInitLPF(
 
 // ============================================================================
 
+void accelInit(hackflight_t * hf)
+{
+    accel_t * accel = &hf->accel;
+
+    uint32_t accSampleTimeUs = 1e6 / ACCEL_RATE;
+
+    biquadFilterInitLPF(&accel->filter[0], LPF_CUTOFF_HZ, accSampleTimeUs); 
+    biquadFilterInitLPF(&accel->filter[1], LPF_CUTOFF_HZ, accSampleTimeUs); 
+    biquadFilterInitLPF(&accel->filter[2], LPF_CUTOFF_HZ, accSampleTimeUs); 
+}
+
 void  accelUpdate(void * hackflight, uint32_t usec)
 {
-    hackflight_t * hf = (hackflight_t *)hackflight;
     (void)usec;
 
-    static float adc[3];
-    static bool initialized;
-    static biquadFilter_t filter[3];
+    hackflight_t * hf = (hackflight_t *)hackflight;
+
+    accel_t * accel = &hf->accel;
+
     // static flightDynamicsTrims_t * trims;
 
     // the calibration is done is the main loop. Calibrating decreases at each
     // cycle down to 0, then we enter in a normal mode.
     // uint16_t calibrating;      
 
-    if (!initialized) {
-        const uint32_t accSampleTimeUs = 1e6 / ACCEL_RATE;
-        biquadFilterInitLPF(&filter[0], LPF_CUTOFF_HZ, accSampleTimeUs); 
-        biquadFilterInitLPF(&filter[1], LPF_CUTOFF_HZ, accSampleTimeUs); 
-        biquadFilterInitLPF(&filter[2], LPF_CUTOFF_HZ, accSampleTimeUs); 
-    }
-    initialized = true;
-
-    //if (!accelIsReady()) {
-    //    return;
-   // }
+    if (!accelIsReady()) {
+        return;
+     }
 
     for (int k = 0; k < 3; k++) {
-        //adc[k] = accelRead(k);
+        accel->adc[k] = accelRead(k);
     }
 
     for (int k = 0; k < 3; k++) {
-        adc[k] = biquadFilterApply(&filter[k], adc[k]);
+        accel->adc[k] = biquadFilterApply(&accel->filter[k], accel->adc[k]);
     }
 
     //alignSensorViaRotation(adc);
@@ -199,10 +202,10 @@ void  accelUpdate(void * hackflight, uint32_t usec)
     // adc[1] -= acc->trims->raw[1];
     // adc[2] -= acc->trims->raw[2];
 
-    imuSensor_t * accum = &hf->accel.accum;
 
-    accum->values.x += adc[0];
-    accum->values.y += adc[1];
-    accum->values.z += adc[2];
+    imuSensor_t * accum = &accel->accum;
+    accum->values.x += accel->adc[0];
+    accum->values.y += accel->adc[1];
+    accum->values.z += accel->adc[2];
     accum->count++;
 }

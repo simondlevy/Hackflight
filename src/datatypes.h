@@ -194,7 +194,7 @@ typedef struct {
     gyro_reset_t gyroReset;
 } imuFusion_t;
 
-typedef void (*imu_align_fun)(axes_t * axes);
+typedef void (*imuAlignFun_t)(axes_t * axes);
 
  // Stats ------------------------------------------------------------------------
 
@@ -467,7 +467,9 @@ typedef void (*mixer_t)(float throttle, float roll, float pitch, float yaw,
 
 typedef struct {
 
-    imuSensor_t accum;
+    imuSensor_t    accum;
+    float          adc[3];
+    biquadFilter_t filter[3];
 
 } accel_t;
 
@@ -481,14 +483,14 @@ typedef struct {
     task_t           attitudeTask;
     demands_t        demands;
     gyro_t           gyro;
-    imu_align_fun    imuAlignFun;
-    imuFusion_t     imuFusionPrev;
+    imuAlignFun_t    imuAlignFun;
+    imuFusion_t      imuFusionPrev;
     float            maxArmingAngle;
     mixer_t          mixer;
     void *           motorDevice;
     float            mspMotors[4];
     task_t           mspTask;
-    pidController_t pidControllers[10];
+    pidController_t  pidControllers[10];
     uint8_t          pidCount;
     bool             pidZeroThrottleItermReset;
     rx_t             rx;
@@ -497,7 +499,7 @@ typedef struct {
     scheduler_t      scheduler;
     task_t           sensorTasks[10];
     uint8_t          sensorTaskCount;
-    vehicleState_t  vstate;
+    vehicleState_t   vstate;
 
 } hackflight_t;
 

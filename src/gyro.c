@@ -104,7 +104,8 @@ static void calibrate(gyro_t * gyro)
 {
     for (int axis = 0; axis < 3; axis++) {
         // Reset g[axis] at start of calibration
-        if (gyro->calibration.cyclesRemaining == (int32_t)calculateCalibratingCycles()) {
+        if (gyro->calibration.cyclesRemaining ==
+                (int32_t)calculateCalibratingCycles()) {
             gyro->calibration.sum[axis] = 0.0f;
             devClear(&gyro->calibration.var[axis]);
             // zero is set to zero until calibration complete
@@ -125,7 +126,6 @@ static void calibrate(gyro_t * gyro)
                 return;
             }
 
-            // please take care with exotic boardalignment !!
             gyro->zero[axis] =
                 gyro->calibration.sum[axis] / calculateCalibratingCycles();
         }

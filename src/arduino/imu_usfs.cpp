@@ -58,6 +58,17 @@ static void interruptHandler()
 
 extern "C" {
 
+    bool accelIsReady(void)
+    {
+        return false;
+    }
+
+    float accelRead(uint8_t axis)
+    {
+        (void)axis;
+        return 0;
+    }
+
     uint32_t gyroInterruptCount(void)
     {
         return _gyroInterruptCount;

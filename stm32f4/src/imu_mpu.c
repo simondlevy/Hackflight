@@ -275,7 +275,7 @@ static const mpuDetectionResult_t *gyroMpuDetectionResult(void)
     return &gyroDev.mpuDetectionResult;
 }
 
-void accelInit(void)
+static void accelDevInit(void)
 {
     accelDev.gyro = &gyroDev;
     accelDev.mpuDetectionResult = *gyroMpuDetectionResult();
@@ -294,7 +294,7 @@ float accelRead(uint8_t k)
 }
 
 
-void gyroDevInit(void)
+static void gyroDevInit(void)
 {
     gyroDeviceConfig_t gyroDeviceConfig;
 
@@ -378,5 +378,5 @@ void imuInit(hackflight_t * hf, uint8_t interruptPin)
     (void)interruptPin;
 
     gyroDevInit();
-    accelInit();
+    accelDevInit();
 }

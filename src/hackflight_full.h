@@ -32,7 +32,7 @@ void hackflightInitFull(
         mixer_t mixer,
         void * motorDevice,
         uint8_t imuInterruptPin,
-        imu_align_fun imuAlign,
+        imuAlignFun_t imuAlign,
         uint8_t ledPin);
 
 void hackflightStep(hackflight_t * hackflight);
