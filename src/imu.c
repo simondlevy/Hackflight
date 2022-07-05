@@ -119,17 +119,6 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
     imuUpdateFusion(hf, time, &quat, &rot);
 }
 
-int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
-{
-    int32_t gyroSkew = cmpTimeCycles(nextTargetCycles, gyroSyncTime()) % desiredPeriodCycles;
-
-    if (gyroSkew > (desiredPeriodCycles / 2)) {
-        gyroSkew -= desiredPeriodCycles;
-    }
-
-    return gyroSkew;
-}
-
 
 #if defined(__cplusplus)
 }
