@@ -122,7 +122,6 @@ COMMON_SRC = \
             $(HSRC_DIR)/failsafe.c \
             $(HSRC_DIR)/gyro.c \
             $(HSRC_DIR)/hackflight.c \
-            $(HSRC_DIR)/imu.c \
             $(HSRC_DIR)/led.c \
             $(HSRC_DIR)/maths.c \
             $(HSRC_DIR)/msp.c \

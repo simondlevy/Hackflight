@@ -27,7 +27,7 @@
 #include "deg2rad.h"
 #include "gyro.h"
 #include "imu.h"
-#include "maths.h"
+#include "quat2euler.h"
 #include "time.h"
 
 static float invSqrt(float x)
@@ -103,7 +103,7 @@ void imuAccumulateGyro(gyro_t * gyro)
     }
 }
 
-void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
+void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 {
     int32_t deltaT = time - hf->imuFusionPrev.time;
 
@@ -120,19 +120,16 @@ void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
         memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyroReset_t));
     }
 
-    mahony(dt, &gyroAvg, &fusionPrev->quat, quat);
-}
+    quaternion_t quat = {0,0,0,0};
+    mahony(dt, &gyroAvg, &fusionPrev->quat, &quat);
 
-void imuUpdateFusion(
-        hackflight_t * hf,
-        uint32_t time,
-        quaternion_t * quat,
-        rotation_t * rot)
-{
+    rotation_t rot = {0,0,0};
+    quat2euler(&quat, &hf->vstate, &rot);
+
     imuFusion_t fusion;
     fusion.time = time;
-    memcpy(&fusion.quat, quat, sizeof(quaternion_t));
-    memcpy(&fusion.rot, rot, sizeof(rotation_t));
+    memcpy(&fusion.quat, &quat, sizeof(quaternion_t));
+    memcpy(&fusion.rot, &rot, sizeof(rotation_t));
     memcpy(&hf->imuFusionPrev, &fusion, sizeof(imuFusion_t));
     memset(&hf->gyro.accum, 0, sizeof(imuSensor_t));
 }

@@ -21,12 +21,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "arming.h"
 #include "datatypes.h"
-#include "gyro.h"
-#include "imu.h"
-#include "maths.h"
-#include "time.h"
 
 // Constants for trig functions
 
@@ -102,23 +97,6 @@ static void quat2euler(
     rot->r21 = r21;
     rot->r22 = r22;
 }
-
-// =============================================================================
-
-void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
-{
-    quaternion_t quat = {0,0,0,0};
-
-    imuGetQuaternion(hf, time, &quat);
-
-    rotation_t rot = {0,0,0};
-
-    quat2euler(&quat, &hf->vstate, &rot);
-
-    // Stubbed for hardware-quaternion IMUs
-    imuUpdateFusion(hf, time, &quat, &rot);
-}
-
 
 #if defined(__cplusplus)
 }

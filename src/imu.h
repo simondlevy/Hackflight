@@ -24,21 +24,11 @@
 extern "C" {
 #endif
 
-    void    imuAccumulateGyro(gyro_t * gyro);
+    void imuAccumulateGyro(gyro_t * gyro);
 
-    void    imuGetEulerAngles(hackflight_t * hf, uint32_t time);
+    void imuGetEulerAngles(hackflight_t * hf, uint32_t time);
 
-    int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles);
-
-    void    imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat);
-
-    void    imuInit(hackflight_t * hf, uint8_t interruptPin);
-
-    void    imuUpdateFusion(
-            hackflight_t * hf,
-            uint32_t time,
-            quaternion_t * quat,
-            rotation_t * rot);
+    void imuInit(hackflight_t * hf, uint8_t interruptPin);
 
 #if defined(__cplusplus)
 }
