@@ -105,77 +105,20 @@ static void quat2euler(
     rot->r22 = r22;
 }
 
-static float invSqrt(float x)
-{
-    return 1.0f / sqrtf(x);
-}
-
-static float square(float x)
-{
-    return x * x;
-}
-
-static void getAverage(imuSensor_t * sensor, uint32_t period, axes_t * avg)
-{
-    uint32_t denom = sensor->count * period;
-
-    avg->x = denom ? sensor->values.x / denom : 0;
-    avg->y = denom ? sensor->values.y / denom : 0;
-    avg->z = denom ? sensor->values.z / denom : 0;
-}
-
-static void mahony(
-        float dt,
-        axes_t * gyro,
-        quaternion_t * quat_old,
-        quaternion_t * quat_new)
-{
-    // Convert gyro degrees to radians
-    float gx = deg2rad(gyro->x);
-    float gy = deg2rad(gyro->y);
-    float gz = deg2rad(gyro->z);
-
-    // Apply proportional and integral feedback, then integrate rate-of-change
-    float gx1 = gx * dt / 2;
-    float gy1 = gy * dt / 2;
-    float gz1 = gz * dt / 2;
-
-    // Update quaternion
-    float qw =
-        quat_old->w - quat_old->x * gx1 - quat_old->y * gy1 - quat_old->z * gz1;
-    float qx =
-        quat_old->x + quat_old->w * gx1 + quat_old->y * gz1 - quat_old->z * gy1;
-    float qy =
-        quat_old->y + quat_old->w * gy1 - quat_old->x * gz1 + quat_old->z * gx1;
-    float qz =
-        quat_old->z + quat_old->w * gz1 + quat_old->x * gy1 - quat_old->y * gx1;
-
-    // Normalise quaternion
-    float recipNorm = invSqrt(square(qw) + square(qx) + square(qy) + square(qz));
-    quat_new->w = qw * recipNorm;
-    quat_new->x = qx * recipNorm;
-    quat_new->y = qy * recipNorm;
-    quat_new->z = qz * recipNorm;
-}
 // =============================================================================
 
-void imuAccumulateGyro(gyro_t * gyro)
+void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 {
-    static float _adcf[3];
+    quaternion_t quat = {0,0,0,0};
 
-    // integrate using trapezium rule to avoid bias
-    gyro->accum.values.x +=
-        0.5f * (_adcf[0] + gyro->dps_filtered[0]) * CORE_PERIOD();
-    gyro->accum.values.y +=
-        0.5f * (_adcf[1] + gyro->dps_filtered[1]) * CORE_PERIOD();
-    gyro->accum.values.z +=
-        0.5f * (_adcf[2] + gyro->dps_filtered[2]) * CORE_PERIOD();
+    imuGetQuaternion(hf, time, &quat);
 
-    gyro->accum.count++;
+    rotation_t rot = {0,0,0};
 
-    for (int axis = 0; axis < 3; axis++) {
-        _adcf[axis] = gyro->dps_filtered[axis];
-    }
+    quat2euler(&quat, &hf->vstate, &rot);
+
+    // Stubbed for hardware-quaternion IMUs
+    imuUpdateFusion(hf, time, &quat, &rot);
 }
 
 int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
@@ -189,52 +132,6 @@ int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
     return gyroSkew;
 }
 
-static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
-{
-    int32_t deltaT = time - hf->imuFusionPrev.time;
-
-    axes_t gyroAvg = {0,0,0};
-    getAverage(&hf->gyro.accum, CORE_PERIOD(), &gyroAvg);
-
-    float dt = deltaT * 1e-6;
-
-    imuFusion_t * fusionPrev = &hf->imuFusionPrev;
-
-    gyroReset_t new_gyro_reset = {0};
-
-    if (!armingIsArmed(&hf->arming)) {
-        memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyroReset_t));
-    }
-
-    mahony(dt, &gyroAvg, &fusionPrev->quat, quat);
-}
-
-void updateFusion(
-        hackflight_t * hf,
-        uint32_t time,
-        quaternion_t * quat,
-        rotation_t * rot)
-{
-    imuFusion_t fusion;
-    fusion.time = time;
-    memcpy(&fusion.quat, quat, sizeof(quaternion_t));
-    memcpy(&fusion.rot, rot, sizeof(rotation_t));
-    memcpy(&hf->imuFusionPrev, &fusion, sizeof(imuFusion_t));
-    memset(&hf->gyro.accum, 0, sizeof(imuSensor_t));
-}
-
-void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
-{
-    quaternion_t quat = {0,0,0,0};
-
-    getQuaternion(hf, time, &quat);
-
-    rotation_t rot = {0,0,0};
-
-    quat2euler(&quat, &hf->vstate, &rot);
-
-    updateFusion(hf, time, &quat, &rot);
-}
 
 #if defined(__cplusplus)
 }

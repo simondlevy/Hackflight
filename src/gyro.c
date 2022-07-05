@@ -224,8 +224,7 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
 
     gyro->sampleCount = 0;
 
-
-    // Used for quaternion filter; stubbed otherwise
+    // Used for sensor fusion via quaternion filter; stubbed otherwise
     imuAccumulateGyro(gyro);
 
     vstate->dphi   = gyro->dps_filtered[0];

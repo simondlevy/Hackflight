@@ -30,7 +30,15 @@ extern "C" {
 
     int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles);
 
+    void    imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat);
+
     void    imuInit(hackflight_t * hf, uint8_t interruptPin);
+
+    void    imuUpdateFusion(
+            hackflight_t * hf,
+            uint32_t time,
+            quaternion_t * quat,
+            rotation_t * rot);
 
 #if defined(__cplusplus)
 }
