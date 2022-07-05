@@ -59,7 +59,12 @@ static void task_attitude(void * hackflight, uint32_t time)
 {
     hackflight_t * hf = (hackflight_t *)hackflight;
 
-    imuGetEulerAngles(hf, time);
+    axes_t angles = {0,0,0};
+    imuGetEulerAngles(hf, time, &angles);
+
+    hf->vstate.phi   = angles.x;
+    hf->vstate.theta = angles.y;
+    hf->vstate.psi   = angles.z;
 }
 
 // PID controller support ------------------------------------------------------

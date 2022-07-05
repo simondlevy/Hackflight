@@ -103,7 +103,7 @@ void imuAccumulateGyro(gyro_t * gyro)
     }
 }
 
-void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
+void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
 {
     int32_t deltaT = time - hf->imuFusionPrev.time;
 
@@ -114,7 +114,7 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 
     imuFusion_t * fusionPrev = &hf->imuFusionPrev;
 
-    gyroReset_t new_gyro_reset = {0};
+    gyroReset_t new_gyro_reset = {0,0,false};
 
     if (!armingIsArmed(&hf->arming)) {
         memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyroReset_t));
@@ -124,7 +124,7 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
     mahony(dt, &gyroAvg, &fusionPrev->quat, &quat);
 
     rotation_t rot = {0,0,0};
-    quat2euler(&quat, &hf->vstate, &rot);
+    quat2euler(&quat, angles, &rot);
 
     imuFusion_t fusion;
     fusion.time = time;

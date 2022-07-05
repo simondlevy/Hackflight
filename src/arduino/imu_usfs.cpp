@@ -19,9 +19,11 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+
 #include <USFS.h>
 
 #include <imu.h>
+#include <quat2euler.h>
 
 static const uint8_t  ACCEL_RATE_TENTH = 20; // 1/10th actual rate
 static const uint8_t  GYRO_RATE_TENTH = 100; // 1/10th actual rate
@@ -43,7 +45,6 @@ USFS_INTERRUPT_GYRO;
 static const uint8_t REPORT_HZ = 2;
 
 static bool    _accelIsReady;
-static int16_t _accelAdc[3];
 static int16_t _gyroAdc[3];
 static float   _quat[4];
 
@@ -110,18 +111,15 @@ extern "C" {
         return _gyroSyncTime;
     }
 
-    void imuGetQuaternion(
-            hackflight_t * hf,
-            uint32_t time,
-            quaternion_t * quat)
+    void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
     {
-        (void)hf;
         (void)time;
 
-        quat->w = _quat[0];
-        quat->x = _quat[1];
-        quat->y = _quat[2];
-        quat->z = _quat[3];
+        quaternion_t quat = {_quat[0], _quat[1], _quat[2], _quat[3]};
+        rotation_t rot = {0,0,0}; // ignored
+        quat2euler(&quat, angles, &rot);
+
+        hf->imuAlignFun(angles);
     }
 
     void imuInit(hackflight_t * hf, uint8_t interruptPin)

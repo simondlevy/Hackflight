@@ -69,10 +69,7 @@ static float atan2_approx(float y, float x)
     return res;
 }
 
-static void quat2euler(
-        quaternion_t * quat,
-        vehicleState_t * state,
-        rotation_t * rot)
+static void quat2euler( quaternion_t * quat, axes_t * angles, rotation_t * rot)
 {
     float qw = quat->w;
     float qx = quat->x;
@@ -88,9 +85,9 @@ static void quat2euler(
     float psi = -atan2_approx(r10, r00); 
 
     // Results
-    state->phi   = atan2_approx(r21, r22); 
-    state->theta = (0.5f * M_PI) - acos_approx(-r20);
-    state->psi   = psi + ((psi < 0) ? 2 * M_PI : 0);
+    angles->x = atan2_approx(r21, r22); 
+    angles->y = (0.5f * M_PI) - acos_approx(-r20);
+    angles->z = psi + ((psi < 0) ? 2 * M_PI : 0);
 
     // Additional output
     rot->r20 = r20;
