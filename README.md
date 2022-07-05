@@ -37,7 +37,7 @@ Simulators can use just the <b>.h</b> files in the
 [src](https://github.com/simondlevy/Hackflight/tree/master/src) directory, which contain the
 basic control algorithms (open-loop control / PID control).  Real flight
 controllers use the code in the <b>.c</b> files located in that directory
-directory and in the [stm32/src](https://github.com/simondlevy/Hackflight/tree/master/stm32/src) directory,
+directory and in the [stm32f4/src](https://github.com/simondlevy/Hackflight/tree/master/stm32f4/src) directory,
 which contain code for real-time scheduling and for reading from physical sensors and R/C receivers.
 
 ## Design principles
