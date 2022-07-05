@@ -19,18 +19,9 @@
 #pragma once
 
 #include "datatypes.h"
+#include "init_task.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
+static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
 {
-    task->fun = fun;
-    task->desiredPeriodUs = 1000000 / rate;
+    initTask(&hf->sensorTasks[hf->sensorTaskCount++], fun, rate);
 }
-
-
-#if defined(__cplusplus)
-}
-#endif

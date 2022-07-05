@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <accel.h>
 #include <core_rate.h>
 #include <datatypes.h>
 #include <hackflight_full.h>
@@ -27,6 +28,7 @@
 #include <imu_alignment/rotate_270.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <rx/sbus.h>
+#include <sensor.h>
 #include <serial.h>
 
 #include "bus_spi.h"
@@ -87,6 +89,9 @@ int main(void)
             0,                  // dummy value for IMU interrupt pin
             imuRotate270,
             37);                // LED pin
+
+    accelInit(&hf);
+    hackflightAddSensor(&hf, accelUpdate, ACCEL_RATE);
 
     while (true) {
         hackflightStep(&hf);

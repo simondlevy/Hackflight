@@ -53,21 +53,6 @@ static const uint16_t PIDSUM_LIMIT      = 500;
 extern "C" {
 #endif
 
-// General task support -------------------------------------------------------
-
-static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
-{
-    task->fun = fun;
-    task->desiredPeriodUs = 1000000 / rate;
-}
-
-// General sensor support ------------------------------------------------------
-
-static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
-{
-    initTask(&hf->sensorTasks[hf->sensorTaskCount++], fun, rate);
-}
-
 // Attitude estimation --------------------------------------------------------
 
 static void task_attitude(void * hackflight, uint32_t time)

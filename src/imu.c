@@ -22,9 +22,7 @@
 #include <math.h>
 
 #include "arming.h"
-#include "core_rate.h"
 #include "datatypes.h"
-#include "deg2rad.h"
 #include "gyro.h"
 #include "imu.h"
 #include "maths.h"

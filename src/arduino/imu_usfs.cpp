@@ -37,20 +37,19 @@ static const uint16_t ACCEL_SCALE      = 8;
 static const uint16_t MAG_SCALE        = 1000;
 
 static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
-                                        USFS_INTERRUPT_ERROR |
-                                        USFS_INTERRUPT_GYRO |
-                                        USFS_INTERRUPT_ACCEL;
+USFS_INTERRUPT_ERROR |
+USFS_INTERRUPT_GYRO;
 
 static const uint8_t REPORT_HZ = 2;
 
-static bool _accelIsReady;
+static bool    _accelIsReady;
 static int16_t _accelAdc[3];
 static int16_t _gyroAdc[3];
+static float   _quat[4];
 
-static volatile bool _gotNewData;
+static volatile bool     _gotNewData;
 static volatile uint32_t _gyroInterruptCount;
 static volatile uint32_t _gyroSyncTime;
-
 
 static void interruptHandler()
 {
@@ -60,16 +59,6 @@ static void interruptHandler()
 }
 
 extern "C" {
-
-    bool accelIsReady(void)
-    {
-        return _accelIsReady;
-    }
-
-    float accelReadRaw(uint8_t axis)
-    {
-        return _accelAdc[axis];
-    }
 
     uint32_t gyroInterruptCount(void)
     {
@@ -97,12 +86,11 @@ extern "C" {
                 result = true;
             }
 
-            if (usfsEventStatusIsAccelerometer(eventStatus)) { 
-                usfsReadAccelerometer(_accelAdc);
-                _accelIsReady = true;
-            }
+            if (usfsEventStatusIsQuaternion(eventStatus)) { 
+                usfsReadQuaternion(_quat);
+            } 
 
-        } 
+        }
 
         return result;
     }
@@ -120,6 +108,20 @@ extern "C" {
     uint32_t gyroSyncTime(void)
     {
         return _gyroSyncTime;
+    }
+
+    void imuGetQuaternion(
+            hackflight_t * hf,
+            uint32_t time,
+            quaternion_t * quat)
+    {
+        (void)hf;
+        (void)time;
+
+        quat->w = _quat[0];
+        quat->x = _quat[1];
+        quat->y = _quat[2];
+        quat->z = _quat[3];
     }
 
     void imuInit(hackflight_t * hf, uint8_t interruptPin)
@@ -150,5 +152,23 @@ extern "C" {
         // Clear interrupts
         usfsCheckStatus();
     }
+
+    void imuAccumulateGyro(gyro_t * gyro)
+    {
+        (void)gyro;
+    }
+
+    void imuUpdateFusion(
+            hackflight_t * hf,
+            uint32_t time,
+            quaternion_t * quat,
+            rotation_t * rot)
+    {
+        (void)hf;
+        (void)time;
+        (void)quat;
+        (void)rot;
+    }
+
 
 } // extern "C"

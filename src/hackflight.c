@@ -21,7 +21,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "accel.h"
 #include "arming.h"
 #include "gyro.h"
 #include "debug.h"
@@ -318,15 +317,12 @@ extern "C" {
             uint8_t ledPin)
     {
         mspInit();
-        accelInit(hf);
         gyroInit(hf);
         imuInit(hf, imuInterruptPin);
         ledInit(ledPin);
         ledFlash(10, 50);
         failsafeInit();
         failsafeReset();
-
-        hackflightAddSensor(hf, accelUpdate, ACCEL_RATE);
 
         hf->rx.devCheck = rxDeviceFuns->check;
         hf->rx.devConvert = rxDeviceFuns->convert;
