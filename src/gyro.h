@@ -26,7 +26,7 @@ extern "C" {
 
     // For both hardware and sim implementations -------------------------------
 
-    void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate);
+    void gyroGetAngularVelocities(hackflight_t * hf);
 
     // For hardware impelmentations --------------------------------------------
 
@@ -34,8 +34,7 @@ extern "C" {
     void     gyroInit(hackflight_t * hf);
     uint32_t gyroInterruptCount(void);
     bool     gyroIsReady(void);
-    int16_t  gyroReadRaw(uint8_t k);
-    uint16_t gyroScaleDps(void);
+    void     gyroReadScaled(axes_t * values);
     uint32_t gyroSyncTime(void);
 
 #if defined(__cplusplus)

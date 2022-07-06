@@ -34,12 +34,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 #include "systemdev.h"
 
-#define MPU_ADDRESS        0x68
-#define MPU_INQUIRY_MASK   0x7E
-
-// Need to see at least this many interrupts during initialisation to confirm EXTI connectivity
-#define GYRO_EXTI_DETECT_THRESHOLD 1000
-
 // The gyro buffer is split 50/50, the first half for the transmit buffer, the
 // second half for the receive buffer This buffer is large enough for the gyros
 // currently supported in imu_mpu.c but should be reviewed id other gyro
@@ -322,9 +316,16 @@ static void gyroDevInit(void)
     gyroDev.initFn(&gyroDev);
 }
 
-uint16_t gyroScaleDps(void)
+static float readScaled(uint8_t axis)
 {
-    return gyroDev.scaleDps;
+    return gyroDev.adcRaw[axis] * (gyroDev.scaleDps / 32768.);
+}
+
+void gyroReadScaled(axes_t * values)
+{
+    values->x = readScaled(0);
+    values->y = readScaled(1);
+    values->z = readScaled(2);
 }
 
 uint32_t gyroInterruptCount(void)
@@ -346,11 +347,6 @@ bool  gyroIsReady(void)
 uint32_t gyroSyncTime(void)
 {
     return gyroDev.gyroSyncEXTI;
-}
-
-int16_t gyroReadRaw(uint8_t k)
-{
-    return gyroDev.adcRaw[k];
 }
 
 bool gyroSyncCheckUpdate(gyroDev_t *gyro)

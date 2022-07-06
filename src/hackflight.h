@@ -124,7 +124,7 @@ static float constrain_demand(float demand, float limit, float scaling)
 
 static void hackflightRunCoreTasks(hackflight_t * hf)
 {
-    gyroReadScaled(hf, &hf->vstate);
+    gyroGetAngularVelocities(hf);
 
     uint32_t currentTimeUs = timeMicros();
 

@@ -27,9 +27,9 @@
 #include "system.h"
 #include "time.h"
 
-static const uint32_t CALIBRATION_DURATION           = 1250000;
+static const uint32_t CALIBRATION_DURATION           = 1250000; // uSec
 static const uint16_t LPF1_DYN_MIN_HZ                = 250;
-static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
+static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 5; // DPS
 static const uint16_t LPF2_STATIC_HZ                 = 500;
 
 #if defined(__cplusplus)
@@ -102,7 +102,12 @@ static void setCalibrationCycles(gyro_t * gyro)
 
 static void calibrate(gyro_t * gyro)
 {
+    axes_t axes = {0,0,0};
+    gyroReadScaled(&axes);
+    float values[3] = {axes.x, axes.y, axes.z};
+
     for (int axis = 0; axis < 3; axis++) {
+
         // Reset g[axis] at start of calibration
         if (gyro->calibration.cyclesRemaining ==
                 (int32_t)calculateCalibratingCycles()) {
@@ -113,8 +118,9 @@ static void calibrate(gyro_t * gyro)
         }
 
         // Sum up CALIBRATING_GYRO_TIME_US readings
-        gyro->calibration.sum[axis] += gyroReadRaw(axis);
-        devPush(&gyro->calibration.var[axis], gyroReadRaw(axis));
+        float value = values[axis];
+        gyro->calibration.sum[axis] += value;
+        devPush(&gyro->calibration.var[axis], value);
 
         if (gyro->calibration.cyclesRemaining == 1) {
             const float stddev = devStandardDeviation(&gyro->calibration.var[axis]);
@@ -152,7 +158,7 @@ void gyroInit(hackflight_t * hf)
     setCalibrationCycles(gyro); // start calibrating
 }
 
-void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
+void gyroGetAngularVelocities(hackflight_t * hf)
 {
     if (!gyroIsReady()) {
         return;
@@ -162,25 +168,26 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
 
     bool calibrationComplete = gyro->calibration.cyclesRemaining <= 0;
 
-    static axes_t _adc;
+    static axes_t _values;
 
-    if (calibrationComplete) {
+    if (!calibrationComplete) {
 
-        // move 16-bit gyro data into floats to avoid overflows in calculations
-        _adc.x = gyroReadRaw(0) - gyro->zero[0];
-        _adc.y = gyroReadRaw(1) - gyro->zero[1];
-        _adc.z = gyroReadRaw(2) - gyro->zero[2];
-
-        hf->imuAlignFun(&_adc);
-
-    } else {
         calibrate(gyro);
     }
 
-    if (calibrationComplete) {
-        gyro->dps[0] = _adc.x * (gyroScaleDps() / 32768.);
-        gyro->dps[1] = _adc.y * (gyroScaleDps() / 32768.);
-        gyro->dps[2] = _adc.z * (gyroScaleDps() / 32768.);
+    else {
+
+        gyroReadScaled(&_values);
+
+        _values.x -= gyro->zero[0];
+        _values.y -= gyro->zero[1];
+        _values.z -= gyro->zero[2];
+
+        hf->imuAlignFun(&_values);
+
+        gyro->dps[0] = _values.x;
+        gyro->dps[1] = _values.y;
+        gyro->dps[2] = _values.z;
     }
 
     if (gyro->downsampleFilterEnabled) {
@@ -227,9 +234,9 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
     // Used for sensor fusion via quaternion filter; stubbed otherwise
     imuAccumulateGyro(gyro);
 
-    vstate->dphi   = gyro->dps_filtered[0];
-    vstate->dtheta = gyro->dps_filtered[1];
-    vstate->dpsi   = gyro->dps_filtered[2];
+    hf->vstate.dphi   = gyro->dps_filtered[0];
+    hf->vstate.dtheta = gyro->dps_filtered[1];
+    hf->vstate.dpsi   = gyro->dps_filtered[2];
 
     gyro->isCalibrating = !calibrationComplete;
 }

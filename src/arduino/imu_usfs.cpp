@@ -44,9 +44,9 @@ USFS_INTERRUPT_GYRO;
 
 static const uint8_t REPORT_HZ = 2;
 
-static bool    _accelIsReady;
-static int16_t _gyroAdc[3];
-static float   _quat[4];
+static bool _accelIsReady;
+static float _gx, _gy, _gz;
+static float _qw, _qx, _qy, _qz;
 
 static volatile bool     _gotNewData;
 static volatile uint32_t _gyroInterruptCount;
@@ -83,12 +83,12 @@ extern "C" {
             }
 
             if (usfsEventStatusIsGyrometer(eventStatus)) { 
-                usfsReadGyrometer(_gyroAdc);
+                usfsReadGyrometer(_gx, _gy, _gz);
                 result = true;
             }
 
             if (usfsEventStatusIsQuaternion(eventStatus)) { 
-                usfsReadQuaternion(_quat);
+                usfsReadQuaternion(_qw, _qx, _qy, _qz);
             } 
 
         }
@@ -96,14 +96,9 @@ extern "C" {
         return result;
     }
 
-    int16_t gyroReadRaw(uint8_t k)
+    void gyroReadScaled(axes_t * values)
     {
-        return _gyroAdc[k];
-    }
-
-    uint16_t gyroScaleDps(void)
-    {
-        return GYRO_SCALE_DPS;
+        usfsReadGyrometer(values->x, values->y, values->z);
     }
 
     uint32_t gyroSyncTime(void)
@@ -115,7 +110,7 @@ extern "C" {
     {
         (void)time;
 
-        quaternion_t quat = {_quat[0], _quat[1], _quat[2], _quat[3]};
+        quaternion_t quat = {_qw, _qx, _qy, _qz};
         rotation_t rot = {0,0,0}; // ignored
         quat2euler(&quat, angles, &rot);
 
@@ -151,6 +146,7 @@ extern "C" {
         usfsCheckStatus();
     }
 
+    // Skip to save time
     void imuAccumulateGyro(gyro_t * gyro)
     {
         (void)gyro;
