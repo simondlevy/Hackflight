@@ -49,22 +49,6 @@ static const uint8_t BIT_GYRO       = 0x04;
 static const uint8_t BIT_I2C_IF_DIS = 0x10;
 static const uint8_t BIT_H_RESET    = 0x80;
 
-// Product ID Description for MPU6000
-// high 4 bits low 4 bits
-// Product Name Product Revision
-#define MPU6000ES_REV_C4 0x14
-#define MPU6000ES_REV_C5 0x15
-#define MPU6000ES_REV_D6 0x16
-#define MPU6000ES_REV_D7 0x17
-#define MPU6000ES_REV_D8 0x18
-#define MPU6000_REV_C4 0x54
-#define MPU6000_REV_C5 0x55
-#define MPU6000_REV_D6 0x56
-#define MPU6000_REV_D7 0x57
-#define MPU6000_REV_D8 0x58
-#define MPU6000_REV_D9 0x59
-#define MPU6000_REV_D10 0x5A
-
 static void mpu6000AccAndGyroInit(gyroDev_t *gyro)
 {
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
@@ -153,26 +137,7 @@ uint8_t mpuBusDetect(const extDevice_t *dev)
     uint8_t detectedSensor = MPU_NONE;
 
     if (whoAmI == MPU6000_WHO_AM_I_CONST) {
-        const uint8_t productID = spiReadRegMsk(dev, MPU_RA_PRODUCT_ID);
-
-        /* look for a product ID we recognise */
-
-        // verify product revision
-        switch (productID) {
-        case MPU6000ES_REV_C4:
-        case MPU6000ES_REV_C5:
-        case MPU6000_REV_C4:
-        case MPU6000_REV_C5:
-        case MPU6000ES_REV_D6:
-        case MPU6000ES_REV_D7:
-        case MPU6000ES_REV_D8:
-        case MPU6000_REV_D6:
-        case MPU6000_REV_D7:
-        case MPU6000_REV_D8:
-        case MPU6000_REV_D9:
-        case MPU6000_REV_D10:
-            detectedSensor = MPU_60x0_SPI;
-        }
+        detectedSensor = MPU_60x0_SPI;
     }
 
     spiSetClkDivisor(dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
