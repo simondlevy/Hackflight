@@ -75,7 +75,7 @@ int main(void)
         19.55048,     // Rate Ki
         0.021160,     // Rate Kd
         0.0165048,    // Rate Kf
-        0.0}; // 3.0; // Level Kp
+        0.0};         // Level Kp
 
     hackflight_t hf = {0};
 

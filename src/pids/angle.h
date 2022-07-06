@@ -26,6 +26,7 @@
 #include "core_dt.h"
 #include "pt1_filter.h"
 #include "pt3_filter.h"
+#include "rad2deg.h"
 #include "rx_rate.h"
 
 // minimum of 5ms between updates
@@ -63,6 +64,8 @@ static const uint8_t FEEDFORWARD_BOOST_FACTOR  = 15;
 static const uint8_t FEEDFORWARD_MAX_RATE_LIMIT = 90;
 static const uint8_t DYN_LPF_CURVE_EXPO = 5;
 
+// XXX should compute this based on cyclic stick throw
+static const float LEVEL_PID_SETPOINT_MAX = 670;
 
 static float FREQUENCY() {return 1.0f / CORE_DT(); }
 
@@ -250,19 +253,17 @@ extern "C" {
         }
     }
 
-    static float levelPid(
-            anglePidConstants_t * constants,
-            float currentSetpoint,
-            float currentAngle)
+    static float levelPid(float kp, float setpoint, float angle) 
     {
-        // calculate error angle and limit the angle to the max inclination
-        // rcDeflection in [-1.0, 1.0]
-        float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
-        angle = constrain_f(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
-        float errorAngle = angle - (currentAngle / 10);
-        return constants->k_level_p > 0 ?
-            errorAngle * constants->k_level_p :
-            currentSetpoint;
+        
+        float target = constrain_f(
+                LEVEL_ANGLE_LIMIT * setpoint / LEVEL_PID_SETPOINT_MAX,
+                -LEVEL_ANGLE_LIMIT,
+                LEVEL_ANGLE_LIMIT);
+
+        float error = target - rad2deg(angle);
+
+        return kp > 0 ?  error * kp : setpoint;
     }
 
     // =========================================================================
@@ -361,14 +362,17 @@ extern "C" {
 
             float maxVelocity =
                 axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
+
             if (maxVelocity) {
                 currentPidSetpoint =
                     accelerationLimit(pid, axis, currentPidSetpoint);
             }
 
             if (axis != 2) {
-                currentPidSetpoint =
-                    levelPid(constants, currentPidSetpoint, currentAngles[axis]);
+                currentPidSetpoint = levelPid(
+                        constants->k_level_p,
+                        currentPidSetpoint,
+                        currentAngles[axis]);
             }
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
