@@ -28,28 +28,18 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "io.h"
 #include "systemdev.h"
 
-// 16.384 dps/lsb scalefactor for 2000dps sensors
-#define GYRO_SCALE_2000DPS (2000.0f / (1 << 15))   
-
-// 8.192 dps/lsb scalefactor for 4000dps sensors
-#define GYRO_SCALE_4000DPS (4000.0f / (1 << 15))   
-
 // RF = Register Flag
-#define MPU_RF_DATA_RDY_EN (1 << 0)
+static const uint8_t MPU_RF_DATA_RDY_EN = 0x01;
 
-#define MPU6000_CONFIG              0x1A
-
-#define BITS_DLPF_CFG_256HZ         0x00
-#define BITS_DLPF_CFG_188HZ         0x01
-#define BITS_DLPF_CFG_98HZ          0x02
-#define BITS_DLPF_CFG_42HZ          0x03
+static const uint8_t MPU6000_CONFIG              = 0x1A;
 
 // 1 MHz max SPI frequency for initialisation
-#define MPU6000_MAX_SPI_INIT_CLK_HZ 1000000
-// 20 MHz max SPI frequency
-#define MPU6000_MAX_SPI_CLK_HZ 20000000
+static const uint32_t MPU6000_MAX_SPI_INIT_CLK_HZ = 1000000;
 
-#define MPU6000_SHORT_THRESHOLD         82  // Any interrupt interval less than this will be recognised as the short interval of ~79us
+// 20 MHz max SPI frequency
+static const uint32_t MPU6000_MAX_SPI_CLK_HZ = 20000000;
+
+static uint32_t MPU6000_SHORT_THRESHOLD = 82;
 
 // Bits
 #define BIT_SLEEP                   0x40
@@ -130,7 +120,12 @@ static void mpu6000AccAndGyroInit(gyroDev_t *gyro)
     spiWriteReg(&gyro->dev, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
     delayMicroseconds(15);
 
-    spiWriteReg(&gyro->dev, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
+    // INT_ANYRD_2CLEAR
+    spiWriteReg(
+            &gyro->dev,
+            MPU_RA_INT_PIN_CFG,
+            0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  
+
     delayMicroseconds(15);
 
     spiWriteReg(&gyro->dev, MPU_RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
