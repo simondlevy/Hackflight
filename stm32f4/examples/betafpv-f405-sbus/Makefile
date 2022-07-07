@@ -112,7 +112,19 @@ endif
 
 .DEFAULT_GOAL := hex
 
-#include $(ROOT)/make/csource.mk
+HACKFLIGHT_OBJS = obj/arming.o \
+               obj/debug.o \
+               obj/failsafe.o \
+               obj/gyro.o \
+               obj/hackflight.o \
+               obj/led.o \
+               obj/maths.o \
+               obj/msp.o \
+               obj/rx.o \
+               obj/stm32_clock.o \
+               obj/sbus.o 
+
+
 COMMON_SRC = \
             ./main.c \
             accel.c \
@@ -229,9 +241,6 @@ TARGET_BASENAME = obj/hackflight
 
 TARG_OBJ_DIR = obj/$(TARGET)
 
-#
-# Things we will build
-#
 TARGET_BIN      = $(TARGET_BASENAME).bin
 TARGET_HEX      = $(TARGET_BASENAME).hex
 TARGET_DFU      = $(TARGET_BASENAME).dfu
@@ -267,17 +276,7 @@ $(TARGET_DFU): $(TARGET_HEX)
 	@echo "Creating DFU $(TARGET_DFU)" "$(STDOUT)"
 	$(V1) $(PYTHON) $(DFUSE-PACK) -i $< $@
 
-TARGET_OBJS += obj/arming.o \
-               obj/debug.o \
-               obj/failsafe.o \
-               obj/gyro.o \
-               obj/hackflight.o \
-               obj/led.o \
-               obj/maths.o \
-               obj/msp.o \
-               obj/rx.o \
-               obj/stm32_clock.o \
-               obj/sbus.o 
+TARGET_OBJS += $(HACKFLIGHT_OBJS)
 
 obj/arming.o: $(HSRC_DIR)/arming.c
 	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/arming.c
