@@ -116,7 +116,6 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             ./main.c \
-            $(HSRC_DIR)/accel.c \
             $(HSRC_DIR)/arming.c \
             $(HSRC_DIR)/debug.c \
             $(HSRC_DIR)/failsafe.c \
@@ -129,6 +128,7 @@ COMMON_SRC = \
             $(HSRC_DIR)/rx/dsmx.c \
             $(HSRC_DIR)/rx/sbus.c \
             $(HSRC_DIR)/stm32_clock.c \
+            accel.c \
             imu_fusion.c \
             imu_mpu6000.c \
             dshot.c \
