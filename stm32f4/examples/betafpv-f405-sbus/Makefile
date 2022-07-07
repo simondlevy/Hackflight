@@ -115,14 +115,6 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             ./main.c \
-            $(HSRC_DIR)/debug.c \
-            $(HSRC_DIR)/failsafe.c \
-            $(HSRC_DIR)/gyro.c \
-            $(HSRC_DIR)/hackflight.c \
-            $(HSRC_DIR)/led.c \
-            $(HSRC_DIR)/maths.c \
-            $(HSRC_DIR)/msp.c \
-            $(HSRC_DIR)/rx.c \
             $(HSRC_DIR)/rx/sbus.c \
             $(HSRC_DIR)/stm32_clock.c \
             accel.c \
@@ -277,10 +269,42 @@ $(TARGET_DFU): $(TARGET_HEX)
 	@echo "Creating DFU $(TARGET_DFU)" "$(STDOUT)"
 	$(V1) $(PYTHON) $(DFUSE-PACK) -i $< $@
 
-TARGET_OBJS += obj/arming.o
+TARGET_OBJS += obj/arming.o \
+               obj/debug.o \
+               obj/failsafe.o \
+               obj/gyro.o \
+               obj/hackflight.o \
+               obj/led.o \
+               obj/maths.o \
+               obj/msp.o \
+               obj/rx.o \
 
 obj/arming.o: $(HSRC_DIR)/arming.c
-	$(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/arming.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/arming.c
+
+obj/debug.o: $(HSRC_DIR)/debug.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/debug.c
+
+obj/failsafe.o: $(HSRC_DIR)/failsafe.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/failsafe.c
+
+obj/gyro.o: $(HSRC_DIR)/gyro.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/gyro.c
+
+obj/hackflight.o: $(HSRC_DIR)/hackflight.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/hackflight.c
+
+obj/led.o: $(HSRC_DIR)/led.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/led.c
+
+obj/maths.o: $(HSRC_DIR)/maths.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/maths.c
+
+obj/msp.o: $(HSRC_DIR)/msp.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/msp.c
+
+obj/rx.o: $(HSRC_DIR)/rx.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/rx.c
 
 $(TARGET_ELF): $(TARGET_OBJS) $(LD_SCRIPT)
 	@echo "Linking" $@
