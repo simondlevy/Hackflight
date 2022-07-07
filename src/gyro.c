@@ -27,7 +27,7 @@
 #include "system.h"
 #include "time.h"
 
-static const uint32_t CALIBRATION_DURATION           = 1250000; // uSec
+static const uint16_t CALIBRATION_ITERATIONS         = 5000;
 static const uint16_t LPF1_DYN_MIN_HZ                = 250;
 static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 5; // DPS
 static const uint16_t LPF2_STATIC_HZ                 = 500;
@@ -35,11 +35,6 @@ static const uint16_t LPF2_STATIC_HZ                 = 500;
 #if defined(__cplusplus)
 extern "C" {
 #endif
-
-static uint32_t calculateCalibratingCycles(void)
-{
-    return CALIBRATION_DURATION / CORE_PERIOD();
-}
 
 static float nullFilterApply(filter_t *filter, float input)
 {
@@ -97,7 +92,7 @@ static bool initLowpassFilterLpf(
 
 static void setCalibrationCycles(gyro_t * gyro)
 {
-    gyro->calibration.cyclesRemaining = (int32_t)calculateCalibratingCycles();
+    gyro->calibration.cyclesRemaining = (int32_t)CALIBRATION_ITERATIONS;
 }
 
 static void calibrate(gyro_t * gyro)
@@ -109,8 +104,7 @@ static void calibrate(gyro_t * gyro)
     for (int axis = 0; axis < 3; axis++) {
 
         // Reset g[axis] at start of calibration
-        if (gyro->calibration.cyclesRemaining ==
-                (int32_t)calculateCalibratingCycles()) {
+        if (gyro->calibration.cyclesRemaining == CALIBRATION_ITERATIONS) {
             gyro->calibration.sum[axis] = 0.0f;
             devClear(&gyro->calibration.var[axis]);
             // zero is set to zero until calibration complete
@@ -133,7 +127,7 @@ static void calibrate(gyro_t * gyro)
             }
 
             gyro->zero[axis] =
-                gyro->calibration.sum[axis] / calculateCalibratingCycles();
+                gyro->calibration.sum[axis] / CALIBRATION_ITERATIONS;
         }
     }
 
