@@ -280,7 +280,6 @@ bool    mpuDetect(struct gyroDev_s *gyro, const struct gyroDeviceConfig_s *confi
 uint8_t mpuGyroDLPF(struct gyroDev_s *gyro);
 void    mpuGyroInit(struct gyroDev_s *gyro);
 void    mpuPreInit(gyroDeviceConfig_t * config);
-bool    mpuGyroRead(struct gyroDev_s *gyro);
 bool    mpuGyroReadSPI(struct gyroDev_s *gyro);
 uint8_t mpuGyroReadRegister(const extDevice_t *dev, uint8_t reg);
 

@@ -109,8 +109,6 @@ void mpu6000SpiGyroInit(gyroDev_t *gyro)
 
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
 
-    mpuGyroRead(gyro);
-
     if (((int8_t)gyro->adcRaw[1]) == -1 && ((int8_t)gyro->adcRaw[0]) == -1) {
         systemFailureMode(FAILURE_GYRO_INIT_FAILED);
     }

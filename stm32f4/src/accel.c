@@ -153,8 +153,6 @@ static void biquadFilterInitLPF(
     biquadFilterInit(filter, filterFreq, refreshRate, BIQUAD_Q, FILTER_LPF, 1.0f);
 }
 
-
-
 // ============================================================================
 
 void accelInit(hackflight_t * hf)
@@ -168,7 +166,7 @@ void accelInit(hackflight_t * hf)
     biquadFilterInitLPF(&accel->filter[2], LPF_CUTOFF_HZ, accSampleTimeUs); 
 }
 
-void  accelUpdate(void * hackflight, uint32_t usec)
+void accelUpdate(void * hackflight, uint32_t usec)
 {
     (void)usec;
 
@@ -185,8 +183,6 @@ void  accelUpdate(void * hackflight, uint32_t usec)
     if (!accelIsReady()) {
         return;
      }
-
-    // debugPrintf("%d\n", (int)accelReadRaw(0));
 
     static axes_t _adc;
 
