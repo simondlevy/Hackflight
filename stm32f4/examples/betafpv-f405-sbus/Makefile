@@ -115,8 +115,6 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             ./main.c \
-            $(HSRC_DIR)/rx/sbus.c \
-            $(HSRC_DIR)/stm32_clock.c \
             accel.c \
             imu_fusion.c \
             imu_mpu6000.c \
@@ -278,6 +276,8 @@ TARGET_OBJS += obj/arming.o \
                obj/maths.o \
                obj/msp.o \
                obj/rx.o \
+               obj/stm32_clock.o \
+               obj/sbus.o 
 
 obj/arming.o: $(HSRC_DIR)/arming.c
 	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/arming.c
@@ -305,6 +305,13 @@ obj/msp.o: $(HSRC_DIR)/msp.c
 
 obj/rx.o: $(HSRC_DIR)/rx.c
 	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/rx.c
+
+obj/stm32_clock.o: $(HSRC_DIR)/stm32_clock.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/stm32_clock.c
+
+obj/sbus.o: $(HSRC_DIR)/rx/sbus.c
+	$(V1) $(CROSS_CC) -c -o obj/sbus.o $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/rx/sbus.c
+
 
 $(TARGET_ELF): $(TARGET_OBJS) $(LD_SCRIPT)
 	@echo "Linking" $@
