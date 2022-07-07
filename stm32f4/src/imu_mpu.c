@@ -1,24 +1,25 @@
 /*
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <debug.h>
 #include <maths.h>
 #include <system.h>
 #include <time.h>
@@ -107,6 +108,12 @@ bool mpuAccReadSPI(accDev_t *acc)
 
     // Wait for completion
     spiWait(&acc->gyro->dev);
+
+    // Read from the gyro, which is the same SPI device as the acc
+    int16_t *accData = (int16_t *)acc->gyro->dev.rxBuf;
+    acc->ADCRaw[0] = __builtin_bswap16(accData[1]);
+    acc->ADCRaw[1] = __builtin_bswap16(accData[2]);
+    acc->ADCRaw[2] = __builtin_bswap16(accData[3]);
 
     return true;
 }
