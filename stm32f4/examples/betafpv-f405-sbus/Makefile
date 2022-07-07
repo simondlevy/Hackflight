@@ -278,35 +278,8 @@ $(TARGET_DFU): $(TARGET_HEX)
 
 TARGET_OBJS += $(HACKFLIGHT_OBJS)
 
-obj/arming.o: $(HSRC_DIR)/arming.c
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/arming.c
-
-obj/debug.o: $(HSRC_DIR)/debug.c
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/debug.c
-
-obj/failsafe.o: $(HSRC_DIR)/failsafe.c
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/failsafe.c
-
-obj/gyro.o: $(HSRC_DIR)/gyro.c
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/gyro.c
-
-obj/hackflight.o: $(HSRC_DIR)/hackflight.c
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/hackflight.c
-
-obj/led.o: $(HSRC_DIR)/led.c
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/led.c
-
-obj/maths.o: $(HSRC_DIR)/maths.c
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/maths.c
-
-obj/msp.o: $(HSRC_DIR)/msp.c
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/msp.c
-
-obj/rx.o: $(HSRC_DIR)/rx.c
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/rx.c
-
-obj/stm32_clock.o: $(HSRC_DIR)/stm32_clock.c
-	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/stm32_clock.c
+obj/%.o: $(HSRC_DIR)/%.c
+	$(V1) $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
 
 obj/sbus.o: $(HSRC_DIR)/rx/sbus.c
 	$(V1) $(CROSS_CC) -c -o obj/sbus.o $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $(HSRC_DIR)/rx/sbus.c
