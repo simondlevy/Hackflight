@@ -6,7 +6,6 @@ SERIAL_DEVICE ?= COM30
 
 # Working directories
 ROOT         := ../..
-OBJECT_DIR   := ./obj
 STM_SRC_DIR  := $(ROOT)/src
 HSRC_DIR     := $(ROOT)/../src
 CMSIS_DIR    := $(ROOT)/lib/CMSIS
@@ -237,9 +236,9 @@ LD_FLAGS     = -lm \
               -T$(LD_SCRIPT)
 
 
-TARGET_BASENAME = $(OBJECT_DIR)/hackflight
+TARGET_BASENAME = obj/hackflight
 
-TARG_OBJ_DIR = $(OBJECT_DIR)/$(TARGET)
+TARG_OBJ_DIR = obj/$(TARGET)
 
 #
 # Things we will build
