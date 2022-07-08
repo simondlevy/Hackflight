@@ -39,7 +39,7 @@ static const float ATTITUDE_RESET_ACTIVE_TIME = 500000;
 // gyro quiet period after disarm before attitude reset
 static const uint32_t ATTITUDE_RESET_QUIET_TIME = 250000;   
 
-static const float DCM_KP = 25;
+static const float DCM_KP = 0.25;
 static const float DCM_KI = 0.03;
 
 // dcmKpGain value to use during attitude reset
@@ -181,7 +181,7 @@ void imuAccumulateGyro(gyro_t * gyro)
 // for a 250ms period of low gyro activity to ensure the craft is not moving -
 // use a large dcmKpGain value for 500ms to allow the attitude estimate to
 // quickly converge - reset the gain back to the standard setting
-static float calcKpGain(uint32_t time, axes_t * gyroAvg, bool armState)
+static float calculateKpGain(uint32_t time, axes_t * gyroAvg, bool armState)
 {
     static bool lastArmState;
     static uint32_t gyroQuietPeriodTimeEnd;
@@ -266,6 +266,8 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
 
     axes_t accelRaw = hf->accel.raw;
 
+    
+
     quaternion_t quat = {0,0,0,0};
     mahony(
             dt,
@@ -273,7 +275,7 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
             &accelRaw,
             &fusionPrev->quat,
             &rot, 
-            0, // dcmKpGain
+            calculateKpGain(time, &gyroAvg, hf->arming.is_armed),        
             &quat);
 
     quat2euler(&quat, angles, &rot);
