@@ -125,9 +125,9 @@ static void mahony(
     }
 
     // Apply proportional and integral feedback
-    gx += 0;//dcmKpGain * ex + integralFBx;
-    gy += 0;//dcmKpGain * ey + integralFBy;
-    gz += 0;//dcmKpGain * ez + integralFBz;
+    gx += dcmKpGain * ex + integralFBx;
+    gy += dcmKpGain * ey + integralFBy;
+    gz += dcmKpGain * ez + integralFBz;
 
     // Integrate rate of change of quaternion
     gx *= dt / 2;
