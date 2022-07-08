@@ -105,6 +105,24 @@ static void mahony(
     float gy = deg2rad(gyro->y);
     float gz = deg2rad(gyro->z);
 
+    // Compute and apply integral feedback if enabled
+    if (DCM_KI > 0) {
+
+        // Calculate general spin rate (rad/s)
+        float spin_rate = sqrtf(square(gx) + square(gy) + square(gz));
+
+        // Stop integrating if spinning beyond the certain limit
+        if (spin_rate < deg2rad(SPIN_RATE_LIMIT)) {
+            integralFBx += DCM_KI * ex * dt;    // integral error scaled by Ki
+            integralFBy += DCM_KI * ey * dt;
+            integralFBz += DCM_KI * ez * dt;
+        }
+    } else {
+        integralFBx = 0;    // prevent integral windup
+        integralFBy = 0;
+        integralFBz = 0;
+    }
+
     // Apply proportional and integral feedback, then integrate rate-of-change
     float gx1 = gx * dt / 2;
     float gy1 = gy * dt / 2;
@@ -325,18 +343,6 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
 
     quaternion_t quat = {0,0,0,0};
     mahony(dt, &gyroAvg, &accelRaw, &fusionPrev->quat, &rot, &quat);
-
-    /*
-    mahony2(dt, 
-            deg2rad(gyroAvg.x), deg2rad(gyroAvg.y), deg2rad(gyroAvg.z),
-            accelRaw->x,
-            accelRaw->y,
-            accelRaw->z,
-            &rot,
-            &fusionPrev->quat,
-            calcKpGain(time, &gyroAvg, hf->arming.is_armed),
-            &quat);
-            */
 
     quat2euler(&quat, angles, &rot);
 
