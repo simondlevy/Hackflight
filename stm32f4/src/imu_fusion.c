@@ -72,6 +72,7 @@ static void mahony(
         axes_t * accel,
         quaternion_t * quat_old,
         rotation_t * rot,
+        float dcmKpGain,
         quaternion_t * quat_new)
 {
     float ax = accel->x;
@@ -123,7 +124,12 @@ static void mahony(
         integralFBz = 0;
     }
 
-    // Apply proportional and integral feedback, then integrate rate-of-change
+    // Apply proportional and integral feedback
+    gx += 0;//dcmKpGain * ex + integralFBx;
+    gy += 0;//dcmKpGain * ey + integralFBy;
+    gz += 0;//dcmKpGain * ez + integralFBz;
+
+    // Integrate rate of change of quaternion
     gx *= dt / 2;
     gy *= dt / 2;
     gz *= dt / 2;
@@ -261,7 +267,14 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
     axes_t accelRaw = hf->accel.raw;
 
     quaternion_t quat = {0,0,0,0};
-    mahony(dt, &gyroAvg, &accelRaw, &fusionPrev->quat, &rot, &quat);
+    mahony(
+            dt,
+            &gyroAvg,
+            &accelRaw,
+            &fusionPrev->quat,
+            &rot, 
+            0, // dcmKpGain
+            &quat);
 
     quat2euler(&quat, angles, &rot);
 
