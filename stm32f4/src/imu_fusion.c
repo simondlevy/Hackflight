@@ -73,7 +73,15 @@ static void mahony(
         quaternion_t * quat_old,
         quaternion_t * quat_new)
 {
-    (void)accel;
+    float ax = accel->x;
+    float ay = accel->y;
+    float az = accel->z;
+
+    // Integral error terms scaled by Ki
+    static float integralFBx,  integralFBy, integralFBz;    
+
+    // Use raw heading error (from GPS or whatever else)
+    float ex = 0, ey = 0, ez = 0;
 
     // Convert gyro degrees to radians
     float gx = deg2rad(gyro->x);
