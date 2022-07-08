@@ -71,6 +71,7 @@ static void mahony(
         axes_t * gyro,
         axes_t * accel,
         quaternion_t * quat_old,
+        rotation_t * rot,
         quaternion_t * quat_new)
 {
     float ax = accel->x;
@@ -82,6 +83,22 @@ static void mahony(
 
     // Use raw heading error (from GPS or whatever else)
     float ex = 0, ey = 0, ez = 0;
+
+    // Use measured acceleration vector
+    float recipAccNorm = square(ax) + square(ay) + square(az);
+    if (recipAccNorm > 0.01) {
+        // Normalise accelerometer measurement
+        recipAccNorm = invSqrt(recipAccNorm);
+        ax *= recipAccNorm;
+        ay *= recipAccNorm;
+        az *= recipAccNorm;
+
+        // Error is sum of cross product between estimated direction and
+        // measured direction of gravity
+        ex += (ay * rot->r22 - az * rot->r21);
+        ey += (az * rot->r20 - ax * rot->r22);
+        ez += (ax * rot->r21 - ay * rot->r20);
+    }
 
     // Convert gyro degrees to radians
     float gx = deg2rad(gyro->x);
@@ -307,7 +324,7 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
     axes_t accelRaw = hf->accel.raw;
 
     quaternion_t quat = {0,0,0,0};
-    mahony(dt, &gyroAvg, &accelRaw, &fusionPrev->quat, &quat);
+    mahony(dt, &gyroAvg, &accelRaw, &fusionPrev->quat, &rot, &quat);
 
     /*
     mahony2(dt, 
