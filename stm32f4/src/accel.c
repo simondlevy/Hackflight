@@ -170,10 +170,6 @@ void accelUpdate(void * hackflight, uint32_t usec)
 {
     (void)usec;
 
-    hackflight_t * hf = (hackflight_t *)hackflight;
-
-    accel_t * accel = &hf->accel;
-
     // static flightDynamicsTrims_t * trims;
 
     // the calibration is done is the main loop. Calibrating decreases at each
@@ -184,17 +180,21 @@ void accelUpdate(void * hackflight, uint32_t usec)
         return;
      }
 
-    static axes_t _adc;
+    hackflight_t * hf = (hackflight_t *)hackflight;
 
-    _adc.x = accelReadRaw(0);
-    _adc.y = accelReadRaw(1);
-    _adc.z = accelReadRaw(2);
+    accel_t * accel = &hf->accel;
 
-    _adc.x = biquadFilterApply(&accel->filter[0], _adc.x);
-    _adc.y = biquadFilterApply(&accel->filter[1], _adc.y);
-    _adc.z = biquadFilterApply(&accel->filter[2], _adc.z);
+    axes_t * raw = &accel->raw;
 
-    hf->imuAlignFun(&_adc);
+    raw->x = accelReadRaw(0);
+    raw->y = accelReadRaw(1);
+    raw->z = accelReadRaw(2);
+
+    raw->x = biquadFilterApply(&accel->filter[0], raw->x);
+    raw->y = biquadFilterApply(&accel->filter[1], raw->y);
+    raw->z = biquadFilterApply(&accel->filter[2], raw->z);
+
+    hf->imuAlignFun(raw);
 
     // if (calibrating != 0) {
     //     calibrate(acc, adc);
@@ -205,8 +205,8 @@ void accelUpdate(void * hackflight, uint32_t usec)
     // adc[2] -= acc->trims->raw[2];
 
     imuSensor_t * accum = &accel->accum;
-    accum->values.x += _adc.x;
-    accum->values.y += _adc.y;
-    accum->values.z += _adc.z;
+    accum->values.x += raw->x;
+    accum->values.y += raw->y;
+    accum->values.z += raw->z;
     accum->count++;
 }

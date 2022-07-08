@@ -467,6 +467,7 @@ typedef void (*mixer_t)(float throttle, float roll, float pitch, float yaw,
 
 typedef struct {
 
+    axes_t         raw;
     imuSensor_t    accum;
     biquadFilter_t filter[3];
 
