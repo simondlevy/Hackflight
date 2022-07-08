@@ -124,19 +124,19 @@ static void mahony(
     }
 
     // Apply proportional and integral feedback, then integrate rate-of-change
-    float gx1 = gx * dt / 2;
-    float gy1 = gy * dt / 2;
-    float gz1 = gz * dt / 2;
+    gx *= dt / 2;
+    gy *= dt / 2;
+    gz *= dt / 2;
 
     // Update quaternion
     float qw =
-        quat_old->w - quat_old->x * gx1 - quat_old->y * gy1 - quat_old->z * gz1;
+        quat_old->w - quat_old->x * gx - quat_old->y * gy - quat_old->z * gz;
     float qx =
-        quat_old->x + quat_old->w * gx1 + quat_old->y * gz1 - quat_old->z * gy1;
+        quat_old->x + quat_old->w * gx + quat_old->y * gz - quat_old->z * gy;
     float qy =
-        quat_old->y + quat_old->w * gy1 - quat_old->x * gz1 + quat_old->z * gx1;
+        quat_old->y + quat_old->w * gy - quat_old->x * gz + quat_old->z * gx;
     float qz =
-        quat_old->z + quat_old->w * gz1 + quat_old->x * gy1 - quat_old->y * gx1;
+        quat_old->z + quat_old->w * gz + quat_old->x * gy - quat_old->y * gx;
 
     // Normalise quaternion
     float recipNorm = invSqrt(square(qw) + square(qx) + square(qy) + square(qz));
