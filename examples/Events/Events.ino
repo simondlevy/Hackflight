@@ -48,16 +48,23 @@ static const bool VERBOSE = true;
 
 static const uint8_t REPORT_HZ = 2;
 
-static volatile bool _gotNewData;
-
-static void interruptHandler()
+static volatile bool _gotNewImuData;
+static void imuInterruptHandler()
 {
-    _gotNewData = true;
+    _gotNewImuData = true;
+}
+
+static volatile bool _gotNewRxData;
+void serialEvent1(void)
+{
+    _gotNewRxData = true;
 }
 
 void setup()
 {
     Serial.begin(115200);
+
+    Serial1.begin(115200);
 
     Wire.begin(); 
     Wire.setClock(400000); 
@@ -76,7 +83,7 @@ void setup()
             INTERRUPT_ENABLE);
 
     pinMode(INTERRUPT_PIN, INPUT);
-    attachInterrupt(INTERRUPT_PIN, interruptHandler, RISING);  
+    attachInterrupt(INTERRUPT_PIN, imuInterruptHandler, RISING);  
 
     // Clear interrupts
     usfsCheckStatus();
@@ -88,9 +95,9 @@ void loop()
     static uint32_t _gyroCount;
     static uint32_t _quatCount;
 
-    if (_gotNewData) { 
+    if (_gotNewImuData) { 
 
-        _gotNewData = false;  
+        _gotNewImuData = false;  
 
         uint8_t eventStatus = usfsCheckStatus(); 
 
@@ -114,13 +121,24 @@ void loop()
 
     } 
 
+    static uint32_t _rxCount;
+
+    if (_gotNewRxData) { 
+        _gotNewRxData = false;  
+        _rxCount++;
+    }
+
     static uint32_t _msec;
 
     uint32_t msec = millis();
 
     if (msec-_msec > 1000/REPORT_HZ) { 
 
-        printf("Gyro=%d  Quat=%d\n", (int)_gyroCount*REPORT_HZ, (int)_quatCount*REPORT_HZ);
+        printf("Gyro=%d  Quat=%d  Receiver=%d\n",
+            (int)_gyroCount*REPORT_HZ,
+            (int)_quatCount*REPORT_HZ,
+            (int)_rxCount*REPORT_HZ);
+
 
         _gyroCount = 0;
         _quatCount = 0;
