@@ -146,7 +146,6 @@ void loop()
 
     } 
 
-
     if (_gotNewRxData) { 
         _gotNewRxData = false;  
         handleEvent(EVENT_RX);
@@ -163,7 +162,6 @@ void loop()
             (int)_gyroCount*REPORT_HZ,
             (int)_quatCount*REPORT_HZ,
             (int)_rxCount*REPORT_HZ);
-
 
         _gyroCount = 0;
         _quatCount = 0;

@@ -152,15 +152,12 @@ static uint8_t sbusChannelsDecode(uint16_t * channelData, const sbusChannels_t *
 static sbusFrameData_t _frameData;
 
 // Receive ISR callback
-static void sbusDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
+static void sbusDataReceive(uint8_t c, void *data, uint32_t time)
 {
     (void)data;
 
-    const uint32_t nowUs = currentTimeUs;
-
-    const int32_t sbusFrameTime = cmpTimeUs(nowUs, _frameData.startAtUs);
-
-    if (sbusFrameTime > (long)(TIME_NEEDED_PER_FRAME + 500)) {
+    if (cmpTimeUs(time, _frameData.startAtUs) 
+            > (long)(TIME_NEEDED_PER_FRAME + 500)) {
         _frameData.position = 0;
     }
 
@@ -168,16 +165,12 @@ static void sbusDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
         if (c != FRAME_BEGIN_BYTE) {
             return;
         }
-        _frameData.startAtUs = nowUs;
+        _frameData.startAtUs = time;
     }
 
     if (_frameData.position < FRAME_SIZE) {
         _frameData.frame.bytes[_frameData.position++] = (uint8_t)c;
-        if (_frameData.position < FRAME_SIZE) {
-            _frameData.done = false;
-        } else {
-            _frameData.done = true;
-        }
+        _frameData.done = _frameData.position == FRAME_SIZE;
     }
 }
 
