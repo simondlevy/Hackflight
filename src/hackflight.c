@@ -278,8 +278,8 @@ extern "C" {
                     scheduler->taskGuardDeltaDownCycles;
             }
         } else if (task->taskAgeCycles > TASK_AGE_EXPEDITE_COUNT) {
-            // If a task has been unable to run, then reduce it's recorded
-            // estimated run time to ensure it's ultimate scheduling
+            // If a task has been unable to run, then reduce its recorded
+            // estimated run time to ensure its ultimate scheduling
             task->anticipatedExecutionTime *= 
                 TASK_AGE_EXPEDITE_SCALE;
         }
