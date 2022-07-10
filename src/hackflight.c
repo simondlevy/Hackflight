@@ -237,6 +237,54 @@ extern "C" {
         updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
     }
 
+    static void runSelectedTask(
+            hackflight_t * hf,
+            task_t * task,
+            int32_t loopRemainingCycles,
+            uint32_t nextTargetCycles,
+            uint32_t currentTimeUs)
+    {
+        int32_t taskRequiredTimeUs =
+            task->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT;
+        int32_t taskRequiredTimeCycles =
+            (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
+
+        uint32_t nowCycles = systemGetCycleCounter();
+        loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+
+        scheduler_t * scheduler = &hf->scheduler;
+
+        // Allow a little extra time
+        taskRequiredTimeCycles += scheduler->taskGuardCycles;
+
+        if (taskRequiredTimeCycles < loopRemainingCycles) {
+            uint32_t antipatedEndCycles =
+                nowCycles + taskRequiredTimeCycles;
+            executeTask(hf, task, currentTimeUs);
+            nowCycles = systemGetCycleCounter();
+            int32_t cyclesOverdue =
+                cmpTimeCycles(nowCycles, antipatedEndCycles);
+
+            if ((cyclesOverdue > 0) ||
+                    (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
+                if (scheduler->taskGuardCycles <
+                        scheduler->taskGuardMaxCycles) {
+                    scheduler->taskGuardCycles +=
+                        scheduler->taskGuardDeltaUpCycles;
+                }
+            } else if (scheduler->taskGuardCycles >
+                    scheduler->taskGuardMinCycles) {
+                scheduler->taskGuardCycles -=
+                    scheduler->taskGuardDeltaDownCycles;
+            }
+        } else if (task->taskAgeCycles > TASK_AGE_EXPEDITE_COUNT) {
+            // If a task has been unable to run, then reduce it's recorded
+            // estimated run time to ensure it's ultimate scheduling
+            task->anticipatedExecutionTime *= 
+                TASK_AGE_EXPEDITE_SCALE;
+        }
+    }
+
     static void checkDynamicTasks(
             hackflight_t * hf,
             int32_t loopRemainingCycles,
@@ -264,46 +312,12 @@ extern "C" {
                 &selectedTask, &selectedTaskDynamicPriority);
 
         if (selectedTask) {
-
-            int32_t taskRequiredTimeUs =
-                selectedTask->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT;
-            int32_t taskRequiredTimeCycles =
-                (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
-
-            uint32_t nowCycles = systemGetCycleCounter();
-            loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
-
-            scheduler_t * scheduler = &hf->scheduler;
-
-            // Allow a little extra time
-            taskRequiredTimeCycles += scheduler->taskGuardCycles;
-
-            if (taskRequiredTimeCycles < loopRemainingCycles) {
-                uint32_t antipatedEndCycles =
-                    nowCycles + taskRequiredTimeCycles;
-                executeTask(hf, selectedTask, currentTimeUs);
-                nowCycles = systemGetCycleCounter();
-                int32_t cyclesOverdue =
-                    cmpTimeCycles(nowCycles, antipatedEndCycles);
-
-                if ((cyclesOverdue > 0) ||
-                        (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
-                    if (scheduler->taskGuardCycles <
-                            scheduler->taskGuardMaxCycles) {
-                        scheduler->taskGuardCycles +=
-                            scheduler->taskGuardDeltaUpCycles;
-                    }
-                } else if (scheduler->taskGuardCycles >
-                        scheduler->taskGuardMinCycles) {
-                    scheduler->taskGuardCycles -=
-                        scheduler->taskGuardDeltaDownCycles;
-                }
-            } else if (selectedTask->taskAgeCycles > TASK_AGE_EXPEDITE_COUNT) {
-                // If a task has been unable to run, then reduce it's recorded
-                // estimated run time to ensure it's ultimate scheduling
-                selectedTask->anticipatedExecutionTime *= 
-                    TASK_AGE_EXPEDITE_SCALE;
-            }
+            runSelectedTask(
+                    hf,
+                    selectedTask,
+                    loopRemainingCycles,
+                    nextTargetCycles,
+                    currentTimeUs);
         }
     }
 
