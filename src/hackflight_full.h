@@ -35,7 +35,7 @@ void hackflightInitFull(
         imuAlignFun_t imuAlign,
         uint8_t ledPin);
 
-void hackflightStep(hackflight_t * hackflight);
+void hackflightStepFull(hackflight_t * hackflight);
 
 #if defined(__cplusplus)
 }

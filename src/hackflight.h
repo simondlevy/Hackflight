@@ -115,14 +115,36 @@ static void task_rx(void * hackflight, uint32_t time)
     }
 }
 
-// Core tasks: gyro, PID controllers, mixer, motors ------------------------
-
 static float constrain_demand(float demand, float limit, float scaling)
 {
     return constrain_f(demand, -limit, +limit) / scaling;
 }
 
-static void hackflightRunCoreTasks(hackflight_t * hf)
+
+// ----------------------------------------------------------------------------
+
+static void hackflightInit(
+        hackflight_t * hf,
+        anglePidConstants_t * anglePidConstants,
+        mixer_t mixer)
+{
+    hf->mixer = mixer;
+
+    anglePidInit(&hf->anglepid, anglePidConstants);
+
+    hackflightAddPidController(hf, anglePidUpdate, &hf->anglepid);
+
+    initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
+
+    initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
+
+    // Initialize quaternion in upright position
+    hf->imuFusionPrev.quat.w = 1;
+
+    hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+}
+
+static void hackflightStep(hackflight_t * hf)
 {
     gyroGetAngularVelocities(hf);
 
@@ -148,29 +170,6 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
     motorWrite(hf->motorDevice,
             armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
-}
-
-// ============================================================================
-
-static void hackflightInit(
-        hackflight_t * hf,
-        anglePidConstants_t * anglePidConstants,
-        mixer_t mixer)
-{
-    hf->mixer = mixer;
-
-    anglePidInit(&hf->anglepid, anglePidConstants);
-
-    hackflightAddPidController(hf, anglePidUpdate, &hf->anglepid);
-
-    initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
-
-    initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
-
-    // Initialize quaternion in upright position
-    hf->imuFusionPrev.quat.w = 1;
-
-    hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 }
 
 #if defined(__cplusplus)

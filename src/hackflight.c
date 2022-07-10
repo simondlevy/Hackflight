@@ -163,7 +163,7 @@ extern "C" {
             loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
         }
 
-        hackflightRunCoreTasks(hf);
+        hackflightStep(hf);
 
         // CPU busy
         if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
@@ -295,19 +295,23 @@ extern "C" {
 
         uint32_t currentTimeUs = timeMicros();
 
+        // Sensors
         for (uint8_t k=0; k<hf->sensorTaskCount; ++k) {
             task_t * task = &hf->sensorTasks[k];
             adjustAndUpdateTask(task, currentTimeUs,&selectedTask,
                     &selectedTaskDynamicPriority);
         }
 
+        // Receiver
         adjustRxDynamicPriority(&hf->rx, &hf->rxTask, currentTimeUs);
         updateDynamicTask(&hf->rxTask, &selectedTask,
                 &selectedTaskDynamicPriority);
 
+        // Attitude
         adjustAndUpdateTask(&hf->attitudeTask, currentTimeUs,
                 &selectedTask, &selectedTaskDynamicPriority);
 
+        // MSP
         adjustAndUpdateTask(&hf->mspTask, currentTimeUs,
                 &selectedTask, &selectedTaskDynamicPriority);
 
@@ -394,7 +398,7 @@ extern "C" {
         schedulerInit(&hf->scheduler);
     }
 
-    void hackflightStep(hackflight_t * hf)
+    void hackflightStepFull(hackflight_t * hf)
     {
         scheduler_t * scheduler = &hf->scheduler;
 

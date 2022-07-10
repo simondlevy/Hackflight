@@ -62,5 +62,5 @@ void setup(void)
 
 void loop(void)
 {
-    hackflightStep(&_hf);
+    hackflightStepFull(&_hf);
 }

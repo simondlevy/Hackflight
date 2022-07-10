@@ -94,7 +94,7 @@ int main(void)
     hackflightAddSensor(&hf, accelUpdate, ACCEL_RATE);
 
     while (true) {
-        hackflightStep(&hf);
+        hackflightStepFull(&hf);
     }
 
     return 0;
