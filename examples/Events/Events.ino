@@ -90,11 +90,34 @@ void setup()
 
 } // setup
 
+enum {
+
+    EVENT_GYRO,
+    EVENT_QUAT,
+    EVENT_RX
+};
+
+static uint32_t _gyroCount;
+static uint32_t _quatCount;
+static uint32_t _rxCount;
+
+static void handleEvent(uint8_t event)
+{
+    switch(event) {
+        case EVENT_GYRO:
+            _gyroCount++;
+            break;
+        case EVENT_QUAT:
+            _quatCount++;
+            break;
+        case EVENT_RX:
+            _rxCount++;
+            break;
+    }
+}
+
 void loop()
 {
-    static uint32_t _gyroCount;
-    static uint32_t _quatCount;
-
     if (_gotNewImuData) { 
 
         _gotNewImuData = false;  
@@ -108,24 +131,26 @@ void loop()
 
         if (usfsEventStatusIsGyrometer(eventStatus)) { 
 
-            float gx=0, gy=0, gz=0;
-            usfsReadGyrometer(gx, gy, gz);
-            _gyroCount++;
+            handleEvent(EVENT_GYRO);
+            //float gx=0, gy=0, gz=0;
+            //usfsReadGyrometer(gx, gy, gz);
+            //_gyroCount++;
         }
 
         if (usfsEventStatusIsQuaternion(eventStatus)) { 
-            float qw=0, qx=0, qy=0, qz=0;
-            usfsReadQuaternion(qw, qx, qy, qz);
-            _quatCount++;
+            handleEvent(EVENT_QUAT);
+            //float qw=0, qx=0, qy=0, qz=0;
+            //usfsReadQuaternion(qw, qx, qy, qz);
+            //_quatCount++;
         }
 
     } 
 
-    static uint32_t _rxCount;
 
     if (_gotNewRxData) { 
         _gotNewRxData = false;  
-        _rxCount++;
+        handleEvent(EVENT_RX);
+        //_rxCount++;
     }
 
     static uint32_t _msec;
