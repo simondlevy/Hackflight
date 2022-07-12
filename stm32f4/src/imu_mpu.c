@@ -19,6 +19,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <string.h>
 
+#include <arming.h>
+#include <core_rate.h>
+#include <deg2rad.h>
 #include <maths.h>
 #include <quat2euler.h>
 #include <system.h>

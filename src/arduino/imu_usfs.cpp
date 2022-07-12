@@ -23,6 +23,7 @@
 #include <USFS.h>
 
 #include <datatypes.h>
+#include <quat2euler.h>
 #include <imu.h>
 
 static const uint8_t  ACCEL_RATE_TENTH = 20; // 1/10th actual rate
@@ -115,6 +116,17 @@ extern "C" {
         return USFS_GYRO_SCALE;
     }
 
+    void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
+    {
+        (void)time;
+
+        quaternion_t quat = {_qw, _qx, _qy, _qz};
+        rotation_t rot = {0,0,0}; // ignored
+        quat2euler(&quat, angles, &rot);
+
+        hf->imuAlignFun(angles);
+    }
+
     void imuInit(hackflight_t * hf, uint8_t interruptPin)
     {
         (void)hf;
@@ -139,32 +151,6 @@ extern "C" {
 
         // Clear interrupts
         usfsCheckStatus();
-    }
-
-    void imuUpdate(
-            hackflight_t * hf,
-            uint32_t time,
-            quaternion_t * quat,
-            rotation_t * rot)
-    {
-        (void)time;
-        (void)quat;
-        (void)rot;
-
-        vehicle_state_t * vstate = &hf->vstate;
-
-        axes_t angles = {vstate->phi, vstate->theta, vstate->psi};
-
-        hf->imuAlignFun(&angles);
-
-        vstate->phi   = angles.x;
-        vstate->theta = angles.y;
-        vstate->psi   = angles.z;
-    }
-
-    uint32_t CORE_RATE(void)
-    {
-        return 1000;
     }
 
 } // extern "C"
