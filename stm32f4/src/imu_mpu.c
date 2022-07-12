@@ -382,7 +382,7 @@ void imuInit(hackflight_t * hf, uint8_t interruptPin)
     accelInit();
 }
 
-static void imuUpdate(
+static void updateFusion(
         hackflight_t * hf,
         uint32_t time,
         quaternion_t * quat,
@@ -470,17 +470,19 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 }
 
 
-void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
+void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
 {
+    (void)angles;
+
     quaternion_t quat = {0,0,0,0};
 
     getQuaternion(hf, time, &quat);
 
     rotation_t rot = {0,0,0};
 
-    quat2euler(&quat, &hf->vstate, &rot);
+    quat2euler(&quat, angles, &rot);
 
-    imuUpdate(hf, time, &quat, &rot);
+    updateFusion(hf, time, &quat, &rot);
 }
 
 

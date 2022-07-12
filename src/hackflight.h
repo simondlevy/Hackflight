@@ -56,7 +56,16 @@ extern "C" {
 static void task_attitude(void * hackflight, uint32_t time)
 {
     hackflight_t * hf = (hackflight_t *)hackflight;
-    imuGetEulerAngles(hf, time);
+
+    axes_t angles = {0,0,0};
+
+    imuGetEulerAngles(hf, time, &angles);
+
+    vehicle_state_t * vstate = &hf->vstate;
+
+    vstate->phi   = angles.x;
+    vstate->theta = angles.y;
+    vstate->psi   = angles.z;
 }
 
 // PID controller support -----------------------------------------------------
