@@ -146,6 +146,18 @@ extern "C" {
         usfsCheckStatus();
     }
 
+    void imuUpdate(
+            hackflight_t * hf,
+            uint32_t time,
+            quaternion_t * quat,
+            rotation_t * rot)
+    {
+        (void)hf;
+        (void)time;
+        (void)quat;
+        (void)rot;
+    }
+
     uint32_t CORE_RATE(void)
     {
         return 1000;

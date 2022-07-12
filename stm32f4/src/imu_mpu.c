@@ -381,7 +381,7 @@ void imuInit(hackflight_t * hf, uint8_t interruptPin)
     accelInit();
 }
 
-void imuUpdateFusion(
+void imuUpdate(
         hackflight_t * hf,
         uint32_t time,
         quaternion_t * quat,

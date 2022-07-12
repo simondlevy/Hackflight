@@ -213,7 +213,7 @@ void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 
     quat2euler(&quat, &hf->vstate, &rot);
 
-    imuUpdateFusion(hf, time, &quat, &rot);
+    imuUpdate(hf, time, &quat, &rot);
 }
 
 #if defined(__cplusplus)
