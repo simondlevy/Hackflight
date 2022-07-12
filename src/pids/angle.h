@@ -132,25 +132,6 @@ extern "C" {
         return value;
     }
 
-    static float accelerationLimit(anglePid_t * pid, uint8_t axis,
-            float currentPidSetpoint)
-    {
-        const float currentVelocity =
-            currentPidSetpoint - pid->previousSetpoint[axis];
-
-        float maxVelocity =
-            axis == 2 ? 0 : 0;
-
-        if (fabsf(currentVelocity) > maxVelocity) {
-            currentPidSetpoint = (currentVelocity > 0) ?
-                pid->previousSetpoint[axis] + maxVelocity :
-                pid->previousSetpoint[axis] - maxVelocity;
-        }
-
-        pid->previousSetpoint[axis] = currentPidSetpoint;
-        return currentPidSetpoint;
-    }
-
     static void applyItermRelax(
             anglePid_t * pid,
             const int axis,
