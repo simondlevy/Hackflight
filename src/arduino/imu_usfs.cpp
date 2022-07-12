@@ -19,35 +19,36 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+
 #include <USFS.h>
 
+#include <datatypes.h>
 #include <imu.h>
 
-static const uint8_t  GYRO_RATE_TENTH = 100;   // 1/10th actual rate
-static const uint16_t GYRO_SCALE_DPS  = 2000;
+static const uint8_t  ACCEL_RATE_TENTH = 20; // 1/10th actual rate
+static const uint8_t  GYRO_RATE_TENTH = 100; // 1/10th actual rate
 
 // Arbitrary; unused
 static const uint8_t  ACCEL_BANDWIDTH  = 3;
 static const uint8_t  GYRO_BANDWIDTH   = 3;
 static const uint8_t  QUAT_DIVISOR     = 1;
 static const uint8_t  MAG_RATE         = 100;
-static const uint8_t  ACCEL_RATE_TENTH = 20; // Multiply by 10 to get actual rate
 static const uint8_t  BARO_RATE        = 50;
-static const uint16_t ACCEL_SCALE      = 8;
-static const uint16_t MAG_SCALE        = 1000;
 
 static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
-                                        USFS_INTERRUPT_ERROR |
-                                        USFS_INTERRUPT_GYRO;
+USFS_INTERRUPT_ERROR |
+USFS_INTERRUPT_GYRO |
+USFS_INTERRUPT_QUAT;
 
 static const uint8_t REPORT_HZ = 2;
 
-static int16_t _gyroAdc[3];
-static volatile bool _gotNewData;
+static bool _accelIsReady;
+static int16_t _gyroRaw[3];
+static float _qw, _qx, _qy, _qz;
 
+static volatile bool     _gotNewData;
 static volatile uint32_t _gyroInterruptCount;
 static volatile uint32_t _gyroSyncTime;
-
 
 static void interruptHandler()
 {
@@ -67,6 +68,8 @@ extern "C" {
     {
         bool result = false;
 
+        _accelIsReady = false;
+
         if (_gotNewData) { 
 
             _gotNewData = false;  
@@ -78,28 +81,43 @@ extern "C" {
             }
 
             if (usfsEventStatusIsGyrometer(eventStatus)) { 
-                usfsReadGyrometer(_gyroAdc);
+                usfsReadGyrometerRaw(_gyroRaw);
                 result = true;
             }
 
-        } 
+            if (usfsEventStatusIsQuaternion(eventStatus)) { 
+                usfsReadQuaternion(_qw, _qx, _qy, _qz);
+            } 
+
+        }
 
         return result;
-    }
-
-    int16_t gyroReadRaw(uint8_t k)
-    {
-        return _gyroAdc[k];
-    }
-
-    uint16_t gyroScaleDps(void)
-    {
-        return GYRO_SCALE_DPS;
     }
 
     uint32_t gyroSyncTime(void)
     {
         return _gyroSyncTime;
+    }
+
+    void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
+    {
+        (void)hf;
+        (void)time;
+
+        quat->w = _qw;
+        quat->x = _qx;
+        quat->y = _qy;
+        quat->z = _qz;
+    }
+
+    int16_t gyroReadRaw(uint8_t k)
+    {
+        return _gyroRaw[k];
+    }
+
+    float gyroScaleDps(void)
+    {
+        return USFS_GYRO_SCALE;
     }
 
     void imuInit(hackflight_t * hf, uint8_t interruptPin)
@@ -114,9 +132,6 @@ extern "C" {
         usfsBegin(
                 ACCEL_BANDWIDTH,
                 GYRO_BANDWIDTH,
-                ACCEL_SCALE,
-                GYRO_SCALE_DPS,
-                MAG_SCALE,
                 QUAT_DIVISOR,
                 MAG_RATE,
                 ACCEL_RATE_TENTH,
@@ -129,6 +144,11 @@ extern "C" {
 
         // Clear interrupts
         usfsCheckStatus();
+    }
+
+    uint32_t CORE_RATE(void)
+    {
+        return 1000;
     }
 
 } // extern "C"
