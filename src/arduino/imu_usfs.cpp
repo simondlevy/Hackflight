@@ -95,17 +95,6 @@ extern "C" {
         return _gyroSyncTime;
     }
 
-    void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
-    {
-        (void)hf;
-        (void)time;
-
-        quat->w = _qw;
-        quat->x = _qx;
-        quat->y = _qy;
-        quat->z = _qz;
-    }
-
     int16_t gyroReadRaw(uint8_t k)
     {
         return _gyroRaw[k];
