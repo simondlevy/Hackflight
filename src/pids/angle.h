@@ -64,8 +64,6 @@ static const uint8_t FEEDFORWARD_MAX_RATE_LIMIT = 90;
 static const uint8_t DYN_LPF_CURVE_EXPO = 5;
 
 
-static float FREQUENCY() {return 1.0f / CORE_DT(); }
-
 // Scale factors to make best use of range with D_LPF debugging, aiming for max
 // +/-16K as debug values are 16 bit
 static const float D_LPF_FILT_SCALE = 22;
@@ -379,8 +377,11 @@ extern "C" {
             float pidSetpointDelta = 0;
             float feedforwardMaxRate = rxApplyRates(1, 1);
 
+            float freq = 1.0f / CORE_DT();
+
             // -----calculate D component
             if ((axis < 2 && constants->k_rate_d > 0)) {
+
 
                 // Divide rate change by dT to get differential (ie dr/dt).
                 // dT is fixed and calculated from the target PID loop time
@@ -388,7 +389,7 @@ extern "C" {
                 // dynamically calculated deltaT whenever another task causes
                 // the PID loop execution to be delayed.
                 const float delta = -(gyroRateDterm[axis] -
-                        pid->previousGyroRateDterm[axis]) * FREQUENCY();
+                        pid->previousGyroRateDterm[axis]) * freq;
 
                 float preTpaD = constants->k_rate_d * delta;
 
@@ -408,7 +409,7 @@ extern "C" {
                     dMinGyroFactor = fabsf(dMinGyroFactor) * d_min_gyro_gain;
                     const float d_min_setpoint_gain =
                         D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
-                        D_MIN_ADVANCE * FREQUENCY() / (100 * D_MIN_LOWPASS_HZ);
+                        D_MIN_ADVANCE * freq / (100 * D_MIN_LOWPASS_HZ);
                     const float dMinSetpointFactor =
                         (fabsf(pidSetpointDelta)) * d_min_setpoint_gain;
                     dMinFactor = fmaxf(dMinGyroFactor, dMinSetpointFactor);
@@ -444,8 +445,7 @@ extern "C" {
                 // halve feedforward in Level mode since stick sensitivity is
                 // weaker by about half transition now calculated in
                 // feedforward.c when new RC data arrives 
-                float feedForward =
-                    feedforwardGain * pidSetpointDelta * FREQUENCY();
+                float feedForward = feedforwardGain * pidSetpointDelta * freq;
 
                 float feedforwardMaxRateLimit =
                     feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
