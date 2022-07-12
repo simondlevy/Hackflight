@@ -471,7 +471,7 @@ typedef void (*mixer_t)(float throttle, float roll, float pitch, float yaw,
 typedef struct {
 
     arming_t         arming;
-    anglePid_t      anglepid;
+    anglePid_t       anglepid;
     task_t           attitudeTask;
     demands_t        demands;
     gyro_t           gyro;

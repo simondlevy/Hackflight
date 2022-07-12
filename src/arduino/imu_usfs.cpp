@@ -40,9 +40,6 @@ USFS_INTERRUPT_ERROR |
 USFS_INTERRUPT_GYRO |
 USFS_INTERRUPT_QUAT;
 
-static const uint8_t REPORT_HZ = 2;
-
-static bool _accelIsReady;
 static int16_t _gyroRaw[3];
 static float _qw, _qx, _qy, _qz;
 
@@ -67,8 +64,6 @@ extern "C" {
     bool gyroIsReady(void)
     {
         bool result = false;
-
-        _accelIsReady = false;
 
         if (_gotNewData) { 
 
@@ -152,10 +147,19 @@ extern "C" {
             quaternion_t * quat,
             rotation_t * rot)
     {
-        (void)hf;
         (void)time;
         (void)quat;
         (void)rot;
+
+        vehicle_state_t * vstate = &hf->vstate;
+
+        axes_t angles = {vstate->phi, vstate->theta, vstate->psi};
+
+        hf->imuAlignFun(&angles);
+
+        vstate->phi   = angles.x;
+        vstate->theta = angles.y;
+        vstate->psi   = angles.z;
     }
 
     uint32_t CORE_RATE(void)

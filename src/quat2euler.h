@@ -76,33 +76,30 @@ static float atan2_approx(float y, float x)
     return res;
 }
 
-// =============================================================================
-
-void imuAccumulateGyro(gyro_t * gyro)
+static void quat2euler(quaternion_t * quat, vehicle_state_t * state, rotation_t * rot)
 {
-    static float _adcf[3];
+    float qw = quat->w;
+    float qx = quat->x;
+    float qy = quat->y;
+    float qz = quat->z;
 
-    // integrate using trapezium rule to avoid bias
-    gyro->accum.values.x += 0.5f * (_adcf[0] + gyro->dps_filtered[0]) * CORE_PERIOD();
-    gyro->accum.values.y += 0.5f * (_adcf[1] + gyro->dps_filtered[1]) * CORE_PERIOD();
-    gyro->accum.values.z += 0.5f * (_adcf[2] + gyro->dps_filtered[2]) * CORE_PERIOD();
+    float r00 = 1 - 2 * qy*qy - 2 * qz*qz;
+    float r10 = 2 * (qx*qy + qw*qz);
+    float r20 = 2 * (qx*qz - qw*qy);
+    float r21 = 2 * (qy*qz + qw*qx);
+    float r22 = 1 - 2 * qx*qx - 2 * qy*qy;
 
-    gyro->accum.count++;
+    float psi = -atan2_approx(r10, r00); 
 
-    for (int axis = 0; axis < 3; axis++) {
-        _adcf[axis] = gyro->dps_filtered[axis];
-    }
-}
+    // Results
+    state->phi   = atan2_approx(r21, r22); 
+    state->theta = (0.5f * M_PI) - acos_approx(-r20);
+    state->psi   = psi + ((psi < 0) ? 2 * M_PI : 0);
 
-int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
-{
-    int32_t gyroSkew = cmpTimeCycles(nextTargetCycles, gyroSyncTime()) % desiredPeriodCycles;
-
-    if (gyroSkew > (desiredPeriodCycles / 2)) {
-        gyroSkew -= desiredPeriodCycles;
-    }
-
-    return gyroSkew;
+    // Additional output
+    rot->r20 = r20;
+    rot->r21 = r21;
+    rot->r22 = r22;
 }
 
 #if defined(__cplusplus)

@@ -32,12 +32,6 @@ extern "C" {
 
     void    imuInit(hackflight_t * hf, uint8_t interruptPin);
 
-    void    imuUpdate(
-                hackflight_t * hf,
-                uint32_t time,
-                quaternion_t * quat,
-                rotation_t * rot);
-
 #if defined(__cplusplus)
 }
 #endif
