@@ -79,8 +79,6 @@ static const float D_MIN_LOWPASS_HZ = 35;
 static const float D_MIN_GAIN_FACTOR          = 0.00008;
 static const float D_MIN_SETPOINT_GAIN_FACTOR = 0.00008f;
 
-static const uint16_t RATE_ACCEL_LIMIT = 0;
-static const uint16_t YAW_RATE_ACCEL_LIMIT = 0;
 static const uint16_t ITERM_LIMIT = 400;
 
 static const float LEVEL_ANGLE_LIMIT = 45;
@@ -88,16 +86,6 @@ static const float LEVEL_ANGLE_LIMIT = 45;
 #if defined(__cplusplus)
 extern "C" {
 #endif
-
-    static float MAX_VELOCITY_CYCLIC() 
-    {
-        return RATE_ACCEL_LIMIT * 100 * CORE_DT();
-    }
-
-    static float MAX_VELOCITY_YAW() 
-    {
-        return YAW_RATE_ACCEL_LIMIT * 100 * CORE_DT(); 
-    }
 
     static float pt2FilterApply(pt2Filter_t *filter, float input)
     {
@@ -151,7 +139,7 @@ extern "C" {
             currentPidSetpoint - pid->previousSetpoint[axis];
 
         float maxVelocity =
-            axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
+            axis == 2 ? 0 : 0;
 
         if (fabsf(currentVelocity) > maxVelocity) {
             currentPidSetpoint = (currentVelocity > 0) ?
@@ -358,13 +346,6 @@ extern "C" {
         for (uint8_t axis = 0; axis <= 2; ++axis) {
 
             float currentPidSetpoint = pidSetpoints[axis];
-
-            float maxVelocity =
-                axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
-            if (maxVelocity) {
-                currentPidSetpoint =
-                    accelerationLimit(pid, axis, currentPidSetpoint);
-            }
 
             if (axis != 2) {
                 currentPidSetpoint =
