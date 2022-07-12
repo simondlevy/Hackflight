@@ -472,14 +472,10 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 
 void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
 {
-    (void)angles;
-
     quaternion_t quat = {0,0,0,0};
-
     getQuaternion(hf, time, &quat);
 
     rotation_t rot = {0,0,0};
-
     quat2euler(&quat, angles, &rot);
 
     updateFusion(hf, time, &quat, &rot);
