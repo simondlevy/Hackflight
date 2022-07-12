@@ -198,6 +198,7 @@ CC_SIZE_OPTIMISATION    := $(OPTIMISATION_BASE) $(OPTIMISE_SIZE)
 CC_NO_OPTIMISATION      := 
 
 CFLAGS     += $(ARCH_FLAGS) \
+			  -DCORE_RATE=10000 \
               $(addprefix -I,$(INCLUDE_DIRS)) \
               -std=gnu11 \
               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \

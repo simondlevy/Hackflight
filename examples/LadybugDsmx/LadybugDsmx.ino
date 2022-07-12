@@ -37,10 +37,10 @@ void setup(void)
     static uint8_t motorPins[4] = {13, 16, 3, 11};
 
     static anglePidConstants_t anglePidConstants = {
-        1.441305,     // Rate Kp
-        19.55048,     // Rate Ki
-        0.021160,     // Rate Kd
-        0.0165048,    // Rate Kf
+        1.5,     // Rate Kp
+        5.0,     // Rate Ki
+        0,     // Rate Kd
+        0,    // Rate Kf
         0.0}; // 3.0, // Level Kp
 
     motorInitBrushed(motorPins);

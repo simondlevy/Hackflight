@@ -20,6 +20,8 @@
 
 #include "datatypes.h" // for CONST
 
-static uint32_t CORE_RATE = 10000;
+#ifndef CORE_RATE
+#define CORE_RATE 1000
+#endif
 
 static uint32_t CORE_PERIOD() { return 1000000 / CORE_RATE; }
