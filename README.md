@@ -37,7 +37,7 @@ Simulators can use just the <b>.h</b> files in the
 [src](https://github.com/simondlevy/Hackflight/tree/master/src) directory, which contain the
 basic control algorithms (open-loop control / PID control).  Real flight
 controllers use the code in the <b>.c</b> files located in that directory
-directory and in the [stm32/src](https://github.com/simondlevy/Hackflight/tree/master/stm32/src) directory,
+directory and in the [stm32f4/src](https://github.com/simondlevy/Hackflight/tree/master/stm32f4/src) directory,
 which contain code for real-time scheduling and for reading from physical sensors and R/C receivers.
 
 ## Design principles
@@ -61,24 +61,15 @@ channel values,  we also provide a very simple &ldquo;Ground Control Station&rdq
 that allows you to connect to the board and see what's going on. Windows users
 can run this program directly: just clone the [HackflightGCS](https://github.com/simondlevy/HackflightGCS)
 repository and double-click on <b>hackflight.exe</b>.  Others can run the
-<b>hackflight.py</b> Python script in the <b>extras/gcs/python</b> folder.  To
-run the Python script you'll need to install
-[MSPPG](https://github.com/simondlevy/RoboFirmwareToolkit/tree/main/extras/parser), a
-parser generator for the Multiwii Serial Protocol (MSP) messages used by the
-firmware. Follow the directions in that folder to install MSPPG for Python.
+<b>gcs.py</b> Python script in the <b>gcs</b> folder.  
 
 ## PID Controllers
 
-<b>A PID controller is not the same as a
-[flight mode](https://oscarliang.com/rate-acro-horizon-flight-mode-level/).</b>
-For example, so-called [Acro mode](http://ardupilot.org/copter/docs/acro-mode.html#acro-mode) 
-requires a PID controller based on angular
-velocity (a.k.a. rate, computed from the gyrometer) for each of the three angles
-(roll, pitch yaw). So-called [Stabilize](http://ardupilot.org/copter/docs/stabilize-mode.html#stabilize-mode) 
-mode requires these three angular-velocity controllers,
-plus a PID controller based on angle (computed from the quaternion) for the
-roll and pitch axes.   To support this arrangement in Hackflight, PID
-controllers for aux state 0 will also run in aux states 1 and 2, and PID
-controllers for aux state 1 will also run in aux state 2.
+By default, Hackflight has a single PID controller, for controlling the vehicle's roll,
+pitch, and yaw angles via four constants: K<sub>P</sub>, K<sub>I</sub>, and K<sub>D</sub> for
+angular velocity, and another K<sub>P</sub> for roll and
+pitch angle values     If the latter value is set to zero,
+the vehicle will fly in so-called &ldquo;rate mode&rdquo;; otherwise, it will fly in
+&ldquo;level mode&rdquo;.
 
 <p align="center"> <img src="media/pidcontrollers.png" width=600> </p>
