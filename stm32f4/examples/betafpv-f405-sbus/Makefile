@@ -284,54 +284,65 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 $(OBJECT_DIR)/arming.o: $(HFSRC_DIR)/arming.c $(HFSRC_DIR)/arming.h \
 	  $(HFSRC_DIR)/failsafe.h $(HFSRC_DIR)/led.h $(HFSRC_DIR)/motor.h \
 	  $(HFSRC_DIR)/rx_status.h
+	@echo arming.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/arming.o $(CFLAGS) $(HFSRC_DIR)/arming.c
 
 $(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.c $(HFSRC_DIR)/msp.h
+	@echo debug.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/debug.o $(CFLAGS) $(HFSRC_DIR)/debug.c
 
 $(OBJECT_DIR)/failsafe.o: $(HFSRC_DIR)/failsafe.c $(HFSRC_DIR)/arming.h \
 	  $(HFSRC_DIR)/failsafe.h $(HFSRC_DIR)/rx.h $(HFSRC_DIR)/rx_status.h $(HFSRC_DIR)/time.h
+	@echo failsafe.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/failsafe.o $(CFLAGS) $(HFSRC_DIR)/failsafe.c
 
 $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.c $(HFSRC_DIR)/core_dt.h $(HFSRC_DIR)/datatypes.h \
 	  $(HFSRC_DIR)/gyro.h $(HFSRC_DIR)/imu.h $(HFSRC_DIR)/maths.h \
 	  $(HFSRC_DIR)/pt1_filter.h $(HFSRC_DIR)/stats.h $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
+	@echo gyro.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HFSRC_DIR)/gyro.c
 
 $(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c $(HFSRC_DIR)/hackflight.h \
 	  $(HFSRC_DIR)/gyro.h $(HFSRC_DIR)/led.h $(HFSRC_DIR)/msp.h $(HFSRC_DIR)/rx.h \
 	  $(HFSRC_DIR)/system.h
+	@echo hackflight.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) \
 		$(HFSRC_DIR)/hackflight.c
 
 $(OBJECT_DIR)/imu.o: $(HFSRC_DIR)/imu.c $(HFSRC_DIR)/arming.h $(HFSRC_DIR)/core_dt.h \
 	  $(HFSRC_DIR)/datatypes.h $(HFSRC_DIR)/imu.h $(HFSRC_DIR)/maths.h $(HFSRC_DIR)/time.h
+	@echo imu.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/imu.o $(CFLAGS) $(HFSRC_DIR)/imu.c
 
 $(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.c $(HFSRC_DIR)/led.h $(HFSRC_DIR)/time.h
+	@echo led.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/led.o $(CFLAGS) $(HFSRC_DIR)/led.c
 
 $(OBJECT_DIR)/maths.o: $(HFSRC_DIR)/maths.c $(HFSRC_DIR)/datatypes.h
+	@echo maths.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/maths.o $(CFLAGS) $(HFSRC_DIR)/maths.c
 
 $(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.c $(HFSRC_DIR)/motor.h $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
+	@echo msp.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HFSRC_DIR)/msp.c \
 		
-
 $(OBJECT_DIR)/rx.o: $(HFSRC_DIR)/rx.c $(HFSRC_DIR)/arming.h $(HFSRC_DIR)/core_dt.h \
 	  $(HFSRC_DIR)/datatypes.h $(HFSRC_DIR)/failsafe.h $(HFSRC_DIR)/led.h \
 	  $(HFSRC_DIR)/maths.h $(HFSRC_DIR)/motor.h $(HFSRC_DIR)/pt3_filter.h \
 	  $(HFSRC_DIR)/pwm.h $(HFSRC_DIR)/rx.h $(HFSRC_DIR)/rx_rate.h \
 	  $(HFSRC_DIR)/rx_status.h $(HFSRC_DIR)/scale.h 
+	@echo rx.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/rx.o $(CFLAGS) $(HFSRC_DIR)/rx.c
 
 $(OBJECT_DIR)/sbus.o: $(HFSRC_DIR)/rx/sbus.c $(HFSRC_DIR)/datatypes.h \
 	  $(HFSRC_DIR)/serial.h $(HFSRC_DIR)/time.h
+	@echo sbus.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/sbus.o $(CFLAGS) $(HFSRC_DIR)/rx/sbus.c
 
 $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
+	@echo stm32_clock.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32_clock.o $(CFLAGS) \
 		$(HFSRC_DIR)/stm32_clock.c
 
