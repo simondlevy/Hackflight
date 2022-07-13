@@ -20,7 +20,7 @@
 #include <Arduino.h>
 
 #include <hackflight_full.h>
-
+#include "rx/dsmx.h"
 #include "arduino/ladybugfc.hpp"
 
 void setup(void)
