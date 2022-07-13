@@ -52,7 +52,8 @@ ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
 # default xtal value for F4 targets
 HSE_VALUE       ?= 8000000
 
-# used to disable features based on flash space shortage (larger number => more features disabled)
+# used to disable features based on flash space shortage (larger number => more
+# features disabled)
 FEATURE_CUT_LEVEL_SUPPLIED := $(FEATURE_CUT_LEVEL)
 FEATURE_CUT_LEVEL =
 
@@ -284,44 +285,63 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 	@echo "Linking" $@
 	$(V1) $(CROSS_CC) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
-$(OBJECT_DIR)/arming.o: $(HSRC_DIR)/arming.c
+$(OBJECT_DIR)/arming.o: $(HSRC_DIR)/arming.c $(HSRC_DIR)/arming.h \
+	  $(HSRC_DIR)/failsafe.h $(HSRC_DIR)/led.h $(HSRC_DIR)/motor.h \
+	  $(HSRC_DIR)/rx_status.h
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/arming.o $(CFLAGS) $(HSRC_DIR)/arming.c
 
-$(OBJECT_DIR)/debug.o: $(HSRC_DIR)/debug.c
+$(OBJECT_DIR)/debug.o: $(HSRC_DIR)/debug.c $(HSRC_DIR)/msp.h
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/debug.o $(CFLAGS) $(HSRC_DIR)/debug.c
 
-$(OBJECT_DIR)/failsafe.o: $(HSRC_DIR)/failsafe.c
+$(OBJECT_DIR)/failsafe.o: $(HSRC_DIR)/failsafe.c $(HSRC_DIR)/arming.h \
+	  $(HSRC_DIR)/failsafe.h $(HSRC_DIR)/rx.h $(HSRC_DIR)/rx_status.h $(HSRC_DIR)/time.h
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/failsafe.o $(CFLAGS) $(HSRC_DIR)/failsafe.c
 
-$(OBJECT_DIR)/gyro.o: $(HSRC_DIR)/gyro.c
+$(OBJECT_DIR)/gyro.o: $(HSRC_DIR)/gyro.c $(HSRC_DIR)/core_dt.h $(HSRC_DIR)/datatypes.h \
+	  $(HSRC_DIR)/gyro.h $(HSRC_DIR)/imu.h $(HSRC_DIR)/maths.h \
+	  $(HSRC_DIR)/pt1_filter.h $(HSRC_DIR)/stats.h $(HSRC_DIR)/system.h \
+	  $(HSRC_DIR)/time.h
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HSRC_DIR)/gyro.c
 
-$(OBJECT_DIR)/hackflight.o: $(HSRC_DIR)/hackflight.c $(HSRC_DIR)/hackflight.h
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(HSRC_DIR)/hackflight.c
+$(OBJECT_DIR)/hackflight.o: $(HSRC_DIR)/hackflight.c $(HSRC_DIR)/hackflight.h \
+	  $(HSRC_DIR)/gyro.h $(HSRC_DIR)/led.h $(HSRC_DIR)/msp.h $(HSRC_DIR)/rx.h \
+	  $(HSRC_DIR)/system.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) \
+		$(HSRC_DIR)/hackflight.c
 
-$(OBJECT_DIR)/imu.o: $(HSRC_DIR)/imu.c
+$(OBJECT_DIR)/imu.o: $(HSRC_DIR)/imu.c $(HSRC_DIR)/arming.h $(HSRC_DIR)/core_dt.h \
+	  $(HSRC_DIR)/datatypes.h $(HSRC_DIR)/imu.h $(HSRC_DIR)/maths.h $(HSRC_DIR)/time.h
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/imu.o $(CFLAGS) $(HSRC_DIR)/imu.c
 
-$(OBJECT_DIR)/led.o: $(HSRC_DIR)/led.c
+$(OBJECT_DIR)/led.o: $(HSRC_DIR)/led.c $(HSRC_DIR)/led.h $(HSRC_DIR)/time.h
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/led.o $(CFLAGS) $(HSRC_DIR)/led.c
 
-$(OBJECT_DIR)/maths.o: $(HSRC_DIR)/maths.c
+$(OBJECT_DIR)/maths.o: $(HSRC_DIR)/maths.c $(HSRC_DIR)/datatypes.h
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/maths.o $(CFLAGS) $(HSRC_DIR)/maths.c
 
-$(OBJECT_DIR)/msp.o: $(HSRC_DIR)/msp.c
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HSRC_DIR)/msp.c
+$(OBJECT_DIR)/msp.o: $(HSRC_DIR)/msp.c $(HSRC_DIR)/motor.h $(HSRC_DIR)/system.h \
+	  $(HSRC_DIR)/time.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HSRC_DIR)/msp.c \
+		
 
-$(OBJECT_DIR)/rx.o: $(HSRC_DIR)/rx.c
+$(OBJECT_DIR)/rx.o: $(HSRC_DIR)/rx.c $(HSRC_DIR)/arming.h $(HSRC_DIR)/core_dt.h \
+	  $(HSRC_DIR)/datatypes.h $(HSRC_DIR)/failsafe.h $(HSRC_DIR)/led.h \
+	  $(HSRC_DIR)/maths.h $(HSRC_DIR)/motor.h $(HSRC_DIR)/pt3_filter.h \
+	  $(HSRC_DIR)/pwm.h $(HSRC_DIR)/rx.h $(HSRC_DIR)/rx_rate.h \
+	  $(HSRC_DIR)/rx_status.h $(HSRC_DIR)/scale.h 
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/rx.o $(CFLAGS) $(HSRC_DIR)/rx.c
 
-$(OBJECT_DIR)/sbus.o: $(HSRC_DIR)/rx/sbus.c
+$(OBJECT_DIR)/sbus.o: $(HSRC_DIR)/rx/sbus.c $(HSRC_DIR)/datatypes.h \
+	  $(HSRC_DIR)/serial.h $(HSRC_DIR)/time.h
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/sbus.o $(CFLAGS) $(HSRC_DIR)/rx/sbus.c
 
 $(OBJECT_DIR)/stm32_clock.o: $(HSRC_DIR)/stm32_clock.c
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32_clock.o $(CFLAGS) $(HSRC_DIR)/stm32_clock.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32_clock.o $(CFLAGS) \
+		$(HSRC_DIR)/stm32_clock.c
 
 define compile_file
-	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
+	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) \
+		$(CC_DEFAULT_OPTIMISATION) $<
 endef
 
 $(TARG_OBJ_DIR)/%.o: %.c
