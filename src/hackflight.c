@@ -359,7 +359,6 @@ extern "C" {
         ledInit(ledPin);
         ledFlash(10, 50);
         failsafeInit();
-        failsafeReset();
 
         hf->rx.devCheck = rxDeviceFuns->check;
         hf->rx.devConvert = rxDeviceFuns->convert;
