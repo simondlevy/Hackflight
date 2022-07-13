@@ -372,9 +372,6 @@ extern "C" {
 
         hackflightInit(hf, anglePidConstants, mixer);
 
-        // Initialize quaternion in upright position
-        hf->imuFusionPrev.quat.w = 1;
-
         hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 
