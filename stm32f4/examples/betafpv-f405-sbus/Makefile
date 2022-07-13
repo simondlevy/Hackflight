@@ -1,9 +1,8 @@
-# The target to build, see VALID_TARGETS below
-TARGET    ?= STM32F405
 TARGET_MCU := STM32F4
 
-# SERIAL_DEVICE ?= /dev/ttyACM0
-SERIAL_DEVICE ?= COM30
+TARGET    := STM32F405
+
+SERIAL_DEVICE ?= /dev/ttyACM0
 
 # Working directories
 ROOT         := ../..
