@@ -91,15 +91,6 @@ typedef struct {
     pt1Filter_t         windupLpf[3];
 } anglePid_t;
 
-// Demands ----------------------------------------------------------------------
-
-typedef struct {
-    float throttle;
-    float roll;
-    float pitch;
-    float yaw;
-} demands_t;
-
 // Axes ------------------------------------------------------------------------
 
 typedef struct {
@@ -107,6 +98,13 @@ typedef struct {
     float y;
     float z;
 } axes_t;
+
+// Demands ----------------------------------------------------------------------
+
+typedef struct {
+    float throttle;
+    axes_t rpy;
+} demands_t;
 
 // Vehicle state ----------------------------------------------------------------
 
@@ -487,22 +485,22 @@ typedef struct {
     demands_t        demands;
     gyro_t           gyro;
     imu_align_fun    imuAlignFun;
-    imuFusion_t     imuFusionPrev;
+    imuFusion_t      imuFusionPrev;
     float            maxArmingAngle;
     mixer_t          mixer;
     void *           motorDevice;
     float            mspMotors[4];
     task_t           mspTask;
-    pidController_t pidControllers[10];
+    pidController_t  pidControllers[10];
     uint8_t          pidCount;
     bool             pidZeroThrottleItermReset;
     rx_t             rx;
     task_t           rxTask;
-    rxAxes_t        rxAxes;
+    rxAxes_t         rxAxes;
     scheduler_t      scheduler;
     task_t           sensorTasks[10];
     uint8_t          sensorTaskCount;
-    vehicleState_t  vstate;
+    vehicleState_t   vstate;
 
 } hackflight_t;
 

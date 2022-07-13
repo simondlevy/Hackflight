@@ -318,7 +318,7 @@ extern "C" {
                         gyroRateDterm[axis]);
         }
 
-        float pidSetpoints[3] = { demands->roll, demands->pitch, demands->yaw };
+        float pidSetpoints[3] = { demands->rpy.x, demands->rpy.y, demands->rpy.z };
         float currentAngles[3] = { vstate->phi, vstate->theta, vstate->psi };
 
         // ----------PID controller----------
@@ -491,9 +491,9 @@ extern "C" {
             }
         }
 
-        demands->roll  = pid->data[0].Sum;
-        demands->pitch = pid->data[1].Sum;
-        demands->yaw   = pid->data[2].Sum;
+        demands->rpy.x = pid->data[0].Sum;
+        demands->rpy.y = pid->data[1].Sum;
+        demands->rpy.z = pid->data[2].Sum;
 
         updateDynLpfCutoffs(pid, currentTimeUs, demands->throttle);
     }

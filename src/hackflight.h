@@ -87,7 +87,7 @@ static void task_rx(void * hackflight, uint32_t time)
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
-    rxAxes_t rxax = {{0, 0, 0, 0}, 0, 0};
+    static rxAxes_t rxax = {{0, {0, 0, 0}}, 0, 0};
 
     bool gotNewData = false;
 
@@ -131,14 +131,6 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
     rxGetDemands(&hf->rx, currentTimeUs, &hf->anglepid, &hf->demands);
 
-    /*
-    printf("t=%2.2f  r=%2.2f  p=%2.2f  y=%2.2f\n", 
-            hf->demands.throttle,
-            hf->demands.roll,
-            hf->demands.pitch,
-            hf->demands.yaw);
-            */
-
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pidController_t pid = hf->pidControllers[k];
         pid.fun(currentTimeUs, &hf->demands, pid.data,
@@ -148,9 +140,9 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
     float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
     hf->mixer(
             hf->demands.throttle,
-            constrain_demand(hf->demands.roll, PIDSUM_LIMIT_CYCLIC),
-            constrain_demand(hf->demands.pitch, PIDSUM_LIMIT_CYCLIC),
-            -constrain_demand(hf->demands.yaw, PIDSUM_LIMIT_YAW),
+            constrain_demand(hf->demands.rpy.x, PIDSUM_LIMIT_CYCLIC),
+            constrain_demand(hf->demands.rpy.y, PIDSUM_LIMIT_CYCLIC),
+            -constrain_demand(hf->demands.rpy.z, PIDSUM_LIMIT_YAW),
             mixmotors);
 
     motorWrite(hf->motorDevice,

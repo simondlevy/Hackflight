@@ -80,7 +80,6 @@ static const uint16_t RATE_LIMIT                  = 1998;
 static const float    THR_EXPO8                   = 0;
 static const float    THR_MID8                    = 50;
 static const float    COMMAND_DIVIDER             = 500;
-static const float    YAW_COMMAND_DIVIDER         = 500;
 
 // minimum PWM pulse width which is considered valid
 static const uint16_t PWM_PULSE_MIN   = 750;   
@@ -704,9 +703,9 @@ static void processSmoothingFilter(
         }
 
         rx->dataToSmooth.throttle = rx->commands.throttle;
-        rx->dataToSmooth.roll = rawSetpoint[1];
-        rx->dataToSmooth.pitch = rawSetpoint[2];
-        rx->dataToSmooth.yaw = rawSetpoint[3];
+        rx->dataToSmooth.rpy.x = rawSetpoint[1];
+        rx->dataToSmooth.rpy.y = rawSetpoint[2];
+        rx->dataToSmooth.rpy.z = rawSetpoint[3];
     }
 
     // Each pid loop, apply the last received channel value to the filter, if
@@ -714,16 +713,16 @@ static void processSmoothingFilter(
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterThrottle,
             rx->dataToSmooth.throttle, &rx->commands.throttle);
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterRoll,
-            rx->dataToSmooth.roll, &setpointRate[1]);
+            rx->dataToSmooth.rpy.x, &setpointRate[1]);
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterPitch,
-            rx->dataToSmooth.pitch, &setpointRate[2]);
+            rx->dataToSmooth.rpy.y, &setpointRate[2]);
     smoothingFilterApply(&rx->smoothingFilter, &rx->smoothingFilter.filterYaw,
-            rx->dataToSmooth.yaw, &setpointRate[3]);
+            rx->dataToSmooth.rpy.z, &setpointRate[3]);
 }
 
-static float getRawSetpoint(float command, float divider)
+static float getRawSetpoint(float command)
 {
-    float commandf = command / divider;
+    float commandf = command / COMMAND_DIVIDER;
 
     float commandfAbs = fabsf(commandf);
 
@@ -823,9 +822,9 @@ void rxPoll(
     }
 
     rxax->demands.throttle = rx->raw[THROTTLE];
-    rxax->demands.roll     = rx->raw[ROLL];
-    rxax->demands.pitch    = rx->raw[PITCH];
-    rxax->demands.yaw      = rx->raw[YAW];
+    rxax->demands.rpy.x    = rx->raw[ROLL];
+    rxax->demands.rpy.y    = rx->raw[PITCH];
+    rxax->demands.rpy.z    = rx->raw[YAW];
     rxax->aux1             = rx->raw[AUX1];
     rxax->aux2             = rx->raw[AUX2];
 
@@ -846,9 +845,9 @@ void rxGetDemands(
 
         rx->previousFrameTimeUs = 0;
 
-        rawSetpoint[ROLL]  = getRawSetpoint(rx->command[ROLL], COMMAND_DIVIDER);
-        rawSetpoint[PITCH] = getRawSetpoint(rx->command[PITCH], COMMAND_DIVIDER);
-        rawSetpoint[YAW]   = getRawSetpoint(rx->command[YAW], YAW_COMMAND_DIVIDER);
+        rawSetpoint[ROLL]  = getRawSetpoint(rx->command[ROLL]);
+        rawSetpoint[PITCH] = getRawSetpoint(rx->command[PITCH]);
+        rawSetpoint[YAW]   = getRawSetpoint(rx->command[YAW]);
     }
 
     processSmoothingFilter(currentTimeUs, rx, ratepid, setpointRate, rawSetpoint);
@@ -858,9 +857,9 @@ void rxGetDemands(
     demands->throttle =
         constrain_f((rx->commands.throttle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
 
-    demands->roll  = setpointRate[ROLL];
-    demands->pitch = setpointRate[PITCH];
-    demands->yaw   = setpointRate[YAW];
+    demands->rpy.x = setpointRate[ROLL];
+    demands->rpy.y = setpointRate[PITCH];
+    demands->rpy.z = setpointRate[YAW];
 
     rx->gotNewData = false;
 }

@@ -195,9 +195,9 @@ static bool processOutCommand(
 
         case MSP_RC:
             sbufWriteU16(dst, rxax->demands.throttle); 
-            sbufWriteU16(dst, rxax->demands.roll);
-            sbufWriteU16(dst, rxax->demands.pitch);
-            sbufWriteU16(dst, rxax->demands.yaw);
+            sbufWriteU16(dst, rxax->demands.rpy.x);
+            sbufWriteU16(dst, rxax->demands.rpy.y);
+            sbufWriteU16(dst, rxax->demands.rpy.z);
             sbufWriteU16(dst, rxax->aux1);
             sbufWriteU16(dst, rxax->aux2);
             break;
