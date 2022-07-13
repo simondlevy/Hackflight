@@ -43,9 +43,9 @@ static const uint32_t ATTITUDE_TASK_RATE = 100;
 
 // PID-limiting constants -----------------------------------------------------
 
-static const float    PID_MIXER_SCALING = 1000;
-static const uint16_t PIDSUM_LIMIT_YAW  = 400;
-static const uint16_t PIDSUM_LIMIT      = 500;
+static const float    PID_MIXER_SCALING   = 1000;
+static const uint16_t PIDSUM_LIMIT_CYCLIC = 500;
+static const uint16_t PIDSUM_LIMIT_YAW    = 400;
 
 // Attitude task --------------------------------------------------------------
 
@@ -118,9 +118,9 @@ static void task_rx(void * hackflight, uint32_t time)
 
 // Core tasks: gyro, PID controllers, mixer, motors ------------------------
 
-static float constrain_demand(float demand, float limit, float scaling)
+static float constrain_demand(float demand, float limit)
 {
-    return constrain_f(demand, -limit, +limit) / scaling;
+    return constrain_f(demand, -limit, +limit) / PID_MIXER_SCALING;
 }
 
 static void hackflightRunCoreTasks(hackflight_t * hf)
@@ -131,6 +131,14 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
     rxGetDemands(&hf->rx, currentTimeUs, &hf->anglepid, &hf->demands);
 
+    /*
+    printf("t=%2.2f  r=%2.2f  p=%2.2f  y=%2.2f\n", 
+            hf->demands.throttle,
+            hf->demands.roll,
+            hf->demands.pitch,
+            hf->demands.yaw);
+            */
+
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pidController_t pid = hf->pidControllers[k];
         pid.fun(currentTimeUs, &hf->demands, pid.data,
@@ -140,9 +148,9 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
     float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
     hf->mixer(
             hf->demands.throttle,
-            constrain_demand(hf->demands.roll, PIDSUM_LIMIT, PID_MIXER_SCALING),
-            constrain_demand(hf->demands.pitch, PIDSUM_LIMIT, PID_MIXER_SCALING),
-            -constrain_demand(hf->demands.yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING),
+            constrain_demand(hf->demands.roll, PIDSUM_LIMIT_CYCLIC),
+            constrain_demand(hf->demands.pitch, PIDSUM_LIMIT_CYCLIC),
+            -constrain_demand(hf->demands.yaw, PIDSUM_LIMIT_YAW),
             mixmotors);
 
     motorWrite(hf->motorDevice,

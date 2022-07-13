@@ -19,6 +19,7 @@
 #include <Arduino.h>
 
 #include <arming.h>
+#include <core_rate.h>
 #include <debug.h>
 #include <motor.h>
 #include <pwm.h>
@@ -83,5 +84,5 @@ void motorWrite(void * motorDevice, float *values)
         analogWrite(pins[k], (uint8_t)(values[k] * 255));
     }
 
-    //printf("%f %f %f %f\n", values[0], values[1], values[2], values[3]);
+    //printf("%2.2f %2.2f %2.2f %2.2f\n", values[0], values[1], values[2], values[3]);
 }
