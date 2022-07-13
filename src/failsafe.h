@@ -68,7 +68,6 @@ extern "C" {
 #endif
 
 void failsafeInit(void);
-void failsafeReset(void);
 void failsafeStartMonitoring(void);
 void failsafeUpdateState(float * rcData, void * motorDevice, arming_t * arming);
 bool failsafeIsMonitoring(void);

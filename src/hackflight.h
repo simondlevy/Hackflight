@@ -127,8 +127,6 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 {
     uint32_t currentTimeUs = timeMicros();
 
-    float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
-
     gyroReadScaled(hf, &hf->vstate);
 
     rxGetDemands(&hf->rx, currentTimeUs, &hf->anglepid, &hf->demands);
@@ -139,7 +137,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
                 &hf->vstate, hf->pidZeroThrottleItermReset);
     }
 
-    // Calculate and Limit the PID sum
+    float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
     hf->mixer(
             hf->demands.throttle,
             constrain_demand(hf->demands.roll, PIDSUM_LIMIT, PID_MIXER_SCALING),
@@ -167,11 +165,6 @@ static void hackflightInit(
     initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
 
     initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
-
-    // Initialize quaternion in upright position
-    hf->imuFusionPrev.quat.w = 1;
-
-    hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 }
 
 #if defined(__cplusplus)

@@ -88,6 +88,9 @@ int main(void)
             imuRotate270,
             37);                // LED pin
 
+        // Initialize quaternion in upright position
+        hf.imuFusionPrev.quat.w = 1;
+
     while (true) {
         hackflightStep(&hf);
     }

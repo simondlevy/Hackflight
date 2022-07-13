@@ -71,7 +71,7 @@ static const float TASK_AGE_EXPEDITE_SCALE = 0.9;
 static const uint32_t CORE_RATE_COUNT = 25000;
 static const uint32_t GYRO_LOCK_COUNT = 400;
 
-// MSP task ---------------------------------------------------------------------
+// MSP task --------------------------------------------------------------------
 
 static const uint32_t MSP_TASK_RATE = 100;
 
@@ -304,42 +304,8 @@ extern "C" {
         }
     }
 
-    // -------------------------------------------------------------------------
-
-    void hackflightInitFull(
-            hackflight_t * hf,
-            rxDevFuns_t * rxDeviceFuns,
-            serialPortIdentifier_e rxDevPort,
-            anglePidConstants_t * anglePidConstants,
-            mixer_t mixer,
-            void * motorDevice,
-            uint8_t imuInterruptPin,
-            imu_align_fun imuAlign,
-            uint8_t ledPin)
+    static void schedulerInit(scheduler_t * scheduler)
     {
-        mspInit();
-        gyroInit(hf);
-        imuInit(hf, imuInterruptPin);
-        ledInit(ledPin);
-        ledFlash(10, 50);
-        failsafeInit();
-        failsafeReset();
-
-        hf->rx.devCheck = rxDeviceFuns->check;
-        hf->rx.devConvert = rxDeviceFuns->convert;
-
-        rxDeviceFuns->init(rxDevPort);
-
-        hf->imuAlignFun = imuAlign;
-
-        hf->motorDevice = motorDevice;
-
-        hackflightInit(hf, anglePidConstants, mixer);
-
-        initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
-
-        scheduler_t * scheduler = &hf->scheduler;
-
         scheduler->loopStartCycles =
             systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
         scheduler->loopStartMinCycles =
@@ -372,6 +338,43 @@ extern "C" {
             (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
 
         scheduler->clockRate = systemClockMicrosToCycles(1000000);
+     }
+
+    // -------------------------------------------------------------------------
+
+    void hackflightInitFull(
+            hackflight_t * hf,
+            rxDevFuns_t * rxDeviceFuns,
+            serialPortIdentifier_e rxDevPort,
+            anglePidConstants_t * anglePidConstants,
+            mixer_t mixer,
+            void * motorDevice,
+            uint8_t imuInterruptPin,
+            imu_align_fun imuAlign,
+            uint8_t ledPin)
+    {
+        mspInit();
+        gyroInit(hf);
+        imuInit(hf, imuInterruptPin);
+        ledInit(ledPin);
+        ledFlash(10, 50);
+        failsafeInit();
+
+        hf->rx.devCheck = rxDeviceFuns->check;
+        hf->rx.devConvert = rxDeviceFuns->convert;
+
+        rxDeviceFuns->init(rxDevPort);
+
+        hf->imuAlignFun = imuAlign;
+
+        hf->motorDevice = motorDevice;
+
+        hackflightInit(hf, anglePidConstants, mixer);
+
+        hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+        initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
+
+        schedulerInit(&hf->scheduler);
     }
 
     void hackflightStep(hackflight_t * hf)
@@ -384,7 +387,8 @@ extern "C" {
         // Realtime gyro/filtering/PID tasks get complete priority
         uint32_t nowCycles = systemGetCycleCounter();
 
-        int32_t loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+        int32_t loopRemainingCycles =
+            cmpTimeCycles(nextTargetCycles, nowCycles);
 
         if (loopRemainingCycles < -scheduler->desiredPeriodCycles) {
             // A task has so grossly overrun that at entire gyro cycle has been

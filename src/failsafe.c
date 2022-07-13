@@ -35,18 +35,6 @@ static uint32_t PERIOD_OF_3_SECONDS() { return 3 * MILLIS_PER_SECOND; }
 static const uint32_t PERIOD_RXDATA_FAILURE      =   200;    // millis
 static const uint32_t PERIOD_RXDATA_RECOVERY     =   200;    // millis
 
-/*
- * Usage:
- *
- * failsafeInit() and failsafeReset() must be called before the other methods
- * are used.
- *
- * failsafeInit() and failsafeReset() can be called in any order.
- * failsafeInit() should only be called once.
- *
- * enable() should be called after system initialisation.
- */
-
 static failsafeState_t failsafeState;
 
 const char * const failsafeProcedureNames[FAILSAFE_PROCEDURE_COUNT] = {
@@ -54,12 +42,11 @@ const char * const failsafeProcedureNames[FAILSAFE_PROCEDURE_COUNT] = {
     "DROP",
 };
 
-/*
- * Should called when the failsafe config needs to be changed - e.g. a
- * different profile has been selected.
- */
-void failsafeReset(void)
+void failsafeInit(void)
 {
+    failsafeState.events = 0;
+    failsafeState.monitoring = false;
+
     failsafeState.rxDataFailurePeriod =
         PERIOD_RXDATA_FAILURE + 4 * MILLIS_PER_TENTH_SECOND;
     failsafeState.rxDataRecoveryPeriod =
@@ -72,14 +59,6 @@ void failsafeReset(void)
     failsafeState.receivingRxDataPeriodPreset = 0;
     failsafeState.phase = FAILSAFE_IDLE;
     failsafeState.rxLinkState = FAILSAFE_RXLINK_DOWN;
-}
-
-void failsafeInit(void)
-{
-    failsafeState.events = 0;
-    failsafeState.monitoring = false;
-
-    return;
 }
 
 bool failsafeIsMonitoring(void)
