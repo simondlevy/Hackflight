@@ -304,6 +304,42 @@ extern "C" {
         }
     }
 
+    static void schedulerInit(scheduler_t * scheduler)
+    {
+        scheduler->loopStartCycles =
+            systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+        scheduler->loopStartMinCycles =
+            systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+        scheduler->loopStartMaxCycles =
+            systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
+        scheduler->loopStartDeltaDownCycles =
+            systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
+        scheduler->loopStartDeltaUpCycles =
+            systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
+
+        scheduler->taskGuardMinCycles =
+            systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
+        scheduler->taskGuardMaxCycles =
+            systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
+        scheduler->taskGuardCycles = scheduler->taskGuardMinCycles;
+        scheduler->taskGuardDeltaDownCycles =
+            systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
+        scheduler->taskGuardDeltaUpCycles =
+            systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
+
+        scheduler->lastTargetCycles = systemGetCycleCounter();
+
+        scheduler->nextTimingCycles = scheduler->lastTargetCycles;
+
+        scheduler->desiredPeriodCycles =
+            (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
+
+        scheduler->guardMargin =
+            (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
+
+        scheduler->clockRate = systemClockMicrosToCycles(1000000);
+     }
+
     // -------------------------------------------------------------------------
 
     void hackflightInitFull(
@@ -338,41 +374,8 @@ extern "C" {
 
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 
-        scheduler_t * scheduler = &hf->scheduler;
-
-        scheduler->loopStartCycles =
-            systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-        scheduler->loopStartMinCycles =
-            systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-        scheduler->loopStartMaxCycles =
-            systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
-        scheduler->loopStartDeltaDownCycles =
-            systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
-        scheduler->loopStartDeltaUpCycles =
-            systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
-
-        scheduler->taskGuardMinCycles =
-            systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
-        scheduler->taskGuardMaxCycles =
-            systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
-        scheduler->taskGuardCycles = scheduler->taskGuardMinCycles;
-        scheduler->taskGuardDeltaDownCycles =
-            systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
-        scheduler->taskGuardDeltaUpCycles =
-            systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
-
-        scheduler->lastTargetCycles = systemGetCycleCounter();
-
-        scheduler->nextTimingCycles = scheduler->lastTargetCycles;
-
-        scheduler->desiredPeriodCycles =
-            (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
-
-        scheduler->guardMargin =
-            (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
-
-        scheduler->clockRate = systemClockMicrosToCycles(1000000);
-    }
+        schedulerInit(&hf->scheduler);
+   }
 
     void hackflightStep(hackflight_t * hf)
     {
