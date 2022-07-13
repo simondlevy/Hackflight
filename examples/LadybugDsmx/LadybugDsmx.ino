@@ -51,7 +51,7 @@ void setup(void)
     hackflightInitFull(
             &_hf,
             &dsmxDeviceFuns,
-            SERIAL_PORT_NONE,
+            SERIAL_PORT_USART1,
             &anglePidConstants,
             mixerQuadXbf,
             (void *)&motorPins,

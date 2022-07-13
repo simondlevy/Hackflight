@@ -29,6 +29,13 @@ void serialEvent1(void)
     }
 }
 
+void serialEvent2(void)
+{
+    while (Serial2.available()) {
+        _rxCallback(Serial2.read(), NULL, micros());
+    }
+}
+
 bool serialIsTransmitBufferEmpty(void * port)
 {
     (void)port;
@@ -41,11 +48,17 @@ void serialOpenPortDsmx(
         serialPortIdentifier_e identifier,
         serialReceiveCallbackPtr rxCallback)
 {
-    (void)identifier;
+    switch (identifier) {
+        case SERIAL_PORT_USART1:
+            Serial2.begin(115200);
+            break;
+        case SERIAL_PORT_USART2:
+            Serial2.begin(115200);
+            break;
+        default:
+            break;
+    }
 
-    // Always use Serial1
-    Serial1.begin(115200);
- 
     _rxCallback = rxCallback;
 }
 
@@ -53,19 +66,35 @@ void serialOpenPortSbus(
         serialPortIdentifier_e identifier,
         serialReceiveCallbackPtr rxCallback)
 {
-    (void)identifier;
 
-    // Always use Serial1
+    switch (identifier) {
+        case SERIAL_PORT_USART1:
 #if defined(TEENSYSUINO)
-    Serial1.begin(100000, SERIAL_8E2_RXINV_TXINV);
+            Serial1.begin(100000, SERIAL_8E2_RXINV_TXINV);
 #elif defined(STM32L496xx) || defined(STM32L476xx) || defined(STM32L433xx) || defined(STM32L432xx)
-    Serial1.begin(100000, SERIAL_SBUS);
+            Serial1.begin(100000, SERIAL_SBUS);
 #elif defined(ESP32)
-    Serial1.begin(100000, SERIAL_8E2, rxpin, txpin, true);
+            Serial1.begin(100000, SERIAL_8E2, rxpin, txpin, true);
 #else
-    Serial1.begin(100000, SERIAL_8E2);
+            Serial1.begin(100000, SERIAL_8E2);
 #endif
- 
+             break;
+        case SERIAL_PORT_USART2:
+#if defined(TEENSYSUINO)
+            Serial2.begin(100000, SERIAL_8E2_RXINV_TXINV);
+#elif defined(STM32L496xx) || defined(STM32L476xx) || defined(STM32L433xx) || defined(STM32L432xx)
+            Serial2.begin(100000, SERIAL_SBUS);
+#elif defined(ESP32)
+            Serial2.begin(100000, SERIAL_8E2, rxpin, txpin, true);
+#else
+            Serial2.begin(100000, SERIAL_8E2);
+#endif
+            break;
+        default:
+            break;
+    }
+
+
     _rxCallback = rxCallback;
 }
 
@@ -82,6 +111,8 @@ uint8_t serialRead(void  * port)
         Serial.read() :
         port == &Serial1 ?
         Serial1.read() :
+        port == &Serial2 ?
+        Serial2.read() :
         0;
 }
 
@@ -91,7 +122,9 @@ uint32_t serialBytesAvailable(void * port)
         Serial.available() :
         port == &Serial1 ?
         Serial1.available() :
-        0;
+        port == &Serial2 ?
+        Serial2.available() :
+         0;
 }
 
 void serialWrite(void * port, uint8_t c)
@@ -102,7 +135,10 @@ void serialWrite(void * port, uint8_t c)
     else if (port == &Serial1) {
         Serial1.write(c);
     }
- }
+    else if (port == &Serial2) {
+        Serial2.write(c);
+    }
+}
 
 void serialWriteBuf(void * port, const uint8_t *data, uint32_t count)
 {
@@ -111,5 +147,8 @@ void serialWriteBuf(void * port, const uint8_t *data, uint32_t count)
     }
     else if (port == &Serial1) {
         Serial1.write(data, count);
+    }
+    else if (port == &Serial2) {
+        Serial2.write(data, count);
     }
 }
