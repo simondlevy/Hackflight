@@ -71,7 +71,7 @@ static const float TASK_AGE_EXPEDITE_SCALE = 0.9;
 static const uint32_t CORE_RATE_COUNT = 25000;
 static const uint32_t GYRO_LOCK_COUNT = 400;
 
-// MSP task ---------------------------------------------------------------------
+// MSP task --------------------------------------------------------------------
 
 static const uint32_t MSP_TASK_RATE = 100;
 
@@ -388,7 +388,8 @@ extern "C" {
         // Realtime gyro/filtering/PID tasks get complete priority
         uint32_t nowCycles = systemGetCycleCounter();
 
-        int32_t loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+        int32_t loopRemainingCycles =
+            cmpTimeCycles(nextTargetCycles, nowCycles);
 
         if (loopRemainingCycles < -scheduler->desiredPeriodCycles) {
             // A task has so grossly overrun that at entire gyro cycle has been
