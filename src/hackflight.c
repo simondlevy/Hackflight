@@ -30,8 +30,6 @@
 #include "rx.h"
 #include "system.h"
 
-// Tuning constants for angle PID controller ----------------------------------
-
 
 // Scheduling constants -------------------------------------------------------
 
