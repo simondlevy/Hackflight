@@ -1,5 +1,6 @@
 # The target to build, see VALID_TARGETS below
 TARGET    ?= STM32F405
+TARGET_MCU := STM32F4
 
 # SERIAL_DEVICE ?= /dev/ttyACM0
 SERIAL_DEVICE ?= COM30
@@ -65,13 +66,10 @@ BASE_ALT_PAIRS    = $(join $(BASE_TARGET_NAMES:=/),$(ALT_TARGET_NAMES))
 find_target_pair  = $(filter %/$(1),$(BASE_ALT_PAIRS))
 get_base_target   = $(if $(call find_target_pair,$(1)),$(patsubst %/,%,$(dir $(call find_target_pair,$(1)))),$(1))
 
-UNIFIED_TARGETS := STM32F405
-
 BASE_TARGET   := $(call get_base_target,$(TARGET))
 
 F4_TARGETS      := $(F405_TARGETS) $(F411_TARGETS) $(F446_TARGETS)
 
-TARGET_MCU := STM32F4
 
 TARGET_FLAGS  	:= $(TARGET_FLAGS) -D$(TARGET_MCU)
 REVISION := norevision
@@ -88,7 +86,6 @@ FATFS_SRC       = $(notdir $(wildcard $(FATFS_DIR)/*.c))
 
 CSOURCES        := $(shell find $(STM_SRC_DIR) -name '*.c')
 
-# start specific includes
 include ../../STM32F4.mk
 
 # Configure default flash sizes for the targets (largest size specified gets hit first) if flash not specified already.
