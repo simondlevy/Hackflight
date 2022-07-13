@@ -8,10 +8,10 @@ SERIAL_DEVICE ?= COM30
 ROOT         := ../..
 OBJECT_DIR   := ./obj
 STM_SRC_DIR  := $(ROOT)/src
-HSRC_DIR     := $(ROOT)/../src
+HFSRC_DIR     := $(ROOT)/../src
 CMSIS_DIR    := $(ROOT)/lib/CMSIS
 INCLUDE_DIRS := $(STM_SRC_DIR) \
-	            $(HSRC_DIR) \
+	            $(HFSRC_DIR) \
                 $(STM_SRC_DIR)/startup
 LINKER_DIR   := $(ROOT)/link
 
@@ -285,59 +285,59 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 	@echo "Linking" $@
 	$(V1) $(CROSS_CC) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
-$(OBJECT_DIR)/arming.o: $(HSRC_DIR)/arming.c $(HSRC_DIR)/arming.h \
-	  $(HSRC_DIR)/failsafe.h $(HSRC_DIR)/led.h $(HSRC_DIR)/motor.h \
-	  $(HSRC_DIR)/rx_status.h
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/arming.o $(CFLAGS) $(HSRC_DIR)/arming.c
+$(OBJECT_DIR)/arming.o: $(HFSRC_DIR)/arming.c $(HFSRC_DIR)/arming.h \
+	  $(HFSRC_DIR)/failsafe.h $(HFSRC_DIR)/led.h $(HFSRC_DIR)/motor.h \
+	  $(HFSRC_DIR)/rx_status.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/arming.o $(CFLAGS) $(HFSRC_DIR)/arming.c
 
-$(OBJECT_DIR)/debug.o: $(HSRC_DIR)/debug.c $(HSRC_DIR)/msp.h
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/debug.o $(CFLAGS) $(HSRC_DIR)/debug.c
+$(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.c $(HFSRC_DIR)/msp.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/debug.o $(CFLAGS) $(HFSRC_DIR)/debug.c
 
-$(OBJECT_DIR)/failsafe.o: $(HSRC_DIR)/failsafe.c $(HSRC_DIR)/arming.h \
-	  $(HSRC_DIR)/failsafe.h $(HSRC_DIR)/rx.h $(HSRC_DIR)/rx_status.h $(HSRC_DIR)/time.h
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/failsafe.o $(CFLAGS) $(HSRC_DIR)/failsafe.c
+$(OBJECT_DIR)/failsafe.o: $(HFSRC_DIR)/failsafe.c $(HFSRC_DIR)/arming.h \
+	  $(HFSRC_DIR)/failsafe.h $(HFSRC_DIR)/rx.h $(HFSRC_DIR)/rx_status.h $(HFSRC_DIR)/time.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/failsafe.o $(CFLAGS) $(HFSRC_DIR)/failsafe.c
 
-$(OBJECT_DIR)/gyro.o: $(HSRC_DIR)/gyro.c $(HSRC_DIR)/core_dt.h $(HSRC_DIR)/datatypes.h \
-	  $(HSRC_DIR)/gyro.h $(HSRC_DIR)/imu.h $(HSRC_DIR)/maths.h \
-	  $(HSRC_DIR)/pt1_filter.h $(HSRC_DIR)/stats.h $(HSRC_DIR)/system.h \
-	  $(HSRC_DIR)/time.h
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HSRC_DIR)/gyro.c
+$(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.c $(HFSRC_DIR)/core_dt.h $(HFSRC_DIR)/datatypes.h \
+	  $(HFSRC_DIR)/gyro.h $(HFSRC_DIR)/imu.h $(HFSRC_DIR)/maths.h \
+	  $(HFSRC_DIR)/pt1_filter.h $(HFSRC_DIR)/stats.h $(HFSRC_DIR)/system.h \
+	  $(HFSRC_DIR)/time.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HFSRC_DIR)/gyro.c
 
-$(OBJECT_DIR)/hackflight.o: $(HSRC_DIR)/hackflight.c $(HSRC_DIR)/hackflight.h \
-	  $(HSRC_DIR)/gyro.h $(HSRC_DIR)/led.h $(HSRC_DIR)/msp.h $(HSRC_DIR)/rx.h \
-	  $(HSRC_DIR)/system.h
+$(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c $(HFSRC_DIR)/hackflight.h \
+	  $(HFSRC_DIR)/gyro.h $(HFSRC_DIR)/led.h $(HFSRC_DIR)/msp.h $(HFSRC_DIR)/rx.h \
+	  $(HFSRC_DIR)/system.h
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) \
-		$(HSRC_DIR)/hackflight.c
+		$(HFSRC_DIR)/hackflight.c
 
-$(OBJECT_DIR)/imu.o: $(HSRC_DIR)/imu.c $(HSRC_DIR)/arming.h $(HSRC_DIR)/core_dt.h \
-	  $(HSRC_DIR)/datatypes.h $(HSRC_DIR)/imu.h $(HSRC_DIR)/maths.h $(HSRC_DIR)/time.h
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/imu.o $(CFLAGS) $(HSRC_DIR)/imu.c
+$(OBJECT_DIR)/imu.o: $(HFSRC_DIR)/imu.c $(HFSRC_DIR)/arming.h $(HFSRC_DIR)/core_dt.h \
+	  $(HFSRC_DIR)/datatypes.h $(HFSRC_DIR)/imu.h $(HFSRC_DIR)/maths.h $(HFSRC_DIR)/time.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/imu.o $(CFLAGS) $(HFSRC_DIR)/imu.c
 
-$(OBJECT_DIR)/led.o: $(HSRC_DIR)/led.c $(HSRC_DIR)/led.h $(HSRC_DIR)/time.h
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/led.o $(CFLAGS) $(HSRC_DIR)/led.c
+$(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.c $(HFSRC_DIR)/led.h $(HFSRC_DIR)/time.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/led.o $(CFLAGS) $(HFSRC_DIR)/led.c
 
-$(OBJECT_DIR)/maths.o: $(HSRC_DIR)/maths.c $(HSRC_DIR)/datatypes.h
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/maths.o $(CFLAGS) $(HSRC_DIR)/maths.c
+$(OBJECT_DIR)/maths.o: $(HFSRC_DIR)/maths.c $(HFSRC_DIR)/datatypes.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/maths.o $(CFLAGS) $(HFSRC_DIR)/maths.c
 
-$(OBJECT_DIR)/msp.o: $(HSRC_DIR)/msp.c $(HSRC_DIR)/motor.h $(HSRC_DIR)/system.h \
-	  $(HSRC_DIR)/time.h
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HSRC_DIR)/msp.c \
+$(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.c $(HFSRC_DIR)/motor.h $(HFSRC_DIR)/system.h \
+	  $(HFSRC_DIR)/time.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HFSRC_DIR)/msp.c \
 		
 
-$(OBJECT_DIR)/rx.o: $(HSRC_DIR)/rx.c $(HSRC_DIR)/arming.h $(HSRC_DIR)/core_dt.h \
-	  $(HSRC_DIR)/datatypes.h $(HSRC_DIR)/failsafe.h $(HSRC_DIR)/led.h \
-	  $(HSRC_DIR)/maths.h $(HSRC_DIR)/motor.h $(HSRC_DIR)/pt3_filter.h \
-	  $(HSRC_DIR)/pwm.h $(HSRC_DIR)/rx.h $(HSRC_DIR)/rx_rate.h \
-	  $(HSRC_DIR)/rx_status.h $(HSRC_DIR)/scale.h 
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/rx.o $(CFLAGS) $(HSRC_DIR)/rx.c
+$(OBJECT_DIR)/rx.o: $(HFSRC_DIR)/rx.c $(HFSRC_DIR)/arming.h $(HFSRC_DIR)/core_dt.h \
+	  $(HFSRC_DIR)/datatypes.h $(HFSRC_DIR)/failsafe.h $(HFSRC_DIR)/led.h \
+	  $(HFSRC_DIR)/maths.h $(HFSRC_DIR)/motor.h $(HFSRC_DIR)/pt3_filter.h \
+	  $(HFSRC_DIR)/pwm.h $(HFSRC_DIR)/rx.h $(HFSRC_DIR)/rx_rate.h \
+	  $(HFSRC_DIR)/rx_status.h $(HFSRC_DIR)/scale.h 
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/rx.o $(CFLAGS) $(HFSRC_DIR)/rx.c
 
-$(OBJECT_DIR)/sbus.o: $(HSRC_DIR)/rx/sbus.c $(HSRC_DIR)/datatypes.h \
-	  $(HSRC_DIR)/serial.h $(HSRC_DIR)/time.h
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/sbus.o $(CFLAGS) $(HSRC_DIR)/rx/sbus.c
+$(OBJECT_DIR)/sbus.o: $(HFSRC_DIR)/rx/sbus.c $(HFSRC_DIR)/datatypes.h \
+	  $(HFSRC_DIR)/serial.h $(HFSRC_DIR)/time.h
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/sbus.o $(CFLAGS) $(HFSRC_DIR)/rx/sbus.c
 
-$(OBJECT_DIR)/stm32_clock.o: $(HSRC_DIR)/stm32_clock.c
+$(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32_clock.o $(CFLAGS) \
-		$(HSRC_DIR)/stm32_clock.c
+		$(HFSRC_DIR)/stm32_clock.c
 
 define compile_file
 	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) \
