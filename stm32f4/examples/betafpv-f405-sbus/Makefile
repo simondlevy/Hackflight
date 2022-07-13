@@ -296,7 +296,7 @@ $(OBJECT_DIR)/failsafe.o: $(HSRC_DIR)/failsafe.c
 $(OBJECT_DIR)/gyro.o: $(HSRC_DIR)/gyro.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HSRC_DIR)/gyro.c
 
-$(OBJECT_DIR)/hackflight.o: $(HSRC_DIR)/hackflight.c
+$(OBJECT_DIR)/hackflight.o: $(HSRC_DIR)/hackflight.c $(HSRC_DIR)/hackflight.h
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(HSRC_DIR)/hackflight.c
 
 $(OBJECT_DIR)/imu.o: $(HSRC_DIR)/imu.c
