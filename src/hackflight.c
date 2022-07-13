@@ -310,7 +310,7 @@ extern "C" {
 
     void hackflightInitFull(
             hackflight_t * hf,
-            rx_dev_funs_t * rxDeviceFuns,
+            rxDevFuns_t * rxDeviceFuns,
             serialPortIdentifier_e rxDevPort,
             anglePidConstants_t * anglePidConstants,
             mixer_t mixer,

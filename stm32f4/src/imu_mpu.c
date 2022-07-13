@@ -391,12 +391,12 @@ static void updateFusion(
         quaternion_t * quat,
         rotation_t * rot)
 {
-    imu_fusion_t fusion;
+    imuFusion_t fusion;
     fusion.time = time;
     memcpy(&fusion.quat, quat, sizeof(quaternion_t));
     memcpy(&fusion.rot, rot, sizeof(rotation_t));
-    memcpy(&hf->imuFusionPrev, &fusion, sizeof(imu_fusion_t));
-    memset(&hf->gyro.accum, 0, sizeof(imu_sensor_t));
+    memcpy(&hf->imuFusionPrev, &fusion, sizeof(imuFusion_t));
+    memset(&hf->gyro.accum, 0, sizeof(imuSensor_t));
 }
 
 static float invSqrt(float x)
@@ -443,7 +443,7 @@ static void mahony(
     quat_new->z = qz * recipNorm;
 }
 
-static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
+static void getAverage(imuSensor_t * sensor, uint32_t period, axes_t * avg)
 {
     uint32_t denom = sensor->count * period;
 
@@ -461,12 +461,12 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 
     float dt = deltaT * 1e-6;
 
-    imu_fusion_t * fusionPrev = &hf->imuFusionPrev;
+    imuFusion_t * fusionPrev = &hf->imuFusionPrev;
 
-    gyro_reset_t new_gyro_reset = {0};
+    gyroReset_t new_gyro_reset = {0};
 
     if (!armingIsArmed(&hf->arming)) {
-        memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyro_reset_t));
+        memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyroReset_t));
     }
 
     mahony(dt, &gyroAvg, &fusionPrev->quat, quat);

@@ -123,7 +123,18 @@ typedef struct {
     float dtheta;
     float psi;
     float dpsi;
-} vehicle_state_t;
+} vehicleState_t;
+
+// Altitude-hold PID control ---------------------------------------------------
+
+typedef struct {
+
+    float kp;
+    float ki;
+
+    float * rawThrottle;
+
+} altPid_t;
 
 // General PID control ---------------------------------------------------------
 
@@ -131,7 +142,7 @@ typedef void (*pid_fun_t)(
         uint32_t usec,
         demands_t * demands,
         void * data,
-        vehicle_state_t * vstate,
+        vehicleState_t * vstate,
         bool reset
         );
 
@@ -139,7 +150,7 @@ typedef void (*pid_fun_t)(
 typedef struct {
     pid_fun_t fun;
     void * data;
-} pid_controller_t;
+} pidController_t;
 
 
 // Tasks ------------------------------------------------------------------------
@@ -182,20 +193,20 @@ typedef struct {
 typedef struct {
     axes_t values;
     uint32_t count;
-} imu_sensor_t;
+} imuSensor_t;
 
 typedef struct {
     uint32_t quietPeriodEnd;
     uint32_t resetTimeEnd;
     bool resetCompleted;
-} gyro_reset_t;
+} gyroReset_t;
 
 typedef struct {
     uint32_t time;
     quaternion_t quat;
     rotation_t rot;
-    gyro_reset_t gyroReset;
-} imu_fusion_t;
+    gyroReset_t gyroReset;
+} imuFusion_t;
 
 typedef void (*imu_align_fun)(axes_t * axes);
 
@@ -246,7 +257,7 @@ typedef union {
 } gyroLowpassFilter_t;
 
 typedef struct {
-    imu_sensor_t accum;
+    imuSensor_t accum;
     float        dps[3];          // aligned, calibrated, scaled, unfiltered
     float        dps_filtered[3]; // filtered 
     uint8_t      sampleCount;     // sample counter
@@ -341,7 +352,7 @@ typedef struct {
     demands_t demands;
     float aux1;
     float aux2;
-} rx_axes_t;
+} rxAxes_t;
 
 typedef enum rc_alias {
     THROTTLE,
@@ -350,7 +361,7 @@ typedef enum rc_alias {
     YAW,
     AUX1,
     AUX2
-} rc_alias_e;
+} rcAlias_e;
 
 typedef enum {
     RX_FRAME_PENDING = 0,
@@ -424,7 +435,7 @@ typedef struct {
     rx_dev_check_fun check;
     rx_dev_convert_fun convert;
 
-} rx_dev_funs_t;
+} rxDevFuns_t;
 
 typedef struct {
 
@@ -476,22 +487,22 @@ typedef struct {
     demands_t        demands;
     gyro_t           gyro;
     imu_align_fun    imuAlignFun;
-    imu_fusion_t     imuFusionPrev;
+    imuFusion_t     imuFusionPrev;
     float            maxArmingAngle;
     mixer_t          mixer;
     void *           motorDevice;
     float            mspMotors[4];
     task_t           mspTask;
-    pid_controller_t pidControllers[10];
+    pidController_t pidControllers[10];
     uint8_t          pidCount;
     bool             pidZeroThrottleItermReset;
     rx_t             rx;
     task_t           rxTask;
-    rx_axes_t        rxAxes;
+    rxAxes_t        rxAxes;
     scheduler_t      scheduler;
     task_t           sensorTasks[10];
     uint8_t          sensorTaskCount;
-    vehicle_state_t  vstate;
+    vehicleState_t  vstate;
 
 } hackflight_t;
 

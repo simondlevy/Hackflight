@@ -61,7 +61,7 @@ static void task_attitude(void * hackflight, uint32_t time)
 
     imuGetEulerAngles(hf, time, &angles);
 
-    vehicle_state_t * vstate = &hf->vstate;
+    vehicleState_t * vstate = &hf->vstate;
 
     vstate->phi   = angles.x;
     vstate->theta = angles.y;
@@ -87,7 +87,7 @@ static void task_rx(void * hackflight, uint32_t time)
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
-    rx_axes_t rxax = {{0, 0, 0, 0}, 0, 0};
+    rxAxes_t rxax = {{0, 0, 0, 0}, 0, 0};
 
     bool gotNewData = false;
 
@@ -112,7 +112,7 @@ static void task_rx(void * hackflight, uint32_t time)
     }
 
     if (gotNewData) {
-        memcpy(&hf->rxAxes, &rxax, sizeof(rx_axes_t));
+        memcpy(&hf->rxAxes, &rxax, sizeof(rxAxes_t));
     }
 }
 
@@ -125,19 +125,19 @@ static float constrain_demand(float demand, float limit, float scaling)
 
 static void hackflightRunCoreTasks(hackflight_t * hf)
 {
-    gyroReadScaled(hf, &hf->vstate);
-
     uint32_t currentTimeUs = timeMicros();
+
+    float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
+
+    gyroReadScaled(hf, &hf->vstate);
 
     rxGetDemands(&hf->rx, currentTimeUs, &hf->anglepid, &hf->demands);
 
     for (uint8_t k=0; k<hf->pidCount; ++k) {
-        pid_controller_t pid = hf->pidControllers[k];
+        pidController_t pid = hf->pidControllers[k];
         pid.fun(currentTimeUs, &hf->demands, pid.data,
                 &hf->vstate, hf->pidZeroThrottleItermReset);
     }
-
-    float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
     // Calculate and Limit the PID sum
     hf->mixer(

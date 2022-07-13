@@ -29,8 +29,8 @@ void mspInit(void);
 void mspTriggerDebugging(void);
 
 void mspUpdate(
-        vehicle_state_t * state,
-        rx_axes_t *rxaxes,
+        vehicleState_t * state,
+        rxAxes_t *rxaxes,
         bool armed,
         void * motorDevice,
         float * motors);

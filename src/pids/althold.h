@@ -19,7 +19,6 @@
 #pragma once
 
 #include "datatypes.h"
-#include "althold_struct.h"
 
 static bool inBand(float value, float band) 
 {
@@ -32,7 +31,7 @@ static float constrainAbs(float v, float lim)
 }
 
 static void altHoldPidInit(
-        alt_pid_t * pid,
+        altPid_t * pid,
         const float kp,
         const float ki,
         float * rawThrottle)
@@ -46,7 +45,7 @@ static void altHoldPidUpdate(
         uint32_t currentTimeUs
         , demands_t * demands
         , void * data
-        , vehicle_state_t * vstate
+        , vehicleState_t * vstate
         , bool reset
         )
 {
@@ -59,7 +58,7 @@ static void altHoldPidUpdate(
     static float _errorI;
     static float _altitudeTarget;
 
-    alt_pid_t * pid = (alt_pid_t *)data;
+    altPid_t * pid = (altPid_t *)data;
     float  throttle = *(pid->rawThrottle);
 
     // NED => ENU

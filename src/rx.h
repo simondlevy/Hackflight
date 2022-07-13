@@ -43,7 +43,7 @@ extern "C" {
             uint32_t currentTimeUs,
             bool imuIsLevel,
             bool calibrating,
-            rx_axes_t * rxax,
+            rxAxes_t * rxax,
             void * motorDevice,
             arming_t * arming,
             bool * pidItermResetReady,
