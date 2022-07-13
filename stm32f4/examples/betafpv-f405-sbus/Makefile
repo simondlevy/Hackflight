@@ -116,7 +116,6 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             ./main.c \
-            $(HSRC_DIR)/arming.c \
             $(HSRC_DIR)/debug.c \
             $(HSRC_DIR)/failsafe.c \
             $(HSRC_DIR)/gyro.c \
@@ -280,9 +279,12 @@ $(TARGET_DFU): $(TARGET_HEX)
 	@echo "Creating DFU $(TARGET_DFU)" "$(STDOUT)"
 	$(V1) $(PYTHON) $(DFUSE-PACK) -i $< $@
 
-$(TARGET_ELF): $(TARGET_OBJS) $(LD_SCRIPT)
+$(TARGET_ELF): $(TARGET_OBJS) $(OBJECT_DIR)/arming.o $(LD_SCRIPT)
 	@echo "Linking" $@
 	$(V1) $(CROSS_CC) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
+
+$(OBJECT_DIR)/arming.o: $(HSRC_DIR)/arming.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/arming.o $(CFLAGS) $(HSRC_DIR)/arming.c
 
 define compile_file
 	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
