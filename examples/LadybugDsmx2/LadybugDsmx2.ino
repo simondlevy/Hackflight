@@ -25,7 +25,7 @@
 
 void setup(void)
 {
-    ladybugSetup();
+    ladybugSetup(SERIAL_PORT_USART2, dsmxDeviceFuns);
 }
 
 void loop(void)

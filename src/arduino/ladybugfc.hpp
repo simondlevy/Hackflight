@@ -31,7 +31,7 @@
 
 static hackflight_t _hf;
 
-static void ladybugSetup(void)
+static void ladybugSetup(serialPortIdentifier_e rxPort, rxDevFuns_t rxDeviceFuns)
 {
     Wire.begin();
     delay(100);
@@ -52,8 +52,8 @@ static void ladybugSetup(void)
     // Always use Serial1 for receiver, no no need to specify
     hackflightInitFull(
             &_hf,
-            &dsmxDeviceFuns,
-            SERIAL_PORT_USART2,
+            &rxDeviceFuns,
+            rxPort,
             &anglePidConstants,
             mixerQuadXbf,
             (void *)&motorPins,
