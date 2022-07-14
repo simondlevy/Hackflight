@@ -100,35 +100,40 @@ static void setCalibrationCycles(gyro_t * gyro)
     gyro->calibration.cyclesRemaining = (int32_t)calculateCalibratingCycles();
 }
 
+static void calibrateAxis(gyro_t * gyro, uint8_t axis)
+{
+    // Reset g[axis] at start of calibration
+    if (gyro->calibration.cyclesRemaining == (int32_t)calculateCalibratingCycles()) {
+        gyro->calibration.sum[axis] = 0.0f;
+        devClear(&gyro->calibration.var[axis]);
+        // zero is set to zero until calibration complete
+        gyro->zero[axis] = 0.0f;
+    }
+
+    // Sum up CALIBRATING_GYRO_TIME_US readings
+    gyro->calibration.sum[axis] += gyroReadRaw(axis);
+    devPush(&gyro->calibration.var[axis], gyroReadRaw(axis));
+
+    if (gyro->calibration.cyclesRemaining == 1) {
+        const float stddev = devStandardDeviation(&gyro->calibration.var[axis]);
+
+        // check deviation and startover in case the model was moved
+        if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
+                MOVEMENT_CALIBRATION_THRESHOLD) {
+            setCalibrationCycles(gyro);
+            return;
+        }
+
+        // please take care with exotic boardalignment !!
+        gyro->zero[axis] =
+            gyro->calibration.sum[axis] / calculateCalibratingCycles();
+    }
+}
+
 static void calibrate(gyro_t * gyro)
 {
     for (int axis = 0; axis < 3; axis++) {
-        // Reset g[axis] at start of calibration
-        if (gyro->calibration.cyclesRemaining == (int32_t)calculateCalibratingCycles()) {
-            gyro->calibration.sum[axis] = 0.0f;
-            devClear(&gyro->calibration.var[axis]);
-            // zero is set to zero until calibration complete
-            gyro->zero[axis] = 0.0f;
-        }
-
-        // Sum up CALIBRATING_GYRO_TIME_US readings
-        gyro->calibration.sum[axis] += gyroReadRaw(axis);
-        devPush(&gyro->calibration.var[axis], gyroReadRaw(axis));
-
-        if (gyro->calibration.cyclesRemaining == 1) {
-            const float stddev = devStandardDeviation(&gyro->calibration.var[axis]);
-
-            // check deviation and startover in case the model was moved
-            if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
-                    MOVEMENT_CALIBRATION_THRESHOLD) {
-                setCalibrationCycles(gyro);
-                return;
-            }
-
-            // please take care with exotic boardalignment !!
-            gyro->zero[axis] =
-                gyro->calibration.sum[axis] / calculateCalibratingCycles();
-        }
+        calibrateAxis(gyro, axis);
     }
 
     --gyro->calibration.cyclesRemaining;

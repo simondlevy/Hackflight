@@ -276,6 +276,7 @@ typedef struct {
     gyroLowpassFilter_t lowpass2Filter[3];
 
     float zero[3];
+
 } gyro_t;
 
 // Serial ports ----------------------------------------------------------------
