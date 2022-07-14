@@ -241,12 +241,6 @@ typedef float (*filterApplyFnPtr)(filter_t *filter, float input);
 
 // Gyro ------------------------------------------------------------------------
 
-typedef struct {
-    float sum[3];
-    stdev_t var[3];
-    int32_t cyclesRemaining;
-} gyroCalibration_t;
-
 typedef union {
     pt1Filter_t pt1FilterState;
     biquadFilter_t biquadFilterState;
@@ -255,17 +249,21 @@ typedef union {
 } gyroLowpassFilter_t;
 
 typedef struct {
+
+    float   dps[3];          // aligned, calibrated, scaled, unfiltered
+    float   dps_filtered[3]; // filtered 
+    uint8_t sampleCount;     // sample counter
+    float   sampleSum[3];    // summed samples used for downsampling
+
+    bool    isCalibrating;
+    float   calibrationSum[3];
+    stdev_t calibrationVariance[3];
+    int32_t calibrationCyclesRemaining;
+
     imuSensor_t accum;
-    float        dps[3];          // aligned, calibrated, scaled, unfiltered
-    float        dps_filtered[3]; // filtered 
-    uint8_t      sampleCount;     // sample counter
-    float        sampleSum[3];    // summed samples used for downsampling
-    bool         isCalibrating;
 
     // if true then downsample using gyro lowpass 2, otherwise use averaging
     bool downsampleFilterEnabled;      
-
-    gyroCalibration_t calibration;
 
     // lowpass gyro soft filter
     filterApplyFnPtr lowpassFilterApplyFn;

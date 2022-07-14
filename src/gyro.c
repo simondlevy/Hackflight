@@ -97,25 +97,25 @@ static bool initLowpassFilterLpf(
 
 static void setCalibrationCycles(gyro_t * gyro)
 {
-    gyro->calibration.cyclesRemaining = (int32_t)calculateCalibratingCycles();
+    gyro->calibrationCyclesRemaining = (int32_t)calculateCalibratingCycles();
 }
 
 static void calibrateAxis(gyro_t * gyro, uint8_t axis)
 {
     // Reset g[axis] at start of calibration
-    if (gyro->calibration.cyclesRemaining == (int32_t)calculateCalibratingCycles()) {
-        gyro->calibration.sum[axis] = 0.0f;
-        devClear(&gyro->calibration.var[axis]);
+    if (gyro->calibrationCyclesRemaining == (int32_t)calculateCalibratingCycles()) {
+        gyro->calibrationSum[axis] = 0.0f;
+        devClear(&gyro->calibrationVariance[axis]);
         // zero is set to zero until calibration complete
         gyro->zero[axis] = 0.0f;
     }
 
     // Sum up CALIBRATING_GYRO_TIME_US readings
-    gyro->calibration.sum[axis] += gyroReadRaw(axis);
-    devPush(&gyro->calibration.var[axis], gyroReadRaw(axis));
+    gyro->calibrationSum[axis] += gyroReadRaw(axis);
+    devPush(&gyro->calibrationVariance[axis], gyroReadRaw(axis));
 
-    if (gyro->calibration.cyclesRemaining == 1) {
-        const float stddev = devStandardDeviation(&gyro->calibration.var[axis]);
+    if (gyro->calibrationCyclesRemaining == 1) {
+        const float stddev = devStandardDeviation(&gyro->calibrationVariance[axis]);
 
         // check deviation and startover in case the model was moved
         if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
@@ -126,7 +126,7 @@ static void calibrateAxis(gyro_t * gyro, uint8_t axis)
 
         // please take care with exotic boardalignment !!
         gyro->zero[axis] =
-            gyro->calibration.sum[axis] / calculateCalibratingCycles();
+            gyro->calibrationSum[axis] / calculateCalibratingCycles();
     }
 }
 
@@ -136,7 +136,7 @@ static void calibrate(gyro_t * gyro)
         calibrateAxis(gyro, axis);
     }
 
-    --gyro->calibration.cyclesRemaining;
+    --gyro->calibrationCyclesRemaining;
 }
 
 // ============================================================================
@@ -163,7 +163,7 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
 
     gyro_t * gyro = &hf->gyro;
 
-    bool calibrationComplete = gyro->calibration.cyclesRemaining <= 0;
+    bool calibrationComplete = gyro->calibrationCyclesRemaining <= 0;
 
     if (calibrationComplete) {
 
