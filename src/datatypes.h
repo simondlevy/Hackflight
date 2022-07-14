@@ -250,14 +250,15 @@ typedef union {
 
 typedef struct {
 
-    float   dps[3];          // aligned, calibrated, scaled, unfiltered
-    float   dpsFiltered[3]; // filtered 
-    uint8_t sampleCount;     // sample counter
-    float   sampleSum[3];    // summed samples used for downsampling
+    float   unused[3];
+
+    float   dpsFiltered[3];
+    uint8_t sampleCount;
+    float   unused2[3]; 
 
     bool    isCalibrating;
-    float   calibrationSum[3];
-    stdev_t calibrationVariance[3];
+    float   unused3[3];
+    stdev_t unused4[3];
     int32_t calibrationCyclesRemaining;
 
     imuSensor_t accum;
