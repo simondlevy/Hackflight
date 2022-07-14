@@ -16,7 +16,7 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "core_rate.h"
+#include "core_dt.h"
 #include "datatypes.h"
 #include "debug.h"
 #include "pt1_filter.h"
@@ -47,11 +47,7 @@ static float nullFilterApply(filter_t *filter, float input)
     return input;
 }
 
-static bool initLowpassFilter(
-        gyro_t * gyro,
-        int slot,
-        uint16_t lpfHz,
-        uint32_t looptime)
+static void initLowpassFilter( gyro_t * gyro, int slot, uint16_t lpfHz)
 {
     filterApplyFnPtr *lowpassFilterApplyFn;
     gyroLowpassFilter_t *lowpassFilter = NULL;
@@ -68,31 +64,20 @@ static bool initLowpassFilter(
             break;
 
         default:
-            return false;
+            return;
     }
 
-    bool ret = false;
-
-    // Establish some common constants
-    const float gyroDt = looptime * 1e-6f;
-
-    // Gain could be calculated a little later as it is specific to the
-    // pt1/bqrcf2/fkf branches
-    const float gain = pt1FilterGain(lpfHz, gyroDt);
+    const float gain = pt1FilterGain(lpfHz, CORE_DT());
 
     // Dereference the pointer to null before checking valid cutoff and filter
     // type. It will be overridden for positive cases.
     *lowpassFilterApplyFn = nullFilterApply;
 
     // If lowpass cutoff has been specified
-    if (lpfHz) {
-        *lowpassFilterApplyFn = (filterApplyFnPtr) pt1FilterApply;
-        for (int axis = 0; axis < 3; axis++) {
-            pt1FilterInit(&lowpassFilter[axis].pt1FilterState, gain);
-        }
-        ret = true;
+    *lowpassFilterApplyFn = (filterApplyFnPtr) pt1FilterApply;
+    for (int axis = 0; axis < 3; axis++) {
+        pt1FilterInit(&lowpassFilter[axis].pt1FilterState, gain);
     }
-    return ret;
 }
 
 static void setCalibrationCycles(gyro_t * gyro)
@@ -145,14 +130,11 @@ void gyroInit(hackflight_t * hf)
 {
     gyro_t * gyro = &hf->gyro;
 
-    initLowpassFilter(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ, CORE_PERIOD());
+    initLowpassFilter(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ);
 
-    gyro->downsampleFilterEnabled = initLowpassFilter(
-            gyro,
-            FILTER_LPF2,
-            LPF2_STATIC_HZ,
-            CORE_PERIOD()
-            );
+    gyro->downsampleFilterEnabled = true;
+
+    initLowpassFilter( gyro, FILTER_LPF2, LPF2_STATIC_HZ);
 
     setCalibrationCycles(gyro); // start calibrating
 }
