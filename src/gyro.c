@@ -41,12 +41,6 @@ static uint32_t calculateCalibratingCycles(void)
     return CALIBRATION_DURATION / CORE_PERIOD();
 }
 
-static float nullFilterApply(filter_t *filter, float input)
-{
-    (void)filter;
-    return input;
-}
-
 static void initLowpassFilter(
         gyroLowpassFilter_t * lowpassFilter,
         uint16_t lpfHz)
