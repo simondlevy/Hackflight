@@ -47,7 +47,7 @@ static float nullFilterApply(filter_t *filter, float input)
     return input;
 }
 
-static bool initLowpassFilterLpf(
+static bool initLowpassFilter(
         gyro_t * gyro,
         int slot,
         uint16_t lpfHz,
@@ -145,9 +145,9 @@ void gyroInit(hackflight_t * hf)
 {
     gyro_t * gyro = &hf->gyro;
 
-    initLowpassFilterLpf(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ, CORE_PERIOD());
+    initLowpassFilter(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ, CORE_PERIOD());
 
-    gyro->downsampleFilterEnabled = initLowpassFilterLpf(
+    gyro->downsampleFilterEnabled = initLowpassFilter(
             gyro,
             FILTER_LPF2,
             LPF2_STATIC_HZ,
