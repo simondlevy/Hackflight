@@ -380,8 +380,7 @@ extern "C" {
             float freq = 1.0f / CORE_DT();
 
             // -----calculate D component
-            if ((axis < 2 && constants->k_rate_d > 0)) {
-
+            if (axis < 2 && constants->k_rate_d > 0) {
 
                 // Divide rate change by dT to get differential (ie dr/dt).
                 // dT is fixed and calculated from the target PID loop time
@@ -473,6 +472,7 @@ extern "C" {
                 pid->data[axis].I +
                 pid->data[axis].D +
                 pid->data[axis].F;
+
             if (axis == 2 && USE_INTEGRATED_YAW) {
                 pid->data[axis].Sum += pidSum * CORE_DT() * 100.0f;
                 pid->data[axis].Sum -= pid->data[axis].Sum *

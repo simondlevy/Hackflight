@@ -30,7 +30,6 @@
 #include "rx.h"
 #include "system.h"
 
-
 // Scheduling constants -------------------------------------------------------
 
 // Wait at start of scheduler loop if gyroSampleTask is nearly due

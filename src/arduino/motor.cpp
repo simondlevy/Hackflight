@@ -19,7 +19,6 @@
 #include <Arduino.h>
 
 #include <arming.h>
-#include <core_rate.h>
 #include <debug.h>
 #include <motor.h>
 #include <pwm.h>

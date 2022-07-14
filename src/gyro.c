@@ -172,14 +172,13 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
 
         hf->imuAlignFun(&_adc);
 
-    } else {
-        calibrate(gyro);
-    }
-
-    if (calibrationComplete) {
         gyro->dps[0] = _adc.x * (gyroScaleDps() / 32768.);
         gyro->dps[1] = _adc.y * (gyroScaleDps() / 32768.);
         gyro->dps[2] = _adc.z * (gyroScaleDps() / 32768.);
+
+    } else {
+
+        calibrate(gyro);
     }
 
     if (gyro->downsampleFilterEnabled) {
