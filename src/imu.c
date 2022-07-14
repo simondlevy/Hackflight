@@ -38,14 +38,14 @@ void imuAccumulateGyro(gyro_t * gyro)
     static float _adcf[3];
 
     // integrate using trapezium rule to avoid bias
-    gyro->accum.values.x += 0.5f * (_adcf[0] + gyro->dps_filtered[0]) * CORE_PERIOD();
-    gyro->accum.values.y += 0.5f * (_adcf[1] + gyro->dps_filtered[1]) * CORE_PERIOD();
-    gyro->accum.values.z += 0.5f * (_adcf[2] + gyro->dps_filtered[2]) * CORE_PERIOD();
+    gyro->accum.values.x += 0.5f * (_adcf[0] + gyro->dpsFiltered[0]) * CORE_PERIOD();
+    gyro->accum.values.y += 0.5f * (_adcf[1] + gyro->dpsFiltered[1]) * CORE_PERIOD();
+    gyro->accum.values.z += 0.5f * (_adcf[2] + gyro->dpsFiltered[2]) * CORE_PERIOD();
 
     gyro->accum.count++;
 
     for (int axis = 0; axis < 3; axis++) {
-        _adcf[axis] = gyro->dps_filtered[axis];
+        _adcf[axis] = gyro->dpsFiltered[axis];
     }
 }
 

@@ -107,14 +107,14 @@ static void calibrate(gyro_t * gyro)
 static void computeDpsFilteredAxis(gyro_t * gyro, uint8_t axis)
 {
     // using gyro lowpass 2 filter for downsampling
-    float dps_filtered = gyro->sampleSum[axis];
+    float dpsFiltered = gyro->sampleSum[axis];
 
     // apply static notch filters and software lowpass filters
-    dps_filtered =
+    dpsFiltered =
         //gyro->lowpassFilterApplyFn((filter_t *)&gyro->lowpassFilter[axis],
-        pt1FilterApply((pt1Filter_t *)&gyro->lowpassFilter[axis], dps_filtered);
+        pt1FilterApply((pt1Filter_t *)&gyro->lowpassFilter[axis], dpsFiltered);
 
-    gyro->dps_filtered[axis] = dps_filtered;
+    gyro->dpsFiltered[axis] = dpsFiltered;
 }
 
 // ============================================================================
@@ -177,9 +177,9 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
     // Used for quaternion filter; stubbed otherwise
     imuAccumulateGyro(gyro);
 
-    vstate->dphi   = gyro->dps_filtered[0];
-    vstate->dtheta = gyro->dps_filtered[1];
-    vstate->dpsi   = gyro->dps_filtered[2];
+    vstate->dphi   = gyro->dpsFiltered[0];
+    vstate->dtheta = gyro->dpsFiltered[1];
+    vstate->dpsi   = gyro->dpsFiltered[2];
 
     gyro->isCalibrating = !calibrationComplete;
 }

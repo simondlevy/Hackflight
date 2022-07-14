@@ -251,7 +251,7 @@ typedef union {
 typedef struct {
 
     float   dps[3];          // aligned, calibrated, scaled, unfiltered
-    float   dps_filtered[3]; // filtered 
+    float   dpsFiltered[3]; // filtered 
     uint8_t sampleCount;     // sample counter
     float   sampleSum[3];    // summed samples used for downsampling
 
