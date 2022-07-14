@@ -34,7 +34,7 @@ extern "C" {
         return (int32_t)(a - b);
     }
 
-    void delayMicroseconds(uint32_t us);
+    void delayMicros(uint32_t us);
     void delayMillis(uint32_t ms);
 
     uint32_t microsISR(void);
