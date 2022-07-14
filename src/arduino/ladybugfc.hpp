@@ -38,7 +38,7 @@ static void ladybugSetup(serialPortIdentifier_e rxPort, rxDevFuns_t rxDeviceFuns
     static uint8_t motorPins[4] = {13, 16, 3, 11};
 
     static anglePidConstants_t anglePidConstants = {
-        1.5,  // Rate Kp
+        1.2,  // Rate Kp
         5.0,  // Rate Ki
         0.0,  // Rate Kd
         0.0,  // Rate Kf
