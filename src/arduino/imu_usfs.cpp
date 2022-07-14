@@ -23,6 +23,7 @@
 #include <USFS.h>
 
 #include <datatypes.h>
+#include <gyro.h>
 #include <quat2euler.h>
 #include <imu.h>
 
@@ -100,9 +101,9 @@ extern "C" {
         return _gyroRaw[k];
     }
 
-    float gyroScaleDps(void)
+    uint16_t gyroScaleDps(void)
     {
-        return USFS_GYRO_SCALE;
+        return (uint16_t)(USFS_GYRO_SCALE * 32768);
     }
 
     void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
