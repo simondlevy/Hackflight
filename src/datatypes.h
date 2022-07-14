@@ -266,11 +266,9 @@ typedef struct {
     bool downsampleFilterEnabled;      
 
     // lowpass gyro soft filter
-    filterApplyFnPtr lowpassFilterApplyFn;
     gyroLowpassFilter_t lowpassFilter[3];
 
     // lowpass2 gyro soft filter
-    filterApplyFnPtr lowpass2FilterApplyFn;
     gyroLowpassFilter_t lowpass2Filter[3];
 
     float zero[3];
