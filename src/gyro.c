@@ -132,8 +132,6 @@ void gyroInit(hackflight_t * hf)
 
     initLowpassFilter(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ);
 
-    gyro->downsampleFilterEnabled = true;
-
     initLowpassFilter( gyro, FILTER_LPF2, LPF2_STATIC_HZ);
 
     setCalibrationCycles(gyro); // start calibrating
@@ -166,36 +164,18 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
         calibrate(gyro);
     }
 
-    if (gyro->downsampleFilterEnabled) {
-        // using gyro lowpass 2 filter for downsampling
-        gyro->sampleSum[0] = gyro->lowpass2FilterApplyFn(
-                (filter_t *)&gyro->lowpass2Filter[0], gyro->dps[0]);
-        gyro->sampleSum[1] = gyro->lowpass2FilterApplyFn(
-                (filter_t *)&gyro->lowpass2Filter[1], gyro->dps[1]);
-        gyro->sampleSum[2] = gyro->lowpass2FilterApplyFn(
-                (filter_t *)&gyro->lowpass2Filter[2], gyro->dps[2]);
-    } else {
-        // using simple averaging for downsampling
-        gyro->sampleSum[0] += gyro->dps[0];
-        gyro->sampleSum[1] += gyro->dps[1];
-        gyro->sampleSum[2] += gyro->dps[2];
-        gyro->sampleCount++;
-    }
+    // using gyro lowpass 2 filter for downsampling
+    gyro->sampleSum[0] = gyro->lowpass2FilterApplyFn(
+            (filter_t *)&gyro->lowpass2Filter[0], gyro->dps[0]);
+    gyro->sampleSum[1] = gyro->lowpass2FilterApplyFn(
+            (filter_t *)&gyro->lowpass2Filter[1], gyro->dps[1]);
+    gyro->sampleSum[2] = gyro->lowpass2FilterApplyFn(
+            (filter_t *)&gyro->lowpass2Filter[2], gyro->dps[2]);
 
     for (int axis = 0; axis < 3; axis++) {
 
-        // downsample the individual gyro samples
-        float dps_filtered = 0;
-        if (gyro->downsampleFilterEnabled) {
-            // using gyro lowpass 2 filter for downsampling
-            dps_filtered = gyro->sampleSum[axis];
-        } else {
-            // using simple average for downsampling
-            if (gyro->sampleCount) {
-                dps_filtered = gyro->sampleSum[axis] / gyro->sampleCount;
-            }
-            gyro->sampleSum[axis] = 0;
-        }
+        // using gyro lowpass 2 filter for downsampling
+        float dps_filtered = gyro->sampleSum[axis];
 
         // apply static notch filters and software lowpass filters
         dps_filtered =
