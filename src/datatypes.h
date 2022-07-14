@@ -262,9 +262,6 @@ typedef struct {
 
     imuSensor_t accum;
 
-    // if true then downsample using gyro lowpass 2, otherwise use averaging
-    bool downsampleFilterEnabled;      
-
     // lowpass gyro soft filter
     gyroLowpassFilter_t lowpassFilter[3];
 
