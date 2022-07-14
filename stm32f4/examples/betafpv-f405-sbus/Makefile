@@ -171,7 +171,6 @@ CROSS_GDB   := $(ARM_SDK_PREFIX)gdb
 OBJCOPY     := $(ARM_SDK_PREFIX)objcopy
 OBJDUMP     := $(ARM_SDK_PREFIX)objdump
 SIZE        := $(ARM_SDK_PREFIX)size
-DFUSE-PACK  := $(ROOT)/utils/dfuse-pack.py
 
 #
 # Tool options.
@@ -262,7 +261,7 @@ $(TARGET_HEX): $(TARGET_ELF)
 
 $(TARGET_DFU): $(TARGET_HEX)
 	@echo "Creating DFU $(TARGET_DFU)" "$(STDOUT)"
-	$(V1) $(PYTHON) $(DFUSE-PACK) -i $< $@
+	$(V1) $(PYTHON) ../../dfuse-pack.py -i $< $@
 
 $(TARGET_ELF): $(TARGET_OBJS) \
 	  $(OBJECT_DIR)/arming.o \
