@@ -69,11 +69,9 @@ static void calibrateAxis(gyro_t * gyro, gyroAxis_t * axis, uint8_t index)
 
     if (gyro->calibrationCyclesRemaining == 1) {
 
-        float stddev = devStandardDeviation(&axis->calibrationVariance);
-
         // check deviation and startover in case the model was moved
-        if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
-                MOVEMENT_CALIBRATION_THRESHOLD) {
+        if (devStandardDeviation(&axis->calibrationVariance)
+                > MOVEMENT_CALIBRATION_THRESHOLD) {
             setCalibrationCycles(gyro);
             return;
         }
