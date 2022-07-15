@@ -54,28 +54,22 @@ static void setCalibrationCycles(gyro_t * gyro)
     gyro->calibrationCyclesRemaining = (int32_t)calculateCalibratingCycles();
 }
 
-static void calibrateAxis(
-        gyro_t * gyro,
-        gyroAxis_t * axis,
-        uint8_t index)
+static void calibrateAxis(gyro_t * gyro, gyroAxis_t * axis, uint8_t index)
 {
-    static float calibrationSum[3];
-    static stdev_t calibrationVariance[3];
-
     if (gyro->calibrationCyclesRemaining ==
             (int32_t)calculateCalibratingCycles()) {
-        calibrationSum[index] = 0;
-        devClear(&calibrationVariance[index]);
+        axis->calibrationSum = 0;
+        devClear(&axis->calibrationVariance);
         axis->zero = 0;
     }
 
     // Sum up CALIBRATING_GYRO_TIME_US readings
-    calibrationSum[index] += gyroReadRaw(index);
-    devPush(&calibrationVariance[index], gyroReadRaw(index));
+    axis->calibrationSum += gyroReadRaw(index);
+    devPush(&axis->calibrationVariance, gyroReadRaw(index));
 
     if (gyro->calibrationCyclesRemaining == 1) {
 
-        float stddev = devStandardDeviation(&calibrationVariance[index]);
+        float stddev = devStandardDeviation(&axis->calibrationVariance);
 
         // check deviation and startover in case the model was moved
         if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
@@ -85,7 +79,7 @@ static void calibrateAxis(
         }
 
         // please take care with exotic boardalignment !!
-        axis->zero = calibrationSum[index] / calculateCalibratingCycles();
+        axis->zero = axis->calibrationSum / calculateCalibratingCycles();
     }
 }
 

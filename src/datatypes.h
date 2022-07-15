@@ -250,6 +250,8 @@ typedef union {
 
 typedef struct {
 
+    float               calibrationSum;
+    stdev_t             calibrationVariance;
     float               dpsFiltered;
     gyroLowpassFilter_t lowpassFilter;
     gyroLowpassFilter_t lowpass2Filter;
