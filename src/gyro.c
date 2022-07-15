@@ -98,10 +98,7 @@ static void calibrate(gyro_t * gyro)
     --gyro->calibrationCyclesRemaining;
 }
 
-static void computeDpsFilteredAxis(
-        gyro_t * gyro,
-        float sampleSum,
-        gyroAxis_t * axis)
+static void computeDpsFilteredAxis(float sampleSum, gyroAxis_t * axis)
 {
     axis->dpsFiltered =
         pt1FilterApply((pt1Filter_t *)&axis->lowpassFilter, sampleSum);
@@ -125,6 +122,32 @@ void gyroInit(hackflight_t * hf)
     setCalibrationCycles(gyro);
 }
 
+static float scale(float value)
+{
+    return value * (gyroScaleDps() / 32768.);
+}
+
+static void accumulateAxis(gyroAxis_t * axis, float *adcf, float * accum)
+{
+    // integrate using trapezium rule to avoid bias
+    *accum += 0.5f * (*adcf + axis->dpsFiltered) * CORE_PERIOD();
+
+    *adcf = axis->dpsFiltered;
+}
+
+static void accumulate(gyro_t * gyro)
+{
+    static axes_t _adcf;
+
+    accumulateAxis(&gyro->x, &_adcf.x, &gyro->accum.values.x);
+    accumulateAxis(&gyro->y, &_adcf.y, &gyro->accum.values.y);
+    accumulateAxis(&gyro->z, &_adcf.z, &gyro->accum.values.z);
+
+    gyro->accum.count++;
+}
+
+// ----------------------------------------------------------------------------
+
 void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
 {
     if (!gyroIsReady()) return;
@@ -146,9 +169,9 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
 
         hf->imuAlignFun(&adc);
 
-        _dps.x = adc.x * (gyroScaleDps() / 32768.);
-        _dps.y = adc.y * (gyroScaleDps() / 32768.);
-        _dps.z = adc.z * (gyroScaleDps() / 32768.);
+        _dps.x = scale(adc.x);
+        _dps.y = scale(adc.y);
+        _dps.z = scale(adc.z);
 
     } else {
 
@@ -158,19 +181,19 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
     // using gyro lowpass 2 filter for downsampling
     _sampleSum.x =
         pt1FilterApply((pt1Filter_t *)&gyro->x.lowpass2Filter, _dps.x);
+    computeDpsFilteredAxis(_sampleSum.x, &gyro->x);
+
     _sampleSum.y =
         pt1FilterApply((pt1Filter_t *)&gyro->y.lowpass2Filter, _dps.y);
+    computeDpsFilteredAxis(_sampleSum.y, &gyro->y);
+
     _sampleSum.z =
         pt1FilterApply((pt1Filter_t *)&gyro->z.lowpass2Filter, _dps.z);
-
-    computeDpsFilteredAxis(gyro, _sampleSum.x, &gyro->x);
-    computeDpsFilteredAxis(gyro, _sampleSum.y, &gyro->y);
-    computeDpsFilteredAxis(gyro, _sampleSum.z, &gyro->z);
+    computeDpsFilteredAxis(_sampleSum.z, &gyro->z);
 
     gyro->sampleCount = 0;
 
-    // Used for quaternion filter; stubbed otherwise
-    imuAccumulateGyro(gyro);
+    accumulate(gyro);
 
     vstate->dphi   = gyro->x.dpsFiltered;
     vstate->dtheta = gyro->y.dpsFiltered;

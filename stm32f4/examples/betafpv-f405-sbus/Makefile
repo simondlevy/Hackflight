@@ -269,7 +269,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 	  $(OBJECT_DIR)/failsafe.o \
 	  $(OBJECT_DIR)/gyro.o \
 	  $(OBJECT_DIR)/hackflight.o \
-	  $(OBJECT_DIR)/imu.o \
 	  $(OBJECT_DIR)/led.o \
 	  $(OBJECT_DIR)/maths.o \
 	  $(OBJECT_DIR)/msp.o \
@@ -308,11 +307,6 @@ $(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c $(HFSRC_DIR)/hackflight.h 
 	@echo hackflight.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) \
 		$(HFSRC_DIR)/hackflight.c
-
-$(OBJECT_DIR)/imu.o: $(HFSRC_DIR)/imu.c $(HFSRC_DIR)/arming.h $(HFSRC_DIR)/core_dt.h \
-	  $(HFSRC_DIR)/datatypes.h $(HFSRC_DIR)/imu.h $(HFSRC_DIR)/maths.h $(HFSRC_DIR)/time.h
-	@echo imu.c
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/imu.o $(CFLAGS) $(HFSRC_DIR)/imu.c
 
 $(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.c $(HFSRC_DIR)/led.h $(HFSRC_DIR)/time.h
 	@echo led.c

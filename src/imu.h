@@ -24,11 +24,7 @@
 extern "C" {
 #endif
 
-    void    imuAccumulateGyro(gyro_t * gyro);
-
     void    imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles);
-
-    int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles);
 
     void    imuInit(hackflight_t * hf, uint8_t interruptPin);
 

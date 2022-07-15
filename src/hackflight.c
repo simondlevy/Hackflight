@@ -146,6 +146,19 @@ extern "C" {
         }
     }
 
+    static int32_t getGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
+    {
+        int32_t gyroSkew =
+            cmpTimeCycles(nextTargetCycles, gyroSyncTime()) % desiredPeriodCycles;
+
+        if (gyroSkew > (desiredPeriodCycles / 2)) {
+            gyroSkew -= desiredPeriodCycles;
+        }
+
+        return gyroSkew;
+    }
+
+
     static void checkCoreTasks(
             hackflight_t * hf,
             int32_t loopRemainingCycles,
@@ -196,7 +209,7 @@ extern "C" {
         static int32_t _gyroSkewAccum;
 
         int32_t gyroSkew =
-            imuGetGyroSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
+            getGyroSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
 
         _gyroSkewAccum += gyroSkew;
 
