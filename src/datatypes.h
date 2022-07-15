@@ -74,21 +74,44 @@ typedef struct {
 } anglePidConstants_t;
 
 typedef struct {
+
+    pidAxisData_t  datag;
+    pt2Filter_t    dMinLowpassg;
+    pt2Filter_t    dMinRangeg;
+    dtermLowpass_t dtermLowpassg;
+    dtermLowpass_t dtermLowpass2g;
+    bool           feedforwardLpfInitialized;
+    pt3Filter_t    feedforwardPt3g;
+    float          previousSetpointCorrectiong;
+    float          previousGyroRateDtermg;
+    float          previousSetpointg;
+    pt1Filter_t    windupLpfg;
+
+} anglePidAxis_t;
+
+typedef struct {
+
     anglePidConstants_t constants;
+    int32_t             dynLpfPreviousQuantizedThrottle;  
+    uint32_t            lastDynLpfUpdateUs;
+    pt1Filter_t         ptermYawLowpass;
+
+    anglePidAxis_t x;
+    anglePidAxis_t y;
+    anglePidAxis_t z;
+
     pidAxisData_t       data[3];
     pt2Filter_t         dMinLowpass[3];
     pt2Filter_t         dMinRange[3];
     dtermLowpass_t      dtermLowpass[3];
     dtermLowpass_t      dtermLowpass2[3];
-    int32_t             dynLpfPreviousQuantizedThrottle;  
     bool                feedforwardLpfInitialized;
     pt3Filter_t         feedforwardPt3[3];
-    uint32_t            lastDynLpfUpdateUs;
     float               previousSetpointCorrection[3];
     float               previousGyroRateDterm[3];
     float               previousSetpoint[3];
-    pt1Filter_t         ptermYawLowpass;
     pt1Filter_t         windupLpf[3];
+
 } anglePid_t;
 
 // Axes ------------------------------------------------------------------------

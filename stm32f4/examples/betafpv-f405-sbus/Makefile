@@ -324,6 +324,7 @@ $(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c \
 	  $(HFSRC_DIR)/hackflight.h \
 	  $(HFSRC_DIR)/gyro.h \
 	  $(HFSRC_DIR)/led.h \
+	  $(HFSRC_DIR)/pids/angle.h \
 	  $(HFSRC_DIR)/msp.h \
 	  $(HFSRC_DIR)/rx.h \
 	  $(HFSRC_DIR)/system.h

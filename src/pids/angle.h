@@ -3,14 +3,15 @@
 
    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+   Hackflight is free software: you can redistribute it and/or modify it under
+   the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
@@ -33,11 +34,13 @@ static const uint16_t DYN_LPF_THROTTLE_UPDATE_DELAY_US = 5000;
 
 static const uint16_t DYN_LPF_THROTTLE_STEPS = 100;
 
-// The constant scale factor to replace the Kd component of the feedforward calculation.
-// This value gives the same "feel" as the previous Kd default of 26 (26 * DTERM_SCALE)
+// The constant scale factor to replace the Kd component of the feedforward
+// calculation.  This value gives the same "feel" as the previous Kd default of
+// 26 (26 * DTERM_SCALE)
 static const float FEEDFORWARD_SCALE = 0.013754;
 
-// Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
+// Full iterm suppression in setpoint mode at high-passed setpoint rate >
+// 40deg/sec
 static const float   ITERM_RELAX_SETPOINT_THRESHOLD = 40;
 static const uint8_t ITERM_RELAX_CUTOFF     = 15;
 
@@ -95,8 +98,8 @@ extern "C" {
 
     static float pt2FilterGain(float f_cut, float dT)
     {
-        const float order = 2.0f;
-        const float orderCutoffCorrection = 1 / sqrtf(powf(2, 1.0f / order) - 1);
+        const float order = 2;
+        const float orderCutoffCorrection = 1 / sqrtf(powf(2, 1 / order) - 1);
         float RC = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
         // float RC = 1 / (2 * 1.553773974f * M_PI * f_cut);
         // where 1.553773974 = 1 / sqrt( (2^(1 / order) - 1) ) and order is 2
@@ -105,8 +108,8 @@ extern "C" {
 
     static void pt2FilterInit(pt2Filter_t *filter, float k)
     {
-        filter->state = 0.0f;
-        filter->state1 = 0.0f;
+        filter->state = 0;
+        filter->state1 = 0;
         filter->k = k;
     }
 
@@ -116,7 +119,7 @@ extern "C" {
             float currentPidSetpoint,
             float maxRateLimit) {
 
-        if (value * currentPidSetpoint > 0.0f) {
+        if (value * currentPidSetpoint > 0) {
             if (fabsf(currentPidSetpoint) <= maxRateLimit) {
                 value = constrain_f(value, (-maxRateLimit -
                             currentPidSetpoint) * constants->k_rate_p,
@@ -132,17 +135,17 @@ extern "C" {
 
     static void applyItermRelax(
             anglePid_t * pid,
-            const int axis,
+            const uint8_t index,
             const float iterm,
             float *itermErrorRate,
             float *currentPidSetpoint)
     {
         const float setpointLpf =
-            pt1FilterApply(&pid->windupLpf[axis], *currentPidSetpoint);
+            pt1FilterApply(&pid->windupLpf[index], *currentPidSetpoint);
 
         const float setpointHpf = fabsf(*currentPidSetpoint - setpointLpf);
 
-        if (axis < 2) {
+        if (index < 2) {
 
             const float itermRelaxFactor =
                 fmaxf(0, 1 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD);
@@ -157,11 +160,13 @@ extern "C" {
     }
 
     static float applyRcSmoothingFeedforwardFilter(
-            anglePid_t * pid, int axis, float pidSetpointDelta)
+            anglePid_t * pid,
+            uint8_t index,
+            float pidSetpointDelta)
     {
         float ret = pidSetpointDelta;
         if (pid->feedforwardLpfInitialized) {
-            ret = pt3FilterApply(&pid->feedforwardPt3[axis], pidSetpointDelta);
+            ret = pt3FilterApply(&pid->feedforwardPt3[index], pidSetpointDelta);
         }
         return ret;
     }
@@ -171,25 +176,33 @@ extern "C" {
             uint16_t dynLpfMin,
             uint16_t dynLpfMax,
             uint8_t expo) {
-        const float expof = expo / 10.0f;
+        const float expof = expo / 10;
         static float curve;
         curve = throttle * (1 - throttle) * expof + throttle;
         return (dynLpfMax - dynLpfMin) * curve + dynLpfMin;
     }
 
+    static void pidDynLpfDTermUpdateAxis(
+            anglePid_t * pid,
+            float cutoffFreq,
+            uint8_t index)
+    {
+        pid->dtermLowpass[index].pt1Filter.k =
+            pt1FilterGain(cutoffFreq, CORE_DT());
+    }
+
     static void pidDynLpfDTermUpdate(anglePid_t * pid, float throttle)
     {
-        const uint16_t dyn_lpf_min = DTERM_LPF1_DYN_MIN_HZ;
-        const uint16_t dyn_lpf_max = DTERM_LPF1_DYN_MAX_HZ;
         float cutoffFreq =
-            dynLpfCutoffFreq(throttle, dyn_lpf_min, dyn_lpf_max,
+            dynLpfCutoffFreq(
+                    throttle,
+                    DTERM_LPF1_DYN_MIN_HZ,
+                    DTERM_LPF1_DYN_MAX_HZ,
                     DYN_LPF_CURVE_EXPO);
 
-        for (uint8_t axis = 0; axis < 3; axis++) {
-            pid->dtermLowpass[axis].pt1Filter.k =
-                pt1FilterGain(cutoffFreq, CORE_DT());
-
-        }
+        pidDynLpfDTermUpdateAxis(pid, cutoffFreq, 0);
+        pidDynLpfDTermUpdateAxis(pid, cutoffFreq, 1);
+        pidDynLpfDTermUpdateAxis(pid, cutoffFreq, 2);
     }
 
     static void updateDynLpfCutoffs(
@@ -232,6 +245,54 @@ extern "C" {
             currentSetpoint;
     }
 
+    static void pt1FilterInitAxis(anglePid_t * pid, uint8_t index)
+    {
+        pt1FilterInit(&pid->dtermLowpass[index].pt1Filter,
+                pt1FilterGain(DTERM_LPF1_DYN_MIN_HZ, CORE_DT()));
+
+        pt1FilterInit(&pid->dtermLowpass2[index].pt1Filter,
+                pt1FilterGain(DTERM_LPF2_HZ, CORE_DT()));
+    }
+
+    static void pt1FilterInitWindupAxis(anglePid_t * pid, uint8_t index)
+    {
+        pt1FilterInit(&pid->windupLpf[index],
+                pt1FilterGain(ITERM_RELAX_CUTOFF, CORE_DT()));
+    }
+
+    static void pt2FilterInitAxis(anglePid_t * pid, uint8_t index)
+    {
+        pt2FilterInit(&pid->dMinRange[index],
+                pt2FilterGain(D_MIN_RANGE_HZ, CORE_DT()));
+        pt2FilterInit(&pid->dMinLowpass[index],
+                pt2FilterGain(D_MIN_LOWPASS_HZ, CORE_DT()));
+    }
+
+    static void computeGyroRateDtermAxis(
+            anglePid_t * pid,
+            float gyroRates[3],
+            float gyroRateDterm[3],
+            uint8_t index)
+    {
+        float dterm = gyroRates[index];
+
+        filterApplyFnPtr dtermLowpassApplyFn = (filterApplyFnPtr)pt1FilterApply;
+
+        dterm = dtermLowpassApplyFn(
+                (filter_t *) &pid->dtermLowpass[index], dterm);
+
+        filterApplyFnPtr dtermLowpass2ApplyFn = (filterApplyFnPtr)pt1FilterApply;
+        
+        gyroRateDterm[index] = dtermLowpass2ApplyFn(
+                (filter_t *) &pid->dtermLowpass2[index],
+                dterm);
+    }
+
+    static void resetItermAxis(anglePid_t * pid, uint8_t index)
+    {
+        pid->data[index].I = 0;
+    }
+
     // =========================================================================
 
     static void anglePidInit(anglePid_t * pid, anglePidConstants_t * constants)
@@ -242,40 +303,20 @@ extern "C" {
         // to allow an initial zero throttle to set the filter cutoff
         pid->dynLpfPreviousQuantizedThrottle = -1;  
 
-        // 1st Dterm Lowpass Filter
-        uint16_t dterm_lpf1_init_hz = DTERM_LPF1_DYN_MIN_HZ;
-
-        dterm_lpf1_init_hz = DTERM_LPF1_DYN_MIN_HZ;
-
-        for (uint8_t axis = 0; axis <= 2; axis++) {
-            pt1FilterInit(&pid->dtermLowpass[axis].pt1Filter,
-                    pt1FilterGain(dterm_lpf1_init_hz, CORE_DT()));
-        }
-
-        // 2nd Dterm Lowpass Filter
-        for (uint8_t axis = 0; axis <= 2; axis++) {
-            pt1FilterInit(&pid->dtermLowpass2[axis].pt1Filter,
-                    pt1FilterGain(DTERM_LPF2_HZ, CORE_DT()));
-        }
+        pt1FilterInitAxis(pid, 0);
+        pt1FilterInitAxis(pid, 1);
+        pt1FilterInitAxis(pid, 2);
 
         pt1FilterInit(&pid->ptermYawLowpass,
                 pt1FilterGain(YAW_LOWPASS_HZ, CORE_DT()));
 
-        for (int i = 0; i < 3; i++) {
-            pt1FilterInit(&pid->windupLpf[i],
-                    pt1FilterGain(ITERM_RELAX_CUTOFF, CORE_DT()));
-        }
+        pt1FilterInitWindupAxis(pid, 0);
+        pt1FilterInitWindupAxis(pid, 1);
+        pt1FilterInitWindupAxis(pid, 2);
 
-        // Initialize the filters for all axis even if the d_min[axis] value is
-        // 0 Otherwise if the pidProfile.d_min_xxx parameters are ever added to
-        // in-flight adjustments and transition from 0 to > 0 in flight the
-        // feature won't work because the filter wasn't initialized.
-        for (uint8_t axis = 0; axis <= 2; axis++) {
-            pt2FilterInit(&pid->dMinRange[axis],
-                    pt2FilterGain(D_MIN_RANGE_HZ, CORE_DT()));
-            pt2FilterInit(&pid->dMinLowpass[axis],
-                    pt2FilterGain(D_MIN_LOWPASS_HZ, CORE_DT()));
-        }
+        pt2FilterInitAxis(pid, 0);
+        pt2FilterInitAxis(pid, 1);
+        pt2FilterInitAxis(pid, 2);
     }
 
     static void anglePidUpdate(
@@ -293,42 +334,30 @@ extern "C" {
         float dynCi = CORE_DT();
         const float itermWindupPointInv =
             1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
-        if (itermWindupPointInv > 1.0f) {
-            dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
+        if (itermWindupPointInv > 1) {
+            dynCi *= constrain_f(itermWindupPointInv, 0, 1);
         }
 
         float gyroRates[3] = {vstate->dphi, vstate->dtheta, vstate->dpsi};
 
         // Precalculate gyro deta for D-term here, this allows loop unrolling
-        float gyroRateDterm[3];
-        for (uint8_t axis = 0; axis <= 2; ++axis) {
+        float gyroRateDterm[3] = {0};
 
-            gyroRateDterm[axis] = gyroRates[axis];
+        computeGyroRateDtermAxis(pid, gyroRates, gyroRateDterm, 0);
+        computeGyroRateDtermAxis(pid, gyroRates, gyroRateDterm, 1);
+        computeGyroRateDtermAxis(pid, gyroRates, gyroRateDterm, 2);
 
-            filterApplyFnPtr dtermLowpassApplyFn =
-                (filterApplyFnPtr)pt1FilterApply;
-            gyroRateDterm[axis] =
-                dtermLowpassApplyFn((filter_t *) &pid->dtermLowpass[axis],
-                        gyroRateDterm[axis]);
-
-            filterApplyFnPtr dtermLowpass2ApplyFn =
-                (filterApplyFnPtr)pt1FilterApply;
-            gyroRateDterm[axis] =
-                dtermLowpass2ApplyFn((filter_t *) &pid->dtermLowpass2[axis],
-                        gyroRateDterm[axis]);
-        }
-
-        float pidSetpoints[3] = { demands->rpy.x, demands->rpy.y, demands->rpy.z };
+        float pidSetpoints[3] = {demands->rpy.x, demands->rpy.y, demands->rpy.z};
         float currentAngles[3] = { vstate->phi, vstate->theta, vstate->psi };
 
         // ----------PID controller----------
-        for (uint8_t axis = 0; axis <= 2; ++axis) {
+        for (uint8_t index=0; index<3; ++index) {
 
-            float currentPidSetpoint = pidSetpoints[axis];
+            float currentPidSetpoint = pidSetpoints[index];
 
-            if (axis != 2) {
+            if (index != 2) {
                 currentPidSetpoint =
-                    levelPid(constants, currentPidSetpoint, currentAngles[axis]);
+                    levelPid(constants, currentPidSetpoint, currentAngles[index]);
             }
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
@@ -336,13 +365,13 @@ extern "C" {
             // because the PIDs will be zeroed below
 
             // -----calculate error rate
-            const float gyroRate = gyroRates[axis]; // gyro output in deg/sec
+            const float gyroRate = gyroRates[index]; // gyro output in deg/sec
             float errorRate = currentPidSetpoint - gyroRate; // r - y
-            const float previousIterm = pid->data[axis].I;
+            const float previousIterm = pid->data[index].I;
             float itermErrorRate = errorRate;
             float uncorrectedSetpoint = currentPidSetpoint;
 
-            applyItermRelax(pid, axis, previousIterm, &itermErrorRate,
+            applyItermRelax(pid, index, previousIterm, &itermErrorRate,
                     &currentPidSetpoint);
             errorRate = currentPidSetpoint - gyroRate;
             float setpointCorrection = currentPidSetpoint - uncorrectedSetpoint;
@@ -355,21 +384,23 @@ extern "C" {
             // -----calculate P component
             filterApplyFnPtr ptermYawLowpassApplyFn =
                 (filterApplyFnPtr)pt1FilterApply;
-            pid->data[axis].P = constants->k_rate_p * errorRate;
-            if (axis == 2) {
-                pid->data[axis].P = ptermYawLowpassApplyFn((filter_t *)
-                        &pid->ptermYawLowpass, pid->data[axis].P);
+            pid->data[index].P = constants->k_rate_p * errorRate;
+            if (index == 2) {
+                pid->data[index].P = ptermYawLowpassApplyFn((filter_t *)
+                        &pid->ptermYawLowpass, pid->data[index].P);
             }
 
             // -----calculate I component
             // if launch control is active override the iterm gains and apply
             // iterm windup protection to all axes
             float Ki =
-                constants->k_rate_i * ((axis == 2 && !USE_INTEGRATED_YAW) ? 2.5 : 1);
+                constants->k_rate_i * ((index == 2 && !USE_INTEGRATED_YAW) ?
+                        2.5 : 
+                        1);
             float axisDynCi =
-                (axis == 2) ? dynCi : CORE_DT(); // check windup for yaw only
+                (index == 2) ? dynCi : CORE_DT(); // check windup for yaw only
 
-            pid->data[axis].I =
+            pid->data[index].I =
                 constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
                         -ITERM_LIMIT, ITERM_LIMIT);
 
@@ -377,24 +408,24 @@ extern "C" {
             float pidSetpointDelta = 0;
             float feedforwardMaxRate = rxApplyRates(1, 1);
 
-            float freq = 1.0f / CORE_DT();
+            float freq = 1 / CORE_DT();
 
             // -----calculate D component
-            if (axis < 2 && constants->k_rate_d > 0) {
+            if (index < 2 && constants->k_rate_d > 0) {
 
                 // Divide rate change by dT to get differential (ie dr/dt).
                 // dT is fixed and calculated from the target PID loop time
                 // This is done to avoid DTerm spikes that occur with
                 // dynamically calculated deltaT whenever another task causes
                 // the PID loop execution to be delayed.
-                const float delta = -(gyroRateDterm[axis] -
-                        pid->previousGyroRateDterm[axis]) * freq;
+                const float delta = -(gyroRateDterm[index] -
+                        pid->previousGyroRateDterm[index]) * freq;
 
                 float preTpaD = constants->k_rate_d * delta;
 
-                float dMinFactor = 1.0f;
+                float dMinFactor = 1;
 
-                float dMinPercent = axis == 2 ?
+                float dMinPercent = index == 2 ?
                     0 :
                     D_MIN > 0 && D_MIN < constants->k_rate_d ?
                     D_MIN / constants->k_rate_d :
@@ -404,7 +435,7 @@ extern "C" {
                     const float d_min_gyro_gain =
                         D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
                     float dMinGyroFactor =
-                        pt2FilterApply(&pid->dMinRange[axis], delta);
+                        pt2FilterApply(&pid->dMinRange[index], delta);
                     dMinGyroFactor = fabsf(dMinGyroFactor) * d_min_gyro_gain;
                     const float d_min_setpoint_gain =
                         D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
@@ -413,30 +444,30 @@ extern "C" {
                         (fabsf(pidSetpointDelta)) * d_min_setpoint_gain;
                     dMinFactor = fmaxf(dMinGyroFactor, dMinSetpointFactor);
                     dMinFactor =
-                        dMinPercent + (1.0f - dMinPercent) * dMinFactor;
+                        dMinPercent + (1 - dMinPercent) * dMinFactor;
                     dMinFactor =
-                        pt2FilterApply(&pid->dMinLowpass[axis], dMinFactor);
-                    dMinFactor = fminf(dMinFactor, 1.0f);
+                        pt2FilterApply(&pid->dMinLowpass[index], dMinFactor);
+                    dMinFactor = fminf(dMinFactor, 1);
                 }
 
                 // Apply the dMinFactor
                 preTpaD *= dMinFactor;
-                pid->data[axis].D = preTpaD;
+                pid->data[index].D = preTpaD;
 
                 // Log the value of D pre application of TPA
                 preTpaD *= D_LPF_FILT_SCALE;
 
             } else {
-                pid->data[axis].D = 0;
+                pid->data[index].D = 0;
             }
 
-            pid->previousGyroRateDterm[axis] = gyroRateDterm[axis];
+            pid->previousGyroRateDterm[index] = gyroRateDterm[index];
 
             // -----calculate feedforward component
             // include abs control correction in feedforward
             pidSetpointDelta += setpointCorrection -
-                pid->previousSetpointCorrection[axis];
-            pid->previousSetpointCorrection[axis] = setpointCorrection;
+                pid->previousSetpointCorrection[index];
+            pid->previousSetpointCorrection[index] = setpointCorrection;
 
             // no feedforward in launch control
             float feedforwardGain = constants->k_rate_f;
@@ -450,35 +481,35 @@ extern "C" {
                     feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
 
                 bool shouldApplyFeedforwardLimits =
-                    feedforwardMaxRateLimit != 0.0f && axis < 2;
+                    feedforwardMaxRateLimit != 0 && index < 2;
 
-                pid->data[axis].F = shouldApplyFeedforwardLimits ?
+                pid->data[index].F = shouldApplyFeedforwardLimits ?
                     applyFeedforwardLimit(
                             constants,
                             feedForward,
                             currentPidSetpoint,
                             feedforwardMaxRateLimit) :
                     feedForward;
-                pid->data[axis].F =
-                    applyRcSmoothingFeedforwardFilter(pid, axis,
-                            pid->data[axis].F);
+                pid->data[index].F =
+                    applyRcSmoothingFeedforwardFilter(pid, index,
+                            pid->data[index].F);
             } else {
-                pid->data[axis].F = 0;
+                pid->data[index].F = 0;
             }
 
             // calculating the PID sum
             const float pidSum =
-                pid->data[axis].P +
-                pid->data[axis].I +
-                pid->data[axis].D +
-                pid->data[axis].F;
+                pid->data[index].P +
+                pid->data[index].I +
+                pid->data[index].D +
+                pid->data[index].F;
 
-            if (axis == 2 && USE_INTEGRATED_YAW) {
-                pid->data[axis].Sum += pidSum * CORE_DT() * 100.0f;
-                pid->data[axis].Sum -= pid->data[axis].Sum *
-                    INTEGRATED_YAW_RELAX / 100000.0f * CORE_DT() / 0.000125f;
+            if (index == 2 && USE_INTEGRATED_YAW) {
+                pid->data[index].Sum += pidSum * CORE_DT() * 100;
+                pid->data[index].Sum -= pid->data[index].Sum *
+                    INTEGRATED_YAW_RELAX / 100000 * CORE_DT() / 0.000125f;
             } else {
-                pid->data[axis].Sum = pidSum;
+                pid->data[index].Sum = pidSum;
             }
         }
 
@@ -486,9 +517,9 @@ extern "C" {
         // This may look very innefficient, but it is done on purpose to always
         // show real CPU usage as in flight
         if (reset) {
-            for (uint8_t axis = 0; axis < 3; axis++) {
-                pid->data[axis].I = 0.0f;
-            }
+            resetItermAxis(pid, 0);
+            resetItermAxis(pid, 1);
+            resetItermAxis(pid, 2);
         }
 
         demands->rpy.x = pid->data[0].Sum;
