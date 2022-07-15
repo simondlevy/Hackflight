@@ -146,6 +146,13 @@ static void accumulate(gyro_t * gyro)
     gyro->accum.count++;
 }
 
+static void runFilter(gyroAxis_t * axis, float dps)
+{
+    float sampleSum = pt1FilterApply((pt1Filter_t *)&axis->lowpass2Filter, dps);
+    computeDpsFilteredAxis(sampleSum, axis);
+}
+
+
 // ----------------------------------------------------------------------------
 
 void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
@@ -157,7 +164,6 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
     bool calibrationComplete = gyro->calibrationCyclesRemaining <= 0;
 
     static axes_t _dps;
-    static axes_t _sampleSum;
 
     if (calibrationComplete) {
 
@@ -178,18 +184,9 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
         calibrate(gyro);
     }
 
-    // using gyro lowpass 2 filter for downsampling
-    _sampleSum.x =
-        pt1FilterApply((pt1Filter_t *)&gyro->x.lowpass2Filter, _dps.x);
-    computeDpsFilteredAxis(_sampleSum.x, &gyro->x);
-
-    _sampleSum.y =
-        pt1FilterApply((pt1Filter_t *)&gyro->y.lowpass2Filter, _dps.y);
-    computeDpsFilteredAxis(_sampleSum.y, &gyro->y);
-
-    _sampleSum.z =
-        pt1FilterApply((pt1Filter_t *)&gyro->z.lowpass2Filter, _dps.z);
-    computeDpsFilteredAxis(_sampleSum.z, &gyro->z);
+    runFilter(&gyro->x, _dps.x);
+    runFilter(&gyro->y, _dps.y);
+    runFilter(&gyro->z, _dps.z);
 
     gyro->sampleCount = 0;
 
