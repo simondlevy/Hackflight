@@ -126,7 +126,7 @@ uint32_t millis(void)
     return sysTickUptime;
 }
 
-void delayMicroseconds(uint32_t us)
+void delayMicros(uint32_t us)
 {
     uint32_t now = micros();
     while (micros() - now < us);
@@ -135,7 +135,7 @@ void delayMicroseconds(uint32_t us)
 void delay(uint32_t ms)
 {
     while (ms--)
-        delayMicroseconds(1000);
+        delayMicros(1000);
 }
 
 static void indicate(uint8_t count, uint16_t duration)

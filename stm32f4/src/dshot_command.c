@@ -207,9 +207,9 @@ static void commandWrite(
     }
 
     if (commandType == DSHOT_CMD_TYPE_BLOCKING) {
-        delayMicroseconds(DSHOT_INITIAL_DELAY_US - DSHOT_COMMAND_DELAY_US);
+        delayMicros(DSHOT_INITIAL_DELAY_US - DSHOT_COMMAND_DELAY_US);
         for (; repeats; repeats--) {
-            delayMicroseconds(DSHOT_COMMAND_DELAY_US);
+            delayMicros(DSHOT_COMMAND_DELAY_US);
 
             uint32_t timeoutUs = micros() + 1000;
             while (!motorGetVTable(motorDevice).updateStart() &&
@@ -224,7 +224,7 @@ static void commandWrite(
 
             motorGetVTable(motorDevice).updateComplete();
         }
-        delayMicroseconds(delayAfterCommandUs);
+        delayMicros(delayAfterCommandUs);
     } else if (commandType == DSHOT_CMD_TYPE_INLINE) {
         dshotCommandControl_t *commandControl = addCommand();
         if (commandControl) {
