@@ -250,15 +250,23 @@ typedef union {
 
 typedef struct {
 
-    float               dpsFiltered[3];
-    gyroLowpassFilter_t lowpassFilter[3];
-    gyroLowpassFilter_t lowpass2Filter[3];
-    float               zero[3];
+    float               dpsFiltered;
+    gyroLowpassFilter_t lowpassFilter;
+    gyroLowpassFilter_t lowpass2Filter;
+    float               zero;
+
+} gyroAxis_t;
+
+typedef struct {
 
     imuSensor_t accum;
     int32_t     calibrationCyclesRemaining;
     uint8_t     sampleCount;
     bool        isCalibrating;
+
+    gyroAxis_t x;
+    gyroAxis_t y;
+    gyroAxis_t z;
 
 } gyro_t;
 

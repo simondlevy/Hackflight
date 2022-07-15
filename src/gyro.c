@@ -41,23 +41,12 @@ static uint32_t calculateCalibratingCycles(void)
     return CALIBRATION_DURATION / CORE_PERIOD();
 }
 
-static void initLowpassFilterAxis(
-        gyroLowpassFilter_t * lowpassFilter,
-        uint16_t lpfHz, 
-        uint8_t axis)
-{
-    pt1FilterInit(
-            &lowpassFilter[axis].pt1FilterState, 
-            pt1FilterGain(lpfHz, CORE_DT()));
-}
-
 static void initLowpassFilter(
         gyroLowpassFilter_t * lowpassFilter,
         uint16_t lpfHz)
 {
-    initLowpassFilterAxis(lowpassFilter, lpfHz, 0);
-    initLowpassFilterAxis(lowpassFilter, lpfHz, 1);
-    initLowpassFilterAxis(lowpassFilter, lpfHz, 2);
+    pt1FilterInit(
+            &lowpassFilter->pt1FilterState, pt1FilterGain(lpfHz, CORE_DT()));
 }
 
 static void setCalibrationCycles(gyro_t * gyro)
@@ -65,27 +54,28 @@ static void setCalibrationCycles(gyro_t * gyro)
     gyro->calibrationCyclesRemaining = (int32_t)calculateCalibratingCycles();
 }
 
-static void calibrateAxis(gyro_t * gyro, uint8_t axis)
+static void calibrateAxis(
+        gyro_t * gyro,
+        gyroAxis_t * axis,
+        uint8_t index)
 {
     static float calibrationSum[3];
     static stdev_t calibrationVariance[3];
 
-    // Reset g[axis] at start of calibration
     if (gyro->calibrationCyclesRemaining ==
             (int32_t)calculateCalibratingCycles()) {
-        calibrationSum[axis] = 0.0f;
-        devClear(&calibrationVariance[axis]);
-        // zero is set to zero until calibration complete
-        gyro->zero[axis] = 0.0f;
+        calibrationSum[index] = 0;
+        devClear(&calibrationVariance[index]);
+        axis->zero = 0;
     }
 
     // Sum up CALIBRATING_GYRO_TIME_US readings
-    calibrationSum[axis] += gyroReadRaw(axis);
-    devPush(&calibrationVariance[axis], gyroReadRaw(axis));
+    calibrationSum[index] += gyroReadRaw(index);
+    devPush(&calibrationVariance[index], gyroReadRaw(index));
 
     if (gyro->calibrationCyclesRemaining == 1) {
 
-        float stddev = devStandardDeviation(&calibrationVariance[axis]);
+        float stddev = devStandardDeviation(&calibrationVariance[index]);
 
         // check deviation and startover in case the model was moved
         if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
@@ -95,33 +85,26 @@ static void calibrateAxis(gyro_t * gyro, uint8_t axis)
         }
 
         // please take care with exotic boardalignment !!
-        gyro->zero[axis] = calibrationSum[axis] / calculateCalibratingCycles();
+        axis->zero = calibrationSum[index] / calculateCalibratingCycles();
     }
 }
 
 static void calibrate(gyro_t * gyro)
 {
-    calibrateAxis(gyro, 0);
-    calibrateAxis(gyro, 1);
-    calibrateAxis(gyro, 2);
+    calibrateAxis(gyro, &gyro->x, 0);
+    calibrateAxis(gyro, &gyro->y, 1);
+    calibrateAxis(gyro, &gyro->z, 2);
 
     --gyro->calibrationCyclesRemaining;
 }
 
 static void computeDpsFilteredAxis(
         gyro_t * gyro,
-        float sampleSum[3],
-        uint8_t axis)
+        float sampleSum,
+        gyroAxis_t * axis)
 {
-    // using gyro lowpass 2 filter for downsampling
-    float dpsFiltered = sampleSum[axis];
-
-    // apply static notch filters and software lowpass filters
-    dpsFiltered =
-        //gyro->lowpassFilterApplyFn((filter_t *)&gyro->lowpassFilter[axis],
-        pt1FilterApply((pt1Filter_t *)&gyro->lowpassFilter[axis], dpsFiltered);
-
-    gyro->dpsFiltered[axis] = dpsFiltered;
+    axis->dpsFiltered =
+        pt1FilterApply((pt1Filter_t *)&axis->lowpassFilter, sampleSum);
 }
 
 // ============================================================================
@@ -130,9 +113,13 @@ void gyroInit(hackflight_t * hf)
 {
     gyro_t * gyro = &hf->gyro;
 
-    initLowpassFilter(gyro->lowpassFilter, LPF1_DYN_MIN_HZ);
+    initLowpassFilter(&gyro->x.lowpassFilter, LPF1_DYN_MIN_HZ);
+    initLowpassFilter(&gyro->y.lowpassFilter, LPF1_DYN_MIN_HZ);
+    initLowpassFilter(&gyro->z.lowpassFilter, LPF1_DYN_MIN_HZ);
 
-    initLowpassFilter(gyro->lowpass2Filter, LPF2_STATIC_HZ);
+    initLowpassFilter(&gyro->x.lowpass2Filter, LPF2_STATIC_HZ);
+    initLowpassFilter(&gyro->y.lowpass2Filter, LPF2_STATIC_HZ);
+    initLowpassFilter(&gyro->z.lowpass2Filter, LPF2_STATIC_HZ);
 
     // Start calibrating
     setCalibrationCycles(gyro);
@@ -146,22 +133,22 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
 
     bool calibrationComplete = gyro->calibrationCyclesRemaining <= 0;
 
-    static float dps[3];
-    static float sampleSum[3];
+    static axes_t _dps;
+    static axes_t _sampleSum;
 
     if (calibrationComplete) {
 
         axes_t adc = {
-            gyroReadRaw(0) - gyro->zero[0],
-            gyroReadRaw(1) - gyro->zero[1],
-            gyroReadRaw(2) - gyro->zero[2]
+            gyroReadRaw(0) - gyro->x.zero,
+            gyroReadRaw(1) - gyro->y.zero,
+            gyroReadRaw(2) - gyro->z.zero
         };
 
         hf->imuAlignFun(&adc);
 
-        dps[0] = adc.x * (gyroScaleDps() / 32768.);
-        dps[1] = adc.y * (gyroScaleDps() / 32768.);
-        dps[2] = adc.z * (gyroScaleDps() / 32768.);
+        _dps.x = adc.x * (gyroScaleDps() / 32768.);
+        _dps.y = adc.y * (gyroScaleDps() / 32768.);
+        _dps.z = adc.z * (gyroScaleDps() / 32768.);
 
     } else {
 
@@ -169,25 +156,25 @@ void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
     }
 
     // using gyro lowpass 2 filter for downsampling
-    sampleSum[0] =
-        pt1FilterApply((pt1Filter_t *)&gyro->lowpass2Filter[0], dps[0]);
-    sampleSum[1] =
-        pt1FilterApply((pt1Filter_t *)&gyro->lowpass2Filter[1], dps[1]);
-    sampleSum[2] =
-        pt1FilterApply((pt1Filter_t *)&gyro->lowpass2Filter[2], dps[2]);
+    _sampleSum.x =
+        pt1FilterApply((pt1Filter_t *)&gyro->x.lowpass2Filter, _dps.x);
+    _sampleSum.y =
+        pt1FilterApply((pt1Filter_t *)&gyro->y.lowpass2Filter, _dps.y);
+    _sampleSum.z =
+        pt1FilterApply((pt1Filter_t *)&gyro->z.lowpass2Filter, _dps.z);
 
-    computeDpsFilteredAxis(gyro, sampleSum, 0);
-    computeDpsFilteredAxis(gyro, sampleSum, 1);
-    computeDpsFilteredAxis(gyro, sampleSum, 2);
+    computeDpsFilteredAxis(gyro, _sampleSum.x, &gyro->x);
+    computeDpsFilteredAxis(gyro, _sampleSum.y, &gyro->y);
+    computeDpsFilteredAxis(gyro, _sampleSum.z, &gyro->z);
 
     gyro->sampleCount = 0;
 
     // Used for quaternion filter; stubbed otherwise
     imuAccumulateGyro(gyro);
 
-    vstate->dphi   = gyro->dpsFiltered[0];
-    vstate->dtheta = gyro->dpsFiltered[1];
-    vstate->dpsi   = gyro->dpsFiltered[2];
+    vstate->dphi   = gyro->x.dpsFiltered;
+    vstate->dtheta = gyro->y.dpsFiltered;
+    vstate->dpsi   = gyro->z.dpsFiltered;
 
     gyro->isCalibrating = !calibrationComplete;
 }

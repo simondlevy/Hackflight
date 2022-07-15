@@ -35,18 +35,21 @@ extern "C" {
 
 void imuAccumulateGyro(gyro_t * gyro)
 {
-    static float _adcf[3];
+    static axes_t _adcf;
 
     // integrate using trapezium rule to avoid bias
-    gyro->accum.values.x += 0.5f * (_adcf[0] + gyro->dpsFiltered[0]) * CORE_PERIOD();
-    gyro->accum.values.y += 0.5f * (_adcf[1] + gyro->dpsFiltered[1]) * CORE_PERIOD();
-    gyro->accum.values.z += 0.5f * (_adcf[2] + gyro->dpsFiltered[2]) * CORE_PERIOD();
+    gyro->accum.values.x +=
+        0.5f * (_adcf.x + gyro->x.dpsFiltered) * CORE_PERIOD();
+    gyro->accum.values.y +=
+        0.5f * (_adcf.y + gyro->y.dpsFiltered) * CORE_PERIOD();
+    gyro->accum.values.z +=
+        0.5f * (_adcf.z + gyro->z.dpsFiltered) * CORE_PERIOD();
 
     gyro->accum.count++;
 
-    for (int axis = 0; axis < 3; axis++) {
-        _adcf[axis] = gyro->dpsFiltered[axis];
-    }
+    _adcf.x = gyro->x.dpsFiltered;
+    _adcf.y = gyro->y.dpsFiltered;
+    _adcf.z = gyro->z.dpsFiltered;
 }
 
 int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
