@@ -261,7 +261,7 @@ $(TARGET_HEX): $(TARGET_ELF)
 
 $(TARGET_DFU): $(TARGET_HEX)
 	@echo "Creating DFU $(TARGET_DFU)" "$(STDOUT)"
-	$(V1) $(PYTHON) ../../dfuse-pack.py -i $< $@
+	$(V1) $(PYTHON) $(ROOT)/dfuse-pack.py -i $< $@
 
 $(TARGET_ELF): $(TARGET_OBJS) \
 	  $(OBJECT_DIR)/arming.o \

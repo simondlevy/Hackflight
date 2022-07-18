@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2022 Simon D. Levy
+   nCopyright (c) 2022 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -156,7 +156,7 @@ extern "C" {
         } 
     }
 
-    static float applyRcSmoothingFeedforwardFilter(
+    static float applySmoothingFeedforwardFilter(
             anglePid_t * pid,
             uint8_t index,
             float pidSetpointDelta)
@@ -265,7 +265,7 @@ extern "C" {
                 pt2FilterGain(D_MIN_LOWPASS_HZ, CORE_DT()));
     }
 
-    static void computeGyroRateDtermAxis(
+    static void computeDtermAxis(
             anglePid_t * pid,
             float gyroRates[3],
             float gyroRateDterm[3],
@@ -301,7 +301,7 @@ extern "C" {
             float currentPidSetpoint,
             uint8_t index)
     {
-        pid->previousGyroRateDterm[index] = gyroRateDterm[index];
+        // pid->previousDterm[index] = gyroRateDterm[index];
 
         pidSetpointDelta += setpointCorrection -
             pid->previousSetpointCorrection[index];
@@ -330,8 +330,7 @@ extern "C" {
                         feedforwardMaxRateLimit) :
                 feedForward;
             pid->data[index].F =
-                applyRcSmoothingFeedforwardFilter(pid, index,
-                        pid->data[index].F);
+                applySmoothingFeedforwardFilter(pid, index, pid->data[index].F);
 
         }
 
@@ -409,7 +408,7 @@ extern "C" {
             // dynamically calculated deltaT whenever another task causes
             // the PID loop execution to be delayed.
             const float delta = -(gyroRateDterm[index] -
-                    pid->previousGyroRateDterm[index]) * freq;
+                    pid->previousDterm[index]) * freq;
 
             float dMinFactor = 1;
 
@@ -444,7 +443,7 @@ extern "C" {
             pid->data[index].D = 0;
         }
 
-        pid->previousGyroRateDterm[index] = gyroRateDterm[index];
+        pid->previousDterm[index] = gyroRateDterm[index];
 
         pid->data[index].Sum = 
             computeFeedforwardAndSum(pid, constants, gyroRateDterm, true,
@@ -558,9 +557,9 @@ extern "C" {
         // Precalculate gyro deta for D-term here, this allows loop unrolling
         float gyroRateDterm[3] = {0};
 
-        computeGyroRateDtermAxis(pid, gyroRates, gyroRateDterm, 0);
-        computeGyroRateDtermAxis(pid, gyroRates, gyroRateDterm, 1);
-        computeGyroRateDtermAxis(pid, gyroRates, gyroRateDterm, 2);
+        computeDtermAxis(pid, gyroRates, gyroRateDterm, 0);
+        computeDtermAxis(pid, gyroRates, gyroRateDterm, 1);
+        computeDtermAxis(pid, gyroRates, gyroRateDterm, 2);
 
         float pidSetpoints[3] = {demands->rpy.x, demands->rpy.y, demands->rpy.z};
         float currentAngles[3] = { vstate->phi, vstate->theta, vstate->psi };

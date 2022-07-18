@@ -75,19 +75,33 @@ typedef struct {
 
 typedef struct {
 
-    pidAxisData_t  datag;
-    pt2Filter_t    dMinLowpassg;
-    pt2Filter_t    dMinRangeg;
-    dtermLowpass_t dtermLowpassg;
-    dtermLowpass_t dtermLowpass2g;
-    bool           feedforwardLpfInitialized;
-    pt3Filter_t    feedforwardPt3g;
-    float          previousSetpointCorrectiong;
-    float          previousGyroRateDtermg;
-    float          previousSetpointg;
-    pt1Filter_t    windupLpfg;
+    float          P;
+    float          I;
+    pt3Filter_t    feedforwardPt3;
+    float          previousSetpointCorrection;
+    float          previousDterm;
 
 } anglePidAxis_t;
+
+typedef struct {
+
+    float          D;
+    anglePidAxis_t anglePid;
+    pt2Filter_t    dMinLowpass;
+    pt2Filter_t    dMinRange;
+    dtermLowpass_t dtermLowpass;
+    dtermLowpass_t dtermLowpass2;
+    float          previousDterm;
+    pt1Filter_t    windupLpf;
+
+} cyclicPid_t;
+
+typedef struct {
+
+    anglePidAxis_t anglePid;
+    pt1Filter_t    ptermLowpass;
+
+} yawPid_t;
 
 typedef struct {
 
@@ -108,9 +122,9 @@ typedef struct {
     bool                feedforwardLpfInitialized;
     pt3Filter_t         feedforwardPt3[3];
     float               previousSetpointCorrection[3];
-    float               previousGyroRateDterm[3];
-    float               previousSetpoint[3];
-    pt1Filter_t         windupLpf[3];
+    float               previousDterm[3];
+
+    pt1Filter_t         windupLpf[2];
 
 } anglePid_t;
 
