@@ -386,7 +386,7 @@ void imuInit(hackflight_t * hf, uint8_t interruptPin)
 }
 
 static void updateFusion(
-        hackflight_t * hf,
+        hackflight_full_t * hf,
         uint32_t time,
         quaternion_t * quat,
         rotation_t * rot)
@@ -452,7 +452,7 @@ static void getAverage(imuSensor_t * sensor, uint32_t period, axes_t * avg)
     avg->z = denom ? sensor->values.z / denom : 0;
 }
 
-static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
+static void getQuaternion(hackflight_full_t * hf, uint32_t time, quaternion_t * quat)
 {
     int32_t deltaT = time - hf->imuFusionPrev.time;
 
@@ -473,7 +473,7 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 }
 
 
-void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
+void imuGetEulerAngles(hackflight_full_t * hf, uint32_t time, axes_t * angles)
 {
     quaternion_t quat = {0,0,0,0};
     getQuaternion(hf, time, &quat);

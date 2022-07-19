@@ -75,7 +75,7 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0}; // 3.0; // Level Kp
 
-    hackflight_t hf = {0};
+    hackflight_full_t hf = {0};
 
     hackflightInitFull(
             &hf,
@@ -92,7 +92,7 @@ int main(void)
         hf.imuFusionPrev.quat.w = 1;
 
     while (true) {
-        hackflightStep(&hf);
+        hackflightStepFull(&hf);
     }
 
     return 0;
