@@ -268,7 +268,7 @@ extern "C" {
     static void computeDtermAxis(
             anglePid_t * pid,
             float gyroRate,
-            float gyroRateDterm[3],
+            float gyroRateDterm[2],
             uint8_t index)
     {
         float dterm = gyroRate;
@@ -300,8 +300,6 @@ extern "C" {
             float currentPidSetpoint,
             uint8_t index)
     {
-        // pid->previousDterm[index] = gyroRateDterm[index];
-
         pidSetpointDelta += setpointCorrection -
             pid->previousSetpointCorrection[index];
 
@@ -553,18 +551,19 @@ extern "C" {
         }
 
         // Precalculate gyro deta for D-term here, this allows loop unrolling
-        float gyroRateDterm[3] = {0};
+        float gyroRateDterm[3] = {2};
 
         computeDtermAxis(pid, vstate->dphi,   gyroRateDterm, 0);
         computeDtermAxis(pid, vstate->dtheta, gyroRateDterm, 1);
-        computeDtermAxis(pid, vstate->dpsi,   gyroRateDterm, 2);
 
         axes_t rpy = demands->rpy;
 
         computeCyclic(pid, constants, rpy.x, vstate->phi,
                 vstate->dphi, gyroRateDterm, 0);
+
         computeCyclic(pid, constants, rpy.y, vstate->theta,
                 vstate->dtheta, gyroRateDterm, 1);
+
         computeYaw(pid, constants, rpy.z, vstate->dpsi, dynCi);
 
         // Disable PID control if at zero throttle or if gyro overflow detected
