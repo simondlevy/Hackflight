@@ -503,6 +503,13 @@ extern "C" {
 
     } // computeYaw
 
+    static void initAxis(anglePid_t * pid, uint8_t index) 
+    {
+        pt1FilterInitAxis(pid, index);
+        pt1FilterInitWindupAxis(pid, index);
+        pt2FilterInitAxis(pid, index);
+    }
+
     // =========================================================================
 
     static void anglePidInit(anglePid_t * pid, anglePidConstants_t * constants)
@@ -513,20 +520,12 @@ extern "C" {
         // to allow an initial zero throttle to set the filter cutoff
         pid->dynLpfPreviousQuantizedThrottle = -1;  
 
-        pt1FilterInitAxis(pid, 0);
-        pt1FilterInitAxis(pid, 1);
-        pt1FilterInitAxis(pid, 2);
-
         pt1FilterInit(&pid->ptermYawLowpass,
                 pt1FilterGain(YAW_LOWPASS_HZ, CORE_DT()));
 
-        pt1FilterInitWindupAxis(pid, 0);
-        pt1FilterInitWindupAxis(pid, 1);
-        pt1FilterInitWindupAxis(pid, 2);
-
-        pt2FilterInitAxis(pid, 0);
-        pt2FilterInitAxis(pid, 1);
-        pt2FilterInitAxis(pid, 2);
+        initAxis(pid, 0);
+        initAxis(pid, 1);
+        initAxis(pid, 2);
     }
 
     static void anglePidUpdate(
