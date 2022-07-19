@@ -506,8 +506,13 @@ extern "C" {
     static void initAxis(anglePid_t * pid, uint8_t index) 
     {
         pt1FilterInitAxis(pid, index);
-        pt1FilterInitWindupAxis(pid, index);
         pt2FilterInitAxis(pid, index);
+    }
+
+    static void initCyclicAxis(anglePid_t * pid, uint8_t index) 
+    {
+        initAxis(pid, index);
+        pt1FilterInitWindupAxis(pid, index);
     }
 
     // =========================================================================
@@ -523,8 +528,8 @@ extern "C" {
         pt1FilterInit(&pid->ptermYawLowpass,
                 pt1FilterGain(YAW_LOWPASS_HZ, CORE_DT()));
 
-        initAxis(pid, 0);
-        initAxis(pid, 1);
+        initCyclicAxis(pid, 0);
+        initCyclicAxis(pid, 1);
         initAxis(pid, 2);
     }
 

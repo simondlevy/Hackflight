@@ -110,9 +110,9 @@ typedef struct {
     uint32_t            lastDynLpfUpdateUs;
     pt1Filter_t         ptermYawLowpass;
 
-    anglePidAxis_t x;
-    anglePidAxis_t y;
-    anglePidAxis_t z;
+    cyclicPid_t         x;
+    cyclicPid_t         y;
+    yawPid_t            z;
 
     pidAxisData_t       data[3];
     pt2Filter_t         dMinLowpass[3];
