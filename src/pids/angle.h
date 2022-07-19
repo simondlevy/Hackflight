@@ -268,7 +268,7 @@ extern "C" {
     static void computeDtermAxis(
             anglePid_t * pid,
             float gyroRate,
-            float gyroRateDterm[2],
+            float gyroRateDterm[3],
             uint8_t index)
     {
         float dterm = gyroRate;
@@ -551,7 +551,7 @@ extern "C" {
         }
 
         // Precalculate gyro deta for D-term here, this allows loop unrolling
-        float gyroRateDterm[3] = {2};
+        float gyroRateDterm[3] = {0};
 
         computeDtermAxis(pid, vstate->dphi,   gyroRateDterm, 0);
         computeDtermAxis(pid, vstate->dtheta, gyroRateDterm, 1);
