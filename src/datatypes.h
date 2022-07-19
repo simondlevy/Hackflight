@@ -508,30 +508,38 @@ typedef void (*mixer_t)(float throttle, float roll, float pitch, float yaw,
 
 // Hackflight ------------------------------------------------------------------
 
+// Real and simulated
 typedef struct {
 
-    arming_t         arming;
     anglePid_t       anglepid;
-    task_t           attitudeTask;
     demands_t        demands;
-    gyro_t           gyro;
-    imu_align_fun    imuAlignFun;
-    imuFusion_t      imuFusionPrev;
-    float            maxArmingAngle;
     mixer_t          mixer;
-    void *           motorDevice;
-    float            mspMotors[4];
-    task_t           mspTask;
     pidController_t  pidControllers[10];
     uint8_t          pidCount;
     bool             pidZeroThrottleItermReset;
-    rx_t             rx;
-    task_t           rxTask;
-    rxAxes_t         rxAxes;
-    scheduler_t      scheduler;
-    task_t           sensorTasks[10];
-    uint8_t          sensorTaskCount;
     vehicleState_t   vstate;
 
 } hackflight_t;
+
+// Real
+typedef struct {
+
+    arming_t         arming;
+    task_t           attitudeTask;
+    gyro_t           gyro;
+    hackflight_t     hackflight;
+    imu_align_fun    imuAlignFun;
+    imuFusion_t      imuFusionPrev;
+    float            maxArmingAngle;
+    void *           motorDevice;
+    float            mspMotors[4];
+    task_t           mspTask;
+    rx_t             rx;
+    rxAxes_t         rxAxes;
+    task_t           rxTask;
+    scheduler_t      scheduler;
+    task_t           sensorTasks[10];
+    uint8_t          sensorTaskCount;
+
+} hackflight_full_t;
 

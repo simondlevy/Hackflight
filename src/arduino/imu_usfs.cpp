@@ -106,7 +106,7 @@ extern "C" {
         return (uint16_t)(USFS_GYRO_SCALE * 32768);
     }
 
-    void imuGetEulerAngles(hackflight_t * hf, uint32_t time, axes_t * angles)
+    void imuGetEulerAngles(hackflight_full_t * hf, uint32_t time, axes_t * angles)
     {
         (void)time;
 
@@ -117,7 +117,7 @@ extern "C" {
         hf->imuAlignFun(angles);
     }
 
-    void imuInit(hackflight_t * hf, uint8_t interruptPin)
+    void imuInit(hackflight_full_t * hf, uint8_t interruptPin)
     {
         (void)hf;
 

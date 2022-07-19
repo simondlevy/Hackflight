@@ -28,7 +28,7 @@
 #include <motor.h>
 #include <stm32_clock.h>
 
-static hackflight_t _hf;
+static hackflight_full_t _hf;
 
 static void ladybugSetup(serialPortIdentifier_e rxPort, rxDevFuns_t rxDeviceFuns)
 {
@@ -63,5 +63,5 @@ static void ladybugSetup(serialPortIdentifier_e rxPort, rxDevFuns_t rxDeviceFuns
 
 static void ladybugLoop(void)
 {
-    hackflightStep(&_hf);
+    hackflightStepFull(&_hf);
 }

@@ -22,13 +22,24 @@
 #include <string.h>
 
 #include "arming.h"
+#include "deg2rad.h"
 #include "gyro.h"
 #include "debug.h"
+#include "failsafe.h"
+#include "gyro.h"
 #include "hackflight.h"
+#include "hackflight_full.h"
+#include "imu.h"
+#include "init_task.h"
 #include "led.h"
+#include "motor.h"
 #include "msp.h"
 #include "rx.h"
 #include "system.h"
+
+// Arming safety  -------------------------------------------------------------
+
+static const float MAX_ARMING_ANGLE = 25;
 
 // Scheduling constants -------------------------------------------------------
 
@@ -70,6 +81,11 @@ static const float TASK_AGE_EXPEDITE_SCALE = 0.9;
 static const uint32_t CORE_RATE_COUNT = 25000;
 static const uint32_t GYRO_LOCK_COUNT = 400;
 
+// Scheduling constants -------------------------------------------------------
+static const uint32_t RX_TASK_RATE       = 33;
+static const uint32_t ATTITUDE_TASK_RATE = 100;
+
+
 // MSP task --------------------------------------------------------------------
 
 static const uint32_t MSP_TASK_RATE = 100;
@@ -78,12 +94,13 @@ static const uint32_t MSP_TASK_RATE = 100;
 extern "C" {
 #endif
 
-    static void task_msp(void * hackflight, uint32_t time)
+    static void task_msp(void * ptr, uint32_t time)
     {
         (void)time;
 
-        hackflight_t * hf = (hackflight_t *)hackflight;
-        mspUpdate(&hf->vstate, &hf->rxAxes, armingIsArmed(&hf->arming),
+        hackflight_full_t * hf = (hackflight_full_t *)ptr;
+
+        mspUpdate(&hf->hackflight.vstate, &hf->rxAxes, armingIsArmed(&hf->arming),
                 hf->motorDevice, hf->mspMotors);
     }
 
@@ -122,7 +139,7 @@ extern "C" {
     }
 
     static void executeTask(
-            hackflight_t * hf,
+            hackflight_full_t * hf,
             task_t *task,
             uint32_t currentTimeUs)
     {
@@ -160,12 +177,12 @@ extern "C" {
 
 
     static void checkCoreTasks(
-            hackflight_t * hf,
+            hackflight_full_t * hff,
             int32_t loopRemainingCycles,
             uint32_t nowCycles,
             uint32_t nextTargetCycles)
     {
-        scheduler_t * scheduler = &hf->scheduler;
+        scheduler_t * scheduler = &hff->scheduler;
 
         if (scheduler->loopStartCycles > scheduler->loopStartMinCycles) {
             scheduler->loopStartCycles -= scheduler->loopStartDeltaDownCycles;
@@ -176,7 +193,17 @@ extern "C" {
             loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
         }
 
-        hackflightRunCoreTasks(hf);
+        hackflight_t * hf = &hff->hackflight;
+
+        gyroReadScaled(hff, &hf->vstate);
+
+        rxGetDemands(&hff->rx, timeMicros(), &hf->anglepid, &hf->demands);
+
+        float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
+        hackflightStep(hf, mixmotors);
+
+        motorWrite(hff->motorDevice,
+                armingIsArmed(&hff->arming) ? mixmotors : hff->mspMotors);
 
         // CPU busy
         if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
@@ -247,7 +274,7 @@ extern "C" {
     }
 
     static void checkDynamicTasks(
-            hackflight_t * hf,
+            hackflight_full_t * hf,
             int32_t loopRemainingCycles,
             uint32_t nextTargetCycles)
     {
@@ -350,12 +377,69 @@ extern "C" {
             (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
 
         scheduler->clockRate = systemClockMicrosToCycles(1000000);
-     }
+    }
+
+    // Attitude estimation task -----------------------------------------------
+
+    static void task_attitude(void * ptr, uint32_t time)
+    {
+        hackflight_full_t * hf = (hackflight_full_t *)ptr;
+
+        axes_t angles = {0,0,0};
+
+        imuGetEulerAngles(hf, time, &angles);
+
+        vehicleState_t * vstate = &hf->hackflight.vstate;
+
+        vstate->phi   = angles.x;
+        vstate->theta = angles.y;
+        vstate->psi   = angles.z;
+    }
+
+
+    // RX polling task ------------------------------------------------------------
+
+    static void task_rx(void * ptr, uint32_t time)
+    {
+        hackflight_full_t * hf = (hackflight_full_t *)ptr;
+
+        bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;
+        bool pidItermResetReady = false;
+        bool pidItermResetValue = false;
+
+        static rxAxes_t rxax = {{0, {0, 0, 0}}, 0, 0};
+
+        bool gotNewData = false;
+
+        bool imuIsLevel =
+            fabsf(hf->hackflight.vstate.phi) < hf->maxArmingAngle &&
+            fabsf(hf->hackflight.vstate.theta) < hf->maxArmingAngle;
+
+        rxPoll(
+                &hf->rx,
+                time,
+                imuIsLevel, 
+                calibrating,
+                &rxax,
+                hf->motorDevice,
+                &hf->arming,
+                &pidItermResetReady,
+                &pidItermResetValue,
+                &gotNewData);
+
+        if (pidItermResetReady) {
+            hf->hackflight.pidZeroThrottleItermReset = pidItermResetValue;
+        }
+
+        if (gotNewData) {
+            memcpy(&hf->rxAxes, &rxax, sizeof(rxAxes_t));
+        }
+    }
 
     // -------------------------------------------------------------------------
 
     void hackflightInitFull(
-            hackflight_t * hf,
+            hackflight_full_t * hf,
             rxDevFuns_t * rxDeviceFuns,
             serialPortIdentifier_e rxDevPort,
             anglePidConstants_t * anglePidConstants,
@@ -381,15 +465,19 @@ extern "C" {
 
         hf->motorDevice = motorDevice;
 
-        hackflightInit(hf, anglePidConstants, mixer);
+        hackflightInit(&hf->hackflight, anglePidConstants, mixer);
 
         hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 
+        initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
+
+        initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
+
         schedulerInit(&hf->scheduler);
     }
 
-    void hackflightStep(hackflight_t * hf)
+    void hackflightStepFull(hackflight_full_t * hf)
     {
         scheduler_t * scheduler = &hf->scheduler;
 

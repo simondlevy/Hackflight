@@ -18,28 +18,11 @@
 
 #pragma once
 
-#include "arming.h"
 #include "datatypes.h"
 #include "debug.h"
-#include "deg2rad.h"
-#include "failsafe.h"
-#include "gyro.h"
-#include "imu.h"
-#include "init_task.h"
 #include "maths.h"
-#include "motor.h"
 #include "pids/angle.h"
-#include "rx.h"
 #include "time.h"
-
-// Arming safety  -------------------------------------------------------------
-
-static const float MAX_ARMING_ANGLE = 25;
-
-// Scheduling constants -------------------------------------------------------
-
-static const uint32_t RX_TASK_RATE       = 33;
-static const uint32_t ATTITUDE_TASK_RATE = 100;
 
 // PID-limiting constants -----------------------------------------------------
 
@@ -53,21 +36,6 @@ static const uint16_t PIDSUM_LIMIT_YAW    = 400;
 extern "C" {
 #endif
 
-static void task_attitude(void * hackflight, uint32_t time)
-{
-    hackflight_t * hf = (hackflight_t *)hackflight;
-
-    axes_t angles = {0,0,0};
-
-    imuGetEulerAngles(hf, time, &angles);
-
-    vehicleState_t * vstate = &hf->vstate;
-
-    vstate->phi   = angles.x;
-    vstate->theta = angles.y;
-    vstate->psi   = angles.z;
-}
-
 // PID controller support -----------------------------------------------------
 
 static void hackflightAddPidController(hackflight_t * hf, pid_fun_t fun, void * data)
@@ -77,45 +45,6 @@ static void hackflightAddPidController(hackflight_t * hf, pid_fun_t fun, void * 
     hf->pidCount++;
 }
 
-// RX polling task ------------------------------------------------------------
-
-static void task_rx(void * hackflight, uint32_t time)
-{
-    hackflight_t * hf = (hackflight_t *)hackflight;
-
-    bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;
-    bool pidItermResetReady = false;
-    bool pidItermResetValue = false;
-
-    static rxAxes_t rxax = {{0, {0, 0, 0}}, 0, 0};
-
-    bool gotNewData = false;
-
-    bool imuIsLevel =
-        fabsf(hf->vstate.phi) < hf->maxArmingAngle &&
-        fabsf(hf->vstate.theta) < hf->maxArmingAngle;
-
-    rxPoll(
-            &hf->rx,
-            time,
-            imuIsLevel, 
-            calibrating,
-            &rxax,
-            hf->motorDevice,
-            &hf->arming,
-            &pidItermResetReady,
-            &pidItermResetValue,
-            &gotNewData);
-
-    if (pidItermResetReady) {
-        hf->pidZeroThrottleItermReset = pidItermResetValue;
-    }
-
-    if (gotNewData) {
-        memcpy(&hf->rxAxes, &rxax, sizeof(rxAxes_t));
-    }
-}
-
 // Core tasks: gyro, PID controllers, mixer, motors ------------------------
 
 static float constrain_demand(float demand, float limit)
@@ -123,13 +52,9 @@ static float constrain_demand(float demand, float limit)
     return constrain_f(demand, -limit, +limit) / PID_MIXER_SCALING;
 }
 
-static void hackflightRunCoreTasks(hackflight_t * hf)
+static void hackflightStep(hackflight_t * hf, float mixmotors[])
 {
     uint32_t currentTimeUs = timeMicros();
-
-    gyroReadScaled(hf, &hf->vstate);
-
-    rxGetDemands(&hf->rx, currentTimeUs, &hf->anglepid, &hf->demands);
 
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pidController_t pid = hf->pidControllers[k];
@@ -137,16 +62,12 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
                 &hf->vstate, hf->pidZeroThrottleItermReset);
     }
 
-    float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
     hf->mixer(
             hf->demands.throttle,
             constrain_demand(hf->demands.rpy.x, PIDSUM_LIMIT_CYCLIC),
             constrain_demand(hf->demands.rpy.y, PIDSUM_LIMIT_CYCLIC),
             -constrain_demand(hf->demands.rpy.z, PIDSUM_LIMIT_YAW),
             mixmotors);
-
-    motorWrite(hf->motorDevice,
-            armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
 }
 
 // ============================================================================
@@ -161,10 +82,6 @@ static void hackflightInit(
     anglePidInit(&hf->anglepid, anglePidConstants);
 
     hackflightAddPidController(hf, anglePidUpdate, &hf->anglepid);
-
-    initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
-
-    initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
 }
 
 #if defined(__cplusplus)

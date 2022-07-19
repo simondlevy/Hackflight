@@ -24,17 +24,12 @@
 extern "C" {
 #endif
 
-    // For both hardware and sim implementations -------------------------------
-
-    void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate);
-
-    // For hardware impelmentations --------------------------------------------
-
     void     gyroDevInit(void);
-    void     gyroInit(hackflight_t * hf);
+    void     gyroInit(hackflight_full_t * hf);
     uint32_t gyroInterruptCount(void);
     bool     gyroIsReady(void);
     int16_t  gyroReadRaw(uint8_t k);
+    void     gyroReadScaled(hackflight_full_t * hf, vehicleState_t * vstate);
     uint16_t gyroScaleDps(void);
     uint32_t gyroSyncTime(void);
 

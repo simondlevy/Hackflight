@@ -76,7 +76,6 @@ static void calibrateAxis(gyro_t * gyro, gyroAxis_t * axis, uint8_t index)
             return;
         }
 
-        // please take care with exotic boardalignment !!
         axis->zero = axis->calibrationSum / calculateCalibratingCycles();
     }
 }
@@ -98,7 +97,7 @@ static void computeDpsFilteredAxis(float sampleSum, gyroAxis_t * axis)
 
 // ============================================================================
 
-void gyroInit(hackflight_t * hf)
+void gyroInit(hackflight_full_t * hf)
 {
     gyro_t * gyro = &hf->gyro;
 
@@ -147,7 +146,7 @@ static void runFilter(gyroAxis_t * axis, float dps)
 
 // ----------------------------------------------------------------------------
 
-void gyroReadScaled(hackflight_t * hf, vehicleState_t * vstate)
+void gyroReadScaled(hackflight_full_t * hf, vehicleState_t * vstate)
 {
     if (!gyroIsReady()) return;
 

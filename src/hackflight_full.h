@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 void hackflightInitFull(
-        hackflight_t * hf,
+        hackflight_full_t * hf,
         rxDevFuns_t * rxDeviceFuns,
         serialPortIdentifier_e rxDevPort,
         anglePidConstants_t * anglePidConstants,
@@ -35,7 +35,7 @@ void hackflightInitFull(
         imu_align_fun imuAlign,
         uint8_t ledPin);
 
-void hackflightStep(hackflight_t * hackflight);
+void hackflightStepFull(hackflight_full_t * hackflightFull);
 
 #if defined(__cplusplus)
 }
