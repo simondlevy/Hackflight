@@ -566,10 +566,7 @@ extern "C" {
                 gyroRates, gyroRateDterm, 1);
         computeAnglePidYaw(pid, constants, pidSetpoints, gyroRates, dynCi);
 
-        // Disable PID control if at zero throttle or if gyro overflow detected
-        // This may look very innefficient, but it is done on purpose to always
-        // show real CPU usage as in flight
-        if (hf->zeroThrottleReset) {
+        if (hf->atZeroThrottle) {
             resetItermAxis(pid, 0);
             resetItermAxis(pid, 1);
             resetItermAxis(pid, 2);
