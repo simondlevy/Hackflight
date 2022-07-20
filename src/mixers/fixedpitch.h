@@ -71,24 +71,7 @@ extern "C" {
         // clip adjusted roll/pitch/yaw. This could move throttle down, but
         // also up for those low throttle flips.
         for (int i = 0; i < motorCount; i++) {
-            float motorOutput = mix[i] + throttle;
-            motorOutput = motorValueLow() +
-                (motorValueHigh() - motorValueLow()) * motorOutput;
-
-            if (failsafeIsActive()) {
-                if (motorIsProtocolDshot()) {
-                    // Prevent getting into special reserved range
-                    motorOutput = (motorOutput < motorValueLow()) ?
-                        motorValueDisarmed() :
-                        motorOutput; 
-                }
-                motorOutput =
-                    constrain_f(motorOutput, motorValueDisarmed(), motorValueHigh());
-            } else {
-                motorOutput =
-                    constrain_f(motorOutput, motorValueLow(), motorValueHigh());
-            }
-            motors[i] = motorOutput;
+            motors[i] = mix[i] + throttle;
         }
     }
 

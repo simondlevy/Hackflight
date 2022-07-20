@@ -176,6 +176,33 @@ extern "C" {
     }
 
 
+    static void constrainMotors(float * motors)
+    {
+        for (uint8_t k=0; k<4; ++k) { // XXX should support other than 4
+
+            float motorValue = motors[k];
+
+            motorValue = motorValueLow() +
+                (motorValueHigh() - motorValueLow()) * motorValue;
+
+            if (failsafeIsActive()) {
+                if (motorIsProtocolDshot()) {
+                    // Prevent getting into special reserved range
+                    motorValue = (motorValue < motorValueLow()) ?
+                        motorValueDisarmed() :
+                        motorValue; 
+                }
+                motorValue =
+                    constrain_f(motorValue, motorValueDisarmed(), motorValueHigh());
+            } else {
+                motorValue =
+                    constrain_f(motorValue, motorValueLow(), motorValueHigh());
+            }
+
+            motors[k] = motorValue;
+        }
+    }
+
     static void checkCoreTasks(
             hackflight_full_t * hff,
             int32_t loopRemainingCycles,
@@ -201,6 +228,8 @@ extern "C" {
 
         float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
         hackflightStep(hf, mixmotors);
+
+        constrainMotors(mixmotors);
 
         motorWrite(hff->motorDevice,
                 armingIsArmed(&hff->arming) ? mixmotors : hff->mspMotors);

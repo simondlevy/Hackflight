@@ -54,14 +54,14 @@ static float constrain_demand(float demand, float limit)
 
 static void hackflightStep(hackflight_t * hf, float mixmotors[])
 {
-    uint32_t currentTimeUs = timeMicros();
-
+    // Run PID controllers
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pidController_t pid = hf->pidControllers[k];
-        pid.fun(currentTimeUs, &hf->demands, pid.data,
+        pid.fun(timeMicros(), &hf->demands, pid.data,
                 &hf->vstate, hf->pidZeroThrottleItermReset);
     }
 
+    // Run mixer
     hf->mixer(
             hf->demands.throttle,
             constrain_demand(hf->demands.rpy.x, PIDSUM_LIMIT_CYCLIC),
