@@ -64,11 +64,11 @@ static void altHoldPidUpdate(void * hfptr, void * pidptr, uint32_t usec)
 
     // Reset controller when moving into deadband above a minimum altitude
     bool gotNewTarget = inBand && !_inBandPrev;
-    _errorI = gotNewTarget || hf->pidZeroThrottleItermReset ? 0 : _errorI;
+    _errorI = gotNewTarget || hf->zeroThrottleReset ? 0 : _errorI;
 
     _inBandPrev = inBand;
 
-    if (hf->pidZeroThrottleItermReset) {
+    if (hf->zeroThrottleReset) {
         _altitudeTarget = 0;
     }
 

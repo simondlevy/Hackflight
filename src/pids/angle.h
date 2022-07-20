@@ -293,7 +293,6 @@ extern "C" {
     static float computeFeedforwardAndSum(
             anglePid_t *pid,
             anglePidConstants_t * constants,
-            float gyroRateDterm[3],
             bool shouldApplyFeedforwardLimits,
             float pidSetpointDelta,
             float setpointCorrection,
@@ -446,7 +445,7 @@ extern "C" {
         pid->previousDterm[index] = gyroRateDterm[index];
 
         pid->data[index].Sum = 
-            computeFeedforwardAndSum(pid, constants, gyroRateDterm, true,
+            computeFeedforwardAndSum(pid, constants, true,
                 pidSetpointDelta, setpointCorrection, feedforwardMaxRate,
                 currentPidSetpoint, index);
 
@@ -457,7 +456,6 @@ extern "C" {
             anglePidConstants_t * constants,
             float pidSetpoints[3],
             float gyroRates[3],
-            float gyroRateDterm[3],
             float dynCi)
     {
         float currentPidSetpoint = pidSetpoints[2];
@@ -493,7 +491,7 @@ extern "C" {
         pid->data[2].D = 0;
 
         float pidSum =
-            computeFeedforwardAndSum(pid, constants, gyroRateDterm, false,
+            computeFeedforwardAndSum(pid, constants, false,
                 pidSetpointDelta, setpointCorrection, feedforwardMaxRate,
                 currentPidSetpoint, 2);
 
@@ -566,13 +564,12 @@ extern "C" {
                 gyroRates, gyroRateDterm, 0);
         computeAnglePidCyclic(pid, constants, pidSetpoints, currentAngles,
                 gyroRates, gyroRateDterm, 1);
-        computeAnglePidYaw(pid, constants, pidSetpoints,
-                gyroRates, gyroRateDterm, dynCi);
+        computeAnglePidYaw(pid, constants, pidSetpoints, gyroRates, dynCi);
 
         // Disable PID control if at zero throttle or if gyro overflow detected
         // This may look very innefficient, but it is done on purpose to always
         // show real CPU usage as in flight
-        if (hf->pidZeroThrottleItermReset) {
+        if (hf->zeroThrottleReset) {
             resetItermAxis(pid, 0);
             resetItermAxis(pid, 1);
             resetItermAxis(pid, 2);

@@ -108,7 +108,7 @@ static void task_rx(void * hackflight, uint32_t time)
             &gotNewData);
 
     if (pidItermResetReady) {
-        hf->pidZeroThrottleItermReset = pidItermResetValue;
+        hf->zeroThrottleReset = pidItermResetValue;
     }
 
     if (gotNewData) {
