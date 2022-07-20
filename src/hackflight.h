@@ -133,8 +133,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pidController_t pid = hf->pidControllers[k];
-        pid.fun(currentTimeUs, &hf->demands, pid.data,
-                &hf->vstate, hf->pidZeroThrottleItermReset);
+        pid.fun(hf, pid.data, currentTimeUs);
     }
 
     float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
