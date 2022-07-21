@@ -20,6 +20,11 @@
 
 #include "datatypes.h"
 
+static constexpr float ALTITUDE_MIN   = 1.0;
+static constexpr float PILOT_VELZ_MAX = 2.5;
+static constexpr float STICK_DEADBAND = 0.2;
+static constexpr float WINDUP_MAX     = 0.4;
+
 static bool inBand(float value, float band) 
 {
     return value > -band && value < band;
@@ -30,52 +35,40 @@ static float constrainAbs(float v, float lim)
     return v < -lim ? -lim : v > +lim ? +lim : v;
 }
 
-static void altHoldPidInit(
-        altPid_t * pid,
-        const float kp,
-        const float ki,
-        float * rawThrottle)
+static void altHoldPidInit(altHoldPid_t * pid, const float kp, const float ki)
 {
     pid->kp = kp;
     pid->ki = ki;
-    pid->rawThrottle = rawThrottle;
 }
 
-static void altHoldPidUpdate(
-        uint32_t currentTimeUs
-        , demands_t * demands
-        , void * data
-        , vehicleState_t * vstate
-        , bool reset
-        )
+static void altHoldPidUpdate(void * hfptr, void * pidptr, uint32_t usec)
 {
-    static constexpr float ALTITUDE_MIN   = 1.0;
-    static constexpr float PILOT_VELZ_MAX = 2.5;
-    static constexpr float STICK_DEADBAND = 0.2;
-    static constexpr float WINDUP_MAX     = 0.4;
+    hackflight_t * hf = (hackflight_t *)hfptr;
+    altHoldPid_t * pid = (altHoldPid_t *)pidptr;
+
+    vehicleState_t * vstate = &hf->vstate;
+    demands_t * demands = &hf->demands;
 
     static bool _inBandPrev;
     static float _errorI;
     static float _altitudeTarget;
 
-    altPid_t * pid = (altPid_t *)data;
-    float  throttle = *(pid->rawThrottle);
-
     // NED => ENU
     float altitude = vstate->z;
 
-    float sthrottle = 2 * throttle - 1; // [0,1] => [-1,+1]
+    // Rescale throttle [0,1] => [-1,+1]
+    float sthrottle = 2 * hf->rxAxes.demands.throttle - 1; 
 
     // Is stick demand in deadband, above a minimum altitude?
     bool inBand = fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
     // Reset controller when moving into deadband above a minimum altitude
     bool gotNewTarget = inBand && !_inBandPrev;
-    _errorI = gotNewTarget || reset ? 0 : _errorI;
-        
+    _errorI = gotNewTarget || hf->atZeroThrottle ? 0 : _errorI;
+
     _inBandPrev = inBand;
 
-    if (reset) {
+    if (hf->atZeroThrottle) {
         _altitudeTarget = 0;
     }
 

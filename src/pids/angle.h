@@ -204,10 +204,10 @@ extern "C" {
 
     static void updateDynLpfCutoffs(
             anglePid_t * pid,
-            uint32_t currentTimeUs,
+            uint32_t usec,
             float throttle)
     {
-        if (cmpTimeUs(currentTimeUs, pid->lastDynLpfUpdateUs) >=
+        if (cmpTimeUs(usec, pid->lastDynLpfUpdateUs) >=
                 DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
 
             // quantize the throttle reduce the number of filter updates
@@ -222,7 +222,7 @@ extern "C" {
                     (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
                 pidDynLpfDTermUpdate(pid, dynLpfThrottle);
                 pid->dynLpfPreviousQuantizedThrottle = quantizedThrottle;
-                pid->lastDynLpfUpdateUs = currentTimeUs;
+                pid->lastDynLpfUpdateUs = usec;
             }
         }
     }
@@ -293,7 +293,6 @@ extern "C" {
     static float computeFeedforwardAndSum(
             anglePid_t *pid,
             anglePidConstants_t * constants,
-            float gyroRateDterm[3],
             bool shouldApplyFeedforwardLimits,
             float pidSetpointDelta,
             float setpointCorrection,
@@ -446,7 +445,7 @@ extern "C" {
         pid->previousDterm[index] = gyroRateDterm[index];
 
         pid->data[index].Sum = 
-            computeFeedforwardAndSum(pid, constants, gyroRateDterm, true,
+            computeFeedforwardAndSum(pid, constants, true,
                 pidSetpointDelta, setpointCorrection, feedforwardMaxRate,
                 currentPidSetpoint, index);
 
@@ -457,7 +456,6 @@ extern "C" {
             anglePidConstants_t * constants,
             float pidSetpoints[3],
             float gyroRates[3],
-            float gyroRateDterm[3],
             float dynCi)
     {
         float currentPidSetpoint = pidSetpoints[2];
@@ -493,7 +491,7 @@ extern "C" {
         pid->data[2].D = 0;
 
         float pidSum =
-            computeFeedforwardAndSum(pid, constants, gyroRateDterm, false,
+            computeFeedforwardAndSum(pid, constants, false,
                 pidSetpointDelta, setpointCorrection, feedforwardMaxRate,
                 currentPidSetpoint, 2);
 
@@ -533,15 +531,13 @@ extern "C" {
         pt2FilterInitAxis(pid, 2);
     }
 
-    static void anglePidUpdate(
-            uint32_t currentTimeUs,
-            demands_t * demands,
-            void * data,
-            vehicleState_t * vstate,
-            bool reset
-            )
+    static void anglePidUpdate(void * hfptr, void * pidptr, uint32_t usec)
     {
-        anglePid_t * pid = (anglePid_t *)data;
+        hackflight_t * hf = (hackflight_t *)hfptr;
+        anglePid_t * pid = (anglePid_t *)pidptr;
+
+        vehicleState_t * vstate = &hf->vstate;
+        demands_t * demands = &hf->demands;
         anglePidConstants_t * constants = &pid->constants;
 
         // gradually scale back integration when above windup point
@@ -568,13 +564,9 @@ extern "C" {
                 gyroRates, gyroRateDterm, 0);
         computeAnglePidCyclic(pid, constants, pidSetpoints, currentAngles,
                 gyroRates, gyroRateDterm, 1);
-        computeAnglePidYaw(pid, constants, pidSetpoints,
-                gyroRates, gyroRateDterm, dynCi);
+        computeAnglePidYaw(pid, constants, pidSetpoints, gyroRates, dynCi);
 
-        // Disable PID control if at zero throttle or if gyro overflow detected
-        // This may look very innefficient, but it is done on purpose to always
-        // show real CPU usage as in flight
-        if (reset) {
+        if (hf->atZeroThrottle) {
             resetItermAxis(pid, 0);
             resetItermAxis(pid, 1);
             resetItermAxis(pid, 2);
@@ -584,7 +576,7 @@ extern "C" {
         demands->rpy.y = pid->data[1].Sum;
         demands->rpy.z = pid->data[2].Sum;
 
-        updateDynLpfCutoffs(pid, currentTimeUs, demands->throttle);
+        updateDynLpfCutoffs(pid, usec, demands->throttle);
     }
 
 #if defined(__cplusplus)

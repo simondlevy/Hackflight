@@ -167,20 +167,11 @@ typedef struct {
     float kp;
     float ki;
 
-    float * rawThrottle;
-
-} altPid_t;
+} altHoldPid_t;
 
 // General PID control ---------------------------------------------------------
 
-typedef void (*pid_fun_t)(
-        uint32_t usec,
-        demands_t * demands,
-        void * data,
-        vehicleState_t * vstate,
-        bool reset
-        );
-
+typedef void (*pid_fun_t)(void * hf, void * pid, uint32_t usec);
 
 typedef struct {
     pid_fun_t fun;
@@ -524,7 +515,7 @@ typedef struct {
     task_t           mspTask;
     pidController_t  pidControllers[10];
     uint8_t          pidCount;
-    bool             pidZeroThrottleItermReset;
+    bool             atZeroThrottle;
     rx_t             rx;
     task_t           rxTask;
     rxAxes_t         rxAxes;

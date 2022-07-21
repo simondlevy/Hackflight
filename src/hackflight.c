@@ -176,7 +176,11 @@ extern "C" {
             loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
         }
 
-        hackflightRunCoreTasks(hf);
+        float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
+        hackflightRunCoreTasks(hf, mixmotors);
+
+        motorWrite(hf->motorDevice,
+                armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
 
         // CPU busy
         if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {

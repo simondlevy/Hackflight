@@ -108,7 +108,7 @@ static void task_rx(void * hackflight, uint32_t time)
             &gotNewData);
 
     if (pidItermResetReady) {
-        hf->pidZeroThrottleItermReset = pidItermResetValue;
+        hf->atZeroThrottle = pidItermResetValue;
     }
 
     if (gotNewData) {
@@ -123,7 +123,7 @@ static float constrain_demand(float demand, float limit)
     return constrain_f(demand, -limit, +limit) / PID_MIXER_SCALING;
 }
 
-static void hackflightRunCoreTasks(hackflight_t * hf)
+static void hackflightRunCoreTasks(hackflight_t * hf, float motors[])
 {
     uint32_t currentTimeUs = timeMicros();
 
@@ -133,20 +133,16 @@ static void hackflightRunCoreTasks(hackflight_t * hf)
 
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pidController_t pid = hf->pidControllers[k];
-        pid.fun(currentTimeUs, &hf->demands, pid.data,
-                &hf->vstate, hf->pidZeroThrottleItermReset);
+        pid.fun(hf, pid.data, currentTimeUs);
     }
 
-    float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
     hf->mixer(
             hf->demands.throttle,
             constrain_demand(hf->demands.rpy.x, PIDSUM_LIMIT_CYCLIC),
             constrain_demand(hf->demands.rpy.y, PIDSUM_LIMIT_CYCLIC),
             -constrain_demand(hf->demands.rpy.z, PIDSUM_LIMIT_YAW),
-            mixmotors);
+            motors);
 
-    motorWrite(hf->motorDevice,
-            armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
 }
 
 // ============================================================================
