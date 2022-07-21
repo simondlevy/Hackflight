@@ -265,22 +265,23 @@ extern "C" {
                 pt2FilterGain(D_MIN_LOWPASS_HZ, CORE_DT()));
     }
 
-    static void computeDtermAxis(
+    static float computeDtermAxis(
             anglePid_t * pid,
             float gyroRates[3],
-            float gyroRateDterm[3],
             uint8_t index)
     {
         float dterm = gyroRates[index];
 
-        filterApplyFnPtr dtermLowpassApplyFn = (filterApplyFnPtr)pt1FilterApply;
+        filterApplyFnPtr dtermLowpassApplyFn =
+            (filterApplyFnPtr)pt1FilterApply;
 
         dterm = dtermLowpassApplyFn(
                 (filter_t *) &pid->dtermLowpass[index], dterm);
 
-        filterApplyFnPtr dtermLowpass2ApplyFn = (filterApplyFnPtr)pt1FilterApply;
+        filterApplyFnPtr dtermLowpass2ApplyFn =
+            (filterApplyFnPtr)pt1FilterApply;
         
-        gyroRateDterm[index] = dtermLowpass2ApplyFn(
+        return dtermLowpass2ApplyFn(
                 (filter_t *) &pid->dtermLowpass2[index],
                 dterm);
     }
@@ -300,8 +301,6 @@ extern "C" {
             float currentPidSetpoint,
             uint8_t index)
     {
-        // pid->previousDterm[index] = gyroRateDterm[index];
-
         pidSetpointDelta += setpointCorrection -
             pid->previousSetpointCorrection[index];
 
@@ -357,13 +356,13 @@ extern "C" {
                     -ITERM_LIMIT, ITERM_LIMIT);
     }
 
-    static void computeAnglePidCyclic(
+    static void computeCyclic(
             anglePid_t * pid,
             anglePidConstants_t * constants,
             float pidSetpoints[3],
             float currentAngles[3],
             float gyroRates[3],
-            float gyroRateDterm[3],
+            float gyroRateDterm,
             uint8_t index)
     {
         // Apply optional level PID to get initial setpoint
@@ -406,7 +405,7 @@ extern "C" {
             // This is done to avoid DTerm spikes that occur with
             // dynamically calculated deltaT whenever another task causes
             // the PID loop execution to be delayed.
-            const float delta = -(gyroRateDterm[index] -
+            const float delta = -(gyroRateDterm -
                     pid->previousDterm[index]) * freq;
 
             float dMinFactor = 1;
@@ -442,16 +441,16 @@ extern "C" {
             pid->data[index].D = 0;
         }
 
-        pid->previousDterm[index] = gyroRateDterm[index];
+        pid->previousDterm[index] = gyroRateDterm;
 
         pid->data[index].Sum = 
             computeFeedforwardAndSum(pid, constants, true,
                 pidSetpointDelta, setpointCorrection, feedforwardMaxRate,
                 currentPidSetpoint, index);
 
-    } // computeAnglePidCyclic
+    } // computeCyclic
 
-    static void computeAnglePidYaw(
+    static void computeYaw(
             anglePid_t * pid,
             anglePidConstants_t * constants,
             float pidSetpoints[3],
@@ -503,7 +502,7 @@ extern "C" {
             pid->data[2].Sum = pidSum;
         }    
 
-    } // computeAnglePidYaw
+    } // computeYaw
 
     // =========================================================================
 
@@ -550,21 +549,18 @@ extern "C" {
 
         float gyroRates[3] = {vstate->dphi, vstate->dtheta, vstate->dpsi};
 
-        // Precalculate gyro deta for D-term here, this allows loop unrolling
-        float gyroRateDterm[3] = {0};
-
         float pidSetpoints[3] = {demands->rpy.x, demands->rpy.y, demands->rpy.z};
         float currentAngles[3] = { vstate->phi, vstate->theta, vstate->psi };
 
-        computeDtermAxis(pid, gyroRates, gyroRateDterm, 0);
-        computeAnglePidCyclic(pid, constants, pidSetpoints, currentAngles,
-                gyroRates, gyroRateDterm, 0);
+        float dx = computeDtermAxis(pid, gyroRates, 0);
+        computeCyclic(pid, constants, pidSetpoints, currentAngles,
+                gyroRates, dx, 0);
 
-        computeDtermAxis(pid, gyroRates, gyroRateDterm, 1);
-        computeAnglePidCyclic(pid, constants, pidSetpoints, currentAngles,
-                gyroRates, gyroRateDterm, 1);
+        float dy = computeDtermAxis(pid, gyroRates, 1);
+        computeCyclic(pid, constants, pidSetpoints, currentAngles,
+                gyroRates, dy, 1);
 
-        computeAnglePidYaw(pid, constants, pidSetpoints, gyroRates, dynCi);
+        computeYaw(pid, constants, pidSetpoints, gyroRates, dynCi);
 
         if (hf->atZeroThrottle) {
             resetItermAxis(pid, 0);
