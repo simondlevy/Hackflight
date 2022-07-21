@@ -22,7 +22,6 @@
 
 #include "datatypes.h"
 #include "debug.h"
-#include "failsafe.h"
 #include "maths.h"
 #include "motor.h"
 
@@ -37,6 +36,7 @@ extern "C" {
             float yaw,
             axes_t * axes,
             uint8_t motorCount,
+            bool failsafeActive,
             float * motors)
     {
         float mix[MAX_SUPPORTED_MOTORS];
@@ -75,7 +75,7 @@ extern "C" {
             motorOutput = motorValueLow() +
                 (motorValueHigh() - motorValueLow()) * motorOutput;
 
-            if (failsafeIsActive()) {
+            if (failsafeActive) {
                 if (motorIsProtocolDshot()) {
                     // Prevent getting into special reserved range
                     motorOutput = (motorOutput < motorValueLow()) ?

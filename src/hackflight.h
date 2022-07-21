@@ -123,7 +123,7 @@ static float constrain_demand(float demand, float limit)
     return constrain_f(demand, -limit, +limit) / PID_MIXER_SCALING;
 }
 
-static void hackflightRunCoreTasks(hackflight_t * hf, float motors[])
+static void hackflightRunCoreTasks(hackflight_t * hf, bool failsafeActive, float motors[])
 {
     uint32_t currentTimeUs = timeMicros();
 
@@ -141,6 +141,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf, float motors[])
             constrain_demand(hf->demands.rpy.x, PIDSUM_LIMIT_CYCLIC),
             constrain_demand(hf->demands.rpy.y, PIDSUM_LIMIT_CYCLIC),
             -constrain_demand(hf->demands.rpy.z, PIDSUM_LIMIT_YAW),
+            failsafeActive,
             motors);
 
 }
