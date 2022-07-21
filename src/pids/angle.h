@@ -553,17 +553,17 @@ extern "C" {
         // Precalculate gyro deta for D-term here, this allows loop unrolling
         float gyroRateDterm[3] = {0};
 
-        computeDtermAxis(pid, gyroRates, gyroRateDterm, 0);
-        computeDtermAxis(pid, gyroRates, gyroRateDterm, 1);
-        computeDtermAxis(pid, gyroRates, gyroRateDterm, 2);
-
         float pidSetpoints[3] = {demands->rpy.x, demands->rpy.y, demands->rpy.z};
         float currentAngles[3] = { vstate->phi, vstate->theta, vstate->psi };
 
+        computeDtermAxis(pid, gyroRates, gyroRateDterm, 0);
         computeAnglePidCyclic(pid, constants, pidSetpoints, currentAngles,
                 gyroRates, gyroRateDterm, 0);
+
+        computeDtermAxis(pid, gyroRates, gyroRateDterm, 1);
         computeAnglePidCyclic(pid, constants, pidSetpoints, currentAngles,
                 gyroRates, gyroRateDterm, 1);
+
         computeAnglePidYaw(pid, constants, pidSetpoints, gyroRates, dynCi);
 
         if (hf->atZeroThrottle) {
