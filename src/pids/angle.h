@@ -359,7 +359,7 @@ extern "C" {
     static void computeCyclic(
             anglePid_t * pid,
             anglePidConstants_t * constants,
-            float pidSetpoints[3],
+            float pidSetpoint,
             float currentAngles[3],
             float gyroRates[3],
             float gyroRateDterm,
@@ -367,7 +367,7 @@ extern "C" {
     {
         // Apply optional level PID to get initial setpoint
         float currentPidSetpoint =
-            levelPid(constants, pidSetpoints[index], currentAngles[index]);
+            levelPid(constants, pidSetpoint, currentAngles[index]);
 
         // -----calculate error rate
         const float gyroRate = gyroRates[index]; // gyro output in deg/sec
@@ -453,11 +453,11 @@ extern "C" {
     static void computeYaw(
             anglePid_t * pid,
             anglePidConstants_t * constants,
-            float pidSetpoints[3],
+            float pidSetpoint,
             float gyroRates[3],
             float dynCi)
     {
-        float currentPidSetpoint = pidSetpoints[2];
+        float currentPidSetpoint = pidSetpoint;
 
         // -----calculate error rate
         const float gyroRate = gyroRates[2]; // gyro output in deg/sec
@@ -549,18 +549,17 @@ extern "C" {
 
         float gyroRates[3] = {vstate->dphi, vstate->dtheta, vstate->dpsi};
 
-        float pidSetpoints[3] = {demands->rpy.x, demands->rpy.y, demands->rpy.z};
         float currentAngles[3] = { vstate->phi, vstate->theta, vstate->psi };
 
         float dx = computeDtermAxis(pid, gyroRates, 0);
-        computeCyclic(pid, constants, pidSetpoints, currentAngles,
+        computeCyclic(pid, constants, demands->rpy.x, currentAngles,
                 gyroRates, dx, 0);
 
         float dy = computeDtermAxis(pid, gyroRates, 1);
-        computeCyclic(pid, constants, pidSetpoints, currentAngles,
+        computeCyclic(pid, constants, demands->rpy.y, currentAngles,
                 gyroRates, dy, 1);
 
-        computeYaw(pid, constants, pidSetpoints, gyroRates, dynCi);
+        computeYaw(pid, constants, demands->rpy.z, gyroRates, dynCi);
 
         if (hf->atZeroThrottle) {
             resetItermAxis(pid, 0);
