@@ -9,10 +9,10 @@ SERIAL_DEVICE ?= /dev/ttyACM0
 ROOT         := ../../stm32f4
 OBJECT_DIR   := ./obj
 STM_SRC_DIR  := $(ROOT)/src
-HSRC_DIR     := $(ROOT)/../src
+HFSRC_DIR     := $(ROOT)/../src
 CMSIS_DIR    := $(ROOT)/lib/CMSIS
 INCLUDE_DIRS := $(STM_SRC_DIR) \
-	            $(HSRC_DIR) \
+	            $(HFSRC_DIR) \
                 $(STM_SRC_DIR)/startup
 LINKER_DIR   := $(ROOT)/link
 
@@ -117,19 +117,19 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             ./main.c \
-            $(HSRC_DIR)/arming.c \
-            $(HSRC_DIR)/debug.c \
-            $(HSRC_DIR)/failsafe.c \
-            $(HSRC_DIR)/gyro.c \
-            $(HSRC_DIR)/hackflight.c \
-            $(HSRC_DIR)/imu.c \
-            $(HSRC_DIR)/led.c \
-            $(HSRC_DIR)/maths.c \
-            $(HSRC_DIR)/msp.c \
-            $(HSRC_DIR)/rx.c \
-            $(HSRC_DIR)/rx/dsmx.c \
-            $(HSRC_DIR)/rx/sbus.c \
-            $(HSRC_DIR)/stm32_clock.c \
+            $(HFSRC_DIR)/arming.c \
+            $(HFSRC_DIR)/debug.c \
+            $(HFSRC_DIR)/failsafe.c \
+            $(HFSRC_DIR)/gyro.c \
+            $(HFSRC_DIR)/hackflight.c \
+            $(HFSRC_DIR)/imu.c \
+            $(HFSRC_DIR)/led.c \
+            $(HFSRC_DIR)/maths.c \
+            $(HFSRC_DIR)/msp.c \
+            $(HFSRC_DIR)/rx.c \
+            $(HFSRC_DIR)/rx/dsmx.c \
+            $(HFSRC_DIR)/rx/sbus.c \
+            $(HFSRC_DIR)/stm32_clock.c \
             imu_mpu6000.c \
             dshot.c \
             dshot_dpwm.c \
