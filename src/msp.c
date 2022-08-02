@@ -24,6 +24,7 @@
 #include "datatypes.h"
 #include "debug.h"
 #include "motor.h"
+#include "msp.h"
 #include "rad2deg.h"
 #include "serial.h"
 #include "system.h"

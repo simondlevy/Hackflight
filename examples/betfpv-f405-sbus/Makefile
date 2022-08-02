@@ -117,7 +117,6 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             ./main.c \
-            $(HFSRC_DIR)/msp.c \
             $(HFSRC_DIR)/rx.c \
             $(HFSRC_DIR)/rx/dsmx.c \
             $(HFSRC_DIR)/rx/sbus.c \
@@ -280,7 +279,8 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hackflight.o \
 		  $(OBJECT_DIR)/imu.o \
 		  $(OBJECT_DIR)/led.o \
-		  $(OBJECT_DIR)/maths.o
+		  $(OBJECT_DIR)/maths.o \
+		  $(OBJECT_DIR)/msp.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CC) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
@@ -359,6 +359,18 @@ $(OBJECT_DIR)/maths.o: $(HFSRC_DIR)/maths.c \
 	  $(HFSRC_DIR)/maths.h
 	@echo maths.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/maths.o $(CFLAGS) $(HFSRC_DIR)/maths.c
+
+$(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.c \
+	  $(HFSRC_DIR)/datatypes.h \
+	  $(HFSRC_DIR)/debug.h \
+	  $(HFSRC_DIR)/motor.h \
+	  $(HFSRC_DIR)/msp.h \
+	  $(HFSRC_DIR)/rad2deg.h \
+	  $(HFSRC_DIR)/serial.h \
+	  $(HFSRC_DIR)/system.h \
+	  $(HFSRC_DIR)/time.h
+	@echo msp.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HFSRC_DIR)/msp.c
 
 define compile_file
 	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
