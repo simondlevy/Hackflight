@@ -280,7 +280,7 @@ $(TARGET_DFU): $(TARGET_HEX)
 	@echo "Creating DFU $(TARGET_DFU)" "$(STDOUT)"
 	$(V1) $(PYTHON) $(DFUSE-PACK) -i $< $@
 
-$(TARGET_ELF): $(TARGET_OBJS) $(LD_SCRIPT)
+$(TARGET_ELF): $(TARGET_OBJS)
 	@echo "Linking" $@
 	$(V1) $(CROSS_CC) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
