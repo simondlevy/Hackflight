@@ -117,7 +117,6 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             ./main.c \
-            $(HFSRC_DIR)/maths.c \
             $(HFSRC_DIR)/msp.c \
             $(HFSRC_DIR)/rx.c \
             $(HFSRC_DIR)/rx/dsmx.c \
@@ -280,7 +279,8 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/gyro.o \
 		  $(OBJECT_DIR)/hackflight.o \
 		  $(OBJECT_DIR)/imu.o \
-		  $(OBJECT_DIR)/led.o
+		  $(OBJECT_DIR)/led.o \
+		  $(OBJECT_DIR)/maths.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CC) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
@@ -354,6 +354,11 @@ $(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.c \
 	  $(HFSRC_DIR)/time.h 
 	@echo led.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/led.o $(CFLAGS) $(HFSRC_DIR)/led.c
+
+$(OBJECT_DIR)/maths.o: $(HFSRC_DIR)/maths.c \
+	  $(HFSRC_DIR)/maths.h
+	@echo maths.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/maths.o $(CFLAGS) $(HFSRC_DIR)/maths.c
 
 define compile_file
 	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
