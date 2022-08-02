@@ -22,8 +22,8 @@
 #include <string.h>
 
 #include "arming.h"
-#include "gyro.h"
 #include "debug.h"
+#include "gyro.h"
 #include "hackflight.h"
 #include "led.h"
 #include "msp.h"

@@ -117,7 +117,6 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             ./main.c \
-            $(HFSRC_DIR)/hackflight.c \
             $(HFSRC_DIR)/imu.c \
             $(HFSRC_DIR)/led.c \
             $(HFSRC_DIR)/maths.c \
@@ -280,7 +279,8 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/arming.o \
 		  $(OBJECT_DIR)/debug.o \
 		  $(OBJECT_DIR)/failsafe.o \
-		  $(OBJECT_DIR)/gyro.o
+		  $(OBJECT_DIR)/gyro.o \
+		  $(OBJECT_DIR)/hackflight.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CC) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
@@ -324,6 +324,18 @@ $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.c \
 	  $(HFSRC_DIR)/time.h
 	@echo gyro.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HFSRC_DIR)/gyro.c
+
+$(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c \
+	  $(HFSRC_DIR)/arming.h \
+	  $(HFSRC_DIR)/debug.h \
+	  $(HFSRC_DIR)/gyro.h \
+	  $(HFSRC_DIR)/hackflight.h \
+	  $(HFSRC_DIR)/led.h \
+	  $(HFSRC_DIR)/msp.h \
+	  $(HFSRC_DIR)/rx.h \
+	  $(HFSRC_DIR)/system.h
+	@echo hackflight.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(HFSRC_DIR)/hackflight.c
 
 define compile_file
 	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
