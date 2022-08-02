@@ -117,7 +117,6 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             ./main.c \
-            $(HFSRC_DIR)/gyro.c \
             $(HFSRC_DIR)/hackflight.c \
             $(HFSRC_DIR)/imu.c \
             $(HFSRC_DIR)/led.c \
@@ -280,7 +279,8 @@ $(TARGET_DFU): $(TARGET_HEX)
 $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/arming.o \
 		  $(OBJECT_DIR)/debug.o \
-		  $(OBJECT_DIR)/failsafe.o
+		  $(OBJECT_DIR)/failsafe.o \
+		  $(OBJECT_DIR)/gyro.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CC) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
@@ -310,6 +310,20 @@ $(OBJECT_DIR)/failsafe.o: $(HFSRC_DIR)/failsafe.c \
 	  $(HFSRC_DIR)/time.h
 	@echo failsafe.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/failsafe.o $(CFLAGS) $(HFSRC_DIR)/failsafe.c
+
+$(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.c \
+	  $(HFSRC_DIR)/core_rate.h \
+	  $(HFSRC_DIR)/datatypes.h \
+	  $(HFSRC_DIR)/debug.h \
+	  $(HFSRC_DIR)/gyro.h \
+	  $(HFSRC_DIR)/imu.h \
+	  $(HFSRC_DIR)/maths.h \
+	  $(HFSRC_DIR)/pt1_filter.h \
+	  $(HFSRC_DIR)/stats.h \
+	  $(HFSRC_DIR)/system.h \
+	  $(HFSRC_DIR)/time.h
+	@echo gyro.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HFSRC_DIR)/gyro.c
 
 define compile_file
 	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
