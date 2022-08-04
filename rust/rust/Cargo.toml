@@ -1,0 +1,8 @@
+[package]
+name = "hackflight"
+version = "0.1.0"
+authors = ["Simon D. Levy<simon.d.levy@gmail.com>"]
+description = "Multirotor firmware toolkit"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
