@@ -8,6 +8,7 @@
 
 pub mod hackflight {
 
+    /*
     use datatypes::datatypes::Demands;
     use datatypes::datatypes::Motors;
     use datatypes::datatypes::VehicleState;
@@ -38,5 +39,6 @@ pub mod hackflight {
         (new_motors, new_altitude_pid, new_yaw_pid)
 
     } // run_hackflight
+    */
 
 } // mod hackflight
