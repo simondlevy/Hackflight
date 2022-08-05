@@ -1,3 +1,4 @@
+
 /*
    Copyright (c) 2022 Simon D. Levy
 
@@ -17,50 +18,17 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
-#include <Wire.h>
-
 #include <hackflight_full.h>
-#include <imu_alignment/rotate_0.h>
-#include <mixers/fixedpitch/quadxbf.h>
-#include <motor.h>
-#include <rx/dsmx.h>
-#include <stm32_clock.h>
+#include <arduino/ladybug.hpp>
 
-static hackflight_t _hf;
+#include <rx/dsmx.h>
 
 void setup(void)
 {
-    Wire.begin();
-    delay(100);
-
-    static uint8_t motorPins[4] = {13, 16, 3, 11};
-
-    static anglePidConstants_t anglePidConstants = {
-        1.441305,     // Rate Kp
-        19.55048,     // Rate Ki
-        0.021160,     // Rate Kd
-        0.0165048,    // Rate Kf
-        0.0}; // 3.0, // Level Kp
-
-    motorInitBrushed(motorPins);
-
-    stm32_startCycleCounter();
-
-    // Always use Serial1 for receiver, no no need to specify
-    hackflightInitFull(
-            &_hf,
-            &dsmxDeviceFuns,
-            SERIAL_PORT_NONE,
-            &anglePidConstants,
-            mixerQuadXbf,
-            (void *)&motorPins,
-            12,  // IMU interrupt pin
-            imuRotate0,
-            18); // LED pin
+    ladybug_setup(&dsmxDeviceFuns);
 }
 
 void loop(void)
 {
-    hackflightStep(&_hf);
+    ladybug_loop();
 }
