@@ -44,6 +44,8 @@ static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
 static const uint8_t REPORT_HZ = 2;
 
 static int16_t _gyroAdc[3];
+static float _qw, _qx, _qy, _qz;
+
 static volatile bool _gotNewData;
 
 static volatile uint32_t _gyroInterruptCount;
@@ -81,6 +83,10 @@ extern "C" {
             if (usfsEventStatusIsGyrometer(eventStatus)) { 
                 usfsReadGyrometerRaw(_gyroAdc);
                 result = true;
+            }
+
+            if (usfsEventStatusIsQuaternion(eventStatus)) { 
+                usfsReadQuaternion(_qw, _qx, _qy, _qz);
             }
 
         } 
@@ -132,6 +138,17 @@ extern "C" {
     void imuAccumulateGyro(gyro_t * gyro)
     {
         (void)gyro;
+    }
+
+    void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
+    {
+        (void)hf;
+        (void)time;
+
+        quat->w = _qw;
+        quat->x = _qx;
+        quat->y = _qy;
+        quat->z = _qz;
     }
 
     void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
