@@ -38,7 +38,8 @@ static const uint16_t MAG_SCALE        = 1000;
 
 static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
                                         USFS_INTERRUPT_ERROR |
-                                        USFS_INTERRUPT_GYRO;
+                                        USFS_INTERRUPT_GYRO | 
+                                        USFS_INTERRUPT_QUAT;
 
 static const uint8_t REPORT_HZ = 2;
 
@@ -78,7 +79,7 @@ extern "C" {
             }
 
             if (usfsEventStatusIsGyrometer(eventStatus)) { 
-                usfsReadGyrometer(_gyroAdc);
+                usfsReadGyrometerRaw(_gyroAdc);
                 result = true;
             }
 
@@ -114,9 +115,6 @@ extern "C" {
         usfsBegin(
                 ACCEL_BANDWIDTH,
                 GYRO_BANDWIDTH,
-                ACCEL_SCALE,
-                GYRO_SCALE_DPS,
-                MAG_SCALE,
                 QUAT_DIVISOR,
                 MAG_RATE,
                 ACCEL_RATE_TENTH,
@@ -129,6 +127,19 @@ extern "C" {
 
         // Clear interrupts
         usfsCheckStatus();
+    }
+
+    void imuAccumulateGyro(gyro_t * gyro)
+    {
+        (void)gyro;
+    }
+
+    void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
+    {
+        (void)hf;
+        (void)time;
+        (void)quat;
+        (void)rot;
     }
 
 } // extern "C"

@@ -117,7 +117,6 @@ endif
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
             ./main.c \
-            $(HFSRC_DIR)/rx/sbus.c \
             imu_mpu6000.c \
             dshot.c \
             dshot_dpwm.c \
@@ -280,6 +279,7 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/maths.o \
 		  $(OBJECT_DIR)/msp.o \
 		  $(OBJECT_DIR)/rx.o \
+		  $(OBJECT_DIR)/sbus.o \
 		  $(OBJECT_DIR)/stm32_clock.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CC) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
@@ -389,6 +389,13 @@ $(OBJECT_DIR)/rx.o: $(HFSRC_DIR)/rx.c \
 	  $(HFSRC_DIR)/time.h
 	@echo rx.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/rx.o $(CFLAGS) $(HFSRC_DIR)/rx.c
+
+$(OBJECT_DIR)/sbus.o: $(HFSRC_DIR)/rx/sbus.c \
+	  $(HFSRC_DIR)/datatypes.h \
+	  $(HFSRC_DIR)/serial.h \
+	  $(HFSRC_DIR)/time.h
+	@echo rx.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/sbus.o $(CFLAGS) $(HFSRC_DIR)/rx/sbus.c
 
 $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
 	@echo stm32_clock.c

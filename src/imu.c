@@ -103,7 +103,7 @@ int32_t imuGetGyroSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
     return gyroSkew;
 }
 
-static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
+static void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
 {
     int32_t deltaT = time - hf->imuFusionPrev.time;
 
@@ -123,27 +123,19 @@ static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     mahony(dt, &gyroAvg, &fusionPrev->quat, quat);
 }
 
-void updateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
-{
-    imu_fusion_t fusion;
-    fusion.time = time;
-    memcpy(&fusion.quat, quat, sizeof(quaternion_t));
-    memcpy(&fusion.rot, rot, sizeof(rotation_t));
-    memcpy(&hf->imuFusionPrev, &fusion, sizeof(imu_fusion_t));
-    memset(&hf->gyro.accum, 0, sizeof(imu_sensor_t));
-}
 
 void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
 {
     quaternion_t quat = {0,0,0,0};
 
-    getQuaternion(hf, time, &quat);
+    imuGetQuaternion(hf, time, &quat);
 
     rotation_t rot = {0,0,0};
 
     quat2euler(&quat, &hf->vstate, &rot);
 
-    updateFusion(hf, time, &quat, &rot);
+    // Stubbed for USFS
+    imuUpdateFusion(hf, time, &quat, &rot);
 }
 
 #if defined(__cplusplus)

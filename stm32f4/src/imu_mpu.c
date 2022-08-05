@@ -397,3 +397,14 @@ void imuAccumulateGyro(gyro_t * gyro)
         _adcf[axis] = gyro->dps_filtered[axis];
     }
 }
+
+void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
+{
+    imu_fusion_t fusion;
+    fusion.time = time;
+    memcpy(&fusion.quat, quat, sizeof(quaternion_t));
+    memcpy(&fusion.rot, rot, sizeof(rotation_t));
+    memcpy(&hf->imuFusionPrev, &fusion, sizeof(imu_fusion_t));
+    memset(&hf->gyro.accum, 0, sizeof(imu_sensor_t));
+}
+
