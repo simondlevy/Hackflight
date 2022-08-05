@@ -262,6 +262,7 @@ $(TARGET_BIN): $(TARGET_ELF)
 $(TARGET_HEX): $(TARGET_ELF)
 	@echo "Creating HEX $(TARGET_HEX)" "$(STDOUT)"
 	$(V1) $(OBJCOPY) -O ihex --set-start 0x8000000 $< $@
+	rm -rf src
 	rm -rf ../src
 
 $(TARGET_DFU): $(TARGET_HEX)

@@ -24,6 +24,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <time.h>
 #include "macros.h"
 
+#include "core_rate.h"
 #include "imu_mpu.h"
 #include "atomic.h"
 #include "bus.h"
@@ -379,4 +380,20 @@ void imuInit(hackflight_t * hf, uint8_t interruptPin)
 
     gyroDevInit();
     accelInit();
+}
+
+void imuAccumulateGyro(gyro_t * gyro)
+{
+    static float _adcf[3];
+
+    // integrate using trapezium rule to avoid bias
+    gyro->accum.values.x += 0.5f * (_adcf[0] + gyro->dps_filtered[0]) * CORE_PERIOD();
+    gyro->accum.values.y += 0.5f * (_adcf[1] + gyro->dps_filtered[1]) * CORE_PERIOD();
+    gyro->accum.values.z += 0.5f * (_adcf[2] + gyro->dps_filtered[2]) * CORE_PERIOD();
+
+    gyro->accum.count++;
+
+    for (int axis = 0; axis < 3; axis++) {
+        _adcf[axis] = gyro->dps_filtered[axis];
+    }
 }
