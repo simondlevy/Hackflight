@@ -172,7 +172,12 @@ extern "C" {
 
         rxGetDemands(&hf->rx, usec, &hf->anglepid, &hf->demands);
 
-        hackflightRunCoreTasks(hf, usec);
+        float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
+
+        hackflightRunCoreTasks(hf, usec, mixmotors);
+
+        motorWrite(hf->motorDevice,
+                armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
 
         // CPU busy
         if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {

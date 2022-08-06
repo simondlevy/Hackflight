@@ -174,7 +174,6 @@ void gyroReadScaled(hackflight_t * hf, vehicle_state_t * vstate)
 
     } else {
         calibrate(gyro);
-        debugPrintf("calibrating\n");
     }
 
     if (calibrationComplete) {

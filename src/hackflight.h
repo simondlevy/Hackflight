@@ -114,14 +114,12 @@ static float constrain_demand(float demand, float limit, float scaling)
     return constrain_f(demand, -limit, +limit) / scaling;
 }
 
-static void hackflightRunCoreTasks(hackflight_t * hf, uint32_t usec)
+static void hackflightRunCoreTasks(hackflight_t * hf, uint32_t usec, float mixmotors[])
 {
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pid_controller_t pid = hf->pidControllers[k];
         pid.fun(usec, &hf->demands, pid.data, &hf->vstate, hf->pidZeroThrottleItermReset);
     }
-
-    float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
     // Calculate and Limit the PID sum
     hf->mixer(
@@ -130,9 +128,6 @@ static void hackflightRunCoreTasks(hackflight_t * hf, uint32_t usec)
             constrain_demand(hf->demands.pitch, PIDSUM_LIMIT, PID_MIXER_SCALING),
             -constrain_demand(hf->demands.yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING),
             mixmotors);
-
-    motorWrite(hf->motorDevice,
-            armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
 }
 
 // ============================================================================
