@@ -28,8 +28,7 @@
 
 #include "mixers/fixedpitch.h"
 
-static void mixerQuadXbf(float throttle, float roll, float pitch, float yaw,
-        float * motors)
+static void mixerQuadXbf(demands_t * demands, float * motors)
 {
     static axes_t mixerQuadXbfAxes[] = {
         //  rol   pit    yaw
@@ -39,5 +38,5 @@ static void mixerQuadXbf(float throttle, float roll, float pitch, float yaw,
         { +1.0f, -1.0f, -1.0f }, // FRONT_L
     };
 
-    fixedPitchMix(throttle, roll, pitch, yaw, mixerQuadXbfAxes, 4, motors);
+    fixedPitchMix(demands, mixerQuadXbfAxes, 4, motors);
 }

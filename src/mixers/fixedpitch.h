@@ -31,10 +31,7 @@ extern "C" {
 #endif
 
     static void fixedPitchMix(
-            float throttle,
-            float roll,
-            float pitch,
-            float yaw,
+            demands_t * demands,
             axes_t * axes,
             uint8_t motorCount,
             float * motors)
@@ -45,7 +42,10 @@ extern "C" {
 
         for (int i = 0; i < motorCount; i++) {
 
-            mix[i] = roll * axes[i].x + pitch * axes[i].y + yaw * axes[i].z;
+            mix[i] =
+                demands->roll * axes[i].x +
+                demands->pitch * axes[i].y +
+                demands->yaw * axes[i].z;
 
             if (mix[i] > mixMax) {
                 mixMax = mix[i];
@@ -57,12 +57,14 @@ extern "C" {
 
         float motorRange = mixMax - mixMin;
 
+        float throttle = demands->throttle;
+
         if (motorRange > 1.0f) {
             for (int i = 0; i < motorCount; i++) {
                 mix[i] /= motorRange;
             }
         } else {
-            if (throttle > 0.5f) {
+            if (demands->throttle > 0.5f) {
                 throttle = constrain_f(throttle, -mixMin, 1.0f - mixMax);
             }
         }

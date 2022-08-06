@@ -116,18 +116,20 @@ static float constrain_demand(float demand, float limit, float scaling)
 
 static void hackflightRunCoreTasks(hackflight_t * hf, uint32_t usec, float mixmotors[])
 {
+    // Run PID controllers to get new demands
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pid_controller_t pid = hf->pidControllers[k];
         pid.fun(usec, &hf->demands, pid.data, &hf->vstate, hf->pidReset);
     }
 
-    // Calculate and Limit the PID sum
-    hf->mixer(
-            hf->demands.throttle,
-            constrain_demand(hf->demands.roll, PIDSUM_LIMIT, PID_MIXER_SCALING),
-            constrain_demand(hf->demands.pitch, PIDSUM_LIMIT, PID_MIXER_SCALING),
-            -constrain_demand(hf->demands.yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING),
-            mixmotors);
+
+    // Constrain the demands
+    hf->demands.roll  = constrain_demand(hf->demands.roll, PIDSUM_LIMIT, PID_MIXER_SCALING),
+    hf->demands.pitch = constrain_demand(hf->demands.pitch, PIDSUM_LIMIT, PID_MIXER_SCALING),
+    hf->demands.yaw   = -constrain_demand(hf->demands.yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING),
+
+    // Run the mixer to get motors from demands
+    hf->mixer(&hf->demands, mixmotors);
 }
 
 // ============================================================================
