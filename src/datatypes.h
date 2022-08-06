@@ -484,7 +484,7 @@ typedef struct {
     task_t           mspTask;
     pid_controller_t pidControllers[10];
     uint8_t          pidCount;
-    bool             pidZeroThrottleItermReset;
+    bool             pidReset;
     rx_t             rx;
     task_t           rxTask;
     rx_axes_t        rxAxes;

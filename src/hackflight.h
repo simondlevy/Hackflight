@@ -99,7 +99,7 @@ static void task_rx(void * hackflight, uint32_t time)
             &gotNewData);
 
     if (pidItermResetReady) {
-        hf->pidZeroThrottleItermReset = pidItermResetValue;
+        hf->pidReset = pidItermResetValue;
     }
 
     if (gotNewData) {
@@ -118,7 +118,7 @@ static void hackflightRunCoreTasks(hackflight_t * hf, uint32_t usec, float mixmo
 {
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pid_controller_t pid = hf->pidControllers[k];
-        pid.fun(usec, &hf->demands, pid.data, &hf->vstate, hf->pidZeroThrottleItermReset);
+        pid.fun(usec, &hf->demands, pid.data, &hf->vstate, hf->pidReset);
     }
 
     // Calculate and Limit the PID sum
