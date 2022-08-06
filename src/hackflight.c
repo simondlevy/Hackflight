@@ -174,7 +174,11 @@ extern "C" {
 
         float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
-        hackflightRunCoreTasks(hf, usec, mixmotors);
+        hackflightRunCoreTasks(
+                hf,
+                usec,
+                failsafeIsActive(),
+                mixmotors);
 
         motorWrite(hf->motorDevice,
                 armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);

@@ -3,17 +3,18 @@
 
    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+   Hackflight is free software: you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
 
-   You should have received a copy of the GNU General Public License along with
-   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License along
+   with Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -22,7 +23,6 @@
 
 #include "datatypes.h"
 #include "debug.h"
-#include "failsafe.h"
 #include "maths.h"
 #include "motor.h"
 
@@ -32,7 +32,8 @@ extern "C" {
 
     static void fixedPitchMix(
             demands_t * demands,
-            axes_t * axes,
+            axes_t * spins,
+            bool failsafe,
             uint8_t motorCount,
             float * motors)
     {
@@ -43,9 +44,9 @@ extern "C" {
         for (int i = 0; i < motorCount; i++) {
 
             mix[i] =
-                demands->roll * axes[i].x +
-                demands->pitch * axes[i].y +
-                demands->yaw * axes[i].z;
+                demands->roll  * spins[i].x +
+                demands->pitch * spins[i].y +
+                demands->yaw   * spins[i].z;
 
             if (mix[i] > mixMax) {
                 mixMax = mix[i];
@@ -77,7 +78,7 @@ extern "C" {
             motorOutput = motorValueLow() +
                 (motorValueHigh() - motorValueLow()) * motorOutput;
 
-            if (failsafeIsActive()) {
+            if (failsafe) {
                 if (motorIsProtocolDshot()) {
                     // Prevent getting into special reserved range
                     motorOutput = (motorOutput < motorValueLow()) ?

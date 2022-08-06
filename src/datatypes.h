@@ -463,7 +463,7 @@ typedef struct {
 
 // Mixer -----------------------------------------------------------------------
 
-typedef void (*mixer_t)(demands_t * demands, float * motors);
+typedef void (*mixer_t)(demands_t * demands, bool failsafe, float * motors);
 
 // Hackflight ------------------------------------------------------------------
 
