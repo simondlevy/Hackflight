@@ -209,8 +209,7 @@ extern "C" {
         static uint32_t _terminalGyroLockCount;
         static int32_t _gyroSkewAccum;
 
-        int32_t gyroSkew =
-            imuGetGyroSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
+        int32_t gyroSkew = gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
 
         _gyroSkewAccum += gyroSkew;
 

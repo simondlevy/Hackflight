@@ -135,30 +135,26 @@ extern "C" {
         usfsCheckStatus();
     }
 
-    void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
-    {
-        (void)hf;
-        (void)time;
 
-        quat->w = _qw;
-        quat->x = _qx;
-        quat->y = _qy;
-        quat->z = _qz;
+    void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
+    {
+        vehicle_state_t * vstate = &hf->vstate;
+
+        vstate->phi   = atan2(2.0f*(_qw*_qx+_qy*_qz), _qw*_qw-_qx*_qx-_qy*_qy+_qz*_qz);
+        vstate->theta = asin(2.0f*(_qx*_qz-_qw*_qy));
+        vstate->psi   = atan2(2.0f*(_qx*_qy+_qw*_qz), _qw*_qw+_qx*_qx-_qy*_qy-_qz*_qz);
+
+        // Convert heading from [-pi,+pi] to [0,2*pi]
+        if (vstate->psi < 0) {
+            vstate->psi += 2*M_PI;
+        }
     }
 
-    // Unused ------------------------------------------------------------------------------------
 
+    // Unused
     void imuAccumulateGyro(gyro_t * gyro)
     {
         (void)gyro;
-    }
-
-    void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
-    {
-        (void)hf;
-        (void)time;
-        (void)quat;
-        (void)rot;
     }
 
 } // extern "C"
