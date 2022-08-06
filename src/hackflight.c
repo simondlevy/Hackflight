@@ -25,6 +25,7 @@
 #include "debug.h"
 #include "gyro.h"
 #include "hackflight.h"
+#include "init_task.h"
 #include "led.h"
 #include "msp.h"
 #include "rx.h"
