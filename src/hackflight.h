@@ -101,7 +101,3 @@ static void hackflightInit(
 
     hackflightAddPidController(hf, anglePidUpdate, &hf->anglepid);
 }
-
-#if defined(__cplusplus)
-}
-#endif
