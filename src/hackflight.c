@@ -73,6 +73,61 @@ static const float TASK_AGE_EXPEDITE_SCALE = 0.9;
 static const uint32_t CORE_RATE_COUNT = 25000;
 static const uint32_t GYRO_LOCK_COUNT = 400;
 
+// Arming safety  -------------------------------------------------------------
+
+static const float MAX_ARMING_ANGLE = 25;
+
+// Attitude task --------------------------------------------------------------
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+static void task_attitude(void * hackflight, uint32_t time)
+{
+    hackflight_t * hf = (hackflight_t *)hackflight;
+    imuGetEulerAngles(hf, time);
+}
+
+// RX polling task ------------------------------------------------------------
+
+static void task_rx(void * hackflight, uint32_t time)
+{
+    hackflight_t * hf = (hackflight_t *)hackflight;
+
+    bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;
+    bool pidItermResetReady = false;
+    bool pidItermResetValue = false;
+
+    rx_axes_t rxax = {{0, 0, 0, 0}, 0, 0};
+
+    bool gotNewData = false;
+
+    bool imuIsLevel =
+        fabsf(hf->vstate.phi) < hf->maxArmingAngle &&
+        fabsf(hf->vstate.theta) < hf->maxArmingAngle;
+
+    rxPoll(
+            &hf->rx,
+            time,
+            imuIsLevel, 
+            calibrating,
+            &rxax,
+            hf->motorDevice,
+            &hf->arming,
+            &pidItermResetReady,
+            &pidItermResetValue,
+            &gotNewData);
+
+    if (pidItermResetReady) {
+        hf->pidReset = pidItermResetValue;
+    }
+
+    if (gotNewData) {
+        memcpy(&hf->rxAxes, &rxax, sizeof(rx_axes_t));
+    }
+}
+
 // MSP task ---------------------------------------------------------------------
 
 static const uint32_t MSP_TASK_RATE = 100;
@@ -221,7 +276,8 @@ extern "C" {
         static uint32_t _terminalGyroLockCount;
         static int32_t _gyroSkewAccum;
 
-        int32_t gyroSkew = gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
+        int32_t gyroSkew =
+            gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
 
         _gyroSkewAccum += gyroSkew;
 
@@ -359,6 +415,15 @@ extern "C" {
         hf->motorDevice = motorDevice;
 
         hackflightInit(hf, anglePidConstants, mixer);
+
+        initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
+
+        initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
+
+        // Initialize quaternion in upright position
+        hf->imuFusionPrev.quat.w = 1;
+
+        hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 
