@@ -32,7 +32,8 @@
 static void mixerQuadXbf(
         demands_t * demands,
         bool failsafe,
-        float * motors)
+        motor_config_t * motorConfig,
+        float * motorvals)
 {
     static axes_t spins[] = {
         //  rol   pit    yaw
@@ -42,5 +43,5 @@ static void mixerQuadXbf(
         { +1.0f, -1.0f, -1.0f }, // FRONT_L
     };
 
-    fixedPitchMix(demands, spins, failsafe, 4, motors);
+    fixedPitchMix(demands, motorConfig, spins, failsafe, 4, motorvals);
 }

@@ -460,10 +460,26 @@ typedef struct {
 
 } rx_t;
 
+// Motors ----------------------------------------------------------------------
+
+typedef struct {
+
+    float disarmed;
+    float high;
+    float low;
+    bool isDshot;
+
+} motor_config_t;
+
 
 // Mixer -----------------------------------------------------------------------
 
-typedef void (*mixer_t)(demands_t * demands, bool failsafe, float * motors);
+typedef void (*mixer_t)(
+        demands_t * demands,
+        bool failsafe,
+        motor_config_t * motorConfig,
+        float * motors);
+
 
 // Hackflight ------------------------------------------------------------------
 

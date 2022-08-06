@@ -118,7 +118,8 @@ static void hackflightRunCoreTasks(
         hackflight_t * hf,
         uint32_t usec,
         bool failsafe,
-        float mixmotors[])
+        motor_config_t * motorConfig,
+        float motorvals[])
 {
     // Run PID controllers to get new demands
     for (uint8_t k=0; k<hf->pidCount; ++k) {
@@ -137,7 +138,7 @@ static void hackflightRunCoreTasks(
         -constrain_demand(demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING),
 
     // Run the mixer to get motors from demands
-    hf->mixer(&hf->demands, failsafe, mixmotors);
+    hf->mixer(&hf->demands, failsafe, motorConfig, motorvals);
 }
 
 // ============================================================================

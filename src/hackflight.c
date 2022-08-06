@@ -174,10 +174,18 @@ extern "C" {
 
         float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
+        motor_config_t motorConfig = {
+            motorValueDisarmed(),
+            motorValueHigh(),
+            motorValueLow(),
+            motorIsProtocolDshot()  
+        };
+
         hackflightRunCoreTasks(
                 hf,
                 usec,
                 failsafeIsActive(),
+                &motorConfig,
                 mixmotors);
 
         motorWrite(hf->motorDevice,

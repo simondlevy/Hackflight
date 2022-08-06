@@ -32,6 +32,7 @@ extern "C" {
 
     static void fixedPitchMix(
             demands_t * demands,
+            motor_config_t * motorConfig,
             axes_t * spins,
             bool failsafe,
             uint8_t motorCount,
@@ -75,21 +76,26 @@ extern "C" {
         // also up for those low throttle flips.
         for (int i = 0; i < motorCount; i++) {
             float motorOutput = mix[i] + throttle;
-            motorOutput = motorValueLow() +
-                (motorValueHigh() - motorValueLow()) * motorOutput;
+            motorOutput = motorConfig->low +
+                (motorConfig->high - motorConfig->low) * motorOutput;
 
             if (failsafe) {
-                if (motorIsProtocolDshot()) {
+                if (motorConfig->isDshot) {
                     // Prevent getting into special reserved range
-                    motorOutput = (motorOutput < motorValueLow()) ?
-                        motorValueDisarmed() :
+                    motorOutput = (motorOutput < motorConfig->low) ?
+                        motorConfig->disarmed :
                         motorOutput; 
                 }
-                motorOutput =
-                    constrain_f(motorOutput, motorValueDisarmed(), motorValueHigh());
+                motorOutput = constrain_f(
+                        motorOutput,
+                        motorConfig->disarmed,
+                        motorConfig->high);
             } else {
                 motorOutput =
-                    constrain_f(motorOutput, motorValueLow(), motorValueHigh());
+                    constrain_f(
+                            motorOutput,
+                            motorConfig->low,
+                            motorConfig->high);
             }
             motors[i] = motorOutput;
         }
