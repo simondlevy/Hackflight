@@ -78,14 +78,14 @@ static void hackflightRunCoreTasks(
     // Constrain the demands, negating yaw to make it agree with PID
     demands_t * demands = &hf->demands;
     demands->roll  =
-        constrain_demand(demands->roll, PIDSUM_LIMIT, PID_MIXER_SCALING),
-        demands->pitch =
-            constrain_demand(demands->pitch, PIDSUM_LIMIT, PID_MIXER_SCALING),
-        demands->yaw   =
-            -constrain_demand(demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING),
+        constrain_demand(demands->roll, PIDSUM_LIMIT, PID_MIXER_SCALING);
+    demands->pitch =
+        constrain_demand(demands->pitch, PIDSUM_LIMIT, PID_MIXER_SCALING);
+    demands->yaw   =
+        -constrain_demand(demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
 
-        // Run the mixer to get motors from demands
-        hf->mixer(&hf->demands, failsafe, motorConfig, motorvals);
+    // Run the mixer to get motors from demands
+    hf->mixer(&hf->demands, failsafe, motorConfig, motorvals);
 }
 
 static void hackflightInit(
