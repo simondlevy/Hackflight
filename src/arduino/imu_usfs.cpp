@@ -135,11 +135,6 @@ extern "C" {
         usfsCheckStatus();
     }
 
-    void imuAccumulateGyro(gyro_t * gyro)
-    {
-        (void)gyro;
-    }
-
     void imuGetQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
     {
         (void)hf;
@@ -149,6 +144,13 @@ extern "C" {
         quat->x = _qx;
         quat->y = _qy;
         quat->z = _qz;
+    }
+
+    // Unused ------------------------------------------------------------------------------------
+
+    void imuAccumulateGyro(gyro_t * gyro)
+    {
+        (void)gyro;
     }
 
     void imuUpdateFusion(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)

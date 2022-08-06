@@ -21,7 +21,7 @@
 #include <Wire.h>
 
 #include <hackflight_full.h>
-#include <imu_alignment/rotate_270.h>
+#include <imu_alignment/rotate_0.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <motor.h>
 #include <stm32_clock.h>
@@ -55,7 +55,7 @@ static void ladybug_setup(rx_dev_funs_t * rxDeviceFuns)
             mixerQuadXbf,
             (void *)&motorPins,
             12,  // IMU interrupt pin
-            imuRotate270,
+            imuRotate0,
             18); // LED pin
 }
 

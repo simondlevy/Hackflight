@@ -451,4 +451,4 @@ $(TARGET_OBJS): $(wildcard make/*)
 -include $(TARGET_DEPS)
 
 listen:
-	miniterm.py $(SERIAL_DEVICE) 115200
+	miniterm $(SERIAL_DEVICE) 115200

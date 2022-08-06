@@ -114,18 +114,11 @@ static float constrain_demand(float demand, float limit, float scaling)
     return constrain_f(demand, -limit, +limit) / scaling;
 }
 
-static void hackflightRunCoreTasks(hackflight_t * hf)
+static void hackflightRunCoreTasks(hackflight_t * hf, uint32_t usec)
 {
-    gyroReadScaled(hf, &hf->vstate);
-
-    uint32_t currentTimeUs = timeMicros();
-
-    rxGetDemands(&hf->rx, currentTimeUs, &hf->anglepid, &hf->demands);
-
     for (uint8_t k=0; k<hf->pidCount; ++k) {
         pid_controller_t pid = hf->pidControllers[k];
-        pid.fun(currentTimeUs, &hf->demands, pid.data,
-                &hf->vstate, hf->pidZeroThrottleItermReset);
+        pid.fun(usec, &hf->demands, pid.data, &hf->vstate, hf->pidZeroThrottleItermReset);
     }
 
     float mixmotors[MAX_SUPPORTED_MOTORS] = {0};

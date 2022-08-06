@@ -94,11 +94,11 @@ extern "C" {
 
     static int32_t taskNextStateTime;
 
-    static void adjustDynamicPriority(task_t * task, uint32_t currentTimeUs) 
+    static void adjustDynamicPriority(task_t * task, uint32_t usec) 
     {
         // Task is time-driven, dynamicPriority is last execution age (measured
         // in desiredPeriods). Task age is calculated from last execution.
-        task->taskAgeCycles = (cmpTimeUs(currentTimeUs, task->lastExecutedAtUs) /
+        task->taskAgeCycles = (cmpTimeUs(usec, task->lastExecutedAtUs) /
                 task->desiredPeriodUs);
         if (task->taskAgeCycles > 0) {
             task->dynamicPriority = 1 + task->taskAgeCycles;
@@ -107,15 +107,15 @@ extern "C" {
 
     // Increase priority for RX task
     static void adjustRxDynamicPriority(rx_t * rx, task_t * task,
-            uint32_t currentTimeUs) 
+            uint32_t usec) 
     {
         if (task->dynamicPriority > 0) {
-            task->taskAgeCycles = 1 + (cmpTimeUs(currentTimeUs,
+            task->taskAgeCycles = 1 + (cmpTimeUs(usec,
                         task->lastSignaledAtUs) / task->desiredPeriodUs);
             task->dynamicPriority = 1 + task->taskAgeCycles;
         } else  {
-            if (rxCheck(rx, currentTimeUs)) {
-                task->lastSignaledAtUs = currentTimeUs;
+            if (rxCheck(rx, usec)) {
+                task->lastSignaledAtUs = usec;
                 task->taskAgeCycles = 1;
                 task->dynamicPriority = 2;
             } else {
@@ -127,13 +127,13 @@ extern "C" {
     static void executeTask(
             hackflight_t * hf,
             task_t *task,
-            uint32_t currentTimeUs)
+            uint32_t usec)
     {
-        task->lastExecutedAtUs = currentTimeUs;
+        task->lastExecutedAtUs = usec;
         task->dynamicPriority = 0;
 
         uint32_t time = timeMicros();
-        task->fun(hf, currentTimeUs);
+        task->fun(hf, usec);
 
         uint32_t taskExecutionTimeUs = timeMicros() - time;
 
@@ -166,7 +166,13 @@ extern "C" {
             loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
         }
 
-        hackflightRunCoreTasks(hf);
+        gyroReadScaled(hf, &hf->vstate);
+
+        uint32_t usec = timeMicros();
+
+        rxGetDemands(&hf->rx, usec, &hf->anglepid, &hf->demands);
+
+        hackflightRunCoreTasks(hf, usec);
 
         // CPU busy
         if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
@@ -228,11 +234,11 @@ extern "C" {
 
     static void adjustAndUpdateTask(
             task_t * task,
-            uint32_t currentTimeUs,
+            uint32_t usec,
             task_t ** selectedTask,
             uint16_t * selectedTaskDynamicPriority)
     {
-        adjustDynamicPriority(task, currentTimeUs);
+        adjustDynamicPriority(task, usec);
         updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
     }
 
@@ -244,22 +250,22 @@ extern "C" {
         task_t *selectedTask = NULL;
         uint16_t selectedTaskDynamicPriority = 0;
 
-        uint32_t currentTimeUs = timeMicros();
+        uint32_t usec = timeMicros();
 
         for (uint8_t k=0; k<hf->sensorTaskCount; ++k) {
             task_t * task = &hf->sensorTasks[k];
-            adjustAndUpdateTask(task, currentTimeUs,&selectedTask,
+            adjustAndUpdateTask(task, usec,&selectedTask,
                     &selectedTaskDynamicPriority);
         }
 
-        adjustRxDynamicPriority(&hf->rx, &hf->rxTask, currentTimeUs);
+        adjustRxDynamicPriority(&hf->rx, &hf->rxTask, usec);
         updateDynamicTask(&hf->rxTask, &selectedTask,
                 &selectedTaskDynamicPriority);
 
-        adjustAndUpdateTask(&hf->attitudeTask, currentTimeUs,
+        adjustAndUpdateTask(&hf->attitudeTask, usec,
                 &selectedTask, &selectedTaskDynamicPriority);
 
-        adjustAndUpdateTask(&hf->mspTask, currentTimeUs,
+        adjustAndUpdateTask(&hf->mspTask, usec,
                 &selectedTask, &selectedTaskDynamicPriority);
 
         if (selectedTask) {
@@ -280,7 +286,7 @@ extern "C" {
             if (taskRequiredTimeCycles < loopRemainingCycles) {
                 uint32_t antipatedEndCycles =
                     nowCycles + taskRequiredTimeCycles;
-                executeTask(hf, selectedTask, currentTimeUs);
+                executeTask(hf, selectedTask, usec);
                 nowCycles = systemGetCycleCounter();
                 int32_t cyclesOverdue =
                     cmpTimeCycles(nowCycles, antipatedEndCycles);
