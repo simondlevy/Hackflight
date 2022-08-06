@@ -22,7 +22,6 @@
 #include "arming.h"
 #include "datatypes.h"
 #include "debug.h"
-#include "deg2rad.h"
 #include "failsafe.h"
 #include "gyro.h"
 #include "imu.h"

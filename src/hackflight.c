@@ -23,6 +23,7 @@
 
 #include "arming.h"
 #include "debug.h"
+#include "deg2rad.h"
 #include "gyro.h"
 #include "hackflight.h"
 #include "init_task.h"
