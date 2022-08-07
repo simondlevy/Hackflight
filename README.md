@@ -31,7 +31,7 @@ Currently, Hackflight has been tested on the following platforms:
 
 * [STM32F405 AIO flight controller](https://betafpv.com/products/f405-20a-aio-2-4s-brushless-flight-controllerblheli_s-v3)
 
-* [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine
+* [MultiSim](https://github.com/simondlevy/MultiSim) flight simulator based on UnrealEngine
 
 Simulators can use just the <b>.h</b> files in the
 [src](https://github.com/simondlevy/Hackflight/tree/master/src) directory, which contain the
