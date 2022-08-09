@@ -89,13 +89,21 @@ static const float LEVEL_ANGLE_LIMIT = 45;
 extern "C" {
 #endif
 
-    static float MAX_VELOCITY_CYCLIC() { return RATE_ACCEL_LIMIT * 100 * CORE_DT(); }
-    static float MAX_VELOCITY_YAW()    { return YAW_RATE_ACCEL_LIMIT * 100 * CORE_DT(); }
+    static float MAX_VELOCITY_CYCLIC() 
+    {
+        return RATE_ACCEL_LIMIT * 100 * CORE_DT();
+    }
+
+    static float MAX_VELOCITY_YAW() 
+    {
+        return YAW_RATE_ACCEL_LIMIT * 100 * CORE_DT(); 
+    }
 
     static float pt2FilterApply(pt2Filter_t *filter, float input)
     {
         filter->state1 = filter->state1 + filter->k * (input - filter->state1);
-        filter->state = filter->state + filter->k * (filter->state1 - filter->state);
+        filter->state =
+            filter->state + filter->k * (filter->state1 - filter->state);
         return filter->state;
     }
 
@@ -117,7 +125,7 @@ extern "C" {
     }
 
     static float applyFeedforwardLimit(
-            angle_pid_t * pid,
+            anglePidConstants_t * constants,
             float value,
             float currentPidSetpoint,
             float maxRateLimit) {
@@ -125,8 +133,9 @@ extern "C" {
         if (value * currentPidSetpoint > 0.0f) {
             if (fabsf(currentPidSetpoint) <= maxRateLimit) {
                 value = constrain_f(value, (-maxRateLimit -
-                            currentPidSetpoint) * pid->k_rate_p,
-                        (maxRateLimit - currentPidSetpoint) * pid->k_rate_p);
+                            currentPidSetpoint) * constants->k_rate_p,
+                        (maxRateLimit - currentPidSetpoint) *
+                        constants->k_rate_p);
             } else {
                 value = 0;
             }
@@ -135,12 +144,14 @@ extern "C" {
         return value;
     }
 
-    static float accelerationLimit(angle_pid_t * pid, uint8_t axis,
+    static float accelerationLimit(anglePid_t * pid, uint8_t axis,
             float currentPidSetpoint)
     {
-        const float currentVelocity = currentPidSetpoint - pid->previousSetpoint[axis];
+        const float currentVelocity =
+            currentPidSetpoint - pid->previousSetpoint[axis];
 
-        float maxVelocity = axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
+        float maxVelocity =
+            axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
 
         if (fabsf(currentVelocity) > maxVelocity) {
             currentPidSetpoint = (currentVelocity > 0) ?
@@ -153,7 +164,7 @@ extern "C" {
     }
 
     static void applyItermRelax(
-            angle_pid_t * pid,
+            anglePid_t * pid,
             const int axis,
             const float iterm,
             float *itermErrorRate,
@@ -179,7 +190,7 @@ extern "C" {
     }
 
     static float applyRcSmoothingFeedforwardFilter(
-            angle_pid_t * pid, int axis, float pidSetpointDelta)
+            anglePid_t * pid, int axis, float pidSetpointDelta)
     {
         float ret = pidSetpointDelta;
         if (pid->feedforwardLpfInitialized) {
@@ -189,28 +200,33 @@ extern "C" {
     }
 
     static float dynLpfCutoffFreq(
-            float throttle, uint16_t dynLpfMin, uint16_t dynLpfMax, uint8_t expo) {
+            float throttle,
+            uint16_t dynLpfMin,
+            uint16_t dynLpfMax,
+            uint8_t expo) {
         const float expof = expo / 10.0f;
         static float curve;
         curve = throttle * (1 - throttle) * expof + throttle;
         return (dynLpfMax - dynLpfMin) * curve + dynLpfMin;
     }
 
-    static void pidDynLpfDTermUpdate(angle_pid_t * pid, float throttle)
+    static void pidDynLpfDTermUpdate(anglePid_t * pid, float throttle)
     {
         const uint16_t dyn_lpf_min = DTERM_LPF1_DYN_MIN_HZ;
         const uint16_t dyn_lpf_max = DTERM_LPF1_DYN_MAX_HZ;
         float cutoffFreq =
-            dynLpfCutoffFreq(throttle, dyn_lpf_min, dyn_lpf_max, DYN_LPF_CURVE_EXPO);
+            dynLpfCutoffFreq(throttle, dyn_lpf_min, dyn_lpf_max,
+                    DYN_LPF_CURVE_EXPO);
 
         for (uint8_t axis = 0; axis < 3; axis++) {
-            pid->dtermLowpass[axis].pt1Filter.k = pt1FilterGain(cutoffFreq, CORE_DT());
+            pid->dtermLowpass[axis].pt1Filter.k =
+                pt1FilterGain(cutoffFreq, CORE_DT());
 
         }
     }
 
     static void updateDynLpfCutoffs(
-            angle_pid_t * pid,
+            anglePid_t * pid,
             uint32_t currentTimeUs,
             float throttle)
     {
@@ -218,13 +234,15 @@ extern "C" {
                 DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
 
             // quantize the throttle reduce the number of filter updates
-            int32_t quantizedThrottle = lrintf(throttle * DYN_LPF_THROTTLE_STEPS); 
+            int32_t quantizedThrottle =
+                lrintf(throttle * DYN_LPF_THROTTLE_STEPS); 
 
             if (quantizedThrottle != pid->dynLpfPreviousQuantizedThrottle) {
 
                 // scale the quantized value back to the throttle range so the
                 // filter cutoff steps are repeatable
-                float dynLpfThrottle = (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
+                float dynLpfThrottle =
+                    (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
                 pidDynLpfDTermUpdate(pid, dynLpfThrottle);
                 pid->dynLpfPreviousQuantizedThrottle = quantizedThrottle;
                 pid->lastDynLpfUpdateUs = currentTimeUs;
@@ -232,33 +250,27 @@ extern "C" {
         }
     }
 
-    static float levelPid(angle_pid_t * pid, float currentSetpoint, float currentAngle)
+    static float levelPid(
+            anglePidConstants_t * constants,
+            float currentSetpoint,
+            float currentAngle)
     {
         // calculate error angle and limit the angle to the max inclination
         // rcDeflection in [-1.0, 1.0]
         float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
         angle = constrain_f(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
         float errorAngle = angle - (currentAngle / 10);
-        return pid->k_level_p > 0 ? errorAngle * pid->k_level_p : currentSetpoint;
+        return constants->k_level_p > 0 ?
+            errorAngle * constants->k_level_p :
+            currentSetpoint;
     }
 
-    // ==================================================================================
+    // =========================================================================
 
-    static void anglePidInit(
-            angle_pid_t * pid,
-            float rate_p,
-            float rate_i,
-            float rate_d,
-            float rate_f,
-            float level_p
-            )
+    static void anglePidInit(anglePid_t * pid, anglePidConstants_t * constants)
     {
         // set constants
-        pid->k_rate_p = rate_p;
-        pid->k_rate_i = rate_i;
-        pid->k_rate_d = rate_d;
-        pid->k_rate_f = rate_f;
-        pid->k_level_p = level_p;
+        memcpy(&pid->constants, constants, sizeof(anglePidConstants_t));
 
         // to allow an initial zero throttle to set the filter cutoff
         pid->dynLpfPreviousQuantizedThrottle = -1;  
@@ -279,18 +291,21 @@ extern "C" {
                     pt1FilterGain(DTERM_LPF2_HZ, CORE_DT()));
         }
 
-        pt1FilterInit(&pid->ptermYawLowpass, pt1FilterGain(YAW_LOWPASS_HZ, CORE_DT()));
+        pt1FilterInit(&pid->ptermYawLowpass,
+                pt1FilterGain(YAW_LOWPASS_HZ, CORE_DT()));
 
         for (int i = 0; i < 3; i++) {
-            pt1FilterInit(&pid->windupLpf[i], pt1FilterGain(ITERM_RELAX_CUTOFF, CORE_DT()));
+            pt1FilterInit(&pid->windupLpf[i],
+                    pt1FilterGain(ITERM_RELAX_CUTOFF, CORE_DT()));
         }
 
-        // Initialize the filters for all axis even if the d_min[axis] value is 0
-        // Otherwise if the pidProfile.d_min_xxx parameters are ever added to
-        // in-flight adjustments and transition from 0 to > 0 in flight the feature
-        // won't work because the filter wasn't initialized.
+        // Initialize the filters for all axis even if the d_min[axis] value is
+        // 0 Otherwise if the pidProfile.d_min_xxx parameters are ever added to
+        // in-flight adjustments and transition from 0 to > 0 in flight the
+        // feature won't work because the filter wasn't initialized.
         for (uint8_t axis = 0; axis <= 2; axis++) {
-            pt2FilterInit(&pid->dMinRange[axis], pt2FilterGain(D_MIN_RANGE_HZ, CORE_DT()));
+            pt2FilterInit(&pid->dMinRange[axis],
+                    pt2FilterGain(D_MIN_RANGE_HZ, CORE_DT()));
             pt2FilterInit(&pid->dMinLowpass[axis],
                     pt2FilterGain(D_MIN_LOWPASS_HZ, CORE_DT()));
         }
@@ -304,11 +319,13 @@ extern "C" {
             bool reset
             )
     {
-        angle_pid_t * pid = (angle_pid_t *)data;
+        anglePid_t * pid = (anglePid_t *)data;
+        anglePidConstants_t * constants = &pid->constants;
 
         // gradually scale back integration when above windup point
         float dynCi = CORE_DT();
-        const float itermWindupPointInv = 1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
+        const float itermWindupPointInv =
+            1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
         if (itermWindupPointInv > 1.0f) {
             dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
         }
@@ -321,12 +338,14 @@ extern "C" {
 
             gyroRateDterm[axis] = gyroRates[axis];
 
-            filterApplyFnPtr dtermLowpassApplyFn = (filterApplyFnPtr)pt1FilterApply;
+            filterApplyFnPtr dtermLowpassApplyFn =
+                (filterApplyFnPtr)pt1FilterApply;
             gyroRateDterm[axis] =
                 dtermLowpassApplyFn((filter_t *) &pid->dtermLowpass[axis],
                         gyroRateDterm[axis]);
 
-            filterApplyFnPtr dtermLowpass2ApplyFn = (filterApplyFnPtr)pt1FilterApply;
+            filterApplyFnPtr dtermLowpass2ApplyFn =
+                (filterApplyFnPtr)pt1FilterApply;
             gyroRateDterm[axis] =
                 dtermLowpass2ApplyFn((filter_t *) &pid->dtermLowpass2[axis],
                         gyroRateDterm[axis]);
@@ -340,19 +359,21 @@ extern "C" {
 
             float currentPidSetpoint = pidSetpoints[axis];
 
-            float maxVelocity = axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
+            float maxVelocity =
+                axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
             if (maxVelocity) {
-                currentPidSetpoint = accelerationLimit(pid, axis, currentPidSetpoint);
+                currentPidSetpoint =
+                    accelerationLimit(pid, axis, currentPidSetpoint);
             }
 
             if (axis != 2) {
                 currentPidSetpoint =
-                    levelPid(pid, currentPidSetpoint, currentAngles[axis]);
+                    levelPid(constants, currentPidSetpoint, currentAngles[axis]);
             }
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
-            // recovery It's not necessary to zero the set points for R/P because
-            // the PIDs will be zeroed below
+            // recovery It's not necessary to zero the set points for R/P
+            // because the PIDs will be zeroed below
 
             // -----calculate error rate
             const float gyroRate = gyroRates[axis]; // gyro output in deg/sec
@@ -367,23 +388,26 @@ extern "C" {
             float setpointCorrection = currentPidSetpoint - uncorrectedSetpoint;
 
             // --------low-level gyro-based PID based on 2DOF PID controller.
-            // ---------- 2-DOF PID controller with optional filter on derivative
-            // term.  b = 1 and only c (feedforward weight) can be tuned (amount
-            // derivative on measurement or error).
+            // ---------- 2-DOF PID controller with optional filter on
+            // derivative term.  b = 1 and only c (feedforward weight) can be
+            // tuned (amount derivative on measurement or error).
 
             // -----calculate P component
-            filterApplyFnPtr ptermYawLowpassApplyFn = (filterApplyFnPtr)pt1FilterApply;
-            pid->data[axis].P = pid->k_rate_p * errorRate;
+            filterApplyFnPtr ptermYawLowpassApplyFn =
+                (filterApplyFnPtr)pt1FilterApply;
+            pid->data[axis].P = constants->k_rate_p * errorRate;
             if (axis == 2) {
                 pid->data[axis].P = ptermYawLowpassApplyFn((filter_t *)
                         &pid->ptermYawLowpass, pid->data[axis].P);
             }
 
             // -----calculate I component
-            // if launch control is active override the iterm gains and apply iterm
-            // windup protection to all axes
-            float Ki = pid->k_rate_i * ((axis == 2 && !USE_INTEGRATED_YAW) ? 2.5 : 1);
-            float axisDynCi = (axis == 2) ? dynCi : CORE_DT(); // check windup for yaw only
+            // if launch control is active override the iterm gains and apply
+            // iterm windup protection to all axes
+            float Ki =
+                constants->k_rate_i * ((axis == 2 && !USE_INTEGRATED_YAW) ? 2.5 : 1);
+            float axisDynCi =
+                (axis == 2) ? dynCi : CORE_DT(); // check windup for yaw only
 
             pid->data[axis].I =
                 constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
@@ -394,30 +418,31 @@ extern "C" {
             float feedforwardMaxRate = rxApplyRates(1, 1);
 
             // -----calculate D component
-            if ((axis < 2 && pid->k_rate_d > 0)) {
+            if ((axis < 2 && constants->k_rate_d > 0)) {
 
                 // Divide rate change by dT to get differential (ie dr/dt).
                 // dT is fixed and calculated from the target PID loop time
-                // This is done to avoid DTerm spikes that occur with dynamically
-                // calculated deltaT whenever another task causes the PID
-                // loop execution to be delayed.
+                // This is done to avoid DTerm spikes that occur with
+                // dynamically calculated deltaT whenever another task causes
+                // the PID loop execution to be delayed.
                 const float delta = -(gyroRateDterm[axis] -
                         pid->previousGyroRateDterm[axis]) * FREQUENCY();
 
-                float preTpaD = pid->k_rate_d * delta;
+                float preTpaD = constants->k_rate_d * delta;
 
                 float dMinFactor = 1.0f;
 
                 float dMinPercent = axis == 2 ?
                     0 :
-                    D_MIN > 0 && D_MIN < pid->k_rate_d ?
-                    D_MIN / pid->k_rate_d :
+                    D_MIN > 0 && D_MIN < constants->k_rate_d ?
+                    D_MIN / constants->k_rate_d :
                     0;
 
                 if (dMinPercent > 0) {
                     const float d_min_gyro_gain =
                         D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
-                    float dMinGyroFactor = pt2FilterApply(&pid->dMinRange[axis], delta);
+                    float dMinGyroFactor =
+                        pt2FilterApply(&pid->dMinRange[axis], delta);
                     dMinGyroFactor = fabsf(dMinGyroFactor) * d_min_gyro_gain;
                     const float d_min_setpoint_gain =
                         D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
@@ -425,8 +450,10 @@ extern "C" {
                     const float dMinSetpointFactor =
                         (fabsf(pidSetpointDelta)) * d_min_setpoint_gain;
                     dMinFactor = fmaxf(dMinGyroFactor, dMinSetpointFactor);
-                    dMinFactor = dMinPercent + (1.0f - dMinPercent) * dMinFactor;
-                    dMinFactor = pt2FilterApply(&pid->dMinLowpass[axis], dMinFactor);
+                    dMinFactor =
+                        dMinPercent + (1.0f - dMinPercent) * dMinFactor;
+                    dMinFactor =
+                        pt2FilterApply(&pid->dMinLowpass[axis], dMinFactor);
                     dMinFactor = fminf(dMinFactor, 1.0f);
                 }
 
@@ -450,12 +477,13 @@ extern "C" {
             pid->previousSetpointCorrection[axis] = setpointCorrection;
 
             // no feedforward in launch control
-            float feedforwardGain = pid->k_rate_f;
+            float feedforwardGain = constants->k_rate_f;
             if (feedforwardGain > 0) {
                 // halve feedforward in Level mode since stick sensitivity is
-                // weaker by about half transition now calculated in feedforward.c
-                // when new RC data arrives 
-                float feedForward = feedforwardGain * pidSetpointDelta * FREQUENCY();
+                // weaker by about half transition now calculated in
+                // feedforward.c when new RC data arrives 
+                float feedForward =
+                    feedforwardGain * pidSetpointDelta * FREQUENCY();
 
                 float feedforwardMaxRateLimit =
                     feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
@@ -464,11 +492,15 @@ extern "C" {
                     feedforwardMaxRateLimit != 0.0f && axis < 2;
 
                 pid->data[axis].F = shouldApplyFeedforwardLimits ?
-                    applyFeedforwardLimit(pid, feedForward, currentPidSetpoint,
+                    applyFeedforwardLimit(
+                            constants,
+                            feedForward,
+                            currentPidSetpoint,
                             feedforwardMaxRateLimit) :
                     feedForward;
                 pid->data[axis].F =
-                    applyRcSmoothingFeedforwardFilter(pid, axis, pid->data[axis].F);
+                    applyRcSmoothingFeedforwardFilter(pid, axis,
+                            pid->data[axis].F);
             } else {
                 pid->data[axis].F = 0;
             }

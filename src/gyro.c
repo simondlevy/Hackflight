@@ -16,16 +16,16 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "align_sensor.h"
 #include "core_rate.h"
 #include "datatypes.h"
 #include "debug.h"
-#include "pt1_filter.h"
 #include "gyro.h"
 #include "imu.h"
 #include "maths.h"
+#include "pt1_filter.h"
 #include "stats.h"
 #include "system.h"
+#include "time.h"
 
 static const uint32_t CALIBRATION_DURATION           = 1250000;
 static const uint16_t LPF1_DYN_MIN_HZ                = 250;
@@ -152,30 +152,34 @@ void gyroInit(hackflight_t * hf)
     setCalibrationCycles(gyro); // start calibrating
 }
 
-void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate)
+void gyroReadScaled(hackflight_t * hf, vehicle_state_t * vstate)
 {
     if (!gyroIsReady()) return;
 
+    gyro_t * gyro = &hf->gyro;
+
     bool calibrationComplete = gyro->calibration.cyclesRemaining <= 0;
 
-    static float _adc[3];
+    static axes_t _adc;
 
     if (calibrationComplete) {
+
         // move 16-bit gyro data into floats to avoid overflows in calculations
 
-        _adc[0] = gyroReadRaw(0) - gyro->zero[0];
-        _adc[1] = gyroReadRaw(1) - gyro->zero[1];
-        _adc[2] = gyroReadRaw(2) - gyro->zero[2];
+        _adc.x = gyroReadRaw(0) - gyro->zero[0];
+        _adc.y = gyroReadRaw(1) - gyro->zero[1];
+        _adc.z = gyroReadRaw(2) - gyro->zero[2];
 
-        alignSensorViaRotation(_adc);
+        hf->imuAlignFun(&_adc);
+
     } else {
         calibrate(gyro);
     }
 
     if (calibrationComplete) {
-        gyro->dps[0] = _adc[0] * gyroScale();
-        gyro->dps[1] = _adc[1] * gyroScale();
-        gyro->dps[2] = _adc[2] * gyroScale();
+        gyro->dps[0] = _adc.x * (gyroScaleDps() / 32768.);
+        gyro->dps[1] = _adc.y * (gyroScaleDps() / 32768.);
+        gyro->dps[2] = _adc.z * (gyroScaleDps() / 32768.);
     }
 
     if (gyro->downsampleFilterEnabled) {
@@ -193,7 +197,6 @@ void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate)
         gyro->sampleSum[2] += gyro->dps[2];
         gyro->sampleCount++;
     }
-
 
     for (int axis = 0; axis < 3; axis++) {
 
@@ -229,6 +232,17 @@ void gyroReadScaled(gyro_t * gyro, vehicle_state_t * vstate)
     vstate->dpsi   = gyro->dps_filtered[2];
 
     gyro->isCalibrating = !calibrationComplete;
+}
+
+int32_t gyroGetSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
+{
+    int32_t gyroSkew = cmpTimeCycles(nextTargetCycles, gyroSyncTime()) % desiredPeriodCycles;
+
+    if (gyroSkew > (desiredPeriodCycles / 2)) {
+        gyroSkew -= desiredPeriodCycles;
+    }
+
+    return gyroSkew;
 }
 
 #if defined(__cplusplus)

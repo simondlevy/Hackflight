@@ -187,6 +187,18 @@ void serialWriteBuf(void * p, const uint8_t *data, uint32_t count)
     }
 }
 
+void serialOpenPortDsmx(serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
+{
+    serialOpenPort(
+            identifier,
+            FUNCTION_RX_SERIAL,
+            rxCallback,
+            NULL,
+            BAUD_115200,
+            MODE_RX,
+            SERIAL_NOT_INVERTED);
+}
+
 void serialOpenPortSbus(serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
 {
     serialOpenPort(
@@ -201,6 +213,11 @@ void serialOpenPortSbus(serialPortIdentifier_e identifier, serialReceiveCallback
 
 void * serialOpenPortUsb(void)
 {
-    return serialOpenPort(SERIAL_PORT_USB_VCP, FUNCTION_MSP, NULL, NULL,
-            BAUD_115200, MODE_RXTX, SERIAL_NOT_INVERTED);
+    return serialOpenPort(
+            SERIAL_PORT_USB_VCP,
+            FUNCTION_MSP,
+            NULL, NULL,
+            BAUD_115200,
+            MODE_RXTX,
+            SERIAL_NOT_INVERTED);
 }

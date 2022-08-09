@@ -3,14 +3,15 @@
 
    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+   Hackflight is free software: you can redistribute it and/or modify it under
+   the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
@@ -20,16 +21,19 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "accel.h"
 #include "arming.h"
-#include "board.h"
-#include "gyro.h"
 #include "debug.h"
+#include "deg2rad.h"
+#include "gyro.h"
 #include "hackflight.h"
+#include "init_task.h"
 #include "led.h"
 #include "msp.h"
 #include "rx.h"
 #include "system.h"
+
+// Tuning constants for angle PID controller ----------------------------------
+
 
 // Scheduling constants -------------------------------------------------------
 
@@ -71,6 +75,61 @@ static const float TASK_AGE_EXPEDITE_SCALE = 0.9;
 static const uint32_t CORE_RATE_COUNT = 25000;
 static const uint32_t GYRO_LOCK_COUNT = 400;
 
+// Arming safety  -------------------------------------------------------------
+
+static const float MAX_ARMING_ANGLE = 25;
+
+// Attitude task --------------------------------------------------------------
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+static void task_attitude(void * hackflight, uint32_t time)
+{
+    hackflight_t * hf = (hackflight_t *)hackflight;
+    imuGetEulerAngles(hf, time);
+}
+
+// RX polling task ------------------------------------------------------------
+
+static void task_rx(void * hackflight, uint32_t time)
+{
+    hackflight_t * hf = (hackflight_t *)hackflight;
+
+    bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;
+    bool pidItermResetReady = false;
+    bool pidItermResetValue = false;
+
+    rx_axes_t rxax = {{0, 0, 0, 0}, 0, 0};
+
+    bool gotNewData = false;
+
+    bool imuIsLevel =
+        fabsf(hf->vstate.phi) < hf->maxArmingAngle &&
+        fabsf(hf->vstate.theta) < hf->maxArmingAngle;
+
+    rxPoll(
+            &hf->rx,
+            time,
+            imuIsLevel, 
+            calibrating,
+            &rxax,
+            hf->motorDevice,
+            &hf->arming,
+            &pidItermResetReady,
+            &pidItermResetValue,
+            &gotNewData);
+
+    if (pidItermResetReady) {
+        hf->pidReset = pidItermResetValue;
+    }
+
+    if (gotNewData) {
+        memcpy(&hf->rxAxes, &rxax, sizeof(rx_axes_t));
+    }
+}
+
 // MSP task ---------------------------------------------------------------------
 
 static const uint32_t MSP_TASK_RATE = 100;
@@ -92,11 +151,11 @@ extern "C" {
 
     static int32_t taskNextStateTime;
 
-    static void adjustDynamicPriority(task_t * task, uint32_t currentTimeUs) 
+    static void adjustDynamicPriority(task_t * task, uint32_t usec) 
     {
         // Task is time-driven, dynamicPriority is last execution age (measured
         // in desiredPeriods). Task age is calculated from last execution.
-        task->taskAgeCycles = (cmpTimeUs(currentTimeUs, task->lastExecutedAtUs) /
+        task->taskAgeCycles = (cmpTimeUs(usec, task->lastExecutedAtUs) /
                 task->desiredPeriodUs);
         if (task->taskAgeCycles > 0) {
             task->dynamicPriority = 1 + task->taskAgeCycles;
@@ -105,15 +164,15 @@ extern "C" {
 
     // Increase priority for RX task
     static void adjustRxDynamicPriority(rx_t * rx, task_t * task,
-            uint32_t currentTimeUs) 
+            uint32_t usec) 
     {
         if (task->dynamicPriority > 0) {
-            task->taskAgeCycles = 1 + (cmpTimeUs(currentTimeUs,
+            task->taskAgeCycles = 1 + (cmpTimeUs(usec,
                         task->lastSignaledAtUs) / task->desiredPeriodUs);
             task->dynamicPriority = 1 + task->taskAgeCycles;
         } else  {
-            if (rxCheck(rx, currentTimeUs)) {
-                task->lastSignaledAtUs = currentTimeUs;
+            if (rxCheck(rx, usec)) {
+                task->lastSignaledAtUs = usec;
                 task->taskAgeCycles = 1;
                 task->dynamicPriority = 2;
             } else {
@@ -122,13 +181,16 @@ extern "C" {
         }
     }
 
-    static void executeTask(hackflight_t * hf, task_t *task, uint32_t currentTimeUs)
+    static void executeTask(
+            hackflight_t * hf,
+            task_t *task,
+            uint32_t usec)
     {
-        task->lastExecutedAtUs = currentTimeUs;
+        task->lastExecutedAtUs = usec;
         task->dynamicPriority = 0;
 
         uint32_t time = timeMicros();
-        task->fun(hf, currentTimeUs);
+        task->fun(hf, usec);
 
         uint32_t taskExecutionTimeUs = timeMicros() - time;
 
@@ -161,7 +223,30 @@ extern "C" {
             loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
         }
 
-        hackflightRunCoreTasks(hf);
+        gyroReadScaled(hf, &hf->vstate);
+
+        uint32_t usec = timeMicros();
+
+        rxGetDemands(&hf->rx, usec, &hf->anglepid, &hf->demands);
+
+        float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
+
+        motor_config_t motorConfig = {
+            motorValueDisarmed(),
+            motorValueHigh(),
+            motorValueLow(),
+            motorIsProtocolDshot()  
+        };
+
+        hackflightRunCoreTasks(
+                hf,
+                usec,
+                failsafeIsActive(),
+                &motorConfig,
+                mixmotors);
+
+        motorWrite(hf->motorDevice,
+                armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
 
         // CPU busy
         if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
@@ -169,9 +254,8 @@ extern "C" {
         }
         scheduler->lastTargetCycles = nextTargetCycles;
 
-        // Bring the scheduler into lock with the gyro
-        // Track the actual gyro rate over given number of cycle times and set the
-        // expected timebase
+        // Bring the scheduler into lock with the gyro Track the actual gyro
+        // rate over given number of cycle times and set the expected timebase
         static uint32_t _terminalGyroRateCount;
         static int32_t _sampleRateStartCycles;
 
@@ -181,19 +265,21 @@ extern "C" {
         }
 
         if (gyroInterruptCount() >= _terminalGyroRateCount) {
-            // Calculate number of clock cycles on average between gyro interrupts
+            // Calculate number of clock cycles on average between gyro
+            // interrupts
             uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
             scheduler->desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
             _sampleRateStartCycles = nowCycles;
             _terminalGyroRateCount += CORE_RATE_COUNT;
         }
 
-        // Track actual gyro rate over given number of cycle times and remove skew
+        // Track actual gyro rate over given number of cycle times and remove
+        // skew
         static uint32_t _terminalGyroLockCount;
         static int32_t _gyroSkewAccum;
 
         int32_t gyroSkew =
-            imuGetGyroSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
+            gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
 
         _gyroSkewAccum += gyroSkew;
 
@@ -222,11 +308,11 @@ extern "C" {
 
     static void adjustAndUpdateTask(
             task_t * task,
-            uint32_t currentTimeUs,
+            uint32_t usec,
             task_t ** selectedTask,
             uint16_t * selectedTaskDynamicPriority)
     {
-        adjustDynamicPriority(task, currentTimeUs);
+        adjustDynamicPriority(task, usec);
         updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
     }
 
@@ -238,21 +324,22 @@ extern "C" {
         task_t *selectedTask = NULL;
         uint16_t selectedTaskDynamicPriority = 0;
 
-        uint32_t currentTimeUs = timeMicros();
+        uint32_t usec = timeMicros();
 
         for (uint8_t k=0; k<hf->sensorTaskCount; ++k) {
             task_t * task = &hf->sensorTasks[k];
-            adjustAndUpdateTask(task, currentTimeUs,&selectedTask,
+            adjustAndUpdateTask(task, usec,&selectedTask,
                     &selectedTaskDynamicPriority);
         }
 
-        adjustRxDynamicPriority(&hf->rx, &hf->rxTask, currentTimeUs);
-        updateDynamicTask(&hf->rxTask, &selectedTask, &selectedTaskDynamicPriority);
+        adjustRxDynamicPriority(&hf->rx, &hf->rxTask, usec);
+        updateDynamicTask(&hf->rxTask, &selectedTask,
+                &selectedTaskDynamicPriority);
 
-        adjustAndUpdateTask(&hf->attitudeTask, currentTimeUs,
+        adjustAndUpdateTask(&hf->attitudeTask, usec,
                 &selectedTask, &selectedTaskDynamicPriority);
 
-        adjustAndUpdateTask(&hf->mspTask, currentTimeUs,
+        adjustAndUpdateTask(&hf->mspTask, usec,
                 &selectedTask, &selectedTaskDynamicPriority);
 
         if (selectedTask) {
@@ -271,14 +358,17 @@ extern "C" {
             taskRequiredTimeCycles += scheduler->taskGuardCycles;
 
             if (taskRequiredTimeCycles < loopRemainingCycles) {
-                uint32_t antipatedEndCycles = nowCycles + taskRequiredTimeCycles;
-                executeTask(hf, selectedTask, currentTimeUs);
+                uint32_t antipatedEndCycles =
+                    nowCycles + taskRequiredTimeCycles;
+                executeTask(hf, selectedTask, usec);
                 nowCycles = systemGetCycleCounter();
-                int32_t cyclesOverdue = cmpTimeCycles(nowCycles, antipatedEndCycles);
+                int32_t cyclesOverdue =
+                    cmpTimeCycles(nowCycles, antipatedEndCycles);
 
                 if ((cyclesOverdue > 0) ||
                         (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
-                    if (scheduler->taskGuardCycles < scheduler->taskGuardMaxCycles) {
+                    if (scheduler->taskGuardCycles <
+                            scheduler->taskGuardMaxCycles) {
                         scheduler->taskGuardCycles +=
                             scheduler->taskGuardDeltaUpCycles;
                     }
@@ -290,42 +380,52 @@ extern "C" {
             } else if (selectedTask->taskAgeCycles > TASK_AGE_EXPEDITE_COUNT) {
                 // If a task has been unable to run, then reduce it's recorded
                 // estimated run time to ensure it's ultimate scheduling
-                selectedTask->anticipatedExecutionTime *= TASK_AGE_EXPEDITE_SCALE;
+                selectedTask->anticipatedExecutionTime *= 
+                    TASK_AGE_EXPEDITE_SCALE;
             }
         }
     }
 
-    // ----------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     void hackflightInitFull(
             hackflight_t * hf,
+            rx_dev_funs_t * rxDeviceFuns,
+            serialPortIdentifier_e rxDevPort,
+            anglePidConstants_t * anglePidConstants,
             mixer_t mixer,
             void * motorDevice,
-            serialPortIdentifier_e rxPort,
             uint8_t imuInterruptPin,
+            imu_align_fun imuAlign,
             uint8_t ledPin)
     {
-        // Tuning constants for angle PID controller
-        static const float RATE_P  = 1.441305;
-        static const float RATE_I  = 19.55048;
-        static const float RATE_D  = 0.021160;
-        static const float RATE_F  = 0.0165048;
-        static const float LEVEL_P = 0 /*3.0*/;
-
         mspInit();
         gyroInit(hf);
         imuInit(hf, imuInterruptPin);
         ledInit(ledPin);
         ledFlash(10, 50);
         failsafeInit();
-        //mspInit();
         failsafeReset();
+
+        hf->rx.devCheck = rxDeviceFuns->check;
+        hf->rx.devConvert = rxDeviceFuns->convert;
+
+        rxDeviceFuns->init(rxDevPort);
+
+        hf->imuAlignFun = imuAlign;
 
         hf->motorDevice = motorDevice;
 
-        hackflightInit(hf, mixer, rxPort, RATE_P, RATE_I, RATE_D, RATE_F, LEVEL_P);
+        hackflightInit(hf, anglePidConstants, mixer);
 
-        hackflightAddSensor(hf, imuAccelTask, ACCEL_RATE);
+        initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
+
+        initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
+
+        // Initialize quaternion in upright position
+        hf->imuFusionPrev.quat.w = 1;
+
+        hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
         initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 
@@ -380,8 +480,9 @@ extern "C" {
         if (loopRemainingCycles < -scheduler->desiredPeriodCycles) {
             // A task has so grossly overrun that at entire gyro cycle has been
             // skipped This is most likely to occur when connected to the
-            // configurator via USB as the serial task is non-deterministic Recover
-            // as best we can, advancing scheduling by a whole number of cycles
+            // configurator via USB as the serial task is non-deterministic
+            // Recover as best we can, advancing scheduling by a whole number
+            // of cycles
             nextTargetCycles += scheduler->desiredPeriodCycles * (1 +
                     (loopRemainingCycles / -scheduler->desiredPeriodCycles));
             loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);

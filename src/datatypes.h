@@ -66,26 +66,30 @@ typedef union dtermLowpass_u {
 } dtermLowpass_t;
 
 typedef struct {
-    pidAxisData_t  data[3];
-    pt2Filter_t    dMinLowpass[3];
-    pt2Filter_t    dMinRange[3];
-    dtermLowpass_t dtermLowpass[3];
-    dtermLowpass_t dtermLowpass2[3];
-    int32_t        dynLpfPreviousQuantizedThrottle;  
-    bool           feedforwardLpfInitialized;
-    pt3Filter_t    feedforwardPt3[3];
-    float          k_rate_p;
-    float          k_rate_i;
-    float          k_rate_d;
-    float          k_rate_f;
-    float          k_level_p;
-    uint32_t       lastDynLpfUpdateUs;
-    float          previousSetpointCorrection[3];
-    float          previousGyroRateDterm[3];
-    float          previousSetpoint[3];
-    pt1Filter_t    ptermYawLowpass;
-    pt1Filter_t    windupLpf[3];
-} angle_pid_t;
+    float k_rate_p;
+    float k_rate_i;
+    float k_rate_d;
+    float k_rate_f;
+    float k_level_p;
+} anglePidConstants_t;
+
+typedef struct {
+    anglePidConstants_t constants;
+    pidAxisData_t       data[3];
+    pt2Filter_t         dMinLowpass[3];
+    pt2Filter_t         dMinRange[3];
+    dtermLowpass_t      dtermLowpass[3];
+    dtermLowpass_t      dtermLowpass2[3];
+    int32_t             dynLpfPreviousQuantizedThrottle;  
+    bool                feedforwardLpfInitialized;
+    pt3Filter_t         feedforwardPt3[3];
+    uint32_t            lastDynLpfUpdateUs;
+    float               previousSetpointCorrection[3];
+    float               previousGyroRateDterm[3];
+    float               previousSetpoint[3];
+    pt1Filter_t         ptermYawLowpass;
+    pt1Filter_t         windupLpf[3];
+} anglePid_t;
 
 // Demands ----------------------------------------------------------------------
 
@@ -193,7 +197,9 @@ typedef struct {
     gyro_reset_t gyroReset;
 } imu_fusion_t;
 
-// Stats ------------------------------------------------------------------------
+typedef void (*imu_align_fun)(axes_t * axes);
+
+ // Stats ------------------------------------------------------------------------
 
 typedef struct {
     float m_oldM, m_newM, m_oldS, m_newS;
@@ -408,54 +414,83 @@ typedef struct rxSmoothingFilter_s {
 
 } rxSmoothingFilter_t;
 
+typedef void    (*rx_dev_init_fun)(serialPortIdentifier_e port);
+typedef uint8_t (*rx_dev_check_fun)(uint16_t * channelData, uint32_t * frameTimeUs);
+typedef float   (*rx_dev_convert_fun)(uint16_t * channelData, uint8_t chan);
+
+typedef struct {
+
+    rx_dev_init_fun init;
+    rx_dev_check_fun check;
+    rx_dev_convert_fun convert;
+
+} rx_dev_funs_t;
+
 typedef struct {
 
     rxSmoothingFilter_t smoothingFilter;
 
-    bool        auxiliaryProcessingRequired;
-    bool        calculatedCutoffs;
-    uint16_t    channelData[CHANNEL_COUNT];
-    float       command[4];
-    demands_t   commands;
-    bool        dataProcessingRequired;
-    demands_t   dataToSmooth;
-    int32_t     frameTimeDeltaUs;
-    bool        gotNewData;
-    bool        inFailsafeMode;
-    bool        initializedFilter;
-    bool        initializedThrottleTable;
-    uint32_t    invalidPulsePeriod[CHANNEL_COUNT];
-    bool        isRateValid;
-    uint32_t    lastFrameTimeUs;
-    uint32_t    lastRxTimeUs;
-    int16_t     lookupThrottleRc[THROTTLE_LOOKUP_LENGTH];
-    uint32_t    needSignalBefore;
-    uint32_t    nextUpdateAtUs;
-    uint32_t    previousFrameTimeUs;
-    float       raw[CHANNEL_COUNT];
-    uint32_t    refreshPeriod;
-    bool        signalReceived;
-    rxState_e   state;
-    uint32_t    validFrameTimeMs;
+    bool               auxiliaryProcessingRequired;
+    bool               calculatedCutoffs;
+    uint16_t           channelData[CHANNEL_COUNT];
+    float              command[4];
+    demands_t          commands;
+    bool               dataProcessingRequired;
+    demands_t          dataToSmooth;
+    rx_dev_check_fun   devCheck;
+    rx_dev_convert_fun devConvert;
+    int32_t            frameTimeDeltaUs;
+    bool               gotNewData;
+    bool               inFailsafeMode;
+    bool               initializedFilter;
+    bool               initializedThrottleTable;
+    uint32_t           invalidPulsePeriod[CHANNEL_COUNT];
+    bool               isRateValid;
+    uint32_t           lastFrameTimeUs;
+    uint32_t           lastRxTimeUs;
+    int16_t            lookupThrottleRc[THROTTLE_LOOKUP_LENGTH];
+    uint32_t           needSignalBefore;
+    uint32_t           nextUpdateAtUs;
+    uint32_t           previousFrameTimeUs;
+    float              raw[CHANNEL_COUNT];
+    uint32_t           refreshPeriod;
+    bool               signalReceived;
+    rxState_e          state;
+    uint32_t           validFrameTimeMs;
 
 } rx_t;
+
+// Motors ----------------------------------------------------------------------
+
+typedef struct {
+
+    float disarmed;
+    float high;
+    float low;
+    bool isDshot;
+
+} motor_config_t;
 
 
 // Mixer -----------------------------------------------------------------------
 
-typedef void (*mixer_t)(float throttle, float roll, float pitch, float yaw,
+typedef void (*mixer_t)(
+        demands_t * demands,
+        bool failsafe,
+        motor_config_t * motorConfig,
         float * motors);
+
 
 // Hackflight ------------------------------------------------------------------
 
 typedef struct {
 
-    imu_sensor_t     accelAccum;
     arming_t         arming;
-    angle_pid_t      anglepid;
+    anglePid_t      anglepid;
     task_t           attitudeTask;
     demands_t        demands;
     gyro_t           gyro;
+    imu_align_fun    imuAlignFun;
     imu_fusion_t     imuFusionPrev;
     float            maxArmingAngle;
     mixer_t          mixer;
@@ -464,7 +499,7 @@ typedef struct {
     task_t           mspTask;
     pid_controller_t pidControllers[10];
     uint8_t          pidCount;
-    bool             pidZeroThrottleItermReset;
+    bool             pidReset;
     rx_t             rx;
     task_t           rxTask;
     rx_axes_t        rxAxes;

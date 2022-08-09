@@ -26,10 +26,13 @@ extern "C" {
 
 void hackflightInitFull(
         hackflight_t * hf,
+        rx_dev_funs_t * rxDeviceFuns,
+        serialPortIdentifier_e rxDevPort,
+        anglePidConstants_t * anglePidConstants,
         mixer_t mixer,
         void * motorDevice,
-        serialPortIdentifier_e rxPort,
         uint8_t imuInterruptPin,
+        imu_align_fun imuAlign,
         uint8_t ledPin);
 
 void hackflightStep(hackflight_t * hackflight);

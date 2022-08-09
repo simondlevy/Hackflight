@@ -3,17 +3,18 @@
 
    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+   Hackflight is free software: you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
 
-   You should have received a copy of the GNU General Public License along with
-   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License along
+   with Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -22,7 +23,6 @@
 
 #include "datatypes.h"
 #include "debug.h"
-#include "failsafe.h"
 #include "maths.h"
 #include "motor.h"
 
@@ -31,11 +31,10 @@ extern "C" {
 #endif
 
     static void fixedPitchMix(
-            float throttle,
-            float roll,
-            float pitch,
-            float yaw,
-            axes_t * axes,
+            demands_t * demands,
+            motor_config_t * motorConfig,
+            axes_t * spins,
+            bool failsafe,
             uint8_t motorCount,
             float * motors)
     {
@@ -45,7 +44,10 @@ extern "C" {
 
         for (int i = 0; i < motorCount; i++) {
 
-            mix[i] = roll * axes[i].x + pitch * axes[i].y + yaw * axes[i].z;
+            mix[i] =
+                demands->roll  * spins[i].x +
+                demands->pitch * spins[i].y +
+                demands->yaw   * spins[i].z;
 
             if (mix[i] > mixMax) {
                 mixMax = mix[i];
@@ -57,12 +59,14 @@ extern "C" {
 
         float motorRange = mixMax - mixMin;
 
+        float throttle = demands->throttle;
+
         if (motorRange > 1.0f) {
             for (int i = 0; i < motorCount; i++) {
                 mix[i] /= motorRange;
             }
         } else {
-            if (throttle > 0.5f) {
+            if (demands->throttle > 0.5f) {
                 throttle = constrain_f(throttle, -mixMin, 1.0f - mixMax);
             }
         }
@@ -72,21 +76,26 @@ extern "C" {
         // also up for those low throttle flips.
         for (int i = 0; i < motorCount; i++) {
             float motorOutput = mix[i] + throttle;
-            motorOutput = motorValueLow() +
-                (motorValueHigh() - motorValueLow()) * motorOutput;
+            motorOutput = motorConfig->low +
+                (motorConfig->high - motorConfig->low) * motorOutput;
 
-            if (failsafeIsActive()) {
-                if (motorIsProtocolDshot()) {
+            if (failsafe) {
+                if (motorConfig->isDshot) {
                     // Prevent getting into special reserved range
-                    motorOutput = (motorOutput < motorValueLow()) ?
-                        motorValueDisarmed() :
+                    motorOutput = (motorOutput < motorConfig->low) ?
+                        motorConfig->disarmed :
                         motorOutput; 
                 }
-                motorOutput =
-                    constrain_f(motorOutput, motorValueDisarmed(), motorValueHigh());
+                motorOutput = constrain_f(
+                        motorOutput,
+                        motorConfig->disarmed,
+                        motorConfig->high);
             } else {
                 motorOutput =
-                    constrain_f(motorOutput, motorValueLow(), motorValueHigh());
+                    constrain_f(
+                            motorOutput,
+                            motorConfig->low,
+                            motorConfig->high);
             }
             motors[i] = motorOutput;
         }

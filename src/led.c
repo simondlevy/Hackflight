@@ -16,8 +16,8 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "time.h"
 #include "led.h"
+#include "time.h"
 
 static uint32_t warningLedTimer = 0;
 
