@@ -2,7 +2,6 @@ TARGET_MCU := STM32F4
 
 TARGET    := STM32F405
 
-# SERIAL_DEVICE ?= /dev/ttyACM0
 SERIAL_DEVICE ?= /dev/ttyACM0
 
 # Working directories
@@ -327,34 +326,34 @@ $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
 
 # C++ ==========================================================================
 
-$(OBJECT_DIR)/arming.o: $(HFSRC_DIR)/arming.c \
+$(OBJECT_DIR)/arming.o: $(HFSRC_DIR)/arming.cpp \
       $(HFSRC_DIR)/arming.h \
       $(HFSRC_DIR)/datatypes.h \
       $(HFSRC_DIR)/failsafe.h \
       $(HFSRC_DIR)/led.h \
       $(HFSRC_DIR)/motor.h \
       $(HFSRC_DIR)/rx_status.h
-	@echo arming.c
+	@echo arming.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/arming.o $(CFLAGS) \
-		$(HFSRC_DIR)/arming.c
+		$(HFSRC_DIR)/arming.cpp
 
-$(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.c \
+$(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.cpp \
 	  $(HFSRC_DIR)/msp.h \
 	  $(HFSRC_DIR)/datatypes.h
-	@echo debug.c
-	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/debug.o $(CFLAGS) $(HFSRC_DIR)/debug.c
+	@echo debug.cpp
+	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/debug.o $(CFLAGS) $(HFSRC_DIR)/debug.cpp
 
-$(OBJECT_DIR)/failsafe.o: $(HFSRC_DIR)/failsafe.c \
+$(OBJECT_DIR)/failsafe.o: $(HFSRC_DIR)/failsafe.cpp \
 	  $(HFSRC_DIR)/arming.h \
 	  $(HFSRC_DIR)/debug.h \
 	  $(HFSRC_DIR)/failsafe.h \
 	  $(HFSRC_DIR)/rx.h \
 	  $(HFSRC_DIR)/rx_status.h \
 	  $(HFSRC_DIR)/time.h
-	@echo failsafe.c
-	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/failsafe.o $(CFLAGS) $(HFSRC_DIR)/failsafe.c
+	@echo failsafe.cpp
+	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/failsafe.o $(CFLAGS) $(HFSRC_DIR)/failsafe.cpp
 
-$(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.c \
+$(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
 	  $(HFSRC_DIR)/core_rate.h \
 	  $(HFSRC_DIR)/datatypes.h \
 	  $(HFSRC_DIR)/debug.h \
@@ -365,21 +364,21 @@ $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.c \
 	  $(HFSRC_DIR)/stats.h \
 	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
-	@echo gyro.c
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HFSRC_DIR)/gyro.c
+	@echo gyro.cpp
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HFSRC_DIR)/gyro.cpp
 
-$(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.c \
+$(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.cpp \
 	  $(HFSRC_DIR)/led.h \
 	  $(HFSRC_DIR)/time.h 
-	@echo led.c
-	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/led.o $(CFLAGS) $(HFSRC_DIR)/led.c
+	@echo led.cpp
+	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/led.o $(CFLAGS) $(HFSRC_DIR)/led.cpp
 
-$(OBJECT_DIR)/maths.o: $(HFSRC_DIR)/maths.c \
+$(OBJECT_DIR)/maths.o: $(HFSRC_DIR)/maths.cpp \
 	  $(HFSRC_DIR)/maths.h
 	@echo maths.c
-	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/maths.o $(CFLAGS) $(HFSRC_DIR)/maths.c
+	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/maths.o $(CFLAGS) $(HFSRC_DIR)/maths.cpp
 
-$(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.c \
+$(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.cpp \
 	  $(HFSRC_DIR)/datatypes.h \
 	  $(HFSRC_DIR)/debug.h \
 	  $(HFSRC_DIR)/motor.h \
@@ -388,8 +387,8 @@ $(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.c \
 	  $(HFSRC_DIR)/serial.h \
 	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
-	@echo msp.c
-	$(V1) $(CROSS_CXX) -c -std=c++20 -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HFSRC_DIR)/msp.c
+	@echo msp.cpp
+	$(V1) $(CROSS_CXX) -c -std=c++20 -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HFSRC_DIR)/msp.cpp
 
 define compile_file
 	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
