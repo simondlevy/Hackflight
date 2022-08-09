@@ -114,7 +114,7 @@ endif
 .DEFAULT_GOAL := hex
 
 #include $(ROOT)/make/csource.mk
-COMMON_SRC = \
+STM32_SRC = \
             imu_mpu6000.c \
             dshot.c \
             dshot_dpwm.c \
@@ -144,7 +144,7 @@ COMMON_SRC = \
             $(addprefix config/,$(notdir $(wildcard $(STM_SRC_DIR)/config/*.c)))
 
 COMMON_DEVICE_SRC =  $(CMSIS_SRC) $(DEVICE_STDPERIPH_SRC)
-COMMON_SRC := $(COMMON_SRC) $(COMMON_DEVICE_SRC)
+COMMON_SRC := $(STM32_SRC) $(COMMON_DEVICE_SRC)
 
 
 # Search path and source files for the ST stdperiph library
