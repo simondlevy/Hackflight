@@ -296,18 +296,6 @@ $(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c \
 	@echo hackflight.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(HFSRC_DIR)/hackflight.c
 
-$(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.c \
-	  $(HFSRC_DIR)/datatypes.h \
-	  $(HFSRC_DIR)/debug.h \
-	  $(HFSRC_DIR)/motor.h \
-	  $(HFSRC_DIR)/msp.h \
-	  $(HFSRC_DIR)/rad2deg.h \
-	  $(HFSRC_DIR)/serial.h \
-	  $(HFSRC_DIR)/system.h \
-	  $(HFSRC_DIR)/time.h
-	@echo msp.c
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HFSRC_DIR)/msp.c
-
 $(OBJECT_DIR)/rx.o: $(HFSRC_DIR)/rx.c \
 	  $(HFSRC_DIR)/arming.h \
 	  $(HFSRC_DIR)/core_dt.h \
@@ -390,6 +378,18 @@ $(OBJECT_DIR)/maths.o: $(HFSRC_DIR)/maths.c \
 	  $(HFSRC_DIR)/maths.h
 	@echo maths.c
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/maths.o $(CFLAGS) $(HFSRC_DIR)/maths.c
+
+$(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.c \
+	  $(HFSRC_DIR)/datatypes.h \
+	  $(HFSRC_DIR)/debug.h \
+	  $(HFSRC_DIR)/motor.h \
+	  $(HFSRC_DIR)/msp.h \
+	  $(HFSRC_DIR)/rad2deg.h \
+	  $(HFSRC_DIR)/serial.h \
+	  $(HFSRC_DIR)/system.h \
+	  $(HFSRC_DIR)/time.h
+	@echo msp.c
+	$(V1) $(CROSS_CXX) -c -std=c++20 -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HFSRC_DIR)/msp.c
 
 define compile_file
 	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<

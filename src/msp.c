@@ -254,7 +254,7 @@ static mspResult_e fcProcessCommand(
     //(void)srcDesc;
     (void)mspPostProcessFn;
 
-    int ret = MSP_RESULT_ACK;
+    mspResult_e ret = MSP_RESULT_ACK;
     sbuf_t *dst = &reply->buf;
     sbuf_t *src = &cmd->buf;
     const int16_t cmdMSP = cmd->cmd;
@@ -457,7 +457,7 @@ static mspPostProcessFnPtr serialProcessReceivedCommand(
 
     mspPacket_t command = {
         .buf = { .ptr = msp->inBuf, .end = msp->inBuf + msp->dataSize, },
-        .cmd = msp->cmdMSP,
+        .cmd = (int16_t)msp->cmdMSP,
         .result = 0,
         .direction = MSP_DIRECTION_REQUEST,
     };
@@ -514,8 +514,9 @@ static void serialProcessReceivedReply(
             .ptr = msp->inBuf,
             .end = msp->inBuf + msp->dataSize,
         },
-        .cmd = msp->cmdMSP,
+        .cmd = (int16_t)msp->cmdMSP,
         .result = 0,
+        .direction = 0,
     };
 
     mspProcessReplyFn(&reply);
