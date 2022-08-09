@@ -187,7 +187,6 @@ CC_NO_OPTIMISATION      :=
 
 CFLAGS     += $(ARCH_FLAGS) \
               $(addprefix -I,$(INCLUDE_DIRS)) \
-              -std=gnu11 \
               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
 			  -Wno-unused-function \
               -ffunction-sections \
@@ -211,7 +210,7 @@ ASFLAGS     = $(ARCH_FLAGS) \
 
 LD_FLAGS     = -lm \
               -nostartfiles \
-              --specs=nano.specs \
+              --specs=nosys.specs \
               -lc \
               -lnosys \
               $(ARCH_FLAGS) \
