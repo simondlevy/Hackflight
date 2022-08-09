@@ -115,7 +115,6 @@ endif
 
 #include $(ROOT)/make/csource.mk
 COMMON_SRC = \
-            ./main.c \
             imu_mpu6000.c \
             dshot.c \
             dshot_dpwm.c \
@@ -267,6 +266,7 @@ $(TARGET_DFU): $(TARGET_HEX)
 	$(V1) $(PYTHON) $(DFUSE-PACK) -i $< $@
 
 $(TARGET_ELF): $(TARGET_OBJS) \
+		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/arming.o \
 		  $(OBJECT_DIR)/debug.o \
 		  $(OBJECT_DIR)/failsafe.o \
@@ -282,6 +282,11 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 	$(V1) $(CROSS_CC) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
 # C ===========================================================================
+
+$(OBJECT_DIR)/main.o: main.c \
+	  dshot_command.h
+	@echo main.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/main.o $(CFLAGS) main.c
 
 $(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c \
 	  $(HFSRC_DIR)/arming.h \
