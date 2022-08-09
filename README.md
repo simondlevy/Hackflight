@@ -51,7 +51,7 @@ More generally, Hackflight attempts to maintain a simple relationship between
 the code and the elements of the flight-control flow diagram shown below:
 
 <p align="center"> 
-<img src="media/dataflow.png" width=700>
+<img src="media/dataflow2.png" width=700>
 </p>
 
 ## Ground Control Station
