@@ -292,21 +292,7 @@ $(OBJECT_DIR)/main.o: main.c \
       $(HFSRC_DIR)/imu_alignment/rotate_270.h \
       $(HFSRC_DIR)/mixers/fixedpitch/quadxbf.h \
       $(HFSRC_DIR)/rx/sbus.h \
-      $(HFSRC_DIR)/serial.h \
-	  dshot_command.h \
-      bus_spi.h \
-      dshot_command.h \
-      exti.h \
-      flash.h \
-      inverter.h \
-      io.h \
-      motordev.h \
-      pinio.h \
-      serialdev.h \
-      serial_uart.h \
-      systemdev.h \
-      timer.h \
-      usb_io.h
+      $(HFSRC_DIR)/serial.h
 	@echo main.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/main.o $(CFLAGS) main.c
 
