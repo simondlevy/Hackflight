@@ -75,12 +75,7 @@ class Hackflight : HackflightCore {
                 uint8_t ledPin) 
             : HackflightCore(anglePidConstants, mixer)
         {
-            (void)rxDeviceFuns;
-            (void)rxDevPort;
-            (void)motorDevice;
-            (void)imuInterruptPin;
             (void)imuAlign;
-            (void)ledPin;
 
             mspInit();
             imuInit(imuInterruptPin);
@@ -89,7 +84,6 @@ class Hackflight : HackflightCore {
             failsafeInit();
             failsafeReset();
 
-#if 0
             m_rx.devCheck = rxDeviceFuns->check;
             m_rx.devConvert = rxDeviceFuns->convert;
 
@@ -99,6 +93,7 @@ class Hackflight : HackflightCore {
 
             m_motorDevice = motorDevice;
 
+#if 0
             initTask(&m_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
 
             initTask(&m_rxTask, task_rx,  RX_TASK_RATE);
