@@ -42,12 +42,6 @@ class Hackflight : HackflightCore {
 
     friend class Task;
 
-    public: // to support tasks
-
-        arming_t     m_arming;
-        Gyro         m_gyro;
-        imu_fusion_t m_imuFusionPrev;
-
     private:
 
         // Wait at start of scheduler loop if gyroSampleTask is nearly due
@@ -93,6 +87,8 @@ class Hackflight : HackflightCore {
         AttitudeTask  m_attitudeTask;
         task_t        m_mspTask;
         ReceiverTask  m_rxTask;
+
+        new_hackflight_t m_hackflight;
 
         imu_align_fun    m_imuAlignFun;
         float            m_maxArmingAngle;
