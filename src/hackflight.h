@@ -162,4 +162,30 @@ class HackflightCore {
             m_pidControllers[m_pidCount].data = data;
             m_pidCount++;
         }
+
+        void runCoreTasks(
+                uint32_t usec,
+                bool failsafe,
+                motor_config_t * motorConfig,
+                float motorvals[])
+        {
+            // Run PID controllers to get new demands
+            for (uint8_t k=0; k<m_pidCount; ++k) {
+                pid_controller_t pid = m_pidControllers[k];
+                pid.fun(usec, &m_demands, pid.data, &m_vstate, m_pidReset);
+            }
+
+            // Constrain the demands, negating yaw to make it agree with PID
+            demands_t * demands = &m_demands;
+            demands->roll  =
+                constrain_demand(demands->roll, PIDSUM_LIMIT, PID_MIXER_SCALING);
+            demands->pitch =
+                constrain_demand(demands->pitch, PIDSUM_LIMIT, PID_MIXER_SCALING);
+            demands->yaw   =
+                -constrain_demand(demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
+
+            // Run the mixer to get motors from demands
+            m_mixer(&m_demands, failsafe, motorConfig, motorvals);
+        }
+
 };
