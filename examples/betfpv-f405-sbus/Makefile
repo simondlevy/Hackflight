@@ -284,19 +284,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 
 # C ===========================================================================
 
-$(OBJECT_DIR)/main.o: main.cpp \
-	  hardware_init.h \
-	  $(HFSRC_DIR)/core_rate.h \
-      $(HFSRC_DIR)/datatypes.h \
-      $(HFSRC_DIR)/hackflight_full.h \
-      $(HFSRC_DIR)/imu.h \
-      $(HFSRC_DIR)/imu_alignment/rotate_270.h \
-      $(HFSRC_DIR)/mixers/fixedpitch/quadxbf.h \
-      $(HFSRC_DIR)/rx/sbus.h \
-      $(HFSRC_DIR)/serial.h
-	@echo main.cpp
-	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/main.o $(CFLAGS) main.cpp
-
 $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 	  hardware_init.h \
 	  dshot_command.h \
@@ -358,6 +345,19 @@ $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32_clock.o $(CFLAGS) $(HFSRC_DIR)/stm32_clock.c
 
 # C++ ==========================================================================
+
+$(OBJECT_DIR)/main.o: main.cpp \
+	  hardware_init.h \
+	  $(HFSRC_DIR)/core_rate.h \
+      $(HFSRC_DIR)/datatypes.h \
+      $(HFSRC_DIR)/hackflight_full.h \
+      $(HFSRC_DIR)/imu.h \
+      $(HFSRC_DIR)/imu_alignment/rotate_270.h \
+      $(HFSRC_DIR)/mixers/fixedpitch/quadxbf.h \
+      $(HFSRC_DIR)/rx/sbus.h \
+      $(HFSRC_DIR)/serial.h
+	@echo main.cpp
+	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/main.o $(CFLAGS) main.cpp
 
 $(OBJECT_DIR)/arming.o: $(HFSRC_DIR)/arming.cpp \
       $(HFSRC_DIR)/arming.h \
