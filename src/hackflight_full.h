@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "datatypes.h"
+#include "hackflight.h"
 
 void hackflightInitFull(
         hackflight_t * hf,

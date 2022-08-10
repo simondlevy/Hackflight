@@ -188,4 +188,4 @@ class HackflightCore {
             m_mixer(&m_demands, failsafe, motorConfig, motorvals);
         }
 
-};
+}; // class Hackflight
