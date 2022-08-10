@@ -136,10 +136,8 @@ static void calibrate(gyro_t * gyro)
 
 // ============================================================================
 
-void gyroInit(hackflight_t * hf)
+void gyroInit(gyro_t * gyro)
 {
-    gyro_t * gyro = &hf->gyro;
-
     initLowpassFilterLpf(gyro, FILTER_LPF1, LPF1_DYN_MIN_HZ, CORE_PERIOD());
 
     gyro->downsampleFilterEnabled = initLowpassFilterLpf(
@@ -152,11 +150,9 @@ void gyroInit(hackflight_t * hf)
     setCalibrationCycles(gyro); // start calibrating
 }
 
-void gyroReadScaled(hackflight_t * hf, vehicle_state_t * vstate)
+void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
 {
     if (!gyroIsReady()) return;
-
-    gyro_t * gyro = &hf->gyro;
 
     bool calibrationComplete = gyro->calibration.cyclesRemaining <= 0;
 
@@ -170,7 +166,7 @@ void gyroReadScaled(hackflight_t * hf, vehicle_state_t * vstate)
         _adc.y = gyroReadRaw(1) - gyro->zero[1];
         _adc.z = gyroReadRaw(2) - gyro->zero[2];
 
-        hf->imuAlignFun(&_adc);
+        align(&_adc);
 
     } else {
         calibrate(gyro);

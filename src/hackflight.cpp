@@ -215,7 +215,7 @@ static void checkCoreTasks(
         loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
     }
 
-    gyroReadScaled(hf, &hf->vstate);
+    gyroReadScaled(&hf->gyro, hf->imuAlignFun, &hf->vstate);
 
     uint32_t usec = timeMicros();
 
@@ -392,7 +392,7 @@ void hackflightInitFull(
         uint8_t ledPin)
 {
     mspInit();
-    gyroInit(hf);
+    gyroInit(&hf->gyro);
     imuInit(hf, imuInterruptPin);
     ledInit(ledPin);
     ledFlash(10, 50);

@@ -26,11 +26,11 @@ extern "C" {
 
     void     gyroDevInit(void);
     int32_t  gyroGetSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles);
-    void     gyroInit(hackflight_t * hf);
+    void     gyroInit(gyro_t * gyro);
     uint32_t gyroInterruptCount(void);
     bool     gyroIsReady(void);
     int16_t  gyroReadRaw(uint8_t k);
-    void     gyroReadScaled(hackflight_t * hf, vehicle_state_t * vstate);
+    void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate);
     uint16_t gyroScaleDps(void);
     uint32_t gyroSyncTime(void);
 
