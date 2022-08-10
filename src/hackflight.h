@@ -99,3 +99,8 @@ static void hackflightInit(
 
     hackflightAddPidController(hf, anglePidUpdate, &hf->anglepid);
 }
+
+class HackflightCore {
+
+
+};
