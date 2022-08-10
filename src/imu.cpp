@@ -216,11 +216,11 @@ void imuGetEulerAngles(
         uint32_t time,
         vehicle_state_t * vstate)
 {
-    quaternion_t quat = {0,0,0,0};
+    quaternion_t quat = {};
 
     getQuaternion(gyro, arming, fusionPrev, time, &quat);
 
-    rotation_t rot = {0,0,0};
+    rotation_t rot = {};
 
     quat2euler(&quat, vstate, &rot);
 
