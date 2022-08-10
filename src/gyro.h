@@ -177,5 +177,131 @@ class Gyro {
             --m_calibration.cyclesRemaining;
         }
 
+        void accumulate(void)
+        {
+            static float _adcf[3];
+
+            // integrate using trapezium rule to avoid bias
+            m_accum.values.x += 0.5f * (_adcf[0] + m_dps_filtered[0]) * CORE_PERIOD();
+            m_accum.values.y += 0.5f * (_adcf[1] + m_dps_filtered[1]) * CORE_PERIOD();
+            m_accum.values.z += 0.5f * (_adcf[2] + m_dps_filtered[2]) * CORE_PERIOD();
+
+            m_accum.count++;
+
+            for (int axis = 0; axis < 3; axis++) {
+                _adcf[axis] = m_dps_filtered[axis];
+            }
+        }
+
+
+    public:
+
+        Gyro(void)
+        {
+            initLowpassFilterLpf(FILTER_LPF1, LPF1_DYN_MIN_HZ, CORE_PERIOD());
+
+            m_downsampleFilterEnabled = initLowpassFilterLpf(
+                    FILTER_LPF2,
+                    LPF2_STATIC_HZ,
+                    CORE_PERIOD()
+                    );
+
+            setCalibrationCycles(); // start calibrating
+        }
+
+        void readScaled(imu_align_fun align, vehicle_state_t * vstate)
+        {
+            if (!gyroIsReady()) return;
+
+            bool calibrationComplete = m_calibration.cyclesRemaining <= 0;
+
+            static axes_t _adc;
+
+            if (calibrationComplete) {
+
+                // move 16-bit gyro data into floats to avoid overflows in
+                // calculations
+
+                _adc.x = gyroReadRaw(0) - m_zero[0];
+                _adc.y = gyroReadRaw(1) - m_zero[1];
+                _adc.z = gyroReadRaw(2) - m_zero[2];
+
+                align(&_adc);
+
+            } else {
+                calibrate();
+            }
+
+            if (calibrationComplete) {
+                m_dps[0] = _adc.x * (gyroScaleDps() / 32768.);
+                m_dps[1] = _adc.y * (gyroScaleDps() / 32768.);
+                m_dps[2] = _adc.z * (gyroScaleDps() / 32768.);
+            }
+
+            if (m_downsampleFilterEnabled) {
+                // using gyro lowpass 2 filter for downsampling
+                m_sampleSum[0] = m_lowpass2FilterApplyFn(
+                        (filter_t *)&m_lowpass2Filter[0], m_dps[0]);
+                m_sampleSum[1] = m_lowpass2FilterApplyFn(
+                        (filter_t *)&m_lowpass2Filter[1], m_dps[1]);
+                m_sampleSum[2] = m_lowpass2FilterApplyFn(
+                        (filter_t *)&m_lowpass2Filter[2], m_dps[2]);
+            } else {
+                // using simple averaging for downsampling
+                m_sampleSum[0] += m_dps[0];
+                m_sampleSum[1] += m_dps[1];
+                m_sampleSum[2] += m_dps[2];
+                m_sampleCount++;
+            }
+
+            for (int axis = 0; axis < 3; axis++) {
+
+                // downsample the individual gyro samples
+                float dps_filtered = 0;
+                if (m_downsampleFilterEnabled) {
+                    // using gyro lowpass 2 filter for downsampling
+                    dps_filtered = m_sampleSum[axis];
+                } else {
+                    // using simple average for downsampling
+                    if (m_sampleCount) {
+                        dps_filtered = m_sampleSum[axis] / m_sampleCount;
+                    }
+                    m_sampleSum[axis] = 0;
+                }
+
+                // apply static notch filters and software lowpass filters
+                dps_filtered =
+                    m_lowpassFilterApplyFn((filter_t *)&m_lowpassFilter[axis],
+                            dps_filtered);
+
+                m_dps_filtered[axis] = dps_filtered;
+            }
+
+            m_sampleCount = 0;
+
+            // Used for fusion with accelerometer
+            accumulate();
+
+            vstate->dphi   = m_dps_filtered[0];
+            vstate->dtheta = m_dps_filtered[1];
+            vstate->dpsi   = m_dps_filtered[2];
+
+            m_isCalibrating = !calibrationComplete;
+        }
+
+        static int32_t getSkew(
+                uint32_t nextTargetCycles,
+                int32_t desiredPeriodCycles)
+        {
+            int32_t skew = cmpTimeCycles(nextTargetCycles, gyroSyncTime()) %
+                desiredPeriodCycles;
+
+            if (skew > (desiredPeriodCycles / 2)) {
+                skew -= desiredPeriodCycles;
+            }
+
+            return skew;
+        }
+
 }; // class Gyro
 
