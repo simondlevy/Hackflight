@@ -380,7 +380,7 @@ $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
 	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
 	@echo gyro.cpp
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HFSRC_DIR)/gyro.cpp
+	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HFSRC_DIR)/gyro.cpp
 
 $(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.cpp \
 	  $(HFSRC_DIR)/led.h \
