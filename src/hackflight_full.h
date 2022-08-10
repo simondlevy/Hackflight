@@ -47,7 +47,7 @@ class Hackflight : HackflightCore {
 
         arming_t         m_arming;
         task_t           m_attitudeTask;
-        gyro_t           m_gyro;
+        Gyro             m_gyro;
         imu_align_fun    m_imuAlignFun;
         imu_fusion_t     m_imuFusionPrev;
         float            m_maxArmingAngle;
