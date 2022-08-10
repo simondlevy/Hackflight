@@ -16,6 +16,8 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <math.h>
 
 #include "datatypes.h"
@@ -24,12 +26,12 @@
 extern "C" {
 #endif
 
-    void devClear(stdev_t *dev)
+    static void devClear(stdev_t *dev)
     {
         dev->m_n = 0;
     }
 
-    void devPush(stdev_t *dev, float x)
+    static void devPush(stdev_t *dev, float x)
     {
         dev->m_n++;
         if (dev->m_n == 1) {
@@ -43,12 +45,12 @@ extern "C" {
         }
     }
 
-    float devVariance(stdev_t *dev)
+    static float devVariance(stdev_t *dev)
     {
         return ((dev->m_n > 1) ? dev->m_newS / (dev->m_n - 1) : 0.0f);
     }
 
-    float devStandardDeviation(stdev_t *dev)
+    static float devStandardDeviation(stdev_t *dev)
     {
         return sqrtf(devVariance(dev));
     }

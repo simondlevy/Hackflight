@@ -16,16 +16,7 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "core_rate.h"
-#include "datatypes.h"
-#include "debug.h"
 #include "gyro.h"
-#include "imu.h"
-#include "maths.h"
-#include "pt1_filter.h"
-#include "stats.h"
-#include "system.h"
-#include "time.h"
 
 static const uint32_t CALIBRATION_DURATION           = 1250000;
 static const uint16_t LPF1_DYN_MIN_HZ                = 250;
