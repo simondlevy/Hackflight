@@ -150,14 +150,19 @@ static void mahony(
     quat_new->z = qz * recipNorm;
 }
 
-static void update(hackflight_t * hf, imu_fusion_t * fusionPrev, uint32_t time, quaternion_t * quat, rotation_t * rot)
+static void update(
+        gyro_t * gyro,
+        imu_fusion_t * fusionPrev,
+        uint32_t time,
+        quaternion_t * quat,
+        rotation_t * rot)
 {
     imu_fusion_t fusion;
     fusion.time = time;
     memcpy(&fusion.quat, quat, sizeof(quaternion_t));
     memcpy(&fusion.rot, rot, sizeof(rotation_t));
     memcpy(fusionPrev, &fusion, sizeof(imu_fusion_t));
-    memset(&hf->gyro.accum, 0, sizeof(imu_sensor_t));
+    memset(&gyro->accum, 0, sizeof(imu_sensor_t));
 }
 
 static void getQuaternion(
@@ -218,5 +223,5 @@ void imuGetEulerAngles(
 
     quat2euler(&quat, &hf->vstate, &rot);
 
-    update(hf, fusionPrev, time, &quat, &rot);
+    update(gyro, fusionPrev, time, &quat, &rot);
 }
