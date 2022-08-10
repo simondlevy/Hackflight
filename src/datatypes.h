@@ -486,7 +486,7 @@ typedef void (*mixer_t)(
 typedef struct {
 
     arming_t         arming;
-    anglePid_t      anglepid;
+    anglePid_t       anglepid;
     task_t           attitudeTask;
     demands_t        demands;
     gyro_t           gyro;

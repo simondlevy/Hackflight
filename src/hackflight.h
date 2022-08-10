@@ -102,27 +102,42 @@ static void hackflightInit(
 
 class HackflightCore {
 
-    arming_t         arming;
-    anglePid_t       anglepid;
-    task_t           attitudeTask;
-    demands_t        demands;
-    gyro_t           gyro;
-    imu_align_fun    imuAlignFun;
-    imu_fusion_t     imuFusionPrev;
-    float            maxArmingAngle;
-    mixer_t          mixer;
-    void *           motorDevice;
-    float            mspMotors[4];
-    task_t           mspTask;
-    pid_controller_t pidControllers[10];
-    uint8_t          pidCount;
-    bool             pidReset;
-    rx_t             rx;
-    task_t           rxTask;
-    rx_axes_t        rxAxes;
-    scheduler_t      scheduler;
-    task_t           sensorTasks[10];
-    uint8_t          sensorTaskCount;
-    vehicle_state_t  vstate;
+    private:
+
+        // Scheduling constants
+
+        static const uint32_t RX_TASK_RATE       = 33;
+        static const uint32_t ATTITUDE_TASK_RATE = 100;
+
+        // PID-limiting constants
+
+        static constexpr float    PID_MIXER_SCALING = 1000;
+        static constexpr uint16_t PIDSUM_LIMIT_YAW  = 400;
+        static constexpr uint16_t PIDSUM_LIMIT      = 500;
+
+        // Instance variable
+
+        arming_t         arming;
+        anglePid_t       anglepid;
+        task_t           attitudeTask;
+        demands_t        demands;
+        gyro_t           gyro;
+        imu_align_fun    imuAlignFun;
+        imu_fusion_t     imuFusionPrev;
+        float            maxArmingAngle;
+        mixer_t          mixer;
+        void *           motorDevice;
+        float            mspMotors[4];
+        task_t           mspTask;
+        pid_controller_t pidControllers[10];
+        uint8_t          pidCount;
+        bool             pidReset;
+        rx_t             rx;
+        task_t           rxTask;
+        rx_axes_t        rxAxes;
+        scheduler_t      scheduler;
+        task_t           sensorTasks[10];
+        uint8_t          sensorTaskCount;
+        vehicle_state_t  vstate;
 
 };

@@ -4,7 +4,7 @@
 
 ## Intro
 
-Hackflight is a software toolkit for building multirotor flight
+Hackflight is a C++ software toolkit for building multirotor flight
 controllers and simulators.  It is geared toward people like me who want to tinker with
 flight-control firmware, and use it to teach students about ideas like inertial
 measurement and PID tuning.  <b>If you are in the 99% percent of users who just
