@@ -19,6 +19,7 @@
 #pragma once
 
 #include "attitude_task.h"
+#include "deg2rad.h"
 #include "receiver_task.h"
 #include "hackflight.h"
 #include "led.h"
@@ -52,6 +53,9 @@ class Hackflight : HackflightCore {
         // Scheduling constants
         static const uint32_t RX_TASK_RATE       = 33;
         static const uint32_t ATTITUDE_TASK_RATE = 100;
+
+        // Arming safety angle constant
+        static constexpr float MAX_ARMING_ANGLE = 25;
 
         // Essential tasks
         AttitudeTask  m_attitudeTask;
@@ -100,14 +104,12 @@ class Hackflight : HackflightCore {
 
             m_motorDevice = motorDevice;
 
-#if 0
-            initTask(&m_rxTask, task_rx,  RX_TASK_RATE);
-
             // Initialize quaternion in upright position
             m_imuFusionPrev.quat.w = 1;
 
             m_maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
+#if 0
             initTask(&m_mspTask, task_msp, MSP_TASK_RATE);
 
             scheduler_t * scheduler = &m_scheduler;
