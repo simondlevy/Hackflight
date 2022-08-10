@@ -198,14 +198,15 @@ class Hackflight : HackflightCore {
                 loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            /*
             // Tune out the time lost between completing the last task
             // execution and re-entering the scheduler
             if ((loopRemainingCycles < m_scheduler.loopStartMinCycles) &&
-                    (m_scheduler.loopStartCycles < m_scheduler.loopStartMaxCycles)) {
+                    (m_scheduler.loopStartCycles <
+                     m_scheduler.loopStartMaxCycles)) {
                 m_scheduler.loopStartCycles += m_scheduler.loopStartDeltaUpCycles;
             }
 
+            /*
             // Once close to the timing boundary, poll for its arrival
             if (loopRemainingCycles < m_scheduler.loopStartCycles) {
                 checkCoreTasks(
