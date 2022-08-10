@@ -49,13 +49,13 @@ class Hackflight : HackflightCore {
     private:
 
         // Scheduling constants
-
         static const uint32_t RX_TASK_RATE       = 33;
         static const uint32_t ATTITUDE_TASK_RATE = 100;
 
-        // Instance variable
+        // Essential tasks
+        AttitudeTask  m_attitudeTask;
+        //ReceiverTask  m_rxTask;
 
-        AttitudeTask     m_attitudeTask;
         imu_align_fun    m_imuAlignFun;
         float            m_maxArmingAngle;
         void *           m_motorDevice;
@@ -100,8 +100,6 @@ class Hackflight : HackflightCore {
             m_motorDevice = motorDevice;
 
 #if 0
-            initTask(&m_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
-
             initTask(&m_rxTask, task_rx,  RX_TASK_RATE);
 
             // Initialize quaternion in upright position

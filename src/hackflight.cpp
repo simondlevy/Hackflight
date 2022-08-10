@@ -100,7 +100,7 @@ static void task_rx(void * hackflight, uint32_t time)
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
-    rx_axes_t rxax = {{0, 0, 0, 0}, 0, 0};
+    rx_axes_t rxax = {};
 
     bool gotNewData = false;
 
