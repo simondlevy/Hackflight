@@ -50,9 +50,41 @@ class Hackflight : HackflightCore {
 
     private:
 
-        // Scheduling constants
-        static const uint32_t RX_TASK_RATE       = 33;
-        static const uint32_t ATTITUDE_TASK_RATE = 100;
+        // Wait at start of scheduler loop if gyroSampleTask is nearly due
+        static const uint32_t SCHED_START_LOOP_MIN_US = 1;   
+        static const uint32_t SCHED_START_LOOP_MAX_US = 12;
+
+        // Fraction of a us to reduce start loop wait
+        static const uint32_t SCHED_START_LOOP_DOWN_STEP = 50;  
+
+        // Fraction of a us to increase start loop wait
+        static const uint32_t SCHED_START_LOOP_UP_STEP = 1;   
+
+        // Add an amount to the estimate of a task duration
+        static const uint32_t TASK_GUARD_MARGIN_MIN_US = 3;   
+        static const uint32_t TASK_GUARD_MARGIN_MAX_US = 6;
+
+        // Fraction of a us to reduce task guard margin
+        static const uint32_t TASK_GUARD_MARGIN_DOWN_STEP = 50;  
+
+        // Fraction of a us to increase task guard margin
+        static const uint32_t TASK_GUARD_MARGIN_UP_STEP = 1;   
+
+        // Add a margin to the amount of time allowed for a check function to
+        // run
+        static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
+
+        // Some tasks have occasional peaks in execution time so normal moving
+        // average duration estimation doesn't work Decay the estimated max
+        // task duration by
+        // 1/(1 << TASK_EXEC_TIME_SHIFT) on every invocation
+        static const uint32_t TASK_EXEC_TIME_SHIFT = 7;
+
+        // Make aged tasks more schedulable
+        static const uint32_t TASK_AGE_EXPEDITE_COUNT = 1;   
+
+        // By scaling their expected execution time
+        static constexpr float TASK_AGE_EXPEDITE_SCALE = 0.9; 
 
         // Arming safety angle constant
         static constexpr float MAX_ARMING_ANGLE = 25;
@@ -109,9 +141,6 @@ class Hackflight : HackflightCore {
 
             m_maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
-#if 0
-            initTask(&m_mspTask, task_msp, MSP_TASK_RATE);
-
             scheduler_t * scheduler = &m_scheduler;
 
             scheduler->loopStartCycles =
@@ -146,8 +175,6 @@ class Hackflight : HackflightCore {
                 (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
 
             scheduler->clockRate = systemClockMicrosToCycles(1000000);        
-
-#endif
         }
 
         void step(void)
