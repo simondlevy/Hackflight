@@ -150,4 +150,11 @@ class HackflightCore {
 
             // addPidController(anglePidUpdate, &hf->anglepid);
         }
+
+        void addPidController(pid_fun_t fun, void * data)
+        {
+            m_pidControllers[m_pidCount].fun = fun;
+            m_pidControllers[m_pidCount].data = data;
+            m_pidCount++;
+        }
 };
