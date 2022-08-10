@@ -141,43 +141,87 @@ class Hackflight : HackflightCore {
 
             m_maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
-            scheduler_t * scheduler = &m_scheduler;
-
-            scheduler->loopStartCycles =
+            m_scheduler.loopStartCycles =
                 systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-            scheduler->loopStartMinCycles =
+            m_scheduler.loopStartMinCycles =
                 systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-            scheduler->loopStartMaxCycles =
+            m_scheduler.loopStartMaxCycles =
                 systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
-            scheduler->loopStartDeltaDownCycles =
+            m_scheduler.loopStartDeltaDownCycles =
                 systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
-            scheduler->loopStartDeltaUpCycles =
+            m_scheduler.loopStartDeltaUpCycles =
                 systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
 
-            scheduler->taskGuardMinCycles =
+            m_scheduler.taskGuardMinCycles =
                 systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
-            scheduler->taskGuardMaxCycles =
+            m_scheduler.taskGuardMaxCycles =
                 systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
-            scheduler->taskGuardCycles = scheduler->taskGuardMinCycles;
-            scheduler->taskGuardDeltaDownCycles =
+            m_scheduler.taskGuardCycles = m_scheduler.taskGuardMinCycles;
+            m_scheduler.taskGuardDeltaDownCycles =
                 systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
-            scheduler->taskGuardDeltaUpCycles =
+            m_scheduler.taskGuardDeltaUpCycles =
                 systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
 
-            scheduler->lastTargetCycles = systemGetCycleCounter();
+            m_scheduler.lastTargetCycles = systemGetCycleCounter();
 
-            scheduler->nextTimingCycles = scheduler->lastTargetCycles;
+            m_scheduler.nextTimingCycles = m_scheduler.lastTargetCycles;
 
-            scheduler->desiredPeriodCycles =
+            m_scheduler.desiredPeriodCycles =
                 (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
 
-            scheduler->guardMargin =
+            m_scheduler.guardMargin =
                 (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
 
-            scheduler->clockRate = systemClockMicrosToCycles(1000000);        
-        }
+            m_scheduler.clockRate = systemClockMicrosToCycles(1000000);        
+
+        } // constructor
 
         void step(void)
         {
-        }
+            uint32_t nextTargetCycles =
+                m_scheduler.lastTargetCycles + m_scheduler.desiredPeriodCycles;
+
+            // Realtime gyro/filtering/PID tasks get complete priority
+            uint32_t nowCycles = systemGetCycleCounter();
+
+            int32_t loopRemainingCycles =
+                cmpTimeCycles(nextTargetCycles, nowCycles);
+
+            if (loopRemainingCycles < -m_scheduler.desiredPeriodCycles) {
+                // A task has so grossly overrun that at entire gyro cycle has
+                // been skipped This is most likely to occur when connected to
+                // the configurator via USB as the serial task is
+                // non-deterministic Recover as best we can, advancing
+                // scheduling by a whole number of cycles
+                nextTargetCycles += m_scheduler.desiredPeriodCycles * (1 +
+                        (loopRemainingCycles / -m_scheduler.desiredPeriodCycles));
+                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+            }
+
+            /*
+            // Tune out the time lost between completing the last task
+            // execution and re-entering the scheduler
+            if ((loopRemainingCycles < m_scheduler.loopStartMinCycles) &&
+                    (m_scheduler.loopStartCycles < m_scheduler.loopStartMaxCycles)) {
+                m_scheduler.loopStartCycles += m_scheduler.loopStartDeltaUpCycles;
+            }
+
+            // Once close to the timing boundary, poll for its arrival
+            if (loopRemainingCycles < m_scheduler.loopStartCycles) {
+                checkCoreTasks(
+                        hf,
+                        loopRemainingCycles,
+                        nowCycles,
+                        nextTargetCycles);
+            }
+
+            int32_t newLoopRemainingCyles =
+                cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
+
+            if (newLoopRemainingCyles > m_scheduler.guardMargin) {
+                checkDynamicTasks(hf, newLoopRemainingCyles, nextTargetCycles);
+            }
+            */
+
+        } // step()
 };
