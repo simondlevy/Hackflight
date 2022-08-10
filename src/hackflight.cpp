@@ -84,7 +84,7 @@ static const float MAX_ARMING_ANGLE = 25;
 static void task_attitude(void * hackflight, uint32_t time)
 {
     hackflight_t * hf = (hackflight_t *)hackflight;
-    imuGetEulerAngles(hf, time);
+    imuGetEulerAngles(hf, &hf->imuFusionPrev, time);
 }
 
 // RX polling task ------------------------------------------------------------

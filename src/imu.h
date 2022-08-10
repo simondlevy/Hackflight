@@ -22,7 +22,7 @@
 
 void imuAccumulateGyro(gyro_t * gyro);
 
-void imuGetEulerAngles(hackflight_t * hf, uint32_t time);
+void imuGetEulerAngles(hackflight_t * hf, imu_fusion_t * imuFusionPrev, uint32_t time);
 
 #if defined(__cplusplus)
 extern "C" {

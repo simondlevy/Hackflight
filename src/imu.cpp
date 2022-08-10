@@ -150,26 +150,24 @@ static void mahony(
     quat_new->z = qz * recipNorm;
 }
 
-static void update(hackflight_t * hf, uint32_t time, quaternion_t * quat, rotation_t * rot)
+static void update(hackflight_t * hf, imu_fusion_t * fusionPrev, uint32_t time, quaternion_t * quat, rotation_t * rot)
 {
     imu_fusion_t fusion;
     fusion.time = time;
     memcpy(&fusion.quat, quat, sizeof(quaternion_t));
     memcpy(&fusion.rot, rot, sizeof(rotation_t));
-    memcpy(&hf->imuFusionPrev, &fusion, sizeof(imu_fusion_t));
+    memcpy(fusionPrev, &fusion, sizeof(imu_fusion_t));
     memset(&hf->gyro.accum, 0, sizeof(imu_sensor_t));
 }
 
-static void getQuaternion(hackflight_t * hf, uint32_t time, quaternion_t * quat)
+static void getQuaternion(hackflight_t * hf, imu_fusion_t * fusionPrev, uint32_t time, quaternion_t * quat)
 {
-    int32_t deltaT = time - hf->imuFusionPrev.time;
+    int32_t deltaT = time - fusionPrev->time;
 
     axes_t gyroAvg = {};
     getAverage(&hf->gyro.accum, CORE_PERIOD(), &gyroAvg);
 
     float dt = deltaT * 1e-6;
-
-    imu_fusion_t * fusionPrev = &hf->imuFusionPrev;
 
     gyro_reset_t new_gyro_reset = {};
 
@@ -201,17 +199,17 @@ void imuAccumulateGyro(gyro_t * gyro)
     }
 }
 
-void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
+void imuGetEulerAngles(hackflight_t * hf, imu_fusion_t * fusionPrev, uint32_t time)
 {
     quaternion_t quat = {0,0,0,0};
 
-    getQuaternion(hf, time, &quat);
+    getQuaternion(hf, fusionPrev, time, &quat);
 
     rotation_t rot = {0,0,0};
 
     quat2euler(&quat, &hf->vstate, &rot);
 
-    update(hf, time, &quat, &rot);
+    update(hf, fusionPrev, time, &quat, &rot);
 }
 
 
