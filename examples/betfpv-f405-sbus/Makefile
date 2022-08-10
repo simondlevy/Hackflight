@@ -267,8 +267,8 @@ $(TARGET_DFU): $(TARGET_HEX)
 	$(V1) $(PYTHON) $(DFUSE-PACK) -i $< $@
 
 $(TARGET_ELF): $(TARGET_OBJS) \
-		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/hardware_init.o \
+		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/arming.o \
 		  $(OBJECT_DIR)/debug.o \
 		  $(OBJECT_DIR)/failsafe.o \
