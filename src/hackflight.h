@@ -127,7 +127,7 @@ class HackflightCore {
 
     public:
 
-        void Hackflight(anglePidConstants_t * anglePidConstants, mixer_t mixer)
+        HackflightCore(anglePidConstants_t * anglePidConstants, mixer_t mixer)
         {
             m_mixer = mixer;
 

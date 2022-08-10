@@ -236,7 +236,8 @@ void gyroReadScaled(hackflight_t * hf, vehicle_state_t * vstate)
 
 int32_t gyroGetSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
 {
-    int32_t gyroSkew = cmpTimeCycles(nextTargetCycles, gyroSyncTime()) % desiredPeriodCycles;
+    int32_t gyroSkew =
+        cmpTimeCycles(nextTargetCycles, gyroSyncTime()) % desiredPeriodCycles;
 
     if (gyroSkew > (desiredPeriodCycles / 2)) {
         gyroSkew -= desiredPeriodCycles;

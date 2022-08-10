@@ -19,6 +19,7 @@
 #pragma once
 
 #include "hackflight.h"
+#include "msp.h"
 
 void hackflightInitFull(
         hackflight_t * hf,
@@ -70,8 +71,81 @@ class Hackflight : HackflightCore {
                 void * motorDevice,
                 uint8_t imuInterruptPin,
                 imu_align_fun imuAlign,
-                uint8_t ledPin)
+                uint8_t ledPin) 
+            : HackflightCore(anglePidConstants, mixer)
         {
+            (void)rxDeviceFuns;
+            (void)rxDevPort;
+            (void)motorDevice;
+            (void)imuInterruptPin;
+            (void)imuAlign;
+            (void)ledPin;
+
+            mspInit();
+#if 0
+            gyroInit(this);
+            imuInit(this, imuInterruptPin);
+            ledInit(ledPin);
+            ledFlash(10, 50);
+            failsafeInit();
+            failsafeReset();
+
+            m_rx.devCheck = rxDeviceFuns->check;
+            m_rx.devConvert = rxDeviceFuns->convert;
+
+            rxDeviceFuns->init(rxDevPort);
+
+            m_imuAlignFun = imuAlign;
+
+            m_motorDevice = motorDevice;
+
+            initTask(&m_attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
+
+            initTask(&m_rxTask, task_rx,  RX_TASK_RATE);
+
+            // Initialize quaternion in upright position
+            m_imuFusionPrev.quat.w = 1;
+
+            m_maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+
+            initTask(&m_mspTask, task_msp, MSP_TASK_RATE);
+
+            scheduler_t * scheduler = &m_scheduler;
+
+            scheduler->loopStartCycles =
+                systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+            scheduler->loopStartMinCycles =
+                systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+            scheduler->loopStartMaxCycles =
+                systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
+            scheduler->loopStartDeltaDownCycles =
+                systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
+            scheduler->loopStartDeltaUpCycles =
+                systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
+
+            scheduler->taskGuardMinCycles =
+                systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
+            scheduler->taskGuardMaxCycles =
+                systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
+            scheduler->taskGuardCycles = scheduler->taskGuardMinCycles;
+            scheduler->taskGuardDeltaDownCycles =
+                systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
+            scheduler->taskGuardDeltaUpCycles =
+                systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
+
+            scheduler->lastTargetCycles = systemGetCycleCounter();
+
+            scheduler->nextTimingCycles = scheduler->lastTargetCycles;
+
+            scheduler->desiredPeriodCycles =
+                (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
+
+            scheduler->guardMargin =
+                (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
+
+            scheduler->clockRate = systemClockMicrosToCycles(1000000);        
+
+#endif
         }
 
         void step(void)
