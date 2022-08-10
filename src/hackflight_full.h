@@ -224,7 +224,7 @@ class Hackflight : HackflightCore {
             m_motorDevice = motorDevice;
 
             // Initialize quaternion in upright position
-            m_imuFusionPrev.quat.w = 1;
+            m_hackflight.imuFusionPrev.quat.w = 1;
 
             m_maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
