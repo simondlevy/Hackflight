@@ -487,6 +487,15 @@ typedef void (*mixer_t)(
 
 typedef struct {
 
+    arming_t        arming;
+    gyro_t          gyro;
+    imu_fusion_t    imuFusionPrev;
+    vehicle_state_t vstate;
+
+} new_hackflight_t;
+
+typedef struct {
+
     arming_t         arming;
     anglePid_t       anglepid;
     task_t           attitudeTask;

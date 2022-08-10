@@ -18,10 +18,10 @@
 
 #pragma once
 
+#include "attitude_task.h"
 #include "hackflight.h"
 #include "led.h"
 #include "msp.h"
-#include "task.h"
 
 void hackflightInitFull(
         hackflight_t * hf,
@@ -55,7 +55,7 @@ class Hackflight : HackflightCore {
 
         // Instance variable
 
-        task_t           m_attitudeTask;
+        AttitudeTask     m_attitudeTask;
         imu_align_fun    m_imuAlignFun;
         float            m_maxArmingAngle;
         void *           m_motorDevice;
