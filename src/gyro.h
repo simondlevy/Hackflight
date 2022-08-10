@@ -38,3 +38,32 @@ extern "C" {
 }
 #endif
 
+class Gyro {
+
+
+    private:
+
+        imu_sensor_t m_accum;
+        float m_dps[3];          // aligned, calibrated, scaled, unfiltered
+        float  m_dps_filtered[3]; // filtered 
+        uint8_t m_sampleCount;     // sample counter
+        float m_sampleSum[3];    // summed samples used for downsampling
+        bool  m_isCalibrating;
+
+        // if true then downsample using gyro lowpass 2, otherwise use averaging
+        bool m_downsampleFilterEnabled;      
+
+        gyroCalibration_t m_calibration;
+
+        // lowpass gyro soft filter
+        filterApplyFnPtr m_lowpassFilterApplyFn;
+        gyroLowpassFilter_t m_lowpassFilter[3];
+
+        // lowpass2 gyro soft filter
+        filterApplyFnPtr m_lowpass2FilterApplyFn;
+        gyroLowpassFilter_t m_lowpass2Filter[3];
+
+        float zero[3];
+
+}; // class Gyro
+
