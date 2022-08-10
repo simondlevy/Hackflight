@@ -213,7 +213,8 @@ void imuGetEulerAngles(
         hackflight_t * hf,
         gyro_t * gyro,
         imu_fusion_t * fusionPrev,
-        uint32_t time)
+        uint32_t time,
+        vehicle_state_t * vstate)
 {
     quaternion_t quat = {0,0,0,0};
 
@@ -221,7 +222,7 @@ void imuGetEulerAngles(
 
     rotation_t rot = {0,0,0};
 
-    quat2euler(&quat, &hf->vstate, &rot);
+    quat2euler(&quat, vstate, &rot);
 
     update(gyro, fusionPrev, time, &quat, &rot);
 }

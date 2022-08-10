@@ -26,7 +26,8 @@ void imuGetEulerAngles(
         hackflight_t * hf,
         gyro_t * gyro,
         imu_fusion_t * imuFusionPrev,
-        uint32_t time);
+        uint32_t time,
+        vehicle_state_t * vstate);
 
 #if defined(__cplusplus)
 extern "C" {
