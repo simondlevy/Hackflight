@@ -91,15 +91,14 @@ class Hackflight : HackflightCore {
 
         // Essential tasks
         AttitudeTask  m_attitudeTask;
-        //ReceiverTask  m_rxTask;
+        task_t        m_mspTask;
+        ReceiverTask  m_rxTask;
 
         imu_align_fun    m_imuAlignFun;
         float            m_maxArmingAngle;
         void *           m_motorDevice;
         float            m_mspMotors[4];
-        task_t           m_mspTask;
         rx_t             m_rx;
-        task_t           m_rxTask;
         rx_axes_t        m_rxAxes;
         scheduler_t      m_scheduler;
         task_t           m_sensorTasks[10];
