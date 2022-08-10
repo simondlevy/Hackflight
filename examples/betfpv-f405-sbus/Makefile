@@ -267,6 +267,7 @@ $(TARGET_DFU): $(TARGET_HEX)
 
 $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/main.o \
+		  $(OBJECT_DIR)/init.o \
 		  $(OBJECT_DIR)/arming.o \
 		  $(OBJECT_DIR)/debug.o \
 		  $(OBJECT_DIR)/failsafe.o \
@@ -308,6 +309,24 @@ $(OBJECT_DIR)/main.o: main.c \
       usb_io.h
 	@echo main.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/main.o $(CFLAGS) main.c
+
+$(OBJECT_DIR)/init.o: init.c \
+	  dshot_command.h \
+      bus_spi.h \
+      dshot_command.h \
+      exti.h \
+      flash.h \
+      inverter.h \
+      io.h \
+      motordev.h \
+      pinio.h \
+      serialdev.h \
+      serial_uart.h \
+      systemdev.h \
+      timer.h \
+      usb_io.h
+	@echo main.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/init.o $(CFLAGS) init.c
 
 $(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c \
 	  $(HFSRC_DIR)/arming.h \

@@ -29,44 +29,11 @@
 #include <rx/sbus.h>
 #include <serial.h>
 
-#include "bus_spi.h"
-#include "dshot_command.h"
-#include "exti.h"
-#include "flash.h"
-#include "inverter.h"
-#include "io.h"
-#include "motordev.h"
-#include "pinio.h"
-#include "serialdev.h"
-#include "serial_uart.h"
-#include "systemdev.h"
-#include "timer.h"
-#include "usb_io.h"
+#include "init.h"
 
 int main(void)
 {
-    systemInit();
-    ioInitGlobal();
-    extiInit();
-    systemClockSetHSEValue(8000000);
-    OverclockRebootIfNecessary(0);
-    timerInit();
-    serialUartPinConfigure();
-    serialInit(-1);
-    void * motorDevice = motorInitDshot(4);
-    inverterInit();
-    spiPinConfigure();
-    spiPreInit();
-    spiInit(0x07); // mask for devices 0,1,2
-    dshotSetPidLoopTime(CORE_PERIOD());
-    pinioInit();
-    usbCableDetectInit();
-    flashInit();
-    timerStart();
-    spiInitBusDMA();
-    motorPostInit(motorDevice);
-    motorEnable(motorDevice);
-    systemInitUnusedPins();
+    void * motorDevice = init(CORE_PERIOD());
 
     static anglePidConstants_t anglePidConstants = {
         1.441305,     // Rate Kp
