@@ -315,24 +315,6 @@ $(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c \
 	@echo hackflight.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(HFSRC_DIR)/hackflight.c
 
-$(OBJECT_DIR)/rx.o: $(HFSRC_DIR)/rx.c \
-	  $(HFSRC_DIR)/arming.h \
-	  $(HFSRC_DIR)/core_dt.h \
-	  $(HFSRC_DIR)/datatypes.h \
-	  $(HFSRC_DIR)/failsafe.h \
-	  $(HFSRC_DIR)/led.h \
-	  $(HFSRC_DIR)/maths.h \
-	  $(HFSRC_DIR)/motor.h \
-	  $(HFSRC_DIR)/pt3_filter.h \
-	  $(HFSRC_DIR)/pwm.h \
-	  $(HFSRC_DIR)/rx.h \
-	  $(HFSRC_DIR)/rx_rate.h \
-	  $(HFSRC_DIR)/rx_status.h \
-	  $(HFSRC_DIR)/scale.h \
-	  $(HFSRC_DIR)/time.h
-	@echo rx.c
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/rx.o $(CFLAGS) $(HFSRC_DIR)/rx.c
-
 $(OBJECT_DIR)/sbus.o: $(HFSRC_DIR)/rx/sbus.c \
 	  $(HFSRC_DIR)/datatypes.h \
 	  $(HFSRC_DIR)/serial.h \
@@ -422,6 +404,24 @@ $(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.cpp \
 	  $(HFSRC_DIR)/time.h
 	@echo msp.cpp
 	$(V1) $(CROSS_CXX) -c -std=c++20 -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HFSRC_DIR)/msp.cpp
+
+$(OBJECT_DIR)/rx.o: $(HFSRC_DIR)/rx.cpp \
+	  $(HFSRC_DIR)/arming.h \
+	  $(HFSRC_DIR)/core_dt.h \
+	  $(HFSRC_DIR)/datatypes.h \
+	  $(HFSRC_DIR)/failsafe.h \
+	  $(HFSRC_DIR)/led.h \
+	  $(HFSRC_DIR)/maths.h \
+	  $(HFSRC_DIR)/motor.h \
+	  $(HFSRC_DIR)/pt3_filter.h \
+	  $(HFSRC_DIR)/pwm.h \
+	  $(HFSRC_DIR)/rx.h \
+	  $(HFSRC_DIR)/rx_rate.h \
+	  $(HFSRC_DIR)/rx_status.h \
+	  $(HFSRC_DIR)/scale.h \
+	  $(HFSRC_DIR)/time.h
+	@echo rx.c
+	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/rx.o $(CFLAGS) $(HFSRC_DIR)/rx.cpp
 
 define compile_file
 	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<

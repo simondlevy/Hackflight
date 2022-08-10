@@ -206,10 +206,10 @@ static void initChannelRangeConfig(rxChannelRangeConfig_t  * config)
 // rxPoll
 static void readChannelsApplyRanges(rx_t * rx, float raw[])
 {
-    rxChannelRangeConfig_t rxChannelRangeConfigThrottle = {0};
-    rxChannelRangeConfig_t rxChannelRangeConfigRoll = {0};
-    rxChannelRangeConfig_t rxChannelRangeConfigPitch = {0};
-    rxChannelRangeConfig_t rxChannelRangeConfigYaw = {0};
+    rxChannelRangeConfig_t rxChannelRangeConfigThrottle = {};
+    rxChannelRangeConfig_t rxChannelRangeConfigRoll = {};
+    rxChannelRangeConfig_t rxChannelRangeConfigPitch = {};
+    rxChannelRangeConfig_t rxChannelRangeConfigYaw = {};
 
     initChannelRangeConfig(&rxChannelRangeConfigThrottle);
     initChannelRangeConfig(&rxChannelRangeConfigRoll);
@@ -734,6 +734,10 @@ static float getRawSetpoint(float command, float divider)
 
 // ----------------------------------------------------------------------------
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 // Called from hackflight.c::adjustRxDynamicPriority()
 bool rxCheck(rx_t * rx, uint32_t currentTimeUs)
 {
@@ -773,6 +777,11 @@ bool rxCheck(rx_t * rx, uint32_t currentTimeUs)
     // data driven or 50Hz
     return rx->dataProcessingRequired || rx->auxiliaryProcessingRequired; 
 }
+
+#if defined(__cplusplus)
+}
+#endif
+
 
 void rxPoll(
         rx_t * rx,
@@ -839,8 +848,8 @@ void rxGetDemands(
         anglePid_t * ratepid,
         demands_t * demands)
 {
-    float rawSetpoint[4] = {0};
-    float setpointRate[4] = {0};
+    float rawSetpoint[4] = {};
+    float setpointRate[4] = {};
 
     if (rx->gotNewData) {
 

@@ -50,13 +50,13 @@ extern "C" {
             bool * pidItermResetValue,
             bool * gotNewData);
 
+    bool rxCheck(rx_t * rx, uint32_t currentTimeUs);
+
 #if defined(__cplusplus)
 }
 #endif
 
 // For hardware impelmentations ------------------------------------------------
-
-bool rxCheck(rx_t * rx, uint32_t currentTimeUs);
 
 uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs);
 
