@@ -109,8 +109,7 @@ class Hackflight : HackflightCore {
                 uint32_t nowCycles,
                 uint32_t nextTargetCycles)
         {
-            /*
-            scheduler_t * scheduler = &_m_scheduler;
+            scheduler_t * scheduler = &m_scheduler;
 
             if (scheduler->loopStartCycles > scheduler->loopStartMinCycles) {
                 scheduler->loopStartCycles -= scheduler->loopStartDeltaDownCycles;
@@ -121,6 +120,7 @@ class Hackflight : HackflightCore {
                 loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
+            /*
             gyroReadScaled(&hf->gyro, hf->imuAlignFun, &hf->vstate);
 
             uint32_t usec = timeMicros();
