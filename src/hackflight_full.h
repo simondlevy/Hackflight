@@ -19,6 +19,7 @@
 #pragma once
 
 #include "hackflight.h"
+#include "led.h"
 #include "msp.h"
 
 void hackflightInitFull(
@@ -82,13 +83,13 @@ class Hackflight : HackflightCore {
             (void)ledPin;
 
             mspInit();
-#if 0
-            imuInit(this, imuInterruptPin);
+            imuInit(imuInterruptPin);
             ledInit(ledPin);
             ledFlash(10, 50);
             failsafeInit();
             failsafeReset();
 
+#if 0
             m_rx.devCheck = rxDeviceFuns->check;
             m_rx.devConvert = rxDeviceFuns->convert;
 
