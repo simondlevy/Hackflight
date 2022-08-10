@@ -40,8 +40,12 @@ extern "C" {
 
 class Gyro {
 
-
     private:
+
+        static const uint32_t CALIBRATION_DURATION           = 1250000;
+        static const uint16_t LPF1_DYN_MIN_HZ                = 250;
+        static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
+        static const uint16_t LPF2_STATIC_HZ                 = 500;
 
         imu_sensor_t m_accum;
         float m_dps[3];          // aligned, calibrated, scaled, unfiltered

@@ -246,6 +246,7 @@ typedef union {
 } gyroLowpassFilter_t;
 
 typedef struct {
+
     imu_sensor_t accum;
     float        dps[3];          // aligned, calibrated, scaled, unfiltered
     float        dps_filtered[3]; // filtered 
@@ -267,6 +268,7 @@ typedef struct {
     gyroLowpassFilter_t lowpass2Filter[3];
 
     float zero[3];
+
 } gyro_t;
 
 // Serial ports ----------------------------------------------------------------
