@@ -20,12 +20,14 @@
 
 #include "datatypes.h"
 
+void imuAccumulateGyro(gyro_t * gyro);
+
+void imuGetEulerAngles(hackflight_t * hf, uint32_t time);
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-    void    imuAccumulateGyro(gyro_t * gyro);
-    void    imuGetEulerAngles(hackflight_t * hf, uint32_t time);
     void    imuInit(uint8_t interruptPin);
 
 #if defined(__cplusplus)
