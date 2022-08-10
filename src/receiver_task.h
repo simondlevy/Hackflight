@@ -18,7 +18,10 @@
 
 #pragma once
 
+#include <string.h>
+
 #include "datatypes.h"
+#include "rx.h"
 #include "task.h"
 
 class ReceiverTask : public Task {

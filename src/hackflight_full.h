@@ -19,6 +19,7 @@
 #pragma once
 
 #include "attitude_task.h"
+#include "receiver_task.h"
 #include "hackflight.h"
 #include "led.h"
 #include "msp.h"
