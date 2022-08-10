@@ -26,7 +26,7 @@ extern "C" {
 
     void    imuAccumulateGyro(gyro_t * gyro);
     void    imuGetEulerAngles(hackflight_t * hf, uint32_t time);
-    void    imuInit(hackflight_t * hf, uint8_t interruptPin);
+    void    imuInit(uint8_t interruptPin);
 
 #if defined(__cplusplus)
 }

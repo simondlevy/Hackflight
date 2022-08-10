@@ -393,7 +393,7 @@ void hackflightInitFull(
 {
     mspInit();
     gyroInit(&hf->gyro);
-    imuInit(hf, imuInterruptPin);
+    imuInit(imuInterruptPin);
     ledInit(ledPin);
     ledFlash(10, 50);
     failsafeInit();

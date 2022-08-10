@@ -83,7 +83,6 @@ class Hackflight : HackflightCore {
 
             mspInit();
 #if 0
-            gyroInit(this);
             imuInit(this, imuInterruptPin);
             ledInit(ledPin);
             ledFlash(10, 50);

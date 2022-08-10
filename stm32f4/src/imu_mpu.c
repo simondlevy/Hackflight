@@ -496,9 +496,8 @@ uint16_t gyroSetSampleRate(gyroDev_t *gyro)
     return 8000;
 }
 
-void imuInit(hackflight_t * hf, uint8_t interruptPin)
+void imuInit(uint8_t interruptPin)
 {
-    (void)hf;
     (void)interruptPin;
 
     gyroDevInit();

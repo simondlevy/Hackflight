@@ -109,10 +109,8 @@ extern "C" {
         return _gyroSyncTime;
     }
 
-    void imuInit(hackflight_t * hf, uint8_t interruptPin)
+    void imuInit(uint8_t interruptPin)
     {
-        (void)hf;
-
         Wire.setClock(400000); 
         delay(100);
 
