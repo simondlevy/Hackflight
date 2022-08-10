@@ -32,3 +32,8 @@ void hackflightInitFull(
         uint8_t ledPin);
 
 void hackflightStep(hackflight_t * hackflight);
+
+class Hackflight : HackflightCore {
+
+
+};
