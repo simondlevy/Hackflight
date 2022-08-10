@@ -29,11 +29,11 @@
 #include <rx/sbus.h>
 #include <serial.h>
 
-#include "init.h"
+#include "hardware_init.h"
 
 int main(void)
 {
-    void * motorDevice = init(CORE_PERIOD());
+    void * motorDevice = hardwareInit(CORE_PERIOD());
 
     static anglePidConstants_t anglePidConstants = {
         1.441305,     // Rate Kp
@@ -42,7 +42,7 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0}; // 3.0; // Level Kp
 
-    hackflight_t hf = {0};
+    hackflight_t hf = {};
 
     hackflightInitFull(
             &hf,

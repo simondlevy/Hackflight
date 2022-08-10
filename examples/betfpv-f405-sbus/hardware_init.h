@@ -18,4 +18,12 @@
  */
 
 // returns pointer to motorDevice
-void * init(uint32_t core_period);
+#if defined (__cplusplus)
+extern "C" {
+#endif
+
+void * hardwareInit(uint32_t core_period);
+
+#if defined (__cplusplus)
+}
+#endif

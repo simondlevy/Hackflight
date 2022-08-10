@@ -24,7 +24,6 @@
 #include "dshot_command.h"
 #include "exti.h"
 #include "flash.h"
-#include "init.h"
 #include "inverter.h"
 #include "io.h"
 #include "motordev.h"
@@ -35,7 +34,13 @@
 #include "timer.h"
 #include "usb_io.h"
 
-void * init(uint32_t core_period)
+#include "hardware_init.h"
+
+#if defined (__cplusplus)
+extern "C" {
+#endif
+
+void * hardwareInit(uint32_t core_period)
 {
     systemInit();
     ioInitGlobal();
@@ -62,3 +67,7 @@ void * init(uint32_t core_period)
 
     return motorDevice;
 }
+
+#if defined (__cplusplus)
+}
+#endif
