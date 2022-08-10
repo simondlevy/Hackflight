@@ -300,7 +300,7 @@ $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
       systemdev.h \
       timer.h \
       usb_io.h
-	@echo main.c
+	@echo gcc hardware_init.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hardware_init.o $(CFLAGS) hardware_init.c
 
 $(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c \
@@ -312,14 +312,14 @@ $(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c \
 	  $(HFSRC_DIR)/msp.h \
 	  $(HFSRC_DIR)/rx.h \
 	  $(HFSRC_DIR)/system.h
-	@echo hackflight.c
+	@echo gcc hackflight.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(HFSRC_DIR)/hackflight.c
 
 $(OBJECT_DIR)/sbus.o: $(HFSRC_DIR)/rx/sbus.c \
 	  $(HFSRC_DIR)/datatypes.h \
 	  $(HFSRC_DIR)/serial.h \
 	  $(HFSRC_DIR)/time.h
-	@echo rx.c
+	@echo gcc rx/sbus.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/sbus.o $(CFLAGS) $(HFSRC_DIR)/rx/sbus.c
 
 $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
@@ -338,7 +338,7 @@ $(OBJECT_DIR)/main.o: main.cpp \
       $(HFSRC_DIR)/mixers/fixedpitch/quadxbf.h \
       $(HFSRC_DIR)/rx/sbus.h \
       $(HFSRC_DIR)/serial.h
-	@echo main.cpp
+	@echo g++ main.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/main.o $(CFLAGS) main.cpp
 
 $(OBJECT_DIR)/arming.o: $(HFSRC_DIR)/arming.cpp \
@@ -348,14 +348,14 @@ $(OBJECT_DIR)/arming.o: $(HFSRC_DIR)/arming.cpp \
       $(HFSRC_DIR)/led.h \
       $(HFSRC_DIR)/motor.h \
       $(HFSRC_DIR)/rx_status.h
-	@echo arming.cpp
+	@echo g++ arming.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/arming.o $(CFLAGS) \
 		$(HFSRC_DIR)/arming.cpp
 
 $(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.cpp \
 	  $(HFSRC_DIR)/msp.h \
 	  $(HFSRC_DIR)/datatypes.h
-	@echo debug.cpp
+	@echo g++ debug.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/debug.o $(CFLAGS) $(HFSRC_DIR)/debug.cpp
 
 $(OBJECT_DIR)/failsafe.o: $(HFSRC_DIR)/failsafe.cpp \
@@ -365,7 +365,7 @@ $(OBJECT_DIR)/failsafe.o: $(HFSRC_DIR)/failsafe.cpp \
 	  $(HFSRC_DIR)/rx.h \
 	  $(HFSRC_DIR)/rx_status.h \
 	  $(HFSRC_DIR)/time.h
-	@echo failsafe.cpp
+	@echo g++ failsafe.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/failsafe.o $(CFLAGS) $(HFSRC_DIR)/failsafe.cpp
 
 $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
@@ -379,18 +379,18 @@ $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
 	  $(HFSRC_DIR)/stats.h \
 	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
-	@echo gyro.cpp
+	@echo g++ gyro.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HFSRC_DIR)/gyro.cpp
 
 $(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.cpp \
 	  $(HFSRC_DIR)/led.h \
 	  $(HFSRC_DIR)/time.h 
-	@echo led.cpp
+	@echo g++ led.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/led.o $(CFLAGS) $(HFSRC_DIR)/led.cpp
 
 $(OBJECT_DIR)/maths.o: $(HFSRC_DIR)/maths.cpp \
 	  $(HFSRC_DIR)/maths.h
-	@echo maths.c
+	@echo g++ maths.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/maths.o $(CFLAGS) $(HFSRC_DIR)/maths.cpp
 
 $(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.cpp \
@@ -402,7 +402,7 @@ $(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.cpp \
 	  $(HFSRC_DIR)/serial.h \
 	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
-	@echo msp.cpp
+	@echo g++ msp.cpp
 	$(V1) $(CROSS_CXX) -c -std=c++20 -o $(OBJECT_DIR)/msp.o $(CFLAGS) $(HFSRC_DIR)/msp.cpp
 
 $(OBJECT_DIR)/rx.o: $(HFSRC_DIR)/rx.cpp \
@@ -420,11 +420,11 @@ $(OBJECT_DIR)/rx.o: $(HFSRC_DIR)/rx.cpp \
 	  $(HFSRC_DIR)/rx_status.h \
 	  $(HFSRC_DIR)/scale.h \
 	  $(HFSRC_DIR)/time.h
-	@echo rx.c
+	@echo g++ rx.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/rx.o $(CFLAGS) $(HFSRC_DIR)/rx.cpp
 
 define compile_file
-	echo "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
+	echo gcc "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
 endef
 
 $(TARG_OBJ_DIR)/%.o: %.c
