@@ -303,18 +303,6 @@ $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 	@echo gcc hardware_init.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hardware_init.o $(CFLAGS) hardware_init.c
 
-$(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c \
-	  $(HFSRC_DIR)/arming.h \
-	  $(HFSRC_DIR)/debug.h \
-	  $(HFSRC_DIR)/gyro.h \
-	  $(HFSRC_DIR)/hackflight.h \
-	  $(HFSRC_DIR)/led.h \
-	  $(HFSRC_DIR)/msp.h \
-	  $(HFSRC_DIR)/rx.h \
-	  $(HFSRC_DIR)/system.h
-	@echo gcc hackflight.c
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(HFSRC_DIR)/hackflight.c
-
 $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
 	@echo stm32_clock.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32_clock.o $(CFLAGS) $(HFSRC_DIR)/stm32_clock.c
@@ -374,6 +362,18 @@ $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
 	  $(HFSRC_DIR)/time.h
 	@echo g++ gyro.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/gyro.o $(CFLAGS) $(HFSRC_DIR)/gyro.cpp
+
+$(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.cpp \
+	  $(HFSRC_DIR)/arming.h \
+	  $(HFSRC_DIR)/debug.h \
+	  $(HFSRC_DIR)/gyro.h \
+	  $(HFSRC_DIR)/hackflight.h \
+	  $(HFSRC_DIR)/led.h \
+	  $(HFSRC_DIR)/msp.h \
+	  $(HFSRC_DIR)/rx.h \
+	  $(HFSRC_DIR)/system.h
+	@echo gcc hackflight.cpp
+	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(HFSRC_DIR)/hackflight.cpp
 
 $(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.cpp \
 	  $(HFSRC_DIR)/led.h \

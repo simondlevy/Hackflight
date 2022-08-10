@@ -20,10 +20,6 @@
 
 #include "datatypes.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 void hackflightInitFull(
         hackflight_t * hf,
         rx_dev_funs_t * rxDeviceFuns,
@@ -36,7 +32,3 @@ void hackflightInitFull(
         uint8_t ledPin);
 
 void hackflightStep(hackflight_t * hackflight);
-
-#if defined(__cplusplus)
-}
-#endif
