@@ -117,27 +117,37 @@ class HackflightCore {
 
         // Instance variable
 
-        arming_t         arming;
-        anglePid_t       anglepid;
-        task_t           attitudeTask;
-        demands_t        demands;
-        gyro_t           gyro;
-        imu_align_fun    imuAlignFun;
-        imu_fusion_t     imuFusionPrev;
-        float            maxArmingAngle;
-        mixer_t          mixer;
-        void *           motorDevice;
-        float            mspMotors[4];
-        task_t           mspTask;
-        pid_controller_t pidControllers[10];
-        uint8_t          pidCount;
-        bool             pidReset;
-        rx_t             rx;
-        task_t           rxTask;
-        rx_axes_t        rxAxes;
-        scheduler_t      scheduler;
-        task_t           sensorTasks[10];
-        uint8_t          sensorTaskCount;
-        vehicle_state_t  vstate;
+        arming_t         m_arming;
+        anglePid_t       m_anglepid;
+        task_t           m_attitudeTask;
+        demands_t        m_demands;
+        gyro_t           m_gyro;
+        imu_align_fun    m_imuAlignFun;
+        imu_fusion_t     m_imuFusionPrev;
+        float            m_maxArmingAngle;
+        mixer_t          m_mixer;
+        void *           m_motorDevice;
+        float            m_mspMotors[4];
+        task_t           m_mspTask;
+        pid_controller_t m_pidControllers[10];
+        uint8_t          m_pidCount;
+        bool             m_pidReset;
+        rx_t             m_rx;
+        task_t           m_rxTask;
+        rx_axes_t        m_rxAxes;
+        scheduler_t      m_scheduler;
+        task_t           m_sensorTasks[10];
+        uint8_t          m_sensorTaskCount;
+        vehicle_state_t  m_vstate;
 
+    public:
+
+        void Hackflight(anglePidConstants_t * anglePidConstants, mixer_t mixer)
+        {
+            m_mixer = mixer;
+
+            anglePidInit(&m_anglepid, anglePidConstants);
+
+            // addPidController(anglePidUpdate, &hf->anglepid);
+        }
 };
