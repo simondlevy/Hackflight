@@ -166,8 +166,8 @@ static void update(
 }
 
 static void getQuaternion(
-        hackflight_t * hf,
         gyro_t * gyro,
+        arming_t * arming,
         imu_fusion_t * fusionPrev,
         uint32_t time,
         quaternion_t * quat)
@@ -181,7 +181,7 @@ static void getQuaternion(
 
     gyro_reset_t new_gyro_reset = {};
 
-    if (!armingIsArmed(&hf->arming)) {
+    if (!armingIsArmed(arming)) {
         memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyro_reset_t));
     }
 
@@ -217,7 +217,7 @@ void imuGetEulerAngles(
 {
     quaternion_t quat = {0,0,0,0};
 
-    getQuaternion(hf, gyro, fusionPrev, time, &quat);
+    getQuaternion(gyro, &hf->arming, fusionPrev, time, &quat);
 
     rotation_t rot = {0,0,0};
 
