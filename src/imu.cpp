@@ -210,15 +210,15 @@ void imuAccumulateGyro(gyro_t * gyro)
 }
 
 void imuGetEulerAngles(
-        hackflight_t * hf,
         gyro_t * gyro,
         imu_fusion_t * fusionPrev,
+        arming_t * arming,
         uint32_t time,
         vehicle_state_t * vstate)
 {
     quaternion_t quat = {0,0,0,0};
 
-    getQuaternion(gyro, &hf->arming, fusionPrev, time, &quat);
+    getQuaternion(gyro, arming, fusionPrev, time, &quat);
 
     rotation_t rot = {0,0,0};
 

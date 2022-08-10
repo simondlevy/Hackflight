@@ -23,9 +23,9 @@
 void imuAccumulateGyro(gyro_t * gyro);
 
 void imuGetEulerAngles(
-        hackflight_t * hf,
         gyro_t * gyro,
         imu_fusion_t * imuFusionPrev,
+        arming_t * arming,
         uint32_t time,
         vehicle_state_t * vstate);
 
