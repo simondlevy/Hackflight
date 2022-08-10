@@ -18,18 +18,10 @@
 
 #include "datatypes.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
+void rxDevInitDsmx(serialPortIdentifier_e port);
 
-    void rxDevInitDsmx(serialPortIdentifier_e port);
+uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs);
 
-    uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs);
-
-    float rxDevConvertDsmx(uint16_t * channelData, uint8_t chan);
-
-#if defined(__cplusplus)
-}
-#endif
+float rxDevConvertDsmx(uint16_t * channelData, uint8_t chan);
 
 rx_dev_funs_t dsmxDeviceFuns = { rxDevInitDsmx, rxDevCheckDsmx, rxDevConvertDsmx };

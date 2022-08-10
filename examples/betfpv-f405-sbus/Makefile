@@ -315,13 +315,6 @@ $(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.c \
 	@echo gcc hackflight.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hackflight.o $(CFLAGS) $(HFSRC_DIR)/hackflight.c
 
-$(OBJECT_DIR)/sbus.o: $(HFSRC_DIR)/rx/sbus.c \
-	  $(HFSRC_DIR)/datatypes.h \
-	  $(HFSRC_DIR)/serial.h \
-	  $(HFSRC_DIR)/time.h
-	@echo gcc rx/sbus.c
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/sbus.o $(CFLAGS) $(HFSRC_DIR)/rx/sbus.c
-
 $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
 	@echo stm32_clock.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32_clock.o $(CFLAGS) $(HFSRC_DIR)/stm32_clock.c
@@ -422,6 +415,15 @@ $(OBJECT_DIR)/rx.o: $(HFSRC_DIR)/rx.cpp \
 	  $(HFSRC_DIR)/time.h
 	@echo g++ rx.cpp
 	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/rx.o $(CFLAGS) $(HFSRC_DIR)/rx.cpp
+
+$(OBJECT_DIR)/sbus.o: $(HFSRC_DIR)/rx/sbus.cpp \
+	  $(HFSRC_DIR)/datatypes.h \
+	  $(HFSRC_DIR)/serial.h \
+	  $(HFSRC_DIR)/time.h
+	@echo gcc rx/sbus.cpp
+	$(V1) $(CROSS_CXX) -c -o $(OBJECT_DIR)/sbus.o $(CFLAGS) $(HFSRC_DIR)/rx/sbus.cpp
+
+# ==============================================================================
 
 define compile_file
 	echo gcc "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
