@@ -118,7 +118,6 @@ class HackflightCore {
         pid_controller_t m_pidControllers[10];
         uint8_t          m_pidCount;
         bool             m_pidReset;
-        vehicle_state_t  m_vstate;
 
         static float constrain_demand(float demand, float limit, float scaling)
         {
@@ -126,6 +125,9 @@ class HackflightCore {
         }
 
     public:
+
+        // Supports tasks
+        vehicle_state_t  m_vstate;
 
         HackflightCore(anglePidConstants_t * anglePidConstants, mixer_t mixer)
         {

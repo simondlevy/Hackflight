@@ -21,6 +21,7 @@
 #include "hackflight.h"
 #include "led.h"
 #include "msp.h"
+#include "task.h"
 
 void hackflightInitFull(
         hackflight_t * hf,
@@ -37,6 +38,14 @@ void hackflightStep(hackflight_t * hackflight);
 
 class Hackflight : HackflightCore {
 
+    friend class Task;
+
+    public: // to support tasks
+
+        arming_t     m_arming;
+        Gyro         m_gyro;
+        imu_fusion_t m_imuFusionPrev;
+
     private:
 
         // Scheduling constants
@@ -46,11 +55,8 @@ class Hackflight : HackflightCore {
 
         // Instance variable
 
-        arming_t         m_arming;
         task_t           m_attitudeTask;
-        Gyro             m_gyro;
         imu_align_fun    m_imuAlignFun;
-        imu_fusion_t     m_imuFusionPrev;
         float            m_maxArmingAngle;
         void *           m_motorDevice;
         float            m_mspMotors[4];

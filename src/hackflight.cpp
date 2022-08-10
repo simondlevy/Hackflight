@@ -32,9 +32,6 @@
 #include "rx.h"
 #include "system.h"
 
-// Tuning constants for angle PID controller ----------------------------------
-
-
 // Scheduling constants -------------------------------------------------------
 
 // Wait at start of scheduler loop if gyroSampleTask is nearly due
@@ -84,6 +81,7 @@ static const float MAX_ARMING_ANGLE = 25;
 static void task_attitude(void * hackflight, uint32_t time)
 {
     hackflight_t * hf = (hackflight_t *)hackflight;
+
     imuGetEulerAngles(
             &hf->gyro,
             &hf->imuFusionPrev,
