@@ -104,11 +104,6 @@ class HackflightCore {
 
     private:
 
-        // Scheduling constants
-
-        static const uint32_t RX_TASK_RATE       = 33;
-        static const uint32_t ATTITUDE_TASK_RATE = 100;
-
         // PID-limiting constants
 
         static constexpr float    PID_MIXER_SCALING = 1000;
@@ -117,27 +112,12 @@ class HackflightCore {
 
         // Instance variable
 
-        arming_t         m_arming;
         anglePid_t       m_anglepid;
-        task_t           m_attitudeTask;
         demands_t        m_demands;
-        gyro_t           m_gyro;
-        imu_align_fun    m_imuAlignFun;
-        imu_fusion_t     m_imuFusionPrev;
-        float            m_maxArmingAngle;
         mixer_t          m_mixer;
-        void *           m_motorDevice;
-        float            m_mspMotors[4];
-        task_t           m_mspTask;
         pid_controller_t m_pidControllers[10];
         uint8_t          m_pidCount;
         bool             m_pidReset;
-        rx_t             m_rx;
-        task_t           m_rxTask;
-        rx_axes_t        m_rxAxes;
-        scheduler_t      m_scheduler;
-        task_t           m_sensorTasks[10];
-        uint8_t          m_sensorTaskCount;
         vehicle_state_t  m_vstate;
 
         static float constrain_demand(float demand, float limit, float scaling)
