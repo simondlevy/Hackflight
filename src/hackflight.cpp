@@ -384,6 +384,8 @@ void hackflightInitFull(
         imu_align_fun imuAlign,
         uint8_t ledPin)
 {
+    hackflightInit(hf, anglePidConstants, mixer);
+
     mspInit();
     gyroInit(&hf->gyro);
     imuInit(imuInterruptPin);
@@ -400,8 +402,6 @@ void hackflightInitFull(
     hf->imuAlignFun = imuAlign;
 
     hf->motorDevice = motorDevice;
-
-    hackflightInit(hf, anglePidConstants, mixer);
 
     initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
 
