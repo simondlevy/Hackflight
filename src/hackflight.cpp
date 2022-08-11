@@ -188,6 +188,7 @@ static void adjustRxDynamicPriority(rx_t * rx, task_t * task,
 
 static void executeTask(
         hackflight_t * hf,
+        task_data_t * dp,
         task_t *task,
         uint32_t usec)
 {
@@ -195,7 +196,7 @@ static void executeTask(
     task->dynamicPriority = 0;
 
     uint32_t time = timeMicros();
-    task->fun(hf, NULL, usec);
+    task->fun(hf, dp, usec);
 
     uint32_t taskExecutionTimeUs = timeMicros() - time;
 
@@ -321,6 +322,7 @@ static void adjustAndUpdateTask(
 
 static void checkDynamicTasks(
         hackflight_t * hf,
+        task_data_t * dp,
         int32_t loopRemainingCycles,
         uint32_t nextTargetCycles)
 {
@@ -357,7 +359,7 @@ static void checkDynamicTasks(
         if (taskRequiredTimeCycles < loopRemainingCycles) {
             uint32_t antipatedEndCycles =
                 nowCycles + taskRequiredTimeCycles;
-            executeTask(hf, selectedTask, usec);
+            executeTask(hf, dp, selectedTask, usec);
             nowCycles = systemGetCycleCounter();
             int32_t cyclesOverdue =
                 cmpTimeCycles(nowCycles, antipatedEndCycles);
@@ -387,6 +389,7 @@ static void checkDynamicTasks(
 
 void hackflightInitFull(
         hackflight_t * hf,
+        task_data_t * td,
         rx_dev_funs_t * rxDeviceFuns,
         serialPortIdentifier_e rxDevPort,
         anglePidConstants_t * anglePidConstants,
@@ -462,7 +465,7 @@ void hackflightInitFull(
     scheduler->clockRate = systemClockMicrosToCycles(1000000);
 }
 
-void hackflightStep(hackflight_t * hf)
+void hackflightStep(hackflight_t * hf, task_data_t * td)
 {
     scheduler_t * scheduler = &hf->scheduler;
 
@@ -501,6 +504,6 @@ void hackflightStep(hackflight_t * hf)
         cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     if (newLoopRemainingCyles > scheduler->guardMargin) {
-        checkDynamicTasks(hf, newLoopRemainingCyles, nextTargetCycles);
+        checkDynamicTasks(hf, td, newLoopRemainingCyles, nextTargetCycles);
     }
 }

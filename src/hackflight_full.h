@@ -26,9 +26,11 @@
 #include "hackflight.h"
 #include "led.h"
 #include "msp.h"
+#include "task.h"
 
 void hackflightInitFull(
         hackflight_t * hf,
+        task_data_t * td,
         rx_dev_funs_t * rxDeviceFuns,
         serialPortIdentifier_e rxDevPort,
         anglePidConstants_t * anglePidConstants,
@@ -38,7 +40,7 @@ void hackflightInitFull(
         imu_align_fun imuAlign,
         uint8_t ledPin);
 
-void hackflightStep(hackflight_t * hackflight);
+void hackflightStep(hackflight_t * hackflight, task_data_t * td);
 
 #if 0
 
