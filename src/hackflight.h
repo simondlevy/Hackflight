@@ -29,6 +29,7 @@
 #include "motor.h"
 #include "pids/angle.h"
 #include "rx.h"
+#include "task.h"
 #include "time.h"
 
 // Datatypes ------------------------------------------------------------------
@@ -57,21 +58,6 @@ typedef struct {
     vehicle_state_t  vstate;
 
 } hackflight_t;
-
-typedef struct {
-
-    arming_t         arming;
-    gyro_t           gyro;
-    imu_fusion_t     imuFusionPrev;
-    float            maxArmingAngle;
-    void *           motorDevice;
-    float            mspMotors[4];
-    bool             pidReset;
-    rx_t             rx;
-    rx_axes_t        rxAxes;
-    vehicle_state_t  vstate;
-
-} task_data_t;
 
 // Scheduling constants -------------------------------------------------------
 

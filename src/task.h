@@ -22,6 +22,21 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+typedef struct {
+
+    arming_t         arming;
+    gyro_t           gyro;
+    imu_fusion_t     imuFusionPrev;
+    float            maxArmingAngle;
+    void *           motorDevice;
+    float            mspMotors[4];
+    bool             pidReset;
+    rx_t             rx;
+    rx_axes_t        rxAxes;
+    vehicle_state_t  vstate;
+
+} task_data_t;
+
 class Task {
 
     friend class Hackflight;
