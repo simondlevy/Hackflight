@@ -115,7 +115,7 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
         fabsf(hf->vstate.theta) < td->maxArmingAngle;
 
     rxPoll(
-            &hf->rx,
+            &td->rx,
             usec,
             imuIsLevel, 
             calibrating,
@@ -131,7 +131,7 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
     }
 
     if (gotNewData) {
-        memcpy(&hf->rxAxes, &rxax, sizeof(rx_axes_t));
+        memcpy(&td->rxAxes, &rxax, sizeof(rx_axes_t));
     }
 }
 
@@ -148,7 +148,7 @@ static void task_msp(void * hp, void * dp, uint32_t usec)
 
     mspUpdate(
             &hf->vstate,
-            &hf->rxAxes,
+            &td->rxAxes,
             armingIsArmed(&td->arming),
             td->motorDevice,
             td->mspMotors);
@@ -232,7 +232,7 @@ static void checkCoreTasks(
 
     uint32_t usec = timeMicros();
 
-    rxGetDemands(&hf->rx, usec, &hf->anglepid, &hf->demands);
+    rxGetDemands(&td->rx, usec, &hf->anglepid, &hf->demands);
 
     float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
@@ -332,7 +332,7 @@ static void checkDynamicTasks(
 
     uint32_t usec = timeMicros();
 
-    adjustRxDynamicPriority(&hf->rx, &hf->rxTask, usec);
+    adjustRxDynamicPriority(&dp->rx, &hf->rxTask, usec);
     updateDynamicTask(&hf->rxTask, &selectedTask,
             &selectedTaskDynamicPriority);
 
@@ -410,8 +410,8 @@ void hackflightInitFull(
     failsafeInit();
     failsafeReset();
 
-    hf->rx.devCheck = rxDeviceFuns->check;
-    hf->rx.devConvert = rxDeviceFuns->convert;
+    td->rx.devCheck = rxDeviceFuns->check;
+    td->rx.devConvert = rxDeviceFuns->convert;
 
     rxDeviceFuns->init(rxDevPort);
 

@@ -37,9 +37,7 @@ typedef struct {
     pid_controller_t pidControllers[10];
     uint8_t          pidCount;
     bool             pidReset;
-    rx_t             rx;
     task_t           rxTask;
-    rx_axes_t        rxAxes;
     scheduler_t      scheduler;
     vehicle_state_t  vstate;
 
