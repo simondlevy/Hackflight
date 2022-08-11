@@ -331,6 +331,7 @@ static void adjustAndUpdateTask(
 
 static void checkDynamicTasks(
         hackflight_core_t * hf,
+        hackflight_tasks_t * ht,
         task_data_t * dt,
         int32_t loopRemainingCycles,
         uint32_t nextTargetCycles)
@@ -340,14 +341,14 @@ static void checkDynamicTasks(
 
     uint32_t usec = timeMicros();
 
-    adjustRxDynamicPriority(&dt->rx, &hf->rxTask, usec);
-    updateDynamicTask(&hf->rxTask, &selectedTask,
+    adjustRxDynamicPriority(&dt->rx, &ht->rxTask, usec);
+    updateDynamicTask(&ht->rxTask, &selectedTask,
             &selectedTaskDynamicPriority);
 
-    adjustAndUpdateTask(&hf->attitudeTask, usec,
+    adjustAndUpdateTask(&ht->attitudeTask, usec,
             &selectedTask, &selectedTaskDynamicPriority);
 
-    adjustAndUpdateTask(&hf->mspTask, usec,
+    adjustAndUpdateTask(&ht->mspTask, usec,
             &selectedTask, &selectedTaskDynamicPriority);
 
     if (selectedTask) {
@@ -435,16 +436,16 @@ void hackflightInitFull(
 
     td->motorDevice = motorDevice;
 
-    initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
+    initTask(&ht->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
 
-    initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
+    initTask(&ht->rxTask, task_rx,  RX_TASK_RATE);
 
     // Initialize quaternion in upright position
     td->imuFusionPrev.quat.w = 1;
 
     td->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
-    initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
+    initTask(&ht->mspTask, task_msp, MSP_TASK_RATE);
 
     scheduler_t * scheduler = &hf->scheduler;
 
@@ -526,6 +527,6 @@ void hackflightStep(
         cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     if (newLoopRemainingCyles > scheduler->guardMargin) {
-        checkDynamicTasks(hf, td, newLoopRemainingCyles, nextTargetCycles);
+        checkDynamicTasks(hf, ht, td, newLoopRemainingCyles, nextTargetCycles);
     }
 }

@@ -29,15 +29,12 @@
 typedef struct {
 
     anglePid_t       anglepid;
-    task_t           attitudeTask;
     demands_t        demands;
     imu_align_fun    imuAlignFun;
     mixer_t          mixer;
-    task_t           mspTask;
     pid_controller_t pidControllers[10];
     uint8_t          pidCount;
     bool             pidReset;
-    task_t           rxTask;
     scheduler_t      scheduler;
     vehicle_state_t  vstate;
 
