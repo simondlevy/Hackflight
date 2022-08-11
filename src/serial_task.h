@@ -25,11 +25,11 @@
 #include "msp.h"
 #include "task.h"
 
-class MspTask : public Task {
+class SerialTask : public Task {
 
     public:
 
-        MspTask()
+        SerialTask()
             : Task(100) // Hz
         {
             mspInit();

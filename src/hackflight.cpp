@@ -32,6 +32,10 @@
 #include "rx.h"
 #include "system.h"
 
+#include "attitude_task.h"
+#include "receiver_task.h"
+#include "serial_task.h"
+
 // Scheduling constants -------------------------------------------------------
 
 // Wait at start of scheduler loop if gyroSampleTask is nearly due

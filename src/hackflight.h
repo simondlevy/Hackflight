@@ -29,7 +29,6 @@
 #include "motor.h"
 #include "pids/angle.h"
 #include "rx.h"
-#include "task.h"
 #include "time.h"
 
 // Datatypes ------------------------------------------------------------------
