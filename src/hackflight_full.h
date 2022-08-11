@@ -304,11 +304,9 @@ class Hackflight : HackflightCore {
                 m_scheduler.loopStartCycles += m_scheduler.loopStartDeltaUpCycles;
             }
 
-            /*
             // Once close to the timing boundary, poll for its arrival
             if (loopRemainingCycles < m_scheduler.loopStartCycles) {
                 checkCoreTasks(
-                        hf,
                         loopRemainingCycles,
                         nowCycles,
                         nextTargetCycles);
@@ -317,6 +315,7 @@ class Hackflight : HackflightCore {
             int32_t newLoopRemainingCyles =
                 cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
+            /*
             if (newLoopRemainingCyles > m_scheduler.guardMargin) {
                 checkDynamicTasks(hf, newLoopRemainingCyles, nextTargetCycles);
             }
