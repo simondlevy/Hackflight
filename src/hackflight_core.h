@@ -28,7 +28,7 @@
 
 typedef struct {
 
-    anglePid_t       anglepid;
+    anglePid_t       anglePid;
     demands_t        demands;
     imu_align_fun    imuAlignFun;
     mixer_t          mixer;
@@ -103,8 +103,8 @@ static void hackflightInit(
 {
     hc->mixer = mixer;
 
-    anglePidInit(&hc->anglepid, anglePidConstants);
+    anglePidInit(&hc->anglePid, anglePidConstants);
 
-    hackflightAddPidController(hc, anglePidUpdate, &hc->anglepid);
+    hackflightAddPidController(hc, anglePidUpdate, &hc->anglePid);
 }
 

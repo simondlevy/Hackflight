@@ -294,7 +294,7 @@ static void checkCoreTasks(
 
     uint32_t usec = timeMicros();
 
-    rxGetDemands(&td->rx, usec, &hf->anglepid, &hf->demands);
+    rxGetDemands(&td->rx, usec, &hf->anglePid, &hf->demands);
 
     float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 

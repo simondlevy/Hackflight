@@ -30,7 +30,7 @@ class HackflightCore {
 
         // Instance variable
 
-        anglePid_t       m_anglepid;
+        anglePid_t       m_anglePid;
         demands_t        m_demands;
         mixer_t          m_mixer;
         pid_controller_t m_pidControllers[10];
@@ -51,9 +51,9 @@ class HackflightCore {
         {
             m_mixer = mixer;
 
-            anglePidInit(&m_anglepid, anglePidConstants);
+            anglePidInit(&m_anglePid, anglePidConstants);
 
-            addPidController(anglePidUpdate, &m_anglepid);
+            addPidController(anglePidUpdate, &m_anglePid);
         }
 
         void addPidController(pid_fun_t fun, void * data)
