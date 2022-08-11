@@ -33,10 +33,7 @@
 #include "msp.h"
 #include "rx.h"
 #include "system.h"
-
-#include "attitude_task.h"
-#include "receiver_task.h"
-#include "serial_task.h"
+#include "task.h"
 
 // Scheduling constants -------------------------------------------------------
 
