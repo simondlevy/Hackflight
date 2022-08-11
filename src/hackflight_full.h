@@ -88,17 +88,20 @@ class Hackflight : HackflightCore {
         task_t        m_mspTask;
         ReceiverTask  m_rxTask;
 
-        new_hackflight_t m_hackflight;
+        // Scheduler
+        scheduler_t m_scheduler;
 
-        imu_align_fun    m_imuAlignFun;
-        float            m_maxArmingAngle;
-        void *           m_motorDevice;
-        float            m_mspMotors[4];
-        rx_t             m_rx;
-        rx_axes_t        m_rxAxes;
-        scheduler_t      m_scheduler;
-        task_t           m_sensorTasks[10];
-        uint8_t          m_sensorTaskCount;
+        // Arming safety
+        float m_maxArmingAngle;
+
+        // IMU alignment function
+        imu_align_fun m_imuAlignFun;
+
+        // XXX can we avoid void * ?
+        void * m_motorDevice;
+
+        // Core contents for tasks
+        hackflight_t m_hackflight;
 
         void checkCoreTasks(
                 int32_t loopRemainingCycles,
@@ -214,8 +217,8 @@ class Hackflight : HackflightCore {
             failsafeInit();
             failsafeReset();
 
-            m_rx.devCheck = rxDeviceFuns->check;
-            m_rx.devConvert = rxDeviceFuns->convert;
+            m_hackflight.rx.devCheck = rxDeviceFuns->check;
+            m_hackflight.rx.devConvert = rxDeviceFuns->convert;
 
             rxDeviceFuns->init(rxDevPort);
 

@@ -33,7 +33,7 @@ class ReceiverTask : public Task {
         {
         }
 
-        void fun(new_hackflight_t * hf, uint32_t time)
+        void fun(hackflight_t * hf, uint32_t time)
         {
             bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;
             bool pidItermResetReady = false;

@@ -41,5 +41,5 @@ class Task {
         uint32_t m_lastSignaledAtUs;         
         uint32_t m_anticipatedExecutionTime;
 
-        virtual void fun(new_hackflight_t * hf, uint32_t time) = 0;
+        virtual void fun(hackflight_t * hf, uint32_t time) = 0;
 };
