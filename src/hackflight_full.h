@@ -228,6 +228,17 @@ class Hackflight : HackflightCore {
             }
         }
 
+        void adjustAndUpdateTask(
+                Task * task,
+                uint32_t usec,
+                Task ** selectedTask,
+                uint16_t * selectedTaskDynamicPriority)
+        {
+            adjustDynamicPriority(task, usec);
+            updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
+        }
+
+
 
         void checkDynamicTasks(
                 int32_t loopRemainingCycles,
@@ -245,10 +256,10 @@ class Hackflight : HackflightCore {
             updateDynamicTask(&m_rxTask, &selectedTask,
                     &selectedTaskDynamicPriority);
 
-            /*
-               adjustAndUpdateTask(&hf->attitudeTask, usec,
-               &selectedTask, &selectedTaskDynamicPriority);
+            adjustAndUpdateTask(&m_attitudeTask, usec,
+                    &selectedTask, &selectedTaskDynamicPriority);
 
+            /*
                adjustAndUpdateTask(&hf->mspTask, usec,
                &selectedTask, &selectedTaskDynamicPriority);
 
