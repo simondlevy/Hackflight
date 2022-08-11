@@ -259,10 +259,10 @@ class Hackflight : HackflightCore {
             adjustAndUpdateTask(&m_attitudeTask, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            /*
-               adjustAndUpdateTask(&hf->mspTask, usec,
-               &selectedTask, &selectedTaskDynamicPriority);
+            adjustAndUpdateTask(&m_mspTask, usec,
+                    &selectedTask, &selectedTaskDynamicPriority);
 
+            /*
                if (selectedTask) {
 
                int32_t taskRequiredTimeUs =
