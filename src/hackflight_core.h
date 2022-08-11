@@ -57,11 +57,11 @@ static const uint16_t PIDSUM_LIMIT      = 500;
 
 // PID controller support -----------------------------------------------------
 
-static void hackflightAddPidController(hackflight_core_t * hf, pid_fun_t fun, void * data)
+static void hackflightAddPidController(hackflight_core_t * hc, pid_fun_t fun, void * data)
 {
-    hf->pidControllers[hf->pidCount].fun = fun;
-    hf->pidControllers[hf->pidCount].data = data;
-    hf->pidCount++;
+    hc->pidControllers[hc->pidCount].fun = fun;
+    hc->pidControllers[hc->pidCount].data = data;
+    hc->pidCount++;
 }
 
 // Core tasks: gyro, PID controllers, mixer, motors ---------------------------
@@ -74,21 +74,21 @@ static float constrain_demand(float demand, float limit, float scaling)
 // Public API -----------------------------------------------------------------
 
 static void hackflightRunCoreTasks(
-        hackflight_core_t * hf,
+        hackflight_core_t * hc,
         uint32_t usec,
         bool failsafe,
         motor_config_t * motorConfig,
         float motorvals[])
 {
     // Run PID controllers to get new demands
-    for (uint8_t k=0; k<hf->pidCount; ++k) {
-        pid_controller_t pid = hf->pidControllers[k];
-        pid.fun(usec, &hf->demands, pid.data, &hf->vstate, hf->pidReset);
+    for (uint8_t k=0; k<hc->pidCount; ++k) {
+        pid_controller_t pid = hc->pidControllers[k];
+        pid.fun(usec, &hc->demands, pid.data, &hc->vstate, hc->pidReset);
     }
 
 
     // Constrain the demands, negating yaw to make it agree with PID
-    demands_t * demands = &hf->demands;
+    demands_t * demands = &hc->demands;
     demands->roll  =
         constrain_demand(demands->roll, PIDSUM_LIMIT, PID_MIXER_SCALING);
     demands->pitch =
@@ -97,18 +97,18 @@ static void hackflightRunCoreTasks(
         -constrain_demand(demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
 
     // Run the mixer to get motors from demands
-    hf->mixer(&hf->demands, failsafe, motorConfig, motorvals);
+    hc->mixer(&hc->demands, failsafe, motorConfig, motorvals);
 }
 
 static void hackflightInit(
-        hackflight_core_t * hf,
+        hackflight_core_t * hc,
         anglePidConstants_t * anglePidConstants,
         mixer_t mixer)
 {
-    hf->mixer = mixer;
+    hc->mixer = mixer;
 
-    anglePidInit(&hf->anglepid, anglePidConstants);
+    anglePidInit(&hc->anglepid, anglePidConstants);
 
-    hackflightAddPidController(hf, anglePidUpdate, &hf->anglepid);
+    hackflightAddPidController(hc, anglePidUpdate, &hc->anglepid);
 }
 
