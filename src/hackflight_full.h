@@ -354,6 +354,7 @@ class Hackflight : HackflightCore {
         (void)imuAlign;
 
         mspInit();
+        gyroInit(&m_taskData.gyro);
         imuInit(imuInterruptPin);
         ledInit(ledPin);
         ledFlash(10, 50);

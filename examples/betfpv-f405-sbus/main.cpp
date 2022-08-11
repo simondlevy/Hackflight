@@ -59,6 +59,22 @@ int main(void)
         hackflightStep(&hf);
     }
 
+    /*
+    Hackflight hf = Hackflight(
+            &sbusDeviceFuns,
+            SERIAL_PORT_USART3, // RX port
+            &anglePidConstants,
+            mixerQuadXbf,
+            motorDevice,
+            0,                  // dummy value for IMU interrupt pin
+            imuRotate270,
+            37);                // LED pin
+
+    while (true) {
+        hf.step();
+    }
+    */
+
     return 0;
 }
 
