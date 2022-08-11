@@ -92,7 +92,7 @@ static void task_attitude(void * hp, void * dp, uint32_t usec)
 
     imuGetEulerAngles(
             &td->gyro,
-            &hf->imuFusionPrev,
+            &td->imuFusionPrev,
             &td->arming,
             usec,
             &hf->vstate);
@@ -427,7 +427,7 @@ void hackflightInitFull(
     initTask(&hf->rxTask, task_rx,  RX_TASK_RATE);
 
     // Initialize quaternion in upright position
-    hf->imuFusionPrev.quat.w = 1;
+    td->imuFusionPrev.quat.w = 1;
 
     hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
