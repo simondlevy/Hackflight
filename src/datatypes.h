@@ -506,8 +506,6 @@ typedef struct {
     task_t           rxTask;
     rx_axes_t        rxAxes;
     scheduler_t      scheduler;
-    task_t           sensorTasks[10];
-    uint8_t          sensorTaskCount;
     vehicle_state_t  vstate;
 
 } hackflight_t;
