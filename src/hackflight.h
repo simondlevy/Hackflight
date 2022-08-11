@@ -31,7 +31,6 @@ typedef struct {
     anglePid_t       anglepid;
     task_t           attitudeTask;
     demands_t        demands;
-    gyro_t           gyro;
     imu_align_fun    imuAlignFun;
     imu_fusion_t     imuFusionPrev;
     float            maxArmingAngle;

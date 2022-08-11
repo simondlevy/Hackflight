@@ -91,7 +91,7 @@ static void task_attitude(void * hp, void * dp, uint32_t usec)
 
 
     imuGetEulerAngles(
-            &hf->gyro,
+            &td->gyro,
             &hf->imuFusionPrev,
             &td->arming,
             usec,
@@ -105,7 +105,7 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
     hackflight_t * hf = (hackflight_t *)hp;
     task_data_t * td = (task_data_t *)dp;
 
-    bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;
+    bool calibrating = td->gyro.isCalibrating; // || acc.calibrating != 0;
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
@@ -231,7 +231,7 @@ static void checkCoreTasks(
         loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
     }
 
-    gyroReadScaled(&hf->gyro, hf->imuAlignFun, &hf->vstate);
+    gyroReadScaled(&td->gyro, hf->imuAlignFun, &hf->vstate);
 
     uint32_t usec = timeMicros();
 
@@ -403,12 +403,10 @@ void hackflightInitFull(
         imu_align_fun imuAlign,
         uint8_t ledPin)
 {
-    (void)td;
-
     hackflightInit(hf, anglePidConstants, mixer);
 
     mspInit();
-    gyroInit(&hf->gyro);
+    gyroInit(&td->gyro);
     imuInit(imuInterruptPin);
     ledInit(ledPin);
     ledFlash(10, 50);
