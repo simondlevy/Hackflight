@@ -19,17 +19,10 @@
 
 #pragma once
 
-#include "arming.h"
 #include "datatypes.h"
 #include "debug.h"
-#include "failsafe.h"
-#include "gyro.h"
-#include "imu.h"
 #include "maths.h"
-#include "motor.h"
 #include "pids/angle.h"
-#include "rx.h"
-#include "time.h"
 
 // Datatypes ------------------------------------------------------------------
 
