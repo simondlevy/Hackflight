@@ -154,7 +154,7 @@ static void task_msp(void * hp, void * dp, uint32_t usec)
             &hf->rxAxes,
             armingIsArmed(&td->arming),
             td->motorDevice,
-            hf->mspMotors);
+            td->mspMotors);
 }
 
 // Support for dynamically scheduled tasks ---------------------------------
@@ -254,7 +254,7 @@ static void checkCoreTasks(
             mixmotors);
 
     motorWrite(td->motorDevice,
-            armingIsArmed(&td->arming) ? mixmotors : hf->mspMotors);
+            armingIsArmed(&td->arming) ? mixmotors : td->mspMotors);
 
     // CPU busy
     if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
