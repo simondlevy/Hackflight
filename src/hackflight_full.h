@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "attitude_task.h"
-#include "msp_task.h"
-#include "receiver_task.h"
+//#include "attitude_task.h"
+//#include "msp_task.h"
+//#include "receiver_task.h"
 
 #include "deg2rad.h"
 #include "hackflight.h"
@@ -39,6 +39,8 @@ void hackflightInitFull(
         uint8_t ledPin);
 
 void hackflightStep(hackflight_t * hackflight);
+
+#if 0
 
 class Hackflight : HackflightCore {
 
@@ -457,3 +459,5 @@ class Hackflight : HackflightCore {
 
     } // step()
 };
+
+#endif
