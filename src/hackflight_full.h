@@ -107,7 +107,7 @@ class Hackflight : HackflightCore {
         imu_align_fun m_imuAlignFun;
 
         // Core contents for tasks
-        task_data_t m_task_data;
+        task_data_t m_taskData;
 
         void checkCoreTasks(
                 int32_t loopRemainingCycles,
@@ -125,7 +125,7 @@ class Hackflight : HackflightCore {
                 loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            task_data_t * data = &m_task_data;
+            task_data_t * data = &m_taskData;
 
             gyroReadScaled(&data->gyro, m_imuAlignFun, &data->vstate);
 
@@ -201,6 +201,24 @@ class Hackflight : HackflightCore {
             }
         }
 
+        void adjustRxDynamicPriority(uint32_t usec) 
+        {
+            if (m_rxTask.dynamicPriority > 0) {
+                m_rxTask.ageCycles = 1 +
+                    (cmpTimeUs(usec, m_rxTask.lastSignaledAtUs) /
+                     m_rxTask.desiredPeriodUs);
+                m_rxTask.dynamicPriority = 1 + m_rxTask.ageCycles;
+            } else  {
+                if (rxCheck(&m_taskData.rx, usec)) {
+                    m_rxTask.lastSignaledAtUs = usec;
+                    m_rxTask.ageCycles = 1;
+                    m_rxTask.dynamicPriority = 2;
+                } else {
+                    m_rxTask.ageCycles = 0;
+                }
+            }
+        }
+
         void checkDynamicTasks(
                 int32_t loopRemainingCycles,
                 uint32_t nextTargetCycles)
@@ -210,62 +228,63 @@ class Hackflight : HackflightCore {
 
             uint32_t usec = timeMicros();
 
-            task_data_t * data = &m_task_data;
+            task_data_t * data = &m_taskData;
+
+            adjustRxDynamicPriority(usec);
 
             /*
-            adjustRxDynamicPriority(&hf->rx, &hf->rxTask, usec);
-            updateDynamicTask(&hf->rxTask, &selectedTask,
+            updateDynamicTask(&m_rxTask, &selectedTask,
                     &selectedTaskDynamicPriority);
 
-            adjustAndUpdateTask(&hf->attitudeTask, usec,
-                    &selectedTask, &selectedTaskDynamicPriority);
+               adjustAndUpdateTask(&hf->attitudeTask, usec,
+               &selectedTask, &selectedTaskDynamicPriority);
 
-            adjustAndUpdateTask(&hf->mspTask, usec,
-                    &selectedTask, &selectedTaskDynamicPriority);
+               adjustAndUpdateTask(&hf->mspTask, usec,
+               &selectedTask, &selectedTaskDynamicPriority);
 
-            if (selectedTask) {
+               if (selectedTask) {
 
-                int32_t taskRequiredTimeUs =
-                    selectedTask->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT;
-                int32_t taskRequiredTimeCycles =
-                    (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
+               int32_t taskRequiredTimeUs =
+               selectedTask->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT;
+               int32_t taskRequiredTimeCycles =
+               (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
 
-                uint32_t nowCycles = systemGetCycleCounter();
-                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+               uint32_t nowCycles = systemGetCycleCounter();
+               loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
-                scheduler_t * scheduler = &hf->scheduler;
+               scheduler_t * scheduler = &hf->scheduler;
 
-                // Allow a little extra time
-                taskRequiredTimeCycles += scheduler->taskGuardCycles;
+            // Allow a little extra time
+            taskRequiredTimeCycles += scheduler->taskGuardCycles;
 
-                if (taskRequiredTimeCycles < loopRemainingCycles) {
-                    uint32_t antipatedEndCycles =
-                        nowCycles + taskRequiredTimeCycles;
-                    executeTask(hf, selectedTask, usec);
-                    nowCycles = systemGetCycleCounter();
-                    int32_t cyclesOverdue =
-                        cmpTimeCycles(nowCycles, antipatedEndCycles);
+            if (taskRequiredTimeCycles < loopRemainingCycles) {
+            uint32_t antipatedEndCycles =
+            nowCycles + taskRequiredTimeCycles;
+            executeTask(hf, selectedTask, usec);
+            nowCycles = systemGetCycleCounter();
+            int32_t cyclesOverdue =
+            cmpTimeCycles(nowCycles, antipatedEndCycles);
 
-                    if ((cyclesOverdue > 0) ||
-                            (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
-                        if (scheduler->taskGuardCycles <
-                                scheduler->taskGuardMaxCycles) {
-                            scheduler->taskGuardCycles +=
-                                scheduler->taskGuardDeltaUpCycles;
-                        }
-                    } else if (scheduler->taskGuardCycles >
-                            scheduler->taskGuardMinCycles) {
-                        scheduler->taskGuardCycles -=
-                            scheduler->taskGuardDeltaDownCycles;
-                    }
-                } else if (selectedTask->taskAgeCycles > TASK_AGE_EXPEDITE_COUNT) {
-                    // If a task has been unable to run, then reduce it's recorded
-                    // estimated run time to ensure it's ultimate scheduling
-                    selectedTask->anticipatedExecutionTime *= 
-                        TASK_AGE_EXPEDITE_SCALE;
-                }
+            if ((cyclesOverdue > 0) ||
+            (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
+            if (scheduler->taskGuardCycles <
+            scheduler->taskGuardMaxCycles) {
+            scheduler->taskGuardCycles +=
+            scheduler->taskGuardDeltaUpCycles;
             }
-            */
+            } else if (scheduler->taskGuardCycles >
+            scheduler->taskGuardMinCycles) {
+            scheduler->taskGuardCycles -=
+            scheduler->taskGuardDeltaDownCycles;
+            }
+            } else if (selectedTask->ageCycles > TASK_AGE_EXPEDITE_COUNT) {
+            // If a task has been unable to run, then reduce it's recorded
+            // estimated run time to ensure it's ultimate scheduling
+            selectedTask->anticipatedExecutionTime *= 
+            TASK_AGE_EXPEDITE_SCALE;
+            }
+            }
+             */
         }
 
         static void adjustDynamicPriority(Task * task, uint32_t usec) 
@@ -273,10 +292,10 @@ class Hackflight : HackflightCore {
             // Task is time-driven, dynamicPriority is last execution age
             // (measured in desiredPeriods). Task age is calculated from last
             // execution.
-            task->m_ageCycles = (cmpTimeUs(usec, task->m_lastExecutedAtUs) /
-                    task->m_desiredPeriodUs);
-            if (task->m_ageCycles > 0) {
-                task->m_dynamicPriority = 1 + task->m_ageCycles;
+            task->ageCycles = (cmpTimeUs(usec, task->lastExecutedAtUs) /
+                    task->desiredPeriodUs);
+            if (task->ageCycles > 0) {
+                task->dynamicPriority = 1 + task->ageCycles;
             }
         }
 
@@ -302,19 +321,19 @@ class Hackflight : HackflightCore {
             failsafeInit();
             failsafeReset();
 
-            m_task_data.rx.devCheck = rxDeviceFuns->check;
-            m_task_data.rx.devConvert = rxDeviceFuns->convert;
+            m_taskData.rx.devCheck = rxDeviceFuns->check;
+            m_taskData.rx.devConvert = rxDeviceFuns->convert;
 
             rxDeviceFuns->init(rxDevPort);
 
             m_imuAlignFun = imuAlign;
 
-            m_task_data.motorDevice = motorDevice;
+            m_taskData.motorDevice = motorDevice;
 
             // Initialize quaternion in upright position
-            m_task_data.imuFusionPrev.quat.w = 1;
+            m_taskData.imuFusionPrev.quat.w = 1;
 
-            m_task_data.maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+            m_taskData.maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
             m_scheduler.loopStartCycles =
                 systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);

@@ -30,18 +30,17 @@ class Task {
 
         Task(uint32_t rate)
         {
-            m_desiredPeriodUs = 1000000 / rate;
+            desiredPeriodUs = 1000000 / rate;
         }
 
     protected:
 
-        int32_t  m_desiredPeriodUs;            
-        uint32_t m_lastExecutedAtUs;          
-
-        uint16_t m_dynamicPriority;          
-        uint16_t m_ageCycles;
-        uint32_t m_lastSignaledAtUs;         
-        uint32_t m_anticipatedExecutionTime;
+        uint16_t ageCycles;
+        uint32_t anticipatedExecutionTime;
+        int32_t  desiredPeriodUs;            
+        uint16_t dynamicPriority;          
+        uint32_t lastExecutedAtUs;          
+        uint32_t lastSignaledAtUs;         
 
         virtual void fun(task_data_t * data, uint32_t time) = 0;
 };
