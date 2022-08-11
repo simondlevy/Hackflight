@@ -201,7 +201,76 @@ class Hackflight : HackflightCore {
             }
         }
 
+        void checkDynamicTasks(
+                int32_t loopRemainingCycles,
+                uint32_t nextTargetCycles)
+        {
+            task_t *selectedTask = NULL;
+            uint16_t selectedTaskDynamicPriority = 0;
 
+            uint32_t usec = timeMicros();
+
+            /*
+            for (uint8_t k=0; k<hf->sensorTaskCount; ++k) {
+                task_t * task = &hf->sensorTasks[k];
+                adjustAndUpdateTask(task, usec,&selectedTask,
+                        &selectedTaskDynamicPriority);
+            }
+
+            adjustRxDynamicPriority(&hf->rx, &hf->rxTask, usec);
+            updateDynamicTask(&hf->rxTask, &selectedTask,
+                    &selectedTaskDynamicPriority);
+
+            adjustAndUpdateTask(&hf->attitudeTask, usec,
+                    &selectedTask, &selectedTaskDynamicPriority);
+
+            adjustAndUpdateTask(&hf->mspTask, usec,
+                    &selectedTask, &selectedTaskDynamicPriority);
+
+            if (selectedTask) {
+
+                int32_t taskRequiredTimeUs =
+                    selectedTask->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT;
+                int32_t taskRequiredTimeCycles =
+                    (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
+
+                uint32_t nowCycles = systemGetCycleCounter();
+                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+
+                scheduler_t * scheduler = &hf->scheduler;
+
+                // Allow a little extra time
+                taskRequiredTimeCycles += scheduler->taskGuardCycles;
+
+                if (taskRequiredTimeCycles < loopRemainingCycles) {
+                    uint32_t antipatedEndCycles =
+                        nowCycles + taskRequiredTimeCycles;
+                    executeTask(hf, selectedTask, usec);
+                    nowCycles = systemGetCycleCounter();
+                    int32_t cyclesOverdue =
+                        cmpTimeCycles(nowCycles, antipatedEndCycles);
+
+                    if ((cyclesOverdue > 0) ||
+                            (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
+                        if (scheduler->taskGuardCycles <
+                                scheduler->taskGuardMaxCycles) {
+                            scheduler->taskGuardCycles +=
+                                scheduler->taskGuardDeltaUpCycles;
+                        }
+                    } else if (scheduler->taskGuardCycles >
+                            scheduler->taskGuardMinCycles) {
+                        scheduler->taskGuardCycles -=
+                            scheduler->taskGuardDeltaDownCycles;
+                    }
+                } else if (selectedTask->taskAgeCycles > TASK_AGE_EXPEDITE_COUNT) {
+                    // If a task has been unable to run, then reduce it's recorded
+                    // estimated run time to ensure it's ultimate scheduling
+                    selectedTask->anticipatedExecutionTime *= 
+                        TASK_AGE_EXPEDITE_SCALE;
+                }
+            }
+            */
+        }
 
     public:
 
@@ -315,11 +384,9 @@ class Hackflight : HackflightCore {
             int32_t newLoopRemainingCyles =
                 cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
-            /*
             if (newLoopRemainingCyles > m_scheduler.guardMargin) {
-                checkDynamicTasks(hf, newLoopRemainingCyles, nextTargetCycles);
+                checkDynamicTasks(newLoopRemainingCyles, nextTargetCycles);
             }
-            */
 
         } // step()
 };
