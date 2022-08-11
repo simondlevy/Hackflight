@@ -271,31 +271,6 @@ typedef enum {
     SERIAL_PORT_IDENTIFIER_MAX = SERIAL_PORT_LPUART1,
 } serialPortIdentifier_e;
 
-// Scheduling ------------------------------------------------------------------
-
-typedef struct {
-    int32_t loopStartCycles;
-    int32_t loopStartMinCycles;
-    int32_t loopStartMaxCycles;
-    uint32_t loopStartDeltaDownCycles;
-    uint32_t loopStartDeltaUpCycles;
-
-    int32_t taskGuardCycles;
-    int32_t taskGuardMinCycles;
-    int32_t taskGuardMaxCycles;
-    uint32_t taskGuardDeltaDownCycles;
-    uint32_t taskGuardDeltaUpCycles;
-
-    int32_t desiredPeriodCycles;
-    uint32_t lastTargetCycles;
-
-    uint32_t nextTimingCycles;
-
-    int32_t guardMargin;
-    uint32_t clockRate;
-
-} scheduler_t;
-
 // Arming ---------------------------------------------------------------------
 
 typedef struct {

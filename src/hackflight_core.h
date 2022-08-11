@@ -35,7 +35,6 @@ typedef struct {
     pid_controller_t pidControllers[10];
     uint8_t          pidCount;
     bool             pidReset;
-    scheduler_t      scheduler;
     vehicle_state_t  vstate;
 
 } hackflight_core_t;

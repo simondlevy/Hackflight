@@ -44,10 +44,12 @@ int main(void)
 
     hackflight_core_t hf = {};
     hackflight_tasks_t ht = {};
+    scheduler_t scheduler = {};
     task_data_t td = {};
 
     hackflightInitFull(
             &hf,
+            &scheduler,
             &ht,
             &td,
             &sbusDeviceFuns,
@@ -60,7 +62,7 @@ int main(void)
             37);                // LED pin
 
     while (true) {
-        hackflightStep(&hf, &ht, &td);
+        hackflightStep(&hf, &scheduler, &ht, &td);
     }
 
     /*

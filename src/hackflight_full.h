@@ -74,6 +74,31 @@ static const float TASK_AGE_EXPEDITE_SCALE = 0.9;
 static const uint32_t CORE_RATE_COUNT = 25000;
 static const uint32_t GYRO_LOCK_COUNT = 400;
 
+// Scheduling ------------------------------------------------------------------
+
+typedef struct {
+    int32_t loopStartCycles;
+    int32_t loopStartMinCycles;
+    int32_t loopStartMaxCycles;
+    uint32_t loopStartDeltaDownCycles;
+    uint32_t loopStartDeltaUpCycles;
+
+    int32_t taskGuardCycles;
+    int32_t taskGuardMinCycles;
+    int32_t taskGuardMaxCycles;
+    uint32_t taskGuardDeltaDownCycles;
+    uint32_t taskGuardDeltaUpCycles;
+
+    int32_t desiredPeriodCycles;
+    uint32_t lastTargetCycles;
+
+    uint32_t nextTimingCycles;
+
+    int32_t guardMargin;
+    uint32_t clockRate;
+
+} scheduler_t;
+
 // Arming safety  -------------------------------------------------------------
 
 static const float MAX_ARMING_ANGLE = 25;
@@ -239,13 +264,12 @@ static void executeTask(
 
 static void checkCoreTasks(
         hackflight_core_t * hf,
+        scheduler_t * scheduler,
         task_data_t * td,
         int32_t loopRemainingCycles,
         uint32_t nowCycles,
         uint32_t nextTargetCycles)
 {
-    scheduler_t * scheduler = &hf->scheduler;
-
     if (scheduler->loopStartCycles > scheduler->loopStartMinCycles) {
         scheduler->loopStartCycles -= scheduler->loopStartDeltaDownCycles;
     }
@@ -350,6 +374,7 @@ static void adjustAndUpdateTask(
 
 static void checkDynamicTasks(
         hackflight_core_t * hf,
+        scheduler_t * scheduler,
         hackflight_tasks_t * ht,
         task_data_t * dt,
         int32_t loopRemainingCycles,
@@ -379,8 +404,6 @@ static void checkDynamicTasks(
 
         uint32_t nowCycles = systemGetCycleCounter();
         loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
-
-        scheduler_t * scheduler = &hf->scheduler;
 
         // Allow a little extra time
         taskRequiredTimeCycles += scheduler->taskGuardCycles;
@@ -423,6 +446,7 @@ static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
 
 void hackflightInitFull(
         hackflight_core_t * hf,
+        scheduler_t * scheduler,
         hackflight_tasks_t * ht,
         task_data_t * td,
         rx_dev_funs_t * rxDeviceFuns,
@@ -434,8 +458,6 @@ void hackflightInitFull(
         imu_align_fun imuAlign,
         uint8_t ledPin)
 {
-    (void)ht;
-
     hackflightInit(hf, anglePidConstants, mixer);
 
     mspInit();
@@ -465,8 +487,6 @@ void hackflightInitFull(
     td->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
     initTask(&ht->mspTask, task_msp, MSP_TASK_RATE);
-
-    scheduler_t * scheduler = &hf->scheduler;
 
     scheduler->loopStartCycles =
         systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
@@ -504,13 +524,10 @@ void hackflightInitFull(
 
 void hackflightStep(
         hackflight_core_t * hf,
+        scheduler_t * scheduler,
         hackflight_tasks_t * ht,
         task_data_t * td)
 {
-    (void)ht;
-
-    scheduler_t * scheduler = &hf->scheduler;
-
     uint32_t nextTargetCycles =
         scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
 
@@ -539,13 +556,13 @@ void hackflightStep(
 
     // Once close to the timing boundary, poll for its arrival
     if (loopRemainingCycles < scheduler->loopStartCycles) {
-        checkCoreTasks(hf, td, loopRemainingCycles, nowCycles, nextTargetCycles);
+        checkCoreTasks(hf, scheduler, td, loopRemainingCycles, nowCycles, nextTargetCycles);
     }
 
     int32_t newLoopRemainingCyles =
         cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     if (newLoopRemainingCyles > scheduler->guardMargin) {
-        checkDynamicTasks(hf, ht, td, newLoopRemainingCyles, nextTargetCycles);
+        checkDynamicTasks(hf, scheduler, ht, td, newLoopRemainingCyles, nextTargetCycles);
     }
 }
