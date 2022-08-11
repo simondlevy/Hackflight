@@ -90,6 +90,12 @@ class Hackflight : HackflightCore {
         MspTask       m_mspTask;
         ReceiverTask  m_rxTask;
 
+        // Demands
+        demands_t m_demands;
+
+        // Essential PID controller
+        anglePid_t m_anglePid;
+
         // Scheduler
         scheduler_t m_scheduler;
 
@@ -119,11 +125,11 @@ class Hackflight : HackflightCore {
 
             gyroReadScaled(&data->gyro, m_imuAlignFun, &data->vstate);
 
-            /*
             uint32_t usec = timeMicros();
 
-            rxGetDemands(&hf->rx, usec, &hf->anglepid, &hf->demands);
+            rxGetDemands(&data->rx, usec, &m_anglePid, &m_demands);
 
+            /*
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
             motor_config_t motorConfig = {
