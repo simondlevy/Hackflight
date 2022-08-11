@@ -249,8 +249,6 @@ class Hackflight : HackflightCore {
 
         uint32_t usec = timeMicros();
 
-        task_data_t * data = &m_taskData;
-
         adjustRxDynamicPriority(usec);
 
         updateDynamicTask(&m_rxTask, &selectedTask,
@@ -264,49 +262,69 @@ class Hackflight : HackflightCore {
 
         if (selectedTask) {
 
-            /*
-               int32_t taskRequiredTimeUs =
-               selectedTask->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT;
-               int32_t taskRequiredTimeCycles =
-               (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
+            int32_t taskRequiredTimeUs =
+                selectedTask->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT;
+            int32_t taskRequiredTimeCycles =
+                (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
 
-               uint32_t nowCycles = systemGetCycleCounter();
-               loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+            uint32_t nowCycles = systemGetCycleCounter();
+            loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
-               scheduler_t * scheduler = &hf->scheduler;
+            scheduler_t * scheduler = &m_scheduler;
 
             // Allow a little extra time
             taskRequiredTimeCycles += scheduler->taskGuardCycles;
 
             if (taskRequiredTimeCycles < loopRemainingCycles) {
-            uint32_t antipatedEndCycles =
-            nowCycles + taskRequiredTimeCycles;
-            executeTask(hf, selectedTask, usec);
-            nowCycles = systemGetCycleCounter();
-            int32_t cyclesOverdue =
-            cmpTimeCycles(nowCycles, antipatedEndCycles);
+                uint32_t antipatedEndCycles =
+                    nowCycles + taskRequiredTimeCycles;
+                executeTask(selectedTask, usec);
+                nowCycles = systemGetCycleCounter();
+                int32_t cyclesOverdue =
+                    cmpTimeCycles(nowCycles, antipatedEndCycles);
 
-            if ((cyclesOverdue > 0) ||
-            (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
-            if (scheduler->taskGuardCycles <
-            scheduler->taskGuardMaxCycles) {
-            scheduler->taskGuardCycles +=
-            scheduler->taskGuardDeltaUpCycles;
-            }
-            } else if (scheduler->taskGuardCycles >
-            scheduler->taskGuardMinCycles) {
-            scheduler->taskGuardCycles -=
-            scheduler->taskGuardDeltaDownCycles;
-            }
+                if ((cyclesOverdue > 0) ||
+                        (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
+                    if (scheduler->taskGuardCycles <
+                            scheduler->taskGuardMaxCycles) {
+                        scheduler->taskGuardCycles +=
+                            scheduler->taskGuardDeltaUpCycles;
+                    }
+                } else if (scheduler->taskGuardCycles >
+                        scheduler->taskGuardMinCycles) {
+                    scheduler->taskGuardCycles -=
+                        scheduler->taskGuardDeltaDownCycles;
+                }
             } else if (selectedTask->ageCycles > TASK_AGE_EXPEDITE_COUNT) {
-            // If a task has been unable to run, then reduce it's recorded
-            // estimated run time to ensure it's ultimate scheduling
-            selectedTask->anticipatedExecutionTime *= 
-            TASK_AGE_EXPEDITE_SCALE;
+                // If a task has been unable to run, then reduce it's recorded
+                // estimated run time to ensure it's ultimate scheduling
+                selectedTask->anticipatedExecutionTime *= 
+                    TASK_AGE_EXPEDITE_SCALE;
             }
-             */
         }
     }
+
+    void executeTask(Task *task, uint32_t usec)
+    {
+        task->lastExecutedAtUs = usec;
+        task->dynamicPriority = 0;
+
+        uint32_t time = timeMicros();
+        task->fun(&m_taskData, usec);
+
+        uint32_t taskExecutionTimeUs = timeMicros() - time;
+
+        // Update estimate of expected task duration
+        if (taskExecutionTimeUs >
+                (task->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT)) {
+            task->anticipatedExecutionTime =
+                taskExecutionTimeUs << TASK_EXEC_TIME_SHIFT;
+        } else if (task->anticipatedExecutionTime > 1) {
+            // Slowly decay the max time
+            task->anticipatedExecutionTime--;
+        }
+    }
+
 
     static void adjustDynamicPriority(Task * task, uint32_t usec) 
     {

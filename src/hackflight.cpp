@@ -144,8 +144,6 @@ static void task_msp(void * hackflight, uint32_t time)
 
 // Support for dynamically scheduled tasks ---------------------------------
 
-static int32_t taskNextStateTime;
-
 static void adjustDynamicPriority(task_t * task, uint32_t usec) 
 {
     // Task is time-driven, dynamicPriority is last execution age (measured
@@ -189,8 +187,6 @@ static void executeTask(
 
     uint32_t taskExecutionTimeUs = timeMicros() - time;
 
-    // Update estimate of expected task duration
-    taskNextStateTime = -1;
     if (taskExecutionTimeUs >
             (task->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT)) {
         task->anticipatedExecutionTime =
