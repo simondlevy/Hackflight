@@ -33,7 +33,6 @@ typedef struct {
     demands_t        demands;
     imu_align_fun    imuAlignFun;
     mixer_t          mixer;
-    void *           motorDevice;
     float            mspMotors[4];
     task_t           mspTask;
     pid_controller_t pidControllers[10];

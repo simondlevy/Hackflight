@@ -123,7 +123,7 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
             imuIsLevel, 
             calibrating,
             &rxax,
-            hf->motorDevice,
+            td->motorDevice,
             &td->arming,
             &pidItermResetReady,
             &pidItermResetValue,
@@ -153,7 +153,7 @@ static void task_msp(void * hp, void * dp, uint32_t usec)
             &hf->vstate,
             &hf->rxAxes,
             armingIsArmed(&td->arming),
-            hf->motorDevice,
+            td->motorDevice,
             hf->mspMotors);
 }
 
@@ -253,7 +253,7 @@ static void checkCoreTasks(
             &motorConfig,
             mixmotors);
 
-    motorWrite(hf->motorDevice,
+    motorWrite(td->motorDevice,
             armingIsArmed(&td->arming) ? mixmotors : hf->mspMotors);
 
     // CPU busy
@@ -420,7 +420,7 @@ void hackflightInitFull(
 
     hf->imuAlignFun = imuAlign;
 
-    hf->motorDevice = motorDevice;
+    td->motorDevice = motorDevice;
 
     initTask(&hf->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
 
