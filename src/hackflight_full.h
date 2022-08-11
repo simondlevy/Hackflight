@@ -78,7 +78,7 @@ static const uint32_t GYRO_LOCK_COUNT = 400;
 
 static const float MAX_ARMING_ANGLE = 25;
 
-// Hackflight data structure
+// Tasks for full Hackflight
 
 typedef struct {
 
@@ -403,6 +403,7 @@ static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
 
 void hackflightInitFull(
         hackflight_core_t * hf,
+        hackflight_tasks_t * ht,
         task_data_t * td,
         rx_dev_funs_t * rxDeviceFuns,
         serialPortIdentifier_e rxDevPort,
@@ -413,6 +414,8 @@ void hackflightInitFull(
         imu_align_fun imuAlign,
         uint8_t ledPin)
 {
+    (void)ht;
+
     hackflightInit(hf, anglePidConstants, mixer);
 
     mspInit();
@@ -479,8 +482,13 @@ void hackflightInitFull(
     scheduler->clockRate = systemClockMicrosToCycles(1000000);
 }
 
-void hackflightStep(hackflight_core_t * hf, task_data_t * td)
+void hackflightStep(
+        hackflight_core_t * hf,
+        hackflight_tasks_t * ht,
+        task_data_t * td)
 {
+    (void)ht;
+
     scheduler_t * scheduler = &hf->scheduler;
 
     uint32_t nextTargetCycles =
