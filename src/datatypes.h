@@ -144,15 +144,12 @@ typedef struct {
 
 // Tasks ------------------------------------------------------------------------
 
-typedef void (*task_fun_t)(
-        void * hackflight,
-        uint32_t usec
-        );
+typedef void (*task_fun_t)(void * hp, void * dp, uint32_t usec);
 
 typedef struct {
 
     // For both hardware and sim implementations
-    void (*fun)(void * hackflight, uint32_t time);
+    void (*fun)(void * hp, void * dp, uint32_t time);
     int32_t desiredPeriodUs;            
     uint32_t lastExecutedAtUs;          
 

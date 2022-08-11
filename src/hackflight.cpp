@@ -84,23 +84,27 @@ static const float MAX_ARMING_ANGLE = 25;
 
 // Attitude task --------------------------------------------------------------
 
-static void task_attitude(void * hackflight, uint32_t time)
+static void task_attitude(void * hp, void * dp, uint32_t usec)
 {
-    hackflight_t * hf = (hackflight_t *)hackflight;
+    hackflight_t * hf = (hackflight_t *)hp;
+
+    (void)dp;
 
     imuGetEulerAngles(
             &hf->gyro,
             &hf->imuFusionPrev,
             &hf->arming,
-            time,
+            usec,
             &hf->vstate);
 }
 
 // RX polling task ------------------------------------------------------------
 
-static void task_rx(void * hackflight, uint32_t time)
+static void task_rx(void * hp, void * dp, uint32_t usec)
 {
-    hackflight_t * hf = (hackflight_t *)hackflight;
+    hackflight_t * hf = (hackflight_t *)hp;
+
+    (void)dp;
 
     bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;
     bool pidItermResetReady = false;
@@ -116,7 +120,7 @@ static void task_rx(void * hackflight, uint32_t time)
 
     rxPoll(
             &hf->rx,
-            time,
+            usec,
             imuIsLevel, 
             calibrating,
             &rxax,
@@ -139,11 +143,13 @@ static void task_rx(void * hackflight, uint32_t time)
 
 static const uint32_t MSP_TASK_RATE = 100;
 
-static void task_msp(void * hackflight, uint32_t time)
+static void task_msp(void * hp, void * dp, uint32_t usec)
 {
-    (void)time;
+    hackflight_t * hf = (hackflight_t *)hp;
 
-    hackflight_t * hf = (hackflight_t *)hackflight;
+    (void)usec;
+    (void)dp;
+
     mspUpdate(&hf->vstate, &hf->rxAxes, armingIsArmed(&hf->arming),
             hf->motorDevice, hf->mspMotors);
 }
@@ -189,7 +195,7 @@ static void executeTask(
     task->dynamicPriority = 0;
 
     uint32_t time = timeMicros();
-    task->fun(hf, usec);
+    task->fun(hf, NULL, usec);
 
     uint32_t taskExecutionTimeUs = timeMicros() - time;
 
