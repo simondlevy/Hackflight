@@ -96,7 +96,6 @@ static void task_attitude(void * hp, void * dp, uint32_t usec)
     hackflight_core_t * hf = (hackflight_core_t *)hp;
     task_data_t * td = (task_data_t *)dp;
 
-
     imuGetEulerAngles(
             &td->gyro,
             &td->imuFusionPrev,
@@ -198,7 +197,7 @@ static void adjustRxDynamicPriority(rx_t * rx, task_t * task,
 
 static void executeTask(
         hackflight_core_t * hf,
-        task_data_t * dp,
+        task_data_t * dt,
         task_t *task,
         uint32_t usec)
 {
@@ -206,7 +205,7 @@ static void executeTask(
     task->dynamicPriority = 0;
 
     uint32_t time = timeMicros();
-    task->fun(hf, dp, usec);
+    task->fun(hf, dt, usec);
 
     uint32_t taskExecutionTimeUs = timeMicros() - time;
 
@@ -333,7 +332,7 @@ static void adjustAndUpdateTask(
 
 static void checkDynamicTasks(
         hackflight_core_t * hf,
-        task_data_t * dp,
+        task_data_t * dt,
         int32_t loopRemainingCycles,
         uint32_t nextTargetCycles)
 {
@@ -342,7 +341,7 @@ static void checkDynamicTasks(
 
     uint32_t usec = timeMicros();
 
-    adjustRxDynamicPriority(&dp->rx, &hf->rxTask, usec);
+    adjustRxDynamicPriority(&dt->rx, &hf->rxTask, usec);
     updateDynamicTask(&hf->rxTask, &selectedTask,
             &selectedTaskDynamicPriority);
 
@@ -370,7 +369,7 @@ static void checkDynamicTasks(
         if (taskRequiredTimeCycles < loopRemainingCycles) {
             uint32_t antipatedEndCycles =
                 nowCycles + taskRequiredTimeCycles;
-            executeTask(hf, dp, selectedTask, usec);
+            executeTask(hf, dt, selectedTask, usec);
             nowCycles = systemGetCycleCounter();
             int32_t cyclesOverdue =
                 cmpTimeCycles(nowCycles, antipatedEndCycles);
