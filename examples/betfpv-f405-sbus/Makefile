@@ -273,7 +273,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/debug.o \
 		  $(OBJECT_DIR)/failsafe.o \
 		  $(OBJECT_DIR)/gyro.o \
-		  $(OBJECT_DIR)/hackflight.o \
 		  $(OBJECT_DIR)/imu.o \
 		  $(OBJECT_DIR)/led.o \
 		  $(OBJECT_DIR)/maths.o \
@@ -361,17 +360,6 @@ $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
 	  $(HFSRC_DIR)/stats.h \
 	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/hackflight.o: $(HFSRC_DIR)/hackflight.cpp \
-	  $(HFSRC_DIR)/arming.h \
-	  $(HFSRC_DIR)/debug.h \
-	  $(HFSRC_DIR)/gyro.h \
-	  $(HFSRC_DIR)/hackflight.h \
-	  $(HFSRC_DIR)/led.h \
-	  $(HFSRC_DIR)/msp.h \
-	  $(HFSRC_DIR)/rx.h \
-	  $(HFSRC_DIR)/system.h
 	$(V1) $(call compile_cpp)
 
 $(OBJECT_DIR)/imu.o: $(HFSRC_DIR)/imu.cpp \
