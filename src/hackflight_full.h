@@ -148,7 +148,7 @@ typedef struct {
 
 static void task_attitude(void * hp, void * dp, uint32_t usec)
 {
-    hackflight_core_t * hf = (hackflight_core_t *)hp;
+    hackflight_core_t * core = (hackflight_core_t *)hp;
     task_data_t * td = (task_data_t *)dp;
 
     imuGetEulerAngles(
@@ -156,14 +156,14 @@ static void task_attitude(void * hp, void * dp, uint32_t usec)
             &td->imuFusionPrev,
             &td->arming,
             usec,
-            &hf->vstate);
+            &core->vstate);
 }
 
 // RX polling task ------------------------------------------------------------
 
 static void task_rx(void * hp, void * dp, uint32_t usec)
 {
-    hackflight_core_t * hf = (hackflight_core_t *)hp;
+    hackflight_core_t * core = (hackflight_core_t *)hp;
     task_data_t * td = (task_data_t *)dp;
 
     bool calibrating = td->gyro.isCalibrating; // || acc.calibrating != 0;
@@ -175,8 +175,8 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
     bool gotNewData = false;
 
     bool imuIsLevel =
-        fabsf(hf->vstate.phi) < td->maxArmingAngle &&
-        fabsf(hf->vstate.theta) < td->maxArmingAngle;
+        fabsf(core->vstate.phi) < td->maxArmingAngle &&
+        fabsf(core->vstate.theta) < td->maxArmingAngle;
 
     rxPoll(
             &td->rx,
@@ -191,7 +191,7 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
             &gotNewData);
 
     if (pidItermResetReady) {
-        hf->pidReset = pidItermResetValue;
+        core->pidReset = pidItermResetValue;
     }
 
     if (gotNewData) {
@@ -205,13 +205,13 @@ static const uint32_t MSP_TASK_RATE = 100;
 
 static void task_msp(void * hp, void * dp, uint32_t usec)
 {
-    hackflight_core_t * hf = (hackflight_core_t *)hp;
+    hackflight_core_t * core = (hackflight_core_t *)hp;
     task_data_t * td = (task_data_t *)dp;
 
     (void)usec;
 
     mspUpdate(
-            &hf->vstate,
+            &core->vstate,
             &td->rxAxes,
             armingIsArmed(&td->arming),
             td->motorDevice,
@@ -251,7 +251,7 @@ static void adjustRxDynamicPriority(rx_t * rx, task_t * task,
 }
 
 static void executeTask(
-        hackflight_core_t * hf,
+        hackflight_core_t * core,
         task_data_t * dt,
         task_t *task,
         uint32_t usec)
@@ -260,7 +260,7 @@ static void executeTask(
     task->dynamicPriority = 0;
 
     uint32_t time = timeMicros();
-    task->fun(hf, dt, usec);
+    task->fun(core, dt, usec);
 
     uint32_t taskExecutionTimeUs = timeMicros() - time;
 
@@ -275,8 +275,8 @@ static void executeTask(
 }
 
 static void checkCoreTasks(
-        hackflight_full_t * hff,
-        hackflight_core_t * hf,
+        hackflight_full_t * full,
+        hackflight_core_t * core,
         scheduler_t * scheduler,
         task_data_t * td,
         int32_t loopRemainingCycles,
@@ -292,11 +292,11 @@ static void checkCoreTasks(
         loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
     }
 
-    gyroReadScaled(&td->gyro, hff->imuAlignFun, &hf->vstate);
+    gyroReadScaled(&td->gyro, full->imuAlignFun, &core->vstate);
 
     uint32_t usec = timeMicros();
 
-    rxGetDemands(&td->rx, usec, &hf->anglePid, &hf->demands);
+    rxGetDemands(&td->rx, usec, &core->anglePid, &core->demands);
 
     float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
@@ -308,7 +308,7 @@ static void checkCoreTasks(
     };
 
     hackflightRunCoreTasks(
-            hf,
+            core,
             usec,
             failsafeIsActive(),
             &motorConfig,
@@ -495,7 +495,7 @@ static void schedulerInit(scheduler_t * scheduler)
 // -------------------------------------------------------------------------
 
 void hackflightInitFull(
-        hackflight_full_t * hff,
+        hackflight_full_t * full,
         hackflight_core_t * hf,
         hackflight_tasks_t * ht,
         rx_dev_funs_t * rxDeviceFuns,
@@ -509,7 +509,7 @@ void hackflightInitFull(
 {
     hackflightInit(hf, anglePidConstants, mixer);
 
-    task_data_t * td = &hff->taskData;
+    task_data_t * td = &full->taskData;
 
     mspInit();
     gyroInit(&td->gyro);
@@ -524,7 +524,7 @@ void hackflightInitFull(
 
     rxDeviceFuns->init(rxDevPort);
 
-    hff->imuAlignFun = imuAlign;
+    full->imuAlignFun = imuAlign;
 
     td->motorDevice = motorDevice;
 
@@ -539,17 +539,17 @@ void hackflightInitFull(
 
     initTask(&ht->mspTask, task_msp, MSP_TASK_RATE);
 
-    schedulerInit(&hff->scheduler);
+    schedulerInit(&full->scheduler);
 }
 
 void hackflightStep(
-        hackflight_full_t * hff,
-        hackflight_core_t * hf,
+        hackflight_full_t * full,
+        hackflight_core_t * core,
         hackflight_tasks_t * ht)
 {
-    scheduler_t * scheduler = &hff->scheduler;
+    scheduler_t * scheduler = &full->scheduler;
 
-    task_data_t * td = &hff->taskData;
+    task_data_t * td = &full->taskData;
 
     uint32_t nextTargetCycles =
         scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
@@ -580,8 +580,8 @@ void hackflightStep(
     // Once close to the timing boundary, poll for its arrival
     if (loopRemainingCycles < scheduler->loopStartCycles) {
         checkCoreTasks(
-                hff,
-                hf,
+                full,
+                core,
                 scheduler,
                 td,
                 loopRemainingCycles,
@@ -593,6 +593,6 @@ void hackflightStep(
         cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     if (newLoopRemainingCyles > scheduler->guardMargin) {
-        checkDynamicTasks(hf, scheduler, ht, td, newLoopRemainingCyles, nextTargetCycles);
+        checkDynamicTasks(core, scheduler, ht, td, newLoopRemainingCyles, nextTargetCycles);
     }
 }
