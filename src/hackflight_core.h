@@ -41,7 +41,7 @@ typedef struct {
     scheduler_t      scheduler;
     vehicle_state_t  vstate;
 
-} hackflight_t;
+} hackflight_core_t;
 
 // Scheduling constants -------------------------------------------------------
 
@@ -57,7 +57,7 @@ static const uint16_t PIDSUM_LIMIT      = 500;
 
 // PID controller support -----------------------------------------------------
 
-static void hackflightAddPidController(hackflight_t * hf, pid_fun_t fun, void * data)
+static void hackflightAddPidController(hackflight_core_t * hf, pid_fun_t fun, void * data)
 {
     hf->pidControllers[hf->pidCount].fun = fun;
     hf->pidControllers[hf->pidCount].data = data;
@@ -74,7 +74,7 @@ static float constrain_demand(float demand, float limit, float scaling)
 // Public API -----------------------------------------------------------------
 
 static void hackflightRunCoreTasks(
-        hackflight_t * hf,
+        hackflight_core_t * hf,
         uint32_t usec,
         bool failsafe,
         motor_config_t * motorConfig,
@@ -101,7 +101,7 @@ static void hackflightRunCoreTasks(
 }
 
 static void hackflightInit(
-        hackflight_t * hf,
+        hackflight_core_t * hf,
         anglePidConstants_t * anglePidConstants,
         mixer_t mixer)
 {

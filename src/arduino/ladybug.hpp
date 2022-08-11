@@ -26,7 +26,7 @@
 #include <motor.h>
 #include <stm32_clock.h>
 
-static hackflight_t _hf;
+static hackflight_core_t _hf;
         
 static void ladybug_setup(rx_dev_funs_t * rxDeviceFuns)
 {

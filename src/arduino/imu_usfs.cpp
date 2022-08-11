@@ -134,7 +134,7 @@ extern "C" {
     }
 
 
-    void imuGetEulerAngles(hackflight_t * hf, uint32_t time)
+    void imuGetEulerAngles(hackflight_core_t * hf, uint32_t time)
     {
         vehicle_state_t * vstate = &hf->vstate;
 

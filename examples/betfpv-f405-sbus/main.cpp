@@ -42,7 +42,7 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0}; // 3.0; // Level Kp
 
-    hackflight_t hf = {};
+    hackflight_core_t hf = {};
 
     task_data_t td = {};
 

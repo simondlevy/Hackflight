@@ -79,11 +79,17 @@ static const uint32_t GYRO_LOCK_COUNT = 400;
 
 static const float MAX_ARMING_ANGLE = 25;
 
+// Hackflight data structure
+
+typedef struct {
+
+} hackflight_full_t;
+
 // Attitude task --------------------------------------------------------------
 
 static void task_attitude(void * hp, void * dp, uint32_t usec)
 {
-    hackflight_t * hf = (hackflight_t *)hp;
+    hackflight_core_t * hf = (hackflight_core_t *)hp;
     task_data_t * td = (task_data_t *)dp;
 
 
@@ -99,7 +105,7 @@ static void task_attitude(void * hp, void * dp, uint32_t usec)
 
 static void task_rx(void * hp, void * dp, uint32_t usec)
 {
-    hackflight_t * hf = (hackflight_t *)hp;
+    hackflight_core_t * hf = (hackflight_core_t *)hp;
     task_data_t * td = (task_data_t *)dp;
 
     bool calibrating = td->gyro.isCalibrating; // || acc.calibrating != 0;
@@ -141,7 +147,7 @@ static const uint32_t MSP_TASK_RATE = 100;
 
 static void task_msp(void * hp, void * dp, uint32_t usec)
 {
-    hackflight_t * hf = (hackflight_t *)hp;
+    hackflight_core_t * hf = (hackflight_core_t *)hp;
     task_data_t * td = (task_data_t *)dp;
 
     (void)usec;
@@ -187,7 +193,7 @@ static void adjustRxDynamicPriority(rx_t * rx, task_t * task,
 }
 
 static void executeTask(
-        hackflight_t * hf,
+        hackflight_core_t * hf,
         task_data_t * dp,
         task_t *task,
         uint32_t usec)
@@ -211,7 +217,7 @@ static void executeTask(
 }
 
 static void checkCoreTasks(
-        hackflight_t * hf,
+        hackflight_core_t * hf,
         task_data_t * td,
         int32_t loopRemainingCycles,
         uint32_t nowCycles,
@@ -322,7 +328,7 @@ static void adjustAndUpdateTask(
 }
 
 static void checkDynamicTasks(
-        hackflight_t * hf,
+        hackflight_core_t * hf,
         task_data_t * dp,
         int32_t loopRemainingCycles,
         uint32_t nextTargetCycles)
@@ -389,7 +395,7 @@ static void checkDynamicTasks(
 // -------------------------------------------------------------------------
 
 void hackflightInitFull(
-        hackflight_t * hf,
+        hackflight_core_t * hf,
         task_data_t * td,
         rx_dev_funs_t * rxDeviceFuns,
         serialPortIdentifier_e rxDevPort,
@@ -466,7 +472,7 @@ void hackflightInitFull(
     scheduler->clockRate = systemClockMicrosToCycles(1000000);
 }
 
-void hackflightStep(hackflight_t * hf, task_data_t * td)
+void hackflightStep(hackflight_core_t * hf, task_data_t * td)
 {
     scheduler_t * scheduler = &hf->scheduler;
 
