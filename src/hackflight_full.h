@@ -136,10 +136,11 @@ typedef struct {
 
 typedef struct {
 
-    hackflight_core_t core;
+    hackflight_core_t  core;
+    imu_align_fun      imuAlignFun;
+    task_data_t        taskData;
     hackflight_tasks_t tasks;
-    task_data_t taskData;
-    scheduler_t scheduler;
+    scheduler_t        scheduler;
 
 } hackflight_full_t;
 
