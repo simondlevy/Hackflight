@@ -457,6 +457,7 @@ static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
 // -------------------------------------------------------------------------
 
 void hackflightInitFull(
+        hackflight_full_t * hff,
         hackflight_core_t * hf,
         scheduler_t * scheduler,
         hackflight_tasks_t * ht,
@@ -535,6 +536,7 @@ void hackflightInitFull(
 }
 
 void hackflightStep(
+        hackflight_full_t * hff,
         hackflight_core_t * hf,
         scheduler_t * scheduler,
         hackflight_tasks_t * ht,

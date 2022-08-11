@@ -42,12 +42,14 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0}; // 3.0; // Level Kp
 
+    hackflight_full_t hff = {};
     hackflight_core_t hf = {};
     hackflight_tasks_t ht = {};
     scheduler_t scheduler = {};
     task_data_t td = {};
 
     hackflightInitFull(
+            &hff,
             &hf,
             &scheduler,
             &ht,
@@ -62,7 +64,7 @@ int main(void)
             37);                // LED pin
 
     while (true) {
-        hackflightStep(&hf, &scheduler, &ht, &td);
+        hackflightStep(&hff, &hf, &scheduler, &ht, &td);
     }
 
     /*
