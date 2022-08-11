@@ -93,14 +93,8 @@ class Hackflight : HackflightCore {
         // Scheduler
         scheduler_t m_scheduler;
 
-        // Arming safety
-        float m_maxArmingAngle;
-
         // IMU alignment function
         imu_align_fun m_imuAlignFun;
-
-        // XXX can we avoid void * ?
-        void * m_motorDevice;
 
         // Core contents for tasks
         task_data_t m_task_data;
@@ -121,11 +115,11 @@ class Hackflight : HackflightCore {
                 loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
+            /*
             task_data_t * data = &m_task_data;
 
             gyroReadScaled(&data->gyro, data->imuAlignFun, &data->vstate);
 
-            /*
             uint32_t usec = timeMicros();
 
             rxGetDemands(&hf->rx, usec, &hf->anglepid, &hf->demands);
@@ -228,12 +222,12 @@ class Hackflight : HackflightCore {
 
             m_imuAlignFun = imuAlign;
 
-            m_motorDevice = motorDevice;
+            m_task_data.motorDevice = motorDevice;
 
             // Initialize quaternion in upright position
             m_task_data.imuFusionPrev.quat.w = 1;
 
-            m_maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+            m_task_data.maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
             m_scheduler.loopStartCycles =
                 systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);

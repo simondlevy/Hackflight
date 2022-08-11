@@ -519,7 +519,6 @@ typedef struct {
     task_t           attitudeTask;
     demands_t        demands;
     gyro_t           gyro;
-    imu_align_fun    imuAlignFun;
     imu_fusion_t     imuFusionPrev;
     float            maxArmingAngle;
     mixer_t          mixer;
@@ -532,7 +531,6 @@ typedef struct {
     rx_t             rx;
     task_t           rxTask;
     rx_axes_t        rxAxes;
-    scheduler_t      scheduler;
     task_t           sensorTasks[10];
     uint8_t          sensorTaskCount;
     vehicle_state_t  vstate;
