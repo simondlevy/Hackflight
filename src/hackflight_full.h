@@ -139,6 +139,7 @@ typedef struct {
     hackflight_core_t core;
     hackflight_tasks_t tasks;
     task_data_t taskData;
+    scheduler_t scheduler;
 
 } hackflight_full_t;
 
