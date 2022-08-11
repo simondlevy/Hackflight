@@ -78,6 +78,25 @@ static const uint32_t GYRO_LOCK_COUNT = 400;
 
 static const float MAX_ARMING_ANGLE = 25;
 
+// General task type ----------------------------------------------------------
+
+typedef void (*task_fun_t)(void * hp, void * dp, uint32_t usec);
+
+typedef struct {
+
+    // For both hardware and sim implementations
+    void (*fun)(void * hp, void * dp, uint32_t time);
+    int32_t desiredPeriodUs;            
+    uint32_t lastExecutedAtUs;          
+
+    // For hardware impelmentations
+    uint16_t dynamicPriority;          
+    uint16_t taskAgeCycles;
+    uint32_t lastSignaledAtUs;         
+    uint32_t anticipatedExecutionTime;
+
+} task_t;
+
 // Tasks for full Hackflight
 
 typedef struct {
