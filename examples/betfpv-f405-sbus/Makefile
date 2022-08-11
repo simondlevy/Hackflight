@@ -316,7 +316,7 @@ $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \
 	  $(HFSRC_DIR)/core_rate.h \
       $(HFSRC_DIR)/datatypes.h \
-      $(HFSRC_DIR)/hackflight_full.h \
+      $(HFSRC_DIR)/hackflight_new.h \
       $(HFSRC_DIR)/imu.h \
       $(HFSRC_DIR)/imu_alignment/rotate_270.h \
       $(HFSRC_DIR)/mixers/fixedpitch/quadxbf.h \
