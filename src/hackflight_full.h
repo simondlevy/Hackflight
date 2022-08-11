@@ -83,7 +83,11 @@ static const float MAX_ARMING_ANGLE = 25;
 
 typedef struct {
 
-} hackflight_full_t;
+    task_t attitudeTask;
+    task_t mspTask;
+    task_t rxTask;
+
+ } hackflight_tasks_t;
 
 // Attitude task --------------------------------------------------------------
 
