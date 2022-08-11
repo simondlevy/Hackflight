@@ -45,13 +45,11 @@ int main(void)
     hackflight_full_t full = {};
     hackflight_core_t core = {};
     hackflight_tasks_t tasks = {};
-    task_data_t taskData = {};
 
     hackflightInitFull(
             &full,
             &core,
             &tasks,
-            &taskData,
             &sbusDeviceFuns,
             SERIAL_PORT_USART3, // RX port
             &anglePidConstants,
@@ -62,7 +60,7 @@ int main(void)
             37);                // LED pin
 
     while (true) {
-        hackflightStep(&full, &core, &tasks, &taskData);
+        hackflightStep(&full, &core, &tasks);
     }
 
     /*

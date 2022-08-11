@@ -498,7 +498,6 @@ void hackflightInitFull(
         hackflight_full_t * hff,
         hackflight_core_t * hf,
         hackflight_tasks_t * ht,
-        task_data_t * td,
         rx_dev_funs_t * rxDeviceFuns,
         serialPortIdentifier_e rxDevPort,
         anglePidConstants_t * anglePidConstants,
@@ -509,6 +508,8 @@ void hackflightInitFull(
         uint8_t ledPin)
 {
     hackflightInit(hf, anglePidConstants, mixer);
+
+    task_data_t * td = &hff->taskData;
 
     mspInit();
     gyroInit(&td->gyro);
@@ -544,10 +545,11 @@ void hackflightInitFull(
 void hackflightStep(
         hackflight_full_t * hff,
         hackflight_core_t * hf,
-        hackflight_tasks_t * ht,
-        task_data_t * td)
+        hackflight_tasks_t * ht)
 {
     scheduler_t * scheduler = &hff->scheduler;
+
+    task_data_t * td = &hff->taskData;
 
     uint32_t nextTargetCycles =
         scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
