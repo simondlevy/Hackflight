@@ -85,6 +85,10 @@ class Hackflight : HackflightCore {
         // Arming safety angle constant
         static constexpr float MAX_ARMING_ANGLE = 25;
 
+        // Gyro interrupt counts over which to measure loop time and skew
+        static const uint32_t CORE_RATE_COUNT = 25000;
+        static const uint32_t GYRO_LOCK_COUNT = 400;
+
         // Essential tasks
         AttitudeTask  m_attitudeTask;
         MspTask       m_mspTask;
@@ -154,7 +158,6 @@ class Hackflight : HackflightCore {
             }
             scheduler->lastTargetCycles = nextTargetCycles;
 
-            /*
             // Bring the scheduler into lock with the gyro Track the actual gyro
             // rate over given number of cycle times and set the expected timebase
             static uint32_t _terminalGyroRateCount;
@@ -196,7 +199,6 @@ class Hackflight : HackflightCore {
 
                 _gyroSkewAccum = 0;
             }
-            */
         }
 
 
