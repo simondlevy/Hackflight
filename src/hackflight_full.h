@@ -26,7 +26,7 @@
 #include "deg2rad.h"
 #include "failsafe.h"
 #include "gyro.h"
-#include "hackflight.h"
+#include "hackflight_core.h"
 #include "init_task.h"
 #include "led.h"
 #include "motor.h"
