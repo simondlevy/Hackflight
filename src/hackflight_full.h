@@ -27,7 +27,6 @@
 #include "failsafe.h"
 #include "gyro.h"
 #include "hackflight_core.h"
-#include "init_task.h"
 #include "led.h"
 #include "motor.h"
 #include "msp.h"
@@ -395,6 +394,11 @@ static void checkDynamicTasks(
     }
 }
 
+static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
+{
+    task->fun = fun;
+    task->desiredPeriodUs = 1000000 / rate;
+}
 // -------------------------------------------------------------------------
 
 void hackflightInitFull(
