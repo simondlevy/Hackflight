@@ -115,11 +115,11 @@ class Hackflight : HackflightCore {
                 loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            /*
             task_data_t * data = &m_task_data;
 
-            gyroReadScaled(&data->gyro, data->imuAlignFun, &data->vstate);
+            gyroReadScaled(&data->gyro, m_imuAlignFun, &data->vstate);
 
+            /*
             uint32_t usec = timeMicros();
 
             rxGetDemands(&hf->rx, usec, &hf->anglepid, &hf->demands);
