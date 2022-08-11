@@ -46,225 +46,225 @@ class Hackflight : HackflightCore {
 
     private:
 
-        // Wait at start of scheduler loop if gyroSampleTask is nearly due
-        static const uint32_t SCHED_START_LOOP_MIN_US = 1;   
-        static const uint32_t SCHED_START_LOOP_MAX_US = 12;
+    // Wait at start of scheduler loop if gyroSampleTask is nearly due
+    static const uint32_t SCHED_START_LOOP_MIN_US = 1;   
+    static const uint32_t SCHED_START_LOOP_MAX_US = 12;
 
-        // Fraction of a us to reduce start loop wait
-        static const uint32_t SCHED_START_LOOP_DOWN_STEP = 50;  
+    // Fraction of a us to reduce start loop wait
+    static const uint32_t SCHED_START_LOOP_DOWN_STEP = 50;  
 
-        // Fraction of a us to increase start loop wait
-        static const uint32_t SCHED_START_LOOP_UP_STEP = 1;   
+    // Fraction of a us to increase start loop wait
+    static const uint32_t SCHED_START_LOOP_UP_STEP = 1;   
 
-        // Add an amount to the estimate of a task duration
-        static const uint32_t TASK_GUARD_MARGIN_MIN_US = 3;   
-        static const uint32_t TASK_GUARD_MARGIN_MAX_US = 6;
+    // Add an amount to the estimate of a task duration
+    static const uint32_t TASK_GUARD_MARGIN_MIN_US = 3;   
+    static const uint32_t TASK_GUARD_MARGIN_MAX_US = 6;
 
-        // Fraction of a us to reduce task guard margin
-        static const uint32_t TASK_GUARD_MARGIN_DOWN_STEP = 50;  
+    // Fraction of a us to reduce task guard margin
+    static const uint32_t TASK_GUARD_MARGIN_DOWN_STEP = 50;  
 
-        // Fraction of a us to increase task guard margin
-        static const uint32_t TASK_GUARD_MARGIN_UP_STEP = 1;   
+    // Fraction of a us to increase task guard margin
+    static const uint32_t TASK_GUARD_MARGIN_UP_STEP = 1;   
 
-        // Add a margin to the amount of time allowed for a check function to
-        // run
-        static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
+    // Add a margin to the amount of time allowed for a check function to
+    // run
+    static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
 
-        // Some tasks have occasional peaks in execution time so normal moving
-        // average duration estimation doesn't work Decay the estimated max
-        // task duration by
-        // 1/(1 << TASK_EXEC_TIME_SHIFT) on every invocation
-        static const uint32_t TASK_EXEC_TIME_SHIFT = 7;
+    // Some tasks have occasional peaks in execution time so normal moving
+    // average duration estimation doesn't work Decay the estimated max
+    // task duration by
+    // 1/(1 << TASK_EXEC_TIME_SHIFT) on every invocation
+    static const uint32_t TASK_EXEC_TIME_SHIFT = 7;
 
-        // Make aged tasks more schedulable
-        static const uint32_t TASK_AGE_EXPEDITE_COUNT = 1;   
+    // Make aged tasks more schedulable
+    static const uint32_t TASK_AGE_EXPEDITE_COUNT = 1;   
 
-        // By scaling their expected execution time
-        static constexpr float TASK_AGE_EXPEDITE_SCALE = 0.9; 
+    // By scaling their expected execution time
+    static constexpr float TASK_AGE_EXPEDITE_SCALE = 0.9; 
 
-        // Arming safety angle constant
-        static constexpr float MAX_ARMING_ANGLE = 25;
+    // Arming safety angle constant
+    static constexpr float MAX_ARMING_ANGLE = 25;
 
-        // Gyro interrupt counts over which to measure loop time and skew
-        static const uint32_t CORE_RATE_COUNT = 25000;
-        static const uint32_t GYRO_LOCK_COUNT = 400;
+    // Gyro interrupt counts over which to measure loop time and skew
+    static const uint32_t CORE_RATE_COUNT = 25000;
+    static const uint32_t GYRO_LOCK_COUNT = 400;
 
-        // Essential tasks
-        AttitudeTask  m_attitudeTask;
-        MspTask       m_mspTask;
-        ReceiverTask  m_rxTask;
+    // Essential tasks
+    AttitudeTask  m_attitudeTask;
+    MspTask       m_mspTask;
+    ReceiverTask  m_rxTask;
 
-        // Demands
-        demands_t m_demands;
+    // Demands
+    demands_t m_demands;
 
-        // Essential PID controller
-        anglePid_t m_anglePid;
+    // Essential PID controller
+    anglePid_t m_anglePid;
 
-        // Scheduler
-        scheduler_t m_scheduler;
+    // Scheduler
+    scheduler_t m_scheduler;
 
-        // IMU alignment function
-        imu_align_fun m_imuAlignFun;
+    // IMU alignment function
+    imu_align_fun m_imuAlignFun;
 
-        // Core contents for tasks
-        task_data_t m_taskData;
+    // Core contents for tasks
+    task_data_t m_taskData;
 
-        void checkCoreTasks(
-                int32_t loopRemainingCycles,
-                uint32_t nowCycles,
-                uint32_t nextTargetCycles)
-        {
-            scheduler_t * scheduler = &m_scheduler;
+    void checkCoreTasks(
+            int32_t loopRemainingCycles,
+            uint32_t nowCycles,
+            uint32_t nextTargetCycles)
+    {
+        scheduler_t * scheduler = &m_scheduler;
 
-            if (scheduler->loopStartCycles > scheduler->loopStartMinCycles) {
-                scheduler->loopStartCycles -= scheduler->loopStartDeltaDownCycles;
-            }
-
-            while (loopRemainingCycles > 0) {
-                nowCycles = systemGetCycleCounter();
-                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
-            }
-
-            task_data_t * data = &m_taskData;
-
-            gyroReadScaled(&data->gyro, m_imuAlignFun, &data->vstate);
-
-            uint32_t usec = timeMicros();
-
-            rxGetDemands(&data->rx, usec, &m_anglePid, &m_demands);
-
-            motor_config_t motorConfig = {
-                motorValueDisarmed(),
-                motorValueHigh(),
-                motorValueLow(),
-                motorIsProtocolDshot()  
-            };
-
-            float mixmotors[MAX_SUPPORTED_MOTORS] = {};
-
-            runCoreTasks(
-                    usec,
-                    failsafeIsActive(),
-                    &motorConfig,
-                    mixmotors);
-
-            motorWrite(
-                    data->motorDevice,
-                    armingIsArmed(&data->arming) ? mixmotors : data->mspMotors);
-
-            // CPU busy
-            if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
-                scheduler->nextTimingCycles += scheduler->clockRate;
-            }
-            scheduler->lastTargetCycles = nextTargetCycles;
-
-            // Bring the scheduler into lock with the gyro Track the actual gyro
-            // rate over given number of cycle times and set the expected timebase
-            static uint32_t _terminalGyroRateCount;
-            static int32_t _sampleRateStartCycles;
-
-            if ((_terminalGyroRateCount == 0)) {
-                _terminalGyroRateCount = gyroInterruptCount() + CORE_RATE_COUNT;
-                _sampleRateStartCycles = nowCycles;
-            }
-
-            if (gyroInterruptCount() >= _terminalGyroRateCount) {
-                // Calculate number of clock cycles on average between gyro
-                // interrupts
-                uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-                scheduler->desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
-                _sampleRateStartCycles = nowCycles;
-                _terminalGyroRateCount += CORE_RATE_COUNT;
-            }
-
-            // Track actual gyro rate over given number of cycle times and remove
-            // skew
-            static uint32_t _terminalGyroLockCount;
-            static int32_t _gyroSkewAccum;
-
-            int32_t gyroSkew =
-                gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
-
-            _gyroSkewAccum += gyroSkew;
-
-            if ((_terminalGyroLockCount == 0)) {
-                _terminalGyroLockCount = gyroInterruptCount() + GYRO_LOCK_COUNT;
-            }
-
-            if (gyroInterruptCount() >= _terminalGyroLockCount) {
-                _terminalGyroLockCount += GYRO_LOCK_COUNT;
-
-                // Move the desired start time of the gyroSampleTask
-                scheduler->lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
-
-                _gyroSkewAccum = 0;
-            }
+        if (scheduler->loopStartCycles > scheduler->loopStartMinCycles) {
+            scheduler->loopStartCycles -= scheduler->loopStartDeltaDownCycles;
         }
 
-        void adjustRxDynamicPriority(uint32_t usec) 
-        {
-            if (m_rxTask.dynamicPriority > 0) {
-                m_rxTask.ageCycles = 1 +
-                    (cmpTimeUs(usec, m_rxTask.lastSignaledAtUs) /
-                     m_rxTask.desiredPeriodUs);
-                m_rxTask.dynamicPriority = 1 + m_rxTask.ageCycles;
-            } else  {
-                if (rxCheck(&m_taskData.rx, usec)) {
-                    m_rxTask.lastSignaledAtUs = usec;
-                    m_rxTask.ageCycles = 1;
-                    m_rxTask.dynamicPriority = 2;
-                } else {
-                    m_rxTask.ageCycles = 0;
-                }
+        while (loopRemainingCycles > 0) {
+            nowCycles = systemGetCycleCounter();
+            loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+        }
+
+        task_data_t * data = &m_taskData;
+
+        gyroReadScaled(&data->gyro, m_imuAlignFun, &data->vstate);
+
+        uint32_t usec = timeMicros();
+
+        rxGetDemands(&data->rx, usec, &m_anglePid, &m_demands);
+
+        motor_config_t motorConfig = {
+            motorValueDisarmed(),
+            motorValueHigh(),
+            motorValueLow(),
+            motorIsProtocolDshot()  
+        };
+
+        float mixmotors[MAX_SUPPORTED_MOTORS] = {};
+
+        runCoreTasks(
+                usec,
+                failsafeIsActive(),
+                &motorConfig,
+                mixmotors);
+
+        motorWrite(
+                data->motorDevice,
+                armingIsArmed(&data->arming) ? mixmotors : data->mspMotors);
+
+        // CPU busy
+        if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
+            scheduler->nextTimingCycles += scheduler->clockRate;
+        }
+        scheduler->lastTargetCycles = nextTargetCycles;
+
+        // Bring the scheduler into lock with the gyro Track the actual gyro
+        // rate over given number of cycle times and set the expected timebase
+        static uint32_t _terminalGyroRateCount;
+        static int32_t _sampleRateStartCycles;
+
+        if ((_terminalGyroRateCount == 0)) {
+            _terminalGyroRateCount = gyroInterruptCount() + CORE_RATE_COUNT;
+            _sampleRateStartCycles = nowCycles;
+        }
+
+        if (gyroInterruptCount() >= _terminalGyroRateCount) {
+            // Calculate number of clock cycles on average between gyro
+            // interrupts
+            uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
+            scheduler->desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
+            _sampleRateStartCycles = nowCycles;
+            _terminalGyroRateCount += CORE_RATE_COUNT;
+        }
+
+        // Track actual gyro rate over given number of cycle times and remove
+        // skew
+        static uint32_t _terminalGyroLockCount;
+        static int32_t _gyroSkewAccum;
+
+        int32_t gyroSkew =
+            gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
+
+        _gyroSkewAccum += gyroSkew;
+
+        if ((_terminalGyroLockCount == 0)) {
+            _terminalGyroLockCount = gyroInterruptCount() + GYRO_LOCK_COUNT;
+        }
+
+        if (gyroInterruptCount() >= _terminalGyroLockCount) {
+            _terminalGyroLockCount += GYRO_LOCK_COUNT;
+
+            // Move the desired start time of the gyroSampleTask
+            scheduler->lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
+
+            _gyroSkewAccum = 0;
+        }
+    }
+
+    void adjustRxDynamicPriority(uint32_t usec) 
+    {
+        if (m_rxTask.dynamicPriority > 0) {
+            m_rxTask.ageCycles = 1 +
+                (cmpTimeUs(usec, m_rxTask.lastSignaledAtUs) /
+                 m_rxTask.desiredPeriodUs);
+            m_rxTask.dynamicPriority = 1 + m_rxTask.ageCycles;
+        } else  {
+            if (rxCheck(&m_taskData.rx, usec)) {
+                m_rxTask.lastSignaledAtUs = usec;
+                m_rxTask.ageCycles = 1;
+                m_rxTask.dynamicPriority = 2;
+            } else {
+                m_rxTask.ageCycles = 0;
             }
         }
+    }
 
-        void updateDynamicTask(Task * task, Task ** selected,
-                uint16_t * selectedPriority)
-        {
-            if (task->dynamicPriority > *selectedPriority) {
-                *selectedPriority = task->dynamicPriority;
-                *selected = task;
-            }
+    void updateDynamicTask(Task * task, Task ** selected,
+            uint16_t * selectedPriority)
+    {
+        if (task->dynamicPriority > *selectedPriority) {
+            *selectedPriority = task->dynamicPriority;
+            *selected = task;
         }
+    }
 
-        void adjustAndUpdateTask(
-                Task * task,
-                uint32_t usec,
-                Task ** selectedTask,
-                uint16_t * selectedTaskDynamicPriority)
-        {
-            adjustDynamicPriority(task, usec);
-            updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
-        }
+    void adjustAndUpdateTask(
+            Task * task,
+            uint32_t usec,
+            Task ** selectedTask,
+            uint16_t * selectedTaskDynamicPriority)
+    {
+        adjustDynamicPriority(task, usec);
+        updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
+    }
 
 
 
-        void checkDynamicTasks(
-                int32_t loopRemainingCycles,
-                uint32_t nextTargetCycles)
-        {
-            Task * selectedTask = NULL;
-            uint16_t selectedTaskDynamicPriority = 0;
+    void checkDynamicTasks(
+            int32_t loopRemainingCycles,
+            uint32_t nextTargetCycles)
+    {
+        Task * selectedTask = NULL;
+        uint16_t selectedTaskDynamicPriority = 0;
 
-            uint32_t usec = timeMicros();
+        uint32_t usec = timeMicros();
 
-            task_data_t * data = &m_taskData;
+        task_data_t * data = &m_taskData;
 
-            adjustRxDynamicPriority(usec);
+        adjustRxDynamicPriority(usec);
 
-            updateDynamicTask(&m_rxTask, &selectedTask,
-                    &selectedTaskDynamicPriority);
+        updateDynamicTask(&m_rxTask, &selectedTask,
+                &selectedTaskDynamicPriority);
 
-            adjustAndUpdateTask(&m_attitudeTask, usec,
-                    &selectedTask, &selectedTaskDynamicPriority);
+        adjustAndUpdateTask(&m_attitudeTask, usec,
+                &selectedTask, &selectedTaskDynamicPriority);
 
-            adjustAndUpdateTask(&m_mspTask, usec,
-                    &selectedTask, &selectedTaskDynamicPriority);
+        adjustAndUpdateTask(&m_mspTask, usec,
+                &selectedTask, &selectedTaskDynamicPriority);
+
+        if (selectedTask) {
 
             /*
-               if (selectedTask) {
-
                int32_t taskRequiredTimeUs =
                selectedTask->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT;
                int32_t taskRequiredTimeCycles =
@@ -304,137 +304,137 @@ class Hackflight : HackflightCore {
             selectedTask->anticipatedExecutionTime *= 
             TASK_AGE_EXPEDITE_SCALE;
             }
-            }
              */
         }
+    }
 
-        static void adjustDynamicPriority(Task * task, uint32_t usec) 
-        {
-            // Task is time-driven, dynamicPriority is last execution age
-            // (measured in desiredPeriods). Task age is calculated from last
-            // execution.
-            task->ageCycles = (cmpTimeUs(usec, task->lastExecutedAtUs) /
-                    task->desiredPeriodUs);
-            if (task->ageCycles > 0) {
-                task->dynamicPriority = 1 + task->ageCycles;
-            }
+    static void adjustDynamicPriority(Task * task, uint32_t usec) 
+    {
+        // Task is time-driven, dynamicPriority is last execution age
+        // (measured in desiredPeriods). Task age is calculated from last
+        // execution.
+        task->ageCycles = (cmpTimeUs(usec, task->lastExecutedAtUs) /
+                task->desiredPeriodUs);
+        if (task->ageCycles > 0) {
+            task->dynamicPriority = 1 + task->ageCycles;
         }
+    }
 
     public:
 
-        Hackflight(
-                rx_dev_funs_t * rxDeviceFuns,
-                serialPortIdentifier_e rxDevPort,
-                anglePidConstants_t * anglePidConstants,
-                mixer_t mixer,
-                void * motorDevice,
-                uint8_t imuInterruptPin,
-                imu_align_fun imuAlign,
-                uint8_t ledPin) 
-            : HackflightCore(anglePidConstants, mixer)
-        {
-            (void)imuAlign;
+    Hackflight(
+            rx_dev_funs_t * rxDeviceFuns,
+            serialPortIdentifier_e rxDevPort,
+            anglePidConstants_t * anglePidConstants,
+            mixer_t mixer,
+            void * motorDevice,
+            uint8_t imuInterruptPin,
+            imu_align_fun imuAlign,
+            uint8_t ledPin) 
+        : HackflightCore(anglePidConstants, mixer)
+    {
+        (void)imuAlign;
 
-            mspInit();
-            imuInit(imuInterruptPin);
-            ledInit(ledPin);
-            ledFlash(10, 50);
-            failsafeInit();
-            failsafeReset();
+        mspInit();
+        imuInit(imuInterruptPin);
+        ledInit(ledPin);
+        ledFlash(10, 50);
+        failsafeInit();
+        failsafeReset();
 
-            m_taskData.rx.devCheck = rxDeviceFuns->check;
-            m_taskData.rx.devConvert = rxDeviceFuns->convert;
+        m_taskData.rx.devCheck = rxDeviceFuns->check;
+        m_taskData.rx.devConvert = rxDeviceFuns->convert;
 
-            rxDeviceFuns->init(rxDevPort);
+        rxDeviceFuns->init(rxDevPort);
 
-            m_imuAlignFun = imuAlign;
+        m_imuAlignFun = imuAlign;
 
-            m_taskData.motorDevice = motorDevice;
+        m_taskData.motorDevice = motorDevice;
 
-            // Initialize quaternion in upright position
-            m_taskData.imuFusionPrev.quat.w = 1;
+        // Initialize quaternion in upright position
+        m_taskData.imuFusionPrev.quat.w = 1;
 
-            m_taskData.maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+        m_taskData.maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
-            m_scheduler.loopStartCycles =
-                systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-            m_scheduler.loopStartMinCycles =
-                systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-            m_scheduler.loopStartMaxCycles =
-                systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
-            m_scheduler.loopStartDeltaDownCycles =
-                systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
-            m_scheduler.loopStartDeltaUpCycles =
-                systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
+        m_scheduler.loopStartCycles =
+            systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+        m_scheduler.loopStartMinCycles =
+            systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+        m_scheduler.loopStartMaxCycles =
+            systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
+        m_scheduler.loopStartDeltaDownCycles =
+            systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
+        m_scheduler.loopStartDeltaUpCycles =
+            systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
 
-            m_scheduler.taskGuardMinCycles =
-                systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
-            m_scheduler.taskGuardMaxCycles =
-                systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
-            m_scheduler.taskGuardCycles = m_scheduler.taskGuardMinCycles;
-            m_scheduler.taskGuardDeltaDownCycles =
-                systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
-            m_scheduler.taskGuardDeltaUpCycles =
-                systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
+        m_scheduler.taskGuardMinCycles =
+            systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
+        m_scheduler.taskGuardMaxCycles =
+            systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
+        m_scheduler.taskGuardCycles = m_scheduler.taskGuardMinCycles;
+        m_scheduler.taskGuardDeltaDownCycles =
+            systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
+        m_scheduler.taskGuardDeltaUpCycles =
+            systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
 
-            m_scheduler.lastTargetCycles = systemGetCycleCounter();
+        m_scheduler.lastTargetCycles = systemGetCycleCounter();
 
-            m_scheduler.nextTimingCycles = m_scheduler.lastTargetCycles;
+        m_scheduler.nextTimingCycles = m_scheduler.lastTargetCycles;
 
-            m_scheduler.desiredPeriodCycles =
-                (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
+        m_scheduler.desiredPeriodCycles =
+            (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
 
-            m_scheduler.guardMargin =
-                (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
+        m_scheduler.guardMargin =
+            (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
 
-            m_scheduler.clockRate = systemClockMicrosToCycles(1000000);        
+        m_scheduler.clockRate = systemClockMicrosToCycles(1000000);        
 
-        } // constructor
+    } // constructor
 
-        void step(void)
-        {
-            uint32_t nextTargetCycles =
-                m_scheduler.lastTargetCycles + m_scheduler.desiredPeriodCycles;
+    void step(void)
+    {
+        uint32_t nextTargetCycles =
+            m_scheduler.lastTargetCycles + m_scheduler.desiredPeriodCycles;
 
-            // Realtime gyro/filtering/PID tasks get complete priority
-            uint32_t nowCycles = systemGetCycleCounter();
+        // Realtime gyro/filtering/PID tasks get complete priority
+        uint32_t nowCycles = systemGetCycleCounter();
 
-            int32_t loopRemainingCycles =
-                cmpTimeCycles(nextTargetCycles, nowCycles);
+        int32_t loopRemainingCycles =
+            cmpTimeCycles(nextTargetCycles, nowCycles);
 
-            if (loopRemainingCycles < -m_scheduler.desiredPeriodCycles) {
-                // A task has so grossly overrun that at entire gyro cycle has
-                // been skipped This is most likely to occur when connected to
-                // the configurator via USB as the serial task is
-                // non-deterministic Recover as best we can, advancing
-                // scheduling by a whole number of cycles
-                nextTargetCycles += m_scheduler.desiredPeriodCycles * (1 +
-                        (loopRemainingCycles / -m_scheduler.desiredPeriodCycles));
-                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
-            }
+        if (loopRemainingCycles < -m_scheduler.desiredPeriodCycles) {
+            // A task has so grossly overrun that at entire gyro cycle has
+            // been skipped This is most likely to occur when connected to
+            // the configurator via USB as the serial task is
+            // non-deterministic Recover as best we can, advancing
+            // scheduling by a whole number of cycles
+            nextTargetCycles += m_scheduler.desiredPeriodCycles * (1 +
+                    (loopRemainingCycles / -m_scheduler.desiredPeriodCycles));
+            loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+        }
 
-            // Tune out the time lost between completing the last task
-            // execution and re-entering the scheduler
-            if ((loopRemainingCycles < m_scheduler.loopStartMinCycles) &&
-                    (m_scheduler.loopStartCycles <
-                     m_scheduler.loopStartMaxCycles)) {
-                m_scheduler.loopStartCycles += m_scheduler.loopStartDeltaUpCycles;
-            }
+        // Tune out the time lost between completing the last task
+        // execution and re-entering the scheduler
+        if ((loopRemainingCycles < m_scheduler.loopStartMinCycles) &&
+                (m_scheduler.loopStartCycles <
+                 m_scheduler.loopStartMaxCycles)) {
+            m_scheduler.loopStartCycles += m_scheduler.loopStartDeltaUpCycles;
+        }
 
-            // Once close to the timing boundary, poll for its arrival
-            if (loopRemainingCycles < m_scheduler.loopStartCycles) {
-                checkCoreTasks(
-                        loopRemainingCycles,
-                        nowCycles,
-                        nextTargetCycles);
-            }
+        // Once close to the timing boundary, poll for its arrival
+        if (loopRemainingCycles < m_scheduler.loopStartCycles) {
+            checkCoreTasks(
+                    loopRemainingCycles,
+                    nowCycles,
+                    nextTargetCycles);
+        }
 
-            int32_t newLoopRemainingCyles =
-                cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
+        int32_t newLoopRemainingCyles =
+            cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
-            if (newLoopRemainingCyles > m_scheduler.guardMargin) {
-                checkDynamicTasks(newLoopRemainingCyles, nextTargetCycles);
-            }
+        if (newLoopRemainingCyles > m_scheduler.guardMargin) {
+            checkDynamicTasks(newLoopRemainingCyles, nextTargetCycles);
+        }
 
-        } // step()
+    } // step()
 };
