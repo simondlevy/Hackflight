@@ -144,9 +144,9 @@ class Hackflight : HackflightCore {
                     &motorConfig,
                     mixmotors);
 
-            /*
-            motorWrite(hf->motorDevice,
-                    armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
+            motorWrite(
+                    data->motorDevice,
+                    armingIsArmed(&data->arming) ? mixmotors : data->mspMotors);
 
             // CPU busy
             if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
@@ -154,6 +154,7 @@ class Hackflight : HackflightCore {
             }
             scheduler->lastTargetCycles = nextTargetCycles;
 
+            /*
             // Bring the scheduler into lock with the gyro Track the actual gyro
             // rate over given number of cycle times and set the expected timebase
             static uint32_t _terminalGyroRateCount;
