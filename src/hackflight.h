@@ -28,7 +28,6 @@
 
 typedef struct {
 
-    arming_t         arming;
     anglePid_t       anglepid;
     task_t           attitudeTask;
     demands_t        demands;

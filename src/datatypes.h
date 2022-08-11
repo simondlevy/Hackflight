@@ -478,5 +478,3 @@ typedef void (*mixer_t)(
         bool failsafe,
         motor_config_t * motorConfig,
         float * motors);
-
-

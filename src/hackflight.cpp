@@ -87,13 +87,13 @@ static const float MAX_ARMING_ANGLE = 25;
 static void task_attitude(void * hp, void * dp, uint32_t usec)
 {
     hackflight_t * hf = (hackflight_t *)hp;
+    task_data_t * td = (task_data_t *)dp;
 
-    (void)dp;
 
     imuGetEulerAngles(
             &hf->gyro,
             &hf->imuFusionPrev,
-            &hf->arming,
+            &td->arming,
             usec,
             &hf->vstate);
 }
@@ -103,8 +103,7 @@ static void task_attitude(void * hp, void * dp, uint32_t usec)
 static void task_rx(void * hp, void * dp, uint32_t usec)
 {
     hackflight_t * hf = (hackflight_t *)hp;
-
-    (void)dp;
+    task_data_t * td = (task_data_t *)dp;
 
     bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;
     bool pidItermResetReady = false;
@@ -125,7 +124,7 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
             calibrating,
             &rxax,
             hf->motorDevice,
-            &hf->arming,
+            &td->arming,
             &pidItermResetReady,
             &pidItermResetValue,
             &gotNewData);
@@ -146,12 +145,16 @@ static const uint32_t MSP_TASK_RATE = 100;
 static void task_msp(void * hp, void * dp, uint32_t usec)
 {
     hackflight_t * hf = (hackflight_t *)hp;
+    task_data_t * td = (task_data_t *)dp;
 
     (void)usec;
-    (void)dp;
 
-    mspUpdate(&hf->vstate, &hf->rxAxes, armingIsArmed(&hf->arming),
-            hf->motorDevice, hf->mspMotors);
+    mspUpdate(
+            &hf->vstate,
+            &hf->rxAxes,
+            armingIsArmed(&td->arming),
+            hf->motorDevice,
+            hf->mspMotors);
 }
 
 // Support for dynamically scheduled tasks ---------------------------------
@@ -212,6 +215,7 @@ static void executeTask(
 
 static void checkCoreTasks(
         hackflight_t * hf,
+        task_data_t * td,
         int32_t loopRemainingCycles,
         uint32_t nowCycles,
         uint32_t nextTargetCycles)
@@ -250,7 +254,7 @@ static void checkCoreTasks(
             mixmotors);
 
     motorWrite(hf->motorDevice,
-            armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
+            armingIsArmed(&td->arming) ? mixmotors : hf->mspMotors);
 
     // CPU busy
     if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
@@ -399,6 +403,8 @@ void hackflightInitFull(
         imu_align_fun imuAlign,
         uint8_t ledPin)
 {
+    (void)td;
+
     hackflightInit(hf, anglePidConstants, mixer);
 
     mspInit();
@@ -497,7 +503,7 @@ void hackflightStep(hackflight_t * hf, task_data_t * td)
 
     // Once close to the timing boundary, poll for its arrival
     if (loopRemainingCycles < scheduler->loopStartCycles) {
-        checkCoreTasks(hf, loopRemainingCycles, nowCycles, nextTargetCycles);
+        checkCoreTasks(hf, td, loopRemainingCycles, nowCycles, nextTargetCycles);
     }
 
     int32_t newLoopRemainingCyles =
