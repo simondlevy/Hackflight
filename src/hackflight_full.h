@@ -496,7 +496,6 @@ static void schedulerInit(scheduler_t * scheduler)
 void hackflightInitFull(
         hackflight_full_t * hff,
         hackflight_core_t * hf,
-        scheduler_t * scheduler,
         hackflight_tasks_t * ht,
         task_data_t * td,
         rx_dev_funs_t * rxDeviceFuns,
@@ -538,16 +537,17 @@ void hackflightInitFull(
 
     initTask(&ht->mspTask, task_msp, MSP_TASK_RATE);
 
-    schedulerInit(scheduler);
+    schedulerInit(&hff->scheduler);
 }
 
 void hackflightStep(
         hackflight_full_t * hff,
         hackflight_core_t * hf,
-        scheduler_t * scheduler,
         hackflight_tasks_t * ht,
         task_data_t * td)
 {
+    scheduler_t * scheduler = &hff->scheduler;
+
     uint32_t nextTargetCycles =
         scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
 
