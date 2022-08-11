@@ -129,9 +129,6 @@ class Hackflight : HackflightCore {
 
             rxGetDemands(&data->rx, usec, &m_anglePid, &m_demands);
 
-            /*
-            float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
-
             motor_config_t motorConfig = {
                 motorValueDisarmed(),
                 motorValueHigh(),
@@ -139,13 +136,15 @@ class Hackflight : HackflightCore {
                 motorIsProtocolDshot()  
             };
 
-            hackflightRunCoreTasks(
-                    hf,
+            float mixmotors[MAX_SUPPORTED_MOTORS] = {};
+
+            runCoreTasks(
                     usec,
                     failsafeIsActive(),
                     &motorConfig,
                     mixmotors);
 
+            /*
             motorWrite(hf->motorDevice,
                     armingIsArmed(&hf->arming) ? mixmotors : hf->mspMotors);
 
@@ -198,6 +197,8 @@ class Hackflight : HackflightCore {
             }
             */
         }
+
+
 
     public:
 
