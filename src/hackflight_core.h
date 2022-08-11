@@ -30,7 +30,6 @@ typedef struct {
 
     anglePid_t       anglePid;
     demands_t        demands;
-    imu_align_fun    imuAlignFun;
     mixer_t          mixer;
     pid_controller_t pidControllers[10];
     uint8_t          pidCount;

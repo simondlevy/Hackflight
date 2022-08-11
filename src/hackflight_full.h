@@ -275,6 +275,7 @@ static void executeTask(
 }
 
 static void checkCoreTasks(
+        hackflight_full_t * hff,
         hackflight_core_t * hf,
         scheduler_t * scheduler,
         task_data_t * td,
@@ -291,7 +292,7 @@ static void checkCoreTasks(
         loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
     }
 
-    gyroReadScaled(&td->gyro, hf->imuAlignFun, &hf->vstate);
+    gyroReadScaled(&td->gyro, hff->imuAlignFun, &hf->vstate);
 
     uint32_t usec = timeMicros();
 
@@ -522,7 +523,7 @@ void hackflightInitFull(
 
     rxDeviceFuns->init(rxDevPort);
 
-    hf->imuAlignFun = imuAlign;
+    hff->imuAlignFun = imuAlign;
 
     td->motorDevice = motorDevice;
 
@@ -576,7 +577,14 @@ void hackflightStep(
 
     // Once close to the timing boundary, poll for its arrival
     if (loopRemainingCycles < scheduler->loopStartCycles) {
-        checkCoreTasks(hf, scheduler, td, loopRemainingCycles, nowCycles, nextTargetCycles);
+        checkCoreTasks(
+                hff,
+                hf,
+                scheduler,
+                td,
+                loopRemainingCycles,
+                nowCycles,
+                nextTargetCycles);
     }
 
     int32_t newLoopRemainingCyles =
