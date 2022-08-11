@@ -19,8 +19,10 @@
 #pragma once
 
 #include "attitude_task.h"
-#include "deg2rad.h"
+#include "msp_task.h"
 #include "receiver_task.h"
+
+#include "deg2rad.h"
 #include "hackflight.h"
 #include "led.h"
 #include "msp.h"
@@ -85,7 +87,7 @@ class Hackflight : HackflightCore {
 
         // Essential tasks
         AttitudeTask  m_attitudeTask;
-        task_t        m_mspTask;
+        MspTask       m_mspTask;
         ReceiverTask  m_rxTask;
 
         // Scheduler
@@ -101,7 +103,7 @@ class Hackflight : HackflightCore {
         void * m_motorDevice;
 
         // Core contents for tasks
-        hackflight_t m_hackflight;
+        task_data_t m_task_data;
 
         void checkCoreTasks(
                 int32_t loopRemainingCycles,
@@ -118,6 +120,8 @@ class Hackflight : HackflightCore {
                 nowCycles = systemGetCycleCounter();
                 loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
             }
+
+            task_data_t * task_data = &m_task_data;
 
             /*
             gyroReadScaled(&hf->gyro, hf->imuAlignFun, &hf->vstate);
@@ -217,8 +221,8 @@ class Hackflight : HackflightCore {
             failsafeInit();
             failsafeReset();
 
-            m_hackflight.rx.devCheck = rxDeviceFuns->check;
-            m_hackflight.rx.devConvert = rxDeviceFuns->convert;
+            m_task_data.rx.devCheck = rxDeviceFuns->check;
+            m_task_data.rx.devConvert = rxDeviceFuns->convert;
 
             rxDeviceFuns->init(rxDevPort);
 
@@ -227,7 +231,7 @@ class Hackflight : HackflightCore {
             m_motorDevice = motorDevice;
 
             // Initialize quaternion in upright position
-            m_hackflight.imuFusionPrev.quat.w = 1;
+            m_task_data.imuFusionPrev.quat.w = 1;
 
             m_maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 

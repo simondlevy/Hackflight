@@ -33,9 +33,9 @@ class ReceiverTask : public Task {
         {
         }
 
-        void fun(hackflight_t * hf, uint32_t time)
+        void fun(task_data_t * data, uint32_t time)
         {
-            bool calibrating = hf->gyro.isCalibrating; // || acc.calibrating != 0;
+            bool calibrating = data->gyro.isCalibrating; // || acc.calibrating != 0;
             bool pidItermResetReady = false;
             bool pidItermResetValue = false;
 
@@ -44,27 +44,27 @@ class ReceiverTask : public Task {
             bool gotNewData = false;
 
             bool imuIsLevel =
-                fabsf(hf->vstate.phi) < hf->maxArmingAngle &&
-                fabsf(hf->vstate.theta) < hf->maxArmingAngle;
+                fabsf(data->vstate.phi) < data->maxArmingAngle &&
+                fabsf(data->vstate.theta) < data->maxArmingAngle;
 
             rxPoll(
-                    &hf->rx,
+                    &data->rx,
                     time,
                     imuIsLevel, 
                     calibrating,
                     &rxax,
-                    hf->motorDevice,
-                    &hf->arming,
+                    data->motorDevice,
+                    &data->arming,
                     &pidItermResetReady,
                     &pidItermResetValue,
                     &gotNewData);
 
             if (pidItermResetReady) {
-                hf->pidReset = pidItermResetValue;
+                data->pidReset = pidItermResetValue;
             }
 
             if (gotNewData) {
-                memcpy(&hf->rxAxes, &rxax, sizeof(rx_axes_t));
+                memcpy(&data->rxAxes, &rxax, sizeof(rx_axes_t));
             }
         }
 };

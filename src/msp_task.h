@@ -20,6 +20,7 @@
 
 #include <string.h>
 
+#include "arming.h"
 #include "datatypes.h"
 #include "msp.h"
 #include "task.h"
@@ -34,13 +35,15 @@ class MspTask : public Task {
             mspInit();
         }
 
-        void fun(new_hackflight_t * hf, uint32_t time)
+        void fun(task_data_t * data, uint32_t time)
         {
+            (void)time;
+
             mspUpdate(
-                    &hf->vstate,
-                    &hf->rxAxes,
-                    armingIsArmed(&hf->arming),
-                    hf->motorDevice,
-                    hf->mspMotors);
+                    &data->vstate,
+                    &data->rxAxes,
+                    armingIsArmed(&data->arming),
+                    data->motorDevice,
+                    data->mspMotors);
         }        
 };
