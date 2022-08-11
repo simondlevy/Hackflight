@@ -366,7 +366,9 @@ static void checkCoreTasks(
     }
 }
 
-static void updateDynamicTask(task_t * task, task_t ** selected,
+static void updateDynamicTask(
+        task_t * task,
+        task_t ** selected,
         uint16_t * selectedPriority)
 {
     if (task->dynamicPriority > *selectedPriority) {
@@ -386,7 +388,7 @@ static void adjustAndUpdateTask(
 }
 
 static void checkDynamicTasks(
-        hackflight_core_t * hf,
+        hackflight_core_t * core,
         scheduler_t * scheduler,
         hackflight_tasks_t * ht,
         task_data_t * dt,
@@ -424,7 +426,7 @@ static void checkDynamicTasks(
         if (taskRequiredTimeCycles < loopRemainingCycles) {
             uint32_t antipatedEndCycles =
                 nowCycles + taskRequiredTimeCycles;
-            executeTask(hf, dt, selectedTask, usec);
+            executeTask(core, dt, selectedTask, usec);
             nowCycles = systemGetCycleCounter();
             int32_t cyclesOverdue =
                 cmpTimeCycles(nowCycles, antipatedEndCycles);
@@ -496,7 +498,7 @@ static void schedulerInit(scheduler_t * scheduler)
 
 void hackflightInitFull(
         hackflight_full_t * full,
-        hackflight_core_t * hf,
+        hackflight_core_t * core,
         hackflight_tasks_t * ht,
         rx_dev_funs_t * rxDeviceFuns,
         serialPortIdentifier_e rxDevPort,
@@ -507,7 +509,7 @@ void hackflightInitFull(
         imu_align_fun imuAlign,
         uint8_t ledPin)
 {
-    hackflightInit(hf, anglePidConstants, mixer);
+    hackflightInit(core, anglePidConstants, mixer);
 
     task_data_t * td = &full->taskData;
 
