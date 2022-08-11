@@ -122,7 +122,7 @@ typedef struct {
 
 } task_t;
 
-// Tasks for full Hackflight
+// Tasks for full Hackflight --------------------------------------------------
 
 typedef struct {
 
@@ -131,6 +131,16 @@ typedef struct {
     task_t rxTask;
 
  } hackflight_tasks_t;
+
+// Full structure for running Hackflight --------------------------------------
+
+typedef struct {
+
+    hackflight_core_t core;
+    hackflight_tasks_t tasks;
+    task_data_t taskData;
+
+} hackflight_full_t;
 
 // Attitude task --------------------------------------------------------------
 
