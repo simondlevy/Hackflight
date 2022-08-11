@@ -24,6 +24,8 @@
 
 class Task {
 
+    friend class Hackflight;
+
     public:
 
         Task(uint32_t rate)
@@ -31,13 +33,13 @@ class Task {
             m_desiredPeriodUs = 1000000 / rate;
         }
 
-    private:
+    protected:
 
         int32_t  m_desiredPeriodUs;            
         uint32_t m_lastExecutedAtUs;          
 
         uint16_t m_dynamicPriority;          
-        uint16_t m_taskAgeCycles;
+        uint16_t m_ageCycles;
         uint32_t m_lastSignaledAtUs;         
         uint32_t m_anticipatedExecutionTime;
 

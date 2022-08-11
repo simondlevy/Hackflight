@@ -210,6 +210,8 @@ class Hackflight : HackflightCore {
 
             uint32_t usec = timeMicros();
 
+            task_data_t * data = &m_task_data;
+
             /*
             adjustRxDynamicPriority(&hf->rx, &hf->rxTask, usec);
             updateDynamicTask(&hf->rxTask, &selectedTask,
@@ -264,6 +266,18 @@ class Hackflight : HackflightCore {
                 }
             }
             */
+        }
+
+        static void adjustDynamicPriority(Task * task, uint32_t usec) 
+        {
+            // Task is time-driven, dynamicPriority is last execution age
+            // (measured in desiredPeriods). Task age is calculated from last
+            // execution.
+            task->m_ageCycles = (cmpTimeUs(usec, task->m_lastExecutedAtUs) /
+                    task->m_desiredPeriodUs);
+            if (task->m_ageCycles > 0) {
+                task->m_dynamicPriority = 1 + task->m_ageCycles;
+            }
         }
 
     public:
