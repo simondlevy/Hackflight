@@ -32,7 +32,6 @@ typedef struct {
     task_t           attitudeTask;
     demands_t        demands;
     imu_align_fun    imuAlignFun;
-    float            maxArmingAngle;
     mixer_t          mixer;
     void *           motorDevice;
     float            mspMotors[4];

@@ -114,8 +114,8 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
     bool gotNewData = false;
 
     bool imuIsLevel =
-        fabsf(hf->vstate.phi) < hf->maxArmingAngle &&
-        fabsf(hf->vstate.theta) < hf->maxArmingAngle;
+        fabsf(hf->vstate.phi) < td->maxArmingAngle &&
+        fabsf(hf->vstate.theta) < td->maxArmingAngle;
 
     rxPoll(
             &hf->rx,
@@ -429,7 +429,7 @@ void hackflightInitFull(
     // Initialize quaternion in upright position
     td->imuFusionPrev.quat.w = 1;
 
-    hf->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+    td->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
     initTask(&hf->mspTask, task_msp, MSP_TASK_RATE);
 
