@@ -321,12 +321,6 @@ static void checkDynamicTasks(
 
     uint32_t usec = timeMicros();
 
-    for (uint8_t k=0; k<hf->sensorTaskCount; ++k) {
-        task_t * task = &hf->sensorTasks[k];
-        adjustAndUpdateTask(task, usec,&selectedTask,
-                &selectedTaskDynamicPriority);
-    }
-
     adjustRxDynamicPriority(&hf->rx, &hf->rxTask, usec);
     updateDynamicTask(&hf->rxTask, &selectedTask,
             &selectedTaskDynamicPriority);

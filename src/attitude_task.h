@@ -18,9 +18,26 @@
 
 #pragma once
 
-#include "hackflight.h"
+#include "datatypes.h"
+#include "imu.h"
+#include "task.h"
 
-static void hackflightAddSensor(hackflight_t * hf, task_fun_t fun, uint32_t rate)
-{
-    initTask(&hf->sensorTasks[hf->sensorTaskCount++], fun, rate);
-}
+class AttitudeTask : public Task {
+
+    public:
+
+        AttitudeTask()
+            : Task(100) // Hz
+        {
+        }
+
+        void fun(task_data_t * data, uint32_t time)
+        {
+            imuGetEulerAngles(
+                    &data->gyro,
+                    &data->imuFusionPrev,
+                    &data->arming,
+                    time,
+                    &data->vstate);
+        }
+};
