@@ -297,12 +297,13 @@ static void adjustAndUpdateTask(
 
 static void checkDynamicTasks(
         hackflight_full_t * full,
-        hackflight_core_t * core,
-        scheduler_t * scheduler,
-        task_data_t * td,
         int32_t loopRemainingCycles,
         uint32_t nextTargetCycles)
 {
+    hackflight_core_t * core = &full->core;
+    scheduler_t * scheduler = &full->scheduler;
+    task_data_t * td = &full->taskData;
+
     task_t *selectedTask = NULL;
     uint16_t selectedTaskDynamicPriority = 0;
 
@@ -496,11 +497,6 @@ void hackflightStep(hackflight_full_t * full)
         cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     if (newLoopRemainingCyles > scheduler->guardMargin) {
-        checkDynamicTasks(
-                full, core,
-                scheduler,
-                td,
-                newLoopRemainingCyles,
-                nextTargetCycles);
+        checkDynamicTasks(full, newLoopRemainingCyles, nextTargetCycles);
     }
 }
