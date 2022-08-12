@@ -22,6 +22,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "hackflight_core.h"
+
 typedef struct {
 
     arming_t         arming;
@@ -35,7 +37,10 @@ typedef struct {
 
 } task_data_t;
 
-typedef void (*task_fun_t)(void * hp, void * dp, uint32_t usec);
+typedef void (*task_fun_t)(
+        hackflight_core_t * core,
+        task_data_t * data,
+        uint32_t usec);
 
 typedef struct {
 
@@ -55,6 +60,3 @@ static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
     task->fun = fun;
     task->desiredPeriodUs = 1000000 / rate;
 }
-
-
-

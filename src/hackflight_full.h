@@ -121,27 +121,27 @@ typedef struct {
 
 // Attitude task --------------------------------------------------------------
 
-static void task_attitude(void * hp, void * dp, uint32_t usec)
+static void task_attitude(
+        hackflight_core_t * core,
+        task_data_t * data,
+        uint32_t usec)
 {
-    hackflight_core_t * core = (hackflight_core_t *)hp;
-    task_data_t * td = (task_data_t *)dp;
-
     imuGetEulerAngles(
-            &td->gyro,
-            &td->imuFusionPrev,
-            &td->arming,
+            &data->gyro,
+            &data->imuFusionPrev,
+            &data->arming,
             usec,
             &core->vstate);
 }
 
 // RX polling task ------------------------------------------------------------
 
-static void task_rx(void * hp, void * dp, uint32_t usec)
+static void task_rx(
+        hackflight_core_t * core,
+        task_data_t * data,
+        uint32_t usec)
 {
-    hackflight_core_t * core = (hackflight_core_t *)hp;
-    task_data_t * td = (task_data_t *)dp;
-
-    bool calibrating = td->gyro.isCalibrating; // || acc.calibrating != 0;
+    bool calibrating = data->gyro.isCalibrating; // || acc.calibrating != 0;
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
@@ -150,17 +150,17 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
     bool gotNewData = false;
 
     bool imuIsLevel =
-        fabsf(core->vstate.phi) < td->maxArmingAngle &&
-        fabsf(core->vstate.theta) < td->maxArmingAngle;
+        fabsf(core->vstate.phi) < data->maxArmingAngle &&
+        fabsf(core->vstate.theta) < data->maxArmingAngle;
 
     rxPoll(
-            &td->rx,
+            &data->rx,
             usec,
             imuIsLevel, 
             calibrating,
             &rxax,
-            td->motorDevice,
-            &td->arming,
+            data->motorDevice,
+            &data->arming,
             &pidItermResetReady,
             &pidItermResetValue,
             &gotNewData);
@@ -170,7 +170,7 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
     }
 
     if (gotNewData) {
-        memcpy(&td->rxAxes, &rxax, sizeof(rx_axes_t));
+        memcpy(&data->rxAxes, &rxax, sizeof(rx_axes_t));
     }
 }
 
@@ -178,19 +178,19 @@ static void task_rx(void * hp, void * dp, uint32_t usec)
 
 static const uint32_t MSP_TASK_RATE = 100;
 
-static void task_msp(void * hp, void * dp, uint32_t usec)
+static void task_msp(
+        hackflight_core_t * core,
+        task_data_t * data,
+        uint32_t usec)
 {
-    hackflight_core_t * core = (hackflight_core_t *)hp;
-    task_data_t * td = (task_data_t *)dp;
-
     (void)usec;
 
     mspUpdate(
             &core->vstate,
-            &td->rxAxes,
-            armingIsArmed(&td->arming),
-            td->motorDevice,
-            td->mspMotors);
+            &data->rxAxes,
+            armingIsArmed(&data->arming),
+            data->motorDevice,
+            data->mspMotors);
 }
 
 // Support for dynamically scheduled tasks ---------------------------------
@@ -227,7 +227,7 @@ static void adjustRxDynamicPriority(rx_t * rx, task_t * task,
 
 static void executeTask(
         hackflight_core_t * core,
-        task_data_t * dt,
+        task_data_t * td,
         task_t *task,
         uint32_t usec)
 {
@@ -235,7 +235,7 @@ static void executeTask(
     task->dynamicPriority = 0;
 
     uint32_t time = timeMicros();
-    task->fun(core, dt, usec);
+    task->fun(core, td, usec);
 
     uint32_t taskExecutionTimeUs = timeMicros() - time;
 
@@ -366,7 +366,7 @@ static void checkDynamicTasks(
         hackflight_full_t * full,
         hackflight_core_t * core,
         scheduler_t * scheduler,
-        task_data_t * dt,
+        task_data_t * td,
         int32_t loopRemainingCycles,
         uint32_t nextTargetCycles)
 {
@@ -375,7 +375,7 @@ static void checkDynamicTasks(
 
     uint32_t usec = timeMicros();
 
-    adjustRxDynamicPriority(&dt->rx, &full->rxTask, usec);
+    adjustRxDynamicPriority(&td->rx, &full->rxTask, usec);
     updateDynamicTask(&full->rxTask, &selectedTask,
             &selectedTaskDynamicPriority);
 
@@ -401,7 +401,7 @@ static void checkDynamicTasks(
         if (taskRequiredTimeCycles < loopRemainingCycles) {
             uint32_t antipatedEndCycles =
                 nowCycles + taskRequiredTimeCycles;
-            executeTask(core, dt, selectedTask, usec);
+            executeTask(core, td, selectedTask, usec);
             nowCycles = systemGetCycleCounter();
             int32_t cyclesOverdue =
                 cmpTimeCycles(nowCycles, antipatedEndCycles);
