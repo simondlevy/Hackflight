@@ -57,6 +57,18 @@ class Task {
 
     public:
 
+        void adjustDynamicPriority(uint32_t usec) 
+        {
+            // Task is time-driven, dynamicPriority is last execution age
+            // (measured in desiredPeriods). Task age is calculated from last
+            // execution.
+            m_ageCycles =
+                (cmpTimeUs(usec, m_lastExecutedAtUs) / m_desiredPeriodUs);
+            if (m_ageCycles > 0) {
+                m_dynamicPriority = 1 + m_ageCycles;
+            }
+        }
+
         virtual void fun(
                 hackflight_core_t * core,
                 task_data_t * data,
