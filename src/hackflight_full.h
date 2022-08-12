@@ -64,8 +64,10 @@ typedef struct {
 
 // Support for dynamically scheduled tasks ---------------------------------
 
-static void adjustDynamicPriority(task_t * task, uint32_t usec) 
+static void adjustDynamicPriority(task_t * task, task_data_t * td, uint32_t usec) 
 {
+    (void)td;
+
     // Task is time-driven, dynamicPriority is last execution age (measured
     // in desiredPeriods). Task age is calculated from last execution.
     task->taskAgeCycles = (cmpTimeUs(usec, task->lastExecutedAtUs) /
@@ -224,11 +226,12 @@ static void updateDynamicTask(
 
 static void adjustAndUpdateTask(
         task_t * task,
+        task_data_t * td,
         uint32_t usec,
         task_t ** selectedTask,
         uint16_t * selectedTaskDynamicPriority)
 {
-    adjustDynamicPriority(task, usec);
+    adjustDynamicPriority(task, td, usec);
     updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
 }
 
@@ -250,10 +253,10 @@ static void checkDynamicTasks(
     updateDynamicTask(&full->rxTask, &selectedTask,
             &selectedTaskDynamicPriority);
 
-    adjustAndUpdateTask(&full->attitudeTask, usec,
+    adjustAndUpdateTask(&full->attitudeTask, &full->taskData, usec,
             &selectedTask, &selectedTaskDynamicPriority);
 
-    adjustAndUpdateTask(&full->mspTask, usec,
+    adjustAndUpdateTask(&full->mspTask, &full->taskData, usec,
             &selectedTask, &selectedTaskDynamicPriority);
 
     if (selectedTask) {
