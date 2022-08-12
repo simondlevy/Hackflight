@@ -78,15 +78,14 @@ static void adjustDynamicPriority(task_t * task, task_data_t * td, uint32_t usec
 }
 
 // Increase priority for RX task
-static void adjustRxDynamicPriority(rx_t * rx, task_t * task,
-        uint32_t usec) 
+static void adjustRxDynamicPriority(task_t * task, task_data_t *td, uint32_t usec) 
 {
     if (task->dynamicPriority > 0) {
         task->taskAgeCycles = 1 + (cmpTimeUs(usec,
                     task->lastSignaledAtUs) / task->desiredPeriodUs);
         task->dynamicPriority = 1 + task->taskAgeCycles;
     } else  {
-        if (rxCheck(rx, usec)) {
+        if (rxCheck(&td->rx, usec)) {
             task->lastSignaledAtUs = usec;
             task->taskAgeCycles = 1;
             task->dynamicPriority = 2;
@@ -249,7 +248,7 @@ static void checkDynamicTasks(
 
     uint32_t usec = timeMicros();
 
-    adjustRxDynamicPriority(&td->rx, &full->rxTask, usec);
+    adjustRxDynamicPriority(&full->rxTask, &full->taskData, usec);
     updateDynamicTask(&full->rxTask, &selectedTask,
             &selectedTaskDynamicPriority);
 
