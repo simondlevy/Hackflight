@@ -48,17 +48,19 @@ class Task {
         uint32_t m_lastExecutedAtUs;          
         uint32_t m_lastSignaledAtUs;         
 
-    public:
+    protected:
 
         Task(uint32_t rate) 
         {
             m_desiredPeriodUs = 1000000 / rate;
         }
 
+    public:
+
         virtual void fun(
                 hackflight_core_t * core,
                 task_data_t * data,
-                uint32_t usec);
+                uint32_t usec) = 0;
 
 }; 
 
