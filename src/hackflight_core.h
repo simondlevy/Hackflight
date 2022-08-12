@@ -107,3 +107,34 @@ static void hackflightInit(
     hackflightAddPidController(hc, anglePidUpdate, &hc->anglePid);
 }
 
+class HackflightCore {
+
+    private:
+
+        // Scheduling constants
+        static const uint32_t RX_TASK_RATE       = 33;
+        static const uint32_t ATTITUDE_TASK_RATE = 100;
+
+        // PID-limiting constants
+        static constexpr  float PID_MIXER_SCALING = 1000;
+        static const uint16_t   PIDSUM_LIMIT_YAW  = 400;
+        static const uint16_t   PIDSUM_LIMIT      = 500;
+
+        anglePid_t       m_anglePid;
+        demands_t        m_demands;
+        mixer_t          m_mixer;
+        pid_controller_t m_pidControllers[10];
+        uint8_t          m_pidCount;
+        bool             m_pidReset;
+        vehicle_state_t  m_vstate;
+
+    public:
+
+        void addPidController(pid_fun_t fun, void * data)
+        {
+            m_pidControllers[m_pidCount].fun = fun;
+            m_pidControllers[m_pidCount].data = data;
+            m_pidCount++;
+        }
+
+}; // class HackflightCore
