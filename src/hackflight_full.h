@@ -256,3 +256,8 @@ void hackflightStep(hackflight_full_t * full)
         checkDynamicTasks(full, scheduler);
     }
 }
+
+class Hackflight : public HackflightCore {
+
+
+};

@@ -128,6 +128,11 @@ class HackflightCore {
         bool             m_pidReset;
         vehicle_state_t  m_vstate;
 
+        static float constrain_demand(float demand, float limit, float scaling)
+        {
+            return constrain_f(demand, -limit, +limit) / scaling;
+        }
+
     public:
 
         HackflightCore(anglePidConstants_t * anglePidConstants, mixer_t mixer)
