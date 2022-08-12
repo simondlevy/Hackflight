@@ -24,6 +24,45 @@
 #include "rx.h"
 #include "task.h"
 
+static void task_rx(
+        hackflight_core_t * core,
+        task_data_t * data,
+        uint32_t usec)
+{
+    bool calibrating = data->gyro.isCalibrating; // || acc.calibrating != 0;
+    bool pidItermResetReady = false;
+    bool pidItermResetValue = false;
+
+    rx_axes_t rxax = {};
+
+    bool gotNewData = false;
+
+    bool imuIsLevel =
+        fabsf(core->vstate.phi) < data->maxArmingAngle &&
+        fabsf(core->vstate.theta) < data->maxArmingAngle;
+
+    rxPoll(
+            &data->rx,
+            usec,
+            imuIsLevel, 
+            calibrating,
+            &rxax,
+            data->motorDevice,
+            &data->arming,
+            &pidItermResetReady,
+            &pidItermResetValue,
+            &gotNewData);
+
+    if (pidItermResetReady) {
+        core->pidReset = pidItermResetValue;
+    }
+
+    if (gotNewData) {
+        memcpy(&data->rxAxes, &rxax, sizeof(rx_axes_t));
+    }
+}
+
+
 class ReceiverTask : public Task {
 
     public:
@@ -33,9 +72,10 @@ class ReceiverTask : public Task {
         {
         }
 
-        void fun(task_data_t * data, uint32_t time)
+        void fun(hackflight_core_t * core, task_data_t * data, uint32_t time)
         {
-            bool calibrating = data->gyro.isCalibrating; // || acc.calibrating != 0;
+            bool calibrating = data->gyro.isCalibrating; 
+               // || acc.calibrating != 0;
             bool pidItermResetReady = false;
             bool pidItermResetValue = false;
 
@@ -44,8 +84,8 @@ class ReceiverTask : public Task {
             bool gotNewData = false;
 
             bool imuIsLevel =
-                fabsf(data->vstate.phi) < data->maxArmingAngle &&
-                fabsf(data->vstate.theta) < data->maxArmingAngle;
+                fabsf(core->vstate.phi) < data->maxArmingAngle &&
+                fabsf(core->vstate.theta) < data->maxArmingAngle;
 
             rxPoll(
                     &data->rx,
@@ -60,7 +100,7 @@ class ReceiverTask : public Task {
                     &gotNewData);
 
             if (pidItermResetReady) {
-                data->pidReset = pidItermResetValue;
+                core->pidReset = pidItermResetValue;
             }
 
             if (gotNewData) {

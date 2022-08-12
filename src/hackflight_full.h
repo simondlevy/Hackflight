@@ -32,6 +32,7 @@
 #include "motor.h"
 #include "msp_task.h"
 #include "msp.h"
+#include "receiver_task.h"
 #include "rx.h"
 #include "system.h"
 #include "task.h"
@@ -120,46 +121,6 @@ typedef struct {
     task_t rxTask;
 
 } hackflight_full_t;
-
-// RX polling task ------------------------------------------------------------
-
-static void task_rx(
-        hackflight_core_t * core,
-        task_data_t * data,
-        uint32_t usec)
-{
-    bool calibrating = data->gyro.isCalibrating; // || acc.calibrating != 0;
-    bool pidItermResetReady = false;
-    bool pidItermResetValue = false;
-
-    rx_axes_t rxax = {};
-
-    bool gotNewData = false;
-
-    bool imuIsLevel =
-        fabsf(core->vstate.phi) < data->maxArmingAngle &&
-        fabsf(core->vstate.theta) < data->maxArmingAngle;
-
-    rxPoll(
-            &data->rx,
-            usec,
-            imuIsLevel, 
-            calibrating,
-            &rxax,
-            data->motorDevice,
-            &data->arming,
-            &pidItermResetReady,
-            &pidItermResetValue,
-            &gotNewData);
-
-    if (pidItermResetReady) {
-        core->pidReset = pidItermResetValue;
-    }
-
-    if (gotNewData) {
-        memcpy(&data->rxAxes, &rxax, sizeof(rx_axes_t));
-    }
-}
 
 // Support for dynamically scheduled tasks ---------------------------------
 
