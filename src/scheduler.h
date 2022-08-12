@@ -50,45 +50,42 @@ class Scheduler {
         // Add a margin to the amount of time allowed for a check function to run
         static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
 
+        int32_t m_loopStartCycles;
+        int32_t m_loopStartMinCycles;
+        int32_t m_loopStartMaxCycles;
+        uint32_t m_loopStartDeltaDownCycles;
+        uint32_t m_loopStartDeltaUpCycles;
+
+        uint32_t m_nextTimingCycles;
+
+        int32_t m_guardMargin;
+        uint32_t m_clockRate;
+
     public:
 
-        int32_t loopStartCycles;
-        int32_t loopStartMinCycles;
-        int32_t loopStartMaxCycles;
-        uint32_t loopStartDeltaDownCycles;
-        uint32_t loopStartDeltaUpCycles;
-
+        int32_t desiredPeriodCycles;
+        uint32_t lastTargetCycles;
         int32_t taskGuardCycles;
         int32_t taskGuardMinCycles;
         int32_t taskGuardMaxCycles;
         uint32_t taskGuardDeltaDownCycles;
         uint32_t taskGuardDeltaUpCycles;
-
-        int32_t desiredPeriodCycles;
-        uint32_t lastTargetCycles;
-
-        uint32_t nextTimingCycles;
-
-        int32_t guardMargin;
-        uint32_t clockRate;
-
         uint32_t nextTargetCycles;
         int32_t loopRemainingCycles;
         int32_t newLoopRemainingCyles;
 
-    public:
 
         Scheduler(void)
         {
-            loopStartCycles =
+            m_loopStartCycles =
                 systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-            loopStartMinCycles =
+            m_loopStartMinCycles =
                 systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-            loopStartMaxCycles =
+            m_loopStartMaxCycles =
                 systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
-            loopStartDeltaDownCycles =
+            m_loopStartDeltaDownCycles =
                 systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
-            loopStartDeltaUpCycles =
+            m_loopStartDeltaUpCycles =
                 systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
 
             taskGuardMinCycles =
@@ -103,15 +100,31 @@ class Scheduler {
 
             lastTargetCycles = systemGetCycleCounter();
 
-            nextTimingCycles = lastTargetCycles;
+            m_nextTimingCycles = lastTargetCycles;
 
             desiredPeriodCycles =
                 (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
 
-            guardMargin =
+            m_guardMargin =
                 (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
 
-            clockRate = systemClockMicrosToCycles(1000000);
+            m_clockRate = systemClockMicrosToCycles(1000000);
+        }
+
+        void corePreUpdate(void) 
+        {
+            if (m_loopStartCycles > m_loopStartMinCycles) {
+                m_loopStartCycles -= m_loopStartDeltaDownCycles;
+            }
+        }
+
+        void corePostUpdate(uint32_t nowCycles)
+        {
+            // CPU busy
+            if (cmpTimeCycles(m_nextTimingCycles, nowCycles) < 0) {
+                m_nextTimingCycles += m_clockRate;
+            }
+            lastTargetCycles = nextTargetCycles;
         }
 
         bool isCoreReady(uint32_t nowCycles)
@@ -133,20 +146,20 @@ class Scheduler {
 
             // Tune out the time lost between completing the last task
             // execution and re-entering the scheduler
-            if ((loopRemainingCycles < loopStartMinCycles) &&
-                    (loopStartCycles < loopStartMaxCycles)) {
-                loopStartCycles += loopStartDeltaUpCycles;
+            if ((loopRemainingCycles < m_loopStartMinCycles) &&
+                    (m_loopStartCycles < m_loopStartMaxCycles)) {
+                m_loopStartCycles += m_loopStartDeltaUpCycles;
             }
 
             // Once close to the timing boundary, poll for its arrival
-            return loopRemainingCycles < loopStartCycles;
+            return loopRemainingCycles < m_loopStartCycles;
         }
 
         bool isDynamicReady(uint32_t nowCycles) 
         {
             newLoopRemainingCyles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
-            return newLoopRemainingCyles > guardMargin;
+            return newLoopRemainingCyles > m_guardMargin;
         }
 
 }; // class Scheduler

@@ -71,9 +71,7 @@ static void checkCoreTasks(
     Scheduler * scheduler = &full->scheduler;
     task_data_t * td = &full->taskData;
 
-    if (scheduler->loopStartCycles > scheduler->loopStartMinCycles) {
-        scheduler->loopStartCycles -= scheduler->loopStartDeltaDownCycles;
-    }
+    scheduler->corePreUpdate();
 
     while (loopRemainingCycles > 0) {
         nowCycles = systemGetCycleCounter();
@@ -105,11 +103,7 @@ static void checkCoreTasks(
     motorWrite(td->motorDevice,
             armingIsArmed(&td->arming) ? mixmotors : td->mspMotors);
 
-    // CPU busy
-    if (cmpTimeCycles(scheduler->nextTimingCycles, nowCycles) < 0) {
-        scheduler->nextTimingCycles += scheduler->clockRate;
-    }
-    scheduler->lastTargetCycles = nextTargetCycles;
+    scheduler->corePostUpdate(nowCycles);
 
     // Bring the scheduler into lock with the gyro Track the actual gyro
     // rate over given number of cycle times and set the expected timebase
@@ -180,17 +174,17 @@ static void checkDynamicTasks(
     if (selectedTask) {
 
         int32_t taskRequiredTimeUs = selectedTask->getRequiredTime();
-        int32_t taskRequiredTimeCycles =
+        int32_t taskRequiredCycles =
             (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
 
         uint32_t nowCycles = systemGetCycleCounter();
         loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
         // Allow a little extra time
-        taskRequiredTimeCycles += scheduler->taskGuardCycles;
+        taskRequiredCycles += scheduler->taskGuardCycles;
 
-        if (taskRequiredTimeCycles < loopRemainingCycles) {
-            uint32_t antipatedEndCycles = nowCycles + taskRequiredTimeCycles;
+        if (taskRequiredCycles < loopRemainingCycles) {
+            uint32_t antipatedEndCycles = nowCycles + taskRequiredCycles;
             selectedTask->execute(core, td, usec);
             nowCycles = systemGetCycleCounter();
             int32_t cyclesOverdue = cmpTimeCycles(nowCycles, antipatedEndCycles);
@@ -198,8 +192,7 @@ static void checkDynamicTasks(
             if ((cyclesOverdue > 0) ||
                     (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
 
-                if (scheduler->taskGuardCycles <
-                        scheduler->taskGuardMaxCycles) {
+                if (scheduler->taskGuardCycles < scheduler->taskGuardMaxCycles) {
                     scheduler->taskGuardCycles +=
                         scheduler->taskGuardDeltaUpCycles;
                 }
