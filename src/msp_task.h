@@ -47,6 +47,8 @@ class MspTask : public Task {
                 task_data_t * data,
                 uint32_t usec) override
         {
+            (void)usec;
+
             mspUpdate(
                     &core->vstate,
                     &data->rxAxes,
