@@ -120,6 +120,10 @@ typedef struct {
     task_t mspTask;
     task_t rxTask;
 
+    AttitudeTask m_attitudeTask;
+    MspTask      m_mspTask;
+    ReceiverTask m_receiverTask;
+
 } hackflight_full_t;
 
 // Support for dynamically scheduled tasks ---------------------------------
