@@ -42,10 +42,10 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0}; // 3.0; // Level Kp
 
-    hackflight_full_t full = {};
+    Hackflight::data_t hf = {};
 
-    hackflightInitFull(
-            &full,
+    Hackflight::init(
+            &hf,
             &sbusDeviceFuns,
             SERIAL_PORT_USART3, // RX port
             &anglePidConstants,
@@ -56,24 +56,9 @@ int main(void)
             37);                // LED pin
 
     while (true) {
-        hackflightStep(&full);
-    }
 
-    /*
-    Hackflight hf = Hackflight(
-            &sbusDeviceFuns,
-            SERIAL_PORT_USART3, // RX port
-            &anglePidConstants,
-            mixerQuadXbf,
-            motorDevice,
-            0,                  // dummy value for IMU interrupt pin
-            imuRotate270,
-            37);                // LED pin
-
-    while (true) {
-        hf.step();
+        Hackflight::step(&hf);
     }
-    */
 
     return 0;
 }

@@ -38,226 +38,8 @@
 #include "system.h"
 #include "task.h"
 
-// Gyro interrupt counts over which to measure loop time and skew
-static const uint32_t CORE_RATE_COUNT = 25000;
-static const uint32_t GYRO_LOCK_COUNT = 400;
 
-// Arming safety  
-static const float MAX_ARMING_ANGLE = 25;
-
-// Full structure for running Hackflight
-
-typedef struct {
-
-    core_data_t core;
-
-    imu_align_fun imuAlignFun;
-    task_data_t   taskData;
-    Scheduler     scheduler;
-
-    AttitudeTask attitudeTask;
-    MspTask      mspTask;
-    ReceiverTask receiverTask;
-
-} hackflight_full_t;
-
-static void checkCoreTasks(
-        hackflight_full_t * full,
-        Scheduler * scheduler,
-        uint32_t nowCycles)
-{
-    core_data_t * core = &full->core;
-    task_data_t * td = &full->taskData;
-
-    int32_t loopRemainingCycles = scheduler->getLoopRemainingCycles();
-    uint32_t nextTargetCycles = scheduler->getNextTargetCycles();
-
-    scheduler->corePreUpdate();
-
-    while (loopRemainingCycles > 0) {
-        nowCycles = systemGetCycleCounter();
-        loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
-    }
-
-    gyroReadScaled(&td->gyro, full->imuAlignFun, &core->vstate);
-
-    uint32_t usec = timeMicros();
-
-    rxGetDemands(&td->rx, usec, &core->anglePid, &core->demands);
-
-    float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
-
-    motor_config_t motorConfig = {
-        motorValueDisarmed(),
-        motorValueHigh(),
-        motorValueLow(),
-        motorIsProtocolDshot()  
-    };
-
-    hackflightRunCoreTasks(
-            core,
-            usec,
-            failsafeIsActive(),
-            &motorConfig,
-            mixmotors);
-
-    motorWrite(td->motorDevice,
-            armingIsArmed(&td->arming) ? mixmotors : td->mspMotors);
-
-    scheduler->corePostUpdate(nowCycles);
-
-    // Bring the scheduler into lock with the gyro Track the actual gyro
-    // rate over given number of cycle times and set the expected timebase
-    static uint32_t _terminalGyroRateCount;
-    static int32_t _sampleRateStartCycles;
-
-    if ((_terminalGyroRateCount == 0)) {
-        _terminalGyroRateCount = gyroInterruptCount() + CORE_RATE_COUNT;
-        _sampleRateStartCycles = nowCycles;
-    }
-
-    if (gyroInterruptCount() >= _terminalGyroRateCount) {
-        // Calculate number of clock cycles on average between gyro
-        // interrupts
-        uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-        scheduler->desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
-        _sampleRateStartCycles = nowCycles;
-        _terminalGyroRateCount += CORE_RATE_COUNT;
-    }
-
-    // Track actual gyro rate over given number of cycle times and remove
-    // skew
-    static uint32_t _terminalGyroLockCount;
-    static int32_t _gyroSkewAccum;
-
-    int32_t gyroSkew =
-        gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
-
-    _gyroSkewAccum += gyroSkew;
-
-    if ((_terminalGyroLockCount == 0)) {
-        _terminalGyroLockCount = gyroInterruptCount() + GYRO_LOCK_COUNT;
-    }
-
-    if (gyroInterruptCount() >= _terminalGyroLockCount) {
-        _terminalGyroLockCount += GYRO_LOCK_COUNT;
-
-        // Move the desired start time of the gyroSampleTask
-        scheduler->lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
-
-        _gyroSkewAccum = 0;
-    }
-}
-
-static void checkDynamicTasks( hackflight_full_t * full, Scheduler * scheduler)
-{
-    core_data_t * core = &full->core;
-    task_data_t * td = &full->taskData;
-
-    Task *selectedTask = NULL;
-    uint16_t selectedTaskDynamicPriority = 0;
-
-    uint32_t usec = timeMicros();
-
-    Task::update(&full->receiverTask, &full->taskData, usec,
-            &selectedTask, &selectedTaskDynamicPriority);
-
-    Task::update(&full->attitudeTask, &full->taskData, usec,
-            &selectedTask, &selectedTaskDynamicPriority);
-
-    Task::update(&full->mspTask, &full->taskData, usec,
-            &selectedTask, &selectedTaskDynamicPriority);
-
-    if (selectedTask) {
-
-        int32_t loopRemainingCycles = scheduler->getLoopRemainingCycles();
-        uint32_t nextTargetCycles = scheduler->getNextTargetCycles();
-
-        int32_t taskRequiredTimeUs = selectedTask->getRequiredTime();
-        int32_t taskRequiredCycles =
-            (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
-
-        uint32_t nowCycles = systemGetCycleCounter();
-        loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
-
-        // Allow a little extra time
-        taskRequiredCycles += scheduler->getTaskGuardCycles();
-
-        if (taskRequiredCycles < loopRemainingCycles) {
-
-            uint32_t anticipatedEndCycles = nowCycles + taskRequiredCycles;
-
-            selectedTask->execute(core, td, usec);
-
-            scheduler->updateDynamic(
-                    systemGetCycleCounter(),
-                    anticipatedEndCycles);
-
-        } else {
-            selectedTask->enableRun();
-        }
-    }
-}
-
-// -------------------------------------------------------------------------
-
-void hackflightInitFull(
-        hackflight_full_t * full,
-        rx_dev_funs_t * rxDeviceFuns,
-        serialPortIdentifier_e rxDevPort,
-        anglePidConstants_t * anglePidConstants,
-        mixer_t mixer,
-        void * motorDevice,
-        uint8_t imuInterruptPin,
-        imu_align_fun imuAlign,
-        uint8_t ledPin)
-{
-    core_data_t * core = &full->core;
-
-    hackflightInit(core, anglePidConstants, mixer);
-
-    task_data_t * td = &full->taskData;
-
-    mspInit();
-    gyroInit(&td->gyro);
-    imuInit(imuInterruptPin);
-    ledInit(ledPin);
-    ledFlash(10, 50);
-    failsafeInit();
-    failsafeReset();
-
-    td->rx.devCheck = rxDeviceFuns->check;
-    td->rx.devConvert = rxDeviceFuns->convert;
-
-    rxDeviceFuns->init(rxDevPort);
-
-    full->imuAlignFun = imuAlign;
-
-    td->motorDevice = motorDevice;
-
-    // Initialize quaternion in upright position
-    td->imuFusionPrev.quat.w = 1;
-
-    td->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
-}
-
-void hackflightStep(hackflight_full_t * full)
-{
-    Scheduler * scheduler = &full->scheduler;
-
-    // Realtime gyro/filtering/PID tasks get complete priority
-    uint32_t nowCycles = systemGetCycleCounter();
-
-    if (scheduler->isCoreReady(nowCycles)) {
-        checkCoreTasks(full, scheduler, nowCycles);
-    }
-
-    if (scheduler->isDynamicReady(systemGetCycleCounter())) {
-        checkDynamicTasks(full, scheduler);
-    }
-}
-
-class Hackflight : public HackflightCore {
+class Hackflight {
 
     private:
 
@@ -268,40 +50,55 @@ class Hackflight : public HackflightCore {
         // Arming safety  
         static constexpr float MAX_ARMING_ANGLE = 25;
 
-        uint8_t       m_imuInterruptPin;
-        uint8_t       m_ledPin;
+    public:
 
-        imu_align_fun m_imuAlignFun;
-        task_data_t   m_taskData;
-        Scheduler     m_scheduler;
+        typedef struct {
 
-        AttitudeTask m_attitudeTask;
-        MspTask      m_mspTask;
-        ReceiverTask m_receiverTask;
+            HackflightCore::data_t coreData;
 
-        void checkCoreTasks(uint32_t nowCycles)
+            imu_align_fun imuAlignFun;
+            task_data_t   taskData;
+            Scheduler     scheduler;
+
+            AttitudeTask attitudeTask;
+            MspTask      mspTask;
+            ReceiverTask receiverTask;
+
+        } data_t;
+
+    private:
+
+        static void checkCoreTasks(
+                data_t * data,
+                Scheduler * scheduler,
+                uint32_t nowCycles)
         {
-            core_data_t * core = &m_core;
+            HackflightCore::data_t * coreData = &data->coreData;
+            task_data_t * taskData = &data->taskData;
 
-            task_data_t * td = &m_taskData;
+            int32_t loopRemainingCycles = scheduler->getLoopRemainingCycles();
+            uint32_t nextTargetCycles = scheduler->getNextTargetCycles();
 
-            int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
-            uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
-
-            m_scheduler.corePreUpdate();
+            scheduler->corePreUpdate();
 
             while (loopRemainingCycles > 0) {
                 nowCycles = systemGetCycleCounter();
-                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+                loopRemainingCycles =
+                    cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            gyroReadScaled(&td->gyro, m_imuAlignFun, &core->vstate);
+            gyroReadScaled(
+                    &taskData->gyro, data->imuAlignFun, &coreData->vstate);
 
             uint32_t usec = timeMicros();
 
-            rxGetDemands(&td->rx, usec, &core->anglePid, &core->demands);
+            rxGetDemands(
+                    &taskData->rx,
+                    usec,
+                    &coreData->anglePid,
+                    &coreData->demands);
 
-            float mixmotors[MAX_SUPPORTED_MOTORS] = {};
+            float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
             motor_config_t motorConfig = {
                 motorValueDisarmed(),
@@ -310,15 +107,23 @@ class Hackflight : public HackflightCore {
                 motorIsProtocolDshot()  
             };
 
-            runCoreTasks(usec, failsafeIsActive(), &motorConfig, mixmotors);
+            HackflightCore::step(
+                    coreData,
+                    usec,
+                    failsafeIsActive(),
+                    &motorConfig,
+                    mixmotors);
 
-            motorWrite(td->motorDevice,
-                    armingIsArmed(&td->arming) ? mixmotors : td->mspMotors);
+            motorWrite(taskData->motorDevice,
+                    armingIsArmed(&taskData->arming) ?
+                    mixmotors :
+                    taskData->mspMotors);
 
-            m_scheduler.corePostUpdate(nowCycles);
+            scheduler->corePostUpdate(nowCycles);
 
-            // Bring the scheduler into lock with the gyro Track the actual gyro
-            // rate over given number of cycle times and set the expected timebase
+            // Bring the scheduler into lock with the gyro Track the actual
+            // gyro rate over given number of cycle times and set the expected
+            // timebase
             static uint32_t _terminalGyroRateCount;
             static int32_t _sampleRateStartCycles;
 
@@ -331,18 +136,18 @@ class Hackflight : public HackflightCore {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-                m_scheduler.desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
+                scheduler->desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
                 _terminalGyroRateCount += CORE_RATE_COUNT;
             }
 
-            // Track actual gyro rate over given number of cycle times and remove
-            // skew
+            // Track actual gyro rate over given number of cycle times and
+            // remove skew
             static uint32_t _terminalGyroLockCount;
             static int32_t _gyroSkewAccum;
 
             int32_t gyroSkew =
-                gyroGetSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
+                gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 
@@ -354,35 +159,36 @@ class Hackflight : public HackflightCore {
                 _terminalGyroLockCount += GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
-                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
+                scheduler->lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
 
                 _gyroSkewAccum = 0;
             }
 
         } // checkCoreTasks
 
-        void checkDynamicTasks(void)
+        static void checkDynamicTasks(
+                data_t * full, Scheduler * scheduler)
         {
-            // task_data_t * td = &m_taskData;
-
             Task *selectedTask = NULL;
             uint16_t selectedTaskDynamicPriority = 0;
 
             uint32_t usec = timeMicros();
 
-            Task::update(&m_receiverTask, &m_taskData, usec,
+            Task::update(&full->receiverTask, &full->taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_attitudeTask, &m_taskData, usec,
+            Task::update(&full->attitudeTask, &full->taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_mspTask, &m_taskData, usec,
+            Task::update(&full->mspTask, &full->taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
             if (selectedTask) {
 
-                int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
-                uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
+                int32_t loopRemainingCycles =
+                    scheduler->getLoopRemainingCycles();
+                uint32_t nextTargetCycles =
+                    scheduler->getNextTargetCycles();
 
                 int32_t taskRequiredTimeUs = selectedTask->getRequiredTime();
                 int32_t taskRequiredCycles =
@@ -390,19 +196,21 @@ class Hackflight : public HackflightCore {
                             (uint32_t)taskRequiredTimeUs);
 
                 uint32_t nowCycles = systemGetCycleCounter();
-                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+                loopRemainingCycles =
+                    cmpTimeCycles(nextTargetCycles, nowCycles);
 
                 // Allow a little extra time
-                taskRequiredCycles += m_scheduler.getTaskGuardCycles();
+                taskRequiredCycles += scheduler->getTaskGuardCycles();
 
                 if (taskRequiredCycles < loopRemainingCycles) {
 
                     uint32_t anticipatedEndCycles =
                         nowCycles + taskRequiredCycles;
 
-                    selectedTask->execute(&m_core, &m_taskData, usec);
+                    selectedTask->execute
+                        (&full->coreData, &full->taskData, usec);
 
-                    m_scheduler.updateDynamic(
+                    scheduler->updateDynamic(
                             systemGetCycleCounter(),
                             anticipatedEndCycles);
 
@@ -411,11 +219,12 @@ class Hackflight : public HackflightCore {
                 }
             }
 
-        } // checkDynamicsTasks
+        } // checkDyanmicTasks
 
     public:
 
-        Hackflight(
+        static void init(
+                data_t * full,
                 rx_dev_funs_t * rxDeviceFuns,
                 serialPortIdentifier_e rxDevPort,
                 anglePidConstants_t * anglePidConstants,
@@ -424,37 +233,51 @@ class Hackflight : public HackflightCore {
                 uint8_t imuInterruptPin,
                 imu_align_fun imuAlign,
                 uint8_t ledPin)
-            : HackflightCore(anglePidConstants, mixer)
         {
-            m_imuInterruptPin = imuInterruptPin;
-            m_ledPin = ledPin;
+            HackflightCore::data_t * coreData = &full->coreData;
 
-            task_data_t * td = &m_taskData;
+            HackflightCore::init(coreData, anglePidConstants, mixer);
 
-            td->rx.devCheck = rxDeviceFuns->check;
-            td->rx.devConvert = rxDeviceFuns->convert;
+            task_data_t * taskData = &full->taskData;
 
-            rxDeviceFuns->init(rxDevPort);
-
-            m_imuAlignFun = imuAlign;
-
-            td->motorDevice = motorDevice;
-
-            // Initialize quaternion in upright position
-            td->imuFusionPrev.quat.w = 1;
-
-            td->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
-        }
-
-        void begin(void)
-        {
             mspInit();
-            gyroInit(&m_taskData.gyro);
-            imuInit(m_imuInterruptPin);
-            ledInit(m_ledPin);
+            gyroInit(&taskData->gyro);
+            imuInit(imuInterruptPin);
+            ledInit(ledPin);
             ledFlash(10, 50);
             failsafeInit();
             failsafeReset();
+
+            taskData->rx.devCheck = rxDeviceFuns->check;
+            taskData->rx.devConvert = rxDeviceFuns->convert;
+
+            rxDeviceFuns->init(rxDevPort);
+
+            full->imuAlignFun = imuAlign;
+
+            taskData->motorDevice = motorDevice;
+
+            // Initialize quaternion in upright position
+            taskData->imuFusionPrev.quat.w = 1;
+
+            taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+
+        } // init
+
+        static void step(data_t * full)
+        {
+            Scheduler * scheduler = &full->scheduler;
+
+            // Realtime gyro/filtering/PID tasks get complete priority
+            uint32_t nowCycles = systemGetCycleCounter();
+
+            if (scheduler->isCoreReady(nowCycles)) {
+                checkCoreTasks(full, scheduler, nowCycles);
+            }
+
+            if (scheduler->isDynamicReady(systemGetCycleCounter())) {
+                checkDynamicTasks(full, scheduler);
+            }
         }
 
 }; // class Hackflight

@@ -92,7 +92,7 @@ class Task {
             }
         }
 
-        void execute(core_data_t * core, task_data_t * td, uint32_t usec)
+        void execute(HackflightCore::data_t * core, task_data_t * td, uint32_t usec)
         {
             m_lastExecutedAtUs = usec;
             m_dynamicPriority = 0;
@@ -134,7 +134,7 @@ class Task {
 
 
         virtual void fun(
-                core_data_t * core,
+                HackflightCore::data_t * core,
                 task_data_t * data,
                 uint32_t usec) = 0;
 }; 

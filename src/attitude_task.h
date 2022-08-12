@@ -23,7 +23,7 @@
 #include "task.h"
 
 static void task_attitude(
-        core_data_t * core,
+        HackflightCore::data_t * core,
         task_data_t * data,
         uint32_t usec)
 {
@@ -44,7 +44,7 @@ class AttitudeTask : public Task {
         }
 
         virtual void fun(
-                core_data_t * core,
+                HackflightCore::data_t * core,
                 task_data_t * data,
                 uint32_t time) override
         {
