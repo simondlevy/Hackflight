@@ -400,7 +400,7 @@ class Hackflight : public HackflightCore {
                     uint32_t anticipatedEndCycles =
                         nowCycles + taskRequiredCycles;
 
-                    // selectedTask->execute(this, td, usec);
+                    selectedTask->execute(&m_core, &m_taskData, usec);
 
                     m_scheduler.updateDynamic(
                             systemGetCycleCounter(),
