@@ -38,11 +38,6 @@ typedef struct {
 
 } core_data_t;
 
-// Scheduling constants -------------------------------------------------------
-
-static const uint32_t RX_TASK_RATE       = 33;
-static const uint32_t ATTITUDE_TASK_RATE = 100;
-
 // PID-limiting constants -----------------------------------------------------
 
 static const float    PID_MIXER_SCALING = 1000;
