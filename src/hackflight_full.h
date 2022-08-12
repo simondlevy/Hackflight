@@ -190,15 +190,14 @@ static void checkDynamicTasks(
         taskRequiredTimeCycles += scheduler->taskGuardCycles;
 
         if (taskRequiredTimeCycles < loopRemainingCycles) {
-            uint32_t antipatedEndCycles =
-                nowCycles + taskRequiredTimeCycles;
+            uint32_t antipatedEndCycles = nowCycles + taskRequiredTimeCycles;
             selectedTask->execute(core, td, usec);
             nowCycles = systemGetCycleCounter();
-            int32_t cyclesOverdue =
-                cmpTimeCycles(nowCycles, antipatedEndCycles);
+            int32_t cyclesOverdue = cmpTimeCycles(nowCycles, antipatedEndCycles);
 
             if ((cyclesOverdue > 0) ||
                     (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
+
                 if (scheduler->taskGuardCycles <
                         scheduler->taskGuardMaxCycles) {
                     scheduler->taskGuardCycles +=
@@ -261,41 +260,21 @@ void hackflightStep(hackflight_full_t * full)
 {
     Scheduler * scheduler = &full->scheduler;
 
-    uint32_t nextTargetCycles =
-        scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
-
     // Realtime gyro/filtering/PID tasks get complete priority
     uint32_t nowCycles = systemGetCycleCounter();
 
-    int32_t loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
-
-    if (loopRemainingCycles < -scheduler->desiredPeriodCycles) {
-        // A task has so grossly overrun that at entire gyro cycle has been
-        // skipped This is most likely to occur when connected to the
-        // configurator via USB as the serial task is non-deterministic
-        // Recover as best we can, advancing scheduling by a whole number
-        // of cycles
-        nextTargetCycles += scheduler->desiredPeriodCycles * (1 +
-                (loopRemainingCycles / -scheduler->desiredPeriodCycles));
-        loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+    if (scheduler->isCoreReady(nowCycles)) {
+        checkCoreTasks(
+                full,
+                scheduler->loopRemainingCycles,
+                nowCycles,
+                scheduler->nextTargetCycles);
     }
 
-    // Tune out the time lost between completing the last task execution and
-    // re-entering the scheduler
-    if ((loopRemainingCycles < scheduler->loopStartMinCycles) &&
-            (scheduler->loopStartCycles < scheduler->loopStartMaxCycles)) {
-        scheduler->loopStartCycles += scheduler->loopStartDeltaUpCycles;
-    }
-
-    // Once close to the timing boundary, poll for its arrival
-    if (loopRemainingCycles < scheduler->loopStartCycles) {
-        checkCoreTasks(full, loopRemainingCycles, nowCycles, nextTargetCycles);
-    }
-
-    int32_t newLoopRemainingCyles =
-        cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
-
-    if (newLoopRemainingCyles > scheduler->guardMargin) {
-        checkDynamicTasks(full, newLoopRemainingCyles, nextTargetCycles);
+    if (scheduler->isDynamicReady(systemGetCycleCounter())) {
+        checkDynamicTasks(
+                full,
+                scheduler->newLoopRemainingCyles,
+                scheduler->nextTargetCycles);
     }
 }

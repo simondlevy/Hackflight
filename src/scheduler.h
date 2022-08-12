@@ -70,6 +70,10 @@ class Scheduler {
         int32_t guardMargin;
         uint32_t clockRate;
 
+        uint32_t nextTargetCycles;
+        int32_t loopRemainingCycles;
+        int32_t newLoopRemainingCyles;
+
         Scheduler(void)
         {
             loopStartCycles =
@@ -104,6 +108,41 @@ class Scheduler {
                 (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
 
             clockRate = systemClockMicrosToCycles(1000000);
+        }
+
+        bool isCoreReady(uint32_t nowCycles)
+        {
+            nextTargetCycles = lastTargetCycles + desiredPeriodCycles;
+
+            loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+
+            if (loopRemainingCycles < -desiredPeriodCycles) {
+                // A task has so grossly overrun that at entire gyro cycle has
+                // been skipped This is most likely to occur when connected to
+                // the configurator via USB as the serial task is
+                // non-deterministic Recover as best we can, advancing
+                // scheduling by a whole number of cycles
+                nextTargetCycles += desiredPeriodCycles * (1 +
+                        (loopRemainingCycles / -desiredPeriodCycles));
+                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+            }
+
+            // Tune out the time lost between completing the last task
+            // execution and re-entering the scheduler
+            if ((loopRemainingCycles < loopStartMinCycles) &&
+                    (loopStartCycles < loopStartMaxCycles)) {
+                loopStartCycles += loopStartDeltaUpCycles;
+            }
+
+            // Once close to the timing boundary, poll for its arrival
+            return loopRemainingCycles < loopStartCycles;
+        }
+
+        bool isDynamicReady(uint32_t nowCycles) 
+        {
+            newLoopRemainingCyles = cmpTimeCycles(nextTargetCycles, nowCycles);
+
+            return newLoopRemainingCyles > guardMargin;
         }
 
 }; // class Scheduler
