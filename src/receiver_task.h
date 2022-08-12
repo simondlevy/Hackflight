@@ -25,7 +25,7 @@
 #include "task.h"
 
 static void task_rx(
-        hackflight_core_t * core,
+        core_data_t * core,
         task_data_t * data,
         uint32_t usec)
 {
@@ -90,7 +90,7 @@ class ReceiverTask : public Task {
             }
         }    
         
-        void fun(hackflight_core_t * core, task_data_t * data, uint32_t time)
+        void fun(core_data_t * core, task_data_t * data, uint32_t time)
         {
             bool calibrating = data->gyro.isCalibrating; 
             // || acc.calibrating != 0;

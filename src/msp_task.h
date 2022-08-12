@@ -23,7 +23,7 @@
 static const uint32_t MSP_TASK_RATE = 100;
 
 static void task_msp(
-        hackflight_core_t * core,
+        core_data_t * core,
         task_data_t * data,
         uint32_t usec)
 {
@@ -44,7 +44,7 @@ class MspTask : public Task {
         MspTask() : Task(100) { } // Hz
 
         virtual void fun(
-                hackflight_core_t * core,
+                core_data_t * core,
                 task_data_t * data,
                 uint32_t usec) override
         {

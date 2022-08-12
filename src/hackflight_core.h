@@ -36,7 +36,7 @@ typedef struct {
     bool             pidReset;
     vehicle_state_t  vstate;
 
-} hackflight_core_t;
+} core_data_t;
 
 // Scheduling constants -------------------------------------------------------
 
@@ -52,7 +52,7 @@ static const uint16_t PIDSUM_LIMIT      = 500;
 
 // PID controller support -----------------------------------------------------
 
-static void hackflightAddPidController(hackflight_core_t * hc, pid_fun_t fun, void * data)
+static void hackflightAddPidController(core_data_t * hc, pid_fun_t fun, void * data)
 {
     hc->pidControllers[hc->pidCount].fun = fun;
     hc->pidControllers[hc->pidCount].data = data;
@@ -69,7 +69,7 @@ static float constrain_demand(float demand, float limit, float scaling)
 // Public API -----------------------------------------------------------------
 
 static void hackflightRunCoreTasks(
-        hackflight_core_t * hc,
+        core_data_t * hc,
         uint32_t usec,
         bool failsafe,
         motor_config_t * motorConfig,
@@ -96,7 +96,7 @@ static void hackflightRunCoreTasks(
 }
 
 static void hackflightInit(
-        hackflight_core_t * hc,
+        core_data_t * hc,
         anglePidConstants_t * anglePidConstants,
         mixer_t mixer)
 {
@@ -127,13 +127,13 @@ class HackflightCore {
 
     protected:
 
-        hackflight_core_t m_core;
+        core_data_t m_core;
 
     public:
 
         HackflightCore(anglePidConstants_t * anglePidConstants, mixer_t mixer)
         {
-            hackflight_core_t * core = &m_core;
+            core_data_t * core = &m_core;
 
             core->mixer = mixer;
 
@@ -144,7 +144,7 @@ class HackflightCore {
 
         void addPidController(pid_fun_t fun, void * data)
         {
-            hackflight_core_t * core = &m_core;
+            core_data_t * core = &m_core;
 
             core->pidControllers[core->pidCount].fun = fun;
             core->pidControllers[core->pidCount].data = data;
@@ -157,7 +157,7 @@ class HackflightCore {
                 motor_config_t * motorConfig,
                 float motorvals[])
         {
-            hackflight_core_t * core = &m_core;
+            core_data_t * core = &m_core;
 
             // Run PID controllers to get new demands
             for (uint8_t k=0; k<core->pidCount; ++k) {

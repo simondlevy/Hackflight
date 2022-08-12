@@ -49,7 +49,7 @@ static const float MAX_ARMING_ANGLE = 25;
 
 typedef struct {
 
-    hackflight_core_t core;
+    core_data_t core;
 
     imu_align_fun imuAlignFun;
     task_data_t   taskData;
@@ -66,7 +66,7 @@ static void checkCoreTasks(
         Scheduler * scheduler,
         uint32_t nowCycles)
 {
-    hackflight_core_t * core = &full->core;
+    core_data_t * core = &full->core;
     task_data_t * td = &full->taskData;
 
     int32_t loopRemainingCycles = scheduler->getLoopRemainingCycles();
@@ -151,7 +151,7 @@ static void checkCoreTasks(
 
 static void checkDynamicTasks( hackflight_full_t * full, Scheduler * scheduler)
 {
-    hackflight_core_t * core = &full->core;
+    core_data_t * core = &full->core;
     task_data_t * td = &full->taskData;
 
     Task *selectedTask = NULL;
@@ -212,7 +212,7 @@ void hackflightInitFull(
         imu_align_fun imuAlign,
         uint8_t ledPin)
 {
-    hackflight_core_t * core = &full->core;
+    core_data_t * core = &full->core;
 
     hackflightInit(core, anglePidConstants, mixer);
 
@@ -281,7 +281,7 @@ class Hackflight : public HackflightCore {
 
         void checkCoreTasks(uint32_t nowCycles)
         {
-            hackflight_core_t * core = &m_core;
+            core_data_t * core = &m_core;
 
             task_data_t * td = &m_taskData;
 
