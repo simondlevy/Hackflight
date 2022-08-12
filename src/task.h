@@ -39,12 +39,9 @@ typedef void (*task_fun_t)(void * hp, void * dp, uint32_t usec);
 
 typedef struct {
 
-    // For both hardware and sim implementations
-    void (*fun)(void * hp, void * dp, uint32_t time);
+    task_fun_t fun;
     int32_t desiredPeriodUs;            
     uint32_t lastExecutedAtUs;          
-
-    // For hardware impelmentations
     uint16_t dynamicPriority;          
     uint16_t taskAgeCycles;
     uint32_t lastSignaledAtUs;         
