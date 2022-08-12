@@ -39,7 +39,7 @@ typedef struct {
 
 class Task {
 
-    private:
+    protected:
 
         // Some tasks have occasional peaks in execution time so normal moving
         // average duration estimation doesn't work Decay the estimated max
@@ -52,8 +52,6 @@ class Task {
         uint16_t m_dynamicPriority;          
         uint32_t m_lastExecutedAtUs;          
         uint32_t m_lastSignaledAtUs;         
-
-    protected:
 
         Task(uint32_t rate) 
         {

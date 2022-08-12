@@ -72,10 +72,28 @@ class ReceiverTask : public Task {
         {
         }
 
+        // Increase priority for RX task
+        void adjustDynamicPriority(task_data_t *td, uint32_t usec) 
+        {
+            if (m_dynamicPriority > 0) {
+                m_ageCycles = 1 + (cmpTimeUs(usec,
+                            m_lastSignaledAtUs) / m_desiredPeriodUs);
+                m_dynamicPriority = 1 + m_ageCycles;
+            } else  {
+                if (rxCheck(&td->rx, usec)) {
+                    m_lastSignaledAtUs = usec;
+                    m_ageCycles = 1;
+                    m_dynamicPriority = 2;
+                } else {
+                    m_ageCycles = 0;
+                }
+            }
+        }    
+        
         void fun(hackflight_core_t * core, task_data_t * data, uint32_t time)
         {
             bool calibrating = data->gyro.isCalibrating; 
-               // || acc.calibrating != 0;
+            // || acc.calibrating != 0;
             bool pidItermResetReady = false;
             bool pidItermResetValue = false;
 
