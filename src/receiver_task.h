@@ -26,7 +26,7 @@
 
 static void task_rx(
         HackflightCore::data_t * core,
-        task_data_t * data,
+        Task::data_t * data,
         uint32_t usec)
 {
     bool calibrating = data->gyro.isCalibrating; // || acc.calibrating != 0;
@@ -73,7 +73,7 @@ class ReceiverTask : public Task {
         }
 
         // Increase priority for RX task
-        void adjustDynamicPriority(task_data_t *td, uint32_t usec) 
+        void adjustDynamicPriority(Task::data_t *td, uint32_t usec) 
         {
             if (m_dynamicPriority > 0) {
                 m_ageCycles = 1 + (cmpTimeUs(usec,
@@ -92,7 +92,7 @@ class ReceiverTask : public Task {
         
         void fun(
                 HackflightCore::data_t * core,
-                task_data_t * data,
+                Task::data_t * data,
                 uint32_t time)
         {
             bool calibrating = data->gyro.isCalibrating; 

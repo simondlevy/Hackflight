@@ -24,20 +24,22 @@
 
 #include "hackflight_core.h"
 
-typedef struct {
-
-    arming_t         arming;
-    gyro_t           gyro;
-    imu_fusion_t     imuFusionPrev;
-    float            maxArmingAngle;
-    void *           motorDevice;
-    float            mspMotors[4];
-    rx_t             rx;
-    rx_axes_t        rxAxes;
-
-} task_data_t;
-
 class Task {
+
+    public:
+
+        typedef struct {
+
+            arming_t         arming;
+            gyro_t           gyro;
+            imu_fusion_t     imuFusionPrev;
+            float            maxArmingAngle;
+            void *           motorDevice;
+            float            mspMotors[4];
+            rx_t             rx;
+            rx_axes_t        rxAxes;
+
+        } data_t;
 
     private:
 
@@ -69,7 +71,7 @@ class Task {
 
     public:
 
-        virtual void adjustDynamicPriority(task_data_t * data, uint32_t usec)
+        virtual void adjustDynamicPriority(data_t * data, uint32_t usec)
         {
             (void)data;
 
@@ -92,7 +94,8 @@ class Task {
             }
         }
 
-        void execute(HackflightCore::data_t * core, task_data_t * td, uint32_t usec)
+        void execute(
+                HackflightCore::data_t * core, data_t * td, uint32_t usec)
         {
             m_lastExecutedAtUs = usec;
             m_dynamicPriority = 0;
@@ -119,7 +122,7 @@ class Task {
 
         static void update(
                 Task * task,
-                task_data_t * data,
+                data_t * data,
                 uint32_t usec,
                 Task ** selected,
                 uint16_t * selectedPriority)
@@ -135,6 +138,6 @@ class Task {
 
         virtual void fun(
                 HackflightCore::data_t * core,
-                task_data_t * data,
+                data_t * data,
                 uint32_t usec) = 0;
 }; 

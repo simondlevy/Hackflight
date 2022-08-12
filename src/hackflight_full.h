@@ -57,7 +57,7 @@ class Hackflight {
             HackflightCore::data_t coreData;
 
             imu_align_fun imuAlignFun;
-            task_data_t   taskData;
+            Task::data_t   taskData;
             Scheduler     scheduler;
 
             AttitudeTask attitudeTask;
@@ -74,7 +74,7 @@ class Hackflight {
                 uint32_t nowCycles)
         {
             HackflightCore::data_t * coreData = &data->coreData;
-            task_data_t * taskData = &data->taskData;
+            Task::data_t * taskData = &data->taskData;
 
             int32_t loopRemainingCycles = scheduler->getLoopRemainingCycles();
             uint32_t nextTargetCycles = scheduler->getNextTargetCycles();
@@ -235,10 +235,8 @@ class Hackflight {
                 uint8_t ledPin)
         {
             HackflightCore::data_t * coreData = &full->coreData;
-
             HackflightCore::init(coreData, anglePidConstants, mixer);
-
-            task_data_t * taskData = &full->taskData;
+            Task::data_t * taskData = &full->taskData;
 
             mspInit();
             gyroInit(&taskData->gyro);

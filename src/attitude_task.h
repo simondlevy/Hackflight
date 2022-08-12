@@ -24,7 +24,7 @@
 
 static void task_attitude(
         HackflightCore::data_t * core,
-        task_data_t * data,
+        Task::data_t * data,
         uint32_t usec)
 {
     imuGetEulerAngles(
@@ -45,7 +45,7 @@ class AttitudeTask : public Task {
 
         virtual void fun(
                 HackflightCore::data_t * core,
-                task_data_t * data,
+                Task::data_t * data,
                 uint32_t time) override
         {
             imuGetEulerAngles(

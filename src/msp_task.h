@@ -20,23 +20,6 @@
 #include "msp.h"
 #include "task.h"
 
-static const uint32_t MSP_TASK_RATE = 100;
-
-static void task_msp(
-        HackflightCore::data_t * core,
-        task_data_t * data,
-        uint32_t usec)
-{
-    (void)usec;
-
-    mspUpdate(
-            &core->vstate,
-            &data->rxAxes,
-            armingIsArmed(&data->arming),
-            data->motorDevice,
-            data->mspMotors);
-}
-
 class MspTask : public Task {
 
     public:
@@ -45,7 +28,7 @@ class MspTask : public Task {
 
         virtual void fun(
                 HackflightCore::data_t * core,
-                task_data_t * data,
+                Task::data_t * data,
                 uint32_t usec) override
         {
             (void)usec;
