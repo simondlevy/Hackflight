@@ -57,7 +57,7 @@ class Task {
 
     public:
 
-        void adjustDynamicPriority(uint32_t usec) 
+        virtual void adjustDynamicPriority(uint32_t usec)
         {
             // Task is time-driven, dynamicPriority is last execution age
             // (measured in desiredPeriods). Task age is calculated from last
