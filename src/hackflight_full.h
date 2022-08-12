@@ -259,5 +259,14 @@ void hackflightStep(hackflight_full_t * full)
 
 class Hackflight : public HackflightCore {
 
+    private:
+
+        imu_align_fun m_imuAlignFun;
+        task_data_t   m_taskData;
+        Scheduler     m_scheduler;
+
+        AttitudeTask m_attitudeTask;
+        MspTask      m_mspTask;
+        ReceiverTask m_receiverTask;
 
 };
