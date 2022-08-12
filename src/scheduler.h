@@ -46,17 +46,6 @@ static const uint32_t TASK_GUARD_MARGIN_UP_STEP = 1;
 // Add a margin to the amount of time allowed for a check function to run
 static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
 
-// Some tasks have occasional peaks in execution time so normal moving average
-// duration estimation doesn't work Decay the estimated max task duration by
-// 1/(1 << TASK_EXEC_TIME_SHIFT) on every invocation
-static const uint32_t TASK_EXEC_TIME_SHIFT = 7;
-
-// Make aged tasks more schedulable
-static const uint32_t TASK_AGE_EXPEDITE_COUNT = 1;   
-
-// By scaling their expected execution time
-static const float TASK_AGE_EXPEDITE_SCALE = 0.9; 
-
 // Gyro interrupt counts over which to measure loop time and skew
 static const uint32_t CORE_RATE_COUNT = 25000;
 static const uint32_t GYRO_LOCK_COUNT = 400;

@@ -39,15 +39,24 @@ typedef struct {
 
 class Task {
 
-    protected:
+    private:
 
         // Some tasks have occasional peaks in execution time so normal moving
         // average duration estimation doesn't work Decay the estimated max
         // task duration by 1/(1 << EXEC_TIME_SHIFT) on every invocation
         static const uint32_t EXEC_TIME_SHIFT = 7;
 
-        uint16_t m_ageCycles;
+        // Make aged tasks more schedulable
+        static const uint32_t AGE_EXPEDITE_COUNT = 1;   
+
+        // By scaling their expected execution time
+        static constexpr float AGE_EXPEDITE_SCALE = 0.9; 
+
         uint32_t m_anticipatedExecutionTime;
+
+    protected:
+
+        uint16_t m_ageCycles;
         int32_t  m_desiredPeriodUs;            
         uint16_t m_dynamicPriority;          
         uint32_t m_lastExecutedAtUs;          
@@ -74,6 +83,15 @@ class Task {
             }
         }
 
+        // If a task has been unable to run, then reduce its recorded
+        // estimated run time to ensure its ultimate scheduling
+        void enableRun(void) 
+        {
+            if (m_ageCycles > AGE_EXPEDITE_COUNT) {
+                m_anticipatedExecutionTime *= AGE_EXPEDITE_SCALE;
+            }
+        }
+
         void execute(hackflight_core_t * core, task_data_t * td, uint32_t usec)
         {
             m_lastExecutedAtUs = usec;
@@ -94,35 +112,29 @@ class Task {
             }
         }
 
+        int32_t getRequiredTime(void)
+        {
+            return m_anticipatedExecutionTime >> EXEC_TIME_SHIFT;
+        }
+
+        static void update(
+                Task * task,
+                task_data_t * data,
+                uint32_t usec,
+                Task ** selected,
+                uint16_t * selectedPriority)
+        {
+            task->adjustDynamicPriority(data, usec);
+
+            if (task->m_dynamicPriority > *selectedPriority) {
+                *selectedPriority = task->m_dynamicPriority;
+                *selected = task;
+            }
+        }
+
+
         virtual void fun(
                 hackflight_core_t * core,
                 task_data_t * data,
                 uint32_t usec) = 0;
-
 }; 
-
-// ----------------------------------------------------------------------------
-
-typedef void (*task_fun_t)(
-        hackflight_core_t * core,
-        task_data_t * data,
-        uint32_t usec);
-
-typedef struct {
-
-    task_fun_t fun;
-    int32_t desiredPeriodUs;            
-    uint32_t lastExecutedAtUs;          
-    uint16_t dynamicPriority;          
-    uint16_t taskAgeCycles;
-    uint32_t lastSignaledAtUs;         
-    uint32_t anticipatedExecutionTime;
-
-} task_t;
-
-
-static void initTask(task_t * task, task_fun_t fun, uint32_t rate)
-{
-    task->fun = fun;
-    task->desiredPeriodUs = 1000000 / rate;
-}

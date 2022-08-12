@@ -52,72 +52,11 @@ typedef struct {
     task_data_t   taskData;
     scheduler_t   scheduler;
 
-    task_t attitudeTask;
-    task_t mspTask;
-    task_t rxTask;
-
-    AttitudeTask m_attitudeTask;
-    MspTask      m_mspTask;
-    ReceiverTask m_receiverTask;
+    AttitudeTask attitudeTask;
+    MspTask      mspTask;
+    ReceiverTask receiverTask;
 
 } hackflight_full_t;
-
-// Support for dynamically scheduled tasks ---------------------------------
-
-static void adjustDynamicPriority(task_t * task, task_data_t * td, uint32_t usec) 
-{
-    (void)td;
-
-    // Task is time-driven, dynamicPriority is last execution age (measured
-    // in desiredPeriods). Task age is calculated from last execution.
-    task->taskAgeCycles = (cmpTimeUs(usec, task->lastExecutedAtUs) /
-            task->desiredPeriodUs);
-    if (task->taskAgeCycles > 0) {
-        task->dynamicPriority = 1 + task->taskAgeCycles;
-    }
-}
-
-// Increase priority for RX task
-static void adjustRxDynamicPriority(task_t * task, task_data_t *td, uint32_t usec) 
-{
-    if (task->dynamicPriority > 0) {
-        task->taskAgeCycles = 1 + (cmpTimeUs(usec,
-                    task->lastSignaledAtUs) / task->desiredPeriodUs);
-        task->dynamicPriority = 1 + task->taskAgeCycles;
-    } else  {
-        if (rxCheck(&td->rx, usec)) {
-            task->lastSignaledAtUs = usec;
-            task->taskAgeCycles = 1;
-            task->dynamicPriority = 2;
-        } else {
-            task->taskAgeCycles = 0;
-        }
-    }
-}
-
-static void executeTask(
-        hackflight_core_t * core,
-        task_data_t * td,
-        task_t *task,
-        uint32_t usec)
-{
-    task->lastExecutedAtUs = usec;
-    task->dynamicPriority = 0;
-
-    uint32_t time = timeMicros();
-    task->fun(core, td, usec);
-
-    uint32_t taskExecutionTimeUs = timeMicros() - time;
-
-    if (taskExecutionTimeUs >
-            (task->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT)) {
-        task->anticipatedExecutionTime =
-            taskExecutionTimeUs << TASK_EXEC_TIME_SHIFT;
-    } else if (task->anticipatedExecutionTime > 1) {
-        // Slowly decay the max time
-        task->anticipatedExecutionTime--;
-    }
-}
 
 static void checkCoreTasks(
         hackflight_full_t * full,
@@ -212,28 +151,6 @@ static void checkCoreTasks(
     }
 }
 
-static void updateDynamicTask(
-        task_t * task,
-        task_t ** selected,
-        uint16_t * selectedPriority)
-{
-    if (task->dynamicPriority > *selectedPriority) {
-        *selectedPriority = task->dynamicPriority;
-        *selected = task;
-    }
-}
-
-static void adjustAndUpdateTask(
-        task_t * task,
-        task_data_t * td,
-        uint32_t usec,
-        task_t ** selectedTask,
-        uint16_t * selectedTaskDynamicPriority)
-{
-    adjustDynamicPriority(task, td, usec);
-    updateDynamicTask(task, selectedTask, selectedTaskDynamicPriority);
-}
-
 static void checkDynamicTasks(
         hackflight_full_t * full,
         int32_t loopRemainingCycles,
@@ -243,25 +160,23 @@ static void checkDynamicTasks(
     scheduler_t * scheduler = &full->scheduler;
     task_data_t * td = &full->taskData;
 
-    task_t *selectedTask = NULL;
+    Task *selectedTask = NULL;
     uint16_t selectedTaskDynamicPriority = 0;
 
     uint32_t usec = timeMicros();
 
-    adjustRxDynamicPriority(&full->rxTask, &full->taskData, usec);
-    updateDynamicTask(&full->rxTask, &selectedTask,
-            &selectedTaskDynamicPriority);
-
-    adjustAndUpdateTask(&full->attitudeTask, &full->taskData, usec,
+    Task::update(&full->receiverTask, &full->taskData, usec,
             &selectedTask, &selectedTaskDynamicPriority);
 
-    adjustAndUpdateTask(&full->mspTask, &full->taskData, usec,
+    Task::update(&full->attitudeTask, &full->taskData, usec,
+            &selectedTask, &selectedTaskDynamicPriority);
+
+    Task::update(&full->mspTask, &full->taskData, usec,
             &selectedTask, &selectedTaskDynamicPriority);
 
     if (selectedTask) {
 
-        int32_t taskRequiredTimeUs =
-            selectedTask->anticipatedExecutionTime >> TASK_EXEC_TIME_SHIFT;
+        int32_t taskRequiredTimeUs = selectedTask->getRequiredTime();
         int32_t taskRequiredTimeCycles =
             (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs);
 
@@ -274,7 +189,7 @@ static void checkDynamicTasks(
         if (taskRequiredTimeCycles < loopRemainingCycles) {
             uint32_t antipatedEndCycles =
                 nowCycles + taskRequiredTimeCycles;
-            executeTask(core, td, selectedTask, usec);
+            selectedTask->execute(core, td, usec);
             nowCycles = systemGetCycleCounter();
             int32_t cyclesOverdue =
                 cmpTimeCycles(nowCycles, antipatedEndCycles);
@@ -291,11 +206,8 @@ static void checkDynamicTasks(
                 scheduler->taskGuardCycles -=
                     scheduler->taskGuardDeltaDownCycles;
             }
-        } else if (selectedTask->taskAgeCycles > TASK_AGE_EXPEDITE_COUNT) {
-            // If a task has been unable to run, then reduce it's recorded
-            // estimated run time to ensure it's ultimate scheduling
-            selectedTask->anticipatedExecutionTime *= 
-                TASK_AGE_EXPEDITE_SCALE;
+        } else {
+            selectedTask->enableRun();
         }
     }
 }
@@ -336,16 +248,10 @@ void hackflightInitFull(
 
     td->motorDevice = motorDevice;
 
-    initTask(&full->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
-
-    initTask(&full->rxTask, task_rx,  RX_TASK_RATE);
-
     // Initialize quaternion in upright position
     td->imuFusionPrev.quat.w = 1;
 
     td->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
-
-    initTask(&full->mspTask, task_msp, MSP_TASK_RATE);
 
     schedulerInit(&full->scheduler);
 }
