@@ -281,6 +281,8 @@ class Hackflight : public HackflightCore {
 
         void checkCoreTasks(uint32_t nowCycles)
         {
+            hackflight_core_t * core = &m_core;
+
             task_data_t * td = &m_taskData;
 
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
@@ -293,11 +295,11 @@ class Hackflight : public HackflightCore {
                 loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            gyroReadScaled(&td->gyro, m_imuAlignFun, &m_vstate);
+            gyroReadScaled(&td->gyro, m_imuAlignFun, &core->vstate);
 
             uint32_t usec = timeMicros();
 
-            rxGetDemands(&td->rx, usec, &m_anglePid, &m_demands);
+            rxGetDemands(&td->rx, usec, &core->anglePid, &core->demands);
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {};
 
