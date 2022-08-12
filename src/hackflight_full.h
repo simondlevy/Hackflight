@@ -358,7 +358,59 @@ class Hackflight : public HackflightCore {
             }
 
         } // checkCoreTasks
-    
+
+        void checkDynamicTasks(void)
+        {
+            // task_data_t * td = &m_taskData;
+
+            Task *selectedTask = NULL;
+            uint16_t selectedTaskDynamicPriority = 0;
+
+            uint32_t usec = timeMicros();
+
+            Task::update(&m_receiverTask, &m_taskData, usec,
+                    &selectedTask, &selectedTaskDynamicPriority);
+
+            Task::update(&m_attitudeTask, &m_taskData, usec,
+                    &selectedTask, &selectedTaskDynamicPriority);
+
+            Task::update(&m_mspTask, &m_taskData, usec,
+                    &selectedTask, &selectedTaskDynamicPriority);
+
+            if (selectedTask) {
+
+                int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
+                uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
+
+                int32_t taskRequiredTimeUs = selectedTask->getRequiredTime();
+                int32_t taskRequiredCycles =
+                    (int32_t)systemClockMicrosToCycles(
+                            (uint32_t)taskRequiredTimeUs);
+
+                uint32_t nowCycles = systemGetCycleCounter();
+                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+
+                // Allow a little extra time
+                taskRequiredCycles += m_scheduler.getTaskGuardCycles();
+
+                if (taskRequiredCycles < loopRemainingCycles) {
+
+                    uint32_t anticipatedEndCycles =
+                        nowCycles + taskRequiredCycles;
+
+                    // selectedTask->execute(this, td, usec);
+
+                    m_scheduler.updateDynamic(
+                            systemGetCycleCounter(),
+                            anticipatedEndCycles);
+
+                } else {
+                    selectedTask->enableRun();
+                }
+            }
+
+        } // checkDynamicsTasks
+
     public:
 
         Hackflight(
