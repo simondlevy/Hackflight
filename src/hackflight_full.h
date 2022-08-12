@@ -122,16 +122,6 @@ typedef struct {
 
 } task_t;
 
-// Tasks for full Hackflight --------------------------------------------------
-
-typedef struct {
-
-    task_t attitudeTask;
-    task_t mspTask;
-    task_t rxTask;
-
- } hackflight_tasks_t;
-
 // Full structure for running Hackflight --------------------------------------
 
 typedef struct {
@@ -139,8 +129,11 @@ typedef struct {
     hackflight_core_t  core;
     imu_align_fun      imuAlignFun;
     task_data_t        taskData;
-    hackflight_tasks_t tasks;
     scheduler_t        scheduler;
+
+    task_t attitudeTask;
+    task_t mspTask;
+    task_t rxTask;
 
 } hackflight_full_t;
 
@@ -388,9 +381,9 @@ static void adjustAndUpdateTask(
 }
 
 static void checkDynamicTasks(
+        hackflight_full_t * full,
         hackflight_core_t * core,
         scheduler_t * scheduler,
-        hackflight_tasks_t * ht,
         task_data_t * dt,
         int32_t loopRemainingCycles,
         uint32_t nextTargetCycles)
@@ -400,14 +393,14 @@ static void checkDynamicTasks(
 
     uint32_t usec = timeMicros();
 
-    adjustRxDynamicPriority(&dt->rx, &ht->rxTask, usec);
-    updateDynamicTask(&ht->rxTask, &selectedTask,
+    adjustRxDynamicPriority(&dt->rx, &full->rxTask, usec);
+    updateDynamicTask(&full->rxTask, &selectedTask,
             &selectedTaskDynamicPriority);
 
-    adjustAndUpdateTask(&ht->attitudeTask, usec,
+    adjustAndUpdateTask(&full->attitudeTask, usec,
             &selectedTask, &selectedTaskDynamicPriority);
 
-    adjustAndUpdateTask(&ht->mspTask, usec,
+    adjustAndUpdateTask(&full->mspTask, usec,
             &selectedTask, &selectedTaskDynamicPriority);
 
     if (selectedTask) {
@@ -499,7 +492,6 @@ static void schedulerInit(scheduler_t * scheduler)
 void hackflightInitFull(
         hackflight_full_t * full,
         hackflight_core_t * core,
-        hackflight_tasks_t * ht,
         rx_dev_funs_t * rxDeviceFuns,
         serialPortIdentifier_e rxDevPort,
         anglePidConstants_t * anglePidConstants,
@@ -530,24 +522,21 @@ void hackflightInitFull(
 
     td->motorDevice = motorDevice;
 
-    initTask(&ht->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
+    initTask(&full->attitudeTask, task_attitude, ATTITUDE_TASK_RATE);
 
-    initTask(&ht->rxTask, task_rx,  RX_TASK_RATE);
+    initTask(&full->rxTask, task_rx,  RX_TASK_RATE);
 
     // Initialize quaternion in upright position
     td->imuFusionPrev.quat.w = 1;
 
     td->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
-    initTask(&ht->mspTask, task_msp, MSP_TASK_RATE);
+    initTask(&full->mspTask, task_msp, MSP_TASK_RATE);
 
     schedulerInit(&full->scheduler);
 }
 
-void hackflightStep(
-        hackflight_full_t * full,
-        hackflight_core_t * core,
-        hackflight_tasks_t * ht)
+void hackflightStep(hackflight_full_t * full, hackflight_core_t * core)
 {
     scheduler_t * scheduler = &full->scheduler;
 
@@ -595,6 +584,11 @@ void hackflightStep(
         cmpTimeCycles(nextTargetCycles, systemGetCycleCounter());
 
     if (newLoopRemainingCyles > scheduler->guardMargin) {
-        checkDynamicTasks(core, scheduler, ht, td, newLoopRemainingCyles, nextTargetCycles);
+        checkDynamicTasks(
+                full, core,
+                scheduler,
+                td,
+                newLoopRemainingCyles,
+                nextTargetCycles);
     }
 }
