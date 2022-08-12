@@ -38,11 +38,14 @@
 #include "system.h"
 #include "task.h"
 
-// Arming safety  -------------------------------------------------------------
+// Gyro interrupt counts over which to measure loop time and skew
+static const uint32_t CORE_RATE_COUNT = 25000;
+static const uint32_t GYRO_LOCK_COUNT = 400;
 
+// Arming safety  
 static const float MAX_ARMING_ANGLE = 25;
 
-// Full structure for running Hackflight --------------------------------------
+// Full structure for running Hackflight
 
 typedef struct {
 
@@ -50,7 +53,7 @@ typedef struct {
 
     imu_align_fun imuAlignFun;
     task_data_t   taskData;
-    scheduler_t   scheduler;
+    Scheduler     scheduler;
 
     AttitudeTask attitudeTask;
     MspTask      mspTask;
@@ -65,7 +68,7 @@ static void checkCoreTasks(
         uint32_t nextTargetCycles)
 {
     hackflight_core_t * core = &full->core;
-    scheduler_t * scheduler = &full->scheduler;
+    Scheduler * scheduler = &full->scheduler;
     task_data_t * td = &full->taskData;
 
     if (scheduler->loopStartCycles > scheduler->loopStartMinCycles) {
@@ -157,7 +160,7 @@ static void checkDynamicTasks(
         uint32_t nextTargetCycles)
 {
     hackflight_core_t * core = &full->core;
-    scheduler_t * scheduler = &full->scheduler;
+    Scheduler * scheduler = &full->scheduler;
     task_data_t * td = &full->taskData;
 
     Task *selectedTask = NULL;
@@ -252,13 +255,11 @@ void hackflightInitFull(
     td->imuFusionPrev.quat.w = 1;
 
     td->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
-
-    schedulerInit(&full->scheduler);
 }
 
 void hackflightStep(hackflight_full_t * full)
 {
-    scheduler_t * scheduler = &full->scheduler;
+    Scheduler * scheduler = &full->scheduler;
 
     uint32_t nextTargetCycles =
         scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;

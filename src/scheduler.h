@@ -21,94 +21,89 @@
 #include <stdint.h>
 #include <string.h>
 
-// Constants -------------------------------------------------------
+class Scheduler {
 
-// Wait at start of scheduler loop if gyroSampleTask is nearly due
-static const uint32_t SCHED_START_LOOP_MIN_US = 1;   
-static const uint32_t SCHED_START_LOOP_MAX_US = 12;
+    public:
 
-// Fraction of a us to reduce start loop wait
-static const uint32_t SCHED_START_LOOP_DOWN_STEP = 50;  
+        // Constants -------------------------------------------------------
 
-// Fraction of a us to increase start loop wait
-static const uint32_t SCHED_START_LOOP_UP_STEP = 1;   
+        // Wait at start of scheduler loop if gyroSampleTask is nearly due
+        static const uint32_t SCHED_START_LOOP_MIN_US = 1;   
+        static const uint32_t SCHED_START_LOOP_MAX_US = 12;
 
-// Add an amount to the estimate of a task duration
-static const uint32_t TASK_GUARD_MARGIN_MIN_US = 3;   
-static const uint32_t TASK_GUARD_MARGIN_MAX_US = 6;
+        // Fraction of a us to reduce start loop wait
+        static const uint32_t SCHED_START_LOOP_DOWN_STEP = 50;  
 
-// Fraction of a us to reduce task guard margin
-static const uint32_t TASK_GUARD_MARGIN_DOWN_STEP = 50;  
+        // Fraction of a us to increase start loop wait
+        static const uint32_t SCHED_START_LOOP_UP_STEP = 1;   
 
-// Fraction of a us to increase task guard margin
-static const uint32_t TASK_GUARD_MARGIN_UP_STEP = 1;   
+        // Add an amount to the estimate of a task duration
+        static const uint32_t TASK_GUARD_MARGIN_MIN_US = 3;   
+        static const uint32_t TASK_GUARD_MARGIN_MAX_US = 6;
 
-// Add a margin to the amount of time allowed for a check function to run
-static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
+        // Fraction of a us to reduce task guard margin
+        static const uint32_t TASK_GUARD_MARGIN_DOWN_STEP = 50;  
 
-// Gyro interrupt counts over which to measure loop time and skew
-static const uint32_t CORE_RATE_COUNT = 25000;
-static const uint32_t GYRO_LOCK_COUNT = 400;
+        // Fraction of a us to increase task guard margin
+        static const uint32_t TASK_GUARD_MARGIN_UP_STEP = 1;   
 
-// Structure  ------------------------------------------------------------------
+        // Add a margin to the amount of time allowed for a check function to run
+        static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
 
-typedef struct {
-    int32_t loopStartCycles;
-    int32_t loopStartMinCycles;
-    int32_t loopStartMaxCycles;
-    uint32_t loopStartDeltaDownCycles;
-    uint32_t loopStartDeltaUpCycles;
+        int32_t loopStartCycles;
+        int32_t loopStartMinCycles;
+        int32_t loopStartMaxCycles;
+        uint32_t loopStartDeltaDownCycles;
+        uint32_t loopStartDeltaUpCycles;
 
-    int32_t taskGuardCycles;
-    int32_t taskGuardMinCycles;
-    int32_t taskGuardMaxCycles;
-    uint32_t taskGuardDeltaDownCycles;
-    uint32_t taskGuardDeltaUpCycles;
+        int32_t taskGuardCycles;
+        int32_t taskGuardMinCycles;
+        int32_t taskGuardMaxCycles;
+        uint32_t taskGuardDeltaDownCycles;
+        uint32_t taskGuardDeltaUpCycles;
 
-    int32_t desiredPeriodCycles;
-    uint32_t lastTargetCycles;
+        int32_t desiredPeriodCycles;
+        uint32_t lastTargetCycles;
 
-    uint32_t nextTimingCycles;
+        uint32_t nextTimingCycles;
 
-    int32_t guardMargin;
-    uint32_t clockRate;
+        int32_t guardMargin;
+        uint32_t clockRate;
 
-} scheduler_t;
+        Scheduler(void)
+        {
+            loopStartCycles =
+                systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+            loopStartMinCycles =
+                systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+            loopStartMaxCycles =
+                systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
+            loopStartDeltaDownCycles =
+                systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
+            loopStartDeltaUpCycles =
+                systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
 
-static void schedulerInit(scheduler_t * scheduler)
-{
-    scheduler->loopStartCycles =
-        systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-    scheduler->loopStartMinCycles =
-        systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
-    scheduler->loopStartMaxCycles =
-        systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
-    scheduler->loopStartDeltaDownCycles =
-        systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
-    scheduler->loopStartDeltaUpCycles =
-        systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
+            taskGuardMinCycles =
+                systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
+            taskGuardMaxCycles =
+                systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
+            taskGuardCycles = taskGuardMinCycles;
+            taskGuardDeltaDownCycles =
+                systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
+            taskGuardDeltaUpCycles =
+                systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
 
-    scheduler->taskGuardMinCycles =
-        systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
-    scheduler->taskGuardMaxCycles =
-        systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
-    scheduler->taskGuardCycles = scheduler->taskGuardMinCycles;
-    scheduler->taskGuardDeltaDownCycles =
-        systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
-    scheduler->taskGuardDeltaUpCycles =
-        systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
+            lastTargetCycles = systemGetCycleCounter();
 
-    scheduler->lastTargetCycles = systemGetCycleCounter();
+            nextTimingCycles = lastTargetCycles;
 
-    scheduler->nextTimingCycles = scheduler->lastTargetCycles;
+            desiredPeriodCycles =
+                (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
 
-    scheduler->desiredPeriodCycles =
-        (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
+            guardMargin =
+                (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
 
-    scheduler->guardMargin =
-        (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
+            clockRate = systemClockMicrosToCycles(1000000);
+        }
 
-    scheduler->clockRate = systemClockMicrosToCycles(1000000);
-}
-
-
+}; // class Scheduler
