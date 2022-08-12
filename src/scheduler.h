@@ -23,7 +23,7 @@
 
 class Scheduler {
 
-    public:
+    private:
 
         // Constants -------------------------------------------------------
 
@@ -50,6 +50,8 @@ class Scheduler {
         // Add a margin to the amount of time allowed for a check function to run
         static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
 
+    public:
+
         int32_t loopStartCycles;
         int32_t loopStartMinCycles;
         int32_t loopStartMaxCycles;
@@ -73,6 +75,8 @@ class Scheduler {
         uint32_t nextTargetCycles;
         int32_t loopRemainingCycles;
         int32_t newLoopRemainingCyles;
+
+    public:
 
         Scheduler(void)
         {
