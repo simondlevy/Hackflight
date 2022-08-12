@@ -17,6 +17,7 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "msp.h"
 #include "task.h"
 
 static const uint32_t MSP_TASK_RATE = 100;

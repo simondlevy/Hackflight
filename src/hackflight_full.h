@@ -29,6 +29,7 @@
 #include "hackflight_core.h"
 #include "led.h"
 #include "motor.h"
+#include "msp_task.h"
 #include "msp.h"
 #include "rx.h"
 #include "system.h"
@@ -172,25 +173,6 @@ static void task_rx(
     if (gotNewData) {
         memcpy(&data->rxAxes, &rxax, sizeof(rx_axes_t));
     }
-}
-
-// MSP task ---------------------------------------------------------------------
-
-static const uint32_t MSP_TASK_RATE = 100;
-
-static void task_msp(
-        hackflight_core_t * core,
-        task_data_t * data,
-        uint32_t usec)
-{
-    (void)usec;
-
-    mspUpdate(
-            &core->vstate,
-            &data->rxAxes,
-            armingIsArmed(&data->arming),
-            data->motorDevice,
-            data->mspMotors);
 }
 
 // Support for dynamically scheduled tasks ---------------------------------
