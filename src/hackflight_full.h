@@ -69,8 +69,8 @@ static void checkCoreTasks(
     hackflight_core_t * core = &full->core;
     task_data_t * td = &full->taskData;
 
-    int32_t loopRemainingCycles = scheduler->loopRemainingCycles;
-    uint32_t nextTargetCycles = scheduler->nextTargetCycles;
+    int32_t loopRemainingCycles = scheduler->getLoopRemainingCycles();
+    uint32_t nextTargetCycles = scheduler->getNextTargetCycles();
 
     scheduler->corePreUpdate();
 
@@ -151,9 +151,6 @@ static void checkCoreTasks(
 
 static void checkDynamicTasks( hackflight_full_t * full, Scheduler * scheduler)
 {
-    int32_t loopRemainingCycles = scheduler->loopRemainingCycles;
-    uint32_t nextTargetCycles = scheduler->nextTargetCycles;
-
     hackflight_core_t * core = &full->core;
     task_data_t * td = &full->taskData;
 
@@ -172,6 +169,9 @@ static void checkDynamicTasks( hackflight_full_t * full, Scheduler * scheduler)
             &selectedTask, &selectedTaskDynamicPriority);
 
     if (selectedTask) {
+
+        int32_t loopRemainingCycles = scheduler->getLoopRemainingCycles();
+        uint32_t nextTargetCycles = scheduler->getNextTargetCycles();
 
         int32_t taskRequiredTimeUs = selectedTask->getRequiredTime();
         int32_t taskRequiredCycles =

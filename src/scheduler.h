@@ -52,11 +52,13 @@ class Scheduler {
 
         uint32_t m_clockRate;
         int32_t  m_guardMargin;
+        int32_t  m_loopRemainingCycles;
         int32_t  m_loopStartCycles;
         uint32_t m_loopStartDeltaDownCycles;
         uint32_t m_loopStartDeltaUpCycles;
         int32_t  m_loopStartMaxCycles;
         int32_t  m_loopStartMinCycles;
+        uint32_t m_nextTargetCycles;
         uint32_t m_nextTimingCycles;
         int32_t  m_taskGuardCycles;
         uint32_t m_taskGuardDeltaDownCycles;
@@ -69,10 +71,6 @@ class Scheduler {
         // These can be modified by hackflight_full
         int32_t  desiredPeriodCycles;
         uint32_t lastTargetCycles;
-
-        uint32_t nextTargetCycles;
-        int32_t loopRemainingCycles;
-
 
         Scheduler(void)
         {
@@ -123,46 +121,57 @@ class Scheduler {
             if (cmpTimeCycles(m_nextTimingCycles, nowCycles) < 0) {
                 m_nextTimingCycles += m_clockRate;
             }
-            lastTargetCycles = nextTargetCycles;
+            lastTargetCycles = m_nextTargetCycles;
         }
 
         int32_t getTaskGuardCycles(void)
         {
             return m_taskGuardCycles;
         }
+        
+        int32_t getLoopRemainingCycles(void)
+        {
+            return m_loopRemainingCycles;
+        }
+        
+        uint32_t getNextTargetCycles(void)
+        {
+            return m_nextTargetCycles;
+        }
 
         bool isCoreReady(uint32_t nowCycles)
         {
-            nextTargetCycles = lastTargetCycles + desiredPeriodCycles;
+            m_nextTargetCycles = lastTargetCycles + desiredPeriodCycles;
 
-            loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+            m_loopRemainingCycles = cmpTimeCycles(m_nextTargetCycles, nowCycles);
 
-            if (loopRemainingCycles < -desiredPeriodCycles) {
+            if (m_loopRemainingCycles < -desiredPeriodCycles) {
                 // A task has so grossly overrun that at entire gyro cycle has
                 // been skipped This is most likely to occur when connected to
                 // the configurator via USB as the serial task is
                 // non-deterministic Recover as best we can, advancing
                 // scheduling by a whole number of cycles
-                nextTargetCycles += desiredPeriodCycles * (1 +
-                        (loopRemainingCycles / -desiredPeriodCycles));
-                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+                m_nextTargetCycles += desiredPeriodCycles * (1 +
+                        (m_loopRemainingCycles / -desiredPeriodCycles));
+                m_loopRemainingCycles = cmpTimeCycles(
+                        m_nextTargetCycles, nowCycles);
             }
 
             // Tune out the time lost between completing the last task
             // execution and re-entering the scheduler
-            if ((loopRemainingCycles < m_loopStartMinCycles) &&
+            if ((m_loopRemainingCycles < m_loopStartMinCycles) &&
                     (m_loopStartCycles < m_loopStartMaxCycles)) {
                 m_loopStartCycles += m_loopStartDeltaUpCycles;
             }
 
             // Once close to the timing boundary, poll for its arrival
-            return loopRemainingCycles < m_loopStartCycles;
+            return m_loopRemainingCycles < m_loopStartCycles;
         }
 
         bool isDynamicReady(uint32_t nowCycles) 
         {
             int32_t newLoopRemainingCyles =
-                cmpTimeCycles(nextTargetCycles, nowCycles);
+                cmpTimeCycles(m_nextTargetCycles, nowCycles);
 
             return newLoopRemainingCyles > m_guardMargin;
         }
