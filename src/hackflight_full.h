@@ -261,6 +261,9 @@ class Hackflight : public HackflightCore {
 
     private:
 
+        uint8_t       m_imuInterruptPin;
+        uint8_t       m_ledPin;
+
         imu_align_fun m_imuAlignFun;
         task_data_t   m_taskData;
         Scheduler     m_scheduler;
@@ -282,15 +285,10 @@ class Hackflight : public HackflightCore {
                 uint8_t ledPin)
             : HackflightCore(anglePidConstants, mixer)
         {
-            task_data_t * td = &m_taskData;
+            m_imuInterruptPin = imuInterruptPin;
+            m_ledPin = ledPin;
 
-            mspInit();
-            gyroInit(&td->gyro);
-            imuInit(imuInterruptPin);
-            ledInit(ledPin);
-            ledFlash(10, 50);
-            failsafeInit();
-            failsafeReset();
+            task_data_t * td = &m_taskData;
 
             td->rx.devCheck = rxDeviceFuns->check;
             td->rx.devConvert = rxDeviceFuns->convert;
@@ -305,6 +303,17 @@ class Hackflight : public HackflightCore {
             td->imuFusionPrev.quat.w = 1;
 
             td->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+        }
+
+        void begin(void)
+        {
+            mspInit();
+            gyroInit(&m_taskData.gyro);
+            imuInit(m_imuInterruptPin);
+            ledInit(m_ledPin);
+            ledFlash(10, 50);
+            failsafeInit();
+            failsafeReset();
         }
 
 }; // class Hackflight
