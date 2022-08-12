@@ -34,26 +34,3 @@ typedef struct {
     rx_axes_t        rxAxes;
 
 } task_data_t;
-
-class Task {
-
-    friend class Hackflight;
-
-    public:
-
-        Task(uint32_t rate)
-        {
-            desiredPeriodUs = 1000000 / rate;
-        }
-
-    protected:
-
-        uint16_t ageCycles;
-        uint32_t anticipatedExecutionTime;
-        int32_t  desiredPeriodUs;            
-        uint16_t dynamicPriority;          
-        uint32_t lastExecutedAtUs;          
-        uint32_t lastSignaledAtUs;         
-
-        virtual void fun(task_data_t * data, uint32_t time) = 0;
-};
