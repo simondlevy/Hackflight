@@ -41,6 +41,11 @@ class Task {
 
     private:
 
+        // Some tasks have occasional peaks in execution time so normal moving
+        // average duration estimation doesn't work Decay the estimated max
+        // task duration by 1/(1 << EXEC_TIME_SHIFT) on every invocation
+        static const uint32_t EXEC_TIME_SHIFT = 7;
+
         uint16_t m_ageCycles;
         uint32_t m_anticipatedExecutionTime;
         int32_t  m_desiredPeriodUs;            
@@ -69,12 +74,34 @@ class Task {
             }
         }
 
+        void execute(hackflight_core_t * core, task_data_t * td, uint32_t usec)
+        {
+            m_lastExecutedAtUs = usec;
+            m_dynamicPriority = 0;
+
+            uint32_t time = timeMicros();
+            fun(core, td, usec);
+
+            uint32_t taskExecutionTimeUs = timeMicros() - time;
+
+            if (taskExecutionTimeUs >
+                    (m_anticipatedExecutionTime >> EXEC_TIME_SHIFT)) {
+                m_anticipatedExecutionTime =
+                    taskExecutionTimeUs << EXEC_TIME_SHIFT;
+            } else if (m_anticipatedExecutionTime > 1) {
+                // Slowly decay the max time
+                m_anticipatedExecutionTime--;
+            }
+        }
+
         virtual void fun(
                 hackflight_core_t * core,
                 task_data_t * data,
                 uint32_t usec) = 0;
 
 }; 
+
+// ----------------------------------------------------------------------------
 
 typedef void (*task_fun_t)(
         hackflight_core_t * core,
