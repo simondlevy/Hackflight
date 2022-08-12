@@ -72,7 +72,6 @@ class Scheduler {
 
         uint32_t nextTargetCycles;
         int32_t loopRemainingCycles;
-        int32_t newLoopRemainingCyles;
 
 
         Scheduler(void)
@@ -162,7 +161,8 @@ class Scheduler {
 
         bool isDynamicReady(uint32_t nowCycles) 
         {
-            newLoopRemainingCyles = cmpTimeCycles(nextTargetCycles, nowCycles);
+            int32_t newLoopRemainingCyles =
+                cmpTimeCycles(nextTargetCycles, nowCycles);
 
             return newLoopRemainingCyles > m_guardMargin;
         }
