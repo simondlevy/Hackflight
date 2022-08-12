@@ -261,6 +261,13 @@ class Hackflight : public HackflightCore {
 
     private:
 
+        // Gyro interrupt counts over which to measure loop time and skew
+        static const uint32_t CORE_RATE_COUNT = 25000;
+        static const uint32_t GYRO_LOCK_COUNT = 400;
+
+        // Arming safety  
+        static constexpr float MAX_ARMING_ANGLE = 25;
+
         uint8_t       m_imuInterruptPin;
         uint8_t       m_ledPin;
 
