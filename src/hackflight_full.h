@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "arming.h"
+#include "attitude_task.h"
 #include "debug.h"
 #include "deg2rad.h"
 #include "failsafe.h"
@@ -119,21 +120,6 @@ typedef struct {
     task_t rxTask;
 
 } hackflight_full_t;
-
-// Attitude task --------------------------------------------------------------
-
-static void task_attitude(
-        hackflight_core_t * core,
-        task_data_t * data,
-        uint32_t usec)
-{
-    imuGetEulerAngles(
-            &data->gyro,
-            &data->imuFusionPrev,
-            &data->arming,
-            usec,
-            &core->vstate);
-}
 
 // RX polling task ------------------------------------------------------------
 

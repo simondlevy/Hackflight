@@ -22,6 +22,18 @@
 #include "imu.h"
 #include "task.h"
 
+static void task_attitude(
+        hackflight_core_t * core,
+        task_data_t * data,
+        uint32_t usec)
+{
+    imuGetEulerAngles(
+            &data->gyro,
+            &data->imuFusionPrev,
+            &data->arming,
+            usec,
+            &core->vstate);
+}
 class AttitudeTask : public Task {
 
     public:
@@ -31,13 +43,16 @@ class AttitudeTask : public Task {
         {
         }
 
-        void fun(task_data_t * data, uint32_t time)
+        virtual void fun(
+                hackflight_core_t * core,
+                task_data_t * data,
+                uint32_t time) override
         {
             imuGetEulerAngles(
                     &data->gyro,
                     &data->imuFusionPrev,
                     &data->arming,
                     time,
-                    &data->vstate);
+                    &core->vstate);
         }
 };
