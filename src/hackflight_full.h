@@ -269,4 +269,42 @@ class Hackflight : public HackflightCore {
         MspTask      m_mspTask;
         ReceiverTask m_receiverTask;
 
-};
+    public:
+
+        Hackflight(
+                rx_dev_funs_t * rxDeviceFuns,
+                serialPortIdentifier_e rxDevPort,
+                anglePidConstants_t * anglePidConstants,
+                mixer_t mixer,
+                void * motorDevice,
+                uint8_t imuInterruptPin,
+                imu_align_fun imuAlign,
+                uint8_t ledPin)
+            : HackflightCore(anglePidConstants, mixer)
+        {
+            task_data_t * td = &m_taskData;
+
+            mspInit();
+            gyroInit(&td->gyro);
+            imuInit(imuInterruptPin);
+            ledInit(ledPin);
+            ledFlash(10, 50);
+            failsafeInit();
+            failsafeReset();
+
+            td->rx.devCheck = rxDeviceFuns->check;
+            td->rx.devConvert = rxDeviceFuns->convert;
+
+            rxDeviceFuns->init(rxDevPort);
+
+            m_imuAlignFun = imuAlign;
+
+            td->motorDevice = motorDevice;
+
+            // Initialize quaternion in upright position
+            td->imuFusionPrev.quat.w = 1;
+
+            td->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+        }
+
+}; // class Hackflight
