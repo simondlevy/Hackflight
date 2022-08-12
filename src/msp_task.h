@@ -47,6 +47,11 @@ class MspTask : public Task {
                 task_data_t * data,
                 uint32_t usec) override
         {
+            mspUpdate(
+                    &core->vstate,
+                    &data->rxAxes,
+                    armingIsArmed(&data->arming),
+                    data->motorDevice,
+                    data->mspMotors);
         }
-
 };
