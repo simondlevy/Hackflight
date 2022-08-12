@@ -50,26 +50,26 @@ class Scheduler {
         // Add a margin to the amount of time allowed for a check function to run
         static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
 
-        int32_t m_loopStartCycles;
-        int32_t m_loopStartMinCycles;
-        int32_t m_loopStartMaxCycles;
+        uint32_t m_clockRate;
+        int32_t  m_guardMargin;
+        int32_t  m_loopStartCycles;
         uint32_t m_loopStartDeltaDownCycles;
         uint32_t m_loopStartDeltaUpCycles;
-
+        int32_t  m_loopStartMaxCycles;
+        int32_t  m_loopStartMinCycles;
         uint32_t m_nextTimingCycles;
-
-        int32_t m_guardMargin;
-        uint32_t m_clockRate;
+        int32_t  m_taskGuardCycles;
+        uint32_t m_taskGuardDeltaDownCycles;
+        uint32_t m_taskGuardDeltaUpCycles;
+        int32_t  m_taskGuardMinCycles;
+        int32_t  m_taskGuardMaxCycles;
 
     public:
 
-        int32_t desiredPeriodCycles;
+        // These can be modified by hackflight_full
+        int32_t  desiredPeriodCycles;
         uint32_t lastTargetCycles;
-        int32_t taskGuardCycles;
-        int32_t taskGuardMinCycles;
-        int32_t taskGuardMaxCycles;
-        uint32_t taskGuardDeltaDownCycles;
-        uint32_t taskGuardDeltaUpCycles;
+
         uint32_t nextTargetCycles;
         int32_t loopRemainingCycles;
         int32_t newLoopRemainingCyles;
@@ -88,14 +88,14 @@ class Scheduler {
             m_loopStartDeltaUpCycles =
                 systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
 
-            taskGuardMinCycles =
+            m_taskGuardMinCycles =
                 systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
-            taskGuardMaxCycles =
+            m_taskGuardMaxCycles =
                 systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
-            taskGuardCycles = taskGuardMinCycles;
-            taskGuardDeltaDownCycles =
+            m_taskGuardCycles = m_taskGuardMinCycles;
+            m_taskGuardDeltaDownCycles =
                 systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
-            taskGuardDeltaUpCycles =
+            m_taskGuardDeltaUpCycles =
                 systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
 
             lastTargetCycles = systemGetCycleCounter();
@@ -125,6 +125,11 @@ class Scheduler {
                 m_nextTimingCycles += m_clockRate;
             }
             lastTargetCycles = nextTargetCycles;
+        }
+
+        int32_t getTaskGuardCycles(void)
+        {
+            return m_taskGuardCycles;
         }
 
         bool isCoreReady(uint32_t nowCycles)
@@ -160,6 +165,20 @@ class Scheduler {
             newLoopRemainingCyles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
             return newLoopRemainingCyles > m_guardMargin;
+        }
+
+        void updateDynamic(uint32_t nowCycles, uint32_t anticipatedEndCycles)
+        {
+            int32_t cyclesOverdue = cmpTimeCycles(nowCycles, anticipatedEndCycles);
+
+            if ((cyclesOverdue > 0) || (-cyclesOverdue < m_taskGuardMinCycles)) {
+
+                if (m_taskGuardCycles < m_taskGuardMaxCycles) {
+                    m_taskGuardCycles += m_taskGuardDeltaUpCycles;
+                }
+            } else if (m_taskGuardCycles > m_taskGuardMinCycles) {
+                m_taskGuardCycles -= m_taskGuardDeltaDownCycles;
+            }        
         }
 
 }; // class Scheduler

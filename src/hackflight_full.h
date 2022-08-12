@@ -63,13 +63,14 @@ typedef struct {
 
 static void checkCoreTasks(
         hackflight_full_t * full,
-        int32_t loopRemainingCycles,
-        uint32_t nowCycles,
-        uint32_t nextTargetCycles)
+        Scheduler * scheduler,
+        uint32_t nowCycles)
 {
     hackflight_core_t * core = &full->core;
-    Scheduler * scheduler = &full->scheduler;
     task_data_t * td = &full->taskData;
+
+    int32_t loopRemainingCycles = scheduler->loopRemainingCycles;
+    uint32_t nextTargetCycles = scheduler->nextTargetCycles;
 
     scheduler->corePreUpdate();
 
@@ -148,13 +149,12 @@ static void checkCoreTasks(
     }
 }
 
-static void checkDynamicTasks(
-        hackflight_full_t * full,
-        int32_t loopRemainingCycles,
-        uint32_t nextTargetCycles)
+static void checkDynamicTasks( hackflight_full_t * full, Scheduler * scheduler)
 {
+    int32_t loopRemainingCycles = scheduler->loopRemainingCycles;
+    uint32_t nextTargetCycles = scheduler->nextTargetCycles;
+
     hackflight_core_t * core = &full->core;
-    Scheduler * scheduler = &full->scheduler;
     task_data_t * td = &full->taskData;
 
     Task *selectedTask = NULL;
@@ -181,26 +181,18 @@ static void checkDynamicTasks(
         loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
 
         // Allow a little extra time
-        taskRequiredCycles += scheduler->taskGuardCycles;
+        taskRequiredCycles += scheduler->getTaskGuardCycles();
 
         if (taskRequiredCycles < loopRemainingCycles) {
-            uint32_t antipatedEndCycles = nowCycles + taskRequiredCycles;
+
+            uint32_t anticipatedEndCycles = nowCycles + taskRequiredCycles;
+
             selectedTask->execute(core, td, usec);
-            nowCycles = systemGetCycleCounter();
-            int32_t cyclesOverdue = cmpTimeCycles(nowCycles, antipatedEndCycles);
 
-            if ((cyclesOverdue > 0) ||
-                    (-cyclesOverdue < scheduler->taskGuardMinCycles)) {
+            scheduler->updateDynamic(
+                    systemGetCycleCounter(),
+                    anticipatedEndCycles);
 
-                if (scheduler->taskGuardCycles < scheduler->taskGuardMaxCycles) {
-                    scheduler->taskGuardCycles +=
-                        scheduler->taskGuardDeltaUpCycles;
-                }
-            } else if (scheduler->taskGuardCycles >
-                    scheduler->taskGuardMinCycles) {
-                scheduler->taskGuardCycles -=
-                    scheduler->taskGuardDeltaDownCycles;
-            }
         } else {
             selectedTask->enableRun();
         }
@@ -257,17 +249,10 @@ void hackflightStep(hackflight_full_t * full)
     uint32_t nowCycles = systemGetCycleCounter();
 
     if (scheduler->isCoreReady(nowCycles)) {
-        checkCoreTasks(
-                full,
-                scheduler->loopRemainingCycles,
-                nowCycles,
-                scheduler->nextTargetCycles);
+        checkCoreTasks(full, scheduler, nowCycles);
     }
 
     if (scheduler->isDynamicReady(systemGetCycleCounter())) {
-        checkDynamicTasks(
-                full,
-                scheduler->newLoopRemainingCyles,
-                scheduler->nextTargetCycles);
+        checkDynamicTasks(full, scheduler);
     }
 }
