@@ -120,18 +120,21 @@ class HackflightCore {
         static const uint16_t   PIDSUM_LIMIT_YAW  = 400;
         static const uint16_t   PIDSUM_LIMIT      = 500;
 
-        anglePid_t       m_anglePid;
-        demands_t        m_demands;
         mixer_t          m_mixer;
         pid_controller_t m_pidControllers[10];
         uint8_t          m_pidCount;
         bool             m_pidReset;
-        vehicle_state_t  m_vstate;
 
         static float constrain_demand(float demand, float limit, float scaling)
         {
             return constrain_f(demand, -limit, +limit) / scaling;
         }
+
+    protected:
+
+        anglePid_t       m_anglePid;
+        demands_t        m_demands;
+        vehicle_state_t  m_vstate;
 
     public:
 

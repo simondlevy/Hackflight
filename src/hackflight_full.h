@@ -279,6 +279,86 @@ class Hackflight : public HackflightCore {
         MspTask      m_mspTask;
         ReceiverTask m_receiverTask;
 
+        void checkCoreTasks(uint32_t nowCycles)
+        {
+            task_data_t * td = &m_taskData;
+
+            int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
+            uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
+
+            m_scheduler.corePreUpdate();
+
+            while (loopRemainingCycles > 0) {
+                nowCycles = systemGetCycleCounter();
+                loopRemainingCycles = cmpTimeCycles(nextTargetCycles, nowCycles);
+            }
+
+            gyroReadScaled(&td->gyro, m_imuAlignFun, &m_vstate);
+
+            uint32_t usec = timeMicros();
+
+            rxGetDemands(&td->rx, usec, &m_anglePid, &m_demands);
+
+            float mixmotors[MAX_SUPPORTED_MOTORS] = {};
+
+            motor_config_t motorConfig = {
+                motorValueDisarmed(),
+                motorValueHigh(),
+                motorValueLow(),
+                motorIsProtocolDshot()  
+            };
+
+            runCoreTasks(usec, failsafeIsActive(), &motorConfig, mixmotors);
+
+            motorWrite(td->motorDevice,
+                    armingIsArmed(&td->arming) ? mixmotors : td->mspMotors);
+
+            m_scheduler.corePostUpdate(nowCycles);
+
+            // Bring the scheduler into lock with the gyro Track the actual gyro
+            // rate over given number of cycle times and set the expected timebase
+            static uint32_t _terminalGyroRateCount;
+            static int32_t _sampleRateStartCycles;
+
+            if ((_terminalGyroRateCount == 0)) {
+                _terminalGyroRateCount = gyroInterruptCount() + CORE_RATE_COUNT;
+                _sampleRateStartCycles = nowCycles;
+            }
+
+            if (gyroInterruptCount() >= _terminalGyroRateCount) {
+                // Calculate number of clock cycles on average between gyro
+                // interrupts
+                uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
+                m_scheduler.desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
+                _sampleRateStartCycles = nowCycles;
+                _terminalGyroRateCount += CORE_RATE_COUNT;
+            }
+
+            // Track actual gyro rate over given number of cycle times and remove
+            // skew
+            static uint32_t _terminalGyroLockCount;
+            static int32_t _gyroSkewAccum;
+
+            int32_t gyroSkew =
+                gyroGetSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
+
+            _gyroSkewAccum += gyroSkew;
+
+            if ((_terminalGyroLockCount == 0)) {
+                _terminalGyroLockCount = gyroInterruptCount() + GYRO_LOCK_COUNT;
+            }
+
+            if (gyroInterruptCount() >= _terminalGyroLockCount) {
+                _terminalGyroLockCount += GYRO_LOCK_COUNT;
+
+                // Move the desired start time of the gyroSampleTask
+                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
+
+                _gyroSkewAccum = 0;
+            }
+
+        } // checkCoreTasks
+    
     public:
 
         Hackflight(
