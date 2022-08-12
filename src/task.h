@@ -37,6 +37,31 @@ typedef struct {
 
 } task_data_t;
 
+class Task {
+
+    private:
+
+        uint16_t m_ageCycles;
+        uint32_t m_anticipatedExecutionTime;
+        int32_t  m_desiredPeriodUs;            
+        uint16_t m_dynamicPriority;          
+        uint32_t m_lastExecutedAtUs;          
+        uint32_t m_lastSignaledAtUs;         
+
+    public:
+
+        Task(uint32_t rate) 
+        {
+            m_desiredPeriodUs = 1000000 / rate;
+        }
+
+        virtual void fun(
+                hackflight_core_t * core,
+                task_data_t * data,
+                uint32_t usec);
+
+}; 
+
 typedef void (*task_fun_t)(
         hackflight_core_t * core,
         task_data_t * data,
