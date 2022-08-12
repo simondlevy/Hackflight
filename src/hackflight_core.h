@@ -130,6 +130,15 @@ class HackflightCore {
 
     public:
 
+        HackflightCore(anglePidConstants_t * anglePidConstants, mixer_t mixer)
+        {
+            m_mixer = mixer;
+
+            anglePidInit(&m_anglePid, anglePidConstants);
+
+            addPidController(anglePidUpdate, &m_anglePid);
+        }
+
         void addPidController(pid_fun_t fun, void * data)
         {
             m_pidControllers[m_pidCount].fun = fun;
