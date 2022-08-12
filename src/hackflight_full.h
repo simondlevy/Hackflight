@@ -120,13 +120,14 @@ static void executeTask(
 
 static void checkCoreTasks(
         hackflight_full_t * full,
-        hackflight_core_t * core,
-        scheduler_t * scheduler,
-        task_data_t * td,
         int32_t loopRemainingCycles,
         uint32_t nowCycles,
         uint32_t nextTargetCycles)
 {
+    hackflight_core_t * core = &full->core;
+    scheduler_t * scheduler = &full->scheduler;
+    task_data_t * td = &full->taskData;
+
     if (scheduler->loopStartCycles > scheduler->loopStartMinCycles) {
         scheduler->loopStartCycles -= scheduler->loopStartDeltaDownCycles;
     }
@@ -349,11 +350,7 @@ void hackflightInitFull(
 
 void hackflightStep(hackflight_full_t * full)
 {
-    hackflight_core_t * core = &full->core;
-
     scheduler_t * scheduler = &full->scheduler;
-
-    task_data_t * td = &full->taskData;
 
     uint32_t nextTargetCycles =
         scheduler->lastTargetCycles + scheduler->desiredPeriodCycles;
@@ -383,14 +380,7 @@ void hackflightStep(hackflight_full_t * full)
 
     // Once close to the timing boundary, poll for its arrival
     if (loopRemainingCycles < scheduler->loopStartCycles) {
-        checkCoreTasks(
-                full,
-                core,
-                scheduler,
-                td,
-                loopRemainingCycles,
-                nowCycles,
-                nextTargetCycles);
+        checkCoreTasks(full, loopRemainingCycles, nowCycles, nextTargetCycles);
     }
 
     int32_t newLoopRemainingCyles =
