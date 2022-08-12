@@ -43,11 +43,9 @@ int main(void)
         0.0}; // 3.0; // Level Kp
 
     hackflight_full_t full = {};
-    hackflight_core_t core = {};
 
     hackflightInitFull(
             &full,
-            &core,
             &sbusDeviceFuns,
             SERIAL_PORT_USART3, // RX port
             &anglePidConstants,
@@ -58,7 +56,7 @@ int main(void)
             37);                // LED pin
 
     while (true) {
-        hackflightStep(&full, &core);
+        hackflightStep(&full);
     }
 
     /*

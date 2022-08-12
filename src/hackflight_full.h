@@ -126,10 +126,11 @@ typedef struct {
 
 typedef struct {
 
-    hackflight_core_t  core;
-    imu_align_fun      imuAlignFun;
-    task_data_t        taskData;
-    scheduler_t        scheduler;
+    hackflight_core_t core;
+
+    imu_align_fun imuAlignFun;
+    task_data_t   taskData;
+    scheduler_t   scheduler;
 
     task_t attitudeTask;
     task_t mspTask;
@@ -491,7 +492,6 @@ static void schedulerInit(scheduler_t * scheduler)
 
 void hackflightInitFull(
         hackflight_full_t * full,
-        hackflight_core_t * core,
         rx_dev_funs_t * rxDeviceFuns,
         serialPortIdentifier_e rxDevPort,
         anglePidConstants_t * anglePidConstants,
@@ -501,6 +501,8 @@ void hackflightInitFull(
         imu_align_fun imuAlign,
         uint8_t ledPin)
 {
+    hackflight_core_t * core = &full->core;
+
     hackflightInit(core, anglePidConstants, mixer);
 
     task_data_t * td = &full->taskData;
@@ -536,8 +538,10 @@ void hackflightInitFull(
     schedulerInit(&full->scheduler);
 }
 
-void hackflightStep(hackflight_full_t * full, hackflight_core_t * core)
+void hackflightStep(hackflight_full_t * full)
 {
+    hackflight_core_t * core = &full->core;
+
     scheduler_t * scheduler = &full->scheduler;
 
     task_data_t * td = &full->taskData;
