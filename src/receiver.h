@@ -395,6 +395,7 @@ class Receiver {
         static void detectAndApplySignalLossBehaviour(
                 data_t * data,
                 Arming::data_t * arming,
+                Failsafe * failsafe,
                 uint32_t currentTimeUs,
                 float raw[])
         {
@@ -433,10 +434,10 @@ class Receiver {
             }
 
             if (flightChannelsValid) {
-                failsafeOnValidDataReceived(arming);
+                failsafe->onValidDataReceived(arming);
             } else {
                 data->inFailsafeMode = true;
-                failsafeOnValidDataFailed(arming);
+                failsafe->onValidDataFailed(arming);
                 for (uint8_t channel = 0; channel < CHANNEL_COUNT; channel++) {
                     raw[channel] = getFailValue(raw, channel);
                 }
@@ -496,6 +497,7 @@ class Receiver {
         static bool calculateChannelsAndUpdateFailsafe(
                 data_t * data,
                 Arming::data_t * arming,
+                Failsafe * failsafe,
                 uint32_t currentTimeUs,
                 float raw[])
         {
@@ -511,7 +513,7 @@ class Receiver {
             data->nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
 
             readChannelsApplyRanges(data, raw);
-            detectAndApplySignalLossBehaviour(data, arming, currentTimeUs, raw);
+            detectAndApplySignalLossBehaviour(data, arming, failsafe, currentTimeUs, raw);
 
             return true;
         }
@@ -538,7 +540,8 @@ class Receiver {
                 void * motorDevice,
                 float raw[],
                 uint32_t currentTimeUs,
-                Arming::data_t * arming)
+                Arming::data_t * arming,
+                Failsafe * failsafe)
         {
             int32_t frameAgeUs;
 
@@ -563,11 +566,11 @@ class Receiver {
                         SMOOTHING_RATE_MAX_US);
 
             if (currentTimeUs >
-                    FAILSAFE_POWER_ON_DELAY_US && !failsafeIsMonitoring()) {
-                failsafeStartMonitoring();
+                    FAILSAFE_POWER_ON_DELAY_US && !failsafe->isMonitoring()) {
+                failsafe->startMonitoring();
             }
 
-            failsafeUpdateState(raw, motorDevice, arming);
+            failsafe->update(raw, motorDevice, arming);
 
             return Arming::throttleIsDown(raw);
         }
@@ -885,9 +888,6 @@ class Receiver {
 
                             }
                         } else {
-                            // we have either stopped receiving rx samples
-                            // (failsafe?) or the sample time is unreasonable
-                            // so reset the accumulation
                             rcSmoothingResetAccumulation(&data->smoothingFilter);
                         }
                     }
@@ -985,8 +985,6 @@ class Receiver {
                 bool * pidItermResetValue,
                 bool * gotNewData)
         {
-            (void)failsafe;
-
             *pidItermResetReady = false;
 
             data->gotNewData = false;
@@ -998,15 +996,23 @@ class Receiver {
                     break;
 
                 case STATE_PROCESS:
-                    if (!calculateChannelsAndUpdateFailsafe(data,
-                                arming, currentTimeUs,
+                    if (!calculateChannelsAndUpdateFailsafe(
+                                data,
+                                arming, 
+                                failsafe,
+                                currentTimeUs,
                                 data->raw)) {
                         data->state = STATE_CHECK;
                         break;
                     }
                     *pidItermResetReady = true;
-                    *pidItermResetValue = processData(data, motorDevice, data->raw,
-                            currentTimeUs, arming);
+                    *pidItermResetValue = processData(
+                            data,
+                            motorDevice,
+                            data->raw,
+                            currentTimeUs,
+                            arming, 
+                            failsafe);
                     data->state = STATE_MODES;
                     break;
 

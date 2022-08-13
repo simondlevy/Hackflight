@@ -23,15 +23,6 @@
 
 #include "arming.h"
 
-void failsafeInit(void);
-void failsafeReset(void);
-void failsafeStartMonitoring(void);
-void failsafeUpdateState(float * rcData, void * motorDevice, Arming::data_t * arming);
-bool failsafeIsMonitoring(void);
-bool failsafeIsActive(void);
-void failsafeOnValidDataReceived(Arming::data_t * arming);
-void failsafeOnValidDataFailed(Arming::data_t * arming);
-
 class Failsafe {
 
     private:
@@ -109,6 +100,8 @@ class Failsafe {
         {
             m_events = 0;
             m_monitoring = false;
+
+            reset();
         }
 
         bool isMonitoring(void)

@@ -107,7 +107,7 @@ class Hackflight {
             HackflightCore::step(
                     coreData,
                     usec,
-                    failsafeIsActive(),
+                    taskData->failsafe.isActive(),
                     &motorConfig,
                     mixmotors);
 
@@ -240,8 +240,6 @@ class Hackflight {
             imuInit(imuInterruptPin);
             ledInit(ledPin);
             ledFlash(10, 50);
-            failsafeInit();
-            failsafeReset();
 
             taskData->rx.devCheck = rxDeviceFuns->check;
             taskData->rx.devConvert = rxDeviceFuns->convert;
