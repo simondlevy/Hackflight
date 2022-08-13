@@ -97,6 +97,32 @@ class Failsafe {
             state.monitoring = false;
         }
 
+        bool isMonitoring(void)
+        {
+            return state.monitoring;
+        }
+
+        bool isActive(void)
+        {
+            return state.active;
+        }
+
+        void onValidDataFailed(Arming::data_t * arming)
+        {
+            (void)arming;
+            Arming::setRxFailsafe(arming, false);
+            state.validRxDataFailedAt = timeMillis();
+            if ((state.validRxDataFailedAt - state.validRxDataReceivedAt) >
+                    state.rxDataFailurePeriod) {
+                state.rxLinkState = FAILSAFE_RXLINK_DOWN;
+            }
+        }
+
+        void onValidDataReceived(Arming::data_t * arming)
+        {
+            (void)arming;
+        }
+
         void reset(void)
         {
             state.rxDataFailurePeriod =
@@ -122,26 +148,6 @@ class Failsafe {
         {
             (void)rcData;
             (void)motorDevice;
-            (void)arming;
-        }
-
-        bool isMonitoring(void)
-        {
-            return false;
-        }
-
-        bool isActive(void)
-        {
-            return false;
-        }
-
-        void onValidDataReceived(Arming::data_t * arming)
-        {
-            (void)arming;
-        }
-
-        void onValidDataFailed(Arming::data_t * arming)
-        {
             (void)arming;
         }
 };
