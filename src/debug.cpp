@@ -19,7 +19,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "debug.h"
 
 typedef void (*putcf) (void *, char);
-extern putcf stdout_putf;
 
 static void * printfSerialPort;
 
