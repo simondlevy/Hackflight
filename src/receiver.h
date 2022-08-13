@@ -101,7 +101,36 @@ class Receiver {
             AUX2
         } rc_alias_e;
 
-    public:
+        static float pt3FilterGain(float f_cut, float dT)
+        {
+            const float order = 3.0f;
+            const float orderCutoffCorrection =
+                1 / sqrtf(powf(2, 1.0f / order) - 1);
+            float RC = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
+            // float RC = 1 / (2 * 1.961459177f * M_PI * f_cut);
+            // where 1.961459177 = 1 / sqrt( (2^(1 / order) - 1) ) and order is 3
+            return dT / (RC + dT);
+        }
+
+        static void pt3FilterInit(pt3Filter_t *filter, float k)
+        {
+            filter->state = 0;
+            filter->state1 = 0;
+            filter->state2 = 0;
+            filter->k = k;
+        }
+
+        static void pt3FilterUpdateCutoff(pt3Filter_t *filter, float k)
+        {
+            filter->k = k;
+        }
+
+        static inline int32_t cmp32(uint32_t a, uint32_t b)
+        {
+            return (int32_t)(a-b); 
+        }
+
+     public:
 
         typedef struct {
             demands_t demands;
@@ -221,36 +250,7 @@ class Receiver {
         } data_t;
 
 
-        static float pt3FilterGain(float f_cut, float dT)
-        {
-            const float order = 3.0f;
-            const float orderCutoffCorrection =
-                1 / sqrtf(powf(2, 1.0f / order) - 1);
-            float RC = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
-            // float RC = 1 / (2 * 1.961459177f * M_PI * f_cut);
-            // where 1.961459177 = 1 / sqrt( (2^(1 / order) - 1) ) and order is 3
-            return dT / (RC + dT);
-        }
-
-        static void pt3FilterInit(pt3Filter_t *filter, float k)
-        {
-            filter->state = 0;
-            filter->state1 = 0;
-            filter->state2 = 0;
-            filter->k = k;
-        }
-
-        static void pt3FilterUpdateCutoff(pt3Filter_t *filter, float k)
-        {
-            filter->k = k;
-        }
-
-        static inline int32_t cmp32(uint32_t a, uint32_t b)
-        {
-            return (int32_t)(a-b); 
-        }
-
-        static uint8_t rxfail_step_to_channel_value(uint8_t step)
+       static uint8_t rxfail_step_to_channel_value(uint8_t step)
         {
             return (PWM_PULSE_MIN + 25 * step);
         }
