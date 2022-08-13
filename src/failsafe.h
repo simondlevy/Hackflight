@@ -71,7 +71,7 @@ class Failsafe {
             SWITCH_MODE_STAGE2
         } failsafeSwitchMode_e;
 
-        typedef struct m_state_s {
+        typedef struct {
             int16_t events;
             bool monitoring;
             bool active;
@@ -85,86 +85,86 @@ class Failsafe {
             uint32_t receivingRxDataPeriodPreset; 
             failsafePhase_e phase;
             failsafeRxLinkState_e rxLinkState;
-        } m_state_t;
+        } data_t;
 
-        m_state_t m_state;
+        data_t m_data;
 
         void activate(void)
         {
-            m_state.active = true;
+            m_data.active = true;
 
-            m_state.phase = LANDING;
+            m_data.phase = LANDING;
 
-            m_state.landingShouldBeFinishedAt =
+            m_data.landingShouldBeFinishedAt =
                 timeMillis() + 10 * MILLIS_PER_TENTH_SECOND;
 
-            m_state.events++;
+            m_data.events++;
         }
 
 
         bool isReceivingRxData(void)
         {
-            return (m_state.rxLinkState == RXLINK_UP);
+            return (m_data.rxLinkState == RXLINK_UP);
         }
 
     public:
 
         Failsafe(void)
         {
-            m_state.events = 0;
-            m_state.monitoring = false;
+            m_data.events = 0;
+            m_data.monitoring = false;
         }
 
         bool isMonitoring(void)
         {
-            return m_state.monitoring;
+            return m_data.monitoring;
         }
 
         bool isActive(void)
         {
-            return m_state.active;
+            return m_data.active;
         }
 
         void onValidDataFailed(Arming::data_t * arming)
         {
             (void)arming;
             Arming::setRxFailsafe(arming, false);
-            m_state.validRxDataFailedAt = timeMillis();
-            if ((m_state.validRxDataFailedAt - m_state.validRxDataReceivedAt) >
-                    m_state.rxDataFailurePeriod) {
-                m_state.rxLinkState = RXLINK_DOWN;
+            m_data.validRxDataFailedAt = timeMillis();
+            if ((m_data.validRxDataFailedAt - m_data.validRxDataReceivedAt) >
+                    m_data.rxDataFailurePeriod) {
+                m_data.rxLinkState = RXLINK_DOWN;
             }
         }
 
         void onValidDataReceived(Arming::data_t * arming)
         {
-            m_state.validRxDataReceivedAt = timeMillis();
-            if ((m_state.validRxDataReceivedAt - m_state.validRxDataFailedAt) >
-                    m_state.rxDataRecoveryPeriod) {
-                m_state.rxLinkState = RXLINK_UP;
+            m_data.validRxDataReceivedAt = timeMillis();
+            if ((m_data.validRxDataReceivedAt - m_data.validRxDataFailedAt) >
+                    m_data.rxDataRecoveryPeriod) {
+                m_data.rxLinkState = RXLINK_UP;
                 Arming::setRxFailsafe(arming, true);
             }
         }
 
         void reset(void)
         {
-            m_state.rxDataFailurePeriod =
+            m_data.rxDataFailurePeriod =
                 PERIOD_RXDATA_FAILURE + 4 * MILLIS_PER_TENTH_SECOND;
-            m_state.rxDataRecoveryPeriod =
+            m_data.rxDataRecoveryPeriod =
                 PERIOD_RXDATA_RECOVERY + 20 * MILLIS_PER_TENTH_SECOND;
-            m_state.validRxDataReceivedAt = 0;
-            m_state.validRxDataFailedAt = 0;
-            m_state.throttleLowPeriod = 0;
-            m_state.landingShouldBeFinishedAt = 0;
-            m_state.receivingRxDataPeriod = 0;
-            m_state.receivingRxDataPeriodPreset = 0;
-            m_state.phase = IDLE;
-            m_state.rxLinkState = RXLINK_DOWN;
+            m_data.validRxDataReceivedAt = 0;
+            m_data.validRxDataFailedAt = 0;
+            m_data.throttleLowPeriod = 0;
+            m_data.landingShouldBeFinishedAt = 0;
+            m_data.receivingRxDataPeriod = 0;
+            m_data.receivingRxDataPeriodPreset = 0;
+            m_data.phase = IDLE;
+            m_data.rxLinkState = RXLINK_DOWN;
         }        
 
         void startMonitoring(void)
         {
-            m_state.monitoring = true;
+            m_data.monitoring = true;
         }
 
         void update(float * rcData, void * motorDevice, Arming::data_t * arming)
@@ -184,50 +184,50 @@ class Failsafe {
             do {
                 reprocessState = false;
 
-                switch (m_state.phase) {
+                switch (m_data.phase) {
                     case IDLE:
                         if (Arming::isArmed(arming)) {
                             // Track throttle command below minimum time
                             if (!Arming::throttleIsDown(rcData)) {
-                                m_state.throttleLowPeriod =
+                                m_data.throttleLowPeriod =
                                     timeMillis() + 100 * MILLIS_PER_TENTH_SECOND;
                             }
                             if (0 == SWITCH_MODE_KILL) {
                                 activate();
-                                m_state.phase = LANDED;      
-                                m_state.receivingRxDataPeriodPreset =
+                                m_data.phase = LANDED;      
+                                m_data.receivingRxDataPeriodPreset =
                                     PERIOD_OF_1_SECONDS();    
                                 // require 1 seconds of valid rxData
                                 reprocessState = true;
                             } else if (!receivingRxData) {
-                                if (timeMillis() > m_state.throttleLowPeriod
+                                if (timeMillis() > m_data.throttleLowPeriod
                                    ) {
                                     activate();
 
                                     // skip auto-landing procedure
-                                    m_state.phase = LANDED;      
-                                    m_state.receivingRxDataPeriodPreset =
+                                    m_data.phase = LANDED;      
+                                    m_data.receivingRxDataPeriodPreset =
                                         PERIOD_OF_3_SECONDS(); 
                                     // require 3 seconds of valid rxData
                                 } else {
-                                    m_state.phase = RX_LOSS_DETECTED;
+                                    m_data.phase = RX_LOSS_DETECTED;
                                 }
                                 reprocessState = true;
                             }
                         } else {
-                            m_state.throttleLowPeriod = 0;
+                            m_data.throttleLowPeriod = 0;
                         }
                         break;
 
                     case RX_LOSS_DETECTED:
                         if (receivingRxData) {
-                            m_state.phase = RX_LOSS_RECOVERED;
+                            m_data.phase = RX_LOSS_RECOVERED;
                         } else {
                             // Drop the craft
                             activate();
 
                             // skip auto-landing procedure
-                            m_state.phase = LANDED;      
+                            m_data.phase = LANDED;      
                             break;
                         }
                         reprocessState = true;
@@ -237,31 +237,31 @@ class Failsafe {
                         break;
                     case LANDED:
                         Arming::disarm(arming, motorDevice);
-                        m_state.receivingRxDataPeriod = timeMillis() +
-                            m_state.receivingRxDataPeriodPreset; // set required
-                        m_state.phase = RX_LOSS_MONITORING;
+                        m_data.receivingRxDataPeriod = timeMillis() +
+                            m_data.receivingRxDataPeriodPreset; // set required
+                        m_data.phase = RX_LOSS_MONITORING;
                         reprocessState = true;
                         break;
 
                     case RX_LOSS_MONITORING:
                         if (receivingRxData) {
-                            if (timeMillis() > m_state.receivingRxDataPeriod) {
+                            if (timeMillis() > m_data.receivingRxDataPeriod) {
                                 if (!Arming::isArmed(arming)) {
-                                    m_state.phase = RX_LOSS_RECOVERED;
+                                    m_data.phase = RX_LOSS_RECOVERED;
                                     reprocessState = true;
                                 }
                             }
                         } else {
-                            m_state.receivingRxDataPeriod = timeMillis() +
-                                m_state.receivingRxDataPeriodPreset; 
+                            m_data.receivingRxDataPeriod = timeMillis() +
+                                m_data.receivingRxDataPeriodPreset; 
                         }
                         break;
 
                     case RX_LOSS_RECOVERED:
-                        m_state.throttleLowPeriod = timeMillis() + 100 *
+                        m_data.throttleLowPeriod = timeMillis() + 100 *
                             MILLIS_PER_TENTH_SECOND;
-                        m_state.phase = IDLE;
-                        m_state.active = false;
+                        m_data.phase = IDLE;
+                        m_data.active = false;
                         reprocessState = true;
                         break;
 
