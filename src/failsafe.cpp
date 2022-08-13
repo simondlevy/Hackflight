@@ -71,6 +71,11 @@ typedef struct failsafeState_s {
 
 static failsafeState_t failsafeState;
 
+static bool isReceivingRxData(void)
+{
+    return (failsafeState.rxLinkState == FAILSAFE_RXLINK_UP);
+}
+
 /*
  * Should called when the failsafe config needs to be changed - e.g. a
  * different profile has been selected.
@@ -126,11 +131,6 @@ static void failsafeActivate(void)
     failsafeState.events++;
 }
 
-static bool failsafeIsReceivingRxData(void)
-{
-    return (failsafeState.rxLinkState == FAILSAFE_RXLINK_UP);
-}
-
 void failsafeOnValidDataReceived(Arming::data_t * arming)
 {
     failsafeState.validRxDataReceivedAt = timeMillis();
@@ -159,7 +159,7 @@ void failsafeUpdateState(float * rcData, void * motorDevice, Arming::data_t * ar
         return;
     }
 
-    bool receivingRxData = failsafeIsReceivingRxData();
+    bool receivingRxData = isReceivingRxData();
 
     if (0 == FAILSAFE_SWITCH_MODE_STAGE2) {
         receivingRxData = false; // force Stage2
