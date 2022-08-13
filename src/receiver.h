@@ -137,6 +137,16 @@ class Receiver {
         typedef float   (*rx_dev_convert_fun)
             (uint16_t * channelData, uint8_t chan);
 
+       static uint8_t rxfail_step_to_channel_value(uint8_t step)
+        {
+            return (PWM_PULSE_MIN + 25 * step);
+        }
+
+        static bool isPulseValid(uint16_t pulseDuration)
+        {
+            return  pulseDuration >= 885 && pulseDuration <= 2115;
+        }
+
      public:
 
         typedef struct {
@@ -249,16 +259,6 @@ class Receiver {
 
         } data_t;
 
-
-       static uint8_t rxfail_step_to_channel_value(uint8_t step)
-        {
-            return (PWM_PULSE_MIN + 25 * step);
-        }
-
-        static bool isPulseValid(uint16_t pulseDuration)
-        {
-            return  pulseDuration >= 885 && pulseDuration <= 2115;
-        }
 
         static uint16_t getFailValue(float * rcData, uint8_t channel)
         {
