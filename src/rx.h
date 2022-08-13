@@ -149,7 +149,7 @@ class Receiver {
             uint32_t           needSignalBefore;
             uint32_t           nextUpdateAtUs;
             uint32_t           previousFrameTimeUs;
-            float              raw[CHANNEL_COUNT];
+            float              raw[CHAN_COUNT];
             uint32_t           refreshPeriod;
             bool               signalReceived;
             rxState_e          state;
