@@ -71,11 +71,50 @@ void failsafeStartMonitoring(void);
 void failsafeUpdateState(float * rcData, void * motorDevice, Arming::data_t * arming);
 bool failsafeIsMonitoring(void);
 bool failsafeIsActive(void);
-bool failsafeIsReceivingRxData(void);
 void failsafeOnValidDataReceived(Arming::data_t * arming);
 void failsafeOnValidDataFailed(Arming::data_t * arming);
 
 class Failsafe {
 
+    public:
 
+        void init(void)
+        {
+        }
+
+        void reset(void)
+        {
+        }
+
+        void startMonitoring(void)
+        {
+        }
+
+        void updateState(
+                float * rcData, void * motorDevice, Arming::data_t * arming)
+        {
+            (void)rcData;
+            (void)motorDevice;
+            (void)arming;
+        }
+
+        bool isMonitoring(void)
+        {
+            return false;
+        }
+
+        bool isActive(void)
+        {
+            return false;
+        }
+
+        void onValidDataReceived(Arming::data_t * arming)
+        {
+            (void)arming;
+        }
+
+        void onValidDataFailed(Arming::data_t * arming)
+        {
+            (void)arming;
+        }
 };

@@ -107,7 +107,7 @@ static void failsafeActivate(void)
     failsafeState.events++;
 }
 
-bool failsafeIsReceivingRxData(void)
+static bool failsafeIsReceivingRxData(void)
 {
     return (failsafeState.rxLinkState == FAILSAFE_RXLINK_UP);
 }
