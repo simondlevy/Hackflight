@@ -20,7 +20,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdlib.h>
 
 #include "debug.h"
-#include "msp.h"
 #include "serial.h"
 
 typedef void (*putcf) (void *, char);
@@ -220,6 +219,8 @@ void debugFlush(void)
 
 void debugPrintf(const char *fmt, ...)
 {
+    void mspTriggerDebugging(void);
+
     va_list va;
     va_start(va, fmt);
     tfp_format(NULL, stdout_putf, fmt, va);
