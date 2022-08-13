@@ -43,12 +43,3 @@
 
 
     void armingSetRxFailsafe(arming_t * arming, bool enabled);
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-    void armingSetDshotBitbangOkay(arming_t * arming, bool enabled);
-#if defined(__cplusplus)
-}
-#endif

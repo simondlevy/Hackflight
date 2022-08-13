@@ -38,8 +38,7 @@ static bool readyToArm(arming_t * arming)
         arming->arming_switch_okay &&
         arming->gyro_done_calibrating &&
         arming->rx_failsafe_okay &&
-        arming->throttle_is_down &&
-        arming->dshot_bitbang_okay;
+        arming->throttle_is_down;
 }
 
 void armingCheck(
@@ -113,7 +112,7 @@ void armingUpdateStatus(
 
         arming->gyro_done_calibrating = !calibrating;
 
-        motorCheckDshotBitbangStatus(arming);
+        //motorCheckDshotBitbangStatus(arming);
 
         arming->acc_done_calibrating = true;
 
@@ -132,11 +131,6 @@ void armingUpdateStatus(
 
         ledWarningUpdate();
     }
-}
-
-void armingSetDshotBitbangOkay(arming_t * arming, bool okay)
-{
-    arming->dshot_bitbang_okay = okay;
 }
 
 void armingSetRxFailsafe(arming_t * arming, bool okay)

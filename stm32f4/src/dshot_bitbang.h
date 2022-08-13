@@ -46,4 +46,4 @@ const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(
 
 const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer);
 
-void motorCheckDshotBitbangStatus(arming_t * arming);
+//void motorCheckDshotBitbangStatus(arming_t * arming);

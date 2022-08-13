@@ -23,11 +23,6 @@
 #include <motor.h>
 #include <pwm.h>
 
-void motorCheckDshotBitbangStatus(arming_t * arming)
-{
-    armingSetDshotBitbangOkay(arming, true);
-}
-
 bool motorIsReady(uint32_t currentTime)
 {
     (void)currentTime;
