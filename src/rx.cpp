@@ -22,18 +22,11 @@
 #include <math.h>
 
 #include "arming.h"
-#include "core_dt.h"
 #include "datatypes.h"
 #include "failsafe.h"
 #include "led.h"
-#include "maths.h"
 #include "motor.h"
-#include "pt3_filter.h"
-#include "pwm.h"
 #include "rx.h"
-#include "rx_rate.h"
-#include "rx_status.h"
-#include "scale.h"
 #include "time.h"
 
 static const uint32_t FAILSAFE_POWER_ON_DELAY_US = (1000 * 1000 * 5);
