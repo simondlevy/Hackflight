@@ -1023,6 +1023,46 @@ class Receiver {
 
         } // poll
 
+        // Runs in fast (inner, core) loop
+        void getDemands(
+                rx_t * rx,
+                uint32_t currentTimeUs,
+                anglePid_t * ratepid,
+                demands_t * demands)
+        {
+            float rawSetpoint[4] = {};
+            float setpointRate[4] = {};
+
+            if (rx->gotNewData) {
+
+                rx->previousFrameTimeUs = 0;
+
+                rawSetpoint[ROLL] =
+                    getRawSetpoint(rx->command[ROLL], COMMAND_DIVIDER);
+                rawSetpoint[PITCH] =
+                    getRawSetpoint(rx->command[PITCH], COMMAND_DIVIDER);
+                rawSetpoint[YAW] =
+                    getRawSetpoint(rx->command[YAW], YAW_COMMAND_DIVIDER);
+            }
+
+            processSmoothingFilter(
+                    currentTimeUs, rx, ratepid, setpointRate, rawSetpoint);
+
+            // Find min and max throttle based on conditions. Throttle has to
+            // be known before mixing
+            demands->throttle =
+                constrain_f((rx->commands.throttle - PWM_MIN) /
+                        (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
+
+            demands->roll  = setpointRate[ROLL];
+            demands->pitch = setpointRate[PITCH];
+            demands->yaw   = setpointRate[YAW];
+
+            rx->gotNewData = false;
+
+        } // getDemands
+
+
 }; // class Receiver
 
 #if defined(__cplusplus)
