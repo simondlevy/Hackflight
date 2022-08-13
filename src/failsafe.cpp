@@ -119,7 +119,7 @@ void failsafeStartMonitoring(void)
     failsafeState.monitoring = true;
 }
 
-static void failsafeActivate(void)
+static void activate(void)
 {
     failsafeState.active = true;
 
@@ -184,7 +184,7 @@ void failsafeUpdateState(float * rcData, void * motorDevice, Arming::data_t * ar
                     if (0 == FAILSAFE_SWITCH_MODE_KILL) {
                         // KillswitchEvent: failsafe switch is configured as
                         // KILL switch and is switched ON
-                        failsafeActivate();
+                        activate();
 
                         // skip auto-landing procedure
                         failsafeState.phase = FAILSAFE_LANDED;      
@@ -197,7 +197,7 @@ void failsafeUpdateState(float * rcData, void * motorDevice, Arming::data_t * ar
                            ) {
                             // JustDisarm: throttle was LOW for at least
                             // 'failsafe_throttle_low_delay' seconds
-                            failsafeActivate();
+                            activate();
 
                             // skip auto-landing procedure
                             failsafeState.phase = FAILSAFE_LANDED;      
@@ -220,7 +220,7 @@ void failsafeUpdateState(float * rcData, void * motorDevice, Arming::data_t * ar
                     failsafeState.phase = FAILSAFE_RX_LOSS_RECOVERED;
                 } else {
                     // Drop the craft
-                    failsafeActivate();
+                    activate();
 
                     // skip auto-landing procedure
                     failsafeState.phase = FAILSAFE_LANDED;      

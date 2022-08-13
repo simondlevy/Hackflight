@@ -1,20 +1,20 @@
 /*
-Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2022 Simon D. Levy
 
-This file is part of Hackflight.
+   This file is part of Hackflight.
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -71,7 +71,7 @@ class Failsafe {
             FAILSAFE_SWITCH_MODE_STAGE2
         } failsafeSwitchMode_e;
 
-        typedef struct failsafeState_s {
+        typedef struct m_state_s {
             int16_t events;
             bool monitoring;
             bool active;
@@ -85,9 +85,22 @@ class Failsafe {
             uint32_t receivingRxDataPeriodPreset; 
             failsafePhase_e phase;
             failsafeRxLinkState_e rxLinkState;
-        } failsafeState_t;
+        } m_state_t;
 
-        failsafeState_t m_state;
+        m_state_t m_state;
+
+        void activate(void)
+        {
+            m_state.active = true;
+
+            m_state.phase = FAILSAFE_LANDING;
+
+            m_state.landingShouldBeFinishedAt =
+                timeMillis() + 10 * MILLIS_PER_TENTH_SECOND;
+
+            m_state.events++;
+        }
+
 
         bool isReceivingRxData(void)
         {
@@ -156,13 +169,106 @@ class Failsafe {
 
         void update(float * rcData, void * motorDevice, Arming::data_t * arming)
         {
-            (void)rcData;
-            (void)motorDevice;
-            (void)arming;
-
             if (!isMonitoring()) {
                 return;
             }
 
+            bool receivingRxData = isReceivingRxData();
+
+            if (0 == FAILSAFE_SWITCH_MODE_STAGE2) {
+                receivingRxData = false; // force Stage2
+            }
+
+            bool reprocessState;
+
+            do {
+                reprocessState = false;
+
+                switch (m_state.phase) {
+                    case FAILSAFE_IDLE:
+                        if (Arming::isArmed(arming)) {
+                            // Track throttle command below minimum time
+                            if (!Arming::throttleIsDown(rcData)) {
+                                m_state.throttleLowPeriod =
+                                    timeMillis() + 100 * MILLIS_PER_TENTH_SECOND;
+                            }
+                            if (0 == FAILSAFE_SWITCH_MODE_KILL) {
+                                activate();
+
+                                m_state.phase = FAILSAFE_LANDED;      
+                                m_state.receivingRxDataPeriodPreset =
+                                    PERIOD_OF_1_SECONDS();    
+                                // require 1 seconds of valid rxData
+                                reprocessState = true;
+                            } else if (!receivingRxData) {
+                                if (timeMillis() > m_state.throttleLowPeriod
+                                   ) {
+                                    activate();
+
+                                    // skip auto-landing procedure
+                                    m_state.phase = FAILSAFE_LANDED;      
+                                    m_state.receivingRxDataPeriodPreset =
+                                        PERIOD_OF_3_SECONDS(); 
+                                    // require 3 seconds of valid rxData
+                                } else {
+                                    m_state.phase = FAILSAFE_RX_LOSS_DETECTED;
+                                }
+                                reprocessState = true;
+                            }
+                        } else {
+                            m_state.throttleLowPeriod = 0;
+                        }
+                        break;
+
+                    case FAILSAFE_RX_LOSS_DETECTED:
+                        if (receivingRxData) {
+                            m_state.phase = FAILSAFE_RX_LOSS_RECOVERED;
+                        } else {
+                            // Drop the craft
+                            activate();
+
+                            // skip auto-landing procedure
+                            m_state.phase = FAILSAFE_LANDED;      
+                            break;
+                        }
+                        reprocessState = true;
+                        break;
+
+                    case FAILSAFE_LANDING:
+                        break;
+                    case FAILSAFE_LANDED:
+                        Arming::disarm(arming, motorDevice);
+                        m_state.receivingRxDataPeriod = timeMillis() +
+                            m_state.receivingRxDataPeriodPreset; // set required
+                        m_state.phase = FAILSAFE_RX_LOSS_MONITORING;
+                        reprocessState = true;
+                        break;
+
+                    case FAILSAFE_RX_LOSS_MONITORING:
+                        if (receivingRxData) {
+                            if (timeMillis() > m_state.receivingRxDataPeriod) {
+                                if (!Arming::isArmed(arming)) {
+                                    m_state.phase = FAILSAFE_RX_LOSS_RECOVERED;
+                                    reprocessState = true;
+                                }
+                            }
+                        } else {
+                            m_state.receivingRxDataPeriod = timeMillis() +
+                                m_state.receivingRxDataPeriodPreset; 
+                        }
+                        break;
+
+                    case FAILSAFE_RX_LOSS_RECOVERED:
+                        m_state.throttleLowPeriod = timeMillis() + 100 *
+                            MILLIS_PER_TENTH_SECOND;
+                        m_state.phase = FAILSAFE_IDLE;
+                        m_state.active = false;
+                        reprocessState = true;
+                        break;
+
+                    default:
+                        break;
+                }
+            } while (reprocessState);        
         }
 };
