@@ -93,6 +93,8 @@ class Failsafe {
 
         void init(void)
         {
+            state.events = 0;
+            state.monitoring = false;
         }
 
         void reset(void)
