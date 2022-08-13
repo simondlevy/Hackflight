@@ -917,6 +917,50 @@ class Receiver {
         }
 
 
+    public:
+
+        // Called from hackflight.c::adjustRxDynamicPriority()
+        bool check(rx_t * rx, uint32_t currentTimeUs)
+        {
+            bool signalReceived = false;
+            bool useDataDrivenProcessing = true;
+
+            if (rx->state != RX_STATE_CHECK) {
+                return true;
+            }
+
+            const uint8_t frameStatus =
+                rx->devCheck(rx->channelData, &rx->lastFrameTimeUs);
+
+            if (frameStatus & RX_FRAME_COMPLETE) {
+                rx->inFailsafeMode = (frameStatus & RX_FRAME_FAILSAFE) != 0;
+                bool rxFrameDropped = (frameStatus & RX_FRAME_DROPPED) != 0;
+                signalReceived = !(rx->inFailsafeMode || rxFrameDropped);
+                if (signalReceived) {
+                    rx->needSignalBefore =
+                        currentTimeUs + NEED_SIGNAL_MAX_DELAY_US;
+                }
+            }
+
+            if (frameStatus & RX_FRAME_PROCESSING_REQUIRED) {
+                rx->auxiliaryProcessingRequired = true;
+            }
+
+            if (signalReceived) {
+                rx->signalReceived = true;
+            } else if (currentTimeUs >= rx->needSignalBefore) {
+                rx->signalReceived = false;
+            }
+
+            if ((signalReceived && useDataDrivenProcessing) ||
+                    cmpTimeUs(currentTimeUs, rx->nextUpdateAtUs) > 0) {
+                rx->dataProcessingRequired = true;
+            }
+
+            // data driven or 50Hz
+            return rx->dataProcessingRequired || rx->auxiliaryProcessingRequired; 
+        }
+
 }; // class Receiver
 
 #if defined(__cplusplus)
