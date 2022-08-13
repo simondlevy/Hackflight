@@ -23,5 +23,3 @@ void debugFlush(void);
 void debugPrintf(const char *fmt, ...);
 
 void debugSetPort(void * p);
-
-int printf(const char * fmt, ...);
