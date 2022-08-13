@@ -65,10 +65,6 @@ typedef struct failsafeState_s {
     failsafeRxLinkState_e rxLinkState;
 } failsafeState_t;
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 void failsafeInit(void);
 void failsafeReset(void);
 void failsafeStartMonitoring(void);
@@ -78,7 +74,3 @@ bool failsafeIsActive(void);
 bool failsafeIsReceivingRxData(void);
 void failsafeOnValidDataReceived(Arming::data_t * arming);
 void failsafeOnValidDataFailed(Arming::data_t * arming);
-
-#if defined(__cplusplus)
-}
-#endif
