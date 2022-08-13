@@ -23,48 +23,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "arming.h"
 
-typedef enum {
-    FAILSAFE_IDLE = 0,
-    FAILSAFE_RX_LOSS_DETECTED,
-    FAILSAFE_LANDING,
-    FAILSAFE_LANDED,
-    FAILSAFE_RX_LOSS_MONITORING,
-    FAILSAFE_RX_LOSS_RECOVERED
-} failsafePhase_e;
-
-typedef enum {
-    FAILSAFE_RXLINK_DOWN = 0,
-    FAILSAFE_RXLINK_UP
-} failsafeRxLinkState_e;
-
-typedef enum {
-    FAILSAFE_PROCEDURE_AUTO_LANDING = 0,
-    FAILSAFE_PROCEDURE_DROP_IT,
-    FAILSAFE_PROCEDURE_COUNT   // must be last
-} failsafeProcedure_e;
-
-typedef enum {
-    FAILSAFE_SWITCH_MODE_STAGE1 = 0,
-    FAILSAFE_SWITCH_MODE_KILL,
-    FAILSAFE_SWITCH_MODE_STAGE2
-} failsafeSwitchMode_e;
-
-typedef struct failsafeState_s {
-    int16_t events;
-    bool monitoring;
-    bool active;
-    uint32_t rxDataFailurePeriod;
-    uint32_t rxDataRecoveryPeriod;
-    uint32_t validRxDataReceivedAt;
-    uint32_t validRxDataFailedAt;
-    uint32_t throttleLowPeriod;             // throttle stick must have been below 'min_check' for this period
-    uint32_t landingShouldBeFinishedAt;
-    uint32_t receivingRxDataPeriod;         // period for the required period of valid rxData
-    uint32_t receivingRxDataPeriodPreset;   // preset for the required period of valid rxData
-    failsafePhase_e phase;
-    failsafeRxLinkState_e rxLinkState;
-} failsafeState_t;
-
 void failsafeInit(void);
 void failsafeReset(void);
 void failsafeStartMonitoring(void);
