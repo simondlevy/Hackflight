@@ -21,6 +21,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "arming.h"
+
 typedef enum {
     FAILSAFE_IDLE = 0,
     FAILSAFE_RX_LOSS_DETECTED,
@@ -70,12 +72,12 @@ extern "C" {
 void failsafeInit(void);
 void failsafeReset(void);
 void failsafeStartMonitoring(void);
-void failsafeUpdateState(float * rcData, void * motorDevice, arming_t * arming);
+void failsafeUpdateState(float * rcData, void * motorDevice, Arming::data_t * arming);
 bool failsafeIsMonitoring(void);
 bool failsafeIsActive(void);
 bool failsafeIsReceivingRxData(void);
-void failsafeOnValidDataReceived(arming_t * arming);
-void failsafeOnValidDataFailed(arming_t * arming);
+void failsafeOnValidDataReceived(Arming::data_t * arming);
+void failsafeOnValidDataFailed(Arming::data_t * arming);
 
 #if defined(__cplusplus)
 }

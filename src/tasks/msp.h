@@ -36,7 +36,7 @@ class MspTask : public Task {
             mspUpdate(
                     &core->vstate,
                     &data->rxAxes,
-                    armingIsArmed(&data->arming),
+                    Arming::isArmed(&data->arming),
                     data->motorDevice,
                     data->mspMotors);
         }

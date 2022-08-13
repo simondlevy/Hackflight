@@ -95,15 +95,6 @@ class Receiver {
         // maximum PWM pulse width which is considered valid
         static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-        typedef enum rc_alias {
-            THROTTLE,
-            ROLL,
-            PITCH,
-            YAW,
-            AUX1,
-            AUX2
-        } rc_alias_e;
-
         static float pt3FilterGain(float f_cut, float dT)
         {
             const float order = 3.0f;
@@ -263,11 +254,6 @@ class Receiver {
         } data_t;
 
 
-        static bool throttleIsDown(float raw[])
-        {
-            return raw[THROTTLE] < 1050;
-        }
-
         static float applyRates(float commandf, const float commandfAbs)
         {
             float expof = RC_EXPO / 100.0f;
@@ -408,7 +394,7 @@ class Receiver {
 
         static void detectAndApplySignalLossBehaviour(
                 data_t * rx,
-                arming_t * arming,
+                Arming::data_t * arming,
                 uint32_t currentTimeUs,
                 float raw[])
         {
@@ -509,7 +495,7 @@ class Receiver {
 
         static bool calculateChannelsAndUpdateFailsafe(
                 data_t * rx,
-                arming_t * arming,
+                Arming::data_t * arming,
                 uint32_t currentTimeUs,
                 float raw[])
         {
@@ -552,7 +538,7 @@ class Receiver {
                 void * motorDevice,
                 float raw[],
                 uint32_t currentTimeUs,
-                arming_t * arming)
+                Arming::data_t * arming)
         {
             int32_t frameAgeUs;
 
@@ -583,7 +569,7 @@ class Receiver {
 
             failsafeUpdateState(raw, motorDevice, arming);
 
-            return throttleIsDown(raw);
+            return Arming::throttleIsDown(raw);
         }
 
         static void ratePidFeedforwardLpfInit(
@@ -993,7 +979,7 @@ class Receiver {
                 bool calibrating,
                 axes_t * rxax,
                 void * motorDevice,
-                arming_t * arming,
+                Arming::data_t * arming,
                 bool * pidItermResetReady,
                 bool * pidItermResetValue,
                 bool * gotNewData)
@@ -1022,7 +1008,7 @@ class Receiver {
                     break;
 
                 case STATE_MODES:
-                    armingCheck(arming, motorDevice, currentTimeUs, rx->raw,
+                    Arming::check(arming, motorDevice, currentTimeUs, rx->raw,
                             imuIsLevel,
                             calibrating);
                     rx->state = STATE_UPDATE;
@@ -1031,7 +1017,7 @@ class Receiver {
                 case STATE_UPDATE:
                     rx->gotNewData = true;
                     updateCommands(rx, rx->raw);
-                    armingUpdateStatus(arming, rx->raw, imuIsLevel, calibrating);
+                    Arming::updateStatus(arming, rx->raw, imuIsLevel, calibrating);
                     rx->state = STATE_CHECK;
                     break;
             }

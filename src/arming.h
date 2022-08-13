@@ -22,24 +22,143 @@
 #include <stdbool.h>
 
 #include "datatypes.h"
+#include "led.h"
+#include "motor.h"
 
-    void armingCheck(
-            arming_t * arming,
-            void * motorDevice,
-            uint32_t currentTimeUs,
-            float raw[],
-            bool imuIsLevel,
-            bool calibrating);
+class Arming {
 
-    void  armingDisarm(arming_t * arming, void * motorDevice);
+    public:
 
-    bool  armingIsArmed(arming_t * arming);
+        typedef struct {
 
-    void  armingUpdateStatus(
-            arming_t * arming,
-            float raw[],
-            bool imuIsLevel,
-            bool calibrating);
+            bool acc_done_calibrating;
+            bool angle_okay;
+            bool switch_okay;
+            bool gyro_done_calibrating;
+            bool is_armed;
+            bool rx_failsafe_okay;
+            bool throttle_is_down;
 
+        } data_t;
 
-    void armingSetRxFailsafe(arming_t * arming, bool enabled);
+    private:
+
+        static bool readyToArm(data_t * data)
+        {
+            return 
+                data->acc_done_calibrating &&
+                data->angle_okay &&
+                data->switch_okay &&
+                data->gyro_done_calibrating &&
+                data->rx_failsafe_okay &&
+                data->throttle_is_down;
+        }
+
+        static bool rxAux1IsSet(float raw[])
+        {
+            return raw[4] > 1200;
+        }
+
+    public:
+
+        static void check(
+                data_t * data,
+                void * motorDevice,
+                uint32_t currentTimeUs,
+                float raw[],
+                bool imuIsLevel,
+                bool calibrating)
+        {
+            static bool _doNotRepeat;
+
+            if (rxAux1IsSet(raw)) {
+
+                Arming::updateStatus(data, raw, imuIsLevel, calibrating);
+
+                if (readyToArm(data)) {
+
+                    if (data->is_armed) {
+                        return;
+                    }
+
+                    if (!motorIsReady(currentTimeUs)) {
+                        return;
+                    }
+
+                    data->is_armed = true;
+
+                }
+
+            } else {
+
+                if (data->is_armed) {
+                    Arming::disarm(data, motorDevice);
+                    data->is_armed = false;
+                }
+            }
+
+            if (!(data->is_armed || _doNotRepeat || !readyToArm(data))) {
+                _doNotRepeat = true;
+            }
+        }
+
+        static void disarm(data_t * data, void * motorDevice)
+        {
+            if (data->is_armed) {
+                motorStop(motorDevice);
+            }
+
+            data->is_armed = false;
+        }
+
+        static bool isArmed(data_t * data)
+        {
+            return data->is_armed;
+        }
+
+        static void updateStatus(
+                data_t * data,
+                float raw[],
+                bool imuIsLevel,
+                bool calibrating) 
+        {
+            if (data->is_armed) {
+                ledSet(true);
+            } else {
+
+                data->throttle_is_down = throttleIsDown(raw);
+
+                data->angle_okay = imuIsLevel;
+
+                data->gyro_done_calibrating = !calibrating;
+
+                data->acc_done_calibrating = true;
+
+                // If arming is disabled and the ARM switch is on
+                if (!readyToArm(data) && rxAux1IsSet(raw)) {
+                    data->switch_okay = false;
+                } else if (!rxAux1IsSet(raw)) {
+                    data->switch_okay = true;
+                }
+
+                if (!readyToArm(data)) {
+                    ledWarningFlash();
+                } else {
+                    ledWarningDisable();
+                }
+
+                ledWarningUpdate();
+            }
+        }
+
+        static void setRxFailsafe(data_t * data, bool okay)
+        {
+            data->rx_failsafe_okay= okay;
+        }
+
+        static bool throttleIsDown(float raw[])
+        {
+            return raw[THROTTLE] < 1050;
+        }
+
+}; // class Arming

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "arming.h"
 #include "datatypes.h"
 
 void imuAccumulateGyro(gyro_t * gyro);
@@ -25,7 +26,7 @@ void imuAccumulateGyro(gyro_t * gyro);
 void imuGetEulerAngles(
         gyro_t * gyro,
         imu_fusion_t * imuFusionPrev,
-        arming_t * arming,
+        Arming::data_t * arming,
         uint32_t time,
         vehicle_state_t * vstate);
 

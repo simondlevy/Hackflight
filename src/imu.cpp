@@ -167,7 +167,7 @@ static void update(
 
 static void getQuaternion(
         gyro_t * gyro,
-        arming_t * arming,
+        Arming::data_t * arming,
         imu_fusion_t * fusionPrev,
         uint32_t time,
         quaternion_t * quat)
@@ -181,7 +181,7 @@ static void getQuaternion(
 
     gyro_reset_t new_gyro_reset = {};
 
-    if (!armingIsArmed(arming)) {
+    if (!Arming::isArmed(arming)) {
         memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyro_reset_t));
     }
 
@@ -212,7 +212,7 @@ void imuAccumulateGyro(gyro_t * gyro)
 void imuGetEulerAngles(
         gyro_t * gyro,
         imu_fusion_t * fusionPrev,
-        arming_t * arming,
+        Arming::data_t * arming,
         uint32_t time,
         vehicle_state_t * vstate)
 {

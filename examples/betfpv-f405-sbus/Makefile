@@ -269,7 +269,6 @@ $(TARGET_DFU): $(TARGET_HEX)
 $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
-		  $(OBJECT_DIR)/arming.o \
 		  $(OBJECT_DIR)/debug.o \
 		  $(OBJECT_DIR)/failsafe.o \
 		  $(OBJECT_DIR)/gyro.o \
@@ -323,16 +322,6 @@ $(OBJECT_DIR)/main.o: main.cpp \
       $(HFSRC_DIR)/receivers/sbus.h \
       $(HFSRC_DIR)/serial.h
 	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/arming.o: $(HFSRC_DIR)/arming.cpp \
-      $(HFSRC_DIR)/arming.h \
-      $(HFSRC_DIR)/datatypes.h \
-      $(HFSRC_DIR)/failsafe.h \
-      $(HFSRC_DIR)/led.h \
-      $(HFSRC_DIR)/motor.h \
-      $(HFSRC_DIR)/receiver.h 
-	$(V1) $(call compile_cpp)
-	@echo g++ arming.cpp
 
 $(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.cpp \
 	  $(HFSRC_DIR)/msp.h \

@@ -31,7 +31,7 @@ class Task {
 
         typedef struct {
 
-            arming_t         arming;
+            Arming::data_t         arming;
             gyro_t           gyro;
             imu_fusion_t     imuFusionPrev;
             float            maxArmingAngle;

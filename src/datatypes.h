@@ -271,20 +271,16 @@ typedef enum {
     SERIAL_PORT_IDENTIFIER_MAX = SERIAL_PORT_LPUART1,
 } serialPortIdentifier_e;
 
-// Arming ---------------------------------------------------------------------
+// Stick indices --------------------------------------------------------------
 
-typedef struct {
-
-    bool acc_done_calibrating;
-    bool angle_okay;
-    bool arming_switch_okay;
-    bool gyro_done_calibrating;
-    bool is_armed;
-    bool rx_failsafe_okay;
-    bool throttle_is_down;
-
-} arming_t;
-
+typedef enum rc_alias {
+    THROTTLE,
+    ROLL,
+    PITCH,
+    YAW,
+    AUX1,
+    AUX2
+} rc_alias_e;
 
 // Motors ----------------------------------------------------------------------
 
