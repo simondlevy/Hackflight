@@ -21,8 +21,8 @@
 #include <string.h>
 
 #include "datatypes.h"
-#include "receiver.h"
 #include "task.h"
+#include "../receiver.h"
 
 class ReceiverTask : public Task {
 

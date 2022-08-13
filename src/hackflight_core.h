@@ -89,7 +89,6 @@ class HackflightCore {
                         hc->pidReset);
             }
 
-
             // Constrain the demands, negating yaw to make it agree with PID
             demands_t * demands = &hc->demands;
             demands->roll  = constrain_demand(

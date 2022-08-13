@@ -22,7 +22,6 @@
 #include <string.h>
 
 #include "arming.h"
-#include "attitude_task.h"
 #include "debug.h"
 #include "deg2rad.h"
 #include "failsafe.h"
@@ -30,14 +29,13 @@
 #include "hackflight_core.h"
 #include "led.h"
 #include "motor.h"
-#include "msp_task.h"
 #include "msp.h"
-#include "receiver_task.h"
 #include "receiver.h"
 #include "scheduler.h"
 #include "system.h"
-#include "task.h"
-
+#include "tasks/attitude.h"
+#include "tasks/msp.h"
+#include "tasks/receiver.h"
 
 class Hackflight {
 

@@ -17,8 +17,8 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "msp.h"
 #include "task.h"
+#include "../msp.h"
 
 class MspTask : public Task {
 
