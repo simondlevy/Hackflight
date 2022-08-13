@@ -16,11 +16,7 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <stdarg.h>
-#include <stdlib.h>
-
 #include "debug.h"
-#include "serial.h"
 
 typedef void (*putcf) (void *, char);
 extern putcf stdout_putf;

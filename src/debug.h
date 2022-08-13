@@ -18,6 +18,11 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <stdarg.h>
+#include <stdlib.h>
+
+#include "serial.h"
+
 void debugFlush(void);
 
 void debugPrintf(const char *fmt, ...);
