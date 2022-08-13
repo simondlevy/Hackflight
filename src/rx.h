@@ -26,10 +26,64 @@
 
 class Receiver {
 
-    public:
+    private:
 
         static const uint8_t CHAN_COUNT = 18;
         static const uint8_t THROTTLE_LOOKUP_SIZE = 12;
+
+        static const uint32_t FAILSAFE_POWER_ON_DELAY_US = (1000 * 1000 * 5);
+
+        // Minimum rc smoothing cutoff frequency
+        static const uint16_t RC_SMOOTHING_CUTOFF_MIN_HZ = 15;    
+
+        // The value to use for "auto" when interpolated feedforward is enabled
+        static const uint16_t RC_SMOOTHING_FEEDFORWARD_INITIAL_HZ = 100;   
+
+        // Guard time to wait after retraining to prevent retraining again too
+        // quickly
+        static const uint16_t RC_SMOOTHING_FILTER_RETRAINING_DELAY_MS = 2000;  
+
+        // Number of rx frame rate samples to average during frame rate changes
+        static const uint8_t  RC_SMOOTHING_FILTER_RETRAINING_SAMPLES = 20;    
+
+        // Time to wait after power to let the PID loop stabilize before starting
+        // average frame rate calculation
+        static const uint16_t RC_SMOOTHING_FILTER_STARTUP_DELAY_MS = 5000;  
+
+        // Additional time to wait after receiving first valid rx frame before
+        // initial training starts
+        static const uint16_t RC_SMOOTHING_FILTER_TRAINING_DELAY_MS = 1000;  
+
+        // Number of rx frame rate samples to average during initial training
+        static const uint8_t  RC_SMOOTHING_FILTER_TRAINING_SAMPLES = 50;    
+
+        // Look for samples varying this much from the current detected frame
+        // rate to initiate retraining
+        static const uint8_t  RC_SMOOTHING_RX_RATE_CHANGE_PERCENT = 20;    
+
+        // 65.5ms or 15.26hz
+        static const uint32_t RC_SMOOTHING_RX_RATE_MAX_US = 65500; 
+
+        // 0.950ms to fit 1kHz without an issue
+        static const uint32_t RC_SMOOTHING_RX_RATE_MIN_US = 950;   
+
+        static const uint32_t DELAY_15_HZ       = 1000000 / 15;
+
+        static const uint32_t NEED_SIGNAL_MAX_DELAY_US = 1000000 / 10;
+
+        static const uint16_t  MAX_INVALID__PULSE_TIME     = 300;
+        static const uint16_t  RATE_LIMIT                  = 1998;
+        static constexpr float THR_EXPO8                   = 0;
+        static constexpr float THR_MID8                    = 50;
+        static constexpr float COMMAND_DIVIDER             = 500;
+        static constexpr float YAW_COMMAND_DIVIDER         = 500;
+
+        // minimum PWM pulse width which is considered valid
+        static const uint16_t PWM_PULSE_MIN   = 750;   
+
+        // maximum PWM pulse width which is considered valid
+        static const uint16_t PWM_PULSE_MAX   = 2250;  
+
 
         typedef struct {
             demands_t demands;
