@@ -16,9 +16,7 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
+#pragma once
 
 void debugFlush(void);
 
@@ -27,7 +25,3 @@ void debugPrintf(const char *fmt, ...);
 void debugSetPort(void * p);
 
 int printf(const char * fmt, ...);
- 
-#if defined(__cplusplus)
-}
-#endif
