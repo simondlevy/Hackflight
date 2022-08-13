@@ -77,7 +77,8 @@ class Receiver {
 
         static const uint32_t DELAY_15_HZ       = 1000000 / 15;
 
-        static const uint32_t NEED_SIGNAL_MAX_DELAY_US  = 1000000 / 10;
+        static const uint32_t NEED_SIGNAL_MAX_DELAY_US    = 1000000 / 10;
+
         static const uint16_t  MAX_INVALID__PULSE_TIME     = 300;
         static const uint16_t  RATE_LIMIT                  = 1998;
         static constexpr float THR_EXPO8                   = 0;
@@ -85,13 +86,13 @@ class Receiver {
         static constexpr float COMMAND_DIVIDER             = 500;
         static constexpr float YAW_COMMAND_DIVIDER         = 500;
 
-    public:
-
         // minimum PWM pulse width which is considered valid
         static const uint16_t PWM_PULSE_MIN   = 750;   
 
         // maximum PWM pulse width which is considered valid
         static const uint16_t PWM_PULSE_MAX   = 2250;  
+
+    public:
 
 
         typedef struct {
