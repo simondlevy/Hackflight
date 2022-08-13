@@ -54,7 +54,7 @@ class ReceiverTask : public Task {
         void fun(
                 HackflightCore::data_t * core,
                 Task::data_t * data,
-                uint32_t time)
+                uint32_t usec)
         {
             bool calibrating = data->gyro.isCalibrating; 
             // || acc.calibrating != 0;
@@ -71,7 +71,7 @@ class ReceiverTask : public Task {
 
             Receiver::poll(
                     &data->rx,
-                    time,
+                    usec,
                     imuIsLevel, 
                     calibrating,
                     &rxax,
