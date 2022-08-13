@@ -959,7 +959,69 @@ class Receiver {
 
             // data driven or 50Hz
             return rx->dataProcessingRequired || rx->auxiliaryProcessingRequired; 
-        }
+
+        } // check
+
+        void poll(
+                rx_t * rx,
+                uint32_t currentTimeUs,
+                bool imuIsLevel,
+                bool calibrating,
+                rx_axes_t * rxax,
+                void * motorDevice,
+                arming_t * arming,
+                bool * pidItermResetReady,
+                bool * pidItermResetValue,
+                bool * gotNewData)
+        {
+            *pidItermResetReady = false;
+
+            rx->gotNewData = false;
+
+            switch (rx->state) {
+                default:
+                case RX_STATE_CHECK:
+                    rx->state = RX_STATE_PROCESS;
+                    break;
+
+                case RX_STATE_PROCESS:
+                    if (!calculateChannelsAndUpdateFailsafe(rx,
+                                arming, currentTimeUs,
+                                rx->raw)) {
+                        rx->state = RX_STATE_CHECK;
+                        break;
+                    }
+                    *pidItermResetReady = true;
+                    *pidItermResetValue = processData(rx, motorDevice, rx->raw,
+                            currentTimeUs, arming);
+                    rx->state = RX_STATE_MODES;
+                    break;
+
+                case RX_STATE_MODES:
+                    armingCheck(arming, motorDevice, currentTimeUs, rx->raw,
+                            imuIsLevel,
+                            calibrating);
+                    rx->state = RX_STATE_UPDATE;
+                    break;
+
+                case RX_STATE_UPDATE:
+                    rx->gotNewData = true;
+                    updateCommands(rx, rx->raw);
+                    armingUpdateStatus(arming, rx->raw, imuIsLevel, calibrating);
+                    rx->state = RX_STATE_CHECK;
+                    break;
+            }
+
+            rxax->demands.throttle = rx->raw[THROTTLE];
+            rxax->demands.roll     = rx->raw[ROLL];
+            rxax->demands.pitch    = rx->raw[PITCH];
+            rxax->demands.yaw      = rx->raw[YAW];
+            rxax->aux1             = rx->raw[AUX1];
+            rxax->aux2             = rx->raw[AUX2];
+
+            *gotNewData = rx->gotNewData;
+
+        } // poll
 
 }; // class Receiver
 
