@@ -34,7 +34,7 @@
 
 class Receiver {
 
-    public:
+    private:
 
         static const uint8_t CHANNEL_COUNT = 18;
         static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
@@ -42,38 +42,40 @@ class Receiver {
         static const uint32_t FAILSAFE_POWER_ON_DELAY_US = (1000 * 1000 * 5);
 
         // Minimum rc smoothing cutoff frequency
-        static const uint16_t RC_SMOOTHING_CUTOFF_MIN_HZ = 15;    
+        static const uint16_t SMOOTHING_CUTOFF_MIN_HZ = 15;    
 
         // The value to use for "auto" when interpolated feedforward is enabled
-        static const uint16_t RC_SMOOTHING_FEEDFORWARD_INITIAL_HZ = 100;   
+        static const uint16_t SMOOTHING_FEEDFORWARD_INITIAL_HZ = 100;   
 
         // Guard time to wait after retraining to prevent retraining again too
         // quickly
-        static const uint16_t RC_SMOOTHING_FILTER_RETRAINING_DELAY_MS = 2000;  
+        static const uint16_t SMOOTHING_FILTER_RETRAINING_DELAY_MS = 2000;  
 
         // Number of rx frame rate samples to average during frame rate changes
-        static const uint8_t  RC_SMOOTHING_FILTER_RETRAINING_SAMPLES = 20;    
+        static const uint8_t  SMOOTHING_FILTER_RETRAINING_SAMPLES = 20;    
 
         // Time to wait after power to let the PID loop stabilize before starting
         // average frame rate calculation
-        static const uint16_t RC_SMOOTHING_FILTER_STARTUP_DELAY_MS = 5000;  
+        static const uint16_t SMOOTHING_FILTER_STARTUP_DELAY_MS = 5000;  
 
         // Additional time to wait after receiving first valid rx frame before
         // initial training starts
-        static const uint16_t RC_SMOOTHING_FILTER_TRAINING_DELAY_MS = 1000;  
+        static const uint16_t SMOOTHING_FILTER_TRAINING_DELAY_MS = 1000;  
 
         // Number of rx frame rate samples to average during initial training
-        static const uint8_t  RC_SMOOTHING_FILTER_TRAINING_SAMPLES = 50;    
+        static const uint8_t  SMOOTHING_FILTER_TRAINING_SAMPLES = 50;    
 
         // Look for samples varying this much from the current detected frame
         // rate to initiate retraining
-        static const uint8_t  RC_SMOOTHING_RATE_CHANGE_PERCENT = 20;    
+        static const uint8_t  SMOOTHING_RATE_CHANGE_PERCENT = 20;    
 
         // 65.5ms or 15.26hz
-        static const uint32_t RC_SMOOTHING_RATE_MAX_US = 65500; 
+        static const uint32_t SMOOTHING_RATE_MAX_US = 65500; 
 
         // 0.950ms to fit 1kHz without an issue
-        static const uint32_t RC_SMOOTHING_RATE_MIN_US = 950;   
+        static const uint32_t SMOOTHING_RATE_MIN_US = 950;   
+
+    public:
 
         static const uint32_t DELAY_15_HZ       = 1000000 / 15;
 
@@ -546,12 +548,12 @@ class Receiver {
             rx->lastRxTimeUs = currentTimeUs;
 
             rx->isRateValid =
-                ((uint32_t)refreshPeriodUs >= RC_SMOOTHING_RATE_MIN_US &&
-                 (uint32_t)refreshPeriodUs <= RC_SMOOTHING_RATE_MAX_US);
+                ((uint32_t)refreshPeriodUs >= SMOOTHING_RATE_MIN_US &&
+                 (uint32_t)refreshPeriodUs <= SMOOTHING_RATE_MAX_US);
 
             rx->refreshPeriod =
-                constrain_i32_u32(refreshPeriodUs, RC_SMOOTHING_RATE_MIN_US,
-                        RC_SMOOTHING_RATE_MAX_US);
+                constrain_i32_u32(refreshPeriodUs, SMOOTHING_RATE_MIN_US,
+                        SMOOTHING_RATE_MAX_US);
 
             if (currentTimeUs >
                     FAILSAFE_POWER_ON_DELAY_US && !failsafeIsMonitoring()) {
@@ -656,14 +658,14 @@ class Receiver {
 
             if (smoothingFilter->setpointCutoffSetting == 0) {
                 smoothingFilter->setpointCutoffFrequency =
-                    fmaxf(RC_SMOOTHING_CUTOFF_MIN_HZ,
+                    fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
                             calcAutoSmoothingCutoff(
                                 smoothingFilter->averageFrameTimeUs,
                                 smoothingFilter->autoSmoothnessFactorSetpoint)); 
             }
             if (smoothingFilter->throttleCutoffSetting == 0) {
                 smoothingFilter->throttleCutoffFrequency =
-                    fmaxf(RC_SMOOTHING_CUTOFF_MIN_HZ,
+                    fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
                             calcAutoSmoothingCutoff(
                                 smoothingFilter->averageFrameTimeUs,
                                 smoothingFilter->autoSmoothnessFactorThrottle));
@@ -698,7 +700,7 @@ class Receiver {
             oldCutoff = smoothingFilter->feedforwardCutoffFrequency;
             if (smoothingFilter->ffCutoffSetting == 0) {
                 smoothingFilter->feedforwardCutoffFrequency =
-                    fmaxf(RC_SMOOTHING_CUTOFF_MIN_HZ,
+                    fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
                             calcAutoSmoothingCutoff(
                                 smoothingFilter->averageFrameTimeUs,
                                 smoothingFilter->autoSmoothnessFactorSetpoint)); 
@@ -727,8 +729,8 @@ class Receiver {
             // if we've collected enough samples then calculate the average and
             // reset the accumulation
             uint32_t sampleLimit = (smoothingFilter->filterInitialized) ?
-                RC_SMOOTHING_FILTER_RETRAINING_SAMPLES :
-                RC_SMOOTHING_FILTER_TRAINING_SAMPLES;
+                SMOOTHING_FILTER_RETRAINING_SAMPLES :
+                SMOOTHING_FILTER_TRAINING_SAMPLES;
 
             if (smoothingFilter->trainingCount >= sampleLimit) {
                 // Throw out high and low samples
@@ -788,7 +790,7 @@ class Receiver {
                          (rx->smoothingFilter.autoSmoothnessFactorSetpoint /
                           10.0f));
                     float ffCutoff = 
-                        RC_SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
+                        SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
                     rx->smoothingFilter.feedforwardCutoffFrequency = 
                         lrintf(ffCutoff);
                 } else {
@@ -820,7 +822,7 @@ class Receiver {
                     // that to calculate the filter cutoff frequencies
 
                     // skip during FC initialization
-                    if ((currentTimeMs > RC_SMOOTHING_FILTER_STARTUP_DELAY_MS))
+                    if ((currentTimeMs > SMOOTHING_FILTER_STARTUP_DELAY_MS))
                     {
                         if (rx->signalReceived && rx->isRateValid) {
 
@@ -829,8 +831,8 @@ class Receiver {
                                 rx->validFrameTimeMs =
                                     currentTimeMs +
                                     (rx->smoothingFilter.filterInitialized ?
-                                     RC_SMOOTHING_FILTER_RETRAINING_DELAY_MS :
-                                     RC_SMOOTHING_FILTER_TRAINING_DELAY_MS);
+                                     SMOOTHING_FILTER_RETRAINING_DELAY_MS :
+                                     SMOOTHING_FILTER_TRAINING_DELAY_MS);
                             } else {
                             }
 
@@ -851,7 +853,7 @@ class Receiver {
                                         100;
 
                                     if (percentChange <
-                                            RC_SMOOTHING_RATE_CHANGE_PERCENT) {
+                                            SMOOTHING_RATE_CHANGE_PERCENT) {
                                         // We received a sample that wasn't
                                         // more than the limit percent so reset
                                         // the accumulation During retraining
