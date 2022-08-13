@@ -19,7 +19,6 @@
 #include <string.h>
 
 #include <motor.h>
-#include <arming.h>
 
 #include "platform.h"
 #include "io.h"
