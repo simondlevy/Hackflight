@@ -87,71 +87,71 @@ class Failsafe {
             failsafeRxLinkState_e rxLinkState;
         } failsafeState_t;
 
-        static failsafeState_t state;
+        failsafeState_t m_state;
 
-        static bool isReceivingRxData(void)
+        bool isReceivingRxData(void)
         {
-            return (state.rxLinkState == FAILSAFE_RXLINK_UP);
+            return (m_state.rxLinkState == FAILSAFE_RXLINK_UP);
         }
 
     public:
 
-        void init(void)
+        Failsafe(void)
         {
-            state.events = 0;
-            state.monitoring = false;
+            m_state.events = 0;
+            m_state.monitoring = false;
         }
 
         bool isMonitoring(void)
         {
-            return state.monitoring;
+            return m_state.monitoring;
         }
 
         bool isActive(void)
         {
-            return state.active;
+            return m_state.active;
         }
 
         void onValidDataFailed(Arming::data_t * arming)
         {
             (void)arming;
             Arming::setRxFailsafe(arming, false);
-            state.validRxDataFailedAt = timeMillis();
-            if ((state.validRxDataFailedAt - state.validRxDataReceivedAt) >
-                    state.rxDataFailurePeriod) {
-                state.rxLinkState = FAILSAFE_RXLINK_DOWN;
+            m_state.validRxDataFailedAt = timeMillis();
+            if ((m_state.validRxDataFailedAt - m_state.validRxDataReceivedAt) >
+                    m_state.rxDataFailurePeriod) {
+                m_state.rxLinkState = FAILSAFE_RXLINK_DOWN;
             }
         }
 
         void onValidDataReceived(Arming::data_t * arming)
         {
-            state.validRxDataReceivedAt = timeMillis();
-            if ((state.validRxDataReceivedAt - state.validRxDataFailedAt) >
-                    state.rxDataRecoveryPeriod) {
-                state.rxLinkState = FAILSAFE_RXLINK_UP;
+            m_state.validRxDataReceivedAt = timeMillis();
+            if ((m_state.validRxDataReceivedAt - m_state.validRxDataFailedAt) >
+                    m_state.rxDataRecoveryPeriod) {
+                m_state.rxLinkState = FAILSAFE_RXLINK_UP;
                 Arming::setRxFailsafe(arming, true);
             }
         }
 
         void reset(void)
         {
-            state.rxDataFailurePeriod =
+            m_state.rxDataFailurePeriod =
                 PERIOD_RXDATA_FAILURE + 4 * MILLIS_PER_TENTH_SECOND;
-            state.rxDataRecoveryPeriod =
+            m_state.rxDataRecoveryPeriod =
                 PERIOD_RXDATA_RECOVERY + 20 * MILLIS_PER_TENTH_SECOND;
-            state.validRxDataReceivedAt = 0;
-            state.validRxDataFailedAt = 0;
-            state.throttleLowPeriod = 0;
-            state.landingShouldBeFinishedAt = 0;
-            state.receivingRxDataPeriod = 0;
-            state.receivingRxDataPeriodPreset = 0;
-            state.phase = FAILSAFE_IDLE;
-            state.rxLinkState = FAILSAFE_RXLINK_DOWN;
+            m_state.validRxDataReceivedAt = 0;
+            m_state.validRxDataFailedAt = 0;
+            m_state.throttleLowPeriod = 0;
+            m_state.landingShouldBeFinishedAt = 0;
+            m_state.receivingRxDataPeriod = 0;
+            m_state.receivingRxDataPeriodPreset = 0;
+            m_state.phase = FAILSAFE_IDLE;
+            m_state.rxLinkState = FAILSAFE_RXLINK_DOWN;
         }        
 
         void startMonitoring(void)
         {
-            state.monitoring = true;
+            m_state.monitoring = true;
         }
 
         void update(float * rcData, void * motorDevice, Arming::data_t * arming)
