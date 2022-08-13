@@ -105,7 +105,7 @@ class Failsafe {
 
     public:
 
-        void init(void)
+        Failsafe()
         {
             m_events = 0;
             m_monitoring = false;

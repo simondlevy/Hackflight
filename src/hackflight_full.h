@@ -53,6 +53,7 @@ class Hackflight {
         typedef struct {
 
             HackflightCore::data_t coreData;
+            Failsafe               failsafe;
             imu_align_fun          imuAlignFun;
             Scheduler              scheduler;
             Task::data_t           taskData;
