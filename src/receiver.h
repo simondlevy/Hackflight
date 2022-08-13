@@ -92,15 +92,6 @@ class Receiver {
         // maximum PWM pulse width which is considered valid
         static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-    public:
-
-
-        typedef struct {
-            demands_t demands;
-            float aux1;
-            float aux2;
-        } axes_t;
-
         typedef enum rc_alias {
             THROTTLE,
             ROLL,
@@ -109,6 +100,14 @@ class Receiver {
             AUX1,
             AUX2
         } rc_alias_e;
+
+    public:
+
+        typedef struct {
+            demands_t demands;
+            float aux1;
+            float aux2;
+        } axes_t;
 
         typedef enum {
             FRAME_PENDING = 0,
