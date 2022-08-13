@@ -34,6 +34,59 @@ void failsafeOnValidDataFailed(Arming::data_t * arming);
 
 class Failsafe {
 
+    private:
+
+        static const uint32_t MILLIS_PER_TENTH_SECOND    =   100;
+        static const uint32_t MILLIS_PER_SECOND          =  1000;
+
+        static uint32_t PERIOD_OF_1_SECONDS() { return 1 * MILLIS_PER_SECOND; }
+        static uint32_t PERIOD_OF_3_SECONDS() { return 3 * MILLIS_PER_SECOND; }
+
+        static const uint32_t PERIOD_RXDATA_FAILURE      =   200;    // millis
+        static const uint32_t PERIOD_RXDATA_RECOVERY     =   200;    // millis
+
+        typedef enum {
+            FAILSAFE_IDLE = 0,
+            FAILSAFE_RX_LOSS_DETECTED,
+            FAILSAFE_LANDING,
+            FAILSAFE_LANDED,
+            FAILSAFE_RX_LOSS_MONITORING,
+            FAILSAFE_RX_LOSS_RECOVERED
+        } failsafePhase_e;
+
+        typedef enum {
+            FAILSAFE_RXLINK_DOWN = 0,
+            FAILSAFE_RXLINK_UP
+        } failsafeRxLinkState_e;
+
+        typedef enum {
+            FAILSAFE_PROCEDURE_AUTO_LANDING = 0,
+            FAILSAFE_PROCEDURE_DROP_IT,
+            FAILSAFE_PROCEDURE_COUNT   // must be last
+        } failsafeProcedure_e;
+
+        typedef enum {
+            FAILSAFE_SWITCH_MODE_STAGE1 = 0,
+            FAILSAFE_SWITCH_MODE_KILL,
+            FAILSAFE_SWITCH_MODE_STAGE2
+        } failsafeSwitchMode_e;
+
+        typedef struct failsafeState_s {
+            int16_t events;
+            bool monitoring;
+            bool active;
+            uint32_t rxDataFailurePeriod;
+            uint32_t rxDataRecoveryPeriod;
+            uint32_t validRxDataReceivedAt;
+            uint32_t validRxDataFailedAt;
+            uint32_t throttleLowPeriod;             
+            uint32_t landingShouldBeFinishedAt;
+            uint32_t receivingRxDataPeriod;        
+            uint32_t receivingRxDataPeriodPreset; 
+            failsafePhase_e phase;
+            failsafeRxLinkState_e rxLinkState;
+        } failsafeState_t;
+
     public:
 
         void init(void)
