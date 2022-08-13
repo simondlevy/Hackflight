@@ -23,10 +23,6 @@
 
 #include "datatypes.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
     void armingCheck(
             arming_t * arming,
             void * motorDevice,
@@ -45,10 +41,14 @@ extern "C" {
             bool imuIsLevel,
             bool calibrating);
 
-    void armingSetDshotBitbangOkay(arming_t * arming, bool enabled);
 
     void armingSetRxFailsafe(arming_t * arming, bool enabled);
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+    void armingSetDshotBitbangOkay(arming_t * arming, bool enabled);
 #if defined(__cplusplus)
 }
 #endif
