@@ -980,10 +980,13 @@ class Receiver {
                 axes_t * rxax,
                 void * motorDevice,
                 Arming::data_t * arming,
+                Failsafe * failsafe,
                 bool * pidItermResetReady,
                 bool * pidItermResetValue,
                 bool * gotNewData)
         {
+            (void)failsafe;
+
             *pidItermResetReady = false;
 
             data->gotNewData = false;
