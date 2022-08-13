@@ -352,10 +352,10 @@ $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
 	  $(HFSRC_DIR)/core_rate.h \
 	  $(HFSRC_DIR)/datatypes.h \
 	  $(HFSRC_DIR)/debug.h \
+	  $(HFSRC_DIR)/filters/pt1.h \
 	  $(HFSRC_DIR)/gyro.h \
 	  $(HFSRC_DIR)/imu.h \
 	  $(HFSRC_DIR)/maths.h \
-	  $(HFSRC_DIR)/pt1_filter.h \
 	  $(HFSRC_DIR)/stats.h \
 	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
@@ -396,10 +396,10 @@ $(OBJECT_DIR)/receiver.o: $(HFSRC_DIR)/receiver.cpp \
 	  $(HFSRC_DIR)/core_dt.h \
 	  $(HFSRC_DIR)/datatypes.h \
 	  $(HFSRC_DIR)/failsafe.h \
+	  $(HFSRC_DIR)/filters/pt3.h \
 	  $(HFSRC_DIR)/led.h \
 	  $(HFSRC_DIR)/maths.h \
 	  $(HFSRC_DIR)/motor.h \
-	  $(HFSRC_DIR)/pt3_filter.h \
 	  $(HFSRC_DIR)/pwm.h \
 	  $(HFSRC_DIR)/receiver.h \
 	  $(HFSRC_DIR)/scale.h \

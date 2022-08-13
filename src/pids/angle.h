@@ -24,8 +24,8 @@
 #include "datatypes.h"
 #include "debug.h"
 #include "core_dt.h"
-#include "pt1_filter.h"
-#include "pt3_filter.h"
+#include "../filters/pt1.h"
+#include "../filters/pt3.h"
 #include "receiver.h"
 
 // minimum of 5ms between updates
