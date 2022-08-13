@@ -24,45 +24,6 @@
 #include "receiver.h"
 #include "task.h"
 
-static void task_rx(
-        HackflightCore::data_t * core,
-        Task::data_t * data,
-        uint32_t usec)
-{
-    bool calibrating = data->gyro.isCalibrating; // || acc.calibrating != 0;
-    bool pidItermResetReady = false;
-    bool pidItermResetValue = false;
-
-    Receiver::axes_t rxax = {};
-
-    bool gotNewData = false;
-
-    bool imuIsLevel =
-        fabsf(core->vstate.phi) < data->maxArmingAngle &&
-        fabsf(core->vstate.theta) < data->maxArmingAngle;
-
-    Receiver::poll(
-            &data->rx,
-            usec,
-            imuIsLevel, 
-            calibrating,
-            &rxax,
-            data->motorDevice,
-            &data->arming,
-            &pidItermResetReady,
-            &pidItermResetValue,
-            &gotNewData);
-
-    if (pidItermResetReady) {
-        core->pidReset = pidItermResetValue;
-    }
-
-    if (gotNewData) {
-        memcpy(&data->rxAxes, &rxax, sizeof(Receiver::axes_t));
-    }
-}
-
-
 class ReceiverTask : public Task {
 
     public:
