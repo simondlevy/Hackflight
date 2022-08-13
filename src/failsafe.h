@@ -151,6 +151,7 @@ class Failsafe {
 
         void startMonitoring(void)
         {
+            state.monitoring = true;
         }
 
         void updateState(
