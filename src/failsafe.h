@@ -120,7 +120,12 @@ class Failsafe {
 
         void onValidDataReceived(Arming::data_t * arming)
         {
-            (void)arming;
+            state.validRxDataReceivedAt = timeMillis();
+            if ((state.validRxDataReceivedAt - state.validRxDataFailedAt) >
+                    state.rxDataRecoveryPeriod) {
+                state.rxLinkState = FAILSAFE_RXLINK_UP;
+                Arming::setRxFailsafe(arming, true);
+            }
         }
 
         void reset(void)
