@@ -130,6 +130,13 @@ class Receiver {
             return (int32_t)(a-b); 
         }
 
+        typedef void    (*rx_dev_init_fun
+                )(serialPortIdentifier_e port);
+        typedef uint8_t (*rx_dev_check_fun)
+            (uint16_t * channelData, uint32_t * frameTimeUs);
+        typedef float   (*rx_dev_convert_fun)
+            (uint16_t * channelData, uint8_t chan);
+
      public:
 
         typedef struct {
@@ -199,13 +206,6 @@ class Receiver {
             uint16_t    trainingMin;
 
         } rxSmoothingFilter_t;
-
-        typedef void    (*rx_dev_init_fun
-                )(serialPortIdentifier_e port);
-        typedef uint8_t (*rx_dev_check_fun)
-            (uint16_t * channelData, uint32_t * frameTimeUs);
-        typedef float   (*rx_dev_convert_fun)
-            (uint16_t * channelData, uint8_t chan);
 
         typedef struct {
 
