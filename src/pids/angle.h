@@ -26,7 +26,7 @@
 #include "core_dt.h"
 #include "pt1_filter.h"
 #include "pt3_filter.h"
-#include "rx_rate.h"
+#include "receiver.h"
 
 // minimum of 5ms between updates
 static const uint16_t DYN_LPF_THROTTLE_UPDATE_DELAY_US = 5000; 
@@ -415,7 +415,7 @@ extern "C" {
 
             // -----calculate pidSetpointDelta
             float pidSetpointDelta = 0;
-            float feedforwardMaxRate = rxApplyRates(1, 1);
+            float feedforwardMaxRate = Receiver::applyRates(1, 1);
 
             // -----calculate D component
             if ((axis < 2 && constants->k_rate_d > 0)) {

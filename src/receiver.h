@@ -27,7 +27,6 @@
 #include "maths.h"
 #include "pt3_filter.h"
 #include "pwm.h"
-#include "rx_rate.h"
 #include "scale.h"
 #include "serial.h"
 #include "time.h"
@@ -38,6 +37,10 @@ class Receiver {
 
         static const uint8_t CHANNEL_COUNT = 18;
         static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
+
+        static const uint8_t RC_EXPO = 0;
+        static const uint8_t RC_RATE = 7;
+        static const uint8_t RATE    = 67;
 
         static const uint32_t FAILSAFE_POWER_ON_DELAY_US = (1000 * 1000 * 5);
 
@@ -147,7 +150,7 @@ class Receiver {
             return  pulseDuration >= 885 && pulseDuration <= 2115;
         }
 
-     public:
+    public:
 
         typedef struct {
             demands_t demands;
@@ -263,6 +266,18 @@ class Receiver {
         static bool throttleIsDown(float raw[])
         {
             return raw[THROTTLE] < 1050;
+        }
+
+        static float applyRates(float commandf, const float commandfAbs)
+        {
+            float expof = RC_EXPO / 100.0f;
+            expof =commandfAbs * (powf(commandf, 5) * expof + commandf * (1 - expof));
+
+            const float centerSensitivity = RC_RATE * 10.0f;
+            const float stickMovement = fmaxf(0, RATE * 10.0f - centerSensitivity);
+            const float angleRate = commandf * centerSensitivity + stickMovement * expof;
+
+            return angleRate;
         }
 
      private:
@@ -920,7 +935,7 @@ class Receiver {
 
             float commandfAbs = fabsf(commandf);
 
-            float angleRate = rxApplyRates(commandf, commandfAbs);
+            float angleRate = applyRates(commandf, commandfAbs);
 
             return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
         }
