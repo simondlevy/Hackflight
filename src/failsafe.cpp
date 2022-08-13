@@ -68,17 +68,6 @@ typedef struct failsafeState_s {
     failsafePhase_e phase;
     failsafeRxLinkState_e rxLinkState;
 } failsafeState_t;
-/*
- * Usage:
- *
- * failsafeInit() and failsafeReset() must be called before the other methods
- * are used.
- *
- * failsafeInit() and failsafeReset() can be called in any order.
- * failsafeInit() should only be called once.
- *
- * enable() should be called after system initialisation.
- */
 
 static failsafeState_t failsafeState;
 

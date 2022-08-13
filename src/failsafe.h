@@ -87,6 +87,8 @@ class Failsafe {
             failsafeRxLinkState_e rxLinkState;
         } failsafeState_t;
 
+        static failsafeState_t failsafeState;
+
     public:
 
         void init(void)
