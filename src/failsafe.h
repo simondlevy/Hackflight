@@ -74,3 +74,8 @@ bool failsafeIsActive(void);
 bool failsafeIsReceivingRxData(void);
 void failsafeOnValidDataReceived(Arming::data_t * arming);
 void failsafeOnValidDataFailed(Arming::data_t * arming);
+
+class Failsafe {
+
+
+};
