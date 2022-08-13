@@ -24,12 +24,12 @@
 #include "serial.h"
 #include "time.h"
 
-#define CHANNEL_COUNT 18
-#define THROTTLE_LOOKUP_LENGTH 12
-
 class Receiver {
 
     public:
+
+        static const uint8_t CHAN_COUNT = 18;
+        static const uint8_t THROTTLE_LOOKUP_SIZE = 12;
 
         typedef struct {
             demands_t demands;
@@ -108,9 +108,12 @@ class Receiver {
 
         } rxSmoothingFilter_t;
 
-        typedef void    (*rx_dev_init_fun)(serialPortIdentifier_e port);
-        typedef uint8_t (*rx_dev_check_fun)(uint16_t * channelData, uint32_t * frameTimeUs);
-        typedef float   (*rx_dev_convert_fun)(uint16_t * channelData, uint8_t chan);
+        typedef void    (*rx_dev_init_fun
+                )(serialPortIdentifier_e port);
+        typedef uint8_t (*rx_dev_check_fun)
+            (uint16_t * channelData, uint32_t * frameTimeUs);
+        typedef float   (*rx_dev_convert_fun)
+            (uint16_t * channelData, uint8_t chan);
 
         typedef struct {
 
@@ -126,7 +129,7 @@ class Receiver {
 
             bool               auxiliaryProcessingRequired;
             bool               calculatedCutoffs;
-            uint16_t           channelData[CHANNEL_COUNT];
+            uint16_t           channelData[CHAN_COUNT];
             float              command[4];
             demands_t          commands;
             bool               dataProcessingRequired;
@@ -138,11 +141,11 @@ class Receiver {
             bool               inFailsafeMode;
             bool               initializedFilter;
             bool               initializedThrottleTable;
-            uint32_t           invalidPulsePeriod[CHANNEL_COUNT];
+            uint32_t           invalidPulsePeriod[CHAN_COUNT];
             bool               isRateValid;
             uint32_t           lastFrameTimeUs;
             uint32_t           lastRxTimeUs;
-            int16_t            lookupThrottleRc[THROTTLE_LOOKUP_LENGTH];
+            int16_t            lookupThrottleRc[THROTTLE_LOOKUP_SIZE];
             uint32_t           needSignalBefore;
             uint32_t           nextUpdateAtUs;
             uint32_t           previousFrameTimeUs;
