@@ -154,11 +154,15 @@ class Failsafe {
             state.monitoring = true;
         }
 
-        void updateState(
-                float * rcData, void * motorDevice, Arming::data_t * arming)
+        void update(float * rcData, void * motorDevice, Arming::data_t * arming)
         {
             (void)rcData;
             (void)motorDevice;
             (void)arming;
+
+            if (!isMonitoring()) {
+                return;
+            }
+
         }
 };
