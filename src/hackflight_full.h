@@ -58,6 +58,8 @@ class Hackflight {
             Task::data_t   taskData;
             Scheduler     scheduler;
 
+            Failsafe      failsafe;
+
             AttitudeTask attitudeTask;
             MspTask      mspTask;
             ReceiverTask receiverTask;
