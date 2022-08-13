@@ -87,7 +87,7 @@ class Failsafe {
             failsafeRxLinkState_e rxLinkState;
         } failsafeState_t;
 
-        static failsafeState_t failsafeState;
+        static failsafeState_t state;
 
     public:
 
@@ -97,7 +97,19 @@ class Failsafe {
 
         void reset(void)
         {
-        }
+            state.rxDataFailurePeriod =
+                PERIOD_RXDATA_FAILURE + 4 * MILLIS_PER_TENTH_SECOND;
+            state.rxDataRecoveryPeriod =
+                PERIOD_RXDATA_RECOVERY + 20 * MILLIS_PER_TENTH_SECOND;
+            state.validRxDataReceivedAt = 0;
+            state.validRxDataFailedAt = 0;
+            state.throttleLowPeriod = 0;
+            state.landingShouldBeFinishedAt = 0;
+            state.receivingRxDataPeriod = 0;
+            state.receivingRxDataPeriodPreset = 0;
+            state.phase = FAILSAFE_IDLE;
+            state.rxLinkState = FAILSAFE_RXLINK_DOWN;
+        }        
 
         void startMonitoring(void)
         {
