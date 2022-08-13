@@ -23,7 +23,7 @@
 #include "failsafe.h"
 #include "led.h"
 #include "motor.h"
-#include "rx_status.h"
+#include "receiver.h"
 
 static bool rxAux1IsSet(float raw[])
 {
@@ -107,7 +107,7 @@ void armingUpdateStatus(
         ledSet(true);
     } else {
 
-        arming->throttle_is_down = rxThrottleIsDown(raw);
+        arming->throttle_is_down = Receiver::throttleIsDown(raw);
 
         arming->angle_okay = imuIsLevel;
 

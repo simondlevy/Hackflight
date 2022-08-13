@@ -26,7 +26,7 @@
 #include <imu.h>
 #include <imu_alignment/rotate_270.h>
 #include <mixers/fixedpitch/quadxbf.h>
-#include <rx/sbus.h>
+#include <receivers/sbus.h>
 #include <serial.h>
 
 #include "hardware_init.h"

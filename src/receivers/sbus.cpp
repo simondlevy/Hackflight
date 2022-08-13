@@ -20,6 +20,7 @@
 
 #include "datatypes.h"
 #include "debug.h"
+#include "receiver.h"
 #include "serial.h"
 #include "time.h"
 
@@ -137,16 +138,16 @@ static uint8_t sbusChannelsDecode(uint16_t * channelData, const sbusChannels_t *
     if (channels->flags & FLAG_FAILSAFE_ACTIVE) {
         // internal failsafe enabled and rx failsafe flag set
         // RX *should* still be sending valid channel data (repeated), so use it.
-        return RX_FRAME_COMPLETE | RX_FRAME_FAILSAFE;
+        return Receiver::FRAME_COMPLETE | Receiver::FRAME_FAILSAFE;
     }
 
     if (channels->flags & FLAG_SIGNAL_LOSS) {
         // The received data is a repeat of the last valid data so can be
         // considered complete.
-        return RX_FRAME_COMPLETE | RX_FRAME_DROPPED;
+        return Receiver::FRAME_COMPLETE | Receiver::FRAME_DROPPED;
     }
 
-    return RX_FRAME_COMPLETE;
+    return Receiver::FRAME_COMPLETE;
 }
 
 static sbusFrameData_t _frameData;
@@ -186,14 +187,14 @@ static void sbusDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
 uint8_t rxDevCheckSbus(uint16_t * channelData, uint32_t * frameTimeUs)
 {
     if (!_frameData.done) {
-        return RX_FRAME_PENDING;
+        return Receiver::FRAME_PENDING;
     }
     _frameData.done = false;
 
     const uint8_t frameStatus = sbusChannelsDecode(channelData,
             &_frameData.frame.frame.channels);
 
-    if (!(frameStatus & (RX_FRAME_FAILSAFE | RX_FRAME_DROPPED))) {
+    if (!(frameStatus & (Receiver::FRAME_FAILSAFE | Receiver::FRAME_DROPPED))) {
         *frameTimeUs = _frameData.startAtUs;
     }
 

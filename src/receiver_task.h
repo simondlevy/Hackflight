@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "datatypes.h"
-#include "rx.h"
+#include "receiver.h"
 #include "task.h"
 
 static void task_rx(
@@ -33,7 +33,7 @@ static void task_rx(
     bool pidItermResetReady = false;
     bool pidItermResetValue = false;
 
-    rx_axes_t rxax = {};
+    Receiver::axes_t rxax = {};
 
     bool gotNewData = false;
 
@@ -41,7 +41,7 @@ static void task_rx(
         fabsf(core->vstate.phi) < data->maxArmingAngle &&
         fabsf(core->vstate.theta) < data->maxArmingAngle;
 
-    rxPoll(
+    Receiver::poll(
             &data->rx,
             usec,
             imuIsLevel, 
@@ -58,7 +58,7 @@ static void task_rx(
     }
 
     if (gotNewData) {
-        memcpy(&data->rxAxes, &rxax, sizeof(rx_axes_t));
+        memcpy(&data->rxAxes, &rxax, sizeof(Receiver::axes_t));
     }
 }
 
@@ -80,7 +80,7 @@ class ReceiverTask : public Task {
                             m_lastSignaledAtUs) / m_desiredPeriodUs);
                 m_dynamicPriority = 1 + m_ageCycles;
             } else  {
-                if (rxCheck(&td->rx, usec)) {
+                if (Receiver::check(&td->rx, usec)) {
                     m_lastSignaledAtUs = usec;
                     m_ageCycles = 1;
                     m_dynamicPriority = 2;
@@ -100,7 +100,7 @@ class ReceiverTask : public Task {
             bool pidItermResetReady = false;
             bool pidItermResetValue = false;
 
-            rx_axes_t rxax = {};
+            Receiver::axes_t rxax = {};
 
             bool gotNewData = false;
 
@@ -108,7 +108,7 @@ class ReceiverTask : public Task {
                 fabsf(core->vstate.phi) < data->maxArmingAngle &&
                 fabsf(core->vstate.theta) < data->maxArmingAngle;
 
-            rxPoll(
+            Receiver::poll(
                     &data->rx,
                     time,
                     imuIsLevel, 
@@ -125,7 +125,7 @@ class ReceiverTask : public Task {
             }
 
             if (gotNewData) {
-                memcpy(&data->rxAxes, &rxax, sizeof(rx_axes_t));
+                memcpy(&data->rxAxes, &rxax, sizeof(Receiver::axes_t));
             }
         }
 };

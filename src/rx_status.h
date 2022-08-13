@@ -26,11 +26,6 @@
 extern "C" {
 #endif
 
-static bool rxThrottleIsDown(float raw[])
-{
-    return raw[THROTTLE] < 1050;
-}
-
 #if defined(__cplusplus)
 }
 #endif

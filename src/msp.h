@@ -19,6 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 
 #include "datatypes.h"
+#include "receiver.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -30,7 +31,7 @@ void mspTriggerDebugging(void);
 
 void mspUpdate(
         vehicle_state_t * state,
-        rx_axes_t *rxaxes,
+        Receiver::axes_t *rxaxes,
         bool armed,
         void * motorDevice,
         float * motors);

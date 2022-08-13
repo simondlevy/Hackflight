@@ -33,7 +33,7 @@
 #include "msp_task.h"
 #include "msp.h"
 #include "receiver_task.h"
-#include "rx.h"
+#include "receiver.h"
 #include "scheduler.h"
 #include "system.h"
 #include "task.h"
@@ -92,7 +92,7 @@ class Hackflight {
 
             uint32_t usec = timeMicros();
 
-            rxGetDemands(
+            Receiver::getDemands(
                     &taskData->rx,
                     usec,
                     &coreData->anglePid,
@@ -225,7 +225,7 @@ class Hackflight {
 
         static void init(
                 data_t * full,
-                rx_dev_funs_t * rxDeviceFuns,
+                Receiver::device_funs_t * rxDeviceFuns,
                 serialPortIdentifier_e rxDevPort,
                 anglePidConstants_t * anglePidConstants,
                 mixer_t mixer,

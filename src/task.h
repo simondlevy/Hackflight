@@ -23,6 +23,7 @@
 #include <stdint.h>
 
 #include "hackflight_core.h"
+#include "receiver.h"
 
 class Task {
 
@@ -36,8 +37,8 @@ class Task {
             float            maxArmingAngle;
             void *           motorDevice;
             float            mspMotors[4];
-            rx_t             rx;
-            rx_axes_t        rxAxes;
+            Receiver::data_t rx;
+            Receiver::axes_t rxAxes;
 
         } data_t;
 

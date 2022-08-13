@@ -28,7 +28,7 @@
 
 static core_data_t _hf;
         
-static void ladybug_setup(rx_dev_funs_t * rxDeviceFuns)
+static void ladybug_setup(Receiver::device_funs_t * rxDeviceFuns)
 {
     Wire.begin();
     delay(100);

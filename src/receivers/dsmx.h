@@ -17,11 +17,12 @@
  */
 
 #include "datatypes.h"
+#include "receiver.h"
 
-void rxDevInitSbus(serialPortIdentifier_e port);
+void rxDevInitDsmx(serialPortIdentifier_e port);
 
-uint8_t rxDevCheckSbus(uint16_t * channelData, uint32_t * frameTimeUs);
+uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs);
 
-float rxDevConvertSbus(uint16_t * channelData, uint8_t chan);
+float rxDevConvertDsmx(uint16_t * channelData, uint8_t chan);
 
-rx_dev_funs_t sbusDeviceFuns = { rxDevInitSbus, rxDevCheckSbus, rxDevConvertSbus };
+Receiver::device_funs_t dsmxDeviceFuns = { rxDevInitDsmx, rxDevCheckDsmx, rxDevConvertDsmx };

@@ -20,23 +20,24 @@
 
 #include <math.h>
 
+#include "arming.h"
 #include "core_dt.h"
 #include "datatypes.h"
+#include "failsafe.h"
 #include "maths.h"
 #include "pt3_filter.h"
 #include "pwm.h"
 #include "rx_rate.h"
-#include "rx_status.h"
 #include "scale.h"
 #include "serial.h"
 #include "time.h"
 
 class Receiver {
 
-    private:
+    public:
 
-        static const uint8_t CHAN_COUNT = 18;
-        static const uint8_t THROTTLE_LOOKUP_SIZE = 12;
+        static const uint8_t CHANNEL_COUNT = 18;
+        static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
 
         static const uint32_t FAILSAFE_POWER_ON_DELAY_US = (1000 * 1000 * 5);
 
@@ -66,13 +67,13 @@ class Receiver {
 
         // Look for samples varying this much from the current detected frame
         // rate to initiate retraining
-        static const uint8_t  RC_SMOOTHING_RX_RATE_CHANGE_PERCENT = 20;    
+        static const uint8_t  RC_SMOOTHING_RATE_CHANGE_PERCENT = 20;    
 
         // 65.5ms or 15.26hz
-        static const uint32_t RC_SMOOTHING_RX_RATE_MAX_US = 65500; 
+        static const uint32_t RC_SMOOTHING_RATE_MAX_US = 65500; 
 
         // 0.950ms to fit 1kHz without an issue
-        static const uint32_t RC_SMOOTHING_RX_RATE_MIN_US = 950;   
+        static const uint32_t RC_SMOOTHING_RATE_MIN_US = 950;   
 
         static const uint32_t DELAY_15_HZ       = 1000000 / 15;
 
@@ -96,7 +97,7 @@ class Receiver {
             demands_t demands;
             float aux1;
             float aux2;
-        } rx_axes_t;
+        } axes_t;
 
         typedef enum rc_alias {
             THROTTLE,
@@ -108,18 +109,18 @@ class Receiver {
         } rc_alias_e;
 
         typedef enum {
-            RX_FRAME_PENDING = 0,
-            RX_FRAME_COMPLETE = (1 << 0),
-            RX_FRAME_FAILSAFE = (1 << 1),
-            RX_FRAME_PROCESSING_REQUIRED = (1 << 2),
-            RX_FRAME_DROPPED = (1 << 3)
+            FRAME_PENDING = 0,
+            FRAME_COMPLETE = (1 << 0),
+            FRAME_FAILSAFE = (1 << 1),
+            FRAME_PROCESSING_REQUIRED = (1 << 2),
+            FRAME_DROPPED = (1 << 3)
         } rxFrameState_e;
 
         typedef enum {
-            RX_FAILSAFE_MODE_AUTO = 0,
-            RX_FAILSAFE_MODE_HOLD,
-            RX_FAILSAFE_MODE_SET,
-            RX_FAILSAFE_MODE_INVALID
+            FAILSAFE_MODE_AUTO = 0,
+            FAILSAFE_MODE_HOLD,
+            FAILSAFE_MODE_SET,
+            FAILSAFE_MODE_INVALID
         } rxFailsafeChannelMode_e;
 
         typedef struct rxFailsafeChannelConfig_s {
@@ -134,11 +135,11 @@ class Receiver {
 
 
         typedef enum {
-            RX_STATE_CHECK,
-            RX_STATE_PROCESS,
-            RX_STATE_MODES,
-            RX_STATE_UPDATE,
-            RX_STATE_COUNT
+            STATE_CHECK,
+            STATE_PROCESS,
+            STATE_MODES,
+            STATE_UPDATE,
+            STATE_COUNT
         } rxState_e;
 
         typedef struct rxSmoothingFilter_s {
@@ -182,7 +183,7 @@ class Receiver {
             rx_dev_check_fun check;
             rx_dev_convert_fun convert;
 
-        } rx_dev_funs_t;
+        } device_funs_t;
 
         typedef struct {
 
@@ -190,7 +191,7 @@ class Receiver {
 
             bool               auxiliaryProcessingRequired;
             bool               calculatedCutoffs;
-            uint16_t           channelData[CHAN_COUNT];
+            uint16_t           channelData[CHANNEL_COUNT];
             float              command[4];
             demands_t          commands;
             bool               dataProcessingRequired;
@@ -202,21 +203,21 @@ class Receiver {
             bool               inFailsafeMode;
             bool               initializedFilter;
             bool               initializedThrottleTable;
-            uint32_t           invalidPulsePeriod[CHAN_COUNT];
+            uint32_t           invalidPulsePeriod[CHANNEL_COUNT];
             bool               isRateValid;
             uint32_t           lastFrameTimeUs;
             uint32_t           lastRxTimeUs;
-            int16_t            lookupThrottleRc[THROTTLE_LOOKUP_SIZE];
+            int16_t            lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
             uint32_t           needSignalBefore;
             uint32_t           nextUpdateAtUs;
             uint32_t           previousFrameTimeUs;
-            float              raw[CHAN_COUNT];
+            float              raw[CHANNEL_COUNT];
             uint32_t           refreshPeriod;
             bool               signalReceived;
             rxState_e          state;
             uint32_t           validFrameTimeMs;
 
-        } rx_t;
+        } data_t;
 
 
         static float pt3FilterGain(float f_cut, float dT)
@@ -277,14 +278,14 @@ class Receiver {
                 &rxFailsafeChannelConfigs[channel];
 
             switch (channelFailsafeConfig->mode) {
-                case RX_FAILSAFE_MODE_AUTO:
+                case FAILSAFE_MODE_AUTO:
                     return channel == ROLL || channel == PITCH || channel == YAW ?
                         1500 :
                         885;
-                case RX_FAILSAFE_MODE_INVALID:
-                case RX_FAILSAFE_MODE_HOLD:
+                case FAILSAFE_MODE_INVALID:
+                case FAILSAFE_MODE_HOLD:
                     return rcData[channel];
-                case RX_FAILSAFE_MODE_SET:
+                case FAILSAFE_MODE_SET:
                     return
                         rxfail_step_to_channel_value(channelFailsafeConfig->step);
             }
@@ -341,7 +342,7 @@ class Receiver {
             config->max = PWM_MAX;
         }
 
-        static void readChannelsApplyRanges(rx_t * rx, float raw[])
+        static void readChannelsApplyRanges(data_t * rx, float raw[])
         {
             rxChannelRangeConfig_t rxChannelRangeConfigThrottle = {};
             rxChannelRangeConfig_t rxChannelRangeConfigRoll = {};
@@ -383,7 +384,7 @@ class Receiver {
         }
 
         static void detectAndApplySignalLossBehaviour(
-                rx_t * rx,
+                data_t * rx,
                 arming_t * arming,
                 uint32_t currentTimeUs,
                 float raw[])
@@ -433,10 +434,10 @@ class Receiver {
             }
         }
 
-        static int16_t lookupThrottle(rx_t * rx, int32_t tmp)
+        static int16_t lookupThrottle(data_t * rx, int32_t tmp)
         {
             if (!rx->initializedThrottleTable) {
-                for (uint8_t i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
+                for (uint8_t i = 0; i < THROTTLE_LOOKUP_TABLE_SIZE; i++) {
                     const int16_t tmp2 = 10 * i - THR_MID8;
                     uint8_t y = tmp2 > 0 ?
                         100 - THR_MID8 :
@@ -468,7 +469,7 @@ class Receiver {
             return raw < 1500 ? -cmd : cmd;
         }
 
-        static void updateCommands(rx_t * rx, float raw[])
+        static void updateCommands(data_t * rx, float raw[])
         {
             for (uint8_t axis=ROLL; axis<=YAW; axis++) {
                 // non coupled PID reduction scaler used in PID controller 1
@@ -484,7 +485,7 @@ class Receiver {
         }
 
         static bool calculateChannelsAndUpdateFailsafe(
-                rx_t * rx,
+                data_t * rx,
                 arming_t * arming,
                 uint32_t currentTimeUs,
                 float raw[])
@@ -507,7 +508,7 @@ class Receiver {
         }
 
         static int32_t getFrameDelta(
-                rx_t * rx, uint32_t currentTimeUs, int32_t *frameAgeUs)
+                data_t * rx, uint32_t currentTimeUs, int32_t *frameAgeUs)
         {
             uint32_t frameTimeUs = rx->lastFrameTimeUs;
 
@@ -524,7 +525,7 @@ class Receiver {
         }
 
         static bool processData(
-                rx_t * rx,
+                data_t * rx,
                 void * motorDevice,
                 float raw[],
                 uint32_t currentTimeUs,
@@ -545,12 +546,12 @@ class Receiver {
             rx->lastRxTimeUs = currentTimeUs;
 
             rx->isRateValid =
-                ((uint32_t)refreshPeriodUs >= RC_SMOOTHING_RX_RATE_MIN_US &&
-                 (uint32_t)refreshPeriodUs <= RC_SMOOTHING_RX_RATE_MAX_US);
+                ((uint32_t)refreshPeriodUs >= RC_SMOOTHING_RATE_MIN_US &&
+                 (uint32_t)refreshPeriodUs <= RC_SMOOTHING_RATE_MAX_US);
 
             rx->refreshPeriod =
-                constrain_i32_u32(refreshPeriodUs, RC_SMOOTHING_RX_RATE_MIN_US,
-                        RC_SMOOTHING_RX_RATE_MAX_US);
+                constrain_i32_u32(refreshPeriodUs, RC_SMOOTHING_RATE_MIN_US,
+                        RC_SMOOTHING_RATE_MAX_US);
 
             if (currentTimeUs >
                     FAILSAFE_POWER_ON_DELAY_US && !failsafeIsMonitoring()) {
@@ -559,7 +560,12 @@ class Receiver {
 
             failsafeUpdateState(raw, motorDevice, arming);
 
-            return rxThrottleIsDown(raw);
+            return throttleIsDown(raw);
+        }
+
+        static bool throttleIsDown(float raw[])
+        {
+            return raw[THROTTLE] < 1050;
         }
 
         static void ratePidFeedforwardLpfInit(
@@ -754,7 +760,7 @@ class Receiver {
 
         static void processSmoothingFilter(
                 uint32_t currentTimeUs,
-                rx_t * rx,
+                data_t * rx,
                 anglePid_t * ratepid,
                 float setpointRate[4],
                 float rawSetpoint[3])
@@ -845,7 +851,7 @@ class Receiver {
                                         100;
 
                                     if (percentChange <
-                                            RC_SMOOTHING_RX_RATE_CHANGE_PERCENT) {
+                                            RC_SMOOTHING_RATE_CHANGE_PERCENT) {
                                         // We received a sample that wasn't
                                         // more than the limit percent so reset
                                         // the accumulation During retraining
@@ -920,21 +926,21 @@ class Receiver {
     public:
 
         // Called from hackflight.c::adjustRxDynamicPriority()
-        bool check(rx_t * rx, uint32_t currentTimeUs)
+        static bool check(data_t * rx, uint32_t currentTimeUs)
         {
             bool signalReceived = false;
             bool useDataDrivenProcessing = true;
 
-            if (rx->state != RX_STATE_CHECK) {
+            if (rx->state != STATE_CHECK) {
                 return true;
             }
 
             const uint8_t frameStatus =
                 rx->devCheck(rx->channelData, &rx->lastFrameTimeUs);
 
-            if (frameStatus & RX_FRAME_COMPLETE) {
-                rx->inFailsafeMode = (frameStatus & RX_FRAME_FAILSAFE) != 0;
-                bool rxFrameDropped = (frameStatus & RX_FRAME_DROPPED) != 0;
+            if (frameStatus & FRAME_COMPLETE) {
+                rx->inFailsafeMode = (frameStatus & FRAME_FAILSAFE) != 0;
+                bool rxFrameDropped = (frameStatus & FRAME_DROPPED) != 0;
                 signalReceived = !(rx->inFailsafeMode || rxFrameDropped);
                 if (signalReceived) {
                     rx->needSignalBefore =
@@ -942,7 +948,7 @@ class Receiver {
                 }
             }
 
-            if (frameStatus & RX_FRAME_PROCESSING_REQUIRED) {
+            if (frameStatus & FRAME_PROCESSING_REQUIRED) {
                 rx->auxiliaryProcessingRequired = true;
             }
 
@@ -962,12 +968,12 @@ class Receiver {
 
         } // check
 
-        void poll(
-                rx_t * rx,
+        static void poll(
+                data_t * rx,
                 uint32_t currentTimeUs,
                 bool imuIsLevel,
                 bool calibrating,
-                rx_axes_t * rxax,
+                axes_t * rxax,
                 void * motorDevice,
                 arming_t * arming,
                 bool * pidItermResetReady,
@@ -980,35 +986,35 @@ class Receiver {
 
             switch (rx->state) {
                 default:
-                case RX_STATE_CHECK:
-                    rx->state = RX_STATE_PROCESS;
+                case STATE_CHECK:
+                    rx->state = STATE_PROCESS;
                     break;
 
-                case RX_STATE_PROCESS:
+                case STATE_PROCESS:
                     if (!calculateChannelsAndUpdateFailsafe(rx,
                                 arming, currentTimeUs,
                                 rx->raw)) {
-                        rx->state = RX_STATE_CHECK;
+                        rx->state = STATE_CHECK;
                         break;
                     }
                     *pidItermResetReady = true;
                     *pidItermResetValue = processData(rx, motorDevice, rx->raw,
                             currentTimeUs, arming);
-                    rx->state = RX_STATE_MODES;
+                    rx->state = STATE_MODES;
                     break;
 
-                case RX_STATE_MODES:
+                case STATE_MODES:
                     armingCheck(arming, motorDevice, currentTimeUs, rx->raw,
                             imuIsLevel,
                             calibrating);
-                    rx->state = RX_STATE_UPDATE;
+                    rx->state = STATE_UPDATE;
                     break;
 
-                case RX_STATE_UPDATE:
+                case STATE_UPDATE:
                     rx->gotNewData = true;
                     updateCommands(rx, rx->raw);
                     armingUpdateStatus(arming, rx->raw, imuIsLevel, calibrating);
-                    rx->state = RX_STATE_CHECK;
+                    rx->state = STATE_CHECK;
                     break;
             }
 
@@ -1024,8 +1030,8 @@ class Receiver {
         } // poll
 
         // Runs in fast (inner, core) loop
-        void getDemands(
-                rx_t * rx,
+        static void getDemands(
+                data_t * rx,
                 uint32_t currentTimeUs,
                 anglePid_t * ratepid,
                 demands_t * demands)
@@ -1064,38 +1070,6 @@ class Receiver {
 
 
 }; // class Receiver
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-    // For both hardware and sim implementations -------------------------------
-
-    void rxDevInit(serialPortIdentifier_e port);
-
-    void rxGetDemands(
-            rx_t * rx,
-            uint32_t currentTimeUs,
-            anglePid_t * ratepid,
-            demands_t * demands);
-
-    void rxPoll(
-            rx_t * rx,
-            uint32_t currentTimeUs,
-            bool imuIsLevel,
-            bool calibrating,
-            rx_axes_t * rxax,
-            void * motorDevice,
-            arming_t * arming,
-            bool * pidItermResetReady,
-            bool * pidItermResetValue,
-            bool * gotNewData);
-
-    bool rxCheck(rx_t * rx, uint32_t currentTimeUs);
-
-#if defined(__cplusplus)
-}
-#endif
 
 // For hardware impelmentations ------------------------------------------------
 
