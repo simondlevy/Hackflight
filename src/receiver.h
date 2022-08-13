@@ -75,18 +75,17 @@ class Receiver {
         // 0.950ms to fit 1kHz without an issue
         static const uint32_t SMOOTHING_RATE_MIN_US = 950;   
 
-    public:
-
         static const uint32_t DELAY_15_HZ       = 1000000 / 15;
 
-        static const uint32_t NEED_SIGNAL_MAX_DELAY_US = 1000000 / 10;
-
+        static const uint32_t NEED_SIGNAL_MAX_DELAY_US  = 1000000 / 10;
         static const uint16_t  MAX_INVALID__PULSE_TIME     = 300;
         static const uint16_t  RATE_LIMIT                  = 1998;
         static constexpr float THR_EXPO8                   = 0;
         static constexpr float THR_MID8                    = 50;
         static constexpr float COMMAND_DIVIDER             = 500;
         static constexpr float YAW_COMMAND_DIVIDER         = 500;
+
+    public:
 
         // minimum PWM pulse width which is considered valid
         static const uint16_t PWM_PULSE_MIN   = 750;   
