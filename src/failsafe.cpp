@@ -16,13 +16,7 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "debug.h"
 #include "failsafe.h"
-#include "receiver.h"
-#include "time.h"
 
 static const uint32_t MILLIS_PER_TENTH_SECOND    =   100;
 static const uint32_t MILLIS_PER_SECOND          =  1000;
