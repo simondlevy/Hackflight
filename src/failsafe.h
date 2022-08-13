@@ -89,6 +89,11 @@ class Failsafe {
 
         static failsafeState_t state;
 
+        static bool isReceivingRxData(void)
+        {
+            return (state.rxLinkState == FAILSAFE_RXLINK_UP);
+        }
+
     public:
 
         void init(void)
