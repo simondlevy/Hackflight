@@ -260,6 +260,13 @@ class Receiver {
         } data_t;
 
 
+        static bool throttleIsDown(float raw[])
+        {
+            return raw[THROTTLE] < 1050;
+        }
+
+     private:
+
         static uint16_t getFailValue(float * rcData, uint8_t channel)
         {
             rxFailsafeChannelConfig_t rxFailsafeChannelConfigs[CHANNEL_COUNT];
@@ -562,11 +569,6 @@ class Receiver {
             failsafeUpdateState(raw, motorDevice, arming);
 
             return throttleIsDown(raw);
-        }
-
-        static bool throttleIsDown(float raw[])
-        {
-            return raw[THROTTLE] < 1050;
         }
 
         static void ratePidFeedforwardLpfInit(
