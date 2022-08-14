@@ -33,19 +33,26 @@
 extern "C" {
 #endif
 
+    // Device functions
     void     gyroDevInit(void);
-    int32_t  gyroGetSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles);
-    void     gyroInit(gyro_t * gyro);
-    uint32_t gyroInterruptCount(void);
-    bool     gyroIsReady(void);
-    int16_t  gyroReadRaw(uint8_t k);
-    void     gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate);
-    uint16_t gyroScaleDps(void);
-    uint32_t gyroSyncTime(void);
+    uint32_t gyroDevInterruptCount(void);
+    bool     gyroDevIsReady(void);
+    int16_t  gyroDevReadRaw(uint8_t k);
+    uint16_t gyroDevScaleDps(void);
+    uint32_t gyroDevSyncTime(void);
+
 
 #if defined(__cplusplus)
 }
 #endif
+
+void gyroInit(gyro_t * gyro);
+
+void gyroReadScaled(
+        gyro_t *gyro,
+        Imu * imu,
+        imu_align_fun align,
+        vehicle_state_t * vstate);
 
 class Gyro {
 
@@ -154,8 +161,8 @@ class Gyro {
                 }
 
                 // Sum up CALIBRATING_GYRO_TIME_US readings
-                m_calibration.sum[axis] += gyroReadRaw(axis);
-                devPush(&m_calibration.var[axis], gyroReadRaw(axis));
+                m_calibration.sum[axis] += gyroDevReadRaw(axis);
+                devPush(&m_calibration.var[axis], gyroDevReadRaw(axis));
 
                 if (m_calibration.cyclesRemaining == 1) {
                     const float stddev =
@@ -182,7 +189,7 @@ class Gyro {
             static float _adcf[3];
 
             // integrate using trapezium rule to avoid bias
-            m_accum.values.x += 0.5f * (_adcf[0] + m_dps_filtered[0]) * CORE_PERIOD();
+            m_accum.values.x +=0.5f * (_adcf[0] + m_dps_filtered[0]) * CORE_PERIOD();
             m_accum.values.y += 0.5f * (_adcf[1] + m_dps_filtered[1]) * CORE_PERIOD();
             m_accum.values.z += 0.5f * (_adcf[2] + m_dps_filtered[2]) * CORE_PERIOD();
 
@@ -211,7 +218,7 @@ class Gyro {
 
         void readScaled(imu_align_fun align, vehicle_state_t * vstate)
         {
-            if (!gyroIsReady()) return;
+            if (!gyroDevIsReady()) return;
 
             bool calibrationComplete = m_calibration.cyclesRemaining <= 0;
 
@@ -222,9 +229,9 @@ class Gyro {
                 // move 16-bit gyro data into floats to avoid overflows in
                 // calculations
 
-                _adc.x = gyroReadRaw(0) - m_zero[0];
-                _adc.y = gyroReadRaw(1) - m_zero[1];
-                _adc.z = gyroReadRaw(2) - m_zero[2];
+                _adc.x = gyroDevReadRaw(0) - m_zero[0];
+                _adc.y = gyroDevReadRaw(1) - m_zero[1];
+                _adc.z = gyroDevReadRaw(2) - m_zero[2];
 
                 align(&_adc);
 
@@ -233,9 +240,9 @@ class Gyro {
             }
 
             if (calibrationComplete) {
-                m_dps[0] = _adc.x * (gyroScaleDps() / 32768.);
-                m_dps[1] = _adc.y * (gyroScaleDps() / 32768.);
-                m_dps[2] = _adc.z * (gyroScaleDps() / 32768.);
+                m_dps[0] = _adc.x * (gyroDevScaleDps() / 32768.);
+                m_dps[1] = _adc.y * (gyroDevScaleDps() / 32768.);
+                m_dps[2] = _adc.z * (gyroDevScaleDps() / 32768.);
             }
 
             if (m_downsampleFilterEnabled) {
@@ -293,7 +300,7 @@ class Gyro {
                 uint32_t nextTargetCycles,
                 int32_t desiredPeriodCycles)
         {
-            int32_t skew = cmpTimeCycles(nextTargetCycles, gyroSyncTime()) %
+            int32_t skew = cmpTimeCycles(nextTargetCycles, gyroDevSyncTime()) %
                 desiredPeriodCycles;
 
             if (skew > (desiredPeriodCycles / 2)) {

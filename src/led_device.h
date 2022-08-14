@@ -16,27 +16,19 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <Arduino.h>
+#pragma once
 
-#include "led.h"
+#include <stdbool.h>
+#include <stdint.h>
 
-static bool _on;
-static uint8_t _pin;
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
-void ledDevInit(uint8_t pin)
-{
-    _pin = pin;
-    pinMode(_pin, OUTPUT);
+void ledDevInit(uint8_t pin);
+void ledDevSet(bool on);
+void ledDevToggle(void);
+
+#if defined(__cplusplus)
 }
-
-void ledDevSet(bool on)
-{
-    digitalWrite(_pin, on);
-    _on = on;
-}
-
-void ledDevToggle(void)
-{
-    _on = !_on;
-    ledDevSet(_on);
-}
+#endif

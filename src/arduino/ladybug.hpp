@@ -26,8 +26,12 @@
 #include <motor.h>
 #include <stm32_clock.h>
 
-static core_data_t _hf;
-        
+#include "imu_usfs.h"
+
+static Hackflight::data_t _hf;
+
+static ImuUsfs _imu;
+
 static void ladybug_setup(Receiver::device_funs_t * rxDeviceFuns)
 {
     Wire.begin();
@@ -47,8 +51,9 @@ static void ladybug_setup(Receiver::device_funs_t * rxDeviceFuns)
     stm32_startCycleCounter();
 
     // Always use Serial1 for receiver, no no need to specify
-    hackflightInitFull(
+    Hackflight::init(
             &_hf,
+            &_imu,
             rxDeviceFuns,
             SERIAL_PORT_NONE,
             &anglePidConstants,
@@ -61,5 +66,5 @@ static void ladybug_setup(Receiver::device_funs_t * rxDeviceFuns)
 
 static void ladybug_loop(void)
 {
-    hackflightStep(&_hf);
+    Hackflight::step(&_hf);
 }

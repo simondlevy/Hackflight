@@ -17,16 +17,18 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <math.h>
 #include <stdint.h>
 #include <string.h>
 
 #include "arming.h"
-#include "debug.h"
 #include "deg2rad.h"
 #include "failsafe.h"
 #include "gyro.h"
 #include "hackflight_core.h"
+#include "imu.h"
 #include "led.h"
 #include "motor.h"
 #include "msp.h"
@@ -53,10 +55,9 @@ class Hackflight {
         typedef struct {
 
             HackflightCore::data_t coreData;
-
-            imu_align_fun imuAlignFun;
-            Task::data_t   taskData;
-            Scheduler     scheduler;
+            imu_align_fun          imuAlignFun;
+            Scheduler              scheduler;
+            Task::data_t           taskData;
 
             AttitudeTask attitudeTask;
             MspTask      mspTask;
@@ -86,7 +87,10 @@ class Hackflight {
             }
 
             gyroReadScaled(
-                    &taskData->gyro, data->imuAlignFun, &coreData->vstate);
+                    &taskData->gyro,
+                    taskData->imu,
+                    data->imuAlignFun,
+                    &coreData->vstate);
 
             uint32_t usec = timeMicros();
 
@@ -108,12 +112,12 @@ class Hackflight {
             HackflightCore::step(
                     coreData,
                     usec,
-                    failsafeIsActive(),
+                    taskData->failsafe.isActive(),
                     &motorConfig,
                     mixmotors);
 
             motorWrite(taskData->motorDevice,
-                    armingIsArmed(&taskData->arming) ?
+                    Arming::isArmed(&taskData->arming) ?
                     mixmotors :
                     taskData->mspMotors);
 
@@ -126,11 +130,11 @@ class Hackflight {
             static int32_t _sampleRateStartCycles;
 
             if ((_terminalGyroRateCount == 0)) {
-                _terminalGyroRateCount = gyroInterruptCount() + CORE_RATE_COUNT;
+                _terminalGyroRateCount = gyroDevInterruptCount() + CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
             }
 
-            if (gyroInterruptCount() >= _terminalGyroRateCount) {
+            if (gyroDevInterruptCount() >= _terminalGyroRateCount) {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
@@ -145,15 +149,15 @@ class Hackflight {
             static int32_t _gyroSkewAccum;
 
             int32_t gyroSkew =
-                gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
+                Gyro::getSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 
             if ((_terminalGyroLockCount == 0)) {
-                _terminalGyroLockCount = gyroInterruptCount() + GYRO_LOCK_COUNT;
+                _terminalGyroLockCount = gyroDevInterruptCount() + GYRO_LOCK_COUNT;
             }
 
-            if (gyroInterruptCount() >= _terminalGyroLockCount) {
+            if (gyroDevInterruptCount() >= _terminalGyroLockCount) {
                 _terminalGyroLockCount += GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
@@ -222,7 +226,8 @@ class Hackflight {
     public:
 
         static void init(
-                data_t * full,
+                data_t * data,
+                Imu * imu,
                 Receiver::device_funs_t * rxDeviceFuns,
                 serialPortIdentifier_e rxDevPort,
                 anglePidConstants_t * anglePidConstants,
@@ -232,24 +237,24 @@ class Hackflight {
                 imu_align_fun imuAlign,
                 uint8_t ledPin)
         {
-            HackflightCore::data_t * coreData = &full->coreData;
+            HackflightCore::data_t * coreData = &data->coreData;
             HackflightCore::init(coreData, anglePidConstants, mixer);
-            Task::data_t * taskData = &full->taskData;
+            Task::data_t * taskData = &data->taskData;
 
             mspInit();
             gyroInit(&taskData->gyro);
-            imuInit(imuInterruptPin);
-            ledInit(ledPin);
-            ledFlash(10, 50);
-            failsafeInit();
-            failsafeReset();
+            imuDevInit(imuInterruptPin);
+            ledDevInit(ledPin);
+            Led::flash(10, 50);
+
+            taskData->imu = imu;
 
             taskData->rx.devCheck = rxDeviceFuns->check;
             taskData->rx.devConvert = rxDeviceFuns->convert;
 
             rxDeviceFuns->init(rxDevPort);
 
-            full->imuAlignFun = imuAlign;
+            data->imuAlignFun = imuAlign;
 
             taskData->motorDevice = motorDevice;
 

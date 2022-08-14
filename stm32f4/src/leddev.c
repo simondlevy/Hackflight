@@ -14,25 +14,27 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "led.h"
+#include "led_device.h"
 
 #include "io.h"
 
 static IO_t led;
 
-void ledInit(uint8_t pin)
+void ledDevInit(uint8_t pin)
 {
     led = IOGetByTag(pin);
     IOInit(led, OWNER_LED, RESOURCE_INDEX(0));
     IOConfigGPIO(led, IOCFG_OUT_PP);
 }
 
-void ledToggle(void)
+void ledDevSet(bool on)
+{
+    IOWrite(led, !on);
+}
+
+void ledDevToggle(void)
 {
     IOToggle(led);
 }
 
-void ledSet(bool on)
-{
-    IOWrite(led, !on);
-}
+

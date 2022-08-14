@@ -269,13 +269,8 @@ $(TARGET_DFU): $(TARGET_HEX)
 $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
-		  $(OBJECT_DIR)/arming.o \
 		  $(OBJECT_DIR)/debug.o \
-		  $(OBJECT_DIR)/failsafe.o \
 		  $(OBJECT_DIR)/gyro.o \
-		  $(OBJECT_DIR)/imu.o \
-		  $(OBJECT_DIR)/led.o \
-		  $(OBJECT_DIR)/maths.o \
 		  $(OBJECT_DIR)/msp.o \
 		  $(OBJECT_DIR)/sbus.o \
 		  $(OBJECT_DIR)/stm32_clock.o
@@ -324,28 +319,10 @@ $(OBJECT_DIR)/main.o: main.cpp \
       $(HFSRC_DIR)/serial.h
 	$(V1) $(call compile_cpp)
 
-$(OBJECT_DIR)/arming.o: $(HFSRC_DIR)/arming.cpp \
-      $(HFSRC_DIR)/arming.h \
-      $(HFSRC_DIR)/datatypes.h \
-      $(HFSRC_DIR)/failsafe.h \
-      $(HFSRC_DIR)/led.h \
-      $(HFSRC_DIR)/motor.h \
-      $(HFSRC_DIR)/receiver.h 
-	$(V1) $(call compile_cpp)
-	@echo g++ arming.cpp
-
 $(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.cpp \
 	  $(HFSRC_DIR)/msp.h \
 	  $(HFSRC_DIR)/datatypes.h
 	$(V1) $(call compile_cpp)
-	@echo g++ debug.cpp
-
-$(OBJECT_DIR)/failsafe.o: $(HFSRC_DIR)/failsafe.cpp \
-	  $(HFSRC_DIR)/arming.h \
-	  $(HFSRC_DIR)/debug.h \
-	  $(HFSRC_DIR)/failsafe.h \
-	  $(HFSRC_DIR)/receiver.h \
-	  $(HFSRC_DIR)/time.h
 	$(V1) $(call compile_cpp)
 
 $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
@@ -361,25 +338,6 @@ $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
 	  $(HFSRC_DIR)/time.h
 	$(V1) $(call compile_cpp)
 
-$(OBJECT_DIR)/imu.o: $(HFSRC_DIR)/imu.cpp \
-	  $(HFSRC_DIR)/arming.h \
-	  $(HFSRC_DIR)/core_rate.h \
-	  $(HFSRC_DIR)/datatypes.h \
-	  $(HFSRC_DIR)/deg2rad.h \
-	  $(HFSRC_DIR)/maths.h \
-	  $(HFSRC_DIR)/system.h \
-	  $(HFSRC_DIR)/time.h
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.cpp \
-	  $(HFSRC_DIR)/led.h \
-	  $(HFSRC_DIR)/time.h 
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/maths.o: $(HFSRC_DIR)/maths.cpp \
-	  $(HFSRC_DIR)/maths.h
-	$(V1) $(call compile_cpp)
-
 $(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.cpp \
 	  $(HFSRC_DIR)/datatypes.h \
 	  $(HFSRC_DIR)/debug.h \
@@ -388,21 +346,6 @@ $(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.cpp \
 	  $(HFSRC_DIR)/rad2deg.h \
 	  $(HFSRC_DIR)/serial.h \
 	  $(HFSRC_DIR)/system.h \
-	  $(HFSRC_DIR)/time.h
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/receiver.o: $(HFSRC_DIR)/receiver.cpp \
-	  $(HFSRC_DIR)/arming.h \
-	  $(HFSRC_DIR)/core_dt.h \
-	  $(HFSRC_DIR)/datatypes.h \
-	  $(HFSRC_DIR)/failsafe.h \
-	  $(HFSRC_DIR)/filters/pt3.h \
-	  $(HFSRC_DIR)/led.h \
-	  $(HFSRC_DIR)/maths.h \
-	  $(HFSRC_DIR)/motor.h \
-	  $(HFSRC_DIR)/pwm.h \
-	  $(HFSRC_DIR)/receiver.h \
-	  $(HFSRC_DIR)/scale.h \
 	  $(HFSRC_DIR)/time.h
 	$(V1) $(call compile_cpp)
 

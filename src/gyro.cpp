@@ -23,10 +23,6 @@ static const uint16_t LPF1_DYN_MIN_HZ                = 250;
 static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
 static const uint16_t LPF2_STATIC_HZ                 = 500;
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 static uint32_t calculateCalibratingCycles(void)
 {
     return CALIBRATION_DURATION / CORE_PERIOD();
@@ -103,8 +99,8 @@ static void calibrate(gyro_t * gyro)
         }
 
         // Sum up CALIBRATING_GYRO_TIME_US readings
-        gyro->calibration.sum[axis] += gyroReadRaw(axis);
-        devPush(&gyro->calibration.var[axis], gyroReadRaw(axis));
+        gyro->calibration.sum[axis] += gyroDevReadRaw(axis);
+        devPush(&gyro->calibration.var[axis], gyroDevReadRaw(axis));
 
         if (gyro->calibration.cyclesRemaining == 1) {
             const float stddev = devStandardDeviation(&gyro->calibration.var[axis]);
@@ -141,9 +137,13 @@ void gyroInit(gyro_t * gyro)
     setCalibrationCycles(gyro); // start calibrating
 }
 
-void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
+void gyroReadScaled(
+        gyro_t *gyro,
+        Imu * imu,
+        imu_align_fun align,
+        vehicle_state_t * vstate)
 {
-    if (!gyroIsReady()) return;
+    if (!gyroDevIsReady()) return;
 
     bool calibrationComplete = gyro->calibration.cyclesRemaining <= 0;
 
@@ -153,9 +153,9 @@ void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
 
         // move 16-bit gyro data into floats to avoid overflows in calculations
 
-        _adc.x = gyroReadRaw(0) - gyro->zero[0];
-        _adc.y = gyroReadRaw(1) - gyro->zero[1];
-        _adc.z = gyroReadRaw(2) - gyro->zero[2];
+        _adc.x = gyroDevReadRaw(0) - gyro->zero[0];
+        _adc.y = gyroDevReadRaw(1) - gyro->zero[1];
+        _adc.z = gyroDevReadRaw(2) - gyro->zero[2];
 
         align(&_adc);
 
@@ -164,9 +164,9 @@ void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
     }
 
     if (calibrationComplete) {
-        gyro->dps[0] = _adc.x * (gyroScaleDps() / 32768.);
-        gyro->dps[1] = _adc.y * (gyroScaleDps() / 32768.);
-        gyro->dps[2] = _adc.z * (gyroScaleDps() / 32768.);
+        gyro->dps[0] = _adc.x * (gyroDevScaleDps() / 32768.);
+        gyro->dps[1] = _adc.y * (gyroDevScaleDps() / 32768.);
+        gyro->dps[2] = _adc.z * (gyroDevScaleDps() / 32768.);
     }
 
     if (gyro->downsampleFilterEnabled) {
@@ -212,7 +212,7 @@ void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
 
 
     // Used for quaternion filter; stubbed otherwise
-    imuAccumulateGyro(gyro);
+    imu->accumulateGyro(gyro);
 
     vstate->dphi   = gyro->dps_filtered[0];
     vstate->dtheta = gyro->dps_filtered[1];
@@ -220,19 +220,3 @@ void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
 
     gyro->isCalibrating = !calibrationComplete;
 }
-
-int32_t gyroGetSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
-{
-    int32_t gyroSkew =
-        cmpTimeCycles(nextTargetCycles, gyroSyncTime()) % desiredPeriodCycles;
-
-    if (gyroSkew > (desiredPeriodCycles / 2)) {
-        gyroSkew -= desiredPeriodCycles;
-    }
-
-    return gyroSkew;
-}
-
-#if defined(__cplusplus)
-}
-#endif

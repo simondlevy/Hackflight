@@ -18,22 +18,33 @@
 
 #pragma once
 
+#include "arming.h"
 #include "datatypes.h"
+#include "deg2rad.h"
+#include "imu.h"
 
-void imuAccumulateGyro(gyro_t * gyro);
+class Imu {
 
-void imuGetEulerAngles(
-        gyro_t * gyro,
-        imu_fusion_t * imuFusionPrev,
-        arming_t * arming,
-        uint32_t time,
-        vehicle_state_t * vstate);
+    public:
+
+        virtual void accumulateGyro(gyro_t * gyro) 
+        {
+            (void)gyro;
+        }
+
+        virtual void getEulerAngles(
+                gyro_t * gyro,
+                imu_fusion_t * fusionPrev,
+                Arming::data_t * arming,
+                uint32_t time,
+                vehicle_state_t * vstate) = 0;
+};
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-    void    imuInit(uint8_t interruptPin);
+    void  imuDevInit(uint8_t interruptPin);
 
 #if defined(__cplusplus)
 }

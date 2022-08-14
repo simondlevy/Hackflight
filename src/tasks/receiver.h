@@ -77,6 +77,7 @@ class ReceiverTask : public Task {
                     &rxax,
                     data->motorDevice,
                     &data->arming,
+                    &data->failsafe,
                     &pidItermResetReady,
                     &pidItermResetValue,
                     &gotNewData);

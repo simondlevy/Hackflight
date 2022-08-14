@@ -23,7 +23,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 #include "atomic.h"
 #include "io.h"
-#include "led.h"
+#include "led_device.h"
 #include "nvic.h"
 #include "resource.h"
 #include "systemdev.h"
@@ -142,12 +142,12 @@ static void indicate(uint8_t count, uint16_t duration)
 {
     if (count) {
 
-        ledSet(false);
+        ledDevSet(false);
 
         while (count--) {
-            ledToggle();
+            ledDevToggle();
             delay(duration);
-            ledToggle();
+            ledDevToggle();
             delay(duration);
         }
     }

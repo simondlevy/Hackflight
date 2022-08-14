@@ -23,7 +23,7 @@
 #include <core_rate.h>
 #include <datatypes.h>
 #include <hackflight_full.h>
-#include <imu.h>
+#include <imu_fusion.h>
 #include <imu_alignment/rotate_270.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <receivers/sbus.h>
@@ -44,8 +44,11 @@ int main(void)
 
     Hackflight::data_t hf = {};
 
+    ImuFusion imu;
+
     Hackflight::init(
             &hf,
+            &imu,
             &sbusDeviceFuns,
             SERIAL_PORT_USART3, // RX port
             &anglePidConstants,

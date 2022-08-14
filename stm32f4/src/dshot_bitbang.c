@@ -19,7 +19,6 @@
 #include <string.h>
 
 #include <motor.h>
-#include <arming.h>
 
 #include "platform.h"
 #include "io.h"
@@ -586,10 +585,3 @@ motorDevice_t *dshotBitbangDevInit(uint8_t count)
 
     return &bbDevice;
 }
-
-
-void motorCheckDshotBitbangStatus(arming_t * arming)
-{
-    armingSetDshotBitbangOkay(arming, dshotBitbangGetStatus() == DSHOT_BITBANG_STATUS_OK);
-}
-

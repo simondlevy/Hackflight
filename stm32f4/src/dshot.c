@@ -18,7 +18,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <math.h>
 
-#include <arming.h>
 #include <maths.h>
 #include <motor.h>
 #include <motor.h>

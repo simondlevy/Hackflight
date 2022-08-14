@@ -16,15 +16,11 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <stdarg.h>
-#include <stdlib.h>
 
 #include "debug.h"
-#include "msp.h"
 #include "serial.h"
 
 typedef void (*putcf) (void *, char);
-extern putcf stdout_putf;
 
 static void * printfSerialPort;
 
@@ -109,8 +105,6 @@ static void i2a(int num, char *bf)
     }
     ui2a(num, 10, 0, bf);
 }
-
-putcf stdout_putf;
 
 // print bf, padded from left to at least n characters.
 // padding is zero ('0') if z!=0, space (' ') otherwise
@@ -213,6 +207,8 @@ static void _putc(void *p, char c)
 
 // ----------------------------------------------------------------------------
 
+putcf stdout_putf;
+
 void debugFlush(void)
 {
     while (!serialIsTransmitBufferEmpty(printfSerialPort));
@@ -220,6 +216,8 @@ void debugFlush(void)
 
 void debugPrintf(const char *fmt, ...)
 {
+    void mspTriggerDebugging(void);
+
     va_list va;
     va_start(va, fmt);
     tfp_format(NULL, stdout_putf, fmt, va);
