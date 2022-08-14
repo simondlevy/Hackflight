@@ -64,6 +64,56 @@ class Msp {
             return (int16_t)rad2deg(rad);
         }
 
+        // streambuf ------------------------------------------------------------------
+
+        typedef struct sbuf_s {
+            uint8_t *ptr;          // data pointer must be first (sbuf_t* is equivalent to uint8_t **)
+            uint8_t *end;
+        } sbuf_t;
+
+        static void sbufWriteU8(sbuf_t *dst, uint8_t val)
+        {
+            *dst->ptr++ = val;
+        }
+
+        static void sbufWriteU16(sbuf_t *dst, uint16_t val)
+        {
+            sbufWriteU8(dst, val >> 0);
+            sbufWriteU8(dst, val >> 8);
+        }
+
+        static uint8_t sbufReadU8(sbuf_t *src)
+        {
+            return *src->ptr++;
+        }
+
+        static uint16_t sbufReadU16(sbuf_t *src)
+        {
+            uint16_t ret;
+            ret = sbufReadU8(src);
+            ret |= sbufReadU8(src) << 8;
+            return ret;
+        }
+
+        // reader - return bytes remaining in buffer
+        // writer - return available space
+        static int sbufBytesRemaining(sbuf_t *buf)
+        {
+            return buf->end - buf->ptr;
+        }
+
+        static uint8_t* sbufPtr(sbuf_t *buf)
+        {
+            return buf->ptr;
+        }
+
+        // modifies streambuf so that written data are prepared for reading
+        static void sbufSwitchToReader(sbuf_t *buf, uint8_t *base)
+        {
+            buf->end = buf->ptr;
+            buf->ptr = base;
+        }
+
 
 }; // class Msp
 
