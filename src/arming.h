@@ -36,6 +36,7 @@ class Arming {
             bool switch_okay;
             bool gyro_done_calibrating;
             bool is_armed;
+            Led  led;
             bool rx_failsafe_okay;
             bool throttle_is_down;
 
