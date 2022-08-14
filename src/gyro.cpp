@@ -103,8 +103,8 @@ static void calibrate(gyro_t * gyro)
         }
 
         // Sum up CALIBRATING_GYRO_TIME_US readings
-        gyro->calibration.sum[axis] += gyroReadRaw(axis);
-        devPush(&gyro->calibration.var[axis], gyroReadRaw(axis));
+        gyro->calibration.sum[axis] += gyroDevReadRaw(axis);
+        devPush(&gyro->calibration.var[axis], gyroDevReadRaw(axis));
 
         if (gyro->calibration.cyclesRemaining == 1) {
             const float stddev = devStandardDeviation(&gyro->calibration.var[axis]);
@@ -153,9 +153,9 @@ void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
 
         // move 16-bit gyro data into floats to avoid overflows in calculations
 
-        _adc.x = gyroReadRaw(0) - gyro->zero[0];
-        _adc.y = gyroReadRaw(1) - gyro->zero[1];
-        _adc.z = gyroReadRaw(2) - gyro->zero[2];
+        _adc.x = gyroDevReadRaw(0) - gyro->zero[0];
+        _adc.y = gyroDevReadRaw(1) - gyro->zero[1];
+        _adc.z = gyroDevReadRaw(2) - gyro->zero[2];
 
         align(&_adc);
 

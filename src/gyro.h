@@ -36,9 +36,9 @@ extern "C" {
     void     gyroDevInit(void);
     uint32_t gyroDevInterruptCount(void);
     bool     gyroDevIsReady(void);
+    int16_t  gyroDevReadRaw(uint8_t k);
 
     void     gyroInit(gyro_t * gyro);
-    int16_t  gyroReadRaw(uint8_t k);
     void     gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate);
     uint16_t gyroScaleDps(void);
     uint32_t gyroSyncTime(void);
@@ -154,8 +154,8 @@ class Gyro {
                 }
 
                 // Sum up CALIBRATING_GYRO_TIME_US readings
-                m_calibration.sum[axis] += gyroReadRaw(axis);
-                devPush(&m_calibration.var[axis], gyroReadRaw(axis));
+                m_calibration.sum[axis] += gyroDevReadRaw(axis);
+                devPush(&m_calibration.var[axis], gyroDevReadRaw(axis));
 
                 if (m_calibration.cyclesRemaining == 1) {
                     const float stddev =
@@ -222,9 +222,9 @@ class Gyro {
                 // move 16-bit gyro data into floats to avoid overflows in
                 // calculations
 
-                _adc.x = gyroReadRaw(0) - m_zero[0];
-                _adc.y = gyroReadRaw(1) - m_zero[1];
-                _adc.z = gyroReadRaw(2) - m_zero[2];
+                _adc.x = gyroDevReadRaw(0) - m_zero[0];
+                _adc.y = gyroDevReadRaw(1) - m_zero[1];
+                _adc.z = gyroDevReadRaw(2) - m_zero[2];
 
                 align(&_adc);
 

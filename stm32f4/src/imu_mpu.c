@@ -346,7 +346,7 @@ uint32_t gyroSyncTime(void)
     return gyroDev.gyroSyncEXTI;
 }
 
-int16_t gyroReadRaw(uint8_t k)
+int16_t gyroDevReadRaw(uint8_t k)
 {
     return gyroDev.adcRaw[k];
 }
