@@ -21,6 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 
 #include "datatypes.h"
+#include "rad2deg.h"
 #include "receiver.h"
 
 #if defined(__cplusplus)
@@ -57,6 +58,11 @@ class Msp {
         static const uint8_t RC        = 105;
         static const uint8_t ATTITUDE  = 108;    
         static const uint8_t SET_MOTOR = 214;    
+
+        static int16_t rad2degi(float rad)
+        {
+            return (int16_t)rad2deg(rad);
+        }
 
 
 }; // class Msp
