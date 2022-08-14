@@ -272,7 +272,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/debug.o \
 		  $(OBJECT_DIR)/gyro.o \
 		  $(OBJECT_DIR)/imu.o \
-		  $(OBJECT_DIR)/led.o \
 		  $(OBJECT_DIR)/maths.o \
 		  $(OBJECT_DIR)/msp.o \
 		  $(OBJECT_DIR)/sbus.o \
@@ -349,11 +348,6 @@ $(OBJECT_DIR)/imu.o: $(HFSRC_DIR)/imu.cpp \
 	  $(HFSRC_DIR)/maths.h \
 	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.cpp \
-	  $(HFSRC_DIR)/led.h \
-	  $(HFSRC_DIR)/time.h 
 	$(V1) $(call compile_cpp)
 
 $(OBJECT_DIR)/maths.o: $(HFSRC_DIR)/maths.cpp \

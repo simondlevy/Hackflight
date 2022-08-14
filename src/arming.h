@@ -143,12 +143,12 @@ class Arming {
                 }
 
                 if (!readyToArm(data)) {
-                    ledWarningFlash();
+                    data->led.warningFlash();
                 } else {
-                    ledWarningDisable();
+                    data->led.warningDisable();
                 }
 
-                ledWarningUpdate();
+                data->led.warningUpdate();
             }
         }
 
