@@ -33,19 +33,21 @@
 extern "C" {
 #endif
 
+    // Device functions
     void     gyroDevInit(void);
     uint32_t gyroDevInterruptCount(void);
     bool     gyroDevIsReady(void);
     int16_t  gyroDevReadRaw(uint8_t k);
     uint16_t gyroDevScaleDps(void);
-
-    void     gyroInit(gyro_t * gyro);
-    void     gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate);
     uint32_t gyroDevSyncTime(void);
+
 
 #if defined(__cplusplus)
 }
 #endif
+
+void gyroInit(gyro_t * gyro);
+void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate);
 
 class Gyro {
 

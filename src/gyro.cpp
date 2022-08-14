@@ -23,10 +23,6 @@ static const uint16_t LPF1_DYN_MIN_HZ                = 250;
 static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
 static const uint16_t LPF2_STATIC_HZ                 = 500;
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 static uint32_t calculateCalibratingCycles(void)
 {
     return CALIBRATION_DURATION / CORE_PERIOD();
@@ -220,7 +216,3 @@ void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
 
     gyro->isCalibrating = !calibrationComplete;
 }
-
-#if defined(__cplusplus)
-}
-#endif
