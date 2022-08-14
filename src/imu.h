@@ -30,6 +30,31 @@ void imuGetEulerAngles(
         uint32_t time,
         vehicle_state_t * vstate);
 
+class Imu {
+
+    public:
+
+        void accumulateGyro(gyro_t * gyro)
+        {
+            (void)gyro;
+        }
+
+        void getEulerAngles(
+                gyro_t * gyro,
+                imu_fusion_t * imuFusionPrev,
+                Arming::data_t * arming,
+                uint32_t time,
+                vehicle_state_t * vstate)
+        {
+            (void)gyro;
+            (void)imuFusionPrev;
+            (void)arming;
+            (void)time;
+            (void)vstate;
+        }
+
+};
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
