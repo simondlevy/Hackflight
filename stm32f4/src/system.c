@@ -142,12 +142,12 @@ static void indicate(uint8_t count, uint16_t duration)
 {
     if (count) {
 
-        ledSet(false);
+        ledDevSet(false);
 
         while (count--) {
-            ledToggle();
+            ledDevToggle();
             delay(duration);
-            ledToggle();
+            ledDevToggle();
             delay(duration);
         }
     }

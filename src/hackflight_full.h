@@ -238,7 +238,7 @@ class Hackflight {
             mspInit();
             gyroInit(&taskData->gyro);
             imuInit(imuInterruptPin);
-            ledInit(ledPin);
+            ledDevInit(ledPin);
             ledFlash(10, 50);
 
             taskData->rx.devCheck = rxDeviceFuns->check;

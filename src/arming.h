@@ -123,7 +123,7 @@ class Arming {
                 bool calibrating) 
         {
             if (data->is_armed) {
-                ledSet(true);
+                ledDevSet(true);
             } else {
 
                 data->throttle_is_down = throttleIsDown(raw);

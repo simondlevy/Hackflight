@@ -19,7 +19,6 @@
 #include "led.h"
 #include "time.h"
 
-static uint32_t warningLedTimer = 0;
 
 typedef enum {
     WARNING_LED_OFF = 0,
@@ -28,18 +27,19 @@ typedef enum {
 } warningLedState_e;
 
 static warningLedState_e warningLedState = WARNING_LED_OFF;
+static uint32_t warningLedTimer = 0;
 
 static void warningLedRefresh(void)
 {
     switch (warningLedState) {
         case WARNING_LED_OFF:
-            ledSet(false);
+            ledDevSet(false);
             break;
         case WARNING_LED_ON:
-            ledSet(true);
+            ledDevSet(true);
             break;
         case WARNING_LED_FLASH:
-            ledToggle();
+            ledDevToggle();
             break;
     }
 
@@ -48,6 +48,17 @@ static void warningLedRefresh(void)
 }
 
 // ----------------------------------------------------------------------------
+
+void ledFlash(uint8_t reps, uint16_t delayMs)
+{
+    ledDevSet(false);
+    for (uint8_t i=0; i<reps; i++) {
+        ledDevToggle();
+        delayMillis(delayMs);
+    }
+    ledDevSet(false);
+}
+
 
 void ledWarningDisable(void)
 {
@@ -70,12 +81,4 @@ void ledWarningUpdate(void)
     warningLedRefresh();
 }
 
-void ledFlash(uint8_t reps, uint16_t delayMs)
-{
-    ledSet(false);
-    for (uint8_t i=0; i<reps; i++) {
-        ledToggle();
-        delayMillis(delayMs);
-    }
-    ledSet(false);
-}
+

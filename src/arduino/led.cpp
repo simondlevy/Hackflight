@@ -23,20 +23,20 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 static bool _on;
 static uint8_t _pin;
 
-void ledInit(uint8_t pin)
+void ledDevInit(uint8_t pin)
 {
     _pin = pin;
     pinMode(_pin, OUTPUT);
 }
 
-void ledSet(bool on)
+void ledDevSet(bool on)
 {
     digitalWrite(_pin, on);
     _on = on;
 }
 
-void ledToggle(void)
+void ledDevToggle(void)
 {
     _on = !_on;
-    ledSet(_on);
+    ledDevSet(_on);
 }

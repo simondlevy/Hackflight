@@ -25,13 +25,14 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 extern "C" {
 #endif
 
+void ledDevInit(uint8_t pin);
+void ledDevSet(bool on);
+void ledDevToggle(void);
+
 void ledFlash(uint8_t reps, uint16_t delayMs);
-void ledInit(uint8_t pin);
 void ledWarningDisable(void);
-void ledWarningUpdate(void);
 void ledWarningFlash(void);
-void ledSet(bool on);
-void ledToggle(void);
+void ledWarningUpdate(void);
 
 #if defined(__cplusplus)
 }
