@@ -66,7 +66,7 @@ extern "C" {
         return _gyroInterruptCount;
     }
 
-    bool gyroIsReady(void)
+    bool gyroDevIsReady(void)
     {
         bool result = false;
 

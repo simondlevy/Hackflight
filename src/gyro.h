@@ -35,9 +35,9 @@ extern "C" {
 
     void     gyroDevInit(void);
     uint32_t gyroDevInterruptCount(void);
+    bool     gyroDevIsReady(void);
 
     void     gyroInit(gyro_t * gyro);
-    bool     gyroIsReady(void);
     int16_t  gyroReadRaw(uint8_t k);
     void     gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate);
     uint16_t gyroScaleDps(void);
@@ -211,7 +211,7 @@ class Gyro {
 
         void readScaled(imu_align_fun align, vehicle_state_t * vstate)
         {
-            if (!gyroIsReady()) return;
+            if (!gyroDevIsReady()) return;
 
             bool calibrationComplete = m_calibration.cyclesRemaining <= 0;
 

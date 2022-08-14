@@ -330,7 +330,7 @@ uint32_t gyroDevInterruptCount(void)
     return gyroDev.detectedEXTI;
 }
 
-bool  gyroIsReady(void)
+bool  gyroDevIsReady(void)
 {
     bool ready = gyroDev.readFn(&gyroDev);
 

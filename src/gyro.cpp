@@ -143,7 +143,7 @@ void gyroInit(gyro_t * gyro)
 
 void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
 {
-    if (!gyroIsReady()) return;
+    if (!gyroDevIsReady()) return;
 
     bool calibrationComplete = gyro->calibration.cyclesRemaining <= 0;
 
