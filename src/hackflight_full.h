@@ -237,7 +237,7 @@ class Hackflight {
 
             mspInit();
             gyroInit(&taskData->gyro);
-            imuInit(imuInterruptPin);
+            imuDevInit(imuInterruptPin);
             ledDevInit(ledPin);
             Led::flash(10, 50);
 

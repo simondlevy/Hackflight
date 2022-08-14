@@ -370,7 +370,7 @@ uint16_t gyroSetSampleRate(gyroDev_t *gyro)
     return 8000;
 }
 
-void imuInit(uint8_t interruptPin)
+void imuDevInit(uint8_t interruptPin)
 {
     (void)interruptPin;
 

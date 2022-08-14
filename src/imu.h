@@ -34,7 +34,7 @@ void imuGetEulerAngles(
 extern "C" {
 #endif
 
-    void    imuInit(uint8_t interruptPin);
+    void  imuDevInit(uint8_t interruptPin);
 
 #if defined(__cplusplus)
 }
