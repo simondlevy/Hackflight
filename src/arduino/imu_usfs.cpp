@@ -99,7 +99,7 @@ extern "C" {
         return _gyroAdc[k];
     }
 
-    uint16_t gyroScaleDps(void)
+    uint16_t gyroDevScaleDps(void)
     {
         return GYRO_SCALE_DPS;
     }

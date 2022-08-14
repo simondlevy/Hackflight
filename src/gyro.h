@@ -37,10 +37,10 @@ extern "C" {
     uint32_t gyroDevInterruptCount(void);
     bool     gyroDevIsReady(void);
     int16_t  gyroDevReadRaw(uint8_t k);
+    uint16_t gyroDevScaleDps(void);
 
     void     gyroInit(gyro_t * gyro);
     void     gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate);
-    uint16_t gyroScaleDps(void);
     uint32_t gyroSyncTime(void);
 
 #if defined(__cplusplus)
@@ -233,9 +233,9 @@ class Gyro {
             }
 
             if (calibrationComplete) {
-                m_dps[0] = _adc.x * (gyroScaleDps() / 32768.);
-                m_dps[1] = _adc.y * (gyroScaleDps() / 32768.);
-                m_dps[2] = _adc.z * (gyroScaleDps() / 32768.);
+                m_dps[0] = _adc.x * (gyroDevScaleDps() / 32768.);
+                m_dps[1] = _adc.y * (gyroDevScaleDps() / 32768.);
+                m_dps[2] = _adc.z * (gyroDevScaleDps() / 32768.);
             }
 
             if (m_downsampleFilterEnabled) {

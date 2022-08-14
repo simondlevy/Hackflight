@@ -320,7 +320,7 @@ void gyroDevInit(void)
     gyroDev.initFn(&gyroDev);
 }
 
-uint16_t gyroScaleDps(void)
+uint16_t gyroDevScaleDps(void)
 {
     return gyroDev.scaleDps;
 }
