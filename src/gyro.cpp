@@ -221,18 +221,6 @@ void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
     gyro->isCalibrating = !calibrationComplete;
 }
 
-int32_t gyroGetSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
-{
-    int32_t gyroSkew =
-        cmpTimeCycles(nextTargetCycles, gyroSyncTime()) % desiredPeriodCycles;
-
-    if (gyroSkew > (desiredPeriodCycles / 2)) {
-        gyroSkew -= desiredPeriodCycles;
-    }
-
-    return gyroSkew;
-}
-
 #if defined(__cplusplus)
 }
 #endif

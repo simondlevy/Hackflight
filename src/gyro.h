@@ -182,7 +182,7 @@ class Gyro {
             static float _adcf[3];
 
             // integrate using trapezium rule to avoid bias
-            m_accum.values.x += 0.5f * (_adcf[0] + m_dps_filtered[0]) * CORE_PERIOD();
+            m_accum.values.x +=0.5f * (_adcf[0] + m_dps_filtered[0]) * CORE_PERIOD();
             m_accum.values.y += 0.5f * (_adcf[1] + m_dps_filtered[1]) * CORE_PERIOD();
             m_accum.values.z += 0.5f * (_adcf[2] + m_dps_filtered[2]) * CORE_PERIOD();
 

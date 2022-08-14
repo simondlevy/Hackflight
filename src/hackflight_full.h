@@ -144,7 +144,7 @@ class Hackflight {
             static int32_t _gyroSkewAccum;
 
             int32_t gyroSkew =
-                gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
+                Gyro::getSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 
