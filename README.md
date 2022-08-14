@@ -33,13 +33,6 @@ Currently, Hackflight has been tested on the following platforms:
 
 * [MultiSim](https://github.com/simondlevy/MultiSim) flight simulator based on UnrealEngine
 
-Simulators can use just the <b>.h</b> files in the
-[src](https://github.com/simondlevy/Hackflight/tree/master/src) directory, which contain the
-basic control algorithms (open-loop control / PID control).  Real flight
-controllers use the code in the <b>.c</b> files located in that directory
-directory and in the [stm32/src](https://github.com/simondlevy/Hackflight/tree/master/stm32/src) directory,
-which contain code for real-time scheduling and for reading from physical sensors and R/C receivers.
-
 ## Design principles
 
 Hackflight attempts to maintain a simple relationship between
