@@ -198,7 +198,7 @@ class Imu {
         }
     public:
 
-        static void accumulateGyro(gyro_t * gyro)
+        void accumulateGyro(gyro_t * gyro)
         {
             static float _adcf[3];
 
@@ -217,7 +217,7 @@ class Imu {
             }
         }
 
-        static void getEulerAngles(
+        void getEulerAngles(
                 gyro_t * gyro,
                 imu_fusion_t * fusionPrev,
                 Arming::data_t * arming,
