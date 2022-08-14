@@ -22,9 +22,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "macros.h"
 
-#include "arming.h"
 #include "core_rate.h"
-#include "deg2rad.h"
+#include "imu.h"
 #include "system.h"
 #include "time.h"
 
