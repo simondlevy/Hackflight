@@ -69,11 +69,12 @@ class Msp {
         }
 
         void * m_dbgPort = NULL;
+        bool   m_debugging = false;
 
         // streambuf ------------------------------------------------------------------
 
         typedef struct sbuf_s {
-            uint8_t *ptr;          // data pointer must be first (sbuf_t* is equivalent to uint8_t **)
+            uint8_t *ptr;  
             uint8_t *end;
         } sbuf_t;
 
@@ -541,6 +542,18 @@ class Msp {
             mspProcessReplyFn(&reply);
 
             msp->state = IDLE;
+        }
+
+        Msp(void)
+        {
+            memset(mspPorts, 0, sizeof(mspPorts));
+            serialAllocatePort();
+            debugSetPort(m_dbgPort);
+        }
+
+        void triggerDebugging(void)
+        {
+            m_debugging = true;
         }
 
 
