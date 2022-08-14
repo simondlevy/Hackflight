@@ -21,7 +21,6 @@
 
 #include "datatypes.h"
 #include "debug.h"
-//#include "maths.h"
 #include "pids/angle.h"
 
 class HackflightCore {
