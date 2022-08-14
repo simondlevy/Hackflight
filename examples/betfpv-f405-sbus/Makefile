@@ -320,7 +320,7 @@ $(OBJECT_DIR)/main.o: main.cpp \
       $(HFSRC_DIR)/serial.h
 	$(V1) $(call compile_cpp)
 
-$(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.cpp \
+$(OBJECT_DIR)/debug.o: $(STM_SRC_DIR)/debug.cpp \
 	  $(HFSRC_DIR)/msp.h \
 	  $(HFSRC_DIR)/datatypes.h
 	$(V1) $(call compile_cpp)
