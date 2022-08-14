@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 #include "datatypes.h"
-#include "debug.h"
+#include "receiver.h"
 #include "serial.h"
 #include "time.h"
 
@@ -68,7 +68,7 @@ static void dsmxDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
 
 uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs)
 {
-    uint8_t result = RX_FRAME_PENDING;
+    uint8_t result = Receiver::FRAME_PENDING;
 
     if (_frameComplete) {
 
@@ -87,7 +87,7 @@ uint8_t rxDevCheckDsmx(uint16_t * channelData, uint32_t * frameTimeUs)
             }
         }
 
-        result = RX_FRAME_COMPLETE;
+        result = Receiver::FRAME_COMPLETE;
     }
 
     return result;

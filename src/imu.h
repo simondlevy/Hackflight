@@ -23,15 +23,6 @@
 #include "deg2rad.h"
 #include "imu.h"
 
-void imuAccumulateGyro(gyro_t * gyro);
-
-void imuGetEulerAngles(
-        gyro_t * gyro,
-        imu_fusion_t * imuFusionPrev,
-        Arming::data_t * arming,
-        uint32_t time,
-        vehicle_state_t * vstate);
-
 class Imu {
 
     public:

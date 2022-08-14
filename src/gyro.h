@@ -47,7 +47,12 @@ extern "C" {
 #endif
 
 void gyroInit(gyro_t * gyro);
-void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate);
+
+void gyroReadScaled(
+        gyro_t *gyro,
+        Imu * imu,
+        imu_align_fun align,
+        vehicle_state_t * vstate);
 
 class Gyro {
 

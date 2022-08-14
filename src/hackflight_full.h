@@ -17,12 +17,13 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <math.h>
 #include <stdint.h>
 #include <string.h>
 
 #include "arming.h"
-#include "debug.h"
 #include "deg2rad.h"
 #include "failsafe.h"
 #include "gyro.h"
@@ -86,7 +87,10 @@ class Hackflight {
             }
 
             gyroReadScaled(
-                    &taskData->gyro, data->imuAlignFun, &coreData->vstate);
+                    &taskData->gyro,
+                    taskData->imu,
+                    data->imuAlignFun,
+                    &coreData->vstate);
 
             uint32_t usec = timeMicros();
 
@@ -222,7 +226,7 @@ class Hackflight {
     public:
 
         static void init(
-                data_t * full,
+                data_t * data,
                 Imu * imu,
                 Receiver::device_funs_t * rxDeviceFuns,
                 serialPortIdentifier_e rxDevPort,
@@ -233,11 +237,9 @@ class Hackflight {
                 imu_align_fun imuAlign,
                 uint8_t ledPin)
         {
-            (void)imu;
-
-            HackflightCore::data_t * coreData = &full->coreData;
+            HackflightCore::data_t * coreData = &data->coreData;
             HackflightCore::init(coreData, anglePidConstants, mixer);
-            Task::data_t * taskData = &full->taskData;
+            Task::data_t * taskData = &data->taskData;
 
             mspInit();
             gyroInit(&taskData->gyro);
@@ -245,12 +247,14 @@ class Hackflight {
             ledDevInit(ledPin);
             Led::flash(10, 50);
 
+            taskData->imu = imu;
+
             taskData->rx.devCheck = rxDeviceFuns->check;
             taskData->rx.devConvert = rxDeviceFuns->convert;
 
             rxDeviceFuns->init(rxDevPort);
 
-            full->imuAlignFun = imuAlign;
+            data->imuAlignFun = imuAlign;
 
             taskData->motorDevice = motorDevice;
 

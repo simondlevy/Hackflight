@@ -21,7 +21,7 @@
 #include <hackflight_full.h>
 #include <arduino/ladybug.hpp>
 
-#include <rx/dsmx.h>
+#include <receivers/dsmx.h>
 
 void setup(void)
 {

@@ -137,7 +137,11 @@ void gyroInit(gyro_t * gyro)
     setCalibrationCycles(gyro); // start calibrating
 }
 
-void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
+void gyroReadScaled(
+        gyro_t *gyro,
+        Imu * imu,
+        imu_align_fun align,
+        vehicle_state_t * vstate)
 {
     if (!gyroDevIsReady()) return;
 
@@ -208,7 +212,7 @@ void gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate)
 
 
     // Used for quaternion filter; stubbed otherwise
-    imuAccumulateGyro(gyro);
+    imu->accumulateGyro(gyro);
 
     vstate->dphi   = gyro->dps_filtered[0];
     vstate->dtheta = gyro->dps_filtered[1];

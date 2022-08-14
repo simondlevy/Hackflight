@@ -23,6 +23,8 @@
 
 #include <imu.h>
 
+#include "imu_usfs.h"
+
 static const uint8_t  GYRO_RATE_TENTH = 100;   // 1/10th actual rate
 static const uint16_t GYRO_SCALE_DPS  = 2000;
 
@@ -37,9 +39,9 @@ static const uint16_t ACCEL_SCALE      = 8;
 static const uint16_t MAG_SCALE        = 1000;
 
 static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
-                                        USFS_INTERRUPT_ERROR |
-                                        USFS_INTERRUPT_GYRO | 
-                                        USFS_INTERRUPT_QUAT;
+USFS_INTERRUPT_ERROR |
+USFS_INTERRUPT_GYRO | 
+USFS_INTERRUPT_QUAT;
 
 static const uint8_t REPORT_HZ = 2;
 
@@ -47,10 +49,8 @@ static int16_t _gyroAdc[3];
 static float _qw, _qx, _qy, _qz;
 
 static volatile bool _gotNewData;
-
 static volatile uint32_t _gyroInterruptCount;
 static volatile uint32_t _gyroDevSyncTime;
-
 
 static void interruptHandler()
 {
@@ -109,7 +109,7 @@ extern "C" {
         return _gyroDevSyncTime;
     }
 
-    void imuInit(uint8_t interruptPin)
+    void imuDevInit(uint8_t interruptPin)
     {
         Wire.setClock(400000); 
         delay(100);
@@ -133,26 +133,21 @@ extern "C" {
         usfsCheckStatus();
     }
 
+}
 
-    void imuGetEulerAngles(core_data_t * hf, uint32_t time)
-    {
-        vehicle_state_t * vstate = &hf->vstate;
+void ImuUsfs::getEulerAngles(
+        gyro_t * gyro,
+        imu_fusion_t * fusionPrev,
+        Arming::data_t * arming,
+        uint32_t time,
+        vehicle_state_t * vstate) 
+{
+    vstate->phi   = atan2(2.0f*(_qw*_qx+_qy*_qz), _qw*_qw-_qx*_qx-_qy*_qy+_qz*_qz);
+    vstate->theta = asin(2.0f*(_qx*_qz-_qw*_qy));
+    vstate->psi   = atan2(2.0f*(_qx*_qy+_qw*_qz), _qw*_qw+_qx*_qx-_qy*_qy-_qz*_qz);
 
-        vstate->phi   = atan2(2.0f*(_qw*_qx+_qy*_qz), _qw*_qw-_qx*_qx-_qy*_qy+_qz*_qz);
-        vstate->theta = asin(2.0f*(_qx*_qz-_qw*_qy));
-        vstate->psi   = atan2(2.0f*(_qx*_qy+_qw*_qz), _qw*_qw+_qx*_qx-_qy*_qy-_qz*_qz);
-
-        // Convert heading from [-pi,+pi] to [0,2*pi]
-        if (vstate->psi < 0) {
-            vstate->psi += 2*M_PI;
-        }
+    // Convert heading from [-pi,+pi] to [0,2*pi]
+    if (vstate->psi < 0) {
+        vstate->psi += 2*M_PI;
     }
-
-
-    // Unused
-    void imuAccumulateGyro(gyro_t * gyro)
-    {
-        (void)gyro;
-    }
-
-} // extern "C"
+}

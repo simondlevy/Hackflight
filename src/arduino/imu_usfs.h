@@ -9,25 +9,24 @@
    any later version.
 
    Hackflight is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-   more details.
+   ANY WARRANTY without even the implied warranty of MERCHANTABILITY or FITNESS
+   FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+   details.
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <hackflight_full.h>
-#include <arduino/ladybug.hpp>
+#include <imu.h>
 
-#include <receivers/sbus.h>
+class ImuUsfs : public Imu {
 
-void setup(void)
-{
-    ladybug_setup(&sbusDeviceFuns);
-}
+    public:
 
-void loop(void)
-{
-    ladybug_loop();
-}
+        virtual void getEulerAngles(
+                gyro_t * gyro,
+                imu_fusion_t * fusionPrev,
+                Arming::data_t * arming,
+                uint32_t time,
+                vehicle_state_t * vstate) override;
+};

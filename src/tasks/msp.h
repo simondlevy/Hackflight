@@ -17,6 +17,8 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include "task.h"
 #include "../msp.h"
 

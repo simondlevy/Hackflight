@@ -22,7 +22,6 @@
 #include <stdbool.h>
 
 #include "datatypes.h"
-#include "debug.h"
 #include "motor.h"
 
 #if defined(__cplusplus)

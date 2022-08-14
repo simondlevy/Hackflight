@@ -34,6 +34,7 @@ class Task {
             Arming::data_t   arming;
             Failsafe         failsafe;
             gyro_t           gyro;
+            Imu *            imu;
             imu_fusion_t     imuFusionPrev;
             float            maxArmingAngle;
             void *           motorDevice;
