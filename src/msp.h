@@ -44,6 +44,20 @@ void mspUpdate(
 
 class Msp {
 
+    private:
+
+        static const uint8_t MAX_PORT_COUNT = 3;
+        static const uint8_t PORT_INBUF_SIZE = 192;
+        static const uint16_t PORT_DATAFLASH_BUFFER_SIZE = 4096;
+        static const uint8_t PORT_DATAFLASH_INFO_SIZE = 16;
+        static const uint16_t PORT_OUTBUF_SIZE =
+            PORT_DATAFLASH_BUFFER_SIZE + PORT_DATAFLASH_INFO_SIZE;
+        static const uint8_t JUMBO_FRAME_SIZE_LIMIT = 255;
+
+        static const uint8_t RC        = 105;
+        static const uint8_t ATTITUDE  = 108;    
+        static const uint8_t SET_MOTOR = 214;    
+
 
 }; // class Msp
 
