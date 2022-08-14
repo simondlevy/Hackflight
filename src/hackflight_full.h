@@ -27,6 +27,7 @@
 #include "failsafe.h"
 #include "gyro.h"
 #include "hackflight_core.h"
+#include "imu.h"
 #include "led.h"
 #include "motor.h"
 #include "msp.h"
@@ -222,6 +223,7 @@ class Hackflight {
 
         static void init(
                 data_t * full,
+                Imu * imu,
                 Receiver::device_funs_t * rxDeviceFuns,
                 serialPortIdentifier_e rxDevPort,
                 anglePidConstants_t * anglePidConstants,
@@ -231,6 +233,8 @@ class Hackflight {
                 imu_align_fun imuAlign,
                 uint8_t ledPin)
         {
+            (void)imu;
+
             HackflightCore::data_t * coreData = &full->coreData;
             HackflightCore::init(coreData, anglePidConstants, mixer);
             Task::data_t * taskData = &full->taskData;

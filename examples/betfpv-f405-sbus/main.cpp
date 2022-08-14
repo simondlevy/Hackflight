@@ -48,6 +48,7 @@ int main(void)
 
     Hackflight::init(
             &hf,
+            &imu,
             &sbusDeviceFuns,
             SERIAL_PORT_USART3, // RX port
             &anglePidConstants,
