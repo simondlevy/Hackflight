@@ -19,7 +19,6 @@
 #include "led.h"
 #include "time.h"
 
-
 typedef enum {
     WARNING_LED_OFF = 0,
     WARNING_LED_ON,

@@ -21,20 +21,77 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-void ledDevInit(uint8_t pin);
-void ledDevSet(bool on);
-void ledDevToggle(void);
-
-#if defined(__cplusplus)
-}
-#endif
+#include "led_device.h"
+#include "time.h"
 
 void ledFlash(uint8_t reps, uint16_t delayMs);
 void ledWarningDisable(void);
 void ledWarningFlash(void);
 void ledWarningUpdate(void);
+
+class LED {
+
+    private:
+
+        typedef enum {
+            WARNING_LED_OFF = 0,
+            WARNING_LED_ON,
+            WARNING_LED_FLASH
+        } warningLedState_e;
+
+        warningLedState_e m_warningLedState = WARNING_LED_OFF;
+
+        uint32_t m_warningLedTimer = 0;
+
+        void warningRefresh(void)
+        {
+            switch (m_warningLedState) {
+                case WARNING_LED_OFF:
+                    ledDevSet(false);
+                    break;
+                case WARNING_LED_ON:
+                    ledDevSet(true);
+                    break;
+                case WARNING_LED_FLASH:
+                    ledDevToggle();
+                    break;
+            }
+
+            uint32_t now = timeMicros();
+            m_warningLedTimer = now + 500000;
+        }
+
+    public:
+
+        void flash(uint8_t reps, uint16_t delayMs)
+        {
+            ledDevSet(false);
+            for (uint8_t i=0; i<reps; i++) {
+                ledDevToggle();
+                delayMillis(delayMs);
+            }
+            ledDevSet(false);
+        }
+
+        void warningDisable(void)
+        {
+            m_warningLedState = WARNING_LED_OFF;
+        }
+
+        void warningFlash(void)
+        {
+            m_warningLedState = WARNING_LED_FLASH;
+        }
+
+        void warningUpdate(void)
+        {
+            uint32_t now = timeMicros();
+
+            if ((int32_t)(now - m_warningLedTimer) < 0) {
+                return;
+            }
+
+            warningRefresh();
+        }
+};
 
