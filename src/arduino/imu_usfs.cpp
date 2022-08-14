@@ -49,14 +49,14 @@ static float _qw, _qx, _qy, _qz;
 static volatile bool _gotNewData;
 
 static volatile uint32_t _gyroInterruptCount;
-static volatile uint32_t _gyroSyncTime;
+static volatile uint32_t _gyroDevSyncTime;
 
 
 static void interruptHandler()
 {
     _gotNewData = true;
     _gyroInterruptCount++;
-    _gyroSyncTime = micros();
+    _gyroDevSyncTime = micros();
 }
 
 extern "C" {
@@ -104,9 +104,9 @@ extern "C" {
         return GYRO_SCALE_DPS;
     }
 
-    uint32_t gyroSyncTime(void)
+    uint32_t gyroDevSyncTime(void)
     {
-        return _gyroSyncTime;
+        return _gyroDevSyncTime;
     }
 
     void imuInit(uint8_t interruptPin)

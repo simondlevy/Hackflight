@@ -341,7 +341,7 @@ bool  gyroDevIsReady(void)
     return ready;
 }
 
-uint32_t gyroSyncTime(void)
+uint32_t gyroDevSyncTime(void)
 {
     return gyroDev.gyroSyncEXTI;
 }

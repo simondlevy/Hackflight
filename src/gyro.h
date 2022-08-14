@@ -41,7 +41,7 @@ extern "C" {
 
     void     gyroInit(gyro_t * gyro);
     void     gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate);
-    uint32_t gyroSyncTime(void);
+    uint32_t gyroDevSyncTime(void);
 
 #if defined(__cplusplus)
 }
@@ -293,7 +293,7 @@ class Gyro {
                 uint32_t nextTargetCycles,
                 int32_t desiredPeriodCycles)
         {
-            int32_t skew = cmpTimeCycles(nextTargetCycles, gyroSyncTime()) %
+            int32_t skew = cmpTimeCycles(nextTargetCycles, gyroDevSyncTime()) %
                 desiredPeriodCycles;
 
             if (skew > (desiredPeriodCycles / 2)) {
