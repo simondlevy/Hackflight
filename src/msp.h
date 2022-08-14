@@ -42,3 +42,8 @@ void mspUpdate(
 }
 #endif
 
+class Msp {
+
+
+}; // class Msp
+
