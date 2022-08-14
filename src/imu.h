@@ -219,16 +219,16 @@ class Imu {
 
         static void getEulerAngles(
                 gyro_t * gyro,
-                imu_fusion_t * imuFusionPrev,
+                imu_fusion_t * fusionPrev,
                 Arming::data_t * arming,
                 uint32_t time,
                 vehicle_state_t * vstate)
         {
-            (void)gyro;
-            (void)imuFusionPrev;
-            (void)arming;
-            (void)time;
-            (void)vstate;
+            quaternion_t quat = {};
+            getQuaternion(gyro, arming, fusionPrev, time, &quat);
+            rotation_t rot = {};
+            quat2euler(&quat, vstate, &rot);
+            update(gyro, fusionPrev, time, &quat, &rot);
         }
 
 };
