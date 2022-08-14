@@ -325,7 +325,7 @@ uint16_t gyroScaleDps(void)
     return gyroDev.scaleDps;
 }
 
-uint32_t gyroInterruptCount(void)
+uint32_t gyroDevInterruptCount(void)
 {
     return gyroDev.detectedEXTI;
 }

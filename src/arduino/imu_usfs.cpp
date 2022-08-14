@@ -61,7 +61,7 @@ static void interruptHandler()
 
 extern "C" {
 
-    uint32_t gyroInterruptCount(void)
+    uint32_t gyroDevInterruptCount(void)
     {
         return _gyroInterruptCount;
     }

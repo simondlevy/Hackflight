@@ -34,9 +34,9 @@ extern "C" {
 #endif
 
     void     gyroDevInit(void);
-    int32_t  gyroGetSkew(uint32_t nextTargetCycles, int32_t desiredPeriodCycles);
+    uint32_t gyroDevInterruptCount(void);
+
     void     gyroInit(gyro_t * gyro);
-    uint32_t gyroInterruptCount(void);
     bool     gyroIsReady(void);
     int16_t  gyroReadRaw(uint8_t k);
     void     gyroReadScaled(gyro_t *gyro, imu_align_fun align, vehicle_state_t * vstate);
