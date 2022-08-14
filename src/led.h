@@ -63,7 +63,7 @@ class LED {
 
     public:
 
-        void flash(uint8_t reps, uint16_t delayMs)
+        static void flash(uint8_t reps, uint16_t delayMs)
         {
             ledDevSet(false);
             for (uint8_t i=0; i<reps; i++) {
