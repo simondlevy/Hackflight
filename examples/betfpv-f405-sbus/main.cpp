@@ -44,6 +44,8 @@ int main(void)
 
     Hackflight::data_t hf = {};
 
+    ImuFusion imu;
+
     Hackflight::init(
             &hf,
             &sbusDeviceFuns,
