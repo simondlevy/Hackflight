@@ -24,12 +24,11 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "led_device.h"
 #include "time.h"
 
-void ledFlash(uint8_t reps, uint16_t delayMs);
 void ledWarningDisable(void);
 void ledWarningFlash(void);
 void ledWarningUpdate(void);
 
-class LED {
+class Led {
 
     private:
 

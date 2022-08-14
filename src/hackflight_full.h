@@ -239,7 +239,7 @@ class Hackflight {
             gyroInit(&taskData->gyro);
             imuInit(imuInterruptPin);
             ledDevInit(ledPin);
-            ledFlash(10, 50);
+            Led::flash(10, 50);
 
             taskData->rx.devCheck = rxDeviceFuns->check;
             taskData->rx.devConvert = rxDeviceFuns->convert;

@@ -48,17 +48,6 @@ static void warningLedRefresh(void)
 
 // ----------------------------------------------------------------------------
 
-void ledFlash(uint8_t reps, uint16_t delayMs)
-{
-    ledDevSet(false);
-    for (uint8_t i=0; i<reps; i++) {
-        ledDevToggle();
-        delayMillis(delayMs);
-    }
-    ledDevSet(false);
-}
-
-
 void ledWarningDisable(void)
 {
     warningLedState = WARNING_LED_OFF;
