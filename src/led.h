@@ -29,11 +29,12 @@ void ledDevInit(uint8_t pin);
 void ledDevSet(bool on);
 void ledDevToggle(void);
 
+#if defined(__cplusplus)
+}
+#endif
+
 void ledFlash(uint8_t reps, uint16_t delayMs);
 void ledWarningDisable(void);
 void ledWarningFlash(void);
 void ledWarningUpdate(void);
 
-#if defined(__cplusplus)
-}
-#endif
