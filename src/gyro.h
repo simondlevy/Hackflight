@@ -63,6 +63,19 @@ class Gyro {
         static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
         static const uint16_t LPF2_STATIC_HZ                 = 500;
 
+        typedef struct {
+            float sum[3];
+            stdev_t var[3];
+            int32_t cyclesRemaining;
+        } calibration_t;
+
+        typedef union {
+            pt1Filter_t pt1FilterState;
+            biquadFilter_t biquadFilterState;
+            pt2Filter_t pt2FilterState;
+            pt3Filter_t pt3FilterState;
+        } lowpassFilter_t;
+
         imu_sensor_t m_accum;
         float m_dps[3];            // aligned, calibrated, scaled, unfiltered
         float  m_dps_filtered[3];  // filtered 
@@ -73,15 +86,15 @@ class Gyro {
         // if true then downsample using gyro lowpass 2, otherwise use averaging
         bool m_downsampleFilterEnabled;      
 
-        gyroCalibration_t m_calibration;
+        calibration_t m_calibration;
 
         // lowpass gyro soft filter
         filterApplyFnPtr m_lowpassFilterApplyFn;
-        gyroLowpassFilter_t m_lowpassFilter[3];
+        lowpassFilter_t m_lowpassFilter[3];
 
         // lowpass2 gyro soft filter
         filterApplyFnPtr m_lowpass2FilterApplyFn;
-        gyroLowpassFilter_t m_lowpass2Filter[3];
+        lowpassFilter_t m_lowpass2Filter[3];
 
         float m_zero[3];
 
@@ -102,7 +115,7 @@ class Gyro {
                 uint32_t looptime)
         {
             filterApplyFnPtr *lowpassFilterApplyFn;
-            gyroLowpassFilter_t *lowpassFilter = NULL;
+            lowpassFilter_t *lowpassFilter = NULL;
 
             switch (slot) {
                 case FILTER_LPF1:
