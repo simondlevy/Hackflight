@@ -27,7 +27,7 @@ float rxDevConvertSbus(uint16_t * channelData, uint8_t chan);
 
 Receiver::device_funs_t sbusDeviceFuns = { rxDevInitSbus, rxDevCheckSbus, rxDevConvertSbus };
 
-class Sbus {
+class SbusReceiver : public Receiver {
 
 
     private:
@@ -180,6 +180,30 @@ class Sbus {
         }
 
         frameData_t m_frameData;
+
+    protected:
+
+        virtual uint8_t check(uint16_t * chanData, uint32_t * frameTimeUs)
+           override
+           {
+               (void)chanData;
+               (void)frameTimeUs;
+
+               return 0;
+           } 
+
+        virtual float convert(uint16_t * chanData, uint8_t chanId) override 
+        {
+               (void)chanData;
+               (void)chanId;
+
+               return 0;
+        }
+
+        virtual void devInit(serialPortIdentifier_e port) override
+        {
+            (void)port;
+        }
 
     public:
 

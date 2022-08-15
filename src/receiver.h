@@ -131,7 +131,7 @@ class Receiver {
         typedef float   (*rx_dev_convert_fun)
             (uint16_t * channelData, uint8_t chan);
 
-       static uint8_t rxfail_step_to_channel_value(uint8_t step)
+        static uint8_t rxfail_step_to_channel_value(uint8_t step)
         {
             return (PWM_PULSE_MIN + 25 * step);
         }
@@ -266,7 +266,7 @@ class Receiver {
             return angleRate;
         }
 
-     private:
+    private:
 
         static uint16_t getFailValue(float * rcData, uint8_t channel)
         {
@@ -744,7 +744,7 @@ class Receiver {
 
                 smoothingFilter->averageFrameTimeUs =
                     lrintf(smoothingFilter->trainingSum /
-                        (smoothingFilter->trainingCount - 2));
+                            (smoothingFilter->trainingCount - 2));
                 rcSmoothingResetAccumulation(smoothingFilter);
                 return true;
             }
@@ -926,6 +926,14 @@ class Receiver {
             return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
         }
 
+
+    protected:
+
+        virtual uint8_t check(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
+
+        virtual float convert(uint16_t * chanData, uint8_t chanId) = 0;
+
+        virtual void devInit(serialPortIdentifier_e port) = 0;
 
     public:
 

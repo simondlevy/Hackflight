@@ -210,8 +210,3 @@ void rxDevInitSbus(serialPortIdentifier_e port)
 {
     serialOpenPortSbus(port, sbusDataReceive, NULL);
 }
-
-class SbusReceiver : public Receiver {
-
-
-};
