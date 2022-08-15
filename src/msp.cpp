@@ -22,12 +22,9 @@
 #include <math.h>
 
 #include "datatypes.h"
-#include "debug.h"
 #include "motor.h"
 #include "msp.h"
-#include "rad2deg.h"
 #include "serial.h"
-#include "system.h"
 #include "time.h"
 
 #define MAX_MSP_PORT_COUNT 3
@@ -40,9 +37,6 @@
 #define MSP_RC        105    
 #define MSP_ATTITUDE  108    
 #define MSP_SET_MOTOR 214    
-
-#define ARRAYEND(x) (&(x)[ARRAYLEN(x)])
-#define ARRAYLEN(x) (sizeof(x) / sizeof((x)[0]))
 
 static int16_t rad2degi(float rad)
 {
