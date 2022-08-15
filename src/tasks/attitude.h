@@ -37,7 +37,6 @@ class AttitudeTask : public Task {
                 uint32_t time) override
         {
             data->imu->getEulerAngles(
-                    &data->gyro,
                     &data->imuFusionPrev,
                     &data->arming,
                     time,

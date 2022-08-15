@@ -270,7 +270,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/debug.o \
-		  $(OBJECT_DIR)/gyro.o \
 		  $(OBJECT_DIR)/sbus.o \
 		  $(OBJECT_DIR)/stm32_clock.o
 	@echo "Linking" $@
@@ -322,19 +321,6 @@ $(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.cpp \
 	  $(HFSRC_DIR)/msp.h \
 	  $(HFSRC_DIR)/datatypes.h
 	$(V1) $(call compile_cpp)
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
-	  $(HFSRC_DIR)/core_rate.h \
-	  $(HFSRC_DIR)/datatypes.h \
-	  $(HFSRC_DIR)/debug.h \
-	  $(HFSRC_DIR)/filters/pt1.h \
-	  $(HFSRC_DIR)/gyro.h \
-	  $(HFSRC_DIR)/imu.h \
-	  $(HFSRC_DIR)/maths.h \
-	  $(HFSRC_DIR)/stats.h \
-	  $(HFSRC_DIR)/system.h \
-	  $(HFSRC_DIR)/time.h
 	$(V1) $(call compile_cpp)
 
 $(OBJECT_DIR)/sbus.o: $(HFSRC_DIR)/receivers/sbus.cpp \

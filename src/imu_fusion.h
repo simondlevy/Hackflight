@@ -150,23 +150,7 @@ class ImuFusion : public Imu {
             quat_new->z = qz * recipNorm;
         }
 
-        static void update(
-                gyro_t * gyro,
-                imu_fusion_t * fusionPrev,
-                uint32_t time,
-                quaternion_t * quat,
-                rotation_t * rot)
-        {
-            imu_fusion_t fusion;
-            fusion.time = time;
-            memcpy(&fusion.quat, quat, sizeof(quaternion_t));
-            memcpy(&fusion.rot, rot, sizeof(rotation_t));
-            memcpy(fusionPrev, &fusion, sizeof(imu_fusion_t));
-            memset(&gyro->accum, 0, sizeof(imu_sensor_t));
-        }
-
-        static void getQuaternion(
-                gyro_t * gyro,
+        void getQuaternion(
                 Arming::data_t * arming,
                 imu_fusion_t * fusionPrev,
                 uint32_t time,
@@ -175,54 +159,59 @@ class ImuFusion : public Imu {
             int32_t deltaT = time - fusionPrev->time;
 
             axes_t gyroAvg = {};
-            getAverage(&gyro->accum, CORE_PERIOD(), &gyroAvg);
+            getAverage(&m_accum, CORE_PERIOD(), &gyroAvg);
 
             float dt = deltaT * 1e-6;
 
             gyro_reset_t new_gyro_reset = {};
 
             if (!Arming::isArmed(arming)) {
-                memcpy(&fusionPrev->gyroReset, &new_gyro_reset, sizeof(gyro_reset_t));
+                memcpy(&fusionPrev->gyroReset, &new_gyro_reset,
+                        sizeof(gyro_reset_t));
             }
 
             mahony(dt, &gyroAvg, &fusionPrev->quat, quat);
 
         }
 
+        imu_sensor_t m_accum;
+
     public:
 
-        virtual void accumulateGyro(gyro_t * gyro) override
+        virtual void accumulateGyro(float gx, float gy, float gz) override
         {
-            static float _adcf[3];
+            static axes_t _adcf;
 
             // integrate using trapezium rule to avoid bias
-            gyro->accum.values.x +=
-                0.5f * (_adcf[0] + gyro->dps_filtered[0]) * CORE_PERIOD();
-            gyro->accum.values.y +=
-                0.5f * (_adcf[1] + gyro->dps_filtered[1]) * CORE_PERIOD();
-            gyro->accum.values.z +=
-                0.5f * (_adcf[2] + gyro->dps_filtered[2]) * CORE_PERIOD();
+            m_accum.values.x += 0.5f * (_adcf.x + gx) * CORE_PERIOD();
+            m_accum.values.y += 0.5f * (_adcf.y + gy) * CORE_PERIOD();
+            m_accum.values.z += 0.5f * (_adcf.z + gz) * CORE_PERIOD();
 
-            gyro->accum.count++;
+            m_accum.count++;
 
-            for (int axis = 0; axis < 3; axis++) {
-                _adcf[axis] = gyro->dps_filtered[axis];
-            }
+            _adcf.x = gx;
+            _adcf.y = gy;
+            _adcf.z = gz;
         }
 
         virtual void getEulerAngles(
-                gyro_t * gyro,
                 imu_fusion_t * fusionPrev,
                 Arming::data_t * arming,
                 uint32_t time,
                 vehicle_state_t * vstate) override
         {
             quaternion_t quat = {};
-            getQuaternion(gyro, arming, fusionPrev, time, &quat);
+            getQuaternion(arming, fusionPrev, time, &quat);
             rotation_t rot = {};
             quat2euler(&quat, vstate, &rot);
-            update(gyro, fusionPrev, time, &quat, &rot);
-        }
+
+            imu_fusion_t fusion;
+            fusion.time = time;
+            memcpy(&fusion.quat, &quat, sizeof(quaternion_t));
+            memcpy(&fusion.rot, &rot, sizeof(rotation_t));
+            memcpy(fusionPrev, &fusion, sizeof(imu_fusion_t));
+            memset(&m_accum, 0, sizeof(imu_sensor_t));
+         }
 
 };
 

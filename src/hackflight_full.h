@@ -86,8 +86,7 @@ class Hackflight {
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            gyroReadScaled(
-                    &taskData->gyro,
+            taskData->gyro.readScaled(
                     taskData->imu,
                     data->imuAlignFun,
                     &coreData->vstate);
@@ -241,7 +240,6 @@ class Hackflight {
             HackflightCore::init(coreData, anglePidConstants, mixer);
             Task::data_t * taskData = &data->taskData;
 
-            gyroInit(&taskData->gyro);
             imuDevInit(imuInterruptPin);
             ledDevInit(ledPin);
             Led::flash(10, 50);

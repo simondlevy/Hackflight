@@ -27,13 +27,14 @@ class Imu {
 
     public:
 
-        virtual void accumulateGyro(gyro_t * gyro) 
+        virtual void accumulateGyro(float gx, float gy, float gz)
         {
-            (void)gyro;
+            (void)gx;
+            (void)gy;
+            (void)gz;
         }
 
         virtual void getEulerAngles(
-                gyro_t * gyro,
                 imu_fusion_t * fusionPrev,
                 Arming::data_t * arming,
                 uint32_t time,

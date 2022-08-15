@@ -46,14 +46,6 @@ extern "C" {
 }
 #endif
 
-void gyroInit(gyro_t * gyro);
-
-void gyroReadScaled(
-        gyro_t *gyro,
-        Imu * imu,
-        imu_align_fun align,
-        vehicle_state_t * vstate);
-
 class Gyro {
 
     private:
@@ -76,7 +68,6 @@ class Gyro {
             pt3Filter_t pt3FilterState;
         } lowpassFilter_t;
 
-        imu_sensor_t m_accum;
         float m_dps[3];            // aligned, calibrated, scaled, unfiltered
         float  m_dps_filtered[3];  // filtered 
         uint8_t m_sampleCount;     // sample counter
@@ -197,23 +188,6 @@ class Gyro {
             --m_calibration.cyclesRemaining;
         }
 
-        void accumulate(void)
-        {
-            static float _adcf[3];
-
-            // integrate using trapezium rule to avoid bias
-            m_accum.values.x +=0.5f * (_adcf[0] + m_dps_filtered[0]) * CORE_PERIOD();
-            m_accum.values.y += 0.5f * (_adcf[1] + m_dps_filtered[1]) * CORE_PERIOD();
-            m_accum.values.z += 0.5f * (_adcf[2] + m_dps_filtered[2]) * CORE_PERIOD();
-
-            m_accum.count++;
-
-            for (int axis = 0; axis < 3; axis++) {
-                _adcf[axis] = m_dps_filtered[axis];
-            }
-        }
-
-
     public:
 
         Gyro(void)
@@ -229,7 +203,7 @@ class Gyro {
             setCalibrationCycles(); // start calibrating
         }
 
-        void readScaled(imu_align_fun align, vehicle_state_t * vstate)
+        void readScaled(Imu * imu, imu_align_fun align, vehicle_state_t * vstate)
         {
             if (!gyroDevIsReady()) return;
 
@@ -300,13 +274,19 @@ class Gyro {
             m_sampleCount = 0;
 
             // Used for fusion with accelerometer
-            accumulate();
+            imu->accumulateGyro(
+                    m_dps_filtered[0], m_dps_filtered[1], m_dps_filtered[2]);
 
             vstate->dphi   = m_dps_filtered[0];
             vstate->dtheta = m_dps_filtered[1];
             vstate->dpsi   = m_dps_filtered[2];
 
             m_isCalibrating = !calibrationComplete;
+        }
+
+        bool isCalibrating(void)
+        {
+            return m_isCalibrating;
         }
 
         static int32_t getSkew(
