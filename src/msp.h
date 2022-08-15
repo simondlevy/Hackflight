@@ -535,6 +535,10 @@ class Msp {
         Msp(void)
         {
             memset(m_ports, 0, sizeof(m_ports));
+        }
+
+        void begin(void)
+        {
             m_dbgPort = serialOpenPortUsb();
             m_ports[0].port = m_dbgPort;
             debugSetPort(m_dbgPort);

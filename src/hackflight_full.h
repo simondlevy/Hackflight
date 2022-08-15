@@ -240,6 +240,8 @@ class Hackflight {
             HackflightCore::init(coreData, anglePidConstants, mixer);
             Task::data_t * taskData = &data->taskData;
 
+            taskData->msp.begin();
+
             imuDevInit(imuInterruptPin);
             ledDevInit(ledPin);
             Led::flash(10, 50);
