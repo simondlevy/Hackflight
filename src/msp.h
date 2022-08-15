@@ -541,9 +541,11 @@ class Msp {
         Msp(void)
         {
             memset(m_ports, 0, sizeof(m_ports));
-            void * serialPort = serialOpenPortUsb();
-            resetPort(&m_ports[0], serialPort);
-            m_dbgPort = serialPort;
+
+            m_dbgPort = serialOpenPortUsb();
+
+            resetPort(&m_ports[0], m_dbgPort);
+
             debugSetPort(m_dbgPort);
         }
 
