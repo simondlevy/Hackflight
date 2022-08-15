@@ -183,31 +183,8 @@ class SbusReceiver : public Receiver {
 
     protected:
 
-        virtual uint8_t check(uint16_t * chanData, uint32_t * frameTimeUs)
-           override
-           {
-               (void)chanData;
-               (void)frameTimeUs;
-
-               return 0;
-           } 
-
-        virtual float convert(uint16_t * chanData, uint8_t chanId) override 
-        {
-               (void)chanData;
-               (void)chanId;
-
-               return 0;
-        }
-
-        virtual void devInit(serialPortIdentifier_e port) override
-        {
-            (void)port;
-        }
-
-    public:
-
-        uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
+        virtual uint8_t check(uint16_t * channelData, uint32_t * frameTimeUs)
+            override
         {
             if (!m_frameData.done) {
                 return Receiver::FRAME_PENDING;
@@ -225,15 +202,15 @@ class SbusReceiver : public Receiver {
             return frameStatus;
         }
 
-        void rxDevInit(serialPortIdentifier_e port)
-        {
-            serialOpenPortSbus(port, dataReceive, &m_frameData);
-        }
-
-        static float rxDevConvert(uint16_t * channelData, uint8_t chan)
+        virtual float convert(uint16_t * channelData, uint8_t chan) override
         {
             // [172,1811] -> [1000,2000]
             return (5 * (float)channelData[chan] / 8) + 880;
+        }
+
+        virtual void devInit(serialPortIdentifier_e port) override
+        {
+            serialOpenPortSbus(port, dataReceive, &m_frameData);
         }
 
 }; // class Sbus
