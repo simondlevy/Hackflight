@@ -23,6 +23,7 @@
 #include <stdint.h>
 
 #include "hackflight_core.h"
+#include "msp.h"
 #include "receiver.h"
 
 class Task {
@@ -38,6 +39,7 @@ class Task {
             imu_fusion_t     imuFusionPrev;
             float            maxArmingAngle;
             void *           motorDevice;
+            Msp              msp;
             float            mspMotors[4];
             Receiver::data_t rx;
             Receiver::axes_t rxAxes;
