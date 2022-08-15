@@ -253,6 +253,36 @@ class Receiver {
 
         } data_t;
 
+        rxSmoothingFilter_t m_smoothingFilter;
+
+        bool               m_auxiliaryProcessingRequired;
+        bool               m_calculatedCutoffs;
+        uint16_t           m_channelData[CHANNEL_COUNT];
+        float              m_command[4];
+        demands_t          m_commands;
+        bool               m_dataProcessingRequired;
+        demands_t          m_dataToSmooth;
+        rx_dev_check_fun   m_devCheck;
+        rx_dev_convert_fun m_devConvert;
+        int32_t            m_frameTimeDeltaUs;
+        bool               m_gotNewData;
+        bool               m_inFailsafeMode;
+        bool               m_initializedFilter;
+        bool               m_initializedThrottleTable;
+        uint32_t           m_invalidPulsePeriod[CHANNEL_COUNT];
+        bool               m_isRateValid;
+        uint32_t           m_lastFrameTimeUs;
+        uint32_t           m_lastRxTimeUs;
+        int16_t            m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
+        uint32_t           m_needSignalBefore;
+        uint32_t           m_nextUpdateAtUs;
+        uint32_t           m_previousFrameTimeUs;
+        float              m_raw[CHANNEL_COUNT];
+        uint32_t           m_refreshPeriod;
+        bool               m_signalReceived;
+        rxState_e          m_state;
+        uint32_t           m_validFrameTimeMs;
+
 
         static float applyRates(float commandf, const float commandfAbs)
         {

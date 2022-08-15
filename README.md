@@ -46,7 +46,7 @@ The following two principles help with this strategy:
 
 1. Use header-only C++ classes whenever possible.
 
-2. [Avoid inheritance](https://queue.acm.org/detail.cfm?id=2038036).
+2. [Minimal use of inheritance](https://queue.acm.org/detail.cfm?id=2038036).
 
 ## Ground Control Station
 
