@@ -42,6 +42,12 @@ the code and the elements of the flight-control flow diagram shown below:
 <img src="media/dataflow3.png" width=700>
 </p>
 
+The following two principles help with this strategy:
+
+1. Use header-only C++ classes whenever possible.
+
+2. [Avoid inheritance](https://queue.acm.org/detail.cfm?id=2038036).
+
 ## Ground Control Station
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
