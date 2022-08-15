@@ -183,7 +183,12 @@ class SbusReceiver : public Receiver {
 
     protected:
 
-        virtual uint8_t check(uint16_t * channelData, uint32_t * frameTimeUs)
+        virtual void begin(serialPortIdentifier_e port) override
+        {
+            serialOpenPortSbus(port, dataReceive, &m_frameData);
+        }
+
+        virtual uint8_t read(uint16_t * channelData, uint32_t * frameTimeUs)
             override
         {
             if (!m_frameData.done) {
@@ -206,11 +211,6 @@ class SbusReceiver : public Receiver {
         {
             // [172,1811] -> [1000,2000]
             return (5 * (float)channelData[chan] / 8) + 880;
-        }
-
-        virtual void devInit(serialPortIdentifier_e port) override
-        {
-            serialOpenPortSbus(port, dataReceive, &m_frameData);
         }
 
 }; // class Sbus

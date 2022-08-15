@@ -929,15 +929,15 @@ class Receiver {
 
     protected:
 
-        virtual uint8_t check(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
+        virtual void begin(serialPortIdentifier_e port) = 0;
+
+        virtual uint8_t read(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
 
         virtual float convert(uint16_t * chanData, uint8_t chanId) = 0;
 
-        virtual void devInit(serialPortIdentifier_e port) = 0;
-
     public:
 
-        // Called from hackflight.c::adjustRxDynamicPriority()
+        // Called from tasks/receiver.h::adjustRxDynamicPriority()
         static bool check(data_t * data, uint32_t currentTimeUs)
         {
             bool signalReceived = false;
