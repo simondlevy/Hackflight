@@ -307,15 +307,6 @@ class Msp {
             mspPortToReset->port = serialPort;
         }
 
-        void serialAllocatePort(void)
-        {
-            void * serialPort = serialOpenPortUsb();
-
-            resetPort(&m_ports[0], serialPort);
-
-            m_dbgPort = serialPort;
-        }
-
         static bool serialProcessReceivedData(mspPort_t *mspPort, uint8_t c)
         {
             switch (mspPort->state) {
@@ -550,7 +541,9 @@ class Msp {
         Msp(void)
         {
             memset(m_ports, 0, sizeof(m_ports));
-            serialAllocatePort();
+            void * serialPort = serialOpenPortUsb();
+            resetPort(&m_ports[0], serialPort);
+            m_dbgPort = serialPort;
             debugSetPort(m_dbgPort);
         }
 
