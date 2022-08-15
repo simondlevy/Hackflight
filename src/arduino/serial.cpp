@@ -20,12 +20,13 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
  
 #include <serial.h>
 
-serialReceiveCallbackPtr _rxCallback;
+serialReceiveCallbackPtr _callback;
+void * _data;
 
 void serialEvent1(void)
 {
     while (Serial1.available()) {
-        _rxCallback(Serial1.read(), NULL, micros());
+        _callback(Serial1.read(), _data, micros());
     }
 }
 
@@ -39,19 +40,22 @@ bool serialIsTransmitBufferEmpty(void * port)
 
 void serialOpenPortDsmx(
         serialPortIdentifier_e identifier,
-        serialReceiveCallbackPtr rxCallback)
+        serialReceiveCallbackPtr callback,
+        void * data)
 {
     (void)identifier;
 
     // Always use Serial1
     Serial1.begin(115200);
  
-    _rxCallback = rxCallback;
+    _callback = callback;
+    _data = data;
 }
 
 void serialOpenPortSbus(
         serialPortIdentifier_e identifier,
-        serialReceiveCallbackPtr rxCallback)
+        serialReceiveCallbackPtr callback,
+        void * data)
 {
     (void)identifier;
 
@@ -66,7 +70,8 @@ void serialOpenPortSbus(
     Serial1.begin(100000, SERIAL_8E2);
 #endif
  
-    _rxCallback = rxCallback;
+    _callback = callback;
+    _data = data;
 }
 
 void * serialOpenPortUsb(void)

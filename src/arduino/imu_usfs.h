@@ -24,7 +24,6 @@ class ImuUsfs : public Imu {
     public:
 
         virtual void getEulerAngles(
-                gyro_t * gyro,
                 imu_fusion_t * fusionPrev,
                 Arming::data_t * arming,
                 uint32_t time,
