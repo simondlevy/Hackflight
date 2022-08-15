@@ -22,7 +22,6 @@
 #include <math.h>
 
 #include "datatypes.h"
-#include "debug.h"
 #include "motor.h"
 #include "msp.h"
 #include "serial.h"

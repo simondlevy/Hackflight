@@ -21,6 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 
 #include "datatypes.h"
+#include "debug.h"
 #include "rad2deg.h"
 #include "receiver.h"
 #include "system.h"
@@ -68,10 +69,8 @@ class Msp {
             return (int16_t)rad2deg(rad);
         }
 
-        void * m_dbgPort = NULL;
-        bool   m_debugging = false;
 
-        // streambuf ------------------------------------------------------------------
+        // streambuf -----------------------------------------------------------
 
         typedef struct sbuf_s {
             uint8_t *ptr;  
@@ -206,6 +205,10 @@ class Msp {
             uint16_t size;
         } mspHeaderJUMBO_t;
 
+        void *    m_dbgPort = NULL;
+        bool      m_debugging = false;
+        mspPort_t m_ports[MAX_PORT_COUNT];
+
         static bool processOutCommand(
                 int16_t cmdMSP,
                 sbuf_t *dst,
@@ -298,8 +301,6 @@ class Msp {
             (void)reply;
         }
 
-        static mspPort_t mspPorts[MAX_PORT_COUNT];
-
         static void resetPort(mspPort_t *mspPortToReset, void * serialPort)
         {
             memset(mspPortToReset, 0, sizeof(mspPort_t));
@@ -310,7 +311,7 @@ class Msp {
         {
             void * serialPort = serialOpenPortUsb();
 
-            resetPort(&mspPorts[0], serialPort);
+            resetPort(&m_ports[0], serialPort);
 
             m_dbgPort = serialPort;
         }
@@ -546,7 +547,7 @@ class Msp {
 
         Msp(void)
         {
-            memset(mspPorts, 0, sizeof(mspPorts));
+            memset(m_ports, 0, sizeof(m_ports));
             serialAllocatePort();
             debugSetPort(m_dbgPort);
         }
@@ -556,6 +557,77 @@ class Msp {
             m_debugging = true;
         }
 
+        void update(
+                vehicle_state_t * vstate,
+                Receiver::axes_t *rxaxes,
+                bool armed,
+                void * motorDevice,
+                float * motors)
+        {
+            (void)vstate;
+            (void)rxaxes;
+            (void)armed;
+            (void)motorDevice;
+            (void)motors;
+
+            // Sync debugging to MSP update
+            if (m_debugging) {
+                debugFlush();
+                m_debugging = false;
+            }
+
+            else for (uint8_t portId=0; portId<MAX_PORT_COUNT; portId++) {
+
+                mspPort_t * const mspPort = &m_ports[portId];
+
+                if (!mspPort->port) {
+                    continue;
+                }
+
+                mspPostProcessFnPtr mspPostProcessFn = NULL;
+
+                if (serialBytesAvailable(mspPort->port)) {
+                    // There are bytes incoming - abort pending request
+                    mspPort->lastActivityMs = timeMillis();
+                    mspPort->pendingRequest = PENDING_NONE;
+
+                    while (serialBytesAvailable(mspPort->port)) {
+                        const uint8_t c = serialRead(mspPort->port);
+                        const bool consumed = serialProcessReceivedData(mspPort, c);
+
+                        if (!consumed && !armed) {
+                            evaualteNonMspData(mspPort, c);
+                        }
+
+                        if (mspPort->state == COMMAND_RECEIVED) {
+                            if (mspPort->packetType == PACKET_COMMAND) {
+                                mspPostProcessFn =
+                                    serialProcessReceivedCommand(
+                                            mspPort,
+                                            fcProcessCommand,
+                                            vstate,
+                                            rxaxes,
+                                            motorDevice,
+                                            motors);
+                            } else if (mspPort->packetType == PACKET_REPLY) {
+                                serialProcessReceivedReply(mspPort, fcProcessReply);
+                            }
+
+                            mspPort->state = IDLE;
+                            break; 
+                            // process one command at a time so as not to block.
+                        }
+                    }
+
+                    if (mspPostProcessFn) {
+                        mspPostProcessFn(mspPort->port);
+                    }
+                } else {
+                    processPendingRequest(mspPort);
+                }
+            }
+
+        }
 
 }; // class Msp
 
