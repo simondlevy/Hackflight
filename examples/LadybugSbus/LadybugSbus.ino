@@ -22,9 +22,11 @@
 
 #include <receivers/sbus.h>
 
+static SbusReceiver receiver;
+
 void setup(void)
 {
-    ladybug_setup(&sbusDeviceFuns);
+    ladybug_setup(&receiver, &sbusDeviceFuns);
 }
 
 void loop(void)

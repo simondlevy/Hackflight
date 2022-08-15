@@ -227,6 +227,7 @@ class Hackflight {
         static void init(
                 data_t * data,
                 Imu * imu,
+                Receiver * receiver,
                 Receiver::device_funs_t * rxDeviceFuns,
                 serialPortIdentifier_e rxDevPort,
                 anglePidConstants_t * anglePidConstants,
@@ -250,6 +251,8 @@ class Hackflight {
 
             taskData->rx.devCheck = rxDeviceFuns->check;
             taskData->rx.devConvert = rxDeviceFuns->convert;
+
+            (void)receiver;
 
             rxDeviceFuns->init(rxDevPort);
 

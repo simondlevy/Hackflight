@@ -46,9 +46,12 @@ int main(void)
 
     ImuFusion imu;
 
+    SbusReceiver receiver;
+
     Hackflight::init(
             &hf,
             &imu,
+            &receiver,
             &sbusDeviceFuns,
             SERIAL_PORT_USART3, // RX port
             &anglePidConstants,
