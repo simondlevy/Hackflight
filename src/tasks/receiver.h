@@ -35,14 +35,14 @@ class ReceiverTask : public Task {
         }
 
         // Increase priority for RX task
-        void adjustDynamicPriority(Task::data_t *td, uint32_t usec) 
+        void adjustDynamicPriority(Task::data_t *data, uint32_t usec) 
         {
             if (m_dynamicPriority > 0) {
                 m_ageCycles = 1 + (cmpTimeUs(usec,
                             m_lastSignaledAtUs) / m_desiredPeriodUs);
                 m_dynamicPriority = 1 + m_ageCycles;
             } else  {
-                if (Receiver::check(&td->rx, usec)) {
+                if (Receiver::check(&data->rx, usec)) {
                     m_lastSignaledAtUs = usec;
                     m_ageCycles = 1;
                     m_dynamicPriority = 2;
