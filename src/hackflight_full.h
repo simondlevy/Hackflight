@@ -241,7 +241,6 @@ class Hackflight {
             HackflightCore::init(coreData, anglePidConstants, mixer);
             Task::data_t * taskData = &data->taskData;
 
-            mspInit();
             gyroInit(&taskData->gyro);
             imuDevInit(imuInterruptPin);
             ledDevInit(ledPin);

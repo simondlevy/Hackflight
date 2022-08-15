@@ -271,7 +271,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/debug.o \
 		  $(OBJECT_DIR)/gyro.o \
-		  $(OBJECT_DIR)/msp.o \
 		  $(OBJECT_DIR)/sbus.o \
 		  $(OBJECT_DIR)/stm32_clock.o
 	@echo "Linking" $@
@@ -334,17 +333,6 @@ $(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
 	  $(HFSRC_DIR)/imu.h \
 	  $(HFSRC_DIR)/maths.h \
 	  $(HFSRC_DIR)/stats.h \
-	  $(HFSRC_DIR)/system.h \
-	  $(HFSRC_DIR)/time.h
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.cpp \
-	  $(HFSRC_DIR)/datatypes.h \
-	  $(HFSRC_DIR)/debug.h \
-	  $(HFSRC_DIR)/motor.h \
-	  $(HFSRC_DIR)/msp.h \
-	  $(HFSRC_DIR)/rad2deg.h \
-	  $(HFSRC_DIR)/serial.h \
 	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
 	$(V1) $(call compile_cpp)
