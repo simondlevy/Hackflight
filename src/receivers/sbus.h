@@ -149,67 +149,67 @@ class Sbus {
             return Receiver::FRAME_COMPLETE;
         }
 
-        static frameData_t _frameData;
-
         // Receive ISR callback
-        static void sbusDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
+        static void dataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
         {
-            (void)data;
+            frameData_t * frameData = (frameData_t *)data;
 
             const uint32_t nowUs = currentTimeUs;
 
-            const int32_t frameTime = cmpTimeUs(nowUs, _frameData.startAtUs);
+            const int32_t frameTime = cmpTimeUs(nowUs, frameData->startAtUs);
 
             if (frameTime > (long)(TIME_NEEDED_PER_FRAME + 500)) {
-                _frameData.position = 0;
+                frameData->position = 0;
             }
 
-            if (_frameData.position == 0) {
+            if (frameData->position == 0) {
                 if (c != FRAME_BEGIN_BYTE) {
                     return;
                 }
-                _frameData.startAtUs = nowUs;
+                frameData->startAtUs = nowUs;
             }
 
-            if (_frameData.position < FRAME_SIZE) {
-                _frameData.frame.bytes[_frameData.position++] = (uint8_t)c;
-                if (_frameData.position < FRAME_SIZE) {
-                    _frameData.done = false;
+            if (frameData->position < FRAME_SIZE) {
+                frameData->frame.bytes[frameData->position++] = (uint8_t)c;
+                if (frameData->position < FRAME_SIZE) {
+                    frameData->done = false;
                 } else {
-                    _frameData.done = true;
+                    frameData->done = true;
                 }
             }
         }
+
+        frameData_t m_frameData;
 
     public:
 
         uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs)
         {
-            if (!_frameData.done) {
+            if (!m_frameData.done) {
                 return Receiver::FRAME_PENDING;
             }
-            _frameData.done = false;
+            m_frameData.done = false;
 
             const uint8_t frameStatus = channelsDecode(channelData,
-                    &_frameData.frame.frame.channels);
+                    &m_frameData.frame.frame.channels);
 
             if (!(frameStatus &
                         (Receiver::FRAME_FAILSAFE | Receiver::FRAME_DROPPED))) {
-                *frameTimeUs = _frameData.startAtUs;
+                *frameTimeUs = m_frameData.startAtUs;
             }
 
             return frameStatus;
         }
 
-        float rxDevConvert(uint16_t * channelData, uint8_t chan)
+        void rxDevInit(serialPortIdentifier_e port)
+        {
+            serialOpenPortSbus(port, dataReceive, &m_frameData);
+        }
+
+        static float rxDevConvert(uint16_t * channelData, uint8_t chan)
         {
             // [172,1811] -> [1000,2000]
             return (5 * (float)channelData[chan] / 8) + 880;
-        }
-
-        void rxDevInit(serialPortIdentifier_e port)
-        {
-            serialOpenPortSbus(port, sbusDataReceive);
         }
 
 }; // class Sbus

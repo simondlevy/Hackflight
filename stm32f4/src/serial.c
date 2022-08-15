@@ -36,7 +36,8 @@ typedef struct serialPortUsage_s {
 
 static serialPortUsage_t _serialPortUsageList[SERIAL_PORT_COUNT];
 
-static serialPortUsage_t *findSerialPortUsageByIdentifier(serialPortIdentifier_e identifier)
+static serialPortUsage_t *findSerialPortUsageByIdentifier(
+        serialPortIdentifier_e identifier)
 {
     uint8_t index;
     for (index = 0; index < SERIAL_PORT_COUNT; index++) {
@@ -77,7 +78,8 @@ void serialInit(serialPortIdentifier_e serialPortToDisable)
 
         else if (_serialPortUsageList[index].identifier <= SERIAL_PORT_USART8) {
             int resourceIndex =
-                SERIAL_PORT_IDENTIFIER_TO_INDEX(_serialPortUsageList[index].identifier);
+                SERIAL_PORT_IDENTIFIER_TO_INDEX(
+                        _serialPortUsageList[index].identifier);
             if (!(IO_TAG_TX[resourceIndex] || IO_TAG_RX[resourceIndex])) {
                 _serialPortUsageList[index].identifier = SERIAL_PORT_NONE;
             }
@@ -103,7 +105,8 @@ void * serialOpenPort(
     portMode_e mode,
     portOptions_e options)
 {
-    serialPortUsage_t *serialPortUsage = findSerialPortUsageByIdentifier(identifier);
+    serialPortUsage_t *serialPortUsage =
+        findSerialPortUsageByIdentifier(identifier);
     if (!serialPortUsage || serialPortUsage->function != FUNCTION_NONE) {
         // not available / already in use
         return NULL;
@@ -187,7 +190,8 @@ void serialWriteBuf(void * p, const uint8_t *data, uint32_t count)
     }
 }
 
-void serialOpenPortDsmx(serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
+void serialOpenPortDsmx(
+        serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
 {
     serialOpenPort(
             identifier,
@@ -199,13 +203,16 @@ void serialOpenPortDsmx(serialPortIdentifier_e identifier, serialReceiveCallback
             SERIAL_NOT_INVERTED);
 }
 
-void serialOpenPortSbus(serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
+void serialOpenPortSbus(
+        serialPortIdentifier_e identifier,
+        serialReceiveCallbackPtr callback,
+        void * data)
 {
     serialOpenPort(
             identifier,
             FUNCTION_RX_SERIAL,
-            rxCallback,
-            NULL,
+            callback,
+            data,
             100000,
             MODE_RX,
             SERIAL_STOPBITS_2 | SERIAL_PARITY_EVEN | SERIAL_INVERTED);
