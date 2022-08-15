@@ -252,7 +252,7 @@ class Hackflight {
             taskData->rx.devCheck = rxDeviceFuns->check;
             taskData->rx.devConvert = rxDeviceFuns->convert;
 
-            (void)receiver;
+            taskData->receiver = receiver;
 
             rxDeviceFuns->init(rxDevPort);
 
