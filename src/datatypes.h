@@ -208,28 +208,6 @@ struct filter_s;
 typedef struct filter_s filter_t;
 typedef float (*filterApplyFnPtr)(filter_t *filter, float input);
 
-// Serial ports ----------------------------------------------------------------
-
-typedef enum {
-    SERIAL_PORT_ALL = -2,
-    SERIAL_PORT_NONE = -1,
-    SERIAL_PORT_USART1 = 0,
-    SERIAL_PORT_USART2,
-    SERIAL_PORT_USART3,
-    SERIAL_PORT_UART4,
-    SERIAL_PORT_UART5,
-    SERIAL_PORT_USART6,
-    SERIAL_PORT_USART7,
-    SERIAL_PORT_USART8,
-    SERIAL_PORT_UART9,
-    SERIAL_PORT_USART10,
-    SERIAL_PORT_USB_VCP = 20,
-    SERIAL_PORT_SOFTSERIAL1 = 30,
-    SERIAL_PORT_SOFTSERIAL2,
-    SERIAL_PORT_LPUART1 = 40,
-    SERIAL_PORT_IDENTIFIER_MAX = SERIAL_PORT_LPUART1,
-} serialPortIdentifier_e;
-
 // Stick indices --------------------------------------------------------------
 
 typedef enum rc_alias {
