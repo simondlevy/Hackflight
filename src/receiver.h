@@ -797,6 +797,7 @@ class Receiver {
         static void processSmoothingFilter(
                 uint32_t currentTimeUs,
                 data_t * data,
+                Receiver * rx,
                 anglePid_t * ratepid,
                 float setpointRate[4],
                 float rawSetpoint[3])
@@ -1083,6 +1084,7 @@ class Receiver {
         // Runs in fast (inner, core) loop
         static void getDemands(
                 data_t * data,
+                Receiver * rx,
                 uint32_t currentTimeUs,
                 anglePid_t * ratepid,
                 demands_t * demands)
@@ -1103,7 +1105,7 @@ class Receiver {
             }
 
             processSmoothingFilter(
-                    currentTimeUs, data, ratepid, setpointRate, rawSetpoint);
+                    currentTimeUs, data, rx, ratepid, setpointRate, rawSetpoint);
 
             // Find min and max throttle based on conditions. Throttle has to
             // be known before mixing

@@ -95,6 +95,7 @@ class Hackflight {
 
             Receiver::getDemands(
                     &taskData->rx,
+                    taskData->receiver,
                     usec,
                     &coreData->anglePid,
                     &coreData->demands);
