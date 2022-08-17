@@ -223,12 +223,7 @@ class Receiver {
 
             rx_dev_check_fun   devCheck;
             rx_dev_convert_fun devConvert;
-            int32_t            frameTimeDeltaUs;
-            bool               gotNewData;
-            bool               inFailsafeMode;
-            bool               initializedFilter;
-            bool               initializedThrottleTable;
-            uint32_t           invalidPulsePeriod[CHANNEL_COUNT];
+
             bool               isRateValid;
             uint32_t           lastFrameTimeUs;
             uint32_t           lastRxTimeUs;
@@ -415,6 +410,7 @@ class Receiver {
 
         static void detectAndApplySignalLossBehaviour(
                 data_t * data,
+                Receiver * rx,
                 Arming::data_t * arming,
                 Failsafe * failsafe,
                 uint32_t currentTimeUs,
@@ -422,7 +418,7 @@ class Receiver {
         {
             uint32_t currentTimeMs = currentTimeUs/ 1000;
 
-            bool useValueFromRx = data->signalReceived && !data->inFailsafeMode;
+            bool useValueFromRx = data->signalReceived && !rx->m_inFailsafeMode;
 
             bool flightChannelsValid = true;
 
@@ -433,11 +429,11 @@ class Receiver {
                 bool validPulse = useValueFromRx && isPulseValid(sample);
 
                 if (validPulse) {
-                    data->invalidPulsePeriod[channel] =
+                    rx->m_invalidPulsePeriod[channel] =
                         currentTimeMs + MAX_INVALID__PULSE_TIME;
                 } else {
                     if (cmp32(currentTimeMs,
-                                data->invalidPulsePeriod[channel]) < 0) {
+                                rx->m_invalidPulsePeriod[channel]) < 0) {
                         // skip to next channel to hold channel value
                         // MAX_INVALID__PULSE_TIME
                         continue;           
@@ -457,7 +453,7 @@ class Receiver {
             if (flightChannelsValid) {
                 failsafe->onValidDataReceived(arming);
             } else {
-                data->inFailsafeMode = true;
+                rx->m_inFailsafeMode = true;
                 failsafe->onValidDataFailed(arming);
                 for (uint8_t channel = 0; channel < CHANNEL_COUNT; channel++) {
                     raw[channel] = getFailValue(raw, channel);
@@ -465,9 +461,9 @@ class Receiver {
             }
         }
 
-        static int16_t lookupThrottle(data_t * data, int32_t tmp)
+        static int16_t lookupThrottle(data_t * data, Receiver * rx, int32_t tmp)
         {
-            if (!data->initializedThrottleTable) {
+            if (!rx->m_initializedThrottleTable) {
                 for (uint8_t i = 0; i < THROTTLE_LOOKUP_TABLE_SIZE; i++) {
                     const int16_t tmp2 = 10 * i - THR_MID8;
                     uint8_t y = tmp2 > 0 ?
@@ -483,7 +479,7 @@ class Receiver {
                 }
             }
 
-            data->initializedThrottleTable = true;
+            rx->m_initializedThrottleTable = true;
 
             const int32_t tmp3 = tmp / 100;
             // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
@@ -512,7 +508,7 @@ class Receiver {
             int32_t tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
             int32_t tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
-            rx->m_commands.throttle = lookupThrottle(data, tmp2);
+            rx->m_commands.throttle = lookupThrottle(data, rx, tmp2);
         }
 
         static bool calculateChannelsAndUpdateFailsafe(
@@ -535,13 +531,17 @@ class Receiver {
             data->nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
 
             readChannelsApplyRanges(data, rx, raw);
-            detectAndApplySignalLossBehaviour(data, arming, failsafe, currentTimeUs, raw);
+            detectAndApplySignalLossBehaviour(data, rx,
+                    arming, failsafe, currentTimeUs, raw);
 
             return true;
         }
 
         static int32_t getFrameDelta(
-                data_t * data, uint32_t currentTimeUs, int32_t *frameAgeUs)
+                data_t * data,
+                Receiver * rx,
+                uint32_t currentTimeUs,
+                int32_t *frameAgeUs)
         {
             uint32_t frameTimeUs = data->lastFrameTimeUs;
 
@@ -550,15 +550,16 @@ class Receiver {
             const int32_t deltaUs =
                 cmpTimeUs(frameTimeUs, data->previousFrameTimeUs);
             if (deltaUs) {
-                data->frameTimeDeltaUs = deltaUs;
+                rx->m_frameTimeDeltaUs = deltaUs;
                 data->previousFrameTimeUs = frameTimeUs;
             }
 
-            return data->frameTimeDeltaUs;
+            return rx->m_frameTimeDeltaUs;
         }
 
         static bool processData(
                 data_t * data,
+                Receiver * rx,
                 void * motorDevice,
                 float raw[],
                 uint32_t currentTimeUs,
@@ -568,7 +569,7 @@ class Receiver {
             int32_t frameAgeUs;
 
             int32_t refreshPeriodUs =
-                getFrameDelta(data, currentTimeUs, &frameAgeUs);
+                getFrameDelta(data, rx, currentTimeUs, &frameAgeUs);
 
             if (!refreshPeriodUs ||
                     cmpTimeUs(currentTimeUs, data->lastRxTimeUs) <= frameAgeUs) {
@@ -796,7 +797,7 @@ class Receiver {
                 float rawSetpoint[3])
         {
             // first call initialization
-            if (!data->initializedFilter) {
+            if (!rx->m_initializedFilter) {
 
                 rx->m_smoothingFilter.filterInitialized = false;
                 rx->m_smoothingFilter.averageFrameTimeUs = 0;
@@ -837,9 +838,9 @@ class Receiver {
                 }
             }
 
-            data->initializedFilter = true;
+            rx->m_initializedFilter = true;
 
-            if (data->gotNewData) {
+            if (rx->m_gotNewData) {
                 // for auto calculated filters we need to examine each rx frame
                 // interval
                 if (rx->m_calculatedCutoffs) {
@@ -974,9 +975,9 @@ class Receiver {
                 data->devCheck(rx->m_channelData, &data->lastFrameTimeUs);
 
             if (frameStatus & FRAME_COMPLETE) {
-                data->inFailsafeMode = (frameStatus & FRAME_FAILSAFE) != 0;
+                rx->m_inFailsafeMode = (frameStatus & FRAME_FAILSAFE) != 0;
                 bool rxFrameDropped = (frameStatus & FRAME_DROPPED) != 0;
-                signalReceived = !(data->inFailsafeMode || rxFrameDropped);
+                signalReceived = !(rx->m_inFailsafeMode || rxFrameDropped);
                 if (signalReceived) {
                     data->needSignalBefore =
                         currentTimeUs + NEED_SIGNAL_MAX_DELAY_US;
@@ -1019,7 +1020,7 @@ class Receiver {
         {
             *pidItermResetReady = false;
 
-            data->gotNewData = false;
+            rx->m_gotNewData = false;
 
             switch (data->state) {
                 default:
@@ -1041,6 +1042,7 @@ class Receiver {
                     *pidItermResetReady = true;
                     *pidItermResetValue = processData(
                             data,
+                            rx,
                             motorDevice,
                             data->raw,
                             currentTimeUs,
@@ -1057,7 +1059,7 @@ class Receiver {
                     break;
 
                 case STATE_UPDATE:
-                    data->gotNewData = true;
+                    rx->m_gotNewData = true;
                     updateCommands(data, rx, data->raw);
                     Arming::updateStatus(arming, data->raw, imuIsLevel, calibrating);
                     data->state = STATE_CHECK;
@@ -1071,7 +1073,7 @@ class Receiver {
             rxax->aux1             = data->raw[AUX1];
             rxax->aux2             = data->raw[AUX2];
 
-            *gotNewData = data->gotNewData;
+            *gotNewData = rx->m_gotNewData;
 
         } // poll
 
@@ -1086,7 +1088,7 @@ class Receiver {
             float rawSetpoint[4] = {};
             float setpointRate[4] = {};
 
-            if (data->gotNewData) {
+            if (rx->m_gotNewData) {
 
                 data->previousFrameTimeUs = 0;
 
@@ -1111,7 +1113,7 @@ class Receiver {
             demands->pitch = setpointRate[PITCH];
             demands->yaw   = setpointRate[YAW];
 
-            data->gotNewData = false;
+            rx->m_gotNewData = false;
 
         } // getDemands
 
