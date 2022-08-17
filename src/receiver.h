@@ -523,13 +523,14 @@ class Receiver {
 
         static bool calculateChannelsAndUpdateFailsafe(
                 data_t * data,
+                Receiver * rx,
                 Arming::data_t * arming,
                 Failsafe * failsafe,
                 uint32_t currentTimeUs,
                 float raw[])
         {
-            if (data->auxiliaryProcessingRequired) {
-                data->auxiliaryProcessingRequired = false;
+            if (rx->m_auxiliaryProcessingRequired) {
+                rx->m_auxiliaryProcessingRequired = false;
             }
 
             if (!data->dataProcessingRequired) {
@@ -989,7 +990,7 @@ class Receiver {
             }
 
             if (frameStatus & FRAME_PROCESSING_REQUIRED) {
-                data->auxiliaryProcessingRequired = true;
+                rx->m_auxiliaryProcessingRequired = true;
             }
 
             if (signalReceived) {
@@ -1004,7 +1005,7 @@ class Receiver {
             }
 
             // data driven or 50Hz
-            return data->dataProcessingRequired || data->auxiliaryProcessingRequired; 
+            return data->dataProcessingRequired || rx->m_auxiliaryProcessingRequired; 
 
         } // check
 
@@ -1035,6 +1036,7 @@ class Receiver {
                 case STATE_PROCESS:
                     if (!calculateChannelsAndUpdateFailsafe(
                                 data,
+                                rx,
                                 arming, 
                                 failsafe,
                                 currentTimeUs,
