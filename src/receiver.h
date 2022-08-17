@@ -128,8 +128,6 @@ class Receiver {
                 )(serialPortIdentifier_e port);
         typedef uint8_t (*rx_dev_check_fun)
             (uint16_t * channelData, uint32_t * frameTimeUs);
-        typedef float   (*rx_dev_convert_fun)
-            (uint16_t * channelData, uint8_t chan);
 
         static uint8_t rxfail_step_to_channel_value(uint8_t step)
         {
@@ -215,12 +213,10 @@ class Receiver {
 
             rx_dev_init_fun init;
             rx_dev_check_fun check;
-            rx_dev_convert_fun convert;
 
         } device_funs_t;
 
         rx_dev_check_fun   devCheck;
-        rx_dev_convert_fun devConvert;
 
         rxSmoothingFilter_t m_smoothingFilter;
 
@@ -232,7 +228,6 @@ class Receiver {
         bool               m_dataProcessingRequired;
         demands_t          m_dataToSmooth;
         rx_dev_check_fun   m_devCheck;
-        rx_dev_convert_fun m_devConvert;
         int32_t            m_frameTimeDeltaUs;
         bool               m_gotNewData;
         bool               m_inFailsafeMode;
@@ -364,7 +359,7 @@ class Receiver {
             for (uint8_t channel=0; channel<CHANNEL_COUNT; ++channel) {
 
                 // sample the channel
-                float sample = devConvert(m_channelData, channel);
+                float sample = convert(m_channelData, channel);
 
                 // apply the rx calibration
                 switch (channel) {

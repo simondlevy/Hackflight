@@ -200,12 +200,6 @@ uint8_t rxDevCheckSbus(uint16_t * channelData, uint32_t * frameTimeUs)
     return frameStatus;
 }
 
-float rxDevConvertSbus(uint16_t * channelData, uint8_t chan)
-{
-    // [172,1811] -> [1000,2000]
-    return (5 * (float)channelData[chan] / 8) + 880;
-}
-
 void rxDevInitSbus(serialPortIdentifier_e port)
 {
     serialOpenPortSbus(port, sbusDataReceive, &_frameData);

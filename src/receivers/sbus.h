@@ -25,7 +25,7 @@ uint8_t rxDevCheckSbus(uint16_t * channelData, uint32_t * frameTimeUs);
 
 float rxDevConvertSbus(uint16_t * channelData, uint8_t chan);
 
-Receiver::device_funs_t sbusDeviceFuns = { rxDevInitSbus, rxDevCheckSbus, rxDevConvertSbus };
+Receiver::device_funs_t sbusDeviceFuns = { rxDevInitSbus, rxDevCheckSbus };
 
 class SbusReceiver : public Receiver {
 
