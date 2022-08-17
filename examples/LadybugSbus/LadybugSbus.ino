@@ -26,7 +26,7 @@ static SbusReceiver receiver;
 
 void setup(void)
 {
-    ladybug_setup(&receiver, &sbusDeviceFuns);
+    ladybug_setup(&receiver);
 }
 
 void loop(void)

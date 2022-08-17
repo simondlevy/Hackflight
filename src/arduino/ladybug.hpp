@@ -32,7 +32,7 @@ static Hackflight::data_t _hf;
 
 static ImuUsfs _imu;
 
-static void ladybug_setup(Receiver * receiver, Receiver::device_funs_t * rxDeviceFuns)
+static void ladybug_setup(Receiver * receiver)
 {
     Wire.begin();
     delay(100);
@@ -55,8 +55,6 @@ static void ladybug_setup(Receiver * receiver, Receiver::device_funs_t * rxDevic
             &_hf,
             &_imu,
             receiver,
-            rxDeviceFuns,
-            SERIAL_PORT_NONE,
             &anglePidConstants,
             mixerQuadXbf,
             (void *)&motorPins,
