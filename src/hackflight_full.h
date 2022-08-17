@@ -93,8 +93,7 @@ class Hackflight {
 
             uint32_t usec = timeMicros();
 
-            Receiver::getDemands(
-                    taskData->receiver,
+            taskData->receiver->getDemands(
                     usec,
                     &coreData->anglePid,
                     &coreData->demands);

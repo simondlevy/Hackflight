@@ -42,7 +42,7 @@ class ReceiverTask : public Task {
                             m_lastSignaledAtUs) / m_desiredPeriodUs);
                 m_dynamicPriority = 1 + m_ageCycles;
             } else  {
-                if (Receiver::check(data->receiver, usec)) {
+                if (data->receiver->check(usec)) {
                     m_lastSignaledAtUs = usec;
                     m_ageCycles = 1;
                     m_dynamicPriority = 2;
@@ -70,8 +70,7 @@ class ReceiverTask : public Task {
                 fabsf(core->vstate.phi) < data->maxArmingAngle &&
                 fabsf(core->vstate.theta) < data->maxArmingAngle;
 
-            Receiver::poll(
-                    data->receiver,
+            data->receiver->poll(
                     usec,
                     imuIsLevel, 
                     calibrating,
