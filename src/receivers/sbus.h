@@ -156,6 +156,37 @@ class SbusReceiver : public Receiver {
 
             return Receiver::FRAME_COMPLETE;
         }
+
+        // Receive ISR callback
+        static void dataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
+        {
+            SbusReceiver::frameData_t * frameData = (SbusReceiver::frameData_t *)data;
+
+            const uint32_t nowUs = currentTimeUs;
+
+            const int32_t sbusFrameTime = cmpTimeUs(nowUs, frameData->startAtUs);
+
+            if (sbusFrameTime > (long)(SbusReceiver::TIME_NEEDED_PER_FRAME + 500)) {
+                frameData->position = 0;
+            }
+
+            if (frameData->position == 0) {
+                if (c != SbusReceiver::FRAME_BEGIN_BYTE) {
+                    return;
+                }
+                frameData->startAtUs = nowUs;
+            }
+
+            if (frameData->position < SbusReceiver::FRAME_SIZE) {
+                frameData->frame.bytes[frameData->position++] = (uint8_t)c;
+                if (frameData->position < SbusReceiver::FRAME_SIZE) {
+                    frameData->done = false;
+                } else {
+                    frameData->done = true;
+                }
+            }
+        }
+
     protected:
 
         virtual float convert(uint16_t * channelData, uint8_t chan) override
@@ -169,35 +200,6 @@ class SbusReceiver : public Receiver {
 
 
 
-// Receive ISR callback
-static void sbusDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
-{
-    SbusReceiver::frameData_t * frameData = (SbusReceiver::frameData_t *)data;
-
-    const uint32_t nowUs = currentTimeUs;
-
-    const int32_t sbusFrameTime = cmpTimeUs(nowUs, frameData->startAtUs);
-
-    if (sbusFrameTime > (long)(SbusReceiver::TIME_NEEDED_PER_FRAME + 500)) {
-        frameData->position = 0;
-    }
-
-    if (frameData->position == 0) {
-        if (c != SbusReceiver::FRAME_BEGIN_BYTE) {
-            return;
-        }
-        frameData->startAtUs = nowUs;
-    }
-
-    if (frameData->position < SbusReceiver::FRAME_SIZE) {
-        frameData->frame.bytes[frameData->position++] = (uint8_t)c;
-        if (frameData->position < SbusReceiver::FRAME_SIZE) {
-            frameData->done = false;
-        } else {
-            frameData->done = true;
-        }
-    }
-}
 
 // Public API ==================================================================
 
@@ -223,7 +225,7 @@ uint8_t rxDevCheckSbus(uint16_t * channelData, uint32_t * frameTimeUs)
 
 void rxDevInitSbus(serialPortIdentifier_e port)
 {
-    serialOpenPortSbus(port, sbusDataReceive, &_frameData);
+    serialOpenPortSbus(port, SbusReceiver::dataReceive, &_frameData);
 }
 
 
