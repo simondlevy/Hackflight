@@ -117,6 +117,7 @@ endif
 #include $(ROOT)/make/csource.mk
 STM32_SRC = \
             imu_mpu6000.c \
+            debug.c \
             dshot.c \
             dshot_dpwm.c \
             dshot_command.c \
@@ -269,7 +270,6 @@ $(TARGET_DFU): $(TARGET_HEX)
 $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
-		  $(OBJECT_DIR)/debug.o \
 		  $(OBJECT_DIR)/stm32_clock.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CXX) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
@@ -313,12 +313,6 @@ $(OBJECT_DIR)/main.o: main.cpp \
       $(HFSRC_DIR)/mixers/fixedpitch/quadxbf.h \
       $(HFSRC_DIR)/receivers/sbus.h \
       $(HFSRC_DIR)/serial.h
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.cpp \
-	  $(HFSRC_DIR)/msp.h \
-	  $(HFSRC_DIR)/datatypes.h
-	$(V1) $(call compile_cpp)
 	$(V1) $(call compile_cpp)
 
 # ==============================================================================

@@ -21,8 +21,16 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdarg.h>
 #include <stdlib.h>
 
-void debugFlush(void);
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
-void debugPrintf(const char *fmt, ...);
+    void debugFlush(void);
 
-void debugSetPort(void * p);
+    void debugPrintf(const char *fmt, ...);
+
+    void debugSetPort(void * p);
+
+#if defined(__cplusplus)
+}
+#endif
