@@ -201,7 +201,8 @@ class SbusReceiver : public Receiver {
             return (5 * (float)channelData[chan] / 8) + 880;
         }
 
-        uint8_t devCheck(uint16_t * channelData, uint32_t * frameTimeUs)
+        virtual uint8_t devCheck(uint16_t * channelData, uint32_t * frameTimeUs)
+            override
         {
             if (!m_frameData.done) {
                 return Receiver::FRAME_PENDING;
