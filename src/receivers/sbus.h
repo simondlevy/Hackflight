@@ -49,6 +49,10 @@ class SbusReceiver : public Receiver {
         static const uint16_t CHANNEL_MIN = 173;
         static const uint16_t CHANNEL_MAX = 1812;
 
+        static const uint32_t TIME_NEEDED_PER_FRAME = 3000;
+
+        static const uint8_t FRAME_BEGIN_BYTE = 0x0F;
+
         typedef struct sbusChannels_s {
             // 176 bits of data (11 bits per channel * 16 channels) = 22 bytes.
             uint16_t chan0 : 11;
@@ -70,38 +74,29 @@ class SbusReceiver : public Receiver {
             uint8_t flags;
         } __attribute__((__packed__)) sbusChannels_t;
 
+        static const uint8_t FRAME_SIZE = sizeof(sbusChannels_t) + 2;
+
         struct sbusFrame_s {
             uint8_t syncByte;
             sbusChannels_t channels;
             /**
-             * The endByte is 0x00 on FrSky and some futaba RX's, on Some SBUS2 RX's
-             * the value indicates the telemetry byte that is sent after every 4th sbus
+             * The endByte is 0x00 on FrSky and some futaba RX's, on Some SBUS2
+             * RX's the value indicates the telemetry byte that is sent after
+             * every 4th sbus
              * frame.
              *
-             * See https://github.com/cleancleanissues/590#issuecomment-101027349
+             * See
+             * https://github.com/cleancleanissues/590#issuecomment-101027349
              * and
              * https://github.com/cleancleanissues/590#issuecomment-101706023
              */
             uint8_t endByte;
         } __attribute__ ((__packed__));
 
-
-    public:
-
-        static const uint8_t FRAME_SIZE = sizeof(sbusChannels_t) + 2;
-
-    private:
-
         typedef union {
             uint8_t bytes[FRAME_SIZE];
             struct sbusFrame_s frame;
         } frame_t;
-
-    public:
-
-        static const uint32_t TIME_NEEDED_PER_FRAME = 3000;
-
-        static const uint8_t FRAME_BEGIN_BYTE = 0x0F;
 
         typedef struct {
             frame_t frame;
@@ -145,8 +140,9 @@ class SbusReceiver : public Receiver {
             }
 
             if (channels->flags & FLAG_FAILSAFE_ACTIVE) {
-                // internal failsafe enabled and rx failsafe flag set
-                // RX *should* still be sending valid channel data (repeated), so use it.
+                // internal failsafe enabled and rx failsafe flag set RX
+                // *should* still be sending valid channel data (repeated), so
+                // use it.
                 return Receiver::FRAME_COMPLETE | Receiver::FRAME_FAILSAFE;
             }
 
@@ -216,7 +212,8 @@ class SbusReceiver : public Receiver {
                     channelData,
                     &m_frameData.frame.frame.channels);
 
-            if (!(frameStatus & (Receiver::FRAME_FAILSAFE | Receiver::FRAME_DROPPED))) {
+            if (!(frameStatus & (Receiver::FRAME_FAILSAFE |
+                            Receiver::FRAME_DROPPED))) {
                 *frameTimeUs = m_frameData.startAtUs;
             }
 
