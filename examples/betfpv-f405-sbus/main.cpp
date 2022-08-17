@@ -46,7 +46,7 @@ int main(void)
 
     ImuFusion imu = {};
 
-    SbusReceiver receiver = {};
+    SbusReceiver receiver = SbusReceiver(SERIAL_PORT_USART3);
 
     Hackflight::init(
             &hf,

@@ -192,7 +192,7 @@ class SbusReceiver : public Receiver {
         virtual void begin(void) override
         {
             serialOpenPortSbus(
-                    SERIAL_PORT_USART3,
+                    m_port,
                     dataReceive,
                     &m_frameData);
         }
@@ -221,6 +221,14 @@ class SbusReceiver : public Receiver {
             }
 
             return frameStatus;
+        }
+
+    public:
+
+        SbusReceiver(serialPortIdentifier_e port=SERIAL_PORT_NONE) 
+            : Receiver()
+        {
+            m_port = port;
         }
 
 }; // class SbusReceiver
