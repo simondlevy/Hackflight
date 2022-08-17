@@ -185,6 +185,8 @@ class SbusReceiver : public Receiver {
             }
         }
 
+        serialPortIdentifier_e m_port;
+
     protected:
 
         virtual void begin(void) override
