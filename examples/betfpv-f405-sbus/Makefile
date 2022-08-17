@@ -270,7 +270,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/debug.o \
-		  $(OBJECT_DIR)/sbus.o \
 		  $(OBJECT_DIR)/stm32_clock.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CXX) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
@@ -308,9 +307,8 @@ $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \
 	  $(HFSRC_DIR)/core_rate.h \
       $(HFSRC_DIR)/datatypes.h \
-      $(HFSRC_DIR)/hackflight_core.h \
       $(HFSRC_DIR)/hackflight_full.h \
-      $(HFSRC_DIR)/imu.h \
+      $(HFSRC_DIR)/imu_fusion.h \
       $(HFSRC_DIR)/imu_alignment/rotate_270.h \
       $(HFSRC_DIR)/mixers/fixedpitch/quadxbf.h \
       $(HFSRC_DIR)/receivers/sbus.h \
@@ -321,12 +319,6 @@ $(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.cpp \
 	  $(HFSRC_DIR)/msp.h \
 	  $(HFSRC_DIR)/datatypes.h
 	$(V1) $(call compile_cpp)
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/sbus.o: $(HFSRC_DIR)/receivers/sbus.cpp \
-	  $(HFSRC_DIR)/datatypes.h \
-	  $(HFSRC_DIR)/serial.h \
-	  $(HFSRC_DIR)/time.h
 	$(V1) $(call compile_cpp)
 
 # ==============================================================================

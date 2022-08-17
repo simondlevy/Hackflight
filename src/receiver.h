@@ -920,9 +920,9 @@ class Receiver {
 
     protected:
 
-        virtual void begin(serialPortIdentifier_e port) = 0;
+        // virtual void begin(serialPortIdentifier_e port) = 0;
 
-        virtual uint8_t read(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
+        // virtual uint8_t read(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
 
         virtual float convert(uint16_t * chanData, uint8_t chanId) = 0;
 
