@@ -149,39 +149,39 @@ static uint8_t sbusChannelsDecode(uint16_t * channelData, const sbusChannels_t *
     return Receiver::FRAME_COMPLETE;
 }
 
-static sbusFrameData_t _frameData;
-
 // Receive ISR callback
 static void sbusDataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
 {
-    (void)data;
+    sbusFrameData_t * frameData = (sbusFrameData_t *)data;
 
     const uint32_t nowUs = currentTimeUs;
 
-    const int32_t sbusFrameTime = cmpTimeUs(nowUs, _frameData.startAtUs);
+    const int32_t sbusFrameTime = cmpTimeUs(nowUs, frameData->startAtUs);
 
     if (sbusFrameTime > (long)(TIME_NEEDED_PER_FRAME + 500)) {
-        _frameData.position = 0;
+        frameData->position = 0;
     }
 
-    if (_frameData.position == 0) {
+    if (frameData->position == 0) {
         if (c != FRAME_BEGIN_BYTE) {
             return;
         }
-        _frameData.startAtUs = nowUs;
+        frameData->startAtUs = nowUs;
     }
 
-    if (_frameData.position < FRAME_SIZE) {
-        _frameData.frame.bytes[_frameData.position++] = (uint8_t)c;
-        if (_frameData.position < FRAME_SIZE) {
-            _frameData.done = false;
+    if (frameData->position < FRAME_SIZE) {
+        frameData->frame.bytes[frameData->position++] = (uint8_t)c;
+        if (frameData->position < FRAME_SIZE) {
+            frameData->done = false;
         } else {
-            _frameData.done = true;
+            frameData->done = true;
         }
     }
 }
 
 // Public API ==================================================================
+
+static sbusFrameData_t _frameData;
 
 uint8_t rxDevCheckSbus(uint16_t * channelData, uint32_t * frameTimeUs)
 {
@@ -208,5 +208,5 @@ float rxDevConvertSbus(uint16_t * channelData, uint8_t chan)
 
 void rxDevInitSbus(serialPortIdentifier_e port)
 {
-    serialOpenPortSbus(port, sbusDataReceive, NULL);
+    serialOpenPortSbus(port, sbusDataReceive, &_frameData);
 }
