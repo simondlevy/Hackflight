@@ -1078,9 +1078,3 @@ class Receiver {
 
 
 }; // class Receiver
-
-// For hardware impelmentations ------------------------------------------------
-
-uint8_t rxDevCheck(uint16_t * channelData, uint32_t * frameTimeUs);
-
-float rxDevConvert(uint16_t * channelData, uint8_t chan);
