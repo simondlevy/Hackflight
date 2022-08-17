@@ -221,8 +221,6 @@ class Receiver {
 
         typedef struct {
 
-            rxSmoothingFilter_t smoothingFilter;
-
             bool               auxiliaryProcessingRequired;
             bool               calculatedCutoffs;
             uint16_t           channelData[CHANNEL_COUNT];
@@ -805,42 +803,42 @@ class Receiver {
             // first call initialization
             if (!data->initializedFilter) {
 
-                data->smoothingFilter.filterInitialized = false;
-                data->smoothingFilter.averageFrameTimeUs = 0;
-                data->smoothingFilter.autoSmoothnessFactorSetpoint = 30;
-                data->smoothingFilter.autoSmoothnessFactorThrottle = 30;
-                data->smoothingFilter.setpointCutoffSetting = 0;
-                data->smoothingFilter.throttleCutoffSetting = 0;
-                data->smoothingFilter.ffCutoffSetting = 0;
-                rcSmoothingResetAccumulation(&data->smoothingFilter);
-                data->smoothingFilter.setpointCutoffFrequency =
-                    data->smoothingFilter.setpointCutoffSetting;
-                data->smoothingFilter.throttleCutoffFrequency =
-                    data->smoothingFilter.throttleCutoffSetting;
-                if (data->smoothingFilter.ffCutoffSetting == 0) {
+                rx->m_smoothingFilter.filterInitialized = false;
+                rx->m_smoothingFilter.averageFrameTimeUs = 0;
+                rx->m_smoothingFilter.autoSmoothnessFactorSetpoint = 30;
+                rx->m_smoothingFilter.autoSmoothnessFactorThrottle = 30;
+                rx->m_smoothingFilter.setpointCutoffSetting = 0;
+                rx->m_smoothingFilter.throttleCutoffSetting = 0;
+                rx->m_smoothingFilter.ffCutoffSetting = 0;
+                rcSmoothingResetAccumulation(&rx->m_smoothingFilter);
+                rx->m_smoothingFilter.setpointCutoffFrequency =
+                    rx->m_smoothingFilter.setpointCutoffSetting;
+                rx->m_smoothingFilter.throttleCutoffFrequency =
+                    rx->m_smoothingFilter.throttleCutoffSetting;
+                if (rx->m_smoothingFilter.ffCutoffSetting == 0) {
                     // calculate and use an initial derivative cutoff until the RC
                     // interval is known
                     const float cutoffFactor = 1.5f /
                         (1.0f +
-                         (data->smoothingFilter.autoSmoothnessFactorSetpoint /
+                         (rx->m_smoothingFilter.autoSmoothnessFactorSetpoint /
                           10.0f));
                     float ffCutoff = 
                         SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
-                    data->smoothingFilter.feedforwardCutoffFrequency = 
+                    rx->m_smoothingFilter.feedforwardCutoffFrequency = 
                         lrintf(ffCutoff);
                 } else {
-                    data->smoothingFilter.feedforwardCutoffFrequency =
-                        data->smoothingFilter.ffCutoffSetting;
+                    rx->m_smoothingFilter.feedforwardCutoffFrequency =
+                        rx->m_smoothingFilter.ffCutoffSetting;
                 }
 
                 data->calculatedCutoffs = 
-                    rcSmoothingAutoCalculate(&data->smoothingFilter);
+                    rcSmoothingAutoCalculate(&rx->m_smoothingFilter);
 
                 // if we don't need to calculate cutoffs dynamically then the
                 // filters can be initialized now
                 if (!data->calculatedCutoffs) {
-                    setSmoothingFilterCutoffs(ratepid, &data->smoothingFilter);
-                    data->smoothingFilter.filterInitialized = true;
+                    setSmoothingFilterCutoffs(ratepid, &rx->m_smoothingFilter);
+                    rx->m_smoothingFilter.filterInitialized = true;
                 }
             }
 
@@ -865,7 +863,7 @@ class Receiver {
                             if (data->validFrameTimeMs == 0) {
                                 data->validFrameTimeMs =
                                     currentTimeMs +
-                                    (data->smoothingFilter.filterInitialized ?
+                                    (rx->m_smoothingFilter.filterInitialized ?
                                      SMOOTHING_FILTER_RETRAINING_DELAY_MS :
                                      SMOOTHING_FILTER_TRAINING_DELAY_MS);
                             } else {
@@ -880,11 +878,11 @@ class Receiver {
                                 // During retraining check samples to determine
                                 // if they vary by more than the limit
                                 // percentage.
-                                if (data->smoothingFilter.filterInitialized) {
+                                if (rx->m_smoothingFilter.filterInitialized) {
                                     const float percentChange =
                                         fabs((data->refreshPeriod -
-                                                    data->smoothingFilter.averageFrameTimeUs) /
-                                                (float)data->smoothingFilter.averageFrameTimeUs) *
+                                                    rx->m_smoothingFilter.averageFrameTimeUs) /
+                                                (float)rx->m_smoothingFilter.averageFrameTimeUs) *
                                         100;
 
                                     if (percentChange <
@@ -896,7 +894,7 @@ class Receiver {
                                         // samples that are all significantly
                                         // different than the current average
                                         rcSmoothingResetAccumulation(
-                                                &data->smoothingFilter);
+                                                &rx->m_smoothingFilter);
                                         accumulateSample = false;
                                     }
                                 }
@@ -904,21 +902,21 @@ class Receiver {
                                 // accumlate the sample into the average
                                 if (accumulateSample) { if
                                     (rcSmoothingAccumulateSample(
-                                                                 &data->smoothingFilter,
+                                                                 &rx->m_smoothingFilter,
                                                                  data->refreshPeriod))
                                     {
                                         // the required number of samples were
                                         // collected so set the filter cutoffs, but
                                         // only if smoothing is active
-                                        setSmoothingFilterCutoffs(ratepid, &data->smoothingFilter);
-                                        data->smoothingFilter.filterInitialized = true;
+                                        setSmoothingFilterCutoffs(ratepid, &rx->m_smoothingFilter);
+                                        rx->m_smoothingFilter.filterInitialized = true;
                                         data->validFrameTimeMs = 0;
                                     }
                                 }
 
                             }
                         } else {
-                            rcSmoothingResetAccumulation(&data->smoothingFilter);
+                            rcSmoothingResetAccumulation(&rx->m_smoothingFilter);
                         }
                     }
                 }
@@ -931,17 +929,17 @@ class Receiver {
 
             // Each pid loop, apply the last received channel value to the
             // filter, if initialised - thanks @klutvott
-            smoothingFilterApply(&data->smoothingFilter,
-                    &data->smoothingFilter.filterThrottle,
+            smoothingFilterApply(&rx->m_smoothingFilter,
+                    &rx->m_smoothingFilter.filterThrottle,
                     data->dataToSmooth.throttle, &data->commands.throttle);
-            smoothingFilterApply(&data->smoothingFilter,
-                    &data->smoothingFilter.filterRoll,
+            smoothingFilterApply(&rx->m_smoothingFilter,
+                    &rx->m_smoothingFilter.filterRoll,
                     data->dataToSmooth.roll, &setpointRate[1]);
-            smoothingFilterApply(&data->smoothingFilter,
-                    &data->smoothingFilter.filterPitch,
+            smoothingFilterApply(&rx->m_smoothingFilter,
+                    &rx->m_smoothingFilter.filterPitch,
                     data->dataToSmooth.pitch, &setpointRate[2]);
-            smoothingFilterApply(&data->smoothingFilter,
-                    &data->smoothingFilter.filterYaw,
+            smoothingFilterApply(&rx->m_smoothingFilter,
+                    &rx->m_smoothingFilter.filterYaw,
                     data->dataToSmooth.yaw, &setpointRate[3]);
         }
 
