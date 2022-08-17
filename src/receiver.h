@@ -831,12 +831,12 @@ class Receiver {
                         rx->m_smoothingFilter.ffCutoffSetting;
                 }
 
-                data->calculatedCutoffs = 
+                rx->m_calculatedCutoffs = 
                     rcSmoothingAutoCalculate(&rx->m_smoothingFilter);
 
                 // if we don't need to calculate cutoffs dynamically then the
                 // filters can be initialized now
-                if (!data->calculatedCutoffs) {
+                if (!rx->m_calculatedCutoffs) {
                     setSmoothingFilterCutoffs(ratepid, &rx->m_smoothingFilter);
                     rx->m_smoothingFilter.filterInitialized = true;
                 }
@@ -847,7 +847,7 @@ class Receiver {
             if (data->gotNewData) {
                 // for auto calculated filters we need to examine each rx frame
                 // interval
-                if (data->calculatedCutoffs) {
+                if (rx->m_calculatedCutoffs) {
                     const uint32_t currentTimeMs = currentTimeUs / 1000;
 
                     // If the filter cutoffs in auto mode, and we have good rx
