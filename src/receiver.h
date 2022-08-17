@@ -219,12 +219,8 @@ class Receiver {
 
         } device_funs_t;
 
-        typedef struct {
-
-            rx_dev_check_fun   devCheck;
-            rx_dev_convert_fun devConvert;
-
-        } data_t;
+        rx_dev_check_fun   devCheck;
+        rx_dev_convert_fun devConvert;
 
         rxSmoothingFilter_t m_smoothingFilter;
 
@@ -353,8 +349,7 @@ class Receiver {
             config->max = PWM_MAX;
         }
 
-        static void readChannelsApplyRanges(
-                data_t * data, Receiver * rx, float raw[])
+        static void readChannelsApplyRanges(Receiver * rx, float raw[])
         {
             rxChannelRangeConfig_t rxChannelRangeConfigThrottle = {};
             rxChannelRangeConfig_t rxChannelRangeConfigRoll = {};
@@ -369,7 +364,7 @@ class Receiver {
             for (uint8_t channel=0; channel<CHANNEL_COUNT; ++channel) {
 
                 // sample the channel
-                float sample = data->devConvert(rx->m_channelData, channel);
+                float sample = rx->devConvert(rx->m_channelData, channel);
 
                 // apply the rx calibration
                 switch (channel) {
@@ -498,7 +493,6 @@ class Receiver {
         }
 
         static bool calculateChannelsAndUpdateFailsafe(
-                data_t * data,
                 Receiver * rx,
                 Arming::data_t * arming,
                 Failsafe * failsafe,
@@ -516,7 +510,7 @@ class Receiver {
             rx->m_dataProcessingRequired = false;
             rx->m_nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
 
-            readChannelsApplyRanges(data, rx, raw);
+            readChannelsApplyRanges(rx, raw);
             detectAndApplySignalLossBehaviour(rx,
                     arming, failsafe, currentTimeUs, raw);
 
@@ -945,7 +939,7 @@ class Receiver {
     public:
 
         // Called from tasks/receiver.h::adjustRxDynamicPriority()
-        static bool check(data_t * data, Receiver * rx, uint32_t currentTimeUs)
+        static bool check(Receiver * rx, uint32_t currentTimeUs)
         {
             bool signalReceived = false;
             bool useDataDrivenProcessing = true;
@@ -955,7 +949,7 @@ class Receiver {
             }
 
             const uint8_t frameStatus =
-                data->devCheck(rx->m_channelData, &rx->m_lastFrameTimeUs);
+                rx->devCheck(rx->m_channelData, &rx->m_lastFrameTimeUs);
 
             if (frameStatus & FRAME_COMPLETE) {
                 rx->m_inFailsafeMode = (frameStatus & FRAME_FAILSAFE) != 0;
@@ -988,7 +982,6 @@ class Receiver {
         } // check
 
         static void poll(
-                data_t * data,
                 Receiver * rx,
                 uint32_t currentTimeUs,
                 bool imuIsLevel,
@@ -1013,7 +1006,6 @@ class Receiver {
 
                 case STATE_PROCESS:
                     if (!calculateChannelsAndUpdateFailsafe(
-                                data,
                                 rx,
                                 arming, 
                                 failsafe,

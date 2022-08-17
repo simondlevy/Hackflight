@@ -42,7 +42,6 @@ class Task {
             Msp              msp;
             float            mspMotors[4];
             Receiver *       receiver;
-            Receiver::data_t rx;
             Receiver::axes_t rxAxes;
 
         } data_t;

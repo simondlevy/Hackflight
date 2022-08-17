@@ -249,8 +249,8 @@ class Hackflight {
 
             taskData->imu = imu;
 
-            taskData->rx.devCheck = rxDeviceFuns->check;
-            taskData->rx.devConvert = rxDeviceFuns->convert;
+            receiver->devCheck = rxDeviceFuns->check;
+            receiver->devConvert = rxDeviceFuns->convert;
 
             taskData->receiver = receiver;
 
