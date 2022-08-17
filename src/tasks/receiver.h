@@ -42,7 +42,7 @@ class ReceiverTask : public Task {
                             m_lastSignaledAtUs) / m_desiredPeriodUs);
                 m_dynamicPriority = 1 + m_ageCycles;
             } else  {
-                if (Receiver::check(&data->rx, usec)) {
+                if (Receiver::check(&data->rx, data->receiver, usec)) {
                     m_lastSignaledAtUs = usec;
                     m_ageCycles = 1;
                     m_dynamicPriority = 2;
@@ -72,6 +72,7 @@ class ReceiverTask : public Task {
 
             Receiver::poll(
                     &data->rx,
+                    data->receiver,
                     usec,
                     imuIsLevel, 
                     calibrating,

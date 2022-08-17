@@ -967,7 +967,7 @@ class Receiver {
     public:
 
         // Called from tasks/receiver.h::adjustRxDynamicPriority()
-        static bool check(data_t * data, uint32_t currentTimeUs)
+        static bool check(data_t * data, Receiver * rx, uint32_t currentTimeUs)
         {
             bool signalReceived = false;
             bool useDataDrivenProcessing = true;
@@ -1011,6 +1011,7 @@ class Receiver {
 
         static void poll(
                 data_t * data,
+                Receiver * rx,
                 uint32_t currentTimeUs,
                 bool imuIsLevel,
                 bool calibrating,
