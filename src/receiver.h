@@ -221,7 +221,6 @@ class Receiver {
 
         typedef struct {
 
-            bool               calculatedCutoffs;
             uint16_t           channelData[CHANNEL_COUNT];
             float              command[4];
             demands_t          commands;
