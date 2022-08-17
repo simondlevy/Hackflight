@@ -224,19 +224,6 @@ class Receiver {
             rx_dev_check_fun   devCheck;
             rx_dev_convert_fun devConvert;
 
-            bool               isRateValid;
-            uint32_t           lastFrameTimeUs;
-            uint32_t           lastRxTimeUs;
-            int16_t            lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
-            uint32_t           needSignalBefore;
-            uint32_t           nextUpdateAtUs;
-            uint32_t           previousFrameTimeUs;
-            float              raw[CHANNEL_COUNT];
-            uint32_t           refreshPeriod;
-            bool               signalReceived;
-            rxState_e          state;
-            uint32_t           validFrameTimeMs;
-
         } data_t;
 
         rxSmoothingFilter_t m_smoothingFilter;
@@ -409,7 +396,6 @@ class Receiver {
         }
 
         static void detectAndApplySignalLossBehaviour(
-                data_t * data,
                 Receiver * rx,
                 Arming::data_t * arming,
                 Failsafe * failsafe,
@@ -418,7 +404,7 @@ class Receiver {
         {
             uint32_t currentTimeMs = currentTimeUs/ 1000;
 
-            bool useValueFromRx = data->signalReceived && !rx->m_inFailsafeMode;
+            bool useValueFromRx = rx->m_signalReceived && !rx->m_inFailsafeMode;
 
             bool flightChannelsValid = true;
 
@@ -461,7 +447,7 @@ class Receiver {
             }
         }
 
-        static int16_t lookupThrottle(data_t * data, Receiver * rx, int32_t tmp)
+        static int16_t lookupThrottle(Receiver * rx, int32_t tmp)
         {
             if (!rx->m_initializedThrottleTable) {
                 for (uint8_t i = 0; i < THROTTLE_LOOKUP_TABLE_SIZE; i++) {
@@ -471,11 +457,11 @@ class Receiver {
                         tmp2 < 0 ?
                         THR_MID8 :
                         1;
-                    data->lookupThrottleRc[i] =
+                    rx->m_lookupThrottleRc[i] =
                         10 * THR_MID8 + tmp2 * (100 - THR_EXPO8 + (int32_t)
                                 THR_EXPO8 * (tmp2 * tmp2) / (y * y)) / 10;
-                    data->lookupThrottleRc[i] = PWM_MIN + (PWM_MAX - PWM_MIN) *
-                        data->lookupThrottleRc[i] / 1000; 
+                    rx->m_lookupThrottleRc[i] = PWM_MIN + (PWM_MAX - PWM_MIN) *
+                        rx->m_lookupThrottleRc[i] / 1000; 
                 }
             }
 
@@ -483,8 +469,8 @@ class Receiver {
 
             const int32_t tmp3 = tmp / 100;
             // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
-            return data->lookupThrottleRc[tmp3] + (tmp - tmp3 * 100) *
-                (data->lookupThrottleRc[tmp3 + 1] - data->lookupThrottleRc[tmp3]) / 100;
+            return rx->m_lookupThrottleRc[tmp3] + (tmp - tmp3 * 100) *
+                (rx->m_lookupThrottleRc[tmp3 + 1] - rx->m_lookupThrottleRc[tmp3]) / 100;
         }
 
         static float updateCommand(float raw, float sgn)
@@ -496,7 +482,7 @@ class Receiver {
             return raw < 1500 ? -cmd : cmd;
         }
 
-        static void updateCommands(data_t * data, Receiver * rx, float raw[])
+        static void updateCommands(Receiver * rx, float raw[])
         {
             for (uint8_t axis=ROLL; axis<=YAW; axis++) {
                 // non coupled PID reduction scaler used in PID controller 1
@@ -508,7 +494,7 @@ class Receiver {
             int32_t tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
             int32_t tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
-            rx->m_commands.throttle = lookupThrottle(data, rx, tmp2);
+            rx->m_commands.throttle = lookupThrottle(rx, tmp2);
         }
 
         static bool calculateChannelsAndUpdateFailsafe(
@@ -528,37 +514,35 @@ class Receiver {
             }
 
             rx->m_dataProcessingRequired = false;
-            data->nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
+            rx->m_nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
 
             readChannelsApplyRanges(data, rx, raw);
-            detectAndApplySignalLossBehaviour(data, rx,
+            detectAndApplySignalLossBehaviour(rx,
                     arming, failsafe, currentTimeUs, raw);
 
             return true;
         }
 
         static int32_t getFrameDelta(
-                data_t * data,
                 Receiver * rx,
                 uint32_t currentTimeUs,
                 int32_t *frameAgeUs)
         {
-            uint32_t frameTimeUs = data->lastFrameTimeUs;
+            uint32_t frameTimeUs = rx->m_lastFrameTimeUs;
 
             *frameAgeUs = cmpTimeUs(currentTimeUs, frameTimeUs);
 
             const int32_t deltaUs =
-                cmpTimeUs(frameTimeUs, data->previousFrameTimeUs);
+                cmpTimeUs(frameTimeUs, rx->m_previousFrameTimeUs);
             if (deltaUs) {
                 rx->m_frameTimeDeltaUs = deltaUs;
-                data->previousFrameTimeUs = frameTimeUs;
+                rx->m_previousFrameTimeUs = frameTimeUs;
             }
 
             return rx->m_frameTimeDeltaUs;
         }
 
         static bool processData(
-                data_t * data,
                 Receiver * rx,
                 void * motorDevice,
                 float raw[],
@@ -569,22 +553,22 @@ class Receiver {
             int32_t frameAgeUs;
 
             int32_t refreshPeriodUs =
-                getFrameDelta(data, rx, currentTimeUs, &frameAgeUs);
+                getFrameDelta(rx, currentTimeUs, &frameAgeUs);
 
             if (!refreshPeriodUs ||
-                    cmpTimeUs(currentTimeUs, data->lastRxTimeUs) <= frameAgeUs) {
+                    cmpTimeUs(currentTimeUs, rx->m_lastRxTimeUs) <= frameAgeUs) {
 
                 // calculate a delta here if not supplied by the protocol
-                refreshPeriodUs = cmpTimeUs(currentTimeUs, data->lastRxTimeUs); 
+                refreshPeriodUs = cmpTimeUs(currentTimeUs, rx->m_lastRxTimeUs); 
             }
 
-            data->lastRxTimeUs = currentTimeUs;
+            rx->m_lastRxTimeUs = currentTimeUs;
 
-            data->isRateValid =
+            rx->m_isRateValid =
                 ((uint32_t)refreshPeriodUs >= SMOOTHING_RATE_MIN_US &&
                  (uint32_t)refreshPeriodUs <= SMOOTHING_RATE_MAX_US);
 
-            data->refreshPeriod =
+            rx->m_refreshPeriod =
                 constrain_i32_u32(refreshPeriodUs, SMOOTHING_RATE_MIN_US,
                         SMOOTHING_RATE_MAX_US);
 
@@ -790,7 +774,6 @@ class Receiver {
 
         static void processSmoothingFilter(
                 uint32_t currentTimeUs,
-                data_t * data,
                 Receiver * rx,
                 anglePid_t * ratepid,
                 float setpointRate[4],
@@ -853,11 +836,11 @@ class Receiver {
                     // skip during FC initialization
                     if ((currentTimeMs > SMOOTHING_FILTER_STARTUP_DELAY_MS))
                     {
-                        if (data->signalReceived && data->isRateValid) {
+                        if (rx->m_signalReceived && rx->m_isRateValid) {
 
                             // set the guard time expiration if it's not set
-                            if (data->validFrameTimeMs == 0) {
-                                data->validFrameTimeMs =
+                            if (rx->m_validFrameTimeMs == 0) {
+                                rx->m_validFrameTimeMs =
                                     currentTimeMs +
                                     (rx->m_smoothingFilter.filterInitialized ?
                                      SMOOTHING_FILTER_RETRAINING_DELAY_MS :
@@ -867,7 +850,7 @@ class Receiver {
 
                             // if the guard time has expired then process the
                             // rx frame time
-                            if (currentTimeMs > data->validFrameTimeMs) {
+                            if (currentTimeMs > rx->m_validFrameTimeMs) {
                                 bool accumulateSample = true;
 
                                 // During initial training process all samples.
@@ -876,7 +859,7 @@ class Receiver {
                                 // percentage.
                                 if (rx->m_smoothingFilter.filterInitialized) {
                                     const float percentChange =
-                                        fabs((data->refreshPeriod -
+                                        fabs((rx->m_refreshPeriod -
                                                     rx->m_smoothingFilter.averageFrameTimeUs) /
                                                 (float)rx->m_smoothingFilter.averageFrameTimeUs) *
                                         100;
@@ -899,14 +882,14 @@ class Receiver {
                                 if (accumulateSample) { if
                                     (rcSmoothingAccumulateSample(
                                                                  &rx->m_smoothingFilter,
-                                                                 data->refreshPeriod))
+                                                                 rx->m_refreshPeriod))
                                     {
                                         // the required number of samples were
                                         // collected so set the filter cutoffs, but
                                         // only if smoothing is active
                                         setSmoothingFilterCutoffs(ratepid, &rx->m_smoothingFilter);
                                         rx->m_smoothingFilter.filterInitialized = true;
-                                        data->validFrameTimeMs = 0;
+                                        rx->m_validFrameTimeMs = 0;
                                     }
                                 }
 
@@ -967,19 +950,19 @@ class Receiver {
             bool signalReceived = false;
             bool useDataDrivenProcessing = true;
 
-            if (data->state != STATE_CHECK) {
+            if (rx->m_state != STATE_CHECK) {
                 return true;
             }
 
             const uint8_t frameStatus =
-                data->devCheck(rx->m_channelData, &data->lastFrameTimeUs);
+                data->devCheck(rx->m_channelData, &rx->m_lastFrameTimeUs);
 
             if (frameStatus & FRAME_COMPLETE) {
                 rx->m_inFailsafeMode = (frameStatus & FRAME_FAILSAFE) != 0;
                 bool rxFrameDropped = (frameStatus & FRAME_DROPPED) != 0;
                 signalReceived = !(rx->m_inFailsafeMode || rxFrameDropped);
                 if (signalReceived) {
-                    data->needSignalBefore =
+                    rx->m_needSignalBefore =
                         currentTimeUs + NEED_SIGNAL_MAX_DELAY_US;
                 }
             }
@@ -989,13 +972,13 @@ class Receiver {
             }
 
             if (signalReceived) {
-                data->signalReceived = true;
-            } else if (currentTimeUs >= data->needSignalBefore) {
-                data->signalReceived = false;
+                rx->m_signalReceived = true;
+            } else if (currentTimeUs >= rx->m_needSignalBefore) {
+                rx->m_signalReceived = false;
             }
 
             if ((signalReceived && useDataDrivenProcessing) ||
-                    cmpTimeUs(currentTimeUs, data->nextUpdateAtUs) > 0) {
+                    cmpTimeUs(currentTimeUs, rx->m_nextUpdateAtUs) > 0) {
                 rx->m_dataProcessingRequired = true;
             }
 
@@ -1022,10 +1005,10 @@ class Receiver {
 
             rx->m_gotNewData = false;
 
-            switch (data->state) {
+            switch (rx->m_state) {
                 default:
                 case STATE_CHECK:
-                    data->state = STATE_PROCESS;
+                    rx->m_state = STATE_PROCESS;
                     break;
 
                 case STATE_PROCESS:
@@ -1035,43 +1018,42 @@ class Receiver {
                                 arming, 
                                 failsafe,
                                 currentTimeUs,
-                                data->raw)) {
-                        data->state = STATE_CHECK;
+                                rx->m_raw)) {
+                        rx->m_state = STATE_CHECK;
                         break;
                     }
                     *pidItermResetReady = true;
                     *pidItermResetValue = processData(
-                            data,
                             rx,
                             motorDevice,
-                            data->raw,
+                            rx->m_raw,
                             currentTimeUs,
                             arming, 
                             failsafe);
-                    data->state = STATE_MODES;
+                    rx->m_state = STATE_MODES;
                     break;
 
                 case STATE_MODES:
-                    Arming::check(arming, motorDevice, currentTimeUs, data->raw,
+                    Arming::check(arming, motorDevice, currentTimeUs, rx->m_raw,
                             imuIsLevel,
                             calibrating);
-                    data->state = STATE_UPDATE;
+                    rx->m_state = STATE_UPDATE;
                     break;
 
                 case STATE_UPDATE:
                     rx->m_gotNewData = true;
-                    updateCommands(data, rx, data->raw);
-                    Arming::updateStatus(arming, data->raw, imuIsLevel, calibrating);
-                    data->state = STATE_CHECK;
+                    updateCommands(rx, rx->m_raw);
+                    Arming::updateStatus(arming, rx->m_raw, imuIsLevel, calibrating);
+                    rx->m_state = STATE_CHECK;
                     break;
             }
 
-            rxax->demands.throttle = data->raw[THROTTLE];
-            rxax->demands.roll     = data->raw[ROLL];
-            rxax->demands.pitch    = data->raw[PITCH];
-            rxax->demands.yaw      = data->raw[YAW];
-            rxax->aux1             = data->raw[AUX1];
-            rxax->aux2             = data->raw[AUX2];
+            rxax->demands.throttle = rx->m_raw[THROTTLE];
+            rxax->demands.roll     = rx->m_raw[ROLL];
+            rxax->demands.pitch    = rx->m_raw[PITCH];
+            rxax->demands.yaw      = rx->m_raw[YAW];
+            rxax->aux1             = rx->m_raw[AUX1];
+            rxax->aux2             = rx->m_raw[AUX2];
 
             *gotNewData = rx->m_gotNewData;
 
@@ -1079,7 +1061,6 @@ class Receiver {
 
         // Runs in fast (inner, core) loop
         static void getDemands(
-                data_t * data,
                 Receiver * rx,
                 uint32_t currentTimeUs,
                 anglePid_t * ratepid,
@@ -1090,7 +1071,7 @@ class Receiver {
 
             if (rx->m_gotNewData) {
 
-                data->previousFrameTimeUs = 0;
+                rx->m_previousFrameTimeUs = 0;
 
                 rawSetpoint[ROLL] =
                     getRawSetpoint(rx->m_command[ROLL], COMMAND_DIVIDER);
@@ -1101,7 +1082,7 @@ class Receiver {
             }
 
             processSmoothingFilter(
-                    currentTimeUs, data, rx, ratepid, setpointRate, rawSetpoint);
+                    currentTimeUs, rx, ratepid, setpointRate, rawSetpoint);
 
             // Find min and max throttle based on conditions. Throttle has to
             // be known before mixing
