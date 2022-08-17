@@ -33,6 +33,8 @@
 
 class Receiver {
 
+    friend class Hackflight;
+
     private:
 
         static const uint8_t CHANNEL_COUNT = 18;
@@ -124,11 +126,6 @@ class Receiver {
             return (int32_t)(a-b); 
         }
 
-        typedef void    (*rx_dev_init_fun
-                )(serialPortIdentifier_e port);
-        typedef uint8_t (*rx_dev_check_fun)
-            (uint16_t * channelData, uint32_t * frameTimeUs);
-
         static uint8_t rxfail_step_to_channel_value(uint8_t step)
         {
             return (PWM_PULSE_MIN + 25 * step);
@@ -209,15 +206,6 @@ class Receiver {
 
         } rxSmoothingFilter_t;
 
-        typedef struct {
-
-            rx_dev_init_fun init;
-            rx_dev_check_fun check;
-
-        } device_funs_t;
-
-        rx_dev_check_fun   devCheck;
-
         rxSmoothingFilter_t m_smoothingFilter;
 
         bool               m_auxiliaryProcessingRequired;
@@ -227,7 +215,6 @@ class Receiver {
         demands_t          m_commands;
         bool               m_dataProcessingRequired;
         demands_t          m_dataToSmooth;
-        rx_dev_check_fun   m_devCheck;
         int32_t            m_frameTimeDeltaUs;
         bool               m_gotNewData;
         bool               m_inFailsafeMode;
@@ -920,9 +907,9 @@ class Receiver {
 
     protected:
 
-        // virtual void begin(serialPortIdentifier_e port) = 0;
+        virtual void begin(/*serialPortIdentifier_e port*/) = 0;
 
-        // virtual uint8_t read(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
+        virtual uint8_t devCheck(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
 
         virtual float convert(uint16_t * chanData, uint8_t chanId) = 0;
 

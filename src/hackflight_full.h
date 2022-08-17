@@ -227,8 +227,6 @@ class Hackflight {
                 data_t * data,
                 Imu * imu,
                 Receiver * receiver,
-                Receiver::device_funs_t * rxDeviceFuns,
-                serialPortIdentifier_e rxDevPort,
                 anglePidConstants_t * anglePidConstants,
                 mixer_t mixer,
                 void * motorDevice,
@@ -248,11 +246,9 @@ class Hackflight {
 
             taskData->imu = imu;
 
-            receiver->devCheck = rxDeviceFuns->check;
-
             taskData->receiver = receiver;
 
-            rxDeviceFuns->init(rxDevPort);
+            receiver->begin();
 
             data->imuAlignFun = imuAlign;
 

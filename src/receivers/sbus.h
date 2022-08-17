@@ -37,7 +37,6 @@
  * time to send frame: 3ms.
  */
 
-
 class SbusReceiver : public Receiver {
 
     private:
@@ -111,7 +110,10 @@ class SbusReceiver : public Receiver {
             bool done;
         } frameData_t;
 
-        static uint8_t decodeChannels(uint16_t * channelData, const sbusChannels_t *channels)
+        frameData_t m_frameData;
+
+        static uint8_t decodeChannels(
+                uint16_t * channelData, const sbusChannels_t *channels)
         {
             channelData[0] = channels->chan0;
             channelData[1] = channels->chan1;
@@ -160,26 +162,26 @@ class SbusReceiver : public Receiver {
         // Receive ISR callback
         static void dataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
         {
-            SbusReceiver::frameData_t * frameData = (SbusReceiver::frameData_t *)data;
+            frameData_t * frameData = (frameData_t *)data;
 
             const uint32_t nowUs = currentTimeUs;
 
             const int32_t sbusFrameTime = cmpTimeUs(nowUs, frameData->startAtUs);
 
-            if (sbusFrameTime > (long)(SbusReceiver::TIME_NEEDED_PER_FRAME + 500)) {
+            if (sbusFrameTime > (long)(TIME_NEEDED_PER_FRAME + 500)) {
                 frameData->position = 0;
             }
 
             if (frameData->position == 0) {
-                if (c != SbusReceiver::FRAME_BEGIN_BYTE) {
+                if (c != FRAME_BEGIN_BYTE) {
                     return;
                 }
                 frameData->startAtUs = nowUs;
             }
 
-            if (frameData->position < SbusReceiver::FRAME_SIZE) {
+            if (frameData->position < FRAME_SIZE) {
                 frameData->frame.bytes[frameData->position++] = (uint8_t)c;
-                if (frameData->position < SbusReceiver::FRAME_SIZE) {
+                if (frameData->position < FRAME_SIZE) {
                     frameData->done = false;
                 } else {
                     frameData->done = true;
@@ -189,46 +191,38 @@ class SbusReceiver : public Receiver {
 
     protected:
 
+        virtual void begin(void) override
+        {
+            serialOpenPortSbus(
+                    SERIAL_PORT_USART3,
+                    dataReceive,
+                    &m_frameData);
+        }
+
         virtual float convert(uint16_t * channelData, uint8_t chan) override
         {
             // [172,1811] -> [1000,2000]
             return (5 * (float)channelData[chan] / 8) + 880;
         }
 
+        uint8_t devCheck(uint16_t * channelData, uint32_t * frameTimeUs)
+        {
+            if (!m_frameData.done) {
+                return Receiver::FRAME_PENDING;
+            }
+            m_frameData.done = false;
+
+            const uint8_t frameStatus = decodeChannels(
+                    channelData,
+                    &m_frameData.frame.frame.channels);
+
+            if (!(frameStatus & (Receiver::FRAME_FAILSAFE | Receiver::FRAME_DROPPED))) {
+                *frameTimeUs = m_frameData.startAtUs;
+            }
+
+            return frameStatus;
+        }
+
 }; // class SbusReceiver
-
-
-
-
-
-// Public API ==================================================================
-
-static SbusReceiver::frameData_t _frameData;
-
-uint8_t rxDevCheckSbus(uint16_t * channelData, uint32_t * frameTimeUs)
-{
-    if (!_frameData.done) {
-        return Receiver::FRAME_PENDING;
-    }
-    _frameData.done = false;
-
-    const uint8_t frameStatus = SbusReceiver::decodeChannels(
-            channelData,
-            &_frameData.frame.frame.channels);
-
-    if (!(frameStatus & (Receiver::FRAME_FAILSAFE | Receiver::FRAME_DROPPED))) {
-        *frameTimeUs = _frameData.startAtUs;
-    }
-
-    return frameStatus;
-}
-
-void rxDevInitSbus(serialPortIdentifier_e port)
-{
-    serialOpenPortSbus(port, SbusReceiver::dataReceive, &_frameData);
-}
-
-
-Receiver::device_funs_t sbusDeviceFuns = { rxDevInitSbus, rxDevCheckSbus };
 
 

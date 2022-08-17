@@ -52,8 +52,6 @@ int main(void)
             &hf,
             &imu,
             &receiver,
-            &sbusDeviceFuns,
-            SERIAL_PORT_USART3, // RX port
             &anglePidConstants,
             mixerQuadXbf,
             motorDevice,
