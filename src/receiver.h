@@ -283,7 +283,6 @@ class Receiver {
         rxState_e          m_state;
         uint32_t           m_validFrameTimeMs;
 
-
         static float applyRates(float commandf, const float commandfAbs)
         {
             float expof = RC_EXPO / 100.0f;

@@ -44,9 +44,9 @@ int main(void)
 
     Hackflight::data_t hf = {};
 
-    ImuFusion imu;
+    ImuFusion imu = {};
 
-    SbusReceiver receiver;
+    SbusReceiver receiver = {};
 
     Hackflight::init(
             &hf,
