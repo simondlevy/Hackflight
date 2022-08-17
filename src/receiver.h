@@ -221,11 +221,6 @@ class Receiver {
 
         typedef struct {
 
-            uint16_t           channelData[CHANNEL_COUNT];
-            float              command[4];
-            demands_t          commands;
-            bool               dataProcessingRequired;
-            demands_t          dataToSmooth;
             rx_dev_check_fun   devCheck;
             rx_dev_convert_fun devConvert;
             int32_t            frameTimeDeltaUs;
@@ -376,7 +371,8 @@ class Receiver {
             config->max = PWM_MAX;
         }
 
-        static void readChannelsApplyRanges(data_t * data, float raw[])
+        static void readChannelsApplyRanges(
+                data_t * data, Receiver * rx, float raw[])
         {
             rxChannelRangeConfig_t rxChannelRangeConfigThrottle = {};
             rxChannelRangeConfig_t rxChannelRangeConfigRoll = {};
@@ -391,7 +387,7 @@ class Receiver {
             for (uint8_t channel=0; channel<CHANNEL_COUNT; ++channel) {
 
                 // sample the channel
-                float sample = data->devConvert(data->channelData, channel);
+                float sample = data->devConvert(rx->m_channelData, channel);
 
                 // apply the rx calibration
                 switch (channel) {
@@ -504,19 +500,19 @@ class Receiver {
             return raw < 1500 ? -cmd : cmd;
         }
 
-        static void updateCommands(data_t * data, float raw[])
+        static void updateCommands(data_t * data, Receiver * rx, float raw[])
         {
             for (uint8_t axis=ROLL; axis<=YAW; axis++) {
                 // non coupled PID reduction scaler used in PID controller 1
                 // and PID controller 2.
-                data->command[axis] =
+                rx->m_command[axis] =
                     updateCommand(raw[axis], axis == YAW ? -1 : +1);
             }
 
             int32_t tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
             int32_t tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
-            data->commands.throttle = lookupThrottle(data, tmp2);
+            rx->m_commands.throttle = lookupThrottle(data, tmp2);
         }
 
         static bool calculateChannelsAndUpdateFailsafe(
@@ -531,14 +527,14 @@ class Receiver {
                 rx->m_auxiliaryProcessingRequired = false;
             }
 
-            if (!data->dataProcessingRequired) {
+            if (!rx->m_dataProcessingRequired) {
                 return false;
             }
 
-            data->dataProcessingRequired = false;
+            rx->m_dataProcessingRequired = false;
             data->nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
 
-            readChannelsApplyRanges(data, raw);
+            readChannelsApplyRanges(data, rx, raw);
             detectAndApplySignalLossBehaviour(data, arming, failsafe, currentTimeUs, raw);
 
             return true;
@@ -920,26 +916,26 @@ class Receiver {
                     }
                 }
 
-                data->dataToSmooth.throttle = data->commands.throttle;
-                data->dataToSmooth.roll = rawSetpoint[1];
-                data->dataToSmooth.pitch = rawSetpoint[2];
-                data->dataToSmooth.yaw = rawSetpoint[3];
+                rx->m_dataToSmooth.throttle = rx->m_commands.throttle;
+                rx->m_dataToSmooth.roll = rawSetpoint[1];
+                rx->m_dataToSmooth.pitch = rawSetpoint[2];
+                rx->m_dataToSmooth.yaw = rawSetpoint[3];
             }
 
             // Each pid loop, apply the last received channel value to the
             // filter, if initialised - thanks @klutvott
             smoothingFilterApply(&rx->m_smoothingFilter,
                     &rx->m_smoothingFilter.filterThrottle,
-                    data->dataToSmooth.throttle, &data->commands.throttle);
+                    rx->m_dataToSmooth.throttle, &rx->m_commands.throttle);
             smoothingFilterApply(&rx->m_smoothingFilter,
                     &rx->m_smoothingFilter.filterRoll,
-                    data->dataToSmooth.roll, &setpointRate[1]);
+                    rx->m_dataToSmooth.roll, &setpointRate[1]);
             smoothingFilterApply(&rx->m_smoothingFilter,
                     &rx->m_smoothingFilter.filterPitch,
-                    data->dataToSmooth.pitch, &setpointRate[2]);
+                    rx->m_dataToSmooth.pitch, &setpointRate[2]);
             smoothingFilterApply(&rx->m_smoothingFilter,
                     &rx->m_smoothingFilter.filterYaw,
-                    data->dataToSmooth.yaw, &setpointRate[3]);
+                    rx->m_dataToSmooth.yaw, &setpointRate[3]);
         }
 
         static float getRawSetpoint(float command, float divider)
@@ -975,7 +971,7 @@ class Receiver {
             }
 
             const uint8_t frameStatus =
-                data->devCheck(data->channelData, &data->lastFrameTimeUs);
+                data->devCheck(rx->m_channelData, &data->lastFrameTimeUs);
 
             if (frameStatus & FRAME_COMPLETE) {
                 data->inFailsafeMode = (frameStatus & FRAME_FAILSAFE) != 0;
@@ -999,11 +995,11 @@ class Receiver {
 
             if ((signalReceived && useDataDrivenProcessing) ||
                     cmpTimeUs(currentTimeUs, data->nextUpdateAtUs) > 0) {
-                data->dataProcessingRequired = true;
+                rx->m_dataProcessingRequired = true;
             }
 
             // data driven or 50Hz
-            return data->dataProcessingRequired || rx->m_auxiliaryProcessingRequired; 
+            return rx->m_dataProcessingRequired || rx->m_auxiliaryProcessingRequired; 
 
         } // check
 
@@ -1062,7 +1058,7 @@ class Receiver {
 
                 case STATE_UPDATE:
                     data->gotNewData = true;
-                    updateCommands(data, data->raw);
+                    updateCommands(data, rx, data->raw);
                     Arming::updateStatus(arming, data->raw, imuIsLevel, calibrating);
                     data->state = STATE_CHECK;
                     break;
@@ -1095,11 +1091,11 @@ class Receiver {
                 data->previousFrameTimeUs = 0;
 
                 rawSetpoint[ROLL] =
-                    getRawSetpoint(data->command[ROLL], COMMAND_DIVIDER);
+                    getRawSetpoint(rx->m_command[ROLL], COMMAND_DIVIDER);
                 rawSetpoint[PITCH] =
-                    getRawSetpoint(data->command[PITCH], COMMAND_DIVIDER);
+                    getRawSetpoint(rx->m_command[PITCH], COMMAND_DIVIDER);
                 rawSetpoint[YAW] =
-                    getRawSetpoint(data->command[YAW], YAW_COMMAND_DIVIDER);
+                    getRawSetpoint(rx->m_command[YAW], YAW_COMMAND_DIVIDER);
             }
 
             processSmoothingFilter(
@@ -1108,7 +1104,7 @@ class Receiver {
             // Find min and max throttle based on conditions. Throttle has to
             // be known before mixing
             demands->throttle =
-                constrain_f((data->commands.throttle - PWM_MIN) /
+                constrain_f((rx->m_commands.throttle - PWM_MIN) /
                         (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
 
             demands->roll  = setpointRate[ROLL];
