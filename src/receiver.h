@@ -150,25 +150,19 @@ class Receiver {
             FRAME_FAILSAFE = (1 << 1),
             FRAME_PROCESSING_REQUIRED = (1 << 2),
             FRAME_DROPPED = (1 << 3)
-        } rxFrameState_e;
+        } frameState_e;
 
         typedef enum {
             FAILSAFE_MODE_AUTO = 0,
             FAILSAFE_MODE_HOLD,
             FAILSAFE_MODE_SET,
             FAILSAFE_MODE_INVALID
-        } rxFailsafeChannelMode_e;
+        } failsafeChannelMode_e;
 
-        typedef struct rxFailsafeChannelConfig_s {
+        typedef struct failsafeChannelConfig_s {
             uint8_t mode; 
             uint8_t step;
-        } rxFailsafeChannelConfig_t;
-
-        typedef struct rxChannelRangeConfig_s {
-            uint16_t min;
-            uint16_t max;
-        } rxChannelRangeConfig_t;
-
+        } failsafeChannelConfig_t;
 
         typedef enum {
             STATE_CHECK,
@@ -176,9 +170,9 @@ class Receiver {
             STATE_MODES,
             STATE_UPDATE,
             STATE_COUNT
-        } rxState_e;
+        } state_e;
 
-        typedef struct rxSmoothingFilter_s {
+        typedef struct smoothingFilter_s {
 
             uint8_t     autoSmoothnessFactorSetpoint;
             uint32_t    averageFrameTimeUs;
@@ -204,35 +198,35 @@ class Receiver {
             uint16_t    trainingMax;
             uint16_t    trainingMin;
 
-        } rxSmoothingFilter_t;
+        } smoothingFilter_t;
 
-        rxSmoothingFilter_t m_smoothingFilter;
+        smoothingFilter_t m_smoothingFilter;
 
-        bool               m_auxiliaryProcessingRequired;
-        bool               m_calculatedCutoffs;
-        uint16_t           m_channelData[CHANNEL_COUNT];
-        float              m_command[4];
-        demands_t          m_commands;
-        bool               m_dataProcessingRequired;
-        demands_t          m_dataToSmooth;
-        int32_t            m_frameTimeDeltaUs;
-        bool               m_gotNewData;
-        bool               m_inFailsafeMode;
-        bool               m_initializedFilter;
-        bool               m_initializedThrottleTable;
-        uint32_t           m_invalidPulsePeriod[CHANNEL_COUNT];
-        bool               m_isRateValid;
-        uint32_t           m_lastFrameTimeUs;
-        uint32_t           m_lastRxTimeUs;
-        int16_t            m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
-        uint32_t           m_needSignalBefore;
-        uint32_t           m_nextUpdateAtUs;
-        uint32_t           m_previousFrameTimeUs;
-        float              m_raw[CHANNEL_COUNT];
-        uint32_t           m_refreshPeriod;
-        bool               m_signalReceived;
-        rxState_e          m_state;
-        uint32_t           m_validFrameTimeMs;
+        bool      m_auxiliaryProcessingRequired;
+        bool      m_calculatedCutoffs;
+        uint16_t  m_channelData[CHANNEL_COUNT];
+        float     m_command[4];
+        demands_t m_commands;
+        bool      m_dataProcessingRequired;
+        demands_t m_dataToSmooth;
+        int32_t   m_frameTimeDeltaUs;
+        bool      m_gotNewData;
+        bool      m_inFailsafeMode;
+        bool      m_initializedFilter;
+        bool      m_initializedThrottleTable;
+        uint32_t  m_invalidPulsePeriod[CHANNEL_COUNT];
+        bool      m_isRateValid;
+        uint32_t  m_lastFrameTimeUs;
+        uint32_t  m_lastRxTimeUs;
+        int16_t   m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
+        uint32_t  m_needSignalBefore;
+        uint32_t  m_nextUpdateAtUs;
+        uint32_t  m_previousFrameTimeUs;
+        float     m_raw[CHANNEL_COUNT];
+        uint32_t  m_refreshPeriod;
+        bool      m_signalReceived;
+        state_e   m_state;
+        uint32_t  m_validFrameTimeMs;
 
         static float applyRates(float commandf, const float commandfAbs)
         {
@@ -250,21 +244,21 @@ class Receiver {
 
         static uint16_t getFailValue(float * rcData, uint8_t channel)
         {
-            rxFailsafeChannelConfig_t rxFailsafeChannelConfigs[CHANNEL_COUNT];
+            failsafeChannelConfig_t failsafeChannelConfigs[CHANNEL_COUNT];
 
             for (uint8_t i = 0; i < CHANNEL_COUNT; i++) {
-                rxFailsafeChannelConfigs[i].step = 30;
+                failsafeChannelConfigs[i].step = 30;
             }
-            rxFailsafeChannelConfigs[3].step = 5;
+            failsafeChannelConfigs[3].step = 5;
             for (uint8_t i = 0; i < 4; i++) {
-                rxFailsafeChannelConfigs[i].mode = 0;
+                failsafeChannelConfigs[i].mode = 0;
             }
             for (uint8_t i = 4; i < CHANNEL_COUNT; i++) {
-                rxFailsafeChannelConfigs[i].mode = 1;
+                failsafeChannelConfigs[i].mode = 1;
             }
 
-            const rxFailsafeChannelConfig_t *channelFailsafeConfig =
-                &rxFailsafeChannelConfigs[channel];
+            const failsafeChannelConfig_t *channelFailsafeConfig =
+                &failsafeChannelConfigs[channel];
 
             switch (channelFailsafeConfig->mode) {
                 case FAILSAFE_MODE_AUTO:
@@ -282,17 +276,13 @@ class Receiver {
             return 0;
         }
 
-        static float applyRxChannelRangeConfiguraton(
-                float sample,
-                const rxChannelRangeConfig_t *range)
+        static float applyChannelRangeConfiguraton(float sample)
         {
             // Avoid corruption of channel with a value of PPM_RCVR_TIMEOUT
             if (sample == 0) {
                 return 0;
             }
 
-            sample =
-                scaleRangef(sample, range->min, range->max, PWM_MIN, PWM_MAX);
             sample = constrain_f(sample, PWM_PULSE_MIN, PWM_PULSE_MAX);
 
             return sample;
@@ -317,7 +307,7 @@ class Receiver {
         }
 
         static void rcSmoothingResetAccumulation(
-                rxSmoothingFilter_t *smoothingFilter)
+                smoothingFilter_t *smoothingFilter)
         {
             smoothingFilter->trainingSum = 0;
             smoothingFilter->trainingCount = 0;
@@ -325,47 +315,16 @@ class Receiver {
             smoothingFilter->trainingMax = 0;
         }
 
-        static void initChannelRangeConfig(rxChannelRangeConfig_t  * config)
-        {
-            config->min = PWM_MIN;
-            config->max = PWM_MAX;
-        }
-
         void readChannelsApplyRanges(float raw[])
         {
-            rxChannelRangeConfig_t rxChannelRangeConfigThrottle = {};
-            rxChannelRangeConfig_t rxChannelRangeConfigRoll = {};
-            rxChannelRangeConfig_t rxChannelRangeConfigPitch = {};
-            rxChannelRangeConfig_t rxChannelRangeConfigYaw = {};
-
-            initChannelRangeConfig(&rxChannelRangeConfigThrottle);
-            initChannelRangeConfig(&rxChannelRangeConfigRoll);
-            initChannelRangeConfig(&rxChannelRangeConfigPitch);
-            initChannelRangeConfig(&rxChannelRangeConfigYaw);
-
             for (uint8_t channel=0; channel<CHANNEL_COUNT; ++channel) {
 
-                // sample the channel
                 float sample = convert(m_channelData, channel);
 
                 // apply the rx calibration
-                switch (channel) {
-                    case 0:
-                        sample =applyRxChannelRangeConfiguraton(sample,
-                                &rxChannelRangeConfigThrottle);
-                        break;
-                    case 1:
-                        sample = applyRxChannelRangeConfiguraton(sample,
-                                &rxChannelRangeConfigRoll);
-                        break;
-                    case 2:
-                        sample = applyRxChannelRangeConfiguraton(sample,
-                                &rxChannelRangeConfigPitch);
-                        break;
-                    case 3:
-                        sample = applyRxChannelRangeConfiguraton(sample,
-                                &rxChannelRangeConfigYaw);
-                        break;
+                if (channel < 4) {
+
+                    sample = applyChannelRangeConfiguraton(sample);
                 }
 
                 raw[channel] = sample;
@@ -580,7 +539,7 @@ class Receiver {
         }
 
         static void smoothingFilterInit(
-                rxSmoothingFilter_t * smoothingFilter,
+                smoothingFilter_t * smoothingFilter,
                 pt3Filter_t * filter,
                 float setpointCutoffFrequency,
                 float dT)
@@ -595,7 +554,7 @@ class Receiver {
         }
 
         static void smoothingFilterInitRollPitchYaw(
-                rxSmoothingFilter_t * smoothingFilter,
+                smoothingFilter_t * smoothingFilter,
                 pt3Filter_t * filter,
                 float dT)
         {
@@ -604,7 +563,7 @@ class Receiver {
         }
 
         static void levelFilterInit(
-                rxSmoothingFilter_t * smoothingFilter,
+                smoothingFilter_t * smoothingFilter,
                 pt3Filter_t * filter,
                 float dT)
         {
@@ -620,7 +579,7 @@ class Receiver {
         }
 
         static void smoothingFilterApply(
-                rxSmoothingFilter_t * smoothingFilter,
+                smoothingFilter_t * smoothingFilter,
                 pt3Filter_t * filter,
                 float dataToSmooth,
                 float * dst)
@@ -635,7 +594,7 @@ class Receiver {
         }
 
         static void setSmoothingFilterCutoffs(anglePid_t * ratepid,
-                rxSmoothingFilter_t *smoothingFilter)
+                smoothingFilter_t *smoothingFilter)
         {
             const float dT = CORE_PERIOD() * 1e-6f;
             uint16_t oldCutoff = smoothingFilter->setpointCutoffFrequency;
@@ -700,15 +659,15 @@ class Receiver {
 
 
         static bool rcSmoothingAccumulateSample(
-                rxSmoothingFilter_t *smoothingFilter,
-                int rxFrameTimeUs)
+                smoothingFilter_t *smoothingFilter,
+                int frameTimeUs)
         {
-            smoothingFilter->trainingSum += rxFrameTimeUs;
+            smoothingFilter->trainingSum += frameTimeUs;
             smoothingFilter->trainingCount++;
             smoothingFilter->trainingMax =
-                fmaxf(smoothingFilter->trainingMax, rxFrameTimeUs);
+                fmaxf(smoothingFilter->trainingMax, frameTimeUs);
             smoothingFilter->trainingMin =
-                fminf(smoothingFilter->trainingMin, rxFrameTimeUs);
+                fminf(smoothingFilter->trainingMin, frameTimeUs);
 
             // if we've collected enough samples then calculate the average and
             // reset the accumulation
@@ -732,7 +691,7 @@ class Receiver {
 
 
         static bool rcSmoothingAutoCalculate(
-                rxSmoothingFilter_t * smoothingFilter)
+                smoothingFilter_t * smoothingFilter)
         {
             // if any rc smoothing cutoff is 0 (auto) then we need to calculate
             // cutoffs
@@ -930,8 +889,8 @@ class Receiver {
 
             if (frameStatus & FRAME_COMPLETE) {
                 m_inFailsafeMode = (frameStatus & FRAME_FAILSAFE) != 0;
-                bool rxFrameDropped = (frameStatus & FRAME_DROPPED) != 0;
-                signalReceived = !(m_inFailsafeMode || rxFrameDropped);
+                bool frameDropped = (frameStatus & FRAME_DROPPED) != 0;
+                signalReceived = !(m_inFailsafeMode || frameDropped);
                 if (signalReceived) {
                     m_needSignalBefore =
                         currentTimeUs + NEED_SIGNAL_MAX_DELAY_US;
