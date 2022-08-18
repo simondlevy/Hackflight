@@ -20,7 +20,6 @@
 
 #include "arming.h"
 #include "datatypes.h"
-#include "deg2rad.h"
 #include "imu.h"
 
 class Imu {

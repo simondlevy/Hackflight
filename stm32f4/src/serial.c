@@ -191,13 +191,15 @@ void serialWriteBuf(void * p, const uint8_t *data, uint32_t count)
 }
 
 void serialOpenPortDsmx(
-        serialPortIdentifier_e identifier, serialReceiveCallbackPtr rxCallback)
+        serialPortIdentifier_e identifier,
+        serialReceiveCallbackPtr callback,
+        void * data)
 {
     serialOpenPort(
             identifier,
             FUNCTION_RX_SERIAL,
-            rxCallback,
-            NULL,
+            callback,
+            data,
             BAUD_115200,
             MODE_RX,
             SERIAL_NOT_INVERTED);

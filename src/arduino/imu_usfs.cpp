@@ -141,6 +141,10 @@ void ImuUsfs::getEulerAngles(
         uint32_t time,
         vehicle_state_t * vstate) 
 {
+    (void)fusionPrev;
+    (void)arming;
+    (void)time;
+
     vstate->phi =
         atan2(2.0f*(_qw*_qx+_qy*_qz), _qw*_qw-_qx*_qx-_qy*_qy+_qz*_qz);
     vstate->theta = asin(2.0f*(_qx*_qz-_qw*_qy));
