@@ -62,7 +62,7 @@ class ReceiverTask : public Task {
             bool pidItermResetReady = false;
             bool pidItermResetValue = false;
 
-            Receiver::axes_t rxax = {};
+            Receiver::axes_t rxax = {{0, 0, 0, 0}, 0, 0};
 
             bool gotNewData = false;
 

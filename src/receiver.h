@@ -27,7 +27,6 @@
 #include "filters/pt3.h"
 #include "maths.h"
 #include "pwm.h"
-#include "scale.h"
 #include "serial.h"
 #include "time.h"
 
@@ -578,19 +577,14 @@ class Receiver {
             }
         }
 
-        static void smoothingFilterApply(
+        static float smoothingFilterApply(
                 smoothingFilter_t * smoothingFilter,
                 pt3Filter_t * filter,
-                float dataToSmooth,
-                float * dst)
+                float dataToSmooth)
         {
-            if (smoothingFilter->filterInitialized) {
-                *dst = pt3FilterApply(filter, dataToSmooth);
-            } else {
-                // If filter isn't initialized yet, as in smoothing off, use the
-                // actual unsmoothed rx channel data
-                *dst = dataToSmooth;
-            }
+            return smoothingFilter->filterInitialized ?
+                pt3FilterApply(filter, dataToSmooth) :
+                dataToSmooth;
         }
 
         static void setSmoothingFilterCutoffs(anglePid_t * ratepid,
@@ -706,8 +700,8 @@ class Receiver {
         void processSmoothingFilter(
                 uint32_t currentTimeUs,
                 anglePid_t * ratepid,
-                float setpointRate[4],
-                float rawSetpoint[3])
+                float * setpointRate,
+                float * rawSetpoint)
         {
             // first call initialization
             if (!m_initializedFilter) {
@@ -831,25 +825,22 @@ class Receiver {
                 }
 
                 m_dataToSmooth.throttle = m_commands.throttle;
-                m_dataToSmooth.roll = rawSetpoint[1];
-                m_dataToSmooth.pitch = rawSetpoint[2];
-                m_dataToSmooth.yaw = rawSetpoint[3];
+                m_dataToSmooth.roll  = rawSetpoint[0];
+                m_dataToSmooth.pitch = rawSetpoint[1];
+                m_dataToSmooth.yaw   = rawSetpoint[2];
             }
 
             // Each pid loop, apply the last received channel value to the
             // filter, if initialised - thanks @klutvott
-            smoothingFilterApply(&m_smoothingFilter,
+            m_commands.throttle = smoothingFilterApply(&m_smoothingFilter,
                     &m_smoothingFilter.filterThrottle,
-                    m_dataToSmooth.throttle, &m_commands.throttle);
-            smoothingFilterApply(&m_smoothingFilter,
-                    &m_smoothingFilter.filterRoll,
-                    m_dataToSmooth.roll, &setpointRate[1]);
-            smoothingFilterApply(&m_smoothingFilter,
-                    &m_smoothingFilter.filterPitch,
-                    m_dataToSmooth.pitch, &setpointRate[2]);
-            smoothingFilterApply(&m_smoothingFilter,
-                    &m_smoothingFilter.filterYaw,
-                    m_dataToSmooth.yaw, &setpointRate[3]);
+                    m_dataToSmooth.throttle);
+            setpointRate[0] = smoothingFilterApply(&m_smoothingFilter,
+                    &m_smoothingFilter.filterRoll, m_dataToSmooth.roll);
+            setpointRate[1] = smoothingFilterApply(&m_smoothingFilter,
+                    &m_smoothingFilter.filterPitch, m_dataToSmooth.pitch);
+            setpointRate[2] = smoothingFilterApply(&m_smoothingFilter,
+                    &m_smoothingFilter.filterYaw, m_dataToSmooth.yaw);
         }
 
         static float getRawSetpoint(float command, float divider)
@@ -990,21 +981,21 @@ class Receiver {
                 anglePid_t * ratepid,
                 demands_t * demands)
         {
-            float rawSetpoint[4] = {};
-            float setpointRate[4] = {};
+            float rawSetpoint[3] = {};
 
             if (m_gotNewData) {
 
                 m_previousFrameTimeUs = 0;
 
-                rawSetpoint[ROLL] =
+                rawSetpoint[0] =
                     getRawSetpoint(m_command[ROLL], COMMAND_DIVIDER);
-                rawSetpoint[PITCH] =
+                rawSetpoint[1] =
                     getRawSetpoint(m_command[PITCH], COMMAND_DIVIDER);
-                rawSetpoint[YAW] =
+                rawSetpoint[2] =
                     getRawSetpoint(m_command[YAW], YAW_COMMAND_DIVIDER);
             }
 
+            float setpointRate[3] = {};
             processSmoothingFilter(
                     currentTimeUs, ratepid, setpointRate, rawSetpoint);
 
@@ -1014,9 +1005,9 @@ class Receiver {
                 constrain_f((m_commands.throttle - PWM_MIN) /
                         (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
 
-            demands->roll  = setpointRate[ROLL];
-            demands->pitch = setpointRate[PITCH];
-            demands->yaw   = setpointRate[YAW];
+            demands->roll  = setpointRate[0];
+            demands->pitch = setpointRate[1];
+            demands->yaw   = setpointRate[2];
 
             m_gotNewData = false;
 
