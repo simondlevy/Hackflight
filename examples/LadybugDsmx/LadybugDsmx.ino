@@ -23,9 +23,11 @@
 
 #include <receivers/dsmx.h>
 
+static DsmxReceiver receiver;
+
 void setup(void)
 {
-    ladybug_setup(&dsmxDeviceFuns);
+    ladybug_setup(&receiver);
 }
 
 void loop(void)

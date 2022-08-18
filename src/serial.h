@@ -138,7 +138,8 @@ extern "C" {
 
     void serialOpenPortDsmx(
             serialPortIdentifier_e identifier,
-            serialReceiveCallbackPtr rxCallback);
+            serialReceiveCallbackPtr callback,
+            void * data);
 
     void serialOpenPortSbus(
             serialPortIdentifier_e identifier,
