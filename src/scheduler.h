@@ -23,6 +23,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "clock.h"
+
 class Scheduler {
 
     private:
@@ -102,7 +104,7 @@ class Scheduler {
             m_nextTimingCycles = lastTargetCycles;
 
             desiredPeriodCycles =
-                (int32_t)systemClockMicrosToCycles(CORE_PERIOD());
+                (int32_t)systemClockMicrosToCycles(Clock::PERIOD());
 
             m_guardMargin =
                 (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);

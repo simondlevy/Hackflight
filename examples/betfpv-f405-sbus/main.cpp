@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <core_rate.h>
+#include <clock.h>
 #include <datatypes.h>
 #include <hackflight_full.h>
 #include <imu_fusion.h>
@@ -33,7 +33,7 @@
 
 int main(void)
 {
-    void * motorDevice = hardwareInit(CORE_PERIOD());
+    void * motorDevice = hardwareInit(Clock::PERIOD());
 
     static anglePidConstants_t anglePidConstants = {
         1.441305,     // Rate Kp
