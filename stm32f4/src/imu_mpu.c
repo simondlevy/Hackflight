@@ -25,7 +25,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <time.h>
 #include "macros.h"
 
-#include "core_rate.h"
 #include "imu_mpu.h"
 #include "atomic.h"
 #include "bus.h"

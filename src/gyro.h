@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 
-#include "core_rate.h"
+#include "clock.h"
 #include "datatypes.h"
 #include "filters/pt1.h"
 #include "imu.h"
@@ -91,7 +91,7 @@ class Gyro {
 
         static uint32_t calculateCalibratingCycles(void)
         {
-            return CALIBRATION_DURATION / CORE_PERIOD();
+            return CALIBRATION_DURATION / Clock::CORE_PERIOD();
         }
 
         static float nullFilterApply(filter_t *filter, float input)
@@ -192,12 +192,12 @@ class Gyro {
 
         Gyro(void)
         {
-            initLowpassFilterLpf(FILTER_LPF1, LPF1_DYN_MIN_HZ, CORE_PERIOD());
+            initLowpassFilterLpf(FILTER_LPF1, LPF1_DYN_MIN_HZ, Clock::CORE_PERIOD());
 
             m_downsampleFilterEnabled = initLowpassFilterLpf(
                     FILTER_LPF2,
                     LPF2_STATIC_HZ,
-                    CORE_PERIOD()
+                    Clock::CORE_PERIOD()
                     );
 
             setCalibrationCycles(); // start calibrating

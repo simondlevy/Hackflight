@@ -18,8 +18,19 @@
 
 #pragma once
 
-#include "datatypes.h" // for CONST
+class Clock {
 
-static uint32_t CORE_RATE = 10000;
+    public:
 
-static uint32_t CORE_PERIOD() { return 1000000 / CORE_RATE; }
+        static const uint32_t CORE_RATE = 10000;
+
+        static uint32_t CORE_PERIOD(void)
+        { 
+            return 1000000 / CORE_RATE;
+        }
+
+        static float CORE_DT(void)
+        {
+            return CORE_PERIOD() * 1e-6f;
+        }
+};

@@ -21,8 +21,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "clock.h"
 #include "datatypes.h"
-#include "core_dt.h"
 #include "../filters/pt1.h"
 #include "../filters/pt3.h"
 #include "receiver.h"
@@ -63,7 +63,7 @@ static const uint8_t FEEDFORWARD_MAX_RATE_LIMIT = 90;
 static const uint8_t DYN_LPF_CURVE_EXPO = 5;
 
 
-static float FREQUENCY() {return 1.0f / CORE_DT(); }
+static float FREQUENCY() {return 1.0f / Clock::CORE_DT(); }
 
 // Scale factors to make best use of range with D_LPF debugging, aiming for max
 // +/-16K as debug values are 16 bit
@@ -90,12 +90,12 @@ extern "C" {
 
     static float MAX_VELOCITY_CYCLIC() 
     {
-        return RATE_ACCEL_LIMIT * 100 * CORE_DT();
+        return RATE_ACCEL_LIMIT * 100 * Clock::CORE_DT();
     }
 
     static float MAX_VELOCITY_YAW() 
     {
-        return YAW_RATE_ACCEL_LIMIT * 100 * CORE_DT(); 
+        return YAW_RATE_ACCEL_LIMIT * 100 * Clock::CORE_DT(); 
     }
 
     static float pt2FilterApply(pt2Filter_t *filter, float input)
@@ -219,7 +219,7 @@ extern "C" {
 
         for (uint8_t axis = 0; axis < 3; axis++) {
             pid->dtermLowpass[axis].pt1Filter.k =
-                pt1FilterGain(cutoffFreq, CORE_DT());
+                pt1FilterGain(cutoffFreq, Clock::CORE_DT());
 
         }
     }
@@ -281,21 +281,21 @@ extern "C" {
 
         for (uint8_t axis = 0; axis <= 2; axis++) {
             pt1FilterInit(&pid->dtermLowpass[axis].pt1Filter,
-                    pt1FilterGain(dterm_lpf1_init_hz, CORE_DT()));
+                    pt1FilterGain(dterm_lpf1_init_hz, Clock::CORE_DT()));
         }
 
         // 2nd Dterm Lowpass Filter
         for (uint8_t axis = 0; axis <= 2; axis++) {
             pt1FilterInit(&pid->dtermLowpass2[axis].pt1Filter,
-                    pt1FilterGain(DTERM_LPF2_HZ, CORE_DT()));
+                    pt1FilterGain(DTERM_LPF2_HZ, Clock::CORE_DT()));
         }
 
         pt1FilterInit(&pid->ptermYawLowpass,
-                pt1FilterGain(YAW_LOWPASS_HZ, CORE_DT()));
+                pt1FilterGain(YAW_LOWPASS_HZ, Clock::CORE_DT()));
 
         for (int i = 0; i < 3; i++) {
             pt1FilterInit(&pid->windupLpf[i],
-                    pt1FilterGain(ITERM_RELAX_CUTOFF, CORE_DT()));
+                    pt1FilterGain(ITERM_RELAX_CUTOFF, Clock::CORE_DT()));
         }
 
         // Initialize the filters for all axis even if the d_min[axis] value is
@@ -304,9 +304,9 @@ extern "C" {
         // feature won't work because the filter wasn't initialized.
         for (uint8_t axis = 0; axis <= 2; axis++) {
             pt2FilterInit(&pid->dMinRange[axis],
-                    pt2FilterGain(D_MIN_RANGE_HZ, CORE_DT()));
+                    pt2FilterGain(D_MIN_RANGE_HZ, Clock::CORE_DT()));
             pt2FilterInit(&pid->dMinLowpass[axis],
-                    pt2FilterGain(D_MIN_LOWPASS_HZ, CORE_DT()));
+                    pt2FilterGain(D_MIN_LOWPASS_HZ, Clock::CORE_DT()));
         }
     }
 
@@ -322,7 +322,7 @@ extern "C" {
         anglePidConstants_t * constants = &pid->constants;
 
         // gradually scale back integration when above windup point
-        float dynCi = CORE_DT();
+        float dynCi = Clock::CORE_DT();
         const float itermWindupPointInv =
             1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
         if (itermWindupPointInv > 1.0f) {
@@ -406,7 +406,7 @@ extern "C" {
             float Ki =
                 constants->k_rate_i * ((axis == 2 && !USE_INTEGRATED_YAW) ? 2.5 : 1);
             float axisDynCi =
-                (axis == 2) ? dynCi : CORE_DT(); // check windup for yaw only
+                (axis == 2) ? dynCi : Clock::CORE_DT(); // check windup for yaw only
 
             pid->data[axis].I =
                 constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
@@ -511,9 +511,9 @@ extern "C" {
                 pid->data[axis].D +
                 pid->data[axis].F;
             if (axis == 2 && USE_INTEGRATED_YAW) {
-                pid->data[axis].Sum += pidSum * CORE_DT() * 100.0f;
+                pid->data[axis].Sum += pidSum * Clock::CORE_DT() * 100.0f;
                 pid->data[axis].Sum -= pid->data[axis].Sum *
-                    INTEGRATED_YAW_RELAX / 100000.0f * CORE_DT() / 0.000125f;
+                    INTEGRATED_YAW_RELAX / 100000.0f * Clock::CORE_DT() / 0.000125f;
             } else {
                 pid->data[axis].Sum = pidSum;
             }
