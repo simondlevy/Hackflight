@@ -34,6 +34,22 @@ class Receiver {
 
     friend class Hackflight;
 
+    public:
+
+        typedef struct {
+            demands_t demands;
+            float aux1;
+            float aux2;
+        } axes_t;
+
+        typedef enum {
+            FRAME_PENDING = 0,
+            FRAME_COMPLETE = (1 << 0),
+            FRAME_FAILSAFE = (1 << 1),
+            FRAME_PROCESSING_REQUIRED = (1 << 2),
+            FRAME_DROPPED = (1 << 3)
+        } frameState_e;
+
     private:
 
         static const uint8_t CHANNEL_COUNT = 18;
@@ -135,22 +151,6 @@ class Receiver {
             return  pulseDuration >= 885 && pulseDuration <= 2115;
         }
 
-    public:
-
-        typedef struct {
-            demands_t demands;
-            float aux1;
-            float aux2;
-        } axes_t;
-
-        typedef enum {
-            FRAME_PENDING = 0,
-            FRAME_COMPLETE = (1 << 0),
-            FRAME_FAILSAFE = (1 << 1),
-            FRAME_PROCESSING_REQUIRED = (1 << 2),
-            FRAME_DROPPED = (1 << 3)
-        } frameState_e;
-
         typedef enum {
             FAILSAFE_MODE_AUTO = 0,
             FAILSAFE_MODE_HOLD,
@@ -226,18 +226,6 @@ class Receiver {
         bool      m_signalReceived;
         state_e   m_state;
         uint32_t  m_validFrameTimeMs;
-
-        static float applyRates(float commandf, const float commandfAbs)
-        {
-            float expof = RC_EXPO / 100.0f;
-            expof =commandfAbs * (powf(commandf, 5) * expof + commandf * (1 - expof));
-
-            const float centerSensitivity = RC_RATE * 10.0f;
-            const float stickMovement = fmaxf(0, RATE * 10.0f - centerSensitivity);
-            const float angleRate = commandf * centerSensitivity + stickMovement * expof;
-
-            return angleRate;
-        }
 
     private:
 
@@ -866,7 +854,19 @@ class Receiver {
 
     public:
 
-        // Called from tasks/receiver.h::adjustRxDynamicPriority()
+        static float applyRates(float commandf, const float commandfAbs)
+        {
+            float expof = RC_EXPO / 100.0f;
+            expof =commandfAbs * (powf(commandf, 5) * expof + commandf * (1 - expof));
+
+            const float centerSensitivity = RC_RATE * 10.0f;
+            const float stickMovement = fmaxf(0, RATE * 10.0f - centerSensitivity);
+            const float angleRate = commandf * centerSensitivity + stickMovement * expof;
+
+            return angleRate;
+        }
+
+    // Called from tasks/receiver.h::adjustRxDynamicPriority()
         bool check(uint32_t currentTimeUs)
         {
             bool signalReceived = false;
