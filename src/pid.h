@@ -27,5 +27,4 @@ class PidController {
                 demands_t * demands,
                 vehicle_state_t * vstate,
                 bool reset) = 0;
-
 };
