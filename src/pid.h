@@ -25,7 +25,6 @@ class PidController {
         virtual void update(
                 uint32_t currentTimeUs,
                 demands_t * demands,
-                void * data,
                 vehicle_state_t * vstate,
                 bool reset) = 0;
 
