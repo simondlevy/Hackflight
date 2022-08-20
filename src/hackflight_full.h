@@ -69,6 +69,7 @@ class Hackflight {
 
         static void checkCoreTasks(
                 data_t * data,
+                AnglePidController * anglePid,
                 Scheduler * scheduler,
                 uint32_t nowCycles)
         {
@@ -109,6 +110,7 @@ class Hackflight {
 
             HackflightCore::step(
                     coreData,
+                    anglePid,
                     usec,
                     taskData->failsafe.isActive(),
                     &motorConfig,
@@ -261,7 +263,7 @@ class Hackflight {
 
         } // init
 
-        static void step(data_t * full)
+        static void step(data_t * full, AnglePidController * anglePid)
         {
             Scheduler * scheduler = &full->scheduler;
 
@@ -269,7 +271,7 @@ class Hackflight {
             uint32_t nowCycles = systemGetCycleCounter();
 
             if (scheduler->isCoreReady(nowCycles)) {
-                checkCoreTasks(full, scheduler, nowCycles);
+                checkCoreTasks(full, anglePid, scheduler, nowCycles);
             }
 
             if (scheduler->isDynamicReady(systemGetCycleCounter())) {

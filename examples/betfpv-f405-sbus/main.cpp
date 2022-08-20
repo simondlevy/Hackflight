@@ -42,6 +42,13 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0}; // 3.0; // Level Kp
 
+    static AnglePidController anglePid(
+        1.441305,     // Rate Kp
+        19.55048,     // Rate Ki
+        0.021160,     // Rate Kd
+        0.0165048,    // Rate Kf
+        0.0); // 3.0; // Level Kp
+
     Hackflight::data_t hf = {};
 
     ImuFusion imu = {};
@@ -61,7 +68,7 @@ int main(void)
 
     while (true) {
 
-        Hackflight::step(&hf);
+        Hackflight::step(&hf, &anglePid);
     }
 
     return 0;

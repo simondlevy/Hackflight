@@ -71,11 +71,14 @@ class HackflightCore {
 
         static void step(
                 data_t * hc,
+                AnglePidController * anglePid,
                 uint32_t usec,
                 bool failsafe,
                 motor_config_t * motorConfig,
                 float motorvals[])
         {
+            (void)anglePid;
+
             // Run PID controllers to get new demands
             for (uint8_t k=0; k<hc->pidCount; ++k) {
                 pid_controller_t pid = hc->pidControllers[k];
