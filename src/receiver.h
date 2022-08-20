@@ -513,25 +513,26 @@ class Receiver {
         }
 
         static void ratePidFeedforwardLpfInit(
-                anglePid_t * pid, uint16_t filterCutoff)
+                anglePid_t * anglePidData, uint16_t filterCutoff)
         {
             if (filterCutoff > 0) {
-                pid->feedforwardLpfInitialized = true;
-                pt3FilterInit(&pid->feedforwardPt3[0],
+                anglePidData->feedforwardLpfInitialized = true;
+                pt3FilterInit(&anglePidData->feedforwardPt3[0],
                         pt3FilterGain(filterCutoff, Clock::DT()));
-                pt3FilterInit(&pid->feedforwardPt3[1],
+                pt3FilterInit(&anglePidData->feedforwardPt3[1],
                         pt3FilterGain(filterCutoff, Clock::DT()));
-                pt3FilterInit(&pid->feedforwardPt3[2],
+                pt3FilterInit(&anglePidData->feedforwardPt3[2],
                         pt3FilterGain(filterCutoff, Clock::DT()));
             }
         }
 
         static void ratePidFeedforwardLpfUpdate(
-                anglePid_t * pid, uint16_t filterCutoff)
+                anglePid_t * anglePidData, uint16_t filterCutoff)
         {
             if (filterCutoff > 0) {
                 for (uint8_t axis=ROLL; axis<=YAW; axis++) {
-                    pt3FilterUpdateCutoff(&pid->feedforwardPt3[axis],
+                    pt3FilterUpdateCutoff(
+                            &anglePidData->feedforwardPt3[axis],
                             pt3FilterGain(filterCutoff, Clock::DT()));
                 }
             }
@@ -587,7 +588,7 @@ class Receiver {
                 dataToSmooth;
         }
 
-        static void setSmoothingFilterCutoffs(anglePid_t * ratepid,
+        static void setSmoothingFilterCutoffs(anglePid_t * anglePidData,
                 smoothingFilter_t *smoothingFilter)
         {
             const float dT = Clock::PERIOD() * 1e-6f;
@@ -643,10 +644,10 @@ class Receiver {
                                 smoothingFilter->autoSmoothnessFactorSetpoint)); 
             }
             if (!smoothingFilter->filterInitialized) {
-                ratePidFeedforwardLpfInit(ratepid,
+                ratePidFeedforwardLpfInit(anglePidData,
                         smoothingFilter->feedforwardCutoffFrequency);
             } else if (smoothingFilter->feedforwardCutoffFrequency != oldCutoff) {
-                ratePidFeedforwardLpfUpdate(ratepid,
+                ratePidFeedforwardLpfUpdate(anglePidData,
                         smoothingFilter->feedforwardCutoffFrequency);
             }
         }
@@ -699,7 +700,7 @@ class Receiver {
 
         void processSmoothingFilter(
                 uint32_t currentTimeUs,
-                anglePid_t * ratepid,
+                anglePid_t * anglePidData,
                 float * setpointRate,
                 float * rawSetpoint)
         {
@@ -740,7 +741,7 @@ class Receiver {
                 // if we don't need to calculate cutoffs dynamically then the
                 // filters can be initialized now
                 if (!m_calculatedCutoffs) {
-                    setSmoothingFilterCutoffs(ratepid, &m_smoothingFilter);
+                    setSmoothingFilterCutoffs(anglePidData, &m_smoothingFilter);
                     m_smoothingFilter.filterInitialized = true;
                 }
             }
@@ -811,7 +812,7 @@ class Receiver {
                                         // the required number of samples were
                                         // collected so set the filter cutoffs, but
                                         // only if smoothing is active
-                                        setSmoothingFilterCutoffs(ratepid, &m_smoothingFilter);
+                                        setSmoothingFilterCutoffs(anglePidData, &m_smoothingFilter);
                                         m_smoothingFilter.filterInitialized = true;
                                         m_validFrameTimeMs = 0;
                                     }
@@ -978,7 +979,7 @@ class Receiver {
         // Runs in fast (inner, core) loop
         void getDemands(
                 uint32_t currentTimeUs,
-                anglePid_t * ratepid,
+                anglePid_t * anglePidData,
                 demands_t * demands)
         {
             float rawSetpoint[3] = {};
@@ -997,7 +998,7 @@ class Receiver {
 
             float setpointRate[3] = {};
             processSmoothingFilter(
-                    currentTimeUs, ratepid, setpointRate, rawSetpoint);
+                    currentTimeUs, anglePidData, setpointRate, rawSetpoint);
 
             // Find min and max throttle based on conditions. Throttle has to
             // be known before mixing
