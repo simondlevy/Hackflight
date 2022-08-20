@@ -94,10 +94,9 @@ class Hackflight {
 
             uint32_t usec = timeMicros();
 
-            taskData->receiver->getDemands(
-                    usec,
-                    &coreData->anglePid,
-                    &coreData->demands);
+            float rawSetpoints[3] = {0,0,0};
+
+            taskData->receiver->getDemands(usec, rawSetpoints, &coreData->demands);
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 

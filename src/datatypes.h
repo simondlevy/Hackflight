@@ -48,13 +48,6 @@ typedef struct {
     float weight;
 } biquadFilter_t;
 
-// Angle PID control ----------------------------------------------------------
-
-typedef struct {
-    bool         feedforwardLpfInitialized; // ***
-    pt3Filter_t  feedforwardPt3[3]; // ***
-} anglePid_t;
-
 // Demands ----------------------------------------------------------------------
 
 typedef struct {
