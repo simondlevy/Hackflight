@@ -29,19 +29,29 @@
 
 #include "mixers/fixedpitch.h"
 
-static void mixerQuadXbf(
-        demands_t * demands,
-        bool failsafe,
-        motor_config_t * motorConfig,
-        float * motorvals)
-{
-    static axes_t spins[] = {
-        //  rol   pit    yaw
-        { -1.0f, +1.0f, -1.0f }, // REAR_R
-        { -1.0f, -1.0f, +1.0f }, // FRONT_R
-        { +1.0f, +1.0f, +1.0f }, // REAR_L
-        { +1.0f, -1.0f, -1.0f }, // FRONT_L
-    };
+class QuadXbfMixer : public FixedPitchMixer {
 
-    fixedPitchMix(demands, motorConfig, spins, failsafe, 4, motorvals);
-}
+    private:
+
+        axes_t m_spins[4] = {
+            //  rol   pit    yaw
+            { -1.0f, +1.0f, -1.0f }, // REAR_R
+            { -1.0f, -1.0f, +1.0f }, // FRONT_R
+            { +1.0f, +1.0f, +1.0f }, // REAR_L
+            { +1.0f, -1.0f, -1.0f }, // FRONT_L
+        };
+
+    protected:
+
+        virtual axes_t getSpin(uint8_t k) override
+        {
+            return m_spins[k];
+        }
+
+    public:
+
+        QuadXbfMixer(void) 
+            : FixedPitchMixer(4)
+        {
+        }
+};

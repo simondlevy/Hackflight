@@ -20,6 +20,7 @@
 #pragma once
 
 #include "datatypes.h"
+#include "mixer.h"
 #include "pids/angle.h"
 
 class HackflightCore {
@@ -51,9 +52,7 @@ class HackflightCore {
                 data_t * hc,
                 AnglePidController * anglePid,
                 uint32_t usec,
-                bool failsafe,
-                mixer_t mixer,
-                motor_config_t * motorConfig,
+                Mixer * mixer,
                 float motorvals[])
         {
             demands_t * demands = &hc->demands;
@@ -71,7 +70,7 @@ class HackflightCore {
                         demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
 
             // Run the mixer to get motors from demands
-            mixer(&hc->demands, failsafe, motorConfig, motorvals);
+            mixer->run(&hc->demands, motorvals);
         }
 
 }; // class HackflightCore

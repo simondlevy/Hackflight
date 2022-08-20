@@ -70,7 +70,7 @@ class Hackflight {
         static void checkCoreTasks(
                 data_t * data,
                 AnglePidController * anglePid,
-                mixer_t mixer,
+                Mixer * mixer,
                 Scheduler * scheduler,
                 uint32_t nowCycles)
         {
@@ -101,21 +101,35 @@ class Hackflight {
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
-            motor_config_t motorConfig = {
-                motorValueDisarmed(),
-                motorValueHigh(),
-                motorValueLow(),
-                motorIsProtocolDshot()  
-            };
+            HackflightCore::step(coreData, anglePid, usec, mixer, mixmotors);
 
-            HackflightCore::step(
-                    coreData,
-                    anglePid,
-                    usec,
-                    taskData->failsafe.isActive(),
-                    mixer,
-                    &motorConfig,
-                    mixmotors);
+            for (uint8_t i=0; i<mixer->getMotorCount(); i++) {
+
+                float motorOutput = mixmotors[i];
+
+                motorOutput = motorValueLow() +
+                    (motorValueHigh() - motorValueLow()) * motorOutput;
+
+                if (taskData->failsafe.isActive()) {
+                    if (motorIsProtocolDshot()) {
+                        // Prevent getting into special reserved range
+                        motorOutput = (motorOutput < motorValueLow()) ?
+                            motorValueDisarmed() :
+                            motorOutput; 
+                    }
+                    motorOutput = constrain_f(
+                            motorOutput,
+                            motorValueDisarmed(),
+                            motorValueHigh());
+                } else {
+                    motorOutput =
+                        constrain_f(
+                                motorOutput,
+                                motorValueLow(),
+                                motorValueHigh());
+                }
+                mixmotors[i] = motorOutput;
+            }
 
             motorWrite(taskData->motorDevice,
                     Arming::isArmed(&taskData->arming) ?
@@ -263,7 +277,7 @@ class Hackflight {
         static void step(
                 data_t * full,
                 AnglePidController * anglePid,
-                mixer_t mixer)
+                Mixer * mixer)
         {
             Scheduler * scheduler = &full->scheduler;
 

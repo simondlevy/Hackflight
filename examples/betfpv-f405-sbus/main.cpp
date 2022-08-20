@@ -33,7 +33,7 @@
 
 int main(void)
 {
-    void * motorDevice = hardwareInit(Clock::PERIOD());
+    auto motorDevice = hardwareInit(Clock::PERIOD());
 
     static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -46,7 +46,9 @@ int main(void)
 
     ImuFusion imu = {};
 
-    SbusReceiver receiver = SbusReceiver(SERIAL_PORT_USART3);
+    auto receiver = SbusReceiver(SERIAL_PORT_USART3);
+
+    QuadXbfMixer mixer; 
 
     Hackflight::init(
             &hf,
@@ -59,7 +61,7 @@ int main(void)
 
     while (true) {
 
-        Hackflight::step(&hf, &anglePid, mixerQuadXbf);
+        Hackflight::step(&hf, &anglePid, &mixer);
     }
 
     return 0;

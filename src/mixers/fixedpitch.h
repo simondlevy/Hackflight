@@ -24,81 +24,57 @@
 #include "datatypes.h"
 #include "motor.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
+class FixedPitchMixer : public Mixer {
 
-    static void fixedPitchMix(
-            demands_t * demands,
-            motor_config_t * motorConfig,
-            axes_t * spins,
-            bool failsafe,
-            uint8_t motorCount,
-            float * motors)
-    {
-        float mix[MAX_SUPPORTED_MOTORS];
+    protected:
 
-        float mixMax = 0, mixMin = 0;
-
-        for (int i = 0; i < motorCount; i++) {
-
-            mix[i] =
-                demands->roll  * spins[i].x +
-                demands->pitch * spins[i].y +
-                demands->yaw   * spins[i].z;
-
-            if (mix[i] > mixMax) {
-                mixMax = mix[i];
-            } else if (mix[i] < mixMin) {
-                mixMin = mix[i];
-            }
-            mix[i] = mix[i];
+        FixedPitchMixer(uint8_t motorCount) 
+            : Mixer(motorCount)
+        {
         }
 
-        float motorRange = mixMax - mixMin;
+        virtual axes_t getSpin(uint8_t k) = 0;
 
-        float throttle = demands->throttle;
+        virtual void run(demands_t * demands, float * motorvals) override
+        {
+            float mix[MAX_SUPPORTED_MOTORS];
 
-        if (motorRange > 1.0f) {
-            for (int i = 0; i < motorCount; i++) {
-                mix[i] /= motorRange;
-            }
-        } else {
-            if (demands->throttle > 0.5f) {
-                throttle = constrain_f(throttle, -mixMin, 1.0f - mixMax);
-            }
-        }
+            float mixMax = 0, mixMin = 0;
 
-        // Now add in the desired throttle, but keep in a range that doesn't
-        // clip adjusted roll/pitch/yaw. This could move throttle down, but
-        // also up for those low throttle flips.
-        for (int i = 0; i < motorCount; i++) {
-            float motorOutput = mix[i] + throttle;
-            motorOutput = motorConfig->low +
-                (motorConfig->high - motorConfig->low) * motorOutput;
+            for (int i = 0; i < m_motorCount; i++) {
 
-            if (failsafe) {
-                if (motorConfig->isDshot) {
-                    // Prevent getting into special reserved range
-                    motorOutput = (motorOutput < motorConfig->low) ?
-                        motorConfig->disarmed :
-                        motorOutput; 
+                mix[i] =
+                    demands->roll  * getSpin(i).x +
+                    demands->pitch * getSpin(i).y +
+                    demands->yaw   * getSpin(i).z;
+
+                if (mix[i] > mixMax) {
+                    mixMax = mix[i];
+                } else if (mix[i] < mixMin) {
+                    mixMin = mix[i];
                 }
-                motorOutput = constrain_f(
-                        motorOutput,
-                        motorConfig->disarmed,
-                        motorConfig->high);
-            } else {
-                motorOutput =
-                    constrain_f(
-                            motorOutput,
-                            motorConfig->low,
-                            motorConfig->high);
+                mix[i] = mix[i];
             }
-            motors[i] = motorOutput;
-        }
-    }
 
-#if defined(__cplusplus)
-}
-#endif
+            float motorRange = mixMax - mixMin;
+
+            float throttle = demands->throttle;
+
+            if (motorRange > 1.0f) {
+                for (int i = 0; i < m_motorCount; i++) {
+                    mix[i] /= motorRange;
+                }
+            } else {
+                if (demands->throttle > 0.5f) {
+                    throttle = constrain_f(throttle, -mixMin, 1.0f - mixMax);
+                }
+            }
+
+            for (int i = 0; i < m_motorCount; i++) {
+
+                motorvals[i] = mix[i] + throttle;
+            }
+
+        } // run
+
+}; // class FixedPitchMixer

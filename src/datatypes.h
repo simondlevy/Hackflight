@@ -176,22 +176,6 @@ typedef enum rc_alias {
     AUX2
 } rc_alias_e;
 
-// Motors ----------------------------------------------------------------------
-
-typedef struct {
-
-    float disarmed;
-    float high;
-    float low;
-    bool isDshot;
-
-} motor_config_t;
-
-
 // Mixer -----------------------------------------------------------------------
 
-typedef void (*mixer_t)(
-        demands_t * demands,
-        bool failsafe,
-        motor_config_t * motorConfig,
-        float * motors);
+typedef void (*mixer_t)(demands_t * demands, float * motors);
