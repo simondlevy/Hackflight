@@ -49,15 +49,15 @@ class HackflightCore {
         } data_t;
 
         static void step(
-                data_t * hc,
+                data_t * data,
                 AnglePidController * anglePid,
                 uint32_t usec,
                 Mixer * mixer,
                 float motorvals[])
         {
-            demands_t * demands = &hc->demands;
+            demands_t * demands = &data->demands;
 
-            anglePid->update(usec, demands, &hc->vstate, hc->pidReset);
+            anglePid->update(usec, demands, &data->vstate, data->pidReset);
 
             // Constrain the demands, negating yaw to make it agree with PID
             demands->roll  = constrain_demand(
@@ -70,7 +70,7 @@ class HackflightCore {
                         demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
 
             // Run the mixer to get motors from demands
-            mixer->run(&hc->demands, motorvals);
+            mixer->run(&data->demands, motorvals);
         }
 
 }; // class HackflightCore
