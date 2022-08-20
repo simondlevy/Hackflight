@@ -267,6 +267,8 @@ class AnglePidController : public PidController {
         }
 
 
+    public:
+
         virtual void update(
                 uint32_t currentTimeUs,
                 demands_t * demands,
@@ -281,7 +283,7 @@ class AnglePidController : public PidController {
             (void)reset;
         }
 
-};
+}; // class AnglePidController
 
 // minimum of 5ms between updates
 static const uint16_t DYN_LPF_THROTTLE_UPDATE_DELAY_US = 5000; 
