@@ -70,6 +70,7 @@ class Hackflight {
         static void checkCoreTasks(
                 data_t * data,
                 AnglePidController * anglePid,
+                mixer_t mixer,
                 Scheduler * scheduler,
                 uint32_t nowCycles)
         {
@@ -112,6 +113,7 @@ class Hackflight {
                     anglePid,
                     usec,
                     taskData->failsafe.isActive(),
+                    mixer,
                     &motorConfig,
                     mixmotors);
 
@@ -228,14 +230,11 @@ class Hackflight {
                 data_t * data,
                 Imu * imu,
                 Receiver * receiver,
-                mixer_t mixer,
                 void * motorDevice,
                 uint8_t imuInterruptPin,
                 imu_align_fun imuAlign,
                 uint8_t ledPin)
         {
-            HackflightCore::data_t * coreData = &data->coreData;
-            HackflightCore::init(coreData, mixer);
             Task::data_t * taskData = &data->taskData;
 
             taskData->msp.begin();
@@ -261,7 +260,10 @@ class Hackflight {
 
         } // init
 
-        static void step(data_t * full, AnglePidController * anglePid)
+        static void step(
+                data_t * full,
+                AnglePidController * anglePid,
+                mixer_t mixer)
         {
             Scheduler * scheduler = &full->scheduler;
 
@@ -269,7 +271,7 @@ class Hackflight {
             uint32_t nowCycles = systemGetCycleCounter();
 
             if (scheduler->isCoreReady(nowCycles)) {
-                checkCoreTasks(full, anglePid, scheduler, nowCycles);
+                checkCoreTasks(full, anglePid, mixer, scheduler, nowCycles);
             }
 
             if (scheduler->isDynamicReady(systemGetCycleCounter())) {

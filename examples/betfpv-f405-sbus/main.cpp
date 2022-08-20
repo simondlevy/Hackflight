@@ -52,7 +52,6 @@ int main(void)
             &hf,
             &imu,
             &receiver,
-            mixerQuadXbf,
             motorDevice,
             0,                  // dummy value for IMU interrupt pin
             imuRotate270,
@@ -60,7 +59,7 @@ int main(void)
 
     while (true) {
 
-        Hackflight::step(&hf, &anglePid);
+        Hackflight::step(&hf, &anglePid, mixerQuadXbf);
     }
 
     return 0;

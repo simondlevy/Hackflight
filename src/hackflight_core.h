@@ -40,7 +40,6 @@ class HackflightCore {
         typedef struct {
 
             demands_t        demands;
-            mixer_t          mixer;
             pid_controller_t pidControllers[10];
             uint8_t          pidCount;
             bool             pidReset;
@@ -48,16 +47,12 @@ class HackflightCore {
 
         } data_t;
 
-        static void init(data_t * hc, mixer_t mixer)
-        {
-            hc->mixer = mixer;
-        }
-
         static void step(
                 data_t * hc,
                 AnglePidController * anglePid,
                 uint32_t usec,
                 bool failsafe,
+                mixer_t mixer,
                 motor_config_t * motorConfig,
                 float motorvals[])
         {
@@ -76,7 +71,7 @@ class HackflightCore {
                         demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
 
             // Run the mixer to get motors from demands
-            hc->mixer(&hc->demands, failsafe, motorConfig, motorvals);
+            mixer(&hc->demands, failsafe, motorConfig, motorvals);
         }
 
 }; // class HackflightCore
