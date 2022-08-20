@@ -18,7 +18,7 @@
 
 #pragma once
 
-class Pid {
+class PidController {
 
     virtual void update(
         uint32_t currentTimeUs,

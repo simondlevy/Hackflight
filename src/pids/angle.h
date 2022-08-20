@@ -25,7 +25,27 @@
 #include "datatypes.h"
 #include "../filters/pt1.h"
 #include "../filters/pt3.h"
+#include "pid.h"
 #include "receiver.h"
+
+
+class AnglePidController : public PidController {
+
+    virtual void update(
+        uint32_t currentTimeUs,
+        demands_t * demands,
+        void * data,
+        vehicle_state_t * vstate,
+        bool reset) override
+    {
+        (void)currentTimeUs;
+        (void)demands;
+        (void)data;
+        (void)vstate;
+        (void)reset;
+     }
+ 
+};
 
 // minimum of 5ms between updates
 static const uint16_t DYN_LPF_THROTTLE_UPDATE_DELAY_US = 5000; 
