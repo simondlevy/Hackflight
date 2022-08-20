@@ -90,6 +90,183 @@ class AnglePidController : public PidController {
 
         static constexpr float LEVEL_ANGLE_LIMIT = 45;
 
+        static float MAX_VELOCITY_CYCLIC() 
+        {
+            return RATE_ACCEL_LIMIT * 100 * Clock::DT();
+        }
+
+        static float MAX_VELOCITY_YAW() 
+        {
+            return YAW_RATE_ACCEL_LIMIT * 100 * Clock::DT(); 
+        }
+
+        static float pt2FilterApply(pt2Filter_t *filter, float input)
+        {
+            filter->state1 = filter->state1 + filter->k * (input - filter->state1);
+            filter->state =
+                filter->state + filter->k * (filter->state1 - filter->state);
+            return filter->state;
+        }
+
+        static float pt2FilterGain(float f_cut, float dT)
+        {
+            const float order = 2.0f;
+            const float orderCutoffCorrection = 1 / sqrtf(powf(2, 1.0f / order) - 1);
+            float RC = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
+            // float RC = 1 / (2 * 1.553773974f * M_PI * f_cut);
+            // where 1.553773974 = 1 / sqrt( (2^(1 / order) - 1) ) and order is 2
+            return dT / (RC + dT);
+        }
+
+        static void pt2FilterInit(pt2Filter_t *filter, float k)
+        {
+            filter->state = 0.0f;
+            filter->state1 = 0.0f;
+            filter->k = k;
+        }
+
+        static float applyFeedforwardLimit(
+                anglePidConstants_t * constants,
+                float value,
+                float currentPidSetpoint,
+                float maxRateLimit) {
+
+            if (value * currentPidSetpoint > 0.0f) {
+                if (fabsf(currentPidSetpoint) <= maxRateLimit) {
+                    value = constrain_f(value, (-maxRateLimit -
+                                currentPidSetpoint) * constants->k_rate_p,
+                            (maxRateLimit - currentPidSetpoint) *
+                            constants->k_rate_p);
+                } else {
+                    value = 0;
+                }
+            }
+
+            return value;
+        }
+
+        static float accelerationLimit(anglePid_t * pid, uint8_t axis,
+                float currentPidSetpoint)
+        {
+            const float currentVelocity =
+                currentPidSetpoint - pid->previousSetpoint[axis];
+
+            float maxVelocity =
+                axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
+
+            if (fabsf(currentVelocity) > maxVelocity) {
+                currentPidSetpoint = (currentVelocity > 0) ?
+                    pid->previousSetpoint[axis] + maxVelocity :
+                    pid->previousSetpoint[axis] - maxVelocity;
+            }
+
+            pid->previousSetpoint[axis] = currentPidSetpoint;
+            return currentPidSetpoint;
+        }
+
+        static void applyItermRelax(
+                anglePid_t * pid,
+                const int axis,
+                const float iterm,
+                float *itermErrorRate,
+                float *currentPidSetpoint)
+        {
+            const float setpointLpf =
+                pt1FilterApply(&pid->windupLpf[axis], *currentPidSetpoint);
+
+            const float setpointHpf = fabsf(*currentPidSetpoint - setpointLpf);
+
+            if (axis < 2) {
+
+                const float itermRelaxFactor =
+                    fmaxf(0, 1 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD);
+                const bool isDecreasingI = ((iterm > 0) && (*itermErrorRate < 0)) ||
+                    ((iterm < 0) && (*itermErrorRate > 0));
+                if (isDecreasingI) {
+                    // Do Nothing, use the precalculed itermErrorRate
+                } else {
+                    *itermErrorRate *= itermRelaxFactor;
+                } 
+            }
+        }
+
+        static float applyRcSmoothingFeedforwardFilter(
+                anglePid_t * pid, int axis, float pidSetpointDelta)
+        {
+            float ret = pidSetpointDelta;
+            if (pid->feedforwardLpfInitialized) {
+                ret = pt3FilterApply(&pid->feedforwardPt3[axis], pidSetpointDelta);
+            }
+            return ret;
+        }
+
+        static float dynLpfCutoffFreq(
+                float throttle,
+                uint16_t dynLpfMin,
+                uint16_t dynLpfMax,
+                uint8_t expo) {
+            const float expof = expo / 10.0f;
+            static float curve;
+            curve = throttle * (1 - throttle) * expof + throttle;
+            return (dynLpfMax - dynLpfMin) * curve + dynLpfMin;
+        }
+
+        static void pidDynLpfDTermUpdate(anglePid_t * pid, float throttle)
+        {
+            const uint16_t dyn_lpf_min = DTERM_LPF1_DYN_MIN_HZ;
+            const uint16_t dyn_lpf_max = DTERM_LPF1_DYN_MAX_HZ;
+            float cutoffFreq =
+                dynLpfCutoffFreq(throttle, dyn_lpf_min, dyn_lpf_max,
+                        DYN_LPF_CURVE_EXPO);
+
+            for (uint8_t axis = 0; axis < 3; axis++) {
+                pid->dtermLowpass[axis].pt1Filter.k =
+                    pt1FilterGain(cutoffFreq, Clock::DT());
+
+            }
+        }
+
+        static void updateDynLpfCutoffs(
+                anglePid_t * pid,
+                uint32_t currentTimeUs,
+                float throttle)
+        {
+            if (cmpTimeUs(currentTimeUs, pid->lastDynLpfUpdateUs) >=
+                    DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
+
+                // quantize the throttle reduce the number of filter updates
+                int32_t quantizedThrottle =
+                    lrintf(throttle * DYN_LPF_THROTTLE_STEPS); 
+
+                if (quantizedThrottle != pid->dynLpfPreviousQuantizedThrottle) {
+
+                    // scale the quantized value back to the throttle range so the
+                    // filter cutoff steps are repeatable
+                    float dynLpfThrottle =
+                        (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
+                    pidDynLpfDTermUpdate(pid, dynLpfThrottle);
+                    pid->dynLpfPreviousQuantizedThrottle = quantizedThrottle;
+                    pid->lastDynLpfUpdateUs = currentTimeUs;
+                }
+            }
+        }
+
+        static float levelPid(
+                anglePidConstants_t * constants,
+                float currentSetpoint,
+                float currentAngle)
+        {
+            // calculate error angle and limit the angle to the max inclination
+            // rcDeflection in [-1.0, 1.0]
+            float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
+            angle = constrain_f(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
+            float errorAngle = angle - (currentAngle / 10);
+            return constants->k_level_p > 0 ?
+                errorAngle * constants->k_level_p :
+                currentSetpoint;
+        }
+
+
         virtual void update(
                 uint32_t currentTimeUs,
                 demands_t * demands,
