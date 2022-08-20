@@ -100,6 +100,45 @@ class AnglePidController : public PidController {
             return YAW_RATE_ACCEL_LIMIT * 100 * Clock::DT(); 
         }
 
+        typedef struct pidAxisData_s {
+            float P;
+            float I;
+            float D;
+            float F;
+            float Sum;
+        } pidAxisData_t;
+
+        typedef union dtermLowpass_u {
+            biquadFilter_t biquadFilter;
+            pt1Filter_t    pt1Filter;
+            pt2Filter_t    pt2Filter;
+            pt3Filter_t    pt3Filter;
+        } dtermLowpass_t;
+
+        typedef struct {
+            float k_rate_p;
+            float k_rate_i;
+            float k_rate_d;
+            float k_rate_f;
+            float k_level_p;
+        } anglePidConstants_t;
+
+        anglePidConstants_t m_constants;
+        pidAxisData_t       m_data[3];
+        pt2Filter_t         m_dMinLowpass[3];
+        pt2Filter_t         m_dMinRange[3];
+        dtermLowpass_t      m_dtermLowpass[3];
+        dtermLowpass_t      m_dtermLowpass2[3];
+        int32_t             m_dynLpfPreviousQuantizedThrottle;  
+        bool                m_feedforwardLpfInitialized;
+        pt3Filter_t         m_feedforwardPt3[3];
+        uint32_t            m_lastDynLpfUpdateUs;
+        float               m_previousSetpointCorrection[3];
+        float               m_previousGyroRateDterm[3];
+        float               m_previousSetpoint[3];
+        pt1Filter_t         m_ptermYawLowpass;
+        pt1Filter_t         m_windupLpf[3];
+
         static float pt2FilterApply(pt2Filter_t *filter, float input)
         {
             filter->state1 = filter->state1 + filter->k * (input - filter->state1);
@@ -268,6 +307,10 @@ class AnglePidController : public PidController {
 
 
     public:
+
+        AnglePidController()
+        {
+        }
 
         virtual void update(
                 uint32_t currentTimeUs,
