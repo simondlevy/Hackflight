@@ -979,26 +979,25 @@ class Receiver {
         // Runs in fast (inner, core) loop
         void getDemands(
                 uint32_t currentTimeUs,
+                float rawSetpoints[3],
                 anglePid_t * anglePidData,
                 demands_t * demands)
         {
-            float rawSetpoint[3] = {};
-
             if (m_gotNewData) {
 
                 m_previousFrameTimeUs = 0;
 
-                rawSetpoint[0] =
+                rawSetpoints[0] =
                     getRawSetpoint(m_command[ROLL], COMMAND_DIVIDER);
-                rawSetpoint[1] =
+                rawSetpoints[1] =
                     getRawSetpoint(m_command[PITCH], COMMAND_DIVIDER);
-                rawSetpoint[2] =
+                rawSetpoints[2] =
                     getRawSetpoint(m_command[YAW], YAW_COMMAND_DIVIDER);
             }
 
             float setpointRate[3] = {};
             processSmoothingFilter(
-                    currentTimeUs, anglePidData, setpointRate, rawSetpoint);
+                    currentTimeUs, anglePidData, setpointRate, rawSetpoints);
 
             // Find min and max throttle based on conditions. Throttle has to
             // be known before mixing

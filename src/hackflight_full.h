@@ -94,8 +94,11 @@ class Hackflight {
 
             uint32_t usec = timeMicros();
 
+            float rawSetpoints[3] = {0,0,0};
+
             taskData->receiver->getDemands(
                     usec,
+                    rawSetpoints,
                     &coreData->anglePid,
                     &coreData->demands);
 
