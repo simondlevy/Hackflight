@@ -132,6 +132,11 @@ class AnglePidController : public PidController {
         int32_t             m_dynLpfPreviousQuantizedThrottle;  
         bool                m_feedforwardLpfInitialized;
         pt3Filter_t         m_feedforwardPt3[3];
+        float               m_kp;
+        float               m_ki;
+        float               m_kd;
+        float               m_kf;
+        float               m_sum;
         uint32_t            m_lastDynLpfUpdateUs;
         float               m_previousSetpointCorrection[3];
         float               m_previousGyroRateDterm[3];
