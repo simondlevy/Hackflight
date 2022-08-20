@@ -96,11 +96,7 @@ class Hackflight {
 
             float rawSetpoints[3] = {0,0,0};
 
-            taskData->receiver->getDemands(
-                    usec,
-                    rawSetpoints,
-                    &coreData->anglePid,
-                    &coreData->demands);
+            taskData->receiver->getDemands(usec, rawSetpoints, &coreData->demands);
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 

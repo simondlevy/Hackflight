@@ -39,7 +39,6 @@ class HackflightCore {
 
         typedef struct {
 
-            anglePid_t       anglePid;
             demands_t        demands;
             mixer_t          mixer;
             pid_controller_t pidControllers[10];

@@ -201,31 +201,33 @@ class Receiver {
 
         smoothingFilter_t m_smoothingFilter;
 
-        bool      m_auxiliaryProcessingRequired;
-        bool      m_calculatedCutoffs;
-        uint16_t  m_channelData[CHANNEL_COUNT];
-        float     m_command[4];
-        demands_t m_commands;
-        bool      m_dataProcessingRequired;
-        demands_t m_dataToSmooth;
-        int32_t   m_frameTimeDeltaUs;
-        bool      m_gotNewData;
-        bool      m_inFailsafeMode;
-        bool      m_initializedFilter;
-        bool      m_initializedThrottleTable;
-        uint32_t  m_invalidPulsePeriod[CHANNEL_COUNT];
-        bool      m_isRateValid;
-        uint32_t  m_lastFrameTimeUs;
-        uint32_t  m_lastRxTimeUs;
-        int16_t   m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
-        uint32_t  m_needSignalBefore;
-        uint32_t  m_nextUpdateAtUs;
-        uint32_t  m_previousFrameTimeUs;
-        float     m_raw[CHANNEL_COUNT];
-        uint32_t  m_refreshPeriod;
-        bool      m_signalReceived;
-        state_e   m_state;
-        uint32_t  m_validFrameTimeMs;
+        bool         m_auxiliaryProcessingRequired;
+        bool         m_calculatedCutoffs;
+        uint16_t     m_channelData[CHANNEL_COUNT];
+        float        m_command[4];
+        demands_t    m_commands;
+        bool         m_dataProcessingRequired;
+        demands_t    m_dataToSmooth;
+        bool         m_feedforwardLpfInitialized;
+        pt3Filter_t  m_feedforwardPt3[3];
+        int32_t      m_frameTimeDeltaUs;
+        bool         m_gotNewData;
+        bool         m_inFailsafeMode;
+        bool         m_initializedFilter;
+        bool         m_initializedThrottleTable;
+        uint32_t     m_invalidPulsePeriod[CHANNEL_COUNT];
+        bool         m_isRateValid;
+        uint32_t     m_lastFrameTimeUs;
+        uint32_t     m_lastRxTimeUs;
+        int16_t      m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
+        uint32_t     m_needSignalBefore;
+        uint32_t     m_nextUpdateAtUs;
+        uint32_t     m_previousFrameTimeUs;
+        float        m_raw[CHANNEL_COUNT];
+        uint32_t     m_refreshPeriod;
+        bool         m_signalReceived;
+        state_e      m_state;
+        uint32_t     m_validFrameTimeMs;
 
     private:
 
@@ -293,13 +295,12 @@ class Receiver {
             }
         }
 
-        static void rcSmoothingResetAccumulation(
-                smoothingFilter_t *smoothingFilter)
+        void smoothingResetAccumulation(void)
         {
-            smoothingFilter->trainingSum = 0;
-            smoothingFilter->trainingCount = 0;
-            smoothingFilter->trainingMin = UINT16_MAX;
-            smoothingFilter->trainingMax = 0;
+            m_smoothingFilter.trainingSum = 0;
+            m_smoothingFilter.trainingCount = 0;
+            m_smoothingFilter.trainingMin = UINT16_MAX;
+            m_smoothingFilter.trainingMax = 0;
         }
 
         void readChannelsApplyRanges(float raw[])
@@ -500,27 +501,25 @@ class Receiver {
             return Arming::throttleIsDown(raw);
         }
 
-        static void ratePidFeedforwardLpfInit(
-                anglePid_t * anglePidData, uint16_t filterCutoff)
+        void ratePidFeedforwardLpfInit(uint16_t filterCutoff)
         {
             if (filterCutoff > 0) {
-                anglePidData->feedforwardLpfInitialized = true;
-                pt3FilterInit(&anglePidData->feedforwardPt3[0],
+                m_feedforwardLpfInitialized = true;
+                pt3FilterInit(&m_feedforwardPt3[0],
                         pt3FilterGain(filterCutoff, Clock::DT()));
-                pt3FilterInit(&anglePidData->feedforwardPt3[1],
+                pt3FilterInit(&m_feedforwardPt3[1],
                         pt3FilterGain(filterCutoff, Clock::DT()));
-                pt3FilterInit(&anglePidData->feedforwardPt3[2],
+                pt3FilterInit(&m_feedforwardPt3[2],
                         pt3FilterGain(filterCutoff, Clock::DT()));
             }
         }
 
-        static void ratePidFeedforwardLpfUpdate(
-                anglePid_t * anglePidData, uint16_t filterCutoff)
+        void ratePidFeedforwardLpfUpdate(uint16_t filterCutoff)
         {
             if (filterCutoff > 0) {
                 for (uint8_t axis=ROLL; axis<=YAW; axis++) {
                     pt3FilterUpdateCutoff(
-                            &anglePidData->feedforwardPt3[axis],
+                            &m_feedforwardPt3[axis],
                             pt3FilterGain(filterCutoff, Clock::DT()));
                 }
             }
@@ -576,8 +575,7 @@ class Receiver {
                 dataToSmooth;
         }
 
-        static void setSmoothingFilterCutoffs(anglePid_t * anglePidData,
-                smoothingFilter_t *smoothingFilter)
+        void setSmoothingFilterCutoffs(smoothingFilter_t *smoothingFilter)
         {
             const float dT = Clock::PERIOD() * 1e-6f;
             uint16_t oldCutoff = smoothingFilter->setpointCutoffFrequency;
@@ -632,48 +630,45 @@ class Receiver {
                                 smoothingFilter->autoSmoothnessFactorSetpoint)); 
             }
             if (!smoothingFilter->filterInitialized) {
-                ratePidFeedforwardLpfInit(anglePidData,
+                ratePidFeedforwardLpfInit(
                         smoothingFilter->feedforwardCutoffFrequency);
             } else if (smoothingFilter->feedforwardCutoffFrequency != oldCutoff) {
-                ratePidFeedforwardLpfUpdate(anglePidData,
+                ratePidFeedforwardLpfUpdate(
                         smoothingFilter->feedforwardCutoffFrequency);
             }
         }
 
-
-        static bool rcSmoothingAccumulateSample(
-                smoothingFilter_t *smoothingFilter,
-                int frameTimeUs)
+        bool smoothingAccumulateSample(void)
         {
-            smoothingFilter->trainingSum += frameTimeUs;
-            smoothingFilter->trainingCount++;
-            smoothingFilter->trainingMax =
-                fmaxf(smoothingFilter->trainingMax, frameTimeUs);
-            smoothingFilter->trainingMin =
-                fminf(smoothingFilter->trainingMin, frameTimeUs);
+            m_smoothingFilter.trainingSum += m_refreshPeriod;
+            m_smoothingFilter.trainingCount++;
+            m_smoothingFilter.trainingMax =
+                fmaxf(m_smoothingFilter.trainingMax, m_refreshPeriod);
+            m_smoothingFilter.trainingMin =
+                fminf(m_smoothingFilter.trainingMin, m_refreshPeriod);
 
             // if we've collected enough samples then calculate the average and
             // reset the accumulation
-            uint32_t sampleLimit = (smoothingFilter->filterInitialized) ?
+            uint32_t sampleLimit = (m_smoothingFilter.filterInitialized) ?
                 SMOOTHING_FILTER_RETRAINING_SAMPLES :
                 SMOOTHING_FILTER_TRAINING_SAMPLES;
 
-            if (smoothingFilter->trainingCount >= sampleLimit) {
+            if (m_smoothingFilter.trainingCount >= sampleLimit) {
                 // Throw out high and low samples
-                smoothingFilter->trainingSum = smoothingFilter->trainingSum -
-                    smoothingFilter->trainingMin - smoothingFilter->trainingMax; 
+                m_smoothingFilter.trainingSum = m_smoothingFilter.trainingSum -
+                    m_smoothingFilter.trainingMin - m_smoothingFilter.trainingMax; 
 
-                smoothingFilter->averageFrameTimeUs =
-                    lrintf(smoothingFilter->trainingSum /
-                            (smoothingFilter->trainingCount - 2));
-                rcSmoothingResetAccumulation(smoothingFilter);
+                m_smoothingFilter.averageFrameTimeUs =
+                    lrintf(m_smoothingFilter.trainingSum /
+                            (m_smoothingFilter.trainingCount - 2));
+                smoothingResetAccumulation();
                 return true;
             }
             return false;
         }
 
 
-        static bool rcSmoothingAutoCalculate(
+        static bool smoothingAutoCalculate(
                 smoothingFilter_t * smoothingFilter)
         {
             // if any rc smoothing cutoff is 0 (auto) then we need to calculate
@@ -688,7 +683,6 @@ class Receiver {
 
         void processSmoothingFilter(
                 uint32_t currentTimeUs,
-                anglePid_t * anglePidData,
                 float * setpointRate,
                 float * rawSetpoint)
         {
@@ -702,7 +696,7 @@ class Receiver {
                 m_smoothingFilter.setpointCutoffSetting = 0;
                 m_smoothingFilter.throttleCutoffSetting = 0;
                 m_smoothingFilter.ffCutoffSetting = 0;
-                rcSmoothingResetAccumulation(&m_smoothingFilter);
+                smoothingResetAccumulation();
                 m_smoothingFilter.setpointCutoffFrequency =
                     m_smoothingFilter.setpointCutoffSetting;
                 m_smoothingFilter.throttleCutoffFrequency =
@@ -724,12 +718,12 @@ class Receiver {
                 }
 
                 m_calculatedCutoffs = 
-                    rcSmoothingAutoCalculate(&m_smoothingFilter);
+                    smoothingAutoCalculate(&m_smoothingFilter);
 
                 // if we don't need to calculate cutoffs dynamically then the
                 // filters can be initialized now
                 if (!m_calculatedCutoffs) {
-                    setSmoothingFilterCutoffs(anglePidData, &m_smoothingFilter);
+                    setSmoothingFilterCutoffs(&m_smoothingFilter);
                     m_smoothingFilter.filterInitialized = true;
                 }
             }
@@ -785,22 +779,18 @@ class Receiver {
                                         // we need a contiguous block of
                                         // samples that are all significantly
                                         // different than the current average
-                                        rcSmoothingResetAccumulation(
-                                                &m_smoothingFilter);
+                                        smoothingResetAccumulation();
                                         accumulateSample = false;
                                     }
                                 }
 
                                 // accumlate the sample into the average
-                                if (accumulateSample) { if
-                                    (rcSmoothingAccumulateSample(
-                                                                 &m_smoothingFilter,
-                                                                 m_refreshPeriod))
-                                    {
+                                if (accumulateSample) { 
+                                    if (smoothingAccumulateSample()) {
                                         // the required number of samples were
                                         // collected so set the filter cutoffs, but
                                         // only if smoothing is active
-                                        setSmoothingFilterCutoffs(anglePidData, &m_smoothingFilter);
+                                        setSmoothingFilterCutoffs(&m_smoothingFilter);
                                         m_smoothingFilter.filterInitialized = true;
                                         m_validFrameTimeMs = 0;
                                     }
@@ -808,7 +798,7 @@ class Receiver {
 
                             }
                         } else {
-                            rcSmoothingResetAccumulation(&m_smoothingFilter);
+                            smoothingResetAccumulation();
                         }
                     }
                 }
@@ -980,7 +970,6 @@ class Receiver {
         void getDemands(
                 uint32_t currentTimeUs,
                 float rawSetpoints[3],
-                anglePid_t * anglePidData,
                 demands_t * demands)
         {
             if (m_gotNewData) {
@@ -996,8 +985,7 @@ class Receiver {
             }
 
             float setpointRate[3] = {};
-            processSmoothingFilter(
-                    currentTimeUs, anglePidData, setpointRate, rawSetpoints);
+            processSmoothingFilter(currentTimeUs, setpointRate, rawSetpoints);
 
             // Find min and max throttle based on conditions. Throttle has to
             // be known before mixing
