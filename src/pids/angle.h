@@ -31,20 +31,79 @@
 
 class AnglePidController : public PidController {
 
-    virtual void update(
-        uint32_t currentTimeUs,
-        demands_t * demands,
-        void * data,
-        vehicle_state_t * vstate,
-        bool reset) override
-    {
-        (void)currentTimeUs;
-        (void)demands;
-        (void)data;
-        (void)vstate;
-        (void)reset;
-     }
- 
+    private:
+
+        // minimum of 5ms between updates
+        static const uint16_t DYN_LPF_THROTTLE_UPDATE_DELAY_US = 5000; 
+
+        static const uint16_t DYN_LPF_THROTTLE_STEPS = 100;
+
+        // The constant scale factor to replace the Kd component of the
+        // feedforward calculation.  This value gives the same "feel" as the
+        // previous Kd default of 26 (26 * DTERM_SCALE)
+        static constexpr float FEEDFORWARD_SCALE = 0.013754;
+
+        // Full iterm suppression in setpoint mode at high-passed setpoint rate
+        // > 40deg/sec
+        static constexpr float   ITERM_RELAX_SETPOINT_THRESHOLD = 40;
+        static const uint8_t ITERM_RELAX_CUTOFF     = 15;
+
+        static const uint16_t DTERM_LPF1_DYN_MIN_HZ = 75;
+        static const uint16_t DTERM_LPF1_DYN_MAX_HZ = 150;
+        static const uint16_t DTERM_LPF2_HZ         = 150;
+        static const uint16_t YAW_LOWPASS_HZ     = 100;
+        static const bool     USE_INTEGRATED_YAW = false;  // XXX try true?
+        static const uint8_t  ITERM_WINDUP_POINT_PERCENT = 85;        
+
+        // How much integrated yaw should be reduced to offset the drag based
+        // yaw component
+        static const uint8_t INTEGRATED_YAW_RELAX = 200;  
+
+        static const uint8_t D_MIN = 30;
+        static const uint8_t D_MIN_GAIN = 37;
+        static const uint8_t D_MIN_ADVANCE = 20;
+
+        // Amount of lowpass type smoothing for feedforward steps
+        static constexpr float FEEDFORWARD_SMOOTH_FACTOR = 0.75;      
+
+        static const uint8_t FEEDFORWARD_JITTER_FACTOR = 7;
+        static const uint8_t FEEDFORWARD_BOOST_FACTOR  = 15;
+        static const uint8_t FEEDFORWARD_MAX_RATE_LIMIT = 90;
+        static const uint8_t DYN_LPF_CURVE_EXPO = 5;
+
+        // Scale factors to make best use of range with D_LPF debugging, aiming
+        // for max +/-16K as debug values are 16 bit
+        static constexpr float D_LPF_FILT_SCALE = 22;
+
+        // PT2 lowpass input cutoff to peak D around propwash frequencies
+        static constexpr float D_MIN_RANGE_HZ   = 85;  
+
+        // PT2 lowpass cutoff to smooth the boost effect
+        static constexpr float D_MIN_LOWPASS_HZ = 35;  
+
+        static constexpr float D_MIN_GAIN_FACTOR          = 0.00008;
+        static constexpr float D_MIN_SETPOINT_GAIN_FACTOR = 0.00008f;
+
+        static const uint16_t RATE_ACCEL_LIMIT = 0;
+        static const uint16_t YAW_RATE_ACCEL_LIMIT = 0;
+        static const uint16_t ITERM_LIMIT = 400;
+
+        static constexpr float LEVEL_ANGLE_LIMIT = 45;
+
+        virtual void update(
+                uint32_t currentTimeUs,
+                demands_t * demands,
+                void * data,
+                vehicle_state_t * vstate,
+                bool reset) override
+        {
+            (void)currentTimeUs;
+            (void)demands;
+            (void)data;
+            (void)vstate;
+            (void)reset;
+        }
+
 };
 
 // minimum of 5ms between updates
