@@ -299,7 +299,6 @@ class AnglePidController : public PidController {
                 currentSetpoint;
         }
 
-
     public:
 
         AnglePidController(
@@ -314,6 +313,45 @@ class AnglePidController : public PidController {
             m_k_rate_d = k_rate_d;
             m_k_rate_f = k_rate_f;
             m_k_level_p = k_level_p;
+
+            // to allow an initial zero throttle to set the filter cutoff
+            m_dynLpfPreviousQuantizedThrottle = -1;  
+
+            // 1st Dterm Lowpass Filter
+            uint16_t dterm_lpf1_init_hz = DTERM_LPF1_DYN_MIN_HZ;
+
+            dterm_lpf1_init_hz = DTERM_LPF1_DYN_MIN_HZ;
+
+            for (uint8_t axis = 0; axis <= 2; axis++) {
+                pt1FilterInit(&m_dtermLowpass[axis].pt1Filter,
+                        pt1FilterGain(dterm_lpf1_init_hz, Clock::DT()));
+            }
+
+            // 2nd Dterm Lowpass Filter
+            for (uint8_t axis = 0; axis <= 2; axis++) {
+                pt1FilterInit(&m_dtermLowpass2[axis].pt1Filter,
+                        pt1FilterGain(DTERM_LPF2_HZ, Clock::DT()));
+            }
+
+            pt1FilterInit(&m_ptermYawLowpass,
+                    pt1FilterGain(YAW_LOWPASS_HZ, Clock::DT()));
+
+            for (int i = 0; i < 3; i++) {
+                pt1FilterInit(&m_windupLpf[i],
+                        pt1FilterGain(ITERM_RELAX_CUTOFF, Clock::DT()));
+            }
+
+            // Initialize the filters for all axis even if the d_min[axis]
+            // value is 0 Otherwise if the pidProfile.d_min_xxx parameters are
+            // ever added to in-flight adjustments and transition from 0 to > 0
+            // in flight the feature won't work because the filter wasn't
+            // initialized.
+            for (uint8_t axis = 0; axis <= 2; axis++) {
+                pt2FilterInit(&m_dMinRange[axis],
+                        pt2FilterGain(D_MIN_RANGE_HZ, Clock::DT()));
+                pt2FilterInit(&m_dMinLowpass[axis],
+                        pt2FilterGain(D_MIN_LOWPASS_HZ, Clock::DT()));
+            }
         }
 
         virtual void update(
@@ -323,12 +361,9 @@ class AnglePidController : public PidController {
                 vehicle_state_t * vstate,
                 bool reset) override
         {
-            (void)currentTimeUs;
-            (void)demands;
-            (void)data;
-            (void)vstate;
-            (void)reset;
-        }
+
+
+        } // update
 
 }; // class AnglePidController
 
