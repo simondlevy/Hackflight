@@ -229,7 +229,6 @@ class Hackflight {
                 data_t * data,
                 Imu * imu,
                 Receiver * receiver,
-                anglePidConstants_t * anglePidConstants,
                 mixer_t mixer,
                 void * motorDevice,
                 uint8_t imuInterruptPin,
@@ -237,7 +236,7 @@ class Hackflight {
                 uint8_t ledPin)
         {
             HackflightCore::data_t * coreData = &data->coreData;
-            HackflightCore::init(coreData, anglePidConstants, mixer);
+            HackflightCore::init(coreData, mixer);
             Task::data_t * taskData = &data->taskData;
 
             taskData->msp.begin();

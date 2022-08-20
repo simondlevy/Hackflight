@@ -49,24 +49,9 @@ class HackflightCore {
 
         } data_t;
 
-        static void init(
-                data_t * hc,
-                anglePidConstants_t * anglePidConstants,
-                mixer_t mixer)
+        static void init(data_t * hc, mixer_t mixer)
         {
             hc->mixer = mixer;
-
-            anglePidInit(&hc->anglePid, anglePidConstants);
-
-            addPidController(hc, anglePidUpdate, &hc->anglePid);
-        }
-
-        static void addPidController(
-                data_t * hc, pid_fun_t fun, void * data)
-        {
-            hc->pidControllers[hc->pidCount].fun = fun;
-            hc->pidControllers[hc->pidCount].data = data;
-            hc->pidCount++;
         }
 
         static void step(
@@ -77,21 +62,11 @@ class HackflightCore {
                 motor_config_t * motorConfig,
                 float motorvals[])
         {
-            (void)anglePid;
+            demands_t * demands = &hc->demands;
 
-            // Run PID controllers to get new demands
-            for (uint8_t k=0; k<hc->pidCount; ++k) {
-                pid_controller_t pid = hc->pidControllers[k];
-                pid.fun(
-                        usec,
-                        &hc->demands,
-                        pid.data,
-                        &hc->vstate,
-                        hc->pidReset);
-            }
+            anglePid->update(usec, demands, &hc->vstate, hc->pidReset);
 
             // Constrain the demands, negating yaw to make it agree with PID
-            demands_t * demands = &hc->demands;
             demands->roll  = constrain_demand(
                     demands->roll, PIDSUM_LIMIT, PID_MIXER_SCALING);
             demands->pitch =
