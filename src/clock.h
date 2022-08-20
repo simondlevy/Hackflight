@@ -20,17 +20,19 @@
 
 class Clock {
 
+    private:
+
+        static const uint32_t RATE = 10000;
+
     public:
 
-        static const uint32_t CORE_RATE = 10000;
-
-        static uint32_t CORE_PERIOD(void)
+        static uint32_t PERIOD(void)
         { 
-            return 1000000 / CORE_RATE;
+            return 1000000 / RATE;
         }
 
-        static float CORE_DT(void)
+        static float DT(void)
         {
-            return CORE_PERIOD() * 1e-6f;
+            return PERIOD() * 1e-6f;
         }
 };

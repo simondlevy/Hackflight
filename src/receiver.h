@@ -518,11 +518,11 @@ class Receiver {
             if (filterCutoff > 0) {
                 pid->feedforwardLpfInitialized = true;
                 pt3FilterInit(&pid->feedforwardPt3[0],
-                        pt3FilterGain(filterCutoff, Clock::CORE_DT()));
+                        pt3FilterGain(filterCutoff, Clock::DT()));
                 pt3FilterInit(&pid->feedforwardPt3[1],
-                        pt3FilterGain(filterCutoff, Clock::CORE_DT()));
+                        pt3FilterGain(filterCutoff, Clock::DT()));
                 pt3FilterInit(&pid->feedforwardPt3[2],
-                        pt3FilterGain(filterCutoff, Clock::CORE_DT()));
+                        pt3FilterGain(filterCutoff, Clock::DT()));
             }
         }
 
@@ -532,7 +532,7 @@ class Receiver {
             if (filterCutoff > 0) {
                 for (uint8_t axis=ROLL; axis<=YAW; axis++) {
                     pt3FilterUpdateCutoff(&pid->feedforwardPt3[axis],
-                            pt3FilterGain(filterCutoff, Clock::CORE_DT()));
+                            pt3FilterGain(filterCutoff, Clock::DT()));
                 }
             }
         }
@@ -590,7 +590,7 @@ class Receiver {
         static void setSmoothingFilterCutoffs(anglePid_t * ratepid,
                 smoothingFilter_t *smoothingFilter)
         {
-            const float dT = Clock::CORE_PERIOD() * 1e-6f;
+            const float dT = Clock::PERIOD() * 1e-6f;
             uint16_t oldCutoff = smoothingFilter->setpointCutoffFrequency;
 
             if (smoothingFilter->setpointCutoffSetting == 0) {

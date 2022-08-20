@@ -160,7 +160,7 @@ class ImuFusion : public Imu {
             int32_t deltaT = time - fusionPrev->time;
 
             axes_t gyroAvg = {};
-            getAverage(&m_accum, Clock::CORE_PERIOD(), &gyroAvg);
+            getAverage(&m_accum, Clock::PERIOD(), &gyroAvg);
 
             float dt = deltaT * 1e-6;
 
@@ -184,9 +184,9 @@ class ImuFusion : public Imu {
             static axes_t _adcf;
 
             // integrate using trapezium rule to avoid bias
-            m_accum.values.x += 0.5f * (_adcf.x + gx) * Clock::CORE_PERIOD();
-            m_accum.values.y += 0.5f * (_adcf.y + gy) * Clock::CORE_PERIOD();
-            m_accum.values.z += 0.5f * (_adcf.z + gz) * Clock::CORE_PERIOD();
+            m_accum.values.x += 0.5f * (_adcf.x + gx) * Clock::PERIOD();
+            m_accum.values.y += 0.5f * (_adcf.y + gy) * Clock::PERIOD();
+            m_accum.values.z += 0.5f * (_adcf.z + gz) * Clock::PERIOD();
 
             m_accum.count++;
 

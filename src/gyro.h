@@ -91,7 +91,7 @@ class Gyro {
 
         static uint32_t calculateCalibratingCycles(void)
         {
-            return CALIBRATION_DURATION / Clock::CORE_PERIOD();
+            return CALIBRATION_DURATION / Clock::PERIOD();
         }
 
         static float nullFilterApply(filter_t *filter, float input)
@@ -192,12 +192,12 @@ class Gyro {
 
         Gyro(void)
         {
-            initLowpassFilterLpf(FILTER_LPF1, LPF1_DYN_MIN_HZ, Clock::CORE_PERIOD());
+            initLowpassFilterLpf(FILTER_LPF1, LPF1_DYN_MIN_HZ, Clock::PERIOD());
 
             m_downsampleFilterEnabled = initLowpassFilterLpf(
                     FILTER_LPF2,
                     LPF2_STATIC_HZ,
-                    Clock::CORE_PERIOD()
+                    Clock::PERIOD()
                     );
 
             setCalibrationCycles(); // start calibrating

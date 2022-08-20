@@ -33,7 +33,7 @@
 
 int main(void)
 {
-    void * motorDevice = hardwareInit(Clock::CORE_PERIOD());
+    void * motorDevice = hardwareInit(Clock::PERIOD());
 
     static anglePidConstants_t anglePidConstants = {
         1.441305,     // Rate Kp
