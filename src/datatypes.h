@@ -22,54 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Filtering ------------------------------------------------------------------
-
-typedef struct pt1Filter_s {
-    float state;
-    float k;
-} pt1Filter_t;
-
-typedef struct {
-    float state;
-    float state1;
-    float k;
-} pt2Filter_t;
-
-typedef struct {
-    float state;
-    float state1;
-    float state2;
-    float k;
-} pt3Filter_t;
-
-typedef struct {
-    float b0, b1, b2, a1, a2;
-    float x1, x2, y1, y2;
-    float weight;
-} biquadFilter_t;
-
-enum {
-    FILTER_LPF1 = 0,
-    FILTER_LPF2
-};
-
-typedef enum {
-    FILTER_LPF,    // 2nd order Butterworth section
-    FILTER_NOTCH,
-    FILTER_BPF,
-} biquadFilterType_e;
-
-typedef enum {
-    FILTER_PT1 = 0,
-    FILTER_BIQUAD,
-    FILTER_PT2,
-    FILTER_PT3,
-} lowpassFilterType_e;
-
-struct filter_s;
-typedef struct filter_s filter_t;
-typedef float (*filterApplyFnPtr)(filter_t *filter, float input);
-
 // Demands ----------------------------------------------------------------------
 
 typedef struct {

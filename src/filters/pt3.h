@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "datatypes.h"
+#include "filters.h"
 
 // rx.c, ratepid.h
 static float pt3FilterApply(pt3Filter_t *filter, float input)

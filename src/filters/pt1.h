@@ -20,7 +20,7 @@
 
 #include <math.h>
 
-#include "datatypes.h"
+#include "filters.h"
 
 static float pt1FilterApply(pt1Filter_t *filter, float input)
 {
