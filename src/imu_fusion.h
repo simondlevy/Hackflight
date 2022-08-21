@@ -153,7 +153,7 @@ class ImuFusion : public Imu {
 
         void getQuaternion(
                 Arming::data_t * arming,
-                imu_fusion_t * fusionPrev,
+                Imu::fusion_t * fusionPrev,
                 uint32_t time,
                 quaternion_t * quat)
         {
@@ -196,7 +196,7 @@ class ImuFusion : public Imu {
         }
 
         virtual void getEulerAngles(
-                imu_fusion_t * fusionPrev,
+                Imu::fusion_t * fusionPrev,
                 Arming::data_t * arming,
                 uint32_t time,
                 vehicle_state_t * vstate) override
@@ -206,11 +206,11 @@ class ImuFusion : public Imu {
             rotation_t rot = {};
             quat2euler(&quat, vstate, &rot);
 
-            imu_fusion_t fusion;
+            Imu::fusion_t fusion;
             fusion.time = time;
             memcpy(&fusion.quat, &quat, sizeof(quaternion_t));
             memcpy(&fusion.rot, &rot, sizeof(rotation_t));
-            memcpy(fusionPrev, &fusion, sizeof(imu_fusion_t));
+            memcpy(fusionPrev, &fusion, sizeof(Imu::fusion_t));
             memset(&m_accum, 0, sizeof(imu_sensor_t));
          }
 

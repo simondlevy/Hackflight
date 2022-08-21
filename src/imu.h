@@ -25,6 +25,13 @@ class Imu {
 
     public:
 
+        typedef struct {
+            uint32_t time;
+            quaternion_t quat;
+            rotation_t rot;
+            gyro_reset_t gyroReset;
+        } fusion_t;
+
         virtual void accumulateGyro(float gx, float gy, float gz)
         {
             (void)gx;
@@ -33,7 +40,7 @@ class Imu {
         }
 
         virtual void getEulerAngles(
-                imu_fusion_t * fusionPrev,
+                fusion_t * fusionPrev,
                 Arming::data_t * arming,
                 uint32_t time,
                 vehicle_state_t * vstate) = 0;

@@ -23,6 +23,7 @@
 #include <stdint.h>
 
 #include "hackflight_core.h"
+#include "imu.h"
 #include "msp.h"
 #include "receiver.h"
 
@@ -36,7 +37,7 @@ class Task {
             Failsafe         failsafe;
             Gyro             gyro;
             Imu *            imu;
-            imu_fusion_t     imuFusionPrev;
+            Imu::fusion_t     imuFusionPrev;
             float            maxArmingAngle;
             void *           motorDevice;
             Msp              msp;

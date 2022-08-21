@@ -24,7 +24,7 @@ class ImuUsfs : public Imu {
     public:
 
         virtual void getEulerAngles(
-                imu_fusion_t * fusionPrev,
+                Imu::fusion_t * fusionPrev,
                 Arming::data_t * arming,
                 uint32_t time,
                 vehicle_state_t * vstate) override;
