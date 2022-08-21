@@ -73,19 +73,14 @@ class Hackflight {
 
         } data_t;
 
-        void checkCoreTasks(
-                data_t * data,
-                AnglePidController * anglePid,
-                Mixer * mixer,
-                Scheduler * scheduler,
-                uint32_t nowCycles)
+        void checkCoreTasks(data_t * data, uint32_t nowCycles)
         {
             Task::data_t * taskData = &data->taskData;
 
-            int32_t loopRemainingCycles = scheduler->getLoopRemainingCycles();
-            uint32_t nextTargetCycles = scheduler->getNextTargetCycles();
+            int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
+            uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
 
-            scheduler->corePreUpdate();
+            m_scheduler.corePreUpdate();
 
             while (loopRemainingCycles > 0) {
                 nowCycles = systemGetCycleCounter();
@@ -111,13 +106,13 @@ class Hackflight {
             HackflightCore::step(
                     &demands,
                     &taskData->vstate,
-                    anglePid,
+                    m_anglePid,
                     taskData->pidReset,
                     usec,
-                    mixer,
+                    m_mixer,
                     mixmotors);
 
-            for (uint8_t i=0; i<mixer->getMotorCount(); i++) {
+            for (uint8_t i=0; i<m_mixer->getMotorCount(); i++) {
 
                 float motorOutput = mixmotors[i];
 
@@ -150,7 +145,7 @@ class Hackflight {
                     mixmotors :
                     taskData->mspMotors);
 
-            scheduler->corePostUpdate(nowCycles);
+            m_scheduler.corePostUpdate(nowCycles);
 
             // Bring the scheduler into lock with the gyro Track the actual
             // gyro rate over given number of cycle times and set the expected
@@ -167,7 +162,7 @@ class Hackflight {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-                scheduler->desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
+                m_scheduler.desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
                 _terminalGyroRateCount += CORE_RATE_COUNT;
             }
@@ -178,7 +173,7 @@ class Hackflight {
             static int32_t _gyroSkewAccum;
 
             int32_t gyroSkew =
-                Gyro::getSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
+                Gyro::getSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 
@@ -190,15 +185,14 @@ class Hackflight {
                 _terminalGyroLockCount += GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
-                scheduler->lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
+                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
 
                 _gyroSkewAccum = 0;
             }
 
         } // checkCoreTasks
 
-        void checkDynamicTasks(
-                data_t * full, Scheduler * scheduler)
+        void checkDynamicTasks(data_t * full)
         {
             Task *selectedTask = NULL;
             uint16_t selectedTaskDynamicPriority = 0;
@@ -217,9 +211,9 @@ class Hackflight {
             if (selectedTask) {
 
                 int32_t loopRemainingCycles =
-                    scheduler->getLoopRemainingCycles();
+                    m_scheduler.getLoopRemainingCycles();
                 uint32_t nextTargetCycles =
-                    scheduler->getNextTargetCycles();
+                    m_scheduler.getNextTargetCycles();
 
                 int32_t taskRequiredTimeUs = selectedTask->getRequiredTime();
                 int32_t taskRequiredCycles =
@@ -231,7 +225,7 @@ class Hackflight {
                     cmpTimeCycles(nextTargetCycles, nowCycles);
 
                 // Allow a little extra time
-                taskRequiredCycles += scheduler->getTaskGuardCycles();
+                taskRequiredCycles += m_scheduler.getTaskGuardCycles();
 
                 if (taskRequiredCycles < loopRemainingCycles) {
 
@@ -240,7 +234,7 @@ class Hackflight {
 
                     selectedTask->execute(&full->taskData, usec);
 
-                    scheduler->updateDynamic(
+                    m_scheduler.updateDynamic(
                             systemGetCycleCounter(),
                             anticipatedEndCycles);
 
@@ -301,17 +295,15 @@ class Hackflight {
 
         void step(data_t * data)
         {
-            Scheduler * scheduler = &m_scheduler;
-
             // Realtime gyro/filtering/PID tasks get complete priority
             uint32_t nowCycles = systemGetCycleCounter();
 
-            if (scheduler->isCoreReady(nowCycles)) {
-                checkCoreTasks(data, m_anglePid, m_mixer, scheduler, nowCycles);
+            if (m_scheduler.isCoreReady(nowCycles)) {
+                checkCoreTasks(data, nowCycles);
             }
 
-            if (scheduler->isDynamicReady(systemGetCycleCounter())) {
-                checkDynamicTasks(data, scheduler);
+            if (m_scheduler.isDynamicReady(systemGetCycleCounter())) {
+                checkDynamicTasks(data);
             }
         }
 
