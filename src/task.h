@@ -142,6 +142,5 @@ class Task {
             }
         }
 
-
         virtual void fun(data_t * data, uint32_t usec) = 0;
 }; 
