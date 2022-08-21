@@ -26,6 +26,13 @@ class Imu {
     public:
 
         typedef struct {
+            float w;
+            float x;
+            float y;
+            float z;
+        } quaternion_t;
+
+        typedef struct {
             uint32_t time;
             quaternion_t quat;
             rotation_t rot;

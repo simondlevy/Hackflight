@@ -72,7 +72,7 @@ class ImuFusion : public Imu {
             return res;
         }
 
-        static void quat2euler(quaternion_t * quat, vehicle_state_t * state, rotation_t * rot)
+        static void quat2euler(Imu::quaternion_t * quat, vehicle_state_t * state, rotation_t * rot)
         {
             float qw = quat->w;
             float qx = quat->x;
@@ -120,8 +120,8 @@ class ImuFusion : public Imu {
         static void mahony(
                 float dt,
                 axes_t * gyro,
-                quaternion_t * quat_old,
-                quaternion_t * quat_new)
+                Imu::quaternion_t * quat_old,
+                Imu::quaternion_t * quat_new)
         {
             // Convert gyro degrees to radians
             float gx = deg2rad(gyro->x);
@@ -155,7 +155,7 @@ class ImuFusion : public Imu {
                 Arming::data_t * arming,
                 Imu::fusion_t * fusionPrev,
                 uint32_t time,
-                quaternion_t * quat)
+                Imu::quaternion_t * quat)
         {
             int32_t deltaT = time - fusionPrev->time;
 
@@ -201,19 +201,18 @@ class ImuFusion : public Imu {
                 uint32_t time,
                 vehicle_state_t * vstate) override
         {
-            quaternion_t quat = {};
+            Imu::quaternion_t quat = {};
             getQuaternion(arming, fusionPrev, time, &quat);
             rotation_t rot = {};
             quat2euler(&quat, vstate, &rot);
 
             Imu::fusion_t fusion;
             fusion.time = time;
-            memcpy(&fusion.quat, &quat, sizeof(quaternion_t));
+            memcpy(&fusion.quat, &quat, sizeof(Imu::quaternion_t));
             memcpy(&fusion.rot, &rot, sizeof(rotation_t));
             memcpy(fusionPrev, &fusion, sizeof(Imu::fusion_t));
             memset(&m_accum, 0, sizeof(imu_sensor_t));
          }
-
 };
 
 #if defined(__cplusplus)

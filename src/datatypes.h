@@ -60,13 +60,6 @@ typedef struct {
 // IMU ------------------------------------------------------------------------
 
 typedef struct {
-    float w;
-    float x;
-    float y;
-    float z;
-} quaternion_t;
-
-typedef struct {
     float r20;
     float r21;
     float r22;
