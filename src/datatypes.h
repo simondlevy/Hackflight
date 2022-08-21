@@ -56,22 +56,6 @@ typedef struct {
     float dpsi;
 } vehicle_state_t;
 
-// General PID control ---------------------------------------------------------
-
-typedef void (*pid_fun_t)(
-        uint32_t usec,
-        demands_t * demands,
-        void * data,
-        vehicle_state_t * vstate,
-        bool reset
-        );
-
-
-typedef struct {
-    pid_fun_t fun;
-    void * data;
-} pid_controller_t;
-
 
 // IMU ------------------------------------------------------------------------
 
