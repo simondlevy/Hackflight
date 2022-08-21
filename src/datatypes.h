@@ -175,7 +175,3 @@ typedef enum rc_alias {
     AUX1,
     AUX2
 } rc_alias_e;
-
-// Mixer -----------------------------------------------------------------------
-
-typedef void (*mixer_t)(demands_t * demands, float * motors);
