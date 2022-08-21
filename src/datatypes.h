@@ -19,11 +19,6 @@
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
-
-// Demands ----------------------------------------------------------------------
-
 typedef struct {
     float throttle;
     float roll;
