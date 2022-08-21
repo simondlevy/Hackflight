@@ -50,6 +50,8 @@ class Hackflight {
         // Arming safety  
         static constexpr float MAX_ARMING_ANGLE = 25;
 
+        uint8_t m_ledPin;
+
     public:
 
         typedef struct {
@@ -63,7 +65,6 @@ class Hackflight {
             ReceiverTask receiverTask;
 
             uint8_t imuInterruptPin;
-            uint8_t ledPin;
 
         } data_t;
 
@@ -247,8 +248,9 @@ class Hackflight {
 
     public:
 
-        Hackflight(void)
+        Hackflight(uint8_t ledPin)
         {
+            m_ledPin = ledPin;
         }
 
         void init(
@@ -257,8 +259,7 @@ class Hackflight {
                 Receiver * receiver,
                 void * motorDevice,
                 Imu::align_fun imuAlign,
-                uint8_t imuInterruptPin,
-                uint8_t ledPin)
+                uint8_t imuInterruptPin)
         {
             Task::data_t * taskData = &data->taskData;
 
@@ -276,7 +277,6 @@ class Hackflight {
             taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
             data->imuInterruptPin = imuInterruptPin;
-            data->ledPin = ledPin;
         }
 
         void begin(data_t * data)
@@ -285,7 +285,7 @@ class Hackflight {
 
             imuDevInit(data->imuInterruptPin);
 
-            ledDevInit(data->ledPin);
+            ledDevInit(m_ledPin);
 
             Led::flash(10, 50);
 
