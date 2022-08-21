@@ -305,14 +305,10 @@ $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
 
 $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \
-	  $(HFSRC_DIR)/clock.h \
-      $(HFSRC_DIR)/datatypes.h \
-      $(HFSRC_DIR)/hackflight_full.h \
-      $(HFSRC_DIR)/imu_fusion.h \
+	  $(HFSRC_DIR)/*.h \
       $(HFSRC_DIR)/imu_alignment/rotate_270.h \
       $(HFSRC_DIR)/mixers/fixedpitch/quadxbf.h \
-      $(HFSRC_DIR)/receivers/sbus.h \
-      $(HFSRC_DIR)/serial.h
+      $(HFSRC_DIR)/receivers/sbus.h
 	$(V1) $(call compile_cpp)
 
 # ==============================================================================

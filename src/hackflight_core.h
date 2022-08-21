@@ -41,8 +41,6 @@ class HackflightCore {
         typedef struct {
 
             demands_t        demands;
-            pid_controller_t pidControllers[10];
-            uint8_t          pidCount;
             bool             pidReset;
             vehicle_state_t  vstate;
 
