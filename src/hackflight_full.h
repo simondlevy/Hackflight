@@ -58,13 +58,13 @@ class Hackflight {
         Mixer *              m_mixer;
         void *               m_motorDevice;
         Receiver *           m_receiver;
+        Scheduler            m_scheduler;
 
     public:
 
         typedef struct {
 
             Imu::align_fun imuAlignFun;
-            Scheduler      scheduler;
             Task::data_t   taskData;
 
             AttitudeTask attitudeTask;
@@ -301,7 +301,7 @@ class Hackflight {
 
         void step(data_t * data)
         {
-            Scheduler * scheduler = &data->scheduler;
+            Scheduler * scheduler = &m_scheduler;
 
             // Realtime gyro/filtering/PID tasks get complete priority
             uint32_t nowCycles = systemGetCycleCounter();
