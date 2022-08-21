@@ -73,7 +73,7 @@ class Hackflight {
 
         } data_t;
 
-        static void checkCoreTasks(
+        void checkCoreTasks(
                 data_t * data,
                 AnglePidController * anglePid,
                 Mixer * mixer,
@@ -197,7 +197,7 @@ class Hackflight {
 
         } // checkCoreTasks
 
-        static void checkDynamicTasks(
+        void checkDynamicTasks(
                 data_t * full, Scheduler * scheduler)
         {
             Task *selectedTask = NULL;
