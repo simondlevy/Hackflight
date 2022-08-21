@@ -52,10 +52,7 @@ class ReceiverTask : public Task {
             }
         }    
         
-        void fun(
-                HackflightCore::data_t * core,
-                Task::data_t * data,
-                uint32_t usec)
+        void fun(Task::data_t * data, uint32_t usec)
         {
             bool calibrating = data->gyro.isCalibrating(); 
             // || acc.calibrating != 0;
@@ -67,8 +64,8 @@ class ReceiverTask : public Task {
             bool gotNewData = false;
 
             bool imuIsLevel =
-                fabsf(core->vstate.phi) < data->maxArmingAngle &&
-                fabsf(core->vstate.theta) < data->maxArmingAngle;
+                fabsf(data->vstate.phi) < data->maxArmingAngle &&
+                fabsf(data->vstate.theta) < data->maxArmingAngle;
 
             data->receiver->poll(
                     usec,
@@ -83,7 +80,7 @@ class ReceiverTask : public Task {
                     &gotNewData);
 
             if (pidItermResetReady) {
-                core->pidReset = pidItermResetValue;
+                data->pidReset = pidItermResetValue;
             }
 
             if (gotNewData) {

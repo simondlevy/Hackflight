@@ -31,15 +31,12 @@ class AttitudeTask : public Task {
         {
         }
 
-        virtual void fun(
-                HackflightCore::data_t * core,
-                Task::data_t * data,
-                uint32_t time) override
+        virtual void fun(Task::data_t * data, uint32_t time) override
         {
             data->imu->getEulerAngles(
                     &data->imuFusionPrev,
                     &data->arming,
                     time,
-                    &core->vstate);
+                    &data->vstate);
         }
 };

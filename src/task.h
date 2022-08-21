@@ -41,8 +41,11 @@ class Task {
             void *           motorDevice;
             Msp              msp;
             float            mspMotors[4];
+            bool             pidReset;
             Receiver *       receiver;
             Receiver::axes_t rxAxes;
+            vehicle_state_t  vstate;
+
 
         } data_t;
 
@@ -99,14 +102,13 @@ class Task {
             }
         }
 
-        void execute(
-                HackflightCore::data_t * core, data_t * td, uint32_t usec)
+        void execute(data_t * data, uint32_t usec)
         {
             m_lastExecutedAtUs = usec;
             m_dynamicPriority = 0;
 
             uint32_t time = timeMicros();
-            fun(core, td, usec);
+            fun(data, usec);
 
             uint32_t taskExecutionTimeUs = timeMicros() - time;
 
@@ -141,8 +143,5 @@ class Task {
         }
 
 
-        virtual void fun(
-                HackflightCore::data_t * core,
-                data_t * data,
-                uint32_t usec) = 0;
+        virtual void fun(data_t * data, uint32_t usec) = 0;
 }; 

@@ -38,24 +38,16 @@ class HackflightCore {
 
     public:
 
-        typedef struct {
-
-            demands_t        demands;
-            bool             pidReset;
-            vehicle_state_t  vstate;
-
-        } data_t;
-
         static void step(
-                data_t * data,
+                demands_t * demands,
+                vehicle_state_t * vstate,
                 AnglePidController * anglePid,
+                bool pidReset,
                 uint32_t usec,
                 Mixer * mixer,
                 float motorvals[])
         {
-            demands_t * demands = &data->demands;
-
-            anglePid->update(usec, demands, &data->vstate, data->pidReset);
+            anglePid->update(usec, demands, vstate, pidReset);
 
             // Constrain the demands, negating yaw to make it agree with PID
             demands->roll  = constrain_demand(
@@ -68,7 +60,7 @@ class HackflightCore {
                         demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
 
             // Run the mixer to get motors from demands
-            mixer->run(&data->demands, motorvals);
+            mixer->run(demands, motorvals);
         }
 
 }; // class HackflightCore

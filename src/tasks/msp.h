@@ -28,15 +28,12 @@ class MspTask : public Task {
 
         MspTask() : Task(100) { } // Hz
 
-        virtual void fun(
-                HackflightCore::data_t * coreData,
-                Task::data_t * data,
-                uint32_t usec) override
+        virtual void fun(Task::data_t * data, uint32_t usec) override
         {
             (void)usec;
 
             data->msp.update(
-                    &coreData->vstate,
+                    &data->vstate,
                     &data->rxAxes,
                     Arming::isArmed(&data->arming),
                     data->motorDevice,

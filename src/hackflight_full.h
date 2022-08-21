@@ -54,7 +54,6 @@ class Hackflight {
 
         typedef struct {
 
-            HackflightCore::data_t coreData;
             imu_align_fun          imuAlignFun;
             Scheduler              scheduler;
             Task::data_t           taskData;
@@ -74,7 +73,6 @@ class Hackflight {
                 Scheduler * scheduler,
                 uint32_t nowCycles)
         {
-            HackflightCore::data_t * coreData = &data->coreData;
             Task::data_t * taskData = &data->taskData;
 
             int32_t loopRemainingCycles = scheduler->getLoopRemainingCycles();
@@ -91,17 +89,26 @@ class Hackflight {
             taskData->gyro.readScaled(
                     taskData->imu,
                     data->imuAlignFun,
-                    &coreData->vstate);
+                    &taskData->vstate);
 
             uint32_t usec = timeMicros();
 
             float rawSetpoints[3] = {0,0,0};
 
-            taskData->receiver->getDemands(usec, rawSetpoints, &coreData->demands);
+            demands_t demands = {0,0,0,0};
+
+            taskData->receiver->getDemands(usec, rawSetpoints, &demands);
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
-            HackflightCore::step(coreData, anglePid, usec, mixer, mixmotors);
+            HackflightCore::step(
+                    &demands,
+                    &taskData->vstate,
+                    anglePid,
+                    taskData->pidReset,
+                    usec,
+                    mixer,
+                    mixmotors);
 
             for (uint8_t i=0; i<mixer->getMotorCount(); i++) {
 
@@ -224,8 +231,7 @@ class Hackflight {
                     uint32_t anticipatedEndCycles =
                         nowCycles + taskRequiredCycles;
 
-                    selectedTask->execute
-                        (&full->coreData, &full->taskData, usec);
+                    selectedTask->execute(&full->taskData, usec);
 
                     scheduler->updateDynamic(
                             systemGetCycleCounter(),
