@@ -53,11 +53,12 @@ int main(void)
     Hackflight hf(
             &receiver,
             &imu,
+            imuRotate270,
             motorDevice,
             0,   // dummy value for IMU interrupt pin
             37); // LED pin
 
-    hf.init(&hfdata, imuRotate270);
+    hf.init(&hfdata);
 
     hf.begin(&hfdata);
 

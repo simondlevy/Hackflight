@@ -47,7 +47,6 @@ class Task {
             Receiver::axes_t rxAxes;
             vehicle_state_t  vstate;
 
-
         } data_t;
 
     private:

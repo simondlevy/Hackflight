@@ -50,11 +50,12 @@ class Hackflight {
         // Arming safety  
         static constexpr float MAX_ARMING_ANGLE = 25;
 
-        Receiver * m_receiver;
-        Imu *      m_imu;
-        uint8_t    m_imuInterruptPin;
-        uint8_t    m_ledPin;
-        void *     m_motorDevice;
+        Imu *          m_imu;
+        Imu::align_fun m_imuAlignFun;
+        uint8_t        m_imuInterruptPin;
+        uint8_t        m_ledPin;
+        void *         m_motorDevice;
+        Receiver *     m_receiver;
 
     public:
 
@@ -253,18 +254,20 @@ class Hackflight {
         Hackflight(
                 Receiver * receiver,
                 Imu * imu,
+                Imu::align_fun imuAlignFun,
                 void * motorDevice,
                 uint8_t imuInterruptPin,
                 uint8_t ledPin)
         {
             m_receiver = receiver;
             m_imu = imu;
+            m_imuAlignFun = imuAlignFun;
             m_motorDevice = motorDevice;
             m_imuInterruptPin = imuInterruptPin;
             m_ledPin = ledPin;
         }
 
-        void init(data_t * data, Imu::align_fun imuAlign)
+        void init(data_t * data)
         {
             Task::data_t * taskData = &data->taskData;
 
@@ -272,7 +275,7 @@ class Hackflight {
             taskData->imu = m_imu;
             taskData->motorDevice = m_motorDevice;
 
-            data->imuAlignFun = imuAlign;
+            data->imuAlignFun = m_imuAlignFun;
 
             // Initialize quaternion in upright position
             taskData->imuFusionPrev.quat.w = 1;
