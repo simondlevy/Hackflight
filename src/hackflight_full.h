@@ -50,6 +50,7 @@ class Hackflight {
         // Arming safety  
         static constexpr float MAX_ARMING_ANGLE = 25;
 
+        AttitudeTask         m_attitudeTask;
         Imu *                m_imu;
         Imu::align_fun       m_imuAlignFun;
         AnglePidController * m_anglePid;
@@ -66,7 +67,6 @@ class Hackflight {
 
             Task::data_t   taskData;
 
-            AttitudeTask attitudeTask;
             MspTask      mspTask;
             ReceiverTask receiverTask;
 
@@ -201,7 +201,7 @@ class Hackflight {
             Task::update(&full->receiverTask, &full->taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&full->attitudeTask, &full->taskData, usec,
+            Task::update(&m_attitudeTask, &full->taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
             Task::update(&full->mspTask, &full->taskData, usec,
