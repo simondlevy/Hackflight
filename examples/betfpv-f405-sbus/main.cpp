@@ -60,8 +60,6 @@ int main(void)
             0,   // dummy value for IMU interrupt pin
             37); // LED pin
 
-    hf.init(&hfdata);
-
     hf.begin(&hfdata);
 
     while (true) {

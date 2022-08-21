@@ -273,7 +273,7 @@ class Hackflight {
             m_ledPin = ledPin;
         }
 
-        void init(data_t * data)
+        void begin(data_t * data)
         {
             Task::data_t * taskData = &data->taskData;
 
@@ -287,10 +287,7 @@ class Hackflight {
             taskData->imuFusionPrev.quat.w = 1;
 
             taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
-        }
 
-        void begin(data_t * data)
-        {
             data->taskData.msp.begin();
 
             imuDevInit(m_imuInterruptPin);
