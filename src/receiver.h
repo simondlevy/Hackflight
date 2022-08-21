@@ -23,7 +23,6 @@
 #include "arming.h"
 #include "clock.h"
 #include "datatypes.h"
-#include "failsafe.h"
 #include "filters/pt3.h"
 #include "maths.h"
 #include "pwm.h"
