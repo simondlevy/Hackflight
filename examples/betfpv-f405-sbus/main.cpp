@@ -46,7 +46,7 @@ int main(void)
 
     ImuFusion imu = {};
 
-    auto receiver = SbusReceiver(SERIAL_PORT_USART3);
+    SbusReceiver receiver(SERIAL_PORT_USART3);
 
     QuadXbfMixer mixer; 
 
