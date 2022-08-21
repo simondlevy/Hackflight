@@ -64,7 +64,6 @@ class Hackflight {
 
         typedef struct {
 
-            Imu::align_fun imuAlignFun;
             Task::data_t   taskData;
 
             AttitudeTask attitudeTask;
@@ -90,7 +89,7 @@ class Hackflight {
 
             taskData->gyro.readScaled(
                     taskData->imu,
-                    data->imuAlignFun,
+                    m_imuAlignFun,
                     &taskData->vstate);
 
             uint32_t usec = timeMicros();
@@ -274,8 +273,6 @@ class Hackflight {
             taskData->receiver = m_receiver;
             taskData->imu = m_imu;
             taskData->motorDevice = m_motorDevice;
-
-            data->imuAlignFun = m_imuAlignFun;
 
             // Initialize quaternion in upright position
             taskData->imuFusionPrev.quat.w = 1;
