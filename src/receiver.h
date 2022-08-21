@@ -20,7 +20,6 @@
 
 #include <math.h>
 
-#include "arming.h"
 #include "clock.h"
 #include "datatypes.h"
 #include "filters/pt3.h"
