@@ -54,7 +54,7 @@ class Hackflight {
 
         typedef struct {
 
-            imu_align_fun          imuAlignFun;
+            Imu::align_fun          imuAlignFun;
             Scheduler              scheduler;
             Task::data_t           taskData;
 
@@ -252,7 +252,7 @@ class Hackflight {
                 Receiver * receiver,
                 void * motorDevice,
                 uint8_t imuInterruptPin,
-                imu_align_fun imuAlign,
+                Imu::align_fun imuAlign,
                 uint8_t ledPin)
         {
             Task::data_t * taskData = &data->taskData;

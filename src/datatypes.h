@@ -57,10 +57,6 @@ typedef struct {
 } vehicle_state_t;
 
 
-// IMU ------------------------------------------------------------------------
-
-typedef void (*imu_align_fun)(axes_t * axes);
-
 // Stick indices --------------------------------------------------------------
 
 typedef enum rc_alias {

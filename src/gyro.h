@@ -203,7 +203,7 @@ class Gyro {
             setCalibrationCycles(); // start calibrating
         }
 
-        void readScaled(Imu * imu, imu_align_fun align, vehicle_state_t * vstate)
+        void readScaled(Imu * imu, Imu::align_fun align, vehicle_state_t * vstate)
         {
             if (!gyroDevIsReady()) return;
 

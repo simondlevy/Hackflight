@@ -51,6 +51,8 @@ class Imu {
             gyro_reset_t gyroReset;
         } fusion_t;
 
+    typedef void (*align_fun)(axes_t * axes);
+
         virtual void accumulateGyro(float gx, float gy, float gz)
         {
             (void)gx;
