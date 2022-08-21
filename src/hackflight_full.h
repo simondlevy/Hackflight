@@ -296,7 +296,7 @@ class Hackflight {
             data->taskData.receiver->begin();
         }
 
-        static void step(
+        void step(
                 data_t * full,
                 AnglePidController * anglePid,
                 Mixer * mixer)
