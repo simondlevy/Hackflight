@@ -269,7 +269,6 @@ class Hackflight {
 
         static void begin(
                 data_t * data,
-                Receiver * receiver,
                 uint8_t imuInterruptPin,
                 uint8_t ledPin)
         {
@@ -279,7 +278,7 @@ class Hackflight {
             ledDevInit(ledPin);
             Led::flash(10, 50);
 
-            receiver->begin();
+            data->taskData.receiver->begin();
         }
 
         static void step(

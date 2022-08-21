@@ -59,7 +59,6 @@ int main(void)
 
     Hackflight::begin(
             &hf,
-            &receiver,
             0,                  // dummy value for IMU interrupt pin
             37);                // LED pin
 
