@@ -51,10 +51,11 @@ int main(void)
     QuadXbfMixer mixer; 
 
     Hackflight hf(
+            &imu,
             0,   // dummy value for IMU interrupt pin
             37); // LED pin
 
-    hf.init( &hfdata, &imu, &receiver, motorDevice, imuRotate270);
+    hf.init(&hfdata, &receiver, motorDevice, imuRotate270);
 
     hf.begin(&hfdata);
 

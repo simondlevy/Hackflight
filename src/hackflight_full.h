@@ -50,6 +50,7 @@ class Hackflight {
         // Arming safety  
         static constexpr float MAX_ARMING_ANGLE = 25;
 
+        Imu *   m_imu;
         uint8_t m_imuInterruptPin;
         uint8_t m_ledPin;
 
@@ -57,9 +58,9 @@ class Hackflight {
 
         typedef struct {
 
-            Imu::align_fun          imuAlignFun;
-            Scheduler              scheduler;
-            Task::data_t           taskData;
+            Imu::align_fun imuAlignFun;
+            Scheduler      scheduler;
+            Task::data_t   taskData;
 
             AttitudeTask attitudeTask;
             MspTask      mspTask;
@@ -247,22 +248,26 @@ class Hackflight {
 
     public:
 
-        Hackflight(uint8_t imuInterruptPin, uint8_t ledPin)
+        Hackflight(
+                Imu * imu,
+                uint8_t imuInterruptPin,
+                uint8_t ledPin)
         {
+            m_imu = imu;
+
             m_imuInterruptPin = imuInterruptPin;
             m_ledPin = ledPin;
         }
 
         void init(
                 data_t * data,
-                Imu * imu,
                 Receiver * receiver,
                 void * motorDevice,
                 Imu::align_fun imuAlign)
         {
             Task::data_t * taskData = &data->taskData;
 
-            taskData->imu = imu;
+            taskData->imu = m_imu;
 
             taskData->receiver = receiver;
 
