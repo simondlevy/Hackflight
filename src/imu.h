@@ -33,6 +33,12 @@ class Imu {
         } quaternion_t;
 
         typedef struct {
+            float r20;
+            float r21;
+            float r22;
+        } rotation_t;
+
+        typedef struct {
             uint32_t time;
             quaternion_t quat;
             rotation_t rot;

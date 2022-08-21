@@ -60,12 +60,6 @@ typedef struct {
 // IMU ------------------------------------------------------------------------
 
 typedef struct {
-    float r20;
-    float r21;
-    float r22;
-} rotation_t;
-
-typedef struct {
     axes_t values;
     uint32_t count;
 } imu_sensor_t;

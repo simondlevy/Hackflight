@@ -72,7 +72,7 @@ class ImuFusion : public Imu {
             return res;
         }
 
-        static void quat2euler(Imu::quaternion_t * quat, vehicle_state_t * state, rotation_t * rot)
+        static void quat2euler(Imu::quaternion_t * quat, vehicle_state_t * state, Imu::rotation_t * rot)
         {
             float qw = quat->w;
             float qx = quat->x;
@@ -203,13 +203,13 @@ class ImuFusion : public Imu {
         {
             Imu::quaternion_t quat = {};
             getQuaternion(arming, fusionPrev, time, &quat);
-            rotation_t rot = {};
+            Imu::rotation_t rot = {};
             quat2euler(&quat, vstate, &rot);
 
             Imu::fusion_t fusion;
             fusion.time = time;
             memcpy(&fusion.quat, &quat, sizeof(Imu::quaternion_t));
-            memcpy(&fusion.rot, &rot, sizeof(rotation_t));
+            memcpy(&fusion.rot, &rot, sizeof(Imu::rotation_t));
             memcpy(fusionPrev, &fusion, sizeof(Imu::fusion_t));
             memset(&m_accum, 0, sizeof(imu_sensor_t));
          }
