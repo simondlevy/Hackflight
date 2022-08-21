@@ -299,19 +299,19 @@ class Hackflight {
             data->taskData.receiver->begin();
         }
 
-        void step(data_t * full)
+        void step(data_t * data)
         {
-            Scheduler * scheduler = &full->scheduler;
+            Scheduler * scheduler = &data->scheduler;
 
             // Realtime gyro/filtering/PID tasks get complete priority
             uint32_t nowCycles = systemGetCycleCounter();
 
             if (scheduler->isCoreReady(nowCycles)) {
-                checkCoreTasks(full, m_anglePid, m_mixer, scheduler, nowCycles);
+                checkCoreTasks(data, m_anglePid, m_mixer, scheduler, nowCycles);
             }
 
             if (scheduler->isDynamicReady(systemGetCycleCounter())) {
-                checkDynamicTasks(full, scheduler);
+                checkDynamicTasks(data, scheduler);
             }
         }
 
