@@ -59,7 +59,7 @@ typedef struct {
 
 // Stick indices --------------------------------------------------------------
 
-typedef enum rc_alias {
+typedef enum {
     THROTTLE,
     ROLL,
     PITCH,
