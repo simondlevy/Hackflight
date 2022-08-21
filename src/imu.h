@@ -39,6 +39,12 @@ class Imu {
         } rotation_t;
 
         typedef struct {
+            uint32_t quietPeriodEnd;
+            uint32_t resetTimeEnd;
+            bool resetCompleted;
+        } gyro_reset_t;
+
+        typedef struct {
             uint32_t time;
             quaternion_t quat;
             rotation_t rot;

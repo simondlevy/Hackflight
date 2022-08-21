@@ -59,12 +59,6 @@ typedef struct {
 
 // IMU ------------------------------------------------------------------------
 
-typedef struct {
-    uint32_t quietPeriodEnd;
-    uint32_t resetTimeEnd;
-    bool resetCompleted;
-} gyro_reset_t;
-
 typedef void (*imu_align_fun)(axes_t * axes);
 
 // Stick indices --------------------------------------------------------------

@@ -169,11 +169,11 @@ class ImuFusion : public Imu {
 
             float dt = deltaT * 1e-6;
 
-            gyro_reset_t new_gyro_reset = {};
+            Imu::gyro_reset_t new_gyro_reset = {};
 
             if (!Arming::isArmed(arming)) {
                 memcpy(&fusionPrev->gyroReset, &new_gyro_reset,
-                        sizeof(gyro_reset_t));
+                        sizeof(Imu::gyro_reset_t));
             }
 
             mahony(dt, &gyroAvg, &fusionPrev->quat, quat);
