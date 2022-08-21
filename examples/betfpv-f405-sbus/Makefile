@@ -43,7 +43,6 @@ endif
 # configure some directories that are relative to wherever ROOT_DIR is located
 TOOLS_DIR ?= /opt
 
-#ARM_SDK_DIR ?= $(TOOLS_DIR)/gcc-arm-none-eabi-9-2020-q2-update
 ARM_SDK_DIR ?= $(TOOLS_DIR)/gcc-arm-11.2-2022.02-x86_64-arm-none-eabi
 GCC_REQUIRED_VERSION ?= 9.3.1
 STM32FLASH_DIR := $(TOOLS_DIR)/stm32flash

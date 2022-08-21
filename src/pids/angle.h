@@ -25,9 +25,9 @@
 #include "datatypes.h"
 #include "../filters/pt1.h"
 #include "../filters/pt3.h"
+#include "maths.h"
 #include "pid.h"
-#include "receiver.h"
-
+#include "time.h"
 
 class AnglePidController : public PidController {
 
@@ -89,6 +89,10 @@ class AnglePidController : public PidController {
         static const uint16_t ITERM_LIMIT = 400;
 
         static constexpr float LEVEL_ANGLE_LIMIT = 45;
+
+        static const uint8_t RC_EXPO = 0;
+        static const uint8_t RC_RATE = 7;
+        static const uint8_t RATE    = 67;
 
         static float MAX_VELOCITY_CYCLIC() 
         {
@@ -359,6 +363,20 @@ class AnglePidController : public PidController {
             }
         }
 
+        static float applyRates(float commandf, const float commandfAbs)
+        {
+            float expof = RC_EXPO / 100.0f;
+            expof =
+                commandfAbs * (powf(commandf, 5) * expof + commandf * (1 - expof));
+
+            const float centerSensitivity = RC_RATE * 10.0f;
+            const float stickMovement = fmaxf(0, RATE * 10.0f - centerSensitivity);
+            const float angleRate = commandf * centerSensitivity + 
+                stickMovement * expof;
+
+            return angleRate;
+        }
+
         virtual void update(
                 uint32_t currentTimeUs,
                 demands_t * demands,
@@ -462,7 +480,7 @@ class AnglePidController : public PidController {
 
                 // -----calculate pidSetpointDelta
                 float pidSetpointDelta = 0;
-                float feedforwardMaxRate = Receiver::applyRates(1, 1);
+                float feedforwardMaxRate = applyRates(1, 1);
 
                 // -----calculate D component
                 if ((axis < 2 && m_k_rate_d > 0)) {
