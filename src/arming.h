@@ -24,6 +24,7 @@
 #include "datatypes.h"
 #include "led.h"
 #include "motor.h"
+#include "motor.h"
 
 class Arming {
 
