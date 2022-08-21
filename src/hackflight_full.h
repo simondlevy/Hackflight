@@ -255,17 +255,9 @@ class Hackflight {
         {
             Task::data_t * taskData = &data->taskData;
 
-            taskData->msp.begin();
-
-            imuDevInit(imuInterruptPin);
-            ledDevInit(ledPin);
-            Led::flash(10, 50);
-
             taskData->imu = imu;
 
             taskData->receiver = receiver;
-
-            receiver->begin();
 
             data->imuAlignFun = imuAlign;
 
@@ -276,7 +268,14 @@ class Hackflight {
 
             taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
-        } // init
+            taskData->msp.begin();
+
+            imuDevInit(imuInterruptPin);
+            ledDevInit(ledPin);
+            Led::flash(10, 50);
+
+            receiver->begin();
+        }
 
         static void step(
                 data_t * full,
