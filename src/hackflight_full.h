@@ -62,6 +62,9 @@ class Hackflight {
             MspTask      mspTask;
             ReceiverTask receiverTask;
 
+            uint8_t imuInterruptPin;
+            uint8_t ledPin;
+
         } data_t;
 
         static void checkCoreTasks(
@@ -249,7 +252,9 @@ class Hackflight {
                 Imu * imu,
                 Receiver * receiver,
                 void * motorDevice,
-                Imu::align_fun imuAlign)
+                Imu::align_fun imuAlign,
+                uint8_t imuInterruptPin,
+                uint8_t ledPin)
         {
             Task::data_t * taskData = &data->taskData;
 
@@ -265,17 +270,19 @@ class Hackflight {
             taskData->imuFusionPrev.quat.w = 1;
 
             taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+
+            data->imuInterruptPin = imuInterruptPin;
+            data->ledPin = ledPin;
         }
 
-        static void begin(
-                data_t * data,
-                uint8_t imuInterruptPin,
-                uint8_t ledPin)
+        static void begin(data_t * data)
         {
             data->taskData.msp.begin();
 
-            imuDevInit(imuInterruptPin);
-            ledDevInit(ledPin);
+            imuDevInit(data->imuInterruptPin);
+
+            ledDevInit(data->ledPin);
+
             Led::flash(10, 50);
 
             data->taskData.receiver->begin();
