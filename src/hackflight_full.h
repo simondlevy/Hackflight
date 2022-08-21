@@ -60,6 +60,7 @@ class Hackflight {
         void *               m_motorDevice;
         MspTask              m_mspTask;
         Receiver *           m_receiver;
+        ReceiverTask         m_receiverTask;
         Scheduler            m_scheduler;
 
     public:
@@ -68,7 +69,6 @@ class Hackflight {
 
             Task::data_t   taskData;
 
-            ReceiverTask receiverTask;
 
         } data_t;
 
@@ -198,7 +198,7 @@ class Hackflight {
 
             uint32_t usec = timeMicros();
 
-            Task::update(&full->receiverTask, &full->taskData, usec,
+            Task::update(&m_receiverTask, &full->taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
             Task::update(&m_attitudeTask, &full->taskData, usec,
