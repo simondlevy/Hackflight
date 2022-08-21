@@ -249,9 +249,7 @@ class Hackflight {
                 Imu * imu,
                 Receiver * receiver,
                 void * motorDevice,
-                uint8_t imuInterruptPin,
-                Imu::align_fun imuAlign,
-                uint8_t ledPin)
+                Imu::align_fun imuAlign)
         {
             Task::data_t * taskData = &data->taskData;
 
@@ -267,8 +265,15 @@ class Hackflight {
             taskData->imuFusionPrev.quat.w = 1;
 
             taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+        }
 
-            taskData->msp.begin();
+        static void begin(
+                data_t * data,
+                Receiver * receiver,
+                uint8_t imuInterruptPin,
+                uint8_t ledPin)
+        {
+            data->taskData.msp.begin();
 
             imuDevInit(imuInterruptPin);
             ledDevInit(ledPin);

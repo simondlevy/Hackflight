@@ -55,8 +55,12 @@ int main(void)
             &imu,
             &receiver,
             motorDevice,
+            imuRotate270);
+
+    Hackflight::begin(
+            &hf,
+            &receiver,
             0,                  // dummy value for IMU interrupt pin
-            imuRotate270,
             37);                // LED pin
 
     while (true) {
