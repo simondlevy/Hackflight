@@ -50,9 +50,10 @@ class Hackflight {
         // Arming safety  
         static constexpr float MAX_ARMING_ANGLE = 25;
 
-        Imu *   m_imu;
-        uint8_t m_imuInterruptPin;
-        uint8_t m_ledPin;
+        Receiver * m_receiver;
+        Imu *      m_imu;
+        uint8_t    m_imuInterruptPin;
+        uint8_t    m_ledPin;
 
     public:
 
@@ -249,27 +250,26 @@ class Hackflight {
     public:
 
         Hackflight(
+                Receiver * receiver,
                 Imu * imu,
                 uint8_t imuInterruptPin,
                 uint8_t ledPin)
         {
+            m_receiver = receiver;
             m_imu = imu;
-
             m_imuInterruptPin = imuInterruptPin;
             m_ledPin = ledPin;
         }
 
         void init(
                 data_t * data,
-                Receiver * receiver,
                 void * motorDevice,
                 Imu::align_fun imuAlign)
         {
             Task::data_t * taskData = &data->taskData;
 
+            taskData->receiver = m_receiver;
             taskData->imu = m_imu;
-
-            taskData->receiver = receiver;
 
             data->imuAlignFun = imuAlign;
 
