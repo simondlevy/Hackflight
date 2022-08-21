@@ -71,10 +71,8 @@ class Hackflight {
 
         } data_t;
 
-        void checkCoreTasks(data_t * data, uint32_t nowCycles)
+        void checkCoreTasks(Task::data_t * taskData, uint32_t nowCycles)
         {
-            Task::data_t * taskData = &data->taskData;
-
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
             uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
 
@@ -190,20 +188,20 @@ class Hackflight {
 
         } // checkCoreTasks
 
-        void checkDynamicTasks(data_t * full)
+        void checkDynamicTasks(Task::data_t * taskData)
         {
             Task *selectedTask = NULL;
             uint16_t selectedTaskDynamicPriority = 0;
 
             uint32_t usec = timeMicros();
 
-            Task::update(&m_receiverTask, &full->taskData, usec,
+            Task::update(&m_receiverTask, taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_attitudeTask, &full->taskData, usec,
+            Task::update(&m_attitudeTask, taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_mspTask, &full->taskData, usec,
+            Task::update(&m_mspTask, taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
             if (selectedTask) {
@@ -230,7 +228,7 @@ class Hackflight {
                     uint32_t anticipatedEndCycles =
                         nowCycles + taskRequiredCycles;
 
-                    selectedTask->execute(&full->taskData, usec);
+                    selectedTask->execute(taskData, usec);
 
                     m_scheduler.updateDynamic(
                             systemGetCycleCounter(),
@@ -265,10 +263,8 @@ class Hackflight {
             m_ledPin = ledPin;
         }
 
-        void begin(data_t * data)
+        void begin(Task::data_t * taskData)
         {
-            Task::data_t * taskData = &data->taskData;
-
             taskData->receiver = m_receiver;
             taskData->imu = m_imu;
             taskData->motorDevice = m_motorDevice;
@@ -278,7 +274,7 @@ class Hackflight {
 
             taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
-            data->taskData.msp.begin();
+            taskData->msp.begin();
 
             imuDevInit(m_imuInterruptPin);
 
@@ -286,20 +282,20 @@ class Hackflight {
 
             Led::flash(10, 50);
 
-            data->taskData.receiver->begin();
+            taskData->receiver->begin();
         }
 
-        void step(data_t * data)
+        void step(Task::data_t * taskData)
         {
             // Realtime gyro/filtering/PID tasks get complete priority
             uint32_t nowCycles = systemGetCycleCounter();
 
             if (m_scheduler.isCoreReady(nowCycles)) {
-                checkCoreTasks(data, nowCycles);
+                checkCoreTasks(taskData, nowCycles);
             }
 
             if (m_scheduler.isDynamicReady(systemGetCycleCounter())) {
-                checkDynamicTasks(data);
+                checkDynamicTasks(taskData);
             }
         }
 

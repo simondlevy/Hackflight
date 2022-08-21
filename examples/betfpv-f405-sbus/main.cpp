@@ -42,7 +42,7 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-    Hackflight::data_t hfdata = {};
+    Task::data_t taskData = {};
 
     ImuFusion imu;
 
@@ -60,11 +60,11 @@ int main(void)
             0,   // dummy value for IMU interrupt pin
             37); // LED pin
 
-    hf.begin(&hfdata);
+    hf.begin(&taskData);
 
     while (true) {
 
-        hf.step(&hfdata);
+        hf.step(&taskData);
     }
 
     return 0;
