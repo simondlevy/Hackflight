@@ -48,6 +48,28 @@ typedef struct {
     float weight;
 } biquadFilter_t;
 
+enum {
+    FILTER_LPF1 = 0,
+    FILTER_LPF2
+};
+
+typedef enum {
+    FILTER_LPF,    // 2nd order Butterworth section
+    FILTER_NOTCH,
+    FILTER_BPF,
+} biquadFilterType_e;
+
+typedef enum {
+    FILTER_PT1 = 0,
+    FILTER_BIQUAD,
+    FILTER_PT2,
+    FILTER_PT3,
+} lowpassFilterType_e;
+
+struct filter_s;
+typedef struct filter_s filter_t;
+typedef float (*filterApplyFnPtr)(filter_t *filter, float input);
+
 // Demands ----------------------------------------------------------------------
 
 typedef struct {
@@ -140,30 +162,6 @@ typedef struct {
     float m_oldM, m_newM, m_oldS, m_newS;
     int m_n; // XXX should be uint32_t ?
 } stdev_t;
-
-// Filters ----------------------------------------------------------------------
-
-enum {
-    FILTER_LPF1 = 0,
-    FILTER_LPF2
-};
-
-typedef enum {
-    FILTER_LPF,    // 2nd order Butterworth section
-    FILTER_NOTCH,
-    FILTER_BPF,
-} biquadFilterType_e;
-
-typedef enum {
-    FILTER_PT1 = 0,
-    FILTER_BIQUAD,
-    FILTER_PT2,
-    FILTER_PT3,
-} lowpassFilterType_e;
-
-struct filter_s;
-typedef struct filter_s filter_t;
-typedef float (*filterApplyFnPtr)(filter_t *filter, float input);
 
 // Stick indices --------------------------------------------------------------
 
