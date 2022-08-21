@@ -50,6 +50,7 @@ class Hackflight {
         // Arming safety  
         static constexpr float MAX_ARMING_ANGLE = 25;
 
+        uint8_t m_imuInterruptPin;
         uint8_t m_ledPin;
 
     public:
@@ -63,8 +64,6 @@ class Hackflight {
             AttitudeTask attitudeTask;
             MspTask      mspTask;
             ReceiverTask receiverTask;
-
-            uint8_t imuInterruptPin;
 
         } data_t;
 
@@ -248,8 +247,9 @@ class Hackflight {
 
     public:
 
-        Hackflight(uint8_t ledPin)
+        Hackflight(uint8_t imuInterruptPin, uint8_t ledPin)
         {
+            m_imuInterruptPin = imuInterruptPin;
             m_ledPin = ledPin;
         }
 
@@ -258,8 +258,7 @@ class Hackflight {
                 Imu * imu,
                 Receiver * receiver,
                 void * motorDevice,
-                Imu::align_fun imuAlign,
-                uint8_t imuInterruptPin)
+                Imu::align_fun imuAlign)
         {
             Task::data_t * taskData = &data->taskData;
 
@@ -275,15 +274,13 @@ class Hackflight {
             taskData->imuFusionPrev.quat.w = 1;
 
             taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
-
-            data->imuInterruptPin = imuInterruptPin;
         }
 
         void begin(data_t * data)
         {
             data->taskData.msp.begin();
 
-            imuDevInit(data->imuInterruptPin);
+            imuDevInit(m_imuInterruptPin);
 
             ledDevInit(m_ledPin);
 
