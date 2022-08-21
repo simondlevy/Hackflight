@@ -274,8 +274,6 @@ class Hackflight {
 
             data->imuAlignFun = imuAlign;
 
-            taskData->motorDevice = motorDevice;
-
             // Initialize quaternion in upright position
             taskData->imuFusionPrev.quat.w = 1;
 
