@@ -247,7 +247,11 @@ class Hackflight {
 
     public:
 
-        static void init(
+        Hackflight(void)
+        {
+        }
+
+        void init(
                 data_t * data,
                 Imu * imu,
                 Receiver * receiver,
@@ -275,7 +279,7 @@ class Hackflight {
             data->ledPin = ledPin;
         }
 
-        static void begin(data_t * data)
+        void begin(data_t * data)
         {
             data->taskData.msp.begin();
 

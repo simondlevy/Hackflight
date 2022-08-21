@@ -42,7 +42,7 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-    Hackflight::data_t hf = {};
+    Hackflight::data_t hfdata = {};
 
     ImuFusion imu = {};
 
@@ -50,8 +50,10 @@ int main(void)
 
     QuadXbfMixer mixer; 
 
-    Hackflight::init(
-            &hf,
+    Hackflight hf;
+
+    hf.init(
+            &hfdata,
             &imu,
             &receiver,
             motorDevice,
@@ -59,11 +61,11 @@ int main(void)
             0,                  // dummy value for IMU interrupt pin
             37);                // LED pin
 
-    Hackflight::begin(&hf);
+    hf.begin(&hfdata);
 
     while (true) {
 
-        Hackflight::step(&hf, &anglePid, &mixer);
+        hf.step(&hfdata, &anglePid, &mixer);
     }
 
     return 0;
