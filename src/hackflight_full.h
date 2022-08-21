@@ -65,12 +65,6 @@ class Hackflight {
 
     public:
 
-        typedef struct {
-
-            Task::data_t   taskData;
-
-        } data_t;
-
         void checkCoreTasks(Task::data_t * taskData, uint32_t nowCycles)
         {
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
