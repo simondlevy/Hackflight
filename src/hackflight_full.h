@@ -69,7 +69,6 @@ class Hackflight {
 
             Task::data_t   taskData;
 
-
         } data_t;
 
         void checkCoreTasks(data_t * data, uint32_t nowCycles)
