@@ -108,6 +108,11 @@ class ImuFusion : public Imu {
             return x * x;
         }
 
+        typedef struct {
+            axes_t values;
+            uint32_t count;
+        } imu_sensor_t;
+
         static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
         {
             uint32_t denom = sensor->count * period;
