@@ -20,12 +20,14 @@
 
 #include <math.h>
 
+#include "arming.h"
 #include "clock.h"
 #include "datatypes.h"
 #include "filters/pt3.h"
 #include "maths.h"
 #include "pwm.h"
 #include "serial.h"
+#include "sticks.h"
 #include "time.h"
 
 class Receiver {
@@ -496,7 +498,7 @@ class Receiver {
 
             failsafe->update(raw, motorDevice, arming);
 
-            return Arming::throttleIsDown(raw);
+            return throttleIsDown(raw);
         }
 
         void ratePidFeedforwardLpfInit(uint16_t filterCutoff)

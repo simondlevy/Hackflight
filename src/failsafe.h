@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include "arming.h"
+#include "sticks.h"
 
 class Failsafe {
 
@@ -177,7 +178,7 @@ class Failsafe {
                     case IDLE:
                         if (Arming::isArmed(arming)) {
                             // Track throttle command below minimum time
-                            if (!Arming::throttleIsDown(rcData)) {
+                            if (!throttleIsDown(rcData)) {
                                 m_throttleLowPeriod =
                                     timeMillis() + 100 * MILLIS_PER_TENTH_SECOND;
                             }

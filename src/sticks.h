@@ -22,36 +22,18 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Demands ----------------------------------------------------------------------
+typedef enum {
+    THROTTLE,
+    ROLL,
+    PITCH,
+    YAW,
+    AUX1,
+    AUX2
+} rc_alias_e;
 
-typedef struct {
-    float throttle;
-    float roll;
-    float pitch;
-    float yaw;
-} demands_t;
+static bool throttleIsDown(float raw[])
+{
+    return raw[THROTTLE] < 1050;
+}
 
-// Axes ------------------------------------------------------------------------
 
-typedef struct {
-    float x;
-    float y;
-    float z;
-} axes_t;
-
-// Vehicle state ----------------------------------------------------------------
-
-typedef struct {
-    float x;
-    float dx;
-    float y;
-    float dy;
-    float z;
-    float dz;
-    float phi;
-    float dphi;
-    float theta;
-    float dtheta;
-    float psi;
-    float dpsi;
-} vehicle_state_t;

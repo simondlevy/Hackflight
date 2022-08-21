@@ -25,6 +25,7 @@
 #include "led.h"
 #include "motor.h"
 #include "motor.h"
+#include "sticks.h"
 
 class Arming {
 
@@ -156,11 +157,6 @@ class Arming {
         static void setRxFailsafe(data_t * data, bool okay)
         {
             data->rx_failsafe_okay= okay;
-        }
-
-        static bool throttleIsDown(float raw[])
-        {
-            return raw[THROTTLE] < 1050;
         }
 
 }; // class Arming
