@@ -58,6 +58,7 @@ class Hackflight {
         uint8_t              m_ledPin;
         Mixer *              m_mixer;
         void *               m_motorDevice;
+        MspTask              m_mspTask;
         Receiver *           m_receiver;
         Scheduler            m_scheduler;
 
@@ -67,7 +68,6 @@ class Hackflight {
 
             Task::data_t   taskData;
 
-            MspTask      mspTask;
             ReceiverTask receiverTask;
 
         } data_t;
@@ -204,7 +204,7 @@ class Hackflight {
             Task::update(&m_attitudeTask, &full->taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&full->mspTask, &full->taskData, usec,
+            Task::update(&m_mspTask, &full->taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
             if (selectedTask) {
