@@ -54,6 +54,7 @@ class Hackflight {
         Imu::align_fun m_imuAlignFun;
         uint8_t        m_imuInterruptPin;
         uint8_t        m_ledPin;
+        Mixer *        m_mixer;
         void *         m_motorDevice;
         Receiver *     m_receiver;
 
@@ -255,12 +256,14 @@ class Hackflight {
                 Receiver * receiver,
                 Imu * imu,
                 Imu::align_fun imuAlignFun,
+                Mixer * mixer,
                 void * motorDevice,
                 uint8_t imuInterruptPin,
                 uint8_t ledPin)
         {
             m_receiver = receiver;
             m_imu = imu;
+            m_mixer = mixer;
             m_imuAlignFun = imuAlignFun;
             m_motorDevice = motorDevice;
             m_imuInterruptPin = imuInterruptPin;
@@ -296,10 +299,7 @@ class Hackflight {
             data->taskData.receiver->begin();
         }
 
-        void step(
-                data_t * full,
-                AnglePidController * anglePid,
-                Mixer * mixer)
+        void step(data_t * full, AnglePidController * anglePid)
         {
             Scheduler * scheduler = &full->scheduler;
 
@@ -307,7 +307,7 @@ class Hackflight {
             uint32_t nowCycles = systemGetCycleCounter();
 
             if (scheduler->isCoreReady(nowCycles)) {
-                checkCoreTasks(full, anglePid, mixer, scheduler, nowCycles);
+                checkCoreTasks(full, anglePid, m_mixer, scheduler, nowCycles);
             }
 
             if (scheduler->isDynamicReady(systemGetCycleCounter())) {

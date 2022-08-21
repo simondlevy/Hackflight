@@ -54,6 +54,7 @@ int main(void)
             &receiver,
             &imu,
             imuRotate270,
+            &mixer,
             motorDevice,
             0,   // dummy value for IMU interrupt pin
             37); // LED pin
@@ -64,7 +65,7 @@ int main(void)
 
     while (true) {
 
-        hf.step(&hfdata, &anglePid, &mixer);
+        hf.step(&hfdata, &anglePid);
     }
 
     return 0;
