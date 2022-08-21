@@ -64,8 +64,6 @@ class Hackflight {
 
         } data_t;
 
-    private:
-
         static void checkCoreTasks(
                 data_t * data,
                 AnglePidController * anglePid,
