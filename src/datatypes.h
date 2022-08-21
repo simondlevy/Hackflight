@@ -92,13 +92,6 @@ typedef struct {
 
 typedef void (*imu_align_fun)(axes_t * axes);
 
- // Stats ------------------------------------------------------------------------
-
-typedef struct {
-    float m_oldM, m_newM, m_oldS, m_newS;
-    int m_n; // XXX should be uint32_t ?
-} stdev_t;
-
 // Stick indices --------------------------------------------------------------
 
 typedef enum rc_alias {

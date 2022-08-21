@@ -22,6 +22,11 @@
 
 #include "datatypes.h"
 
+typedef struct {
+    float m_oldM, m_newM, m_oldS, m_newS;
+    int m_n; // XXX should be uint32_t ?
+} stdev_t;
+
 static void devClear(stdev_t *dev)
 {
     dev->m_n = 0;
