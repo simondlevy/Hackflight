@@ -19,9 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <math.h>
 
 #include <maths.h>
-#include <motor.h>
-#include <motor.h>
-#include <motor.h>
+#include <motor_device.h>
 #include <pwm.h>
 #include <scale.h>
 #include <time.h>

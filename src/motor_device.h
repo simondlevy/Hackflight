@@ -18,4 +18,30 @@
 
 #pragma once
 
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "datatypes.h"
+#include "time.h"
+
 #define MAX_SUPPORTED_MOTORS 8
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+    // void    motorCheckDshotBitbangStatus(Arming::data_t * arming);
+    float   motorConvertFromExternal(void * motorDevice, uint16_t externalValue);
+    void    motorInitBrushed(uint8_t * pins);
+    void  * motorInitDshot(uint8_t count);
+    bool    motorIsProtocolDshot(void);
+    bool    motorIsReady(uint32_t currentTime);
+    float   motorValueDisarmed(void);
+    float   motorValueHigh(void);
+    float   motorValueLow(void);
+    void    motorStop(void * motorDevice);
+    void    motorWrite(void * motorDevice, float *values);
+
+#if defined(__cplusplus)
+}
+#endif

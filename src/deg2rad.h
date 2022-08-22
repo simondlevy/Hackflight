@@ -20,15 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <math.h>
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 static float deg2rad(float deg)
 {
     return deg * M_PI / 180;
 }
-
-#if defined(__cplusplus)
-}
-#endif

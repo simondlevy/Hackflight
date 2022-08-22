@@ -23,16 +23,8 @@
 
 #include "datatypes.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-    static void imuRotate0(axes_t * axes)
-    {
-        axes->y = -axes->y;
-        axes->z = -axes->z;
-    }
-
-#if defined(__cplusplus)
+static void imuRotate0(axes_t * axes)
+{
+    axes->y = -axes->y;
+    axes->z = -axes->z;
 }
-#endif

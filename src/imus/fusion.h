@@ -219,13 +219,3 @@ class FusionImu : public Imu {
             memset(&m_accum, 0, sizeof(imu_sensor_t));
          }
 };
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-    void  imuDevInit(uint8_t interruptPin);
-
-#if defined(__cplusplus)
-}
-#endif

@@ -23,19 +23,11 @@
 
 #include "datatypes.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
+static void imuRotate270(axes_t * axes)
+{
+    float x = axes->x;
+    float y = axes->y;
 
-    static void imuRotate270(axes_t * axes)
-    {
-        float x = axes->x;
-        float y = axes->y;
-
-        axes->x = -y;
-        axes->y = x;
-    }
-
-#if defined(__cplusplus)
+    axes->x = -y;
+    axes->y = x;
 }
-#endif

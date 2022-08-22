@@ -26,25 +26,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "receiver.h"
 #include "system.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-void mspInit(void);
-
-void mspTriggerDebugging(void);
-
-void mspUpdate(
-        vehicle_state_t * state,
-        Receiver::axes_t *rxaxes,
-        bool armed,
-        void * motorDevice,
-        float * motors);
-
-#if defined(__cplusplus)
-}
-#endif
-
 #define ARRAYEND(x) (&(x)[ARRAYLEN(x)])
 #define ARRAYLEN(x) (sizeof(x) / sizeof((x)[0]))
 

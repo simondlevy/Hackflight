@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <time.h>
 #include <maths.h>
-#include <motor.h>
+#include <motor_device.h>
 
 #include "platform.h"
 #include "dshot.h" // for DSHOT_ constants in mixerInitEscEndpoints
