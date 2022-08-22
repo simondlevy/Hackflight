@@ -23,28 +23,12 @@
 #include "clock.h"
 #include "datatypes.h"
 #include "filters/pt1.h"
+#include "gyro_device.h"
 #include "imu.h"
 #include "maths.h"
 #include "stats.h"
 #include "system.h"
 #include "time.h"
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-    // Device functions
-    void     gyroDevInit(void);
-    uint32_t gyroDevInterruptCount(void);
-    bool     gyroDevIsReady(void);
-    int16_t  gyroDevReadRaw(uint8_t k);
-    uint16_t gyroDevScaleDps(void);
-    uint32_t gyroDevSyncTime(void);
-
-
-#if defined(__cplusplus)
-}
-#endif
 
 class Gyro {
 
