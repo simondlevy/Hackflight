@@ -260,7 +260,6 @@ class Hackflight {
             m_taskData.imuFusionPrev.quat.w = 1;
 
             m_taskData.maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
-
         }
 
         void begin(void)

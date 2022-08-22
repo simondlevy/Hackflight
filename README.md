@@ -42,11 +42,12 @@ the code and the elements of the flight-control flow diagram shown below:
 <img src="media/dataflow3.png" width=700>
 </p>
 
-The following two principles help with this strategy:
-
-1. Use header-only C++ classes whenever possible.
-
-2. [Minimal use of inheritance](https://queue.acm.org/detail.cfm?id=2038036).
+By using header-only C++ classes whenever possible, and
+ [avoiding complicated inheritance](https://queue.acm.org/detail.cfm?id=2038036), 
+Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-beckman-dont-fear-the-monad) 
+approach to taming the complexity of flight control.  Check out this
+[example program](https://github.com/simondlevy/Hackflight/blob/master/examples/betfpv-f405-sbus/main.cpp#L34-L66)
+to get an idea of how this approach works.
 
 ## Ground Control Station
 
