@@ -42,15 +42,13 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-    Task::data_t taskData = {};
+    static ImuFusion imu;
 
-    ImuFusion imu;
+    static SbusReceiver receiver(SERIAL_PORT_USART3);
 
-    SbusReceiver receiver(SERIAL_PORT_USART3);
+    static QuadXbfMixer mixer; 
 
-    QuadXbfMixer mixer; 
-
-    Hackflight hf(
+    static Hackflight hf(
             &receiver,
             &imu,
             imuRotate270,
@@ -60,11 +58,11 @@ int main(void)
             0,   // dummy value for IMU interrupt pin
             37); // LED pin
 
-    hf.begin(&taskData);
+    hf.begin();
 
     while (true) {
 
-        hf.step(&taskData);
+        hf.step();
     }
 
     return 0;

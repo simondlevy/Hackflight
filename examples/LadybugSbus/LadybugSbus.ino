@@ -19,17 +19,18 @@
 
 #include <hackflight_full.h>
 #include <arduino/ladybug.hpp>
-
 #include <receivers/sbus.h>
 
-static SbusReceiver receiver;
+static SbusReceiver _receiver;
+
+static LadybugFc _ladybug = LadybugFc(&_receiver);
 
 void setup(void)
 {
-    ladybug_setup(&receiver);
+    _ladybug.begin();
 }
 
 void loop(void)
 {
-    ladybug_loop();
+    _ladybug.step();
 }

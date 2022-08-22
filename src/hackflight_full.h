@@ -57,15 +57,14 @@ class Hackflight {
         uint8_t              m_imuInterruptPin;
         uint8_t              m_ledPin;
         Mixer *              m_mixer;
-        void *               m_motorDevice;
         MspTask              m_mspTask;
-        Receiver *           m_receiver;
         ReceiverTask         m_receiverTask;
         Scheduler            m_scheduler;
+        Task::data_t         m_taskData;
 
     public:
 
-        void checkCoreTasks(Task::data_t * taskData, uint32_t nowCycles)
+        void checkCoreTasks(uint32_t nowCycles)
         {
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
             uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
@@ -78,10 +77,10 @@ class Hackflight {
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            taskData->gyro.readScaled(
-                    taskData->imu,
+            m_taskData.gyro.readScaled(
+                    m_taskData.imu,
                     m_imuAlignFun,
-                    &taskData->vstate);
+                    &m_taskData.vstate);
 
             uint32_t usec = timeMicros();
 
@@ -89,15 +88,15 @@ class Hackflight {
 
             demands_t demands = {0,0,0,0};
 
-            taskData->receiver->getDemands(usec, rawSetpoints, &demands);
+            m_taskData.receiver->getDemands(usec, rawSetpoints, &demands);
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
             HackflightCore::step(
                     &demands,
-                    &taskData->vstate,
+                    &m_taskData.vstate,
                     m_anglePid,
-                    taskData->pidReset,
+                    m_taskData.pidReset,
                     usec,
                     m_mixer,
                     mixmotors);
@@ -109,7 +108,7 @@ class Hackflight {
                 motorOutput = motorValueLow() +
                     (motorValueHigh() - motorValueLow()) * motorOutput;
 
-                if (taskData->failsafe.isActive()) {
+                if (m_taskData.failsafe.isActive()) {
                     if (motorIsProtocolDshot()) {
                         // Prevent getting into special reserved range
                         motorOutput = (motorOutput < motorValueLow()) ?
@@ -130,10 +129,10 @@ class Hackflight {
                 mixmotors[i] = motorOutput;
             }
 
-            motorWrite(taskData->motorDevice,
-                    Arming::isArmed(&taskData->arming) ?
+            motorWrite(m_taskData.motorDevice,
+                    Arming::isArmed(&m_taskData.arming) ?
                     mixmotors :
-                    taskData->mspMotors);
+                    m_taskData.mspMotors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -182,20 +181,20 @@ class Hackflight {
 
         } // checkCoreTasks
 
-        void checkDynamicTasks(Task::data_t * taskData)
+        void checkDynamicTasks(void)
         {
             Task *selectedTask = NULL;
             uint16_t selectedTaskDynamicPriority = 0;
 
             uint32_t usec = timeMicros();
 
-            Task::update(&m_receiverTask, taskData, usec,
+            Task::update(&m_receiverTask, &m_taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_attitudeTask, taskData, usec,
+            Task::update(&m_attitudeTask, &m_taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_mspTask, taskData, usec,
+            Task::update(&m_mspTask, &m_taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
             if (selectedTask) {
@@ -222,7 +221,7 @@ class Hackflight {
                     uint32_t anticipatedEndCycles =
                         nowCycles + taskRequiredCycles;
 
-                    selectedTask->execute(taskData, usec);
+                    selectedTask->execute(&m_taskData, usec);
 
                     m_scheduler.updateDynamic(
                             systemGetCycleCounter(),
@@ -247,49 +246,47 @@ class Hackflight {
                 uint8_t imuInterruptPin,
                 uint8_t ledPin)
         {
-            m_receiver = receiver;
-            m_imu = imu;
             m_mixer = mixer;
             m_imuAlignFun = imuAlignFun;
             m_anglePid = anglePid;
-            m_motorDevice = motorDevice;
             m_imuInterruptPin = imuInterruptPin;
             m_ledPin = ledPin;
-        }
 
-        void begin(Task::data_t * taskData)
-        {
-            taskData->receiver = m_receiver;
-            taskData->imu = m_imu;
-            taskData->motorDevice = m_motorDevice;
+            m_taskData.receiver = receiver;
+            m_taskData.imu = imu;
+            m_taskData.motorDevice = motorDevice;
 
             // Initialize quaternion in upright position
-            taskData->imuFusionPrev.quat.w = 1;
+            m_taskData.imuFusionPrev.quat.w = 1;
 
-            taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+            m_taskData.maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
-            taskData->msp.begin();
+        }
+
+        void begin(void)
+        {
+            m_taskData.receiver->begin();
+
+            m_taskData.msp.begin();
 
             imuDevInit(m_imuInterruptPin);
 
             ledDevInit(m_ledPin);
 
             Led::flash(10, 50);
-
-            taskData->receiver->begin();
         }
 
-        void step(Task::data_t * taskData)
+        void step(void)
         {
             // Realtime gyro/filtering/PID tasks get complete priority
             uint32_t nowCycles = systemGetCycleCounter();
 
             if (m_scheduler.isCoreReady(nowCycles)) {
-                checkCoreTasks(taskData, nowCycles);
+                checkCoreTasks(nowCycles);
             }
 
             if (m_scheduler.isDynamicReady(systemGetCycleCounter())) {
-                checkDynamicTasks(taskData);
+                checkDynamicTasks();
             }
         }
 

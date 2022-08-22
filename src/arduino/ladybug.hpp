@@ -28,8 +28,6 @@
 
 #include "imu_usfs.h"
 
-static Hackflight::data_t _hf;
-
 static ImuUsfs _imu;
 
 static AnglePidController _anglePid(
@@ -42,29 +40,35 @@ static AnglePidController _anglePid(
 
 QuadXbfMixer _mixer; 
 
-static void ladybug_setup(Receiver * receiver)
-{
-    Wire.begin();
-    delay(100);
+static uint8_t _motorPins[4] = {13, 16, 3, 11};
 
-    static uint8_t motorPins[4] = {13, 16, 3, 11};
+class LadybugFc : public Hackflight {
 
-    motorInitBrushed(motorPins);
+    public:
 
-    stm32_startCycleCounter();
+        LadybugFc(Receiver * receiver) 
 
-    // Always use Serial1 for receiver, no no need to specify
-    Hackflight::init(
-            &_hf,
-            &_imu,
-            receiver,
-            (void *)&motorPins,
-            12,  // IMU interrupt pin
-            imuRotate0,
-            18); // LED pin
-}
+            : Hackflight(
+                    receiver,
+                    &_imu,
+                    imuRotate0,
+                    &_anglePid,
+                    &_mixer,
+                    (void *)&_motorPins,
+                    12,  // IMU interrupt pin
+                    18)  // LED pin
+        {
+        }
 
-static void ladybug_loop(void)
-{
-    Hackflight::step(&_hf, &_anglePid, &_mixer);
-}
+        void begin(void)
+        {
+            Wire.begin();
+            delay(100);
+
+            motorInitBrushed(_motorPins);
+
+            stm32_startCycleCounter();
+
+            Hackflight::begin();
+        }
+};

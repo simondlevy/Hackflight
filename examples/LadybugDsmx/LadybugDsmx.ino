@@ -20,17 +20,18 @@
 
 #include <hackflight_full.h>
 #include <arduino/ladybug.hpp>
-
 #include <receivers/dsmx.h>
 
-static DsmxReceiver receiver;
+static DsmxReceiver _receiver;
+
+static LadybugFc _ladybug = LadybugFc(&_receiver);
 
 void setup(void)
 {
-    ladybug_setup(&receiver);
+    _ladybug.begin();
 }
 
 void loop(void)
 {
-    ladybug_loop();
+    _ladybug.step();
 }
