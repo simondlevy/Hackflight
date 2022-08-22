@@ -25,7 +25,7 @@
 #include "datatypes.h"
 #include "../filters/pt1.h"
 #include "../filters/pt3.h"
-#include "maths.h"
+#include "constrain.h"
 #include "pid.h"
 #include "time.h"
 

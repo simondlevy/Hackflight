@@ -25,7 +25,7 @@
 #include "filters/pt1.h"
 #include "gyro_device.h"
 #include "imu.h"
-#include "maths.h"
+#include "constrain.h"
 #include "stats.h"
 #include "system.h"
 #include "time.h"

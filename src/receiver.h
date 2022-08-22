@@ -24,7 +24,7 @@
 #include "clock.h"
 #include "datatypes.h"
 #include "filters/pt3.h"
-#include "maths.h"
+#include "constrain.h"
 #include "pids/angle.h"
 #include "pwm.h"
 #include "serial_device.h"

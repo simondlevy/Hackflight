@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include <time.h>
-#include <maths.h>
+#include <constrain.h>
 #include <motor_device.h>
 
 #include "platform.h"

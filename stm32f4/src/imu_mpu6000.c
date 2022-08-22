@@ -17,7 +17,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <maths.h>
+#include <constrain.h>
 #include <system.h>
 #include <time.h>
 

@@ -16,7 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <maths.h>
+#include <constrain.h>
 #include <time.h>
 
 #include "bus.h"

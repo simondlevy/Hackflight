@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <string.h>
 
-#include <maths.h>
+#include <constrain.h>
 #include <system.h>
 #include <time.h>
 #include "macros.h"
