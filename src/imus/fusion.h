@@ -26,7 +26,7 @@
 #include "deg2rad.h"
 #include "imu.h"
 
-class ImuFusion : public Imu {
+class FusionImu : public Imu {
 
     private:
 
