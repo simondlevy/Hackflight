@@ -27,7 +27,7 @@
 #include "maths.h"
 #include "pids/angle.h"
 #include "pwm.h"
-#include "serial.h"
+#include "serial_device.h"
 #include "sticks.h"
 #include "time.h"
 

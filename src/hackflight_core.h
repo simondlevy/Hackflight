@@ -36,6 +36,21 @@ class HackflightCore {
             return constrain_f(demand, -limit, +limit) / scaling;
         }
 
+        static void constrain_demands(demands_t * demands)
+        {
+            demands->roll  = constrain_demand(
+                    demands->roll, PIDSUM_LIMIT, PID_MIXER_SCALING);
+
+            demands->pitch =
+                constrain_demand(
+                        demands->pitch, PIDSUM_LIMIT, PID_MIXER_SCALING);
+
+            // Negate yaw to make it agree with PID
+            demands->yaw   =
+                -constrain_demand(
+                        demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
+        }
+
     public:
 
         static void step(
@@ -47,17 +62,11 @@ class HackflightCore {
                 Mixer * mixer,
                 float motorvals[])
         {
+            // Run PID controllers to get new demands
             anglePid->update(usec, demands, vstate, pidReset);
 
-            // Constrain the demands, negating yaw to make it agree with PID
-            demands->roll  = constrain_demand(
-                    demands->roll, PIDSUM_LIMIT, PID_MIXER_SCALING);
-            demands->pitch =
-                constrain_demand(
-                        demands->pitch, PIDSUM_LIMIT, PID_MIXER_SCALING);
-            demands->yaw   =
-                -constrain_demand(
-                        demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
+            // Constrain demands
+            constrain_demands(demands);
 
             // Run the mixer to get motors from demands
             mixer->run(demands, motorvals);
