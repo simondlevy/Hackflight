@@ -66,6 +66,10 @@ typedef enum {
     GYRO_HARDWARE_LPF_EXPERIMENTAL
 } gyroHardwareLpf_e;
 
+typedef struct fp_rotationMatrix_s {
+    float m[3][3];              // matrix
+} fp_rotationMatrix_t;
+
 typedef struct gyroDev_s {
     sensorGyroInitFuncPtr initFn;                             // initialize function
     sensorGyroReadFuncPtr readFn;                             // read 3 axis data function

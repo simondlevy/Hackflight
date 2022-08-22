@@ -18,12 +18,7 @@
 
 #pragma once
 
-#include <math.h>
 #include <stdint.h>
-
-typedef struct fp_rotationMatrix_s {
-    float m[3][3];              // matrix
-} fp_rotationMatrix_t;
 
 static inline int constrain_f_i32(float amt, int32_t low, int32_t high)
 {
