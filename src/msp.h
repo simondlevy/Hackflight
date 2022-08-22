@@ -22,7 +22,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "datatypes.h"
 #include "debug.h"
-#include "rad2deg.h"
+#include "maths.h"
 #include "receiver.h"
 #include "system.h"
 
@@ -47,7 +47,7 @@ class Msp {
 
         static int16_t rad2degi(float rad)
         {
-            return (int16_t)rad2deg(rad);
+            return (int16_t)Math::rad2deg(rad);
         }
 
 

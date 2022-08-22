@@ -20,7 +20,16 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <math.h>
 
-static float rad2deg(float rad)
-{
-    return 180 * rad / M_PI;
-}
+class Math {
+
+    public:
+
+        static float deg2rad(float deg)
+        {
+            return deg * M_PI / 180;
+        }
+        static float rad2deg(float rad)
+        {
+            return 180 * rad / M_PI;
+        }
+};

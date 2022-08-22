@@ -23,8 +23,8 @@
 #include "arming.h"
 #include "clock.h"
 #include "datatypes.h"
-#include "deg2rad.h"
 #include "imu.h"
+#include "maths.h"
 
 class FusionImu : public Imu {
 
@@ -129,9 +129,9 @@ class FusionImu : public Imu {
                 Imu::quaternion_t * quat_new)
         {
             // Convert gyro degrees to radians
-            float gx = deg2rad(gyro->x);
-            float gy = deg2rad(gyro->y);
-            float gz = deg2rad(gyro->z);
+            float gx = Math::deg2rad(gyro->x);
+            float gy = Math::deg2rad(gyro->y);
+            float gz = Math::deg2rad(gyro->z);
 
             // Apply proportional and integral feedback, then integrate rate-of-change
             float gx1 = gx * dt / 2;

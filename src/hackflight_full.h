@@ -24,13 +24,13 @@
 #include <string.h>
 
 #include "arming.h"
-#include "deg2rad.h"
 #include "failsafe.h"
 #include "gyro.h"
 #include "hackflight_core.h"
 #include "imu.h"
 #include "imu_device.h"
 #include "led.h"
+#include "maths.h"
 #include "motor.h"
 #include "msp.h"
 #include "receiver.h"
@@ -260,7 +260,7 @@ class Hackflight {
             // Initialize quaternion in upright position
             m_taskData.imuFusionPrev.quat.w = 1;
 
-            m_taskData.maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
+            m_taskData.maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
         }
 
         void begin(void)
