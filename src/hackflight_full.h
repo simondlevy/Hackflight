@@ -29,6 +29,7 @@
 #include "gyro.h"
 #include "hackflight_core.h"
 #include "imu.h"
+#include "imu_device.h"
 #include "led.h"
 #include "motor.h"
 #include "msp.h"

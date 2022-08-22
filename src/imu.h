@@ -66,13 +66,3 @@ class Imu {
                 uint32_t time,
                 vehicle_state_t * vstate) = 0;
 };
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-    void  imuDevInit(uint8_t interruptPin);
-
-#if defined(__cplusplus)
-}
-#endif
