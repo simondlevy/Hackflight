@@ -17,8 +17,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "serial.h"
-#include "macros.h"
+#include <serial_device.h>
+#include <macros.h>
 
 #include "inverter.h"
 #include "nvic.h"

@@ -29,8 +29,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "usb_io.h"
 
 #include <time.h>
+#include <serial_device.h>
 
-#include "serial.h"
 #include "serial_usb_vcp.h"
 
 #include "systemdev.h"

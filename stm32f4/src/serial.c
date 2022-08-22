@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 
 
-#include "serial.h"
+#include <serial_device.h>
 #include <time.h>
 
 #include "platform.h"

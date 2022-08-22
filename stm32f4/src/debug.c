@@ -17,8 +17,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-#include "debug.h"
-#include "serial.h"
+#include <debug.h>
+#include <serial_device.h>
 
 typedef void (*putcf) (void *, char);
 
