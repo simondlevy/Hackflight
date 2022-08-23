@@ -146,7 +146,9 @@ class AnglePidController : public PidController {
         float               m_previousSetpointCorrection[3];
         float               m_previousGyroRateDterm[3];
         float               m_previousSetpoint[3];
-        pt1Filter_t         m_ptermYawLowpass;
+
+        Pt1Filter           m_ptermYawLpf = Pt1Filter(YAW_LOWPASS_HZ);
+
         pt1Filter_t         m_windupLpf[3];
 
         static float pt2FilterApply(pt2Filter_t *filter, float input)
@@ -328,9 +330,6 @@ class AnglePidController : public PidController {
             // to allow an initial zero throttle to set the filter cutoff
             m_dynLpfPreviousQuantizedThrottle = -1;  
 
-            pt1FilterInit(&m_ptermYawLowpass,
-                    pt1FilterGain(YAW_LOWPASS_HZ, Clock::DT()));
-
             for (int i = 0; i < 3; i++) {
                 pt1FilterInit(&m_windupLpf[i],
                         pt1FilterGain(ITERM_RELAX_CUTOFF, Clock::DT()));
@@ -431,12 +430,9 @@ class AnglePidController : public PidController {
                 // tuned (amount derivative on measurement or error).
 
                 // -----calculate P component
-                filterApplyFnPtr ptermYawLowpassApplyFn =
-                    (filterApplyFnPtr)pt1FilterApply;
                 m_data[axis].P = m_k_rate_p * errorRate;
                 if (axis == 2) {
-                    m_data[axis].P = ptermYawLowpassApplyFn((filter_t *)
-                            &m_ptermYawLowpass, m_data[axis].P);
+                    m_data[axis].P = m_ptermYawLpf.apply(m_data[axis].P);
                 }
 
                 // -----calculate I component
