@@ -55,3 +55,44 @@ static float devStandardDeviation(stdev_t *dev)
 {
     return sqrtf(devVariance(dev));
 }
+
+class Stat {
+
+    private:
+
+        float m_oldM;
+        float  m_newM;
+        float  m_oldS;
+        float  m_newS;
+        int m_n; // XXX should be uint32_t ?
+
+        void devClear(void)
+        {
+            m_n = 0;
+        }
+
+        void devPush(float x)
+        {
+            m_n++;
+
+            if (m_n == 1) {
+                m_oldM = m_newM = x;
+                m_oldS = 0.0f;
+            } else {
+                m_newM = m_oldM + (x - m_oldM) / m_n;
+                m_newS = m_oldS + (x - m_oldM) * (x - m_newM);
+                m_oldM = m_newM;
+                m_oldS = m_newS;
+            }
+        }
+
+        float devVariance(void)
+        {
+            return ((m_n > 1) ? m_newS / (m_n - 1) : 0.0f);
+        }
+
+        float devStandardDeviation(void)
+        {
+            return sqrtf(devVariance());
+        }
+}; 
