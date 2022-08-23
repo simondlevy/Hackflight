@@ -305,7 +305,7 @@ $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
 $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \
 	  $(HFSRC_DIR)/*.h \
-      $(HFSRC_DIR)/*/rotate_270.h
+      $(HFSRC_DIR)/*/*.h
 	$(V1) $(call compile_cpp)
 
 # ==============================================================================

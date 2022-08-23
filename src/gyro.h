@@ -107,8 +107,6 @@ class Gyro {
                     return false;
             }
 
-            bool ret = false;
-
             // Establish some common constants
             const float gyroDt = looptime * 1e-6f;
 
@@ -120,15 +118,13 @@ class Gyro {
             // filter type. It will be overridden for positive cases.
             *lowpassFilterApplyFn = nullFilterApply;
 
-            // If lowpass cutoff has been specified
-            if (lpfHz) {
-                *lowpassFilterApplyFn = (filterApplyFnPtr) pt1FilterApply;
-                for (int axis = 0; axis < 3; axis++) {
-                    pt1FilterInit(&lowpassFilter[axis].pt1FilterState, gain);
-                }
-                ret = true;
+            *lowpassFilterApplyFn = (filterApplyFnPtr) pt1FilterApply;
+
+            for (int axis = 0; axis < 3; axis++) {
+                pt1FilterInit(&lowpassFilter[axis].pt1FilterState, gain);
             }
-            return ret;
+
+            return true;
         }
 
         void setCalibrationCycles(void)

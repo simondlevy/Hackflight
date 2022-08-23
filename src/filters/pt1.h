@@ -34,9 +34,38 @@ static void pt1FilterInit(pt1Filter_t *filter, float k)
     filter->k = k;
 }
 
-// PT1 Low Pass filter
 static float pt1FilterGain(float f_cut, float dT)
 {
     float RC = 1 / (2 * M_PI * f_cut);
     return dT / (RC + dT);
 }
+
+// PT1 Low Pass filter
+class Pt1Filter {
+
+    private:
+
+        float m_state;
+        float m_k;
+
+    public:
+
+        Pt1Filter(float k)
+        {
+            m_state = 0.0;
+            m_k = k;
+        }
+
+        float apply(float input)
+        {
+            m_state = m_state + m_k * (input - m_state);
+            return m_state;
+        }
+
+        static float gain(float f_cut, float dT)
+        {
+            float RC = 1 / (2 * M_PI * f_cut);
+            return dT / (RC + dT);
+        }
+
+}; // class Pt1Filter
