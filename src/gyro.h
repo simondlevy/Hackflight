@@ -99,24 +99,6 @@ class Gyro {
             }
         }
 
-        void initLpf2(uint16_t hz)
-        {
-            filterApplyFnPtr * lowpassFilterApplyFn = &m_lowpass2FilterApplyFn;
-            lowpassFilter_t * lowpassFilter = m_lowpass2Filter;
-
-            // Gain could be calculated a little later as it is specific to the
-            // pt1/bqrcf2/fkf branches
-            const float gain = pt1FilterGain(hz, Clock::DT());
-
-            // Dereference the pointer to null before checking valid cutoff and
-            // filter type. It will be overridden for positive cases.
-            *lowpassFilterApplyFn = (filterApplyFnPtr)pt1FilterApply;
-
-            for (int axis = 0; axis < 3; axis++) {
-                pt1FilterInit(&lowpassFilter[axis].pt1FilterState, gain);
-            }
-        }
-
         void setCalibrationCycles(void)
         {
             m_calibration.cyclesRemaining = (int32_t)calculateCalibratingCycles();
@@ -163,7 +145,7 @@ class Gyro {
         {
             initLpf(&m_lowpass1FilterApplyFn, m_lowpass1Filter, LPF1_DYN_MIN_HZ);
 
-            initLpf2(LPF2_STATIC_HZ);
+            initLpf(&m_lowpass2FilterApplyFn, m_lowpass2Filter, LPF2_STATIC_HZ);
 
             setCalibrationCycles(); // start calibrating
         }
