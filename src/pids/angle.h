@@ -130,11 +130,19 @@ class AnglePidController : public PidController {
             Pt1Filter(DTERM_LPF2_HZ)
         };
 
+        Pt2Filter m_dMinLpf[3] = {
+            Pt2Filter(D_MIN_LOWPASS_HZ),
+            Pt2Filter(D_MIN_LOWPASS_HZ),
+            Pt2Filter(D_MIN_LOWPASS_HZ)
+        };
+
+        Pt2Filter m_dMinRange[3] = {
+            Pt2Filter(D_MIN_RANGE_HZ),
+            Pt2Filter(D_MIN_RANGE_HZ),
+            Pt2Filter(D_MIN_RANGE_HZ)
+        };
+
         pidAxisData_t       m_data[3];
-
-        pt2Filter_t         m_dMinLowpass[3];
-        pt2Filter_t         m_dMinRange[3];
-
         int32_t             m_dynLpfPreviousQuantizedThrottle;  
         bool                m_feedforwardLpfInitialized;
         pt3Filter_t         m_feedforwardPt3[3];
@@ -156,33 +164,6 @@ class AnglePidController : public PidController {
             Pt1Filter(ITERM_RELAX_CUTOFF),
             Pt1Filter(ITERM_RELAX_CUTOFF)
         };
-
-        static float pt2FilterApply(pt2Filter_t *filter, float input)
-        {
-            filter->state1 =
-                filter->state1 + filter->k * (input - filter->state1);
-            filter->state =
-                filter->state + filter->k * (filter->state1 - filter->state);
-            return filter->state;
-        }
-
-        static float pt2FilterGain(float f_cut, float dT)
-        {
-            const float order = 2.0f;
-            const float orderCutoffCorrection =
-                1 / sqrtf(powf(2, 1.0f / order) - 1);
-            float RC = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
-            // float RC = 1 / (2 * 1.553773974f * M_PI * f_cut);
-            // where 1.553773974 = 1 / sqrt( (2^(1 / order) - 1) ) and order is 2
-            return dT / (RC + dT);
-        }
-
-        static void pt2FilterInit(pt2Filter_t *filter, float k)
-        {
-            filter->state = 0.0f;
-            filter->state1 = 0.0f;
-            filter->k = k;
-        }
 
         float applyFeedforwardLimit(
                 float value,
@@ -334,19 +315,6 @@ class AnglePidController : public PidController {
 
             // to allow an initial zero throttle to set the filter cutoff
             m_dynLpfPreviousQuantizedThrottle = -1;  
-
-
-            // Initialize the filters for all axis even if the d_min[axis]
-            // value is 0 Otherwise if the pidProfile.d_min_xxx parameters are
-            // ever added to in-flight adjustments and transition from 0 to > 0
-            // in flight the feature won't work because the filter wasn't
-            // initialized.
-            for (uint8_t axis = 0; axis <= 2; axis++) {
-                pt2FilterInit(&m_dMinRange[axis],
-                        pt2FilterGain(D_MIN_RANGE_HZ, Clock::DT()));
-                pt2FilterInit(&m_dMinLowpass[axis],
-                        pt2FilterGain(D_MIN_LOWPASS_HZ, Clock::DT()));
-            }
         }
 
         static float applyRates(float commandf, const float commandfAbs)
@@ -479,8 +447,7 @@ class AnglePidController : public PidController {
                     if (dMinPercent > 0) {
                         const float d_min_gyro_gain =
                             D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
-                        float dMinGyroFactor =
-                            pt2FilterApply(&m_dMinRange[axis], delta);
+                        float dMinGyroFactor = m_dMinRange[axis].apply(delta);
                         dMinGyroFactor = fabsf(dMinGyroFactor) * d_min_gyro_gain;
                         const float d_min_setpoint_gain =
                             D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
@@ -491,8 +458,7 @@ class AnglePidController : public PidController {
                         dMinFactor = fmaxf(dMinGyroFactor, dMinSetpointFactor);
                         dMinFactor =
                             dMinPercent + (1.0f - dMinPercent) * dMinFactor;
-                        dMinFactor =
-                            pt2FilterApply(&m_dMinLowpass[axis], dMinFactor);
+                        dMinFactor = m_dMinLpf[axis].apply(dMinFactor);
                         dMinFactor = fminf(dMinFactor, 1.0f);
                     }
 

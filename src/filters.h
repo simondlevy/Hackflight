@@ -25,12 +25,6 @@
 typedef struct {
     float state;
     float state1;
-    float k;
-} pt2Filter_t;
-
-typedef struct {
-    float state;
-    float state1;
     float state2;
     float k;
 } pt3Filter_t;
