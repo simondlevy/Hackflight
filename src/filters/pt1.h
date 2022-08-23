@@ -20,6 +20,7 @@
 
 #include <math.h>
 
+#include "clock.h"
 #include "filters.h"
 
 static float pt1FilterApply(pt1Filter_t *filter, float input)
@@ -50,7 +51,7 @@ class Pt1Filter {
 
     public:
 
-        Pt1Filter(float f_cut, float dt)
+        Pt1Filter(float f_cut, float dt=Clock::DT())
         {
             m_state = 0.0;
 

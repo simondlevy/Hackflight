@@ -55,15 +55,15 @@ class Gyro {
 
 
         Pt1Filter m_lowpassFilter1[3] = {
-            Pt1Filter(LPF1_DYN_MIN_HZ, Clock::DT()),
-            Pt1Filter(LPF1_DYN_MIN_HZ, Clock::DT()),
-            Pt1Filter(LPF1_DYN_MIN_HZ, Clock::DT())
+            Pt1Filter(LPF1_DYN_MIN_HZ),
+            Pt1Filter(LPF1_DYN_MIN_HZ),
+            Pt1Filter(LPF1_DYN_MIN_HZ)
         };
 
         Pt1Filter m_lowpassFilter2[3] = {
-            Pt1Filter(LPF2_STATIC_HZ, Clock::DT()),
-            Pt1Filter(LPF2_STATIC_HZ, Clock::DT()),
-            Pt1Filter(LPF2_STATIC_HZ, Clock::DT())
+            Pt1Filter(LPF2_STATIC_HZ),
+            Pt1Filter(LPF2_STATIC_HZ),
+            Pt1Filter(LPF2_STATIC_HZ)
         };
 
         float m_zero[3];
