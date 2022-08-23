@@ -24,6 +24,7 @@
 #include "clock.h"
 #include "datatypes.h"
 #include "../filters/pt1.h"
+#include "../filters/pt2.h"
 #include "../filters/pt3.h"
 #include "constrain.h"
 #include "pid.h"
@@ -130,6 +131,7 @@ class AnglePidController : public PidController {
         };
 
         pidAxisData_t       m_data[3];
+
         pt2Filter_t         m_dMinLowpass[3];
         pt2Filter_t         m_dMinRange[3];
 
