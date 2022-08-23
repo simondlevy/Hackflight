@@ -83,11 +83,8 @@ class Gyro {
 
         void initLpf1(uint16_t lpfHz)
         {
-            filterApplyFnPtr *lowpassFilterApplyFn;
-            lowpassFilter_t *lowpassFilter = NULL;
-
-            lowpassFilterApplyFn = &m_lowpassFilterApplyFn;
-            lowpassFilter = m_lowpassFilter;
+            filterApplyFnPtr * lowpassFilterApplyFn = &m_lowpassFilterApplyFn;
+            lowpassFilter_t * lowpassFilter = m_lowpassFilter;
 
             // Establish some common constants
             const float gyroDt = Clock::DT();
@@ -98,8 +95,6 @@ class Gyro {
 
             // Dereference the pointer to null before checking valid cutoff and
             // filter type. It will be overridden for positive cases.
-            *lowpassFilterApplyFn = nullFilterApply;
-
             *lowpassFilterApplyFn = (filterApplyFnPtr) pt1FilterApply;
 
             for (int axis = 0; axis < 3; axis++) {
