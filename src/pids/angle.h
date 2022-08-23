@@ -147,9 +147,13 @@ class AnglePidController : public PidController {
         float               m_previousGyroRateDterm[3];
         float               m_previousSetpoint[3];
 
-        Pt1Filter           m_ptermYawLpf = Pt1Filter(YAW_LOWPASS_HZ);
+        Pt1Filter m_ptermYawLpf = Pt1Filter(YAW_LOWPASS_HZ);
 
-        pt1Filter_t         m_windupLpf[3];
+        Pt1Filter  m_windupLpf[3] = {
+            Pt1Filter(ITERM_RELAX_CUTOFF),
+            Pt1Filter(ITERM_RELAX_CUTOFF),
+            Pt1Filter(ITERM_RELAX_CUTOFF)
+        };
 
         static float pt2FilterApply(pt2Filter_t *filter, float input)
         {
@@ -221,8 +225,7 @@ class AnglePidController : public PidController {
                 float *itermErrorRate,
                 float *currentPidSetpoint)
         {
-            const float setpointLpf =
-                pt1FilterApply(&m_windupLpf[axis], *currentPidSetpoint);
+            const float setpointLpf = m_windupLpf[axis].apply(*currentPidSetpoint);
 
             const float setpointHpf = fabsf(*currentPidSetpoint - setpointLpf);
 
@@ -330,10 +333,6 @@ class AnglePidController : public PidController {
             // to allow an initial zero throttle to set the filter cutoff
             m_dynLpfPreviousQuantizedThrottle = -1;  
 
-            for (int i = 0; i < 3; i++) {
-                pt1FilterInit(&m_windupLpf[i],
-                        pt1FilterGain(ITERM_RELAX_CUTOFF, Clock::DT()));
-            }
 
             // Initialize the filters for all axis even if the d_min[axis]
             // value is 0 Otherwise if the pidProfile.d_min_xxx parameters are

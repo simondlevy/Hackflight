@@ -21,25 +21,6 @@
 #include <math.h>
 
 #include "clock.h"
-#include "filters.h"
-
-static float pt1FilterApply(pt1Filter_t *filter, float input)
-{
-    filter->state = filter->state + filter->k * (input - filter->state);
-    return filter->state;
-}
-
-static void pt1FilterInit(pt1Filter_t *filter, float k)
-{
-    filter->state = 0.0f;
-    filter->k = k;
-}
-
-static float pt1FilterGain(float f_cut, float dT)
-{
-    float RC = 1 / (2 * M_PI * f_cut);
-    return dT / (RC + dT);
-}
 
 // PT1 Low Pass filter
 class Pt1Filter {

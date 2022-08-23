@@ -22,11 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef struct pt1Filter_s {
-    float state;
-    float k;
-} pt1Filter_t;
-
 typedef struct {
     float state;
     float state1;

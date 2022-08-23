@@ -72,12 +72,6 @@ class Gyro {
             return CALIBRATION_DURATION / Clock::PERIOD();
         }
 
-        static float nullFilterApply(filter_t *filter, float input)
-        {
-            (void)filter;
-            return input;
-        }
-
         void setCalibrationCycles(void)
         {
             m_calibration.cyclesRemaining = (int32_t)calculateCalibratingCycles();
