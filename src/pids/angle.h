@@ -118,17 +118,16 @@ class AnglePidController : public PidController {
         } pidAxisData_t;
 
         typedef union dtermLowpass_u {
-            biquadFilter_t biquadFilter;
             pt1Filter_t    pt1Filter;
-            pt2Filter_t    pt2Filter;
-            pt3Filter_t    pt3Filter;
         } dtermLowpass_t;
 
         pidAxisData_t       m_data[3];
         pt2Filter_t         m_dMinLowpass[3];
         pt2Filter_t         m_dMinRange[3];
+
         dtermLowpass_t      m_dtermLowpass[3];
         dtermLowpass_t      m_dtermLowpass2[3];
+
         int32_t             m_dynLpfPreviousQuantizedThrottle;  
         bool                m_feedforwardLpfInitialized;
         pt3Filter_t         m_feedforwardPt3[3];
@@ -326,14 +325,9 @@ class AnglePidController : public PidController {
             // to allow an initial zero throttle to set the filter cutoff
             m_dynLpfPreviousQuantizedThrottle = -1;  
 
-            // 1st Dterm Lowpass Filter
-            uint16_t dterm_lpf1_init_hz = DTERM_LPF1_DYN_MIN_HZ;
-
-            dterm_lpf1_init_hz = DTERM_LPF1_DYN_MIN_HZ;
-
             for (uint8_t axis = 0; axis <= 2; axis++) {
                 pt1FilterInit(&m_dtermLowpass[axis].pt1Filter,
-                        pt1FilterGain(dterm_lpf1_init_hz, Clock::DT()));
+                        pt1FilterGain(DTERM_LPF1_DYN_MIN_HZ, Clock::DT()));
             }
 
             // 2nd Dterm Lowpass Filter
