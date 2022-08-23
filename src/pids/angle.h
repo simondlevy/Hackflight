@@ -117,6 +117,18 @@ class AnglePidController : public PidController {
             float Sum;
         } pidAxisData_t;
 
+        Pt1Filter m_dtermLfp1[3] = {
+            Pt1Filter(DTERM_LPF1_DYN_MIN_HZ),
+            Pt1Filter(DTERM_LPF1_DYN_MIN_HZ),
+            Pt1Filter(DTERM_LPF1_DYN_MIN_HZ)
+        };
+
+        Pt1Filter m_dtermLpf2[3] = {
+            Pt1Filter(DTERM_LPF2_HZ),
+            Pt1Filter(DTERM_LPF2_HZ),
+            Pt1Filter(DTERM_LPF2_HZ)
+        };
+
         typedef union dtermLowpass_u {
             pt1Filter_t    pt1Filter;
         } dtermLowpass_t;

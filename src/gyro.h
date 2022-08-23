@@ -53,7 +53,6 @@ class Gyro {
 
         calibration_t m_calibration;
 
-
         Pt1Filter m_lowpassFilter1[3] = {
             Pt1Filter(LPF1_DYN_MIN_HZ),
             Pt1Filter(LPF1_DYN_MIN_HZ),
