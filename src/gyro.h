@@ -61,8 +61,8 @@ class Gyro {
         calibration_t m_calibration;
 
         // lowpass gyro soft filter
-        filterApplyFnPtr m_lowpassFilterApplyFn;
-        lowpassFilter_t m_lowpassFilter[3];
+        filterApplyFnPtr m_lowpass1FilterApplyFn;
+        lowpassFilter_t m_lowpass1Filter[3];
 
         // lowpass2 gyro soft filter
         filterApplyFnPtr m_lowpass2FilterApplyFn;
@@ -81,17 +81,14 @@ class Gyro {
             return input;
         }
 
-        void initLpf1(uint16_t lpfHz)
+        void initLpf1(uint16_t hz)
         {
-            filterApplyFnPtr * lowpassFilterApplyFn = &m_lowpassFilterApplyFn;
-            lowpassFilter_t * lowpassFilter = m_lowpassFilter;
-
-            // Establish some common constants
-            const float gyroDt = Clock::DT();
+            filterApplyFnPtr * lowpassFilterApplyFn = &m_lowpass1FilterApplyFn;
+            lowpassFilter_t * lowpassFilter = m_lowpass1Filter;
 
             // Gain could be calculated a little later as it is specific to the
             // pt1/bqrcf2/fkf branches
-            const float gain = pt1FilterGain(lpfHz, gyroDt);
+            const float gain = pt1FilterGain(hz, Clock::DT());
 
             // Dereference the pointer to null before checking valid cutoff and
             // filter type. It will be overridden for positive cases.
@@ -102,17 +99,14 @@ class Gyro {
             }
         }
 
-        void initLpf2(uint16_t lpfHz)
+        void initLpf2(uint16_t hz)
         {
             filterApplyFnPtr * lowpassFilterApplyFn = &m_lowpass2FilterApplyFn;
             lowpassFilter_t * lowpassFilter = m_lowpass2Filter;
 
-            // Establish some common constants
-            const float gyroDt = Clock::DT();
-
             // Gain could be calculated a little later as it is specific to the
             // pt1/bqrcf2/fkf branches
-            const float gain = pt1FilterGain(lpfHz, gyroDt);
+            const float gain = pt1FilterGain(hz, Clock::DT());
 
             // Dereference the pointer to null before checking valid cutoff and
             // filter type. It will be overridden for positive cases.
@@ -215,7 +209,7 @@ class Gyro {
 
                 // apply static notch filters and software lowpass filters
                 m_dps_filtered[axis] =
-                    m_lowpassFilterApplyFn((filter_t *)&m_lowpassFilter[axis],
+                    m_lowpass1FilterApplyFn((filter_t *)&m_lowpass1Filter[axis],
                             m_sampleSum[axis]);
             }
 
