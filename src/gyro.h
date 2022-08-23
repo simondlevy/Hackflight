@@ -58,9 +58,6 @@ class Gyro {
         float m_sampleSum[3];      // summed samples used for downsampling
         bool  m_isCalibrating;
 
-        // if true then downsample using gyro lowpass 2, otherwise use averaging
-        bool m_downsampleFilterEnabled;      
-
         calibration_t m_calibration;
 
         // lowpass gyro soft filter
@@ -84,31 +81,16 @@ class Gyro {
             return input;
         }
 
-        bool initLowpassFilterLpf(
-                int slot,
-                uint16_t lpfHz,
-                uint32_t looptime)
+        void initLpf1(uint16_t lpfHz)
         {
             filterApplyFnPtr *lowpassFilterApplyFn;
             lowpassFilter_t *lowpassFilter = NULL;
 
-            switch (slot) {
-                case FILTER_LPF1:
-                    lowpassFilterApplyFn = &m_lowpassFilterApplyFn;
-                    lowpassFilter = m_lowpassFilter;
-                    break;
-
-                case FILTER_LPF2:
-                    lowpassFilterApplyFn = &m_lowpass2FilterApplyFn;
-                    lowpassFilter = m_lowpass2Filter;
-                    break;
-
-                default:
-                    return false;
-            }
+            lowpassFilterApplyFn = &m_lowpassFilterApplyFn;
+            lowpassFilter = m_lowpassFilter;
 
             // Establish some common constants
-            const float gyroDt = looptime * 1e-6f;
+            const float gyroDt = Clock::DT();
 
             // Gain could be calculated a little later as it is specific to the
             // pt1/bqrcf2/fkf branches
@@ -123,8 +105,32 @@ class Gyro {
             for (int axis = 0; axis < 3; axis++) {
                 pt1FilterInit(&lowpassFilter[axis].pt1FilterState, gain);
             }
+        }
 
-            return true;
+        void initLpf2(uint16_t lpfHz)
+        {
+            filterApplyFnPtr *lowpassFilterApplyFn;
+            lowpassFilter_t *lowpassFilter = NULL;
+
+            lowpassFilterApplyFn = &m_lowpass2FilterApplyFn;
+            lowpassFilter = m_lowpass2Filter;
+
+            // Establish some common constants
+            const float gyroDt = Clock::DT();
+
+            // Gain could be calculated a little later as it is specific to the
+            // pt1/bqrcf2/fkf branches
+            const float gain = pt1FilterGain(lpfHz, gyroDt);
+
+            // Dereference the pointer to null before checking valid cutoff and
+            // filter type. It will be overridden for positive cases.
+            *lowpassFilterApplyFn = nullFilterApply;
+
+            *lowpassFilterApplyFn = (filterApplyFnPtr) pt1FilterApply;
+
+            for (int axis = 0; axis < 3; axis++) {
+                pt1FilterInit(&lowpassFilter[axis].pt1FilterState, gain);
+            }
         }
 
         void setCalibrationCycles(void)
@@ -171,13 +177,9 @@ class Gyro {
 
         Gyro(void)
         {
-            initLowpassFilterLpf(FILTER_LPF1, LPF1_DYN_MIN_HZ, Clock::PERIOD());
+            initLpf1(LPF1_DYN_MIN_HZ);
 
-            m_downsampleFilterEnabled = initLowpassFilterLpf(
-                    FILTER_LPF2,
-                    LPF2_STATIC_HZ,
-                    Clock::PERIOD()
-                    );
+            initLpf2(LPF2_STATIC_HZ);
 
             setCalibrationCycles(); // start calibrating
         }
@@ -211,43 +213,20 @@ class Gyro {
                 m_dps[2] = _adc.z * (gyroDevScaleDps() / 32768.);
             }
 
-            if (m_downsampleFilterEnabled) {
-                // using gyro lowpass 2 filter for downsampling
-                m_sampleSum[0] = m_lowpass2FilterApplyFn(
-                        (filter_t *)&m_lowpass2Filter[0], m_dps[0]);
-                m_sampleSum[1] = m_lowpass2FilterApplyFn(
-                        (filter_t *)&m_lowpass2Filter[1], m_dps[1]);
-                m_sampleSum[2] = m_lowpass2FilterApplyFn(
-                        (filter_t *)&m_lowpass2Filter[2], m_dps[2]);
-            } else {
-                // using simple averaging for downsampling
-                m_sampleSum[0] += m_dps[0];
-                m_sampleSum[1] += m_dps[1];
-                m_sampleSum[2] += m_dps[2];
-                m_sampleCount++;
-            }
+            // using gyro lowpass 2 filter for downsampling
+            m_sampleSum[0] = m_lowpass2FilterApplyFn(
+                    (filter_t *)&m_lowpass2Filter[0], m_dps[0]);
+            m_sampleSum[1] = m_lowpass2FilterApplyFn(
+                    (filter_t *)&m_lowpass2Filter[1], m_dps[1]);
+            m_sampleSum[2] = m_lowpass2FilterApplyFn(
+                    (filter_t *)&m_lowpass2Filter[2], m_dps[2]);
 
             for (int axis = 0; axis < 3; axis++) {
 
-                // downsample the individual gyro samples
-                float dps_filtered = 0;
-                if (m_downsampleFilterEnabled) {
-                    // using gyro lowpass 2 filter for downsampling
-                    dps_filtered = m_sampleSum[axis];
-                } else {
-                    // using simple average for downsampling
-                    if (m_sampleCount) {
-                        dps_filtered = m_sampleSum[axis] / m_sampleCount;
-                    }
-                    m_sampleSum[axis] = 0;
-                }
-
                 // apply static notch filters and software lowpass filters
-                dps_filtered =
+                m_dps_filtered[axis] =
                     m_lowpassFilterApplyFn((filter_t *)&m_lowpassFilter[axis],
-                            dps_filtered);
-
-                m_dps_filtered[axis] = dps_filtered;
+                            m_sampleSum[axis]);
             }
 
             m_sampleCount = 0;
