@@ -145,7 +145,6 @@ class AnglePidController : public PidController {
         pidAxisData_t       m_data[3];
         int32_t             m_dynLpfPreviousQuantizedThrottle;  
         bool                m_feedforwardLpfInitialized;
-        pt3Filter_t         m_feedforwardPt3[3];
         float               m_k_rate_p;
         float               m_k_rate_i;
         float               m_k_rate_d;
@@ -227,17 +226,6 @@ class AnglePidController : public PidController {
                     *itermErrorRate *= itermRelaxFactor;
                 } 
             }
-        }
-
-        float applyRcSmoothingFeedforwardFilter(
-                int axis, float pidSetpointDelta)
-        {
-            float ret = pidSetpointDelta;
-            if (m_feedforwardLpfInitialized) {
-                ret =
-                    pt3FilterApply(&m_feedforwardPt3[axis], pidSetpointDelta);
-            }
-            return ret;
         }
 
         static float dynLpfCutoffFreq(
@@ -502,8 +490,6 @@ class AnglePidController : public PidController {
                                 currentPidSetpoint,
                                 feedforwardMaxRateLimit) :
                         feedForward;
-                    m_data[axis].F =
-                        applyRcSmoothingFeedforwardFilter(axis, m_data[axis].F);
                 } else {
                     m_data[axis].F = 0;
                 }
