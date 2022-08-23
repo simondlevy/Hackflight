@@ -47,6 +47,7 @@ class Pt1Filter {
     private:
 
         float m_state;
+        float m_dt;
         float m_k;
 
     public:
@@ -54,15 +55,21 @@ class Pt1Filter {
         Pt1Filter(float f_cut, float dt=Clock::DT())
         {
             m_state = 0.0;
+            m_dt = dt;
 
-            float rc = 1 / (2 * M_PI * f_cut);
-            m_k = dt / (rc + dt);
+            computeGain(f_cut);
         }
 
         float apply(float input)
         {
             m_state = m_state + m_k * (input - m_state);
             return m_state;
+        }
+
+        void computeGain(float f_cut)
+        {
+            float rc = 1 / (2 * M_PI * f_cut);
+            m_k = m_dt / (rc + m_dt);
         }
 
 }; // class Pt1Filter
