@@ -81,11 +81,11 @@ class Gyro {
             return input;
         }
 
-        void initLpf1(uint16_t hz)
+        static void initLpf(
+                filterApplyFnPtr * lowpassFilterApplyFn,
+                lowpassFilter_t * lowpassFilter,
+                uint16_t hz)
         {
-            filterApplyFnPtr * lowpassFilterApplyFn = &m_lowpass1FilterApplyFn;
-            lowpassFilter_t * lowpassFilter = m_lowpass1Filter;
-
             // Gain could be calculated a little later as it is specific to the
             // pt1/bqrcf2/fkf branches
             const float gain = pt1FilterGain(hz, Clock::DT());
@@ -161,7 +161,7 @@ class Gyro {
 
         Gyro(void)
         {
-            initLpf1(LPF1_DYN_MIN_HZ);
+            initLpf(&m_lowpass1FilterApplyFn, m_lowpass1Filter, LPF1_DYN_MIN_HZ);
 
             initLpf2(LPF2_STATIC_HZ);
 
