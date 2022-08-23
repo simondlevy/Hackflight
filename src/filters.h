@@ -23,13 +23,6 @@
 #include <stdint.h>
 
 typedef struct {
-    float state;
-    float state1;
-    float state2;
-    float k;
-} pt3Filter_t;
-
-typedef struct {
     float b0, b1, b2, a1, a2;
     float x1, x2, y1, y2;
     float weight;
