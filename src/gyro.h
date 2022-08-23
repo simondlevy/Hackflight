@@ -53,13 +53,18 @@ class Gyro {
 
         calibration_t m_calibration;
 
-        // lowpass gyro soft filter
-        filterApplyFnPtr m_lowpass1FilterApplyFn;
-        pt1Filter_t m_lowpass1Filter[3];
 
-        // lowpass2 gyro soft filter
-        filterApplyFnPtr m_lowpass2FilterApplyFn;
-        pt1Filter_t m_lowpass2Filter[3];
+        Pt1Filter m_lowpassFilter1[3] = {
+            Pt1Filter(LPF1_DYN_MIN_HZ, Clock::DT()),
+            Pt1Filter(LPF1_DYN_MIN_HZ, Clock::DT()),
+            Pt1Filter(LPF1_DYN_MIN_HZ, Clock::DT())
+        };
+
+        Pt1Filter m_lowpassFilter2[3] = {
+            Pt1Filter(LPF2_STATIC_HZ, Clock::DT()),
+            Pt1Filter(LPF2_STATIC_HZ, Clock::DT()),
+            Pt1Filter(LPF2_STATIC_HZ, Clock::DT())
+        };
 
         float m_zero[3];
 
@@ -72,24 +77,6 @@ class Gyro {
         {
             (void)filter;
             return input;
-        }
-
-        static void initLpf(
-                filterApplyFnPtr * lowpassFilterApplyFn,
-                pt1Filter_t * lowpassFilter,
-                uint16_t hz)
-        {
-            // Gain could be calculated a little later as it is specific to the
-            // pt1/bqrcf2/fkf branches
-            const float gain = pt1FilterGain(hz, Clock::DT());
-
-            // Dereference the pointer to null before checking valid cutoff and
-            // filter type. It will be overridden for positive cases.
-            *lowpassFilterApplyFn = (filterApplyFnPtr) pt1FilterApply;
-
-            for (int axis = 0; axis < 3; axis++) {
-                pt1FilterInit(&lowpassFilter[axis], gain);
-            }
         }
 
         void setCalibrationCycles(void)
@@ -136,10 +123,6 @@ class Gyro {
 
         Gyro(void)
         {
-            initLpf(&m_lowpass1FilterApplyFn, m_lowpass1Filter, LPF1_DYN_MIN_HZ);
-
-            initLpf(&m_lowpass2FilterApplyFn, m_lowpass2Filter, LPF2_STATIC_HZ);
-
             setCalibrationCycles(); // start calibrating
         }
 
@@ -173,19 +156,15 @@ class Gyro {
             }
 
             // using gyro lowpass 2 filter for downsampling
-            m_sampleSum[0] = m_lowpass2FilterApplyFn(
-                    (filter_t *)&m_lowpass2Filter[0], m_dps[0]);
-            m_sampleSum[1] = m_lowpass2FilterApplyFn(
-                    (filter_t *)&m_lowpass2Filter[1], m_dps[1]);
-            m_sampleSum[2] = m_lowpass2FilterApplyFn(
-                    (filter_t *)&m_lowpass2Filter[2], m_dps[2]);
+            m_sampleSum[0] = m_lowpassFilter2[0].apply(m_dps[0]);
+            m_sampleSum[1] = m_lowpassFilter2[1].apply(m_dps[1]);
+            m_sampleSum[2] = m_lowpassFilter2[2].apply(m_dps[2]);
 
             for (int axis = 0; axis < 3; axis++) {
 
                 // apply static notch filters and software lowpass filters
                 m_dps_filtered[axis] =
-                    m_lowpass1FilterApplyFn((filter_t *)&m_lowpass1Filter[axis],
-                            m_sampleSum[axis]);
+                    m_lowpassFilter1[axis].apply(m_sampleSum[axis]);
             }
 
             m_sampleCount = 0;

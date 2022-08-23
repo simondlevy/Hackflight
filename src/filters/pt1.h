@@ -50,22 +50,18 @@ class Pt1Filter {
 
     public:
 
-        Pt1Filter(float k)
+        Pt1Filter(float f_cut, float dt)
         {
             m_state = 0.0;
-            m_k = k;
+
+            float rc = 1 / (2 * M_PI * f_cut);
+            m_k = dt / (rc + dt);
         }
 
         float apply(float input)
         {
             m_state = m_state + m_k * (input - m_state);
             return m_state;
-        }
-
-        static float gain(float f_cut, float dT)
-        {
-            float RC = 1 / (2 * M_PI * f_cut);
-            return dT / (RC + dT);
         }
 
 }; // class Pt1Filter
