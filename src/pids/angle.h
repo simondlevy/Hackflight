@@ -117,7 +117,7 @@ class AnglePidController : public PidController {
             float Sum;
         } pidAxisData_t;
 
-        Pt1Filter m_dtermLfp1[3] = {
+        Pt1Filter m_dtermLpf1[3] = {
             Pt1Filter(DTERM_LPF1_DYN_MIN_HZ),
             Pt1Filter(DTERM_LPF1_DYN_MIN_HZ),
             Pt1Filter(DTERM_LPF1_DYN_MIN_HZ)
@@ -129,16 +129,9 @@ class AnglePidController : public PidController {
             Pt1Filter(DTERM_LPF2_HZ)
         };
 
-        typedef union dtermLowpass_u {
-            pt1Filter_t    pt1Filter;
-        } dtermLowpass_t;
-
         pidAxisData_t       m_data[3];
         pt2Filter_t         m_dMinLowpass[3];
         pt2Filter_t         m_dMinRange[3];
-
-        dtermLowpass_t      m_dtermLowpass[3];
-        dtermLowpass_t      m_dtermLowpass2[3];
 
         int32_t             m_dynLpfPreviousQuantizedThrottle;  
         bool                m_feedforwardLpfInitialized;
@@ -279,9 +272,7 @@ class AnglePidController : public PidController {
                         DYN_LPF_CURVE_EXPO);
 
             for (uint8_t axis = 0; axis < 3; axis++) {
-                m_dtermLowpass[axis].pt1Filter.k =
-                    pt1FilterGain(cutoffFreq, Clock::DT());
-
+                m_dtermLpf1[axis].computeGain(cutoffFreq);
             }
         }
 
@@ -336,17 +327,6 @@ class AnglePidController : public PidController {
 
             // to allow an initial zero throttle to set the filter cutoff
             m_dynLpfPreviousQuantizedThrottle = -1;  
-
-            for (uint8_t axis = 0; axis <= 2; axis++) {
-                pt1FilterInit(&m_dtermLowpass[axis].pt1Filter,
-                        pt1FilterGain(DTERM_LPF1_DYN_MIN_HZ, Clock::DT()));
-            }
-
-            // 2nd Dterm Lowpass Filter
-            for (uint8_t axis = 0; axis <= 2; axis++) {
-                pt1FilterInit(&m_dtermLowpass2[axis].pt1Filter,
-                        pt1FilterGain(DTERM_LPF2_HZ, Clock::DT()));
-            }
 
             pt1FilterInit(&m_ptermYawLowpass,
                     pt1FilterGain(YAW_LOWPASS_HZ, Clock::DT()));
@@ -404,18 +384,8 @@ class AnglePidController : public PidController {
             for (uint8_t axis = 0; axis <= 2; ++axis) {
 
                 gyroRateDterm[axis] = gyroRates[axis];
-
-                filterApplyFnPtr dtermLowpassApplyFn =
-                    (filterApplyFnPtr)pt1FilterApply;
-                gyroRateDterm[axis] =
-                    dtermLowpassApplyFn((filter_t *) &m_dtermLowpass[axis],
-                            gyroRateDterm[axis]);
-
-                filterApplyFnPtr dtermLowpass2ApplyFn =
-                    (filterApplyFnPtr)pt1FilterApply;
-                gyroRateDterm[axis] =
-                    dtermLowpass2ApplyFn((filter_t *) &m_dtermLowpass2[axis],
-                            gyroRateDterm[axis]);
+                gyroRateDterm[axis] = m_dtermLpf1[axis].apply(gyroRateDterm[axis]);
+                gyroRateDterm[axis] = m_dtermLpf2[axis].apply(gyroRateDterm[axis]);
             }
 
             float pidSetpoints[3] = {demands->roll, demands->pitch, demands->yaw};
