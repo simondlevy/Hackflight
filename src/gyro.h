@@ -45,13 +45,6 @@ class Gyro {
             int32_t cyclesRemaining;
         } calibration_t;
 
-        typedef union {
-            pt1Filter_t pt1FilterState;
-            biquadFilter_t biquadFilterState;
-            pt2Filter_t pt2FilterState;
-            pt3Filter_t pt3FilterState;
-        } lowpassFilter_t;
-
         float m_dps[3];            // aligned, calibrated, scaled, unfiltered
         float  m_dps_filtered[3];  // filtered 
         uint8_t m_sampleCount;     // sample counter
@@ -62,11 +55,11 @@ class Gyro {
 
         // lowpass gyro soft filter
         filterApplyFnPtr m_lowpass1FilterApplyFn;
-        lowpassFilter_t m_lowpass1Filter[3];
+        pt1Filter_t m_lowpass1Filter[3];
 
         // lowpass2 gyro soft filter
         filterApplyFnPtr m_lowpass2FilterApplyFn;
-        lowpassFilter_t m_lowpass2Filter[3];
+        pt1Filter_t m_lowpass2Filter[3];
 
         float m_zero[3];
 
@@ -83,7 +76,7 @@ class Gyro {
 
         static void initLpf(
                 filterApplyFnPtr * lowpassFilterApplyFn,
-                lowpassFilter_t * lowpassFilter,
+                pt1Filter_t * lowpassFilter,
                 uint16_t hz)
         {
             // Gain could be calculated a little later as it is specific to the
@@ -95,7 +88,7 @@ class Gyro {
             *lowpassFilterApplyFn = (filterApplyFnPtr) pt1FilterApply;
 
             for (int axis = 0; axis < 3; axis++) {
-                pt1FilterInit(&lowpassFilter[axis].pt1FilterState, gain);
+                pt1FilterInit(&lowpassFilter[axis], gain);
             }
         }
 
