@@ -22,41 +22,7 @@
 
 #include "datatypes.h"
 
-typedef struct {
-    float m_oldM, m_newM, m_oldS, m_newS;
-    int m_n; // XXX should be uint32_t ?
-} stdev_t;
-
-static void devClear(stdev_t *dev)
-{
-    dev->m_n = 0;
-}
-
-static void devPush(stdev_t *dev, float x)
-{
-    dev->m_n++;
-    if (dev->m_n == 1) {
-        dev->m_oldM = dev->m_newM = x;
-        dev->m_oldS = 0.0f;
-    } else {
-        dev->m_newM = dev->m_oldM + (x - dev->m_oldM) / dev->m_n;
-        dev->m_newS = dev->m_oldS + (x - dev->m_oldM) * (x - dev->m_newM);
-        dev->m_oldM = dev->m_newM;
-        dev->m_oldS = dev->m_newS;
-    }
-}
-
-static float devVariance(stdev_t *dev)
-{
-    return ((dev->m_n > 1) ? dev->m_newS / (dev->m_n - 1) : 0.0f);
-}
-
-static float devStandardDeviation(stdev_t *dev)
-{
-    return sqrtf(devVariance(dev));
-}
-
-class Stat {
+class Stats {
 
     private:
 
@@ -64,14 +30,21 @@ class Stat {
         float  m_newM;
         float  m_oldS;
         float  m_newS;
-        int m_n; // XXX should be uint32_t ?
+        int32_t m_n;
 
-        void devClear(void)
+        float variance(void)
+        {
+            return ((m_n > 1) ? m_newS / (m_n - 1) : 0.0f);
+        }
+
+    public:
+
+        void clear(void)
         {
             m_n = 0;
         }
 
-        void devPush(float x)
+        void push(float x)
         {
             m_n++;
 
@@ -86,13 +59,8 @@ class Stat {
             }
         }
 
-        float devVariance(void)
+        float stdev(void)
         {
-            return ((m_n > 1) ? m_newS / (m_n - 1) : 0.0f);
-        }
-
-        float devStandardDeviation(void)
-        {
-            return sqrtf(devVariance());
+            return sqrtf(variance());
         }
 }; 

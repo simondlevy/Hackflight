@@ -41,7 +41,7 @@ class Gyro {
 
         typedef struct {
             float sum[3];
-            stdev_t var[3];
+            Stats var[3];
             int32_t cyclesRemaining;
         } calibration_t;
 
@@ -143,18 +143,17 @@ class Gyro {
                 if (m_calibration.cyclesRemaining ==
                         (int32_t)calculateCalibratingCycles()) {
                     m_calibration.sum[axis] = 0.0f;
-                    devClear(&m_calibration.var[axis]);
+                    m_calibration.var[axis].clear();
                     // zero is set to zero until calibration complete
                     m_zero[axis] = 0.0f;
                 }
 
                 // Sum up CALIBRATING_GYRO_TIME_US readings
                 m_calibration.sum[axis] += gyroDevReadRaw(axis);
-                devPush(&m_calibration.var[axis], gyroDevReadRaw(axis));
+                m_calibration.var[axis].push(gyroDevReadRaw(axis));
 
                 if (m_calibration.cyclesRemaining == 1) {
-                    const float stddev =
-                        devStandardDeviation(&m_calibration.var[axis]);
+                    const float stddev = m_calibration.var[axis].stdev();
 
                     // check deviation and startover in case the model was moved
                     if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
