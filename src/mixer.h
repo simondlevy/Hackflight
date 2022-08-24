@@ -22,6 +22,8 @@
 
 class Mixer {
 
+    friend class Hackflight;
+
     protected:
 
         uint8_t m_motorCount;
@@ -31,12 +33,12 @@ class Mixer {
             m_motorCount = motorCount;
         }
 
-    public:
-
         uint8_t getMotorCount(void)
         {
             return m_motorCount;
         }
+
+    public:
 
         virtual void run(demands_t * demands, float * motorvals) = 0;
 };
