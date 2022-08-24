@@ -19,22 +19,6 @@
 #pragma once
 
 #include "clock.h"
-#include "filters.h"
-
-typedef struct {
-    float state;
-    float state1;
-    float state2;
-    float k;
-} pt3Filter_t;
-
-static float pt3FilterApply(pt3Filter_t *filter, float input)
-{
-    filter->state1 = filter->state1 + filter->k * (input - filter->state1);
-    filter->state2 = filter->state2 + filter->k * (filter->state1 - filter->state2);
-    filter->state = filter->state + filter->k * (filter->state2 - filter->state);
-    return filter->state;
-}
 
 // PT3 Low Pass filter
 class Pt3Filter {

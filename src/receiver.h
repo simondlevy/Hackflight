@@ -111,30 +111,6 @@ class Receiver {
     // maximum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-    static float pt3FilterGain(float f_cut, float dT)
-    {
-        const float order = 3.0f;
-        const float orderCutoffCorrection =
-            1 / sqrtf(powf(2, 1.0f / order) - 1);
-        float RC = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
-        // float RC = 1 / (2 * 1.961459177f * M_PI * f_cut);
-        // where 1.961459177 = 1 / sqrt( (2^(1 / order) - 1) ) and order is 3
-        return dT / (RC + dT);
-    }
-
-    static void pt3FilterInit(pt3Filter_t *filter, float k)
-    {
-        filter->state = 0;
-        filter->state1 = 0;
-        filter->state2 = 0;
-        filter->k = k;
-    }
-
-    static void pt3FilterUpdateCutoff(pt3Filter_t *filter, float k)
-    {
-        filter->k = k;
-    }
-
     static inline int32_t cmp32(uint32_t a, uint32_t b)
     {
         return (int32_t)(a-b); 
@@ -176,13 +152,15 @@ class Receiver {
     uint16_t    m_feedforwardCutoffFrequency;
     uint8_t     m_ffCutoffSetting;
 
-    pt3Filter_t m_filterThrottle;
-    pt3Filter_t m_filterRoll;
-    pt3Filter_t m_filterPitch;
-    pt3Filter_t m_filterYaw;
+    Pt3Filter m_filterThrottle;
+    Pt3Filter m_filterRoll;
+    Pt3Filter m_filterPitch;
+    Pt3Filter m_filterYaw;
 
-    pt3Filter_t m_filterDeflectionRoll;
-    pt3Filter_t m_filterDeflectionPitch;
+    Pt3Filter m_filterDeflectionRoll;
+    Pt3Filter m_filterDeflectionPitch;
+
+    Pt3Filter  m_feedforwardPt3[3];
 
     bool        m_filterInitialized;
     uint16_t    m_setpointCutoffFrequency;
@@ -202,7 +180,6 @@ class Receiver {
     bool         m_dataProcessingRequired;
     demands_t    m_dataToSmooth;
     bool         m_feedforwardLpfInitialized;
-    pt3Filter_t  m_feedforwardPt3[3];
     int32_t      m_frameTimeDeltaUs;
     bool         m_gotNewData;
     bool         m_inFailsafeMode;
@@ -498,12 +475,9 @@ class Receiver {
     {
         if (filterCutoff > 0) {
             m_feedforwardLpfInitialized = true;
-            pt3FilterInit(&m_feedforwardPt3[0],
-                    pt3FilterGain(filterCutoff, Clock::DT()));
-            pt3FilterInit(&m_feedforwardPt3[1],
-                    pt3FilterGain(filterCutoff, Clock::DT()));
-            pt3FilterInit(&m_feedforwardPt3[2],
-                    pt3FilterGain(filterCutoff, Clock::DT()));
+            m_feedforwardPt3[0].init(filterCutoff);
+            m_feedforwardPt3[1].init(filterCutoff);
+            m_feedforwardPt3[2].init(filterCutoff);
         }
     }
 
@@ -511,60 +485,43 @@ class Receiver {
     {
         if (filterCutoff > 0) {
             for (uint8_t axis=ROLL; axis<=YAW; axis++) {
-                pt3FilterUpdateCutoff(
-                        &m_feedforwardPt3[axis],
-                        pt3FilterGain(filterCutoff, Clock::DT()));
+                m_feedforwardPt3[axis].computeGain(filterCutoff);
             }
         }
     }
 
-    void smoothingFilterInit(
-            pt3Filter_t * filter,
-            float setpointCutoffFrequency,
-            float dT)
+    void smoothingFilterInit(Pt3Filter * filter, float setpointCutoffFrequency)
     {
         if (!m_filterInitialized) {
-            pt3FilterInit(
-                    filter, pt3FilterGain(setpointCutoffFrequency, dT)); 
+            filter->init(setpointCutoffFrequency);
         } else {
-            pt3FilterUpdateCutoff(
-                    filter, pt3FilterGain(setpointCutoffFrequency, dT)); 
+            filter->computeGain(setpointCutoffFrequency); 
         }
     }
 
-    void smoothingFilterInitRollPitchYaw(pt3Filter_t * filter, float dT)
+    void smoothingFilterInitRollPitchYaw(Pt3Filter * filter)
     {
-        smoothingFilterInit(filter,
-                m_setpointCutoffFrequency, dT);
+        filter->init(m_setpointCutoffFrequency);
     }
 
-    void levelFilterInit(
-            pt3Filter_t * filter,
-            float dT)
+    void levelFilterInit(Pt3Filter * filter)
     {
         if (!m_filterInitialized) {
-            pt3FilterInit(filter,
-                    pt3FilterGain(
-                        m_setpointCutoffFrequency, dT)); 
+            filter->init(m_setpointCutoffFrequency);
         } else {
-            pt3FilterUpdateCutoff(filter,
-                    pt3FilterGain(
-                        m_setpointCutoffFrequency, dT)); 
+            filter->computeGain(m_setpointCutoffFrequency);
         }
     }
 
-    float smoothingFilterApply(
-            pt3Filter_t * filter,
-            float dataToSmooth)
+    float smoothingFilterApply(Pt3Filter * filter, float dataToSmooth)
     {
         return m_filterInitialized ?
-            pt3FilterApply(filter, dataToSmooth) :
+            filter->apply(dataToSmooth) :
             dataToSmooth;
     }
 
     void setSmoothingFilterCutoffs(void)
     {
-        const float dT = Clock::PERIOD() * 1e-6f;
         uint16_t oldCutoff = m_setpointCutoffFrequency;
 
         if (m_setpointCutoffSetting == 0) {
@@ -586,16 +543,14 @@ class Receiver {
         if ((m_setpointCutoffFrequency != oldCutoff) ||
                 !m_filterInitialized) {
 
-            smoothingFilterInit(
-                    &m_filterThrottle,
-                    m_throttleCutoffFrequency, dT);
+            m_filterThrottle.init(m_throttleCutoffFrequency);
 
-            smoothingFilterInitRollPitchYaw(&m_filterRoll, dT);
-            smoothingFilterInitRollPitchYaw(&m_filterPitch, dT);
-            smoothingFilterInitRollPitchYaw(&m_filterYaw, dT);
+            smoothingFilterInitRollPitchYaw(&m_filterRoll);
+            smoothingFilterInitRollPitchYaw(&m_filterPitch);
+            smoothingFilterInitRollPitchYaw(&m_filterYaw);
 
-            levelFilterInit(&m_filterDeflectionRoll, dT);
-            levelFilterInit(&m_filterDeflectionPitch, dT);
+            levelFilterInit(&m_filterDeflectionRoll);
+            levelFilterInit(&m_filterDeflectionPitch);
         }
 
         // update or initialize the FF filter
