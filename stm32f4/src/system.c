@@ -138,32 +138,10 @@ void delay(uint32_t ms)
         delayMicroseconds(1000);
 }
 
-static void indicate(uint8_t count, uint16_t duration)
-{
-    if (count) {
-
-        ledDevSet(false);
-
-        while (count--) {
-            ledDevToggle();
-            delay(duration);
-            ledDevToggle();
-            delay(duration);
-        }
-    }
-}
-
 void systemIndicateFailure(failureMode_e mode, int codeRepeatsRemaining)
 {
-    while (codeRepeatsRemaining--) {
-        indicate(WARNING_FLASH_COUNT, WARNING_FLASH_DURATION_MS);
-
-        delay(WARNING_PAUSE_DURATION_MS);
-
-        indicate(mode + 1, WARNING_CODE_DURATION_LONG_MS);
-
-        delay(1000);
-    }
+    (void)mode;
+    (void)codeRepeatsRemaining;
 }
 
 void systemFailureMode(failureMode_e mode)

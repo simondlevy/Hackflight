@@ -129,7 +129,7 @@ STM32_SRC = \
             exti.c \
             flash.c \
             io.c \
-            leddev.c \
+            led.c \
             motor.c \
             pinio.c \
             rcc.c \
