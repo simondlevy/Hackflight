@@ -170,35 +170,29 @@ class Receiver {
         STATE_COUNT
     } state_e;
 
-    typedef struct smoothingFilter_s {
+    uint8_t     m_autoSmoothnessFactorSetpoint;
+    uint32_t    m_averageFrameTimeUs;
+    uint8_t     m_autoSmoothnessFactorThrottle;
+    uint16_t    m_feedforwardCutoffFrequency;
+    uint8_t     m_ffCutoffSetting;
 
-        uint8_t     autoSmoothnessFactorSetpoint;
-        uint32_t    averageFrameTimeUs;
-        uint8_t     autoSmoothnessFactorThrottle;
-        uint16_t    feedforwardCutoffFrequency;
-        uint8_t     ffCutoffSetting;
+    pt3Filter_t m_filterThrottle;
+    pt3Filter_t m_filterRoll;
+    pt3Filter_t m_filterPitch;
+    pt3Filter_t m_filterYaw;
 
-        pt3Filter_t filterThrottle;
-        pt3Filter_t filterRoll;
-        pt3Filter_t filterPitch;
-        pt3Filter_t filterYaw;
+    pt3Filter_t m_filterDeflectionRoll;
+    pt3Filter_t m_filterDeflectionPitch;
 
-        pt3Filter_t filterDeflectionRoll;
-        pt3Filter_t filterDeflectionPitch;
-
-        bool        filterInitialized;
-        uint16_t    setpointCutoffFrequency;
-        uint8_t     setpointCutoffSetting;
-        uint16_t    throttleCutoffFrequency;
-        uint8_t     throttleCutoffSetting;
-        float       trainingSum;
-        uint32_t    trainingCount;
-        uint16_t    trainingMax;
-        uint16_t    trainingMin;
-
-    } smoothingFilter_t;
-
-    smoothingFilter_t m_smoothingFilter;
+    bool        m_filterInitialized;
+    uint16_t    m_setpointCutoffFrequency;
+    uint8_t     m_setpointCutoffSetting;
+    uint16_t    m_throttleCutoffFrequency;
+    uint8_t     m_throttleCutoffSetting;
+    float       m_trainingSum;
+    uint32_t    m_trainingCount;
+    uint16_t    m_trainingMax;
+    uint16_t    m_trainingMin;
 
     bool         m_auxiliaryProcessingRequired;
     bool         m_calculatedCutoffs;
@@ -296,10 +290,10 @@ class Receiver {
 
     void smoothingResetAccumulation(void)
     {
-        m_smoothingFilter.trainingSum = 0;
-        m_smoothingFilter.trainingCount = 0;
-        m_smoothingFilter.trainingMin = UINT16_MAX;
-        m_smoothingFilter.trainingMax = 0;
+        m_trainingSum = 0;
+        m_trainingCount = 0;
+        m_trainingMin = UINT16_MAX;
+        m_trainingMax = 0;
     }
 
     void readChannelsApplyRanges(float raw[])
@@ -529,7 +523,7 @@ class Receiver {
             float setpointCutoffFrequency,
             float dT)
     {
-        if (!m_smoothingFilter.filterInitialized) {
+        if (!m_filterInitialized) {
             pt3FilterInit(
                     filter, pt3FilterGain(setpointCutoffFrequency, dT)); 
         } else {
@@ -541,21 +535,21 @@ class Receiver {
     void smoothingFilterInitRollPitchYaw(pt3Filter_t * filter, float dT)
     {
         smoothingFilterInit(filter,
-                m_smoothingFilter.setpointCutoffFrequency, dT);
+                m_setpointCutoffFrequency, dT);
     }
 
     void levelFilterInit(
             pt3Filter_t * filter,
             float dT)
     {
-        if (!m_smoothingFilter.filterInitialized) {
+        if (!m_filterInitialized) {
             pt3FilterInit(filter,
                     pt3FilterGain(
-                        m_smoothingFilter.setpointCutoffFrequency, dT)); 
+                        m_setpointCutoffFrequency, dT)); 
         } else {
             pt3FilterUpdateCutoff(filter,
                     pt3FilterGain(
-                        m_smoothingFilter.setpointCutoffFrequency, dT)); 
+                        m_setpointCutoffFrequency, dT)); 
         }
     }
 
@@ -563,7 +557,7 @@ class Receiver {
             pt3Filter_t * filter,
             float dataToSmooth)
     {
-        return m_smoothingFilter.filterInitialized ?
+        return m_filterInitialized ?
             pt3FilterApply(filter, dataToSmooth) :
             dataToSmooth;
     }
@@ -571,80 +565,80 @@ class Receiver {
     void setSmoothingFilterCutoffs(void)
     {
         const float dT = Clock::PERIOD() * 1e-6f;
-        uint16_t oldCutoff = m_smoothingFilter.setpointCutoffFrequency;
+        uint16_t oldCutoff = m_setpointCutoffFrequency;
 
-        if (m_smoothingFilter.setpointCutoffSetting == 0) {
-            m_smoothingFilter.setpointCutoffFrequency =
+        if (m_setpointCutoffSetting == 0) {
+            m_setpointCutoffFrequency =
                 fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
                         calcAutoSmoothingCutoff(
-                            m_smoothingFilter.averageFrameTimeUs,
-                            m_smoothingFilter.autoSmoothnessFactorSetpoint)); 
+                            m_averageFrameTimeUs,
+                            m_autoSmoothnessFactorSetpoint)); 
         }
-        if (m_smoothingFilter.throttleCutoffSetting == 0) {
-            m_smoothingFilter.throttleCutoffFrequency =
+        if (m_throttleCutoffSetting == 0) {
+            m_throttleCutoffFrequency =
                 fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
                         calcAutoSmoothingCutoff(
-                            m_smoothingFilter.averageFrameTimeUs,
-                            m_smoothingFilter.autoSmoothnessFactorThrottle));
+                            m_averageFrameTimeUs,
+                            m_autoSmoothnessFactorThrottle));
         }
 
         // initialize or update the Setpoint filter
-        if ((m_smoothingFilter.setpointCutoffFrequency != oldCutoff) ||
-                !m_smoothingFilter.filterInitialized) {
+        if ((m_setpointCutoffFrequency != oldCutoff) ||
+                !m_filterInitialized) {
 
             smoothingFilterInit(
-                    &m_smoothingFilter.filterThrottle,
-                    m_smoothingFilter.throttleCutoffFrequency, dT);
+                    &m_filterThrottle,
+                    m_throttleCutoffFrequency, dT);
 
-            smoothingFilterInitRollPitchYaw(&m_smoothingFilter.filterRoll, dT);
-            smoothingFilterInitRollPitchYaw(&m_smoothingFilter.filterPitch, dT);
-            smoothingFilterInitRollPitchYaw(&m_smoothingFilter.filterYaw, dT);
+            smoothingFilterInitRollPitchYaw(&m_filterRoll, dT);
+            smoothingFilterInitRollPitchYaw(&m_filterPitch, dT);
+            smoothingFilterInitRollPitchYaw(&m_filterYaw, dT);
 
-            levelFilterInit(&m_smoothingFilter.filterDeflectionRoll, dT);
-            levelFilterInit(&m_smoothingFilter.filterDeflectionPitch, dT);
+            levelFilterInit(&m_filterDeflectionRoll, dT);
+            levelFilterInit(&m_filterDeflectionPitch, dT);
         }
 
         // update or initialize the FF filter
-        oldCutoff = m_smoothingFilter.feedforwardCutoffFrequency;
-        if (m_smoothingFilter.ffCutoffSetting == 0) {
-            m_smoothingFilter.feedforwardCutoffFrequency =
+        oldCutoff = m_feedforwardCutoffFrequency;
+        if (m_ffCutoffSetting == 0) {
+            m_feedforwardCutoffFrequency =
                 fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
                         calcAutoSmoothingCutoff(
-                            m_smoothingFilter.averageFrameTimeUs,
-                            m_smoothingFilter.autoSmoothnessFactorSetpoint)); 
+                            m_averageFrameTimeUs,
+                            m_autoSmoothnessFactorSetpoint)); 
         }
-        if (!m_smoothingFilter.filterInitialized) {
+        if (!m_filterInitialized) {
             ratePidFeedforwardLpfInit(
-                    m_smoothingFilter.feedforwardCutoffFrequency);
-        } else if (m_smoothingFilter.feedforwardCutoffFrequency != oldCutoff) {
+                    m_feedforwardCutoffFrequency);
+        } else if (m_feedforwardCutoffFrequency != oldCutoff) {
             ratePidFeedforwardLpfUpdate(
-                    m_smoothingFilter.feedforwardCutoffFrequency);
+                    m_feedforwardCutoffFrequency);
         }
     }
 
     bool smoothingAccumulateSample(void)
     {
-        m_smoothingFilter.trainingSum += m_refreshPeriod;
-        m_smoothingFilter.trainingCount++;
-        m_smoothingFilter.trainingMax =
-            fmaxf(m_smoothingFilter.trainingMax, m_refreshPeriod);
-        m_smoothingFilter.trainingMin =
-            fminf(m_smoothingFilter.trainingMin, m_refreshPeriod);
+        m_trainingSum += m_refreshPeriod;
+        m_trainingCount++;
+        m_trainingMax =
+            fmaxf(m_trainingMax, m_refreshPeriod);
+        m_trainingMin =
+            fminf(m_trainingMin, m_refreshPeriod);
 
         // if we've collected enough samples then calculate the average and
         // reset the accumulation
-        uint32_t sampleLimit = (m_smoothingFilter.filterInitialized) ?
+        uint32_t sampleLimit = (m_filterInitialized) ?
             SMOOTHING_FILTER_RETRAINING_SAMPLES :
             SMOOTHING_FILTER_TRAINING_SAMPLES;
 
-        if (m_smoothingFilter.trainingCount >= sampleLimit) {
+        if (m_trainingCount >= sampleLimit) {
             // Throw out high and low samples
-            m_smoothingFilter.trainingSum = m_smoothingFilter.trainingSum -
-                m_smoothingFilter.trainingMin - m_smoothingFilter.trainingMax; 
+            m_trainingSum = m_trainingSum -
+                m_trainingMin - m_trainingMax; 
 
-            m_smoothingFilter.averageFrameTimeUs =
-                lrintf(m_smoothingFilter.trainingSum /
-                        (m_smoothingFilter.trainingCount - 2));
+            m_averageFrameTimeUs =
+                lrintf(m_trainingSum /
+                        (m_trainingCount - 2));
             smoothingResetAccumulation();
             return true;
         }
@@ -656,9 +650,9 @@ class Receiver {
     {
         // if any rc smoothing cutoff is 0 (auto) then we need to calculate
         // cutoffs
-        if ((m_smoothingFilter.setpointCutoffSetting == 0) ||
-                (m_smoothingFilter.ffCutoffSetting == 0) ||
-                (m_smoothingFilter.throttleCutoffSetting == 0)) {
+        if ((m_setpointCutoffSetting == 0) ||
+                (m_ffCutoffSetting == 0) ||
+                (m_throttleCutoffSetting == 0)) {
             return true;
         }
         return false;
@@ -672,32 +666,32 @@ class Receiver {
         // first call initialization
         if (!m_initializedFilter) {
 
-            m_smoothingFilter.filterInitialized = false;
-            m_smoothingFilter.averageFrameTimeUs = 0;
-            m_smoothingFilter.autoSmoothnessFactorSetpoint = 30;
-            m_smoothingFilter.autoSmoothnessFactorThrottle = 30;
-            m_smoothingFilter.setpointCutoffSetting = 0;
-            m_smoothingFilter.throttleCutoffSetting = 0;
-            m_smoothingFilter.ffCutoffSetting = 0;
+            m_filterInitialized = false;
+            m_averageFrameTimeUs = 0;
+            m_autoSmoothnessFactorSetpoint = 30;
+            m_autoSmoothnessFactorThrottle = 30;
+            m_setpointCutoffSetting = 0;
+            m_throttleCutoffSetting = 0;
+            m_ffCutoffSetting = 0;
             smoothingResetAccumulation();
-            m_smoothingFilter.setpointCutoffFrequency =
-                m_smoothingFilter.setpointCutoffSetting;
-            m_smoothingFilter.throttleCutoffFrequency =
-                m_smoothingFilter.throttleCutoffSetting;
-            if (m_smoothingFilter.ffCutoffSetting == 0) {
+            m_setpointCutoffFrequency =
+                m_setpointCutoffSetting;
+            m_throttleCutoffFrequency =
+                m_throttleCutoffSetting;
+            if (m_ffCutoffSetting == 0) {
                 // calculate and use an initial derivative cutoff until the RC
                 // interval is known
                 const float cutoffFactor = 1.5f /
                     (1.0f +
-                     (m_smoothingFilter.autoSmoothnessFactorSetpoint /
+                     (m_autoSmoothnessFactorSetpoint /
                       10.0f));
                 float ffCutoff = 
                     SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
-                m_smoothingFilter.feedforwardCutoffFrequency = 
+                m_feedforwardCutoffFrequency = 
                     lrintf(ffCutoff);
             } else {
-                m_smoothingFilter.feedforwardCutoffFrequency =
-                    m_smoothingFilter.ffCutoffSetting;
+                m_feedforwardCutoffFrequency =
+                    m_ffCutoffSetting;
             }
 
             m_calculatedCutoffs = smoothingAutoCalculate();
@@ -706,7 +700,7 @@ class Receiver {
             // filters can be initialized now
             if (!m_calculatedCutoffs) {
                 setSmoothingFilterCutoffs();
-                m_smoothingFilter.filterInitialized = true;
+                m_filterInitialized = true;
             }
         }
 
@@ -731,7 +725,7 @@ class Receiver {
                         if (m_validFrameTimeMs == 0) {
                             m_validFrameTimeMs =
                                 currentTimeMs +
-                                (m_smoothingFilter.filterInitialized ?
+                                (m_filterInitialized ?
                                  SMOOTHING_FILTER_RETRAINING_DELAY_MS :
                                  SMOOTHING_FILTER_TRAINING_DELAY_MS);
                         } else {
@@ -746,11 +740,11 @@ class Receiver {
                             // During retraining check samples to determine
                             // if they vary by more than the limit
                             // percentage.
-                            if (m_smoothingFilter.filterInitialized) {
+                            if (m_filterInitialized) {
                                 const float percentChange =
                                     fabs((m_refreshPeriod -
-                                                m_smoothingFilter.averageFrameTimeUs) /
-                                            (float)m_smoothingFilter.averageFrameTimeUs) *
+                                                m_averageFrameTimeUs) /
+                                            (float)m_averageFrameTimeUs) *
                                     100;
 
                                 if (percentChange <
@@ -773,7 +767,7 @@ class Receiver {
                                     // collected so set the filter cutoffs, but
                                     // only if smoothing is active
                                     setSmoothingFilterCutoffs();
-                                    m_smoothingFilter.filterInitialized = true;
+                                    m_filterInitialized = true;
                                     m_validFrameTimeMs = 0;
                                 }
                             }
@@ -794,14 +788,14 @@ class Receiver {
         // Each pid loop, apply the last received channel value to the
         // filter, if initialised - thanks @klutvott
         m_commands.throttle = smoothingFilterApply(
-                &m_smoothingFilter.filterThrottle,
+                &m_filterThrottle,
                 m_dataToSmooth.throttle);
         setpointRate[0] = smoothingFilterApply(
-                &m_smoothingFilter.filterRoll, m_dataToSmooth.roll);
+                &m_filterRoll, m_dataToSmooth.roll);
         setpointRate[1] = smoothingFilterApply(
-                &m_smoothingFilter.filterPitch, m_dataToSmooth.pitch);
+                &m_filterPitch, m_dataToSmooth.pitch);
         setpointRate[2] = smoothingFilterApply(
-                &m_smoothingFilter.filterYaw, m_dataToSmooth.yaw);
+                &m_filterYaw, m_dataToSmooth.yaw);
     }
 
     static float getRawSetpoint(float command, float divider)
