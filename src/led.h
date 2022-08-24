@@ -25,6 +25,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 class Led {
 
+    friend class Arming;
+    friend class Hackflight;
+
     private:
 
         typedef enum {
@@ -54,23 +57,6 @@ class Led {
             uint32_t now = timeMicros();
             m_warningLedTimer = now + 500000;
         }
-
-    protected:
-
-        uint8_t m_pin = 0;
-
-        Led(uint8_t pin)
-        {
-            m_pin = pin;
-        }
-
-        virtual void devInit(void) = 0;
-
-        virtual void devSet(bool on) = 0;
-
-        virtual void devToggle(void) = 0;
-
-    public:
 
         void begin(void)
         {
@@ -112,5 +98,20 @@ class Led {
 
             warningRefresh();
         }
+    protected:
+
+        uint8_t m_pin = 0;
+
+        Led(uint8_t pin)
+        {
+            m_pin = pin;
+        }
+
+        virtual void devInit(void) = 0;
+
+        virtual void devSet(bool on) = 0;
+
+        virtual void devToggle(void) = 0;
+
 
 };
