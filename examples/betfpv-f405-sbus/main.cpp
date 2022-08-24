@@ -30,6 +30,7 @@
 #include <serial_device.h>
 
 #include <stm32f4_cpp/led.h>
+#include <stm32f4_cpp/imu_mpu6000.h>
 
 #include "hardware_init.h"
 
