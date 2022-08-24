@@ -21,7 +21,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <constrain.h>
 #include <motor_device.h>
 #include <pwm.h>
-#include <scale.h>
 #include <time.h>
 
 #include "platform.h"
@@ -36,6 +35,14 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 // Time to separate dshot beacon and armining/disarming events
 static const uint32_t DSHOT_BEACON_GUARD_DELAY_US = 1200000;  
+
+static float scaleRangef(float x, float srcFrom, float srcTo, float destFrom, float destTo)
+{
+    float a = (destTo - destFrom) * (x - srcFrom);
+    float b = srcTo - srcFrom;
+    return (a / b) + destFrom;
+}
+
 
 void dshotInitEndpoints(float outputLimit, float *outputLow, float *outputHigh, float *disarm) {
     float outputLimitOffset = DSHOT_RANGE * (1 - outputLimit);

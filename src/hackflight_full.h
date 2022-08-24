@@ -230,7 +230,6 @@ class Hackflight {
                     m_scheduler.updateDynamic(
                             systemGetCycleCounter(),
                             anticipatedEndCycles);
-
                 } else {
                     selectedTask->enableRun();
                 }
