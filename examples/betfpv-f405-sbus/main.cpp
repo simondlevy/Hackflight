@@ -29,8 +29,8 @@
 #include <receivers/sbus.h>
 #include <serial_device.h>
 
-#include <stm32f4_cpp/led.h>
-#include <stm32f4_cpp/imu_mpu6000.h>
+#include <cpp_stm32f4/led.h>
+#include <cpp_stm32f4/imu_mpu6000.h>
 
 #include "hardware_init.h"
 

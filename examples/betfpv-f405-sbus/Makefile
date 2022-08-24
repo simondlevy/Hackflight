@@ -303,7 +303,7 @@ $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \
 	  $(HFSRC_DIR)/*.h \
       $(HFSRC_DIR)/*/*.h \
-      $(STM_SRC_DIR)/stm32f4_cpp/*.h
+      $(STM_SRC_DIR)/cpp_stm32f4/*.h
 	$(V1) $(call compile_cpp)
 
 define compile_c
