@@ -64,6 +64,8 @@ class AltHoldPidController : public PidController {
                 vehicle_state_t * vstate,
                 bool reset) override
         {
+            (void)currentTimeUs;
+
             // NED => ENU
             float altitude = vstate->z;
 

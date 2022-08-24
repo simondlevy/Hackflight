@@ -22,6 +22,7 @@
 #include "datatypes.h"
 #include "mixer.h"
 #include "pids/angle.h"
+#include "pids/althold.h"
 
 class HackflightCore {
 
@@ -60,10 +61,14 @@ class HackflightCore {
                 bool pidReset,
                 uint32_t usec,
                 Mixer * mixer,
-                float motorvals[])
+                float motorvals[],
+                AltHoldPidController * altHoldPid=NULL)
         {
             // Run PID controllers to get new demands
             anglePid->update(usec, demands, vstate, pidReset);
+
+            if (altHoldPid != NULL) {
+            }
 
             // Constrain demands
             constrain_demands(demands);
