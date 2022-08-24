@@ -19,86 +19,6 @@
 #pragma once
 
 #include "datatypes.h"
-#include "althold_struct.h"
-
-static bool inBand(float value, float band) 
-{
-    return value > -band && value < band;
-}
-
-static float constrainAbs(float v, float lim)
-{
-    return v < -lim ? -lim : v > +lim ? +lim : v;
-}
-
-static void altHoldPidInit(
-        alt_pid_t * pid,
-        const float kp,
-        const float ki,
-        float * rawThrottle)
-{
-    pid->kp = kp;
-    pid->ki = ki;
-    pid->rawThrottle = rawThrottle;
-}
-
-static void altHoldPidUpdate(
-        uint32_t currentTimeUs
-        , demands_t * demands
-        , void * data
-        , vehicle_state_t * vstate
-        , bool reset
-        )
-{
-    static constexpr float ALTITUDE_MIN   = 1.0;
-    static constexpr float PILOT_VELZ_MAX = 2.5;
-    static constexpr float STICK_DEADBAND = 0.2;
-    static constexpr float WINDUP_MAX     = 0.4;
-
-    static bool _inBandPrev;
-    static float _errorI;
-    static float _altitudeTarget;
-
-    alt_pid_t * pid = (alt_pid_t *)data;
-    float  throttle = *(pid->rawThrottle);
-
-    // NED => ENU
-    float altitude = vstate->z;
-
-    float sthrottle = 2 * throttle - 1; // [0,1] => [-1,+1]
-
-    // Is stick demand in deadband, above a minimum altitude?
-    bool inBand = fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
-
-    // Reset controller when moving into deadband above a minimum altitude
-    bool gotNewTarget = inBand && !_inBandPrev;
-    _errorI = gotNewTarget || reset ? 0 : _errorI;
-        
-    _inBandPrev = inBand;
-
-    if (reset) {
-        _altitudeTarget = 0;
-    }
-
-    _altitudeTarget = gotNewTarget ? altitude : _altitudeTarget;
-
-    // Target velocity is a setpoint inside deadband, scaled
-    // constant outside
-    float targetVelocity = inBand ?
-        _altitudeTarget - altitude :
-        PILOT_VELZ_MAX * sthrottle;
-
-    // Compute error as scaled target minus actual
-    float error = targetVelocity - vstate->dz;
-
-    // Compute I term, avoiding windup
-    _errorI = constrainAbs(_errorI + error, WINDUP_MAX);
-
-    float correction = error * pid->kp + _errorI * pid->ki;
-
-    // Adjust throttle demand based on error
-    demands->throttle += correction;
-}
 
 class AltHoldPidController : public PidController {
     
@@ -154,30 +74,30 @@ class AltHoldPidController : public PidController {
                 fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
             // Reset controller when moving into deadband above a minimum altitude
-            bool gotNewTarget = inBand && !m__inBandPrev;
-            m__errorI = gotNewTarget || reset ? 0 : _errorI;
+            bool gotNewTarget = inBand && !m_inBandPrev;
+            m_errorI = gotNewTarget || reset ? 0 : m_errorI;
 
-            m__inBandPrev = inBand;
+            m_inBandPrev = inBand;
 
             if (reset) {
-                m__altitudeTarget = 0;
+                m_altitudeTarget = 0;
             }
 
-            m__altitudeTarget = gotNewTarget ? altitude : m__altitudeTarget;
+            m_altitudeTarget = gotNewTarget ? altitude : m_altitudeTarget;
 
             // Target velocity is a setpoint inside deadband, scaled
             // constant outside
             float targetVelocity = inBand ?
-                m__altitudeTarget - altitude :
+                m_altitudeTarget - altitude :
                 PILOT_VELZ_MAX * sthrottle;
 
             // Compute error as scaled target minus actual
             float error = targetVelocity - vstate->dz;
 
             // Compute I term, avoiding windup
-            m__errorI = constrainAbs(m__errorI + error, WINDUP_MAX);
+            m_errorI = constrainAbs(m_errorI + error, WINDUP_MAX);
 
-            float correction = error * m_kp + _errorI * m_ki;
+            float correction = error * m_kp + m_errorI * m_ki;
 
             // Adjust throttle demand based on error
             demands->throttle += correction;
