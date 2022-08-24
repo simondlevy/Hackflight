@@ -101,17 +101,8 @@ class AltHoldPidController : public PidController {
             // Compute I term, avoiding windup
             m_errorI = constrainAbs(m_errorI + error, WINDUP_MAX);
 
-            float correction = error * m_kp + m_errorI * m_ki;
-
-            printf("thr=%10.10f  dz=%3.3f  err=%+3.3f  tgtVel=%+3.3f  corr=%+3.3f\n",
-                    demands->throttle, 
-                    dz,
-                    error,
-                    targetVelocity,
-                    correction);
-
             // Adjust throttle demand based on error
-            demands->throttle += correction/10;
+            demands->throttle += (error * m_kp + m_errorI * m_ki);
         }
 
 }; // class AltHoldPidController
