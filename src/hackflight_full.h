@@ -50,10 +50,14 @@ class Hackflight {
         static constexpr float MAX_ARMING_ANGLE = 25;
 
         // Initialzed in main()
-        AnglePidController * m_anglePid;
-        Imu                * m_imu;
-        Led                * m_led;
-        Mixer              * m_mixer;
+        Imu   * m_imu;
+        Led   * m_led;
+        Mixer * m_mixer;
+        
+        // First PID controller is automatically AnglePidController;
+        // others can be added via addPidController()
+        PidController * m_pidControllers[PidController::MAX_PID_CONTROLLERS];
+        uint8_t         m_pidControllerCount;
 
         // Initialzed here
         AttitudeTask         m_attitudeTask;
@@ -96,7 +100,8 @@ class Hackflight {
             HackflightCore::step(
                     &demands,
                     &m_taskData.vstate,
-                    m_anglePid,
+                    m_pidControllers,
+                    m_pidControllerCount,
                     m_taskData.pidReset,
                     usec,
                     m_mixer,
@@ -248,8 +253,10 @@ class Hackflight {
         {
             m_mixer = mixer;
             m_imuAlignFun = imuAlignFun;
-            m_anglePid = anglePid;
             m_led = led;
+
+            m_pidControllers[0] = anglePid;
+            m_pidControllerCount = 1;
 
             m_taskData.receiver = receiver;
             m_taskData.imu = imu;
