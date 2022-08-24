@@ -67,18 +67,18 @@ class AltHoldPidController : public PidController {
             (void)currentTimeUs;
 
             // NED => ENU
-            float altitude = -vstate->z;
-            float dz = -vstate->dz;
+            auto altitude = -vstate->z;
+            auto dz = -vstate->dz;
 
             // [0,1] => [-1,+1]
-            float sthrottle = 2 * demands->throttle - 1; 
+            auto sthrottle = 2 * demands->throttle - 1; 
 
             // Is stick demand in deadband, above a minimum altitude?
-            bool inBand =
+            auto inBand =
                 fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
             // Reset controller when moving into deadband above a minimum altitude
-            bool gotNewTarget = inBand && !m_inBandPrev;
+            auto gotNewTarget = inBand && !m_inBandPrev;
             m_errorI = gotNewTarget || reset ? 0 : m_errorI;
 
             m_inBandPrev = inBand;
@@ -91,12 +91,12 @@ class AltHoldPidController : public PidController {
 
             // Target velocity is a setpoint inside deadband, scaled
             // constant outside
-            float targetVelocity = inBand ?
+            auto targetVelocity = inBand ?
                 m_altitudeTarget - altitude :
                 PILOT_VELZ_MAX * sthrottle;
 
             // Compute error as scaled target minus actual
-            float error = targetVelocity - dz;
+            auto error = targetVelocity - dz;
 
             // Compute I term, avoiding windup
             m_errorI = constrainAbs(m_errorI + error, WINDUP_MAX);
