@@ -142,6 +142,16 @@ class MpuImu : public FusionImu {
         static const uint8_t RA_FIFO_COUNTL             = 0x73;
         static const uint8_t RA_FIFO_R_W                = 0x74;
 
+        // Need to see at least this many interrupts during initialisation to
+        // confirm EXTI connectivity
+        static const uint16_t GYRO_EXTI_DETECT_THRESHOLD = 1000;
+
+        // The gyro buffer is split 50/50, the first half for the transmit
+        // buffer, the second half for the receive buffer This buffer is large
+        // enough for the gyros currently supported in imu_mpu.c but should be
+        // reviewed id other gyro types are supported with SPI DMA.
+        static const uint8_t GYRO_BUF_SIZE = 32;
+
         typedef enum {
             MPU_NONE,
             MPU_3050,
@@ -222,7 +232,7 @@ class MpuImu : public FusionImu {
             uint16_t acc_1G;
             int16_t ADCRaw[3];
             mpuDetectionResult_t mpuDetectionResult;
-            
+
             bool dataReady;
             gyroDev_t *gyro;
             bool acc_high_fsr;
