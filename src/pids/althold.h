@@ -109,7 +109,34 @@ class AltHoldPidController : public PidController {
         static constexpr float STICK_DEADBAND = 0.2;
         static constexpr float WINDUP_MAX     = 0.4;
 
+        static bool inBand(float value, float band) 
+        {
+            return value > -band && value < band;
+        }
+
+        static float constrainAbs(float v, float lim)
+        {
+            return v < -lim ? -lim : v > +lim ? +lim : v;
+        }
+
+        float m_kp;
+        float m_ki;
+
+        bool m_inBandPrev;
+        float m_errorI;
+        float m_altitudeTarget;
+
     public:
+
+        AltHoldPidController(float kp, float ki)
+        {
+            m_kp = kp;
+            m_ki = ki;
+
+            m_inBandPrev = false;
+            m_errorI = 0;
+            m_altitudeTarget = 0;
+        }
 
         virtual void update(
                 uint32_t currentTimeUs,
@@ -117,10 +144,43 @@ class AltHoldPidController : public PidController {
                 vehicle_state_t * vstate,
                 bool reset) override
         {
-            (void)currentTimeUs;
-            (void)demands;
-            (void)vstate;
-            (void)reset;
+            // NED => ENU
+            float altitude = vstate->z;
+
+            float sthrottle = 2 * demands->throttle - 1; // [0,1] => [-1,+1]
+
+            // Is stick demand in deadband, above a minimum altitude?
+            bool inBand =
+                fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+
+            // Reset controller when moving into deadband above a minimum altitude
+            bool gotNewTarget = inBand && !m__inBandPrev;
+            m__errorI = gotNewTarget || reset ? 0 : _errorI;
+
+            m__inBandPrev = inBand;
+
+            if (reset) {
+                m__altitudeTarget = 0;
+            }
+
+            m__altitudeTarget = gotNewTarget ? altitude : m__altitudeTarget;
+
+            // Target velocity is a setpoint inside deadband, scaled
+            // constant outside
+            float targetVelocity = inBand ?
+                m__altitudeTarget - altitude :
+                PILOT_VELZ_MAX * sthrottle;
+
+            // Compute error as scaled target minus actual
+            float error = targetVelocity - vstate->dz;
+
+            // Compute I term, avoiding windup
+            m__errorI = constrainAbs(m__errorI + error, WINDUP_MAX);
+
+            float correction = error * m_kp + _errorI * m_ki;
+
+            // Adjust throttle demand based on error
+            demands->throttle += correction;
         }
 
 }; // class AltHoldPidController
