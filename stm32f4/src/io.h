@@ -47,6 +47,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "io_def.h"
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 bool IORead(IO_t io);
 void IOWrite(IO_t io, bool value);
 void IOHi(IO_t io);
@@ -70,3 +74,7 @@ void IOTraversePins(IOTraverseFuncPtr_t func);
 
 GPIO_TypeDef* IO_GPIO(IO_t io);
 uint16_t IO_Pin(IO_t io);
+
+#if defined(__cplusplus)
+}
+#endif

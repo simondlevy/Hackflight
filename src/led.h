@@ -21,7 +21,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "led_device.h"
 #include "time.h"
 
 class Led {
@@ -44,13 +43,13 @@ class Led {
         {
             switch (m_warningLedState) {
                 case WARNING_LED_OFF:
-                    ledDevSet(false);
+                    devSet(false);
                     break;
                 case WARNING_LED_ON:
-                    ledDevSet(true);
+                    devSet(true);
                     break;
                 case WARNING_LED_FLASH:
-                    ledDevToggle();
+                    devToggle();
                     break;
             }
 
@@ -58,22 +57,38 @@ class Led {
             m_warningLedTimer = now + 500000;
         }
 
+    protected:
+
+        virtual void devInit(uint8_t pin) = 0;
+
+        virtual void devSet(bool on) = 0;
+
+        virtual void devToggle(void) = 0;
     public:
 
-        /*
         Led(uint8_t pin)
         {
             m_pin = pin;
-        }*/
+        }
 
-        static void flash(uint8_t reps, uint16_t delayMs)
+        void begin(void)
         {
-            ledDevSet(false);
+            devInit(m_pin);
+        }
+
+        void flash(uint8_t reps, uint16_t delayMs)
+        {
+            devSet(false);
             for (uint8_t i=0; i<reps; i++) {
-                ledDevToggle();
+                devToggle();
                 delayMillis(delayMs);
             }
-            ledDevSet(false);
+            devSet(false);
+        }
+
+        void set (bool onOff)
+        {
+            devSet(onOff);
         }
 
         void warningDisable(void)
@@ -96,4 +111,5 @@ class Led {
 
             warningRefresh();
         }
+
 };

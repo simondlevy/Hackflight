@@ -23,7 +23,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 #include "atomic.h"
 #include "io.h"
-#include "led_device.h"
 #include "nvic.h"
 #include "resource.h"
 #include "systemdev.h"

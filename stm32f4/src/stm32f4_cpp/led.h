@@ -1,6 +1,4 @@
 /*
-Copyright (c) 2022 Simon D. Levy
-
 This file is part of Hackflight.
 
 Hackflight is free software: you can redistribute it and/or modify it under the
@@ -14,22 +12,44 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-#pragma once
+#include <led.h>
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "io.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
+class Stm32F4Led : public Led {
 
-void ledDevInit(uint8_t pin);
-void ledDevSet(bool on);
-void ledDevToggle(void);
+    private:
 
-#if defined(__cplusplus)
-}
-#endif
+        IO_t m_led;
+
+    protected:
+
+        virtual void devInit(uint8_t pin) override
+        {
+            m_led = IOGetByTag(pin);
+            IOInit(m_led, OWNER_LED, RESOURCE_INDEX(0));
+            IOConfigGPIO(m_led, IOCFG_OUT_PP);
+        }
+
+        virtual void devSet(bool on) override
+        {
+            IOWrite(m_led, !on);
+        }
+
+        virtual void devToggle(void) override
+        {
+            IOToggle(m_led);
+        }
+
+    public:
+
+        Stm32F4Led(uint8_t pin) 
+            : Led(pin)
+        {
+        }
+
+}; // class Stm32F4Led 
+
 

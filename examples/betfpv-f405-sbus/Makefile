@@ -267,7 +267,6 @@ $(TARGET_DFU): $(TARGET_HEX)
 
 $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
-		  $(OBJECT_DIR)/led.o \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/stm32_clock.o
 	@echo "Linking" $@
@@ -303,20 +302,18 @@ $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
 $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \
 	  $(HFSRC_DIR)/*.h \
-      $(HFSRC_DIR)/*/*.h
+      $(HFSRC_DIR)/*/*.h \
+      $(STM_SRC_DIR)/stm32f4_cpp/*.h
 	$(V1) $(call compile_cpp)
 
-$(OBJECT_DIR)/led.o: $(STM_SRC_DIR)/led.c \
-	  $(HFSRC_DIR)/*.h \
-      $(HFSRC_DIR)/*/*.h
-	$(V1) $(call compile_c)
-
 define compile_c
-	echo gcc "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
+	echo gcc "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) \
+		$(CC_DEFAULT_OPTIMISATION) $<
 endef
 
 define compile_cpp
-	echo g++ "$<" "$(STDOUT)" && $(CROSS_CXX) -c -std=c++20 -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
+	echo g++ "$<" "$(STDOUT)" && $(CROSS_CXX) -c -std=c++20 -o $@ \
+		$(CFLAGS) -Wno-register -Wno-volatile $(CC_DEFAULT_OPTIMISATION) $<
 endef
 
 $(TARG_OBJ_DIR)/%.o: %.c

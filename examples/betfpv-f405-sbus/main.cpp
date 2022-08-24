@@ -29,6 +29,8 @@
 #include <receivers/sbus.h>
 #include <serial_device.h>
 
+#include <stm32f4_cpp/led.h>
+
 #include "hardware_init.h"
 
 int main(void)
@@ -48,6 +50,8 @@ int main(void)
 
     static QuadXbfMixer mixer; 
 
+    static Stm32F4Led led(37); // pin
+
     static Hackflight hf(
             &receiver,
             &imu,
@@ -55,8 +59,8 @@ int main(void)
             &anglePid,
             &mixer,
             motorDevice,
-            0,   // dummy value for IMU interrupt pin
-            37); // LED pin
+            &led,
+            0);   // dummy value for IMU interrupt pin
 
     hf.begin();
 

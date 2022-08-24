@@ -51,13 +51,16 @@ class Hackflight {
         // Arming safety  
         static constexpr float MAX_ARMING_ANGLE = 25;
 
-        AttitudeTask         m_attitudeTask;
-        Imu *                m_imu;
-        Imu::align_fun       m_imuAlignFun;
+        // Initialzed in main()
         AnglePidController * m_anglePid;
+        Imu                * m_imu;
+        Led                * m_led;
+        Mixer              * m_mixer;
+
+        // Initialzed here
+        AttitudeTask         m_attitudeTask;
+        Imu::align_fun       m_imuAlignFun;
         uint8_t              m_imuInterruptPin;
-        uint8_t              m_ledPin;
-        Mixer *              m_mixer;
         MspTask              m_mspTask;
         ReceiverTask         m_receiverTask;
         Scheduler            m_scheduler;
@@ -244,14 +247,14 @@ class Hackflight {
                 AnglePidController * anglePid,
                 Mixer * mixer,
                 void * motorDevice,
-                uint8_t imuInterruptPin,
-                uint8_t ledPin)
+                Led * led,
+                uint8_t imuInterruptPin)
         {
             m_mixer = mixer;
             m_imuAlignFun = imuAlignFun;
             m_anglePid = anglePid;
             m_imuInterruptPin = imuInterruptPin;
-            m_ledPin = ledPin;
+            m_led = led;
 
             m_taskData.receiver = receiver;
             m_taskData.imu = imu;
@@ -261,6 +264,8 @@ class Hackflight {
             m_taskData.imuFusionPrev.quat.w = 1;
 
             m_taskData.maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
+
+            m_taskData.arming.m_led = led;
         }
 
         void begin(void)
@@ -271,9 +276,9 @@ class Hackflight {
 
             imuDevInit(m_imuInterruptPin);
 
-            ledDevInit(m_ledPin);
+            m_led->begin();
 
-            Led::flash(10, 50);
+            m_led->flash(10, 50);
         }
 
         void step(void)

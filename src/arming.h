@@ -30,12 +30,13 @@ class Arming {
 
     public:
 
+        Led  * m_led;
+
         bool m_acc_done_calibrating;
         bool m_angle_okay;
         bool m_switch_okay;
         bool m_gyro_done_calibrating;
         bool m_is_armed;
-        Led  m_led;
         bool m_rx_failsafe_okay;
         bool m_throttle_is_down;
 
@@ -119,7 +120,7 @@ class Arming {
                 bool calibrating) 
         {
             if (m_is_armed) {
-                ledDevSet(true);
+                m_led->set(true);
             } else {
 
                 m_throttle_is_down = throttleIsDown(raw);
@@ -138,12 +139,12 @@ class Arming {
                 }
 
                 if (!readyToArm()) {
-                    m_led.warningFlash();
+                    m_led->warningFlash();
                 } else {
-                    m_led.warningDisable();
+                    m_led->warningDisable();
                 }
 
-                m_led.warningUpdate();
+                m_led->warningUpdate();
             }
         }
 
