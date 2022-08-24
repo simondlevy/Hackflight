@@ -67,8 +67,6 @@ class Hackflight {
         Scheduler            m_scheduler;
         Task::data_t         m_taskData;
 
-    public:
-
         void checkCoreTasks(uint32_t nowCycles)
         {
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
@@ -185,7 +183,7 @@ class Hackflight {
                 _gyroSkewAccum = 0;
             }
 
-        } // checkCoreTasks
+        }
 
         void checkDynamicTasks(void)
         {
