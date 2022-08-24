@@ -99,3 +99,28 @@ static void altHoldPidUpdate(
     // Adjust throttle demand based on error
     demands->throttle += correction;
 }
+
+class AltHoldPidController : public PidController {
+    
+    private:
+
+        static constexpr float ALTITUDE_MIN   = 1.0;
+        static constexpr float PILOT_VELZ_MAX = 2.5;
+        static constexpr float STICK_DEADBAND = 0.2;
+        static constexpr float WINDUP_MAX     = 0.4;
+
+    public:
+
+        virtual void update(
+                uint32_t currentTimeUs,
+                demands_t * demands,
+                vehicle_state_t * vstate,
+                bool reset) override
+        {
+            (void)currentTimeUs;
+            (void)demands;
+            (void)vstate;
+            (void)reset;
+        }
+
+}; // class AltHoldPidController
