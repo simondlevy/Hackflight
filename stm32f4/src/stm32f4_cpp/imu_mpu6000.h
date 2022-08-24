@@ -16,6 +16,18 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "imu_mpu.h"
 
+class ImuMpu6000 : public ImuMpu {
+
+    public:
+
+        ImuMpu6000(uint8_t interruptPin) 
+            : ImuMpu(interruptPin)
+        {
+        }
+
+}; // class ImuMpu6000
+
+
 #if 0
 
 // 16.384 dps/lsb scalefactor for 2000dps sensors

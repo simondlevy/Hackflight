@@ -21,6 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include <constrain.h>
+#include <imus/fusion.h>
 #include <imu_device.h>
 #include <system.h>
 #include <time.h>
@@ -34,6 +35,18 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "nvic.h"
 #include "platform.h"
 #include "systemdev.h"
+
+class ImuMpu : public FusionImu {
+
+    protected:
+
+        ImuMpu(uint8_t interruptPin) 
+            : FusionImu(interruptPin)
+        {
+        }
+
+}; // class ImuMpu6000
+
 
 #if 0
 
