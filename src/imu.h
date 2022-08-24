@@ -88,8 +88,8 @@ class Imu {
                 }
 
                 // Sum up CALIBRATING_GYRO_TIME_US readings
-                m_calibration.sum[axis] += gyroDevReadRaw(axis);
-                m_calibration.var[axis].push(gyroDevReadRaw(axis));
+                m_calibration.sum[axis] += imuDevReadRawGyro(axis);
+                m_calibration.var[axis].push(imuDevReadRawGyro(axis));
 
                 if (m_calibration.cyclesRemaining == 1) {
                     const float stddev = m_calibration.var[axis].stdev();
@@ -169,7 +169,7 @@ class Imu {
 
         void readScaledGyro(Imu * imu, Imu::align_fun align, vehicle_state_t * vstate)
         {
-            if (!gyroDevIsReady()) return;
+            if (!imuDevGyroIsReady()) return;
 
             bool calibrationComplete = m_calibration.cyclesRemaining <= 0;
 
@@ -180,9 +180,9 @@ class Imu {
                 // move 16-bit gyro data into floats to avoid overflows in
                 // calculations
 
-                _adc.x = gyroDevReadRaw(0) - m_zero[0];
-                _adc.y = gyroDevReadRaw(1) - m_zero[1];
-                _adc.z = gyroDevReadRaw(2) - m_zero[2];
+                _adc.x = imuDevReadRawGyro(0) - m_zero[0];
+                _adc.y = imuDevReadRawGyro(1) - m_zero[1];
+                _adc.z = imuDevReadRawGyro(2) - m_zero[2];
 
                 align(&_adc);
 
@@ -191,9 +191,9 @@ class Imu {
             }
 
             if (calibrationComplete) {
-                m_dps[0] = _adc.x * (gyroDevScaleDps() / 32768.);
-                m_dps[1] = _adc.y * (gyroDevScaleDps() / 32768.);
-                m_dps[2] = _adc.z * (gyroDevScaleDps() / 32768.);
+                m_dps[0] = _adc.x * (imuDevScaleGyro() / 32768.);
+                m_dps[1] = _adc.y * (imuDevScaleGyro() / 32768.);
+                m_dps[2] = _adc.z * (imuDevScaleGyro() / 32768.);
             }
 
             // using gyro lowpass 2 filter for downsampling
@@ -230,7 +230,7 @@ class Imu {
                 uint32_t nextTargetCycles,
                 int32_t desiredPeriodCycles)
         {
-            int32_t skew = cmpTimeCycles(nextTargetCycles, gyroDevSyncTime()) %
+            int32_t skew = cmpTimeCycles(nextTargetCycles, imuDevGyroSyncTime()) %
                 desiredPeriodCycles;
 
             if (skew > (desiredPeriodCycles / 2)) {

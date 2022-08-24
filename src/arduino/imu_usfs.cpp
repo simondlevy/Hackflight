@@ -50,23 +50,23 @@ static float _qw, _qx, _qy, _qz;
 
 static volatile bool _gotNewData;
 static volatile uint32_t _gyroInterruptCount;
-static volatile uint32_t _gyroDevSyncTime;
+static volatile uint32_t _imuDevGyroSyncTime;
 
 static void interruptHandler()
 {
     _gotNewData = true;
     _gyroInterruptCount++;
-    _gyroDevSyncTime = micros();
+    _imuDevGyroSyncTime = micros();
 }
 
 extern "C" {
 
-    uint32_t gyroDevInterruptCount(void)
+    uint32_t imuDevGyroInterruptCount(void)
     {
         return _gyroInterruptCount;
     }
 
-    bool gyroDevIsReady(void)
+    bool imuDevGyroIsReady(void)
     {
         bool result = false;
 
@@ -94,19 +94,19 @@ extern "C" {
         return result;
     }
 
-    int16_t gyroDevReadRaw(uint8_t k)
+    int16_t imuDevReadRawGyro(uint8_t k)
     {
         return _gyroAdc[k];
     }
 
-    uint16_t gyroDevScaleDps(void)
+    uint16_t imuDevScaleGyro(void)
     {
         return GYRO_SCALE_DPS;
     }
 
-    uint32_t gyroDevSyncTime(void)
+    uint32_t imuDevGyroSyncTime(void)
     {
-        return _gyroDevSyncTime;
+        return _imuDevGyroSyncTime;
     }
 
     void imuDevInit(uint8_t interruptPin)

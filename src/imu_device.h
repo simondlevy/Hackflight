@@ -25,13 +25,11 @@ extern "C" {
 #endif
 
     void     imuDevInit(uint8_t interruptPin);
-    uint32_t gyroDevInterruptCount(void);
-    bool     gyroDevIsReady(void);
-    int16_t  gyroDevReadRaw(uint8_t k);
-    uint16_t gyroDevScaleDps(void);
-    uint32_t gyroDevSyncTime(void);
-
-
+    uint32_t imuDevGyroInterruptCount(void);
+    bool     imuDevGyroIsReady(void);
+    uint32_t imuDevGyroSyncTime(void);
+    int16_t  imuDevReadRawGyro(uint8_t k);
+    uint16_t imuDevScaleGyro(void);
 
 #if defined(__cplusplus)
 }

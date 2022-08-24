@@ -320,17 +320,17 @@ static void gyroDevInit(void)
     gyroDev.initFn(&gyroDev);
 }
 
-uint16_t gyroDevScaleDps(void)
+uint16_t imuDevScaleGyro(void)
 {
     return gyroDev.scaleDps;
 }
 
-uint32_t gyroDevInterruptCount(void)
+uint32_t imuDevGyroInterruptCount(void)
 {
     return gyroDev.detectedEXTI;
 }
 
-bool  gyroDevIsReady(void)
+bool  imuDevGyroIsReady(void)
 {
     bool ready = gyroDev.readFn(&gyroDev);
 
@@ -341,12 +341,12 @@ bool  gyroDevIsReady(void)
     return ready;
 }
 
-uint32_t gyroDevSyncTime(void)
+uint32_t imuDevGyroSyncTime(void)
 {
     return gyroDev.gyroSyncEXTI;
 }
 
-int16_t gyroDevReadRaw(uint8_t k)
+int16_t imuDevReadRawGyro(uint8_t k)
 {
     return gyroDev.adcRaw[k];
 }
