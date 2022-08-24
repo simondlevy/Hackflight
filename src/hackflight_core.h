@@ -68,6 +68,7 @@ class HackflightCore {
             anglePid->update(usec, demands, vstate, pidReset);
 
             if (altHoldPid != NULL) {
+                altHoldPid->update(usec, demands, vstate, pidReset);
             }
 
             // Constrain demands

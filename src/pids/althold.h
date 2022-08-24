@@ -67,13 +67,16 @@ class AltHoldPidController : public PidController {
             (void)currentTimeUs;
 
             // NED => ENU
-            float altitude = vstate->z;
+            float altitude = -vstate->z;
 
-            float sthrottle = 2 * demands->throttle - 1; // [0,1] => [-1,+1]
+            // [0,1] => [-1,+1]
+            float sthrottle = 2 * demands->throttle - 1; 
 
             // Is stick demand in deadband, above a minimum altitude?
             bool inBand =
                 fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+
+            printf("inBand=%d\n", inBand);
 
             // Reset controller when moving into deadband above a minimum altitude
             bool gotNewTarget = inBand && !m_inBandPrev;
@@ -102,7 +105,7 @@ class AltHoldPidController : public PidController {
             float correction = error * m_kp + m_errorI * m_ki;
 
             // Adjust throttle demand based on error
-            demands->throttle += correction;
+            //demands->throttle += correction;
         }
 
 }; // class AltHoldPidController
