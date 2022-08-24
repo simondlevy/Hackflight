@@ -29,7 +29,6 @@
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
-#include "motor.h"
 #include "msp.h"
 #include "receiver.h"
 #include "scheduler.h"
