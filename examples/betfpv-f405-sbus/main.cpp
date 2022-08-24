@@ -30,7 +30,6 @@
 #include <serial_device.h>
 
 #include <cpp_stm32f4/led.h>
-#include <cpp_stm32f4/imu_mpu6000.h>
 
 #include "hardware_init.h"
 
@@ -45,7 +44,7 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-    static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
+    static FusionImu imu(0); // dummy value for IMU interrupt pin
 
     static SbusReceiver receiver(SERIAL_PORT_USART3);
 
