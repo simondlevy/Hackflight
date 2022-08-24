@@ -129,7 +129,6 @@ STM32_SRC = \
             exti.c \
             flash.c \
             io.c \
-            led.c \
             motor.c \
             pinio.c \
             rcc.c \
@@ -268,6 +267,7 @@ $(TARGET_DFU): $(TARGET_HEX)
 
 $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
+		  $(OBJECT_DIR)/led.o \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/stm32_clock.o
 	@echo "Linking" $@
@@ -300,15 +300,16 @@ $(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32_clock.o $(CFLAGS) \
 		$(HFSRC_DIR)/stm32_clock.c
 
-# C++ ==========================================================================
-
 $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \
 	  $(HFSRC_DIR)/*.h \
       $(HFSRC_DIR)/*/*.h
 	$(V1) $(call compile_cpp)
 
-# ==============================================================================
+$(OBJECT_DIR)/led.o: $(STM_SRC_DIR)/led.c \
+	  $(HFSRC_DIR)/*.h \
+      $(HFSRC_DIR)/*/*.h
+	$(V1) $(call compile_c)
 
 define compile_c
 	echo gcc "$<" "$(STDOUT)" && $(CROSS_CC) -c -o $@ $(CFLAGS) $(CC_DEFAULT_OPTIMISATION) $<
