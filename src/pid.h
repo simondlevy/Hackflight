@@ -22,6 +22,8 @@ class PidController {
 
     public:
 
+        static const uint8_t MAX_PID_CONTROLLERS = 10;
+
         virtual void update(
                 uint32_t currentTimeUs,
                 demands_t * demands,

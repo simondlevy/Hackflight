@@ -19,10 +19,11 @@
 
 #pragma once
 
+
+#include "constrain.h"
 #include "datatypes.h"
 #include "mixer.h"
-#include "pids/angle.h"
-#include "pids/althold.h"
+#include "pid.h"
 
 class HackflightCore {
 
@@ -57,18 +58,16 @@ class HackflightCore {
         static void step(
                 demands_t * demands,
                 vehicle_state_t * vstate,
-                AnglePidController * anglePid,
+                PidController * pidControllers[],
+                uint8_t pidCount,
                 bool pidReset,
                 uint32_t usec,
                 Mixer * mixer,
-                float motorvals[],
-                AltHoldPidController * altHoldPid=NULL)
+                float motorvals[])
         {
             // Run PID controllers to get new demands
-            anglePid->update(usec, demands, vstate, pidReset);
-
-            if (altHoldPid != NULL) {
-                altHoldPid->update(usec, demands, vstate, pidReset);
+            for (uint8_t k=0; k<pidCount; ++k) {
+                pidControllers[k]->update(usec, demands, vstate, pidReset);
             }
 
             // Constrain demands
