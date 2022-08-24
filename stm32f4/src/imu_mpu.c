@@ -45,21 +45,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 // types are supported with SPI DMA.
 #define GYRO_BUF_SIZE 32
 
-busStatus_e mpuIntcallback(uint32_t arg)
-{
-    gyroDev_t *gyro = (gyroDev_t *)arg;
-    int32_t gyroDmaDuration =
-        cmpTimeCycles(systemGetCycleCounter(), gyro->gyroLastEXTI);
-
-    if (gyroDmaDuration > gyro->gyroDmaMaxDuration) {
-        gyro->gyroDmaMaxDuration = gyroDmaDuration;
-    }
-
-    gyro->dataReady = true;
-
-    return BUS_READY;
-}
-
 static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
     gyroDev_t *gyroDev = container_of(cb, gyroDev_t, exti);
