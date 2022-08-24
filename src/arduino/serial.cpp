@@ -18,7 +18,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <Arduino.h>
  
-#include <serial.h>
+#include <serial_device.h>
 
 serialReceiveCallbackPtr _callback;
 void * _data;

@@ -27,6 +27,7 @@
 #include <stm32_clock.h>
 
 #include "imu_usfs.h"
+#include "arduino_led.h"
 
 static ImuUsfs _imu;
 
@@ -38,7 +39,9 @@ static AnglePidController _anglePid(
         0.0); // 3.0; // Level Kp
 
 
-QuadXbfMixer _mixer; 
+static QuadXbfMixer _mixer; 
+
+static ArduinoLed _led(18); // pin
 
 static uint8_t _motorPins[4] = {13, 16, 3, 11};
 
@@ -55,8 +58,8 @@ class LadybugFc : public Hackflight {
                     &_anglePid,
                     &_mixer,
                     (void *)&_motorPins,
-                    12,  // IMU interrupt pin
-                    18)  // LED pin
+                    &_led,
+                    12)   // IMU interrupt pin
         {
         }
 

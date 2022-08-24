@@ -26,9 +26,9 @@ class Stm32F4Led : public Led {
 
     protected:
 
-        virtual void devInit(uint8_t pin) override
+        virtual void devInit(void) override
         {
-            m_led = IOGetByTag(pin);
+            m_led = IOGetByTag(m_pin);
             IOInit(m_led, OWNER_LED, RESOURCE_INDEX(0));
             IOConfigGPIO(m_led, IOCFG_OUT_PP);
         }

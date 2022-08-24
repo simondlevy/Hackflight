@@ -37,8 +37,6 @@ class Led {
 
         uint32_t m_warningLedTimer = 0;
 
-        uint8_t m_pin = 0;
-
         void warningRefresh(void)
         {
             switch (m_warningLedState) {
@@ -59,21 +57,24 @@ class Led {
 
     protected:
 
-        virtual void devInit(uint8_t pin) = 0;
-
-        virtual void devSet(bool on) = 0;
-
-        virtual void devToggle(void) = 0;
-    public:
+        uint8_t m_pin = 0;
 
         Led(uint8_t pin)
         {
             m_pin = pin;
         }
 
+        virtual void devInit(void) = 0;
+
+        virtual void devSet(bool on) = 0;
+
+        virtual void devToggle(void) = 0;
+
+    public:
+
         void begin(void)
         {
-            devInit(m_pin);
+            devInit();
         }
 
         void flash(uint8_t reps, uint16_t delayMs)

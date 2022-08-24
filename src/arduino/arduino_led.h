@@ -18,25 +18,41 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <Arduino.h>
 
-#include "led.h"
+#include <led.h>
 
-static bool _on;
-static uint8_t _pin;
+class ArduinoLed : public Led {
 
-void ledDevInit(uint8_t pin)
-{
-    _pin = pin;
-    pinMode(_pin, OUTPUT);
-}
+    private:
 
-void ledDevSet(bool on)
-{
-    digitalWrite(_pin, on);
-    _on = on;
-}
+        bool m_on;
 
-void ledDevToggle(void)
-{
-    _on = !_on;
-    ledDevSet(_on);
-}
+    protected:
+
+        virtual void devInit(void) override
+        {
+            pinMode(m_pin, OUTPUT);
+        }
+
+        virtual void devSet(bool on) override
+        {
+            digitalWrite(m_pin, on);
+            m_on = on;
+        }
+
+        virtual void devToggle(void) override
+        {
+            m_on = !m_on;
+            devSet(m_on);
+        }
+
+    public:
+
+        ArduinoLed(uint8_t pin) 
+            : Led(pin)
+        {
+            m_on = false;
+        }
+
+}; // class ArduinoLed 
+
+
