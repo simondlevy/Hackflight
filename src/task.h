@@ -39,7 +39,6 @@ class Task {
 
             Arming           arming;
             Failsafe         failsafe;
-            Gyro             gyro;
             Imu::fusion_t    imuFusionPrev;
             float            maxArmingAngle;
             Msp              msp;

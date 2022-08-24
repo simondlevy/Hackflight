@@ -25,7 +25,6 @@
 
 #include "arming.h"
 #include "failsafe.h"
-#include "gyro.h"
 #include "hackflight_core.h"
 #include "imu.h"
 #include "led.h"
@@ -79,7 +78,7 @@ class Hackflight {
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            m_taskData.gyro.readScaled(
+            m_taskData.imu->readScaledGyro(
                     m_taskData.imu,
                     m_imuAlignFun,
                     &m_taskData.vstate);
@@ -164,7 +163,7 @@ class Hackflight {
             static int32_t _gyroSkewAccum;
 
             int32_t gyroSkew =
-                Gyro::getSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
+                Imu::getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 

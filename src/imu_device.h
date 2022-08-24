@@ -24,7 +24,14 @@
 extern "C" {
 #endif
 
-    void  imuDevInit(uint8_t interruptPin);
+    void     imuDevInit(uint8_t interruptPin);
+    uint32_t gyroDevInterruptCount(void);
+    bool     gyroDevIsReady(void);
+    int16_t  gyroDevReadRaw(uint8_t k);
+    uint16_t gyroDevScaleDps(void);
+    uint32_t gyroDevSyncTime(void);
+
+
 
 #if defined(__cplusplus)
 }

@@ -21,7 +21,6 @@
 #include <string.h>
 
 #include "datatypes.h"
-#include "gyro.h"
 #include "task.h"
 #include "../receiver.h"
 
@@ -54,7 +53,7 @@ class ReceiverTask : public Task {
         
         void fun(Task::data_t * data, uint32_t usec)
         {
-            bool calibrating = data->gyro.isCalibrating(); 
+            bool calibrating = data->imu->gyroIsCalibrating(); 
             // || acc.calibrating != 0;
             bool pidItermResetReady = false;
             bool pidItermResetValue = false;

@@ -21,9 +21,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include <constrain.h>
+#include <imu_device.h>
 #include <system.h>
 #include <time.h>
-#include "macros.h"
 
 #include "imu_mpu.h"
 #include "atomic.h"
@@ -31,6 +31,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "bus_spi.h"
 #include "exti.h"
 #include "io.h"
+#include "macros.h"
 #include "nvic.h"
 #include "platform.h"
 #include "systemdev.h"
@@ -291,7 +292,7 @@ float accelRead(uint8_t k)
 }
 
 
-void gyroDevInit(void)
+static void gyroDevInit(void)
 {
     gyroDeviceConfig_t gyroDeviceConfig;
 
