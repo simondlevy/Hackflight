@@ -358,7 +358,7 @@ static bool bbMotorConfig(IO_t io, uint8_t motorIndex, g_motorPwmProtocolTypes_e
 
         if (!bbPort || !dmaAllocate(dmaGetIdentifier(bbPort->dmaResource),
                     bbPort->owner.owner, bbPort->owner.resourceIndex)) {
-            bbDevice.vTable.write = motorWriteNull;
+            bbDevice.vTable.write = motorDevWriteNull;
             bbDevice.vTable.updateStart = motorUpdateStartNull;
             bbDevice.vTable.updateComplete = motorUpdateCompleteNull;
 
@@ -556,7 +556,7 @@ motorDevice_t *dshotBitbangDevInit(uint8_t count)
 
         if (!IOIsFreeOrPreinit(io)) {
             /* not enough motors initialised for the mixer or a break in the motors */
-            bbDevice.vTable.write = motorWriteNull;
+            bbDevice.vTable.write = motorDevWriteNull;
             bbDevice.vTable.updateStart = motorUpdateStartNull;
             bbDevice.vTable.updateComplete = motorUpdateCompleteNull;
             bbStatus = DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT;

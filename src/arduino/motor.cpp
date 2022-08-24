@@ -22,13 +22,13 @@
 #include <motor.h>
 #include <pwm.h>
 
-bool motorIsReady(uint32_t currentTime)
+bool motorDevIsReady(uint32_t currentTime)
 {
     (void)currentTime;
     return true;
 }
 
-float motorConvertFromExternal(void * motorDevice, uint16_t externalValue)
+float motorDevConvertFromExternal(void * motorDevice, uint16_t externalValue)
 {
     (void)externalValue;
     (void)motorDevice;
@@ -36,7 +36,7 @@ float motorConvertFromExternal(void * motorDevice, uint16_t externalValue)
     return (externalValue - PWM_MIN) / (float)(PWM_MAX - PWM_MIN);
 }
 
-void  motorInitBrushed(uint8_t * pins)
+void  motorDevInitBrushed(uint8_t * pins)
 {
     for (uint8_t k=0; k<4; ++k) {
         analogWriteFrequency(pins[k], 10000);
@@ -44,32 +44,32 @@ void  motorInitBrushed(uint8_t * pins)
     }
 }
 
-bool motorIsProtocolDshot(void)
+bool motorDevIsProtocolDshot(void)
 {
     return false;
 }
 
-float motorValueDisarmed(void)
+float motorDevValueDisarmed(void)
 {
     return 0;
 }
 
-float motorValueHigh(void)
+float motorDevValueHigh(void)
 {
     return 1;
 }
 
-float motorValueLow(void)
+float motorDevValueLow(void)
 {
     return 0;
 }
 
-void motorStop(void * motorDevice)
+void motorDevStop(void * motorDevice)
 {
     (void)motorDevice;
 }
 
-void motorWrite(void * motorDevice, float *values)
+void motorDevWrite(void * motorDevice, float *values)
 {
     uint8_t * pins = (uint8_t *)motorDevice;
 

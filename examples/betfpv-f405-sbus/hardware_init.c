@@ -50,7 +50,7 @@ void * hardwareInit(uint32_t core_period)
     timerInit();
     serialUartPinConfigure();
     serialInit(-1);
-    void * motorDevice = motorInitDshot(4);
+    void * motorDevice = motorDevInitDshot(4);
     inverterInit();
     spiPinConfigure();
     spiPreInit();

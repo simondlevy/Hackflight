@@ -232,7 +232,7 @@ class Msp {
 
                 case SET_MOTOR:
                     for (int i = 0; i < 4; i++) {
-                        motors[i] = motorConvertFromExternal(motorDevice, sbufReadU16(src));
+                        motors[i] = motorDevConvertFromExternal(motorDevice, sbufReadU16(src));
                     }
                     break;
 

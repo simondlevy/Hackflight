@@ -108,31 +108,31 @@ class Hackflight {
 
                 float motorOutput = mixmotors[i];
 
-                motorOutput = motorValueLow() +
-                    (motorValueHigh() - motorValueLow()) * motorOutput;
+                motorOutput = motorDevValueLow() +
+                    (motorDevValueHigh() - motorDevValueLow()) * motorOutput;
 
                 if (m_taskData.failsafe.isActive()) {
-                    if (motorIsProtocolDshot()) {
+                    if (motorDevIsProtocolDshot()) {
                         // Prevent getting into special reserved range
-                        motorOutput = (motorOutput < motorValueLow()) ?
-                            motorValueDisarmed() :
+                        motorOutput = (motorOutput < motorDevValueLow()) ?
+                            motorDevValueDisarmed() :
                             motorOutput; 
                     }
                     motorOutput = constrain_f(
                             motorOutput,
-                            motorValueDisarmed(),
-                            motorValueHigh());
+                            motorDevValueDisarmed(),
+                            motorDevValueHigh());
                 } else {
                     motorOutput =
                         constrain_f(
                                 motorOutput,
-                                motorValueLow(),
-                                motorValueHigh());
+                                motorDevValueLow(),
+                                motorDevValueHigh());
                 }
                 mixmotors[i] = motorOutput;
             }
 
-            motorWrite(m_taskData.motorDevice,
+            motorDevWrite(m_taskData.motorDevice,
                     m_taskData.arming.isArmed() ?
                     mixmotors :
                     m_taskData.mspMotors);

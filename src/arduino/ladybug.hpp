@@ -67,7 +67,7 @@ class LadybugFc : public Hackflight {
             Wire.begin();
             delay(100);
 
-            motorInitBrushed(_motorPins);
+            motorDevInitBrushed(_motorPins);
 
             stm32_startCycleCounter();
 

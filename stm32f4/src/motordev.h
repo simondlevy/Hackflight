@@ -65,7 +65,7 @@ typedef struct motorDevice_s {
 } motorDevice_t;
 
 void     motorPostInitNull();
-void     motorWriteNull(uint8_t index, float value);
+void     motorDevWriteNull(uint8_t index, float value);
 bool     motorUpdateStartNull(void);
 void     motorUpdateCompleteNull(void);
 void     motorPostInit(void * motorDevice);

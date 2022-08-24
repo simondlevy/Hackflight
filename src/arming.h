@@ -79,7 +79,7 @@ class Arming {
                     return;
                 }
 
-                if (!motorIsReady(currentTimeUs)) {
+                if (!motorDevIsReady(currentTimeUs)) {
                     return;
                 }
 
@@ -103,7 +103,7 @@ class Arming {
     void disarm(void * motorDevice)
     {
         if (m_is_armed) {
-            motorStop(motorDevice);
+            motorDevStop(motorDevice);
         }
 
         m_is_armed = false;

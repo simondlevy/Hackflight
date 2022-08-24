@@ -41,7 +41,7 @@ float motorGetDigitalIdOffset(void)
     return CONVERT_PARAMETER_TO_PERCENT(digitalIdleOffsetValue * 0.01f);
 }
 
-bool motorIsProtocolDshot(void)
+bool motorDevIsProtocolDshot(void)
 {
     return motorProtocolDshot;
 }
@@ -81,7 +81,7 @@ bool motorCheckProtocolEnabled(bool *isProtocolDshot)
     return enabled;
 }
 
-float motorConvertFromExternal(void * motorDevice_void, uint16_t externalValue)
+float motorDevConvertFromExternal(void * motorDevice_void, uint16_t externalValue)
 {
     motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
 
@@ -112,7 +112,7 @@ motorVTable_t motorGetVTable(void * motorDevice_void)
     return motorDevice->vTable;
 }
 
-void * motorInitDshot(uint8_t motorCount) {
+void * motorDevInitDshot(uint8_t motorCount) {
 
     motorProtocolEnabled = motorCheckProtocolEnabled(&motorProtocolDshot);
 
@@ -158,7 +158,7 @@ bool motorUpdateStartNull(void)
     return true;
 }
 
-void motorWrite(void * motorDevice_void, float *values)
+void motorDevWrite(void * motorDevice_void, float *values)
 {
     motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
 
@@ -173,7 +173,7 @@ void motorWrite(void * motorDevice_void, float *values)
     }
 }
 
-void motorWriteNull(uint8_t index, float value)
+void motorDevWriteNull(uint8_t index, float value)
 {
     UNUSED(index);
     UNUSED(value);
