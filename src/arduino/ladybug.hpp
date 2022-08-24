@@ -29,7 +29,7 @@
 #include "imu_usfs.h"
 #include "arduino_led.h"
 
-static ImuUsfs _imu;
+static ImuUsfs _imu(12); // interrupt pin
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -58,8 +58,7 @@ class LadybugFc : public Hackflight {
                     &_anglePid,
                     &_mixer,
                     (void *)&_motorPins,
-                    &_led,
-                    12)   // IMU interrupt pin
+                    &_led)
         {
         }
 

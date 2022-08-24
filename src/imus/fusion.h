@@ -184,6 +184,11 @@ class FusionImu : public Imu {
 
     public:
 
+        FusionImu(uint8_t interruptPin)
+            : Imu(interruptPin)
+        {
+        }
+
         virtual void accumulateGyro(float gx, float gy, float gz) override
         {
             static axes_t _adcf;

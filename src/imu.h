@@ -20,10 +20,13 @@
 
 #include "arming.h"
 #include "datatypes.h"
+#include "imu_device.h"
 
 class Imu {
 
     public:
+
+        uint8_t m_interruptPin;
 
         typedef struct {
             float w;
@@ -51,7 +54,7 @@ class Imu {
             gyro_reset_t gyroReset;
         } fusion_t;
 
-    typedef void (*align_fun)(axes_t * axes);
+        typedef void (*align_fun)(axes_t * axes);
 
         virtual void accumulateGyro(float gx, float gy, float gz)
         {
@@ -65,4 +68,17 @@ class Imu {
                 Arming * arming,
                 uint32_t time,
                 vehicle_state_t * vstate) = 0;
+
+
+        void begin(void)
+        {
+            imuDevInit(m_interruptPin);
+        }
+
+    protected:
+
+        Imu(uint8_t interruptPin) 
+        {
+            m_interruptPin = interruptPin;
+        }
 };

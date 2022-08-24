@@ -23,6 +23,11 @@ class ImuUsfs : public Imu {
 
     public:
 
+        ImuUsfs(uint8_t interruptPin) 
+            : Imu(interruptPin)
+        {
+        }
+
         virtual void getEulerAngles(
                 Imu::fusion_t * fusionPrev,
                 Arming * arming,

@@ -28,7 +28,6 @@
 #include "gyro.h"
 #include "hackflight_core.h"
 #include "imu.h"
-#include "imu_device.h"
 #include "led.h"
 #include "maths.h"
 #include "motor.h"
@@ -60,7 +59,6 @@ class Hackflight {
         // Initialzed here
         AttitudeTask         m_attitudeTask;
         Imu::align_fun       m_imuAlignFun;
-        uint8_t              m_imuInterruptPin;
         MspTask              m_mspTask;
         ReceiverTask         m_receiverTask;
         Scheduler            m_scheduler;
@@ -247,13 +245,11 @@ class Hackflight {
                 AnglePidController * anglePid,
                 Mixer * mixer,
                 void * motorDevice,
-                Led * led,
-                uint8_t imuInterruptPin)
+                Led * led)
         {
             m_mixer = mixer;
             m_imuAlignFun = imuAlignFun;
             m_anglePid = anglePid;
-            m_imuInterruptPin = imuInterruptPin;
             m_led = led;
 
             m_taskData.receiver = receiver;
@@ -274,7 +270,7 @@ class Hackflight {
 
             m_taskData.msp.begin();
 
-            imuDevInit(m_imuInterruptPin);
+            m_taskData.imu->begin();
 
             m_led->begin();
 
