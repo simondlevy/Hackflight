@@ -137,7 +137,7 @@ extern "C" {
 
 void ImuUsfs::getEulerAngles(
         Imu::fusion_t * fusionPrev,
-        Arming::data_t * arming,
+        Arming * arming,
         uint32_t time,
         vehicle_state_t * vstate) 
 {

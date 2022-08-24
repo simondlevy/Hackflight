@@ -33,7 +33,7 @@ class Task {
 
         typedef struct {
 
-            Arming::data_t   arming;
+            Arming           arming;
             Failsafe         failsafe;
             Gyro             gyro;
             Imu *            imu;

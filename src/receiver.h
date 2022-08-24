@@ -290,7 +290,7 @@ class Receiver {
     }
 
     void detectAndApplySignalLossBehaviour(
-            Arming::data_t * arming,
+            Arming * arming,
             Failsafe * failsafe,
             uint32_t currentTimeUs,
             float raw[])
@@ -391,7 +391,7 @@ class Receiver {
     }
 
     bool calculateChannelsAndUpdateFailsafe(
-            Arming::data_t * arming,
+            Arming * arming,
             Failsafe * failsafe,
             uint32_t currentTimeUs,
             float raw[])
@@ -436,7 +436,7 @@ class Receiver {
             void * motorDevice,
             float raw[],
             uint32_t currentTimeUs,
-            Arming::data_t * arming,
+            Arming * arming,
             Failsafe * failsafe)
     {
         int32_t frameAgeUs;
@@ -824,7 +824,7 @@ class Receiver {
             bool calibrating,
             axes_t * rxax,
             void * motorDevice,
-            Arming::data_t * arming,
+            Arming * arming,
             Failsafe * failsafe,
             bool * pidItermResetReady,
             bool * pidItermResetValue,
@@ -860,7 +860,7 @@ class Receiver {
                 break;
 
             case STATE_MODES:
-                Arming::check(arming, motorDevice, currentTimeUs, m_raw,
+                arming->check(motorDevice, currentTimeUs, m_raw,
                         imuIsLevel,
                         calibrating);
                 m_state = STATE_UPDATE;
@@ -869,7 +869,7 @@ class Receiver {
             case STATE_UPDATE:
                 m_gotNewData = true;
                 updateCommands(m_raw);
-                Arming::updateStatus(arming, m_raw, imuIsLevel, calibrating);
+                arming->updateStatus(m_raw, imuIsLevel, calibrating);
                 m_state = STATE_CHECK;
                 break;
         }

@@ -131,7 +131,7 @@ class Hackflight {
             }
 
             motorWrite(m_taskData.motorDevice,
-                    Arming::isArmed(&m_taskData.arming) ?
+                    m_taskData.arming.isArmed() ?
                     mixmotors :
                     m_taskData.mspMotors);
 

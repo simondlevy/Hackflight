@@ -38,6 +38,8 @@ class Led {
 
         uint32_t m_warningLedTimer = 0;
 
+        uint8_t m_pin = 0;
+
         void warningRefresh(void)
         {
             switch (m_warningLedState) {
@@ -57,6 +59,12 @@ class Led {
         }
 
     public:
+
+        /*
+        Led(uint8_t pin)
+        {
+            m_pin = pin;
+        }*/
 
         static void flash(uint8_t reps, uint16_t delayMs)
         {

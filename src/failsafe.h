@@ -115,10 +115,10 @@ class Failsafe {
             return m_active;
         }
 
-        void onValidDataFailed(Arming::data_t * arming)
+        void onValidDataFailed(Arming * arming)
         {
             (void)arming;
-            Arming::setRxFailsafe(arming, false);
+            arming->setRxFailsafe(false);
             m_validRxDataFailedAt = timeMillis();
             if ((m_validRxDataFailedAt - m_validRxDataReceivedAt) >
                     m_rxDataFailurePeriod) {
@@ -126,13 +126,13 @@ class Failsafe {
             }
         }
 
-        void onValidDataReceived(Arming::data_t * arming)
+        void onValidDataReceived(Arming * arming)
         {
             m_validRxDataReceivedAt = timeMillis();
             if ((m_validRxDataReceivedAt - m_validRxDataFailedAt) >
                     m_rxDataRecoveryPeriod) {
                 m_rxLinkState = RXLINK_UP;
-                Arming::setRxFailsafe(arming, true);
+                arming->setRxFailsafe(true);
             }
         }
 
@@ -157,7 +157,7 @@ class Failsafe {
             m_monitoring = true;
         }
 
-        void update( float * rcData, void * motorDevice, Arming::data_t * arming)
+        void update( float * rcData, void * motorDevice, Arming * arming)
         {
             if (!isMonitoring()) {
                 return;
@@ -176,7 +176,7 @@ class Failsafe {
 
                 switch (m_phase) {
                     case IDLE:
-                        if (Arming::isArmed(arming)) {
+                        if (arming->isArmed()) {
                             // Track throttle command below minimum time
                             if (!throttleIsDown(rcData)) {
                                 m_throttleLowPeriod =
@@ -226,7 +226,7 @@ class Failsafe {
                     case LANDING:
                         break;
                     case LANDED:
-                        Arming::disarm(arming, motorDevice);
+                        arming->disarm(motorDevice);
                         m_receivingRxDataPeriod = timeMillis() +
                             m_receivingRxDataPeriodPreset; // set required
                         m_phase = RX_LOSS_MONITORING;
@@ -236,7 +236,7 @@ class Failsafe {
                     case RX_LOSS_MONITORING:
                         if (receivingRxData) {
                             if (timeMillis() > m_receivingRxDataPeriod) {
-                                if (!Arming::isArmed(arming)) {
+                                if (!arming->isArmed()) {
                                     m_phase = RX_LOSS_RECOVERED;
                                     reprocessState = true;
                                 }

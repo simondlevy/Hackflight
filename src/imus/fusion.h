@@ -157,7 +157,7 @@ class FusionImu : public Imu {
         }
 
         void getQuaternion(
-                Arming::data_t * arming,
+                Arming * arming,
                 Imu::fusion_t * fusionPrev,
                 uint32_t time,
                 Imu::quaternion_t * quat)
@@ -171,7 +171,7 @@ class FusionImu : public Imu {
 
             Imu::gyro_reset_t new_gyro_reset = {};
 
-            if (!Arming::isArmed(arming)) {
+            if (!arming->isArmed()) {
                 memcpy(&fusionPrev->gyroReset, &new_gyro_reset,
                         sizeof(Imu::gyro_reset_t));
             }
@@ -202,7 +202,7 @@ class FusionImu : public Imu {
 
         virtual void getEulerAngles(
                 Imu::fusion_t * fusionPrev,
-                Arming::data_t * arming,
+                Arming * arming,
                 uint32_t time,
                 vehicle_state_t * vstate) override
         {

@@ -30,30 +30,26 @@ class Arming {
 
     public:
 
-        typedef struct {
-
-            bool acc_done_calibrating;
-            bool angle_okay;
-            bool switch_okay;
-            bool gyro_done_calibrating;
-            bool is_armed;
-            Led  led;
-            bool rx_failsafe_okay;
-            bool throttle_is_down;
-
-        } data_t;
+        bool m_acc_done_calibrating;
+        bool m_angle_okay;
+        bool m_switch_okay;
+        bool m_gyro_done_calibrating;
+        bool m_is_armed;
+        Led  m_led;
+        bool m_rx_failsafe_okay;
+        bool m_throttle_is_down;
 
     private:
 
-        static bool readyToArm(data_t * data)
+        bool readyToArm(void)
         {
             return 
-                data->acc_done_calibrating &&
-                data->angle_okay &&
-                data->switch_okay &&
-                data->gyro_done_calibrating &&
-                data->rx_failsafe_okay &&
-                data->throttle_is_down;
+                m_acc_done_calibrating &&
+                m_angle_okay &&
+                m_switch_okay &&
+                m_gyro_done_calibrating &&
+                m_rx_failsafe_okay &&
+                m_throttle_is_down;
         }
 
         static bool rxAux1IsSet(float raw[])
@@ -63,8 +59,7 @@ class Arming {
 
     public:
 
-        static void check(
-                data_t * data,
+        void check(
                 void * motorDevice,
                 uint32_t currentTimeUs,
                 float raw[],
@@ -75,11 +70,11 @@ class Arming {
 
             if (rxAux1IsSet(raw)) {
 
-                Arming::updateStatus(data, raw, imuIsLevel, calibrating);
+                updateStatus(raw, imuIsLevel, calibrating);
 
-                if (readyToArm(data)) {
+                if (readyToArm()) {
 
-                    if (data->is_armed) {
+                    if (m_is_armed) {
                         return;
                     }
 
@@ -87,75 +82,74 @@ class Arming {
                         return;
                     }
 
-                    data->is_armed = true;
+                    m_is_armed = true;
 
                 }
 
             } else {
 
-                if (data->is_armed) {
-                    Arming::disarm(data, motorDevice);
-                    data->is_armed = false;
+                if (m_is_armed) {
+                    disarm(motorDevice);
+                    m_is_armed = false;
                 }
             }
 
-            if (!(data->is_armed || _doNotRepeat || !readyToArm(data))) {
+            if (!(m_is_armed || _doNotRepeat || !readyToArm())) {
                 _doNotRepeat = true;
             }
         }
 
-        static void disarm(data_t * data, void * motorDevice)
+        void disarm(void * motorDevice)
         {
-            if (data->is_armed) {
+            if (m_is_armed) {
                 motorStop(motorDevice);
             }
 
-            data->is_armed = false;
+            m_is_armed = false;
         }
 
-        static bool isArmed(data_t * data)
+        bool isArmed(void)
         {
-            return data->is_armed;
+            return m_is_armed;
         }
 
-        static void updateStatus(
-                data_t * data,
+        void updateStatus(
                 float raw[],
                 bool imuIsLevel,
                 bool calibrating) 
         {
-            if (data->is_armed) {
+            if (m_is_armed) {
                 ledDevSet(true);
             } else {
 
-                data->throttle_is_down = throttleIsDown(raw);
+                m_throttle_is_down = throttleIsDown(raw);
 
-                data->angle_okay = imuIsLevel;
+                m_angle_okay = imuIsLevel;
 
-                data->gyro_done_calibrating = !calibrating;
+                m_gyro_done_calibrating = !calibrating;
 
-                data->acc_done_calibrating = true;
+                m_acc_done_calibrating = true;
 
                 // If arming is disabled and the ARM switch is on
-                if (!readyToArm(data) && rxAux1IsSet(raw)) {
-                    data->switch_okay = false;
+                if (!readyToArm() && rxAux1IsSet(raw)) {
+                    m_switch_okay = false;
                 } else if (!rxAux1IsSet(raw)) {
-                    data->switch_okay = true;
+                    m_switch_okay = true;
                 }
 
-                if (!readyToArm(data)) {
-                    data->led.warningFlash();
+                if (!readyToArm()) {
+                    m_led.warningFlash();
                 } else {
-                    data->led.warningDisable();
+                    m_led.warningDisable();
                 }
 
-                data->led.warningUpdate();
+                m_led.warningUpdate();
             }
         }
 
-        static void setRxFailsafe(data_t * data, bool okay)
+        void setRxFailsafe(bool okay)
         {
-            data->rx_failsafe_okay= okay;
+            m_rx_failsafe_okay= okay;
         }
 
 }; // class Arming
