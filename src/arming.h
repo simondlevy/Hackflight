@@ -28,110 +28,110 @@
 
 class Arming {
 
-    public:
+    friend class Failsafe;
+    friend class FusionImu;
+    friend class Hackflight;
+    friend class Receiver;
+    friend class MspTask;
 
-        Led  * m_led;
+    bool readyToArm(void)
+    {
+        return 
+            m_acc_done_calibrating &&
+            m_angle_okay &&
+            m_switch_okay &&
+            m_gyro_done_calibrating &&
+            m_rx_failsafe_okay &&
+            m_throttle_is_down;
+    }
 
-        bool m_acc_done_calibrating;
-        bool m_angle_okay;
-        bool m_switch_okay;
-        bool m_gyro_done_calibrating;
-        bool m_is_armed;
-        bool m_rx_failsafe_okay;
-        bool m_throttle_is_down;
+    static bool rxAux1IsSet(float raw[])
+    {
+        return raw[4] > 1200;
+    }
 
-    private:
+    Led  * m_led;
 
-        bool readyToArm(void)
-        {
-            return 
-                m_acc_done_calibrating &&
-                m_angle_okay &&
-                m_switch_okay &&
-                m_gyro_done_calibrating &&
-                m_rx_failsafe_okay &&
-                m_throttle_is_down;
-        }
+    bool m_acc_done_calibrating;
+    bool m_angle_okay;
+    bool m_switch_okay;
+    bool m_gyro_done_calibrating;
+    bool m_is_armed;
+    bool m_rx_failsafe_okay;
+    bool m_throttle_is_down;
 
-        static bool rxAux1IsSet(float raw[])
-        {
-            return raw[4] > 1200;
-        }
+    void check(
+            void * motorDevice,
+            uint32_t currentTimeUs,
+            float raw[],
+            bool imuIsLevel,
+            bool calibrating)
+    {
+        static bool _doNotRepeat;
 
-    public:
+        if (rxAux1IsSet(raw)) {
 
-        void check(
-                void * motorDevice,
-                uint32_t currentTimeUs,
-                float raw[],
-                bool imuIsLevel,
-                bool calibrating)
-        {
-            static bool _doNotRepeat;
+            updateStatus(raw, imuIsLevel, calibrating);
 
-            if (rxAux1IsSet(raw)) {
-
-                updateStatus(raw, imuIsLevel, calibrating);
-
-                if (readyToArm()) {
-
-                    if (m_is_armed) {
-                        return;
-                    }
-
-                    if (!motorIsReady(currentTimeUs)) {
-                        return;
-                    }
-
-                    m_is_armed = true;
-
-                }
-
-            } else {
+            if (readyToArm()) {
 
                 if (m_is_armed) {
-                    disarm(motorDevice);
-                    m_is_armed = false;
+                    return;
                 }
+
+                if (!motorIsReady(currentTimeUs)) {
+                    return;
+                }
+
+                m_is_armed = true;
+
             }
 
-            if (!(m_is_armed || _doNotRepeat || !readyToArm())) {
-                _doNotRepeat = true;
-            }
-        }
+        } else {
 
-        void disarm(void * motorDevice)
-        {
             if (m_is_armed) {
-                motorStop(motorDevice);
+                disarm(motorDevice);
+                m_is_armed = false;
             }
-
-            m_is_armed = false;
         }
 
-        bool isArmed(void)
-        {
-            return m_is_armed;
+        if (!(m_is_armed || _doNotRepeat || !readyToArm())) {
+            _doNotRepeat = true;
+        }
+    }
+
+    void disarm(void * motorDevice)
+    {
+        if (m_is_armed) {
+            motorStop(motorDevice);
         }
 
-        void updateStatus(
-                float raw[],
-                bool imuIsLevel,
-                bool calibrating) 
-        {
-            if (m_is_armed) {
-                m_led->set(true);
-            } else {
+        m_is_armed = false;
+    }
 
-                m_throttle_is_down = throttleIsDown(raw);
+    bool isArmed(void)
+    {
+        return m_is_armed;
+    }
 
-                m_angle_okay = imuIsLevel;
+    void updateStatus(
+            float raw[],
+            bool imuIsLevel,
+            bool calibrating) 
+    {
+        if (m_is_armed) {
+            m_led->set(true);
+        } else {
 
-                m_gyro_done_calibrating = !calibrating;
+            m_throttle_is_down = throttleIsDown(raw);
 
-                m_acc_done_calibrating = true;
+            m_angle_okay = imuIsLevel;
 
-                // If arming is disabled and the ARM switch is on
+            m_gyro_done_calibrating = !calibrating;
+
+            m_acc_done_calibrating = true;
+
+            // If arming is disabled and the ARM switch is on
                 if (!readyToArm() && rxAux1IsSet(raw)) {
                     m_switch_okay = false;
                 } else if (!rxAux1IsSet(raw)) {
