@@ -59,9 +59,9 @@ class HackflightCore {
                 demands_t * demands,
                 vehicle_state_t * vstate,
                 PidController * pidControllers[],
-                uint8_t pidCount,
-                bool pidReset,
-                uint32_t usec,
+                const uint8_t pidCount,
+                const bool pidReset,
+                const uint32_t usec,
                 Mixer * mixer,
                 float motorvals[])
         {
