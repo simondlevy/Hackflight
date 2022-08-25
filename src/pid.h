@@ -27,6 +27,6 @@ class PidController {
         virtual void update(
                 const uint32_t currentTimeUs,
                 demands_t * demands,
-                vehicle_state_t * vstate,
+                const vehicle_state_t & vstate,
                 const bool reset) = 0;
 };

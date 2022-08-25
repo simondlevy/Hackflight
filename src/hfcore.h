@@ -57,7 +57,7 @@ class HackflightCore {
 
         static void step(
                 demands_t * demands,
-                vehicle_state_t * vstate,
+                const vehicle_state_t & vstate,
                 PidController * pidControllers[],
                 const uint8_t pidCount,
                 const bool pidReset,

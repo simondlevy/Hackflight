@@ -321,7 +321,7 @@ class AnglePidController : public PidController {
         virtual void update(
                 const uint32_t currentTimeUs,
                 demands_t * demands,
-                vehicle_state_t * vstate,
+                const vehicle_state_t & vstate,
                 const bool reset) override
         {
             // gradually scale back integration when above windup point
@@ -332,7 +332,7 @@ class AnglePidController : public PidController {
                 dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
             }
 
-            float gyroRates[3] = {vstate->dphi, vstate->dtheta, vstate->dpsi};
+            float gyroRates[3] = {vstate.dphi, vstate.dtheta, vstate.dpsi};
 
             // Precalculate gyro deta for D-term here, this allows loop unrolling
             float gyroRateDterm[3];
@@ -344,7 +344,7 @@ class AnglePidController : public PidController {
             }
 
             float pidSetpoints[3] = {demands->roll, demands->pitch, demands->yaw};
-            float currentAngles[3] = {vstate->phi, vstate->theta, vstate->psi};
+            float currentAngles[3] = {vstate.phi, vstate.theta, vstate.psi};
 
             // ----------PID controller----------
             for (uint8_t axis = 0; axis <= 2; ++axis) {

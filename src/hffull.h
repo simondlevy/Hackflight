@@ -96,7 +96,7 @@ class Hackflight {
 
             HackflightCore::step(
                     &demands,
-                    &m_taskData.vstate,
+                    m_taskData.vstate,
                     m_pidControllers,
                     m_pidControllerCount,
                     m_taskData.pidReset,
