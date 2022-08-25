@@ -20,7 +20,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#include <hackflight_full.h>
+#include <hffull.h>
 #include <alignment/rotate_0.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <motor.h>

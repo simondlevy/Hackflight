@@ -23,7 +23,7 @@
 #include <alignment/rotate_270.h>
 #include <clock.h>
 #include <datatypes.h>
-#include <hackflight_full.h>
+#include <hffull.h>
 #include <imus/fusion.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <receivers/sbus.h>

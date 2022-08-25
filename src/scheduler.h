@@ -70,7 +70,7 @@ class Scheduler {
 
     public:
 
-        // These can be modified by hackflight_full
+        // These can be modified by hffull
         int32_t  desiredPeriodCycles;
         uint32_t lastTargetCycles;
 

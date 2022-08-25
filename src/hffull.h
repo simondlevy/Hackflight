@@ -25,7 +25,7 @@
 
 #include "arming.h"
 #include "failsafe.h"
-#include "hackflight_core.h"
+#include "hfcore.h"
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
