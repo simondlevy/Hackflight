@@ -393,7 +393,7 @@ class Msp {
         static int serialEncode(mspPort_t *msp, mspPacket_t *packet)
         {
             const int dataLen = sbufBytesRemaining(&packet->buf);
-            uint8_t hdrBuf[16] = { '$', 'M', packet->result == RESULT_ERROR ? '!' : '>'};
+            uint8_t hdrBuf[16] = { (uint8_t)'$', (uint8_t)'M', (uint8_t)(packet->result == RESULT_ERROR ? '!' : '>')};
             uint8_t crcBuf[2];
             uint8_t checksum;
             int hdrLen = 3;

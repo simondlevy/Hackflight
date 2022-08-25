@@ -25,10 +25,10 @@
 
 #include "arming.h"
 #include "failsafe.h"
-#include "hfcore.h"
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
+#include "mixer.h"
 #include "msp.h"
 #include "receiver.h"
 #include "scheduler.h"
@@ -40,6 +40,10 @@
 class Hackflight {
 
     private:
+
+        static constexpr float PID_MIXER_SCALING = 1000;
+        static const uint16_t  PIDSUM_LIMIT_YAW  = 400;
+        static const uint16_t  PIDSUM_LIMIT      = 500;
 
         // Gyro interrupt counts over which to measure loop time and skew
         static const uint32_t CORE_RATE_COUNT = 25000;
@@ -94,7 +98,7 @@ class Hackflight {
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
-            HackflightCore::step(
+            Hackflight::step(
                     demands,
                     m_taskData.vstate,
                     m_pidControllers,
@@ -236,7 +240,56 @@ class Hackflight {
 
         } // checkDyanmicTasks
 
+        static float constrain_demand(float demand, float limit, float scaling)
+        {
+            return constrain_f(demand, -limit, +limit) / scaling;
+        }
+
+        static void constrain_demands(demands_t * demands)
+        {
+            demands->roll  = constrain_demand(
+                    demands->roll, PIDSUM_LIMIT, PID_MIXER_SCALING);
+
+            demands->pitch =
+                constrain_demand(
+                        demands->pitch, PIDSUM_LIMIT, PID_MIXER_SCALING);
+
+            // Negate yaw to make it agree with PID
+            demands->yaw   =
+                -constrain_demand(
+                        demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
+        }
+
     public:
+
+        static void step(
+                const demands_t & stickDemands,
+                const vehicle_state_t & vstate,
+                PidController * pidControllers[],
+                const uint8_t pidCount,
+                const bool pidReset,
+                const uint32_t usec,
+                Mixer mixer,
+                float motorvals[])
+        {
+            demands_t demands = {
+                stickDemands.throttle,
+                stickDemands.roll,
+                stickDemands.pitch,
+                stickDemands.yaw
+            };
+
+            // Run PID controllers to get new demands
+            for (uint8_t k=0; k<pidCount; ++k) {
+                pidControllers[k]->update(usec, &demands, vstate, pidReset);
+            }
+
+            // Constrain demands
+            constrain_demands(&demands);
+
+            // Run the mixer to get motors from demands
+            mixer.run(demands, motorvals);
+        }
 
         Hackflight(
                 Receiver * receiver,

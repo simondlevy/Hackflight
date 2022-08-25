@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "hfcore.h"
+#include "hackflight.h"
 #include "imu.h"
 #include "msp.h"
 #include "receiver.h"
