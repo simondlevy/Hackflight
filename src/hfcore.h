@@ -56,7 +56,7 @@ class HackflightCore {
     public:
 
         static void step(
-                demands_t * demands,
+                const demands_t & stickDemands,
                 const vehicle_state_t & vstate,
                 PidController * pidControllers[],
                 const uint8_t pidCount,
@@ -65,16 +65,23 @@ class HackflightCore {
                 Mixer mixer,
                 float motorvals[])
         {
+            demands_t demands = {
+                stickDemands.throttle,
+                stickDemands.roll,
+                stickDemands.pitch,
+                stickDemands.yaw
+            };
+
             // Run PID controllers to get new demands
             for (uint8_t k=0; k<pidCount; ++k) {
-                pidControllers[k]->update(usec, demands, vstate, pidReset);
+                pidControllers[k]->update(usec, &demands, vstate, pidReset);
             }
 
             // Constrain demands
-            constrain_demands(demands);
+            constrain_demands(&demands);
 
             // Run the mixer to get motors from demands
-            mixer.run(*demands, motorvals);
+            mixer.run(demands, motorvals);
         }
 
 }; // class HackflightCore

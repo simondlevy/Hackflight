@@ -95,7 +95,7 @@ class Hackflight {
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
             HackflightCore::step(
-                    &demands,
+                    demands,
                     m_taskData.vstate,
                     m_pidControllers,
                     m_pidControllerCount,
