@@ -23,7 +23,7 @@
 
 #include "datatypes.h"
 #include "receiver.h"
-#include "serial_device.h"
+#include "serial.h"
 #include "time.h"
 
 class SbusReceiver : public Receiver {

@@ -18,7 +18,7 @@
 #include <math.h>
 #include <string.h>
 
-#include <motor_device.h>
+#include <motor.h>
 
 #include "platform.h"
 #include "io.h"

@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#include "motor_device.h"
+#include "motor.h"
 #include "datatypes.h"
 
 class FixedPitchMixer : public Mixer {

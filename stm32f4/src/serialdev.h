@@ -16,7 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <serial_device.h>
+#include <serial.h>
 
 #include "io.h"
 #include "io_types.h"

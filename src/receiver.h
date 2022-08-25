@@ -27,7 +27,7 @@
 #include "constrain.h"
 #include "pids/angle.h"
 #include "pwm.h"
-#include "serial_device.h"
+#include "serial.h"
 #include "sticks.h"
 #include "time.h"
 

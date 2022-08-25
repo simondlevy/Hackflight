@@ -16,7 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <motor_device.h>
+#include <motor.h>
 #include <time.h>
 
 static const uint8_t  MOTOR_IO_TAGS[8] = {32, 33, 19, 18, 56, 24, 0, 0};

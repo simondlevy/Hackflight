@@ -18,7 +18,7 @@
 #include <stdint.h>
 
 
-#include <motor_device.h>
+#include <motor.h>
 #include <time.h>
 
 #include "platform.h"
