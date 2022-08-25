@@ -20,11 +20,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <alignment/rotate_270.h>
 #include <clock.h>
 #include <datatypes.h>
 #include <hackflight_full.h>
 #include <imus/fusion.h>
-#include <imu_alignment/rotate_270.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <receivers/sbus.h>
 #include <serial.h>
