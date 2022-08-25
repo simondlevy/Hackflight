@@ -268,7 +268,7 @@ $(TARGET_DFU): $(TARGET_HEX)
 $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
-		  $(OBJECT_DIR)/stm32_clock.o
+		  $(OBJECT_DIR)/stm32clock.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CXX) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
@@ -294,10 +294,10 @@ $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hardware_init.o $(CFLAGS) \
 		hardware_init.c
 
-$(OBJECT_DIR)/stm32_clock.o: $(HFSRC_DIR)/stm32_clock.c
-	@echo stm32_clock.c
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32_clock.o $(CFLAGS) \
-		$(HFSRC_DIR)/stm32_clock.c
+$(OBJECT_DIR)/stm32clock.o: $(HFSRC_DIR)/stm32clock.c
+	@echo stm32clock.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32clock.o $(CFLAGS) \
+		$(HFSRC_DIR)/stm32clock.c
 
 $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \

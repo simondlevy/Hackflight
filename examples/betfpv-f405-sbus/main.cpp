@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <alignment/rotate_270.h>
+#include <alignment/rotate270.h>
 #include <clock.h>
 #include <datatypes.h>
 #include <hffull.h>

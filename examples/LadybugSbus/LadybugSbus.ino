@@ -17,7 +17,7 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <hackflight_full.h>
+#include <hffull.h>
 #include <arduino/ladybug.hpp>
 #include <receivers/sbus.h>
 

@@ -21,10 +21,10 @@
 #include <Wire.h>
 
 #include <hffull.h>
-#include <alignment/rotate_0.h>
+#include <alignment/rotate0.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <motor.h>
-#include <stm32_clock.h>
+#include <stm32clock.h>
 
 #include "imu_usfs.h"
 #include "arduino_led.h"
