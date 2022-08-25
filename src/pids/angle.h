@@ -288,11 +288,11 @@ class AnglePidController : public PidController {
     public:
 
         AnglePidController(
-                float k_rate_p,
-                float k_rate_i,
-                float k_rate_d,
-                float k_rate_f,
-                float k_level_p)
+                const float k_rate_p,
+                const float k_rate_i,
+                const float k_rate_d,
+                const float k_rate_f,
+                const float k_level_p)
         {
             m_k_rate_p = k_rate_p;
             m_k_rate_i = k_rate_i;
@@ -319,10 +319,10 @@ class AnglePidController : public PidController {
         }
 
         virtual void update(
-                uint32_t currentTimeUs,
+                const uint32_t currentTimeUs,
                 demands_t * demands,
                 vehicle_state_t * vstate,
-                bool reset) override
+                const bool reset) override
         {
             // gradually scale back integration when above windup point
             float dynCi = Clock::DT();

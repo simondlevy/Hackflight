@@ -25,8 +25,8 @@ class PidController {
         static const uint8_t MAX_PID_CONTROLLERS = 10;
 
         virtual void update(
-                uint32_t currentTimeUs,
+                const uint32_t currentTimeUs,
                 demands_t * demands,
                 vehicle_state_t * vstate,
-                bool reset) = 0;
+                const bool reset) = 0;
 };

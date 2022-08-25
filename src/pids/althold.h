@@ -48,7 +48,7 @@ class AltHoldPidController : public PidController {
 
     public:
 
-        AltHoldPidController(float kp, float ki)
+        AltHoldPidController(const float kp, const float ki)
         {
             m_kp = kp;
             m_ki = ki;
@@ -59,10 +59,10 @@ class AltHoldPidController : public PidController {
         }
 
         virtual void update(
-                uint32_t currentTimeUs,
+                const uint32_t currentTimeUs,
                 demands_t * demands,
                 vehicle_state_t * vstate,
-                bool reset) override
+                const bool reset) override
         {
             (void)currentTimeUs;
 
