@@ -74,7 +74,7 @@ class HackflightCore {
             constrain_demands(demands);
 
             // Run the mixer to get motors from demands
-            mixer->run(demands, motorvals);
+            mixer->run(*demands, motorvals);
         }
 
 }; // class HackflightCore

@@ -35,7 +35,7 @@ class FixedPitchMixer : public Mixer {
 
         virtual axes_t getSpin(uint8_t k) = 0;
 
-        virtual void run(demands_t * demands, float * motorvals) override
+        virtual void run(const demands_t & demands, float * motorvals) override
         {
             float mix[MAX_SUPPORTED_MOTORS];
 
@@ -44,9 +44,9 @@ class FixedPitchMixer : public Mixer {
             for (int i = 0; i < m_motorCount; i++) {
 
                 mix[i] =
-                    demands->roll  * getSpin(i).x +
-                    demands->pitch * getSpin(i).y +
-                    demands->yaw   * getSpin(i).z;
+                    demands.roll  * getSpin(i).x +
+                    demands.pitch * getSpin(i).y +
+                    demands.yaw   * getSpin(i).z;
 
                 if (mix[i] > mixMax) {
                     mixMax = mix[i];
@@ -58,14 +58,14 @@ class FixedPitchMixer : public Mixer {
 
             float motorRange = mixMax - mixMin;
 
-            float throttle = demands->throttle;
+            float throttle = demands.throttle;
 
             if (motorRange > 1.0f) {
                 for (int i = 0; i < m_motorCount; i++) {
                     mix[i] /= motorRange;
                 }
             } else {
-                if (demands->throttle > 0.5f) {
+                if (demands.throttle > 0.5f) {
                     throttle = constrain_f(throttle, -mixMin, 1.0f - mixMax);
                 }
             }

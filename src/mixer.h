@@ -40,5 +40,5 @@ class Mixer {
 
     public:
 
-        virtual void run(demands_t * demands, float * motorvals) = 0;
+        virtual void run(const demands_t & demands, float * motorvals) = 0;
 };
