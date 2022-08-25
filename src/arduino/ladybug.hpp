@@ -20,7 +20,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#include <hffull.h>
+#include <hackflight.h>
 #include <alignment/rotate0.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <motor.h>
@@ -39,7 +39,7 @@ static AnglePidController _anglePid(
         0.0); // 3.0; // Level Kp
 
 
-static QuadXbfMixer _mixer; 
+static Mixer _mixer = QuadXbfMixer::make();
 
 static ArduinoLed _led(18); // pin
 
