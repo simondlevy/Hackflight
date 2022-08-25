@@ -48,7 +48,7 @@ int main(void)
 
     static SbusReceiver receiver(SERIAL_PORT_USART3);
 
-    static QuadXbfMixer mixer; 
+    static Mixer mixer = QuadXbfMixer::make();
 
     static Stm32F4Led led(37); // pin
 

@@ -101,7 +101,7 @@ class Hackflight {
                     m_pidControllerCount,
                     m_taskData.pidReset,
                     usec,
-                    m_mixer,
+                    *m_mixer,
                     mixmotors);
 
             for (uint8_t i=0; i<m_mixer->getMotorCount(); i++) {

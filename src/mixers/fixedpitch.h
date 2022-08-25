@@ -22,31 +22,29 @@
 #include <stdbool.h>
 
 #include "motor.h"
+#include "mixer.h"
 #include "datatypes.h"
 
-class FixedPitchMixer : public Mixer {
+class FixedPitchMixer {
 
-    protected:
+    public:
 
-        FixedPitchMixer(uint8_t motorCount) 
-            : Mixer(motorCount)
-        {
-        }
-
-        virtual axes_t getSpin(uint8_t k) = 0;
-
-        virtual void run(const demands_t & demands, float * motorvals) override
+        static void fun(
+                const demands_t & demands,
+                uint8_t motorCount,
+                const axes_t * spins,
+                float * motorvals)
         {
             float mix[MAX_SUPPORTED_MOTORS];
 
             float mixMax = 0, mixMin = 0;
 
-            for (int i = 0; i < m_motorCount; i++) {
+            for (int i = 0; i < motorCount; i++) {
 
                 mix[i] =
-                    demands.roll  * getSpin(i).x +
-                    demands.pitch * getSpin(i).y +
-                    demands.yaw   * getSpin(i).z;
+                    demands.roll  * spins[i].x +
+                    demands.pitch * spins[i].y +
+                    demands.yaw   * spins[i].z;
 
                 if (mix[i] > mixMax) {
                     mixMax = mix[i];
@@ -61,7 +59,7 @@ class FixedPitchMixer : public Mixer {
             float throttle = demands.throttle;
 
             if (motorRange > 1.0f) {
-                for (int i = 0; i < m_motorCount; i++) {
+                for (int i = 0; i < motorCount; i++) {
                     mix[i] /= motorRange;
                 }
             } else {
@@ -70,7 +68,7 @@ class FixedPitchMixer : public Mixer {
                 }
             }
 
-            for (int i = 0; i < m_motorCount; i++) {
+            for (int i = 0; i < motorCount; i++) {
 
                 motorvals[i] = mix[i] + throttle;
             }

@@ -62,7 +62,7 @@ class HackflightCore {
                 const uint8_t pidCount,
                 const bool pidReset,
                 const uint32_t usec,
-                Mixer * mixer,
+                Mixer mixer,
                 float motorvals[])
         {
             // Run PID controllers to get new demands
@@ -74,7 +74,7 @@ class HackflightCore {
             constrain_demands(demands);
 
             // Run the mixer to get motors from demands
-            mixer->run(*demands, motorvals);
+            mixer.run(*demands, motorvals);
         }
 
 }; // class HackflightCore

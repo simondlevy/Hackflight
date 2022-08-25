@@ -22,15 +22,20 @@
 
 class Mixer {
 
-    friend class Hackflight;
+    private:
 
-    protected:
+        typedef void (*mixerFun_t)(const demands_t & demands, float * motorvals);
 
         uint8_t m_motorCount;
 
-        Mixer(uint8_t motorCount)
+        mixerFun_t m_fun;
+
+    public:
+
+        Mixer(uint8_t motorCount, mixerFun_t fun)
         {
             m_motorCount = motorCount;
+            m_fun = fun;
         }
 
         uint8_t getMotorCount(void)
@@ -38,7 +43,8 @@ class Mixer {
             return m_motorCount;
         }
 
-    public:
-
-        virtual void run(const demands_t & demands, float * motorvals) = 0;
+        void run(const demands_t & demands, float * motorvals)
+        {
+            m_fun(demands, motorvals);
+        }
 };

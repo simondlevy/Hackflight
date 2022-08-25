@@ -28,30 +28,31 @@
  */
 
 #include "mixers/fixedpitch.h"
+#include "motor.h"
 
-class QuadXbfMixer : public FixedPitchMixer {
+class QuadXbfMixer {
 
     private:
 
-        axes_t m_spins[4] = {
-            //  rol   pit    yaw
-            { -1.0f, +1.0f, -1.0f }, // REAR_R
-            { -1.0f, -1.0f, +1.0f }, // FRONT_R
-            { +1.0f, +1.0f, +1.0f }, // REAR_L
-            { +1.0f, -1.0f, -1.0f }, // FRONT_L
-        };
-
-    protected:
-
-        virtual axes_t getSpin(uint8_t k) override
+        static void fun(const demands_t & demands, float * motorvals)
         {
-            return m_spins[k];
+            static constexpr axes_t SPINS[4] = {
+                //  rol   pit    yaw
+                { -1.0f, +1.0f, -1.0f }, // REAR_R
+                { -1.0f, -1.0f, +1.0f }, // FRONT_R
+                { +1.0f, +1.0f, +1.0f }, // REAR_L
+                { +1.0f, -1.0f, -1.0f }, // FRONT_L
+            };
+
+            FixedPitchMixer::fun(demands, 4, SPINS, motorvals);
         }
 
     public:
 
-        QuadXbfMixer(void) 
-            : FixedPitchMixer(4)
+        static Mixer make(void)
         {
+            return Mixer(4, fun);
         }
 };
+
+
