@@ -24,6 +24,7 @@
 
 #include "hackflight.h"
 #include "imu.h"
+#include "motor.h"
 #include "msp.h"
 #include "receiver.h"
 
@@ -42,7 +43,7 @@ class Task {
             Imu::fusion_t    imuFusionPrev;
             float            maxArmingAngle;
             Msp              msp;
-            float            mspMotors[4];
+            float            mspMotors[MAX_SUPPORTED_MOTORS];
             bool             pidReset;
             Receiver::axes_t rxAxes;
             vehicle_state_t  vstate;
