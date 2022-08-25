@@ -18,13 +18,29 @@
 
 #pragma once
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+    void     imuDevInit(uint8_t interruptPin);
+    uint32_t imuDevGyroInterruptCount(void);
+    bool     imuDevGyroIsReady(void);
+    uint32_t imuDevGyroSyncTime(void);
+    int16_t  imuDevReadRawGyro(uint8_t k);
+    uint16_t imuDevScaleGyro(void);
+
+#if defined(__cplusplus)
+}
+#endif
+
+#if defined(__cplusplus)
+
 #include "arming.h"
 #include "clock.h"
 #include "constrain.h"
 #include "datatypes.h"
 #include "filters/pt1.h"
 #include "imu.h"
-#include "imu_device.h"
 #include "stats.h"
 #include "system.h"
 #include "time.h"
@@ -240,3 +256,7 @@ class Imu {
             return skew;
         }
 };
+
+#endif
+
+

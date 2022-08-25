@@ -22,7 +22,6 @@
 
 #include <constrain.h>
 #include <imus/fusion.h>
-#include <imu_device.h>
 #include <system.h>
 #include <time.h>
 

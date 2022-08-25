@@ -21,7 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include <constrain.h>
-#include <imu_device.h>
+#include <imu.h>
 #include <system.h>
 #include <time.h>
 

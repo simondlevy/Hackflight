@@ -112,6 +112,4 @@ class Led {
         virtual void devSet(bool on) = 0;
 
         virtual void devToggle(void) = 0;
-
-
 };
