@@ -433,7 +433,7 @@ class MpuImu : public FusionImu {
 
         virtual uint32_t devGyroSyncTime(void) override
         {
-            return 0;
+            return m_gyroDev.gyroSyncEXTI;
         }
 
         virtual void devInit(uint8_t interruptPin) override
