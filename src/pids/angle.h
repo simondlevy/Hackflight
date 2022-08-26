@@ -22,7 +22,6 @@
 #include <math.h>
 
 #include "clock.h"
-#include "datatypes.h"
 #include "../filters/pt1.h"
 #include "../filters/pt2.h"
 #include "constrain.h"
@@ -321,7 +320,7 @@ class AnglePidController : public PidController {
         virtual void update(
                 const uint32_t currentTimeUs,
                 Demands * demands,
-                const vehicle_state_t & vstate,
+                const State & vstate,
                 const bool reset) override
         {
             // gradually scale back integration when above windup point

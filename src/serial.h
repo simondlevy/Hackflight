@@ -21,7 +21,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "datatypes.h"
 #include "time.h"
 
 typedef enum {

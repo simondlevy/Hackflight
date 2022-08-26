@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include "datatypes.h"
 #include "timer.h"
 
 typedef enum {

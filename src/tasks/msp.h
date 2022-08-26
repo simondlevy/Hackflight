@@ -34,7 +34,7 @@ class MspTask : public Task {
 
             data->msp.update(
                     &data->vstate,
-                    &data->rxAxes,
+                    &data->rxSticks,
                     data->arming.isArmed(),
                     data->motorDevice,
                     data->mspMotors);

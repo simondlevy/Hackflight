@@ -19,17 +19,71 @@
 
 #pragma once
 
-typedef struct {
-    float x;
-    float dx;
-    float y;
-    float dy;
-    float z;
-    float dz;
-    float phi;
-    float dphi;
-    float theta;
-    float dtheta;
-    float psi;
-    float dpsi;
-} vehicle_state_t;
+class State {
+
+    public:
+
+        float x;
+        float dx;
+        float y;
+        float dy;
+        float z;
+        float dz;
+        float phi;
+        float dphi;
+        float theta;
+        float dtheta;
+        float psi;
+        float dpsi;
+
+        State(
+                float _x,
+                float _dx,
+                float _y,
+                float _dy,
+                float _z,
+                float _dz,
+                float _phi,
+                float _dphi,
+                float _theta,
+                float _dtheta,
+                float _psi,
+                float _dpsi
+             )
+
+        {
+            x = _x;
+            dx = _dx;
+            y = _y;
+            dy = _dy;
+            z = _z;
+            dz = _dz;
+            phi = _phi;
+            dphi = _dphi;
+            theta = _theta;
+            dtheta = _dtheta;
+            psi = _psi;
+            dpsi = _dpsi;
+        }
+
+        State(void)
+            : State(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        {
+        }
+
+        State(const State & state)
+        {
+            x = state.x;
+            dx = state.dx;
+            y = state.y;
+            dy = state.dy;
+            z = state.z;
+            dz = state.dz;
+            phi = state.phi;
+            dphi = state.dphi;
+            theta = state.theta;
+            dtheta = state.dtheta;
+            psi = state.psi;
+            dpsi = state.dpsi;
+        }
+};

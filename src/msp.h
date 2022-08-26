@@ -20,8 +20,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdbool.h>
 
-#include "datatypes.h"
 #include "debug.h"
+#include "imu.h"
 #include "maths.h"
 #include "receiver.h"
 #include "state.h"
@@ -135,8 +135,8 @@ class Msp {
                 mspPacket_t *cmd,
                 mspPacket_t *reply,
                 mspPostProcessFnPtr *mspPostProcessFn,
-                vehicle_state_t * vstate,
-                Receiver::axes_t * rxax,
+                State * vstate,
+                Receiver::sticks_t * rxax,
                 void * motorDevice,
                 float * motors);
 
@@ -194,8 +194,8 @@ class Msp {
         static bool processOutCommand(
                 int16_t cmdMSP,
                 sbuf_t *dst,
-                vehicle_state_t * vstate,
-                Receiver::axes_t * rxax)
+                State * vstate,
+                Receiver::sticks_t * rxax)
         {
             bool unsupportedCommand = false;
 
@@ -253,8 +253,8 @@ class Msp {
                 mspPacket_t *cmd,
                 mspPacket_t *reply,
                 mspPostProcessFnPtr *mspPostProcessFn,
-                vehicle_state_t * vstate,
-                Receiver::axes_t * rxax,
+                State * vstate,
+                Receiver::sticks_t * rxax,
                 void * motorDevice,
                 float * motors) {
 
@@ -428,8 +428,8 @@ class Msp {
         static mspPostProcessFnPtr serialProcessReceivedCommand(
                 mspPort_t *msp,
                 mspProcessCommandFnPtr mspProcessCommandFn,
-                vehicle_state_t * vstate,
-                Receiver::axes_t * rxax,
+                State * vstate,
+                Receiver::sticks_t * rxax,
                 void * motorDevice,
                 float * motors)
         {
@@ -532,14 +532,14 @@ class Msp {
         }
 
         void update(
-                vehicle_state_t * vstate,
-                Receiver::axes_t *rxaxes,
+                State * vstate,
+                Receiver::sticks_t *rxsticks,
                 bool armed,
                 void * motorDevice,
                 float * motors)
         {
             (void)vstate;
-            (void)rxaxes;
+            (void)rxsticks;
             (void)armed;
             (void)motorDevice;
             (void)motors;
@@ -580,7 +580,7 @@ class Msp {
                                             mspPort,
                                             fcProcessCommand,
                                             vstate,
-                                            rxaxes,
+                                            rxsticks,
                                             motorDevice,
                                             motors);
                             } else if (mspPort->packetType == PACKET_REPLY) {

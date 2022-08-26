@@ -22,7 +22,6 @@
 
 #include <alignment/rotate270.h>
 #include <clock.h>
-#include <datatypes.h>
 #include <hackflight.h>
 #include <imus/fusion.h>
 #include <mixers/fixedpitch/quadxbf.h>

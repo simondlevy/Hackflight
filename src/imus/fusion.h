@@ -22,9 +22,8 @@
 
 #include "arming.h"
 #include "clock.h"
-#include "datatypes.h"
-#include "state.h"
 #include "imu.h"
+#include "state.h"
 #include "maths.h"
 
 class FusionImu : public Imu {
@@ -73,7 +72,7 @@ class FusionImu : public Imu {
             return res;
         }
 
-        static void quat2euler(Imu::quaternion_t * quat, vehicle_state_t * state, Imu::rotation_t * rot)
+        static void quat2euler(Imu::quaternion_t * quat, State * state, Imu::rotation_t * rot)
         {
             float qw = quat->w;
             float qx = quat->x;
@@ -110,11 +109,11 @@ class FusionImu : public Imu {
         }
 
         typedef struct {
-            axes_t values;
+            Imu::axes_t values;
             uint32_t count;
         } imu_sensor_t;
 
-        static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
+        static void getAverage(imu_sensor_t * sensor, uint32_t period, Imu::axes_t * avg)
         {
             uint32_t denom = sensor->count * period;
 
@@ -125,7 +124,7 @@ class FusionImu : public Imu {
 
         static void mahony(
                 float dt,
-                axes_t * gyro,
+                Imu::axes_t * gyro,
                 Imu::quaternion_t * quat_old,
                 Imu::quaternion_t * quat_new)
         {
@@ -165,7 +164,7 @@ class FusionImu : public Imu {
         {
             int32_t deltaT = time - fusionPrev->time;
 
-            axes_t gyroAvg = {};
+            Imu::axes_t gyroAvg = {};
             getAverage(&m_accum, Clock::PERIOD(), &gyroAvg);
 
             float dt = deltaT * 1e-6;
@@ -192,7 +191,7 @@ class FusionImu : public Imu {
 
         virtual void accumulateGyro(float gx, float gy, float gz) override
         {
-            static axes_t _adcf;
+            static Imu::axes_t _adcf;
 
             // integrate using trapezium rule to avoid bias
             m_accum.values.x += 0.5f * (_adcf.x + gx) * Clock::PERIOD();
@@ -210,7 +209,7 @@ class FusionImu : public Imu {
                 Imu::fusion_t * fusionPrev,
                 Arming * arming,
                 uint32_t time,
-                vehicle_state_t * vstate) override
+                State * vstate) override
         {
             Imu::quaternion_t quat = {};
             getQuaternion(arming, fusionPrev, time, &quat);

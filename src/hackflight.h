@@ -261,7 +261,7 @@ class Hackflight {
 
         static auto step(
                 const Demands & stickDemands,
-                const vehicle_state_t & vstate,
+                const State & state,
                 PidController * pidControllers[],
                 const uint8_t pidCount,
                 const bool pidReset,
@@ -273,7 +273,7 @@ class Hackflight {
 
             // Run PID controllers to get new demands
             for (uint8_t k=0; k<pidCount; ++k) {
-                pidControllers[k]->update(usec, &demands, vstate, pidReset);
+                pidControllers[k]->update(usec, &demands, state, pidReset);
             }
 
             // Constrain demands

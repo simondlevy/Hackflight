@@ -27,6 +27,7 @@
    with Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "imu.h"
 #include "mixers/fixedpitch.h"
 #include "motors/quad.h"
 
@@ -36,7 +37,7 @@ class QuadXbfMixer {
 
         static auto fun(const Demands & demands) -> Motors
         {
-            static constexpr axes_t SPINS[4] = {
+            static constexpr Imu::axes_t SPINS[4] = {
                 //  rol   pit    yaw
                 { -1.0f, +1.0f, -1.0f }, // REAR_R
                 { -1.0f, -1.0f, +1.0f }, // FRONT_R

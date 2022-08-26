@@ -34,19 +34,19 @@ class Task {
 
         typedef struct {
 
-            Imu *            imu;
-            void *           motorDevice;
-            Receiver *       receiver;
+            Imu *              imu;
+            void *             motorDevice;
+            Receiver *         receiver;
 
-            Arming           arming;
-            Failsafe         failsafe;
-            Imu::fusion_t    imuFusionPrev;
-            float            maxArmingAngle;
-            Msp              msp;
-            float            mspMotors[MAX_SUPPORTED_MOTORS];
-            bool             pidReset;
-            Receiver::axes_t rxAxes;
-            vehicle_state_t  vstate;
+            Arming             arming;
+            Failsafe           failsafe;
+            Imu::fusion_t      imuFusionPrev;
+            float              maxArmingAngle;
+            Msp                msp;
+            float              mspMotors[MAX_SUPPORTED_MOTORS];
+            bool               pidReset;
+            Receiver::sticks_t rxSticks;
+            State              vstate;
 
         } data_t;
 

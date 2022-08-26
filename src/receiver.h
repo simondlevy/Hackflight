@@ -22,7 +22,6 @@
 
 #include "arming.h"
 #include "clock.h"
-#include "datatypes.h"
 #include "demands.h"
 #include "filters/pt3.h"
 #include "constrain.h"
@@ -42,7 +41,7 @@ class Receiver {
         Demands demands;
         float aux1;
         float aux2;
-    } axes_t;
+    } sticks_t;
 
     typedef enum {
         FRAME_PENDING = 0,
@@ -806,7 +805,7 @@ class Receiver {
             uint32_t currentTimeUs,
             bool imuIsLevel,
             bool calibrating,
-            axes_t * rxax,
+            sticks_t * sticks,
             void * motorDevice,
             Arming * arming,
             Failsafe * failsafe,
@@ -858,12 +857,12 @@ class Receiver {
                 break;
         }
 
-        rxax->demands.throttle = m_raw[THROTTLE];
-        rxax->demands.roll     = m_raw[ROLL];
-        rxax->demands.pitch    = m_raw[PITCH];
-        rxax->demands.yaw      = m_raw[YAW];
-        rxax->aux1             = m_raw[AUX1];
-        rxax->aux2             = m_raw[AUX2];
+        sticks->demands.throttle = m_raw[THROTTLE];
+        sticks->demands.roll     = m_raw[ROLL];
+        sticks->demands.pitch    = m_raw[PITCH];
+        sticks->demands.yaw      = m_raw[YAW];
+        sticks->aux1             = m_raw[AUX1];
+        sticks->aux2             = m_raw[AUX2];
 
         *gotNewData = m_gotNewData;
 

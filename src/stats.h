@@ -18,9 +18,8 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <math.h>
-
-#include "datatypes.h"
 
 class Stats {
 

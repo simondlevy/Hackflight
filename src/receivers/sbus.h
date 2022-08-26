@@ -21,7 +21,6 @@
 
 #include <stdlib.h>
 
-#include "datatypes.h"
 #include "receiver.h"
 #include "serial.h"
 #include "time.h"

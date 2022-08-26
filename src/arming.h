@@ -21,7 +21,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "datatypes.h"
 #include "led.h"
 #include "motors.h"
 #include "sticks.h"
@@ -114,10 +113,7 @@ class Arming {
         return m_is_armed;
     }
 
-    void updateStatus(
-            float raw[],
-            bool imuIsLevel,
-            bool calibrating) 
+    void updateStatus( float raw[], bool imuIsLevel, bool calibrating)
     {
         if (m_is_armed) {
             m_led->set(true);

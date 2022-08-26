@@ -21,7 +21,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "datatypes.h"
 #include "time.h"
 
 #define MAX_SUPPORTED_MOTORS 8

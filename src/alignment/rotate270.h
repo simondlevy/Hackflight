@@ -21,9 +21,9 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "datatypes.h"
+#include "imu.h"
 
-static void imuRotate270(axes_t * axes)
+static void imuRotate270(Imu::axes_t * axes)
 {
     float x = axes->x;
     float y = axes->y;

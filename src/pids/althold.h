@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "datatypes.h"
+#include "pid.h"
 
 class AltHoldPidController : public PidController {
     
@@ -61,7 +61,7 @@ class AltHoldPidController : public PidController {
         virtual void update(
                 const uint32_t currentTimeUs,
                 Demands * demands,
-                const vehicle_state_t & vstate,
+                const State & vstate,
                 const bool reset) override
         {
             (void)currentTimeUs;

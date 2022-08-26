@@ -38,7 +38,6 @@ extern "C" {
 #include "arming.h"
 #include "clock.h"
 #include "constrain.h"
-#include "datatypes.h"
 #include "state.h"
 #include "filters/pt1.h"
 #include "imu.h"
@@ -139,6 +138,12 @@ class Imu {
     public:
 
         typedef struct {
+            float x;
+            float y;
+            float z;
+        } axes_t;
+
+        typedef struct {
             float w;
             float x;
             float y;
@@ -177,14 +182,14 @@ class Imu {
                 fusion_t * fusionPrev,
                 Arming * arming,
                 uint32_t time,
-                vehicle_state_t * vstate) = 0;
+                State * vstate) = 0;
 
         void begin(void)
         {
             imuDevInit(m_interruptPin);
         }
 
-        void readScaledGyro(Imu * imu, Imu::align_fun align, vehicle_state_t * vstate)
+        void readScaledGyro(Imu * imu, Imu::align_fun align, State * vstate)
         {
             if (!imuDevGyroIsReady()) return;
 

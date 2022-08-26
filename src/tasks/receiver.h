@@ -20,7 +20,6 @@
 
 #include <string.h>
 
-#include "datatypes.h"
 #include "task.h"
 #include "../receiver.h"
 
@@ -58,7 +57,7 @@ class ReceiverTask : public Task {
             bool pidItermResetReady = false;
             bool pidItermResetValue = false;
 
-            Receiver::axes_t rxax = {{0, 0, 0, 0}, 0, 0};
+            Receiver::sticks_t rxsticks = {{0, 0, 0, 0}, 0, 0};
 
             bool gotNewData = false;
 
@@ -70,7 +69,7 @@ class ReceiverTask : public Task {
                     usec,
                     imuIsLevel, 
                     calibrating,
-                    &rxax,
+                    &rxsticks,
                     data->motorDevice,
                     &data->arming,
                     &data->failsafe,
@@ -83,12 +82,12 @@ class ReceiverTask : public Task {
             }
 
             if (gotNewData) {
-                data->rxAxes.demands.throttle = rxax.demands.throttle;
-                data->rxAxes.demands.roll = rxax.demands.roll;
-                data->rxAxes.demands.pitch = rxax.demands.pitch;
-                data->rxAxes.demands.yaw = rxax.demands.yaw;
-                data->rxAxes.aux1 = rxax.aux1;
-                data->rxAxes.aux2 = rxax.aux2;
+                data->rxSticks.demands.throttle = rxsticks.demands.throttle;
+                data->rxSticks.demands.roll = rxsticks.demands.roll;
+                data->rxSticks.demands.pitch = rxsticks.demands.pitch;
+                data->rxSticks.demands.yaw = rxsticks.demands.yaw;
+                data->rxSticks.aux1 = rxsticks.aux1;
+                data->rxSticks.aux2 = rxsticks.aux2;
             }
         }
 };
