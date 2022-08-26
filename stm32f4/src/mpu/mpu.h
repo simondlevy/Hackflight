@@ -14,8 +14,10 @@
    Hackflight. If not, see <https:
  */
 
+#include "time.h"
 #include "bus_spi.h"
 #include "devices.h"
+#include "nvic.h"
 
 class MpuImu : public FusionImu {
 
@@ -180,7 +182,7 @@ class MpuImu : public FusionImu {
 
         typedef struct gyroDeviceConfig_s {
             int8_t index;
-            uint8_t busType;
+            busType_e busType;
             uint8_t spiBus;
             ioTag_t csnTag;
             uint8_t i2cBus;
@@ -335,5 +337,65 @@ class MpuImu : public FusionImu {
             return false;
         }
 
+        void preInit(gyroDeviceConfig_t * config)
+        {
+            spiPreinitRegister(config->csnTag, IOCFG_IPU, 1);
+        }
+
+        bool detect(gyroDev_t *gyro, const gyroDeviceConfig_t *config)
+        {
+            static busDevice_t bus;
+            gyro->dev.bus = &bus;
+
+            // MPU datasheet specifies 30ms.
+            delayMillis(35);
+
+            if (config->busType == BUS_TYPE_NONE) {
+                return false;
+            }
+
+            if (config->busType == BUS_TYPE_GYRO_AUTO) {
+                gyro->dev.bus->busType = BUS_TYPE_I2C;
+            } else {
+                gyro->dev.bus->busType = config->busType;
+            }
+
+            gyro->dev.bus->busType = BUS_TYPE_SPI;
+
+            return detectSPISensorsAndUpdateDetectionResult(gyro, config);
+        }
+
+        void gyroInit(gyroDev_t *gyro)
+        {
+            if (gyro->mpuIntExtiTag == IO_TAG_NONE) {
+                return;
+            }
+
+            const IO_t mpuIntIO = IOGetByTag(gyro->mpuIntExtiTag);
+
+            IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
+            EXTIHandlerInit(&gyro->exti, intExtiHandler);
+            EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
+                    BETAFLIGHT_EXTI_TRIGGER_RISING);
+            EXTIEnable(mpuIntIO, true);
+        }
+
+        uint8_t gyroDLPF(gyroDev_t *gyro)
+        {
+            (void)gyro;
+            return 0;
+        }
+
+        uint8_t gyroReadRegister(const extDevice_t *dev, uint8_t reg)
+        {
+            uint8_t data;
+            const bool ack = busReadRegisterBuffer(dev, reg, &data, 1);
+            if (ack) {
+                return data;
+            } else {
+                return 0;
+            }
+
+        }
 
 };  // class MpuImu

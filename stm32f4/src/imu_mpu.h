@@ -268,7 +268,7 @@ typedef enum {
 
 typedef struct gyroDeviceConfig_s {
     int8_t index;
-    uint8_t busType;
+    busType_e busType;
     uint8_t spiBus;
     ioTag_t csnTag;
     uint8_t i2cBus;

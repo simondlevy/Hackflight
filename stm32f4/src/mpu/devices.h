@@ -70,30 +70,32 @@ typedef struct fp_rotationMatrix_s {
 } fp_rotationMatrix_t;
 
 typedef struct gyroDev_s {
-    sensorGyroInitFuncPtr initFn;                             // initialize function
-    sensorGyroReadFuncPtr readFn;                             // read 3 axis data function
-    sensorGyroReadDataFuncPtr temperatureFn;                  // read temperature if available
-    extiCallbackRec_t exti;
-    extDevice_t dev;
-    uint16_t scaleDps;
-    int16_t adcRaw[3];                                       // raw data from sensor
-    int16_t temperature;
-    mpuDetectionResult_t mpuDetectionResult;
-    uint32_t detectedEXTI;
-    uint32_t gyroLastEXTI;
-    uint32_t gyroSyncEXTI;
-    int32_t gyroShortPeriod;
-    int32_t gyroDmaMaxDuration;
-    busSegment_t segments[2];
-    volatile bool dataReady;
-    uint8_t hardware_lpf;
-    uint8_t hardware_32khz_lpf;
-    ioTag_t mpuIntExtiTag;
-    uint8_t gyroHasOverflowProtection;
-    gyroHardware_e gyroHardware;
-    fp_rotationMatrix_t rotationMatrix;
-    uint16_t gyroSampleRateHz;
-    uint16_t accSampleRateHz;
+
+    uint16_t                  accSampleRateHz;
+    int16_t                   adcRaw[3];                          
+    uint32_t                  detectedEXTI;
+    volatile bool             dataReady;
+    extDevice_t               dev;
+    extiCallbackRec_t         exti;
+    fp_rotationMatrix_t       rotationMatrix;
+    int32_t                   gyroDmaMaxDuration;
+    gyroHardware_e            gyroHardware;
+    uint8_t                   gyroHasOverflowProtection;
+    uint32_t                  gyroLastEXTI;
+    uint16_t                  gyroSampleRateHz;
+    int32_t                   gyroShortPeriod;
+    uint32_t                  gyroSyncEXTI;
+    uint8_t                   hardware_32khz_lpf;
+    uint8_t                   hardware_lpf;
+    sensorGyroInitFuncPtr     initFn;                  
+    mpuDetectionResult_t      mpuDetectionResult;
+    ioTag_t                   mpuIntExtiTag;
+    sensorGyroReadFuncPtr     readFn;                 
+    uint16_t                  scaleDps;
+    busSegment_t              segments[2];
+    int16_t                   temperature;
+    sensorGyroReadDataFuncPtr temperatureFn;     
+
 } gyroDev_t;
 
 typedef struct accDev_s {
