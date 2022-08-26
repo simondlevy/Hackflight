@@ -117,7 +117,6 @@ class MpuImu : public FusionImu {
         static const uint8_t RA_SIGNAL_PATH_RESET       = 0x68;
         static const uint8_t RA_MOT_DETECT_CTRL         = 0x69;
         static const uint8_t RA_USER_CTRL               = 0x6A;
-        static const uint8_t RA_PWR_MGMT_1              = 0x6B;
         static const uint8_t RA_PWR_MGMT_2              = 0x6C;
         static const uint8_t RA_BANK_SEL                = 0x6D;
         static const uint8_t RA_MEM_START_ADDR          = 0x6E;
@@ -195,6 +194,8 @@ class MpuImu : public FusionImu {
         } gyroDeviceConfig_t;
 
     protected:
+
+        static const uint8_t RA_PWR_MGMT_1              = 0x6B;
 
         MpuImu(uint8_t interruptPin) 
             : FusionImu(interruptPin)
