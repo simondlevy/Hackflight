@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "bus_spi.h"
 #include "mpu.h"
 
 class Mpu6000Imu : public MpuImu {
@@ -97,10 +98,10 @@ class Mpu6000Imu : public MpuImu {
             (void)dev;
 
             mpuSensor_e detectedSensor = MPU_NONE;
-            /*
-            spiSetClkDivisor(dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
 
-            // reset the device configuration
+            spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
+
+            /*            // reset the device configuration
             spiWriteReg(dev, MPU_RA_PWR_MGMT_1, BIT_H_RESET);
             delay(100);  // datasheet specifies a 100ms delay after reset
 
