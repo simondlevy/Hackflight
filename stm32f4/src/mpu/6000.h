@@ -168,6 +168,7 @@ class Mpu6000Imu : public MpuImu {
             return true;
         }
 
+
         virtual bool readAcc(accDev_t * acc) override
         {
             (void)acc;
@@ -179,6 +180,12 @@ class Mpu6000Imu : public MpuImu {
             (void)gyro;
             return false;
         }
+
+        virtual void init(gyroDev_t *gyro) override
+        {
+            (void)gyro;
+        }
+
 
     public:
 
