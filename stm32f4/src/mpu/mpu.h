@@ -232,4 +232,21 @@ class MpuImu : public FusionImu {
             return true;
         }
 
+        bool mpuGyroRead(gyroDev_t *gyro)
+        {
+            uint8_t data[6];
+
+            const bool ack = busReadRegisterBuffer(&gyro->dev, RA_GYRO_XOUT_H, data, 6);
+            if (!ack) {
+                return false;
+            }
+
+            gyro->adcRaw[0] = (int16_t)((data[0] << 8) | data[1]);
+            gyro->adcRaw[1] = (int16_t)((data[2] << 8) | data[3]);
+            gyro->adcRaw[2] = (int16_t)((data[4] << 8) | data[5]);
+
+            return true;
+        }
+
+
 };  // class MpuImu
