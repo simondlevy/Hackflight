@@ -398,4 +398,7 @@ class MpuImu : public FusionImu {
 
         }
 
+        accDev_t  m_accelDev;
+        gyroDev_t m_gyroDev;
+
 };  // class MpuImu
