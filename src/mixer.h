@@ -20,6 +20,7 @@
 
 #include "datatypes.h"
 #include "demands.h"
+#include "motors.h"
 
 class Mixer {
 
@@ -47,5 +48,34 @@ class Mixer {
         void run(const Demands & demands, float * motorvals)
         {
             m_fun(demands, motorvals);
+        }
+};
+
+class NewMixer {
+
+    private:
+
+        typedef Motors (*mixerFun_t)(const Demands & demands);
+
+        uint8_t m_motorCount;
+
+        mixerFun_t m_fun;
+
+    public:
+
+        NewMixer(uint8_t motorCount, mixerFun_t fun)
+        {
+            m_motorCount = motorCount;
+            m_fun = fun;
+        }
+
+        uint8_t getMotorCount(void)
+        {
+            return m_motorCount;
+        }
+
+        auto run(const Demands & demands) -> Motors
+        {
+            return m_fun(demands);
         }
 };
