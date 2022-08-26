@@ -182,14 +182,17 @@ class Mpu6000Imu : public MpuImu {
         {
             MpuImu::gyroInit(gyro);
 
-               spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
+               spiSetClkDivisor
+                   (&gyro->dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
 
-            // Device was already reset during detection so proceed with configuration
+            // Device was already reset during detection so proceed with
+            // configuration
+
+            // Clock Source PPL with Z axis gyro reference
+            spiWriteReg(&gyro->dev, RA_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
+            delayMicroseconds(15);
 
             /*
-            // Clock Source PPL with Z axis gyro reference
-            spiWriteReg(&gyro->dev, MPU_RA_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
-            delayMicroseconds(15);
 
             // Disable Primary I2C Interface
             spiWriteReg(&gyro->dev, MPU_RA_USER_CTRL, BIT_I2C_IF_DIS);
