@@ -240,24 +240,19 @@ class Hackflight {
 
         } // checkDyanmicTasks
 
-        static float constrain_demand(float demand, float limit, float scaling)
+        static float constrain_demand(const float demand, const float limit)
         {
-            return constrain_f(demand, -limit, +limit) / scaling;
+            return constrain_f(demand, -limit, +limit) / PID_MIXER_SCALING;
         }
 
         static void constrain_demands(demands_t * demands)
         {
-            demands->roll  = constrain_demand(
-                    demands->roll, PIDSUM_LIMIT, PID_MIXER_SCALING);
+            demands->roll  = constrain_demand(demands->roll, PIDSUM_LIMIT);
 
-            demands->pitch =
-                constrain_demand(
-                        demands->pitch, PIDSUM_LIMIT, PID_MIXER_SCALING);
+            demands->pitch = constrain_demand(demands->pitch, PIDSUM_LIMIT);
 
             // Negate yaw to make it agree with PID
-            demands->yaw   =
-                -constrain_demand(
-                        demands->yaw, PIDSUM_LIMIT_YAW, PID_MIXER_SCALING);
+            demands->yaw   = -constrain_demand(demands->yaw, PIDSUM_LIMIT_YAW);
         }
 
     public:
