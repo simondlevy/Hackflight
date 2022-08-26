@@ -36,9 +36,6 @@ typedef struct spiPreinit_s {
 static spiPreinit_t spiPreinitArray[SPI_PREINIT_COUNT];
 static int spiPreinitCount = 0;
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
 void spiPreinitRegister(ioTag_t iotag, uint8_t iocfg, bool init)
 {
     if (!iotag) {
@@ -91,7 +88,3 @@ void spiPreinitByTag(ioTag_t tag)
 {
     spiPreinitByIO(IOGetByTag(tag));
 }
-
-#if defined (__cplusplus)
-}
-#endif

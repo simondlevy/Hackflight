@@ -341,7 +341,7 @@ class MpuImu : public FusionImu {
         void preInit(gyroDeviceConfig_t * config)
         {
             (void)config;
-            //spiPreinitRegister(config->csnTag, IOCFG_IPU, 1);
+            spiPreinitRegister(config->csnTag, IOCFG_IPU, 1);
         }
 
         bool detect(gyroDev_t *gyro, const gyroDeviceConfig_t *config)
