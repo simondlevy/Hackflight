@@ -36,6 +36,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 #include "systemdev.h"
 
+#include "gyro_container_of.h"
+
 // Need to see at least this many interrupts during initialisation to confirm EXTI connectivity
 #define GYRO_EXTI_DETECT_THRESHOLD 1000
 
@@ -47,7 +49,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
-    gyroDev_t *gyroDev = CONTAINER_OF(cb, gyroDev_t, exti);
+    gyroDev_t *gyroDev = gyroContainerOf(cb);
 
     // Ideally we'd use a time to capture such information, but unfortunately
     // the port used for EXTI interrupt does not have an associated timer

@@ -115,6 +115,7 @@ endif
 
 #include $(ROOT)/make/csource.mk
 STM32_SRC = \
+			gyro_container_of.c \
             imu_mpu6000.c \
             debug.c \
             dshot.c \
