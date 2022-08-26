@@ -107,16 +107,18 @@ class Mpu6000Imu : public MpuImu {
 
             // reset the device signal paths
             spiWriteReg(dev, RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
-            delayMillis(100);  // datasheet specifies a 100ms delay after signal path reset
 
-            /*            
+            // datasheet specifies a 100ms delay after signal path reset
+            delayMillis(100);  
 
             const uint8_t whoAmI = spiReadRegMsk(dev, RA_WHO_AM_I);
 
-            // Ensure CS high time is met which is violated on H7 without this delay
+            // Ensure CS high time is met which is violated on H7 without this
+            // delay
             delayMicroseconds(1); 
 
-            if (whoAmI == MPU6000_WHO_AM_I_CONST) {
+            if (whoAmI == WHO_AM_I_CONST) {
+
                 const uint8_t productID = spiReadRegMsk(dev, RA_PRODUCT_ID);
 
                 // look for a product ID we recognise
@@ -139,8 +141,8 @@ class Mpu6000Imu : public MpuImu {
                 }
             }
 
-            spiSetClkDivisor(dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
-            */
+            spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
+            
             return detectedSensor;
         }
 
