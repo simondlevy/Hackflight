@@ -46,7 +46,6 @@ class MpuImu : public FusionImu {
         static const uint8_t RA_ZG_OFFS_USRH     		= 0x17;    
         static const uint8_t RA_ZG_OFFS_USRL     		= 0x18;
         static const uint8_t RA_CONFIG           		= 0x1A;
-        static const uint8_t RA_ACCEL_CONFIG     		= 0x1C;
         static const uint8_t RA_FF_THR           		= 0x1D;
         static const uint8_t RA_FF_DUR           		= 0x1E;
         static const uint8_t RA_MOT_THR          		= 0x1F;
@@ -132,14 +131,6 @@ class MpuImu : public FusionImu {
             NUM_CLK
         };
 
-        enum accel_fsr_e {
-            INV_FSR_2G = 0,
-            INV_FSR_4G,
-            INV_FSR_8G,
-            INV_FSR_16G,
-            NUM_ACCEL_FSR
-        };
-
         enum icm_high_range_accel_fsr_e {
             ICM_HIGH_RANGE_FSR_4G = 0,
             ICM_HIGH_RANGE_FSR_8G,
@@ -173,6 +164,7 @@ class MpuImu : public FusionImu {
         static const uint8_t RA_PRODUCT_ID        = 0x0C;   
         static const uint8_t RA_SMPLRT_DIV        = 0x19;
         static const uint8_t RA_GYRO_CONFIG       = 0x1B;
+        static const uint8_t RA_ACCEL_CONFIG      = 0x1C;
         static const uint8_t RA_PWR_MGMT_1        = 0x6B;
         static const uint8_t RA_SIGNAL_PATH_RESET = 0x68;
         static const uint8_t RA_USER_CTRL         = 0x6A;
@@ -185,6 +177,14 @@ class MpuImu : public FusionImu {
             INV_FSR_1000DPS,
             INV_FSR_2000DPS,
             NUM_GYRO_FSR
+        };
+
+        enum accel_fsr_e {
+            INV_FSR_2G = 0,
+            INV_FSR_4G,
+            INV_FSR_8G,
+            INV_FSR_16G,
+            NUM_ACCEL_FSR
         };
 
         MpuImu(uint8_t interruptPin) 
