@@ -14,8 +14,18 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
-#include "imu_mpu.h"
+#include "gyro_container_of.h"
 
-gyroDev_t * gyroContainerOf(extiCallbackRec_t * cb);
+#define CONTAINER_OF(ptr, type, member)  ( __extension__ ({     \
+            const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
+            (type *)( (char *)__mptr - offsetof(type,member) );}))
+
+gyroDev_t * gyroContainerOf(extiCallbackRec_t * cb)
+{
+    return CONTAINER_OF(cb, gyroDev_t, exti);
+}
 

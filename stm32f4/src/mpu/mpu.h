@@ -14,26 +14,7 @@
    Hackflight. If not, see <https:
  */
 
-#include <math.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <constrain.h>
-#include <imus/fusion.h>
-#include <system.h>
-#include <time.h>
-
-#include "atomic.h"
-#include "bus.h"
-#include "bus_spi.h"
-#include "exti.h"
-#include "io.h"
-#include "macros.h"
-#include "nvic.h"
-#include "platform.h"
-#include "systemdev.h"
+#include "devices.h"
 
 class MpuImu : public FusionImu {
 
@@ -151,96 +132,6 @@ class MpuImu : public FusionImu {
         // reviewed id other gyro types are supported with SPI DMA.
         static const uint8_t GYRO_BUF_SIZE = 32;
 
-        typedef enum {
-            MPU_NONE,
-            MPU_3050,
-            MPU_60x0,
-            MPU_60x0_SPI,
-            MPU_65xx_I2C,
-            MPU_65xx_SPI,
-            MPU_9250_SPI,
-            ICM_20601_SPI,
-            ICM_20602_SPI,
-            ICM_20608_SPI,
-            ICM_20649_SPI,
-            ICM_20689_SPI,
-            ICM_42605_SPI,
-            ICM_42688P_SPI,
-            BMI_160_SPI,
-            BMI_270_SPI,
-            LSM6DSO_SPI,
-            L3GD20_SPI,
-        } mpuSensor_e;
-
-        typedef struct mpuDetectionResult_s {
-            mpuSensor_e sensor;
-        } mpuDetectionResult_t;
-
-        struct accDev_s;
-        typedef void (*sensorAccInitFuncPtr)(struct accDev_s *acc);
-        typedef bool (*sensorAccReadFuncPtr)(struct accDev_s *acc);
-
-        struct gyroDev_s;
-        typedef void (*sensorGyroInitFuncPtr)(struct gyroDev_s *gyro);
-        typedef bool (*sensorGyroReadFuncPtr)(struct gyroDev_s *gyro);
-        typedef bool (*sensorGyroReadDataFuncPtr)(
-                struct gyroDev_s *gyro, int16_t *data);
-
-        typedef enum {
-            GYRO_NONE = 0
-        } gyroHardware_e;
-
-        typedef enum {
-            GYRO_HARDWARE_LPF_NORMAL,
-            GYRO_HARDWARE_LPF_EXPERIMENTAL
-        } gyroHardwareLpf_e;
-
-        typedef struct fp_rotationMatrix_s {
-            float m[3][3];              
-        } fp_rotationMatrix_t;
-
-        typedef struct gyroDev_s {
-            sensorGyroInitFuncPtr initFn;                             
-            sensorGyroReadFuncPtr readFn;                             
-            sensorGyroReadDataFuncPtr temperatureFn;                  
-            extiCallbackRec_t exti;
-            extDevice_t dev;
-            uint16_t scaleDps;
-            int16_t adcRaw[3];                                       
-            int16_t temperature;
-            mpuDetectionResult_t mpuDetectionResult;
-            uint32_t detectedEXTI;
-            uint32_t gyroLastEXTI;
-            uint32_t gyroSyncEXTI;
-            int32_t gyroShortPeriod;
-            int32_t gyroDmaMaxDuration;
-            busSegment_t segments[2];
-            volatile bool dataReady;
-            uint8_t hardware_lpf;
-            uint8_t hardware_32khz_lpf;
-            ioTag_t mpuIntExtiTag;
-            uint8_t gyroHasOverflowProtection;
-            gyroHardware_e gyroHardware;
-            fp_rotationMatrix_t rotationMatrix;
-            uint16_t gyroSampleRateHz;
-            uint16_t accSampleRateHz;
-        } gyroDev_t;
-
-        typedef struct accDev_s {
-            sensorAccInitFuncPtr initFn;                              
-            sensorAccReadFuncPtr readFn;                              
-            uint16_t acc_1G;
-            int16_t ADCRaw[3];
-            mpuDetectionResult_t mpuDetectionResult;
-
-            bool dataReady;
-            gyroDev_t *gyro;
-            bool acc_high_fsr;
-            char revisionCode;                                      
-            uint8_t filler[2];
-            fp_rotationMatrix_t rotationMatrix;
-        } accDev_t;
-
         enum gyro_fsr_e {
             INV_FSR_250DPS = 0,
             INV_FSR_500DPS,
@@ -306,10 +197,11 @@ class MpuImu : public FusionImu {
 
         static void mpuIntExtiHandler(extiCallbackRec_t *cb)
         {
-            (void)cb;
-            
-            gyroDev_t *gyroDev = NULL; //CONTAINER_OF(cb, gyroDev_t, exti);
+            gyroDev_t *gyroDev = gyroContainerOf(cb);
 
+            (void)gyroDev;
+
+            /*
             // Ideally we'd use a time to capture such information, but
             // unfortunately the port used for EXTI interrupt does not have an
             // associated timer
@@ -324,6 +216,7 @@ class MpuImu : public FusionImu {
             gyroDev->gyroLastEXTI = nowCycles;
 
             gyroDev->detectedEXTI++;
+            */
            
         }
 

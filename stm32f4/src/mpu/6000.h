@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "imu_mpu.h"
+#include "mpu.h"
 
 class Mpu6000Imu : public MpuImu {
 

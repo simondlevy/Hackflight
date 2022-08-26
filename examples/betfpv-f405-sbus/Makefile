@@ -115,7 +115,7 @@ endif
 
 #include $(ROOT)/make/csource.mk
 STM32_SRC = \
-			gyro_container_of.c \
+			mpu_devices.c \
             imu_mpu6000.c \
             debug.c \
             dshot.c \
@@ -306,7 +306,7 @@ $(OBJECT_DIR)/main.o: main.cpp \
       $(HFSRC_DIR)/*/*.h \
       $(HFSRC_DIR)/mixers/*.h \
       $(HFSRC_DIR)/mixers/fixedpitch/*.h \
-      $(STM_SRC_DIR)/cpp_stm32f4/*.h
+      $(STM_SRC_DIR)/*/*.h
 	$(V1) $(call compile_cpp)
 
 define compile_c

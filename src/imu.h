@@ -261,7 +261,8 @@ class Imu {
 
             return skew;
         }
-};
+
+}; // class Imu
 
 #endif
 

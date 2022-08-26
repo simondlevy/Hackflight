@@ -28,7 +28,8 @@
 #include <receivers/sbus.h>
 #include <serial.h>
 
-#include <cpp_stm32f4/led.h>
+#include <mpu/6000.h>
+#include <led/led.h>
 
 #include "hardware_init.h"
 
