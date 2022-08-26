@@ -100,7 +100,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define MPU6000_REV_D9 0x59
 #define MPU6000_REV_D10 0x5A
 
-void mpu6000SpiGyroInit(gyroDev_t *gyro)
+static void mpu6000SpiGyroInit(gyroDev_t *gyro)
 {
     mpuGyroInit(gyro);
 
