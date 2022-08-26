@@ -232,8 +232,6 @@ uint8_t mpuGyroReadRegister(const extDevice_t *dev, uint8_t reg)
 
 }
 
-// Glue code ------------------------------------------------------------------
-
 static accDev_t accelDev;
 static gyroDev_t gyroDev;
 
@@ -242,16 +240,12 @@ static const mpuDetectionResult_t *gyroMpuDetectionResult(void)
     return &gyroDev.mpuDetectionResult;
 }
 
-bool accelIsReady(void)
-{
-    return accelDev.readFn(&accelDev);
-}
+// Device API -----------------------------------------------------------------
 
 float accelRead(uint8_t k) 
 {
     return accelDev.ADCRaw[k];
 }
-
 
 uint16_t imuDevScaleGyro(void)
 {
