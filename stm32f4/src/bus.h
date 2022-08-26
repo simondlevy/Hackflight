@@ -119,4 +119,11 @@ bool busReadRegisterBuffer(const extDevice_t *dev, uint8_t reg, uint8_t *data, u
 bool busReadRegisterBufferStart(const extDevice_t *dev, uint8_t reg, uint8_t *data, uint8_t length);
 uint8_t busReadRegister(const extDevice_t *dev, uint8_t reg);
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
 void busDeviceRegister(const extDevice_t *dev);
+
+#if defined(__cplusplus)
+}
+#endif

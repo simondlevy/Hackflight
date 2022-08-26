@@ -296,20 +296,13 @@ bool gyroSyncCheckUpdate(gyroDev_t *gyro)
     return ret;
 }
 
-uint16_t gyroSetSampleRate(gyroDev_t *gyro)
-{
-    gyro->accSampleRateHz = 1000;
-
-    return 8000;
-}
-
 void imuDevInit(uint8_t interruptPin)
 {
     (void)interruptPin;
 
     static gyroDeviceConfig_t gyroDeviceConfig; 
 
-    gyroDeviceConfig.busType = 2;
+    gyroDeviceConfig.busType = BUS_TYPE_SPI; // XXX pass from subclass
     gyroDeviceConfig.spiBus = 1;
     gyroDeviceConfig.csnTag = 20;
     gyroDeviceConfig.extiTag = 52;
@@ -326,7 +319,9 @@ void imuDevInit(uint8_t interruptPin)
 
     gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
-    gyroDev.gyroSampleRateHz = gyroSetSampleRate(&gyroDev);
+    gyroDev.accSampleRateHz = 1000;// XXX pass from subclass
+    gyroDev.gyroSampleRateHz = 8000;// XXX pass from subclass
+
     gyroDev.initFn(&gyroDev);
     
     accelDev.gyro = &gyroDev;

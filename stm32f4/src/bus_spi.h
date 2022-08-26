@@ -69,6 +69,10 @@ typedef enum SPIDevice {
 #define CHECK_SPI_RX_DATA_AVAILABLE(instance) LL_SPI_IsActiveFlag_RXNE(instance)
 #define SPI_RX_DATA_REGISTER(base) ((base)->DR)
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 void spiPreinitRegister(ioTag_t iotag, uint8_t iocfg, uint8_t init);
 void spiPreinitByIO(IO_t io);
 void spiPreinitByTag(ioTag_t tag);
@@ -142,3 +146,9 @@ void    spiPinConfigure(void);
 void    spiPreInit(void);
 bool    spiUseDMA(const extDevice_t *dev);
 bool    spiUseMOSI_DMA(const extDevice_t *dev);
+
+#if defined(__cplusplus)
+}
+#endif
+
+

@@ -210,6 +210,6 @@ bool gyroSyncCheckUpdate(gyroDev_t *gyro);
 uint16_t gyroSetSampleRate(gyroDev_t *gyro);
 
 // API for specific MPU sensor
-bool    mpuBusAccDetect(accDev_t *acc);
 uint8_t mpuBusDetect(const extDevice_t *dev);
+bool    mpuBusAccDetect(accDev_t *acc);
 bool    mpuBusGyroDetect(gyroDev_t *gyro);

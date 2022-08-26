@@ -92,7 +92,7 @@ class Mpu6000Imu : public MpuImu {
 
     protected:
 
-        virtual mpuSensor_e mpuBusDetect(const extDevice_t *dev) override
+        virtual mpuSensor_e busDetect(const extDevice_t *dev) override
         {
             (void)dev;
 
@@ -141,6 +141,40 @@ class Mpu6000Imu : public MpuImu {
             */
             return detectedSensor;
         }
+
+        virtual bool busAccDetect(accDev_t *acc) override
+        {
+            (void)acc;
+            /*
+            if (acc->mpuDetectionResult.sensor != MPU_60x0_SPI) {
+                return false;
+            }
+
+            acc->readFn = accReadSPI;
+
+            return true;
+            */
+            return false;
+        }
+
+        virtual bool busGyroDetect(gyroDev_t *gyro) override
+        {
+            (void)gyro;
+            /*
+            if (gyro->mpuDetectionResult.sensor != MPU_60x0_SPI) {
+                return false;
+            }
+
+            gyro->initFn = mpu6000SpiGyroInit;
+            gyro->readFn = mpuGyroReadSPI;
+            gyro->scaleDps = 2000;
+            gyro->gyroShortPeriod = systemClockMicrosToCycles(MPU6000_SHORT_THRESHOLD);
+
+            return true;
+            */
+            return false;
+        }
+
     public:
 
         Mpu6000Imu(uint8_t interruptPin) 

@@ -17,6 +17,7 @@
 #include "imus/fusion.h"
 
 #include "time.h"
+#include "bus.h"
 #include "bus_spi.h"
 #include "devices.h"
 #include "nvic.h"
@@ -305,8 +306,6 @@ class MpuImu : public FusionImu {
 
         typedef uint8_t (*gyroSpiDetectFn_t)(const extDevice_t *dev);
 
-        virtual mpuSensor_e mpuBusDetect(const extDevice_t *dev) = 0;
-
         bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro,
                 const gyroDeviceConfig_t *config)
         {
@@ -326,7 +325,7 @@ class MpuImu : public FusionImu {
             // It is hard to use hardware to optimize the detection loop here,
             // as hardware type and detection function name doesn't match.
             // May need a bitmap of hardware to detection function to do it right?
-            mpuSensor_e sensor = mpuBusDetect(&gyro->dev);
+            mpuSensor_e sensor = busDetect(&gyro->dev);
             if (sensor != MPU_NONE) {
                 gyro->mpuDetectionResult.sensor = sensor;
                 busDeviceRegister(&gyro->dev);
@@ -341,7 +340,8 @@ class MpuImu : public FusionImu {
 
         void preInit(gyroDeviceConfig_t * config)
         {
-            spiPreinitRegister(config->csnTag, IOCFG_IPU, 1);
+            (void)config;
+            //spiPreinitRegister(config->csnTag, IOCFG_IPU, 1);
         }
 
         bool detect(gyroDev_t *gyro, const gyroDeviceConfig_t *config)
@@ -408,6 +408,12 @@ class MpuImu : public FusionImu {
             return &m_gyroDev.mpuDetectionResult;
         }
 
+        virtual mpuSensor_e busDetect(const extDevice_t *dev) = 0;
+
+        virtual bool busAccDetect(accDev_t *acc) = 0;
+
+        virtual bool busGyroDetect(gyroDev_t *gyro) = 0;
+
     public:
 
         virtual uint32_t devGyroInterruptCount(void) override
@@ -440,6 +446,34 @@ class MpuImu : public FusionImu {
         {
             (void)interruptPin;
 
+            static gyroDeviceConfig_t gyroDeviceConfig; 
+
+            gyroDeviceConfig.busType = BUS_TYPE_SPI; // XXX pass from subclass
+            gyroDeviceConfig.spiBus = 1;
+            gyroDeviceConfig.csnTag = 20;
+            gyroDeviceConfig.extiTag = 52;
+
+            spiPreinitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
+
+            detect(&m_gyroDev, &gyroDeviceConfig);
+            busGyroDetect(&m_gyroDev);
+
+            // SPI DMA buffer required per device
+            static uint8_t gyroBuf1[GYRO_BUF_SIZE];
+            m_gyroDev.dev.txBuf = gyroBuf1;
+            m_gyroDev.dev.rxBuf = &gyroBuf1[GYRO_BUF_SIZE / 2];
+
+            m_gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
+
+            m_gyroDev.accSampleRateHz = 1000;// XXX pass from subclass
+            m_gyroDev.gyroSampleRateHz = 8000;// XXX pass from subclass
+
+            m_gyroDev.initFn(&m_gyroDev);
+
+            m_accelDev.gyro = &m_gyroDev;
+            m_accelDev.mpuDetectionResult = *gyroMpuDetectionResult();
+            m_accelDev.acc_high_fsr = false;
+            busAccDetect(&m_accelDev);
         }
 
         virtual uint16_t devScaleGyro(void) override
