@@ -16,6 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "bus_spi.h"
 #include "mpu.h"
+#include "time.h"
 
 class Mpu6000Imu : public MpuImu {
 
@@ -95,15 +96,15 @@ class Mpu6000Imu : public MpuImu {
 
         virtual mpuSensor_e busDetect(const extDevice_t *dev) override
         {
-            (void)dev;
-
             mpuSensor_e detectedSensor = MPU_NONE;
 
             spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
 
-            /*            // reset the device configuration
             spiWriteReg(dev, MPU_RA_PWR_MGMT_1, BIT_H_RESET);
-            delay(100);  // datasheet specifies a 100ms delay after reset
+            delayMillis(100);  // datasheet specifies a 100ms delay after reset
+
+            /*            
+            // reset the device configuration
 
             // reset the device signal paths
             spiWriteReg(dev, MPU_RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
