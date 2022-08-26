@@ -23,7 +23,6 @@
 #include <alignment/rotate270.h>
 #include <clock.h>
 #include <hackflight.h>
-#include <imus/fusion.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <receivers/sbus.h>
 #include <serial.h>
@@ -44,7 +43,7 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-    static FusionImu imu(0); // dummy value for IMU interrupt pin
+    static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
 
     static SbusReceiver receiver(SERIAL_PORT_USART3);
 

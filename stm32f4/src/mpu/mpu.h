@@ -14,6 +14,8 @@
    Hackflight. If not, see <https:
  */
 
+#include "imus/fusion.h"
+
 #include "time.h"
 #include "bus_spi.h"
 #include "devices.h"
@@ -405,5 +407,39 @@ class MpuImu : public FusionImu {
         {
             return &m_gyroDev.mpuDetectionResult;
         }
+
+    public:
+
+        virtual uint32_t devGyroInterruptCount(void) override
+        {
+            return 0;
+        }
+
+        virtual bool devGyroIsReady(void) override
+        {
+            return false;
+        }
+
+        virtual int16_t devReadRawGyro(uint8_t k) override
+        {
+            (void)k;
+            return 0;
+        }
+
+        virtual uint32_t devGyroSyncTime(void) override
+        {
+            return 0;
+        }
+
+        virtual void devInit(uint8_t interruptPin) override
+        {
+            (void)interruptPin;
+        }
+
+        virtual uint16_t devScaleGyro(void) override
+        {
+            return 0;
+        }
+
 
 };  // class MpuImu

@@ -90,6 +90,57 @@ class Mpu6000Imu : public MpuImu {
         static const uint8_t REV_D9 = 0x59;
         static const uint8_t REV_D10 = 0x5A;
 
+    protected:
+
+        virtual mpuSensor_e mpuBusDetect(const extDevice_t *dev) override
+        {
+            (void)dev;
+
+            mpuSensor_e detectedSensor = MPU_NONE;
+            /*
+            spiSetClkDivisor(dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
+
+            // reset the device configuration
+            spiWriteReg(dev, MPU_RA_PWR_MGMT_1, BIT_H_RESET);
+            delay(100);  // datasheet specifies a 100ms delay after reset
+
+            // reset the device signal paths
+            spiWriteReg(dev, MPU_RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
+            delay(100);  // datasheet specifies a 100ms delay after signal path reset
+
+
+            const uint8_t whoAmI = spiReadRegMsk(dev, MPU_RA_WHO_AM_I);
+
+            // Ensure CS high time is met which is violated on H7 without this delay
+            delayMicroseconds(1); 
+
+            if (whoAmI == MPU6000_WHO_AM_I_CONST) {
+                const uint8_t productID = spiReadRegMsk(dev, MPU_RA_PRODUCT_ID);
+
+                // look for a product ID we recognise
+
+                // verify product revision
+                switch (productID) {
+                    case MPU6000ES_REV_C4:
+                    case MPU6000ES_REV_C5:
+                    case MPU6000_REV_C4:
+                    case MPU6000_REV_C5:
+                    case MPU6000ES_REV_D6:
+                    case MPU6000ES_REV_D7:
+                    case MPU6000ES_REV_D8:
+                    case MPU6000_REV_D6:
+                    case MPU6000_REV_D7:
+                    case MPU6000_REV_D8:
+                    case MPU6000_REV_D9:
+                    case MPU6000_REV_D10:
+                        detectedSensor = MPU_60x0_SPI;
+                }
+            }
+
+            spiSetClkDivisor(dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
+            */
+            return detectedSensor;
+        }
     public:
 
         Mpu6000Imu(uint8_t interruptPin) 
