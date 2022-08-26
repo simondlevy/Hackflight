@@ -412,7 +412,7 @@ class MpuImu : public FusionImu {
 
         virtual uint32_t devGyroInterruptCount(void) override
         {
-            return 0;
+            return m_gyroDev.detectedEXTI;
         }
 
         virtual bool devGyroIsReady(void) override
