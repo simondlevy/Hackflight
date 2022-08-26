@@ -16,6 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "bus_spi.h"
 #include "mpu.h"
+#include "systemdev.h"
 #include "time.h"
 
 class Mpu6000Imu : public MpuImu {
@@ -220,7 +221,7 @@ class Mpu6000Imu : public MpuImu {
             spiWriteReg(&gyro->dev, RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
             delayMicroseconds(15);
 
-            spiSetClkDivisor(&gyro->dev,spiCalculateDivider(MAX_SPI_CLK_HZ));
+            spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
             delayMicroseconds(1);
 
             spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
@@ -231,15 +232,13 @@ class Mpu6000Imu : public MpuImu {
 
             spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
 
-            /*
-            mpuGyroRead(gyro);
+            gyroRead(gyro);
 
-            if (((int8_t)gyro->adcRaw[1]) == -1 && ((int8_t)gyro->adcRaw[0]) == -1) {
-            systemFailureMode(FAILURE_GYRO_INIT_FAILED);
+            if (((int8_t)gyro->adcRaw[1]) == -1 &&
+                    ((int8_t)gyro->adcRaw[0]) == -1) {
+                systemFailureMode(FAILURE_GYRO_INIT_FAILED);
             }
-             */
         }
-
 
     public:
 

@@ -56,6 +56,10 @@ typedef enum {
     BOOTLOADER_REQUEST_FLASH,
 } bootloaderRequestType_e;
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 // failure
 void systemIndicateFailure(failureMode_e mode, int repeatCount);
 void systemFailureMode(failureMode_e mode);
@@ -78,3 +82,7 @@ typedef void extiCallbackHandlerFunc(void);
 void delay(uint32_t ms);
 uint32_t micros(void);
 uint32_t millis(void);
+
+#if defined(__cplusplus)
+}
+#endif

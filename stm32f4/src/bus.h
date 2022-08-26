@@ -115,7 +115,6 @@ bool busRawReadRegisterBufferStart(const extDevice_t *dev, uint8_t reg, uint8_t 
 bool busWriteRegister(const extDevice_t *dev, uint8_t reg, uint8_t data);
 bool busWriteRegisterStart(const extDevice_t *dev, uint8_t reg, uint8_t data);
 // Read routines where the register is ORed with 0x80
-bool busReadRegisterBuffer(const extDevice_t *dev, uint8_t reg, uint8_t *data, uint8_t length);
 bool busReadRegisterBufferStart(const extDevice_t *dev, uint8_t reg, uint8_t *data, uint8_t length);
 uint8_t busReadRegister(const extDevice_t *dev, uint8_t reg);
 
@@ -123,7 +122,7 @@ uint8_t busReadRegister(const extDevice_t *dev, uint8_t reg);
 extern "C" {
 #endif
 void busDeviceRegister(const extDevice_t *dev);
-
+bool busReadRegisterBuffer(const extDevice_t *dev, uint8_t reg, uint8_t *data, uint8_t length);
 #if defined(__cplusplus)
 }
 #endif
