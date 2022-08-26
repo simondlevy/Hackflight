@@ -478,7 +478,7 @@ class MpuImu : public FusionImu {
 
         virtual uint16_t devScaleGyro(void) override
         {
-            return 0;
+            return m_gyroDev.scaleDps;
         }
 
 
