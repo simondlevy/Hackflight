@@ -217,21 +217,21 @@ class Mpu6000Imu : public MpuImu {
                     0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
             delayMicroseconds(15);
 
-            /*
             spiWriteReg(&gyro->dev, RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
             delayMicroseconds(15);
 
-            spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
+            spiSetClkDivisor(&gyro->dev,spiCalculateDivider(MAX_SPI_CLK_HZ));
             delayMicroseconds(1);
 
-            spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
+            spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
 
             // Accel and Gyro DLPF Setting
             spiWriteReg(&gyro->dev, MPU6000_CONFIG, 0); // no gyro DLPF
             delayMicroseconds(1);
 
-            spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
+            spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
 
+            /*
             mpuGyroRead(gyro);
 
             if (((int8_t)gyro->adcRaw[1]) == -1 && ((int8_t)gyro->adcRaw[0]) == -1) {
