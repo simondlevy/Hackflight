@@ -148,35 +148,69 @@ class Mpu6000Imu : public MpuImu {
 
         virtual bool busAccDetect(accDev_t *acc) override
         {
-            (void)acc;
-            /*
             if (acc->mpuDetectionResult.sensor != MPU_60x0_SPI) {
                 return false;
             }
 
-            acc->readFn = accReadSPI;
-
             return true;
-            */
-            return false;
         }
 
         virtual bool busGyroDetect(gyroDev_t *gyro) override
         {
-            (void)gyro;
-            /*
             if (gyro->mpuDetectionResult.sensor != MPU_60x0_SPI) {
                 return false;
             }
 
-            gyro->initFn = mpu6000SpiGyroInit;
-            gyro->readFn = mpuGyroReadSPI;
-            gyro->scaleDps = 2000;
-            gyro->gyroShortPeriod = systemClockMicrosToCycles(MPU6000_SHORT_THRESHOLD);
+            gyro->scaleDps = 2000; // XXX should be passed to superclass
+
+            gyro->gyroShortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
 
             return true;
-            */
+        }
+
+        virtual bool readAcc(accDev_t * acc) override
+        {
+            (void)acc;
             return false;
+        }
+
+        virtual bool readGyro(gyroDev_t * gyro) override
+        {
+            (void)gyro;
+            return false;
+        }
+
+    public:
+
+        virtual uint32_t devGyroInterruptCount(void) override
+        {
+            return m_gyroDev.detectedEXTI;
+        }
+
+        virtual bool devGyroIsReady(void) override
+        {
+            bool ready = m_gyroDev.readFn(&m_gyroDev);
+
+            if (ready) {
+                m_gyroDev.dataReady = false;
+            }
+
+            return ready;
+        }
+
+        virtual int16_t devReadRawGyro(uint8_t k) override
+        {
+            return m_gyroDev.adcRaw[k];
+        }
+
+        virtual uint32_t devGyroSyncTime(void) override
+        {
+            return m_gyroDev.gyroSyncEXTI;
+        }
+
+        virtual void devInit(uint8_t interruptPin) override
+        {
+            (void)interruptPin;
         }
 
     public:

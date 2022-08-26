@@ -404,6 +404,10 @@ class MpuImu : public FusionImu {
 
         virtual bool busGyroDetect(gyroDev_t *gyro) = 0;
 
+        virtual bool readAcc(accDev_t * acc) = 0;
+
+        virtual bool readGyro(gyroDev_t * gyro) = 0;
+
     public:
 
         virtual uint32_t devGyroInterruptCount(void) override
