@@ -22,12 +22,15 @@
 extern "C" {
 #endif
 
-    void     imuDevInit(uint8_t interruptPin);
+    // Called externally
     uint32_t imuDevGyroInterruptCount(void);
+
+    // Called here
+    void     imuDevInit(uint8_t interruptPin);
     bool     imuDevGyroIsReady(void);
+    int16_t  imuDevReadRawGyro(uint8_t k);
     uint16_t imuDevGyroScale(void);
     uint32_t imuDevGyroSyncTime(void);
-    int16_t  imuDevReadRawGyro(uint8_t k);
 
 #if defined(__cplusplus)
 }
@@ -263,11 +266,12 @@ class Imu {
         }
 
         virtual uint32_t devGyroInterruptCount(void) = 0;
+
+        virtual void     devInit(uint8_t interruptPin) = 0;
         virtual bool     devGyroIsReady(void) = 0;
         virtual int16_t  devReadRawGyro(uint8_t k) = 0;
         virtual uint16_t devGyroScale(void) = 0;
         virtual uint32_t devGyroSyncTime(void) = 0;
-        virtual void     devInit(uint8_t interruptPin) = 0;
 
 }; // class Imu
 
