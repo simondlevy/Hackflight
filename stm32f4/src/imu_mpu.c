@@ -64,21 +64,6 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
     gyroDev->detectedEXTI++;
 }
 
-static void mpuIntExtiInit(gyroDev_t *gyro)
-{
-    if (gyro->mpuIntExtiTag == IO_TAG_NONE) {
-        return;
-    }
-
-    const IO_t mpuIntIO = IOGetByTag(gyro->mpuIntExtiTag);
-
-    IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
-    EXTIHandlerInit(&gyro->exti, mpuIntExtiHandler);
-    EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
-            BETAFLIGHT_EXTI_TRIGGER_RISING);
-    EXTIEnable(mpuIntIO, true);
-}
-
 bool mpuAccRead(accDev_t *acc)
 {
     uint8_t data[6];
@@ -227,7 +212,17 @@ bool mpuDetect(gyroDev_t *gyro, const gyroDeviceConfig_t *config)
 
 void mpuGyroInit(gyroDev_t *gyro)
 {
-    mpuIntExtiInit(gyro);
+    if (gyro->mpuIntExtiTag == IO_TAG_NONE) {
+        return;
+    }
+
+    const IO_t mpuIntIO = IOGetByTag(gyro->mpuIntExtiTag);
+
+    IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
+    EXTIHandlerInit(&gyro->exti, mpuIntExtiHandler);
+    EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
+            BETAFLIGHT_EXTI_TRIGGER_RISING);
+    EXTIEnable(mpuIntIO, true);
 }
 
 uint8_t mpuGyroDLPF(gyroDev_t *gyro)

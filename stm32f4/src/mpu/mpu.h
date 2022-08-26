@@ -195,7 +195,7 @@ class MpuImu : public FusionImu {
         {
         }
 
-        static void mpuIntExtiHandler(extiCallbackRec_t *cb)
+        static void intExtiHandler(extiCallbackRec_t *cb)
         {
             gyroDev_t *gyroDev = gyroContainerOf(cb);
 
