@@ -216,7 +216,7 @@ class MpuImu : public FusionImu {
             gyroDev->detectedEXTI++;
         }
 
-        bool mpuAccRead(accDev_t *acc)
+        bool accRead(accDev_t *acc)
         {
             uint8_t data[6];
 
@@ -233,7 +233,7 @@ class MpuImu : public FusionImu {
             return true;
         }
 
-        bool mpuGyroRead(gyroDev_t *gyro)
+        bool gyroRead(gyroDev_t *gyro)
         {
             uint8_t data[6];
 
@@ -249,7 +249,7 @@ class MpuImu : public FusionImu {
             return true;
         }
 
-        bool mpuAccReadSPI(accDev_t *acc)
+        bool accReadSPI(accDev_t *acc)
         {
             // Ensure any prior DMA has completed before continuing
             spiWaitClaim(&acc->gyro->dev);
@@ -271,7 +271,7 @@ class MpuImu : public FusionImu {
             return true;
         }
 
-        bool mpuGyroReadSPI(gyroDev_t *gyro)
+        bool gyroReadSPI(gyroDev_t *gyro)
         {
             uint16_t *gyroData = (uint16_t *)gyro->dev.rxBuf;
 
