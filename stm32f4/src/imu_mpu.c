@@ -242,11 +242,6 @@ static const mpuDetectionResult_t *gyroMpuDetectionResult(void)
 
 // Device API -----------------------------------------------------------------
 
-float accelRead(uint8_t k) 
-{
-    return accelDev.ADCRaw[k];
-}
-
 uint16_t imuDevScaleGyro(void)
 {
     return gyroDev.scaleDps;
