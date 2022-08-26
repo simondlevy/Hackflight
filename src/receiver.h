@@ -236,18 +236,6 @@ class Receiver {
         return 0;
     }
 
-    static float applyChannelRangeConfiguraton(float sample)
-    {
-        // Avoid corruption of channel with a value of PPM_RCVR_TIMEOUT
-        if (sample == 0) {
-            return 0;
-        }
-
-        sample = constrain_f(sample, PWM_PULSE_MIN, PWM_PULSE_MAX);
-
-        return sample;
-    }
-
     // Determine a cutoff frequency based on smoothness factor and calculated
     // average rx frame time
     static int calcAutoSmoothingCutoff(
@@ -280,13 +268,9 @@ class Receiver {
 
             float sample = convert(m_channelData, channel);
 
-            // apply the rx calibration
-            if (channel < 4) {
-
-                sample = applyChannelRangeConfiguraton(sample);
-            }
-
-            raw[channel] = sample;
+            raw[channel] = channel < 4 && sample != 0 ?
+                constrain_f(sample, PWM_PULSE_MIN, PWM_PULSE_MAX) :
+                sample;
         }
     }
 
@@ -381,8 +365,7 @@ class Receiver {
         for (uint8_t axis=ROLL; axis<=YAW; axis++) {
             // non coupled PID reduction scaler used in PID controller 1
             // and PID controller 2.
-            m_command[axis] =
-                updateCommand(raw[axis], axis == YAW ? -1 : +1);
+            m_command[axis] = updateCommand(raw[axis], axis == YAW ? -1 : +1);
         }
 
         int32_t tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
