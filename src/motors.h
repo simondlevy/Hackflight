@@ -56,7 +56,11 @@ class Motors {
 
         uint8_t m_count;
 
-        Motors(uint8_t count) {
+        Motors(float vals[], uint8_t count) {
+
+            for (uint8_t k=0; k<count; ++k) {
+                values[k] = vals[k];
+            }
 
             m_count = count;
         }

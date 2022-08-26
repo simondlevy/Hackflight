@@ -27,9 +27,9 @@ class QuadMotors {
 
     public:
 
-        static Motors make(void)
+        static Motors make(float vals[])
         {
-            return Motors(4);
+            return Motors(vals, 4);
         }
 
 }; // class QuadMotors

@@ -267,7 +267,7 @@ class Hackflight {
                 const uint8_t pidCount,
                 const bool pidReset,
                 const uint32_t usec,
-                Mixer mixer) -> Motors
+                NewMixer mixer) -> Motors
         {
             // Star with stick demands
             Demands demands(stickDemands);
@@ -280,12 +280,8 @@ class Hackflight {
             // Constrain demands
             constrain_demands(&demands);
 
-            (void)mixer;
-
             // Run the mixer to get motors from demands
-            //mixer.run(demands, motorvals);
-
-            return QuadMotors::make();
+            return mixer.run(demands);
         }
 
         static void step(

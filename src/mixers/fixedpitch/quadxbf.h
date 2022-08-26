@@ -28,7 +28,7 @@
  */
 
 #include "mixers/fixedpitch.h"
-#include "motors.h"
+#include "motors/quad.h"
 
 class QuadXbfMixer {
 
@@ -56,3 +56,31 @@ class QuadXbfMixer {
 };
 
 
+class NewQuadXbfMixer {
+
+    private:
+
+        static auto fun(const Demands & demands) -> Motors
+        {
+            static constexpr axes_t SPINS[4] = {
+                //  rol   pit    yaw
+                { -1.0f, +1.0f, -1.0f }, // REAR_R
+                { -1.0f, -1.0f, +1.0f }, // FRONT_R
+                { +1.0f, +1.0f, +1.0f }, // REAR_L
+                { +1.0f, -1.0f, -1.0f }, // FRONT_L
+            };
+
+            float motorvals[4];
+
+            FixedPitchMixer::fun(demands, 4, SPINS, motorvals);
+
+            return QuadMotors::make(motorvals);
+        }
+
+    public:
+
+        static NewMixer make(void)
+        {
+            return NewMixer(4, fun);
+        }
+};
