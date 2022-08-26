@@ -401,4 +401,9 @@ class MpuImu : public FusionImu {
         accDev_t  m_accelDev;
         gyroDev_t m_gyroDev;
 
+        const mpuDetectionResult_t *gyroMpuDetectionResult(void)
+        {
+            return &m_gyroDev.mpuDetectionResult;
+        }
+
 };  // class MpuImu
