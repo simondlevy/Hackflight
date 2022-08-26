@@ -182,11 +182,6 @@ static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro,
     return false;
 }
 
-void mpuPreInit(gyroDeviceConfig_t * config)
-{
-    spiPreinitRegister(config->csnTag, IOCFG_IPU, 1);
-}
-
 bool mpuDetect(gyroDev_t *gyro, const gyroDeviceConfig_t *config)
 {
     static busDevice_t bus;
@@ -225,12 +220,6 @@ void mpuGyroInit(gyroDev_t *gyro)
     EXTIEnable(mpuIntIO, true);
 }
 
-uint8_t mpuGyroDLPF(gyroDev_t *gyro)
-{
-    (void)gyro;
-    return 0;
-}
-
 uint8_t mpuGyroReadRegister(const extDevice_t *dev, uint8_t reg)
 {
     uint8_t data;
@@ -253,14 +242,6 @@ static const mpuDetectionResult_t *gyroMpuDetectionResult(void)
     return &gyroDev.mpuDetectionResult;
 }
 
-void accelInit(void)
-{
-    accelDev.gyro = &gyroDev;
-    accelDev.mpuDetectionResult = *gyroMpuDetectionResult();
-    accelDev.acc_high_fsr = false;
-    mpuBusAccDetect(&accelDev);
-}
-
 bool accelIsReady(void)
 {
     return accelDev.readFn(&accelDev);
@@ -271,34 +252,6 @@ float accelRead(uint8_t k)
     return accelDev.ADCRaw[k];
 }
 
-
-static void gyroDevInit(void)
-{
-    gyroDeviceConfig_t gyroDeviceConfig;
-
-    mpuPreInit(&gyroDeviceConfig);
-
-    gyroDeviceConfig.index = 0;
-    gyroDeviceConfig.busType = 2;
-    gyroDeviceConfig.spiBus = 1;
-    gyroDeviceConfig.csnTag = 20;
-    gyroDeviceConfig.i2cBus = 0;
-    gyroDeviceConfig.i2cAddress = 0;
-    gyroDeviceConfig.extiTag = 52;
-
-    mpuDetect(&gyroDev, &gyroDeviceConfig);
-    mpuBusGyroDetect(&gyroDev);
-
-    // SPI DMA buffer required per device
-    static uint8_t gyroBuf1[GYRO_BUF_SIZE];
-    gyroDev.dev.txBuf = gyroBuf1;
-    gyroDev.dev.rxBuf = &gyroBuf1[GYRO_BUF_SIZE / 2];
-
-    gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
-
-    gyroDev.gyroSampleRateHz = gyroSetSampleRate(&gyroDev);
-    gyroDev.initFn(&gyroDev);
-}
 
 uint16_t imuDevScaleGyro(void)
 {
@@ -354,6 +307,30 @@ void imuDevInit(uint8_t interruptPin)
 {
     (void)interruptPin;
 
-    gyroDevInit();
-    accelInit();
+    static gyroDeviceConfig_t gyroDeviceConfig; 
+
+    gyroDeviceConfig.busType = 2;
+    gyroDeviceConfig.spiBus = 1;
+    gyroDeviceConfig.csnTag = 20;
+    gyroDeviceConfig.extiTag = 52;
+
+    spiPreinitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
+
+    mpuDetect(&gyroDev, &gyroDeviceConfig);
+    mpuBusGyroDetect(&gyroDev);
+
+    // SPI DMA buffer required per device
+    static uint8_t gyroBuf1[GYRO_BUF_SIZE];
+    gyroDev.dev.txBuf = gyroBuf1;
+    gyroDev.dev.rxBuf = &gyroBuf1[GYRO_BUF_SIZE / 2];
+
+    gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
+
+    gyroDev.gyroSampleRateHz = gyroSetSampleRate(&gyroDev);
+    gyroDev.initFn(&gyroDev);
+    
+    accelDev.gyro = &gyroDev;
+    accelDev.mpuDetectionResult = *gyroMpuDetectionResult();
+    accelDev.acc_high_fsr = false;
+    mpuBusAccDetect(&accelDev);
 }

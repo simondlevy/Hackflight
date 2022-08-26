@@ -439,6 +439,7 @@ class MpuImu : public FusionImu {
         virtual void devInit(uint8_t interruptPin) override
         {
             (void)interruptPin;
+
         }
 
         virtual uint16_t devScaleGyro(void) override

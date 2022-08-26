@@ -150,7 +150,7 @@ void mpu6000SpiGyroInit(gyroDev_t *gyro)
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
 
     // Accel and Gyro DLPF Setting
-    spiWriteReg(&gyro->dev, MPU6000_CONFIG, mpuGyroDLPF(gyro));
+    spiWriteReg(&gyro->dev, MPU6000_CONFIG, 0); // no gyro DLPF
     delayMicroseconds(1);
 
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
