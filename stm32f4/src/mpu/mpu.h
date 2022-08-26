@@ -215,4 +215,21 @@ class MpuImu : public FusionImu {
             gyroDev->detectedEXTI++;
         }
 
+        bool mpuAccRead(accDev_t *acc)
+        {
+            uint8_t data[6];
+
+            const bool ack =
+                busReadRegisterBuffer(&acc->gyro->dev, RA_ACCEL_XOUT_H, data, 6);
+            if (!ack) {
+                return false;
+            }
+
+            acc->ADCRaw[0] = (int16_t)((data[0] << 8) | data[1]);
+            acc->ADCRaw[1] = (int16_t)((data[2] << 8) | data[3]);
+            acc->ADCRaw[2] = (int16_t)((data[4] << 8) | data[5]);
+
+            return true;
+        }
+
 };  // class MpuImu
