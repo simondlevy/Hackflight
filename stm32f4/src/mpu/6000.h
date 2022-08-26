@@ -192,32 +192,31 @@ class Mpu6000Imu : public MpuImu {
             spiWriteReg(&gyro->dev, RA_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
             delayMicroseconds(15);
 
-            /*
-
             // Disable Primary I2C Interface
-            spiWriteReg(&gyro->dev, MPU_RA_USER_CTRL, BIT_I2C_IF_DIS);
+            spiWriteReg(&gyro->dev, RA_USER_CTRL, BIT_I2C_IF_DIS);
             delayMicroseconds(15);
 
-            spiWriteReg(&gyro->dev, MPU_RA_PWR_MGMT_2, 0x00);
+            spiWriteReg(&gyro->dev, RA_PWR_MGMT_2, 0x00);
             delayMicroseconds(15);
 
             // Accel Sample Rate 1kHz
             // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-            spiWriteReg(&gyro->dev, MPU_RA_SMPLRT_DIV, 0);
+            spiWriteReg(&gyro->dev, RA_SMPLRT_DIV, 0);
             delayMicroseconds(15);
 
             // Gyro +/- 2000 DPS Full Scale
-            spiWriteReg(&gyro->dev, MPU_RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
+            spiWriteReg(&gyro->dev, RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
             delayMicroseconds(15);
 
+            /*
             // Accel +/- 16 G Full Scale
-            spiWriteReg(&gyro->dev, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
+            spiWriteReg(&gyro->dev, RA_ACCEL_CONFIG, INV_FSR_16G << 3);
             delayMicroseconds(15);
 
-            spiWriteReg(&gyro->dev, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
+            spiWriteReg(&gyro->dev, RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
             delayMicroseconds(15);
 
-            spiWriteReg(&gyro->dev, MPU_RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
+            spiWriteReg(&gyro->dev, RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
             delayMicroseconds(15);
 
             spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));

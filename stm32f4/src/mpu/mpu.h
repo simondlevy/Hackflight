@@ -45,9 +45,7 @@ class MpuImu : public FusionImu {
         static const uint8_t RA_YG_OFFS_USRL     		= 0x16;
         static const uint8_t RA_ZG_OFFS_USRH     		= 0x17;    
         static const uint8_t RA_ZG_OFFS_USRL     		= 0x18;
-        static const uint8_t RA_SMPLRT_DIV       		= 0x19;
         static const uint8_t RA_CONFIG           		= 0x1A;
-        static const uint8_t RA_GYRO_CONFIG      		= 0x1B;
         static const uint8_t RA_ACCEL_CONFIG     		= 0x1C;
         static const uint8_t RA_FF_THR           		= 0x1D;
         static const uint8_t RA_FF_DUR           		= 0x1E;
@@ -101,8 +99,6 @@ class MpuImu : public FusionImu {
         static const uint8_t RA_I2C_SLV3_DO             = 0x66;
         static const uint8_t RA_I2C_MST_DELAY_CTRL      = 0x67;
         static const uint8_t RA_MOT_DETECT_CTRL         = 0x69;
-        static const uint8_t RA_USER_CTRL               = 0x6A;
-        static const uint8_t RA_PWR_MGMT_2              = 0x6C;
         static const uint8_t RA_BANK_SEL                = 0x6D;
         static const uint8_t RA_MEM_START_ADDR          = 0x6E;
         static const uint8_t RA_MEM_R_W                 = 0x6F;
@@ -121,14 +117,6 @@ class MpuImu : public FusionImu {
         // enough for the gyros currently supported in imu_mpu.c but should be
         // reviewed id other gyro types are supported with SPI DMA.
         static const uint8_t GYRO_BUF_SIZE = 32;
-
-        enum gyro_fsr_e {
-            INV_FSR_250DPS = 0,
-            INV_FSR_500DPS,
-            INV_FSR_1000DPS,
-            INV_FSR_2000DPS,
-            NUM_GYRO_FSR
-        };
 
         enum icm_high_range_gyro_fsr_e {
             ICM_HIGH_RANGE_FSR_500DPS = 0,
@@ -181,10 +169,23 @@ class MpuImu : public FusionImu {
     protected:
 
         static const uint8_t WHO_AM_I_CONST       = 0x68;
-        static const uint8_t RA_WHO_AM_I          = 0x75;
+
+        static const uint8_t RA_PRODUCT_ID        = 0x0C;   
+        static const uint8_t RA_SMPLRT_DIV        = 0x19;
+        static const uint8_t RA_GYRO_CONFIG       = 0x1B;
         static const uint8_t RA_PWR_MGMT_1        = 0x6B;
         static const uint8_t RA_SIGNAL_PATH_RESET = 0x68;
-        static const uint8_t RA_PRODUCT_ID        = 0x0C;   
+        static const uint8_t RA_USER_CTRL         = 0x6A;
+        static const uint8_t RA_PWR_MGMT_2        = 0x6C;
+        static const uint8_t RA_WHO_AM_I          = 0x75;
+
+        enum gyro_fsr_e {
+            INV_FSR_250DPS = 0,
+            INV_FSR_500DPS,
+            INV_FSR_1000DPS,
+            INV_FSR_2000DPS,
+            NUM_GYRO_FSR
+        };
 
         MpuImu(uint8_t interruptPin) 
             : FusionImu(interruptPin)
