@@ -244,7 +244,7 @@ class MpuImu : public FusionImu {
             return true;
         }
 
-        bool accReadSPI(accDev_t *acc)
+        bool accReadSpi(accDev_t *acc)
         {
             // Ensure any prior DMA has completed before continuing
             spiWaitClaim(&acc->gyro->dev);
@@ -266,7 +266,7 @@ class MpuImu : public FusionImu {
             return true;
         }
 
-        bool gyroReadSPI(gyroDev_t *gyro)
+        bool gyroReadSpi(gyroDev_t *gyro)
         {
             uint16_t *gyroData = (uint16_t *)gyro->dev.rxBuf;
 
