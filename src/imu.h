@@ -39,6 +39,7 @@ extern "C" {
 #include "clock.h"
 #include "constrain.h"
 #include "datatypes.h"
+#include "state.h"
 #include "filters/pt1.h"
 #include "imu.h"
 #include "stats.h"

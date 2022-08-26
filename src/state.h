@@ -21,6 +21,15 @@
 
 typedef struct {
     float x;
+    float dx;
     float y;
+    float dy;
     float z;
-} axes_t;
+    float dz;
+    float phi;
+    float dphi;
+    float theta;
+    float dtheta;
+    float psi;
+    float dpsi;
+} vehicle_state_t;

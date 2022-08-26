@@ -23,6 +23,7 @@
 #include "arming.h"
 #include "clock.h"
 #include "datatypes.h"
+#include "state.h"
 #include "imu.h"
 #include "maths.h"
 
