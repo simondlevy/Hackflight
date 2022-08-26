@@ -417,7 +417,13 @@ class MpuImu : public FusionImu {
 
         virtual bool devGyroIsReady(void) override
         {
-            return false;
+            bool ready = m_gyroDev.readFn(&m_gyroDev);
+
+            if (ready) {
+                m_gyroDev.dataReady = false;
+            }
+
+            return ready;
         }
 
         virtual int16_t devReadRawGyro(uint8_t k) override
