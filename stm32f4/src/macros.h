@@ -81,7 +81,7 @@ http://resnet.uoregon.edu/~gurney_j/jmpc/bitwise.html
 
 // non ISO variant from linux kernel; checks ptr type, but triggers 'ISO C forbids braced-groups within expressions [-Wpedantic]'
 //  __extension__ is here to disable this warning
-#define container_of(ptr, type, member)  ( __extension__ ({     \
+#define CONTAINER_OF(ptr, type, member)  ( __extension__ ({     \
             const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
             (type *)( (char *)__mptr - offsetof(type,member) );}))
 

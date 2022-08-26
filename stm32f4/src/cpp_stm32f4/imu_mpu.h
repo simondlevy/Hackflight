@@ -308,7 +308,7 @@ class MpuImu : public FusionImu {
         {
             (void)cb;
             
-            gyroDev_t *gyroDev = NULL; //container_of(cb, gyroDev_t, exti);
+            gyroDev_t *gyroDev = NULL; //CONTAINER_OF(cb, gyroDev_t, exti);
 
             // Ideally we'd use a time to capture such information, but
             // unfortunately the port used for EXTI interrupt does not have an

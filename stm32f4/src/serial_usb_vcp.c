@@ -146,7 +146,7 @@ static bool usbVcpFlush(vcpPort_t *port)
 
 static void usbVcpWrite(serialPort_t *instance, uint8_t c)
 {
-    vcpPort_t *port = container_of(instance, vcpPort_t, port);
+    vcpPort_t *port = CONTAINER_OF(instance, vcpPort_t, port);
 
     port->txBuf[port->txAt++] = c;
     if (!port->buffering || port->txAt >= ARRAYLEN(port->txBuf)) {
@@ -156,7 +156,7 @@ static void usbVcpWrite(serialPort_t *instance, uint8_t c)
 
 static void usbVcpBeginWrite(serialPort_t *instance)
 {
-    vcpPort_t *port = container_of(instance, vcpPort_t, port);
+    vcpPort_t *port = CONTAINER_OF(instance, vcpPort_t, port);
     port->buffering = true;
 }
 
@@ -168,7 +168,7 @@ static uint32_t usbTxBytesFree(const serialPort_t *instance)
 
 static void usbVcpEndWrite(serialPort_t *instance)
 {
-    vcpPort_t *port = container_of(instance, vcpPort_t, port);
+    vcpPort_t *port = CONTAINER_OF(instance, vcpPort_t, port);
     port->buffering = false;
     usbVcpFlush(port);
 }

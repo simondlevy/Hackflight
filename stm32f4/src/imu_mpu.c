@@ -47,7 +47,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
-    gyroDev_t *gyroDev = container_of(cb, gyroDev_t, exti);
+    gyroDev_t *gyroDev = CONTAINER_OF(cb, gyroDev_t, exti);
 
     // Ideally we'd use a time to capture such information, but unfortunately
     // the port used for EXTI interrupt does not have an associated timer
