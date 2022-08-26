@@ -19,12 +19,13 @@
 #pragma once
 
 #include "datatypes.h"
+#include "demands.h"
 
 class Mixer {
 
     private:
 
-        typedef void (*mixerFun_t)(const demands_t & demands, float * motorvals);
+        typedef void (*mixerFun_t)(const Demands & demands, float * motorvals);
 
         uint8_t m_motorCount;
 
@@ -43,7 +44,7 @@ class Mixer {
             return m_motorCount;
         }
 
-        void run(const demands_t & demands, float * motorvals)
+        void run(const Demands & demands, float * motorvals)
         {
             m_fun(demands, motorvals);
         }

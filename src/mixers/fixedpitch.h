@@ -30,7 +30,7 @@ class FixedPitchMixer {
     public:
 
         static void fun(
-                const demands_t & demands,
+                const Demands & demands,
                 uint8_t motorCount,
                 const axes_t * spins,
                 float * motorvals)

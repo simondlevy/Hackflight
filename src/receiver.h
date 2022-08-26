@@ -23,6 +23,7 @@
 #include "arming.h"
 #include "clock.h"
 #include "datatypes.h"
+#include "demands.h"
 #include "filters/pt3.h"
 #include "constrain.h"
 #include "pids/angle.h"
@@ -38,7 +39,7 @@ class Receiver {
     public:
 
     typedef struct {
-        demands_t demands;
+        Demands demands;
         float aux1;
         float aux2;
     } axes_t;
@@ -176,9 +177,9 @@ class Receiver {
     bool         m_calculatedCutoffs;
     uint16_t     m_channelData[CHANNEL_COUNT];
     float        m_command[4];
-    demands_t    m_commands;
+    Demands      m_commands;
     bool         m_dataProcessingRequired;
-    demands_t    m_dataToSmooth;
+    Demands      m_dataToSmooth;
     bool         m_feedforwardLpfInitialized;
     int32_t      m_frameTimeDeltaUs;
     bool         m_gotNewData;
@@ -889,7 +890,7 @@ class Receiver {
     void getDemands(
             uint32_t currentTimeUs,
             float rawSetpoints[3],
-            demands_t * demands)
+            Demands * demands)
     {
         if (m_gotNewData) {
 

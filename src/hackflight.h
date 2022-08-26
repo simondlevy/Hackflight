@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "arming.h"
+#include "demands.h"
 #include "failsafe.h"
 #include "imu.h"
 #include "led.h"
@@ -92,7 +93,7 @@ class Hackflight {
 
             float rawSetpoints[3] = {0,0,0};
 
-            demands_t demands = {0,0,0,0};
+            Demands demands = {0,0,0,0};
 
             m_taskData.receiver->getDemands(usec, rawSetpoints, &demands);
 
@@ -245,7 +246,7 @@ class Hackflight {
             return constrain_f(demand, -limit, +limit) / PID_MIXER_SCALING;
         }
 
-        static void constrain_demands(demands_t * demands)
+        static void constrain_demands(Demands * demands)
         {
             demands->roll  = constrain_demand(demands->roll, PIDSUM_LIMIT);
 
@@ -258,7 +259,7 @@ class Hackflight {
     public:
 
         static void step(
-                const demands_t & stickDemands,
+                const Demands & stickDemands,
                 const vehicle_state_t & vstate,
                 PidController * pidControllers[],
                 const uint8_t pidCount,
@@ -267,12 +268,8 @@ class Hackflight {
                 Mixer mixer,
                 float motorvals[])
         {
-            demands_t demands = {
-                stickDemands.throttle,
-                stickDemands.roll,
-                stickDemands.pitch,
-                stickDemands.yaw
-            };
+            // Star with stick demands
+            Demands demands(stickDemands);
 
             // Run PID controllers to get new demands
             for (uint8_t k=0; k<pidCount; ++k) {

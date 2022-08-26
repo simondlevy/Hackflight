@@ -60,7 +60,7 @@ class AltHoldPidController : public PidController {
 
         virtual void update(
                 const uint32_t currentTimeUs,
-                demands_t * demands,
+                Demands * demands,
                 const vehicle_state_t & vstate,
                 const bool reset) override
         {

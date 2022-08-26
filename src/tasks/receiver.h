@@ -83,7 +83,12 @@ class ReceiverTask : public Task {
             }
 
             if (gotNewData) {
-                memcpy(&data->rxAxes, &rxax, sizeof(Receiver::axes_t));
+                data->rxAxes.demands.throttle = rxax.demands.throttle;
+                data->rxAxes.demands.roll = rxax.demands.roll;
+                data->rxAxes.demands.pitch = rxax.demands.pitch;
+                data->rxAxes.demands.yaw = rxax.demands.yaw;
+                data->rxAxes.aux1 = rxax.aux1;
+                data->rxAxes.aux2 = rxax.aux2;
             }
         }
 };

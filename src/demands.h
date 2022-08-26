@@ -19,27 +19,33 @@
 
 #pragma once
 
-// Axes ------------------------------------------------------------------------
+class Demands {
 
-typedef struct {
-    float x;
-    float y;
-    float z;
-} axes_t;
+    public:
 
-// Vehicle state ----------------------------------------------------------------
+        float throttle;
+        float roll;
+        float pitch;
+        float yaw;
 
-typedef struct {
-    float x;
-    float dx;
-    float y;
-    float dy;
-    float z;
-    float dz;
-    float phi;
-    float dphi;
-    float theta;
-    float dtheta;
-    float psi;
-    float dpsi;
-} vehicle_state_t;
+        Demands(float t, float r, float p, float y)
+        {
+            throttle = t;
+            roll = r;
+            pitch = p;
+            yaw = y;
+        }
+
+        Demands(void)
+            : Demands(0, 0, 0, 0)
+        {
+        }
+
+        Demands(const Demands & demands)
+        {
+            throttle = demands.throttle;
+            roll = demands.roll;
+            pitch = demands.pitch;
+            yaw = demands.yaw;
+         }
+};
