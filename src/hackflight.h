@@ -38,6 +38,8 @@
 #include "tasks/msp.h"
 #include "tasks/receiver.h"
 
+#include "motors/quad.h"
+
 class Hackflight {
 
     private:
@@ -257,6 +259,34 @@ class Hackflight {
         }
 
     public:
+
+        static auto step(
+                const Demands & stickDemands,
+                const vehicle_state_t & vstate,
+                PidController * pidControllers[],
+                const uint8_t pidCount,
+                const bool pidReset,
+                const uint32_t usec,
+                Mixer mixer) -> Motors
+        {
+            // Star with stick demands
+            Demands demands(stickDemands);
+
+            // Run PID controllers to get new demands
+            for (uint8_t k=0; k<pidCount; ++k) {
+                pidControllers[k]->update(usec, &demands, vstate, pidReset);
+            }
+
+            // Constrain demands
+            constrain_demands(&demands);
+
+            (void)mixer;
+
+            // Run the mixer to get motors from demands
+            //mixer.run(demands, motorvals);
+
+            return QuadMotors::make();
+        }
 
         static void step(
                 const Demands & stickDemands,

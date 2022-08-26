@@ -18,7 +18,7 @@
 #include <stdint.h>
 
 
-#include <motor.h>
+#include <motors.h>
 #include <time.h>
 
 #include "platform.h"

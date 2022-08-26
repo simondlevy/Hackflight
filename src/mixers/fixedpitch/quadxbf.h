@@ -28,7 +28,7 @@
  */
 
 #include "mixers/fixedpitch.h"
-#include "motor.h"
+#include "motors.h"
 
 class QuadXbfMixer {
 

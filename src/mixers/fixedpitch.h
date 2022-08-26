@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#include "motor.h"
+#include "motors.h"
 #include "mixer.h"
 #include "datatypes.h"
 

@@ -44,3 +44,23 @@ extern "C" {
 #if defined(__cplusplus)
 }
 #endif
+
+
+#if defined(__cplusplus)
+
+class Motors {
+
+    public:
+
+        float values[MAX_SUPPORTED_MOTORS];
+
+        uint8_t m_count;
+
+        Motors(uint8_t count) {
+
+            m_count = count;
+        }
+        
+}; // class Motors
+
+#endif

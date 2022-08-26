@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <math.h>
 
 #include <constrain.h>
-#include <motor.h>
+#include <motors.h>
 #include <pwm.h>
 #include <time.h>
 

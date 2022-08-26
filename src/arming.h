@@ -23,7 +23,7 @@
 
 #include "datatypes.h"
 #include "led.h"
-#include "motor.h"
+#include "motors.h"
 #include "sticks.h"
 
 class Arming {

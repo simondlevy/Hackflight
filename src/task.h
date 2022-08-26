@@ -24,7 +24,7 @@
 
 #include "hackflight.h"
 #include "imu.h"
-#include "motor.h"
+#include "motors.h"
 #include "msp.h"
 #include "receiver.h"
 

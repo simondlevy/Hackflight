@@ -23,7 +23,7 @@
 #include <hackflight.h>
 #include <alignment/rotate0.h>
 #include <mixers/fixedpitch/quadxbf.h>
-#include <motor.h>
+#include <motors.h>
 #include <stm32clock.h>
 
 #include "imu_usfs.h"
