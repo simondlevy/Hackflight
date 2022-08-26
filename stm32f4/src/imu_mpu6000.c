@@ -100,8 +100,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define MPU6000_REV_D9 0x59
 #define MPU6000_REV_D10 0x5A
 
-static void mpu6000AccAndGyroInit(gyroDev_t *gyro)
+void mpu6000SpiGyroInit(gyroDev_t *gyro)
 {
+    mpuGyroInit(gyro);
+
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
 
     // Device was already reset during detection so proceed with configuration
@@ -138,14 +140,6 @@ static void mpu6000AccAndGyroInit(gyroDev_t *gyro)
 
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
     delayMicroseconds(1);
-}
-
-
-void mpu6000SpiGyroInit(gyroDev_t *gyro)
-{
-    mpuGyroInit(gyro);
-
-    mpu6000AccAndGyroInit(gyro);
 
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
 

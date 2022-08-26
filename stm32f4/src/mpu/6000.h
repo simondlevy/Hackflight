@@ -84,13 +84,13 @@ class Mpu6000Imu : public MpuImu {
         static const uint8_t ES_REV_D6 = 0x16;
         static const uint8_t ES_REV_D7 = 0x17;
         static const uint8_t ES_REV_D8 = 0x18;
-        static const uint8_t REV_C4 = 0x54;
-        static const uint8_t REV_C5 = 0x55;
-        static const uint8_t REV_D6 = 0x56;
-        static const uint8_t REV_D7 = 0x57;
-        static const uint8_t REV_D8 = 0x58;
-        static const uint8_t REV_D9 = 0x59;
-        static const uint8_t REV_D10 = 0x5A;
+        static const uint8_t REV_C4    = 0x54;
+        static const uint8_t REV_C5    = 0x55;
+        static const uint8_t REV_D6    = 0x56;
+        static const uint8_t REV_D7    = 0x57;
+        static const uint8_t REV_D8    = 0x58;
+        static const uint8_t REV_D9    = 0x59;
+        static const uint8_t REV_D10   = 0x5A;
 
     protected:
 
