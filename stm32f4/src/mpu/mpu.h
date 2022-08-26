@@ -14,6 +14,7 @@
    Hackflight. If not, see <https:
  */
 
+#include "bus_spi.h"
 #include "devices.h"
 
 class MpuImu : public FusionImu {
@@ -244,6 +245,56 @@ class MpuImu : public FusionImu {
             gyro->adcRaw[0] = (int16_t)((data[0] << 8) | data[1]);
             gyro->adcRaw[1] = (int16_t)((data[2] << 8) | data[3]);
             gyro->adcRaw[2] = (int16_t)((data[4] << 8) | data[5]);
+
+            return true;
+        }
+
+        bool mpuAccReadSPI(accDev_t *acc)
+        {
+            // Ensure any prior DMA has completed before continuing
+            spiWaitClaim(&acc->gyro->dev);
+
+            acc->gyro->dev.txBuf[0] = RA_ACCEL_XOUT_H | 0x80;
+
+            busSegment_t segments[] = {
+                {NULL, NULL, 7, true, NULL},
+                {NULL, NULL, 0, true, NULL},
+            };
+            segments[0].txData = acc->gyro->dev.txBuf;
+            segments[0].rxData = &acc->gyro->dev.rxBuf[1];
+
+            spiSequence(&acc->gyro->dev, &segments[0]);
+
+            // Wait for completion
+            spiWait(&acc->gyro->dev);
+
+            return true;
+        }
+
+        bool mpuGyroReadSPI(gyroDev_t *gyro)
+        {
+            uint16_t *gyroData = (uint16_t *)gyro->dev.rxBuf;
+
+            // Ensure any prior DMA has completed before continuing
+            spiWaitClaim(&gyro->dev);
+
+            gyro->dev.txBuf[0] = RA_GYRO_XOUT_H | 0x80;
+
+            busSegment_t segments[] = {
+                {NULL, NULL, 7, true, NULL},
+                {NULL, NULL, 0, true, NULL},
+            };
+            segments[0].txData = gyro->dev.txBuf;
+            segments[0].rxData = &gyro->dev.rxBuf[1];
+
+            spiSequence(&gyro->dev, &segments[0]);
+
+            // Wait for completion
+            spiWait(&gyro->dev);
+
+            gyro->adcRaw[0] = __builtin_bswap16(gyroData[1]);
+            gyro->adcRaw[1] = __builtin_bswap16(gyroData[2]);
+            gyro->adcRaw[2] = __builtin_bswap16(gyroData[3]);
 
             return true;
         }
