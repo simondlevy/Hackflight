@@ -199,9 +199,6 @@ class MpuImu : public FusionImu {
         {
             gyroDev_t *gyroDev = gyroContainerOf(cb);
 
-            (void)gyroDev;
-
-            /*
             // Ideally we'd use a time to capture such information, but
             // unfortunately the port used for EXTI interrupt does not have an
             // associated timer
@@ -216,8 +213,6 @@ class MpuImu : public FusionImu {
             gyroDev->gyroLastEXTI = nowCycles;
 
             gyroDev->detectedEXTI++;
-            */
-           
         }
 
 };  // class MpuImu

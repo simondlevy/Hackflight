@@ -115,8 +115,8 @@ endif
 
 #include $(ROOT)/make/csource.mk
 STM32_SRC = \
-			mpu_devices.c \
-            imu_mpu6000.c \
+			imu_mpu6000.c \
+			mpu/devices.c \
             debug.c \
             dshot.c \
             dshot_dpwm.c \

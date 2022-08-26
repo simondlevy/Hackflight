@@ -18,7 +18,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stddef.h>
 #include <stdint.h>
 
-#include "gyro_container_of.h"
+#include "devices.h"
 
 #define CONTAINER_OF(ptr, type, member)  ( __extension__ ({     \
             const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
