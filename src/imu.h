@@ -25,9 +25,9 @@ extern "C" {
     void     imuDevInit(uint8_t interruptPin);
     uint32_t imuDevGyroInterruptCount(void);
     bool     imuDevGyroIsReady(void);
+    uint16_t imuDevGyroScale(void);
     uint32_t imuDevGyroSyncTime(void);
     int16_t  imuDevReadRawGyro(uint8_t k);
-    uint16_t imuDevScaleGyro(void);
 
 #if defined(__cplusplus)
 }
@@ -213,9 +213,9 @@ class Imu {
             }
 
             if (calibrationComplete) {
-                m_dps[0] = _adc.x * (imuDevScaleGyro() / 32768.);
-                m_dps[1] = _adc.y * (imuDevScaleGyro() / 32768.);
-                m_dps[2] = _adc.z * (imuDevScaleGyro() / 32768.);
+                m_dps[0] = _adc.x * (imuDevGyroScale() / 32768.);
+                m_dps[1] = _adc.y * (imuDevGyroScale() / 32768.);
+                m_dps[2] = _adc.z * (imuDevGyroScale() / 32768.);
             }
 
             // using gyro lowpass 2 filter for downsampling
@@ -265,9 +265,9 @@ class Imu {
         virtual uint32_t devGyroInterruptCount(void) = 0;
         virtual bool     devGyroIsReady(void) = 0;
         virtual int16_t  devReadRawGyro(uint8_t k) = 0;
+        virtual uint16_t devGyroScale(void) = 0;
         virtual uint32_t devGyroSyncTime(void) = 0;
         virtual void     devInit(uint8_t interruptPin) = 0;
-        virtual uint16_t devScaleGyro(void) = 0;
 
 }; // class Imu
 

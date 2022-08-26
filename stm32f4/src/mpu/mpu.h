@@ -434,6 +434,11 @@ class MpuImu : public FusionImu {
             return m_gyroDev.adcRaw[k];
         }
 
+        virtual uint16_t devGyroScale(void) override
+        {
+            return m_gyroDev.scaleDps;
+        }
+
         virtual uint32_t devGyroSyncTime(void) override
         {
             return m_gyroDev.gyroSyncEXTI;
@@ -471,11 +476,6 @@ class MpuImu : public FusionImu {
             m_accelDev.mpuDetectionResult = *gyroMpuDetectionResult();
             m_accelDev.acc_high_fsr = false;
             busAccDetect(&m_accelDev);
-        }
-
-        virtual uint16_t devScaleGyro(void) override
-        {
-            return m_gyroDev.scaleDps;
         }
 
 

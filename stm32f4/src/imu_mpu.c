@@ -242,16 +242,10 @@ static const mpuDetectionResult_t *gyroMpuDetectionResult(void)
 
 // Device API -----------------------------------------------------------------
 
-uint16_t imuDevScaleGyro(void)
-{
-    return gyroDev.scaleDps;
-}
-
 uint32_t imuDevGyroInterruptCount(void)
 {
     return gyroDev.detectedEXTI;
 }
-
 bool  imuDevGyroIsReady(void)
 {
     bool ready = gyroDev.readFn(&gyroDev);
@@ -263,14 +257,19 @@ bool  imuDevGyroIsReady(void)
     return ready;
 }
 
+int16_t imuDevReadRawGyro(uint8_t k)
+{
+    return gyroDev.adcRaw[k];
+}
+
 uint32_t imuDevGyroSyncTime(void)
 {
     return gyroDev.gyroSyncEXTI;
 }
 
-int16_t imuDevReadRawGyro(uint8_t k)
+uint16_t imuDevGyroScale(void)
 {
-    return gyroDev.adcRaw[k];
+    return gyroDev.scaleDps;
 }
 
 bool gyroSyncCheckUpdate(gyroDev_t *gyro)
