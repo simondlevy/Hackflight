@@ -103,13 +103,13 @@ class Mpu6000Imu : public MpuImu {
             spiWriteReg(dev, RA_PWR_MGMT_1, BIT_H_RESET);
             delayMillis(100);  // datasheet specifies a 100ms delay after reset
 
-            /*            
             // reset the device configuration
 
             // reset the device signal paths
             spiWriteReg(dev, RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
-            delay(100);  // datasheet specifies a 100ms delay after signal path reset
+            delayMillis(100);  // datasheet specifies a 100ms delay after signal path reset
 
+            /*            
 
             const uint8_t whoAmI = spiReadRegMsk(dev, RA_WHO_AM_I);
 

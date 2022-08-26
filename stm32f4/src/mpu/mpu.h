@@ -114,7 +114,6 @@ class MpuImu : public FusionImu {
         static const uint8_t RA_I2C_SLV2_DO             = 0x65;
         static const uint8_t RA_I2C_SLV3_DO             = 0x66;
         static const uint8_t RA_I2C_MST_DELAY_CTRL      = 0x67;
-        static const uint8_t RA_SIGNAL_PATH_RESET       = 0x68;
         static const uint8_t RA_MOT_DETECT_CTRL         = 0x69;
         static const uint8_t RA_USER_CTRL               = 0x6A;
         static const uint8_t RA_PWR_MGMT_2              = 0x6C;
@@ -196,6 +195,7 @@ class MpuImu : public FusionImu {
     protected:
 
         static const uint8_t RA_PWR_MGMT_1              = 0x6B;
+        static const uint8_t RA_SIGNAL_PATH_RESET       = 0x68;
 
         MpuImu(uint8_t interruptPin) 
             : FusionImu(interruptPin)
