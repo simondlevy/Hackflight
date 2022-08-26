@@ -299,5 +299,41 @@ class MpuImu : public FusionImu {
             return true;
         }
 
+        typedef uint8_t (*gyroSpiDetectFn_t)(const extDevice_t *dev);
+
+        virtual mpuSensor_e mpuBusDetect(const extDevice_t *dev) = 0;
+
+        bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro,
+                const gyroDeviceConfig_t *config)
+        {
+            if (!config->csnTag || !spiSetBusInstance(&gyro->dev, config->spiBus)) {
+                return false;
+            }
+
+            gyro->dev.busType_u.spi.csnPin = IOGetByTag(config->csnTag);
+
+            IOInit(gyro->dev.busType_u.spi.csnPin, OWNER_GYRO_CS,
+                    RESOURCE_INDEX(config->index));
+            IOConfigGPIO(gyro->dev.busType_u.spi.csnPin, SPI_IO_CS_CFG);
+
+            // Ensure device is disabled, important when two devices are on the same bus.
+            IOHi(gyro->dev.busType_u.spi.csnPin); 
+
+            // It is hard to use hardware to optimize the detection loop here,
+            // as hardware type and detection function name doesn't match.
+            // May need a bitmap of hardware to detection function to do it right?
+            mpuSensor_e sensor = mpuBusDetect(&gyro->dev);
+            if (sensor != MPU_NONE) {
+                gyro->mpuDetectionResult.sensor = sensor;
+                busDeviceRegister(&gyro->dev);
+                return true;
+            }
+
+            // Detection failed, disable CS pin again
+            spiPreinitByTag(config->csnTag);
+
+            return false;
+        }
+
 
 };  // class MpuImu
