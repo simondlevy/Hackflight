@@ -168,7 +168,6 @@ class Mpu6000Imu : public MpuImu {
             return true;
         }
 
-
         virtual bool readAcc(accDev_t * acc) override
         {
             return MpuImu::accReadSpi(acc);
@@ -181,7 +180,60 @@ class Mpu6000Imu : public MpuImu {
 
         virtual void init(gyroDev_t *gyro) override
         {
-            (void)gyro;
+            MpuImu::gyroInit(gyro);
+
+               spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
+
+            // Device was already reset during detection so proceed with configuration
+
+            /*
+            // Clock Source PPL with Z axis gyro reference
+            spiWriteReg(&gyro->dev, MPU_RA_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
+            delayMicroseconds(15);
+
+            // Disable Primary I2C Interface
+            spiWriteReg(&gyro->dev, MPU_RA_USER_CTRL, BIT_I2C_IF_DIS);
+            delayMicroseconds(15);
+
+            spiWriteReg(&gyro->dev, MPU_RA_PWR_MGMT_2, 0x00);
+            delayMicroseconds(15);
+
+            // Accel Sample Rate 1kHz
+            // Gyroscope Output Rate =  1kHz when the DLPF is enabled
+            spiWriteReg(&gyro->dev, MPU_RA_SMPLRT_DIV, 0);
+            delayMicroseconds(15);
+
+            // Gyro +/- 2000 DPS Full Scale
+            spiWriteReg(&gyro->dev, MPU_RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
+            delayMicroseconds(15);
+
+            // Accel +/- 16 G Full Scale
+            spiWriteReg(&gyro->dev, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
+            delayMicroseconds(15);
+
+            spiWriteReg(&gyro->dev, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
+            delayMicroseconds(15);
+
+            spiWriteReg(&gyro->dev, MPU_RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
+            delayMicroseconds(15);
+
+            spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
+            delayMicroseconds(1);
+
+            spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
+
+            // Accel and Gyro DLPF Setting
+            spiWriteReg(&gyro->dev, MPU6000_CONFIG, 0); // no gyro DLPF
+            delayMicroseconds(1);
+
+            spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
+
+            mpuGyroRead(gyro);
+
+            if (((int8_t)gyro->adcRaw[1]) == -1 && ((int8_t)gyro->adcRaw[0]) == -1) {
+            systemFailureMode(FAILURE_GYRO_INIT_FAILED);
+            }
+             */
         }
 
 

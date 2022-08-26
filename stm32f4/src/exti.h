@@ -33,9 +33,24 @@ struct extiCallbackRec_s {
     extiHandlerCallback *fn;
 };
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 void extiInit(void);
 
 void EXTIHandlerInit(extiCallbackRec_t *cb, extiHandlerCallback *fn);
-void EXTIConfig(IO_t io, extiCallbackRec_t *cb, int irqPriority, ioConfig_t config, extiTrigger_t trigger);
+
+void EXTIConfig(
+        IO_t io, extiCallbackRec_t *cb,
+        int irqPriority,
+        ioConfig_t config,
+        extiTrigger_t trigger);
+
 void EXTIRelease(IO_t io);
+
 void EXTIEnable(IO_t io, bool enable);
+
+#if defined(__cplusplus)
+}
+#endif
