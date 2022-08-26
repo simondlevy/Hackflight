@@ -428,8 +428,7 @@ class MpuImu : public FusionImu {
 
         virtual int16_t devReadRawGyro(uint8_t k) override
         {
-            (void)k;
-            return 0;
+            return m_gyroDev.adcRaw[k];
         }
 
         virtual uint32_t devGyroSyncTime(void) override
