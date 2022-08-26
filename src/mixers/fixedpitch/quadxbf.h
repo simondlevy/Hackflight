@@ -34,32 +34,6 @@ class QuadXbfMixer {
 
     private:
 
-        static void fun(const Demands & demands, float * motorvals)
-        {
-            static constexpr axes_t SPINS[4] = {
-                //  rol   pit    yaw
-                { -1.0f, +1.0f, -1.0f }, // REAR_R
-                { -1.0f, -1.0f, +1.0f }, // FRONT_R
-                { +1.0f, +1.0f, +1.0f }, // REAR_L
-                { +1.0f, -1.0f, -1.0f }, // FRONT_L
-            };
-
-            FixedPitchMixer::fun(demands, 4, SPINS, motorvals);
-        }
-
-    public:
-
-        static Mixer make(void)
-        {
-            return Mixer(4, fun);
-        }
-};
-
-
-class NewQuadXbfMixer {
-
-    private:
-
         static auto fun(const Demands & demands) -> Motors
         {
             static constexpr axes_t SPINS[4] = {
@@ -79,8 +53,8 @@ class NewQuadXbfMixer {
 
     public:
 
-        static NewMixer make(void)
+        static Mixer make(void)
         {
-            return NewMixer(4, fun);
+            return Mixer(4, fun);
         }
 };

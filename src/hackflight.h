@@ -101,19 +101,18 @@ class Hackflight {
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
-            Hackflight::step(
+            auto motors = Hackflight::step(
                     demands,
                     m_taskData.vstate,
                     m_pidControllers,
                     m_pidControllerCount,
                     m_taskData.pidReset,
                     usec,
-                    *m_mixer,
-                    mixmotors);
+                    *m_mixer);
 
             for (uint8_t i=0; i<m_mixer->getMotorCount(); i++) {
 
-                float motorOutput = mixmotors[i];
+                float motorOutput = motors.values[i];
 
                 motorOutput = motorDevValueLow() +
                     (motorDevValueHigh() - motorDevValueLow()) * motorOutput;
@@ -267,7 +266,7 @@ class Hackflight {
                 const uint8_t pidCount,
                 const bool pidReset,
                 const uint32_t usec,
-                NewMixer mixer) -> Motors
+                Mixer mixer) -> Motors
         {
             // Star with stick demands
             Demands demands(stickDemands);
@@ -282,31 +281,6 @@ class Hackflight {
 
             // Run the mixer to get motors from demands
             return mixer.run(demands);
-        }
-
-        static void step(
-                const Demands & stickDemands,
-                const vehicle_state_t & vstate,
-                PidController * pidControllers[],
-                const uint8_t pidCount,
-                const bool pidReset,
-                const uint32_t usec,
-                Mixer mixer,
-                float motorvals[])
-        {
-            // Star with stick demands
-            Demands demands(stickDemands);
-
-            // Run PID controllers to get new demands
-            for (uint8_t k=0; k<pidCount; ++k) {
-                pidControllers[k]->update(usec, &demands, vstate, pidReset);
-            }
-
-            // Constrain demands
-            constrain_demands(&demands);
-
-            // Run the mixer to get motors from demands
-            mixer.run(demands, motorvals);
         }
 
         Hackflight(

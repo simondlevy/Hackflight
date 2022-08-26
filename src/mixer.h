@@ -26,35 +26,6 @@ class Mixer {
 
     private:
 
-        typedef void (*mixerFun_t)(const Demands & demands, float * motorvals);
-
-        uint8_t m_motorCount;
-
-        mixerFun_t m_fun;
-
-    public:
-
-        Mixer(uint8_t motorCount, mixerFun_t fun)
-        {
-            m_motorCount = motorCount;
-            m_fun = fun;
-        }
-
-        uint8_t getMotorCount(void)
-        {
-            return m_motorCount;
-        }
-
-        void run(const Demands & demands, float * motorvals)
-        {
-            m_fun(demands, motorvals);
-        }
-};
-
-class NewMixer {
-
-    private:
-
         typedef Motors (*mixerFun_t)(const Demands & demands);
 
         uint8_t m_motorCount;
@@ -63,7 +34,7 @@ class NewMixer {
 
     public:
 
-        NewMixer(uint8_t motorCount, mixerFun_t fun)
+        Mixer(uint8_t motorCount, mixerFun_t fun)
         {
             m_motorCount = motorCount;
             m_fun = fun;
