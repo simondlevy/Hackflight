@@ -22,7 +22,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "bus.h"
 #include "exti.h"
+#include "mpu/devices.h"
 
+
+#if 0
 typedef enum {
     MPU_NONE,
     MPU_3050,
@@ -112,6 +115,8 @@ typedef struct accDev_s {
     uint8_t filler[2];
     fp_rotationMatrix_t rotationMatrix;
 } accDev_t;
+#endif
+
 #define GYRO_USES_SPI
 
 #define MPU_RA_WHO_AM_I         0x75
