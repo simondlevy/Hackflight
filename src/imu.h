@@ -41,7 +41,7 @@ extern "C" {
 #include "state.h"
 #include "filters/pt1.h"
 #include "imu.h"
-#include "stats.h"
+#include "stdev.h"
 #include "system.h"
 #include "time.h"
 
@@ -56,7 +56,7 @@ class Imu {
 
         typedef struct {
             float sum[3];
-            Stats var[3];
+            Stdev var[3];
             int32_t cyclesRemaining;
         } calibration_t;
 
