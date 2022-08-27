@@ -17,14 +17,15 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include <constrain.h>
-#include <imu.h>
+#include <imus/fusion.h>
 #include <time.h>
 
-#include "bus.h"
-#include "exti.h"
 #include "mpudev.h"
 
-class MpuImu {
+#include <bus.h>
+#include <exti.h>
+
+class MpuImu : public FusionImu {
 
     public:
 
@@ -202,6 +203,11 @@ class MpuImu {
         static bool gyroRead(gyroDev_t *gyro);
 
         static bool gyroReadSPI(gyroDev_t *gyro);
+
+        MpuImu(uint8_t interruptPin, uint16_t gyroScale)
+            : FusionImu(interruptPin, gyroScale)
+        {
+        }
 
 }; // class MpuImu
 
