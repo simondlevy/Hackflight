@@ -213,28 +213,12 @@ class MpuImu : public FusionImu {
             gyroDev->detectedEXTI++;
         }
 
-        bool accRead(accDev_t *acc)
-        {
-            uint8_t data[6];
-
-            const bool ack =
-                busReadRegisterBuffer(&acc->gyro->dev, RA_ACCEL_XOUT_H, data, 6);
-            if (!ack) {
-                return false;
-            }
-
-            acc->ADCRaw[0] = (int16_t)((data[0] << 8) | data[1]);
-            acc->ADCRaw[1] = (int16_t)((data[2] << 8) | data[3]);
-            acc->ADCRaw[2] = (int16_t)((data[4] << 8) | data[5]);
-
-            return true;
-        }
-
         bool gyroRead(gyroDev_t *gyro)
         {
             uint8_t data[6];
 
-            const bool ack = busReadRegisterBuffer(&gyro->dev, RA_GYRO_XOUT_H, data, 6);
+            const bool ack =
+                busReadRegisterBuffer(&gyro->dev, RA_GYRO_XOUT_H, data, 6);
             if (!ack) {
                 return false;
             }
@@ -311,7 +295,8 @@ class MpuImu : public FusionImu {
                     RESOURCE_INDEX(config->index));
             IOConfigGPIO(gyro->dev.busType_u.spi.csnPin, SPI_IO_CS_CFG);
 
-            // Ensure device is disabled, important when two devices are on the same bus.
+            // Ensure device is disabled, important when two devices are on the
+            // same bus.
             IOHi(gyro->dev.busType_u.spi.csnPin); 
 
             // It is hard to use hardware to optimize the detection loop here,
@@ -369,8 +354,8 @@ class MpuImu : public FusionImu {
 
             IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
             EXTIHandlerInit(&gyro->exti, intExtiHandler);
-            EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
-                    BETAFLIGHT_EXTI_TRIGGER_RISING);
+            EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI,
+                    IOCFG_IN_FLOATING, BETAFLIGHT_EXTI_TRIGGER_RISING);
             EXTIEnable(mpuIntIO, true);
         }
 
@@ -473,6 +458,5 @@ class MpuImu : public FusionImu {
             m_accelDev.acc_high_fsr = false;
             busAccDetect(&m_accelDev);
         }
-
 
 };  // class MpuImu

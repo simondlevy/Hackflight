@@ -196,7 +196,6 @@ struct gyroDeviceConfig_s;
 struct accDev_s;
 
 
-bool    mpuAccRead(struct accDev_s *acc);
 bool    mpuAccReadSPI(struct accDev_s *acc);
 bool    mpuBusAccDetect(accDev_t *acc);
 uint8_t mpuBusDetect(const extDevice_t *dev);
