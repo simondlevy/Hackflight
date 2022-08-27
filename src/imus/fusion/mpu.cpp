@@ -69,7 +69,7 @@ bool mpuGyroRead(gyroDev_t *gyro)
 {
     uint8_t data[6];
 
-    const bool ack = busReadRegisterBuffer(&gyro->dev, MPU_RA_GYRO_XOUT_H, data, 6);
+    const bool ack = busReadRegisterBuffer(&gyro->dev, MpuImu::RA_GYRO_XOUT_H, data, 6);
     if (!ack) {
         return false;
     }
@@ -88,7 +88,7 @@ bool mpuGyroReadSPI(gyroDev_t *gyro)
     // Ensure any prior DMA has completed before continuing
     spiWaitClaim(&gyro->dev);
 
-    gyro->dev.txBuf[0] = MPU_RA_GYRO_XOUT_H | 0x80;
+    gyro->dev.txBuf[0] = MpuImu::RA_GYRO_XOUT_H | 0x80;
 
     busSegment_t segments[] = {
         {NULL, NULL, 7, true, NULL},

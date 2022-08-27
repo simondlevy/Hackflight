@@ -100,33 +100,33 @@ static void mpu6000SpiGyroInit(gyroDev_t *gyro)
     // Device was already reset during detection so proceed with configuration
 
     // Clock Source PPL with Z axis gyro reference
-    spiWriteReg(&gyro->dev, MPU_RA_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
+    spiWriteReg(&gyro->dev, MpuImu::RA_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
     delayMicroseconds(15);
 
     // Disable Primary I2C Interface
-    spiWriteReg(&gyro->dev, MPU_RA_USER_CTRL, BIT_I2C_IF_DIS);
+    spiWriteReg(&gyro->dev, MpuImu::RA_USER_CTRL, BIT_I2C_IF_DIS);
     delayMicroseconds(15);
 
-    spiWriteReg(&gyro->dev, MPU_RA_PWR_MGMT_2, 0x00);
+    spiWriteReg(&gyro->dev, MpuImu::RA_PWR_MGMT_2, 0x00);
     delayMicroseconds(15);
 
     // Accel Sample Rate 1kHz
     // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-    spiWriteReg(&gyro->dev, MPU_RA_SMPLRT_DIV, 0);
+    spiWriteReg(&gyro->dev, MpuImu::RA_SMPLRT_DIV, 0);
     delayMicroseconds(15);
 
     // Gyro +/- 2000 DPS Full Scale
-    spiWriteReg(&gyro->dev, MPU_RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
+    spiWriteReg(&gyro->dev, MpuImu::RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
     delayMicroseconds(15);
 
     // Accel +/- 16 G Full Scale
-    spiWriteReg(&gyro->dev, MPU_RA_ACCEL_CONFIG, INV_FSR_16G << 3);
+    spiWriteReg(&gyro->dev, MpuImu::RA_ACCEL_CONFIG, INV_FSR_16G << 3);
     delayMicroseconds(15);
 
-    spiWriteReg(&gyro->dev, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
+    spiWriteReg(&gyro->dev, MpuImu::RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
     delayMicroseconds(15);
 
-    spiWriteReg(&gyro->dev, MPU_RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
+    spiWriteReg(&gyro->dev, MpuImu::RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
     delayMicroseconds(15);
 
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
@@ -155,20 +155,20 @@ mpuSensor_e mpuBusDetect(const extDevice_t *dev)
     spiSetClkDivisor(dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
 
     // reset the device configuration
-    spiWriteReg(dev, MPU_RA_PWR_MGMT_1, BIT_H_RESET);
+    spiWriteReg(dev, MpuImu::RA_PWR_MGMT_1, BIT_H_RESET);
     delay(100);  // datasheet specifies a 100ms delay after reset
 
     // reset the device signal paths
-    spiWriteReg(dev, MPU_RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
+    spiWriteReg(dev, MpuImu::RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
     delay(100);  // datasheet specifies a 100ms delay after signal path reset
 
 
-    const uint8_t whoAmI = spiReadRegMsk(dev, MPU_RA_WHO_AM_I);
+    const uint8_t whoAmI = spiReadRegMsk(dev, MpuImu::RA_WHO_AM_I);
     delayMicroseconds(1); // Ensure CS high time is met which is violated on H7 without this delay
     mpuSensor_e detectedSensor = MPU_NONE;
 
-    if (whoAmI == MPU6000_WHO_AM_I_CONST) {
-        const uint8_t productID = spiReadRegMsk(dev, MPU_RA_PRODUCT_ID);
+    if (whoAmI == MpuImu::MPU6000_WHO_AM_I_CONST) {
+        const uint8_t productID = spiReadRegMsk(dev, MpuImu::RA_PRODUCT_ID);
 
         /* look for a product ID we recognise */
 
