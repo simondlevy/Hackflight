@@ -181,7 +181,7 @@ class MpuImu {
 
 }; // class MpuImu
 
-typedef struct gyroDeviceConfig_s {
+typedef struct {
     int8_t index;
     busType_e busType;
     uint8_t spiBus;
@@ -189,12 +189,11 @@ typedef struct gyroDeviceConfig_s {
     uint8_t i2cBus;
     uint8_t i2cAddress;
     ioTag_t extiTag;
-    uint8_t alignment;        // sensor_align_e
-    //sensorAlignment_t customAlignment;
+    uint8_t alignment;
 } gyroDeviceConfig_t;
 
 mpuSensor_e mpuBusDetect(const extDevice_t *dev);
 bool        mpuBusGyroDetect(gyroDev_t *gyro);
-void        mpuGyroInit(struct gyroDev_s *gyro);
-bool        mpuGyroRead(struct gyroDev_s *gyro);
-bool        mpuGyroReadSPI(struct gyroDev_s *gyro);
+void        mpuGyroInit(gyroDev_t *gyro);
+bool        mpuGyroRead(gyroDev_t *gyro);
+bool        mpuGyroReadSPI(gyroDev_t *gyro);
