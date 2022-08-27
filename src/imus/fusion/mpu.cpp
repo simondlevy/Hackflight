@@ -56,74 +56,74 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
     gyroDev->detectedEXTI++;
 }
 
-bool MpuImu::gyroRead(gyroDev_t *gyro)
+bool MpuImu::gyroRead(gyroDev_t *gyroDev)
 {
     uint8_t data[6];
 
-    const bool ack = busReadRegisterBuffer(&gyro->dev, MpuImu::RA_GYRO_XOUT_H, data, 6);
+    const bool ack = busReadRegisterBuffer(&gyroDev->dev, MpuImu::RA_GYRO_XOUT_H, data, 6);
     if (!ack) {
         return false;
     }
 
-    gyro->adcRaw[0] = (int16_t)((data[0] << 8) | data[1]);
-    gyro->adcRaw[1] = (int16_t)((data[2] << 8) | data[3]);
-    gyro->adcRaw[2] = (int16_t)((data[4] << 8) | data[5]);
+    gyroDev->adcRaw[0] = (int16_t)((data[0] << 8) | data[1]);
+    gyroDev->adcRaw[1] = (int16_t)((data[2] << 8) | data[3]);
+    gyroDev->adcRaw[2] = (int16_t)((data[4] << 8) | data[5]);
 
     return true;
 }
 
-bool MpuImu::gyroReadSPI(gyroDev_t *gyro)
+bool MpuImu::gyroReadSPI(gyroDev_t *gyroDev)
 {
-    uint16_t *gyroData = (uint16_t *)gyro->dev.rxBuf;
+    uint16_t *gyroData = (uint16_t *)gyroDev->dev.rxBuf;
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(&gyro->dev);
+    spiWaitClaim(&gyroDev->dev);
 
-    gyro->dev.txBuf[0] = MpuImu::RA_GYRO_XOUT_H | 0x80;
+    gyroDev->dev.txBuf[0] = MpuImu::RA_GYRO_XOUT_H | 0x80;
 
     busSegment_t segments[] = {
         {NULL, NULL, 7, true, NULL},
         {NULL, NULL, 0, true, NULL},
     };
-    segments[0].txData = gyro->dev.txBuf;
-    segments[0].rxData = &gyro->dev.rxBuf[1];
+    segments[0].txData = gyroDev->dev.txBuf;
+    segments[0].rxData = &gyroDev->dev.rxBuf[1];
 
-    spiSequence(&gyro->dev, &segments[0]);
+    spiSequence(&gyroDev->dev, &segments[0]);
 
     // Wait for completion
-    spiWait(&gyro->dev);
+    spiWait(&gyroDev->dev);
 
-    gyro->adcRaw[0] = __builtin_bswap16(gyroData[1]);
-    gyro->adcRaw[1] = __builtin_bswap16(gyroData[2]);
-    gyro->adcRaw[2] = __builtin_bswap16(gyroData[3]);
+    gyroDev->adcRaw[0] = __builtin_bswap16(gyroData[1]);
+    gyroDev->adcRaw[1] = __builtin_bswap16(gyroData[2]);
+    gyroDev->adcRaw[2] = __builtin_bswap16(gyroData[3]);
 
     return true;
 }
 
 typedef uint8_t (*gyroSpiDetectFn_t)(const extDevice_t *dev);
 
-static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro,
+static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyroDev,
         const MpuImu::gyroDeviceConfig_t *config)
 {
-    if (!config->csnTag || !spiSetBusInstance(&gyro->dev, config->spiBus)) {
+    if (!config->csnTag || !spiSetBusInstance(&gyroDev->dev, config->spiBus)) {
         return false;
     }
 
-    gyro->dev.busType_u.spi.csnPin = IOGetByTag(config->csnTag);
+    gyroDev->dev.busType_u.spi.csnPin = IOGetByTag(config->csnTag);
 
-    IOInit(gyro->dev.busType_u.spi.csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(config->index));
-    IOConfigGPIO(gyro->dev.busType_u.spi.csnPin, SPI_IO_CS_CFG);
+    IOInit(gyroDev->dev.busType_u.spi.csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(config->index));
+    IOConfigGPIO(gyroDev->dev.busType_u.spi.csnPin, SPI_IO_CS_CFG);
 
     // Ensure device is disabled, important when two devices are on the same bus.
-    IOHi(gyro->dev.busType_u.spi.csnPin); 
+    IOHi(gyroDev->dev.busType_u.spi.csnPin); 
 
     // It is hard to use hardware to optimize the detection loop here,
     // as hardware type and detection function name doesn't match.
     // May need a bitmap of hardware to detection function to do it right?
-    auto sensor = mpuBusDetect(&gyro->dev);
+    auto sensor = mpuBusDetect(&gyroDev->dev);
     if (sensor != MPU_NONE) {
-        gyro->mpuDetectionResult.sensor = sensor;
-        busDeviceRegister(&gyro->dev);
+        gyroDev->mpuDetectionResult.sensor = sensor;
+        busDeviceRegister(&gyroDev->dev);
         return true;
     }
 
@@ -133,10 +133,10 @@ static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro,
     return false;
 }
 
-static bool mpuDetect(gyroDev_t *gyro, const MpuImu::gyroDeviceConfig_t *config)
+static bool mpuDetect(gyroDev_t *gyroDev, const MpuImu::gyroDeviceConfig_t *config)
 {
     static busDevice_t bus;
-    gyro->dev.bus = &bus;
+    gyroDev->dev.bus = &bus;
 
     // MPU datasheet specifies 30ms.
     delay(35);
@@ -146,27 +146,27 @@ static bool mpuDetect(gyroDev_t *gyro, const MpuImu::gyroDeviceConfig_t *config)
     }
 
     if (config->busType == BUS_TYPE_GYRO_AUTO) {
-        gyro->dev.bus->busType = BUS_TYPE_I2C;
+        gyroDev->dev.bus->busType = BUS_TYPE_I2C;
     } else {
-        gyro->dev.bus->busType = config->busType;
+        gyroDev->dev.bus->busType = config->busType;
     }
 
-    gyro->dev.bus->busType = BUS_TYPE_SPI;
+    gyroDev->dev.bus->busType = BUS_TYPE_SPI;
 
-    return detectSPISensorsAndUpdateDetectionResult(gyro, config);
+    return detectSPISensorsAndUpdateDetectionResult(gyroDev, config);
 }
 
-void MpuImu::gyroInit(gyroDev_t *gyro)
+void MpuImu::gyroInit(gyroDev_t *gyroDev)
 {
-    if (gyro->mpuIntExtiTag == IO_TAG_NONE) {
+    if (gyroDev->mpuIntExtiTag == IO_TAG_NONE) {
         return;
     }
 
-    const IO_t mpuIntIO = IOGetByTag(gyro->mpuIntExtiTag);
+    const IO_t mpuIntIO = IOGetByTag(gyroDev->mpuIntExtiTag);
 
     IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
-    EXTIHandlerInit(&gyro->exti, mpuIntExtiHandler);
-    EXTIConfig(mpuIntIO, &gyro->exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
+    EXTIHandlerInit(&gyroDev->exti, mpuIntExtiHandler);
+    EXTIConfig(mpuIntIO, &gyroDev->exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
             BETAFLIGHT_EXTI_TRIGGER_RISING);
     EXTIEnable(mpuIntIO, true);
 }
