@@ -186,7 +186,7 @@ uint32_t imuDevGyroInterruptCount(void)
     return m_gyroDev.detectedEXTI;
 }
 
-bool  imuDevGyroIsReady(void)
+bool MpuImu::devGyroIsReady(void)
 {
     bool ready = m_gyroDev.readFn();
 

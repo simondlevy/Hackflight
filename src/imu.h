@@ -24,7 +24,6 @@ extern "C" {
 
     // Called externally
     uint32_t imuDevGyroInterruptCount(void);
-    bool     imuDevGyroIsReady(void);
     int16_t  imuDevReadRawGyro(uint8_t k);
     uint32_t imuDevGyroSyncTime(void);
 
@@ -194,7 +193,7 @@ class Imu {
 
         void readScaledGyro(Imu * imu, Imu::align_fun align, State * vstate)
         {
-            if (!imuDevGyroIsReady()) return;
+            if (!devGyroIsReady()) return;
 
             bool calibrationComplete = m_calibration.cyclesRemaining <= 0;
 
@@ -265,10 +264,11 @@ class Imu {
             return skew;
         }
 
+        virtual void devInit(uint8_t interruptPin) = 0;
+
         //virtual uint32_t devGyroInterruptCount(void) = 0;
-        //virtual bool     devGyroIsReady(void) = 0;
+        virtual bool     devGyroIsReady(void) = 0;
         //virtual uint32_t devGyroSyncTime(void) = 0;
-        virtual void     devInit(uint8_t interruptPin) = 0;
         //virtual int16_t  devReadRawGyro(uint8_t k) = 0;
 
 }; // class Imu
