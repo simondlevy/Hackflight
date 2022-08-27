@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -45,11 +47,6 @@ typedef enum {
 typedef struct mpuDetectionResult_s {
     mpuSensor_e sensor;
 } mpuDetectionResult_t;
-
-
-struct accDev_s;
-typedef void (*sensorAccInitFuncPtr)(struct accDev_s *acc);
-typedef bool (*sensorAccReadFuncPtr)(struct accDev_s *acc);
 
 struct gyroDev_s;
 typedef void (*sensorGyroInitFuncPtr)(struct gyroDev_s *gyro);
@@ -95,21 +92,6 @@ typedef struct gyroDev_s {
 
 } gyroDev_t;
 
-typedef struct accDev_s {
-    sensorAccInitFuncPtr initFn;                              // initialize function
-    sensorAccReadFuncPtr readFn;                              // read 3 axis data function
-    uint16_t acc_1G;
-    int16_t ADCRaw[3];
-    mpuDetectionResult_t mpuDetectionResult;
-    //sensor_align_e accAlign;
-    bool dataReady;
-    gyroDev_t *gyro;
-    bool acc_high_fsr;
-    char revisionCode;                                      // a revision code for the sensor, if known
-    uint8_t filler[2];
-    fp_rotationMatrix_t rotationMatrix;
-} accDev_t;
-
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -119,5 +101,4 @@ gyroDev_t * gyroContainerOf(extiCallbackRec_t * cb);
 #if defined(__cplusplus)
 }
 #endif
-
 

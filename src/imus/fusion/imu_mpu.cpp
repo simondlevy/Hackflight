@@ -32,6 +32,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "exti.h"
 #include "io.h"
 #include "macros.h"
+#include "mpudev.h"
 #include "nvic.h"
 #include "platform.h"
 #include "systemdev.h"
@@ -47,7 +48,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
-    gyroDev_t *gyroDev = CONTAINER_OF(cb, gyroDev_t, exti);
+    gyroDev_t *gyroDev = gyroContainerOf(cb);
 
     // Ideally we'd use a time to capture such information, but unfortunately
     // the port used for EXTI interrupt does not have an associated timer
@@ -125,12 +126,10 @@ static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro,
     // Ensure device is disabled, important when two devices are on the same bus.
     IOHi(gyro->dev.busType_u.spi.csnPin); 
 
-    uint8_t sensor = MPU_NONE;
-
     // It is hard to use hardware to optimize the detection loop here,
     // as hardware type and detection function name doesn't match.
     // May need a bitmap of hardware to detection function to do it right?
-    sensor = mpuBusDetect(&gyro->dev);
+    auto sensor = mpuBusDetect(&gyro->dev);
     if (sensor != MPU_NONE) {
         gyro->mpuDetectionResult.sensor = sensor;
         busDeviceRegister(&gyro->dev);

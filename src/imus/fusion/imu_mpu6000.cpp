@@ -158,7 +158,7 @@ static void mpu6000SpiGyroInit(gyroDev_t *gyro)
 
 // ----------------------------------------------------------------------------
 
-uint8_t mpuBusDetect(const extDevice_t *dev)
+mpuSensor_e mpuBusDetect(const extDevice_t *dev)
 {
 
     spiSetClkDivisor(dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
@@ -174,7 +174,7 @@ uint8_t mpuBusDetect(const extDevice_t *dev)
 
     const uint8_t whoAmI = spiReadRegMsk(dev, MPU_RA_WHO_AM_I);
     delayMicroseconds(1); // Ensure CS high time is met which is violated on H7 without this delay
-    uint8_t detectedSensor = MPU_NONE;
+    mpuSensor_e detectedSensor = MPU_NONE;
 
     if (whoAmI == MPU6000_WHO_AM_I_CONST) {
         const uint8_t productID = spiReadRegMsk(dev, MPU_RA_PRODUCT_ID);
