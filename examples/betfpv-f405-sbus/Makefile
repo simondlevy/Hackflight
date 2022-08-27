@@ -122,6 +122,9 @@ STM32_SRC = \
             dshot.c \
             dshot_dpwm.c \
             dshot_command.c \
+            dshot_bitbang.c \
+            dshot_bitbang_decode.c \
+            dshot_bitbang_stdperiph.c \
             bus.c \
             bus_spi.c \
             bus_spi_config.c \
@@ -133,6 +136,8 @@ STM32_SRC = \
             io.c \
             motor.c \
             pinio.c \
+            pwm_output_dshot.c \
+            pwm_output_dshot_shared.c \
             rcc.c \
             serial.c \
             serial_uart.c \

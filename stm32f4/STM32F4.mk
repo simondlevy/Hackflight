@@ -106,12 +106,7 @@ MCU_COMMON_SRC = \
             startup/system_stm32f4xx.c \
             bus_spi_stdperiph.c \
             dma_stm32f4xx.c \
-            dshot_bitbang.c \
-            dshot_bitbang_decode.c \
-            dshot_bitbang_stdperiph.c \
             inverter.c \
-            pwm_output_dshot.c \
-            pwm_output_dshot_shared.c \
             serial_uart_stdperiph.c \
             serial_uart_stm32f4xx.c \
             system_stm32f4xx.c \
