@@ -173,19 +173,19 @@ void MpuImu::gyroInit(gyroDev_t *gyroDev)
 
 // ----------------------------------------------------------------------------
 
-static gyroDev_t gyroDev;
+static gyroDev_t m_gyroDev;
 
 uint32_t imuDevGyroInterruptCount(void)
 {
-    return gyroDev.detectedEXTI;
+    return m_gyroDev.detectedEXTI;
 }
 
 bool  imuDevGyroIsReady(void)
 {
-    bool ready = gyroDev.readFn(&gyroDev);
+    bool ready = m_gyroDev.readFn(&m_gyroDev);
 
     if (ready) {
-        gyroDev.dataReady = false;
+        m_gyroDev.dataReady = false;
     }
 
     return ready;
@@ -193,12 +193,12 @@ bool  imuDevGyroIsReady(void)
 
 int16_t imuDevReadRawGyro(uint8_t k)
 {
-    return gyroDev.adcRaw[k];
+    return m_gyroDev.adcRaw[k];
 }
 
 uint32_t imuDevGyroSyncTime(void)
 {
-    return gyroDev.gyroSyncEXTI;
+    return m_gyroDev.gyroSyncEXTI;
 }
 
 void imuDevInit(uint8_t interruptPin)
@@ -214,15 +214,15 @@ void imuDevInit(uint8_t interruptPin)
 
     spiPreinitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
 
-    mpuDetect(&gyroDev, &gyroDeviceConfig);
-    mpuBusGyroDetect(&gyroDev);
+    mpuDetect(&m_gyroDev, &gyroDeviceConfig);
+    mpuBusGyroDetect(&m_gyroDev);
 
     // SPI DMA buffer required per device
     static uint8_t gyroBuf1[MpuImu::GYRO_BUF_SIZE];
-    gyroDev.dev.txBuf = gyroBuf1;
-    gyroDev.dev.rxBuf = &gyroBuf1[MpuImu::GYRO_BUF_SIZE / 2];
+    m_gyroDev.dev.txBuf = gyroBuf1;
+    m_gyroDev.dev.rxBuf = &gyroBuf1[MpuImu::GYRO_BUF_SIZE / 2];
 
-    gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
+    m_gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
-    gyroDev.initFn(&gyroDev);
+    m_gyroDev.initFn(&m_gyroDev);
 }
