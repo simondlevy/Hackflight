@@ -15,8 +15,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "bus_spi.h"
-#include "mpu.h"
 #include "systemdev.h"
+
+#include "imus/fusion/mpu.h"
 #include "time.h"
 
 class Mpu6000Imu : public MpuImu {

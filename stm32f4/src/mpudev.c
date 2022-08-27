@@ -18,7 +18,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stddef.h>
 #include <stdint.h>
 
-#include "devices.h"
+#include "mpudev.h"
+
+#if !defined (__cplusplus)
 
 #define CONTAINER_OF(ptr, type, member)  ( __extension__ ({     \
             const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
@@ -29,3 +31,4 @@ gyroDev_t * gyroContainerOf(extiCallbackRec_t * cb)
     return CONTAINER_OF(cb, gyroDev_t, exti);
 }
 
+#endif

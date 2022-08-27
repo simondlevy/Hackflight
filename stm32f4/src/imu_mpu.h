@@ -22,7 +22,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "bus.h"
 #include "exti.h"
-#include "mpu/devices.h"
+#include "mpudev.h"
 
 #define GYRO_USES_SPI
 

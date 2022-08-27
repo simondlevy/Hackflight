@@ -116,7 +116,7 @@ endif
 #include $(ROOT)/make/csource.mk
 STM32_SRC = \
 			imu_mpu6000.c \
-			mpu/devices.c \
+			mpudev.c \
             debug.c \
             dshot.c \
             dshot_dpwm.c \
@@ -306,6 +306,8 @@ $(OBJECT_DIR)/main.o: main.cpp \
       $(HFSRC_DIR)/*/*.h \
       $(HFSRC_DIR)/mixers/*.h \
       $(HFSRC_DIR)/mixers/fixedpitch/*.h \
+      $(HFSRC_DIR)/imus/fusion/*.h \
+      $(HFSRC_DIR)/imus/fusion/mpu/*.h \
       $(STM_SRC_DIR)/*/*.h
 	$(V1) $(call compile_cpp)
 

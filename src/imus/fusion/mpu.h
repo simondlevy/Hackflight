@@ -15,11 +15,11 @@
  */
 
 #include "imus/fusion.h"
-
 #include "time.h"
+
 #include "bus.h"
 #include "bus_spi.h"
-#include "devices.h"
+#include "mpudev.h"
 #include "nvic.h"
 
 class MpuImu : public FusionImu {
