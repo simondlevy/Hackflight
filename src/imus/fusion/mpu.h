@@ -448,9 +448,6 @@ class MpuImu : public FusionImu {
 
             m_gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
-            m_gyroDev.accSampleRateHz = 1000;// XXX pass from subclass
-            m_gyroDev.gyroSampleRateHz = 8000;// XXX pass from subclass
-
             m_gyroDev.initFn(&m_gyroDev);
 
             m_accelDev.gyro = &m_gyroDev;

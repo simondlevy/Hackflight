@@ -71,7 +71,6 @@ typedef struct fp_rotationMatrix_s {
 
 typedef struct gyroDev_s {
 
-    uint16_t                  accSampleRateHz;
     int16_t                   adcRaw[3];                          
     uint32_t                  detectedEXTI;
     volatile bool             dataReady;
@@ -82,7 +81,6 @@ typedef struct gyroDev_s {
     gyroHardware_e            gyroHardware;
     uint8_t                   gyroHasOverflowProtection;
     uint32_t                  gyroLastEXTI;
-    uint16_t                  gyroSampleRateHz;
     int32_t                   gyroShortPeriod;
     uint32_t                  gyroSyncEXTI;
     uint8_t                   hardware_32khz_lpf;

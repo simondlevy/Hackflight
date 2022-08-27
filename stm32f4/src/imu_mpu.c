@@ -261,9 +261,6 @@ void imuDevInit(uint8_t interruptPin)
 
     gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
-    gyroDev.accSampleRateHz = 1000;// XXX pass from subclass
-    gyroDev.gyroSampleRateHz = 8000;// XXX pass from subclass
-
     gyroDev.initFn(&gyroDev);
     
     accelDev.gyro = &gyroDev;
