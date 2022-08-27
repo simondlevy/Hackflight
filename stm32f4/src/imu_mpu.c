@@ -255,18 +255,6 @@ uint32_t imuDevGyroSyncTime(void)
     return gyroDev.gyroSyncEXTI;
 }
 
-bool gyroSyncCheckUpdate(gyroDev_t *gyro)
-{
-    bool ret;
-    if (gyro->dataReady) {
-        ret = true;
-        gyro->dataReady= false;
-    } else {
-        ret = false;
-    }
-    return ret;
-}
-
 void imuDevInit(uint8_t interruptPin)
 {
     (void)interruptPin;

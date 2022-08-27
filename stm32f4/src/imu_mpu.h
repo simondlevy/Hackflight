@@ -193,20 +193,15 @@ typedef struct gyroDeviceConfig_s {
 struct gyroDev_s;
 struct gyroDeviceConfig_s;
 
+struct accDev_s;
+
+
+bool    mpuAccRead(struct accDev_s *acc);
+bool    mpuAccReadSPI(struct accDev_s *acc);
+bool    mpuBusAccDetect(accDev_t *acc);
+uint8_t mpuBusDetect(const extDevice_t *dev);
+bool    mpuBusGyroDetect(gyroDev_t *gyro);
 bool    mpuDetect(struct gyroDev_s *gyro, const struct gyroDeviceConfig_s *config);
 void    mpuGyroInit(struct gyroDev_s *gyro);
 bool    mpuGyroRead(struct gyroDev_s *gyro);
 bool    mpuGyroReadSPI(struct gyroDev_s *gyro);
-
-struct accDev_s;
-
-bool mpuAccRead(struct accDev_s *acc);
-bool mpuAccReadSPI(struct accDev_s *acc);
-
-bool gyroSyncCheckUpdate(gyroDev_t *gyro);
-uint16_t gyroSetSampleRate(gyroDev_t *gyro);
-
-// API for specific MPU sensor
-uint8_t mpuBusDetect(const extDevice_t *dev);
-bool    mpuBusAccDetect(accDev_t *acc);
-bool    mpuBusGyroDetect(gyroDev_t *gyro);
