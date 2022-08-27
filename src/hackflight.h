@@ -171,7 +171,7 @@ class Hackflight {
             static int32_t _gyroSkewAccum;
 
             int32_t gyroSkew =
-                Imu::getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
+                m_imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 

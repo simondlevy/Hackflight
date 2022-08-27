@@ -24,8 +24,6 @@ extern "C" {
 
     // Called externally
     uint32_t imuDevGyroInterruptCount(void);
-
-    // Called here
     void     imuDevInit(uint8_t interruptPin);
     bool     imuDevGyroIsReady(void);
     int16_t  imuDevReadRawGyro(uint8_t k);
@@ -254,7 +252,7 @@ class Imu {
             return m_isCalibrating;
         }
 
-        static int32_t getGyroSkew(
+        int32_t getGyroSkew(
                 uint32_t nextTargetCycles,
                 int32_t desiredPeriodCycles)
         {
@@ -269,11 +267,10 @@ class Imu {
         }
 
         virtual uint32_t devGyroInterruptCount(void) = 0;
-
-        virtual void     devInit(uint8_t interruptPin) = 0;
         virtual bool     devGyroIsReady(void) = 0;
-        virtual int16_t  devReadRawGyro(uint8_t k) = 0;
         virtual uint32_t devGyroSyncTime(void) = 0;
+        virtual void     devInit(uint8_t interruptPin) = 0;
+        virtual int16_t  devReadRawGyro(uint8_t k) = 0;
 
 }; // class Imu
 
