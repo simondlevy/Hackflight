@@ -134,6 +134,13 @@ class MpuImu {
         static const uint8_t RA_FIFO_COUNTL      = 0x73;
         static const uint8_t RA_FIFO_R_W         = 0x74;
 
+        // The gyro buffer is split 50/50, the first half for the transmit buffer, the
+        // second half for the receive buffer This buffer is large enough for the gyros
+        // currently supported in imu_mpu.c but should be reviewed id other gyro
+        // types are supported with SPI DMA.
+        static const uint8_t GYRO_BUF_SIZE = 32;
+
+
         enum gyro_fsr_e {
             INV_FSR_250DPS = 0,
             INV_FSR_500DPS,

@@ -37,15 +37,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 #include "systemdev.h"
 
-// Need to see at least this many interrupts during initialisation to confirm EXTI connectivity
-#define GYRO_EXTI_DETECT_THRESHOLD 1000
-
-// The gyro buffer is split 50/50, the first half for the transmit buffer, the
-// second half for the receive buffer This buffer is large enough for the gyros
-// currently supported in imu_mpu.c but should be reviewed id other gyro
-// types are supported with SPI DMA.
-#define GYRO_BUF_SIZE 32
-
 static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
     gyroDev_t *gyroDev = gyroContainerOf(cb);
@@ -227,9 +218,9 @@ void imuDevInit(uint8_t interruptPin)
     mpuBusGyroDetect(&gyroDev);
 
     // SPI DMA buffer required per device
-    static uint8_t gyroBuf1[GYRO_BUF_SIZE];
+    static uint8_t gyroBuf1[MpuImu::GYRO_BUF_SIZE];
     gyroDev.dev.txBuf = gyroBuf1;
-    gyroDev.dev.rxBuf = &gyroBuf1[GYRO_BUF_SIZE / 2];
+    gyroDev.dev.rxBuf = &gyroBuf1[MpuImu::GYRO_BUF_SIZE / 2];
 
     gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
