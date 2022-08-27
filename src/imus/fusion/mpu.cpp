@@ -186,6 +186,19 @@ uint32_t imuDevGyroInterruptCount(void)
     return m_gyroDev.detectedEXTI;
 }
 
+int16_t imuDevReadRawGyro(uint8_t k)
+{
+    return m_gyroDev.adcRaw[k];
+}
+
+uint32_t imuDevGyroSyncTime(void)
+{
+    return m_gyroDev.gyroSyncEXTI;
+}
+
+
+// ----------------------------------------------------------------------------
+
 bool MpuImu::devGyroIsReady(void)
 {
     bool ready = m_gyroDev.readFn();
@@ -195,16 +208,6 @@ bool MpuImu::devGyroIsReady(void)
     }
 
     return ready;
-}
-
-int16_t imuDevReadRawGyro(uint8_t k)
-{
-    return m_gyroDev.adcRaw[k];
-}
-
-uint32_t imuDevGyroSyncTime(void)
-{
-    return m_gyroDev.gyroSyncEXTI;
 }
 
 void MpuImu::devInit(uint8_t interruptPin)

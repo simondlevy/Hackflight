@@ -264,10 +264,10 @@ class Imu {
             return skew;
         }
 
+        virtual bool devGyroIsReady(void) = 0;
         virtual void devInit(uint8_t interruptPin) = 0;
 
         //virtual uint32_t devGyroInterruptCount(void) = 0;
-        virtual bool     devGyroIsReady(void) = 0;
         //virtual uint32_t devGyroSyncTime(void) = 0;
         //virtual int16_t  devReadRawGyro(uint8_t k) = 0;
 

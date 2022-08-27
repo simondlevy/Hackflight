@@ -210,6 +210,7 @@ class MpuImu : public FusionImu {
         }
 
         virtual void devInit(uint8_t interruptPin) override;
+
         virtual bool devGyroIsReady(void) override;
 
 }; // class MpuImu
