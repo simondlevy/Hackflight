@@ -203,17 +203,6 @@ uint8_t mpuBusDetect(const extDevice_t *dev)
     return detectedSensor;
 }
 
-bool mpuBusAccDetect(accDev_t *acc)
-{
-    if (acc->mpuDetectionResult.sensor != MPU_60x0_SPI) {
-        return false;
-    }
-
-    acc->readFn = mpuAccReadSPI;
-
-    return true;
-}
-
 bool mpuBusGyroDetect(gyroDev_t *gyro)
 {
     if (gyro->mpuDetectionResult.sensor != MPU_60x0_SPI) {

@@ -80,28 +80,6 @@ bool mpuGyroRead(gyroDev_t *gyro)
     return true;
 }
 
-bool mpuAccReadSPI(accDev_t *acc)
-{
-    // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(&acc->gyro->dev);
-
-    acc->gyro->dev.txBuf[0] = MPU_RA_ACCEL_XOUT_H | 0x80;
-
-    busSegment_t segments[] = {
-        {NULL, NULL, 7, true, NULL},
-        {NULL, NULL, 0, true, NULL},
-    };
-    segments[0].txData = acc->gyro->dev.txBuf;
-    segments[0].rxData = &acc->gyro->dev.rxBuf[1];
-
-    spiSequence(&acc->gyro->dev, &segments[0]);
-
-    // Wait for completion
-    spiWait(&acc->gyro->dev);
-
-    return true;
-}
-
 bool mpuGyroReadSPI(gyroDev_t *gyro)
 {
     uint16_t *gyroData = (uint16_t *)gyro->dev.rxBuf;
@@ -203,7 +181,6 @@ void mpuGyroInit(gyroDev_t *gyro)
     EXTIEnable(mpuIntIO, true);
 }
 
-static accDev_t accelDev;
 static gyroDev_t gyroDev;
 
 static const mpuDetectionResult_t *gyroMpuDetectionResult(void)
@@ -217,6 +194,7 @@ uint32_t imuDevGyroInterruptCount(void)
 {
     return gyroDev.detectedEXTI;
 }
+
 bool  imuDevGyroIsReady(void)
 {
     bool ready = gyroDev.readFn(&gyroDev);
@@ -262,9 +240,4 @@ void imuDevInit(uint8_t interruptPin)
     gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
     gyroDev.initFn(&gyroDev);
-    
-    accelDev.gyro = &gyroDev;
-    accelDev.mpuDetectionResult = *gyroMpuDetectionResult();
-    accelDev.acc_high_fsr = false;
-    mpuBusAccDetect(&accelDev);
 }

@@ -193,11 +193,7 @@ typedef struct gyroDeviceConfig_s {
 struct gyroDev_s;
 struct gyroDeviceConfig_s;
 
-struct accDev_s;
 
-
-bool    mpuAccReadSPI(struct accDev_s *acc);
-bool    mpuBusAccDetect(accDev_t *acc);
 uint8_t mpuBusDetect(const extDevice_t *dev);
 bool    mpuBusGyroDetect(gyroDev_t *gyro);
 bool    mpuDetect(struct gyroDev_s *gyro, const struct gyroDeviceConfig_s *config);

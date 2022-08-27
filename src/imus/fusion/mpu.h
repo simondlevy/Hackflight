@@ -385,17 +385,13 @@ class MpuImu : public FusionImu {
             return &m_gyroDev.mpuDetectionResult;
         }
 
-        virtual void init(gyroDev_t *gyro) = 0;
-
         virtual mpuSensor_e busDetect(const extDevice_t *dev) = 0;
-
-        virtual bool busAccDetect(accDev_t *acc) = 0;
-
-        virtual bool busGyroDetect(gyroDev_t *gyro) = 0;
+        virtual bool        busAccDetect(accDev_t *acc) = 0;
+        virtual bool        busGyroDetect(gyroDev_t *gyro) = 0;
+        virtual void        init(gyroDev_t *gyro) = 0;
+        virtual bool        readGyro(gyroDev_t * gyro) = 0;
 
         virtual bool readAcc(accDev_t * acc) = 0;
-
-        virtual bool readGyro(gyroDev_t * gyro) = 0;
 
     public:
 
@@ -406,7 +402,7 @@ class MpuImu : public FusionImu {
 
         virtual bool devGyroIsReady(void) override
         {
-            bool ready = m_gyroDev.readFn(&m_gyroDev);
+            bool ready = readGyro(&m_gyroDev);
 
             if (ready) {
                 m_gyroDev.dataReady = false;
@@ -448,7 +444,7 @@ class MpuImu : public FusionImu {
 
             m_gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
-            m_gyroDev.initFn(&m_gyroDev);
+            init(&m_gyroDev);
 
             m_accelDev.gyro = &m_gyroDev;
             m_accelDev.mpuDetectionResult = *gyroMpuDetectionResult();
