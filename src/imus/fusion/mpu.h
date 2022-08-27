@@ -209,6 +209,8 @@ class MpuImu : public FusionImu {
         {
         }
 
+        virtual void devInit(uint8_t interruptPin) override;
+
 }; // class MpuImu
 
 mpuSensor_e mpuBusDetect(const extDevice_t *dev);

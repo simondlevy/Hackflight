@@ -207,7 +207,7 @@ uint32_t imuDevGyroSyncTime(void)
     return m_gyroDev.gyroSyncEXTI;
 }
 
-void imuDevInit(uint8_t interruptPin)
+void MpuImu::devInit(uint8_t interruptPin)
 {
     (void)interruptPin;
 
