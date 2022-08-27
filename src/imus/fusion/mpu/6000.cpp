@@ -30,7 +30,7 @@
 
 static void mpu6000SpiGyroInit(gyroDev_t *gyro)
 {
-    MpuImu::gyroInit(gyro);
+    MpuImu::gyroInit();
 
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(Mpu6000Imu::MAX_SPI_INIT_CLK_HZ));
 

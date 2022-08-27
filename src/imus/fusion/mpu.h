@@ -198,7 +198,7 @@ class MpuImu : public FusionImu {
             uint8_t alignment;
         } gyroDeviceConfig_t;
 
-        static void gyroInit(gyroDev_t *gyro);
+        static void gyroInit(void);
 
         static bool gyroRead(gyroDev_t *gyro);
 

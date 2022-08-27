@@ -156,24 +156,24 @@ static bool mpuDetect(gyroDev_t *gyroDev, const MpuImu::gyroDeviceConfig_t *conf
     return detectSPISensorsAndUpdateDetectionResult(gyroDev, config);
 }
 
-void MpuImu::gyroInit(gyroDev_t *gyroDev)
+static gyroDev_t m_gyroDev;
+
+void MpuImu::gyroInit(void)
 {
-    if (gyroDev->mpuIntExtiTag == IO_TAG_NONE) {
+    if (m_gyroDev.mpuIntExtiTag == IO_TAG_NONE) {
         return;
     }
 
-    const IO_t mpuIntIO = IOGetByTag(gyroDev->mpuIntExtiTag);
+    const IO_t mpuIntIO = IOGetByTag(m_gyroDev.mpuIntExtiTag);
 
     IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
-    EXTIHandlerInit(&gyroDev->exti, mpuIntExtiHandler);
-    EXTIConfig(mpuIntIO, &gyroDev->exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
+    EXTIHandlerInit(&m_gyroDev.exti, mpuIntExtiHandler);
+    EXTIConfig(mpuIntIO, &m_gyroDev.exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
             BETAFLIGHT_EXTI_TRIGGER_RISING);
     EXTIEnable(mpuIntIO, true);
 }
 
 // ----------------------------------------------------------------------------
-
-static gyroDev_t m_gyroDev;
 
 uint32_t imuDevGyroInterruptCount(void)
 {
