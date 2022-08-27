@@ -267,11 +267,6 @@ uint32_t imuDevGyroSyncTime(void)
     return gyroDev.gyroSyncEXTI;
 }
 
-uint16_t imuDevGyroScale(void)
-{
-    return gyroDev.scaleDps;
-}
-
 bool gyroSyncCheckUpdate(gyroDev_t *gyro)
 {
     bool ret;

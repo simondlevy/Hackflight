@@ -187,8 +187,8 @@ class MpuImu : public FusionImu {
             NUM_ACCEL_FSR
         };
 
-        MpuImu(uint8_t interruptPin) 
-            : FusionImu(interruptPin)
+        MpuImu(uint8_t interruptPin, uint16_t gyroScale) 
+            : FusionImu(interruptPin, gyroScale)
         {
         }
 
@@ -432,11 +432,6 @@ class MpuImu : public FusionImu {
         virtual int16_t devReadRawGyro(uint8_t k) override
         {
             return m_gyroDev.adcRaw[k];
-        }
-
-        virtual uint16_t devGyroScale(void) override
-        {
-            return m_gyroDev.scaleDps;
         }
 
         virtual uint32_t devGyroSyncTime(void) override

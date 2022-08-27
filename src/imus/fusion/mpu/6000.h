@@ -163,8 +163,6 @@ class Mpu6000Imu : public MpuImu {
                 return false;
             }
 
-            gyro->scaleDps = 2000; // XXX should be passed to superclass
-
             gyro->gyroShortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
 
             return true;
@@ -277,7 +275,7 @@ class Mpu6000Imu : public MpuImu {
     public:
 
         Mpu6000Imu(uint8_t interruptPin) 
-            : MpuImu(interruptPin)
+            : MpuImu(interruptPin, 2000)
         {
         }
 

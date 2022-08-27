@@ -184,8 +184,8 @@ class FusionImu : public Imu {
 
     public:
 
-        FusionImu(uint8_t interruptPin)
-            : Imu(interruptPin)
+        FusionImu(uint8_t interruptPin, uint16_t gyroScale)
+            : Imu(interruptPin, gyroScale)
         {
         }
 

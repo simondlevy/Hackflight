@@ -222,7 +222,6 @@ bool mpuBusGyroDetect(gyroDev_t *gyro)
 
     gyro->initFn = mpu6000SpiGyroInit;
     gyro->readFn = mpuGyroReadSPI;
-    gyro->scaleDps = 2000;
     gyro->gyroShortPeriod = systemClockMicrosToCycles(MPU6000_SHORT_THRESHOLD);
     return true;
 }
