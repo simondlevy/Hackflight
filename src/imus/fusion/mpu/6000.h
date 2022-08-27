@@ -16,7 +16,7 @@
 
 #include <imus/fusion/mpu.h>
 
-class Mpu6000Imu {
+class Mpu6000Imu : public MpuImu {
 
     public:
 
@@ -82,5 +82,10 @@ class Mpu6000Imu {
         static const uint8_t REV_D8   = 0x58;
         static const uint8_t REV_D9   = 0x59;
         static const uint8_t REV_D10  = 0x5A;
+
+        Mpu6000Imu(uint8_t interruptPin, uint16_t gyroScale)
+            : MpuImu(interruptPin, gyroScale)
+        {
+        }
 
 }; // class Mpu6000Imu
