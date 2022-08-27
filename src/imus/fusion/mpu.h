@@ -190,10 +190,11 @@ class MpuImu {
             uint8_t alignment;
         } gyroDeviceConfig_t;
 
+        static void mpuGyroInit(gyroDev_t *gyro);
+
 }; // class MpuImu
 
 mpuSensor_e mpuBusDetect(const extDevice_t *dev);
 bool        mpuBusGyroDetect(gyroDev_t *gyro);
-void        mpuGyroInit(gyroDev_t *gyro);
 bool        mpuGyroRead(gyroDev_t *gyro);
 bool        mpuGyroReadSPI(gyroDev_t *gyro);

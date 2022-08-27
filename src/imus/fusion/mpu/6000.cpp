@@ -93,7 +93,7 @@ static const uint8_t MPU6000_REV_D10 = 0x5A;
 
 static void mpu6000SpiGyroInit(gyroDev_t *gyro)
 {
-    mpuGyroInit(gyro);
+    MpuImu::mpuGyroInit(gyro);
 
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_INIT_CLK_HZ));
 
