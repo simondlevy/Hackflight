@@ -117,7 +117,9 @@ static bool detectSPISensorsAndUpdateDetectionResult(
 
     m_gyroDev.dev.busType_u.spi.csnPin = IOGetByTag(config->csnTag);
 
-    IOInit(m_gyroDev.dev.busType_u.spi.csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(config->index));
+    IOInit(m_gyroDev.dev.busType_u.spi.csnPin, OWNER_GYRO_CS,
+            RESOURCE_INDEX(config->index));
+
     IOConfigGPIO(m_gyroDev.dev.busType_u.spi.csnPin, SPI_IO_CS_CFG);
 
     // Ensure device is disabled, important when two devices are on the same bus.
