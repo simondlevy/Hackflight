@@ -112,7 +112,7 @@ bool mpuGyroReadSPI(gyroDev_t *gyro)
 typedef uint8_t (*gyroSpiDetectFn_t)(const extDevice_t *dev);
 
 static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro,
-        const gyroDeviceConfig_t *config)
+        const MpuImu::gyroDeviceConfig_t *config)
 {
     if (!config->csnTag || !spiSetBusInstance(&gyro->dev, config->spiBus)) {
         return false;
@@ -142,7 +142,7 @@ static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro,
     return false;
 }
 
-static bool mpuDetect(gyroDev_t *gyro, const gyroDeviceConfig_t *config)
+static bool mpuDetect(gyroDev_t *gyro, const MpuImu::gyroDeviceConfig_t *config)
 {
     static busDevice_t bus;
     gyro->dev.bus = &bus;
@@ -214,7 +214,7 @@ void imuDevInit(uint8_t interruptPin)
 {
     (void)interruptPin;
 
-    static gyroDeviceConfig_t gyroDeviceConfig; 
+    static MpuImu::gyroDeviceConfig_t gyroDeviceConfig; 
 
     gyroDeviceConfig.busType = BUS_TYPE_SPI; // XXX pass from subclass
     gyroDeviceConfig.spiBus = 1;

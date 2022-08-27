@@ -179,18 +179,18 @@ class MpuImu {
             GYRO_OVERFLOW_Z = 0x04
         } gyroOverflow_e;
 
-}; // class MpuImu
+        typedef struct {
+            int8_t index;
+            busType_e busType;
+            uint8_t spiBus;
+            ioTag_t csnTag;
+            uint8_t i2cBus;
+            uint8_t i2cAddress;
+            ioTag_t extiTag;
+            uint8_t alignment;
+        } gyroDeviceConfig_t;
 
-typedef struct {
-    int8_t index;
-    busType_e busType;
-    uint8_t spiBus;
-    ioTag_t csnTag;
-    uint8_t i2cBus;
-    uint8_t i2cAddress;
-    ioTag_t extiTag;
-    uint8_t alignment;
-} gyroDeviceConfig_t;
+}; // class MpuImu
 
 mpuSensor_e mpuBusDetect(const extDevice_t *dev);
 bool        mpuBusGyroDetect(gyroDev_t *gyro);
