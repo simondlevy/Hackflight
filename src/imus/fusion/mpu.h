@@ -230,28 +230,6 @@ class MpuImu : public FusionImu {
             return true;
         }
 
-        bool accReadSpi(accDev_t *acc)
-        {
-            // Ensure any prior DMA has completed before continuing
-            spiWaitClaim(&acc->gyro->dev);
-
-            acc->gyro->dev.txBuf[0] = RA_ACCEL_XOUT_H | 0x80;
-
-            busSegment_t segments[] = {
-                {NULL, NULL, 7, true, NULL},
-                {NULL, NULL, 0, true, NULL},
-            };
-            segments[0].txData = acc->gyro->dev.txBuf;
-            segments[0].rxData = &acc->gyro->dev.rxBuf[1];
-
-            spiSequence(&acc->gyro->dev, &segments[0]);
-
-            // Wait for completion
-            spiWait(&acc->gyro->dev);
-
-            return true;
-        }
-
         bool gyroReadSpi(gyroDev_t *gyro)
         {
             uint16_t *gyroData = (uint16_t *)gyro->dev.rxBuf;
@@ -377,7 +355,6 @@ class MpuImu : public FusionImu {
 
         }
 
-        accDev_t  m_accelDev;
         gyroDev_t m_gyroDev;
 
         const mpuDetectionResult_t *gyroMpuDetectionResult(void)
@@ -386,12 +363,9 @@ class MpuImu : public FusionImu {
         }
 
         virtual mpuSensor_e busDetect(const extDevice_t *dev) = 0;
-        virtual bool        busAccDetect(accDev_t *acc) = 0;
         virtual bool        busGyroDetect(gyroDev_t *gyro) = 0;
-        virtual void        init(gyroDev_t *gyro) = 0;
+        virtual void        gyroDevInit(gyroDev_t *gyro) = 0;
         virtual bool        readGyro(gyroDev_t * gyro) = 0;
-
-        virtual bool readAcc(accDev_t * acc) = 0;
 
     public:
 
@@ -444,12 +418,7 @@ class MpuImu : public FusionImu {
 
             m_gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
-            init(&m_gyroDev);
-
-            m_accelDev.gyro = &m_gyroDev;
-            m_accelDev.mpuDetectionResult = *gyroMpuDetectionResult();
-            m_accelDev.acc_high_fsr = false;
-            busAccDetect(&m_accelDev);
+            gyroDevInit(&m_gyroDev);
         }
 
 };  // class MpuImu

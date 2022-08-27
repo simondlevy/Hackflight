@@ -148,15 +148,6 @@ class Mpu6000Imu : public MpuImu {
             return detectedSensor;
         }
 
-        virtual bool busAccDetect(accDev_t *acc) override
-        {
-            if (acc->mpuDetectionResult.sensor != MPU_60x0_SPI) {
-                return false;
-            }
-
-            return true;
-        }
-
         virtual bool busGyroDetect(gyroDev_t *gyro) override
         {
             if (gyro->mpuDetectionResult.sensor != MPU_60x0_SPI) {
@@ -168,22 +159,16 @@ class Mpu6000Imu : public MpuImu {
             return true;
         }
 
-        virtual bool readAcc(accDev_t * acc) override
-        {
-            return MpuImu::accReadSpi(acc);
-        }
-
         virtual bool readGyro(gyroDev_t * gyro) override
         {
             return MpuImu::gyroReadSpi(gyro);
         }
 
-        virtual void init(gyroDev_t *gyro) override
+        virtual void gyroDevInit(gyroDev_t *gyro) override
         {
             MpuImu::gyroInit(gyro);
 
-               spiSetClkDivisor
-                   (&gyro->dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
+            spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
 
             // Device was already reset during detection so proceed with
             // configuration
