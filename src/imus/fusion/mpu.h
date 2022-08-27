@@ -193,11 +193,8 @@ typedef struct gyroDeviceConfig_s {
     //sensorAlignment_t customAlignment;
 } gyroDeviceConfig_t;
 
-struct gyroDeviceConfig_s;
-
 mpuSensor_e mpuBusDetect(const extDevice_t *dev);
-bool    mpuBusGyroDetect(gyroDev_t *gyro);
-bool    mpuDetect(struct gyroDev_s *gyro, const struct gyroDeviceConfig_s *config);
-void    mpuGyroInit(struct gyroDev_s *gyro);
-bool    mpuGyroRead(struct gyroDev_s *gyro);
-bool    mpuGyroReadSPI(struct gyroDev_s *gyro);
+bool        mpuBusGyroDetect(gyroDev_t *gyro);
+void        mpuGyroInit(struct gyroDev_s *gyro);
+bool        mpuGyroRead(struct gyroDev_s *gyro);
+bool        mpuGyroReadSPI(struct gyroDev_s *gyro);

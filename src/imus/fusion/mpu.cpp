@@ -142,7 +142,7 @@ static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyro,
     return false;
 }
 
-bool mpuDetect(gyroDev_t *gyro, const gyroDeviceConfig_t *config)
+static bool mpuDetect(gyroDev_t *gyro, const gyroDeviceConfig_t *config)
 {
     static busDevice_t bus;
     gyro->dev.bus = &bus;
