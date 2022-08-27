@@ -140,7 +140,7 @@ static void mpu6000SpiGyroInit(gyroDev_t *gyro)
 
     spiSetClkDivisor(&gyro->dev, spiCalculateDivider(MPU6000_MAX_SPI_CLK_HZ));
 
-    mpuGyroRead(gyro);
+    MpuImu::gyroRead(gyro);
 
     if (((int8_t)gyro->adcRaw[1]) == -1 && ((int8_t)gyro->adcRaw[0]) == -1) {
         systemFailureMode(FAILURE_GYRO_INIT_FAILED);
@@ -201,7 +201,7 @@ bool mpuBusGyroDetect(gyroDev_t *gyro)
     }
 
     gyro->initFn = mpu6000SpiGyroInit;
-    gyro->readFn = mpuGyroReadSPI;
+    gyro->readFn = MpuImu::gyroReadSPI;
     gyro->gyroShortPeriod = systemClockMicrosToCycles(MPU6000_SHORT_THRESHOLD);
     return true;
 }

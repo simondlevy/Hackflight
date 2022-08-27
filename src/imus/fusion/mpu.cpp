@@ -56,7 +56,7 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
     gyroDev->detectedEXTI++;
 }
 
-bool mpuGyroRead(gyroDev_t *gyro)
+bool MpuImu::gyroRead(gyroDev_t *gyro)
 {
     uint8_t data[6];
 
@@ -72,7 +72,7 @@ bool mpuGyroRead(gyroDev_t *gyro)
     return true;
 }
 
-bool mpuGyroReadSPI(gyroDev_t *gyro)
+bool MpuImu::gyroReadSPI(gyroDev_t *gyro)
 {
     uint16_t *gyroData = (uint16_t *)gyro->dev.rxBuf;
 

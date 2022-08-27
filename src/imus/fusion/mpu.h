@@ -199,9 +199,11 @@ class MpuImu {
 
         static void gyroInit(gyroDev_t *gyro);
 
+        static bool gyroRead(gyroDev_t *gyro);
+
+        static bool gyroReadSPI(gyroDev_t *gyro);
+
 }; // class MpuImu
 
 mpuSensor_e mpuBusDetect(const extDevice_t *dev);
 bool        mpuBusGyroDetect(gyroDev_t *gyro);
-bool        mpuGyroRead(gyroDev_t *gyro);
-bool        mpuGyroReadSPI(gyroDev_t *gyro);
