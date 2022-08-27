@@ -116,11 +116,11 @@ static void mpu6000SpiGyroInit(gyroDev_t *gyro)
     delayMicroseconds(15);
 
     // Gyro +/- 2000 DPS Full Scale
-    spiWriteReg(&gyro->dev, MpuImu::RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
+    spiWriteReg(&gyro->dev, MpuImu::RA_GYRO_CONFIG, MpuImu::INV_FSR_2000DPS << 3);
     delayMicroseconds(15);
 
     // Accel +/- 16 G Full Scale
-    spiWriteReg(&gyro->dev, MpuImu::RA_ACCEL_CONFIG, INV_FSR_16G << 3);
+    spiWriteReg(&gyro->dev, MpuImu::RA_ACCEL_CONFIG, MpuImu::INV_FSR_16G << 3);
     delayMicroseconds(15);
 
     spiWriteReg(&gyro->dev, MpuImu::RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR

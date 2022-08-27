@@ -134,52 +134,52 @@ class MpuImu {
         static const uint8_t RA_FIFO_COUNTL      = 0x73;
         static const uint8_t RA_FIFO_R_W         = 0x74;
 
+        enum gyro_fsr_e {
+            INV_FSR_250DPS = 0,
+            INV_FSR_500DPS,
+            INV_FSR_1000DPS,
+            INV_FSR_2000DPS,
+            NUM_GYRO_FSR
+        };
+
+        enum icm_high_range_gyro_fsr_e {
+            ICM_HIGH_RANGE_FSR_500DPS = 0,
+            ICM_HIGH_RANGE_FSR_1000DPS,
+            ICM_HIGH_RANGE_FSR_2000DPS,
+            ICM_HIGH_RANGE_FSR_4000DPS,
+            NUM_ICM_HIGH_RANGE_GYRO_FSR
+        };
+
+        enum clock_sel_e {
+            INV_CLK_INTERNAL = 0,
+            INV_CLK_PLL,
+            NUM_CLK
+        };
+
+        enum accel_fsr_e {
+            INV_FSR_2G = 0,
+            INV_FSR_4G,
+            INV_FSR_8G,
+            INV_FSR_16G,
+            NUM_ACCEL_FSR
+        };
+
+        enum icm_high_range_accel_fsr_e {
+            ICM_HIGH_RANGE_FSR_4G = 0,
+            ICM_HIGH_RANGE_FSR_8G,
+            ICM_HIGH_RANGE_FSR_16G,
+            ICM_HIGH_RANGE_FSR_32G,
+            NUM_ICM_HIGH_RANGE_ACCEL_FSR
+        };
+
+        typedef enum {
+            GYRO_OVERFLOW_NONE = 0x00,
+            GYRO_OVERFLOW_X = 0x01,
+            GYRO_OVERFLOW_Y = 0x02,
+            GYRO_OVERFLOW_Z = 0x04
+        } gyroOverflow_e;
+
 }; // class MpuImu
-
-enum gyro_fsr_e {
-    INV_FSR_250DPS = 0,
-    INV_FSR_500DPS,
-    INV_FSR_1000DPS,
-    INV_FSR_2000DPS,
-    NUM_GYRO_FSR
-};
-
-enum icm_high_range_gyro_fsr_e {
-    ICM_HIGH_RANGE_FSR_500DPS = 0,
-    ICM_HIGH_RANGE_FSR_1000DPS,
-    ICM_HIGH_RANGE_FSR_2000DPS,
-    ICM_HIGH_RANGE_FSR_4000DPS,
-    NUM_ICM_HIGH_RANGE_GYRO_FSR
-};
-
-enum clock_sel_e {
-    INV_CLK_INTERNAL = 0,
-    INV_CLK_PLL,
-    NUM_CLK
-};
-
-enum accel_fsr_e {
-    INV_FSR_2G = 0,
-    INV_FSR_4G,
-    INV_FSR_8G,
-    INV_FSR_16G,
-    NUM_ACCEL_FSR
-};
-
-enum icm_high_range_accel_fsr_e {
-    ICM_HIGH_RANGE_FSR_4G = 0,
-    ICM_HIGH_RANGE_FSR_8G,
-    ICM_HIGH_RANGE_FSR_16G,
-    ICM_HIGH_RANGE_FSR_32G,
-    NUM_ICM_HIGH_RANGE_ACCEL_FSR
-};
-
-typedef enum {
-    GYRO_OVERFLOW_NONE = 0x00,
-    GYRO_OVERFLOW_X = 0x01,
-    GYRO_OVERFLOW_Y = 0x02,
-    GYRO_OVERFLOW_Z = 0x04
-} gyroOverflow_e;
 
 typedef struct gyroDeviceConfig_s {
     int8_t index;
