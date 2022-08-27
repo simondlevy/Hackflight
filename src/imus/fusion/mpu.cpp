@@ -102,28 +102,30 @@ bool MpuImu::gyroReadSPI(gyroDev_t *gyroDev)
 
 typedef uint8_t (*gyroSpiDetectFn_t)(const extDevice_t *dev);
 
-static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyroDev,
+static gyroDev_t m_gyroDev;
+
+static bool detectSPISensorsAndUpdateDetectionResult(
         const MpuImu::gyroDeviceConfig_t *config)
 {
-    if (!config->csnTag || !spiSetBusInstance(&gyroDev->dev, config->spiBus)) {
+    if (!config->csnTag || !spiSetBusInstance(&m_gyroDev.dev, config->spiBus)) {
         return false;
     }
 
-    gyroDev->dev.busType_u.spi.csnPin = IOGetByTag(config->csnTag);
+    m_gyroDev.dev.busType_u.spi.csnPin = IOGetByTag(config->csnTag);
 
-    IOInit(gyroDev->dev.busType_u.spi.csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(config->index));
-    IOConfigGPIO(gyroDev->dev.busType_u.spi.csnPin, SPI_IO_CS_CFG);
+    IOInit(m_gyroDev.dev.busType_u.spi.csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(config->index));
+    IOConfigGPIO(m_gyroDev.dev.busType_u.spi.csnPin, SPI_IO_CS_CFG);
 
     // Ensure device is disabled, important when two devices are on the same bus.
-    IOHi(gyroDev->dev.busType_u.spi.csnPin); 
+    IOHi(m_gyroDev.dev.busType_u.spi.csnPin); 
 
     // It is hard to use hardware to optimize the detection loop here,
     // as hardware type and detection function name doesn't match.
     // May need a bitmap of hardware to detection function to do it right?
-    auto sensor = mpuBusDetect(&gyroDev->dev);
+    auto sensor = mpuBusDetect(&m_gyroDev.dev);
     if (sensor != MPU_NONE) {
-        gyroDev->mpuDetectionResult.sensor = sensor;
-        busDeviceRegister(&gyroDev->dev);
+        m_gyroDev.mpuDetectionResult.sensor = sensor;
+        busDeviceRegister(&m_gyroDev.dev);
         return true;
     }
 
@@ -132,8 +134,6 @@ static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyroDev,
 
     return false;
 }
-
-static gyroDev_t m_gyroDev;
 
 static bool mpuDetect(const MpuImu::gyroDeviceConfig_t *config)
 {
@@ -155,7 +155,7 @@ static bool mpuDetect(const MpuImu::gyroDeviceConfig_t *config)
 
     m_gyroDev.dev.bus->busType = BUS_TYPE_SPI;
 
-    return detectSPISensorsAndUpdateDetectionResult(&m_gyroDev, config);
+    return detectSPISensorsAndUpdateDetectionResult(config);
 }
 
 void MpuImu::gyroInit(void)
