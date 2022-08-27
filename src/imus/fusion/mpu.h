@@ -357,11 +357,6 @@ class MpuImu : public FusionImu {
 
         gyroDev_t m_gyroDev;
 
-        const mpuDetectionResult_t *gyroMpuDetectionResult(void)
-        {
-            return &m_gyroDev.mpuDetectionResult;
-        }
-
         virtual mpuSensor_e busDetect(const extDevice_t *dev) = 0;
         virtual bool        busGyroDetect(gyroDev_t *gyro) = 0;
         virtual void        gyroDevInit(gyroDev_t *gyro) = 0;

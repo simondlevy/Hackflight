@@ -181,14 +181,15 @@ void mpuGyroInit(gyroDev_t *gyro)
     EXTIEnable(mpuIntIO, true);
 }
 
+// ----------------------------------------------------------------------------
+
 static gyroDev_t gyroDev;
 
+/*
 static const mpuDetectionResult_t *gyroMpuDetectionResult(void)
 {
     return &gyroDev.mpuDetectionResult;
-}
-
-// Device API -----------------------------------------------------------------
+}*/
 
 uint32_t imuDevGyroInterruptCount(void)
 {
