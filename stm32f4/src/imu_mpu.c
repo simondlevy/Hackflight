@@ -185,12 +185,6 @@ void mpuGyroInit(gyroDev_t *gyro)
 
 static gyroDev_t gyroDev;
 
-/*
-static const mpuDetectionResult_t *gyroMpuDetectionResult(void)
-{
-    return &gyroDev.mpuDetectionResult;
-}*/
-
 uint32_t imuDevGyroInterruptCount(void)
 {
     return gyroDev.detectedEXTI;
