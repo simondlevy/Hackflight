@@ -200,7 +200,8 @@ class MpuImu : public FusionImu {
             // unfortunately the port used for EXTI interrupt does not have an
             // associated timer
             uint32_t nowCycles = systemGetCycleCounter();
-            int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, gyroDev->gyroLastEXTI);
+            int32_t gyroLastPeriod =
+                cmpTimeCycles(nowCycles, gyroDev->gyroLastEXTI);
             // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
             if ((gyroDev->gyroShortPeriod == 0) ||
                     (gyroLastPeriod < gyroDev->gyroShortPeriod)) {

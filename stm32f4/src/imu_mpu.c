@@ -220,18 +220,6 @@ void mpuGyroInit(gyroDev_t *gyro)
     EXTIEnable(mpuIntIO, true);
 }
 
-uint8_t mpuGyroReadRegister(const extDevice_t *dev, uint8_t reg)
-{
-    uint8_t data;
-    const bool ack = busReadRegisterBuffer(dev, reg, &data, 1);
-    if (ack) {
-        return data;
-    } else {
-        return 0;
-    }
-
-}
-
 static accDev_t accelDev;
 static gyroDev_t gyroDev;
 
