@@ -274,8 +274,8 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/stm32clock.o \
-		  $(OBJECT_DIR)/imu_mpu.o \
-		  $(OBJECT_DIR)/imu_mpu6000.o \
+		  $(OBJECT_DIR)/mpu.o \
+		  $(OBJECT_DIR)/6000.o \
 		  $(OBJECT_DIR)/mpudev.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CXX) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
@@ -303,15 +303,15 @@ $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 		hardware_init.c
 
 $(OBJECT_DIR)/mpudev.o: $(HFSRC_DIR)/imus/fusion/mpudev.c
-	@echo mpudev.c
+	@echo imus/fusion/mpudev.c
 	$(V1) $(call compile_c)
 
-$(OBJECT_DIR)/imu_mpu.o: $(HFSRC_DIR)/imus/fusion/imu_mpu.cpp
-	@echo imu_mpu.cpp
+$(OBJECT_DIR)/mpu.o: $(HFSRC_DIR)/imus/fusion/mpu.cpp
+	@echo imus/fusion/mpu.cpp
 	$(V1) $(call compile_cpp)
 
-$(OBJECT_DIR)/imu_mpu6000.o: $(HFSRC_DIR)/imus/fusion/imu_mpu6000.cpp
-	@echo imu_mpu6000.cpp
+$(OBJECT_DIR)/6000.o: $(HFSRC_DIR)/imus/fusion/mpu/6000.cpp
+	@echo imus/fusion/mpu/6000.cpp
 	$(V1) $(call compile_cpp)
 
 $(OBJECT_DIR)/stm32clock.o: $(HFSRC_DIR)/stm32clock.c

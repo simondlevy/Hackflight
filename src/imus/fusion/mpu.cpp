@@ -25,7 +25,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <system.h>
 #include <time.h>
 
-#include "imu_mpu.h"
+#include "mpu.h"
 #include "atomic.h"
 #include "bus.h"
 #include "bus_spi.h"
