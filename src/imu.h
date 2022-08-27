@@ -24,7 +24,6 @@ extern "C" {
 
     // Called externally
     uint32_t imuDevGyroInterruptCount(void);
-    int16_t  imuDevReadRawGyro(uint8_t k);
     uint32_t imuDevGyroSyncTime(void);
 
 #if defined(__cplusplus)
@@ -104,8 +103,8 @@ class Imu {
                 }
 
                 // Sum up CALIBRATING_GYRO_TIME_US readings
-                m_calibration.sum[axis] += imuDevReadRawGyro(axis);
-                m_calibration.var[axis].push(imuDevReadRawGyro(axis));
+                m_calibration.sum[axis] += devReadRawGyro(axis);
+                m_calibration.var[axis].push(devReadRawGyro(axis));
 
                 if (m_calibration.cyclesRemaining == 1) {
                     const float stddev = m_calibration.var[axis].stdev();
@@ -204,9 +203,9 @@ class Imu {
                 // move 16-bit gyro data into floats to avoid overflows in
                 // calculations
 
-                _adc.x = imuDevReadRawGyro(0) - m_zero[0];
-                _adc.y = imuDevReadRawGyro(1) - m_zero[1];
-                _adc.z = imuDevReadRawGyro(2) - m_zero[2];
+                _adc.x = devReadRawGyro(0) - m_zero[0];
+                _adc.y = devReadRawGyro(1) - m_zero[1];
+                _adc.z = devReadRawGyro(2) - m_zero[2];
 
                 align(&_adc);
 
@@ -264,12 +263,12 @@ class Imu {
             return skew;
         }
 
-        virtual bool devGyroIsReady(void) = 0;
-        virtual void devInit(uint8_t interruptPin) = 0;
+        virtual bool     devGyroIsReady(void) = 0;
+        virtual void     devInit(uint8_t interruptPin) = 0;
+        virtual int16_t  devReadRawGyro(uint8_t k) = 0;
 
         //virtual uint32_t devGyroInterruptCount(void) = 0;
         //virtual uint32_t devGyroSyncTime(void) = 0;
-        //virtual int16_t  devReadRawGyro(uint8_t k) = 0;
 
 }; // class Imu
 

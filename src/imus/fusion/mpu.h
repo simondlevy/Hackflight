@@ -213,6 +213,8 @@ class MpuImu : public FusionImu {
 
         virtual bool devGyroIsReady(void) override;
 
+        virtual int16_t devReadRawGyro(uint8_t k) override;
+
 }; // class MpuImu
 
 mpuSensor_e mpuBusDetect(const extDevice_t *dev);
