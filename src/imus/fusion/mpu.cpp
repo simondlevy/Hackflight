@@ -56,23 +56,27 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
     gyroDev->detectedEXTI++;
 }
 
-bool MpuImu::gyroRead(gyroDev_t *gyroDev)
+// ----------------------------------------------------------------------------
+
+static gyroDev_t m_gyroDev;
+
+bool MpuImu::gyroRead(void)
 {
     uint8_t data[6];
 
-    const bool ack = busReadRegisterBuffer(&gyroDev->dev, MpuImu::RA_GYRO_XOUT_H, data, 6);
+    const bool ack = busReadRegisterBuffer(
+            &m_gyroDev.dev, MpuImu::RA_GYRO_XOUT_H, data, 6);
+
     if (!ack) {
         return false;
     }
 
-    gyroDev->adcRaw[0] = (int16_t)((data[0] << 8) | data[1]);
-    gyroDev->adcRaw[1] = (int16_t)((data[2] << 8) | data[3]);
-    gyroDev->adcRaw[2] = (int16_t)((data[4] << 8) | data[5]);
+    m_gyroDev.adcRaw[0] = (int16_t)((data[0] << 8) | data[1]);
+    m_gyroDev.adcRaw[1] = (int16_t)((data[2] << 8) | data[3]);
+    m_gyroDev.adcRaw[2] = (int16_t)((data[4] << 8) | data[5]);
 
     return true;
 }
-
-static gyroDev_t m_gyroDev;
 
 bool MpuImu::gyroReadSPI()
 {
