@@ -165,7 +165,7 @@ static bool mpuDetect(gyroDev_t *gyro, const MpuImu::gyroDeviceConfig_t *config)
     return detectSPISensorsAndUpdateDetectionResult(gyro, config);
 }
 
-void MpuImu::mpuGyroInit(gyroDev_t *gyro)
+void MpuImu::gyroInit(gyroDev_t *gyro)
 {
     if (gyro->mpuIntExtiTag == IO_TAG_NONE) {
         return;

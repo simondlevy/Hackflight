@@ -190,7 +190,7 @@ class MpuImu {
             uint8_t alignment;
         } gyroDeviceConfig_t;
 
-        static void mpuGyroInit(gyroDev_t *gyro);
+        static void gyroInit(gyroDev_t *gyro);
 
 }; // class MpuImu
 
