@@ -133,10 +133,12 @@ static bool detectSPISensorsAndUpdateDetectionResult(gyroDev_t *gyroDev,
     return false;
 }
 
-static bool mpuDetect(gyroDev_t *gyroDev, const MpuImu::gyroDeviceConfig_t *config)
+static gyroDev_t m_gyroDev;
+
+static bool mpuDetect(const MpuImu::gyroDeviceConfig_t *config)
 {
     static busDevice_t bus;
-    gyroDev->dev.bus = &bus;
+    m_gyroDev.dev.bus = &bus;
 
     // MPU datasheet specifies 30ms.
     delay(35);
@@ -146,17 +148,15 @@ static bool mpuDetect(gyroDev_t *gyroDev, const MpuImu::gyroDeviceConfig_t *conf
     }
 
     if (config->busType == BUS_TYPE_GYRO_AUTO) {
-        gyroDev->dev.bus->busType = BUS_TYPE_I2C;
+        m_gyroDev.dev.bus->busType = BUS_TYPE_I2C;
     } else {
-        gyroDev->dev.bus->busType = config->busType;
+        m_gyroDev.dev.bus->busType = config->busType;
     }
 
-    gyroDev->dev.bus->busType = BUS_TYPE_SPI;
+    m_gyroDev.dev.bus->busType = BUS_TYPE_SPI;
 
-    return detectSPISensorsAndUpdateDetectionResult(gyroDev, config);
+    return detectSPISensorsAndUpdateDetectionResult(&m_gyroDev, config);
 }
-
-static gyroDev_t m_gyroDev;
 
 void MpuImu::gyroInit(void)
 {
@@ -214,7 +214,7 @@ void imuDevInit(uint8_t interruptPin)
 
     spiPreinitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
 
-    mpuDetect(&m_gyroDev, &gyroDeviceConfig);
+    mpuDetect(&gyroDeviceConfig);
     mpuBusGyroDetect(&m_gyroDev);
 
     // SPI DMA buffer required per device
