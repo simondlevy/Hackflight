@@ -27,7 +27,8 @@
 #include <receivers/sbus.h>
 #include <serial.h>
 
-#include <imus/fusion/mpu/6000.h>
+//#include <imus/fusion/mpu/6000.h>
+#include <imus/fusion.h>
 #include <led/led.h>
 
 #include "hardware_init.h"
@@ -43,7 +44,10 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-    static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
+    // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
+    static FusionImu imu(
+            0,     // dummy value for IMU interrupt pin
+            2000); // gyro scale DPS
 
     static SbusReceiver receiver(SERIAL_PORT_USART3);
 

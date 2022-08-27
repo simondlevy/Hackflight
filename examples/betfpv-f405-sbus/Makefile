@@ -115,8 +115,6 @@ endif
 
 #include $(ROOT)/make/csource.mk
 STM32_SRC = \
-            imu_mpu.c \
-			imu_mpu6000.c \
 			mpudev.c \
             debug.c \
             dshot.c \
@@ -276,7 +274,9 @@ $(TARGET_DFU): $(TARGET_HEX)
 $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
-		  $(OBJECT_DIR)/stm32clock.o
+		  $(OBJECT_DIR)/stm32clock.o \
+		  $(OBJECT_DIR)/imu_mpu.o \
+		  $(OBJECT_DIR)/imu_mpu6000.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CXX) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
@@ -302,6 +302,16 @@ $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hardware_init.o $(CFLAGS) \
 		hardware_init.c
 
+$(OBJECT_DIR)/imu_mpu.o: $(HFSRC_DIR)/imus/fusion/imu_mpu.c
+	@echo imu_mpu.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/imu_mpu.o $(CFLAGS) \
+		$(HFSRC_DIR)/imus/fusion/imu_mpu.c
+
+$(OBJECT_DIR)/imu_mpu6000.o: $(HFSRC_DIR)/imus/fusion/imu_mpu6000.c
+	@echo imu_mpu6000.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/imu_mpu6000.o $(CFLAGS) \
+		$(HFSRC_DIR)/imus/fusion/imu_mpu6000.c
+
 $(OBJECT_DIR)/stm32clock.o: $(HFSRC_DIR)/stm32clock.c
 	@echo stm32clock.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/stm32clock.o $(CFLAGS) \
@@ -313,8 +323,6 @@ $(OBJECT_DIR)/main.o: main.cpp \
       $(HFSRC_DIR)/*/*.h \
       $(HFSRC_DIR)/mixers/*.h \
       $(HFSRC_DIR)/mixers/fixedpitch/*.h \
-      $(HFSRC_DIR)/imus/fusion/*.h \
-      $(HFSRC_DIR)/imus/fusion/mpu/*.h \
       $(STM_SRC_DIR)/*/*.h
 	$(V1) $(call compile_cpp)
 
