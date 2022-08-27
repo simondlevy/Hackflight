@@ -72,37 +72,37 @@ bool MpuImu::gyroRead(gyroDev_t *gyroDev)
     return true;
 }
 
-bool MpuImu::gyroReadSPI(gyroDev_t *gyroDev)
+static gyroDev_t m_gyroDev;
+
+bool MpuImu::gyroReadSPI()
 {
-    uint16_t *gyroData = (uint16_t *)gyroDev->dev.rxBuf;
+    uint16_t *gyroData = (uint16_t *)m_gyroDev.dev.rxBuf;
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(&gyroDev->dev);
+    spiWaitClaim(&m_gyroDev.dev);
 
-    gyroDev->dev.txBuf[0] = MpuImu::RA_GYRO_XOUT_H | 0x80;
+    m_gyroDev.dev.txBuf[0] = MpuImu::RA_GYRO_XOUT_H | 0x80;
 
     busSegment_t segments[] = {
         {NULL, NULL, 7, true, NULL},
         {NULL, NULL, 0, true, NULL},
     };
-    segments[0].txData = gyroDev->dev.txBuf;
-    segments[0].rxData = &gyroDev->dev.rxBuf[1];
+    segments[0].txData = m_gyroDev.dev.txBuf;
+    segments[0].rxData = &m_gyroDev.dev.rxBuf[1];
 
-    spiSequence(&gyroDev->dev, &segments[0]);
+    spiSequence(&m_gyroDev.dev, &segments[0]);
 
     // Wait for completion
-    spiWait(&gyroDev->dev);
+    spiWait(&m_gyroDev.dev);
 
-    gyroDev->adcRaw[0] = __builtin_bswap16(gyroData[1]);
-    gyroDev->adcRaw[1] = __builtin_bswap16(gyroData[2]);
-    gyroDev->adcRaw[2] = __builtin_bswap16(gyroData[3]);
+    m_gyroDev.adcRaw[0] = __builtin_bswap16(gyroData[1]);
+    m_gyroDev.adcRaw[1] = __builtin_bswap16(gyroData[2]);
+    m_gyroDev.adcRaw[2] = __builtin_bswap16(gyroData[3]);
 
     return true;
 }
 
 typedef uint8_t (*gyroSpiDetectFn_t)(const extDevice_t *dev);
-
-static gyroDev_t m_gyroDev;
 
 static bool detectSPISensorsAndUpdateDetectionResult(
         const MpuImu::gyroDeviceConfig_t *config)
@@ -182,7 +182,7 @@ uint32_t imuDevGyroInterruptCount(void)
 
 bool  imuDevGyroIsReady(void)
 {
-    bool ready = m_gyroDev.readFn(&m_gyroDev);
+    bool ready = m_gyroDev.readFn();
 
     if (ready) {
         m_gyroDev.dataReady = false;

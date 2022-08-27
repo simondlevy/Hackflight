@@ -50,7 +50,7 @@ typedef struct mpuDetectionResult_s {
 
 struct gyroDev_s;
 typedef void (*sensorGyroInitFuncPtr)(struct gyroDev_s *gyro);
-typedef bool (*sensorGyroReadFuncPtr)(struct gyroDev_s *gyro);
+typedef bool (*sensorGyroReadFuncPtr)(void);
 typedef bool (*sensorGyroReadDataFuncPtr)(struct gyroDev_s *gyro, int16_t *data);
 
 typedef enum {

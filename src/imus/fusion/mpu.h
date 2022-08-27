@@ -202,7 +202,7 @@ class MpuImu : public FusionImu {
 
         static bool gyroRead(gyroDev_t *gyro);
 
-        static bool gyroReadSPI(gyroDev_t *gyro);
+        static bool gyroReadSPI(void);
 
         MpuImu(uint8_t interruptPin, uint16_t gyroScale)
             : FusionImu(interruptPin, gyroScale)
