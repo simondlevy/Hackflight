@@ -50,7 +50,7 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 
 // ----------------------------------------------------------------------------
 
-mpuSensor_e Mpu6000Imu::mpuBusDetect(const extDevice_t *dev)
+mpuSensor_e Mpu6000::mpuBusDetect(const extDevice_t *dev)
 {
 
     spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
@@ -96,14 +96,14 @@ mpuSensor_e Mpu6000Imu::mpuBusDetect(const extDevice_t *dev)
     return detectedSensor;
 }
 
-bool Mpu6000Imu::mpuBusGyroDetect(gyroDev_t *gyro)
+bool Mpu6000::mpuBusGyroDetect(gyroDev_t *gyro)
 {
     if (gyro->mpuDetectionResult.sensor != MPU_60x0_SPI) {
         return false;
     }
 
-    gyro->readFn = Mpu6000Imu::gyroReadSPI;
-    gyro->gyroShortPeriod = systemClockMicrosToCycles(Mpu6000Imu::SHORT_THRESHOLD);
+    gyro->readFn = Mpu6000::gyroReadSPI;
+    gyro->gyroShortPeriod = systemClockMicrosToCycles(Mpu6000::SHORT_THRESHOLD);
     return true;
 }
 
@@ -112,12 +112,12 @@ bool Mpu6000Imu::mpuBusGyroDetect(gyroDev_t *gyro)
 
 static gyroDev_t m_gyroDev;
 
-bool Mpu6000Imu::gyroRead(void)
+bool Mpu6000::gyroRead(void)
 {
     uint8_t data[6];
 
     const bool ack = busReadRegisterBuffer(
-            &m_gyroDev.dev, Mpu6000Imu::RA_GYRO_XOUT_H, data, 6);
+            &m_gyroDev.dev, Mpu6000::RA_GYRO_XOUT_H, data, 6);
 
     if (!ack) {
         return false;
@@ -130,14 +130,14 @@ bool Mpu6000Imu::gyroRead(void)
     return true;
 }
 
-bool Mpu6000Imu::gyroReadSPI()
+bool Mpu6000::gyroReadSPI()
 {
     uint16_t *gyroData = (uint16_t *)m_gyroDev.dev.rxBuf;
 
     // Ensure any prior DMA has completed before continuing
     spiWaitClaim(&m_gyroDev.dev);
 
-    m_gyroDev.dev.txBuf[0] = Mpu6000Imu::RA_GYRO_XOUT_H | 0x80;
+    m_gyroDev.dev.txBuf[0] = Mpu6000::RA_GYRO_XOUT_H | 0x80;
 
     busSegment_t segments[] = {
         {NULL, NULL, 7, true, NULL},
@@ -160,8 +160,8 @@ bool Mpu6000Imu::gyroReadSPI()
 
 typedef uint8_t (*gyroSpiDetectFn_t)(const extDevice_t *dev);
 
-bool Mpu6000Imu::detectSPISensorsAndUpdateDetectionResult(
-        const Mpu6000Imu::gyroDeviceConfig_t *config)
+bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
+        const Mpu6000::gyroDeviceConfig_t *config)
 {
     if (!config->csnTag || !spiSetBusInstance(&m_gyroDev.dev, config->spiBus)) {
         return false;
@@ -193,7 +193,7 @@ bool Mpu6000Imu::detectSPISensorsAndUpdateDetectionResult(
     return false;
 }
 
-void Mpu6000Imu::gyroInit(void)
+void Mpu6000::gyroInit(void)
 {
     if (m_gyroDev.mpuIntExtiTag == IO_TAG_NONE) {
         return;
@@ -223,7 +223,7 @@ uint32_t imuDevGyroSyncTime(void)
 
 // ----------------------------------------------------------------------------
 
-bool Mpu6000Imu::devGyroIsReady(void)
+bool Mpu6000::devGyroIsReady(void)
 {
     bool ready = m_gyroDev.readFn();
 
@@ -234,7 +234,7 @@ bool Mpu6000Imu::devGyroIsReady(void)
     return ready;
 }
 
-bool Mpu6000Imu::mpuDetect(const Mpu6000Imu::gyroDeviceConfig_t *config)
+bool Mpu6000::mpuDetect(const Mpu6000::gyroDeviceConfig_t *config)
 {
     static busDevice_t bus;
     m_gyroDev.dev.bus = &bus;
@@ -258,11 +258,11 @@ bool Mpu6000Imu::mpuDetect(const Mpu6000Imu::gyroDeviceConfig_t *config)
 }
 
 
-void Mpu6000Imu::devInit(uint8_t interruptPin)
+void Mpu6000::devInit(uint8_t interruptPin)
 {
     (void)interruptPin;
 
-    static Mpu6000Imu::gyroDeviceConfig_t gyroDeviceConfig; 
+    static Mpu6000::gyroDeviceConfig_t gyroDeviceConfig; 
 
     gyroDeviceConfig.busType = BUS_TYPE_SPI; // XXX pass from subclass
     gyroDeviceConfig.spiBus = 1;
@@ -275,67 +275,70 @@ void Mpu6000Imu::devInit(uint8_t interruptPin)
     mpuBusGyroDetect(&m_gyroDev);
 
     // SPI DMA buffer required per device
-    static uint8_t gyroBuf1[Mpu6000Imu::GYRO_BUF_SIZE];
+    static uint8_t gyroBuf1[Mpu6000::GYRO_BUF_SIZE];
     m_gyroDev.dev.txBuf = gyroBuf1;
-    m_gyroDev.dev.rxBuf = &gyroBuf1[Mpu6000Imu::GYRO_BUF_SIZE / 2];
+    m_gyroDev.dev.rxBuf = &gyroBuf1[Mpu6000::GYRO_BUF_SIZE / 2];
 
     m_gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
     gyroInit();
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000Imu::MAX_SPI_INIT_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000::MAX_SPI_INIT_CLK_HZ));
 
     // Device was already reset during detection so proceed with configuration
 
     // Clock Source PPL with Z axis gyro reference
-    spiWriteReg(&m_gyroDev.dev, Mpu6000Imu::RA_PWR_MGMT_1, Mpu6000Imu::CLK_SEL_PLLGYROZ);
+    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_PWR_MGMT_1, Mpu6000::CLK_SEL_PLLGYROZ);
     delayMicroseconds(15);
 
     // Disable Primary I2C Interface
-    spiWriteReg(&m_gyroDev.dev, Mpu6000Imu::RA_USER_CTRL, Mpu6000Imu::BIT_I2C_IF_DIS);
+    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_USER_CTRL, Mpu6000::BIT_I2C_IF_DIS);
     delayMicroseconds(15);
 
-    spiWriteReg(&m_gyroDev.dev, Mpu6000Imu::RA_PWR_MGMT_2, 0x00);
+    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_PWR_MGMT_2, 0x00);
     delayMicroseconds(15);
 
     // Accel Sample Rate 1kHz
     // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-    spiWriteReg(&m_gyroDev.dev, Mpu6000Imu::RA_SMPLRT_DIV, 0);
+    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_SMPLRT_DIV, 0);
     delayMicroseconds(15);
 
     // Gyro +/- 2000 DPS Full Scale
-    spiWriteReg(&m_gyroDev.dev, Mpu6000Imu::RA_GYRO_CONFIG, Mpu6000Imu::INV_FSR_2000DPS << 3);
+    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_GYRO_CONFIG, Mpu6000::INV_FSR_2000DPS << 3);
     delayMicroseconds(15);
 
     // Accel +/- 16 G Full Scale
-    spiWriteReg(&m_gyroDev.dev, Mpu6000Imu::RA_ACCEL_CONFIG, Mpu6000Imu::INV_FSR_16G << 3);
+    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_ACCEL_CONFIG, Mpu6000::INV_FSR_16G << 3);
     delayMicroseconds(15);
 
-    spiWriteReg(&m_gyroDev.dev, Mpu6000Imu::RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
+    // INT_ANYRD_2CLEAR
+    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_INT_PIN_CFG,
+            0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);
+
     delayMicroseconds(15);
 
-    spiWriteReg(&m_gyroDev.dev, Mpu6000Imu::RA_INT_ENABLE, Mpu6000Imu::RF_DATA_RDY_EN);
+    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_INT_ENABLE, Mpu6000::RF_DATA_RDY_EN);
     delayMicroseconds(15);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000Imu::MAX_SPI_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000::MAX_SPI_CLK_HZ));
     delayMicroseconds(1);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000Imu::MAX_SPI_INIT_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000::MAX_SPI_INIT_CLK_HZ));
 
     // Accel and Gyro DLPF Setting
-    spiWriteReg(&m_gyroDev.dev, Mpu6000Imu::CONFIG, 0); // no gyro DLPF
+    spiWriteReg(&m_gyroDev.dev, Mpu6000::CONFIG, 0); // no gyro DLPF
     delayMicroseconds(1);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000Imu::MAX_SPI_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000::MAX_SPI_CLK_HZ));
 
-    Mpu6000Imu::gyroRead();
+    Mpu6000::gyroRead();
 
     if (((int8_t)m_gyroDev.adcRaw[1]) == -1 && ((int8_t)m_gyroDev.adcRaw[0]) == -1) {
         systemFailureMode(FAILURE_GYRO_INIT_FAILED);
     }
 }
 
-int16_t Mpu6000Imu::devReadRawGyro(uint8_t k)
+int16_t Mpu6000::devReadRawGyro(uint8_t k)
 {
     return m_gyroDev.adcRaw[k];
 }

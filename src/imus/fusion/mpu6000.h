@@ -17,7 +17,7 @@
 #include <imus/fusion.h>
 #include <imus/fusion/mpudev.h>
 
-class Mpu6000Imu : public FusionImu {
+class Mpu6000 : public FusionImu {
 
     private:
 
@@ -258,7 +258,7 @@ class Mpu6000Imu : public FusionImu {
 
         bool detectSPISensorsAndUpdateDetectionResult(const gyroDeviceConfig_t *config);
 
-        bool mpuDetect(const Mpu6000Imu::gyroDeviceConfig_t *config);
+        bool mpuDetect(const Mpu6000::gyroDeviceConfig_t *config);
 
         static void gyroInit(void);
 
@@ -274,12 +274,12 @@ class Mpu6000Imu : public FusionImu {
 
     public:
 
-         Mpu6000Imu(uint8_t interruptPin, uint16_t gyroScale)
+         Mpu6000(uint8_t interruptPin, uint16_t gyroScale)
             : FusionImu(interruptPin, gyroScale)
         {
         }
 
-}; // class Mpu6000Imu
+}; // class Mpu6000
 
 mpuSensor_e mpuBusDetect(const extDevice_t *dev);
 bool        mpuBusGyroDetect(gyroDev_t *gyro);
