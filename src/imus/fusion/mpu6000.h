@@ -19,7 +19,7 @@
 
 class Mpu6000Imu : public FusionImu {
 
-    public:
+    private:
 
         // RF = Register Flag
         static const uint8_t RF_DATA_RDY_EN = 1 << 0;
@@ -252,10 +252,13 @@ class Mpu6000Imu : public FusionImu {
             uint8_t alignment;
         } gyroDeviceConfig_t;
 
-         Mpu6000Imu(uint8_t interruptPin, uint16_t gyroScale)
-            : FusionImu(interruptPin, gyroScale)
-        {
-        }
+        mpuSensor_e mpuBusDetect(const extDevice_t *dev);
+
+        bool mpuBusGyroDetect(gyroDev_t *gyro);
+
+        bool detectSPISensorsAndUpdateDetectionResult(const gyroDeviceConfig_t *config);
+
+        bool mpuDetect(const Mpu6000Imu::gyroDeviceConfig_t *config);
 
         static void gyroInit(void);
 
@@ -268,6 +271,13 @@ class Mpu6000Imu : public FusionImu {
         virtual bool devGyroIsReady(void) override;
 
         virtual int16_t devReadRawGyro(uint8_t k) override;
+
+    public:
+
+         Mpu6000Imu(uint8_t interruptPin, uint16_t gyroScale)
+            : FusionImu(interruptPin, gyroScale)
+        {
+        }
 
 }; // class Mpu6000Imu
 

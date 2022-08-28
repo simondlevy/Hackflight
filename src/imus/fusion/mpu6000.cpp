@@ -50,53 +50,53 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 
 // ----------------------------------------------------------------------------
 
-mpuSensor_e mpuBusDetect(const extDevice_t *dev)
+mpuSensor_e Mpu6000Imu::mpuBusDetect(const extDevice_t *dev)
 {
 
-    spiSetClkDivisor(dev, spiCalculateDivider(Mpu6000Imu::MAX_SPI_INIT_CLK_HZ));
+    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
 
     // reset the device configuration
-    spiWriteReg(dev, Mpu6000Imu::RA_PWR_MGMT_1, Mpu6000Imu::BIT_H_RESET);
+    spiWriteReg(dev, RA_PWR_MGMT_1, BIT_H_RESET);
     delay(100);  // datasheet specifies a 100ms delay after reset
 
     // reset the device signal paths
-    spiWriteReg(dev, Mpu6000Imu::RA_SIGNAL_PATH_RESET,
-            Mpu6000Imu::BIT_GYRO | Mpu6000Imu::BIT_ACC | Mpu6000Imu::BIT_TEMP);
+    spiWriteReg(dev, RA_SIGNAL_PATH_RESET,
+            BIT_GYRO | BIT_ACC | BIT_TEMP);
     delay(100);  // datasheet specifies a 100ms delay after signal path reset
 
 
-    const uint8_t whoAmI = spiReadRegMsk(dev, Mpu6000Imu::RA_WHO_AM_I);
+    const uint8_t whoAmI = spiReadRegMsk(dev, RA_WHO_AM_I);
 
     // Ensure CS high time is met which is violated on H7 without this delay
     delayMicroseconds(1); 
     mpuSensor_e detectedSensor = MPU_NONE;
 
-    if (whoAmI == Mpu6000Imu::MPU6000_WHO_AM_I_CONST) {
-        const uint8_t productID = spiReadRegMsk(dev, Mpu6000Imu::RA_PRODUCT_ID);
+    if (whoAmI == MPU6000_WHO_AM_I_CONST) {
+        const uint8_t productID = spiReadRegMsk(dev, RA_PRODUCT_ID);
 
         // verify product revision
         switch (productID) {
-            case Mpu6000Imu::ES_REV_C4:
-            case Mpu6000Imu::ES_REV_C5:
-            case Mpu6000Imu::REV_C4:
-            case Mpu6000Imu::REV_C5:
-            case Mpu6000Imu::ES_REV_D6:
-            case Mpu6000Imu::ES_REV_D7:
-            case Mpu6000Imu::ES_REV_D8:
-            case Mpu6000Imu::REV_D6:
-            case Mpu6000Imu::REV_D7:
-            case Mpu6000Imu::REV_D8:
-            case Mpu6000Imu::REV_D9:
-            case Mpu6000Imu::REV_D10:
+            case ES_REV_C4:
+            case ES_REV_C5:
+            case REV_C4:
+            case REV_C5:
+            case ES_REV_D6:
+            case ES_REV_D7:
+            case ES_REV_D8:
+            case REV_D6:
+            case REV_D7:
+            case REV_D8:
+            case REV_D9:
+            case REV_D10:
                 detectedSensor = MPU_60x0_SPI;
         }
     }
 
-    spiSetClkDivisor(dev, spiCalculateDivider(Mpu6000Imu::MAX_SPI_CLK_HZ));
+    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
     return detectedSensor;
 }
 
-bool mpuBusGyroDetect(gyroDev_t *gyro)
+bool Mpu6000Imu::mpuBusGyroDetect(gyroDev_t *gyro)
 {
     if (gyro->mpuDetectionResult.sensor != MPU_60x0_SPI) {
         return false;
@@ -160,7 +160,7 @@ bool Mpu6000Imu::gyroReadSPI()
 
 typedef uint8_t (*gyroSpiDetectFn_t)(const extDevice_t *dev);
 
-static bool detectSPISensorsAndUpdateDetectionResult(
+bool Mpu6000Imu::detectSPISensorsAndUpdateDetectionResult(
         const Mpu6000Imu::gyroDeviceConfig_t *config)
 {
     if (!config->csnTag || !spiSetBusInstance(&m_gyroDev.dev, config->spiBus)) {
@@ -191,29 +191,6 @@ static bool detectSPISensorsAndUpdateDetectionResult(
     spiPreinitByTag(config->csnTag);
 
     return false;
-}
-
-static bool mpuDetect(const Mpu6000Imu::gyroDeviceConfig_t *config)
-{
-    static busDevice_t bus;
-    m_gyroDev.dev.bus = &bus;
-
-    // MPU datasheet specifies 30ms.
-    delay(35);
-
-    if (config->busType == BUS_TYPE_NONE) {
-        return false;
-    }
-
-    if (config->busType == BUS_TYPE_GYRO_AUTO) {
-        m_gyroDev.dev.bus->busType = BUS_TYPE_I2C;
-    } else {
-        m_gyroDev.dev.bus->busType = config->busType;
-    }
-
-    m_gyroDev.dev.bus->busType = BUS_TYPE_SPI;
-
-    return detectSPISensorsAndUpdateDetectionResult(config);
 }
 
 void Mpu6000Imu::gyroInit(void)
@@ -256,6 +233,30 @@ bool Mpu6000Imu::devGyroIsReady(void)
 
     return ready;
 }
+
+bool Mpu6000Imu::mpuDetect(const Mpu6000Imu::gyroDeviceConfig_t *config)
+{
+    static busDevice_t bus;
+    m_gyroDev.dev.bus = &bus;
+
+    // MPU datasheet specifies 30ms.
+    delay(35);
+
+    if (config->busType == BUS_TYPE_NONE) {
+        return false;
+    }
+
+    if (config->busType == BUS_TYPE_GYRO_AUTO) {
+        m_gyroDev.dev.bus->busType = BUS_TYPE_I2C;
+    } else {
+        m_gyroDev.dev.bus->busType = config->busType;
+    }
+
+    m_gyroDev.dev.bus->busType = BUS_TYPE_SPI;
+
+    return detectSPISensorsAndUpdateDetectionResult(config);
+}
+
 
 void Mpu6000Imu::devInit(uint8_t interruptPin)
 {
