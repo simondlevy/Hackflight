@@ -127,10 +127,6 @@ class Mpu6000 : public FusionImu {
 
         bool mpuDetect(const Mpu6000::gyroDeviceConfig_t *config);
 
-        void gyroRead(void);
-
-        static bool gyroReadSPI(void);
-
         virtual void devInit(uint8_t interruptPin) override;
 
         virtual bool devGyroIsReady(void) override;

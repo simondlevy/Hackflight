@@ -49,48 +49,6 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 
 static gyroDev_t m_gyroDev;
 
-void Mpu6000::gyroRead(void)
-{
-    uint8_t data[6];
-
-    const bool ack = busReadRegisterBuffer(
-            &m_gyroDev.dev, Mpu6000::RA_GYRO_XOUT_H, data, 6);
-
-    if (ack) {
-        m_gyroDev.adcRaw[0] = (int16_t)((data[0] << 8) | data[1]);
-        m_gyroDev.adcRaw[1] = (int16_t)((data[2] << 8) | data[3]);
-        m_gyroDev.adcRaw[2] = (int16_t)((data[4] << 8) | data[5]);
-    }
-}
-
-bool Mpu6000::gyroReadSPI()
-{
-    uint16_t *gyroData = (uint16_t *)m_gyroDev.dev.rxBuf;
-
-    // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(&m_gyroDev.dev);
-
-    m_gyroDev.dev.txBuf[0] = Mpu6000::RA_GYRO_XOUT_H | 0x80;
-
-    busSegment_t segments[] = {
-        {NULL, NULL, 7, true, NULL},
-        {NULL, NULL, 0, true, NULL},
-    };
-    segments[0].txData = m_gyroDev.dev.txBuf;
-    segments[0].rxData = &m_gyroDev.dev.rxBuf[1];
-
-    spiSequence(&m_gyroDev.dev, &segments[0]);
-
-    // Wait for completion
-    spiWait(&m_gyroDev.dev);
-
-    m_gyroDev.adcRaw[0] = __builtin_bswap16(gyroData[1]);
-    m_gyroDev.adcRaw[1] = __builtin_bswap16(gyroData[2]);
-    m_gyroDev.adcRaw[2] = __builtin_bswap16(gyroData[3]);
-
-    return true;
-}
-
 bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
         const Mpu6000::gyroDeviceConfig_t *config)
 {
@@ -144,13 +102,32 @@ uint32_t imuDevGyroSyncTime(void)
 
 bool Mpu6000::devGyroIsReady(void)
 {
-    bool ready = gyroReadSPI();
+    uint16_t *gyroData = (uint16_t *)m_gyroDev.dev.rxBuf;
 
-    if (ready) {
-        m_gyroDev.dataReady = false;
-    }
+    // Ensure any prior DMA has completed before continuing
+    spiWaitClaim(&m_gyroDev.dev);
 
-    return ready;
+    m_gyroDev.dev.txBuf[0] = Mpu6000::RA_GYRO_XOUT_H | 0x80;
+
+    busSegment_t segments[] = {
+        {NULL, NULL, 7, true, NULL},
+        {NULL, NULL, 0, true, NULL},
+    };
+    segments[0].txData = m_gyroDev.dev.txBuf;
+    segments[0].rxData = &m_gyroDev.dev.rxBuf[1];
+
+    spiSequence(&m_gyroDev.dev, &segments[0]);
+
+    // Wait for completion
+    spiWait(&m_gyroDev.dev);
+
+    m_gyroDev.adcRaw[0] = __builtin_bswap16(gyroData[1]);
+    m_gyroDev.adcRaw[1] = __builtin_bswap16(gyroData[2]);
+    m_gyroDev.adcRaw[2] = __builtin_bswap16(gyroData[3]);
+
+    m_gyroDev.dataReady = false;
+
+    return true;
 }
 
 bool Mpu6000::mpuDetect(const Mpu6000::gyroDeviceConfig_t *config)
@@ -256,8 +233,6 @@ void Mpu6000::devInit(uint8_t interruptPin)
     delayMicroseconds(1);
 
     spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
-
-    gyroRead();
 
     if (((int8_t)m_gyroDev.adcRaw[1]) == -1 && ((int8_t)m_gyroDev.adcRaw[0]) == -1) {
         systemFailureMode(FAILURE_GYRO_INIT_FAILED);
