@@ -141,7 +141,7 @@ class Mpu6000 : public FusionImu {
 
     public:
 
-        // Shared with mpuIntExtiHandler routine
+        // Shared with interrupt handler routine
         typedef struct {
 
             int16_t           adcRaw[3];                          

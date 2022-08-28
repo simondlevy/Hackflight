@@ -25,117 +25,87 @@
 
 #include "imu_usfs.h"
 
-static const uint8_t  GYRO_RATE_TENTH = 100;   // 1/10th actual rate
-static const uint16_t GYRO_SCALE_DPS  = 2000;
-
-// Arbitrary; unused
-static const uint8_t  ACCEL_BANDWIDTH  = 3;
-static const uint8_t  GYRO_BANDWIDTH   = 3;
-static const uint8_t  QUAT_DIVISOR     = 1;
-static const uint8_t  MAG_RATE         = 100;
-static const uint8_t  ACCEL_RATE_TENTH = 20; // Multiply by 10 to get actual rate
-static const uint8_t  BARO_RATE        = 50;
-static const uint16_t ACCEL_SCALE      = 8;
-static const uint16_t MAG_SCALE        = 1000;
-
-static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
-USFS_INTERRUPT_ERROR |
-USFS_INTERRUPT_GYRO | 
-USFS_INTERRUPT_QUAT;
-
-static const uint8_t REPORT_HZ = 2;
-
 static int16_t _gyroAdc[3];
 static float _qw, _qx, _qy, _qz;
 
-static volatile bool _gotNewData;
-static volatile uint32_t _gyroInterruptCount;
-static volatile uint32_t _imuDevGyroSyncTime;
+static volatile UsfsImu::gyroDev_t m_gyroDev;
 
-static void interruptHandler()
+static void UsfsImu::interruptHandler(void)
 {
-    _gotNewData = true;
-    _gyroInterruptCount++;
-    _imuDevGyroSyncTime = micros();
+    m_gyroDev.gotNewData = true;
+   *m_gyroDev.interruptCountPtr += 1;
+   *m_gyroDev.syncTimePtr = micros();
 }
 
-extern "C" {
+bool UsfsImu::devGyroIsReady(void)
+{
+    bool result = false;
 
-    uint32_t imuDevGyroInterruptCount(void)
-    {
-        return _gyroInterruptCount;
-    }
+    if (_gotNewData) { 
 
-    bool imuDevGyroIsReady(void)
-    {
-        bool result = false;
+        _gotNewData = false;  
 
-        if (_gotNewData) { 
+        uint8_t eventStatus = usfsCheckStatus(); 
 
-            _gotNewData = false;  
+        if (usfsEventStatusIsError(eventStatus)) { 
+            usfsReportError(eventStatus);
+        }
 
-            uint8_t eventStatus = usfsCheckStatus(); 
+        if (usfsEventStatusIsGyrometer(eventStatus)) { 
+            usfsReadGyrometerRaw(_gyroAdc);
+            result = true;
+        }
 
-            if (usfsEventStatusIsError(eventStatus)) { 
-                usfsReportError(eventStatus);
-            }
+        if (usfsEventStatusIsQuaternion(eventStatus)) { 
+            usfsReadQuaternion(_qw, _qx, _qy, _qz);
+        }
+    } 
 
-            if (usfsEventStatusIsGyrometer(eventStatus)) { 
-                usfsReadGyrometerRaw(_gyroAdc);
-                result = true;
-            }
-
-            if (usfsEventStatusIsQuaternion(eventStatus)) { 
-                usfsReadQuaternion(_qw, _qx, _qy, _qz);
-            }
-
-        } 
-
-        return result;
-    }
-
-    int16_t imuDevReadRawGyro(uint8_t k)
-    {
-        return _gyroAdc[k];
-    }
-
-    uint16_t imuDevGyroScale(void)
-    {
-        return GYRO_SCALE_DPS;
-    }
-
-    uint32_t imuDevGyroSyncTime(void)
-    {
-        return _imuDevGyroSyncTime;
-    }
-
-    void imuDevInit(uint8_t interruptPin)
-    {
-        Wire.setClock(400000); 
-        delay(100);
-
-        usfsLoadFirmware(); 
-
-        usfsBegin(
-                ACCEL_BANDWIDTH,
-                GYRO_BANDWIDTH,
-                QUAT_DIVISOR,
-                MAG_RATE,
-                ACCEL_RATE_TENTH,
-                GYRO_RATE_TENTH,
-                BARO_RATE,
-                INTERRUPT_ENABLE);
-
-        pinMode(interruptPin, INPUT);
-        attachInterrupt(interruptPin, interruptHandler, RISING);  
-
-        // Clear interrupts
-        usfsCheckStatus();
-    }
-
+    return result;
 }
 
-void ImuUsfs::getEulerAngles(
+int16_t UsfsImu::devReadRawGyro(uint8_t k)
+{
+    return _gyroAdc[k];
+}
+
+uint32_t UsfsImu::devGyroInterruptCount(void)
+{
+    return _gyroInterruptCount;
+}
+
+uint32_t UsfsImu::devGyroSyncTime(void)
+{
+    return _imuDevGyroSyncTime;
+}
+
+
+void UsfsImu::devInit(
+                uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr)
+{
+    Wire.setClock(400000); 
+    delay(100);
+
+    usfsLoadFirmware(); 
+
+    usfsBegin(
+            ACCEL_BANDWIDTH,
+            GYRO_BANDWIDTH,
+            QUAT_DIVISOR,
+            MAG_RATE,
+            ACCEL_RATE_TENTH,
+            GYRO_RATE_TENTH,
+            BARO_RATE,
+            INTERRUPT_ENABLE);
+
+    pinMode(m_interruptPin, INPUT);
+    attachInterrupt(interruptPin, interruptHandler, RISING);  
+
+    // Clear interrupts
+    usfsCheckStatus();
+}
+
+void UsfsImu::getEulerAngles(
         Imu::fusion_t * fusionPrev,
         Arming * arming,
         uint32_t time,

@@ -47,10 +47,8 @@ void Mpu6000::interruptHandler(extiCallbackRec_t *cb)
 
     prevTime = nowCycles;
 
-    *m_gyroDev.interruptCountPtr = *m_gyroDev.interruptCountPtr  + 1;
+    *m_gyroDev.interruptCountPtr += 1;
 }
-
-// ----------------------------------------------------------------------------
 
 bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
         const Mpu6000::gyroDeviceConfig_t *config)
