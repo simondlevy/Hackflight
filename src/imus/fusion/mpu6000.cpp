@@ -118,23 +118,24 @@ bool Mpu6000::gyroReadSPI()
 bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
         const Mpu6000::gyroDeviceConfig_t *config)
 {
-    if (!config->csnTag || !spiSetBusInstance(&m_gyroDev.dev, config->spiBus)) {
+   extDevice_t *dev = &m_gyroDev.dev;
+
+    if (!config->csnTag || !spiSetBusInstance(dev, config->spiBus)) {
         return false;
     }
 
-    m_gyroDev.dev.busType_u.spi.csnPin = IOGetByTag(config->csnTag);
+    dev->busType_u.spi.csnPin = IOGetByTag(config->csnTag);
 
-    IOInit(m_gyroDev.dev.busType_u.spi.csnPin, OWNER_GYRO_CS,
-            RESOURCE_INDEX(config->index));
+    IOInit(dev->busType_u.spi.csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(config->index));
 
-    IOConfigGPIO(m_gyroDev.dev.busType_u.spi.csnPin, SPI_IO_CS_CFG);
+    IOConfigGPIO(dev->busType_u.spi.csnPin, SPI_IO_CS_CFG);
 
     // Ensure device is disabled, important when two devices are on the same bus.
-    IOHi(m_gyroDev.dev.busType_u.spi.csnPin); 
+    IOHi(dev->busType_u.spi.csnPin); 
 
-    busInit(&m_gyroDev.dev);
+    busInit(dev);
 
-    busDeviceRegister(&m_gyroDev.dev);
+    busDeviceRegister(dev);
 
     return true;
 }
