@@ -30,8 +30,6 @@ extern "C" {
 }
 #endif
 
-#if defined(__cplusplus)
-
 #include "arming.h"
 #include "clock.h"
 #include "constrain.h"
@@ -264,7 +262,3 @@ class Imu {
         //virtual uint32_t devGyroSyncTime(void) = 0;
 
 }; // class Imu
-
-#endif
-
-
