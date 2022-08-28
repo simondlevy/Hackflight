@@ -139,6 +139,7 @@ class Mpu6000 : public FusionImu {
 
     public:
 
+        // Shared with mpuIntExtiHandler routine
         typedef struct {
 
             int16_t           adcRaw[3];                          
@@ -146,6 +147,8 @@ class Mpu6000 : public FusionImu {
             extiCallbackRec_t exti;
             int32_t           dmaMaxDuration;
             int32_t           shortPeriod;
+            uint32_t *        syncTimePtr;
+            uint32_t *        interruptCountPtr;
 
         } gyroDev_t;
 

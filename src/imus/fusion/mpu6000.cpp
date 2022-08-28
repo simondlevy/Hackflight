@@ -27,9 +27,6 @@
 
 static Mpu6000::gyroDev_t m_gyroDev;
 
-static uint32_t * m_gyroSyncTimePtr;
-static uint32_t * m_gyroInterruptCountPtr;
-
 static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
     (void)cb;
@@ -45,12 +42,12 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
     if ((m_gyroDev.shortPeriod == 0) ||
             (gyroLastPeriod < m_gyroDev.shortPeriod)) {
 
-        *m_gyroSyncTimePtr = prevTime + m_gyroDev.dmaMaxDuration;
+        *m_gyroDev.syncTimePtr = prevTime + m_gyroDev.dmaMaxDuration;
     }
 
     prevTime = nowCycles;
 
-    *m_gyroInterruptCountPtr = *m_gyroInterruptCountPtr  + 1;
+    *m_gyroDev.interruptCountPtr = *m_gyroDev.interruptCountPtr  + 1;
 }
 
 // ----------------------------------------------------------------------------
@@ -144,8 +141,8 @@ bool Mpu6000::mpuDetect(const Mpu6000::gyroDeviceConfig_t *config)
 
 void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr)
 {
-    m_gyroSyncTimePtr = gyroSyncTimePtr;
-    m_gyroInterruptCountPtr = gyroInterruptCountPtr;
+    m_gyroDev.syncTimePtr = gyroSyncTimePtr;
+    m_gyroDev.interruptCountPtr = gyroInterruptCountPtr;
 
     static gyroDeviceConfig_t gyroDeviceConfig; 
 
