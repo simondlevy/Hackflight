@@ -127,10 +127,8 @@ class Imu {
 
     protected:
 
-        Imu(uint8_t interruptPin, uint16_t gyroScale) 
+        Imu(uint16_t gyroScale) 
         {
-            m_interruptPin = interruptPin;
-
             m_gyroScale = gyroScale;
 
             setCalibrationCycles(); // start calibrating
@@ -187,7 +185,7 @@ class Imu {
 
         void begin(void)
         {
-            devInit(m_interruptPin);
+            devInit();
         }
 
         void readScaledGyro(Imu * imu, Imu::align_fun align, State * vstate)
@@ -264,7 +262,7 @@ class Imu {
         }
 
         virtual bool     devGyroIsReady(void) = 0;
-        virtual void     devInit(uint8_t interruptPin) = 0;
+        virtual void     devInit(void) = 0;
         virtual int16_t  devReadRawGyro(uint8_t k) = 0;
 
         //virtual uint32_t devGyroInterruptCount(void) = 0;

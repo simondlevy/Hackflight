@@ -151,13 +151,11 @@ bool Mpu6000::mpuDetect(const Mpu6000::gyroDeviceConfig_t *config)
 }
 
 
-void Mpu6000::devInit(uint8_t interruptPin)
+void Mpu6000::devInit(void)
 {
-    (void)interruptPin;
-
     static gyroDeviceConfig_t gyroDeviceConfig; 
 
-    gyroDeviceConfig.busType = BUS_TYPE_SPI; // XXX pass from subclass
+    gyroDeviceConfig.busType = BUS_TYPE_SPI;
     gyroDeviceConfig.spiBus = 1;
     gyroDeviceConfig.csnTag = 20;
     gyroDeviceConfig.extiTag = 52;
