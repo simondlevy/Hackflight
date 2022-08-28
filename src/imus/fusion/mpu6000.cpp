@@ -64,35 +64,6 @@ void Mpu6000::busInit(const extDevice_t *dev)
             BIT_GYRO | BIT_ACC | BIT_TEMP);
     delay(100);  // datasheet specifies a 100ms delay after signal path reset
 
-    /*
-    const uint8_t whoAmI = spiReadRegMsk(dev, RA_WHO_AM_I);
-
-    // Ensure CS high time is met which is violated on H7 without this delay
-    delayMicroseconds(1); 
-
-    mpuSensor_e detectedSensor = MPU_NONE;
-
-    if (whoAmI == WHO_AM_I_CONST) {
-        const uint8_t productID = spiReadRegMsk(dev, RA_PRODUCT_ID);
-
-        // verify product revision
-        switch (productID) {
-            case ES_REV_C4:
-            case ES_REV_C5:
-            case REV_C4:
-            case REV_C5:
-            case ES_REV_D6:
-            case ES_REV_D7:
-            case ES_REV_D8:
-            case REV_D6:
-            case REV_D7:
-            case REV_D8:
-            case REV_D9:
-            case REV_D10:
-                detectedSensor = MPU_60x0_SPI;
-        }
-    }
-    */
     spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
 }
 

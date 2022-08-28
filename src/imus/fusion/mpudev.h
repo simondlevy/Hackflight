@@ -23,27 +23,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "exti.h"
 #include "io.h"
 
-typedef enum {
-    MPU_NONE,
-    MPU_3050,
-    MPU_60x0,
-    MPU_60x0_SPI,
-    MPU_65xx_I2C,
-    MPU_65xx_SPI,
-    MPU_9250_SPI,
-    ICM_20601_SPI,
-    ICM_20602_SPI,
-    ICM_20608_SPI,
-    ICM_20649_SPI,
-    ICM_20689_SPI,
-    ICM_42605_SPI,
-    ICM_42688P_SPI,
-    BMI_160_SPI,
-    BMI_270_SPI,
-    LSM6DSO_SPI,
-    L3GD20_SPI,
-} mpuSensor_e;
-
 struct gyroDev_s;
 
 typedef struct gyroDev_s {

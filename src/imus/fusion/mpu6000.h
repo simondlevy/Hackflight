@@ -147,6 +147,3 @@ class Mpu6000 : public FusionImu {
         }
 
 }; // class Mpu6000
-
-mpuSensor_e mpuBusDetect(const extDevice_t *dev);
-bool        mpuBusGyroDetect(gyroDev_t *gyro);
