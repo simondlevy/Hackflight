@@ -145,7 +145,6 @@ class Mpu6000 : public FusionImu {
             extDevice_t       dev;
             extiCallbackRec_t exti;
             int32_t           gyroDmaMaxDuration;
-            uint32_t          gyroLastEXTI;
             int32_t           gyroShortPeriod;
             ioTag_t           mpuIntExtiTag;
 

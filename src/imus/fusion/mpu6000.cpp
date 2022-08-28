@@ -34,20 +34,21 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
     (void)cb;
 
+    static uint32_t prevTime;
+
     // Ideally we'd use a time to capture such information, but unfortunately
     // the port used for EXTI interrupt does not have an associated timer
     uint32_t nowCycles = systemGetCycleCounter();
-    int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, m_gyroDev.gyroLastEXTI);
+    int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, prevTime);
 
     // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
     if ((m_gyroDev.gyroShortPeriod == 0) ||
             (gyroLastPeriod < m_gyroDev.gyroShortPeriod)) {
 
-        *m_gyroSyncTimePtr =
-            m_gyroDev.gyroLastEXTI + m_gyroDev.gyroDmaMaxDuration;
+        *m_gyroSyncTimePtr = prevTime + m_gyroDev.gyroDmaMaxDuration;
     }
 
-    m_gyroDev.gyroLastEXTI = nowCycles;
+    prevTime = nowCycles;
 
     *m_gyroInterruptCountPtr = *m_gyroInterruptCountPtr  + 1;
 }
