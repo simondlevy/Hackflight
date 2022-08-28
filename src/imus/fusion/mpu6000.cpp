@@ -16,7 +16,6 @@
 
 #include <constrain.h>
 #include <imus/fusion/mpu6000.h>
-#include <imus/fusion/mpudev.h>
 #include <system.h>
 #include <time.h>
 
@@ -26,28 +25,28 @@
 #include <platform.h>
 #include <systemdev.h>
 
+static Mpu6000::gyroDev_t m_gyroDev;
+
 static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
-    gyroDev_t *gyroDev = gyroContainerOf(cb);
+    (void)cb;
 
     // Ideally we'd use a time to capture such information, but unfortunately
     // the port used for EXTI interrupt does not have an associated timer
     uint32_t nowCycles = systemGetCycleCounter();
-    int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, gyroDev->gyroLastEXTI);
+    int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, m_gyroDev.gyroLastEXTI);
     // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
-    if ((gyroDev->gyroShortPeriod == 0) ||
-            (gyroLastPeriod < gyroDev->gyroShortPeriod)) {
-        gyroDev->gyroSyncEXTI =
-            gyroDev->gyroLastEXTI + gyroDev->gyroDmaMaxDuration;
+    if ((m_gyroDev.gyroShortPeriod == 0) ||
+            (gyroLastPeriod < m_gyroDev.gyroShortPeriod)) {
+        m_gyroDev.gyroSyncEXTI =
+            m_gyroDev.gyroLastEXTI + m_gyroDev.gyroDmaMaxDuration;
     }
-    gyroDev->gyroLastEXTI = nowCycles;
+    m_gyroDev.gyroLastEXTI = nowCycles;
 
-    gyroDev->detectedEXTI++;
+    m_gyroDev.detectedEXTI++;
 }
 
 // ----------------------------------------------------------------------------
-
-static gyroDev_t m_gyroDev;
 
 bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
         const Mpu6000::gyroDeviceConfig_t *config)

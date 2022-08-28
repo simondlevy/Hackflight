@@ -15,7 +15,10 @@
  */
 
 #include <imus/fusion.h>
-#include <imus/fusion/mpudev.h>
+
+#include <bus.h>
+#include <exti.h>
+#include <io.h>
 
 class Mpu6000 : public FusionImu {
 
@@ -135,7 +138,21 @@ class Mpu6000 : public FusionImu {
 
     public:
 
-         Mpu6000(uint16_t gyroScale)
+        typedef struct {
+
+            int16_t           adcRaw[3];                          
+            uint32_t          detectedEXTI;
+            extDevice_t       dev;
+            extiCallbackRec_t exti;
+            int32_t           gyroDmaMaxDuration;
+            uint32_t          gyroLastEXTI;
+            int32_t           gyroShortPeriod;
+            uint32_t          gyroSyncEXTI;
+            ioTag_t           mpuIntExtiTag;
+
+        } gyroDev_t;
+
+        Mpu6000(uint16_t gyroScale)
             : FusionImu(gyroScale)
         {
         }
