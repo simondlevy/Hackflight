@@ -215,14 +215,6 @@ class Mpu6000 : public FusionImu {
             NUM_ACCEL_FSR
         };
 
-        enum icm_high_range_accel_fsr_e {
-            ICM_HIGH_RANGE_FSR_4G = 0,
-            ICM_HIGH_RANGE_FSR_8G,
-            ICM_HIGH_RANGE_FSR_16G,
-            ICM_HIGH_RANGE_FSR_32G,
-            NUM_ICM_HIGH_RANGE_ACCEL_FSR
-        };
-
         typedef struct {
             int8_t index;
             busType_e busType;

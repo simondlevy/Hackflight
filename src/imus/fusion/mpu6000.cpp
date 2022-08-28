@@ -234,7 +234,7 @@ void Mpu6000::devInit(uint8_t interruptPin)
 {
     (void)interruptPin;
 
-    static Mpu6000::gyroDeviceConfig_t gyroDeviceConfig; 
+    static gyroDeviceConfig_t gyroDeviceConfig; 
 
     gyroDeviceConfig.busType = BUS_TYPE_SPI; // XXX pass from subclass
     gyroDeviceConfig.spiBus = 1;
@@ -245,13 +245,13 @@ void Mpu6000::devInit(uint8_t interruptPin)
 
     mpuDetect(&gyroDeviceConfig);
 
-    m_gyroDev.readFn = Mpu6000::gyroReadSPI;
-    m_gyroDev.gyroShortPeriod = systemClockMicrosToCycles(Mpu6000::SHORT_THRESHOLD);
+    m_gyroDev.readFn = gyroReadSPI;
+    m_gyroDev.gyroShortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
 
     // SPI DMA buffer required per device
-    static uint8_t gyroBuf1[Mpu6000::GYRO_BUF_SIZE];
+    static uint8_t gyroBuf1[GYRO_BUF_SIZE];
     m_gyroDev.dev.txBuf = gyroBuf1;
-    m_gyroDev.dev.rxBuf = &gyroBuf1[Mpu6000::GYRO_BUF_SIZE / 2];
+    m_gyroDev.dev.rxBuf = &gyroBuf1[GYRO_BUF_SIZE / 2];
 
     m_gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
@@ -263,55 +263,55 @@ void Mpu6000::devInit(uint8_t interruptPin)
             BETAFLIGHT_EXTI_TRIGGER_RISING);
     EXTIEnable(mpuIntIO, true);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000::MAX_SPI_INIT_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
 
     // Device was already reset during detection so proceed with configuration
 
     // Clock Source PPL with Z axis gyro reference
-    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_PWR_MGMT_1, Mpu6000::CLK_SEL_PLLGYROZ);
+    spiWriteReg(&m_gyroDev.dev, RA_PWR_MGMT_1, CLK_SEL_PLLGYROZ);
     delayMicroseconds(15);
 
     // Disable Primary I2C Interface
-    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_USER_CTRL, Mpu6000::BIT_I2C_IF_DIS);
+    spiWriteReg(&m_gyroDev.dev, RA_USER_CTRL, BIT_I2C_IF_DIS);
     delayMicroseconds(15);
 
-    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_PWR_MGMT_2, 0x00);
+    spiWriteReg(&m_gyroDev.dev, RA_PWR_MGMT_2, 0x00);
     delayMicroseconds(15);
 
     // Accel Sample Rate 1kHz
     // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_SMPLRT_DIV, 0);
+    spiWriteReg(&m_gyroDev.dev, RA_SMPLRT_DIV, 0);
     delayMicroseconds(15);
 
     // Gyro +/- 2000 DPS Full Scale
-    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_GYRO_CONFIG, Mpu6000::INV_FSR_2000DPS << 3);
+    spiWriteReg(&m_gyroDev.dev, RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
     delayMicroseconds(15);
 
     // Accel +/- 16 G Full Scale
-    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_ACCEL_CONFIG, Mpu6000::INV_FSR_16G << 3);
+    spiWriteReg(&m_gyroDev.dev, RA_ACCEL_CONFIG, INV_FSR_16G << 3);
     delayMicroseconds(15);
 
     // INT_ANYRD_2CLEAR
-    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_INT_PIN_CFG,
+    spiWriteReg(&m_gyroDev.dev, RA_INT_PIN_CFG,
             0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);
 
     delayMicroseconds(15);
 
-    spiWriteReg(&m_gyroDev.dev, Mpu6000::RA_INT_ENABLE, Mpu6000::RF_DATA_RDY_EN);
+    spiWriteReg(&m_gyroDev.dev, RA_INT_ENABLE, RF_DATA_RDY_EN);
     delayMicroseconds(15);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000::MAX_SPI_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
     delayMicroseconds(1);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000::MAX_SPI_INIT_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
 
     // Accel and Gyro DLPF Setting
-    spiWriteReg(&m_gyroDev.dev, Mpu6000::CONFIG, 0); // no gyro DLPF
+    spiWriteReg(&m_gyroDev.dev, CONFIG, 0); // no gyro DLPF
     delayMicroseconds(1);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000::MAX_SPI_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
 
-    Mpu6000::gyroRead();
+    gyroRead();
 
     if (((int8_t)m_gyroDev.adcRaw[1]) == -1 && ((int8_t)m_gyroDev.adcRaw[0]) == -1) {
         systemFailureMode(FAILURE_GYRO_INIT_FAILED);
