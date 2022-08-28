@@ -39,18 +39,7 @@ class Mpu6000 : public FusionImu {
         static const uint8_t RA_WHO_AM_I         = 0x75;
         static const uint8_t RA_WHO_AM_I_LEGACY  = 0x00;
 
-        static const uint8_t MPUx0x0_WHO_AM_I_CONST   = 0x68 ;
-        static const uint8_t MPU6000_WHO_AM_I_CONST   = 0x68;
-        static const uint8_t MPU6500_WHO_AM_I_CONST   = 0x70;
-        static const uint8_t MPU9250_WHO_AM_I_CONST   = 0x71;
-        static const uint8_t MPU9255_WHO_AM_I_CONST   = 0x73;
-        static const uint8_t ICM20601_WHO_AM_I_CONST  = 0xAC;
-        static const uint8_t ICM20602_WHO_AM_I_CONST  = 0x12;
-        static const uint8_t ICM20608G_WHO_AM_I_CONST = 0xAF;
-        static const uint8_t ICM20649_WHO_AM_I_CONST  = 0xE1;
-        static const uint8_t ICM20689_WHO_AM_I_CONST  = 0x98;
-        static const uint8_t ICM42605_WHO_AM_I_CONST  = 0x42;
-        static const uint8_t ICM42688P_WHO_AM_I_CONST = 0x47;
+        static const uint8_t WHO_AM_I_CONST   = 0x68;
 
         // RA = Register Address;
 

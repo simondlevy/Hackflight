@@ -71,7 +71,7 @@ mpuSensor_e Mpu6000::mpuBusDetect(const extDevice_t *dev)
     delayMicroseconds(1); 
     mpuSensor_e detectedSensor = MPU_NONE;
 
-    if (whoAmI == MPU6000_WHO_AM_I_CONST) {
+    if (whoAmI == WHO_AM_I_CONST) {
         const uint8_t productID = spiReadRegMsk(dev, RA_PRODUCT_ID);
 
         // verify product revision
