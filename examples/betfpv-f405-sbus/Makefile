@@ -274,7 +274,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/stm32clock.o \
-		  $(OBJECT_DIR)/mpu.o \
 		  $(OBJECT_DIR)/mpu6000.o \
 		  $(OBJECT_DIR)/mpudev.o
 	@echo "Linking" $@
@@ -305,10 +304,6 @@ $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 $(OBJECT_DIR)/mpudev.o: $(HFSRC_DIR)/imus/fusion/mpudev.c
 	@echo imus/fusion/mpudev.c
 	$(V1) $(call compile_c)
-
-$(OBJECT_DIR)/mpu.o: $(HFSRC_DIR)/imus/fusion/mpu.cpp
-	@echo imus/fusion/mpu.cpp
-	$(V1) $(call compile_cpp)
 
 $(OBJECT_DIR)/mpu6000.o: $(HFSRC_DIR)/imus/fusion/mpu6000.cpp
 	@echo imus/fusion/mpu6000.cpp
