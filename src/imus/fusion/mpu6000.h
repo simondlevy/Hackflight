@@ -59,38 +59,14 @@ class Mpu6000 : public FusionImu {
         // types are supported with SPI DMA.
         static const uint8_t GYRO_BUF_SIZE = 32;
 
-        // Bits
-        static const uint8_t BIT_SLEEP                   = 0x40;
-        static const uint8_t BIT_H_RESET                 = 0x80;
-        static const uint8_t BITS_CLKSEL                 = 0x07;
         static const uint8_t CLK_SEL_PLLGYROX            = 0x01;
         static const uint8_t CLK_SEL_PLLGYROZ            = 0x03;
-        static const uint8_t EXT_SYNC_GYROX              = 0x02;
-        static const uint8_t BITS_FS_250DPS              = 0x00;
-        static const uint8_t BITS_FS_500DPS              = 0x08;
-        static const uint8_t BITS_FS_1000DPS             = 0x10;
-        static const uint8_t BITS_FS_2000DPS             = 0x18;
-        static const uint8_t BITS_FS_2G                  = 0x00;
-        static const uint8_t BITS_FS_4G                  = 0x08;
-        static const uint8_t BITS_FS_8G                  = 0x10;
-        static const uint8_t BITS_FS_16G                 = 0x18;
-        static const uint8_t BITS_FS_MASK                = 0x18;
-        static const uint8_t BITS_DLPF_CFG_256HZ         = 0x00;
-        static const uint8_t BITS_DLPF_CFG_188HZ         = 0x01;
-        static const uint8_t BITS_DLPF_CFG_98HZ          = 0x02;
-        static const uint8_t BITS_DLPF_CFG_42HZ          = 0x03;
-        static const uint8_t BITS_DLPF_CFG_20HZ          = 0x04;
-        static const uint8_t BITS_DLPF_CFG_10HZ          = 0x05;
-        static const uint8_t BITS_DLPF_CFG_5HZ           = 0x06;
-        static const uint8_t BITS_DLPF_CFG_2100HZ_NOLPF  = 0x07;
-        static const uint8_t BITS_DLPF_CFG_MASK          = 0x07;
-        static const uint8_t BIT_INT_ANYRD_2CLEAR        = 0x10;
-        static const uint8_t BIT_RAW_RDY_EN              = 0x01;
-        static const uint8_t BIT_I2C_IF_DIS              = 0x10;
-        static const uint8_t BIT_INT_STATUS_DATA         = 0x01;
-        static const uint8_t BIT_GYRO                    = 0x04;
-        static const uint8_t BIT_ACC                     = 0x02;
+
         static const uint8_t BIT_TEMP                    = 0x01;
+        static const uint8_t BIT_ACC                     = 0x02;
+        static const uint8_t BIT_GYRO                    = 0x04;
+        static const uint8_t BIT_I2C_IF_DIS              = 0x10;
+        static const uint8_t BIT_H_RESET                 = 0x80;
 
         // Product ID Description for MPU6000 high 4 bits low 4 bits Product
         // Name Product Revision
