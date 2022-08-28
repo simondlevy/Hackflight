@@ -47,26 +47,6 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 
 // ----------------------------------------------------------------------------
 
-void Mpu6000::busInit(const extDevice_t *dev)
-{
-
-    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
-
-    // reset the device configuration
-    spiWriteReg(dev, RA_PWR_MGMT_1, BIT_H_RESET);
-    delay(100);  // datasheet specifies a 100ms delay after reset
-
-    // reset the device signal paths
-    spiWriteReg(dev, RA_SIGNAL_PATH_RESET,
-            BIT_GYRO | BIT_ACC | BIT_TEMP);
-    delay(100);  // datasheet specifies a 100ms delay after signal path reset
-
-    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
-}
-
-
-// ----------------------------------------------------------------------------
-
 static gyroDev_t m_gyroDev;
 
 bool Mpu6000::gyroRead(void)
@@ -133,7 +113,18 @@ bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
     // Ensure device is disabled, important when two devices are on the same bus.
     IOHi(dev->busType_u.spi.csnPin); 
 
-    busInit(dev);
+    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
+
+    // reset the device configuration
+    spiWriteReg(dev, RA_PWR_MGMT_1, BIT_H_RESET);
+    delay(100);  // datasheet specifies a 100ms delay after reset
+
+    // reset the device signal paths
+    spiWriteReg(dev, RA_SIGNAL_PATH_RESET,
+            BIT_GYRO | BIT_ACC | BIT_TEMP);
+    delay(100);  // datasheet specifies a 100ms delay after signal path reset
+
+    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
 
     busDeviceRegister(dev);
 
