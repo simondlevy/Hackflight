@@ -223,13 +223,6 @@ class Mpu6000 : public FusionImu {
             NUM_ICM_HIGH_RANGE_ACCEL_FSR
         };
 
-        typedef enum {
-            GYRO_OVERFLOW_NONE = 0x00,
-            GYRO_OVERFLOW_X = 0x01,
-            GYRO_OVERFLOW_Y = 0x02,
-            GYRO_OVERFLOW_Z = 0x04
-        } gyroOverflow_e;
-
         typedef struct {
             int8_t index;
             busType_e busType;
