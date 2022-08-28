@@ -89,15 +89,6 @@ bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
     return true;
 }
 
-// ----------------------------------------------------------------------------
-
-uint32_t imuDevGyroInterruptCount(void)
-{
-    return m_gyroDev.detectedEXTI;
-}
-
-// ----------------------------------------------------------------------------
-
 bool Mpu6000::devGyroIsReady(void)
 {
     uint16_t *gyroData = (uint16_t *)m_gyroDev.dev.rxBuf;

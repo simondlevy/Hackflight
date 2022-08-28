@@ -142,7 +142,6 @@ class Mpu6000 : public FusionImu {
         typedef struct {
 
             int16_t           adcRaw[3];                          
-            uint32_t          detectedEXTI;
             extDevice_t       dev;
             extiCallbackRec_t exti;
             int32_t           gyroDmaMaxDuration;
