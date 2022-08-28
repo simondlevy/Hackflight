@@ -27,7 +27,7 @@
 
 static Mpu6000::gyroDev_t m_gyroDev;
 
-static void mpuIntExtiHandler(extiCallbackRec_t *cb)
+void Mpu6000::interruptHandler(extiCallbackRec_t *cb)
 {
     (void)cb;
 
@@ -165,7 +165,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     const IO_t mpuIntIO = IOGetByTag(gyroDeviceConfig.extiTag);
 
     IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
-    EXTIHandlerInit(&m_gyroDev.exti, mpuIntExtiHandler);
+    EXTIHandlerInit(&m_gyroDev.exti, interruptHandler);
     EXTIConfig(mpuIntIO, &m_gyroDev.exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
             BETAFLIGHT_EXTI_TRIGGER_RISING);
     EXTIEnable(mpuIntIO, true);

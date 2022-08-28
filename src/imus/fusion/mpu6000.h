@@ -137,6 +137,8 @@ class Mpu6000 : public FusionImu {
 
         virtual int16_t devReadRawGyro(uint8_t k) override;
 
+        static void interruptHandler(extiCallbackRec_t *cb);
+
     public:
 
         // Shared with mpuIntExtiHandler routine
