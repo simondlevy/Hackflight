@@ -21,10 +21,7 @@
 #include <time.h>
 
 #include <atomic.h>
-#include <bus.h>
 #include <bus_spi.h>
-#include <exti.h>
-#include <io.h>
 #include <nvic.h>
 #include <platform.h>
 #include <systemdev.h>

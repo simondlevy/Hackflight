@@ -16,12 +16,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "bus.h"
-#include "exti.h"
-#include "io.h"
+#include <bus.h>
+#include <exti.h>
+#include <io.h>
 
 struct gyroDev_s;
 
