@@ -82,7 +82,6 @@ typedef struct gyroDev_s {
     uint32_t                  gyroSyncEXTI;
     uint8_t                   hardware_32khz_lpf;
     uint8_t                   hardware_lpf;
-    sensorGyroInitFuncPtr     initFn;                  
     mpuDetectionResult_t      mpuDetectionResult;
     ioTag_t                   mpuIntExtiTag;
     sensorGyroReadFuncPtr     readFn;                 

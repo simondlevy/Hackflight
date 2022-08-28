@@ -28,7 +28,7 @@
 #include <io.h>
 #include <systemdev.h>
 
-static void mpu6000SpiGyroInit(gyroDev_t *gyro)
+void Mpu6000Imu::mpuBusInit(gyroDev_t *gyro)
 {
     MpuImu::gyroInit();
 
@@ -138,7 +138,6 @@ bool mpuBusGyroDetect(gyroDev_t *gyro)
         return false;
     }
 
-    gyro->initFn = mpu6000SpiGyroInit;
     gyro->readFn = MpuImu::gyroReadSPI;
     gyro->gyroShortPeriod = systemClockMicrosToCycles(Mpu6000Imu::SHORT_THRESHOLD);
     return true;

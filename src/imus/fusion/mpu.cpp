@@ -228,7 +228,7 @@ void MpuImu::devInit(uint8_t interruptPin)
 
     m_gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
-    m_gyroDev.initFn(&m_gyroDev);
+    mpuBusInit(&m_gyroDev);
 }
 
 int16_t MpuImu::devReadRawGyro(uint8_t k)

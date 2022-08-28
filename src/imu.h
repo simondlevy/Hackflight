@@ -253,8 +253,8 @@ class Imu {
                 uint32_t nextTargetCycles,
                 int32_t desiredPeriodCycles)
         {
-            int32_t skew = cmpTimeCycles(nextTargetCycles, imuDevGyroSyncTime()) %
-                desiredPeriodCycles;
+            int32_t skew = cmpTimeCycles(nextTargetCycles,
+                    imuDevGyroSyncTime()) % desiredPeriodCycles;
 
             if (skew > (desiredPeriodCycles / 2)) {
                 skew -= desiredPeriodCycles;

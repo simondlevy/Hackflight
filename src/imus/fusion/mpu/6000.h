@@ -88,4 +88,6 @@ class Mpu6000Imu : public MpuImu {
         {
         }
 
+        virtual void mpuBusInit(gyroDev_t * gyro) override;
+
 }; // class Mpu6000Imu
