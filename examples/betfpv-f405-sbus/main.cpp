@@ -28,7 +28,7 @@
 #include <serial.h>
 
 #include <imus/softquat/mpu6000.h>
-#include <led/led.h>
+#include <leds/stm32f4.h>
 
 #include "hardware_init.h"
 
