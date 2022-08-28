@@ -241,15 +241,11 @@ class Mpu6000 : public FusionImu {
             uint8_t alignment;
         } gyroDeviceConfig_t;
 
-        mpuSensor_e mpuBusDetect(const extDevice_t *dev);
-
-        bool mpuBusGyroDetect(gyroDev_t *gyro);
+        mpuSensor_e busDetect(const extDevice_t *dev);
 
         bool detectSPISensorsAndUpdateDetectionResult(const gyroDeviceConfig_t *config);
 
         bool mpuDetect(const Mpu6000::gyroDeviceConfig_t *config);
-
-        static void gyroInit(void);
 
         static bool gyroRead(void);
 

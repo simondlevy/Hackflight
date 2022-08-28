@@ -50,7 +50,7 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 
 // ----------------------------------------------------------------------------
 
-mpuSensor_e Mpu6000::mpuBusDetect(const extDevice_t *dev)
+mpuSensor_e Mpu6000::busDetect(const extDevice_t *dev)
 {
 
     spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
@@ -94,17 +94,6 @@ mpuSensor_e Mpu6000::mpuBusDetect(const extDevice_t *dev)
 
     spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
     return detectedSensor;
-}
-
-bool Mpu6000::mpuBusGyroDetect(gyroDev_t *gyro)
-{
-    if (gyro->mpuDetectionResult.sensor != MPU_60x0_SPI) {
-        return false;
-    }
-
-    gyro->readFn = Mpu6000::gyroReadSPI;
-    gyro->gyroShortPeriod = systemClockMicrosToCycles(Mpu6000::SHORT_THRESHOLD);
-    return true;
 }
 
 
@@ -158,8 +147,6 @@ bool Mpu6000::gyroReadSPI()
     return true;
 }
 
-typedef uint8_t (*gyroSpiDetectFn_t)(const extDevice_t *dev);
-
 bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
         const Mpu6000::gyroDeviceConfig_t *config)
 {
@@ -180,7 +167,7 @@ bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
     // It is hard to use hardware to optimize the detection loop here,
     // as hardware type and detection function name doesn't match.
     // May need a bitmap of hardware to detection function to do it right?
-    auto sensor = mpuBusDetect(&m_gyroDev.dev);
+    auto sensor = busDetect(&m_gyroDev.dev);
     if (sensor != MPU_NONE) {
         m_gyroDev.mpuDetectionResult.sensor = sensor;
         busDeviceRegister(&m_gyroDev.dev);
@@ -191,21 +178,6 @@ bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
     spiPreinitByTag(config->csnTag);
 
     return false;
-}
-
-void Mpu6000::gyroInit(void)
-{
-    if (m_gyroDev.mpuIntExtiTag == IO_TAG_NONE) {
-        return;
-    }
-
-    const IO_t mpuIntIO = IOGetByTag(m_gyroDev.mpuIntExtiTag);
-
-    IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
-    EXTIHandlerInit(&m_gyroDev.exti, mpuIntExtiHandler);
-    EXTIConfig(mpuIntIO, &m_gyroDev.exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
-            BETAFLIGHT_EXTI_TRIGGER_RISING);
-    EXTIEnable(mpuIntIO, true);
 }
 
 // ----------------------------------------------------------------------------
@@ -272,7 +244,9 @@ void Mpu6000::devInit(uint8_t interruptPin)
     spiPreinitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
 
     mpuDetect(&gyroDeviceConfig);
-    mpuBusGyroDetect(&m_gyroDev);
+
+    m_gyroDev.readFn = Mpu6000::gyroReadSPI;
+    m_gyroDev.gyroShortPeriod = systemClockMicrosToCycles(Mpu6000::SHORT_THRESHOLD);
 
     // SPI DMA buffer required per device
     static uint8_t gyroBuf1[Mpu6000::GYRO_BUF_SIZE];
@@ -281,7 +255,13 @@ void Mpu6000::devInit(uint8_t interruptPin)
 
     m_gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
 
-    gyroInit();
+    const IO_t mpuIntIO = IOGetByTag(m_gyroDev.mpuIntExtiTag);
+
+    IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
+    EXTIHandlerInit(&m_gyroDev.exti, mpuIntExtiHandler);
+    EXTIConfig(mpuIntIO, &m_gyroDev.exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
+            BETAFLIGHT_EXTI_TRIGGER_RISING);
+    EXTIEnable(mpuIntIO, true);
 
     spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(Mpu6000::MAX_SPI_INIT_CLK_HZ));
 
