@@ -84,7 +84,6 @@ typedef struct gyroDev_s {
     uint8_t                   hardware_lpf;
     mpuDetectionResult_t      mpuDetectionResult;
     ioTag_t                   mpuIntExtiTag;
-    sensorGyroReadFuncPtr     readFn;                 
     busSegment_t              segments[2];
     int16_t                   temperature;
     sensorGyroReadDataFuncPtr temperatureFn;     

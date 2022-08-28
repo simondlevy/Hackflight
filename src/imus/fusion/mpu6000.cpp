@@ -197,7 +197,7 @@ uint32_t imuDevGyroSyncTime(void)
 
 bool Mpu6000::devGyroIsReady(void)
 {
-    bool ready = m_gyroDev.readFn();
+    bool ready = gyroReadSPI();
 
     if (ready) {
         m_gyroDev.dataReady = false;
@@ -245,7 +245,6 @@ void Mpu6000::devInit(uint8_t interruptPin)
 
     mpuDetect(&gyroDeviceConfig);
 
-    m_gyroDev.readFn = gyroReadSPI;
     m_gyroDev.gyroShortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
 
     // SPI DMA buffer required per device
