@@ -39,7 +39,7 @@ Hackflight attempts to maintain a simple relationship between
 the code and the elements of the flight-control flow diagram shown below:
 
 <p align="center"> 
-<img src="media/dataflow3.png" width=700>
+<img src="media/dataflow.png" width=700>
 </p>
 
 By using header-only C++ classes whenever possible, and
