@@ -43,9 +43,6 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 
         *m_gyroSyncTimePtr =
             m_gyroDev.gyroLastEXTI + m_gyroDev.gyroDmaMaxDuration;
-
-        m_gyroDev.gyroSyncEXTI =
-            m_gyroDev.gyroLastEXTI + m_gyroDev.gyroDmaMaxDuration;
     }
     m_gyroDev.gyroLastEXTI = nowCycles;
 
@@ -95,12 +92,6 @@ uint32_t imuDevGyroInterruptCount(void)
 {
     return m_gyroDev.detectedEXTI;
 }
-
-uint32_t imuDevGyroSyncTime(void)
-{
-    return m_gyroDev.gyroSyncEXTI;
-}
-
 
 // ----------------------------------------------------------------------------
 
