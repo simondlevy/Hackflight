@@ -20,7 +20,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdbool.h>
 
-#include "debug.h"
 #include "imu.h"
 #include "maths.h"
 #include "receiver.h"
@@ -521,9 +520,10 @@ class Msp {
 
         void begin(void)
         {
-            m_dbgPort = serialOpenPortUsb();
-            m_ports[0].port = m_dbgPort;
-            debugSetPort(m_dbgPort);
+            m_ports[0].port = serialOpenPortUsb();
+
+            m_dbgPort = m_ports[0].port; 
+            serialDebugSetPort(m_dbgPort);
         }
 
         void triggerDebugging(void)
@@ -546,7 +546,7 @@ class Msp {
 
             // Sync debugging to MSP update
             if (m_debugging) {
-                debugFlush();
+                serialDebugFlush();
                 m_debugging = false;
             }
 

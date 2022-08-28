@@ -20,6 +20,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdarg.h>
+#include <stdlib.h>
 
 #include "time.h"
 
@@ -156,6 +158,12 @@ extern "C" {
     void serialWrite(void * port, uint8_t c);
 
     void serialWriteBuf(void * port, const uint8_t *data, uint32_t count);
+
+    void serialDebugFlush(void);
+
+    void serialDebugPrintf(const char *fmt, ...);
+
+    void serialDebugSetPort(void * p);
 
 #if defined(__cplusplus)
 }

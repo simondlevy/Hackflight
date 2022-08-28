@@ -118,3 +118,19 @@ void serialWriteBuf(void * port, const uint8_t *data, uint32_t count)
         Serial1.write(data, count);
     }
 }
+
+// These functions are stubbed, because for Arduino we should be using Serial.print*()
+
+void serialDebugFlush(void)
+{
+}
+
+void serialDebugPrintf(const char *fmt, ...)
+{
+    (void)fmt;
+}
+
+void serialDebugSetPort(void * p)
+{
+    (void)p;
+}

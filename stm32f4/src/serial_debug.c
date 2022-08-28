@@ -17,7 +17,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-#include <debug.h>
 #include <serial.h>
 
 typedef void (*putcf) (void *, char);
@@ -209,12 +208,12 @@ static void _putc(void *p, char c)
 
 putcf stdout_putf;
 
-void debugFlush(void)
+void serialDebugFlush(void)
 {
     while (!serialIsTransmitBufferEmpty(printfSerialPort));
 }
 
-void debugPrintf(const char *fmt, ...)
+void serialDebugPrintf(const char *fmt, ...)
 {
     //void mspTriggerDebugging(void);
 
@@ -225,7 +224,7 @@ void debugPrintf(const char *fmt, ...)
     //mspTriggerDebugging();
 }
 
-void debugSetPort(void * p)
+void serialDebugSetPort(void * p)
 {
     printfSerialPort = p;
     stdout_putf = _putc;
