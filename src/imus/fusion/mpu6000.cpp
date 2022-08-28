@@ -18,7 +18,7 @@
 #include <stdint.h>
 
 #include <constrain.h>
-#include <imus/fusion/mpu/6000.h>
+#include <imus/fusion/mpu6000.h>
 #include <system.h>
 #include <time.h>
 

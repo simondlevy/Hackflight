@@ -275,7 +275,7 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/stm32clock.o \
 		  $(OBJECT_DIR)/mpu.o \
-		  $(OBJECT_DIR)/6000.o \
+		  $(OBJECT_DIR)/mpu6000.o \
 		  $(OBJECT_DIR)/mpudev.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CXX) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
@@ -310,8 +310,8 @@ $(OBJECT_DIR)/mpu.o: $(HFSRC_DIR)/imus/fusion/mpu.cpp
 	@echo imus/fusion/mpu.cpp
 	$(V1) $(call compile_cpp)
 
-$(OBJECT_DIR)/6000.o: $(HFSRC_DIR)/imus/fusion/mpu/6000.cpp
-	@echo imus/fusion/mpu/6000.cpp
+$(OBJECT_DIR)/mpu6000.o: $(HFSRC_DIR)/imus/fusion/mpu6000.cpp
+	@echo imus/fusion/mpu6000.cpp
 	$(V1) $(call compile_cpp)
 
 $(OBJECT_DIR)/stm32clock.o: $(HFSRC_DIR)/stm32clock.c
