@@ -66,6 +66,8 @@ class Imu {
         
         uint16_t m_gyroScale;
 
+        uint32_t m_gyroSyncTime;
+
         Pt1Filter m_lowpassFilter1[3] = {
             Pt1Filter(GYRO_GYRO_LPF1_DYN_MIN_HZ),
             Pt1Filter(GYRO_GYRO_LPF1_DYN_MIN_HZ),
@@ -245,7 +247,8 @@ class Imu {
                 int32_t desiredPeriodCycles)
         {
             int32_t skew = cmpTimeCycles(nextTargetCycles,
-                    imuDevGyroSyncTime()) % desiredPeriodCycles;
+                    //imuDevGyroSyncTime()) % desiredPeriodCycles;
+                    m_gyroSyncTime) % desiredPeriodCycles;
 
             if (skew > (desiredPeriodCycles / 2)) {
                 skew -= desiredPeriodCycles;
@@ -254,8 +257,13 @@ class Imu {
             return skew;
         }
 
+        void begin(void) 
+        {
+            devInit(&m_gyroSyncTime);
+        }
+
         virtual bool     devGyroIsReady(void) = 0;
-        virtual void     begin(void) = 0;
+        virtual void     devInit(uint32_t * gyroSyncTime) = 0;
         virtual int16_t  devReadRawGyro(uint8_t k) = 0;
 
         //virtual uint32_t devGyroInterruptCount(void) = 0;

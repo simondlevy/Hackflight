@@ -27,6 +27,8 @@
 
 static Mpu6000::gyroDev_t m_gyroDev;
 
+static uint32_t * m_gyroSyncTimePtr;
+
 static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 {
     (void)cb;
@@ -38,6 +40,10 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
     // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
     if ((m_gyroDev.gyroShortPeriod == 0) ||
             (gyroLastPeriod < m_gyroDev.gyroShortPeriod)) {
+
+        *m_gyroSyncTimePtr =
+            m_gyroDev.gyroLastEXTI + m_gyroDev.gyroDmaMaxDuration;
+
         m_gyroDev.gyroSyncEXTI =
             m_gyroDev.gyroLastEXTI + m_gyroDev.gyroDmaMaxDuration;
     }
@@ -150,8 +156,10 @@ bool Mpu6000::mpuDetect(const Mpu6000::gyroDeviceConfig_t *config)
 }
 
 
-void Mpu6000::begin(void)
+void Mpu6000::devInit(uint32_t * gyroSyncTimePtr)
 {
+    m_gyroSyncTimePtr = gyroSyncTimePtr;
+
     static gyroDeviceConfig_t gyroDeviceConfig; 
 
     gyroDeviceConfig.busType = BUS_TYPE_SPI;

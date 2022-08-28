@@ -130,9 +130,9 @@ class Mpu6000 : public FusionImu {
 
         bool mpuDetect(const Mpu6000::gyroDeviceConfig_t *config);
 
-        virtual void begin(void) override;
-
         virtual bool devGyroIsReady(void) override;
+
+        virtual void devInit(uint32_t * gyroSyncTime) override;
 
         virtual int16_t devReadRawGyro(uint8_t k) override;
 
