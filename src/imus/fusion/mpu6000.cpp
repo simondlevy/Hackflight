@@ -165,9 +165,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     m_gyroDev.dev.txBuf = gyroBuf1;
     m_gyroDev.dev.rxBuf = &gyroBuf1[GYRO_BUF_SIZE / 2];
 
-    m_gyroDev.mpuIntExtiTag = gyroDeviceConfig.extiTag;
-
-    const IO_t mpuIntIO = IOGetByTag(m_gyroDev.mpuIntExtiTag);
+    const IO_t mpuIntIO = IOGetByTag(gyroDeviceConfig.extiTag);
 
     IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
     EXTIHandlerInit(&m_gyroDev.exti, mpuIntExtiHandler);
