@@ -18,18 +18,6 @@
 
 #pragma once
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-    // Called externally
-    uint32_t imuDevGyroInterruptCount(void);
-    uint32_t imuDevGyroSyncTime(void);
-
-#if defined(__cplusplus)
-}
-#endif
-
 #include "arming.h"
 #include "clock.h"
 #include "constrain.h"
@@ -67,6 +55,7 @@ class Imu {
         uint16_t m_gyroScale;
 
         uint32_t m_gyroSyncTime;
+        uint32_t m_gyroInterruptCount;
 
         Pt1Filter m_lowpassFilter1[3] = {
             Pt1Filter(GYRO_GYRO_LPF1_DYN_MIN_HZ),
@@ -246,9 +235,8 @@ class Imu {
                 uint32_t nextTargetCycles,
                 int32_t desiredPeriodCycles)
         {
-            int32_t skew = cmpTimeCycles(nextTargetCycles,
-                    //imuDevGyroSyncTime()) % desiredPeriodCycles;
-                    m_gyroSyncTime) % desiredPeriodCycles;
+            int32_t skew =
+                cmpTimeCycles(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;
 
             if (skew > (desiredPeriodCycles / 2)) {
                 skew -= desiredPeriodCycles;
@@ -259,14 +247,19 @@ class Imu {
 
         void begin(void) 
         {
-            devInit(&m_gyroSyncTime);
+            devInit(&m_gyroSyncTime, &m_gyroInterruptCount);
         }
 
-        virtual bool     devGyroIsReady(void) = 0;
-        virtual void     devInit(uint32_t * gyroSyncTime) = 0;
-        virtual int16_t  devReadRawGyro(uint8_t k) = 0;
+        uint32_t gyroInterruptCount(void)
+        {
+            return m_gyroInterruptCount;
+        }
 
-        //virtual uint32_t devGyroInterruptCount(void) = 0;
-        //virtual uint32_t devGyroSyncTime(void) = 0;
+        virtual bool devGyroIsReady(void) = 0;
+
+        virtual void devInit(
+                uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) = 0;
+
+        virtual int16_t devReadRawGyro(uint8_t k) = 0;
 
 }; // class Imu

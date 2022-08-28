@@ -132,7 +132,8 @@ class Mpu6000 : public FusionImu {
 
         virtual bool devGyroIsReady(void) override;
 
-        virtual void devInit(uint32_t * gyroSyncTime) override;
+        virtual void devInit(
+                uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) override;
 
         virtual int16_t devReadRawGyro(uint8_t k) override;
 
