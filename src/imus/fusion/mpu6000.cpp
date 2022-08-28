@@ -74,8 +74,7 @@ bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
     delay(100);  // datasheet specifies a 100ms delay after reset
 
     // reset the device signal paths
-    spiWriteReg(dev, RA_SIGNAL_PATH_RESET,
-            BIT_GYRO | BIT_ACC | BIT_TEMP);
+    spiWriteReg(dev, RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
     delay(100);  // datasheet specifies a 100ms delay after signal path reset
 
     spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
@@ -124,8 +123,6 @@ bool Mpu6000::devGyroIsReady(void)
     m_gyroDev.adcRaw[0] = __builtin_bswap16(gyroData[1]);
     m_gyroDev.adcRaw[1] = __builtin_bswap16(gyroData[2]);
     m_gyroDev.adcRaw[2] = __builtin_bswap16(gyroData[3]);
-
-    m_gyroDev.dataReady = false;
 
     return true;
 }
@@ -187,8 +184,6 @@ void Mpu6000::devInit(uint8_t interruptPin)
     EXTIEnable(mpuIntIO, true);
 
     spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
-
-    // Device was already reset during detection so proceed with configuration
 
     // Clock Source PPL with Z axis gyro reference
     spiWriteReg(&m_gyroDev.dev, RA_PWR_MGMT_1, CLK_SEL_PLLGYROZ);
