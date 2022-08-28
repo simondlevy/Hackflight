@@ -151,7 +151,7 @@ bool Mpu6000::mpuDetect(const Mpu6000::gyroDeviceConfig_t *config)
 }
 
 
-void Mpu6000::devInit(void)
+void Mpu6000::begin(void)
 {
     static gyroDeviceConfig_t gyroDeviceConfig; 
 

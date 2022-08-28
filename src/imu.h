@@ -183,11 +183,6 @@ class Imu {
                 uint32_t time,
                 State * vstate) = 0;
 
-        void begin(void)
-        {
-            devInit();
-        }
-
         void readScaledGyro(Imu * imu, Imu::align_fun align, State * vstate)
         {
             if (!devGyroIsReady()) return;
@@ -262,7 +257,7 @@ class Imu {
         }
 
         virtual bool     devGyroIsReady(void) = 0;
-        virtual void     devInit(void) = 0;
+        virtual void     begin(void) = 0;
         virtual int16_t  devReadRawGyro(uint8_t k) = 0;
 
         //virtual uint32_t devGyroInterruptCount(void) = 0;
