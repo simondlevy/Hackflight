@@ -18,6 +18,7 @@
  */
 
 #include <imu.h>
+#include <USFS.h>
 
 class UsfsImu : public Imu {
 
@@ -45,7 +46,7 @@ class UsfsImu : public Imu {
 
         uint8_t m_interruptPin;
 
-        int16_t m__gyroAdc[3];
+        int16_t m_gyroAdc[3];
 
         float m_qw, m_qx, m_qy, m_qz;
 
@@ -77,8 +78,5 @@ class UsfsImu : public Imu {
 
         } gyroDev_t;
 
-        UsfsImu(uint16_t gyroScale) 
-            : Imu(GYRO_SCALE_DPS)
-        {
-        }
+        UsfsImu(uint8_t interruptPin);
 };

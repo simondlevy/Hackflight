@@ -19,15 +19,12 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include <USFS.h>
-
-#include <imu.h>
 
 #include "imu_usfs.h"
 
 static volatile UsfsImu::gyroDev_t m_gyroDev;
 
-static void UsfsImu::interruptHandler(void)
+void UsfsImu::interruptHandler(void)
 {
     m_gyroDev.gotNewData = true;
    *m_gyroDev.interruptCountPtr += 1;
@@ -83,7 +80,7 @@ void UsfsImu::devInit(
             INTERRUPT_ENABLE);
 
     pinMode(m_interruptPin, INPUT);
-    attachInterrupt(interruptPin, interruptHandler, RISING);  
+    attachInterrupt(m_interruptPin, interruptHandler, RISING);  
 
     // Clear interrupts
     usfsCheckStatus();
@@ -104,14 +101,22 @@ void UsfsImu::getEulerAngles(
     (void)arming;
     (void)time;
 
-    vstate->phi =
-        atan2(2.0f*(_qw*_qx+_qy*_qz), _qw*_qw-_qx*_qx-_qy*_qy+_qz*_qz);
-    vstate->theta = asin(2.0f*(_qx*_qz-_qw*_qy));
-    vstate->psi =
-        atan2(2.0f*(_qx*_qy+_qw*_qz), _qw*_qw+_qx*_qx-_qy*_qy-_qz*_qz);
+    float qw = m_qw;
+    float qx = m_qx;
+    float qy = m_qy;
+    float qz = m_qz;
+
+    vstate->phi = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
+    vstate->theta = asin(2.0f*(qx*qz-qw*qy));
+    vstate->psi = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
 
     // Convert heading from [-pi,+pi] to [0,2*pi]
     if (vstate->psi < 0) {
         vstate->psi += 2*M_PI;
     }
+}
+
+UsfsImu::UsfsImu(uint8_t interruptPin) : Imu(GYRO_SCALE_DPS)
+{
+    m_interruptPin = interruptPin;
 }

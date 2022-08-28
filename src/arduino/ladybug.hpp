@@ -29,7 +29,7 @@
 #include "imu_usfs.h"
 #include "arduino_led.h"
 
-static ImuUsfs _imu(12); // interrupt pin
+static UsfsImu _imu(12); // interrupt pin
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
