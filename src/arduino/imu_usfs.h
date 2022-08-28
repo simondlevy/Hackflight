@@ -45,6 +45,10 @@ class UsfsImu : public Imu {
 
         uint8_t m_interruptPin;
 
+        int16_t m__gyroAdc[3];
+
+        float m_qw, m_qx, m_qy, m_qz;
+
     protected:
 
         virtual void getEulerAngles(
@@ -59,6 +63,8 @@ class UsfsImu : public Imu {
                 uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) override;
 
         virtual int16_t devReadRawGyro(uint8_t k) override;
+
+        static void interruptHandler(void);
 
     public:
 

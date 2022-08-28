@@ -14,6 +14,8 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#if !defined(ARDUINO)
+
 #include <constrain.h>
 #include <imus/fusion/mpu6000.h>
 #include <system.h>
@@ -136,7 +138,6 @@ bool Mpu6000::mpuDetect(const Mpu6000::gyroDeviceConfig_t *config)
     return detectSPISensorsAndUpdateDetectionResult(config);
 }
 
-
 void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr)
 {
     m_gyroDev.syncTimePtr = gyroSyncTimePtr;
@@ -223,3 +224,5 @@ int16_t Mpu6000::devReadRawGyro(uint8_t k)
 {
     return m_gyroDev.adcRaw[k];
 }
+
+#endif // !defined(ARDUINO)

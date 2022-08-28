@@ -25,9 +25,6 @@
 
 #include "imu_usfs.h"
 
-static int16_t _gyroAdc[3];
-static float _qw, _qx, _qy, _qz;
-
 static volatile UsfsImu::gyroDev_t m_gyroDev;
 
 static void UsfsImu::interruptHandler(void)
@@ -41,9 +38,9 @@ bool UsfsImu::devGyroIsReady(void)
 {
     bool result = false;
 
-    if (_gotNewData) { 
+    if (m_gyroDev.gotNewData) { 
 
-        _gotNewData = false;  
+        m_gyroDev.gotNewData = false;  
 
         uint8_t eventStatus = usfsCheckStatus(); 
 
@@ -52,37 +49,24 @@ bool UsfsImu::devGyroIsReady(void)
         }
 
         if (usfsEventStatusIsGyrometer(eventStatus)) { 
-            usfsReadGyrometerRaw(_gyroAdc);
+            usfsReadGyrometerRaw(m_gyroAdc);
             result = true;
         }
 
         if (usfsEventStatusIsQuaternion(eventStatus)) { 
-            usfsReadQuaternion(_qw, _qx, _qy, _qz);
+            usfsReadQuaternion(m_qw, m_qx, m_qy, m_qz);
         }
     } 
 
     return result;
 }
 
-int16_t UsfsImu::devReadRawGyro(uint8_t k)
-{
-    return _gyroAdc[k];
-}
-
-uint32_t UsfsImu::devGyroInterruptCount(void)
-{
-    return _gyroInterruptCount;
-}
-
-uint32_t UsfsImu::devGyroSyncTime(void)
-{
-    return _imuDevGyroSyncTime;
-}
-
-
 void UsfsImu::devInit(
                 uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr)
 {
+    m_gyroDev.syncTimePtr = gyroSyncTimePtr;
+    m_gyroDev.interruptCountPtr = gyroInterruptCountPtr;
+
     Wire.setClock(400000); 
     delay(100);
 
@@ -103,6 +87,11 @@ void UsfsImu::devInit(
 
     // Clear interrupts
     usfsCheckStatus();
+}
+
+int16_t UsfsImu::devReadRawGyro(uint8_t k)
+{
+    return m_gyroAdc[k];
 }
 
 void UsfsImu::getEulerAngles(
