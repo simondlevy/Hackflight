@@ -14,13 +14,13 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <imus/fusion.h>
+#include <imus/softquat.h>
 
 #include <bus.h>
 #include <exti.h>
 #include <io.h>
 
-class Mpu6000 : public FusionImu {
+class Mpu6000 : public SoftQuatImu {
 
     private:
 
@@ -154,9 +154,6 @@ class Mpu6000 : public FusionImu {
 
         } gyroDev_t;
 
-        Mpu6000(uint16_t gyroScale)
-            : FusionImu(gyroScale)
-        {
-        }
+        Mpu6000(uint16_t gyroScale);
 
 }; // class Mpu6000

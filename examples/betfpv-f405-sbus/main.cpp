@@ -27,7 +27,7 @@
 #include <receivers/sbus.h>
 #include <serial.h>
 
-#include <imus/fusion/mpu6000.h>
+#include <imus/softquat/mpu6000.h>
 #include <led/led.h>
 
 #include "hardware_init.h"

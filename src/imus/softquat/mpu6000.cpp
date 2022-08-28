@@ -17,7 +17,7 @@
 #if !defined(ARDUINO)
 
 #include <constrain.h>
-#include <imus/fusion/mpu6000.h>
+#include <imus/softquat/mpu6000.h>
 #include <system.h>
 #include <time.h>
 
@@ -223,6 +223,10 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 int16_t Mpu6000::devReadRawGyro(uint8_t k)
 {
     return m_gyroDev.adcRaw[k];
+}
+
+Mpu6000::Mpu6000(uint16_t gyroScale) : SoftQuatImu(gyroScale)
+{
 }
 
 #endif // !defined(ARDUINO)

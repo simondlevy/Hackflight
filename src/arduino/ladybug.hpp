@@ -24,9 +24,9 @@
 #include <alignment/rotate0.h>
 #include <mixers/fixedpitch/quadxbf.h>
 #include <motors.h>
+#include <imus/usfs/usfs.h>
 #include <stm32clock.h>
 
-#include "imu_usfs.h"
 #include "arduino_led.h"
 
 static UsfsImu _imu(12); // interrupt pin

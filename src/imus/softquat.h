@@ -26,7 +26,7 @@
 #include "state.h"
 #include "maths.h"
 
-class FusionImu : public Imu {
+class SoftQuatImu : public Imu {
 
     private:
 
@@ -184,7 +184,7 @@ class FusionImu : public Imu {
 
     public:
 
-        FusionImu(uint16_t gyroScale)
+        SoftQuatImu(uint16_t gyroScale)
             : Imu(gyroScale)
         {
         }

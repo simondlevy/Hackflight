@@ -20,7 +20,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#include "imu_usfs.h"
+#include "usfs.h"
 
 static volatile UsfsImu::gyroDev_t m_gyroDev;
 

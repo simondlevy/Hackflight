@@ -300,8 +300,8 @@ $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/hardware_init.o $(CFLAGS) \
 		hardware_init.c
 
-$(OBJECT_DIR)/mpu6000.o: $(HFSRC_DIR)/imus/fusion/*.*
-	@echo imus/fusion/mpu6000.cpp
+$(OBJECT_DIR)/mpu6000.o: $(HFSRC_DIR)/imus/softquat/*.*
+	@echo imus/softquat/mpu6000.cpp
 	$(V1) $(call compile_cpp)
 
 $(OBJECT_DIR)/stm32clock.o: $(HFSRC_DIR)/stm32clock.c
