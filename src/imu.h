@@ -30,6 +30,20 @@
 
 class Imu {
 
+    friend class Hackflight;
+    friend class Task;
+    friend class AttitudeTask;
+    friend class ReceiverTask;
+
+    public:
+
+        // Common structure for angles, stick axes, etc.
+        typedef struct {
+            float x;
+            float y;
+            float z;
+        } axes_t;
+
     private:
 
         static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
@@ -123,13 +137,12 @@ class Imu {
             setCalibrationCycles(); // start calibrating
         }
 
-    public:
+        virtual bool devGyroIsReady(void) = 0;
 
-        typedef struct {
-            float x;
-            float y;
-            float z;
-        } axes_t;
+        virtual void devInit(
+                uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) = 0;
+
+        virtual int16_t devReadRawGyro(uint8_t k) = 0;
 
         typedef struct {
             float w;
@@ -254,12 +267,5 @@ class Imu {
         {
             return m_gyroInterruptCount;
         }
-
-        virtual bool devGyroIsReady(void) = 0;
-
-        virtual void devInit(
-                uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) = 0;
-
-        virtual int16_t devReadRawGyro(uint8_t k) = 0;
 
 }; // class Imu
