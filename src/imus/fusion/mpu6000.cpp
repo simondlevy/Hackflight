@@ -42,10 +42,10 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
     int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, prevTime);
 
     // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
-    if ((m_gyroDev.gyroShortPeriod == 0) ||
-            (gyroLastPeriod < m_gyroDev.gyroShortPeriod)) {
+    if ((m_gyroDev.shortPeriod == 0) ||
+            (gyroLastPeriod < m_gyroDev.shortPeriod)) {
 
-        *m_gyroSyncTimePtr = prevTime + m_gyroDev.gyroDmaMaxDuration;
+        *m_gyroSyncTimePtr = prevTime + m_gyroDev.dmaMaxDuration;
     }
 
     prevTime = nowCycles;
@@ -158,7 +158,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     mpuDetect(&gyroDeviceConfig);
 
-    m_gyroDev.gyroShortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
+    m_gyroDev.shortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
 
     // SPI DMA buffer required per device
     static uint8_t gyroBuf1[GYRO_BUF_SIZE];
