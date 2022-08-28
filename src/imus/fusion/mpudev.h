@@ -20,9 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <exti.h>
 #include <io.h>
 
-struct gyroDev_s;
-
-typedef struct gyroDev_s {
+typedef struct {
 
     int16_t           adcRaw[3];                          
     uint32_t          detectedEXTI;
