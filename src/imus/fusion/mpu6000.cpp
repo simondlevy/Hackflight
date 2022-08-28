@@ -50,7 +50,7 @@ static void mpuIntExtiHandler(extiCallbackRec_t *cb)
 
 // ----------------------------------------------------------------------------
 
-mpuSensor_e Mpu6000::busDetect(const extDevice_t *dev)
+void Mpu6000::busInit(const extDevice_t *dev)
 {
 
     spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
@@ -64,11 +64,12 @@ mpuSensor_e Mpu6000::busDetect(const extDevice_t *dev)
             BIT_GYRO | BIT_ACC | BIT_TEMP);
     delay(100);  // datasheet specifies a 100ms delay after signal path reset
 
-
+    /*
     const uint8_t whoAmI = spiReadRegMsk(dev, RA_WHO_AM_I);
 
     // Ensure CS high time is met which is violated on H7 without this delay
     delayMicroseconds(1); 
+
     mpuSensor_e detectedSensor = MPU_NONE;
 
     if (whoAmI == WHO_AM_I_CONST) {
@@ -91,9 +92,8 @@ mpuSensor_e Mpu6000::busDetect(const extDevice_t *dev)
                 detectedSensor = MPU_60x0_SPI;
         }
     }
-
+    */
     spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
-    return detectedSensor;
 }
 
 
@@ -164,20 +164,11 @@ bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
     // Ensure device is disabled, important when two devices are on the same bus.
     IOHi(m_gyroDev.dev.busType_u.spi.csnPin); 
 
-    // It is hard to use hardware to optimize the detection loop here,
-    // as hardware type and detection function name doesn't match.
-    // May need a bitmap of hardware to detection function to do it right?
-    auto sensor = busDetect(&m_gyroDev.dev);
-    if (sensor != MPU_NONE) {
-        m_gyroDev.mpuDetectionResult.sensor = sensor;
-        busDeviceRegister(&m_gyroDev.dev);
-        return true;
-    }
+    busInit(&m_gyroDev.dev);
 
-    // Detection failed, disable CS pin again
-    spiPreinitByTag(config->csnTag);
+    busDeviceRegister(&m_gyroDev.dev);
 
-    return false;
+    return true;
 }
 
 // ----------------------------------------------------------------------------

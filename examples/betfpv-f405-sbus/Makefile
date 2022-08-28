@@ -305,8 +305,7 @@ $(OBJECT_DIR)/mpudev.o: $(HFSRC_DIR)/imus/fusion/mpudev.c
 	@echo imus/fusion/mpudev.c
 	$(V1) $(call compile_c)
 
-$(OBJECT_DIR)/mpu6000.o: $(HFSRC_DIR)/imus/fusion/mpu6000.cpp \
-	  $(HFSRC_DIR)/imus/fusion/mpu6000.h
+$(OBJECT_DIR)/mpu6000.o: $(HFSRC_DIR)/imus/fusion/*.*
 	@echo imus/fusion/mpu6000.cpp
 	$(V1) $(call compile_cpp)
 

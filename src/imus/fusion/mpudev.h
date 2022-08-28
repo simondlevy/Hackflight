@@ -44,27 +44,7 @@ typedef enum {
     L3GD20_SPI,
 } mpuSensor_e;
 
-typedef struct mpuDetectionResult_s {
-    mpuSensor_e sensor;
-} mpuDetectionResult_t;
-
 struct gyroDev_s;
-typedef void (*sensorGyroInitFuncPtr)(struct gyroDev_s *gyro);
-typedef bool (*sensorGyroReadFuncPtr)(void);
-typedef bool (*sensorGyroReadDataFuncPtr)(struct gyroDev_s *gyro, int16_t *data);
-
-typedef enum {
-    GYRO_NONE = 0
-} gyroHardware_e;
-
-typedef enum {
-    GYRO_HARDWARE_LPF_NORMAL,
-    GYRO_HARDWARE_LPF_EXPERIMENTAL
-} gyroHardwareLpf_e;
-
-typedef struct fp_rotationMatrix_s {
-    float m[3][3];              // matrix
-} fp_rotationMatrix_t;
 
 typedef struct gyroDev_s {
 
@@ -73,20 +53,11 @@ typedef struct gyroDev_s {
     volatile bool             dataReady;
     extDevice_t               dev;
     extiCallbackRec_t         exti;
-    fp_rotationMatrix_t       rotationMatrix;
     int32_t                   gyroDmaMaxDuration;
-    gyroHardware_e            gyroHardware;
-    uint8_t                   gyroHasOverflowProtection;
     uint32_t                  gyroLastEXTI;
     int32_t                   gyroShortPeriod;
     uint32_t                  gyroSyncEXTI;
-    uint8_t                   hardware_32khz_lpf;
-    uint8_t                   hardware_lpf;
-    mpuDetectionResult_t      mpuDetectionResult;
     ioTag_t                   mpuIntExtiTag;
-    busSegment_t              segments[2];
-    int16_t                   temperature;
-    sensorGyroReadDataFuncPtr temperatureFn;     
 
 } gyroDev_t;
 
