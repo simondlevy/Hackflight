@@ -39,7 +39,6 @@ class Mpu6000 : public FusionImu {
         static const uint8_t WHO_AM_I_CONST   = 0x68;
 
         // RA = Register Address;
-
         static const uint8_t RA_PRODUCT_ID         = 0x0C;
         static const uint8_t RA_SMPLRT_DIV         = 0x19;
         static const uint8_t RA_GYRO_CONFIG        = 0x1B;
@@ -59,14 +58,14 @@ class Mpu6000 : public FusionImu {
         // types are supported with SPI DMA.
         static const uint8_t GYRO_BUF_SIZE = 32;
 
-        static const uint8_t CLK_SEL_PLLGYROX            = 0x01;
-        static const uint8_t CLK_SEL_PLLGYROZ            = 0x03;
+        static const uint8_t CLK_SEL_PLLGYROX = 0x01;
+        static const uint8_t CLK_SEL_PLLGYROZ = 0x03;
 
-        static const uint8_t BIT_TEMP                    = 0x01;
-        static const uint8_t BIT_ACC                     = 0x02;
-        static const uint8_t BIT_GYRO                    = 0x04;
-        static const uint8_t BIT_I2C_IF_DIS              = 0x10;
-        static const uint8_t BIT_H_RESET                 = 0x80;
+        static const uint8_t BIT_TEMP       = 0x01;
+        static const uint8_t BIT_ACC        = 0x02;
+        static const uint8_t BIT_GYRO       = 0x04;
+        static const uint8_t BIT_I2C_IF_DIS = 0x10;
+        static const uint8_t BIT_H_RESET    = 0x80;
 
         // Product ID Description for MPU6000 high 4 bits low 4 bits Product
         // Name Product Revision
