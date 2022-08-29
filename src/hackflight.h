@@ -91,7 +91,7 @@ class Hackflight {
                     m_imuAlignFun,
                     &m_taskData.vstate);
 
-            uint32_t usec = timeMicros();
+            auto usec = timeMicros();
 
             float rawSetpoints[3] = {0,0,0};
 
@@ -112,7 +112,7 @@ class Hackflight {
 
             for (uint8_t i=0; i<m_mixer->getMotorCount(); i++) {
 
-                float motorOutput = motors.values[i];
+                auto motorOutput = motors.values[i];
 
                 motorOutput = motorDevValueLow() +
                     (motorDevValueHigh() - motorDevValueLow()) * motorOutput;
@@ -170,7 +170,7 @@ class Hackflight {
             static uint32_t _terminalGyroLockCount;
             static int32_t _gyroSkewAccum;
 
-            int32_t gyroSkew =
+            auto gyroSkew =
                 m_imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
@@ -208,17 +208,15 @@ class Hackflight {
 
             if (selectedTask) {
 
-                int32_t loopRemainingCycles =
-                    m_scheduler.getLoopRemainingCycles();
-                uint32_t nextTargetCycles =
-                    m_scheduler.getNextTargetCycles();
+                auto loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
+                auto nextTargetCycles = m_scheduler.getNextTargetCycles();
 
-                int32_t taskRequiredTimeUs = selectedTask->getRequiredTime();
-                int32_t taskRequiredCycles =
+                auto taskRequiredTimeUs = selectedTask->getRequiredTime();
+                auto taskRequiredCycles =
                     (int32_t)systemClockMicrosToCycles(
                             (uint32_t)taskRequiredTimeUs);
 
-                uint32_t nowCycles = systemGetCycleCounter();
+                auto nowCycles = systemGetCycleCounter();
                 loopRemainingCycles =
                     cmpTimeCycles(nextTargetCycles, nowCycles);
 
@@ -227,8 +225,7 @@ class Hackflight {
 
                 if (taskRequiredCycles < loopRemainingCycles) {
 
-                    uint32_t anticipatedEndCycles =
-                        nowCycles + taskRequiredCycles;
+                    auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
 
                     selectedTask->execute(&m_taskData, usec);
 
@@ -327,7 +324,7 @@ class Hackflight {
         void step(void)
         {
             // Realtime gyro/filtering/PID tasks get complete priority
-            uint32_t nowCycles = systemGetCycleCounter();
+            auto nowCycles = systemGetCycleCounter();
 
             if (m_scheduler.isCoreReady(nowCycles)) {
                 checkCoreTasks(nowCycles);
