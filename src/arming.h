@@ -22,7 +22,7 @@
 #include <stdbool.h>
 
 #include "led.h"
-#include "motors.h"
+#include "esc.h"
 #include "sticks.h"
 
 class Arming {

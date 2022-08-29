@@ -17,13 +17,10 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
-#include <stdbool.h>
-
 #include <alignment/rotate270.h>
-#include <clock.h>
+#include <core/clock.h>
+#include <core/mixers/fixedpitch/quadxbf.h>
 #include <hackflight.h>
-#include <mixers/fixedpitch/quadxbf.h>
 #include <receivers/sbus.h>
 #include <serial.h>
 

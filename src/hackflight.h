@@ -24,12 +24,11 @@
 #include <string.h>
 
 #include "arming.h"
-#include "demands.h"
+#include "core/step.h"
 #include "failsafe.h"
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
-#include "mixer.h"
 #include "msp.h"
 #include "receiver.h"
 #include "scheduler.h"
@@ -41,10 +40,6 @@
 class Hackflight {
 
     private:
-
-        static constexpr float PID_MIXER_SCALING = 1000;
-        static const uint16_t  PIDSUM_LIMIT_YAW  = 400;
-        static const uint16_t  PIDSUM_LIMIT      = 500;
 
         // Gyro interrupt counts over which to measure loop time and skew
         static const uint32_t CORE_RATE_COUNT = 25000;
@@ -99,7 +94,7 @@ class Hackflight {
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
-            auto motors = Hackflight::step(
+            auto motors = HackflightCore::step(
                     demands,
                     m_taskData.vstate,
                     m_pidControllers,
@@ -237,46 +232,7 @@ class Hackflight {
 
         } // checkDyanmicTasks
 
-        static float constrain_demand(const float demand, const float limit)
-        {
-            return constrain(demand, -limit, +limit) / PID_MIXER_SCALING;
-        }
-
-        static void constrain_demands(Demands * demands)
-        {
-            demands->roll  = constrain_demand(demands->roll, PIDSUM_LIMIT);
-
-            demands->pitch = constrain_demand(demands->pitch, PIDSUM_LIMIT);
-
-            // Negate yaw to make it agree with PID
-            demands->yaw   = -constrain_demand(demands->yaw, PIDSUM_LIMIT_YAW);
-        }
-
     public:
-
-        static auto step(
-                const Demands & stickDemands,
-                const State & state,
-                PidController * pidControllers[],
-                const uint8_t pidCount,
-                const bool pidReset,
-                const uint32_t usec,
-                Mixer mixer) -> Motors
-        {
-            // Star with stick demands
-            Demands demands(stickDemands);
-
-            // Run PID controllers to get new demands
-            for (auto k=0; k<pidCount; ++k) {
-                pidControllers[k]->update(usec, &demands, state, pidReset);
-            }
-
-            // Constrain demands
-            constrain_demands(&demands);
-
-            // Run the mixer to get motors from demands
-            return mixer.run(demands);
-        }
 
         Hackflight(
                 Receiver * receiver,

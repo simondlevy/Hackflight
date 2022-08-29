@@ -20,10 +20,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdbool.h>
 
+#include "core/state.h"
 #include "imu.h"
 #include "maths.h"
 #include "receiver.h"
-#include "state.h"
 #include "system.h"
 
 #define ARRAYEND(x) (&(x)[ARRAYLEN(x)])

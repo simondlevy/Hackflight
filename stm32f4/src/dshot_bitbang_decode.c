@@ -18,12 +18,12 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 #include <stdio.h>
 
-#include "platform.h"
+#include <core/constrain.h>
 
-#include <constrain.h>
-#include "macros.h"
 #include "dshot.h"
 #include "dshot_bitbang_decode.h"
+#include "macros.h"
+#include "platform.h"
 
 #define MIN(a,b) \
   __extension__ ({ __typeof__ (a) _a = (a); \

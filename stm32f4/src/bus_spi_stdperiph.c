@@ -20,16 +20,17 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "platform.h"
 
-// STM32F405 can't DMA to/from FASTRAM (CCM SRAM)
-#define IS_CCM(p) (((uint32_t)p & 0xffff0000) == 0x10000000)
+#include <core/constrain.h>
 
-#include <constrain.h>
 #include "bus.h"
 #include "bus_spi.h"
 #include "bus_spi_impl.h"
 #include "exti.h"
 #include "io.h"
 #include "rcc.h"
+
+// STM32F405 can't DMA to/from FASTRAM (CCM SRAM)
+#define IS_CCM(p) (((uint32_t)p & 0xffff0000) == 0x10000000)
 
 static SPI_InitTypeDef defaultInit = {
     .SPI_Mode = SPI_Mode_Master,

@@ -18,9 +18,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <string.h>
 
+#include <core/constrain.h>
+#include <esc.h>
 #include <time.h>
-#include <constrain.h>
-#include <motors.h>
 
 #include "platform.h"
 #include "dshot.h" // for DSHOT_ constants in mixerInitEscEndpoints

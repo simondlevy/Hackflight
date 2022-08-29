@@ -28,8 +28,8 @@
  */
 
 #include "imu.h"
-#include "mixers/fixedpitch.h"
-#include "motors/quad.h"
+#include "core/mixers/fixedpitch.h"
+#include "core/motors/quad.h"
 
 class QuadXbfMixer {
 

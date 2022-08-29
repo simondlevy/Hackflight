@@ -18,26 +18,26 @@
 
 #pragma once
 
-#include <math.h>
+#include "core/clock.h"
 
-#include "clock.h"
-
-// PT2 Low Pass filter
-class Pt2Filter {
+// PT3 Low Pass filter
+class Pt3Filter {
 
     private:
 
-        float m_state;
-        float m_state1;
-        float m_dt;
-        float m_k;
+        float m_state = 0;
+        float m_state1 = 0;
+        float m_state2 = 0;
+        float m_dt = 0;
+        float m_k = 0;
 
     public:
 
-        Pt2Filter(float f_cut, float dt=Clock::DT())
+        void init(float f_cut, float dt=Clock::DT())
         {
             m_state = 0.0;
             m_state1 = 0.0;
+            m_state2 = 0.0;
             m_dt = dt;
 
             computeGain(f_cut);
@@ -46,17 +46,20 @@ class Pt2Filter {
         float apply(float input)
         {
             m_state1 = m_state1 + m_k * (input - m_state1);
-            m_state = m_state + m_k * (m_state1 - m_state);
+            m_state2 = m_state2 + m_k * (m_state1 - m_state2);
+            m_state = m_state + m_k * (m_state2 - m_state);
             return m_state;
-         }
+        }
 
         void computeGain(float f_cut)
         {
-            const float order = 2.0f;
+            const float order = 3.0f;
             const float orderCutoffCorrection =
                 1 / sqrtf(powf(2, 1.0f / order) - 1);
             float rc = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
+            // float rc = 1 / (2 * 1.961459177f * M_PI * f_cut);
+            // where 1.961459177 = 1 / sqrt( (2^(1 / order) - 1) ) and order is 3
             m_k = m_dt / (rc + m_dt);
-         }
+        }
 
-}; // class Pt2Filter
+}; // class Pt3Filter

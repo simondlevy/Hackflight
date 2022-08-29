@@ -16,7 +16,7 @@
 
 #if !defined(ARDUINO)
 
-#include <constrain.h>
+#include <core/constrain.h>
 #include <imus/softquat/mpu6000.h>
 #include <system.h>
 #include <time.h>

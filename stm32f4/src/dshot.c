@@ -18,8 +18,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <math.h>
 
-#include <constrain.h>
-#include <motors.h>
+#include <core/constrain.h>
+#include <esc.h>
 #include <pwm.h>
 #include <time.h>
 

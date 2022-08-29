@@ -21,9 +21,9 @@
 #include <string.h>
 
 #include "arming.h"
-#include "clock.h"
+#include "core/clock.h"
+#include "core/state.h"
 #include "imu.h"
-#include "state.h"
 #include "maths.h"
 
 class SoftQuatImu : public Imu {

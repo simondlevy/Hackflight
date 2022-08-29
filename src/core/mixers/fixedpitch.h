@@ -21,9 +21,9 @@
 
 #include <stdbool.h>
 
-#include "motors.h"
+#include "core/mixer.h"
+#include "core/motors.h"
 #include "imu.h"
-#include "mixer.h"
 
 class FixedPitchMixer {
 

@@ -21,11 +21,11 @@
 #include <math.h>
 
 #include "arming.h"
-#include "clock.h"
-#include "demands.h"
-#include "filters/pt3.h"
-#include "constrain.h"
-#include "pids/angle.h"
+#include "core/clock.h"
+#include "core/constrain.h"
+#include "core/demands.h"
+#include "core/filters/pt3.h"
+#include "core/pids/angle.h"
 #include "pwm.h"
 #include "serial.h"
 #include "sticks.h"

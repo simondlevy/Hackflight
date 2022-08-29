@@ -18,39 +18,18 @@
 
 #pragma once
 
-#include <math.h>
+#include <stdint.h>
+#include <stdbool.h>
 
-#include "clock.h"
+#include "core/motors.h"
 
-// PT1 Low Pass filter
-class Pt1Filter {
-
-    private:
-
-        float m_state;
-        float m_dt;
-        float m_k;
+class QuadMotors {
 
     public:
 
-        Pt1Filter(float f_cut, float dt=Clock::DT())
+        static Motors make(float vals[])
         {
-            m_state = 0.0;
-            m_dt = dt;
-
-            computeGain(f_cut);
+            return Motors(vals, 4);
         }
 
-        float apply(float input)
-        {
-            m_state = m_state + m_k * (input - m_state);
-            return m_state;
-        }
-
-        void computeGain(float f_cut)
-        {
-            float rc = 1 / (2 * M_PI * f_cut);
-            m_k = m_dt / (rc + m_dt);
-        }
-
-}; // class Pt1Filter
+}; // class QuadMotors

@@ -21,11 +21,11 @@
 #include <string.h>
 #include <math.h>
 
-#include "clock.h"
-#include "../filters/pt1.h"
-#include "../filters/pt2.h"
-#include "constrain.h"
-#include "pid.h"
+#include "core/clock.h"
+#include "core/constrain.h"
+#include "core/filters/pt1.h"
+#include "core/filters/pt2.h"
+#include "core/pid.h"
 #include "time.h"
 
 class AnglePidController : public PidController {
