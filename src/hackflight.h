@@ -38,8 +38,6 @@
 #include "tasks/msp.h"
 #include "tasks/receiver.h"
 
-#include "motors/quad.h"
-
 class Hackflight {
 
     private:
