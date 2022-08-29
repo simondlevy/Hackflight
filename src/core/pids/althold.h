@@ -105,4 +105,55 @@ class AltHoldPidController : public PidController {
             demands->throttle += (error * m_kp + m_errorI * m_ki);
         }
 
+        virtual auto update(
+                const uint32_t currentTimeUs,
+                const Demands & demands,
+                const State & vstate,
+                const bool reset) -> Demands override
+        {
+            (void)currentTimeUs;
+
+            // NED => ENU
+            auto altitude = -vstate.z;
+            auto dz = -vstate.dz;
+
+            // [0,1] => [-1,+1]
+            auto sthrottle = 2 * demands.throttle - 1; 
+
+            // Is stick demand in deadband, above a minimum altitude?
+            auto inBand =
+                fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+
+            // Reset controller when moving into deadband above a minimum altitude
+            auto gotNewTarget = inBand && !m_inBandPrev;
+            m_errorI = gotNewTarget || reset ? 0 : m_errorI;
+
+            m_inBandPrev = inBand;
+
+            if (reset) {
+                m_altitudeTarget = 0;
+            }
+
+            m_altitudeTarget = gotNewTarget ? altitude : m_altitudeTarget;
+
+            // Target velocity is a setpoint inside deadband, scaled
+            // constant outside
+            auto targetVelocity = inBand ?
+                m_altitudeTarget - altitude :
+                PILOT_VELZ_MAX * sthrottle;
+
+            // Compute error as scaled target minus actual
+            auto error = targetVelocity - dz;
+
+            // Compute I term, avoiding windup
+            m_errorI = constrainAbs(m_errorI + error, WINDUP_MAX);
+
+            // Adjust throttle demand based on error
+            return Demands(
+                    demands.throttle + (error * m_kp + m_errorI * m_ki),
+                    demands.roll,
+                    demands.pitch,
+                    demands.yaw);
+        }
+
 }; // class AltHoldPidController
