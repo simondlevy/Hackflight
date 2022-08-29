@@ -268,7 +268,7 @@ class Receiver {
             float sample = convert(m_channelData, channel);
 
             raw[channel] = channel < 4 && sample != 0 ?
-                constrain_f(sample, PWM_PULSE_MIN, PWM_PULSE_MAX) :
+                constrain(sample, PWM_PULSE_MIN, PWM_PULSE_MAX) :
                 sample;
         }
     }
@@ -744,7 +744,7 @@ class Receiver {
 
         auto angleRate = AnglePidController::applyRates(commandf, commandfAbs);
 
-        return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
+        return constrain(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
     }
 
 
@@ -892,7 +892,7 @@ class Receiver {
         // Find min and max throttle based on conditions. Throttle has to
         // be known before mixing
         demands->throttle =
-            constrain_f((m_commands.throttle - PWM_MIN) /
+            constrain((m_commands.throttle - PWM_MIN) /
                     (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
 
         demands->roll  = setpointRate[0];

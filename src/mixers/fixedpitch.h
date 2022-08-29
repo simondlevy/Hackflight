@@ -64,7 +64,7 @@ class FixedPitchMixer {
                 }
             } else {
                 if (demands.throttle > 0.5f) {
-                    throttle = constrain_f(throttle, -mixMin, 1.0f - mixMax);
+                    throttle = constrain(throttle, -mixMin, 1.0f - mixMax);
                 }
             }
 

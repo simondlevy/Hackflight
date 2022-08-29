@@ -124,13 +124,13 @@ class Hackflight {
                             motorDevValueDisarmed() :
                             motorOutput; 
                     }
-                    motorOutput = constrain_f(
+                    motorOutput = constrain(
                             motorOutput,
                             motorDevValueDisarmed(),
                             motorDevValueHigh());
                 } else {
                     motorOutput =
-                        constrain_f(
+                        constrain(
                                 motorOutput,
                                 motorDevValueLow(),
                                 motorDevValueHigh());
@@ -241,7 +241,7 @@ class Hackflight {
 
         static float constrain_demand(const float demand, const float limit)
         {
-            return constrain_f(demand, -limit, +limit) / PID_MIXER_SCALING;
+            return constrain(demand, -limit, +limit) / PID_MIXER_SCALING;
         }
 
         static void constrain_demands(Demands * demands)

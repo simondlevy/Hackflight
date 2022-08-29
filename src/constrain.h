@@ -20,27 +20,22 @@
 
 #include <stdint.h>
 
-static inline int constrain_f_i32(float amt, int32_t low, int32_t high)
+static inline float constrain(float amt, float low, float high)
 {
-    if (amt < low)
-        return low;
-    else if (amt > high)
-        return high;
-    else
-        return amt;
+    return amt < low ? low : amt > high ? high : amt;
 }
 
-static inline int constrain_u16_u16(uint16_t amt, uint16_t low, uint16_t high)
+static inline uint16_t constrain_u16(uint16_t amt, uint16_t low, uint16_t high)
 {
-    if (amt < low)
-        return low;
-    else if (amt > high)
-        return high;
-    else
-        return amt;
+    return amt < low ? low : amt > high ? high : amt;
 }
 
-static inline int constrain_i32_u32(int32_t amt, uint32_t low, uint32_t high)
+static inline int32_t constrain_f_i32(float amt, int32_t low, int32_t high)
+{
+    return amt < low ? low : amt > high ? high : amt;
+}
+
+static inline int32_t constrain_i32_u32(int32_t amt, uint32_t low, uint32_t high)
 {
     if (amt < (int32_t)low)
         return low;
@@ -50,12 +45,3 @@ static inline int constrain_i32_u32(int32_t amt, uint32_t low, uint32_t high)
         return amt;
 }
 
-static inline float constrain_f(float amt, float low, float high)
-{
-    if (amt < low)
-        return low;
-    else if (amt > high)
-        return high;
-    else
-        return amt;
-}

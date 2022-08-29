@@ -169,7 +169,7 @@ class AnglePidController : public PidController {
 
             if (value * currentPidSetpoint > 0.0f) {
                 if (fabsf(currentPidSetpoint) <= maxRateLimit) {
-                    value = constrain_f(value, (-maxRateLimit -
+                    value = constrain(value, (-maxRateLimit -
                                 currentPidSetpoint) * m_k_rate_p,
                             (maxRateLimit - currentPidSetpoint) *
                             m_k_rate_p);
@@ -277,7 +277,7 @@ class AnglePidController : public PidController {
             // calculate error angle and limit the angle to the max inclination
             // rcDeflection in [-1.0, 1.0]
             float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
-            angle = constrain_f(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
+            angle = constrain(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
             float errorAngle = angle - (currentAngle / 10);
             return m_k_level_p > 0 ?
                 errorAngle * m_k_level_p :
@@ -328,7 +328,7 @@ class AnglePidController : public PidController {
             const auto itermWindupPointInv =
                 1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
             if (itermWindupPointInv > 1.0f) {
-                dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
+                dynCi *= constrain(itermWindupPointInv, 0.0f, 1.0f);
             }
 
             float gyroRates[3] = {vstate.dphi, vstate.dtheta, vstate.dpsi};
@@ -402,7 +402,7 @@ class AnglePidController : public PidController {
                     (axis == 2) ? dynCi : Clock::DT(); 
 
                 m_data[axis].I =
-                    constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
+                    constrain(previousIterm + (Ki * axisDynCi) * itermErrorRate,
                             -ITERM_LIMIT, ITERM_LIMIT);
 
                 // -----calculate pidSetpointDelta

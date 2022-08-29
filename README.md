@@ -45,8 +45,8 @@ example, the maintenance of an error integral in a PID controller:
 <img src="media/dataflow2.png" width=700>
 </p>
 
-By using header-only C++ classes whenever possible, and
- [avoiding complicated inheritance](https://queue.acm.org/detail.cfm?id=2038036), 
+By using header-only C++ classes whenever possible, and avoiding C-style macros and
+ [complicated inheritance](https://queue.acm.org/detail.cfm?id=2038036), 
 Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-beckman-dont-fear-the-monad) 
 approach to taming the complexity of flight control.  Check out this
 [example program](https://github.com/simondlevy/Hackflight/blob/master/examples/betfpv-f405-sbus/main.cpp#L37-L69)

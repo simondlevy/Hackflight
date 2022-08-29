@@ -50,7 +50,7 @@ static uint16_t spiDivisorToBRbits(SPI_TypeDef *instance, uint16_t divisor)
         divisor /= 2; // Safe for divisor == 0 or 1
     }
 
-    divisor = constrain_u16_u16(divisor, 2, 256);
+    divisor = constrain_u16(divisor, 2, 256);
 
     return (ffs(divisor) - 2) << 3; // SPI_CR1_BR_Pos
 }
