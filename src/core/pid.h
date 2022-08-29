@@ -32,4 +32,10 @@ class PidController {
                 Demands * demands,
                 const State & vstate,
                 const bool reset) = 0;
+
+         virtual auto update(
+                const uint32_t currentTimeUs,
+                const Demands & demands,
+                const State & vstate,
+                const bool reset) -> Demands = 0;
 };
