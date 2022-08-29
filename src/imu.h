@@ -19,6 +19,7 @@
 #pragma once
 
 #include "arming.h"
+#include "core/axes.h"
 #include "core/clock.h"
 #include "core/constrain.h"
 #include "core/filters/pt1.h"
@@ -34,15 +35,6 @@ class Imu {
     friend class Task;
     friend class AttitudeTask;
     friend class ReceiverTask;
-
-    public:
-
-        // Common structure for angles, stick axes, etc.
-        typedef struct {
-            float x;
-            float y;
-            float z;
-        } axes_t;
 
     private:
 

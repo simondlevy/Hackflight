@@ -21,6 +21,7 @@
 #include <string.h>
 
 #include "arming.h"
+#include "core/axes.h"
 #include "core/clock.h"
 #include "core/state.h"
 #include "imu.h"
@@ -109,11 +110,11 @@ class SoftQuatImu : public Imu {
         }
 
         typedef struct {
-            Imu::axes_t values;
+            axes_t values;
             uint32_t count;
         } imu_sensor_t;
 
-        static void getAverage(imu_sensor_t * sensor, uint32_t period, Imu::axes_t * avg)
+        static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
         {
             uint32_t denom = sensor->count * period;
 
@@ -124,7 +125,7 @@ class SoftQuatImu : public Imu {
 
         static void mahony(
                 float dt,
-                Imu::axes_t * gyro,
+                axes_t * gyro,
                 Imu::quaternion_t * quat_old,
                 Imu::quaternion_t * quat_new)
         {
@@ -164,7 +165,7 @@ class SoftQuatImu : public Imu {
         {
             int32_t deltaT = time - fusionPrev->time;
 
-            Imu::axes_t gyroAvg = {};
+            axes_t gyroAvg = {};
             getAverage(&m_accum, Clock::PERIOD(), &gyroAvg);
 
             float dt = deltaT * 1e-6;
@@ -191,7 +192,7 @@ class SoftQuatImu : public Imu {
 
         virtual void accumulateGyro(float gx, float gy, float gz) override
         {
-            static Imu::axes_t _adcf;
+            static axes_t _adcf;
 
             // integrate using trapezium rule to avoid bias
             m_accum.values.x += 0.5f * (_adcf.x + gx) * Clock::PERIOD();

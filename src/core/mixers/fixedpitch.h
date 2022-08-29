@@ -21,9 +21,10 @@
 
 #include <stdbool.h>
 
+#include "core/axes.h"
+#include "core/constrain.h"
 #include "core/mixer.h"
 #include "core/motors.h"
-#include "imu.h"
 
 class FixedPitchMixer {
 
@@ -32,7 +33,7 @@ class FixedPitchMixer {
         static void fun(
                 const Demands & demands,
                 uint8_t motorCount,
-                const Imu::axes_t * spins,
+                const axes_t * spins,
                 float * motorvals)
         {
             float mix[MAX_SUPPORTED_MOTORS];

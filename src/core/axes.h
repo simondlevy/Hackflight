@@ -18,13 +18,9 @@
 
 #pragma once
 
-#include "core/axes.h"
-
-static void imuRotate270(axes_t * axes)
-{
-    float x = axes->x;
-    float y = axes->y;
-
-    axes->x = -y;
-    axes->y = x;
-}
+// Common structure for angles, stick axes, etc.
+typedef struct {
+    float x;
+    float y;
+    float z;
+} axes_t;
