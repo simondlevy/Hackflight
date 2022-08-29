@@ -54,7 +54,7 @@ class Led {
                     break;
             }
 
-            uint32_t now = timeMicros();
+            auto now = timeMicros();
             m_warningLedTimer = now + 500000;
         }
 
@@ -66,7 +66,7 @@ class Led {
         void flash(uint8_t reps, uint16_t delayMs)
         {
             devSet(false);
-            for (uint8_t i=0; i<reps; i++) {
+            for (auto i=0; i<reps; i++) {
                 devToggle();
                 delayMillis(delayMs);
             }

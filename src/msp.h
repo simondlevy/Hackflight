@@ -196,7 +196,7 @@ class Msp {
                 State * vstate,
                 Receiver::sticks_t * rxax)
         {
-            bool unsupportedCommand = false;
+            auto unsupportedCommand = false;
 
             switch (cmdMSP) {
 
@@ -263,7 +263,7 @@ class Msp {
             mspResult_e ret = RESULT_ACK;
             sbuf_t *dst = &reply->buf;
             sbuf_t *src = &cmd->buf;
-            const int16_t cmdMSP = cmd->cmd;
+            const auto cmdMSP = cmd->cmd;
             // initialize reply by default
             reply->cmd = cmd->cmd;
 
@@ -440,7 +440,7 @@ class Msp {
                 .result = 0,
                 .direction = DIRECTION_REPLY,
             };
-            uint8_t *outBufHead = reply.buf.ptr;
+            auto *outBufHead = reply.buf.ptr;
 
             mspPacket_t command = {
                 .buf = { .ptr = msp->inBuf, .end = msp->inBuf + msp->dataSize, },
@@ -450,7 +450,7 @@ class Msp {
             };
 
             mspPostProcessFnPtr mspPostProcessFn = NULL;
-            const mspResult_e status = mspProcessCommandFn(
+            const auto status = mspProcessCommandFn(
                     &command,
                     &reply,
                     &mspPostProcessFn,
@@ -550,7 +550,7 @@ class Msp {
                 m_debugging = false;
             }
 
-            else for (uint8_t portId=0; portId<MAX_PORT_COUNT; portId++) {
+            else for (auto portId=0; portId<MAX_PORT_COUNT; portId++) {
 
                 mspPort_t * const mspPort = &m_ports[portId];
 
@@ -566,8 +566,9 @@ class Msp {
                     mspPort->pendingRequest = PENDING_NONE;
 
                     while (serialBytesAvailable(mspPort->port)) {
-                        const uint8_t c = serialRead(mspPort->port);
-                        const bool consumed = serialProcessReceivedData(mspPort, c);
+
+                        const auto c = serialRead(mspPort->port);
+                        const auto consumed = serialProcessReceivedData(mspPort, c);
 
                         if (!consumed && !armed) {
                             evaualteNonMspData(mspPort, c);

@@ -205,14 +205,14 @@ class Receiver {
     {
         failsafeChannelConfig_t failsafeChannelConfigs[CHANNEL_COUNT];
 
-        for (uint8_t i = 0; i < CHANNEL_COUNT; i++) {
+        for (auto i = 0; i < CHANNEL_COUNT; i++) {
             failsafeChannelConfigs[i].step = 30;
         }
         failsafeChannelConfigs[3].step = 5;
-        for (uint8_t i = 0; i < 4; i++) {
+        for (auto i = 0; i < 4; i++) {
             failsafeChannelConfigs[i].mode = 0;
         }
-        for (uint8_t i = 4; i < CHANNEL_COUNT; i++) {
+        for (auto i = 4; i < CHANNEL_COUNT; i++) {
             failsafeChannelConfigs[i].mode = 1;
         }
 
@@ -242,9 +242,9 @@ class Receiver {
             uint8_t autoSmoothnessFactor)
     {
         if (avgRxFrameTimeUs > 0) {
-            const float cutoffFactor =
+            const auto cutoffFactor =
                 1.5f / (1.0f + (autoSmoothnessFactor / 10.0f));
-            float cutoff =
+            auto cutoff =
                 (1 / (avgRxFrameTimeUs * 1e-6f));  // link frequency
             cutoff = cutoff * cutoffFactor;
             return lrintf(cutoff);
@@ -263,7 +263,7 @@ class Receiver {
 
     void readChannelsApplyRanges(float raw[])
     {
-        for (uint8_t channel=0; channel<CHANNEL_COUNT; ++channel) {
+        for (auto channel=0; channel<CHANNEL_COUNT; ++channel) {
 
             float sample = convert(m_channelData, channel);
 
@@ -279,17 +279,17 @@ class Receiver {
             uint32_t currentTimeUs,
             float raw[])
     {
-        uint32_t currentTimeMs = currentTimeUs/ 1000;
+        auto currentTimeMs = currentTimeUs/ 1000;
 
-        bool useValueFromRx = m_signalReceived && !m_inFailsafeMode;
+        auto useValueFromRx = m_signalReceived && !m_inFailsafeMode;
 
-        bool flightChannelsValid = true;
+        auto flightChannelsValid = true;
 
-        for (uint8_t channel = 0; channel < CHANNEL_COUNT; channel++) {
+        for (auto channel = 0; channel < CHANNEL_COUNT; channel++) {
 
-            float sample = raw[channel];
+            auto sample = raw[channel];
 
-            bool validPulse = useValueFromRx && isPulseValid(sample);
+            auto validPulse = useValueFromRx && isPulseValid(sample);
 
             if (validPulse) {
                 m_invalidPulsePeriod[channel] =
@@ -318,7 +318,7 @@ class Receiver {
         } else {
             m_inFailsafeMode = true;
             failsafe->onValidDataFailed(arming);
-            for (uint8_t channel = 0; channel < CHANNEL_COUNT; channel++) {
+            for (auto channel = 0; channel < CHANNEL_COUNT; channel++) {
                 raw[channel] = getFailValue(raw, channel);
             }
         }
@@ -327,7 +327,7 @@ class Receiver {
     int16_t lookupThrottle(int32_t tmp)
     {
         if (!m_initializedThrottleTable) {
-            for (uint8_t i = 0; i < THROTTLE_LOOKUP_TABLE_SIZE; i++) {
+            for (auto i = 0; i < THROTTLE_LOOKUP_TABLE_SIZE; i++) {
                 const int16_t tmp2 = 10 * i - THR_MID8;
                 uint8_t y = tmp2 > 0 ?
                     100 - THR_MID8 :
@@ -344,7 +344,8 @@ class Receiver {
 
         m_initializedThrottleTable = true;
 
-        const int32_t tmp3 = tmp / 100;
+        const auto tmp3 = tmp / 100;
+
         // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
         return m_lookupThrottleRc[tmp3] + (tmp - tmp3 * 100) *
             (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100;
@@ -367,8 +368,8 @@ class Receiver {
             m_command[axis] = updateCommand(raw[axis], axis == YAW ? -1 : +1);
         }
 
-        int32_t tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
-        int32_t tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
+        auto tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
+        auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
         m_commands.throttle = lookupThrottle(tmp2);
     }
@@ -401,12 +402,12 @@ class Receiver {
             uint32_t currentTimeUs,
             int32_t *frameAgeUs)
     {
-        uint32_t frameTimeUs = m_lastFrameTimeUs;
+        auto frameTimeUs = m_lastFrameTimeUs;
 
         *frameAgeUs = cmpTimeUs(currentTimeUs, frameTimeUs);
 
-        const int32_t deltaUs =
-            cmpTimeUs(frameTimeUs, m_previousFrameTimeUs);
+        const auto deltaUs = cmpTimeUs(frameTimeUs, m_previousFrameTimeUs);
+
         if (deltaUs) {
             m_frameTimeDeltaUs = deltaUs;
             m_previousFrameTimeUs = frameTimeUs;
@@ -424,7 +425,7 @@ class Receiver {
     {
         int32_t frameAgeUs;
 
-        int32_t refreshPeriodUs =
+        auto refreshPeriodUs =
             getFrameDelta(currentTimeUs, &frameAgeUs);
 
         if (!refreshPeriodUs ||
@@ -619,12 +620,11 @@ class Receiver {
             if (m_ffCutoffSetting == 0) {
                 // calculate and use an initial derivative cutoff until the RC
                 // interval is known
-                const float cutoffFactor = 1.5f /
+                const auto cutoffFactor = 1.5f /
                     (1.0f +
                      (m_autoSmoothnessFactorSetpoint /
                       10.0f));
-                float ffCutoff = 
-                    SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
+                auto ffCutoff = SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
                 m_feedforwardCutoffFrequency = 
                     lrintf(ffCutoff);
             } else {
@@ -648,7 +648,7 @@ class Receiver {
             // for auto calculated filters we need to examine each rx frame
             // interval
             if (m_calculatedCutoffs) {
-                const uint32_t currentTimeMs = currentTimeUs / 1000;
+                const auto currentTimeMs = currentTimeUs / 1000;
 
                 // If the filter cutoffs in auto mode, and we have good rx
                 // data, then determine the average rx frame rate and use
@@ -672,14 +672,14 @@ class Receiver {
                         // if the guard time has expired then process the
                         // rx frame time
                         if (currentTimeMs > m_validFrameTimeMs) {
-                            bool accumulateSample = true;
+                            auto accumulateSample = true;
 
                             // During initial training process all samples.
                             // During retraining check samples to determine
                             // if they vary by more than the limit
                             // percentage.
                             if (m_filterInitialized) {
-                                const float percentChange =
+                                const auto percentChange =
                                     fabs((m_refreshPeriod -
                                                 m_averageFrameTimeUs) /
                                             (float)m_averageFrameTimeUs) *
@@ -738,11 +738,11 @@ class Receiver {
 
     static float getRawSetpoint(float command, float divider)
     {
-        float commandf = command / divider;
+        auto commandf = command / divider;
 
-        float commandfAbs = fabsf(commandf);
+        auto commandfAbs = fabsf(commandf);
 
-        float angleRate = AnglePidController::applyRates(commandf, commandfAbs);
+        auto angleRate = AnglePidController::applyRates(commandf, commandfAbs);
 
         return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
     }
@@ -761,19 +761,19 @@ class Receiver {
     // Called from tasks/receiver.h::adjustRxDynamicPriority()
     bool check(uint32_t currentTimeUs)
     {
-        bool signalReceived = false;
-        bool useDataDrivenProcessing = true;
+        auto signalReceived = false;
+        auto useDataDrivenProcessing = true;
 
         if (m_state != STATE_CHECK) {
             return true;
         }
 
-        const uint8_t frameStatus =
+        const auto frameStatus =
             devCheck(m_channelData, &m_lastFrameTimeUs);
 
         if (frameStatus & FRAME_COMPLETE) {
             m_inFailsafeMode = (frameStatus & FRAME_FAILSAFE) != 0;
-            bool frameDropped = (frameStatus & FRAME_DROPPED) != 0;
+            auto frameDropped = (frameStatus & FRAME_DROPPED) != 0;
             signalReceived = !(m_inFailsafeMode || frameDropped);
             if (signalReceived) {
                 m_needSignalBefore =

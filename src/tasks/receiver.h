@@ -52,16 +52,16 @@ class ReceiverTask : public Task {
         
         void fun(Task::data_t * data, uint32_t usec)
         {
-            bool calibrating = data->imu->gyroIsCalibrating(); 
+            auto calibrating = data->imu->gyroIsCalibrating(); 
             // || acc.calibrating != 0;
-            bool pidItermResetReady = false;
-            bool pidItermResetValue = false;
+            auto pidItermResetReady = false;
+            auto pidItermResetValue = false;
 
             Receiver::sticks_t rxsticks = {{0, 0, 0, 0}, 0, 0};
 
-            bool gotNewData = false;
+            auto gotNewData = false;
 
-            bool imuIsLevel =
+            auto imuIsLevel =
                 fabsf(data->vstate.phi) < data->maxArmingAngle &&
                 fabsf(data->vstate.theta) < data->maxArmingAngle;
 

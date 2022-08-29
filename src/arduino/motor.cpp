@@ -38,7 +38,7 @@ float motorDevConvertFromExternal(void * motorDevice, uint16_t externalValue)
 
 void  motorDevInitBrushed(uint8_t * pins)
 {
-    for (uint8_t k=0; k<4; ++k) {
+    for (auto k=0; k<4; ++k) {
         analogWriteFrequency(pins[k], 10000);
         analogWrite(pins[k], 0);
     }
@@ -73,7 +73,7 @@ void motorDevWrite(void * motorDevice, float *values)
 {
     uint8_t * pins = (uint8_t *)motorDevice;
 
-    for (uint8_t k=0; k<4; ++k) {
+    for (auto k=0; k<4; ++k) {
         analogWrite(pins[k], (uint8_t)(values[k] * 255));
     }
 

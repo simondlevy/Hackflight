@@ -95,7 +95,7 @@ class Imu {
 
         void calibrate(void)
         {
-            for (int axis = 0; axis < 3; axis++) {
+            for (auto axis = 0; axis < 3; axis++) {
                 // Reset g[axis] at start of calibration
                 if (m_calibration.cyclesRemaining ==
                         (int32_t)calculateCalibratingCycles()) {
@@ -189,7 +189,7 @@ class Imu {
         {
             if (!devGyroIsReady()) return;
 
-            bool calibrationComplete = m_calibration.cyclesRemaining <= 0;
+            auto calibrationComplete = m_calibration.cyclesRemaining <= 0;
 
             static axes_t _adc;
 
@@ -219,7 +219,7 @@ class Imu {
             m_sampleSum[1] = m_lowpassFilter2[1].apply(m_dps[1]);
             m_sampleSum[2] = m_lowpassFilter2[2].apply(m_dps[2]);
 
-            for (int axis = 0; axis < 3; axis++) {
+            for (auto axis = 0; axis < 3; axis++) {
 
                 // apply static notch filters and software lowpass filters
                 m_dps_filtered[axis] =
@@ -248,7 +248,7 @@ class Imu {
                 uint32_t nextTargetCycles,
                 int32_t desiredPeriodCycles)
         {
-            int32_t skew =
+            auto skew =
                 cmpTimeCycles(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;
 
             if (skew > (desiredPeriodCycles / 2)) {

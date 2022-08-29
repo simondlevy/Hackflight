@@ -172,7 +172,7 @@ class Scheduler {
 
         bool isDynamicReady(uint32_t nowCycles) 
         {
-            int32_t newLoopRemainingCyles =
+            auto newLoopRemainingCyles =
                 cmpTimeCycles(m_nextTargetCycles, nowCycles);
 
             return newLoopRemainingCyles > m_guardMargin;
@@ -180,7 +180,7 @@ class Scheduler {
 
         void updateDynamic(uint32_t nowCycles, uint32_t anticipatedEndCycles)
         {
-            int32_t cyclesOverdue = cmpTimeCycles(nowCycles, anticipatedEndCycles);
+            auto cyclesOverdue = cmpTimeCycles(nowCycles, anticipatedEndCycles);
 
             if ((cyclesOverdue > 0) || (-cyclesOverdue < m_taskGuardMinCycles)) {
 

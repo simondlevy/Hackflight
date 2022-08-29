@@ -110,7 +110,7 @@ class Hackflight {
                     usec,
                     *m_mixer);
 
-            for (uint8_t i=0; i<m_mixer->getMotorCount(); i++) {
+            for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
                 auto motorOutput = motors.values[i];
 
@@ -269,7 +269,7 @@ class Hackflight {
             Demands demands(stickDemands);
 
             // Run PID controllers to get new demands
-            for (uint8_t k=0; k<pidCount; ++k) {
+            for (auto k=0; k<pidCount; ++k) {
                 pidControllers[k]->update(usec, &demands, state, pidReset);
             }
 

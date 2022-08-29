@@ -57,7 +57,7 @@ class Motors {
 
         Motors(float vals[], uint8_t count) {
 
-            for (uint8_t k=0; k<count; ++k) {
+            for (auto k=0; k<count; ++k) {
                 values[k] = vals[k];
             }
 

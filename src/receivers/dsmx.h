@@ -86,7 +86,7 @@ class DsmxReceiver : public Receiver {
         virtual float convert(uint16_t * channelData, uint8_t chan) override
         {
             // Ignore channel 6 for now (problems with transmitter)
-            uint16_t chanval = chan == 5 ? 1 : channelData[chan];
+            auto chanval = chan == 5 ? 1 : channelData[chan];
 
             return 1000 * (1 + (chanval - 1) / (float)(CHAN_RESOLUTION-1));
         }
@@ -94,7 +94,7 @@ class DsmxReceiver : public Receiver {
         virtual uint8_t devCheck(uint16_t * channelData, uint32_t * frameTimeUs)
             override
         {
-            uint8_t result = Receiver::FRAME_PENDING;
+            auto result = Receiver::FRAME_PENDING;
 
             if (m_frameData.done) {
 
@@ -102,11 +102,11 @@ class DsmxReceiver : public Receiver {
 
                 *frameTimeUs = m_frameData.lastTimeUs;
 
-                uint8_t * bytes = m_frameData.bytes;
+                auto * bytes = m_frameData.bytes;
 
-                for (int b=3; b<FRAME_SIZE; b+=2) {
+                for (auto b=3; b<FRAME_SIZE; b+=2) {
 
-                    const uint8_t channel = 0x0F & (bytes[b - 1] >> CHAN_SHIFT);
+                    const auto channel = 0x0F & (bytes[b - 1] >> CHAN_SHIFT);
 
                     if (channel < MAX_CHANNELS) {
 
