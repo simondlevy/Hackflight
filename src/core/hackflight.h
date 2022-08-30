@@ -25,6 +25,8 @@
 #include "pid.h"
 #include "state.h"
 
+#include <vector>
+
 class HackflightCore {
 
     private:
@@ -35,17 +37,21 @@ class HackflightCore {
 
         static float constrain_demand(const float demand, const float limit)
         {
-            return constrain(demand, -limit, +limit) / PID_MIXER_SCALING;
+            return constrain_f(demand, -limit, +limit) / PID_MIXER_SCALING;
         }
 
-        static void constrain_demands(Demands * demands)
+        static auto constrain_demands(const Demands & demands) -> Demands
         {
-            demands->roll  = constrain_demand(demands->roll, PIDSUM_LIMIT);
+            return Demands (
+                    demands.throttle,
 
-            demands->pitch = constrain_demand(demands->pitch, PIDSUM_LIMIT);
+                    constrain_demand(demands.roll, PIDSUM_LIMIT),
 
-            // Negate yaw to make it agree with PID
-            demands->yaw   = -constrain_demand(demands->yaw, PIDSUM_LIMIT_YAW);
+                    constrain_demand(demands.pitch, PIDSUM_LIMIT),
+
+                    // Negate yaw to make it agree with PID
+                    -constrain_demand(demands.yaw, PIDSUM_LIMIT_YAW)
+                    );
         }
 
     public:
@@ -53,8 +59,7 @@ class HackflightCore {
         static auto step(
                 const Demands & stickDemands,
                 const State & state,
-                PidController * pidControllers[],
-                const uint8_t pidCount,
+                std::vector<PidController *> * pidControllers,
                 const bool pidReset,
                 const uint32_t usec,
                 Mixer mixer) -> Motors
@@ -62,16 +67,12 @@ class HackflightCore {
             // Star with stick demands
             Demands demands(stickDemands);
 
-            // Run PID controllers to get new demands
-            for (auto k=0; k<pidCount; ++k) {
-                pidControllers[k]->update(usec, &demands, state, pidReset);
+            for (auto p: *pidControllers) {
+                p->update(usec, &demands, state, pidReset);
             }
 
-            // Constrain demands
-            constrain_demands(&demands);
-
             // Run the mixer to get motors from demands
-            return mixer.run(demands);
+            return mixer.run(constrain_demands(demands));
         }
 
 };  // class HackflightCore

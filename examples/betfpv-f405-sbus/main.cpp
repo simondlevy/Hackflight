@@ -29,6 +29,9 @@
 
 #include "hardware_init.h"
 
+#include <vector>
+using namespace std;
+
 int main(void)
 {
     auto motorDevice = hardwareInit(Clock::PERIOD());
@@ -43,6 +46,8 @@ int main(void)
     // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
     static Mpu6000 imu(2000); // gyro scale DPS
 
+    vector<PidController *> pidControllers = {&anglePid};
+
     static SbusReceiver receiver(SERIAL_PORT_USART3);
 
     static Mixer mixer = QuadXbfMixer::make();
@@ -53,7 +58,7 @@ int main(void)
             &receiver,
             &imu,
             imuRotate270,
-            &anglePid,
+            &pidControllers,
             &mixer,
             motorDevice,
             &led);

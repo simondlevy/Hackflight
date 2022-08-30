@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "arming.h"
-#include "core/step.h"
+#include "core/hackflight.h"
 #include "failsafe.h"
 #include "imu.h"
 #include "led.h"
@@ -36,6 +36,9 @@
 #include "tasks/attitude.h"
 #include "tasks/msp.h"
 #include "tasks/receiver.h"
+
+#include <vector>
+using namespace std;
 
 class Hackflight {
 
@@ -53,10 +56,7 @@ class Hackflight {
         Led   * m_led;
         Mixer * m_mixer;
         
-        // First PID controller is automatically AnglePidController;
-        // others can be added via addPidController()
-        PidController * m_pidControllers[PidController::MAX_PID_CONTROLLERS];
-        uint8_t         m_pidControllerCount;
+        vector<PidController *> * m_pidControllers;
 
         // Initialzed here
         AttitudeTask         m_attitudeTask;
@@ -98,7 +98,6 @@ class Hackflight {
                     demands,
                     m_taskData.vstate,
                     m_pidControllers,
-                    m_pidControllerCount,
                     m_taskData.pidReset,
                     usec,
                     *m_mixer);
@@ -117,13 +116,13 @@ class Hackflight {
                             motorDevValueDisarmed() :
                             motorOutput; 
                     }
-                    motorOutput = constrain(
+                    motorOutput = constrain_f(
                             motorOutput,
                             motorDevValueDisarmed(),
                             motorDevValueHigh());
                 } else {
                     motorOutput =
-                        constrain(
+                        constrain_f(
                                 motorOutput,
                                 motorDevValueLow(),
                                 motorDevValueHigh());
@@ -238,7 +237,7 @@ class Hackflight {
                 Receiver * receiver,
                 Imu * imu,
                 Imu::align_fun imuAlignFun,
-                AnglePidController * anglePid,
+                vector<PidController *> * pidControllers,
                 Mixer * mixer,
                 void * motorDevice,
                 Led * led)
@@ -247,8 +246,7 @@ class Hackflight {
             m_imuAlignFun = imuAlignFun;
             m_led = led;
 
-            m_pidControllers[0] = anglePid;
-            m_pidControllerCount = 1;
+            m_pidControllers = pidControllers;
 
             m_taskData.receiver = receiver;
             m_taskData.imu = imu;

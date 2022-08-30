@@ -19,7 +19,7 @@
 #include <Arduino.h>
 
 #include <arming.h>
-#include <motors.h>
+#include <esc.h>
 #include <pwm.h>
 
 bool motorDevIsReady(uint32_t currentTime)

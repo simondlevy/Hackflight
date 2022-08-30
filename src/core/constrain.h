@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-static inline float constrain(float amt, float low, float high)
+static inline float constrain_f(float amt, float low, float high)
 {
     return amt < low ? low : amt > high ? high : amt;
 }

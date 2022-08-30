@@ -20,13 +20,16 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#include <hackflight.h>
 #include <alignment/rotate0.h>
-#include <leds/arduino.h>
-#include <mixers/fixedpitch/quadxbf.h>
-#include <motors.h>
+#include <core/mixers/fixedpitch/quadxbf.h>
+#include <hackflight.h>
 #include <imus/usfs/usfs.h>
+#include <leds/arduino.h>
+#include <esc.h>
 #include <stm32clock.h>
+
+#include <vector>
+using namespace std;
 
 static UsfsImu _imu(12); // interrupt pin
 
@@ -44,6 +47,8 @@ static ArduinoLed _led(18); // pin
 
 static uint8_t _motorPins[4] = {13, 16, 3, 11};
 
+static vector<PidController *> _pidControllers = {&_anglePid};
+
 class LadybugFc : public Hackflight {
 
     public:
@@ -54,7 +59,7 @@ class LadybugFc : public Hackflight {
                     receiver,
                     &_imu,
                     imuRotate0,
-                    &_anglePid,
+                    &_pidControllers,
                     &_mixer,
                     (void *)&_motorPins,
                     &_led)
