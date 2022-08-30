@@ -24,6 +24,13 @@ class DshotEsc : public Esc {
 
     private:
 
+        static const uint16_t MIN_VALUE = 48;
+        static const uint16_t MAX_VALUE = 2047;
+        static const uint16_t STOP_VALUE = 0;
+        static const uint16_t VALUE_RANGE = MAX_VALUE - MIN_VALUE;
+
+        static const uint8_t ALL_MOTORS = 255;
+
         typedef struct {
 
             float    (*convertFromExternal)(uint16_t value);
@@ -46,12 +53,133 @@ class DshotEsc : public Esc {
         bool        m_initialized;
         escVTable_t m_vTable;
 
+        typedef enum {
+
+            // dshot commands sent inline with motor signal (motors must be enabled)
+            CMD_TYPE_INLINE,    
+
+            // dshot commands sent in blocking method (motors must be disabled)
+            CMD_TYPE_BLOCKING       
+
+        } dshotCommandType_e;
+
+        typedef enum {
+            CMD_MOTOR_STOP,
+            CMD_BEACON1,
+            CMD_BEACON2,
+            CMD_BEACON3,
+            CMD_BEACON4,
+            CMD_BEACON5,
+            CMD_ESC_INFO, // V2 includes settings
+            CMD_SPIN_DIRECTION_1,
+            CMD_SPIN_DIRECTION_2,
+            CMD_SETTINGS_REQUEST, // Currently not implemented
+            CMD_SAVE_SETTINGS,
+            CMD_SPIN_DIRECTION_NORMAL = 20,
+            CMD_SPIN_DIRECTION_REVERSED = 21,
+            CMD_LED0_ON, // BLHeli32 only
+            CMD_LED1_ON, // BLHeli32 only
+            CMD_LED2_ON, // BLHeli32 only
+            CMD_LED3_ON, // BLHeli32 only
+            CMD_LED0_OFF, // BLHeli32 only
+            CMD_LED1_OFF, // BLHeli32 only
+            CMD_LED2_OFF, // BLHeli32 only
+            CMD_LED3_OFF, // BLHeli32 only
+            CMD_AUDIO_STREAM_MODE_ON_OFF = 30, // KISS audio Stream mode on/Off
+            CMD_SILENT_MODE_ON_OFF = 31, // KISS silent Mode on/Off
+            CMD_MAX = 47
+        } commands_e;
+
+        static void commandWrite(
+                uint8_t index,
+                commands_e command,
+                commandType_e commandType)
+        {
+            (void)index;
+            (void)command;
+            (void)commandType;
+
+            /*
+               if (!commandsAreEnabled(escDevice, commandType) ||
+               (command > DSHOT_MAX_COMMAND) ||
+               dshotCommandQueueFull()) { return;
+               }
+
+               uint8_t repeats = 1;
+               uint32_t delayAfterCommandUs = DSHOT_COMMAND_DELAY_US;
+
+               switch (command) {
+               case CMD_SPIN_DIRECTION_1:
+               case CMD_SPIN_DIRECTION_2:
+               case CMD_SAVE_SETTINGS:
+               case CMD_SPIN_DIRECTION_NORMAL:
+               case CMD_SPIN_DIRECTION_REVERSED:
+               repeats = 10;
+               break;
+               case CMD_BEACON1:
+               case CMD_BEACON2:
+               case CMD_BEACON3:
+               case CMD_BEACON4:
+               case CMD_BEACON5:
+               delayAfterCommandUs = DSHOT_BEEP_DELAY_US;
+               break;
+               default:
+               break;
+               }
+
+               if (commandType == CMD_TYPE_BLOCKING) {
+               delayMicroseconds(DSHOT_INITIAL_DELAY_US - DSHOT_COMMAND_DELAY_US);
+               for (; repeats; repeats--) {
+               delayMicroseconds(DSHOT_COMMAND_DELAY_US);
+
+               uint32_t timeoutUs = micros() + 1000;
+               while (!escGetVTable(escDevice).updateStart() &&
+               cmpTimeUs(timeoutUs, micros()) > 0);
+               for (uint8_t i = 0; i < motorCount; i++) {
+               if ((i == index) || (index == ALL_MOTORS)) {
+               motorDmaOutput_t *const motor = getMotorDmaOutput(i);
+               motor->protocolControl.requestTelemetry = true;
+               escGetVTable(escDevice).writeInt(i, command);
+               }
+               }
+
+               escGetVTable(escDevice).updateComplete();
+               }
+               delayMicroseconds(delayAfterCommandUs);
+               } else if (commandType == CMD_TYPE_INLINE) {
+               dshotCommandControl_t *commandControl = addCommand();
+               if (commandControl) {
+               commandControl->repeats = repeats;
+               commandControl->delayAfterCommandUs = delayAfterCommandUs;
+               for (unsigned i = 0; i < motorCount; i++) {
+               if (index == i || index == ALL_MOTORS) {
+               commandControl->command[i] = command;
+               } else {
+               commandControl->command[i] = CMD_MOTOR_STOP;
+               }
+               }
+               if (allMotorsAreIdle(motorCount)) {
+            // we can skip the motors idle wait state
+            commandControl->state = DSHOT_COMMAND_STATE_STARTDELAY;
+            commandControl->nextCommandCycleDelay =
+            dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
+            } else {
+            commandControl->state = DSHOT_COMMAND_STATE_IDLEWAIT;
+
+            // will be set after idle wait completes
+            commandControl->nextCommandCycleDelay = 0;  
+            }
+            }
+        }*/
+
+        } // commandWrite
+
+
     public:
 
         DshotEsc(uint8_t count) override 
         {
-            // XXX
-            (void)count;
+            m_count = count;
         }
 
         virtual void begin(void) override 
@@ -61,9 +189,7 @@ class DshotEsc : public Esc {
 
         virtual float  convertFromExternal(uint16_t value) override 
         {
-            // XXX
-            (void)value;
-            return 0;
+            return m_vTable.convertFromExternal(externalValue);
         }
 
         virtual bool isProtocolDshot(void) override 
@@ -80,25 +206,25 @@ class DshotEsc : public Esc {
 
         virtual float valueDisarmed(void) override 
         {
-            // XXX
-            return 0;
+            return (float)STOP_VALUE;
         }
 
         virtual float valueHigh(void) override 
         {
-            // XXX
-            return 0;
+            return MAX_VALUE;
         }
 
         virtual float valueLow(void) override 
         {
-            // XXX
-            return 0;
+            return MIN_VALUE + 0.045 * VALUE_RANGE;
         }
 
         virtual void stop(void) override 
         {
-            // XXX
+            commandWrite(
+                    ALL_MOTORS,
+                    CMD_SPIN_DIRECTION_NORMAL,
+                    CMD_TYPE_INLINE);
         }
 
         virtual void write(float *values) override 
