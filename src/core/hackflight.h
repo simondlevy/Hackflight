@@ -68,7 +68,7 @@ class HackflightCore {
             Demands demands(stickDemands);
 
             for (auto p: *pidControllers) {
-                p->update(usec, &demands, state, pidReset);
+                demands = p->update(usec, demands, state, pidReset);
             }
 
             // Run the mixer to get motors from demands
