@@ -35,7 +35,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 static bool motorProtocolEnabled = false;
 static bool motorProtocolDshot = false;
 
-float motorGetDigitalIdOffset(void)
+float escGetDigitalIdOffset(void)
 {
     uint16_t digitalIdleOffsetValue = 450;
     return CONVERT_PARAMETER_TO_PERCENT(digitalIdleOffsetValue * 0.01f);
@@ -46,7 +46,7 @@ bool escDevIsProtocolDshot(void)
     return motorProtocolDshot;
 }
 
-bool motorCheckProtocolEnabled(bool *isProtocolDshot)
+bool escCheckProtocolEnabled(bool *isProtocolDshot)
 {
     bool enabled = false;
     bool isDshot = false;
@@ -85,10 +85,10 @@ float escDevConvertFromExternal(void * escDevice_void, uint16_t externalValue)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
-    return escDevice->vTable.convertExternalToMotor(externalValue);
+    return escDevice->vTable.convertFromExternal(externalValue);
 }
 
-void motorEnable(void * escDevice_void)
+void escEnable(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
@@ -98,14 +98,14 @@ void motorEnable(void * escDevice_void)
     }
 }
 
-uint32_t motorGetEnableTimeMs(void * escDevice_void)
+uint32_t escGetEnableTimeMs(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
     return escDevice->enableTimeMs;
 }
 
-escVTable_t motorGetVTable(void * escDevice_void)
+escVTable_t escGetVTable(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
@@ -114,7 +114,7 @@ escVTable_t motorGetVTable(void * escDevice_void)
 
 void * escDevInitDshot(uint8_t motorCount) {
 
-    motorProtocolEnabled = motorCheckProtocolEnabled(&motorProtocolDshot);
+    motorProtocolEnabled = escCheckProtocolEnabled(&motorProtocolDshot);
 
     memset(motors, 0, sizeof(motors));
 
@@ -131,29 +131,29 @@ void * escDevInitDshot(uint8_t motorCount) {
 }
 
 
-bool motorIsEnabled(void * escDevice_void)
+bool escIsEnabled(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
     return escDevice->enabled;
 }
 
-void motorPostInit(void * escDevice_void)
+void escPostInit(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
     escDevice->vTable.postInit();
 }
 
-void motorPostInitNull(void)
+void escPostInitNull(void)
 {
 }
 
-void motorUpdateCompleteNull(void)
+void escUpdateCompleteNull(void)
 {
 }
 
-bool motorUpdateStartNull(void)
+bool escUpdateStartNull(void)
 {
     return true;
 }

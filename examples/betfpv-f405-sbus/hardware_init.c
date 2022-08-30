@@ -61,8 +61,8 @@ void * hardwareInit(uint32_t core_period)
     flashInit();
     timerStart();
     spiInitBusDMA();
-    motorPostInit(escDevice);
-    motorEnable(escDevice);
+    escPostInit(escDevice);
+    escEnable(escDevice);
     systemInitUnusedPins();
 
     return escDevice;

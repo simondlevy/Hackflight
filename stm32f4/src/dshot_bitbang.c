@@ -359,8 +359,8 @@ static bool bbMotorConfig(IO_t io, uint8_t motorIndex, escProtocol_t pwmProtocol
         if (!bbPort || !dmaAllocate(dmaGetIdentifier(bbPort->dmaResource),
                     bbPort->owner.owner, bbPort->owner.resourceIndex)) {
             bbDevice.vTable.write = escDevWriteNull;
-            bbDevice.vTable.updateStart = motorUpdateStartNull;
-            bbDevice.vTable.updateComplete = motorUpdateCompleteNull;
+            bbDevice.vTable.updateStart = escUpdateStartNull;
+            bbDevice.vTable.updateComplete = escUpdateCompleteNull;
 
             return false;
         }
@@ -524,13 +524,13 @@ static escVTable_t bbVTable = {
     .postInit = bbPostInit,
     .enable = bbEnableMotors,
     .disable = bbDisableMotors,
-    .isMotorEnabled = bbIsMotorEnabled,
+    .isEnabled = bbIsMotorEnabled,
     .updateStart = bbUpdateStart,
     .write = bbWrite,
     .writeInt = bbWriteInt,
     .updateComplete = bbUpdateComplete,
-    .convertExternalToMotor = dshotConvertFromExternal,
-    .convertMotorToExternal = dshotConvertToExternal,
+    .convertFromExternal = dshotConvertFromExternal,
+    .convertToExternal = dshotConvertToExternal,
     .shutdown = bbShutdown,
 };
 
@@ -557,8 +557,8 @@ escDevice_t *dshotBitbangDevInit(uint8_t count)
         if (!IOIsFreeOrPreinit(io)) {
             /* not enough motors initialised for the mixer or a break in the motors */
             bbDevice.vTable.write = escDevWriteNull;
-            bbDevice.vTable.updateStart = motorUpdateStartNull;
-            bbDevice.vTable.updateComplete = motorUpdateCompleteNull;
+            bbDevice.vTable.updateStart = escUpdateStartNull;
+            bbDevice.vTable.updateComplete = escUpdateCompleteNull;
             bbStatus = DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT;
             return NULL;
         }

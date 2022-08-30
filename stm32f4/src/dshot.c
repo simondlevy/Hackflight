@@ -47,7 +47,7 @@ static float scaleRangef(float x, float srcFrom, float srcTo, float destFrom, fl
 void dshotInitEndpoints(float outputLimit, float *outputLow, float *outputHigh, float *disarm) {
     float outputLimitOffset = DSHOT_RANGE * (1 - outputLimit);
     *disarm = DSHOT_CMD_MOTOR_STOP;
-    *outputLow = DSHOT_MIN_THROTTLE + motorGetDigitalIdOffset() * DSHOT_RANGE;
+    *outputLow = DSHOT_MIN_THROTTLE + escGetDigitalIdOffset() * DSHOT_RANGE;
     *outputHigh = DSHOT_MAX_THROTTLE - outputLimitOffset;
 }
 

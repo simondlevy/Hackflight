@@ -39,39 +39,37 @@ static const escProtocol_t ESC_PROTOCOL = ESC_DSHOT600;
 
 typedef struct {
 
-    void (*postInit)(void);
-    float (*convertExternalToMotor)(uint16_t externalValue);
-    uint16_t (*convertMotorToExternal)(float motorValue);
-    bool (*enable)(void);
-    void (*disable)(void);
-    bool (*isMotorEnabled)(uint8_t index);
-    bool (*updateStart)(void);
-    void (*write)(uint8_t index, float value);
-    void (*writeInt)(uint8_t index, uint16_t value);
-    void (*updateComplete)(void);
-    void (*shutdown)(void);
+    float    (*convertFromExternal)(uint16_t value);
+    uint16_t (*convertToExternal)(float value);
+    void     (*disable)(void);
+    bool     (*enable)(void);
+    bool     (*isEnabled)(uint8_t index);
+    void     (*postInit)(void);
+    void     (*shutdown)(void);
+    void     (*updateComplete)(void);
+    bool     (*updateStart)(void);
+    void     (*write)(uint8_t index, float value);
+    void     (*writeInt)(uint8_t index, uint16_t value);
 
 } escVTable_t;
 
 typedef struct {
-    escVTable_t vTable;
     uint8_t     count;
-    bool        initialized;
     bool        enabled;
     uint32_t    enableTimeMs;
+    bool        initialized;
+    escVTable_t vTable;
 } escDevice_t;
 
-void     motorPostInitNull();
-void     escDevWriteNull(uint8_t index, float value);
-bool     motorUpdateStartNull(void);
-void     motorUpdateCompleteNull(void);
-void     motorPostInit(void * escDevice);
+void escDevWriteNull(uint8_t index, float value);
+void escPostInit(void * escDevice);
+void escPostInitNull();
+void escUpdateCompleteNull(void);
+bool escUpdateStartNull(void);
 
-
-escVTable_t   motorGetVTable(void * escDevice);
-bool          motorCheckProtocolEnabled(bool *protocolIsDshot);
-void          motorEnable(void * escDevice);
-bool          motorIsEnabled(void * escDevice);
-uint32_t      motorGetEnableTimeMs(void * escDevice);
-
-float motorGetDigitalIdOffset(void);
+bool        escCheckProtocolEnabled(bool *protocolIsDshot);
+void        escEnable(void * escDevice);
+float       escGetDigitalIdOffset(void);
+uint32_t    escGetEnableTimeMs(void * escDevice);
+escVTable_t escGetVTable(void * escDevice);
+bool        escIsEnabled(void * escDevice);

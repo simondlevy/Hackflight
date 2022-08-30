@@ -154,13 +154,13 @@ static bool commandsAreEnabled(
 
     switch (commandType) {
         case DSHOT_CMD_TYPE_BLOCKING:
-            ret = !motorIsEnabled(escDevice);
+            ret = !escIsEnabled(escDevice);
 
             break;
         case DSHOT_CMD_TYPE_INLINE:
-            ret = motorIsEnabled(escDevice) &&
-                motorGetEnableTimeMs(escDevice) &&
-                millis() > motorGetEnableTimeMs(escDevice) +
+            ret = escIsEnabled(escDevice) &&
+                escGetEnableTimeMs(escDevice) &&
+                millis() > escGetEnableTimeMs(escDevice) +
                 DSHOT_PROTOCOL_DETECTION_DELAY_MS;
 
             break;
@@ -212,17 +212,17 @@ static void commandWrite(
             delayMicroseconds(DSHOT_COMMAND_DELAY_US);
 
             uint32_t timeoutUs = micros() + 1000;
-            while (!motorGetVTable(escDevice).updateStart() &&
+            while (!escGetVTable(escDevice).updateStart() &&
                     cmpTimeUs(timeoutUs, micros()) > 0);
             for (uint8_t i = 0; i < motorCount; i++) {
                 if ((i == index) || (index == ALL_MOTORS)) {
                     motorDmaOutput_t *const motor = getMotorDmaOutput(i);
                     motor->protocolControl.requestTelemetry = true;
-                    motorGetVTable(escDevice).writeInt(i, command);
+                    escGetVTable(escDevice).writeInt(i, command);
                 }
             }
 
-            motorGetVTable(escDevice).updateComplete();
+            escGetVTable(escDevice).updateComplete();
         }
         delayMicroseconds(delayAfterCommandUs);
     } else if (commandType == DSHOT_CMD_TYPE_INLINE) {

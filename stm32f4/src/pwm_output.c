@@ -136,13 +136,13 @@ static uint16_t pwmConvertToExternal(float motorValue)
 }
 
 static escVTable_t motorPwmVTable = {
-    .postInit = motorPostInitNull,
+    .postInit = escPostInitNull,
     .enable = pwmEnableMotors,
     .disable = pwmDisableMotors,
-    .isMotorEnabled = pwmIsMotorEnabled,
+    .isEnabled = pwmIsMotorEnabled,
     .shutdown = pwmShutdownPulsesForAllMotors,
-    .convertExternalToMotor = pwmConvertFromExternal,
-    .convertMotorToExternal = pwmConvertToExternal,
+    .convertFromExternal = pwmConvertFromExternal,
+    .convertToExternal = pwmConvertToExternal,
 };
 
 escDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUnsyncedPwm)
@@ -179,8 +179,8 @@ escDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUns
     }
 
     motorPwmDevice.vTable.write = pwmWriteStandard;
-    motorPwmDevice.vTable.updateStart = motorUpdateStartNull;
-    motorPwmDevice.vTable.updateComplete = useUnsyncedPwm ? motorUpdateCompleteNull : pwmCompleteOneshotMotorUpdate;
+    motorPwmDevice.vTable.updateStart = escUpdateStartNull;
+    motorPwmDevice.vTable.updateComplete = useUnsyncedPwm ? escUpdateCompleteNull : pwmCompleteOneshotMotorUpdate;
 
     for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex < motorCount; motorIndex++) {
         const ioTag_t tag = ESC_IO_TAGS[motorIndex];
@@ -189,7 +189,7 @@ escDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUns
         if (timerHardware == NULL) {
             /* not enough motors initialised for the mixer or a break in the motors */
             motorPwmDevice.vTable.write = &pwmWriteUnused;
-            motorPwmDevice.vTable.updateComplete = motorUpdateCompleteNull;
+            motorPwmDevice.vTable.updateComplete = escUpdateCompleteNull;
             /* TODO: block arming and add reason system cannot arm */
             return NULL;
         }
