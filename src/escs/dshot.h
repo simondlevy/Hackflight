@@ -40,6 +40,7 @@ class DshotEsc : public Esc {
         // Time to separate dshot beacon and armining/disarming events
         static const uint32_t BEACON_GUARD_DELAY_US = 1200000;  
 
+        static const uint32_t COMMAND_DELAY_US = 1000;
 
         typedef struct {
 
@@ -98,92 +99,26 @@ class DshotEsc : public Esc {
             CMD_MAX = 47
         } commands_e;
 
+        typedef enum {
+            COMMAND_STATE_IDLEWAIT,   // waiting for motors to go idle
+            COMMAND_STATE_STARTDELAY, // initial delay before a sequence of commands
+            COMMAND_STATE_ACTIVE,     // actively sending command
+            COMMAND_STATE_POSTDELAY   // delay period after the command has been sent
+        } commandState_e;
+
+        typedef struct {
+            commandState_e state;
+            uint32_t nextCommandCycleDelay;
+            uint32_t delayAfterCommandUs;
+            uint8_t repeats;
+            uint8_t command[MAX_SUPPORTED_MOTORS];
+        } commandControl_t;
+
         uint8_t     m_motorCount;
 
         escDevice_t * m_escDevice;
 
         pwmOutputPort_t m_motors[MAX_SUPPORTED_MOTORS];
-
-        static void commandWrite( uint8_t index, commands_e command)
-        {
-            (void)index;
-            (void)command;
-
-            /* XXX
-               if (!commandsAreEnabled(escDevice, commandType) ||
-               (command > DSHOT_MAX_COMMAND) ||
-               dshotCommandQueueFull()) { return;
-               }
-
-               uint8_t repeats = 1;
-               uint32_t delayAfterCommandUs = DSHOT_COMMAND_DELAY_US;
-
-               switch (command) {
-               case CMD_SPIN_DIRECTION_1:
-               case CMD_SPIN_DIRECTION_2:
-               case CMD_SAVE_SETTINGS:
-               case CMD_SPIN_DIRECTION_NORMAL:
-               case CMD_SPIN_DIRECTION_REVERSED:
-               repeats = 10;
-               break;
-               case CMD_BEACON1:
-               case CMD_BEACON2:
-               case CMD_BEACON3:
-               case CMD_BEACON4:
-               case CMD_BEACON5:
-               delayAfterCommandUs = DSHOT_BEEP_DELAY_US;
-               break;
-               default:
-               break;
-               }
-
-               if (commandType == CMD_TYPE_BLOCKING) {
-               delayMicroseconds(DSHOT_INITIAL_DELAY_US - DSHOT_COMMAND_DELAY_US);
-               for (; repeats; repeats--) {
-               delayMicroseconds(DSHOT_COMMAND_DELAY_US);
-
-               uint32_t timeoutUs = micros() + 1000;
-               while (!escGetVTable(escDevice).updateStart() &&
-               cmpTimeUs(timeoutUs, micros()) > 0);
-               for (uint8_t i = 0; i < motorCount; i++) {
-               if ((i == index) || (index == ALL_MOTORS)) {
-               motorDmaOutput_t *const motor = getMotorDmaOutput(i);
-               motor->protocolControl.requestTelemetry = true;
-               escGetVTable(escDevice).writeInt(i, command);
-               }
-               }
-
-               escGetVTable(escDevice).updateComplete();
-               }
-               delayMicroseconds(delayAfterCommandUs);
-               } else if (commandType == CMD_TYPE_INLINE) {
-               dshotCommandControl_t *commandControl = addCommand();
-               if (commandControl) {
-               commandControl->repeats = repeats;
-               commandControl->delayAfterCommandUs = delayAfterCommandUs;
-               for (unsigned i = 0; i < motorCount; i++) {
-               if (index == i || index == ALL_MOTORS) {
-               commandControl->command[i] = command;
-               } else {
-               commandControl->command[i] = CMD_MOTOR_STOP;
-               }
-               }
-               if (allMotorsAreIdle(motorCount)) {
-            // we can skip the motors idle wait state
-            commandControl->state = DSHOT_COMMAND_STATE_STARTDELAY;
-            commandControl->nextCommandCycleDelay =
-            dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
-            } else {
-            commandControl->state = DSHOT_COMMAND_STATE_IDLEWAIT;
-
-            // will be set after idle wait completes
-            commandControl->nextCommandCycleDelay = 0;  
-            }
-            }
-        }*/
-
-        } // commandWrite
-
 
     public:
 
@@ -236,7 +171,31 @@ class DshotEsc : public Esc {
 
         virtual void stop(void) override 
         {
-            commandWrite(ALL_MOTORS, CMD_SPIN_DIRECTION_NORMAL);
+            /*
+            uint8_t repeats = 10;
+            uint32_t delayAfterCommandUs = COMMAND_DELAY_US;
+
+            dshotCommandControl_t *commandControl = addCommand();
+
+            if (commandControl) {
+                commandControl->repeats = repeats;
+                commandControl->delayAfterCommandUs = delayAfterCommandUs;
+                for (unsigned i = 0; i < m_motorCount; i++) {
+                    commandControl->command[i] = DSHOT_CMD_SPIN_DIRECTION_NORMAL;
+                }
+                if (allMotorsAreIdle(m_motorCount)) {
+                    // we can skip the motors idle wait state
+                    commandControl->state = DSHOT_COMMAND_STATE_STARTDELAY;
+                    commandControl->nextCommandCycleDelay =
+                        dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
+                } else {
+                    commandControl->state = DSHOT_COMMAND_STATE_IDLEWAIT;
+
+                    // will be set after idle wait completes
+                    commandControl->nextCommandCycleDelay = 0;  
+                }
+            }
+            */
         }
 
         virtual void write(float *values) override 
