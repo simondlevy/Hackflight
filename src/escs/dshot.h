@@ -31,6 +31,10 @@ class DshotEsc : public Esc {
 
         static const uint8_t ALL_MOTORS = 255;
 
+        // Time to separate dshot beacon and armining/disarming events
+        static const uint32_t BEACON_GUARD_DELAY_US = 1200000;  
+
+
         typedef struct {
 
             float    (*convertFromExternal)(uint16_t value);
@@ -199,9 +203,7 @@ class DshotEsc : public Esc {
 
         virtual bool isReady(uint32_t currentTime) override 
         {
-            // XXX
-            (void)currentTime;
-            return false;
+            return currentTimeUs >= BEACON_GUARD_DELAY_US;
         }
 
         virtual float valueDisarmed(void) override 
