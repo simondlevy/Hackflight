@@ -103,7 +103,7 @@ class DshotEsc : public Esc {
             (void)command;
             (void)commandType;
 
-            /*
+            /* XXX
                if (!commandsAreEnabled(escDevice, commandType) ||
                (command > DSHOT_MAX_COMMAND) ||
                dshotCommandQueueFull()) { return;
@@ -231,9 +231,16 @@ class DshotEsc : public Esc {
 
         virtual void write(float *values) override 
         {
-            // XXX
-            (void)values;
-        }
+            if (m_escDevice.enabled) {
+                if (!m_escDevice.vTable.updateStart()) {
+                    return;
+                }
+                for (auto i = 0; i < m_escDevice.count; i++) {
+                    m_escDevice.vTable.write(i, values[i]);
+                }
+                m_escDevice.vTable.updateComplete();
+            }
+        }            
 };
 
 #endif
