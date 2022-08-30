@@ -51,10 +51,20 @@ class DshotEsc : public Esc {
 
         } escVTable_t;
 
+        typedef struct {
+            //timerChannel_t channel;
+            float pulseScale;
+            float pulseOffset;
+            bool forceOverflow;
+            bool enabled;
+            //IO_t io;
+        } pwmOutputPort_t;
+
         uint8_t     m_count;
         bool        m_enabled;
         uint32_t    m_enableTimeMs;
         bool        m_initialized;
+        pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
         escVTable_t m_vTable;
 
         typedef enum {
@@ -188,11 +198,9 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            /* XXX
-            motorProtocolEnabled = escCheckProtocolEnabled(&motorProtocolDshot);
-
             memset(motors, 0, sizeof(motors));
 
+            /* XXX
             static FAST_DATA_ZERO_INIT escDevice_t *escDevice;
 
             escDevice = dshotBitbangDevInit(motorCount);
