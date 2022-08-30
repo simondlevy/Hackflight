@@ -22,6 +22,30 @@
 
 class DshotEsc : public Esc {
 
+    private:
+
+        typedef struct {
+
+            float    (*convertFromExternal)(uint16_t value);
+            uint16_t (*convertToExternal)(float value);
+            void     (*disable)(void);
+            bool     (*enable)(void);
+            bool     (*isEnabled)(uint8_t index);
+            void     (*postInit)(void);
+            void     (*shutdown)(void);
+            void     (*updateComplete)(void);
+            bool     (*updateStart)(void);
+            void     (*write)(uint8_t index, float value);
+            void     (*writeInt)(uint8_t index, uint16_t value);
+
+        } escVTable_t;
+
+        uint8_t     m_count;
+        bool        m_enabled;
+        uint32_t    m_enableTimeMs;
+        bool        m_initialized;
+        escVTable_t m_vTable;
+
     public:
 
         DshotEsc(uint8_t count) override 
