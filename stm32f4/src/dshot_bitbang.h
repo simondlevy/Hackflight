@@ -33,8 +33,11 @@ typedef enum {
 } dshotBitbangStatus_e;
 
 struct escDevConfig_s;
-
 struct escDevice_s;
+
+#if defined (__cplusplus)
+extern "C" {
+#endif
 
 escDevice_t *dshotBitbangDevInit(uint8_t motorCount);
 
@@ -46,4 +49,6 @@ const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(
 
 const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer);
 
-//void motorCheckDshotBitbangStatus(arming_t * arming);
+#if defined (__cplusplus)
+}
+#endif

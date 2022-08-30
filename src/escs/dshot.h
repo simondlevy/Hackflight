@@ -20,6 +20,7 @@
 
 #include <string.h>
 
+#include "dshot_bitbang.h"
 #include "io_types.h"
 #include "timer.h"
 #include "esc.h"
@@ -210,8 +211,6 @@ class DshotEsc : public Esc {
             memset(motors, 0, sizeof(motors));
 
             /* XXX
-            static FAST_DATA_ZERO_INIT escDevice_t *escDevice;
-
             escDevice = dshotBitbangDevInit(motorCount);
 
             escDevice->count = motorCount;
