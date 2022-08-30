@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "pwm.h"
 #include "time.h"
 
 #define MAX_SUPPORTED_MOTORS 8
@@ -29,7 +30,7 @@
 extern "C" {
 #endif
 
-    float   escDevConvertFromExternal(void * escDevice, uint16_t externalValue);
+    float   escDevConvertFromExternal(void * escDevice, uint16_t value);
     void    escDevInitBrushed(uint8_t * pins);
     void  * escDevInitDshot(uint8_t count);
     bool    escDevIsProtocolDshot(void);
@@ -48,19 +49,17 @@ extern "C" {
 
 class Esc {
 
-    protected:
+    public:
 
-        virtual float  convertFromExternal(void * escDevice, uint16_t externalValue) = 0;
-        virtual void   initBrushed(uint8_t * pins) = 0;
-        virtual void * initDshot(uint8_t count) = 0;
-        virtual bool   isProtocolDshot(void) = 0;
-        virtual bool   isReady(uint32_t currentTime) = 0;
-        virtual float  valueDisarmed(void) = 0;
-        virtual float  valueHigh(void) = 0;
-        virtual float  valueLow(void) = 0;
-        virtual void   stop(void * ice) = 0;
-        virtual void   write(void * ice, float *values) = 0;
-
+        virtual void  begin(void) = 0;
+        virtual float convertFromExternal(void * device, uint16_t value) = 0;
+        virtual bool  isProtocolDshot(void) = 0;
+        virtual bool  isReady(uint32_t currentTime) = 0;
+        virtual float valueDisarmed(void) = 0;
+        virtual float valueHigh(void) = 0;
+        virtual float valueLow(void) = 0;
+        virtual void  stop(void) = 0;
+        virtual void  write(float *values) = 0;
 };
 
 #endif
