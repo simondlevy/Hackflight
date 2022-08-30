@@ -30,6 +30,7 @@ Currently, Hackflight has been tested on the following platforms:
 * [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller) from Tlera Corp.
 
 * [STM32F405 AIO flight controller](https://betafpv.com/products/f405-20a-aio-2-4s-brushless-flight-controllerblheli_s-v3)
+from BetaFPV
 
 * [MultiSim](https://github.com/simondlevy/MultiSim) flight simulator based on UnrealEngine
 
