@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "io_types.h"
 #include "esc.h"
 
 class DshotEsc : public Esc {
@@ -50,6 +51,11 @@ class DshotEsc : public Esc {
             void     (*writeInt)(uint8_t index, uint16_t value);
 
         } escVTable_t;
+
+        typedef struct {
+            //volatile timCCR_t *ccr;
+            //TIM_TypeDef       *tim;
+        } timerChannel_t;
 
         typedef struct {
             //timerChannel_t channel;
