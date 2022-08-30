@@ -24,6 +24,7 @@
 #include "io_types.h"
 #include "timer.h"
 #include "esc.h"
+#include "escdev.h"
 
 class DshotEsc : public Esc {
 
@@ -107,12 +108,11 @@ class DshotEsc : public Esc {
             CMD_MAX = 47
         } commands_e;
 
-        uint8_t     m_count;
-        bool        m_enabled;
-        uint32_t    m_enableTimeMs;
-        bool        m_initialized;
-        pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
-        escVTable_t m_vTable;
+        uint8_t     m_motorCount;
+
+        escDevice_t * m_escDevice;
+
+        pwmOutputPort_t m_motors[MAX_SUPPORTED_MOTORS];
 
         static void commandWrite(
                 uint8_t index,
@@ -203,26 +203,24 @@ class DshotEsc : public Esc {
 
         DshotEsc(uint8_t count)
         {
-            m_count = count;
+            m_motorCount = count;
         }
 
         virtual void begin(void) override 
         {
-            memset(motors, 0, sizeof(motors));
+            memset(m_motors, 0, sizeof(m_motors));
 
-            /* XXX
-            escDevice = dshotBitbangDevInit(motorCount);
+            m_escDevice = dshotBitbangDevInit(m_motorCount);
 
-            escDevice->count = motorCount;
-            escDevice->initialized = true;
-            escDevice->enableTimeMs = 0;
-            escDevice->enabled = false;
-            */
+            m_escDevice->count = m_motorCount;
+            m_escDevice->initialized = true;
+            m_escDevice->enableTimeMs = 0;
+            m_escDevice->enabled = false;
         }
 
         virtual float  convertFromExternal(uint16_t value) override 
         {
-            return m_vTable.convertFromExternal(value);
+            return m_escDevice->vTable.convertFromExternal(value);
         }
 
         virtual bool isProtocolDshot(void) override 
@@ -260,14 +258,14 @@ class DshotEsc : public Esc {
 
         virtual void write(float *values) override 
         {
-            if (m_enabled) {
-                if (!m_vTable.updateStart()) {
+            if (m_escDevice->enabled) {
+                if (!m_escDevice->vTable.updateStart()) {
                     return;
                 }
-                for (auto i = 0; i < m_count; i++) {
-                    m_vTable.write(i, values[i]);
+                for (auto i = 0; i < m_motorCount; i++) {
+                    m_escDevice->vTable.write(i, values[i]);
                 }
-                m_vTable.updateComplete();
+                m_escDevice->vTable.updateComplete();
             }
         }            
 };
