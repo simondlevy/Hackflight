@@ -313,9 +313,7 @@ $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \
 	  $(HFSRC_DIR)/*.h \
       $(HFSRC_DIR)/*/*.h \
-      $(HFSRC_DIR)//core/mixers/*.h \
-      $(HFSRC_DIR)//core/mixers/fixedpitch/*.h \
-      $(STM_SRC_DIR)/*/*.h
+      $(HFSRC_DIR)/*/*/*.h
 	$(V1) $(call compile_cpp)
 
 define compile_c

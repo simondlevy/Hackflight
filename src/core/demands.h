@@ -40,12 +40,4 @@ class Demands {
             : Demands(0, 0, 0, 0)
         {
         }
-
-        Demands(const Demands & demands)
-        {
-            throttle = demands.throttle;
-            roll = demands.roll;
-            pitch = demands.pitch;
-            yaw = demands.yaw;
-         }
 };

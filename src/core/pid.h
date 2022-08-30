@@ -25,14 +25,6 @@ class PidController {
 
     public:
 
-        static const uint8_t MAX_PID_CONTROLLERS = 10;
-
-        virtual void update(
-                const uint32_t currentTimeUs,
-                Demands * demands,
-                const State & vstate,
-                const bool reset) = 0;
-
          virtual auto update(
                 const uint32_t currentTimeUs,
                 const Demands & demands,
