@@ -32,7 +32,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #define CONVERT_PARAMETER_TO_PERCENT(param) (0.01f * param)
 
-static bool motorProtocolEnabled = false;
 static bool motorProtocolDshot = false;
 
 float escGetDigitalIdOffset(void)
@@ -44,41 +43,6 @@ float escGetDigitalIdOffset(void)
 bool escDevIsProtocolDshot(void)
 {
     return motorProtocolDshot;
-}
-
-bool escCheckProtocolEnabled(bool *isProtocolDshot)
-{
-    bool enabled = false;
-    bool isDshot = false;
-
-    switch (ESC_PROTOCOL) {
-    case ESC_STANDARD:
-    case ESC_ONESHOT125:
-    case ESC_ONESHOT42:
-    case ESC_MULTISHOT:
-    case ESC_BRUSHED:
-        enabled = true;
-
-        break;
-
-    case ESC_DSHOT150:
-    case ESC_DSHOT300:
-    case ESC_DSHOT600:
-    case ESC_PROSHOT1000:
-        enabled = true;
-        isDshot = true;
-
-        break;
-    default:
-
-        break;
-    }
-
-    if (isProtocolDshot) {
-        *isProtocolDshot = isDshot;
-    }
-
-    return enabled;
 }
 
 float escDevConvertFromExternal(void * escDevice_void, uint16_t externalValue)
@@ -113,8 +77,6 @@ escVTable_t escGetVTable(void * escDevice_void)
 }
 
 void * escDevInitDshot(uint8_t motorCount) {
-
-    motorProtocolEnabled = escCheckProtocolEnabled(&motorProtocolDshot);
 
     memset(motors, 0, sizeof(motors));
 
