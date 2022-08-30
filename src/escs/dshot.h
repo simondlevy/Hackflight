@@ -188,7 +188,20 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            // XXX
+            /* XXX
+            motorProtocolEnabled = escCheckProtocolEnabled(&motorProtocolDshot);
+
+            memset(motors, 0, sizeof(motors));
+
+            static FAST_DATA_ZERO_INIT escDevice_t *escDevice;
+
+            escDevice = dshotBitbangDevInit(motorCount);
+
+            escDevice->count = motorCount;
+            escDevice->initialized = true;
+            escDevice->enableTimeMs = 0;
+            escDevice->enabled = false;
+            */
         }
 
         virtual float  convertFromExternal(uint16_t value) override 
