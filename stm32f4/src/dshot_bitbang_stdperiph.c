@@ -28,7 +28,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dshot.h"
 #include "dshot_bitbang_impl.h"
 #include "dshot_command.h"
-#include "motordev.h"
+#include "escdev.h"
 #include "nvic.h"
 #include "pwm_output.h" // XXX for pwmOutputPort_t motors[]; should go away with refactoring
 #include <time.h>

@@ -34,7 +34,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dshot.h"
 #include "dshot_dpwm.h"
 #include "dshot_command.h"
-#include "motordev.h"
+#include "escdev.h"
 #include "systemdev.h"
 
 #include "pwm_output_dshot_shared.h"

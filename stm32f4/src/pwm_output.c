@@ -21,7 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <time.h>
 
-#include "motordev.h"
+#include "escdev.h"
 #include "platform.h"
 #include "io.h"
 #include "pwm_output.h"

@@ -27,7 +27,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "atomic.h"
 #include "dshot.h"
 #include "dshot_command.h"
-#include "motordev.h"
+#include "escdev.h"
 #include "nvic.h"
 #include "pwm_output.h" // for PWM_TYPE_* and others
 #include "timer.h"

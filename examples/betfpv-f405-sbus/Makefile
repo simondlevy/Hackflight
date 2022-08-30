@@ -129,10 +129,10 @@ STM32_SRC = \
             bus_spi_stdperiph.c \
             dma_common.c \
             dma_reqmap.c \
+            escdev.c \
             exti.c \
             flash.c \
             io.c \
-            motor.c \
             pinio.c \
             pwm_output_dshot.c \
             pwm_output_dshot_shared.c \
@@ -289,7 +289,7 @@ $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
       flash.h \
       inverter.h \
       io.h \
-      motordev.h \
+      escdev.h \
       pinio.h \
       serialdev.h \
       serial_uart.h \

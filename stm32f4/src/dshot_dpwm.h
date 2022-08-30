@@ -17,7 +17,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "dshot.h"
-#include "motordev.h"
+#include "escdev.h"
 
 #define MOTOR_DSHOT600_HZ     MHZ_TO_HZ(12)
 #define MOTOR_DSHOT300_HZ     MHZ_TO_HZ(6)

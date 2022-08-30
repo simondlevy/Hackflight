@@ -22,11 +22,11 @@
 
 #include "bus_spi.h"
 #include "dshot_command.h"
+#include "escdev.h"
 #include "exti.h"
 #include "flash.h"
 #include "inverter.h"
 #include "io.h"
-#include "motordev.h"
 #include "pinio.h"
 #include "serialdev.h"
 #include "serial_uart.h"

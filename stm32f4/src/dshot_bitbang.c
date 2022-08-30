@@ -29,7 +29,7 @@
 #include "dshot_bitbang.h"
 #include "dshot_bitbang_impl.h"
 #include "dshot_command.h"
-#include "motordev.h"
+#include "escdev.h"
 #include "nvic.h"
 #include "pwm_output.h" 
 #include "dshot_dpwm.h"

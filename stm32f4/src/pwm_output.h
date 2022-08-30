@@ -22,7 +22,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 #include "dma.h"
 #include "io_types.h"
-#include "motordev.h"
+#include "escdev.h"
 #include "timer.h"
 
 #define BRUSHED_MOTORS_PWM_RATE 16000

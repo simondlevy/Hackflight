@@ -24,7 +24,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "pwm_output.h"
 #include "dshot.h"
 #include "dshot_dpwm.h"
-#include "motordev.h"
+#include "escdev.h"
 
 DSHOT_DMA_BUFFER_ATTRIBUTE DSHOT_DMA_BUFFER_UNIT dshotDmaBuffer[MAX_SUPPORTED_MOTORS][DSHOT_DMA_BUFFER_ALLOC_SIZE];
 DSHOT_DMA_BUFFER_ATTRIBUTE DSHOT_DMA_BUFFER_UNIT dshotBurstDmaBuffer[MAX_DMA_TIMERS][DSHOT_DMA_BUFFER_SIZE * 4];

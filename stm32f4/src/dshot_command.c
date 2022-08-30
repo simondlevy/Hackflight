@@ -23,7 +23,7 @@
 
 #include "platform.h"
 #include "io.h"
-#include "motordev.h"
+#include "escdev.h"
 #include "timer.h"
 #include "dshot.h"
 #include "dshot_dpwm.h"

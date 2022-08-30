@@ -17,7 +17,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include <time.h>
-#include "motordev.h"
+#include "escdev.h"
 
 #define USE_DMA_REGISTER_CACHE
 

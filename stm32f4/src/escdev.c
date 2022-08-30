@@ -27,7 +27,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "pwm_output.h" // for PWM_TYPE_* and others
 #include "dshot_bitbang.h"
 #include "dshot_dpwm.h"
-#include "motordev.h"
+#include "escdev.h"
 #include "systemdev.h"
 
 #define CONVERT_PARAMETER_TO_PERCENT(param) (0.01f * param)
