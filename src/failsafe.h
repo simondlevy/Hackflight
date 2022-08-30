@@ -158,7 +158,7 @@ class Failsafe {
             m_monitoring = true;
         }
 
-        void update( float * rcData, void * motorDevice, Arming * arming)
+        void update( float * rcData, void * escDevice, Arming * arming)
         {
             if (!isMonitoring()) {
                 return;
@@ -227,7 +227,7 @@ class Failsafe {
                     case LANDING:
                         break;
                     case LANDED:
-                        arming->disarm(motorDevice);
+                        arming->disarm(escDevice);
                         m_receivingRxDataPeriod = timeMillis() +
                             m_receivingRxDataPeriodPreset; // set required
                         m_phase = RX_LOSS_MONITORING;

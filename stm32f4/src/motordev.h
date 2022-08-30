@@ -56,29 +56,29 @@ typedef struct motorVTable_s {
 
 } motorVTable_t;
 
-typedef struct motorDevice_s {
+typedef struct escDevice_s {
     motorVTable_t vTable;
     uint8_t       count;
     bool          initialized;
     bool          enabled;
     uint32_t      motorEnableTimeMs;
-} motorDevice_t;
+} escDevice_t;
 
 void     motorPostInitNull();
-void     motorDevWriteNull(uint8_t index, float value);
+void     escDevWriteNull(uint8_t index, float value);
 bool     motorUpdateStartNull(void);
 void     motorUpdateCompleteNull(void);
-void     motorPostInit(void * motorDevice);
+void     motorPostInit(void * escDevice);
 
-struct motorDevConfig_s; 
+struct escDevConfig_s; 
 
-motorVTable_t motorGetVTable(void * motorDevice);
+motorVTable_t motorGetVTable(void * escDevice);
 bool          motorCheckProtocolEnabled(bool *protocolIsDshot);
-void          motorEnable(void * motorDevice);
-bool          motorIsEnabled(void * motorDevice);
-uint32_t      motorGetEnableTimeMs(void * motorDevice);
+void          motorEnable(void * escDevice);
+bool          motorIsEnabled(void * escDevice);
+uint32_t      motorGetEnableTimeMs(void * escDevice);
 
-struct motorDevConfig_s;
-typedef struct motorDevConfig_s motorDevConfig_t;
+struct escDevConfig_s;
+typedef struct escDevConfig_s escDevConfig_t;
 
 float motorGetDigitalIdOffset(void);

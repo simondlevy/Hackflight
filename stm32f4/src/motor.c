@@ -41,7 +41,7 @@ float motorGetDigitalIdOffset(void)
     return CONVERT_PARAMETER_TO_PERCENT(digitalIdleOffsetValue * 0.01f);
 }
 
-bool motorDevIsProtocolDshot(void)
+bool escDevIsProtocolDshot(void)
 {
     return motorProtocolDshot;
 }
@@ -81,68 +81,68 @@ bool motorCheckProtocolEnabled(bool *isProtocolDshot)
     return enabled;
 }
 
-float motorDevConvertFromExternal(void * motorDevice_void, uint16_t externalValue)
+float escDevConvertFromExternal(void * escDevice_void, uint16_t externalValue)
 {
-    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
-    return motorDevice->vTable.convertExternalToMotor(externalValue);
+    return escDevice->vTable.convertExternalToMotor(externalValue);
 }
 
-void motorEnable(void * motorDevice_void)
+void motorEnable(void * escDevice_void)
 {
-    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
-    if (motorDevice->initialized && motorDevice->vTable.enable()) {
-        motorDevice->enabled = true;
-        motorDevice->motorEnableTimeMs = millis();
+    if (escDevice->initialized && escDevice->vTable.enable()) {
+        escDevice->enabled = true;
+        escDevice->motorEnableTimeMs = millis();
     }
 }
 
-uint32_t motorGetEnableTimeMs(void * motorDevice_void)
+uint32_t motorGetEnableTimeMs(void * escDevice_void)
 {
-    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
-    return motorDevice->motorEnableTimeMs;
+    return escDevice->motorEnableTimeMs;
 }
 
-motorVTable_t motorGetVTable(void * motorDevice_void)
+motorVTable_t motorGetVTable(void * escDevice_void)
 {
-    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
-    return motorDevice->vTable;
+    return escDevice->vTable;
 }
 
-void * motorDevInitDshot(uint8_t motorCount) {
+void * escDevInitDshot(uint8_t motorCount) {
 
     motorProtocolEnabled = motorCheckProtocolEnabled(&motorProtocolDshot);
 
     memset(motors, 0, sizeof(motors));
 
-    static FAST_DATA_ZERO_INIT motorDevice_t *motorDevice;
+    static FAST_DATA_ZERO_INIT escDevice_t *escDevice;
 
-    motorDevice = dshotBitbangDevInit(motorCount);
+    escDevice = dshotBitbangDevInit(motorCount);
 
-    motorDevice->count = motorCount;
-    motorDevice->initialized = true;
-    motorDevice->motorEnableTimeMs = 0;
-    motorDevice->enabled = false;
+    escDevice->count = motorCount;
+    escDevice->initialized = true;
+    escDevice->motorEnableTimeMs = 0;
+    escDevice->enabled = false;
 
-    return (void *)motorDevice;
+    return (void *)escDevice;
 }
 
 
-bool motorIsEnabled(void * motorDevice_void)
+bool motorIsEnabled(void * escDevice_void)
 {
-    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
-    return motorDevice->enabled;
+    return escDevice->enabled;
 }
 
-void motorPostInit(void * motorDevice_void)
+void motorPostInit(void * escDevice_void)
 {
-    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
-    motorDevice->vTable.postInit();
+    escDevice->vTable.postInit();
 }
 
 void motorPostInitNull(void)
@@ -158,22 +158,22 @@ bool motorUpdateStartNull(void)
     return true;
 }
 
-void motorDevWrite(void * motorDevice_void, float *values)
+void escDevWrite(void * escDevice_void, float *values)
 {
-    motorDevice_t * motorDevice = (motorDevice_t *)motorDevice_void;
+    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
-    if (motorDevice->enabled) {
-        if (!motorDevice->vTable.updateStart()) {
+    if (escDevice->enabled) {
+        if (!escDevice->vTable.updateStart()) {
             return;
         }
-        for (int i = 0; i < motorDevice->count; i++) {
-            motorDevice->vTable.write(i, values[i]);
+        for (int i = 0; i < escDevice->count; i++) {
+            escDevice->vTable.write(i, values[i]);
         }
-        motorDevice->vTable.updateComplete();
+        escDevice->vTable.updateComplete();
     }
 }
 
-void motorDevWriteNull(uint8_t index, float value)
+void escDevWriteNull(uint8_t index, float value)
 {
     UNUSED(index);
     UNUSED(value);

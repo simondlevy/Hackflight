@@ -34,7 +34,7 @@ using namespace std;
 
 int main(void)
 {
-    auto motorDevice = hardwareInit(Clock::PERIOD());
+    auto escDevice = hardwareInit(Clock::PERIOD());
 
     static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -60,7 +60,7 @@ int main(void)
             imuRotate270,
             &pidControllers,
             &mixer,
-            motorDevice,
+            escDevice,
             &led);
 
     hf.begin();

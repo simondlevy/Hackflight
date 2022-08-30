@@ -72,7 +72,7 @@ void pwmOutConfig(timerChannel_t *channel, const timerHardware_t *timerHardware,
     *channel->ccr = 0;
 }
 
-static FAST_DATA_ZERO_INIT motorDevice_t motorPwmDevice;
+static FAST_DATA_ZERO_INIT escDevice_t motorPwmDevice;
 
 static void pwmWriteUnused(uint8_t index, float value)
 {
@@ -145,7 +145,7 @@ static motorVTable_t motorPwmVTable = {
     .convertMotorToExternal = pwmConvertToExternal,
 };
 
-motorDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUnsyncedPwm)
+escDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUnsyncedPwm)
 {
     motorPwmDevice.vTable = motorPwmVTable;
 

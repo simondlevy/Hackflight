@@ -31,11 +31,11 @@ typedef enum {
     DSHOT_BITBANG_STATUS_TOO_MANY_PORTS,
 } dshotBitbangStatus_e;
 
-struct motorDevConfig_s;
+struct escDevConfig_s;
 
-struct motorDevice_s;
+struct escDevice_s;
 
-struct motorDevice_s *dshotBitbangDevInit(uint8_t motorCount);
+struct escDevice_s *dshotBitbangDevInit(uint8_t motorCount);
 
 dshotBitbangStatus_e dshotBitbangGetStatus();
 

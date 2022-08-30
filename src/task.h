@@ -35,7 +35,7 @@ class Task {
         typedef struct {
 
             Imu *              imu;
-            void *             motorDevice;
+            void *             escDevice;
             Receiver *         receiver;
 
             Arming             arming;

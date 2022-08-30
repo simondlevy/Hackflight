@@ -147,20 +147,20 @@ static bool allMotorsAreIdle(uint8_t motorCount)
 }
 
 static bool commandsAreEnabled(
-        void * motorDevice,
+        void * escDevice,
         dshotCommandType_e commandType)
 {
     bool ret = false;
 
     switch (commandType) {
         case DSHOT_CMD_TYPE_BLOCKING:
-            ret = !motorIsEnabled(motorDevice);
+            ret = !motorIsEnabled(escDevice);
 
             break;
         case DSHOT_CMD_TYPE_INLINE:
-            ret = motorIsEnabled(motorDevice) &&
-                motorGetEnableTimeMs(motorDevice) &&
-                millis() > motorGetEnableTimeMs(motorDevice) +
+            ret = motorIsEnabled(escDevice) &&
+                motorGetEnableTimeMs(escDevice) &&
+                millis() > motorGetEnableTimeMs(escDevice) +
                 DSHOT_PROTOCOL_DETECTION_DELAY_MS;
 
             break;
@@ -173,13 +173,13 @@ static bool commandsAreEnabled(
 }
 
 static void commandWrite(
-        void * motorDevice,
+        void * escDevice,
         uint8_t index,
         uint8_t motorCount,
         uint8_t command,
         dshotCommandType_e commandType)
 {
-    if (!commandsAreEnabled(motorDevice, commandType) ||
+    if (!commandsAreEnabled(escDevice, commandType) ||
             (command > DSHOT_MAX_COMMAND) ||
             dshotCommandQueueFull()) { return;
     }
@@ -212,17 +212,17 @@ static void commandWrite(
             delayMicroseconds(DSHOT_COMMAND_DELAY_US);
 
             uint32_t timeoutUs = micros() + 1000;
-            while (!motorGetVTable(motorDevice).updateStart() &&
+            while (!motorGetVTable(escDevice).updateStart() &&
                     cmpTimeUs(timeoutUs, micros()) > 0);
             for (uint8_t i = 0; i < motorCount; i++) {
                 if ((i == index) || (index == ALL_MOTORS)) {
                     motorDmaOutput_t *const motor = getMotorDmaOutput(i);
                     motor->protocolControl.requestTelemetry = true;
-                    motorGetVTable(motorDevice).writeInt(i, command);
+                    motorGetVTable(escDevice).writeInt(i, command);
                 }
             }
 
-            motorGetVTable(motorDevice).updateComplete();
+            motorGetVTable(escDevice).updateComplete();
         }
         delayMicroseconds(delayAfterCommandUs);
     } else if (commandType == DSHOT_CMD_TYPE_INLINE) {
@@ -324,8 +324,8 @@ bool dshotCommandOutputIsEnabled(uint8_t motorCount)
     return true;
 }
 
-void motorDevStop(void * motorDevice)
+void escDevStop(void * escDevice)
 {
-    commandWrite(motorDevice, ALL_MOTORS, 4, DSHOT_CMD_SPIN_DIRECTION_NORMAL,
+    commandWrite(escDevice, ALL_MOTORS, 4, DSHOT_CMD_SPIN_DIRECTION_NORMAL,
             DSHOT_CMD_TYPE_INLINE);
 }

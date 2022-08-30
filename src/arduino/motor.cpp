@@ -22,21 +22,21 @@
 #include <esc.h>
 #include <pwm.h>
 
-bool motorDevIsReady(uint32_t currentTime)
+bool escDevIsReady(uint32_t currentTime)
 {
     (void)currentTime;
     return true;
 }
 
-float motorDevConvertFromExternal(void * motorDevice, uint16_t externalValue)
+float escDevConvertFromExternal(void * escDevice, uint16_t externalValue)
 {
     (void)externalValue;
-    (void)motorDevice;
+    (void)escDevice;
 
     return (externalValue - PWM_MIN) / (float)(PWM_MAX - PWM_MIN);
 }
 
-void  motorDevInitBrushed(uint8_t * pins)
+void  escDevInitBrushed(uint8_t * pins)
 {
     for (auto k=0; k<4; ++k) {
         analogWriteFrequency(pins[k], 10000);
@@ -44,34 +44,34 @@ void  motorDevInitBrushed(uint8_t * pins)
     }
 }
 
-bool motorDevIsProtocolDshot(void)
+bool escDevIsProtocolDshot(void)
 {
     return false;
 }
 
-float motorDevValueDisarmed(void)
+float escDevValueDisarmed(void)
 {
     return 0;
 }
 
-float motorDevValueHigh(void)
+float escDevValueHigh(void)
 {
     return 1;
 }
 
-float motorDevValueLow(void)
+float escDevValueLow(void)
 {
     return 0;
 }
 
-void motorDevStop(void * motorDevice)
+void escDevStop(void * escDevice)
 {
-    (void)motorDevice;
+    (void)escDevice;
 }
 
-void motorDevWrite(void * motorDevice, float *values)
+void escDevWrite(void * escDevice, float *values)
 {
-    uint8_t * pins = (uint8_t *)motorDevice;
+    uint8_t * pins = (uint8_t *)escDevice;
 
     for (auto k=0; k<4; ++k) {
         analogWrite(pins[k], (uint8_t)(values[k] * 255));

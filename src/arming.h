@@ -60,7 +60,7 @@ class Arming {
     bool m_throttle_is_down;
 
     void check(
-            void * motorDevice,
+            void * escDevice,
             uint32_t currentTimeUs,
             float raw[],
             bool imuIsLevel,
@@ -78,7 +78,7 @@ class Arming {
                     return;
                 }
 
-                if (!motorDevIsReady(currentTimeUs)) {
+                if (!escDevIsReady(currentTimeUs)) {
                     return;
                 }
 
@@ -89,7 +89,7 @@ class Arming {
         } else {
 
             if (m_is_armed) {
-                disarm(motorDevice);
+                disarm(escDevice);
                 m_is_armed = false;
             }
         }
@@ -99,10 +99,10 @@ class Arming {
         }
     }
 
-    void disarm(void * motorDevice)
+    void disarm(void * escDevice)
     {
         if (m_is_armed) {
-            motorDevStop(motorDevice);
+            escDevStop(escDevice);
         }
 
         m_is_armed = false;

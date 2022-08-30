@@ -417,7 +417,7 @@ class Receiver {
     }
 
     bool processData(
-            void * motorDevice,
+            void * escDevice,
             float raw[],
             uint32_t currentTimeUs,
             Arming * arming,
@@ -450,7 +450,7 @@ class Receiver {
             failsafe->startMonitoring();
         }
 
-        failsafe->update(raw, motorDevice, arming);
+        failsafe->update(raw, escDevice, arming);
 
         return throttleIsDown(raw);
     }
@@ -806,7 +806,7 @@ class Receiver {
             bool imuIsLevel,
             bool calibrating,
             sticks_t * sticks,
-            void * motorDevice,
+            void * escDevice,
             Arming * arming,
             Failsafe * failsafe,
             bool * pidItermResetReady,
@@ -834,7 +834,7 @@ class Receiver {
                 }
                 *pidItermResetReady = true;
                 *pidItermResetValue = processData(
-                        motorDevice,
+                        escDevice,
                         m_raw,
                         currentTimeUs,
                         arming, 
@@ -843,7 +843,7 @@ class Receiver {
                 break;
 
             case STATE_MODES:
-                arming->check(motorDevice, currentTimeUs, m_raw,
+                arming->check(escDevice, currentTimeUs, m_raw,
                         imuIsLevel,
                         calibrating);
                 m_state = STATE_UPDATE;

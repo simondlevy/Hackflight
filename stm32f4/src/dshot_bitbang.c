@@ -82,7 +82,7 @@ const timerHardware_t bbTimerHardware[] = {
     DEF_TIM(TIM1,  CH4, NONE,  TIM_USE_NONE, 0, 0),
 };
 
-static FAST_DATA_ZERO_INIT motorDevice_t bbDevice;
+static FAST_DATA_ZERO_INIT escDevice_t bbDevice;
 static FAST_DATA_ZERO_INIT uint32_t lastSendUs;
 
 
@@ -358,7 +358,7 @@ static bool bbMotorConfig(IO_t io, uint8_t motorIndex, g_motorPwmProtocolTypes_e
 
         if (!bbPort || !dmaAllocate(dmaGetIdentifier(bbPort->dmaResource),
                     bbPort->owner.owner, bbPort->owner.resourceIndex)) {
-            bbDevice.vTable.write = motorDevWriteNull;
+            bbDevice.vTable.write = escDevWriteNull;
             bbDevice.vTable.updateStart = motorUpdateStartNull;
             bbDevice.vTable.updateComplete = motorUpdateCompleteNull;
 
@@ -539,7 +539,7 @@ dshotBitbangStatus_e dshotBitbangGetStatus()
     return bbStatus;
 }
 
-motorDevice_t *dshotBitbangDevInit(uint8_t count)
+escDevice_t *dshotBitbangDevInit(uint8_t count)
 {
     bbDevice.vTable = bbVTable;
     motorCount = count;
@@ -556,7 +556,7 @@ motorDevice_t *dshotBitbangDevInit(uint8_t count)
 
         if (!IOIsFreeOrPreinit(io)) {
             /* not enough motors initialised for the mixer or a break in the motors */
-            bbDevice.vTable.write = motorDevWriteNull;
+            bbDevice.vTable.write = escDevWriteNull;
             bbDevice.vTable.updateStart = motorUpdateStartNull;
             bbDevice.vTable.updateComplete = motorUpdateCompleteNull;
             bbStatus = DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT;

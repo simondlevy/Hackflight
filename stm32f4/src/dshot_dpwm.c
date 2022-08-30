@@ -75,4 +75,4 @@ uint32_t getDshotHz(g_motorPwmProtocolTypes_e pwmProtocolType)
     }
 }
 
-FAST_DATA_ZERO_INIT motorDevice_t dshotPwmDevice;
+FAST_DATA_ZERO_INIT escDevice_t dshotPwmDevice;

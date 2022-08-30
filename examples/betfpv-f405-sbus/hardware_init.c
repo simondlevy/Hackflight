@@ -50,7 +50,7 @@ void * hardwareInit(uint32_t core_period)
     timerInit();
     serialUartPinConfigure();
     serialInit(-1);
-    void * motorDevice = motorDevInitDshot(4);
+    void * escDevice = escDevInitDshot(4);
     inverterInit();
     spiPinConfigure();
     spiPreInit();
@@ -61,11 +61,11 @@ void * hardwareInit(uint32_t core_period)
     flashInit();
     timerStart();
     spiInitBusDMA();
-    motorPostInit(motorDevice);
-    motorEnable(motorDevice);
+    motorPostInit(escDevice);
+    motorEnable(escDevice);
     systemInitUnusedPins();
 
-    return motorDevice;
+    return escDevice;
 }
 
 #if defined (__cplusplus)

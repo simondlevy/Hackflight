@@ -42,7 +42,7 @@ uint8_t loadDmaBufferProshot(uint32_t *dmaBuffer, int stride, uint16_t packet);
 
 uint32_t getDshotHz(g_motorPwmProtocolTypes_e pwmProtocolType);
 
-struct motorDevConfig_s;
+struct escDevConfig_s;
 
 /* Motor DMA related, moved from pwm_output.h */
 
@@ -102,4 +102,4 @@ bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t m
 bool pwmStartDshotMotorUpdate(void);
 void pwmCompleteDshotMotorUpdate(void);
 extern bool useBurstDshot;
-extern motorDevice_t dshotPwmDevice;
+extern escDevice_t dshotPwmDevice;

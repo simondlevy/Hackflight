@@ -166,22 +166,22 @@ void validateAndfixMotorOutputReordering(uint8_t *array, const unsigned size)
     }
 }
 
-float motorDevValueDisarmed(void)
+float escDevValueDisarmed(void)
 {
     return DSHOT_CMD_MOTOR_STOP;
 }
 
-float motorDevValueHigh(void) 
+float escDevValueHigh(void) 
 {
     return DSHOT_MAX_THROTTLE;
 }
 
-float motorDevValueLow(void)
+float escDevValueLow(void)
 {
     return DSHOT_MIN_THROTTLE + 0.045 * DSHOT_RANGE;
 }
 
-bool motorDevIsReady(uint32_t currentTimeUs)
+bool escDevIsReady(uint32_t currentTimeUs)
 {
     return currentTimeUs >= DSHOT_BEACON_GUARD_DELAY_US;
 }

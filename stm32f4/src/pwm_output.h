@@ -53,8 +53,8 @@ typedef struct {
 
 extern FAST_DATA_ZERO_INIT pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
 
-struct motorDevConfig_s;
-motorDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUnsyncedPwm);
+struct escDevConfig_s;
+escDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUnsyncedPwm);
 
 void pwmOutConfig(timerChannel_t *channel, const timerHardware_t *timerHardware, uint32_t hz, uint16_t period, uint16_t value, uint8_t inversion);
 

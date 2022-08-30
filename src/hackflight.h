@@ -106,31 +106,31 @@ class Hackflight {
 
                 auto motorOutput = motors.values[i];
 
-                motorOutput = motorDevValueLow() +
-                    (motorDevValueHigh() - motorDevValueLow()) * motorOutput;
+                motorOutput = escDevValueLow() +
+                    (escDevValueHigh() - escDevValueLow()) * motorOutput;
 
                 if (m_taskData.failsafe.isActive()) {
-                    if (motorDevIsProtocolDshot()) {
+                    if (escDevIsProtocolDshot()) {
                         // Prevent getting into special reserved range
-                        motorOutput = (motorOutput < motorDevValueLow()) ?
-                            motorDevValueDisarmed() :
+                        motorOutput = (motorOutput < escDevValueLow()) ?
+                            escDevValueDisarmed() :
                             motorOutput; 
                     }
                     motorOutput = constrain_f(
                             motorOutput,
-                            motorDevValueDisarmed(),
-                            motorDevValueHigh());
+                            escDevValueDisarmed(),
+                            escDevValueHigh());
                 } else {
                     motorOutput =
                         constrain_f(
                                 motorOutput,
-                                motorDevValueLow(),
-                                motorDevValueHigh());
+                                escDevValueLow(),
+                                escDevValueHigh());
                 }
                 mixmotors[i] = motorOutput;
             }
 
-            motorDevWrite(m_taskData.motorDevice,
+            escDevWrite(m_taskData.escDevice,
                     m_taskData.arming.isArmed() ?
                     mixmotors :
                     m_taskData.mspMotors);
@@ -239,7 +239,7 @@ class Hackflight {
                 Imu::align_fun imuAlignFun,
                 vector<PidController *> * pidControllers,
                 Mixer * mixer,
-                void * motorDevice,
+                void * escDevice,
                 Led * led)
         {
             m_mixer = mixer;
@@ -250,7 +250,7 @@ class Hackflight {
 
             m_taskData.receiver = receiver;
             m_taskData.imu = imu;
-            m_taskData.motorDevice = motorDevice;
+            m_taskData.escDevice = escDevice;
 
             // Initialize quaternion in upright position
             m_taskData.imuFusionPrev.quat.w = 1;

@@ -29,16 +29,16 @@
 extern "C" {
 #endif
 
-    float   motorDevConvertFromExternal(void * motorDevice, uint16_t externalValue);
-    void    motorDevInitBrushed(uint8_t * pins);
-    void  * motorDevInitDshot(uint8_t count);
-    bool    motorDevIsProtocolDshot(void);
-    bool    motorDevIsReady(uint32_t currentTime);
-    float   motorDevValueDisarmed(void);
-    float   motorDevValueHigh(void);
-    float   motorDevValueLow(void);
-    void    motorDevStop(void * motorDevice);
-    void    motorDevWrite(void * motorDevice, float *values);
+    float   escDevConvertFromExternal(void * escDevice, uint16_t externalValue);
+    void    escDevInitBrushed(uint8_t * pins);
+    void  * escDevInitDshot(uint8_t count);
+    bool    escDevIsProtocolDshot(void);
+    bool    escDevIsReady(uint32_t currentTime);
+    float   escDevValueDisarmed(void);
+    float   escDevValueHigh(void);
+    float   escDevValueLow(void);
+    void    escDevStop(void * escDevice);
+    void    escDevWrite(void * escDevice, float *values);
 
 #if defined(__cplusplus)
 }
