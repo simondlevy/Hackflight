@@ -43,3 +43,24 @@ extern "C" {
 #if defined(__cplusplus)
 }
 #endif
+
+#if defined(__cplusplus)
+
+class Esc {
+
+    protected:
+
+        virtual float  convertFromExternal(void * escDevice, uint16_t externalValue) = 0;
+        virtual void   initBrushed(uint8_t * pins) = 0;
+        virtual void * initDshot(uint8_t count) = 0;
+        virtual bool   isProtocolDshot(void) = 0;
+        virtual bool   isReady(uint32_t currentTime) = 0;
+        virtual float  valueDisarmed(void) = 0;
+        virtual float  valueHigh(void) = 0;
+        virtual float  valueLow(void) = 0;
+        virtual void   stop(void * ice) = 0;
+        virtual void   write(void * ice, float *values) = 0;
+
+};
+
+#endif
