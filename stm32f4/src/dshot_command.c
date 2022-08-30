@@ -146,40 +146,21 @@ static bool allMotorsAreIdle(uint8_t motorCount)
     return true;
 }
 
-static bool commandsAreEnabled(
-        void * escDevice,
-        dshotCommandType_e commandType)
+static bool commandsAreEnabled(void * escDevice)
 {
-    bool ret = false;
-
-    switch (commandType) {
-        case DSHOT_CMD_TYPE_BLOCKING:
-            ret = !escIsEnabled(escDevice);
-
-            break;
-        case DSHOT_CMD_TYPE_INLINE:
-            ret = escIsEnabled(escDevice) &&
-                escGetEnableTimeMs(escDevice) &&
-                millis() > escGetEnableTimeMs(escDevice) +
-                DSHOT_PROTOCOL_DETECTION_DELAY_MS;
-
-            break;
-        default:
-
-            break;
-    }
-
-    return ret;
+    return escIsEnabled(escDevice) &&
+        escGetEnableTimeMs(escDevice) &&
+        millis() > escGetEnableTimeMs(escDevice) +
+        DSHOT_PROTOCOL_DETECTION_DELAY_MS;
 }
 
 static void commandWrite(
         void * escDevice,
         uint8_t index,
         uint8_t motorCount,
-        uint8_t command,
-        dshotCommandType_e commandType)
+        uint8_t command)
 {
-    if (!commandsAreEnabled(escDevice, commandType) ||
+    if (!commandsAreEnabled(escDevice) ||
             (command > DSHOT_MAX_COMMAND) ||
             dshotCommandQueueFull()) { return;
     }
@@ -206,48 +187,27 @@ static void commandWrite(
             break;
     }
 
-    if (commandType == DSHOT_CMD_TYPE_BLOCKING) {
-        delayMicroseconds(DSHOT_INITIAL_DELAY_US - DSHOT_COMMAND_DELAY_US);
-        for (; repeats; repeats--) {
-            delayMicroseconds(DSHOT_COMMAND_DELAY_US);
-
-            uint32_t timeoutUs = micros() + 1000;
-            while (!escGetVTable(escDevice).updateStart() &&
-                    cmpTimeUs(timeoutUs, micros()) > 0);
-            for (uint8_t i = 0; i < motorCount; i++) {
-                if ((i == index) || (index == ALL_MOTORS)) {
-                    motorDmaOutput_t *const motor = getMotorDmaOutput(i);
-                    motor->protocolControl.requestTelemetry = true;
-                    escGetVTable(escDevice).writeInt(i, command);
-                }
-            }
-
-            escGetVTable(escDevice).updateComplete();
-        }
-        delayMicroseconds(delayAfterCommandUs);
-    } else if (commandType == DSHOT_CMD_TYPE_INLINE) {
-        dshotCommandControl_t *commandControl = addCommand();
-        if (commandControl) {
-            commandControl->repeats = repeats;
-            commandControl->delayAfterCommandUs = delayAfterCommandUs;
-            for (unsigned i = 0; i < motorCount; i++) {
-                if (index == i || index == ALL_MOTORS) {
-                    commandControl->command[i] = command;
-                } else {
-                    commandControl->command[i] = DSHOT_CMD_MOTOR_STOP;
-                }
-            }
-            if (allMotorsAreIdle(motorCount)) {
-                // we can skip the motors idle wait state
-                commandControl->state = DSHOT_COMMAND_STATE_STARTDELAY;
-                commandControl->nextCommandCycleDelay =
-                    dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
+    dshotCommandControl_t *commandControl = addCommand();
+    if (commandControl) {
+        commandControl->repeats = repeats;
+        commandControl->delayAfterCommandUs = delayAfterCommandUs;
+        for (unsigned i = 0; i < motorCount; i++) {
+            if (index == i || index == ALL_MOTORS) {
+                commandControl->command[i] = command;
             } else {
-                commandControl->state = DSHOT_COMMAND_STATE_IDLEWAIT;
-
-                // will be set after idle wait completes
-                commandControl->nextCommandCycleDelay = 0;  
+                commandControl->command[i] = DSHOT_CMD_MOTOR_STOP;
             }
+        }
+        if (allMotorsAreIdle(motorCount)) {
+            // we can skip the motors idle wait state
+            commandControl->state = DSHOT_COMMAND_STATE_STARTDELAY;
+            commandControl->nextCommandCycleDelay =
+                dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
+        } else {
+            commandControl->state = DSHOT_COMMAND_STATE_IDLEWAIT;
+
+            // will be set after idle wait completes
+            commandControl->nextCommandCycleDelay = 0;  
         }
     }
 }
@@ -326,6 +286,5 @@ bool dshotCommandOutputIsEnabled(uint8_t motorCount)
 
 void escDevStop(void * escDevice)
 {
-    commandWrite(escDevice, ALL_MOTORS, 4, DSHOT_CMD_SPIN_DIRECTION_NORMAL,
-            DSHOT_CMD_TYPE_INLINE);
+    commandWrite(escDevice, ALL_MOTORS, 4, DSHOT_CMD_SPIN_DIRECTION_NORMAL);
 }

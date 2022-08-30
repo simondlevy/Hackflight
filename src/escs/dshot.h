@@ -72,16 +72,6 @@ class DshotEsc : public Esc {
         } pwmOutputPort_t;
 
         typedef enum {
-
-            // dshot commands sent inline with motor signal (motors must be enabled)
-            CMD_TYPE_INLINE,    
-
-            // dshot commands sent in blocking method (motors must be disabled)
-            CMD_TYPE_BLOCKING       
-
-        } commandType_e;
-
-        typedef enum {
             CMD_MOTOR_STOP,
             CMD_BEACON1,
             CMD_BEACON2,
@@ -114,14 +104,10 @@ class DshotEsc : public Esc {
 
         pwmOutputPort_t m_motors[MAX_SUPPORTED_MOTORS];
 
-        static void commandWrite(
-                uint8_t index,
-                commands_e command,
-                commandType_e commandType)
+        static void commandWrite( uint8_t index, commands_e command)
         {
             (void)index;
             (void)command;
-            (void)commandType;
 
             /* XXX
                if (!commandsAreEnabled(escDevice, commandType) ||
@@ -250,10 +236,7 @@ class DshotEsc : public Esc {
 
         virtual void stop(void) override 
         {
-            commandWrite(
-                    ALL_MOTORS,
-                    CMD_SPIN_DIRECTION_NORMAL,
-                    CMD_TYPE_INLINE);
+            commandWrite( ALL_MOTORS, CMD_SPIN_DIRECTION_NORMAL);
         }
 
         virtual void write(float *values) override 
