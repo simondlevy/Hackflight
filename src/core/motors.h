@@ -26,26 +26,6 @@
 #define MAX_SUPPORTED_MOTORS 8
 
 #if defined(__cplusplus)
-extern "C" {
-#endif
-
-    float   motorDevConvertFromExternal(void * motorDevice, uint16_t externalValue);
-    void    motorDevInitBrushed(uint8_t * pins);
-    void  * motorDevInitDshot(uint8_t count);
-    bool    motorDevIsProtocolDshot(void);
-    bool    motorDevIsReady(uint32_t currentTime);
-    float   motorDevValueDisarmed(void);
-    float   motorDevValueHigh(void);
-    float   motorDevValueLow(void);
-    void    motorDevStop(void * motorDevice);
-    void    motorDevWrite(void * motorDevice, float *values);
-
-#if defined(__cplusplus)
-}
-#endif
-
-
-#if defined(__cplusplus)
 
 class Motors {
 
