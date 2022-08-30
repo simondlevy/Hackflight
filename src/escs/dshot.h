@@ -236,7 +236,7 @@ class DshotEsc : public Esc {
 
         virtual void stop(void) override 
         {
-            commandWrite( ALL_MOTORS, CMD_SPIN_DIRECTION_NORMAL);
+            commandWrite(ALL_MOTORS, CMD_SPIN_DIRECTION_NORMAL);
         }
 
         virtual void write(float *values) override 
