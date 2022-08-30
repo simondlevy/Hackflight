@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "escdev.h"
 #include "timer.h"
 
 typedef enum {
@@ -35,7 +36,7 @@ struct escDevConfig_s;
 
 struct escDevice_s;
 
-struct escDevice_s *dshotBitbangDevInit(uint8_t motorCount);
+escDevice_t *dshotBitbangDevInit(uint8_t motorCount);
 
 dshotBitbangStatus_e dshotBitbangGetStatus();
 

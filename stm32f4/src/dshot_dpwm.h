@@ -40,7 +40,7 @@ extern FAST_DATA_ZERO_INIT loadDmaBufferFn *loadDmaBuffer;
 uint8_t loadDmaBufferDshot(uint32_t *dmaBuffer, int stride, uint16_t packet);
 uint8_t loadDmaBufferProshot(uint32_t *dmaBuffer, int stride, uint16_t packet);
 
-uint32_t getDshotHz(g_motorPwmProtocolTypes_e pwmProtocolType);
+uint32_t getDshotHz(escProtocol_t pwmProtocolType);
 
 struct escDevConfig_s;
 
@@ -98,7 +98,7 @@ typedef struct motorDmaOutput_s {
 motorDmaOutput_t *getMotorDmaOutput(uint8_t index);
 
 void pwmWriteDshotInt(uint8_t index, uint16_t value);
-bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t motorIndex, uint8_t reorderedMotorIndex, g_motorPwmProtocolTypes_e pwmProtocolType, uint8_t output);
+bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t motorIndex, uint8_t reorderedMotorIndex, escProtocol_t pwmProtocolType, uint8_t output);
 bool pwmStartDshotMotorUpdate(void);
 void pwmCompleteDshotMotorUpdate(void);
 extern bool useBurstDshot;

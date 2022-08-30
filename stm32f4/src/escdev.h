@@ -19,27 +19,26 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <esc.h>
 #include <time.h>
 
-static const uint8_t  MOTOR_IO_TAGS[8] = {32, 33, 19, 18, 56, 24, 0, 0};
-
-static const uint8_t MOTOR_PWM_PROTOCOL = 7;
+static const uint8_t ESC_IO_TAGS[8] = {32, 33, 19, 18, 56, 24, 0, 0};
 
 typedef enum {
-    PWM_TYPE_STANDARD = 0,
-    PWM_TYPE_ONESHOT125,
-    PWM_TYPE_ONESHOT42,
-    PWM_TYPE_MULTISHOT,
-    PWM_TYPE_BRUSHED,
-    PWM_TYPE_DSHOT150,
-    PWM_TYPE_DSHOT300,
-    PWM_TYPE_DSHOT600,
-    PWM_TYPE_PROSHOT1000,
-    PWM_TYPE_DISABLED,
-    PWM_TYPE_MAX
-} g_motorPwmProtocolTypes_e;
+    ESC_STANDARD = 0,
+    ESC_ONESHOT125,
+    ESC_ONESHOT42,
+    ESC_MULTISHOT,
+    ESC_BRUSHED,
+    ESC_DSHOT150,
+    ESC_DSHOT300,
+    ESC_DSHOT600,
+    ESC_PROSHOT1000,
+    ESC_DISABLED,
+    ESC_MAX
+} escProtocol_t;
 
+static const escProtocol_t ESC_PROTOCOL = ESC_DSHOT600;
 
-typedef struct motorVTable_s {
-    // Common
+typedef struct {
+
     void (*postInit)(void);
     float (*convertExternalToMotor)(uint16_t externalValue);
     uint16_t (*convertMotorToExternal)(float motorValue);
@@ -52,16 +51,14 @@ typedef struct motorVTable_s {
     void (*updateComplete)(void);
     void (*shutdown)(void);
 
-    // Digital commands
+} escVTable_t;
 
-} motorVTable_t;
-
-typedef struct escDevice_s {
-    motorVTable_t vTable;
-    uint8_t       count;
-    bool          initialized;
-    bool          enabled;
-    uint32_t      motorEnableTimeMs;
+typedef struct {
+    escVTable_t vTable;
+    uint8_t     count;
+    bool        initialized;
+    bool        enabled;
+    uint32_t    enableTimeMs;
 } escDevice_t;
 
 void     motorPostInitNull();
@@ -70,15 +67,11 @@ bool     motorUpdateStartNull(void);
 void     motorUpdateCompleteNull(void);
 void     motorPostInit(void * escDevice);
 
-struct escDevConfig_s; 
 
-motorVTable_t motorGetVTable(void * escDevice);
+escVTable_t   motorGetVTable(void * escDevice);
 bool          motorCheckProtocolEnabled(bool *protocolIsDshot);
 void          motorEnable(void * escDevice);
 bool          motorIsEnabled(void * escDevice);
 uint32_t      motorGetEnableTimeMs(void * escDevice);
-
-struct escDevConfig_s;
-typedef struct escDevConfig_s escDevConfig_t;
 
 float motorGetDigitalIdOffset(void);

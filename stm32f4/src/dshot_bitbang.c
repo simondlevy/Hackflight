@@ -223,15 +223,15 @@ const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer)
 
 // Return frequency of smallest change [state/sec]
 
-static uint32_t getDshotBaseFrequency(g_motorPwmProtocolTypes_e pwmProtocolType)
+static uint32_t getDshotBaseFrequency(escProtocol_t pwmProtocolType)
 {
     switch (pwmProtocolType) {
-        case(PWM_TYPE_DSHOT600):
+        case(ESC_DSHOT600):
             return MOTOR_DSHOT600_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
-        case(PWM_TYPE_DSHOT300):
+        case(ESC_DSHOT300):
             return MOTOR_DSHOT300_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
         default:
-        case(PWM_TYPE_DSHOT150):
+        case(ESC_DSHOT150):
             return MOTOR_DSHOT150_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
     }
 }
@@ -316,7 +316,7 @@ static void bbFindPacerTimer(void)
     }
 }
 
-static void bbTimebaseSetup(bbPort_t *bbPort, g_motorPwmProtocolTypes_e dshotProtocolType)
+static void bbTimebaseSetup(bbPort_t *bbPort, escProtocol_t dshotProtocolType)
 {
     uint32_t timerclock = timerClock(bbPort->timhw->tim);
 
@@ -334,7 +334,7 @@ static void bbTimebaseSetup(bbPort_t *bbPort, g_motorPwmProtocolTypes_e dshotPro
 // it does not use the timer channel associated with the pin.
 //
 
-static bool bbMotorConfig(IO_t io, uint8_t motorIndex, g_motorPwmProtocolTypes_e pwmProtocolType, uint8_t output)
+static bool bbMotorConfig(IO_t io, uint8_t motorIndex, escProtocol_t pwmProtocolType, uint8_t output)
 {
     int pinIndex = IO_GPIOPinIdx(io);
     int portIndex = IO_GPIOPortIdx(io);
@@ -507,7 +507,7 @@ static void bbPostInit()
             motorCount; motorIndex++) {
 
         if (!bbMotorConfig(bbMotors[motorIndex].io, motorIndex,
-                    MOTOR_PWM_PROTOCOL, bbMotors[motorIndex].output)) { return
+                    ESC_PROTOCOL, bbMotors[motorIndex].output)) { return
             NULL;
         }
 
@@ -520,7 +520,7 @@ static void bbPostInit()
     }
 }
 
-static motorVTable_t bbVTable = {
+static escVTable_t bbVTable = {
     .postInit = bbPostInit,
     .enable = bbEnableMotors,
     .disable = bbDisableMotors,
@@ -548,8 +548,8 @@ escDevice_t *dshotBitbangDevInit(uint8_t count)
     memset(bbOutputBuffer, 0, sizeof(bbOutputBuffer));
 
     for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex < motorCount; motorIndex++) {
-        const timerHardware_t *timerHardware = timerGetConfiguredByTag(MOTOR_IO_TAGS[motorIndex]);
-        const IO_t io = IOGetByTag(MOTOR_IO_TAGS[motorIndex]);
+        const timerHardware_t *timerHardware = timerGetConfiguredByTag(ESC_IO_TAGS[motorIndex]);
+        const IO_t io = IOGetByTag(ESC_IO_TAGS[motorIndex]);
 
         uint8_t output = timerHardware->output;
         bbPuPdMode = (output & TIMER_OUTPUT_INVERTED) ? BB_GPIO_PULLDOWN : BB_GPIO_PULLUP;

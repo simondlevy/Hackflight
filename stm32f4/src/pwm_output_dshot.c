@@ -152,7 +152,7 @@ void pwmCompleteDshotMotorUpdate(void)
     }
 }
 
-bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t motorIndex, uint8_t reorderedMotorIndex, g_motorPwmProtocolTypes_e pwmProtocolType, uint8_t output)
+bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t motorIndex, uint8_t reorderedMotorIndex, escProtocol_t pwmProtocolType, uint8_t output)
 {
 #define OCINIT motor->ocInitStruct
 #define DMAINIT motor->dmaInitStruct
@@ -224,7 +224,7 @@ bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t m
         TIM_Cmd(timer, DISABLE);
 
         TIM_TimeBaseStructure.TIM_Prescaler = (uint16_t)(lrintf((float) timerClock(timer) / getDshotHz(pwmProtocolType) + 0.01f) - 1);
-        TIM_TimeBaseStructure.TIM_Period = (pwmProtocolType == PWM_TYPE_PROSHOT1000 ? (MOTOR_NIBBLE_LENGTH_PROSHOT) : MOTOR_BITLENGTH) - 1;
+        TIM_TimeBaseStructure.TIM_Period = (pwmProtocolType == ESC_PROSHOT1000 ? (MOTOR_NIBBLE_LENGTH_PROSHOT) : MOTOR_BITLENGTH) - 1;
         TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
         TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
         TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
@@ -277,7 +277,7 @@ bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t m
         DMAINIT.DMA_MemoryBurst = DMA_MemoryBurst_Single;
         DMAINIT.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
         DMAINIT.DMA_PeripheralBaseAddr = (uint32_t)&timerHardware->tim->DMAR;
-        DMAINIT.DMA_BufferSize = (pwmProtocolType == PWM_TYPE_PROSHOT1000) ? PROSHOT_DMA_BUFFER_SIZE : DSHOT_DMA_BUFFER_SIZE; // XXX
+        DMAINIT.DMA_BufferSize = (pwmProtocolType == ESC_PROSHOT1000) ? PROSHOT_DMA_BUFFER_SIZE : DSHOT_DMA_BUFFER_SIZE; // XXX
         DMAINIT.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
         DMAINIT.DMA_MemoryInc = DMA_MemoryInc_Enable;
         DMAINIT.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
@@ -309,7 +309,7 @@ bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t m
 
     motor->dshotTelemetryDeadtimeUs = DSHOT_TELEMETRY_DEADTIME_US + 1000000 *
         (16 * MOTOR_BITLENGTH) / getDshotHz(pwmProtocolType);
-    motor->timer->outputPeriod = (pwmProtocolType == PWM_TYPE_PROSHOT1000 ? (MOTOR_NIBBLE_LENGTH_PROSHOT) : MOTOR_BITLENGTH) - 1;
+    motor->timer->outputPeriod = (pwmProtocolType == ESC_PROSHOT1000 ? (MOTOR_NIBBLE_LENGTH_PROSHOT) : MOTOR_BITLENGTH) - 1;
     pwmDshotSetDirectionOutput(motor);
 
     if (useBurstDshot) {

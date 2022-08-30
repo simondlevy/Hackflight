@@ -29,7 +29,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dshot_command.h"
 #include "escdev.h"
 #include "nvic.h"
-#include "pwm_output.h" // for PWM_TYPE_* and others
+#include "pwm_output.h" // for ESC_* and others
 #include "timer.h"
 #include "dshot_dpwm.h" // for motorDmaOutput_t, should be gone
 

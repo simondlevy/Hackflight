@@ -60,17 +60,17 @@ FAST_DATA_ZERO_INIT loadDmaBufferFn *loadDmaBuffer;
     return PROSHOT_DMA_BUFFER_SIZE;
 }
 
-uint32_t getDshotHz(g_motorPwmProtocolTypes_e pwmProtocolType)
+uint32_t getDshotHz(escProtocol_t pwmProtocolType)
 {
     switch (pwmProtocolType) {
-    case(PWM_TYPE_PROSHOT1000):
+    case(ESC_PROSHOT1000):
         return MOTOR_PROSHOT1000_HZ;
-    case(PWM_TYPE_DSHOT600):
+    case(ESC_DSHOT600):
         return MOTOR_DSHOT600_HZ;
-    case(PWM_TYPE_DSHOT300):
+    case(ESC_DSHOT300):
         return MOTOR_DSHOT300_HZ;
     default:
-    case(PWM_TYPE_DSHOT150):
+    case(ESC_DSHOT150):
         return MOTOR_DSHOT150_HZ;
     }
 }

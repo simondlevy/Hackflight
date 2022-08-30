@@ -101,7 +101,7 @@ void pwmDisableMotors(void)
     pwmShutdownPulsesForAllMotors();
 }
 
-static motorVTable_t motorPwmVTable;
+static escVTable_t motorPwmVTable;
 bool pwmEnableMotors(void)
 {
     /* check motors can be enabled */
@@ -135,7 +135,7 @@ static uint16_t pwmConvertToExternal(float motorValue)
     return (uint16_t)motorValue;
 }
 
-static motorVTable_t motorPwmVTable = {
+static escVTable_t motorPwmVTable = {
     .postInit = motorPostInitNull,
     .enable = pwmEnableMotors,
     .disable = pwmDisableMotors,
@@ -151,26 +151,26 @@ escDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUns
 
     float sMin = 0;
     float sLen = 0;
-    switch (MOTOR_PWM_PROTOCOL) {
+    switch (ESC_PROTOCOL) {
     default:
-    case PWM_TYPE_ONESHOT125:
+    case ESC_ONESHOT125:
         sMin = 125e-6f;
         sLen = 125e-6f;
         break;
-    case PWM_TYPE_ONESHOT42:
+    case ESC_ONESHOT42:
         sMin = 42e-6f;
         sLen = 42e-6f;
         break;
-    case PWM_TYPE_MULTISHOT:
+    case ESC_MULTISHOT:
         sMin = 5e-6f;
         sLen = 20e-6f;
         break;
-    case PWM_TYPE_BRUSHED:
+    case ESC_BRUSHED:
         sMin = 0;
         useUnsyncedPwm = true;
         idlePulse = 0;
         break;
-    case PWM_TYPE_STANDARD:
+    case ESC_STANDARD:
         sMin = 1e-3f;
         sLen = 1e-3f;
         useUnsyncedPwm = true;
@@ -183,7 +183,7 @@ escDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUns
     motorPwmDevice.vTable.updateComplete = useUnsyncedPwm ? motorUpdateCompleteNull : pwmCompleteOneshotMotorUpdate;
 
     for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex < motorCount; motorIndex++) {
-        const ioTag_t tag = MOTOR_IO_TAGS[motorIndex];
+        const ioTag_t tag = ESC_IO_TAGS[motorIndex];
         const timerHardware_t *timerHardware = timerAllocate(tag, OWNER_MOTOR, RESOURCE_INDEX(motorIndex));
 
         if (timerHardware == NULL) {
@@ -214,7 +214,7 @@ escDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUns
             TODO: this can be moved back to periodMin and periodLen
             once mixer outputs a 0..1 float value.
         */
-        motors[motorIndex].pulseScale = ((MOTOR_PWM_PROTOCOL == PWM_TYPE_BRUSHED) ? period : (sLen * hz)) / 1000.0f;
+        motors[motorIndex].pulseScale = ((ESC_PROTOCOL == ESC_BRUSHED) ? period : (sLen * hz)) / 1000.0f;
         motors[motorIndex].pulseOffset = (sMin * hz) - (motors[motorIndex].pulseScale * 1000);
 
         pwmOutConfig(&motors[motorIndex].channel, timerHardware, hz, period, idlePulse, false);

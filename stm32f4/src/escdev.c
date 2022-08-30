@@ -24,7 +24,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "platform.h"
 #include "dshot.h" // for DSHOT_ constants in mixerInitEscEndpoints
-#include "pwm_output.h" // for PWM_TYPE_* and others
+#include "pwm_output.h" // for ESC_* and others
 #include "dshot_bitbang.h"
 #include "dshot_dpwm.h"
 #include "escdev.h"
@@ -51,20 +51,20 @@ bool motorCheckProtocolEnabled(bool *isProtocolDshot)
     bool enabled = false;
     bool isDshot = false;
 
-    switch (MOTOR_PWM_PROTOCOL) {
-    case PWM_TYPE_STANDARD:
-    case PWM_TYPE_ONESHOT125:
-    case PWM_TYPE_ONESHOT42:
-    case PWM_TYPE_MULTISHOT:
-    case PWM_TYPE_BRUSHED:
+    switch (ESC_PROTOCOL) {
+    case ESC_STANDARD:
+    case ESC_ONESHOT125:
+    case ESC_ONESHOT42:
+    case ESC_MULTISHOT:
+    case ESC_BRUSHED:
         enabled = true;
 
         break;
 
-    case PWM_TYPE_DSHOT150:
-    case PWM_TYPE_DSHOT300:
-    case PWM_TYPE_DSHOT600:
-    case PWM_TYPE_PROSHOT1000:
+    case ESC_DSHOT150:
+    case ESC_DSHOT300:
+    case ESC_DSHOT600:
+    case ESC_PROSHOT1000:
         enabled = true;
         isDshot = true;
 
@@ -94,7 +94,7 @@ void motorEnable(void * escDevice_void)
 
     if (escDevice->initialized && escDevice->vTable.enable()) {
         escDevice->enabled = true;
-        escDevice->motorEnableTimeMs = millis();
+        escDevice->enableTimeMs = millis();
     }
 }
 
@@ -102,10 +102,10 @@ uint32_t motorGetEnableTimeMs(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
-    return escDevice->motorEnableTimeMs;
+    return escDevice->enableTimeMs;
 }
 
-motorVTable_t motorGetVTable(void * escDevice_void)
+escVTable_t motorGetVTable(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 
@@ -124,7 +124,7 @@ void * escDevInitDshot(uint8_t motorCount) {
 
     escDevice->count = motorCount;
     escDevice->initialized = true;
-    escDevice->motorEnableTimeMs = 0;
+    escDevice->enableTimeMs = 0;
     escDevice->enabled = false;
 
     return (void *)escDevice;
