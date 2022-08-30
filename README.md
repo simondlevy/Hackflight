@@ -60,8 +60,4 @@ channel values,  we also provide a very simple &ldquo;Ground Control Station&rdq
 that allows you to connect to the board and see what's going on. Windows users
 can run this program directly: just clone the [HackflightGCS](https://github.com/simondlevy/HackflightGCS)
 repository and double-click on <b>hackflight.exe</b>.  Others can run the
-<b>hackflight.py</b> Python script in the <b>extras/gcs/python</b> folder.  To
-run the Python script you'll need to install
-[MSPPG](https://github.com/simondlevy/RoboFirmwareToolkit/tree/main/extras/parser), a
-parser generator for the Multiwii Serial Protocol (MSP) messages used by the
-firmware. Follow the directions in that folder to install MSPPG for Python.
+<b>gcs.py</b> Python script in the <b>gcs</b> folder.
