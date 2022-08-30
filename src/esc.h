@@ -52,7 +52,7 @@ class Esc {
     public:
 
         virtual void  begin(void) = 0;
-        virtual float convertFromExternal(void * device, uint16_t value) = 0;
+        virtual float convertFromExternal(uint16_t value) = 0;
         virtual bool  isProtocolDshot(void) = 0;
         virtual bool  isReady(uint32_t currentTime) = 0;
         virtual float valueDisarmed(void) = 0;

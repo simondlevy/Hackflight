@@ -18,7 +18,10 @@
 
 #pragma once
 
+#include <string.h>
+
 #include "io_types.h"
+#include "timer.h"
 #include "esc.h"
 
 class DshotEsc : public Esc {
@@ -53,8 +56,8 @@ class DshotEsc : public Esc {
         } escVTable_t;
 
         typedef struct {
-            //volatile timCCR_t *ccr;
-            //TIM_TypeDef       *tim;
+            volatile timCCR_t *ccr;
+            TIM_TypeDef       *tim;
         } timerChannel_t;
 
         typedef struct {
@@ -66,13 +69,6 @@ class DshotEsc : public Esc {
             //IO_t io;
         } pwmOutputPort_t;
 
-        uint8_t     m_count;
-        bool        m_enabled;
-        uint32_t    m_enableTimeMs;
-        bool        m_initialized;
-        pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
-        escVTable_t m_vTable;
-
         typedef enum {
 
             // dshot commands sent inline with motor signal (motors must be enabled)
@@ -81,7 +77,7 @@ class DshotEsc : public Esc {
             // dshot commands sent in blocking method (motors must be disabled)
             CMD_TYPE_BLOCKING       
 
-        } dshotCommandType_e;
+        } commandType_e;
 
         typedef enum {
             CMD_MOTOR_STOP,
@@ -109,6 +105,13 @@ class DshotEsc : public Esc {
             CMD_SILENT_MODE_ON_OFF = 31, // KISS silent Mode on/Off
             CMD_MAX = 47
         } commands_e;
+
+        uint8_t     m_count;
+        bool        m_enabled;
+        uint32_t    m_enableTimeMs;
+        bool        m_initialized;
+        pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
+        escVTable_t m_vTable;
 
         static void commandWrite(
                 uint8_t index,
@@ -197,7 +200,7 @@ class DshotEsc : public Esc {
 
     public:
 
-        DshotEsc(uint8_t count) override 
+        DshotEsc(uint8_t count)
         {
             m_count = count;
         }
@@ -220,7 +223,7 @@ class DshotEsc : public Esc {
 
         virtual float  convertFromExternal(uint16_t value) override 
         {
-            return m_vTable.convertFromExternal(externalValue);
+            return m_vTable.convertFromExternal(value);
         }
 
         virtual bool isProtocolDshot(void) override 
@@ -228,7 +231,7 @@ class DshotEsc : public Esc {
             return true;
         }
 
-        virtual bool isReady(uint32_t currentTime) override 
+        virtual bool isReady(uint32_t currentTimeUs) override 
         {
             return currentTimeUs >= BEACON_GUARD_DELAY_US;
         }
@@ -258,16 +261,14 @@ class DshotEsc : public Esc {
 
         virtual void write(float *values) override 
         {
-            if (m_escDevice.enabled) {
-                if (!m_escDevice.vTable.updateStart()) {
+            if (m_enabled) {
+                if (!m_vTable.updateStart()) {
                     return;
                 }
-                for (auto i = 0; i < m_escDevice.count; i++) {
-                    m_escDevice.vTable.write(i, values[i]);
+                for (auto i = 0; i < m_count; i++) {
+                    m_vTable.write(i, values[i]);
                 }
-                m_escDevice.vTable.updateComplete();
+                m_vTable.updateComplete();
             }
         }            
 };
-
-#endif
