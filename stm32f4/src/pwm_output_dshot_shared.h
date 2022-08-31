@@ -14,26 +14,6 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-extern FAST_DATA_ZERO_INIT uint8_t dmaMotorTimerCount;
-extern motorDmaTimer_t dmaMotorTimers[MAX_DMA_TIMERS];
 extern motorDmaOutput_t dmaMotors[MAX_SUPPORTED_MOTORS];
 
-extern uint32_t readDoneCount;
-
-FAST_DATA_ZERO_INIT extern uint32_t inputStampUs;
-
-typedef struct dshotDMAHandlerCycleCounters_s {
-    uint32_t irqAt;
-    uint32_t changeDirectionCompletedAt;
-} dshotDMAHandlerCycleCounters_t;
-
-FAST_DATA_ZERO_INIT extern dshotDMAHandlerCycleCounters_t dshotDMAHandlerCycleCounters;
-
-
-uint8_t getTimerIndex(TIM_TypeDef *timer);
 motorDmaOutput_t *getMotorDmaOutput(uint8_t index);
-void dshotEnableChannels(uint8_t motorCount);
-
-void pwmDshotSetDirectionOutput(
-    motorDmaOutput_t * const motor
-);

@@ -39,13 +39,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "pwm_output_dshot_shared.h"
 
-FAST_DATA_ZERO_INIT uint8_t dmaMotorTimerCount = 0;
-motorDmaTimer_t dmaMotorTimers[MAX_DMA_TIMERS];
 motorDmaOutput_t dmaMotors[MAX_SUPPORTED_MOTORS];
-
-FAST_DATA_ZERO_INIT uint32_t inputStampUs;
-
-FAST_DATA_ZERO_INIT dshotDMAHandlerCycleCounters_t dshotDMAHandlerCycleCounters;
 
 motorDmaOutput_t *getMotorDmaOutput(uint8_t index)
 {
