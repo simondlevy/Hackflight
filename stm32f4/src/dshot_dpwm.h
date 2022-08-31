@@ -39,34 +39,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define DSHOT_TELEMETRY_DEADTIME_US   (30 + 5) // 30 to switch lines and 5 to switch lines back
 
 
-typedef uint8_t loadDmaBufferFn(uint32_t *dmaBuffer, int stride, uint16_t packet);  // function pointer used to encode a digital motor value into the DMA buffer representation
-extern FAST_DATA_ZERO_INIT loadDmaBufferFn *loadDmaBuffer;
-uint8_t loadDmaBufferDshot(uint32_t *dmaBuffer, int stride, uint16_t packet);
-uint8_t loadDmaBufferProshot(uint32_t *dmaBuffer, int stride, uint16_t packet);
-
-uint32_t getDshotHz(escProtocol_t pwmProtocolType);
-
-struct escDevConfig_s;
-
-/* Motor DMA related, moved from pwm_output.h */
-
-#define MAX_DMA_TIMERS        8
-
-#define DSHOT_DMA_BUFFER_SIZE   18 /* resolution + frame reset (2us) */
-#define PROSHOT_DMA_BUFFER_SIZE 6  /* resolution + frame reset (2us) */
-
-#define GCR_TELEMETRY_INPUT_LEN MAX_GCR_EDGES
-
-#define DSHOT_DMA_BUFFER_ATTRIBUTE // None
-
 #define DSHOT_DMA_BUFFER_UNIT uint32_t
-
-#define DSHOT_DMA_BUFFER_ALLOC_SIZE GCR_TELEMETRY_INPUT_LEN
-
-extern DSHOT_DMA_BUFFER_UNIT dshotDmaBuffer[MAX_SUPPORTED_MOTORS][DSHOT_DMA_BUFFER_ALLOC_SIZE];
-extern DSHOT_DMA_BUFFER_UNIT dshotDmaInputBuffer[MAX_SUPPORTED_MOTORS][DSHOT_DMA_BUFFER_ALLOC_SIZE];
-
-extern DSHOT_DMA_BUFFER_UNIT dshotBurstDmaBuffer[MAX_DMA_TIMERS][DSHOT_DMA_BUFFER_SIZE * 4];
 
 typedef struct {
     TIM_TypeDef *timer;
