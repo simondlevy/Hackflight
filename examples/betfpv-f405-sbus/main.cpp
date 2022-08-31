@@ -37,8 +37,6 @@ int main(void)
 {
     hardwareInit();
 
-    auto escDevice = escInit(Clock::PERIOD());
-
     static AnglePidController anglePid(
         1.441305,     // Rate Kp
         19.55048,     // Rate Ki
