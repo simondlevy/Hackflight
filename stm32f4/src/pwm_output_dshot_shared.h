@@ -14,6 +14,3 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-extern motorDmaOutput_t dmaMotors[MAX_SUPPORTED_MOTORS];
-
-motorDmaOutput_t *getMotorDmaOutput(uint8_t index);

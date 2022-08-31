@@ -19,6 +19,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dshot.h"
 #include "escdev.h"
 
+#include "timer.h"
+#include "io.h"
+#include "dma.h"
+
 #define MOTOR_DSHOT600_HZ     MHZ_TO_HZ(12)
 #define MOTOR_DSHOT300_HZ     MHZ_TO_HZ(6)
 #define MOTOR_DSHOT150_HZ     MHZ_TO_HZ(3)

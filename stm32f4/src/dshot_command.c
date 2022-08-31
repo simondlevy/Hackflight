@@ -225,3 +225,10 @@ bool dshotCommandOutputIsEnabled(uint8_t motorCount)
 
     return true;
 }
+
+motorDmaOutput_t dmaMotors[MAX_SUPPORTED_MOTORS];
+
+motorDmaOutput_t *getMotorDmaOutput(uint8_t index)
+{
+    return &dmaMotors[index];
+}

@@ -134,7 +134,6 @@ STM32_SRC = \
             flash.c \
             io.c \
             pinio.c \
-            pwm_output_dshot_shared.c \
             rcc.c \
             serial.c \
             serial_uart.c \

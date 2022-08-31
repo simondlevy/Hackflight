@@ -39,9 +39,3 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "pwm_output_dshot_shared.h"
 
-motorDmaOutput_t dmaMotors[MAX_SUPPORTED_MOTORS];
-
-motorDmaOutput_t *getMotorDmaOutput(uint8_t index)
-{
-    return &dmaMotors[index];
-}

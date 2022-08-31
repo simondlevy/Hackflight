@@ -18,6 +18,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdbool.h>
 
+#include "dshot_dpwm.h"
+
 #define DSHOT_MAX_COMMAND 47
 
 typedef enum {
@@ -53,3 +55,7 @@ bool    dshotCommandIsProcessing(void);
 uint8_t dshotCommandGetCurrent(uint8_t index);
 bool    dshotCommandOutputIsEnabled(uint8_t motorCount);
 void    dshotSetPidLoopTime(uint32_t);
+
+extern motorDmaOutput_t dmaMotors[MAX_SUPPORTED_MOTORS];
+
+motorDmaOutput_t *getMotorDmaOutput(uint8_t index);
