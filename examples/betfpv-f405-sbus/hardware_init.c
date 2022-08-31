@@ -61,10 +61,10 @@ void * escInit(uint32_t core_period)
     usbCableDetectInit();
     flashInit();
     systemInitUnusedPins();
+    pinioInit();
 
     void * escDevice = escDevInitDshot(4);
     dshotSetPidLoopTime(core_period);
-    pinioInit();
     timerStart();
     spiInitBusDMA();
     escPostInit(escDevice);
