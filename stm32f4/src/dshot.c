@@ -33,32 +33,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "dshot_dpwm.h" // for motorDmaOutput_t, should be gone
 
-/*
-static float scaleRangef(float x, float srcFrom, float srcTo, float destFrom, float destTo)
-{
-    float a = (destTo - destFrom) * (x - srcFrom);
-    float b = srcTo - srcFrom;
-    return (a / b) + destFrom;
-}*/
-
-
-void dshotInitEndpoints(float outputLimit, float *outputLow, float *outputHigh, float *disarm) {
-    float outputLimitOffset = DSHOT_RANGE * (1 - outputLimit);
-    *disarm = DSHOT_CMD_MOTOR_STOP;
-    *outputLow = DSHOT_MIN_THROTTLE + escGetDigitalIdOffset() * DSHOT_RANGE;
-    *outputHigh = DSHOT_MAX_THROTTLE - outputLimitOffset;
-}
-
-/*
-uint16_t dshotConvertToExternal(float motorValue)
-{
-    uint16_t externalValue;
-
-    externalValue = (motorValue < DSHOT_MIN_THROTTLE) ? PWM_MIN : scaleRangef(motorValue, DSHOT_MIN_THROTTLE, DSHOT_MAX_THROTTLE, PWM_MIN + 1, PWM_MAX);
-
-    return externalValue;
-}*/
-
 uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
 {
     uint16_t packet;
