@@ -62,11 +62,11 @@ void * escInit(uint32_t core_period)
     flashInit();
     systemInitUnusedPins();
     pinioInit();
+    timerStart();
+    spiInitBusDMA();
 
     void * escDevice = escDevInitDshot(4);
     dshotSetPidLoopTime(core_period);
-    timerStart();
-    spiInitBusDMA();
     escPostInit(escDevice);
     escEnable(escDevice);
 
