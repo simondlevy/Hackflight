@@ -72,7 +72,7 @@ class DshotEsc : public Esc {
             CMD_AUDIO_STREAM_MODE_ON_OFF = 30, // KISS audio Stream mode on/Off
             CMD_SILENT_MODE_ON_OFF = 31, // KISS silent Mode on/Off
             CMD_MAX = 47
-        } dshotCommands_e;
+        } commands_e;
 
         typedef struct {
             volatile timCCR_t * ccr;

@@ -48,20 +48,6 @@ void dshotInitEndpoints(float outputLimit, float *outputLow, float *outputHigh, 
     *outputHigh = DSHOT_MAX_THROTTLE - outputLimitOffset;
 }
 
-float dshotConvertFromExternal(uint16_t externalValue)
-{
-    float motorValue;
-
-    externalValue = constrain_u16(externalValue, PWM_MIN, PWM_MAX);
-
-    motorValue = (externalValue == PWM_MIN) ?
-        DSHOT_CMD_MOTOR_STOP :
-        scaleRangef(externalValue, PWM_MIN + 1, PWM_MAX,
-                DSHOT_MIN_THROTTLE, DSHOT_MAX_THROTTLE);
-
-    return motorValue;
-}
-
 uint16_t dshotConvertToExternal(float motorValue)
 {
     uint16_t externalValue;
