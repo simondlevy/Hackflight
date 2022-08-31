@@ -25,17 +25,17 @@ class DshotBitbangEsc : public DshotEsc {
 
     protected:
 
-    virtual escDevice_t * deviceInit(void) override
-    {
-        return dshotBitbangDevInit(m_motorCount);
-    }        
+        virtual escDevice_t * deviceInit(void) override
+        {
+            return dshotBitbangDevInit(m_motorCount);
+        }        
 
     public:
 
-    DshotBitbangEsc(uint8_t count) 
-        : DshotEsc(count)
-    {
-    }
+        DshotBitbangEsc(uint8_t count) 
+            : DshotEsc(count)
+        {
+        }
 
 
 }; // class DshotBitbangEsc

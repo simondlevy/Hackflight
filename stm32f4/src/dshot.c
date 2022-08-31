@@ -64,9 +64,4 @@ uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
 
 FAST_DATA_ZERO_INIT dshotTelemetryState_t dshotTelemetryState;
 
-uint16_t motorGetDshotTelemetry(uint8_t index)
-{
-    return dshotTelemetryState.motorState[index].telemetryValue;
-}
-
 FAST_DATA_ZERO_INIT dshotTelemetryQuality_t dshotTelemetryQuality[MAX_SUPPORTED_MOTORS];
