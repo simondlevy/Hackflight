@@ -105,26 +105,9 @@ escVTable_t escGetVTable(void * escDevice_void)
 
 escDevice_t * dshotInit(uint8_t motorCount) {
 
-    memset(motors, 0, sizeof(motors));
+    // memset(motors, 0, sizeof(motors));
 
-    static FAST_DATA_ZERO_INIT escDevice_t *escDevice;
-
-    escDevice = dshotBitbangDevInit(motorCount);
-
-    /*
-    escDevice->count = motorCount;
-    escDevice->initialized = true;
-    escDevice->enableTimeMs = 0;
-    escDevice->enabled = false;
-
-    dshotSetPidLoopTime(corePeriod);
-
-    escPostInit(escDevice);
-
-    escEnable(escDevice);
-    */
-
-    return escDevice;
+    return dshotBitbangDevInit(motorCount);
 }
 
 
