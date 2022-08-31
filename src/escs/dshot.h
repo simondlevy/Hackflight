@@ -20,6 +20,7 @@
 
 #include "core/clock.h"
 #include "esc.h"
+#include "time.h"
 
 #include <timer.h>
 #include <io_types.h>
@@ -50,7 +51,7 @@ typedef struct {
 
 
 extern "C" {
-    escDevice_t * dshotInit(uint8_t count, uint32_t period);
+    escDevice_t * dshotInit(uint8_t count);
     void   dshotStop();
 }
 
@@ -69,9 +70,6 @@ class DshotEsc : public Esc {
         static const uint32_t COMMAND_DELAY_US = 1000;
 
         static const uint8_t MAX_COMMANDS = 3;
-
-        // default to 8KHz (125us) loop to prevent possible div/0
-        static const uint32_t COMMAND_PID_LOOP_TIME_US = 125; 
 
         typedef enum {
             CMD_MOTOR_STOP = 0,
@@ -167,7 +165,7 @@ class DshotEsc : public Esc {
             // Find the minimum number of motor output cycles needed to
             // provide at least delayUs time delay
 
-            return (delayUs + COMMAND_PID_LOOP_TIME_US - 1) / COMMAND_PID_LOOP_TIME_US;
+            return (delayUs + Clock::PERIOD() - 1) / Clock::PERIOD();
         }
 
     public:
@@ -179,7 +177,19 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            m_escDevice = dshotInit(m_motorCount, Clock::PERIOD());
+            m_escDevice = dshotInit(m_motorCount);
+
+            m_escDevice->count = m_motorCount;
+            m_escDevice->initialized = true;
+            m_escDevice->enableTimeMs = 0;
+            m_escDevice->enabled = false;
+
+            m_escDevice->vTable.postInit();
+
+            if (m_escDevice->initialized && m_escDevice->vTable.enable()) {
+                m_escDevice->enabled = true;
+                m_escDevice->enableTimeMs = timeMillis();
+            }
         }
 
         virtual float convertFromExternal(uint16_t value) override 
@@ -215,27 +225,27 @@ class DshotEsc : public Esc {
         virtual void stop(void) override 
         {
             dshotStop();
-            
+
             /*
-            commandControl_t *commandControl = addCommand();
+               commandControl_t *commandControl = addCommand();
 
-            if (commandControl) {
-                commandControl->repeats = 10;
-                commandControl->delayAfterCommandUs = COMMAND_DELAY_US;
-                for (auto i=0; i<m_motorCount; i++) {
-                    commandControl->command[i] = CMD_SPIN_DIRECTION_NORMAL;
-                }
-                if (allMotorsAreIdle()) {
-                    // we can skip the motors idle wait state
-                    commandControl->state = COMMAND_STATE_STARTDELAY;
-                    commandControl->nextCommandCycleDelay =
-                        dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
-                } else {
-                    commandControl->state = COMMAND_STATE_IDLEWAIT;
+               if (commandControl) {
+               commandControl->repeats = 10;
+               commandControl->delayAfterCommandUs = COMMAND_DELAY_US;
+               for (auto i=0; i<m_motorCount; i++) {
+               commandControl->command[i] = CMD_SPIN_DIRECTION_NORMAL;
+               }
+               if (allMotorsAreIdle()) {
+            // we can skip the motors idle wait state
+            commandControl->state = COMMAND_STATE_STARTDELAY;
+            commandControl->nextCommandCycleDelay =
+            dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
+            } else {
+            commandControl->state = COMMAND_STATE_IDLEWAIT;
 
-                    // will be set after idle wait completes
-                    commandControl->nextCommandCycleDelay = 0;  
-                }
+            // will be set after idle wait completes
+            commandControl->nextCommandCycleDelay = 0;  
+            }
             }*/
         }
 
