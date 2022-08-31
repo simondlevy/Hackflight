@@ -19,8 +19,16 @@
 #pragma once
 
 #include <escs/dshot.h>
+#include <dshot_bitbang.h>
 
 class DshotBitbangEsc : public DshotEsc {
+
+    protected:
+
+        virtual escDevice_t * deviceInit(void) override
+        {
+            return dshotBitbangDevInit(m_motorCount);
+        }
 
     public:
 

@@ -22,9 +22,9 @@
 #include "esc.h"
 #include "time.h"
 
-#include <dshot_bitbang.h>
-#include <dshot_dpwm.h>
+#include <escdev.h>
 #include <timer.h>
+#include <dshot_dpwm.h>
 #include <io_types.h>
 
 class DshotEsc : public Esc {
@@ -141,6 +141,10 @@ class DshotEsc : public Esc {
             return (delayUs + Clock::PERIOD() - 1) / Clock::PERIOD();
         }
 
+    protected:
+
+        virtual escDevice_t * deviceInit(void) = 0;
+
     public:
 
         DshotEsc(uint8_t count) 
@@ -150,7 +154,7 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            m_escDevice = dshotBitbangDevInit(m_motorCount);
+            m_escDevice = deviceInit();
 
             m_escDevice->count = m_motorCount;
             m_escDevice->initialized = true;
