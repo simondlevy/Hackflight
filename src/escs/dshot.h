@@ -122,9 +122,9 @@ class DshotEsc : public Esc {
 
     public:
 
-        DshotEsc(uint8_t count)
+        DshotEsc(uint8_t count) 
+            : Esc(count)
         {
-            m_motorCount = count;
         }
 
         virtual void begin(void) override 

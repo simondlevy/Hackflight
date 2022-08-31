@@ -49,6 +49,15 @@ extern "C" {
 
 class Esc {
 
+    protected:
+
+        uint8_t m_motorCount;
+
+        Esc(uint8_t motorCount) 
+        {
+            m_motorCount = motorCount;
+        }
+
     public:
 
         virtual void  begin(void) = 0;

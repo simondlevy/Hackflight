@@ -25,17 +25,15 @@ class ArduinoBrushedEsc : public Esc {
     private:
 
         uint8_t m_pins[MAX_SUPPORTED_MOTORS];
-        uint8_t m_count;
 
     public:
 
-        BrushedEsc(uint8_t * pins, uint8_t count) override 
+        BrushedEsc(uint8_t * pins, uint8_t count)  
+            : Esc(count)
         {
             for (auto k=0; k<count; ++k) {
                 m_pins[k] = pins[k];
             }
-
-            m_count = count;
         }
 
         virtual void begin(void) override
