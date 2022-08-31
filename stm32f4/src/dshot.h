@@ -45,8 +45,6 @@ typedef struct dshotProtocolControl_s {
 
 uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb);
 
-extern bool useDshotTelemetry;
-
 typedef struct dshotTelemetryMotorState_s {
     uint16_t telemetryValue;
     bool telemetryActive;

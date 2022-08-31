@@ -43,17 +43,9 @@ void bbGpioSetup(bbMotor_t *bbMotor)
     bbPort->gpioModeInput |= (GPIO_Mode_IN << (pinIndex * 2));
     bbPort->gpioModeOutput |= (GPIO_Mode_OUT << (pinIndex * 2));
 
-    if (useDshotTelemetry) {
-        bbPort->gpioIdleBSRR |= (1 << pinIndex);         // BS (lower half)
-    } else {
-        bbPort->gpioIdleBSRR |= (1 << (pinIndex + 16));  // BR (higher half)
-    }
+    bbPort->gpioIdleBSRR |= (1 << (pinIndex + 16));  // BR (higher half)
 
-    if (useDshotTelemetry) {
-        IOWrite(bbMotor->io, 1);
-    } else {
-        IOWrite(bbMotor->io, 0);
-    }
+    IOWrite(bbMotor->io, 0);
 
     IOConfigGPIO(bbMotor->io, IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, bbPuPdMode));
 }

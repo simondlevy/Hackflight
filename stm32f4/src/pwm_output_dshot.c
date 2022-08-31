@@ -141,13 +141,6 @@ void pwmCompleteDshotMotorUpdate(void)
             TIM_DMACmd(motor->timerHardware->tim, motor->timerDmaSource, DISABLE);
         }
 
-        if (useDshotTelemetry) {
-            pwmDshotSetDirectionInput(motor);
-            xDMA_SetCurrDataCounter(motor->dmaRef, GCR_TELEMETRY_INPUT_LEN);
-            xDMA_Cmd(motor->dmaRef, ENABLE);
-            TIM_DMACmd(motor->timerHardware->tim, motor->timerDmaSource, ENABLE);
-            dshotDMAHandlerCycleCounters.changeDirectionCompletedAt = systemGetCycleCounter();
-        }
         DMA_CLEAR_FLAG(descriptor, DMA_IT_TCIF);
     }
 }
@@ -209,9 +202,6 @@ bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t m
 
     uint8_t pupMode = 0;
     pupMode = (output & TIMER_OUTPUT_INVERTED) ? GPIO_PuPd_DOWN : GPIO_PuPd_UP;
-    if (useDshotTelemetry) {
-        output ^= TIMER_OUTPUT_INVERTED;
-    }
 
     motor->iocfg = IO_CONFIG(GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_PP, pupMode);
     IOConfigGPIOAF(motorIO, motor->iocfg, timerHardware->alternateFunction);
@@ -330,10 +320,6 @@ bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t m
         TIM_ARRPreloadConfig(timer, ENABLE);
         TIM_CtrlPWMOutputs(timer, ENABLE);
         TIM_Cmd(timer, ENABLE);
-    }
-    if (useDshotTelemetry) {
-        // avoid high line during startup to prevent bootloader activation
-        *timerChCCR(timerHardware) = 0xffff;
     }
     motor->configured = true;
 

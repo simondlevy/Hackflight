@@ -51,10 +51,6 @@ uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
     }
     // append checksum
 
-    if (useDshotTelemetry) {
-        csum = ~csum;
-    }
-
     csum &= 0xf;
     packet = (packet << 4) | csum;
 
