@@ -18,12 +18,15 @@
 
 #pragma once
 
+#include "core/clock.h"
 #include "esc.h"
 
-float   escDevConvertFromExternal(void * escDevice, uint16_t value);
-void  * escDevInitDshot(uint8_t count);
-void    escDevStop(void * escDevice);
-void    escDevWrite(void * escDevice, float *values);
+extern "C" {
+    float   escDevConvertFromExternal(void * escDevice, uint16_t value);
+    void  * escDevInitDshot(uint8_t count, uint32_t period);
+    void    escDevStop(void * escDevice);
+    void    escDevWrite(void * escDevice, float *values);
+}
 
 class DshotEsc : public Esc {
 
@@ -48,7 +51,7 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            m_escDevice = escDevInitDshot(m_motorCount);
+            m_escDevice = escDevInitDshot(m_motorCount, Clock::PERIOD());
         }
 
         virtual float convertFromExternal(uint16_t value) override 

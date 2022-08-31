@@ -35,7 +35,7 @@ using namespace std;
 
 int main(void)
 {
-    auto escDevice = hardwareInit(Clock::PERIOD());
+    hardwareInit();
 
     static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -53,6 +53,8 @@ int main(void)
 
     static Mixer mixer = QuadXbfMixer::make();
 
+    static DshotEsc esc(4);
+
     static Stm32F4Led led(37); // pin
 
     static Hackflight hf(
@@ -61,7 +63,7 @@ int main(void)
             imuRotate270,
             &pidControllers,
             &mixer,
-            escDevice,
+            &esc,
             &led);
 
     hf.begin();

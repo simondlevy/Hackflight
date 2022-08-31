@@ -40,7 +40,7 @@
 extern "C" {
 #endif
 
-void * hardwareInit(uint32_t core_period)
+void hardwareInit(void)
 {
     systemInit();
     ioInitGlobal();
@@ -50,22 +50,16 @@ void * hardwareInit(uint32_t core_period)
     timerInit();
     serialUartPinConfigure();
     serialInit(-1);
-    void * escDevice = escDevInitDshot(4);
     inverterInit();
     spiPinConfigure();
     spiPreInit();
     spiInit(0x07); // mask for devices 0,1,2
-    dshotSetPidLoopTime(core_period);
-    pinioInit();
     usbCableDetectInit();
     flashInit();
+    systemInitUnusedPins();
+    pinioInit();
     timerStart();
     spiInitBusDMA();
-    escPostInit(escDevice);
-    escEnable(escDevice);
-    systemInitUnusedPins();
-
-    return escDevice;
 }
 
 #if defined (__cplusplus)
