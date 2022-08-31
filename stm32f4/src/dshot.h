@@ -70,5 +70,3 @@ extern dshotTelemetryState_t dshotTelemetryState;
 void updateDshotTelemetryQuality(dshotTelemetryQuality_t *qualityStats, bool packetValid, uint32_t currentTimeMs);
 
 bool isDshotTelemetryActive(void);
-
-void validateAndfixMotorOutputReordering(uint8_t *array, const unsigned size);
