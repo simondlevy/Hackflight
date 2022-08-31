@@ -18,7 +18,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdbool.h>
 
-#include "dshot_dpwm.h"
+#include "dshot_dev.h"
 
 #define DSHOT_MAX_COMMAND 47
 

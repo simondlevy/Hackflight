@@ -27,7 +27,6 @@
 #include <escdev.h>
 #include <timer.h>
 #include <dshot_dev.h>
-#include <dshot_dpwm.h>
 #include <io_types.h>
 
 class DshotEsc : public Esc {
