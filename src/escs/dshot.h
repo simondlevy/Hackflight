@@ -81,6 +81,8 @@ class DshotEsc : public Esc {
 
         void * m_escDevice;
 
+    pwmOutputPort_t m_motors[MAX_SUPPORTED_MOTORS];
+
     public:
 
         DshotEsc(uint8_t count) 
