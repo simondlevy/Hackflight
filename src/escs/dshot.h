@@ -19,7 +19,9 @@
 #pragma once
 
 #include "core/clock.h"
+#include "core/constrain.h"
 #include "esc.h"
+#include "pwm.h"
 #include "time.h"
 
 #include <escdev.h>
@@ -141,6 +143,15 @@ class DshotEsc : public Esc {
             return (delayUs + Clock::PERIOD() - 1) / Clock::PERIOD();
         }
 
+        static float scaleRangef(
+                float x, float srcFrom, float srcTo, float destFrom, float destTo)
+        {
+            auto a = (destTo - destFrom) * (x - srcFrom);
+            auto b = srcTo - srcFrom;
+            return (a / b) + destFrom;
+        }
+
+
     protected:
 
         virtual escDevice_t * deviceInit(void) = 0;
@@ -171,8 +182,14 @@ class DshotEsc : public Esc {
 
         virtual float convertFromExternal(uint16_t value) override 
         {
-            return m_escDevice->vTable.convertFromExternal(value);
+            auto constrainedValue = constrain_u16(value, PWM_MIN, PWM_MAX);
+
+            return constrainedValue == PWM_MIN ?
+                (float)CMD_MOTOR_STOP :
+                scaleRangef(constrainedValue, PWM_MIN + 1, PWM_MAX,
+                        MIN_VALUE, MAX_VALUE);
         }
+
 
         virtual bool isProtocolDshot(void) override 
         {
