@@ -21,6 +21,8 @@
 #include "core/clock.h"
 #include "esc.h"
 
+#include <timer.h>
+
 extern "C" {
     void * dshotInit(uint8_t count, uint32_t period);
     void   dshotStop(void * escDevice);
@@ -61,6 +63,11 @@ class DshotEsc : public Esc {
             bool        initialized;
             escVTable_t vTable;
         } escDevice_t;
+
+        typedef struct {
+            volatile timCCR_t * ccr;
+            TIM_TypeDef * tim;
+        } timerChannel_t;
 
         void * m_escDevice;
 
@@ -129,8 +136,8 @@ class DshotEsc : public Esc {
 
 
         /*
-        virtual void write(float *values) override 
-        {
-            dshotWrite(m_escDevice, values);
-        }*/
+           virtual void write(float *values) override 
+           {
+           dshotWrite(m_escDevice, values);
+           }*/
 };
