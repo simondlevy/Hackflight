@@ -62,16 +62,6 @@ void hardwareInit(void)
     spiInitBusDMA();
 }
 
-void * escInit(uint32_t core_period)
-{
-    void * escDevice = escDevInitDshot(4);
-    dshotSetPidLoopTime(core_period);
-    escPostInit(escDevice);
-    escEnable(escDevice);
-
-    return escDevice;
-}
-
 #if defined (__cplusplus)
 }
 #endif
