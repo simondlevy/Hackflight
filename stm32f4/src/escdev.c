@@ -79,13 +79,6 @@ bool escCheckProtocolEnabled(bool *isProtocolDshot)
     return enabled;
 }
 
-float escDevConvertFromExternal(void * escDevice_void, uint16_t externalValue)
-{
-    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
-
-    return escDevice->vTable.convertFromExternal(externalValue);
-}
-
 void escEnable(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;

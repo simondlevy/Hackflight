@@ -22,8 +22,6 @@
 #include "esc.h"
 
 extern "C" {
-    float   escDevConvertFromExternal(void * escDevice, uint16_t value);
-
     void  * dshotInit(uint8_t count, uint32_t period);
     void    dshotStop(void * escDevice);
     void    dshotWrite(void * escDevice, float *values);
