@@ -22,9 +22,11 @@
 #include "esc.h"
 #include "time.h"
 
+#include <dshot_bitbang.h>
 #include <timer.h>
 #include <io_types.h>
 
+/*
 typedef struct {
 
     float    (*convertFromExternal)(uint16_t value);
@@ -48,7 +50,7 @@ typedef struct {
     bool        initialized;
     escVTable_t vTable;
 } escDevice_t;
-
+*/
 
 extern "C" {
     escDevice_t * dshotInit(uint8_t count);
@@ -177,7 +179,7 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            m_escDevice = dshotInit(m_motorCount);
+            m_escDevice = dshotBitbangDevInit(m_motorCount);
 
             m_escDevice->count = m_motorCount;
             m_escDevice->initialized = true;
