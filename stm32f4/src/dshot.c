@@ -31,7 +31,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "nvic.h"
 #include "pwm_output.h" // for ESC_* and others
 #include "timer.h"
-#include "dshot_dpwm.h" // for motorDmaOutput_t, should be gone
 
 uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
 {
