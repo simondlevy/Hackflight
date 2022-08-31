@@ -24,8 +24,6 @@ extern "C" {
 
 void hardwareInit(void);
 
-void * escInit(uint32_t core_period);
-
 #if defined (__cplusplus)
 }
 #endif
