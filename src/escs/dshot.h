@@ -23,6 +23,7 @@
 #include "time.h"
 
 #include <dshot_bitbang.h>
+#include <dshot_dpwm.h>
 #include <timer.h>
 #include <io_types.h>
 
@@ -124,13 +125,12 @@ class DshotEsc : public Esc {
 
         bool allMotorsAreIdle(void)
         {
-            /*
             for (auto i=0; i<m_motorCount; i++) {
                 const motorDmaOutput_t *motor = getMotorDmaOutput(i);
                 if (motor->protocolControl.value) {
                     return false;
                 }
-            }*/
+            }
 
             return true;
         }
