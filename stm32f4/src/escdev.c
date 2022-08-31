@@ -103,14 +103,6 @@ escVTable_t escGetVTable(void * escDevice_void)
     return escDevice->vTable;
 }
 
-escDevice_t * dshotInit(uint8_t motorCount) {
-
-    // memset(motors, 0, sizeof(motors));
-
-    return dshotBitbangDevInit(motorCount);
-}
-
-
 bool escIsEnabled(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;

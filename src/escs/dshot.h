@@ -53,7 +53,6 @@ typedef struct {
 */
 
 extern "C" {
-    escDevice_t * dshotInit(uint8_t count);
     void   dshotStop();
 }
 
