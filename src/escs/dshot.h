@@ -27,10 +27,6 @@
 #include <timer.h>
 #include <io_types.h>
 
-extern "C" {
-    void   dshotStop();
-}
-
 class DshotEsc : public Esc {
 
     private:
@@ -44,6 +40,8 @@ class DshotEsc : public Esc {
         static const uint32_t BEACON_GUARD_DELAY_US = 1200000;  
 
         static const uint32_t COMMAND_DELAY_US = 1000;
+
+        static const uint32_t INITIAL_DELAY_US = 10000;
 
         static const uint8_t MAX_COMMANDS = 3;
 
@@ -112,7 +110,7 @@ class DshotEsc : public Esc {
         uint8_t m_commandQueueHead;
         uint8_t m_commandQueueTail;
 
-        commandControl_t * addCommand()
+        commandControl_t * addCommand(void)
         {
             auto newHead = (m_commandQueueHead + 1) % (MAX_COMMANDS + 1);
             if (newHead == m_commandQueueTail) {
@@ -199,29 +197,26 @@ class DshotEsc : public Esc {
 
         virtual void stop(void) override 
         {
-            dshotStop();
+            commandControl_t *commandControl = addCommand();
 
-            /*
-               commandControl_t *commandControl = addCommand();
+            if (commandControl) {
+                commandControl->repeats = 10;
+                commandControl->delayAfterCommandUs = COMMAND_DELAY_US;
+                for (auto i=0; i<m_motorCount; i++) {
+                    commandControl->command[i] = CMD_SPIN_DIRECTION_NORMAL;
+                }
+                if (allMotorsAreIdle()) {
+                    // we can skip the motors idle wait state
+                    commandControl->state = COMMAND_STATE_STARTDELAY;
+                    commandControl->nextCommandCycleDelay =
+                        dshotCommandCyclesFromTime(INITIAL_DELAY_US);
+                } else {
+                    commandControl->state = COMMAND_STATE_IDLEWAIT;
 
-               if (commandControl) {
-               commandControl->repeats = 10;
-               commandControl->delayAfterCommandUs = COMMAND_DELAY_US;
-               for (auto i=0; i<m_motorCount; i++) {
-               commandControl->command[i] = CMD_SPIN_DIRECTION_NORMAL;
-               }
-               if (allMotorsAreIdle()) {
-            // we can skip the motors idle wait state
-            commandControl->state = COMMAND_STATE_STARTDELAY;
-            commandControl->nextCommandCycleDelay =
-            dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
-            } else {
-            commandControl->state = COMMAND_STATE_IDLEWAIT;
-
-            // will be set after idle wait completes
-            commandControl->nextCommandCycleDelay = 0;  
+                    // will be set after idle wait completes
+                    commandControl->nextCommandCycleDelay = 0;  
+                }
             }
-            }*/
         }
 
         virtual void write(float *values) override
