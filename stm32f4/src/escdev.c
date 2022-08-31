@@ -153,21 +153,6 @@ bool escUpdateStartNull(void)
     return true;
 }
 
-void dshotWrite(void * escDevice_void, float *values)
-{
-    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
-
-    if (escDevice->enabled) {
-        if (!escDevice->vTable.updateStart()) {
-            return;
-        }
-        for (int i = 0; i < escDevice->count; i++) {
-            escDevice->vTable.write(i, values[i]);
-        }
-        escDevice->vTable.updateComplete();
-    }
-}
-
 void escDevWriteNull(uint8_t index, float value)
 {
     UNUSED(index);
