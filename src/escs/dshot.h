@@ -26,7 +26,7 @@
 
 extern "C" {
     void * dshotInit(uint8_t count, uint32_t period);
-    void   dshotStop(void * escDevice);
+    void   dshotStop();
 }
 
 class DshotEsc : public Esc {
@@ -128,7 +128,7 @@ class DshotEsc : public Esc {
 
         virtual void stop(void) override 
         {
-            dshotStop(m_escDevice);
+            dshotStop();
         }
 
         virtual void write(float *values) override

@@ -226,10 +226,8 @@ bool dshotCommandOutputIsEnabled(uint8_t motorCount)
     return true;
 }
 
-void dshotStop(void * escDevice)
+void dshotStop(void)
 {
-    (void)escDevice;
-
     uint8_t repeats = 10;
     uint32_t delayAfterCommandUs = DSHOT_COMMAND_DELAY_US;
 
