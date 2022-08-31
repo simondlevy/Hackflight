@@ -146,10 +146,4 @@ class DshotEsc : public Esc {
             }
         }
 
-
-        /*
-           virtual void write(float *values) override 
-           {
-           dshotWrite(m_escDevice, values);
-           }*/
-};
+}; // class DshotEsc
