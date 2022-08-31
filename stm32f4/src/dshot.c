@@ -70,21 +70,3 @@ uint16_t motorGetDshotTelemetry(uint8_t index)
 }
 
 FAST_DATA_ZERO_INIT dshotTelemetryQuality_t dshotTelemetryQuality[MAX_SUPPORTED_MOTORS];
-
-void updateDshotTelemetryQuality(dshotTelemetryQuality_t *qualityStats, bool packetValid, uint32_t currentTimeMs)
-{
-    uint8_t statsBucketIndex = (currentTimeMs / DSHOT_TELEMETRY_QUALITY_BUCKET_MS) % DSHOT_TELEMETRY_QUALITY_BUCKET_COUNT;
-    if (statsBucketIndex != qualityStats->lastBucketIndex) {
-        qualityStats->packetCountSum -= qualityStats->packetCountArray[statsBucketIndex];
-        qualityStats->invalidCountSum -= qualityStats->invalidCountArray[statsBucketIndex];
-        qualityStats->packetCountArray[statsBucketIndex] = 0;
-        qualityStats->invalidCountArray[statsBucketIndex] = 0;
-        qualityStats->lastBucketIndex = statsBucketIndex;
-    }
-    qualityStats->packetCountSum++;
-    qualityStats->packetCountArray[statsBucketIndex]++;
-    if (!packetValid) {
-        qualityStats->invalidCountSum++;
-        qualityStats->invalidCountArray[statsBucketIndex]++;
-    }
-}
