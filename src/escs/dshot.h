@@ -200,26 +200,30 @@ class DshotEsc : public Esc {
 
             auto * commandControl = addCommand();
 
-            /*
-               if (commandControl) {
-               commandControl->repeats = repeats;
-               commandControl->delayAfterCommandUs = delayAfterCommandUs;
-               for (unsigned i = 0; i < m_motorCount; i++) {
-               commandControl->command[i] = DSHOT_CMD_SPIN_DIRECTION_NORMAL;
-               }
-               if (allMotorsAreIdle(m_motorCount)) {
-            // we can skip the motors idle wait state
-            commandControl->state = DSHOT_COMMAND_STATE_STARTDELAY;
-            commandControl->nextCommandCycleDelay =
-            dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
-            } else {
-            commandControl->state = DSHOT_COMMAND_STATE_IDLEWAIT;
+            if (commandControl) {
 
-            // will be set after idle wait completes
-            commandControl->nextCommandCycleDelay = 0;  
+                commandControl->repeats = repeats;
+
+                commandControl->delayAfterCommandUs = delayAfterCommandUs;
+
+                for (auto i=0; i<m_motorCount; i++) {
+                    commandControl->command[i] = CMD_SPIN_DIRECTION_NORMAL;
+                }
+
+                /*
+                if (allMotorsAreIdle(m_motorCount)) {
+                    // we can skip the motors idle wait state
+                    commandControl->state = DSHOT_COMMAND_STATE_STARTDELAY;
+                    commandControl->nextCommandCycleDelay =
+                        dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
+                } else {
+                    commandControl->state = DSHOT_COMMAND_STATE_IDLEWAIT;
+
+                    // will be set after idle wait completes
+                    commandControl->nextCommandCycleDelay = 0;  
+                }
+                */
             }
-            }
-             */
         }
 
         virtual void write(float *values) override 
