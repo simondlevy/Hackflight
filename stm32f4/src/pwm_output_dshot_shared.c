@@ -62,39 +62,3 @@ uint8_t getTimerIndex(TIM_TypeDef *timer)
     dmaMotorTimers[dmaMotorTimerCount++].timer = timer;
     return dmaMotorTimerCount - 1;
 }
-
-
- void pwmWriteDshotInt(uint8_t index, uint16_t value)
-{
-    motorDmaOutput_t *const motor = &dmaMotors[index];
-
-    if (!motor->configured) {
-        return;
-    }
-
-    /*If there is a command ready to go overwrite the value and send that instead*/
-    if (dshotCommandIsProcessing()) {
-        value = dshotCommandGetCurrent(index);
-        if (value) {
-            motor->protocolControl.requestTelemetry = true;
-        }
-    }
-
-    motor->protocolControl.value = value;
-
-    uint16_t packet = prepareDshotPacket(&motor->protocolControl);
-    uint8_t bufferSize;
-
-    if (useBurstDshot) {
-        bufferSize = loadDmaBuffer(&motor->timer->dmaBurstBuffer[timerLookupChannelIndex(motor->timerHardware->channel)], 4, packet);
-        motor->timer->dmaBurstLength = bufferSize * 4;
-    } else {
-        bufferSize = loadDmaBuffer(motor->dmaBuffer, 1, packet);
-        motor->timer->timerDmaSources |= motor->timerDmaSource;
-        xDMA_SetCurrDataCounter(motor->dmaRef, bufferSize);
-        xDMA_Cmd(motor->dmaRef, ENABLE);
-    }
-}
-
-
-void dshotEnableChannels(uint8_t motorCount);
