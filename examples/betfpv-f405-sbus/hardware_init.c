@@ -60,6 +60,7 @@ void * escInit(uint32_t core_period)
     spiInit(0x07); // mask for devices 0,1,2
     usbCableDetectInit();
     flashInit();
+    systemInitUnusedPins();
 
     void * escDevice = escDevInitDshot(4);
     dshotSetPidLoopTime(core_period);
@@ -68,7 +69,6 @@ void * escInit(uint32_t core_period)
     spiInitBusDMA();
     escPostInit(escDevice);
     escEnable(escDevice);
-    systemInitUnusedPins();
 
     return escDevice;
 }
