@@ -117,7 +117,6 @@ endif
 STM32_SRC = \
             serial_debug.c \
             dshot.c \
-            dshot_dpwm.c \
             dshot_command.c \
             dshot_bitbang.c \
             dshot_bitbang_decode.c \
