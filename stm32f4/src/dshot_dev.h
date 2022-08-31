@@ -19,7 +19,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 
 #include <time.h>
+
 #include "escdev.h"
+#include "timer.h"
+#include "io.h"
 
 #define MIN_GCR_EDGES         7
 #define MAX_GCR_EDGES         22
@@ -60,3 +63,43 @@ typedef struct dshotTelemetryState_s {
 } dshotTelemetryState_t;
 
 extern dshotTelemetryState_t dshotTelemetryState;
+
+#define DSHOT_DMA_BUFFER_UNIT uint32_t
+
+typedef struct {
+    TIM_TypeDef *timer;
+    uint16_t outputPeriod;
+    dmaResource_t *dmaBurstRef;
+    uint16_t dmaBurstLength;
+    uint32_t *dmaBurstBuffer;
+    uint16_t timerDmaSources;
+} motorDmaTimer_t;
+
+typedef struct motorDmaOutput_s {
+    dshotProtocolControl_t protocolControl;
+    ioTag_t ioTag;
+    const timerHardware_t *timerHardware;
+    uint16_t timerDmaSource;
+    uint8_t timerDmaIndex;
+    bool configured;
+    uint8_t output;
+    uint8_t index;
+    uint32_t iocfg;
+    DMA_InitTypeDef   dmaInitStruct;
+    volatile bool isInput;
+    int32_t dshotTelemetryDeadtimeUs;
+    uint8_t dmaInputLen;
+    TIM_OCInitTypeDef ocInitStruct;
+    TIM_ICInitTypeDef icInitStruct;
+    dmaResource_t *dmaRef;
+    motorDmaTimer_t *timer;
+    DSHOT_DMA_BUFFER_UNIT *dmaBuffer;
+} motorDmaOutput_t;
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+    motorDmaOutput_t *getMotorDmaOutput(uint8_t index);
+#if defined(__cplusplus)
+}
+#endif
