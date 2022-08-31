@@ -20,7 +20,7 @@
 #include <alignment/rotate270.h>
 #include <core/clock.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/dshot.h>
+#include <escs/dshot/bitbang.h>
 #include <hackflight.h>
 #include <receivers/sbus.h>
 #include <serial.h>
@@ -53,7 +53,7 @@ int main(void)
 
     static Mixer mixer = QuadXbfMixer::make();
 
-    static DshotEsc esc(4);
+    static DshotBitbangEsc esc(4);
 
     static Stm32F4Led led(37); // pin
 

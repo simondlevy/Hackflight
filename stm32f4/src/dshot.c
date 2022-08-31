@@ -33,9 +33,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "dshot_dpwm.h" // for motorDmaOutput_t, should be gone
 
-// Time to separate dshot beacon and armining/disarming events
-static const uint32_t DSHOT_BEACON_GUARD_DELAY_US = 1200000;  
-
 static float scaleRangef(float x, float srcFrom, float srcTo, float destFrom, float destTo)
 {
     float a = (destTo - destFrom) * (x - srcFrom);
@@ -164,24 +161,4 @@ void validateAndfixMotorOutputReordering(uint8_t *array, const unsigned size)
             array[i] = i;
         }
     }
-}
-
-float escDevValueDisarmed(void)
-{
-    return DSHOT_CMD_MOTOR_STOP;
-}
-
-float escDevValueHigh(void) 
-{
-    return DSHOT_MAX_THROTTLE;
-}
-
-float escDevValueLow(void)
-{
-    return DSHOT_MIN_THROTTLE + 0.045 * DSHOT_RANGE;
-}
-
-bool escDevIsReady(uint32_t currentTimeUs)
-{
-    return currentTimeUs >= DSHOT_BEACON_GUARD_DELAY_US;
 }
