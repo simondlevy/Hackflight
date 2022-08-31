@@ -19,20 +19,20 @@
 #include <string.h>
 
 #include <esc.h>
+#include <time.h>
 
-#include "platform.h"
-#include "io.h"
-#include "io_impl.h"
 #include "dma.h"
 #include "dma_reqmap.h"
-#include "dshot_dev.h"
 #include "dshot_bitbang.h"
 #include "dshot_command.h"
+#include "dshot_dev.h"
 #include "escdev.h"
+#include "io.h"
+#include "io_impl.h"
 #include "nvic.h"
+#include "platform.h"
 #include "pwm_output.h" 
 #include "systemdev.h"
-#include <time.h>
 #include "timer.h"
 
 typedef enum {
