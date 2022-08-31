@@ -50,10 +50,6 @@ void hardwareInit(void)
     timerInit();
     serialUartPinConfigure();
     serialInit(-1);
-}
-
-void * escInit(uint32_t core_period)
-{
     inverterInit();
     spiPinConfigure();
     spiPreInit();
@@ -64,7 +60,10 @@ void * escInit(uint32_t core_period)
     pinioInit();
     timerStart();
     spiInitBusDMA();
+}
 
+void * escInit(uint32_t core_period)
+{
     void * escDevice = escDevInitDshot(4);
     dshotSetPidLoopTime(core_period);
     escPostInit(escDevice);
