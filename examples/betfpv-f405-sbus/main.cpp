@@ -35,7 +35,9 @@ using namespace std;
 
 int main(void)
 {
-    auto escDevice = hardwareInit(Clock::PERIOD());
+    hardwareInit();
+
+    auto escDevice = escInit(Clock::PERIOD());
 
     static AnglePidController anglePid(
         1.441305,     // Rate Kp

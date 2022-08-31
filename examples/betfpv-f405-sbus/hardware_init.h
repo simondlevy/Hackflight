@@ -22,7 +22,9 @@
 extern "C" {
 #endif
 
-void * hardwareInit(uint32_t core_period);
+void hardwareInit(void);
+
+void * escInit(uint32_t core_period);
 
 #if defined (__cplusplus)
 }

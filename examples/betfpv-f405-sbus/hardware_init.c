@@ -40,7 +40,7 @@
 extern "C" {
 #endif
 
-void * hardwareInit(uint32_t core_period)
+void hardwareInit(void)
 {
     systemInit();
     ioInitGlobal();
@@ -50,6 +50,10 @@ void * hardwareInit(uint32_t core_period)
     timerInit();
     serialUartPinConfigure();
     serialInit(-1);
+}
+
+void * escInit(uint32_t core_period)
+{
     void * escDevice = escDevInitDshot(4);
     inverterInit();
     spiPinConfigure();
