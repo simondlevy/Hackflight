@@ -24,8 +24,33 @@
 #include <timer.h>
 #include <io_types.h>
 
+typedef struct {
+
+    float    (*convertFromExternal)(uint16_t value);
+    uint16_t (*convertToExternal)(float value);
+    void     (*disable)(void);
+    bool     (*enable)(void);
+    bool     (*isEnabled)(uint8_t index);
+    void     (*postInit)(void);
+    void     (*shutdown)(void);
+    void     (*updateComplete)(void);
+    bool     (*updateStart)(void);
+    void     (*write)(uint8_t index, float value);
+    void     (*writeInt)(uint8_t index, uint16_t value);
+
+} escVTable_t;
+
+typedef struct {
+    uint8_t     count;
+    bool        enabled;
+    uint32_t    enableTimeMs;
+    bool        initialized;
+    escVTable_t vTable;
+} escDevice_t;
+
+
 extern "C" {
-    void * dshotInit(uint8_t count, uint32_t period);
+    escDevice_t * dshotInit(uint8_t count, uint32_t period);
     void   dshotStop();
 }
 
@@ -75,31 +100,6 @@ class DshotEsc : public Esc {
             CMD_MAX = 47
         } dshotCommands_e;
 
-
-        typedef struct {
-
-            float    (*convertFromExternal)(uint16_t value);
-            uint16_t (*convertToExternal)(float value);
-            void     (*disable)(void);
-            bool     (*enable)(void);
-            bool     (*isEnabled)(uint8_t index);
-            void     (*postInit)(void);
-            void     (*shutdown)(void);
-            void     (*updateComplete)(void);
-            bool     (*updateStart)(void);
-            void     (*write)(uint8_t index, float value);
-            void     (*writeInt)(uint8_t index, uint16_t value);
-
-        } escVTable_t;
-
-        typedef struct {
-            uint8_t     count;
-            bool        enabled;
-            uint32_t    enableTimeMs;
-            bool        initialized;
-            escVTable_t vTable;
-        } escDevice_t;
-
         typedef struct {
             volatile timCCR_t * ccr;
             TIM_TypeDef * tim;
@@ -129,7 +129,7 @@ class DshotEsc : public Esc {
             uint8_t command[MAX_SUPPORTED_MOTORS];
         } commandControl_t;
 
-        void * m_escDevice;
+        escDevice_t * m_escDevice;
 
         pwmOutputPort_t m_motors[MAX_SUPPORTED_MOTORS];
 
@@ -184,8 +184,7 @@ class DshotEsc : public Esc {
 
         virtual float convertFromExternal(uint16_t value) override 
         {
-            escDevice_t * escDevice = (escDevice_t *)m_escDevice;
-            return escDevice->vTable.convertFromExternal(value);
+            return m_escDevice->vTable.convertFromExternal(value);
         }
 
         virtual bool isProtocolDshot(void) override 
@@ -242,16 +241,14 @@ class DshotEsc : public Esc {
 
         virtual void write(float *values) override
         {
-            escDevice_t * escDevice = (escDevice_t *)m_escDevice;
-
-            if (escDevice->enabled) {
-                if (!escDevice->vTable.updateStart()) {
+            if (m_escDevice->enabled) {
+                if (!m_escDevice->vTable.updateStart()) {
                     return;
                 }
-                for (auto i=0; i <escDevice->count; i++) {
-                    escDevice->vTable.write(i, values[i]);
+                for (auto i=0; i <m_escDevice->count; i++) {
+                    m_escDevice->vTable.write(i, values[i]);
                 }
-                escDevice->vTable.updateComplete();
+                m_escDevice->vTable.updateComplete();
             }
         }
 

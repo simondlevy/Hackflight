@@ -103,7 +103,7 @@ escVTable_t escGetVTable(void * escDevice_void)
     return escDevice->vTable;
 }
 
-void * dshotInit(uint8_t motorCount, uint32_t corePeriod) {
+escDevice_t * dshotInit(uint8_t motorCount, uint32_t corePeriod) {
 
     memset(motors, 0, sizeof(motors));
 
@@ -122,7 +122,7 @@ void * dshotInit(uint8_t motorCount, uint32_t corePeriod) {
 
     escEnable(escDevice);
 
-    return (void *)escDevice;
+    return escDevice;
 }
 
 
