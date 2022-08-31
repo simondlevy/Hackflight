@@ -119,7 +119,6 @@ STM32_SRC = \
             dshot.c \
             dshot_command.c \
             dshot_bitbang.c \
-            dshot_bitbang_decode.c \
             dshot_bitbang_stdperiph.c \
             bus.c \
             bus_spi.c \
