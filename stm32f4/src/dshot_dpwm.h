@@ -20,7 +20,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "timer.h"
 #include "io.h"
-#include "dma.h"
 
 #define DSHOT_DMA_BUFFER_UNIT uint32_t
 
