@@ -41,6 +41,30 @@ class DshotEsc : public Esc {
         // Time to separate dshot beacon and armining/disarming events
         static const uint32_t BEACON_GUARD_DELAY_US = 1200000;  
 
+        typedef struct {
+
+            float    (*convertFromExternal)(uint16_t value);
+            uint16_t (*convertToExternal)(float value);
+            void     (*disable)(void);
+            bool     (*enable)(void);
+            bool     (*isEnabled)(uint8_t index);
+            void     (*postInit)(void);
+            void     (*shutdown)(void);
+            void     (*updateComplete)(void);
+            bool     (*updateStart)(void);
+            void     (*write)(uint8_t index, float value);
+            void     (*writeInt)(uint8_t index, uint16_t value);
+
+        } escVTable_t;
+
+        typedef struct {
+            uint8_t     count;
+            bool        enabled;
+            uint32_t    enableTimeMs;
+            bool        initialized;
+            escVTable_t vTable;
+        } escDevice_t;
+
         void * m_escDevice;
 
     public:
@@ -57,7 +81,8 @@ class DshotEsc : public Esc {
 
         virtual float convertFromExternal(uint16_t value) override 
         {
-            return escDevConvertFromExternal(m_escDevice, value);
+            escDevice_t * escDevice = (escDevice_t *)m_escDevice;
+            return escDevice->vTable.convertFromExternal(value);
         }
 
         virtual bool isProtocolDshot(void) override 
