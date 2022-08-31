@@ -25,14 +25,13 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "io_impl.h"
 #include "dma.h"
 #include "dma_reqmap.h"
-#include "dshot_dev.h"
-#include "dshot_bitbang.h"
-#include "dshot_command.h"
 #include "escdev.h"
 #include "nvic.h"
 #include "pwm_output.h"
 #include <time.h>
 #include "timer.h"
+
+#include "dshot_bitbang.h"
 
 static void bbLoadDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
 {
