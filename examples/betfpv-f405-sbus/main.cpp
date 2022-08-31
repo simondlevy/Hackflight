@@ -47,9 +47,9 @@ int main(void)
     // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
     static Mpu6000 imu(2000); // gyro scale DPS
 
-    vector<PidController *> pidControllers = {&anglePid};
+    vector<PidController *> pids = {&anglePid};
 
-    static SbusReceiver receiver(SERIAL_PORT_USART3);
+    static SbusReceiver rx(SERIAL_PORT_USART3);
 
     static Mixer mixer = QuadXbfMixer::make();
 
@@ -57,14 +57,7 @@ int main(void)
 
     static Stm32F4Led led(37); // pin
 
-    static Hackflight hf(
-            &receiver,
-            &imu,
-            imuRotate270,
-            &pidControllers,
-            &mixer,
-            &esc,
-            &led);
+    static Hackflight hf(&rx, &imu, imuRotate270, &pids, &mixer, &esc, &led);
 
     hf.begin();
 
