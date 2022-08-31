@@ -44,9 +44,8 @@ class ArduinoBrushedEsc : public Esc {
             }
         }
 
-        virtual float  convertFromExternal(void * device, uint16_t value) override 
+        virtual float  convertFromExternal(uint16_t value) override 
         {
-            (void)device;
             (void)value;
 
             return (value - PWM_MIN) / (float)(PWM_MAX - PWM_MIN);
