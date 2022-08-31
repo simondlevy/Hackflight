@@ -22,6 +22,7 @@
 #include "esc.h"
 
 #include <timer.h>
+#include <io_types.h>
 
 extern "C" {
     void * dshotInit(uint8_t count, uint32_t period);
@@ -68,6 +69,15 @@ class DshotEsc : public Esc {
             volatile timCCR_t * ccr;
             TIM_TypeDef * tim;
         } timerChannel_t;
+
+        typedef struct {
+            timerChannel_t channel;
+            float pulseScale;
+            float pulseOffset;
+            bool forceOverflow;
+            bool enabled;
+            IO_t io;
+        } pwmOutputPort_t;
 
         void * m_escDevice;
 
