@@ -25,7 +25,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "io_impl.h"
 #include "dma.h"
 #include "dma_reqmap.h"
-#include "dshot.h"
+#include "dshot_dev.h"
 #include "dshot_bitbang_impl.h"
 #include "dshot_command.h"
 #include "escdev.h"

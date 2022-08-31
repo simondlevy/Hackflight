@@ -16,7 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "dshot.h"
+#include "dshot_dev.h"
 
 #include "timer.h"
 #include "io.h"

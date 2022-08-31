@@ -25,7 +25,7 @@
 #include "io.h"
 #include "escdev.h"
 #include "timer.h"
-#include "dshot.h"
+#include "dshot_dev.h"
 #include "pwm_output.h"
 #include "dshot_command.h"
 #include "systemdev.h"

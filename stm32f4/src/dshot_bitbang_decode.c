@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <core/constrain.h>
 
-#include "dshot.h"
+#include "dshot_dev.h"
 #include "dshot_bitbang_decode.h"
 #include "macros.h"
 #include "platform.h"
@@ -38,7 +38,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define MIN_VALID_BBSAMPLES ((21 - 2) * 3)
 #define MAX_VALID_BBSAMPLES ((21 + 2) * 3)
 
-// setting this define in dshot.h allows the cli command dshot_telemetry_info to
+// setting this define in dshot_dev.h allows the cli command dshot_telemetry_info to
 // display the received telemetry data in raw form which helps identify
 // the root cause of packet decoding issues.
 
