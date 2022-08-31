@@ -21,10 +21,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <time.h>
 #include "escdev.h"
 
-#define DSHOT_MIN_THROTTLE       48
-#define DSHOT_MAX_THROTTLE     2047
-#define DSHOT_RANGE (DSHOT_MAX_THROTTLE - DSHOT_MIN_THROTTLE)
-
 #define MIN_GCR_EDGES         7
 #define MAX_GCR_EDGES         22
 
