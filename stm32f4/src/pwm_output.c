@@ -140,9 +140,7 @@ static escVTable_t motorPwmVTable = {
     .enable = pwmEnableMotors,
     .disable = pwmDisableMotors,
     .isEnabled = pwmIsMotorEnabled,
-    .shutdown = pwmShutdownPulsesForAllMotors,
-    .convertFromExternal = pwmConvertFromExternal,
-    .convertToExternal = pwmConvertToExternal,
+    .shutdown = pwmShutdownPulsesForAllMotors
 };
 
 escDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUnsyncedPwm)

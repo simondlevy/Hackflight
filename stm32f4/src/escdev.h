@@ -39,8 +39,6 @@ static const escProtocol_t ESC_PROTOCOL = ESC_DSHOT600;
 
 typedef struct {
 
-    float    (*convertFromExternal)(uint16_t value);
-    uint16_t (*convertToExternal)(float value);
     void     (*disable)(void);
     bool     (*enable)(void);
     bool     (*isEnabled)(uint8_t index);

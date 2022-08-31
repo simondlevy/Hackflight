@@ -541,8 +541,6 @@ static escVTable_t bbVTable = {
     .write = bbWrite,
     .writeInt = bbWriteInt,
     .updateComplete = bbUpdateComplete,
-    .convertFromExternal = dshotConvertFromExternal,
-    .convertToExternal = dshotConvertToExternal,
     .shutdown = bbShutdown,
 };
 
