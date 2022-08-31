@@ -54,11 +54,12 @@ void hardwareInit(void)
 
 void * escInit(uint32_t core_period)
 {
-    void * escDevice = escDevInitDshot(4);
     inverterInit();
     spiPinConfigure();
     spiPreInit();
     spiInit(0x07); // mask for devices 0,1,2
+
+    void * escDevice = escDevInitDshot(4);
     dshotSetPidLoopTime(core_period);
     pinioInit();
     usbCableDetectInit();
