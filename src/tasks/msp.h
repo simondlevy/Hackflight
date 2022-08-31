@@ -36,7 +36,7 @@ class MspTask : public Task {
                     &data->vstate,
                     &data->rxSticks,
                     data->arming.isArmed(),
-                    data->escDevice,
+                    data->esc,
                     data->mspMotors);
         }
 };

@@ -26,6 +26,7 @@
 #include "core/demands.h"
 #include "core/filters/pt3.h"
 #include "core/pids/angle.h"
+#include "esc.h"
 #include "pwm.h"
 #include "serial.h"
 #include "sticks.h"
@@ -417,7 +418,7 @@ class Receiver {
     }
 
     bool processData(
-            void * escDevice,
+            Esc * esc,
             float raw[],
             uint32_t currentTimeUs,
             Arming * arming,
@@ -450,7 +451,7 @@ class Receiver {
             failsafe->startMonitoring();
         }
 
-        failsafe->update(raw, escDevice, arming);
+        failsafe->update(raw, esc, arming);
 
         return throttleIsDown(raw);
     }
@@ -806,7 +807,7 @@ class Receiver {
             bool imuIsLevel,
             bool calibrating,
             sticks_t * sticks,
-            void * escDevice,
+            Esc * esc,
             Arming * arming,
             Failsafe * failsafe,
             bool * pidItermResetReady,
@@ -834,7 +835,7 @@ class Receiver {
                 }
                 *pidItermResetReady = true;
                 *pidItermResetValue = processData(
-                        escDevice,
+                        esc,
                         m_raw,
                         currentTimeUs,
                         arming, 
@@ -843,7 +844,7 @@ class Receiver {
                 break;
 
             case STATE_MODES:
-                arming->check(escDevice, currentTimeUs, m_raw,
+                arming->check(esc, currentTimeUs, m_raw,
                         imuIsLevel,
                         calibrating);
                 m_state = STATE_UPDATE;

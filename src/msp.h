@@ -136,7 +136,7 @@ class Msp {
                 mspPostProcessFnPtr *mspPostProcessFn,
                 State * vstate,
                 Receiver::sticks_t * rxax,
-                void * escDevice,
+                Esc * esc,
                 float * motors);
 
         typedef void (*mspProcessReplyFnPtr)(mspPacket_t *cmd);
@@ -225,14 +225,14 @@ class Msp {
         static mspResult_e processInCommand(
                 int16_t cmdMSP,
                 sbuf_t *src,
-                void * escDevice,
+                Esc * esc,
                 float * motors)
         {
             switch (cmdMSP) {
 
                 case SET_MOTOR:
                     for (int i = 0; i < 4; i++) {
-                        motors[i] = escDevConvertFromExternal(escDevice, sbufReadU16(src));
+                        motors[i] = esc->convertFromExternal(sbufReadU16(src));
                     }
                     break;
 
@@ -254,7 +254,7 @@ class Msp {
                 mspPostProcessFnPtr *mspPostProcessFn,
                 State * vstate,
                 Receiver::sticks_t * rxax,
-                void * escDevice,
+                Esc * esc,
                 float * motors) {
 
             //(void)srcDesc;
@@ -271,7 +271,7 @@ class Msp {
                 ret = RESULT_ACK;
             } 
             else {
-                ret = processInCommand(cmdMSP, src, escDevice, motors);
+                ret = processInCommand(cmdMSP, src, esc, motors);
             }
             reply->result = ret;
             return ret;
@@ -429,7 +429,7 @@ class Msp {
                 mspProcessCommandFnPtr mspProcessCommandFn,
                 State * vstate,
                 Receiver::sticks_t * rxax,
-                void * escDevice,
+                Esc * esc,
                 float * motors)
         {
             static uint8_t mspSerialOutBuf[PORT_OUTBUF_SIZE];
@@ -456,7 +456,7 @@ class Msp {
                     &mspPostProcessFn,
                     vstate,
                     rxax,
-                    escDevice,
+                    esc,
                     motors);
 
             if (status != RESULT_NO_REPLY) {
@@ -535,15 +535,9 @@ class Msp {
                 State * vstate,
                 Receiver::sticks_t *rxsticks,
                 bool armed,
-                void * escDevice,
+                Esc * esc,
                 float * motors)
         {
-            (void)vstate;
-            (void)rxsticks;
-            (void)armed;
-            (void)escDevice;
-            (void)motors;
-
             // Sync debugging to MSP update
             if (m_debugging) {
                 serialDebugFlush();
@@ -582,7 +576,7 @@ class Msp {
                                             fcProcessCommand,
                                             vstate,
                                             rxsticks,
-                                            escDevice,
+                                            esc,
                                             motors);
                             } else if (mspPort->packetType == PACKET_REPLY) {
                                 serialProcessReceivedReply(mspPort, fcProcessReply);

@@ -21,8 +21,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "led.h"
 #include "esc.h"
+#include "led.h"
 #include "sticks.h"
 
 class Arming {
@@ -60,7 +60,7 @@ class Arming {
     bool m_throttle_is_down;
 
     void check(
-            void * escDevice,
+            Esc * esc,
             uint32_t currentTimeUs,
             float raw[],
             bool imuIsLevel,
@@ -78,7 +78,7 @@ class Arming {
                     return;
                 }
 
-                if (!escDevIsReady(currentTimeUs)) {
+                if (!esc->isReady(currentTimeUs)) {
                     return;
                 }
 
@@ -89,7 +89,7 @@ class Arming {
         } else {
 
             if (m_is_armed) {
-                disarm(escDevice);
+                disarm(esc);
                 m_is_armed = false;
             }
         }
@@ -99,10 +99,10 @@ class Arming {
         }
     }
 
-    void disarm(void * escDevice)
+    void disarm(Esc * esc)
     {
         if (m_is_armed) {
-            escDevStop(escDevice);
+            esc->stop();
         }
 
         m_is_armed = false;

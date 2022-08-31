@@ -70,7 +70,7 @@ class ReceiverTask : public Task {
                     imuIsLevel, 
                     calibrating,
                     &rxsticks,
-                    data->escDevice,
+                    data->esc,
                     &data->arming,
                     &data->failsafe,
                     &pidItermResetReady,
