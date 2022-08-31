@@ -22,9 +22,9 @@
 #include "esc.h"
 
 extern "C" {
-    void  * dshotInit(uint8_t count, uint32_t period);
-    void    dshotStop(void * escDevice);
-    void    dshotWrite(void * escDevice, float *values);
+    void * dshotInit(uint8_t count, uint32_t period);
+    void   dshotStop(void * escDevice);
+    void   dshotWrite(void * escDevice, float *values);
 }
 
 class DshotEsc : public Esc {
@@ -113,8 +113,25 @@ class DshotEsc : public Esc {
             dshotStop(m_escDevice);
         }
 
+        virtual void write(float *values) override
+        {
+            escDevice_t * escDevice = (escDevice_t *)m_escDevice;
+
+            if (escDevice->enabled) {
+                if (!escDevice->vTable.updateStart()) {
+                    return;
+                }
+                for (auto i=0; i <escDevice->count; i++) {
+                    escDevice->vTable.write(i, values[i]);
+                }
+                escDevice->vTable.updateComplete();
+            }
+        }
+
+
+        /*
         virtual void write(float *values) override 
         {
             dshotWrite(m_escDevice, values);
-        }            
+        }*/
 };
