@@ -34,6 +34,25 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <time.h>
 #include "timer.h"
 
+static void bbLoadDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
+{
+    ((DMA_Stream_TypeDef *)dmaResource)->CR = dmaRegCache->CR;
+    ((DMA_Stream_TypeDef *)dmaResource)->FCR = dmaRegCache->FCR;
+    ((DMA_Stream_TypeDef *)dmaResource)->NDTR = dmaRegCache->NDTR;
+    ((DMA_Stream_TypeDef *)dmaResource)->PAR = dmaRegCache->PAR;
+    ((DMA_Stream_TypeDef *)dmaResource)->M0AR = dmaRegCache->M0AR;
+}
+
+static void bbSaveDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
+{
+    dmaRegCache->CR = ((DMA_Stream_TypeDef *)dmaResource)->CR;
+    dmaRegCache->FCR = ((DMA_Stream_TypeDef *)dmaResource)->FCR;
+    dmaRegCache->NDTR = ((DMA_Stream_TypeDef *)dmaResource)->NDTR;
+    dmaRegCache->PAR = ((DMA_Stream_TypeDef *)dmaResource)->PAR;
+    dmaRegCache->M0AR = ((DMA_Stream_TypeDef *)dmaResource)->M0AR;
+}
+
+
 void bbGpioSetup(bbMotor_t *bbMotor)
 {
     bbPort_t *bbPort = bbMotor->bbPort;
@@ -81,23 +100,7 @@ void bbTimerChannelInit(bbPort_t *bbPort)
     TIM_Cmd(bbPort->timhw->tim, ENABLE);
 }
 
-void bbLoadDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
-{
-    ((DMA_Stream_TypeDef *)dmaResource)->CR = dmaRegCache->CR;
-    ((DMA_Stream_TypeDef *)dmaResource)->FCR = dmaRegCache->FCR;
-    ((DMA_Stream_TypeDef *)dmaResource)->NDTR = dmaRegCache->NDTR;
-    ((DMA_Stream_TypeDef *)dmaResource)->PAR = dmaRegCache->PAR;
-    ((DMA_Stream_TypeDef *)dmaResource)->M0AR = dmaRegCache->M0AR;
-}
 
-static void bbSaveDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
-{
-    dmaRegCache->CR = ((DMA_Stream_TypeDef *)dmaResource)->CR;
-    dmaRegCache->FCR = ((DMA_Stream_TypeDef *)dmaResource)->FCR;
-    dmaRegCache->NDTR = ((DMA_Stream_TypeDef *)dmaResource)->NDTR;
-    dmaRegCache->PAR = ((DMA_Stream_TypeDef *)dmaResource)->PAR;
-    dmaRegCache->M0AR = ((DMA_Stream_TypeDef *)dmaResource)->M0AR;
-}
 
 void bbSwitchToOutput(bbPort_t * bbPort)
 {
@@ -123,31 +126,6 @@ void bbSwitchToOutput(bbPort_t * bbPort)
     bbPort->timhw->tim->ARR = bbPort->outputARR;
 
     bbPort->direction = DSHOT_BITBANG_DIRECTION_OUTPUT;
-
-}
-
-void bbSwitchToInput(bbPort_t *bbPort)
-{
-
-    // Set GPIO to input
-
-    ATOMIC_BLOCK(NVIC_PRIO_TIMER) {
-        MODIFY_REG(bbPort->gpio->MODER, bbPort->gpioModeMask, bbPort->gpioModeInput);
-    }
-
-    // Reinitialize port group DMA for input
-
-    dmaResource_t *dmaResource = bbPort->dmaResource;
-    bbLoadDMARegs(dmaResource, &bbPort->dmaRegInput);
-
-    // Reinitialize pacer timer for input
-
-    bbPort->timhw->tim->CNT = 0;
-    bbPort->timhw->tim->ARR = bbPort->inputARR;
-
-    bbDMA_Cmd(bbPort, ENABLE);
-
-    bbPort->direction = DSHOT_BITBANG_DIRECTION_INPUT;
 
 }
 
