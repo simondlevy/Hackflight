@@ -104,7 +104,6 @@ extern "C" {
 
 void pwmWriteDshotInt(uint8_t index, uint16_t value);
 bool pwmDshotMotorHardwareConfig(const timerHardware_t *timerHardware, uint8_t motorIndex, uint8_t reorderedMotorIndex, escProtocol_t pwmProtocolType, uint8_t output);
-bool pwmStartDshotMotorUpdate(void);
 void pwmCompleteDshotMotorUpdate(void);
 extern bool useBurstDshot;
 extern escDevice_t dshotPwmDevice;

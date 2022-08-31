@@ -155,52 +155,6 @@ static uint32_t decodeTelemetryPacket(uint32_t buffer[], uint32_t count)
     return ret;
 }
 
- bool pwmStartDshotMotorUpdate(void)
-{
-    if (!useDshotTelemetry) {
-        return true;
-    }
-    const uint32_t currentTimeMs = millis();
-    const uint32_t currentUs = micros();
-    for (int i = 0; i < dshotPwmDevice.count; i++) {
-        int32_t usSinceInput = cmpTimeUs(currentUs, inputStampUs);
-        if (usSinceInput >= 0 && usSinceInput < dmaMotors[i].dshotTelemetryDeadtimeUs) {
-            return false;
-        }
-        if (dmaMotors[i].isInput) {
-            uint32_t edges = GCR_TELEMETRY_INPUT_LEN - xDMA_GetCurrDataCounter(dmaMotors[i].dmaRef);
-
-            TIM_DMACmd(dmaMotors[i].timerHardware->tim, dmaMotors[i].timerDmaSource, DISABLE);
-
-            uint16_t value = 0xffff;
-
-            if (edges > MIN_GCR_EDGES) {
-                dshotTelemetryState.readCount++;
-                value = decodeTelemetryPacket(dmaMotors[i].dmaBuffer, edges);
-
-                bool validTelemetryPacket = false;
-                if (value != 0xffff) {
-                    dshotTelemetryState.motorState[i].telemetryValue = value;
-                    dshotTelemetryState.motorState[i].telemetryActive = true;
-                    if (i < 4) {
-                    }
-                    validTelemetryPacket = true;
-                } else {
-                    dshotTelemetryState.invalidPacketCount++;
-                    if (i == 0) {
-                        memcpy(dshotTelemetryState.inputBuffer, dmaMotors[i].dmaBuffer, sizeof(dshotTelemetryState.inputBuffer));
-                    }
-                }
-                updateDshotTelemetryQuality(&dshotTelemetryQuality[i], validTelemetryPacket, currentTimeMs);
-            }
-        }
-        pwmDshotSetDirectionOutput(&dmaMotors[i]);
-    }
-    inputStampUs = 0;
-    dshotEnableChannels(dshotPwmDevice.count);
-    return true;
-}
-
 bool isDshotMotorTelemetryActive(uint8_t motorIndex)
 {
     return dshotTelemetryState.motorState[motorIndex].telemetryActive;

@@ -37,5 +37,3 @@ void dshotEnableChannels(uint8_t motorCount);
 void pwmDshotSetDirectionOutput(
     motorDmaOutput_t * const motor
 );
-
-bool pwmStartDshotMotorUpdate(void);
