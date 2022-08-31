@@ -20,37 +20,33 @@
 
 #include "esc.h"
 
+#include <vector>
+using namespace std;
+
 class ArduinoBrushedEsc : public Esc {
 
     private:
 
-        uint8_t m_pins[MAX_SUPPORTED_MOTORS];
-        uint8_t m_count;
+        vector<uint8_t> * m_pins;
 
     public:
 
-        BrushedEsc(uint8_t * pins, uint8_t count) override 
+        ArduinoBrushedEsc(vector<uint8_t> * pins)  
+            : Esc(pins->size())
         {
-            for (auto k=0; k<count; ++k) {
-                m_pins[k] = pins[k];
-            }
-
-            m_count = count;
+            m_pins = pins;
         }
 
         virtual void begin(void) override
         {
-            for (auto k=0; k<m_count; ++k) {
-                analogWriteFrequency(m_pins[k], 10000);
-                analogWrite(m_pins[k], 0);
+            for (auto p : *m_pins) {
+                analogWriteFrequency(p, 10000);
+                analogWrite(p, 0);
             }
         }
 
-        virtual float  convertFromExternal(void * device, uint16_t value) override 
+        virtual float  convertFromExternal(uint16_t value) override 
         {
-            (void)device;
-            (void)value;
-
             return (value - PWM_MIN) / (float)(PWM_MAX - PWM_MIN);
         }
 
@@ -87,8 +83,9 @@ class ArduinoBrushedEsc : public Esc {
 
         virtual void write(float *values) override 
         {
-            for (auto k=0; k<m_count; ++k) {
-                analogWrite(m_pins[k], (uint8_t)(m_values[k] * 255));
+            uint8_t k=0;
+            for (auto p: *m_pins) {
+                analogWrite(p, (uint8_t)(values[k++] * 255));
             }
         }
 };

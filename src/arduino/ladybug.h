@@ -25,7 +25,7 @@
 #include <hackflight.h>
 #include <imus/usfs/usfs.h>
 #include <leds/arduino.h>
-#include <esc.h>
+#include <escs/brushed.h>
 #include <stm32clock.h>
 
 #include <vector>
@@ -45,9 +45,11 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 static ArduinoLed _led(18); // pin
 
-static uint8_t _motorPins[4] = {13, 16, 3, 11};
+static vector<uint8_t> _motorPins = {13, 16, 3, 11};
 
 static vector<PidController *> _pidControllers = {&_anglePid};
+
+static ArduinoBrushedEsc _esc(&_motorPins);
 
 class LadybugFc : public Hackflight {
 
@@ -61,7 +63,7 @@ class LadybugFc : public Hackflight {
                     imuRotate0,
                     &_pidControllers,
                     &_mixer,
-                    (void *)&_motorPins,
+                    &_esc,
                     &_led)
         {
         }
@@ -70,8 +72,6 @@ class LadybugFc : public Hackflight {
         {
             Wire.begin();
             delay(100);
-
-            escDevInitBrushed(_motorPins);
 
             stm32_startCycleCounter();
 

@@ -19,12 +19,19 @@
 
 #pragma once
 
+#undef min
+#undef max
+
 #include <math.h>
 #include <stdint.h>
 #include <string.h>
 
+#include <vector>
+using namespace std;
+
 #include "arming.h"
 #include "core/hackflight.h"
+#include "esc.h"
 #include "failsafe.h"
 #include "imu.h"
 #include "led.h"
@@ -106,31 +113,31 @@ class Hackflight {
 
                 auto motorOutput = motors.values[i];
 
-                motorOutput = escDevValueLow() +
-                    (escDevValueHigh() - escDevValueLow()) * motorOutput;
+                motorOutput = m_taskData.esc->valueLow() +
+                    (m_taskData.esc->valueHigh() - m_taskData.esc->valueLow()) * motorOutput;
 
                 if (m_taskData.failsafe.isActive()) {
-                    if (escDevIsProtocolDshot()) {
+                    if (m_taskData.esc->isProtocolDshot()) {
                         // Prevent getting into special reserved range
-                        motorOutput = (motorOutput < escDevValueLow()) ?
-                            escDevValueDisarmed() :
+                        motorOutput = (motorOutput < m_taskData.esc->valueLow()) ?
+                            m_taskData.esc->valueDisarmed() :
                             motorOutput; 
                     }
                     motorOutput = constrain_f(
                             motorOutput,
-                            escDevValueDisarmed(),
-                            escDevValueHigh());
+                            m_taskData.esc->valueDisarmed(),
+                            m_taskData.esc->valueHigh());
                 } else {
                     motorOutput =
                         constrain_f(
                                 motorOutput,
-                                escDevValueLow(),
-                                escDevValueHigh());
+                                m_taskData.esc->valueLow(),
+                                m_taskData.esc->valueHigh());
                 }
                 mixmotors[i] = motorOutput;
             }
 
-            escDevWrite(m_taskData.escDevice,
+            m_taskData.esc->write(
                     m_taskData.arming.isArmed() ?
                     mixmotors :
                     m_taskData.mspMotors);
@@ -239,18 +246,19 @@ class Hackflight {
                 Imu::align_fun imuAlignFun,
                 vector<PidController *> * pidControllers,
                 Mixer * mixer,
-                void * escDevice,
+                Esc * esc,
                 Led * led)
         {
             m_mixer = mixer;
             m_imuAlignFun = imuAlignFun;
             m_led = led;
+            m_taskData.esc = esc;
 
             m_pidControllers = pidControllers;
 
             m_taskData.receiver = receiver;
             m_taskData.imu = imu;
-            m_taskData.escDevice = escDevice;
+            m_taskData.esc = esc;
 
             // Initialize quaternion in upright position
             m_taskData.imuFusionPrev.quat.w = 1;
@@ -269,6 +277,8 @@ class Hackflight {
             m_taskData.imu->begin();
 
             m_led->begin();
+
+            m_taskData.esc->begin();
 
             m_led->flash(10, 50);
         }

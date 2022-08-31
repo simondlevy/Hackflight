@@ -23,6 +23,7 @@
 #include <stdint.h>
 
 #include "core/motors.h"
+#include "esc.h"
 #include "hackflight.h"
 #include "imu.h"
 #include "msp.h"
@@ -35,7 +36,7 @@ class Task {
         typedef struct {
 
             Imu *              imu;
-            void *             escDevice;
+            Esc *              esc;
             Receiver *         receiver;
 
             Arming             arming;

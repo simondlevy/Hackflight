@@ -21,33 +21,20 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "pwm.h"
-#include "time.h"
-
 #define MAX_SUPPORTED_MOTORS 8
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-    float   escDevConvertFromExternal(void * escDevice, uint16_t value);
-    void    escDevInitBrushed(uint8_t * pins);
-    void  * escDevInitDshot(uint8_t count);
-    bool    escDevIsProtocolDshot(void);
-    bool    escDevIsReady(uint32_t currentTime);
-    float   escDevValueDisarmed(void);
-    float   escDevValueHigh(void);
-    float   escDevValueLow(void);
-    void    escDevStop(void * escDevice);
-    void    escDevWrite(void * escDevice, float *values);
-
-#if defined(__cplusplus)
-}
-#endif
 
 #if defined(__cplusplus)
 
 class Esc {
+
+    protected:
+
+        uint8_t m_motorCount;
+
+        Esc(uint8_t motorCount) 
+        {
+            m_motorCount = motorCount;
+        }
 
     public:
 

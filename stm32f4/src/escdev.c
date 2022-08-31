@@ -23,9 +23,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <time.h>
 
 #include "platform.h"
-#include "dshot.h" // for DSHOT_ constants in mixerInitEscEndpoints
-#include "pwm_output.h" // for ESC_* and others
+#include "dshot.h"
+#include "pwm_output.h" 
 #include "dshot_bitbang.h"
+#include "dshot_command.h"
 #include "dshot_dpwm.h"
 #include "escdev.h"
 #include "systemdev.h"
@@ -109,7 +110,7 @@ escVTable_t escGetVTable(void * escDevice_void)
     return escDevice->vTable;
 }
 
-void * escDevInitDshot(uint8_t motorCount) {
+void * escDevInitDshot(uint8_t motorCount, uint32_t corePeriod) {
 
     memset(motors, 0, sizeof(motors));
 
@@ -121,6 +122,12 @@ void * escDevInitDshot(uint8_t motorCount) {
     escDevice->initialized = true;
     escDevice->enableTimeMs = 0;
     escDevice->enabled = false;
+
+    dshotSetPidLoopTime(corePeriod);
+
+    escPostInit(escDevice);
+
+    escEnable(escDevice);
 
     return (void *)escDevice;
 }
