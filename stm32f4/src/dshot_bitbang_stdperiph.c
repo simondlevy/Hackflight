@@ -26,12 +26,11 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dma.h"
 #include "dma_reqmap.h"
 #include "dshot_dev.h"
-#include "dshot_bitbang_impl.h"
 #include "dshot_bitbang.h"
 #include "dshot_command.h"
 #include "escdev.h"
 #include "nvic.h"
-#include "pwm_output.h" // XXX for pwmOutputPort_t motors[]; should go away with refactoring
+#include "pwm_output.h"
 #include <time.h>
 #include "timer.h"
 
