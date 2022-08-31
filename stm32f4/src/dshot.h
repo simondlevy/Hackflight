@@ -60,5 +60,3 @@ typedef struct dshotTelemetryState_s {
 } dshotTelemetryState_t;
 
 extern dshotTelemetryState_t dshotTelemetryState;
-
-bool isDshotTelemetryActive(void);
