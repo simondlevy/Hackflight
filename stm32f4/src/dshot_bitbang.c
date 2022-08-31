@@ -21,6 +21,9 @@
 #include <esc.h>
 #include <time.h>
 
+#include "platform.h"
+
+#include "atomic.h"
 #include "dma.h"
 #include "dma_reqmap.h"
 #include "dshot_bitbang.h"
@@ -30,7 +33,6 @@
 #include "io.h"
 #include "io_impl.h"
 #include "nvic.h"
-#include "platform.h"
 #include "pwm_output.h" 
 #include "systemdev.h"
 #include "timer.h"
