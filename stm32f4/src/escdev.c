@@ -110,7 +110,7 @@ escVTable_t escGetVTable(void * escDevice_void)
     return escDevice->vTable;
 }
 
-void * escDevInitDshot(uint8_t motorCount, uint32_t corePeriod) {
+void * dshotInit(uint8_t motorCount, uint32_t corePeriod) {
 
     memset(motors, 0, sizeof(motors));
 
@@ -160,7 +160,7 @@ bool escUpdateStartNull(void)
     return true;
 }
 
-void escDevWrite(void * escDevice_void, float *values)
+void dshotWrite(void * escDevice_void, float *values)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;
 

@@ -23,9 +23,10 @@
 
 extern "C" {
     float   escDevConvertFromExternal(void * escDevice, uint16_t value);
-    void  * escDevInitDshot(uint8_t count, uint32_t period);
-    void    escDevStop(void * escDevice);
-    void    escDevWrite(void * escDevice, float *values);
+
+    void  * dshotInit(uint8_t count, uint32_t period);
+    void    dshotStop(void * escDevice);
+    void    dshotWrite(void * escDevice, float *values);
 }
 
 class DshotEsc : public Esc {
@@ -51,7 +52,7 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            m_escDevice = escDevInitDshot(m_motorCount, Clock::PERIOD());
+            m_escDevice = dshotInit(m_motorCount, Clock::PERIOD());
         }
 
         virtual float convertFromExternal(uint16_t value) override 
@@ -86,11 +87,11 @@ class DshotEsc : public Esc {
 
         virtual void stop(void) override 
         {
-            escDevStop(m_escDevice);
+            dshotStop(m_escDevice);
         }
 
         virtual void write(float *values) override 
         {
-            escDevWrite(m_escDevice, values);
+            dshotWrite(m_escDevice, values);
         }            
 };

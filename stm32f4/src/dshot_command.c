@@ -226,7 +226,7 @@ bool dshotCommandOutputIsEnabled(uint8_t motorCount)
     return true;
 }
 
-void escDevStop(void * escDevice)
+void dshotStop(void * escDevice)
 {
     (void)escDevice;
 
