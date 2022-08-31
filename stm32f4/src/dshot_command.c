@@ -225,31 +225,3 @@ bool dshotCommandOutputIsEnabled(uint8_t motorCount)
 
     return true;
 }
-
-void dshotStop(void)
-{
-    uint8_t repeats = 10;
-    uint32_t delayAfterCommandUs = DSHOT_COMMAND_DELAY_US;
-
-    uint8_t m_motorCount = 4;
-
-    dshotCommandControl_t *commandControl = addCommand();
-    if (commandControl) {
-        commandControl->repeats = repeats;
-        commandControl->delayAfterCommandUs = delayAfterCommandUs;
-        for (unsigned i = 0; i < m_motorCount; i++) {
-            commandControl->command[i] = DSHOT_CMD_SPIN_DIRECTION_NORMAL;
-        }
-        if (allMotorsAreIdle(m_motorCount)) {
-            // we can skip the motors idle wait state
-            commandControl->state = DSHOT_COMMAND_STATE_STARTDELAY;
-            commandControl->nextCommandCycleDelay =
-                dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
-        } else {
-            commandControl->state = DSHOT_COMMAND_STATE_IDLEWAIT;
-
-            // will be set after idle wait completes
-            commandControl->nextCommandCycleDelay = 0;  
-        }
-    }
-}
