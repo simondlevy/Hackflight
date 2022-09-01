@@ -18,6 +18,7 @@
 
 #include <time.h>
 
+#include "bitbang.h"
 #include "dshot_dev.h"
 #include "escdev.h"
 #include "timer.h"
@@ -96,68 +97,6 @@ const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer);
 #define BB_GPIO_PULLDOWN GPIO_PuPd_DOWN
 #define BB_GPIO_PULLUP   GPIO_PuPd_UP
 
-typedef struct dmaRegCache_s {
-    uint32_t CR;
-    uint32_t FCR;
-    uint32_t NDTR;
-    uint32_t PAR;
-    uint32_t M0AR;
-} dmaRegCache_t;
-
-// Per pacer timer
-
-typedef struct bbPacer_s {
-    TIM_TypeDef *tim;
-    uint16_t dmaSources;
-} bbPacer_t;
-
-// Per GPIO port and timer channel
-
-typedef struct bbPort_s {
-    int portIndex;
-    GPIO_TypeDef *gpio;
-    const timerHardware_t *timhw;
-
-    uint16_t dmaSource;
-
-    dmaResource_t *dmaResource; // DMA resource for this port & timer channel
-    uint32_t dmaChannel;        // DMA channel or peripheral request
-
-    uint8_t direction;
-
-    // DMA resource register cache
-    dmaRegCache_t dmaRegOutput;
-    dmaRegCache_t dmaRegInput;
-
-    // For direct manipulation of GPIO_MODER register
-    uint32_t gpioModeMask;
-    uint32_t gpioModeInput;
-    uint32_t gpioModeOutput;
-
-    // Idle value
-    uint32_t gpioIdleBSRR;
-
-    TIM_TimeBaseInitTypeDef timeBaseInit;
-
-    // Output
-    uint16_t outputARR;
-    DMA_InitTypeDef outputDmaInit;
-    uint32_t *portOutputBuffer;
-    uint32_t portOutputCount;
-
-    // Input
-    uint16_t inputARR;
-    DMA_InitTypeDef inputDmaInit;
-    uint16_t *portInputBuffer;
-    uint32_t portInputCount;
-    bool inputActive;
-
-    // Misc
-    uint32_t outputIrq;
-    uint32_t inputIrq;
-    resourceOwner_t owner;
-} bbPort_t;
-
 // Per motor output
 
 typedef struct bbMotor_s {
@@ -181,8 +120,6 @@ extern FAST_DATA_ZERO_INIT int usedMotorPorts;
 
 extern FAST_DATA_ZERO_INIT bbMotor_t bbMotors[MAX_SUPPORTED_MOTORS];
 
-extern uint8_t bbPuPdMode;
-
 // DMA buffers
 // Note that we are not sharing input and output buffers,
 // as output buffer is only modified for middle bits
@@ -204,21 +141,3 @@ extern uint32_t bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTE
 #define DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH DSHOT_BB_PORT_IP_BUF_LENGTH
 
 extern uint16_t bbInputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
-
-typedef enum {
-    BITBANG_DIRECTION_OUTPUT, 
-    BITBANG_DIRECTION_INPUT
-} bitbangDirection_e;
-
-void bbDMA_Cmd(bbPort_t *bbPort, FunctionalState NewState);
-int  bbDMA_Count(bbPort_t *bbPort);
-void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor);
-void bbDMA_ITConfig(bbPort_t *bbPort);
-void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction);
-void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io);
-void bbSwitchToInput(bbPort_t * bbPort);
-void bbSwitchToOutput(bbPort_t * bbPort);
-void bbTIM_DMACmd(TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState);
-void bbTIM_TimeBaseInit(bbPort_t *bbPort, uint16_t period);
-void bbTimerChannelInit(bbPort_t *bbPort, resourceOwner_e owner);
-

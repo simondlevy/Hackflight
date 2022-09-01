@@ -30,7 +30,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "pwm_output.h"
 #include "timer.h"
 
-#include "dshot_bitbang.h"
+#include "bitbang.h"
+
+// XXX
+extern uint8_t bbPuPdMode;
 
 static void bbLoadDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
 {
