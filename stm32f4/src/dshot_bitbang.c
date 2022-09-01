@@ -540,19 +540,16 @@ dshotBitbangStatus_e dshotBitbangGetStatus()
     return bbStatus;
 }
 
-void dshotBitbangDevInit(uint8_t count)
+void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
 {
-    static const uint8_t ESC_IO_TAGS[4] = {32, 33, 19, 18};
-
     motorCount = count;
     bbStatus = DSHOT_BITBANG_STATUS_OK;
 
     memset(bbOutputBuffer, 0, sizeof(bbOutputBuffer));
 
     for (int motorIndex = 0; motorIndex < motorCount; motorIndex++) {
-        const timerHardware_t *timerHardware =
-            timerGetConfiguredByTag(ESC_IO_TAGS[motorIndex]);
-        const IO_t io = IOGetByTag(ESC_IO_TAGS[motorIndex]);
+        const timerHardware_t *timerHardware = timerGetConfiguredByTag(pins[motorIndex]);
+        const IO_t io = IOGetByTag(pins[motorIndex]);
 
         uint8_t output = timerHardware->output;
         bbPuPdMode = (output & TIMER_OUTPUT_INVERTED) ?

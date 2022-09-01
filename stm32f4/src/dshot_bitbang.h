@@ -46,7 +46,7 @@ void bbUpdateComplete(uint8_t motorCount);
 bool bbUpdateStart(void);
 void bbWrite(uint8_t motorIndex, float value);
 
-void dshotBitbangDevInit(uint8_t motorCount);
+void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count);
 
 dshotBitbangStatus_e dshotBitbangGetStatus();
 

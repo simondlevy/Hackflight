@@ -27,7 +27,9 @@ class DshotBitbangEsc : public DshotEsc {
 
         virtual void deviceInit(void) override
         {
-            dshotBitbangDevInit(m_motorCount);
+            static const uint8_t pins[4] = {32, 33, 19, 18};
+
+            dshotBitbangDevInit(pins, m_motorCount);
         }        
 
         virtual bool enable(void) override
