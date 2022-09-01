@@ -535,7 +535,6 @@ void bbPostInit()
 }
 
 static escVTable_t bbVTable = {
-    .disable = bbDisableMotors,
     .isEnabled = bbIsMotorEnabled,
     .updateStart = bbUpdateStart,
     .write = bbWrite,
