@@ -27,42 +27,12 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define MIN_GCR_EDGES         7
 #define MAX_GCR_EDGES         22
 
-#define DSHOT_TELEMETRY_QUALITY_WINDOW 1       // capture a rolling 1 second of packet stats
-#define DSHOT_TELEMETRY_QUALITY_BUCKET_MS 100  // determines the granularity of the stats and the overall number of rolling buckets
-#define DSHOT_TELEMETRY_QUALITY_BUCKET_COUNT (DSHOT_TELEMETRY_QUALITY_WINDOW * 1000 / DSHOT_TELEMETRY_QUALITY_BUCKET_MS)
-
-typedef struct dshotTelemetryQuality_s {
-    uint32_t packetCountSum;
-    uint32_t invalidCountSum;
-    uint32_t packetCountArray[DSHOT_TELEMETRY_QUALITY_BUCKET_COUNT];
-    uint32_t invalidCountArray[DSHOT_TELEMETRY_QUALITY_BUCKET_COUNT];
-    uint8_t lastBucketIndex;
-}  dshotTelemetryQuality_t;
-
-extern dshotTelemetryQuality_t dshotTelemetryQuality[MAX_SUPPORTED_MOTORS];
-
 typedef struct dshotProtocolControl_s {
     uint16_t value;
     bool requestTelemetry;
 } dshotProtocolControl_t;
 
 uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb);
-
-typedef struct dshotTelemetryMotorState_s {
-    uint16_t telemetryValue;
-    bool telemetryActive;
-} dshotTelemetryMotorState_t;
-
-
-typedef struct dshotTelemetryState_s {
-    bool useDshotTelemetry;
-    uint32_t invalidPacketCount;
-    uint32_t readCount;
-    dshotTelemetryMotorState_t motorState[MAX_SUPPORTED_MOTORS];
-    uint32_t inputBuffer[MAX_GCR_EDGES];
-} dshotTelemetryState_t;
-
-extern dshotTelemetryState_t dshotTelemetryState;
 
 #define DSHOT_DMA_BUFFER_UNIT uint32_t
 
