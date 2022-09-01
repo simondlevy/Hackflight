@@ -30,6 +30,11 @@ class DshotBitbangEsc : public DshotEsc {
             return dshotBitbangDevInit(m_motorCount);
         }        
 
+        virtual void postInit(void) override
+        {
+            bbPostInit();
+        }
+
     public:
 
         DshotBitbangEsc(uint8_t count) 

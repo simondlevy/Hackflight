@@ -58,4 +58,4 @@ void    dshotSetPidLoopTime(uint32_t);
 
 extern motorDmaOutput_t dmaMotors[MAX_SUPPORTED_MOTORS];
 
-motorDmaOutput_t *getMotorDmaOutput(uint8_t index);
+motorDmaOutput_t * getMotorDmaOutput(uint8_t index);

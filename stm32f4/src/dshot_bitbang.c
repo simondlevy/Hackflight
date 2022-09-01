@@ -513,7 +513,7 @@ static bool bbIsMotorEnabled(uint8_t index)
     return bbMotors[index].enabled;
 }
 
-static void bbPostInit()
+void bbPostInit()
 {
     bbFindPacerTimer();
 
@@ -535,7 +535,6 @@ static void bbPostInit()
 }
 
 static escVTable_t bbVTable = {
-    .postInit = bbPostInit,
     .enable = bbEnableMotors,
     .disable = bbDisableMotors,
     .isEnabled = bbIsMotorEnabled,

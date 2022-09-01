@@ -109,13 +109,6 @@ bool escIsEnabled(void * escDevice_void)
     return escDevice->enabled;
 }
 
-void escPostInit(void * escDevice_void)
-{
-    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
-
-    escDevice->vTable.postInit();
-}
-
 void escPostInitNull(void)
 {
 }

@@ -24,8 +24,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "io.h"
 
-#define MIN_GCR_EDGES         7
-#define MAX_GCR_EDGES         22
+#define MIN_GCR_EDGES 7
+#define MAX_GCR_EDGES 22
 
 typedef struct dshotProtocolControl_s {
     uint16_t value;

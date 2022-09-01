@@ -62,38 +62,12 @@ static dshotCommandControl_t commandQueue[DSHOT_MAX_COMMANDS + 1];
 static uint8_t commandQueueHead;
 static uint8_t commandQueueTail;
 
-void dshotSetPidLoopTime(uint32_t pidLoopTime)
-{
-    dshotCommandPidLoopTimeUs = pidLoopTime;
-}
-
-static  bool dshotCommandQueueFull()
-{
-    return (commandQueueHead + 1) % (DSHOT_MAX_COMMANDS + 1) == commandQueueTail;
-}
-
-bool dshotCommandQueueEmpty(void)
-{
-    return commandQueueHead == commandQueueTail;
-}
-
 static  bool isLastDshotCommand(void)
 {
     return ((commandQueueTail + 1) % (DSHOT_MAX_COMMANDS + 1) == commandQueueHead);
 }
 
-bool dshotCommandIsProcessing(void)
-{
-    if (dshotCommandQueueEmpty()) {
-        return false;
-    }
-    dshotCommandControl_t* command = &commandQueue[commandQueueTail];
-    const bool commandIsProcessing = command->state ==
-        DSHOT_COMMAND_STATE_STARTDELAY || command->state ==
-        DSHOT_COMMAND_STATE_ACTIVE || (command->state ==
-                DSHOT_COMMAND_STATE_POSTDELAY && !isLastDshotCommand()); return
-        commandIsProcessing;
-}
+
 
 static  bool dshotCommandQueueUpdate(void)
 {
@@ -153,6 +127,23 @@ static bool commandsAreEnabled(void * escDevice)
         DSHOT_PROTOCOL_DETECTION_DELAY_MS;
 }
 
+bool dshotCommandQueueEmpty(void)
+{
+    return commandQueueHead == commandQueueTail;
+}
+
+bool dshotCommandIsProcessing(void)
+{
+    if (dshotCommandQueueEmpty()) {
+        return false;
+    }
+    dshotCommandControl_t* command = &commandQueue[commandQueueTail];
+    const bool commandIsProcessing = command->state ==
+        DSHOT_COMMAND_STATE_STARTDELAY || command->state ==
+        DSHOT_COMMAND_STATE_ACTIVE || (command->state ==
+                DSHOT_COMMAND_STATE_POSTDELAY && !isLastDshotCommand()); return
+        commandIsProcessing;
+}
 uint8_t dshotCommandGetCurrent(uint8_t index)
 {
     return commandQueue[commandQueueTail].command[index];

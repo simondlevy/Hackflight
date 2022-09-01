@@ -43,6 +43,8 @@ struct escDevice_s;
 extern "C" {
 #endif
 
+void bbPostInit();
+
 escDevice_t *dshotBitbangDevInit(uint8_t motorCount);
 
 dshotBitbangStatus_e dshotBitbangGetStatus();

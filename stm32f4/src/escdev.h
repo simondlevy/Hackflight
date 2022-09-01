@@ -42,7 +42,6 @@ typedef struct {
     void     (*disable)(void);
     bool     (*enable)(void);
     bool     (*isEnabled)(uint8_t index);
-    void     (*postInit)(void);
     void     (*shutdown)(void);
     void     (*updateComplete)(void);
     bool     (*updateStart)(void);
@@ -60,7 +59,6 @@ typedef struct {
 } escDevice_t;
 
 void escDevWriteNull(uint8_t index, float value);
-void escPostInit(void * escDevice);
 void escPostInitNull();
 void escUpdateCompleteNull(void);
 bool escUpdateStartNull(void);
