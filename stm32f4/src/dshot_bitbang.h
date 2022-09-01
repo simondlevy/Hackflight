@@ -165,9 +165,9 @@ typedef struct bbPort_s {
 
 typedef struct bbMotor_s {
     dshotProtocolControl_t protocolControl;
-    int pinIndex;            // pinIndex of this motor output within a group that bbPort points to
+    int pinIndex;    // pinIndex of this motor output within a group that bbPort points to
     int portIndex;
-    IO_t io;                 // IO_t for this output
+    IO_t io;         // IO_t for this output
     uint8_t output;
     uint32_t iocfg;
     bbPort_t *bbPort;
@@ -208,15 +208,15 @@ extern uint32_t bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTE
 
 extern uint16_t bbInputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 
-void bbGpioSetup(bbMotor_t *bbMotor);
-void bbTimerChannelInit(bbPort_t *bbPort);
-void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction);
-void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor);
-void bbSwitchToOutput(bbPort_t * bbPort);
-void bbSwitchToInput(bbPort_t * bbPort);
-
-void bbTIM_TimeBaseInit(bbPort_t *bbPort, uint16_t period);
-void bbTIM_DMACmd(TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState);
-void bbDMA_ITConfig(bbPort_t *bbPort);
 void bbDMA_Cmd(bbPort_t *bbPort, FunctionalState NewState);
 int  bbDMA_Count(bbPort_t *bbPort);
+void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor);
+void bbDMA_ITConfig(bbPort_t *bbPort);
+void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction);
+void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io);
+void bbSwitchToInput(bbPort_t * bbPort);
+void bbSwitchToOutput(bbPort_t * bbPort);
+void bbTIM_DMACmd(TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState);
+void bbTIM_TimeBaseInit(bbPort_t *bbPort, uint16_t period);
+void bbTimerChannelInit(bbPort_t *bbPort);
+

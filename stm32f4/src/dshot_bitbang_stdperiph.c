@@ -28,7 +28,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "escdev.h"
 #include "nvic.h"
 #include "pwm_output.h"
-#include <time.h>
 #include "timer.h"
 
 #include "dshot_bitbang.h"
@@ -51,11 +50,8 @@ static void bbSaveDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache
     dmaRegCache->M0AR = ((DMA_Stream_TypeDef *)dmaResource)->M0AR;
 }
 
-
-void bbGpioSetup(bbMotor_t *bbMotor)
+void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io)
 {
-    bbPort_t *bbPort = bbMotor->bbPort;
-    int pinIndex = bbMotor->pinIndex;
 
     bbPort->gpioModeMask |= (GPIO_MODER_MODER0 << (pinIndex * 2));
     bbPort->gpioModeInput |= (GPIO_Mode_IN << (pinIndex * 2));
@@ -63,9 +59,9 @@ void bbGpioSetup(bbMotor_t *bbMotor)
 
     bbPort->gpioIdleBSRR |= (1 << (pinIndex + 16));  // BR (higher half)
 
-    IOWrite(bbMotor->io, 0);
+    IOWrite(io, 0);
 
-    IOConfigGPIO(bbMotor->io, IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, bbPuPdMode));
+    IOConfigGPIO(io, IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, bbPuPdMode));
 }
 
 void bbTimerChannelInit(bbPort_t *bbPort)
@@ -130,7 +126,10 @@ void bbSwitchToOutput(bbPort_t * bbPort)
 
 void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction)
 {
-    DMA_InitTypeDef *dmainit = (direction == DSHOT_BITBANG_DIRECTION_OUTPUT) ?  &bbPort->outputDmaInit : &bbPort->inputDmaInit;
+    DMA_InitTypeDef *dmainit =
+        (direction == DSHOT_BITBANG_DIRECTION_OUTPUT) ?
+        &bbPort->outputDmaInit :
+        &bbPort->inputDmaInit;
 
     DMA_StructInit(dmainit);
 

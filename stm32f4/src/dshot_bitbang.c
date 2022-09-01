@@ -391,23 +391,25 @@ static bool bbMotorConfig(
         bbDMA_ITConfig(bbPort);
     }
 
-    bbMotors[motorIndex].pinIndex = pinIndex;
-    bbMotors[motorIndex].io = io;
-    bbMotors[motorIndex].output = output;
-    bbMotors[motorIndex].bbPort = bbPort;
+    bbMotor_t * bbMotor = &bbMotors[motorIndex];
+
+    bbMotor->pinIndex = pinIndex;
+    bbMotor->io = io;
+    bbMotor->output = output;
+    bbMotor->bbPort = bbPort;
 
     IOInit(io, OWNER_MOTOR, RESOURCE_INDEX(motorIndex));
 
     // Setup GPIO_MODER and GPIO_ODR register manipulation values
 
-    bbGpioSetup(&bbMotors[motorIndex]);
+    bbGpioSetup(bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io);
 
     bbOutputDataInit(
             bbPort->portOutputBuffer, (1 << pinIndex), DSHOT_BITBANG_NONINVERTED);
 
     bbSwitchToOutput(bbPort);
 
-    bbMotors[motorIndex].configured = true;
+    bbMotor->configured = true;
 
     return true;
 }
