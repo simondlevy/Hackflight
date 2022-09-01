@@ -32,8 +32,6 @@ typedef struct dshotProtocolControl_s {
     bool requestTelemetry;
 } dshotProtocolControl_t;
 
-uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb);
-
 #define DSHOT_DMA_BUFFER_UNIT uint32_t
 
 typedef struct {
@@ -70,6 +68,7 @@ typedef struct motorDmaOutput_s {
 extern "C" {
 #endif
     motorDmaOutput_t *getMotorDmaOutput(uint8_t index);
+    uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb);
 #if defined(__cplusplus)
 }
 #endif
