@@ -547,9 +547,7 @@ void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
         const IO_t io = IOGetByTag(pins[motorIndex]);
 
         uint8_t output = timerHardware->output;
-        bbPuPdMode = (output & TIMER_OUTPUT_INVERTED) ?
-            BB_GPIO_PULLDOWN :
-            BB_GPIO_PULLUP;
+        bbPuPdMode = (output & TIMER_OUTPUT_INVERTED) ? GPIO_PuPd_DOWN : GPIO_PuPd_UP;
 
         if (!IOIsFreeOrPreinit(io)) {
             // not enough motors initialised for the mixer or a break in the motors
