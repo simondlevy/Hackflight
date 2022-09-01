@@ -512,7 +512,7 @@ static void bbShutdown(void)
     return;
 }
 
-void bbPostInit()
+void bbPostInit(dshotProtocol_t protocol)
 {
     bbFindPacerTimer();
 
@@ -520,7 +520,7 @@ void bbPostInit()
             motorCount; motorIndex++) {
 
         if (!bbMotorConfig(bbMotors[motorIndex].io, motorIndex,
-                    DSHOT_PROTOCOL, bbMotors[motorIndex].output)) { 
+                    protocol, bbMotors[motorIndex].output)) { 
             return NULL;
         }
 

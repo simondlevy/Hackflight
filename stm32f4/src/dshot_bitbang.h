@@ -44,7 +44,7 @@ extern "C" {
 #endif
 
 bool bbEnableMotors(void);
-void bbPostInit();
+void bbPostInit(dshotProtocol_t protocol);
 void bbUpdateComplete(uint8_t motorCount);
 bool bbUpdateStart(void);
 void bbWrite(uint8_t motorIndex, float value);

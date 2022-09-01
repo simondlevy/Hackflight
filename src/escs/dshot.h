@@ -111,8 +111,6 @@ class DshotEsc : public Esc {
 
         bool m_enabled;
 
-        dshotProtocol_t m_protocol;
-
         commandControl_t * addCommand(void)
         {
             auto newHead = (m_commandQueueHead + 1) % (MAX_COMMANDS + 1);
@@ -154,6 +152,8 @@ class DshotEsc : public Esc {
 
 
     protected:
+
+        dshotProtocol_t m_protocol;
 
         virtual void deviceInit(void) = 0;
         virtual bool enable(void) = 0;

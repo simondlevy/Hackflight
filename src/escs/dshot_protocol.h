@@ -24,5 +24,3 @@ typedef enum {
     DSHOT300,
     DSHOT600,
 } dshotProtocol_t;
-
-static const dshotProtocol_t DSHOT_PROTOCOL = DSHOT600;

@@ -37,7 +37,7 @@ class DshotBitbangEsc : public DshotEsc {
 
         virtual void postInit(void) override
         {
-            bbPostInit();
+            bbPostInit(m_protocol);
         }
 
         virtual void updateComplete(void)override
