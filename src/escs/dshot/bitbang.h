@@ -25,9 +25,9 @@ class DshotBitbangEsc : public DshotEsc {
 
     protected:
 
-        virtual escDevice_t * deviceInit(void) override
+        virtual void deviceInit(void) override
         {
-            return dshotBitbangDevInit(m_motorCount);
+            dshotBitbangDevInit(m_motorCount);
         }        
 
         virtual bool enable(void) override

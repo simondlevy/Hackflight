@@ -81,7 +81,6 @@ const timerHardware_t bbTimerHardware[] = {
     DEF_TIM(TIM1,  CH4, NONE,  TIM_USE_NONE, 0, 0),
 };
 
-static FAST_DATA_ZERO_INIT escDevice_t bbDevice;
 static FAST_DATA_ZERO_INIT uint32_t lastSendUs;
 
 typedef struct {
@@ -540,7 +539,7 @@ dshotBitbangStatus_e dshotBitbangGetStatus()
     return bbStatus;
 }
 
-escDevice_t *dshotBitbangDevInit(uint8_t count)
+void dshotBitbangDevInit(uint8_t count)
 {
     static const uint8_t ESC_IO_TAGS[8] = {32, 33, 19, 18, 56, 24, 0, 0};
 
@@ -585,6 +584,4 @@ escDevice_t *dshotBitbangDevInit(uint8_t count)
         // Fill in motors structure for 4way access (XXX Should be refactored)
         motors[motorIndex].io = bbMotors[motorIndex].io;
     }
-
-    return &bbDevice;
 }

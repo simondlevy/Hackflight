@@ -103,8 +103,6 @@ class DshotEsc : public Esc {
             uint8_t command[MAX_SUPPORTED_MOTORS];
         } commandControl_t;
 
-        escDevice_t * m_escDevice;
-
         pwmOutputPort_t m_motors[MAX_SUPPORTED_MOTORS];
 
         // gets set to the actual value when the PID loop is initialized
@@ -112,10 +110,7 @@ class DshotEsc : public Esc {
         uint8_t m_commandQueueHead;
         uint8_t m_commandQueueTail;
 
-        uint8_t  m_count;
-        bool     m_enabled;
-        uint32_t m_enableTimeMs;
-        bool     m_initialized;
+        bool m_enabled;
 
         commandControl_t * addCommand(void)
         {
@@ -159,8 +154,7 @@ class DshotEsc : public Esc {
 
     protected:
 
-        virtual escDevice_t * deviceInit(void) = 0;
-
+        virtual void deviceInit(void) = 0;
         virtual bool enable(void) = 0;
         virtual void postInit(void) = 0;
         virtual void updateComplete(void) = 0;
@@ -177,17 +171,14 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            m_escDevice = deviceInit();
+            deviceInit();
 
-            m_escDevice->initialized = true;
-            m_escDevice->enableTimeMs = 0;
-            m_escDevice->enabled = false;
+            m_enabled = false;
 
             postInit();
 
-            if (m_escDevice->initialized && enable()) {
-                m_escDevice->enabled = true;
-                m_escDevice->enableTimeMs = timeMillis();
+            if (enable()) {
+                m_enabled = true;
             }
         }
 
@@ -253,7 +244,7 @@ class DshotEsc : public Esc {
 
         virtual void write(float *values) override
         {
-            if (m_escDevice->enabled) {
+            if (m_enabled) {
                 if (!updateStart()) {
                     return;
                 }
