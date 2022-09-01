@@ -45,7 +45,7 @@ extern "C" {
 
 bool bbEnableMotors(void);
 void bbPostInit();
-void bbUpdateComplete(void);
+void bbUpdateComplete(uint8_t motorCount);
 bool bbUpdateStart(void);
 void bbWrite(uint8_t motorIndex, float value);
 

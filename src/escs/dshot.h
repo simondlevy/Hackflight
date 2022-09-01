@@ -112,6 +112,11 @@ class DshotEsc : public Esc {
         uint8_t m_commandQueueHead;
         uint8_t m_commandQueueTail;
 
+        uint8_t  m_count;
+        bool     m_enabled;
+        uint32_t m_enableTimeMs;
+        bool     m_initialized;
+
         commandControl_t * addCommand(void)
         {
             auto newHead = (m_commandQueueHead + 1) % (MAX_COMMANDS + 1);
@@ -174,7 +179,6 @@ class DshotEsc : public Esc {
         {
             m_escDevice = deviceInit();
 
-            m_escDevice->count = m_motorCount;
             m_escDevice->initialized = true;
             m_escDevice->enableTimeMs = 0;
             m_escDevice->enabled = false;
@@ -253,7 +257,7 @@ class DshotEsc : public Esc {
                 if (!updateStart()) {
                     return;
                 }
-                for (auto i=0; i <m_escDevice->count; i++) {
+                for (auto i=0; i <m_motorCount; i++) {
                     write(i, values[i]);
                 }
                 updateComplete();

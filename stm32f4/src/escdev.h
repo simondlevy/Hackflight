@@ -36,7 +36,6 @@ typedef enum {
 static const escProtocol_t ESC_PROTOCOL = ESC_DSHOT600;
 
 typedef struct {
-    uint8_t     count;
     bool        enabled;
     uint32_t    enableTimeMs;
     bool        initialized;

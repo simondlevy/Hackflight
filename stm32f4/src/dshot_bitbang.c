@@ -471,12 +471,12 @@ void bbWrite(uint8_t motorIndex, float value)
     bbWriteInt(motorIndex, value);
 }
 
-void bbUpdateComplete(void)
+void bbUpdateComplete(uint8_t motorCount)
 {
     // If there is a dshot command loaded up, time it correctly with motor update
 
     if (!dshotCommandQueueEmpty()) {
-        if (!dshotCommandOutputIsEnabled(bbDevice.count)) {
+        if (!dshotCommandOutputIsEnabled(motorCount)) {
             return;
         }
     }

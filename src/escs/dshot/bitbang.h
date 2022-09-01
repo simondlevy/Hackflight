@@ -42,7 +42,7 @@ class DshotBitbangEsc : public DshotEsc {
 
         virtual void updateComplete(void)override
         {
-            bbUpdateComplete();
+            bbUpdateComplete(m_motorCount);
         }
 
         virtual bool updateStart(void) override
