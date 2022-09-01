@@ -23,6 +23,21 @@
 
 class DshotBitbangEsc : public DshotEsc {
 
+    private:
+
+        typedef enum {
+            MODE_OFF,
+            MODE_ON,
+            MODE_AUTO,
+        } mode_e;
+
+        typedef enum {
+            STATUS_OK,
+            STATUS_MOTOR_PIN_CONFLICT,
+            STATUS_NO_PACER,
+            STATUS_TOO_MANY_PORTS,
+        } status_e;
+
     protected:
 
         virtual void deviceInit(void) override
