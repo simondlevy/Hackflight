@@ -22,7 +22,6 @@
 
 #include "bus_spi.h"
 #include "dshot_command.h"
-#include "escdev.h"
 #include "exti.h"
 #include "flash.h"
 #include "inverter.h"

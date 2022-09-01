@@ -29,7 +29,7 @@
 #include "dshot_bitbang.h"
 #include "dshot_command.h"
 #include "dshot_dev.h"
-#include "escdev.h"
+#include "esc_protocol.h"
 #include "io.h"
 #include "io_impl.h"
 #include "nvic.h"

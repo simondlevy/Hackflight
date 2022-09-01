@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <time.h>
 
-#include "escdev.h"
+#include "esc_protocol.h"
 #include "timer.h"
 #include "io.h"
 

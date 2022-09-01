@@ -283,7 +283,6 @@ $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
       flash.h \
       inverter.h \
       io.h \
-      escdev.h \
       pinio.h \
       serialdev.h \
       serial_uart.h \

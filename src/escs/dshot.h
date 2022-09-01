@@ -24,7 +24,7 @@
 #include "pwm.h"
 #include "time.h"
 
-#include <escdev.h>
+#include <esc_protocol.h>
 #include <timer.h>
 #include <dshot_dev.h>
 #include <io_types.h>
