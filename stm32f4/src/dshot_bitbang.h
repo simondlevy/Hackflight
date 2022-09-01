@@ -65,9 +65,6 @@ const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer);
 
 #define DSHOT_BITBANG_TELEMETRY_OVER_SAMPLE 3
 
-#define DSHOT_BITBANG_DIRECTION_OUTPUT 0
-#define DSHOT_BITBANG_DIRECTION_INPUT  1
-
 #define DSHOT_BITBANG_INVERTED         true
 #define DSHOT_BITBANG_NONINVERTED      false
 
@@ -208,6 +205,11 @@ extern uint32_t bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTE
 
 extern uint16_t bbInputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 
+typedef enum {
+    BITBANG_DIRECTION_OUTPUT, 
+    BITBANG_DIRECTION_INPUT
+} bitbangDirection_e;
+
 void bbDMA_Cmd(bbPort_t *bbPort, FunctionalState NewState);
 int  bbDMA_Count(bbPort_t *bbPort);
 void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor);
@@ -218,5 +220,5 @@ void bbSwitchToInput(bbPort_t * bbPort);
 void bbSwitchToOutput(bbPort_t * bbPort);
 void bbTIM_DMACmd(TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState);
 void bbTIM_TimeBaseInit(bbPort_t *bbPort, uint16_t period);
-void bbTimerChannelInit(bbPort_t *bbPort);
+void bbTimerChannelInit(bbPort_t *bbPort, resourceOwner_e owner);
 

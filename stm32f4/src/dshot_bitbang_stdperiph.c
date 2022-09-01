@@ -64,7 +64,7 @@ void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io)
     IOConfigGPIO(io, IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, bbPuPdMode));
 }
 
-void bbTimerChannelInit(bbPort_t *bbPort)
+void bbTimerChannelInit(bbPort_t *bbPort, resourceOwner_e owner)
 {
     const timerHardware_t *timhw = bbPort->timhw;
 
@@ -76,7 +76,8 @@ void bbTimerChannelInit(bbPort_t *bbPort)
     TIM_OCStruct.TIM_OutputState = TIM_OutputState_Enable;
     TIM_OCStruct.TIM_OCPolarity = TIM_OCPolarity_Low;
 
-    TIM_OCStruct.TIM_Pulse = 10; // Duty doesn't matter, but too value small would make monitor output invalid
+    // Duty doesn't matter, but too value small would make monitor output invalid
+    TIM_OCStruct.TIM_Pulse = 10; 
 
     TIM_Cmd(bbPort->timhw->tim, DISABLE);
 
@@ -86,7 +87,7 @@ void bbTimerChannelInit(bbPort_t *bbPort)
     if (timhw->tag) {
         IO_t io = IOGetByTag(timhw->tag);
         IOConfigGPIOAF(io, IOCFG_AF_PP, timhw->alternateFunction);
-        IOInit(io, OWNER_DSHOT_BITBANG, 0);
+        IOInit(io, owner, 0);
         TIM_CtrlPWMOutputs(timhw->tim, ENABLE);
     }
 
@@ -120,14 +121,13 @@ void bbSwitchToOutput(bbPort_t * bbPort)
 
     bbPort->timhw->tim->ARR = bbPort->outputARR;
 
-    bbPort->direction = DSHOT_BITBANG_DIRECTION_OUTPUT;
-
+    bbPort->direction = BITBANG_DIRECTION_OUTPUT;
 }
 
-void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction)
+void bbDMAPreconfigure(bbPort_t *bbPort, bitbangDirection_e direction)
 {
     DMA_InitTypeDef *dmainit =
-        (direction == DSHOT_BITBANG_DIRECTION_OUTPUT) ?
+        (direction == BITBANG_DIRECTION_OUTPUT) ?
         &bbPort->outputDmaInit :
         &bbPort->inputDmaInit;
 
@@ -142,7 +142,7 @@ void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction)
     dmainit->DMA_MemoryBurst = DMA_MemoryBurst_Single ;
     dmainit->DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
 
-    if (direction == DSHOT_BITBANG_DIRECTION_OUTPUT) {
+    if (direction == BITBANG_DIRECTION_OUTPUT) {
         dmainit->DMA_Priority = DMA_Priority_High;
         dmainit->DMA_DIR = DMA_DIR_MemoryToPeripheral;
         dmainit->DMA_BufferSize = bbPort->portOutputCount;

@@ -382,11 +382,11 @@ static bool bbMotorConfig(
 
         bbTimebaseSetup(bbPort, pwmProtocolType);
         bbTIM_TimeBaseInit(bbPort, bbPort->outputARR);
-        bbTimerChannelInit(bbPort);
+        bbTimerChannelInit(bbPort, OWNER_DSHOT_BITBANG);
 
         bbSetupDma(bbPort);
-        bbDMAPreconfigure(bbPort, DSHOT_BITBANG_DIRECTION_OUTPUT);
-        bbDMAPreconfigure(bbPort, DSHOT_BITBANG_DIRECTION_INPUT);
+        bbDMAPreconfigure(bbPort, BITBANG_DIRECTION_OUTPUT);
+        bbDMAPreconfigure(bbPort, BITBANG_DIRECTION_INPUT);
 
         bbDMA_ITConfig(bbPort);
     }
