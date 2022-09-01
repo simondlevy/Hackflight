@@ -33,7 +33,6 @@
 #include "io.h"
 #include "io_impl.h"
 #include "nvic.h"
-#include "pwm_output.h" 
 #include "systemdev.h"
 #include "timer.h"
 
@@ -84,6 +83,21 @@ const timerHardware_t bbTimerHardware[] = {
 
 static FAST_DATA_ZERO_INIT escDevice_t bbDevice;
 static FAST_DATA_ZERO_INIT uint32_t lastSendUs;
+
+typedef struct {
+    volatile timCCR_t *ccr;
+    TIM_TypeDef       *tim;
+} timerChannel_t;
+
+typedef struct {
+    timerChannel_t channel;
+    float pulseScale;
+    float pulseOffset;
+    bool forceOverflow;
+    bool enabled;
+    IO_t io;
+} pwmOutputPort_t;
+
 
 static pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
 

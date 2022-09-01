@@ -27,7 +27,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dma_reqmap.h"
 #include "escdev.h"
 #include "nvic.h"
-#include "pwm_output.h"
 #include "timer.h"
 
 #include "bitbang.h"

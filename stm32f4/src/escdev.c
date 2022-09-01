@@ -23,7 +23,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <time.h>
 
 #include "platform.h"
-#include "pwm_output.h" 
 #include "dshot_dev.h"
 #include "dshot_bitbang.h"
 #include "dshot_command.h"

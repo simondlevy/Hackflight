@@ -29,7 +29,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dshot_command.h"
 #include "escdev.h"
 #include "nvic.h"
-#include "pwm_output.h" // for ESC_* and others
 #include "timer.h"
 
 uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
