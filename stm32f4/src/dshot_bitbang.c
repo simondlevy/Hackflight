@@ -29,7 +29,7 @@
 #include "dshot_bitbang.h"
 #include "dshot_command.h"
 #include "dshot_dev.h"
-#include "esc_protocol.h"
+#include "dshot_protocol.h"
 #include "io.h"
 #include "io_impl.h"
 #include "nvic.h"
@@ -238,7 +238,7 @@ const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer)
 
 // Return frequency of smallest change [state/sec]
 
-static uint32_t getDshotBaseFrequency(escProtocol_t pwmProtocolType)
+static uint32_t getDshotBaseFrequency(dshotProtocol_t pwmProtocolType)
 {
     switch (pwmProtocolType) {
         case(ESC_DSHOT600):
@@ -338,7 +338,7 @@ static void bbFindPacerTimer(void)
     }
 }
 
-static void bbTimebaseSetup(bbPort_t *bbPort, escProtocol_t dshotProtocolType)
+static void bbTimebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
 {
     uint32_t timerclock = timerClock(bbPort->timhw->tim);
 
@@ -354,7 +354,7 @@ static void bbTimebaseSetup(bbPort_t *bbPort, escProtocol_t dshotProtocolType)
 // TIM_USE_MOTOR; it does not use the timer channel associated with the pin.
 
 static bool bbMotorConfig(
-        IO_t io, uint8_t motorIndex, escProtocol_t pwmProtocolType, uint8_t output)
+        IO_t io, uint8_t motorIndex, dshotProtocol_t pwmProtocolType, uint8_t output)
 {
     int pinIndex = IO_GPIOPinIdx(io);
     int portIndex = IO_GPIOPortIdx(io);

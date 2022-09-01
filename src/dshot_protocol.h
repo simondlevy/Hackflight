@@ -20,17 +20,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <time.h>
 
 typedef enum {
-    ESC_STANDARD = 0,
-    ESC_ONESHOT125,
-    ESC_ONESHOT42,
-    ESC_MULTISHOT,
-    ESC_BRUSHED,
     ESC_DSHOT150,
     ESC_DSHOT300,
     ESC_DSHOT600,
-    ESC_PROSHOT1000,
-    ESC_DISABLED,
-    ESC_MAX
-} escProtocol_t;
+} dshotProtocol_t;
 
-static const escProtocol_t ESC_PROTOCOL = ESC_DSHOT600;
+static const dshotProtocol_t ESC_PROTOCOL = ESC_DSHOT600;

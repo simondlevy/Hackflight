@@ -27,7 +27,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dma_reqmap.h"
 #include "exti.h"
 #include "io.h"
-#include "esc_protocol.h"
+#include "dshot_protocol.h"
 #include "rcc.h"
 #include "nvic.h"
 

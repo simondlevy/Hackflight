@@ -27,7 +27,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "atomic.h"
 #include "dshot_dev.h"
 #include "dshot_command.h"
-#include "esc_protocol.h"
+#include "dshot_protocol.h"
 #include "nvic.h"
 #include "timer.h"
 
