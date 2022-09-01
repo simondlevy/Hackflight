@@ -38,6 +38,18 @@ class DshotBitbangEsc : public DshotEsc {
             STATUS_TOO_MANY_PORTS,
         } status_e;
 
+        typedef struct {
+            dshotProtocolControl_t protocolControl;
+            int pinIndex;    
+            int portIndex;
+            IO_t io; 
+            uint8_t output;
+            uint32_t iocfg;
+            bbPort_t *bbPort;
+            bool configured;
+            bool enabled;
+        } bbMotor_t;
+
     protected:
 
         virtual void deviceInit(void) override
