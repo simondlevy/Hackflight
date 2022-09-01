@@ -39,8 +39,6 @@ static const escProtocol_t ESC_PROTOCOL = ESC_DSHOT600;
 
 typedef struct {
 
-    bool     (*isEnabled)(uint8_t index);
-    void     (*shutdown)(void);
     void     (*updateComplete)(void);
     bool     (*updateStart)(void);
     void     (*write)(uint8_t index, float value);

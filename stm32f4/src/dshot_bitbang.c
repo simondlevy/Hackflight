@@ -85,6 +85,7 @@ const timerHardware_t bbTimerHardware[] = {
 static FAST_DATA_ZERO_INIT escDevice_t bbDevice;
 static FAST_DATA_ZERO_INIT uint32_t lastSendUs;
 
+static pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
 
 // DMA GPIO output buffer formatting
 
@@ -533,8 +534,7 @@ static escVTable_t bbVTable = {
     .updateStart = bbUpdateStart,
     .write = bbWrite,
     .writeInt = bbWriteInt,
-    .updateComplete = bbUpdateComplete,
-    .shutdown = bbShutdown,
+    .updateComplete = bbUpdateComplete
 };
 
 dshotBitbangStatus_e dshotBitbangGetStatus()

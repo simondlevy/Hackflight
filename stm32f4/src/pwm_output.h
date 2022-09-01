@@ -51,8 +51,6 @@ typedef struct {
     IO_t io;
 } pwmOutputPort_t;
 
-extern FAST_DATA_ZERO_INIT pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
-
 struct escDevConfig_s;
 escDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useUnsyncedPwm);
 

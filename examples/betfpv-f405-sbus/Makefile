@@ -139,7 +139,6 @@ STM32_SRC = \
             system.c \
             timer_common.c \
             timer.c \
-            pwm_output.c \
             $(addprefix pg/, $(notdir $(wildcard $(STM_SRC_DIR)/pg/*.c))) \
             $(addprefix common/,$(notdir $(wildcard $(STM_SRC_DIR)/common/*.c))) \
             $(addprefix config/,$(notdir $(wildcard $(STM_SRC_DIR)/config/*.c)))
