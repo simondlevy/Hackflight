@@ -20,7 +20,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <time.h>
 
-#include "dshot_protocol.h"
 #include "timer.h"
 #include "io.h"
 

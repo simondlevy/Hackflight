@@ -19,11 +19,11 @@
 
 
 #include <esc.h>
+#include <escs/dshot_protocol.h>
 #include <time.h>
 
 #include "platform.h"
 #include "io.h"
-#include "dshot_protocol.h"
 #include "timer.h"
 #include "dshot_dev.h"
 #include "dshot_command.h"

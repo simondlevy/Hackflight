@@ -16,11 +16,11 @@
 
 #pragma once
 
+#include <escs/dshot_protocol.h>
 #include <time.h>
 
 #include "bitbang.h"
 #include "dshot_dev.h"
-#include "dshot_protocol.h"
 #include "timer.h"
 
 typedef enum {

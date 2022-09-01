@@ -25,7 +25,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "io_impl.h"
 #include "dma.h"
 #include "dma_reqmap.h"
-#include "dshot_protocol.h"
 #include "nvic.h"
 #include "timer.h"
 

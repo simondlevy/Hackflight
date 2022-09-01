@@ -18,13 +18,12 @@
 
 #pragma once
 
-#include "core/clock.h"
-#include "core/constrain.h"
-#include "esc.h"
-#include "pwm.h"
-#include "time.h"
-
-#include <dshot_protocol.h>
+#include <core/clock.h>
+#include <core/constrain.h>
+#include <esc.h>
+#include <escs/dshot_protocol.h>
+#include <pwm.h>
+#include <time.h>
 #include <timer.h>
 #include <dshot_dev.h>
 #include <io_types.h>

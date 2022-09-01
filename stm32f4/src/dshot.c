@@ -20,6 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <core/constrain.h>
 #include <esc.h>
+#include <escs/dshot_protocol.h>
 #include <pwm.h>
 #include <time.h>
 
@@ -27,7 +28,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "atomic.h"
 #include "dshot_dev.h"
 #include "dshot_command.h"
-#include "dshot_protocol.h"
 #include "nvic.h"
 #include "timer.h"
 

@@ -29,7 +29,6 @@
 #include "dshot_bitbang.h"
 #include "dshot_command.h"
 #include "dshot_dev.h"
-#include "dshot_protocol.h"
 #include "io.h"
 #include "io_impl.h"
 #include "nvic.h"
