@@ -102,8 +102,6 @@ class DshotEsc : public Esc {
             uint8_t command[MAX_SUPPORTED_MOTORS];
         } commandControl_t;
 
-        pwmOutputPort_t m_motors[MAX_SUPPORTED_MOTORS];
-
         // gets set to the actual value when the PID loop is initialized
         commandControl_t m_commandQueue[MAX_COMMANDS + 1];
         uint8_t m_commandQueueHead;
@@ -155,6 +153,7 @@ class DshotEsc : public Esc {
 
         dshotProtocol_t m_protocol;
 
+        uint8_t m_motors[MAX_SUPPORTED_MOTORS];
         uint8_t m_motorCount;
 
         virtual void deviceInit(void) = 0;
