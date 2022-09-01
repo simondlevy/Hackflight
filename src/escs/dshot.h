@@ -157,8 +157,11 @@ class DshotEsc : public Esc {
         virtual escDevice_t * deviceInit(void) = 0;
 
         virtual bool enable(void) = 0;
-
         virtual void postInit(void) = 0;
+        virtual void updateComplete(void) = 0;
+        virtual bool updateStart(void) = 0;
+        virtual void write(uint8_t index, float value) = 0;
+        virtual void writeInt(uint8_t index, uint16_t value) = 0;
 
     public:
 
@@ -247,13 +250,13 @@ class DshotEsc : public Esc {
         virtual void write(float *values) override
         {
             if (m_escDevice->enabled) {
-                if (!m_escDevice->vTable.updateStart()) {
+                if (!updateStart()) {
                     return;
                 }
                 for (auto i=0; i <m_escDevice->count; i++) {
-                    m_escDevice->vTable.write(i, values[i]);
+                    write(i, values[i]);
                 }
-                m_escDevice->vTable.updateComplete();
+                updateComplete();
             }
         }
 

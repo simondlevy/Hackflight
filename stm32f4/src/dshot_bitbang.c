@@ -377,15 +377,6 @@ static bool bbMotorConfig(
             bbPort->dmaChannel = dmaChannelSpec->channel;
         }
 
-        if (!bbPort || !dmaAllocate(dmaGetIdentifier(bbPort->dmaResource),
-                    bbPort->owner.owner, bbPort->owner.resourceIndex)) {
-            bbDevice.vTable.write = escDevWriteNull;
-            bbDevice.vTable.updateStart = escUpdateStartNull;
-            bbDevice.vTable.updateComplete = escUpdateCompleteNull;
-
-            return false;
-        }
-
         bbPort->gpio = IO_GPIO(io);
 
         bbPort->portOutputCount = MOTOR_DSHOT_BUF_LENGTH;
@@ -430,7 +421,7 @@ static bool bbMotorConfig(
     return true;
 }
 
-static bool bbUpdateStart(void)
+bool bbUpdateStart(void)
 {
     for (int i = 0; i < usedMotorPorts; i++) {
         bbDMA_Cmd(&bbPorts[i], DISABLE);
@@ -440,7 +431,7 @@ static bool bbUpdateStart(void)
     return true;
 }
 
-static void bbWriteInt(uint8_t motorIndex, uint16_t value)
+void bbWriteInt(uint8_t motorIndex, uint16_t value)
 {
     bbMotor_t *const bbmotor = &bbMotors[motorIndex];
 
@@ -475,12 +466,12 @@ static void bbWriteInt(uint8_t motorIndex, uint16_t value)
             DSHOT_BITBANG_NONINVERTED);
 }
 
-static void bbWrite(uint8_t motorIndex, float value)
+void bbWrite(uint8_t motorIndex, float value)
 {
     bbWriteInt(motorIndex, value);
 }
 
-static void bbUpdateComplete(void)
+void bbUpdateComplete(void)
 {
     // If there is a dshot command loaded up, time it correctly with motor update
 
@@ -544,13 +535,6 @@ void bbPostInit()
     }
 }
 
-static escVTable_t bbVTable = {
-    .updateStart = bbUpdateStart,
-    .write = bbWrite,
-    .writeInt = bbWriteInt,
-    .updateComplete = bbUpdateComplete
-};
-
 dshotBitbangStatus_e dshotBitbangGetStatus()
 {
     return bbStatus;
@@ -558,7 +542,6 @@ dshotBitbangStatus_e dshotBitbangGetStatus()
 
 escDevice_t *dshotBitbangDevInit(uint8_t count)
 {
-    bbDevice.vTable = bbVTable;
     motorCount = count;
     bbStatus = DSHOT_BITBANG_STATUS_OK;
 
@@ -577,9 +560,6 @@ escDevice_t *dshotBitbangDevInit(uint8_t count)
 
         if (!IOIsFreeOrPreinit(io)) {
             // not enough motors initialised for the mixer or a break in the motors
-            bbDevice.vTable.write = escDevWriteNull;
-            bbDevice.vTable.updateStart = escUpdateStartNull;
-            bbDevice.vTable.updateComplete = escUpdateCompleteNull;
             bbStatus = DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT;
             return NULL;
         }

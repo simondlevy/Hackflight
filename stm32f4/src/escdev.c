@@ -84,13 +84,6 @@ uint32_t escGetEnableTimeMs(void * escDevice_void)
     return escDevice->enableTimeMs;
 }
 
-escVTable_t escGetVTable(void * escDevice_void)
-{
-    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
-
-    return escDevice->vTable;
-}
-
 bool escIsEnabled(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;

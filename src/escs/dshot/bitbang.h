@@ -40,6 +40,26 @@ class DshotBitbangEsc : public DshotEsc {
             bbPostInit();
         }
 
+        virtual void updateComplete(void)override
+        {
+            bbUpdateComplete();
+        }
+
+        virtual bool updateStart(void) override
+        {
+            return bbUpdateStart();
+        }
+
+        virtual void write(uint8_t index, float value) override
+        {
+            bbWrite(index, value);
+        }
+
+        virtual void writeInt(uint8_t index, uint16_t value) override
+        {
+            bbWrite(index, value);
+        }
+
     public:
 
         DshotBitbangEsc(uint8_t count) 

@@ -38,20 +38,10 @@ typedef enum {
 static const escProtocol_t ESC_PROTOCOL = ESC_DSHOT600;
 
 typedef struct {
-
-    void     (*updateComplete)(void);
-    bool     (*updateStart)(void);
-    void     (*write)(uint8_t index, float value);
-    void     (*writeInt)(uint8_t index, uint16_t value);
-
-} escVTable_t;
-
-typedef struct {
     uint8_t     count;
     bool        enabled;
     uint32_t    enableTimeMs;
     bool        initialized;
-    escVTable_t vTable;
 } escDevice_t;
 
 void escDevWriteNull(uint8_t index, float value);
@@ -62,5 +52,4 @@ bool escUpdateStartNull(void);
 bool        escCheckProtocolEnabled(bool *protocolIsDshot);
 float       escGetDigitalIdOffset(void);
 uint32_t    escGetEnableTimeMs(void * escDevice);
-escVTable_t escGetVTable(void * escDevice);
 bool        escIsEnabled(void * escDevice);

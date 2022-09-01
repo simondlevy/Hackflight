@@ -44,8 +44,10 @@ extern "C" {
 #endif
 
 bool bbEnableMotors(void);
-
 void bbPostInit();
+void bbUpdateComplete(void);
+bool bbUpdateStart(void);
+void bbWrite(uint8_t motorIndex, float value);
 
 escDevice_t *dshotBitbangDevInit(uint8_t motorCount);
 
