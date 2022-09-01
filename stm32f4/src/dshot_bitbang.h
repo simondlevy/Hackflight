@@ -60,17 +60,12 @@ const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer);
 }
 #endif
 
-#define USE_DMA_REGISTER_CACHE
-
-#define DEBUG_COUNT_INTERRUPT
-#define DEBUG_MONITOR_PACER
-
-#define MAX_SUPPORTED_MOTOR_PORTS 4 // Max direct dshot port groups, limited by number of usable timer (TIM1 and TIM8) x number of channels per timer (4), 3 is enough to cover motor pins on GPIOA, GPIOB and GPIOC.
+// Max direct dshot port groups, limited by number of usable timer (TIM1 and
+// TIM8) x number of channels per timer (4), 3 is enough to cover motor pins on
+// GPIOA, GPIOB and GPIOC.
+#define MAX_SUPPORTED_MOTOR_PORTS 4 
 
 #define DSHOT_BITBANG_TELEMETRY_OVER_SAMPLE 3
-
-#define DSHOT_BITBANG_INVERTED         true
-#define DSHOT_BITBANG_NONINVERTED      false
 
 // Symbol rate [symbol/sec]
 #define MOTOR_DSHOT600_SYMBOL_RATE     (600 * 1000)

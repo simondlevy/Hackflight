@@ -411,8 +411,7 @@ static bool bbMotorConfig(
 
     bbGpioSetup(bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io, bbPuPdMode);
 
-    bbOutputDataInit(
-            bbPort->portOutputBuffer, (1 << pinIndex), DSHOT_BITBANG_NONINVERTED);
+    bbOutputDataInit(bbPort->portOutputBuffer, (1 << pinIndex), false); // not inverted
 
     bbSwitchToOutput(bbPort);
 
@@ -459,11 +458,7 @@ void bbWriteInt(uint8_t motorIndex, uint16_t value)
 
     bbPort_t *bbPort = bbmotor->bbPort;
 
-    bbOutputDataSet(
-            bbPort->portOutputBuffer,
-            bbmotor->pinIndex,
-            packet,
-            DSHOT_BITBANG_NONINVERTED);
+    bbOutputDataSet( bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
 }
 
 void bbWrite(uint8_t motorIndex, float value)
