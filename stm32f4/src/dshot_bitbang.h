@@ -67,11 +67,6 @@ const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer);
 
 #define DSHOT_BITBANG_TELEMETRY_OVER_SAMPLE 3
 
-// Symbol rate [symbol/sec]
-#define MOTOR_DSHOT600_SYMBOL_RATE     (600 * 1000)
-#define MOTOR_DSHOT300_SYMBOL_RATE     (300 * 1000)
-#define MOTOR_DSHOT150_SYMBOL_RATE     (150 * 1000)
-
 #define MOTOR_DSHOT_SYMBOL_TIME_NS(rate)  (1000000000 / (rate))
 
 #define MOTOR_DSHOT_BIT_PER_SYMBOL         1

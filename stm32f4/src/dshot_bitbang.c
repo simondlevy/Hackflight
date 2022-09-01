@@ -243,12 +243,12 @@ static uint32_t getDshotBaseFrequency(dshotProtocol_t pwmProtocolType)
 {
     switch (pwmProtocolType) {
         case(DSHOT600):
-            return MOTOR_DSHOT600_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
+            return 600;
         case(DSHOT300):
-            return MOTOR_DSHOT300_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
+            return 300;
         default:
         case(DSHOT150):
-            return MOTOR_DSHOT150_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
+            return 150;
     }
 }
 
@@ -343,7 +343,7 @@ static void bbTimebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
 {
     uint32_t timerclock = timerClock(bbPort->timhw->tim);
 
-    uint32_t outputFreq = getDshotBaseFrequency(dshotProtocolType);
+    uint32_t outputFreq = 1000 * getDshotBaseFrequency(dshotProtocolType);
     dshotFrameUs = 1000000 * 17 * 3 / outputFreq;
     bbPort->outputARR = timerclock / outputFreq - 1;
 
