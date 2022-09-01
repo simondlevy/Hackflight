@@ -22,10 +22,7 @@
 #include <stdbool.h>
 
 #include "time.h"
-
-#define MAX_SUPPORTED_MOTORS 8
-
-#if defined(__cplusplus)
+#include "maxmotors.h"
 
 class Motors {
 
@@ -45,5 +42,3 @@ class Motors {
         }
         
 }; // class Motors
-
-#endif

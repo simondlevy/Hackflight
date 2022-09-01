@@ -19,7 +19,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <math.h>
 
 #include <core/constrain.h>
-#include <esc.h>
 #include <escs/dshot_protocol.h>
 #include <pwm.h>
 #include <time.h>

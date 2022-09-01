@@ -18,8 +18,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdbool.h>
 
+#include <maxmotors.h>
+
 #include "dshot_dev.h"
-#include <esc.h>
 
 #define DSHOT_MAX_COMMAND 47
 

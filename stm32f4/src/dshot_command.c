@@ -18,7 +18,6 @@
 #include <stdint.h>
 
 
-#include <esc.h>
 #include <escs/dshot_protocol.h>
 #include <time.h>
 

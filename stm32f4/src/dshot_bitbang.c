@@ -18,7 +18,7 @@
 #include <math.h>
 #include <string.h>
 
-#include <esc.h>
+#include <maxmotors.h>
 #include <time.h>
 
 #include "platform.h"
