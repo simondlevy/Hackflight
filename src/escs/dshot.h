@@ -153,6 +153,8 @@ class DshotEsc : public Esc {
 
     protected:
 
+        uint8_t m_motorCount = 4; // XXX
+
         dshotProtocol_t m_protocol;
 
         virtual void deviceInit(void) = 0;
@@ -163,8 +165,8 @@ class DshotEsc : public Esc {
         virtual void write(uint8_t index, float value) = 0;
         virtual void writeInt(uint8_t index, uint16_t value) = 0;
 
-        DshotEsc(uint8_t count, dshotProtocol_t protocol=DSHOT600) 
-            : Esc(count)
+        DshotEsc(vector<uint8_t> * pins, dshotProtocol_t protocol=DSHOT600) 
+            : Esc(pins)
         {
             m_protocol = protocol;
         }

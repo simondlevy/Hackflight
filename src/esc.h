@@ -21,17 +21,20 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <vector>
+using namespace std;
+
 #include "maxmotors.h"
 
 class Esc {
 
     protected:
 
-        uint8_t m_motorCount;
+        vector<uint8_t> * m_pins;
 
-        Esc(uint8_t motorCount) 
+        Esc(vector<uint8_t> * pins)
         {
-            m_motorCount = motorCount;
+            m_pins = pins;
         }
 
     public:

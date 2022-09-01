@@ -49,11 +49,13 @@ int main(void)
 
     vector<PidController *> pids = {&anglePid};
 
+    vector<uint8_t> motorPins = {32, 33, 19, 18};
+
     static SbusReceiver rx(SERIAL_PORT_USART3);
 
     static Mixer mixer = QuadXbfMixer::make();
 
-    static DshotBitbangEsc esc(4);
+    static DshotBitbangEsc esc(&motorPins);
 
     static Stm32F4Led led(37); // pin
 
