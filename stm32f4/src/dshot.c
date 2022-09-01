@@ -38,7 +38,9 @@ uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
 
     ATOMIC_BLOCK(NVIC_PRIO_DSHOT_DMA) {
         packet = (pcb->value << 1) | (pcb->requestTelemetry ? 1 : 0);
-        pcb->requestTelemetry = false;    // reset telemetry request to make sure it's triggered only once in a row
+
+        // reset telemetry request to make sure it's triggered only once in a row
+        pcb->requestTelemetry = false;    
     }
 
     // compute checksum
@@ -55,8 +57,3 @@ uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
 
     return packet;
 }
-
-
-FAST_DATA_ZERO_INIT dshotTelemetryState_t dshotTelemetryState;
-
-FAST_DATA_ZERO_INIT dshotTelemetryQuality_t dshotTelemetryQuality[MAX_SUPPORTED_MOTORS];
