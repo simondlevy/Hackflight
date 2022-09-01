@@ -64,9 +64,9 @@ static dshotBitbangStatus_e bbStatus;
 #define BB_OUTPUT_BUFFER_ATTRIBUTE
 #define BB_INPUT_BUFFER_ATTRIBUTE
 
-BB_OUTPUT_BUFFER_ATTRIBUTE uint32_t
+static BB_OUTPUT_BUFFER_ATTRIBUTE uint32_t
   bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
-BB_INPUT_BUFFER_ATTRIBUTE uint16_t
+static BB_INPUT_BUFFER_ATTRIBUTE uint16_t
   bbInputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 
 static uint8_t bbPuPdMode;
@@ -542,15 +542,14 @@ dshotBitbangStatus_e dshotBitbangGetStatus()
 
 void dshotBitbangDevInit(uint8_t count)
 {
-    static const uint8_t ESC_IO_TAGS[8] = {32, 33, 19, 18, 56, 24, 0, 0};
+    static const uint8_t ESC_IO_TAGS[4] = {32, 33, 19, 18};
 
     motorCount = count;
     bbStatus = DSHOT_BITBANG_STATUS_OK;
 
     memset(bbOutputBuffer, 0, sizeof(bbOutputBuffer));
 
-    for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS &&
-            motorIndex < motorCount; motorIndex++) {
+    for (int motorIndex = 0; motorIndex < motorCount; motorIndex++) {
         const timerHardware_t *timerHardware =
             timerGetConfiguredByTag(ESC_IO_TAGS[motorIndex]);
         const IO_t io = IOGetByTag(ESC_IO_TAGS[motorIndex]);

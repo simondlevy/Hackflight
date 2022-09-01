@@ -118,10 +118,6 @@ typedef struct bbMotor_s {
 // Note that we are not sharing input and output buffers,
 // as output buffer is only modified for middle bits
 
-// DMA output buffer:
-// DShot requires 3 [word/bit] * 16 [bit] = 48 [word]
-extern uint32_t bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
-
 // DMA input buffer
 // (30us + <frame time> + <slack>) / <input sampling clock period>
 // <frame time> = <DShot symbol time> * 16
@@ -133,5 +129,3 @@ extern uint32_t bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTE
 // In some cases this was not enough, so we add 6 extra samples
 #define DSHOT_BB_PORT_IP_BUF_LENGTH 140
 #define DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH DSHOT_BB_PORT_IP_BUF_LENGTH
-
-extern uint16_t bbInputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
