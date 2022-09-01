@@ -40,7 +40,6 @@ static const escProtocol_t ESC_PROTOCOL = ESC_DSHOT600;
 typedef struct {
 
     void     (*disable)(void);
-    bool     (*enable)(void);
     bool     (*isEnabled)(uint8_t index);
     void     (*shutdown)(void);
     void     (*updateComplete)(void);
@@ -64,7 +63,6 @@ void escUpdateCompleteNull(void);
 bool escUpdateStartNull(void);
 
 bool        escCheckProtocolEnabled(bool *protocolIsDshot);
-void        escEnable(void * escDevice);
 float       escGetDigitalIdOffset(void);
 uint32_t    escGetEnableTimeMs(void * escDevice);
 escVTable_t escGetVTable(void * escDevice);

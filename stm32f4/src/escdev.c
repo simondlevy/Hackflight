@@ -78,16 +78,6 @@ bool escCheckProtocolEnabled(bool *isProtocolDshot)
     return enabled;
 }
 
-void escEnable(void * escDevice_void)
-{
-    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
-
-    if (escDevice->initialized && escDevice->vTable.enable()) {
-        escDevice->enabled = true;
-        escDevice->enableTimeMs = millis();
-    }
-}
-
 uint32_t escGetEnableTimeMs(void * escDevice_void)
 {
     escDevice_t * escDevice = (escDevice_t *)escDevice_void;

@@ -488,7 +488,7 @@ static void bbUpdateComplete(void)
     }
 }
 
-static bool bbEnableMotors(void)
+bool bbEnableMotors(void)
 {
     for (int i = 0; i < motorCount; i++) {
         if (bbMotors[i].configured) {
@@ -535,7 +535,6 @@ void bbPostInit()
 }
 
 static escVTable_t bbVTable = {
-    .enable = bbEnableMotors,
     .disable = bbDisableMotors,
     .isEnabled = bbIsMotorEnabled,
     .updateStart = bbUpdateStart,

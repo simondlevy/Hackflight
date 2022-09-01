@@ -156,6 +156,8 @@ class DshotEsc : public Esc {
 
         virtual escDevice_t * deviceInit(void) = 0;
 
+        virtual bool enable(void) = 0;
+
         virtual void postInit(void) = 0;
 
     public:
@@ -176,7 +178,7 @@ class DshotEsc : public Esc {
 
             postInit();
 
-            if (m_escDevice->initialized && m_escDevice->vTable.enable()) {
+            if (m_escDevice->initialized && enable()) {
                 m_escDevice->enabled = true;
                 m_escDevice->enableTimeMs = timeMillis();
             }

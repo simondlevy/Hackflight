@@ -30,6 +30,11 @@ class DshotBitbangEsc : public DshotEsc {
             return dshotBitbangDevInit(m_motorCount);
         }        
 
+        virtual bool enable(void) override
+        {
+            return bbEnableMotors();
+        }
+
         virtual void postInit(void) override
         {
             bbPostInit();
