@@ -520,8 +520,8 @@ void bbPostInit()
             motorCount; motorIndex++) {
 
         if (!bbMotorConfig(bbMotors[motorIndex].io, motorIndex,
-                    DSHOT_PROTOCOL, bbMotors[motorIndex].output)) { return
-            NULL;
+                    DSHOT_PROTOCOL, bbMotors[motorIndex].output)) { 
+            return NULL;
         }
 
 

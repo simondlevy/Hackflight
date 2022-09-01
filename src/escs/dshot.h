@@ -111,6 +111,8 @@ class DshotEsc : public Esc {
 
         bool m_enabled;
 
+        dshotProtocol_t m_protocol;
+
         commandControl_t * addCommand(void)
         {
             auto newHead = (m_commandQueueHead + 1) % (MAX_COMMANDS + 1);
@@ -161,12 +163,13 @@ class DshotEsc : public Esc {
         virtual void write(uint8_t index, float value) = 0;
         virtual void writeInt(uint8_t index, uint16_t value) = 0;
 
-    public:
-
-        DshotEsc(uint8_t count) 
+        DshotEsc(uint8_t count, dshotProtocol_t protocol=DSHOT600) 
             : Esc(count)
         {
+            m_protocol = protocol;
         }
+
+    public:
 
         virtual void begin(void) override 
         {
