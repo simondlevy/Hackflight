@@ -117,15 +117,6 @@ typedef struct bbMotor_s {
     bool enabled;
 } bbMotor_t;
 
-#define MAX_MOTOR_PACERS  4
-extern FAST_DATA_ZERO_INIT bbPacer_t bbPacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
-extern FAST_DATA_ZERO_INIT int usedMotorPacers;
-
-extern FAST_DATA_ZERO_INIT bbPort_t bbPorts[MAX_SUPPORTED_MOTOR_PORTS];
-extern FAST_DATA_ZERO_INIT int usedMotorPorts;
-
-extern FAST_DATA_ZERO_INIT bbMotor_t bbMotors[MAX_SUPPORTED_MOTORS];
-
 // DMA buffers
 // Note that we are not sharing input and output buffers,
 // as output buffer is only modified for middle bits

@@ -35,25 +35,27 @@
 #include "systemdev.h"
 #include "timer.h"
 
+#define MAX_MOTOR_PACERS  4
+
 typedef enum {
     DSHOT_BITBANGED_TIMER_AUTO = 0,
     DSHOT_BITBANGED_TIMER_TIM1,
     DSHOT_BITBANGED_TIMER_TIM8,
 } dshotBitbangedTimer_e;
 
-
 static uint8_t USE_BITBANGED_TIMER = 0;
 
-FAST_DATA_ZERO_INIT bbPacer_t bbPacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
-FAST_DATA_ZERO_INIT int usedMotorPacers = 0;
+static FAST_DATA_ZERO_INIT bbPacer_t bbPacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
+static FAST_DATA_ZERO_INIT int usedMotorPacers = 0;
 
-FAST_DATA_ZERO_INIT bbPort_t bbPorts[MAX_SUPPORTED_MOTOR_PORTS];
-FAST_DATA_ZERO_INIT int usedMotorPorts;
+static FAST_DATA_ZERO_INIT bbPort_t bbPorts[MAX_SUPPORTED_MOTOR_PORTS];
+static FAST_DATA_ZERO_INIT int usedMotorPorts;
 
-FAST_DATA_ZERO_INIT bbMotor_t bbMotors[MAX_SUPPORTED_MOTORS];
+static FAST_DATA_ZERO_INIT bbMotor_t bbMotors[MAX_SUPPORTED_MOTORS];
 
 static FAST_DATA_ZERO_INIT int motorCount;
-dshotBitbangStatus_e bbStatus;
+
+static dshotBitbangStatus_e bbStatus;
 
 // For MCUs that use MPU to control DMA coherency, there might be a performance hit
 // on manipulating input buffer content especially if it is read multiple times,
