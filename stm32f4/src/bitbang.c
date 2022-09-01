@@ -53,7 +53,7 @@ static void bbSaveDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache
     dmaRegCache->M0AR = ((DMA_Stream_TypeDef *)dmaResource)->M0AR;
 }
 
-void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io)
+void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io, uint8_t puPdMode)
 {
 
     bbPort->gpioModeMask |= (GPIO_MODER_MODER0 << (pinIndex * 2));
@@ -64,7 +64,7 @@ void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io)
 
     IOWrite(io, 0);
 
-    IOConfigGPIO(io, IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, bbPuPdMode));
+    IOConfigGPIO(io, IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, puPdMode));
 }
 
 void bbTimerChannelInit(bbPort_t *bbPort, resourceOwner_e owner)

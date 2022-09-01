@@ -69,7 +69,8 @@ BB_OUTPUT_BUFFER_ATTRIBUTE uint32_t
 BB_INPUT_BUFFER_ATTRIBUTE uint16_t
   bbInputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 
-uint8_t bbPuPdMode;
+static uint8_t bbPuPdMode;
+
 FAST_DATA_ZERO_INIT uint32_t dshotFrameUs;
 
 
@@ -402,7 +403,7 @@ static bool bbMotorConfig(
 
     // Setup GPIO_MODER and GPIO_ODR register manipulation values
 
-    bbGpioSetup(bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io);
+    bbGpioSetup(bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io, bbPuPdMode);
 
     bbOutputDataInit(
             bbPort->portOutputBuffer, (1 << pinIndex), DSHOT_BITBANG_NONINVERTED);
