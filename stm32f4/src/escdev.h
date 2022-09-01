@@ -19,8 +19,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <esc.h>
 #include <time.h>
 
-static const uint8_t ESC_IO_TAGS[8] = {32, 33, 19, 18, 56, 24, 0, 0};
-
 typedef enum {
     ESC_STANDARD = 0,
     ESC_ONESHOT125,
@@ -44,12 +42,6 @@ typedef struct {
     bool        initialized;
 } escDevice_t;
 
-void escDevWriteNull(uint8_t index, float value);
-void escPostInitNull();
-void escUpdateCompleteNull(void);
-bool escUpdateStartNull(void);
-
 bool        escCheckProtocolEnabled(bool *protocolIsDshot);
 float       escGetDigitalIdOffset(void);
 uint32_t    escGetEnableTimeMs(void * escDevice);
-bool        escIsEnabled(void * escDevice);

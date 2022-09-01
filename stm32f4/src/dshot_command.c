@@ -118,14 +118,6 @@ static bool allMotorsAreIdle(uint8_t motorCount)
     return true;
 }
 
-static bool commandsAreEnabled(void * escDevice)
-{
-    return escIsEnabled(escDevice) &&
-        escGetEnableTimeMs(escDevice) &&
-        millis() > escGetEnableTimeMs(escDevice) +
-        DSHOT_PROTOCOL_DETECTION_DELAY_MS;
-}
-
 bool dshotCommandQueueEmpty(void)
 {
     return commandQueueHead == commandQueueTail;

@@ -542,6 +542,8 @@ dshotBitbangStatus_e dshotBitbangGetStatus()
 
 escDevice_t *dshotBitbangDevInit(uint8_t count)
 {
+    static const uint8_t ESC_IO_TAGS[8] = {32, 33, 19, 18, 56, 24, 0, 0};
+
     motorCount = count;
     bbStatus = DSHOT_BITBANG_STATUS_OK;
 

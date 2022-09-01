@@ -83,29 +83,3 @@ uint32_t escGetEnableTimeMs(void * escDevice_void)
 
     return escDevice->enableTimeMs;
 }
-
-bool escIsEnabled(void * escDevice_void)
-{
-    escDevice_t * escDevice = (escDevice_t *)escDevice_void;
-
-    return escDevice->enabled;
-}
-
-void escPostInitNull(void)
-{
-}
-
-void escUpdateCompleteNull(void)
-{
-}
-
-bool escUpdateStartNull(void)
-{
-    return true;
-}
-
-void escDevWriteNull(uint8_t index, float value)
-{
-    UNUSED(index);
-    UNUSED(value);
-}
