@@ -136,7 +136,6 @@ static uint16_t pwmConvertToExternal(float motorValue)
 }
 
 static escVTable_t motorPwmVTable = {
-    .isEnabled = pwmIsMotorEnabled,
     .shutdown = pwmShutdownPulsesForAllMotors
 };
 
