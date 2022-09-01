@@ -36,9 +36,6 @@ typedef enum {
     DSHOT_BITBANG_STATUS_TOO_MANY_PORTS,
 } dshotBitbangStatus_e;
 
-struct escDevConfig_s;
-struct escDevice_s;
-
 #if defined (__cplusplus)
 extern "C" {
 #endif
