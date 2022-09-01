@@ -23,43 +23,6 @@
 #include "dshot_dev.h"
 #include "timer.h"
 
-typedef enum {
-    DSHOT_BITBANG_OFF,
-    DSHOT_BITBANG_ON,
-    DSHOT_BITBANG_AUTO,
-} dshotBitbangMode_e;
-
-typedef enum {
-    DSHOT_BITBANG_STATUS_OK,
-    DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT,
-    DSHOT_BITBANG_STATUS_NO_PACER,
-    DSHOT_BITBANG_STATUS_TOO_MANY_PORTS,
-} dshotBitbangStatus_e;
-
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
-bool bbEnableMotors(void);
-void bbPostInit(dshotProtocol_t protocol);
-void bbUpdateComplete(uint8_t motorCount);
-bool bbUpdateStart(void);
-void bbWrite(uint8_t motorIndex, float value);
-
-void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count);
-
-dshotBitbangStatus_e dshotBitbangGetStatus();
-
-const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(
-        int8_t timerNumber,
-        uint16_t timerChannel);
-
-const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer);
-
-#if defined (__cplusplus)
-}
-#endif
-
 // Max direct dshot port groups, limited by number of usable timer (TIM1 and
 // TIM8) x number of channels per timer (4), 3 is enough to cover motor pins on
 // GPIOA, GPIOB and GPIOC.
@@ -90,7 +53,31 @@ const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer);
 #define BB_GPIO_PULLDOWN GPIO_PuPd_DOWN
 #define BB_GPIO_PULLUP   GPIO_PuPd_UP
 
-// Per motor output
+
+// DMA input buffer
+// (30us + <frame time> + <slack>) / <input sampling clock period>
+// <frame time> = <DShot symbol time> * 16
+// Temporary size for DS600
+// <frame time> = 26us
+// <sampling period> = 0.44us
+// <slack> = 10%
+// (30 + 26 + 3) / 0.44 = 134
+// In some cases this was not enough, so we add 6 extra samples
+#define DSHOT_BB_PORT_IP_BUF_LENGTH 140
+#define DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH DSHOT_BB_PORT_IP_BUF_LENGTH
+
+typedef enum {
+    DSHOT_BITBANG_OFF,
+    DSHOT_BITBANG_ON,
+    DSHOT_BITBANG_AUTO,
+} dshotBitbangMode_e;
+
+typedef enum {
+    DSHOT_BITBANG_STATUS_OK,
+    DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT,
+    DSHOT_BITBANG_STATUS_NO_PACER,
+    DSHOT_BITBANG_STATUS_TOO_MANY_PORTS,
+} dshotBitbangStatus_e;
 
 typedef struct bbMotor_s {
     dshotProtocolControl_t protocolControl;
@@ -104,18 +91,28 @@ typedef struct bbMotor_s {
     bool enabled;
 } bbMotor_t;
 
-// DMA buffers
-// Note that we are not sharing input and output buffers,
-// as output buffer is only modified for middle bits
+#if defined (__cplusplus)
+extern "C" {
+#endif
 
-// DMA input buffer
-// (30us + <frame time> + <slack>) / <input sampling clock period>
-// <frame time> = <DShot symbol time> * 16
-// Temporary size for DS600
-// <frame time> = 26us
-// <sampling period> = 0.44us
-// <slack> = 10%
-// (30 + 26 + 3) / 0.44 = 134
-// In some cases this was not enough, so we add 6 extra samples
-#define DSHOT_BB_PORT_IP_BUF_LENGTH 140
-#define DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH DSHOT_BB_PORT_IP_BUF_LENGTH
+bool bbEnableMotors(void);
+void bbPostInit(dshotProtocol_t protocol);
+void bbUpdateComplete(uint8_t motorCount);
+bool bbUpdateStart(void);
+void bbWrite(uint8_t motorIndex, float value);
+
+void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count);
+
+dshotBitbangStatus_e dshotBitbangGetStatus();
+
+const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(
+        int8_t timerNumber,
+        uint16_t timerChannel);
+
+const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer);
+
+#if defined (__cplusplus)
+}
+#endif
+
+
