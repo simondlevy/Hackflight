@@ -153,9 +153,9 @@ class DshotEsc : public Esc {
 
     protected:
 
-        uint8_t m_motorCount = 4; // XXX
-
         dshotProtocol_t m_protocol;
+
+        uint8_t m_motorCount;
 
         virtual void deviceInit(void) = 0;
         virtual bool enable(void) = 0;
@@ -169,6 +169,7 @@ class DshotEsc : public Esc {
             : Esc(pins)
         {
             m_protocol = protocol;
+            m_motorCount = pins->size();
         }
 
     public:
