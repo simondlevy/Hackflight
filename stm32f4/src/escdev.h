@@ -41,7 +41,3 @@ typedef struct {
     uint32_t    enableTimeMs;
     bool        initialized;
 } escDevice_t;
-
-bool        escCheckProtocolEnabled(bool *protocolIsDshot);
-float       escGetDigitalIdOffset(void);
-uint32_t    escGetEnableTimeMs(void * escDevice);
