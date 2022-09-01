@@ -240,12 +240,12 @@ const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer)
 static uint32_t getDshotBaseFrequency(dshotProtocol_t pwmProtocolType)
 {
     switch (pwmProtocolType) {
-        case(ESC_DSHOT600):
+        case(DSHOT600):
             return MOTOR_DSHOT600_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
-        case(ESC_DSHOT300):
+        case(DSHOT300):
             return MOTOR_DSHOT300_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
         default:
-        case(ESC_DSHOT150):
+        case(DSHOT150):
             return MOTOR_DSHOT150_SYMBOL_RATE * MOTOR_DSHOT_STATE_PER_SYMBOL;
     }
 }
@@ -520,7 +520,7 @@ void bbPostInit()
             motorCount; motorIndex++) {
 
         if (!bbMotorConfig(bbMotors[motorIndex].io, motorIndex,
-                    ESC_PROTOCOL, bbMotors[motorIndex].output)) { return
+                    DSHOT_PROTOCOL, bbMotors[motorIndex].output)) { return
             NULL;
         }
 

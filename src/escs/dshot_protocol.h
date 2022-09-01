@@ -20,9 +20,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <time.h>
 
 typedef enum {
-    ESC_DSHOT150,
-    ESC_DSHOT300,
-    ESC_DSHOT600,
+    DSHOT150,
+    DSHOT300,
+    DSHOT600,
 } dshotProtocol_t;
 
-static const dshotProtocol_t ESC_PROTOCOL = ESC_DSHOT600;
+static const dshotProtocol_t DSHOT_PROTOCOL = DSHOT600;
