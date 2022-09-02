@@ -95,10 +95,6 @@ void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count);
 
 dshotBitbangStatus_e dshotBitbangGetStatus();
 
-const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(
-        int8_t timerNumber,
-        uint16_t timerChannel);
-
 #if defined (__cplusplus)
 }
 #endif

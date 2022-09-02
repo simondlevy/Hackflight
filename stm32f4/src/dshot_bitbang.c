@@ -258,7 +258,7 @@ void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor)
     DMA_CLEAR_FLAG(descriptor, DMA_IT_TCIF);
 }
 
-static const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer)
+static const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
 {
     for (int index = 0; index < usedMotorPorts; index++) {
         const timerHardware_t *bitbangTimer = bbPorts[index].timhw;
@@ -269,6 +269,22 @@ static const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *t
 
     return &freeOwner;
 }
+
+static const timerHardware_t *timerGetAllocatedByNumberAndChannel(
+        int8_t timerNumber,
+        uint16_t timerChannel)
+{
+    for (int index = 0; index < usedMotorPorts; index++) {
+        const timerHardware_t *bitbangTimer = bbPorts[index].timhw;
+        if (bitbangTimer && timerGetTIMNumber(bitbangTimer->tim) == timerNumber
+                && bitbangTimer->channel == timerChannel &&
+                bbPorts[index].owner.owner) { return bitbangTimer;
+        }
+    }
+
+    return NULL;
+}
+
 
 // Setup bbPorts array elements so that they each have a TIM1 or TIM8 channel
 // in timerHardware array for BB-DShot.
@@ -287,11 +303,9 @@ static void bbFindPacerTimer(void)
             }
             bool timerConflict = false;
             for (int channel = 0; channel < CC_CHANNELS_PER_TIMER; channel++) {
-                const timerHardware_t *timer =
-                    dshotBitbangTimerGetAllocatedByNumberAndChannel(timNumber,
-                            CC_CHANNEL_FROM_INDEX(channel)); 
-                //const resourceOwner_e timerOwner = timerGetOwner(timer)->owner;
-                const resourceOwner_e timerOwner = dshotBitbangTimerGetOwner(timer)->owner;
+                const timerHardware_t *timer = timerGetAllocatedByNumberAndChannel(
+                        timNumber, CC_CHANNEL_FROM_INDEX(channel)); 
+                const resourceOwner_e timerOwner = timerGetOwner(timer)->owner;
                 if (timerOwner != OWNER_FREE && timerOwner != OWNER_DSHOT_BITBANG) {
                     timerConflict = true;
                     break;
@@ -417,21 +431,6 @@ static void bbShutdown(void)
 }
 
 // -------------------------------------------------------------------------
-
-const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(
-        int8_t timerNumber,
-        uint16_t timerChannel)
-{
-    for (int index = 0; index < usedMotorPorts; index++) {
-        const timerHardware_t *bitbangTimer = bbPorts[index].timhw;
-        if (bitbangTimer && timerGetTIMNumber(bitbangTimer->tim) == timerNumber
-                && bitbangTimer->channel == timerChannel &&
-                bbPorts[index].owner.owner) { return bitbangTimer;
-        }
-    }
-
-    return NULL;
-}
 
 
 bool bbUpdateStart(void)
