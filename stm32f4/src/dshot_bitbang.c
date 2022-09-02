@@ -63,19 +63,6 @@ static uint32_t TELEMETRY_OVER_SAMPLE = 3;
 // In some cases this was not enough, so we add 6 extra samples
 #define PORT_IP_BUF_LENGTH 140
 
-typedef enum {
-    DSHOT_BITBANG_OFF,
-    DSHOT_BITBANG_ON,
-    DSHOT_BITBANG_AUTO,
-} dshotBitbangMode_e;
-
-typedef enum {
-    DSHOT_BITBANG_STATUS_OK,
-    DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT,
-    DSHOT_BITBANG_STATUS_NO_PACER,
-    DSHOT_BITBANG_STATUS_TOO_MANY_PORTS,
-} dshotBitbangStatus_e;
-
 typedef struct bbMotor_s {
     dshotProtocolControl_t protocolControl;
     int pinIndex;    // pinIndex of this motor output within a group that bbPort points to
@@ -89,13 +76,11 @@ typedef struct bbMotor_s {
 } bbMotor_t;
 
 
-static uint8_t USE_BITBANGED_TIMER = 0;
-
 typedef enum {
-    DSHOT_BITBANGED_TIMER_AUTO = 0,
-    DSHOT_BITBANGED_TIMER_TIM1,
-    DSHOT_BITBANGED_TIMER_TIM8,
-} dshotBitbangedTimer_e;
+    TIMER_AUTO = 0,
+    TIMER_TIM1,
+    TIMER_TIM8,
+} timer_e;
 
 typedef struct {
     volatile timCCR_t *ccr;
@@ -110,6 +95,8 @@ typedef struct {
     bool enabled;
     IO_t io;
 } pwmOutputPort_t;
+
+static timer_e USE_TIMER = TIMER_AUTO;
 
 static bbPacer_t m_pacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
 static int m_usedMotorPacers = 0;
@@ -331,8 +318,8 @@ static void bbFindPacerTimer(void)
         for (uint8_t tmrIndex=0; tmrIndex<ARRAYLEN(m_timerHardware); tmrIndex++) {
             const timerHardware_t *timer = &m_timerHardware[tmrIndex];
             int timNumber = timerGetTIMNumber(timer->tim);
-            if ((USE_BITBANGED_TIMER == DSHOT_BITBANGED_TIMER_TIM1 && timNumber != 1)
-                    || (USE_BITBANGED_TIMER == DSHOT_BITBANGED_TIMER_TIM8 &&
+            if ((USE_TIMER == TIMER_TIM1 && timNumber != 1)
+                    || (USE_TIMER == TIMER_TIM8 &&
                         timNumber != 8)) {
                 continue;
             }
