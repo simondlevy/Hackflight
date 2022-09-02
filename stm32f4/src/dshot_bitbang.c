@@ -37,52 +37,72 @@
 
 #define MAX_MOTOR_PACERS  4
 
+// Max direct dshot port groups, limited by number of usable timer (TIM1 and
+// TIM8) x number of channels per timer (4), 3 is enough to cover motor pins on
+// GPIOA, GPIOB and GPIOC.
+#define MAX_SUPPORTED_MOTOR_PORTS 4 
+
+#define DSHOT_BITBANG_TELEMETRY_OVER_SAMPLE 3
+
+#define MOTOR_DSHOT_SYMBOL_TIME_NS(rate)  (1000000000 / (rate))
+
+#define MOTOR_DSHOT_BIT_PER_SYMBOL         1
+
+#define MOTOR_DSHOT_STATE_PER_SYMBOL       3  // Initial high, 0/1, low
+
+#define MOTOR_DSHOT_FRAME_BITS             16
+
+#define MOTOR_DSHOT_FRAME_TIME_NS(rate)    ((MOTOR_DSHOT_FRAME_BITS / MOTOR_DSHOT_BIT_PER_SYMBOL) * MOTOR_DSHOT_SYMBOL_TIME_NS(rate))
+
+#define MOTOR_DSHOT_BUF_LENGTH            ((MOTOR_DSHOT_FRAME_BITS / MOTOR_DSHOT_BIT_PER_SYMBOL) * MOTOR_DSHOT_STATE_PER_SYMBOL)
+
+#define MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH MOTOR_DSHOT_BUF_LENGTH
+
+// DMA input buffer
+// (30us + <frame time> + <slack>) / <input sampling clock period>
+// <frame time> = <DShot symbol time> * 16
+// Temporary size for DS600
+// <frame time> = 26us
+// <sampling period> = 0.44us
+// <slack> = 10%
+// (30 + 26 + 3) / 0.44 = 134
+// In some cases this was not enough, so we add 6 extra samples
+#define DSHOT_BB_PORT_IP_BUF_LENGTH 140
+#define DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH DSHOT_BB_PORT_IP_BUF_LENGTH
+
+typedef enum {
+    DSHOT_BITBANG_OFF,
+    DSHOT_BITBANG_ON,
+    DSHOT_BITBANG_AUTO,
+} dshotBitbangMode_e;
+
+typedef enum {
+    DSHOT_BITBANG_STATUS_OK,
+    DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT,
+    DSHOT_BITBANG_STATUS_NO_PACER,
+    DSHOT_BITBANG_STATUS_TOO_MANY_PORTS,
+} dshotBitbangStatus_e;
+
+typedef struct bbMotor_s {
+    dshotProtocolControl_t protocolControl;
+    int pinIndex;    // pinIndex of this motor output within a group that bbPort points to
+    int portIndex;
+    IO_t io;         // IO_t for this output
+    uint8_t output;
+    uint32_t iocfg;
+    bbPort_t *bbPort;
+    bool configured;
+    bool enabled;
+} bbMotor_t;
+
+
+static uint8_t USE_BITBANGED_TIMER = 0;
+
 typedef enum {
     DSHOT_BITBANGED_TIMER_AUTO = 0,
     DSHOT_BITBANGED_TIMER_TIM1,
     DSHOT_BITBANGED_TIMER_TIM8,
 } dshotBitbangedTimer_e;
-
-static uint8_t USE_BITBANGED_TIMER = 0;
-
-static bbPacer_t m_pacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
-static int m_usedMotorPacers = 0;
-
-static bbPort_t m_ports[MAX_SUPPORTED_MOTOR_PORTS];
-static int m_usedMotorPorts;
-
-static bbMotor_t m_motors[MAX_SUPPORTED_MOTORS];
-
-static int m_motorCount;
-
-static dshotBitbangStatus_e m_status;
-
-// For MCUs that use MPU to control DMA coherency, there might be a performance hit
-// on manipulating input buffer content especially if it is read multiple times,
-// as the buffer region is attributed as not cachable.
-// If this is not desirable, we should use manual cache invalidation.
-#define BB_OUTPUT_BUFFER_ATTRIBUTE
-#define BB_INPUT_BUFFER_ATTRIBUTE
-
-static BB_OUTPUT_BUFFER_ATTRIBUTE uint32_t
-  bbOutputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
-static BB_INPUT_BUFFER_ATTRIBUTE uint16_t
-  bbInputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
-
-static uint8_t bbPuPdMode;
-
-uint32_t dshotFrameUs;
-
-
-const timerHardware_t bbTimerHardware[] = {
-    DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 1),
-    DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 2),
-    DEF_TIM(TIM1,  CH2, NONE,  TIM_USE_NONE, 0, 1),
-    DEF_TIM(TIM1,  CH3, NONE,  TIM_USE_NONE, 0, 1),
-    DEF_TIM(TIM1,  CH4, NONE,  TIM_USE_NONE, 0, 0),
-};
-
-static uint32_t lastSendUs;
 
 typedef struct {
     volatile timCCR_t *ccr;
@@ -98,6 +118,32 @@ typedef struct {
     IO_t io;
 } pwmOutputPort_t;
 
+static bbPacer_t m_pacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
+static int m_usedMotorPacers = 0;
+
+static bbPort_t m_ports[MAX_SUPPORTED_MOTOR_PORTS];
+static int m_usedMotorPorts;
+
+static bbMotor_t m_motors[MAX_SUPPORTED_MOTORS];
+
+static int m_motorCount;
+
+static uint32_t m_outputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
+static uint16_t m_inputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
+
+static uint8_t m_puPdMode;
+
+uint32_t m_frameUs;
+
+const timerHardware_t m_timerHardware[] = {
+    DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 1),
+    DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 2),
+    DEF_TIM(TIM1,  CH2, NONE,  TIM_USE_NONE, 0, 1),
+    DEF_TIM(TIM1,  CH3, NONE,  TIM_USE_NONE, 0, 1),
+    DEF_TIM(TIM1,  CH4, NONE,  TIM_USE_NONE, 0, 0),
+};
+
+static uint32_t m_lastSendUs;
 
 static pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
 
@@ -189,7 +235,6 @@ static bbPort_t *bbFindMotorPort(int portIndex)
 static bbPort_t *bbAllocateMotorPort(int portIndex)
 {
     if (m_usedMotorPorts >= MAX_SUPPORTED_MOTOR_PORTS) {
-        m_status = DSHOT_BITBANG_STATUS_TOO_MANY_PORTS;
         return NULL;
     }
 
@@ -197,7 +242,6 @@ static bbPort_t *bbAllocateMotorPort(int portIndex)
 
     if (!bbPort->timhw) {
         // No more pacer channel available
-        m_status = DSHOT_BITBANG_STATUS_NO_PACER;
         return NULL;
     }
 
@@ -293,8 +337,8 @@ static void bbFindPacerTimer(void)
 {
     for (int bbPortIndex=0; bbPortIndex<MAX_SUPPORTED_MOTOR_PORTS; bbPortIndex++) {
 
-        for (uint8_t tmrIndex=0; tmrIndex<ARRAYLEN(bbTimerHardware); tmrIndex++) {
-            const timerHardware_t *timer = &bbTimerHardware[tmrIndex];
+        for (uint8_t tmrIndex=0; tmrIndex<ARRAYLEN(m_timerHardware); tmrIndex++) {
+            const timerHardware_t *timer = &m_timerHardware[tmrIndex];
             int timNumber = timerGetTIMNumber(timer->tim);
             if ((USE_BITBANGED_TIMER == DSHOT_BITBANGED_TIMER_TIM1 && timNumber != 1)
                     || (USE_BITBANGED_TIMER == DSHOT_BITBANGED_TIMER_TIM8 &&
@@ -344,7 +388,7 @@ static void bbTimebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
     uint32_t timerclock = timerClock(bbPort->timhw->tim);
 
     uint32_t outputFreq = 1000 * getDshotBaseFrequency(dshotProtocolType);
-    dshotFrameUs = 1000000 * 17 * 3 / outputFreq;
+    m_frameUs = 1000000 * 17 * 3 / outputFreq;
     bbPort->outputARR = timerclock / outputFreq - 1;
 
     uint32_t inputFreq = outputFreq * 5 * 2 * DSHOT_BITBANG_TELEMETRY_OVER_SAMPLE / 24;
@@ -380,11 +424,11 @@ static bool bbMotorConfig(
         bbPort->gpio = IO_GPIO(io);
 
         bbPort->portOutputCount = MOTOR_DSHOT_BUF_LENGTH;
-        bbPort->portOutputBuffer = &bbOutputBuffer[(bbPort - m_ports) *
+        bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) *
             MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH];
 
         bbPort->portInputCount = DSHOT_BB_PORT_IP_BUF_LENGTH;
-        bbPort->portInputBuffer = &bbInputBuffer[(bbPort - m_ports) *
+        bbPort->portInputBuffer = &m_inputBuffer[(bbPort - m_ports) *
             DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH];
 
         bbTimebaseSetup(bbPort, pwmProtocolType);
@@ -409,7 +453,7 @@ static bool bbMotorConfig(
 
     // Setup GPIO_MODER and GPIO_ODR register manipulation values
 
-    bbGpioSetup(bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io, bbPuPdMode);
+    bbGpioSetup(bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io, m_puPdMode);
 
     bbOutputDataInit(bbPort->portOutputBuffer, (1 << pinIndex), false); // not inverted
 
@@ -495,7 +539,7 @@ void bbUpdateComplete(uint8_t motorCount)
         bbDMA_Cmd(bbPort, ENABLE);
     }
 
-    lastSendUs = micros();
+    m_lastSendUs = micros();
     for (int i = 0; i < m_usedMotorPacers; i++) {
         bbPacer_t *bbPacer = &m_pacers[i];
         bbTIM_DMACmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
@@ -533,28 +577,21 @@ void bbPostInit(dshotProtocol_t protocol)
     }
 }
 
-dshotBitbangStatus_e dshotBitbangGetStatus()
-{
-    return m_status;
-}
-
 void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
 {
     m_motorCount = count;
-    m_status = DSHOT_BITBANG_STATUS_OK;
 
-    memset(bbOutputBuffer, 0, sizeof(bbOutputBuffer));
+    memset(m_outputBuffer, 0, sizeof(m_outputBuffer));
 
     for (int motorIndex = 0; motorIndex < m_motorCount; motorIndex++) {
         const timerHardware_t *timerHardware = timerGetConfiguredByTag(pins[motorIndex]);
         const IO_t io = IOGetByTag(pins[motorIndex]);
 
         uint8_t output = timerHardware->output;
-        bbPuPdMode = (output & TIMER_OUTPUT_INVERTED) ? GPIO_PuPd_DOWN : GPIO_PuPd_UP;
+        m_puPdMode = (output & TIMER_OUTPUT_INVERTED) ? GPIO_PuPd_DOWN : GPIO_PuPd_UP;
 
         if (!IOIsFreeOrPreinit(io)) {
             // not enough motors initialised for the mixer or a break in the motors
-            m_status = DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT;
             return NULL;
         }
 
@@ -564,7 +601,7 @@ void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
         m_motors[motorIndex].io = io;
         m_motors[motorIndex].output = output;
         m_motors[motorIndex].iocfg = IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz,
-                GPIO_OType_PP, bbPuPdMode);
+                GPIO_OType_PP, m_puPdMode);
 
         IOInit(io, OWNER_MOTOR, RESOURCE_INDEX(motorIndex));
         IOConfigGPIO(io, m_motors[motorIndex].iocfg);
