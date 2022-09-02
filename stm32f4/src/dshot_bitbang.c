@@ -210,33 +210,6 @@ static bbPort_t *bbAllocateMotorPort(int portIndex)
     return bbPort;
 }
 
-const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(
-        int8_t timerNumber,
-        uint16_t timerChannel)
-{
-    for (int index = 0; index < usedMotorPorts; index++) {
-        const timerHardware_t *bitbangTimer = bbPorts[index].timhw;
-        if (bitbangTimer && timerGetTIMNumber(bitbangTimer->tim) == timerNumber
-                && bitbangTimer->channel == timerChannel &&
-                bbPorts[index].owner.owner) { return bitbangTimer;
-        }
-    }
-
-    return NULL;
-}
-
-const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer)
-{
-    for (int index = 0; index < usedMotorPorts; index++) {
-        const timerHardware_t *bitbangTimer = bbPorts[index].timhw;
-        if (bitbangTimer && bitbangTimer == timer) {
-            return &bbPorts[index].owner;
-        }
-    }
-
-    return &freeOwner;
-}
-
 // Return frequency of smallest change [state/sec]
 
 static uint32_t getDshotBaseFrequency(dshotProtocol_t pwmProtocolType)
@@ -420,6 +393,46 @@ static bool bbMotorConfig(
     return true;
 }
 
+static void bbDisableMotors(void)
+{
+    return;
+}
+
+static void bbShutdown(void)
+{
+    return;
+}
+
+// -------------------------------------------------------------------------
+
+const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(
+        int8_t timerNumber,
+        uint16_t timerChannel)
+{
+    for (int index = 0; index < usedMotorPorts; index++) {
+        const timerHardware_t *bitbangTimer = bbPorts[index].timhw;
+        if (bitbangTimer && timerGetTIMNumber(bitbangTimer->tim) == timerNumber
+                && bitbangTimer->channel == timerChannel &&
+                bbPorts[index].owner.owner) { return bitbangTimer;
+        }
+    }
+
+    return NULL;
+}
+
+const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer)
+{
+    for (int index = 0; index < usedMotorPorts; index++) {
+        const timerHardware_t *bitbangTimer = bbPorts[index].timhw;
+        if (bitbangTimer && bitbangTimer == timer) {
+            return &bbPorts[index].owner;
+        }
+    }
+
+    return &freeOwner;
+}
+
+
 bool bbUpdateStart(void)
 {
     for (int i = 0; i < usedMotorPorts; i++) {
@@ -497,16 +510,6 @@ bool bbEnableMotors(void)
         }
     }
     return true;
-}
-
-static void bbDisableMotors(void)
-{
-    return;
-}
-
-static void bbShutdown(void)
-{
-    return;
 }
 
 void bbPostInit(dshotProtocol_t protocol)
