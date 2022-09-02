@@ -34,7 +34,7 @@ class AttitudeTask : public Task {
         {
             data->imu->getEulerAngles(
                     &data->imuFusionPrev,
-                    &data->arming,
+                    data->arming.isArmed(),
                     time,
                     &data->vstate);
         }

@@ -93,12 +93,12 @@ int16_t UsfsImu::devReadRawGyro(uint8_t k)
 
 void UsfsImu::getEulerAngles(
         Imu::fusion_t * fusionPrev,
-        Arming * arming,
+        bool isArmed,
         uint32_t time,
         State * vstate) 
 {
     (void)fusionPrev;
-    (void)arming;
+    (void)isArmed;
     (void)time;
 
     float qw = m_qw;

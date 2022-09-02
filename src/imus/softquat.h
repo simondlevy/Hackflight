@@ -20,7 +20,6 @@
 
 #include <string.h>
 
-#include "arming.h"
 #include "core/axes.h"
 #include "core/clock.h"
 #include "core/state.h"
@@ -158,7 +157,7 @@ class SoftQuatImu : public Imu {
         }
 
         void getQuaternion(
-                Arming * arming,
+                bool isArmed,
                 Imu::fusion_t * fusionPrev,
                 uint32_t time,
                 Imu::quaternion_t * quat)
@@ -172,7 +171,7 @@ class SoftQuatImu : public Imu {
 
             Imu::gyro_reset_t new_gyro_reset = {};
 
-            if (!arming->isArmed()) {
+            if (!isArmed) {
                 memcpy(&fusionPrev->gyroReset, &new_gyro_reset,
                         sizeof(Imu::gyro_reset_t));
             }
@@ -208,12 +207,12 @@ class SoftQuatImu : public Imu {
 
         virtual void getEulerAngles(
                 Imu::fusion_t * fusionPrev,
-                Arming * arming,
+                bool isArmed,
                 uint32_t time,
                 State * vstate) override
         {
             Imu::quaternion_t quat = {};
-            getQuaternion(arming, fusionPrev, time, &quat);
+            getQuaternion(isArmed, fusionPrev, time, &quat);
             Imu::rotation_t rot = {};
             quat2euler(&quat, vstate, &rot);
 

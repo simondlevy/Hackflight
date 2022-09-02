@@ -173,7 +173,7 @@ class Imu {
 
         virtual void getEulerAngles(
                 fusion_t * fusionPrev,
-                Arming * arming,
+                bool isArmed,
                 uint32_t time,
                 State * vstate) = 0;
 

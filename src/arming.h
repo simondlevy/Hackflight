@@ -32,6 +32,7 @@ class Arming {
     friend class Hackflight;
     friend class Receiver;
     friend class MspTask;
+    friend class AttitudeTask;
 
     bool readyToArm(void)
     {
