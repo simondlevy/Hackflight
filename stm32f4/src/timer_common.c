@@ -17,7 +17,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 
 #include "dma_reqmap.h"
-#include "dshot_bitbang.h"
 #include "io.h"
 #include "timer.h"
 
@@ -34,6 +33,19 @@ const resourceOwner_t freeOwner = { .owner = OWNER_FREE, .resourceIndex = 0 };
 static resourceOwner_t timerOwners[MAX_TIMER_PINMAP_COUNT];
 
 static timerIOConfig_t timerIOConfig[MAX_TIMER_PINMAP_COUNT];
+
+static const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
+{
+    for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
+        const timerHardware_t *assignedTimer =
+            timerGetByTagAndIndex(timerIOConfig[i].ioTag, timerIOConfig[i].index);
+        if (assignedTimer && assignedTimer == timer) {
+            return &timerOwners[i];
+        }
+    }
+
+    return &freeOwner;
+}
 
 const timerHardware_t *timerGetByTagAndIndex(ioTag_t ioTag, unsigned timerIndex)
 {
@@ -69,39 +81,8 @@ const timerHardware_t *timerGetConfiguredByTag(ioTag_t ioTag)
     return timerGetByTagAndIndex(ioTag, timerIndex);
 }
 
-const timerHardware_t *timerGetAllocatedByNumberAndChannel(
-        int8_t timerNumber,
-        uint16_t timerChannel)
-{
-    for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
-        const timerHardware_t *timer =
-            timerGetByTagAndIndex(timerIOConfig[i].ioTag,
-                    timerIOConfig[i].index);
-        if (timer && timerGetTIMNumber(timer->tim) ==
-                timerNumber && timer->channel == timerChannel && timerOwners[i].owner) {
-            return timer;
-        }
-    }
-
-    return dshotBitbangTimerGetAllocatedByNumberAndChannel(timerNumber, timerChannel);
-}
-
-const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
-{
-    for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
-        const timerHardware_t *assignedTimer =
-            timerGetByTagAndIndex(timerIOConfig[i].ioTag, timerIOConfig[i].index);
-        if (assignedTimer && assignedTimer == timer) {
-            return &timerOwners[i];
-        }
-    }
-
-    return &freeOwner;
-
-    //return dshotBitbangTimerGetOwner(timer);
-}
-
-const timerHardware_t *timerAllocate(ioTag_t ioTag, resourceOwner_e owner, uint8_t resourceIndex)
+const timerHardware_t *timerAllocate(
+        ioTag_t ioTag, resourceOwner_e owner, uint8_t resourceIndex)
 {
     if (!ioTag) {
         return NULL;
@@ -109,7 +90,8 @@ const timerHardware_t *timerAllocate(ioTag_t ioTag, resourceOwner_e owner, uint8
 
     for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
         if (timerIOConfig[i].ioTag == ioTag) {
-            const timerHardware_t *timer = timerGetByTagAndIndex(ioTag, timerIOConfig[i].index);
+            const timerHardware_t *timer =
+                timerGetByTagAndIndex(ioTag, timerIOConfig[i].index);
 
             if (timerGetOwner(timer)->owner) {
                 return NULL;

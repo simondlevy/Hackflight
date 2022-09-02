@@ -99,8 +99,6 @@ const timerHardware_t *dshotBitbangTimerGetAllocatedByNumberAndChannel(
         int8_t timerNumber,
         uint16_t timerChannel);
 
-const resourceOwner_t *dshotBitbangTimerGetOwner(const timerHardware_t *timer);
-
 #if defined (__cplusplus)
 }
 #endif
