@@ -45,17 +45,17 @@ typedef enum {
 
 static uint8_t USE_BITBANGED_TIMER = 0;
 
-static bbPacer_t bbPacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
-static int usedMotorPacers = 0;
+static bbPacer_t m_pacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
+static int m_usedMotorPacers = 0;
 
-static bbPort_t bbPorts[MAX_SUPPORTED_MOTOR_PORTS];
-static int usedMotorPorts;
+static bbPort_t m_ports[MAX_SUPPORTED_MOTOR_PORTS];
+static int m_usedMotorPorts;
 
-static bbMotor_t bbMotors[MAX_SUPPORTED_MOTORS];
+static bbMotor_t m_motors[MAX_SUPPORTED_MOTORS];
 
-static int motorCount;
+static int m_motorCount;
 
-static dshotBitbangStatus_e bbStatus;
+static dshotBitbangStatus_e m_status;
 
 // For MCUs that use MPU to control DMA coherency, there might be a performance hit
 // on manipulating input buffer content especially if it is read multiple times,
@@ -158,11 +158,11 @@ static bbPacer_t *bbFindMotorPacer(TIM_TypeDef *tim)
 {
     for (int i = 0; i < MAX_MOTOR_PACERS; i++) {
 
-        bbPacer_t *bbPacer = &bbPacers[i];
+        bbPacer_t *bbPacer = &m_pacers[i];
 
         if (bbPacer->tim == NULL) {
             bbPacer->tim = tim;
-            ++usedMotorPacers;
+            ++m_usedMotorPacers;
             return bbPacer;
         }
 
@@ -178,9 +178,9 @@ static bbPacer_t *bbFindMotorPacer(TIM_TypeDef *tim)
 
 static bbPort_t *bbFindMotorPort(int portIndex)
 {
-    for (int i = 0; i < usedMotorPorts; i++) {
-        if (bbPorts[i].portIndex == portIndex) {
-            return &bbPorts[i];
+    for (int i = 0; i < m_usedMotorPorts; i++) {
+        if (m_ports[i].portIndex == portIndex) {
+            return &m_ports[i];
         }
     }
     return NULL;
@@ -188,16 +188,16 @@ static bbPort_t *bbFindMotorPort(int portIndex)
 
 static bbPort_t *bbAllocateMotorPort(int portIndex)
 {
-    if (usedMotorPorts >= MAX_SUPPORTED_MOTOR_PORTS) {
-        bbStatus = DSHOT_BITBANG_STATUS_TOO_MANY_PORTS;
+    if (m_usedMotorPorts >= MAX_SUPPORTED_MOTOR_PORTS) {
+        m_status = DSHOT_BITBANG_STATUS_TOO_MANY_PORTS;
         return NULL;
     }
 
-    bbPort_t *bbPort = &bbPorts[usedMotorPorts];
+    bbPort_t *bbPort = &m_ports[m_usedMotorPorts];
 
     if (!bbPort->timhw) {
         // No more pacer channel available
-        bbStatus = DSHOT_BITBANG_STATUS_NO_PACER;
+        m_status = DSHOT_BITBANG_STATUS_NO_PACER;
         return NULL;
     }
 
@@ -205,7 +205,7 @@ static bbPort_t *bbAllocateMotorPort(int portIndex)
     bbPort->owner.owner = OWNER_DSHOT_BITBANG;
     bbPort->owner.resourceIndex = RESOURCE_INDEX(portIndex);
 
-    ++usedMotorPorts;
+    ++m_usedMotorPorts;
 
     return bbPort;
 }
@@ -260,10 +260,10 @@ void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor)
 
 static const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
 {
-    for (int index = 0; index < usedMotorPorts; index++) {
-        const timerHardware_t *bitbangTimer = bbPorts[index].timhw;
+    for (int index = 0; index < m_usedMotorPorts; index++) {
+        const timerHardware_t *bitbangTimer = m_ports[index].timhw;
         if (bitbangTimer && bitbangTimer == timer) {
-            return &bbPorts[index].owner;
+            return &m_ports[index].owner;
         }
     }
 
@@ -274,11 +274,11 @@ static const timerHardware_t *timerGetAllocatedByNumberAndChannel(
         int8_t timerNumber,
         uint16_t timerChannel)
 {
-    for (int index = 0; index < usedMotorPorts; index++) {
-        const timerHardware_t *bitbangTimer = bbPorts[index].timhw;
+    for (int index = 0; index < m_usedMotorPorts; index++) {
+        const timerHardware_t *bitbangTimer = m_ports[index].timhw;
         if (bitbangTimer && timerGetTIMNumber(bitbangTimer->tim) == timerNumber
                 && bitbangTimer->channel == timerChannel &&
-                bbPorts[index].owner.owner) { return bitbangTimer;
+                m_ports[index].owner.owner) { return bitbangTimer;
         }
     }
 
@@ -286,7 +286,7 @@ static const timerHardware_t *timerGetAllocatedByNumberAndChannel(
 }
 
 
-// Setup bbPorts array elements so that they each have a TIM1 or TIM8 channel
+// Setup m_ports array elements so that they each have a TIM1 or TIM8 channel
 // in timerHardware array for BB-DShot.
 
 static void bbFindPacerTimer(void)
@@ -313,7 +313,7 @@ static void bbFindPacerTimer(void)
             }
 
             for (int index = 0; index < bbPortIndex; index++) {
-                const timerHardware_t* t = bbPorts[index].timhw;
+                const timerHardware_t* t = m_ports[index].timhw;
                 if (timerGetTIMNumber(t->tim) == timNumber &&
                         timer->channel == t->channel) {
                     timerConflict = true;
@@ -331,7 +331,7 @@ static void bbFindPacerTimer(void)
                         dmaopt); dmaResource_t *dma = dmaChannelSpec->ref;
             dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(dma);
             if (dmaGetOwner(dmaIdentifier)->owner == OWNER_FREE) {
-                bbPorts[bbPortIndex].timhw = timer;
+                m_ports[bbPortIndex].timhw = timer;
 
                 break;
             }
@@ -380,11 +380,11 @@ static bool bbMotorConfig(
         bbPort->gpio = IO_GPIO(io);
 
         bbPort->portOutputCount = MOTOR_DSHOT_BUF_LENGTH;
-        bbPort->portOutputBuffer = &bbOutputBuffer[(bbPort - bbPorts) *
+        bbPort->portOutputBuffer = &bbOutputBuffer[(bbPort - m_ports) *
             MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH];
 
         bbPort->portInputCount = DSHOT_BB_PORT_IP_BUF_LENGTH;
-        bbPort->portInputBuffer = &bbInputBuffer[(bbPort - bbPorts) *
+        bbPort->portInputBuffer = &bbInputBuffer[(bbPort - m_ports) *
             DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH];
 
         bbTimebaseSetup(bbPort, pwmProtocolType);
@@ -398,7 +398,7 @@ static bool bbMotorConfig(
         bbDMA_ITConfig(bbPort);
     }
 
-    bbMotor_t * bbMotor = &bbMotors[motorIndex];
+    bbMotor_t * bbMotor = &m_motors[motorIndex];
 
     bbMotor->pinIndex = pinIndex;
     bbMotor->io = io;
@@ -435,9 +435,9 @@ static void bbShutdown(void)
 
 bool bbUpdateStart(void)
 {
-    for (int i = 0; i < usedMotorPorts; i++) {
-        bbDMA_Cmd(&bbPorts[i], DISABLE);
-        bbOutputDataClear(bbPorts[i].portOutputBuffer);
+    for (int i = 0; i < m_usedMotorPorts; i++) {
+        bbDMA_Cmd(&m_ports[i], DISABLE);
+        bbOutputDataClear(m_ports[i].portOutputBuffer);
     }
 
     return true;
@@ -445,7 +445,7 @@ bool bbUpdateStart(void)
 
 void bbWriteInt(uint8_t motorIndex, uint16_t value)
 {
-    bbMotor_t *const bbmotor = &bbMotors[motorIndex];
+    bbMotor_t *const bbmotor = &m_motors[motorIndex];
 
     if (!bbmotor->configured) {
         return;
@@ -489,24 +489,24 @@ void bbUpdateComplete(uint8_t motorCount)
         }
     }
 
-    for (int i = 0; i < usedMotorPorts; i++) {
-        bbPort_t *bbPort = &bbPorts[i];
+    for (int i = 0; i < m_usedMotorPorts; i++) {
+        bbPort_t *bbPort = &m_ports[i];
 
         bbDMA_Cmd(bbPort, ENABLE);
     }
 
     lastSendUs = micros();
-    for (int i = 0; i < usedMotorPacers; i++) {
-        bbPacer_t *bbPacer = &bbPacers[i];
+    for (int i = 0; i < m_usedMotorPacers; i++) {
+        bbPacer_t *bbPacer = &m_pacers[i];
         bbTIM_DMACmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
     }
 }
 
 bool bbEnableMotors(void)
 {
-    for (int i = 0; i < motorCount; i++) {
-        if (bbMotors[i].configured) {
-            IOConfigGPIO(bbMotors[i].io, bbMotors[i].iocfg);
+    for (int i = 0; i < m_motorCount; i++) {
+        if (m_motors[i].configured) {
+            IOConfigGPIO(m_motors[i].io, m_motors[i].iocfg);
         }
     }
     return true;
@@ -517,15 +517,15 @@ void bbPostInit(dshotProtocol_t protocol)
     bbFindPacerTimer();
 
     for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex <
-            motorCount; motorIndex++) {
+            m_motorCount; motorIndex++) {
 
-        if (!bbMotorConfig(bbMotors[motorIndex].io, motorIndex,
-                    protocol, bbMotors[motorIndex].output)) { 
+        if (!bbMotorConfig(m_motors[motorIndex].io, motorIndex,
+                    protocol, m_motors[motorIndex].output)) { 
             return NULL;
         }
 
 
-        bbMotors[motorIndex].enabled = true;
+        m_motors[motorIndex].enabled = true;
 
         // Fill in motors structure for 4way access (XXX Should be refactored)
 
@@ -535,17 +535,17 @@ void bbPostInit(dshotProtocol_t protocol)
 
 dshotBitbangStatus_e dshotBitbangGetStatus()
 {
-    return bbStatus;
+    return m_status;
 }
 
 void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
 {
-    motorCount = count;
-    bbStatus = DSHOT_BITBANG_STATUS_OK;
+    m_motorCount = count;
+    m_status = DSHOT_BITBANG_STATUS_OK;
 
     memset(bbOutputBuffer, 0, sizeof(bbOutputBuffer));
 
-    for (int motorIndex = 0; motorIndex < motorCount; motorIndex++) {
+    for (int motorIndex = 0; motorIndex < m_motorCount; motorIndex++) {
         const timerHardware_t *timerHardware = timerGetConfiguredByTag(pins[motorIndex]);
         const IO_t io = IOGetByTag(pins[motorIndex]);
 
@@ -554,20 +554,20 @@ void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
 
         if (!IOIsFreeOrPreinit(io)) {
             // not enough motors initialised for the mixer or a break in the motors
-            bbStatus = DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT;
+            m_status = DSHOT_BITBANG_STATUS_MOTOR_PIN_CONFLICT;
             return NULL;
         }
 
         int pinIndex = IO_GPIOPinIdx(io);
 
-        bbMotors[motorIndex].pinIndex = pinIndex;
-        bbMotors[motorIndex].io = io;
-        bbMotors[motorIndex].output = output;
-        bbMotors[motorIndex].iocfg = IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz,
+        m_motors[motorIndex].pinIndex = pinIndex;
+        m_motors[motorIndex].io = io;
+        m_motors[motorIndex].output = output;
+        m_motors[motorIndex].iocfg = IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz,
                 GPIO_OType_PP, bbPuPdMode);
 
         IOInit(io, OWNER_MOTOR, RESOURCE_INDEX(motorIndex));
-        IOConfigGPIO(io, bbMotors[motorIndex].iocfg);
+        IOConfigGPIO(io, m_motors[motorIndex].iocfg);
         if (output & TIMER_OUTPUT_INVERTED) {
             IOLo(io);
         } else {
@@ -575,6 +575,6 @@ void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
         }
 
         // Fill in motors structure for 4way access (XXX Should be refactored)
-        motors[motorIndex].io = bbMotors[motorIndex].io;
+        motors[motorIndex].io = m_motors[motorIndex].io;
     }
 }
