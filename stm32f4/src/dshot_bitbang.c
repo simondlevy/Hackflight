@@ -277,8 +277,9 @@ static void bbFindPacerTimer(void)
             for (int channel = 0; channel < CC_CHANNELS_PER_TIMER; channel++) {
                 const timerHardware_t *timer =
                     timerGetAllocatedByNumberAndChannel(timNumber,
-                            CC_CHANNEL_FROM_INDEX(channel)); const
-                    resourceOwner_e timerOwner = timerGetOwner(timer)->owner;
+                            CC_CHANNEL_FROM_INDEX(channel)); 
+                //const resourceOwner_e timerOwner = timerGetOwner(timer)->owner;
+                const resourceOwner_e timerOwner = dshotBitbangTimerGetOwner(timer)->owner;
                 if (timerOwner != OWNER_FREE && timerOwner != OWNER_DSHOT_BITBANG) {
                     timerConflict = true;
                     break;
