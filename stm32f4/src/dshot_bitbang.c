@@ -127,7 +127,7 @@ static uint32_t m_lastSendUs;
 
 // DMA GPIO output buffer formatting
 
-static void bbOutputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
+static void outputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
 {
     uint32_t resetMask;
     uint32_t setMask;
@@ -149,8 +149,7 @@ static void bbOutputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
     }
 }
 
-static void bbOutputDataSet(
-        uint32_t *buffer, int pinNumber, uint16_t value, bool inverted)
+static void outputDataSet(uint32_t *buffer, int pinNumber, uint16_t value, bool inverted)
 {
     uint32_t middleBit;
 
@@ -168,7 +167,7 @@ static void bbOutputDataSet(
     }
 }
 
-static void bbOutputDataClear(uint32_t *buffer)
+static void outputDataClear(uint32_t *buffer)
 {
     // Middle position to no change
     for (int bitpos = 0; bitpos < 16; bitpos++) {
@@ -176,9 +175,7 @@ static void bbOutputDataClear(uint32_t *buffer)
     }
 }
 
-// bbPacer management
-
-static bbPacer_t *bbFindMotorPacer(TIM_TypeDef *tim)
+static bbPacer_t *findMotorPacer(TIM_TypeDef *tim)
 {
     for (int i = 0; i < MAX_MOTOR_PACERS; i++) {
 
@@ -200,7 +197,7 @@ static bbPacer_t *bbFindMotorPacer(TIM_TypeDef *tim)
 
 // bbPort management
 
-static bbPort_t *bbFindMotorPort(int portIndex)
+static bbPort_t *findMotorPort(int portIndex)
 {
     for (int i = 0; i < m_usedMotorPorts; i++) {
         if (m_ports[i].portIndex == portIndex) {
@@ -210,7 +207,7 @@ static bbPort_t *bbFindMotorPort(int portIndex)
     return NULL;
 }
 
-static bbPort_t *bbAllocateMotorPort(int portIndex)
+static bbPort_t *allocateMotorPort(int portIndex)
 {
     if (m_usedMotorPorts >= MAX_SUPPORTED_MOTOR_PORTS) {
         return NULL;
@@ -247,13 +244,13 @@ static uint32_t getDshotBaseFrequency(dshotProtocol_t pwmProtocolType)
     }
 }
 
-static void bbSetupDma(bbPort_t *bbPort)
+static void setupDma(bbPort_t *bbPort)
 {
     const dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(bbPort->dmaResource);
     dmaEnable(dmaIdentifier);
     bbPort->dmaSource = timerDmaSource(bbPort->timhw->channel);
 
-    bbPacer_t *bbPacer = bbFindMotorPacer(bbPort->timhw->tim);
+    bbPacer_t *bbPacer = findMotorPacer(bbPort->timhw->tim);
     bbPacer->dmaSources |= bbPort->dmaSource;
 
     dmaSetHandler(
@@ -263,21 +260,6 @@ static void bbSetupDma(bbPort_t *bbPort)
             (uint32_t)bbPort);
 
     bbDMA_ITConfig(bbPort);
-}
-
-void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor)
-{
-    bbPort_t *bbPort = (bbPort_t *)descriptor->userParam;
-
-    bbDMA_Cmd(bbPort, DISABLE);
-
-    bbTIM_DMACmd(bbPort->timhw->tim, bbPort->dmaSource, DISABLE);
-
-    if (DMA_GET_FLAG_STATUS(descriptor, DMA_IT_TEIF)) {
-        while (1) {};
-    }
-
-    DMA_CLEAR_FLAG(descriptor, DMA_IT_TCIF);
 }
 
 static const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
@@ -311,7 +293,7 @@ static const timerHardware_t *timerGetAllocatedByNumberAndChannel(
 // Setup m_ports array elements so that they each have a TIM1 or TIM8 channel
 // in timerHardware array for BB-DShot.
 
-static void bbFindPacerTimer(void)
+static void findPacerTimer(void)
 {
     for (int bbPortIndex=0; bbPortIndex<MAX_SUPPORTED_MOTOR_PORTS; bbPortIndex++) {
 
@@ -361,7 +343,7 @@ static void bbFindPacerTimer(void)
     }
 }
 
-static void bbTimebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
+static void timebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
 {
     uint32_t timerclock = timerClock(bbPort->timhw->tim);
 
@@ -376,19 +358,19 @@ static void bbTimebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
 // bb only use pin info associated with timerHardware entry designated as
 // TIM_USE_MOTOR; it does not use the timer channel associated with the pin.
 
-static bool bbMotorConfig(
+static bool motorConfig(
         IO_t io, uint8_t motorIndex, dshotProtocol_t pwmProtocolType, uint8_t output)
 {
     int pinIndex = IO_GPIOPinIdx(io);
     int portIndex = IO_GPIOPortIdx(io);
 
-    bbPort_t *bbPort = bbFindMotorPort(portIndex);
+    bbPort_t *bbPort = findMotorPort(portIndex);
 
     if (!bbPort) {
 
         // New port group
 
-        bbPort = bbAllocateMotorPort(portIndex);
+        bbPort = allocateMotorPort(portIndex);
 
         if (bbPort) {
             const timerHardware_t *timhw = bbPort->timhw;
@@ -407,11 +389,11 @@ static bool bbMotorConfig(
         bbPort->portInputCount = PORT_IP_BUF_LENGTH;
         bbPort->portInputBuffer = &m_inputBuffer[(bbPort - m_ports) * PORT_IP_BUF_LENGTH];
 
-        bbTimebaseSetup(bbPort, pwmProtocolType);
+        timebaseSetup(bbPort, pwmProtocolType);
         bbTIM_TimeBaseInit(bbPort, bbPort->outputARR);
         bbTimerChannelInit(bbPort, OWNER_DSHOT_BITBANG);
 
-        bbSetupDma(bbPort);
+        setupDma(bbPort);
         bbDMAPreconfigure(bbPort, BITBANG_DIRECTION_OUTPUT);
         bbDMAPreconfigure(bbPort, BITBANG_DIRECTION_INPUT);
 
@@ -431,7 +413,7 @@ static bool bbMotorConfig(
 
     bbGpioSetup(bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io, m_puPdMode);
 
-    bbOutputDataInit(bbPort->portOutputBuffer, (1 << pinIndex), false); // not inverted
+    outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex), false); // not inverted
 
     bbSwitchToOutput(bbPort);
 
@@ -440,14 +422,21 @@ static bool bbMotorConfig(
     return true;
 }
 
-static void bbDisableMotors(void)
-{
-    return;
-}
+// -------------------------------------------------------------------------
 
-static void bbShutdown(void)
+void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor)
 {
-    return;
+    bbPort_t *bbPort = (bbPort_t *)descriptor->userParam;
+
+    bbDMA_Cmd(bbPort, DISABLE);
+
+    bbTIM_DMACmd(bbPort->timhw->tim, bbPort->dmaSource, DISABLE);
+
+    if (DMA_GET_FLAG_STATUS(descriptor, DMA_IT_TEIF)) {
+        while (1) {};
+    }
+
+    DMA_CLEAR_FLAG(descriptor, DMA_IT_TCIF);
 }
 
 // -------------------------------------------------------------------------
@@ -500,12 +489,12 @@ bool dshotBitbangEnableMotors(void)
 
 void dshotBitbangPostInit(dshotProtocol_t protocol)
 {
-    bbFindPacerTimer();
+    findPacerTimer();
 
     for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex <
             m_motorCount; motorIndex++) {
 
-        if (!bbMotorConfig(m_motors[motorIndex].io, motorIndex,
+        if (!motorConfig(m_motors[motorIndex].io, motorIndex,
                     protocol, m_motors[motorIndex].output)) { 
             return NULL;
         }
@@ -542,7 +531,7 @@ bool dshotBitbangUpdateStart(void)
 {
     for (int i = 0; i < m_usedMotorPorts; i++) {
         bbDMA_Cmd(&m_ports[i], DISABLE);
-        bbOutputDataClear(m_ports[i].portOutputBuffer);
+        outputDataClear(m_ports[i].portOutputBuffer);
     }
 
     return true;
@@ -578,7 +567,7 @@ void dshotBitbangWrite(uint8_t motorIndex, float value)
 
     bbPort_t *bbPort = bbmotor->bbPort;
 
-    bbOutputDataSet( bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
+    outputDataSet( bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
 }
 
 
