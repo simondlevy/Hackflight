@@ -46,6 +46,9 @@ class DshotEsc : public Esc {
 
         static const uint8_t MAX_COMMANDS = 3;
 
+        // default to 8KHz (125us) loop to prevent possible div/0
+        static const uint32_t PID_LOOP_TIME_US = 125; 
+
         typedef enum {
             CMD_MOTOR_STOP = 0,
             CMD_BEACON1,
@@ -109,6 +112,8 @@ class DshotEsc : public Esc {
 
         bool m_enabled;
 
+        motorDmaOutput_t m_dmaMotors[MAX_SUPPORTED_MOTORS];
+
         commandControl_t * addCommand(void)
         {
             auto newHead = (m_commandQueueHead + 1) % (MAX_COMMANDS + 1);
@@ -130,6 +135,14 @@ class DshotEsc : public Esc {
             }
 
             return true;
+        }
+
+        static uint32_t commandCyclesFromTime(uint32_t delayUs)
+        {
+            // Find the minimum number of motor output cycles needed to
+            // provide at least delayUs time delay
+
+            return (delayUs + PID_LOOP_TIME_US - 1) / PID_LOOP_TIME_US;
         }
 
         static uint32_t dshotCommandCyclesFromTime(uint32_t delayUs)
@@ -162,7 +175,6 @@ class DshotEsc : public Esc {
         virtual void updateComplete(void) = 0;
         virtual bool updateStart(void) = 0;
         virtual void write(uint8_t index, float value) = 0;
-        virtual void writeInt(uint8_t index, uint16_t value) = 0;
 
         DshotEsc(vector<uint8_t> * pins, dshotProtocol_t protocol=DSHOT600) 
             : Esc(pins)
@@ -174,6 +186,127 @@ class DshotEsc : public Esc {
             for (auto i=0; i<m_motorCount; ++i) {
                 m_motorPins[i] = (*pins)[i];
             }
+        }
+
+        motorDmaOutput_t * getMotorDmaOutput(uint8_t index)
+        {
+            return &m_dmaMotors[index];
+        }
+
+
+        bool commandQueueEmpty(void)
+        {
+            return m_commandQueueHead == m_commandQueueTail;
+        }
+
+        bool commandQueueUpdate(void)
+        {
+            if (!commandQueueEmpty()) {
+                m_commandQueueTail = (m_commandQueueTail + 1) % (MAX_COMMANDS + 1);
+                if (!commandQueueEmpty()) {
+                    // There is another command in the queue so update it so it's ready
+                    // to output in sequence. It can go directly to the
+                    // DSHOT_COMMAND_STATE_ACTIVE state and bypass the
+                    // DSHOT_COMMAND_STATE_IDLEWAIT and DSHOT_COMMAND_STATE_STARTDELAY
+                    // states.
+                    commandControl_t* nextCommand = &m_commandQueue[m_commandQueueTail];
+                    nextCommand->state = COMMAND_STATE_ACTIVE;
+                    nextCommand->nextCommandCycleDelay = 0;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // This function is used to synchronize the dshot command output timing with
+        // the normal motor output timing tied to the PID loop frequency. A "true"
+        // result allows the motor output to be sent, "false" means delay until next
+        // loop. So take the example of a dshot command that needs to repeat 10 times
+        // at 1ms intervals.  If we have a 8KHz PID loop we'll end up sending the dshot
+        // command every 8th motor output.
+        bool commandOutputIsEnabled(void)
+        {
+            commandControl_t* command = &m_commandQueue[m_commandQueueTail];
+
+            switch (command->state) {
+                case COMMAND_STATE_IDLEWAIT:
+                    if (allMotorsAreIdle()) {
+                        command->state = COMMAND_STATE_STARTDELAY;
+                        command->nextCommandCycleDelay =
+                            dshotCommandCyclesFromTime(INITIAL_DELAY_US);
+                    }
+                    break;
+
+                case COMMAND_STATE_STARTDELAY:
+                    if (command->nextCommandCycleDelay) {
+                        --command->nextCommandCycleDelay;
+                        return false;  // Delay motor output till start of command sequence
+                    }
+                    command->state = COMMAND_STATE_ACTIVE;
+                    command->nextCommandCycleDelay = 0;  // first iter of repeat happens now
+                    [[fallthrough]];
+
+                case COMMAND_STATE_ACTIVE:
+                    if (command->nextCommandCycleDelay) {
+                        --command->nextCommandCycleDelay;
+                        return false;  // Delay motor output until the next command repeat
+                    }
+
+                    command->repeats--;
+                    if (command->repeats) {
+                        command->nextCommandCycleDelay =
+                            commandCyclesFromTime(COMMAND_DELAY_US);
+                    } else {
+                        command->state = COMMAND_STATE_POSTDELAY;
+                        command->nextCommandCycleDelay =
+                            commandCyclesFromTime(command->delayAfterCommandUs);
+                        if (!isLastCommand() && command->nextCommandCycleDelay > 0) {
+                            // Account for the 1 extra motor output loop between
+                            // commands.  Otherwise the inter-command delay will be
+                            // COMMAND_DELAY_US + 1 loop.
+                            command->nextCommandCycleDelay--;
+                        }
+                    }
+                    break;
+
+                case COMMAND_STATE_POSTDELAY:
+                    if (command->nextCommandCycleDelay) {
+                        --command->nextCommandCycleDelay;
+                        return false;  // Delay motor output until end of post-command delay
+                    }
+                    if (commandQueueUpdate()) {
+                        // Will be true if the command queue is not empty and we
+                        // want to wait for the next command to start in sequence.
+                        return false;
+                    }
+                    break;
+            }
+
+            return true;
+        }
+
+        bool isLastCommand(void)
+        {
+            return ((m_commandQueueTail + 1) % (MAX_COMMANDS + 1) == m_commandQueueHead);
+        }
+
+        uint8_t commandGetCurrent(uint8_t index)
+        {
+            return m_commandQueue[m_commandQueueTail].command[index];
+        }
+
+        bool commandIsProcessing(void)
+        {
+            if (commandQueueEmpty()) {
+                return false;
+            }
+
+            commandControl_t* command = &m_commandQueue[m_commandQueueTail];
+
+            return
+                command->state == COMMAND_STATE_STARTDELAY ||
+                command->state == COMMAND_STATE_ACTIVE ||
+                (command->state == COMMAND_STATE_POSTDELAY && !isLastCommand()); 
         }
 
     public:
@@ -252,15 +385,15 @@ class DshotEsc : public Esc {
         }
 
         virtual void write(float *values) override
-        {
-            if (m_enabled) {
-                if (!updateStart()) {
-                    return;
-                }
-                for (auto i=0; i <m_motorCount; i++) {
-                    write(i, values[i]);
-                }
-                updateComplete();
+            {
+                if (m_enabled) {
+                    if (!updateStart()) {
+                        return;
+                    }
+                    for (auto i=0; i <m_motorCount; i++) {
+                        write(i, values[i]);
+                    }
+                    updateComplete();
             }
         }
 

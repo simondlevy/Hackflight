@@ -87,14 +87,21 @@ typedef struct bbPort_s {
     resourceOwner_t owner;
 } bbPort_t;
 
-void bbDMA_Cmd(bbPort_t *bbPort, FunctionalState NewState);
-int  bbDMA_Count(bbPort_t *bbPort);
-void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor);
-void bbDMA_ITConfig(bbPort_t *bbPort);
-void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction);
-void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io, uint8_t puPdMode);
-void bbSwitchToOutput(bbPort_t * bbPort);
-void bbTIM_DMACmd(TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState);
-void bbTIM_TimeBaseInit(bbPort_t *bbPort, uint16_t period);
-void bbTimerChannelInit(bbPort_t *bbPort, resourceOwner_e owner);
+#if defined (__cplusplus)
+extern "C" {
+#endif
 
+    void bbDMA_Cmd(bbPort_t *bbPort, FunctionalState NewState);
+    int  bbDMA_Count(bbPort_t *bbPort);
+    void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor);
+    void bbDMA_ITConfig(bbPort_t *bbPort);
+    void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction);
+    void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io, uint8_t puPdMode);
+    void bbSwitchToOutput(bbPort_t * bbPort);
+    void bbTIM_DMACmd(TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState);
+    void bbTIM_TimeBaseInit(bbPort_t *bbPort, uint16_t period);
+    void bbTimerChannelInit(bbPort_t *bbPort, resourceOwner_e owner);
+
+#if defined (__cplusplus)
+}
+#endif

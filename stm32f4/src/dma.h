@@ -113,14 +113,32 @@ typedef enum {
 #define IS_DMA_ENABLED(reg) (((DMA_ARCH_TYPE *)(reg))->CR & DMA_SxCR_EN)
 #define REG_NDTR NDTR
 
-dmaIdentifier_e dmaAllocate(dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex);
-void dmaEnable(dmaIdentifier_e identifier);
-void dmaSetHandler(dmaIdentifier_e identifier, dmaCallbackHandlerFuncPtr callback, uint32_t priority, uint32_t userParam);
+#if defined (__cplusplus)
+extern "C" {
+#endif
 
-dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel);
-const resourceOwner_t *dmaGetOwner(dmaIdentifier_e identifier);
-dmaChannelDescriptor_t* dmaGetDescriptorByIdentifier(const dmaIdentifier_e identifier);
-uint32_t dmaGetChannel(const uint8_t channel);
+    dmaIdentifier_e dmaAllocate(
+            dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex);
+
+    void dmaEnable(dmaIdentifier_e identifier);
+
+    uint32_t dmaGetChannel(const uint8_t channel);
+
+    dmaChannelDescriptor_t* dmaGetDescriptorByIdentifier(const dmaIdentifier_e identifier);
+
+    dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel);
+
+    const resourceOwner_t *dmaGetOwner(dmaIdentifier_e identifier);
+
+    void dmaSetHandler(
+            dmaIdentifier_e identifier,
+            dmaCallbackHandlerFuncPtr callback,
+            uint32_t priority,
+            uint32_t userParam);
+
+#if defined (__cplusplus)
+}
+#endif
 
 //
 // Wrapper macros to cast dmaResource_t back into DMA_ARCH_TYPE

@@ -82,11 +82,6 @@ class DshotBitbangEsc : public DshotEsc {
             dshotBitbangWrite(index, value);
         }
 
-        virtual void writeInt(uint8_t index, uint16_t value) override
-        {
-            dshotBitbangWrite(index, value);
-        }
-
     public:
 
         DshotBitbangEsc(vector<uint8_t> * pins, dshotProtocol_t protocol=DSHOT600) 

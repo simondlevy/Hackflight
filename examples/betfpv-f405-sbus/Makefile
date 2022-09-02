@@ -116,10 +116,10 @@ endif
 #include $(ROOT)/make/csource.mk
 STM32_SRC = \
             serial_debug.c \
-            dshot.c \
-            dshot_bitbang.c \
             dshot_packet.c \
             bitbang.c \
+            dshot_bitbang.c \
+            dshot.c \
             bus.c \
             bus_spi.c \
             bus_spi_config.c \

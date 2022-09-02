@@ -29,7 +29,7 @@
 #include <io_impl.h>
 #include <nvic.h>
 
-class NewDshotBitbangEsc : public DshotEsc {
+class DshotBitbangEsc : public DshotEsc {
 
     private:
 
@@ -543,14 +543,14 @@ class NewDshotBitbangEsc : public DshotEsc {
             }
 
             // fetch requestTelemetry from motors. Needs to be refactored.
-            motorDmaOutput_t * const motor = getMotorDmaOutput(motorIndex);
+            motorDmaOutput_t * const motor = getMotorDmaOutput(index);
             bbmotor->protocolControl.requestTelemetry =
                 motor->protocolControl.requestTelemetry;
             motor->protocolControl.requestTelemetry = false;
 
             // If there is a command ready to go overwrite the value and send that instead
-            if (dshotCommandIsProcessing()) {
-                ivalue = dshotCommandGetCurrent(motorIndex);
+            if (commandIsProcessing()) {
+                ivalue = commandGetCurrent(index);
                 if (ivalue) {
                     bbmotor->protocolControl.requestTelemetry = true;
                 }
@@ -567,9 +567,9 @@ class NewDshotBitbangEsc : public DshotEsc {
 
     public:
 
-        NewDshotBitbangEsc(vector<uint8_t> * pins, dshotProtocol_t protocol=DSHOT600) 
+        DshotBitbangEsc(vector<uint8_t> * pins, dshotProtocol_t protocol=DSHOT600) 
             : DshotEsc(pins, protocol)
         {
         }
 
-}; // class NewDshotBitbangEsc
+}; // class DshotBitbangEsc

@@ -51,29 +51,30 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 extern "C" {
 #endif
 
-bool IORead(IO_t io);
-void IOWrite(IO_t io, bool value);
-void IOHi(IO_t io);
-void IOLo(IO_t io);
-void IOToggle(IO_t io);
+    bool IORead(IO_t io);
+    void IOWrite(IO_t io, bool value);
+    void IOHi(IO_t io);
+    void IOLo(IO_t io);
+    void IOToggle(IO_t io);
 
-void IOInit(IO_t io, resourceOwner_e owner, uint8_t index);
-void IORelease(IO_t io);  // unimplemented
-resourceOwner_e IOGetOwner(IO_t io);
-bool IOIsFreeOrPreinit(IO_t io);
-IO_t IOGetByTag(ioTag_t tag);
+    void IOInit(IO_t io, resourceOwner_e owner, uint8_t index);
+    void IORelease(IO_t io);  // unimplemented
+    resourceOwner_e IOGetOwner(IO_t io);
+    bool IOIsFreeOrPreinit(IO_t io);
+    IO_t IOGetByTag(ioTag_t tag);
 
-void IOConfigGPIO(IO_t io, ioConfig_t cfg);
-void IOConfigGPIOAF(IO_t io, ioConfig_t cfg, uint8_t af);
+    void IOConfigGPIO(IO_t io, ioConfig_t cfg);
+    void IOConfigGPIOAF(IO_t io, ioConfig_t cfg, uint8_t af);
 
-void ioInitGlobal(void);
+    void ioInitGlobal(void);
 
-typedef void (*IOTraverseFuncPtr_t)(IO_t io);
+    typedef void (*IOTraverseFuncPtr_t)(IO_t io);
 
-void IOTraversePins(IOTraverseFuncPtr_t func);
+    void IOTraversePins(IOTraverseFuncPtr_t func);
 
-GPIO_TypeDef* IO_GPIO(IO_t io);
-uint16_t IO_Pin(IO_t io);
+    GPIO_TypeDef* IO_GPIO(IO_t io);
+
+    uint16_t IO_Pin(IO_t io);
 
 #if defined(__cplusplus)
 }

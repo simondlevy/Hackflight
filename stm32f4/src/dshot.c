@@ -65,8 +65,6 @@ static  bool isLastDshotCommand(void)
     return ((commandQueueTail + 1) % (DSHOT_MAX_COMMANDS + 1) == commandQueueHead);
 }
 
-
-
 static  bool dshotCommandQueueUpdate(void)
 {
     if (!dshotCommandQueueEmpty()) {

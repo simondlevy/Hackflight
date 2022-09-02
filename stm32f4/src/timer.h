@@ -162,38 +162,59 @@ void timerChInit(const timerHardware_t *timHw, channelType_t type, int irqPriori
 // per-timer
 //
 
-void timerForceOverflow(TIM_TypeDef *tim);
+#if defined (__cplusplus)
+extern "C" {
+#endif
 
-void timerConfigUpdateCallback(const TIM_TypeDef *tim, timerOvrHandlerRec_t *updateCallback);
+    void timerForceOverflow(TIM_TypeDef *tim);
 
-uint32_t timerClock(TIM_TypeDef *tim);
+    void timerConfigUpdateCallback(
+            const TIM_TypeDef *tim, timerOvrHandlerRec_t *updateCallback);
 
-void configTimeBase(TIM_TypeDef *tim, uint16_t period, uint32_t hz);  // TODO - just for migration
-void timerReconfigureTimeBase(TIM_TypeDef *tim, uint16_t period, uint32_t hz);
+    uint32_t timerClock(TIM_TypeDef *tim);
 
-rccPeriphTag_t timerRCC(TIM_TypeDef *tim);
-uint8_t timerInputIrq(TIM_TypeDef *tim);
+    void configTimeBase(TIM_TypeDef *tim, uint16_t period, uint32_t hz);  
 
-extern const resourceOwner_t freeOwner;
+    void timerReconfigureTimeBase(TIM_TypeDef *tim, uint16_t period, uint32_t hz);
 
-struct timerIOConfig_s;
+    rccPeriphTag_t timerRCC(TIM_TypeDef *tim);
+    uint8_t timerInputIrq(TIM_TypeDef *tim);
 
-struct timerIOConfig_s *timerIoConfigByTag(ioTag_t ioTag);
-const timerHardware_t *timerGetConfiguredByTag(ioTag_t ioTag);
-const timerHardware_t *timerAllocate(ioTag_t ioTag, resourceOwner_e owner, uint8_t resourceIndex);
-const timerHardware_t *timerGetByTagAndIndex(ioTag_t ioTag, unsigned timerIndex);
-ioTag_t timerioTagGetByUsage(timerUsageFlag_e usageFlag, uint8_t index);
+    extern const resourceOwner_t freeOwner;
 
-void timerOCInit(TIM_TypeDef *tim, uint8_t channel, TIM_OCInitTypeDef *init);
-void timerOCPreloadConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t preload);
+    struct timerIOConfig_s;
 
-volatile timCCR_t *timerCCR(TIM_TypeDef *tim, uint8_t channel);
-uint16_t timerDmaSource(uint8_t channel);
+    struct timerIOConfig_s *timerIoConfigByTag(ioTag_t ioTag);
 
-uint16_t timerGetPrescalerByDesiredHertz(TIM_TypeDef *tim, uint32_t hz);
-uint16_t timerGetPrescalerByDesiredMhz(TIM_TypeDef *tim, uint16_t mhz);
-uint16_t timerGetPeriodByPrescaler(TIM_TypeDef *tim, uint16_t prescaler, uint32_t hz);
+    const timerHardware_t *timerGetConfiguredByTag(ioTag_t ioTag);
 
-int8_t timerGetNumberByIndex(uint8_t index);
-int8_t timerGetTIMNumber(const TIM_TypeDef *tim);
-uint8_t timerLookupChannelIndex(const uint16_t channel);
+    const timerHardware_t *timerAllocate(
+            ioTag_t ioTag, resourceOwner_e owner, uint8_t resourceIndex);
+
+    const timerHardware_t *timerGetByTagAndIndex(ioTag_t ioTag, unsigned timerIndex);
+
+    ioTag_t timerioTagGetByUsage(timerUsageFlag_e usageFlag, uint8_t index);
+
+    void timerOCInit(TIM_TypeDef *tim, uint8_t channel, TIM_OCInitTypeDef *init);
+
+    void timerOCPreloadConfig(TIM_TypeDef *tim, uint8_t channel, uint16_t preload);
+
+    volatile timCCR_t *timerCCR(TIM_TypeDef *tim, uint8_t channel);
+
+    uint16_t timerDmaSource(uint8_t channel);
+
+    uint16_t timerGetPrescalerByDesiredHertz(TIM_TypeDef *tim, uint32_t hz);
+
+    uint16_t timerGetPrescalerByDesiredMhz(TIM_TypeDef *tim, uint16_t mhz);
+
+    uint16_t timerGetPeriodByPrescaler(TIM_TypeDef *tim, uint16_t prescaler, uint32_t hz);
+
+    int8_t timerGetNumberByIndex(uint8_t index);
+
+    int8_t timerGetTIMNumber(const TIM_TypeDef *tim);
+
+    uint8_t timerLookupChannelIndex(const uint16_t channel);
+
+#if defined (__cplusplus)
+}
+#endif
