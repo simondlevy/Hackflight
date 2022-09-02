@@ -42,21 +42,15 @@
 // GPIOA, GPIOB and GPIOC.
 #define MAX_SUPPORTED_MOTOR_PORTS 4 
 
-#define DSHOT_BITBANG_TELEMETRY_OVER_SAMPLE 3
+static uint32_t TELEMETRY_OVER_SAMPLE = 3;
 
-#define MOTOR_DSHOT_SYMBOL_TIME_NS(rate)  (1000000000 / (rate))
+#define BIT_PER_SYMBOL 1
 
-#define MOTOR_DSHOT_BIT_PER_SYMBOL         1
+#define STATE_PER_SYMBOL 3
 
-#define MOTOR_DSHOT_STATE_PER_SYMBOL       3  // Initial high, 0/1, low
+#define FRAME_BITS 16
 
-#define MOTOR_DSHOT_FRAME_BITS             16
-
-#define MOTOR_DSHOT_FRAME_TIME_NS(rate)    ((MOTOR_DSHOT_FRAME_BITS / MOTOR_DSHOT_BIT_PER_SYMBOL) * MOTOR_DSHOT_SYMBOL_TIME_NS(rate))
-
-#define MOTOR_DSHOT_BUF_LENGTH            ((MOTOR_DSHOT_FRAME_BITS / MOTOR_DSHOT_BIT_PER_SYMBOL) * MOTOR_DSHOT_STATE_PER_SYMBOL)
-
-#define MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH MOTOR_DSHOT_BUF_LENGTH
+#define BUF_LENGTH ((FRAME_BITS / BIT_PER_SYMBOL) * STATE_PER_SYMBOL)
 
 // DMA input buffer
 // (30us + <frame time> + <slack>) / <input sampling clock period>
@@ -67,8 +61,7 @@
 // <slack> = 10%
 // (30 + 26 + 3) / 0.44 = 134
 // In some cases this was not enough, so we add 6 extra samples
-#define DSHOT_BB_PORT_IP_BUF_LENGTH 140
-#define DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH DSHOT_BB_PORT_IP_BUF_LENGTH
+#define PORT_IP_BUF_LENGTH 140
 
 typedef enum {
     DSHOT_BITBANG_OFF,
@@ -128,8 +121,8 @@ static bbMotor_t m_motors[MAX_SUPPORTED_MOTORS];
 
 static int m_motorCount;
 
-static uint32_t m_outputBuffer[MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
-static uint16_t m_inputBuffer[DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
+static uint32_t m_outputBuffer[BUF_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
+static uint16_t m_inputBuffer[PORT_IP_BUF_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 
 static uint8_t m_puPdMode;
 
@@ -389,7 +382,7 @@ static void bbTimebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
     m_frameUs = 1000000 * 17 * 3 / outputFreq;
     bbPort->outputARR = timerclock / outputFreq - 1;
 
-    uint32_t inputFreq = outputFreq * 5 * 2 * DSHOT_BITBANG_TELEMETRY_OVER_SAMPLE / 24;
+    uint32_t inputFreq = outputFreq * 5 * 2 * TELEMETRY_OVER_SAMPLE / 24;
     bbPort->inputARR = timerclock / inputFreq - 1;
 }
 
@@ -421,13 +414,11 @@ static bool bbMotorConfig(
 
         bbPort->gpio = IO_GPIO(io);
 
-        bbPort->portOutputCount = MOTOR_DSHOT_BUF_LENGTH;
-        bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) *
-            MOTOR_DSHOT_BUF_CACHE_ALIGN_LENGTH];
+        bbPort->portOutputCount = BUF_LENGTH;
+        bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
 
-        bbPort->portInputCount = DSHOT_BB_PORT_IP_BUF_LENGTH;
-        bbPort->portInputBuffer = &m_inputBuffer[(bbPort - m_ports) *
-            DSHOT_BB_PORT_IP_BUF_CACHE_ALIGN_LENGTH];
+        bbPort->portInputCount = PORT_IP_BUF_LENGTH;
+        bbPort->portInputBuffer = &m_inputBuffer[(bbPort - m_ports) * PORT_IP_BUF_LENGTH];
 
         bbTimebaseSetup(bbPort, pwmProtocolType);
         bbTIM_TimeBaseInit(bbPort, bbPort->outputARR);
