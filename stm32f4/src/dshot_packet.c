@@ -14,21 +14,10 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <math.h>
-
-#include <core/constrain.h>
-#include <escs/dshot_protocol.h>
-#include <pwm.h>
-#include <time.h>
-
 #include "platform.h"
 #include "atomic.h"
 #include "dshot_dev.h"
-#include "dshot.h"
 #include "nvic.h"
-#include "timer.h"
 
 uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
 {
