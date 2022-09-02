@@ -116,9 +116,9 @@ endif
 #include $(ROOT)/make/csource.mk
 STM32_SRC = \
             serial_debug.c \
-            dshot_packet.c \
-            dshot_command.c \
+            dshot.c \
             dshot_bitbang.c \
+            dshot_packet.c \
             bitbang.c \
             bus.c \
             bus_spi.c \
@@ -276,9 +276,9 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 
 $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 	  hardware_init.h \
-	  dshot_command.h \
+	  dshot.h \
       bus_spi.h \
-      dshot_command.h \
+      dshot.h \
       exti.h \
       flash.h \
       inverter.h \
