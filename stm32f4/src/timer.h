@@ -180,7 +180,7 @@ struct timerIOConfig_s;
 
 struct timerIOConfig_s *timerIoConfigByTag(ioTag_t ioTag);
 const timerHardware_t *timerGetAllocatedByNumberAndChannel(int8_t timerNumber, uint16_t timerChannel);
-const resourceOwner_t *timerGetOwner(const timerHardware_t *timer);
+//const resourceOwner_t *timerGetOwner(const timerHardware_t *timer);
 const timerHardware_t *timerGetConfiguredByTag(ioTag_t ioTag);
 const timerHardware_t *timerAllocate(ioTag_t ioTag, resourceOwner_e owner, uint8_t resourceIndex);
 const timerHardware_t *timerGetByTagAndIndex(ioTag_t ioTag, unsigned timerIndex);

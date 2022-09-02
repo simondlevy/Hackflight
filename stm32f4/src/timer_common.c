@@ -96,7 +96,9 @@ const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
         }
     }
 
-    return dshotBitbangTimerGetOwner(timer);
+    return &freeOwner;
+
+    //return dshotBitbangTimerGetOwner(timer);
 }
 
 const timerHardware_t *timerAllocate(ioTag_t ioTag, resourceOwner_e owner, uint8_t resourceIndex)
