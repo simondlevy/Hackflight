@@ -423,23 +423,6 @@ static bool motorConfig(
 
 // -------------------------------------------------------------------------
 
-void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor)
-{
-    bbPort_t *bbPort = (bbPort_t *)descriptor->userParam;
-
-    bbDMA_Cmd(bbPort, DISABLE);
-
-    bbTIM_DMACmd(bbPort->timhw->tim, bbPort->dmaSource, DISABLE);
-
-    if (DMA_GET_FLAG_STATUS(descriptor, DMA_IT_TEIF)) {
-        while (1) {};
-    }
-
-    DMA_CLEAR_FLAG(descriptor, DMA_IT_TCIF);
-}
-
-// -------------------------------------------------------------------------
-
 void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
 {
     m_motorCount = count;

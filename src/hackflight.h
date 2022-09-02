@@ -268,11 +268,8 @@ class Hackflight {
         void begin(void)
         {
             m_taskData.receiver->begin();
-
             m_taskData.msp.begin();
-
             m_taskData.imu->begin();
-
             m_taskData.esc->begin();
 
             m_led->begin();
