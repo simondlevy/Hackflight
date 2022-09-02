@@ -476,107 +476,6 @@ static void bbShutdown(void)
 
 // -------------------------------------------------------------------------
 
-
-bool dshotBitbangUpdateStart(void)
-{
-    for (int i = 0; i < m_usedMotorPorts; i++) {
-        bbDMA_Cmd(&m_ports[i], DISABLE);
-        bbOutputDataClear(m_ports[i].portOutputBuffer);
-    }
-
-    return true;
-}
-
-void dshotBitbangWriteInt(uint8_t motorIndex, uint16_t value)
-{
-    bbMotor_t *const bbmotor = &m_motors[motorIndex];
-
-    if (!bbmotor->configured) {
-        return;
-    }
-
-    // fetch requestTelemetry from motors. Needs to be refactored.
-    motorDmaOutput_t * const motor = getMotorDmaOutput(motorIndex);
-    bbmotor->protocolControl.requestTelemetry =
-        motor->protocolControl.requestTelemetry;
-    motor->protocolControl.requestTelemetry = false;
-
-    // If there is a command ready to go overwrite the value and send that instead
-    if (dshotCommandIsProcessing()) {
-        value = dshotCommandGetCurrent(motorIndex);
-        if (value) {
-            bbmotor->protocolControl.requestTelemetry = true;
-        }
-    }
-
-    bbmotor->protocolControl.value = value;
-
-    uint16_t packet = prepareDshotPacket(&bbmotor->protocolControl);
-
-    bbPort_t *bbPort = bbmotor->bbPort;
-
-    bbOutputDataSet( bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
-}
-
-void dshotBitbangWrite(uint8_t motorIndex, float value)
-{
-    dshotBitbangWriteInt(motorIndex, value);
-}
-
-void dshotBitbangUpdateComplete(uint8_t motorCount)
-{
-    // If there is a dshot command loaded up, time it correctly with motor update
-
-    if (!dshotCommandQueueEmpty()) {
-        if (!dshotCommandOutputIsEnabled(motorCount)) {
-            return;
-        }
-    }
-
-    for (int i = 0; i < m_usedMotorPorts; i++) {
-        bbPort_t *bbPort = &m_ports[i];
-
-        bbDMA_Cmd(bbPort, ENABLE);
-    }
-
-    m_lastSendUs = micros();
-    for (int i = 0; i < m_usedMotorPacers; i++) {
-        bbPacer_t *bbPacer = &m_pacers[i];
-        bbTIM_DMACmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
-    }
-}
-
-bool dshotBitbangEnableMotors(void)
-{
-    for (int i = 0; i < m_motorCount; i++) {
-        if (m_motors[i].configured) {
-            IOConfigGPIO(m_motors[i].io, m_motors[i].iocfg);
-        }
-    }
-    return true;
-}
-
-void dshotBitbangPostInit(dshotProtocol_t protocol)
-{
-    bbFindPacerTimer();
-
-    for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex <
-            m_motorCount; motorIndex++) {
-
-        if (!bbMotorConfig(m_motors[motorIndex].io, motorIndex,
-                    protocol, m_motors[motorIndex].output)) { 
-            return NULL;
-        }
-
-
-        m_motors[motorIndex].enabled = true;
-
-        // Fill in motors structure for 4way access (XXX Should be refactored)
-
-        motors[motorIndex].enabled = true;
-    }
-}
-
 void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
 {
     m_motorCount = count;
@@ -615,3 +514,102 @@ void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
         motors[motorIndex].io = m_motors[motorIndex].io;
     }
 }
+
+bool dshotBitbangEnableMotors(void)
+{
+    for (int i = 0; i < m_motorCount; i++) {
+        if (m_motors[i].configured) {
+            IOConfigGPIO(m_motors[i].io, m_motors[i].iocfg);
+        }
+    }
+    return true;
+}
+
+void dshotBitbangPostInit(dshotProtocol_t protocol)
+{
+    bbFindPacerTimer();
+
+    for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex <
+            m_motorCount; motorIndex++) {
+
+        if (!bbMotorConfig(m_motors[motorIndex].io, motorIndex,
+                    protocol, m_motors[motorIndex].output)) { 
+            return NULL;
+        }
+
+
+        m_motors[motorIndex].enabled = true;
+
+        // Fill in motors structure for 4way access (XXX Should be refactored)
+
+        motors[motorIndex].enabled = true;
+    }
+}
+
+void dshotBitbangUpdateComplete(uint8_t motorCount)
+{
+    // If there is a dshot command loaded up, time it correctly with motor update
+
+    if (!dshotCommandQueueEmpty()) {
+        if (!dshotCommandOutputIsEnabled(motorCount)) {
+            return;
+        }
+    }
+
+    for (int i = 0; i < m_usedMotorPorts; i++) {
+        bbPort_t *bbPort = &m_ports[i];
+
+        bbDMA_Cmd(bbPort, ENABLE);
+    }
+
+    m_lastSendUs = micros();
+    for (int i = 0; i < m_usedMotorPacers; i++) {
+        bbPacer_t *bbPacer = &m_pacers[i];
+        bbTIM_DMACmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
+    }
+}
+
+bool dshotBitbangUpdateStart(void)
+{
+    for (int i = 0; i < m_usedMotorPorts; i++) {
+        bbDMA_Cmd(&m_ports[i], DISABLE);
+        bbOutputDataClear(m_ports[i].portOutputBuffer);
+    }
+
+    return true;
+}
+
+void dshotBitbangWrite(uint8_t motorIndex, float value)
+{
+    uint16_t ivalue = (uint16_t)value;
+
+    bbMotor_t *const bbmotor = &m_motors[motorIndex];
+
+    if (!bbmotor->configured) {
+        return;
+    }
+
+    // fetch requestTelemetry from motors. Needs to be refactored.
+    motorDmaOutput_t * const motor = getMotorDmaOutput(motorIndex);
+    bbmotor->protocolControl.requestTelemetry =
+        motor->protocolControl.requestTelemetry;
+    motor->protocolControl.requestTelemetry = false;
+
+    // If there is a command ready to go overwrite the value and send that instead
+    if (dshotCommandIsProcessing()) {
+        ivalue = dshotCommandGetCurrent(motorIndex);
+        if (ivalue) {
+            bbmotor->protocolControl.requestTelemetry = true;
+        }
+    }
+
+    bbmotor->protocolControl.value = ivalue;
+
+    uint16_t packet = prepareDshotPacket(&bbmotor->protocolControl);
+
+    bbPort_t *bbPort = bbmotor->bbPort;
+
+    bbOutputDataSet( bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
+}
+
+
