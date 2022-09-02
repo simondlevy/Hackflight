@@ -40,6 +40,15 @@ class SoftQuatImu : public Imu {
         static constexpr float atanPolyCoef6  = 0.1471039133652469f;
         static constexpr float atanPolyCoef7  = 0.6444640676891548f;
 
+        typedef struct {
+            uint32_t time;
+            quaternion_t quat;
+            rotation_t rot;
+            gyro_reset_t gyroReset;
+        } fusion_t;
+
+        fusion_t m_fusionPrev;
+
         // http://http.developer.nvidia.com/Cg/acos.html Handbook of
         // Mathematical Functions M. Abramowitz and I.A. Stegun, Ed.
         // acos_approx maximum absolute error = 6.760856e-05 rads (3.873685e-03
@@ -72,7 +81,8 @@ class SoftQuatImu : public Imu {
             return res;
         }
 
-        static void quat2euler(Imu::quaternion_t * quat, State * state, Imu::rotation_t * rot)
+        static void quat2euler(
+                Imu::quaternion_t * quat, State * state, Imu::rotation_t * rot)
         {
             float qw = quat->w;
             float qx = quat->x;
@@ -156,13 +166,9 @@ class SoftQuatImu : public Imu {
             quat_new->z = qz * recipNorm;
         }
 
-        void getQuaternion(
-                bool isArmed,
-                Imu::fusion_t * fusionPrev,
-                uint32_t time,
-                Imu::quaternion_t * quat)
+        void getQuaternion(bool isArmed, uint32_t time, Imu::quaternion_t * quat)
         {
-            int32_t deltaT = time - fusionPrev->time;
+            int32_t deltaT = time - m_fusionPrev.time;
 
             axes_t gyroAvg = {};
             getAverage(&m_accum, Clock::PERIOD(), &gyroAvg);
@@ -172,11 +178,11 @@ class SoftQuatImu : public Imu {
             Imu::gyro_reset_t new_gyro_reset = {};
 
             if (!isArmed) {
-                memcpy(&fusionPrev->gyroReset, &new_gyro_reset,
+                memcpy(&m_fusionPrev.gyroReset, &new_gyro_reset,
                         sizeof(Imu::gyro_reset_t));
             }
 
-            mahony(dt, &gyroAvg, &fusionPrev->quat, quat);
+            mahony(dt, &gyroAvg, &m_fusionPrev.quat, quat);
 
         }
 
@@ -187,6 +193,10 @@ class SoftQuatImu : public Imu {
         SoftQuatImu(uint16_t gyroScale)
             : Imu(gyroScale)
         {
+            memset(&m_fusionPrev, 0, sizeof(fusion_t));
+
+            // Initialize quaternion in upright position
+            m_fusionPrev.quat.w = 1;
         }
 
         virtual void accumulateGyro(float gx, float gy, float gz) override
@@ -205,22 +215,18 @@ class SoftQuatImu : public Imu {
             _adcf.z = gz;
         }
 
-        virtual void getEulerAngles(
-                Imu::fusion_t * fusionPrev,
-                bool isArmed,
-                uint32_t time,
-                State * vstate) override
+        virtual void getEulerAngles(bool isArmed, uint32_t time, State * vstate) override
         {
             Imu::quaternion_t quat = {};
-            getQuaternion(isArmed, fusionPrev, time, &quat);
+            getQuaternion(isArmed, time, &quat);
             Imu::rotation_t rot = {};
             quat2euler(&quat, vstate, &rot);
 
-            Imu::fusion_t fusion;
+            fusion_t fusion;
             fusion.time = time;
             memcpy(&fusion.quat, &quat, sizeof(Imu::quaternion_t));
             memcpy(&fusion.rot, &rot, sizeof(Imu::rotation_t));
-            memcpy(fusionPrev, &fusion, sizeof(Imu::fusion_t));
+            memcpy(&m_fusionPrev, &fusion, sizeof(fusion_t));
             memset(&m_accum, 0, sizeof(imu_sensor_t));
          }
 };

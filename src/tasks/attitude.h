@@ -32,10 +32,6 @@ class AttitudeTask : public Task {
 
         virtual void fun(Task::data_t * data, uint32_t time) override
         {
-            data->imu->getEulerAngles(
-                    &data->imuFusionPrev,
-                    data->arming.isArmed(),
-                    time,
-                    &data->vstate);
+            data->imu->getEulerAngles(data->arming.isArmed(), time, &data->vstate);
         }
 };

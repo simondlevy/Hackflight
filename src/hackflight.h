@@ -260,9 +260,6 @@ class Hackflight {
             m_taskData.imu = imu;
             m_taskData.esc = esc;
 
-            // Initialize quaternion in upright position
-            m_taskData.imuFusionPrev.quat.w = 1;
-
             m_taskData.maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
 
             m_taskData.arming.m_led = led;
@@ -276,9 +273,9 @@ class Hackflight {
 
             m_taskData.imu->begin();
 
-            m_led->begin();
-
             m_taskData.esc->begin();
+
+            m_led->begin();
 
             m_led->flash(10, 50);
         }

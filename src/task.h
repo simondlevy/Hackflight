@@ -41,7 +41,6 @@ class Task {
 
             Arming             arming;
             Failsafe           failsafe;
-            Imu::fusion_t      imuFusionPrev;
             float              maxArmingAngle;
             Msp                msp;
             float              mspMotors[MAX_SUPPORTED_MOTORS];

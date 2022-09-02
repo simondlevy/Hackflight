@@ -155,13 +155,6 @@ class Imu {
             bool resetCompleted;
         } gyro_reset_t;
 
-        typedef struct {
-            uint32_t time;
-            quaternion_t quat;
-            rotation_t rot;
-            gyro_reset_t gyroReset;
-        } fusion_t;
-
         typedef void (*align_fun)(axes_t * axes);
 
         virtual void accumulateGyro(float gx, float gy, float gz)
@@ -171,11 +164,7 @@ class Imu {
             (void)gz;
         }
 
-        virtual void getEulerAngles(
-                fusion_t * fusionPrev,
-                bool isArmed,
-                uint32_t time,
-                State * vstate) = 0;
+        virtual void getEulerAngles(bool isArmed, uint32_t time, State * vstate) = 0;
 
         void readScaledGyro(Imu * imu, Imu::align_fun align, State * vstate)
         {
