@@ -24,13 +24,12 @@
 extern "C" {
 #endif
 
-bool bbEnableMotors(void);
-void bbPostInit(dshotProtocol_t protocol);
-void bbUpdateComplete(uint8_t motorCount);
-bool bbUpdateStart(void);
-void bbWrite(uint8_t motorIndex, float value);
-
 void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count);
+bool dshotBitbangEnableMotors(void);
+void dshotBitbangPostInit(dshotProtocol_t protocol);
+void dshotBitbangUpdateComplete(uint8_t motorCount);
+bool dshotBitbangUpdateStart(void);
+void dshotBitbangWrite(uint8_t motorIndex, float value);
 
 #if defined (__cplusplus)
 }

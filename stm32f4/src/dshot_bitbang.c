@@ -477,7 +477,7 @@ static void bbShutdown(void)
 // -------------------------------------------------------------------------
 
 
-bool bbUpdateStart(void)
+bool dshotBitbangUpdateStart(void)
 {
     for (int i = 0; i < m_usedMotorPorts; i++) {
         bbDMA_Cmd(&m_ports[i], DISABLE);
@@ -487,7 +487,7 @@ bool bbUpdateStart(void)
     return true;
 }
 
-void bbWriteInt(uint8_t motorIndex, uint16_t value)
+void dshotBitbangWriteInt(uint8_t motorIndex, uint16_t value)
 {
     bbMotor_t *const bbmotor = &m_motors[motorIndex];
 
@@ -518,12 +518,12 @@ void bbWriteInt(uint8_t motorIndex, uint16_t value)
     bbOutputDataSet( bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
 }
 
-void bbWrite(uint8_t motorIndex, float value)
+void dshotBitbangWrite(uint8_t motorIndex, float value)
 {
-    bbWriteInt(motorIndex, value);
+    dshotBitbangWriteInt(motorIndex, value);
 }
 
-void bbUpdateComplete(uint8_t motorCount)
+void dshotBitbangUpdateComplete(uint8_t motorCount)
 {
     // If there is a dshot command loaded up, time it correctly with motor update
 
@@ -546,7 +546,7 @@ void bbUpdateComplete(uint8_t motorCount)
     }
 }
 
-bool bbEnableMotors(void)
+bool dshotBitbangEnableMotors(void)
 {
     for (int i = 0; i < m_motorCount; i++) {
         if (m_motors[i].configured) {
@@ -556,7 +556,7 @@ bool bbEnableMotors(void)
     return true;
 }
 
-void bbPostInit(dshotProtocol_t protocol)
+void dshotBitbangPostInit(dshotProtocol_t protocol)
 {
     bbFindPacerTimer();
 

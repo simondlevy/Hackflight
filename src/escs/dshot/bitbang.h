@@ -59,32 +59,32 @@ class DshotBitbangEsc : public DshotEsc {
 
         virtual bool enable(void) override
         {
-            return bbEnableMotors();
+            return dshotBitbangEnableMotors();
         }
 
         virtual void postInit(void) override
         {
-            bbPostInit(m_protocol);
+            dshotBitbangPostInit(m_protocol);
         }
 
         virtual void updateComplete(void)override
         {
-            bbUpdateComplete(m_motorCount);
+            dshotBitbangUpdateComplete(m_motorCount);
         }
 
         virtual bool updateStart(void) override
         {
-            return bbUpdateStart();
+            return dshotBitbangUpdateStart();
         }
 
         virtual void write(uint8_t index, float value) override
         {
-            bbWrite(index, value);
+            dshotBitbangWrite(index, value);
         }
 
         virtual void writeInt(uint8_t index, uint16_t value) override
         {
-            bbWrite(index, value);
+            dshotBitbangWrite(index, value);
         }
 
     public:
