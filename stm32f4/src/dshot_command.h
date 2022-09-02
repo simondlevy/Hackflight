@@ -51,13 +51,21 @@ typedef enum {
     DSHOT_CMD_MAX = 47
 } dshotCommands_e;
 
-void    dshotCommandWrite(uint8_t index, uint8_t motorCount, uint8_t command);
-bool    dshotCommandQueueEmpty(void);
-bool    dshotCommandIsProcessing(void);
-uint8_t dshotCommandGetCurrent(uint8_t index);
-bool    dshotCommandOutputIsEnabled(uint8_t motorCount);
-void    dshotSetPidLoopTime(uint32_t);
-
 extern motorDmaOutput_t dmaMotors[MAX_SUPPORTED_MOTORS];
 
 motorDmaOutput_t * getMotorDmaOutput(uint8_t index);
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+    void    dshotCommandWrite(uint8_t index, uint8_t motorCount, uint8_t command);
+    bool    dshotCommandQueueEmpty(void);
+    bool    dshotCommandIsProcessing(void);
+    uint8_t dshotCommandGetCurrent(uint8_t index);
+    bool    dshotCommandOutputIsEnabled(uint8_t motorCount);
+    void    dshotSetPidLoopTime(uint32_t);
+
+#if defined(__cplusplus)
+}
+#endif
