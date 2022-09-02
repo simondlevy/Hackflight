@@ -45,15 +45,15 @@ typedef enum {
 
 static uint8_t USE_BITBANGED_TIMER = 0;
 
-static FAST_DATA_ZERO_INIT bbPacer_t bbPacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
-static FAST_DATA_ZERO_INIT int usedMotorPacers = 0;
+static bbPacer_t bbPacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
+static int usedMotorPacers = 0;
 
-static FAST_DATA_ZERO_INIT bbPort_t bbPorts[MAX_SUPPORTED_MOTOR_PORTS];
-static FAST_DATA_ZERO_INIT int usedMotorPorts;
+static bbPort_t bbPorts[MAX_SUPPORTED_MOTOR_PORTS];
+static int usedMotorPorts;
 
-static FAST_DATA_ZERO_INIT bbMotor_t bbMotors[MAX_SUPPORTED_MOTORS];
+static bbMotor_t bbMotors[MAX_SUPPORTED_MOTORS];
 
-static FAST_DATA_ZERO_INIT int motorCount;
+static int motorCount;
 
 static dshotBitbangStatus_e bbStatus;
 
@@ -71,7 +71,7 @@ static BB_INPUT_BUFFER_ATTRIBUTE uint16_t
 
 static uint8_t bbPuPdMode;
 
-FAST_DATA_ZERO_INIT uint32_t dshotFrameUs;
+uint32_t dshotFrameUs;
 
 
 const timerHardware_t bbTimerHardware[] = {
@@ -82,7 +82,7 @@ const timerHardware_t bbTimerHardware[] = {
     DEF_TIM(TIM1,  CH4, NONE,  TIM_USE_NONE, 0, 0),
 };
 
-static FAST_DATA_ZERO_INIT uint32_t lastSendUs;
+static uint32_t lastSendUs;
 
 typedef struct {
     volatile timCCR_t *ccr;
