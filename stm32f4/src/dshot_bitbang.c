@@ -73,8 +73,7 @@ typedef struct bbMotor_s {
     bbPort_t *bbPort;
     bool configured;
     bool enabled;
-} bbMotor_t;
-
+} motor_t;
 
 typedef enum {
     TIMER_AUTO = 0,
@@ -104,7 +103,7 @@ static int m_usedMotorPacers = 0;
 static bbPort_t m_ports[MAX_SUPPORTED_MOTOR_PORTS];
 static int m_usedMotorPorts;
 
-static bbMotor_t m_motors[MAX_SUPPORTED_MOTORS];
+static motor_t m_motors[MAX_SUPPORTED_MOTORS];
 
 static int m_motorCount;
 
@@ -400,7 +399,7 @@ static bool motorConfig(
         bbDMA_ITConfig(bbPort);
     }
 
-    bbMotor_t * bbMotor = &m_motors[motorIndex];
+    motor_t * bbMotor = &m_motors[motorIndex];
 
     bbMotor->pinIndex = pinIndex;
     bbMotor->io = io;
@@ -541,7 +540,7 @@ void dshotBitbangWrite(uint8_t motorIndex, float value)
 {
     uint16_t ivalue = (uint16_t)value;
 
-    bbMotor_t *const bbmotor = &m_motors[motorIndex];
+    motor_t *const bbmotor = &m_motors[motorIndex];
 
     if (!bbmotor->configured) {
         return;
