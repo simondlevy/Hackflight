@@ -145,8 +145,6 @@ const timerHardware_t m_timerHardware[] = {
 
 static uint32_t m_lastSendUs;
 
-static pwmOutputPort_t motors[MAX_SUPPORTED_MOTORS];
-
 // DMA GPIO output buffer formatting
 
 static void bbOutputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
@@ -509,9 +507,6 @@ void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
         } else {
             IOHi(io);
         }
-
-        // Fill in motors structure for 4way access (XXX Should be refactored)
-        motors[motorIndex].io = m_motors[motorIndex].io;
     }
 }
 
@@ -539,10 +534,6 @@ void dshotBitbangPostInit(dshotProtocol_t protocol)
 
 
         m_motors[motorIndex].enabled = true;
-
-        // Fill in motors structure for 4way access (XXX Should be refactored)
-
-        motors[motorIndex].enabled = true;
     }
 }
 
