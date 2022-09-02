@@ -26,11 +26,10 @@
 
 #include <bitbang.h>
 #include <dma_reqmap.h>
-#include <dshot_command.h>
 #include <io_impl.h>
 #include <nvic.h>
 
-class DshotBitbangEsc : public DshotEsc {
+class NewDshotBitbangEsc : public DshotEsc {
 
     private:
 
@@ -537,7 +536,7 @@ class DshotBitbangEsc : public DshotEsc {
         {
             uint16_t ivalue = (uint16_t)value;
 
-            motor_t *const bbmotor = &m_motors[motorIndex];
+            motor_t *const bbmotor = &m_motors[index];
 
             if (!bbmotor->configured) {
                 return;
@@ -568,9 +567,9 @@ class DshotBitbangEsc : public DshotEsc {
 
     public:
 
-        DshotBitbangEsc(vector<uint8_t> * pins, dshotProtocol_t protocol=DSHOT600) 
+        NewDshotBitbangEsc(vector<uint8_t> * pins, dshotProtocol_t protocol=DSHOT600) 
             : DshotEsc(pins, protocol)
         {
         }
 
-}; // class DshotBitbangEsc
+}; // class NewDshotBitbangEsc

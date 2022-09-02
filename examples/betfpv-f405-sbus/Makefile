@@ -116,7 +116,7 @@ endif
 #include $(ROOT)/make/csource.mk
 STM32_SRC = \
             serial_debug.c \
-            dshot.c \
+            dshot_packet.c \
             dshot_command.c \
             dshot_bitbang.c \
             bitbang.c \

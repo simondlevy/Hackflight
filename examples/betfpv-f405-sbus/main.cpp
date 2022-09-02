@@ -21,6 +21,7 @@
 #include <core/clock.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot/bitbang.h>
+//#include <escs/dshot/newbitbang.h>
 #include <hackflight.h>
 #include <receivers/sbus.h>
 #include <serial.h>
