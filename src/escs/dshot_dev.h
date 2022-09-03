@@ -66,7 +66,6 @@ typedef struct motorDmaOutput_s {
 #if defined(__cplusplus)
 extern "C" {
 #endif
-    motorDmaOutput_t *getMotorDmaOutput(uint8_t index);
     uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb);
 #if defined(__cplusplus)
 }

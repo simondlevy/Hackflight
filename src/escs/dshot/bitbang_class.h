@@ -21,7 +21,6 @@
 #include <string.h>
 
 #include <escs/dshot.h>
-#include <escs/dshot_command.h>
 #include <escs/dshot_dev.h>
 #include <maxmotors.h>
 #include <time.h>
