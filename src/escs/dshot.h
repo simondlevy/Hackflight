@@ -36,7 +36,7 @@
 
 class DshotEsc : public Esc {
 
-    protected:
+    private:
 
         static const uint16_t MIN_VALUE = 48;
         static const uint16_t MAX_VALUE = 2047;
@@ -53,8 +53,11 @@ class DshotEsc : public Esc {
         // default to 8KHz (125us) loop to prevent possible div/0
         static const uint32_t PID_LOOP_TIME_US = 125; 
 
-        // default to 8KHz (125us) loop to prevent possible div/0
+        // XXX should we be using Clock::PERIOD() instead?
         static const uint32_t COMMAND_PID_LOOP_TIME_US = 125; 
+
+
+    protected:
 
         typedef enum {
             DSHOT150,
