@@ -231,7 +231,7 @@ class Msp {
             switch (cmdMSP) {
 
                 case SET_MOTOR:
-                    for (int i = 0; i < 4; i++) {
+                    for (auto i=0; i<4; i++) { // XXX
                         motors[i] = esc->convertFromExternal(sbufReadU16(src));
                     }
                     break;

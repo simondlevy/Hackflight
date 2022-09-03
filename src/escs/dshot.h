@@ -107,7 +107,7 @@ class DshotEsc : public Esc {
 
         bool allMotorsAreIdle()
         {
-            for (unsigned i = 0; i < m_motorCount; i++) {
+            for (auto i=0; i<m_motorCount; i++) {
                 const motorDmaOutput_t *motor = getMotorDmaOutput(i);
                 if (motor->protocolControl.value) {
                     return false;
@@ -309,7 +309,7 @@ class DshotEsc : public Esc {
             // compute checksum
             unsigned csum = 0;
             unsigned csum_data = packet;
-            for (int i = 0; i < 3; i++) {
+            for (auto i=0; i<3; i++) {
                 csum ^=  csum_data;   // xor data by nibbles
                 csum_data >>= 4;
             }
