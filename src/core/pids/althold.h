@@ -29,12 +29,12 @@ class AltHoldPidController : public PidController {
         static constexpr float STICK_DEADBAND = 0.2;
         static constexpr float WINDUP_MAX     = 0.4;
 
-        static bool inBand(float value, float band) 
+        static bool inBand(const float value, const float band) 
         {
             return value > -band && value < band;
         }
 
-        static float constrainAbs(float v, float lim)
+        static float constrainAbs(const float v, const float lim)
         {
             return v < -lim ? -lim : v > +lim ? +lim : v;
         }
