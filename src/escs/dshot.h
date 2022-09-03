@@ -37,16 +37,11 @@
 #include "timer.h"
 #include "systemdev.h"
 
-#define DSHOT_PROTOCOL_DETECTION_DELAY_MS 3000
-#define DSHOT_INITIAL_DELAY_US 10000
-#define DSHOT_COMMAND_DELAY_US 1000
-#define DSHOT_ESCINFO_DELAY_US 12000
-#define DSHOT_BEEP_DELAY_US 100000
-#define DSHOT_MAX_COMMANDS 3
+static const uint32_t COMMAND_DELAY_US = 1000;
 
-#define FALLTHROUGH __attribute__ ((fallthrough))
+static const uint32_t DSHOT_INITIAL_DELAY_US = 10000;
 
-#define DSHOT_MAX_COMMAND 47
+static const uint8_t DSHOT_MAX_COMMANDS = 3;
 
 typedef enum {
     DSHOT150,
@@ -55,25 +50,25 @@ typedef enum {
 } protocol_t;
 
 typedef enum {
-    DSHOT_COMMAND_STATE_IDLEWAIT,   // waiting for motors to go idle
-    DSHOT_COMMAND_STATE_STARTDELAY, // initial delay before a sequence of commands
-    DSHOT_COMMAND_STATE_ACTIVE,     // actively sending command
-    DSHOT_COMMAND_STATE_POSTDELAY   // delay period after the command has been sent
-} dshotCommandState_e;
+    COMMAND_STATE_IDLEWAIT,   // waiting for motors to go idle
+    COMMAND_STATE_STARTDELAY, // initial delay before a sequence of cmds
+    COMMAND_STATE_ACTIVE,     // actively sending command
+    COMMAND_STATE_POSTDELAY   // delay period after the cmd has been sent
+} commandState_e;
 
 typedef struct dshotCommandControl_s {
-    dshotCommandState_e state;
+    commandState_e state;
     uint32_t nextCommandCycleDelay;
     uint32_t delayAfterCommandUs;
     uint8_t repeats;
     uint8_t command[MAX_SUPPORTED_MOTORS];
-} dshotCommandControl_t;
+} commandControl_t;
 
 // default to 8KHz (125us) loop to prevent possible div/0
 static uint32_t dshotCommandPidLoopTimeUs = 125; 
 
 // gets set to the actual value when the PID loop is initialized
-static dshotCommandControl_t commandQueue[DSHOT_MAX_COMMANDS + 1];
+static commandControl_t commandQueue[DSHOT_MAX_COMMANDS + 1];
 static uint8_t commandQueueHead;
 static uint8_t commandQueueTail;
 
@@ -96,11 +91,10 @@ static  bool dshotCommandQueueUpdate(void)
         if (!dshotCommandQueueEmpty()) {
             // There is another command in the queue so update it so it's ready
             // to output in sequence. It can go directly to the
-            // DSHOT_COMMAND_STATE_ACTIVE state and bypass the
-            // DSHOT_COMMAND_STATE_IDLEWAIT and DSHOT_COMMAND_STATE_STARTDELAY
-            // states.
-            dshotCommandControl_t* nextCommand = &commandQueue[commandQueueTail];
-            nextCommand->state = DSHOT_COMMAND_STATE_ACTIVE;
+            // COMMAND_STATE_ACTIVE state and bypass the COMMAND_STATE_IDLEWAIT
+            // and COMMAND_STATE_STARTDELAY states.
+            commandControl_t* nextCommand = &commandQueue[commandQueueTail];
+            nextCommand->state = COMMAND_STATE_ACTIVE;
             nextCommand->nextCommandCycleDelay = 0;
             return true;
         }
@@ -116,13 +110,13 @@ static  uint32_t dshotCommandCyclesFromTime(uint32_t delayUs)
     return (delayUs + dshotCommandPidLoopTimeUs - 1) / dshotCommandPidLoopTimeUs;
 }
 
-static dshotCommandControl_t* addCommand()
+static commandControl_t* addCommand()
 {
     int newHead = (commandQueueHead + 1) % (DSHOT_MAX_COMMANDS + 1);
     if (newHead == commandQueueTail) {
         return NULL;
     }
-    dshotCommandControl_t* control = &commandQueue[commandQueueHead];
+    commandControl_t* control = &commandQueue[commandQueueHead];
     commandQueueHead = newHead;
     return control;
 }
@@ -150,11 +144,11 @@ static bool dshotCommandIsProcessing(void)
     if (dshotCommandQueueEmpty()) {
         return false;
     }
-    dshotCommandControl_t* command = &commandQueue[commandQueueTail];
+    commandControl_t* command = &commandQueue[commandQueueTail];
     const bool commandIsProcessing = command->state ==
-        DSHOT_COMMAND_STATE_STARTDELAY || command->state ==
-        DSHOT_COMMAND_STATE_ACTIVE || (command->state ==
-                DSHOT_COMMAND_STATE_POSTDELAY && !isLastDshotCommand()); return
+        COMMAND_STATE_STARTDELAY || command->state ==
+        COMMAND_STATE_ACTIVE || (command->state ==
+                COMMAND_STATE_POSTDELAY && !isLastDshotCommand()); return
         commandIsProcessing;
 }
 
@@ -173,26 +167,26 @@ static bool dshotCommandOutputIsEnabled(uint8_t motorCount)
 {
     UNUSED(motorCount);
 
-    dshotCommandControl_t* command = &commandQueue[commandQueueTail];
+    commandControl_t* command = &commandQueue[commandQueueTail];
     switch (command->state) {
-        case DSHOT_COMMAND_STATE_IDLEWAIT:
+        case COMMAND_STATE_IDLEWAIT:
             if (allMotorsAreIdle(motorCount)) {
-                command->state = DSHOT_COMMAND_STATE_STARTDELAY;
+                command->state = COMMAND_STATE_STARTDELAY;
                 command->nextCommandCycleDelay =
                     dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
             }
             break;
 
-        case DSHOT_COMMAND_STATE_STARTDELAY:
+        case COMMAND_STATE_STARTDELAY:
             if (command->nextCommandCycleDelay) {
                 --command->nextCommandCycleDelay;
                 return false;  // Delay motor output until start of command sequence
             }
-            command->state = DSHOT_COMMAND_STATE_ACTIVE;
+            command->state = COMMAND_STATE_ACTIVE;
             command->nextCommandCycleDelay = 0;  // first iter of repeat happens now
-            FALLTHROUGH;
+            [[fallthrough]];
 
-        case DSHOT_COMMAND_STATE_ACTIVE:
+        case COMMAND_STATE_ACTIVE:
             if (command->nextCommandCycleDelay) {
                 --command->nextCommandCycleDelay;
                 return false;  // Delay motor output until the next command repeat
@@ -201,21 +195,21 @@ static bool dshotCommandOutputIsEnabled(uint8_t motorCount)
             command->repeats--;
             if (command->repeats) {
                 command->nextCommandCycleDelay =
-                    dshotCommandCyclesFromTime(DSHOT_COMMAND_DELAY_US);
+                    dshotCommandCyclesFromTime(COMMAND_DELAY_US);
             } else {
-                command->state = DSHOT_COMMAND_STATE_POSTDELAY;
+                command->state = COMMAND_STATE_POSTDELAY;
                 command->nextCommandCycleDelay =
                     dshotCommandCyclesFromTime(command->delayAfterCommandUs);
                 if (!isLastDshotCommand() && command->nextCommandCycleDelay > 0) {
                     // Account for the 1 extra motor output loop between
                     // commands.  Otherwise the inter-command delay will be
-                    // DSHOT_COMMAND_DELAY_US + 1 loop.
+                    // COMMAND_DELAY_US + 1 loop.
                     command->nextCommandCycleDelay--;
                 }
             }
             break;
 
-        case DSHOT_COMMAND_STATE_POSTDELAY:
+        case COMMAND_STATE_POSTDELAY:
             if (command->nextCommandCycleDelay) {
                 --command->nextCommandCycleDelay;
                 return false;  // Delay motor output until end of post-command delay
@@ -243,8 +237,6 @@ class DshotEsc : public Esc {
 
         // Time to separate dshot beacon and armining/disarming events
         static const uint32_t BEACON_GUARD_DELAY_US = 1200000;  
-
-        static const uint32_t COMMAND_DELAY_US = 1000;
 
         static const uint32_t INITIAL_DELAY_US = 10000;
 
@@ -293,21 +285,6 @@ class DshotEsc : public Esc {
             bool enabled;
             IO_t io;
         } pwmOutputPort_t;
-
-        typedef enum {
-            COMMAND_STATE_IDLEWAIT,   // waiting for motors to go idle
-            COMMAND_STATE_STARTDELAY, // initial delay before a sequence of cmds
-            COMMAND_STATE_ACTIVE,     // actively sending command
-            COMMAND_STATE_POSTDELAY   // delay period after the cmd has been sent
-        } commandState_e;
-
-        typedef struct dshotCommandControl_s {
-            commandState_e state;
-            uint32_t nextCommandCycleDelay;
-            uint32_t delayAfterCommandUs;
-            uint8_t repeats;
-            uint8_t command[MAX_SUPPORTED_MOTORS];
-        } commandControl_t;
 
         // gets set to the actual value when the PID loop is initialized
         commandControl_t m_commandQueue[MAX_COMMANDS + 1];
@@ -402,8 +379,8 @@ class DshotEsc : public Esc {
                 if (!commandQueueEmpty()) {
                     // There is another command in the queue so update it so it's ready
                     // to output in sequence. It can go directly to the
-                    // DSHOT_COMMAND_STATE_ACTIVE state and bypass the
-                    // DSHOT_COMMAND_STATE_IDLEWAIT and DSHOT_COMMAND_STATE_STARTDELAY
+                    // COMMAND_STATE_ACTIVE state and bypass the
+                    // COMMAND_STATE_IDLEWAIT and COMMAND_STATE_STARTDELAY
                     // states.
                     commandControl_t* nextCommand = &m_commandQueue[m_commandQueueTail];
                     nextCommand->state = COMMAND_STATE_ACTIVE;
