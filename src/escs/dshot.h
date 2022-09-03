@@ -60,7 +60,7 @@ typedef struct dshotCommandControl_s {
 } commandControl_t;
 
 // default to 8KHz (125us) loop to prevent possible div/0
-static uint32_t dshotCommandPidLoopTimeUs = 125; 
+static const uint32_t COMMAND_PID_LOOP_TIME_US = 125; 
 
 // gets set to the actual value when the PID loop is initialized
 static commandControl_t commandQueue[DSHOT_MAX_COMMANDS + 1];
@@ -102,7 +102,7 @@ static  uint32_t dshotCommandCyclesFromTime(uint32_t delayUs)
     // Find the minimum number of motor output cycles needed to
     // provide at least delayUs time delay
 
-    return (delayUs + dshotCommandPidLoopTimeUs - 1) / dshotCommandPidLoopTimeUs;
+    return (delayUs + COMMAND_PID_LOOP_TIME_US - 1) / COMMAND_PID_LOOP_TIME_US;
 }
 
 static commandControl_t* addCommand()
