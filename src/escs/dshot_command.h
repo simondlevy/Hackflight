@@ -59,12 +59,10 @@ motorDmaOutput_t * getMotorDmaOutput(uint8_t index);
 extern "C" {
 #endif
 
-    void    dshotCommandWrite(uint8_t index, uint8_t motorCount, uint8_t command);
-    bool    dshotCommandQueueEmpty(void);
-    bool    dshotCommandIsProcessing(void);
     uint8_t dshotCommandGetCurrent(uint8_t index);
+    bool    dshotCommandIsProcessing(void);
     bool    dshotCommandOutputIsEnabled(uint8_t motorCount);
-    void    dshotSetPidLoopTime(uint32_t);
+    bool    dshotCommandQueueEmpty(void);
 
 #if defined(__cplusplus)
 }
