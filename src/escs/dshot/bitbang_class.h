@@ -122,241 +122,234 @@ const timerHardware_t m_timerHardware[] = {
 
 static uint32_t m_lastSendUs;
 
-// DMA GPIO output buffer formatting
-
-static void outputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
-{
-    uint32_t resetMask;
-    uint32_t setMask;
-
-    if (inverted) {
-        resetMask = portMask;
-        setMask = (portMask << 16);
-    } else {
-        resetMask = (portMask << 16);
-        setMask = portMask;
-    }
-
-    int bitpos;
-
-    for (bitpos = 0; bitpos < 16; bitpos++) {
-        buffer[bitpos * 3 + 0] |= setMask ; // Always set all ports
-        buffer[bitpos * 3 + 1] = 0;          // Reset bits are port dependent
-        buffer[bitpos * 3 + 2] |= resetMask; // Always reset all ports
-    }
-}
-
-static void outputDataSet(uint32_t *buffer, int pinNumber, uint16_t value, bool inverted)
-{
-    uint32_t middleBit;
-
-    if (inverted) {
-        middleBit = (1 << (pinNumber + 0));
-    } else {
-        middleBit = (1 << (pinNumber + 16));
-    }
-
-    for (int pos = 0; pos < 16; pos++) {
-        if (!(value & 0x8000)) {
-            buffer[pos * 3 + 1] |= middleBit;
-        }
-        value <<= 1;
-    }
-}
-
-static void outputDataClear(uint32_t *buffer)
-{
-    // Middle position to no change
-    for (int bitpos = 0; bitpos < 16; bitpos++) {
-        buffer[bitpos * 3 + 1] = 0;
-    }
-}
-
-static bbPacer_t *findMotorPacer(TIM_TypeDef *tim)
-{
-    for (int i = 0; i < MAX_MOTOR_PACERS; i++) {
-
-        bbPacer_t *bbPacer = &m_pacers[i];
-
-        if (bbPacer->tim == NULL) {
-            bbPacer->tim = tim;
-            ++m_usedMotorPacers;
-            return bbPacer;
-        }
-
-        if (bbPacer->tim == tim) {
-            return bbPacer;
-        }
-    }
-
-    return NULL;
-}
-
-// bbPort management
-
-static bbPort_t *findMotorPort(int portIndex)
-{
-    for (int i = 0; i < m_usedMotorPorts; i++) {
-        if (m_ports[i].portIndex == portIndex) {
-            return &m_ports[i];
-        }
-    }
-    return NULL;
-}
-
-static bbPort_t *allocateMotorPort(int portIndex)
-{
-    if (m_usedMotorPorts >= MAX_SUPPORTED_MOTOR_PORTS) {
-        return NULL;
-    }
-
-    bbPort_t *bbPort = &m_ports[m_usedMotorPorts];
-
-    if (!bbPort->timhw) {
-        // No more pacer channel available
-        return NULL;
-    }
-
-    bbPort->portIndex = portIndex;
-    bbPort->owner.owner = OWNER_DSHOT_BITBANG;
-    bbPort->owner.resourceIndex = RESOURCE_INDEX(portIndex);
-
-    ++m_usedMotorPorts;
-
-    return bbPort;
-}
-
-// Return frequency of smallest change [state/sec]
-
-static uint32_t getDshotBaseFrequency(dshotProtocol_t pwmProtocolType)
-{
-    switch (pwmProtocolType) {
-        case(DSHOT600):
-            return 600;
-        case(DSHOT300):
-            return 300;
-        default:
-        case(DSHOT150):
-            return 150;
-    }
-}
-
-static void setupDma(bbPort_t *bbPort)
-{
-    const dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(bbPort->dmaResource);
-    dmaEnable(dmaIdentifier);
-    bbPort->dmaSource = timerDmaSource(bbPort->timhw->channel);
-
-    bbPacer_t *bbPacer = findMotorPacer(bbPort->timhw->tim);
-    bbPacer->dmaSources |= bbPort->dmaSource;
-
-    dmaSetHandler(
-            dmaIdentifier,
-            bbDMAIrqHandler,
-            NVIC_BUILD_PRIORITY(2, 1),
-            (uint32_t)bbPort);
-
-    bbDMA_ITConfig(bbPort);
-}
-
-static const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
-{
-    for (int index = 0; index < m_usedMotorPorts; index++) {
-        const timerHardware_t *bitbangTimer = m_ports[index].timhw;
-        if (bitbangTimer && bitbangTimer == timer) {
-            return &m_ports[index].owner;
-        }
-    }
-
-    return &freeOwner;
-}
-
-static const timerHardware_t *timerGetAllocatedByNumberAndChannel(
-        int8_t timerNumber,
-        uint16_t timerChannel)
-{
-    for (int index = 0; index < m_usedMotorPorts; index++) {
-        const timerHardware_t *bitbangTimer = m_ports[index].timhw;
-        if (bitbangTimer && timerGetTIMNumber(bitbangTimer->tim) == timerNumber
-                && bitbangTimer->channel == timerChannel &&
-                m_ports[index].owner.owner) { return bitbangTimer;
-        }
-    }
-
-    return NULL;
-}
-
-
-// Setup m_ports array elements so that they each have a TIM1 or TIM8 channel
-// in timerHardware array for BB-DShot.
-
-static void findPacerTimer(void)
-{
-    for (int bbPortIndex=0; bbPortIndex<MAX_SUPPORTED_MOTOR_PORTS; bbPortIndex++) {
-
-        for (uint8_t tmrIndex=0; tmrIndex<ARRAYLEN(m_timerHardware); tmrIndex++) {
-            const timerHardware_t *timer = &m_timerHardware[tmrIndex];
-            int timNumber = timerGetTIMNumber(timer->tim);
-            if ((USE_TIMER == TIMER_TIM1 && timNumber != 1)
-                    || (USE_TIMER == TIMER_TIM8 &&
-                        timNumber != 8)) {
-                continue;
-            }
-            bool timerConflict = false;
-            for (int channel = 0; channel < CC_CHANNELS_PER_TIMER; channel++) {
-                const timerHardware_t *timer = timerGetAllocatedByNumberAndChannel(
-                        timNumber, CC_CHANNEL_FROM_INDEX(channel)); 
-                const resourceOwner_e timerOwner = timerGetOwner(timer)->owner;
-                if (timerOwner != OWNER_FREE && timerOwner != OWNER_DSHOT_BITBANG) {
-                    timerConflict = true;
-                    break;
-                }
-            }
-
-            for (int index = 0; index < bbPortIndex; index++) {
-                const timerHardware_t* t = m_ports[index].timhw;
-                if (timerGetTIMNumber(t->tim) == timNumber &&
-                        timer->channel == t->channel) {
-                    timerConflict = true;
-                    break;
-                }
-            }
-
-            if (timerConflict) {
-                continue;
-            }
-
-            dmaoptValue_t dmaopt = dmaGetOptionByTimer(timer);
-            const dmaChannelSpec_t *dmaChannelSpec =
-                dmaGetChannelSpecByTimerValue(timer->tim, timer->channel,
-                        dmaopt); dmaResource_t *dma = dmaChannelSpec->ref;
-            dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(dma);
-            if (dmaGetOwner(dmaIdentifier)->owner == OWNER_FREE) {
-                m_ports[bbPortIndex].timhw = timer;
-
-                break;
-            }
-        }
-    }
-}
-
-static void timebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
-{
-    uint32_t timerclock = timerClock(bbPort->timhw->tim);
-
-    uint32_t outputFreq = 1000 * getDshotBaseFrequency(dshotProtocolType);
-    m_frameUs = 1000000 * 17 * 3 / outputFreq;
-    bbPort->outputARR = timerclock / outputFreq - 1;
-
-    uint32_t inputFreq = outputFreq * 5 * 2 * TELEMETRY_OVER_SAMPLE / 24;
-    bbPort->inputARR = timerclock / inputFreq - 1;
-}
-
 // -------------------------------------------------------------------------
 
 class DshotBitbangEsc : public DshotEsc {
 
     private:
+
+        static void outputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
+        {
+            uint32_t resetMask;
+            uint32_t setMask;
+
+            if (inverted) {
+                resetMask = portMask;
+                setMask = (portMask << 16);
+            } else {
+                resetMask = (portMask << 16);
+                setMask = portMask;
+            }
+
+            int bitpos;
+
+            for (bitpos = 0; bitpos < 16; bitpos++) {
+                buffer[bitpos * 3 + 0] |= setMask ; // Always set all ports
+                buffer[bitpos * 3 + 1] = 0;          // Reset bits are port dependent
+                buffer[bitpos * 3 + 2] |= resetMask; // Always reset all ports
+            }
+        }
+
+        static void outputDataSet(uint32_t *buffer, int pinNumber, uint16_t value, bool inverted)
+        {
+            uint32_t middleBit;
+
+            if (inverted) {
+                middleBit = (1 << (pinNumber + 0));
+            } else {
+                middleBit = (1 << (pinNumber + 16));
+            }
+
+            for (int pos = 0; pos < 16; pos++) {
+                if (!(value & 0x8000)) {
+                    buffer[pos * 3 + 1] |= middleBit;
+                }
+                value <<= 1;
+            }
+        }
+
+        static void outputDataClear(uint32_t *buffer)
+        {
+            // Middle position to no change
+            for (int bitpos = 0; bitpos < 16; bitpos++) {
+                buffer[bitpos * 3 + 1] = 0;
+            }
+        }
+
+        static bbPacer_t *findMotorPacer(TIM_TypeDef *tim)
+        {
+            for (int i = 0; i < MAX_MOTOR_PACERS; i++) {
+
+                bbPacer_t *bbPacer = &m_pacers[i];
+
+                if (bbPacer->tim == NULL) {
+                    bbPacer->tim = tim;
+                    ++m_usedMotorPacers;
+                    return bbPacer;
+                }
+
+                if (bbPacer->tim == tim) {
+                    return bbPacer;
+                }
+            }
+
+            return NULL;
+        }
+
+        static bbPort_t *findMotorPort(int portIndex)
+        {
+            for (int i = 0; i < m_usedMotorPorts; i++) {
+                if (m_ports[i].portIndex == portIndex) {
+                    return &m_ports[i];
+                }
+            }
+            return NULL;
+        }
+
+
+        static bbPort_t *allocateMotorPort(int portIndex)
+        {
+            if (m_usedMotorPorts >= MAX_SUPPORTED_MOTOR_PORTS) {
+                return NULL;
+            }
+
+            bbPort_t *bbPort = &m_ports[m_usedMotorPorts];
+
+            if (!bbPort->timhw) {
+                // No more pacer channel available
+                return NULL;
+            }
+
+            bbPort->portIndex = portIndex;
+            bbPort->owner.owner = OWNER_DSHOT_BITBANG;
+            bbPort->owner.resourceIndex = RESOURCE_INDEX(portIndex);
+
+            ++m_usedMotorPorts;
+
+            return bbPort;
+        }
+
+        static uint32_t getDshotBaseFrequency(dshotProtocol_t pwmProtocolType)
+        {
+            switch (pwmProtocolType) {
+                case(DSHOT600):
+                    return 600;
+                case(DSHOT300):
+                    return 300;
+                default:
+                case(DSHOT150):
+                    return 150;
+            }
+        }
+
+        static void setupDma(bbPort_t *bbPort)
+        {
+            const dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(bbPort->dmaResource);
+            dmaEnable(dmaIdentifier);
+            bbPort->dmaSource = timerDmaSource(bbPort->timhw->channel);
+
+            bbPacer_t *bbPacer = findMotorPacer(bbPort->timhw->tim);
+            bbPacer->dmaSources |= bbPort->dmaSource;
+
+            dmaSetHandler(
+                    dmaIdentifier,
+                    bbDMAIrqHandler,
+                    NVIC_BUILD_PRIORITY(2, 1),
+                    (uint32_t)bbPort);
+
+            bbDMA_ITConfig(bbPort);
+        }
+
+        static const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
+        {
+            for (int index = 0; index < m_usedMotorPorts; index++) {
+                const timerHardware_t *bitbangTimer = m_ports[index].timhw;
+                if (bitbangTimer && bitbangTimer == timer) {
+                    return &m_ports[index].owner;
+                }
+            }
+
+            return &freeOwner;
+        }
+
+        static const timerHardware_t *timerGetAllocatedByNumberAndChannel(
+                int8_t timerNumber,
+                uint16_t timerChannel)
+        {
+            for (int index = 0; index < m_usedMotorPorts; index++) {
+                const timerHardware_t *bitbangTimer = m_ports[index].timhw;
+                if (bitbangTimer && timerGetTIMNumber(bitbangTimer->tim) == timerNumber
+                        && bitbangTimer->channel == timerChannel &&
+                        m_ports[index].owner.owner) { return bitbangTimer;
+                }
+            }
+
+            return NULL;
+        }
+
+        // Setup m_ports array elements so that they each have a TIM1 or TIM8 channel
+        // in timerHardware array for BB-DShot.
+        static void findPacerTimer(void)
+        {
+            for (int bbPortIndex=0; bbPortIndex<MAX_SUPPORTED_MOTOR_PORTS; bbPortIndex++) {
+
+                for (uint8_t tmrIndex=0; tmrIndex<ARRAYLEN(m_timerHardware); tmrIndex++) {
+                    const timerHardware_t *timer = &m_timerHardware[tmrIndex];
+                    int timNumber = timerGetTIMNumber(timer->tim);
+                    if ((USE_TIMER == TIMER_TIM1 && timNumber != 1)
+                            || (USE_TIMER == TIMER_TIM8 &&
+                                timNumber != 8)) {
+                        continue;
+                    }
+                    bool timerConflict = false;
+                    for (int channel = 0; channel < CC_CHANNELS_PER_TIMER; channel++) {
+                        const timerHardware_t *timer = timerGetAllocatedByNumberAndChannel(
+                                timNumber, CC_CHANNEL_FROM_INDEX(channel)); 
+                        const resourceOwner_e timerOwner = timerGetOwner(timer)->owner;
+                        if (timerOwner != OWNER_FREE && timerOwner != OWNER_DSHOT_BITBANG) {
+                            timerConflict = true;
+                            break;
+                        }
+                    }
+
+                    for (int index = 0; index < bbPortIndex; index++) {
+                        const timerHardware_t* t = m_ports[index].timhw;
+                        if (timerGetTIMNumber(t->tim) == timNumber &&
+                                timer->channel == t->channel) {
+                            timerConflict = true;
+                            break;
+                        }
+                    }
+
+                    if (timerConflict) {
+                        continue;
+                    }
+
+                    dmaoptValue_t dmaopt = dmaGetOptionByTimer(timer);
+                    const dmaChannelSpec_t *dmaChannelSpec =
+                        dmaGetChannelSpecByTimerValue(timer->tim, timer->channel,
+                                dmaopt); dmaResource_t *dma = dmaChannelSpec->ref;
+                    dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(dma);
+                    if (dmaGetOwner(dmaIdentifier)->owner == OWNER_FREE) {
+                        m_ports[bbPortIndex].timhw = timer;
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        static void timebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
+        {
+            uint32_t timerclock = timerClock(bbPort->timhw->tim);
+
+            uint32_t outputFreq = 1000 * getDshotBaseFrequency(dshotProtocolType);
+            m_frameUs = 1000000 * 17 * 3 / outputFreq;
+            bbPort->outputARR = timerclock / outputFreq - 1;
+
+            uint32_t inputFreq = outputFreq * 5 * 2 * TELEMETRY_OVER_SAMPLE / 24;
+            bbPort->inputARR = timerclock / inputFreq - 1;
+        }
 
         // bb only use pin info associated with timerHardware entry designated as
         // TIM_USE_MOTOR; it does not use the timer channel associated with the pin.
