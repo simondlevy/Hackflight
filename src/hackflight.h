@@ -30,7 +30,6 @@
 using namespace std;
 
 #include "arming.h"
-#include "core/hackflight.h"
 #include "esc.h"
 #include "failsafe.h"
 #include "imu.h"
@@ -43,9 +42,6 @@ using namespace std;
 #include "tasks/attitude.h"
 #include "tasks/msp.h"
 #include "tasks/receiver.h"
-
-#include <vector>
-using namespace std;
 
 class Hackflight {
 

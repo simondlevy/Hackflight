@@ -31,8 +31,6 @@
 // STM32F4 includes
 #include <pwm.h>
 
-// -----------------------------------------------------------------------------
-
 class DshotEsc : public Esc {
 
     private:
