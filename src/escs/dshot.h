@@ -32,11 +32,6 @@
 #include <io_types.h>
 #include <time.h>
 
-#include "platform.h"
-#include "io.h"
-#include "timer.h"
-#include "systemdev.h"
-
 static const uint32_t COMMAND_DELAY_US = 1000;
 
 static const uint32_t DSHOT_INITIAL_DELAY_US = 10000;
