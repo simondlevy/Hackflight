@@ -19,7 +19,7 @@
 #pragma once
 
 #include <escs/dshot.h>
-#include <dshot_bitbang.h>
+#include <escs/dshot/dshot_bitbang.h>
 
 class DshotBitbangEsc : public DshotEsc {
 
