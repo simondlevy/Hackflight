@@ -33,7 +33,7 @@ class Pt3Filter {
 
     public:
 
-        void init(float f_cut, float dt=Clock::DT())
+        void init(const float f_cut, const float dt=Clock::DT())
         {
             m_state = 0.0;
             m_state1 = 0.0;
@@ -43,7 +43,7 @@ class Pt3Filter {
             computeGain(f_cut);
         }
 
-        float apply(float input)
+        float apply(const float input)
         {
             m_state1 = m_state1 + m_k * (input - m_state1);
             m_state2 = m_state2 + m_k * (m_state1 - m_state2);
@@ -51,7 +51,7 @@ class Pt3Filter {
             return m_state;
         }
 
-        void computeGain(float f_cut)
+        void computeGain(const float f_cut)
         {
             const float order = 3.0f;
             const float orderCutoffCorrection =

@@ -46,7 +46,7 @@ class Task {
             float              mspMotors[MAX_SUPPORTED_MOTORS];
             bool               pidReset;
             Receiver::sticks_t rxSticks;
-            State              vstate;
+            VehicleState              vstate;
 
         } data_t;
 

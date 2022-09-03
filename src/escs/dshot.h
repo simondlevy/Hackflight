@@ -79,10 +79,10 @@ class DshotEsc : public Esc {
             COMMAND_STATE_STARTDELAY, // initial delay before a sequence of cmds
             COMMAND_STATE_ACTIVE,     // actively sending command
             COMMAND_STATE_POSTDELAY   // delay period after the cmd has been sent
-        } commandState_e;
+        } commandVehicleState_e;
 
         typedef struct {
-            commandState_e state;
+            commandVehicleState_e state;
             uint32_t nextCommandCycleDelay;
             uint32_t delayAfterCommandUs;
             uint8_t repeats;

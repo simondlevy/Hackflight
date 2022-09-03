@@ -52,7 +52,7 @@ class Failsafe {
     typedef enum {
         RXLINK_DOWN = 0,
         RXLINK_UP
-    } failsafeRxLinkState_e;
+    } failsafeRxLinkVehicleState_e;
 
     typedef enum {
         PROCEDURE_AUTO_LANDING = 0,
@@ -74,7 +74,7 @@ class Failsafe {
     uint32_t               m_receivingRxDataPeriod;        
     uint32_t               m_receivingRxDataPeriodPreset; 
     uint32_t               m_rxDataFailurePeriod;
-    failsafeRxLinkState_e  m_rxLinkState;
+    failsafeRxLinkVehicleState_e  m_rxLinkVehicleState;
     uint32_t               m_validRxDataReceivedAt;
     uint32_t               m_rxDataRecoveryPeriod;
     uint32_t               m_throttleLowPeriod;             
@@ -95,7 +95,7 @@ class Failsafe {
 
     bool isReceivingRxData(void)
     {
-        return (m_rxLinkState == RXLINK_UP);
+        return (m_rxLinkVehicleState == RXLINK_UP);
     }
 
     Failsafe()
@@ -123,7 +123,7 @@ class Failsafe {
         m_validRxDataFailedAt = timeMillis();
         if ((m_validRxDataFailedAt - m_validRxDataReceivedAt) >
                 m_rxDataFailurePeriod) {
-            m_rxLinkState = RXLINK_DOWN;
+            m_rxLinkVehicleState = RXLINK_DOWN;
         }
     }
 
@@ -132,7 +132,7 @@ class Failsafe {
         m_validRxDataReceivedAt = timeMillis();
             if ((m_validRxDataReceivedAt - m_validRxDataFailedAt) >
                     m_rxDataRecoveryPeriod) {
-                m_rxLinkState = RXLINK_UP;
+                m_rxLinkVehicleState = RXLINK_UP;
                 arming->setRxFailsafe(true);
             }
         }
@@ -150,7 +150,7 @@ class Failsafe {
             m_receivingRxDataPeriod = 0;
             m_receivingRxDataPeriodPreset = 0;
             m_phase = IDLE;
-            m_rxLinkState = RXLINK_DOWN;
+            m_rxLinkVehicleState = RXLINK_DOWN;
         }        
 
         void startMonitoring(void)
@@ -170,10 +170,10 @@ class Failsafe {
                 receivingRxData = false; // force Stage2
             }
 
-            bool reprocessState;
+            bool reprocessVehicleState;
 
             do {
-                reprocessState = false;
+                reprocessVehicleState = false;
 
                 switch (m_phase) {
                     case IDLE:
@@ -189,7 +189,7 @@ class Failsafe {
                                 m_receivingRxDataPeriodPreset =
                                     PERIOD_OF_1_SECONDS();    
                                 // require 1 seconds of valid rxData
-                                reprocessState = true;
+                                reprocessVehicleState = true;
                             } else if (!receivingRxData) {
                                 if (timeMillis() > m_throttleLowPeriod
                                    ) {
@@ -203,7 +203,7 @@ class Failsafe {
                                 } else {
                                     m_phase = RX_LOSS_DETECTED;
                                 }
-                                reprocessState = true;
+                                reprocessVehicleState = true;
                             }
                         } else {
                             m_throttleLowPeriod = 0;
@@ -221,7 +221,7 @@ class Failsafe {
                             m_phase = LANDED;      
                             break;
                         }
-                        reprocessState = true;
+                        reprocessVehicleState = true;
                         break;
 
                     case LANDING:
@@ -231,7 +231,7 @@ class Failsafe {
                         m_receivingRxDataPeriod = timeMillis() +
                             m_receivingRxDataPeriodPreset; // set required
                         m_phase = RX_LOSS_MONITORING;
-                        reprocessState = true;
+                        reprocessVehicleState = true;
                         break;
 
                     case RX_LOSS_MONITORING:
@@ -239,7 +239,7 @@ class Failsafe {
                             if (timeMillis() > m_receivingRxDataPeriod) {
                                 if (!arming->isArmed()) {
                                     m_phase = RX_LOSS_RECOVERED;
-                                    reprocessState = true;
+                                    reprocessVehicleState = true;
                                 }
                             }
                         } else {
@@ -253,13 +253,13 @@ class Failsafe {
                             MILLIS_PER_TENTH_SECOND;
                         m_phase = IDLE;
                         m_active = false;
-                        reprocessState = true;
+                        reprocessVehicleState = true;
                         break;
 
                     default:
                         break;
                 }
-            } while (reprocessState);        
+            } while (reprocessVehicleState);        
         }
 
 }; // class Failsafe

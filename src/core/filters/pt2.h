@@ -34,7 +34,7 @@ class Pt2Filter {
 
     public:
 
-        Pt2Filter(float f_cut, float dt=Clock::DT())
+        Pt2Filter(const float f_cut, const float dt=Clock::DT())
         {
             m_state = 0.0;
             m_state1 = 0.0;
@@ -43,14 +43,14 @@ class Pt2Filter {
             computeGain(f_cut);
         }
 
-        float apply(float input)
+        float apply(const float input)
         {
             m_state1 = m_state1 + m_k * (input - m_state1);
             m_state = m_state + m_k * (m_state1 - m_state);
             return m_state;
          }
 
-        void computeGain(float f_cut)
+        void computeGain(const float f_cut)
         {
             const float order = 2.0f;
             const float orderCutoffCorrection =

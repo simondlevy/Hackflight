@@ -20,22 +20,22 @@
 
 #include <stdint.h>
 
-static inline float constrain_f(float amt, float low, float high)
+static inline float constrain_f(const float amt, const float low, const float high)
 {
     return amt < low ? low : amt > high ? high : amt;
 }
 
-static inline uint16_t constrain_u16(uint16_t amt, uint16_t low, uint16_t high)
+static inline uint16_t constrain_u16(const uint16_t amt, const uint16_t low, const uint16_t high)
 {
     return amt < low ? low : amt > high ? high : amt;
 }
 
-static inline int32_t constrain_f_i32(float amt, int32_t low, int32_t high)
+static inline int32_t constrain_f_i32(const float amt, const int32_t low, const int32_t high)
 {
     return amt < low ? low : amt > high ? high : amt;
 }
 
-static inline int32_t constrain_i32_u32(int32_t amt, uint32_t low, uint32_t high)
+static inline int32_t constrain_i32_u32(const int32_t amt, const uint32_t low, const uint32_t high)
 {
     if (amt < (int32_t)low)
         return low;

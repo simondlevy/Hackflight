@@ -22,7 +22,7 @@
 #include "demands.h"
 #include "motors.h"
 #include "pid.h"
-#include "state.h"
+#include "vstate.h"
 
 #include <vector>
 using namespace std;
@@ -62,7 +62,7 @@ class Mixer {
 
     public:
 
-        Mixer(uint8_t motorCount, mixerFun_t fun)
+        Mixer(const uint8_t motorCount, const mixerFun_t fun)
         {
             m_motorCount = motorCount;
             m_fun = fun;
@@ -75,7 +75,7 @@ class Mixer {
 
         auto step(
                 const Demands & stickDemands,
-                const State & state,
+                const VehicleState & state,
                 vector<PidController *> * pidControllers,
                 const bool pidReset,
                 const uint32_t usec) -> Motors

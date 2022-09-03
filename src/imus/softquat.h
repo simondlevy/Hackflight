@@ -22,7 +22,7 @@
 
 #include "core/axes.h"
 #include "core/clock.h"
-#include "core/state.h"
+#include "core/vstate.h"
 #include "imu.h"
 #include "maths.h"
 
@@ -82,7 +82,7 @@ class SoftQuatImu : public Imu {
         }
 
         static void quat2euler(
-                Imu::quaternion_t * quat, State * state, Imu::rotation_t * rot)
+                Imu::quaternion_t * quat, VehicleState * state, Imu::rotation_t * rot)
         {
             float qw = quat->w;
             float qx = quat->x;
@@ -215,7 +215,7 @@ class SoftQuatImu : public Imu {
             _adcf.z = gz;
         }
 
-        virtual void getEulerAngles(bool isArmed, uint32_t time, State * vstate) override
+        virtual void getEulerAngles(bool isArmed, uint32_t time, VehicleState * vstate) override
         {
             Imu::quaternion_t quat = {};
             getQuaternion(isArmed, time, &quat);

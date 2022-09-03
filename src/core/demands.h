@@ -28,7 +28,7 @@ class Demands {
         float pitch;
         float yaw;
 
-        Demands(float t, float r, float p, float y)
+        Demands(const float t, const float r, const float p, const float y)
         {
             throttle = t;
             roll = r;

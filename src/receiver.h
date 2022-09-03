@@ -50,7 +50,7 @@ class Receiver {
         FRAME_FAILSAFE = (1 << 1),
         FRAME_PROCESSING_REQUIRED = (1 << 2),
         FRAME_DROPPED = (1 << 3)
-    } frameState_e;
+    } frameVehicleState_e;
 
     private:
 

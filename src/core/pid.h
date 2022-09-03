@@ -19,7 +19,7 @@
 #pragma once
 
 #include "demands.h"
-#include "state.h"
+#include "vstate.h"
 
 class PidController {
 
@@ -28,6 +28,6 @@ class PidController {
          virtual auto update(
                 const uint32_t currentTimeUs,
                 const Demands & demands,
-                const State & vstate,
+                const VehicleState & vstate,
                 const bool reset) -> Demands = 0;
 };

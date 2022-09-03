@@ -320,7 +320,7 @@ class AnglePidController : public PidController {
         virtual auto update(
                 const uint32_t currentTimeUs,
                 const Demands & demands,
-                const State & vstate,
+                const VehicleState & vstate,
                 const bool reset) -> Demands override
         {
             // gradually scale back integration when above windup point

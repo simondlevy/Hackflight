@@ -23,7 +23,7 @@
 #include "core/clock.h"
 #include "core/constrain.h"
 #include "core/filters/pt1.h"
-#include "core/state.h"
+#include "core/vstate.h"
 #include "imu.h"
 #include "stdev.h"
 #include "system.h"
@@ -164,9 +164,9 @@ class Imu {
             (void)gz;
         }
 
-        virtual void getEulerAngles(bool isArmed, uint32_t time, State * vstate) = 0;
+        virtual void getEulerAngles(bool isArmed, uint32_t time, VehicleState * vstate) = 0;
 
-        void readScaledGyro(Imu * imu, Imu::align_fun align, State * vstate)
+        void readScaledGyro(Imu * imu, Imu::align_fun align, VehicleState * vstate)
         {
             if (!devGyroIsReady()) return;
 
