@@ -63,32 +63,32 @@ typedef struct dshotCommandControl_s {
 static const uint32_t COMMAND_PID_LOOP_TIME_US = 125; 
 
 // gets set to the actual value when the PID loop is initialized
-static commandControl_t commandQueue[DSHOT_MAX_COMMANDS + 1];
-static uint8_t commandQueueHead;
-static uint8_t commandQueueTail;
+static commandControl_t m_commandQueue[DSHOT_MAX_COMMANDS + 1];
+static uint8_t m_commandQueueHead;
+static uint8_t m_commandQueueTail;
 
 motorDmaOutput_t m_dmaMotors[MAX_SUPPORTED_MOTORS];
 
 static  bool isLastDshotCommand(void)
 {
-    return ((commandQueueTail + 1) % (DSHOT_MAX_COMMANDS + 1) == commandQueueHead);
+    return ((m_commandQueueTail + 1) % (DSHOT_MAX_COMMANDS + 1) == m_commandQueueHead);
 }
 
 static bool dshotCommandQueueEmpty(void)
 {
-    return commandQueueHead == commandQueueTail;
+    return m_commandQueueHead == m_commandQueueTail;
 }
 
 static  bool dshotCommandQueueUpdate(void)
 {
     if (!dshotCommandQueueEmpty()) {
-        commandQueueTail = (commandQueueTail + 1) % (DSHOT_MAX_COMMANDS + 1);
+        m_commandQueueTail = (m_commandQueueTail + 1) % (DSHOT_MAX_COMMANDS + 1);
         if (!dshotCommandQueueEmpty()) {
             // There is another command in the queue so update it so it's ready
             // to output in sequence. It can go directly to the
             // COMMAND_STATE_ACTIVE state and bypass the COMMAND_STATE_IDLEWAIT
             // and COMMAND_STATE_STARTDELAY states.
-            commandControl_t* nextCommand = &commandQueue[commandQueueTail];
+            commandControl_t* nextCommand = &m_commandQueue[m_commandQueueTail];
             nextCommand->state = COMMAND_STATE_ACTIVE;
             nextCommand->nextCommandCycleDelay = 0;
             return true;
@@ -127,7 +127,7 @@ static bool dshotCommandIsProcessing(void)
     if (dshotCommandQueueEmpty()) {
         return false;
     }
-    commandControl_t* command = &commandQueue[commandQueueTail];
+    commandControl_t* command = &m_commandQueue[m_commandQueueTail];
     const bool commandIsProcessing = command->state ==
         COMMAND_STATE_STARTDELAY || command->state ==
         COMMAND_STATE_ACTIVE || (command->state ==
@@ -137,7 +137,7 @@ static bool dshotCommandIsProcessing(void)
 
 static uint8_t dshotCommandGetCurrent(uint8_t index)
 {
-    return commandQueue[commandQueueTail].command[index];
+    return m_commandQueue[m_commandQueueTail].command[index];
 }
 
 // This function is used to synchronize the dshot command output timing with
@@ -150,7 +150,7 @@ static bool dshotCommandOutputIsEnabled(uint8_t motorCount)
 {
     UNUSED(motorCount);
 
-    commandControl_t* command = &commandQueue[commandQueueTail];
+    commandControl_t* command = &m_commandQueue[m_commandQueueTail];
     switch (command->state) {
         case COMMAND_STATE_IDLEWAIT:
             if (allMotorsAreIdle(motorCount)) {
@@ -268,11 +268,6 @@ class DshotEsc : public Esc {
             bool enabled;
             IO_t io;
         } pwmOutputPort_t;
-
-        // gets set to the actual value when the PID loop is initialized
-        commandControl_t m_commandQueue[MAX_COMMANDS + 1];
-        uint8_t m_commandQueueHead;
-        uint8_t m_commandQueueTail;
 
         bool m_enabled;
 
