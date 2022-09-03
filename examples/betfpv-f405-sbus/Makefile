@@ -117,7 +117,6 @@ endif
 STM32_SRC = \
             serial_debug.c \
             bitbang.c \
-            dshot_packet.c \
             bus.c \
             bus_spi.c \
             bus_spi_config.c \
@@ -268,7 +267,8 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/stm32clock.o \
 		  $(OBJECT_DIR)/mpu6000.o \
 		  $(OBJECT_DIR)/dshot_bitbang.o \
-		  $(OBJECT_DIR)/dshot_command.o
+		  $(OBJECT_DIR)/dshot_command.o \
+		  $(OBJECT_DIR)/dshot_packet.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CXX) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
 
@@ -306,6 +306,11 @@ $(OBJECT_DIR)/dshot_command.o: $(HFSRC_DIR)/escs/dshot_command.c \
 	@echo escs/dshot_command.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/dshot_command.o $(CFLAGS) \
 		$(HFSRC_DIR)/escs/dshot_command.c
+
+$(OBJECT_DIR)/dshot_packet.o: $(HFSRC_DIR)/escs/dshot_packet.c
+	@echo escs/dshot_packet.c
+	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/dshot_packet.o $(CFLAGS) \
+		$(HFSRC_DIR)/escs/dshot_packet.c
 
 $(OBJECT_DIR)/stm32clock.o: $(HFSRC_DIR)/stm32clock.c
 	@echo stm32clock.c
