@@ -220,7 +220,7 @@ class DshotBitbangEsc : public DshotEsc {
             return bbPort;
         }
 
-        static uint32_t getDshotBaseFrequency(dshotProtocol_t pwmProtocolType)
+        static uint32_t getDshotBaseFrequency(protocol_t pwmProtocolType)
         {
             switch (pwmProtocolType) {
                 case(DSHOT600):
@@ -325,7 +325,7 @@ class DshotBitbangEsc : public DshotEsc {
             }
         }
 
-        static void timebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
+        static void timebaseSetup(bbPort_t *bbPort, protocol_t dshotProtocolType)
         {
             uint32_t timerclock = timerClock(bbPort->timhw->tim);
 
@@ -543,7 +543,7 @@ class DshotBitbangEsc : public DshotEsc {
 
     public:
 
-        DshotBitbangEsc(vector<uint8_t> * pins, dshotProtocol_t protocol=DSHOT600) 
+        DshotBitbangEsc(vector<uint8_t> * pins, protocol_t protocol=DSHOT600) 
             : DshotEsc(pins, protocol)
         {
         }

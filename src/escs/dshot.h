@@ -25,7 +25,6 @@
 #include <core/constrain.h>
 #include <esc.h>
 #include <escs/dshot_dev.h>
-#include <escs/dshot_protocol.h>
 #include <maxmotors.h>
 #include <pwm.h>
 #include <time.h>
@@ -48,6 +47,12 @@
 #define FALLTHROUGH __attribute__ ((fallthrough))
 
 #define DSHOT_MAX_COMMAND 47
+
+typedef enum {
+    DSHOT150,
+    DSHOT300,
+    DSHOT600,
+} protocol_t;
 
 typedef enum {
     DSHOT_COMMAND_STATE_IDLEWAIT,   // waiting for motors to go idle
@@ -361,7 +366,7 @@ class DshotEsc : public Esc {
 
     protected:
 
-        dshotProtocol_t m_protocol;
+        protocol_t m_protocol;
 
         uint8_t m_motorPins[MAX_SUPPORTED_MOTORS];
         uint8_t m_motorCount;
@@ -373,7 +378,7 @@ class DshotEsc : public Esc {
         virtual bool updateStart(void) = 0;
         virtual void write(uint8_t index, float value) = 0;
 
-        DshotEsc(vector<uint8_t> * pins, dshotProtocol_t protocol=DSHOT600) 
+        DshotEsc(vector<uint8_t> * pins, protocol_t protocol=DSHOT600) 
             : Esc(pins)
         {
             m_protocol = protocol;
