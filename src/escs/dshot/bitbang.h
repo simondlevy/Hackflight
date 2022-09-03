@@ -20,11 +20,13 @@
 
 #include <string.h>
 
+// Hackflight includes
+#include "escs/dshot.h"
+
+// STM32F4 includes
 #include <bitbang.h>
 #include <dma.h>
 #include <dma_reqmap.h>
-#include <escs/dshot.h>
-#include <escs/dshot/dshot_dev.h>
 #include <io.h>
 #include <io_impl.h>
 #include <nvic.h>
@@ -89,19 +91,6 @@ class DshotBitbangEsc : public DshotEsc {
             TIMER_TIM8,
         } timer_e;
 
-        typedef struct {
-            volatile timCCR_t *ccr;
-            TIM_TypeDef       *tim;
-        } timerChannel_t;
-
-        typedef struct {
-            timerChannel_t channel;
-            float pulseScale;
-            float pulseOffset;
-            bool forceOverflow;
-            bool enabled;
-            IO_t io;
-        } pwmOutputPort_t;
 
         bbPacer_t m_pacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
         int m_usedMotorPacers = 0;

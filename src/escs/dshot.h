@@ -21,16 +21,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <core/clock.h>
-#include <core/constrain.h>
-#include <esc.h>
-#include <escs/dshot/dshot_dev.h>
-#include <maxmotors.h>
+// Hackflight includes
+#include "core/clock.h"
+#include "core/constrain.h"
+#include "esc.h"
+#include "escs/dshot/dshot_dev.h"
+#include "maxmotors.h"
+
+// STM32F4 includes
 #include <pwm.h>
-#include <time.h>
-#include <timer.h>
-#include <io_types.h>
-#include <time.h>
 
 // -----------------------------------------------------------------------------
 
@@ -57,6 +56,33 @@ class DshotEsc : public Esc {
         static const uint32_t COMMAND_PID_LOOP_TIME_US = 125; 
 
         typedef enum {
+            CMD_MOTOR_STOP = 0,
+            CMD_BEACON1,
+            CMD_BEACON2,
+            CMD_BEACON3,
+            CMD_BEACON4,
+            CMD_BEACON5,
+            CMD_ESC_INFO, // V2 includes settings
+            CMD_SPIN_DIRECTION_1,
+            CMD_SPIN_DIRECTION_2,
+            CMD_SETTINGS_REQUEST, // Currently not implemented
+            CMD_SAVE_SETTINGS,
+            CMD_SPIN_DIRECTION_NORMAL = 20,
+            CMD_SPIN_DIRECTION_REVERSED = 21,
+            CMD_LED0_ON, // BLHeli32 only
+            CMD_LED1_ON, // BLHeli32 only
+            CMD_LED2_ON, // BLHeli32 only
+            CMD_LED3_ON, // BLHeli32 only
+            CMD_LED0_OFF, // BLHeli32 only
+            CMD_LED1_OFF, // BLHeli32 only
+            CMD_LED2_OFF, // BLHeli32 only
+            CMD_LED3_OFF, // BLHeli32 only
+            CMD_AUDIO_STREAM_MODE_ON_OFF = 30, // KISS audio Stream mode on/Off
+            CMD_SILENT_MODE_ON_OFF = 31, // KISS silent Mode on/Off
+            CMD_MAX = 47
+        } commands_e;
+
+        typedef enum {
             COMMAND_STATE_IDLEWAIT,   // waiting for motors to go idle
             COMMAND_STATE_STARTDELAY, // initial delay before a sequence of cmds
             COMMAND_STATE_ACTIVE,     // actively sending command
@@ -78,22 +104,13 @@ class DshotEsc : public Esc {
 
         motorDmaOutput_t m_dmaMotors[MAX_SUPPORTED_MOTORS];
 
-    protected:
+        bool m_enabled;
 
-        typedef enum {
-            DSHOT150,
-            DSHOT300,
-            DSHOT600,
-        } protocol_t;
+        uint8_t m_motorPins[MAX_SUPPORTED_MOTORS];
 
-        bool isLastDshotCommand(void)
+        bool isLastCommand(void)
         {
             return ((m_commandQueueTail + 1) % (MAX_COMMANDS + 1) == m_commandQueueHead);
-        }
-
-        motorDmaOutput_t * getMotorDmaOutput(uint8_t index)
-        {
-            return &m_dmaMotors[index];
         }
 
         bool allMotorsAreIdle()
@@ -106,6 +123,64 @@ class DshotEsc : public Esc {
             }
 
             return true;
+        }
+
+        commandControl_t * addCommand(void)
+        {
+            auto newHead = (m_commandQueueHead + 1) % (MAX_COMMANDS + 1);
+            if (newHead == m_commandQueueTail) {
+                return NULL;
+            }
+            auto * control = &m_commandQueue[m_commandQueueHead];
+            m_commandQueueHead = newHead;
+            return control;
+        }
+
+        static uint32_t commandCyclesFromTime(uint32_t delayUs)
+        {
+            // Find the minimum number of motor output cycles needed to
+            // provide at least delayUs time delay
+
+            return (delayUs + PID_LOOP_TIME_US - 1) / PID_LOOP_TIME_US;
+        }
+
+        static float scaleRangef(
+                float x, float srcFrom, float srcTo, float destFrom, float destTo)
+        {
+            auto a = (destTo - destFrom) * (x - srcFrom);
+            auto b = srcTo - srcFrom;
+            return (a / b) + destFrom;
+        }
+
+    protected:
+
+        typedef enum {
+            DSHOT150,
+            DSHOT300,
+            DSHOT600,
+        } protocol_t;
+
+        typedef struct {
+            volatile timCCR_t * ccr;
+            TIM_TypeDef * tim;
+        } timerChannel_t;
+
+        typedef struct {
+            timerChannel_t channel;
+            float pulseScale;
+            float pulseOffset;
+            bool forceOverflow;
+            bool enabled;
+            IO_t io;
+        } pwmOutputPort_t;
+
+        protocol_t m_protocol;
+
+        uint8_t m_motorCount;
+
+        motorDmaOutput_t * getMotorDmaOutput(uint8_t index)
+        {
+            return &m_dmaMotors[index];
         }
 
         // This function is used to synchronize the dshot command output timing with
@@ -149,7 +224,7 @@ class DshotEsc : public Esc {
                         command->state = COMMAND_STATE_POSTDELAY;
                         command->nextCommandCycleDelay =
                             commandCyclesFromTime(command->delayAfterCommandUs);
-                        if (!isLastDshotCommand() && command->nextCommandCycleDelay > 0) {
+                        if (!isLastCommand() && command->nextCommandCycleDelay > 0) {
                             // Account for the 1 extra motor output loop between
                             // commands.  Otherwise the inter-command delay will be
                             // COMMAND_DELAY_US + 1 loop.
@@ -172,83 +247,6 @@ class DshotEsc : public Esc {
 
             return true;
         }
-
-
-        typedef enum {
-            CMD_MOTOR_STOP = 0,
-            CMD_BEACON1,
-            CMD_BEACON2,
-            CMD_BEACON3,
-            CMD_BEACON4,
-            CMD_BEACON5,
-            CMD_ESC_INFO, // V2 includes settings
-            CMD_SPIN_DIRECTION_1,
-            CMD_SPIN_DIRECTION_2,
-            CMD_SETTINGS_REQUEST, // Currently not implemented
-            CMD_SAVE_SETTINGS,
-            CMD_SPIN_DIRECTION_NORMAL = 20,
-            CMD_SPIN_DIRECTION_REVERSED = 21,
-            CMD_LED0_ON, // BLHeli32 only
-            CMD_LED1_ON, // BLHeli32 only
-            CMD_LED2_ON, // BLHeli32 only
-            CMD_LED3_ON, // BLHeli32 only
-            CMD_LED0_OFF, // BLHeli32 only
-            CMD_LED1_OFF, // BLHeli32 only
-            CMD_LED2_OFF, // BLHeli32 only
-            CMD_LED3_OFF, // BLHeli32 only
-            CMD_AUDIO_STREAM_MODE_ON_OFF = 30, // KISS audio Stream mode on/Off
-            CMD_SILENT_MODE_ON_OFF = 31, // KISS silent Mode on/Off
-            CMD_MAX = 47
-        } commands_e;
-
-        typedef struct {
-            volatile timCCR_t * ccr;
-            TIM_TypeDef * tim;
-        } timerChannel_t;
-
-        typedef struct {
-            timerChannel_t channel;
-            float pulseScale;
-            float pulseOffset;
-            bool forceOverflow;
-            bool enabled;
-            IO_t io;
-        } pwmOutputPort_t;
-
-        bool m_enabled;
-
-        commandControl_t * addCommand(void)
-        {
-            auto newHead = (m_commandQueueHead + 1) % (MAX_COMMANDS + 1);
-            if (newHead == m_commandQueueTail) {
-                return NULL;
-            }
-            auto * control = &m_commandQueue[m_commandQueueHead];
-            m_commandQueueHead = newHead;
-            return control;
-        }
-
-        static uint32_t commandCyclesFromTime(uint32_t delayUs)
-        {
-            // Find the minimum number of motor output cycles needed to
-            // provide at least delayUs time delay
-
-            return (delayUs + PID_LOOP_TIME_US - 1) / PID_LOOP_TIME_US;
-        }
-
-        static float scaleRangef(
-                float x, float srcFrom, float srcTo, float destFrom, float destTo)
-        {
-            auto a = (destTo - destFrom) * (x - srcFrom);
-            auto b = srcTo - srcFrom;
-            return (a / b) + destFrom;
-        }
-
-
-        protocol_t m_protocol;
-
-        uint8_t m_motorPins[MAX_SUPPORTED_MOTORS];
-        uint8_t m_motorCount;
 
         virtual void deviceInit(void) = 0;
         virtual bool enable(void) = 0;
@@ -291,11 +289,6 @@ class DshotEsc : public Esc {
                 }
             }
             return false;
-        }
-
-        bool isLastCommand(void)
-        {
-            return ((m_commandQueueTail + 1) % (MAX_COMMANDS + 1) == m_commandQueueHead);
         }
 
         uint8_t commandGetCurrent(uint8_t index)
