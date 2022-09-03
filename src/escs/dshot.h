@@ -24,7 +24,7 @@
 #include <core/clock.h>
 #include <core/constrain.h>
 #include <esc.h>
-#include <escs/dshot_dev.h>
+#include <escs/dshot/dshot_dev.h>
 #include <maxmotors.h>
 #include <pwm.h>
 #include <time.h>

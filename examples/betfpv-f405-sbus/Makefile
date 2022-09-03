@@ -294,7 +294,7 @@ $(OBJECT_DIR)/mpu6000.o: $(HFSRC_DIR)/imus/softquat/*.*
 	$(V1) $(call compile_cpp)
 
 $(OBJECT_DIR)/dshot_packet.o: $(HFSRC_DIR)/escs/dshot/dshot_packet.c
-	@echo escs/dshot_packet.c
+	@echo escs/dshot/dshot_packet.c
 	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/dshot_packet.o $(CFLAGS) \
 		$(HFSRC_DIR)/escs/dshot/dshot_packet.c
 

@@ -24,7 +24,7 @@
 #include <dma.h>
 #include <dma_reqmap.h>
 #include <escs/dshot.h>
-#include <escs/dshot_dev.h>
+#include <escs/dshot/dshot_dev.h>
 #include <io.h>
 #include <io_impl.h>
 #include <nvic.h>
