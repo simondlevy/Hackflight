@@ -486,39 +486,6 @@ static void dshotBitbangPostInit(dshotProtocol_t protocol)
     }
 }
 
-static void dshotBitbangUpdateComplete(uint8_t motorCount)
-{
-    // If there is a dshot command loaded up, time it correctly with motor update
-
-    if (!dshotCommandQueueEmpty()) {
-        if (!dshotCommandOutputIsEnabled(motorCount)) {
-            return;
-        }
-    }
-
-    for (int i = 0; i < m_usedMotorPorts; i++) {
-        bbPort_t *bbPort = &m_ports[i];
-
-        bbDMA_Cmd(bbPort, ENABLE);
-    }
-
-    m_lastSendUs = micros();
-    for (int i = 0; i < m_usedMotorPacers; i++) {
-        bbPacer_t *bbPacer = &m_pacers[i];
-        bbTIM_DMACmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
-    }
-}
-
-static bool dshotBitbangUpdateStart(void)
-{
-    for (int i = 0; i < m_usedMotorPorts; i++) {
-        bbDMA_Cmd(&m_ports[i], DISABLE);
-        outputDataClear(m_ports[i].portOutputBuffer);
-    }
-
-    return true;
-}
-
 class DshotBitbangEsc : public DshotEsc {
 
     protected:
@@ -540,12 +507,35 @@ class DshotBitbangEsc : public DshotEsc {
 
         virtual void updateComplete(void)override
         {
-            dshotBitbangUpdateComplete(m_motorCount);
+            // If there is a dshot command loaded up, time it correctly with motor update
+
+            if (!dshotCommandQueueEmpty()) {
+                if (!dshotCommandOutputIsEnabled(m_motorCount)) {
+                    return;
+                }
+            }
+
+            for (int i = 0; i < m_usedMotorPorts; i++) {
+                bbPort_t *bbPort = &m_ports[i];
+
+                bbDMA_Cmd(bbPort, ENABLE);
+            }
+
+            m_lastSendUs = micros();
+            for (int i = 0; i < m_usedMotorPacers; i++) {
+                bbPacer_t *bbPacer = &m_pacers[i];
+                bbTIM_DMACmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
+            }
         }
 
         virtual bool updateStart(void) override
         {
-            return dshotBitbangUpdateStart();
+            for (int i = 0; i < m_usedMotorPorts; i++) {
+                bbDMA_Cmd(&m_ports[i], DISABLE);
+                outputDataClear(m_ports[i].portOutputBuffer);
+            }
+
+            return true;
         }
 
         virtual void write(uint8_t index, float value) override
