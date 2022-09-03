@@ -21,7 +21,6 @@
 #include <stdbool.h>
 
 #include "bus_spi.h"
-#include "dshot.h"
 #include "exti.h"
 #include "flash.h"
 #include "inverter.h"

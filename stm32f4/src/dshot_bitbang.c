@@ -26,7 +26,7 @@
 #include "atomic.h"
 #include "dma.h"
 #include "dma_reqmap.h"
-#include "dshot.h"
+#include "dshot_command.h"
 #include "dshot_bitbang.h"
 #include "dshot_dev.h"
 #include "io.h"

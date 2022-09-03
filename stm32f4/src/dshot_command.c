@@ -25,7 +25,7 @@
 #include "io.h"
 #include "timer.h"
 #include "dshot_dev.h"
-#include "dshot.h"
+#include "dshot_command.h"
 #include "systemdev.h"
 
 #define DSHOT_PROTOCOL_DETECTION_DELAY_MS 3000
