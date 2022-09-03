@@ -105,18 +105,6 @@ static  uint32_t dshotCommandCyclesFromTime(uint32_t delayUs)
     return (delayUs + COMMAND_PID_LOOP_TIME_US - 1) / COMMAND_PID_LOOP_TIME_US;
 }
 
-static commandControl_t* addCommand()
-{
-    int newHead = (commandQueueHead + 1) % (DSHOT_MAX_COMMANDS + 1);
-    if (newHead == commandQueueTail) {
-        return NULL;
-    }
-    commandControl_t* control = &commandQueue[commandQueueHead];
-    commandQueueHead = newHead;
-    return control;
-}
-
-
 static motorDmaOutput_t * getMotorDmaOutput(uint8_t index)
 {
     return &m_dmaMotors[index];
