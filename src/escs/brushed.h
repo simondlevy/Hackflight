@@ -32,9 +32,9 @@ class ArduinoBrushedEsc : public Esc {
 
         virtual void begin(void) override
         {
-            for (auto p : *m_pins) {
-                analogWriteFrequency(p, 10000);
-                analogWrite(p, 0);
+            for (auto pin : *m_pins) {
+                analogWriteFrequency(pin, 10000);
+                analogWrite(pin, 0);
             }
         }
 

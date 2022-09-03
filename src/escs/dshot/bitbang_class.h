@@ -105,8 +105,6 @@ static int m_usedMotorPorts;
 
 static motor_t m_motors[MAX_SUPPORTED_MOTORS];
 
-static int m_motorCount;
-
 static uint32_t m_outputBuffer[BUF_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 static uint16_t m_inputBuffer[PORT_IP_BUF_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 
@@ -423,64 +421,60 @@ static bool motorConfig(
 
 // -------------------------------------------------------------------------
 
-static void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
-{
-    m_motorCount = count;
-
-    memset(m_outputBuffer, 0, sizeof(m_outputBuffer));
-
-    for (int motorIndex = 0; motorIndex < m_motorCount; motorIndex++) {
-        const timerHardware_t *timerHardware = timerGetConfiguredByTag(pins[motorIndex]);
-        const IO_t io = IOGetByTag(pins[motorIndex]);
-
-        uint8_t output = timerHardware->output;
-        m_puPdMode = (output & TIMER_OUTPUT_INVERTED) ? GPIO_PuPd_DOWN : GPIO_PuPd_UP;
-
-        if (!IOIsFreeOrPreinit(io)) {
-            // not enough motors initialised for the mixer or a break in the motors
-            return;
-        }
-
-        int pinIndex = IO_GPIOPinIdx(io);
-
-        m_motors[motorIndex].pinIndex = pinIndex;
-        m_motors[motorIndex].io = io;
-        m_motors[motorIndex].output = output;
-        m_motors[motorIndex].iocfg = IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz,
-                GPIO_OType_PP, m_puPdMode);
-
-        IOInit(io, OWNER_MOTOR, RESOURCE_INDEX(motorIndex));
-        IOConfigGPIO(io, m_motors[motorIndex].iocfg);
-        if (output & TIMER_OUTPUT_INVERTED) {
-            IOLo(io);
-        } else {
-            IOHi(io);
-        }
-    }
-}
-
-static bool dshotBitbangEnableMotors(void)
-{
-    for (int i = 0; i < m_motorCount; i++) {
-        if (m_motors[i].configured) {
-            IOConfigGPIO(m_motors[i].io, m_motors[i].iocfg);
-        }
-    }
-    return true;
-}
-
 class DshotBitbangEsc : public DshotEsc {
 
     protected:
 
         virtual void deviceInit(void) override
         {
-            dshotBitbangDevInit(m_motorPins, m_motorCount);
+            memset(m_outputBuffer, 0, sizeof(m_outputBuffer));
+
+            uint8_t motorIndex = 0;
+
+            for (auto pin : *m_pins) {
+
+                const timerHardware_t *timerHardware = timerGetConfiguredByTag(pin);
+
+                const IO_t io = IOGetByTag(pin);
+
+                uint8_t output = timerHardware->output;
+                m_puPdMode = (output & TIMER_OUTPUT_INVERTED) ?
+                    GPIO_PuPd_DOWN :
+                    GPIO_PuPd_UP;
+
+                if (!IOIsFreeOrPreinit(io)) {
+                    // not enough motors initialised for the mixer or a break in the motors
+                    return;
+                }
+
+                int pinIndex = IO_GPIOPinIdx(io);
+
+                m_motors[motorIndex].pinIndex = pinIndex;
+                m_motors[motorIndex].io = io;
+                m_motors[motorIndex].output = output;
+                m_motors[motorIndex].iocfg = IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz,
+                        GPIO_OType_PP, m_puPdMode);
+
+                IOInit(io, OWNER_MOTOR, RESOURCE_INDEX(motorIndex));
+                IOConfigGPIO(io, m_motors[motorIndex].iocfg);
+                if (output & TIMER_OUTPUT_INVERTED) {
+                    IOLo(io);
+                } else {
+                    IOHi(io);
+                }
+
+                motorIndex++;
+            }
         }        
 
         virtual bool enable(void) override
         {
-            return dshotBitbangEnableMotors();
+            for (int i = 0; i < m_motorCount; i++) {
+                if (m_motors[i].configured) {
+                    IOConfigGPIO(m_motors[i].io, m_motors[i].iocfg);
+                }
+            }
+            return true;
         }
 
         virtual void postInit(void) override
