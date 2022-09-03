@@ -101,20 +101,20 @@ class Hackflight {
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
-            auto motors = HackflightCore::step(
+            auto motors = m_mixer->step(
                     demands,
                     m_taskData.vstate,
                     m_pidControllers,
                     m_taskData.pidReset,
-                    usec,
-                    *m_mixer);
+                    usec);
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
                 auto motorOutput = motors.values[i];
 
                 motorOutput = m_taskData.esc->valueLow() +
-                    (m_taskData.esc->valueHigh() - m_taskData.esc->valueLow()) * motorOutput;
+                    (m_taskData.esc->valueHigh() -
+                     m_taskData.esc->valueLow()) * motorOutput;
 
                 if (m_taskData.failsafe.isActive()) {
                     if (m_taskData.esc->isProtocolDshot()) {
