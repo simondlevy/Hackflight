@@ -352,76 +352,82 @@ static void timebaseSetup(bbPort_t *bbPort, dshotProtocol_t dshotProtocolType)
     bbPort->inputARR = timerclock / inputFreq - 1;
 }
 
-// bb only use pin info associated with timerHardware entry designated as
-// TIM_USE_MOTOR; it does not use the timer channel associated with the pin.
-
-static bool motorConfig(
-        IO_t io, uint8_t motorIndex, dshotProtocol_t pwmProtocolType, uint8_t output)
-{
-    int pinIndex = IO_GPIOPinIdx(io);
-    int portIndex = IO_GPIOPortIdx(io);
-
-    bbPort_t *bbPort = findMotorPort(portIndex);
-
-    if (!bbPort) {
-
-        // New port group
-
-        bbPort = allocateMotorPort(portIndex);
-
-        if (bbPort) {
-            const timerHardware_t *timhw = bbPort->timhw;
-            const dmaChannelSpec_t *dmaChannelSpec =
-                dmaGetChannelSpecByTimerValue(timhw->tim, timhw->channel,
-                        dmaGetOptionByTimer(timhw)); bbPort->dmaResource =
-                dmaChannelSpec->ref;
-            bbPort->dmaChannel = dmaChannelSpec->channel;
-        }
-
-        bbPort->gpio = IO_GPIO(io);
-
-        bbPort->portOutputCount = BUF_LENGTH;
-        bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
-
-        bbPort->portInputCount = PORT_IP_BUF_LENGTH;
-        bbPort->portInputBuffer = &m_inputBuffer[(bbPort - m_ports) * PORT_IP_BUF_LENGTH];
-
-        timebaseSetup(bbPort, pwmProtocolType);
-        bbTIM_TimeBaseInit(bbPort, bbPort->outputARR);
-        bbTimerChannelInit(bbPort, OWNER_DSHOT_BITBANG);
-
-        setupDma(bbPort);
-        bbDMAPreconfigure(bbPort, BITBANG_DIRECTION_OUTPUT);
-        bbDMAPreconfigure(bbPort, BITBANG_DIRECTION_INPUT);
-
-        bbDMA_ITConfig(bbPort);
-    }
-
-    motor_t * bbMotor = &m_motors[motorIndex];
-
-    bbMotor->pinIndex = pinIndex;
-    bbMotor->io = io;
-    bbMotor->output = output;
-    bbMotor->bbPort = bbPort;
-
-    IOInit(io, OWNER_MOTOR, RESOURCE_INDEX(motorIndex));
-
-    // Setup GPIO_MODER and GPIO_ODR register manipulation values
-
-    bbGpioSetup(bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io, m_puPdMode);
-
-    outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex), false); // not inverted
-
-    bbSwitchToOutput(bbPort);
-
-    bbMotor->configured = true;
-
-    return true;
-}
-
 // -------------------------------------------------------------------------
 
 class DshotBitbangEsc : public DshotEsc {
+
+    private:
+
+        // bb only use pin info associated with timerHardware entry designated as
+        // TIM_USE_MOTOR; it does not use the timer channel associated with the pin.
+
+        bool motorConfig(uint8_t motorIndex)
+        {
+            IO_t io = m_motors[motorIndex].io;
+            uint8_t output = m_motors[motorIndex].output;
+
+            int pinIndex = IO_GPIOPinIdx(io);
+            int portIndex = IO_GPIOPortIdx(io);
+
+            bbPort_t *bbPort = findMotorPort(portIndex);
+
+            if (!bbPort) {
+
+                // New port group
+
+                bbPort = allocateMotorPort(portIndex);
+
+                if (bbPort) {
+                    const timerHardware_t *timhw = bbPort->timhw;
+                    const dmaChannelSpec_t *dmaChannelSpec =
+                        dmaGetChannelSpecByTimerValue(timhw->tim, timhw->channel,
+                                dmaGetOptionByTimer(timhw)); bbPort->dmaResource =
+                        dmaChannelSpec->ref;
+                    bbPort->dmaChannel = dmaChannelSpec->channel;
+                }
+
+                bbPort->gpio = IO_GPIO(io);
+
+                bbPort->portOutputCount = BUF_LENGTH;
+                bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
+
+                bbPort->portInputCount = PORT_IP_BUF_LENGTH;
+                bbPort->portInputBuffer =
+                    &m_inputBuffer[(bbPort - m_ports) * PORT_IP_BUF_LENGTH];
+
+                timebaseSetup(bbPort, m_protocol);
+                bbTIM_TimeBaseInit(bbPort, bbPort->outputARR);
+                bbTimerChannelInit(bbPort, OWNER_DSHOT_BITBANG);
+
+                setupDma(bbPort);
+                bbDMAPreconfigure(bbPort, BITBANG_DIRECTION_OUTPUT);
+                bbDMAPreconfigure(bbPort, BITBANG_DIRECTION_INPUT);
+
+                bbDMA_ITConfig(bbPort);
+            }
+
+            motor_t * bbMotor = &m_motors[motorIndex];
+
+            bbMotor->pinIndex = pinIndex;
+            bbMotor->io = io;
+            bbMotor->output = output;
+            bbMotor->bbPort = bbPort;
+
+            IOInit(io, OWNER_MOTOR, RESOURCE_INDEX(motorIndex));
+
+            // Setup GPIO_MODER and GPIO_ODR register manipulation values
+
+            bbGpioSetup(bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io, m_puPdMode);
+
+            // not inverted
+            outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex), false); 
+
+            bbSwitchToOutput(bbPort);
+
+            bbMotor->configured = true;
+
+            return true;
+        }
 
     protected:
 
@@ -484,11 +490,9 @@ class DshotBitbangEsc : public DshotEsc {
             for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex <
                     m_motorCount; motorIndex++) {
 
-                if (!motorConfig(m_motors[motorIndex].io, motorIndex,
-                            m_protocol, m_motors[motorIndex].output)) { 
+                if (!motorConfig(motorIndex)) {
                     return;
                 }
-
 
                 m_motors[motorIndex].enabled = true;
             }
