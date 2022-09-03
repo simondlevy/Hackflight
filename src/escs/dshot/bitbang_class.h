@@ -21,8 +21,8 @@
 #include <string.h>
 
 #include <escs/dshot.h>
-#include "escs/dshot_command.h"
-#include "escs/dshot_dev.h"
+#include <escs/dshot_command.h>
+#include <escs/dshot_dev.h>
 #include <maxmotors.h>
 #include <time.h>
 
@@ -35,19 +35,17 @@
 #include <systemdev.h>
 #include <timer.h>
 
-const timerHardware_t m_timerHardware[] = {
-    DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 1),
-    DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 2),
-    DEF_TIM(TIM1,  CH2, NONE,  TIM_USE_NONE, 0, 1),
-    DEF_TIM(TIM1,  CH3, NONE,  TIM_USE_NONE, 0, 1),
-    DEF_TIM(TIM1,  CH4, NONE,  TIM_USE_NONE, 0, 0),
-};
-
-// -------------------------------------------------------------------------
-
 class DshotBitbangEsc : public DshotEsc {
 
     private:
+
+        const timerHardware_t m_timerHardware[5] = {
+            DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 1),
+            DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 2),
+            DEF_TIM(TIM1,  CH2, NONE,  TIM_USE_NONE, 0, 1),
+            DEF_TIM(TIM1,  CH3, NONE,  TIM_USE_NONE, 0, 1),
+            DEF_TIM(TIM1,  CH4, NONE,  TIM_USE_NONE, 0, 0),
+        };
 
         static const uint8_t MAX_MOTOR_PACERS = 4;
 
@@ -121,7 +119,7 @@ class DshotBitbangEsc : public DshotEsc {
         uint16_t m_inputBuffer[PORT_IP_BUF_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 
         uint8_t m_puPdMode;
-        
+
         static void outputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
         {
             uint32_t resetMask;
