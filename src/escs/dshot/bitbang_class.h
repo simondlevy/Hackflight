@@ -97,21 +97,6 @@ typedef struct {
 
 static timer_e USE_TIMER = TIMER_AUTO;
 
-static bbPacer_t m_pacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
-static int m_usedMotorPacers = 0;
-
-static bbPort_t m_ports[MAX_SUPPORTED_MOTOR_PORTS];
-static int m_usedMotorPorts;
-
-static motor_t m_motors[MAX_SUPPORTED_MOTORS];
-
-static uint32_t m_outputBuffer[BUF_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
-static uint16_t m_inputBuffer[PORT_IP_BUF_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
-
-static uint8_t m_puPdMode;
-
-uint32_t m_frameUs;
-
 const timerHardware_t m_timerHardware[] = {
     DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 1),
     DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 2),
@@ -120,13 +105,24 @@ const timerHardware_t m_timerHardware[] = {
     DEF_TIM(TIM1,  CH4, NONE,  TIM_USE_NONE, 0, 0),
 };
 
-static uint32_t m_lastSendUs;
-
 // -------------------------------------------------------------------------
 
 class DshotBitbangEsc : public DshotEsc {
 
     private:
+
+        bbPacer_t m_pacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
+        int m_usedMotorPacers = 0;
+
+        bbPort_t m_ports[MAX_SUPPORTED_MOTOR_PORTS];
+        int m_usedMotorPorts;
+
+        motor_t m_motors[MAX_SUPPORTED_MOTORS];
+
+        uint32_t m_outputBuffer[BUF_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
+        uint16_t m_inputBuffer[PORT_IP_BUF_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
+
+        uint8_t m_puPdMode;
 
         static void outputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
         {
@@ -176,7 +172,7 @@ class DshotBitbangEsc : public DshotEsc {
             }
         }
 
-        static bbPacer_t *findMotorPacer(TIM_TypeDef *tim)
+        bbPacer_t *findMotorPacer(TIM_TypeDef *tim)
         {
             for (int i = 0; i < MAX_MOTOR_PACERS; i++) {
 
@@ -196,7 +192,7 @@ class DshotBitbangEsc : public DshotEsc {
             return NULL;
         }
 
-        static bbPort_t *findMotorPort(int portIndex)
+        bbPort_t *findMotorPort(int portIndex)
         {
             for (int i = 0; i < m_usedMotorPorts; i++) {
                 if (m_ports[i].portIndex == portIndex) {
@@ -207,7 +203,7 @@ class DshotBitbangEsc : public DshotEsc {
         }
 
 
-        static bbPort_t *allocateMotorPort(int portIndex)
+        bbPort_t *allocateMotorPort(int portIndex)
         {
             if (m_usedMotorPorts >= MAX_SUPPORTED_MOTOR_PORTS) {
                 return NULL;
@@ -242,7 +238,7 @@ class DshotBitbangEsc : public DshotEsc {
             }
         }
 
-        static void setupDma(bbPort_t *bbPort)
+        void setupDma(bbPort_t *bbPort)
         {
             const dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(bbPort->dmaResource);
             dmaEnable(dmaIdentifier);
@@ -260,7 +256,7 @@ class DshotBitbangEsc : public DshotEsc {
             bbDMA_ITConfig(bbPort);
         }
 
-        static const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
+        const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
         {
             for (int index = 0; index < m_usedMotorPorts; index++) {
                 const timerHardware_t *bitbangTimer = m_ports[index].timhw;
@@ -272,7 +268,7 @@ class DshotBitbangEsc : public DshotEsc {
             return &freeOwner;
         }
 
-        static const timerHardware_t *timerGetAllocatedByNumberAndChannel(
+        const timerHardware_t *timerGetAllocatedByNumberAndChannel(
                 int8_t timerNumber,
                 uint16_t timerChannel)
         {
@@ -289,7 +285,7 @@ class DshotBitbangEsc : public DshotEsc {
 
         // Setup m_ports array elements so that they each have a TIM1 or TIM8 channel
         // in timerHardware array for BB-DShot.
-        static void findPacerTimer(void)
+        void findPacerTimer(void)
         {
             for (int bbPortIndex=0; bbPortIndex<MAX_SUPPORTED_MOTOR_PORTS; bbPortIndex++) {
 
@@ -344,7 +340,6 @@ class DshotBitbangEsc : public DshotEsc {
             uint32_t timerclock = timerClock(bbPort->timhw->tim);
 
             uint32_t outputFreq = 1000 * getDshotBaseFrequency(dshotProtocolType);
-            m_frameUs = 1000000 * 17 * 3 / outputFreq;
             bbPort->outputARR = timerclock / outputFreq - 1;
 
             uint32_t inputFreq = outputFreq * 5 * 2 * TELEMETRY_OVER_SAMPLE / 24;
@@ -507,7 +502,6 @@ class DshotBitbangEsc : public DshotEsc {
                 bbDMA_Cmd(bbPort, ENABLE);
             }
 
-            m_lastSendUs = micros();
             for (int i = 0; i < m_usedMotorPacers; i++) {
                 bbPacer_t *bbPacer = &m_pacers[i];
                 bbTIM_DMACmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
