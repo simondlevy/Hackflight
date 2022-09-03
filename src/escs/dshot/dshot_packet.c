@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "escs/dshot_dev.h"
 #include "nvic.h"
 
-uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
+uint16_t getDshotPacketAtomic(dshotProtocolControl_t *pcb)
 {
     uint16_t packet = 0;
 
@@ -29,18 +29,6 @@ uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
         // reset telemetry request to make sure it's triggered only once in a row
         pcb->requestTelemetry = false;    
     }
-
-    // compute checksum
-    unsigned csum = 0;
-    unsigned csum_data = packet;
-    for (int i = 0; i < 3; i++) {
-        csum ^=  csum_data;   // xor data by nibbles
-        csum_data >>= 4;
-    }
-    // append checksum
-
-    csum &= 0xf;
-    packet = (packet << 4) | csum;
 
     return packet;
 }

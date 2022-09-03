@@ -505,6 +505,25 @@ class DshotEsc : public Esc {
                 (command->state == COMMAND_STATE_POSTDELAY && !isLastCommand()); 
         }
 
+        uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
+        {
+            uint16_t packet = getDshotPacketAtomic(pcb);
+
+            // compute checksum
+            unsigned csum = 0;
+            unsigned csum_data = packet;
+            for (int i = 0; i < 3; i++) {
+                csum ^=  csum_data;   // xor data by nibbles
+                csum_data >>= 4;
+            }
+
+            // append checksum
+            csum &= 0xf;
+            packet = (packet << 4) | csum;
+
+            return packet;
+        }
+
     public:
 
         virtual void begin(void) override 
@@ -581,12 +600,12 @@ class DshotEsc : public Esc {
         }
 
         virtual void write(float *values) override
-            {
-                if (m_enabled) {
-                    if (!updateStart()) {
-                        return;
-                    }
-                    for (auto i=0; i <m_motorCount; i++) {
+        {
+            if (m_enabled) {
+                if (!updateStart()) {
+                    return;
+                }
+                for (auto i=0; i <m_motorCount; i++) {
                         write(i, values[i]);
                     }
                     updateComplete();

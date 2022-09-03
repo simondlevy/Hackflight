@@ -23,15 +23,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "io.h"
 
-//#define MIN_GCR_EDGES 7
-//#define MAX_GCR_EDGES 22
-
 typedef struct dshotProtocolControl_s {
     uint16_t value;
     bool requestTelemetry;
 } dshotProtocolControl_t;
-
-typedef uint32_t DSHOT_DMA_BUFFER_UNIT;
 
 typedef struct {
     TIM_TypeDef *timer;
@@ -60,13 +55,13 @@ typedef struct motorDmaOutput_s {
     TIM_ICInitTypeDef icInitStruct;
     dmaResource_t *dmaRef;
     motorDmaTimer_t *timer;
-    DSHOT_DMA_BUFFER_UNIT *dmaBuffer;
+    uint32_t * dmaBuffer;
 } motorDmaOutput_t;
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
-    uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb);
+    uint16_t getDshotPacketAtomic(dshotProtocolControl_t *pcb);
 #if defined(__cplusplus)
 }
 #endif

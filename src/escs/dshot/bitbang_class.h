@@ -20,11 +20,11 @@
 
 #include <string.h>
 
-#include <escs/dshot.h>
-
 #include <bitbang.h>
 #include <dma.h>
 #include <dma_reqmap.h>
+#include <escs/dshot.h>
+#include <escs/dshot_dev.h>
 #include <io.h>
 #include <io_impl.h>
 #include <nvic.h>
@@ -73,9 +73,9 @@ class DshotBitbangEsc : public DshotEsc {
 
         typedef struct bbMotor_s {
             dshotProtocolControl_t protocolControl;
-            int pinIndex;    // pinIndex of this motor output within a group that bbPort points to
+            int pinIndex;    
             int portIndex;
-            IO_t io;         // IO_t for this output
+            IO_t io;        
             uint8_t output;
             uint32_t iocfg;
             bbPort_t *bbPort;
@@ -138,7 +138,8 @@ class DshotBitbangEsc : public DshotEsc {
             }
         }
 
-        static void outputDataSet(uint32_t *buffer, int pinNumber, uint16_t value, bool inverted)
+        static void outputDataSet(
+                uint32_t *buffer, int pinNumber, uint16_t value, bool inverted)
         {
             uint32_t middleBit;
 
