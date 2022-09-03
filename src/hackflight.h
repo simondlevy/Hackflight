@@ -30,6 +30,7 @@
 using namespace std;
 
 #include "arming.h"
+#include "core/mixer.h"
 #include "esc.h"
 #include "failsafe.h"
 #include "imu.h"
