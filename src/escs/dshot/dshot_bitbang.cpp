@@ -438,7 +438,7 @@ void dshotBitbangDevInit(const uint8_t pins[], const uint8_t count)
 
         if (!IOIsFreeOrPreinit(io)) {
             // not enough motors initialised for the mixer or a break in the motors
-            return NULL;
+            return;
         }
 
         int pinIndex = IO_GPIOPinIdx(io);
@@ -478,7 +478,7 @@ void dshotBitbangPostInit(dshotProtocol_t protocol)
 
         if (!motorConfig(m_motors[motorIndex].io, motorIndex,
                     protocol, m_motors[motorIndex].output)) { 
-            return NULL;
+            return;
         }
 
 

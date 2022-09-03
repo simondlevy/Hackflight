@@ -295,11 +295,11 @@ $(OBJECT_DIR)/mpu6000.o: $(HFSRC_DIR)/imus/softquat/*.*
 	@echo imus/softquat/mpu6000.cpp
 	$(V1) $(call compile_cpp)
 
-$(OBJECT_DIR)/dshot_bitbang.o: $(HFSRC_DIR)/escs/dshot/dshot_bitbang.c \
+$(OBJECT_DIR)/dshot_bitbang.o: $(HFSRC_DIR)/escs/dshot/dshot_bitbang.cpp \
 	$(HFSRC_DIR)/escs/dshot/dshot_bitbang.h
-	@echo escs/dshot/dshot_bitbang.c
-	$(V1) $(CROSS_CC) -c -o $(OBJECT_DIR)/dshot_bitbang.o $(CFLAGS) \
-		$(HFSRC_DIR)/escs/dshot/dshot_bitbang.c
+	@echo escs/dshot/dshot_bitbang.cpp
+	$(V1) $(CROSS_CXX) -Wno-register -c -o $(OBJECT_DIR)/dshot_bitbang.o \
+		$(CFLAGS) $(HFSRC_DIR)/escs/dshot/dshot_bitbang.cpp
 
 $(OBJECT_DIR)/dshot_command.o: $(HFSRC_DIR)/escs/dshot_command.c \
 	$(HFSRC_DIR)/escs/dshot_command.h
