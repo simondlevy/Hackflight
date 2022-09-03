@@ -519,41 +519,6 @@ static bool dshotBitbangUpdateStart(void)
     return true;
 }
 
-static void dshotBitbangWrite(uint8_t motorIndex, float value)
-{
-    uint16_t ivalue = (uint16_t)value;
-
-    motor_t *const bbmotor = &m_motors[motorIndex];
-
-    if (!bbmotor->configured) {
-        return;
-    }
-
-    // fetch requestTelemetry from motors. Needs to be refactored.
-    motorDmaOutput_t * const motor = getMotorDmaOutput(motorIndex);
-    bbmotor->protocolControl.requestTelemetry =
-        motor->protocolControl.requestTelemetry;
-    motor->protocolControl.requestTelemetry = false;
-
-    // If there is a command ready to go overwrite the value and send that instead
-    if (dshotCommandIsProcessing()) {
-        ivalue = dshotCommandGetCurrent(motorIndex);
-        if (ivalue) {
-            bbmotor->protocolControl.requestTelemetry = true;
-        }
-    }
-
-    bbmotor->protocolControl.value = ivalue;
-
-    uint16_t packet = prepareDshotPacket(&bbmotor->protocolControl);
-
-    bbPort_t *bbPort = bbmotor->bbPort;
-
-    outputDataSet( bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
-}
-
-
-
 class DshotBitbangEsc : public DshotEsc {
 
     protected:
@@ -585,7 +550,35 @@ class DshotBitbangEsc : public DshotEsc {
 
         virtual void write(uint8_t index, float value) override
         {
-            dshotBitbangWrite(index, value);
+            uint16_t ivalue = (uint16_t)value;
+
+            motor_t *const bbmotor = &m_motors[index];
+
+            if (!bbmotor->configured) {
+                return;
+            }
+
+            // fetch requestTelemetry from motors. Needs to be refactored.
+            motorDmaOutput_t * const motor = getMotorDmaOutput(index);
+            bbmotor->protocolControl.requestTelemetry =
+                motor->protocolControl.requestTelemetry;
+            motor->protocolControl.requestTelemetry = false;
+
+            // If there is a command ready to go overwrite the value and send that instead
+            if (dshotCommandIsProcessing()) {
+                ivalue = dshotCommandGetCurrent(index);
+                if (ivalue) {
+                    bbmotor->protocolControl.requestTelemetry = true;
+                }
+            }
+
+            bbmotor->protocolControl.value = ivalue;
+
+            uint16_t packet = prepareDshotPacket(&bbmotor->protocolControl);
+
+            bbPort_t *bbPort = bbmotor->bbPort;
+
+            outputDataSet( bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
         }
 
     public:
