@@ -24,7 +24,6 @@
 #include "platform.h"
 #include "io.h"
 #include "timer.h"
-#include "dshot_dev.h"
 #include "dshot_command.h"
 #include "systemdev.h"
 

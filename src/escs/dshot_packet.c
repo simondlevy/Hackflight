@@ -16,7 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "platform.h"
 #include "atomic.h"
-#include "dshot_dev.h"
+#include "escs/dshot_dev.h"
 #include "nvic.h"
 
 uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)

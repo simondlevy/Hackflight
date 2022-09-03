@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <maxmotors.h>
 
-#include "dshot_dev.h"
+#include "escs/dshot_dev.h"
 
 #define DSHOT_MAX_COMMAND 47
 
