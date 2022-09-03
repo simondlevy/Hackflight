@@ -469,23 +469,6 @@ static bool dshotBitbangEnableMotors(void)
     return true;
 }
 
-static void dshotBitbangPostInit(dshotProtocol_t protocol)
-{
-    findPacerTimer();
-
-    for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex <
-            m_motorCount; motorIndex++) {
-
-        if (!motorConfig(m_motors[motorIndex].io, motorIndex,
-                    protocol, m_motors[motorIndex].output)) { 
-            return;
-        }
-
-
-        m_motors[motorIndex].enabled = true;
-    }
-}
-
 class DshotBitbangEsc : public DshotEsc {
 
     protected:
@@ -502,7 +485,19 @@ class DshotBitbangEsc : public DshotEsc {
 
         virtual void postInit(void) override
         {
-            dshotBitbangPostInit(m_protocol);
+            findPacerTimer();
+
+            for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex <
+                    m_motorCount; motorIndex++) {
+
+                if (!motorConfig(m_motors[motorIndex].io, motorIndex,
+                            m_protocol, m_motors[motorIndex].output)) { 
+                    return;
+                }
+
+
+                m_motors[motorIndex].enabled = true;
+            }
         }
 
         virtual void updateComplete(void)override
