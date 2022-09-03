@@ -38,17 +38,29 @@ class DshotEsc : public Esc {
 
     protected:
 
+        static const uint16_t MIN_VALUE = 48;
+        static const uint16_t MAX_VALUE = 2047;
+        static const uint16_t STOP_VALUE = 0;
+        static const uint16_t VALUE_RANGE = MAX_VALUE - MIN_VALUE;
+        static const uint32_t COMMAND_DELAY_US = 1000;
+        static const uint32_t INITIAL_DELAY_US = 10000;
+
+        // Time to separate dshot beacon and armining/disarming events
+        static const uint32_t BEACON_GUARD_DELAY_US = 1200000;  
+
+        static const uint8_t MAX_COMMANDS = 3;
+
+        // default to 8KHz (125us) loop to prevent possible div/0
+        static const uint32_t PID_LOOP_TIME_US = 125; 
+
+        // default to 8KHz (125us) loop to prevent possible div/0
+        static const uint32_t COMMAND_PID_LOOP_TIME_US = 125; 
+
         typedef enum {
             DSHOT150,
             DSHOT300,
             DSHOT600,
         } protocol_t;
-
-        static const uint32_t COMMAND_DELAY_US = 1000;
-
-        static const uint32_t DSHOT_INITIAL_DELAY_US = 10000;
-
-        static const uint8_t DSHOT_MAX_COMMANDS = 3;
 
         typedef enum {
             COMMAND_STATE_IDLEWAIT,   // waiting for motors to go idle
@@ -65,11 +77,8 @@ class DshotEsc : public Esc {
             uint8_t command[MAX_SUPPORTED_MOTORS];
         } commandControl_t;
 
-        // default to 8KHz (125us) loop to prevent possible div/0
-        static const uint32_t COMMAND_PID_LOOP_TIME_US = 125; 
-
         // gets set to the actual value when the PID loop is initialized
-        commandControl_t m_commandQueue[DSHOT_MAX_COMMANDS + 1];
+        commandControl_t m_commandQueue[MAX_COMMANDS + 1];
         uint8_t m_commandQueueHead;
         uint8_t m_commandQueueTail;
 
@@ -77,7 +86,7 @@ class DshotEsc : public Esc {
 
         bool isLastDshotCommand(void)
         {
-            return ((m_commandQueueTail + 1) % (DSHOT_MAX_COMMANDS + 1) == m_commandQueueHead);
+            return ((m_commandQueueTail + 1) % (MAX_COMMANDS + 1) == m_commandQueueHead);
         }
 
         bool dshotCommandQueueEmpty(void)
@@ -88,7 +97,7 @@ class DshotEsc : public Esc {
         bool dshotCommandQueueUpdate(void)
         {
             if (!dshotCommandQueueEmpty()) {
-                m_commandQueueTail = (m_commandQueueTail + 1) % (DSHOT_MAX_COMMANDS + 1);
+                m_commandQueueTail = (m_commandQueueTail + 1) % (MAX_COMMANDS + 1);
                 if (!dshotCommandQueueEmpty()) {
                     // There is another command in the queue so update it so it's ready
                     // to output in sequence. It can go directly to the
@@ -162,7 +171,7 @@ class DshotEsc : public Esc {
                     if (allMotorsAreIdle(motorCount)) {
                         command->state = COMMAND_STATE_STARTDELAY;
                         command->nextCommandCycleDelay =
-                            dshotCommandCyclesFromTime(DSHOT_INITIAL_DELAY_US);
+                            dshotCommandCyclesFromTime(INITIAL_DELAY_US);
                     }
                     break;
 
@@ -213,21 +222,6 @@ class DshotEsc : public Esc {
             return true;
         }
 
-
-        static const uint16_t MIN_VALUE = 48;
-        static const uint16_t MAX_VALUE = 2047;
-        static const uint16_t STOP_VALUE = 0;
-        static const uint16_t VALUE_RANGE = MAX_VALUE - MIN_VALUE;
-
-        // Time to separate dshot beacon and armining/disarming events
-        static const uint32_t BEACON_GUARD_DELAY_US = 1200000;  
-
-        static const uint32_t INITIAL_DELAY_US = 10000;
-
-        static const uint8_t MAX_COMMANDS = 3;
-
-        // default to 8KHz (125us) loop to prevent possible div/0
-        static const uint32_t PID_LOOP_TIME_US = 125; 
 
         typedef enum {
             CMD_MOTOR_STOP = 0,
@@ -311,8 +305,6 @@ class DshotEsc : public Esc {
             return (a / b) + destFrom;
         }
 
-
-    protected:
 
         protocol_t m_protocol;
 
