@@ -21,7 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
 {
-    uint16_t packet;
+    uint16_t packet = 0;
 
     ATOMIC_BLOCK(NVIC_PRIO_DSHOT_DMA) {
         packet = (pcb->value << 1) | (pcb->requestTelemetry ? 1 : 0);
