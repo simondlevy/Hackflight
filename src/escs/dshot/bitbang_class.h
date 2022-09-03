@@ -35,68 +35,6 @@
 #include <systemdev.h>
 #include <timer.h>
 
-static const uint8_t MAX_MOTOR_PACERS = 4;
-
-// Max direct dshot port groups, limited by number of usable timer (TIM1 and
-// TIM8) x number of channels per timer (4), 3 is enough to cover motor pins on
-// GPIOA, GPIOB and GPIOC.
-static const uint8_t MAX_SUPPORTED_MOTOR_PORTS = 4;
-
-static const uint32_t TELEMETRY_OVER_SAMPLE = 3;
-
-static const uint8_t BIT_PER_SYMBOL = 1;
-
-static const uint8_t STATE_PER_SYMBOL = 3;
-
-static const uint8_t FRAME_BITS = 16;
-
-static const uint8_t BUF_LENGTH = (FRAME_BITS / BIT_PER_SYMBOL) * STATE_PER_SYMBOL;
-
-// DMA input buffer
-// (30us + <frame time> + <slack>) / <input sampling clock period>
-// <frame time> = <DShot symbol time> * 16
-// Temporary size for DS600
-// <frame time> = 26us
-// <sampling period> = 0.44us
-// <slack> = 10%
-// (30 + 26 + 3) / 0.44 = 134
-// In some cases this was not enough, so we add 6 extra samples
-static const uint8_t PORT_IP_BUF_LENGTH = 140;
-
-typedef struct bbMotor_s {
-    dshotProtocolControl_t protocolControl;
-    int pinIndex;    // pinIndex of this motor output within a group that bbPort points to
-    int portIndex;
-    IO_t io;         // IO_t for this output
-    uint8_t output;
-    uint32_t iocfg;
-    bbPort_t *bbPort;
-    bool configured;
-    bool enabled;
-} motor_t;
-
-typedef enum {
-    TIMER_AUTO = 0,
-    TIMER_TIM1,
-    TIMER_TIM8,
-} timer_e;
-
-typedef struct {
-    volatile timCCR_t *ccr;
-    TIM_TypeDef       *tim;
-} timerChannel_t;
-
-typedef struct {
-    timerChannel_t channel;
-    float pulseScale;
-    float pulseOffset;
-    bool forceOverflow;
-    bool enabled;
-    IO_t io;
-} pwmOutputPort_t;
-
-static timer_e USE_TIMER = TIMER_AUTO;
-
 const timerHardware_t m_timerHardware[] = {
     DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 1),
     DEF_TIM(TIM1,  CH1, NONE,  TIM_USE_NONE, 0, 2),
@@ -111,6 +49,66 @@ class DshotBitbangEsc : public DshotEsc {
 
     private:
 
+        static const uint8_t MAX_MOTOR_PACERS = 4;
+
+        // Max direct dshot port groups, limited by number of usable timer (TIM1 and
+        // TIM8) x number of channels per timer (4), 3 is enough to cover motor pins on
+        // GPIOA, GPIOB and GPIOC.
+        static const uint8_t MAX_SUPPORTED_MOTOR_PORTS = 4;
+
+        static const uint32_t TELEMETRY_OVER_SAMPLE = 3;
+
+        static const uint8_t BIT_PER_SYMBOL = 1;
+
+        static const uint8_t STATE_PER_SYMBOL = 3;
+
+        static const uint8_t FRAME_BITS = 16;
+
+        static const uint8_t BUF_LENGTH = (FRAME_BITS / BIT_PER_SYMBOL) * STATE_PER_SYMBOL;
+
+        // DMA input buffer
+        // (30us + <frame time> + <slack>) / <input sampling clock period>
+        // <frame time> = <DShot symbol time> * 16
+        // Temporary size for DS600
+        // <frame time> = 26us
+        // <sampling period> = 0.44us
+        // <slack> = 10%
+        // (30 + 26 + 3) / 0.44 = 134
+        // In some cases this was not enough, so we add 6 extra samples
+        static const uint8_t PORT_IP_BUF_LENGTH = 140;
+
+        typedef struct bbMotor_s {
+            dshotProtocolControl_t protocolControl;
+            int pinIndex;    // pinIndex of this motor output within a group that bbPort points to
+            int portIndex;
+            IO_t io;         // IO_t for this output
+            uint8_t output;
+            uint32_t iocfg;
+            bbPort_t *bbPort;
+            bool configured;
+            bool enabled;
+        } motor_t;
+
+        typedef enum {
+            TIMER_AUTO = 0,
+            TIMER_TIM1,
+            TIMER_TIM8,
+        } timer_e;
+
+        typedef struct {
+            volatile timCCR_t *ccr;
+            TIM_TypeDef       *tim;
+        } timerChannel_t;
+
+        typedef struct {
+            timerChannel_t channel;
+            float pulseScale;
+            float pulseOffset;
+            bool forceOverflow;
+            bool enabled;
+            IO_t io;
+        } pwmOutputPort_t;
+
         bbPacer_t m_pacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
         int m_usedMotorPacers = 0;
 
@@ -123,7 +121,7 @@ class DshotBitbangEsc : public DshotEsc {
         uint16_t m_inputBuffer[PORT_IP_BUF_LENGTH * MAX_SUPPORTED_MOTOR_PORTS];
 
         uint8_t m_puPdMode;
-
+        
         static void outputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
         {
             uint32_t resetMask;
@@ -292,11 +290,6 @@ class DshotBitbangEsc : public DshotEsc {
                 for (uint8_t tmrIndex=0; tmrIndex<ARRAYLEN(m_timerHardware); tmrIndex++) {
                     const timerHardware_t *timer = &m_timerHardware[tmrIndex];
                     int timNumber = timerGetTIMNumber(timer->tim);
-                    if ((USE_TIMER == TIMER_TIM1 && timNumber != 1)
-                            || (USE_TIMER == TIMER_TIM8 &&
-                                timNumber != 8)) {
-                        continue;
-                    }
                     bool timerConflict = false;
                     for (int channel = 0; channel < CC_CHANNELS_PER_TIMER; channel++) {
                         const timerHardware_t *timer = timerGetAllocatedByNumberAndChannel(
