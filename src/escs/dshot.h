@@ -63,7 +63,7 @@ class DshotEsc : public Esc {
             COMMAND_STATE_POSTDELAY   // delay period after the cmd has been sent
         } commandState_e;
 
-        typedef struct dshotCommandControl_s {
+        typedef struct {
             commandState_e state;
             uint32_t nextCommandCycleDelay;
             uint32_t delayAfterCommandUs;
@@ -91,37 +91,6 @@ class DshotEsc : public Esc {
             return ((m_commandQueueTail + 1) % (MAX_COMMANDS + 1) == m_commandQueueHead);
         }
 
-        bool dshotCommandQueueEmpty(void)
-        {
-            return m_commandQueueHead == m_commandQueueTail;
-        }
-
-        bool dshotCommandQueueUpdate(void)
-        {
-            if (!dshotCommandQueueEmpty()) {
-                m_commandQueueTail = (m_commandQueueTail + 1) % (MAX_COMMANDS + 1);
-                if (!dshotCommandQueueEmpty()) {
-                    // There is another command in the queue so update it so it's ready
-                    // to output in sequence. It can go directly to the
-                    // COMMAND_STATE_ACTIVE state and bypass the COMMAND_STATE_IDLEWAIT
-                    // and COMMAND_STATE_STARTDELAY states.
-                    commandControl_t* nextCommand = &m_commandQueue[m_commandQueueTail];
-                    nextCommand->state = COMMAND_STATE_ACTIVE;
-                    nextCommand->nextCommandCycleDelay = 0;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        static  uint32_t dshotCommandCyclesFromTime(uint32_t delayUs)
-        {
-            // Find the minimum number of motor output cycles needed to
-            // provide at least delayUs time delay
-
-            return (delayUs + COMMAND_PID_LOOP_TIME_US - 1) / COMMAND_PID_LOOP_TIME_US;
-        }
-
         motorDmaOutput_t * getMotorDmaOutput(uint8_t index)
         {
             return &m_dmaMotors[index];
@@ -139,24 +108,6 @@ class DshotEsc : public Esc {
             return true;
         }
 
-        bool dshotCommandIsProcessing(void)
-        {
-            if (dshotCommandQueueEmpty()) {
-                return false;
-            }
-            commandControl_t* command = &m_commandQueue[m_commandQueueTail];
-            const bool commandIsProcessing = command->state ==
-                COMMAND_STATE_STARTDELAY || command->state ==
-                COMMAND_STATE_ACTIVE || (command->state ==
-                        COMMAND_STATE_POSTDELAY && !isLastDshotCommand()); return
-                commandIsProcessing;
-        }
-
-        uint8_t dshotCommandGetCurrent(uint8_t index)
-        {
-            return m_commandQueue[m_commandQueueTail].command[index];
-        }
-
         // This function is used to synchronize the dshot command output timing with
         // the normal motor output timing tied to the PID loop frequency. A "true"
         // result allows the motor output to be sent, "false" means delay until next
@@ -171,7 +122,7 @@ class DshotEsc : public Esc {
                     if (allMotorsAreIdle()) {
                         command->state = COMMAND_STATE_STARTDELAY;
                         command->nextCommandCycleDelay =
-                            dshotCommandCyclesFromTime(INITIAL_DELAY_US);
+                            commandCyclesFromTime(INITIAL_DELAY_US);
                     }
                     break;
 
@@ -193,11 +144,11 @@ class DshotEsc : public Esc {
                     command->repeats--;
                     if (command->repeats) {
                         command->nextCommandCycleDelay =
-                            dshotCommandCyclesFromTime(COMMAND_DELAY_US);
+                            commandCyclesFromTime(COMMAND_DELAY_US);
                     } else {
                         command->state = COMMAND_STATE_POSTDELAY;
                         command->nextCommandCycleDelay =
-                            dshotCommandCyclesFromTime(command->delayAfterCommandUs);
+                            commandCyclesFromTime(command->delayAfterCommandUs);
                         if (!isLastDshotCommand() && command->nextCommandCycleDelay > 0) {
                             // Account for the 1 extra motor output loop between
                             // commands.  Otherwise the inter-command delay will be
@@ -212,7 +163,7 @@ class DshotEsc : public Esc {
                         --command->nextCommandCycleDelay;
                         return false;  // Delay motor output until end of post-command delay
                     }
-                    if (dshotCommandQueueUpdate()) {
+                    if (commandQueueUpdate()) {
                         // Will be true if the command queue is not empty and we
                         // want to wait for the next command to start in sequence.
                         return false;
@@ -450,7 +401,7 @@ class DshotEsc : public Esc {
                     // we can skip the motors idle wait state
                     commandControl->state = COMMAND_STATE_STARTDELAY;
                     commandControl->nextCommandCycleDelay =
-                        dshotCommandCyclesFromTime(INITIAL_DELAY_US);
+                        commandCyclesFromTime(INITIAL_DELAY_US);
                 } else {
                     commandControl->state = COMMAND_STATE_IDLEWAIT;
 
