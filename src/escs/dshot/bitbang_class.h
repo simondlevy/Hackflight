@@ -26,17 +26,14 @@
 #include <maxmotors.h>
 #include <time.h>
 
-#include "platform.h"
-
-#include "atomic.h"
-#include "bitbang.h"
-#include "dma.h"
-#include "dma_reqmap.h"
-#include "io.h"
-#include "io_impl.h"
-#include "nvic.h"
-#include "systemdev.h"
-#include "timer.h"
+#include <bitbang.h>
+#include <dma.h>
+#include <dma_reqmap.h>
+#include <io.h>
+#include <io_impl.h>
+#include <nvic.h>
+#include <systemdev.h>
+#include <timer.h>
 
 static const uint8_t MAX_MOTOR_PACERS = 4;
 
