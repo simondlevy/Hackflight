@@ -49,12 +49,6 @@ class DshotEsc : public Esc {
 
         static const uint8_t MAX_COMMANDS = 3;
 
-        // default to 8KHz (125us) loop to prevent possible div/0
-        static const uint32_t PID_LOOP_TIME_US = 125; 
-
-        // XXX should we be using Clock::PERIOD() instead?
-        static const uint32_t COMMAND_PID_LOOP_TIME_US = 125; 
-
         typedef enum {
             CMD_MOTOR_STOP = 0,
             CMD_BEACON1,
@@ -141,7 +135,7 @@ class DshotEsc : public Esc {
             // Find the minimum number of motor output cycles needed to
             // provide at least delayUs time delay
 
-            return (delayUs + PID_LOOP_TIME_US - 1) / PID_LOOP_TIME_US;
+            return (delayUs + Clock::PERIOD() - 1) / Clock::PERIOD();
         }
 
         static float scaleRangef(
