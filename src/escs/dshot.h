@@ -76,6 +76,7 @@ class DshotEsc : public Esc {
         uint8_t m_commandQueueHead;
         uint8_t m_commandQueueTail;
 
+        motorDmaOutput_t m_dmaMotors[MAX_SUPPORTED_MOTORS];
 
     protected:
 
@@ -84,8 +85,6 @@ class DshotEsc : public Esc {
             DSHOT300,
             DSHOT600,
         } protocol_t;
-
-        motorDmaOutput_t m_dmaMotors[MAX_SUPPORTED_MOTORS];
 
         bool isLastDshotCommand(void)
         {
@@ -128,9 +127,9 @@ class DshotEsc : public Esc {
             return &m_dmaMotors[index];
         }
 
-        bool allMotorsAreIdle(uint8_t motorCount)
+        bool allMotorsAreIdle()
         {
-            for (unsigned i = 0; i < motorCount; i++) {
+            for (unsigned i = 0; i < m_motorCount; i++) {
                 const motorDmaOutput_t *motor = getMotorDmaOutput(i);
                 if (motor->protocolControl.value) {
                     return false;
@@ -164,14 +163,12 @@ class DshotEsc : public Esc {
         // loop. So take the example of a dshot command that needs to repeat 10 times
         // at 1ms intervals.  If we have a 8KHz PID loop we'll end up sending the dshot
         // command every 8th motor output.
-        bool dshotCommandOutputIsEnabled(uint8_t motorCount)
+        bool commandOutputIsEnabled(void)
         {
-            UNUSED(motorCount);
-
             commandControl_t* command = &m_commandQueue[m_commandQueueTail];
             switch (command->state) {
                 case COMMAND_STATE_IDLEWAIT:
-                    if (allMotorsAreIdle(motorCount)) {
+                    if (allMotorsAreIdle()) {
                         command->state = COMMAND_STATE_STARTDELAY;
                         command->nextCommandCycleDelay =
                             dshotCommandCyclesFromTime(INITIAL_DELAY_US);
@@ -280,18 +277,6 @@ class DshotEsc : public Esc {
             return control;
         }
 
-        bool allMotorsAreIdle(void)
-        {
-            for (auto i=0; i<m_motorCount; i++) {
-                const motorDmaOutput_t *motor = getMotorDmaOutput(i);
-                if (motor->protocolControl.value) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         static uint32_t commandCyclesFromTime(uint32_t delayUs)
         {
             // Find the minimum number of motor output cycles needed to
@@ -355,73 +340,6 @@ class DshotEsc : public Esc {
                 }
             }
             return false;
-        }
-
-        // This function is used to synchronize the dshot command output timing with
-        // the normal motor output timing tied to the PID loop frequency. A "true"
-        // result allows the motor output to be sent, "false" means delay until next
-        // loop. So take the example of a dshot command that needs to repeat 10 times
-        // at 1ms intervals.  If we have a 8KHz PID loop we'll end up sending the dshot
-        // command every 8th motor output.
-        bool commandOutputIsEnabled(void)
-        {
-            commandControl_t* command = &m_commandQueue[m_commandQueueTail];
-
-            switch (command->state) {
-                case COMMAND_STATE_IDLEWAIT:
-                    if (allMotorsAreIdle()) {
-                        command->state = COMMAND_STATE_STARTDELAY;
-                        command->nextCommandCycleDelay =
-                            dshotCommandCyclesFromTime(INITIAL_DELAY_US);
-                    }
-                    break;
-
-                case COMMAND_STATE_STARTDELAY:
-                    if (command->nextCommandCycleDelay) {
-                        --command->nextCommandCycleDelay;
-                        return false;  // Delay motor output till start of command sequence
-                    }
-                    command->state = COMMAND_STATE_ACTIVE;
-                    command->nextCommandCycleDelay = 0;  // first iter of repeat happens now
-                    [[fallthrough]];
-
-                case COMMAND_STATE_ACTIVE:
-                    if (command->nextCommandCycleDelay) {
-                        --command->nextCommandCycleDelay;
-                        return false;  // Delay motor output until the next command repeat
-                    }
-
-                    command->repeats--;
-                    if (command->repeats) {
-                        command->nextCommandCycleDelay =
-                            commandCyclesFromTime(COMMAND_DELAY_US);
-                    } else {
-                        command->state = COMMAND_STATE_POSTDELAY;
-                        command->nextCommandCycleDelay =
-                            commandCyclesFromTime(command->delayAfterCommandUs);
-                        if (!isLastCommand() && command->nextCommandCycleDelay > 0) {
-                            // Account for the 1 extra motor output loop between
-                            // commands.  Otherwise the inter-command delay will be
-                            // COMMAND_DELAY_US + 1 loop.
-                            command->nextCommandCycleDelay--;
-                        }
-                    }
-                    break;
-
-                case COMMAND_STATE_POSTDELAY:
-                    if (command->nextCommandCycleDelay) {
-                        --command->nextCommandCycleDelay;
-                        return false;  // Delay motor output until end of post-command delay
-                    }
-                    if (commandQueueUpdate()) {
-                        // Will be true if the command queue is not empty and we
-                        // want to wait for the next command to start in sequence.
-                        return false;
-                    }
-                    break;
-            }
-
-            return true;
         }
 
         bool isLastCommand(void)

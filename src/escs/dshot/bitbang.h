@@ -478,8 +478,8 @@ class DshotBitbangEsc : public DshotEsc {
         {
             // If there is a dshot command loaded up, time it correctly with motor update
 
-            if (!dshotCommandQueueEmpty()) {
-                if (!dshotCommandOutputIsEnabled(m_motorCount)) {
+            if (!commandQueueEmpty()) {
+                if (!commandOutputIsEnabled()) {
                     return;
                 }
             }
@@ -523,8 +523,8 @@ class DshotBitbangEsc : public DshotEsc {
             motor->protocolControl.requestTelemetry = false;
 
             // If there is a command ready to go overwrite the value and send that instead
-            if (dshotCommandIsProcessing()) {
-                ivalue = dshotCommandGetCurrent(index);
+            if (commandIsProcessing()) {
+                ivalue = commandGetCurrent(index);
                 if (ivalue) {
                     bbmotor->protocolControl.requestTelemetry = true;
                 }
