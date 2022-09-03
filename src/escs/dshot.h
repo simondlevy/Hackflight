@@ -56,15 +56,6 @@ class DshotEsc : public Esc {
         // XXX should we be using Clock::PERIOD() instead?
         static const uint32_t COMMAND_PID_LOOP_TIME_US = 125; 
 
-
-    protected:
-
-        typedef enum {
-            DSHOT150,
-            DSHOT300,
-            DSHOT600,
-        } protocol_t;
-
         typedef enum {
             COMMAND_STATE_IDLEWAIT,   // waiting for motors to go idle
             COMMAND_STATE_STARTDELAY, // initial delay before a sequence of cmds
@@ -84,6 +75,15 @@ class DshotEsc : public Esc {
         commandControl_t m_commandQueue[MAX_COMMANDS + 1];
         uint8_t m_commandQueueHead;
         uint8_t m_commandQueueTail;
+
+
+    protected:
+
+        typedef enum {
+            DSHOT150,
+            DSHOT300,
+            DSHOT600,
+        } protocol_t;
 
         motorDmaOutput_t m_dmaMotors[MAX_SUPPORTED_MOTORS];
 
