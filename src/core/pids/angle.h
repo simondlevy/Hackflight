@@ -374,8 +374,7 @@ class AnglePidController : public PidController {
 
                 auto dMinFactor = 1.0f;
 
-                auto dMinPercent = axis == 2 ?
-                    0.0f :
+                auto dMinPercent = 
                     D_MIN > 0 && D_MIN < m_k_rate_d ?
                     D_MIN / m_k_rate_d :
                     0.0f;
