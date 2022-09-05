@@ -140,22 +140,18 @@ class AnglePidController : public PidController {
         Pt1Filter m_ptermYawLpf = Pt1Filter(YAW_LOWPASS_HZ);
 
         float applyFeedforwardLimit(
-                float value,
-                float currentPidSetpoint,
-                float maxRateLimit) {
+                const float value,
+                const float currentPidSetpoint,
+                const float maxRateLimit) {
 
-            if (value * currentPidSetpoint > 0.0f) {
-                if (fabsf(currentPidSetpoint) <= maxRateLimit) {
-                    value = constrain_f(value, (-maxRateLimit -
-                                currentPidSetpoint) * m_k_rate_p,
-                            (maxRateLimit - currentPidSetpoint) *
-                            m_k_rate_p);
-                } else {
-                    value = 0;
-                }
-            }
-
-            return value;
+            return value * currentPidSetpoint > 0.0f ?
+                fabsf(currentPidSetpoint) <= maxRateLimit ?
+                constrain_f(value, (-maxRateLimit -
+                            currentPidSetpoint) * m_k_rate_p,
+                        (maxRateLimit - currentPidSetpoint) *
+                        m_k_rate_p) :
+                0 :
+                0;
         }
 
         float accelerationLimit(
