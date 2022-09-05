@@ -242,24 +242,23 @@ class Hackflight {
                 Imu & imu,
                 Imu::align_fun imuAlignFun,
                 vector<PidController *> & pidControllers,
-                Mixer * mixer,
-                Esc * esc,
-                Led * led)
+                Mixer & mixer,
+                Esc & esc,
+                Led & led)
         {
-            m_mixer = mixer;
+            m_mixer = &mixer;
             m_imuAlignFun = imuAlignFun;
-            m_led = led;
-            m_taskData.esc = esc;
+            m_led = &led;
 
             m_pidControllers = &pidControllers;
 
             m_taskData.receiver = &receiver;
             m_taskData.imu = &imu;
-            m_taskData.esc = esc;
+            m_taskData.esc = &esc;
 
             m_taskData.maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
 
-            m_taskData.arming.m_led = led;
+            m_taskData.arming.m_led = &led;
         }
 
         void begin(void)
