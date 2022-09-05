@@ -294,7 +294,6 @@ class AnglePidController : public PidController {
                 const float angle,
                 const float angvel,
                 const float dterm,
-                const float dynCi,
                 const uint8_t axis)
         {
             auto currentPidSetpoint = demand;
@@ -337,8 +336,7 @@ class AnglePidController : public PidController {
             // iterm windup protection to all axes
             auto Ki = m_k_rate_i; 
 
-            auto axisDynCi = // check windup for yaw only
-                (axis == 2) ? dynCi : Clock::DT(); 
+            auto axisDynCi = Clock::DT(); // check windup for yaw only
 
             m_data[axis].I =
                 constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
@@ -349,7 +347,7 @@ class AnglePidController : public PidController {
             auto feedforwardMaxRate = applyRates(1, 1);
 
             // -----calculate D component
-            if ((axis < 2 && m_k_rate_d > 0)) {
+            if ((m_k_rate_d > 0)) {
 
                 // Divide rate change by dT to get differential (ie dr/dt).
                 // dT is fixed and calculated from the target PID loop time
@@ -436,14 +434,8 @@ class AnglePidController : public PidController {
                 m_data[axis].I +
                 m_data[axis].D +
                 m_data[axis].F;
-            if (axis == 2 && USE_INTEGRATED_YAW) {
-                m_data[axis].Sum += pidSum * Clock::DT() * 100.0f;
-                m_data[axis].Sum -= m_data[axis].Sum *
-                    INTEGRATED_YAW_RELAX / 100000.0f * Clock::DT() /
-                    0.000125f;
-            } else {
+
                 m_data[axis].Sum = pidSum;
-            }
         }
 
         void updateYaw(
@@ -608,8 +600,8 @@ class AnglePidController : public PidController {
             auto dtermZ = initDterm(vstate.dpsi, 2);
 
             // ----------PID controller----------
-            updateCyclic(demands.roll,  vstate.phi,   vstate.dphi,   dtermX, dynCi, 0);
-            updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, dtermY, dynCi, 1);
+            updateCyclic(demands.roll,  vstate.phi,   vstate.dphi,   dtermX, 0);
+            updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, dtermY, 1);
             updateYaw(demands.yaw, vstate.dpsi, dtermZ, dynCi, 2);
 
             // Disable PID control if at zero throttle or if gyro overflow
