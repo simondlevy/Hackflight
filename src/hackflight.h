@@ -241,7 +241,7 @@ class Hackflight {
                 Receiver & receiver,
                 Imu & imu,
                 Imu::align_fun imuAlignFun,
-                vector<PidController *> * pidControllers,
+                vector<PidController *> & pidControllers,
                 Mixer * mixer,
                 Esc * esc,
                 Led * led)
@@ -251,7 +251,7 @@ class Hackflight {
             m_led = led;
             m_taskData.esc = esc;
 
-            m_pidControllers = pidControllers;
+            m_pidControllers = &pidControllers;
 
             m_taskData.receiver = &receiver;
             m_taskData.imu = &imu;
