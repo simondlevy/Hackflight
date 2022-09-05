@@ -331,17 +331,11 @@ class AnglePidController : public PidController {
 
             // -----calculate P component
             m_data[axis].P = m_k_rate_p * errorRate;
-            if (axis == 2) {
-                m_data[axis].P = m_ptermYawLpf.apply(m_data[axis].P);
-            }
 
             // -----calculate I component
             // if launch control is active override the iterm gains and apply
             // iterm windup protection to all axes
-            auto Ki =
-                m_k_rate_i * ((axis == 2 && !USE_INTEGRATED_YAW) ?
-                        2.5 :
-                        1);
+            auto Ki = m_k_rate_i; 
 
             auto axisDynCi = // check windup for yaw only
                 (axis == 2) ? dynCi : Clock::DT(); 
