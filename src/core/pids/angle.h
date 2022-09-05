@@ -158,20 +158,21 @@ class AnglePidController : public PidController {
 
         float accelerationLimit(
                 axis_t * axis,
-                float currentSetpoint,
+                const float currentSetpoint,
                 const float maxVelocity)
         {
             const float currentVelocity = currentSetpoint - axis->previousSetpoint;
 
-            if (fabsf(currentVelocity) > maxVelocity) {
-                currentSetpoint = (currentVelocity > 0) ?
-                    axis->previousSetpoint + maxVelocity :
-                    axis->previousSetpoint - maxVelocity;
-            }
+            const float newSetpoint = 
+                fabsf(currentVelocity) > maxVelocity ?
+                currentVelocity > 0 ?
+                axis->previousSetpoint + maxVelocity :
+                axis->previousSetpoint - maxVelocity :
+                currentSetpoint;
 
-            axis->previousSetpoint = currentSetpoint;
+            axis->previousSetpoint = newSetpoint;
 
-            return currentSetpoint;
+            return newSetpoint;
         }
 
         float applyItermRelax(
@@ -222,37 +223,18 @@ class AnglePidController : public PidController {
             initLpf1(&m_pitch, cutoffFreq);
         }
 
-        void updateDynLpfCutoffs(const uint32_t currentTimeUs, const float throttle)
-        {
-            if (cmpTimeUs(currentTimeUs, m_lastDynLpfUpdateUs) >=
-                    DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
-
-                // quantize the throttle reduce the number of filter updates
-                const int32_t quantizedThrottle =
-                    lrintf(throttle * DYN_LPF_THROTTLE_STEPS); 
-
-                if (quantizedThrottle != m_dynLpfPreviousQuantizedThrottle) {
-
-                    // scale the quantized value back to the throttle range so the
-                    // filter cutoff steps are repeatable
-                    auto dynLpfThrottle =
-                        (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
-                    pidDynLpfDTermUpdate(dynLpfThrottle);
-                    m_dynLpfPreviousQuantizedThrottle = quantizedThrottle;
-                    m_lastDynLpfUpdateUs = currentTimeUs;
-                }
-            }
-        }
-
         float levelPid(const float currentSetpoint, const float currentAngle)
         {
             // calculate error angle and limit the angle to the max inclination
             // rcDeflection in [-1.0, 1.0]
-            float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
-            angle = constrain_f(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
-            const float errorAngle = angle - (currentAngle / 10);
+
+            const auto angle = constrain_f(LEVEL_ANGLE_LIMIT * currentSetpoint,
+                    -LEVEL_ANGLE_LIMIT, +LEVEL_ANGLE_LIMIT);
+
+            const auto angleError = angle - (currentAngle / 10);
+
             return m_k_level_p > 0 ?
-                errorAngle * m_k_level_p :
+                angleError * m_k_level_p :
                 currentSetpoint;
         }
 
@@ -269,9 +251,7 @@ class AnglePidController : public PidController {
             const auto feedforwardMaxRateLimit =
                 feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
 
-            const bool shouldApplyFeedforwardLimits = feedforwardMaxRateLimit != 0;
-
-            return shouldApplyFeedforwardLimits ?
+            return feedforwardMaxRateLimit != 0 ?
                 applyFeedforwardLimit(
                         feedForward,
                         currentSetpoint,
@@ -472,7 +452,24 @@ class AnglePidController : public PidController {
                 m_yaw.I = 0;
             }
 
-            updateDynLpfCutoffs(currentTimeUs, demands.throttle);
+            if (cmpTimeUs(currentTimeUs, m_lastDynLpfUpdateUs) >=
+                    DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
+
+                // quantize the throttle reduce the number of filter updates
+                const int32_t quantizedThrottle =
+                    lrintf(demands.throttle * DYN_LPF_THROTTLE_STEPS); 
+
+                if (quantizedThrottle != m_dynLpfPreviousQuantizedThrottle) {
+
+                    // scale the quantized value back to the throttle range so the
+                    // filter cutoff steps are repeatable
+                    const auto dynLpfThrottle =
+                        (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
+                    pidDynLpfDTermUpdate(dynLpfThrottle);
+                    m_dynLpfPreviousQuantizedThrottle = quantizedThrottle;
+                    m_lastDynLpfUpdateUs = currentTimeUs;
+                }
+            }
 
             return Demands(demands.throttle, roll, pitch, yaw);
 
