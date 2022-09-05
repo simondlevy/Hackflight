@@ -51,7 +51,6 @@ class AnglePidController : public PidController {
         static const uint16_t DTERM_LPF1_DYN_MAX_HZ = 150;
         static const uint16_t DTERM_LPF2_HZ         = 150;
         static const uint16_t YAW_LOWPASS_HZ     = 100;
-        static const bool     USE_INTEGRATED_YAW = false;  // XXX try true?
         static const uint8_t  ITERM_WINDUP_POINT_PERCENT = 85;        
 
         // How much integrated yaw should be reduced to offset the drag based
@@ -115,7 +114,6 @@ class AnglePidController : public PidController {
             float P;
             float I;
             float F;
-            float Sum;
 
         } axis_t;
 
@@ -268,7 +266,7 @@ class AnglePidController : public PidController {
                 currentSetpoint;
         }
 
-        void updateCyclic(
+        float updateCyclic(
                 const float demand,
                 const float angle,
                 const float angvel,
@@ -403,10 +401,10 @@ class AnglePidController : public PidController {
                 axis->F = 0;
             }
 
-            axis->Sum = axis->P + axis->I + cyclicAxis->D + axis->F;
+            return axis->P + axis->I + cyclicAxis->D + axis->F;
         }
 
-        void updateYaw(const float demand, const float angvel)
+        float updateYaw(const float demand, const float angvel)
         {
             // gradually scale back integration when above windup point
             auto dynCi = Clock::DT();
@@ -449,7 +447,7 @@ class AnglePidController : public PidController {
             // -----calculate I component
             // if launch control is active override the iterm gains and apply
             // iterm windup protection to all axes
-            auto Ki = m_k_rate_i * (!USE_INTEGRATED_YAW ? 2.5 : 1);
+            auto Ki = m_k_rate_i * 2.5;
 
             auto axisDynCi = dynCi; // check windup for yaw only
 
@@ -477,16 +475,7 @@ class AnglePidController : public PidController {
                 m_yaw.F = 0;
             }
 
-            const auto pidSum = m_yaw.P + m_yaw.I + m_yaw.F;
-
-            if (USE_INTEGRATED_YAW) {
-                m_yaw.Sum += pidSum * Clock::DT() * 100.0f;
-                m_yaw.Sum -= m_yaw.Sum *
-                    INTEGRATED_YAW_RELAX / 100000.0f * Clock::DT() /
-                    0.000125f;
-            } else {
-                m_yaw.Sum = pidSum;
-            }
+            return m_yaw.P + m_yaw.I + m_yaw.F;
         }
 
     public:
@@ -528,14 +517,14 @@ class AnglePidController : public PidController {
                 const VehicleState & vstate,
                 const bool reset) -> Demands override
         {
-            // ----------PID controller----------
-            updateCyclic(demands.roll, vstate.phi, vstate.dphi, &m_roll);
-            updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, &m_pitch);
-            updateYaw(demands.yaw, vstate.dpsi);
+            float roll=
+                updateCyclic(demands.roll, vstate.phi, vstate.dphi, &m_roll);
 
-            // Disable PID control if at zero throttle or if gyro overflow
-            // detected This may look very innefficient, but it is done on
-            // purpose to always show real CPU usage as in flight
+            float pitch =
+                updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, &m_pitch);
+
+            float yaw = updateYaw(demands.yaw, vstate.dpsi);
+
             if (reset) {
                 m_roll.axis.I = 0;
                 m_pitch.axis.I = 0;
@@ -544,8 +533,7 @@ class AnglePidController : public PidController {
 
             updateDynLpfCutoffs(currentTimeUs, demands.throttle);
 
-            return Demands(
-                    demands.throttle, m_roll.axis.Sum, m_pitch.axis.Sum, m_yaw.Sum);
+            return Demands(demands.throttle, roll, pitch, yaw);
 
         } // update
 
