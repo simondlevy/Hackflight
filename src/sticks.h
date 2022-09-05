@@ -31,7 +31,7 @@ typedef enum {
     AUX2
 } rc_alias_e;
 
-static bool throttleIsDown(float raw[])
+static bool throttleIsDown(const float raw[])
 {
     return raw[THROTTLE] < 1050;
 }

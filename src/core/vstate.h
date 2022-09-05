@@ -19,7 +19,7 @@
 
 #pragma once
 
-class State {
+class VehicleState {
 
     public:
 
@@ -36,7 +36,7 @@ class State {
         float psi;
         float dpsi;
 
-        State(
+        VehicleState(
                 float _x,
                 float _dx,
                 float _y,
@@ -66,12 +66,12 @@ class State {
             dpsi = _dpsi;
         }
 
-        State(void)
-            : State(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        VehicleState(void)
+            : VehicleState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
         {
         }
 
-        State(const State & state)
+        VehicleState(const VehicleState & state)
         {
             x = state.x;
             dx = state.dx;

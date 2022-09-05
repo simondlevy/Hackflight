@@ -33,7 +33,7 @@ class Pt1Filter {
 
     public:
 
-        Pt1Filter(float f_cut, float dt=Clock::DT())
+        Pt1Filter(const float f_cut, const float dt=Clock::DT())
         {
             m_state = 0.0;
             m_dt = dt;
@@ -41,13 +41,13 @@ class Pt1Filter {
             computeGain(f_cut);
         }
 
-        float apply(float input)
+        float apply(const float input)
         {
             m_state = m_state + m_k * (input - m_state);
             return m_state;
         }
 
-        void computeGain(float f_cut)
+        void computeGain(const float f_cut)
         {
             float rc = 1 / (2 * M_PI * f_cut);
             m_k = m_dt / (rc + m_dt);

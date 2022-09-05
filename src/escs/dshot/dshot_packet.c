@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
+#if !defined(ARDUINO)
+
 #include "platform.h"
 #include "atomic.h"
 #include "escs/dshot/dshot_dev.h"
@@ -32,3 +34,5 @@ uint16_t getDshotPacketAtomic(dshotProtocolControl_t *pcb)
 
     return packet;
 }
+
+#endif

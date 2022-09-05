@@ -31,8 +31,6 @@
 // STM32F4 includes
 #include <pwm.h>
 
-// -----------------------------------------------------------------------------
-
 class DshotEsc : public Esc {
 
     private:
@@ -81,10 +79,10 @@ class DshotEsc : public Esc {
             COMMAND_STATE_STARTDELAY, // initial delay before a sequence of cmds
             COMMAND_STATE_ACTIVE,     // actively sending command
             COMMAND_STATE_POSTDELAY   // delay period after the cmd has been sent
-        } commandState_e;
+        } commandVehicleState_e;
 
         typedef struct {
-            commandState_e state;
+            commandVehicleState_e state;
             uint32_t nextCommandCycleDelay;
             uint32_t delayAfterCommandUs;
             uint8_t repeats;
@@ -109,7 +107,7 @@ class DshotEsc : public Esc {
 
         bool allMotorsAreIdle()
         {
-            for (unsigned i = 0; i < m_motorCount; i++) {
+            for (auto i=0; i<m_motorCount; i++) {
                 const motorDmaOutput_t *motor = getMotorDmaOutput(i);
                 if (motor->protocolControl.value) {
                     return false;
@@ -311,7 +309,7 @@ class DshotEsc : public Esc {
             // compute checksum
             unsigned csum = 0;
             unsigned csum_data = packet;
-            for (int i = 0; i < 3; i++) {
+            for (auto i=0; i<3; i++) {
                 csum ^=  csum_data;   // xor data by nibbles
                 csum_data >>= 4;
             }

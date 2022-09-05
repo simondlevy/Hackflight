@@ -181,7 +181,7 @@ class AnglePidController : public PidController {
             return value;
         }
 
-        float accelerationLimit(uint8_t axis, float currentPidSetpoint)
+        float accelerationLimit(const uint8_t axis, float currentPidSetpoint)
         {
             const float currentVelocity =
                 currentPidSetpoint - m_previousSetpoint[axis];
@@ -196,6 +196,7 @@ class AnglePidController : public PidController {
             }
 
             m_previousSetpoint[axis] = currentPidSetpoint;
+
             return currentPidSetpoint;
         }
 
@@ -227,17 +228,16 @@ class AnglePidController : public PidController {
         }
 
         static float dynLpfCutoffFreq(
-                float throttle,
-                uint16_t dynLpfMin,
-                uint16_t dynLpfMax,
-                uint8_t expo) {
+                const float throttle,
+                const uint16_t dynLpfMin,
+                const uint16_t dynLpfMax,
+                const uint8_t expo) {
             const float expof = expo / 10.0f;
-            static float curve;
-            curve = throttle * (1 - throttle) * expof + throttle;
+            const auto curve = throttle * (1 - throttle) * expof + throttle;
             return (dynLpfMax - dynLpfMin) * curve + dynLpfMin;
         }
 
-        void pidDynLpfDTermUpdate(float throttle)
+        void pidDynLpfDTermUpdate(const float throttle)
         {
             const auto dyn_lpf_min = DTERM_LPF1_DYN_MIN_HZ;
             const auto dyn_lpf_max = DTERM_LPF1_DYN_MAX_HZ;
@@ -250,13 +250,13 @@ class AnglePidController : public PidController {
             }
         }
 
-        void updateDynLpfCutoffs(uint32_t currentTimeUs, float throttle)
+        void updateDynLpfCutoffs(const uint32_t currentTimeUs, const float throttle)
         {
             if (cmpTimeUs(currentTimeUs, m_lastDynLpfUpdateUs) >=
                     DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
 
                 // quantize the throttle reduce the number of filter updates
-                int32_t quantizedThrottle =
+                const int32_t quantizedThrottle =
                     lrintf(throttle * DYN_LPF_THROTTLE_STEPS); 
 
                 if (quantizedThrottle != m_dynLpfPreviousQuantizedThrottle) {
@@ -272,13 +272,13 @@ class AnglePidController : public PidController {
             }
         }
 
-        float levelPid(float currentSetpoint, float currentAngle)
+        float levelPid(const float currentSetpoint, const float currentAngle)
         {
             // calculate error angle and limit the angle to the max inclination
             // rcDeflection in [-1.0, 1.0]
             float angle = LEVEL_ANGLE_LIMIT * currentSetpoint;
             angle = constrain_f(angle, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
-            float errorAngle = angle - (currentAngle / 10);
+            const float errorAngle = angle - (currentAngle / 10);
             return m_k_level_p > 0 ?
                 errorAngle * m_k_level_p :
                 currentSetpoint;
@@ -303,7 +303,7 @@ class AnglePidController : public PidController {
             m_dynLpfPreviousQuantizedThrottle = -1;  
         }
 
-        static float applyRates(float commandf, const float commandfAbs)
+        static float applyRates(const float commandf, const float commandfAbs)
         {
             float expof = RC_EXPO / 100.0f;
             expof =
@@ -320,7 +320,7 @@ class AnglePidController : public PidController {
         virtual auto update(
                 const uint32_t currentTimeUs,
                 const Demands & demands,
-                const State & vstate,
+                const VehicleState & vstate,
                 const bool reset) -> Demands override
         {
             // gradually scale back integration when above windup point

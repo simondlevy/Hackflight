@@ -34,15 +34,15 @@ class Led {
             WARNING_LED_OFF = 0,
             WARNING_LED_ON,
             WARNING_LED_FLASH
-        } warningLedState_e;
+        } warningLedVehicleState_e;
 
-        warningLedState_e m_warningLedState = WARNING_LED_OFF;
+        warningLedVehicleState_e m_warningLedVehicleState = WARNING_LED_OFF;
 
         uint32_t m_warningLedTimer = 0;
 
         void warningRefresh(void)
         {
-            switch (m_warningLedState) {
+            switch (m_warningLedVehicleState) {
                 case WARNING_LED_OFF:
                     devSet(false);
                     break;
@@ -80,12 +80,12 @@ class Led {
 
         void warningDisable(void)
         {
-            m_warningLedState = WARNING_LED_OFF;
+            m_warningLedVehicleState = WARNING_LED_OFF;
         }
 
         void warningFlash(void)
         {
-            m_warningLedState = WARNING_LED_FLASH;
+            m_warningLedVehicleState = WARNING_LED_FLASH;
         }
 
         void warningUpdate(void)

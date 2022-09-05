@@ -91,7 +91,7 @@ int16_t UsfsImu::devReadRawGyro(uint8_t k)
     return m_gyroAdc[k];
 }
 
-void UsfsImu::getEulerAngles(bool isArmed, uint32_t time, State * vstate) 
+void UsfsImu::getEulerAngles(bool isArmed, uint32_t time, VehicleState * vstate) 
 {
     (void)isArmed;
     (void)time;

@@ -3,12 +3,12 @@
 #include <system.h>
 #include <time.h>
  
-void delayMillis(uint32_t msec)
+void delayMillis(const uint32_t msec)
 {
     delay(msec);
 }
 
-uint32_t systemClockMicrosToCycles(uint32_t usec)
+uint32_t systemClockMicrosToCycles(const uint32_t usec)
 {
     return microsecondsToClockCycles(usec);
 }

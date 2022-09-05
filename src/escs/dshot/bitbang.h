@@ -118,9 +118,7 @@ class DshotBitbangEsc : public DshotEsc {
                 setMask = portMask;
             }
 
-            int bitpos;
-
-            for (bitpos = 0; bitpos < 16; bitpos++) {
+            for (auto bitpos=0; bitpos<16; bitpos++) {
                 buffer[bitpos * 3 + 0] |= setMask ; // Always set all ports
                 buffer[bitpos * 3 + 1] = 0;          // Reset bits are port dependent
                 buffer[bitpos * 3 + 2] |= resetMask; // Always reset all ports
@@ -138,7 +136,7 @@ class DshotBitbangEsc : public DshotEsc {
                 middleBit = (1 << (pinNumber + 16));
             }
 
-            for (int pos = 0; pos < 16; pos++) {
+            for (auto pos=0; pos<16; pos++) {
                 if (!(value & 0x8000)) {
                     buffer[pos * 3 + 1] |= middleBit;
                 }
@@ -149,14 +147,14 @@ class DshotBitbangEsc : public DshotEsc {
         static void outputDataClear(uint32_t *buffer)
         {
             // Middle position to no change
-            for (int bitpos = 0; bitpos < 16; bitpos++) {
+            for (auto bitpos=0; bitpos<16; bitpos++) {
                 buffer[bitpos * 3 + 1] = 0;
             }
         }
 
         bbPacer_t *findMotorPacer(TIM_TypeDef *tim)
         {
-            for (int i = 0; i < MAX_MOTOR_PACERS; i++) {
+            for (auto i=0; i<MAX_MOTOR_PACERS; i++) {
 
                 bbPacer_t *bbPacer = &m_pacers[i];
 
@@ -176,7 +174,7 @@ class DshotBitbangEsc : public DshotEsc {
 
         bbPort_t *findMotorPort(int portIndex)
         {
-            for (int i = 0; i < m_usedMotorPorts; i++) {
+            for (auto i=0; i<m_usedMotorPorts; i++) {
                 if (m_ports[i].portIndex == portIndex) {
                     return &m_ports[i];
                 }
@@ -240,7 +238,7 @@ class DshotBitbangEsc : public DshotEsc {
 
         const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
         {
-            for (int index = 0; index < m_usedMotorPorts; index++) {
+            for (auto index=0; index<m_usedMotorPorts; index++) {
                 const timerHardware_t *bitbangTimer = m_ports[index].timhw;
                 if (bitbangTimer && bitbangTimer == timer) {
                     return &m_ports[index].owner;
@@ -254,7 +252,7 @@ class DshotBitbangEsc : public DshotEsc {
                 int8_t timerNumber,
                 uint16_t timerChannel)
         {
-            for (int index = 0; index < m_usedMotorPorts; index++) {
+            for (auto index=0; index<m_usedMotorPorts; index++) {
                 const timerHardware_t *bitbangTimer = m_ports[index].timhw;
                 if (bitbangTimer && timerGetTIMNumber(bitbangTimer->tim) == timerNumber
                         && bitbangTimer->channel == timerChannel &&
@@ -269,13 +267,13 @@ class DshotBitbangEsc : public DshotEsc {
         // in timerHardware array for BB-DShot.
         void findPacerTimer(void)
         {
-            for (int bbPortIndex=0; bbPortIndex<MAX_SUPPORTED_MOTOR_PORTS; bbPortIndex++) {
+            for (auto bbPortIndex=0; bbPortIndex<MAX_SUPPORTED_MOTOR_PORTS; bbPortIndex++) {
 
                 for (uint8_t tmrIndex=0; tmrIndex<ARRAYLEN(m_timerHardware); tmrIndex++) {
                     const timerHardware_t *timer = &m_timerHardware[tmrIndex];
                     int timNumber = timerGetTIMNumber(timer->tim);
                     bool timerConflict = false;
-                    for (int channel = 0; channel < CC_CHANNELS_PER_TIMER; channel++) {
+                    for (auto channel=0; channel<CC_CHANNELS_PER_TIMER; channel++) {
                         const timerHardware_t *timer = timerGetAllocatedByNumberAndChannel(
                                 timNumber, CC_CHANNEL_FROM_INDEX(channel)); 
                         const resourceOwner_e timerOwner = timerGetOwner(timer)->owner;
@@ -285,7 +283,7 @@ class DshotBitbangEsc : public DshotEsc {
                         }
                     }
 
-                    for (int index = 0; index < bbPortIndex; index++) {
+                    for (auto index=0; index<bbPortIndex; index++) {
                         const timerHardware_t* t = m_ports[index].timhw;
                         if (timerGetTIMNumber(t->tim) == timNumber &&
                                 timer->channel == t->channel) {
@@ -440,7 +438,7 @@ class DshotBitbangEsc : public DshotEsc {
 
         virtual bool enable(void) override
         {
-            for (int i = 0; i < m_motorCount; i++) {
+            for (auto i=0; i<m_motorCount; i++) {
                 if (m_motors[i].configured) {
                     IOConfigGPIO(m_motors[i].io, m_motors[i].iocfg);
                 }
@@ -452,7 +450,7 @@ class DshotBitbangEsc : public DshotEsc {
         {
             findPacerTimer();
 
-            for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex <
+            for (auto motorIndex=0; motorIndex<MAX_SUPPORTED_MOTORS && motorIndex <
                     m_motorCount; motorIndex++) {
 
                 if (!motorConfig(motorIndex)) {
@@ -473,13 +471,13 @@ class DshotBitbangEsc : public DshotEsc {
                 }
             }
 
-            for (int i = 0; i < m_usedMotorPorts; i++) {
+            for (auto i=0; i<m_usedMotorPorts; i++) {
                 bbPort_t *bbPort = &m_ports[i];
 
                 bbDMA_Cmd(bbPort, ENABLE);
             }
 
-            for (int i = 0; i < m_usedMotorPacers; i++) {
+            for (auto i=0; i<m_usedMotorPacers; i++) {
                 bbPacer_t *bbPacer = &m_pacers[i];
                 bbTIM_DMACmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
             }
@@ -487,7 +485,7 @@ class DshotBitbangEsc : public DshotEsc {
 
         virtual bool updateStart(void) override
         {
-            for (int i = 0; i < m_usedMotorPorts; i++) {
+            for (auto i=0; i<m_usedMotorPorts; i++) {
                 bbDMA_Cmd(&m_ports[i], DISABLE);
                 outputDataClear(m_ports[i].portOutputBuffer);
             }

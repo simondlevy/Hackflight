@@ -45,7 +45,7 @@ class Arming {
             m_throttle_is_down;
     }
 
-    static bool rxAux1IsSet(float raw[])
+    static bool rxAux1IsSet(const float raw[])
     {
         return raw[4] > 1200;
     }
@@ -62,10 +62,10 @@ class Arming {
 
     void check(
             Esc * esc,
-            uint32_t currentTimeUs,
-            float raw[],
-            bool imuIsLevel,
-            bool calibrating)
+            const uint32_t currentTimeUs,
+            const float raw[],
+            const bool imuIsLevel,
+            const bool calibrating)
     {
         static bool _doNotRepeat;
 
@@ -114,7 +114,7 @@ class Arming {
         return m_is_armed;
     }
 
-    void updateStatus( float raw[], bool imuIsLevel, bool calibrating)
+    void updateStatus(const float raw[], const bool imuIsLevel, const bool calibrating)
     {
         if (m_is_armed) {
             m_led->set(true);

@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdbool.h>
 
-#include "core/state.h"
+#include "core/vstate.h"
 #include "imu.h"
 #include "maths.h"
 #include "receiver.h"
@@ -134,7 +134,7 @@ class Msp {
                 mspPacket_t *cmd,
                 mspPacket_t *reply,
                 mspPostProcessFnPtr *mspPostProcessFn,
-                State * vstate,
+                VehicleState * vstate,
                 Receiver::sticks_t * rxax,
                 Esc * esc,
                 float * motors);
@@ -149,7 +149,7 @@ class Msp {
             PAYLOAD,
             CHECKSUM,
             COMMAND_RECEIVED
-        } mspState_e;
+        } mspVehicleState_e;
 
 
         typedef enum {
@@ -168,7 +168,7 @@ class Msp {
             void *                    port; // null when port unused.
             uint32_t                  lastActivityMs;
             mspPendingSystemRequest_e pendingRequest;
-            mspState_e                state;
+            mspVehicleState_e                state;
             mspPacketType_e           packetType;
             uint8_t                   inBuf[PORT_INBUF_SIZE];
             uint16_t                  cmdMSP;
@@ -193,7 +193,7 @@ class Msp {
         static bool processOutCommand(
                 int16_t cmdMSP,
                 sbuf_t *dst,
-                State * vstate,
+                VehicleState * vstate,
                 Receiver::sticks_t * rxax)
         {
             auto unsupportedCommand = false;
@@ -231,7 +231,7 @@ class Msp {
             switch (cmdMSP) {
 
                 case SET_MOTOR:
-                    for (int i = 0; i < 4; i++) {
+                    for (auto i=0; i<4; i++) { // XXX
                         motors[i] = esc->convertFromExternal(sbufReadU16(src));
                     }
                     break;
@@ -252,7 +252,7 @@ class Msp {
                 mspPacket_t *cmd,
                 mspPacket_t *reply,
                 mspPostProcessFnPtr *mspPostProcessFn,
-                State * vstate,
+                VehicleState * vstate,
                 Receiver::sticks_t * rxax,
                 Esc * esc,
                 float * motors) {
@@ -427,7 +427,7 @@ class Msp {
         static mspPostProcessFnPtr serialProcessReceivedCommand(
                 mspPort_t *msp,
                 mspProcessCommandFnPtr mspProcessCommandFn,
-                State * vstate,
+                VehicleState * vstate,
                 Receiver::sticks_t * rxax,
                 Esc * esc,
                 float * motors)
@@ -532,7 +532,7 @@ class Msp {
         }
 
         void update(
-                State * vstate,
+                VehicleState * vstate,
                 Receiver::sticks_t *rxsticks,
                 bool armed,
                 Esc * esc,

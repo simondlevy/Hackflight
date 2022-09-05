@@ -32,7 +32,7 @@ class FixedPitchMixer {
 
         static void fun(
                 const Demands & demands,
-                uint8_t motorCount,
+                const uint8_t motorCount,
                 const axes_t * spins,
                 float * motorvals)
         {
@@ -40,7 +40,7 @@ class FixedPitchMixer {
 
             float mixMax = 0, mixMin = 0;
 
-            for (int i = 0; i < motorCount; i++) {
+            for (auto i=0; i<motorCount; i++) {
 
                 mix[i] =
                     demands.roll  * spins[i].x +
@@ -60,7 +60,7 @@ class FixedPitchMixer {
             float throttle = demands.throttle;
 
             if (motorRange > 1.0f) {
-                for (int i = 0; i < motorCount; i++) {
+                for (auto i=0; i<motorCount; i++) {
                     mix[i] /= motorRange;
                 }
             } else {
@@ -69,7 +69,7 @@ class FixedPitchMixer {
                 }
             }
 
-            for (int i = 0; i < motorCount; i++) {
+            for (auto i=0; i<motorCount; i++) {
 
                 motorvals[i] = mix[i] + throttle;
             }
