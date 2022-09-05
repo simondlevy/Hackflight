@@ -284,6 +284,13 @@ class AnglePidController : public PidController {
                 currentSetpoint;
         }
 
+        void initGyroRateDterm(float gyroRate, float gyroRateDterm[], uint8_t axis)
+        {
+            gyroRateDterm[axis] = gyroRate;
+            gyroRateDterm[axis] = m_dtermLpf1[axis].apply(gyroRateDterm[axis]);
+            gyroRateDterm[axis] = m_dtermLpf2[axis].apply(gyroRateDterm[axis]);
+        }
+
     public:
 
         AnglePidController(
@@ -331,19 +338,16 @@ class AnglePidController : public PidController {
                 dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
             }
 
-            float gyroRates[3] = {vstate.dphi, vstate.dtheta, vstate.dpsi};
-
-            // Precalculate gyro deta for D-term here, this allows loop unrolling
-            float gyroRateDterm[3];
-            for (auto axis = 0; axis <= 2; ++axis) {
-
-                gyroRateDterm[axis] = gyroRates[axis];
-                gyroRateDterm[axis] = m_dtermLpf1[axis].apply(gyroRateDterm[axis]);
-                gyroRateDterm[axis] = m_dtermLpf2[axis].apply(gyroRateDterm[axis]);
-            }
-
             float pidSetpoints[3] = {demands.roll, demands.pitch, demands.yaw};
             float currentAngles[3] = {vstate.phi, vstate.theta, vstate.psi};
+            float gyroRateDterm[3] = {};
+
+            // Precalculate gyro deta for D-term here, this allows loop unrolling
+            initGyroRateDterm(vstate.dphi,   gyroRateDterm, 0);
+            initGyroRateDterm(vstate.dtheta, gyroRateDterm, 1);
+            initGyroRateDterm(vstate.dpsi,   gyroRateDterm, 2);
+
+            float gyroRates[3] = {vstate.dphi, vstate.dtheta, vstate.dpsi};
 
             // ----------PID controller----------
             for (auto axis = 0; axis <= 2; ++axis) {
