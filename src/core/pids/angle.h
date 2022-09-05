@@ -37,36 +37,25 @@ class AnglePidController : public PidController {
 
         static const uint16_t DYN_LPF_THROTTLE_STEPS = 100;
 
-        // The constant scale factor to replace the Kd component of the
-        // feedforward calculation.  This value gives the same "feel" as the
-        // previous Kd default of 26 (26 * DTERM_SCALE)
-        static constexpr float FEEDFORWARD_SCALE = 0.013754;
-
         // Full iterm suppression in setpoint mode at high-passed setpoint rate
         // > 40deg/sec
-        static constexpr float   ITERM_RELAX_SETPOINT_THRESHOLD = 40;
-        static const uint8_t ITERM_RELAX_CUTOFF     = 15;
+        static constexpr float ITERM_RELAX_SETPOINT_THRESHOLD = 40;
+        static const uint8_t   ITERM_RELAX_CUTOFF     = 15;
 
         static const uint16_t DTERM_LPF1_DYN_MIN_HZ = 75;
         static const uint16_t DTERM_LPF1_DYN_MAX_HZ = 150;
         static const uint16_t DTERM_LPF2_HZ         = 150;
-        static const uint16_t YAW_LOWPASS_HZ     = 100;
-        static const uint8_t  ITERM_WINDUP_POINT_PERCENT = 85;        
 
-        // How much integrated yaw should be reduced to offset the drag based
-        // yaw component
-        static const uint8_t INTEGRATED_YAW_RELAX = 200;  
+        static const uint16_t YAW_LOWPASS_HZ        = 100;
+
+        static const uint8_t  ITERM_WINDUP_POINT_PERCENT = 85;        
 
         static const uint8_t D_MIN = 30;
         static const uint8_t D_MIN_GAIN = 37;
         static const uint8_t D_MIN_ADVANCE = 20;
 
-        // Amount of lowpass type smoothing for feedforward steps
-        static constexpr float FEEDFORWARD_SMOOTH_FACTOR = 0.75;      
-
-        static const uint8_t FEEDFORWARD_JITTER_FACTOR = 7;
-        static const uint8_t FEEDFORWARD_BOOST_FACTOR  = 15;
         static const uint8_t FEEDFORWARD_MAX_RATE_LIMIT = 90;
+
         static const uint8_t DYN_LPF_CURVE_EXPO = 5;
 
         // PT2 lowpass input cutoff to peak D around propwash frequencies
@@ -74,7 +63,6 @@ class AnglePidController : public PidController {
 
         // PT2 lowpass cutoff to smooth the boost effect
         static constexpr float D_MIN_LOWPASS_HZ = 35;  
-
         static constexpr float D_MIN_GAIN_FACTOR          = 0.00008;
         static constexpr float D_MIN_SETPOINT_GAIN_FACTOR = 0.00008f;
 
