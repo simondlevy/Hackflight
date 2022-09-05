@@ -128,19 +128,20 @@ class AnglePidController : public PidController {
 
         float m_previousDterm[2];
 
-        Pt2Filter m_dMinLpf[3] = {
+        Pt2Filter m_dMinLpf[2] = {
             Pt2Filter(D_MIN_LOWPASS_HZ),
             Pt2Filter(D_MIN_LOWPASS_HZ),
-            Pt2Filter(D_MIN_LOWPASS_HZ)
         };
 
-        Pt2Filter m_dMinRange[3] = {
+        Pt2Filter m_dMinRange[2] = {
             Pt2Filter(D_MIN_RANGE_HZ),
             Pt2Filter(D_MIN_RANGE_HZ),
-            Pt2Filter(D_MIN_RANGE_HZ)
         };
 
         pidAxisData_t m_data[3];
+        float         m_previousSetpointCorrection[3];
+        float         m_previousSetpoint[3];
+
         int32_t       m_dynLpfPreviousQuantizedThrottle;  
         bool          m_feedforwardLpfInitialized;
         float         m_k_rate_p;
@@ -150,8 +151,6 @@ class AnglePidController : public PidController {
         float         m_k_level_p;
         float         m_sum;
         uint32_t      m_lastDynLpfUpdateUs;
-        float         m_previousSetpointCorrection[3];
-        float         m_previousSetpoint[3];
 
         Pt1Filter m_ptermYawLpf = Pt1Filter(YAW_LOWPASS_HZ);
 
