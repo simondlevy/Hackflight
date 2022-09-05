@@ -284,22 +284,22 @@ class AnglePidController : public PidController {
                 currentSetpoint;
         }
 
-        void initGyroRateDterm(float gyroRate, float gyroRateDterm[], uint8_t axis)
+        void initGyroRateDterm(float gyroRate, float dterm[], uint8_t axis)
         {
-            gyroRateDterm[axis] = gyroRate;
-            gyroRateDterm[axis] = m_dtermLpf1[axis].apply(gyroRateDterm[axis]);
-            gyroRateDterm[axis] = m_dtermLpf2[axis].apply(gyroRateDterm[axis]);
+            dterm[axis] = gyroRate;
+            dterm[axis] = m_dtermLpf1[axis].apply(dterm[axis]);
+            dterm[axis] = m_dtermLpf2[axis].apply(dterm[axis]);
         }
 
         void runAxis(
-                float angularVelocity,
-                float pidSetpoint,
-                float currentAngle,
-                float gyroRateDterm[],
+                float demand,
+                float angle,
+                float angvel,
+                float dterm[],
                 float dynCi,
                 uint8_t axis)
         {
-            auto currentPidSetpoint = pidSetpoint;
+            auto currentPidSetpoint = demand;
 
             auto maxVelocity =
                 axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
@@ -309,7 +309,7 @@ class AnglePidController : public PidController {
             }
 
             if (axis != 2) {
-                currentPidSetpoint = levelPid(currentPidSetpoint, currentAngle);
+                currentPidSetpoint = levelPid(currentPidSetpoint, angle);
             }
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
@@ -317,14 +317,14 @@ class AnglePidController : public PidController {
             // because the PIDs will be zeroed below
 
             // -----calculate error rate
-            auto errorRate = currentPidSetpoint - angularVelocity; // r - y
+            auto errorRate = currentPidSetpoint - angvel; // r - y
             const auto previousIterm = m_data[axis].I;
             auto itermErrorRate = errorRate;
             auto uncorrectedSetpoint = currentPidSetpoint;
 
             applyItermRelax(axis, previousIterm, &itermErrorRate,
                     &currentPidSetpoint);
-            errorRate = currentPidSetpoint - angularVelocity;
+            errorRate = currentPidSetpoint - angvel;
             float setpointCorrection =
                 currentPidSetpoint - uncorrectedSetpoint;
 
@@ -354,8 +354,8 @@ class AnglePidController : public PidController {
                 constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
                         -ITERM_LIMIT, ITERM_LIMIT);
 
-            // -----calculate pidSetpointDelta
-            auto pidSetpointDelta = 0.0f;
+            // -----calculate demandDelta
+            auto demandDelta = 0.0f;
             auto feedforwardMaxRate = applyRates(1, 1);
 
             // -----calculate D component
@@ -366,7 +366,7 @@ class AnglePidController : public PidController {
                 // This is done to avoid DTerm spikes that occur with
                 // dynamically calculated deltaT whenever another task causes
                 // the PID loop execution to be delayed.
-                const float delta = -(gyroRateDterm[axis] -
+                const float delta = -(dterm[axis] -
                         m_previousGyroRateDterm[axis]) * FREQUENCY();
 
                 float preTpaD = m_k_rate_d * delta;
@@ -389,7 +389,7 @@ class AnglePidController : public PidController {
                         D_MIN_ADVANCE * FREQUENCY() /
                         (100 * D_MIN_LOWPASS_HZ);
                     const auto dMinSetpointFactor =
-                        (fabsf(pidSetpointDelta)) * d_min_setpoint_gain;
+                        (fabsf(demandDelta)) * d_min_setpoint_gain;
                     dMinFactor = fmaxf(dMinGyroFactor, dMinSetpointFactor);
                     dMinFactor =
                         dMinPercent + (1.0f - dMinPercent) * dMinFactor;
@@ -408,11 +408,11 @@ class AnglePidController : public PidController {
                 m_data[axis].D = 0;
             }
 
-            m_previousGyroRateDterm[axis] = gyroRateDterm[axis];
+            m_previousGyroRateDterm[axis] = dterm[axis];
 
             // -----calculate feedforward component
             // include abs control correction in feedforward
-            pidSetpointDelta += setpointCorrection -
+            demandDelta += setpointCorrection -
                 m_previousSetpointCorrection[axis];
             m_previousSetpointCorrection[axis] = setpointCorrection;
 
@@ -423,7 +423,7 @@ class AnglePidController : public PidController {
                 // weaker by about half transition now calculated in
                 // feedforward.c when new RC data arrives 
                 auto feedForward =
-                    feedforwardGain * pidSetpointDelta * FREQUENCY();
+                    feedforwardGain * demandDelta * FREQUENCY();
 
                 auto feedforwardMaxRateLimit =
                     feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
@@ -504,17 +504,17 @@ class AnglePidController : public PidController {
                 dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
             }
 
-            float gyroRateDterm[3] = {};
+            float dterm[3] = {};
 
             // Precalculate gyro deta for D-term here, this allows loop unrolling
-            initGyroRateDterm(vstate.dphi,   gyroRateDterm, 0);
-            initGyroRateDterm(vstate.dtheta, gyroRateDterm, 1);
-            initGyroRateDterm(vstate.dpsi,   gyroRateDterm, 2);
+            initGyroRateDterm(vstate.dphi,   dterm, 0);
+            initGyroRateDterm(vstate.dtheta, dterm, 1);
+            initGyroRateDterm(vstate.dpsi,   dterm, 2);
 
             // ----------PID controller----------
-            runAxis(vstate.dphi, demands.roll, vstate.phi, gyroRateDterm, dynCi, 0);
-            runAxis(vstate.dtheta, demands.pitch, vstate.theta, gyroRateDterm, dynCi, 1);
-            runAxis(vstate.dpsi, demands.yaw, vstate.psi, gyroRateDterm, dynCi, 2);
+            runAxis(demands.roll,  vstate.phi,   vstate.dphi,   dterm, dynCi, 0);
+            runAxis(demands.pitch, vstate.theta, vstate.dtheta, dterm, dynCi, 1);
+            runAxis(demands.yaw,   vstate.psi,   vstate.dpsi,   dterm, dynCi, 2);
 
             // Disable PID control if at zero throttle or if gyro overflow
             // detected This may look very innefficient, but it is done on
