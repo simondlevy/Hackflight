@@ -59,7 +59,7 @@ int main(void)
 
     static Stm32F4Led led(37); // pin
 
-    static Hackflight hf(rx, &imu, imuRotate270, &pids, &mixer, &esc, &led);
+    static Hackflight hf(rx, imu, imuRotate270, &pids, &mixer, &esc, &led);
 
     hf.begin();
 
