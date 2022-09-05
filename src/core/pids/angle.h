@@ -299,16 +299,14 @@ class AnglePidController : public PidController {
         {
             auto currentPidSetpoint = demand;
 
-            auto maxVelocity =
-                axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
+            auto maxVelocity = MAX_VELOCITY_CYCLIC();
+
             if (maxVelocity) {
                 currentPidSetpoint =
                     accelerationLimit(axis, currentPidSetpoint);
             }
 
-            if (axis != 2) {
-                currentPidSetpoint = levelPid(currentPidSetpoint, angle);
-            }
+            currentPidSetpoint = levelPid(currentPidSetpoint, angle);
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
             // recovery It's not necessary to zero the set points for R/P
