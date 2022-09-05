@@ -138,30 +138,6 @@ class AnglePidController : public PidController {
             Pt2Filter(D_MIN_RANGE_HZ),
         };
 
-        typedef struct {
-
-            Pt1Filter  windupLpf; 
-            float      previousSetpointCorrection;
-            float      previousSetpoint;
-            float      P;
-            float      I;
-            float      F;
-
-        } axis_t;
-
-        typedef struct {
-
-            axis_t axis;
-
-            Pt1Filter dtermLpf1;
-            Pt1Filter dtermLpf2;
-            Pt2Filter dMinLpf;
-            Pt2Filter dMinRange;
-            float     previousDterm;
-            float     D;
-
-        } cyclicAxis_t;
-
         axisCorrection_t m_correction[3];
 
         float m_previousSetpointCorrection[3];
@@ -172,6 +148,31 @@ class AnglePidController : public PidController {
             Pt1Filter(ITERM_RELAX_CUTOFF),
             Pt1Filter(ITERM_RELAX_CUTOFF)
         };
+
+        typedef struct {
+
+            Pt1Filter  windupLpf = Pt1Filter(ITERM_RELAX_CUTOFF); 
+            float      previousSetpointCorrection;
+            float      previousSetpoint;
+            float      P;
+            float      I;
+            float      F;
+
+        } axis_t;
+
+        typedef struct {
+
+            axis_t    axis;
+            Pt1Filter dtermLpf1 = Pt1Filter(DTERM_LPF1_DYN_MIN_HZ);
+            Pt1Filter dtermLpf2 = Pt1Filter(DTERM_LPF2_HZ);
+            Pt2Filter dMinLpf = Pt2Filter(D_MIN_LOWPASS_HZ);
+            Pt2Filter dMinRange = Pt2Filter(D_MIN_RANGE_HZ);
+            float     previousDterm;
+            float     D;
+
+        } cyclicAxis_t;
+
+        axis_t m_yaw;
 
         int32_t       m_dynLpfPreviousQuantizedThrottle;  
         bool          m_feedforwardLpfInitialized;
