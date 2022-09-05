@@ -229,7 +229,7 @@ class AnglePidController : public PidController {
                 const int axis,
                 const float iterm,
                 const float currentPidSetpoint,
-                float itermErrorRate)
+                const float itermErrorRate)
         {
             const float setpointLpf = m_windupLpf[axis].apply(currentPidSetpoint);
 
@@ -242,13 +242,7 @@ class AnglePidController : public PidController {
                 ((iterm > 0) && (itermErrorRate < 0)) ||
                 ((iterm < 0) && (itermErrorRate > 0));
 
-            if (isDecreasingI) {
-                // Do Nothing, use the precalculed itermErrorRate
-            } else {
-                itermErrorRate *= itermRelaxFactor;
-            } 
-
-            return itermErrorRate;
+            return itermErrorRate * (!isDecreasingI ? itermRelaxFactor : 1);
         }
 
         static float dynLpfCutoffFreq(
