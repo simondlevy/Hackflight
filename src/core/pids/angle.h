@@ -290,12 +290,12 @@ class AnglePidController : public PidController {
         }
 
         void runAxis(
-                float demand,
-                float angle,
-                float angvel,
-                float dterm,
-                float dynCi,
-                uint8_t axis)
+                const float demand,
+                const float angle,
+                const float angvel,
+                const float dterm,
+                const float dynCi,
+                const uint8_t axis)
         {
             auto currentPidSetpoint = demand;
 
