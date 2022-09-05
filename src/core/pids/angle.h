@@ -292,14 +292,14 @@ class AnglePidController : public PidController {
         }
 
         void runAxis(
-                float gyroRates[],
-                float pidSetpoints[],
-                float currentAngles[],
+                float angularVelocity,
+                float pidSetpoint,
+                float currentAngle,
                 float gyroRateDterm[],
                 float dynCi,
                 uint8_t axis)
         {
-            auto currentPidSetpoint = pidSetpoints[axis];
+            auto currentPidSetpoint = pidSetpoint;
 
             auto maxVelocity =
                 axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
@@ -309,8 +309,7 @@ class AnglePidController : public PidController {
             }
 
             if (axis != 2) {
-                currentPidSetpoint = levelPid(
-                        currentPidSetpoint, currentAngles[axis]);
+                currentPidSetpoint = levelPid(currentPidSetpoint, currentAngle);
             }
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
@@ -318,15 +317,14 @@ class AnglePidController : public PidController {
             // because the PIDs will be zeroed below
 
             // -----calculate error rate
-            const auto gyroRate = gyroRates[axis]; // gyro output in deg/sec
-            auto errorRate = currentPidSetpoint - gyroRate; // r - y
+            auto errorRate = currentPidSetpoint - angularVelocity; // r - y
             const auto previousIterm = m_data[axis].I;
             auto itermErrorRate = errorRate;
             auto uncorrectedSetpoint = currentPidSetpoint;
 
             applyItermRelax(axis, previousIterm, &itermErrorRate,
                     &currentPidSetpoint);
-            errorRate = currentPidSetpoint - gyroRate;
+            errorRate = currentPidSetpoint - angularVelocity;
             float setpointCorrection =
                 currentPidSetpoint - uncorrectedSetpoint;
 
@@ -506,8 +504,6 @@ class AnglePidController : public PidController {
                 dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
             }
 
-            float pidSetpoints[3] = {demands.roll, demands.pitch, demands.yaw};
-            float currentAngles[3] = {vstate.phi, vstate.theta, vstate.psi};
             float gyroRateDterm[3] = {};
 
             // Precalculate gyro deta for D-term here, this allows loop unrolling
@@ -515,12 +511,10 @@ class AnglePidController : public PidController {
             initGyroRateDterm(vstate.dtheta, gyroRateDterm, 1);
             initGyroRateDterm(vstate.dpsi,   gyroRateDterm, 2);
 
-            float gyroRates[3] = {vstate.dphi, vstate.dtheta, vstate.dpsi};
-
             // ----------PID controller----------
-            runAxis(gyroRates, pidSetpoints, currentAngles, gyroRateDterm, dynCi, 0);
-            runAxis(gyroRates, pidSetpoints, currentAngles, gyroRateDterm, dynCi, 1);
-            runAxis(gyroRates, pidSetpoints, currentAngles, gyroRateDterm, dynCi, 2);
+            runAxis(vstate.dphi, demands.roll, vstate.phi, gyroRateDterm, dynCi, 0);
+            runAxis(vstate.dtheta, demands.pitch, vstate.theta, gyroRateDterm, dynCi, 1);
+            runAxis(vstate.dpsi, demands.yaw, vstate.psi, gyroRateDterm, dynCi, 2);
 
             // Disable PID control if at zero throttle or if gyro overflow
             // detected This may look very innefficient, but it is done on
