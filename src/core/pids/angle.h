@@ -103,16 +103,15 @@ class AnglePidController : public PidController {
             return 1.0f / Clock::DT(); 
         }
 
+        // Common values for all three axes
         typedef struct {
 
-            // XXX not needed for yaw
-            float previousSetpointCorrection;
             float previousSetpoint;
-
             float I;
 
         } axis_t;
 
+        // Values for roll and pitch
         typedef struct {
 
             axis_t    axis;
@@ -125,21 +124,22 @@ class AnglePidController : public PidController {
 
         } cyclicAxis_t;
 
+        // Value for yaw
+        Pt1Filter m_ptermYawLpf = Pt1Filter(YAW_LOWPASS_HZ);
+
         cyclicAxis_t m_roll;
         cyclicAxis_t m_pitch;
         axis_t       m_yaw;
 
-        int32_t       m_dynLpfPreviousQuantizedThrottle;  
-        bool          m_feedforwardLpfInitialized;
-        float         m_k_rate_p;
-        float         m_k_rate_i;
-        float         m_k_rate_d;
-        float         m_k_rate_f;
-        float         m_k_level_p;
-        float         m_sum;
-        uint32_t      m_lastDynLpfUpdateUs;
-
-        Pt1Filter m_ptermYawLpf = Pt1Filter(YAW_LOWPASS_HZ);
+        int32_t  m_dynLpfPreviousQuantizedThrottle;  
+        bool     m_feedforwardLpfInitialized;
+        float    m_k_rate_p;
+        float    m_k_rate_i;
+        float    m_k_rate_d;
+        float    m_k_rate_f;
+        float    m_k_level_p;
+        float    m_sum;
+        uint32_t m_lastDynLpfUpdateUs;
 
         float applyFeedforwardLimit(
                 const float value,
@@ -379,13 +379,9 @@ class AnglePidController : public PidController {
             cyclicAxis->previousDterm = dterm;
 
             // -----calculate feedforward component
-            // include abs control correction in feedforward
-            axis->previousSetpointCorrection = 0;
-
             const auto F =
                 m_k_rate_f > 0 ?
-                computeFeedforward(
-                        newSetpoint, applyRates(1, 1), 0) :
+                computeFeedforward(newSetpoint, applyRates(1, 1), 0) :
                 0;
 
             return P + axis->I + D + F;
