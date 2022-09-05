@@ -226,31 +226,30 @@ class AnglePidController : public PidController {
             return currentPidSetpoint;
         }
 
-        void applyItermRelax(
+        float applyItermRelax(
                 const int axis,
                 const float iterm,
-                float *itermErrorRate,
-                float *currentPidSetpoint)
+                const float currentPidSetpoint,
+                float itermErrorRate)
         {
-            const float setpointLpf = m_windupLpf[axis].apply(*currentPidSetpoint);
+            const float setpointLpf = m_windupLpf[axis].apply(currentPidSetpoint);
 
-            const float setpointHpf = fabsf(*currentPidSetpoint - setpointLpf);
+            const float setpointHpf = fabsf(currentPidSetpoint - setpointLpf);
 
-            if (axis < 2) {
+            const auto itermRelaxFactor =
+                fmaxf(0, 1 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD);
 
-                const auto itermRelaxFactor =
-                    fmaxf(0, 1 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD);
+            const auto isDecreasingI =
+                ((iterm > 0) && (itermErrorRate < 0)) ||
+                ((iterm < 0) && (itermErrorRate > 0));
 
-                const auto isDecreasingI =
-                    ((iterm > 0) && (*itermErrorRate < 0)) ||
-                    ((iterm < 0) && (*itermErrorRate > 0));
+            if (isDecreasingI) {
+                // Do Nothing, use the precalculed itermErrorRate
+            } else {
+                itermErrorRate *= itermRelaxFactor;
+            } 
 
-                if (isDecreasingI) {
-                    // Do Nothing, use the precalculed itermErrorRate
-                } else {
-                    *itermErrorRate *= itermRelaxFactor;
-                } 
-            }
+            return itermErrorRate;
         }
 
         static float dynLpfCutoffFreq(
@@ -329,18 +328,18 @@ class AnglePidController : public PidController {
 
             currentPidSetpoint = levelPid(currentPidSetpoint, angle);
 
-            // Handle yaw spin recovery - zero the setpoint on yaw to aid in
-            // recovery It's not necessary to zero the set points for R/P
-            // because the PIDs will be zeroed below
-
             // -----calculate error rate
-            auto errorRate = currentPidSetpoint - angvel; // r - y
+            auto errorRate = currentPidSetpoint - angvel;
             const auto previousIterm = m_correction[axis].I;
             auto itermErrorRate = errorRate;
             auto uncorrectedSetpoint = currentPidSetpoint;
 
-            applyItermRelax(axis, previousIterm, &itermErrorRate,
-                    &currentPidSetpoint);
+            itermErrorRate = applyItermRelax(
+                    axis,
+                    previousIterm,
+                    currentPidSetpoint,
+                    itermErrorRate);
+
             errorRate = currentPidSetpoint - angvel;
             float setpointCorrection =
                 currentPidSetpoint - uncorrectedSetpoint;
@@ -487,11 +486,8 @@ class AnglePidController : public PidController {
             const auto previousIterm = m_correction[2].I;
             auto itermErrorRate = errorRate;
             auto uncorrectedSetpoint = currentPidSetpoint;
-
-            applyItermRelax(2, previousIterm, &itermErrorRate, &currentPidSetpoint);
             errorRate = currentPidSetpoint - angvel;
-            float setpointCorrection =
-                currentPidSetpoint - uncorrectedSetpoint;
+            float setpointCorrection = currentPidSetpoint - uncorrectedSetpoint;
 
             // --------low-level gyro-based PID based on 2DOF PID controller.
             // ---------- 2-DOF PID controller with optional filter on
