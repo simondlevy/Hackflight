@@ -39,7 +39,7 @@ class Imu {
     private:
 
         static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
-        static const uint16_t GYRO_GYRO_LPF1_DYN_MIN_HZ      = 250;
+        static const uint16_t GYRO_LPF1_DYN_MIN_HZ           = 250;
         static const uint16_t GYRO_LPF2_STATIC_HZ            = 500;
         static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
 
@@ -64,9 +64,9 @@ class Imu {
         uint32_t m_gyroInterruptCount;
 
         Pt1Filter m_lowpassFilter1[3] = {
-            Pt1Filter(GYRO_GYRO_LPF1_DYN_MIN_HZ),
-            Pt1Filter(GYRO_GYRO_LPF1_DYN_MIN_HZ),
-            Pt1Filter(GYRO_GYRO_LPF1_DYN_MIN_HZ)
+            Pt1Filter(GYRO_LPF1_DYN_MIN_HZ),
+            Pt1Filter(GYRO_LPF1_DYN_MIN_HZ),
+            Pt1Filter(GYRO_LPF1_DYN_MIN_HZ)
         };
 
         Pt1Filter m_lowpassFilter2[3] = {
