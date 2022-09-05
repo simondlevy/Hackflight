@@ -438,20 +438,23 @@ class AnglePidController : public PidController {
                 m_data[axis].Sum = pidSum;
         }
 
-        void updateYaw(
-                const float demand,
-                const float angvel,
-                const float dterm,
-                const float dynCi,
-                const uint8_t axis)
+        void updateYaw( const float demand, const float angvel, const float dterm)
         {
+            // gradually scale back integration when above windup point
+            auto dynCi = Clock::DT();
+            const auto itermWindupPointInv =
+                1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
+            if (itermWindupPointInv > 1.0f) {
+                dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
+            }
+
             auto currentPidSetpoint = demand;
 
             auto maxVelocity = MAX_VELOCITY_YAW();
 
             if (maxVelocity) {
                 currentPidSetpoint =
-                    accelerationLimit(axis, currentPidSetpoint);
+                    accelerationLimit(2, currentPidSetpoint);
             }
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
@@ -460,11 +463,11 @@ class AnglePidController : public PidController {
 
             // -----calculate error rate
             auto errorRate = currentPidSetpoint - angvel; // r - y
-            const auto previousIterm = m_data[axis].I;
+            const auto previousIterm = m_data[2].I;
             auto itermErrorRate = errorRate;
             auto uncorrectedSetpoint = currentPidSetpoint;
 
-            applyItermRelax(axis, previousIterm, &itermErrorRate,
+            applyItermRelax(2, previousIterm, &itermErrorRate,
                     &currentPidSetpoint);
             errorRate = currentPidSetpoint - angvel;
             float setpointCorrection =
@@ -476,9 +479,9 @@ class AnglePidController : public PidController {
             // tuned (amount derivative on measurement or error).
 
             // -----calculate P component
-            m_data[axis].P = m_k_rate_p * errorRate;
+            m_data[2].P = m_k_rate_p * errorRate;
 
-            m_data[axis].P = m_ptermYawLpf.apply(m_data[axis].P);
+            m_data[2].P = m_ptermYawLpf.apply(m_data[2].P);
 
             // -----calculate I component
             // if launch control is active override the iterm gains and apply
@@ -487,24 +490,23 @@ class AnglePidController : public PidController {
 
             auto axisDynCi = dynCi; // check windup for yaw only
 
-            m_data[axis].I =
+            m_data[2].I =
                 constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
                         -ITERM_LIMIT, ITERM_LIMIT);
 
             // -----calculate demandDelta
             auto demandDelta = 0.0f;
-            auto feedforwardMaxRate = applyRates(1, 1);
 
             // No D term for yaw
-            m_data[axis].D = 0;
+            m_data[2].D = 0;
 
-            m_previousDterm[axis] = dterm;
+            m_previousDterm[2] = dterm;
 
             // -----calculate feedforward component
             // include abs control correction in feedforward
             demandDelta += setpointCorrection -
-                m_previousSetpointCorrection[axis];
-            m_previousSetpointCorrection[axis] = setpointCorrection;
+                m_previousSetpointCorrection[2];
+            m_previousSetpointCorrection[2] = setpointCorrection;
 
             // no feedforward in launch control
             auto feedforwardGain = m_k_rate_f;
@@ -512,38 +514,26 @@ class AnglePidController : public PidController {
                 // halve feedforward in Level mode since stick sensitivity is
                 // weaker by about half transition now calculated in
                 // feedforward.c when new RC data arrives 
-                auto feedForward =
-                    feedforwardGain * demandDelta * FREQUENCY();
+                auto feedForward = feedforwardGain * demandDelta * FREQUENCY();
 
-                auto feedforwardMaxRateLimit =
-                    feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
-
-                bool shouldApplyFeedforwardLimits =
-                    feedforwardMaxRateLimit != 0.0f && axis < 2;
-
-                m_data[axis].F = shouldApplyFeedforwardLimits ?
-                    applyFeedforwardLimit(
-                            feedForward,
-                            currentPidSetpoint,
-                            feedforwardMaxRateLimit) :
-                    feedForward;
+                m_data[2].F = feedForward;
             } else {
-                m_data[axis].F = 0;
+                m_data[2].F = 0;
             }
 
             // calculating the PID sum
             const auto pidSum =
-                m_data[axis].P +
-                m_data[axis].I +
-                m_data[axis].D +
-                m_data[axis].F;
+                m_data[2].P +
+                m_data[2].I +
+                m_data[2].D +
+                m_data[2].F;
             if (USE_INTEGRATED_YAW) {
-                m_data[axis].Sum += pidSum * Clock::DT() * 100.0f;
-                m_data[axis].Sum -= m_data[axis].Sum *
+                m_data[2].Sum += pidSum * Clock::DT() * 100.0f;
+                m_data[2].Sum -= m_data[2].Sum *
                     INTEGRATED_YAW_RELAX / 100000.0f * Clock::DT() /
                     0.000125f;
             } else {
-                m_data[axis].Sum = pidSum;
+                m_data[2].Sum = pidSum;
             }
         }
 
@@ -586,14 +576,6 @@ class AnglePidController : public PidController {
                 const VehicleState & vstate,
                 const bool reset) -> Demands override
         {
-            // gradually scale back integration when above windup point
-            auto dynCi = Clock::DT();
-            const auto itermWindupPointInv =
-                1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
-            if (itermWindupPointInv > 1.0f) {
-                dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
-            }
-
             // Precalculate gyro deta for D-term here, this allows loop unrolling
             auto dtermX = initDterm(vstate.dphi, 0);
             auto dtermY = initDterm(vstate.dtheta, 1);
@@ -602,7 +584,7 @@ class AnglePidController : public PidController {
             // ----------PID controller----------
             updateCyclic(demands.roll,  vstate.phi,   vstate.dphi,   dtermX, 0);
             updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, dtermY, 1);
-            updateYaw(demands.yaw, vstate.dpsi, dtermZ, dynCi, 2);
+            updateYaw(demands.yaw, vstate.dpsi, dtermZ);
 
             // Disable PID control if at zero throttle or if gyro overflow
             // detected This may look very innefficient, but it is done on
