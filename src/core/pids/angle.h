@@ -138,20 +138,18 @@ class AnglePidController : public PidController {
             Pt2Filter(D_MIN_RANGE_HZ),
         };
 
+        Pt1Filter  m_windupLpf[2] = {
+            Pt1Filter(ITERM_RELAX_CUTOFF),
+            Pt1Filter(ITERM_RELAX_CUTOFF),
+        };
+
         axisCorrection_t m_correction[3];
 
         float m_previousSetpointCorrection[3];
         float m_previousSetpoint[3];
 
-        Pt1Filter  m_windupLpf[3] = {
-            Pt1Filter(ITERM_RELAX_CUTOFF),
-            Pt1Filter(ITERM_RELAX_CUTOFF),
-            Pt1Filter(ITERM_RELAX_CUTOFF)
-        };
-
         typedef struct {
 
-            Pt1Filter  windupLpf = Pt1Filter(ITERM_RELAX_CUTOFF); 
             float      previousSetpointCorrection;
             float      previousSetpoint;
             float      P;
@@ -167,6 +165,7 @@ class AnglePidController : public PidController {
             Pt1Filter dtermLpf2 = Pt1Filter(DTERM_LPF2_HZ);
             Pt2Filter dMinLpf = Pt2Filter(D_MIN_LOWPASS_HZ);
             Pt2Filter dMinRange = Pt2Filter(D_MIN_RANGE_HZ);
+            Pt1Filter windupLpf = Pt1Filter(ITERM_RELAX_CUTOFF); 
             float     previousDterm;
             float     D;
 
