@@ -33,8 +33,8 @@ class FixedPitchMixer {
         static void fun(
                 const Demands & demands,
                 const uint8_t motorCount,
-                const axes_t * spins,
-                float * motorvals)
+                const axes_t spins[],
+                float motorvals[])
         {
             float mix[MAX_SUPPORTED_MOTORS];
 
