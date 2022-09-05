@@ -111,7 +111,6 @@ class AnglePidController : public PidController {
 
             float previousSetpointCorrection;
             float previousSetpoint;
-            float P;
             float I;
             float F;
 
@@ -266,6 +265,29 @@ class AnglePidController : public PidController {
                 currentSetpoint;
         }
 
+        float computeFeedforward(
+                const float currentPidSetpoint,
+                const float feedforwardMaxRate,
+                const float demandDelta)
+        {
+            // halve feedforward in Level mode since stick sensitivity is
+            // weaker by about half transition now calculated in
+            // feedforward.c when new RC data arrives 
+            const auto feedForward = m_k_rate_f * demandDelta * FREQUENCY();
+
+            const auto feedforwardMaxRateLimit =
+                feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
+
+            const bool shouldApplyFeedforwardLimits = feedforwardMaxRateLimit != 0;
+
+            return shouldApplyFeedforwardLimits ?
+                applyFeedforwardLimit(
+                        feedForward,
+                        currentPidSetpoint,
+                        feedforwardMaxRateLimit) :
+                feedForward;
+        }
+
         float updateCyclic(
                 const float demand,
                 const float angle,
@@ -305,7 +327,7 @@ class AnglePidController : public PidController {
                 currentPidSetpoint - uncorrectedSetpoint;
 
             // -----calculate P component
-            axis->P = m_k_rate_p * errorRate;
+            const auto P = m_k_rate_p * errorRate;
 
             // -----calculate I component
             // if launch control is active override the iterm gains and apply
@@ -315,14 +337,14 @@ class AnglePidController : public PidController {
             auto axisDynCi = Clock::DT(); // check windup for yaw only
 
             axis->I = constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
-                        -ITERM_LIMIT, ITERM_LIMIT);
+                    -ITERM_LIMIT, ITERM_LIMIT);
 
             // -----calculate demandDelta
             auto demandDelta = 0.0f;
             auto feedforwardMaxRate = applyRates(1, 1);
 
             // -----calculate D component
-            if ((m_k_rate_d > 0)) {
+            if (m_k_rate_d > 0) {
 
                 // Divide rate change by dT to get differential (ie dr/dt).
                 // dT is fixed and calculated from the target PID loop time
@@ -377,31 +399,17 @@ class AnglePidController : public PidController {
             demandDelta += setpointCorrection - axis->previousSetpointCorrection;
             axis->previousSetpointCorrection = setpointCorrection;
 
+            const auto F =
+                m_k_rate_f > 0 ?
+                computeFeedforward(
+                        currentPidSetpoint, feedforwardMaxRate, demandDelta) :
+                0;
+
             // no feedforward in launch control
-            auto feedforwardGain = m_k_rate_f;
-            if (feedforwardGain > 0) {
-                // halve feedforward in Level mode since stick sensitivity is
-                // weaker by about half transition now calculated in
-                // feedforward.c when new RC data arrives 
-                auto feedForward =
-                    feedforwardGain * demandDelta * FREQUENCY();
+            if (m_k_rate_f > 0) {
+            } 
 
-                auto feedforwardMaxRateLimit =
-                    feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
-
-                bool shouldApplyFeedforwardLimits = feedforwardMaxRateLimit != 0;
-
-                axis->F = shouldApplyFeedforwardLimits ?
-                    applyFeedforwardLimit(
-                            feedForward,
-                            currentPidSetpoint,
-                            feedforwardMaxRateLimit) :
-                    feedForward;
-            } else {
-                axis->F = 0;
-            }
-
-            return axis->P + axis->I + cyclicAxis->D + axis->F;
+            return P + axis->I + cyclicAxis->D + F;
         }
 
         float updateYaw(const float demand, const float angvel)
@@ -441,8 +449,7 @@ class AnglePidController : public PidController {
             // tuned (amount derivative on measurement or error).
 
             // -----calculate P component
-            m_yaw.P = m_k_rate_p * errorRate;
-            m_yaw.P = m_ptermYawLpf.apply(m_yaw.P);
+            const auto P = m_ptermYawLpf.apply(m_k_rate_p * errorRate);
 
             // -----calculate I component
             // if launch control is active override the iterm gains and apply
@@ -465,17 +472,8 @@ class AnglePidController : public PidController {
 
             // no feedforward in launch control
             auto feedforwardGain = m_k_rate_f;
-            if (feedforwardGain > 0) {
-                // halve feedforward in Level mode since stick sensitivity is
-                // weaker by about half transition now calculated in
-                // feedforward.c when new RC data arrives 
-                auto feedForward = feedforwardGain * demandDelta * FREQUENCY();
-                m_yaw.F = feedForward;
-            } else {
-                m_yaw.F = 0;
-            }
 
-            return m_yaw.P + m_yaw.I + m_yaw.F;
+            return P + m_yaw.I + feedforwardGain * demandDelta * FREQUENCY();
         }
 
     public:
