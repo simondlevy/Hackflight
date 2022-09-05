@@ -151,7 +151,7 @@ class AnglePidController : public PidController {
         float         m_sum;
         uint32_t      m_lastDynLpfUpdateUs;
         float         m_previousSetpointCorrection[3];
-        float         m_previousGyroRateDterm[3];
+        float         m_previousDterm[3];
         float         m_previousSetpoint[3];
 
         Pt1Filter m_ptermYawLpf = Pt1Filter(YAW_LOWPASS_HZ);
@@ -284,18 +284,16 @@ class AnglePidController : public PidController {
                 currentSetpoint;
         }
 
-        void initGyroRateDterm(float gyroRate, float dterm[], uint8_t axis)
+        float initDterm(float angvel, uint8_t axis)
         {
-            dterm[axis] = gyroRate;
-            dterm[axis] = m_dtermLpf1[axis].apply(dterm[axis]);
-            dterm[axis] = m_dtermLpf2[axis].apply(dterm[axis]);
+            return m_dtermLpf2[axis].apply(m_dtermLpf1[axis].apply(angvel));
         }
 
         void runAxis(
                 float demand,
                 float angle,
                 float angvel,
-                float dterm[],
+                float dterm,
                 float dynCi,
                 uint8_t axis)
         {
@@ -366,8 +364,7 @@ class AnglePidController : public PidController {
                 // This is done to avoid DTerm spikes that occur with
                 // dynamically calculated deltaT whenever another task causes
                 // the PID loop execution to be delayed.
-                const float delta = -(dterm[axis] -
-                        m_previousGyroRateDterm[axis]) * FREQUENCY();
+                const float delta = -(dterm - m_previousDterm[axis]) * FREQUENCY();
 
                 float preTpaD = m_k_rate_d * delta;
 
@@ -408,7 +405,7 @@ class AnglePidController : public PidController {
                 m_data[axis].D = 0;
             }
 
-            m_previousGyroRateDterm[axis] = dterm[axis];
+            m_previousDterm[axis] = dterm;
 
             // -----calculate feedforward component
             // include abs control correction in feedforward
@@ -504,17 +501,15 @@ class AnglePidController : public PidController {
                 dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
             }
 
-            float dterm[3] = {};
-
             // Precalculate gyro deta for D-term here, this allows loop unrolling
-            initGyroRateDterm(vstate.dphi,   dterm, 0);
-            initGyroRateDterm(vstate.dtheta, dterm, 1);
-            initGyroRateDterm(vstate.dpsi,   dterm, 2);
+            auto dtermX = initDterm(vstate.dphi, 0);
+            auto dtermY = initDterm(vstate.dtheta, 1);
+            auto dtermZ = initDterm(vstate.dpsi, 2);
 
             // ----------PID controller----------
-            runAxis(demands.roll,  vstate.phi,   vstate.dphi,   dterm, dynCi, 0);
-            runAxis(demands.pitch, vstate.theta, vstate.dtheta, dterm, dynCi, 1);
-            runAxis(demands.yaw,   vstate.psi,   vstate.dpsi,   dterm, dynCi, 2);
+            runAxis(demands.roll,  vstate.phi,   vstate.dphi,   dtermX, dynCi, 0);
+            runAxis(demands.pitch, vstate.theta, vstate.dtheta, dtermY, dynCi, 1);
+            runAxis(demands.yaw,   vstate.psi,   vstate.dpsi,   dtermZ, dynCi, 2);
 
             // Disable PID control if at zero throttle or if gyro overflow
             // detected This may look very innefficient, but it is done on
