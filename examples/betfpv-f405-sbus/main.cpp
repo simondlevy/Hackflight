@@ -55,7 +55,7 @@ int main(void)
 
     static Mixer mixer = QuadXbfMixer::make();
 
-    static DshotBitbangEsc esc(&motorPins);
+    static DshotBitbangEsc esc(motorPins);
 
     static Stm32F4Led led(37); // pin
 

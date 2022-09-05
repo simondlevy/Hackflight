@@ -32,9 +32,9 @@ class Esc {
 
         vector<uint8_t> * m_pins;
 
-        Esc(vector<uint8_t> * pins)
+        Esc(vector<uint8_t> & pins)
         {
-            m_pins = pins;
+            m_pins = &pins;
         }
 
     public:

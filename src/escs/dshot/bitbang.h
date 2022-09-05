@@ -528,7 +528,7 @@ class DshotBitbangEsc : public DshotEsc {
 
     public:
 
-        DshotBitbangEsc(vector<uint8_t> * pins, protocol_t protocol=DSHOT600) 
+        DshotBitbangEsc(vector<uint8_t> & pins, protocol_t protocol=DSHOT600) 
             : DshotEsc(pins, protocol)
         {
         }

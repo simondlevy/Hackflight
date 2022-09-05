@@ -247,15 +247,15 @@ class DshotEsc : public Esc {
         virtual bool updateStart(void) = 0;
         virtual void write(uint8_t index, float value) = 0;
 
-        DshotEsc(vector<uint8_t> * pins, protocol_t protocol=DSHOT600) 
+        DshotEsc(vector<uint8_t> & pins, protocol_t protocol=DSHOT600) 
             : Esc(pins)
         {
             m_protocol = protocol;
 
-            m_motorCount = pins->size();
+            m_motorCount = pins.size();
 
             for (auto i=0; i<m_motorCount; ++i) {
-                m_motorPins[i] = (*pins)[i];
+                m_motorPins[i] = pins[i];
             }
         }
 
