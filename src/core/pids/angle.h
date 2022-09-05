@@ -283,18 +283,14 @@ class AnglePidController : public PidController {
                 currentSetpoint;
         }
 
-        float initDterm(float angvel, uint8_t axis)
-        {
-            return m_dtermLpf2[axis].apply(m_dtermLpf1[axis].apply(angvel));
-        }
-
         void updateCyclic(
                 const float demand,
                 const float angle,
                 const float angvel,
-                const float dterm,
                 const uint8_t axis)
         {
+            auto dterm = m_dtermLpf2[axis].apply(m_dtermLpf1[axis].apply(angvel));
+
             auto currentPidSetpoint = demand;
 
             auto maxVelocity = MAX_VELOCITY_CYCLIC();
@@ -573,13 +569,9 @@ class AnglePidController : public PidController {
                 const VehicleState & vstate,
                 const bool reset) -> Demands override
         {
-            // Precalculate gyro deta for D-term here, this allows loop unrolling
-            auto dtermX = initDterm(vstate.dphi, 0);
-            auto dtermY = initDterm(vstate.dtheta, 1);
-
             // ----------PID controller----------
-            updateCyclic(demands.roll,  vstate.phi,   vstate.dphi,   dtermX, 0);
-            updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, dtermY, 1);
+            updateCyclic(demands.roll,  vstate.phi,   vstate.dphi,   0);
+            updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, 1);
             updateYaw(demands.yaw, vstate.dpsi);
 
             // Disable PID control if at zero throttle or if gyro overflow
