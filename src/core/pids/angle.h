@@ -164,13 +164,12 @@ class AnglePidController : public PidController {
         }
 
         float applyItermRelax(
-                cyclicAxis_t * cyclicAxis,
+                cyclicAxis_t & cyclicAxis,
                 const float iterm,
                 const float currentSetpoint,
                 const float itermErrorRate)
         {
-            const float
-                setpointLpf = cyclicAxis->windupLpf.apply(currentSetpoint);
+            const float setpointLpf = cyclicAxis.windupLpf.apply(currentSetpoint);
 
             const float setpointHpf = fabsf(currentSetpoint - setpointLpf);
 
@@ -194,9 +193,9 @@ class AnglePidController : public PidController {
             return (dynLpfMax - dynLpfMin) * curve + dynLpfMin;
         }
 
-        static void initLpf1(cyclicAxis_t * cyclicAxis, const float cutoffFreq)
+        static void initLpf1(cyclicAxis_t & cyclicAxis, const float cutoffFreq)
         {
-            cyclicAxis->dtermLpf1.computeGain(cutoffFreq);
+            cyclicAxis.dtermLpf1.computeGain(cutoffFreq);
         }
 
         void pidDynLpfDTermUpdate(const float throttle)
@@ -207,8 +206,8 @@ class AnglePidController : public PidController {
                 dynLpfCutoffFreq(throttle, dyn_lpf_min, dyn_lpf_max,
                         DYN_LPF_CURVE_EXPO);
 
-            initLpf1(&m_roll, cutoffFreq);
-            initLpf1(&m_pitch, cutoffFreq);
+            initLpf1(m_roll, cutoffFreq);
+            initLpf1(m_pitch, cutoffFreq);
         }
 
         float levelPid(const float currentSetpoint, const float currentAngle)
@@ -248,7 +247,7 @@ class AnglePidController : public PidController {
         }
 
         float computeDMinFactor(
-                cyclicAxis_t * cyclicAxis,
+                cyclicAxis_t & cyclicAxis,
                 const float dMinPercent,
                 const float demandDelta,
                 const float delta)
@@ -257,7 +256,7 @@ class AnglePidController : public PidController {
                 D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
 
             const auto dMinGyroFactor = 
-                fabsf(cyclicAxis->dMinRange.apply(delta)) * d_min_gyro_gain;
+                fabsf(cyclicAxis.dMinRange.apply(delta)) * d_min_gyro_gain;
 
             const auto d_min_setpoint_gain =
                 D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
@@ -270,13 +269,13 @@ class AnglePidController : public PidController {
             const auto dMinFactor = dMinPercent + (1.0f - dMinPercent) *
                 fmaxf(dMinGyroFactor, dMinSetpointFactor);
 
-            const auto dMinFactorFiltered = cyclicAxis->dMinLpf.apply(dMinFactor);
+            const auto dMinFactorFiltered = cyclicAxis.dMinLpf.apply(dMinFactor);
 
             return fminf(dMinFactorFiltered, 1.0f);
         }
 
         float computeDerivative(
-                cyclicAxis_t * cyclicAxis,
+                cyclicAxis_t & cyclicAxis,
                 const float demandDelta,
                 const float dterm)
         {
@@ -285,7 +284,7 @@ class AnglePidController : public PidController {
             // This is done to avoid DTerm spikes that occur with
             // dynamically calculated deltaT whenever another task causes
             // the PID loop execution to be delayed.
-            const float delta = -(dterm - cyclicAxis->previousDterm) * FREQUENCY();
+            const float delta = -(dterm - cyclicAxis.previousDterm) * FREQUENCY();
 
             const auto preTpaD = m_k_rate_d * delta;
 
@@ -307,11 +306,11 @@ class AnglePidController : public PidController {
                 const float demand,
                 const float angle,
                 const float angvel,
-                cyclicAxis_t * cyclicAxis)
+                cyclicAxis_t & cyclicAxis)
         {
             const auto maxVelocity = MAX_VELOCITY_CYCLIC();
 
-            axis_t * axis = &cyclicAxis->axis;
+            axis_t * axis = &cyclicAxis.axis;
 
             const auto currentSetpoint = 
                 maxVelocity ?
@@ -333,18 +332,19 @@ class AnglePidController : public PidController {
             const auto P = m_k_rate_p * errorRate;
 
             // -----calculate I component
-            axis->I = constrain_f(axis->I + (m_k_rate_i * Clock::DT()) * itermErrorRate,
-                    -ITERM_LIMIT, ITERM_LIMIT);
+            axis->I =
+                constrain_f(axis->I + (m_k_rate_i * Clock::DT()) * itermErrorRate,
+                    -ITERM_LIMIT, +ITERM_LIMIT);
 
             // -----calculate D component
             const auto dterm =
-                cyclicAxis->dtermLpf2.apply(cyclicAxis->dtermLpf1.apply(angvel));
+                cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
             const auto D =
                 m_k_rate_d > 0 ?
                 computeDerivative(cyclicAxis, 0, dterm) :
                 0;
 
-            cyclicAxis->previousDterm = dterm;
+            cyclicAxis.previousDterm = dterm;
 
             // -----calculate feedforward component
             const auto F =
@@ -427,10 +427,10 @@ class AnglePidController : public PidController {
                 const bool reset) -> Demands override
         {
             const auto roll=
-                updateCyclic(demands.roll, vstate.phi, vstate.dphi, &m_roll);
+                updateCyclic(demands.roll, vstate.phi, vstate.dphi, m_roll);
 
             const auto pitch =
-                updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, &m_pitch);
+                updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, m_pitch);
 
             const auto yaw = updateYaw(demands.yaw, vstate.dpsi);
 
