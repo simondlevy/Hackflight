@@ -289,7 +289,172 @@ class AnglePidController : public PidController {
             return m_dtermLpf2[axis].apply(m_dtermLpf1[axis].apply(angvel));
         }
 
-        void runAxis(
+        void updateCyclic(
+                const float demand,
+                const float angle,
+                const float angvel,
+                const float dterm,
+                const float dynCi,
+                const uint8_t axis)
+        {
+            auto currentPidSetpoint = demand;
+
+            auto maxVelocity =
+                axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
+            if (maxVelocity) {
+                currentPidSetpoint =
+                    accelerationLimit(axis, currentPidSetpoint);
+            }
+
+            if (axis != 2) {
+                currentPidSetpoint = levelPid(currentPidSetpoint, angle);
+            }
+
+            // Handle yaw spin recovery - zero the setpoint on yaw to aid in
+            // recovery It's not necessary to zero the set points for R/P
+            // because the PIDs will be zeroed below
+
+            // -----calculate error rate
+            auto errorRate = currentPidSetpoint - angvel; // r - y
+            const auto previousIterm = m_data[axis].I;
+            auto itermErrorRate = errorRate;
+            auto uncorrectedSetpoint = currentPidSetpoint;
+
+            applyItermRelax(axis, previousIterm, &itermErrorRate,
+                    &currentPidSetpoint);
+            errorRate = currentPidSetpoint - angvel;
+            float setpointCorrection =
+                currentPidSetpoint - uncorrectedSetpoint;
+
+            // --------low-level gyro-based PID based on 2DOF PID controller.
+            // ---------- 2-DOF PID controller with optional filter on
+            // derivative term.  b = 1 and only c (feedforward weight) can be
+            // tuned (amount derivative on measurement or error).
+
+            // -----calculate P component
+            m_data[axis].P = m_k_rate_p * errorRate;
+            if (axis == 2) {
+                m_data[axis].P = m_ptermYawLpf.apply(m_data[axis].P);
+            }
+
+            // -----calculate I component
+            // if launch control is active override the iterm gains and apply
+            // iterm windup protection to all axes
+            auto Ki =
+                m_k_rate_i * ((axis == 2 && !USE_INTEGRATED_YAW) ?
+                        2.5 :
+                        1);
+
+            auto axisDynCi = // check windup for yaw only
+                (axis == 2) ? dynCi : Clock::DT(); 
+
+            m_data[axis].I =
+                constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
+                        -ITERM_LIMIT, ITERM_LIMIT);
+
+            // -----calculate demandDelta
+            auto demandDelta = 0.0f;
+            auto feedforwardMaxRate = applyRates(1, 1);
+
+            // -----calculate D component
+            if ((axis < 2 && m_k_rate_d > 0)) {
+
+                // Divide rate change by dT to get differential (ie dr/dt).
+                // dT is fixed and calculated from the target PID loop time
+                // This is done to avoid DTerm spikes that occur with
+                // dynamically calculated deltaT whenever another task causes
+                // the PID loop execution to be delayed.
+                const float delta = -(dterm - m_previousDterm[axis]) * FREQUENCY();
+
+                float preTpaD = m_k_rate_d * delta;
+
+                auto dMinFactor = 1.0f;
+
+                auto dMinPercent = axis == 2 ?
+                    0.0f :
+                    D_MIN > 0 && D_MIN < m_k_rate_d ?
+                    D_MIN / m_k_rate_d :
+                    0.0f;
+
+                if (dMinPercent > 0) {
+                    const auto d_min_gyro_gain =
+                        D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
+                    auto dMinGyroFactor = m_dMinRange[axis].apply(delta);
+                    dMinGyroFactor = fabsf(dMinGyroFactor) * d_min_gyro_gain;
+                    const auto d_min_setpoint_gain =
+                        D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
+                        D_MIN_ADVANCE * FREQUENCY() /
+                        (100 * D_MIN_LOWPASS_HZ);
+                    const auto dMinSetpointFactor =
+                        (fabsf(demandDelta)) * d_min_setpoint_gain;
+                    dMinFactor = fmaxf(dMinGyroFactor, dMinSetpointFactor);
+                    dMinFactor =
+                        dMinPercent + (1.0f - dMinPercent) * dMinFactor;
+                    dMinFactor = m_dMinLpf[axis].apply(dMinFactor);
+                    dMinFactor = fminf(dMinFactor, 1.0f);
+                }
+
+                // Apply the dMinFactor
+                preTpaD *= dMinFactor;
+                m_data[axis].D = preTpaD;
+
+                // Log the value of D pre application of TPA
+                preTpaD *= D_LPF_FILT_SCALE;
+
+            } else {
+                m_data[axis].D = 0;
+            }
+
+            m_previousDterm[axis] = dterm;
+
+            // -----calculate feedforward component
+            // include abs control correction in feedforward
+            demandDelta += setpointCorrection -
+                m_previousSetpointCorrection[axis];
+            m_previousSetpointCorrection[axis] = setpointCorrection;
+
+            // no feedforward in launch control
+            auto feedforwardGain = m_k_rate_f;
+            if (feedforwardGain > 0) {
+                // halve feedforward in Level mode since stick sensitivity is
+                // weaker by about half transition now calculated in
+                // feedforward.c when new RC data arrives 
+                auto feedForward =
+                    feedforwardGain * demandDelta * FREQUENCY();
+
+                auto feedforwardMaxRateLimit =
+                    feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
+
+                bool shouldApplyFeedforwardLimits =
+                    feedforwardMaxRateLimit != 0.0f && axis < 2;
+
+                m_data[axis].F = shouldApplyFeedforwardLimits ?
+                    applyFeedforwardLimit(
+                            feedForward,
+                            currentPidSetpoint,
+                            feedforwardMaxRateLimit) :
+                    feedForward;
+            } else {
+                m_data[axis].F = 0;
+            }
+
+            // calculating the PID sum
+            const auto pidSum =
+                m_data[axis].P +
+                m_data[axis].I +
+                m_data[axis].D +
+                m_data[axis].F;
+            if (axis == 2 && USE_INTEGRATED_YAW) {
+                m_data[axis].Sum += pidSum * Clock::DT() * 100.0f;
+                m_data[axis].Sum -= m_data[axis].Sum *
+                    INTEGRATED_YAW_RELAX / 100000.0f * Clock::DT() /
+                    0.000125f;
+            } else {
+                m_data[axis].Sum = pidSum;
+            }
+        }
+
+        void updateYaw(
                 const float demand,
                 const float angle,
                 const float angvel,
@@ -507,9 +672,9 @@ class AnglePidController : public PidController {
             auto dtermZ = initDterm(vstate.dpsi, 2);
 
             // ----------PID controller----------
-            runAxis(demands.roll,  vstate.phi,   vstate.dphi,   dtermX, dynCi, 0);
-            runAxis(demands.pitch, vstate.theta, vstate.dtheta, dtermY, dynCi, 1);
-            runAxis(demands.yaw,   vstate.psi,   vstate.dpsi,   dtermZ, dynCi, 2);
+            updateCyclic(demands.roll,  vstate.phi,   vstate.dphi,   dtermX, dynCi, 0);
+            updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, dtermY, dynCi, 1);
+            updateYaw(demands.yaw,   vstate.psi,   vstate.dpsi,   dtermZ, dynCi, 2);
 
             // Disable PID control if at zero throttle or if gyro overflow
             // detected This may look very innefficient, but it is done on
