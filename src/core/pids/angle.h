@@ -207,13 +207,13 @@ class AnglePidController : public PidController {
             return value;
         }
 
-        float accelerationLimit(const uint8_t axis, float currentPidSetpoint)
+        float accelerationLimit(
+                const uint8_t axis,
+                float currentPidSetpoint,
+                const float maxVelocity)
         {
             const float currentVelocity =
                 currentPidSetpoint - m_previousSetpoint[axis];
-
-            float maxVelocity =
-                axis == 2 ? MAX_VELOCITY_YAW() : MAX_VELOCITY_CYCLIC();
 
             if (fabsf(currentVelocity) > maxVelocity) {
                 currentPidSetpoint = (currentVelocity > 0) ?
@@ -324,7 +324,7 @@ class AnglePidController : public PidController {
 
             if (maxVelocity) {
                 currentPidSetpoint =
-                    accelerationLimit(axis, currentPidSetpoint);
+                    accelerationLimit(axis, currentPidSetpoint, maxVelocity);
             }
 
             currentPidSetpoint = levelPid(currentPidSetpoint, angle);
@@ -475,7 +475,7 @@ class AnglePidController : public PidController {
 
             if (maxVelocity) {
                 currentPidSetpoint =
-                    accelerationLimit(2, currentPidSetpoint);
+                    accelerationLimit(2, currentPidSetpoint, maxVelocity);
             }
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
