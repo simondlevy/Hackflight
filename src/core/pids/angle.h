@@ -69,10 +69,6 @@ class AnglePidController : public PidController {
         static const uint8_t FEEDFORWARD_MAX_RATE_LIMIT = 90;
         static const uint8_t DYN_LPF_CURVE_EXPO = 5;
 
-        // Scale factors to make best use of range with D_LPF debugging, aiming
-        // for max +/-16K as debug values are 16 bit
-        static constexpr float D_LPF_FILT_SCALE = 22;
-
         // PT2 lowpass input cutoff to peak D around propwash frequencies
         static constexpr float D_MIN_RANGE_HZ   = 85;  
 
@@ -124,7 +120,6 @@ class AnglePidController : public PidController {
             Pt2Filter dMinRange = Pt2Filter(D_MIN_RANGE_HZ);
             Pt1Filter windupLpf = Pt1Filter(ITERM_RELAX_CUTOFF); 
             float     previousDterm;
-            float     D;
 
         } cyclicAxis_t;
 
@@ -287,6 +282,62 @@ class AnglePidController : public PidController {
                 feedForward;
         }
 
+        float computeDMinFactor(
+                cyclicAxis_t * cyclicAxis,
+                const float dMinPercent,
+                const float demandDelta,
+                const float delta)
+        {
+            const auto d_min_gyro_gain =
+                D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
+
+            const auto dMinGyroFactor = 
+                fabsf(cyclicAxis->dMinRange.apply(delta)) * d_min_gyro_gain;
+
+            const auto d_min_setpoint_gain =
+                D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
+                D_MIN_ADVANCE * FREQUENCY() /
+                (100 * D_MIN_LOWPASS_HZ);
+
+            const auto dMinSetpointFactor =
+                (fabsf(demandDelta)) * d_min_setpoint_gain;
+
+            const auto dMinFactor = dMinPercent + (1.0f - dMinPercent) *
+                fmaxf(dMinGyroFactor, dMinSetpointFactor);
+
+            const auto dMinFactorFiltered = cyclicAxis->dMinLpf.apply(dMinFactor);
+
+            return fminf(dMinFactorFiltered, 1.0f);
+        }
+
+        float computeDerivative(
+                cyclicAxis_t * cyclicAxis,
+                const float demandDelta,
+                const float dterm)
+        {
+            // Divide rate change by dT to get differential (ie dr/dt).
+            // dT is fixed and calculated from the target PID loop time
+            // This is done to avoid DTerm spikes that occur with
+            // dynamically calculated deltaT whenever another task causes
+            // the PID loop execution to be delayed.
+            const float delta = -(dterm - cyclicAxis->previousDterm) * FREQUENCY();
+
+            const auto preTpaD = m_k_rate_d * delta;
+
+            const auto dMinPercent = 
+                D_MIN > 0 && D_MIN < m_k_rate_d ?
+                D_MIN / m_k_rate_d :
+                0.0f;
+
+            const auto dMinFactor =
+                dMinPercent > 0 ?
+                computeDMinFactor(cyclicAxis, dMinPercent, demandDelta, delta) :
+                1.0f;
+
+            // Apply the dMinFactor
+            return preTpaD * dMinFactor;
+        }
+
         float updateCyclic(
                 const float demand,
                 const float angle,
@@ -343,53 +394,9 @@ class AnglePidController : public PidController {
             auto feedforwardMaxRate = applyRates(1, 1);
 
             // -----calculate D component
-            if (m_k_rate_d > 0) {
-
-                // Divide rate change by dT to get differential (ie dr/dt).
-                // dT is fixed and calculated from the target PID loop time
-                // This is done to avoid DTerm spikes that occur with
-                // dynamically calculated deltaT whenever another task causes
-                // the PID loop execution to be delayed.
-                const float delta =
-                    -(dterm - cyclicAxis->previousDterm) * FREQUENCY();
-
-                float preTpaD = m_k_rate_d * delta;
-
-                auto dMinFactor = 1.0f;
-
-                auto dMinPercent = 
-                    D_MIN > 0 && D_MIN < m_k_rate_d ?
-                    D_MIN / m_k_rate_d :
-                    0.0f;
-
-                if (dMinPercent > 0) {
-                    const auto d_min_gyro_gain =
-                        D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
-                    auto dMinGyroFactor = cyclicAxis->dMinRange.apply(delta);
-                    dMinGyroFactor = fabsf(dMinGyroFactor) * d_min_gyro_gain;
-                    const auto d_min_setpoint_gain =
-                        D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
-                        D_MIN_ADVANCE * FREQUENCY() /
-                        (100 * D_MIN_LOWPASS_HZ);
-                    const auto dMinSetpointFactor =
-                        (fabsf(demandDelta)) * d_min_setpoint_gain;
-                    dMinFactor = fmaxf(dMinGyroFactor, dMinSetpointFactor);
-                    dMinFactor =
-                        dMinPercent + (1.0f - dMinPercent) * dMinFactor;
-                    dMinFactor = cyclicAxis->dMinLpf.apply(dMinFactor);
-                    dMinFactor = fminf(dMinFactor, 1.0f);
-                }
-
-                // Apply the dMinFactor
-                preTpaD *= dMinFactor;
-                cyclicAxis->D = preTpaD;
-
-                // Log the value of D pre application of TPA
-                preTpaD *= D_LPF_FILT_SCALE;
-
-            } else {
-                cyclicAxis->D = 0;
-            }
+            auto D = m_k_rate_d > 0 ?
+                computeDerivative(cyclicAxis, demandDelta, dterm) :
+                0;
 
             cyclicAxis->previousDterm = dterm;
 
@@ -404,11 +411,7 @@ class AnglePidController : public PidController {
                         currentPidSetpoint, feedforwardMaxRate, demandDelta) :
                 0;
 
-            // no feedforward in launch control
-            if (m_k_rate_f > 0) {
-            } 
-
-            return P + axis->I + cyclicAxis->D + F;
+            return P + axis->I + D + F;
         }
 
         float updateYaw(const float demand, const float angvel)
