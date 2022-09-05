@@ -172,7 +172,9 @@ class AnglePidController : public PidController {
 
         } cyclicAxis_t;
 
-        axis_t m_yaw;
+        cyclicAxis_t m_roll;
+        cyclicAxis_t m_pitch;
+        axis_t       m_yaw;
 
         int32_t       m_dynLpfPreviousQuantizedThrottle;  
         bool          m_feedforwardLpfInitialized;
