@@ -161,8 +161,7 @@ class AnglePidController : public PidController {
                 float currentSetpoint,
                 const float maxVelocity)
         {
-            const float currentVelocity =
-                currentSetpoint - axis->previousSetpoint;
+            const float currentVelocity = currentSetpoint - axis->previousSetpoint;
 
             if (fabsf(currentVelocity) > maxVelocity) {
                 currentSetpoint = (currentVelocity > 0) ?
@@ -342,71 +341,51 @@ class AnglePidController : public PidController {
                 const float angvel,
                 cyclicAxis_t * cyclicAxis)
         {
-            auto dterm =
-                cyclicAxis->dtermLpf2.apply(cyclicAxis->dtermLpf1.apply(angvel));
-
-            auto currentSetpoint = demand;
-
-            auto maxVelocity = MAX_VELOCITY_CYCLIC();
+            const auto maxVelocity = MAX_VELOCITY_CYCLIC();
 
             axis_t * axis = &cyclicAxis->axis;
 
-            if (maxVelocity) {
-                currentSetpoint =
-                    accelerationLimit(axis, currentSetpoint, maxVelocity);
-            }
+            const auto currentSetpoint = 
+                maxVelocity ?
+                accelerationLimit(axis, demand, maxVelocity) :
+                demand;
 
-            currentSetpoint = levelPid(currentSetpoint, angle);
+            const auto newSetpoint = levelPid(currentSetpoint, angle);
 
             // -----calculate error rate
-            auto errorRate = currentSetpoint - angvel;
-            const auto previousIterm = axis->I;
-            auto itermErrorRate = errorRate;
-            auto uncorrectedSetpoint = currentSetpoint;
+            const auto errorRate = newSetpoint - angvel;
 
-            itermErrorRate = applyItermRelax(
+            const auto itermErrorRate = applyItermRelax(
                     cyclicAxis,
-                    previousIterm,
-                    currentSetpoint,
-                    itermErrorRate);
-
-            errorRate = currentSetpoint - angvel;
-            float setpointCorrection =
-                currentSetpoint - uncorrectedSetpoint;
+                    axis->I,
+                    newSetpoint,
+                    errorRate);
 
             // -----calculate P component
             const auto P = m_k_rate_p * errorRate;
 
             // -----calculate I component
-            // if launch control is active override the iterm gains and apply
-            // iterm windup protection to all axes
-            auto Ki = m_k_rate_i; 
-
-            auto axisDynCi = Clock::DT(); // check windup for yaw only
-
-            axis->I = constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
+            axis->I = constrain_f(axis->I + (m_k_rate_i * Clock::DT()) * itermErrorRate,
                     -ITERM_LIMIT, ITERM_LIMIT);
 
-            // -----calculate demandDelta
-            auto demandDelta = 0.0f;
-            auto feedforwardMaxRate = applyRates(1, 1);
-
             // -----calculate D component
-            auto D = m_k_rate_d > 0 ?
-                computeDerivative(cyclicAxis, demandDelta, dterm) :
+            const auto dterm =
+                cyclicAxis->dtermLpf2.apply(cyclicAxis->dtermLpf1.apply(angvel));
+            const auto D =
+                m_k_rate_d > 0 ?
+                computeDerivative(cyclicAxis, 0, dterm) :
                 0;
 
             cyclicAxis->previousDterm = dterm;
 
             // -----calculate feedforward component
             // include abs control correction in feedforward
-            demandDelta += setpointCorrection - axis->previousSetpointCorrection;
-            axis->previousSetpointCorrection = setpointCorrection;
+            axis->previousSetpointCorrection = 0;
 
             const auto F =
                 m_k_rate_f > 0 ?
                 computeFeedforward(
-                        currentSetpoint, feedforwardMaxRate, demandDelta) :
+                        newSetpoint, applyRates(1, 1), 0) :
                 0;
 
             return P + axis->I + D + F;
