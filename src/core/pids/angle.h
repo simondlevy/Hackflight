@@ -108,53 +108,14 @@ class AnglePidController : public PidController {
             return 1.0f / Clock::DT(); 
         }
 
-        typedef struct pidAxisData_s {
-            float P;
-            float I;
-            float D;
-            float F;
-            float Sum;
-        } axisCorrection_t;
-
-        Pt1Filter m_dtermLpf1[2] = {
-            Pt1Filter(DTERM_LPF1_DYN_MIN_HZ),
-            Pt1Filter(DTERM_LPF1_DYN_MIN_HZ),
-        };
-
-        Pt1Filter m_dtermLpf2[2] = {
-            Pt1Filter(DTERM_LPF2_HZ),
-            Pt1Filter(DTERM_LPF2_HZ),
-        };
-
-        float m_previousDterm[2];
-
-        Pt2Filter m_dMinLpf[2] = {
-            Pt2Filter(D_MIN_LOWPASS_HZ),
-            Pt2Filter(D_MIN_LOWPASS_HZ),
-        };
-
-        Pt2Filter m_dMinRange[2] = {
-            Pt2Filter(D_MIN_RANGE_HZ),
-            Pt2Filter(D_MIN_RANGE_HZ),
-        };
-
-        Pt1Filter  m_windupLpf[2] = {
-            Pt1Filter(ITERM_RELAX_CUTOFF),
-            Pt1Filter(ITERM_RELAX_CUTOFF),
-        };
-
-        axisCorrection_t m_correction[3];
-
-        float m_previousSetpointCorrection[3];
-        float m_previousSetpoint[3];
-
         typedef struct {
 
-            float      previousSetpointCorrection;
-            float      previousSetpoint;
-            float      P;
-            float      I;
-            float      F;
+            float previousSetpointCorrection;
+            float previousSetpoint;
+            float P;
+            float I;
+            float F;
+            float Sum;
 
         } axis_t;
 
@@ -207,31 +168,32 @@ class AnglePidController : public PidController {
         }
 
         float accelerationLimit(
-                const uint8_t axis,
+                axis_t * axis,
                 float currentPidSetpoint,
                 const float maxVelocity)
         {
             const float currentVelocity =
-                currentPidSetpoint - m_previousSetpoint[axis];
+                currentPidSetpoint - axis->previousSetpoint;
 
             if (fabsf(currentVelocity) > maxVelocity) {
                 currentPidSetpoint = (currentVelocity > 0) ?
-                    m_previousSetpoint[axis] + maxVelocity :
-                    m_previousSetpoint[axis] - maxVelocity;
+                    axis->previousSetpoint + maxVelocity :
+                    axis->previousSetpoint - maxVelocity;
             }
 
-            m_previousSetpoint[axis] = currentPidSetpoint;
+            axis->previousSetpoint = currentPidSetpoint;
 
             return currentPidSetpoint;
         }
 
         float applyItermRelax(
-                const int axis,
+                cyclicAxis_t * cyclicAxis,
                 const float iterm,
                 const float currentPidSetpoint,
                 const float itermErrorRate)
         {
-            const float setpointLpf = m_windupLpf[axis].apply(currentPidSetpoint);
+            const float
+                setpointLpf = cyclicAxis->windupLpf.apply(currentPidSetpoint);
 
             const float setpointHpf = fabsf(currentPidSetpoint - setpointLpf);
 
@@ -255,17 +217,21 @@ class AnglePidController : public PidController {
             return (dynLpfMax - dynLpfMin) * curve + dynLpfMin;
         }
 
+        static void initLpf1(cyclicAxis_t * cyclicAxis, const float cutoffFreq)
+        {
+            cyclicAxis->dtermLpf1.computeGain(cutoffFreq);
+        }
+
         void pidDynLpfDTermUpdate(const float throttle)
         {
             const auto dyn_lpf_min = DTERM_LPF1_DYN_MIN_HZ;
             const auto dyn_lpf_max = DTERM_LPF1_DYN_MAX_HZ;
-            auto cutoffFreq =
+            const auto cutoffFreq =
                 dynLpfCutoffFreq(throttle, dyn_lpf_min, dyn_lpf_max,
                         DYN_LPF_CURVE_EXPO);
 
-            m_dtermLpf1[0].computeGain(cutoffFreq);
-            m_dtermLpf1[1].computeGain(cutoffFreq);
-            m_dtermLpf1[2].computeGain(cutoffFreq);
+            initLpf1(&m_roll, cutoffFreq);
+            initLpf1(&m_pitch, cutoffFreq);
         }
 
         void updateDynLpfCutoffs(const uint32_t currentTimeUs, const float throttle)
@@ -306,13 +272,16 @@ class AnglePidController : public PidController {
                 const float demand,
                 const float angle,
                 const float angvel,
-                const uint8_t axis)
+                cyclicAxis_t * cyclicAxis)
         {
-            auto dterm = m_dtermLpf2[axis].apply(m_dtermLpf1[axis].apply(angvel));
+            auto dterm =
+                cyclicAxis->dtermLpf2.apply(cyclicAxis->dtermLpf1.apply(angvel));
 
             auto currentPidSetpoint = demand;
 
             auto maxVelocity = MAX_VELOCITY_CYCLIC();
+
+            axis_t * axis = &cyclicAxis->axis;
 
             if (maxVelocity) {
                 currentPidSetpoint =
@@ -323,12 +292,12 @@ class AnglePidController : public PidController {
 
             // -----calculate error rate
             auto errorRate = currentPidSetpoint - angvel;
-            const auto previousIterm = m_correction[axis].I;
+            const auto previousIterm = axis->I;
             auto itermErrorRate = errorRate;
             auto uncorrectedSetpoint = currentPidSetpoint;
 
             itermErrorRate = applyItermRelax(
-                    axis,
+                    cyclicAxis,
                     previousIterm,
                     currentPidSetpoint,
                     itermErrorRate);
@@ -337,13 +306,8 @@ class AnglePidController : public PidController {
             float setpointCorrection =
                 currentPidSetpoint - uncorrectedSetpoint;
 
-            // --------low-level gyro-based PID based on 2DOF PID controller.
-            // ---------- 2-DOF PID controller with optional filter on
-            // derivative term.  b = 1 and only c (feedforward weight) can be
-            // tuned (amount derivative on measurement or error).
-
             // -----calculate P component
-            m_correction[axis].P = m_k_rate_p * errorRate;
+            axis->P = m_k_rate_p * errorRate;
 
             // -----calculate I component
             // if launch control is active override the iterm gains and apply
@@ -352,8 +316,7 @@ class AnglePidController : public PidController {
 
             auto axisDynCi = Clock::DT(); // check windup for yaw only
 
-            m_correction[axis].I =
-                constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
+            axis->I = constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
                         -ITERM_LIMIT, ITERM_LIMIT);
 
             // -----calculate demandDelta
@@ -368,7 +331,8 @@ class AnglePidController : public PidController {
                 // This is done to avoid DTerm spikes that occur with
                 // dynamically calculated deltaT whenever another task causes
                 // the PID loop execution to be delayed.
-                const float delta = -(dterm - m_previousDterm[axis]) * FREQUENCY();
+                const float delta =
+                    -(dterm - cyclicAxis->previousDterm) * FREQUENCY();
 
                 float preTpaD = m_k_rate_d * delta;
 
@@ -382,7 +346,7 @@ class AnglePidController : public PidController {
                 if (dMinPercent > 0) {
                     const auto d_min_gyro_gain =
                         D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
-                    auto dMinGyroFactor = m_dMinRange[axis].apply(delta);
+                    auto dMinGyroFactor = cyclicAxis->dMinRange.apply(delta);
                     dMinGyroFactor = fabsf(dMinGyroFactor) * d_min_gyro_gain;
                     const auto d_min_setpoint_gain =
                         D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR *
@@ -393,27 +357,27 @@ class AnglePidController : public PidController {
                     dMinFactor = fmaxf(dMinGyroFactor, dMinSetpointFactor);
                     dMinFactor =
                         dMinPercent + (1.0f - dMinPercent) * dMinFactor;
-                    dMinFactor = m_dMinLpf[axis].apply(dMinFactor);
+                    dMinFactor = cyclicAxis->dMinLpf.apply(dMinFactor);
                     dMinFactor = fminf(dMinFactor, 1.0f);
                 }
 
                 // Apply the dMinFactor
                 preTpaD *= dMinFactor;
-                m_correction[axis].D = preTpaD;
+                cyclicAxis->D = preTpaD;
 
                 // Log the value of D pre application of TPA
                 preTpaD *= D_LPF_FILT_SCALE;
 
             } else {
-                m_correction[axis].D = 0;
+                cyclicAxis->D = 0;
             }
 
-            m_previousDterm[axis] = dterm;
+            cyclicAxis->previousDterm = dterm;
 
             // -----calculate feedforward component
             // include abs control correction in feedforward
-            demandDelta += setpointCorrection - m_previousSetpointCorrection[axis];
-            m_previousSetpointCorrection[axis] = setpointCorrection;
+            demandDelta += setpointCorrection - axis->previousSetpointCorrection;
+            axis->previousSetpointCorrection = setpointCorrection;
 
             // no feedforward in launch control
             auto feedforwardGain = m_k_rate_f;
@@ -427,30 +391,22 @@ class AnglePidController : public PidController {
                 auto feedforwardMaxRateLimit =
                     feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01f;
 
-                bool shouldApplyFeedforwardLimits =
-                    feedforwardMaxRateLimit != 0.0f && axis < 2;
+                bool shouldApplyFeedforwardLimits = feedforwardMaxRateLimit != 0;
 
-                m_correction[axis].F = shouldApplyFeedforwardLimits ?
+                axis->F = shouldApplyFeedforwardLimits ?
                     applyFeedforwardLimit(
                             feedForward,
                             currentPidSetpoint,
                             feedforwardMaxRateLimit) :
                     feedForward;
             } else {
-                m_correction[axis].F = 0;
+                axis->F = 0;
             }
 
-            // calculating the PID sum
-            const auto pidSum =
-                m_correction[axis].P +
-                m_correction[axis].I +
-                m_correction[axis].D +
-                m_correction[axis].F;
-
-                m_correction[axis].Sum = pidSum;
+            axis->Sum = axis->P + axis->I + cyclicAxis->D + axis->F;
         }
 
-        void updateYaw( const float demand, const float angvel)
+        void updateYaw(const float demand, const float angvel)
         {
             // gradually scale back integration when above windup point
             auto dynCi = Clock::DT();
@@ -466,7 +422,7 @@ class AnglePidController : public PidController {
 
             if (maxVelocity) {
                 currentPidSetpoint =
-                    accelerationLimit(2, currentPidSetpoint, maxVelocity);
+                    accelerationLimit(&m_yaw, currentPidSetpoint, maxVelocity);
             }
 
             // Handle yaw spin recovery - zero the setpoint on yaw to aid in
@@ -475,7 +431,7 @@ class AnglePidController : public PidController {
 
             // -----calculate error rate
             auto errorRate = currentPidSetpoint - angvel; // r - y
-            const auto previousIterm = m_correction[2].I;
+            const auto previousIterm = m_yaw.I;
             auto itermErrorRate = errorRate;
             auto uncorrectedSetpoint = currentPidSetpoint;
             errorRate = currentPidSetpoint - angvel;
@@ -487,8 +443,8 @@ class AnglePidController : public PidController {
             // tuned (amount derivative on measurement or error).
 
             // -----calculate P component
-            m_correction[2].P = m_k_rate_p * errorRate;
-            m_correction[2].P = m_ptermYawLpf.apply(m_correction[2].P);
+            m_yaw.P = m_k_rate_p * errorRate;
+            m_yaw.P = m_ptermYawLpf.apply(m_yaw.P);
 
             // -----calculate I component
             // if launch control is active override the iterm gains and apply
@@ -497,17 +453,17 @@ class AnglePidController : public PidController {
 
             auto axisDynCi = dynCi; // check windup for yaw only
 
-            m_correction[2].I =
-                constrain_f(previousIterm + (Ki * axisDynCi) * itermErrorRate,
-                        -ITERM_LIMIT, ITERM_LIMIT);
+            m_yaw.I = constrain_f(
+                    previousIterm + (Ki * axisDynCi) * itermErrorRate,
+                    -ITERM_LIMIT, ITERM_LIMIT);
 
             // -----calculate demandDelta
             auto demandDelta = 0.0f;
 
             // -----calculate feedforward component
             // include abs control correction in feedforward
-            demandDelta += setpointCorrection - m_previousSetpointCorrection[2];
-            m_previousSetpointCorrection[2] = setpointCorrection;
+            demandDelta += setpointCorrection - m_yaw.previousSetpointCorrection;
+            m_yaw.previousSetpointCorrection = setpointCorrection;
 
             // no feedforward in launch control
             auto feedforwardGain = m_k_rate_f;
@@ -516,25 +472,20 @@ class AnglePidController : public PidController {
                 // weaker by about half transition now calculated in
                 // feedforward.c when new RC data arrives 
                 auto feedForward = feedforwardGain * demandDelta * FREQUENCY();
-
-                m_correction[2].F = feedForward;
+                m_yaw.F = feedForward;
             } else {
-                m_correction[2].F = 0;
+                m_yaw.F = 0;
             }
 
-            // calculating the PID sum
-            const auto pidSum =
-                m_correction[2].P +
-                m_correction[2].I +
-                m_correction[2].F;
+            const auto pidSum = m_yaw.P + m_yaw.I + m_yaw.F;
 
             if (USE_INTEGRATED_YAW) {
-                m_correction[2].Sum += pidSum * Clock::DT() * 100.0f;
-                m_correction[2].Sum -= m_correction[2].Sum *
+                m_yaw.Sum += pidSum * Clock::DT() * 100.0f;
+                m_yaw.Sum -= m_yaw.Sum *
                     INTEGRATED_YAW_RELAX / 100000.0f * Clock::DT() /
                     0.000125f;
             } else {
-                m_correction[2].Sum = pidSum;
+                m_yaw.Sum = pidSum;
             }
         }
 
@@ -578,26 +529,23 @@ class AnglePidController : public PidController {
                 const bool reset) -> Demands override
         {
             // ----------PID controller----------
-            updateCyclic(demands.roll,  vstate.phi,   vstate.dphi,   0);
-            updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, 1);
+            updateCyclic(demands.roll, vstate.phi, vstate.dphi, &m_roll);
+            updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, &m_pitch);
             updateYaw(demands.yaw, vstate.dpsi);
 
             // Disable PID control if at zero throttle or if gyro overflow
             // detected This may look very innefficient, but it is done on
             // purpose to always show real CPU usage as in flight
             if (reset) {
-                m_correction[0].I = 0.0f;
-                m_correction[1].I = 0.0f;
-                m_correction[2].I = 0.0f;
+                m_roll.axis.I = 0;
+                m_pitch.axis.I = 0;
+                m_yaw.I = 0;
             }
 
             updateDynLpfCutoffs(currentTimeUs, demands.throttle);
 
             return Demands(
-                    demands.throttle,
-                    m_correction[0].Sum,
-                    m_correction[1].Sum,
-                    m_correction[2].Sum);
+                    demands.throttle, m_roll.axis.Sum, m_pitch.axis.Sum, m_yaw.Sum);
 
         } // update
 
