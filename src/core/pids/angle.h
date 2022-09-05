@@ -105,8 +105,10 @@ class AnglePidController : public PidController {
 
         typedef struct {
 
+            // XXX not needed for yaw
             float previousSetpointCorrection;
             float previousSetpoint;
+
             float I;
 
         } axis_t;
@@ -141,14 +143,14 @@ class AnglePidController : public PidController {
 
         float applyFeedforwardLimit(
                 const float value,
-                const float currentPidSetpoint,
+                const float currentSetpoint,
                 const float maxRateLimit) {
 
-            return value * currentPidSetpoint > 0.0f ?
-                fabsf(currentPidSetpoint) <= maxRateLimit ?
+            return value * currentSetpoint > 0.0f ?
+                fabsf(currentSetpoint) <= maxRateLimit ?
                 constrain_f(value, (-maxRateLimit -
-                            currentPidSetpoint) * m_k_rate_p,
-                        (maxRateLimit - currentPidSetpoint) *
+                            currentSetpoint) * m_k_rate_p,
+                        (maxRateLimit - currentSetpoint) *
                         m_k_rate_p) :
                 0 :
                 0;
@@ -156,33 +158,33 @@ class AnglePidController : public PidController {
 
         float accelerationLimit(
                 axis_t * axis,
-                float currentPidSetpoint,
+                float currentSetpoint,
                 const float maxVelocity)
         {
             const float currentVelocity =
-                currentPidSetpoint - axis->previousSetpoint;
+                currentSetpoint - axis->previousSetpoint;
 
             if (fabsf(currentVelocity) > maxVelocity) {
-                currentPidSetpoint = (currentVelocity > 0) ?
+                currentSetpoint = (currentVelocity > 0) ?
                     axis->previousSetpoint + maxVelocity :
                     axis->previousSetpoint - maxVelocity;
             }
 
-            axis->previousSetpoint = currentPidSetpoint;
+            axis->previousSetpoint = currentSetpoint;
 
-            return currentPidSetpoint;
+            return currentSetpoint;
         }
 
         float applyItermRelax(
                 cyclicAxis_t * cyclicAxis,
                 const float iterm,
-                const float currentPidSetpoint,
+                const float currentSetpoint,
                 const float itermErrorRate)
         {
             const float
-                setpointLpf = cyclicAxis->windupLpf.apply(currentPidSetpoint);
+                setpointLpf = cyclicAxis->windupLpf.apply(currentSetpoint);
 
-            const float setpointHpf = fabsf(currentPidSetpoint - setpointLpf);
+            const float setpointHpf = fabsf(currentSetpoint - setpointLpf);
 
             const auto itermRelaxFactor =
                 fmaxf(0, 1 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD);
@@ -256,7 +258,7 @@ class AnglePidController : public PidController {
         }
 
         float computeFeedforward(
-                const float currentPidSetpoint,
+                const float currentSetpoint,
                 const float feedforwardMaxRate,
                 const float demandDelta)
         {
@@ -273,7 +275,7 @@ class AnglePidController : public PidController {
             return shouldApplyFeedforwardLimits ?
                 applyFeedforwardLimit(
                         feedForward,
-                        currentPidSetpoint,
+                        currentSetpoint,
                         feedforwardMaxRateLimit) :
                 feedForward;
         }
@@ -343,34 +345,34 @@ class AnglePidController : public PidController {
             auto dterm =
                 cyclicAxis->dtermLpf2.apply(cyclicAxis->dtermLpf1.apply(angvel));
 
-            auto currentPidSetpoint = demand;
+            auto currentSetpoint = demand;
 
             auto maxVelocity = MAX_VELOCITY_CYCLIC();
 
             axis_t * axis = &cyclicAxis->axis;
 
             if (maxVelocity) {
-                currentPidSetpoint =
-                    accelerationLimit(axis, currentPidSetpoint, maxVelocity);
+                currentSetpoint =
+                    accelerationLimit(axis, currentSetpoint, maxVelocity);
             }
 
-            currentPidSetpoint = levelPid(currentPidSetpoint, angle);
+            currentSetpoint = levelPid(currentSetpoint, angle);
 
             // -----calculate error rate
-            auto errorRate = currentPidSetpoint - angvel;
+            auto errorRate = currentSetpoint - angvel;
             const auto previousIterm = axis->I;
             auto itermErrorRate = errorRate;
-            auto uncorrectedSetpoint = currentPidSetpoint;
+            auto uncorrectedSetpoint = currentSetpoint;
 
             itermErrorRate = applyItermRelax(
                     cyclicAxis,
                     previousIterm,
-                    currentPidSetpoint,
+                    currentSetpoint,
                     itermErrorRate);
 
-            errorRate = currentPidSetpoint - angvel;
+            errorRate = currentSetpoint - angvel;
             float setpointCorrection =
-                currentPidSetpoint - uncorrectedSetpoint;
+                currentSetpoint - uncorrectedSetpoint;
 
             // -----calculate P component
             const auto P = m_k_rate_p * errorRate;
@@ -404,7 +406,7 @@ class AnglePidController : public PidController {
             const auto F =
                 m_k_rate_f > 0 ?
                 computeFeedforward(
-                        currentPidSetpoint, feedforwardMaxRate, demandDelta) :
+                        currentSetpoint, feedforwardMaxRate, demandDelta) :
                 0;
 
             return P + axis->I + D + F;
@@ -413,55 +415,32 @@ class AnglePidController : public PidController {
         float updateYaw(const float demand, const float angvel)
         {
             // gradually scale back integration when above windup point
-            auto dynCi = Clock::DT();
             const auto itermWindupPointInv =
                 1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
-            if (itermWindupPointInv > 1.0f) {
-                dynCi *= constrain_f(itermWindupPointInv, 0.0f, 1.0f);
-            }
 
-            auto currentPidSetpoint = demand;
+            const auto dynCi = Clock::DT() * 
+                (itermWindupPointInv > 1 ?
+                 constrain_f(itermWindupPointInv, 0, 1) :
+                 1);
 
-            auto maxVelocity = MAX_VELOCITY_YAW();
+            const auto maxVelocity = MAX_VELOCITY_YAW();
 
-            if (maxVelocity) {
-                currentPidSetpoint =
-                    accelerationLimit(&m_yaw, currentPidSetpoint, maxVelocity);
-            }
+            const auto currentSetpoint = 
+                maxVelocity ?
+                accelerationLimit(&m_yaw, demand, maxVelocity) :
+                demand;
 
-            // Handle yaw spin recovery - zero the setpoint on yaw to aid in
-            // recovery It's not necessary to zero the set points for R/P
-            // because the PIDs will be zeroed below
-
-            // -----calculate error rate
-            auto errorRate = currentPidSetpoint - angvel; // r - y
-            const auto previousIterm = m_yaw.I;
-            auto itermErrorRate = errorRate;
-            auto uncorrectedSetpoint = currentPidSetpoint;
-            errorRate = currentPidSetpoint - angvel;
-            const auto setpointCorrection = currentPidSetpoint - uncorrectedSetpoint;
-
-            // --------low-level gyro-based PID based on 2DOF PID controller.
-            // ---------- 2-DOF PID controller with optional filter on
-            // derivative term.  b = 1 and only c (feedforward weight) can be
-            // tuned (amount derivative on measurement or error).
+            const auto errorRate = currentSetpoint - angvel;
 
             // -----calculate P component
             const auto P = m_ptermYawLpf.apply(m_k_rate_p * errorRate);
 
             // -----calculate I component, constraining windup
             m_yaw.I = constrain_f(
-                    previousIterm + (m_k_rate_i * dynCi) * itermErrorRate,
+                    m_yaw.I + (m_k_rate_i * dynCi) * errorRate,
                     -ITERM_LIMIT, ITERM_LIMIT);
 
-            // -----calculate feedforward component
-            // include abs control correction in feedforward
-            const auto demandDelta =
-                setpointCorrection - m_yaw.previousSetpointCorrection;
-
-            m_yaw.previousSetpointCorrection = setpointCorrection;
-
-            return P + m_yaw.I + m_k_rate_f * demandDelta * FREQUENCY();
+            return P + m_yaw.I; 
         }
 
     public:
