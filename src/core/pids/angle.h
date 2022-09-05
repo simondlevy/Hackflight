@@ -112,7 +112,6 @@ class AnglePidController : public PidController {
             float previousSetpointCorrection;
             float previousSetpoint;
             float I;
-            float F;
 
         } axis_t;
 
