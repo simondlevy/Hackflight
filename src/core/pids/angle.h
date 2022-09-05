@@ -245,9 +245,9 @@ class AnglePidController : public PidController {
                 dynLpfCutoffFreq(throttle, dyn_lpf_min, dyn_lpf_max,
                         DYN_LPF_CURVE_EXPO);
 
-            for (auto axis = 0; axis < 3; axis++) {
-                m_dtermLpf1[axis].computeGain(cutoffFreq);
-            }
+            m_dtermLpf1[0].computeGain(cutoffFreq);
+            m_dtermLpf1[1].computeGain(cutoffFreq);
+            m_dtermLpf1[2].computeGain(cutoffFreq);
         }
 
         void updateDynLpfCutoffs(const uint32_t currentTimeUs, const float throttle)
@@ -512,9 +512,9 @@ class AnglePidController : public PidController {
             // detected This may look very innefficient, but it is done on
             // purpose to always show real CPU usage as in flight
             if (reset) {
-                for (auto axis = 0; axis < 3; axis++) {
-                    m_data[axis].I = 0.0f;
-                }
+                m_data[0].I = 0.0f;
+                m_data[1].I = 0.0f;
+                m_data[2].I = 0.0f;
             }
 
             updateDynLpfCutoffs(currentTimeUs, demands.throttle);
