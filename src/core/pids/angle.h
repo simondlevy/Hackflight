@@ -439,7 +439,7 @@ class AnglePidController : public PidController {
             auto itermErrorRate = errorRate;
             auto uncorrectedSetpoint = currentPidSetpoint;
             errorRate = currentPidSetpoint - angvel;
-            float setpointCorrection = currentPidSetpoint - uncorrectedSetpoint;
+            const auto setpointCorrection = currentPidSetpoint - uncorrectedSetpoint;
 
             // --------low-level gyro-based PID based on 2DOF PID controller.
             // ---------- 2-DOF PID controller with optional filter on
@@ -449,29 +449,19 @@ class AnglePidController : public PidController {
             // -----calculate P component
             const auto P = m_ptermYawLpf.apply(m_k_rate_p * errorRate);
 
-            // -----calculate I component
-            // if launch control is active override the iterm gains and apply
-            // iterm windup protection to all axes
-            auto Ki = m_k_rate_i * 2.5;
-
-            auto axisDynCi = dynCi; // check windup for yaw only
-
+            // -----calculate I component, constraining windup
             m_yaw.I = constrain_f(
-                    previousIterm + (Ki * axisDynCi) * itermErrorRate,
+                    previousIterm + (m_k_rate_i * dynCi) * itermErrorRate,
                     -ITERM_LIMIT, ITERM_LIMIT);
-
-            // -----calculate demandDelta
-            auto demandDelta = 0.0f;
 
             // -----calculate feedforward component
             // include abs control correction in feedforward
-            demandDelta += setpointCorrection - m_yaw.previousSetpointCorrection;
+            const auto demandDelta =
+                setpointCorrection - m_yaw.previousSetpointCorrection;
+
             m_yaw.previousSetpointCorrection = setpointCorrection;
 
-            // no feedforward in launch control
-            auto feedforwardGain = m_k_rate_f;
-
-            return P + m_yaw.I + feedforwardGain * demandDelta * FREQUENCY();
+            return P + m_yaw.I + m_k_rate_f * demandDelta * FREQUENCY();
         }
 
     public:
@@ -495,9 +485,10 @@ class AnglePidController : public PidController {
 
         static float applyRates(const float commandf, const float commandfAbs)
         {
-            float expof = RC_EXPO / 100.0f;
-            expof =
-                commandfAbs * (powf(commandf, 5) * expof + commandf * (1 - expof));
+            const auto expo = RC_EXPO / 100.0f;
+
+            const auto expof =
+                commandfAbs * (powf(commandf, 5) * expo + commandf * (1 - expo));
 
             const auto centerSensitivity = RC_RATE * 10.0f;
             const auto stickMovement = fmaxf(0, RATE * 10.0f - centerSensitivity);
@@ -513,13 +504,13 @@ class AnglePidController : public PidController {
                 const VehicleState & vstate,
                 const bool reset) -> Demands override
         {
-            float roll=
+            const auto roll=
                 updateCyclic(demands.roll, vstate.phi, vstate.dphi, &m_roll);
 
-            float pitch =
+            const auto pitch =
                 updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, &m_pitch);
 
-            float yaw = updateYaw(demands.yaw, vstate.dpsi);
+            const auto yaw = updateYaw(demands.yaw, vstate.dpsi);
 
             if (reset) {
                 m_roll.axis.I = 0;
