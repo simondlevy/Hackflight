@@ -120,14 +120,19 @@ class Imu {
             --m_calibration.cyclesRemaining;
         }
 
-        void applyLpf1(uint8_t axis)
+        void applyLpf1(const uint8_t axis)
         {
             m_dps_filtered[axis] = m_lowpassFilter1[axis].apply(m_sampleSum[axis]);
         }
 
-        void applyLpf2(uint8_t axis)
+        void applyLpf2(const uint8_t axis)
         {
             m_sampleSum[axis] = m_lowpassFilter2[axis].apply(m_dps[axis]);
+        }
+
+        void scaleGyro(const uint8_t axis, const float adc)
+        {
+            m_dps[axis] = adc* (m_gyroScale / 32768.);
         }
 
     protected:
@@ -201,9 +206,9 @@ class Imu {
             }
 
             if (calibrationComplete) {
-                m_dps[0] = _adc.x * (m_gyroScale / 32768.);
-                m_dps[1] = _adc.y * (m_gyroScale / 32768.);
-                m_dps[2] = _adc.z * (m_gyroScale / 32768.);
+                scaleGyro(0, _adc.x);
+                scaleGyro(1, _adc.y);
+                scaleGyro(2, _adc.z);
             }
 
             // Use gyro lowpass 2 filter for downsampling
