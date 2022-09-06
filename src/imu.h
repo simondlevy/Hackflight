@@ -120,6 +120,11 @@ class Imu {
             --m_calibration.cyclesRemaining;
         }
 
+        void applyLpf1(uint8_t axis)
+        {
+            m_dps_filtered[axis] = m_lowpassFilter1[axis].apply(m_sampleSum[axis]);
+        }
+
     protected:
 
         Imu(uint16_t gyroScale) 
@@ -164,7 +169,8 @@ class Imu {
             (void)gz;
         }
 
-        virtual void getEulerAngles(bool isArmed, uint32_t time, VehicleState * vstate) = 0;
+        virtual void
+            getEulerAngles(bool isArmed, uint32_t time, VehicleState * vstate) = 0;
 
         void readScaledGyro(Imu * imu, Imu::align_fun align, VehicleState * vstate)
         {
@@ -195,17 +201,15 @@ class Imu {
                 m_dps[2] = _adc.z * (m_gyroScale / 32768.);
             }
 
-            // using gyro lowpass 2 filter for downsampling
+            // Use gyro lowpass 2 filter for downsampling
             m_sampleSum[0] = m_lowpassFilter2[0].apply(m_dps[0]);
             m_sampleSum[1] = m_lowpassFilter2[1].apply(m_dps[1]);
             m_sampleSum[2] = m_lowpassFilter2[2].apply(m_dps[2]);
 
-            for (auto axis = 0; axis < 3; axis++) {
-
-                // apply static notch filters and software lowpass filters
-                m_dps_filtered[axis] =
-                    m_lowpassFilter1[axis].apply(m_sampleSum[axis]);
-            }
+            // Then apply lowpass 1
+            applyLpf1(0);
+            applyLpf1(1);
+            applyLpf1(2);
 
             m_sampleCount = 0;
 
