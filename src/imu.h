@@ -135,6 +135,11 @@ class Imu {
             m_dps[axis] = adc* (m_gyroScale / 32768.);
         }
 
+        float readCalibratedGyro(const uint8_t axis)
+        {
+            return devReadRawGyro(axis) - m_zero[axis];
+        }
+
     protected:
 
         Imu(uint16_t gyroScale) 
@@ -195,9 +200,9 @@ class Imu {
                 // move 16-bit gyro data into floats to avoid overflows in
                 // calculations
 
-                _adc.x = devReadRawGyro(0) - m_zero[0];
-                _adc.y = devReadRawGyro(1) - m_zero[1];
-                _adc.z = devReadRawGyro(2) - m_zero[2];
+                _adc.x = readCalibratedGyro(0);
+                _adc.y = readCalibratedGyro(1);
+                _adc.z = readCalibratedGyro(2);
 
                 align(&_adc);
 
