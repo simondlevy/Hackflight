@@ -29,6 +29,8 @@
 #include "system.h"
 #include "time.h"
 
+#include "serial.h"
+
 class Imu {
 
     friend class Hackflight;
