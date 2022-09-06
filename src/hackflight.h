@@ -83,10 +83,7 @@ class Hackflight {
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            m_taskData.imu->readScaledGyro(
-                    m_taskData.imu,
-                    m_imuAlignFun,
-                    &m_taskData.vstate);
+            m_taskData.imu->readScaledGyro(m_imuAlignFun, &m_taskData.vstate);
 
             auto usec = timeMicros();
 

@@ -49,20 +49,13 @@ class Imu {
             int32_t cyclesRemaining;
         } calibration_t;
 
-        uint8_t m_interruptPin;
         float m_dps[3];            // aligned, calibrated, scaled, unfiltered
-        float  m_dps_filtered[3];  // filtered 
+        float  m_dpsFiltered[3];  // filtered 
         uint8_t m_sampleCount;     // sample counter
         float m_sampleSum[3];      // summed samples used for downsampling
-        bool  m_isCalibrating;
         calibration_t m_calibration;
         float m_zero[3];
         
-        uint16_t m_gyroScale;
-
-        uint32_t m_gyroSyncTime;
-        uint32_t m_gyroInterruptCount;
-
         Pt1Filter m_lowpassFilter1[3] = {
             Pt1Filter(GYRO_LPF1_DYN_MIN_HZ),
             Pt1Filter(GYRO_LPF1_DYN_MIN_HZ),
@@ -74,6 +67,32 @@ class Imu {
             Pt1Filter(GYRO_LPF2_STATIC_HZ),
             Pt1Filter(GYRO_LPF2_STATIC_HZ)
         };
+
+        /*
+        typedef struct {
+
+            float         dps;           // aligned, calibrated, scaled, unfiltered
+            float         dpsFiltered;  // filtered 
+            uint8_t       sampleCount;   // sample counter
+            float         sampleSum;     // summed samples used for downsampling
+            calibration_t calibration;
+            float         zero;
+
+            Pt1Filter lowpassFilter1 = Pt1Filter(GYRO_LPF1_DYN_MIN_HZ);
+            Pt1Filter lowpassFilter2 = Pt1Filter(GYRO_LPF2_STATIC_HZ);
+ 
+        } axis_t;
+
+        axis_t m_x;
+        axis_t m_y;
+        axis_t m_z;
+        */
+
+        uint32_t m_gyroInterruptCount;
+        uint16_t m_gyroScale;
+        uint32_t m_gyroSyncTime;
+        uint8_t  m_interruptPin;
+        bool     m_isCalibrating;
 
         static uint32_t calculateCalibratingCycles(void)
         {
@@ -127,7 +146,7 @@ class Imu {
 
         void applyLpf1(const uint8_t axis)
         {
-            m_dps_filtered[axis] = m_lowpassFilter1[axis].apply(m_sampleSum[axis]);
+            m_dpsFiltered[axis] = m_lowpassFilter1[axis].apply(m_sampleSum[axis]);
         }
 
         void applyLpf2(const uint8_t axis)
@@ -192,7 +211,7 @@ class Imu {
         virtual void
             getEulerAngles(bool isArmed, uint32_t time, VehicleState * vstate) = 0;
 
-        void readScaledGyro(Imu * imu, Imu::align_fun align, VehicleState * vstate)
+        void readScaledGyro(const align_fun align, VehicleState * vstate)
         {
             if (!devGyroIsReady()) return;
 
@@ -234,12 +253,11 @@ class Imu {
             m_sampleCount = 0;
 
             // Used for fusion with accelerometer
-            imu->accumulateGyro(
-                    m_dps_filtered[0], m_dps_filtered[1], m_dps_filtered[2]);
+            accumulateGyro(m_dpsFiltered[0], m_dpsFiltered[1], m_dpsFiltered[2]);
 
-            vstate->dphi   = m_dps_filtered[0];
-            vstate->dtheta = m_dps_filtered[1];
-            vstate->dpsi   = m_dps_filtered[2];
+            vstate->dphi   = m_dpsFiltered[0];
+            vstate->dtheta = m_dpsFiltered[1];
+            vstate->dpsi   = m_dpsFiltered[2];
 
             m_isCalibrating = !calibrationComplete;
         }
