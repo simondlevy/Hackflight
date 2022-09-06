@@ -23,7 +23,7 @@
 
 static SbusReceiver _receiver;
 
-static LadybugFc _ladybug = LadybugFc(&_receiver);
+static LadybugFc _ladybug = LadybugFc(_receiver);
 
 void setup(void)
 {

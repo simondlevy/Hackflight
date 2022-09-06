@@ -24,7 +24,7 @@ class ArduinoBrushedEsc : public Esc {
 
     public:
 
-        ArduinoBrushedEsc(vector<uint8_t> * pins)  
+        ArduinoBrushedEsc(vector<uint8_t> & pins)  
             : Esc(pins)
         {
         }

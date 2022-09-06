@@ -49,22 +49,22 @@ static vector<uint8_t> _motorPins = {13, 16, 3, 11};
 
 static vector<PidController *> _pidControllers = {&_anglePid};
 
-static ArduinoBrushedEsc _esc(&_motorPins);
+static ArduinoBrushedEsc _esc(_motorPins);
 
 class LadybugFc : public Hackflight {
 
     public:
 
-        LadybugFc(Receiver * receiver) 
+        LadybugFc(Receiver & receiver) 
 
             : Hackflight(
                     receiver,
-                    &_imu,
+                    _imu,
                     imuRotate0,
-                    &_pidControllers,
-                    &_mixer,
-                    &_esc,
-                    &_led)
+                    _pidControllers,
+                    _mixer,
+                    _esc,
+                    _led)
         {
         }
 
