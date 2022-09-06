@@ -85,37 +85,42 @@ class Imu {
             m_calibration.cyclesRemaining = (int32_t)calculateCalibratingCycles();
         }
 
+        void calibrateAxis(const uint8_t axis)
+        {
+            // Reset g[axis] at start of calibration
+            if (m_calibration.cyclesRemaining ==
+                    (int32_t)calculateCalibratingCycles()) {
+                m_calibration.sum[axis] = 0.0f;
+                m_calibration.var[axis].clear();
+                // zero is set to zero until calibration complete
+                m_zero[axis] = 0.0f;
+            }
+
+            // Sum up CALIBRATING_GYRO_TIME_US readings
+            m_calibration.sum[axis] += devReadRawGyro(axis);
+            m_calibration.var[axis].push(devReadRawGyro(axis));
+
+            if (m_calibration.cyclesRemaining == 1) {
+                const float stddev = m_calibration.var[axis].stdev();
+
+                // check deviation and startover in case the model was moved
+                if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
+                        MOVEMENT_CALIBRATION_THRESHOLD) {
+                    setCalibrationCycles();
+                    return;
+                }
+
+                // please take care with exotic boardalignment !!
+                m_zero[axis] =
+                    m_calibration.sum[axis] / calculateCalibratingCycles();
+            }
+        }
+
         void calibrate(void)
         {
-            for (auto axis = 0; axis < 3; axis++) {
-                // Reset g[axis] at start of calibration
-                if (m_calibration.cyclesRemaining ==
-                        (int32_t)calculateCalibratingCycles()) {
-                    m_calibration.sum[axis] = 0.0f;
-                    m_calibration.var[axis].clear();
-                    // zero is set to zero until calibration complete
-                    m_zero[axis] = 0.0f;
-                }
-
-                // Sum up CALIBRATING_GYRO_TIME_US readings
-                m_calibration.sum[axis] += devReadRawGyro(axis);
-                m_calibration.var[axis].push(devReadRawGyro(axis));
-
-                if (m_calibration.cyclesRemaining == 1) {
-                    const float stddev = m_calibration.var[axis].stdev();
-
-                    // check deviation and startover in case the model was moved
-                    if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
-                            MOVEMENT_CALIBRATION_THRESHOLD) {
-                        setCalibrationCycles();
-                        return;
-                    }
-
-                    // please take care with exotic boardalignment !!
-                    m_zero[axis] =
-                        m_calibration.sum[axis] / calculateCalibratingCycles();
-                }
-            }
+            calibrateAxis(0);
+            calibrateAxis(1);
+            calibrateAxis(2);
 
             --m_calibration.cyclesRemaining;
         }
