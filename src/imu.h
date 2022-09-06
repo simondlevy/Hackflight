@@ -125,6 +125,11 @@ class Imu {
             m_dps_filtered[axis] = m_lowpassFilter1[axis].apply(m_sampleSum[axis]);
         }
 
+        void applyLpf2(uint8_t axis)
+        {
+            m_sampleSum[axis] = m_lowpassFilter2[axis].apply(m_dps[axis]);
+        }
+
     protected:
 
         Imu(uint16_t gyroScale) 
@@ -202,9 +207,9 @@ class Imu {
             }
 
             // Use gyro lowpass 2 filter for downsampling
-            m_sampleSum[0] = m_lowpassFilter2[0].apply(m_dps[0]);
-            m_sampleSum[1] = m_lowpassFilter2[1].apply(m_dps[1]);
-            m_sampleSum[2] = m_lowpassFilter2[2].apply(m_dps[2]);
+            applyLpf2(0);
+            applyLpf2(1);
+            applyLpf2(2);
 
             // Then apply lowpass 1
             applyLpf1(0);
