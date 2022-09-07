@@ -764,15 +764,13 @@ class Receiver {
             return true;
         }
 
-        const auto frameStatus =
-            devCheck(m_channelData, &m_lastFrameTimeUs);
+        const auto frameStatus = devCheck(m_channelData, &m_lastFrameTimeUs);
 
         // printf("%d: %d\n", (int)frameStatus, (int)m_lastFrameTimeUs);
 
         if (frameStatus) {
             m_inFailsafeMode = false;
-            auto frameDropped = false;
-            signalReceived = !(m_inFailsafeMode || frameDropped);
+            signalReceived = true;
             if (signalReceived) {
                 m_needSignalBefore =
                     currentTimeUs + NEED_SIGNAL_MAX_DELAY_US;
