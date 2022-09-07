@@ -95,54 +95,6 @@ class SbusReceiver : public Receiver {
 
         frameData_t m_frameData;
 
-        static uint8_t decodeChannels(
-                uint16_t * channelData, const sbusChannels_t *channels)
-        {
-            channelData[0] = channels->chan0;
-            channelData[1] = channels->chan1;
-            channelData[2] = channels->chan2;
-            channelData[3] = channels->chan3;
-            channelData[4] = channels->chan4;
-            channelData[5] = channels->chan5;
-            channelData[6] = channels->chan6;
-            channelData[7] = channels->chan7;
-            channelData[8] = channels->chan8;
-            channelData[9] = channels->chan9;
-            channelData[10] = channels->chan10;
-            channelData[11] = channels->chan11;
-            channelData[12] = channels->chan12;
-            channelData[13] = channels->chan13;
-            channelData[14] = channels->chan14;
-            channelData[15] = channels->chan15;
-
-            if (channels->flags & FLAG_CHANNEL_17) {
-                channelData[16] = CHANNEL_MAX;
-            } else {
-                channelData[16] = CHANNEL_MIN;
-            }
-
-            if (channels->flags & FLAG_CHANNEL_18) {
-                channelData[17] = CHANNEL_MAX;
-            } else {
-                channelData[17] = CHANNEL_MIN;
-            }
-
-            if (channels->flags & FLAG_FAILSAFE_ACTIVE) {
-                // internal failsafe enabled and rx failsafe flag set RX
-                // *should* still be sending valid channel data (repeated), so
-                // use it.
-                //return FRAME_COMPLETE | FRAME_FAILSAFE;
-            }
-
-            if (channels->flags & FLAG_SIGNAL_LOSS) {
-                // The received data is a repeat of the last valid data so can be
-                // considered complete.
-                //return FRAME_COMPLETE | FRAME_DROPPED;
-            }
-
-            return FRAME_COMPLETE;
-        }
-
         // Receive ISR callback
         static void dataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
         {
@@ -199,16 +151,40 @@ class SbusReceiver : public Receiver {
             }
             m_frameData.done = false;
 
-            const uint8_t frameStatus = decodeChannels(
-                    channelData,
-                    &m_frameData.frame.frame.channels);
+            auto channels = &m_frameData.frame.frame.channels;
 
-            if (!(frameStatus & (FRAME_FAILSAFE |
-                            FRAME_DROPPED))) {
-                *frameTimeUs = m_frameData.startAtUs;
+            channelData[0] = channels->chan0;
+            channelData[1] = channels->chan1;
+            channelData[2] = channels->chan2;
+            channelData[3] = channels->chan3;
+            channelData[4] = channels->chan4;
+            channelData[5] = channels->chan5;
+            channelData[6] = channels->chan6;
+            channelData[7] = channels->chan7;
+            channelData[8] = channels->chan8;
+            channelData[9] = channels->chan9;
+            channelData[10] = channels->chan10;
+            channelData[11] = channels->chan11;
+            channelData[12] = channels->chan12;
+            channelData[13] = channels->chan13;
+            channelData[14] = channels->chan14;
+            channelData[15] = channels->chan15;
+
+            if (channels->flags & FLAG_CHANNEL_17) {
+                channelData[16] = CHANNEL_MAX;
+            } else {
+                channelData[16] = CHANNEL_MIN;
             }
 
-            return frameStatus;
+            if (channels->flags & FLAG_CHANNEL_18) {
+                channelData[17] = CHANNEL_MAX;
+            } else {
+                channelData[17] = CHANNEL_MIN;
+            }
+
+            *frameTimeUs = m_frameData.startAtUs;
+
+            return FRAME_COMPLETE;
         }
 
     public:

@@ -48,7 +48,6 @@ class Receiver {
         FRAME_PENDING = 0,
         FRAME_COMPLETE = (1 << 0),
         FRAME_FAILSAFE = (1 << 1),
-        FRAME_PROCESSING_REQUIRED = (1 << 2),
         FRAME_DROPPED = (1 << 3)
     } frameVehicleState_e;
 
@@ -785,10 +784,6 @@ class Receiver {
                 m_needSignalBefore =
                     currentTimeUs + NEED_SIGNAL_MAX_DELAY_US;
             }
-        }
-
-        if (frameStatus & FRAME_PROCESSING_REQUIRED) {
-            m_auxiliaryProcessingRequired = true;
         }
 
         if (signalReceived) {
