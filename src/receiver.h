@@ -112,17 +112,17 @@ class Receiver {
     // maximum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-    static inline int32_t cmp32(uint32_t a, uint32_t b)
+    static inline int32_t cmp32(const uint32_t a, const uint32_t b)
     {
         return (int32_t)(a-b); 
     }
 
-    static uint8_t rxfail_step_to_channel_value(uint8_t step)
+    static uint8_t rxfail_step_to_channel_value(const uint8_t step)
     {
         return (PWM_PULSE_MIN + 25 * step);
     }
 
-    static bool isPulseValid(uint16_t pulseDuration)
+    static bool isPulseValid(const uint16_t pulseDuration)
     {
         return  pulseDuration >= 885 && pulseDuration <= 2115;
     }
@@ -202,7 +202,7 @@ class Receiver {
 
     private:
 
-    uint16_t getFailValue(uint8_t channel)
+    uint16_t getFailValue(const uint8_t channel)
     {
         failsafeChannelConfig_t failsafeChannelConfigs[CHANNEL_COUNT];
 
@@ -239,8 +239,8 @@ class Receiver {
     // Determine a cutoff frequency based on smoothness factor and calculated
     // average rx frame time
     static int calcAutoSmoothingCutoff(
-            int avgRxFrameTimeUs,
-            uint8_t autoSmoothnessFactor)
+            const uint32_t avgRxFrameTimeUs,
+            const uint8_t autoSmoothnessFactor)
     {
         if (avgRxFrameTimeUs > 0) {
             const auto cutoffFactor =
@@ -277,7 +277,7 @@ class Receiver {
     void detectAndApplySignalLossBehaviour(
             Arming * arming,
             Failsafe * failsafe,
-            uint32_t currentTimeUs)
+            const uint32_t currentTimeUs)
     {
         auto currentTimeMs = currentTimeUs/ 1000;
 
@@ -324,7 +324,7 @@ class Receiver {
         }
     }
 
-    int16_t lookupThrottle(int32_t tmp)
+    int16_t lookupThrottle(const int32_t tmp)
     {
         if (!m_initializedThrottleTable) {
             for (auto i = 0; i < THROTTLE_LOOKUP_TABLE_SIZE; i++) {
@@ -351,7 +351,7 @@ class Receiver {
             (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100;
     }
 
-    static float updateCommand(float raw, float sgn)
+    static float updateCommand(const float raw, const float sgn)
     {
         float tmp = fminf(fabs(raw - 1500), 500);
 
@@ -377,7 +377,7 @@ class Receiver {
     bool calculateChannelsAndUpdateFailsafe(
             Arming * arming,
             Failsafe * failsafe,
-            uint32_t currentTimeUs)
+            const uint32_t currentTimeUs)
     {
         if (m_auxiliaryProcessingRequired) {
             m_auxiliaryProcessingRequired = false;
@@ -397,9 +397,7 @@ class Receiver {
         return true;
     }
 
-    int32_t getFrameDelta(
-            uint32_t currentTimeUs,
-            int32_t *frameAgeUs)
+    int32_t getFrameDelta(const uint32_t currentTimeUs, int32_t *frameAgeUs)
     {
         auto frameTimeUs = m_lastFrameTimeUs;
 
@@ -417,7 +415,7 @@ class Receiver {
 
     bool processData(
             Esc * esc,
-            uint32_t currentTimeUs,
+            const uint32_t currentTimeUs,
             Arming * arming,
             Failsafe * failsafe)
     {
@@ -453,7 +451,7 @@ class Receiver {
         return throttleIsDown(m_raw);
     }
 
-    void ratePidFeedforwardLpfInit(uint16_t filterCutoff)
+    void ratePidFeedforwardLpfInit(const uint16_t filterCutoff)
     {
         if (filterCutoff > 0) {
             m_feedforwardLpfInitialized = true;
@@ -463,7 +461,7 @@ class Receiver {
         }
     }
 
-    void ratePidFeedforwardLpfUpdate(uint16_t filterCutoff)
+    void ratePidFeedforwardLpfUpdate(const uint16_t filterCutoff)
     {
         if (filterCutoff > 0) {
             for (uint8_t axis=ROLL; axis<=YAW; axis++) {
@@ -472,7 +470,7 @@ class Receiver {
         }
     }
 
-    void smoothingFilterInit(Pt3Filter * filter, float setpointCutoffFrequency)
+    void smoothingFilterInit(Pt3Filter * filter, const float setpointCutoffFrequency)
     {
         if (!m_filterInitialized) {
             filter->init(setpointCutoffFrequency);
@@ -495,7 +493,7 @@ class Receiver {
         }
     }
 
-    float smoothingFilterApply(Pt3Filter * filter, float dataToSmooth)
+    float smoothingFilterApply(Pt3Filter * filter, const float dataToSmooth)
     {
         return m_filterInitialized ?
             filter->apply(dataToSmooth) :
@@ -596,7 +594,7 @@ class Receiver {
     }
 
     void processSmoothingFilter(
-            uint32_t currentTimeUs,
+            const uint32_t currentTimeUs,
             float * setpointRate,
             float * rawSetpoint)
     {
@@ -734,7 +732,7 @@ class Receiver {
                 &m_filterYaw, m_dataToSmooth.yaw);
     }
 
-    static float getRawSetpoint(float command, float divider)
+    static float getRawSetpoint(const float command, const float divider)
     {
         auto commandf = command / divider;
 
@@ -757,7 +755,7 @@ class Receiver {
     public:
 
     // Called from tasks/receiver.h::adjustRxDynamicPriority()
-    bool check(uint32_t currentTimeUs)
+    bool check(const uint32_t currentTimeUs)
     {
         auto signalReceived = false;
         auto useDataDrivenProcessing = true;
@@ -800,9 +798,9 @@ class Receiver {
     } // check
 
     void poll(
-            uint32_t currentTimeUs,
-            bool imuIsLevel,
-            bool calibrating,
+            const uint32_t currentTimeUs,
+            const bool imuIsLevel,
+            const bool calibrating,
             sticks_t * sticks,
             Esc * esc,
             Arming * arming,
@@ -866,7 +864,7 @@ class Receiver {
 
     // Runs in fast (inner, core) loop
     void getDemands(
-            uint32_t currentTimeUs,
+            const uint32_t currentTimeUs,
             float rawSetpoints[3],
             Demands * demands)
     {
