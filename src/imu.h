@@ -51,34 +51,12 @@ class Imu {
             int32_t cyclesRemaining;
         } calibration_t;
 
-        float m_dps[3];            // aligned, calibrated, scaled, unfiltered
-        float  m_dpsFiltered[3];  // filtered 
-        uint8_t m_sampleCount;     // sample counter
-        float m_sampleSum[3];      // summed samples used for downsampling
-        calibration_t m_calibration;
-        float m_zero[3];
-        
-        Pt1Filter m_lowpassFilter1[3] = {
-            Pt1Filter(GYRO_LPF1_DYN_MIN_HZ),
-            Pt1Filter(GYRO_LPF1_DYN_MIN_HZ),
-            Pt1Filter(GYRO_LPF1_DYN_MIN_HZ)
-        };
-
-        Pt1Filter m_lowpassFilter2[3] = {
-            Pt1Filter(GYRO_LPF2_STATIC_HZ),
-            Pt1Filter(GYRO_LPF2_STATIC_HZ),
-            Pt1Filter(GYRO_LPF2_STATIC_HZ)
-        };
-
-        /*
         typedef struct {
 
-            float         dps;           // aligned, calibrated, scaled, unfiltered
-            float         dpsFiltered;  // filtered 
-            uint8_t       sampleCount;   // sample counter
-            float         sampleSum;     // summed samples used for downsampling
-            calibration_t calibration;
-            float         zero;
+            float dps;           // aligned, calibrated, scaled, unfiltered
+            float dpsFiltered;   // filtered 
+            float sampleSum;     // summed samples used for downsampling
+            float zero;
 
             Pt1Filter lowpassFilter1 = Pt1Filter(GYRO_LPF1_DYN_MIN_HZ);
             Pt1Filter lowpassFilter2 = Pt1Filter(GYRO_LPF2_STATIC_HZ);
@@ -88,7 +66,8 @@ class Imu {
         axis_t m_x;
         axis_t m_y;
         axis_t m_z;
-        */
+
+        calibration_t m_calibration;
 
         uint32_t m_gyroInterruptCount;
         uint16_t m_gyroScale;
@@ -106,23 +85,22 @@ class Imu {
             m_calibration.cyclesRemaining = (int32_t)calculateCalibratingCycles();
         }
 
-        void calibrateAxis(const uint8_t axis)
+        void calibrateAxis(axis_t & axis, const uint8_t index)
         {
-            // Reset g[axis] at start of calibration
-            if (m_calibration.cyclesRemaining ==
-                    (int32_t)calculateCalibratingCycles()) {
-                m_calibration.sum[axis] = 0.0f;
-                m_calibration.var[axis].clear();
+            // Reset at start of calibration
+            if (m_calibration.cyclesRemaining == (int32_t)calculateCalibratingCycles()) {
+                m_calibration.sum[index] = 0.0f;
+                m_calibration.var[index].clear();
                 // zero is set to zero until calibration complete
-                m_zero[axis] = 0.0f;
+                axis.zero = 0.0f;
             }
 
             // Sum up CALIBRATING_GYRO_TIME_US readings
-            m_calibration.sum[axis] += devReadRawGyro(axis);
-            m_calibration.var[axis].push(devReadRawGyro(axis));
+            m_calibration.sum[index] += devReadRawGyro(index);
+            m_calibration.var[index].push(devReadRawGyro(index));
 
             if (m_calibration.cyclesRemaining == 1) {
-                const float stddev = m_calibration.var[axis].stdev();
+                const float stddev = m_calibration.var[index].stdev();
 
                 // check deviation and startover in case the model was moved
                 if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
@@ -131,39 +109,37 @@ class Imu {
                     return;
                 }
 
-                // please take care with exotic boardalignment !!
-                m_zero[axis] =
-                    m_calibration.sum[axis] / calculateCalibratingCycles();
+                axis.zero = m_calibration.sum[index] / calculateCalibratingCycles();
             }
         }
 
         void calibrate(void)
         {
-            calibrateAxis(0);
-            calibrateAxis(1);
-            calibrateAxis(2);
+            calibrateAxis(m_x, 0);
+            calibrateAxis(m_y, 1);
+            calibrateAxis(m_z, 2);
 
             --m_calibration.cyclesRemaining;
         }
 
-        void applyLpf1(const uint8_t axis)
+        void applyLpf1(axis_t & axis)
         {
-            m_dpsFiltered[axis] = m_lowpassFilter1[axis].apply(m_sampleSum[axis]);
+            axis.dpsFiltered = axis.lowpassFilter1.apply(axis.sampleSum);
         }
 
-        void applyLpf2(const uint8_t axis)
+        void applyLpf2(axis_t & axis)
         {
-            m_sampleSum[axis] = m_lowpassFilter2[axis].apply(m_dps[axis]);
+            axis.sampleSum = axis.lowpassFilter2.apply(axis.dps);
         }
 
-        void scaleGyro(const uint8_t axis, const float adc)
+        void scaleGyro(axis_t & axis, const float adc)
         {
-            m_dps[axis] = adc* (m_gyroScale / 32768.);
+            axis.dps = adc * (m_gyroScale / 32768.);
         }
 
-        float readCalibratedGyro(const uint8_t axis)
+        float readCalibratedGyro(axis_t & axis, uint8_t index)
         {
-            return devReadRawGyro(axis) - m_zero[axis];
+            return devReadRawGyro(index) - axis.zero;
         }
 
     protected:
@@ -226,9 +202,9 @@ class Imu {
                 // move 16-bit gyro data into floats to avoid overflows in
                 // calculations
 
-                _adc.x = readCalibratedGyro(0);
-                _adc.y = readCalibratedGyro(1);
-                _adc.z = readCalibratedGyro(2);
+                _adc.x = readCalibratedGyro(m_x, 0);
+                _adc.y = readCalibratedGyro(m_y, 1);
+                _adc.z = readCalibratedGyro(m_z, 2);
 
                 align(&_adc);
 
@@ -237,29 +213,27 @@ class Imu {
             }
 
             if (calibrationComplete) {
-                scaleGyro(0, _adc.x);
-                scaleGyro(1, _adc.y);
-                scaleGyro(2, _adc.z);
+                scaleGyro(m_x, _adc.x);
+                scaleGyro(m_y, _adc.y);
+                scaleGyro(m_z, _adc.z);
             }
 
             // Use gyro lowpass 2 filter for downsampling
-            applyLpf2(0);
-            applyLpf2(1);
-            applyLpf2(2);
+            applyLpf2(m_x);
+            applyLpf2(m_y);
+            applyLpf2(m_z);
 
             // Then apply lowpass 1
-            applyLpf1(0);
-            applyLpf1(1);
-            applyLpf1(2);
-
-            m_sampleCount = 0;
+            applyLpf1(m_x);
+            applyLpf1(m_y);
+            applyLpf1(m_z);
 
             // Used for fusion with accelerometer
-            accumulateGyro(m_dpsFiltered[0], m_dpsFiltered[1], m_dpsFiltered[2]);
+            accumulateGyro(m_x.dpsFiltered, m_y.dpsFiltered, m_z.dpsFiltered);
 
-            vstate->dphi   = m_dpsFiltered[0];
-            vstate->dtheta = m_dpsFiltered[1];
-            vstate->dpsi   = m_dpsFiltered[2];
+            vstate->dphi   = m_x.dpsFiltered;
+            vstate->dtheta = m_y.dpsFiltered;
+            vstate->dpsi   = m_z.dpsFiltered;
 
             m_isCalibrating = !calibrationComplete;
         }
