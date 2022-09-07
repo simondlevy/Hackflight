@@ -91,10 +91,9 @@ class DsmxReceiver : public Receiver {
             return 1000 * (1 + (chanval - 1) / (float)(CHAN_RESOLUTION-1));
         }
 
-        virtual uint8_t devCheck(uint16_t * channelData, uint32_t * frameTimeUs)
-            override
+        virtual bool devCheck(uint16_t * channelData, uint32_t * frameTimeUs) override
         {
-            auto result = FRAME_PENDING;
+            auto result = false;
 
             if (m_frameData.done) {
 
@@ -115,7 +114,7 @@ class DsmxReceiver : public Receiver {
                     }
                 }
 
-                result = FRAME_COMPLETE;
+                result = true;
             }
 
             return result;

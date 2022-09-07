@@ -44,11 +44,6 @@ class Receiver {
         float aux2;
     } sticks_t;
 
-    typedef enum {
-        FRAME_PENDING = 0,
-        FRAME_COMPLETE = (1 << 0),
-    } frameVehicleState_e;
-
     private:
 
     static const uint8_t CHANNEL_COUNT = 6;
@@ -753,7 +748,7 @@ class Receiver {
 
     virtual void begin(/*serialPortIdentifier_e port*/) = 0;
 
-    virtual uint8_t devCheck(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
+    virtual bool devCheck(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
 
     virtual float convert(uint16_t * chanData, uint8_t chanId) = 0;
 
@@ -774,9 +769,9 @@ class Receiver {
 
         // printf("%d: %d\n", (int)frameStatus, (int)m_lastFrameTimeUs);
 
-        if (frameStatus & FRAME_COMPLETE) {
-            m_inFailsafeMode = false;//(frameStatus & FRAME_FAILSAFE) != 0;
-            auto frameDropped = false; //(frameStatus & FRAME_DROPPED) != 0;
+        if (frameStatus) {
+            m_inFailsafeMode = false;
+            auto frameDropped = false;
             signalReceived = !(m_inFailsafeMode || frameDropped);
             if (signalReceived) {
                 m_needSignalBefore =

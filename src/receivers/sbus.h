@@ -143,11 +143,10 @@ class SbusReceiver : public Receiver {
             return (5 * (float)channelData[chan] / 8) + 880;
         }
 
-        virtual uint8_t devCheck(uint16_t * channelData, uint32_t * frameTimeUs)
-            override
+        virtual bool devCheck(uint16_t * channelData, uint32_t * frameTimeUs) override
         {
             if (!m_frameData.done) {
-                return FRAME_PENDING;
+                return false;
             }
             m_frameData.done = false;
 
@@ -184,7 +183,7 @@ class SbusReceiver : public Receiver {
 
             *frameTimeUs = m_frameData.startAtUs;
 
-            return FRAME_COMPLETE;
+            return true;
         }
 
     public:
