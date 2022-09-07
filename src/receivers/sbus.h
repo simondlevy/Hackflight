@@ -131,13 +131,13 @@ class SbusReceiver : public Receiver {
                 // internal failsafe enabled and rx failsafe flag set RX
                 // *should* still be sending valid channel data (repeated), so
                 // use it.
-                return FRAME_COMPLETE | FRAME_FAILSAFE;
+                //return FRAME_COMPLETE | FRAME_FAILSAFE;
             }
 
             if (channels->flags & FLAG_SIGNAL_LOSS) {
                 // The received data is a repeat of the last valid data so can be
                 // considered complete.
-                return FRAME_COMPLETE | FRAME_DROPPED;
+                //return FRAME_COMPLETE | FRAME_DROPPED;
             }
 
             return FRAME_COMPLETE;
