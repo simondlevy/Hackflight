@@ -202,7 +202,7 @@ class Receiver {
 
     private:
 
-    static uint16_t getFailValue(float * rcData, uint8_t channel)
+    uint16_t getFailValue(uint8_t channel)
     {
         failsafeChannelConfig_t failsafeChannelConfigs[CHANNEL_COUNT];
 
@@ -227,7 +227,7 @@ class Receiver {
                     885;
             case FAILSAFE_MODE_INVALID:
             case FAILSAFE_MODE_HOLD:
-                return rcData[channel];
+                return m_raw[channel];
             case FAILSAFE_MODE_SET:
                 return
                     rxfail_step_to_channel_value(channelFailsafeConfig->step);
@@ -262,13 +262,13 @@ class Receiver {
         m_trainingMax = 0;
     }
 
-    void readChannelsApplyRanges(float raw[])
+    void readChannelsAndApplyRanges(void)
     {
         for (auto channel=0; channel<CHANNEL_COUNT; ++channel) {
 
             float sample = convert(m_channelData, channel);
 
-            raw[channel] = channel < 4 && sample != 0 ?
+            m_raw[channel] = channel < 4 && sample != 0 ?
                 constrain_f(sample, PWM_PULSE_MIN, PWM_PULSE_MAX) :
                 sample;
         }
@@ -277,8 +277,7 @@ class Receiver {
     void detectAndApplySignalLossBehaviour(
             Arming * arming,
             Failsafe * failsafe,
-            uint32_t currentTimeUs,
-            float raw[])
+            uint32_t currentTimeUs)
     {
         auto currentTimeMs = currentTimeUs/ 1000;
 
@@ -288,7 +287,7 @@ class Receiver {
 
         for (auto channel = 0; channel < CHANNEL_COUNT; channel++) {
 
-            auto sample = raw[channel];
+            auto sample = m_raw[channel];
 
             auto validPulse = useValueFromRx && isPulseValid(sample);
 
@@ -304,14 +303,14 @@ class Receiver {
                 } else {
 
                     // after that apply rxfail value
-                    sample = getFailValue(raw, channel); 
+                    sample = getFailValue(channel); 
                     if (channel < 4) {
                         flightChannelsValid = false;
                     }
                 }
             }
 
-            raw[channel] = sample;
+            m_raw[channel] = sample;
         }
 
         if (flightChannelsValid) {
@@ -320,7 +319,7 @@ class Receiver {
             m_inFailsafeMode = true;
             failsafe->onValidDataFailed(arming);
             for (auto channel = 0; channel < CHANNEL_COUNT; channel++) {
-                raw[channel] = getFailValue(raw, channel);
+                m_raw[channel] = getFailValue(channel);
             }
         }
     }
@@ -361,15 +360,15 @@ class Receiver {
         return raw < 1500 ? -cmd : cmd;
     }
 
-    void updateCommands(float raw[])
+    void updateCommands(void)
     {
         for (uint8_t axis=ROLL; axis<=YAW; axis++) {
             // non coupled PID reduction scaler used in PID controller 1
             // and PID controller 2.
-            m_command[axis] = updateCommand(raw[axis], axis == YAW ? -1 : +1);
+            m_command[axis] = updateCommand(m_raw[axis], axis == YAW ? -1 : +1);
         }
 
-        auto tmp = constrain_f_i32(raw[THROTTLE], 1050, PWM_MAX);
+        auto tmp = constrain_f_i32(m_raw[THROTTLE], 1050, PWM_MAX);
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
         m_commands.throttle = lookupThrottle(tmp2);
@@ -378,8 +377,7 @@ class Receiver {
     bool calculateChannelsAndUpdateFailsafe(
             Arming * arming,
             Failsafe * failsafe,
-            uint32_t currentTimeUs,
-            float raw[])
+            uint32_t currentTimeUs)
     {
         if (m_auxiliaryProcessingRequired) {
             m_auxiliaryProcessingRequired = false;
@@ -392,9 +390,9 @@ class Receiver {
         m_dataProcessingRequired = false;
         m_nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
 
-        readChannelsApplyRanges(raw);
-        detectAndApplySignalLossBehaviour(
-                arming, failsafe, currentTimeUs, raw);
+        readChannelsAndApplyRanges();
+
+        detectAndApplySignalLossBehaviour(arming, failsafe, currentTimeUs);
 
         return true;
     }
@@ -419,7 +417,6 @@ class Receiver {
 
     bool processData(
             Esc * esc,
-            float raw[],
             uint32_t currentTimeUs,
             Arming * arming,
             Failsafe * failsafe)
@@ -451,9 +448,9 @@ class Receiver {
             failsafe->startMonitoring();
         }
 
-        failsafe->update(raw, esc, arming);
+        failsafe->update(m_raw, esc, arming);
 
-        return throttleIsDown(raw);
+        return throttleIsDown(m_raw);
     }
 
     void ratePidFeedforwardLpfInit(uint16_t filterCutoff)
@@ -828,15 +825,13 @@ class Receiver {
                 if (!calculateChannelsAndUpdateFailsafe(
                             arming, 
                             failsafe,
-                            currentTimeUs,
-                            m_raw)) {
+                            currentTimeUs)) {
                     m_state = STATE_CHECK;
                     break;
                 }
                 *pidItermResetReady = true;
                 *pidItermResetValue = processData(
                         esc,
-                        m_raw,
                         currentTimeUs,
                         arming, 
                         failsafe);
@@ -852,7 +847,7 @@ class Receiver {
 
             case STATE_UPDATE:
                 m_gotNewData = true;
-                updateCommands(m_raw);
+                updateCommands();
                 arming->updateStatus(m_raw, imuIsLevel, calibrating);
                 m_state = STATE_CHECK;
                 break;
