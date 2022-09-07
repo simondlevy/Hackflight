@@ -162,6 +162,13 @@ class Receiver {
     Pt3Filter m_filterDeflectionPitch;
 
     Pt3Filter  m_feedforwardPt3[3];
+    uint16_t   m_channelData[CHANNEL_COUNT];
+    uint32_t   m_invalidPulsePeriod[CHANNEL_COUNT];
+    float      m_raw[CHANNEL_COUNT];
+
+    float      m_command[4];
+
+    int16_t    m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
 
     bool        m_filterInitialized;
     uint16_t    m_setpointCutoffFrequency;
@@ -175,8 +182,6 @@ class Receiver {
 
     bool         m_auxiliaryProcessingRequired;
     bool         m_calculatedCutoffs;
-    uint16_t     m_channelData[CHANNEL_COUNT];
-    float        m_command[4];
     Demands      m_commands;
     bool         m_dataProcessingRequired;
     Demands      m_dataToSmooth;
@@ -186,15 +191,12 @@ class Receiver {
     bool         m_inFailsafeMode;
     bool         m_initializedFilter;
     bool         m_initializedThrottleTable;
-    uint32_t     m_invalidPulsePeriod[CHANNEL_COUNT];
     bool         m_isRateValid;
     uint32_t     m_lastFrameTimeUs;
     uint32_t     m_lastRxTimeUs;
-    int16_t      m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
     uint32_t     m_needSignalBefore;
     uint32_t     m_nextUpdateAtUs;
     uint32_t     m_previousFrameTimeUs;
-    float        m_raw[CHANNEL_COUNT];
     uint32_t     m_refreshPeriod;
     bool         m_signalReceived;
     state_e      m_state;
@@ -206,13 +208,17 @@ class Receiver {
     {
         failsafeChannelConfig_t failsafeChannelConfigs[CHANNEL_COUNT];
 
-        for (auto i = 0; i < CHANNEL_COUNT; i++) {
-            failsafeChannelConfigs[i].step = 30;
-        }
-        failsafeChannelConfigs[3].step = 5;
+        failsafeChannelConfigs[THROTTLE].step = 30;
+        failsafeChannelConfigs[ROLL].step     = 30;
+        failsafeChannelConfigs[PITCH].step    = 30;
+        failsafeChannelConfigs[YAW].step      = 5;
+        failsafeChannelConfigs[AUX1].step     = 30;
+        failsafeChannelConfigs[AUX2].step     = 30;
+
         for (auto i = 0; i < 4; i++) {
             failsafeChannelConfigs[i].mode = 0;
         }
+
         for (auto i = 4; i < CHANNEL_COUNT; i++) {
             failsafeChannelConfigs[i].mode = 1;
         }
@@ -363,9 +369,11 @@ class Receiver {
     void updateCommands(void)
     {
         for (uint8_t axis=ROLL; axis<=YAW; axis++) {
+
             // non coupled PID reduction scaler used in PID controller 1
             // and PID controller 2.
             m_command[axis] = updateCommand(m_raw[axis], axis == YAW ? -1 : +1);
+
         }
 
         auto tmp = constrain_f_i32(m_raw[THROTTLE], 1050, PWM_MAX);
