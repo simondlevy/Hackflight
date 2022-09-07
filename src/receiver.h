@@ -59,7 +59,7 @@ class Receiver {
 
     static const uint8_t RATE = 67;
 
-    static const uint32_t FAILSAFE_POWER_ON_DELAY_US = (1000 * 1000 * 5);
+    static const uint32_t FAILSAFE_POWER_ON_DELAY_US = 5000000;
 
     // Minimum rc smoothing cutoff frequency
     static const uint16_t SMOOTHING_CUTOFF_MIN_HZ = 15;    
@@ -774,6 +774,8 @@ class Receiver {
 
         const auto frameStatus =
             devCheck(m_channelData, &m_lastFrameTimeUs);
+
+        // printf("%d: %d\n", (int)frameStatus, (int)m_lastFrameTimeUs);
 
         if (frameStatus & FRAME_COMPLETE) {
             m_inFailsafeMode = (frameStatus & FRAME_FAILSAFE) != 0;

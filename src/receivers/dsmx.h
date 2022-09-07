@@ -94,7 +94,7 @@ class DsmxReceiver : public Receiver {
         virtual uint8_t devCheck(uint16_t * channelData, uint32_t * frameTimeUs)
             override
         {
-            auto result = Receiver::FRAME_PENDING;
+            auto result = FRAME_PENDING;
 
             if (m_frameData.done) {
 
@@ -115,7 +115,7 @@ class DsmxReceiver : public Receiver {
                     }
                 }
 
-                result = Receiver::FRAME_COMPLETE;
+                result = FRAME_COMPLETE;
             }
 
             return result;

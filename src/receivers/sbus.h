@@ -131,16 +131,16 @@ class SbusReceiver : public Receiver {
                 // internal failsafe enabled and rx failsafe flag set RX
                 // *should* still be sending valid channel data (repeated), so
                 // use it.
-                return Receiver::FRAME_COMPLETE | Receiver::FRAME_FAILSAFE;
+                return FRAME_COMPLETE | FRAME_FAILSAFE;
             }
 
             if (channels->flags & FLAG_SIGNAL_LOSS) {
                 // The received data is a repeat of the last valid data so can be
                 // considered complete.
-                return Receiver::FRAME_COMPLETE | Receiver::FRAME_DROPPED;
+                return FRAME_COMPLETE | FRAME_DROPPED;
             }
 
-            return Receiver::FRAME_COMPLETE;
+            return FRAME_COMPLETE;
         }
 
         // Receive ISR callback
@@ -195,7 +195,7 @@ class SbusReceiver : public Receiver {
             override
         {
             if (!m_frameData.done) {
-                return Receiver::FRAME_PENDING;
+                return FRAME_PENDING;
             }
             m_frameData.done = false;
 
@@ -203,8 +203,8 @@ class SbusReceiver : public Receiver {
                     channelData,
                     &m_frameData.frame.frame.channels);
 
-            if (!(frameStatus & (Receiver::FRAME_FAILSAFE |
-                            Receiver::FRAME_DROPPED))) {
+            if (!(frameStatus & (FRAME_FAILSAFE |
+                            FRAME_DROPPED))) {
                 *frameTimeUs = m_frameData.startAtUs;
             }
 

@@ -130,136 +130,136 @@ class Failsafe {
     void onValidDataReceived(Arming * arming)
     {
         m_validRxDataReceivedAt = timeMillis();
-            if ((m_validRxDataReceivedAt - m_validRxDataFailedAt) >
-                    m_rxDataRecoveryPeriod) {
-                m_rxLinkVehicleState = RXLINK_UP;
-                arming->setRxFailsafe(true);
-            }
+        if ((m_validRxDataReceivedAt - m_validRxDataFailedAt) >
+                m_rxDataRecoveryPeriod) {
+            m_rxLinkVehicleState = RXLINK_UP;
+            arming->setRxFailsafe(true);
+        }
+    }
+
+    void reset(void)
+    {
+        m_rxDataFailurePeriod =
+            PERIOD_RXDATA_FAILURE + 4 * MILLIS_PER_TENTH_SECOND;
+        m_rxDataRecoveryPeriod =
+            PERIOD_RXDATA_RECOVERY + 20 * MILLIS_PER_TENTH_SECOND;
+        m_validRxDataReceivedAt = 0;
+        m_validRxDataFailedAt = 0;
+        m_throttleLowPeriod = 0;
+        m_landingShouldBeFinishedAt = 0;
+        m_receivingRxDataPeriod = 0;
+        m_receivingRxDataPeriodPreset = 0;
+        m_phase = IDLE;
+        m_rxLinkVehicleState = RXLINK_DOWN;
+    }        
+
+    void startMonitoring(void)
+    {
+        m_monitoring = true;
+    }
+
+    void update(float * rcData, Esc * esc, Arming * arming)
+    {
+        if (!isMonitoring()) {
+            return;
         }
 
-        void reset(void)
-        {
-            m_rxDataFailurePeriod =
-                PERIOD_RXDATA_FAILURE + 4 * MILLIS_PER_TENTH_SECOND;
-            m_rxDataRecoveryPeriod =
-                PERIOD_RXDATA_RECOVERY + 20 * MILLIS_PER_TENTH_SECOND;
-            m_validRxDataReceivedAt = 0;
-            m_validRxDataFailedAt = 0;
-            m_throttleLowPeriod = 0;
-            m_landingShouldBeFinishedAt = 0;
-            m_receivingRxDataPeriod = 0;
-            m_receivingRxDataPeriodPreset = 0;
-            m_phase = IDLE;
-            m_rxLinkVehicleState = RXLINK_DOWN;
-        }        
+        bool receivingRxData = isReceivingRxData();
 
-        void startMonitoring(void)
-        {
-            m_monitoring = true;
+        if (0 == SWITCH_MODE_STAGE2) {
+            receivingRxData = false; // force Stage2
         }
 
-        void update(float * rcData, Esc * esc, Arming * arming)
-        {
-            if (!isMonitoring()) {
-                return;
-            }
+        bool reprocessVehicleState = false;
 
-            bool receivingRxData = isReceivingRxData();
+        do {
+            reprocessVehicleState = false;
 
-            if (0 == SWITCH_MODE_STAGE2) {
-                receivingRxData = false; // force Stage2
-            }
-
-            bool reprocessVehicleState;
-
-            do {
-                reprocessVehicleState = false;
-
-                switch (m_phase) {
-                    case IDLE:
-                        if (arming->isArmed()) {
-                            // Track throttle command below minimum time
-                            if (!throttleIsDown(rcData)) {
-                                m_throttleLowPeriod =
-                                    timeMillis() + 100 * MILLIS_PER_TENTH_SECOND;
-                            }
-                            if (0 == SWITCH_MODE_KILL) {
+            switch (m_phase) {
+                case IDLE:
+                    if (arming->isArmed()) {
+                        // Track throttle command below minimum time
+                        if (!throttleIsDown(rcData)) {
+                            m_throttleLowPeriod =
+                                timeMillis() + 100 * MILLIS_PER_TENTH_SECOND;
+                        }
+                        if (0 == SWITCH_MODE_KILL) {
+                            activate();
+                            m_phase = LANDED;      
+                            m_receivingRxDataPeriodPreset =
+                                PERIOD_OF_1_SECONDS();    
+                            // require 1 seconds of valid rxData
+                            reprocessVehicleState = true;
+                        } else if (!receivingRxData) {
+                            if (timeMillis() > m_throttleLowPeriod
+                               ) {
                                 activate();
+
+                                // skip auto-landing procedure
                                 m_phase = LANDED;      
                                 m_receivingRxDataPeriodPreset =
-                                    PERIOD_OF_1_SECONDS();    
-                                // require 1 seconds of valid rxData
-                                reprocessVehicleState = true;
-                            } else if (!receivingRxData) {
-                                if (timeMillis() > m_throttleLowPeriod
-                                   ) {
-                                    activate();
+                                    PERIOD_OF_3_SECONDS(); 
+                                // require 3 seconds of valid rxData
+                            } else {
+                                m_phase = RX_LOSS_DETECTED;
+                            }
+                            reprocessVehicleState = true;
+                        }
+                    } else {
+                        m_throttleLowPeriod = 0;
+                    }
+                    break;
 
-                                    // skip auto-landing procedure
-                                    m_phase = LANDED;      
-                                    m_receivingRxDataPeriodPreset =
-                                        PERIOD_OF_3_SECONDS(); 
-                                    // require 3 seconds of valid rxData
-                                } else {
-                                    m_phase = RX_LOSS_DETECTED;
-                                }
+                case RX_LOSS_DETECTED:
+                    if (receivingRxData) {
+                        m_phase = RX_LOSS_RECOVERED;
+                    } else {
+                        // Drop the craft
+                        activate();
+
+                        // skip auto-landing procedure
+                        m_phase = LANDED;      
+                        break;
+                    }
+                    reprocessVehicleState = true;
+                    break;
+
+                case LANDING:
+                    break;
+                case LANDED:
+                    arming->disarm(esc);
+                    m_receivingRxDataPeriod = timeMillis() +
+                        m_receivingRxDataPeriodPreset; // set required
+                    m_phase = RX_LOSS_MONITORING;
+                    reprocessVehicleState = true;
+                    break;
+
+                case RX_LOSS_MONITORING:
+                    if (receivingRxData) {
+                        if (timeMillis() > m_receivingRxDataPeriod) {
+                            if (!arming->isArmed()) {
+                                m_phase = RX_LOSS_RECOVERED;
                                 reprocessVehicleState = true;
                             }
-                        } else {
-                            m_throttleLowPeriod = 0;
                         }
-                        break;
-
-                    case RX_LOSS_DETECTED:
-                        if (receivingRxData) {
-                            m_phase = RX_LOSS_RECOVERED;
-                        } else {
-                            // Drop the craft
-                            activate();
-
-                            // skip auto-landing procedure
-                            m_phase = LANDED;      
-                            break;
-                        }
-                        reprocessVehicleState = true;
-                        break;
-
-                    case LANDING:
-                        break;
-                    case LANDED:
-                        arming->disarm(esc);
+                    } else {
                         m_receivingRxDataPeriod = timeMillis() +
-                            m_receivingRxDataPeriodPreset; // set required
-                        m_phase = RX_LOSS_MONITORING;
-                        reprocessVehicleState = true;
-                        break;
+                            m_receivingRxDataPeriodPreset; 
+                    }
+                    break;
 
-                    case RX_LOSS_MONITORING:
-                        if (receivingRxData) {
-                            if (timeMillis() > m_receivingRxDataPeriod) {
-                                if (!arming->isArmed()) {
-                                    m_phase = RX_LOSS_RECOVERED;
-                                    reprocessVehicleState = true;
-                                }
-                            }
-                        } else {
-                            m_receivingRxDataPeriod = timeMillis() +
-                                m_receivingRxDataPeriodPreset; 
-                        }
-                        break;
+                case RX_LOSS_RECOVERED:
+                    m_throttleLowPeriod = timeMillis() + 100 *
+                        MILLIS_PER_TENTH_SECOND;
+                    m_phase = IDLE;
+                    m_active = false;
+                    reprocessVehicleState = true;
+                    break;
 
-                    case RX_LOSS_RECOVERED:
-                        m_throttleLowPeriod = timeMillis() + 100 *
-                            MILLIS_PER_TENTH_SECOND;
-                        m_phase = IDLE;
-                        m_active = false;
-                        reprocessVehicleState = true;
-                        break;
-
-                    default:
-                        break;
-                }
-            } while (reprocessVehicleState);        
-        }
+                default:
+                    break;
+            }
+        } while (reprocessVehicleState);        
+    }
 
 }; // class Failsafe

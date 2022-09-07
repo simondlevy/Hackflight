@@ -129,25 +129,25 @@ class Arming {
             m_acc_done_calibrating = true;
 
             // If arming is disabled and the ARM switch is on
-                if (!readyToArm() && rxAux1IsSet(raw)) {
-                    m_switch_okay = false;
-                } else if (!rxAux1IsSet(raw)) {
-                    m_switch_okay = true;
-                }
-
-                if (!readyToArm()) {
-                    m_led->warningFlash();
-                } else {
-                    m_led->warningDisable();
-                }
-
-                m_led->warningUpdate();
+            if (!readyToArm() && rxAux1IsSet(raw)) {
+                m_switch_okay = false;
+            } else if (!rxAux1IsSet(raw)) {
+                m_switch_okay = true;
             }
-        }
 
-        void setRxFailsafe(bool okay)
-        {
-            m_rx_failsafe_okay= okay;
+            if (!readyToArm()) {
+                m_led->warningFlash();
+            } else {
+                m_led->warningDisable();
+            }
+
+            m_led->warningUpdate();
         }
+    }
+
+    void setRxFailsafe(bool okay)
+    {
+        m_rx_failsafe_okay= okay;
+    }
 
 }; // class Arming
