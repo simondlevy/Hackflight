@@ -25,7 +25,7 @@
 #include "core/filters/pt1.h"
 #include "core/vstate.h"
 #include "imu.h"
-#include "stdev.h"
+#include "stats.h"
 #include "system.h"
 #include "time.h"
 
@@ -47,7 +47,7 @@ class Imu {
 
         typedef struct {
             float sum[3];
-            Stdev var[3];
+            Stats stats[3];
         } calibration_t;
 
         typedef struct {
@@ -59,7 +59,7 @@ class Imu {
 
             Pt1Filter lowpassFilter1 = Pt1Filter(GYRO_LPF1_DYN_MIN_HZ);
             Pt1Filter lowpassFilter2 = Pt1Filter(GYRO_LPF2_STATIC_HZ);
- 
+
         } axis_t;
 
         axis_t m_x;
@@ -90,17 +90,17 @@ class Imu {
             // Reset at start of calibration
             if (m_calibrationCyclesRemaining == (int32_t)calculateCalibratingCycles()) {
                 m_calibration.sum[index] = 0.0f;
-                m_calibration.var[index].clear();
+                m_calibration.stats[index].clear();
                 // zero is set to zero until calibration complete
                 axis.zero = 0.0f;
             }
 
             // Sum up CALIBRATING_GYRO_TIME_US readings
             m_calibration.sum[index] += devReadRawGyro(index);
-            m_calibration.var[index].push(devReadRawGyro(index));
+            m_calibration.stats[index].push(devReadRawGyro(index));
 
             if (m_calibrationCyclesRemaining == 1) {
-                const float stddev = m_calibration.var[index].stdev();
+                const float stddev = m_calibration.stats[index].stdev();
 
                 // check deviation and startover in case the model was moved
                 if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
@@ -243,9 +243,7 @@ class Imu {
             return m_isCalibrating;
         }
 
-        int32_t getGyroSkew(
-                uint32_t nextTargetCycles,
-                int32_t desiredPeriodCycles)
+        int32_t getGyroSkew( uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
         {
             auto skew =
                 cmpTimeCycles(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;

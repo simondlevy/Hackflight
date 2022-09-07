@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <math.h>
 
-class Stdev {
+class Stats {
 
     private:
 
