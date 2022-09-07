@@ -54,10 +54,10 @@ class Receiver {
 
     private:
 
-    static const uint8_t CHANNEL_COUNT = 18;
+    static const uint8_t CHANNEL_COUNT = 6;
     static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
 
-    static const uint8_t RATE    = 67;
+    static const uint8_t RATE = 67;
 
     static const uint32_t FAILSAFE_POWER_ON_DELAY_US = (1000 * 1000 * 5);
 
