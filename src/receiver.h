@@ -215,13 +215,13 @@ class Receiver {
         failsafeChannelConfigs[AUX1].step     = 30;
         failsafeChannelConfigs[AUX2].step     = 30;
 
-        for (auto i = 0; i < 4; i++) {
-            failsafeChannelConfigs[i].mode = 0;
-        }
+        failsafeChannelConfigs[THROTTLE].mode = 0;
+        failsafeChannelConfigs[ROLL].mode     = 0;
+        failsafeChannelConfigs[PITCH].mode    = 0;
+        failsafeChannelConfigs[YAW].mode      = 0;
+        failsafeChannelConfigs[AUX1].mode     = 1;
+        failsafeChannelConfigs[AUX2].mode     = 1;
 
-        for (auto i = 4; i < CHANNEL_COUNT; i++) {
-            failsafeChannelConfigs[i].mode = 1;
-        }
 
         const failsafeChannelConfig_t *channelFailsafeConfig =
             &failsafeChannelConfigs[channel];
