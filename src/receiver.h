@@ -47,8 +47,6 @@ class Receiver {
     typedef enum {
         FRAME_PENDING = 0,
         FRAME_COMPLETE = (1 << 0),
-        FRAME_FAILSAFE = (1 << 1),
-        FRAME_DROPPED = (1 << 3)
     } frameVehicleState_e;
 
     private:
@@ -777,8 +775,8 @@ class Receiver {
         // printf("%d: %d\n", (int)frameStatus, (int)m_lastFrameTimeUs);
 
         if (frameStatus & FRAME_COMPLETE) {
-            m_inFailsafeMode = (frameStatus & FRAME_FAILSAFE) != 0;
-            auto frameDropped = (frameStatus & FRAME_DROPPED) != 0;
+            m_inFailsafeMode = false;//(frameStatus & FRAME_FAILSAFE) != 0;
+            auto frameDropped = false; //(frameStatus & FRAME_DROPPED) != 0;
             signalReceived = !(m_inFailsafeMode || frameDropped);
             if (signalReceived) {
                 m_needSignalBefore =
