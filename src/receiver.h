@@ -766,7 +766,7 @@ class Receiver {
 
         const auto frameStatus = devCheck(m_channelData, &m_lastFrameTimeUs);
 
-        // printf("%d: %d\n", (int)frameStatus, (int)m_lastFrameTimeUs);
+        // if (frameStatus) serialDebugPrintf("%d\n", (int)m_lastFrameTimeUs);
 
         if (frameStatus) {
             m_inFailsafeMode = false;

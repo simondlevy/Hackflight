@@ -143,7 +143,7 @@ class SbusReceiver : public Receiver {
             return (5 * (float)channelData[chan] / 8) + 880;
         }
 
-        virtual bool devCheck(uint16_t * channelData, uint32_t * frameTimeUs) override
+        virtual bool devCheck(uint16_t channelData[], uint32_t * frameTimeUs) override
         {
             if (!m_frameData.done) {
                 return false;
@@ -158,6 +158,7 @@ class SbusReceiver : public Receiver {
             channelData[3] = channels->chan3;
             channelData[4] = channels->chan4;
             channelData[5] = channels->chan5;
+            /*
             channelData[6] = channels->chan6;
             channelData[7] = channels->chan7;
             channelData[8] = channels->chan8;
@@ -180,6 +181,7 @@ class SbusReceiver : public Receiver {
             } else {
                 channelData[17] = CHANNEL_MIN;
             }
+            */
 
             *frameTimeUs = m_frameData.startAtUs;
 
