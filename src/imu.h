@@ -48,7 +48,6 @@ class Imu {
         typedef struct {
             float sum[3];
             Stdev var[3];
-            int32_t cyclesRemaining;
         } calibration_t;
 
         typedef struct {
@@ -69,6 +68,7 @@ class Imu {
 
         calibration_t m_calibration;
 
+        int32_t  m_calibrationCyclesRemaining;
         uint32_t m_gyroInterruptCount;
         uint16_t m_gyroScale;
         uint32_t m_gyroSyncTime;
@@ -82,13 +82,13 @@ class Imu {
 
         void setCalibrationCycles(void)
         {
-            m_calibration.cyclesRemaining = (int32_t)calculateCalibratingCycles();
+            m_calibrationCyclesRemaining = (int32_t)calculateCalibratingCycles();
         }
 
         void calibrateAxis(axis_t & axis, const uint8_t index)
         {
             // Reset at start of calibration
-            if (m_calibration.cyclesRemaining == (int32_t)calculateCalibratingCycles()) {
+            if (m_calibrationCyclesRemaining == (int32_t)calculateCalibratingCycles()) {
                 m_calibration.sum[index] = 0.0f;
                 m_calibration.var[index].clear();
                 // zero is set to zero until calibration complete
@@ -99,7 +99,7 @@ class Imu {
             m_calibration.sum[index] += devReadRawGyro(index);
             m_calibration.var[index].push(devReadRawGyro(index));
 
-            if (m_calibration.cyclesRemaining == 1) {
+            if (m_calibrationCyclesRemaining == 1) {
                 const float stddev = m_calibration.var[index].stdev();
 
                 // check deviation and startover in case the model was moved
@@ -119,7 +119,7 @@ class Imu {
             calibrateAxis(m_y, 1);
             calibrateAxis(m_z, 2);
 
-            --m_calibration.cyclesRemaining;
+            --m_calibrationCyclesRemaining;
         }
 
         void applyLpf1(axis_t & axis)
@@ -193,7 +193,7 @@ class Imu {
         {
             if (!devGyroIsReady()) return;
 
-            auto calibrationComplete = m_calibration.cyclesRemaining <= 0;
+            auto calibrationComplete = m_calibrationCyclesRemaining <= 0;
 
             static axes_t _adc;
 
