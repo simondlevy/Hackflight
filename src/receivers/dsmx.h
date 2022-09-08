@@ -75,7 +75,7 @@ class DsmxReceiver : public Receiver {
 
      protected:
 
-        virtual void begin(void) override
+        virtual void devStart(void) override
         {
             serialOpenPortDsmx(
                     m_port,
@@ -83,7 +83,7 @@ class DsmxReceiver : public Receiver {
                     &m_frameData);
         }
 
-        virtual float convert(uint16_t * channelData, uint8_t chan) override
+        virtual float devConvert(uint16_t * channelData, uint8_t chan) override
         {
             // Ignore channel 6 for now (problems with transmitter)
             auto chanval = chan == 5 ? 1 : channelData[chan];

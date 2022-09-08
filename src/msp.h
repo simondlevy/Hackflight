@@ -21,6 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 
 #include "core/vstate.h"
+#include "esc.h"
 #include "imu.h"
 #include "maths.h"
 #include "receiver.h"
@@ -50,6 +51,7 @@ class Msp {
             return (int16_t)Math::rad2deg(rad);
         }
 
+        Esc * m_esc;
 
         // streambuf -----------------------------------------------------------
 
@@ -518,8 +520,10 @@ class Msp {
             memset(m_ports, 0, sizeof(m_ports));
         }
 
-        void begin(void)
+        void begin(Esc * esc)
         {
+            m_esc = esc;
+
             m_ports[0].port = serialOpenPortUsb();
 
             m_dbgPort = m_ports[0].port; 
@@ -535,7 +539,6 @@ class Msp {
                 VehicleState * vstate,
                 Receiver::sticks_t *rxsticks,
                 bool armed,
-                Esc * esc,
                 float * motors)
         {
             // Sync debugging to MSP update
@@ -576,7 +579,7 @@ class Msp {
                                             fcProcessCommand,
                                             vstate,
                                             rxsticks,
-                                            esc,
+                                            m_esc,
                                             motors);
                             } else if (mspPort->packetType == PACKET_REPLY) {
                                 serialProcessReceivedReply(mspPort, fcProcessReply);

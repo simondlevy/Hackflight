@@ -129,7 +129,7 @@ class SbusReceiver : public Receiver {
 
     protected:
 
-        virtual void begin(void) override
+        virtual void devStart(void) override
         {
             serialOpenPortSbus(
                     m_port,
@@ -137,7 +137,7 @@ class SbusReceiver : public Receiver {
                     &m_frameData);
         }
 
-        virtual float convert(uint16_t * channelData, uint8_t chan) override
+        virtual float devConvert(uint16_t * channelData, uint8_t chan) override
         {
             // [172,1811] -> [1000,2000]
             return (5 * (float)channelData[chan] / 8) + 880;

@@ -166,6 +166,7 @@ class Receiver {
     Demands  m_commands;
     bool     m_dataProcessingRequired;
     Demands  m_dataToSmooth;
+    Esc *    m_esc;
     uint16_t m_feedforwardCutoffFrequency;
     uint8_t  m_feedforwardCutoffSetting;
     bool     m_feedforwardLpfInitialized;
@@ -226,7 +227,7 @@ class Receiver {
     {
         for (auto channel=0; channel<CHANNEL_COUNT; ++channel) {
 
-            float sample = convert(m_channelData, channel);
+            float sample = devConvert(m_channelData, channel);
 
             m_raw[channel] = channel < 4 && sample != 0 ?
                 constrain_f(sample, PWM_PULSE_MIN, PWM_PULSE_MAX) :
@@ -638,11 +639,18 @@ class Receiver {
 
     protected:
 
-    virtual void begin(/*serialPortIdentifier_e port*/) = 0;
+    void begin(Esc * esc)
+    {
+        m_esc = esc;
+
+        devStart();
+    }
+
+    virtual void devStart(void) = 0;
 
     virtual bool devCheck(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
 
-    virtual float convert(uint16_t * chanData, uint8_t chanId) = 0;
+    virtual float devConvert(uint16_t * chanData, uint8_t chanId) = 0;
 
     public:
 

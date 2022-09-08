@@ -36,7 +36,7 @@ class AttitudeTask : public Task {
         {
         }
 
-        void setImu(Imu * imu)
+        void begin(Imu * imu)
         {
             m_imu = imu;
         }

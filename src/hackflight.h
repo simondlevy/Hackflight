@@ -56,6 +56,7 @@ class Hackflight {
 
         // Initialzed in main()
         Imu   * m_imu;
+        Esc   * m_esc;
         Led   * m_led;
         Mixer * m_mixer;
         
@@ -105,32 +106,32 @@ class Hackflight {
 
                 auto motorOutput = motors.values[i];
 
-                motorOutput = m_taskData.esc->valueLow() +
-                    (m_taskData.esc->valueHigh() -
-                     m_taskData.esc->valueLow()) * motorOutput;
+                motorOutput = m_esc->valueLow() +
+                    (m_esc->valueHigh() -
+                     m_esc->valueLow()) * motorOutput;
 
                 if (m_taskData.failsafeIsActive) {
-                    if (m_taskData.esc->isProtocolDshot()) {
+                    if (m_esc->isProtocolDshot()) {
                         // Prevent getting into special reserved range
-                        motorOutput = (motorOutput < m_taskData.esc->valueLow()) ?
-                            m_taskData.esc->valueDisarmed() :
+                        motorOutput = (motorOutput < m_esc->valueLow()) ?
+                            m_esc->valueDisarmed() :
                             motorOutput; 
                     }
                     motorOutput = constrain_f(
                             motorOutput,
-                            m_taskData.esc->valueDisarmed(),
-                            m_taskData.esc->valueHigh());
+                            m_esc->valueDisarmed(),
+                            m_esc->valueHigh());
                 } else {
                     motorOutput =
                         constrain_f(
                                 motorOutput,
-                                m_taskData.esc->valueLow(),
-                                m_taskData.esc->valueHigh());
+                                m_esc->valueLow(),
+                                m_esc->valueHigh());
                 }
                 mixmotors[i] = motorOutput;
             }
 
-            m_taskData.esc->write(
+            m_esc->write(
                     m_taskData.arming.isArmed() ?
                     mixmotors :
                     m_taskData.mspMotors);
@@ -245,12 +246,13 @@ class Hackflight {
             m_imu = &imu;
             m_mixer = &mixer;
             m_imuAlignFun = imuAlignFun;
+            m_esc = &esc;
             m_led = &led;
 
             m_pidControllers = &pidControllers;
 
             m_taskData.receiver = &receiver;
-            m_taskData.esc = &esc;
+            m_esc = &esc;
 
             m_taskData.maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
 
@@ -260,12 +262,12 @@ class Hackflight {
 
         void begin(void)
         {
-            m_attitudeTask.setImu(m_imu);
+            m_attitudeTask.begin(m_imu);
 
-            m_taskData.receiver->begin();
-            m_taskData.msp.begin();
+            m_taskData.receiver->begin(m_esc);
+            m_taskData.msp.begin(m_esc);
             m_imu->begin();
-            m_taskData.esc->begin();
+            m_esc->begin();
 
             m_led->begin();
 

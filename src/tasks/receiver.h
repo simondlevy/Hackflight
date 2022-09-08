@@ -20,10 +20,15 @@
 
 #include <string.h>
 
+#include "esc.h"
 #include "task.h"
 #include "../receiver.h"
 
 class ReceiverTask : public Task {
+
+    private:
+
+        Esc * m_esc;
 
     public:
 
@@ -72,7 +77,7 @@ class ReceiverTask : public Task {
                     pidItermResetValue = receiver->processData(usec);
                     break;
                 case Receiver::STATE_MODES:
-                    arming->check(data->esc, usec, rxsticks);
+                    arming->check(m_esc, usec, rxsticks);
                     break;
                 case Receiver::STATE_UPDATE:
                     gotNewData = true;
