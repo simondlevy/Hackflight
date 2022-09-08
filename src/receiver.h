@@ -707,9 +707,7 @@ class Receiver {
                 break;
 
             case STATE_MODES:
-                arming->check(esc, currentTimeUs, m_raw,
-                        imuIsLevel,
-                        calibrating);
+                arming->check(esc, currentTimeUs, m_raw);
                 m_state = STATE_UPDATE;
                 break;
 

@@ -59,18 +59,11 @@ class Arming {
     bool m_rx_failsafe_okay;
     bool m_throttle_is_down;
 
-    void check(
-            Esc * esc,
-            const uint32_t currentTimeUs,
-            const float raw[],
-            const bool imuIsLevel,
-            const bool calibrating)
+    void check( Esc * esc, const uint32_t currentTimeUs, const float raw[])
     {
         static bool _doNotRepeat;
 
         if (rxAux1IsSet(raw)) {
-
-            updateStatus(raw, imuIsLevel, calibrating);
 
             if (readyToArm()) {
 
@@ -83,7 +76,6 @@ class Arming {
                 }
 
                 m_is_armed = true;
-
             }
 
         } else {
