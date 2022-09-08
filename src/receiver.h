@@ -120,30 +120,12 @@ class Receiver {
     }
 
     typedef enum {
-        FAILSAFE_MODE_AUTO = 0,
-        FAILSAFE_MODE_HOLD,
-        FAILSAFE_MODE_SET,
-        FAILSAFE_MODE_INVALID
-    } failsafeChannelMode_e;
-
-    typedef struct failsafeChannelConfig_s {
-        uint8_t mode; 
-        uint8_t step;
-    } failsafeChannelConfig_t;
-
-    typedef enum {
         STATE_CHECK,
         STATE_PROCESS,
         STATE_MODES,
         STATE_UPDATE,
         STATE_COUNT
     } state_e;
-
-    uint8_t     m_autoSmoothnessFactorSetpoint;
-    uint32_t    m_averageFrameTimeUs;
-    uint8_t     m_autoSmoothnessFactorThrottle;
-    uint16_t    m_feedforwardCutoffFrequency;
-    uint8_t     m_ffCutoffSetting;
 
     Pt3Filter m_filterThrottle;
     Pt3Filter m_filterRoll;
@@ -162,77 +144,43 @@ class Receiver {
 
     int16_t    m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
 
-    bool        m_filterInitialized;
-    uint16_t    m_setpointCutoffFrequency;
-    uint8_t     m_setpointCutoffSetting;
-    uint16_t    m_throttleCutoffFrequency;
-    uint8_t     m_throttleCutoffSetting;
-    float       m_trainingSum;
-    uint32_t    m_trainingCount;
-    uint16_t    m_trainingMax;
-    uint16_t    m_trainingMin;
-
-    bool         m_auxiliaryProcessingRequired;
-    bool         m_calculatedCutoffs;
-    Demands      m_commands;
-    bool         m_dataProcessingRequired;
-    Demands      m_dataToSmooth;
-    bool         m_feedforwardLpfInitialized;
-    int32_t      m_frameTimeDeltaUs;
-    bool         m_gotNewData;
-    bool         m_inFailsafeMode;
-    bool         m_initializedFilter;
-    bool         m_initializedThrottleTable;
-    bool         m_isRateValid;
-    uint32_t     m_lastFrameTimeUs;
-    uint32_t     m_lastRxTimeUs;
-    uint32_t     m_needSignalBefore;
-    uint32_t     m_nextUpdateAtUs;
-    uint32_t     m_previousFrameTimeUs;
-    uint32_t     m_refreshPeriod;
-    bool         m_signalReceived;
-    state_e      m_state;
-    uint32_t     m_validFrameTimeMs;
+    uint8_t  m_autoSmoothnessFactorSetpoint;
+    uint8_t  m_autoSmoothnessFactorThrottle;
+    bool     m_auxiliaryProcessingRequired;
+    uint32_t m_averageFrameTimeUs;
+    bool     m_calculatedCutoffs;
+    Demands  m_commands;
+    bool     m_dataProcessingRequired;
+    Demands  m_dataToSmooth;
+    uint16_t m_feedforwardCutoffFrequency;
+    uint8_t  m_feedforwardCutoffSetting;
+    bool     m_feedforwardLpfInitialized;
+    bool     m_filterInitialized;
+    int32_t  m_frameTimeDeltaUs;
+    bool     m_gotNewData;
+    bool     m_inFailsafeMode;
+    bool     m_initializedFilter;
+    bool     m_initializedThrottleTable;
+    bool     m_isRateValid;
+    uint32_t m_lastFrameTimeUs;
+    uint32_t m_lastRxTimeUs;
+    uint32_t m_needSignalBefore;
+    uint32_t m_nextUpdateAtUs;
+    uint32_t m_previousFrameTimeUs;
+    uint32_t m_refreshPeriod;
+    uint16_t m_setpointCutoffFrequency;
+    uint8_t  m_setpointCutoffSetting;
+    bool     m_signalReceived;
+    state_e  m_state;
+    uint16_t m_throttleCutoffFrequency;
+    uint8_t  m_throttleCutoffSetting;
+    uint32_t m_trainingCount;
+    uint16_t m_trainingMax;
+    uint16_t m_trainingMin;
+    float    m_trainingSum;
+    uint32_t m_validFrameTimeMs;
 
     private:
-
-    uint16_t getFailValue(const uint8_t channel)
-    {
-        failsafeChannelConfig_t failsafeChannelConfigs[CHANNEL_COUNT];
-
-        failsafeChannelConfigs[THROTTLE].step = 30;
-        failsafeChannelConfigs[ROLL].step     = 30;
-        failsafeChannelConfigs[PITCH].step    = 30;
-        failsafeChannelConfigs[YAW].step      = 5;
-        failsafeChannelConfigs[AUX1].step     = 30;
-        failsafeChannelConfigs[AUX2].step     = 30;
-
-        failsafeChannelConfigs[THROTTLE].mode = 0;
-        failsafeChannelConfigs[ROLL].mode     = 0;
-        failsafeChannelConfigs[PITCH].mode    = 0;
-        failsafeChannelConfigs[YAW].mode      = 0;
-        failsafeChannelConfigs[AUX1].mode     = 1;
-        failsafeChannelConfigs[AUX2].mode     = 1;
-
-
-        const failsafeChannelConfig_t *channelFailsafeConfig =
-            &failsafeChannelConfigs[channel];
-
-        switch (channelFailsafeConfig->mode) {
-            case FAILSAFE_MODE_AUTO:
-                return channel == ROLL || channel == PITCH || channel == YAW ?
-                    1500 :
-                    885;
-            case FAILSAFE_MODE_INVALID:
-            case FAILSAFE_MODE_HOLD:
-                return m_raw[channel];
-            case FAILSAFE_MODE_SET:
-                return
-                    rxfail_step_to_channel_value(channelFailsafeConfig->step);
-        }
-
-        return 0;
-    }
 
     // Determine a cutoff frequency based on smoothness factor and calculated
     // average rx frame time
@@ -469,7 +417,7 @@ class Receiver {
 
         // update or initialize the FF filter
         oldCutoff = m_feedforwardCutoffFrequency;
-        if (m_ffCutoffSetting == 0) {
+        if (m_feedforwardCutoffSetting == 0) {
             m_feedforwardCutoffFrequency =
                 fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
                         calcAutoSmoothingCutoff(
@@ -520,7 +468,7 @@ class Receiver {
         // if any rc smoothing cutoff is 0 (auto) then we need to calculate
         // cutoffs
         if ((m_setpointCutoffSetting == 0) ||
-                (m_ffCutoffSetting == 0) ||
+                (m_feedforwardCutoffSetting == 0) ||
                 (m_throttleCutoffSetting == 0)) {
             return true;
         }
@@ -541,13 +489,13 @@ class Receiver {
             m_autoSmoothnessFactorThrottle = 30;
             m_setpointCutoffSetting = 0;
             m_throttleCutoffSetting = 0;
-            m_ffCutoffSetting = 0;
+            m_feedforwardCutoffSetting = 0;
             smoothingResetAccumulation();
             m_setpointCutoffFrequency =
                 m_setpointCutoffSetting;
             m_throttleCutoffFrequency =
                 m_throttleCutoffSetting;
-            if (m_ffCutoffSetting == 0) {
+            if (m_feedforwardCutoffSetting == 0) {
                 // calculate and use an initial derivative cutoff until the RC
                 // interval is known
                 const auto cutoffFactor = 1.5f /
@@ -559,7 +507,7 @@ class Receiver {
                     lrintf(ffCutoff);
             } else {
                 m_feedforwardCutoffFrequency =
-                    m_ffCutoffSetting;
+                    m_feedforwardCutoffSetting;
             }
 
             m_calculatedCutoffs = smoothingAutoCalculate();
