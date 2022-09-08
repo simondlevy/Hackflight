@@ -34,8 +34,6 @@ class Task {
 
         typedef struct {
 
-            // bool               pidReset;
-            Receiver::sticks_t rxSticks;
             VehicleState       vstate;
 
         } data_t;

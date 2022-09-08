@@ -67,7 +67,8 @@ class Hackflight {
         Imu::align_fun       m_imuAlignFun;
         Msp                  m_msp;
         MspTask              m_mspTask;
-        ReceiverTask         m_receiverTask;
+        ReceiverTask         m_rxTask;
+        Receiver::sticks_t   m_rxSticks;
         Scheduler            m_scheduler;
         Task::data_t         m_taskData;
 
@@ -100,7 +101,7 @@ class Hackflight {
                     demands,
                     m_taskData.vstate,
                     m_pidControllers,
-                    m_receiverTask.gotPidReset(),
+                    m_rxTask.gotPidReset(),
                     usec);
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
@@ -188,7 +189,7 @@ class Hackflight {
 
             uint32_t usec = timeMicros();
 
-            Task::update(&m_receiverTask, &m_taskData, usec,
+            Task::update(&m_rxTask, &m_taskData, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
             Task::update(&m_attitudeTask, &m_taskData, usec,
@@ -258,9 +259,9 @@ class Hackflight {
 
             m_attitudeTask.begin(m_imu, &m_arming);
 
-            m_receiverTask.begin(m_receiver, m_esc, &m_arming);
+            m_rxTask.begin(m_receiver, m_esc, &m_arming, &m_rxSticks);
 
-            m_mspTask.begin(m_msp, m_esc, &m_arming);
+            m_mspTask.begin(m_msp, m_esc, &m_arming, &m_rxSticks);
 
             m_imu->begin();
 

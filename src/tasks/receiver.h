@@ -28,9 +28,10 @@ class ReceiverTask : public Task {
 
     private:
 
-        Receiver * m_receiver;
-        Esc *      m_esc;
-        Arming *   m_arming;
+        Receiver *           m_receiver;
+        Receiver::sticks_t * m_rxSticks;
+        Esc *                m_esc;
+        Arming *             m_arming;
 
         bool m_gotPidReset;
 
@@ -41,11 +42,16 @@ class ReceiverTask : public Task {
         {
         }
 
-        void begin(Receiver * receiver, Esc * esc, Arming * arming)
+        void begin(
+                Receiver * receiver,
+                Esc * esc,
+                Arming * arming,
+                Receiver::sticks_t * rxSticks)
         {
             m_receiver = receiver;
             m_esc = esc;
             m_arming = arming;
+            m_rxSticks = rxSticks;
 
             m_receiver->begin(esc);
         }
@@ -77,6 +83,8 @@ class ReceiverTask : public Task {
         
         void fun(Task::data_t * data, uint32_t usec)
         {
+            (void)data;
+
             auto pidItermResetReady = false;
             auto pidItermResetValue = false;
 
@@ -108,12 +116,12 @@ class ReceiverTask : public Task {
             }
 
             if (gotNewData) {
-                data->rxSticks.demands.throttle = rxsticks.demands.throttle;
-                data->rxSticks.demands.roll = rxsticks.demands.roll;
-                data->rxSticks.demands.pitch = rxsticks.demands.pitch;
-                data->rxSticks.demands.yaw = rxsticks.demands.yaw;
-                data->rxSticks.aux1 = rxsticks.aux1;
-                data->rxSticks.aux2 = rxsticks.aux2;
+                m_rxSticks->demands.throttle = rxsticks.demands.throttle;
+                m_rxSticks->demands.roll = rxsticks.demands.roll;
+                m_rxSticks->demands.pitch = rxsticks.demands.pitch;
+                m_rxSticks->demands.yaw = rxsticks.demands.yaw;
+                m_rxSticks->aux1 = rxsticks.aux1;
+                m_rxSticks->aux2 = rxsticks.aux2;
             }
         }
 };
