@@ -51,9 +51,6 @@ class Hackflight {
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
-        // Arming safety  
-        static constexpr float MAX_ARMING_ANGLE = 25;
-
         // Initialzed in main()
         Receiver * m_receiver;
         Imu *      m_imu;
@@ -73,7 +70,6 @@ class Hackflight {
         ReceiverTask         m_receiverTask;
         Scheduler            m_scheduler;
         Task::data_t         m_taskData;
-
 
         void checkCoreTasks(uint32_t nowCycles)
         {
@@ -136,7 +132,7 @@ class Hackflight {
                 mixmotors[i] = motorOutput;
             }
 
-            m_esc->write(m_arming.isArmed() ?  mixmotors : m_taskData.mspMotors);
+            m_esc->write(m_arming.isArmed() ?  mixmotors : m_mspTask.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -254,7 +250,6 @@ class Hackflight {
 
             m_pidControllers = &pidControllers;
 
-            m_taskData.maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
         }
 
         void begin(void)

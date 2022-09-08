@@ -27,8 +27,12 @@ class AttitudeTask : public Task {
 
     private:
 
+        static constexpr float MAX_ARMING_ANGLE = 25;
+
         Arming * m_arming;
         Imu *    m_imu;
+
+        float m_maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
 
     protected:
 
@@ -48,8 +52,8 @@ class AttitudeTask : public Task {
             m_imu->getEulerAngles(m_arming->isArmed(), time, &data->vstate);
 
             auto imuIsLevel =
-                fabsf(data->vstate.phi) < data->maxArmingAngle &&
-                fabsf(data->vstate.theta) < data->maxArmingAngle;
+                fabsf(data->vstate.phi) < m_maxArmingAngle &&
+                fabsf(data->vstate.theta) < m_maxArmingAngle;
 
             m_arming->updateImuStatus(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }

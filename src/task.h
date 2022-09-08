@@ -34,8 +34,7 @@ class Task {
 
         typedef struct {
 
-            float              maxArmingAngle;
-            float              mspMotors[MAX_SUPPORTED_MOTORS];
+            //float              mspMotors[MAX_SUPPORTED_MOTORS];
             bool               pidReset;
             Receiver::sticks_t rxSticks;
             VehicleState       vstate;

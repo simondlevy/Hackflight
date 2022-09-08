@@ -23,10 +23,14 @@
 #include "../msp.h"
 
 class MspTask : public Task {
+    
+    friend class Hackflight;
 
     private:
 
         Msp * m_msp;
+
+        float  motors[MAX_SUPPORTED_MOTORS];
 
     public:
 
@@ -44,6 +48,6 @@ class MspTask : public Task {
         {
             (void)usec;
 
-            m_msp->update(&data->vstate, &data->rxSticks, data->mspMotors);
+            m_msp->update(&data->vstate, &data->rxSticks, motors);
         }
 };
