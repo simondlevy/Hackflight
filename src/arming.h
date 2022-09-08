@@ -59,7 +59,7 @@ class Arming {
     bool m_rx_failsafe_okay;
     bool m_throttle_is_down;
 
-    void check( Esc * esc, const uint32_t currentTimeUs, const float raw[])
+    void check(Esc * esc, const uint32_t currentTimeUs, const float raw[])
     {
         static bool _doNotRepeat;
 
@@ -105,19 +105,22 @@ class Arming {
         return m_is_armed;
     }
 
-    void updateStatus(const float raw[], const bool imuIsLevel, const bool calibrating)
+    void updateImuStatus(const bool imuIsLevel, const bool calibrating)
+    {
+        m_angle_okay = imuIsLevel;
+
+        m_gyro_done_calibrating = !calibrating;
+
+        m_acc_done_calibrating = true;
+    }
+
+    void updateReceiverStatus(const float raw[])
     {
         if (m_is_armed) {
             m_led->set(true);
         } else {
 
             m_throttle_is_down = throttleIsDown(raw);
-
-            m_angle_okay = imuIsLevel;
-
-            m_gyro_done_calibrating = !calibrating;
-
-            m_acc_done_calibrating = true;
 
             // If arming is disabled and the ARM switch is on
             if (!readyToArm() && rxAux1IsSet(raw)) {

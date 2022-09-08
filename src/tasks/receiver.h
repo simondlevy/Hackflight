@@ -52,8 +52,6 @@ class ReceiverTask : public Task {
         
         void fun(Task::data_t * data, uint32_t usec)
         {
-            auto calibrating = data->imu->gyroIsCalibrating(); 
-            // || acc.calibrating != 0;
             auto pidItermResetReady = false;
             auto pidItermResetValue = false;
 
@@ -61,14 +59,8 @@ class ReceiverTask : public Task {
 
             auto gotNewData = false;
 
-            auto imuIsLevel =
-                fabsf(data->vstate.phi) < data->maxArmingAngle &&
-                fabsf(data->vstate.theta) < data->maxArmingAngle;
-
             data->receiver->poll(
                     usec,
-                    imuIsLevel, 
-                    calibrating,
                     &rxsticks,
                     data->esc,
                     &data->arming,

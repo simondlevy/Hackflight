@@ -677,8 +677,6 @@ class Receiver {
 
     void poll(
             const uint32_t currentTimeUs,
-            const bool imuIsLevel,
-            const bool calibrating,
             sticks_t * sticks,
             Esc * esc,
             Arming * arming,
@@ -714,7 +712,7 @@ class Receiver {
             case STATE_UPDATE:
                 m_gotNewData = true;
                 updateCommands();
-                arming->updateStatus(m_raw, imuIsLevel, calibrating);
+                arming->updateReceiverStatus(m_raw);
                 m_state = STATE_CHECK;
                 break;
         }
