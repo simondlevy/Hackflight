@@ -28,6 +28,7 @@ class ReceiverTask : public Task {
 
     private:
 
+        Receiver * m_receiver;
         Esc * m_esc;
 
     public:
@@ -37,15 +38,25 @@ class ReceiverTask : public Task {
         {
         }
 
+        void begin(Receiver * receiver, Esc * esc)
+        {
+            m_receiver = receiver;
+            m_esc = esc;
+
+            m_receiver->begin(esc);
+        }
+
         // Increase priority for RX task
         void adjustDynamicPriority(Task::data_t *data, uint32_t usec) 
         {
+            (void)data;
+
             if (m_dynamicPriority > 0) {
                 m_ageCycles = 1 + (cmpTimeUs(usec,
                             m_lastSignaledAtUs) / m_desiredPeriodUs);
                 m_dynamicPriority = 1 + m_ageCycles;
             } else  {
-                if (data->receiver->check(usec)) {
+                if (m_receiver->check(usec)) {
                     m_lastSignaledAtUs = usec;
                     m_ageCycles = 1;
                     m_dynamicPriority = 2;
@@ -64,9 +75,7 @@ class ReceiverTask : public Task {
 
             auto gotNewData = false;
 
-            Receiver * receiver = data->receiver;
-
-            Receiver::state_e receiverState = receiver->poll(usec, &rxsticks);
+            Receiver::state_e receiverState = m_receiver->poll(usec, &rxsticks);
 
             Arming * arming = &data->arming;
 
@@ -74,7 +83,7 @@ class ReceiverTask : public Task {
 
                 case Receiver::STATE_PROCESS:
                     pidItermResetReady = true;
-                    pidItermResetValue = receiver->processData(usec);
+                    pidItermResetValue = m_receiver->processData(usec);
                     break;
                 case Receiver::STATE_MODES:
                     arming->check(m_esc, usec, rxsticks);

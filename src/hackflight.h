@@ -55,10 +55,11 @@ class Hackflight {
         static constexpr float MAX_ARMING_ANGLE = 25;
 
         // Initialzed in main()
-        Imu   * m_imu;
-        Esc   * m_esc;
-        Led   * m_led;
-        Mixer * m_mixer;
+        Receiver * m_receiver;
+        Imu *      m_imu;
+        Esc *      m_esc;
+        Led *      m_led;
+        Mixer *    m_mixer;
         
         vector<PidController *> * m_pidControllers;
 
@@ -91,7 +92,7 @@ class Hackflight {
 
             Demands demands = {0,0,0,0};
 
-            m_taskData.receiver->getDemands(usec, rawSetpoints, &demands);
+            m_receiver->getDemands(usec, rawSetpoints, &demands);
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
@@ -243,6 +244,7 @@ class Hackflight {
                 Esc & esc,
                 Led & led)
         {
+            m_receiver = &receiver;
             m_imu = &imu;
             m_mixer = &mixer;
             m_imuAlignFun = imuAlignFun;
@@ -250,9 +252,6 @@ class Hackflight {
             m_led = &led;
 
             m_pidControllers = &pidControllers;
-
-            m_taskData.receiver = &receiver;
-            m_esc = &esc;
 
             m_taskData.maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
 
@@ -264,9 +263,12 @@ class Hackflight {
         {
             m_attitudeTask.begin(m_imu);
 
-            m_taskData.receiver->begin(m_esc);
+            m_receiverTask.begin(m_receiver, m_esc);
+
             m_taskData.msp.begin(m_esc);
+
             m_imu->begin();
+
             m_esc->begin();
 
             m_led->begin();

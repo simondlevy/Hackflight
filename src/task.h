@@ -34,8 +34,6 @@ class Task {
 
         typedef struct {
 
-            Receiver *         receiver;
-
             Arming             arming;
             bool               failsafeIsActive;
             float              maxArmingAngle;
