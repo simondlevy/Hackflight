@@ -52,6 +52,7 @@ class Msp {
         }
 
         Esc * m_esc;
+        Arming * m_arming;
 
         // streambuf -----------------------------------------------------------
 
@@ -520,9 +521,10 @@ class Msp {
             memset(m_ports, 0, sizeof(m_ports));
         }
 
-        void begin(Esc * esc)
+        void begin(Esc * esc, Arming * arming)
         {
             m_esc = esc;
+            m_arming = arming;
 
             m_ports[0].port = serialOpenPortUsb();
 
@@ -535,11 +537,7 @@ class Msp {
             m_debugging = true;
         }
 
-        void update(
-                VehicleState * vstate,
-                Receiver::sticks_t *rxsticks,
-                bool armed,
-                float * motors)
+        void update(VehicleState * vstate, Receiver::sticks_t *rxsticks, float * motors)
         {
             // Sync debugging to MSP update
             if (m_debugging) {
@@ -567,7 +565,7 @@ class Msp {
                         const auto c = serialRead(mspPort->port);
                         const auto consumed = serialProcessReceivedData(mspPort, c);
 
-                        if (!consumed && !armed) {
+                        if (!consumed && !m_arming->isArmed()) {
                             evaualteNonMspData(mspPort, c);
                         }
 

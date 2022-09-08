@@ -64,12 +64,15 @@ class Hackflight {
         vector<PidController *> * m_pidControllers;
 
         // Initialzed here
+        Arming               m_arming;
         AttitudeTask         m_attitudeTask;
         Imu::align_fun       m_imuAlignFun;
+        Msp                  m_msp;
         MspTask              m_mspTask;
         ReceiverTask         m_receiverTask;
         Scheduler            m_scheduler;
         Task::data_t         m_taskData;
+
 
         void checkCoreTasks(uint32_t nowCycles)
         {
@@ -132,10 +135,7 @@ class Hackflight {
                 mixmotors[i] = motorOutput;
             }
 
-            m_esc->write(
-                    m_taskData.arming.isArmed() ?
-                    mixmotors :
-                    m_taskData.mspMotors);
+            m_esc->write(m_arming.isArmed() ?  mixmotors : m_taskData.mspMotors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -254,18 +254,17 @@ class Hackflight {
             m_pidControllers = &pidControllers;
 
             m_taskData.maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
-
-            m_taskData.arming.m_led = &led;
-
         }
 
         void begin(void)
         {
-            m_attitudeTask.begin(m_imu);
+            m_arming.begin(m_led);
 
-            m_receiverTask.begin(m_receiver, m_esc);
+            m_attitudeTask.begin(m_imu, &m_arming);
 
-            m_taskData.msp.begin(m_esc);
+            m_receiverTask.begin(m_receiver, m_esc, &m_arming);
+
+            m_mspTask.begin(m_msp, m_esc, &m_arming);
 
             m_imu->begin();
 

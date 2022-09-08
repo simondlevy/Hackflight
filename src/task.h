@@ -34,10 +34,8 @@ class Task {
 
         typedef struct {
 
-            Arming             arming;
             bool               failsafeIsActive;
             float              maxArmingAngle;
-            Msp                msp;
             float              mspMotors[MAX_SUPPORTED_MOTORS];
             bool               pidReset;
             Receiver::sticks_t rxSticks;

@@ -29,7 +29,8 @@ class ReceiverTask : public Task {
     private:
 
         Receiver * m_receiver;
-        Esc * m_esc;
+        Esc *      m_esc;
+        Arming *   m_arming;
 
     public:
 
@@ -38,10 +39,11 @@ class ReceiverTask : public Task {
         {
         }
 
-        void begin(Receiver * receiver, Esc * esc)
+        void begin(Receiver * receiver, Esc * esc, Arming * arming)
         {
             m_receiver = receiver;
             m_esc = esc;
+            m_arming = arming;
 
             m_receiver->begin(esc);
         }
@@ -77,8 +79,6 @@ class ReceiverTask : public Task {
 
             Receiver::state_e receiverState = m_receiver->poll(usec, &rxsticks);
 
-            Arming * arming = &data->arming;
-
             switch (receiverState) {
 
                 case Receiver::STATE_PROCESS:
@@ -86,11 +86,11 @@ class ReceiverTask : public Task {
                     pidItermResetValue = m_receiver->processData(usec);
                     break;
                 case Receiver::STATE_MODES:
-                    arming->check(m_esc, usec, rxsticks);
+                    m_arming->check(m_esc, usec, rxsticks);
                     break;
                 case Receiver::STATE_UPDATE:
                     gotNewData = true;
-                    arming->updateReceiverStatus(rxsticks);
+                    m_arming->updateReceiverStatus(rxsticks);
                     break;
                 default:
                     break;

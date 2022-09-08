@@ -30,7 +30,7 @@ class Arming {
     friend class SoftQuatImu;
     friend class Hackflight;
     friend class ReceiverTask;
-    friend class MspTask;
+    friend class Msp;
     friend class AttitudeTask;
 
     bool readyToArm(void)
@@ -58,6 +58,11 @@ class Arming {
     bool m_is_armed;
     bool m_rx_failsafe_okay;
     bool m_throttle_is_down;
+
+    void begin(Led * led)
+    {
+        m_led = led;
+    }
 
     void check(Esc * esc, const uint32_t currentTimeUs, const Receiver::sticks_t & sticks)
     {

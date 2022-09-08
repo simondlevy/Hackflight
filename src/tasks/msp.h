@@ -24,18 +24,26 @@
 
 class MspTask : public Task {
 
+    private:
+
+        Msp * m_msp;
+
     public:
 
         MspTask() : Task(100) { } // Hz
+
+        void begin(Msp & msp, Esc * esc, Arming * arming)
+        {
+            m_msp = &msp;
+
+            m_msp->begin(esc, arming);
+        }
+
 
         virtual void fun(Task::data_t * data, uint32_t usec) override
         {
             (void)usec;
 
-            data->msp.update(
-                    &data->vstate,
-                    &data->rxSticks,
-                    data->arming.isArmed(),
-                    data->mspMotors);
+            m_msp->update(&data->vstate, &data->rxSticks, data->mspMotors);
         }
 };

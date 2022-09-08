@@ -27,7 +27,8 @@ class AttitudeTask : public Task {
 
     private:
 
-        Imu * m_imu;
+        Arming * m_arming;
+        Imu *    m_imu;
 
     protected:
 
@@ -36,19 +37,20 @@ class AttitudeTask : public Task {
         {
         }
 
-        void begin(Imu * imu)
+        void begin(Imu * imu, Arming * arming)
         {
             m_imu = imu;
+            m_arming = arming;
         }
 
         virtual void fun(Task::data_t * data, uint32_t time) override
         {
-            m_imu->getEulerAngles(data->arming.isArmed(), time, &data->vstate);
+            m_imu->getEulerAngles(m_arming->isArmed(), time, &data->vstate);
 
             auto imuIsLevel =
                 fabsf(data->vstate.phi) < data->maxArmingAngle &&
                 fabsf(data->vstate.theta) < data->maxArmingAngle;
 
-            data->arming.updateImuStatus(imuIsLevel, m_imu->gyroIsCalibrating()); 
+            m_arming->updateImuStatus(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
 };
