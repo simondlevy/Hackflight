@@ -29,7 +29,6 @@
 #include "esc.h"
 #include "pwm.h"
 #include "serial.h"
-#include "sticks.h"
 #include "time.h"
 
 class Receiver {
@@ -44,6 +43,20 @@ class Receiver {
         float aux1;
         float aux2;
     } sticks_t;
+
+    typedef enum {
+        THROTTLE,
+        ROLL,
+        PITCH,
+        YAW,
+        AUX1,
+        AUX2
+    } rc_alias_e;
+
+    static bool throttleIsDown(const float throttle)
+    {
+        return throttle < 1050;
+    }
 
     private:
 
@@ -259,11 +272,11 @@ class Receiver {
 
     void updateCommands(void)
     {
-        m_command[Sticks::ROLL]  = updateCommand(m_raw[Sticks::ROLL],  +1);
-        m_command[Sticks::PITCH] = updateCommand(m_raw[Sticks::PITCH], +1);
-        m_command[Sticks::YAW]   = updateCommand(m_raw[Sticks::YAW],   -1);
+        m_command[ROLL]  = updateCommand(m_raw[ROLL],  +1);
+        m_command[PITCH] = updateCommand(m_raw[PITCH], +1);
+        m_command[YAW]   = updateCommand(m_raw[YAW],   -1);
 
-        auto tmp = constrain_f_i32(m_raw[Sticks::THROTTLE], 1050, PWM_MAX);
+        auto tmp = constrain_f_i32(m_raw[THROTTLE], 1050, PWM_MAX);
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
         m_commands.throttle = lookupThrottle(tmp2);
@@ -327,7 +340,7 @@ class Receiver {
             constrain_i32_u32(refreshPeriodUs, SMOOTHING_RATE_MIN_US,
                     SMOOTHING_RATE_MAX_US);
 
-        return Sticks::throttleIsDown(m_raw);
+        return throttleIsDown(m_raw[THROTTLE]);
     }
 
     void ratePidFeedforwardLpfInit(const uint16_t filterCutoff)
@@ -343,7 +356,7 @@ class Receiver {
     void ratePidFeedforwardLpfUpdate(const uint16_t filterCutoff)
     {
         if (filterCutoff > 0) {
-            for (uint8_t axis=Sticks::ROLL; axis<=Sticks::YAW; axis++) {
+            for (uint8_t axis=ROLL; axis<=YAW; axis++) {
                 m_feedforwardPt3[axis].computeGain(filterCutoff);
             }
         }
@@ -675,8 +688,6 @@ class Receiver {
     state_e poll(
             const uint32_t currentTimeUs,
             sticks_t * sticks,
-            Esc * esc,
-            Arming * arming,
             bool * pidItermResetReady,
             bool * pidItermResetValue,
             bool * gotNewData)
@@ -704,24 +715,22 @@ class Receiver {
                 break;
 
             case STATE_MODES:
-                arming->check(esc, currentTimeUs, m_raw);
                 m_state = STATE_UPDATE;
                 break;
 
             case STATE_UPDATE:
                 m_gotNewData = true;
                 updateCommands();
-                arming->updateReceiverStatus(m_raw);
                 m_state = STATE_CHECK;
                 break;
         }
 
-        sticks->demands.throttle = m_raw[Sticks::THROTTLE];
-        sticks->demands.roll     = m_raw[Sticks::ROLL];
-        sticks->demands.pitch    = m_raw[Sticks::PITCH];
-        sticks->demands.yaw      = m_raw[Sticks::YAW];
-        sticks->aux1             = m_raw[Sticks::AUX1];
-        sticks->aux2             = m_raw[Sticks::AUX2];
+        sticks->demands.throttle = m_raw[THROTTLE];
+        sticks->demands.roll     = m_raw[ROLL];
+        sticks->demands.pitch    = m_raw[PITCH];
+        sticks->demands.yaw      = m_raw[YAW];
+        sticks->aux1             = m_raw[AUX1];
+        sticks->aux2             = m_raw[AUX2];
 
         *gotNewData = m_gotNewData;
 
@@ -739,12 +748,9 @@ class Receiver {
 
             m_previousFrameTimeUs = 0;
 
-            rawSetpoints[0] =
-                getRawSetpoint(m_command[Sticks::ROLL], COMMAND_DIVIDER);
-            rawSetpoints[1] =
-                getRawSetpoint(m_command[Sticks::PITCH], COMMAND_DIVIDER);
-            rawSetpoints[2] =
-                getRawSetpoint(m_command[Sticks::YAW], YAW_COMMAND_DIVIDER);
+            rawSetpoints[0] = getRawSetpoint(m_command[ROLL], COMMAND_DIVIDER);
+            rawSetpoints[1] = getRawSetpoint(m_command[PITCH], COMMAND_DIVIDER);
+            rawSetpoints[2] = getRawSetpoint(m_command[YAW], YAW_COMMAND_DIVIDER);
         }
 
         float setpointRate[3] = {};

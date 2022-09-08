@@ -23,13 +23,13 @@
 
 #include "esc.h"
 #include "led.h"
-#include "sticks.h"
+#include "receiver.h"
 
 class Arming {
 
     friend class SoftQuatImu;
     friend class Hackflight;
-    friend class Receiver;
+    friend class ReceiverTask;
     friend class MspTask;
     friend class AttitudeTask;
 
@@ -44,9 +44,9 @@ class Arming {
             m_throttle_is_down;
     }
 
-    static bool rxAux1IsSet(const float raw[])
+    static bool rxAux1IsSet(const Receiver::sticks_t & sticks)
     {
-        return raw[4] > 1200;
+        return sticks.aux1 > 1200;
     }
 
     Led  * m_led;
@@ -59,11 +59,11 @@ class Arming {
     bool m_rx_failsafe_okay;
     bool m_throttle_is_down;
 
-    void check(Esc * esc, const uint32_t currentTimeUs, const float raw[])
+    void check(Esc * esc, const uint32_t currentTimeUs, const Receiver::sticks_t & sticks)
     {
         static bool _doNotRepeat;
 
-        if (rxAux1IsSet(raw)) {
+        if (rxAux1IsSet(sticks)) {
 
             if (readyToArm()) {
 
@@ -114,18 +114,18 @@ class Arming {
         m_acc_done_calibrating = true;
     }
 
-    void updateReceiverStatus(const float raw[])
+    void updateReceiverStatus(const Receiver::sticks_t & sticks)
     {
         if (m_is_armed) {
             m_led->set(true);
         } else {
 
-            m_throttle_is_down = Sticks::throttleIsDown(raw);
+            m_throttle_is_down = Receiver::throttleIsDown(sticks.demands.throttle);
 
             // If arming is disabled and the ARM switch is on
-            if (!readyToArm() && rxAux1IsSet(raw)) {
+            if (!readyToArm() && rxAux1IsSet(sticks)) {
                 m_switch_okay = false;
-            } else if (!rxAux1IsSet(raw)) {
+            } else if (!rxAux1IsSet(sticks)) {
                 m_switch_okay = true;
             }
 

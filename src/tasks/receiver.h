@@ -63,17 +63,19 @@ class ReceiverTask : public Task {
                 data->receiver->poll(
                         usec,
                         &rxsticks,
-                        data->esc,
-                        &data->arming,
                         &pidItermResetReady,
                         &pidItermResetValue,
                         &gotNewData);
 
+            Arming * arming = &data->arming;
+
             switch (receiverState) {
+
                 case Receiver::STATE_MODES:
-                    //printf("%f\n", rxsticks.demands.throttle);
+                    arming->check(data->esc, usec, rxsticks);
                     break;
                 case Receiver::STATE_UPDATE:
+                    arming->updateReceiverStatus(rxsticks);
                     break;
                 default:
                     break;
