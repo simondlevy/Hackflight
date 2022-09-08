@@ -282,7 +282,7 @@ class Receiver {
         m_commands.throttle = lookupThrottle(tmp2);
     }
 
-    bool calculateChannels(const uint32_t currentTimeUs)
+    bool calculateChannels(const uint32_t usec)
     {
         if (m_auxiliaryProcessingRequired) {
             m_auxiliaryProcessingRequired = false;
@@ -293,18 +293,18 @@ class Receiver {
         }
 
         m_dataProcessingRequired = false;
-        m_nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
+        m_nextUpdateAtUs = usec + DELAY_15_HZ;
 
         readChannelsAndApplyRanges();
 
         return true;
     }
 
-    int32_t getFrameDelta(const uint32_t currentTimeUs, int32_t *frameAgeUs)
+    int32_t getFrameDelta(const uint32_t usec, int32_t *frameAgeUs)
     {
         auto frameTimeUs = m_lastFrameTimeUs;
 
-        *frameAgeUs = cmpTimeUs(currentTimeUs, frameTimeUs);
+        *frameAgeUs = cmpTimeUs(usec, frameTimeUs);
 
         const auto deltaUs = cmpTimeUs(frameTimeUs, m_previousFrameTimeUs);
 
@@ -316,21 +316,21 @@ class Receiver {
         return m_frameTimeDeltaUs;
     }
 
-    bool processData(const uint32_t currentTimeUs)
+    bool processData(const uint32_t usec)
     {
         int32_t frameAgeUs;
 
         auto refreshPeriodUs =
-            getFrameDelta(currentTimeUs, &frameAgeUs);
+            getFrameDelta(usec, &frameAgeUs);
 
         if (!refreshPeriodUs ||
-                cmpTimeUs(currentTimeUs, m_lastRxTimeUs) <= frameAgeUs) {
+                cmpTimeUs(usec, m_lastRxTimeUs) <= frameAgeUs) {
 
             // calculate a delta here if not supplied by the protocol
-            refreshPeriodUs = cmpTimeUs(currentTimeUs, m_lastRxTimeUs); 
+            refreshPeriodUs = cmpTimeUs(usec, m_lastRxTimeUs); 
         }
 
-        m_lastRxTimeUs = currentTimeUs;
+        m_lastRxTimeUs = usec;
 
         m_isRateValid =
             ((uint32_t)refreshPeriodUs >= SMOOTHING_RATE_MIN_US &&
@@ -486,7 +486,7 @@ class Receiver {
     }
 
     void processSmoothingFilter(
-            const uint32_t currentTimeUs,
+            const uint32_t usec,
             float * setpointRate,
             float * rawSetpoint)
     {
@@ -536,7 +536,7 @@ class Receiver {
             // for auto calculated filters we need to examine each rx frame
             // interval
             if (m_calculatedCutoffs) {
-                const auto currentTimeMs = currentTimeUs / 1000;
+                const auto currentTimeMs = usec / 1000;
 
                 // If the filter cutoffs in auto mode, and we have good rx
                 // data, then determine the average rx frame rate and use
@@ -647,7 +647,7 @@ class Receiver {
     public:
 
     // Called from tasks/receiver.h::adjustRxDynamicPriority()
-    bool check(const uint32_t currentTimeUs)
+    bool check(const uint32_t usec)
     {
         auto signalReceived = false;
         auto useDataDrivenProcessing = true;
@@ -665,18 +665,18 @@ class Receiver {
             signalReceived = true;
             if (signalReceived) {
                 m_needSignalBefore =
-                    currentTimeUs + NEED_SIGNAL_MAX_DELAY_US;
+                    usec + NEED_SIGNAL_MAX_DELAY_US;
             }
         }
 
         if (signalReceived) {
             m_signalReceived = true;
-        } else if (currentTimeUs >= m_needSignalBefore) {
+        } else if (usec >= m_needSignalBefore) {
             m_signalReceived = false;
         }
 
         if ((signalReceived && useDataDrivenProcessing) ||
-                cmpTimeUs(currentTimeUs, m_nextUpdateAtUs) > 0) {
+                cmpTimeUs(usec, m_nextUpdateAtUs) > 0) {
             m_dataProcessingRequired = true;
         }
 
@@ -685,15 +685,8 @@ class Receiver {
 
     } // check
 
-    state_e poll(
-            const uint32_t currentTimeUs,
-            sticks_t * sticks,
-            bool * pidItermResetReady,
-            bool * pidItermResetValue,
-            bool * gotNewData)
+    state_e poll(const uint32_t usec, sticks_t * sticks)
     {
-        *pidItermResetReady = false;
-
         m_gotNewData = false;
 
         state_e retval = m_state;
@@ -705,12 +698,10 @@ class Receiver {
                 break;
 
             case STATE_PROCESS:
-                if (!calculateChannels(currentTimeUs)) {
+                if (!calculateChannels(usec)) {
                     m_state = STATE_CHECK;
                     break;
                 }
-                *pidItermResetReady = true;
-                *pidItermResetValue = processData(currentTimeUs);
                 m_state = STATE_MODES;
                 break;
 
@@ -732,17 +723,12 @@ class Receiver {
         sticks->aux1             = m_raw[AUX1];
         sticks->aux2             = m_raw[AUX2];
 
-        *gotNewData = m_gotNewData;
-
         return retval;
 
     } // poll
 
     // Runs in fast (inner, core) loop
-    void getDemands(
-            const uint32_t currentTimeUs,
-            float rawSetpoints[3],
-            Demands * demands)
+    void getDemands(const uint32_t usec, float rawSetpoints[3], Demands * demands)
     {
         if (m_gotNewData) {
 
@@ -754,7 +740,7 @@ class Receiver {
         }
 
         float setpointRate[3] = {};
-        processSmoothingFilter(currentTimeUs, setpointRate, rawSetpoints);
+        processSmoothingFilter(usec, setpointRate, rawSetpoints);
 
         // Find min and max throttle based on conditions. Throttle has to
         // be known before mixing

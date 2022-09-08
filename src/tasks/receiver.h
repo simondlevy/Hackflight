@@ -59,22 +59,23 @@ class ReceiverTask : public Task {
 
             auto gotNewData = false;
 
-            Receiver::state_e receiverState = 
-                data->receiver->poll(
-                        usec,
-                        &rxsticks,
-                        &pidItermResetReady,
-                        &pidItermResetValue,
-                        &gotNewData);
+            Receiver * receiver = data->receiver;
+
+            Receiver::state_e receiverState = receiver->poll(usec, &rxsticks);
 
             Arming * arming = &data->arming;
 
             switch (receiverState) {
 
+                case Receiver::STATE_PROCESS:
+                    pidItermResetReady = true;
+                    pidItermResetValue = receiver->processData(usec);
+                    break;
                 case Receiver::STATE_MODES:
                     arming->check(data->esc, usec, rxsticks);
                     break;
                 case Receiver::STATE_UPDATE:
+                    gotNewData = true;
                     arming->updateReceiverStatus(rxsticks);
                     break;
                 default:
