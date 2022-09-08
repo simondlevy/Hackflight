@@ -70,7 +70,7 @@ class Hackflight {
         ReceiverTask         m_rxTask;
         Receiver::sticks_t   m_rxSticks;
         Scheduler            m_scheduler;
-        Task::data_t         m_taskData;
+        VehicleState         m_vstate;
 
         void checkCoreTasks(uint32_t nowCycles)
         {
@@ -85,7 +85,7 @@ class Hackflight {
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            m_imu->readScaledGyro(m_imuAlignFun, &m_taskData.vstate);
+            m_imu->readScaledGyro(m_imuAlignFun, &m_vstate);
 
             auto usec = timeMicros();
 
@@ -99,7 +99,7 @@ class Hackflight {
 
             auto motors = m_mixer->step(
                     demands,
-                    m_taskData.vstate,
+                    m_vstate,
                     m_pidControllers,
                     m_rxTask.gotPidReset(),
                     usec);
@@ -189,13 +189,12 @@ class Hackflight {
 
             uint32_t usec = timeMicros();
 
-            Task::update(&m_rxTask, &m_taskData, usec,
+            Task::update(&m_rxTask, usec, &selectedTask, &selectedTaskDynamicPriority);
+
+            Task::update(&m_attitudeTask, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_attitudeTask, &m_taskData, usec,
-                    &selectedTask, &selectedTaskDynamicPriority);
-
-            Task::update(&m_mspTask, &m_taskData, usec,
+            Task::update(&m_mspTask, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
             if (selectedTask) {
@@ -219,7 +218,7 @@ class Hackflight {
 
                     auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
 
-                    selectedTask->execute(&m_taskData, usec);
+                    selectedTask->execute(usec);
 
                     m_scheduler.updateDynamic(
                             systemGetCycleCounter(),
@@ -250,18 +249,17 @@ class Hackflight {
             m_led = &led;
 
             m_pidControllers = &pidControllers;
-
         }
 
         void begin(void)
         {
             m_arming.begin(m_led);
 
-            m_attitudeTask.begin(m_imu, &m_arming);
+            m_attitudeTask.begin(m_imu, &m_arming, &m_vstate);
 
             m_rxTask.begin(m_receiver, m_esc, &m_arming, &m_rxSticks);
 
-            m_mspTask.begin(m_msp, m_esc, &m_arming, &m_rxSticks);
+            m_mspTask.begin(m_msp, m_esc, &m_arming, &m_rxSticks, &m_vstate);
 
             m_imu->begin();
 

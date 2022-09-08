@@ -62,10 +62,8 @@ class ReceiverTask : public Task {
         }
 
         // Increase priority for RX task
-        void adjustDynamicPriority(Task::data_t *data, uint32_t usec) 
+        void adjustDynamicPriority(uint32_t usec) 
         {
-            (void)data;
-
             if (m_dynamicPriority > 0) {
                 m_ageCycles = 1 + (cmpTimeUs(usec,
                             m_lastSignaledAtUs) / m_desiredPeriodUs);
@@ -81,10 +79,8 @@ class ReceiverTask : public Task {
             }
         }    
         
-        void fun(Task::data_t * data, uint32_t usec)
+        void fun(uint32_t usec)
         {
-            (void)data;
-
             auto pidItermResetReady = false;
             auto pidItermResetValue = false;
 

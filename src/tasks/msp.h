@@ -28,7 +28,8 @@ class MspTask : public Task {
 
     private:
 
-        Msp * m_msp;
+        Msp *          m_msp;
+        VehicleState * m_vstate;
 
         float  motors[MAX_SUPPORTED_MOTORS];
 
@@ -38,19 +39,26 @@ class MspTask : public Task {
 
         MspTask() : Task(100) { } // Hz
 
-        void begin(Msp & msp, Esc * esc, Arming * arming, Receiver::sticks_t * rxSticks)
+        void begin(
+                Msp & msp,
+                Esc * esc,
+                Arming * arming,
+                Receiver::sticks_t * rxSticks,
+                VehicleState * vstate)
         {
             m_msp = &msp;
+
+            m_vstate = vstate;
 
             m_msp->begin(esc, arming);
 
             m_rxSticks = rxSticks;
         }
 
-        virtual void fun(Task::data_t * data, uint32_t usec) override
+        virtual void fun(uint32_t usec) override
         {
             (void)usec;
 
-            m_msp->update(&data->vstate, m_rxSticks, motors);
+            m_msp->update(m_vstate, m_rxSticks, motors);
         }
 };

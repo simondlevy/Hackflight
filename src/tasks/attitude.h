@@ -29,8 +29,9 @@ class AttitudeTask : public Task {
 
         static constexpr float MAX_ARMING_ANGLE = 25;
 
-        Arming * m_arming;
-        Imu *    m_imu;
+        Arming *       m_arming;
+        Imu *          m_imu;
+        VehicleState * m_vstate;
 
         float m_maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
 
@@ -41,19 +42,20 @@ class AttitudeTask : public Task {
         {
         }
 
-        void begin(Imu * imu, Arming * arming)
+        void begin(Imu * imu, Arming * arming, VehicleState * vstate)
         {
             m_imu = imu;
             m_arming = arming;
+            m_vstate = vstate;
         }
 
-        virtual void fun(Task::data_t * data, uint32_t time) override
+        virtual void fun(uint32_t time) override
         {
-            m_imu->getEulerAngles(m_arming->isArmed(), time, &data->vstate);
+            m_imu->getEulerAngles(m_arming->isArmed(), time, m_vstate);
 
             auto imuIsLevel =
-                fabsf(data->vstate.phi) < m_maxArmingAngle &&
-                fabsf(data->vstate.theta) < m_maxArmingAngle;
+                fabsf(m_vstate->phi) < m_maxArmingAngle &&
+                fabsf(m_vstate->theta) < m_maxArmingAngle;
 
             m_arming->updateImuStatus(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }

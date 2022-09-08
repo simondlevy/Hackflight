@@ -30,14 +30,6 @@
 
 class Task {
 
-    public:
-
-        typedef struct {
-
-            VehicleState       vstate;
-
-        } data_t;
-
     private:
 
         // Some tasks have occasional peaks in execution time so normal moving
@@ -70,10 +62,8 @@ class Task {
 
     public:
 
-        virtual void adjustDynamicPriority(data_t * data, uint32_t usec)
+        virtual void adjustDynamicPriority(uint32_t usec)
         {
-            (void)data;
-
             // Task is time-driven, dynamicPriority is last execution age
             // (measured in desiredPeriods). Task age is calculated from last
             // execution.
@@ -93,13 +83,13 @@ class Task {
             }
         }
 
-        void execute(data_t * data, uint32_t usec)
+        void execute(uint32_t usec)
         {
             m_lastExecutedAtUs = usec;
             m_dynamicPriority = 0;
 
             uint32_t time = timeMicros();
-            fun(data, usec);
+            fun(usec);
 
             uint32_t taskExecutionTimeUs = timeMicros() - time;
 
@@ -120,12 +110,11 @@ class Task {
 
         static void update(
                 Task * task,
-                data_t * data,
                 uint32_t usec,
                 Task ** selected,
                 uint16_t * selectedPriority)
         {
-            task->adjustDynamicPriority(data, usec);
+            task->adjustDynamicPriority(usec);
 
             if (task->m_dynamicPriority > *selectedPriority) {
                 *selectedPriority = task->m_dynamicPriority;
@@ -133,5 +122,5 @@ class Task {
             }
         }
 
-        virtual void fun(data_t * data, uint32_t usec) = 0;
+        virtual void fun(uint32_t usec) = 0;
 }; 
