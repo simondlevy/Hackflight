@@ -36,7 +36,7 @@ class Imu {
     friend class Hackflight;
     friend class Task;
     friend class AttitudeTask;
-    friend class ReceiverTask;
+    friend class Receiver;
 
     private:
 

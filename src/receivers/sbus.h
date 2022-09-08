@@ -21,8 +21,8 @@
 
 #include <stdlib.h>
 
-#include "receiver.h"
 #include "serial.h"
+#include "tasks/receiver.h"
 #include "time.h"
 
 class SbusReceiver : public Receiver {

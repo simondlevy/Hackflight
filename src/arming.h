@@ -23,14 +23,14 @@
 
 #include "esc.h"
 #include "led.h"
-#include "receiver.h"
+#include "tasks/receiver.h"
 
 class Arming {
 
     friend class SoftQuatImu;
     friend class Hackflight;
-    friend class ReceiverTask;
-    friend class MspTask;
+    friend class Receiver;
+    friend class Msp;
     friend class AttitudeTask;
 
     bool readyToArm(void)

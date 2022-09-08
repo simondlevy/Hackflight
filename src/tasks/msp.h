@@ -30,7 +30,7 @@
 #define ARRAYEND(x) (&(x)[ARRAYLEN(x)])
 #define ARRAYLEN(x) (sizeof(x) / sizeof((x)[0]))
 
-class MspTask : public Task {
+class Msp : public Task {
     
     friend class Hackflight;
 
@@ -528,7 +528,7 @@ class MspTask : public Task {
 
     public:
 
-        MspTask() : Task(100) { } // Hz
+        Msp() : Task(100) { } // Hz
 
         void begin(
                 Esc * esc,

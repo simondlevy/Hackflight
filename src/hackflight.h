@@ -35,7 +35,6 @@ using namespace std;
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
-#include "receiver.h"
 #include "scheduler.h"
 #include "system.h"
 #include "tasks/attitude.h"
@@ -51,21 +50,20 @@ class Hackflight {
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
         // Initialzed in main()
-        Receiver * m_receiver;
         Imu *      m_imu;
         Esc *      m_esc;
         Led *      m_led;
         Mixer *    m_mixer;
+        Receiver * m_receiver;
         
         vector<PidController *> * m_pidControllers;
 
         // Initialzed here
         Arming               m_arming;
-        AttitudeTask         m_attitudeTask;
+        AttitudeTask         m_attitude;
         bool                 m_failsafeIsActive;
         Imu::align_fun       m_imuAlignFun;
-        MspTask              m_mspTask;
-        ReceiverTask         m_rxTask;
+        Msp                  m_msp;
         Receiver::sticks_t   m_rxSticks;
         Scheduler            m_scheduler;
         VehicleState         m_vstate;
@@ -99,7 +97,7 @@ class Hackflight {
                     demands,
                     m_vstate,
                     m_pidControllers,
-                    m_rxTask.gotPidReset(),
+                    m_receiver->gotPidReset(),
                     usec);
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
@@ -131,7 +129,7 @@ class Hackflight {
                 mixmotors[i] = motorOutput;
             }
 
-            m_esc->write(m_arming.isArmed() ?  mixmotors : m_mspTask.motors);
+            m_esc->write(m_arming.isArmed() ?  mixmotors : m_msp.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -187,12 +185,12 @@ class Hackflight {
 
             uint32_t usec = timeMicros();
 
-            Task::update(&m_rxTask, usec, &selectedTask, &selectedTaskDynamicPriority);
+            Task::update(m_receiver, usec, &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_attitudeTask, usec,
+            Task::update(&m_attitude, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_mspTask, usec, &selectedTask, &selectedTaskDynamicPriority);
+            Task::update(&m_msp, usec, &selectedTask, &selectedTaskDynamicPriority);
 
             if (selectedTask) {
 
@@ -252,11 +250,11 @@ class Hackflight {
         {
             m_arming.begin(m_led);
 
-            m_attitudeTask.begin(m_imu, &m_arming, &m_vstate);
+            m_attitude.begin(m_imu, &m_arming, &m_vstate);
 
-            m_rxTask.begin(m_receiver, m_esc, &m_arming, &m_rxSticks);
+            m_msp.begin(m_esc, &m_arming, &m_rxSticks, &m_vstate);
 
-            m_mspTask.begin(m_esc, &m_arming, &m_rxSticks, &m_vstate);
+            m_receiver->begin(m_esc, /*&m_arming,*/ &m_rxSticks);
 
             m_imu->begin();
 

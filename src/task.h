@@ -41,8 +41,6 @@ class Task {
 
     protected:
 
-        Imu *    m_imu;
-
         uint16_t m_ageCycles;
         int32_t  m_desiredPeriodUs;            
         uint16_t m_dynamicPriority;          
