@@ -66,6 +66,7 @@ class Hackflight {
         // Initialzed here
         Arming               m_arming;
         AttitudeTask         m_attitudeTask;
+        bool                 m_failsafeIsActive;
         Imu::align_fun       m_imuAlignFun;
         Msp                  m_msp;
         MspTask              m_mspTask;
@@ -114,7 +115,7 @@ class Hackflight {
                     (m_esc->valueHigh() -
                      m_esc->valueLow()) * motorOutput;
 
-                if (m_taskData.failsafeIsActive) {
+                if (m_failsafeIsActive) {
                     if (m_esc->isProtocolDshot()) {
                         // Prevent getting into special reserved range
                         motorOutput = (motorOutput < m_esc->valueLow()) ?

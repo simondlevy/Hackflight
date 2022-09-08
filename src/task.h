@@ -34,7 +34,6 @@ class Task {
 
         typedef struct {
 
-            bool               failsafeIsActive;
             float              maxArmingAngle;
             float              mspMotors[MAX_SUPPORTED_MOTORS];
             bool               pidReset;
