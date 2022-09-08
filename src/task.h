@@ -35,7 +35,6 @@ class Task {
 
         typedef struct {
 
-            Imu *              imu;
             Esc *              esc;
             Receiver *         receiver;
 
@@ -66,6 +65,8 @@ class Task {
         uint32_t m_anticipatedExecutionTime;
 
     protected:
+
+        Imu *    m_imu;
 
         uint16_t m_ageCycles;
         int32_t  m_desiredPeriodUs;            

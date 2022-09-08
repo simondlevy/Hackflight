@@ -82,7 +82,7 @@ class Hackflight {
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            m_taskData.imu->readScaledGyro(m_imuAlignFun, &m_taskData.vstate);
+            m_imu->readScaledGyro(m_imuAlignFun, &m_taskData.vstate);
 
             auto usec = timeMicros();
 
@@ -242,6 +242,7 @@ class Hackflight {
                 Esc & esc,
                 Led & led)
         {
+            m_imu = &imu;
             m_mixer = &mixer;
             m_imuAlignFun = imuAlignFun;
             m_led = &led;
@@ -249,19 +250,21 @@ class Hackflight {
             m_pidControllers = &pidControllers;
 
             m_taskData.receiver = &receiver;
-            m_taskData.imu = &imu;
             m_taskData.esc = &esc;
 
             m_taskData.maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
 
             m_taskData.arming.m_led = &led;
+
         }
 
         void begin(void)
         {
+            m_attitudeTask.setImu(m_imu);
+
             m_taskData.receiver->begin();
             m_taskData.msp.begin();
-            m_taskData.imu->begin();
+            m_imu->begin();
             m_taskData.esc->begin();
 
             m_led->begin();
