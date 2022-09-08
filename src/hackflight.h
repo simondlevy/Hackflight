@@ -32,7 +32,6 @@ using namespace std;
 #include "arming.h"
 #include "core/mixer.h"
 #include "esc.h"
-#include "failsafe.h"
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
@@ -110,7 +109,7 @@ class Hackflight {
                     (m_taskData.esc->valueHigh() -
                      m_taskData.esc->valueLow()) * motorOutput;
 
-                if (m_taskData.failsafe.isActive()) {
+                if (m_taskData.failsafeIsActive) {
                     if (m_taskData.esc->isProtocolDshot()) {
                         // Prevent getting into special reserved range
                         motorOutput = (motorOutput < m_taskData.esc->valueLow()) ?

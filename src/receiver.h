@@ -272,56 +272,6 @@ class Receiver {
         }
     }
 
-    void detectAndApplySignalLossBehaviour(
-            Arming * arming,
-            Failsafe * failsafe,
-            const uint32_t currentTimeUs)
-    {
-        auto currentTimeMs = currentTimeUs/ 1000;
-
-        auto useValueFromRx = m_signalReceived && !m_inFailsafeMode;
-
-        auto flightChannelsValid = true;
-
-        for (auto channel = 0; channel < CHANNEL_COUNT; channel++) {
-
-            auto sample = m_raw[channel];
-
-            auto validPulse = useValueFromRx && isPulseValid(sample);
-
-            if (validPulse) {
-                m_invalidPulsePeriod[channel] =
-                    currentTimeMs + MAX_INVALID__PULSE_TIME;
-            } else {
-                if (cmp32(currentTimeMs,
-                            m_invalidPulsePeriod[channel]) < 0) {
-                    // skip to next channel to hold channel value
-                    // MAX_INVALID__PULSE_TIME
-                    continue;           
-                } else {
-
-                    // after that apply rxfail value
-                    sample = getFailValue(channel); 
-                    if (channel < 4) {
-                        flightChannelsValid = false;
-                    }
-                }
-            }
-
-            m_raw[channel] = sample;
-        }
-
-        if (flightChannelsValid) {
-            failsafe->onValidDataReceived(arming);
-        } else {
-            m_inFailsafeMode = true;
-            failsafe->onValidDataFailed(arming);
-            for (auto channel = 0; channel < CHANNEL_COUNT; channel++) {
-                m_raw[channel] = getFailValue(channel);
-            }
-        }
-    }
-
     int16_t lookupThrottle(const int32_t tmp)
     {
         if (!m_initializedThrottleTable) {
@@ -374,10 +324,7 @@ class Receiver {
         m_commands.throttle = lookupThrottle(tmp2);
     }
 
-    bool calculateChannelsAndUpdateFailsafe(
-            Arming * arming,
-            Failsafe * failsafe,
-            const uint32_t currentTimeUs)
+    bool calculateChannels(const uint32_t currentTimeUs)
     {
         if (m_auxiliaryProcessingRequired) {
             m_auxiliaryProcessingRequired = false;
@@ -391,8 +338,6 @@ class Receiver {
         m_nextUpdateAtUs = currentTimeUs + DELAY_15_HZ;
 
         readChannelsAndApplyRanges();
-
-        detectAndApplySignalLossBehaviour(arming, failsafe, currentTimeUs);
 
         return true;
     }
@@ -413,11 +358,7 @@ class Receiver {
         return m_frameTimeDeltaUs;
     }
 
-    bool processData(
-            Esc * esc,
-            const uint32_t currentTimeUs,
-            Arming * arming,
-            Failsafe * failsafe)
+    bool processData(const uint32_t currentTimeUs)
     {
         int32_t frameAgeUs;
 
@@ -440,13 +381,6 @@ class Receiver {
         m_refreshPeriod =
             constrain_i32_u32(refreshPeriodUs, SMOOTHING_RATE_MIN_US,
                     SMOOTHING_RATE_MAX_US);
-
-        if (currentTimeUs >
-                FAILSAFE_POWER_ON_DELAY_US && !failsafe->isMonitoring()) {
-            failsafe->startMonitoring();
-        }
-
-        failsafe->update(m_raw, esc, arming);
 
         return throttleIsDown(m_raw);
     }
@@ -800,7 +734,6 @@ class Receiver {
             sticks_t * sticks,
             Esc * esc,
             Arming * arming,
-            Failsafe * failsafe,
             bool * pidItermResetReady,
             bool * pidItermResetValue,
             bool * gotNewData)
@@ -816,19 +749,12 @@ class Receiver {
                 break;
 
             case STATE_PROCESS:
-                if (!calculateChannelsAndUpdateFailsafe(
-                            arming, 
-                            failsafe,
-                            currentTimeUs)) {
+                if (!calculateChannels(currentTimeUs)) {
                     m_state = STATE_CHECK;
                     break;
                 }
                 *pidItermResetReady = true;
-                *pidItermResetValue = processData(
-                        esc,
-                        currentTimeUs,
-                        arming, 
-                        failsafe);
+                *pidItermResetValue = processData(currentTimeUs);
                 m_state = STATE_MODES;
                 break;
 

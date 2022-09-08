@@ -72,7 +72,6 @@ class ReceiverTask : public Task {
                     &rxsticks,
                     data->esc,
                     &data->arming,
-                    &data->failsafe,
                     &pidItermResetReady,
                     &pidItermResetValue,
                     &gotNewData);

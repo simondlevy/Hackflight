@@ -40,13 +40,13 @@ class Task {
             Receiver *         receiver;
 
             Arming             arming;
-            Failsafe           failsafe;
+            bool               failsafeIsActive;
             float              maxArmingAngle;
             Msp                msp;
             float              mspMotors[MAX_SUPPORTED_MOTORS];
             bool               pidReset;
             Receiver::sticks_t rxSticks;
-            VehicleState              vstate;
+            VehicleState       vstate;
 
         } data_t;
 

@@ -27,7 +27,6 @@
 
 class Arming {
 
-    friend class Failsafe;
     friend class SoftQuatImu;
     friend class Hackflight;
     friend class Receiver;
