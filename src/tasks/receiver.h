@@ -32,6 +32,8 @@ class ReceiverTask : public Task {
         Esc *      m_esc;
         Arming *   m_arming;
 
+        bool m_gotPidReset;
+
     public:
 
         ReceiverTask()
@@ -46,6 +48,11 @@ class ReceiverTask : public Task {
             m_arming = arming;
 
             m_receiver->begin(esc);
+        }
+
+        bool gotPidReset(void)
+        {
+            return m_gotPidReset;
         }
 
         // Increase priority for RX task
@@ -97,7 +104,7 @@ class ReceiverTask : public Task {
             }
 
             if (pidItermResetReady) {
-                data->pidReset = pidItermResetValue;
+                m_gotPidReset = pidItermResetValue;
             }
 
             if (gotNewData) {

@@ -100,7 +100,7 @@ class Hackflight {
                     demands,
                     m_taskData.vstate,
                     m_pidControllers,
-                    m_taskData.pidReset,
+                    m_receiverTask.gotPidReset(),
                     usec);
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
