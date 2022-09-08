@@ -22,12 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "core/motors.h"
-#include "hackflight.h"
-#include "imu.h"
-#include "msp.h"
-#include "receiver.h"
-
 class Task {
 
     private:

@@ -35,7 +35,6 @@ using namespace std;
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
-#include "msp.h"
 #include "receiver.h"
 #include "scheduler.h"
 #include "system.h"
@@ -65,7 +64,6 @@ class Hackflight {
         AttitudeTask         m_attitudeTask;
         bool                 m_failsafeIsActive;
         Imu::align_fun       m_imuAlignFun;
-        Msp                  m_msp;
         MspTask              m_mspTask;
         ReceiverTask         m_rxTask;
         Receiver::sticks_t   m_rxSticks;
@@ -194,8 +192,7 @@ class Hackflight {
             Task::update(&m_attitudeTask, usec,
                     &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_mspTask, usec,
-                    &selectedTask, &selectedTaskDynamicPriority);
+            Task::update(&m_mspTask, usec, &selectedTask, &selectedTaskDynamicPriority);
 
             if (selectedTask) {
 
@@ -259,7 +256,7 @@ class Hackflight {
 
             m_rxTask.begin(m_receiver, m_esc, &m_arming, &m_rxSticks);
 
-            m_mspTask.begin(m_msp, m_esc, &m_arming, &m_rxSticks, &m_vstate);
+            m_mspTask.begin(m_esc, &m_arming, &m_rxSticks, &m_vstate);
 
             m_imu->begin();
 
