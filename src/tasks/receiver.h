@@ -59,14 +59,25 @@ class ReceiverTask : public Task {
 
             auto gotNewData = false;
 
-            data->receiver->poll(
-                    usec,
-                    &rxsticks,
-                    data->esc,
-                    &data->arming,
-                    &pidItermResetReady,
-                    &pidItermResetValue,
-                    &gotNewData);
+            Receiver::state_e receiverState = 
+                data->receiver->poll(
+                        usec,
+                        &rxsticks,
+                        data->esc,
+                        &data->arming,
+                        &pidItermResetReady,
+                        &pidItermResetValue,
+                        &gotNewData);
+
+            switch (receiverState) {
+                case Receiver::STATE_MODES:
+                    //printf("%f\n", rxsticks.demands.throttle);
+                    break;
+                case Receiver::STATE_UPDATE:
+                    break;
+                default:
+                    break;
+            }
 
             if (pidItermResetReady) {
                 data->pidReset = pidItermResetValue;

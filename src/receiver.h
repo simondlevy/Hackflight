@@ -35,6 +35,7 @@
 class Receiver {
 
     friend class Hackflight;
+    friend class ReceiverTask;
 
     public:
 
@@ -258,15 +259,11 @@ class Receiver {
 
     void updateCommands(void)
     {
-        for (uint8_t axis=ROLL; axis<=YAW; axis++) {
+        m_command[Sticks::ROLL]  = updateCommand(m_raw[Sticks::ROLL],  +1);
+        m_command[Sticks::PITCH] = updateCommand(m_raw[Sticks::PITCH], +1);
+        m_command[Sticks::YAW]   = updateCommand(m_raw[Sticks::YAW],   -1);
 
-            // non coupled PID reduction scaler used in PID controller 1
-            // and PID controller 2.
-            m_command[axis] = updateCommand(m_raw[axis], axis == YAW ? -1 : +1);
-
-        }
-
-        auto tmp = constrain_f_i32(m_raw[THROTTLE], 1050, PWM_MAX);
+        auto tmp = constrain_f_i32(m_raw[Sticks::THROTTLE], 1050, PWM_MAX);
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
         m_commands.throttle = lookupThrottle(tmp2);
@@ -330,7 +327,7 @@ class Receiver {
             constrain_i32_u32(refreshPeriodUs, SMOOTHING_RATE_MIN_US,
                     SMOOTHING_RATE_MAX_US);
 
-        return throttleIsDown(m_raw);
+        return Sticks::throttleIsDown(m_raw);
     }
 
     void ratePidFeedforwardLpfInit(const uint16_t filterCutoff)
@@ -346,7 +343,7 @@ class Receiver {
     void ratePidFeedforwardLpfUpdate(const uint16_t filterCutoff)
     {
         if (filterCutoff > 0) {
-            for (uint8_t axis=ROLL; axis<=YAW; axis++) {
+            for (uint8_t axis=Sticks::ROLL; axis<=Sticks::YAW; axis++) {
                 m_feedforwardPt3[axis].computeGain(filterCutoff);
             }
         }
@@ -675,7 +672,7 @@ class Receiver {
 
     } // check
 
-    void poll(
+    state_e poll(
             const uint32_t currentTimeUs,
             sticks_t * sticks,
             Esc * esc,
@@ -687,6 +684,8 @@ class Receiver {
         *pidItermResetReady = false;
 
         m_gotNewData = false;
+
+        state_e retval = m_state;
 
         switch (m_state) {
             default:
@@ -717,14 +716,16 @@ class Receiver {
                 break;
         }
 
-        sticks->demands.throttle = m_raw[THROTTLE];
-        sticks->demands.roll     = m_raw[ROLL];
-        sticks->demands.pitch    = m_raw[PITCH];
-        sticks->demands.yaw      = m_raw[YAW];
-        sticks->aux1             = m_raw[AUX1];
-        sticks->aux2             = m_raw[AUX2];
+        sticks->demands.throttle = m_raw[Sticks::THROTTLE];
+        sticks->demands.roll     = m_raw[Sticks::ROLL];
+        sticks->demands.pitch    = m_raw[Sticks::PITCH];
+        sticks->demands.yaw      = m_raw[Sticks::YAW];
+        sticks->aux1             = m_raw[Sticks::AUX1];
+        sticks->aux2             = m_raw[Sticks::AUX2];
 
         *gotNewData = m_gotNewData;
+
+        return retval;
 
     } // poll
 
@@ -739,11 +740,11 @@ class Receiver {
             m_previousFrameTimeUs = 0;
 
             rawSetpoints[0] =
-                getRawSetpoint(m_command[ROLL], COMMAND_DIVIDER);
+                getRawSetpoint(m_command[Sticks::ROLL], COMMAND_DIVIDER);
             rawSetpoints[1] =
-                getRawSetpoint(m_command[PITCH], COMMAND_DIVIDER);
+                getRawSetpoint(m_command[Sticks::PITCH], COMMAND_DIVIDER);
             rawSetpoints[2] =
-                getRawSetpoint(m_command[YAW], YAW_COMMAND_DIVIDER);
+                getRawSetpoint(m_command[Sticks::YAW], YAW_COMMAND_DIVIDER);
         }
 
         float setpointRate[3] = {};

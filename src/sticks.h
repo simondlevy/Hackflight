@@ -22,18 +22,22 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef enum {
-    THROTTLE,
-    ROLL,
-    PITCH,
-    YAW,
-    AUX1,
-    AUX2
-} rc_alias_e;
+class Sticks {
 
-static bool throttleIsDown(const float raw[])
-{
-    return raw[THROTTLE] < 1050;
-}
+    public:
 
+        typedef enum {
+            THROTTLE,
+            ROLL,
+            PITCH,
+            YAW,
+            AUX1,
+            AUX2
+        } rc_alias_e;
+
+        static bool throttleIsDown(const float raw[])
+        {
+            return raw[THROTTLE] < 1050;
+        }
+};
 

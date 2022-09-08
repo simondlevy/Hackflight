@@ -120,7 +120,7 @@ class Arming {
             m_led->set(true);
         } else {
 
-            m_throttle_is_down = throttleIsDown(raw);
+            m_throttle_is_down = Sticks::throttleIsDown(raw);
 
             // If arming is disabled and the ARM switch is on
             if (!readyToArm() && rxAux1IsSet(raw)) {
