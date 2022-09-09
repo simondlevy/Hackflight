@@ -24,7 +24,6 @@
 #include "core/demands.h"
 #include "core/filters/pt3.h"
 #include "core/pids/angle.h"
-#include "esc.h"
 #include "pwm.h"
 #include "serial.h"
 #include "task.h"
@@ -117,7 +116,7 @@ class Receiver : public Task {
     static const uint16_t PWM_PULSE_MAX   = 2250;  
 
     sticks_t * m_sticks;
-    //Arming *             m_arming;
+    Arming *   m_arming;
 
     bool m_gotPidReset;
 
@@ -169,7 +168,6 @@ class Receiver : public Task {
     Demands  m_commands;
     bool     m_dataProcessingRequired;
     Demands  m_dataToSmooth;
-    Esc *    m_esc;
     uint16_t m_feedforwardCutoffFrequency;
     uint8_t  m_feedforwardCutoffSetting;
     bool     m_feedforwardLpfInitialized;
@@ -722,10 +720,9 @@ class Receiver : public Task {
     {
     }
 
-    void begin(Esc * esc, /*Arming * arming,*/ sticks_t * sticks)
+    void begin(Arming * arming, sticks_t * sticks)
     {
-        m_esc = esc;
-        //m_arming = arming;
+        m_arming = arming;
         m_sticks = sticks;
 
         devStart();
@@ -778,7 +775,7 @@ class Receiver : public Task {
                 break;
 
             case STATE_MODES:
-                //m_arming->check(m_esc, usec, sticks);
+                //m_arming->check(usec, sticks);
                 m_state = STATE_UPDATE;
                 break;
 

@@ -23,13 +23,11 @@
 
 #include "esc.h"
 #include "led.h"
-#include "tasks/receiver.h"
 
 class Arming {
 
     friend class SoftQuatImu;
     friend class Hackflight;
-    friend class Receiver;
     friend class Msp;
     friend class AttitudeTask;
 
@@ -44,9 +42,9 @@ class Arming {
             m_throttle_is_down;
     }
 
-    static bool rxAux1IsSet(const Receiver::sticks_t & sticks)
+    static bool rxAux1IsSet(const float aux1)
     {
-        return sticks.aux1 > 1200;
+        return aux1 > 1200;
     }
 
     Led  * m_led;
@@ -64,11 +62,11 @@ class Arming {
         m_led = led;
     }
 
-    void check(Esc * esc, const uint32_t currentTimeUs, const Receiver::sticks_t & sticks)
+    void check(Esc * esc, const uint32_t currentTimeUs, const float aux1Switch)
     {
         static bool _doNotRepeat;
 
-        if (rxAux1IsSet(sticks)) {
+        if (rxAux1IsSet(aux1Switch)) {
 
             if (readyToArm()) {
 
@@ -110,27 +108,27 @@ class Arming {
         return m_is_armed;
     }
 
-    void updateImuStatus(const bool imuIsLevel, const bool calibrating)
+    void updateImuStatus(const bool imuIsLevel, const bool gyroIsCalibrating)
     {
         m_angle_okay = imuIsLevel;
 
-        m_gyro_done_calibrating = !calibrating;
+        m_gyro_done_calibrating = !gyroIsCalibrating;
 
         m_acc_done_calibrating = true;
     }
 
-    void updateReceiverStatus(const Receiver::sticks_t & sticks)
+    void updateReceiverStatus(const bool throttleIsDown, const bool aux1IsSet)
     {
         if (m_is_armed) {
             m_led->set(true);
         } else {
 
-            m_throttle_is_down = Receiver::throttleIsDown(sticks.demands.throttle);
+            m_throttle_is_down = throttleIsDown;
 
             // If arming is disabled and the ARM switch is on
-            if (!readyToArm() && rxAux1IsSet(sticks)) {
+            if (!readyToArm() && aux1IsSet) {
                 m_switch_okay = false;
-            } else if (!rxAux1IsSet(sticks)) {
+            } else if (!aux1IsSet) {
                 m_switch_okay = true;
             }
 
