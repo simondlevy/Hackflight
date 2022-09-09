@@ -50,11 +50,6 @@ class Receiver : public Task {
         AUX2
     } rc_alias_e;
 
-    static bool throttleIsDown(const float throttle)
-    {
-        return throttle < 1050;
-    }
-
     private:
 
     static const uint8_t CHANNEL_COUNT = 6;
@@ -340,7 +335,7 @@ class Receiver : public Task {
             constrain_i32_u32(refreshPeriodUs, SMOOTHING_RATE_MIN_US,
                     SMOOTHING_RATE_MAX_US);
 
-        return throttleIsDown(m_raw[THROTTLE]);
+        return throttleIsDown();
     }
 
     void ratePidFeedforwardLpfInit(const uint16_t filterCutoff)
@@ -635,6 +630,15 @@ class Receiver : public Task {
         return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
     }
 
+    bool aux1IsSet(void)
+    {
+        return m_sticks->aux1 > 1200;
+    }
+
+    bool throttleIsDown(void)
+    {
+        return m_raw[THROTTLE] < 1050;
+    }
 
     protected:
 
@@ -775,13 +779,14 @@ class Receiver : public Task {
                 break;
 
             case STATE_MODES:
-                //m_arming->check(usec, sticks);
+                m_arming->attempt(usec, aux1IsSet());
                 m_state = STATE_UPDATE;
                 break;
 
             case STATE_UPDATE:
                 m_gotNewData = true;
                 updateCommands();
+                m_arming->updateReceiverStatus(throttleIsDown(), aux1IsSet());
                 m_state = STATE_CHECK;
                 break;
         }

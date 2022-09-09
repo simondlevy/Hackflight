@@ -246,7 +246,7 @@ class Hackflight {
 
         void begin(void)
         {
-            m_arming.begin(m_led);
+            m_arming.begin(m_esc, m_led);
 
             m_attitude.begin(m_imu, &m_arming, &m_vstate);
 

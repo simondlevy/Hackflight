@@ -26,10 +26,11 @@
 
 class Arming {
 
-    friend class SoftQuatImu;
+    friend class AttitudeTask;
     friend class Hackflight;
     friend class Msp;
-    friend class AttitudeTask;
+    friend class Receiver;
+    friend class SoftQuatImu;
 
     bool readyToArm(void)
     {
@@ -42,11 +43,7 @@ class Arming {
             m_throttle_is_down;
     }
 
-    static bool rxAux1IsSet(const float aux1)
-    {
-        return aux1 > 1200;
-    }
-
+    Esc  * m_esc;
     Led  * m_led;
 
     bool m_acc_done_calibrating;
@@ -57,47 +54,16 @@ class Arming {
     bool m_rx_failsafe_okay;
     bool m_throttle_is_down;
 
-    void begin(Led * led)
+    void begin(Esc * esc, Led * led)
     {
         m_led = led;
+        m_esc = esc;
     }
 
-    void check(Esc * esc, const uint32_t currentTimeUs, const float aux1Switch)
-    {
-        static bool _doNotRepeat;
-
-        if (rxAux1IsSet(aux1Switch)) {
-
-            if (readyToArm()) {
-
-                if (m_is_armed) {
-                    return;
-                }
-
-                if (!esc->isReady(currentTimeUs)) {
-                    return;
-                }
-
-                m_is_armed = true;
-            }
-
-        } else {
-
-            if (m_is_armed) {
-                disarm(esc);
-                m_is_armed = false;
-            }
-        }
-
-        if (!(m_is_armed || _doNotRepeat || !readyToArm())) {
-            _doNotRepeat = true;
-        }
-    }
-
-    void disarm(Esc * esc)
+    void disarm(void)
     {
         if (m_is_armed) {
-            esc->stop();
+            m_esc->stop();
         }
 
         m_is_armed = false;
@@ -115,6 +81,39 @@ class Arming {
         m_gyro_done_calibrating = !gyroIsCalibrating;
 
         m_acc_done_calibrating = true;
+    }
+
+    // Called by Receiver
+    void attempt(const uint32_t currentTimeUs, const bool aux1IsSet)
+    {
+        static bool _doNotRepeat;
+
+        if (aux1IsSet) {
+
+            if (readyToArm()) {
+
+                if (m_is_armed) {
+                    return;
+                }
+
+                if (!m_esc->isReady(currentTimeUs)) {
+                    return;
+                }
+
+                m_is_armed = true;
+            }
+
+        } else {
+
+            if (m_is_armed) {
+                disarm();
+                m_is_armed = false;
+            }
+        }
+
+        if (!(m_is_armed || _doNotRepeat || !readyToArm())) {
+            _doNotRepeat = true;
+        }
     }
 
     void updateReceiverStatus(const bool throttleIsDown, const bool aux1IsSet)
