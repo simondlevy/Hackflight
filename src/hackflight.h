@@ -175,7 +175,6 @@ class Hackflight {
 
                 _gyroSkewAccum = 0;
             }
-
         }
 
         void checkDynamicTasks(void)

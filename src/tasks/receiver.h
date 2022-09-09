@@ -116,7 +116,7 @@ class Receiver : public Task {
     // maximum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-    Receiver::sticks_t * m_rxSticks;
+    sticks_t * m_rxSticks;
     //Arming *             m_arming;
 
     bool m_gotPidReset;
@@ -764,7 +764,7 @@ class Receiver : public Task {
     {
     }
 
-    void begin(Esc * esc, /*Arming * arming,*/ Receiver::sticks_t * rxSticks)
+    void begin(Esc * esc, /*Arming * arming,*/ sticks_t * rxSticks)
     {
         m_esc = esc;
         //m_arming = arming;
@@ -801,22 +801,22 @@ class Receiver : public Task {
         auto pidItermResetReady = false;
         auto pidItermResetValue = false;
 
-        Receiver::sticks_t rxsticks = {{0, 0, 0, 0}, 0, 0};
+        sticks_t rxsticks = {{0, 0, 0, 0}, 0, 0};
 
         auto gotNewData = false;
 
-        Receiver::state_e receiverState = poll(usec, &rxsticks);
+        state_e receiverState = poll(usec, &rxsticks);
 
         switch (receiverState) {
 
-            case Receiver::STATE_PROCESS:
+            case STATE_PROCESS:
                 pidItermResetReady = true;
                 pidItermResetValue = processData(usec);
                 break;
-            case Receiver::STATE_MODES:
+            case STATE_MODES:
                 //m_arming->check(m_esc, usec, rxsticks);
                 break;
-            case Receiver::STATE_UPDATE:
+            case STATE_UPDATE:
                 gotNewData = true;
                 //m_arming->updateReceiverStatus(rxsticks);
                 break;
