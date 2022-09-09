@@ -33,25 +33,27 @@ class Arming {
 
     bool readyToArm(void)
     {
+        // printf("cal=%d  fs=%d\n", m_gyroDoneCalibrating, m_failsafeOkay);
+
         return 
-            m_acc_done_calibrating &&
-            m_angle_okay &&
-            m_switch_okay &&
-            m_gyro_done_calibrating &&
-            m_rx_failsafe_okay &&
-            m_throttle_is_down;
+            m_accDoneCalibrating &&
+            m_angleOkay &&
+            m_switchOkay &&
+            m_gyroDoneCalibrating &&
+            m_failsafeOkay &&
+            m_throttleIsDown;
     }
 
     Esc  * m_esc;
     Led  * m_led;
 
-    bool m_acc_done_calibrating;
-    bool m_angle_okay;
-    bool m_switch_okay;
-    bool m_gyro_done_calibrating;
+    bool m_accDoneCalibrating;
+    bool m_angleOkay;
+    bool m_switchOkay;
+    bool m_gyroDoneCalibrating;
     bool m_is_armed;
-    bool m_rx_failsafe_okay;
-    bool m_throttle_is_down;
+    bool m_failsafeOkay;
+    bool m_throttleIsDown;
 
     void begin(Esc * esc, Led * led)
     {
@@ -75,11 +77,11 @@ class Arming {
 
     void updateImuStatus(const bool imuIsLevel, const bool gyroIsCalibrating)
     {
-        m_angle_okay = imuIsLevel;
+        m_angleOkay = imuIsLevel;
 
-        m_gyro_done_calibrating = !gyroIsCalibrating;
+        m_gyroDoneCalibrating = !gyroIsCalibrating;
 
-        m_acc_done_calibrating = true;
+        m_accDoneCalibrating = true; // XXX
     }
 
     // Called by Receiver
@@ -121,13 +123,13 @@ class Arming {
             m_led->set(true);
         } else {
 
-            m_throttle_is_down = throttleIsDown;
+            m_throttleIsDown = throttleIsDown;
 
             // If arming is disabled and the ARM switch is on
             if (!readyToArm() && aux1IsSet) {
-                m_switch_okay = false;
+                m_switchOkay = false;
             } else if (!aux1IsSet) {
-                m_switch_okay = true;
+                m_switchOkay = true;
             }
 
             if (!readyToArm()) {
@@ -142,7 +144,7 @@ class Arming {
 
     void setRxFailsafe(bool okay)
     {
-        m_rx_failsafe_okay= okay;
+        m_failsafeOkay= okay;
     }
 
 }; // class Arming

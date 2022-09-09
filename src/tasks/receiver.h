@@ -32,8 +32,7 @@
 class Receiver : public Task {
 
     friend class Hackflight;
-
-    public:
+    friend class Msp;
 
     typedef struct {
         Demands demands;
@@ -49,8 +48,6 @@ class Receiver : public Task {
         AUX1,
         AUX2
     } rc_alias_e;
-
-    private:
 
     static const uint8_t CHANNEL_COUNT = 6;
     static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
@@ -114,21 +111,6 @@ class Receiver : public Task {
     Arming *   m_arming;
 
     bool m_gotPidReset;
-
-    static inline int32_t cmp32(const uint32_t a, const uint32_t b)
-    {
-        return (int32_t)(a-b); 
-    }
-
-    static uint8_t rxfail_step_to_channel_value(const uint8_t step)
-    {
-        return (PWM_PULSE_MIN + 25 * step);
-    }
-
-    static bool isPulseValid(const uint16_t pulseDuration)
-    {
-        return  pulseDuration >= 885 && pulseDuration <= 2115;
-    }
 
     typedef enum {
         STATE_CHECK,
@@ -640,16 +622,6 @@ class Receiver : public Task {
         return m_raw[THROTTLE] < 1050;
     }
 
-    protected:
-
-    virtual void devStart(void) = 0;
-
-    virtual bool devCheck(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
-
-    virtual float devConvert(uint16_t * chanData, uint8_t chanId) = 0;
-
-    public:
-
     bool check(const uint32_t usec)
     {
         auto signalReceived = false;
@@ -717,12 +689,6 @@ class Receiver : public Task {
 
     } // getDemands
 
-    public:
-
-    Receiver()
-        : Task(33) // Hz
-    {
-    }
 
     void begin(Arming * arming, sticks_t * sticks)
     {
@@ -754,6 +720,19 @@ class Receiver : public Task {
             }
         }
     }    
+
+    protected:
+
+    virtual void devStart(void) = 0;
+
+    virtual bool devCheck(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
+
+    virtual float devConvert(uint16_t * chanData, uint8_t chanId) = 0;
+    
+    Receiver()
+        : Task(33) // Hz
+    {
+    }
 
     void fun(uint32_t usec)
     {
