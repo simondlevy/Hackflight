@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "debug.h"
 #include "esc.h"
 #include "led.h"
 
@@ -117,8 +118,13 @@ class Arming {
         }
     }
 
-    void updateReceiverStatus(const bool throttleIsDown, const bool aux1IsSet)
+    void updateReceiverStatus(
+            const bool throttleIsDown,
+            const bool aux1IsSet, 
+            const bool failsafe)
     {
+        printf("failsafe=%d\n", failsafe);
+
         if (m_is_armed) {
             m_led->set(true);
         } else {
@@ -140,11 +146,6 @@ class Arming {
 
             m_led->warningUpdate();
         }
-    }
-
-    void setRxFailsafe(bool okay)
-    {
-        m_failsafeOkay= okay;
     }
 
 }; // class Arming

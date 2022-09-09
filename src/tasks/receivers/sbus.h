@@ -158,30 +158,6 @@ class SbusReceiver : public Receiver {
             channelData[3] = channels->chan3;
             channelData[4] = channels->chan4;
             channelData[5] = channels->chan5;
-            /*
-            channelData[6] = channels->chan6;
-            channelData[7] = channels->chan7;
-            channelData[8] = channels->chan8;
-            channelData[9] = channels->chan9;
-            channelData[10] = channels->chan10;
-            channelData[11] = channels->chan11;
-            channelData[12] = channels->chan12;
-            channelData[13] = channels->chan13;
-            channelData[14] = channels->chan14;
-            channelData[15] = channels->chan15;
-
-            if (channels->flags & FLAG_CHANNEL_17) {
-                channelData[16] = CHANNEL_MAX;
-            } else {
-                channelData[16] = CHANNEL_MIN;
-            }
-
-            if (channels->flags & FLAG_CHANNEL_18) {
-                channelData[17] = CHANNEL_MAX;
-            } else {
-                channelData[17] = CHANNEL_MIN;
-            }
-            */
 
             *frameTimeUs = m_frameData.startAtUs;
 

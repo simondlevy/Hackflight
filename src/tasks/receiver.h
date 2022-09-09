@@ -54,7 +54,7 @@ class Receiver : public Task {
 
     static const uint8_t RATE = 67;
 
-    static const uint32_t FAILSAFE_POWER_ON_DELAY_US = 5000000;
+    static const uint32_t FAILSAFE_US = 5000000;
 
     // Minimum rc smoothing cutoff frequency
     static const uint16_t SMOOTHING_CUTOFF_MIN_HZ = 15;    
@@ -297,11 +297,9 @@ class Receiver : public Task {
     {
         int32_t frameAgeUs;
 
-        auto refreshPeriodUs =
-            getFrameDelta(usec, &frameAgeUs);
+        auto refreshPeriodUs = getFrameDelta(usec, &frameAgeUs);
 
-        if (!refreshPeriodUs ||
-                cmpTimeUs(usec, m_lastRxTimeUs) <= frameAgeUs) {
+        if (!refreshPeriodUs || cmpTimeUs(usec, m_lastRxTimeUs) <= frameAgeUs) {
 
             // calculate a delta here if not supplied by the protocol
             refreshPeriodUs = cmpTimeUs(usec, m_lastRxTimeUs); 
@@ -513,6 +511,7 @@ class Receiver : public Task {
             // for auto calculated filters we need to examine each rx frame
             // interval
             if (m_calculatedCutoffs) {
+
                 const auto currentTimeMs = usec / 1000;
 
                 // If the filter cutoffs in auto mode, and we have good rx
@@ -736,6 +735,8 @@ class Receiver : public Task {
 
     void fun(uint32_t usec)
     {
+        static uint32_t _lastDataTime;
+
         auto pidItermResetReady = false;
         auto pidItermResetValue = false;
 
@@ -764,8 +765,10 @@ class Receiver : public Task {
 
             case STATE_UPDATE:
                 m_gotNewData = true;
+                _lastDataTime = usec;
                 updateCommands();
-                m_arming->updateReceiverStatus(throttleIsDown(), aux1IsSet());
+                bool failsafe = m_gotNewData && (usec-_lastDataTime) > FAILSAFE_US;
+                m_arming->updateReceiverStatus(throttleIsDown(), aux1IsSet(), failsafe);
                 m_state = STATE_CHECK;
                 break;
         }

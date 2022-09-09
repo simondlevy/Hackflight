@@ -20,6 +20,7 @@
 #pragma once
 
 #include "core/vstate.h"
+#include "debug.h"
 #include "esc.h"
 #include "imu.h"
 #include "maths.h"
