@@ -116,7 +116,7 @@ class Receiver : public Task {
     // maximum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-    sticks_t * m_rxSticks;
+    sticks_t * m_sticks;
     //Arming *             m_arming;
 
     bool m_gotPidReset;
@@ -686,48 +686,6 @@ class Receiver : public Task {
 
     } // check
 
-    state_e poll(const uint32_t usec, sticks_t * sticks)
-    {
-        m_gotNewData = false;
-
-        state_e retval = m_state;
-
-        switch (m_state) {
-            default:
-            case STATE_CHECK:
-                m_state = STATE_PROCESS;
-                break;
-
-            case STATE_PROCESS:
-                if (!calculateChannels(usec)) {
-                    m_state = STATE_CHECK;
-                    break;
-                }
-                m_state = STATE_MODES;
-                break;
-
-            case STATE_MODES:
-                m_state = STATE_UPDATE;
-                break;
-
-            case STATE_UPDATE:
-                m_gotNewData = true;
-                updateCommands();
-                m_state = STATE_CHECK;
-                break;
-        }
-
-        sticks->demands.throttle = m_raw[THROTTLE];
-        sticks->demands.roll     = m_raw[ROLL];
-        sticks->demands.pitch    = m_raw[PITCH];
-        sticks->demands.yaw      = m_raw[YAW];
-        sticks->aux1             = m_raw[AUX1];
-        sticks->aux2             = m_raw[AUX2];
-
-        return retval;
-
-    } // poll
-
     // Runs in fast (inner, core) loop
     void getDemands(const uint32_t usec, float rawSetpoints[3], Demands * demands)
     {
@@ -764,11 +722,11 @@ class Receiver : public Task {
     {
     }
 
-    void begin(Esc * esc, /*Arming * arming,*/ sticks_t * rxSticks)
+    void begin(Esc * esc, /*Arming * arming,*/ sticks_t * sticks)
     {
         m_esc = esc;
         //m_arming = arming;
-        m_rxSticks = rxSticks;
+        m_sticks = sticks;
 
         devStart();
     }
@@ -801,40 +759,45 @@ class Receiver : public Task {
         auto pidItermResetReady = false;
         auto pidItermResetValue = false;
 
-        sticks_t rxsticks = {{0, 0, 0, 0}, 0, 0};
+        m_gotNewData = false;
 
-        auto gotNewData = false;
-
-        state_e receiverState = poll(usec, &rxsticks);
-
-        switch (receiverState) {
+        switch (m_state) {
+            default:
+            case STATE_CHECK:
+                m_state = STATE_PROCESS;
+                break;
 
             case STATE_PROCESS:
                 pidItermResetReady = true;
                 pidItermResetValue = processData(usec);
+                if (!calculateChannels(usec)) {
+                    m_state = STATE_CHECK;
+                    break;
+                }
+                m_state = STATE_MODES;
                 break;
+
             case STATE_MODES:
-                //m_arming->check(m_esc, usec, rxsticks);
+                //m_arming->check(m_esc, usec, sticks);
+                m_state = STATE_UPDATE;
                 break;
+
             case STATE_UPDATE:
-                gotNewData = true;
-                //m_arming->updateReceiverStatus(rxsticks);
-                break;
-            default:
+                m_gotNewData = true;
+                updateCommands();
+                m_state = STATE_CHECK;
                 break;
         }
+
+        m_sticks->demands.throttle = m_raw[THROTTLE];
+        m_sticks->demands.roll     = m_raw[ROLL];
+        m_sticks->demands.pitch    = m_raw[PITCH];
+        m_sticks->demands.yaw      = m_raw[YAW];
+        m_sticks->aux1             = m_raw[AUX1];
+        m_sticks->aux2             = m_raw[AUX2];
 
         if (pidItermResetReady) {
             m_gotPidReset = pidItermResetValue;
-        }
-
-        if (gotNewData) {
-            m_rxSticks->demands.throttle = rxsticks.demands.throttle;
-            m_rxSticks->demands.roll = rxsticks.demands.roll;
-            m_rxSticks->demands.pitch = rxsticks.demands.pitch;
-            m_rxSticks->demands.yaw = rxsticks.demands.yaw;
-            m_rxSticks->aux1 = rxsticks.aux1;
-            m_rxSticks->aux2 = rxsticks.aux2;
         }
     }
 };
