@@ -185,12 +185,11 @@ class Hackflight {
 
             uint32_t usec = timeMicros();
 
-            Task::update(m_receiver, usec, &selectedTask, &selectedTaskDynamicPriority);
+            m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_attitude, usec,
-                    &selectedTask, &selectedTaskDynamicPriority);
+            m_attitude.update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_msp, usec, &selectedTask, &selectedTaskDynamicPriority);
+            m_msp.update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
             if (selectedTask) {
 
