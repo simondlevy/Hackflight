@@ -30,7 +30,6 @@ class Arming {
     friend class Hackflight;
     friend class Msp;
     friend class Receiver;
-    friend class SoftQuatImu;
 
     bool readyToArm(void)
     {
