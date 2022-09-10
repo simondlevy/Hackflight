@@ -22,33 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "core/motors.h"
-#include "esc.h"
-#include "hackflight.h"
-#include "imu.h"
-#include "msp.h"
-#include "receiver.h"
-
 class Task {
-
-    public:
-
-        typedef struct {
-
-            Imu *              imu;
-            Esc *              esc;
-            Receiver *         receiver;
-
-            Arming             arming;
-            Failsafe           failsafe;
-            float              maxArmingAngle;
-            Msp                msp;
-            float              mspMotors[MAX_SUPPORTED_MOTORS];
-            bool               pidReset;
-            Receiver::sticks_t rxSticks;
-            VehicleState              vstate;
-
-        } data_t;
 
     private:
 
@@ -80,10 +54,8 @@ class Task {
 
     public:
 
-        virtual void adjustDynamicPriority(data_t * data, uint32_t usec)
+        virtual void adjustDynamicPriority(uint32_t usec)
         {
-            (void)data;
-
             // Task is time-driven, dynamicPriority is last execution age
             // (measured in desiredPeriods). Task age is calculated from last
             // execution.
@@ -103,13 +75,13 @@ class Task {
             }
         }
 
-        void execute(data_t * data, uint32_t usec)
+        void execute(uint32_t usec)
         {
             m_lastExecutedAtUs = usec;
             m_dynamicPriority = 0;
 
             uint32_t time = timeMicros();
-            fun(data, usec);
+            fun(usec);
 
             uint32_t taskExecutionTimeUs = timeMicros() - time;
 
@@ -128,20 +100,15 @@ class Task {
             return m_anticipatedExecutionTime >> EXEC_TIME_SHIFT;
         }
 
-        static void update(
-                Task * task,
-                data_t * data,
-                uint32_t usec,
-                Task ** selected,
-                uint16_t * selectedPriority)
+        void update(uint32_t usec, Task ** selected, uint16_t * selectedPriority)
         {
-            task->adjustDynamicPriority(data, usec);
+            adjustDynamicPriority(usec);
 
-            if (task->m_dynamicPriority > *selectedPriority) {
-                *selectedPriority = task->m_dynamicPriority;
-                *selected = task;
+            if (m_dynamicPriority > *selectedPriority) {
+                *selectedPriority = m_dynamicPriority;
+                *selected = this;
             }
         }
 
-        virtual void fun(data_t * data, uint32_t usec) = 0;
+        virtual void fun(uint32_t usec) = 0;
 }; 

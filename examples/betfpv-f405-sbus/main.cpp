@@ -22,7 +22,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot/bitbang.h>
 #include <hackflight.h>
-#include <receivers/sbus.h>
+#include <tasks/receivers/sbus.h>
 #include <serial.h>
 
 #include <imus/softquat/mpu6000.h>

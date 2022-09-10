@@ -32,12 +32,9 @@ using namespace std;
 #include "arming.h"
 #include "core/mixer.h"
 #include "esc.h"
-#include "failsafe.h"
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
-#include "msp.h"
-#include "receiver.h"
 #include "scheduler.h"
 #include "system.h"
 #include "tasks/attitude.h"
@@ -52,23 +49,24 @@ class Hackflight {
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
-        // Arming safety  
-        static constexpr float MAX_ARMING_ANGLE = 25;
-
         // Initialzed in main()
-        Imu   * m_imu;
-        Led   * m_led;
-        Mixer * m_mixer;
+        Imu *      m_imu;
+        Esc *      m_esc;
+        Led *      m_led;
+        Mixer *    m_mixer;
+        Receiver * m_receiver;
         
         vector<PidController *> * m_pidControllers;
 
         // Initialzed here
-        AttitudeTask         m_attitudeTask;
+        Arming               m_arming;
+        AttitudeTask         m_attitude;
+        bool                 m_failsafeIsActive;
         Imu::align_fun       m_imuAlignFun;
-        MspTask              m_mspTask;
-        ReceiverTask         m_receiverTask;
+        Msp                  m_msp;
+        Receiver::sticks_t   m_rxSticks;
         Scheduler            m_scheduler;
-        Task::data_t         m_taskData;
+        VehicleState         m_vstate;
 
         void checkCoreTasks(uint32_t nowCycles)
         {
@@ -83,7 +81,7 @@ class Hackflight {
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            m_taskData.imu->readScaledGyro(m_imuAlignFun, &m_taskData.vstate);
+            m_imu->readScaledGyro(m_imuAlignFun, &m_vstate);
 
             auto usec = timeMicros();
 
@@ -91,50 +89,47 @@ class Hackflight {
 
             Demands demands = {0,0,0,0};
 
-            m_taskData.receiver->getDemands(usec, rawSetpoints, &demands);
+            m_receiver->getDemands(usec, rawSetpoints, &demands);
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
             auto motors = m_mixer->step(
                     demands,
-                    m_taskData.vstate,
+                    m_vstate,
                     m_pidControllers,
-                    m_taskData.pidReset,
+                    m_receiver->gotPidReset(),
                     usec);
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
                 auto motorOutput = motors.values[i];
 
-                motorOutput = m_taskData.esc->valueLow() +
-                    (m_taskData.esc->valueHigh() -
-                     m_taskData.esc->valueLow()) * motorOutput;
+                motorOutput = m_esc->valueLow() +
+                    (m_esc->valueHigh() -
+                     m_esc->valueLow()) * motorOutput;
 
-                if (m_taskData.failsafe.isActive()) {
-                    if (m_taskData.esc->isProtocolDshot()) {
+                if (m_failsafeIsActive) {
+                    if (m_esc->isProtocolDshot()) {
                         // Prevent getting into special reserved range
-                        motorOutput = (motorOutput < m_taskData.esc->valueLow()) ?
-                            m_taskData.esc->valueDisarmed() :
+                        motorOutput = (motorOutput < m_esc->valueLow()) ?
+                            m_esc->valueDisarmed() :
                             motorOutput; 
                     }
                     motorOutput = constrain_f(
                             motorOutput,
-                            m_taskData.esc->valueDisarmed(),
-                            m_taskData.esc->valueHigh());
+                            m_esc->valueDisarmed(),
+                            m_esc->valueHigh());
                 } else {
                     motorOutput =
                         constrain_f(
                                 motorOutput,
-                                m_taskData.esc->valueLow(),
-                                m_taskData.esc->valueHigh());
+                                m_esc->valueLow(),
+                                m_esc->valueHigh());
                 }
                 mixmotors[i] = motorOutput;
             }
 
-            m_taskData.esc->write(
-                    m_taskData.arming.isArmed() ?
-                    mixmotors :
-                    m_taskData.mspMotors);
+            m_esc->write(m_arming.isArmed() ?  mixmotors : m_msp.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -180,7 +175,6 @@ class Hackflight {
 
                 _gyroSkewAccum = 0;
             }
-
         }
 
         void checkDynamicTasks(void)
@@ -190,14 +184,11 @@ class Hackflight {
 
             uint32_t usec = timeMicros();
 
-            Task::update(&m_receiverTask, &m_taskData, usec,
-                    &selectedTask, &selectedTaskDynamicPriority);
+            m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_attitudeTask, &m_taskData, usec,
-                    &selectedTask, &selectedTaskDynamicPriority);
+            m_attitude.update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
-            Task::update(&m_mspTask, &m_taskData, usec,
-                    &selectedTask, &selectedTaskDynamicPriority);
+            m_msp.update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
             if (selectedTask) {
 
@@ -220,7 +211,7 @@ class Hackflight {
 
                     auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
 
-                    selectedTask->execute(&m_taskData, usec);
+                    selectedTask->execute(usec);
 
                     m_scheduler.updateDynamic(
                             systemGetCycleCounter(),
@@ -243,27 +234,29 @@ class Hackflight {
                 Esc & esc,
                 Led & led)
         {
+            m_receiver = &receiver;
+            m_imu = &imu;
             m_mixer = &mixer;
             m_imuAlignFun = imuAlignFun;
+            m_esc = &esc;
             m_led = &led;
 
             m_pidControllers = &pidControllers;
-
-            m_taskData.receiver = &receiver;
-            m_taskData.imu = &imu;
-            m_taskData.esc = &esc;
-
-            m_taskData.maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
-
-            m_taskData.arming.m_led = &led;
         }
 
         void begin(void)
         {
-            m_taskData.receiver->begin();
-            m_taskData.msp.begin();
-            m_taskData.imu->begin();
-            m_taskData.esc->begin();
+            m_arming.begin(m_esc, m_led);
+
+            m_attitude.begin(m_imu, &m_arming, &m_vstate);
+
+            m_msp.begin(m_esc, &m_arming, &m_rxSticks, &m_vstate);
+
+            m_receiver->begin(&m_arming, &m_rxSticks);
+
+            m_imu->begin();
+
+            m_esc->begin();
 
             m_led->begin();
 

@@ -21,8 +21,8 @@
 
 #include <stdlib.h>
 
-#include "receiver.h"
 #include "serial.h"
+#include "tasks/receiver.h"
 #include "time.h"
 
 class SbusReceiver : public Receiver {
@@ -95,64 +95,14 @@ class SbusReceiver : public Receiver {
 
         frameData_t m_frameData;
 
-        static uint8_t decodeChannels(
-                uint16_t * channelData, const sbusChannels_t *channels)
-        {
-            channelData[0] = channels->chan0;
-            channelData[1] = channels->chan1;
-            channelData[2] = channels->chan2;
-            channelData[3] = channels->chan3;
-            channelData[4] = channels->chan4;
-            channelData[5] = channels->chan5;
-            channelData[6] = channels->chan6;
-            channelData[7] = channels->chan7;
-            channelData[8] = channels->chan8;
-            channelData[9] = channels->chan9;
-            channelData[10] = channels->chan10;
-            channelData[11] = channels->chan11;
-            channelData[12] = channels->chan12;
-            channelData[13] = channels->chan13;
-            channelData[14] = channels->chan14;
-            channelData[15] = channels->chan15;
-
-            if (channels->flags & FLAG_CHANNEL_17) {
-                channelData[16] = CHANNEL_MAX;
-            } else {
-                channelData[16] = CHANNEL_MIN;
-            }
-
-            if (channels->flags & FLAG_CHANNEL_18) {
-                channelData[17] = CHANNEL_MAX;
-            } else {
-                channelData[17] = CHANNEL_MIN;
-            }
-
-            if (channels->flags & FLAG_FAILSAFE_ACTIVE) {
-                // internal failsafe enabled and rx failsafe flag set RX
-                // *should* still be sending valid channel data (repeated), so
-                // use it.
-                return Receiver::FRAME_COMPLETE | Receiver::FRAME_FAILSAFE;
-            }
-
-            if (channels->flags & FLAG_SIGNAL_LOSS) {
-                // The received data is a repeat of the last valid data so can be
-                // considered complete.
-                return Receiver::FRAME_COMPLETE | Receiver::FRAME_DROPPED;
-            }
-
-            return Receiver::FRAME_COMPLETE;
-        }
-
         // Receive ISR callback
         static void dataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
         {
             frameData_t * frameData = (frameData_t *)data;
 
-            const uint32_t nowUs = currentTimeUs;
+            const int32_t timeInterval = cmpTimeUs(currentTimeUs, frameData->startAtUs);
 
-            const int32_t sbusFrameTime = cmpTimeUs(nowUs, frameData->startAtUs);
-
-            if (sbusFrameTime > (long)(TIME_NEEDED_PER_FRAME + 500)) {
+            if (timeInterval > (int32_t)(TIME_NEEDED_PER_FRAME + 500)) {
                 frameData->position = 0;
             }
 
@@ -160,7 +110,7 @@ class SbusReceiver : public Receiver {
                 if (c != FRAME_BEGIN_BYTE) {
                     return;
                 }
-                frameData->startAtUs = nowUs;
+                frameData->startAtUs = currentTimeUs;
             }
 
             if (frameData->position < FRAME_SIZE) {
@@ -177,7 +127,7 @@ class SbusReceiver : public Receiver {
 
     protected:
 
-        virtual void begin(void) override
+        virtual void devStart(void) override
         {
             serialOpenPortSbus(
                     m_port,
@@ -185,30 +135,37 @@ class SbusReceiver : public Receiver {
                     &m_frameData);
         }
 
-        virtual float convert(uint16_t * channelData, uint8_t chan) override
+        virtual float devConvert(uint16_t * channelData, uint8_t chan) override
         {
             // [172,1811] -> [1000,2000]
             return (5 * (float)channelData[chan] / 8) + 880;
         }
 
-        virtual uint8_t devCheck(uint16_t * channelData, uint32_t * frameTimeUs)
-            override
+        virtual bool devRead(uint16_t channelData[], uint32_t * frameTimeUs) override
         {
-            if (!m_frameData.done) {
-                return Receiver::FRAME_PENDING;
+            auto result = false;
+
+            if (m_frameData.done) {
+
+                m_frameData.done = false;
+
+                result = true;
+
+                auto channels = &m_frameData.frame.frame.channels;
+
+                // Update frame time only if there are no channel errors (timeout)
+                *frameTimeUs = channels->flags ? *frameTimeUs : m_frameData.startAtUs;
+
+                channelData[0] = channels->chan0;
+                channelData[1] = channels->chan1;
+                channelData[2] = channels->chan2;
+                channelData[3] = channels->chan3;
+                channelData[4] = channels->chan4;
+                channelData[5] = channels->chan5;
+
             }
-            m_frameData.done = false;
 
-            const uint8_t frameStatus = decodeChannels(
-                    channelData,
-                    &m_frameData.frame.frame.channels);
-
-            if (!(frameStatus & (Receiver::FRAME_FAILSAFE |
-                            Receiver::FRAME_DROPPED))) {
-                *frameTimeUs = m_frameData.startAtUs;
-            }
-
-            return frameStatus;
+            return result;
         }
 
     public:

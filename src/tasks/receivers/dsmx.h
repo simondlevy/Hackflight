@@ -19,8 +19,8 @@
 
 #include <stdlib.h>
 
-#include "receiver.h"
 #include "serial.h"
+#include "tasks/receiver.h"
 #include "time.h"
 
 class DsmxReceiver : public Receiver {
@@ -39,9 +39,9 @@ class DsmxReceiver : public Receiver {
 
         typedef struct {
             uint8_t  bytes[FRAME_SIZE];
-            bool     done;
             uint32_t lastTimeUs;
             uint8_t  position;
+            bool     done;
         } frameData_t;
 
         // Receive ISR callback
@@ -75,7 +75,7 @@ class DsmxReceiver : public Receiver {
 
      protected:
 
-        virtual void begin(void) override
+        virtual void devStart(void) override
         {
             serialOpenPortDsmx(
                     m_port,
@@ -83,7 +83,7 @@ class DsmxReceiver : public Receiver {
                     &m_frameData);
         }
 
-        virtual float convert(uint16_t * channelData, uint8_t chan) override
+        virtual float devConvert(uint16_t * channelData, uint8_t chan) override
         {
             // Ignore channel 6 for now (problems with transmitter)
             auto chanval = chan == 5 ? 1 : channelData[chan];
@@ -91,14 +91,15 @@ class DsmxReceiver : public Receiver {
             return 1000 * (1 + (chanval - 1) / (float)(CHAN_RESOLUTION-1));
         }
 
-        virtual uint8_t devCheck(uint16_t * channelData, uint32_t * frameTimeUs)
-            override
+        virtual bool devRead(uint16_t channelData[], uint32_t * frameTimeUs) override
         {
-            auto result = Receiver::FRAME_PENDING;
+            auto result = false;
 
             if (m_frameData.done) {
 
                 m_frameData.done = false;
+
+                result = true;
 
                 *frameTimeUs = m_frameData.lastTimeUs;
 
@@ -115,7 +116,6 @@ class DsmxReceiver : public Receiver {
                     }
                 }
 
-                result = Receiver::FRAME_COMPLETE;
             }
 
             return result;

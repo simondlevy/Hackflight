@@ -23,15 +23,40 @@
 
 class AttitudeTask : public Task {
 
-    public:
+    friend class Hackflight;
+
+    private:
+
+        static constexpr float MAX_ARMING_ANGLE = 25;
+
+        Arming *       m_arming;
+        Imu *          m_imu;
+        VehicleState * m_vstate;
+
+        float m_maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
+
+    protected:
 
         AttitudeTask()
             : Task(100) // Hz
         {
         }
 
-        virtual void fun(Task::data_t * data, uint32_t time) override
+        void begin(Imu * imu, Arming * arming, VehicleState * vstate)
         {
-            data->imu->getEulerAngles(data->arming.isArmed(), time, &data->vstate);
+            m_imu = imu;
+            m_arming = arming;
+            m_vstate = vstate;
+        }
+
+        virtual void fun(uint32_t time) override
+        {
+            m_imu->getEulerAngles(m_arming->isArmed(), time, m_vstate);
+
+            auto imuIsLevel =
+                fabsf(m_vstate->phi) < m_maxArmingAngle &&
+                fabsf(m_vstate->theta) < m_maxArmingAngle;
+
+            m_arming->updateImuStatus(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
 };
