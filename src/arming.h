@@ -34,14 +34,12 @@ class Arming {
 
     bool readyToArm(void)
     {
-        // printf("cal=%d  fs=%d\n", m_gyroDoneCalibrating, m_failsafeOkay);
-
         return 
             m_accDoneCalibrating &&
             m_angleOkay &&
             m_switchOkay &&
             m_gyroDoneCalibrating &&
-            m_failsafeOkay &&
+            !m_failsafeActive &&
             m_throttleIsDown;
     }
 
@@ -53,7 +51,7 @@ class Arming {
     bool m_switchOkay;
     bool m_gyroDoneCalibrating;
     bool m_is_armed;
-    bool m_failsafeOkay;
+    bool m_failsafeActive;
     bool m_throttleIsDown;
 
     void begin(Esc * esc, Led * led)
@@ -119,12 +117,16 @@ class Arming {
     }
 
     void updateReceiverStatus(
-            const bool throttleIsDown, const bool aux1IsSet, const bool timedOut)
+            const bool throttleIsDown, const bool aux1IsSet, const bool lostSignal)
     {
-        // printf("%d\n", timedOut);
-
         if (m_is_armed) {
-            m_led->set(true);
+            if (lostSignal) {
+                m_failsafeActive = true;
+                disarm();
+            }
+            else {
+                m_led->set(true);
+            }
         } else {
 
             m_throttleIsDown = throttleIsDown;

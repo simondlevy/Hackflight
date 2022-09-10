@@ -54,7 +54,7 @@ class Receiver : public Task {
 
     static const uint8_t RATE = 67;
 
-    static const uint32_t TIMEOUT_US = 50000;
+    static const uint32_t TIMEOUT_MS = 500;
 
     // Minimum rc smoothing cutoff frequency
     static const uint16_t SMOOTHING_CUTOFF_MIN_HZ = 15;    
@@ -732,7 +732,8 @@ class Receiver : public Task {
 
     void fun(uint32_t usec)
     {
-        const auto timedOut = (usec - m_lastFrameTimeUs) > (int32_t)TIMEOUT_US;
+        const auto lostSignal =
+            (usec - m_lastFrameTimeUs) > (int32_t)(1000*TIMEOUT_MS);
 
         auto pidItermResetReady = false;
         auto pidItermResetValue = false;
@@ -763,7 +764,7 @@ class Receiver : public Task {
             case STATE_UPDATE:
                 m_gotNewData = true;
                 updateCommands();
-                m_arming->updateReceiverStatus(throttleIsDown(), aux1IsSet(), timedOut);
+                m_arming->updateReceiverStatus(throttleIsDown(), aux1IsSet(), lostSignal);
                 m_state = STATE_CHECK;
                 break;
         }
