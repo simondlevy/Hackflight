@@ -91,7 +91,7 @@ class DsmxReceiver : public Receiver {
             return 1000 * (1 + (chanval - 1) / (float)(CHAN_RESOLUTION-1));
         }
 
-        virtual bool devRead(uint16_t * channelData[] uint32_t * frameTimeUs) override
+        virtual bool devRead(uint16_t channelData[], uint32_t * frameTimeUs) override
         {
             auto result = false;
 
@@ -119,11 +119,6 @@ class DsmxReceiver : public Receiver {
             }
 
             return result;
-        }
-
-        virtual bool devLostSignal(void) override
-        {
-            return false;
         }
 
     public:

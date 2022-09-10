@@ -118,8 +118,11 @@ class Arming {
         }
     }
 
-    void updateReceiverStatus( const bool throttleIsDown, const bool aux1IsSet)
+    void updateReceiverStatus(
+            const bool throttleIsDown, const bool aux1IsSet, const bool timedOut)
     {
+        // printf("%d\n", timedOut);
+
         if (m_is_armed) {
             m_led->set(true);
         } else {

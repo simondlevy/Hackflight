@@ -54,7 +54,7 @@ class Receiver : public Task {
 
     static const uint8_t RATE = 67;
 
-    static const uint32_t FAILSAFE_US = 1000;
+    static const uint32_t TIMEOUT_US = 50000;
 
     // Minimum rc smoothing cutoff frequency
     static const uint16_t SMOOTHING_CUTOFF_MIN_HZ = 15;    
@@ -725,8 +725,6 @@ class Receiver : public Task {
 
     virtual float devConvert(uint16_t * chanData, uint8_t chanId) = 0;
 
-    //virtual bool devLostSignal(void) = 0;
-    
     Receiver()
         : Task(33) // Hz
     {
@@ -734,7 +732,7 @@ class Receiver : public Task {
 
     void fun(uint32_t usec)
     {
-        // static uint32_t count; printf("%d: %d\n", (int)count++, (int)m_lastFrameTimeUs);
+        const auto timedOut = (usec - m_lastFrameTimeUs) > (int32_t)TIMEOUT_US;
 
         auto pidItermResetReady = false;
         auto pidItermResetValue = false;
@@ -765,7 +763,7 @@ class Receiver : public Task {
             case STATE_UPDATE:
                 m_gotNewData = true;
                 updateCommands();
-                m_arming->updateReceiverStatus(throttleIsDown(), aux1IsSet());
+                m_arming->updateReceiverStatus(throttleIsDown(), aux1IsSet(), timedOut);
                 m_state = STATE_CHECK;
                 break;
         }
