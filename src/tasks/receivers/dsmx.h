@@ -39,9 +39,9 @@ class DsmxReceiver : public Receiver {
 
         typedef struct {
             uint8_t  bytes[FRAME_SIZE];
-            bool     done;
             uint32_t lastTimeUs;
             uint8_t  position;
+            bool     done;
         } frameData_t;
 
         // Receive ISR callback
@@ -91,13 +91,15 @@ class DsmxReceiver : public Receiver {
             return 1000 * (1 + (chanval - 1) / (float)(CHAN_RESOLUTION-1));
         }
 
-        virtual bool devCheck(uint16_t * channelData, uint32_t * frameTimeUs) override
+        virtual bool devRead(uint16_t * channelData[] uint32_t * frameTimeUs) override
         {
             auto result = false;
 
             if (m_frameData.done) {
 
                 m_frameData.done = false;
+
+                result = true;
 
                 *frameTimeUs = m_frameData.lastTimeUs;
 
@@ -114,10 +116,14 @@ class DsmxReceiver : public Receiver {
                     }
                 }
 
-                result = true;
             }
 
             return result;
+        }
+
+        virtual bool devLostSignal(void) override
+        {
+            return false;
         }
 
     public:

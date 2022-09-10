@@ -54,7 +54,7 @@ class Receiver : public Task {
 
     static const uint8_t RATE = 67;
 
-    static const uint32_t FAILSAFE_US = 5000000;
+    static const uint32_t FAILSAFE_US = 1000;
 
     // Minimum rc smoothing cutoff frequency
     static const uint16_t SMOOTHING_CUTOFF_MIN_HZ = 15;    
@@ -630,9 +630,7 @@ class Receiver : public Task {
             return true;
         }
 
-        const auto frameStatus = devCheck(m_channelData, &m_lastFrameTimeUs);
-
-        // if (frameStatus) serialDebugPrintf("%d\n", (int)m_lastFrameTimeUs);
+        const auto frameStatus = devRead(m_channelData, &m_lastFrameTimeUs);
 
         if (frameStatus) {
             m_inFailsafeMode = false;
@@ -706,8 +704,7 @@ class Receiver : public Task {
     void adjustDynamicPriority(uint32_t usec) 
     {
         if (m_dynamicPriority > 0) {
-            m_ageCycles = 1 + (cmpTimeUs(usec,
-                        m_lastSignaledAtUs) / m_desiredPeriodUs);
+            m_ageCycles = 1 + (cmpTimeUs(usec, m_lastSignaledAtUs) / m_desiredPeriodUs);
             m_dynamicPriority = 1 + m_ageCycles;
         } else  {
             if (check(usec)) {
@@ -724,9 +721,11 @@ class Receiver : public Task {
 
     virtual void devStart(void) = 0;
 
-    virtual bool devCheck(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
+    virtual bool devRead(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
 
     virtual float devConvert(uint16_t * chanData, uint8_t chanId) = 0;
+
+    //virtual bool devLostSignal(void) = 0;
     
     Receiver()
         : Task(33) // Hz
@@ -735,7 +734,7 @@ class Receiver : public Task {
 
     void fun(uint32_t usec)
     {
-        static uint32_t _lastDataTime;
+        // static uint32_t count; printf("%d: %d\n", (int)count++, (int)m_lastFrameTimeUs);
 
         auto pidItermResetReady = false;
         auto pidItermResetValue = false;
@@ -765,10 +764,8 @@ class Receiver : public Task {
 
             case STATE_UPDATE:
                 m_gotNewData = true;
-                _lastDataTime = usec;
                 updateCommands();
-                bool failsafe = m_gotNewData && (usec-_lastDataTime) > FAILSAFE_US;
-                m_arming->updateReceiverStatus(throttleIsDown(), aux1IsSet(), failsafe);
+                m_arming->updateReceiverStatus(throttleIsDown(), aux1IsSet());
                 m_state = STATE_CHECK;
                 break;
         }

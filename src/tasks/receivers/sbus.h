@@ -100,11 +100,9 @@ class SbusReceiver : public Receiver {
         {
             frameData_t * frameData = (frameData_t *)data;
 
-            const uint32_t nowUs = currentTimeUs;
+            const int32_t timeInterval = cmpTimeUs(currentTimeUs, frameData->startAtUs);
 
-            const int32_t sbusFrameTime = cmpTimeUs(nowUs, frameData->startAtUs);
-
-            if (sbusFrameTime > (long)(TIME_NEEDED_PER_FRAME + 500)) {
+            if (timeInterval > (int32_t)(TIME_NEEDED_PER_FRAME + 500)) {
                 frameData->position = 0;
             }
 
@@ -112,7 +110,7 @@ class SbusReceiver : public Receiver {
                 if (c != FRAME_BEGIN_BYTE) {
                     return;
                 }
-                frameData->startAtUs = nowUs;
+                frameData->startAtUs = currentTimeUs;
             }
 
             if (frameData->position < FRAME_SIZE) {
@@ -143,25 +141,31 @@ class SbusReceiver : public Receiver {
             return (5 * (float)channelData[chan] / 8) + 880;
         }
 
-        virtual bool devCheck(uint16_t channelData[], uint32_t * frameTimeUs) override
+        virtual bool devRead(uint16_t channelData[], uint32_t * frameTimeUs) override
         {
-            if (!m_frameData.done) {
-                return false;
+            auto result = false;
+
+            if (m_frameData.done) {
+
+                m_frameData.done = false;
+
+                result = true;
+
+                auto channels = &m_frameData.frame.frame.channels;
+
+                // Update frame time only if there are no channel errors (timeout)
+                *frameTimeUs = channels->flags ? *frameTimeUs : m_frameData.startAtUs;
+
+                channelData[0] = channels->chan0;
+                channelData[1] = channels->chan1;
+                channelData[2] = channels->chan2;
+                channelData[3] = channels->chan3;
+                channelData[4] = channels->chan4;
+                channelData[5] = channels->chan5;
+
             }
-            m_frameData.done = false;
 
-            auto channels = &m_frameData.frame.frame.channels;
-
-            channelData[0] = channels->chan0;
-            channelData[1] = channels->chan1;
-            channelData[2] = channels->chan2;
-            channelData[3] = channels->chan3;
-            channelData[4] = channels->chan4;
-            channelData[5] = channels->chan5;
-
-            *frameTimeUs = m_frameData.startAtUs;
-
-            return true;
+            return result;
         }
 
     public:

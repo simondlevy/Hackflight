@@ -118,13 +118,8 @@ class Arming {
         }
     }
 
-    void updateReceiverStatus(
-            const bool throttleIsDown,
-            const bool aux1IsSet, 
-            const bool failsafe)
+    void updateReceiverStatus( const bool throttleIsDown, const bool aux1IsSet)
     {
-        printf("failsafe=%d\n", failsafe);
-
         if (m_is_armed) {
             m_led->set(true);
         } else {
