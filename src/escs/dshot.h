@@ -352,9 +352,9 @@ class DshotEsc : public Esc {
             return true;
         }
 
-        virtual bool isReady(uint32_t currentTimeUs) override 
+        virtual bool isReady(uint32_t usec) override 
         {
-            return currentTimeUs >= BEACON_GUARD_DELAY_US;
+            return usec >= BEACON_GUARD_DELAY_US;
         }
 
         virtual float valueDisarmed(void) override 

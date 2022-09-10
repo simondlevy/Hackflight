@@ -96,11 +96,11 @@ class SbusReceiver : public Receiver {
         frameData_t m_frameData;
 
         // Receive ISR callback
-        static void dataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
+        static void dataReceive(uint8_t c, void *data, uint32_t usec)
         {
             frameData_t * frameData = (frameData_t *)data;
 
-            const int32_t timeInterval = cmpTimeUs(currentTimeUs, frameData->startAtUs);
+            const int32_t timeInterval = cmpTimeUs(usec, frameData->startAtUs);
 
             if (timeInterval > (int32_t)(TIME_NEEDED_PER_FRAME + 500)) {
                 frameData->position = 0;
@@ -110,7 +110,7 @@ class SbusReceiver : public Receiver {
                 if (c != FRAME_BEGIN_BYTE) {
                     return;
                 }
-                frameData->startAtUs = currentTimeUs;
+                frameData->startAtUs = usec;
             }
 
             if (frameData->position < FRAME_SIZE) {

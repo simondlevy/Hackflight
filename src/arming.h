@@ -84,7 +84,7 @@ class Arming {
     }
 
     // Called by Receiver
-    void attempt(const uint32_t currentTimeUs, const bool aux1IsSet)
+    void attempt(const uint32_t usec, const bool aux1IsSet)
     {
         static bool _doNotRepeat;
 
@@ -96,7 +96,7 @@ class Arming {
                     return;
                 }
 
-                if (!m_esc->isReady(currentTimeUs)) {
+                if (!m_esc->isReady(usec)) {
                     return;
                 }
 

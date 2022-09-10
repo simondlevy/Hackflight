@@ -59,12 +59,12 @@ class AltHoldPidController : public PidController {
         }
 
         virtual auto update(
-                const uint32_t currentTimeUs,
+                const uint32_t usec,
                 const Demands & demands,
                 const VehicleState & vstate,
                 const bool reset) -> Demands override
         {
-            (void)currentTimeUs;
+            (void)usec;
 
             // NED => ENU
             const auto altitude = -vstate.z;

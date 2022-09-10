@@ -421,7 +421,7 @@ class AnglePidController : public PidController {
         }
 
         virtual auto update(
-                const uint32_t currentTimeUs,
+                const uint32_t usec,
                 const Demands & demands,
                 const VehicleState & vstate,
                 const bool reset) -> Demands override
@@ -440,7 +440,7 @@ class AnglePidController : public PidController {
                 m_yaw.I = 0;
             }
 
-            if (cmpTimeUs(currentTimeUs, m_lastDynLpfUpdateUs) >=
+            if (cmpTimeUs(usec, m_lastDynLpfUpdateUs) >=
                     DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
 
                 // quantize the throttle reduce the number of filter updates
@@ -455,7 +455,7 @@ class AnglePidController : public PidController {
                         (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
                     pidDynLpfDTermUpdate(dynLpfThrottle);
                     m_dynLpfPreviousQuantizedThrottle = quantizedThrottle;
-                    m_lastDynLpfUpdateUs = currentTimeUs;
+                    m_lastDynLpfUpdateUs = usec;
                 }
             }
 

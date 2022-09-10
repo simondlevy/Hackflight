@@ -26,7 +26,7 @@ class PidController {
     public:
 
          virtual auto update(
-                const uint32_t currentTimeUs,
+                const uint32_t usec,
                 const Demands & demands,
                 const VehicleState & vstate,
                 const bool reset) -> Demands = 0;

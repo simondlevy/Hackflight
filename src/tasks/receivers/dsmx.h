@@ -45,14 +45,14 @@ class DsmxReceiver : public Receiver {
         } frameData_t;
 
         // Receive ISR callback
-        static void dataReceive(uint8_t c, void *data, uint32_t currentTimeUs)
+        static void dataReceive(uint8_t c, void *data, uint32_t usec)
         {
             frameData_t * frameData = (frameData_t *)data;
 
             const uint32_t timeInterval =
-                cmpTimeUs(currentTimeUs, frameData->lastTimeUs);
+                cmpTimeUs(usec, frameData->lastTimeUs);
 
-            frameData->lastTimeUs = currentTimeUs;
+            frameData->lastTimeUs = usec;
 
             if (timeInterval > FRAME_INTERVAL) {
                 frameData->position = 0;
@@ -63,7 +63,7 @@ class DsmxReceiver : public Receiver {
                 if (frameData->position < FRAME_SIZE) {
                     frameData->done = false;
                 } else {
-                    frameData->lastTimeUs = currentTimeUs;
+                    frameData->lastTimeUs = usec;
                     frameData->done = true;
                 }
             }

@@ -122,7 +122,7 @@ extern "C" {
 #endif
 
     typedef void (*serialReceiveCallbackPtr)
-        (uint8_t data, void *rxCallbackData, uint32_t currentTimeUs);
+        (uint8_t data, void *rxCallbackData, uint32_t usec);
 
     void serialInit(serialPortIdentifier_e serialPortToDisable);
 
