@@ -51,7 +51,7 @@ class AttitudeTask : public Task {
 
         virtual void fun(uint32_t time) override
         {
-            Axes angles = m_imu->getEulerAngles(time);
+            auto angles = m_imu->getEulerAngles(time);
 
             m_vstate->phi   = angles.x;
             m_vstate->theta = angles.y;
