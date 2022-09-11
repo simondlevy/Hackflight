@@ -461,8 +461,8 @@ class Receiver : public Task {
 
     void processSmoothingFilter(
             const uint32_t usec,
-            float * setpointRate,
-            float * rawSetpoint)
+            const axes_t & rawSetpoints,
+            float * setpointRate)
     {
         // first call initialization
         if (!m_initializedFilter) {
@@ -581,9 +581,9 @@ class Receiver : public Task {
             }
 
             m_dataToSmooth.throttle = m_commands.throttle;
-            m_dataToSmooth.roll  = rawSetpoint[0];
-            m_dataToSmooth.pitch = rawSetpoint[1];
-            m_dataToSmooth.yaw   = rawSetpoint[2];
+            m_dataToSmooth.roll  = rawSetpoints.x;
+            m_dataToSmooth.pitch = rawSetpoints.y;
+            m_dataToSmooth.yaw   = rawSetpoints.z;
         }
 
         // Each pid loop, apply the last received channel value to the
@@ -659,20 +659,20 @@ class Receiver : public Task {
     // Runs in fast (inner, core) loop
     auto getDemands(const uint32_t usec) -> Demands
     {
-        float rawSetpoints[3] = {};
+        axes_t rawSetpoints = {};
 
         if (m_gotNewData) {
 
             m_previousFrameTimeUs = 0;
 
-            rawSetpoints[0] = getRawSetpoint(m_commandRoll, COMMAND_DIVIDER);
-            rawSetpoints[1] = getRawSetpoint(m_commandPitch, COMMAND_DIVIDER);
-            rawSetpoints[2] = getRawSetpoint(m_commandYaw, YAW_COMMAND_DIVIDER);
+            rawSetpoints.x = getRawSetpoint(m_commandRoll, COMMAND_DIVIDER);
+            rawSetpoints.y = getRawSetpoint(m_commandPitch, COMMAND_DIVIDER);
+            rawSetpoints.z = getRawSetpoint(m_commandYaw, YAW_COMMAND_DIVIDER);
         }
 
         float setpointRate[3] = {};
 
-        processSmoothingFilter(usec, setpointRate, rawSetpoints);
+        processSmoothingFilter(usec, rawSetpoints, setpointRate);
 
         m_gotNewData = false;
 
