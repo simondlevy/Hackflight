@@ -207,9 +207,6 @@ class SoftQuatImu : public Imu {
             m_fusionPrev.rot.x = 0;
             m_fusionPrev.rot.y = 0;
             m_fusionPrev.rot.z = 0;
-            //m_fusionPrev.gyroReset.quietPeriodEnd = 0;
-            //m_fusionPrev.gyroReset.resetTimeEnd = 0;
-            //m_fusionPrev.gyroReset.resetCompleted = false;
 
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
@@ -250,9 +247,9 @@ class SoftQuatImu : public Imu {
             m_fusionPrev.rot.x = rot.x;
             m_fusionPrev.rot.y = rot.y;
             m_fusionPrev.rot.z = rot.z;
-            m_fusionPrev.gyroReset.quietPeriodEnd = 0;
-            m_fusionPrev.gyroReset.resetTimeEnd = 0;
-            m_fusionPrev.gyroReset.resetCompleted = false;
+            //m_fusionPrev.gyroReset.quietPeriodEnd = 0;
+            //m_fusionPrev.gyroReset.resetTimeEnd = 0;
+            //m_fusionPrev.gyroReset.resetCompleted = false;
 
             m_accum.count = 0;
             m_accum.values.x = 0;
