@@ -183,9 +183,6 @@ class SoftQuatImu : public Imu {
             float dt = deltaT * 1e-6;
 
             if (!isArmed) {
-                //m_fusionPrev.gyroReset.quietPeriodEnd = 0;
-                //m_fusionPrev.gyroReset.resetTimeEnd = 0;
-                //m_fusionPrev.gyroReset.resetCompleted = false;
             }
 
             return mahony(dt, gyroAvg, m_fusionPrev.quat);
@@ -199,6 +196,7 @@ class SoftQuatImu : public Imu {
         SoftQuatImu(const uint16_t gyroScale)
             : Imu(gyroScale)
         {
+            /*
             m_fusionPrev.time = 0;
             m_fusionPrev.quat.w = 0;
             m_fusionPrev.quat.x = 0;
@@ -207,6 +205,7 @@ class SoftQuatImu : public Imu {
             m_fusionPrev.rot.x = 0;
             m_fusionPrev.rot.y = 0;
             m_fusionPrev.rot.z = 0;
+            */
 
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
