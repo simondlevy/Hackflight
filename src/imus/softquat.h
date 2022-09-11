@@ -229,18 +229,17 @@ class SoftQuatImu : public Imu {
                 VehicleState * vstate) override
         {
             Quaternion quat = getQuaternion(isArmed, time);
-            Axes rot;
+
             Axes angles;
-            quat2euler(quat, angles, rot);
+
+            quat2euler(quat, angles, m_fusionPrev.rot);
 
             m_fusionPrev.time = time;
+
             m_fusionPrev.quat.w = quat.w;
             m_fusionPrev.quat.x = quat.x;
             m_fusionPrev.quat.y = quat.y;
             m_fusionPrev.quat.z = quat.z;
-            m_fusionPrev.rot.x = rot.x;
-            m_fusionPrev.rot.y = rot.y;
-            m_fusionPrev.rot.z = rot.z;
 
             m_gyroAccum.reset();
 
