@@ -61,7 +61,33 @@ class SoftQuatImu : public Imu {
             public:
 
                 Axes values;
+                Axes adcf;
+
                 uint32_t count;
+
+                void accumulate(float x, float y, float z)
+                {
+                    // integrate using trapezium rule to avoid bias
+                    values.x += 0.5f * (adcf.x + x) * Clock::PERIOD();
+                    values.y += 0.5f * (adcf.y + y) * Clock::PERIOD();
+                    values.z += 0.5f * (adcf.z + z) * Clock::PERIOD();
+
+                    adcf.x = x;
+                    adcf.y = y;
+                    adcf.z = z;
+
+                    count++;
+                }
+                
+                Axes getAverage(void)
+                {
+                    uint32_t denom = count * Clock::PERIOD();
+
+                    return Axes(
+                            denom ? values.x / denom : 0,
+                            denom ? values.y / denom : 0,
+                            denom ? values.z / denom : 0);
+                }
 
                 void reset(void)
                 {
@@ -188,7 +214,7 @@ class SoftQuatImu : public Imu {
         {
             int32_t deltaT = time - m_fusionPrev.time;
 
-            Axes gyroAvg = getAverage(m_gyroAccum, Clock::PERIOD());
+            Axes gyroAvg = m_gyroAccum.getAverage();
 
             float dt = deltaT * 1e-6;
 
@@ -213,18 +239,7 @@ class SoftQuatImu : public Imu {
         virtual void accumulateGyro(
                 const float gx, const float gy, const float gz) override
         {
-            static Axes _adcf;
-
-            // integrate using trapezium rule to avoid bias
-            m_gyroAccum.values.x += 0.5f * (_adcf.x + gx) * Clock::PERIOD();
-            m_gyroAccum.values.y += 0.5f * (_adcf.y + gy) * Clock::PERIOD();
-            m_gyroAccum.values.z += 0.5f * (_adcf.z + gz) * Clock::PERIOD();
-
-            m_gyroAccum.count++;
-
-            _adcf.x = gx;
-            _adcf.y = gy;
-            _adcf.z = gz;
+            m_gyroAccum.accumulate(gx, gy, gz);
         }
 
         virtual void getEulerAngles(
