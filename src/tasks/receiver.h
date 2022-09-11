@@ -657,7 +657,7 @@ class Receiver : public Task {
     } // check
 
     // Runs in fast (inner, core) loop
-    void getDemands(const uint32_t usec, Demands * demands)
+    auto getDemands(const uint32_t usec) -> Demands
     {
         float rawSetpoints[3] = {};
 
@@ -674,19 +674,14 @@ class Receiver : public Task {
 
         processSmoothingFilter(usec, setpointRate, rawSetpoints);
 
-        // Find min and max throttle based on conditions. Throttle has to
-        // be known before mixing
-        demands->throttle =
-            constrain_f((m_commands.throttle - PWM_MIN) /
-                    (PWM_MAX - PWM_MIN), 0.0f, 1.0f);
-
-        demands->roll  = setpointRate[0];
-        demands->pitch = setpointRate[1];
-        demands->yaw   = setpointRate[2];
-
         m_gotNewData = false;
 
-    } // getDemands
+        return Demands(
+                constrain_f((m_commands.throttle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0, 1),
+                setpointRate[0],
+                setpointRate[1],
+                setpointRate[2]);
+    }
 
 
     void begin(Arming * arming, sticks_t * sticks)

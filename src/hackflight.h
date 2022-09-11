@@ -85,9 +85,7 @@ class Hackflight {
 
             auto usec = timeMicros();
 
-            Demands demands = {0,0,0,0};
-
-            m_receiver->getDemands(usec, &demands);
+            Demands demands = m_receiver->getDemands(usec);
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
