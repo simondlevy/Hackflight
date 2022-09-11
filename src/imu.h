@@ -158,6 +158,29 @@ class Imu {
 
         virtual int16_t devReadRawGyro(uint8_t k) = 0;
 
+        class Quaternion {
+
+            public:
+
+                float w;
+                float x;
+                float y;
+                float z;
+
+                Quaternion(float _w, float _x, float _y, float _z)
+                {
+                    w = _w;
+                    x = _x;
+                    y = _y;
+                    z = _z;
+                }
+
+                Quaternion(void)
+                    : Quaternion(0, 0, 0, 0)
+                {
+                }
+        };
+
         typedef struct {
             float w;
             float x;
