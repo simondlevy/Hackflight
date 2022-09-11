@@ -173,16 +173,6 @@ class SoftQuatImu : public Imu {
             rot.z = r22;
         }
 
-        static auto getAverage(const ImuSensor & sensor, const uint32_t period) -> Axes
-        {
-            uint32_t denom = sensor.count * period;
-
-            return Axes(
-                    denom ? sensor.values.x / denom : 0,
-                    denom ? sensor.values.y / denom : 0,
-                    denom ? sensor.values.z / denom : 0);
-        }
-
         static auto mahony(
                 const float dt,
                 const Axes & gyro,
