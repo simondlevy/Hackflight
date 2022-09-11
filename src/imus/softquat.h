@@ -51,7 +51,7 @@ class SoftQuatImu : public Imu {
                 uint32_t time;
                 Quaternion quat;
                 Axes rot;
-                GyroReset gyroReset;
+                //GyroReset gyroReset;
         };
 
         class ImuSensor {
