@@ -230,13 +230,13 @@ class SoftQuatImu : public Imu {
         {
             Quaternion quat = getQuaternion(isArmed, time);
 
-            auto angles = quat2euler(quat, m_fusionPrev.rot);
-
             m_fusionPrev.time = time;
 
             m_fusionPrev.quat = quat;
 
             m_gyroAccum.reset();
+
+            auto angles = quat2euler(quat, m_fusionPrev.rot);
 
             vstate->phi = angles.x;
             vstate->theta = angles.y;
