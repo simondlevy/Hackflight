@@ -43,8 +43,7 @@ class SoftQuatImu : public Imu {
         class GyroReset {
 
             public: 
-                //uint32_t quietPeriodEnd;
-                uint32_t resetTimeEnd;
+                //uint32_t resetTimeEnd;
                 bool resetCompleted;
         };
 
