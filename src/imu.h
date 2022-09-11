@@ -189,16 +189,10 @@ class Imu {
         } quaternion_t;
 
         typedef struct {
-            float r20;
-            float r21;
-            float r22;
-        } rotation_t;
-
-        typedef struct {
             uint32_t quietPeriodEnd;
             uint32_t resetTimeEnd;
             bool resetCompleted;
-        } gyro_reset_t;
+        } gyroReset_t;
 
         typedef void (*align_fun)(Axes * axes);
 

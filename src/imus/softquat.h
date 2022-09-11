@@ -43,8 +43,8 @@ class SoftQuatImu : public Imu {
         typedef struct {
             uint32_t time;
             quaternion_t quat;
-            rotation_t rot;
-            gyro_reset_t gyroReset;
+            Axes rot;
+            gyroReset_t gyroReset;
         } fusion_t;
 
         typedef struct {
@@ -98,7 +98,7 @@ class SoftQuatImu : public Imu {
 
 
         static void quat2euler(
-                quaternion_t * quat, VehicleState * state, rotation_t * rot)
+                quaternion_t * quat, VehicleState * state, Axes * rot)
         {
             float qw = quat->w;
             float qx = quat->x;
@@ -119,9 +119,9 @@ class SoftQuatImu : public Imu {
             state->psi   = psi + ((psi < 0) ? 2 * M_PI : 0);
 
             // Additional output
-            rot->r20 = r20;
-            rot->r21 = r21;
-            rot->r22 = r22;
+            rot->x = r20;
+            rot->y = r21;
+            rot->z = r22;
         }
 
         static auto getAverage(const imu_sensor_t & sensor, const uint32_t period) -> Axes
@@ -172,11 +172,11 @@ class SoftQuatImu : public Imu {
 
             float dt = deltaT * 1e-6;
 
-            gyro_reset_t new_gyro_reset = {};
+            gyroReset_t new_gyroReset = {};
 
             if (!isArmed) {
-                memcpy(&m_fusionPrev.gyroReset, &new_gyro_reset,
-                        sizeof(gyro_reset_t));
+                memcpy(&m_fusionPrev.gyroReset, &new_gyroReset,
+                        sizeof(gyroReset_t));
             }
 
             mahony(dt, gyroAvg, m_fusionPrev.quat, quat);
@@ -190,7 +190,17 @@ class SoftQuatImu : public Imu {
         SoftQuatImu(const uint16_t gyroScale)
             : Imu(gyroScale)
         {
-            memset(&m_fusionPrev, 0, sizeof(fusion_t));
+            m_fusionPrev.time = 0;
+            m_fusionPrev.quat.w = 0;
+            m_fusionPrev.quat.x = 0;
+            m_fusionPrev.quat.y = 0;
+            m_fusionPrev.quat.z = 0;
+            m_fusionPrev.rot.x = 0;
+            m_fusionPrev.rot.y = 0;
+            m_fusionPrev.rot.z = 0;
+            m_fusionPrev.gyroReset.quietPeriodEnd = 0;
+            m_fusionPrev.gyroReset.resetTimeEnd = 0;
+            m_fusionPrev.gyroReset.resetCompleted = false;
 
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
@@ -220,14 +230,19 @@ class SoftQuatImu : public Imu {
         {
             quaternion_t quat = {};
             getQuaternion(isArmed, time, &quat);
-            rotation_t rot = {};
+            Axes rot;
             quat2euler(&quat, vstate, &rot);
 
             fusion_t fusion;
             fusion.time = time;
             memcpy(&fusion.quat, &quat, sizeof(quaternion_t));
-            memcpy(&fusion.rot, &rot, sizeof(rotation_t));
+
+            fusion.rot = rot;
+
+            //memcpy(&fusion.rot, &rot, sizeof(rotation_t));
+
             memcpy(&m_fusionPrev, &fusion, sizeof(fusion_t));
+
 
             m_accum.count = 0;
             m_accum.values.x = 0;
