@@ -40,18 +40,11 @@ class SoftQuatImu : public Imu {
         static constexpr float atanPolyCoef6  = 0.1471039133652469f;
         static constexpr float atanPolyCoef7  = 0.6444640676891548f;
 
-        class GyroReset {
-
-            public: 
-                //bool resetCompleted;
-        };
-
         class Fusion {
             public:
                 uint32_t time;
                 Quaternion quat;
                 Axes rot;
-                //GyroReset gyroReset;
         };
 
         class ImuSensor {
