@@ -228,10 +228,6 @@ class SoftQuatImu : public Imu {
             Axes angles;
             quat2euler(quat, angles, rot);
 
-            vstate->phi = angles.x;
-            vstate->theta = angles.y;
-            vstate->psi = angles.z;
-
             fusion_t fusion;
             fusion.time = time;
 
@@ -248,5 +244,9 @@ class SoftQuatImu : public Imu {
             m_accum.values.x = 0;
             m_accum.values.y = 0;
             m_accum.values.z = 0;
+
+            vstate->phi = angles.x;
+            vstate->theta = angles.y;
+            vstate->psi = angles.z;
         }
 };
