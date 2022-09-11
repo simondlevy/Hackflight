@@ -40,25 +40,29 @@ class SoftQuatImu : public Imu {
         static constexpr float atanPolyCoef6  = 0.1471039133652469f;
         static constexpr float atanPolyCoef7  = 0.6444640676891548f;
 
-        typedef struct {
-            uint32_t quietPeriodEnd;
-            uint32_t resetTimeEnd;
-            bool resetCompleted;
-        } gyroReset_t;
+        class GyroReset {
 
-        typedef struct {
-            uint32_t time;
-            Quaternion quat;
-            Axes rot;
-            gyroReset_t gyroReset;
-        } fusion_t;
+            public: 
+                uint32_t quietPeriodEnd;
+                uint32_t resetTimeEnd;
+                bool resetCompleted;
+        };
 
-        typedef struct {
-            Axes values;
-            uint32_t count;
-        } imu_sensor_t;
+        class Fusion {
+            public:
+                uint32_t time;
+                Quaternion quat;
+                Axes rot;
+                GyroReset gyroReset;
+        };
 
-        fusion_t m_fusionPrev;
+        class ImuSensor {
+            public:
+                Axes values;
+                uint32_t count;
+        };
+
+        Fusion m_fusionPrev;
 
         // http://http.developer.nvidia.com/Cg/acos.html Handbook of
         // Mathematical Functions M. Abramowitz and I.A. Stegun, Ed.
@@ -67,8 +71,13 @@ class SoftQuatImu : public Imu {
         static float acos_approx(const float x)
         {
             float xa = fabsf(x);
-            float result = sqrtf(1.0f - xa) *
-                (1.5707288f + xa * (-0.2121144f + xa * (0.0742610f + (-0.0187293f * xa))));
+
+            float result =
+                sqrtf(1.0f - xa) *
+                (1.5707288f + xa *
+                 (-0.2121144f + xa *
+                  (0.0742610f + (-0.0187293f * xa))));
+
             if (x < 0.0f)
                 return M_PI - result;
             else
@@ -128,7 +137,7 @@ class SoftQuatImu : public Imu {
             rot.z = r22;
         }
 
-        static auto getAverage(const imu_sensor_t & sensor, const uint32_t period) -> Axes
+        static auto getAverage(const ImuSensor & sensor, const uint32_t period) -> Axes
         {
             uint32_t denom = sensor.count * period;
 
@@ -183,7 +192,7 @@ class SoftQuatImu : public Imu {
 
         }
 
-        imu_sensor_t m_accum;
+        ImuSensor m_accum;
 
     public:
 
