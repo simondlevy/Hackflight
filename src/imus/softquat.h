@@ -41,6 +41,12 @@ class SoftQuatImu : public Imu {
         static constexpr float atanPolyCoef7  = 0.6444640676891548f;
 
         typedef struct {
+            uint32_t quietPeriodEnd;
+            uint32_t resetTimeEnd;
+            bool resetCompleted;
+        } gyroReset_t;
+
+        typedef struct {
             uint32_t time;
             Quaternion quat;
             Axes rot;

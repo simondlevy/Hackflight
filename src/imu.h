@@ -181,12 +181,6 @@ class Imu {
                 }
         };
 
-        typedef struct {
-            uint32_t quietPeriodEnd;
-            uint32_t resetTimeEnd;
-            bool resetCompleted;
-        } gyroReset_t;
-
         typedef void (*align_fun)(Axes * axes);
 
         virtual void accumulateGyro(float gx, float gy, float gz)
