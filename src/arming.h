@@ -37,9 +37,10 @@ class Arming {
         return 
             m_accDoneCalibrating &&
             m_angleOkay &&
-            m_switchOkay &&
+            !m_gotFailsafe &&
+            m_haveSignal &&
             m_gyroDoneCalibrating &&
-            !m_failsafeActive &&
+            m_switchOkay &&
             m_throttleIsDown;
     }
 
@@ -48,10 +49,11 @@ class Arming {
 
     bool m_accDoneCalibrating;
     bool m_angleOkay;
-    bool m_switchOkay;
+    bool m_gotFailsafe;
     bool m_gyroDoneCalibrating;
+    bool m_haveSignal;
     bool m_is_armed;
-    bool m_failsafeActive;
+    bool m_switchOkay;
     bool m_throttleIsDown;
 
     void begin(Esc * esc, Led * led)
@@ -74,7 +76,7 @@ class Arming {
         return m_is_armed;
     }
 
-    void updateImuStatus(const bool imuIsLevel, const bool gyroIsCalibrating)
+    void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
     {
         m_angleOkay = imuIsLevel;
 
@@ -116,12 +118,13 @@ class Arming {
         }
     }
 
-    void updateReceiverStatus(
-            const bool throttleIsDown, const bool aux1IsSet, const bool lostSignal)
+    void updateFromReceiver(
+            const bool throttleIsDown, const bool aux1IsSet, const bool haveSignal)
     {
         if (m_is_armed) {
-            if (lostSignal) {
-                m_failsafeActive = true;
+
+            if (!haveSignal && m_haveSignal) {
+                m_gotFailsafe = true;
                 disarm();
             }
             else {
@@ -146,6 +149,8 @@ class Arming {
 
             m_led->warningUpdate();
         }
+
+        m_haveSignal = haveSignal;
     }
 
 }; // class Arming

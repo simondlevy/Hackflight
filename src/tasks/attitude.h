@@ -57,6 +57,6 @@ class AttitudeTask : public Task {
                 fabsf(m_vstate->phi) < m_maxArmingAngle &&
                 fabsf(m_vstate->theta) < m_maxArmingAngle;
 
-            m_arming->updateImuStatus(imuIsLevel, m_imu->gyroIsCalibrating()); 
+            m_arming->updateFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
 };

@@ -732,8 +732,8 @@ class Receiver : public Task {
 
     void fun(uint32_t usec)
     {
-        const auto lostSignal =
-            (usec - m_lastFrameTimeUs) > (int32_t)(1000*TIMEOUT_MS);
+        const auto haveSignal =
+            (usec - m_lastFrameTimeUs) < (int32_t)(1000*TIMEOUT_MS);
 
         auto pidItermResetReady = false;
         auto pidItermResetValue = false;
@@ -764,7 +764,7 @@ class Receiver : public Task {
             case STATE_UPDATE:
                 m_gotNewData = true;
                 updateCommands();
-                m_arming->updateReceiverStatus(throttleIsDown(), aux1IsSet(), lostSignal);
+                m_arming->updateFromReceiver(throttleIsDown(), aux1IsSet(), haveSignal);
                 m_state = STATE_CHECK;
                 break;
         }
