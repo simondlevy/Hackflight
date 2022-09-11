@@ -42,7 +42,7 @@ class SoftQuatImu : public Imu {
 
         typedef struct {
             uint32_t time;
-            quaternion_t quat;
+            Quaternion quat;
             Axes rot;
             gyroReset_t gyroReset;
         } fusion_t;
@@ -98,12 +98,12 @@ class SoftQuatImu : public Imu {
 
 
         static void quat2euler(
-                quaternion_t * quat, VehicleState * state, Axes * rot)
+                const Quaternion & quat, VehicleState * state, Axes * rot)
         {
-            float qw = quat->w;
-            float qx = quat->x;
-            float qy = quat->y;
-            float qz = quat->z;
+            float qw = quat.w;
+            float qx = quat.x;
+            float qy = quat.y;
+            float qz = quat.z;
 
             float r00 = 1 - 2 * qy*qy - 2 * qz*qz;
             float r10 = 2 * (qx*qy + qw*qz);
@@ -137,8 +137,8 @@ class SoftQuatImu : public Imu {
         static void mahony(
                 const float dt,
                 const Axes & gyro,
-                const quaternion_t & q_old,
-                quaternion_t * quat_new)
+                const Quaternion & q_old,
+                Quaternion * quat_new)
         {
             // Convert gyro degrees to radians
             float gx = Math::deg2rad(gyro.x);
@@ -164,7 +164,7 @@ class SoftQuatImu : public Imu {
             quat_new->z = qz * recipNorm;
         }
 
-        void getQuaternion(const bool isArmed, uint32_t time, quaternion_t * quat)
+        void getQuaternion(const bool isArmed, uint32_t time, Quaternion * quat)
         {
             int32_t deltaT = time - m_fusionPrev.time;
 
@@ -228,21 +228,22 @@ class SoftQuatImu : public Imu {
                 const uint32_t time,
                 VehicleState * vstate) override
         {
-            quaternion_t quat = {};
+            Quaternion quat = {};
             getQuaternion(isArmed, time, &quat);
             Axes rot;
-            quat2euler(&quat, vstate, &rot);
+            quat2euler(quat, vstate, &rot);
 
             fusion_t fusion;
             fusion.time = time;
-            memcpy(&fusion.quat, &quat, sizeof(quaternion_t));
+
+            fusion.quat.w = quat.w;
+            fusion.quat.x = quat.x;
+            fusion.quat.y = quat.y;
+            fusion.quat.z = quat.z;
 
             fusion.rot = rot;
 
-            //memcpy(&fusion.rot, &rot, sizeof(rotation_t));
-
             memcpy(&m_fusionPrev, &fusion, sizeof(fusion_t));
-
 
             m_accum.count = 0;
             m_accum.values.x = 0;

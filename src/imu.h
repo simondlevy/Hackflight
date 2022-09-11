@@ -182,13 +182,6 @@ class Imu {
         };
 
         typedef struct {
-            float w;
-            float x;
-            float y;
-            float z;
-        } quaternion_t;
-
-        typedef struct {
             uint32_t quietPeriodEnd;
             uint32_t resetTimeEnd;
             bool resetCompleted;
