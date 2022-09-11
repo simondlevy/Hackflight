@@ -132,7 +132,10 @@ class Receiver : public Task {
     Pt3Filter  m_feedforwardPt3Pitch;
     Pt3Filter  m_feedforwardPt3Yaw;
 
-    float      m_command[4];
+    float      m_commandRoll;
+    float      m_commandPitch;
+    float      m_commandYaw;
+
     uint16_t   m_channelData[CHANNEL_COUNT];
     uint32_t   m_invalidPulsePeriod[CHANNEL_COUNT];
     float      m_raw[CHANNEL_COUNT];
@@ -251,9 +254,9 @@ class Receiver : public Task {
 
     void updateCommands(void)
     {
-        m_command[ROLL]  = updateCommand(m_raw[ROLL],  +1);
-        m_command[PITCH] = updateCommand(m_raw[PITCH], +1);
-        m_command[YAW]   = updateCommand(m_raw[YAW],   -1);
+        m_commandRoll  = updateCommand(m_raw[ROLL],  +1);
+        m_commandPitch = updateCommand(m_raw[PITCH], +1);
+        m_commandYaw   = updateCommand(m_raw[YAW],   -1);
 
         auto tmp = constrain_f_i32(m_raw[THROTTLE], 1050, PWM_MAX);
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
@@ -660,9 +663,9 @@ class Receiver : public Task {
 
             m_previousFrameTimeUs = 0;
 
-            rawSetpoints[0] = getRawSetpoint(m_command[ROLL], COMMAND_DIVIDER);
-            rawSetpoints[1] = getRawSetpoint(m_command[PITCH], COMMAND_DIVIDER);
-            rawSetpoints[2] = getRawSetpoint(m_command[YAW], YAW_COMMAND_DIVIDER);
+            rawSetpoints[0] = getRawSetpoint(m_commandRoll, COMMAND_DIVIDER);
+            rawSetpoints[1] = getRawSetpoint(m_commandPitch, COMMAND_DIVIDER);
+            rawSetpoints[2] = getRawSetpoint(m_commandYaw, YAW_COMMAND_DIVIDER);
         }
 
         float setpointRate[3] = {};
