@@ -215,7 +215,10 @@ class SoftQuatImu : public Imu {
             _adcf.z = gz;
         }
 
-        virtual void getEulerAngles(bool isArmed, uint32_t time, VehicleState * vstate) override
+        virtual void getEulerAngles(
+                const bool isArmed,
+                const uint32_t time,
+                VehicleState * vstate) override
         {
             Imu::quaternion_t quat = {};
             getQuaternion(isArmed, time, &quat);

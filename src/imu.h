@@ -187,7 +187,10 @@ class Imu {
         }
 
         virtual void
-            getEulerAngles(bool isArmed, uint32_t time, VehicleState * vstate) = 0;
+            getEulerAngles(
+                    const bool isArmed, 
+                    const uint32_t time, 
+                    VehicleState * vstate) = 0;
 
         void readScaledGyro(const align_fun align, VehicleState * vstate)
         {
