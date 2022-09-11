@@ -19,11 +19,6 @@
 #pragma once
 
 // Common structure for angles, stick axes, etc.
-typedef struct {
-    float x;
-    float y;
-    float z;
-} axes_t;
 
 class Axes {
 

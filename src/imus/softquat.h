@@ -119,11 +119,11 @@ class SoftQuatImu : public Imu {
         }
 
         typedef struct {
-            axes_t values;
+            Axes values;
             uint32_t count;
         } imu_sensor_t;
 
-        static void getAverage(imu_sensor_t * sensor, uint32_t period, axes_t * avg)
+        static void getAverage(imu_sensor_t * sensor, uint32_t period, Axes * avg)
         {
             uint32_t denom = sensor->count * period;
 
@@ -134,7 +134,7 @@ class SoftQuatImu : public Imu {
 
         static void mahony(
                 float dt,
-                axes_t * gyro,
+                Axes * gyro,
                 Imu::quaternion_t * quat_old,
                 Imu::quaternion_t * quat_new)
         {
@@ -170,7 +170,7 @@ class SoftQuatImu : public Imu {
         {
             int32_t deltaT = time - m_fusionPrev.time;
 
-            axes_t gyroAvg = {};
+            Axes gyroAvg = {};
             getAverage(&m_accum, Clock::PERIOD(), &gyroAvg);
 
             float dt = deltaT * 1e-6;
@@ -201,7 +201,7 @@ class SoftQuatImu : public Imu {
 
         virtual void accumulateGyro(float gx, float gy, float gz) override
         {
-            static axes_t _adcf;
+            static Axes _adcf;
 
             // integrate using trapezium rule to avoid bias
             m_accum.values.x += 0.5f * (_adcf.x + gx) * Clock::PERIOD();
@@ -227,6 +227,10 @@ class SoftQuatImu : public Imu {
             memcpy(&fusion.quat, &quat, sizeof(Imu::quaternion_t));
             memcpy(&fusion.rot, &rot, sizeof(Imu::rotation_t));
             memcpy(&m_fusionPrev, &fusion, sizeof(fusion_t));
-            memset(&m_accum, 0, sizeof(imu_sensor_t));
+
+            m_accum.count = 0;
+            m_accum.values.x = 0;
+            m_accum.values.y = 0;
+            m_accum.values.z = 0;
          }
 };

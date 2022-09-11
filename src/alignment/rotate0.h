@@ -23,7 +23,7 @@
 
 #include "core/axes.h"
 
-static void imuRotate0(axes_t * axes)
+static void imuRotate0(Axes * axes)
 {
     axes->y = -axes->y;
     axes->z = -axes->z;

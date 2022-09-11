@@ -20,7 +20,7 @@
 
 #include "core/axes.h"
 
-static void imuRotate270(axes_t * axes)
+static void imuRotate270(Axes * axes)
 {
     float x = axes->x;
     float y = axes->y;

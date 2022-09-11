@@ -177,7 +177,7 @@ class Imu {
             bool resetCompleted;
         } gyro_reset_t;
 
-        typedef void (*align_fun)(axes_t * axes);
+        typedef void (*align_fun)(Axes * axes);
 
         virtual void accumulateGyro(float gx, float gy, float gz)
         {
@@ -195,7 +195,7 @@ class Imu {
 
             auto calibrationComplete = m_calibrationCyclesRemaining <= 0;
 
-            static axes_t _adc;
+            static Axes _adc;
 
             if (calibrationComplete) {
 
