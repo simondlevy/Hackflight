@@ -57,9 +57,19 @@ class SoftQuatImu : public Imu {
         };
 
         class ImuSensor {
+
             public:
+
                 Axes values;
                 uint32_t count;
+
+                void reset(void)
+                {
+                    values.x = 0;
+                    values.y = 0;
+                    values.z = 0;
+                    count = 0;
+                }
         };
 
         Fusion m_fusionPrev;
@@ -196,17 +206,6 @@ class SoftQuatImu : public Imu {
         SoftQuatImu(const uint16_t gyroScale)
             : Imu(gyroScale)
         {
-            /*
-            m_fusionPrev.time = 0;
-            m_fusionPrev.quat.w = 0;
-            m_fusionPrev.quat.x = 0;
-            m_fusionPrev.quat.y = 0;
-            m_fusionPrev.quat.z = 0;
-            m_fusionPrev.rot.x = 0;
-            m_fusionPrev.rot.y = 0;
-            m_fusionPrev.rot.z = 0;
-            */
-
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
         }
@@ -247,10 +246,7 @@ class SoftQuatImu : public Imu {
             m_fusionPrev.rot.y = rot.y;
             m_fusionPrev.rot.z = rot.z;
 
-            m_accum.count = 0;
-            m_accum.values.x = 0;
-            m_accum.values.y = 0;
-            m_accum.values.z = 0;
+            m_accum.reset();
 
             vstate->phi = angles.x;
             vstate->theta = angles.y;
