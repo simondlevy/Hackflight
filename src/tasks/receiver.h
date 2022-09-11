@@ -459,10 +459,7 @@ class Receiver : public Task {
         return false;
     }
 
-    void processSmoothingFilter(
-            const uint32_t usec,
-            const Axes & rawSetpoints,
-            float * setpointRate)
+    auto processSmoothingFilter(const uint32_t usec, const Axes & rawSetpoints) -> Axes
     {
         // first call initialization
         if (!m_initializedFilter) {
@@ -586,17 +583,14 @@ class Receiver : public Task {
             m_dataToSmooth.yaw   = rawSetpoints.z;
         }
 
-        // Each pid loop, apply the last received channel value to the
-        // filter, if initialised - thanks @klutvott
         m_commands.throttle = smoothingFilterApply(
                 &m_filterThrottle,
                 m_dataToSmooth.throttle);
-        setpointRate[0] = smoothingFilterApply(
-                &m_filterRoll, m_dataToSmooth.roll);
-        setpointRate[1] = smoothingFilterApply(
-                &m_filterPitch, m_dataToSmooth.pitch);
-        setpointRate[2] = smoothingFilterApply(
-                &m_filterYaw, m_dataToSmooth.yaw);
+
+        return Axes(
+                smoothingFilterApply(&m_filterRoll, m_dataToSmooth.roll),
+                smoothingFilterApply(&m_filterPitch, m_dataToSmooth.pitch),
+                smoothingFilterApply(&m_filterYaw, m_dataToSmooth.yaw));
     }
 
     static float getRawSetpoint(const float command, const float divider)
@@ -670,19 +664,16 @@ class Receiver : public Task {
 
                 Axes(0,0,0);
 
-        float setpointRate[3] = {};
-
-        processSmoothingFilter(usec, rawSetpoints, setpointRate);
+        Axes setpointRates = processSmoothingFilter(usec, rawSetpoints);
 
         m_gotNewData = false;
 
         return Demands(
                 constrain_f((m_commands.throttle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0, 1),
-                setpointRate[0],
-                setpointRate[1],
-                setpointRate[2]);
+                setpointRates.x,
+                setpointRates.y,
+                setpointRates.z);
     }
-
 
     void begin(Arming * arming, sticks_t * sticks)
     {
