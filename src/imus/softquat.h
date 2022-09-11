@@ -233,17 +233,17 @@ class SoftQuatImu : public Imu {
             Axes angles;
             quat2euler(quat, angles, rot);
 
-            fusion_t fusion;
-            fusion.time = time;
-
-            fusion.quat.w = quat.w;
-            fusion.quat.x = quat.x;
-            fusion.quat.y = quat.y;
-            fusion.quat.z = quat.z;
-
-            fusion.rot = rot;
-
-            memcpy(&m_fusionPrev, &fusion, sizeof(fusion_t));
+            m_fusionPrev.time = time;
+            m_fusionPrev.quat.w = quat.w;
+            m_fusionPrev.quat.x = quat.x;
+            m_fusionPrev.quat.y = quat.y;
+            m_fusionPrev.quat.z = quat.z;
+            m_fusionPrev.rot.x = rot.x;
+            m_fusionPrev.rot.y = rot.y;
+            m_fusionPrev.rot.z = rot.z;
+            m_fusionPrev.gyroReset.quietPeriodEnd = 0;
+            m_fusionPrev.gyroReset.resetTimeEnd = 0;
+            m_fusionPrev.gyroReset.resetCompleted = false;
 
             m_accum.count = 0;
             m_accum.values.x = 0;
