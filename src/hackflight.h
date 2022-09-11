@@ -87,14 +87,14 @@ class Hackflight {
 
             Demands demands = m_receiver->getDemands(usec);
 
-            float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
-
             auto motors = m_mixer->step(
                     demands,
                     m_vstate,
                     m_pidControllers,
                     m_receiver->gotPidReset(),
                     usec);
+
+            float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
