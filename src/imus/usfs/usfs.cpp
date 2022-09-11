@@ -91,27 +91,22 @@ int16_t UsfsImu::devReadRawGyro(uint8_t k)
     return m_gyroAdc[k];
 }
 
-void UsfsImu::getEulerAngles(
-        const bool isArmed,
-        const uint32_t time,
-        VehicleState * vstate) 
+auto UsfsImu::getEulerAngles(const bool isArmed, const uint32_t time) -> Axes
 {
     (void)isArmed;
     (void)time;
 
-    float qw = m_qw;
-    float qx = m_qx;
-    float qy = m_qy;
-    float qz = m_qz;
+    auto qw = m_qw;
+    auto qx = m_qx;
+    auto qy = m_qy;
+    auto qz = m_qz;
 
-    vstate->phi = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-    vstate->theta = asin(2.0f*(qx*qz-qw*qy));
-    vstate->psi = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
+    auto phi = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
+    auto theta = asin(2.0f*(qx*qz-qw*qy));
+    auto psi = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
 
     // Convert heading from [-pi,+pi] to [0,2*pi]
-    if (vstate->psi < 0) {
-        vstate->psi += 2*M_PI;
-    }
+    return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
 }
 
 UsfsImu::UsfsImu(uint8_t interruptPin) : Imu(GYRO_SCALE_DPS)

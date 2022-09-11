@@ -223,10 +223,8 @@ class SoftQuatImu : public Imu {
             m_gyroAccum.accumulate(gx, gy, gz);
         }
 
-        virtual void getEulerAngles(
-                const bool isArmed,
-                const uint32_t time,
-                VehicleState * vstate) override
+        virtual auto getEulerAngles(
+                const bool isArmed, const uint32_t time) -> Axes override
         {
             Quaternion quat = getQuaternion(isArmed, time);
 
@@ -236,10 +234,6 @@ class SoftQuatImu : public Imu {
 
             m_gyroAccum.reset();
 
-            auto angles = quat2euler(quat, m_fusionPrev.rot);
-
-            vstate->phi = angles.x;
-            vstate->theta = angles.y;
-            vstate->psi = angles.z;
+            return quat2euler(quat, m_fusionPrev.rot);
         }
 };

@@ -51,7 +51,11 @@ class AttitudeTask : public Task {
 
         virtual void fun(uint32_t time) override
         {
-            m_imu->getEulerAngles(m_arming->isArmed(), time, m_vstate);
+            Axes angles = m_imu->getEulerAngles(m_arming->isArmed(), time);
+
+            m_vstate->phi   = angles.x;
+            m_vstate->theta = angles.y;
+            m_vstate->psi   = angles.z;
 
             auto imuIsLevel =
                 fabsf(m_vstate->phi) < m_maxArmingAngle &&

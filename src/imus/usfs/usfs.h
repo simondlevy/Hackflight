@@ -52,10 +52,8 @@ class UsfsImu : public Imu {
 
     protected:
 
-        virtual void getEulerAngles(
-                const bool isArmed,
-                const uint32_t time,
-                VehicleState * vstate) override;
+        virtual auto getEulerAngles(
+                const bool isArmed, const uint32_t time) -> Axes override;
 
         virtual bool devGyroIsReady(void) override;
 
