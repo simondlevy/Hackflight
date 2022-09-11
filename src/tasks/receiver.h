@@ -657,8 +657,10 @@ class Receiver : public Task {
     } // check
 
     // Runs in fast (inner, core) loop
-    void getDemands(const uint32_t usec, float rawSetpoints[3], Demands * demands)
+    void getDemands(const uint32_t usec, Demands * demands)
     {
+        float rawSetpoints[3] = {};
+
         if (m_gotNewData) {
 
             m_previousFrameTimeUs = 0;
@@ -669,6 +671,7 @@ class Receiver : public Task {
         }
 
         float setpointRate[3] = {};
+
         processSmoothingFilter(usec, setpointRate, rawSetpoints);
 
         // Find min and max throttle based on conditions. Throttle has to
