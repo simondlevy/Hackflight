@@ -128,12 +128,14 @@ class Receiver : public Task {
     Pt3Filter m_filterDeflectionRoll;
     Pt3Filter m_filterDeflectionPitch;
 
-    Pt3Filter  m_feedforwardPt3[3];
+    Pt3Filter  m_feedforwardPt3Roll;
+    Pt3Filter  m_feedforwardPt3Pitch;
+    Pt3Filter  m_feedforwardPt3Yaw;
+
+    float      m_command[4];
     uint16_t   m_channelData[CHANNEL_COUNT];
     uint32_t   m_invalidPulsePeriod[CHANNEL_COUNT];
     float      m_raw[CHANNEL_COUNT];
-
-    float      m_command[4];
 
     int16_t    m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
 
@@ -321,28 +323,22 @@ class Receiver : public Task {
     void ratePidFeedforwardLpfInit(const uint16_t filterCutoff)
     {
         if (filterCutoff > 0) {
+
             m_feedforwardLpfInitialized = true;
-            m_feedforwardPt3[0].init(filterCutoff);
-            m_feedforwardPt3[1].init(filterCutoff);
-            m_feedforwardPt3[2].init(filterCutoff);
+
+            m_feedforwardPt3Roll.init(filterCutoff);
+            m_feedforwardPt3Pitch.init(filterCutoff);
+            m_feedforwardPt3Yaw.init(filterCutoff);
         }
     }
 
     void ratePidFeedforwardLpfUpdate(const uint16_t filterCutoff)
     {
         if (filterCutoff > 0) {
-            for (uint8_t axis=ROLL; axis<=YAW; axis++) {
-                m_feedforwardPt3[axis].computeGain(filterCutoff);
-            }
-        }
-    }
 
-    void smoothingFilterInit(Pt3Filter * filter, const float setpointCutoffFrequency)
-    {
-        if (!m_filterInitialized) {
-            filter->init(setpointCutoffFrequency);
-        } else {
-            filter->computeGain(setpointCutoffFrequency); 
+            m_feedforwardPt3Roll.computeGain(filterCutoff);
+            m_feedforwardPt3Pitch.computeGain(filterCutoff);
+            m_feedforwardPt3Yaw.computeGain(filterCutoff);
         }
     }
 
