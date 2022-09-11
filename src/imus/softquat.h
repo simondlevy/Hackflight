@@ -138,7 +138,7 @@ class SoftQuatImu : public Imu {
             return x * x;
         }
 
-        static void quat2euler(const Quaternion & quat, Axes & angles, Axes & rot)
+        static auto quat2euler(const Quaternion & quat, Axes & rot) -> Axes
         {
             const auto qw = quat.w;
             const auto qx = quat.x;
@@ -153,15 +153,15 @@ class SoftQuatImu : public Imu {
 
             const auto psi = -atan2_approx(r10, r00); 
 
-            // Results
-            angles.x = atan2_approx(r21, r22); 
-            angles.y = (0.5f * M_PI) - acos_approx(-r20);
-            angles.z = psi + ((psi < 0) ? 2 * M_PI : 0);
-
             // Additional output
             rot.x = r20;
             rot.y = r21;
             rot.z = r22;
+
+            return Axes(
+                    atan2_approx(r21, r22),
+                    (0.5f * M_PI) - acos_approx(-r20),
+                    psi + ((psi < 0) ? 2 * M_PI : 0));
         }
 
         static auto mahony(
@@ -230,20 +230,11 @@ class SoftQuatImu : public Imu {
         {
             Quaternion quat = getQuaternion(isArmed, time);
 
-            Axes angles;
-
-            quat2euler(quat, angles, m_fusionPrev.rot);
+            auto angles = quat2euler(quat, m_fusionPrev.rot);
 
             m_fusionPrev.time = time;
 
             m_fusionPrev.quat = quat;
-
-            /*
-            m_fusionPrev.quat.w = quat.w;
-            m_fusionPrev.quat.x = quat.x;
-            m_fusionPrev.quat.y = quat.y;
-            m_fusionPrev.quat.z = quat.z;
-            */
 
             m_gyroAccum.reset();
 

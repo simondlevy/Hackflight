@@ -175,15 +175,6 @@ class Imu {
                     z = _z;
                 }
 
-                /*
-                Quaternion(const Quaternion & other)
-                {
-                    w = other.w;
-                    x = other.x;
-                    y = other.y;
-                    z = other.z;
-                }*/
-
                 Quaternion(void)
                     : Quaternion(0, 0, 0, 0)
                 {
