@@ -670,13 +670,6 @@ class Receiver : public Task {
 
                 Axes(0,0,0);
 
-        if (m_gotNewData) {
-
-            rawSetpoints.x = getRawSetpoint(m_commandRoll, COMMAND_DIVIDER);
-            rawSetpoints.y = getRawSetpoint(m_commandPitch, COMMAND_DIVIDER);
-            rawSetpoints.z = getRawSetpoint(m_commandYaw, YAW_COMMAND_DIVIDER);
-        }
-
         float setpointRate[3] = {};
 
         processSmoothingFilter(usec, rawSetpoints, setpointRate);
