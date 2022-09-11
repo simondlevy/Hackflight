@@ -236,10 +236,14 @@ class SoftQuatImu : public Imu {
 
             m_fusionPrev.time = time;
 
+            m_fusionPrev.quat = quat;
+
+            /*
             m_fusionPrev.quat.w = quat.w;
             m_fusionPrev.quat.x = quat.x;
             m_fusionPrev.quat.y = quat.y;
             m_fusionPrev.quat.z = quat.z;
+            */
 
             m_gyroAccum.reset();
 
