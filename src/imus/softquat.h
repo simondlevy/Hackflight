@@ -188,7 +188,7 @@ class SoftQuatImu : public Imu {
         {
             int32_t deltaT = time - m_fusionPrev.time;
 
-            Axes gyroAvg = getAverage(m_accum, Clock::PERIOD());
+            Axes gyroAvg = getAverage(m_gyroAccum, Clock::PERIOD());
 
             float dt = deltaT * 1e-6;
 
@@ -199,7 +199,7 @@ class SoftQuatImu : public Imu {
 
         }
 
-        ImuSensor m_accum;
+        ImuSensor m_gyroAccum;
 
     public:
 
@@ -216,11 +216,11 @@ class SoftQuatImu : public Imu {
             static Axes _adcf;
 
             // integrate using trapezium rule to avoid bias
-            m_accum.values.x += 0.5f * (_adcf.x + gx) * Clock::PERIOD();
-            m_accum.values.y += 0.5f * (_adcf.y + gy) * Clock::PERIOD();
-            m_accum.values.z += 0.5f * (_adcf.z + gz) * Clock::PERIOD();
+            m_gyroAccum.values.x += 0.5f * (_adcf.x + gx) * Clock::PERIOD();
+            m_gyroAccum.values.y += 0.5f * (_adcf.y + gy) * Clock::PERIOD();
+            m_gyroAccum.values.z += 0.5f * (_adcf.z + gz) * Clock::PERIOD();
 
-            m_accum.count++;
+            m_gyroAccum.count++;
 
             _adcf.x = gx;
             _adcf.y = gy;
@@ -246,7 +246,7 @@ class SoftQuatImu : public Imu {
             m_fusionPrev.rot.y = rot.y;
             m_fusionPrev.rot.z = rot.z;
 
-            m_accum.reset();
+            m_gyroAccum.reset();
 
             vstate->phi = angles.x;
             vstate->theta = angles.y;
