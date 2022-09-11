@@ -173,11 +173,10 @@ class SoftQuatImu : public Imu {
 
             float dt = deltaT * 1e-6;
 
-            gyroReset_t new_gyroReset = {};
-
             if (!isArmed) {
-                memcpy(&m_fusionPrev.gyroReset, &new_gyroReset,
-                        sizeof(gyroReset_t));
+                m_fusionPrev.gyroReset.quietPeriodEnd = 0;
+                m_fusionPrev.gyroReset.resetTimeEnd = 0;
+                m_fusionPrev.gyroReset.resetCompleted = false;
             }
 
             return mahony(dt, gyroAvg, m_fusionPrev.quat);
