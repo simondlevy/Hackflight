@@ -24,3 +24,24 @@ typedef struct {
     float y;
     float z;
 } axes_t;
+
+class Axes {
+
+    public:
+
+        float x;
+        float y;
+        float z;
+
+        Axes(const float _x, const float _y, const float _z)
+        {
+            x = _x;
+            y = _y;
+            z = _z;
+        }
+
+        Axes(void)
+            : Axes(0, 0, 0)
+        {
+        }
+};

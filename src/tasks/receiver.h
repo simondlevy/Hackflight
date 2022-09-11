@@ -461,7 +461,7 @@ class Receiver : public Task {
 
     void processSmoothingFilter(
             const uint32_t usec,
-            const axes_t & rawSetpoints,
+            const Axes & rawSetpoints,
             float * setpointRate)
     {
         // first call initialization
@@ -659,11 +659,18 @@ class Receiver : public Task {
     // Runs in fast (inner, core) loop
     auto getDemands(const uint32_t usec) -> Demands
     {
-        axes_t rawSetpoints = {};
+        m_previousFrameTimeUs = m_gotNewData ? 0 : m_previousFrameTimeUs;
+
+        Axes rawSetpoints = m_gotNewData ?
+
+            Axes(
+                    rawSetpoints.x = getRawSetpoint(m_commandRoll, COMMAND_DIVIDER),
+                    rawSetpoints.y = getRawSetpoint(m_commandPitch, COMMAND_DIVIDER),
+                    rawSetpoints.z = getRawSetpoint(m_commandYaw, YAW_COMMAND_DIVIDER)) :
+
+                Axes(0,0,0);
 
         if (m_gotNewData) {
-
-            m_previousFrameTimeUs = 0;
 
             rawSetpoints.x = getRawSetpoint(m_commandRoll, COMMAND_DIVIDER);
             rawSetpoints.y = getRawSetpoint(m_commandPitch, COMMAND_DIVIDER);
