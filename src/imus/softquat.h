@@ -96,7 +96,6 @@ class SoftQuatImu : public Imu {
             return x * x;
         }
 
-
         static void quat2euler(
                 const Quaternion & quat, VehicleState * state, Axes * rot)
         {
@@ -134,11 +133,10 @@ class SoftQuatImu : public Imu {
                     denom ? sensor.values.z / denom : 0);
         }
 
-        static void mahony(
+        static auto mahony(
                 const float dt,
                 const Axes & gyro,
-                const Quaternion & q_old,
-                Quaternion * quat_new)
+                const Quaternion & q_old) -> Quaternion
         {
             // Convert gyro degrees to radians
             float gx = Math::deg2rad(gyro.x);
@@ -157,14 +155,12 @@ class SoftQuatImu : public Imu {
             float qz = q_old.z + q_old.w * gz1 + q_old.x * gy1 - q_old.y * gx1;
 
             // Normalise quaternion
-            float recipNorm = invSqrt(square(qw) + square(qx) + square(qy) + square(qz));
-            quat_new->w = qw * recipNorm;
-            quat_new->x = qx * recipNorm;
-            quat_new->y = qy * recipNorm;
-            quat_new->z = qz * recipNorm;
+            float norm = invSqrt(square(qw) + square(qx) + square(qy) + square(qz));
+
+            return Quaternion(qw * norm, qx * norm, qy * norm, qz * norm);
         }
 
-        void getQuaternion(const bool isArmed, uint32_t time, Quaternion * quat)
+        auto getQuaternion(const bool isArmed, uint32_t time) -> Quaternion
         {
             int32_t deltaT = time - m_fusionPrev.time;
 
@@ -179,7 +175,7 @@ class SoftQuatImu : public Imu {
                         sizeof(gyroReset_t));
             }
 
-            mahony(dt, gyroAvg, m_fusionPrev.quat, quat);
+            return mahony(dt, gyroAvg, m_fusionPrev.quat);
 
         }
 
@@ -228,8 +224,7 @@ class SoftQuatImu : public Imu {
                 const uint32_t time,
                 VehicleState * vstate) override
         {
-            Quaternion quat = {};
-            getQuaternion(isArmed, time, &quat);
+            Quaternion quat = getQuaternion(isArmed, time);
             Axes rot;
             quat2euler(quat, vstate, &rot);
 
