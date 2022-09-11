@@ -191,16 +191,13 @@ class SoftQuatImu : public Imu {
             return Quaternion(qw * norm, qx * norm, qy * norm, qz * norm);
         }
 
-        auto getQuaternion(const bool isArmed, uint32_t time) -> Quaternion
+        auto getQuaternion(uint32_t time) -> Quaternion
         {
             int32_t deltaT = time - m_fusionPrev.time;
 
             Axes gyroAvg = m_gyroAccum.getAverage();
 
             float dt = deltaT * 1e-6;
-
-            if (!isArmed) {
-            }
 
             return mahony(dt, gyroAvg, m_fusionPrev.quat);
 
@@ -223,10 +220,9 @@ class SoftQuatImu : public Imu {
             m_gyroAccum.accumulate(gx, gy, gz);
         }
 
-        virtual auto getEulerAngles(
-                const bool isArmed, const uint32_t time) -> Axes override
+        virtual auto getEulerAngles(const uint32_t time) -> Axes override
         {
-            Quaternion quat = getQuaternion(isArmed, time);
+            Quaternion quat = getQuaternion(time);
 
             m_fusionPrev.time = time;
 

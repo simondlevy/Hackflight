@@ -91,9 +91,8 @@ int16_t UsfsImu::devReadRawGyro(uint8_t k)
     return m_gyroAdc[k];
 }
 
-auto UsfsImu::getEulerAngles(const bool isArmed, const uint32_t time) -> Axes
+auto UsfsImu::getEulerAngles(const uint32_t time) -> Axes
 {
-    (void)isArmed;
     (void)time;
 
     auto qw = m_qw;
