@@ -96,31 +96,30 @@ class SoftQuatImu : public Imu {
             return x * x;
         }
 
-        static void quat2euler(
-                const Quaternion & quat, VehicleState * state, Axes * rot)
+        static void quat2euler(const Quaternion & quat, Axes & angles, Axes & rot)
         {
-            float qw = quat.w;
-            float qx = quat.x;
-            float qy = quat.y;
-            float qz = quat.z;
+            const auto qw = quat.w;
+            const auto qx = quat.x;
+            const auto qy = quat.y;
+            const auto qz = quat.z;
 
-            float r00 = 1 - 2 * qy*qy - 2 * qz*qz;
-            float r10 = 2 * (qx*qy + qw*qz);
-            float r20 = 2 * (qx*qz - qw*qy);
-            float r21 = 2 * (qy*qz + qw*qx);
-            float r22 = 1 - 2 * qx*qx - 2 * qy*qy;
+            const auto r00 = 1 - 2 * qy*qy - 2 * qz*qz;
+            const auto r10 = 2 * (qx*qy + qw*qz);
+            const auto r20 = 2 * (qx*qz - qw*qy);
+            const auto r21 = 2 * (qy*qz + qw*qx);
+            const auto r22 = 1 - 2 * qx*qx - 2 * qy*qy;
 
-            float psi = -atan2_approx(r10, r00); 
+            const auto psi = -atan2_approx(r10, r00); 
 
             // Results
-            state->phi   = atan2_approx(r21, r22); 
-            state->theta = (0.5f * M_PI) - acos_approx(-r20);
-            state->psi   = psi + ((psi < 0) ? 2 * M_PI : 0);
+            angles.x = atan2_approx(r21, r22); 
+            angles.y = (0.5f * M_PI) - acos_approx(-r20);
+            angles.z = psi + ((psi < 0) ? 2 * M_PI : 0);
 
             // Additional output
-            rot->x = r20;
-            rot->y = r21;
-            rot->z = r22;
+            rot.x = r20;
+            rot.y = r21;
+            rot.z = r22;
         }
 
         static auto getAverage(const imu_sensor_t & sensor, const uint32_t period) -> Axes
@@ -226,7 +225,12 @@ class SoftQuatImu : public Imu {
         {
             Quaternion quat = getQuaternion(isArmed, time);
             Axes rot;
-            quat2euler(quat, vstate, &rot);
+            Axes angles;
+            quat2euler(quat, angles, rot);
+
+            vstate->phi = angles.x;
+            vstate->theta = angles.y;
+            vstate->psi = angles.z;
 
             fusion_t fusion;
             fusion.time = time;
