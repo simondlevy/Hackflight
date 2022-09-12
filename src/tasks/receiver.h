@@ -40,15 +40,6 @@ class Receiver : public Task {
         float aux2;
     } sticks_t;
 
-    typedef enum {
-        THROTTLE,
-        ROLL,
-        PITCH,
-        YAW,
-        AUX1,
-        AUX2
-    } rc_alias_e;
-
     static const uint8_t CHANNEL_COUNT = 6;
     static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
 
@@ -138,7 +129,13 @@ class Receiver : public Task {
 
     uint16_t   m_channelData[CHANNEL_COUNT];
     uint32_t   m_invalidPulsePeriod[CHANNEL_COUNT];
-    float      m_raw[CHANNEL_COUNT];
+
+    float m_rawThrottle;
+    float m_rawRoll;
+    float m_rawPitch;
+    float m_rawYaw;
+    float m_rawAux1;
+    float m_rawAux2;
 
     int16_t    m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
 
@@ -204,16 +201,22 @@ class Receiver : public Task {
         m_trainingMax = 0;
     }
 
+    float constrainRaw(uint8_t channel)
+    {
+        auto sample = devConvert(m_channelData, channel);
+
+        return sample == 0 ?  sample : constrain_f(sample, PWM_PULSE_MIN, PWM_PULSE_MAX);
+    }
+
     void readChannelsAndApplyRanges(void)
     {
-        for (auto channel=0; channel<CHANNEL_COUNT; ++channel) {
+        m_rawThrottle = constrainRaw(0);
+        m_rawRoll     = constrainRaw(1);
+        m_rawPitch    = constrainRaw(2);
+        m_rawYaw      = constrainRaw(3);
 
-            float sample = devConvert(m_channelData, channel);
-
-            m_raw[channel] = channel < 4 && sample != 0 ?
-                constrain_f(sample, PWM_PULSE_MIN, PWM_PULSE_MAX) :
-                sample;
-        }
+        m_rawAux1 = devConvert(m_channelData, 4);
+        m_rawAux2 = devConvert(m_channelData, 5);
     }
 
     int16_t lookupThrottle(const int32_t tmp)
@@ -254,11 +257,11 @@ class Receiver : public Task {
 
     void updateCommands(void)
     {
-        m_commandRoll  = updateCommand(m_raw[ROLL],  +1);
-        m_commandPitch = updateCommand(m_raw[PITCH], +1);
-        m_commandYaw   = updateCommand(m_raw[YAW],   -1);
+        m_commandRoll  = updateCommand(m_rawRoll,  +1);
+        m_commandPitch = updateCommand(m_rawPitch, +1);
+        m_commandYaw   = updateCommand(m_rawYaw,   -1);
 
-        auto tmp = constrain_f_i32(m_raw[THROTTLE], 1050, PWM_MAX);
+        auto tmp = constrain_f_i32(m_rawThrottle, 1050, PWM_MAX);
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
         m_commands.throttle = lookupThrottle(tmp2);
@@ -611,7 +614,7 @@ class Receiver : public Task {
 
     bool throttleIsDown(void)
     {
-        return m_raw[THROTTLE] < 1050;
+        return m_rawThrottle < 1050;
     }
 
     bool check(const uint32_t usec)
@@ -757,12 +760,12 @@ class Receiver : public Task {
                 break;
         }
 
-        m_sticks->demands.throttle = m_raw[THROTTLE];
-        m_sticks->demands.roll     = m_raw[ROLL];
-        m_sticks->demands.pitch    = m_raw[PITCH];
-        m_sticks->demands.yaw      = m_raw[YAW];
-        m_sticks->aux1             = m_raw[AUX1];
-        m_sticks->aux2             = m_raw[AUX2];
+        m_sticks->demands.throttle = m_rawThrottle;
+        m_sticks->demands.roll     = m_rawRoll;
+        m_sticks->demands.pitch    = m_rawPitch;
+        m_sticks->demands.yaw      = m_rawYaw;
+        m_sticks->aux1             = m_rawAux1;
+        m_sticks->aux2             = m_rawAux2;
 
         if (pidItermResetReady) {
             m_gotPidReset = pidItermResetValue;
