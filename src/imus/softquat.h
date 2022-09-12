@@ -72,7 +72,7 @@ class SoftQuatImu : public Imu {
                 
                 Axes getAverage(void)
                 {
-                    uint32_t denom = count * Clock::PERIOD();
+                    auto denom = count * Clock::PERIOD();
 
                     return Axes(
                             denom ? values.x / denom : 0,
@@ -97,35 +97,36 @@ class SoftQuatImu : public Imu {
         // degree)
         static float acos_approx(const float x)
         {
-            float xa = fabsf(x);
+            const auto xa = fabsf(x);
 
-            float result =
+            const auto result =
                 sqrtf(1.0f - xa) *
                 (1.5707288f + xa *
                  (-0.2121144f + xa *
                   (0.0742610f + (-0.0187293f * xa))));
 
-            if (x < 0.0f)
-                return M_PI - result;
-            else
-                return result;
+            return x < 0 ? M_PI - result : result;
         }
 
         static float atan2_approx(const float y, const float x)
         {
-            float res, absX, absY;
-            absX = fabsf(x);
-            absY = fabsf(y);
-            res  = absX > absY ? absX : absY;
-            if (res) res = (absX < absY ? absX : absY) / res;
-            else res = 0.0f;
-            res = -((((atanPolyCoef5 * res - atanPolyCoef4) * res - atanPolyCoef3) *
-                        res - atanPolyCoef2) * res - atanPolyCoef1) / ((atanPolyCoef7 *
-                            res + atanPolyCoef6) * res + 1.0f);
-            if (absY > absX) res = (M_PI / 2.0f) - res;
-            if (x < 0) res = M_PI - res;
-            if (y < 0) res = -res;
-            return res;
+            const auto absX = fabsf(x);
+
+            const auto absY = fabsf(y);
+
+            const auto a  = absX > absY ? absX : absY;
+
+            const auto b = a ? (absX < absY ? absX : absY) / a : 0;
+
+            const auto c = -((((atanPolyCoef5 * b - atanPolyCoef4) * b - atanPolyCoef3) *
+                        b - atanPolyCoef2) * b - atanPolyCoef1) / ((atanPolyCoef7 *
+                            b + atanPolyCoef6) * b + 1.0f);
+
+            const auto d = absY > absX ? (M_PI / 2) - c : c;
+
+            const auto e = x < 0  ? M_PI - d : d;
+
+            return y < 0 ? e : -e;
         }
 
         static float invSqrt(const float x)
@@ -210,7 +211,7 @@ class SoftQuatImu : public Imu {
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
         {
-            Quaternion quat = mahony(
+            auto quat = mahony(
                     (time - m_fusionPrev.time) * 1e-6,
                     m_gyroAccum.getAverage(),
                     m_fusionPrev.quat);

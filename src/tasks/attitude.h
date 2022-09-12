@@ -51,13 +51,13 @@ class AttitudeTask : public Task {
 
         virtual void fun(uint32_t time) override
         {
-            auto angles = m_imu->getEulerAngles(time);
+            const auto angles = m_imu->getEulerAngles(time);
 
             m_vstate->phi   = angles.x;
             m_vstate->theta = angles.y;
             m_vstate->psi   = angles.z;
 
-            auto imuIsLevel =
+            const auto imuIsLevel =
                 fabsf(m_vstate->phi) < m_maxArmingAngle &&
                 fabsf(m_vstate->theta) < m_maxArmingAngle;
 
