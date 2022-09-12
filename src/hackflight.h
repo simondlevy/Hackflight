@@ -68,6 +68,36 @@ class Hackflight {
         Scheduler            m_scheduler;
         VehicleState         m_vstate;
 
+        float getMotorValue(const float input, const bool failsafeIsActive)
+        {
+            auto motorOutput = input;
+
+            motorOutput = m_esc->valueLow() +
+                (m_esc->valueHigh() -
+                 m_esc->valueLow()) * motorOutput;
+
+            if (failsafeIsActive) {
+                if (m_esc->isProtocolDshot()) {
+                    // Prevent getting into special reserved range
+                    motorOutput = (motorOutput < m_esc->valueLow()) ?
+                        m_esc->valueDisarmed() :
+                        motorOutput; 
+                }
+                motorOutput = constrain_f(
+                        motorOutput,
+                        m_esc->valueDisarmed(),
+                        m_esc->valueHigh());
+            } else {
+                motorOutput =
+                    constrain_f(
+                            motorOutput,
+                            m_esc->valueLow(),
+                            m_esc->valueHigh());
+            }
+
+            return motorOutput;
+        }
+
         void checkCoreTasks(uint32_t nowCycles)
         {
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
@@ -80,7 +110,7 @@ class Hackflight {
                 loopRemainingCycles =
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
-            
+
             if (m_imu->devGyroIsReady()) {
 
                 auto angvels = m_imu->readScaledGyro(m_imuAlignFun);
@@ -105,31 +135,7 @@ class Hackflight {
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
-                auto motorOutput = motors.values[i];
-
-                motorOutput = m_esc->valueLow() +
-                    (m_esc->valueHigh() -
-                     m_esc->valueLow()) * motorOutput;
-
-                if (m_failsafeIsActive) {
-                    if (m_esc->isProtocolDshot()) {
-                        // Prevent getting into special reserved range
-                        motorOutput = (motorOutput < m_esc->valueLow()) ?
-                            m_esc->valueDisarmed() :
-                            motorOutput; 
-                    }
-                    motorOutput = constrain_f(
-                            motorOutput,
-                            m_esc->valueDisarmed(),
-                            m_esc->valueHigh());
-                } else {
-                    motorOutput =
-                        constrain_f(
-                                motorOutput,
-                                m_esc->valueLow(),
-                                m_esc->valueHigh());
-                }
-                mixmotors[i] = motorOutput;
+                mixmotors[i] = getMotorValue(motors.values[i], m_failsafeIsActive);
             }
 
             m_esc->write(m_arming.isArmed() ?  mixmotors : m_msp.motors);
