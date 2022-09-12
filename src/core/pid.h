@@ -19,15 +19,34 @@
 #pragma once
 
 #include "demands.h"
+#include "time.h"
 #include "vstate.h"
 
 class PidController {
 
-    public:
+    friend class Mixer;
 
-         virtual auto update(
-                const uint32_t usec,
+    protected:
+
+         virtual auto getDemands(
+                const int32_t dusec,
                 const Demands & demands,
                 const VehicleState & vstate,
                 const bool reset) -> Demands = 0;
+
+         auto update(
+                const uint32_t usec,
+                const Demands & demands,
+                const VehicleState & vstate,
+                const bool reset) -> Demands 
+         {
+             static uint32_t _prev;
+
+             const auto dusec = cmpTimeUs(usec, _prev);
+
+             _prev = usec;
+
+             return getDemands(dusec, demands, vstate, reset);
+         }
+
 };

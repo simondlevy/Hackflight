@@ -58,13 +58,13 @@ class AltHoldPidController : public PidController {
             m_altitudeTarget = 0;
         }
 
-        virtual auto update(
-                const uint32_t usec,
+        virtual auto getDemands(
+                const int32_t dusec,
                 const Demands & demands,
                 const VehicleState & vstate,
                 const bool reset) -> Demands override
         {
-            (void)usec;
+            (void)dusec;
 
             // NED => ENU
             const auto altitude = -vstate.z;
