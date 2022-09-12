@@ -95,14 +95,14 @@ auto UsfsImu::getEulerAngles(const uint32_t time) -> Axes
 {
     (void)time;
 
-    auto qw = m_qw;
-    auto qx = m_qx;
-    auto qy = m_qy;
-    auto qz = m_qz;
+    const auto qw = m_qw;
+    const auto qx = m_qx;
+    const auto qy = m_qy;
+    const auto qz = m_qz;
 
-    auto phi = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-    auto theta = asin(2.0f*(qx*qz-qw*qy));
-    auto psi = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
+    const auto phi = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
+    const auto theta = asin(2.0f*(qx*qz-qw*qy));
+    const auto psi = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
 
     // Convert heading from [-pi,+pi] to [0,2*pi]
     return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 

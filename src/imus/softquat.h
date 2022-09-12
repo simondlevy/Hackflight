@@ -171,20 +171,20 @@ class SoftQuatImu : public Imu {
                 const Quaternion & q_old) -> Quaternion
         {
             // Convert gyro degrees to radians
-            float gx = Math::deg2rad(gyro.x);
-            float gy = Math::deg2rad(gyro.y);
-            float gz = Math::deg2rad(gyro.z);
+            const auto gx = Math::deg2rad(gyro.x);
+            const auto gy = Math::deg2rad(gyro.y);
+            const auto gz = Math::deg2rad(gyro.z);
 
             // Apply proportional and integral feedback, then integrate rate-of-change
-            float gx1 = gx * dt / 2;
-            float gy1 = gy * dt / 2;
-            float gz1 = gz * dt / 2;
+            const auto gx1 = gx * dt / 2;
+            const auto gy1 = gy * dt / 2;
+            const auto gz1 = gz * dt / 2;
 
             // Update quaternion
-            float qw = q_old.w - q_old.x * gx1 - q_old.y * gy1 - q_old.z * gz1;
-            float qx = q_old.x + q_old.w * gx1 + q_old.y * gz1 - q_old.z * gy1;
-            float qy = q_old.y + q_old.w * gy1 - q_old.x * gz1 + q_old.z * gx1;
-            float qz = q_old.z + q_old.w * gz1 + q_old.x * gy1 - q_old.y * gx1;
+            const auto qw = q_old.w - q_old.x * gx1 - q_old.y * gy1 - q_old.z * gz1;
+            const auto qx = q_old.x + q_old.w * gx1 + q_old.y * gz1 - q_old.z * gy1;
+            const auto qy = q_old.y + q_old.w * gy1 - q_old.x * gz1 + q_old.z * gx1;
+            const auto qz = q_old.z + q_old.w * gz1 + q_old.x * gy1 - q_old.y * gx1;
 
             // Normalise quaternion
             float norm = invSqrt(square(qw) + square(qx) + square(qy) + square(qz));
