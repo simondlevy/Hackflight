@@ -185,7 +185,7 @@ class Hackflight {
             Task *selectedTask = NULL;
             uint16_t selectedTaskDynamicPriority = 0;
 
-            uint32_t usec = timeMicros();
+            const uint32_t usec = timeMicros();
 
             m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
@@ -195,24 +195,25 @@ class Hackflight {
 
             if (selectedTask) {
 
-                auto loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
-                auto nextTargetCycles = m_scheduler.getNextTargetCycles();
+                const auto nextTargetCycles = m_scheduler.getNextTargetCycles();
 
-                auto taskRequiredTimeUs = selectedTask->getRequiredTime();
+                const auto taskRequiredTimeUs = selectedTask->getRequiredTime();
+
+                const auto nowCycles = systemGetCycleCounter();
+
+                const auto loopRemainingCycles =
+                    cmpTimeCycles(nextTargetCycles, nowCycles);
+
                 auto taskRequiredCycles =
                     (int32_t)systemClockMicrosToCycles(
                             (uint32_t)taskRequiredTimeUs);
-
-                auto nowCycles = systemGetCycleCounter();
-                loopRemainingCycles =
-                    cmpTimeCycles(nextTargetCycles, nowCycles);
 
                 // Allow a little extra time
                 taskRequiredCycles += m_scheduler.getTaskGuardCycles();
 
                 if (taskRequiredCycles < loopRemainingCycles) {
 
-                    auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+                    const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
 
                     selectedTask->execute(usec);
 
