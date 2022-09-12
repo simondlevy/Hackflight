@@ -192,7 +192,7 @@ class Imu {
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 
-        auto readScaledGyro(const align_fun align) -> Axes
+        auto readGyroDps(const align_fun align) -> Axes
         {
             const auto calibrationComplete = m_calibrationCyclesRemaining <= 0;
 

@@ -83,7 +83,7 @@ class Hackflight {
 
             if (m_imu->devGyroIsReady()) {
 
-                auto angvels = m_imu->readScaledGyro(m_imuAlignFun);
+                auto angvels = m_imu->readGyroDps(m_imuAlignFun);
 
                 m_vstate.dphi   = angvels.x;
                 m_vstate.dtheta = angvels.y;
