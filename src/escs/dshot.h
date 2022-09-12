@@ -346,10 +346,23 @@ class DshotEsc : public Esc {
                         MIN_VALUE, MAX_VALUE);
         }
 
-
-        virtual bool isProtocolDshot(void) override 
+        virtual float getMotorValue(
+                const float input, const bool failsafeIsActive) override
         {
-            return true;
+            auto motorOutput = input;
+
+            motorOutput = valueLow() + (MAX_VALUE - valueLow()) * motorOutput;
+
+            if (failsafeIsActive) {
+                // Prevent getting into special reserved range
+                motorOutput = (motorOutput < valueLow()) ?  STOP_VALUE : motorOutput; 
+                motorOutput = constrain_f(motorOutput, STOP_VALUE, MAX_VALUE);
+            } else {
+                motorOutput =
+                    constrain_f(motorOutput, valueLow(), MAX_VALUE);
+            }
+
+            return motorOutput;
         }
 
         virtual bool isReady(uint32_t usec) override 
@@ -357,17 +370,7 @@ class DshotEsc : public Esc {
             return usec >= BEACON_GUARD_DELAY_US;
         }
 
-        virtual float valueDisarmed(void) override 
-        {
-            return (float)STOP_VALUE;
-        }
-
-        virtual float valueHigh(void) override 
-        {
-            return MAX_VALUE;
-        }
-
-        virtual float valueLow(void) override 
+        float valueLow(void)
         {
             return MIN_VALUE + 0.045 * VALUE_RANGE;
         }

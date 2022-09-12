@@ -42,31 +42,20 @@ class ArduinoBrushedEsc : public Esc {
             return (value - PWM_MIN) / (float)(PWM_MAX - PWM_MIN);
         }
 
-        virtual bool isProtocolDshot(void) override 
+        virtual float getMotorValue(
+                const float input, const bool failsafeIsActive) override
         {
-            return false;
+            (void)failsafeIsActive;
+
+            return constrain_f(input, 0, 1);
         }
+
 
         virtual bool isReady(uint32_t currentTime) override 
         {
             (void)currentTime;
 
             return true;
-        }
-
-        virtual float valueDisarmed(void) override 
-        {
-            return 0;
-        }
-
-        virtual float valueHigh(void) override 
-        {
-            return 1;
-        }
-
-        virtual float valueLow(void) override 
-        {
-            return 0;
         }
 
         virtual void stop(void) override 
