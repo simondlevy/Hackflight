@@ -167,7 +167,7 @@ class Imu {
                 float y;
                 float z;
 
-                Quaternion(float _w, float _x, float _y, float _z)
+                Quaternion(const float _w, const float _x, const float _y, const float _z)
                 {
                     w = _w;
                     x = _x;
@@ -183,7 +183,7 @@ class Imu {
 
         typedef void (*align_fun)(Axes * axes);
 
-        virtual void accumulateGyro(float gx, float gy, float gz)
+        virtual void accumulateGyro(const float gx, const float gy, const float gz)
         {
             (void)gx;
             (void)gy;
@@ -194,7 +194,7 @@ class Imu {
 
         auto readScaledGyro(const align_fun align) -> Axes
         {
-            auto calibrationComplete = m_calibrationCyclesRemaining <= 0;
+            const auto calibrationComplete = m_calibrationCyclesRemaining <= 0;
 
             static Axes _adc;
 
@@ -242,16 +242,13 @@ class Imu {
             return m_isCalibrating;
         }
 
-        int32_t getGyroSkew( uint32_t nextTargetCycles, int32_t desiredPeriodCycles)
+        int32_t getGyroSkew(
+                const uint32_t nextTargetCycles, const int32_t desiredPeriodCycles)
         {
-            auto skew =
+            const auto skew =
                 cmpTimeCycles(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;
 
-            if (skew > (desiredPeriodCycles / 2)) {
-                skew -= desiredPeriodCycles;
-            }
-
-            return skew;
+            return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
         }
 
         void begin(void) 

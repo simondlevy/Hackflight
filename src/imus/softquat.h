@@ -56,7 +56,7 @@ class SoftQuatImu : public Imu {
 
                 uint32_t count;
 
-                void accumulate(float x, float y, float z)
+                void accumulate(const float x, const float y, const float z)
                 {
                     // integrate using trapezium rule to avoid bias
                     values.x += 0.5f * (adcf.x + x) * Clock::PERIOD();
