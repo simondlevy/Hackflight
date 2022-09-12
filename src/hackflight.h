@@ -204,12 +204,10 @@ class Hackflight {
                 const auto loopRemainingCycles =
                     cmpTimeCycles(nextTargetCycles, nowCycles);
 
-                auto taskRequiredCycles =
-                    (int32_t)systemClockMicrosToCycles(
-                            (uint32_t)taskRequiredTimeUs);
-
                 // Allow a little extra time
-                taskRequiredCycles += m_scheduler.getTaskGuardCycles();
+                const auto taskRequiredCycles =
+                    (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs) +
+                    m_scheduler.getTaskGuardCycles();
 
                 if (taskRequiredCycles < loopRemainingCycles) {
 
