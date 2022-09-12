@@ -370,12 +370,9 @@ class GCS(MspParser):
             self.portsmenu.pack(side=tk.LEFT)
 
             # Disconnected
-            if ports == []:
+            if len(ports) < len(self.ports):
 
-                self.portsmenu['menu'].delete(0, 'end')
-                self.portsvar.set('')
-                self._disable_button(self.button_connect)
-                self._disable_buttons()
+                exit(0)
 
             # Connected
             else:
