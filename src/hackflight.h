@@ -80,8 +80,15 @@ class Hackflight {
                 loopRemainingCycles =
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
+            
+            if (m_imu->devGyroIsReady()) {
 
-            m_imu->readScaledGyro(m_imuAlignFun, &m_vstate);
+                auto angvels = m_imu->readScaledGyro(m_imuAlignFun);
+
+                m_vstate.dphi   = angvels.x;
+                m_vstate.dtheta = angvels.y;
+                m_vstate.dpsi   = angvels.z;
+            }
 
             auto usec = timeMicros();
 

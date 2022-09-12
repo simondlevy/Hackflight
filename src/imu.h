@@ -192,10 +192,8 @@ class Imu {
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 
-        void readScaledGyro(const align_fun align, VehicleState * vstate)
+        auto readScaledGyro(const align_fun align) -> Axes
         {
-            if (!devGyroIsReady()) return;
-
             auto calibrationComplete = m_calibrationCyclesRemaining <= 0;
 
             static Axes _adc;
@@ -234,11 +232,9 @@ class Imu {
             // Used for fusion with accelerometer
             accumulateGyro(m_x.dpsFiltered, m_y.dpsFiltered, m_z.dpsFiltered);
 
-            vstate->dphi   = m_x.dpsFiltered;
-            vstate->dtheta = m_y.dpsFiltered;
-            vstate->dpsi   = m_z.dpsFiltered;
-
             m_isCalibrating = !calibrationComplete;
+
+            return Axes(m_x.dpsFiltered, m_y.dpsFiltered, m_z.dpsFiltered);
         }
 
         bool gyroIsCalibrating(void)
