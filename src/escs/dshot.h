@@ -128,7 +128,7 @@ class DshotEsc : public Esc {
             return control;
         }
 
-        static uint32_t commandCyclesFromTime(uint32_t delayUs)
+        static uint32_t commandCyclesFromTime(const uint32_t delayUs)
         {
             // Find the minimum number of motor output cycles needed to
             // provide at least delayUs time delay
@@ -137,10 +137,14 @@ class DshotEsc : public Esc {
         }
 
         static float scaleRangef(
-                float x, float srcFrom, float srcTo, float destFrom, float destTo)
+                const float x,
+                const float srcFrom,
+                const float srcTo,
+                const float destFrom,
+                const float destTo)
         {
-            auto a = (destTo - destFrom) * (x - srcFrom);
-            auto b = srcTo - srcFrom;
+            const auto a = (destTo - destFrom) * (x - srcFrom);
+            const auto b = srcTo - srcFrom;
             return (a / b) + destFrom;
         }
 
@@ -170,7 +174,7 @@ class DshotEsc : public Esc {
 
         uint8_t m_motorCount;
 
-        motorDmaOutput_t * getMotorDmaOutput(uint8_t index)
+        motorDmaOutput_t * getMotorDmaOutput(const uint8_t index)
         {
             return &m_dmaMotors[index];
         }
@@ -283,7 +287,7 @@ class DshotEsc : public Esc {
             return false;
         }
 
-        uint8_t commandGetCurrent(uint8_t index)
+        uint8_t commandGetCurrent(const uint8_t index)
         {
             return m_commandQueue[m_commandQueueTail].command[index];
         }
@@ -336,7 +340,7 @@ class DshotEsc : public Esc {
             }
         }
 
-        virtual float convertFromExternal(uint16_t value) override 
+        virtual float convertFromExternal(const uint16_t value) override 
         {
             auto constrainedValue = constrain_u16(value, PWM_MIN, PWM_MAX);
 
@@ -349,23 +353,19 @@ class DshotEsc : public Esc {
         virtual float getMotorValue(
                 const float input, const bool failsafeIsActive) override
         {
-            auto motorOutput = input;
+            const auto scaled = valueLow() + (MAX_VALUE - valueLow()) * input;
 
-            motorOutput = valueLow() + (MAX_VALUE - valueLow()) * motorOutput;
+            const auto output =
+                failsafeIsActive && scaled < valueLow() ?
+                STOP_VALUE :
+                scaled;
 
-            if (failsafeIsActive) {
-                // Prevent getting into special reserved range
-                motorOutput = (motorOutput < valueLow()) ?  STOP_VALUE : motorOutput; 
-                motorOutput = constrain_f(motorOutput, STOP_VALUE, MAX_VALUE);
-            } else {
-                motorOutput =
-                    constrain_f(motorOutput, valueLow(), MAX_VALUE);
-            }
+            const auto lowValue = failsafeIsActive ? STOP_VALUE : valueLow();
 
-            return motorOutput;
+            return constrain_f(output, lowValue, MAX_VALUE);
         }
 
-        virtual bool isReady(uint32_t usec) override 
+        virtual bool isReady(const uint32_t usec) override 
         {
             return usec >= BEACON_GUARD_DELAY_US;
         }
@@ -399,7 +399,7 @@ class DshotEsc : public Esc {
             }
         }
 
-        virtual void write(float *values) override
+        virtual void write(const float values[]) override
         {
             if (m_enabled) {
                 if (!updateStart()) {

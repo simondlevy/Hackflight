@@ -37,7 +37,7 @@ class ArduinoBrushedEsc : public Esc {
             }
         }
 
-        virtual float  convertFromExternal(uint16_t value) override 
+        virtual float  convertFromExternal(const uint16_t value) override 
         {
             return (value - PWM_MIN) / (float)(PWM_MAX - PWM_MIN);
         }
@@ -51,7 +51,7 @@ class ArduinoBrushedEsc : public Esc {
         }
 
 
-        virtual bool isReady(uint32_t currentTime) override 
+        virtual bool isReady(const uint32_t currentTime) override 
         {
             (void)currentTime;
 
@@ -62,7 +62,7 @@ class ArduinoBrushedEsc : public Esc {
         {
         }
 
-        virtual void write(float *values) override 
+        virtual void write(const float values[]) override 
         {
             uint8_t k=0;
             for (auto p: *m_pins) {

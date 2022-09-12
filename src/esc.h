@@ -40,12 +40,15 @@ class Esc {
     public:
 
         virtual void  begin(void) = 0;
-        virtual float convertFromExternal(uint16_t value) = 0;
-        virtual bool  isReady(uint32_t currentTime) = 0;
 
-        virtual void  stop(void) = 0;
-        virtual void  write(float *values) = 0;
+        virtual float convertFromExternal(const uint16_t value) = 0;
 
         virtual float getMotorValue(
                 const float input, const bool failsafeIsActive) = 0;
+
+        virtual bool  isReady(const uint32_t currentTime) = 0;
+
+        virtual void  stop(void) = 0;
+
+        virtual void  write(const float values[]) = 0;
 };
