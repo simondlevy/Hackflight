@@ -127,7 +127,6 @@ class AnglePidController : public PidController {
         float    m_k_rate_f;
         float    m_k_level_p;
         float    m_sum;
-        uint32_t m_lastDynLpfUpdateUs;
 
         float applyFeedforwardLimit(
                 const float value,
@@ -420,8 +419,8 @@ class AnglePidController : public PidController {
             return angleRate;
         }
 
-        virtual auto update(
-                const uint32_t usec,
+        virtual auto getDemands(
+                const int32_t dusec,
                 const Demands & demands,
                 const VehicleState & vstate,
                 const bool reset) -> Demands override
@@ -440,8 +439,7 @@ class AnglePidController : public PidController {
                 m_yaw.I = 0;
             }
 
-            if (cmpTimeUs(usec, m_lastDynLpfUpdateUs) >=
-                    DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
+            if (dusec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
 
                 // quantize the throttle reduce the number of filter updates
                 const int32_t quantizedThrottle =
@@ -455,7 +453,6 @@ class AnglePidController : public PidController {
                         (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
                     pidDynLpfDTermUpdate(dynLpfThrottle);
                     m_dynLpfPreviousQuantizedThrottle = quantizedThrottle;
-                    m_lastDynLpfUpdateUs = usec;
                 }
             }
 
