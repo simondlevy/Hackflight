@@ -66,9 +66,8 @@ class AltHoldPidController : public PidController {
         {
             (void)dusec;
 
-            // NED => ENU
-            const auto altitude = -vstate.z;
-            const auto dz = -vstate.dz;
+            const auto altitude = vstate.z;
+            const auto dz = vstate.dz;
 
             // [0,1] => [-1,+1]
             const auto sthrottle = 2 * demands.throttle - 1; 
