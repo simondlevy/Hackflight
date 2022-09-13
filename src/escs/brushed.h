@@ -50,18 +50,6 @@ class ArduinoBrushedEsc : public Esc {
             return constrain_f(input, 0, 1);
         }
 
-
-        virtual bool isReady(const uint32_t currentTime) override 
-        {
-            (void)currentTime;
-
-            return true;
-        }
-
-        virtual void stop(void) override 
-        {
-        }
-
         virtual void write(const float values[]) override 
         {
             uint8_t k=0;

@@ -46,9 +46,16 @@ class Esc {
         virtual float getMotorValue(
                 const float input, const bool failsafeIsActive) = 0;
 
-        virtual bool  isReady(const uint32_t currentTime) = 0;
-
-        virtual void  stop(void) = 0;
-
         virtual void  write(const float values[]) = 0;
+
+        virtual bool  isReady(const uint32_t currentTime) 
+        {
+            (void)currentTime;
+            return true;
+        }
+
+        virtual void  stop(void) 
+        {
+        }
+
 };
