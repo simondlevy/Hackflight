@@ -136,18 +136,6 @@ class Msp : public Task {
         // msp post process function, used for gracefully handling reboots, etc.
         typedef void (*mspPostProcessFnPtr)(void * port); 
 
-        typedef mspResult_e (*processCommandFnPtr)(
-                //mspDescriptor_t srcDesc,
-                mspPacket_t *cmd,
-                mspPacket_t *reply,
-                mspPostProcessFnPtr *mspPostProcessFn,
-                VehicleState * vstate,
-                Receiver::sticks_t * rxax,
-                Esc * esc,
-                float * motors);
-
-        typedef void (*processReplyFnPtr)(mspPacket_t *cmd);
-
         typedef enum {
             IDLE,
             HEADER_START,
@@ -436,10 +424,7 @@ class Msp : public Task {
                     crcBuf, crcLen);
         }
 
-        mspPostProcessFnPtr processReceivedCommand(
-                mspPort_t *msp,
-                processCommandFnPtr processCommandFn,
-                float * motors)
+        mspPostProcessFnPtr processReceivedCommand(mspPort_t *msp, float * motors)
         {
             static uint8_t mspSerialOutBuf[PORT_OUTBUF_SIZE];
 
@@ -460,7 +445,7 @@ class Msp : public Task {
 
             mspPostProcessFnPtr mspPostProcessFn = NULL;
 
-            const auto status = processCommandFn(
+            const auto status = fcProcessCommand(
                     &command,
                     &reply,
                     &mspPostProcessFn,
@@ -575,8 +560,7 @@ class Msp : public Task {
 
                         if (mspPort->state == COMMAND_RECEIVED) {
                             if (mspPort->packetType == PACKET_COMMAND) {
-                                mspPostProcessFn =
-                                    processReceivedCommand(mspPort, fcProcessCommand, motors);
+                                mspPostProcessFn = processReceivedCommand(mspPort, motors);
                             } else if (mspPort->packetType == PACKET_REPLY) {
                                 mspPort->state = IDLE;
                             }
