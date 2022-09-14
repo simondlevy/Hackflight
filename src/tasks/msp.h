@@ -190,29 +190,25 @@ class Msp : public Task {
             return 1000 + 1000 * value;
         }
 
-        static bool processOutCommand(
-                int16_t cmdMSP,
-                sbuf_t *dst,
-                VehicleState * vstate,
-                Receiver::sticks_t * rxax)
+        bool processOutCommand(int16_t cmdMSP, sbuf_t *dst)
         {
             auto unsupportedCommand = false;
 
             switch (cmdMSP) {
 
                 case RC:
-                    sbufWriteU16(dst, rxax->demands.throttle); 
-                    sbufWriteU16(dst, rxax->demands.roll);
-                    sbufWriteU16(dst, rxax->demands.pitch);
-                    sbufWriteU16(dst, rxax->demands.yaw);
-                    sbufWriteU16(dst, scale(rxax->aux1));
-                    sbufWriteU16(dst, scale(rxax->aux2));
+                    sbufWriteU16(dst, m_rxSticks->demands.throttle); 
+                    sbufWriteU16(dst, m_rxSticks->demands.roll);
+                    sbufWriteU16(dst, m_rxSticks->demands.pitch);
+                    sbufWriteU16(dst, m_rxSticks->demands.yaw);
+                    sbufWriteU16(dst, scale(m_rxSticks->aux1));
+                    sbufWriteU16(dst, scale(m_rxSticks->aux2));
                     break;
 
                 case ATTITUDE:
-                    sbufWriteU16(dst, 10 * rad2degi(vstate->phi));
-                    sbufWriteU16(dst, 10 * rad2degi(vstate->theta));
-                    sbufWriteU16(dst, rad2degi(vstate->psi));
+                    sbufWriteU16(dst, 10 * rad2degi(m_vstate->phi));
+                    sbufWriteU16(dst, 10 * rad2degi(m_vstate->theta));
+                    sbufWriteU16(dst, rad2degi(m_vstate->psi));
                     break;
 
                 default:
@@ -222,17 +218,13 @@ class Msp : public Task {
         }
 
 
-        static mspResult_e processInCommand(
-                int16_t cmdMSP,
-                sbuf_t *src,
-                Esc * esc,
-                float * motors)
+        mspResult_e processInCommand(int16_t cmdMSP, sbuf_t *src, float * motors)
         {
             switch (cmdMSP) {
 
                 case SET_MOTOR:
                     for (auto i=0; i<4; i++) { // XXX
-                        motors[i] = esc->convertFromExternal(sbufReadU16(src));
+                        motors[i] = m_esc->convertFromExternal(sbufReadU16(src));
                     }
                     break;
 
@@ -247,33 +239,20 @@ class Msp : public Task {
         /*
          * Returns RESULT_ACK, RESULT_ERROR or RESULT_NO_REPLY
          */
-        static mspResult_e fcProcessCommand(
-                //mspDescriptor_t srcDesc,
-                mspPacket_t *cmd,
-                mspPacket_t *reply,
-                mspPostProcessFnPtr *mspPostProcessFn,
-                VehicleState * vstate,
-                Receiver::sticks_t * rxax,
-                Esc * esc,
-                float * motors) {
+        mspResult_e fcProcessCommand(mspPacket_t *cmd, mspPacket_t *reply, float * motors) {
 
-            //(void)srcDesc;
-            (void)mspPostProcessFn;
-
-            mspResult_e ret = RESULT_ACK;
             sbuf_t *dst = &reply->buf;
             sbuf_t *src = &cmd->buf;
             const auto cmdMSP = cmd->cmd;
-            // initialize reply by default
             reply->cmd = cmd->cmd;
 
-            if (processOutCommand(cmdMSP, dst, vstate, rxax)) {
-                ret = RESULT_ACK;
-            } 
-            else {
-                ret = processInCommand(cmdMSP, src, esc, motors);
-            }
+            mspResult_e ret = 
+                processOutCommand(cmdMSP, dst) ?
+                RESULT_ACK :
+                processInCommand(cmdMSP, src, motors);
+
             reply->result = ret;
+
             return ret;
         }
 
@@ -445,14 +424,7 @@ class Msp : public Task {
 
             mspPostProcessFnPtr mspPostProcessFn = NULL;
 
-            const auto status = fcProcessCommand(
-                    &command,
-                    &reply,
-                    &mspPostProcessFn,
-                    m_vstate,
-                    m_rxSticks,
-                    m_esc,
-                    motors);
+            const auto status = fcProcessCommand(&command, &reply, motors);
 
             if (status != RESULT_NO_REPLY) {
                 sbufSwitchToReader(&reply.buf, outBufHead); // change streambuf direction
