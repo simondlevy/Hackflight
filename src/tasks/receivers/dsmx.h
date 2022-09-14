@@ -32,8 +32,7 @@ class DsmxReceiver : public Receiver {
         // Support DSMX2048 only
         static const uint8_t  CHAN_SHIFT = 3;
         static const uint8_t  CHAN_MASK  = 0x07;
-        static const uint16_t CHAN_RESOLUTION = 2048;
-        static const uint8_t MAX_CHANNELS = 8;
+        static const uint8_t  MAX_CHANNELS = 8;
 
         static const uint16_t FRAME_INTERVAL = 5000;
 
@@ -75,7 +74,8 @@ class DsmxReceiver : public Receiver {
 
         static float convert(const uint16_t value)
         {
-            return 1000 * (1 + (value - 1) / (float)(CHAN_RESOLUTION-1));
+            return Receiver::convert(value, 0, 2048);
+            //return 1000 * (1 + (value - 1) / (float)(CHAN_RESOLUTION-1));
         }
 
      protected:

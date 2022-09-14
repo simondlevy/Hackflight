@@ -127,8 +127,7 @@ class SbusReceiver : public Receiver {
 
         float convert(const uint16_t value)
         {
-            // [172,1811] -> [1000,2000]
-            return (5 * (float)value / 8) + 880;
+            return Receiver::convert(value, 172, 1811);
         }
 
     protected:

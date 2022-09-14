@@ -705,6 +705,11 @@ class Receiver : public Task {
 
     protected:
 
+    static float convert(const uint16_t value, const uint16_t min, const uint16_t max)
+    {
+        return 1000 + 1000 * ((float)value - min) / (max - min);
+    }
+
     virtual void devStart(void) = 0;
 
     virtual bool devRead(
