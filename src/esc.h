@@ -28,6 +28,10 @@ using namespace std;
 
 class Esc {
 
+    friend class Arming;
+    friend class Hackflight;
+    friend class Msp;
+
     protected:
 
         vector<uint8_t> * m_pins;
@@ -36,8 +40,6 @@ class Esc {
         {
             m_pins = &pins;
         }
-
-    public:
 
         virtual void  begin(void) = 0;
 

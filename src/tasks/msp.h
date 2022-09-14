@@ -222,7 +222,7 @@ class Msp : public Task {
             switch (cmdMSP) {
 
                 case SET_MOTOR:
-                    for (auto i=0; i<4; i++) { // XXX
+                    for (uint8_t i=0; i<m_esc->m_pins->size(); i++) {
                         motors[i] = m_esc->convertFromExternal(sbufReadU16(src));
                     }
                     break;
