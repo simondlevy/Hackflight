@@ -85,7 +85,6 @@ class Receiver : public Task {
 
     static const uint32_t NEED_SIGNAL_MAX_DELAY_US    = 1000000 / 10;
 
-    static const uint16_t  MAX_INVALID__PULSE_TIME     = 300;
     static const uint16_t  RATE_LIMIT                  = 1998;
     static constexpr float THR_EXPO8                   = 0;
     static constexpr float THR_MID8                    = 50;
@@ -123,11 +122,10 @@ class Receiver : public Task {
     Pt3Filter  m_feedforwardPt3Pitch;
     Pt3Filter  m_feedforwardPt3Yaw;
 
+    float      m_commandThrottle;
     float      m_commandRoll;
     float      m_commandPitch;
     float      m_commandYaw;
-
-    uint32_t   m_invalidPulsePeriod[CHANNEL_COUNT];
 
     float m_rawThrottle;
     float m_rawRoll;
@@ -143,7 +141,6 @@ class Receiver : public Task {
     bool     m_auxiliaryProcessingRequired;
     uint32_t m_averageFrameTimeUs;
     bool     m_calculatedCutoffs;
-    Demands  m_commands;
     bool     m_dataProcessingRequired;
     Demands  m_dataToSmooth;
     uint16_t m_feedforwardCutoffFrequency;
@@ -250,7 +247,7 @@ class Receiver : public Task {
         auto tmp = constrain_f_i32(m_rawThrottle, 1050, PWM_MAX);
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
-        m_commands.throttle = lookupThrottle(tmp2);
+        m_commandThrottle = lookupThrottle(tmp2);
     }
 
     bool calculateChannels(const uint32_t usec)
@@ -443,12 +440,9 @@ class Receiver : public Task {
     {
         // if any rc smoothing cutoff is 0 (auto) then we need to calculate
         // cutoffs
-        if ((m_setpointCutoffSetting == 0) ||
+        return ((m_setpointCutoffSetting == 0) ||
                 (m_feedforwardCutoffSetting == 0) ||
-                (m_throttleCutoffSetting == 0)) {
-            return true;
-        }
-        return false;
+                (m_throttleCutoffSetting == 0)); 
     }
 
     auto processSmoothingFilter(const uint32_t usec, const Axes & rawSetpoints) -> Axes
@@ -569,13 +563,13 @@ class Receiver : public Task {
                 }
             }
 
-            m_dataToSmooth.throttle = m_commands.throttle;
+            m_dataToSmooth.throttle = m_commandThrottle;
             m_dataToSmooth.roll  = rawSetpoints.x;
             m_dataToSmooth.pitch = rawSetpoints.y;
             m_dataToSmooth.yaw   = rawSetpoints.z;
         }
 
-        m_commands.throttle = smoothingFilterApply(
+        m_commandThrottle = smoothingFilterApply(
                 &m_filterThrottle,
                 m_dataToSmooth.throttle);
 
@@ -667,7 +661,7 @@ class Receiver : public Task {
         m_gotNewData = false;
 
         return Demands(
-                constrain_f((m_commands.throttle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0, 1),
+                constrain_f((m_commandThrottle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0, 1),
                 setpointRates.x,
                 setpointRates.y,
                 setpointRates.z);
