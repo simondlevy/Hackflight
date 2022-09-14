@@ -73,6 +73,11 @@ class DsmxReceiver : public Receiver {
 
         frameData_t m_frameData;
 
+        static float convert(const uint16_t value)
+        {
+            return 1000 * (1 + (value - 1) / (float)(CHAN_RESOLUTION-1));
+        }
+
      protected:
 
         virtual void devStart(void) override
@@ -83,15 +88,14 @@ class DsmxReceiver : public Receiver {
                     &m_frameData);
         }
 
-        virtual float devConvert(uint16_t * channelData, uint8_t chan) override
-        {
-            // Ignore channel 6 for now (problems with transmitter)
-            auto chanval = chan == 5 ? 1 : channelData[chan];
-
-            return 1000 * (1 + (chanval - 1) / (float)(CHAN_RESOLUTION-1));
-        }
-
-        virtual bool devRead(uint16_t channelData[], uint32_t * frameTimeUs) override
+        virtual bool devRead(
+                float & throttle,
+                float & roll,
+                float & pitch,
+                float & yaw,
+                float & aux1,
+                float & aux2,
+                uint32_t & frameTimeUs) override
         {
             auto result = false;
 
@@ -101,9 +105,11 @@ class DsmxReceiver : public Receiver {
 
                 result = true;
 
-                *frameTimeUs = m_frameData.lastTimeUs;
+                frameTimeUs = m_frameData.lastTimeUs;
 
                 auto * bytes = m_frameData.bytes;
+
+                uint16_t channelData[MAX_CHANNELS] = {};
 
                 for (auto b=3; b<FRAME_SIZE; b+=2) {
 
@@ -111,10 +117,19 @@ class DsmxReceiver : public Receiver {
 
                     if (channel < MAX_CHANNELS) {
 
-                        channelData[channel] = ((uint32_t)(bytes[b - 1] &
-                                    CHAN_MASK) << 8) + bytes[b];
+                        channelData[channel] =
+                            ((uint32_t)(bytes[b - 1] & CHAN_MASK) << 8) + bytes[b];
                     }
                 }
+
+                throttle = convert(channelData[0]);
+                roll     = convert(channelData[1]);
+                pitch    = convert(channelData[2]);
+                yaw      = convert(channelData[3]);
+                aux1     = convert(channelData[4]);
+
+                // Ignore channel 6 for now (problems with transmitter)
+                aux2     = 1000;
 
             }
 

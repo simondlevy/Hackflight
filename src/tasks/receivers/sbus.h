@@ -125,6 +125,12 @@ class SbusReceiver : public Receiver {
 
         serialPortIdentifier_e m_port;
 
+        float convert(const uint16_t value)
+        {
+            // [172,1811] -> [1000,2000]
+            return (5 * (float)value / 8) + 880;
+        }
+
     protected:
 
         virtual void devStart(void) override
@@ -135,13 +141,14 @@ class SbusReceiver : public Receiver {
                     &m_frameData);
         }
 
-        virtual float devConvert(uint16_t * channelData, uint8_t chan) override
-        {
-            // [172,1811] -> [1000,2000]
-            return (5 * (float)channelData[chan] / 8) + 880;
-        }
-
-        virtual bool devRead(uint16_t channelData[], uint32_t * frameTimeUs) override
+        virtual bool devRead(
+                float & throttle,
+                float & roll,
+                float & pitch,
+                float & yaw,
+                float & aux1,
+                float & aux2,
+                uint32_t & frameTimeUs) override
         {
             auto result = false;
 
@@ -154,15 +161,14 @@ class SbusReceiver : public Receiver {
                 auto channels = &m_frameData.frame.frame.channels;
 
                 // Update frame time only if there are no channel errors (timeout)
-                *frameTimeUs = channels->flags ? *frameTimeUs : m_frameData.startAtUs;
+                frameTimeUs = channels->flags ? frameTimeUs : m_frameData.startAtUs;
 
-                channelData[0] = channels->chan0;
-                channelData[1] = channels->chan1;
-                channelData[2] = channels->chan2;
-                channelData[3] = channels->chan3;
-                channelData[4] = channels->chan4;
-                channelData[5] = channels->chan5;
-
+                throttle = convert(channels->chan0);
+                roll     = convert(channels->chan1);
+                pitch    = convert(channels->chan2);
+                yaw      = convert(channels->chan3);
+                aux1     = convert(channels->chan4);
+                aux2     = convert(channels->chan5);
             }
 
             return result;

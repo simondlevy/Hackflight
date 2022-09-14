@@ -127,7 +127,6 @@ class Receiver : public Task {
     float      m_commandPitch;
     float      m_commandYaw;
 
-    uint16_t   m_channelData[CHANNEL_COUNT];
     uint32_t   m_invalidPulsePeriod[CHANNEL_COUNT];
 
     float m_rawThrottle;
@@ -201,22 +200,9 @@ class Receiver : public Task {
         m_trainingMax = 0;
     }
 
-    float constrainRaw(uint8_t channel)
+    float constrainRaw(const float value)
     {
-        auto sample = devConvert(m_channelData, channel);
-
-        return sample == 0 ?  sample : constrain_f(sample, PWM_PULSE_MIN, PWM_PULSE_MAX);
-    }
-
-    void readChannelsAndApplyRanges(void)
-    {
-        m_rawThrottle = constrainRaw(0);
-        m_rawRoll     = constrainRaw(1);
-        m_rawPitch    = constrainRaw(2);
-        m_rawYaw      = constrainRaw(3);
-
-        m_rawAux1 = devConvert(m_channelData, 4);
-        m_rawAux2 = devConvert(m_channelData, 5);
+        return value == 0 ?  value : constrain_f(value, PWM_PULSE_MIN, PWM_PULSE_MAX);
     }
 
     int16_t lookupThrottle(const int32_t tmp)
@@ -280,8 +266,11 @@ class Receiver : public Task {
         m_dataProcessingRequired = false;
         m_nextUpdateAtUs = usec + DELAY_15_HZ;
 
-        readChannelsAndApplyRanges();
-
+        m_rawThrottle = constrainRaw(m_rawThrottle);
+        m_rawRoll     = constrainRaw(m_rawRoll);
+        m_rawPitch    = constrainRaw(m_rawPitch);
+        m_rawYaw      = constrainRaw(m_rawYaw);
+ 
         return true;
     }
 
@@ -626,14 +615,20 @@ class Receiver : public Task {
             return true;
         }
 
-        const auto frameStatus = devRead(m_channelData, &m_lastFrameTimeUs);
+        const auto frameStatus = 
+            devRead(m_rawThrottle,
+                    m_rawRoll,
+                    m_rawPitch,
+                    m_rawYaw,
+                    m_rawAux1,
+                    m_rawAux2,
+                    m_lastFrameTimeUs);
 
         if (frameStatus) {
             m_inFailsafeMode = false;
             signalReceived = true;
             if (signalReceived) {
-                m_needSignalBefore =
-                    usec + NEED_SIGNAL_MAX_DELAY_US;
+                m_needSignalBefore = usec + NEED_SIGNAL_MAX_DELAY_US;
             }
         }
 
@@ -712,9 +707,14 @@ class Receiver : public Task {
 
     virtual void devStart(void) = 0;
 
-    virtual bool devRead(uint16_t * chanData, uint32_t * frameTimeUs) = 0;
-
-    virtual float devConvert(uint16_t * chanData, uint8_t chanId) = 0;
+    virtual bool devRead(
+            float & rawThrottle,
+            float & rawRoll,
+            float & rawPitch,
+            float & rawYaw,
+            float & rawAux1,
+            float & rawAux2,
+            uint32_t & frameTimeUs) = 0;
 
     Receiver()
         : Task(33) // Hz
