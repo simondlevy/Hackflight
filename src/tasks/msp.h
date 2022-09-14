@@ -502,23 +502,6 @@ class Msp : public Task {
             }
         }
 
-        static void processReceivedReply( mspPort_t *msp, processReplyFnPtr processReplyFn)
-        {
-            mspPacket_t reply = {
-                .buf = {
-                    .ptr = msp->inBuf,
-                    .end = msp->inBuf + msp->dataSize,
-                },
-                .cmd = (int16_t)msp->cmdMSP,
-                .result = 0,
-                .direction = 0,
-            };
-
-            processReplyFn(&reply);
-
-            msp->state = IDLE;
-        }
-
     public:
 
         void triggerDebugging(void)
@@ -595,7 +578,7 @@ class Msp : public Task {
                                 mspPostProcessFn =
                                     processReceivedCommand(mspPort, fcProcessCommand, motors);
                             } else if (mspPort->packetType == PACKET_REPLY) {
-                                processReceivedReply(mspPort, fcProcessReply);
+                                mspPort->state = IDLE;
                             }
 
                             mspPort->state = IDLE;
