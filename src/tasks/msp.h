@@ -138,7 +138,7 @@ class Msp : public Task {
         // msp post process function, used for gracefully handling reboots, etc.
         typedef void (*mspPostProcessFnPtr)(void * port); 
 
-        typedef mspResult_e (*mspProcessCommandFnPtr)(
+        typedef mspResult_e (*processCommandFnPtr)(
                 //mspDescriptor_t srcDesc,
                 mspPacket_t *cmd,
                 mspPacket_t *reply,
@@ -148,7 +148,7 @@ class Msp : public Task {
                 Esc * esc,
                 float * motors);
 
-        typedef void (*mspProcessReplyFnPtr)(mspPacket_t *cmd);
+        typedef void (*processReplyFnPtr)(mspPacket_t *cmd);
 
         typedef enum {
             IDLE,
@@ -296,7 +296,7 @@ class Msp : public Task {
             (void)reply;
         }
 
-        static bool serialProcessReceivedData(mspPort_t *mspPort, uint8_t c)
+        static bool processReceivedData(mspPort_t *mspPort, uint8_t c)
         {
             switch (mspPort->state) {
                 default:
@@ -438,9 +438,9 @@ class Msp : public Task {
                     crcBuf, crcLen);
         }
 
-        static mspPostProcessFnPtr serialProcessReceivedCommand(
+        static mspPostProcessFnPtr processReceivedCommand(
                 mspPort_t *msp,
-                mspProcessCommandFnPtr mspProcessCommandFn,
+                processCommandFnPtr processCommandFn,
                 VehicleState * vstate,
                 Receiver::sticks_t * rxax,
                 Esc * esc,
@@ -464,7 +464,7 @@ class Msp : public Task {
             };
 
             mspPostProcessFnPtr mspPostProcessFn = NULL;
-            const auto status = mspProcessCommandFn(
+            const auto status = processCommandFn(
                     &command,
                     &reply,
                     &mspPostProcessFn,
@@ -506,9 +506,7 @@ class Msp : public Task {
             }
         }
 
-        static void serialProcessReceivedReply(
-                mspPort_t *msp,
-                mspProcessReplyFnPtr mspProcessReplyFn)
+        static void processReceivedReply( mspPort_t *msp, processReplyFnPtr processReplyFn)
         {
             mspPacket_t reply = {
                 .buf = {
@@ -520,7 +518,7 @@ class Msp : public Task {
                 .direction = 0,
             };
 
-            mspProcessReplyFn(&reply);
+            processReplyFn(&reply);
 
             msp->state = IDLE;
         }
@@ -587,7 +585,7 @@ class Msp : public Task {
                     while (serialBytesAvailable(mspPort->port)) {
 
                         const auto c = serialRead(mspPort->port);
-                        const auto consumed = serialProcessReceivedData(mspPort, c);
+                        const auto consumed = processReceivedData(mspPort, c);
 
                         if (!consumed && !m_arming->isArmed()) {
                             evaualteNonMspData(mspPort, c);
@@ -596,7 +594,7 @@ class Msp : public Task {
                         if (mspPort->state == COMMAND_RECEIVED) {
                             if (mspPort->packetType == PACKET_COMMAND) {
                                 mspPostProcessFn =
-                                    serialProcessReceivedCommand(
+                                    processReceivedCommand(
                                             mspPort,
                                             fcProcessCommand,
                                             m_vstate,
@@ -604,7 +602,7 @@ class Msp : public Task {
                                             m_esc,
                                             motors);
                             } else if (mspPort->packetType == PACKET_REPLY) {
-                                serialProcessReceivedReply(mspPort, fcProcessReply);
+                                processReceivedReply(mspPort, fcProcessReply);
                             }
 
                             mspPort->state = IDLE;
