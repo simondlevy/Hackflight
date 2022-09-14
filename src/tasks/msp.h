@@ -56,7 +56,6 @@ class Msp : public Task {
 
         Esc *                m_esc;
         Arming *             m_arming;
-        Receiver::sticks_t * m_rxSticks;
         Receiver *           m_receiver;
         VehicleState *       m_vstate;
 
@@ -197,12 +196,12 @@ class Msp : public Task {
             switch (cmdMSP) {
 
                 case RC:
-                    sbufWriteU16(dst, m_rxSticks->demands.throttle); 
-                    sbufWriteU16(dst, m_rxSticks->demands.roll);
-                    sbufWriteU16(dst, m_rxSticks->demands.pitch);
-                    sbufWriteU16(dst, m_rxSticks->demands.yaw);
-                    sbufWriteU16(dst, scale(m_rxSticks->aux1));
-                    sbufWriteU16(dst, scale(m_rxSticks->aux2));
+                    sbufWriteU16(dst, m_receiver->getRawThrottle());
+                    sbufWriteU16(dst, m_receiver->getRawRoll());
+                    sbufWriteU16(dst, m_receiver->getRawPitch());
+                    sbufWriteU16(dst, m_receiver->getRawYaw());
+                    sbufWriteU16(dst, scale(m_receiver->getRawAux1()));
+                    sbufWriteU16(dst, scale(m_receiver->getRawAux2()));
                     break;
 
                 case ATTITUDE:
@@ -470,12 +469,7 @@ class Msp : public Task {
 
         Msp() : Task(100) { } // Hz
 
-        void begin(
-                Esc * esc,
-                Arming * arming,
-                Receiver * receiver,
-                Receiver::sticks_t * rxSticks,
-                VehicleState * vstate)
+        void begin(Esc * esc, Arming * arming, Receiver * receiver, VehicleState * vstate)
         {
             memset(m_ports, 0, sizeof(m_ports));
 
@@ -492,8 +486,6 @@ class Msp : public Task {
             m_vstate = vstate;
 
             m_receiver = receiver;
-
-            m_rxSticks = rxSticks;
         }
 
         virtual void fun(uint32_t usec) override

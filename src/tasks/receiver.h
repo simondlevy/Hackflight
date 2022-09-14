@@ -34,12 +34,6 @@ class Receiver : public Task {
     friend class Hackflight;
     friend class Msp;
 
-    typedef struct {
-        Demands demands;
-        float aux1;
-        float aux2;
-    } sticks_t;
-
     static const uint8_t CHANNEL_COUNT = 6;
     static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
 
@@ -97,7 +91,6 @@ class Receiver : public Task {
     // maximum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-    sticks_t * m_sticks;
     Arming *   m_arming;
 
     bool m_gotPidReset;
@@ -122,10 +115,10 @@ class Receiver : public Task {
     Pt3Filter  m_feedforwardPt3Pitch;
     Pt3Filter  m_feedforwardPt3Yaw;
 
-    float      m_commandThrottle;
-    float      m_commandRoll;
-    float      m_commandPitch;
-    float      m_commandYaw;
+    float m_commandThrottle;
+    float m_commandRoll;
+    float m_commandPitch;
+    float m_commandYaw;
 
     float m_rawThrottle;
     float m_rawRoll;
@@ -134,7 +127,7 @@ class Receiver : public Task {
     float m_rawAux1;
     float m_rawAux2;
 
-    int16_t    m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
+    int16_t  m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
 
     uint8_t  m_autoSmoothnessFactorSetpoint;
     uint8_t  m_autoSmoothnessFactorThrottle;
@@ -240,14 +233,14 @@ class Receiver : public Task {
 
     void updateCommands(void)
     {
-        m_commandRoll  = updateCommand(m_rawRoll,  +1);
-        m_commandPitch = updateCommand(m_rawPitch, +1);
-        m_commandYaw   = updateCommand(m_rawYaw,   -1);
-
         auto tmp = constrain_f_i32(m_rawThrottle, 1050, PWM_MAX);
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
         m_commandThrottle = lookupThrottle(tmp2);
+
+        m_commandRoll  = updateCommand(m_rawRoll,  +1);
+        m_commandPitch = updateCommand(m_rawPitch, +1);
+        m_commandYaw   = updateCommand(m_rawYaw,   -1);
     }
 
     bool calculateChannels(const uint32_t usec)
@@ -592,7 +585,7 @@ class Receiver : public Task {
 
     bool aux1IsSet(void)
     {
-        return m_sticks->aux1 > 0.2;
+        return m_rawAux1 > 0.2;
     }
 
     bool throttleIsDown(void)
@@ -667,10 +660,9 @@ class Receiver : public Task {
                 setpointRates.z);
     }
 
-    void begin(Arming * arming, sticks_t * sticks)
+    void begin(Arming * arming)
     {
         m_arming = arming;
-        m_sticks = sticks;
 
         devStart();
     }
@@ -764,15 +756,38 @@ class Receiver : public Task {
                 break;
         }
 
-        m_sticks->demands.throttle = m_rawThrottle;
-        m_sticks->demands.roll     = m_rawRoll;
-        m_sticks->demands.pitch    = m_rawPitch;
-        m_sticks->demands.yaw      = m_rawYaw;
-        m_sticks->aux1             = m_rawAux1;
-        m_sticks->aux2             = m_rawAux2;
-
         if (pidItermResetReady) {
             m_gotPidReset = pidItermResetValue;
         }
+    }
+
+    float getRawThrottle(void)
+    {
+        return m_rawThrottle;
+    }
+
+    float getRawRoll(void)
+    {
+        return m_rawRoll;
+    }
+
+    float getRawPitch(void)
+    {
+        return m_rawPitch;
+    }
+
+    float getRawYaw(void)
+    {
+        return m_rawYaw;
+    }
+
+    float getRawAux1(void)
+    {
+        return m_rawAux1;
+    }
+
+    float getRawAux2(void)
+    {
+        return m_rawAux2;
     }
 };
