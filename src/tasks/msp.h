@@ -54,15 +54,13 @@ class Msp : public Task {
             return (int16_t)Math::rad2deg(rad);
         }
 
-        Esc * m_esc;
-        Arming * m_arming;
-
-
-        VehicleState * m_vstate;
+        Esc *                m_esc;
+        Arming *             m_arming;
+        Receiver::sticks_t * m_rxSticks;
+        Receiver *           m_receiver;
+        VehicleState *       m_vstate;
 
         float  motors[MAX_SUPPORTED_MOTORS];
-
-        Receiver::sticks_t * m_rxSticks;
 
         typedef struct sbuf_s {
             uint8_t *ptr;  
@@ -461,8 +459,15 @@ class Msp : public Task {
             };
 
             mspPostProcessFnPtr mspPostProcessFn = NULL;
+
             const auto status = processCommandFn(
-                    &command, &reply, &mspPostProcessFn, m_vstate, m_rxSticks, m_esc, motors);
+                    &command,
+                    &reply,
+                    &mspPostProcessFn,
+                    m_vstate,
+                    m_rxSticks,
+                    m_esc,
+                    motors);
 
             if (status != RESULT_NO_REPLY) {
                 sbufSwitchToReader(&reply.buf, outBufHead); // change streambuf direction
@@ -528,6 +533,7 @@ class Msp : public Task {
         void begin(
                 Esc * esc,
                 Arming * arming,
+                Receiver * receiver,
                 Receiver::sticks_t * rxSticks,
                 VehicleState * vstate)
         {
@@ -544,6 +550,8 @@ class Msp : public Task {
             serialDebugSetPort(m_dbgPort);
 
             m_vstate = vstate;
+
+            m_receiver = receiver;
 
             m_rxSticks = rxSticks;
         }

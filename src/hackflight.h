@@ -230,7 +230,7 @@ class Hackflight {
 
             m_attitude.begin(m_imu, &m_arming, &m_vstate);
 
-            m_msp.begin(m_esc, &m_arming, &m_rxSticks, &m_vstate);
+            m_msp.begin(m_esc, &m_arming, m_receiver, &m_rxSticks, &m_vstate);
 
             m_receiver->begin(&m_arming, &m_rxSticks);
 
