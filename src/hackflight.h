@@ -94,6 +94,8 @@ class Hackflight {
 
             Demands demands = m_receiver->getDemands(usec);
 
+            //printf("%3.3f  %3.3f\n", demands.throttle, demands.roll);
+
             auto motors = m_mixer->step(
                     demands,
                     m_vstate,

@@ -125,9 +125,10 @@ class SbusReceiver : public Receiver {
 
         serialPortIdentifier_e m_port;
 
-        float convert(const uint16_t value)
+        float convert(
+                const uint16_t value, const uint16_t dstmin=1000, const uint16_t dstmax=2000)
         {
-            return Receiver::convert(value, 172, 1811);
+            return Receiver::convert(value, 172, 1811, dstmin, dstmax);
         }
 
     protected:
@@ -163,11 +164,13 @@ class SbusReceiver : public Receiver {
                 frameTimeUs = channels->flags ? frameTimeUs : m_frameData.startAtUs;
 
                 throttle = convert(channels->chan0);
+
                 roll     = convert(channels->chan1);
                 pitch    = convert(channels->chan2);
                 yaw      = convert(channels->chan3);
-                aux1     = convert(channels->chan4);
-                aux2     = convert(channels->chan5);
+
+                aux1     = convert(channels->chan4, 0, 1);
+                aux2     = convert(channels->chan5, 0, 1);
             }
 
             return result;

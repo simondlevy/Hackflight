@@ -72,10 +72,10 @@ class DsmxReceiver : public Receiver {
 
         frameData_t m_frameData;
 
-        static float convert(const uint16_t value)
+        static float convert(
+                const uint16_t value, const uint16_t dstmin=1000, const uint16_t dstmax=2000)
         {
-            return Receiver::convert(value, 0, 2048);
-            //return 1000 * (1 + (value - 1) / (float)(CHAN_RESOLUTION-1));
+            return Receiver::convert(value, 0, 2048, dstmin, dstmax);
         }
 
      protected:
@@ -123,13 +123,15 @@ class DsmxReceiver : public Receiver {
                 }
 
                 throttle = convert(channelData[0]);
+
                 roll     = convert(channelData[1]);
                 pitch    = convert(channelData[2]);
                 yaw      = convert(channelData[3]);
-                aux1     = convert(channelData[4]);
+
+                aux1     = convert(channelData[4], 0, 1);
 
                 // Ignore channel 6 for now (problems with transmitter)
-                aux2     = 1000;
+                aux2     = 0;
 
             }
 

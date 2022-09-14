@@ -199,6 +199,11 @@ class Msp : public Task {
         bool      m_debugging = false;
         mspPort_t m_ports[MAX_PORT_COUNT];
 
+        static float scale(const float value)
+        {
+            return 1000 + 1000 * value;
+        }
+
         static bool processOutCommand(
                 int16_t cmdMSP,
                 sbuf_t *dst,
@@ -214,8 +219,8 @@ class Msp : public Task {
                     sbufWriteU16(dst, rxax->demands.roll);
                     sbufWriteU16(dst, rxax->demands.pitch);
                     sbufWriteU16(dst, rxax->demands.yaw);
-                    sbufWriteU16(dst, rxax->aux1);
-                    sbufWriteU16(dst, rxax->aux2);
+                    sbufWriteU16(dst, scale(rxax->aux1));
+                    sbufWriteU16(dst, scale(rxax->aux2));
                     break;
 
                 case ATTITUDE:

@@ -598,7 +598,7 @@ class Receiver : public Task {
 
     bool aux1IsSet(void)
     {
-        return m_sticks->aux1 > 1200;
+        return m_sticks->aux1 > 0.2;
     }
 
     bool throttleIsDown(void)
@@ -705,9 +705,14 @@ class Receiver : public Task {
 
     protected:
 
-    static float convert(const uint16_t value, const uint16_t min, const uint16_t max)
+    static float convert(
+            const uint16_t value,
+            const uint16_t srcmin,
+            const uint16_t srcmax,
+            const float dstmin=1000,
+            const float dstmax=2000)
     {
-        return 1000 + 1000 * ((float)value - min) / (max - min);
+        return dstmin + (dstmax-dstmin) * ((float)value - srcmin) / (srcmax - srcmin);
     }
 
     virtual void devStart(void) = 0;
