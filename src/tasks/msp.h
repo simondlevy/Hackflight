@@ -438,12 +438,9 @@ class Msp : public Task {
                     crcBuf, crcLen);
         }
 
-        static mspPostProcessFnPtr processReceivedCommand(
+        mspPostProcessFnPtr processReceivedCommand(
                 mspPort_t *msp,
                 processCommandFnPtr processCommandFn,
-                VehicleState * vstate,
-                Receiver::sticks_t * rxax,
-                Esc * esc,
                 float * motors)
         {
             static uint8_t mspSerialOutBuf[PORT_OUTBUF_SIZE];
@@ -465,13 +462,7 @@ class Msp : public Task {
 
             mspPostProcessFnPtr mspPostProcessFn = NULL;
             const auto status = processCommandFn(
-                    &command,
-                    &reply,
-                    &mspPostProcessFn,
-                    vstate,
-                    rxax,
-                    esc,
-                    motors);
+                    &command, &reply, &mspPostProcessFn, m_vstate, m_rxSticks, m_esc, motors);
 
             if (status != RESULT_NO_REPLY) {
                 sbufSwitchToReader(&reply.buf, outBufHead); // change streambuf direction
@@ -594,13 +585,7 @@ class Msp : public Task {
                         if (mspPort->state == COMMAND_RECEIVED) {
                             if (mspPort->packetType == PACKET_COMMAND) {
                                 mspPostProcessFn =
-                                    processReceivedCommand(
-                                            mspPort,
-                                            fcProcessCommand,
-                                            m_vstate,
-                                            m_rxSticks,
-                                            m_esc,
-                                            motors);
+                                    processReceivedCommand(mspPort, fcProcessCommand, motors);
                             } else if (mspPort->packetType == PACKET_REPLY) {
                                 processReceivedReply(mspPort, fcProcessReply);
                             }
