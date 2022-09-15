@@ -149,7 +149,6 @@ class Receiver : public Task {
     uint32_t m_previousFrameTimeUs;
     uint32_t m_refreshPeriod;
     uint16_t m_setpointCutoffFrequency;
-    uint8_t  m_setpointCutoffSetting;
     bool     m_signalReceived;
     state_e  m_state;
     uint16_t m_throttleCutoffFrequency;
@@ -346,13 +345,12 @@ class Receiver : public Task {
     {
         uint16_t oldCutoff = m_setpointCutoffFrequency;
 
-        if (m_setpointCutoffSetting == 0) {
-            m_setpointCutoffFrequency =
-                fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
-                        calcAutoSmoothingCutoff(
-                            m_averageFrameTimeUs,
-                            m_autoSmoothnessFactorSetpoint)); 
-        }
+        m_setpointCutoffFrequency =
+            fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
+                    calcAutoSmoothingCutoff(
+                        m_averageFrameTimeUs,
+                        m_autoSmoothnessFactorSetpoint)); 
+
         if (m_throttleCutoffSetting == 0) {
             m_throttleCutoffFrequency =
                 fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
@@ -396,10 +394,8 @@ class Receiver : public Task {
     {
         m_trainingSum += m_refreshPeriod;
         m_trainingCount++;
-        m_trainingMax =
-            fmaxf(m_trainingMax, m_refreshPeriod);
-        m_trainingMin =
-            fminf(m_trainingMin, m_refreshPeriod);
+        m_trainingMax = fmaxf(m_trainingMax, m_refreshPeriod);
+        m_trainingMin = fminf(m_trainingMin, m_refreshPeriod);
 
         // if we've collected enough samples then calculate the average and
         // reset the accumulation
@@ -412,9 +408,7 @@ class Receiver : public Task {
             m_trainingSum = m_trainingSum -
                 m_trainingMin - m_trainingMax; 
 
-            m_averageFrameTimeUs =
-                lrintf(m_trainingSum /
-                        (m_trainingCount - 2));
+            m_averageFrameTimeUs = lrintf(m_trainingSum / (m_trainingCount - 2));
             smoothingResetAccumulation();
             return true;
         }
@@ -426,9 +420,7 @@ class Receiver : public Task {
     {
         // if any rc smoothing cutoff is 0 (auto) then we need to calculate
         // cutoffs
-        return ((m_setpointCutoffSetting == 0) ||
-                (m_feedforwardCutoffSetting == 0) ||
-                (m_throttleCutoffSetting == 0)); 
+        return m_feedforwardCutoffSetting == 0 || m_throttleCutoffSetting == 0; 
     }
 
     void initializeSmoothingFilter(bool & calculatedCutoffs)
@@ -437,11 +429,10 @@ class Receiver : public Task {
         m_averageFrameTimeUs = 0;
         m_autoSmoothnessFactorSetpoint = 30;
         m_autoSmoothnessFactorThrottle = 30;
-        m_setpointCutoffSetting = 0;
         m_throttleCutoffSetting = 0;
         m_feedforwardCutoffSetting = 0;
         smoothingResetAccumulation();
-        m_setpointCutoffFrequency = m_setpointCutoffSetting;
+        m_setpointCutoffFrequency = 0;
         m_throttleCutoffFrequency = m_throttleCutoffSetting;
 
         if (m_feedforwardCutoffSetting == 0) {
