@@ -124,7 +124,6 @@ class Receiver : public Task {
 
     bool     m_auxiliaryProcessingRequired;
     bool     m_dataProcessingRequired;
-    bool     m_filterInitialized;
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
     bool     m_gotPidReset;
@@ -284,17 +283,11 @@ class Receiver : public Task {
         return throttleIsDown();
     }
 
-    float smoothingFilterApply(Pt3Filter * filter, const float dataToSmooth)
-    {
-        return m_filterInitialized ?  filter->apply(dataToSmooth) : dataToSmooth;
-    }
-
     auto processSmoothingFilter(const Axes & rawSetpoints) -> Axes
     {
         static bool _initializedFilter;
 
         if (!_initializedFilter) {
-            m_filterInitialized = false;
             smoothingResetAccumulation();
             m_setpointCutoffFrequency = 0;
             m_throttleCutoffFrequency = 0;
@@ -312,14 +305,9 @@ class Receiver : public Task {
             _dataToSmooth.yaw   = rawSetpoints.z;
         }
 
-        m_commandThrottle = smoothingFilterApply(
-                &m_filterThrottle,
-                _dataToSmooth.throttle);
+        m_commandThrottle = _dataToSmooth.throttle;
 
-        return Axes(
-                smoothingFilterApply(&m_filterRoll, _dataToSmooth.roll),
-                smoothingFilterApply(&m_filterPitch, _dataToSmooth.pitch),
-                smoothingFilterApply(&m_filterYaw, _dataToSmooth.yaw));
+        return Axes(_dataToSmooth.roll, _dataToSmooth.pitch, _dataToSmooth.yaw);
     }
 
     static float getRawSetpoint(const float command, const float divider)
