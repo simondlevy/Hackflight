@@ -137,7 +137,6 @@ class Receiver : public Task {
     Demands  m_dataToSmooth;
     uint16_t m_feedforwardCutoffFrequency;
     uint8_t  m_feedforwardCutoffSetting;
-    bool     m_feedforwardLpfInitialized;
     bool     m_filterInitialized;
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
@@ -307,8 +306,6 @@ class Receiver : public Task {
     void ratePidFeedforwardLpfInit(const uint16_t filterCutoff)
     {
         if (filterCutoff > 0) {
-
-            m_feedforwardLpfInitialized = true;
 
             m_feedforwardPt3Roll.init(filterCutoff);
             m_feedforwardPt3Pitch.init(filterCutoff);
