@@ -47,9 +47,13 @@ static SPI_InitTypeDef defaultInit = {
 static uint16_t spiDivisorToBRbits(SPI_TypeDef *instance, uint16_t divisor)
 {
     // SPI2 and SPI3 are on APB1/AHB1 which PCLK is half that of APB2/AHB2.
-    if (instance == SPI2 || instance == SPI3) {
+#if defined(STM32F410xx) || defined(STM32F411xE)
+    UNUSED(instance);
+#else
+     if (instance == SPI2 || instance == SPI3) {
         divisor /= 2; // Safe for divisor == 0 or 1
     }
+#endif
 
     divisor = constrain_u16(divisor, 2, 256);
 
