@@ -142,7 +142,6 @@ class Receiver : public Task {
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
     bool     m_inFailsafeMode;
-    bool     m_initializedThrottleTable;
     bool     m_isRateValid;
     uint32_t m_lastFrameTimeUs;
     uint32_t m_lastRxTimeUs;
@@ -195,7 +194,9 @@ class Receiver : public Task {
 
     int16_t lookupThrottle(const int32_t tmp)
     {
-        if (!m_initializedThrottleTable) {
+        static bool _initializedThrottleTable;
+
+        if (!_initializedThrottleTable) {
             for (auto i = 0; i < THROTTLE_LOOKUP_TABLE_SIZE; i++) {
                 const int16_t tmp2 = 10 * i - THR_MID8;
                 uint8_t y = tmp2 > 0 ?
@@ -211,7 +212,7 @@ class Receiver : public Task {
             }
         }
 
-        m_initializedThrottleTable = true;
+        _initializedThrottleTable = true;
 
         const auto tmp3 = tmp / 100;
 
