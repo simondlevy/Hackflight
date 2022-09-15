@@ -128,7 +128,6 @@ class Receiver : public Task {
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
     bool     m_gotPidReset;
-    bool     m_inFailsafeMode;
     bool     m_isRateValid;
     uint32_t m_lastFrameTimeUs;
     uint32_t m_lastRxTimeUs;
@@ -367,7 +366,6 @@ class Receiver : public Task {
                     m_lastFrameTimeUs);
 
         if (frameStatus) {
-            m_inFailsafeMode = false;
             signalReceived = true;
             if (signalReceived) {
                 m_needSignalBefore = usec + NEED_SIGNAL_MAX_DELAY_US;
@@ -474,8 +472,7 @@ class Receiver : public Task {
 
     void fun(uint32_t usec)
     {
-        const auto haveSignal =
-            (usec - m_lastFrameTimeUs) < (int32_t)(1000*TIMEOUT_MS);
+        const auto haveSignal = (usec - m_lastFrameTimeUs) < (int32_t)(1000*TIMEOUT_MS);
 
         auto pidItermResetReady = false;
         auto pidItermResetValue = false;
