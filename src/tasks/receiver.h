@@ -41,40 +41,6 @@ class Receiver : public Task {
 
     static const uint32_t TIMEOUT_MS = 500;
 
-    // Minimum rc smoothing cutoff frequency
-    static const uint16_t SMOOTHING_CUTOFF_MIN_HZ = 15;    
-
-    // The value to use for "auto" when interpolated feedforward is enabled
-    static const uint16_t SMOOTHING_FEEDFORWARD_INITIAL_HZ = 100;   
-
-    // Guard time to wait after retraining to prevent retraining again too
-    // quickly
-    static const uint16_t SMOOTHING_FILTER_RETRAINING_DELAY_MS = 2000;  
-
-    // Number of rx frame rate samples to average during frame rate changes
-    static const uint8_t  SMOOTHING_FILTER_RETRAINING_SAMPLES = 20;    
-
-    // Time to wait after power to let the PID loop stabilize before starting
-    // average frame rate calculation
-    static const uint16_t SMOOTHING_FILTER_STARTUP_DELAY_MS = 5000;  
-
-    // Additional time to wait after receiving first valid rx frame before
-    // initial training starts
-    static const uint16_t SMOOTHING_FILTER_TRAINING_DELAY_MS = 1000;  
-
-    // Number of rx frame rate samples to average during initial training
-    static const uint8_t  SMOOTHING_FILTER_TRAINING_SAMPLES = 50;    
-
-    // Look for samples varying this much from the current detected frame
-    // rate to initiate retraining
-    static const uint8_t  SMOOTHING_RATE_CHANGE_PERCENT = 20;    
-
-    // 65.5ms or 15.26hz
-    static const uint32_t SMOOTHING_RATE_MAX_US = 65500; 
-
-    // 0.950ms to fit 1kHz without an issue
-    static const uint32_t SMOOTHING_RATE_MIN_US = 950;   
-
     static const uint32_t DELAY_15_HZ = 1000000 / 15;
 
     static const uint32_t NEED_SIGNAL_MAX_DELAY_US = 1000000 / 10;
@@ -103,70 +69,29 @@ class Receiver : public Task {
         STATE_COUNT
     } state_e;
 
-    Pt3Filter m_filterThrottle;
-    Pt3Filter m_filterRoll;
-    Pt3Filter m_filterPitch;
-    Pt3Filter m_filterYaw;
-
-    float m_commandThrottle;
-    float m_commandRoll;
-    float m_commandPitch;
-    float m_commandYaw;
-
-    float m_rawThrottle;
-    float m_rawRoll;
-    float m_rawPitch;
-    float m_rawYaw;
-    float m_rawAux1;
-    float m_rawAux2;
-
-    int16_t  m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
-
     bool     m_auxiliaryProcessingRequired;
+    float    m_commandThrottle;
+    float    m_commandRoll;
+    float    m_commandPitch;
+    float    m_commandYaw;
     bool     m_dataProcessingRequired;
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
     bool     m_gotPidReset;
     uint32_t m_lastFrameTimeUs;
+    int16_t  m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
     uint32_t m_needSignalBefore;
     uint32_t m_nextUpdateAtUs;
     uint32_t m_previousFrameTimeUs;
-    uint32_t m_refreshPeriod;
-    uint16_t m_setpointCutoffFrequency;
+    float    m_rawThrottle;
+    float    m_rawRoll;
+    float    m_rawPitch;
+    float    m_rawYaw;
+    float    m_rawAux1;
+    float    m_rawAux2;
     bool     m_signalReceived;
     state_e  m_state;
-    uint16_t m_throttleCutoffFrequency;
-    uint32_t m_trainingCount;
-    uint16_t m_trainingMax;
-    uint16_t m_trainingMin;
-    float    m_trainingSum;
     uint32_t m_validFrameTimeMs;
-
-    // Determine a cutoff frequency based on smoothness factor and calculated
-    // average rx frame time
-    static int calcAutoSmoothingCutoff(
-            const uint32_t avgRxFrameTimeUs,
-            const uint8_t autoSmoothnessFactor)
-    {
-        if (avgRxFrameTimeUs > 0) {
-            const auto cutoffFactor =
-                1.5f / (1.0f + (autoSmoothnessFactor / 10.0f));
-            auto cutoff =
-                (1 / (avgRxFrameTimeUs * 1e-6f));  // link frequency
-            cutoff = cutoff * cutoffFactor;
-            return lrintf(cutoff);
-        } else {
-            return 0;
-        }
-    }
-
-    void smoothingResetAccumulation(void)
-    {
-        m_trainingSum = 0;
-        m_trainingCount = 0;
-        m_trainingMin = UINT16_MAX;
-        m_trainingMax = 0;
-    }
 
     float constrainRaw(const float value)
     {
@@ -276,25 +201,11 @@ class Receiver : public Task {
 
         _lastRxTimeUs = usec;
 
-        m_refreshPeriod =
-            constrain_i32_u32(refreshPeriodUs, SMOOTHING_RATE_MIN_US,
-                    SMOOTHING_RATE_MAX_US);
-
         return throttleIsDown();
     }
 
     auto processSmoothingFilter(const Axes & rawSetpoints) -> Axes
     {
-        static bool _initializedFilter;
-
-        if (!_initializedFilter) {
-            smoothingResetAccumulation();
-            m_setpointCutoffFrequency = 0;
-            m_throttleCutoffFrequency = 0;
-        }
-
-        _initializedFilter = true;
-
         static Demands _dataToSmooth;
 
         if (m_gotNewData) {
