@@ -339,9 +339,7 @@ class Receiver : public Task {
 
     float smoothingFilterApply(Pt3Filter * filter, const float dataToSmooth)
     {
-        return m_filterInitialized ?
-            filter->apply(dataToSmooth) :
-            dataToSmooth;
+        return m_filterInitialized ?  filter->apply(dataToSmooth) : dataToSmooth;
     }
 
     void setSmoothingFilterCutoffs(void)
@@ -364,8 +362,7 @@ class Receiver : public Task {
         }
 
         // initialize or update the Setpoint filter
-        if ((m_setpointCutoffFrequency != oldCutoff) ||
-                !m_filterInitialized) {
+        if ((m_setpointCutoffFrequency != oldCutoff) || !m_filterInitialized) {
 
             m_filterThrottle.init(m_throttleCutoffFrequency);
 
