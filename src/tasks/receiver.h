@@ -438,7 +438,7 @@ class Receiver : public Task {
                 (m_throttleCutoffSetting == 0)); 
     }
 
-    void initializeFilter(void)
+    void initializeSmoothingFilter(void)
     {
         m_filterInitialized = false;
         m_averageFrameTimeUs = 0;
@@ -477,86 +477,87 @@ class Receiver : public Task {
         }
     }
 
+    void runSmoothingFilter(uint32_t usec)
+    {
+        const auto currentTimeMs = usec / 1000;
+
+        // If the filter cutoffs in auto mode, and we have good rx data, then
+        // determine the average rx frame rate and use that to calculate the
+        // filter cutoff frequencies
+
+        // skip during FC initialization
+        if ((currentTimeMs > SMOOTHING_FILTER_STARTUP_DELAY_MS))
+        {
+            if (m_signalReceived && m_isRateValid) {
+
+                // set the guard time expiration if it's not set
+                if (m_validFrameTimeMs == 0) {
+                    m_validFrameTimeMs =
+                        currentTimeMs + (m_filterInitialized ?
+                         SMOOTHING_FILTER_RETRAINING_DELAY_MS :
+                         SMOOTHING_FILTER_TRAINING_DELAY_MS);
+                } else {
+                }
+
+                // if the guard time has expired then process the
+                // rx frame time
+                if (currentTimeMs > m_validFrameTimeMs) {
+                    auto accumulateSample = true;
+
+                    // During initial training process all samples.
+                    // During retraining check samples to determine
+                    // if they vary by more than the limit
+                    // percentage.
+                    if (m_filterInitialized) {
+                        const auto percentChange =
+                            fabs((m_refreshPeriod - m_averageFrameTimeUs) /
+                                    (float)m_averageFrameTimeUs) *
+                            100;
+
+                        if (percentChange <
+                                SMOOTHING_RATE_CHANGE_PERCENT) {
+                            // We received a sample that wasn't
+                            // more than the limit percent so reset
+                            // the accumulation During retraining
+                            // we need a contiguous block of
+                            // samples that are all significantly
+                            // different than the current average
+                            smoothingResetAccumulation();
+                            accumulateSample = false;
+                        }
+                    }
+
+                    // accumlate the sample into the average
+                    if (accumulateSample) { 
+                        if (smoothingAccumulateSample()) {
+                            // the required number of samples were
+                            // collected so set the filter cutoffs, but
+                            // only if smoothing is active
+                            setSmoothingFilterCutoffs();
+                            m_filterInitialized = true;
+                            m_validFrameTimeMs = 0;
+                        }
+                    }
+                }
+            } else {
+                smoothingResetAccumulation();
+            }
+        }
+    }
+
     auto processSmoothingFilter(const uint32_t usec, const Axes & rawSetpoints) -> Axes
     {
         if (!m_initializedFilter) {
-            initializeFilter();
+            initializeSmoothingFilter();
         }
 
         m_initializedFilter = true;
 
         if (m_gotNewData) {
-            // for auto calculated filters we need to examine each rx frame
-            // interval
+
             if (m_calculatedCutoffs) {
 
-                const auto currentTimeMs = usec / 1000;
-
-                // If the filter cutoffs in auto mode, and we have good rx
-                // data, then determine the average rx frame rate and use
-                // that to calculate the filter cutoff frequencies
-
-                // skip during FC initialization
-                if ((currentTimeMs > SMOOTHING_FILTER_STARTUP_DELAY_MS))
-                {
-                    if (m_signalReceived && m_isRateValid) {
-
-                        // set the guard time expiration if it's not set
-                        if (m_validFrameTimeMs == 0) {
-                            m_validFrameTimeMs =
-                                currentTimeMs +
-                                (m_filterInitialized ?
-                                 SMOOTHING_FILTER_RETRAINING_DELAY_MS :
-                                 SMOOTHING_FILTER_TRAINING_DELAY_MS);
-                        } else {
-                        }
-
-                        // if the guard time has expired then process the
-                        // rx frame time
-                        if (currentTimeMs > m_validFrameTimeMs) {
-                            auto accumulateSample = true;
-
-                            // During initial training process all samples.
-                            // During retraining check samples to determine
-                            // if they vary by more than the limit
-                            // percentage.
-                            if (m_filterInitialized) {
-                                const auto percentChange =
-                                    fabs((m_refreshPeriod -
-                                                m_averageFrameTimeUs) /
-                                            (float)m_averageFrameTimeUs) *
-                                    100;
-
-                                if (percentChange <
-                                        SMOOTHING_RATE_CHANGE_PERCENT) {
-                                    // We received a sample that wasn't
-                                    // more than the limit percent so reset
-                                    // the accumulation During retraining
-                                    // we need a contiguous block of
-                                    // samples that are all significantly
-                                    // different than the current average
-                                    smoothingResetAccumulation();
-                                    accumulateSample = false;
-                                }
-                            }
-
-                            // accumlate the sample into the average
-                            if (accumulateSample) { 
-                                if (smoothingAccumulateSample()) {
-                                    // the required number of samples were
-                                    // collected so set the filter cutoffs, but
-                                    // only if smoothing is active
-                                    setSmoothingFilterCutoffs();
-                                    m_filterInitialized = true;
-                                    m_validFrameTimeMs = 0;
-                                }
-                            }
-
-                        }
-                    } else {
-                        smoothingResetAccumulation();
-                    }
-                }
+                runSmoothingFilter(usec);
             }
 
             m_dataToSmooth.throttle = m_commandThrottle;
