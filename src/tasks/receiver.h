@@ -75,21 +75,23 @@ class Receiver : public Task {
     // 0.950ms to fit 1kHz without an issue
     static const uint32_t SMOOTHING_RATE_MIN_US = 950;   
 
-    static const uint32_t DELAY_15_HZ       = 1000000 / 15;
+    static const uint32_t DELAY_15_HZ = 1000000 / 15;
 
-    static const uint32_t NEED_SIGNAL_MAX_DELAY_US    = 1000000 / 10;
+    static const uint32_t NEED_SIGNAL_MAX_DELAY_US = 1000000 / 10;
 
-    static const uint16_t  RATE_LIMIT                  = 1998;
-    static constexpr float THR_EXPO8                   = 0;
-    static constexpr float THR_MID8                    = 50;
-    static constexpr float COMMAND_DIVIDER             = 500;
-    static constexpr float YAW_COMMAND_DIVIDER         = 500;
+    static const uint16_t  RATE_LIMIT          = 1998;
+    static constexpr float THR_EXPO8           = 0;
+    static constexpr float THR_MID8            = 50;
+    static constexpr float COMMAND_DIVIDER     = 500;
+    static constexpr float YAW_COMMAND_DIVIDER = 500;
 
     // minimum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MIN   = 750;   
 
     // maximum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MAX   = 2250;  
+
+    static const uint8_t AUTO_SMOOTHNESS_FACTOR_SETPOINT = 30;
 
     Arming * m_arming;
 
@@ -120,13 +122,8 @@ class Receiver : public Task {
 
     int16_t  m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
 
-    uint8_t  m_autoSmoothnessFactorSetpoint;
-    uint8_t  m_autoSmoothnessFactorThrottle;
     bool     m_auxiliaryProcessingRequired;
-    uint32_t m_averageFrameTimeUs;
     bool     m_dataProcessingRequired;
-    Demands  m_dataToSmooth;
-    uint16_t m_feedforwardCutoffFrequency;
     bool     m_filterInitialized;
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
@@ -297,49 +294,37 @@ class Receiver : public Task {
         return m_filterInitialized ?  filter->apply(dataToSmooth) : dataToSmooth;
     }
 
-    void initializeSmoothingFilter(void)
-    {
-        m_filterInitialized = false;
-        m_averageFrameTimeUs = 0;
-        m_autoSmoothnessFactorSetpoint = 30;
-        m_autoSmoothnessFactorThrottle = 30;
-        smoothingResetAccumulation();
-        m_setpointCutoffFrequency = 0;
-        m_throttleCutoffFrequency = 0;
-
-        // calculate and use an initial derivative cutoff until the RC
-        // interval is known
-        const auto cutoffFactor = 1.5f / (1.0f + (m_autoSmoothnessFactorSetpoint / 10.0f));
-        auto ffCutoff = SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
-        m_feedforwardCutoffFrequency = lrintf(ffCutoff);
-    }
-
     auto processSmoothingFilter(const Axes & rawSetpoints) -> Axes
     {
         static bool _initializedFilter;
 
         if (!_initializedFilter) {
-            initializeSmoothingFilter();
+            m_filterInitialized = false;
+            smoothingResetAccumulation();
+            m_setpointCutoffFrequency = 0;
+            m_throttleCutoffFrequency = 0;
         }
 
         _initializedFilter = true;
 
+        static Demands _dataToSmooth;
+
         if (m_gotNewData) {
 
-            m_dataToSmooth.throttle = m_commandThrottle;
-            m_dataToSmooth.roll  = rawSetpoints.x;
-            m_dataToSmooth.pitch = rawSetpoints.y;
-            m_dataToSmooth.yaw   = rawSetpoints.z;
+            _dataToSmooth.throttle = m_commandThrottle;
+            _dataToSmooth.roll  = rawSetpoints.x;
+            _dataToSmooth.pitch = rawSetpoints.y;
+            _dataToSmooth.yaw   = rawSetpoints.z;
         }
 
         m_commandThrottle = smoothingFilterApply(
                 &m_filterThrottle,
-                m_dataToSmooth.throttle);
+                _dataToSmooth.throttle);
 
         return Axes(
-                smoothingFilterApply(&m_filterRoll, m_dataToSmooth.roll),
-                smoothingFilterApply(&m_filterPitch, m_dataToSmooth.pitch),
-                smoothingFilterApply(&m_filterYaw, m_dataToSmooth.yaw));
+                smoothingFilterApply(&m_filterRoll, _dataToSmooth.roll),
+                smoothingFilterApply(&m_filterPitch, _dataToSmooth.pitch),
+                smoothingFilterApply(&m_filterYaw, _dataToSmooth.yaw));
     }
 
     static float getRawSetpoint(const float command, const float divider)
