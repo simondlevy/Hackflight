@@ -437,10 +437,8 @@ class Receiver : public Task {
                 (m_throttleCutoffSetting == 0)); 
     }
 
-    bool initializeSmoothingFilter(void)
+    void initializeSmoothingFilter(bool & calculatedCutoffs)
     {
-        auto calculatedCutoffs = false;
-
         m_filterInitialized = false;
         m_averageFrameTimeUs = 0;
         m_autoSmoothnessFactorSetpoint = 30;
@@ -471,8 +469,6 @@ class Receiver : public Task {
             setSmoothingFilterCutoffs();
             m_filterInitialized = true;
         }
-
-        return calculatedCutoffs;
     }
 
     void runSmoothingFilter(uint32_t usec)
@@ -500,26 +496,24 @@ class Receiver : public Task {
                 // if the guard time has expired then process the
                 // rx frame time
                 if (currentTimeMs > m_validFrameTimeMs) {
+
                     auto accumulateSample = true;
 
-                    // During initial training process all samples.
-                    // During retraining check samples to determine
-                    // if they vary by more than the limit
-                    // percentage.
+                    // During initial training process all samples.  During
+                    // retraining check samples to determine if they vary by
+                    // more than the limit percentage.
                     if (m_filterInitialized) {
                         const auto percentChange =
                             fabs((m_refreshPeriod - m_averageFrameTimeUs) /
                                     (float)m_averageFrameTimeUs) *
                             100;
 
-                        if (percentChange <
-                                SMOOTHING_RATE_CHANGE_PERCENT) {
-                            // We received a sample that wasn't
-                            // more than the limit percent so reset
-                            // the accumulation During retraining
-                            // we need a contiguous block of
-                            // samples that are all significantly
-                            // different than the current average
+                        if (percentChange < SMOOTHING_RATE_CHANGE_PERCENT) {
+                            // We received a sample that wasn't more than the
+                            // limit percent so reset the accumulation During
+                            // retraining we need a contiguous block of samples
+                            // that are all significantly different than the
+                            // current average
                             smoothingResetAccumulation();
                             accumulateSample = false;
                         }
@@ -528,9 +522,9 @@ class Receiver : public Task {
                     // accumlate the sample into the average
                     if (accumulateSample) { 
                         if (smoothingAccumulateSample()) {
-                            // the required number of samples were
-                            // collected so set the filter cutoffs, but
-                            // only if smoothing is active
+                            // the required number of samples were collected so
+                            // set the filter cutoffs, but only if smoothing is
+                            // active
                             setSmoothingFilterCutoffs();
                             m_filterInitialized = true;
                             m_validFrameTimeMs = 0;
@@ -549,7 +543,7 @@ class Receiver : public Task {
         static bool _calculatedCutoffs;
 
         if (!_initializedFilter) {
-            _calculatedCutoffs = initializeSmoothingFilter();
+            initializeSmoothingFilter(_calculatedCutoffs);
         }
 
         _initializedFilter = true;
