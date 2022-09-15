@@ -128,7 +128,6 @@ class Receiver : public Task {
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
     bool     m_gotPidReset;
-    bool     m_isRateValid;
     uint32_t m_lastFrameTimeUs;
     uint32_t m_lastRxTimeUs;
     uint32_t m_needSignalBefore;
@@ -276,10 +275,6 @@ class Receiver : public Task {
         }
 
         m_lastRxTimeUs = usec;
-
-        m_isRateValid =
-            ((uint32_t)refreshPeriodUs >= SMOOTHING_RATE_MIN_US &&
-             (uint32_t)refreshPeriodUs <= SMOOTHING_RATE_MAX_US);
 
         m_refreshPeriod =
             constrain_i32_u32(refreshPeriodUs, SMOOTHING_RATE_MIN_US,
