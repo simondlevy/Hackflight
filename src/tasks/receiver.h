@@ -250,16 +250,16 @@ class Receiver : public Task {
 
     auto getNewDemands(const Axes & rawSetpoints) -> Axes
     {
-        static Axes _dataToSmooth;
+        static Axes _axes;
 
         if (m_gotNewData) {
 
-            _dataToSmooth.x = rawSetpoints.x;
-            _dataToSmooth.y = rawSetpoints.y;
-            _dataToSmooth.z = rawSetpoints.z;
+            _axes.x = rawSetpoints.x;
+            _axes.y = rawSetpoints.y;
+            _axes.z = rawSetpoints.z;
         }
 
-        return Axes(_dataToSmooth.x, _dataToSmooth.y, _dataToSmooth.z);
+        return Axes(_axes.x, _axes.y, _axes.z);
     }
 
     // Runs in fast (inner, core) loop
