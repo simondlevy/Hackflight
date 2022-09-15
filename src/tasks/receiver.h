@@ -136,7 +136,6 @@ class Receiver : public Task {
     bool     m_dataProcessingRequired;
     Demands  m_dataToSmooth;
     uint16_t m_feedforwardCutoffFrequency;
-    uint8_t  m_feedforwardCutoffSetting;
     bool     m_filterInitialized;
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
@@ -374,13 +373,13 @@ class Receiver : public Task {
 
         // update or initialize the FF filter
         oldCutoff = m_feedforwardCutoffFrequency;
-        if (m_feedforwardCutoffSetting == 0) {
-            m_feedforwardCutoffFrequency =
-                fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
-                        calcAutoSmoothingCutoff(
-                            m_averageFrameTimeUs,
-                            m_autoSmoothnessFactorSetpoint)); 
-        }
+
+        m_feedforwardCutoffFrequency =
+            fmaxf(SMOOTHING_CUTOFF_MIN_HZ,
+                    calcAutoSmoothingCutoff(
+                        m_averageFrameTimeUs,
+                        m_autoSmoothnessFactorSetpoint)); 
+
         if (!m_filterInitialized) {
             ratePidFeedforwardLpfInit(
                     m_feedforwardCutoffFrequency);
@@ -420,7 +419,7 @@ class Receiver : public Task {
     {
         // if any rc smoothing cutoff is 0 (auto) then we need to calculate
         // cutoffs
-        return m_feedforwardCutoffSetting == 0 || m_throttleCutoffSetting == 0; 
+        return m_throttleCutoffSetting == 0; 
     }
 
     void initializeSmoothingFilter(bool & calculatedCutoffs)
@@ -430,21 +429,15 @@ class Receiver : public Task {
         m_autoSmoothnessFactorSetpoint = 30;
         m_autoSmoothnessFactorThrottle = 30;
         m_throttleCutoffSetting = 0;
-        m_feedforwardCutoffSetting = 0;
         smoothingResetAccumulation();
         m_setpointCutoffFrequency = 0;
         m_throttleCutoffFrequency = m_throttleCutoffSetting;
 
-        if (m_feedforwardCutoffSetting == 0) {
-            // calculate and use an initial derivative cutoff until the RC
-            // interval is known
-            const auto cutoffFactor = 1.5f /
-                (1.0f + (m_autoSmoothnessFactorSetpoint / 10.0f));
-            auto ffCutoff = SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
-            m_feedforwardCutoffFrequency = lrintf(ffCutoff);
-        } else {
-            m_feedforwardCutoffFrequency = m_feedforwardCutoffSetting;
-        }
+        // calculate and use an initial derivative cutoff until the RC
+        // interval is known
+        const auto cutoffFactor = 1.5f / (1.0f + (m_autoSmoothnessFactorSetpoint / 10.0f));
+        auto ffCutoff = SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
+        m_feedforwardCutoffFrequency = lrintf(ffCutoff);
 
         calculatedCutoffs = smoothingAutoCalculate();
 
@@ -473,8 +466,8 @@ class Receiver : public Task {
                 if (m_validFrameTimeMs == 0) {
                     m_validFrameTimeMs =
                         currentTimeMs + (m_filterInitialized ?
-                         SMOOTHING_FILTER_RETRAINING_DELAY_MS :
-                         SMOOTHING_FILTER_TRAINING_DELAY_MS);
+                                SMOOTHING_FILTER_RETRAINING_DELAY_MS :
+                                SMOOTHING_FILTER_TRAINING_DELAY_MS);
                 } else {
                 }
 
