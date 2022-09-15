@@ -129,7 +129,6 @@ class Receiver : public Task {
     bool     m_gotNewData;
     bool     m_gotPidReset;
     uint32_t m_lastFrameTimeUs;
-    uint32_t m_lastRxTimeUs;
     uint32_t m_needSignalBefore;
     uint32_t m_nextUpdateAtUs;
     uint32_t m_previousFrameTimeUs;
@@ -264,17 +263,19 @@ class Receiver : public Task {
 
     bool processData(const uint32_t usec)
     {
+        static uint32_t _lastRxTimeUs;
+
         int32_t frameAgeUs;
 
         auto refreshPeriodUs = getFrameDelta(usec, &frameAgeUs);
 
-        if (!refreshPeriodUs || cmpTimeUs(usec, m_lastRxTimeUs) <= frameAgeUs) {
+        if (!refreshPeriodUs || cmpTimeUs(usec, _lastRxTimeUs) <= frameAgeUs) {
 
             // calculate a delta here if not supplied by the protocol
-            refreshPeriodUs = cmpTimeUs(usec, m_lastRxTimeUs); 
+            refreshPeriodUs = cmpTimeUs(usec, _lastRxTimeUs); 
         }
 
-        m_lastRxTimeUs = usec;
+        _lastRxTimeUs = usec;
 
         m_refreshPeriod =
             constrain_i32_u32(refreshPeriodUs, SMOOTHING_RATE_MIN_US,
