@@ -34,10 +34,7 @@ class Receiver : public Task {
     friend class Hackflight;
     friend class Msp;
 
-    static const uint8_t CHANNEL_COUNT = 6;
     static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
-
-    static const uint8_t RATE = 67;
 
     static const uint32_t TIMEOUT_MS = 500;
 
@@ -49,15 +46,12 @@ class Receiver : public Task {
     static constexpr float THR_EXPO8           = 0;
     static constexpr float THR_MID8            = 50;
     static constexpr float COMMAND_DIVIDER     = 500;
-    static constexpr float YAW_COMMAND_DIVIDER = 500;
 
     // minimum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MIN   = 750;   
 
     // maximum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MAX   = 2250;  
-
-    static const uint8_t AUTO_SMOOTHNESS_FACTOR_SETPOINT = 30;
 
     Arming * m_arming;
 
@@ -80,7 +74,6 @@ class Receiver : public Task {
     bool     m_gotPidReset;
     uint32_t m_lastFrameTimeUs;
     int16_t  m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
-    uint32_t m_needSignalBefore;
     uint32_t m_nextUpdateAtUs;
     uint32_t m_previousFrameTimeUs;
     float    m_rawThrottle;
@@ -89,9 +82,7 @@ class Receiver : public Task {
     float    m_rawYaw;
     float    m_rawAux1;
     float    m_rawAux2;
-    bool     m_signalReceived;
     state_e  m_state;
-    uint32_t m_validFrameTimeMs;
 
     float constrainRaw(const float value)
     {
@@ -221,9 +212,9 @@ class Receiver : public Task {
         return Axes(_dataToSmooth.roll, _dataToSmooth.pitch, _dataToSmooth.yaw);
     }
 
-    static float getRawSetpoint(const float command, const float divider)
+    static float getRawSetpoint(const float command)
     {
-        auto commandf = command / divider;
+        auto commandf = command / COMMAND_DIVIDER;
 
         auto commandfAbs = fabsf(commandf);
 
@@ -262,15 +253,6 @@ class Receiver : public Task {
 
         if (frameStatus) {
             signalReceived = true;
-            if (signalReceived) {
-                m_needSignalBefore = usec + NEED_SIGNAL_MAX_DELAY_US;
-            }
-        }
-
-        if (signalReceived) {
-            m_signalReceived = true;
-        } else if (usec >= m_needSignalBefore) {
-            m_signalReceived = false;
         }
 
         if ((signalReceived && useDataDrivenProcessing) ||
@@ -291,9 +273,9 @@ class Receiver : public Task {
         Axes rawSetpoints = m_gotNewData ?
 
             Axes(
-                    rawSetpoints.x = getRawSetpoint(m_commandRoll, COMMAND_DIVIDER),
-                    rawSetpoints.y = getRawSetpoint(m_commandPitch, COMMAND_DIVIDER),
-                    rawSetpoints.z = getRawSetpoint(m_commandYaw, YAW_COMMAND_DIVIDER)) :
+                    rawSetpoints.x = getRawSetpoint(m_commandRoll),
+                    rawSetpoints.y = getRawSetpoint(m_commandPitch),
+                    rawSetpoints.z = getRawSetpoint(m_commandYaw)) :
 
                 Axes(0,0,0);
 
