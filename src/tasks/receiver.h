@@ -254,13 +254,13 @@ class Receiver : public Task {
 
         if (m_gotNewData) {
 
-            _dataToSmooth.throttle = m_commandThrottle;
+            //_dataToSmooth.throttle = m_commandThrottle;
             _dataToSmooth.roll  = rawSetpoints.x;
             _dataToSmooth.pitch = rawSetpoints.y;
             _dataToSmooth.yaw   = rawSetpoints.z;
         }
 
-        m_commandThrottle = _dataToSmooth.throttle;
+        //m_commandThrottle = _dataToSmooth.throttle;
 
         return Axes(_dataToSmooth.roll, _dataToSmooth.pitch, _dataToSmooth.yaw);
     }
