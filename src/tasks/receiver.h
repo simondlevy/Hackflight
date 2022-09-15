@@ -133,7 +133,6 @@ class Receiver : public Task {
     uint8_t  m_autoSmoothnessFactorThrottle;
     bool     m_auxiliaryProcessingRequired;
     uint32_t m_averageFrameTimeUs;
-    bool     m_calculatedCutoffs;
     bool     m_dataProcessingRequired;
     Demands  m_dataToSmooth;
     uint16_t m_feedforwardCutoffFrequency;
@@ -143,7 +142,6 @@ class Receiver : public Task {
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
     bool     m_inFailsafeMode;
-    bool     m_initializedFilter;
     bool     m_initializedThrottleTable;
     bool     m_isRateValid;
     uint32_t m_lastFrameTimeUs;
@@ -438,8 +436,10 @@ class Receiver : public Task {
                 (m_throttleCutoffSetting == 0)); 
     }
 
-    void initializeSmoothingFilter(void)
+    bool initializeSmoothingFilter(void)
     {
+        auto calculatedCutoffs = false;
+
         m_filterInitialized = false;
         m_averageFrameTimeUs = 0;
         m_autoSmoothnessFactorSetpoint = 30;
@@ -448,33 +448,30 @@ class Receiver : public Task {
         m_throttleCutoffSetting = 0;
         m_feedforwardCutoffSetting = 0;
         smoothingResetAccumulation();
-        m_setpointCutoffFrequency =
-            m_setpointCutoffSetting;
-        m_throttleCutoffFrequency =
-            m_throttleCutoffSetting;
+        m_setpointCutoffFrequency = m_setpointCutoffSetting;
+        m_throttleCutoffFrequency = m_throttleCutoffSetting;
+
         if (m_feedforwardCutoffSetting == 0) {
             // calculate and use an initial derivative cutoff until the RC
             // interval is known
             const auto cutoffFactor = 1.5f /
-                (1.0f +
-                 (m_autoSmoothnessFactorSetpoint /
-                  10.0f));
+                (1.0f + (m_autoSmoothnessFactorSetpoint / 10.0f));
             auto ffCutoff = SMOOTHING_FEEDFORWARD_INITIAL_HZ * cutoffFactor;
-            m_feedforwardCutoffFrequency = 
-                lrintf(ffCutoff);
+            m_feedforwardCutoffFrequency = lrintf(ffCutoff);
         } else {
-            m_feedforwardCutoffFrequency =
-                m_feedforwardCutoffSetting;
+            m_feedforwardCutoffFrequency = m_feedforwardCutoffSetting;
         }
 
-        m_calculatedCutoffs = smoothingAutoCalculate();
+        calculatedCutoffs = smoothingAutoCalculate();
 
         // if we don't need to calculate cutoffs dynamically then the
         // filters can be initialized now
-        if (!m_calculatedCutoffs) {
+        if (!calculatedCutoffs) {
             setSmoothingFilterCutoffs();
             m_filterInitialized = true;
         }
+
+        return calculatedCutoffs;
     }
 
     void runSmoothingFilter(uint32_t usec)
@@ -547,15 +544,18 @@ class Receiver : public Task {
 
     auto processSmoothingFilter(const uint32_t usec, const Axes & rawSetpoints) -> Axes
     {
-        if (!m_initializedFilter) {
-            initializeSmoothingFilter();
+        static bool _initializedFilter;
+        static bool _calculatedCutoffs;
+
+        if (!_initializedFilter) {
+            _calculatedCutoffs = initializeSmoothingFilter();
         }
 
-        m_initializedFilter = true;
+        _initializedFilter = true;
 
         if (m_gotNewData) {
 
-            if (m_calculatedCutoffs) {
+            if (!_calculatedCutoffs) {
 
                 runSmoothingFilter(usec);
             }
