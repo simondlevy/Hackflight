@@ -248,20 +248,6 @@ class Receiver : public Task {
 
     } // check
 
-    auto getNewDemands(const Axes & rawSetpoints) -> Axes
-    {
-        static Axes _axes;
-
-        if (m_gotNewData) {
-
-            _axes.x = rawSetpoints.x;
-            _axes.y = rawSetpoints.y;
-            _axes.z = rawSetpoints.z;
-        }
-
-        return Axes(_axes.x, _axes.y, _axes.z);
-    }
-
     // Runs in fast (inner, core) loop
     auto getDemands(void) -> Demands
     {
@@ -276,15 +262,22 @@ class Receiver : public Task {
 
                 Axes(0,0,0);
 
-        Axes setpointRates = getNewDemands(rawSetpoints);
+        static Axes _axes;
+
+        if (m_gotNewData) {
+
+            _axes.x = rawSetpoints.x;
+            _axes.y = rawSetpoints.y;
+            _axes.z = rawSetpoints.z;
+        }
 
         m_gotNewData = false;
 
         return Demands(
                 constrain_f((m_commandThrottle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0, 1),
-                setpointRates.x,
-                setpointRates.y,
-                setpointRates.z);
+                _axes.x,
+                _axes.y,
+                _axes.z);
     }
 
     void begin(Arming * arming)
