@@ -91,9 +91,7 @@ class Receiver : public Task {
     // maximum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-    Arming *   m_arming;
-
-    bool m_gotPidReset;
+    Arming * m_arming;
 
     typedef enum {
         STATE_CHECK,
@@ -107,13 +105,6 @@ class Receiver : public Task {
     Pt3Filter m_filterRoll;
     Pt3Filter m_filterPitch;
     Pt3Filter m_filterYaw;
-
-    Pt3Filter m_filterDeflectionRoll;
-    Pt3Filter m_filterDeflectionPitch;
-
-    Pt3Filter  m_feedforwardPt3Roll;
-    Pt3Filter  m_feedforwardPt3Pitch;
-    Pt3Filter  m_feedforwardPt3Yaw;
 
     float m_commandThrottle;
     float m_commandRoll;
@@ -139,6 +130,7 @@ class Receiver : public Task {
     bool     m_filterInitialized;
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
+    bool     m_gotPidReset;
     bool     m_inFailsafeMode;
     bool     m_isRateValid;
     uint32_t m_lastFrameTimeUs;
