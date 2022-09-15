@@ -195,23 +195,6 @@ class Receiver : public Task {
         return throttleIsDown();
     }
 
-    auto getNewDemands(const Axes & rawSetpoints) -> Axes
-    {
-        static Demands _dataToSmooth;
-
-        if (m_gotNewData) {
-
-            _dataToSmooth.throttle = m_commandThrottle;
-            _dataToSmooth.roll  = rawSetpoints.x;
-            _dataToSmooth.pitch = rawSetpoints.y;
-            _dataToSmooth.yaw   = rawSetpoints.z;
-        }
-
-        m_commandThrottle = _dataToSmooth.throttle;
-
-        return Axes(_dataToSmooth.roll, _dataToSmooth.pitch, _dataToSmooth.yaw);
-    }
-
     static float getRawSetpoint(const float command)
     {
         auto commandf = command / COMMAND_DIVIDER;
@@ -264,6 +247,23 @@ class Receiver : public Task {
         return m_dataProcessingRequired || m_auxiliaryProcessingRequired; 
 
     } // check
+
+    auto getNewDemands(const Axes & rawSetpoints) -> Axes
+    {
+        static Demands _dataToSmooth;
+
+        if (m_gotNewData) {
+
+            _dataToSmooth.throttle = m_commandThrottle;
+            _dataToSmooth.roll  = rawSetpoints.x;
+            _dataToSmooth.pitch = rawSetpoints.y;
+            _dataToSmooth.yaw   = rawSetpoints.z;
+        }
+
+        m_commandThrottle = _dataToSmooth.throttle;
+
+        return Axes(_dataToSmooth.roll, _dataToSmooth.pitch, _dataToSmooth.yaw);
+    }
 
     // Runs in fast (inner, core) loop
     auto getDemands(void) -> Demands
