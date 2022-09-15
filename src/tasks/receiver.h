@@ -270,9 +270,9 @@ class Receiver : public Task {
         Axes rawSetpoints = m_gotNewData ?
 
             Axes(
-                    rawSetpoints.x = getRawSetpoint(m_commandRoll),
-                    rawSetpoints.y = getRawSetpoint(m_commandPitch),
-                    rawSetpoints.z = getRawSetpoint(m_commandYaw)) :
+                    getRawSetpoint(m_commandRoll),
+                    getRawSetpoint(m_commandPitch),
+                    getRawSetpoint(m_commandYaw)) :
 
                 Axes(0,0,0);
 
