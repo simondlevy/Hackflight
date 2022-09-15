@@ -195,7 +195,7 @@ class Receiver : public Task {
         return throttleIsDown();
     }
 
-    auto processSmoothingFilter(const Axes & rawSetpoints) -> Axes
+    auto getNewDemands(const Axes & rawSetpoints) -> Axes
     {
         static Demands _dataToSmooth;
 
@@ -279,7 +279,7 @@ class Receiver : public Task {
 
                 Axes(0,0,0);
 
-        Axes setpointRates = processSmoothingFilter(rawSetpoints);
+        Axes setpointRates = getNewDemands(rawSetpoints);
 
         m_gotNewData = false;
 
