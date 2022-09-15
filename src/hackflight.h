@@ -91,7 +91,7 @@ class Hackflight {
 
             auto usec = timeMicros();
 
-            Demands demands = m_receiver->getDemands(usec);
+            Demands demands = m_receiver->getDemands();
 
             //printf("%3.3f  %3.3f\n", demands.throttle, demands.roll);
 
