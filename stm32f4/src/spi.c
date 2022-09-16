@@ -37,10 +37,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define MAX_SPI_PIN_SEL   2
 #define SPIDEV_COUNT      3
 
-// Work around different check routines in the libraries for different MCU types
-#define CHECK_SPI_RX_DATA_AVAILABLE(instance) LL_SPI_IsActiveFlag_RXNE(instance)
-#define SPI_RX_DATA_REGISTER(base) ((base)->DR)
-
 static const uint32_t BUS_SPI_FREE   = 0x00000000;
 static const uint32_t BUS_SPI_LOCKED = 0x00000004;
 
