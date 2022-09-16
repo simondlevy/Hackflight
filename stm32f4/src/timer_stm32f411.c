@@ -830,3 +830,103 @@ uint32_t timerClock(TIM_TypeDef *tim)
     return SystemCoreClock;
 }
 
+const resourceOwner_t freeOwner = { .owner = OWNER_FREE, .resourceIndex = 0 };
+
+static resourceOwner_t timerOwners[MAX_TIMER_PINMAP_COUNT];
+
+timerIOConfig_t *timerIoConfigByTag(ioTag_t ioTag)
+{
+    for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
+        if (timerIOConfig(i)->ioTag == ioTag) {
+            return timerIOConfigMutable(i);
+        }
+    }
+
+    return NULL;
+}
+
+const timerHardware_t *timerGetByTagAndIndex(ioTag_t ioTag, unsigned timerIndex)
+{
+
+    if (!ioTag || !timerIndex) {
+        return NULL;
+    }
+
+    uint8_t index = 1;
+    for (unsigned i = 0; i < TIMER_CHANNEL_COUNT; i++) {
+        if (TIMER_HARDWARE[i].tag == ioTag) {
+            if (index == timerIndex) {
+                return &TIMER_HARDWARE[i];
+            }
+            ++index;
+        }
+    }
+
+    return NULL;
+}
+
+const timerHardware_t *timerGetConfiguredByTag(ioTag_t ioTag)
+{
+    uint8_t timerIndex = 0;
+    for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
+        if (timerIOConfig(i)->ioTag == ioTag) {
+            timerIndex = timerIOConfig(i)->index;
+
+            break;
+        }
+    }
+
+    return timerGetByTagAndIndex(ioTag, timerIndex);
+}
+
+const timerHardware_t *timerGetAllocatedByNumberAndChannel(int8_t timerNumber, uint16_t timerChannel)
+{
+    for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
+        const timerHardware_t *timer = timerGetByTagAndIndex(timerIOConfig(i)->ioTag, timerIOConfig(i)->index);
+        if (timer && timerGetTIMNumber(timer->tim) == timerNumber && timer->channel == timerChannel && timerOwners[i].owner) {
+            return timer;
+        }
+    }
+
+    return dshotBitbangTimerGetAllocatedByNumberAndChannel(timerNumber, timerChannel);
+}
+
+const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
+{
+    for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
+        const timerHardware_t *assignedTimer = timerGetByTagAndIndex(timerIOConfig(i)->ioTag, timerIOConfig(i)->index);
+        if (assignedTimer && assignedTimer == timer) {
+            return &timerOwners[i];
+        }
+    }
+
+    return dshotBitbangTimerGetOwner(timer);
+}
+
+const timerHardware_t *timerAllocate(ioTag_t ioTag, resourceOwner_e owner, uint8_t resourceIndex)
+{
+    if (!ioTag) {
+        return NULL;
+    }
+
+    for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
+        if (timerIOConfig(i)->ioTag == ioTag) {
+            const timerHardware_t *timer = timerGetByTagAndIndex(ioTag, timerIOConfig(i)->index);
+
+            if (timerGetOwner(timer)->owner) {
+                return NULL;
+            }
+
+            timerOwners[i].owner = owner;
+            timerOwners[i].resourceIndex = resourceIndex;
+
+            return timer;
+        }
+    }
+
+    return NULL;
+}
+
+ioTag_t timerioTagGetByUsage(timerUsageFlag_e usageFlag, uint8_t index)
+{
+    uint8_t currentIndex = 0;
