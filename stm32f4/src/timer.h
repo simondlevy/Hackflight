@@ -90,20 +90,14 @@ typedef enum {
     TIMER_OUTPUT_N_CHANNEL = (1 << 1),
 } timerFlag_e;
 
-#define HARDWARE_TIMER_DEFINITION_COUNT 14
-
 #define MHZ_TO_HZ(x) ((x) * 1000000)
 
-#define FULL_TIMER_CHANNEL_COUNT 78
+#define TIMER_CHANNEL_COUNT 78
 
 extern const timerHardware_t fullTimerHardware[];
 
-#define TIMER_CHANNEL_COUNT FULL_TIMER_CHANNEL_COUNT
 #define TIMER_HARDWARE fullTimerHardware
 
-#define USED_TIMERS ( TIM_N(1) | TIM_N(2) | TIM_N(3) | TIM_N(4) | TIM_N(5) | TIM_N(6) | TIM_N(7) | TIM_N(8) | TIM_N(9) | TIM_N(10) | TIM_N(11) | TIM_N(12) | TIM_N(13) | TIM_N(14) )
-
-extern const timerDef_t timerDefinitions[];
 
 typedef enum {
     TYPE_FREE,

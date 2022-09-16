@@ -32,6 +32,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "timer_def.h"
 
+#define HARDWARE_TIMER_DEFINITION_COUNT 14
+
 #define TIM_N(n) (1 << (n))
 
 /*
@@ -41,6 +43,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
     TIM3 4 channels
     TIM4 4 channels
 */
+#define USED_TIMERS ( TIM_N(1) | TIM_N(2) | TIM_N(3) | TIM_N(4) | TIM_N(5) | TIM_N(6) | TIM_N(7) | TIM_N(8) | TIM_N(9) | TIM_N(10) | TIM_N(11) | TIM_N(12) | TIM_N(13) | TIM_N(14) )
+
+extern const timerDef_t timerDefinitions[];
 
 #define USED_TIMER_COUNT BITCOUNT(USED_TIMERS)
 #define CC_CHANNELS_PER_TIMER 4              // TIM_Channel_1..4
@@ -763,7 +768,7 @@ const timerDef_t timerDefinitions[HARDWARE_TIMER_DEFINITION_COUNT] = {
     { .TIMx = TIM14, .rcc = RCC_APB1(TIM14), .inputIrq = TIM8_TRG_COM_TIM14_IRQn},
 };
 
-const timerHardware_t fullTimerHardware[FULL_TIMER_CHANNEL_COUNT] = {
+const timerHardware_t fullTimerHardware[TIMER_CHANNEL_COUNT] = {
     // Auto-generated from 'timer_def.h'
 //PORTA
     DEF_TIM(TIM2, CH1, PA0, TIM_USE_ANY, 0, 0),
