@@ -24,7 +24,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "bus.h"
 #include "spi.h"
-#include "spi_impl.h"
 #include "exti.h"
 #include "io.h"
 #include "rcc.h"

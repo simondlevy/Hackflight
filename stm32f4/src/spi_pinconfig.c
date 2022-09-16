@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "platform.h"
 #include "spi.h"
-#include "spi_impl.h"
+#include "spi.h"
 #include "dma.h"
 #include "exti.h"
 #include "io.h"
