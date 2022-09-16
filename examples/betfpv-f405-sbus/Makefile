@@ -135,7 +135,7 @@ STM32_SRC = \
             serial_uart_stm32f405.c \
             system.c \
             timer_common.c \
-            timer.c \
+            timer_stm32f405.c \
             $(addprefix pg/, $(notdir $(wildcard $(STM_SRC_DIR)/pg/*.c))) \
             $(addprefix common/,$(notdir $(wildcard $(STM_SRC_DIR)/common/*.c))) \
             $(addprefix config/,$(notdir $(wildcard $(STM_SRC_DIR)/config/*.c)))
