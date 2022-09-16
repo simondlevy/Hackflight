@@ -123,7 +123,7 @@ void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments);
 extern "C" {
 #endif
 
-void spiPreinitRegister(ioTag_t iotag, uint8_t iocfg, uint8_t init);
+void spiPreinitRegister(ioTag_t iotag, uint8_t iocfg, bool init);
 void spiPreinitByIO(IO_t io);
 void spiPreinitByTag(ioTag_t tag);
 

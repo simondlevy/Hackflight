@@ -25,14 +25,28 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "spi.h"
 #include "dma_reqmap.h"
 #include "exti.h"
+#include "flash.h"
 #include "io.h"
 #include "rcc.h"
 #include "nvic.h"
+#include "resource.h"
+#include "systemdev.h"
+
+#define SPI_PREINIT_COUNT 16
 
 static uint8_t spiRegisteredDeviceCount = 0;
 
 spiDevice_t spiDevice[SPIDEV_COUNT];
 busDevice_t spiBusDevice[SPIDEV_COUNT];
+
+typedef struct spiPreinit_s {
+    ioTag_t iotag;
+    uint8_t iocfg;
+    bool init;
+} spiPreinit_t;
+
+static spiPreinit_t spiPreinitArray[SPI_PREINIT_COUNT];
+static int spiPreinitCount;
 
 SPIDevice spiDeviceByInstance(SPI_TypeDef *instance)
 {
@@ -671,3 +685,58 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments)
 
     spiSequenceStart(dev, segments);
 }
+
+
+void spiPreinitRegister(ioTag_t iotag, uint8_t iocfg, bool init)
+{
+    if (!iotag) {
+        return;
+    }
+
+    if (spiPreinitCount == SPI_PREINIT_COUNT) {
+        systemIndicateFailure(FAILURE_DEVELOPER, 5);
+        return;
+    }
+
+    spiPreinitArray[spiPreinitCount].iotag = iotag;
+    spiPreinitArray[spiPreinitCount].iocfg = iocfg;
+    spiPreinitArray[spiPreinitCount].init = init;
+    ++spiPreinitCount;
+}
+
+static void spiPreinitPin(spiPreinit_t *preinit, int index)
+{
+    IO_t io = IOGetByTag(preinit->iotag);
+    IOInit(io, OWNER_PREINIT, RESOURCE_INDEX(index));
+    IOConfigGPIO(io, preinit->iocfg);
+    if (preinit->init) {
+        IOHi(io);
+    } else {
+        IOLo(io);
+    }
+}
+
+void spiPreInit(void)
+{
+    flashPreInit();
+
+    for (int i = 0; i < spiPreinitCount; i++) {
+        spiPreinitPin(&spiPreinitArray[i], i);
+    }
+}
+
+void spiPreinitByIO(IO_t io)
+{
+    for (int i = 0; i < spiPreinitCount; i++) {
+        if (io == IOGetByTag(spiPreinitArray[i].iotag)) {
+            spiPreinitPin(&spiPreinitArray[i], i);
+            return;
+        }
+    }
+}
+
+void spiPreinitByTag(ioTag_t tag)
+{
+    spiPreinitByIO(IOGetByTag(tag));
+}
+
