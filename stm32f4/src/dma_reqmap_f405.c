@@ -50,6 +50,12 @@ static const dmaPeripheralMapping_t dmaPeripheralMapping[] = {
     { DMA_PERIPH_SPI_MOSI,  SPIDEV_3,  { DMA(1, 5, 0), DMA(1, 7, 0) } },
     { DMA_PERIPH_SPI_MISO,  SPIDEV_3,  { DMA(1, 0, 0), DMA(1, 2, 0) } },
 
+#if defined(STM32F411xE)
+    { DMA_PERIPH_SPI_MOSI,  SPIDEV_4,  { DMA(2, 1, 4), DMA(2, 4, 5) } },
+    { DMA_PERIPH_SPI_MISO,  SPIDEV_4,  { DMA(2, 0, 4), DMA(2, 3, 5) } },
+
+#endif
+
     { DMA_PERIPH_ADC,     ADCDEV_1,  { DMA(2, 0, 0), DMA(2, 4, 0) } },
     { DMA_PERIPH_ADC,     ADCDEV_2,  { DMA(2, 2, 1), DMA(2, 3, 1) } },
     { DMA_PERIPH_ADC,     ADCDEV_3,  { DMA(2, 0, 2), DMA(2, 1, 2) } },

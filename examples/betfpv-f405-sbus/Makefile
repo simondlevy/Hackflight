@@ -123,7 +123,7 @@ STM32_SRC = \
             bus_spi_pinconfig.c \
             bus_spi_stdperiph.c \
             dma_common.c \
-            dma_reqmap.c \
+            dma_reqmap_f405.c \
             exti.c \
             flash.c \
             io.c \
