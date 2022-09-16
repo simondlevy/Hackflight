@@ -132,6 +132,7 @@ STM32_SRC = \
             serial.c \
             serial_uart.c \
             serial_uart_pinconfig.c \
+            serial_uart_stm32f405.c \
             system.c \
             timer_common.c \
             timer.c \

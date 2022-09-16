@@ -107,7 +107,6 @@ MCU_COMMON_SRC = \
             dma_stm32f4xx.c \
             inverter.c \
             serial_uart_stdperiph.c \
-            serial_uart_stm32f4xx.c \
             system_stm32f4xx.c \
             timer_stm32f4xx.c \
             persistent.c
