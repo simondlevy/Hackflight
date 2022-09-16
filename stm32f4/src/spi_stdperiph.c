@@ -23,8 +23,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <core/constrain.h>
 
 #include "bus.h"
-#include "bus_spi.h"
-#include "bus_spi_impl.h"
+#include "spi.h"
+#include "spi_impl.h"
 #include "exti.h"
 #include "io.h"
 #include "rcc.h"

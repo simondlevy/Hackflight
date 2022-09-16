@@ -22,7 +22,7 @@
 #include <time.h>
 
 #include <atomic.h>
-#include <bus_spi.h>
+#include <spi.h>
 #include <nvic.h>
 #include <platform.h>
 #include <systemdev.h>

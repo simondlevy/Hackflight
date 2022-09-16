@@ -22,8 +22,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "atomic.h"
 #include "bus.h"
-#include "bus_spi.h"
-#include "bus_spi_impl.h"
+#include "spi.h"
+#include "spi_impl.h"
 #include "dma_reqmap.h"
 #include "exti.h"
 #include "io.h"

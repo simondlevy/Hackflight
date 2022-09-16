@@ -19,8 +19,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include "platform.h"
-#include "bus_spi.h"
-#include "bus_spi_impl.h"
+#include "spi.h"
+#include "spi_impl.h"
 #include "dma.h"
 #include "exti.h"
 #include "io.h"

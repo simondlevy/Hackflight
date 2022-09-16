@@ -118,10 +118,10 @@ STM32_SRC = \
             serial_debug.c \
             bitbang.c \
             bus.c \
-            bus_spi.c \
-            bus_spi_config.c \
-            bus_spi_pinconfig.c \
-            bus_spi_stdperiph.c \
+            spi.c \
+            spi_config.c \
+            spi_pinconfig.c \
+            spi_stdperiph.c \
             dma_common.c \
             dma_reqmap_f405.c \
             exti.c \
@@ -274,7 +274,7 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 
 $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 	  hardware_init.h \
-      bus_spi.h \
+      spi.h \
       exti.h \
       flash.h \
       inverter.h \

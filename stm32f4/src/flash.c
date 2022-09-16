@@ -22,7 +22,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "platform.h"
 #include "flash_impl.h"
-#include "bus_spi.h"
+#include "spi.h"
 #include "io.h"
 #include "io_types.h"
 

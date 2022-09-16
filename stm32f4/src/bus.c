@@ -20,7 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 
 #include "bus.h"
-#include "bus_spi.h"
+#include "spi.h"
 
 
 // Access routines where the register is accessed directly

@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 
 #include "adc.h"
-#include "bus_spi.h"
+#include "spi.h"
 #include "serialdev.h"
 #include "serial_uart.h"
 #include "timer_def.h"
