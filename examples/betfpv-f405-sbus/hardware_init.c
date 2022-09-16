@@ -49,15 +49,17 @@ void hardwareInit(void)
     serialUartPinConfigure();
     serialInit(-1);
     inverterInit();
+
     spiPinConfigure();
     spiPreInit();
     spiInit(0x07); // mask for devices 0,1,2
+    spiInitBusDMA();
+
     usbCableDetectInit();
     flashInit();
     systemInitUnusedPins();
     pinioInit();
     timerStart();
-    spiInitBusDMA();
 }
 
 #if defined (__cplusplus)

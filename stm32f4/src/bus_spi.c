@@ -471,19 +471,22 @@ bool spiSetBusInstance(extDevice_t *dev, uint32_t device)
 void spiInitBusDMA()
 {
     uint32_t device;
-    /* Check https://www.st.com/resource/en/errata_sheet/dm00037591-stm32f405407xx-and-stm32f415417xx-device-limitations-stmicroelectronics.pdf
-     * section 2.1.10 which reports an errata that corruption may occurs on DMA2 if AHB peripherals (eg GPIO ports) are
-     * access concurrently with APB peripherals (eg SPI busses). Bitbang DSHOT uses DMA2 to write to GPIO ports. If this
-     * is enabled, then don't enable DMA on an SPI bus using DMA2
+    /* Check
+     * https://www.st.com/resource/en/errata_sheet/dm00037591-stm32f405407xx-and-stm32f415417xx-device-limitations-stmicroelectronics.pdf
+     * section 2.1.10 which reports an errata that corruption may occurs on
+     * DMA2 if AHB peripherals (eg GPIO ports) are access concurrently with APB
+     * peripherals (eg SPI busses). Bitbang DSHOT uses DMA2 to write to GPIO
+     * ports. If this is enabled, then don't enable DMA on an SPI bus using
+     * DMA2
      */
 
     spiPinConfig_t spiPinConfig;
 
-    spiPinConfig.ioTagSck = 21;
+    spiPinConfig.ioTagSck  = 21;
     spiPinConfig.ioTagMiso = 22;
     spiPinConfig.ioTagMosi = 23;
-    spiPinConfig.txDmaopt = -1;
-    spiPinConfig.rxDmaopt = -1;
+    spiPinConfig.txDmaopt  = -1;
+    spiPinConfig.rxDmaopt  = -1;
 
     const bool dshotBitbangActive = true;
 

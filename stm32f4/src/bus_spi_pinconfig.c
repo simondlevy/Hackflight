@@ -87,9 +87,9 @@ void spiPinConfigure(void)
 {
     spiPinConfig_t spiPinConfig;
 
-    spiPinConfig.ioTagSck = 21;
-    spiPinConfig.ioTagMiso = 22;
-    spiPinConfig.ioTagMosi = 23;
+    spiPinConfig.ioTagSck = 21;   // 21 & 0x07 = 5; so, PA5
+    spiPinConfig.ioTagMiso = 22;  //                    PA6
+    spiPinConfig.ioTagMosi = 23;  //                    PA7
     spiPinConfig.txDmaopt = -1;
     spiPinConfig.rxDmaopt = -1;
 

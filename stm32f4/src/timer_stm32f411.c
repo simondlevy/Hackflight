@@ -927,6 +927,33 @@ const timerHardware_t *timerAllocate(ioTag_t ioTag, resourceOwner_e owner, uint8
     return NULL;
 }
 
+#define USABLE_TIMER_CHANNEL_COUNT 8
+
+const timerHardware_t timerHardware[USABLE_TIMER_CHANNEL_COUNT] = {
+
+    DEF_TIM(TIM11,  CH1,  PB9,  TIM_USE_PPM,   0, 0 ), // PPM IN
+    DEF_TIM(TIM2,   CH2,  PB3,  TIM_USE_MOTOR, 0, 0 ), // S1_OUT - UP1-1
+    DEF_TIM(TIM3,   CH1,  PB4,  TIM_USE_MOTOR, 0, 0 ), // S2_OUT - UP1-2
+    DEF_TIM(TIM4,   CH1,  PB6,  TIM_USE_MOTOR, 0, 0 ), // S3_OUT - UP1-2
+    DEF_TIM(TIM4,   CH2,  PB7,  TIM_USE_MOTOR, 0, 0 ), // S4_OUT - UP1-2
+    DEF_TIM(TIM2,   CH1,  PA15, TIM_USE_ANY,   0, 0 ), // S5_OUT - UP1-1
+    DEF_TIM(TIM10,  CH1,  PB8,  TIM_USE_ANY,   0, 0 ), // S6_OUT - DMA NONE
+
+    DEF_TIM(TIM1,   CH1,  PA8,  TIM_USE_LED,   0, 0 ), // LED_STRIP - DMA2_ST3_CH6
+
+};
+
 ioTag_t timerioTagGetByUsage(timerUsageFlag_e usageFlag, uint8_t index)
 {
     uint8_t currentIndex = 0;
+    for (unsigned i = 0; i < USABLE_TIMER_CHANNEL_COUNT; i++) {
+        if ((timerHardware[i].usageFlags & usageFlag) == usageFlag) {
+            if (currentIndex == index) {
+                return timerHardware[i].tag;
+            }
+            currentIndex++;
+        }
+    }
+
+    return IO_TAG_NONE;
+}

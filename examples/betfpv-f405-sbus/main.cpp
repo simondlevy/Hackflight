@@ -57,7 +57,7 @@ int main(void)
 
     static DshotBitbangEsc esc(motorPins);
 
-    static Stm32F4Led led(37); // pin
+    static Stm32F4Led led(37); // 37 & 0x07 = 5; specified as PB5 in betaflight
 
     static Hackflight hf(rx, imu, imuRotate270, pids, mixer, esc, led);
 
