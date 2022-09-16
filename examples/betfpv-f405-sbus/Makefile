@@ -119,7 +119,6 @@ STM32_SRC = \
             bitbang.c \
             bus.c \
             spi.c \
-            spi_pinconfig.c \
             spi_stdperiph.c \
             dma_common.c \
             dma_reqmap_f405.c \
