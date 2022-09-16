@@ -23,7 +23,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 
 #include "atomic.h"
-#include "bus.h"
 #include "spi.h"
 #include "dma_reqmap.h"
 #include "exti.h"

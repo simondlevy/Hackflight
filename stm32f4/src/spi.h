@@ -17,9 +17,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "bus.h"
-#include "io_types.h"
-#include "bus.h"
-#include "rcc_types.h"
 
 #define SPI_IO_CS_CFG IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, \
         GPIO_OType_PP, GPIO_PuPd_NOPULL)
