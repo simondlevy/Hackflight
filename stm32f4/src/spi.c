@@ -36,6 +36,79 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #define SPI_PREINIT_COUNT 16
 
+#define MAX_SPI_PIN_SEL 2
+
+#define BUS_SPI_FREE   0x0
+#define BUS_SPI_LOCKED 0x4
+
+#define SPI_IO_AF_CFG      IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, \
+        GPIO_OType_PP, GPIO_PuPd_NOPULL)
+#define SPI_IO_AF_SCK_CFG  IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, \
+        GPIO_OType_PP, GPIO_PuPd_DOWN)
+#define SPI_IO_AF_MISO_CFG IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, \
+        GPIO_OType_PP, GPIO_PuPd_UP)
+
+#define SPIDEV_COUNT 3
+
+// Macros to convert between CLI bus number and SPIDevice.
+#define SPI_CFG_TO_DEV(x)   ((x) - 1)
+#define SPI_DEV_TO_CFG(x)   ((x) + 1)
+
+// Work around different check routines in the libraries for different MCU types
+#define CHECK_SPI_RX_DATA_AVAILABLE(instance) LL_SPI_IsActiveFlag_RXNE(instance)
+#define SPI_RX_DATA_REGISTER(base) ((base)->DR)
+
+typedef struct spiPinConfig_s {
+    ioTag_t ioTagSck;
+    ioTag_t ioTagMiso;
+    ioTag_t ioTagMosi;
+    int8_t txDmaopt;
+    int8_t rxDmaopt;
+} spiPinConfig_t;
+
+// De facto standard mode
+// See https://en.wikipedia.org/wiki/Serial_Peripheral_Interface
+//
+// Mode CPOL CPHA
+//  0    0    0
+//  1    0    1
+//  2    1    0
+//  3    1    1
+typedef enum {
+    SPI_MODE0_POL_LOW_EDGE_1ST = 0,
+    SPI_MODE1_POL_LOW_EDGE_2ND,
+    SPI_MODE2_POL_HIGH_EDGE_1ST,
+    SPI_MODE3_POL_HIGH_EDGE_2ND
+} SPIMode_e;
+
+typedef struct spiPinDef_s {
+    ioTag_t pin;
+} spiPinDef_t;
+
+typedef struct spiHardware_s {
+    SPIDevice device;
+    SPI_TypeDef *reg;
+    spiPinDef_t sckPins[MAX_SPI_PIN_SEL];
+    spiPinDef_t misoPins[MAX_SPI_PIN_SEL];
+    spiPinDef_t mosiPins[MAX_SPI_PIN_SEL];
+    uint8_t af;
+    rccPeriphTag_t rcc;
+    uint8_t dmaIrqHandler;
+} spiHardware_t;
+
+typedef struct SPIDevice_s {
+    SPI_TypeDef *dev;
+    ioTag_t sck;
+    ioTag_t miso;
+    ioTag_t mosi;
+    uint8_t af;
+    rccPeriphTag_t rcc;
+    volatile uint16_t errorCount;
+    bool leadingEdge;
+    uint8_t dmaIrqHandler;
+} spiDevice_t;
+
+
 static uint8_t spiRegisteredDeviceCount = 0;
 
 spiDevice_t spiDevice[SPIDEV_COUNT];
