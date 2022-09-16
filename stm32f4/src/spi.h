@@ -21,8 +21,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "bus.h"
 #include "rcc_types.h"
 
-#define SPI_TIMEOUT_US  10000
-
 #define MAX_SPI_PIN_SEL 2
 
 #define BUS_SPI_FREE   0x0
@@ -95,8 +93,6 @@ typedef struct spiHardware_s {
     uint8_t dmaIrqHandler;
 } spiHardware_t;
 
-extern const spiHardware_t spiHardware[];
-
 typedef struct SPIDevice_s {
     SPI_TypeDef *dev;
     ioTag_t sck;
@@ -109,7 +105,7 @@ typedef struct SPIDevice_s {
     uint8_t dmaIrqHandler;
 } spiDevice_t;
 
-extern spiDevice_t spiDevice[SPIDEV_COUNT];
+//extern spiDevice_t spiDevice[SPIDEV_COUNT];
 
 void spiInitDevice(SPIDevice device);
 void spiInternalInitStream(const extDevice_t *dev, bool preInit);
