@@ -65,7 +65,9 @@ bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
 
     IOInit(dev->busType_u.spi.csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(config->index));
 
-    IOConfigGPIO(dev->busType_u.spi.csnPin, SPI_IO_CS_CFG);
+    IOConfigGPIO(dev->busType_u.spi.csnPin, 
+            IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL));
+
 
     // Ensure device is disabled, important when two devices are on the same bus.
     IOHi(dev->busType_u.spi.csnPin); 

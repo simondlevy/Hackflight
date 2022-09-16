@@ -18,9 +18,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "bus.h"
 
-#define SPI_IO_CS_CFG IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, \
-        GPIO_OType_PP, GPIO_PuPd_NOPULL)
-
 typedef enum SPIDevice {
     SPIINVALID = -1,
     SPIDEV_1   = 0,
