@@ -34,14 +34,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "systemdev.h"
 
 #define SPI_PREINIT_COUNT 16
-
-#define MAX_SPI_PIN_SEL 2
-
-#define SPIDEV_COUNT 3
-
-// Macros to convert between CLI bus number and SPIDevice.
-#define SPI_CFG_TO_DEV(x)   ((x) - 1)
-#define SPI_DEV_TO_CFG(x)   ((x) + 1)
+#define MAX_SPI_PIN_SEL   2
+#define SPIDEV_COUNT      3
 
 // Work around different check routines in the libraries for different MCU types
 #define CHECK_SPI_RX_DATA_AVAILABLE(instance) LL_SPI_IsActiveFlag_RXNE(instance)
@@ -114,6 +108,11 @@ typedef struct spiPreinit_s {
 
 static spiPreinit_t spiPreinitArray[SPI_PREINIT_COUNT];
 static int spiPreinitCount;
+
+static uint8_t spiCfgToDev(const uint8_t k)
+{
+    return k - 1;
+}
 
 SPIDevice spiDeviceByInstance(SPI_TypeDef *instance)
 {
@@ -519,6 +518,8 @@ static void spiTxIrqHandler(dmaChannelDescriptor_t* descriptor)
     spiIrqHandler(dev);
 }
 
+
+
 // Mark this bus as being SPI and record the first owner to use it
 bool spiSetBusInstance(extDevice_t *dev, uint32_t device)
 {
@@ -526,7 +527,7 @@ bool spiSetBusInstance(extDevice_t *dev, uint32_t device)
         return false;
     }
 
-    dev->bus = &spiBusDevice[SPI_CFG_TO_DEV(device)];
+    dev->bus = &spiBusDevice[spiCfgToDev(device)];
 
     // By default each device should use SPI DMA if the bus supports it
     dev->useDMA = true;
@@ -539,7 +540,7 @@ bool spiSetBusInstance(extDevice_t *dev, uint32_t device)
 
     busDevice_t *bus = dev->bus;
 
-    bus->busType_u.spi.instance = spiInstanceByDevice(SPI_CFG_TO_DEV(device));
+    bus->busType_u.spi.instance = spiInstanceByDevice(spiCfgToDev(device));
 
     if (bus->busType_u.spi.instance == NULL) {
         return false;
