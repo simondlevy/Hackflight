@@ -37,16 +37,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #define MAX_SPI_PIN_SEL 2
 
-#define BUS_SPI_FREE   0x0
-#define BUS_SPI_LOCKED 0x4
-
-#define SPI_IO_AF_CFG      IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, \
-        GPIO_OType_PP, GPIO_PuPd_NOPULL)
-#define SPI_IO_AF_SCK_CFG  IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, \
-        GPIO_OType_PP, GPIO_PuPd_DOWN)
-#define SPI_IO_AF_MISO_CFG IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, \
-        GPIO_OType_PP, GPIO_PuPd_UP)
-
 #define SPIDEV_COUNT 3
 
 // Macros to convert between CLI bus number and SPIDevice.
@@ -56,6 +46,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 // Work around different check routines in the libraries for different MCU types
 #define CHECK_SPI_RX_DATA_AVAILABLE(instance) LL_SPI_IsActiveFlag_RXNE(instance)
 #define SPI_RX_DATA_REGISTER(base) ((base)->DR)
+
+static const uint32_t BUS_SPI_FREE   = 0x00000000;
+static const uint32_t BUS_SPI_LOCKED = 0x00000004;
 
 typedef struct spiPinConfig_s {
     ioTag_t ioTagSck;
@@ -168,7 +161,8 @@ bool spiIsBusy(const extDevice_t *dev)
     return (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
 }
 
-// Indicate that the bus on which this device resides may initiate DMA transfers from interrupt context
+// Indicate that the bus on which this device resides may initiate DMA
+// transfers from interrupt context
 void spiSetAtomicWait(const extDevice_t *dev)
 {
     dev->bus->useAtomicWait = true;
@@ -177,12 +171,14 @@ void spiSetAtomicWait(const extDevice_t *dev)
 // Wait for DMA completion and claim the bus driver
 void spiWaitClaim(const extDevice_t *dev)
 {
-    // If there is a device on the bus whose driver might call spiSequence from an ISR then an
-    // atomic access is required to claim the bus, however if not, then interrupts need not be
+    // If there is a device on the bus whose driver might call spiSequence from
+    // an ISR then an atomic access is required to claim the bus, however if
+    // not, then interrupts need not be
     // disabled as this can result in edge triggered interrupts being missed
 
     if (dev->bus->useAtomicWait) {
-        // Prevent race condition where the bus appears free, but a gyro interrupt starts a transfer
+        // Prevent race condition where the bus appears free, but a gyro
+        // interrupt starts a transfer
         do {
             ATOMIC_BLOCK(NVIC_PRIO_MAX) {
                 if (dev->bus->curSegment == (busSegment_t *)BUS_SPI_FREE) {
@@ -400,7 +396,8 @@ uint8_t spiReadReg(const extDevice_t *dev, uint8_t reg)
     return data;
 }
 
-// Wait for bus to become free, then read a byte of data where the register is ORed with 0x80
+// Wait for bus to become free, then read a byte of data where the register is
+// ORed with 0x80
 uint8_t spiReadRegMsk(const extDevice_t *dev, uint8_t reg)
 {
     return spiReadReg(dev, reg | 0x80);
@@ -457,13 +454,15 @@ static void spiIrqHandler(const extDevice_t *dev)
             // The end of the segment list has been reached
             spiSequenceStart(nextDev, nextSegments);
         } else {
-            // The end of the segment list has been reached, so mark transactions as complete
+            // The end of the segment list has been reached, so mark
+            // transactions as complete
             bus->curSegment = (busSegment_t *)BUS_SPI_FREE;
         }
     } else {
         bus->curSegment = nextSegment;
 
-        // After the completion of the first segment setup the init structure for the subsequent segment
+        // After the completion of the first segment setup the init structure
+        // for the subsequent segment
         if (bus->initSegment) {
             spiInternalInitStream(dev, false);
             bus->initSegment = false;
@@ -472,7 +471,8 @@ static void spiIrqHandler(const extDevice_t *dev)
         // Launch the next transfer
         spiInternalStartDMA(dev);
 
-        // Prepare the init structures ready for the next segment to reduce inter-segment time
+        // Prepare the init structures ready for the next segment to reduce
+        // inter-segment time
         spiInternalInitStream(dev, true);
     }
 }
@@ -598,7 +598,8 @@ void spiInitBusDMA()
         }
 
         for (uint8_t opt = txDmaoptMin; opt <= txDmaoptMax; opt++) {
-            const dmaChannelSpec_t *dmaTxChannelSpec = dmaGetChannelSpecByPeripheral(DMA_PERIPH_SPI_MOSI, device, opt);
+            const dmaChannelSpec_t *dmaTxChannelSpec =
+                dmaGetChannelSpecByPeripheral(DMA_PERIPH_SPI_MOSI, device, opt);
 
             if (dmaTxChannelSpec) {
                 dmaTxIdentifier = dmaGetIdentifier(dmaTxChannelSpec->ref);
@@ -659,9 +660,9 @@ void spiInitBusDMA()
 
             spiInternalResetDescriptors(bus);
 
-            /* Note that this driver may be called both from the normal thread of execution, or from USB interrupt
-             * handlers, so the DMA completion interrupt must be at a higher priority
-             */
+            // Note that this driver may be called both from the normal thread
+            // of execution, or from USB interrupt handlers, so the DMA
+            // completion interrupt must be at a higher priority
             dmaSetHandler(dmaRxIdentifier, spiRxIrqHandler, NVIC_PRIO_SPI_DMA, 0);
 
             bus->useDMA = true;
@@ -738,10 +739,10 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments)
 
     ATOMIC_BLOCK(NVIC_PRIO_MAX) {
         if ((bus->curSegment != (busSegment_t *)BUS_SPI_LOCKED) && spiIsBusy(dev)) {
-            /* Defer this transfer to be triggered upon completion of the current transfer. Blocking calls
-             * and those from non-interrupt context will have already called spiWaitClaim() so this will
-             * only happen for non-blocking calls called from an ISR.
-             */
+            // Defer this transfer to be triggered upon completion of the
+            // current transfer. Blocking calls and those from non-interrupt
+            // context will have already called spiWaitClaim() so this will
+            // only happen for non-blocking calls called from an ISR.
             busSegment_t *endSegment = bus->curSegment;
 
             if (endSegment) {
@@ -909,7 +910,7 @@ void spiPinConfigure(void)
             pDev->dev = hw->reg;
             pDev->af = hw->af;
             pDev->rcc = hw->rcc;
-            pDev->leadingEdge = false; // XXX Should be part of transfer context
+            pDev->leadingEdge = false; 
             pDev->dmaIrqHandler = hw->dmaIrqHandler;
         }
     }
@@ -971,9 +972,20 @@ void spiInitDevice(SPIDevice device)
     IOInit(IOGetByTag(spi->miso), OWNER_SPI_MISO, RESOURCE_INDEX(device));
     IOInit(IOGetByTag(spi->mosi), OWNER_SPI_MOSI, RESOURCE_INDEX(device));
 
-    IOConfigGPIOAF(IOGetByTag(spi->sck),  SPI_IO_AF_SCK_CFG, spi->af);
-    IOConfigGPIOAF(IOGetByTag(spi->miso), SPI_IO_AF_MISO_CFG, spi->af);
-    IOConfigGPIOAF(IOGetByTag(spi->mosi), SPI_IO_AF_CFG, spi->af);
+    IOConfigGPIOAF(
+            IOGetByTag(spi->sck), 
+            IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_DOWN), 
+            spi->af);
+
+    IOConfigGPIOAF(
+            IOGetByTag(spi->miso),
+            IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_UP), 
+            spi->af);
+
+    IOConfigGPIOAF(
+            IOGetByTag(spi->mosi),
+            IO_CONFIG(GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL),
+            spi->af);
 
     // Init SPI hardware
     SPI_I2S_DeInit(spi->dev);
@@ -1050,7 +1062,8 @@ void spiInternalInitStream(const extDevice_t *dev, bool preInit)
     volatile busSegment_t *segment = bus->curSegment;
 
     if (preInit) {
-        // Prepare the init structure for the next segment to reduce inter-segment interval
+        // Prepare the init structure for the next segment to reduce
+        // inter-segment interval
         segment++;
         if(segment->len == 0) {
             // There's no following segment
@@ -1084,7 +1097,8 @@ void spiInternalInitStream(const extDevice_t *dev, bool preInit)
             initRx->DMA_Memory0BaseAddr = (uint32_t)&dummyRxByte;
             initRx->DMA_MemoryInc = DMA_MemoryInc_Disable;
         }
-        // If possible use 16 bit memory writes to prevent atomic access issues on gyro data
+        // If possible use 16 bit memory writes to prevent atomic access issues
+        // on gyro data
         if ((initRx->DMA_Memory0BaseAddr & 0x1) || (len & 0x1)) {
             initRx->DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
         } else {
@@ -1116,28 +1130,27 @@ void spiInternalStartDMA(const extDevice_t *dev)
         streamRegsTx->CR = 0U;
         streamRegsRx->CR = 0U;
 
-        /* Use the Rx interrupt as this occurs once the SPI operation is complete whereas the Tx interrupt
-         * occurs earlier when the Tx FIFO is empty, but the SPI operation is still in progress
-         */
+        // Use the Rx interrupt as this occurs once the SPI operation is
+        // complete whereas the Tx interrupt occurs earlier when the Tx FIFO is
+        // empty, but the SPI operation is still in progress
         DMA_ITConfig(streamRegsRx, DMA_IT_TC, ENABLE);
 
         // Update streams
         DMA_Init(streamRegsTx, dev->bus->initTx);
         DMA_Init(streamRegsRx, dev->bus->initRx);
 
-        /* Note from AN4031
-         *
-         * If the user enables the used peripheral before the corresponding DMA stream, a “FEIF”
-         * (FIFO Error Interrupt Flag) may be set due to the fact the DMA is not ready to provide
-         * the first required data to the peripheral (in case of memory-to-peripheral transfer).
-         */
-
+        // Note from AN4031 If the user enables the used peripheral before the
+        // corresponding DMA stream, a “FEIF” (FIFO Error Interrupt Flag) may
+        // be set due to the fact the DMA is not ready to provide the first
+        // required data to the peripheral (in case of memory-to-peripheral
+        // transfer).
         // Enable streams
         DMA_Cmd(streamRegsTx, ENABLE);
         DMA_Cmd(streamRegsRx, ENABLE);
 
         /* Enable the SPI DMA Tx & Rx requests */
-        SPI_I2S_DMACmd(dev->bus->busType_u.spi.instance, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, ENABLE);
+        SPI_I2S_DMACmd(dev->bus->busType_u.spi.instance,
+                SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, ENABLE);
     } else {
         // Use the correct callback argument
         dmaTx->userParam = (uint32_t)dev;
@@ -1153,13 +1166,11 @@ void spiInternalStartDMA(const extDevice_t *dev)
         // Update stream
         DMA_Init(streamRegsTx, dev->bus->initTx);
 
-        /* Note from AN4031
-         *
-         * If the user enables the used peripheral before the corresponding DMA stream, a “FEIF”
-         * (FIFO Error Interrupt Flag) may be set due to the fact the DMA is not ready to provide
-         * the first required data to the peripheral (in case of memory-to-peripheral transfer).
-         */
-
+        // Note from AN4031 If the user enables the used peripheral before the
+        // corresponding DMA stream, a “FEIF” (FIFO Error Interrupt Flag) may
+        // be set due to the fact the DMA is not ready to provide the first
+        // required data to the peripheral (in case of memory-to-peripheral
+        // transfer).
         // Enable stream
         DMA_Cmd(streamRegsTx, ENABLE);
 
@@ -1237,9 +1248,11 @@ void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments)
     SPI_Cmd(instance, ENABLE);
 
     // Check that any there are no attempts to DMA to/from CCD SRAM
-    for (busSegment_t *checkSegment = bus->curSegment; checkSegment->len; checkSegment++) {
+    for (busSegment_t *checkSegment = bus->curSegment;
+            checkSegment->len; checkSegment++) {
         // Check there is no receive data as only transmit DMA is available
-        if (((checkSegment->rxData) && (IS_CCM(checkSegment->rxData) || (bus->dmaRx == (dmaChannelDescriptor_t *)NULL))) ||
+        if (((checkSegment->rxData) && (IS_CCM(checkSegment->rxData) ||
+                        (bus->dmaRx == (dmaChannelDescriptor_t *)NULL))) ||
             ((checkSegment->txData) && IS_CCM(checkSegment->txData))) {
             dmaSafe = false;
             break;
@@ -1299,7 +1312,8 @@ void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments)
             bus->curSegment->txData = NULL;
             spiSequenceStart(nextDev, nextSegments);
         } else {
-            // The end of the segment list has been reached, so mark transactions as complete
+            // The end of the segment list has been reached, so mark
+            // transactions as complete
             bus->curSegment = (busSegment_t *)BUS_SPI_FREE;
         }
     }
