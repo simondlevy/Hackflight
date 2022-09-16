@@ -28,7 +28,6 @@ typedef enum SPIDevice {
     SPIDEV_6
 } SPIDevice;
 
-void spiInitDevice(SPIDevice device);
 void spiInternalInitStream(const extDevice_t *dev, bool preInit);
 void spiInternalStartDMA(const extDevice_t *dev);
 void spiInternalStopDMA (const extDevice_t *dev);

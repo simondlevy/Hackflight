@@ -136,6 +136,65 @@ SPI_TypeDef *spiInstanceByDevice(SPIDevice device)
     return spiDevice[device].dev;
 }
 
+// STM32F405 can't DMA to/from FASTRAM (CCM SRAM)
+static bool isCcm(const uint8_t * p)
+{
+    return (((uint32_t)p & 0xffff0000) == 0x10000000);
+}
+
+static SPI_InitTypeDef defaultInit = {
+    .SPI_Mode = SPI_Mode_Master,
+    .SPI_Direction = SPI_Direction_2Lines_FullDuplex,
+    .SPI_DataSize = SPI_DataSize_8b,
+    .SPI_NSS = SPI_NSS_Soft,
+    .SPI_FirstBit = SPI_FirstBit_MSB,
+    .SPI_CRCPolynomial = 7,
+    .SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8,
+    .SPI_CPOL = SPI_CPOL_High,
+    .SPI_CPHA = SPI_CPHA_2Edge
+};
+
+
+static void spiInitDevice(SPIDevice device)
+{
+    spiDevice_t *spi = &(spiDevice[device]);
+
+    if (!spi->dev) {
+        return;
+    }
+
+    // Enable SPI clock
+    RCC_ClockCmd(spi->rcc, ENABLE);
+    RCC_ResetCmd(spi->rcc, ENABLE);
+
+    IOInit(IOGetByTag(spi->sck),  OWNER_SPI_SCK,  RESOURCE_INDEX(device));
+    IOInit(IOGetByTag(spi->miso), OWNER_SPI_MISO, RESOURCE_INDEX(device));
+    IOInit(IOGetByTag(spi->mosi), OWNER_SPI_MOSI, RESOURCE_INDEX(device));
+
+    IOConfigGPIOAF(
+            IOGetByTag(spi->sck), 
+            IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_DOWN), 
+            spi->af);
+
+    IOConfigGPIOAF(
+            IOGetByTag(spi->miso),
+            IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_UP), 
+            spi->af);
+
+    IOConfigGPIOAF(
+            IOGetByTag(spi->mosi),
+            IO_CONFIG(GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL),
+            spi->af);
+
+    // Init SPI hardware
+    SPI_I2S_DeInit(spi->dev);
+
+    SPI_I2S_DMACmd(spi->dev, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, DISABLE);
+    SPI_Init(spi->dev, &defaultInit);
+    SPI_Cmd(spi->dev, ENABLE);
+}
+
+
 static void initmask(uint8_t mask, uint8_t k)
 {
     if ((mask>>k) & 0x01) {
@@ -913,21 +972,6 @@ void spiPinConfigure(void)
     }
 }
 
-// STM32F405 can't DMA to/from FASTRAM (CCM SRAM)
-#define IS_CCM(p) (((uint32_t)p & 0xffff0000) == 0x10000000)
-
-static SPI_InitTypeDef defaultInit = {
-    .SPI_Mode = SPI_Mode_Master,
-    .SPI_Direction = SPI_Direction_2Lines_FullDuplex,
-    .SPI_DataSize = SPI_DataSize_8b,
-    .SPI_NSS = SPI_NSS_Soft,
-    .SPI_FirstBit = SPI_FirstBit_MSB,
-    .SPI_CRCPolynomial = 7,
-    .SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8,
-    .SPI_CPOL = SPI_CPOL_High,
-    .SPI_CPHA = SPI_CPHA_2Edge
-};
-
 static uint16_t spiDivisorToBRbits(SPI_TypeDef *instance, uint16_t divisor)
 {
     // SPI2 and SPI3 are on APB1/AHB1 which PCLK is half that of APB2/AHB2.
@@ -952,45 +996,6 @@ static void spiSetDivisorBRreg(SPI_TypeDef *instance, uint16_t divisor)
 #undef BR_BITS
 }
 
-
-void spiInitDevice(SPIDevice device)
-{
-    spiDevice_t *spi = &(spiDevice[device]);
-
-    if (!spi->dev) {
-        return;
-    }
-
-    // Enable SPI clock
-    RCC_ClockCmd(spi->rcc, ENABLE);
-    RCC_ResetCmd(spi->rcc, ENABLE);
-
-    IOInit(IOGetByTag(spi->sck),  OWNER_SPI_SCK,  RESOURCE_INDEX(device));
-    IOInit(IOGetByTag(spi->miso), OWNER_SPI_MISO, RESOURCE_INDEX(device));
-    IOInit(IOGetByTag(spi->mosi), OWNER_SPI_MOSI, RESOURCE_INDEX(device));
-
-    IOConfigGPIOAF(
-            IOGetByTag(spi->sck), 
-            IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_DOWN), 
-            spi->af);
-
-    IOConfigGPIOAF(
-            IOGetByTag(spi->miso),
-            IO_CONFIG(GPIO_Mode_AF,  GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_UP), 
-            spi->af);
-
-    IOConfigGPIOAF(
-            IOGetByTag(spi->mosi),
-            IO_CONFIG(GPIO_Mode_AF, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL),
-            spi->af);
-
-    // Init SPI hardware
-    SPI_I2S_DeInit(spi->dev);
-
-    SPI_I2S_DMACmd(spi->dev, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, DISABLE);
-    SPI_Init(spi->dev, &defaultInit);
-    SPI_Cmd(spi->dev, ENABLE);
-}
 
 void spiInternalResetDescriptors(busDevice_t *bus)
 {
@@ -1248,9 +1253,9 @@ void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments)
     for (busSegment_t *checkSegment = bus->curSegment;
             checkSegment->len; checkSegment++) {
         // Check there is no receive data as only transmit DMA is available
-        if (((checkSegment->rxData) && (IS_CCM(checkSegment->rxData) ||
+        if (((checkSegment->rxData) && (isCcm(checkSegment->rxData) ||
                         (bus->dmaRx == (dmaChannelDescriptor_t *)NULL))) ||
-            ((checkSegment->txData) && IS_CCM(checkSegment->txData))) {
+            ((checkSegment->txData) && isCcm(checkSegment->txData))) {
             dmaSafe = false;
             break;
         }
