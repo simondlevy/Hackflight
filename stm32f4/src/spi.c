@@ -110,24 +110,7 @@ static uint8_t spiCfgToDev(const uint8_t k)
     return k - 1;
 }
 
-SPIDevice spiDeviceByInstance(SPI_TypeDef *instance)
-{
-    if (instance == SPI1) {
-        return SPIDEV_1;
-    }
-
-    if (instance == SPI2) {
-        return SPIDEV_2;
-    }
-
-    if (instance == SPI3) {
-        return SPIDEV_3;
-    }
-
-    return SPIINVALID;
-}
-
-SPI_TypeDef *spiInstanceByDevice(SPIDevice device)
+static SPI_TypeDef *spiInstanceByDevice(SPIDevice device)
 {
     if (device == SPIINVALID || device >= SPIDEV_COUNT) {
         return NULL;
@@ -153,7 +136,6 @@ static SPI_InitTypeDef defaultInit = {
     .SPI_CPOL = SPI_CPOL_High,
     .SPI_CPHA = SPI_CPHA_2Edge
 };
-
 
 static void spiInitDevice(SPIDevice device)
 {
@@ -202,24 +184,19 @@ static void initmask(uint8_t mask, uint8_t k)
     }
 }
 
+// Return true if DMA engine is busy
+static bool spiIsBusy(const extDevice_t *dev)
+{
+    return (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
+}
+
+// ----------------------------------------------------------------------------
+
 void spiInit(uint8_t mask)
 {
     initmask(mask, 0);
     initmask(mask, 1);
     initmask(mask, 2);
-}
-
-// Return true if DMA engine is busy
-bool spiIsBusy(const extDevice_t *dev)
-{
-    return (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
-}
-
-// Indicate that the bus on which this device resides may initiate DMA
-// transfers from interrupt context
-void spiSetAtomicWait(const extDevice_t *dev)
-{
-    dev->bus->useAtomicWait = true;
 }
 
 // Wait for DMA completion and claim the bus driver
@@ -1100,44 +1077,11 @@ void spiSetClkDivisor(const extDevice_t *dev, uint16_t divisor)
     ((extDevice_t *)dev)->busType_u.spi.speed = divisor;
 }
 
-// Set the clock phase/polarity to be used for accesses by the given device
-void spiSetClkPhasePolarity(const extDevice_t *dev, bool leadingEdge)
-{
-    ((extDevice_t *)dev)->busType_u.spi.leadingEdge = leadingEdge;
-}
-
-// Enable/disable DMA on a specific device. Enabled by default.
-void spiDmaEnable(const extDevice_t *dev, bool enable)
-{
-    ((extDevice_t *)dev)->useDMA = enable;
-}
-
-bool spiUseDMA(const extDevice_t *dev)
-{
-    // Full DMA only requires both transmit and receive}
-    return dev->bus->useDMA && dev->bus->dmaRx && dev->useDMA;
-}
-
-bool spiUseMOSI_DMA(const extDevice_t *dev)
-{
-    return dev->bus->useDMA && dev->useDMA;
-}
-
 void spiBusDeviceRegister(const extDevice_t *dev)
 {
     UNUSED(dev);
 
     spiRegisteredDeviceCount++;
-}
-
-uint8_t spiGetRegisteredDeviceCount(void)
-{
-    return spiRegisteredDeviceCount;
-}
-
-uint8_t spiGetExtDeviceCount(const extDevice_t *dev)
-{
-    return dev->bus->deviceCount;
 }
 
 // DMA transfer setup and start
@@ -1169,7 +1113,6 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments)
     spiSequenceStart(dev, segments);
 }
 
-
 void spiPreinitRegister(ioTag_t iotag, uint8_t iocfg, bool init)
 {
     if (!iotag) {
@@ -1199,16 +1142,7 @@ static void spiPreinitPin(spiPreinit_t *preinit, int index)
     }
 }
 
-void spiPreInit(void)
-{
-    flashPreInit();
-
-    for (int i = 0; i < spiPreinitCount; i++) {
-        spiPreinitPin(&spiPreinitArray[i], i);
-    }
-}
-
-void spiPreinitByIO(IO_t io)
+static void spiPreinitByIO(IO_t io)
 {
     for (int i = 0; i < spiPreinitCount; i++) {
         if (io == IOGetByTag(spiPreinitArray[i].iotag)) {
@@ -1218,9 +1152,13 @@ void spiPreinitByIO(IO_t io)
     }
 }
 
-void spiPreinitByTag(ioTag_t tag)
+void spiPreInit(void)
 {
-    spiPreinitByIO(IOGetByTag(tag));
+    flashPreInit();
+
+    for (int i = 0; i < spiPreinitCount; i++) {
+        spiPreinitPin(&spiPreinitArray[i], i);
+    }
 }
 
 const spiHardware_t spiHardware[] = {
