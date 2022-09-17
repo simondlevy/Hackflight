@@ -1128,24 +1128,24 @@ void spiPreInit(void)
     }
 }
 
-void spiPinConfigure(void)
+void spiPinConfigure(
+        const SPIDevice device,
+        uint8_t sckPin,
+        uint8_t misoPin,
+        uint8_t mosiPin)
 {
-    const SPIDevice      device  = SPIDEV_1;
-    SPI_TypeDef *        reg     = SPI1;
-    const uint8_t        af      = GPIO_AF_SPI1;
-    const rccPeriphTag_t rcc     = RCC_APB2(SPI1);
+    const uint8_t afs[3] = {GPIO_AF_SPI1, GPIO_AF_SPI2, GPIO_AF_SPI3}; 
 
-    const ioTag_t sckPin  = 21; // DEFIO_TAG_E(PA5);
-    const ioTag_t misoPin = 22; // DEFIO_TAG_E(PA6);
-    const ioTag_t mosiPin = 23; // DEFIO_TAG_E(PA7);
- 
+    SPI_TypeDef * reg  = SPI1;
+    const rccPeriphTag_t rcc = RCC_APB2(SPI1);
+
     spiDevice_t *pDev = &m_spiDevice[device];
 
     pDev->sck = sckPin;
     pDev->miso = misoPin;
     pDev->mosi = mosiPin;
     pDev->dev = reg;
-    pDev->af = af;
+    pDev->af = afs[device];
     pDev->rcc = rcc;
     pDev->leadingEdge = false; 
 }
