@@ -110,7 +110,7 @@ static uint8_t spiCfgToDev(const uint8_t k)
     return k - 1;
 }
 
-static SPI_TypeDef *spiInstanceByDevice(SPIDevice device)
+static SPI_TypeDef *spiInstanceByDevice(const SPIDevice device)
 {
     if (device == SPIINVALID || device >= SPIDEV_COUNT) {
         return NULL;
@@ -137,7 +137,7 @@ static SPI_InitTypeDef defaultInit = {
     .SPI_CPHA = SPI_CPHA_2Edge
 };
 
-static void spiInitDevice(SPIDevice device)
+static void spiInitDevice(const SPIDevice device)
 {
     spiDevice_t *spi = &(spiDevice[device]);
 
@@ -358,7 +358,8 @@ bool spiWriteRegRB(const extDevice_t *dev, const uint8_t reg, uint8_t data)
 }
 
 // Read a block of data from a register
-void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data, uint8_t length)
+void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
+        uint8_t length)
 {
     uint8_t regg = reg;
 
@@ -378,7 +379,8 @@ void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data, uin
 }
 
 // Read a block of data from a register, returning false if the bus is busy
-bool spiReadRegBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data, uint8_t length)
+bool spiReadRegBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
+        uint8_t length)
 {
     // Ensure any prior DMA has completed before continuing
     if (spiIsBusy(dev)) {
@@ -391,13 +393,15 @@ bool spiReadRegBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data, u
 }
 
 // Read a block of data where the register is ORed with 0x80, returning false if the bus is busy
-bool spiReadRegMskBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data, uint8_t length)
+bool spiReadRegMskBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
+        uint8_t length)
 {
     return spiReadRegBufRB(dev, reg | 0x80, data, length);
 }
 
 // Wait for bus to become free, then write a block of data to a register
-void spiWriteRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data, uint32_t length)
+void spiWriteRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
+        uint32_t length)
 {
     uint8_t regg = reg;
 
@@ -601,8 +605,6 @@ static uint16_t spiDivisorToBRbits(SPI_TypeDef *instance, uint16_t divisor)
 
     return (ffs(divisor) - 2) << 3; // SPI_CR1_BR_Pos
 }
-
-
 
 static void spiSetDivisorBRreg(SPI_TypeDef *instance, uint16_t divisor)
 {
@@ -964,13 +966,8 @@ void spiInitBusDMA()
      * DMA2
      */
 
-    spiPinConfig_t spiPinConfig;
-
-    spiPinConfig.ioTagSck  = 21;
-    spiPinConfig.ioTagMiso = 22;
-    spiPinConfig.ioTagMosi = 23;
-    spiPinConfig.txDmaopt  = -1;
-    spiPinConfig.rxDmaopt  = -1;
+    const int8_t rxDmaopt  = -1;
+    const int8_t txDmaopt  = -1;
 
     const bool dshotBitbangActive = true;
 
@@ -985,7 +982,6 @@ void spiInitBusDMA()
         dmaIdentifier_e dmaTxIdentifier = DMA_NONE;
         dmaIdentifier_e dmaRxIdentifier = DMA_NONE;
 
-        int8_t txDmaopt = spiPinConfig.txDmaopt;
         uint8_t txDmaoptMin = 0;
         uint8_t txDmaoptMax = MAX_PERIPHERAL_DMA_OPTIONS - 1;
 
@@ -1018,7 +1014,6 @@ void spiInitBusDMA()
             }
         }
 
-        int8_t rxDmaopt = spiPinConfig.rxDmaopt;
         uint8_t rxDmaoptMin = 0;
         uint8_t rxDmaoptMax = MAX_PERIPHERAL_DMA_OPTIONS - 1;
 
@@ -1126,7 +1121,7 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments)
     spiSequenceStart(dev, segments);
 }
 
-void spiPreinitRegister(ioTag_t iotag, const uint8_t iocfg, const bool init)
+void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg, const bool init)
 {
     if (!iotag) {
         return;
@@ -1244,6 +1239,7 @@ void spiPinConfigure(void)
     spiPinConfig_t * pConfig = &spiPinConfig;
 
     for (size_t hwindex = 0 ; hwindex < ARRAYLEN(spiHardware) ; hwindex++) {
+
         const spiHardware_t *hw = &spiHardware[hwindex];
 
         if (!hw->reg) {

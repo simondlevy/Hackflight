@@ -45,7 +45,7 @@ static int flashPartitions = 0;
 
 void flashPreInit(void)
 {
-    spiPreinitRegister(CS_TAG, IOCFG_IPU, 1);
+    spiPreInitRegister(CS_TAG, IOCFG_IPU, 1);
 }
 
 bool flashIsReady(void)

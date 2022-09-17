@@ -152,7 +152,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     gyroDeviceConfig.csnTag = 20;
     gyroDeviceConfig.extiTag = 52;
 
-    spiPreinitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
+    spiPreInitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
 
     mpuDetect(&gyroDeviceConfig);
 
