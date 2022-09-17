@@ -54,10 +54,6 @@ typedef enum {
     SPI_MODE3_POL_HIGH_EDGE_2ND
 } SPIMode_e;
 
-typedef struct spiPinDef_s {
-    ioTag_t pin;
-} spiPinDef_t;
-
 typedef struct SPIDevice_s {
     SPI_TypeDef *dev;
     ioTag_t sck;
