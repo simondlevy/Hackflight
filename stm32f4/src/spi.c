@@ -1182,10 +1182,6 @@ void spiPinConfigure(void)
 
         const spiHardware_t *hw = &spiHardware[hwindex];
 
-        if (!hw->reg) {
-            continue;
-        }
-
         SPIDevice device = hw->device;
         spiDevice_t *pDev = &spiDevice[device];
 
