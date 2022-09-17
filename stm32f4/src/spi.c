@@ -1171,14 +1171,11 @@ void spiPinConfigure(void)
     pDev->sck = hw->sckPin.pin;
     pDev->miso = hw->misoPin.pin;
     pDev->mosi = hw->mosiPin.pin;
-
-    if (pDev->sck && pDev->miso && pDev->mosi) {
-        pDev->dev = hw->reg;
-        pDev->af = hw->af;
-        pDev->rcc = hw->rcc;
-        pDev->leadingEdge = false; 
-        pDev->dmaIrqHandler = hw->dmaIrqHandler;
-    }
+    pDev->dev = hw->reg;
+    pDev->af = hw->af;
+    pDev->rcc = hw->rcc;
+    pDev->leadingEdge = false; 
+    pDev->dmaIrqHandler = hw->dmaIrqHandler;
 }
 
 
