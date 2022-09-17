@@ -90,12 +90,6 @@ typedef struct SPIDevice_s {
     uint8_t dmaIrqHandler;
 } spiDevice_t;
 
-
-static uint8_t spiRegisteredDeviceCount = 0;
-
-spiDevice_t spiDevice[SPIDEV_COUNT];
-busDevice_t spiBusDevice[SPIDEV_COUNT];
-
 typedef struct spiPreinit_s {
     ioTag_t iotag;
     uint8_t iocfg;
@@ -103,7 +97,14 @@ typedef struct spiPreinit_s {
 } spiPreinit_t;
 
 static spiPreinit_t spiPreinitArray[SPI_PREINIT_COUNT];
-static int spiPreinitCount;
+
+static uint8_t spiPreinitCount;
+
+static uint8_t spiRegisteredDeviceCount = 0;
+
+static spiDevice_t spiDevice[SPIDEV_COUNT];
+
+static busDevice_t spiBusDevice[SPIDEV_COUNT];
 
 static uint8_t spiCfgToDev(const uint8_t k)
 {
