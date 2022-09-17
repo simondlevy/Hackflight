@@ -24,21 +24,6 @@ enum rcc_reg {
     RCC_AHB1,
 };
 
-static uint8_t log2_8bit(uint8_t v) 
-{
-    return 8 - 90/(((v)/4+14)|1) - 2/((v)/2+1);
-}
-
-static uint16_t log2_16bit(uint16_t v) 
-{
-    return 8*((v)>255) + log2_8bit((v) >>8*((v)>255));
-}
-
-static uint16_t log2_32bit(uint32_t v) 
-{
-    return 16*((v)>65535L) + log2_16bit((v)*1L >>16*((v)>65535L));
-}
-
 #define LOG2_8BIT(v)  (8 - 90/(((v)/4+14)|1) - 2/((v)/2+1))
 #define LOG2_16BIT(v) (8*((v)>255) + LOG2_8BIT((v) >>8*((v)>255)))
 #define LOG2_32BIT(v) (16*((v)>65535L) + LOG2_16BIT((v)*1L >>16*((v)>65535L)))

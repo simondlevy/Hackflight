@@ -1128,28 +1128,16 @@ void spiPreInit(void)
     }
 }
 
-void spiPinConfigure(
-        const SPIDevice device,
-        uint8_t sckPin,
-        uint8_t misoPin,
-        uint8_t mosiPin)
+void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin)
 {
-    const uint8_t afs[3] = {GPIO_AF_SPI1, GPIO_AF_SPI2, GPIO_AF_SPI3}; 
-
-    const SPI_TypeDef * regs[3]  = {SPI1, SPI2, SPI3};
-
-    const SPI_TypeDef * reg = regs[device];
-
-    const uint8_t rcc = RCC_APB2(SPI1);
-
-    spiDevice_t *pDev = &m_spiDevice[device];
+    spiDevice_t *pDev = &m_spiDevice[SPIDEV_1];
 
     pDev->sck = sckPin;
     pDev->miso = misoPin;
     pDev->mosi = mosiPin;
-    pDev->dev = (SPI_TypeDef *)reg;
-    pDev->af = afs[device];
-    pDev->rcc = rcc;
+    pDev->dev = SPI1;
+    pDev->af = GPIO_AF_SPI1;
+    pDev->rcc = RCC_APB2(SPI1);
     pDev->leadingEdge = false; 
 }
 

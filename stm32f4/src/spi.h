@@ -40,8 +40,7 @@ void spiInit(const uint8_t mask);
 
 void spiInitBusDMA(void);
 
-void spiPinConfigure( const SPIDevice device, uint8_t sckPin, uint8_t misoPin,
-        uint8_t mosiPin);
+void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin);
 
 void spiPreInit(void);
 
