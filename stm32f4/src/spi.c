@@ -34,7 +34,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "systemdev.h"
 
 #define SPI_PREINIT_COUNT 16
-#define MAX_SPI_PIN_SEL   1
 #define SPIDEV_COUNT      3
 
 static const uint32_t BUS_SPI_FREE   = 0x00000000;
@@ -62,9 +61,9 @@ typedef struct spiPinDef_s {
 typedef struct spiHardware_s {
     SPIDevice device;
     SPI_TypeDef *reg;
-    spiPinDef_t sckPins[MAX_SPI_PIN_SEL];
-    spiPinDef_t misoPins[MAX_SPI_PIN_SEL];
-    spiPinDef_t mosiPins[MAX_SPI_PIN_SEL];
+    spiPinDef_t sckPin;
+    spiPinDef_t misoPin;
+    spiPinDef_t mosiPin;
     uint8_t af;
     rccPeriphTag_t rcc;
     uint8_t dmaIrqHandler;
@@ -1154,15 +1153,9 @@ void spiPreInit(void)
 static const spiHardware_t spiHardware = {
     .device = SPIDEV_1,
     .reg = SPI1,
-    .sckPins = {
-        { DEFIO_TAG_E(PA5) },
-    },
-    .misoPins = {
-        { DEFIO_TAG_E(PA6) },
-    },
-    .mosiPins = {
-        { DEFIO_TAG_E(PA7) },
-    },
+    .sckPin = { DEFIO_TAG_E(PA5) },
+    .misoPin = { DEFIO_TAG_E(PA6) },
+    .mosiPin = { DEFIO_TAG_E(PA7) },
     .af = GPIO_AF_SPI1,
     .rcc = RCC_APB2(SPI1),
 };
@@ -1178,19 +1171,16 @@ void spiPinConfigure(void)
     SPIDevice device = hw->device;
     spiDevice_t *pDev = &spiDevice[device];
 
-    for (int pindex = 0 ; pindex < MAX_SPI_PIN_SEL ; pindex++) {
+    if (ioTagSck == hw->sckPin.pin) {
+        pDev->sck = hw->sckPin.pin;
+    }
 
-        if (ioTagSck == hw->sckPins[pindex].pin) {
-            pDev->sck = hw->sckPins[pindex].pin;
-        }
+    if (ioTagMiso == hw->misoPin.pin) {
+        pDev->miso = hw->misoPin.pin;
+    }
 
-        if (ioTagMiso == hw->misoPins[pindex].pin) {
-            pDev->miso = hw->misoPins[pindex].pin;
-        }
-
-        if (ioTagMosi == hw->mosiPins[pindex].pin) {
-            pDev->mosi = hw->mosiPins[pindex].pin;
-        }
+    if (ioTagMosi == hw->mosiPin.pin) {
+        pDev->mosi = hw->mosiPin.pin;
     }
 
     if (pDev->sck && pDev->miso && pDev->mosi) {
