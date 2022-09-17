@@ -1162,26 +1162,15 @@ static const spiHardware_t spiHardware = {
 
 void spiPinConfigure(void)
 {
-    const uint8_t ioTagSck  = 21;  // 21 & 0x07 = 5; so, PA5
-    const uint8_t ioTagMiso = 22;  //                    PA6
-    const uint8_t ioTagMosi = 23;  //                    PA7
-
     const spiHardware_t *hw = &spiHardware;
 
     SPIDevice device = hw->device;
+
     spiDevice_t *pDev = &spiDevice[device];
 
-    if (ioTagSck == hw->sckPin.pin) {
-        pDev->sck = hw->sckPin.pin;
-    }
-
-    if (ioTagMiso == hw->misoPin.pin) {
-        pDev->miso = hw->misoPin.pin;
-    }
-
-    if (ioTagMosi == hw->mosiPin.pin) {
-        pDev->mosi = hw->mosiPin.pin;
-    }
+    pDev->sck = hw->sckPin.pin;
+    pDev->miso = hw->misoPin.pin;
+    pDev->mosi = hw->mosiPin.pin;
 
     if (pDev->sck && pDev->miso && pDev->mosi) {
         pDev->dev = hw->reg;
