@@ -1136,7 +1136,8 @@ void spiPinConfigure(
 {
     const uint8_t afs[3] = {GPIO_AF_SPI1, GPIO_AF_SPI2, GPIO_AF_SPI3}; 
 
-    SPI_TypeDef * reg  = SPI1;
+    const SPI_TypeDef * regs[3]  = {SPI1, SPI2, SPI3};
+
     const rccPeriphTag_t rcc = RCC_APB2(SPI1);
 
     spiDevice_t *pDev = &m_spiDevice[device];
@@ -1144,7 +1145,7 @@ void spiPinConfigure(
     pDev->sck = sckPin;
     pDev->miso = misoPin;
     pDev->mosi = mosiPin;
-    pDev->dev = reg;
+    pDev->dev = (SPI_TypeDef *)regs[device];
     pDev->af = afs[device];
     pDev->rcc = rcc;
     pDev->leadingEdge = false; 
