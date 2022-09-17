@@ -28,13 +28,6 @@ typedef enum SPIDevice {
     SPIDEV_6
 } SPIDevice;
 
-void spiInternalInitStream(const extDevice_t *dev, bool preInit);
-void spiInternalStartDMA(const extDevice_t *dev);
-void spiInternalStopDMA (const extDevice_t *dev);
-void spiInternalResetStream(dmaChannelDescriptor_t *descriptor);
-void spiInternalResetDescriptors(busDevice_t *bus);
-void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments);
-
 #if defined(__cplusplus)
 extern "C" {
 #endif
