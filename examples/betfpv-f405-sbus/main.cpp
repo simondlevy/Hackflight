@@ -49,7 +49,7 @@ int main(void)
 
     vector<PidController *> pids = {&anglePid};
 
-    vector<uint8_t> motorPins = {32, 33, 19, 18};
+    vector<uint8_t> motorPins = {0x20, 0x21, 0x13, 0x12};
 
     static SbusReceiver rx(SERIAL_PORT_USART3);
 
@@ -57,7 +57,7 @@ int main(void)
 
     static DshotBitbangEsc esc(motorPins);
 
-    static Stm32F4Led led(37); // 37 & 0x07 = 5; specified as PB5 in betaflight
+    static Stm32F4Led led(0x25); // PB5
 
     static Hackflight hf(rx, imu, imuRotate270, pids, mixer, esc, led);
 
