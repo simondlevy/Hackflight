@@ -966,9 +966,6 @@ void spiInitBusDMA()
      * DMA2
      */
 
-    const int8_t rxDmaopt  = -1;
-    const int8_t txDmaopt  = -1;
-
     const bool dshotBitbangActive = true;
 
     for (device = 0; device < SPIDEV_COUNT; device++) {
@@ -984,11 +981,6 @@ void spiInitBusDMA()
 
         uint8_t txDmaoptMin = 0;
         uint8_t txDmaoptMax = MAX_PERIPHERAL_DMA_OPTIONS - 1;
-
-        if (txDmaopt != -1) {
-            txDmaoptMin = txDmaopt;
-            txDmaoptMax = txDmaopt;
-        }
 
         for (uint8_t opt = txDmaoptMin; opt <= txDmaoptMax; opt++) {
             const dmaChannelSpec_t *dmaTxChannelSpec =
@@ -1016,11 +1008,6 @@ void spiInitBusDMA()
 
         uint8_t rxDmaoptMin = 0;
         uint8_t rxDmaoptMax = MAX_PERIPHERAL_DMA_OPTIONS - 1;
-
-        if (rxDmaopt != -1) {
-            rxDmaoptMin = rxDmaopt;
-            rxDmaoptMax = rxDmaopt;
-        }
 
         for (uint8_t opt = rxDmaoptMin; opt <= rxDmaoptMax; opt++) {
             const dmaChannelSpec_t *dmaRxChannelSpec =
