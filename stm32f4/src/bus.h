@@ -76,7 +76,7 @@ typedef struct busSegment_s {
      * a busSegment_t * structure to link to the next transfer.
      */
     uint8_t *rxData;
-    int len;
+    int32_t len;
     bool negateCS; // Should CS be negated at the end of this segment
     busStatus_e (*callback)(uint32_t arg);
 } busSegment_t;

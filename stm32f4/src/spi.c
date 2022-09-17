@@ -284,16 +284,17 @@ uint8_t spiReadWrite(const extDevice_t *dev, uint8_t data)
 }
 
 // Wait for bus to become free, then read/write a single byte from a register
-uint8_t spiReadWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data)
+uint8_t spiReadWriteReg(const extDevice_t *dev, const uint8_t reg, const uint8_t data)
 {
     uint8_t retval = 0;
 
     uint8_t regg = reg;
+    uint8_t dataa = data;
 
     // This routine blocks so no need to use static data
     busSegment_t segments[] = {
             {&regg, NULL, sizeof(reg), false, NULL},
-            {&data, &retval, sizeof(data), true, NULL},
+            {&dataa, &retval, sizeof(data), true, NULL},
             {NULL, NULL, 0, true, NULL},
     };
 
@@ -359,7 +360,7 @@ bool spiWriteRegRB(const extDevice_t *dev, const uint8_t reg, uint8_t data)
 
 // Read a block of data from a register
 void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        uint8_t length)
+        const uint8_t length)
 {
     uint8_t regg = reg;
 
@@ -380,7 +381,7 @@ void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
 
 // Read a block of data from a register, returning false if the bus is busy
 bool spiReadRegBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        uint8_t length)
+        const uint8_t length)
 {
     // Ensure any prior DMA has completed before continuing
     if (spiIsBusy(dev)) {
@@ -464,7 +465,7 @@ uint16_t spiCalculateDivider(const uint32_t freq)
     return divisor;
 }
 
-static void spiInternalInitStream(const extDevice_t *dev, bool preInit)
+static void spiInternalInitStream(const extDevice_t *dev, const bool preInit)
 {
     static uint8_t dummyTxByte = 0xff;
     static uint8_t dummyRxByte;
@@ -482,7 +483,7 @@ static void spiInternalInitStream(const extDevice_t *dev, bool preInit)
         }
     }
 
-    int len = segment->len;
+    int32_t len = segment->len;
 
     uint8_t *txData = segment->txData;
     DMA_InitTypeDef *initTx = bus->initTx;
@@ -614,7 +615,8 @@ static void spiSetDivisorBRreg(SPI_TypeDef *instance, uint16_t divisor)
 #undef BR_BITS
 }
 
-static bool spiInternalReadWriteBufPolled(SPI_TypeDef *instance, const uint8_t *txData, uint8_t *rxData, int len)
+static bool spiInternalReadWriteBufPolled(SPI_TypeDef *instance, const uint8_t *txData,
+        uint8_t *rxData, uint32_t len)
 {
     uint8_t b;
 

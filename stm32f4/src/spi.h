@@ -49,7 +49,7 @@ void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg, const bool init);
 uint8_t spiReadReg(const extDevice_t *dev, const uint8_t reg);
 
 void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        uint8_t length);
+        const uint8_t length);
 
 bool spiReadRegBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
         uint8_t length);
@@ -57,7 +57,7 @@ bool spiReadRegBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
 uint8_t spiReadRegMsk(const extDevice_t *dev, const uint8_t reg);
 
 bool spiReadRegMskBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        uint8_t length);
+        const uint8_t length);
 
 uint8_t spiReadWrite(const extDevice_t *dev, uint8_t data);
 
@@ -67,7 +67,7 @@ void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData,
 bool spiReadWriteBufRB(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData, 
         const uint8_t length);
 
-uint8_t spiReadWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data);
+uint8_t spiReadWriteReg(const extDevice_t *dev, const uint8_t reg, const uint8_t data);
 
 void spiSequence(const extDevice_t *dev, busSegment_t *segments);
 
