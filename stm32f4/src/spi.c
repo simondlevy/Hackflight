@@ -72,15 +72,10 @@ typedef struct spiPreinit_s {
     bool init;
 } spiPreinit_t;
 
-static spiPreinit_t spiPreinitArray[SPI_PREINIT_COUNT];
-
-static uint8_t spiPreinitCount;
-
-static uint8_t spiRegisteredDeviceCount;
-
-static spiDevice_t spiDevice[SPIDEV_COUNT];
-
-static busDevice_t spiBusDevice[SPIDEV_COUNT];
+static spiPreinit_t m_spiPreinitArray[SPI_PREINIT_COUNT];
+static uint8_t      m_spiPreinitCount;
+static spiDevice_t  m_spiDevice[SPIDEV_COUNT];
+static busDevice_t  m_spiBusDevice[SPIDEV_COUNT];
 
 static uint8_t spiCfgToDev(const uint8_t k)
 {
@@ -93,7 +88,7 @@ static SPI_TypeDef *spiInstanceByDevice(const SPIDevice device)
         return NULL;
     }
 
-    return spiDevice[device].dev;
+    return m_spiDevice[device].dev;
 }
 
 // STM32F405 can't DMA to/from FASTRAM (CCM SRAM)
@@ -116,7 +111,7 @@ static SPI_InitTypeDef defaultInit = {
 
 static void spiInitDevice(const SPIDevice device)
 {
-    spiDevice_t *spi = &(spiDevice[device]);
+    spiDevice_t *spi = &(m_spiDevice[device]);
 
     if (!spi->dev) {
         return;
@@ -864,7 +859,7 @@ bool spiSetBusInstance(extDevice_t *dev, const uint32_t device)
         return false;
     }
 
-    dev->bus = &spiBusDevice[spiCfgToDev(device)];
+    dev->bus = &m_spiBusDevice[spiCfgToDev(device)];
 
     // By default each device should use SPI DMA if the bus supports it
     dev->useDMA = true;
@@ -948,7 +943,7 @@ void spiInitBusDMA()
     const bool dshotBitbangActive = true;
 
     for (device = 0; device < SPIDEV_COUNT; device++) {
-        busDevice_t *bus = &spiBusDevice[device];
+        busDevice_t *bus = &m_spiBusDevice[device];
 
         if (bus->busType != BUS_TYPE_SPI) {
             // This bus is not in use
@@ -1054,8 +1049,6 @@ void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divisor)
 void spiBusDeviceRegister(const extDevice_t *dev)
 {
     UNUSED(dev);
-
-    spiRegisteredDeviceCount++;
 }
 
 // DMA transfer setup and start
@@ -1093,15 +1086,15 @@ void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg, const bool init)
         return;
     }
 
-    if (spiPreinitCount == SPI_PREINIT_COUNT) {
+    if (m_spiPreinitCount == SPI_PREINIT_COUNT) {
         systemIndicateFailure(FAILURE_DEVELOPER, 5);
         return;
     }
 
-    spiPreinitArray[spiPreinitCount].iotag = iotag;
-    spiPreinitArray[spiPreinitCount].iocfg = iocfg;
-    spiPreinitArray[spiPreinitCount].init = init;
-    ++spiPreinitCount;
+    m_spiPreinitArray[m_spiPreinitCount].iotag = iotag;
+    m_spiPreinitArray[m_spiPreinitCount].iocfg = iocfg;
+    m_spiPreinitArray[m_spiPreinitCount].init = init;
+    ++m_spiPreinitCount;
 }
 
 static void spiPreinitPin(spiPreinit_t *preinit, int index)
@@ -1118,9 +1111,9 @@ static void spiPreinitPin(spiPreinit_t *preinit, int index)
 
 static void spiPreinitByIO(IO_t io)
 {
-    for (int i = 0; i < spiPreinitCount; i++) {
-        if (io == IOGetByTag(spiPreinitArray[i].iotag)) {
-            spiPreinitPin(&spiPreinitArray[i], i);
+    for (int i = 0; i < m_spiPreinitCount; i++) {
+        if (io == IOGetByTag(m_spiPreinitArray[i].iotag)) {
+            spiPreinitPin(&m_spiPreinitArray[i], i);
             return;
         }
     }
@@ -1130,8 +1123,8 @@ void spiPreInit(void)
 {
     flashPreInit();
 
-    for (int i = 0; i < spiPreinitCount; i++) {
-        spiPreinitPin(&spiPreinitArray[i], i);
+    for (int i = 0; i < m_spiPreinitCount; i++) {
+        spiPreinitPin(&m_spiPreinitArray[i], i);
     }
 }
 
@@ -1146,7 +1139,7 @@ void spiPinConfigure(void)
     const ioTag_t misoPin = 22; // DEFIO_TAG_E(PA6);
     const ioTag_t mosiPin = 23; // DEFIO_TAG_E(PA7);
  
-    spiDevice_t *pDev = &spiDevice[device];
+    spiDevice_t *pDev = &m_spiDevice[device];
 
     pDev->sck = sckPin;
     pDev->miso = misoPin;
