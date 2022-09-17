@@ -58,17 +58,6 @@ typedef struct spiPinDef_s {
     ioTag_t pin;
 } spiPinDef_t;
 
-typedef struct spiHardware_s {
-    SPIDevice device;
-    SPI_TypeDef *reg;
-    spiPinDef_t sckPin;
-    spiPinDef_t misoPin;
-    spiPinDef_t mosiPin;
-    uint8_t af;
-    rccPeriphTag_t rcc;
-    uint8_t dmaIrqHandler;
-} spiHardware_t;
-
 typedef struct SPIDevice_s {
     SPI_TypeDef *dev;
     ioTag_t sck;
@@ -1150,32 +1139,26 @@ void spiPreInit(void)
     }
 }
 
-static const spiHardware_t spiHardware = {
-    .device = SPIDEV_1,
-    .reg = SPI1,
-    .sckPin = { DEFIO_TAG_E(PA5) },
-    .misoPin = { DEFIO_TAG_E(PA6) },
-    .mosiPin = { DEFIO_TAG_E(PA7) },
-    .af = GPIO_AF_SPI1,
-    .rcc = RCC_APB2(SPI1),
-};
-
 void spiPinConfigure(void)
 {
-    const spiHardware_t *hw = &spiHardware;
+    const SPIDevice      device  = SPIDEV_1;
+    SPI_TypeDef *        reg     = SPI1;
+    const uint8_t        af      = GPIO_AF_SPI1;
+    const rccPeriphTag_t rcc     = RCC_APB2(SPI1);
 
-    SPIDevice device = hw->device;
-
+    const spiPinDef_t    sckPin  = { DEFIO_TAG_E(PA5) };
+    const spiPinDef_t    misoPin = { DEFIO_TAG_E(PA6) };
+    const spiPinDef_t    mosiPin = { DEFIO_TAG_E(PA7) };
+ 
     spiDevice_t *pDev = &spiDevice[device];
 
-    pDev->sck = hw->sckPin.pin;
-    pDev->miso = hw->misoPin.pin;
-    pDev->mosi = hw->mosiPin.pin;
-    pDev->dev = hw->reg;
-    pDev->af = hw->af;
-    pDev->rcc = hw->rcc;
+    pDev->sck = sckPin.pin;
+    pDev->miso = misoPin.pin;
+    pDev->mosi = mosiPin.pin;
+    pDev->dev = reg;
+    pDev->af = af;
+    pDev->rcc = rcc;
     pDev->leadingEdge = false; 
-    pDev->dmaIrqHandler = hw->dmaIrqHandler;
 }
 
 
