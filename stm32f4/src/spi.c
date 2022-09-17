@@ -44,8 +44,6 @@ typedef struct spiPinConfig_s {
     ioTag_t ioTagSck;
     ioTag_t ioTagMiso;
     ioTag_t ioTagMosi;
-    int8_t txDmaopt;
-    int8_t rxDmaopt;
 } spiPinConfig_t;
 
 // De facto standard mode
@@ -100,7 +98,7 @@ static spiPreinit_t spiPreinitArray[SPI_PREINIT_COUNT];
 
 static uint8_t spiPreinitCount;
 
-static uint8_t spiRegisteredDeviceCount = 0;
+static uint8_t spiRegisteredDeviceCount;
 
 static spiDevice_t spiDevice[SPIDEV_COUNT];
 
@@ -1223,8 +1221,6 @@ void spiPinConfigure(void)
     spiPinConfig.ioTagSck = 21;   // 21 & 0x07 = 5; so, PA5
     spiPinConfig.ioTagMiso = 22;  //                    PA6
     spiPinConfig.ioTagMosi = 23;  //                    PA7
-    spiPinConfig.txDmaopt = -1;
-    spiPinConfig.rxDmaopt = -1;
 
     spiPinConfig_t * pConfig = &spiPinConfig;
 
