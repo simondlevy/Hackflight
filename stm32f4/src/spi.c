@@ -231,7 +231,8 @@ void spiWait(const extDevice_t *dev)
 }
 
 // Wait for bus to become free, then read/write block of data
-void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData, int len)
+void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData,
+        const uint8_t len)
 {
     // This routine blocks so no need to use static data
     busSegment_t segments[] = {
@@ -248,7 +249,8 @@ void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData, i
 }
 
 // Read/Write a block of data, returning false if the bus is busy
-bool spiReadWriteBufRB(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData, int length)
+bool spiReadWriteBufRB(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData,
+        const uint8_t length)
 {
     // Ensure any prior DMA has completed before continuing
     if (spiIsBusy(dev)) {
