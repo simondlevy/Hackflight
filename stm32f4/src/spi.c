@@ -1142,9 +1142,9 @@ void spiPinConfigure(void)
     const uint8_t        af      = GPIO_AF_SPI1;
     const rccPeriphTag_t rcc     = RCC_APB2(SPI1);
 
-    const ioTag_t sckPin  = DEFIO_TAG_E(PA5);
-    const ioTag_t misoPin = DEFIO_TAG_E(PA6);
-    const ioTag_t mosiPin = DEFIO_TAG_E(PA7);
+    const ioTag_t sckPin  = 21; // DEFIO_TAG_E(PA5);
+    const ioTag_t misoPin = 22; // DEFIO_TAG_E(PA6);
+    const ioTag_t mosiPin = 23; // DEFIO_TAG_E(PA7);
  
     spiDevice_t *pDev = &spiDevice[device];
 
