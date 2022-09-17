@@ -34,7 +34,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "systemdev.h"
 
 #define SPI_PREINIT_COUNT 16
-#define MAX_SPI_PIN_SEL   2
+#define MAX_SPI_PIN_SEL   1
 #define SPIDEV_COUNT      3
 
 static const uint32_t BUS_SPI_FREE   = 0x00000000;
@@ -1151,25 +1151,20 @@ void spiPreInit(void)
     }
 }
 
-static const spiHardware_t spiHardware[] = {
-    {
-        .device = SPIDEV_1,
-        .reg = SPI1,
-        .sckPins = {
-            { DEFIO_TAG_E(PA5) },
-            { DEFIO_TAG_E(PB3) },
-        },
-        .misoPins = {
-            { DEFIO_TAG_E(PA6) },
-            { DEFIO_TAG_E(PB4) },
-        },
-        .mosiPins = {
-            { DEFIO_TAG_E(PA7) },
-            { DEFIO_TAG_E(PB5) },
-        },
-        .af = GPIO_AF_SPI1,
-        .rcc = RCC_APB2(SPI1),
+static const spiHardware_t spiHardware = {
+    .device = SPIDEV_1,
+    .reg = SPI1,
+    .sckPins = {
+        { DEFIO_TAG_E(PA5) },
     },
+    .misoPins = {
+        { DEFIO_TAG_E(PA6) },
+    },
+    .mosiPins = {
+        { DEFIO_TAG_E(PA7) },
+    },
+    .af = GPIO_AF_SPI1,
+    .rcc = RCC_APB2(SPI1),
 };
 
 void spiPinConfigure(void)
@@ -1178,33 +1173,32 @@ void spiPinConfigure(void)
     const uint8_t ioTagMiso = 22;  //                    PA6
     const uint8_t ioTagMosi = 23;  //                    PA7
 
-    for (size_t hwindex = 0 ; hwindex < ARRAYLEN(spiHardware) ; hwindex++) {
+    const spiHardware_t *hw = &spiHardware;
 
-        const spiHardware_t *hw = &spiHardware[hwindex];
+    SPIDevice device = hw->device;
+    spiDevice_t *pDev = &spiDevice[device];
 
-        SPIDevice device = hw->device;
-        spiDevice_t *pDev = &spiDevice[device];
+    for (int pindex = 0 ; pindex < MAX_SPI_PIN_SEL ; pindex++) {
 
-        for (int pindex = 0 ; pindex < MAX_SPI_PIN_SEL ; pindex++) {
-
-            if (ioTagSck == hw->sckPins[pindex].pin) {
-                pDev->sck = hw->sckPins[pindex].pin;
-            }
-            if (ioTagMiso == hw->misoPins[pindex].pin) {
-                pDev->miso = hw->misoPins[pindex].pin;
-            }
-            if (ioTagMosi == hw->mosiPins[pindex].pin) {
-                pDev->mosi = hw->mosiPins[pindex].pin;
-            }
+        if (ioTagSck == hw->sckPins[pindex].pin) {
+            pDev->sck = hw->sckPins[pindex].pin;
         }
 
-        if (pDev->sck && pDev->miso && pDev->mosi) {
-            pDev->dev = hw->reg;
-            pDev->af = hw->af;
-            pDev->rcc = hw->rcc;
-            pDev->leadingEdge = false; 
-            pDev->dmaIrqHandler = hw->dmaIrqHandler;
+        if (ioTagMiso == hw->misoPins[pindex].pin) {
+            pDev->miso = hw->misoPins[pindex].pin;
         }
+
+        if (ioTagMosi == hw->mosiPins[pindex].pin) {
+            pDev->mosi = hw->mosiPins[pindex].pin;
+        }
+    }
+
+    if (pDev->sck && pDev->miso && pDev->mosi) {
+        pDev->dev = hw->reg;
+        pDev->af = hw->af;
+        pDev->rcc = hw->rcc;
+        pDev->leadingEdge = false; 
+        pDev->dmaIrqHandler = hw->dmaIrqHandler;
     }
 }
 
