@@ -192,7 +192,7 @@ static bool spiIsBusy(const extDevice_t *dev)
 
 // ----------------------------------------------------------------------------
 
-void spiInit(uint8_t mask)
+void spiInit(const uint8_t mask)
 {
     initmask(mask, 0);
     initmask(mask, 1);

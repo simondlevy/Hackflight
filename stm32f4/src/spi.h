@@ -104,7 +104,7 @@ bool    spiReadWriteBufRB(const extDevice_t *dev, uint8_t *txData, uint8_t *rxDa
 
 // Config
 void spiBusDeviceRegister(const extDevice_t *dev);
-void spiInit(uint8_t mask);
+void spiInit(const uint8_t mask);
 void spiInitBusDMA(void);
 void spiPinConfigure(void);
 void spiPreInit(void);
