@@ -40,12 +40,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 static const uint32_t BUS_SPI_FREE   = 0x00000000;
 static const uint32_t BUS_SPI_LOCKED = 0x00000004;
 
-typedef struct spiPinConfig_s {
-    ioTag_t ioTagSck;
-    ioTag_t ioTagMiso;
-    ioTag_t ioTagMosi;
-} spiPinConfig_t;
-
 // De facto standard mode
 // See https://en.wikipedia.org/wiki/Serial_Peripheral_Interface
 //
@@ -1216,13 +1210,9 @@ const spiHardware_t spiHardware[] = {
 
 void spiPinConfigure(void)
 {
-    spiPinConfig_t spiPinConfig;
-
-    spiPinConfig.ioTagSck = 21;   // 21 & 0x07 = 5; so, PA5
-    spiPinConfig.ioTagMiso = 22;  //                    PA6
-    spiPinConfig.ioTagMosi = 23;  //                    PA7
-
-    spiPinConfig_t * pConfig = &spiPinConfig;
+    const uint8_t ioTagSck  = 21;  // 21 & 0x07 = 5; so, PA5
+    const uint8_t ioTagMiso = 22;  //                    PA6
+    const uint8_t ioTagMosi = 23;  //                    PA7
 
     for (size_t hwindex = 0 ; hwindex < ARRAYLEN(spiHardware) ; hwindex++) {
 
@@ -1236,13 +1226,14 @@ void spiPinConfigure(void)
         spiDevice_t *pDev = &spiDevice[device];
 
         for (int pindex = 0 ; pindex < MAX_SPI_PIN_SEL ; pindex++) {
-            if (pConfig[device].ioTagSck == hw->sckPins[pindex].pin) {
+
+            if (ioTagSck == hw->sckPins[pindex].pin) {
                 pDev->sck = hw->sckPins[pindex].pin;
             }
-            if (pConfig[device].ioTagMiso == hw->misoPins[pindex].pin) {
+            if (ioTagMiso == hw->misoPins[pindex].pin) {
                 pDev->miso = hw->misoPins[pindex].pin;
             }
-            if (pConfig[device].ioTagMosi == hw->mosiPins[pindex].pin) {
+            if (ioTagMosi == hw->mosiPins[pindex].pin) {
                 pDev->mosi = hw->mosiPins[pindex].pin;
             }
         }
