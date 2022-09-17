@@ -16,8 +16,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "rcc_types.h"
-
 enum rcc_reg {
     RCC_EMPTY = 0,   // make sure that default value (0) does not enable anything
     RCC_AHB,
@@ -26,11 +24,32 @@ enum rcc_reg {
     RCC_AHB1,
 };
 
+static uint8_t log2_8bit(uint8_t v) 
+{
+    return 8 - 90/(((v)/4+14)|1) - 2/((v)/2+1);
+}
+
+static uint16_t log2_16bit(uint16_t v) 
+{
+    return 8*((v)>255) + log2_8bit((v) >>8*((v)>255));
+}
+
+static uint16_t log2_32bit(uint32_t v) 
+{
+    return 16*((v)>65535L) + log2_16bit((v)*1L >>16*((v)>65535L));
+}
+
+#define LOG2_8BIT(v)  (8 - 90/(((v)/4+14)|1) - 2/((v)/2+1))
+#define LOG2_16BIT(v) (8*((v)>255) + LOG2_8BIT((v) >>8*((v)>255)))
+#define LOG2_32BIT(v) (16*((v)>65535L) + LOG2_16BIT((v)*1L >>16*((v)>65535L)))
+
 #define RCC_ENCODE(reg, mask) (((reg) << 5) | LOG2_32BIT(mask))
-#define RCC_AHB(periph) RCC_ENCODE(RCC_AHB, RCC_AHBENR_ ## periph ## EN)
+
 #define RCC_APB2(periph) RCC_ENCODE(RCC_APB2, RCC_APB2ENR_ ## periph ## EN)
+
+#define RCC_AHB(periph)  RCC_ENCODE(RCC_AHB, RCC_AHBENR_ ## periph ## EN)
 #define RCC_APB1(periph) RCC_ENCODE(RCC_APB1, RCC_APB1ENR_ ## periph ## EN)
 #define RCC_AHB1(periph) RCC_ENCODE(RCC_AHB1, RCC_AHB1ENR_ ## periph ## EN)
 
-void RCC_ClockCmd(rccPeriphTag_t periphTag, FunctionalState NewState);
-void RCC_ResetCmd(rccPeriphTag_t periphTag, FunctionalState NewState);
+void RCC_ClockCmd(uint8_t periphTag, FunctionalState NewState);
+void RCC_ResetCmd(uint8_t periphTag, FunctionalState NewState);

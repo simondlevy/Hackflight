@@ -17,7 +17,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 #include "rcc.h"
 
-void RCC_ClockCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
+void RCC_ClockCmd(uint8_t periphTag, FunctionalState NewState)
 {
     int tag = periphTag >> 5;
     uint32_t mask = 1 << (periphTag & 0x1f);
@@ -35,7 +35,7 @@ void RCC_ClockCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
     }
 }
 
-void RCC_ResetCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
+void RCC_ResetCmd(uint8_t periphTag, FunctionalState NewState)
 {
     int tag = periphTag >> 5;
     uint32_t mask = 1 << (periphTag & 0x1f);

@@ -163,7 +163,7 @@ uint8_t timerLookupChannelIndex(const uint16_t channel)
     return lookupChannelIndex(channel);
 }
 
-rccPeriphTag_t timerRCC(TIM_TypeDef *tim)
+uint8_t timerRCC(TIM_TypeDef *tim)
 {
     for (int i = 0; i < HARDWARE_TIMER_DEFINITION_COUNT; i++) {
         if (timerDefinitions[i].TIMx == tim) {

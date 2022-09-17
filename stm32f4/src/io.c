@@ -24,7 +24,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 // io ports defs are stored in array by index now
 struct ioPortDef_s {
-    rccPeriphTag_t rcc;
+    uint8_t rcc;
 };
 
 const struct ioPortDef_s ioPortDefs[] = {
@@ -199,7 +199,7 @@ void IOConfigGPIO(IO_t io, ioConfig_t cfg)
         return;
     }
 
-    const rccPeriphTag_t rcc = ioPortDefs[IO_GPIOPortIdx(io)].rcc;
+    const uint8_t rcc = ioPortDefs[IO_GPIOPortIdx(io)].rcc;
     RCC_ClockCmd(rcc, ENABLE);
 
     GPIO_InitTypeDef init = {
@@ -218,7 +218,7 @@ void IOConfigGPIOAF(IO_t io, ioConfig_t cfg, uint8_t af)
         return;
     }
 
-    const rccPeriphTag_t rcc = ioPortDefs[IO_GPIOPortIdx(io)].rcc;
+    const uint8_t rcc = ioPortDefs[IO_GPIOPortIdx(io)].rcc;
     RCC_ClockCmd(rcc, ENABLE);
     GPIO_PinAFConfig(IO_GPIO(io), IO_GPIO_PinSource(io), af);
 

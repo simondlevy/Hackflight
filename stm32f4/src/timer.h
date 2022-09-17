@@ -21,7 +21,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "dma.h"
 #include "io_types.h"
-#include "rcc_types.h"
 #include "resource.h"
 #include "timer_def.h"
 
@@ -66,7 +65,7 @@ typedef struct timerOvrHandlerRec_s {
 
 typedef struct timerDef_s {
     TIM_TypeDef *TIMx;
-    rccPeriphTag_t rcc;
+    uint8_t rcc;
     uint8_t inputIrq;
 } timerDef_t;
 
@@ -170,7 +169,7 @@ extern "C" {
 
     void timerReconfigureTimeBase(TIM_TypeDef *tim, uint16_t period, uint32_t hz);
 
-    rccPeriphTag_t timerRCC(TIM_TypeDef *tim);
+    uint8_t timerRCC(TIM_TypeDef *tim);
     uint8_t timerInputIrq(TIM_TypeDef *tim);
 
     extern const resourceOwner_t freeOwner;

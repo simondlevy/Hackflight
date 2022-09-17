@@ -60,7 +60,7 @@ typedef struct SPIDevice_s {
     ioTag_t miso;
     ioTag_t mosi;
     uint8_t af;
-    rccPeriphTag_t rcc;
+    uint8_t rcc;
     volatile uint16_t errorCount;
     bool leadingEdge;
     uint8_t dmaIrqHandler;
@@ -1138,14 +1138,16 @@ void spiPinConfigure(
 
     const SPI_TypeDef * regs[3]  = {SPI1, SPI2, SPI3};
 
-    const rccPeriphTag_t rcc = RCC_APB2(SPI1);
+    const SPI_TypeDef * reg = regs[device];
+
+    const uint8_t rcc = RCC_APB2(SPI1);
 
     spiDevice_t *pDev = &m_spiDevice[device];
 
     pDev->sck = sckPin;
     pDev->miso = misoPin;
     pDev->mosi = mosiPin;
-    pDev->dev = (SPI_TypeDef *)regs[device];
+    pDev->dev = (SPI_TypeDef *)reg;
     pDev->af = afs[device];
     pDev->rcc = rcc;
     pDev->leadingEdge = false; 

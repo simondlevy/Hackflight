@@ -53,7 +53,7 @@ typedef struct uartHardware_s {
     uartPinDef_t rxPins[UARTHARDWARE_MAX_PINS];
     uartPinDef_t txPins[UARTHARDWARE_MAX_PINS];
 
-    rccPeriphTag_t rcc;
+    uint8_t rcc;
 
     uint8_t af;
     uint8_t irqn;

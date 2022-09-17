@@ -302,6 +302,7 @@ $(OBJECT_DIR)/stm32clock.o: $(HFSRC_DIR)/stm32clock.c
 
 $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \
+	  $(STM_SRC_DIR)/*.h \
 	  $(HFSRC_DIR)/*.h \
       $(HFSRC_DIR)/*/*.h \
       $(HFSRC_DIR)/*/*/*.h \
