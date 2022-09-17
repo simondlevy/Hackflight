@@ -1151,7 +1151,7 @@ void spiPreInit(void)
     }
 }
 
-const spiHardware_t spiHardware[] = {
+static const spiHardware_t spiHardware[] = {
     {
         .device = SPIDEV_1,
         .reg = SPI1,
@@ -1169,42 +1169,6 @@ const spiHardware_t spiHardware[] = {
         },
         .af = GPIO_AF_SPI1,
         .rcc = RCC_APB2(SPI1),
-    },
-    {
-        .device = SPIDEV_2,
-        .reg = SPI2,
-        .sckPins = {
-            { DEFIO_TAG_E(PB10) },
-            { DEFIO_TAG_E(PB13) },
-        },
-        .misoPins = {
-            { DEFIO_TAG_E(PB14) },
-            { DEFIO_TAG_E(PC2) },
-        },
-        .mosiPins = {
-            { DEFIO_TAG_E(PB15) },
-            { DEFIO_TAG_E(PC3) },
-        },
-        .af = GPIO_AF_SPI2,
-        .rcc = RCC_APB1(SPI2),
-    },
-    {
-        .device = SPIDEV_3,
-        .reg = SPI3,
-        .sckPins = {
-            { DEFIO_TAG_E(PB3) },
-            { DEFIO_TAG_E(PC10) },
-        },
-        .misoPins = {
-            { DEFIO_TAG_E(PB4) },
-            { DEFIO_TAG_E(PC11) },
-        },
-        .mosiPins = {
-            { DEFIO_TAG_E(PB5) },
-            { DEFIO_TAG_E(PC12) },
-        },
-        .af = GPIO_AF_SPI3,
-        .rcc = RCC_APB1(SPI3),
     },
 };
 
