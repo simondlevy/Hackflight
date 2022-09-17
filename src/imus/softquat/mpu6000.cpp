@@ -149,8 +149,8 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     gyroDeviceConfig.busType = BUS_TYPE_SPI;
     gyroDeviceConfig.spiBus = 1;
-    gyroDeviceConfig.csnTag = 20;
-    gyroDeviceConfig.extiTag = 52;
+    gyroDeviceConfig.csnTag = 0x14;  // PA4
+    gyroDeviceConfig.extiTag = 0x34; // PC4
 
     spiPreInitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
 

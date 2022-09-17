@@ -50,7 +50,7 @@ void hardwareInit(void)
     serialInit(-1);
     inverterInit();
 
-    spi1PinConfigure(21, 22, 23);
+    spi1PinConfigure(0x15, 0x16, 0x17);
     spiPreInit();
     spiInit(0x07); // mask for devices 0,1,2
     spiInitBusDMA();
