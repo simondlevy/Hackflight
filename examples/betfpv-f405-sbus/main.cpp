@@ -45,7 +45,10 @@ int main(void)
         0.0); // 3.0; // Level Kp
 
     // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
-    static Mpu6000 imu(2000); // gyro scale DPS
+    static Mpu6000 imu(
+            0x14,  // CS pin = PA4
+            0x34,  // EXTI pin = PC4
+            2000); // gyro scale DPS
 
     vector<PidController *> pids = {&anglePid};
 

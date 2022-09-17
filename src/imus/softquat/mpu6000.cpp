@@ -149,8 +149,8 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     gyroDeviceConfig.busType = BUS_TYPE_SPI;
     gyroDeviceConfig.spiBus = 1;
-    gyroDeviceConfig.csnTag = 0x14;  // PA4
-    gyroDeviceConfig.extiTag = 0x34; // PC4
+    gyroDeviceConfig.csnTag = m_csPin;
+    gyroDeviceConfig.extiTag = m_extiPin;
 
     spiPreInitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
 
@@ -227,8 +227,13 @@ int16_t Mpu6000::devReadRawGyro(uint8_t k)
     return m_gyroDev.adcRaw[k];
 }
 
-Mpu6000::Mpu6000(uint16_t gyroScale) : SoftQuatImu(gyroScale)
+Mpu6000::Mpu6000(
+        uint8_t csPin,
+        uint8_t extiPin,
+        uint16_t gyroScale) : SoftQuatImu(gyroScale)
 {
+    m_csPin = csPin;
+    m_extiPin = extiPin;
 }
 
 #endif // !defined(ARDUINO)

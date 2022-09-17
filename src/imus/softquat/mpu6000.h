@@ -126,6 +126,9 @@ class Mpu6000 : public SoftQuatImu {
             uint8_t alignment;
         } gyroDeviceConfig_t;
 
+        uint8_t m_csPin;
+        uint8_t m_extiPin;
+
         bool detectSPISensorsAndUpdateDetectionResult(const gyroDeviceConfig_t *config);
 
         bool mpuDetect(const Mpu6000::gyroDeviceConfig_t *config);
@@ -154,6 +157,6 @@ class Mpu6000 : public SoftQuatImu {
 
         } gyroDev_t;
 
-        Mpu6000(uint16_t gyroScale);
+        Mpu6000(uint8_t csPin, uint8_t extiPin, uint16_t gyroScale);
 
 }; // class Mpu6000
