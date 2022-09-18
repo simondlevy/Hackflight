@@ -46,13 +46,11 @@ int main(void)
 
     // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
     static Mpu6000 imu(
-            0x14,  // CS pin = PA4
-            0x34,  // EXTI pin = PC4
+            0x14,  // CS pin   = PA4
+            0x20,  // EXTI pin = PB0
             2000); // gyro scale DPS
 
     vector<PidController *> pids = {&anglePid};
-
-    vector<uint8_t> motorPins = {0x20, 0x21, 0x13, 0x12};
 
     static MockReceiver rx;
 
@@ -60,7 +58,7 @@ int main(void)
 
     static MockEsc esc;
 
-    static Stm32F4Led led(0x25); // PB5
+    static Stm32F4Led led(0x3E); // PC13 (14?)
 
     static Hackflight hf(rx, imu, imuRotate270, pids, mixer, esc, led);
 

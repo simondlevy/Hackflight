@@ -27,15 +27,15 @@
 
 #include "platform.h"
 
-#include "drivers/system.h"
-#include "drivers/io.h"
-#include "drivers/dma.h"
-#include "drivers/nvic.h"
-#include "drivers/rcc.h"
+#include "systemdev.h"
+#include "io.h"
+#include "dma.h"
+#include "nvic.h"
+#include "rcc.h"
 
-#include "drivers/serial.h"
-#include "drivers/serial_uart.h"
-#include "drivers/serial_uart_impl.h"
+#include "serialdev.h"
+#include "serial_uart.h"
+#include "serial_uart_impl.h"
 
 const uartHardware_t uartHardware[UARTDEV_COUNT] = {
 
@@ -173,7 +173,7 @@ void uartIrqHandler(uartPort_t *s)
 {
     if (!s->rxDMAResource && (USART_GetITStatus(s->USARTx, USART_IT_RXNE) == SET)) {
         if (s->port.rxCallback) {
-            s->port.rxCallback(s->USARTx->DR, s->port.rxCallbackData);
+            s->port.rxCallback(s->USARTx->DR, s->port.rxCallbackData, microsISR());
         } else {
             s->port.rxBuffer[s->port.rxBufferHead] = s->USARTx->DR;
             s->port.rxBufferHead = (s->port.rxBufferHead + 1) % s->port.rxBufferSize;

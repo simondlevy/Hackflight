@@ -25,20 +25,27 @@
 
 #include "platform.h"
 
-#include "build/atomic.h"
-
-#include "common/utils.h"
-
-#include "drivers/nvic.h"
-
-#include "drivers/io.h"
+#include "atomic.h"
+#include "dma.h"
+#include "dma_reqmap.h"
+#include "io.h"
+#include "nvic.h"
+#include "macros.h"
 #include "rcc.h"
-#include "drivers/system.h"
-
+#include "stm32f4xx.h"
+#include "systemdev.h"
 #include "timer.h"
-#include "timer_impl.h"
+#include "timer_def.h"
+
+#define HARDWARE_TIMER_DEFINITION_COUNT 14
+
+#define MAX_TIMER_PINMAP_COUNT 21 // Largest known for F405RG (OMNINXT)
 
 #define TIM_N(n) (1 << (n))
+
+#define USED_TIMERS ( TIM_N(1) | TIM_N(2) | TIM_N(3) | TIM_N(4) | TIM_N(10) | TIM_N(11) )
+
+extern const timerDef_t timerDefinitions[];
 
 /*
     Groups that allow running different period (ex 50Hz servos + 400Hz throttle + etc):
@@ -112,10 +119,6 @@ TIM_TypeDef * const usedTimers[USED_TIMER_COUNT] = {
     _DEF(2),
     _DEF(3),
     _DEF(4),
-    _DEF(5),
-    _DEF(6),
-    _DEF(7),
-    _DEF(9),
     _DEF(10),
     _DEF(11),
 #undef _DEF
@@ -128,10 +131,6 @@ const int8_t timerNumbers[USED_TIMER_COUNT] = {
     _DEF(2),
     _DEF(3),
     _DEF(4),
-    _DEF(5),
-    _DEF(6),
-    _DEF(7),
-    _DEF(9),
     _DEF(10),
     _DEF(11),
 #undef _DEF
@@ -744,7 +743,7 @@ const timerDef_t timerDefinitions[HARDWARE_TIMER_DEFINITION_COUNT] = {
     { .TIMx = TIM11, .rcc = RCC_APB2(TIM11), .inputIrq = TIM1_TRG_COM_TIM11_IRQn},
 };
 
-const timerHardware_t fullTimerHardware[FULL_TIMER_CHANNEL_COUNT] = {
+const timerHardware_t fullTimerHardware[TIMER_CHANNEL_COUNT] = {
     // Auto-generated from 'timer_def.h'
 //PORTA
     DEF_TIM(TIM2, CH1, PA0, TIM_USE_ANY, 0, 0),
@@ -824,6 +823,13 @@ const timerHardware_t fullTimerHardware[FULL_TIMER_CHANNEL_COUNT] = {
 
 };
 
+typedef struct timerIOConfig_s {
+    ioTag_t ioTag;
+    uint8_t index;
+    int8_t dmaopt;
+} timerIOConfig_t;
+
+
 uint32_t timerClock(TIM_TypeDef *tim)
 {
     UNUSED(tim);
@@ -834,6 +840,9 @@ const resourceOwner_t freeOwner = { .owner = OWNER_FREE, .resourceIndex = 0 };
 
 static resourceOwner_t timerOwners[MAX_TIMER_PINMAP_COUNT];
 
+static timerIOConfig_t timerIOConfig[MAX_TIMER_PINMAP_COUNT];
+
+/*
 timerIOConfig_t *timerIoConfigByTag(ioTag_t ioTag)
 {
     for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
@@ -844,6 +853,7 @@ timerIOConfig_t *timerIoConfigByTag(ioTag_t ioTag)
 
     return NULL;
 }
+*/
 
 const timerHardware_t *timerGetByTagAndIndex(ioTag_t ioTag, unsigned timerIndex)
 {
@@ -869,8 +879,8 @@ const timerHardware_t *timerGetConfiguredByTag(ioTag_t ioTag)
 {
     uint8_t timerIndex = 0;
     for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
-        if (timerIOConfig(i)->ioTag == ioTag) {
-            timerIndex = timerIOConfig(i)->index;
+        if (timerIOConfig[i].ioTag == ioTag) {
+            timerIndex = timerIOConfig[i].index;
 
             break;
         }
@@ -879,39 +889,30 @@ const timerHardware_t *timerGetConfiguredByTag(ioTag_t ioTag)
     return timerGetByTagAndIndex(ioTag, timerIndex);
 }
 
-const timerHardware_t *timerGetAllocatedByNumberAndChannel(int8_t timerNumber, uint16_t timerChannel)
-{
-    for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
-        const timerHardware_t *timer = timerGetByTagAndIndex(timerIOConfig(i)->ioTag, timerIOConfig(i)->index);
-        if (timer && timerGetTIMNumber(timer->tim) == timerNumber && timer->channel == timerChannel && timerOwners[i].owner) {
-            return timer;
-        }
-    }
-
-    return dshotBitbangTimerGetAllocatedByNumberAndChannel(timerNumber, timerChannel);
-}
-
 const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
 {
     for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
-        const timerHardware_t *assignedTimer = timerGetByTagAndIndex(timerIOConfig(i)->ioTag, timerIOConfig(i)->index);
+        const timerHardware_t *assignedTimer =
+            timerGetByTagAndIndex(timerIOConfig[i].ioTag, timerIOConfig[i].index);
         if (assignedTimer && assignedTimer == timer) {
             return &timerOwners[i];
         }
     }
 
-    return dshotBitbangTimerGetOwner(timer);
+    return &freeOwner;
 }
 
-const timerHardware_t *timerAllocate(ioTag_t ioTag, resourceOwner_e owner, uint8_t resourceIndex)
+const timerHardware_t *timerAllocate(
+        ioTag_t ioTag, resourceOwner_e owner, uint8_t resourceIndex)
 {
     if (!ioTag) {
         return NULL;
     }
 
     for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
-        if (timerIOConfig(i)->ioTag == ioTag) {
-            const timerHardware_t *timer = timerGetByTagAndIndex(ioTag, timerIOConfig(i)->index);
+        if (timerIOConfig[i].ioTag == ioTag) {
+            const timerHardware_t *timer =
+                timerGetByTagAndIndex(ioTag, timerIOConfig[i].index);
 
             if (timerGetOwner(timer)->owner) {
                 return NULL;
@@ -926,6 +927,7 @@ const timerHardware_t *timerAllocate(ioTag_t ioTag, resourceOwner_e owner, uint8
 
     return NULL;
 }
+
 
 #define USABLE_TIMER_CHANNEL_COUNT 8
 

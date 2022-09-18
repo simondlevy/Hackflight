@@ -1,6 +1,6 @@
 TARGET_MCU := STM32F4
 
-TARGET    := STM32F405
+TARGET    := STM32F411
 
 SERIAL_DEVICE ?= /dev/ttyACM0
 
@@ -64,11 +64,11 @@ BASE_ALT_PAIRS    = $(join $(BASE_TARGET_NAMES:=/),$(ALT_TARGET_NAMES))
 find_target_pair  = $(filter %/$(1),$(BASE_ALT_PAIRS))
 get_base_target   = $(if $(call find_target_pair,$(1)),$(patsubst %/,%,$(dir $(call find_target_pair,$(1)))),$(1))
 
-UNIFIED_TARGETS := STM32F405
+UNIFIED_TARGETS := STM32F411
 
 BASE_TARGET   := $(call get_base_target,$(TARGET))
 
-F4_TARGETS      := $(F405_TARGETS) $(F411_TARGETS) $(F446_TARGETS)
+F4_TARGETS      := $(F411_TARGETS) $(F411_TARGETS) $(F446_TARGETS)
 
 TARGET_MCU := STM32F4
 
@@ -119,20 +119,17 @@ STM32_SRC = \
             bitbang.c \
             bus.c \
             spi.c \
-            spi_stm32f405.c \
+            spi_stm32f411.c \
             dma_common.c \
-            dma_reqmap_f405.c \
+            dma_reqmap_f411.c \
             exti.c \
             flash.c \
             io.c \
             pinio.c \
             rcc.c \
             serial.c \
-            serial_uart.c \
-            serial_uart_pinconfig.c \
-            serial_uart_stm32f405.c \
             system.c \
-            timer_stm32f405.c \
+            timer_stm32f411.c \
             $(addprefix pg/, $(notdir $(wildcard $(STM_SRC_DIR)/pg/*.c))) \
             $(addprefix common/,$(notdir $(wildcard $(STM_SRC_DIR)/common/*.c))) \
             $(addprefix config/,$(notdir $(wildcard $(STM_SRC_DIR)/config/*.c)))
