@@ -149,7 +149,7 @@ static void spiInitDevice(const SPIDevice device)
 }
 
 
-static void initmask(uint8_t mask, uint8_t k)
+static void initmask(const uint8_t mask, const uint8_t k)
 {
     if ((mask>>k) & 0x01) {
         spiInitDevice(k);
@@ -563,16 +563,10 @@ static void spiInternalStartDMA(const extDevice_t *dev)
     }
 }
 
-static uint16_t spiDivisorToBRbits(SPI_TypeDef *instance, uint16_t divisor)
+static uint16_t spiDivisorToBRbits(const SPI_TypeDef *instance, uint16_t divisor)
 {
     // SPI2 and SPI3 are on APB1/AHB1 which PCLK is half that of APB2/AHB2.
-#if defined(STM32F410xx) || defined(STM32F411xE)
-    UNUSED(instance);
-#else
-     if (instance == SPI2 || instance == SPI3) {
-        divisor /= 2; // Safe for divisor == 0 or 1
-    }
-#endif
+    divisor /= spiInstanceDenom(instance);
 
     divisor = constrain_u16(divisor, 2, 256);
 
@@ -586,8 +580,11 @@ static void spiSetDivisorBRreg(SPI_TypeDef *instance, uint16_t divisor)
     instance->CR1 = tempRegister | spiDivisorToBRbits(instance, divisor);
 }
 
-static bool spiInternalReadWriteBufPolled(SPI_TypeDef *instance, const uint8_t *txData,
-        uint8_t *rxData, uint32_t len)
+static bool spiInternalReadWriteBufPolled(
+        SPI_TypeDef *instance,
+        const uint8_t *txData,
+        uint8_t *rxData,
+        uint32_t len)
 {
     uint8_t b;
 

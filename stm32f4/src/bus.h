@@ -16,6 +16,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <stdbool.h>
+
 #include "platform.h"
 
 #include "io_types.h"

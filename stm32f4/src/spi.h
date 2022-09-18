@@ -40,6 +40,8 @@ void spiInit(const uint8_t mask);
 
 void spiInitBusDMA(void);
 
+uint8_t spiInstanceDenom(const SPI_TypeDef *instance);
+
 void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin);
 
 void spiPreInit(void);
