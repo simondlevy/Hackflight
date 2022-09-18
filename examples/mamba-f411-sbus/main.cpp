@@ -22,7 +22,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/mock.h>
 #include <hackflight.h>
-#include <tasks/receivers/sbus.h>
+#include <tasks/receivers/mock.h>
 #include <serial.h>
 
 #include <imus/softquat/mpu6000.h>
@@ -54,7 +54,7 @@ int main(void)
 
     vector<uint8_t> motorPins = {0x20, 0x21, 0x13, 0x12};
 
-    static SbusReceiver rx(SERIAL_PORT_USART3);
+    static MockReceiver rx;
 
     static Mixer mixer = QuadXbfMixer::make();
 
