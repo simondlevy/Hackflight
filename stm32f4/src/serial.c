@@ -105,8 +105,8 @@ void * serialOpenPort(
     portMode_e mode,
     portOptions_e options)
 {
-    serialPortUsage_t *serialPortUsage =
-        findSerialPortUsageByIdentifier(identifier);
+    serialPortUsage_t *serialPortUsage = findSerialPortUsageByIdentifier(identifier);
+
     if (!serialPortUsage || serialPortUsage->function != FUNCTION_NONE) {
         // not available / already in use
         return NULL;

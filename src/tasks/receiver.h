@@ -118,7 +118,7 @@ class Receiver : public Task {
             (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100;
     }
 
-    static float updateCommand(const float raw, const float sgn)
+    static float normalizeCommand(const float raw, const float sgn)
     {
         float tmp = fminf(fabs(raw - 1500), 500);
 
@@ -127,16 +127,16 @@ class Receiver : public Task {
         return raw < 1500 ? -cmd : cmd;
     }
 
-    void updateCommands(void)
+    void normalizeCommands(void)
     {
         auto tmp = constrain_f_i32(m_rawThrottle, 1050, PWM_MAX);
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
 
         m_commandThrottle = lookupThrottle(tmp2);
 
-        m_commandRoll  = updateCommand(m_rawRoll,  +1);
-        m_commandPitch = updateCommand(m_rawPitch, +1);
-        m_commandYaw   = updateCommand(m_rawYaw,   -1);
+        m_commandRoll  = normalizeCommand(m_rawRoll,  +1);
+        m_commandPitch = normalizeCommand(m_rawPitch, +1);
+        m_commandYaw   = normalizeCommand(m_rawYaw,   -1);
     }
 
     bool calculateChannels(const uint32_t usec)
@@ -337,6 +337,7 @@ class Receiver : public Task {
     {
     }
 
+    // Task function, called periodically
     void fun(uint32_t usec)
     {
         const auto haveSignal = (usec - m_lastFrameTimeUs) < (int32_t)(1000*TIMEOUT_MS);
@@ -369,7 +370,7 @@ class Receiver : public Task {
 
             case STATE_UPDATE:
                 m_gotNewData = true;
-                updateCommands();
+                normalizeCommands();
                 m_arming->updateFromReceiver(throttleIsDown(), aux1IsSet(), haveSignal);
                 m_state = STATE_CHECK;
                 break;
