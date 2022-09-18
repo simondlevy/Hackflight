@@ -118,6 +118,7 @@ class Receiver : public Task {
             (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100;
     }
 
+    // [1000,2000] => [-500,+500]
     static float normalizeCommand(const float raw, const float sgn)
     {
         float tmp = fminf(fabs(raw - 1500), 500);
@@ -127,13 +128,28 @@ class Receiver : public Task {
         return raw < 1500 ? -cmd : cmd;
     }
 
+    // [-500,+500] => [-670,+670]
+    static float getRawSetpoint(const float command)
+    {
+        auto commandf = command / COMMAND_DIVIDER;
+
+        auto commandfAbs = fabsf(commandf);
+
+        auto angleRate = AnglePidController::applyRates(commandf, commandfAbs);
+
+        float retval = constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
+
+        return retval;
+    }
+
     void normalizeCommands(void)
     {
+        // Throttle [1000,2000] => [1000,2000]
         auto tmp = constrain_f_i32(m_rawThrottle, 1050, PWM_MAX);
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
-
         m_commandThrottle = lookupThrottle(tmp2);
 
+        // Roll, pitch, yaw [1000,2000] => [-500,+500]
         m_commandRoll  = normalizeCommand(m_rawRoll,  +1);
         m_commandPitch = normalizeCommand(m_rawPitch, +1);
         m_commandYaw   = normalizeCommand(m_rawYaw,   -1);
@@ -195,17 +211,6 @@ class Receiver : public Task {
         return throttleIsDown();
     }
 
-    static float getRawSetpoint(const float command)
-    {
-        auto commandf = command / COMMAND_DIVIDER;
-
-        auto commandfAbs = fabsf(commandf);
-
-        auto angleRate = AnglePidController::applyRates(commandf, commandfAbs);
-
-        return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
-    }
-
     bool aux1IsSet(void)
     {
         return m_rawAux1 > 0.2;
@@ -252,6 +257,8 @@ class Receiver : public Task {
     auto getDemands(void) -> Demands
     {
         m_previousFrameTimeUs = m_gotNewData ? 0 : m_previousFrameTimeUs;
+
+        normalizeCommands();
 
         Axes rawSetpoints = m_gotNewData ?
 
@@ -370,7 +377,6 @@ class Receiver : public Task {
 
             case STATE_UPDATE:
                 m_gotNewData = true;
-                normalizeCommands();
                 m_arming->updateFromReceiver(throttleIsDown(), aux1IsSet(), haveSignal);
                 m_state = STATE_CHECK;
                 break;
