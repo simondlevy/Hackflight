@@ -20,7 +20,7 @@
 #include <alignment/rotate270.h>
 #include <core/clock.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/dshot/bitbang.h>
+#include <escs/mock.h>
 #include <hackflight.h>
 #include <tasks/receivers/sbus.h>
 #include <serial.h>
@@ -45,19 +45,22 @@ int main(void)
         0.0); // 3.0; // Level Kp
 
     // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
-    static Mpu6000 imu(2000); // gyro scale DPS
+    static Mpu6000 imu(
+            0x14,  // CS pin = PA4
+            0x34,  // EXTI pin = PC4
+            2000); // gyro scale DPS
 
     vector<PidController *> pids = {&anglePid};
 
-    vector<uint8_t> motorPins = {32, 33, 19, 18};
+    vector<uint8_t> motorPins = {0x20, 0x21, 0x13, 0x12};
 
     static SbusReceiver rx(SERIAL_PORT_USART3);
 
     static Mixer mixer = QuadXbfMixer::make();
 
-    static DshotBitbangEsc esc(motorPins);
+    static MockEsc esc;
 
-    static Stm32F4Led led(37); // pin
+    static Stm32F4Led led(0x25); // PB5
 
     static Hackflight hf(rx, imu, imuRotate270, pids, mixer, esc, led);
 

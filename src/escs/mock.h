@@ -18,51 +18,33 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "esc.h"
 
-#include <vector>
-using namespace std;
-
-#include "maxmotors.h"
-
-class Esc {
-
-    friend class Arming;
-    friend class Hackflight;
-    friend class Msp;
+class MockEsc : public Esc {
 
     protected:
 
-        vector<uint8_t> * m_pins;
-
-        Esc(vector<uint8_t> & pins)
+        virtual void begin(void) override
         {
-            m_pins = &pins;
         }
 
-        Esc(void)
+        virtual float convertFromExternal(const uint16_t value) override
         {
-            m_pins = NULL;
+            (void)value;
+            return 0;
         }
-
-        virtual void  begin(void) = 0;
-
-        virtual float convertFromExternal(const uint16_t value) = 0;
 
         virtual float getMotorValue(
-                const float input, const bool failsafeIsActive) = 0;
-
-        virtual void  write(const float values[]) = 0;
-
-        virtual bool  isReady(const uint32_t currentTime) 
+                const float input, const bool failsafeIsActive) override
         {
-            (void)currentTime;
-            return true;
+            (void)input;
+            (void)failsafeIsActive;
+            return 0;
         }
 
-        virtual void  stop(void) 
-        {
-        }
 
+        virtual void write(const float values[]) override
+        {
+            (void)values;
+        }
 };

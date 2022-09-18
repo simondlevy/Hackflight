@@ -118,12 +118,10 @@ STM32_SRC = \
             serial_debug.c \
             bitbang.c \
             bus.c \
-            bus_spi.c \
-            bus_spi_config.c \
-            bus_spi_pinconfig.c \
-            bus_spi_stdperiph.c \
+            spi.c \
+            spi_stm32f405.c \
             dma_common.c \
-            dma_reqmap_f411.c \
+            dma_reqmap_f405.c \
             exti.c \
             flash.c \
             io.c \
@@ -132,9 +130,9 @@ STM32_SRC = \
             serial.c \
             serial_uart.c \
             serial_uart_pinconfig.c \
-            serial_uart_stm32f411.c \
+            serial_uart_stm32f405.c \
             system.c \
-            timer_stm32f411.c \
+            timer_stm32f405.c \
             $(addprefix pg/, $(notdir $(wildcard $(STM_SRC_DIR)/pg/*.c))) \
             $(addprefix common/,$(notdir $(wildcard $(STM_SRC_DIR)/common/*.c))) \
             $(addprefix config/,$(notdir $(wildcard $(STM_SRC_DIR)/config/*.c)))
@@ -274,7 +272,7 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 
 $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 	  hardware_init.h \
-      bus_spi.h \
+      spi.h \
       exti.h \
       flash.h \
       inverter.h \
@@ -305,6 +303,7 @@ $(OBJECT_DIR)/stm32clock.o: $(HFSRC_DIR)/stm32clock.c
 
 $(OBJECT_DIR)/main.o: main.cpp \
 	  hardware_init.h \
+	  $(STM_SRC_DIR)/*.h \
 	  $(HFSRC_DIR)/*.h \
       $(HFSRC_DIR)/*/*.h \
       $(HFSRC_DIR)/*/*/*.h \

@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "bus_spi.h"
+#include "spi.h"
 #include "exti.h"
 #include "flash.h"
 #include "inverter.h"
@@ -49,15 +49,21 @@ void hardwareInit(void)
     serialUartPinConfigure();
     serialInit(-1);
     inverterInit();
-    spiPinConfigure();
+
+    spi1PinConfigure(
+            0x15,  // sck  = PA5
+            0x16,  // miso = PA6
+            0x17); // mosi = PA7
+
     spiPreInit();
     spiInit(0x07); // mask for devices 0,1,2
+    spiInitBusDMA();
+
     usbCableDetectInit();
     flashInit();
     systemInitUnusedPins();
     pinioInit();
     timerStart();
-    spiInitBusDMA();
 }
 
 #if defined (__cplusplus)
