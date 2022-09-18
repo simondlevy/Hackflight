@@ -581,10 +581,9 @@ static uint16_t spiDivisorToBRbits(SPI_TypeDef *instance, uint16_t divisor)
 
 static void spiSetDivisorBRreg(SPI_TypeDef *instance, uint16_t divisor)
 {
-#define BR_BITS ((BIT(5) | BIT(4) | BIT(3)))
+    const uint16_t BR_BITS = 1<<5 | 1<<4 | 1<<3;
     const uint16_t tempRegister = (instance->CR1 & ~BR_BITS);
     instance->CR1 = tempRegister | spiDivisorToBRbits(instance, divisor);
-#undef BR_BITS
 }
 
 static bool spiInternalReadWriteBufPolled(SPI_TypeDef *instance, const uint8_t *txData,
