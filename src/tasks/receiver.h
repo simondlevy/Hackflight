@@ -42,7 +42,6 @@ class Receiver : public Task {
 
     static const uint32_t NEED_SIGNAL_MAX_DELAY_US = 1000000 / 10;
 
-    static const uint16_t  RATE_LIMIT          = 1998;
     static constexpr float THR_EXPO8           = 0;
     static constexpr float THR_MID8            = 50;
     static constexpr float COMMAND_DIVIDER     = 500;
@@ -125,9 +124,7 @@ class Receiver : public Task {
     
         const auto commandf = command / COMMAND_DIVIDER;
 
-        const auto angleRate = AnglePidController::applyRates(commandf);
-
-        return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
+        return AnglePidController::applyRates(commandf);
     }
 
     bool calculateChannels(const uint32_t usec)
