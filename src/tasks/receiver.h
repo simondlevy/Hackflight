@@ -120,21 +120,19 @@ class Receiver : public Task {
     // [1000,2000] => [-670,+670]
     static float rescaleCommand(const float raw, const float sgn)
     {
-        float tmp = fminf(fabs(raw - 1500), 500);
+        const float tmp = fminf(fabs(raw - 1500), 500);
 
-        float cmd = tmp * sgn;
+        const float cmd = tmp * sgn;
 
-        auto command = raw < 1500 ? -cmd : cmd;
+        const auto command = raw < 1500 ? -cmd : cmd;
     
-        auto commandf = command / COMMAND_DIVIDER;
+        const auto commandf = command / COMMAND_DIVIDER;
 
-        auto commandfAbs = fabsf(commandf);
+        const auto commandfAbs = fabsf(commandf);
 
-        auto angleRate = AnglePidController::applyRates(commandf, commandfAbs);
+        const auto angleRate = AnglePidController::applyRates(commandf, commandfAbs);
 
-        float retval = constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
-
-        return retval;
+        return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
     }
 
     bool calculateChannels(const uint32_t usec)
