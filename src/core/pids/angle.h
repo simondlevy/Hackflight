@@ -348,7 +348,7 @@ class AnglePidController : public PidController {
             // -----calculate feedforward component
             const auto F =
                 m_k_rate_f > 0 ?
-                computeFeedforward(newSetpoint, applyRates(1, 1), 0) :
+                computeFeedforward(newSetpoint, applyRates(1), 0) :
                 0;
 
             return P + axis->I + D + F;
@@ -404,8 +404,10 @@ class AnglePidController : public PidController {
             m_dynLpfPreviousQuantizedThrottle = -1;  
         }
 
-        static float applyRates(const float commandf, const float commandfAbs)
+        static float applyRates(const float commandf)
         {
+            const auto commandfAbs = fabsf(commandf);
+
             const auto expo = RC_EXPO / 100.0f;
 
             const auto expof =

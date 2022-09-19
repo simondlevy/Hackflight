@@ -125,9 +125,7 @@ class Receiver : public Task {
     
         const auto commandf = command / COMMAND_DIVIDER;
 
-        const auto commandfAbs = fabsf(commandf);
-
-        const auto angleRate = AnglePidController::applyRates(commandf, commandfAbs);
+        const auto angleRate = AnglePidController::applyRates(commandf);
 
         return constrain_f(angleRate, -(float)RATE_LIMIT, +(float)RATE_LIMIT);
     }
