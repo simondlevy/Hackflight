@@ -64,7 +64,6 @@ class Receiver : public Task {
     } state_e;
 
     bool     m_auxiliaryProcessingRequired;
-    float    m_commandThrottle;
     float    m_commandRoll;
     float    m_commandPitch;
     float    m_commandYaw;
@@ -89,7 +88,7 @@ class Receiver : public Task {
         return value == 0 ?  value : constrain_f(value, PWM_PULSE_MIN, PWM_PULSE_MAX);
     }
 
-    int16_t lookupThrottle(const int32_t tmp)
+    float lookupThrottle(const int32_t tmp)
     {
         static bool _initializedThrottleTable;
 
@@ -114,8 +113,8 @@ class Receiver : public Task {
         const auto tmp3 = tmp / 100;
 
         // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
-        return m_lookupThrottleRc[tmp3] + (tmp - tmp3 * 100) *
-            (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100;
+        return (float)(m_lookupThrottleRc[tmp3] + (tmp - tmp3 * 100) *
+            (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100);
     }
 
     // [1000,2000] => [-500,+500]
@@ -248,7 +247,7 @@ class Receiver : public Task {
         // Throttle [1000,2000] => [1000,2000]
         auto tmp = constrain_f_i32(m_rawThrottle, 1050, PWM_MAX);
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
-        m_commandThrottle = lookupThrottle(tmp2);
+        auto commandThrottle = lookupThrottle(tmp2);
 
         // Roll, pitch, yaw [1000,2000] => [-500,+500]
         m_commandRoll  = normalizeCommand(m_rawRoll,  +1);
@@ -276,7 +275,7 @@ class Receiver : public Task {
         m_gotNewData = false;
 
         return Demands(
-                constrain_f((m_commandThrottle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0, 1),
+                constrain_f((commandThrottle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0, 1),
                 _axes.x,
                 _axes.y,
                 _axes.z);
