@@ -344,7 +344,7 @@ class AnglePidController : public PidController {
             // -----calculate feedforward component
             const auto F =
                 m_k_rate_f > 0 ?
-                computeFeedforward(newSetpoint, applyRates(1), 0) :
+                computeFeedforward(newSetpoint, 670, 0) :
                 0;
 
             return P + axis->I + D + F;
@@ -398,23 +398,6 @@ class AnglePidController : public PidController {
 
             // to allow an initial zero throttle to set the filter cutoff
             m_dynLpfPreviousQuantizedThrottle = -1;  
-        }
-
-        static float applyRates(const float commandf)
-        {
-            const auto commandfAbs = fabsf(commandf);
-
-            const float expo = 0;
-
-            const auto expof =
-                commandfAbs * (powf(commandf, 5) * expo + commandf * (1 - expo));
-
-            const float centerSensitivity = 70;
-            const auto stickMovement = fmaxf(0, 670 - centerSensitivity);
-            const auto angleRate = commandf * centerSensitivity + 
-                stickMovement * expof;
-
-            return angleRate;
         }
 
         virtual auto getDemands(

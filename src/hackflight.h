@@ -93,7 +93,8 @@ class Hackflight {
 
             Demands demands = m_receiver->getDemands();
 
-            //printf("%3.3f  %3.3f\n", demands.throttle, demands.roll);
+            // XXX not sure why we need this
+            delayMicroseconds(10);
 
             auto motors = m_mixer->step(
                     demands,

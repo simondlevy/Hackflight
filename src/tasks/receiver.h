@@ -121,10 +121,19 @@ class Receiver : public Task {
         const auto cmd = tmp * sgn;
 
         const auto command = raw < 1500 ? -cmd : cmd;
-    
+
         const auto commandf = command / COMMAND_DIVIDER;
 
-        return AnglePidController::applyRates(commandf);
+        const auto expof = commandf * fabsf(commandf);
+
+        const float centerSensitivity = 70;
+
+        const auto stickMovement = fmaxf(0, 670 - centerSensitivity);
+
+        const auto angleRate = commandf * centerSensitivity + 
+            stickMovement * expof;
+
+        return angleRate;
     }
 
     bool calculateChannels(const uint32_t usec)
@@ -144,7 +153,7 @@ class Receiver : public Task {
         m_rawRoll     = constrainRaw(m_rawRoll);
         m_rawPitch    = constrainRaw(m_rawPitch);
         m_rawYaw      = constrainRaw(m_rawYaw);
- 
+
         return true;
     }
 
