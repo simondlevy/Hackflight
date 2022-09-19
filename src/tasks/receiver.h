@@ -64,9 +64,6 @@ class Receiver : public Task {
     } state_e;
 
     bool     m_auxiliaryProcessingRequired;
-    float    commandRoll;
-    float    commandPitch;
-    float    commandYaw;
     bool     m_dataProcessingRequired;
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
