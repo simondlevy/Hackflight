@@ -142,19 +142,6 @@ class Receiver : public Task {
         return retval;
     }
 
-    void normalizeCommands(void)
-    {
-        // Throttle [1000,2000] => [1000,2000]
-        auto tmp = constrain_f_i32(m_rawThrottle, 1050, PWM_MAX);
-        auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
-        m_commandThrottle = lookupThrottle(tmp2);
-
-        // Roll, pitch, yaw [1000,2000] => [-500,+500]
-        m_commandRoll  = normalizeCommand(m_rawRoll,  +1);
-        m_commandPitch = normalizeCommand(m_rawPitch, +1);
-        m_commandYaw   = normalizeCommand(m_rawYaw,   -1);
-    }
-
     bool calculateChannels(const uint32_t usec)
     {
         if (m_auxiliaryProcessingRequired) {
@@ -258,7 +245,15 @@ class Receiver : public Task {
     {
         m_previousFrameTimeUs = m_gotNewData ? 0 : m_previousFrameTimeUs;
 
-        normalizeCommands();
+        // Throttle [1000,2000] => [1000,2000]
+        auto tmp = constrain_f_i32(m_rawThrottle, 1050, PWM_MAX);
+        auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
+        m_commandThrottle = lookupThrottle(tmp2);
+
+        // Roll, pitch, yaw [1000,2000] => [-500,+500]
+        m_commandRoll  = normalizeCommand(m_rawRoll,  +1);
+        m_commandPitch = normalizeCommand(m_rawPitch, +1);
+        m_commandYaw   = normalizeCommand(m_rawYaw,   -1);
 
         Axes rawSetpoints = m_gotNewData ?
 
