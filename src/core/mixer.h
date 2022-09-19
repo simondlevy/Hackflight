@@ -31,34 +31,11 @@ class Mixer {
 
     private:
 
-        static constexpr float PID_MIXER_SCALING = 1000;
-        static const uint16_t  PIDSUM_LIMIT_YAW  = 400;
-        static const uint16_t  PIDSUM_LIMIT      = 500;
-
         typedef Motors (*mixerFun_t)(const Demands & demands);
 
         uint8_t m_motorCount;
 
         mixerFun_t m_fun;
-
-        static float constrain_demand(const float demand, const float limit)
-        {
-            return constrain_f(demand, -limit, +limit) / PID_MIXER_SCALING;
-        }
-
-        static auto constrain_demands(const Demands & demands) -> Demands
-        {
-            return Demands (
-                    demands.throttle,
-
-                    constrain_demand(demands.roll, PIDSUM_LIMIT),
-
-                    constrain_demand(demands.pitch, PIDSUM_LIMIT),
-
-                    // Negate yaw to make it agree with PID
-                    -constrain_demand(demands.yaw, PIDSUM_LIMIT_YAW)
-                    );
-        }
 
     public:
 
@@ -88,6 +65,6 @@ class Mixer {
             }
 
             // Run the mixer to get motors from demands
-            return m_fun(constrain_demands(demands));
+            return m_fun(demands);
         }
 };

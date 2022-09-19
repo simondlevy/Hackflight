@@ -20,6 +20,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
  
 #include <serial.h>
 
+static const uint32_t MY_SERIAL_SBUS = SERIAL_8E2 | 0xC000ul;
+
 serialReceiveCallbackPtr _callback;
 void * _data;
 
