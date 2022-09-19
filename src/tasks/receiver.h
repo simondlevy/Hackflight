@@ -64,9 +64,9 @@ class Receiver : public Task {
     } state_e;
 
     bool     m_auxiliaryProcessingRequired;
-    float    m_commandRoll;
-    float    m_commandPitch;
-    float    m_commandYaw;
+    float    commandRoll;
+    float    commandPitch;
+    float    commandYaw;
     bool     m_dataProcessingRequired;
     int32_t  m_frameTimeDeltaUs;
     bool     m_gotNewData;
@@ -250,16 +250,16 @@ class Receiver : public Task {
         auto commandThrottle = lookupThrottle(tmp2);
 
         // Roll, pitch, yaw [1000,2000] => [-500,+500]
-        m_commandRoll  = normalizeCommand(m_rawRoll,  +1);
-        m_commandPitch = normalizeCommand(m_rawPitch, +1);
-        m_commandYaw   = normalizeCommand(m_rawYaw,   -1);
+        auto commandRoll  = normalizeCommand(m_rawRoll,  +1);
+        auto commandPitch = normalizeCommand(m_rawPitch, +1);
+        auto commandYaw   = normalizeCommand(m_rawYaw,   -1);
 
         Axes rawSetpoints = m_gotNewData ?
 
             Axes(
-                    getRawSetpoint(m_commandRoll),
-                    getRawSetpoint(m_commandPitch),
-                    getRawSetpoint(m_commandYaw)) :
+                    getRawSetpoint(commandRoll),
+                    getRawSetpoint(commandPitch),
+                    getRawSetpoint(commandYaw)) :
 
                 Axes(0,0,0);
 
