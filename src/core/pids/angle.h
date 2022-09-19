@@ -72,10 +72,6 @@ class AnglePidController : public PidController {
 
         static constexpr float LEVEL_ANGLE_LIMIT = 45;
 
-        static const uint8_t RC_EXPO = 0;
-        static const uint8_t RC_RATE = 7;
-        static const uint8_t RATE    = 67;
-
         static float MAX_VELOCITY_CYCLIC() 
         {
             return RATE_ACCEL_LIMIT * 100 * Clock::DT();
@@ -408,13 +404,13 @@ class AnglePidController : public PidController {
         {
             const auto commandfAbs = fabsf(commandf);
 
-            const auto expo = RC_EXPO / 100.0f;
+            const float expo = 0;
 
             const auto expof =
                 commandfAbs * (powf(commandf, 5) * expo + commandf * (1 - expo));
 
-            const auto centerSensitivity = RC_RATE * 10.0f;
-            const auto stickMovement = fmaxf(0, RATE * 10.0f - centerSensitivity);
+            const float centerSensitivity = 70;
+            const auto stickMovement = fmaxf(0, 670 - centerSensitivity);
             const auto angleRate = commandf * centerSensitivity + 
                 stickMovement * expof;
 
