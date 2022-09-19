@@ -120,9 +120,9 @@ class Receiver : public Task {
     // [1000,2000] => [-670,+670]
     static float rescaleCommand(const float raw, const float sgn)
     {
-        const float tmp = fminf(fabs(raw - 1500), 500);
+        const auto tmp = fminf(fabs(raw - 1500), 500);
 
-        const float cmd = tmp * sgn;
+        const auto cmd = tmp * sgn;
 
         const auto command = raw < 1500 ? -cmd : cmd;
     
