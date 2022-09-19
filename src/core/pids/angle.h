@@ -406,13 +406,17 @@ class AnglePidController : public PidController {
                 const VehicleState & vstate,
                 const bool reset) -> Demands override
         {
+            const auto rollDemand  = 670 * demands.roll;
+            const auto pitchDemand = 670 * demands.pitch;
+            const auto yawDemand   = 670 * demands.yaw;
+
             const auto roll=
-                updateCyclic(demands.roll, vstate.phi, vstate.dphi, m_roll);
+                updateCyclic(rollDemand, vstate.phi, vstate.dphi, m_roll);
 
             const auto pitch =
-                updateCyclic(demands.pitch, vstate.theta, vstate.dtheta, m_pitch);
+                updateCyclic(pitchDemand, vstate.theta, vstate.dtheta, m_pitch);
 
-            const auto yaw = updateYaw(demands.yaw, vstate.dpsi);
+            const auto yaw = updateYaw(yawDemand, vstate.dpsi);
 
             if (reset) {
                 m_roll.axis.I = 0;

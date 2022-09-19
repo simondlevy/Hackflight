@@ -116,8 +116,8 @@ class Receiver : public Task {
     // [1000,2000] => [-670,+670]
     static float rescaleCommand(const float raw, const float sgn)
     {
-        static constexpr float MAX = 670;
-        static constexpr float CTR = 70;
+        static constexpr float MAX = 1;
+        static constexpr float CTR = 0.104;
 
         // [1000,2000] => [-1,+1] linearly
         const auto tmp = fminf(fabs(raw - 1500), 500);
@@ -125,10 +125,9 @@ class Receiver : public Task {
         const auto command = raw < 1500 ? -cmd : cmd;
         const auto commandf = command / COMMAND_DIVIDER;
 
-        // [-1,+1] => [-670, +670] nonlinearly
+        // [-1,+1] => [-1, +1] nonlinearly
         const auto expof = commandf * fabsf(commandf);
-        const auto stickMovement = MAX - CTR;
-        const auto angleRate = commandf * CTR + stickMovement * expof;
+        const auto angleRate = commandf * CTR + (MAX-CTR) * expof;
 
         return angleRate;
     }
