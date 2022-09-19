@@ -117,19 +117,15 @@ class Receiver : public Task {
             (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100);
     }
 
-    // [1000,2000] => [-500,+500]
-    static float normalizeCommand(const float raw, const float sgn)
+    // [1000,2000] => [-670,+670]
+    static float rescaleCommand(const float raw, const float sgn)
     {
         float tmp = fminf(fabs(raw - 1500), 500);
 
         float cmd = tmp * sgn;
 
-        return raw < 1500 ? -cmd : cmd;
-    }
-
-    // [-500,+500] => [-670,+670]
-    static float getRawSetpoint(const float command)
-    {
+        auto command = raw < 1500 ? -cmd : cmd;
+    
         auto commandf = command / COMMAND_DIVIDER;
 
         auto commandfAbs = fabsf(commandf);
@@ -249,17 +245,13 @@ class Receiver : public Task {
         auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
         auto commandThrottle = lookupThrottle(tmp2);
 
-        // Roll, pitch, yaw [1000,2000] => [-500,+500]
-        auto commandRoll  = normalizeCommand(m_rawRoll,  +1);
-        auto commandPitch = normalizeCommand(m_rawPitch, +1);
-        auto commandYaw   = normalizeCommand(m_rawYaw,   -1);
-
         Axes rawSetpoints = m_gotNewData ?
 
             Axes(
-                    getRawSetpoint(commandRoll),
-                    getRawSetpoint(commandPitch),
-                    getRawSetpoint(commandYaw)) :
+                    rescaleCommand(m_rawRoll, +1),
+                    rescaleCommand(m_rawPitch, +1),
+                    rescaleCommand(m_rawYaw, -1)
+                    ) :
 
                 Axes(0,0,0);
 
