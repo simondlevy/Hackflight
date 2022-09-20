@@ -433,7 +433,7 @@ class Msp : public Task {
             return mspPostProcessFn;
         }
 
-        static void evaualteNonMspData(mspPort_t * mspPort, uint8_t receivedChar)
+        static void evaluateNonMspData(mspPort_t * mspPort, uint8_t receivedChar)
         {
             if (receivedChar == 'R') {
                 mspPort->pendingRequest = PENDING_BOOTLOADER_ROM;
@@ -516,10 +516,11 @@ class Msp : public Task {
                     while (serialBytesAvailable(mspPort->port)) {
 
                         const auto c = serialRead(mspPort->port);
+
                         const auto consumed = processReceivedData(mspPort, c);
 
                         if (!consumed && !m_arming->isArmed()) {
-                            evaualteNonMspData(mspPort, c);
+                            evaluateNonMspData(mspPort, c);
                         }
 
                         if (mspPort->state == COMMAND_RECEIVED) {
