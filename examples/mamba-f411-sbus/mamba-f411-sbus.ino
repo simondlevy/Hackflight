@@ -17,7 +17,6 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
 #include <hackflight.h>
 #include <alignment/rotate270.h>
 #include <core/clock.h>
@@ -32,6 +31,7 @@
 #include <vector>
 using namespace std;
 
+/*
 int main(void)
 {
     static AnglePidController anglePid(
