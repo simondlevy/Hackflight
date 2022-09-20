@@ -63,12 +63,12 @@ int main(void)
     return 0;
 }
 
+*/
 
 uint32_t systemGetCycleCounter(void)
 {
     return DWT->CYCCNT;
 }
-*/
 
 static const uint8_t LED = PC14;
 static const uint16_t DELAY = 1000;
