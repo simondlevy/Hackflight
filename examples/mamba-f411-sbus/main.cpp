@@ -20,23 +20,19 @@
 #include <alignment/rotate270.h>
 #include <core/clock.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/mock.h>
 #include <hackflight.h>
+
+#include <escs/mock.h>
+#include <imus/mock.h>
 #include <tasks/receivers/mock.h>
-#include <serial.h>
 
-#include <imus/softquat/mpu6000.h>
 #include <leds/stm32f4.h>
-
-#include "hardware_init.h"
 
 #include <vector>
 using namespace std;
 
 int main(void)
 {
-    hardwareInit();
-
     static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -44,21 +40,15 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-    // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
-    static Mpu6000 imu(
-            0x14,  // CS pin   = PA4
-            0x20,  // EXTI pin = PB0
-            2000); // gyro scale DPS
+    static MockEsc esc;
+    static MockImu imu;
+    static MockReceiver rx;
 
     vector<PidController *> pids = {&anglePid};
 
-    static MockReceiver rx;
-
     static Mixer mixer = QuadXbfMixer::make();
 
-    static MockEsc esc;
-
-    static Stm32F4Led led(0x3E); // PC13 (14?)
+    static ArduinoLed led(PC14); // pin
 
     static Hackflight hf(rx, imu, imuRotate270, pids, mixer, esc, led);
 

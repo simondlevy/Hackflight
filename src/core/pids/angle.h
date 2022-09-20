@@ -72,6 +72,10 @@ class AnglePidController : public PidController {
 
         static constexpr float LEVEL_ANGLE_LIMIT = 45;
 
+        static constexpr float OUTPUT_SCALING = 1000;
+        static const uint16_t  LIMIT_YAW  = 400;
+        static const uint16_t  LIMIT      = 500;
+
         static float MAX_VELOCITY_CYCLIC() 
         {
             return RATE_ACCEL_LIMIT * 100 * Clock::DT();
@@ -381,6 +385,11 @@ class AnglePidController : public PidController {
             return P + m_yaw.I; 
         }
 
+        static float constrainOutput(const float demand, const float limit)
+        {
+            return constrain_f(demand, -limit, +limit) / OUTPUT_SCALING;
+        }
+
     public:
 
         AnglePidController(
@@ -441,7 +450,11 @@ class AnglePidController : public PidController {
                 }
             }
 
-            return Demands(demands.throttle, roll, pitch, yaw);
+            return Demands(
+                    demands.throttle,
+                    constrainOutput(roll, LIMIT),
+                    constrainOutput(pitch, LIMIT),
+                    -constrainOutput(yaw, LIMIT_YAW));
 
         } // update
 
