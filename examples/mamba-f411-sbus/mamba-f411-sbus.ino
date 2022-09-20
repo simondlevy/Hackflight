@@ -55,18 +55,11 @@ uint32_t systemGetCycleCounter(void)
     return DWT->CYCCNT;
 }
 
-static const uint8_t LED = PC14;
-static const uint16_t DELAY = 1000;
-
 void setup() 
 {
-    pinMode(LED, OUTPUT);
+    _hf.begin();
 }
 
 void loop() 
 {
-    digitalWrite(LED, HIGH);   
-    delay(DELAY);              
-    digitalWrite(LED, LOW);    
-    delay(DELAY);             
 }
