@@ -31,39 +31,24 @@
 #include <vector>
 using namespace std;
 
-/*
-int main(void)
-{
-    static AnglePidController anglePid(
+static AnglePidController _anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
         0.021160,     // Rate Kd
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-    static MockEsc esc;
-    static MockImu imu;
-    static MockReceiver rx;
+static MockEsc _esc;
+static MockImu _imu;
+static MockReceiver _rx;
 
-    vector<PidController *> pids = {&anglePid};
+vector<PidController *> _pids = {&_anglePid};
 
-    static Mixer mixer = QuadXbfMixer::make();
+static Mixer _mixer = QuadXbfMixer::make();
 
-    static ArduinoLed led(PC14); // pin
+static ArduinoLed _led(PC14); // pin
 
-    static Hackflight hf(rx, imu, imuRotate270, pids, mixer, esc, led);
-
-    hf.begin();
-
-    while (true) {
-
-        hf.step();
-    }
-
-    return 0;
-}
-
-*/
+static Hackflight _hf(_rx, _imu, imuRotate270, _pids, _mixer, _esc, _led);
 
 uint32_t systemGetCycleCounter(void)
 {
@@ -75,13 +60,13 @@ static const uint16_t DELAY = 1000;
 
 void setup() 
 {
-  pinMode(LED, OUTPUT);
+    pinMode(LED, OUTPUT);
 }
 
 void loop() 
 {
-  digitalWrite(LED, HIGH);   
-  delay(DELAY);              
-  digitalWrite(LED, LOW);    
-  delay(DELAY);             
+    digitalWrite(LED, HIGH);   
+    delay(DELAY);              
+    digitalWrite(LED, LOW);    
+    delay(DELAY);             
 }
