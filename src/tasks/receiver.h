@@ -42,9 +42,8 @@ class Receiver : public Task {
 
     static const uint32_t NEED_SIGNAL_MAX_DELAY_US = 1000000 / 10;
 
-    static constexpr float THR_EXPO8           = 0;
-    static constexpr float THR_MID8            = 50;
-    static constexpr float COMMAND_DIVIDER     = 500;
+    static constexpr float THR_EXPO8 = 0;
+    static constexpr float THR_MID8  = 50;
 
     // minimum PWM pulse width which is considered valid
     static const uint16_t PWM_PULSE_MIN   = 750;   
@@ -113,23 +112,13 @@ class Receiver : public Task {
             (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100);
     }
 
-    // [1000,2000] => [-670,+670]
+     // [1000,2000] => [-1,+1]
     static float rescaleCommand(const float raw, const float sgn)
     {
-        static constexpr float MAX = 1;
-        static constexpr float CTR = 0.104;
-
-        // [1000,2000] => [-1,+1] linearly
         const auto tmp = fminf(fabs(raw - 1500), 500);
         const auto cmd = tmp * sgn;
         const auto command = raw < 1500 ? -cmd : cmd;
-        const auto commandf = command / COMMAND_DIVIDER;
-
-        // [-1,+1] => [-1, +1] nonlinearly
-        const auto expof = commandf * fabsf(commandf);
-        const auto angleRate = commandf * CTR + (MAX-CTR) * expof;
-
-        return angleRate;
+        return command / 500;
     }
 
     bool calculateChannels(const uint32_t usec)

@@ -390,6 +390,16 @@ class AnglePidController : public PidController {
             return constrain_f(demand, -limit, +limit) / OUTPUT_SCALING;
         }
 
+        // [-1,+1] => [-670,+670] with nonlinearity
+        static float rescale(const float command)
+        {
+            static constexpr float CTR = 0.104;
+
+            const auto expof = command * fabsf(command);
+            const auto angleRate = command * CTR + (1-CTR) * expof;
+            return 670 * angleRate;
+        }
+
     public:
 
         AnglePidController(
@@ -415,9 +425,9 @@ class AnglePidController : public PidController {
                 const VehicleState & vstate,
                 const bool reset) -> Demands override
         {
-            const auto rollDemand  = 670 * demands.roll;
-            const auto pitchDemand = 670 * demands.pitch;
-            const auto yawDemand   = 670 * demands.yaw;
+            const auto rollDemand  = rescale(demands.roll);
+            const auto pitchDemand = rescale(demands.pitch);
+            const auto yawDemand   = rescale(demands.yaw);
 
             const auto roll=
                 updateCyclic(rollDemand, vstate.phi, vstate.dphi, m_roll);
