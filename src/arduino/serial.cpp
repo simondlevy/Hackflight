@@ -25,12 +25,14 @@ static const uint32_t MY_SERIAL_SBUS = SERIAL_8E2 | 0xC000ul;
 serialReceiveCallbackPtr _callback;
 void * _data;
 
+#if defined(Serial1)
 void serialEvent1(void)
 {
     while (Serial1.available()) {
         _callback(Serial1.read(), _data, micros());
     }
 }
+#endif
 
 bool serialIsTransmitBufferEmpty(void * port)
 {
@@ -47,8 +49,10 @@ void serialOpenPortDsmx(
 {
     (void)identifier;
 
+#if defined(Serial1)
     // Always use Serial1
     Serial1.begin(115200);
+#endif
  
     _callback = callback;
     _data = data;
@@ -62,6 +66,8 @@ void serialOpenPortSbus(
     (void)identifier;
 
     // Always use Serial1
+#if defined(Serial1)
+    // Always use Serial1
 #if defined(TEENSYSUINO)
     Serial1.begin(100000, SERIAL_8E2_RXINV_TXINV);
 #elif defined(STM32L496xx) || defined(STM32L476xx) || defined(STM32L433xx) || defined(STM32L432xx)
@@ -70,6 +76,7 @@ void serialOpenPortSbus(
     Serial1.begin(100000, SERIAL_8E2, rxpin, txpin, true);
 #else
     Serial1.begin(100000, SERIAL_8E2);
+#endif
 #endif
  
     _callback = callback;
@@ -87,8 +94,10 @@ uint8_t serialRead(void  * port)
 {
     return port == &Serial ? 
         Serial.read() :
+#if defined(Serial1)
         port == &Serial1 ?
         Serial1.read() :
+#endif
         0;
 }
 
@@ -96,8 +105,10 @@ uint32_t serialBytesAvailable(void * port)
 {
     return port == &Serial ? 
         Serial.available() :
+#if defined(Serial1)
         port == &Serial1 ?
         Serial1.available() :
+#endif
         0;
 }
 
@@ -106,9 +117,11 @@ void serialWrite(void * port, uint8_t c)
     if (port == &Serial) {
         Serial.write(c);
     }
-    else if (port == &Serial1) {
+#if defined(Serial1)
+    if (port == &Serial1) {
         Serial1.write(c);
     }
+#endif
  }
 
 void serialWriteBuf(void * port, const uint8_t *data, uint32_t count)
@@ -116,9 +129,11 @@ void serialWriteBuf(void * port, const uint8_t *data, uint32_t count)
     if (port == &Serial) {
         Serial.write(data, count);
     }
-    else if (port == &Serial1) {
+#if defined(Serial1)
+    if (port == &Serial1) {
         Serial1.write(data, count);
     }
+#endif
 }
 
 // These functions are stubbed, because for Arduino we should be using Serial.print*()

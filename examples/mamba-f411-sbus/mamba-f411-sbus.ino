@@ -17,16 +17,17 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*
+#include <hackflight.h>
 #include <alignment/rotate270.h>
 #include <core/clock.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <hackflight.h>
 
 #include <escs/mock.h>
 #include <imus/mock.h>
 #include <tasks/receivers/mock.h>
 
-#include <leds/stm32f4.h>
+#include <leds/arduino.h>
 
 #include <vector>
 using namespace std;
@@ -60,4 +61,27 @@ int main(void)
     }
 
     return 0;
+}
+
+
+uint32_t systemGetCycleCounter(void)
+{
+    return DWT->CYCCNT;
+}
+*/
+
+static const uint8_t LED = PC14;
+static const uint16_t DELAY = 1000;
+
+void setup() 
+{
+  pinMode(LED, OUTPUT);
+}
+
+void loop() 
+{
+  digitalWrite(LED, HIGH);   
+  delay(DELAY);              
+  digitalWrite(LED, LOW);    
+  delay(DELAY);             
 }
