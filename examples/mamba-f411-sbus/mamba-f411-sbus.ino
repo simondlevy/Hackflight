@@ -62,4 +62,5 @@ void setup()
 
 void loop() 
 {
+    _hf.step();
 }
