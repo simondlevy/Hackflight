@@ -52,38 +52,6 @@ void Mpu6000::interruptHandler(extiCallbackRec_t *cb)
     *m_gyroDev.interruptCountPtr += 1;
 }
 
-void Mpu6000::detectSPISensorsAndUpdateDetectionResult(const gyroDeviceConfig_t *config)
-{
-   extDevice_t *dev = &m_gyroDev.dev;
-
-    spiSetBusInstance(dev, config->spiBus);
-
-    dev->busType_u.spi.csnPin = IOGetByTag(config->csnTag);
-
-    IOInit(dev->busType_u.spi.csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(config->index));
-
-    IOConfigGPIO(dev->busType_u.spi.csnPin, 
-            IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL));
-
-
-    // Ensure device is disabled, important when two devices are on the same bus.
-    IOHi(dev->busType_u.spi.csnPin); 
-
-    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
-
-    // reset the device configuration
-    spiWriteReg(dev, RA_PWR_MGMT_1, BIT_H_RESET);
-    delay(100);  // datasheet specifies a 100ms delay after reset
-
-    // reset the device signal paths
-    spiWriteReg(dev, RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
-    delay(100);  // datasheet specifies a 100ms delay after signal path reset
-
-    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
-
-    busDeviceRegister(dev);
-}
-
 bool Mpu6000::devGyroIsReady(void)
 {
     uint16_t *gyroData = (uint16_t *)m_gyroDev.dev.rxBuf;
@@ -134,7 +102,35 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     m_gyroDev.dev.bus->busType = BUS_TYPE_SPI;
 
-    detectSPISensorsAndUpdateDetectionResult(&gyroDeviceConfig);
+    extDevice_t *dev = &m_gyroDev.dev;
+
+    spiSetBusInstance(dev, gyroDeviceConfig.spiBus);
+
+    dev->busType_u.spi.csnPin = IOGetByTag(gyroDeviceConfig.csnTag);
+
+    IOInit(dev->busType_u.spi.csnPin, OWNER_GYRO_CS,
+            RESOURCE_INDEX(gyroDeviceConfig.index));
+
+    IOConfigGPIO(dev->busType_u.spi.csnPin, 
+            IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL));
+
+
+    // Ensure device is disabled, important when two devices are on the same bus.
+    IOHi(dev->busType_u.spi.csnPin); 
+
+    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
+
+    // reset the device configuration
+    spiWriteReg(dev, RA_PWR_MGMT_1, BIT_H_RESET);
+    delay(100);  // datasheet specifies a 100ms delay after reset
+
+    // reset the device signal paths
+    spiWriteReg(dev, RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
+    delay(100);  // datasheet specifies a 100ms delay after signal path reset
+
+    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
+
+    busDeviceRegister(dev);
 
     m_gyroDev.shortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
 
