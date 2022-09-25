@@ -52,13 +52,12 @@ void Mpu6000::interruptHandler(extiCallbackRec_t *cb)
     *m_gyroDev.interruptCountPtr += 1;
 }
 
-bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
-        const Mpu6000::gyroDeviceConfig_t *config)
+void Mpu6000::detectSPISensorsAndUpdateDetectionResult(const gyroDeviceConfig_t *config)
 {
    extDevice_t *dev = &m_gyroDev.dev;
 
     if (!config->csnTag || !spiSetBusInstance(dev, config->spiBus)) {
-        return false;
+        return;
     }
 
     dev->busType_u.spi.csnPin = IOGetByTag(config->csnTag);
@@ -85,8 +84,6 @@ bool Mpu6000::detectSPISensorsAndUpdateDetectionResult(
     spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
 
     busDeviceRegister(dev);
-
-    return true;
 }
 
 bool Mpu6000::devGyroIsReady(void)
