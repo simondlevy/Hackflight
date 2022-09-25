@@ -95,16 +95,14 @@ class Mpu6000 : public SoftQuatImu {
         uint8_t m_csPin;
         uint8_t m_extiPin;
 
-        bool detectSPISensorsAndUpdateDetectionResult(const gyroDeviceConfig_t *config);
-
-        bool mpuDetect(const Mpu6000::gyroDeviceConfig_t *config);
-
         virtual bool devGyroIsReady(void) override;
 
         virtual void devInit(
                 uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) override;
 
         virtual int16_t devReadRawGyro(uint8_t k) override;
+
+        bool detectSPISensorsAndUpdateDetectionResult(const gyroDeviceConfig_t *config);
 
         static void interruptHandler(extiCallbackRec_t *cb);
 

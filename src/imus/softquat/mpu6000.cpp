@@ -117,29 +117,6 @@ bool Mpu6000::devGyroIsReady(void)
     return true;
 }
 
-bool Mpu6000::mpuDetect(const Mpu6000::gyroDeviceConfig_t *config)
-{
-    static busDevice_t bus;
-    m_gyroDev.dev.bus = &bus;
-
-    // MPU datasheet specifies 30ms.
-    delay(35);
-
-    if (config->busType == BUS_TYPE_NONE) {
-        return false;
-    }
-
-    if (config->busType == BUS_TYPE_GYRO_AUTO) {
-        m_gyroDev.dev.bus->busType = BUS_TYPE_I2C;
-    } else {
-        m_gyroDev.dev.bus->busType = config->busType;
-    }
-
-    m_gyroDev.dev.bus->busType = BUS_TYPE_SPI;
-
-    return detectSPISensorsAndUpdateDetectionResult(config);
-}
-
 void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr)
 {
     m_gyroDev.syncTimePtr = gyroSyncTimePtr;
@@ -154,7 +131,15 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     spiPreInitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
 
-    mpuDetect(&gyroDeviceConfig);
+    static busDevice_t bus;
+    m_gyroDev.dev.bus = &bus;
+
+    // MPU datasheet specifies 30ms.
+    delay(35);
+
+    m_gyroDev.dev.bus->busType = BUS_TYPE_SPI;
+
+    detectSPISensorsAndUpdateDetectionResult(&gyroDeviceConfig);
 
     m_gyroDev.shortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
 
