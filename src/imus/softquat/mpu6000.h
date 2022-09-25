@@ -39,10 +39,7 @@ class Mpu6000 : public SoftQuatImu {
         // short interval of ~79us
         static const uint8_t SHORT_THRESHOLD = 82 ;
 
-        static const uint8_t WHO_AM_I_CONST   = 0x68;
-
         // RA = Register Address;
-        static const uint8_t RA_PRODUCT_ID         = 0x0C;
         static const uint8_t RA_SMPLRT_DIV         = 0x19;
         static const uint8_t RA_GYRO_CONFIG        = 0x1B;
         static const uint8_t RA_ACCEL_CONFIG       = 0x1C;
@@ -53,15 +50,13 @@ class Mpu6000 : public SoftQuatImu {
         static const uint8_t RA_PWR_MGMT_1         = 0x6B;
         static const uint8_t RA_PWR_MGMT_2         = 0x6C;
         static const uint8_t RA_SIGNAL_PATH_RESET  = 0x68;
-        static const uint8_t RA_WHO_AM_I           = 0x75;
 
-        // The gyro buffer is split 50/50, the first half for the transmit buffer, the
-        // second half for the receive buffer This buffer is large enough for the gyros
-        // currently supported in imu_mpu.c but should be reviewed id other gyro
-        // types are supported with SPI DMA.
+        // The gyro buffer is split 50/50, the first half for the transmit
+        // buffer, the second half for the receive buffer This buffer is large
+        // enough for the gyros currently supported in imu_mpu.c but should be
+        // reviewed id other gyro types are supported with SPI DMA.
         static const uint8_t GYRO_BUF_SIZE = 32;
 
-        static const uint8_t CLK_SEL_PLLGYROX = 0x01;
         static const uint8_t CLK_SEL_PLLGYROZ = 0x03;
 
         static const uint8_t BIT_TEMP       = 0x01;
@@ -70,41 +65,12 @@ class Mpu6000 : public SoftQuatImu {
         static const uint8_t BIT_I2C_IF_DIS = 0x10;
         static const uint8_t BIT_H_RESET    = 0x80;
 
-        // Product ID Description for MPU6000 high 4 bits low 4 bits Product
-        // Name Product Revision
-        static const uint8_t ES_REV_C4 = 0x14;
-        static const uint8_t ES_REV_C5 = 0x15;
-        static const uint8_t ES_REV_D6 = 0x16;
-        static const uint8_t ES_REV_D7 = 0x17;
-        static const uint8_t ES_REV_D8 = 0x18;
-        static const uint8_t REV_C4    = 0x54;
-        static const uint8_t REV_C5    = 0x55;
-        static const uint8_t REV_D6    = 0x56;
-        static const uint8_t REV_D7    = 0x57;
-        static const uint8_t REV_D8    = 0x58;
-        static const uint8_t REV_D9    = 0x59;
-        static const uint8_t REV_D10   = 0x5A;
-
         enum gyro_fsr_e {
             INV_FSR_250DPS = 0,
             INV_FSR_500DPS,
             INV_FSR_1000DPS,
             INV_FSR_2000DPS,
             NUM_GYRO_FSR
-        };
-
-        enum icm_high_range_gyro_fsr_e {
-            ICM_HIGH_RANGE_FSR_500DPS = 0,
-            ICM_HIGH_RANGE_FSR_1000DPS,
-            ICM_HIGH_RANGE_FSR_2000DPS,
-            ICM_HIGH_RANGE_FSR_4000DPS,
-            NUM_ICM_HIGH_RANGE_GYRO_FSR
-        };
-
-        enum clock_sel_e {
-            INV_CLK_INTERNAL = 0,
-            INV_CLK_PLL,
-            NUM_CLK
         };
 
         enum accel_fsr_e {
