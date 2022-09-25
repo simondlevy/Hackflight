@@ -56,9 +56,7 @@ void Mpu6000::detectSPISensorsAndUpdateDetectionResult(const gyroDeviceConfig_t 
 {
    extDevice_t *dev = &m_gyroDev.dev;
 
-    if (!config->csnTag || !spiSetBusInstance(dev, config->spiBus)) {
-        return;
-    }
+    spiSetBusInstance(dev, config->spiBus);
 
     dev->busType_u.spi.csnPin = IOGetByTag(config->csnTag);
 
