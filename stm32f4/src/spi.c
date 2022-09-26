@@ -891,11 +891,6 @@ void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin)
     pDev->leadingEdge = false; 
 }
 
-void spiBusDeviceRegister(const extDevice_t *dev)
-{
-    UNUSED(dev);
-}
-
 void spiInitBusDMA()
 {
     uint32_t device;

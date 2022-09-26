@@ -119,8 +119,6 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
 
-    busDeviceRegister(dev);
-
     m_gyroDev.shortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
 
     // SPI DMA buffer required per device

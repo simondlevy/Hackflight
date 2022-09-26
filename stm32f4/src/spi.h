@@ -32,8 +32,6 @@ typedef enum SPIDevice {
 extern "C" {
 #endif
 
-void spiBusDeviceRegister(const extDevice_t *dev);
-
 uint16_t spiCalculateDivider(const uint32_t freq);
 
 void spiInit(const uint8_t device);

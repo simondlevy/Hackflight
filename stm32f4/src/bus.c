@@ -73,8 +73,3 @@ uint8_t busReadRegister(const extDevice_t *dev, uint8_t reg)
     busReadRegisterBuffer(dev, reg, &data, 1);
     return data;
 }
-
-void busDeviceRegister(const extDevice_t *dev)
-{
-    spiBusDeviceRegister(dev);
-}
