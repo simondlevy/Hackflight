@@ -85,12 +85,6 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     m_gyroDev.syncTimePtr = gyroSyncTimePtr;
     m_gyroDev.interruptCountPtr = gyroInterruptCountPtr;
 
-    static gyroDeviceConfig_t gyroDeviceConfig; 
-
-    gyroDeviceConfig.busType = BUS_TYPE_SPI;
-    gyroDeviceConfig.spiBus = 1;
-    gyroDeviceConfig.extiTag = m_extiPin;
-
     spiPreInitRegister(m_csPin, IOCFG_IPU, 1);
 
     static busDevice_t bus;
@@ -103,16 +97,14 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     extDevice_t *dev = &m_gyroDev.dev;
 
-    spiSetBusInstance(dev, gyroDeviceConfig.spiBus);
+    spiSetBusInstance(dev, 1);
 
     dev->busType_u.spi.csnPin = IOGetByTag(m_csPin);
 
-    IOInit(dev->busType_u.spi.csnPin, OWNER_GYRO_CS,
-            RESOURCE_INDEX(gyroDeviceConfig.index));
+    IOInit(dev->busType_u.spi.csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(0));
 
     IOConfigGPIO(dev->busType_u.spi.csnPin, 
             IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL));
-
 
     // Ensure device is disabled, important when two devices are on the same bus.
     IOHi(dev->busType_u.spi.csnPin); 
@@ -138,7 +130,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     m_gyroDev.dev.txBuf = gyroBuf1;
     m_gyroDev.dev.rxBuf = &gyroBuf1[GYRO_BUF_SIZE / 2];
 
-    const IO_t mpuIntIO = IOGetByTag(gyroDeviceConfig.extiTag);
+    const IO_t mpuIntIO = IOGetByTag(m_extiPin);
 
     IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
     EXTIHandlerInit(&m_gyroDev.exti, interruptHandler);

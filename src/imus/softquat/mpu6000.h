@@ -81,14 +81,6 @@ class Mpu6000 : public SoftQuatImu {
             NUM_ACCEL_FSR
         };
 
-        typedef struct {
-            int8_t index;
-            busType_e busType;
-            uint8_t spiBus;
-            ioTag_t extiTag;
-            uint8_t alignment;
-        } gyroDeviceConfig_t;
-
         uint8_t m_csPin;
         uint8_t m_extiPin;
 
