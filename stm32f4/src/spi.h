@@ -42,28 +42,7 @@ uint8_t spiInstanceDenom(const SPI_TypeDef *instance);
 
 void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin);
 
-uint8_t spiReadReg(const extDevice_t *dev, const uint8_t reg);
-
-void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        const uint8_t length);
-
-bool spiReadRegBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        uint8_t length);
-
-uint8_t spiReadRegMsk(const extDevice_t *dev, const uint8_t reg);
-
-bool spiReadRegMskBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        const uint8_t length);
-
 void spiWait(const extDevice_t *dev);
-
-uint8_t spiReadWrite(const extDevice_t *dev, uint8_t data);
-
-void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData, 
-        const uint8_t len);
-
-bool spiReadWriteBufRB(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData, 
-        const uint8_t length);
 
 uint8_t spiReadWriteReg(const extDevice_t *dev, const uint8_t reg, const uint8_t data);
 
@@ -73,14 +52,7 @@ bool spiSetBusInstance(extDevice_t *dev, const uint32_t device);
 
 void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divider);
 
-void spiWrite(const extDevice_t *dev, uint8_t data);
-
 void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data);
-
-bool spiWriteRegRB(const extDevice_t *dev, const uint8_t reg, uint8_t data);
-
-void spiWriteRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        uint32_t length);
 
 #if defined(__cplusplus)
 }

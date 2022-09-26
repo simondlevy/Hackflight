@@ -560,6 +560,52 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
         initRx->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
     }
 }
+
+// Read a block of data from a register
+static void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
+        const uint8_t length)
+{
+    uint8_t regg = reg;
+
+    // This routine blocks so no need to use static data
+    busSegment_t segments[] = {
+            {&regg, NULL, sizeof(reg), false, NULL},
+            {NULL, data, length, true, NULL},
+            {NULL, NULL, 0, true, NULL},
+    };
+
+    // Ensure any prior DMA has completed before continuing
+    spiWait(dev);
+
+    spiSequence(dev, &segments[0]);
+
+    spiWait(dev);
+}
+
+// Wait for bus to become free, then read a byte from a register
+static uint8_t spiReadReg(const extDevice_t *dev, const uint8_t reg)
+{
+    uint8_t data = 0;
+
+    uint8_t regg = reg;
+
+    // This routine blocks so no need to use static data
+    busSegment_t segments[] = {
+            {&regg, NULL, sizeof(reg), false, NULL},
+            {NULL, &data, sizeof(data), true, NULL},
+            {NULL, NULL, 0, true, NULL},
+    };
+
+    // Ensure any prior DMA has completed before continuing
+    spiWait(dev);
+
+    spiSequence(dev, &segments[0]);
+
+    spiWait(dev);
+
+    return data;
+}
+
 // ----------------------------------------------------------------------------
 
 void spiInit(const uint8_t device)
@@ -601,101 +647,6 @@ void spiInit(const uint8_t device)
     SPI_Cmd(spi->dev, ENABLE);
 }
 
-// Wait for bus to become free, then read/write block of data
-void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData,
-        const uint8_t len)
-{
-    // This routine blocks so no need to use static data
-    busSegment_t segments[] = {
-        {txData, rxData, len, true, NULL},
-        {NULL, NULL, 0, true, NULL},
-    };
-
-    // Ensure any prior DMA has completed before continuing
-    spiWait(dev);
-
-    spiSequence(dev, &segments[0]);
-
-    spiWait(dev);
-}
-
-// Read/Write a block of data, returning false if the bus is busy
-bool spiReadWriteBufRB(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData,
-        const uint8_t length)
-{
-    // Ensure any prior DMA has completed before continuing
-    if (spiIsBusy(dev)) {
-        return false;
-    }
-
-    spiReadWriteBuf(dev, txData, rxData, length);
-
-    return true;
-}
-
-// Wait for bus to become free, then read/write a single byte
-uint8_t spiReadWrite(const extDevice_t *dev, uint8_t data)
-{
-    uint8_t retval;
-
-    // This routine blocks so no need to use static data
-    busSegment_t segments[] = {
-        {&data, &retval, sizeof(data), true, NULL},
-        {NULL, NULL, 0, true, NULL},
-    };
-
-    // Ensure any prior DMA has completed before continuing
-    spiWait(dev);
-
-    spiSequence(dev, &segments[0]);
-
-    spiWait(dev);
-
-    return retval;
-}
-
-// Wait for bus to become free, then read/write a single byte from a register
-uint8_t spiReadWriteReg(const extDevice_t *dev, const uint8_t reg, const uint8_t data)
-{
-    uint8_t retval = 0;
-
-    uint8_t regg = reg;
-    uint8_t dataa = data;
-
-    // This routine blocks so no need to use static data
-    busSegment_t segments[] = {
-        {&regg, NULL, sizeof(reg), false, NULL},
-        {&dataa, &retval, sizeof(data), true, NULL},
-        {NULL, NULL, 0, true, NULL},
-    };
-
-    // Ensure any prior DMA has completed before continuing
-    spiWait(dev);
-
-    spiSequence(dev, &segments[0]);
-
-    spiWait(dev);
-
-    return retval;
-}
-
-// Wait for bus to become free, then write a single byte
-void spiWrite(const extDevice_t *dev, uint8_t data)
-{
-    // This routine blocks so no need to use static data
-    busSegment_t segments[] = {
-            {&data, NULL, sizeof(data), true, NULL},
-            {NULL, NULL, 0, true, NULL},
-    };
-
-    // Ensure any prior DMA has completed before continuing
-    spiWait(dev);
-
-    spiSequence(dev, &segments[0]);
-
-    spiWait(dev);
-}
-
 // Write data to a register
 void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data)
 {
@@ -705,40 +656,6 @@ void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data)
     busSegment_t segments[] = {
             {&regg, NULL, sizeof(reg), false, NULL},
             {&data, NULL, sizeof(data), true, NULL},
-            {NULL, NULL, 0, true, NULL},
-    };
-
-    // Ensure any prior DMA has completed before continuing
-    spiWait(dev);
-
-    spiSequence(dev, &segments[0]);
-
-    spiWait(dev);
-}
-
-// Write data to a register, returning false if the bus is busy
-bool spiWriteRegRB(const extDevice_t *dev, const uint8_t reg, uint8_t data)
-{
-    // Ensure any prior DMA has completed before continuing
-    if (spiIsBusy(dev)) {
-        return false;
-    }
-
-    spiWriteReg(dev, reg, data);
-
-    return true;
-}
-
-// Read a block of data from a register
-void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        const uint8_t length)
-{
-    uint8_t regg = reg;
-
-    // This routine blocks so no need to use static data
-    busSegment_t segments[] = {
-            {&regg, NULL, sizeof(reg), false, NULL},
-            {NULL, data, length, true, NULL},
             {NULL, NULL, 0, true, NULL},
     };
 
@@ -762,65 +679,6 @@ bool spiReadRegBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
     spiReadRegBuf(dev, reg, data, length);
 
     return true;
-}
-
-// Read a block of data where the register is ORed with 0x80, returning false if the bus is busy
-bool spiReadRegMskBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        uint8_t length)
-{
-    return spiReadRegBufRB(dev, reg | 0x80, data, length);
-}
-
-// Wait for bus to become free, then write a block of data to a register
-void spiWriteRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        uint32_t length)
-{
-    uint8_t regg = reg;
-
-    // This routine blocks so no need to use static data
-    busSegment_t segments[] = {
-            {&regg, NULL, sizeof(reg), false, NULL},
-            {data, NULL, length, true, NULL},
-            {NULL, NULL, 0, true, NULL},
-    };
-
-    // Ensure any prior DMA has completed before continuing
-    spiWait(dev);
-
-    spiSequence(dev, &segments[0]);
-
-    spiWait(dev);
-}
-
-// Wait for bus to become free, then read a byte from a register
-uint8_t spiReadReg(const extDevice_t *dev, const uint8_t reg)
-{
-    uint8_t data = 0;
-
-    uint8_t regg = reg;
-
-    // This routine blocks so no need to use static data
-    busSegment_t segments[] = {
-            {&regg, NULL, sizeof(reg), false, NULL},
-            {NULL, &data, sizeof(data), true, NULL},
-            {NULL, NULL, 0, true, NULL},
-    };
-
-    // Ensure any prior DMA has completed before continuing
-    spiWait(dev);
-
-    spiSequence(dev, &segments[0]);
-
-    spiWait(dev);
-
-    return data;
-}
-
-// Wait for bus to become free, then read a byte of data where the register is
-// ORed with 0x80
-uint8_t spiReadRegMsk(const extDevice_t *dev, const uint8_t reg)
-{
-    return spiReadReg(dev, reg | 0x80);
 }
 
 uint16_t spiCalculateDivider(const uint32_t freq)
