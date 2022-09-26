@@ -1051,20 +1051,11 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments)
     spiSequenceStart(dev, segments);
 }
 
-void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg, const bool init)
+void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg)
 {
-    if (!iotag) {
-        return;
-    }
-
-    if (m_spiPreinitCount == SPI_PREINIT_COUNT) {
-        systemIndicateFailure(FAILURE_DEVELOPER, 5);
-        return;
-    }
-
     m_spiPreinitArray[m_spiPreinitCount].iotag = iotag;
     m_spiPreinitArray[m_spiPreinitCount].iocfg = iocfg;
-    m_spiPreinitArray[m_spiPreinitCount].init = init;
+    m_spiPreinitArray[m_spiPreinitCount].init = 1;
     ++m_spiPreinitCount;
 }
 

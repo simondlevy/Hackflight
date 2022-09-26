@@ -46,7 +46,7 @@ void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin);
 
 void spiPreInit(void);
 
-void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg, const bool init);
+void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg);
 
 uint8_t spiReadReg(const extDevice_t *dev, const uint8_t reg);
 

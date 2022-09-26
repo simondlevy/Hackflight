@@ -85,7 +85,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     m_gyroDev.syncTimePtr = gyroSyncTimePtr;
     m_gyroDev.interruptCountPtr = gyroInterruptCountPtr;
 
-    spiPreInitRegister(m_csPin, IOCFG_IPU, 1);
+    spiPreInitRegister(m_csPin, IOCFG_IPU);
 
     static busDevice_t bus;
     m_gyroDev.dev.bus = &bus;
