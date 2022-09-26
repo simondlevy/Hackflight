@@ -22,7 +22,6 @@
 
 #include "spi.h"
 #include "exti.h"
-#include "flash.h"
 #include "inverter.h"
 #include "io.h"
 #include "pinio.h"

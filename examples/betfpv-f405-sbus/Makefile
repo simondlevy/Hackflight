@@ -273,7 +273,6 @@ $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 	  hardware_init.h \
       spi.h \
       exti.h \
-      flash.h \
       inverter.h \
       io.h \
       pinio.h \

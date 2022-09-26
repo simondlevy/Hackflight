@@ -27,7 +27,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "spi.h"
 #include "dma_reqmap.h"
 #include "exti.h"
-//#include "flash.h"
 #include "io.h"
 #include "rcc.h"
 #include "nvic.h"
@@ -1083,8 +1082,6 @@ static void spiPreinitByIO(IO_t io)
 
 void spiPreInit(void)
 {
-    //flashPreInit();
-
     for (int i = 0; i < m_spiPreinitCount; i++) {
         spiPreinitPin(&m_spiPreinitArray[i], i);
     }
