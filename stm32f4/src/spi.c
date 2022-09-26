@@ -170,14 +170,13 @@ void spiWait(const extDevice_t *dev)
 }
 
 // ----------------------------------------------------------------------------
+
 void spiInit(const uint8_t mask)
 {
     initmask(mask, 0);
     initmask(mask, 1);
     initmask(mask, 2);
 }
-
-
 
 // Wait for bus to become free, then read/write block of data
 void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData,
@@ -1080,7 +1079,6 @@ void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg)
     m_spiPreinitArray[m_spiPreinitCount].init = 1;
     ++m_spiPreinitCount;
 }
-
 
 
 void spiPreInit(void)

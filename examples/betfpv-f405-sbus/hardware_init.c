@@ -54,12 +54,11 @@ void hardwareInit(void)
             0x16,  // miso = PA6
             0x17); // mosi = PA7
 
-    spiPreInit();
+    // spiPreInit();
     spiInit(0x07); // mask for devices 0,1,2
     spiInitBusDMA();
 
     usbCableDetectInit();
-    //flashInit();
     systemInitUnusedPins();
     pinioInit();
     timerStart();
