@@ -57,7 +57,7 @@ bool Mpu6000::devGyroIsReady(void)
     uint16_t *gyroData = (uint16_t *)m_gyroDev.dev.rxBuf;
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(&m_gyroDev.dev);
+    spiWait(&m_gyroDev.dev);
 
     m_gyroDev.dev.txBuf[0] = Mpu6000::RA_GYRO_XOUT_H | 0x80;
 

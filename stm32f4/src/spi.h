@@ -61,6 +61,8 @@ uint8_t spiReadRegMsk(const extDevice_t *dev, const uint8_t reg);
 bool spiReadRegMskBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
         const uint8_t length);
 
+void spiWait(const extDevice_t *dev);
+
 uint8_t spiReadWrite(const extDevice_t *dev, uint8_t data);
 
 void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData, 
@@ -76,10 +78,6 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments);
 bool spiSetBusInstance(extDevice_t *dev, const uint32_t device);
 
 void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divider);
-
-void spiWait(const extDevice_t *dev);
-
-void spiWaitClaim(const extDevice_t *dev);
 
 void spiWrite(const extDevice_t *dev, uint8_t data);
 

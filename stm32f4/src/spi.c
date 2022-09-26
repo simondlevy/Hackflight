@@ -162,8 +162,14 @@ static bool spiIsBusy(const extDevice_t *dev)
     return (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
 }
 
-// ----------------------------------------------------------------------------
+// Wait for DMA completion
+void spiWait(const extDevice_t *dev)
+{
+    // Wait for completion
+    while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
+}
 
+// ----------------------------------------------------------------------------
 void spiInit(const uint8_t mask)
 {
     initmask(mask, 0);
@@ -171,24 +177,7 @@ void spiInit(const uint8_t mask)
     initmask(mask, 2);
 }
 
-// Wait for DMA completion and claim the bus driver
-void spiWaitClaim(const extDevice_t *dev)
-{
-    // If there is a device on the bus whose driver might call spiSequence from
-    // an ISR then an atomic access is required to claim the bus, however if
-    // not, then interrupts need not be
-    // disabled as this can result in edge triggered interrupts being missed
 
-    // Wait for completion
-    while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
-}
-
-// Wait for DMA completion
-void spiWait(const extDevice_t *dev)
-{
-    // Wait for completion
-    while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
-}
 
 // Wait for bus to become free, then read/write block of data
 void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData,
@@ -201,7 +190,7 @@ void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData,
     };
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(dev);
+    spiWait(dev);
 
     spiSequence(dev, &segments[0]);
 
@@ -234,7 +223,7 @@ uint8_t spiReadWrite(const extDevice_t *dev, uint8_t data)
     };
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(dev);
+    spiWait(dev);
 
     spiSequence(dev, &segments[0]);
 
@@ -259,7 +248,7 @@ uint8_t spiReadWriteReg(const extDevice_t *dev, const uint8_t reg, const uint8_t
     };
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(dev);
+    spiWait(dev);
 
     spiSequence(dev, &segments[0]);
 
@@ -278,7 +267,7 @@ void spiWrite(const extDevice_t *dev, uint8_t data)
     };
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(dev);
+    spiWait(dev);
 
     spiSequence(dev, &segments[0]);
 
@@ -298,7 +287,7 @@ void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data)
     };
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(dev);
+    spiWait(dev);
 
     spiSequence(dev, &segments[0]);
 
@@ -332,7 +321,7 @@ void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
     };
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(dev);
+    spiWait(dev);
 
     spiSequence(dev, &segments[0]);
 
@@ -374,7 +363,7 @@ void spiWriteRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
     };
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(dev);
+    spiWait(dev);
 
     spiSequence(dev, &segments[0]);
 
@@ -396,7 +385,7 @@ uint8_t spiReadReg(const extDevice_t *dev, const uint8_t reg)
     };
 
     // Ensure any prior DMA has completed before continuing
-    spiWaitClaim(dev);
+    spiWait(dev);
 
     spiSequence(dev, &segments[0]);
 
@@ -1041,7 +1030,7 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments)
         if ((bus->curSegment != (busSegment_t *)BUS_SPI_LOCKED) && spiIsBusy(dev)) {
             // Defer this transfer to be triggered upon completion of the
             // current transfer. Blocking calls and those from non-interrupt
-            // context will have already called spiWaitClaim() so this will
+            // context will have already called spiWait() so this will
             // only happen for non-blocking calls called from an ISR.
             busSegment_t *endSegment = bus->curSegment;
 
