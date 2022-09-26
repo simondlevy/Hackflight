@@ -60,7 +60,7 @@ void hardwareInit(void)
     spiInitBusDMA();
 
     usbCableDetectInit();
-    flashInit();
+    //flashInit();
     systemInitUnusedPins();
     pinioInit();
     timerStart();

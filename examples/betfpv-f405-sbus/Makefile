@@ -123,7 +123,6 @@ STM32_SRC = \
             dma_common.c \
             dma_reqmap_f405.c \
             exti.c \
-            flash.c \
             io.c \
             pinio.c \
             rcc.c \
