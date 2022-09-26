@@ -29,6 +29,19 @@
 
 static Mpu6000::gyroDev_t m_gyroDev;
 
+uint16_t Mpu6000::calculateSpiDivisor(const uint32_t freq)
+{
+    uint32_t spiClk = SystemCoreClock / 2;
+
+    uint16_t divisor = 2;
+
+    spiClk >>= 1;
+
+    for (; (spiClk > freq) && (divisor < 256); divisor <<= 1, spiClk >>= 1);
+
+    return divisor;
+}
+
 void Mpu6000::interruptHandler(extiCallbackRec_t *cb)
 {
     (void)cb;
@@ -107,7 +120,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     // Ensure device is disabled, important when two devices are on the same bus.
     IOHi(dev->busType_u.spi.csnPin); 
 
-    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
+    spiSetClkDivisor(dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
     // reset the device configuration
     spiWriteReg(dev, RA_PWR_MGMT_1, BIT_H_RESET);
@@ -117,7 +130,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     spiWriteReg(dev, RA_SIGNAL_PATH_RESET, BIT_GYRO | BIT_ACC | BIT_TEMP);
     delay(100);  // datasheet specifies a 100ms delay after signal path reset
 
-    spiSetClkDivisor(dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
+    spiSetClkDivisor(dev, calculateSpiDivisor(MAX_SPI_CLK_HZ));
 
     m_gyroDev.shortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
 
@@ -134,7 +147,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
             BETAFLIGHT_EXTI_TRIGGER_RISING);
     EXTIEnable(mpuIntIO, true);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
     // Clock Source PPL with Z axis gyro reference
     spiWriteReg(&m_gyroDev.dev, RA_PWR_MGMT_1, CLK_SEL_PLLGYROZ);
@@ -169,16 +182,16 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     spiWriteReg(&m_gyroDev.dev, RA_INT_ENABLE, RF_DATA_RDY_EN);
     delayMicroseconds(15);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_CLK_HZ));
     delayMicroseconds(1);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_INIT_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
     // Accel and Gyro DLPF Setting
     spiWriteReg(&m_gyroDev.dev, CONFIG, 0); // no gyro DLPF
     delayMicroseconds(1);
 
-    spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
+    spiSetClkDivisor(&m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_CLK_HZ));
 
     if (((int8_t)m_adcRaw[1]) == -1 && ((int8_t)m_adcRaw[0]) == -1) {
         systemFailureMode(FAILURE_GYRO_INIT_FAILED);

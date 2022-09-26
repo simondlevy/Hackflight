@@ -94,6 +94,8 @@ class Mpu6000 : public SoftQuatImu {
 
         static void interruptHandler(extiCallbackRec_t *cb);
 
+        static uint16_t calculateSpiDivisor(const uint32_t freq);
+
     public:
 
         // Shared with interrupt handler routine

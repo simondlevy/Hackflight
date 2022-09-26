@@ -656,20 +656,6 @@ bool spiReadRegBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
     return true;
 }
 
-uint16_t spiCalculateDivider(const uint32_t freq)
-{
-    uint32_t spiClk = SystemCoreClock / 2;
-
-    uint16_t divisor = 2;
-
-    spiClk >>= 1;
-
-    for (; (spiClk > freq) && (divisor < 256); divisor <<= 1, spiClk >>= 1);
-
-    return divisor;
-}
-
-
 
 // Mark this bus as being SPI and record the first owner to use it
 bool spiSetBusInstance(extDevice_t *dev, const uint32_t device)
