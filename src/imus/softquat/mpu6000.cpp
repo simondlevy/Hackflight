@@ -89,10 +89,9 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     gyroDeviceConfig.busType = BUS_TYPE_SPI;
     gyroDeviceConfig.spiBus = 1;
-    gyroDeviceConfig.csnTag = m_csPin;
     gyroDeviceConfig.extiTag = m_extiPin;
 
-    spiPreInitRegister(gyroDeviceConfig.csnTag, IOCFG_IPU, 1);
+    spiPreInitRegister(m_csPin, IOCFG_IPU, 1);
 
     static busDevice_t bus;
     m_gyroDev.dev.bus = &bus;
@@ -106,7 +105,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     spiSetBusInstance(dev, gyroDeviceConfig.spiBus);
 
-    dev->busType_u.spi.csnPin = IOGetByTag(gyroDeviceConfig.csnTag);
+    dev->busType_u.spi.csnPin = IOGetByTag(m_csPin);
 
     IOInit(dev->busType_u.spi.csnPin, OWNER_GYRO_CS,
             RESOURCE_INDEX(gyroDeviceConfig.index));

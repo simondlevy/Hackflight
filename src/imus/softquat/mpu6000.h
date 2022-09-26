@@ -85,9 +85,6 @@ class Mpu6000 : public SoftQuatImu {
             int8_t index;
             busType_e busType;
             uint8_t spiBus;
-            ioTag_t csnTag;
-            uint8_t i2cBus;
-            uint8_t i2cAddress;
             ioTag_t extiTag;
             uint8_t alignment;
         } gyroDeviceConfig_t;
