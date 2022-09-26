@@ -106,9 +106,6 @@ static SPI_InitTypeDef defaultInit = {
     .SPI_CPHA = SPI_CPHA_2Edge
 };
 
-
-
-
 // Return true if DMA engine is busy
 static bool spiIsBusy(const extDevice_t *dev)
 {
@@ -169,6 +166,7 @@ static void spiInternalInitStream(const extDevice_t *dev, const bool preInit)
         initRx->DMA_BufferSize = len;
     }
 }
+
 
 static void spiInternalStartDMA(const extDevice_t *dev)
 {
@@ -524,6 +522,44 @@ static void spiTxIrqHandler(dmaChannelDescriptor_t* descriptor)
     spiIrqHandler(dev);
 }
 
+static void spiInternalResetStream(dmaChannelDescriptor_t *descriptor)
+{
+    DMA_Stream_TypeDef *streamRegs = (DMA_Stream_TypeDef *)descriptor->ref;
+
+    // Disable the stream
+    streamRegs->CR = 0U;
+
+    // Clear any pending interrupt flags
+    DMA_CLEAR_FLAG(descriptor, DMA_IT_HTIF | DMA_IT_TEIF | DMA_IT_TCIF);
+}
+
+static void spiInternalResetDescriptors(busDevice_t *bus)
+{
+    DMA_InitTypeDef *initTx = bus->initTx;
+
+    DMA_StructInit(initTx);
+    initTx->DMA_Channel = bus->dmaTx->channel;
+    initTx->DMA_DIR = DMA_DIR_MemoryToPeripheral;
+    initTx->DMA_Mode = DMA_Mode_Normal;
+    initTx->DMA_PeripheralBaseAddr = (uint32_t)&bus->busType_u.spi.instance->DR;
+    initTx->DMA_Priority = DMA_Priority_Low;
+    initTx->DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+    initTx->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+    initTx->DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+
+    if (bus->dmaRx) {
+        DMA_InitTypeDef *initRx = bus->initRx;
+
+        DMA_StructInit(initRx);
+        initRx->DMA_Channel = bus->dmaRx->channel;
+        initRx->DMA_DIR = DMA_DIR_PeripheralToMemory;
+        initRx->DMA_Mode = DMA_Mode_Normal;
+        initRx->DMA_PeripheralBaseAddr = (uint32_t)&bus->busType_u.spi.instance->DR;
+        initRx->DMA_Priority = DMA_Priority_Low;
+        initRx->DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+        initRx->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+    }
+}
 // ----------------------------------------------------------------------------
 
 void spiInit(const uint8_t device)
@@ -837,46 +873,7 @@ bool spiSetBusInstance(extDevice_t *dev, const uint32_t device)
     return true;
 }
 
-static void spiInternalResetStream(dmaChannelDescriptor_t *descriptor)
-{
-    DMA_Stream_TypeDef *streamRegs = (DMA_Stream_TypeDef *)descriptor->ref;
 
-    // Disable the stream
-    streamRegs->CR = 0U;
-
-    // Clear any pending interrupt flags
-    DMA_CLEAR_FLAG(descriptor, DMA_IT_HTIF | DMA_IT_TEIF | DMA_IT_TCIF);
-}
-
-static void spiInternalResetDescriptors(busDevice_t *bus)
-{
-    DMA_InitTypeDef *initTx = bus->initTx;
-
-    DMA_StructInit(initTx);
-    initTx->DMA_Channel = bus->dmaTx->channel;
-    initTx->DMA_DIR = DMA_DIR_MemoryToPeripheral;
-    initTx->DMA_Mode = DMA_Mode_Normal;
-    initTx->DMA_PeripheralBaseAddr = (uint32_t)&bus->busType_u.spi.instance->DR;
-    initTx->DMA_Priority = DMA_Priority_Low;
-    initTx->DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-    initTx->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    initTx->DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-
-    if (bus->dmaRx) {
-        DMA_InitTypeDef *initRx = bus->initRx;
-
-        DMA_StructInit(initRx);
-        initRx->DMA_Channel = bus->dmaRx->channel;
-        initRx->DMA_DIR = DMA_DIR_PeripheralToMemory;
-        initRx->DMA_Mode = DMA_Mode_Normal;
-        initRx->DMA_PeripheralBaseAddr = (uint32_t)&bus->busType_u.spi.instance->DR;
-        initRx->DMA_Priority = DMA_Priority_Low;
-        initRx->DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-        initRx->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    }
-}
-
-// ----------------------------------------------------------------------------
 
 void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin)
 {
@@ -1037,8 +1034,6 @@ void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divisor)
 {
     ((extDevice_t *)dev)->busType_u.spi.speed = divisor;
 }
-
-
 
 // Wait for DMA completion
 void spiWait(const extDevice_t *dev)
