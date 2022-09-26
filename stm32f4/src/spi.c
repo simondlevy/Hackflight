@@ -179,20 +179,8 @@ void spiWaitClaim(const extDevice_t *dev)
     // not, then interrupts need not be
     // disabled as this can result in edge triggered interrupts being missed
 
-    if (dev->bus->useAtomicWait) {
-        // Prevent race condition where the bus appears free, but a gyro
-        // interrupt starts a transfer
-        do {
-            ATOMIC_BLOCK(NVIC_PRIO_MAX) {
-                if (dev->bus->curSegment == (busSegment_t *)BUS_SPI_FREE) {
-                    dev->bus->curSegment = (busSegment_t *)BUS_SPI_LOCKED;
-                }
-            }
-        } while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_LOCKED);
-    } else {
-        // Wait for completion
-        while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
-    }
+    // Wait for completion
+    while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
 }
 
 // Wait for DMA completion
@@ -208,8 +196,8 @@ void spiReadWriteBuf(const extDevice_t *dev, uint8_t *txData, uint8_t *rxData,
 {
     // This routine blocks so no need to use static data
     busSegment_t segments[] = {
-            {txData, rxData, len, true, NULL},
-            {NULL, NULL, 0, true, NULL},
+        {txData, rxData, len, true, NULL},
+        {NULL, NULL, 0, true, NULL},
     };
 
     // Ensure any prior DMA has completed before continuing
@@ -241,8 +229,8 @@ uint8_t spiReadWrite(const extDevice_t *dev, uint8_t data)
 
     // This routine blocks so no need to use static data
     busSegment_t segments[] = {
-            {&data, &retval, sizeof(data), true, NULL},
-            {NULL, NULL, 0, true, NULL},
+        {&data, &retval, sizeof(data), true, NULL},
+        {NULL, NULL, 0, true, NULL},
     };
 
     // Ensure any prior DMA has completed before continuing
@@ -265,9 +253,9 @@ uint8_t spiReadWriteReg(const extDevice_t *dev, const uint8_t reg, const uint8_t
 
     // This routine blocks so no need to use static data
     busSegment_t segments[] = {
-            {&regg, NULL, sizeof(reg), false, NULL},
-            {&dataa, &retval, sizeof(data), true, NULL},
-            {NULL, NULL, 0, true, NULL},
+        {&regg, NULL, sizeof(reg), false, NULL},
+        {&dataa, &retval, sizeof(data), true, NULL},
+        {NULL, NULL, 0, true, NULL},
     };
 
     // Ensure any prior DMA has completed before continuing
@@ -874,7 +862,6 @@ bool spiSetBusInstance(extDevice_t *dev, const uint32_t device)
 
     bus->busType = BUS_TYPE_SPI;
     bus->useDMA = false;
-    bus->useAtomicWait = false;
     bus->deviceCount = 1;
     bus->initTx = &dev->initTx;
     bus->initRx = &dev->initRx;

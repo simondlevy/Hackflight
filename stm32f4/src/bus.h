@@ -54,7 +54,6 @@ typedef struct busDevice_s {
         } mpuSlave;
     } busType_u;
     bool useDMA;
-    bool useAtomicWait;
     uint8_t deviceCount;
     dmaChannelDescriptor_t *dmaTx;
     dmaChannelDescriptor_t *dmaRx;
