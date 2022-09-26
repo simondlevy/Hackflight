@@ -167,7 +167,6 @@ static void spiInternalInitStream(const extDevice_t *dev, const bool preInit)
     }
 }
 
-
 static void spiInternalStartDMA(const extDevice_t *dev)
 {
     // Assert Chip Select
@@ -580,30 +579,6 @@ static void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *da
     spiSequence(dev, &segments[0]);
 
     spiWait(dev);
-}
-
-// Wait for bus to become free, then read a byte from a register
-static uint8_t spiReadReg(const extDevice_t *dev, const uint8_t reg)
-{
-    uint8_t data = 0;
-
-    uint8_t regg = reg;
-
-    // This routine blocks so no need to use static data
-    busSegment_t segments[] = {
-            {&regg, NULL, sizeof(reg), false, NULL},
-            {NULL, &data, sizeof(data), true, NULL},
-            {NULL, NULL, 0, true, NULL},
-    };
-
-    // Ensure any prior DMA has completed before continuing
-    spiWait(dev);
-
-    spiSequence(dev, &segments[0]);
-
-    spiWait(dev);
-
-    return data;
 }
 
 // ----------------------------------------------------------------------------
