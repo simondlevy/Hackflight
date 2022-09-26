@@ -1080,14 +1080,6 @@ void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg)
     ++m_spiPreinitCount;
 }
 
-
-void spiPreInit(void)
-{
-    for (int i = 0; i < m_spiPreinitCount; i++) {
-        spiPreinitPin(&m_spiPreinitArray[i], i);
-    }
-}
-
 void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin)
 {
     spiDevice_t *pDev = &m_spiDevice[SPIDEV_1];
