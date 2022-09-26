@@ -860,5 +860,3 @@ void spiWait(const extDevice_t *dev)
     // Wait for completion
     while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
 }
-
-
