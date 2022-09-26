@@ -72,7 +72,6 @@ typedef struct spiPreinit_s {
     bool init;
 } spiPreinit_t;
 
-static spiPreinit_t m_spiPreinitArray[SPI_PREINIT_COUNT];
 static uint8_t      m_spiPreinitCount;
 static spiDevice_t  m_spiDevice[SPIDEV_COUNT];
 static busDevice_t  m_spiBusDevice[SPIDEV_COUNT];
@@ -896,28 +895,6 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
     }
 }
 
-static void spiPreinitPin(spiPreinit_t *preinit, int index)
-{
-    IO_t io = IOGetByTag(preinit->iotag);
-    IOInit(io, OWNER_PREINIT, RESOURCE_INDEX(index));
-    IOConfigGPIO(io, preinit->iocfg);
-    if (preinit->init) {
-        IOHi(io);
-    } else {
-        IOLo(io);
-    }
-}
-
-static void spiPreinitByIO(IO_t io)
-{
-    for (int i = 0; i < m_spiPreinitCount; i++) {
-        if (io == IOGetByTag(m_spiPreinitArray[i].iotag)) {
-            spiPreinitPin(&m_spiPreinitArray[i], i);
-            return;
-        }
-    }
-}
-
 // ----------------------------------------------------------------------------
 
 void spiInitBusDMA()
@@ -1070,14 +1047,6 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments)
     }
 
     spiSequenceStart(dev, segments);
-}
-
-void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg)
-{
-    m_spiPreinitArray[m_spiPreinitCount].iotag = iotag;
-    m_spiPreinitArray[m_spiPreinitCount].iocfg = iocfg;
-    m_spiPreinitArray[m_spiPreinitCount].init = 1;
-    ++m_spiPreinitCount;
 }
 
 void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin)
