@@ -897,6 +897,29 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
     }
 }
 
+static void spiPreinitPin(spiPreinit_t *preinit, int index)
+{
+    IO_t io = IOGetByTag(preinit->iotag);
+    IOInit(io, OWNER_PREINIT, RESOURCE_INDEX(index));
+    IOConfigGPIO(io, preinit->iocfg);
+    if (preinit->init) {
+        IOHi(io);
+    } else {
+        IOLo(io);
+    }
+}
+
+static void spiPreinitByIO(IO_t io)
+{
+    for (int i = 0; i < m_spiPreinitCount; i++) {
+        if (io == IOGetByTag(m_spiPreinitArray[i].iotag)) {
+            spiPreinitPin(&m_spiPreinitArray[i], i);
+            return;
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
 
 void spiInitBusDMA()
 {
@@ -1058,27 +1081,7 @@ void spiPreInitRegister(ioTag_t iotag, const uint8_t iocfg)
     ++m_spiPreinitCount;
 }
 
-static void spiPreinitPin(spiPreinit_t *preinit, int index)
-{
-    IO_t io = IOGetByTag(preinit->iotag);
-    IOInit(io, OWNER_PREINIT, RESOURCE_INDEX(index));
-    IOConfigGPIO(io, preinit->iocfg);
-    if (preinit->init) {
-        IOHi(io);
-    } else {
-        IOLo(io);
-    }
-}
 
-static void spiPreinitByIO(IO_t io)
-{
-    for (int i = 0; i < m_spiPreinitCount; i++) {
-        if (io == IOGetByTag(m_spiPreinitArray[i].iotag)) {
-            spiPreinitPin(&m_spiPreinitArray[i], i);
-            return;
-        }
-    }
-}
 
 void spiPreInit(void)
 {
