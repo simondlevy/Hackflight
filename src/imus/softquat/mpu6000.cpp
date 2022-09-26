@@ -73,9 +73,9 @@ bool Mpu6000::devGyroIsReady(void)
     // Wait for completion
     spiWait(&m_gyroDev.dev);
 
-    m_gyroDev.adcRaw[0] = __builtin_bswap16(gyroData[1]);
-    m_gyroDev.adcRaw[1] = __builtin_bswap16(gyroData[2]);
-    m_gyroDev.adcRaw[2] = __builtin_bswap16(gyroData[3]);
+    m_adcRaw[0] = __builtin_bswap16(gyroData[1]);
+    m_adcRaw[1] = __builtin_bswap16(gyroData[2]);
+    m_adcRaw[2] = __builtin_bswap16(gyroData[3]);
 
     return true;
 }
@@ -184,14 +184,14 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     spiSetClkDivisor(&m_gyroDev.dev, spiCalculateDivider(MAX_SPI_CLK_HZ));
 
-    if (((int8_t)m_gyroDev.adcRaw[1]) == -1 && ((int8_t)m_gyroDev.adcRaw[0]) == -1) {
+    if (((int8_t)m_adcRaw[1]) == -1 && ((int8_t)m_adcRaw[0]) == -1) {
         systemFailureMode(FAILURE_GYRO_INIT_FAILED);
     }
 }
 
 int16_t Mpu6000::devReadRawGyro(uint8_t k)
 {
-    return m_gyroDev.adcRaw[k];
+    return m_adcRaw[k];
 }
 
 Mpu6000::Mpu6000(

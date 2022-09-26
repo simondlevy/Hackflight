@@ -81,6 +81,7 @@ class Mpu6000 : public SoftQuatImu {
             NUM_ACCEL_FSR
         };
 
+        int16_t m_adcRaw[3];                          
         uint8_t m_csPin;
         uint8_t m_extiPin;
 
@@ -98,7 +99,6 @@ class Mpu6000 : public SoftQuatImu {
         // Shared with interrupt handler routine
         typedef struct {
 
-            int16_t           adcRaw[3];                          
             extDevice_t       dev;
             extiCallbackRec_t exti;
             int32_t           dmaMaxDuration;
