@@ -1,4 +1,3 @@
-
 /*
 This file is part of Hackflight.
 
@@ -72,7 +71,6 @@ typedef struct spiPreinit_s {
     bool init;
 } spiPreinit_t;
 
-static uint8_t      m_spiPreinitCount;
 static spiDevice_t  m_spiDevice[SPIDEV_COUNT];
 static busDevice_t  m_spiBusDevice[SPIDEV_COUNT];
 
@@ -108,7 +106,25 @@ static SPI_InitTypeDef defaultInit = {
     .SPI_CPHA = SPI_CPHA_2Edge
 };
 
-static void spiInitDevice(const SPIDevice device)
+
+
+
+// Return true if DMA engine is busy
+static bool spiIsBusy(const extDevice_t *dev)
+{
+    return (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
+}
+
+// Wait for DMA completion
+void spiWait(const extDevice_t *dev)
+{
+    // Wait for completion
+    while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
+}
+
+// ----------------------------------------------------------------------------
+
+void spiInit(const uint8_t device)
 {
     spiDevice_t *spi = &(m_spiDevice[device]);
 
@@ -145,36 +161,6 @@ static void spiInitDevice(const SPIDevice device)
     SPI_I2S_DMACmd(spi->dev, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, DISABLE);
     SPI_Init(spi->dev, &defaultInit);
     SPI_Cmd(spi->dev, ENABLE);
-}
-
-
-static void initmask(const uint8_t mask, const uint8_t k)
-{
-    if ((mask>>k) & 0x01) {
-        spiInitDevice(k);
-    }
-}
-
-// Return true if DMA engine is busy
-static bool spiIsBusy(const extDevice_t *dev)
-{
-    return (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
-}
-
-// Wait for DMA completion
-void spiWait(const extDevice_t *dev)
-{
-    // Wait for completion
-    while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
-}
-
-// ----------------------------------------------------------------------------
-
-void spiInit(const uint8_t mask)
-{
-    initmask(mask, 0);
-    initmask(mask, 1);
-    initmask(mask, 2);
 }
 
 // Wait for bus to become free, then read/write block of data

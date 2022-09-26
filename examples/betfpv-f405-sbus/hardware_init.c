@@ -54,7 +54,10 @@ void hardwareInit(void)
             0x16,  // miso = PA6
             0x17); // mosi = PA7
 
-    spiInit(0x07); // mask for devices 0,1,2
+    spiInit(0); 
+    spiInit(1); 
+    spiInit(2); 
+
     spiInitBusDMA();
 
     usbCableDetectInit();
