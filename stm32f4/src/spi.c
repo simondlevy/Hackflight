@@ -37,20 +37,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 static const uint32_t BUS_SPI_FREE   = 0x00000000;
 static const uint32_t BUS_SPI_LOCKED = 0x00000004;
 
-// De facto standard mode
-// See https://en.wikipedia.org/wiki/Serial_Peripheral_Interface
-//
-// Mode CPOL CPHA
-//  0    0    0
-//  1    0    1
-//  2    1    0
-//  3    1    1
-typedef enum {
-    SPI_MODE0_POL_LOW_EDGE_1ST = 0,
-    SPI_MODE1_POL_LOW_EDGE_2ND,
-    SPI_MODE2_POL_HIGH_EDGE_1ST,
-    SPI_MODE3_POL_HIGH_EDGE_2ND
-} SPIMode_e;
 
 typedef struct SPIDevice_s {
     SPI_TypeDef *dev;
@@ -63,12 +49,6 @@ typedef struct SPIDevice_s {
     bool leadingEdge;
     uint8_t dmaIrqHandler;
 } spiDevice_t;
-
-typedef struct spiPreinit_s {
-    ioTag_t iotag;
-    uint8_t iocfg;
-    bool init;
-} spiPreinit_t;
 
 static spiDevice_t  m_spiDevice[SPIDEV_COUNT];
 static busDevice_t  m_spiBusDevice[SPIDEV_COUNT];
