@@ -104,7 +104,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     extDevice_t *dev = &m_gyroDev.dev;
 
-    spiSetBusInstance(dev, 1);
+    spiSetBusInstance(dev);
 
     dev->csnPin = IOGetByTag(m_csPin);
 

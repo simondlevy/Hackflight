@@ -605,9 +605,9 @@ void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data)
 }
 
 // Mark this bus as being SPI and record the first owner to use it
-void spiSetBusInstance(extDevice_t *dev, const uint8_t device)
+void spiSetBusInstance(extDevice_t *dev)
 {
-    dev->bus = &m_spiBusDevice[spiCfgToDev(device)];
+    dev->bus = &m_spiBusDevice[spiCfgToDev(1)];
 
     // By default each device should use SPI DMA if the bus supports it
     dev->useDMA = true;
