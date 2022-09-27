@@ -82,16 +82,6 @@ typedef struct extDevice_s {
     uint32_t callbackArg;
 } extDevice_t;
 
-typedef enum SPIDevice {
-    SPIINVALID = -1,
-    SPIDEV_1   = 0,
-    SPIDEV_2,
-    SPIDEV_3,
-    SPIDEV_4,
-    SPIDEV_5,
-    SPIDEV_6
-} SPIDevice;
-
 #if defined(__cplusplus)
 extern "C" {
 #endif

@@ -21,6 +21,16 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "dma.h"
 #include "timer.h"
 
+typedef enum SPIDevice {
+    SPIINVALID = -1,
+    SPIDEV_1   = 0,
+    SPIDEV_2,
+    SPIDEV_3,
+    SPIDEV_4,
+    SPIDEV_5,
+    SPIDEV_6
+} SPIDevice;
+
 typedef uint16_t dmaCode_t;
 
 typedef struct dmaChannelSpec_s {
