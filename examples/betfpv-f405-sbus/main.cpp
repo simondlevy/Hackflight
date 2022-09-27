@@ -32,6 +32,8 @@
 #include <vector>
 using namespace std;
 
+static const uint8_t CS_PIN = 0x14;
+
 int main(void)
 {
     hardwareInit();
@@ -43,7 +45,7 @@ int main(void)
             0x16,  // miso = PA6
             0x17); // mosi = PA7
 
-    spiSetBusInstance(&spi1);
+    spiSetBusInstance(&spi1, CS_PIN);
 
     static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -55,7 +57,7 @@ int main(void)
     // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
     static Mpu6000 imu(
             &spi1,
-            0x14,  // CS pin = PA4
+            CS_PIN, 
             0x34,  // EXTI pin = PC4
             2000); // gyro scale DPS
 

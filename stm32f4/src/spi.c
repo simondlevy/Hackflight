@@ -596,7 +596,7 @@ void spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data)
 }
 
 // Mark this bus as being SPI and record the first owner to use it
-void spiSetBusInstance(spiDevice_t *dev)
+void spiSetBusInstance(spiDevice_t *dev, const uint8_t csPin)
 {
     static busDevice_t busDevice;
     dev->bus = &busDevice;
@@ -617,6 +617,24 @@ void spiSetBusInstance(spiDevice_t *dev)
     bus->deviceCount = 1;
     bus->initTx = &dev->initTx;
     bus->initRx = &dev->initRx;
+
+    dev->csnPin = IOGetByTag(csPin);
+
+    IOInit(dev->csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(0));
+
+    IOConfigGPIO(dev->csnPin, 
+            IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL));
+
+    // Ensure device is disabled, important when two devices are on the same bus.
+    IOHi(dev->csnPin); 
+
+    IOInit(dev->csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(0));
+
+    IOConfigGPIO(dev->csnPin, 
+            IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL));
+
+    // Ensure device is disabled, important when two devices are on the same bus.
+    IOHi(dev->csnPin); 
 }
 
 void spiInitBusDMA()

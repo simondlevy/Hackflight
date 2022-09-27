@@ -94,7 +94,7 @@ extern "C" {
 
     void spiSequence(const spiDevice_t *dev, busSegment_t *segments);
 
-    void spiSetBusInstance(spiDevice_t *dev);
+    void spiSetBusInstance(spiDevice_t *dev, const uint8_t csPin);
 
     void spiSetClkDivisor(const spiDevice_t *dev, const uint16_t divider);
 

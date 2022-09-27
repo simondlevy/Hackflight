@@ -98,18 +98,6 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     spiDevice_t *dev = m_gyroDev.dev;
 
-    spiSetBusInstance(dev);
-
-    dev->csnPin = IOGetByTag(m_csPin);
-
-    IOInit(dev->csnPin, OWNER_GYRO_CS, RESOURCE_INDEX(0));
-
-    IOConfigGPIO(dev->csnPin, 
-            IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, GPIO_PuPd_NOPULL));
-
-    // Ensure device is disabled, important when two devices are on the same bus.
-    IOHi(dev->csnPin); 
-
     spiSetClkDivisor(dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
     // reset the device configuration
