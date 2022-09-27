@@ -66,17 +66,17 @@ void Mpu6000::interruptHandler(extiCallbackRec_t *cb)
 
 bool Mpu6000::devGyroIsReady(void)
 {
-    uint16_t *gyroData = (uint16_t *)m_gyroDev.dev->rxBuf;
+    uint8_t * rxBuf = spiGetRxBuf(m_gyroDev.dev);
+    uint8_t * txBuf = spiGetTxBuf(m_gyroDev.dev);
+
+    uint16_t * gyroData = (uint16_t *)rxBuf;
 
     // Ensure any prior DMA has completed before continuing
     spiWait(m_gyroDev.dev);
 
-    m_gyroDev.dev->txBuf[0] = Mpu6000::RA_GYRO_XOUT_H | 0x80;
+    txBuf[0] = Mpu6000::RA_GYRO_XOUT_H | 0x80;
 
-    busSegment_t segments[] = {
-        {m_gyroDev.dev->txBuf, &m_gyroDev.dev->rxBuf[1], 7, true},
-        {NULL, NULL, 0, true},
-    };
+    busSegment_t segments[] = { {txBuf, &rxBuf[1], 7, true}, {NULL, NULL, 0, true} };
 
     spiSequence(m_gyroDev.dev, &segments[0]);
 
@@ -95,7 +95,7 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     m_gyroDev.syncTimePtr = gyroSyncTimePtr;
     m_gyroDev.interruptCountPtr = gyroInterruptCountPtr;
 
-    spiDevice_t *dev = m_gyroDev.dev;
+    void *dev = m_gyroDev.dev;
 
     spiSetClkDivisor(dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
@@ -113,10 +113,9 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     // SPI DMA buffer required per device
     static uint8_t gyroBuf1[GYRO_BUF_SIZE];
-    m_gyroDev.dev->txBuf = gyroBuf1;
-    m_gyroDev.dev->rxBuf = &gyroBuf1[GYRO_BUF_SIZE / 2];
+    spiSetRxBuf(dev, &gyroBuf1[GYRO_BUF_SIZE / 2]);
+    spiSetTxBuf(dev, gyroBuf1);
 
-    // Attach interrupt
     attachInterrupt(m_extiPin, interruptHandler);
 
     spiSetClkDivisor(m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
@@ -171,14 +170,10 @@ int16_t Mpu6000::devReadRawGyro(uint8_t k)
     return m_adcRaw[k];
 }
 
-Mpu6000::Mpu6000(
-        spiDevice_t * spi,
-        uint8_t csPin,
-        uint8_t extiPin,
-        uint16_t gyroScale) : SoftQuatImu(gyroScale)
+Mpu6000::Mpu6000(void * spi, uint8_t csPin, uint8_t extiPin, uint16_t gyroScale)
+    : SoftQuatImu(gyroScale)
 {
     m_gyroDev.dev = spi;
-
     m_csPin = csPin;
     m_extiPin = extiPin;
 }

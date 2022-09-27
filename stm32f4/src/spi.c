@@ -23,16 +23,54 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 
 #include "atomic.h"
-#include "spi.h"
 #include "dma_reqmap.h"
 #include "exti.h"
 #include "io.h"
 #include "rcc.h"
 #include "nvic.h"
 #include "resource.h"
+#include "spi.h"
 #include "systemdev.h"
 
+
+// Platform-dependent
+uint8_t spiInstanceDenom(const SPI_TypeDef *instance);
+
 #define SPIDEV_COUNT  1
+
+// Bus interface, independent of connected device
+typedef struct {
+    SPI_TypeDef *instance;
+    uint16_t speed;
+    bool leadingEdge;
+    bool useDMA;
+    uint8_t deviceCount;
+    dmaChannelDescriptor_t *dmaTx;
+    dmaChannelDescriptor_t *dmaRx;
+    // Use a reference here as this saves RAM for unused descriptors
+    DMA_InitTypeDef  *initTx;
+    DMA_InitTypeDef  *initRx;
+
+    busSegment_t * volatile curSegment;
+    bool initSegment;
+} busDevice_t;
+
+// External device has an associated bus and bus dependent address
+typedef struct {
+    busDevice_t *bus;
+    uint16_t speed;
+    IO_t csnPin;
+    bool leadingEdge;
+    // Cache the init structure for the next DMA transfer to reduce inter-segment delay
+    DMA_InitTypeDef initTx;
+    DMA_InitTypeDef initRx;
+    // Support disabling DMA on a per device basis
+    bool useDMA;
+    // Per device buffer reference if needed
+    uint8_t *txBuf, *rxBuf;
+    // Connected devices on the same bus may support different speeds
+    uint32_t callbackArg;
+} spiDevice_t;
 
 static const uint32_t BUS_SPI_FREE   = 0x00000000;
 static const uint32_t BUS_SPI_LOCKED = 0x00000004;
@@ -538,8 +576,46 @@ void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin)
     SPI_Cmd(spi->dev, ENABLE);
 }
 
+// Wait for DMA completion
+static void _spiWait(const spiDevice_t *dev)
+{
+    // Wait for completion
+    while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
+}
+
+// DMA transfer setup and start
+static void _spiSequence(const spiDevice_t *dev, busSegment_t *segments)
+{
+    busDevice_t *bus = dev->bus;
+
+    ATOMIC_BLOCK(NVIC_PRIO_MAX) {
+        if ((bus->curSegment != (busSegment_t *)BUS_SPI_LOCKED) && spiIsBusy(dev)) {
+            // Defer this transfer to be triggered upon completion of the
+            // current transfer. Blocking calls and those from non-interrupt
+            // context will have already called spiWait() so this will
+            // only happen for non-blocking calls called from an ISR.
+            busSegment_t *endSegment = bus->curSegment;
+
+            if (endSegment) {
+                // Find the last segment of the current transfer
+                for (; endSegment->len; endSegment++);
+
+                // Record the dev and segments parameters in the terminating
+                // segment entry
+                endSegment->txData = (uint8_t *)dev;
+                endSegment->rxData = (uint8_t *)segments;
+
+                return;
+            }
+        }
+    }
+
+    spiSequenceStart(dev, segments);
+}
+
+
 // Write data to a register
-void spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data)
+static void _spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data)
 {
     uint8_t regg = reg;
 
@@ -551,15 +627,15 @@ void spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data)
     };
 
     // Ensure any prior DMA has completed before continuing
-    spiWait(dev);
+    _spiWait(dev);
 
-    spiSequence(dev, &segments[0]);
+    _spiSequence(dev, &segments[0]);
 
-    spiWait(dev);
+    _spiWait(dev);
 }
 
 // Mark this bus as being SPI and record the first owner to use it
-void spiSetBusInstance(spiDevice_t *dev, const uint8_t csPin)
+static void _spiSetBusInstance(spiDevice_t *dev, const uint8_t csPin)
 {
     static busDevice_t busDevice;
     dev->bus = &busDevice;
@@ -709,44 +785,63 @@ void spiInitBusDMA()
     }
 }
 
-// DMA transfer setup and start
-void spiSequence(const spiDevice_t *dev, busSegment_t *segments)
-{
-    busDevice_t *bus = dev->bus;
-
-    ATOMIC_BLOCK(NVIC_PRIO_MAX) {
-        if ((bus->curSegment != (busSegment_t *)BUS_SPI_LOCKED) && spiIsBusy(dev)) {
-            // Defer this transfer to be triggered upon completion of the
-            // current transfer. Blocking calls and those from non-interrupt
-            // context will have already called spiWait() so this will
-            // only happen for non-blocking calls called from an ISR.
-            busSegment_t *endSegment = bus->curSegment;
-
-            if (endSegment) {
-                // Find the last segment of the current transfer
-                for (; endSegment->len; endSegment++);
-
-                // Record the dev and segments parameters in the terminating
-                // segment entry
-                endSegment->txData = (uint8_t *)dev;
-                endSegment->rxData = (uint8_t *)segments;
-
-                return;
-            }
-        }
-    }
-
-    spiSequenceStart(dev, segments);
-}
-
-void spiSetClkDivisor(const spiDevice_t *dev, const uint16_t divisor)
+static void _spiSetClkDivisor(const spiDevice_t *dev, const uint16_t divisor)
 {
     ((spiDevice_t *)dev)->speed = divisor;
 }
 
-// Wait for DMA completion
-void spiWait(const spiDevice_t *dev)
+// ------------------------------------------------------------------------------------
+
+void spiWait(const void * dev)
 {
-    // Wait for completion
-    while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
+    _spiWait((spiDevice_t *)dev);
+}
+
+void spiSequence(const void * dev, busSegment_t *segments)
+{
+    _spiSequence((spiDevice_t *)dev, segments);
+}
+
+void spiSetBusInstance(void * dev, const uint8_t csPin)
+{
+    _spiSetBusInstance((spiDevice_t *)dev, csPin);
+}
+
+void spiSetClkDivisor(const void * dev, const uint16_t divider)
+{
+    _spiSetClkDivisor((spiDevice_t *)dev, divider);
+}
+
+void spiWriteReg(const void * dev, const uint8_t reg, uint8_t data)
+{
+    _spiWriteReg((spiDevice_t *)dev, reg, data);
+}
+
+uint8_t * spiGetRxBuf(const void * dev)
+{
+    return ((spiDevice_t *)dev)->rxBuf;
+}
+
+uint8_t * spiGetTxBuf(const void * dev)
+{
+    return ((spiDevice_t *)dev)->txBuf;
+}
+
+void spiSetRxBuf(void * dev, uint8_t * buf)
+{
+    ((spiDevice_t *)dev)->rxBuf = buf;
+}
+
+void spiSetTxBuf(void * dev, uint8_t * buf)
+{
+    ((spiDevice_t *)dev)->txBuf = buf;
+}
+
+static spiDevice_t _spi1;
+
+void * spiGetInstance(const uint8_t csPin)
+{
+    _spiSetBusInstance(&_spi1, csPin);
+
+    return &_spi1;
 }

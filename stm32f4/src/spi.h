@@ -41,39 +41,6 @@ typedef struct {
     bool negateCS; // Should CS be negated at the end of this segment
 } busSegment_t;
 
-// Bus interface, independent of connected device
-typedef struct {
-    SPI_TypeDef *instance;
-    uint16_t speed;
-    bool leadingEdge;
-    bool useDMA;
-    uint8_t deviceCount;
-    dmaChannelDescriptor_t *dmaTx;
-    dmaChannelDescriptor_t *dmaRx;
-    // Use a reference here as this saves RAM for unused descriptors
-    DMA_InitTypeDef  *initTx;
-    DMA_InitTypeDef  *initRx;
-
-    busSegment_t * volatile curSegment;
-    bool initSegment;
-} busDevice_t;
-
-// External device has an associated bus and bus dependent address
-typedef struct {
-    busDevice_t *bus;
-    uint16_t speed;
-    IO_t csnPin;
-    bool leadingEdge;
-    // Cache the init structure for the next DMA transfer to reduce inter-segment delay
-    DMA_InitTypeDef initTx;
-    DMA_InitTypeDef initRx;
-    // Support disabling DMA on a per device basis
-    bool useDMA;
-    // Per device buffer reference if needed
-    uint8_t *txBuf, *rxBuf;
-    // Connected devices on the same bus may support different speeds
-    uint32_t callbackArg;
-} spiDevice_t;
 
 #if defined(__cplusplus)
 extern "C" {
@@ -83,23 +50,22 @@ extern "C" {
 
     void spiInitBusDMA(void);
 
-    void spiWait(const spiDevice_t *dev);
+    void spiWait(const void * dev);
 
-    void spiSequence(const spiDevice_t *dev, busSegment_t *segments);
+    void spiSequence(const void * dev, busSegment_t *segments);
 
-    void spiSetBusInstance(spiDevice_t *dev, const uint8_t csPin);
+    void * spiGetInstance(const uint8_t csPin);
 
-    void spiSetClkDivisor(const spiDevice_t *dev, const uint16_t divider);
+    void spiSetClkDivisor(const void * dev, const uint16_t divider);
 
-    void spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data);
+    void spiWriteReg(const void * dev, const uint8_t reg, uint8_t data);
+
+    uint8_t * spiGetRxBuf(const void * dev);
+    uint8_t * spiGetTxBuf(const void * dev);
+
+    void spiSetRxBuf(void * dev, uint8_t * buf);
+    void spiSetTxBuf(void * dev, uint8_t * buf);
 
 #if defined(__cplusplus)
 }
 #endif
-
-// Platform-dependent
-uint8_t spiInstanceDenom(const SPI_TypeDef *instance);
-
-
-
-

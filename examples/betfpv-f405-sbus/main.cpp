@@ -27,6 +27,8 @@
 #include <tasks/receivers/sbus.h>
 #include <serial.h>
 
+#include <spi.h>
+
 #include "hardware_init.h"
 
 #include <vector>
@@ -38,14 +40,12 @@ int main(void)
 {
     hardwareInit();
 
-    static spiDevice_t spi1; 
-
     spiInit(
             0x15,  // sck  = PA5
             0x16,  // miso = PA6
             0x17); // mosi = PA7
 
-    spiSetBusInstance(&spi1, CS_PIN);
+    void * spi1 = spiGetInstance(CS_PIN);
 
     static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -56,7 +56,7 @@ int main(void)
 
     // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
     static Mpu6000 imu(
-            &spi1,
+            spi1,
             CS_PIN, 
             0x34,  // EXTI pin = PC4
             2000); // gyro scale DPS
