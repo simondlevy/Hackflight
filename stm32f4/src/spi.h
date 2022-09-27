@@ -34,7 +34,7 @@ typedef enum {
  */
 typedef struct {
     /* Note that txData may point to the transmit buffer, or in the case of the
-     * final segment to a const extDevice_t * structure to link to the next
+     * final segment to a const spiDevice_t * structure to link to the next
      * transfer.
      */
     uint8_t *txData;
@@ -72,15 +72,15 @@ typedef struct {
     IO_t csnPin;
     bool leadingEdge;
     // Cache the init structure for the next DMA transfer to reduce inter-segment delay
-    DMA_InitTypeDef             initTx;
-    DMA_InitTypeDef             initRx;
+    DMA_InitTypeDef initTx;
+    DMA_InitTypeDef initRx;
     // Support disabling DMA on a per device basis
     bool useDMA;
     // Per device buffer reference if needed
     uint8_t *txBuf, *rxBuf;
     // Connected devices on the same bus may support different speeds
     uint32_t callbackArg;
-} extDevice_t;
+} spiDevice_t;
 
 #if defined(__cplusplus)
 extern "C" {
@@ -90,15 +90,15 @@ extern "C" {
 
     void spiInitBusDMA(void);
 
-    void spiWait(const extDevice_t *dev);
+    void spiWait(const spiDevice_t *dev);
 
-    void spiSequence(const extDevice_t *dev, busSegment_t *segments);
+    void spiSequence(const spiDevice_t *dev, busSegment_t *segments);
 
-    void spiSetBusInstance(extDevice_t *dev);
+    void spiSetBusInstance(spiDevice_t *dev);
 
-    void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divider);
+    void spiSetClkDivisor(const spiDevice_t *dev, const uint16_t divider);
 
-    void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data);
+    void spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data);
 
 #if defined(__cplusplus)
 }

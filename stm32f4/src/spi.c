@@ -37,7 +37,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 static const uint32_t BUS_SPI_FREE   = 0x00000000;
 static const uint32_t BUS_SPI_LOCKED = 0x00000004;
 
-
 typedef struct {
     SPI_TypeDef *dev;
     ioTag_t sck;
@@ -82,12 +81,12 @@ static SPI_InitTypeDef defaultInit = {
 };
 
 // Return true if DMA engine is busy
-static bool spiIsBusy(const extDevice_t *dev)
+static bool spiIsBusy(const spiDevice_t *dev)
 {
     return (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
 }
 
-static void spiInternalInitStream(const extDevice_t *dev, const bool preInit)
+static void spiInternalInitStream(const spiDevice_t *dev, const bool preInit)
 {
     static uint8_t dummyTxByte = 0xff;
     static uint8_t dummyRxByte;
@@ -142,7 +141,7 @@ static void spiInternalInitStream(const extDevice_t *dev, const bool preInit)
     }
 }
 
-static void spiInternalStartDMA(const extDevice_t *dev)
+static void spiInternalStartDMA(const spiDevice_t *dev)
 {
     // Assert Chip Select
     IOLo(dev->csnPin);
@@ -254,7 +253,7 @@ static bool spiInternalReadWriteBufPolled(
 }
 
 // DMA transfer setup and start
-static void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments)
+static void spiSequenceStart(const spiDevice_t *dev, busSegment_t *segments)
 {
     busDevice_t *bus = dev->bus;
     SPI_TypeDef *instance = bus->instance;
@@ -349,7 +348,7 @@ static void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments)
 
         // If a following transaction has been linked, start it
         if (bus->curSegment->txData) {
-            const extDevice_t *nextDev = (const extDevice_t *)bus->curSegment->txData;
+            const spiDevice_t *nextDev = (const spiDevice_t *)bus->curSegment->txData;
             busSegment_t *nextSegments = (busSegment_t *)bus->curSegment->rxData;
             bus->curSegment->txData = NULL;
             spiSequenceStart(nextDev, nextSegments);
@@ -362,7 +361,7 @@ static void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments)
 }
 
 // Interrupt handler for SPI receive DMA completion
-static void spiIrqHandler(const extDevice_t *dev)
+static void spiIrqHandler(const spiDevice_t *dev)
 {
     busDevice_t *bus = dev->bus;
     busSegment_t *nextSegment;
@@ -393,7 +392,7 @@ static void spiIrqHandler(const extDevice_t *dev)
     if (nextSegment->len == 0) {
         // If a following transaction has been linked, start it
         if (nextSegment->txData) {
-            const extDevice_t *nextDev = (const extDevice_t *)nextSegment->txData;
+            const spiDevice_t *nextDev = (const spiDevice_t *)nextSegment->txData;
             busSegment_t *nextSegments = (busSegment_t *)nextSegment->rxData;
             nextSegment->txData = NULL;
             // The end of the segment list has been reached
@@ -422,7 +421,7 @@ static void spiIrqHandler(const extDevice_t *dev)
     }
 }
 
-static void spiInternalStopDMA (const extDevice_t *dev)
+static void spiInternalStopDMA (const spiDevice_t *dev)
 {
     dmaChannelDescriptor_t *dmaTx = dev->bus->dmaTx;
     dmaChannelDescriptor_t *dmaRx = dev->bus->dmaRx;
@@ -457,7 +456,7 @@ static void spiInternalStopDMA (const extDevice_t *dev)
 // Interrupt handler for SPI receive DMA completion
 static void spiRxIrqHandler(dmaChannelDescriptor_t* descriptor)
 {
-    const extDevice_t *dev = (const extDevice_t *)descriptor->userParam;
+    const spiDevice_t *dev = (const spiDevice_t *)descriptor->userParam;
 
     if (!dev) {
         return;
@@ -478,7 +477,7 @@ static void spiRxIrqHandler(dmaChannelDescriptor_t* descriptor)
 // Interrupt handler for SPI transmit DMA completion
 static void spiTxIrqHandler(dmaChannelDescriptor_t* descriptor)
 {
-    const extDevice_t *dev = (const extDevice_t *)descriptor->userParam;
+    const spiDevice_t *dev = (const spiDevice_t *)descriptor->userParam;
 
     if (!dev) {
         return;
@@ -585,7 +584,7 @@ void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin)
 }
 
 // Write data to a register
-void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data)
+void spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data)
 {
     uint8_t regg = reg;
 
@@ -605,7 +604,7 @@ void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data)
 }
 
 // Mark this bus as being SPI and record the first owner to use it
-void spiSetBusInstance(extDevice_t *dev)
+void spiSetBusInstance(spiDevice_t *dev)
 {
     dev->bus = &m_spiBusDevice[spiCfgToDev(1)];
 
@@ -732,7 +731,7 @@ void spiInitBusDMA()
 }
 
 // DMA transfer setup and start
-void spiSequence(const extDevice_t *dev, busSegment_t *segments)
+void spiSequence(const spiDevice_t *dev, busSegment_t *segments)
 {
     busDevice_t *bus = dev->bus;
 
@@ -761,13 +760,13 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments)
     spiSequenceStart(dev, segments);
 }
 
-void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divisor)
+void spiSetClkDivisor(const spiDevice_t *dev, const uint16_t divisor)
 {
-    ((extDevice_t *)dev)->speed = divisor;
+    ((spiDevice_t *)dev)->speed = divisor;
 }
 
 // Wait for DMA completion
-void spiWait(const extDevice_t *dev)
+void spiWait(const spiDevice_t *dev)
 {
     // Wait for completion
     while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
