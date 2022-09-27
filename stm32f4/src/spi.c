@@ -684,6 +684,7 @@ void spiInitBusDMA()
     const bool dshotBitbangActive = true;
 
     for (device = 0; device < SPIDEV_COUNT; device++) {
+
         busDevice_t *bus = &m_spiBusDevice[device];
 
         if (bus->busType != BUS_TYPE_SPI) {
@@ -799,7 +800,8 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments)
                 // Find the last segment of the current transfer
                 for (; endSegment->len; endSegment++);
 
-                // Record the dev and segments parameters in the terminating segment entry
+                // Record the dev and segments parameters in the terminating
+                // segment entry
                 endSegment->txData = (uint8_t *)dev;
                 endSegment->rxData = (uint8_t *)segments;
 

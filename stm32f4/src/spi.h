@@ -42,8 +42,6 @@ void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin);
 
 void spiWait(const extDevice_t *dev);
 
-uint8_t spiReadWriteReg(const extDevice_t *dev, const uint8_t reg, const uint8_t data);
-
 void spiSequence(const extDevice_t *dev, busSegment_t *segments);
 
 bool spiSetBusInstance(extDevice_t *dev, const uint32_t device);
