@@ -14,7 +14,9 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "spi.h"
+#include "platform.h"
+#include "io_types.h"
+#include "dma.h"
 
 uint8_t spiInstanceDenom(const SPI_TypeDef *instance)
 {

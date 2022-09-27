@@ -119,6 +119,11 @@ uint32_t systemClockMicrosToCycles(uint32_t micros)
     return micros * usTicks;
 }
 
+uint32_t systemGetClockSpeed(void)
+{
+    return SystemCoreClock;
+}
+
 // Return system uptime in milliseconds (rollover in 49 days)
 uint32_t millis(void)
 {

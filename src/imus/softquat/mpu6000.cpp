@@ -21,7 +21,6 @@
 #include <system.h>
 #include <time.h>
 
-
 extern "C" {
     extern void delay(uint32_t msec);
 }
@@ -30,7 +29,7 @@ static Mpu6000::gyroDev_t m_gyroDev;
 
 uint16_t Mpu6000::calculateSpiDivisor(const uint32_t freq)
 {
-    uint32_t clk = SystemCoreClock / 2;
+    uint32_t clk = systemGetClockSpeed() / 2;
 
     uint16_t divisor = 2;
 

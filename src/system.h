@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
     uint32_t systemClockMicrosToCycles(uint32_t usec);
+    uint32_t systemGetClockSpeed(void);
     uint32_t systemGetCycleCounter(void);
     void     systemReboot(void);
 

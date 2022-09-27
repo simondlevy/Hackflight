@@ -16,11 +16,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <stdint.h>
 #include <stdbool.h>
-
-#include "platform.h"
-#include "io_types.h"
-#include "dma.h"
 
 /* Each SPI access may comprise multiple parts, for example, wait/write
  * enable/write/data each of which is defined by a segment, with optional
