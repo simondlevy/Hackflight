@@ -326,23 +326,6 @@ static void spiSequenceStart(const spiDevice_t *dev, busSegment_t *segments)
                 IOHi(dev->csnPin);
             }
 
-            if (bus->curSegment->callback) {
-                switch(bus->curSegment->callback(dev->callbackArg)) {
-                case BUS_BUSY:
-                    // Repeat the last DMA segment
-                    bus->curSegment--;
-                    break;
-
-                case BUS_ABORT:
-                    bus->curSegment = (busSegment_t *)BUS_SPI_FREE;
-                    return;
-
-                case BUS_READY:
-                default:
-                    // Advance to the next DMA segment
-                    break;
-                }
-            }
             bus->curSegment++;
         }
 
@@ -365,26 +348,6 @@ static void spiIrqHandler(const spiDevice_t *dev)
 {
     busDevice_t *bus = dev->bus;
     busSegment_t *nextSegment;
-
-    if (bus->curSegment->callback) {
-        switch(bus->curSegment->callback(dev->callbackArg)) {
-        case BUS_BUSY:
-            // Repeat the last DMA segment
-            bus->curSegment--;
-            // Reinitialise the cached init values as segment is not progressing
-            spiInternalInitStream(dev, true);
-            break;
-
-        case BUS_ABORT:
-            bus->curSegment = (busSegment_t *)BUS_SPI_FREE;
-            return;
-
-        case BUS_READY:
-        default:
-            // Advance to the next DMA segment
-            break;
-        }
-    }
 
     // Advance through the segment list
     nextSegment = bus->curSegment + 1;
@@ -582,9 +545,9 @@ void spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data)
 
     // This routine blocks so no need to use static data
     busSegment_t segments[] = {
-            {&regg, NULL, sizeof(reg), false, NULL},
-            {&data, NULL, sizeof(data), true, NULL},
-            {NULL, NULL, 0, true, NULL},
+            {&regg, NULL, sizeof(reg), false},
+            {&data, NULL, sizeof(data), true},
+            {NULL, NULL, 0, true},
     };
 
     // Ensure any prior DMA has completed before continuing

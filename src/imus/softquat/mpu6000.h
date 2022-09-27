@@ -16,9 +16,8 @@
 
 #include <imus/softquat.h>
 
-#include <spi.h>
 #include <exti.h>
-#include <io.h>
+#include <spi.h>
 
 class Mpu6000 : public SoftQuatImu {
 
@@ -102,7 +101,7 @@ class Mpu6000 : public SoftQuatImu {
         typedef struct {
 
             spiDevice_t *     dev;
-            extiCallbackRec_t exti;
+
             int32_t           dmaMaxDuration;
             int32_t           shortPeriod;
             uint32_t *        syncTimePtr;

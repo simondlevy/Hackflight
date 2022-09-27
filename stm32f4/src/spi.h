@@ -22,12 +22,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "io_types.h"
 #include "dma.h"
 
-typedef enum {
-    BUS_READY,
-    BUS_BUSY,
-    BUS_ABORT
-} busStatus_e;
-
 /* Each SPI access may comprise multiple parts, for example, wait/write
  * enable/write/data each of which is defined by a segment, with optional
  * callback after each is completed
@@ -45,7 +39,6 @@ typedef struct {
     uint8_t *rxData;
     int32_t len;
     bool negateCS; // Should CS be negated at the end of this segment
-    busStatus_e (*callback)(uint32_t arg);
 } busSegment_t;
 
 // Bus interface, independent of connected device
