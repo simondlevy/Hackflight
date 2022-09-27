@@ -105,23 +105,3 @@ typedef struct extDevice_s {
     // Connected devices on the same bus may support different speeds
     uint32_t callbackArg;
 } extDevice_t;
-
-
-// Access routines where the register is accessed directly
-bool busRawWriteRegister(const extDevice_t *dev, uint8_t reg, uint8_t data);
-bool busRawWriteRegisterStart(const extDevice_t *dev, uint8_t reg, uint8_t data);
-bool busRawReadRegisterBufferStart(const extDevice_t *dev, uint8_t reg, uint8_t *data, uint8_t length);
-// Write routines where the register is masked with 0x7f
-bool busWriteRegister(const extDevice_t *dev, uint8_t reg, uint8_t data);
-bool busWriteRegisterStart(const extDevice_t *dev, uint8_t reg, uint8_t data);
-// Read routines where the register is ORed with 0x80
-bool busReadRegisterBufferStart(const extDevice_t *dev, uint8_t reg, uint8_t *data, uint8_t length);
-uint8_t busReadRegister(const extDevice_t *dev, uint8_t reg);
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-bool busReadRegisterBuffer(const extDevice_t *dev, uint8_t reg, uint8_t *data, uint8_t length);
-#if defined(__cplusplus)
-}
-#endif
