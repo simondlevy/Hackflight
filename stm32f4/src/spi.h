@@ -22,16 +22,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "io_types.h"
 #include "dma.h"
 
-/*
-typedef enum {
-    BUS_TYPE_NONE = 0,
-    BUS_TYPE_I2C,
-    BUS_TYPE_SPI,
-    BUS_TYPE_MPU_SLAVE, // Slave I2C on SPI master
-    BUS_TYPE_GYRO_AUTO,  // Only used by acc/gyro bus auto detection code
-} busType_e;
-*/
-
 typedef enum {
     BUS_READY,
     BUS_BUSY,
@@ -40,24 +30,16 @@ typedef enum {
 
 // Bus interface, independent of connected device
 typedef struct busDevice_s {
-    // busType_e busType;
-    union {
-        struct busSpi_s {
-            SPI_TypeDef *instance;
-            uint16_t speed;
-            bool leadingEdge;
-        } spi;
-        struct busMpuSlave_s {
-            struct extDevice_s *master;
-        } mpuSlave;
-    } busType_u;
+    SPI_TypeDef *instance;
+    uint16_t speed;
+    bool leadingEdge;
     bool useDMA;
     uint8_t deviceCount;
     dmaChannelDescriptor_t *dmaTx;
     dmaChannelDescriptor_t *dmaRx;
     // Use a reference here as this saves RAM for unused descriptors
-    DMA_InitTypeDef             *initTx;
-    DMA_InitTypeDef             *initRx;
+    DMA_InitTypeDef  *initTx;
+    DMA_InitTypeDef  *initRx;
 
     struct busSegment_s* volatile curSegment;
     bool initSegment;
@@ -86,16 +68,9 @@ typedef struct busSegment_s {
 // External device has an associated bus and bus dependent address
 typedef struct extDevice_s {
     busDevice_t *bus;
-    union {
-        struct extSpi_s {
-            uint16_t speed;
-            IO_t csnPin;
-            bool leadingEdge;
-        } spi;
-        struct extMpuSlave_s {
-            uint8_t address;
-        } mpuSlave;
-    } busType_u;
+    uint16_t speed;
+    IO_t csnPin;
+    bool leadingEdge;
     // Cache the init structure for the next DMA transfer to reduce inter-segment delay
     DMA_InitTypeDef             initTx;
     DMA_InitTypeDef             initRx;
@@ -121,21 +96,21 @@ typedef enum SPIDevice {
 extern "C" {
 #endif
 
-void spiInit(const uint8_t device);
+    void spiInit(const uint8_t device);
 
-void spiInitBusDMA(void);
+    void spiInitBusDMA(void);
 
-void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin);
+    void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin);
 
-void spiWait(const extDevice_t *dev);
+    void spiWait(const extDevice_t *dev);
 
-void spiSequence(const extDevice_t *dev, busSegment_t *segments);
+    void spiSequence(const extDevice_t *dev, busSegment_t *segments);
 
-bool spiSetBusInstance(extDevice_t *dev, const uint8_t device);
+    bool spiSetBusInstance(extDevice_t *dev, const uint8_t device);
 
-void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divider);
+    void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divider);
 
-void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data);
+    void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data);
 
 #if defined(__cplusplus)
 }

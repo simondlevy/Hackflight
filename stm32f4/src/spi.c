@@ -149,7 +149,7 @@ static void spiInternalInitStream(const extDevice_t *dev, const bool preInit)
 static void spiInternalStartDMA(const extDevice_t *dev)
 {
     // Assert Chip Select
-    IOLo(dev->busType_u.spi.csnPin);
+    IOLo(dev->csnPin);
 
     dmaChannelDescriptor_t *dmaTx = dev->bus->dmaTx;
     dmaChannelDescriptor_t *dmaRx = dev->bus->dmaRx;
@@ -187,7 +187,7 @@ static void spiInternalStartDMA(const extDevice_t *dev)
         DMA_Cmd(streamRegsRx, ENABLE);
 
         /* Enable the SPI DMA Tx & Rx requests */
-        SPI_I2S_DMACmd(dev->bus->busType_u.spi.instance,
+        SPI_I2S_DMACmd(dev->bus->instance,
                 SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, ENABLE);
     } else {
         // Use the correct callback argument
@@ -213,7 +213,7 @@ static void spiInternalStartDMA(const extDevice_t *dev)
         DMA_Cmd(streamRegsTx, ENABLE);
 
         /* Enable the SPI DMA Tx request */
-        SPI_I2S_DMACmd(dev->bus->busType_u.spi.instance, SPI_I2S_DMAReq_Tx, ENABLE);
+        SPI_I2S_DMACmd(dev->bus->instance, SPI_I2S_DMAReq_Tx, ENABLE);
     }
 }
 
@@ -261,7 +261,7 @@ static bool spiInternalReadWriteBufPolled(
 static void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments)
 {
     busDevice_t *bus = dev->bus;
-    SPI_TypeDef *instance = bus->busType_u.spi.instance;
+    SPI_TypeDef *instance = bus->instance;
     bool dmaSafe = dev->useDMA;
     uint32_t xferLen = 0;
     uint32_t segmentCount = 0;
@@ -272,23 +272,23 @@ static void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments)
     SPI_Cmd(instance, DISABLE);
 
     // Switch bus speed
-    if (dev->busType_u.spi.speed != bus->busType_u.spi.speed) {
-        spiSetDivisorBRreg(bus->busType_u.spi.instance, dev->busType_u.spi.speed);
-        bus->busType_u.spi.speed = dev->busType_u.spi.speed;
+    if (dev->speed != bus->speed) {
+        spiSetDivisorBRreg(bus->instance, dev->speed);
+        bus->speed = dev->speed;
     }
 
-    if (dev->busType_u.spi.leadingEdge != bus->busType_u.spi.leadingEdge) {
+    if (dev->leadingEdge != bus->leadingEdge) {
         // Switch SPI clock polarity/phase
         instance->CR1 &= ~(SPI_CPOL_High | SPI_CPHA_2Edge);
 
         // Apply setting
-        if (dev->busType_u.spi.leadingEdge) {
+        if (dev->leadingEdge) {
             instance->CR1 |= SPI_CPOL_Low | SPI_CPHA_1Edge;
         } else
         {
             instance->CR1 |= SPI_CPOL_High | SPI_CPHA_2Edge;
         }
-        bus->busType_u.spi.leadingEdge = dev->busType_u.spi.leadingEdge;
+        bus->leadingEdge = dev->leadingEdge;
     }
 
     SPI_Cmd(instance, ENABLE);
@@ -318,17 +318,17 @@ static void spiSequenceStart(const extDevice_t *dev, busSegment_t *segments)
         // Manually work through the segment list performing a transfer for each
         while (bus->curSegment->len) {
             // Assert Chip Select
-            IOLo(dev->busType_u.spi.csnPin);
+            IOLo(dev->csnPin);
 
             spiInternalReadWriteBufPolled(
-                    bus->busType_u.spi.instance,
+                    bus->instance,
                     bus->curSegment->txData,
                     bus->curSegment->rxData,
                     bus->curSegment->len);
 
             if (bus->curSegment->negateCS) {
                 // Negate Chip Select
-                IOHi(dev->busType_u.spi.csnPin);
+                IOHi(dev->csnPin);
             }
 
             if (bus->curSegment->callback) {
@@ -430,7 +430,7 @@ static void spiInternalStopDMA (const extDevice_t *dev)
 {
     dmaChannelDescriptor_t *dmaTx = dev->bus->dmaTx;
     dmaChannelDescriptor_t *dmaRx = dev->bus->dmaRx;
-    SPI_TypeDef *instance = dev->bus->busType_u.spi.instance;
+    SPI_TypeDef *instance = dev->bus->instance;
     DMA_Stream_TypeDef *streamRegsTx = (DMA_Stream_TypeDef *)dmaTx->ref;
 
     if (dmaRx) {
@@ -471,7 +471,7 @@ static void spiRxIrqHandler(dmaChannelDescriptor_t* descriptor)
 
     if (bus->curSegment->negateCS) {
         // Negate Chip Select
-        IOHi(dev->busType_u.spi.csnPin);
+        IOHi(dev->csnPin);
     }
 
     spiInternalStopDMA(dev);
@@ -494,7 +494,7 @@ static void spiTxIrqHandler(dmaChannelDescriptor_t* descriptor)
 
     if (bus->curSegment->negateCS) {
         // Negate Chip Select
-        IOHi(dev->busType_u.spi.csnPin);
+        IOHi(dev->csnPin);
     }
 
     spiIrqHandler(dev);
@@ -519,7 +519,7 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
     initTx->DMA_Channel = bus->dmaTx->channel;
     initTx->DMA_DIR = DMA_DIR_MemoryToPeripheral;
     initTx->DMA_Mode = DMA_Mode_Normal;
-    initTx->DMA_PeripheralBaseAddr = (uint32_t)&bus->busType_u.spi.instance->DR;
+    initTx->DMA_PeripheralBaseAddr = (uint32_t)&bus->instance->DR;
     initTx->DMA_Priority = DMA_Priority_Low;
     initTx->DMA_PeripheralInc = DMA_PeripheralInc_Disable;
     initTx->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
@@ -532,7 +532,7 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
         initRx->DMA_Channel = bus->dmaRx->channel;
         initRx->DMA_DIR = DMA_DIR_PeripheralToMemory;
         initRx->DMA_Mode = DMA_Mode_Normal;
-        initRx->DMA_PeripheralBaseAddr = (uint32_t)&bus->busType_u.spi.instance->DR;
+        initRx->DMA_PeripheralBaseAddr = (uint32_t)&bus->instance->DR;
         initRx->DMA_Priority = DMA_Priority_Low;
         initRx->DMA_PeripheralInc = DMA_PeripheralInc_Disable;
         initRx->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
@@ -610,9 +610,9 @@ bool spiSetBusInstance(extDevice_t *dev, const uint8_t device)
 
     busDevice_t *bus = dev->bus;
 
-    bus->busType_u.spi.instance = spiInstanceByDevice(spiCfgToDev(device));
+    bus->instance = spiInstanceByDevice(spiCfgToDev(device));
 
-    if (bus->busType_u.spi.instance == NULL) {
+    if (bus->instance == NULL) {
         return false;
     }
 
@@ -778,7 +778,7 @@ void spiSequence(const extDevice_t *dev, busSegment_t *segments)
 
 void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divisor)
 {
-    ((extDevice_t *)dev)->busType_u.spi.speed = divisor;
+    ((extDevice_t *)dev)->speed = divisor;
 }
 
 // Wait for DMA completion
