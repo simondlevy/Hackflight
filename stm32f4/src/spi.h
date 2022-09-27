@@ -36,8 +36,6 @@ void spiInit(const uint8_t device);
 
 void spiInitBusDMA(void);
 
-uint8_t spiInstanceDenom(const SPI_TypeDef *instance);
-
 void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin);
 
 void spiWait(const extDevice_t *dev);
@@ -49,6 +47,9 @@ bool spiSetBusInstance(extDevice_t *dev, const uint32_t device);
 void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divider);
 
 void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data);
+
+// Platform-dependent
+uint8_t spiInstanceDenom(const SPI_TypeDef *instance);
 
 #if defined(__cplusplus)
 }
