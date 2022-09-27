@@ -43,7 +43,7 @@ int main(void)
             0x16,  // miso = PA6
             0x17); // mosi = PA7
 
-    spiInitBusDMA();
+    spiSetBusInstance(&spi1);
 
     static AnglePidController anglePid(
         1.441305,     // Rate Kp

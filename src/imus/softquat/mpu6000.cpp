@@ -96,13 +96,13 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     m_gyroDev.syncTimePtr = gyroSyncTimePtr;
     m_gyroDev.interruptCountPtr = gyroInterruptCountPtr;
 
+    spiDevice_t *dev = m_gyroDev.dev;
+
     static busDevice_t bus;
-    m_gyroDev.dev->bus = &bus;
+    dev->bus = &bus;
 
     // MPU datasheet specifies 30ms.
     delay(35);
-
-    spiDevice_t *dev = m_gyroDev.dev;
 
     spiSetBusInstance(dev);
 
