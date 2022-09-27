@@ -539,27 +539,6 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
     }
 }
 
-// Read a block of data from a register
-static void spiReadRegBuf(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        const uint8_t length)
-{
-    uint8_t regg = reg;
-
-    // This routine blocks so no need to use static data
-    busSegment_t segments[] = {
-            {&regg, NULL, sizeof(reg), false, NULL},
-            {NULL, data, length, true, NULL},
-            {NULL, NULL, 0, true, NULL},
-    };
-
-    // Ensure any prior DMA has completed before continuing
-    spiWait(dev);
-
-    spiSequence(dev, &segments[0]);
-
-    spiWait(dev);
-}
-
 // ----------------------------------------------------------------------------
 
 void spiInit(const uint8_t device)
