@@ -458,10 +458,6 @@ static void spiRxIrqHandler(dmaChannelDescriptor_t* descriptor)
 {
     const spiDevice_t *dev = (const spiDevice_t *)descriptor->userParam;
 
-    if (!dev) {
-        return;
-    }
-
     busDevice_t *bus = dev->bus;
 
     if (bus->curSegment->negateCS) {
@@ -478,10 +474,6 @@ static void spiRxIrqHandler(dmaChannelDescriptor_t* descriptor)
 static void spiTxIrqHandler(dmaChannelDescriptor_t* descriptor)
 {
     const spiDevice_t *dev = (const spiDevice_t *)descriptor->userParam;
-
-    if (!dev) {
-        return;
-    }
 
     busDevice_t *bus = dev->bus;
 
