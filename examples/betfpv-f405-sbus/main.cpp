@@ -36,6 +36,8 @@ int main(void)
 {
     hardwareInit();
 
+    static spiDevice_t spi1; 
+
     spiInit(
             0x15,  // sck  = PA5
             0x16,  // miso = PA6
@@ -52,7 +54,7 @@ int main(void)
 
     // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
     static Mpu6000 imu(
-            NULL,
+            &spi1,
             0x14,  // CS pin = PA4
             0x34,  // EXTI pin = PC4
             2000); // gyro scale DPS

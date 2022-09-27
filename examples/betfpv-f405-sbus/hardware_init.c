@@ -49,16 +49,6 @@ void hardwareInit(void)
     serialUartPinConfigure();
     serialInit(-1);
     inverterInit();
-
-    /*
-    spiInit(
-            0x15,  // sck  = PA5
-            0x16,  // miso = PA6
-            0x17); // mosi = PA7
-
-    spiInitBusDMA();
-    */
-
     usbCableDetectInit();
     systemInitUnusedPins();
     pinioInit();

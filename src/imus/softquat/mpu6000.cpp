@@ -205,6 +205,8 @@ Mpu6000::Mpu6000(
         uint8_t extiPin,
         uint16_t gyroScale) : SoftQuatImu(gyroScale)
 {
+    (void)spi;
+
     m_csPin = csPin;
     m_extiPin = extiPin;
 }
