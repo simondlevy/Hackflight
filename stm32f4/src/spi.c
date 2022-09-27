@@ -48,9 +48,9 @@ typedef struct {
     volatile uint16_t errorCount;
     bool leadingEdge;
     uint8_t dmaIrqHandler;
-} spiDevice_t;
+} spiInfo_t;
 
-static spiDevice_t  m_spiDevice[SPIDEV_COUNT];
+static spiInfo_t  m_spiInfo[SPIDEV_COUNT];
 static busDevice_t  m_spiBusDevice[SPIDEV_COUNT];
 
 static uint8_t spiCfgToDev(const uint8_t k)
@@ -60,7 +60,7 @@ static uint8_t spiCfgToDev(const uint8_t k)
 
 static SPI_TypeDef *spiInstanceByDevice(void)
 {
-    return m_spiDevice[0].dev;
+    return m_spiInfo[0].dev;
 }
 
 // STM32F405 can't DMA to/from FASTRAM (CCM SRAM)
@@ -539,7 +539,7 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
 
 void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin)
 {
-    spiDevice_t *pDev = &m_spiDevice[0];
+    spiInfo_t *pDev = &m_spiInfo[0];
 
     pDev->sck = sckPin;
     pDev->miso = misoPin;
@@ -551,7 +551,7 @@ void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin)
 
     const uint8_t device = 0;
 
-    spiDevice_t *spi = &(m_spiDevice[device]);
+    spiInfo_t *spi = &(m_spiInfo[device]);
 
     // Enable SPI clock
     RCC_ClockCmd(spi->rcc, ENABLE);
