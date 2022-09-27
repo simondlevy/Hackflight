@@ -101,7 +101,7 @@ class Mpu6000 : public SoftQuatImu {
         // Shared with interrupt handler routine
         typedef struct {
 
-            spiDevice_t       dev;
+            spiDevice_t *     dev;
             extiCallbackRec_t exti;
             int32_t           dmaMaxDuration;
             int32_t           shortPeriod;
