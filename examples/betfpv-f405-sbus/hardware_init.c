@@ -55,8 +55,8 @@ void hardwareInit(void)
             0x17); // mosi = PA7
 
     spiInit(0); 
-    spiInit(1); 
-    spiInit(2); 
+    //spiInit(1); 
+    //spiInit(2); 
 
     spiInitBusDMA();
 
