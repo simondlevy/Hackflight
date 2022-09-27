@@ -106,7 +106,7 @@ extern "C" {
 
     void spiSequence(const extDevice_t *dev, busSegment_t *segments);
 
-    bool spiSetBusInstance(extDevice_t *dev, const uint8_t device);
+    void spiSetBusInstance(extDevice_t *dev, const uint8_t device);
 
     void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divider);
 

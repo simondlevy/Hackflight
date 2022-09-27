@@ -60,10 +60,6 @@ static uint8_t spiCfgToDev(const uint8_t k)
 
 static SPI_TypeDef *spiInstanceByDevice(const SPIDevice device)
 {
-    if (device == SPIINVALID || device >= SPIDEV_COUNT) {
-        return NULL;
-    }
-
     return m_spiDevice[device].dev;
 }
 
@@ -601,7 +597,7 @@ void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data)
 }
 
 // Mark this bus as being SPI and record the first owner to use it
-bool spiSetBusInstance(extDevice_t *dev, const uint8_t device)
+void spiSetBusInstance(extDevice_t *dev, const uint8_t device)
 {
     dev->bus = &m_spiBusDevice[spiCfgToDev(device)];
 
@@ -612,16 +608,10 @@ bool spiSetBusInstance(extDevice_t *dev, const uint8_t device)
 
     bus->instance = spiInstanceByDevice(spiCfgToDev(device));
 
-    if (bus->instance == NULL) {
-        return false;
-    }
-
     bus->useDMA = false;
     bus->deviceCount = 1;
     bus->initTx = &dev->initTx;
     bus->initRx = &dev->initRx;
-
-    return true;
 }
 
 void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin)
