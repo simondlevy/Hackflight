@@ -608,12 +608,6 @@ bool spiSetBusInstance(extDevice_t *dev, const uint8_t device)
     // By default each device should use SPI DMA if the bus supports it
     dev->useDMA = true;
 
-    if (dev->bus->busType == BUS_TYPE_SPI) {
-        // This bus has already been initialised
-        dev->bus->deviceCount++;
-        return true;
-    }
-
     busDevice_t *bus = dev->bus;
 
     bus->busType_u.spi.instance = spiInstanceByDevice(spiCfgToDev(device));
@@ -622,7 +616,6 @@ bool spiSetBusInstance(extDevice_t *dev, const uint8_t device)
         return false;
     }
 
-    bus->busType = BUS_TYPE_SPI;
     bus->useDMA = false;
     bus->deviceCount = 1;
     bus->initTx = &dev->initTx;
@@ -661,11 +654,6 @@ void spiInitBusDMA()
     for (device = 0; device < SPIDEV_COUNT; device++) {
 
         busDevice_t *bus = &m_spiBusDevice[device];
-
-        if (bus->busType != BUS_TYPE_SPI) {
-            // This bus is not in use
-            continue;
-        }
 
         dmaIdentifier_e dmaTxIdentifier = DMA_NONE;
         dmaIdentifier_e dmaRxIdentifier = DMA_NONE;

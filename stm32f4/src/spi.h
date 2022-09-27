@@ -22,6 +22,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "io_types.h"
 #include "dma.h"
 
+/*
 typedef enum {
     BUS_TYPE_NONE = 0,
     BUS_TYPE_I2C,
@@ -29,6 +30,7 @@ typedef enum {
     BUS_TYPE_MPU_SLAVE, // Slave I2C on SPI master
     BUS_TYPE_GYRO_AUTO,  // Only used by acc/gyro bus auto detection code
 } busType_e;
+*/
 
 typedef enum {
     BUS_READY,
@@ -38,7 +40,7 @@ typedef enum {
 
 // Bus interface, independent of connected device
 typedef struct busDevice_s {
-    busType_e busType;
+    // busType_e busType;
     union {
         struct busSpi_s {
             SPI_TypeDef *instance;
