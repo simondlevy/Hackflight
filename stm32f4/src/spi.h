@@ -96,7 +96,7 @@ typedef enum SPIDevice {
 extern "C" {
 #endif
 
-    void spiInit(const uint8_t device);
+    void spiInit(void);
 
     void spiInitBusDMA(void);
 

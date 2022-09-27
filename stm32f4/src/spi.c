@@ -537,13 +537,11 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
 
 // ----------------------------------------------------------------------------
 
-void spiInit(const uint8_t device)
+void spiInit(void)
 {
-    spiDevice_t *spi = &(m_spiDevice[device]);
+    const uint8_t device = 0;
 
-    if (!spi->dev) {
-        return;
-    }
+    spiDevice_t *spi = &(m_spiDevice[device]);
 
     // Enable SPI clock
     RCC_ClockCmd(spi->rcc, ENABLE);
