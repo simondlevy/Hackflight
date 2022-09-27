@@ -22,11 +22,10 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot/bitbang.h>
 #include <hackflight.h>
-#include <tasks/receivers/sbus.h>
-#include <serial.h>
-
 #include <imus/softquat/mpu6000.h>
 #include <leds/stm32f4.h>
+#include <tasks/receivers/sbus.h>
+#include <serial.h>
 
 #include "hardware_init.h"
 
@@ -37,6 +36,13 @@ int main(void)
 {
     hardwareInit();
 
+    spiInit(
+            0x15,  // sck  = PA5
+            0x16,  // miso = PA6
+            0x17); // mosi = PA7
+
+    spiInitBusDMA();
+
     static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -46,6 +52,7 @@ int main(void)
 
     // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
     static Mpu6000 imu(
+            NULL,
             0x14,  // CS pin = PA4
             0x34,  // EXTI pin = PC4
             2000); // gyro scale DPS

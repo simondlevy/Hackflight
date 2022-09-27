@@ -200,6 +200,7 @@ int16_t Mpu6000::devReadRawGyro(uint8_t k)
 }
 
 Mpu6000::Mpu6000(
+        spiDevice_t * spi,
         uint8_t csPin,
         uint8_t extiPin,
         uint16_t gyroScale) : SoftQuatImu(gyroScale)

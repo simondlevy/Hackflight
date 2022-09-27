@@ -27,6 +27,7 @@
 #include "pinio.h"
 #include "serialdev.h"
 #include "serial_uart.h"
+#include "spi.h"
 #include "systemdev.h"
 #include "timer.h"
 #include "usb_io.h"
@@ -49,12 +50,14 @@ void hardwareInit(void)
     serialInit(-1);
     inverterInit();
 
+    /*
     spiInit(
             0x15,  // sck  = PA5
             0x16,  // miso = PA6
             0x17); // mosi = PA7
 
     spiInitBusDMA();
+    */
 
     usbCableDetectInit();
     systemInitUnusedPins();
