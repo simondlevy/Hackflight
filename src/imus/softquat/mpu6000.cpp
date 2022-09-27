@@ -21,8 +21,6 @@
 #include <system.h>
 #include <time.h>
 
-#include <exti.h>
-#include <spi.h>
 
 extern "C" {
     extern void delay(uint32_t msec);
