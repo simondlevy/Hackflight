@@ -58,9 +58,9 @@ static uint8_t spiCfgToDev(const uint8_t k)
     return k - 1;
 }
 
-static SPI_TypeDef *spiInstanceByDevice(const SPIDevice device)
+static SPI_TypeDef *spiInstanceByDevice(void)
 {
-    return m_spiDevice[device].dev;
+    return m_spiDevice[0].dev;
 }
 
 // STM32F405 can't DMA to/from FASTRAM (CCM SRAM)
@@ -539,7 +539,7 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
 
 void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin)
 {
-    spiDevice_t *pDev = &m_spiDevice[SPIDEV_1];
+    spiDevice_t *pDev = &m_spiDevice[0];
 
     pDev->sck = sckPin;
     pDev->miso = misoPin;
@@ -614,7 +614,7 @@ void spiSetBusInstance(extDevice_t *dev, const uint8_t device)
 
     busDevice_t *bus = dev->bus;
 
-    bus->instance = spiInstanceByDevice(spiCfgToDev(device));
+    bus->instance = spiInstanceByDevice();
 
     bus->useDMA = false;
     bus->deviceCount = 1;
