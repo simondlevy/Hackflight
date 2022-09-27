@@ -171,3 +171,19 @@ _EXTI_IRQ_HANDLER(EXTI3_IRQHandler, 0x0008);
 _EXTI_IRQ_HANDLER(EXTI4_IRQHandler, 0x0010);
 _EXTI_IRQ_HANDLER(EXTI9_5_IRQHandler, 0x03e0);
 _EXTI_IRQ_HANDLER(EXTI15_10_IRQHandler, 0xfc00);
+
+void attachInterrupt(const uint8_t pin, extiHandlerCallback * isr)
+{
+    static extiCallbackRec_t exti;
+
+    const IO_t mpuIntIO = IOGetByTag(pin);
+
+    IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
+
+    EXTIHandlerInit(&exti, isr);
+
+    EXTIConfig(mpuIntIO, &exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
+            BETAFLIGHT_EXTI_TRIGGER_RISING);
+
+    EXTIEnable(mpuIntIO, true);
+}

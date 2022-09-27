@@ -22,22 +22,23 @@
 #include <time.h>
 
 #include <atomic.h>
-#include <spi.h>
+#include <exti.h>
 #include <nvic.h>
 #include <platform.h>
+#include <spi.h>
 #include <systemdev.h>
 
 static Mpu6000::gyroDev_t m_gyroDev;
 
 uint16_t Mpu6000::calculateSpiDivisor(const uint32_t freq)
 {
-    uint32_t spiClk = SystemCoreClock / 2;
+    uint32_t clk = SystemCoreClock / 2;
 
     uint16_t divisor = 2;
 
-    spiClk >>= 1;
+    clk >>= 1;
 
-    for (; (spiClk > freq) && (divisor < 256); divisor <<= 1, spiClk >>= 1);
+    for (; (clk > freq) && (divisor < 256); divisor <<= 1, clk >>= 1);
 
     return divisor;
 }
@@ -117,13 +118,16 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     m_gyroDev.dev->txBuf = gyroBuf1;
     m_gyroDev.dev->rxBuf = &gyroBuf1[GYRO_BUF_SIZE / 2];
 
+    // Attach interrupt
+    attachInterrupt(m_extiPin, interruptHandler);
+    /*
     const IO_t mpuIntIO = IOGetByTag(m_extiPin);
-
     IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
     EXTIHandlerInit(&m_gyroDev.exti, interruptHandler);
     EXTIConfig(mpuIntIO, &m_gyroDev.exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
             BETAFLIGHT_EXTI_TRIGGER_RISING);
     EXTIEnable(mpuIntIO, true);
+    */
 
     spiSetClkDivisor(m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 

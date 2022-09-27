@@ -51,6 +51,9 @@ void EXTIRelease(IO_t io);
 
 void EXTIEnable(IO_t io, bool enable);
 
+
+void attachInterrupt(const uint8_t pin, extiHandlerCallback * isr);
+
 #if defined(__cplusplus)
 }
 #endif
