@@ -57,20 +57,12 @@ static uint32_t triggerLookupTable[] = {
 #define EXTI_REG_IMR (EXTI->IMR)
 #define EXTI_REG_PR  (EXTI->PR)
 
-void extiInit(void)
-{
-    /* Enable SYSCFG clock otherwise the EXTI irq handlers are not called */
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-    memset(extiChannelRecs, 0, sizeof(extiChannelRecs));
-    memset(extiGroupPriority, 0xff, sizeof(extiGroupPriority));
-}
-
-void EXTIHandlerInit(extiCallbackRec_t *self, extiHandlerCallback *fn)
+static void handlerInit(extiCallbackRec_t *self, extiHandlerCallback *fn)
 {
     self->fn = fn;
 }
 
-void EXTIConfig(IO_t io, extiCallbackRec_t *cb, int irqPriority, ioConfig_t config, extiTrigger_t trigger)
+static void config(IO_t io, extiCallbackRec_t *cb, int irqPriority, ioConfig_t config, extiTrigger_t trigger)
 {
     int chIdx = IO_GPIOPinIdx(io);
 
@@ -110,22 +102,7 @@ void EXTIConfig(IO_t io, extiCallbackRec_t *cb, int irqPriority, ioConfig_t conf
     }
 }
 
-void EXTIRelease(IO_t io)
-{
-    // don't forget to match cleanup with config
-    EXTIEnable(io, false);
-
-    const int chIdx = IO_GPIOPinIdx(io);
-
-    if (chIdx < 0) {
-        return;
-    }
-
-    extiChannelRec_t *rec = &extiChannelRecs[chIdx];
-    rec->handler = NULL;
-}
-
-void EXTIEnable(IO_t io, bool enable)
+static void enable(IO_t io, bool enable)
 {
     uint32_t extiLine = IO_EXTI_Line(io);
 
@@ -139,6 +116,17 @@ void EXTIEnable(IO_t io, bool enable)
         EXTI_REG_IMR &= ~extiLine;
     }
 }
+
+// --------------------------------------------------------------------------
+
+void extiInit(void)
+{
+    /* Enable SYSCFG clock otherwise the EXTI irq handlers are not called */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    memset(extiChannelRecs, 0, sizeof(extiChannelRecs));
+    memset(extiGroupPriority, 0xff, sizeof(extiGroupPriority));
+}
+
 
 #define EXTI_EVENT_MASK 0xFFFF // first 16 bits only, see also definition of extiChannelRecs.
 
@@ -180,10 +168,10 @@ void attachInterrupt(const uint8_t pin, extiHandlerCallback * isr)
 
     IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
 
-    EXTIHandlerInit(&exti, isr);
+    handlerInit(&exti, isr);
 
-    EXTIConfig(mpuIntIO, &exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
+    config(mpuIntIO, &exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
             BETAFLIGHT_EXTI_TRIGGER_RISING);
 
-    EXTIEnable(mpuIntIO, true);
+    enable(mpuIntIO, true);
 }

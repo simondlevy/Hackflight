@@ -27,6 +27,7 @@ typedef enum {
 } extiTrigger_t;
 
 typedef struct extiCallbackRec_s extiCallbackRec_t;
+
 typedef void extiHandlerCallback(extiCallbackRec_t *self);
 
 struct extiCallbackRec_s {
@@ -38,19 +39,6 @@ extern "C" {
 #endif
 
 void extiInit(void);
-
-void EXTIHandlerInit(extiCallbackRec_t *cb, extiHandlerCallback *fn);
-
-void EXTIConfig(
-        IO_t io, extiCallbackRec_t *cb,
-        int irqPriority,
-        ioConfig_t config,
-        extiTrigger_t trigger);
-
-void EXTIRelease(IO_t io);
-
-void EXTIEnable(IO_t io, bool enable);
-
 
 void attachInterrupt(const uint8_t pin, extiHandlerCallback * isr);
 
