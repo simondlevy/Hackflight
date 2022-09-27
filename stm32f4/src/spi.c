@@ -32,7 +32,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "resource.h"
 #include "systemdev.h"
 
-#define SPIDEV_COUNT      3
+#define SPIDEV_COUNT  1
 
 static const uint32_t BUS_SPI_FREE   = 0x00000000;
 static const uint32_t BUS_SPI_LOCKED = 0x00000004;
@@ -601,12 +601,8 @@ void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data)
 }
 
 // Mark this bus as being SPI and record the first owner to use it
-bool spiSetBusInstance(extDevice_t *dev, const uint32_t device)
+bool spiSetBusInstance(extDevice_t *dev, const uint8_t device)
 {
-    if ((device == 0) || (device > SPIDEV_COUNT)) {
-        return false;
-    }
-
     dev->bus = &m_spiBusDevice[spiCfgToDev(device)];
 
     // By default each device should use SPI DMA if the bus supports it
