@@ -32,7 +32,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "resource.h"
 #include "systemdev.h"
 
-#define SPI_PREINIT_COUNT 16
 #define SPIDEV_COUNT      3
 
 static const uint32_t BUS_SPI_FREE   = 0x00000000;
@@ -642,21 +641,6 @@ void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data)
     spiWait(dev);
 }
 
-// Read a block of data from a register, returning false if the bus is busy
-bool spiReadRegBufRB(const extDevice_t *dev, const uint8_t reg, uint8_t *data,
-        const uint8_t length)
-{
-    // Ensure any prior DMA has completed before continuing
-    if (spiIsBusy(dev)) {
-        return false;
-    }
-
-    spiReadRegBuf(dev, reg, data, length);
-
-    return true;
-}
-
-
 // Mark this bus as being SPI and record the first owner to use it
 bool spiSetBusInstance(extDevice_t *dev, const uint32_t device)
 {
@@ -691,8 +675,6 @@ bool spiSetBusInstance(extDevice_t *dev, const uint32_t device)
 
     return true;
 }
-
-
 
 void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin)
 {
