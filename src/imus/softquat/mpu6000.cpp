@@ -75,11 +75,9 @@ bool Mpu6000::devGyroIsReady(void)
     m_gyroDev.dev.txBuf[0] = Mpu6000::RA_GYRO_XOUT_H | 0x80;
 
     busSegment_t segments[] = {
-        {NULL, NULL, 7, true, NULL},
+        {m_gyroDev.dev.txBuf, &m_gyroDev.dev.rxBuf[1], 7, true, NULL},
         {NULL, NULL, 0, true, NULL},
     };
-    segments[0].txData = m_gyroDev.dev.txBuf;
-    segments[0].rxData = &m_gyroDev.dev.rxBuf[1];
 
     spiSequence(&m_gyroDev.dev, &segments[0]);
 

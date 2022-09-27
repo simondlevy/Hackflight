@@ -30,14 +30,11 @@ typedef enum {
     BUS_TYPE_GYRO_AUTO,  // Only used by acc/gyro bus auto detection code
 } busType_e;
 
-struct spiDevice_s;
-
 typedef enum {
     BUS_READY,
     BUS_BUSY,
     BUS_ABORT
 } busStatus_e;
-
 
 // Bus interface, independent of connected device
 typedef struct busDevice_s {
@@ -64,16 +61,19 @@ typedef struct busDevice_s {
     bool initSegment;
 } busDevice_t;
 
-/* Each SPI access may comprise multiple parts, for example, wait/write enable/write/data each of which
- * is defined by a segment, with optional callback after each is completed
+/* Each SPI access may comprise multiple parts, for example, wait/write
+ * enable/write/data each of which is defined by a segment, with optional
+ * callback after each is completed
  */
 typedef struct busSegment_s {
-    /* Note that txData may point to the transmit buffer, or in the case of the final segment to
-     * a const extDevice_t * structure to link to the next transfer.
+    /* Note that txData may point to the transmit buffer, or in the case of the
+     * final segment to a const extDevice_t * structure to link to the next
+     * transfer.
      */
     uint8_t *txData;
-    /* Note that rxData may point to the receive buffer, or in the case of the final segment to
-     * a busSegment_t * structure to link to the next transfer.
+    /* Note that rxData may point to the receive buffer, or in the case of the
+     * final segment to a busSegment_t * structure to link to the next
+     * transfer.
      */
     uint8_t *rxData;
     int32_t len;
