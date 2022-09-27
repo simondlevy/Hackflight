@@ -16,7 +16,7 @@
 
 #include <imus/softquat.h>
 
-#include <bus.h>
+#include <spi.h>
 #include <exti.h>
 #include <io.h>
 
