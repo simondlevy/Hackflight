@@ -48,11 +48,13 @@ void spiSetClkDivisor(const extDevice_t *dev, const uint16_t divider);
 
 void spiWriteReg(const extDevice_t *dev, const uint8_t reg, uint8_t data);
 
-// Platform-dependent
-uint8_t spiInstanceDenom(const SPI_TypeDef *instance);
-
 #if defined(__cplusplus)
 }
 #endif
+
+// Platform-dependent
+uint8_t spiInstanceDenom(const SPI_TypeDef *instance);
+
+
 
 
