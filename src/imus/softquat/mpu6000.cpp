@@ -21,12 +21,12 @@
 #include <system.h>
 #include <time.h>
 
-#include <atomic.h>
 #include <exti.h>
-#include <nvic.h>
-#include <platform.h>
 #include <spi.h>
-#include <systemdev.h>
+
+extern "C" {
+    extern void delay(uint32_t msec);
+}
 
 static Mpu6000::gyroDev_t m_gyroDev;
 
@@ -120,14 +120,6 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     // Attach interrupt
     attachInterrupt(m_extiPin, interruptHandler);
-    /*
-    const IO_t mpuIntIO = IOGetByTag(m_extiPin);
-    IOInit(mpuIntIO, OWNER_GYRO_EXTI, 0);
-    EXTIHandlerInit(&m_gyroDev.exti, interruptHandler);
-    EXTIConfig(mpuIntIO, &m_gyroDev.exti, NVIC_PRIO_MPU_INT_EXTI, IOCFG_IN_FLOATING,
-            BETAFLIGHT_EXTI_TRIGGER_RISING);
-    EXTIEnable(mpuIntIO, true);
-    */
 
     spiSetClkDivisor(m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
@@ -174,10 +166,6 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     delayMicroseconds(1);
 
     spiSetClkDivisor(m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_CLK_HZ));
-
-    if (((int8_t)m_adcRaw[1]) == -1 && ((int8_t)m_adcRaw[0]) == -1) {
-        systemFailureMode(FAILURE_GYRO_INIT_FAILED);
-    }
 }
 
 int16_t Mpu6000::devReadRawGyro(uint8_t k)
