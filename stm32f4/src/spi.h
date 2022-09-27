@@ -96,11 +96,9 @@ typedef enum SPIDevice {
 extern "C" {
 #endif
 
-    void spiInit(void);
+    void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin);
 
     void spiInitBusDMA(void);
-
-    void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin);
 
     void spiWait(const extDevice_t *dev);
 

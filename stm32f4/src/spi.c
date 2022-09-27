@@ -537,8 +537,18 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
 
 // ----------------------------------------------------------------------------
 
-void spiInit(void)
+void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin)
 {
+    spiDevice_t *pDev = &m_spiDevice[SPIDEV_1];
+
+    pDev->sck = sckPin;
+    pDev->miso = misoPin;
+    pDev->mosi = mosiPin;
+    pDev->dev = SPI1;
+    pDev->af = GPIO_AF_SPI1;
+    pDev->rcc = RCC_APB2(SPI1);
+    pDev->leadingEdge = false; 
+
     const uint8_t device = 0;
 
     spiDevice_t *spi = &(m_spiDevice[device]);
@@ -610,19 +620,6 @@ void spiSetBusInstance(extDevice_t *dev, const uint8_t device)
     bus->deviceCount = 1;
     bus->initTx = &dev->initTx;
     bus->initRx = &dev->initRx;
-}
-
-void spi1PinConfigure(uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin)
-{
-    spiDevice_t *pDev = &m_spiDevice[SPIDEV_1];
-
-    pDev->sck = sckPin;
-    pDev->miso = misoPin;
-    pDev->mosi = mosiPin;
-    pDev->dev = SPI1;
-    pDev->af = GPIO_AF_SPI1;
-    pDev->rcc = RCC_APB2(SPI1);
-    pDev->leadingEdge = false; 
 }
 
 void spiInitBusDMA()
