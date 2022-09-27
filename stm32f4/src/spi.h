@@ -28,28 +28,11 @@ typedef enum {
     BUS_ABORT
 } busStatus_e;
 
-// Bus interface, independent of connected device
-typedef struct busDevice_s {
-    SPI_TypeDef *instance;
-    uint16_t speed;
-    bool leadingEdge;
-    bool useDMA;
-    uint8_t deviceCount;
-    dmaChannelDescriptor_t *dmaTx;
-    dmaChannelDescriptor_t *dmaRx;
-    // Use a reference here as this saves RAM for unused descriptors
-    DMA_InitTypeDef  *initTx;
-    DMA_InitTypeDef  *initRx;
-
-    struct busSegment_s* volatile curSegment;
-    bool initSegment;
-} busDevice_t;
-
 /* Each SPI access may comprise multiple parts, for example, wait/write
  * enable/write/data each of which is defined by a segment, with optional
  * callback after each is completed
  */
-typedef struct busSegment_s {
+typedef struct {
     /* Note that txData may point to the transmit buffer, or in the case of the
      * final segment to a const extDevice_t * structure to link to the next
      * transfer.
@@ -65,8 +48,25 @@ typedef struct busSegment_s {
     busStatus_e (*callback)(uint32_t arg);
 } busSegment_t;
 
+// Bus interface, independent of connected device
+typedef struct {
+    SPI_TypeDef *instance;
+    uint16_t speed;
+    bool leadingEdge;
+    bool useDMA;
+    uint8_t deviceCount;
+    dmaChannelDescriptor_t *dmaTx;
+    dmaChannelDescriptor_t *dmaRx;
+    // Use a reference here as this saves RAM for unused descriptors
+    DMA_InitTypeDef  *initTx;
+    DMA_InitTypeDef  *initRx;
+
+    busSegment_t * volatile curSegment;
+    bool initSegment;
+} busDevice_t;
+
 // External device has an associated bus and bus dependent address
-typedef struct extDevice_s {
+typedef struct {
     busDevice_t *bus;
     uint16_t speed;
     IO_t csnPin;

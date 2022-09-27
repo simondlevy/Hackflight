@@ -38,7 +38,7 @@ static const uint32_t BUS_SPI_FREE   = 0x00000000;
 static const uint32_t BUS_SPI_LOCKED = 0x00000004;
 
 
-typedef struct SPIDevice_s {
+typedef struct {
     SPI_TypeDef *dev;
     ioTag_t sck;
     ioTag_t miso;
