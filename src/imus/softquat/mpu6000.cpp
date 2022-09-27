@@ -98,12 +98,6 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
 
     spiDevice_t *dev = m_gyroDev.dev;
 
-    static busDevice_t bus;
-    dev->bus = &bus;
-
-    // MPU datasheet specifies 30ms.
-    delay(35);
-
     spiSetBusInstance(dev);
 
     dev->csnPin = IOGetByTag(m_csPin);

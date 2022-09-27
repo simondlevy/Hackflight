@@ -606,6 +606,12 @@ void spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data)
 // Mark this bus as being SPI and record the first owner to use it
 void spiSetBusInstance(spiDevice_t *dev)
 {
+    static busDevice_t busDevice;
+    dev->bus = &busDevice;
+
+    // MPU datasheet specifies 30ms.
+    delay(35);
+
     dev->bus = &m_spiBusDevice[spiCfgToDev(1)];
 
     // By default each device should use SPI DMA if the bus supports it
