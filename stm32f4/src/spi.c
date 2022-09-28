@@ -617,7 +617,7 @@ static void _spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data
     // Ensure any prior DMA has completed before continuing
     _spiWait(dev);
 
-    _spiSequence(dev, &segments[0]);
+    _spiSequence(dev, segments);
 
     _spiWait(dev);
 }

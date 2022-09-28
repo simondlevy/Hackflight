@@ -77,7 +77,7 @@ bool Mpu6000::devGyroIsReady(void)
 
     busSegment_t segments[] = { {txBuf, &rxBuf[1], 7, true}, {NULL, NULL, 0, true} };
 
-    spiSequence(m_gyroDev.dev, &segments[0]);
+    spiSequence(m_gyroDev.dev, segments);
 
     // Wait for completion
     spiWait(m_gyroDev.dev);
