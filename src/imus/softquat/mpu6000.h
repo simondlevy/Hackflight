@@ -91,7 +91,7 @@ class Mpu6000 : public SoftQuatImu {
 
         virtual int16_t devReadRawGyro(uint8_t k) override;
 
-        static void interruptHandler(extiCallbackRec_t *cb);
+        static void interruptHandler(/*extiCallbackRec_t *cb*/void);
 
         static uint16_t calculateSpiDivisor(const uint32_t freq);
 
