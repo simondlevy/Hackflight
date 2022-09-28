@@ -609,8 +609,8 @@ static void _spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data
 
     // This routine blocks so no need to use static data
     busSegment_t segments[] = {
-            {&regg, NULL, sizeof(reg), false},
-            {&data, NULL, sizeof(data), true},
+            {&regg, NULL, 1, false},
+            {&data, NULL, 1, true},
             {NULL, NULL, 0, true},
     };
 
