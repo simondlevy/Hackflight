@@ -45,8 +45,6 @@ extern "C" {
 
     void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin);
 
-    void spiInitBusDMA(void);
-
     void spiWait(const void * dev);
 
     void spiSequence(const void * dev, busSegment_t *segments);
