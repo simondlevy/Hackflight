@@ -41,7 +41,6 @@ typedef struct {
     SPI_TypeDef *instance;
     uint16_t speed;
     bool leadingEdge;
-    bool useDMA;
     uint8_t deviceCount;
     dmaChannelDescriptor_t *dmaTx;
     dmaChannelDescriptor_t *dmaRx;
@@ -62,8 +61,6 @@ typedef struct {
     // Cache the init structure for the next DMA transfer to reduce inter-segment delay
     DMA_InitTypeDef initTx;
     DMA_InitTypeDef initRx;
-    // Support disabling DMA on a per device basis
-    bool useDMA;
     // Per device buffer reference if needed
     uint8_t *txBuf, *rxBuf;
     // Connected devices on the same bus may support different speeds
@@ -283,7 +280,6 @@ static void spiSequenceStart(const spiDevice_t *dev, busSegment_t *segments)
 {
     busDevice_t *bus = dev->bus;
     SPI_TypeDef *instance = bus->instance;
-    bool dmaSafe = dev->useDMA;
     uint32_t xferLen = 0;
     uint32_t segmentCount = 0;
 
@@ -321,51 +317,42 @@ static void spiSequenceStart(const spiDevice_t *dev, busSegment_t *segments)
         if (((checkSegment->rxData) && (isCcm(checkSegment->rxData) ||
                         (bus->dmaRx == (dmaChannelDescriptor_t *)NULL))) ||
             ((checkSegment->txData) && isCcm(checkSegment->txData))) {
-            dmaSafe = false;
             break;
         }
-        // Note that these counts are only valid if dmaSafe is true
+
         segmentCount++;
         xferLen += checkSegment->len;
     }
-    // Use DMA if possible
-    if (bus->useDMA && dmaSafe && ((segmentCount > 1) || (xferLen > 8))) {
-        // Intialise the init structures for the first transfer
-        spiInternalInitStream(dev, false);
 
-        // Start the transfers
-        spiInternalStartDMA(dev);
+    // Manually work through the segment list performing a transfer for each
+    while (bus->curSegment->len) {
+        // Assert Chip Select
+        IOLo(dev->csnPin);
+
+        spiInternalReadWriteBufPolled(
+                bus->instance,
+                bus->curSegment->txData,
+                bus->curSegment->rxData,
+                bus->curSegment->len);
+
+        if (bus->curSegment->negateCS) {
+            // Negate Chip Select
+            IOHi(dev->csnPin);
+        }
+
+        bus->curSegment++;
+    }
+
+    // If a following transaction has been linked, start it
+    if (bus->curSegment->txData) {
+        const spiDevice_t *nextDev = (const spiDevice_t *)bus->curSegment->txData;
+        busSegment_t *nextSegments = (busSegment_t *)bus->curSegment->rxData;
+        bus->curSegment->txData = NULL;
+        spiSequenceStart(nextDev, nextSegments);
     } else {
-        // Manually work through the segment list performing a transfer for each
-        while (bus->curSegment->len) {
-            // Assert Chip Select
-            IOLo(dev->csnPin);
-
-            spiInternalReadWriteBufPolled(
-                    bus->instance,
-                    bus->curSegment->txData,
-                    bus->curSegment->rxData,
-                    bus->curSegment->len);
-
-            if (bus->curSegment->negateCS) {
-                // Negate Chip Select
-                IOHi(dev->csnPin);
-            }
-
-            bus->curSegment++;
-        }
-
-        // If a following transaction has been linked, start it
-        if (bus->curSegment->txData) {
-            const spiDevice_t *nextDev = (const spiDevice_t *)bus->curSegment->txData;
-            busSegment_t *nextSegments = (busSegment_t *)bus->curSegment->rxData;
-            bus->curSegment->txData = NULL;
-            spiSequenceStart(nextDev, nextSegments);
-        } else {
-            // The end of the segment list has been reached, so mark
-            // transactions as complete
-            bus->curSegment = (busSegment_t *)BUS_SPI_FREE;
-        }
+        // The end of the segment list has been reached, so mark
+        // transactions as complete
+        bus->curSegment = (busSegment_t *)BUS_SPI_FREE;
     }
 }
 
@@ -633,14 +620,10 @@ static void _spiSetBusInstance(spiDevice_t *dev, const uint8_t csPin)
 
     dev->bus = &m_spiBusDevice;
 
-    // By default each device should use SPI DMA if the bus supports it
-    dev->useDMA = true;
-
     busDevice_t *bus = dev->bus;
 
     bus->instance = m_spiInfo.dev;
 
-    bus->useDMA = false;
     bus->deviceCount = 1;
     bus->initTx = &dev->initTx;
     bus->initRx = &dev->initRx;
