@@ -88,16 +88,6 @@ typedef struct {
 static spiInfo_t  m_spiInfo;
 static busDevice_t  m_spiBusDevice;
 
-static uint8_t spiCfgToDev(const uint8_t k)
-{
-    return k - 1;
-}
-
-static SPI_TypeDef *spiInstanceByDevice(void)
-{
-    return m_spiInfo.dev;
-}
-
 // STM32F405 can't DMA to/from FASTRAM (CCM SRAM)
 static bool isCcm(const uint8_t * p)
 {
@@ -648,7 +638,7 @@ static void _spiSetBusInstance(spiDevice_t *dev, const uint8_t csPin)
 
     busDevice_t *bus = dev->bus;
 
-    bus->instance = spiInstanceByDevice();
+    bus->instance = m_spiInfo.dev;
 
     bus->useDMA = false;
     bus->deviceCount = 1;
