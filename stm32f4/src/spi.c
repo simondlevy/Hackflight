@@ -31,7 +31,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "spi.h"
 #include "systemdev.h"
 
-
 // Platform-dependent
 uint8_t spiInstanceDenom(const SPI_TypeDef *instance);
 
@@ -41,10 +40,6 @@ typedef struct {
     uint16_t speed;
     bool leadingEdge;
     uint8_t deviceCount;
-    // Use a reference here as this saves RAM for unused descriptors
-    DMA_InitTypeDef  *initTx;
-    DMA_InitTypeDef  *initRx;
-
     busSegment_t * volatile curSegment;
     bool initSegment;
 } busDevice_t;
@@ -55,12 +50,7 @@ typedef struct {
     uint16_t speed;
     IO_t csnPin;
     bool leadingEdge;
-    // Cache the init structure for the next DMA transfer to reduce inter-segment delay
-    DMA_InitTypeDef initTx;
-    DMA_InitTypeDef initRx;
-    // Per device buffer reference if needed
     uint8_t *txBuf, *rxBuf;
-    // Connected devices on the same bus may support different speeds
     uint32_t callbackArg;
 } spiDevice_t;
 
@@ -146,7 +136,6 @@ static bool spiInternalReadWriteBufPolled(
     return true;
 }
 
-// DMA transfer setup and start
 static void spiSequenceStart(const spiDevice_t *dev, busSegment_t *segments)
 {
     busDevice_t *bus = dev->bus;
@@ -181,7 +170,6 @@ static void spiSequenceStart(const spiDevice_t *dev, busSegment_t *segments)
 
     SPI_Cmd(instance, ENABLE);
 
-    // Check that any there are no attempts to DMA to/from CCD SRAM
     for (busSegment_t *checkSegment = bus->curSegment;
             checkSegment->len; checkSegment++) {
         // Check there is no receive data as only transmit DMA is available
@@ -275,14 +263,13 @@ void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin)
     SPI_Cmd(spi->dev, ENABLE);
 }
 
-// Wait for DMA completion
+// Wait for completion
 static void _spiWait(const spiDevice_t *dev)
 {
     // Wait for completion
     while (dev->bus->curSegment != (busSegment_t *)BUS_SPI_FREE);
 }
 
-// DMA transfer setup and start
 static void _spiSequence(const spiDevice_t *dev, busSegment_t *segments)
 {
     busDevice_t *bus = dev->bus;
@@ -325,7 +312,6 @@ static void _spiWriteReg(const spiDevice_t *dev, const uint8_t reg, uint8_t data
             {NULL, NULL, 0, true},
     };
 
-    // Ensure any prior DMA has completed before continuing
     _spiWait(dev);
 
     _spiSequence(dev, segments);
@@ -349,8 +335,6 @@ static void _spiSetBusInstance(spiDevice_t *dev, const uint8_t csPin)
     bus->instance = m_spiInfo.dev;
 
     bus->deviceCount = 1;
-    bus->initTx = &dev->initTx;
-    bus->initRx = &dev->initRx;
 
     dev->csnPin = IOGetByTag(csPin);
 
