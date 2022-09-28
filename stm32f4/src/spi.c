@@ -23,7 +23,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "platform.h"
 
 #include "atomic.h"
-#include "dma_reqmap.h"
 #include "exti.h"
 #include "io.h"
 #include "rcc.h"
@@ -42,8 +41,6 @@ typedef struct {
     uint16_t speed;
     bool leadingEdge;
     uint8_t deviceCount;
-    dmaChannelDescriptor_t *dmaTx;
-    dmaChannelDescriptor_t *dmaRx;
     // Use a reference here as this saves RAM for unused descriptors
     DMA_InitTypeDef  *initTx;
     DMA_InitTypeDef  *initRx;
@@ -188,8 +185,7 @@ static void spiSequenceStart(const spiDevice_t *dev, busSegment_t *segments)
     for (busSegment_t *checkSegment = bus->curSegment;
             checkSegment->len; checkSegment++) {
         // Check there is no receive data as only transmit DMA is available
-        if (((checkSegment->rxData) && (isCcm(checkSegment->rxData) ||
-                        (bus->dmaRx == (dmaChannelDescriptor_t *)NULL))) ||
+        if (((checkSegment->rxData) && (isCcm(checkSegment->rxData))) ||
             ((checkSegment->txData) && isCcm(checkSegment->txData))) {
             break;
         }
