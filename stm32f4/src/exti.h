@@ -28,7 +28,7 @@ typedef enum {
 
 typedef struct extiCallbackRec_s extiCallbackRec_t;
 
-typedef void extiHandlerCallback(/*extiCallbackRec_t *self*/);
+typedef void extiHandlerCallback();
 
 struct extiCallbackRec_s {
     extiHandlerCallback *fn;

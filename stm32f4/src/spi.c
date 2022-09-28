@@ -36,8 +36,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 // Platform-dependent
 uint8_t spiInstanceDenom(const SPI_TypeDef *instance);
 
-#define SPIDEV_COUNT  1
-
 // Bus interface, independent of connected device
 typedef struct {
     SPI_TypeDef *instance;
@@ -87,8 +85,8 @@ typedef struct {
     uint8_t dmaIrqHandler;
 } spiInfo_t;
 
-static spiInfo_t  m_spiInfo[SPIDEV_COUNT];
-static busDevice_t  m_spiBusDevice[SPIDEV_COUNT];
+static spiInfo_t  m_spiInfo;
+static busDevice_t  m_spiBusDevice;
 
 static uint8_t spiCfgToDev(const uint8_t k)
 {
@@ -97,7 +95,7 @@ static uint8_t spiCfgToDev(const uint8_t k)
 
 static SPI_TypeDef *spiInstanceByDevice(void)
 {
-    return m_spiInfo[0].dev;
+    return m_spiInfo.dev;
 }
 
 // STM32F405 can't DMA to/from FASTRAM (CCM SRAM)
@@ -531,7 +529,7 @@ static void spiInternalResetDescriptors(busDevice_t *bus)
 
 void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin)
 {
-    spiInfo_t *pDev = &m_spiInfo[0];
+    spiInfo_t *pDev = &m_spiInfo;
 
     pDev->sck = sckPin;
     pDev->miso = misoPin;
@@ -543,7 +541,7 @@ void spiInit(const uint8_t sckPin, const uint8_t misoPin, const uint8_t mosiPin)
 
     const uint8_t device = 0;
 
-    spiInfo_t *spi = &(m_spiInfo[device]);
+    spiInfo_t *spi = &m_spiInfo;
 
     // Enable SPI clock
     RCC_ClockCmd(spi->rcc, ENABLE);
@@ -643,7 +641,7 @@ static void _spiSetBusInstance(spiDevice_t *dev, const uint8_t csPin)
     // MPU datasheet specifies 30ms.
     delay(35);
 
-    dev->bus = &m_spiBusDevice[spiCfgToDev(1)];
+    dev->bus = &m_spiBusDevice;
 
     // By default each device should use SPI DMA if the bus supports it
     dev->useDMA = true;
@@ -678,7 +676,6 @@ static void _spiSetBusInstance(spiDevice_t *dev, const uint8_t csPin)
 
 void spiInitBusDMA()
 {
-    uint32_t device;
     /* Check
      * https://www.st.com/resource/en/errata_sheet/dm00037591-stm32f405407xx-and-stm32f415417xx-device-limitations-stmicroelectronics.pdf
      * section 2.1.10 which reports an errata that corruption may occurs on
@@ -688,100 +685,99 @@ void spiInitBusDMA()
      * DMA2
      */
 
+    const uint8_t device = 0;
+
     const bool dshotBitbangActive = true;
 
-    for (device = 0; device < SPIDEV_COUNT; device++) {
+    busDevice_t *bus = &m_spiBusDevice;
 
-        busDevice_t *bus = &m_spiBusDevice[device];
+    dmaIdentifier_e dmaTxIdentifier = DMA_NONE;
+    dmaIdentifier_e dmaRxIdentifier = DMA_NONE;
 
-        dmaIdentifier_e dmaTxIdentifier = DMA_NONE;
-        dmaIdentifier_e dmaRxIdentifier = DMA_NONE;
+    uint8_t txDmaoptMin = 0;
+    uint8_t txDmaoptMax = MAX_PERIPHERAL_DMA_OPTIONS - 1;
 
-        uint8_t txDmaoptMin = 0;
-        uint8_t txDmaoptMax = MAX_PERIPHERAL_DMA_OPTIONS - 1;
+    for (uint8_t opt = txDmaoptMin; opt <= txDmaoptMax; opt++) {
+        const dmaChannelSpec_t *dmaTxChannelSpec =
+            dmaGetChannelSpecByPeripheral(DMA_PERIPH_SPI_MOSI, device, opt);
 
-        for (uint8_t opt = txDmaoptMin; opt <= txDmaoptMax; opt++) {
-            const dmaChannelSpec_t *dmaTxChannelSpec =
-                dmaGetChannelSpecByPeripheral(DMA_PERIPH_SPI_MOSI, device, opt);
-
-            if (dmaTxChannelSpec) {
-                dmaTxIdentifier = dmaGetIdentifier(dmaTxChannelSpec->ref);
-                if (!dmaAllocate(dmaTxIdentifier, OWNER_SPI_MOSI, device + 1)) {
-                    dmaTxIdentifier = DMA_NONE;
-                    continue;
-                }
-                if (dshotBitbangActive && (DMA_DEVICE_NO(dmaTxIdentifier) == 2)) {
-                    dmaTxIdentifier = DMA_NONE;
-                    break;
-                }
-                bus->dmaTx = dmaGetDescriptorByIdentifier(dmaTxIdentifier);
-                bus->dmaTx->stream = DMA_DEVICE_INDEX(dmaTxIdentifier);
-                bus->dmaTx->channel = dmaTxChannelSpec->channel;
-
-                dmaEnable(dmaTxIdentifier);
-
+        if (dmaTxChannelSpec) {
+            dmaTxIdentifier = dmaGetIdentifier(dmaTxChannelSpec->ref);
+            if (!dmaAllocate(dmaTxIdentifier, OWNER_SPI_MOSI, device + 1)) {
+                dmaTxIdentifier = DMA_NONE;
+                continue;
+            }
+            if (dshotBitbangActive && (DMA_DEVICE_NO(dmaTxIdentifier) == 2)) {
+                dmaTxIdentifier = DMA_NONE;
                 break;
             }
-        }
-
-        uint8_t rxDmaoptMin = 0;
-        uint8_t rxDmaoptMax = MAX_PERIPHERAL_DMA_OPTIONS - 1;
-
-        for (uint8_t opt = rxDmaoptMin; opt <= rxDmaoptMax; opt++) {
-            const dmaChannelSpec_t *dmaRxChannelSpec =
-                dmaGetChannelSpecByPeripheral(DMA_PERIPH_SPI_MISO, device, opt);
-
-            if (dmaRxChannelSpec) {
-                dmaRxIdentifier = dmaGetIdentifier(dmaRxChannelSpec->ref);
-                if (!dmaAllocate(dmaRxIdentifier, OWNER_SPI_MISO, device + 1)) {
-                    dmaRxIdentifier = DMA_NONE;
-                    continue;
-                }
-                if (dshotBitbangActive && (DMA_DEVICE_NO(dmaRxIdentifier) == 2)) {
-                    dmaRxIdentifier = DMA_NONE;
-                    break;
-                }
-                bus->dmaRx = dmaGetDescriptorByIdentifier(dmaRxIdentifier);
-                bus->dmaRx->stream = DMA_DEVICE_INDEX(dmaRxIdentifier);
-                bus->dmaRx->channel = dmaRxChannelSpec->channel;
-
-                dmaEnable(dmaRxIdentifier);
-
-                break;
-            }
-        }
-
-        if (dmaTxIdentifier && dmaRxIdentifier) {
-            // Ensure streams are disabled
-            spiInternalResetStream(bus->dmaRx);
-            spiInternalResetStream(bus->dmaTx);
-
-            spiInternalResetDescriptors(bus);
-
-            // Note that this driver may be called both from the normal thread
-            // of execution, or from USB interrupt handlers, so the DMA
-            // completion interrupt must be at a higher priority
-            dmaSetHandler(dmaRxIdentifier, spiRxIrqHandler, NVIC_PRIO_SPI_DMA, 0);
-
-            bus->useDMA = true;
-        } else if (dmaTxIdentifier) {
-            // Transmit on DMA is adequate for OSD so worth having
             bus->dmaTx = dmaGetDescriptorByIdentifier(dmaTxIdentifier);
-            bus->dmaRx = (dmaChannelDescriptor_t *)NULL;
+            bus->dmaTx->stream = DMA_DEVICE_INDEX(dmaTxIdentifier);
+            bus->dmaTx->channel = dmaTxChannelSpec->channel;
 
-            // Ensure streams are disabled
-            spiInternalResetStream(bus->dmaTx);
+            dmaEnable(dmaTxIdentifier);
 
-            spiInternalResetDescriptors(bus);
-
-            dmaSetHandler(dmaTxIdentifier, spiTxIrqHandler, NVIC_PRIO_SPI_DMA, 0);
-
-            bus->useDMA = true;
-        } else {
-            // Disassociate channels from bus
-            bus->dmaRx = (dmaChannelDescriptor_t *)NULL;
-            bus->dmaTx = (dmaChannelDescriptor_t *)NULL;
+            break;
         }
+    }
+
+    uint8_t rxDmaoptMin = 0;
+    uint8_t rxDmaoptMax = MAX_PERIPHERAL_DMA_OPTIONS - 1;
+
+    for (uint8_t opt = rxDmaoptMin; opt <= rxDmaoptMax; opt++) {
+        const dmaChannelSpec_t *dmaRxChannelSpec =
+            dmaGetChannelSpecByPeripheral(DMA_PERIPH_SPI_MISO, device, opt);
+
+        if (dmaRxChannelSpec) {
+            dmaRxIdentifier = dmaGetIdentifier(dmaRxChannelSpec->ref);
+            if (!dmaAllocate(dmaRxIdentifier, OWNER_SPI_MISO, device + 1)) {
+                dmaRxIdentifier = DMA_NONE;
+                continue;
+            }
+            if (dshotBitbangActive && (DMA_DEVICE_NO(dmaRxIdentifier) == 2)) {
+                dmaRxIdentifier = DMA_NONE;
+                break;
+            }
+            bus->dmaRx = dmaGetDescriptorByIdentifier(dmaRxIdentifier);
+            bus->dmaRx->stream = DMA_DEVICE_INDEX(dmaRxIdentifier);
+            bus->dmaRx->channel = dmaRxChannelSpec->channel;
+
+            dmaEnable(dmaRxIdentifier);
+
+            break;
+        }
+    }
+
+    if (dmaTxIdentifier && dmaRxIdentifier) {
+        // Ensure streams are disabled
+        spiInternalResetStream(bus->dmaRx);
+        spiInternalResetStream(bus->dmaTx);
+
+        spiInternalResetDescriptors(bus);
+
+        // Note that this driver may be called both from the normal thread
+        // of execution, or from USB interrupt handlers, so the DMA
+        // completion interrupt must be at a higher priority
+        dmaSetHandler(dmaRxIdentifier, spiRxIrqHandler, NVIC_PRIO_SPI_DMA, 0);
+
+        bus->useDMA = true;
+    } else if (dmaTxIdentifier) {
+        // Transmit on DMA is adequate for OSD so worth having
+        bus->dmaTx = dmaGetDescriptorByIdentifier(dmaTxIdentifier);
+        bus->dmaRx = (dmaChannelDescriptor_t *)NULL;
+
+        // Ensure streams are disabled
+        spiInternalResetStream(bus->dmaTx);
+
+        spiInternalResetDescriptors(bus);
+
+        dmaSetHandler(dmaTxIdentifier, spiTxIrqHandler, NVIC_PRIO_SPI_DMA, 0);
+
+        bus->useDMA = true;
+    } else {
+        // Disassociate channels from bus
+        bus->dmaRx = (dmaChannelDescriptor_t *)NULL;
+        bus->dmaTx = (dmaChannelDescriptor_t *)NULL;
     }
 }
 
