@@ -40,10 +40,8 @@ uint16_t Mpu6000::calculateSpiDivisor(const uint32_t freq)
     return divisor;
 }
 
-void Mpu6000::interruptHandler(/*extiCallbackRec_t *cb*/void)
+void Mpu6000::interruptHandler(void)
 {
-    //(void)cb;
-
     static uint32_t prevTime;
 
     // Ideally we'd use a time to capture such information, but unfortunately
