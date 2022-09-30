@@ -34,7 +34,15 @@
 #include <vector>
 using namespace std;
 
-static const uint8_t CS_PIN = 0x14;
+static const uint8_t CS_PIN  = 0x14;
+static const uint8_t INT_PIN = 0x34;
+
+static Mpu6000 * _imu;
+
+static void imuInterruptHandler(void)
+{
+    _imu->handleInterrupt();
+}
 
 int main(void)
 {
@@ -52,11 +60,9 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-    // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
-    static Mpu6000 imu(
-            CS_PIN, 
-            0x34,  // EXTI pin = PC4
-            2000); // gyro scale DPS
+    static Mpu6000 imu(CS_PIN, 2000); // gyro scale DPS
+
+    _imu = &imu;
 
     vector<PidController *> pids = {&anglePid};
 
@@ -71,6 +77,8 @@ int main(void)
     static Stm32F4Led led(0x25); // PB5
 
     static Hackflight hf(rx, imu, imuRotate270, pids, mixer, esc, led);
+
+    attachInterrupt(INT_PIN, imuInterruptHandler);
 
     hf.begin();
 

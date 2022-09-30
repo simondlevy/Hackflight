@@ -40,7 +40,7 @@ uint16_t Mpu6000::calculateSpiDivisor(const uint32_t freq)
     return divisor;
 }
 
-void Mpu6000::interruptHandler(void)
+void Mpu6000::handleInterrupt(void)
 {
     static uint32_t prevTime;
 
@@ -113,8 +113,6 @@ void Mpu6000::devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountP
     spiSetRxBuf(dev, &gyroBuf1[GYRO_BUF_SIZE / 2]);
     spiSetTxBuf(dev, gyroBuf1);
 
-    attachInterrupt(m_extiPin, interruptHandler);
-
     spiSetClkDivisor(m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
     // Clock Source PPL with Z axis gyro reference
@@ -167,12 +165,11 @@ int16_t Mpu6000::devReadRawGyro(uint8_t k)
     return m_adcRaw[k];
 }
 
-Mpu6000::Mpu6000(uint8_t csPin, uint8_t extiPin, uint16_t gyroScale)
+Mpu6000::Mpu6000(uint8_t csPin, uint16_t gyroScale)
     : SoftQuatImu(gyroScale)
 {
     m_gyroDev.dev = spiGetInstance(csPin);
     m_csPin = csPin;
-    m_extiPin = extiPin;
 }
 
 #endif // !defined(ARDUINO)
