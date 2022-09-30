@@ -80,22 +80,13 @@ class Mpu6000 : public SoftQuatImu {
             NUM_ACCEL_FSR
         };
 
-        typedef struct {
-
-            void * dev;
-
-            int32_t           dmaMaxDuration;
-            int32_t           shortPeriod;
-            uint32_t *        syncTimePtr;
-            uint32_t *        interruptCountPtr;
-
-        } gyroDev_t;
-
-        int16_t m_adcRaw[3];                          
-        uint8_t m_csPin;
-        uint8_t m_extiPin;
-
-        gyroDev_t m_gyroDev;
+        int16_t    m_adcRaw[3];                          
+        uint8_t    m_csPin;
+        void *     m_spi;
+        int32_t    m_dmaMaxDuration;
+        int32_t    m_shortPeriod;
+        uint32_t * m_syncTimePtr;
+        uint32_t * m_interruptCountPtr;
 
         static uint16_t calculateSpiDivisor(const uint32_t freq)
         {
@@ -112,23 +103,23 @@ class Mpu6000 : public SoftQuatImu {
 
         bool devGyroIsReady(void) override
         {
-            uint8_t * rxBuf = spiGetRxBuf(m_gyroDev.dev);
-            uint8_t * txBuf = spiGetTxBuf(m_gyroDev.dev);
+            uint8_t * rxBuf = spiGetRxBuf(m_spi);
+            uint8_t * txBuf = spiGetTxBuf(m_spi);
 
             uint16_t * gyroData = (uint16_t *)rxBuf;
 
             // Ensure any prior DMA has completed before continuing
-            spiWait(m_gyroDev.dev);
+            spiWait(m_spi);
 
             txBuf[0] = Mpu6000::RA_GYRO_XOUT_H | 0x80;
 
             busSegment_t segments[] =
-              { {txBuf, &rxBuf[1], 7, true}, {NULL, NULL, 0, true} };
+            { {txBuf, &rxBuf[1], 7, true}, {NULL, NULL, 0, true} };
 
-            spiSequence(m_gyroDev.dev, segments);
+            spiSequence(m_spi, segments);
 
             // Wait for completion
-            spiWait(m_gyroDev.dev);
+            spiWait(m_spi);
 
             m_adcRaw[0] = __builtin_bswap16(gyroData[1]);
             m_adcRaw[1] = __builtin_bswap16(gyroData[2]);
@@ -139,10 +130,10 @@ class Mpu6000 : public SoftQuatImu {
 
         void devInit(uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) override
         {
-            m_gyroDev.syncTimePtr = gyroSyncTimePtr;
-            m_gyroDev.interruptCountPtr = gyroInterruptCountPtr;
+            m_syncTimePtr = gyroSyncTimePtr;
+            m_interruptCountPtr = gyroInterruptCountPtr;
 
-            void *dev = m_gyroDev.dev;
+            void *dev = m_spi;
 
             spiSetClkDivisor(dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
@@ -156,58 +147,58 @@ class Mpu6000 : public SoftQuatImu {
 
             spiSetClkDivisor(dev, calculateSpiDivisor(MAX_SPI_CLK_HZ));
 
-            m_gyroDev.shortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
+            m_shortPeriod = systemClockMicrosToCycles(SHORT_THRESHOLD);
 
             // SPI DMA buffer required per device
             static uint8_t gyroBuf1[GYRO_BUF_SIZE];
             spiSetRxBuf(dev, &gyroBuf1[GYRO_BUF_SIZE / 2]);
             spiSetTxBuf(dev, gyroBuf1);
 
-            spiSetClkDivisor(m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
+            spiSetClkDivisor(m_spi, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
             // Clock Source PPL with Z axis gyro reference
-            spiWriteReg(m_gyroDev.dev, RA_PWR_MGMT_1, CLK_SEL_PLLGYROZ);
+            spiWriteReg(m_spi, RA_PWR_MGMT_1, CLK_SEL_PLLGYROZ);
             delayMicroseconds(15);
 
             // Disable Primary I2C Interface
-            spiWriteReg(m_gyroDev.dev, RA_USER_CTRL, BIT_I2C_IF_DIS);
+            spiWriteReg(m_spi, RA_USER_CTRL, BIT_I2C_IF_DIS);
             delayMicroseconds(15);
 
-            spiWriteReg(m_gyroDev.dev, RA_PWR_MGMT_2, 0x00);
+            spiWriteReg(m_spi, RA_PWR_MGMT_2, 0x00);
             delayMicroseconds(15);
 
             // Accel Sample Rate 1kHz
             // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-            spiWriteReg(m_gyroDev.dev, RA_SMPLRT_DIV, 0);
+            spiWriteReg(m_spi, RA_SMPLRT_DIV, 0);
             delayMicroseconds(15);
 
             // Gyro +/- 2000 DPS Full Scale
-            spiWriteReg(m_gyroDev.dev, RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
+            spiWriteReg(m_spi, RA_GYRO_CONFIG, INV_FSR_2000DPS << 3);
             delayMicroseconds(15);
 
             // Accel +/- 16 G Full Scale
-            spiWriteReg(m_gyroDev.dev, RA_ACCEL_CONFIG, INV_FSR_16G << 3);
+            spiWriteReg(m_spi, RA_ACCEL_CONFIG, INV_FSR_16G << 3);
             delayMicroseconds(15);
 
             // INT_ANYRD_2CLEAR
-            spiWriteReg(m_gyroDev.dev, RA_INT_PIN_CFG,
+            spiWriteReg(m_spi, RA_INT_PIN_CFG,
                     0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);
 
             delayMicroseconds(15);
 
-            spiWriteReg(m_gyroDev.dev, RA_INT_ENABLE, RF_DATA_RDY_EN);
+            spiWriteReg(m_spi, RA_INT_ENABLE, RF_DATA_RDY_EN);
             delayMicroseconds(15);
 
-            spiSetClkDivisor(m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_CLK_HZ));
+            spiSetClkDivisor(m_spi, calculateSpiDivisor(MAX_SPI_CLK_HZ));
             delayMicroseconds(1);
 
-            spiSetClkDivisor(m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
+            spiSetClkDivisor(m_spi, calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
             // Accel and Gyro DLPF Setting
-            spiWriteReg(m_gyroDev.dev, CONFIG, 0); // no gyro DLPF
+            spiWriteReg(m_spi, CONFIG, 0); // no gyro DLPF
             delayMicroseconds(1);
 
-            spiSetClkDivisor(m_gyroDev.dev, calculateSpiDivisor(MAX_SPI_CLK_HZ));
+            spiSetClkDivisor(m_spi, calculateSpiDivisor(MAX_SPI_CLK_HZ));
         }
 
         int16_t devReadRawGyro(uint8_t k) override
@@ -215,13 +206,12 @@ class Mpu6000 : public SoftQuatImu {
             return m_adcRaw[k];
         }
 
-
     public:
 
         Mpu6000(uint8_t csPin, uint16_t gyroScale)
             : SoftQuatImu(gyroScale)
         {
-            m_gyroDev.dev = spiGetInstance(csPin);
+            m_spi = spiGetInstance(csPin);
             m_csPin = csPin;
         }
 
@@ -235,15 +225,15 @@ class Mpu6000 : public SoftQuatImu {
             int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, prevTime);
 
             // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
-            if ((m_gyroDev.shortPeriod == 0) ||
-                    (gyroLastPeriod < m_gyroDev.shortPeriod)) {
+            if ((m_shortPeriod == 0) ||
+                    (gyroLastPeriod < m_shortPeriod)) {
 
-                *m_gyroDev.syncTimePtr = prevTime + m_gyroDev.dmaMaxDuration;
+                *m_syncTimePtr = prevTime + m_dmaMaxDuration;
             }
 
             prevTime = nowCycles;
 
-            *m_gyroDev.interruptCountPtr += 1;
+            *m_interruptCountPtr += 1;
         }
 
 
