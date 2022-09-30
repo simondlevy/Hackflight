@@ -261,7 +261,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/stm32clock.o \
-		  $(OBJECT_DIR)/mpu6000.o \
 		  $(OBJECT_DIR)/dshot_packet.o
 	@echo "Linking" $@
 	$(V1) $(CROSS_CXX) -o $@ $(filter-out %.ld,$^) $(LD_FLAGS)
