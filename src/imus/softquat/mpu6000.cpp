@@ -167,10 +167,10 @@ int16_t Mpu6000::devReadRawGyro(uint8_t k)
     return m_adcRaw[k];
 }
 
-Mpu6000::Mpu6000(void * spi, uint8_t csPin, uint8_t extiPin, uint16_t gyroScale)
+Mpu6000::Mpu6000(uint8_t csPin, uint8_t extiPin, uint16_t gyroScale)
     : SoftQuatImu(gyroScale)
 {
-    m_gyroDev.dev = spi;
+    m_gyroDev.dev = spiGetInstance(csPin);
     m_csPin = csPin;
     m_extiPin = extiPin;
 }

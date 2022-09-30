@@ -45,8 +45,6 @@ int main(void)
             0x16,  // miso = PA6
             0x17); // mosi = PA7
 
-    void * spi1 = spiGetInstance(CS_PIN);
-
     static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -56,7 +54,6 @@ int main(void)
 
     // static Mpu6000Imu imu(0); // dummy value for IMU interrupt pin
     static Mpu6000 imu(
-            spi1,
             CS_PIN, 
             0x34,  // EXTI pin = PC4
             2000); // gyro scale DPS
