@@ -29,6 +29,8 @@
 
 #include <spi.h>
 
+#include <io_def_generated.h>
+
 #include "hardware_init.h"
 
 #include <vector>
@@ -36,6 +38,7 @@ using namespace std;
 
 static const uint8_t CS_PIN  = 0x14;
 static const uint8_t INT_PIN = 0x34;
+static const uint8_t LED_PIN = 0x25;
 
 static Mpu6000 * _imu;
 
@@ -74,7 +77,7 @@ int main(void)
 
     static DshotBitbangEsc esc(motorPins);
 
-    static Stm32F4Led led(0x25); // PB5
+    static Stm32F4Led led(LED_PIN);
 
     static Hackflight hf(rx, imu, imuRotate270, pids, mixer, esc, led);
 
