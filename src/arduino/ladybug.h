@@ -24,7 +24,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <hackflight.h>
 #include <imus/real/usfs/usfs.h>
-#include <leds/arduino.h>
+#include <leds/real/arduino.h>
 #include <escs/brushed.h>
 #include <stm32clock.h>
 

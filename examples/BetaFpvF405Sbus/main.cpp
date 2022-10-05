@@ -23,7 +23,7 @@
 #include <escs/dshot/bitbang.h>
 #include <hackflight.h>
 #include <imus/real/softquat/mpu6000.h>
-#include <leds/stm32f4.h>
+#include <leds/real/stm32f4.h>
 #include <tasks/receivers/real/sbus.h>
 #include <serial.h>
 
