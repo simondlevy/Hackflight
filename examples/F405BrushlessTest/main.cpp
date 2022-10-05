@@ -22,12 +22,10 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot/bitbang.h>
 #include <hackflight.h>
-#include <imus/softquat/mpu6000.h>
+#include <imus/mock.h>
 #include <leds/stm32f4.h>
-#include <tasks/receivers/sbus.h>
+#include <tasks/receivers/mock.h>
 #include <serial.h>
-
-#include <spi.h>
 
 #include <io_def_generated.h>
 
@@ -36,25 +34,11 @@
 #include <vector>
 using namespace std;
 
-static const uint8_t CS_PIN  = 0x14;
-static const uint8_t INT_PIN = 0x34;
 static const uint8_t LED_PIN = 0x25;
-
-static Mpu6000 * _imu;
-
-static void imuInterruptHandler(void)
-{
-    _imu->handleInterrupt();
-}
 
 int main(void)
 {
     hardwareInit();
-
-    spiInit(
-            0x15,  // sck  = PA5
-            0x16,  // miso = PA6
-            0x17); // mosi = PA7
 
     static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -63,15 +47,13 @@ int main(void)
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-    static Mpu6000 imu(CS_PIN, 2000); // gyro scale DPS
-
-    _imu = &imu;
+    static MockImu imu;
 
     vector<PidController *> pids = {&anglePid};
 
     vector<uint8_t> motorPins = {0x20, 0x21, 0x13, 0x12};
 
-    static SbusReceiver rx(SERIAL_PORT_USART3);
+    static MockReceiver rx;
 
     static Mixer mixer = QuadXbfMixer::make();
 
@@ -80,8 +62,6 @@ int main(void)
     static Stm32F4Led led(LED_PIN);
 
     static Hackflight hf(rx, imu, imuRotate270, pids, mixer, esc, led);
-
-    attachInterrupt(INT_PIN, imuInterruptHandler);
 
     hf.begin();
 
