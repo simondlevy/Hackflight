@@ -23,7 +23,7 @@
 #include <escs/dshot/bitbang.h>
 #include <hackflight.h>
 #include <imus/mock.h>
-#include <leds/stm32f4.h>
+#include <leds/mock.h>
 #include <tasks/receivers/mock.h>
 #include <serial.h>
 
@@ -61,7 +61,7 @@ int main(void)
 
     static DshotBitbangEsc esc(motorPins);
 
-    static Stm32F4Led led(LED_PIN);
+    static MockLed led;
 
     static Hackflight hf(rx, imu, imuRotate270, pids, mixer, esc, led);
 
