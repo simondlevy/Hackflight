@@ -38,13 +38,13 @@ class MockReceiver : public Receiver {
                 float & aux2,
                 uint32_t & frameTimeUs) override
         {
-            (void) throttle;
-            (void) roll;
-            (void) pitch;
-            (void) yaw;
-            (void) aux1;
-            (void) aux2;
-            (void) frameTimeUs;
+            throttle = 1000;
+            roll     = 1500;
+            pitch    = 1500;
+            yaw      = 1500;
+            aux1 = 0;
+            aux2 = 0;
+            (void)frameTimeUs;
             return false;
         }
 
