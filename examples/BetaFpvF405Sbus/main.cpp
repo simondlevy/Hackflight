@@ -24,7 +24,7 @@
 #include <hackflight.h>
 #include <imus/real/softquat/mpu6000.h>
 #include <leds/stm32f4.h>
-#include <tasks/receivers/sbus.h>
+#include <tasks/receivers/real/sbus.h>
 #include <serial.h>
 
 #include <spi.h>

@@ -20,7 +20,7 @@
 
 #include <hackflight.h>
 #include <arduino/ladybug.h>
-#include <tasks/receivers/dsmx.h>
+#include <tasks/receivers/real/dsmx.h>
 
 static DsmxReceiver _receiver;
 

@@ -19,7 +19,7 @@
 
 #include <hackflight.h>
 #include <arduino/ladybug.h>
-#include <tasks/receivers/sbus.h>
+#include <tasks/receivers/real/sbus.h>
 
 static SbusReceiver _receiver;
 
