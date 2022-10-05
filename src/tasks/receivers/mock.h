@@ -38,13 +38,30 @@ class MockReceiver : public Receiver {
                 float & aux2,
                 uint32_t & frameTimeUs) override
         {
+            // Simulates moving the roll stick
+
+            static float _roll;
+            static int8_t dir = +1;
+
+            _roll += .005 * dir;
+
+            if (_roll >= 1.0) {
+                dir = -1;
+            }
+
+            if (_roll <= -1.0) {
+                dir = +1;
+            }
+
             throttle = 1000;
-            roll     = 1500;
+            roll     = 1500 + _roll * 500;
             pitch    = 1500;
             yaw      = 1500;
             aux1 = 0;
             aux2 = 0;
+
             (void)frameTimeUs;
+
             return false;
         }
 
