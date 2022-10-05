@@ -14,7 +14,7 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <imus/softquat.h>
+#include <imus/real/softquat.h>
 
 #include <exti.h>
 #include <spi.h>

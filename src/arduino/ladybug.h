@@ -23,7 +23,7 @@
 #include <alignment/rotate0.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <hackflight.h>
-#include <imus/usfs/usfs.h>
+#include <imus/real/usfs/usfs.h>
 #include <leds/arduino.h>
 #include <escs/brushed.h>
 #include <stm32clock.h>
