@@ -24,7 +24,7 @@
 #include <hackflight.h>
 #include <imus/mock.h>
 #include <leds/stm32f4.h>
-#include <tasks/receivers/sbus.h>
+#include <tasks/receivers/mock.h>
 #include <serial.h>
 
 #include <spi.h>
@@ -55,7 +55,7 @@ int main(void)
 
     vector<uint8_t> motorPins = {0x20, 0x21, 0x13, 0x12};
 
-    static SbusReceiver rx(SERIAL_PORT_USART3);
+    static MockReceiver rx;
 
     static Mixer mixer = QuadXbfMixer::make();
 
