@@ -24,35 +24,69 @@ class MockImu : public Imu {
 
     protected:
 
-        virtual bool devGyroIsReady(void) override
-        {
-            return false;
-        }
-
-        virtual void devInit(
-                uint32_t * gyroSyncTimePtr,
-                uint32_t * gyroInterruptCountPtr) override
-        {
-            (void)gyroSyncTimePtr;
-            (void)gyroInterruptCountPtr;
-        }
-
-        virtual int16_t devReadRawGyro(uint8_t k) override
-        {
-            (void)k;
-            return 0;
-        }
-
-    public:
-
-        MockImu(void)
-            : Imu(0)
+        virtual void begin(void) override 
         {
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
         {
+            // Simulates rocking in the X (phi) axis
+
             (void)time;
-            return Axes(0.1, 0.1, 0.1); // simulate tilt
+
+            static float phi;
+            static int8_t dir = +1;
+
+            phi += .01 * dir;
+
+            if (phi >= 1.0) {
+                dir = -1;
+            }
+
+            if (phi <= -1.0) {
+                dir = +1;
+            }
+
+            return Axes(phi, 0.1, 0.1);
+        }
+
+        virtual uint32_t getGyroInterruptCount(void) override
+        {
+            static uint32_t _count;
+            static uint32_t _tprev;
+
+            // Simulate 8kHz interrupts
+            uint32_t time = micros();
+            if (time - _tprev > 125) {
+                _count++;
+                _tprev = time;
+            }
+
+            return _count;
+        }
+
+        virtual int32_t getGyroSkew(
+                const uint32_t nextTargetCycles,
+                const int32_t desiredPeriodCycles) override
+        {
+            (void)nextTargetCycles;
+            (void)desiredPeriodCycles;
+            return 0;
+        }
+
+        virtual bool gyroIsCalibrating(void) override
+        {
+            return false;
+        }
+
+        virtual bool gyroIsReady(void) override
+        {
+            return false;
+        }
+
+        virtual auto readGyroDps(const align_fun align) -> Axes  override
+        {
+            (void)align;
+            return Axes(0, 0, 0);
         }
 };

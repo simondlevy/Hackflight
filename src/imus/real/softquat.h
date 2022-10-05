@@ -23,10 +23,10 @@
 #include "core/axes.h"
 #include "core/clock.h"
 #include "core/vstate.h"
-#include "imu.h"
+#include "imus/real.h"
 #include "maths.h"
 
-class SoftQuatImu : public Imu {
+class SoftQuatImu : public RealImu {
 
     private:
 
@@ -39,6 +39,29 @@ class SoftQuatImu : public Imu {
         static constexpr float atanPolyCoef5  = 0.05030176425872175f;
         static constexpr float atanPolyCoef6  = 0.1471039133652469f;
         static constexpr float atanPolyCoef7  = 0.6444640676891548f;
+
+        class Quaternion {
+
+            public:
+
+                float w;
+                float x;
+                float y;
+                float z;
+
+                Quaternion(const float _w, const float _x, const float _y, const float _z)
+                {
+                    w = _w;
+                    x = _x;
+                    y = _y;
+                    z = _z;
+                }
+
+                Quaternion(void)
+                    : Quaternion(0, 0, 0, 0)
+                {
+                }
+        };
 
         class Fusion {
             public:
@@ -194,10 +217,10 @@ class SoftQuatImu : public Imu {
 
         ImuSensor m_gyroAccum;
 
-    public:
+    protected:
 
         SoftQuatImu(const uint16_t gyroScale)
-            : Imu(gyroScale)
+            : RealImu(gyroScale)
         {
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;

@@ -80,7 +80,7 @@ class Hackflight {
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            if (m_imu->devGyroIsReady()) {
+            if (m_imu->gyroIsReady()) {
 
                 auto angvels = m_imu->readGyroDps(m_imuAlignFun);
 
@@ -121,11 +121,11 @@ class Hackflight {
             static int32_t _sampleRateStartCycles;
 
             if ((_terminalGyroRateCount == 0)) {
-                _terminalGyroRateCount = m_imu->gyroInterruptCount() + CORE_RATE_COUNT;
+                _terminalGyroRateCount = m_imu->getGyroInterruptCount() + CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
             }
 
-            if (m_imu->gyroInterruptCount() >= _terminalGyroRateCount) {
+            if (m_imu->getGyroInterruptCount() >= _terminalGyroRateCount) {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
@@ -145,10 +145,10 @@ class Hackflight {
             _gyroSkewAccum += gyroSkew;
 
             if ((_terminalGyroLockCount == 0)) {
-                _terminalGyroLockCount = m_imu->gyroInterruptCount() + GYRO_LOCK_COUNT;
+                _terminalGyroLockCount = m_imu->getGyroInterruptCount() + GYRO_LOCK_COUNT;
             }
 
-            if (m_imu->gyroInterruptCount() >= _terminalGyroLockCount) {
+            if (m_imu->getGyroInterruptCount() >= _terminalGyroLockCount) {
                 _terminalGyroLockCount += GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask

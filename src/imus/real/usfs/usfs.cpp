@@ -31,7 +31,7 @@ void UsfsImu::interruptHandler(void)
    *m_gyroDev.syncTimePtr = micros();
 }
 
-bool UsfsImu::devGyroIsReady(void)
+bool UsfsImu::gyroIsReady(void)
 {
     bool result = false;
 
@@ -108,7 +108,7 @@ auto UsfsImu::getEulerAngles(const uint32_t time) -> Axes
     return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
 }
 
-UsfsImu::UsfsImu(uint8_t interruptPin) : Imu(GYRO_SCALE_DPS)
+UsfsImu::UsfsImu(uint8_t interruptPin) : RealImu(GYRO_SCALE_DPS)
 {
     m_interruptPin = interruptPin;
 }

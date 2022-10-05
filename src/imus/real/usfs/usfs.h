@@ -17,10 +17,10 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <imu.h>
+#include <imus/real.h>
 #include <USFS.h>
 
-class UsfsImu : public Imu {
+class UsfsImu : public RealImu {
 
     private:
 
@@ -54,7 +54,7 @@ class UsfsImu : public Imu {
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override;
 
-        virtual bool devGyroIsReady(void) override;
+        virtual bool gyroIsReady(void) override;
 
         virtual void devInit(
                 uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) override;

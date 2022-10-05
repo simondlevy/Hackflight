@@ -101,7 +101,7 @@ class Mpu6000 : public SoftQuatImu {
             return divisor;
         }
 
-        bool devGyroIsReady(void) override
+        bool gyroIsReady(void) override
         {
             uint8_t * rxBuf = spiGetRxBuf(m_spi);
             uint8_t * txBuf = spiGetTxBuf(m_spi);
