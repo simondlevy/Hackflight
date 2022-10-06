@@ -21,15 +21,17 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Hackflight includes
 #include "core/clock.h"
 #include "core/constrain.h"
 #include "esc.h"
-#include "escs/dshot/dshot_dev.h"
 #include "maxmotors.h"
+#include "pwm.h"
 
-// STM32F4 includes
-#include <pwm.h>
+#include "platform.h"
+#include "atomic.h"
+#include "nvic.h"
+#include "timer.h"
+#include "io.h"
 
 class DshotEsc : public Esc {
 
@@ -81,6 +83,43 @@ class DshotEsc : public Esc {
             COMMAND_STATE_POSTDELAY   // delay period after the cmd has been sent
         } commandVehicleState_e;
 
+    protected:
+
+        typedef struct dshotProtocolControl_s {
+            uint16_t value;
+            bool requestTelemetry;
+        } dshotProtocolControl_t;
+
+        typedef struct {
+            TIM_TypeDef *timer;
+            uint16_t outputPeriod;
+            dmaResource_t *dmaBurstRef;
+            uint16_t dmaBurstLength;
+            uint32_t *dmaBurstBuffer;
+            uint16_t timerDmaSources;
+        } motorDmaTimer_t;
+
+        typedef struct motorDmaOutput_s {
+            dshotProtocolControl_t protocolControl;
+            ioTag_t ioTag;
+            const timerHardware_t *timerHardware;
+            uint16_t timerDmaSource;
+            uint8_t timerDmaIndex;
+            bool configured;
+            uint8_t output;
+            uint8_t index;
+            uint32_t iocfg;
+            DMA_InitTypeDef   dmaInitStruct;
+            volatile bool isInput;
+            int32_t dshotTelemetryDeadtimeUs;
+            uint8_t dmaInputLen;
+            TIM_OCInitTypeDef ocInitStruct;
+            TIM_ICInitTypeDef icInitStruct;
+            dmaResource_t *dmaRef;
+            motorDmaTimer_t *timer;
+            uint32_t * dmaBuffer;
+        } motorDmaOutput_t;
+
         typedef struct {
             commandVehicleState_e state;
             uint32_t nextCommandCycleDelay;
@@ -99,6 +138,21 @@ class DshotEsc : public Esc {
         bool m_enabled;
 
         uint8_t m_motorPins[MAX_SUPPORTED_MOTORS];
+
+        static uint16_t getDshotPacketAtomic(dshotProtocolControl_t *pcb)
+        {
+            uint16_t packet = 0;
+
+            ATOMIC_BLOCK(NVIC_PRIO_DSHOT_DMA) {
+                packet = (pcb->value << 1) | (pcb->requestTelemetry ? 1 : 0);
+
+                // reset telemetry request to make sure it's triggered only
+                // once in a row
+                pcb->requestTelemetry = false;    
+            }
+
+            return packet;
+        }
 
         bool isLastCommand(void)
         {
