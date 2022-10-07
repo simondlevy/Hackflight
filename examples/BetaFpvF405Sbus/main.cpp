@@ -20,7 +20,7 @@
 #include <alignment/rotate270.h>
 #include <core/clock.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/dshot/bitbang.h>
+#include <escs/dshot/dsbitbang.h>
 #include <hackflight.h>
 #include <imus/real/softquat/mpu6000.h>
 #include <leds/real/stm32f4.h>
