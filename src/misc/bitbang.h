@@ -47,14 +47,12 @@ typedef struct dmaRegCache_s {
 } dmaRegCache_t;
 
 // Per pacer timer
-
 typedef struct bbPacer_s {
     TIM_TypeDef *tim;
     uint16_t dmaSources;
 } bbPacer_t;
 
 // Per GPIO port and timer channel
-
 typedef struct bbPort_s {
     int portIndex;
     GPIO_TypeDef *gpio;
@@ -118,3 +116,4 @@ extern "C" {
 #if defined (__cplusplus)
 }
 #endif
+

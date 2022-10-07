@@ -24,6 +24,7 @@
 #include "escs/dshot.h"
 
 #include "misc/bitbang.h"
+#include "misc/newbitbang.h"
 
 #include <dma.h>
 #include <dma_reqmap.h>
