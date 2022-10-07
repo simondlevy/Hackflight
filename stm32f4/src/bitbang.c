@@ -28,7 +28,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "nvic.h"
 #include "timer.h"
 
-#include "bitbang.h"
+#include "misc/bitbang.h"
 
 // XXX
 extern uint8_t bbPuPdMode;

@@ -23,8 +23,8 @@
 // Hackflight includes
 #include "escs/dshot.h"
 
-// STM32F4 includes
-#include <bitbang.h>
+#include "misc/bitbang.h"
+
 #include <dma.h>
 #include <dma_reqmap.h>
 #include <io.h>
