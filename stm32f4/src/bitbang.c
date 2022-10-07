@@ -14,20 +14,6 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <stdint.h>
-#include <math.h>
-#include <string.h>
-
-#include "platform.h"
-
-#include "atomic.h"
-#include "io.h"
-#include "io_impl.h"
-#include "dma.h"
-#include "dma_reqmap.h"
-#include "nvic.h"
-#include "timer.h"
-
 #include "misc/bitbang.h"
 
 // XXX
