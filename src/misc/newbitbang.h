@@ -33,9 +33,6 @@
 #include "nvic.h"
 #include "timer.h"
 
-// XXX
-extern uint8_t bbPuPdMode;
-
 class Bitbang {
 
     typedef enum {
@@ -121,17 +118,19 @@ class Bitbang {
         dmaRegCache->M0AR = ((DMA_Stream_TypeDef *)dmaResource)->M0AR;
     }
 
-    void bbDMA_Cmd(bbPort_t *bbPort, FunctionalState NewState)
+    public:
+
+    static void bbDMA_Cmd(bbPort_t *bbPort, FunctionalState NewState)
     {
         xDMA_Cmd(bbPort->dmaResource, NewState);
     }
 
-    int  bbDMA_Count(bbPort_t *bbPort)
+    static int  bbDMA_Count(bbPort_t *bbPort)
     {
         return xDMA_GetCurrDataCounter(bbPort->dmaResource);
     }
 
-    void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor)
+    static void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor)
     {
         bbPort_t *bbPort = (bbPort_t *)descriptor->userParam;
 
@@ -146,12 +145,12 @@ class Bitbang {
         DMA_CLEAR_FLAG(descriptor, DMA_IT_TCIF);
     }
 
-    void bbDMA_ITConfig(bbPort_t *bbPort)
+    static void bbDMA_ITConfig(bbPort_t *bbPort)
     {
         xDMA_ITConfig(bbPort->dmaResource, DMA_IT_TC, ENABLE);
     }
 
-    void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction)
+    static void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction)
     {
         DMA_InitTypeDef *dmainit =
             (direction == BITBANG_DIRECTION_OUTPUT) ?
@@ -196,7 +195,7 @@ class Bitbang {
         }
     }
 
-    void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io, uint8_t puPdMode)
+    static void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io, uint8_t puPdMode)
     {
         bbPort->gpioModeMask |= (GPIO_MODER_MODER0 << (pinIndex * 2));
         bbPort->gpioModeInput |= (GPIO_Mode_IN << (pinIndex * 2));
@@ -210,7 +209,7 @@ class Bitbang {
                 IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, puPdMode));
     }
 
-    void bbSwitchToOutput(bbPort_t * bbPort)
+    static void bbSwitchToOutput(bbPort_t * bbPort)
     {
         // Output idle level before switching to output
         // Use BSRR register for this
@@ -236,13 +235,13 @@ class Bitbang {
         bbPort->direction = BITBANG_DIRECTION_OUTPUT;
     }
 
-    void bbTIM_DMACmd(
+    static void bbTIM_DMACmd(
             TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState)
     {
         TIM_DMACmd(TIMx, TIM_DMASource, NewState);
     }
 
-    void bbTIM_TimeBaseInit(bbPort_t *bbPort, uint16_t period)
+    static void bbTIM_TimeBaseInit(bbPort_t *bbPort, uint16_t period)
     {
         TIM_TimeBaseInitTypeDef *init = &bbPort->timeBaseInit;
 
@@ -254,7 +253,7 @@ class Bitbang {
         TIM_ARRPreloadConfig(bbPort->timhw->tim, ENABLE);
     }
 
-    void bbTimerChannelInit(bbPort_t *bbPort, resourceOwner_e owner)
+    static void bbTimerChannelInit(bbPort_t *bbPort, resourceOwner_e owner)
     {
         const timerHardware_t *timhw = bbPort->timhw;
 

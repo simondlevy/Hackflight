@@ -16,9 +16,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "misc/bitbang.h"
 
-// XXX
-extern uint8_t bbPuPdMode;
-
 static void bbLoadDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
 {
     ((DMA_Stream_TypeDef *)dmaResource)->CR = dmaRegCache->CR;
