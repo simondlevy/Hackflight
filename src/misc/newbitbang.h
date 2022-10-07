@@ -100,4 +100,65 @@ class Bitbang {
         resourceOwner_t owner;
     } bbPort_t;
 
+    void bbDMA_Cmd(bbPort_t *bbPort, FunctionalState NewState)
+    {
+        (void)bbPort;
+        (void)NewState;
+    }
+
+    int  bbDMA_Count(bbPort_t *bbPort)
+    {
+        (void)bbPort;
+        return 0;
+    }
+
+    void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor)
+    {
+        (void)descriptor;
+    }
+
+    void bbDMA_ITConfig(bbPort_t *bbPort)
+    {
+        (void)bbPort;
+    }
+
+    void bbDMAPreconfigure(bbPort_t *bbPort, uint8_t direction)
+    {
+        (void)bbPort;
+        (void)direction;
+    }
+
+    void bbGpioSetup(bbPort_t * bbPort, int pinIndex, IO_t io, uint8_t puPdMode)
+    {
+        (void)bbPort;
+        (void)pinIndex;
+        (void)io;
+        (void)puPdMode;
+    }
+
+    void bbSwitchToOutput(bbPort_t * bbPort)
+    {
+        (void)bbPort;
+    }
+
+    void bbTIM_DMACmd(
+            TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState)
+    {
+        (void)TIMx;
+        (void)TIM_DMASource;
+        (void)NewState;
+    }
+
+    void bbTIM_TimeBaseInit(bbPort_t *bbPort, uint16_t period)
+    {
+        (void)bbPort;
+        (void)period;
+    }
+
+    void bbTimerChannelInit(bbPort_t *bbPort, resourceOwner_e owner)
+    {
+        (void)bbPort;
+        (void)owner;
+    }
+
 }; // class Bitbang
