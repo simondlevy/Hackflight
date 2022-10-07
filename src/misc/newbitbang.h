@@ -48,12 +48,56 @@ class Bitbang {
         uint32_t M0AR;
     } dmaRegCache_t;
 
-// Per pacer timer
-typedef struct bbPacer_s {
-    TIM_TypeDef *tim;
-    uint16_t dmaSources;
-} bbPacer_t;
+    // Per pacer timer
+    typedef struct bbPacer_s {
+        TIM_TypeDef *tim;
+        uint16_t dmaSources;
+    } bbPacer_t;
 
-// Per GPIO port and timer channel
+    // Per GPIO port and timer channel
+    typedef struct bbPort_s {
+        int portIndex;
+        GPIO_TypeDef *gpio;
+        const timerHardware_t *timhw;
 
-};
+        uint16_t dmaSource;
+
+        dmaResource_t *dmaResource; // DMA resource for this port & timer channel
+        uint32_t dmaChannel;        // DMA channel or peripheral request
+
+        uint8_t direction;
+
+        // DMA resource register cache
+        dmaRegCache_t dmaRegOutput;
+        dmaRegCache_t dmaRegInput;
+
+        // For direct manipulation of GPIO_MODER register
+        uint32_t gpioModeMask;
+        uint32_t gpioModeInput;
+        uint32_t gpioModeOutput;
+
+        // Idle value
+        uint32_t gpioIdleBSRR;
+
+        TIM_TimeBaseInitTypeDef timeBaseInit;
+
+        // Output
+        uint16_t outputARR;
+        DMA_InitTypeDef outputDmaInit;
+        uint32_t *portOutputBuffer;
+        uint32_t portOutputCount;
+
+        // Input
+        uint16_t inputARR;
+        DMA_InitTypeDef inputDmaInit;
+        uint16_t *portInputBuffer;
+        uint32_t portInputCount;
+        bool inputActive;
+
+        // Misc
+        uint32_t outputIrq;
+        uint32_t inputIrq;
+        resourceOwner_t owner;
+    } bbPort_t;
+
+}; // class Bitbang
