@@ -20,18 +20,10 @@
 
 #include <string.h>
 
-// Hackflight includes
 #include "escs/dshot.h"
-
 #include "misc/bitbang.h"
 
-#include <dma.h>
-#include <dma_reqmap.h>
-#include <io.h>
-#include <io_impl.h>
-#include <nvic.h>
 #include <systemdev.h>
-#include <timer.h>
 
 class DshotBitbangEsc : public DshotEsc {
 

@@ -22,16 +22,14 @@
 
 #include <time.h>
 
-#include "timer.h"
-
-#include "platform.h"
-#include "atomic.h"
-#include "io.h"
-#include "io_impl.h"
-#include "dma.h"
-#include "dma_reqmap.h"
-#include "nvic.h"
-#include "timer.h"
+#include <platform.h>
+#include <atomic.h>
+#include <dma.h>
+#include <dma_reqmap.h>
+#include <io.h>
+#include <io_impl.h>
+#include <nvic.h>
+#include <timer.h>
 
 class Bitbang {
 
