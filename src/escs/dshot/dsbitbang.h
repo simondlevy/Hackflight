@@ -80,7 +80,7 @@ class DshotBitbangEsc : public DshotEsc {
             IO_t io;        
             uint8_t output;
             uint32_t iocfg;
-            Bitbang::bbPort_t *bbPort;
+            Bitbang::port_t *bbPort;
             bool configured;
             bool enabled;
         } motor_t;
@@ -95,7 +95,7 @@ class DshotBitbangEsc : public DshotEsc {
         Bitbang::bbPacer_t m_pacers[MAX_MOTOR_PACERS];  // TIM1 or TIM8
         int m_usedMotorPacers = 0;
 
-        Bitbang::bbPort_t m_ports[MAX_SUPPORTED_MOTOR_PORTS];
+        Bitbang::port_t m_ports[MAX_SUPPORTED_MOTOR_PORTS];
         int m_usedMotorPorts;
 
         motor_t m_motors[MAX_SUPPORTED_MOTORS];
@@ -172,7 +172,7 @@ class DshotBitbangEsc : public DshotEsc {
             return NULL;
         }
 
-        Bitbang::bbPort_t *findMotorPort(int portIndex)
+        Bitbang::port_t *findMotorPort(int portIndex)
         {
             for (auto i=0; i<m_usedMotorPorts; i++) {
                 if (m_ports[i].portIndex == portIndex) {
@@ -183,13 +183,13 @@ class DshotBitbangEsc : public DshotEsc {
         }
 
 
-        Bitbang::bbPort_t *allocateMotorPort(int portIndex)
+        Bitbang::port_t *allocateMotorPort(int portIndex)
         {
             if (m_usedMotorPorts >= MAX_SUPPORTED_MOTOR_PORTS) {
                 return NULL;
             }
 
-            Bitbang::bbPort_t *bbPort = &m_ports[m_usedMotorPorts];
+            Bitbang::port_t *bbPort = &m_ports[m_usedMotorPorts];
 
             if (!bbPort->timhw) {
                 // No more pacer channel available
@@ -218,7 +218,7 @@ class DshotBitbangEsc : public DshotEsc {
             }
         }
 
-        void setupDma(Bitbang::bbPort_t *bbPort)
+        void setupDma(Bitbang::port_t *bbPort)
         {
             const dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(bbPort->dmaResource);
             dmaEnable(dmaIdentifier);
@@ -310,7 +310,7 @@ class DshotBitbangEsc : public DshotEsc {
             }
         }
 
-        static void timebaseSetup(Bitbang::bbPort_t *bbPort, protocol_t dshotProtocolType)
+        static void timebaseSetup(Bitbang::port_t *bbPort, protocol_t dshotProtocolType)
         {
             uint32_t timerclock = timerClock(bbPort->timhw->tim);
 
@@ -332,7 +332,7 @@ class DshotBitbangEsc : public DshotEsc {
             int pinIndex = IO_GPIOPinIdx(io);
             int portIndex = IO_GPIOPortIdx(io);
 
-            Bitbang::bbPort_t *bbPort = findMotorPort(portIndex);
+            Bitbang::port_t *bbPort = findMotorPort(portIndex);
 
             if (!bbPort) {
 
@@ -473,7 +473,7 @@ class DshotBitbangEsc : public DshotEsc {
             }
 
             for (auto i=0; i<m_usedMotorPorts; i++) {
-                Bitbang::bbPort_t *bbPort = &m_ports[i];
+                Bitbang::port_t *bbPort = &m_ports[i];
 
                 Bitbang::bbDMA_Cmd(bbPort, ENABLE);
             }
@@ -522,9 +522,9 @@ class DshotBitbangEsc : public DshotEsc {
 
             uint16_t packet = prepareDshotPacket(&bbmotor->protocolControl);
 
-            Bitbang::bbPort_t *bbPort = bbmotor->bbPort;
+            Bitbang::port_t *bbPort = bbmotor->bbPort;
 
-            outputDataSet( bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
+            outputDataSet(bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
         }
 
     public:
