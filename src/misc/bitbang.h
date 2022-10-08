@@ -35,12 +35,7 @@
 
 class Bitbang {
 
-    public: // XXX
-
-    typedef enum {
-        DIRECTION_OUTPUT, 
-        DIRECTION_INPUT
-    } bitbangDirection_e;
+    private:
 
     typedef struct dmaRegCache_s {
         uint32_t CR;
@@ -49,6 +44,31 @@ class Bitbang {
         uint32_t PAR;
         uint32_t M0AR;
     } dmaRegCache_t;
+
+    static void loadDmaRegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
+    {
+        ((DMA_Stream_TypeDef *)dmaResource)->CR = dmaRegCache->CR;
+        ((DMA_Stream_TypeDef *)dmaResource)->FCR = dmaRegCache->FCR;
+        ((DMA_Stream_TypeDef *)dmaResource)->NDTR = dmaRegCache->NDTR;
+        ((DMA_Stream_TypeDef *)dmaResource)->PAR = dmaRegCache->PAR;
+        ((DMA_Stream_TypeDef *)dmaResource)->M0AR = dmaRegCache->M0AR;
+    }
+
+    static void saveDmaRegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
+    {
+        dmaRegCache->CR = ((DMA_Stream_TypeDef *)dmaResource)->CR;
+        dmaRegCache->FCR = ((DMA_Stream_TypeDef *)dmaResource)->FCR;
+        dmaRegCache->NDTR = ((DMA_Stream_TypeDef *)dmaResource)->NDTR;
+        dmaRegCache->PAR = ((DMA_Stream_TypeDef *)dmaResource)->PAR;
+        dmaRegCache->M0AR = ((DMA_Stream_TypeDef *)dmaResource)->M0AR;
+    }
+
+    public:
+
+    typedef enum {
+        DIRECTION_OUTPUT, 
+        DIRECTION_INPUT
+    } bitbangDirection_e;
 
     // Per pacer timer
     typedef struct bbPacer_s {
@@ -102,38 +122,18 @@ class Bitbang {
         resourceOwner_t owner;
     } port_t;
 
-    static void bbLoadDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
-    {
-        ((DMA_Stream_TypeDef *)dmaResource)->CR = dmaRegCache->CR;
-        ((DMA_Stream_TypeDef *)dmaResource)->FCR = dmaRegCache->FCR;
-        ((DMA_Stream_TypeDef *)dmaResource)->NDTR = dmaRegCache->NDTR;
-        ((DMA_Stream_TypeDef *)dmaResource)->PAR = dmaRegCache->PAR;
-        ((DMA_Stream_TypeDef *)dmaResource)->M0AR = dmaRegCache->M0AR;
-    }
-
-    static void bbSaveDMARegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
-    {
-        dmaRegCache->CR = ((DMA_Stream_TypeDef *)dmaResource)->CR;
-        dmaRegCache->FCR = ((DMA_Stream_TypeDef *)dmaResource)->FCR;
-        dmaRegCache->NDTR = ((DMA_Stream_TypeDef *)dmaResource)->NDTR;
-        dmaRegCache->PAR = ((DMA_Stream_TypeDef *)dmaResource)->PAR;
-        dmaRegCache->M0AR = ((DMA_Stream_TypeDef *)dmaResource)->M0AR;
-    }
-
-    public:
-
-    static void bbDMA_Cmd(port_t *bbPort, FunctionalState NewState)
+    static void dmaCmd(port_t *bbPort, FunctionalState NewState)
     {
         xDMA_Cmd(bbPort->dmaResource, NewState);
     }
 
-    static void bbDMAIrqHandler(dmaChannelDescriptor_t *descriptor)
+    static void dmaIrqHandler(dmaChannelDescriptor_t *descriptor)
     {
         port_t *bbPort = (port_t *)descriptor->userParam;
 
-        bbDMA_Cmd(bbPort, DISABLE);
+        dmaCmd(bbPort, DISABLE);
 
-        bbTIM_DMACmd(bbPort->timhw->tim, bbPort->dmaSource, DISABLE);
+        timDmaCmd(bbPort->timhw->tim, bbPort->dmaSource, DISABLE);
 
         if (DMA_GET_FLAG_STATUS(descriptor, DMA_IT_TEIF)) {
             while (1) {};
@@ -142,12 +142,12 @@ class Bitbang {
         DMA_CLEAR_FLAG(descriptor, DMA_IT_TCIF);
     }
 
-    static void bbDMA_ITConfig(port_t *bbPort)
+    static void dmaItConfig(port_t *bbPort)
     {
         xDMA_ITConfig(bbPort->dmaResource, DMA_IT_TC, ENABLE);
     }
 
-    static void bbDMAPreconfigure(port_t *bbPort, uint8_t direction)
+    static void dmaPreconfigure(port_t *bbPort, uint8_t direction)
     {
         DMA_InitTypeDef *dmainit =
             (direction == DIRECTION_OUTPUT) ?
@@ -175,7 +175,7 @@ class Bitbang {
             dmainit->DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
 
             xDMA_Init(bbPort->dmaResource, dmainit);
-            bbSaveDMARegs(bbPort->dmaResource, &bbPort->dmaRegOutput);
+            saveDmaRegs(bbPort->dmaResource, &bbPort->dmaRegOutput);
         } else {
             dmainit->DMA_Priority = DMA_Priority_VeryHigh;
             dmainit->DMA_DIR = DMA_DIR_PeripheralToMemory;
@@ -188,11 +188,11 @@ class Bitbang {
             dmainit->DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
 
             xDMA_Init(bbPort->dmaResource, dmainit);
-            bbSaveDMARegs(bbPort->dmaResource, &bbPort->dmaRegInput);
+            saveDmaRegs(bbPort->dmaResource, &bbPort->dmaRegInput);
         }
     }
 
-    static void bbGpioSetup(port_t * bbPort, int pinIndex, IO_t io, uint8_t puPdMode)
+    static void gpioSetup(port_t * bbPort, int pinIndex, IO_t io, uint8_t puPdMode)
     {
         bbPort->gpioModeMask |= (GPIO_MODER_MODER0 << (pinIndex * 2));
         bbPort->gpioModeInput |= (GPIO_Mode_IN << (pinIndex * 2));
@@ -206,7 +206,7 @@ class Bitbang {
                 IO_CONFIG(GPIO_Mode_OUT, GPIO_Speed_50MHz, GPIO_OType_PP, puPdMode));
     }
 
-    static void bbSwitchToOutput(port_t * bbPort)
+    static void switchToOutput(port_t * bbPort)
     {
         // Output idle level before switching to output
         // Use BSRR register for this
@@ -223,7 +223,7 @@ class Bitbang {
         // Reinitialize port group DMA for output
 
         dmaResource_t *dmaResource = bbPort->dmaResource;
-        bbLoadDMARegs(dmaResource, &bbPort->dmaRegOutput);
+        loadDmaRegs(dmaResource, &bbPort->dmaRegOutput);
 
         // Reinitialize pacer timer for output
 
@@ -232,8 +232,7 @@ class Bitbang {
         bbPort->direction = DIRECTION_OUTPUT;
     }
 
-    static void bbTIM_DMACmd(
-            TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState)
+    static void timDmaCmd(TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState)
     {
         TIM_DMACmd(TIMx, TIM_DMASource, NewState);
     }
@@ -250,7 +249,7 @@ class Bitbang {
         TIM_ARRPreloadConfig(bbPort->timhw->tim, ENABLE);
     }
 
-    static void bbTimerChannelInit(port_t *bbPort, resourceOwner_e owner)
+    static void timerChannelInit(port_t *bbPort, resourceOwner_e owner)
     {
         const timerHardware_t *timhw = bbPort->timhw;
 

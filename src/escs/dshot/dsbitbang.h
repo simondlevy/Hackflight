@@ -229,11 +229,11 @@ class DshotBitbangEsc : public DshotEsc {
 
             dmaSetHandler(
                     dmaIdentifier,
-                    Bitbang::bbDMAIrqHandler,
+                    Bitbang::dmaIrqHandler,
                     NVIC_BUILD_PRIORITY(2, 1),
                     (uint32_t)bbPort);
 
-            Bitbang::bbDMA_ITConfig(bbPort);
+            Bitbang::dmaItConfig(bbPort);
         }
 
         const resourceOwner_t *timerGetOwner(const timerHardware_t *timer)
@@ -360,13 +360,13 @@ class DshotBitbangEsc : public DshotEsc {
 
                 timebaseSetup(bbPort, m_protocol);
                 Bitbang::bbTIM_TimeBaseInit(bbPort, bbPort->outputARR);
-                Bitbang::bbTimerChannelInit(bbPort, OWNER_DSHOT_BITBANG);
+                Bitbang::timerChannelInit(bbPort, OWNER_DSHOT_BITBANG);
 
                 setupDma(bbPort);
-                Bitbang::bbDMAPreconfigure(bbPort, Bitbang::DIRECTION_OUTPUT);
-                Bitbang::bbDMAPreconfigure(bbPort, Bitbang::DIRECTION_INPUT);
+                Bitbang::dmaPreconfigure(bbPort, Bitbang::DIRECTION_OUTPUT);
+                Bitbang::dmaPreconfigure(bbPort, Bitbang::DIRECTION_INPUT);
 
-                Bitbang::bbDMA_ITConfig(bbPort);
+                Bitbang::dmaItConfig(bbPort);
             }
 
             motor_t * bbMotor = &m_motors[motorIndex];
@@ -380,13 +380,12 @@ class DshotBitbangEsc : public DshotEsc {
 
             // Setup GPIO_MODER and GPIO_ODR register manipulation values
 
-            Bitbang::bbGpioSetup(
-                    bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io, m_puPdMode);
+            Bitbang::gpioSetup(bbMotor->bbPort, bbMotor->pinIndex, bbMotor->io, m_puPdMode);
 
             // not inverted
             outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex), false); 
 
-            Bitbang::bbSwitchToOutput(bbPort);
+            Bitbang::switchToOutput(bbPort);
 
             bbMotor->configured = true;
 
@@ -475,19 +474,19 @@ class DshotBitbangEsc : public DshotEsc {
             for (auto i=0; i<m_usedMotorPorts; i++) {
                 Bitbang::port_t *bbPort = &m_ports[i];
 
-                Bitbang::bbDMA_Cmd(bbPort, ENABLE);
+                Bitbang::dmaCmd(bbPort, ENABLE);
             }
 
             for (auto i=0; i<m_usedMotorPacers; i++) {
                 Bitbang::bbPacer_t *bbPacer = &m_pacers[i];
-                Bitbang::bbTIM_DMACmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
+                Bitbang::timDmaCmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
             }
         }
 
         virtual bool updateStart(void) override
         {
             for (auto i=0; i<m_usedMotorPorts; i++) {
-                Bitbang::bbDMA_Cmd(&m_ports[i], DISABLE);
+                Bitbang::dmaCmd(&m_ports[i], DISABLE);
                 outputDataClear(m_ports[i].portOutputBuffer);
             }
 
