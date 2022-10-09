@@ -355,9 +355,7 @@ class DshotBitbangEsc : public DshotEsc {
                 Bitbang::timerChannelInit(bbPort, OWNER_DSHOT_BITBANG);
 
                 setupDma(bbPort);
-                Bitbang::dmaPreconfigure(bbPort, Bitbang::DIRECTION_OUTPUT);
-                Bitbang::dmaPreconfigure(bbPort, Bitbang::DIRECTION_INPUT);
-
+                Bitbang::dmaPreconfigure(bbPort);
                 Bitbang::dmaItConfig(bbPort);
             }
 
@@ -524,6 +522,5 @@ class DshotBitbangEsc : public DshotEsc {
             : DshotEsc(pins, protocol)
         {
         }
-
 
 }; // class DshotBitbangEsc

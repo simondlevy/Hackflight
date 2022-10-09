@@ -63,11 +63,6 @@ class Bitbang {
 
     public:
 
-    typedef enum {
-        DIRECTION_OUTPUT, 
-        DIRECTION_INPUT
-    } bitbangDirection_e;
-
     // Per pacer timer
     typedef struct bbPacer_s {
         TIM_TypeDef *tim;
@@ -84,8 +79,6 @@ class Bitbang {
 
         dmaResource_t *dmaResource; // DMA resource for this port & timer channel
         uint32_t dmaChannel;        // DMA channel or peripheral request
-
-        uint8_t direction;
 
         // DMA resource register cache
         dmaRegCache_t dmaRegOutput;
@@ -145,12 +138,9 @@ class Bitbang {
         xDMA_ITConfig(bbPort->dmaResource, DMA_IT_TC, ENABLE);
     }
 
-    static void dmaPreconfigure(port_t *bbPort, uint8_t direction)
+    static void dmaPreconfigure(port_t *bbPort)
     {
-        DMA_InitTypeDef *dmainit =
-            (direction == DIRECTION_OUTPUT) ?
-            &bbPort->outputDmaInit :
-            &bbPort->inputDmaInit;
+        DMA_InitTypeDef * dmainit = &bbPort->outputDmaInit;
 
         DMA_StructInit(dmainit);
 
@@ -162,32 +152,16 @@ class Bitbang {
         dmainit->DMA_FIFOThreshold = DMA_FIFOThreshold_1QuarterFull ;
         dmainit->DMA_MemoryBurst = DMA_MemoryBurst_Single ;
         dmainit->DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+        dmainit->DMA_Priority = DMA_Priority_High;
+        dmainit->DMA_DIR = DMA_DIR_MemoryToPeripheral;
+        dmainit->DMA_BufferSize = bbPort->portOutputCount;
+        dmainit->DMA_PeripheralBaseAddr = (uint32_t)&bbPort->gpio->BSRRL;
+        dmainit->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
+        dmainit->DMA_Memory0BaseAddr = (uint32_t)bbPort->portOutputBuffer;
+        dmainit->DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
 
-        if (direction == DIRECTION_OUTPUT) {
-            dmainit->DMA_Priority = DMA_Priority_High;
-            dmainit->DMA_DIR = DMA_DIR_MemoryToPeripheral;
-            dmainit->DMA_BufferSize = bbPort->portOutputCount;
-            dmainit->DMA_PeripheralBaseAddr = (uint32_t)&bbPort->gpio->BSRRL;
-            dmainit->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
-            dmainit->DMA_Memory0BaseAddr = (uint32_t)bbPort->portOutputBuffer;
-            dmainit->DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
-
-            xDMA_Init(bbPort->dmaResource, dmainit);
-            saveDmaRegs(bbPort->dmaResource, &bbPort->dmaRegOutput);
-        } else {
-            dmainit->DMA_Priority = DMA_Priority_VeryHigh;
-            dmainit->DMA_DIR = DMA_DIR_PeripheralToMemory;
-            dmainit->DMA_BufferSize = bbPort->portInputCount;
-
-            dmainit->DMA_PeripheralBaseAddr = (uint32_t)&bbPort->gpio->IDR;
-
-            dmainit->DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-            dmainit->DMA_Memory0BaseAddr = (uint32_t)bbPort->portInputBuffer;
-            dmainit->DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
-
-            xDMA_Init(bbPort->dmaResource, dmainit);
-            saveDmaRegs(bbPort->dmaResource, &bbPort->dmaRegInput);
-        }
+        xDMA_Init(bbPort->dmaResource, dmainit);
+        saveDmaRegs(bbPort->dmaResource, &bbPort->dmaRegOutput);
     }
 
     static void gpioSetup(port_t * bbPort, int pinIndex, IO_t io, uint8_t puPdMode)
@@ -226,8 +200,6 @@ class Bitbang {
         // Reinitialize pacer timer for output
 
         bbPort->timhw->tim->ARR = bbPort->outputARR;
-
-        bbPort->direction = DIRECTION_OUTPUT;
     }
 
     static void timDmaCmd(TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState NewState)
