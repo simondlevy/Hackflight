@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "escs/dshot.h"
-#include "misc/bitbang.h"
+#include "support/bitbang.h"
 
 #include <systemdev.h>
 
