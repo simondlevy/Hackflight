@@ -154,6 +154,7 @@ class Bitbang {
         dmainit->DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
         dmainit->DMA_Priority = DMA_Priority_High;
         dmainit->DMA_DIR = DMA_DIR_MemoryToPeripheral;
+
         dmainit->DMA_BufferSize = bbPort->portOutputCount;
         dmainit->DMA_PeripheralBaseAddr = (uint32_t)&bbPort->gpio->BSRRL;
         dmainit->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;

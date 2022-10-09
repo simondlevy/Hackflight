@@ -120,6 +120,7 @@ STM32_SRC = \
             spi_stm32f405.c \
             dma_common.c \
             dma_reqmap_f405.c \
+            dma_stm32f4xx.c \
             exti.c \
             io.c \
             pinio.c \
