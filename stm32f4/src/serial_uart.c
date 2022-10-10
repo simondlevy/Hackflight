@@ -22,7 +22,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "macros.h"
 
 #include "dma.h"
-#include "dma_reqmap.h"
 #include "rcc.h"
 #include "serialdev.h"
 #include "serial_uart.h"

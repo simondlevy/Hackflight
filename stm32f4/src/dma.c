@@ -20,13 +20,13 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "adc.h"
 
 #include "dma.h"
-#include "dma_reqmap.h"
 
 #include "nvic.h"
 #include "resource.h"
 #include "serialdev.h"
 #include "serial_uart.h"
 #include "spi.h"
+#include "timer.h"
 #include "timer_def.h"
 
 #include "stm32f4xx_dma.h"

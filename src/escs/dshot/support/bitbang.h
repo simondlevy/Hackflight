@@ -23,7 +23,7 @@
 #include <time.h>
 
 #include <atomic.h>
-#include <dma_reqmap.h>
+#include <dma.h>
 #include <io.h>
 #include <io_impl.h>
 #include <nvic.h>

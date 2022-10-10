@@ -23,7 +23,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "atomic.h"
 #include "dma.h"
-#include "dma_reqmap.h"
 #include "io.h"
 #include "nvic.h"
 #include "macros.h"

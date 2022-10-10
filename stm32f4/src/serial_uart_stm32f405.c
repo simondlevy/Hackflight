@@ -22,7 +22,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include "systemdev.h"
 #include "io.h"
 #include "dma.h"
-#include "dma_reqmap.h"
 #include "nvic.h"
 #include "rcc.h"
 

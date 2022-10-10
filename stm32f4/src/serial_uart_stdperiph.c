@@ -21,7 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <macros.h>
 
 #include "dma.h"
-#include "dma_reqmap.h"
+#include "timer.h"
 #include "inverter.h"
 #include "nvic.h"
 #include "platform.h"
