@@ -489,7 +489,7 @@ dmaoptValue_t dmaGetOptionByTimer(const timerHardware_t *timer)
 /*
  * DMA descriptors.
  */
-dmaChannelDescriptor_t dmaDescriptors[DMA_LAST_HANDLER] = {
+static dmaChannelDescriptor_t dmaDescriptors[DMA_LAST_HANDLER] = {
     DEFINE_DMA_CHANNEL(DMA1, 0,  0),
     DEFINE_DMA_CHANNEL(DMA1, 1,  6),
     DEFINE_DMA_CHANNEL(DMA1, 2, 16),
