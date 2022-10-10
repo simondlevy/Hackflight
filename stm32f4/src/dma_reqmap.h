@@ -104,3 +104,24 @@ extern "C" {
 #define xDMA_GetFlagStatus(dmaResource, flags) DMA_GetFlagStatus((DMA_ARCH_TYPE *)(dmaResource), flags)
 #define xDMA_ClearFlag(dmaResource, flags) DMA_ClearFlag((DMA_ARCH_TYPE *)(dmaResource), flags)
 #define xDMA_MemoryTargetConfig(dmaResource, address, target) DMA_MemoryTargetConfig((DMA_ARCH_TYPE *)(dmaResource), address, target)
+
+#define DEFINE_DMA_IRQ_HANDLER(d, s, i) void DMA ## d ## _Stream ## s ## _IRQHandler(void) {\
+                                               const uint8_t index = DMA_IDENTIFIER_TO_INDEX(i); \
+                                               dmaCallbackHandlerFuncPtr handler = dmaDescriptors[index].irqHandlerCallback; \
+                                               if (handler) \
+                                                   handler(&dmaDescriptors[index]); \
+                                        }
+
+#define DMA_CLEAR_FLAG(d, flag) if (d->flagsShift > 31) d->dma->HIFCR = (flag << (d->flagsShift - 32)); else d->dma->LIFCR = (flag << d->flagsShift)
+#define DMA_GET_FLAG_STATUS(d, flag) (d->flagsShift > 31 ? d->dma->HISR & (flag << (d->flagsShift - 32)): d->dma->LISR & (flag << d->flagsShift))
+
+
+#define DMA_IT_TCIF         ((uint32_t)0x00000020)
+#define DMA_IT_HTIF         ((uint32_t)0x00000010)
+#define DMA_IT_TEIF         ((uint32_t)0x00000008)
+#define DMA_IT_DMEIF        ((uint32_t)0x00000004)
+#define DMA_IT_FEIF         ((uint32_t)0x00000001)
+
+#define IS_DMA_ENABLED(reg) (((DMA_ARCH_TYPE *)(reg))->CR & DMA_SxCR_EN)
+#define REG_NDTR NDTR
+
