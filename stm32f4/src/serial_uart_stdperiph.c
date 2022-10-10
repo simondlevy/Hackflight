@@ -20,6 +20,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <serial.h>
 #include <macros.h>
 
+#include "dma.h"
+#include "dma_reqmap.h"
 #include "inverter.h"
 #include "nvic.h"
 #include "platform.h"
