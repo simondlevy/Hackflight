@@ -118,9 +118,8 @@ STM32_SRC = \
             serial_debug.c \
             spi.c \
             spi_stm32f405.c \
-            dma_reqmap_f405.c \
+            dma.c \
 			stm32f4xx_dma.c \
-            dma_stm32f4xx.c \
             exti.c \
             io.c \
             pinio.c \
