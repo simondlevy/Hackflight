@@ -19,9 +19,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include "platform.h"
-
 #include "nvic.h"
 #include "dma.h"
+#include "dma_impl.h"
 #include "resource.h"
 
 /*
@@ -106,3 +106,43 @@ void dmaSetHandler(dmaIdentifier_e identifier, dmaCallbackHandlerFuncPtr callbac
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 }
+
+dmaIdentifier_e dmaAllocate(dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex)
+{
+    if (dmaGetOwner(identifier)->owner != OWNER_FREE) {
+        return DMA_NONE;
+    }
+
+    const int index = DMA_IDENTIFIER_TO_INDEX(identifier);
+    dmaDescriptors[index].owner.owner = owner;
+    dmaDescriptors[index].owner.resourceIndex = resourceIndex;
+
+    return identifier;
+}
+
+const resourceOwner_t *dmaGetOwner(dmaIdentifier_e identifier)
+{
+    return &dmaDescriptors[DMA_IDENTIFIER_TO_INDEX(identifier)].owner;
+}
+
+dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel)
+{
+    for (int i = 0; i < DMA_LAST_HANDLER; i++) {
+        if (dmaDescriptors[i].ref == channel) {
+            return i + 1;
+        }
+    }
+
+    return 0;
+}
+
+dmaChannelDescriptor_t* dmaGetDescriptorByIdentifier(const dmaIdentifier_e identifier)
+{
+    return &dmaDescriptors[DMA_IDENTIFIER_TO_INDEX(identifier)];
+}
+
+uint32_t dmaGetChannel(const uint8_t channel)
+{
+    return ((uint32_t)channel*2)<<24;
+}
+
