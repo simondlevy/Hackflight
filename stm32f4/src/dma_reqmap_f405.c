@@ -40,34 +40,6 @@ typedef struct dmaTimerMapping_s {
 
 #define DMA(d, s, c) { DMA_CODE(d, s, c), (dmaResource_t *)DMA ## d ## _Stream ## s, DMA_Channel_ ## c }
 
-static const dmaPeripheralMapping_t dmaPeripheralMapping[] = {
-
-    // Everything including F405 and F446
-    { DMA_PERIPH_SPI_MOSI,  SPIDEV_1,  { DMA(2, 3, 3), DMA(2, 5, 3) } },
-    { DMA_PERIPH_SPI_MISO,  SPIDEV_1,  { DMA(2, 0, 3), DMA(2, 2, 3) } },
-    { DMA_PERIPH_SPI_MOSI,  SPIDEV_2,  { DMA(1, 4, 0) } },
-    { DMA_PERIPH_SPI_MISO,  SPIDEV_2,  { DMA(1, 3, 0) } },
-    { DMA_PERIPH_SPI_MOSI,  SPIDEV_3,  { DMA(1, 5, 0), DMA(1, 7, 0) } },
-    { DMA_PERIPH_SPI_MISO,  SPIDEV_3,  { DMA(1, 0, 0), DMA(1, 2, 0) } },
-
-    { DMA_PERIPH_ADC,     ADCDEV_1,  { DMA(2, 0, 0), DMA(2, 4, 0) } },
-    { DMA_PERIPH_ADC,     ADCDEV_2,  { DMA(2, 2, 1), DMA(2, 3, 1) } },
-    { DMA_PERIPH_ADC,     ADCDEV_3,  { DMA(2, 0, 2), DMA(2, 1, 2) } },
-
-    { DMA_PERIPH_UART_TX, UARTDEV_1, { DMA(2, 7, 4) } },
-    { DMA_PERIPH_UART_RX, UARTDEV_1, { DMA(2, 5, 4), DMA(2, 2, 4) } },
-    { DMA_PERIPH_UART_TX, UARTDEV_2, { DMA(1, 6, 4) } },
-    { DMA_PERIPH_UART_RX, UARTDEV_2, { DMA(1, 5, 4) } },
-    { DMA_PERIPH_UART_TX, UARTDEV_3, { DMA(1, 3, 4) } },
-    { DMA_PERIPH_UART_RX, UARTDEV_3, { DMA(1, 1, 4) } },
-    { DMA_PERIPH_UART_TX, UARTDEV_4, { DMA(1, 4, 4) } },
-    { DMA_PERIPH_UART_RX, UARTDEV_4, { DMA(1, 2, 4) } },
-    { DMA_PERIPH_UART_TX, UARTDEV_5, { DMA(1, 7, 4) } },
-    { DMA_PERIPH_UART_RX, UARTDEV_5, { DMA(1, 0, 4) } },
-    { DMA_PERIPH_UART_TX, UARTDEV_6, { DMA(2, 6, 5), DMA(2, 7, 5) } },
-    { DMA_PERIPH_UART_RX, UARTDEV_6, { DMA(2, 1, 5), DMA(2, 2, 5) } },
-};
-
 #define TC(chan) DEF_TIM_CHANNEL(CH_ ## chan)
 
 static const dmaTimerMapping_t dmaTimerMapping[] = {
@@ -103,22 +75,6 @@ static const dmaTimerMapping_t dmaTimerMapping[] = {
 };
 #undef TC
 #undef DMA
-
-const dmaChannelSpec_t *dmaGetChannelSpecByPeripheral(dmaPeripheral_e device, uint8_t index, int8_t opt)
-{
-    if (opt < 0 || opt >= MAX_PERIPHERAL_DMA_OPTIONS) {
-        return NULL;
-    }
-
-    for (unsigned i = 0 ; i < ARRAYLEN(dmaPeripheralMapping) ; i++) {
-        const dmaPeripheralMapping_t *periph = &dmaPeripheralMapping[i];
-        if (periph->device == device && periph->index == index && periph->channelSpec[opt].ref) {
-            return &periph->channelSpec[opt];
-        }
-    }
-
-    return NULL;
-}
 
 const dmaChannelSpec_t *dmaGetChannelSpecByTimerValue(TIM_TypeDef *tim, uint8_t channel, dmaoptValue_t dmaopt)
 {
