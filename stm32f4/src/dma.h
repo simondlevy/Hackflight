@@ -108,22 +108,8 @@ typedef enum {
 #define DMA_IT_DMEIF        ((uint32_t)0x00000004)
 #define DMA_IT_FEIF         ((uint32_t)0x00000001)
 
-// Macros to avoid direct register and register bit access
-
 #define IS_DMA_ENABLED(reg) (((DMA_ARCH_TYPE *)(reg))->CR & DMA_SxCR_EN)
 #define REG_NDTR NDTR
-
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
-#if defined (__cplusplus)
-}
-#endif
-
-//
-// Wrapper macros to cast dmaResource_t back into DMA_ARCH_TYPE
-//
 
 #define xDMA_Init(dmaResource, initStruct) DMA_Init((DMA_ARCH_TYPE *)(dmaResource), initStruct)
 #define xDMA_DeInit(dmaResource) DMA_DeInit((DMA_ARCH_TYPE *)(dmaResource))
