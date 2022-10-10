@@ -618,3 +618,16 @@ uint32_t dmaGetChannel(const uint8_t channel)
     return ((uint32_t)channel*2)<<24;
 }
 
+static void dmaInitChannel(
+        uint8_t j,
+        DMA_TypeDef * dma,
+        dmaResource_t * ref,
+        uint8_t flagShift,
+        IRQn_Type irqN)
+{
+}
+
+void dmaInit(void)
+{
+    //dmaInitChannel(0, DMA1, _, 0, _);
+}

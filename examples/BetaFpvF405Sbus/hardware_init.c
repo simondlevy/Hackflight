@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "dma.h"
 #include "spi.h"
 #include "exti.h"
 #include "inverter.h"
@@ -53,6 +54,7 @@ void hardwareInit(void)
     systemInitUnusedPins();
     pinioInit();
     timerStart();
+    dmaInit();
 }
 
 #if defined (__cplusplus)

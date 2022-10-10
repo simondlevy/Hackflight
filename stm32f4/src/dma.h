@@ -146,6 +146,8 @@ struct timerHardware_s;
 extern "C" {
 #endif
 
+    void dmaInit(void);
+
     dmaoptValue_t dmaoptByTag(ioTag_t ioTag);
 
     const dmaChannelSpec_t * dmaGetChannelSpecByPeripheral(
