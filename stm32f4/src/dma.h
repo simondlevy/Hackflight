@@ -72,22 +72,3 @@ typedef enum {
     DMA2_ST7_HANDLER,
     DMA_LAST_HANDLER = DMA2_ST7_HANDLER
 } dmaIdentifier_e;
-
-#define DMA_DEVICE_NO(x)    ((((x)-1) / 8) + 1)
-#define DMA_DEVICE_INDEX(x) ((((x)-1) % 8))
-#define DMA_OUTPUT_INDEX    0
-#define DMA_OUTPUT_STRING   "DMA%d Stream %d:"
-#define DMA_INPUT_STRING    "DMA%d_ST%d"
-
-#define DEFINE_DMA_CHANNEL(d, s, f) { \
-    .dma = d, \
-    .ref = (dmaResource_t *)d ## _Stream ## s, \
-    .stream = s, \
-    .irqHandlerCallback = NULL, \
-    .flagsShift = f, \
-    .irqN = d ## _Stream ## s ## _IRQn, \
-    .userParam = 0, \
-    .owner.owner = 0, \
-    .owner.resourceIndex = 0 \
-    }
-
