@@ -18,8 +18,10 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "platform.h"
 #include "adc.h"
+
 #include "dma.h"
 #include "dma_reqmap.h"
+
 #include "nvic.h"
 #include "resource.h"
 #include "serialdev.h"
