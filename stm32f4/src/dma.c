@@ -486,9 +486,19 @@ dmaoptValue_t dmaGetOptionByTimer(const timerHardware_t *timer)
     return DMA_OPT_UNUSED;
 }
 
-/*
- * DMA descriptors.
- */
+#define DEFINE_DMA_CHANNEL(d, s, f) { \
+    .dma = d, \
+    .ref = (dmaResource_t *)d ## _Stream ## s, \
+    .stream = s, \
+    .irqHandlerCallback = NULL, \
+    .flagsShift = f, \
+    .irqN = d ## _Stream ## s ## _IRQn, \
+    .userParam = 0, \
+    .owner.owner = 0, \
+    .owner.resourceIndex = 0 \
+    }
+
+
 static dmaChannelDescriptor_t dmaDescriptors[DMA_LAST_HANDLER] = {
     DEFINE_DMA_CHANNEL(DMA1, 0,  0),
     DEFINE_DMA_CHANNEL(DMA1, 1,  6),

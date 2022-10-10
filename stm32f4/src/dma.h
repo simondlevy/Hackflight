@@ -56,18 +56,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define DMA_OUTPUT_STRING   "DMA%d Stream %d:"
 #define DMA_INPUT_STRING    "DMA%d_ST%d"
 
-#define DEFINE_DMA_CHANNEL(d, s, f) { \
-    .dma = d, \
-    .ref = (dmaResource_t *)d ## _Stream ## s, \
-    .stream = s, \
-    .irqHandlerCallback = NULL, \
-    .flagsShift = f, \
-    .irqN = d ## _Stream ## s ## _IRQn, \
-    .userParam = 0, \
-    .owner.owner = 0, \
-    .owner.resourceIndex = 0 \
-    }
-
 typedef enum {
     DMA_NONE = 0,
     DMA1_ST0_HANDLER = 1,
