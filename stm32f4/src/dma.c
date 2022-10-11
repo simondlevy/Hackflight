@@ -618,16 +618,30 @@ uint32_t dmaGetChannel(const uint8_t channel)
     return ((uint32_t)channel*2)<<24;
 }
 
-static void dmaInitChannel(
+static void defineDmaChannel(
         uint8_t j,
         DMA_TypeDef * dma,
-        dmaResource_t * ref,
-        uint8_t flagShift,
+        uint8_t stream,
+        DMA_Stream_TypeDef * ref,
+        uint8_t flagsShift,
         IRQn_Type irqN)
 {
+    dmaChannelDescriptor_t * desc = &dmaDescriptors[j];
+
+    desc->dma = dma;
+    desc->ref = (dmaResource_t *)ref;
+    desc->stream = stream;
+    desc->flagsShift = flagsShift;
+    desc->irqN = irqN;
 }
 
 void dmaInit(void)
 {
-    //dmaInitChannel(0, DMA1, _, 0, _);
+    defineDmaChannel(
+            0,                  // j
+            DMA1,               // dma
+            0,                  // stream
+            DMA1_Stream0,       // ref
+            0,                  // flagsShift
+            DMA1_Stream0_IRQn); // irqN
 }
