@@ -637,11 +637,12 @@ static void defineDmaChannel(
 
 void dmaInit(void)
 {
-    defineDmaChannel(
-            0,                  // j
-            DMA1,               // dma
-            0,                  // stream
-            DMA1_Stream0,       // ref
-            0,                  // flagsShift
-            DMA1_Stream0_IRQn); // irqN
+    defineDmaChannel(0, DMA1, 0, DMA1_Stream0, 0,  DMA1_Stream0_IRQn); 
+    defineDmaChannel(1, DMA1, 1, DMA1_Stream1, 6,  DMA1_Stream1_IRQn); 
+    defineDmaChannel(2, DMA1, 2, DMA1_Stream2, 16, DMA1_Stream2_IRQn); 
+    defineDmaChannel(3, DMA1, 3, DMA1_Stream3, 22, DMA1_Stream3_IRQn); 
+    defineDmaChannel(4, DMA1, 4, DMA1_Stream4, 32, DMA1_Stream4_IRQn); 
+    defineDmaChannel(5, DMA1, 5, DMA1_Stream5, 38, DMA1_Stream5_IRQn); 
+    defineDmaChannel(6, DMA1, 6, DMA1_Stream6, 48, DMA1_Stream6_IRQn); 
+    defineDmaChannel(7, DMA1, 7, DMA1_Stream7, 54, DMA1_Stream7_IRQn); 
 }
