@@ -486,12 +486,14 @@ dmaoptValue_t dmaGetOptionByTimer(const timerHardware_t *timer)
     return DMA_OPT_UNUSED;
 }
 
-#define DEFINE_DMA_IRQ_HANDLER(d, s, i) void DMA ## d ## _Stream ## s ## _IRQHandler(void) {\
-                                               const uint8_t index = DMA_IDENTIFIER_TO_INDEX(i); \
-                                               dmaCallbackHandlerFuncPtr handler = dmaDescriptors[index].irqHandlerCallback; \
-                                               if (handler) \
-                                                   handler(&dmaDescriptors[index]); \
-                                        }
+#define DEFINE_DMA_IRQ_HANDLER(d, s, i) \
+    void DMA ## d ## _Stream ## s ## _IRQHandler(void) {\
+        const uint8_t index = DMA_IDENTIFIER_TO_INDEX(i); \
+        dmaCallbackHandlerFuncPtr handler = dmaDescriptors[index].irqHandlerCallback; \
+        if (handler) { \
+            handler(&dmaDescriptors[index]); \
+        } \
+     }
 
 static dmaChannelDescriptor_t dmaDescriptors[DMA_LAST_HANDLER];
 
@@ -501,6 +503,7 @@ static dmaChannelDescriptor_t dmaDescriptors[DMA_LAST_HANDLER];
 
 
 
+/*
 DEFINE_DMA_IRQ_HANDLER(1, 0, DMA1_ST0_HANDLER)
 DEFINE_DMA_IRQ_HANDLER(1, 1, DMA1_ST1_HANDLER)
 DEFINE_DMA_IRQ_HANDLER(1, 2, DMA1_ST2_HANDLER)
@@ -509,6 +512,8 @@ DEFINE_DMA_IRQ_HANDLER(1, 4, DMA1_ST4_HANDLER)
 DEFINE_DMA_IRQ_HANDLER(1, 5, DMA1_ST5_HANDLER)
 DEFINE_DMA_IRQ_HANDLER(1, 6, DMA1_ST6_HANDLER)
 DEFINE_DMA_IRQ_HANDLER(1, 7, DMA1_ST7_HANDLER)
+*/
+
 DEFINE_DMA_IRQ_HANDLER(2, 0, DMA2_ST0_HANDLER)
 DEFINE_DMA_IRQ_HANDLER(2, 1, DMA2_ST1_HANDLER)
 DEFINE_DMA_IRQ_HANDLER(2, 2, DMA2_ST2_HANDLER)
