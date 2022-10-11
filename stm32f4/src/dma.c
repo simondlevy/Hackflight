@@ -645,4 +645,13 @@ void dmaInit(void)
     defineDmaChannel(5, DMA1, 5, DMA1_Stream5, 38, DMA1_Stream5_IRQn); 
     defineDmaChannel(6, DMA1, 6, DMA1_Stream6, 48, DMA1_Stream6_IRQn); 
     defineDmaChannel(7, DMA1, 7, DMA1_Stream7, 54, DMA1_Stream7_IRQn); 
+
+    defineDmaChannel(8,  DMA2, 0, DMA2_Stream0, 0,  DMA2_Stream0_IRQn); 
+    defineDmaChannel(9,  DMA2, 1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
+    defineDmaChannel(10, DMA2, 2, DMA2_Stream2, 16, DMA2_Stream2_IRQn); 
+    defineDmaChannel(11, DMA2, 3, DMA2_Stream3, 22, DMA2_Stream3_IRQn); 
+    defineDmaChannel(12, DMA2, 4, DMA2_Stream4, 32, DMA2_Stream4_IRQn); 
+    defineDmaChannel(13, DMA2, 5, DMA2_Stream5, 38, DMA2_Stream5_IRQn); 
+    defineDmaChannel(14, DMA2, 6, DMA2_Stream6, 48, DMA2_Stream6_IRQn); 
+    defineDmaChannel(15, DMA2, 7, DMA2_Stream7, 54, DMA2_Stream7_IRQn); 
 }
