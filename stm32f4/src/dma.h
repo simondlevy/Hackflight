@@ -142,13 +142,11 @@ extern "C" {
 
     dmaoptValue_t dmaoptByTag(ioTag_t ioTag); // ???
 
+    // serial_uart.c
     dmaIdentifier_e dmaAllocate(
             dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex);
 
     void dmaEnable(dmaIdentifier_e identifier);
-
-    const dmaChannelSpec_t * dmaGetChannelSpecByPeripheral(
-            dmaPeripheral_e device, uint8_t index, int8_t opt);
 
     const dmaChannelSpec_t * dmaGetChannelSpecByTimerValue(
             TIM_TypeDef *tim, uint8_t channel, dmaoptValue_t dmaopt);
