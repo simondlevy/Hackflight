@@ -509,17 +509,15 @@ dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel)
     return 0;
 }
 
-static void defineDmaChannel(
-        uint8_t j,
-        DMA_TypeDef * dma,
+static void defineDma2Channel(
         uint8_t stream,
         DMA_Stream_TypeDef * ref,
         uint8_t flagsShift,
         IRQn_Type irqN)
 {
-    dmaChannelDescriptor_t * desc = &dmaDescriptors[j];
+    dmaChannelDescriptor_t * desc = &dmaDescriptors[stream+8];
 
-    desc->dma = dma;
+    desc->dma = DMA2;
     desc->ref = (dmaResource_t *)ref;
     desc->stream = stream;
     desc->flagsShift = flagsShift;
@@ -528,12 +526,12 @@ static void defineDmaChannel(
 
 void dmaInit(void)
 {
-    defineDmaChannel(8,  DMA2, 0, DMA2_Stream0, 0,  DMA2_Stream0_IRQn); 
-    defineDmaChannel(9,  DMA2, 1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
-    defineDmaChannel(10, DMA2, 2, DMA2_Stream2, 16, DMA2_Stream2_IRQn); 
-    defineDmaChannel(11, DMA2, 3, DMA2_Stream3, 22, DMA2_Stream3_IRQn); 
-    defineDmaChannel(12, DMA2, 4, DMA2_Stream4, 32, DMA2_Stream4_IRQn); 
-    defineDmaChannel(13, DMA2, 5, DMA2_Stream5, 38, DMA2_Stream5_IRQn); 
-    defineDmaChannel(14, DMA2, 6, DMA2_Stream6, 48, DMA2_Stream6_IRQn); 
-    defineDmaChannel(15, DMA2, 7, DMA2_Stream7, 54, DMA2_Stream7_IRQn); 
+    defineDma2Channel(0, DMA2_Stream0, 0,  DMA2_Stream0_IRQn); 
+    defineDma2Channel(1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
+    defineDma2Channel(2, DMA2_Stream2, 16, DMA2_Stream2_IRQn); 
+    defineDma2Channel(3, DMA2_Stream3, 22, DMA2_Stream3_IRQn); 
+    defineDma2Channel(4, DMA2_Stream4, 32, DMA2_Stream4_IRQn); 
+    defineDma2Channel(5, DMA2_Stream5, 38, DMA2_Stream5_IRQn); 
+    defineDma2Channel(6, DMA2_Stream6, 48, DMA2_Stream6_IRQn); 
+    defineDma2Channel(7, DMA2_Stream7, 54, DMA2_Stream7_IRQn); 
 }
