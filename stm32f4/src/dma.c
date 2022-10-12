@@ -406,14 +406,14 @@ const dmaChannelSpec_t *dmaGetChannelSpecByTimerValue(
 
 dmaOptValue_t dmaGetOptionByTimer(const timerHardware_t *timer)
 {
-    for (unsigned i = 0 ; i < ARRAYLEN(dmaTimerMapping); i++) {
+    for (uint8_t i=0 ; i<ARRAYLEN(dmaTimerMapping); i++) {
         const dmaTimerMapping_t *timerMapping = &dmaTimerMapping[i];
         if (timerMapping->tim == timer->tim && timerMapping->channel == timer->channel) {
-            for (unsigned j = 0; j < MAX_TIMER_DMA_OPTIONS; j++) {
+            for (uint8_t j=0; j<MAX_TIMER_DMA_OPTIONS; j++) {
                 const dmaChannelSpec_t *dma = &timerMapping->channelSpec[j];
                 if (dma->ref ==timer->dmaRefConfigured &&
                         dma->channel == timer->dmaChannelConfigured) {
-                    return j;
+                    return (dmaOptValue_t)j;
                 }
             }
         }
