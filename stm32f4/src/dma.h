@@ -140,7 +140,12 @@ extern "C" {
 
     void dmaInit(void);
 
-    dmaoptValue_t dmaoptByTag(ioTag_t ioTag);
+    dmaoptValue_t dmaoptByTag(ioTag_t ioTag); // ???
+
+    dmaIdentifier_e dmaAllocate(
+            dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex);
+
+    void dmaEnable(dmaIdentifier_e identifier);
 
     const dmaChannelSpec_t * dmaGetChannelSpecByPeripheral(
             dmaPeripheral_e device, uint8_t index, int8_t opt);
@@ -148,16 +153,11 @@ extern "C" {
     const dmaChannelSpec_t * dmaGetChannelSpecByTimerValue(
             TIM_TypeDef *tim, uint8_t channel, dmaoptValue_t dmaopt);
 
-    dmaoptValue_t dmaGetOptionByTimer(const struct timerHardware_s *timer);
-
-    dmaIdentifier_e dmaAllocate(
-            dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex);
-
-    void dmaEnable(dmaIdentifier_e identifier);
-
     dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel);
 
-    const resourceOwner_t *dmaGetOwner(dmaIdentifier_e identifier);
+    dmaoptValue_t dmaGetOptionByTimer(const struct timerHardware_s *timer);
+
+    const resourceOwner_t * dmaGetOwner(dmaIdentifier_e identifier);
 
     void dmaSetHandler(
             dmaIdentifier_e identifier,
