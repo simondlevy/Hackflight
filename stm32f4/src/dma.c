@@ -580,11 +580,6 @@ dmaChannelDescriptor_t* dmaGetDescriptorByIdentifier(const dmaIdentifier_e ident
     return &dmaDescriptors[identifier-1];
 }
 
-uint32_t dmaGetChannel(const uint8_t channel)
-{
-    return ((uint32_t)channel*2)<<24;
-}
-
 static void defineDmaChannel(
         uint8_t j,
         DMA_TypeDef * dma,

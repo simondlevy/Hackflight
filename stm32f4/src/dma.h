@@ -159,8 +159,6 @@ extern "C" {
 
     void dmaEnable(dmaIdentifier_e identifier);
 
-    uint32_t dmaGetChannel(const uint8_t channel);
-
     dmaChannelDescriptor_t* dmaGetDescriptorByIdentifier(const dmaIdentifier_e identifier);
 
     dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel);
