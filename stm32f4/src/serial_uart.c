@@ -219,7 +219,7 @@ void uartConfigureDma(uartDevice_t *uartdev)
     if (uartPort->txDMAResource) {
         dmaIdentifier_e identifier = dmaGetIdentifier(uartPort->txDMAResource);
         if (dmaAllocate(identifier, OWNER_SERIAL_TX, RESOURCE_INDEX(hardware->device))) {
-            dmaEnable(identifier);
+            dmaEnable();
             dmaSetHandler(identifier, uartDmaIrqHandler, hardware->txPriority, (uint32_t)uartdev);
             uartPort->txDMAPeripheralBaseAddr = (uint32_t)&UART_REG_TXD(hardware->reg);
         }
@@ -228,7 +228,7 @@ void uartConfigureDma(uartDevice_t *uartdev)
     if (uartPort->rxDMAResource) {
         dmaIdentifier_e identifier = dmaGetIdentifier(uartPort->rxDMAResource);
         if (dmaAllocate(identifier, OWNER_SERIAL_RX, RESOURCE_INDEX(hardware->device))) {
-            dmaEnable(identifier);
+            dmaEnable();
             uartPort->rxDMAPeripheralBaseAddr = (uint32_t)&UART_REG_RXD(hardware->reg);
         }
     }

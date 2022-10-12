@@ -212,15 +212,14 @@ class DshotBitbangEsc : public DshotEsc {
 
         void setupDma(Bitbang::port_t *bbPort)
         {
-            const dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(bbPort->dmaResource);
-            dmaEnable(dmaIdentifier);
+            dmaEnable();
             bbPort->dmaSource = timerDmaSource(bbPort->timhw->channel);
 
             Bitbang::bbPacer_t *bbPacer = findMotorPacer(bbPort->timhw->tim);
             bbPacer->dmaSources |= bbPort->dmaSource;
 
             dmaSetHandler(
-                    dmaIdentifier,
+                    dmaGetIdentifier(bbPort->dmaResource),
                     Bitbang::dmaIrqHandler,
                     NVIC_BUILD_PRIORITY(2, 1),
                     (uint32_t)bbPort);

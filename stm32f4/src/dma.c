@@ -441,12 +441,12 @@ DEFINE_DMA_IRQ_HANDLER(2, 5, DMA2_ST5_HANDLER)
 DEFINE_DMA_IRQ_HANDLER(2, 6, DMA2_ST6_HANDLER)
 DEFINE_DMA_IRQ_HANDLER(2, 7, DMA2_ST7_HANDLER)
 
-void dmaEnable(dmaIdentifier_e identifier)
+void dmaEnable(void)
 {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
 }
 
-#define RETURN_TCIF_FLAG(s, n) if (s == DMA1_Stream ## n || s == DMA2_Stream ## n) return DMA_IT_TCIF ## n
+#define RETURN_TCIF_FLAG(s, n) if (s == DMA2_Stream ## n) return DMA_IT_TCIF ## n
 
 uint32_t dmaFlag_IT_TCIF(const dmaResource_t *stream)
 {
@@ -461,14 +461,13 @@ uint32_t dmaFlag_IT_TCIF(const dmaResource_t *stream)
     return 0;
 }
 
-#define DMA_RCC(x) ((x) == DMA1 ? RCC_AHB1Periph_DMA1 : RCC_AHB1Periph_DMA2)
 void dmaSetHandler(dmaIdentifier_e identifier, dmaCallbackHandlerFuncPtr callback, uint32_t priority, uint32_t userParam)
 {
     NVIC_InitTypeDef NVIC_InitStructure;
 
     const int index = identifier - 1;
 
-    RCC_AHB1PeriphClockCmd(DMA_RCC(dmaDescriptors[index].dma), ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
     dmaDescriptors[index].irqHandlerCallback = callback;
     dmaDescriptors[index].userParam = userParam;
     dmaDescriptors[index].completeFlag = dmaFlag_IT_TCIF(dmaDescriptors[index].ref);

@@ -147,7 +147,7 @@ extern "C" {
             dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex);
 
     // dsbitbang.h
-    void dmaEnable(dmaIdentifier_e identifier);
+    void dmaEnable(void);
 
     // dsbitbang.h
     const dmaChannelSpec_t * dmaGetChannelSpecByTimerValue(
