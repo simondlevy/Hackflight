@@ -488,7 +488,7 @@ dmaoptValue_t dmaGetOptionByTimer(const timerHardware_t *timer)
 
 #define DEFINE_DMA_IRQ_HANDLER(d, s, i) \
     void DMA ## d ## _Stream ## s ## _IRQHandler(void) {\
-        const uint8_t index = DMA_IDENTIFIER_TO_INDEX(i); \
+        const uint8_t index = i - 1; \
         dmaCallbackHandlerFuncPtr handler = dmaDescriptors[index].irqHandlerCallback; \
         if (handler) { \
             handler(&dmaDescriptors[index]); \
@@ -496,23 +496,6 @@ dmaoptValue_t dmaGetOptionByTimer(const timerHardware_t *timer)
      }
 
 static dmaChannelDescriptor_t dmaDescriptors[DMA_LAST_HANDLER];
-
-/*
- * DMA IRQ Handlers
- */
-
-
-
-/*
-DEFINE_DMA_IRQ_HANDLER(1, 0, DMA1_ST0_HANDLER)
-DEFINE_DMA_IRQ_HANDLER(1, 1, DMA1_ST1_HANDLER)
-DEFINE_DMA_IRQ_HANDLER(1, 2, DMA1_ST2_HANDLER)
-DEFINE_DMA_IRQ_HANDLER(1, 3, DMA1_ST3_HANDLER)
-DEFINE_DMA_IRQ_HANDLER(1, 4, DMA1_ST4_HANDLER)
-DEFINE_DMA_IRQ_HANDLER(1, 5, DMA1_ST5_HANDLER)
-DEFINE_DMA_IRQ_HANDLER(1, 6, DMA1_ST6_HANDLER)
-DEFINE_DMA_IRQ_HANDLER(1, 7, DMA1_ST7_HANDLER)
-*/
 
 DEFINE_DMA_IRQ_HANDLER(2, 0, DMA2_ST0_HANDLER)
 DEFINE_DMA_IRQ_HANDLER(2, 1, DMA2_ST1_HANDLER)
@@ -526,7 +509,7 @@ DEFINE_DMA_IRQ_HANDLER(2, 7, DMA2_ST7_HANDLER)
 #define DMA_RCC(x) ((x) == DMA1 ? RCC_AHB1Periph_DMA1 : RCC_AHB1Periph_DMA2)
 void dmaEnable(dmaIdentifier_e identifier)
 {
-    const int index = DMA_IDENTIFIER_TO_INDEX(identifier);
+    const int index = identifier - 1;
     RCC_AHB1PeriphClockCmd(DMA_RCC(dmaDescriptors[index].dma), ENABLE);
 }
 
@@ -549,7 +532,7 @@ void dmaSetHandler(dmaIdentifier_e identifier, dmaCallbackHandlerFuncPtr callbac
 {
     NVIC_InitTypeDef NVIC_InitStructure;
 
-    const int index = DMA_IDENTIFIER_TO_INDEX(identifier);
+    const int index = identifier - 1;
 
     RCC_AHB1PeriphClockCmd(DMA_RCC(dmaDescriptors[index].dma), ENABLE);
     dmaDescriptors[index].irqHandlerCallback = callback;
@@ -569,7 +552,7 @@ dmaIdentifier_e dmaAllocate(dmaIdentifier_e identifier, resourceOwner_e owner, u
         return DMA_NONE;
     }
 
-    const int index = DMA_IDENTIFIER_TO_INDEX(identifier);
+    const int index = identifier - 1;
     dmaDescriptors[index].owner.owner = owner;
     dmaDescriptors[index].owner.resourceIndex = resourceIndex;
 
@@ -578,7 +561,7 @@ dmaIdentifier_e dmaAllocate(dmaIdentifier_e identifier, resourceOwner_e owner, u
 
 const resourceOwner_t *dmaGetOwner(dmaIdentifier_e identifier)
 {
-    return &dmaDescriptors[DMA_IDENTIFIER_TO_INDEX(identifier)].owner;
+    return &dmaDescriptors[identifier-1].owner;
 }
 
 dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel)
@@ -594,7 +577,7 @@ dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel)
 
 dmaChannelDescriptor_t* dmaGetDescriptorByIdentifier(const dmaIdentifier_e identifier)
 {
-    return &dmaDescriptors[DMA_IDENTIFIER_TO_INDEX(identifier)];
+    return &dmaDescriptors[identifier-1];
 }
 
 uint32_t dmaGetChannel(const uint8_t channel)
@@ -621,17 +604,6 @@ static void defineDmaChannel(
 
 void dmaInit(void)
 {
-    /*
-    defineDmaChannel(0, DMA1, 0, DMA1_Stream0, 0,  DMA1_Stream0_IRQn); 
-    defineDmaChannel(1, DMA1, 1, DMA1_Stream1, 6,  DMA1_Stream1_IRQn); 
-    defineDmaChannel(2, DMA1, 2, DMA1_Stream2, 16, DMA1_Stream2_IRQn); 
-    defineDmaChannel(3, DMA1, 3, DMA1_Stream3, 22, DMA1_Stream3_IRQn); 
-    defineDmaChannel(4, DMA1, 4, DMA1_Stream4, 32, DMA1_Stream4_IRQn); 
-    defineDmaChannel(5, DMA1, 5, DMA1_Stream5, 38, DMA1_Stream5_IRQn); 
-    defineDmaChannel(6, DMA1, 6, DMA1_Stream6, 48, DMA1_Stream6_IRQn); 
-    defineDmaChannel(7, DMA1, 7, DMA1_Stream7, 54, DMA1_Stream7_IRQn); 
-    */
-
     defineDmaChannel(8,  DMA2, 0, DMA2_Stream0, 0,  DMA2_Stream0_IRQn); 
     defineDmaChannel(9,  DMA2, 1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
     defineDmaChannel(10, DMA2, 2, DMA2_Stream2, 16, DMA2_Stream2_IRQn); 

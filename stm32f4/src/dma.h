@@ -101,8 +101,6 @@ typedef struct dmaChannelDescriptor_s {
     uint32_t                    completeFlag;
 } dmaChannelDescriptor_t;
 
-#define DMA_IDENTIFIER_TO_INDEX(x) ((x) - 1)
-
 typedef uint16_t dmaCode_t;
 
 typedef struct dmaChannelSpec_s {
