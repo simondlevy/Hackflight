@@ -500,7 +500,7 @@ const resourceOwner_t *dmaGetOwner(dmaIdentifier_e identifier)
 
 dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel)
 {
-    for (int i = 0; i < DMA_LAST_HANDLER; i++) {
+    for (uint8_t i=0; i<DMA_LAST_HANDLER; i++) {
         if (dmaDescriptors[i].ref == channel) {
             return i + 1;
         }
