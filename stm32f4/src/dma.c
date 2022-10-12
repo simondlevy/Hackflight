@@ -77,89 +77,30 @@ void DMA_DeInit(DMA_Stream_TypeDef* DMAy_Streamx)
   DMAy_Streamx->FCR = (uint32_t)0x00000021; 
 
   /* Reset interrupt pending bits for the selected stream */
-  if (DMAy_Streamx == DMA1_Stream0)
-  {
-    /* Reset interrupt pending bits for DMA1 Stream0 */
-    DMA1->LIFCR = DMA_Stream0_IT_MASK;
-  }
-  else if (DMAy_Streamx == DMA1_Stream1)
-  {
-    /* Reset interrupt pending bits for DMA1 Stream1 */
-    DMA1->LIFCR = DMA_Stream1_IT_MASK;
-  }
-  else if (DMAy_Streamx == DMA1_Stream2)
-  {
-    /* Reset interrupt pending bits for DMA1 Stream2 */
-    DMA1->LIFCR = DMA_Stream2_IT_MASK;
-  }
-  else if (DMAy_Streamx == DMA1_Stream3)
-  {
-    /* Reset interrupt pending bits for DMA1 Stream3 */
-    DMA1->LIFCR = DMA_Stream3_IT_MASK;
-  }
-  else if (DMAy_Streamx == DMA1_Stream4)
-  {
-    /* Reset interrupt pending bits for DMA1 Stream4 */
-    DMA1->HIFCR = DMA_Stream4_IT_MASK;
-  }
-  else if (DMAy_Streamx == DMA1_Stream5)
-  {
-    /* Reset interrupt pending bits for DMA1 Stream5 */
-    DMA1->HIFCR = DMA_Stream5_IT_MASK;
-  }
-  else if (DMAy_Streamx == DMA1_Stream6)
-  {
-    /* Reset interrupt pending bits for DMA1 Stream6 */
-    DMA1->HIFCR = (uint32_t)DMA_Stream6_IT_MASK;
-  }
-  else if (DMAy_Streamx == DMA1_Stream7)
-  {
-    /* Reset interrupt pending bits for DMA1 Stream7 */
-    DMA1->HIFCR = DMA_Stream7_IT_MASK;
-  }
-  else if (DMAy_Streamx == DMA2_Stream0)
-  {
-    /* Reset interrupt pending bits for DMA2 Stream0 */
+  if (DMAy_Streamx == DMA2_Stream0) {
     DMA2->LIFCR = DMA_Stream0_IT_MASK;
   }
-  else if (DMAy_Streamx == DMA2_Stream1)
-  {
-    /* Reset interrupt pending bits for DMA2 Stream1 */
+  else if (DMAy_Streamx == DMA2_Stream1) {
     DMA2->LIFCR = DMA_Stream1_IT_MASK;
   }
-  else if (DMAy_Streamx == DMA2_Stream2)
-  {
-    /* Reset interrupt pending bits for DMA2 Stream2 */
+  else if (DMAy_Streamx == DMA2_Stream2) {
     DMA2->LIFCR = DMA_Stream2_IT_MASK;
   }
-  else if (DMAy_Streamx == DMA2_Stream3)
-  {
-    /* Reset interrupt pending bits for DMA2 Stream3 */
+  else if (DMAy_Streamx == DMA2_Stream3) {
     DMA2->LIFCR = DMA_Stream3_IT_MASK;
   }
-  else if (DMAy_Streamx == DMA2_Stream4)
-  {
-    /* Reset interrupt pending bits for DMA2 Stream4 */
+  else if (DMAy_Streamx == DMA2_Stream4) {
     DMA2->HIFCR = DMA_Stream4_IT_MASK;
   }
-  else if (DMAy_Streamx == DMA2_Stream5)
-  {
-    /* Reset interrupt pending bits for DMA2 Stream5 */
+  else if (DMAy_Streamx == DMA2_Stream5) {
     DMA2->HIFCR = DMA_Stream5_IT_MASK;
   }
-  else if (DMAy_Streamx == DMA2_Stream6)
-  {
-    /* Reset interrupt pending bits for DMA2 Stream6 */
+  else if (DMAy_Streamx == DMA2_Stream6) {
     DMA2->HIFCR = DMA_Stream6_IT_MASK;
   }
-  else 
-  {
-    if (DMAy_Streamx == DMA2_Stream7)
-    {
-      /* Reset interrupt pending bits for DMA2 Stream7 */
+  else if (DMAy_Streamx == DMA2_Stream7) {
       DMA2->HIFCR = DMA_Stream7_IT_MASK;
     }
-  }
 }
 
 void DMA_Init(DMA_Stream_TypeDef* DMAy_Streamx, DMA_InitTypeDef* DMA_InitStruct)
