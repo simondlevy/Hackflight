@@ -70,6 +70,7 @@ typedef enum {
     DMA2_ST7_HANDLER,
     DMA_LAST_HANDLER = DMA2_ST7_HANDLER
 } dmaIdentifier_e;
+
 #define CACHE_LINE_SIZE 32
 #define CACHE_LINE_MASK (CACHE_LINE_SIZE - 1)
 

@@ -502,11 +502,11 @@ dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel)
 {
     for (uint8_t i=0; i<DMA_LAST_HANDLER; i++) {
         if (dmaDescriptors[i].ref == channel) {
-            return i + 1;
+            return (dmaIdentifier_e)(i + 1);
         }
     }
 
-    return 0;
+    return DMA_NONE;
 }
 
 static void defineDma2Channel(
