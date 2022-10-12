@@ -503,8 +503,7 @@ DEFINE_DMA_IRQ_HANDLER(2, 7, DMA2_ST7_HANDLER)
 #define DMA_RCC(x) ((x) == DMA1 ? RCC_AHB1Periph_DMA1 : RCC_AHB1Periph_DMA2)
 void dmaEnable(dmaIdentifier_e identifier)
 {
-    const int index = identifier - 1;
-    RCC_AHB1PeriphClockCmd(DMA_RCC(dmaDescriptors[index].dma), ENABLE);
+    RCC_AHB1PeriphClockCmd(DMA_RCC(dmaDescriptors[identifier-1].dma), ENABLE);
 }
 
 #define RETURN_TCIF_FLAG(s, n) if (s == DMA1_Stream ## n || s == DMA2_Stream ## n) return DMA_IT_TCIF ## n

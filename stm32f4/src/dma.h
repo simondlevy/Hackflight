@@ -146,17 +146,23 @@ extern "C" {
     dmaIdentifier_e dmaAllocate(
             dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex);
 
+    // dsbitbang.h
     void dmaEnable(dmaIdentifier_e identifier);
 
+    // dsbitbang.h
     const dmaChannelSpec_t * dmaGetChannelSpecByTimerValue(
             TIM_TypeDef *tim, uint8_t channel, dmaoptValue_t dmaopt);
 
+    // dsbitbang.h
     dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel);
 
+    // dsbitbang.h
     dmaoptValue_t dmaGetOptionByTimer(const struct timerHardware_s *timer);
 
+    // dsbitbang.h
     const resourceOwner_t * dmaGetOwner(dmaIdentifier_e identifier);
 
+    // dsbitbang.h, serial_uart.c
     void dmaSetHandler(
             dmaIdentifier_e identifier,
             dmaCallbackHandlerFuncPtr callback,
