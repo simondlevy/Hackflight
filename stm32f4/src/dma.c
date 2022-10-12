@@ -332,13 +332,13 @@ void DMA_ITConfig(DMA_Stream_TypeDef* DMAy_Streamx, uint32_t DMA_IT, FunctionalS
   }
 }// ----------------------------------------------------------------------------
 
-typedef struct dmaPeripheralMapping_s {
+typedef struct {
     dmaPeripheral_e device;
     uint8_t index;
     dmaChannelSpec_t channelSpec[MAX_PERIPHERAL_DMA_OPTIONS];
 } dmaPeripheralMapping_t;
 
-typedef struct dmaTimerMapping_s {
+typedef struct {
     TIM_TypeDef *tim;
     uint8_t channel;
     dmaChannelSpec_t channelSpec[MAX_TIMER_DMA_OPTIONS];
