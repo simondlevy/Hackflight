@@ -51,8 +51,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define DMA_INPUT_STRING    "DMA%d_ST%d"
 
 typedef enum {
-    DMA_NONE = 0,
-    DMA1_ST0_HANDLER = 1,
+    DMA_NONE,
+    DMA1_ST0_HANDLER,
     DMA1_ST1_HANDLER,
     DMA1_ST2_HANDLER,
     DMA1_ST3_HANDLER,
