@@ -148,18 +148,12 @@ extern "C" {
     const dmaChannelSpec_t * dmaGetChannelSpecByTimerValue(
             TIM_TypeDef *tim, uint8_t channel, dmaoptValue_t dmaopt);
 
-    const dmaChannelSpec_t * dmaGetChannelSpecByTimer(const struct timerHardware_s *timer);
-
     dmaoptValue_t dmaGetOptionByTimer(const struct timerHardware_s *timer);
-
-    dmaoptValue_t dmaGetUpOptionByTimer(const struct timerHardware_s *timer);
 
     dmaIdentifier_e dmaAllocate(
             dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex);
 
     void dmaEnable(dmaIdentifier_e identifier);
-
-    dmaChannelDescriptor_t* dmaGetDescriptorByIdentifier(const dmaIdentifier_e identifier);
 
     dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel);
 

@@ -441,7 +441,8 @@ static const dmaTimerMapping_t dmaTimerMapping[] = {
 #undef TC
 #undef DMA
 
-const dmaChannelSpec_t *dmaGetChannelSpecByTimerValue(TIM_TypeDef *tim, uint8_t channel, dmaoptValue_t dmaopt)
+const dmaChannelSpec_t *dmaGetChannelSpecByTimerValue(
+        TIM_TypeDef *tim, uint8_t channel, dmaoptValue_t dmaopt)
 {
     if (dmaopt < 0 || dmaopt >= MAX_TIMER_DMA_OPTIONS) {
         return NULL;
@@ -449,22 +450,15 @@ const dmaChannelSpec_t *dmaGetChannelSpecByTimerValue(TIM_TypeDef *tim, uint8_t 
 
     for (unsigned i = 0 ; i < ARRAYLEN(dmaTimerMapping) ; i++) {
         const dmaTimerMapping_t *timerMapping = &dmaTimerMapping[i];
-        if (timerMapping->tim == tim && timerMapping->channel == channel && timerMapping->channelSpec[dmaopt].ref) {
+
+        if (timerMapping->tim == tim && timerMapping->channel == channel &&
+                timerMapping->channelSpec[dmaopt].ref) {
+
             return &timerMapping->channelSpec[dmaopt];
         }
     }
 
     return NULL;
-}
-
-const dmaChannelSpec_t *dmaGetChannelSpecByTimer(const timerHardware_t *timer)
-{
-    if (!timer) {
-        return NULL;
-    }
-
-    dmaoptValue_t dmaopt = dmaoptByTag(timer->tag);
-    return dmaGetChannelSpecByTimerValue(timer->tim, timer->channel, dmaopt);
 }
 
 // dmaGetOptionByTimer is called by pgResetFn_timerIOConfig to find out dmaopt for pre-configured timer.
@@ -546,7 +540,8 @@ void dmaSetHandler(dmaIdentifier_e identifier, dmaCallbackHandlerFuncPtr callbac
     NVIC_Init(&NVIC_InitStructure);
 }
 
-dmaIdentifier_e dmaAllocate(dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex)
+dmaIdentifier_e dmaAllocate(
+        dmaIdentifier_e identifier, resourceOwner_e owner, uint8_t resourceIndex)
 {
     if (dmaGetOwner(identifier)->owner != OWNER_FREE) {
         return DMA_NONE;
@@ -573,11 +568,6 @@ dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel)
     }
 
     return 0;
-}
-
-dmaChannelDescriptor_t* dmaGetDescriptorByIdentifier(const dmaIdentifier_e identifier)
-{
-    return &dmaDescriptors[identifier-1];
 }
 
 static void defineDmaChannel(
