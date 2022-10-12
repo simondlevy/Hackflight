@@ -287,10 +287,10 @@ class DshotBitbangEsc : public DshotEsc {
                         continue;
                     }
 
-                    dmaoptValue_t dmaopt = dmaGetOptionByTimer(timer);
+                    dmaOptValue_t dmaOpt = dmaGetOptionByTimer(timer);
                     const dmaChannelSpec_t *dmaChannelSpec =
                         dmaGetChannelSpecByTimerValue(timer->tim, timer->channel,
-                                dmaopt); dmaResource_t *dma = dmaChannelSpec->ref;
+                                dmaOpt); dmaResource_t *dma = dmaChannelSpec->ref;
                     dmaIdentifier_e dmaIdentifier = dmaGetIdentifier(dma);
                     if (dmaGetOwner(dmaIdentifier)->owner == OWNER_FREE) {
                         m_ports[bbPortIndex].timhw = timer;

@@ -122,7 +122,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define DEF_TIM_OUTPUT(ch)         CONCAT(DEF_TIM_OUTPUT__, DEF_TIM_CH_GET(ch))
 #define DEF_TIM_OUTPUT__D(chan_n, n_channel) PP_IIF(n_channel, TIMER_OUTPUT_N_CHANNEL, TIMER_OUTPUT_NONE)
 
-#define DEF_TIM(tim, chan, pin, flags, out, dmaopt) {           \
+#define DEF_TIM(tim, chan, pin, flags, out, dmaOpt) {           \
     tim,                                                        \
     TIMER_GET_IO_TAG(pin),                                      \
     DEF_TIM_CHANNEL(CH_ ## chan),                               \
@@ -130,8 +130,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
     (DEF_TIM_OUTPUT(CH_ ## chan) | out),                        \
     DEF_TIM_AF(TIM_ ## tim)                                     \
     DEF_TIM_DMA_COND(/* add comma */ ,                          \
-        DEF_TIM_DMA_STREAM(dmaopt, TCH_## tim ## _ ## chan),    \
-        DEF_TIM_DMA_CHANNEL(dmaopt, TCH_## tim ## _ ## chan)    \
+        DEF_TIM_DMA_STREAM(dmaOpt, TCH_## tim ## _ ## chan),    \
+        DEF_TIM_DMA_CHANNEL(dmaOpt, TCH_## tim ## _ ## chan)    \
     )                                                           \
     DEF_TIM_DMA_COND(/* add comma */ ,                          \
         DEF_TIM_DMA_STREAM(0, TCH_## tim ## _UP),               \

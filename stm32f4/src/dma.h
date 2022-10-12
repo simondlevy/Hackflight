@@ -126,7 +126,7 @@ typedef enum {
     DMA_PERIPH_TIMUP,
 } dmaPeripheral_e;
 
-typedef int8_t dmaoptValue_t;
+typedef int8_t dmaOptValue_t;
 
 #define DMA_OPT_UNUSED (-1)
 
@@ -141,7 +141,7 @@ extern "C" {
 
     void dmaInit(void);
 
-    dmaoptValue_t dmaoptByTag(ioTag_t ioTag); // ???
+    dmaOptValue_t dmaOptByTag(ioTag_t ioTag); // ???
 
     // serial_uart.c
     dmaIdentifier_e dmaAllocate(
@@ -152,13 +152,13 @@ extern "C" {
 
     // dsbitbang.h
     const dmaChannelSpec_t * dmaGetChannelSpecByTimerValue(
-            TIM_TypeDef *tim, uint8_t channel, dmaoptValue_t dmaopt);
+            TIM_TypeDef *tim, uint8_t channel, dmaOptValue_t dmaOpt);
 
     // dsbitbang.h
     dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel);
 
     // dsbitbang.h
-    dmaoptValue_t dmaGetOptionByTimer(const struct timerHardware_s *timer);
+    dmaOptValue_t dmaGetOptionByTimer(const struct timerHardware_s *timer);
 
     // dsbitbang.h
     const resourceOwner_t * dmaGetOwner(dmaIdentifier_e identifier);

@@ -383,9 +383,9 @@ static const dmaTimerMapping_t dmaTimerMapping[] = {
 #undef DMA
 
 const dmaChannelSpec_t *dmaGetChannelSpecByTimerValue(
-        TIM_TypeDef *tim, uint8_t channel, dmaoptValue_t dmaopt)
+        TIM_TypeDef *tim, uint8_t channel, dmaOptValue_t dmaOpt)
 {
-    if (dmaopt < 0 || dmaopt >= MAX_TIMER_DMA_OPTIONS) {
+    if (dmaOpt < 0 || dmaOpt >= MAX_TIMER_DMA_OPTIONS) {
         return NULL;
     }
 
@@ -393,25 +393,26 @@ const dmaChannelSpec_t *dmaGetChannelSpecByTimerValue(
         const dmaTimerMapping_t *timerMapping = &dmaTimerMapping[i];
 
         if (timerMapping->tim == tim && timerMapping->channel == channel &&
-                timerMapping->channelSpec[dmaopt].ref) {
+                timerMapping->channelSpec[dmaOpt].ref) {
 
-            return &timerMapping->channelSpec[dmaopt];
+            return &timerMapping->channelSpec[dmaOpt];
         }
     }
 
     return NULL;
 }
 
-// dmaGetOptionByTimer is called by pgResetFn_timerIOConfig to find out dmaopt for pre-configured timer.
+// dmaGetOptionByTimer is called by pgResetFn_timerIOConfig to find out dmaOpt for pre-configured timer.
 
-dmaoptValue_t dmaGetOptionByTimer(const timerHardware_t *timer)
+dmaOptValue_t dmaGetOptionByTimer(const timerHardware_t *timer)
 {
     for (unsigned i = 0 ; i < ARRAYLEN(dmaTimerMapping); i++) {
         const dmaTimerMapping_t *timerMapping = &dmaTimerMapping[i];
         if (timerMapping->tim == timer->tim && timerMapping->channel == timer->channel) {
             for (unsigned j = 0; j < MAX_TIMER_DMA_OPTIONS; j++) {
                 const dmaChannelSpec_t *dma = &timerMapping->channelSpec[j];
-                if (dma->ref == timer->dmaRefConfigured && dma->channel == timer->dmaChannelConfigured) {
+                if (dma->ref ==timer->dmaRefConfigured &&
+                        dma->channel == timer->dmaChannelConfigured) {
                     return j;
                 }
             }

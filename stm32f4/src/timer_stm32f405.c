@@ -868,7 +868,7 @@ const timerHardware_t fullTimerHardware[TIMER_CHANNEL_COUNT] = {
 typedef struct timerIOConfig_s {
     ioTag_t ioTag;
     uint8_t index;
-    int8_t dmaopt;
+    int8_t dmaOpt;
 } timerIOConfig_t;
 
 const resourceOwner_t freeOwner = { .owner = OWNER_FREE, .resourceIndex = 0 };
@@ -961,41 +961,41 @@ void timerIoInit(void)
 {
     timerIOConfig[0].ioTag = 40;
     timerIOConfig[0].index = 2;
-    timerIOConfig[0].dmaopt = -1; 
+    timerIOConfig[0].dmaOpt = -1; 
 
     timerIOConfig[1].ioTag = 56;
     timerIOConfig[1].index = 2;
-    timerIOConfig[1].dmaopt = -1; 
+    timerIOConfig[1].dmaOpt = -1; 
 
     timerIOConfig[2].ioTag = 32;
     timerIOConfig[2].index = 2;
-    timerIOConfig[2].dmaopt = -1; 
+    timerIOConfig[2].dmaOpt = -1; 
 
     timerIOConfig[3].ioTag = 33;
     timerIOConfig[3].index = 2;
-    timerIOConfig[3].dmaopt = -1; 
+    timerIOConfig[3].dmaOpt = -1; 
 
     timerIOConfig[4].ioTag = 19;
     timerIOConfig[4].index = 1;
-    timerIOConfig[4].dmaopt = 1; 
+    timerIOConfig[4].dmaOpt = 1; 
 
     timerIOConfig[5].ioTag = 18;
     timerIOConfig[5].index = 1;
-    timerIOConfig[5].dmaopt = 0; 
+    timerIOConfig[5].dmaOpt = 0; 
 
     timerIOConfig[6].ioTag = 38;
     timerIOConfig[6].index = 1;
-    timerIOConfig[6].dmaopt = 0; 
+    timerIOConfig[6].dmaOpt = 0; 
 
     timerIOConfig[7].ioTag = 24;
     timerIOConfig[7].index = 1;
-    timerIOConfig[7].dmaopt = -1; 
+    timerIOConfig[7].dmaOpt = -1; 
 
     timerIOConfig[8].ioTag = 25;
     timerIOConfig[8].index = 1;
-    timerIOConfig[8].dmaopt = 0; 
+    timerIOConfig[8].dmaOpt = 0; 
 
     timerIOConfig[9].ioTag = 26;
     timerIOConfig[9].index = 1;
-    timerIOConfig[9].dmaopt = 0; 
+    timerIOConfig[9].dmaOpt = 0; 
 }
