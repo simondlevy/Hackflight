@@ -389,7 +389,7 @@ const dmaChannelSpec_t *dmaGetChannelSpecByTimerValue(
         return NULL;
     }
 
-    for (unsigned i = 0 ; i < ARRAYLEN(dmaTimerMapping) ; i++) {
+    for (uint8_t i=0 ; i<ARRAYLEN(dmaTimerMapping) ; i++) {
         const dmaTimerMapping_t *timerMapping = &dmaTimerMapping[i];
 
         if (timerMapping->tim == tim && timerMapping->channel == channel &&
