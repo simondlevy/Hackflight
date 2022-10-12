@@ -462,11 +462,15 @@ uint32_t dmaFlag_IT_TCIF(const dmaResource_t *stream)
     return 0;
 }
 
-void dmaSetHandler(dmaIdentifier_e identifier, dmaCallbackHandlerFuncPtr callback, uint32_t priority, uint32_t userParam)
+void dmaSetHandler(
+        dmaIdentifier_e identifier,
+        dmaCallbackHandlerFuncPtr callback,
+        uint32_t priority,
+        uint32_t userParam)
 {
     NVIC_InitTypeDef NVIC_InitStructure;
 
-    const int index = identifier - 1;
+    const int8_t index = identifier - 1;
 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
     dmaDescriptors[index].irqHandlerCallback = callback;
@@ -487,7 +491,7 @@ dmaIdentifier_e dmaAllocate(
         return DMA_NONE;
     }
 
-    const int index = identifier - 1;
+    const int8_t index = identifier - 1;
     dmaDescriptors[index].owner.owner = owner;
     dmaDescriptors[index].owner.resourceIndex = resourceIndex;
 
