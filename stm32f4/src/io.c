@@ -193,7 +193,7 @@ bool IOIsFreeOrPreinit(IO_t io)
     return false;
 }
 
-void IOConfigGPIO(IO_t io, ioConfig_t cfg)
+static void configGPIO(IO_t io, ioConfig_t cfg)
 {
     if (!io) {
         return;
@@ -209,7 +209,17 @@ void IOConfigGPIO(IO_t io, ioConfig_t cfg)
         .GPIO_OType = (cfg >> 4) & 0x01,
         .GPIO_PuPd = (cfg >> 5) & 0x03,
     };
+
     GPIO_Init(IO_GPIO(io), &init);
+}
+
+void IOConfigGPIO(IO_t io, ioConfig_t cfg)
+{
+    if (!io) {
+        return;
+    }
+
+    configGPIO(io, cfg);
 }
 
 void IOConfigGPIOAF(IO_t io, ioConfig_t cfg, uint8_t af)
@@ -218,18 +228,9 @@ void IOConfigGPIOAF(IO_t io, ioConfig_t cfg, uint8_t af)
         return;
     }
 
-    const uint8_t rcc = ioPortDefs[IO_GPIOPortIdx(io)].rcc;
-    RCC_ClockCmd(rcc, ENABLE);
     GPIO_PinAFConfig(IO_GPIO(io), IO_GPIO_PinSource(io), af);
 
-    GPIO_InitTypeDef init = {
-        .GPIO_Pin = IO_Pin(io),
-        .GPIO_Mode = (cfg >> 0) & 0x03,
-        .GPIO_Speed = (cfg >> 2) & 0x03,
-        .GPIO_OType = (cfg >> 4) & 0x01,
-        .GPIO_PuPd = (cfg >> 5) & 0x03,
-    };
-    GPIO_Init(IO_GPIO(io), &init);
+    configGPIO(io, cfg);
 }
 
 static const uint16_t ioDefUsedMask[DEFIO_PORT_USED_COUNT] = { DEFIO_PORT_USED_LIST };
