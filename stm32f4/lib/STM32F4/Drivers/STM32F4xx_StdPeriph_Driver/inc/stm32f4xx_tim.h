@@ -1034,7 +1034,7 @@ uint32_t TIM_GetCounter(TIM_TypeDef* TIMx);
 uint16_t TIM_GetPrescaler(TIM_TypeDef* TIMx);
 void TIM_UpdateDisableConfig(TIM_TypeDef* TIMx, FunctionalState NewState);
 void TIM_UpdateRequestConfig(TIM_TypeDef* TIMx, uint16_t TIM_UpdateSource);
-void TIM_ARRPreloadConfig(TIM_TypeDef* TIMx, FunctionalState NewState);
+//void TIM_ARRPreloadConfig(TIM_TypeDef* TIMx, FunctionalState NewState);
 void TIM_SelectOnePulseMode(TIM_TypeDef* TIMx, uint16_t TIM_OPMode);
 void TIM_SetClockDivision(TIM_TypeDef* TIMx, uint16_t TIM_CKD);
 void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState);

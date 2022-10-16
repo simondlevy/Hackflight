@@ -519,6 +519,7 @@ void TIM_UpdateRequestConfig(TIM_TypeDef* TIMx, uint16_t TIM_UpdateSource)
   *          This parameter can be: ENABLE or DISABLE.
   * @retval None
   */
+#if 0
 void TIM_ARRPreloadConfig(TIM_TypeDef* TIMx, FunctionalState NewState)
 {
   /* Check the parameters */
@@ -536,7 +537,7 @@ void TIM_ARRPreloadConfig(TIM_TypeDef* TIMx, FunctionalState NewState)
     TIMx->CR1 &= (uint16_t)~TIM_CR1_ARPE;
   }
 }
-
+#endif
 /**
   * @brief  Selects the TIMx's One Pulse Mode.
   * @param  TIMx: where x can be 1 to 14 to select the TIM peripheral.
