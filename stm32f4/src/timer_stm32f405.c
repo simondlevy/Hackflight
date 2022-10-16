@@ -478,6 +478,7 @@ volatile timCCR_t* timerChCCR(const timerHardware_t *timHw)
     return (volatile timCCR_t*)((volatile char*)&timHw->tim->CCR1 + timHw->channel);
 }
 
+#if 0
 void timerChConfigOC(const timerHardware_t* timHw, bool outEnable, bool stateHigh)
 {
     TIM_OCInitTypeDef  TIM_OCInitStructure;
@@ -513,6 +514,7 @@ void timerChConfigOC(const timerHardware_t* timHw, bool outEnable, bool stateHig
         break;
     }
 }
+#endif
 
 static void timCCxHandler(TIM_TypeDef *tim, timerConfig_t *timerConfig)
 {

@@ -978,6 +978,7 @@ void TIM_OC4Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
   *         be initialized.
   * @retval None
   */
+#if 0
 void TIM_OCStructInit(TIM_OCInitTypeDef* TIM_OCInitStruct)
 {
   /* Set the default configuration */
@@ -990,7 +991,7 @@ void TIM_OCStructInit(TIM_OCInitTypeDef* TIM_OCInitStruct)
   TIM_OCInitStruct->TIM_OCIdleState = TIM_OCIdleState_Reset;
   TIM_OCInitStruct->TIM_OCNIdleState = TIM_OCNIdleState_Reset;
 }
-
+#endif
 /**
   * @brief  Selects the TIM Output Compare Mode.
   * @note   This function disables the selected channel before changing the Output
