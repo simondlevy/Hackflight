@@ -225,6 +225,7 @@ void configTimeBase(TIM_TypeDef *tim, uint16_t period, uint32_t hz)
 }
 
 // old interface for PWM inputs. It should be replaced
+#if 0
 void timerConfigure(const timerHardware_t *timerHardwarePtr, uint16_t period, uint32_t hz)
 {
     configTimeBase(timerHardwarePtr->tim, period, hz);
@@ -271,6 +272,7 @@ void timerChInit(const timerHardware_t *timHw, channelType_t type, int irqPriori
         timerInfo[timer].priority = irqPriority;
     }
 }
+#endif
 
 void timerChCCHandlerInit(timerCCHandlerRec_t *self, timerCCHandlerCallback *fn)
 {

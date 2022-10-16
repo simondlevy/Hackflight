@@ -590,6 +590,7 @@ void TIM_SetClockDivision(TIM_TypeDef* TIMx, uint16_t TIM_CKD)
   *          This parameter can be: ENABLE or DISABLE.
   * @retval None
   */
+#if 0
 void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState)
 {
   /* Check the parameters */
@@ -607,6 +608,7 @@ void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState)
     TIMx->CR1 &= (uint16_t)~TIM_CR1_CEN;
   }
 }
+#endif
 /**
   * @}
   */
