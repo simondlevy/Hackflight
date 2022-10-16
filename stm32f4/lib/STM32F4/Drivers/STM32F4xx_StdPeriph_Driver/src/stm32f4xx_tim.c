@@ -2265,6 +2265,7 @@ void TIM_BDTRStructInit(TIM_BDTRInitTypeDef* TIM_BDTRInitStruct)
   *          This parameter can be: ENABLE or DISABLE.
   * @retval None
   */
+#if 0
 void TIM_CtrlPWMOutputs(TIM_TypeDef* TIMx, FunctionalState NewState)
 {
   /* Check the parameters */
@@ -2282,6 +2283,7 @@ void TIM_CtrlPWMOutputs(TIM_TypeDef* TIMx, FunctionalState NewState)
     TIMx->BDTR &= (uint16_t)~TIM_BDTR_MOE;
   }  
 }
+#endif
 
 /**
   * @brief  Selects the TIM peripheral Commutation event.

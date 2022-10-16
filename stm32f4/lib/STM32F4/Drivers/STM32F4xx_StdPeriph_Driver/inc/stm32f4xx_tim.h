@@ -1092,7 +1092,7 @@ void TIM_SetIC4Prescaler(TIM_TypeDef* TIMx, uint16_t TIM_ICPSC);
 /* Advanced-control timers (TIM1 and TIM8) specific features ******************/
 void TIM_BDTRConfig(TIM_TypeDef* TIMx, TIM_BDTRInitTypeDef *TIM_BDTRInitStruct);
 void TIM_BDTRStructInit(TIM_BDTRInitTypeDef* TIM_BDTRInitStruct);
-void TIM_CtrlPWMOutputs(TIM_TypeDef* TIMx, FunctionalState NewState);
+//void TIM_CtrlPWMOutputs(TIM_TypeDef* TIMx, FunctionalState NewState);
 void TIM_SelectCOM(TIM_TypeDef* TIMx, FunctionalState NewState);
 void TIM_CCPreloadControl(TIM_TypeDef* TIMx, FunctionalState NewState);
 
