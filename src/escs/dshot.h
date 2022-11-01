@@ -132,6 +132,19 @@ class DshotEsc : public Esc {
 
         uint8_t m_motorCount;
 
+        static uint32_t getDshotBaseFrequency(protocol_t pwmProtocolType)
+        {
+            switch (pwmProtocolType) {
+                case(DSHOT600):
+                    return 600;
+                case(DSHOT300):
+                    return 300;
+                default:
+                case(DSHOT150):
+                    return 150;
+            }
+        }
+
         // This function is used to synchronize the dshot command output timing with
         // the normal motor output timing tied to the PID loop frequency. A "true"
         // result allows the motor output to be sent, "false" means delay until next

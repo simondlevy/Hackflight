@@ -616,19 +616,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static uint32_t getDshotBaseFrequency(protocol_t pwmProtocolType)
-        {
-            switch (pwmProtocolType) {
-                case(DSHOT600):
-                    return 600;
-                case(DSHOT300):
-                    return 300;
-                default:
-                case(DSHOT150):
-                    return 150;
-            }
-        }
-
         static uint32_t dmaFlag_IT_TCIF(const dmaResource_t *stream)
         {
 
@@ -745,9 +732,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void _IOInit(IO_t io, resourceOwner_e owner, uint8_t index)
         {
-            if (!io) {
-                return;
-            }
             ioRec_t *ioRec =_IORec(io);
             ioRec->owner = owner;
             ioRec->index = index;
@@ -790,7 +774,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             {
                 pos = ((uint32_t)0x01) << pinpos;
 
-                currentpin = (pin) & pos;
+                currentpin = pin & pos;
 
                 if (currentpin == pos)
                 {
