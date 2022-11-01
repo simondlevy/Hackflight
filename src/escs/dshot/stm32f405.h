@@ -553,16 +553,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
          }
 
-        static void bbTIM_TimeBaseInit(port_t *bbPort, uint16_t period)
-        {
-            bbPort->TIM_Prescaler = 0; // Feed raw timerClock
-            bbPort->TIM_ClockDivision = TIM_CLOCKDIVISION_DIV1;
-            bbPort->TIM_CounterMode = TIM_COUNTERMODE_UP;
-            bbPort->TIM_Period = period;
-            TIM_TimeBaseInit(TIM1, bbPort);
-            TIM_ARRPreloadConfig(ENABLE);
-        }
-
         static void outputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
         {
             uint32_t resetMask;
@@ -1219,7 +1209,14 @@ class Stm32F405DshotEsc : public DshotEsc {
                     &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
 
                 timebaseSetup(bbPort, m_protocol);
-                bbTIM_TimeBaseInit(bbPort, bbPort->outputARR);
+
+                bbPort->TIM_Prescaler = 0; // Feed raw timerClock
+                bbPort->TIM_ClockDivision = TIM_CLOCKDIVISION_DIV1;
+                bbPort->TIM_CounterMode = TIM_COUNTERMODE_UP;
+                bbPort->TIM_Period = bbPort->outputARR;
+                TIM_TimeBaseInit(TIM1, bbPort);
+                TIM_ARRPreloadConfig(ENABLE);
+
                 timerChannelInit(bbPort);
 
                 setupDma(bbPort);
