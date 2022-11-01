@@ -335,18 +335,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static uint8_t lookupTimerIndex(const TIM_TypeDef *tim)
-        {
-            switch ((uint32_t)tim >> CASE_SHF) {
-
-                case ((uint32_t)TIM1_BASE >> CASE_SHF): return 1;
-                case ((uint32_t)TIM2_BASE >> CASE_SHF): return 2;
-                case ((uint32_t)TIM5_BASE >> CASE_SHF): return 5;
-            }
-
-            return ~1;  // make sure final index is out of range
-        }
-
         static void loadDmaRegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
         {
             ((DMA_Stream_TypeDef *)dmaResource)->CR = dmaRegCache->CR;
@@ -355,28 +343,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         static void saveDmaRegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
         {
             dmaRegCache->CR = ((DMA_Stream_TypeDef *)dmaResource)->CR;
-        }
-
-        static void TIM_ARRPreloadConfig(FunctionalState newState)
-        {
-            if (newState != DISABLE) {
-                TIM1->CR1 |= TIM_CR1_ARPE;
-            }
-            else {
-                TIM1->CR1 &= (uint16_t)~TIM_CR1_ARPE;
-            }
-        }
-
-        static void TIM_Cmd(FunctionalState newState)
-        {
-            if (newState != DISABLE) {
-                // Enable the TIM Counter
-                TIM1->CR1 |= TIM_CR1_CEN;
-            }
-            else {
-                // Disable the TIM Counter
-                TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
-            }
         }
 
         static uint32_t getDmaFlagStatus(
@@ -395,35 +361,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
             else {
                 descriptor->dma->LIFCR = (flag << descriptor->flagsShift);
-            }
-        }
-
-        static void DMA_ITConfig(
-                DMA_Stream_TypeDef* DMAy_Streamx, uint32_t DMA_IT, FunctionalState newState)
-        {
-            // Check if the DMA_IT parameter contains a FIFO interrupt 
-            if ((DMA_IT & DMA_IT_FE) != 0)
-            {
-                if (newState != DISABLE) {
-                    // Enable the selected DMA FIFO interrupts 
-                    DMAy_Streamx->FCR |= (uint32_t)DMA_IT_FE;
-                }    
-                else {
-                    // Disable the selected DMA FIFO interrupts 
-                    DMAy_Streamx->FCR &= ~(uint32_t)DMA_IT_FE;  
-                }
-            }
-
-            // Check if the DMA_IT parameter contains a Transfer interrupt 
-            if (DMA_IT != DMA_IT_FE) {
-                if (newState != DISABLE) {
-                    // Enable the selected DMA transfer interrupts 
-                    DMAy_Streamx->CR |= (uint32_t)(DMA_IT  & TRANSFER_IT_ENABLE_MASK);
-                }
-                else {
-                    // Disable the selected DMA transfer interrupts 
-                    DMAy_Streamx->CR &= ~(uint32_t)(DMA_IT & TRANSFER_IT_ENABLE_MASK);
-                }    
             }
         }
 
@@ -456,7 +393,21 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void dmaItConfig(port_t *bbPort)
         {
-            DMA_ITConfig((DMA_Stream_TypeDef *)bbPort->dmaResource, DMA_IT_TC, ENABLE);
+            DMA_Stream_TypeDef * DMAy_Streamx =
+                (DMA_Stream_TypeDef *)bbPort->dmaResource;
+
+            // Check if the DMA_IT parameter contains a FIFO interrupt 
+            if ((DMA_IT_TC & DMA_IT_FE) != 0)
+            {
+                // Enable the selected DMA FIFO interrupts 
+                DMAy_Streamx->FCR |= (uint32_t)DMA_IT_FE;
+            }
+
+            // Check if the DMA_IT parameter contains a Transfer interrupt 
+            if (DMA_IT_TC != DMA_IT_FE) {
+                // Enable the selected DMA transfer interrupts 
+                DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
+            }
         }
 
         static void dmaPreconfigure(port_t *bbPort)
@@ -485,7 +436,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 // Disable the DMA sources
                 TIM1->DIER &= (uint16_t)~TIM_DMASource;
             }
-         }
+        }
 
         static void outputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
         {
@@ -917,7 +868,8 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             const timerHardware_t *timhw = bbPort->timhw;
 
-            TIM_Cmd(DISABLE);
+            // Disable the TIM Counter
+            TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
 
             switch (timhw->channel) {
                 case TIM_CHANNEL_1:
@@ -934,7 +886,8 @@ class Stm32F405DshotEsc : public DshotEsc {
                     break;
             }
 
-            TIM_Cmd(ENABLE);
+            // Enable the TIM Counter
+            TIM1->CR1 |= TIM_CR1_CEN;
         }
 
         bbPacer_t *findMotorPacer(void)
@@ -1136,7 +1089,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 // and the repetition counter(only for TIM1 and TIM8) value immediately
                 TIM1->EGR = 0x0001;          
 
-                TIM_ARRPreloadConfig(ENABLE);
+                TIM1->CR1 |= TIM_CR1_ARPE;
 
                 timerChannelInit(bbPort);
 
