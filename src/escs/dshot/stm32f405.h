@@ -940,14 +940,11 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpccer |= TIM_OCPOLARITY_HIGH;
             tmpccer |= TIM_OUTPUTSTATE_ENABLE;
 
-            if((TIMx == TIM1) || (TIMx == TIM8)) {
-
-                tmpccer &= (uint16_t)~TIM_CCER_CC1NP;
-                tmpccer |= TIM_OCPOLARITY_HIGH;
-                tmpccer &= (uint16_t)~TIM_CCER_CC1NE;
-                tmpcr2 &= (uint16_t)~TIM_CR2_OIS1;
-                tmpcr2 &= (uint16_t)~TIM_CR2_OIS1N;
-            }
+            tmpccer &= (uint16_t)~TIM_CCER_CC1NP;
+            tmpccer |= TIM_OCPOLARITY_HIGH;
+            tmpccer &= (uint16_t)~TIM_CCER_CC1NE;
+            tmpcr2 &= (uint16_t)~TIM_CR2_OIS1;
+            tmpcr2 &= (uint16_t)~TIM_CR2_OIS1N;
 
             TIMx->CR2 = tmpcr2;
             TIMx->CCMR1 = tmpccmrx;
@@ -969,14 +966,11 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
             tmpccer |= (uint16_t)(TIM_OUTPUTSTATE_ENABLE << 4);
 
-            if((TIMx == TIM1) || (TIMx == TIM8)) {
-
-                tmpccer &= (uint16_t)~TIM_CCER_CC2NP;
-                tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
-                tmpccer &= (uint16_t)~TIM_CCER_CC2NE;
-                tmpcr2 &= (uint16_t)~TIM_CR2_OIS2;
-                tmpcr2 &= (uint16_t)~TIM_CR2_OIS2N;
-            }
+            tmpccer &= (uint16_t)~TIM_CCER_CC2NP;
+            tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
+            tmpccer &= (uint16_t)~TIM_CCER_CC2NE;
+            tmpcr2 &= (uint16_t)~TIM_CR2_OIS2;
+            tmpcr2 &= (uint16_t)~TIM_CR2_OIS2N;
 
             TIMx->CR2 = tmpcr2;
             TIMx->CCMR1 = tmpccmrx;
@@ -998,14 +992,11 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 8);
             tmpccer |= (uint16_t)(TIM_OUTPUTSTATE_ENABLE << 8);
 
-            if((TIMx == TIM1) || (TIMx == TIM8)) {
-
-                tmpccer &= (uint16_t)~TIM_CCER_CC3NP;
-                tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 8);
-                tmpccer &= (uint16_t)~TIM_CCER_CC3NE;
-                tmpcr2 &= (uint16_t)~TIM_CR2_OIS3;
-                tmpcr2 &= (uint16_t)~TIM_CR2_OIS3N;
-            }
+            tmpccer &= (uint16_t)~TIM_CCER_CC3NP;
+            tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 8);
+            tmpccer &= (uint16_t)~TIM_CCER_CC3NE;
+            tmpcr2 &= (uint16_t)~TIM_CR2_OIS3;
+            tmpcr2 &= (uint16_t)~TIM_CR2_OIS3N;
 
             TIMx->CR2 = tmpcr2;
             TIMx->CCMR2 = tmpccmrx;
@@ -1027,12 +1018,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 12);
             tmpccer |= (uint16_t)(TIM_OUTPUTSTATE_ENABLE << 12);
 
-            if((TIMx == TIM1) || (TIMx == TIM8)) {
-
-                tmpccer &= (uint16_t)~TIM_CCER_CC4NP;
-                tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
-                tmpcr2 &=  (uint16_t)~TIM_CR2_OIS4;
-            }
+            tmpccer &= (uint16_t)~TIM_CCER_CC4NP;
+            tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
+            tmpcr2 &=  (uint16_t)~TIM_CR2_OIS4;
 
             TIMx->CR2 = tmpcr2;
             TIMx->CCMR2 = tmpccmrx;
@@ -1079,7 +1067,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                     TIM_OC4Init(TIM1);
                     break;
             }
- 
+
             TIM_Cmd(TIM1, ENABLE);
         }
 
