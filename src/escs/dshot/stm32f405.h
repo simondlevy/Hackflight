@@ -423,38 +423,26 @@ class Stm32F405DshotEsc : public DshotEsc {
             dmaRegCache->CR = ((DMA_Stream_TypeDef *)dmaResource)->CR;
         }
 
-        static void TIM_ARRPreloadConfig(TIM_TypeDef* TIMx, FunctionalState newState)
+        static void TIM_ARRPreloadConfig(FunctionalState newState)
         {
             if (newState != DISABLE) {
-                TIMx->CR1 |= TIM_CR1_ARPE;
+                TIM1->CR1 |= TIM_CR1_ARPE;
             }
             else {
-                TIMx->CR1 &= (uint16_t)~TIM_CR1_ARPE;
+                TIM1->CR1 &= (uint16_t)~TIM_CR1_ARPE;
             }
         }
 
-        static void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState newState)
+        static void TIM_Cmd(FunctionalState newState)
         {
             if (newState != DISABLE) {
                 // Enable the TIM Counter
-                TIMx->CR1 |= TIM_CR1_CEN;
+                TIM1->CR1 |= TIM_CR1_CEN;
             }
             else {
                 // Disable the TIM Counter
-                TIMx->CR1 &= (uint16_t)~TIM_CR1_CEN;
+                TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
             }
-        }
-
-        static void TIM_CtrlPWMOutputs(TIM_TypeDef* TIMx, FunctionalState newState)
-        {
-            if (newState != DISABLE) {
-                // Enable the TIM Main Output
-                TIMx->BDTR |= TIM_BDTR_MOE;
-            }
-            else {
-                // Disable the TIM Main Output
-                TIMx->BDTR &= (uint16_t)~TIM_BDTR_MOE;
-            }  
         }
 
         static uint32_t getDmaFlagStatus(
@@ -523,7 +511,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             dmaCmd(bbPort, DISABLE);
 
-            timDmaCmd(TIM1, bbPort->dmaSource, DISABLE);
+            timDmaCmd(bbPort->dmaSource, DISABLE);
 
             if (getDmaFlagStatus(descriptor, DMA_IT_TEIF)) {
                 while (1) {};
@@ -553,11 +541,17 @@ class Stm32F405DshotEsc : public DshotEsc {
             saveDmaRegs(bbPort->dmaResource, &bbPort->dmaRegOutput);
         }
 
-        static void timDmaCmd(
-                TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState newState)
+        static void timDmaCmd(uint16_t TIM_DMASource, FunctionalState newState)
         {
-            TIM_DMACmd(TIMx, TIM_DMASource, newState);
-        }
+            if (newState != DISABLE) {
+                // Enable the DMA sources
+                TIM1->DIER |= TIM_DMASource; 
+            }
+            else {
+                // Disable the DMA sources
+                TIM1->DIER &= (uint16_t)~TIM_DMASource;
+            }
+         }
 
         static void bbTIM_TimeBaseInit(port_t *bbPort, uint16_t period)
         {
@@ -566,7 +560,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             bbPort->TIM_CounterMode = TIM_COUNTERMODE_UP;
             bbPort->TIM_Period = period;
             TIM_TimeBaseInit(TIM1, bbPort);
-            TIM_ARRPreloadConfig(TIM1, ENABLE);
+            TIM_ARRPreloadConfig(ENABLE);
         }
 
         static void outputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
@@ -661,19 +655,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                     return TIM_DMA_CC4;
             }
             return 0;
-        }
-
-        static void TIM_DMACmd(
-                TIM_TypeDef* TIMx, uint16_t TIM_DMASource, FunctionalState newState)
-        { 
-            if (newState != DISABLE) {
-                // Enable the DMA sources
-                TIMx->DIER |= TIM_DMASource; 
-            }
-            else {
-                // Disable the DMA sources
-                TIMx->DIER &= (uint16_t)~TIM_DMASource;
-            }
         }
 
         static void TIM_TimeBaseInit(TIM_TypeDef * TIMx, port_t * bbPort)
@@ -890,7 +871,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         }
 
         static void TIM_OCInit(
-                TIM_TypeDef* TIMx,
                 const uint32_t ccer_cc_e,
                 uint32_t * ccmr,
                 const uint32_t ccmr_oc,
@@ -900,9 +880,9 @@ class Stm32F405DshotEsc : public DshotEsc {
                 )
         {
             uint16_t tmpccmrx = 0, tmpccer = 0, tmpcr2 = 0;
-            TIMx->CCER &= (uint16_t)~ccer_cc_e;
-            tmpccer = TIMx->CCER;
-            tmpcr2 =  TIMx->CR2;
+            TIM1->CCER &= (uint16_t)~ccer_cc_e;
+            tmpccer = TIM1->CCER;
+            tmpcr2 =  TIM1->CR2;
             tmpccmrx = *ccmr;
             tmpccmrx &= (uint16_t)~ccmr_oc;
             tmpccmrx &= (uint16_t)~ccmr_cc;
@@ -911,7 +891,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpccer |= TIM_OCPOLARITY_HIGH;
             tmpccer |= TIM_OUTPUTSTATE_ENABLE;
 
-            if((TIMx == TIM1) || (TIMx == TIM8)) {
+            if((TIM1 == TIM1) || (TIM1 == TIM8)) {
 
                 //tmpccer &= (uint16_t)~TIM_CCER_CC1NP;
                 //tmpccer |= TIM_OCPOLARITY_HIGH;
@@ -920,10 +900,10 @@ class Stm32F405DshotEsc : public DshotEsc {
                 //tmpcr2 &= (uint16_t)~TIM_CR2_OIS1N;
             }
 
-            TIMx->CR2 = tmpcr2;
+            TIM1->CR2 = tmpcr2;
             *ccmr = tmpccmrx;
             *ccr = 0x00000000;
-            TIMx->CCER = tmpccer;
+            TIM1->CCER = tmpccer;
          }
 
         static void TIM_OC1Init(void)
@@ -1051,7 +1031,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             const timerHardware_t *timhw = bbPort->timhw;
 
-            TIM_Cmd(TIM1, DISABLE);
+            TIM_Cmd(DISABLE);
 
             switch (timhw->channel) {
                 case TIM_CHANNEL_1:
@@ -1068,22 +1048,22 @@ class Stm32F405DshotEsc : public DshotEsc {
                     break;
             }
 
-            TIM_Cmd(TIM1, ENABLE);
+            TIM_Cmd(ENABLE);
         }
 
-        bbPacer_t *findMotorPacer(TIM_TypeDef *tim)
+        bbPacer_t *findMotorPacer(void)
         {
             for (auto i=0; i<MAX_MOTORS; i++) {
 
                 bbPacer_t *bbPacer = &m_pacers[i];
 
                 if (bbPacer->tim == NULL) {
-                    bbPacer->tim = tim;
+                    bbPacer->tim = TIM1;
                     ++m_usedMotorPacers;
                     return bbPacer;
                 }
 
-                if (bbPacer->tim == tim) {
+                if (bbPacer->tim == TIM1) {
                     return bbPacer;
                 }
             }
@@ -1173,7 +1153,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             bbPort->dmaSource = timerDmaSource(bbPort->timhw->channel);
 
-            bbPacer_t *bbPacer = findMotorPacer(TIM1);
+            bbPacer_t *bbPacer = findMotorPacer();
 
             bbPacer->dmaSources |= bbPort->dmaSource;
 
@@ -1512,7 +1492,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             for (auto i=0; i<m_usedMotorPacers; i++) {
                 bbPacer_t *bbPacer = &m_pacers[i];
-                timDmaCmd(bbPacer->tim, bbPacer->dmaSources, ENABLE);
+                timDmaCmd(bbPacer->dmaSources, ENABLE);
             }
         }
 
