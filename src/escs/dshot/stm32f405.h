@@ -1031,9 +1031,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 tmpccer &= (uint16_t)~TIM_CCER_CC4NP;
                 tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
-                //tmpccer &= (uint16_t)~TIM_CCER_CC4NE;
                 tmpcr2 &=  (uint16_t)~TIM_CR2_OIS4;
-                //tmpcr2 &=  (uint16_t)~TIM_CR2_OIS4N;
             }
 
             TIMx->CR2 = tmpcr2;
@@ -1061,34 +1059,27 @@ class Stm32F405DshotEsc : public DshotEsc {
                     0, ENABLE);
         }
 
-
-
-        void timerOCInit(TIM_TypeDef *tim, uint8_t channel)
-        {
-            switch (channel) {
-                case TIM_CHANNEL_1:
-                    TIM_OC1Init(tim);
-                    break;
-                case TIM_CHANNEL_2:
-                    TIM_OC2Init(tim);
-                    break;
-                case TIM_CHANNEL_3:
-                    TIM_OC3Init(tim);
-                    break;
-                case TIM_CHANNEL_4:
-                    TIM_OC4Init(tim);
-                    break;
-            }
-        }
-
         void timerChannelInit(port_t *bbPort)
         {
             const timerHardware_t *timhw = bbPort->timhw;
 
             TIM_Cmd(TIM1, DISABLE);
 
-            timerOCInit(TIM1, timhw->channel);
-
+            switch (timhw->channel) {
+                case TIM_CHANNEL_1:
+                    TIM_OC1Init(TIM1);
+                    break;
+                case TIM_CHANNEL_2:
+                    TIM_OC2Init(TIM1);
+                    break;
+                case TIM_CHANNEL_3:
+                    TIM_OC3Init(TIM1);
+                    break;
+                case TIM_CHANNEL_4:
+                    TIM_OC4Init(TIM1);
+                    break;
+            }
+ 
             TIM_Cmd(TIM1, ENABLE);
         }
 
