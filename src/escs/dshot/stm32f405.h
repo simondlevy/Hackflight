@@ -367,14 +367,14 @@ class Stm32F405DshotEsc : public DshotEsc {
         static void dmaCmd(port_t *bbPort, FunctionalState newState)
         {
             DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)bbPort->dmaResource;
-    
+
             if (newState != DISABLE) {
                 DMAy_Streamx->CR |= (uint32_t)DMA_SxCR_EN;
             }
             else {
                 DMAy_Streamx->CR &= ~(uint32_t)DMA_SxCR_EN;
             }
-         }
+        }
 
         static void dmaIrqHandler(dmaChannelDescriptor_t *descriptor)
         {
@@ -682,7 +682,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             return m_ioRecs + offset;
         }
 
-        static void TIM_OCInit(
+        static void timOcInit(
                 volatile uint32_t * ccmr,
                 volatile uint32_t * ccr,
                 const uint32_t ccer_cc_e,
@@ -716,50 +716,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             *ccmr = tmpccmrx;
             *ccr = 0x00000000;
             TIM1->CCER = tmpccer;
-         }
-
-        static void TIM_OC1Init(void)
-        {
-            TIM_OCInit( &TIM1->CCMR1, &TIM1->CCR1, TIM_CCER_CC1E, TIM_CCMR1_OC1M,
-                    TIM_CCMR1_CC1S, TIM_CCER_CC1P, TIM_CCER_CC1NP, TIM_CR2_OIS1, 
-                    0, 0, 0, 0);
-        }
-
-        static void TIM_OC2Init(void)
-        {
-            TIM_OCInit( &TIM1->CCMR1, &TIM1->CCR2, TIM_CCER_CC2E, TIM_CCMR1_OC2M,
-                    TIM_CCMR1_CC2S, TIM_CCER_CC2P, TIM_CCER_CC2NP, TIM_CR2_OIS2, 
-                    8, 4, 4, 4);
-        }
-
-        static void TIM_OC3Init(void)
-        {
-            TIM_OCInit( &TIM1->CCMR2, &TIM1->CCR3, TIM_CCER_CC3E, TIM_CCMR2_OC3M,
-                    TIM_CCMR2_CC3S, TIM_CCER_CC3P, TIM_CCER_CC3NP, TIM_CR2_OIS3, 
-                    0, 8, 8, 8);
-        }
-
-        static void TIM_OC4Init(void)
-        {
-            TIM1->CCER &= (uint16_t)~TIM_CCER_CC4E;
-            uint16_t tmpccer = TIM1->CCER;
-            uint16_t tmpcr2 =  TIM1->CR2;
-            uint16_t tmpccmrx = TIM1->CCMR2;
-            tmpccmrx &= (uint16_t)~TIM_CCMR2_OC4M;
-            tmpccmrx &= (uint16_t)~TIM_CCMR2_CC4S;
-            tmpccmrx |= (uint16_t)(TIM_OCMODE_TIMING << 8);
-            tmpccer &= (uint16_t)~TIM_CCER_CC4P;
-            tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 12);
-            tmpccer |= (uint16_t)(TIM_OUTPUTSTATE_ENABLE << 12);
-
-            tmpccer &= (uint16_t)~TIM_CCER_CC4NP;
-            tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
-            tmpcr2 &=  (uint16_t)~TIM_CR2_OIS4;
-
-            TIM1->CR2 = tmpcr2;
-            TIM1->CCMR2 = tmpccmrx;
-            TIM1->CCR4 = 0x00000000;
-            TIM1->CCER = tmpccer;
         }
 
         static void rccInit(void)
@@ -789,16 +745,24 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             switch (timhw->channel) {
                 case TIM_CHANNEL_1:
-                    TIM_OC1Init();
+                    timOcInit( &TIM1->CCMR1, &TIM1->CCR1, TIM_CCER_CC1E,
+                            TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
+                            TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
                     break;
                 case TIM_CHANNEL_2:
-                    TIM_OC2Init();
+                    timOcInit( &TIM1->CCMR1, &TIM1->CCR2, TIM_CCER_CC2E,
+                            TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
+                            TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
                     break;
                 case TIM_CHANNEL_3:
-                    TIM_OC3Init();
+                    timOcInit( &TIM1->CCMR2, &TIM1->CCR3, TIM_CCER_CC3E,
+                            TIM_CCMR2_OC3M, TIM_CCMR2_CC3S, TIM_CCER_CC3P,
+                            TIM_CCER_CC3NP, TIM_CR2_OIS3, 0, 8, 8, 8);
                     break;
                 case TIM_CHANNEL_4:
-                    TIM_OC4Init();
+                    timOcInit( &TIM1->CCMR2, &TIM1->CCR4, TIM_CCER_CC4E,
+                            TIM_CCMR2_OC4M, TIM_CCMR2_CC4S, TIM_CCER_CC4P,
+                            TIM_CCER_CC4NP, TIM_CR2_OIS4, 8, 12, 12, 4);
                     break;
             }
 
