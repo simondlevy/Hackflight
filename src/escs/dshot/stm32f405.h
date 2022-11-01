@@ -723,17 +723,14 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint16_t tmpccmrx = TIM1->CCMR1;
             tmpccmrx &= (uint16_t)~TIM_CCMR1_OC1M;
             tmpccmrx &= (uint16_t)~TIM_CCMR1_CC1S;
-            tmpccmrx |= TIM_OCMODE_TIMING;
+            tmpccmrx |= (TIM_OCMODE_TIMING << 0);
             tmpccer &= (uint16_t)~TIM_CCER_CC1P;
-            tmpccer |= TIM_OCPOLARITY_HIGH;
-            tmpccer |= TIM_OUTPUTSTATE_ENABLE;
+            tmpccer |= (TIM_OCPOLARITY_HIGH << 0);
+            tmpccer |= (TIM_OUTPUTSTATE_ENABLE << 0);;
 
             tmpccer &= (uint16_t)~TIM_CCER_CC1NP;
             tmpccer |= (TIM_OCPOLARITY_HIGH << 0);
             tmpcr2 &= (uint16_t)~TIM_CR2_OIS1;
-
-            //tmpccer &= (uint16_t)~TIM_CCER_CC1NE;
-            //tmpcr2 &= (uint16_t)~TIM_CR2_OIS1N;
 
             TIM1->CR2 = tmpcr2;
             TIM1->CCMR1 = tmpccmrx;
@@ -758,9 +755,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
             tmpcr2 &= (uint16_t)~TIM_CR2_OIS2;
 
-            //tmpccer &= (uint16_t)~TIM_CCER_CC2NE;
-            //tmpcr2 &= (uint16_t)~TIM_CR2_OIS2N;
-
             TIM1->CR2 = tmpcr2;
             TIM1->CCMR1 = tmpccmrx;
             TIM1->CCR2 = 0x00000000;
@@ -783,9 +777,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpccer &= (uint16_t)~TIM_CCER_CC3NP;
             tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 8);
             tmpcr2 &= (uint16_t)~TIM_CR2_OIS3;
-
-            //tmpccer &= (uint16_t)~TIM_CCER_CC3NE;
-            //tmpcr2 &= (uint16_t)~TIM_CR2_OIS3N;
 
             TIM1->CR2 = tmpcr2;
             TIM1->CCMR2 = tmpccmrx;
