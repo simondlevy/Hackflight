@@ -302,80 +302,35 @@ class Stm32F405DshotEsc : public DshotEsc {
             return (((prio)&(0x0f>>(7-(NVIC_PRIORITY_GROUPING>>8))))>>4);
         }
 
-        static void RCC_APB2PeriphClockCmd(uint32_t RCC_APB2Periph, FunctionalState newState)
+        static void RCC_APB2PeriphClockEnable(uint32_t RCC_APB2Periph)
         {
-            if (newState != DISABLE) {
-                RCC->APB2ENR |= RCC_APB2Periph;
-            }
-            else {
-                RCC->APB2ENR &= ~RCC_APB2Periph;
-            }
+            RCC->APB2ENR |= RCC_APB2Periph;
         }
 
-        static void RCC_AHB1PeriphResetCmd(uint32_t RCC_AHB1Periph, FunctionalState newState)
+        static void RCC_AHB1PeriphClockEnable(uint32_t RCC_AHB1Periph)
         {
-            if (newState != DISABLE) {
-                RCC->AHB1RSTR |= RCC_AHB1Periph;
-            }
-            else {
-                RCC->AHB1RSTR &= ~RCC_AHB1Periph;
-            }
+            RCC->AHB1ENR |= RCC_AHB1Periph;
         }
 
-        static void RCC_AHB1PeriphClockCmd(uint32_t RCC_AHB1Periph, FunctionalState newState)
+        static void RCC_APB1PeriphClockEnable(uint32_t RCC_APB1Periph)
         {
-            if (newState != DISABLE) {
-                RCC->AHB1ENR |= RCC_AHB1Periph;
-            }
-            else {
-                RCC->AHB1ENR &= ~RCC_AHB1Periph;
-            }
+            RCC->APB1ENR |= RCC_APB1Periph;
         }
 
-        static void RCC_APB2PeriphResetCmd(uint32_t RCC_APB2Periph, FunctionalState newState)
-        {
-            if (newState != DISABLE) {
-                RCC->APB2RSTR |= RCC_APB2Periph;
-            }
-            else {
-                RCC->APB2RSTR &= ~RCC_APB2Periph;
-            }
-        }
-
-        static void RCC_APB1PeriphResetCmd(uint32_t RCC_APB1Periph, FunctionalState newState)
-        {
-            if (newState != DISABLE) {
-                RCC->APB1RSTR |= RCC_APB1Periph;
-            }
-            else {
-                RCC->APB1RSTR &= ~RCC_APB1Periph;
-            }
-        }
-
-        static void RCC_APB1PeriphClockCmd(uint32_t RCC_APB1Periph, FunctionalState newState)
-        {
-            if (newState != DISABLE) {
-                RCC->APB1ENR |= RCC_APB1Periph;
-            }
-            else {
-                RCC->APB1ENR &= ~RCC_APB1Periph;
-            }
-        }
-
-        static void RCC_ClockCmd(uint8_t periphTag, FunctionalState newState)
+        static void RCC_ClockEnable(uint8_t periphTag)
         {
             int tag = periphTag >> 5;
             uint32_t mask = 1 << (periphTag & 0x1f);
 
             switch (tag) {
                 case RCC_APB2:
-                    RCC_APB2PeriphClockCmd(mask, newState);
+                    RCC_APB2PeriphClockEnable(mask);
                     break;
                 case RCC_APB1:
-                    RCC_APB1PeriphClockCmd(mask, newState);
+                    RCC_APB1PeriphClockEnable(mask);
                     break;
                 case RCC_AHB1:
-                    RCC_AHB1PeriphClockCmd(mask, newState);
+                    RCC_AHB1PeriphClockEnable(mask);
                     break;
             }
         }
@@ -721,7 +676,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             const uint8_t rcc = ioPortDefs[_IO_GPIOPortIdx(io)];
 
-            RCC_ClockCmd(rcc, ENABLE);
+            RCC_ClockEnable(rcc);
 
             uint32_t pin =_IO_Pin(io);
             uint32_t mode  = (cfg >> 0) & 0x03;
@@ -942,7 +897,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void rccInit(void)
         {
-            RCC_APB2PeriphClockCmd(
+            RCC_APB2PeriphClockEnable(
                     RCC_APB2LPENR_TIM1LPEN_Msk   |
                     RCC_APB2LPENR_TIM8LPEN_Msk   |
                     RCC_APB2LPENR_USART1LPEN_Msk |
@@ -955,8 +910,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                     RCC_APB2LPENR_SYSCFGLPEN_Msk |
                     RCC_APB2LPENR_TIM9LPEN_Msk   |
                     RCC_APB2LPENR_TIM10LPEN_Msk  |
-                    RCC_APB2LPENR_TIM11LPEN_Msk  |
-                    0, ENABLE);
+                    RCC_APB2LPENR_TIM11LPEN_Msk);
         }
 
         void timerChannelInit(port_t *bbPort)
@@ -1054,7 +1008,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             const int8_t index = identifier - 1;
 
-            RCC_AHB1PeriphClockCmd(RCC_AHB1PERIPH_DMA2, ENABLE);
+            RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
             m_dmaDescriptors[index].irqHandlerCallback = callback;
             m_dmaDescriptors[index].userParam = userParam;
             m_dmaDescriptors[index].completeFlag =
@@ -1081,7 +1035,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void setupDma(port_t *bbPort)
         {
-            RCC_AHB1PeriphClockCmd(RCC_AHB1PERIPH_DMA2, ENABLE);
+            RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
             bbPort->dmaSource = timerDmaSource(bbPort->timhw->channel);
 
@@ -1332,10 +1286,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void timerInit(void)
         {
-            RCC_ClockCmd(timerRCC(TIM5), ENABLE);
-            RCC_ClockCmd(timerRCC(TIM2), ENABLE);
-            RCC_ClockCmd(timerRCC(TIM2), ENABLE);
-            RCC_ClockCmd(timerRCC(TIM5), ENABLE);
+            RCC_ClockEnable(timerRCC(TIM5));
+            RCC_ClockEnable(timerRCC(TIM2));
+            RCC_ClockEnable(timerRCC(TIM2));
+            RCC_ClockEnable(timerRCC(TIM5));
         }
 
         const resourceOwner_t freeOwner = { .owner = OWNER_FREE, .resourceIndex = 0 };
@@ -1460,7 +1414,8 @@ class Stm32F405DshotEsc : public DshotEsc {
                 return;
             }
 
-            // If there is a command ready to go overwrite the value and send that instead
+            // If there is a command ready to go overwrite the value and send
+            // that instead
             if (commandIsProcessing()) {
                 ivalue = commandGetCurrent(index);
             }
