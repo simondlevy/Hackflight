@@ -683,13 +683,17 @@ class Stm32F405DshotEsc : public DshotEsc {
         }
 
         static void TIM_OCInit(
+                volatile uint32_t * ccmr,
+                volatile uint32_t * ccr,
                 const uint32_t ccer_cc_e,
-                uint32_t * ccmr,
                 const uint32_t ccmr_oc,
                 const uint32_t ccmr_cc,
                 const uint32_t ccer_ccp,
-                const uint8_t shift,
-                uint32_t * ccr
+                const uint32_t ccer_ccnp,
+                const uint32_t cr2_ois,
+                const uint8_t mode_shift,
+                const uint8_t polarity_shift,
+                const uint8_t state_shift
                 )
         {
             TIM1->CCER &= (uint16_t)~ccer_cc_e;
@@ -698,16 +702,14 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint16_t tmpccmrx = *ccmr;
             tmpccmrx &= (uint16_t)~ccmr_oc;
             tmpccmrx &= (uint16_t)~ccmr_cc;
-            tmpccmrx |= TIM_OCMODE_TIMING;
+            tmpccmrx |= (TIM_OCMODE_TIMING << mode_shift);
             tmpccer &= (uint16_t)~ccer_ccp;
-            tmpccer |= TIM_OCPOLARITY_HIGH;
-            tmpccer |= TIM_OUTPUTSTATE_ENABLE;
+            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift);
+            tmpccer |= (TIM_OUTPUTSTATE_ENABLE < state_shift);
 
-            //tmpccer &= (uint16_t)~TIM_CCER_CC1NP;
-            //tmpccer |= TIM_OCPOLARITY_HIGH;
-            //tmpccer &= (uint16_t)~TIM_CCER_CC1NE;
-            //tmpcr2 &= (uint16_t)~TIM_CR2_OIS1;
-            //tmpcr2 &= (uint16_t)~TIM_CR2_OIS1N;
+            tmpccer &= (uint16_t)~ccer_ccnp;
+            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift);
+            tmpcr2 &= (uint16_t)~cr2_ois;
 
             TIM1->CR2 = tmpcr2;
             *ccmr = tmpccmrx;
@@ -717,6 +719,21 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void TIM_OC1Init(void)
         {
+            TIM_OCInit(
+                    &TIM1->CCMR1,
+                    &TIM1->CCR1,
+                    TIM_CCER_CC1E,
+                    TIM_CCMR1_OC1M,
+                    TIM_CCMR1_CC1S,
+                    TIM_CCER_CC1P,
+                    TIM_CCER_CC1NP,
+                    TIM_CR2_OIS1,
+                    0, 
+                    0, 
+                    0);
+
+
+            /*
             TIM1->CCER &= (uint16_t)~TIM_CCER_CC1E;
             uint16_t tmpccer = TIM1->CCER;
             uint16_t tmpcr2 =  TIM1->CR2;
@@ -735,7 +752,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CR2 = tmpcr2;
             TIM1->CCMR1 = tmpccmrx;
             TIM1->CCR1 = 0x00000000;
-            TIM1->CCER = tmpccer;
+            TIM1->CCER = tmpccer;*/
         }
 
         static void TIM_OC2Init(void)
