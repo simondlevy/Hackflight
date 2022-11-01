@@ -839,29 +839,12 @@ class Stm32F405DshotEsc : public DshotEsc {
             return 31 - __builtin_clz(_IO_Pin(io));  // CLZ is a bit faster than FFS
         }
 
-        static int32_t _IO_GPIO_PinSource(IO_t io)
-        {
-            return _IO_GPIOPinIdx(io);
-        }
-
         static void GPIO_PinAFConfig(GPIO_TypeDef* GPIOx, uint16_t GPIO_PinSource, uint8_t GPIO_AF)
         {
-
             uint32_t temp = ((uint32_t)(GPIO_AF) << ((uint32_t)((uint32_t)GPIO_PinSource & (uint32_t)0x07) * 4)) ;
             GPIOx->AFR[GPIO_PinSource >> 0x03] &= ~((uint32_t)0xF << ((uint32_t)((uint32_t)GPIO_PinSource & (uint32_t)0x07) * 4)) ;
             uint32_t temp_2 = GPIOx->AFR[GPIO_PinSource >> 0x03] | temp;
             GPIOx->AFR[GPIO_PinSource >> 0x03] = temp_2;
-        }
-
-        static void _IOConfigGPIOAF(IO_t io, uint8_t cfg, uint8_t af)
-        {
-            if (!io) {
-                return;
-            }
-
-            GPIO_PinAFConfig(_IO_GPIO(io), _IO_GPIO_PinSource(io), af);
-
-            _configGPIO(io, cfg);
         }
 
         // Instance variables ===========================================================
