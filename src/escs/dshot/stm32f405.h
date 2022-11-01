@@ -438,18 +438,10 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void outputDataInit(uint32_t *buffer, uint16_t portMask, bool inverted)
+        static void outputDataInit(uint32_t *buffer, uint16_t portMask)
         {
-            uint32_t resetMask;
-            uint32_t setMask;
-
-            if (inverted) {
-                resetMask = portMask;
-                setMask = (portMask << 16);
-            } else {
-                resetMask = (portMask << 16);
-                setMask = portMask;
-            }
+            uint32_t resetMask = (portMask << 16);
+            uint32_t setMask = portMask;
 
             for (auto bitpos=0; bitpos<16; bitpos++) {
                 buffer[bitpos * 3 + 0] |= setMask ; // Always set all ports
@@ -458,16 +450,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void outputDataSet(
-                uint32_t *buffer, int32_t pinNumber, uint16_t value, bool inverted)
+        static void outputDataSet(uint32_t *buffer, int32_t pinNumber, uint16_t value)
         {
-            uint32_t middleBit;
-
-            if (inverted) {
-                middleBit = (1 << (pinNumber + 0));
-            } else {
-                middleBit = (1 << (pinNumber + 16));
-            }
+            uint32_t middleBit = (1 << (pinNumber + 16));
 
             for (auto pos=0; pos<16; pos++) {
                 if (!(value & 0x8000)) {
@@ -500,21 +485,10 @@ class Stm32F405DshotEsc : public DshotEsc {
             return 0;
         }
 
-        static uint32_t timerClock(TIM_TypeDef *tim)
-        {
-            if (tim == TIM8 || tim == TIM1 || tim == TIM9 || tim == TIM10 || tim == TIM11) {
-                return SystemCoreClock;
-            } else {
-                return SystemCoreClock / 2;
-            }
-        }
-
         static void timebaseSetup(port_t *bbPort, protocol_t dshotProtocolType)
         {
-            uint32_t timerclock = timerClock(TIM1);
-
             uint32_t outputFreq = 1000 * getDshotBaseFrequency(dshotProtocolType);
-            bbPort->outputARR = timerclock / outputFreq - 1;
+            bbPort->outputARR = SystemCoreClock / outputFreq - 1;
         }
 
         static uint16_t timerDmaSource(uint8_t channel)
@@ -1120,8 +1094,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             _IOConfigGPIO(io,
                     io_config(GPIO_Mode_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, m_puPdMode));
 
-            // not inverted
-            outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex), false); 
+            outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex)); 
 
             // Output idle level before switching to output
             // Use BSRR register for this
@@ -1379,7 +1352,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             port_t *bbPort = bbmotor->bbPort;
 
-            outputDataSet(bbPort->portOutputBuffer, bbmotor->pinIndex, packet, false); 
+            outputDataSet(bbPort->portOutputBuffer, bbmotor->pinIndex, packet); 
         }
 
     public:
