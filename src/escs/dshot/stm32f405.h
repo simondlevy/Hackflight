@@ -67,15 +67,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static const uint32_t RCC_AHB1PERIPH_DMA2 = 0x00400000;
 
-        static const uint32_t _MY_DMA_IT_TCIF0 = 0x10008020;
-        static const uint32_t _MY_DMA_IT_TCIF1 = 0x10008800;
-        static const uint32_t _MY_DMA_IT_TCIF2 = 0x10208000;
-        static const uint32_t _MY_DMA_IT_TCIF3 = 0x18008000;
-        static const uint32_t _MY_DMA_IT_TCIF4 = 0x20008020;
-        static const uint32_t _MY_DMA_IT_TCIF5 = 0x20008800;
-        static const uint32_t _MY_DMA_IT_TCIF6 = 0x20208000;
-        static const uint32_t _MY_DMA_IT_TCIF7 = 0x28008000;
-
         static const uint8_t DMA_TIMER_MAPPING_COUNT = 6;
 
         static const uint32_t NVIC_PRIORITY_GROUPING = 0x500;
@@ -90,10 +81,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             (uint32_t)(DMA_SxCR_TCIE | DMA_SxCR_HTIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE);
 
         static const uint32_t DMA_IT_TCIF  = 0x00000020;
-        static const uint32_t DMA_IT_HTIF  = 0x00000010;
         static const uint32_t DMA_IT_TEIF  = 0x00000008;
-        static const uint32_t DMA_IT_DMEIF = 0x00000004;
-        static const uint32_t DMA_IT_FEIF  = 0x00000001;
 
         static const uint8_t MAX_MOTORS = 4;
         static const uint8_t STATE_PER_SYMBOL = 3;
@@ -149,7 +137,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             IRQn_Type                   irqN;
             uint32_t                    userParam;
             uint8_t                     resourceIndex;
-            uint32_t                    completeFlag;
         } dmaChannelDescriptor_t;
 
         // Per pacer timer
@@ -451,21 +438,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             for (auto bitpos=0; bitpos<16; bitpos++) {
                 buffer[bitpos * 3 + 1] = 0;
             }
-        }
-
-        static uint32_t dmaFlag_IT_TCIF(const dmaResource_t *stream)
-        {
-
-            if ((DMA_Stream_TypeDef *)stream == DMA2_Stream0) return _MY_DMA_IT_TCIF0;
-            if ((DMA_Stream_TypeDef *)stream == DMA2_Stream1) return _MY_DMA_IT_TCIF1;
-            if ((DMA_Stream_TypeDef *)stream == DMA2_Stream2) return _MY_DMA_IT_TCIF2;
-            if ((DMA_Stream_TypeDef *)stream == DMA2_Stream3) return _MY_DMA_IT_TCIF3;
-            if ((DMA_Stream_TypeDef *)stream == DMA2_Stream4) return _MY_DMA_IT_TCIF4;
-            if ((DMA_Stream_TypeDef *)stream == DMA2_Stream5) return _MY_DMA_IT_TCIF5;
-            if ((DMA_Stream_TypeDef *)stream == DMA2_Stream6) return _MY_DMA_IT_TCIF6;
-            if ((DMA_Stream_TypeDef *)stream == DMA2_Stream7) return _MY_DMA_IT_TCIF7;
-
-            return 0;
         }
 
         static void timebaseSetup(port_t *bbPort, protocol_t dshotProtocolType)
@@ -815,8 +787,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
             m_dmaDescriptors[index].irqHandlerCallback = callback;
             m_dmaDescriptors[index].userParam = userParam;
-            m_dmaDescriptors[index].completeFlag =
-                dmaFlag_IT_TCIF(m_dmaDescriptors[index].ref);
 
             uint8_t irqChannel = m_dmaDescriptors[index].irqN;
 
