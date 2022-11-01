@@ -69,7 +69,7 @@ class DshotEsc : public Esc {
         uint8_t m_commandQueueHead;
         uint8_t m_commandQueueTail;
 
-        bool m_enabled;
+        bool m_enabled = false;
 
         uint8_t m_motorPins[MAX_SUPPORTED_MOTORS];
 
@@ -217,7 +217,6 @@ class DshotEsc : public Esc {
 
 
         virtual void deviceInit(void) = 0;
-        virtual void postInit(void) = 0;
         virtual void updateComplete(void) = 0;
         virtual bool updateStart(void) = 0;
         virtual void write(uint8_t index, float value) = 0;
@@ -295,11 +294,9 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            deviceInit();
-
             m_enabled = false;
 
-            postInit();
+            deviceInit();
 
             m_enabled = true;
         }

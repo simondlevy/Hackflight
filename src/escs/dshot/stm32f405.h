@@ -1276,10 +1276,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 motorIndex++;
             }
-        }        
 
-        virtual void postInit(void) override
-        {
             m_ports[0].timhw = &m_timer1Hardware[0];
             m_ports[1].timhw = &m_timer1Hardware[1];
             m_ports[2].timhw = &m_timer1Hardware[2];
@@ -1300,7 +1297,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                     _IOConfigGPIO(m_motors[i].io, m_motors[i].iocfg);
                 }
             }
-        }
+        }        
 
         virtual void updateComplete(void) override
         {
