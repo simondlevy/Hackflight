@@ -135,27 +135,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC_AHB1,
         };
 
-        typedef enum {
-            DMA_NONE,
-            DMA1_ST0_HANDLER,
-            DMA1_ST1_HANDLER,
-            DMA1_ST2_HANDLER,
-            DMA1_ST3_HANDLER,
-            DMA1_ST4_HANDLER,
-            DMA1_ST5_HANDLER,
-            DMA1_ST6_HANDLER,
-            DMA1_ST7_HANDLER,
-            DMA2_ST0_HANDLER,
-            DMA2_ST1_HANDLER,
-            DMA2_ST2_HANDLER,
-            DMA2_ST3_HANDLER,
-            DMA2_ST4_HANDLER,
-            DMA2_ST5_HANDLER,
-            DMA2_ST6_HANDLER,
-            DMA2_ST7_HANDLER,
-            DMA_LAST_HANDLER = DMA2_ST7_HANDLER
-        } dmaIdentifier_e;
-
         typedef void * IO_t; 
 
         typedef struct {
@@ -645,34 +624,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                     return TIM_DMA_CC4;
             }
             return 0;
-        }
-
-        static void TIM_TimeBaseInit(port_t * bbPort)
-        {
-            uint16_t tmpcr1 = TIM1->CR1;  
-
-            // Select the Counter Mode
-            tmpcr1 &= (uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS));
-            tmpcr1 |= (uint32_t)bbPort->TIM_CounterMode;
-
-            // Set the clock division 
-            tmpcr1 &=  (uint16_t)(~TIM_CR1_CKD);
-            tmpcr1 |= (uint32_t)bbPort->TIM_ClockDivision;
-
-            TIM1->CR1 = tmpcr1;
-
-            // Set the Autoreload value 
-            TIM1->ARR = bbPort->TIM_Period ;
-
-            // Set the Prescaler value
-            TIM1->PSC = bbPort->TIM_Prescaler;
-
-            // Set the Repetition Counter value
-            TIM1->RCR = bbPort->TIM_RepetitionCounter;
-
-            // Generate an update event to reload the Prescaler 
-            // and the repetition counter(only for TIM1 and TIM8) value immediately
-            TIM1->EGR = 0x0001;          
         }
 
         static ioRec_t* _IORec(IO_t io)
@@ -1205,7 +1156,32 @@ class Stm32F405DshotEsc : public DshotEsc {
                 bbPort->TIM_ClockDivision = TIM_CLOCKDIVISION_DIV1;
                 bbPort->TIM_CounterMode = TIM_COUNTERMODE_UP;
                 bbPort->TIM_Period = bbPort->outputARR;
-                TIM_TimeBaseInit(bbPort);
+
+                uint16_t tmpcr1 = TIM1->CR1;  
+
+                // Select the Counter Mode
+                tmpcr1 &= (uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS));
+                tmpcr1 |= (uint32_t)bbPort->TIM_CounterMode;
+
+                // Set the clock division 
+                tmpcr1 &=  (uint16_t)(~TIM_CR1_CKD);
+                tmpcr1 |= (uint32_t)bbPort->TIM_ClockDivision;
+
+                TIM1->CR1 = tmpcr1;
+
+                // Set the Autoreload value 
+                TIM1->ARR = bbPort->TIM_Period ;
+
+                // Set the Prescaler value
+                TIM1->PSC = bbPort->TIM_Prescaler;
+
+                // Set the Repetition Counter value
+                TIM1->RCR = bbPort->TIM_RepetitionCounter;
+
+                // Generate an update event to reload the Prescaler 
+                // and the repetition counter(only for TIM1 and TIM8) value immediately
+                TIM1->EGR = 0x0001;          
+
                 TIM_ARRPreloadConfig(ENABLE);
 
                 timerChannelInit(bbPort);
@@ -1352,26 +1328,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                 }
             }
             return 0;
-        }
-
-        uint16_t timerGetPrescalerByDesiredHertz(TIM_TypeDef *tim, uint32_t hz)
-        {
-            // protection here for desired hertz > SystemCoreClock???
-            if (hz > timerClock(tim)) {
-                return 0;
-            }
-            return (uint16_t)((timerClock(tim) + hz / 2 ) / hz) - 1;
-        }
-
-        int8_t timerGetTIMNumber(const TIM_TypeDef *tim)
-        {
-            const uint8_t index = lookupTimerIndex(tim);
-
-            if (index < USED_TIMER_COUNT) {
-                return index + 1;
-            } else {
-                return 0;
-            }
         }
 
         void timerInit(void)
