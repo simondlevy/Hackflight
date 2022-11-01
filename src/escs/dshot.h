@@ -120,31 +120,6 @@ class DshotEsc : public Esc {
             return (a / b) + destFrom;
         }
 
-    protected:
-
-        typedef enum {
-            DSHOT150,
-            DSHOT300,
-            DSHOT600,
-        } protocol_t;
-
-        protocol_t m_protocol;
-
-        uint8_t m_motorCount;
-
-        static uint32_t getDshotBaseFrequency(protocol_t pwmProtocolType)
-        {
-            switch (pwmProtocolType) {
-                case(DSHOT600):
-                    return 600;
-                case(DSHOT300):
-                    return 300;
-                default:
-                case(DSHOT150):
-                    return 150;
-            }
-        }
-
         // This function is used to synchronize the dshot command output timing with
         // the normal motor output timing tied to the PID loop frequency. A "true"
         // result allows the motor output to be sent, "false" means delay until next
@@ -210,6 +185,37 @@ class DshotEsc : public Esc {
             return true;
         }
 
+        bool commandQueueIsEmpty(void)
+        {
+            return m_commandQueueHead == m_commandQueueTail;
+        }
+
+    protected:
+
+        typedef enum {
+            DSHOT150,
+            DSHOT300,
+            DSHOT600,
+        } protocol_t;
+
+        protocol_t m_protocol;
+
+        uint8_t m_motorCount;
+
+        static uint32_t getDshotBaseFrequency(protocol_t pwmProtocolType)
+        {
+            switch (pwmProtocolType) {
+                case(DSHOT600):
+                    return 600;
+                case(DSHOT300):
+                    return 300;
+                default:
+                case(DSHOT150):
+                    return 150;
+            }
+        }
+
+
         virtual void deviceInit(void) = 0;
         virtual bool enable(void) = 0;
         virtual void postInit(void) = 0;
@@ -229,16 +235,11 @@ class DshotEsc : public Esc {
             }
         }
 
-        bool commandQueueEmpty(void)
-        {
-            return m_commandQueueHead == m_commandQueueTail;
-        }
-
         bool commandQueueUpdate(void)
         {
-            if (!commandQueueEmpty()) {
+            if (!commandQueueIsEmpty()) {
                 m_commandQueueTail = (m_commandQueueTail + 1) % (MAX_COMMANDS + 1);
-                if (!commandQueueEmpty()) {
+                if (!commandQueueIsEmpty()) {
                     // There is another command in the queue so update it so it's ready
                     // to output in sequence. It can go directly to the
                     // COMMAND_STATE_ACTIVE state and bypass the
@@ -260,7 +261,7 @@ class DshotEsc : public Esc {
 
         bool commandIsProcessing(void)
         {
-            if (commandQueueEmpty()) {
+            if (commandQueueIsEmpty()) {
                 return false;
             }
 
@@ -373,6 +374,12 @@ class DshotEsc : public Esc {
                 }
                 for (auto i=0; i <m_motorCount; i++) {
                     write(i, values[i]);
+                }
+
+                if (!commandQueueIsEmpty()) {
+                    if (!commandOutputIsEnabled()) {
+                        return;
+                    }
                 }
                 updateComplete();
             }

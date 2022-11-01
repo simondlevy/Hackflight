@@ -797,10 +797,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void _configGPIO(IO_t io, uint8_t cfg)
         {
-            if (!io) {
-                return;
-            }
-
             const uint8_t ioPortDefs[6] = {
                 { rcc_ahb1(RCC_AHB1ENR_GPIOAEN_MSK) },
                 { rcc_ahb1(RCC_AHB1ENR_GPIOBEN_MSK) },
@@ -824,18 +820,11 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void _IOConfigGPIO(IO_t io, uint8_t cfg)
         {
-            if (!io) {
-                return;
-            }
-
             _configGPIO(io, cfg);
         }
 
         static int32_t _IO_GPIOPinIdx(IO_t io)
         {
-            if (!io) {
-                return -1;
-            }
             return 31 - __builtin_clz(_IO_Pin(io));  // CLZ is a bit faster than FFS
         }
 
@@ -1494,14 +1483,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         virtual void updateComplete(void) override
         {
-            // If there is a dshot command loaded up, time it correctly with motor update
-
-            if (!commandQueueEmpty()) {
-                if (!commandOutputIsEnabled()) {
-                    return;
-                }
-            }
-
             for (auto i=0; i<m_usedMotorPorts; i++) {
                 port_t *bbPort = &m_ports[i];
 
