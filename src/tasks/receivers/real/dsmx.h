@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 
-#include "serial.h"
 #include "tasks/receiver.h"
 #include "time.h"
 
@@ -27,14 +26,12 @@ class DsmxReceiver : public Receiver {
 
     private:
 
-        static const uint8_t FRAME_SIZE = 16;
-
         // Support DSMX2048 only
         static const uint8_t  CHAN_SHIFT = 3;
         static const uint8_t  CHAN_MASK  = 0x07;
         static const uint8_t  MAX_CHANNELS = 8;
 
-        static const uint16_t FRAME_INTERVAL = 5000;
+        static const uint8_t FRAME_SIZE = 16;
 
         typedef struct {
             uint8_t  bytes[FRAME_SIZE];
@@ -43,49 +40,43 @@ class DsmxReceiver : public Receiver {
             bool     done;
         } frameData_t;
 
-        // Receive ISR callback
-        static void dataReceive(uint8_t c, void *data, uint32_t usec)
-        {
-            frameData_t * frameData = (frameData_t *)data;
-
-            const uint32_t timeInterval =
-                cmpTimeUs(usec, frameData->lastTimeUs);
-
-            frameData->lastTimeUs = usec;
-
-            if (timeInterval > FRAME_INTERVAL) {
-                frameData->position = 0;
-            }
-
-            if (frameData->position < FRAME_SIZE) {
-                frameData->bytes[frameData->position++] = (uint8_t)c;
-                if (frameData->position < FRAME_SIZE) {
-                    frameData->done = false;
-                } else {
-                    frameData->lastTimeUs = usec;
-                    frameData->done = true;
-                }
-            }
-        }
-
-        serialPortIdentifier_e m_port;
-
         frameData_t m_frameData;
 
         static float convert(
-                const uint16_t value, const uint16_t dstmin=1000, const uint16_t dstmax=2000)
+                const uint16_t value,
+                const uint16_t dstmin=1000,
+                const uint16_t dstmax=2000)
         {
             return Receiver::convert(value, 0, 2048, dstmin, dstmax);
         }
 
-     protected:
+    protected:
+
+        virtual void parse(const uint8_t c) override
+        {
+            const uint32_t usec = micros();
+            const uint32_t timeInterval = cmpTimeUs(usec, m_frameData.lastTimeUs);
+
+            m_frameData.lastTimeUs = usec;
+
+            if (timeInterval > 5000) {
+                m_frameData.position = 0;
+            }
+
+            if (m_frameData.position < FRAME_SIZE) {
+                m_frameData.bytes[m_frameData.position++] = (uint8_t)c;
+                if (m_frameData.position < FRAME_SIZE) {
+                    m_frameData.done = false;
+                } else {
+                    m_frameData.lastTimeUs = usec;
+                    m_frameData.done = true;
+                }
+            }
+        }
 
         virtual void devStart(void) override
         {
-            serialOpenPortDsmx(
-                    m_port,
-                    dataReceive,
-                    &m_frameData);
+            m_port->begin(115200);
         }
 
         virtual bool devRead(
@@ -123,11 +114,9 @@ class DsmxReceiver : public Receiver {
                 }
 
                 throttle = convert(channelData[0]);
-
                 roll     = convert(channelData[1]);
                 pitch    = convert(channelData[2]);
                 yaw      = convert(channelData[3]);
-
                 aux1     = convert(channelData[4], 0, 1);
 
                 // Ignore channel 6 for now (problems with transmitter)
@@ -140,10 +129,9 @@ class DsmxReceiver : public Receiver {
 
     public:
 
-        DsmxReceiver(serialPortIdentifier_e port=SERIAL_PORT_NONE) 
-            : Receiver()
+        DsmxReceiver(HardwareSerial & port) 
+            : Receiver(port)
         {
-            m_port = port;
         }
 
 }; // class DsmxReceiver

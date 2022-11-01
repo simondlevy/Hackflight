@@ -27,12 +27,6 @@
 #include "maxmotors.h"
 #include "pwm.h"
 
-#include "platform.h"
-#include "atomic.h"
-#include "nvic.h"
-#include "timer.h"
-#include "io.h"
-
 class DshotEsc : public Esc {
 
     private:
@@ -51,29 +45,7 @@ class DshotEsc : public Esc {
 
         typedef enum {
             CMD_MOTOR_STOP = 0,
-            CMD_BEACON1,
-            CMD_BEACON2,
-            CMD_BEACON3,
-            CMD_BEACON4,
-            CMD_BEACON5,
-            CMD_ESC_INFO, // V2 includes settings
-            CMD_SPIN_DIRECTION_1,
-            CMD_SPIN_DIRECTION_2,
-            CMD_SETTINGS_REQUEST, // Currently not implemented
-            CMD_SAVE_SETTINGS,
             CMD_SPIN_DIRECTION_NORMAL = 20,
-            CMD_SPIN_DIRECTION_REVERSED = 21,
-            CMD_LED0_ON, // BLHeli32 only
-            CMD_LED1_ON, // BLHeli32 only
-            CMD_LED2_ON, // BLHeli32 only
-            CMD_LED3_ON, // BLHeli32 only
-            CMD_LED0_OFF, // BLHeli32 only
-            CMD_LED1_OFF, // BLHeli32 only
-            CMD_LED2_OFF, // BLHeli32 only
-            CMD_LED3_OFF, // BLHeli32 only
-            CMD_AUDIO_STREAM_MODE_ON_OFF = 30, // KISS audio Stream mode on/Off
-            CMD_SILENT_MODE_ON_OFF = 31, // KISS silent Mode on/Off
-            CMD_MAX = 47
         } commands_e;
 
         typedef enum {
@@ -83,42 +55,7 @@ class DshotEsc : public Esc {
             COMMAND_STATE_POSTDELAY   // delay period after the cmd has been sent
         } commandVehicleState_e;
 
-    protected:
-
-        typedef struct dshotProtocolControl_s {
-            uint16_t value;
-            bool requestTelemetry;
-        } dshotProtocolControl_t;
-
-        typedef struct {
-            TIM_TypeDef *timer;
-            uint16_t outputPeriod;
-            dmaResource_t *dmaBurstRef;
-            uint16_t dmaBurstLength;
-            uint32_t *dmaBurstBuffer;
-            uint16_t timerDmaSources;
-        } motorDmaTimer_t;
-
-        typedef struct motorDmaOutput_s {
-            dshotProtocolControl_t protocolControl;
-            ioTag_t ioTag;
-            const timerHardware_t *timerHardware;
-            uint16_t timerDmaSource;
-            uint8_t timerDmaIndex;
-            bool configured;
-            uint8_t output;
-            uint8_t index;
-            uint32_t iocfg;
-            DMA_InitTypeDef   dmaInitStruct;
-            volatile bool isInput;
-            int32_t dshotTelemetryDeadtimeUs;
-            uint8_t dmaInputLen;
-            TIM_OCInitTypeDef ocInitStruct;
-            TIM_ICInitTypeDef icInitStruct;
-            dmaResource_t *dmaRef;
-            motorDmaTimer_t *timer;
-            uint32_t * dmaBuffer;
-        } motorDmaOutput_t;
+        uint16_t m_dmaMotors[MAX_SUPPORTED_MOTORS];
 
         typedef struct {
             commandVehicleState_e state;
@@ -128,31 +65,13 @@ class DshotEsc : public Esc {
             uint8_t command[MAX_SUPPORTED_MOTORS];
         } commandControl_t;
 
-        // gets set to the actual value when the PID loop is initialized
         commandControl_t m_commandQueue[MAX_COMMANDS + 1];
         uint8_t m_commandQueueHead;
         uint8_t m_commandQueueTail;
 
-        motorDmaOutput_t m_dmaMotors[MAX_SUPPORTED_MOTORS];
-
         bool m_enabled;
 
         uint8_t m_motorPins[MAX_SUPPORTED_MOTORS];
-
-        static uint16_t getDshotPacketAtomic(dshotProtocolControl_t *pcb)
-        {
-            uint16_t packet = 0;
-
-            ATOMIC_BLOCK(NVIC_PRIO_DSHOT_DMA) {
-                packet = (pcb->value << 1) | (pcb->requestTelemetry ? 1 : 0);
-
-                // reset telemetry request to make sure it's triggered only
-                // once in a row
-                pcb->requestTelemetry = false;    
-            }
-
-            return packet;
-        }
 
         bool isLastCommand(void)
         {
@@ -162,8 +81,7 @@ class DshotEsc : public Esc {
         bool allMotorsAreIdle()
         {
             for (auto i=0; i<m_motorCount; i++) {
-                const motorDmaOutput_t *motor = getMotorDmaOutput(i);
-                if (motor->protocolControl.value) {
+                if (m_dmaMotors[i]) {
                     return false;
                 }
             }
@@ -210,28 +128,9 @@ class DshotEsc : public Esc {
             DSHOT600,
         } protocol_t;
 
-        typedef struct {
-            volatile timCCR_t * ccr;
-            TIM_TypeDef * tim;
-        } timerChannel_t;
-
-        typedef struct {
-            timerChannel_t channel;
-            float pulseScale;
-            float pulseOffset;
-            bool forceOverflow;
-            bool enabled;
-            IO_t io;
-        } pwmOutputPort_t;
-
         protocol_t m_protocol;
 
         uint8_t m_motorCount;
-
-        motorDmaOutput_t * getMotorDmaOutput(const uint8_t index)
-        {
-            return &m_dmaMotors[index];
-        }
 
         // This function is used to synchronize the dshot command output timing with
         // the normal motor output timing tied to the PID loop frequency. A "true"
@@ -360,9 +259,9 @@ class DshotEsc : public Esc {
                 (command->state == COMMAND_STATE_POSTDELAY && !isLastCommand()); 
         }
 
-        uint16_t prepareDshotPacket(dshotProtocolControl_t *pcb)
+        uint16_t prepareDshotPacket(uint16_t value)
         {
-            uint16_t packet = getDshotPacketAtomic(pcb);
+            uint16_t packet = value << 1;
 
             // compute checksum
             unsigned csum = 0;

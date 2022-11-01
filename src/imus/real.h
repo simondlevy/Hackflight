@@ -26,10 +26,7 @@
 #include "core/vstate.h"
 #include "imu.h"
 #include "stats.h"
-#include "system.h"
 #include "time.h"
-
-#include "serial.h"
 
 class RealImu : public Imu {
 
@@ -151,7 +148,7 @@ class RealImu : public Imu {
             setCalibrationCycles(); // start calibrating
         }
 
-        virtual void devInit(
+        virtual bool devInit(
                 uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) = 0;
 
         virtual int16_t devReadRawGyro(uint8_t k) = 0;

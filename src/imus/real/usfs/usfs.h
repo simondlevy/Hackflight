@@ -56,7 +56,7 @@ class UsfsImu : public RealImu {
 
         virtual bool gyroIsReady(void) override;
 
-        virtual void devInit(
+        virtual bool devInit(
                 uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) override;
 
         virtual int16_t devReadRawGyro(uint8_t k) override;

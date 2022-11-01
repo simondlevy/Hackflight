@@ -22,6 +22,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#if !defined(ARDUINO)
+extern "C" { uint32_t micros(void); }
+#endif
+
 class Task {
 
     private:
@@ -80,10 +84,10 @@ class Task {
             m_lastExecutedAtUs = usec;
             m_dynamicPriority = 0;
 
-            uint32_t time = timeMicros();
+            uint32_t time = micros(); //timeMicros();
             fun(usec);
 
-            uint32_t taskExecutionTimeUs = timeMicros() - time;
+            uint32_t taskExecutionTimeUs = micros() /*timeMicros()*/ - time;
 
             if (taskExecutionTimeUs >
                     (m_anticipatedExecutionTime >> EXEC_TIME_SHIFT)) {

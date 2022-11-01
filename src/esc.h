@@ -64,5 +64,4 @@ class Esc {
         virtual void  stop(void) 
         {
         }
-
 };

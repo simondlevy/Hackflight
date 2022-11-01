@@ -23,6 +23,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#if !defined(ARDUINO)
+extern "C" { uint32_t microsecondsToClockCycles(uint32_t usec); }
+#endif
+
 class Scheduler {
 
     private:
@@ -77,37 +81,36 @@ class Scheduler {
         Scheduler(void)
         {
             m_loopStartCycles =
-                systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+                microsecondsToClockCycles(SCHED_START_LOOP_MIN_US);
             m_loopStartMinCycles =
-                systemClockMicrosToCycles(SCHED_START_LOOP_MIN_US);
+                microsecondsToClockCycles(SCHED_START_LOOP_MIN_US);
             m_loopStartMaxCycles =
-                systemClockMicrosToCycles(SCHED_START_LOOP_MAX_US);
+                microsecondsToClockCycles(SCHED_START_LOOP_MAX_US);
             m_loopStartDeltaDownCycles =
-                systemClockMicrosToCycles(1) / SCHED_START_LOOP_DOWN_STEP;
+                microsecondsToClockCycles(1) / SCHED_START_LOOP_DOWN_STEP;
             m_loopStartDeltaUpCycles =
-                systemClockMicrosToCycles(1) / SCHED_START_LOOP_UP_STEP;
+                microsecondsToClockCycles(1) / SCHED_START_LOOP_UP_STEP;
 
             m_taskGuardMinCycles =
-                systemClockMicrosToCycles(TASK_GUARD_MARGIN_MIN_US);
+                microsecondsToClockCycles(TASK_GUARD_MARGIN_MIN_US);
             m_taskGuardMaxCycles =
-                systemClockMicrosToCycles(TASK_GUARD_MARGIN_MAX_US);
+                microsecondsToClockCycles(TASK_GUARD_MARGIN_MAX_US);
             m_taskGuardCycles = m_taskGuardMinCycles;
             m_taskGuardDeltaDownCycles =
-                systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
+                microsecondsToClockCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
             m_taskGuardDeltaUpCycles =
-                systemClockMicrosToCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
+                microsecondsToClockCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
 
-            lastTargetCycles = systemGetCycleCounter();
-
-            m_nextTimingCycles = lastTargetCycles;
+            lastTargetCycles = 0;
+            m_nextTimingCycles = 0;
 
             desiredPeriodCycles =
-                (int32_t)systemClockMicrosToCycles(Clock::PERIOD());
+                (int32_t)microsecondsToClockCycles(Clock::PERIOD());
 
             m_guardMargin =
-                (int32_t)systemClockMicrosToCycles(CHECK_GUARD_MARGIN_US);
+                (int32_t)microsecondsToClockCycles(CHECK_GUARD_MARGIN_US);
 
-            m_clockRate = systemClockMicrosToCycles(1000000);
+            m_clockRate = microsecondsToClockCycles(1000000);
         }
 
         void corePreUpdate(void) 

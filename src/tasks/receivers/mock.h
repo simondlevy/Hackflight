@@ -65,6 +65,11 @@ class MockReceiver : public Receiver {
             return false;
         }
 
+    virtual void parse(const uint8_t c) override
+    {
+        (void)c;
+    }
+
 }; // class MockReceiver
 
 

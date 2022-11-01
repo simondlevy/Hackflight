@@ -20,529 +20,314 @@
 #pragma once
 
 #include "core/vstate.h"
-#include "debug.h"
 #include "esc.h"
 #include "imu.h"
 #include "maths.h"
 #include "receiver.h"
-#include "system.h"
 #include "task.h"
 
-#define ARRAYEND(x) (&(x)[ARRAYLEN(x)])
-#define ARRAYLEN(x) (sizeof(x) / sizeof((x)[0]))
-
 class Msp : public Task {
-    
+
     friend class Hackflight;
 
-    private:
+    static const uint8_t MAXMSG = 255;
 
-        static const uint8_t MAX_PORT_COUNT = 3;
-        static const uint8_t PORT_INBUF_SIZE = 192;
-        static const uint16_t PORT_DATAFLASH_BUFFER_SIZE = 4096;
-        static const uint8_t PORT_DATAFLASH_INFO_SIZE = 16;
-        static const uint16_t PORT_OUTBUF_SIZE =
-            PORT_DATAFLASH_BUFFER_SIZE + PORT_DATAFLASH_INFO_SIZE;
-        static const uint8_t JUMBO_FRAME_SIZE_LIMIT = 255;
+    static const int OUTBUF_SIZE = 128;
 
-        static const uint8_t RC        = 105;
-        static const uint8_t ATTITUDE  = 108;    
-        static const uint8_t SET_MOTOR = 214;    
+    Board *         m_board;
+    Esc *           m_esc;
+    Arming *        m_arming;
+    Receiver *      m_receiver;
+    VehicleState *  m_vstate;
 
-        static int16_t rad2degi(float rad)
-        {
-            return (int16_t)Math::rad2deg(rad);
-        }
+    uint8_t _outBufChecksum;
+    uint8_t _outBuf[OUTBUF_SIZE];
+    uint8_t _outBufIndex;
+    uint8_t _outBufSize;
 
-        Esc *                m_esc;
-        Arming *             m_arming;
-        Receiver *           m_receiver;
-        VehicleState *       m_vstate;
+    uint8_t _payload[128] = {};
 
-        float  motors[MAX_SUPPORTED_MOTORS];
+    float  motors[MAX_SUPPORTED_MOTORS];
 
-        typedef struct sbuf_s {
-            uint8_t *ptr;  
-            uint8_t *end;
-        } sbuf_t;
+    void serialize16(int16_t a)
+    {
+        serialize8(a & 0xFF);
+        serialize8((a >> 8) & 0xFF);
+    }
 
-        static void sbufWriteU8(sbuf_t *dst, uint8_t val)
-        {
-            *dst->ptr++ = val;
-        }
+    void prepareToSend(uint8_t type, uint8_t count, uint8_t size)
+    {
+        _outBufSize = 0;
+        _outBufIndex = 0;
+        _outBufChecksum = 0;
 
-        static void sbufWriteU16(sbuf_t *dst, uint16_t val)
-        {
-            sbufWriteU8(dst, val >> 0);
-            sbufWriteU8(dst, val >> 8);
-        }
+        addToOutBuf('$');
+        addToOutBuf('M');
+        addToOutBuf('>');
+        serialize8(count*size);
+        serialize8(type);
+    }
 
-        static uint8_t sbufReadU8(sbuf_t *src)
-        {
-            return *src->ptr++;
-        }
+    void addToOutBuf(uint8_t a)
+    {
+        _outBuf[_outBufSize++] = a;
+    }
 
-        static uint16_t sbufReadU16(sbuf_t *src)
-        {
-            uint16_t ret;
-            ret = sbufReadU8(src);
-            ret |= sbufReadU8(src) << 8;
-            return ret;
-        }
+    void completeSend(void)
+    {
+        serialize8(_outBufChecksum);
+        Serial.write(_outBuf, _outBufSize);
+    }
 
-        // reader - return bytes remaining in buffer
-        // writer - return available space
-        static int sbufBytesRemaining(sbuf_t *buf)
-        {
-            return buf->end - buf->ptr;
-        }
+    void serialize8(uint8_t a)
+    {
+        addToOutBuf(a);
+        _outBufChecksum ^= a;
+    }
 
-        static uint8_t* sbufPtr(sbuf_t *buf)
-        {
-            return buf->ptr;
-        }
+    void prepareToSendBytes(uint8_t type, uint8_t count)
+    {
+        prepareToSend(type, count, 1);
+    }
 
-        // modifies streambuf so that written data are prepared for reading
-        static void sbufSwitchToReader(sbuf_t *buf, uint8_t *base)
-        {
-            buf->end = buf->ptr;
-            buf->ptr = base;
-        }
+    void sendByte(uint8_t src)
+    {
+        serialize8(src);
+    }
 
-        // return positive for ACK, negative on error, zero for no reply
-        typedef enum {
-            RESULT_ACK = 1,
-            RESULT_ERROR = -1,
-            RESULT_NO_REPLY = 0,
-            RESULT_CMD_UNKNOWN = -2,   
-        } mspResult_e;
+    void prepareToSendShorts(uint8_t type, uint8_t count)
+    {
+        prepareToSend(type, count, 2);
+    }
 
-        typedef enum {
-            DIRECTION_REPLY = 0,
-            DIRECTION_REQUEST = 1
-        } mspDirection_e;
+    void sendShort(uint16_t src)
+    {
+        uint16_t a;
+        memcpy(&a, &src, 2);
+        serialize16(a);
+    }
 
+    void prepareToSendInts(uint8_t type, uint8_t count)
+    {
+        prepareToSend(type, count, 4);
+    }
 
-        typedef struct mspPacket_s {
-            sbuf_t buf;         // payload only w/o header or crc
-            int16_t cmd;
-            int16_t result;
-            uint8_t direction;  // It also looks like unused and might be deleted.
-        } mspPacket_t;
+    void prepareToSendFloats(uint8_t type, uint8_t count)
+    {
+        prepareToSend(type, count, 4);
+    }
 
-        typedef int mspDescriptor_t;
+    uint8_t availableBytes(void)
+    {
+        return _outBufSize;
+    }
 
-        // msp post process function, used for gracefully handling reboots, etc.
-        typedef void (*mspPostProcessFnPtr)(void * port); 
+    uint8_t readByte(void)
+    {
+        _outBufSize--;
+        return _outBuf[_outBufIndex++];
+    }
 
-        typedef enum {
+    void parse(uint8_t c)
+    {
+        enum {
             IDLE,
-            HEADER_START,
-            HEADER_M,
-            HEADER,
-            PAYLOAD,
-            CHECKSUM,
-            COMMAND_RECEIVED
-        } mspVehicleState_e;
+            GOT_START,
+            GOT_M,
+            GOT_ARROW,
+            GOT_SIZE,
+            IN_PAYLOAD,
+            GOT_CRC
+        }; 
 
+        static uint8_t parser_state;
 
-        typedef enum {
-            PENDING_NONE,
-            PENDING_BOOTLOADER_ROM,
-            PENDING_CLI,
-            PENDING_BOOTLOADER_FLASH,
-        } mspPendingSystemRequest_e;
+        static uint8_t type;
+        static uint8_t crc;
+        static uint8_t size;
+        static uint8_t index;
 
-        typedef enum {
-            PACKET_COMMAND,
-            PACKET_REPLY
-        } mspPacketType_e;
-
-        typedef struct mspPort_s {
-            void *                    port; // null when port unused.
-            uint32_t                  lastActivityMs;
-            mspPendingSystemRequest_e pendingRequest;
-            mspVehicleState_e                state;
-            mspPacketType_e           packetType;
-            uint8_t                   inBuf[PORT_INBUF_SIZE];
-            uint16_t                  cmdMSP;
-            uint_fast16_t             offset;
-            uint_fast16_t             dataSize;
-            uint8_t                   checksum;
-        } mspPort_t;
-
-        typedef struct __attribute__((packed)) {
-            uint8_t size;
-            uint8_t cmd;
-        } mspHeadert;
-
-        typedef struct __attribute__((packed)) {
-            uint16_t size;
-        } mspHeaderJUMBO_t;
-
-        void *    m_dbgPort = NULL;
-        bool      m_debugging = false;
-        mspPort_t m_ports[MAX_PORT_COUNT];
-
-        static float scale(const float value)
-        {
-            return 1000 + 1000 * value;
+        if (parser_state == IDLE && c == 'R') {
+            m_board->reboot();
         }
 
-        bool processOutCommand(int16_t cmdMSP, sbuf_t *dst)
-        {
-            auto unsupportedCommand = false;
+        // Payload functions
+        size = parser_state == GOT_ARROW ? c : size;
+        index = parser_state == IN_PAYLOAD ? index + 1 : 0;
+        bool incoming = type >= 200;
+        bool in_payload = incoming && parser_state == IN_PAYLOAD;
 
-            switch (cmdMSP) {
+        // Command acquisition function
+        type = parser_state == GOT_SIZE ? c : type;
 
-                case RC:
-                    sbufWriteU16(dst, m_receiver->getRawThrottle());
-                    sbufWriteU16(dst, m_receiver->getRawRoll());
-                    sbufWriteU16(dst, m_receiver->getRawPitch());
-                    sbufWriteU16(dst, m_receiver->getRawYaw());
-                    sbufWriteU16(dst, scale(m_receiver->getRawAux1()));
-                    sbufWriteU16(dst, scale(m_receiver->getRawAux2()));
-                    break;
+        // Parser state transition function (final transition below)
+        parser_state
+            = parser_state == IDLE && c == '$' ? GOT_START
+            : parser_state == GOT_START && c == 'M' ? GOT_M
+            : parser_state == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
+            : parser_state == GOT_ARROW ? GOT_SIZE
+            : parser_state == GOT_SIZE ? IN_PAYLOAD
+            : parser_state == IN_PAYLOAD && index <= size ? IN_PAYLOAD
+            : parser_state == IN_PAYLOAD ? GOT_CRC
+            : parser_state;
 
-                case ATTITUDE:
-                    sbufWriteU16(dst, 10 * rad2degi(m_vstate->phi));
-                    sbufWriteU16(dst, 10 * rad2degi(m_vstate->theta));
-                    sbufWriteU16(dst, rad2degi(m_vstate->psi));
-                    break;
+        // Checksum transition function
+        crc 
+            = parser_state == GOT_SIZE ?  c
+            : parser_state == IN_PAYLOAD ? crc ^ c
+            : parser_state == GOT_CRC ? crc 
+            : 0;
 
-                default:
-                    unsupportedCommand = true;
-            }
-            return !unsupportedCommand;
+        // Payload accumulation
+        if (in_payload) {
+            _payload[index-1] = c;
         }
 
+        if (parser_state == GOT_CRC) {
 
-        mspResult_e processInCommand(int16_t cmdMSP, sbuf_t *src, float * motors)
-        {
-            switch (cmdMSP) {
-
-                case SET_MOTOR:
-                    for (uint8_t i=0; i<m_esc->m_pins->size(); i++) {
-                        motors[i] = m_esc->convertFromExternal(sbufReadU16(src));
-                    }
-                    break;
-
-                default:
-                    // we do not know how to handle the (valid) message, indicate error
-                    // MSP $M!
-                    return RESULT_ERROR;
-            }
-            return RESULT_ACK;
-        }
-
-        /*
-         * Returns RESULT_ACK, RESULT_ERROR or RESULT_NO_REPLY
-         */
-        mspResult_e fcProcessCommand(mspPacket_t *cmd, mspPacket_t *reply, float * motors) {
-
-            sbuf_t *dst = &reply->buf;
-            sbuf_t *src = &cmd->buf;
-            const auto cmdMSP = cmd->cmd;
-            reply->cmd = cmd->cmd;
-
-            mspResult_e ret = 
-                processOutCommand(cmdMSP, dst) ?
-                RESULT_ACK :
-                processInCommand(cmdMSP, src, motors);
-
-            reply->result = ret;
-
-            return ret;
-        }
-
-        static void fcProcessReply(mspPacket_t *reply)
-        {
-            (void)reply;
-        }
-
-        static bool processReceivedData(mspPort_t *mspPort, uint8_t c)
-        {
-            switch (mspPort->state) {
-                default:
-                case IDLE:      // Waiting for '$' character
-                    if (c == '$') {
-                        mspPort->state = HEADER_START;
-                    } else {
-                        return false;
-                    }
-                    break;
-
-                case HEADER_START: 
-                    mspPort->offset = 0;
-                    mspPort->checksum = 0;
-                    switch (c) {
-                        case 'M':
-                            mspPort->state = HEADER_M;
-                            break;
-                        default:
-                            mspPort->state = IDLE;
-                            break;
-                    }
-                    break;
-
-                case HEADER_M:      // Waiting for '<' / '>'
-                    mspPort->state = HEADER;
-                    switch (c) {
-                        case '<':
-                            mspPort->packetType = PACKET_COMMAND;
-                            break;
-                        case '>':
-                            mspPort->packetType = PACKET_REPLY;
-                            break;
-                        default:
-                            mspPort->state = IDLE;
-                            break;
-                    }
-                    break;
-
-                case HEADER:    
-                    mspPort->inBuf[mspPort->offset++] = c;
-                    mspPort->checksum ^= c;
-                    if (mspPort->offset == sizeof(mspHeadert)) {
-
-                        mspHeadert * hdr = (mspHeadert *)&mspPort->inBuf[0];
-
-                        // Check incoming buffer size limit
-                        if (hdr->size > PORT_INBUF_SIZE) {
-                            mspPort->state = IDLE;
-                        } else {
-                            mspPort->dataSize = hdr->size;
-                            mspPort->cmdMSP = hdr->cmd;
-                            mspPort->offset = 0;                // re-use buffer
-                            mspPort->state = mspPort->dataSize > 0 ?
-                                PAYLOAD :
-                                CHECKSUM;    // If no payload - jump to checksum byte
-                        }
-                    }
-                    break;
-
-                case PAYLOAD:
-                    mspPort->inBuf[mspPort->offset++] = c;
-                    mspPort->checksum ^= c;
-                    if (mspPort->offset == mspPort->dataSize) {
-                        mspPort->state = CHECKSUM;
-                    }
-                    break;
-
-                case CHECKSUM:
-                    if (mspPort->checksum == c) {
-                        mspPort->state = COMMAND_RECEIVED;
-                    } else {
-                        mspPort->state = IDLE;
-                    }
-                    break;
+            // Message dispatch
+            if (crc == c) {
+                dispatchMessage(type);
             }
 
-            return true;
+            parser_state = IDLE;
         }
 
-        static uint8_t mspSerialChecksumBuf(uint8_t checksum, const uint8_t *data, int len)
-        {
-            while (len-- > 0) {
-                checksum ^= *data++;
-            }
-            return checksum;
+
+    } // parse
+
+    static float scale(const float value)
+    {
+        return 1000 + 1000 * value;
+    }
+
+    static int16_t rad2degi(float rad)
+    {
+        return (int16_t)Math::rad2deg(rad);
+    }
+
+    void handle_SET_MOTOR(uint16_t  m1, uint16_t  m2, uint16_t  m3, uint16_t  m4)
+    {
+        motors[0] = m_esc->convertFromExternal(m1);
+        motors[1] = m_esc->convertFromExternal(m2);
+        motors[2] = m_esc->convertFromExternal(m3);
+        motors[3] = m_esc->convertFromExternal(m4);
+    }
+
+    void handle_RC_Request(
+            uint16_t & c1,
+            uint16_t & c2,
+            uint16_t & c3,
+            uint16_t & c4,
+            uint16_t & c5,
+            uint16_t & c6)
+    {
+        c1 = (uint16_t)m_receiver->getRawThrottle();
+        c2 = (uint16_t)m_receiver->getRawRoll();
+        c3 = (uint16_t)m_receiver->getRawPitch();
+        c4 = (uint16_t)m_receiver->getRawYaw();
+        c5 = scale(m_receiver->getRawAux1());
+        c6 = scale(m_receiver->getRawAux2());
+     }
+
+    void handle_ATTITUDE_Request(uint16_t & phi, uint16_t & theta, uint16_t & psi)
+    {
+        phi   = 10 * rad2degi(m_vstate->phi);
+        theta = 10 * rad2degi(m_vstate->theta);
+        psi   = rad2degi(m_vstate->psi);
+    }
+
+    void dispatchMessage(uint8_t command)
+    {
+        switch (command) {
+
+            case 214:
+                {
+                    uint16_t m1 = 0;
+                    memcpy(&m1,  &_payload[0], sizeof(uint16_t));
+
+                    uint16_t m2 = 0;
+                    memcpy(&m2,  &_payload[2], sizeof(uint16_t));
+
+                    uint16_t m3 = 0;
+                    memcpy(&m3,  &_payload[4], sizeof(uint16_t));
+
+                    uint16_t m4 = 0;
+                    memcpy(&m4,  &_payload[6], sizeof(uint16_t));
+
+                    handle_SET_MOTOR(m1, m2, m3, m4);
+
+                } break;
+
+            case 105:
+                {
+                    uint16_t c1 = 0;
+                    uint16_t c2 = 0;
+                    uint16_t c3 = 0;
+                    uint16_t c4 = 0;
+                    uint16_t c5 = 0;
+                    uint16_t c6 = 0;
+                    handle_RC_Request(c1, c2, c3, c4, c5, c6);
+                    prepareToSendShorts(command, 6);
+                    sendShort(c1);
+                    sendShort(c2);
+                    sendShort(c3);
+                    sendShort(c4);
+                    sendShort(c5);
+                    sendShort(c6);
+                    completeSend();
+                } break;
+
+            case 108:
+                {
+                    uint16_t phi = 0;
+                    uint16_t theta = 0;
+                    uint16_t psi = 0;
+                    handle_ATTITUDE_Request(phi, theta, psi);
+                    prepareToSendShorts(command, 3);
+                    sendShort(phi);
+                    sendShort(theta);
+                    sendShort(psi);
+                    completeSend();
+                } break;
+
+        } // switch (_command)
+
+    } // dispatchMessage 
+
+    Msp() : Task(100) { } // Hz
+
+    void begin(
+            Board * board,
+            Esc * esc,
+            Arming * arming,
+            Receiver * receiver,
+            VehicleState * vstate)
+    {
+        m_board = board;
+
+        m_esc = esc;
+
+        m_arming = arming;
+
+        Serial.begin(115200);
+
+        m_vstate = vstate;
+
+        m_receiver = receiver;
+
+        _outBufChecksum = 0;
+        _outBufIndex = 0;
+        _outBufSize = 0;
+    }
+
+    virtual void fun(uint32_t usec) override
+    {
+        (void)usec;
+
+        while (Serial.available()) {
+            parse(Serial.read());
         }
+    }
 
-        static int serialSendFrame(
-                mspPort_t *msp,
-                const uint8_t * hdr,
-                int hdrLen,
-                const uint8_t * data,
-                int dataLen,
-                const uint8_t * crc,
-                int crcLen)
-        {
-            const int totalFrameLength = hdrLen + dataLen + crcLen;
-
-            // Transmit frame
-            serialWriteBuf(msp->port, hdr, hdrLen);
-            serialWriteBuf(msp->port, data, dataLen);
-            serialWriteBuf(msp->port, crc, crcLen);
-
-            return totalFrameLength;
-        }
-
-        static int serialEncode(mspPort_t *msp, mspPacket_t *packet)
-        {
-            const int dataLen = sbufBytesRemaining(&packet->buf);
-            uint8_t hdrBuf[16] = { (uint8_t)'$', (uint8_t)'M', (uint8_t)(packet->result == RESULT_ERROR ? '!' : '>')};
-            uint8_t crcBuf[2];
-            uint8_t checksum;
-            int hdrLen = 3;
-            int crcLen = 0;
-
-            mspHeadert * hdr = (mspHeadert *)&hdrBuf[hdrLen];
-            hdrLen += sizeof(mspHeadert);
-            hdr->cmd = packet->cmd;
-
-            // Add JUMBO-frame header if necessary
-            if (dataLen >= JUMBO_FRAME_SIZE_LIMIT) {
-                mspHeaderJUMBO_t * hdrJUMBO = (mspHeaderJUMBO_t *)&hdrBuf[hdrLen];
-                hdrLen += sizeof(mspHeaderJUMBO_t);
-
-                hdr->size = JUMBO_FRAME_SIZE_LIMIT;
-                hdrJUMBO->size = dataLen;
-            } else {
-                hdr->size = dataLen;
-            }
-
-            // Pre-calculate CRC
-            checksum = mspSerialChecksumBuf(0, hdrBuf + 3, hdrLen - 3);
-            checksum = mspSerialChecksumBuf(checksum, sbufPtr(&packet->buf), dataLen);
-            crcBuf[crcLen++] = checksum;
-
-            // Send the frame
-            return serialSendFrame(msp, hdrBuf, hdrLen, sbufPtr(&packet->buf), dataLen,
-                    crcBuf, crcLen);
-        }
-
-        mspPostProcessFnPtr processReceivedCommand(mspPort_t *msp, float * motors)
-        {
-            static uint8_t mspSerialOutBuf[PORT_OUTBUF_SIZE];
-
-            mspPacket_t reply = {
-                .buf = { .ptr = mspSerialOutBuf, .end = ARRAYEND(mspSerialOutBuf), },
-                .cmd = -1,
-                .result = 0,
-                .direction = DIRECTION_REPLY,
-            };
-            auto *outBufHead = reply.buf.ptr;
-
-            mspPacket_t command = {
-                .buf = { .ptr = msp->inBuf, .end = msp->inBuf + msp->dataSize, },
-                .cmd = (int16_t)msp->cmdMSP,
-                .result = 0,
-                .direction = DIRECTION_REQUEST,
-            };
-
-            mspPostProcessFnPtr mspPostProcessFn = NULL;
-
-            const auto status = fcProcessCommand(&command, &reply, motors);
-
-            if (status != RESULT_NO_REPLY) {
-                sbufSwitchToReader(&reply.buf, outBufHead); // change streambuf direction
-                serialEncode(msp, &reply);
-            }
-
-            return mspPostProcessFn;
-        }
-
-        static void evaluateNonMspData(mspPort_t * mspPort, uint8_t receivedChar)
-        {
-            if (receivedChar == 'R') {
-                mspPort->pendingRequest = PENDING_BOOTLOADER_ROM;
-            }
-        }
-
-        static void processPendingRequest(mspPort_t * mspPort)
-        {
-            // If no request is pending or 100ms guard time has not elapsed - do nothing
-            if ((mspPort->pendingRequest == PENDING_NONE) ||
-                    (timeMillis() - mspPort->lastActivityMs < 100)) {
-                return;
-            }
-
-            switch(mspPort->pendingRequest) {
-                case PENDING_BOOTLOADER_ROM:
-                    systemReboot();
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-    public:
-
-        void triggerDebugging(void)
-        {
-            m_debugging = true;
-        }
-
-    public:
-
-        Msp() : Task(100) { } // Hz
-
-        void begin(Esc * esc, Arming * arming, Receiver * receiver, VehicleState * vstate)
-        {
-            memset(m_ports, 0, sizeof(m_ports));
-
-            m_esc = esc;
-
-            m_arming = arming;
-
-            m_ports[0].port = serialOpenPortUsb();
-
-            m_dbgPort = m_ports[0].port; 
-
-            serialDebugSetPort(m_dbgPort);
-
-            m_vstate = vstate;
-
-            m_receiver = receiver;
-        }
-
-        virtual void fun(uint32_t usec) override
-        {
-            (void)usec;
-
-            // Sync debugging to MSP update
-            if (m_debugging) {
-                serialDebugFlush();
-                m_debugging = false;
-            }
-
-            else for (auto portId=0; portId<MAX_PORT_COUNT; portId++) {
-
-                mspPort_t * const mspPort = &m_ports[portId];
-
-                if (!mspPort->port) {
-                    continue;
-                }
-
-                mspPostProcessFnPtr mspPostProcessFn = NULL;
-
-                if (serialBytesAvailable(mspPort->port)) {
-                    // There are bytes incoming - abort pending request
-                    mspPort->lastActivityMs = timeMillis();
-                    mspPort->pendingRequest = PENDING_NONE;
-
-                    while (serialBytesAvailable(mspPort->port)) {
-
-                        const auto c = serialRead(mspPort->port);
-
-                        const auto consumed = processReceivedData(mspPort, c);
-
-                        if (!consumed && !m_arming->isArmed()) {
-                            evaluateNonMspData(mspPort, c);
-                        }
-
-                        if (mspPort->state == COMMAND_RECEIVED) {
-                            if (mspPort->packetType == PACKET_COMMAND) {
-                                mspPostProcessFn = processReceivedCommand(mspPort, motors);
-                            } else if (mspPort->packetType == PACKET_REPLY) {
-                                mspPort->state = IDLE;
-                            }
-
-                            mspPort->state = IDLE;
-                            break; 
-                            // process one command at a time so as not to block.
-                        }
-                    }
-
-                    if (mspPostProcessFn) {
-                        mspPostProcessFn(mspPort->port);
-                    }
-                } else {
-                    processPendingRequest(mspPort);
-                }
-            }
-
-        }
-};
+}; // class Msp

@@ -21,9 +21,9 @@
 
 #include <stdlib.h>
 
-#include "serial.h"
 #include "tasks/receiver.h"
 #include "time.h"
+
 
 class SbusReceiver : public Receiver {
 
@@ -36,10 +36,6 @@ class SbusReceiver : public Receiver {
 
         static const uint16_t CHANNEL_MIN = 173;
         static const uint16_t CHANNEL_MAX = 1812;
-
-        static const uint32_t TIME_NEEDED_PER_FRAME = 3000;
-
-        static const uint8_t FRAME_BEGIN_BYTE = 0x0F;
 
         typedef struct sbusChannels_s {
             // 176 bits of data (11 bits per channel * 16 channels) = 22 bytes.
@@ -93,52 +89,54 @@ class SbusReceiver : public Receiver {
             bool done;
         } frameData_t;
 
-        frameData_t m_frameData;
-
-        // Receive ISR callback
-        static void dataReceive(uint8_t c, void *data, uint32_t usec)
-        {
-            frameData_t * frameData = (frameData_t *)data;
-
-            const int32_t timeInterval = cmpTimeUs(usec, frameData->startAtUs);
-
-            if (timeInterval > (int32_t)(TIME_NEEDED_PER_FRAME + 500)) {
-                frameData->position = 0;
-            }
-
-            if (frameData->position == 0) {
-                if (c != FRAME_BEGIN_BYTE) {
-                    return;
-                }
-                frameData->startAtUs = usec;
-            }
-
-            if (frameData->position < FRAME_SIZE) {
-                frameData->frame.bytes[frameData->position++] = (uint8_t)c;
-                if (frameData->position < FRAME_SIZE) {
-                    frameData->done = false;
-                } else {
-                    frameData->done = true;
-                }
-            }
-        }
-
-        serialPortIdentifier_e m_port;
-
         float convert(
-                const uint16_t value, const uint16_t dstmin=1000, const uint16_t dstmax=2000)
+                const uint16_t value,
+                const uint16_t dstmin=1000,
+                const uint16_t dstmax=2000)
         {
             return Receiver::convert(value, 172, 1811, dstmin, dstmax);
         }
 
+        frameData_t m_frameData;
+
     protected:
+
+        virtual void parse(const uint8_t c) override
+        {
+            const uint32_t usec = micros();
+            const int32_t timeInterval = cmpTimeUs(usec, m_frameData.startAtUs);
+
+            if (timeInterval > 3500) {
+                m_frameData.position = 0;
+            }
+
+            if (m_frameData.position == 0) {
+
+                if (c != 0x0F) {
+                    return;
+                }
+                m_frameData.startAtUs = usec;
+            }
+
+            if (m_frameData.position < FRAME_SIZE) {
+                m_frameData.frame.bytes[m_frameData.position++] = c;
+                if (m_frameData.position < FRAME_SIZE) {
+                    m_frameData.done = false;
+                } else {
+                    m_frameData.done = true;
+                }
+            }
+        }
 
         virtual void devStart(void) override
         {
-            serialOpenPortSbus(
-                    m_port,
-                    dataReceive,
-                    &m_frameData);
+#if defined(TEENSYSUINO)
+            m_port->begin(100000, SERIAL_8E2_RXINV_TXINV);
+#elif defined(ESP32)
+            m_port->begin(100000, SERIAL_8E2, rxpin, txpin, true);
+#else // default to STM32
+            m_port->begin(100000, SERIAL_8E2|0xC000ul);
+#endif
         }
 
         virtual bool devRead(
@@ -162,15 +160,13 @@ class SbusReceiver : public Receiver {
 
                 // Update frame time only if there are no channel errors (timeout)
                 frameTimeUs = channels->flags ? frameTimeUs : m_frameData.startAtUs;
-
                 throttle = convert(channels->chan0);
 
-                roll     = convert(channels->chan1);
-                pitch    = convert(channels->chan2);
-                yaw      = convert(channels->chan3);
-
-                aux1     = convert(channels->chan4, 0, 1);
-                aux2     = convert(channels->chan5, 0, 1);
+                roll  = convert(channels->chan1);
+                pitch = convert(channels->chan2);
+                yaw   = convert(channels->chan3);
+                aux1  = convert(channels->chan4, 0, 1);
+                aux2  = convert(channels->chan5, 0, 1);
             }
 
             return result;
@@ -178,12 +174,10 @@ class SbusReceiver : public Receiver {
 
     public:
 
-        SbusReceiver(serialPortIdentifier_e port=SERIAL_PORT_NONE) 
-            : Receiver()
+        SbusReceiver(HardwareSerial & port)
+            : Receiver(port)
         {
-            m_port = port;
         }
 
 }; // class SbusReceiver
-
 

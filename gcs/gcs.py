@@ -176,6 +176,8 @@ class GCS(MspParser):
 
     def handle_RC(self, c1, c2, c3, c4, c5, c6):
 
+        debug((c1, c2, c3, c4, c5, c6))
+
         def norm(x):
 
             MIN = 987
@@ -371,6 +373,8 @@ class GCS(MspParser):
 
             # Disconnected
             if len(ports) < len(self.ports):
+
+                debug('disconnected')
 
                 exit(0)
 

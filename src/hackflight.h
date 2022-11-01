@@ -30,13 +30,13 @@
 using namespace std;
 
 #include "arming.h"
+#include "board.h"
 #include "core/mixer.h"
 #include "esc.h"
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
 #include "scheduler.h"
-#include "system.h"
 #include "tasks/attitude.h"
 #include "tasks/msp.h"
 #include "tasks/receiver.h"
@@ -50,6 +50,7 @@ class Hackflight {
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
         // Initialzed in main()
+        Board *    m_board;
         Imu *      m_imu;
         Esc *      m_esc;
         Led *      m_led;
@@ -75,7 +76,7 @@ class Hackflight {
             m_scheduler.corePreUpdate();
 
             while (loopRemainingCycles > 0) {
-                nowCycles = systemGetCycleCounter();
+                nowCycles = m_board->getCycleCounter();
                 loopRemainingCycles =
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
@@ -89,11 +90,10 @@ class Hackflight {
                 m_vstate.dpsi   = angvels.z;
             }
 
-            auto usec = timeMicros();
+            auto usec = micros();
 
             Demands demands = m_receiver->getDemands();
 
-            // XXX not sure why we need this
             delayMicroseconds(10);
 
             auto motors = m_mixer->step(
@@ -163,7 +163,7 @@ class Hackflight {
             Task *selectedTask = NULL;
             uint16_t selectedTaskDynamicPriority = 0;
 
-            const uint32_t usec = timeMicros();
+            const uint32_t usec = micros(); //timeMicros();
 
             m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
@@ -177,14 +177,14 @@ class Hackflight {
 
                 const auto taskRequiredTimeUs = selectedTask->getRequiredTime();
 
-                const auto nowCycles = systemGetCycleCounter();
+                const auto nowCycles = m_board->getCycleCounter();
 
                 const auto loopRemainingCycles =
                     cmpTimeCycles(nextTargetCycles, nowCycles);
 
                 // Allow a little extra time
                 const auto taskRequiredCycles =
-                    (int32_t)systemClockMicrosToCycles((uint32_t)taskRequiredTimeUs) +
+                    (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
                     m_scheduler.getTaskGuardCycles();
 
                 if (taskRequiredCycles < loopRemainingCycles) {
@@ -194,7 +194,7 @@ class Hackflight {
                     selectedTask->execute(usec);
 
                     m_scheduler.updateDynamic(
-                            systemGetCycleCounter(),
+                            m_board->getCycleCounter(),
                             anticipatedEndCycles);
                 } else {
                     selectedTask->enableRun();
@@ -206,6 +206,7 @@ class Hackflight {
     public:
 
         Hackflight(
+                Board & board,
                 Receiver & receiver,
                 Imu & imu,
                 Imu::align_fun imuAlignFun,
@@ -214,6 +215,7 @@ class Hackflight {
                 Esc & esc,
                 Led & led)
         {
+            m_board = &board;
             m_receiver = &receiver;
             m_imu = &imu;
             m_mixer = &mixer;
@@ -226,11 +228,13 @@ class Hackflight {
 
         void begin(void)
         {
+            m_board->startCycleCounter();
+
             m_arming.begin(m_esc, m_led);
 
             m_attitude.begin(m_imu, &m_arming, &m_vstate);
 
-            m_msp.begin(m_esc, &m_arming, m_receiver, &m_vstate);
+            m_msp.begin(m_board, m_esc, &m_arming, m_receiver, &m_vstate);
 
             m_receiver->begin(&m_arming);
 
@@ -246,13 +250,13 @@ class Hackflight {
         void step(void)
         {
             // Realtime gyro/filtering/PID tasks get complete priority
-            auto nowCycles = systemGetCycleCounter();
+            auto nowCycles = m_board->getCycleCounter();
 
             if (m_scheduler.isCoreReady(nowCycles)) {
                 checkCoreTasks(nowCycles);
             }
 
-            if (m_scheduler.isDynamicReady(systemGetCycleCounter())) {
+            if (m_scheduler.isDynamicReady(m_board->getCycleCounter())) {
                 checkDynamicTasks();
             }
         }

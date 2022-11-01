@@ -21,7 +21,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "debug.h"
 #include "esc.h"
 #include "led.h"
 
@@ -52,7 +51,7 @@ class Arming {
     bool m_gotFailsafe;
     bool m_gyroDoneCalibrating;
     bool m_haveSignal;
-    bool m_is_armed;
+    bool m_isArmed;
     bool m_switchOkay;
     bool m_throttleIsDown;
 
@@ -64,16 +63,16 @@ class Arming {
 
     void disarm(void)
     {
-        if (m_is_armed) {
+        if (m_isArmed) {
             m_esc->stop();
         }
 
-        m_is_armed = false;
+        m_isArmed = false;
     }
 
     bool isArmed(void)
     {
-        return m_is_armed;
+        return m_isArmed;
     }
 
     void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
@@ -94,7 +93,7 @@ class Arming {
 
             if (readyToArm()) {
 
-                if (m_is_armed) {
+                if (m_isArmed) {
                     return;
                 }
 
@@ -102,18 +101,18 @@ class Arming {
                     return;
                 }
 
-                m_is_armed = true;
+                m_isArmed = true;
             }
 
         } else {
 
-            if (m_is_armed) {
+            if (m_isArmed) {
                 disarm();
-                m_is_armed = false;
+                m_isArmed = false;
             }
         }
 
-        if (!(m_is_armed || _doNotRepeat || !readyToArm())) {
+        if (!(m_isArmed || _doNotRepeat || !readyToArm())) {
             _doNotRepeat = true;
         }
     }
@@ -121,7 +120,7 @@ class Arming {
     void updateFromReceiver(
             const bool throttleIsDown, const bool aux1IsSet, const bool haveSignal)
     {
-        if (m_is_armed) {
+        if (m_isArmed) {
 
             if (!haveSignal && m_haveSignal) {
                 m_gotFailsafe = true;

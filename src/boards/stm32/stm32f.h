@@ -1,6 +1,4 @@
 /*
-   Copyright (c) 2022 Simon D. Levy
-
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify it under the
@@ -18,30 +16,36 @@
 
 #pragma once
 
-#include <stdint.h>
+#include "boards/stm32.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
+class Stm32FBoard : public Stm32Board {
 
-    static inline int32_t cmpTimeUs(uint32_t a, uint32_t b)
+#if defined(ARDUINO)
+    virtual void reboot(void) override
     {
-        return (int32_t)(a - b);
-    }
+        __enable_irq();
+        HAL_RCC_DeInit();
+        HAL_DeInit();
+        SysTick->CTRL = SysTick->LOAD = SysTick->VAL = 0;
+        __HAL_SYSCFG_REMAPMEMORY_SYSTEMFLASH();
 
-    static inline int32_t cmpTimeCycles(uint32_t a, uint32_t b)
+        const uint32_t p = (*((uint32_t *) 0x1FFF0000));
+        __set_MSP( p );
+
+        void (*SysMemBootJump)(void);
+        SysMemBootJump = (void (*)(void)) (*((uint32_t *) 0x1FFF0004));
+        SysMemBootJump();
+
+        while( 1 ) {}
+    }
+#else
+    virtual void reboot(void) override
     {
-        return (int32_t)(a - b);
+        RTC_WriteBackupRegister(4, 1);
+
+        __disable_irq();
+
+        NVIC_SystemReset();
     }
-
-    void delayMicroseconds(uint32_t us);
-    void delayMillis(uint32_t ms);
-
-    uint32_t microsISR(void);
-
-    uint32_t ticks(void);
-    int32_t ticks_diff_us(uint32_t begin, uint32_t end);
-
-#if defined(__cplusplus)
-}
 #endif
+};

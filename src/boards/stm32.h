@@ -1,6 +1,4 @@
 /*
-   Copyright (c) 2022 Simon D. Levy
-
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify it under the
@@ -18,30 +16,35 @@
 
 #pragma once
 
-#include <stdint.h>
+#include "board.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
+#include "stm32f4xx.h"
 
-    static inline int32_t cmpTimeUs(uint32_t a, uint32_t b)
+class Stm32Board : public Board {
+
+    virtual uint32_t getClockSpeed(void) override
     {
-        return (int32_t)(a - b);
+        return SystemCoreClock;
     }
 
-    static inline int32_t cmpTimeCycles(uint32_t a, uint32_t b)
+    virtual uint32_t getCycleCounter(void) override
     {
-        return (int32_t)(a - b);
+        return DWT->CYCCNT;
     }
 
-    void delayMicroseconds(uint32_t us);
-    void delayMillis(uint32_t ms);
+    virtual void reboot(void)
+    {
+    }
 
-    uint32_t microsISR(void);
+    virtual void startCycleCounter(void) override
+    {
+        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 
-    uint32_t ticks(void);
-    int32_t ticks_diff_us(uint32_t begin, uint32_t end);
+        __O uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
+        *(DWTLAR) = 0xC5ACCE55;
 
-#if defined(__cplusplus)
-}
-#endif
+        DWT->CYCCNT = 0;
+        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+    }
+
+};

@@ -1,6 +1,4 @@
 /*
-   Copyright (c) 2022 Simon D. Levy
-
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify it under the
@@ -20,28 +18,20 @@
 
 #include <stdint.h>
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
+class Board {
 
-    static inline int32_t cmpTimeUs(uint32_t a, uint32_t b)
-    {
-        return (int32_t)(a - b);
-    }
+    public:
 
-    static inline int32_t cmpTimeCycles(uint32_t a, uint32_t b)
-    {
-        return (int32_t)(a - b);
-    }
+        uint32_t microsToCycles(uint32_t micros)
+        {
+            return getClockSpeed() / 1000000 * micros;
+        }
 
-    void delayMicroseconds(uint32_t us);
-    void delayMillis(uint32_t ms);
+        virtual uint32_t getClockSpeed(void)  = 0;
 
-    uint32_t microsISR(void);
+        virtual uint32_t getCycleCounter(void) = 0;
 
-    uint32_t ticks(void);
-    int32_t ticks_diff_us(uint32_t begin, uint32_t end);
+        virtual void reboot(void) { }
 
-#if defined(__cplusplus)
-}
-#endif
+        virtual void startCycleCounter(void) = 0;
+}; 

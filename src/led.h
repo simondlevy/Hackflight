@@ -54,7 +54,7 @@ class Led {
                     break;
             }
 
-            auto now = timeMicros();
+            auto now = micros();
             m_warningLedTimer = now + 500000;
         }
 
@@ -68,7 +68,7 @@ class Led {
             devSet(false);
             for (auto i=0; i<reps; i++) {
                 devToggle();
-                delayMillis(delayMs);
+                delay(delayMs);
             }
             devSet(false);
         }
@@ -90,7 +90,7 @@ class Led {
 
         void warningUpdate(void)
         {
-            uint32_t now = timeMicros();
+            uint32_t now = micros();
 
             if ((int32_t)(now - m_warningLedTimer) < 0) {
                 return;
@@ -98,14 +98,8 @@ class Led {
 
             warningRefresh();
         }
+
     protected:
-
-        uint8_t m_pin = 0;
-
-        Led(uint8_t pin)
-        {
-            m_pin = pin;
-        }
 
         virtual void devInit(void) = 0;
 

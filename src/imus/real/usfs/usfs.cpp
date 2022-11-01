@@ -58,7 +58,7 @@ bool UsfsImu::gyroIsReady(void)
     return result;
 }
 
-void UsfsImu::devInit(
+bool UsfsImu::devInit(
                 uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr)
 {
     m_gyroDev.syncTimePtr = gyroSyncTimePtr;
@@ -84,6 +84,9 @@ void UsfsImu::devInit(
 
     // Clear interrupts
     usfsCheckStatus();
+
+    // XXX should check USFS begin() status
+    return true;
 }
 
 int16_t UsfsImu::devReadRawGyro(uint8_t k)

@@ -1,6 +1,4 @@
 /*
-   Copyright (c) 2022 Simon D. Levy
-
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify it under the
@@ -18,30 +16,26 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <Arduino.h>
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
+#include "board.h"
 
-    static inline int32_t cmpTimeUs(uint32_t a, uint32_t b)
+class Teensy40 : public Board {
+
+    virtual uint32_t getCycleCounter(void) override
     {
-        return (int32_t)(a - b);
+        return ARM_DWT_CYCCNT;
     }
 
-    static inline int32_t cmpTimeCycles(uint32_t a, uint32_t b)
+    virtual uint32_t getClockSpeed(void) override
     {
-        return (int32_t)(a - b);
+        return F_CPU;
     }
 
-    void delayMicroseconds(uint32_t us);
-    void delayMillis(uint32_t ms);
+    virtual void startCycleCounter(void) override
+    {
+        ARM_DEMCR |= ARM_DEMCR_TRCENA;
+        ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA;
+    }
 
-    uint32_t microsISR(void);
-
-    uint32_t ticks(void);
-    int32_t ticks_diff_us(uint32_t begin, uint32_t end);
-
-#if defined(__cplusplus)
-}
-#endif
+};

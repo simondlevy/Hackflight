@@ -25,9 +25,10 @@
 #include "core/filters/pt3.h"
 #include "core/pids/angle.h"
 #include "pwm.h"
-#include "serial.h"
 #include "task.h"
 #include "time.h"
+
+static HardwareSerial * m_port;
 
 class Receiver : public Task {
 
@@ -309,9 +310,18 @@ class Receiver : public Task {
             float & rawAux2,
             uint32_t & frameTimeUs) = 0;
 
-    Receiver()
+    virtual void parse(const uint8_t c) = 0;
+
+    Receiver(void)
         : Task(33) // Hz
     {
+        m_port = NULL;
+    }
+
+    Receiver(HardwareSerial & port)
+        : Receiver() 
+    {
+        m_port = &port;
     }
 
     // Task function, called periodically
@@ -385,5 +395,14 @@ class Receiver : public Task {
     float getRawAux2(void)
     {
         return m_rawAux2;
+    }
+
+    public:
+
+    void handleEvent(void)
+    {
+        while (m_port->available()) {
+            parse(m_port->read());
+        }
     }
 };
