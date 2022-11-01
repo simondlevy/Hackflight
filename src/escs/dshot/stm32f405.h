@@ -123,7 +123,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         } resourceOwner_e;
 
         typedef struct resourceOwner_s {
-            resourceOwner_e owner;
             uint8_t resourceIndex;
         } resourceOwner_t;
 
@@ -160,7 +159,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint8_t                     flagsShift;
             IRQn_Type                   irqN;
             uint32_t                    userParam;
-            resourceOwner_t             owner;
             uint8_t                     resourceIndex;
             uint32_t                    completeFlag;
         } dmaChannelDescriptor_t;
@@ -210,9 +208,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint32_t *portOutputBuffer;
             uint32_t portOutputCount;
 
-            // Misc
-            resourceOwner_t owner;
-
             // TIM initialization
             uint16_t TIM_Prescaler;       
             uint16_t TIM_CounterMode;       
@@ -249,7 +244,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         typedef struct {
             GPIO_TypeDef *gpio;
             uint16_t pin;
-            resourceOwner_e owner;
             uint8_t index;
         } ioRec_t;
 
@@ -523,20 +517,10 @@ class Stm32F405DshotEsc : public DshotEsc {
             return ioRec->pin;
         }
 
-        static void _IOInit(IO_t io, resourceOwner_e owner, uint8_t index)
+        static void _IOInit(IO_t io, uint8_t index)
         {
             ioRec_t *ioRec =_IORec(io);
-            ioRec->owner = owner;
             ioRec->index = index;
-        }
-
-        static resourceOwner_e _IOGetOwner(IO_t io)
-        {
-            if (!io) {
-                return OWNER_FREE;
-            }
-            const ioRec_t *ioRec = _IORec(io);
-            return ioRec->owner;
         }
 
         static int32_t _IO_GPIOPortIdx(IO_t io)
@@ -814,8 +798,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
 
             bbPort->portIndex = portIndex;
-            bbPort->owner.owner = OWNER_DSHOT_BITBANG;
-            bbPort->owner.resourceIndex = portIndex + 1;
 
             ++m_usedMotorPorts;
 
@@ -985,7 +967,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             bbMotor->output = output;
             bbMotor->bbPort = bbPort;
 
-            _IOInit(io, OWNER_MOTOR, motorIndex+1);
+            _IOInit(io, motorIndex+1);
 
             // Setup GPIO_MODER and GPIO_ODR register manipulation values
 
@@ -1124,8 +1106,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC_ClockEnable(timerRCC(TIM5));
         }
 
-        const resourceOwner_t freeOwner = { .owner = OWNER_FREE, .resourceIndex = 0 };
-
         void ioInit(void)
         {
             ioRec_t *ioRec = m_ioRecs;
@@ -1175,7 +1155,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 m_motors[motorIndex].iocfg =
                     io_config(GPIO_MODE_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, m_puPdMode);
 
-                _IOInit(io, OWNER_MOTOR, motorIndex+1);
+                _IOInit(io, motorIndex+1);
                 _IOConfigGPIO(io, m_motors[motorIndex].iocfg);
 
                 _IO_GPIO(io)->BSRR |= (uint32_t)_IO_Pin(io);
