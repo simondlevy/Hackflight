@@ -1313,14 +1313,12 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        virtual bool updateStart(void) override
+        virtual void updateStart(void) override
         {
             for (auto i=0; i<m_usedMotorPorts; i++) {
                 dmaCmd(&m_ports[i], DISABLE);
                 outputDataClear(m_ports[i].portOutputBuffer);
             }
-
-            return true;
         }
 
         virtual void write(uint8_t index, float value) override

@@ -218,7 +218,7 @@ class DshotEsc : public Esc {
 
         virtual void deviceInit(void) = 0;
         virtual void updateComplete(void) = 0;
-        virtual bool updateStart(void) = 0;
+        virtual void updateStart(void) = 0;
         virtual void write(uint8_t index, float value) = 0;
 
         DshotEsc(vector<uint8_t> & pins, protocol_t protocol=DSHOT600) 
@@ -361,9 +361,9 @@ class DshotEsc : public Esc {
         virtual void write(const float values[]) override
         {
             if (m_enabled) {
-                if (!updateStart()) {
-                    return;
-                }
+
+                updateStart();
+
                 for (auto i=0; i <m_motorCount; i++) {
                     write(i, values[i]);
                 }
