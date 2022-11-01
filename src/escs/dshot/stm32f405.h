@@ -1278,16 +1278,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }        
 
-        virtual bool enable(void) override
-        {
-            for (auto i=0; i<m_motorCount; i++) {
-                if (m_motors[i].configured) {
-                    _IOConfigGPIO(m_motors[i].io, m_motors[i].iocfg);
-                }
-            }
-            return true;
-        }
-
         virtual void postInit(void) override
         {
             m_ports[0].timhw = &m_timer1Hardware[0];
@@ -1303,6 +1293,12 @@ class Stm32F405DshotEsc : public DshotEsc {
                 }
 
                 m_motors[motorIndex].enabled = true;
+            }
+
+            for (auto i=0; i<m_motorCount; i++) {
+                if (m_motors[i].configured) {
+                    _IOConfigGPIO(m_motors[i].io, m_motors[i].iocfg);
+                }
             }
         }
 

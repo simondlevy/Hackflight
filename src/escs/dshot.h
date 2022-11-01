@@ -217,7 +217,6 @@ class DshotEsc : public Esc {
 
 
         virtual void deviceInit(void) = 0;
-        virtual bool enable(void) = 0;
         virtual void postInit(void) = 0;
         virtual void updateComplete(void) = 0;
         virtual bool updateStart(void) = 0;
@@ -302,9 +301,7 @@ class DshotEsc : public Esc {
 
             postInit();
 
-            if (enable()) {
-                m_enabled = true;
-            }
+            m_enabled = true;
         }
 
         virtual float convertFromExternal(const uint16_t value) override 
