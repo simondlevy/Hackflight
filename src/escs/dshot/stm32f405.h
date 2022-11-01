@@ -88,12 +88,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         static const uint8_t FRAME_BITS = 16;
         static const uint8_t BUF_LENGTH = FRAME_BITS * STATE_PER_SYMBOL;
 
-        static const uint32_t USED_TIMER_COUNT = 14;
-
-        // amount we can safely shift timer address to the right. gcc will
-        // throw error if some timers overlap
-        static const uint8_t CASE_SHF = 10;           
-
         // Typedefs =====================================================================
 
         typedef enum { 
@@ -533,7 +527,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void _configGPIO(IO_t io, uint8_t cfg)
+        static void _IOConfigGPIO(IO_t io, uint8_t cfg)
         {
             const uint8_t ioPortDefs[6] = {
                 { rcc_ahb1(RCC_AHB1ENR_GPIOAEN_MSK) },
@@ -554,11 +548,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint32_t pull  = (cfg >> 5) & 0x03;
 
             GPIO_Init(_IO_GPIO(io), pin, mode, speed, pull);
-        }
-
-        static void _IOConfigGPIO(IO_t io, uint8_t cfg)
-        {
-            _configGPIO(io, cfg);
         }
 
         static int32_t _IO_GPIOPinIdx(IO_t io)
