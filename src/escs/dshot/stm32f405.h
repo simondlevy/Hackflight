@@ -647,41 +647,32 @@ class Stm32F405DshotEsc : public DshotEsc {
             return 0;
         }
 
-        static void TIM_TimeBaseInit(TIM_TypeDef * TIMx, port_t * bbPort)
+        static void TIM_TimeBaseInit(port_t * bbPort)
         {
-            uint16_t tmpcr1 = TIMx->CR1;  
+            uint16_t tmpcr1 = TIM1->CR1;  
 
-            if((TIMx == TIM1) || (TIMx == TIM8)||
-                    (TIMx == TIM2) || (TIMx == TIM3)||
-                    (TIMx == TIM4) || (TIMx == TIM5)) 
-            {
-                // Select the Counter Mode
-                tmpcr1 &= (uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS));
-                tmpcr1 |= (uint32_t)bbPort->TIM_CounterMode;
-            }
+            // Select the Counter Mode
+            tmpcr1 &= (uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS));
+            tmpcr1 |= (uint32_t)bbPort->TIM_CounterMode;
 
-            if((TIMx != TIM6) && (TIMx != TIM7)) {
-                // Set the clock division 
-                tmpcr1 &=  (uint16_t)(~TIM_CR1_CKD);
-                tmpcr1 |= (uint32_t)bbPort->TIM_ClockDivision;
-            }
+            // Set the clock division 
+            tmpcr1 &=  (uint16_t)(~TIM_CR1_CKD);
+            tmpcr1 |= (uint32_t)bbPort->TIM_ClockDivision;
 
-            TIMx->CR1 = tmpcr1;
+            TIM1->CR1 = tmpcr1;
 
             // Set the Autoreload value 
-            TIMx->ARR = bbPort->TIM_Period ;
+            TIM1->ARR = bbPort->TIM_Period ;
 
             // Set the Prescaler value
-            TIMx->PSC = bbPort->TIM_Prescaler;
+            TIM1->PSC = bbPort->TIM_Prescaler;
 
-            if ((TIMx == TIM1) || (TIMx == TIM8))  {
-                // Set the Repetition Counter value
-                TIMx->RCR = bbPort->TIM_RepetitionCounter;
-            }
+            // Set the Repetition Counter value
+            TIM1->RCR = bbPort->TIM_RepetitionCounter;
 
             // Generate an update event to reload the Prescaler 
             // and the repetition counter(only for TIM1 and TIM8) value immediately
-            TIMx->EGR = 0x0001;          
+            TIM1->EGR = 0x0001;          
         }
 
         static ioRec_t* _IORec(IO_t io)
@@ -1214,7 +1205,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 bbPort->TIM_ClockDivision = TIM_CLOCKDIVISION_DIV1;
                 bbPort->TIM_CounterMode = TIM_COUNTERMODE_UP;
                 bbPort->TIM_Period = bbPort->outputARR;
-                TIM_TimeBaseInit(TIM1, bbPort);
+                TIM_TimeBaseInit(bbPort);
                 TIM_ARRPreloadConfig(ENABLE);
 
                 timerChannelInit(bbPort);
