@@ -22,7 +22,6 @@
 
 #include "escs/dshot.h"
 
-#include "hal_compat.h"
 #include "stm32f4xx.h"
 #include "dma.h"
 
