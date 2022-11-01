@@ -22,10 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#if !defined(ARDUINO)
-extern "C" { uint32_t micros(void); }
-#endif
-
 class Task {
 
     private:

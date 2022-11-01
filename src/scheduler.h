@@ -23,10 +23,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#if !defined(ARDUINO)
-extern "C" { uint32_t microsecondsToClockCycles(uint32_t usec); }
-#endif
-
 class Scheduler {
 
     private:

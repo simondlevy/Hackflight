@@ -20,7 +20,6 @@
 
 class Stm32FBoard : public Stm32Board {
 
-#if defined(ARDUINO)
     virtual void reboot(void) override
     {
         __enable_irq();
@@ -36,16 +35,6 @@ class Stm32FBoard : public Stm32Board {
         SysMemBootJump = (void (*)(void)) (*((uint32_t *) 0x1FFF0004));
         SysMemBootJump();
 
-        while( 1 ) {}
-    }
-#else
-    virtual void reboot(void) override
-    {
-        RTC_WriteBackupRegister(4, 1);
-
-        __disable_irq();
-
         NVIC_SystemReset();
     }
-#endif
 };
