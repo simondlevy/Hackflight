@@ -115,19 +115,8 @@ class Stm32F405DshotEsc : public DshotEsc {
             GPIO_Mode_AN
         } GPIOMode_TypeDef;
 
-        typedef enum {
-            OWNER_FREE,
-            OWNER_MOTOR,
-            OWNER_DSHOT_BITBANG,
-            OWNER_TOTAL_COUNT
-        } resourceOwner_e;
-
-        typedef struct resourceOwner_s {
-            uint8_t resourceIndex;
-        } resourceOwner_t;
-
         enum rcc_reg {
-            RCC_EMPTY = 0,   // make sure that default value (0) does not enable anything
+            RCC_EMPTY,
             RCC_AHB,
             RCC_APB2,
             RCC_APB1,
