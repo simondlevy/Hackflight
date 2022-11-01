@@ -692,8 +692,9 @@ class Stm32F405DshotEsc : public DshotEsc {
                 const uint32_t ccer_ccnp,
                 const uint32_t cr2_ois,
                 const uint8_t mode_shift,
-                const uint8_t polarity_shift,
-                const uint8_t state_shift
+                const uint8_t polarity_shift1,
+                const uint8_t state_shift,
+                const uint8_t polarity_shift2
                 )
         {
             TIM1->CCER &= (uint16_t)~ccer_cc_e;
@@ -704,11 +705,11 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpccmrx &= (uint16_t)~ccmr_cc;
             tmpccmrx |= (TIM_OCMODE_TIMING << mode_shift);
             tmpccer &= (uint16_t)~ccer_ccp;
-            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift);
+            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift1);
             tmpccer |= (TIM_OUTPUTSTATE_ENABLE < state_shift);
 
             tmpccer &= (uint16_t)~ccer_ccnp;
-            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift);
+            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift2);
             tmpcr2 &= (uint16_t)~cr2_ois;
 
             TIM1->CR2 = tmpcr2;
@@ -719,63 +720,16 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void TIM_OC1Init(void)
         {
-            TIM_OCInit(
-                    &TIM1->CCMR1,
-                    &TIM1->CCR1,
-                    TIM_CCER_CC1E,
-                    TIM_CCMR1_OC1M,
-                    TIM_CCMR1_CC1S,
-                    TIM_CCER_CC1P,
-                    TIM_CCER_CC1NP,
-                    TIM_CR2_OIS1,
-                    0, 
-                    0, 
-                    0);
-
-
-            /*
-            TIM1->CCER &= (uint16_t)~TIM_CCER_CC1E;
-            uint16_t tmpccer = TIM1->CCER;
-            uint16_t tmpcr2 =  TIM1->CR2;
-            uint16_t tmpccmrx = TIM1->CCMR1;
-            tmpccmrx &= (uint16_t)~TIM_CCMR1_OC1M;
-            tmpccmrx &= (uint16_t)~TIM_CCMR1_CC1S;
-            tmpccmrx |= (TIM_OCMODE_TIMING << 0);
-            tmpccer &= (uint16_t)~TIM_CCER_CC1P;
-            tmpccer |= (TIM_OCPOLARITY_HIGH << 0);
-            tmpccer |= (TIM_OUTPUTSTATE_ENABLE << 0);;
-
-            tmpccer &= (uint16_t)~TIM_CCER_CC1NP;
-            tmpccer |= (TIM_OCPOLARITY_HIGH << 0);
-            tmpcr2 &= (uint16_t)~TIM_CR2_OIS1;
-
-            TIM1->CR2 = tmpcr2;
-            TIM1->CCMR1 = tmpccmrx;
-            TIM1->CCR1 = 0x00000000;
-            TIM1->CCER = tmpccer;*/
+            TIM_OCInit( &TIM1->CCMR1, &TIM1->CCR1, TIM_CCER_CC1E, TIM_CCMR1_OC1M,
+                    TIM_CCMR1_CC1S, TIM_CCER_CC1P, TIM_CCER_CC1NP, TIM_CR2_OIS1, 
+                    0, 0, 0, 0);
         }
 
         static void TIM_OC2Init(void)
         {
-            TIM1->CCER &= (uint16_t)~TIM_CCER_CC2E;
-            uint16_t tmpccer = TIM1->CCER;
-            uint16_t tmpcr2 =  TIM1->CR2;
-            uint16_t tmpccmrx = TIM1->CCMR1;
-            tmpccmrx &= (uint16_t)~TIM_CCMR1_OC2M;
-            tmpccmrx &= (uint16_t)~TIM_CCMR1_CC2S;
-            tmpccmrx |= (uint16_t)(TIM_OCMODE_TIMING << 8);
-            tmpccer &= (uint16_t)~TIM_CCER_CC2P;
-            tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
-            tmpccer |= (uint16_t)(TIM_OUTPUTSTATE_ENABLE << 4);
-
-            tmpccer &= (uint16_t)~TIM_CCER_CC2NP;
-            tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
-            tmpcr2 &= (uint16_t)~TIM_CR2_OIS2;
-
-            TIM1->CR2 = tmpcr2;
-            TIM1->CCMR1 = tmpccmrx;
-            TIM1->CCR2 = 0x00000000;
-            TIM1->CCER = tmpccer;
+            TIM_OCInit( &TIM1->CCMR1, &TIM1->CCR2, TIM_CCER_CC2E, TIM_CCMR1_OC2M,
+                    TIM_CCMR1_CC2S, TIM_CCER_CC2P, TIM_CCER_CC2NP, TIM_CR2_OIS2, 
+                    8, 4, 4, 4);
         }
 
         static void TIM_OC3Init(void)
