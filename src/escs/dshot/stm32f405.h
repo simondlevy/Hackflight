@@ -734,25 +734,9 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void TIM_OC3Init(void)
         {
-            TIM1->CCER &= (uint16_t)~TIM_CCER_CC3E;
-            uint16_t tmpccer = TIM1->CCER;
-            uint16_t tmpcr2 =  TIM1->CR2;
-            uint16_t tmpccmrx = TIM1->CCMR2;
-            tmpccmrx &= (uint16_t)~TIM_CCMR2_OC3M;
-            tmpccmrx &= (uint16_t)~TIM_CCMR2_CC3S;  
-            tmpccmrx |= TIM_OCMODE_TIMING;
-            tmpccer &= (uint16_t)~TIM_CCER_CC3P;
-            tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 8);
-            tmpccer |= (uint16_t)(TIM_OUTPUTSTATE_ENABLE << 8);
-
-            tmpccer &= (uint16_t)~TIM_CCER_CC3NP;
-            tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 8);
-            tmpcr2 &= (uint16_t)~TIM_CR2_OIS3;
-
-            TIM1->CR2 = tmpcr2;
-            TIM1->CCMR2 = tmpccmrx;
-            TIM1->CCR3 = 0x00000000;
-            TIM1->CCER = tmpccer;
+            TIM_OCInit( &TIM1->CCMR2, &TIM1->CCR3, TIM_CCER_CC3E, TIM_CCMR2_OC3M,
+                    TIM_CCMR2_CC3S, TIM_CCER_CC3P, TIM_CCER_CC3NP, TIM_CR2_OIS3, 
+                    0, 8, 8, 8);
         }
 
         static void TIM_OC4Init(void)
