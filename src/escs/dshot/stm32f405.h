@@ -895,7 +895,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 uint32_t * ccmr,
                 const uint32_t ccmr_oc,
                 const uint32_t ccmr_cc,
-                const uint32_t ccmr_ccp,
+                const uint32_t ccer_ccp,
                 uint32_t * ccr
                 )
         {
@@ -907,7 +907,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpccmrx &= (uint16_t)~ccmr_oc;
             tmpccmrx &= (uint16_t)~ccmr_cc;
             tmpccmrx |= TIM_OCMODE_TIMING;
-            tmpccer &= (uint16_t)~TIM_CCER_CC1P;
+            tmpccer &= (uint16_t)~ccer_ccp;
             tmpccer |= TIM_OCPOLARITY_HIGH;
             tmpccer |= TIM_OUTPUTSTATE_ENABLE;
 
@@ -1028,7 +1028,12 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpccer |= (uint16_t)(TIM_OUTPUTSTATE_ENABLE << 12);
 
             if((TIMx == TIM1) || (TIMx == TIM8)) {
-                tmpcr2 &=(uint16_t) ~TIM_CR2_OIS4;
+
+                tmpccer &= (uint16_t)~TIM_CCER_CC4NP;
+                tmpccer |= (uint16_t)(TIM_OCPOLARITY_HIGH << 4);
+                //tmpccer &= (uint16_t)~TIM_CCER_CC4NE;
+                tmpcr2 &=  (uint16_t)~TIM_CR2_OIS4;
+                //tmpcr2 &=  (uint16_t)~TIM_CR2_OIS4N;
             }
 
             TIMx->CR2 = tmpcr2;
