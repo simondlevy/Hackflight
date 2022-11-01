@@ -889,6 +889,43 @@ class Stm32F405DshotEsc : public DshotEsc {
             return m_ioRecs + offset;
         }
 
+        static void TIM_OCInit(
+                TIM_TypeDef* TIMx,
+                const uint32_t ccer_cc_e,
+                uint32_t * ccmr,
+                const uint32_t ccmr_oc,
+                const uint32_t ccmr_cc,
+                const uint32_t ccmr_ccp,
+                uint32_t * ccr
+                )
+        {
+            uint16_t tmpccmrx = 0, tmpccer = 0, tmpcr2 = 0;
+            TIMx->CCER &= (uint16_t)~ccer_cc_e;
+            tmpccer = TIMx->CCER;
+            tmpcr2 =  TIMx->CR2;
+            tmpccmrx = *ccmr;
+            tmpccmrx &= (uint16_t)~ccmr_oc;
+            tmpccmrx &= (uint16_t)~ccmr_cc;
+            tmpccmrx |= TIM_OCMODE_TIMING;
+            tmpccer &= (uint16_t)~TIM_CCER_CC1P;
+            tmpccer |= TIM_OCPOLARITY_HIGH;
+            tmpccer |= TIM_OUTPUTSTATE_ENABLE;
+
+            if((TIMx == TIM1) || (TIMx == TIM8)) {
+
+                //tmpccer &= (uint16_t)~TIM_CCER_CC1NP;
+                //tmpccer |= TIM_OCPOLARITY_HIGH;
+                //tmpccer &= (uint16_t)~TIM_CCER_CC1NE;
+                //tmpcr2 &= (uint16_t)~TIM_CR2_OIS1;
+                //tmpcr2 &= (uint16_t)~TIM_CR2_OIS1N;
+            }
+
+            TIMx->CR2 = tmpcr2;
+            *ccmr = tmpccmrx;
+            *ccr = 0x00000000;
+            TIMx->CCER = tmpccer;
+         }
+
         static void TIM_OC1Init(TIM_TypeDef* TIMx)
         {
             uint16_t tmpccmrx = 0, tmpccer = 0, tmpcr2 = 0;
