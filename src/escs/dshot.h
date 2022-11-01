@@ -294,8 +294,6 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            m_enabled = false;
-
             deviceInit();
 
             m_enabled = true;
