@@ -112,10 +112,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint8_t rcc;
         } timerDef_t;
 
-        typedef struct {
-            uint8_t channel;
-        } timerHardware_t;
-
         struct dmaChannelDescriptor_s;
 
         typedef void (*dmaCallbackHandlerFuncPtr)(
@@ -154,7 +150,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             GPIO_TypeDef *gpio;
 
-            const timerHardware_t * timhw;
+            uint8_t channel;
 
             uint16_t dmaSource;
 
@@ -577,7 +573,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         timerDef_t m_timerDefinitions[HARDWARE_TIMER_DEFINITION_COUNT] = {};
 
-        timerHardware_t m_timer1Hardware[4] = {};
+        uint8_t m_timer1channels[4] = {};
 
         static constexpr DMA_Stream_TypeDef * m_streams[8] = {
             DMA2_Stream0,
@@ -672,12 +668,12 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void timerChannelInit(port_t *bbPort)
         {
-            const timerHardware_t *timhw = bbPort->timhw;
+            const uint8_t channel = bbPort->channel;
 
             // Disable the TIM Counter
             TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
 
-            switch (timhw->channel) {
+            switch (channel) {
                 case TIM_CHANNEL_1:
                     timOcInit( &TIM1->CCMR1, &TIM1->CCR1, TIM_CCER_CC1E,
                             TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
@@ -742,11 +738,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             port_t *bbPort = &m_ports[m_usedMotorPorts];
 
-            if (!bbPort->timhw) {
-                // No more pacer channel available
-                return NULL;
-            }
-
             bbPort->portIndex = portIndex;
 
             ++m_usedMotorPorts;
@@ -800,7 +791,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
-            bbPort->dmaSource = timerDmaSource(bbPort->timhw->channel);
+            bbPort->dmaSource = timerDmaSource(bbPort->channel);
 
             bbPacer_t *bbPacer = findMotorPacer();
 
@@ -853,10 +844,9 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 if (bbPort) {
                     static uint8_t options[4] = {1, 0, 1, 0};
-                    const timerHardware_t *timhw = bbPort->timhw;
                     const int8_t option = options[motorIndex];
                     const dmaChannelSpec_t *dmaChannelSpec =
-                        dmaGetChannelSpecByTimerValue(TIM1, timhw->channel, option); 
+                        dmaGetChannelSpecByTimerValue(TIM1, bbPort->channel, option); 
                     bbPort->dmaResource = dmaChannelSpec->ref;
                     bbPort->dmaChannel = dmaChannelSpec->channel;
                 }
@@ -1003,10 +993,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void initTimer1Hardware(void)
         {
-            m_timer1Hardware[0].channel = TIM_CHANNEL_1;
-            m_timer1Hardware[1].channel = TIM_CHANNEL_2;
-            m_timer1Hardware[2].channel = TIM_CHANNEL_3;
-            m_timer1Hardware[3].channel = TIM_CHANNEL_4;
+            m_timer1channels[0] = TIM_CHANNEL_1;
+            m_timer1channels[1] = TIM_CHANNEL_2;
+            m_timer1channels[2] = TIM_CHANNEL_3;
+            m_timer1channels[3] = TIM_CHANNEL_4;
         }
 
         void defineDma2Channel(
@@ -1111,10 +1101,10 @@ class Stm32F405DshotEsc : public DshotEsc {
                 motorIndex++;
             }
 
-            m_ports[0].timhw = &m_timer1Hardware[0];
-            m_ports[1].timhw = &m_timer1Hardware[1];
-            m_ports[2].timhw = &m_timer1Hardware[2];
-            m_ports[3].timhw = &m_timer1Hardware[3];
+            m_ports[0].channel = m_timer1channels[0];
+            m_ports[1].channel = m_timer1channels[1];
+            m_ports[2].channel = m_timer1channels[2];
+            m_ports[3].channel = m_timer1channels[3];
 
             for (auto motorIndex=0; motorIndex<MAX_SUPPORTED_MOTORS && motorIndex <
                     m_motorCount; motorIndex++) {
