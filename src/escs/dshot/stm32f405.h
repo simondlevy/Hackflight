@@ -559,6 +559,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         int32_t m_usedMotorPacers = 0;
 
         port_t m_ports[MAX_MOTORS];
+
         int32_t m_usedMotorPorts;
 
         motor_t m_motors[MAX_SUPPORTED_MOTORS];
@@ -720,10 +721,14 @@ class Stm32F405DshotEsc : public DshotEsc {
             return NULL;
         }
 
+    public:
+
         port_t *findMotorPort(int32_t portIndex)
         {
             for (auto i=0; i<m_usedMotorPorts; i++) {
                 if (m_ports[i].portIndex == portIndex) {
+                    if (portIndex == 2) {
+                    }
                     return &m_ports[i];
                 }
             }
@@ -831,8 +836,12 @@ class Stm32F405DshotEsc : public DshotEsc {
             IO_t io = m_motors[motorIndex].io;
             uint8_t output = m_motors[motorIndex].output;
 
-            int32_t pinIndex = _IO_GPIOPinIdx(io);
-            int32_t portIndex = _IO_GPIOPortIdx(io);
+            const uint32_t pinIdx[4] = {0, 1, 3, 2};
+            const uint32_t prtIdx[4] = {1, 1, 0, 0};
+
+            int32_t pinIndex = pinIdx[motorIndex]; // _IO_GPIOPinIdx(io);
+
+            int32_t portIndex = prtIdx[motorIndex]; // _IO_GPIOPortIdx(io);
 
             port_t *bbPort = findMotorPort(portIndex);
 
@@ -894,7 +903,9 @@ class Stm32F405DshotEsc : public DshotEsc {
                 timerChannelInit(bbPort);
 
                 setupDma(bbPort);
+
                 dmaPreconfigure(bbPort);
+
                 dmaItConfig(bbPort);
             }
 

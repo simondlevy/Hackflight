@@ -20,21 +20,14 @@
 #include <hackflight.h>
 #include <alignment/rotate270.h>
 #include <boards/stm32/stm32f.h>
-#include <core/clock.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot/stm32f405.h>
-#include <leds/real.h>
+#include <leds/mock.h>
 #include <imus//mock.h>
-#include <imus/real/softquat/mpu6000.h>
-#include <tasks/receivers/real/sbus.h>
+#include <tasks/receivers/mock.h>
 
 #include <vector>
 using namespace std;
-
-// See https://github.com/betaflight/unified-targets/blob/master/configs/default/BEFH-BETAFPVF405.config
-static const uint8_t CS_PIN   = PA4;
-static const uint8_t LED_PIN  = PB5;
-static const uint8_t EXTI_PIN = PC4;
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -43,36 +36,21 @@ static AnglePidController _anglePid(
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-static Stm32F405DshotEsc * _esc;
-static Hackflight * _hf;
-static Mpu6000 * _imu;
-static SbusReceiver * _rx;
-
 static vector<PidController *> _pids = {&_anglePid};
+
+static Hackflight * _hf;
+static Stm32F405DshotEsc * _esc;
+
+static Mixer _mixer = QuadXbfMixer::make();
 
 extern "C" void handleDmaIrq(uint8_t id)
 {
     _esc->handleDmaIrq(id);
 }
 
-static void handleImuInterrupt(void)
-{
-    _imu->handleInterrupt();
-}
-
-void serialEvent3(void)
-{
-    _rx->handleEvent();
-}
-
-static Mixer _mixer = QuadXbfMixer::make();
-
 void setup(void)
 {
-    pinMode(EXTI_PIN, INPUT);
-    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
-
-    static SbusReceiver rx(Serial3);
+    static MockReceiver rx;
 
     static Stm32FBoard board;
 
@@ -80,14 +58,12 @@ void setup(void)
 
     static Stm32F405DshotEsc esc(pins);
 
-    static Mpu6000 imu(CS_PIN, &board);
+    static MockImu imu;
 
-    static RealLed led(LED_PIN);
+    static MockLed led;
 
     static Hackflight hf(board, rx, imu, imuRotate270, _pids, _mixer, esc, led);
 
-    _rx = &rx;
-    _imu = &imu;
     _esc = &esc;
     _hf = &hf;
 
@@ -97,4 +73,9 @@ void setup(void)
 void loop(void)
 {
     _hf->step();
+
+    Serial.print(" 3: ");
+    Serial.print(_esc->g_pinIndex);
+    Serial.print(", ");
+    Serial.println(_esc->g_portIndex);
 }

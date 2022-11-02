@@ -20,11 +20,10 @@
 #include <hackflight.h>
 #include <alignment/rotate270.h>
 #include <boards/stm32/stm32f.h>
-#include <core/clock.h>
+//#include <core/clock.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot/stm32f405.h>
 #include <leds/real.h>
-#include <imus//mock.h>
 #include <imus/real/softquat/mpu6000.h>
 #include <tasks/receivers/real/sbus.h>
 
