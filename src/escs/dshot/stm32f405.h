@@ -850,16 +850,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             defineDma2Channel(7, DMA2_Stream7, 54, DMA2_Stream7_IRQn); 
         }
 
-        uint8_t timerRCC(TIM_TypeDef *tim)
-        {
-            for (int32_t i = 0; i < HARDWARE_TIMER_DEFINITION_COUNT; i++) {
-                if (m_timerDefinitions[i].TIMx == tim) {
-                    return m_timerDefinitions[i].rcc;
-                }
-            }
-            return 0;
-        }
-
         void ioInit(void)
         {
             ioRec_t *ioRec = m_ioRecs;
