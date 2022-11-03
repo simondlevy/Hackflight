@@ -1099,12 +1099,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             motor_t *const bbmotor = &m_motors[index];
 
-            if (!bbmotor->configured) {
-                return;
-            }
-
-            // If there is a command ready to go overwrite the value and send
-            // that instead
             if (commandIsProcessing()) {
                 ivalue = commandGetCurrent(index);
             }
