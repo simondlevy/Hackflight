@@ -158,9 +158,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             dmaRegCache_t dmaRegOutput;
             dmaRegCache_t dmaRegInput;
 
-            // Idle value
-            uint32_t gpioIdleBSRR;
-
             // Output
             uint16_t outputARR;
             uint32_t *portOutputBuffer;
@@ -998,8 +995,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 _IOInit(io, motorIndex+1);
 
-                bbPort->gpioIdleBSRR |= (1 << (pinIndex + 16));  // BR (higher half)
-
                 _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
 
                 _IOConfigGPIO(motorIndex, io, io_config(GPIO_Mode_OUT,
@@ -1007,7 +1002,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex)); 
 
-                bbPort->gpio->BSRR = bbPort->gpioIdleBSRR;
+                bbPort->gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
 
                 // Set GPIO to output
                 ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
