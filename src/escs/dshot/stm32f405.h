@@ -182,7 +182,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         typedef struct {
             GPIO_TypeDef *gpio;
             uint16_t pin;
-            uint8_t index;
         } ioRec_t;
 
         // Static local funs ============================================================
@@ -842,7 +841,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             const IO_t io = _IOGetByTag(pin);
 
             ioRec_t *ioRec =_IORec(io);
-            ioRec->index = motorIndex+1;
 
             _IOConfigGPIO(motorIndex, io, 
                     io_config(
