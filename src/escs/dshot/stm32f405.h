@@ -164,7 +164,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         } port_t;
 
         typedef struct {
-            uint16_t        code;
             dmaResource_t * ref;
             uint32_t        channel;
         } dmaChannelSpec_t;
@@ -795,7 +794,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             m_dmaTimerMapping[timerId].channel = channel;
 
             dmaChannelSpec_t * spec = &m_dmaTimerMapping[timerId].channelSpec[specId];
-            spec->code = (d << 12) |( s << 8) | (c << 0);
             spec->ref = (dmaResource_t *)m_streams[s];
             spec->channel = c << 25;
         }
