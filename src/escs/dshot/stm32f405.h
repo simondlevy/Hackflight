@@ -194,7 +194,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef struct bbMotor_s {
             int32_t pinIndex;    
-            int32_t portIndex;
             IO_t io;        
             port_t *bbPort;
         } motor_t;
