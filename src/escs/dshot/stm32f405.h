@@ -1046,12 +1046,9 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 _IO_GPIO(io)->BSRR |= (uint32_t)_IO_Pin(io);
 
+                motorConfig(motorIndex);
+
                 motorIndex++;
-            }
-
-            for (auto i=0; i < m_motorCount; i++) {
-
-                motorConfig(i);
             }
         }        
 
