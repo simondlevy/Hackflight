@@ -789,7 +789,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 (uint32_t)0x01 << (irqChannel & (uint8_t)0x1F);
         }
 
-        void setupDma(port_t *bbPort)
+        void setupDma(uint8_t motorIndex, port_t *bbPort)
         {
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
@@ -896,7 +896,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 timerChannelInit(bbPort);
 
-                setupDma(bbPort);
+                setupDma(motorIndex, bbPort);
 
                 dmaPreconfigure(bbPort);
 
