@@ -408,12 +408,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void timebaseSetup(port_t *bbPort, protocol_t dshotProtocolType)
-        {
-            uint32_t outputFreq = 1000 * getDshotBaseFrequency(dshotProtocolType);
-            bbPort->outputARR = SystemCoreClock / outputFreq - 1;
-        }
-
         static uint16_t timerDmaSource(uint8_t channel)
         {
             switch (channel) {
@@ -710,7 +704,8 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
 
-            timebaseSetup(bbPort, m_protocol);
+            uint32_t outputFreq = 1000 * getDshotBaseFrequency(m_protocol);
+            bbPort->outputARR = SystemCoreClock / outputFreq - 1;
 
             bbPort->TIM_ClockDivision = TIM_CLOCKDIVISION_DIV1;
 
