@@ -196,7 +196,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             int32_t pinIndex;    
             int32_t portIndex;
             IO_t io;        
-            uint8_t output;
             uint32_t iocfg;
             port_t *bbPort;
         } motor_t;
@@ -847,8 +846,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             IO_t io = m_motors[motorIndex].io;
 
-            uint8_t output = m_motors[motorIndex].output;
-
             int32_t pinIndex  = MOTOR_PINS[motorIndex]; 
             int32_t portIndex = MOTOR_PORTS[motorIndex];
 
@@ -862,7 +859,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             bbMotor->pinIndex = pinIndex;
             bbMotor->io = io;
-            bbMotor->output = output;
             bbMotor->bbPort = bbPort;
 
             _IOInit(io, motorIndex+1);
@@ -1040,7 +1036,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 m_motors[motorIndex].pinIndex = pinIndex;
                 m_motors[motorIndex].io = io;
-                m_motors[motorIndex].output = 0;
                 m_motors[motorIndex].iocfg =
                     io_config(GPIO_MODE_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, m_puPdMode);
 
