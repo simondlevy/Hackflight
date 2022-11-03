@@ -700,7 +700,19 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             timerChannelInit(bbPort);
 
-            setupDma(motorIndex, bbPort);
+            RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
+
+            bbPort->dmaSource = timerDmaSource(bbPort->channel);
+
+            m_pacerDmaSources |= bbPort->dmaSource;
+
+            dmaSetHandler(
+                    findDmaIdentifier(bbPort->dmaResource),
+                    dmaIrqHandler,
+                    nvic_build_priority(2, 1),
+                    (uint32_t)bbPort);
+
+            dmaItConfig(bbPort);
 
             dmaPreconfigure(bbPort);
 
@@ -741,23 +753,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         }
 
     public:
-
-        void setupDma(uint8_t motorIndex, port_t *bbPort)
-        {
-            RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
-
-            bbPort->dmaSource = timerDmaSource(bbPort->channel);
-
-            m_pacerDmaSources |= bbPort->dmaSource;
-
-            dmaSetHandler(
-                    findDmaIdentifier(bbPort->dmaResource),
-                    dmaIrqHandler,
-                    nvic_build_priority(2, 1),
-                    (uint32_t)bbPort);
-
-            dmaItConfig(bbPort);
-        }
 
         const dmaChannelSpec_t *dmaGetChannelSpecByTimerValue(
                 TIM_TypeDef *tim, uint8_t channel, int8_t dmaOpt)
