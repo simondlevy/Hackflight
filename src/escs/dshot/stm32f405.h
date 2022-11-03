@@ -159,7 +159,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             dmaRegCache_t dmaRegInput;
 
             // Output
-            uint16_t outputARR;
             uint32_t *portOutputBuffer;
 
         } port_t;
@@ -544,6 +543,8 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         uint16_t m_pacerDmaSources = 0;
 
+        uint16_t m_outputARR;
+
         // Private instance methods =====================================================
 
         IO_t _IOGetByTag(uint8_t tag)
@@ -701,7 +702,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
 
             uint32_t outputFreq = 1000 * getDshotBaseFrequency(m_protocol);
-            bbPort->outputARR = SystemCoreClock / outputFreq - 1;
+            m_outputARR = SystemCoreClock / outputFreq - 1;
 
             uint16_t tmpcr1 = TIM1->CR1;  
 
@@ -716,7 +717,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CR1 = tmpcr1;
 
             // Set the Autoreload value 
-            TIM1->ARR = bbPort->outputARR;
+            TIM1->ARR = m_outputARR;
 
             // Set the Prescaler value
             TIM1->PSC = 0;
@@ -998,7 +999,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 // Reinitialize pacer timer for output
 
-                TIM1->ARR = bbPort->outputARR;
+                TIM1->ARR = m_outputARR;
 
                 _IOConfigGPIO(motorIndex, io, iocfg);
 
