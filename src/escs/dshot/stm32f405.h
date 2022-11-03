@@ -695,8 +695,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             for (auto i=0; i<m_usedMotorPorts; i++) {
                 if (m_ports[i].portIndex == portIndex) {
-                    if (portIndex == 2) {
-                    }
                     return &m_ports[i];
                 }
             }
@@ -714,13 +712,66 @@ class Stm32F405DshotEsc : public DshotEsc {
             return DMA_NONE;
         }
 
-        port_t *allocateMotorPort(int32_t portIndex)
+        port_t *allocateMotorPort(IO_t io, uint8_t motorIndex, int32_t portIndex)
         {
             port_t *bbPort = &m_ports[m_usedMotorPorts];
-
             bbPort->portIndex = portIndex;
-
             ++m_usedMotorPorts;
+
+            static uint8_t options[4] = {1, 0, 1, 0};
+            const int8_t option = options[motorIndex];
+            const dmaChannelSpec_t *dmaChannelSpec =
+                dmaGetChannelSpecByTimerValue(TIM1, bbPort->channel, option); 
+            bbPort->dmaResource = dmaChannelSpec->ref;
+            bbPort->dmaChannel = dmaChannelSpec->channel;
+
+            bbPort->gpio =_IO_GPIO(io);
+
+            bbPort->portOutputCount = BUF_LENGTH;
+            bbPort->portOutputBuffer =
+                &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
+
+            timebaseSetup(bbPort, m_protocol);
+
+            bbPort->TIM_Prescaler = 0; // Feed raw timerClock
+            bbPort->TIM_ClockDivision = TIM_CLOCKDIVISION_DIV1;
+            bbPort->TIM_CounterMode = TIM_COUNTERMODE_UP;
+            bbPort->TIM_Period = bbPort->outputARR;
+
+            uint16_t tmpcr1 = TIM1->CR1;  
+
+            // Select the Counter Mode
+            tmpcr1 &= (uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS));
+            tmpcr1 |= (uint32_t)bbPort->TIM_CounterMode;
+
+            // Set the clock division 
+            tmpcr1 &=  (uint16_t)(~TIM_CR1_CKD);
+            tmpcr1 |= (uint32_t)bbPort->TIM_ClockDivision;
+
+            TIM1->CR1 = tmpcr1;
+
+            // Set the Autoreload value 
+            TIM1->ARR = bbPort->TIM_Period ;
+
+            // Set the Prescaler value
+            TIM1->PSC = bbPort->TIM_Prescaler;
+
+            // Set the Repetition Counter value
+            TIM1->RCR = bbPort->TIM_RepetitionCounter;
+
+            // Generate an update event to reload the Prescaler 
+            // and the repetition counter(only for TIM1 and TIM8) value immediately
+            TIM1->EGR = 0x0001;          
+
+            TIM1->CR1 |= TIM_CR1_ARPE;
+
+            timerChannelInit(bbPort);
+
+            setupDma(motorIndex, bbPort);
+
+            dmaPreconfigure(bbPort);
+
+            dmaItConfig(bbPort);
 
             return bbPort;
         }
@@ -807,67 +858,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             port_t *bbPort = findMotorPort(portIndex);
 
             if (!bbPort) {
-
-                // New port group
-
-                bbPort = allocateMotorPort(portIndex);
-
-                if (bbPort) {
-                    static uint8_t options[4] = {1, 0, 1, 0};
-                    const int8_t option = options[motorIndex];
-                    const dmaChannelSpec_t *dmaChannelSpec =
-                        dmaGetChannelSpecByTimerValue(TIM1, bbPort->channel, option); 
-                    bbPort->dmaResource = dmaChannelSpec->ref;
-                    bbPort->dmaChannel = dmaChannelSpec->channel;
-                }
-
-                bbPort->gpio =_IO_GPIO(io);
-
-                bbPort->portOutputCount = BUF_LENGTH;
-                bbPort->portOutputBuffer =
-                    &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
-
-                timebaseSetup(bbPort, m_protocol);
-
-                bbPort->TIM_Prescaler = 0; // Feed raw timerClock
-                bbPort->TIM_ClockDivision = TIM_CLOCKDIVISION_DIV1;
-                bbPort->TIM_CounterMode = TIM_COUNTERMODE_UP;
-                bbPort->TIM_Period = bbPort->outputARR;
-
-                uint16_t tmpcr1 = TIM1->CR1;  
-
-                // Select the Counter Mode
-                tmpcr1 &= (uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS));
-                tmpcr1 |= (uint32_t)bbPort->TIM_CounterMode;
-
-                // Set the clock division 
-                tmpcr1 &=  (uint16_t)(~TIM_CR1_CKD);
-                tmpcr1 |= (uint32_t)bbPort->TIM_ClockDivision;
-
-                TIM1->CR1 = tmpcr1;
-
-                // Set the Autoreload value 
-                TIM1->ARR = bbPort->TIM_Period ;
-
-                // Set the Prescaler value
-                TIM1->PSC = bbPort->TIM_Prescaler;
-
-                // Set the Repetition Counter value
-                TIM1->RCR = bbPort->TIM_RepetitionCounter;
-
-                // Generate an update event to reload the Prescaler 
-                // and the repetition counter(only for TIM1 and TIM8) value immediately
-                TIM1->EGR = 0x0001;          
-
-                TIM1->CR1 |= TIM_CR1_ARPE;
-
-                timerChannelInit(bbPort);
-
-                setupDma(motorIndex, bbPort);
-
-                dmaPreconfigure(bbPort);
-
-                dmaItConfig(bbPort);
+                bbPort = allocateMotorPort(io, motorIndex, portIndex);
             }
 
             motor_t * bbMotor = &m_motors[motorIndex];
@@ -879,8 +870,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             _IOInit(io, motorIndex+1);
 
-            // Setup GPIO_MODER and GPIO_ODR register manipulation values
-
             bbPort->gpioModeMask |= (GPIO_MODER_MODER0 << (pinIndex * 2));
             bbPort->gpioModeInput |= (GPIO_Mode_IN << (pinIndex * 2));
             bbPort->gpioModeOutput |= (GPIO_Mode_OUT << (pinIndex * 2));
@@ -889,15 +878,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
 
-            _IOConfigGPIO(motorIndex, io,
-                    io_config(GPIO_Mode_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, m_puPdMode));
+            _IOConfigGPIO(motorIndex, io, io_config(GPIO_Mode_OUT,
+                        GPIO_FAST_SPEED, GPIO_OTYPE_PP, m_puPdMode));
 
             outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex)); 
-
-            // Output idle level before switching to output
-            // Use BSRR register for this
-            // Normal: Use BR (higher half)
-            // Inverted: Use BS (lower half)
 
             bbPort->gpio->BSRR = bbPort->gpioIdleBSRR;
 
