@@ -73,4 +73,6 @@ void setup(void)
 void loop(void)
 {
     _hf->step();
+
+    Serial.println(DMA_IT_TC & DMA_IT_FE);
 }

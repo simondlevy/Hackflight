@@ -328,13 +328,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             DMA_Stream_TypeDef * DMAy_Streamx =
                 (DMA_Stream_TypeDef *)bbPort->dmaResource;
 
-            // Check if the DMA_IT parameter contains a FIFO interrupt 
-            if ((DMA_IT_TC & DMA_IT_FE) != 0)
-            {
-                // Enable the selected DMA FIFO interrupts 
-                DMAy_Streamx->FCR |= (uint32_t)DMA_IT_FE;
-            }
-
             // Check if the DMA_IT parameter contains a Transfer interrupt 
             if (DMA_IT_TC != DMA_IT_FE) {
                 // Enable the selected DMA transfer interrupts 
