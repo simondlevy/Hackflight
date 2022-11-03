@@ -844,6 +844,8 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void motorConfig(uint8_t motorIndex)
         {
+            m_ports[motorIndex].channel = m_timer1channels[motorIndex];
+
             IO_t io = m_motors[motorIndex].io;
 
             int32_t pinIndex  = MOTOR_PINS[motorIndex]; 
@@ -1044,11 +1046,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 motorIndex++;
             }
-
-            m_ports[0].channel = m_timer1channels[0];
-            m_ports[1].channel = m_timer1channels[1];
-            m_ports[2].channel = m_timer1channels[2];
-            m_ports[3].channel = m_timer1channels[3];
 
             for (auto i=0; i < m_motorCount; i++) {
 
