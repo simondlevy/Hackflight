@@ -73,5 +73,4 @@ void setup(void)
 void loop(void)
 {
     _hf->step();
-    Serial.println(_esc->g_pacerIndex);
 }

@@ -547,7 +547,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         uint8_t m_ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
 
         bbPacer_t m_pacers[MAX_MOTORS];  // TIM1 or TIM8
-        int32_t m_usedMotorPacers = 0;
 
         port_t m_ports[MAX_MOTORS];
 
@@ -692,21 +691,14 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CR1 |= TIM_CR1_CEN;
         }
 
-    public:
-
-        uint8_t g_pacerIndex;
-
         bbPacer_t *findMotorPacer(void)
         {
             for (auto i=0; i<MAX_MOTORS; i++) {
-
-                g_pacerIndex = i;
 
                 bbPacer_t *bbPacer = &m_pacers[i];
 
                 if (bbPacer->tim == NULL) {
                     bbPacer->tim = TIM1;
-                    ++m_usedMotorPacers;
                     return bbPacer;
                 }
 
@@ -789,6 +781,10 @@ class Stm32F405DshotEsc : public DshotEsc {
                 (uint32_t)0x01 << (irqChannel & (uint8_t)0x1F);
         }
 
+    public:
+
+        void * g_pacers[4];
+
         void setupDma(uint8_t motorIndex, port_t *bbPort)
         {
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
@@ -796,6 +792,8 @@ class Stm32F405DshotEsc : public DshotEsc {
             bbPort->dmaSource = timerDmaSource(bbPort->channel);
 
             bbPacer_t *bbPacer = findMotorPacer();
+
+            g_pacers[motorIndex] = bbPacer;
 
             bbPacer->dmaSources |= bbPort->dmaSource;
 
@@ -1136,7 +1134,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 dmaCmd(bbPort, ENABLE);
             }
 
-            for (auto i=0; i<m_usedMotorPacers; i++) {
+            for (auto i=0; i<1; i++) {
                 bbPacer_t *bbPacer = &m_pacers[i];
                 timDmaCmd(bbPacer->dmaSources, ENABLE);
             }
