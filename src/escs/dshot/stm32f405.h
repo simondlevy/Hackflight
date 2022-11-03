@@ -1053,9 +1053,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             for (auto i=0; i < m_motorCount; i++) {
 
                 motorConfig(i);
-            }
-
-            for (auto i=0; i<m_motorCount; i++) {
                 _IOConfigGPIO(i, m_motors[i].io, m_motors[i].iocfg);
             }
         }        
