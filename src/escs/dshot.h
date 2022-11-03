@@ -207,20 +207,6 @@ class DshotEsc : public Esc {
 
         uint8_t m_motorCount;
 
-        static uint32_t getDshotBaseFrequency(protocol_t pwmProtocolType)
-        {
-            switch (pwmProtocolType) {
-                case(DSHOT600):
-                    return 600;
-                case(DSHOT300):
-                    return 300;
-                default:
-                case(DSHOT150):
-                    return 150;
-            }
-        }
-
-
         virtual void deviceInit(uint32_t outputFreq) = 0;
         virtual void updateComplete(void) = 0;
         virtual void updateStart(void) = 0;
@@ -294,7 +280,12 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            deviceInit(1000 * getDshotBaseFrequency(m_protocol));
+            uint32_t outputFreq =
+                m_protocol == DSHOT150 ? 150 :
+                m_protocol == DSHOT300 ? 300 :
+                600;
+                
+            deviceInit(1000 * outputFreq);
 
             m_enabled = true;
         }
