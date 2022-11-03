@@ -423,12 +423,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             return ioRec->pin;
         }
 
-        static void _IOInit(IO_t io, uint8_t index)
-        {
-            ioRec_t *ioRec =_IORec(io);
-            ioRec->index = index;
-        }
-
         static uint8_t rcc_ahb1(uint32_t gpio)
         {
             return (uint8_t)rcc_encode(RCC_AHB1, gpio); 
@@ -847,7 +841,8 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             const IO_t io = _IOGetByTag(pin);
 
-            _IOInit(io, motorIndex+1);
+            ioRec_t *ioRec =_IORec(io);
+            ioRec->index = motorIndex+1;
 
             _IOConfigGPIO(motorIndex, io, 
                     io_config(
