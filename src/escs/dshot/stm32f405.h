@@ -845,13 +845,16 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             m_motors[motorIndex].pinIndex = pinIndex;
 
-            uint32_t iocfg =
-                io_config(GPIO_MODE_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, GPIO_PUPD_UP);
-
             const IO_t io = _IOGetByTag(pin);
 
             _IOInit(io, motorIndex+1);
-            _IOConfigGPIO(motorIndex, io, iocfg);
+
+            _IOConfigGPIO(motorIndex, io, 
+                    io_config(
+                        GPIO_MODE_OUT,
+                        GPIO_FAST_SPEED,
+                        GPIO_OTYPE_PP,
+                        GPIO_PUPD_UP));
 
             _IO_GPIO(io)->BSRR |= (uint32_t)_IO_Pin(io);
 
@@ -867,8 +870,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             m_motors[motorIndex].bbPort = bbPort;
 
-            _IOInit(io, motorIndex+1);
-
             _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
 
             outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex)); 
@@ -883,15 +884,10 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
 
             // Reinitialize port group DMA for output
-
-            dmaResource_t *dmaResource = bbPort->dmaResource;
-            loadDmaRegs(dmaResource, &bbPort->dmaRegOutput);
+            loadDmaRegs(bbPort->dmaResource, &bbPort->dmaRegOutput);
 
             // Reinitialize pacer timer for output
-
             TIM1->ARR = m_outputARR;
-
-            //_IOConfigGPIO(motorIndex, io, iocfg);
         }
 
     protected: // DshotEsc method overrides =============================================
