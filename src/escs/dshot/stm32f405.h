@@ -542,11 +542,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                 return NULL;
             }
 
-            // check if pin exists
-            if (!(0xffff & (1 << pinIdx))) {
-                return NULL;
-            }
-
             // count bits before this pin on single port
             int32_t offset = __builtin_popcount(((1 << pinIdx) - 1) & 0xffff);
 
@@ -846,14 +841,14 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void initMotor(uint8_t motorIndex, uint8_t pin)
         {
-            const IO_t io = _IOGetByTag(pin);
-
             int32_t pinIndex = MOTOR_PINS[motorIndex];
 
             m_motors[motorIndex].pinIndex = pinIndex;
 
             uint32_t iocfg =
                 io_config(GPIO_MODE_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, GPIO_PUPD_UP);
+
+            const IO_t io = _IOGetByTag(pin);
 
             _IOInit(io, motorIndex+1);
             _IOConfigGPIO(motorIndex, io, iocfg);
@@ -875,9 +870,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             _IOInit(io, motorIndex+1);
 
             _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
-
-            _IOConfigGPIO(motorIndex, io, io_config(GPIO_Mode_OUT,
-                        GPIO_FAST_SPEED, GPIO_OTYPE_PP, GPIO_PUPD_UP));
 
             outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex)); 
 
