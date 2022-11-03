@@ -162,10 +162,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint16_t outputARR;
             uint32_t *portOutputBuffer;
 
-            // TIM initialization
-            uint16_t TIM_ClockDivision;     
-            uint8_t  TIM_RepetitionCounter;  
-
         } port_t;
 
         typedef struct {
@@ -707,8 +703,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint32_t outputFreq = 1000 * getDshotBaseFrequency(m_protocol);
             bbPort->outputARR = SystemCoreClock / outputFreq - 1;
 
-            bbPort->TIM_ClockDivision = TIM_CLOCKDIVISION_DIV1;
-
             uint16_t tmpcr1 = TIM1->CR1;  
 
             // Select the Counter Mode
@@ -717,7 +711,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             // Set the clock division 
             tmpcr1 &=  (uint16_t)(~TIM_CR1_CKD);
-            tmpcr1 |= (uint32_t)bbPort->TIM_ClockDivision;
+            tmpcr1 |= (uint32_t)TIM_CLOCKDIVISION_DIV1;
 
             TIM1->CR1 = tmpcr1;
 
@@ -728,7 +722,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->PSC = 0;
 
             // Set the Repetition Counter value
-            TIM1->RCR = bbPort->TIM_RepetitionCounter;
+            TIM1->RCR = 0;
 
             // Generate an update event to reload the Prescaler 
             // and the repetition counter(only for TIM1 and TIM8) value immediately
