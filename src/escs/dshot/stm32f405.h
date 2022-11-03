@@ -895,6 +895,8 @@ class Stm32F405DshotEsc : public DshotEsc {
             // Reinitialize pacer timer for output
 
             TIM1->ARR = bbPort->outputARR;
+
+            _IOConfigGPIO(motorIndex, m_motors[motorIndex].io, m_motors[motorIndex].iocfg);
         }
 
         void initChannel(
@@ -1050,7 +1052,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             for (auto i=0; i < m_motorCount; i++) {
 
                 motorConfig(i);
-                _IOConfigGPIO(i, m_motors[i].io, m_motors[i].iocfg);
             }
         }        
 
