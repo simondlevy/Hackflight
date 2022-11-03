@@ -842,7 +842,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             return NULL;
         }
 
-        bool motorConfig(uint8_t motorIndex)
+        void motorConfig(uint8_t motorIndex)
         {
             IO_t io = m_motors[motorIndex].io;
 
@@ -893,8 +893,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             // Reinitialize pacer timer for output
 
             TIM1->ARR = bbPort->outputARR;
-
-            return true;
         }
 
         void initChannel(
@@ -1052,11 +1050,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             m_ports[2].channel = m_timer1channels[2];
             m_ports[3].channel = m_timer1channels[3];
 
-            for (auto motorIndex=0; motorIndex < m_motorCount; motorIndex++) {
+            for (auto i=0; i < m_motorCount; i++) {
 
-                if (!motorConfig(motorIndex)) {
-                    return;
-                }
+                motorConfig(i);
             }
 
             for (auto i=0; i<m_motorCount; i++) {
