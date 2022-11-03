@@ -477,15 +477,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             ioRec->index = index;
         }
 
-        static int32_t _IO_GPIOPortIdx(IO_t io)
-        {
-            if (!io) {
-                return -1;
-            }
-
-            return (((size_t)_IO_GPIO(io) - GPIOA_BASE) >> 10);
-        }
-
         static uint8_t rcc_ahb1(uint32_t gpio)
         {
             return (uint8_t)rcc_encode(RCC_AHB1, gpio); 
@@ -537,7 +528,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 { rcc_ahb1(RCC_AHB1ENR_GPIOFEN_MSK) },
             };
 
-            uint8_t portIndex = MOTOR_PORTS[motorIndex]; // _IO_GPIOPortIdx(io);
+            uint8_t portIndex = MOTOR_PORTS[motorIndex];
 
             const uint8_t rcc = ioPortDefs[portIndex];
 
@@ -844,7 +835,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint8_t output = m_motors[motorIndex].output;
 
             int32_t pinIndex  = MOTOR_PINS[motorIndex]; 
-            int32_t portIndex = MOTOR_PORTS[motorIndex]; // _IO_GPIOPortIdx(io);
+            int32_t portIndex = MOTOR_PORTS[motorIndex];
 
             port_t *bbPort = findMotorPort(portIndex);
 
