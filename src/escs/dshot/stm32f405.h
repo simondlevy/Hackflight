@@ -88,7 +88,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         static const uint8_t FRAME_BITS = 16;
         static const uint8_t BUF_LENGTH = FRAME_BITS * STATE_PER_SYMBOL;
 
-        const uint32_t MOTOR_PINS[4]  = {0, 1, 3, 2};
         const uint32_t MOTOR_PORTS[4] = {1, 1, 0, 0};
 
         // Typedefs =====================================================================
@@ -832,10 +831,8 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        void initMotor(uint8_t motorIndex, uint8_t pin)
+        void initMotor(uint8_t motorIndex, uint8_t pinIndex, uint8_t pin)
         {
-            int32_t pinIndex = MOTOR_PINS[motorIndex];
-
             m_motors[motorIndex].pinIndex = pinIndex;
 
             const IO_t io = _IOGetByTag(pin);
@@ -923,10 +920,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             TIM1->CR1 |= TIM_CR1_ARPE;
 
-            initMotor(0, (*m_pins)[0]);
-            initMotor(1, (*m_pins)[1]);
-            initMotor(2, (*m_pins)[2]);
-            initMotor(3, (*m_pins)[3]);
+            initMotor(0, 0, (*m_pins)[0]);
+            initMotor(1, 1, (*m_pins)[1]);
+            initMotor(2, 3, (*m_pins)[2]);
+            initMotor(3, 2, (*m_pins)[3]);
         }        
 
         virtual void updateComplete(void) override
