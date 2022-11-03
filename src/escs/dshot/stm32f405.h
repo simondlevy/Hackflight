@@ -1078,8 +1078,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             m_ports[2].channel = m_timer1channels[2];
             m_ports[3].channel = m_timer1channels[3];
 
-            for (auto motorIndex=0; motorIndex<MAX_SUPPORTED_MOTORS && motorIndex <
-                    m_motorCount; motorIndex++) {
+            for (auto motorIndex=0; motorIndex < m_motorCount; motorIndex++) {
 
                 if (!motorConfig(motorIndex)) {
                     return;
