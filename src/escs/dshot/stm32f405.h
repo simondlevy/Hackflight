@@ -870,10 +870,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 bbPort = allocateMotorPort(io, motorIndex, portIndex);
             }
 
-            motor_t * bbMotor = &m_motors[motorIndex];
-
-            bbMotor->pinIndex = pinIndex;
-            bbMotor->bbPort = bbPort;
+            m_motors[motorIndex].bbPort = bbPort;
 
             _IOInit(io, motorIndex+1);
 
