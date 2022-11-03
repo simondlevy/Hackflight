@@ -781,14 +781,13 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void initChannel(
                 const uint8_t timerId,
-                TIM_TypeDef * tim,
                 const uint8_t channel,
                 const uint8_t specId,
                 const uint32_t d,
                 const uint32_t s,
                 const uint32_t c)
         {
-            m_dmaTimerMapping[timerId].tim = tim;
+            m_dmaTimerMapping[timerId].tim = TIM1;
             m_dmaTimerMapping[timerId].channel = channel;
 
             dmaChannelSpec_t * spec = &m_dmaTimerMapping[timerId].channelSpec[specId];
@@ -798,8 +797,8 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void initTimerMapping(void)
         {
-            initChannel(0, TIM1, TIM_CHANNEL_1, 1, 2, 1, 6); 
-            initChannel(1, TIM1, TIM_CHANNEL_2, 1, 2, 2, 6); 
+            initChannel(0, TIM_CHANNEL_1, 1, 2, 1, 6); 
+            initChannel(1, TIM_CHANNEL_2, 1, 2, 2, 6); 
         }
 
         void initTimerDefinition(uint8_t id, TIM_TypeDef * tim, uint32_t apb, uint32_t en)
