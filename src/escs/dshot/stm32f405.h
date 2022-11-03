@@ -701,9 +701,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
 
-            uint32_t outputFreq = 1000 * getDshotBaseFrequency(m_protocol);
-            m_outputARR = SystemCoreClock / outputFreq - 1;
-
             uint16_t tmpcr1 = TIM1->CR1;  
 
             // Select the Counter Mode
@@ -718,15 +715,8 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             // Set the Autoreload value 
             TIM1->ARR = m_outputARR;
-
-            // Set the Prescaler value
             TIM1->PSC = 0;
-
-            // Set the Repetition Counter value
             TIM1->RCR = 0;
-
-            // Generate an update event to reload the Prescaler 
-            // and the repetition counter(only for TIM1 and TIM8) value immediately
             TIM1->EGR = 0x0001;          
 
             TIM1->CR1 |= TIM_CR1_ARPE;
@@ -936,6 +926,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             initTimer1Hardware();
 
             dmaInit();
+
+            uint32_t outputFreq = 1000 * getDshotBaseFrequency(m_protocol);
+            m_outputARR = SystemCoreClock / outputFreq - 1;
 
             memset(m_outputBuffer, 0, sizeof(m_outputBuffer));
 
