@@ -190,6 +190,11 @@ class DshotEsc : public Esc {
             return m_commandQueueHead == m_commandQueueTail;
         }
 
+        uint16_t commandGetCurrent(const uint8_t index)
+        {
+            return m_commandQueue[m_commandQueueTail].command[index];
+        }
+
     protected:
 
         typedef enum {
@@ -219,7 +224,7 @@ class DshotEsc : public Esc {
         virtual void deviceInit(void) = 0;
         virtual void updateComplete(void) = 0;
         virtual void updateStart(void) = 0;
-        virtual void writeMotor(uint8_t index, float value) = 0;
+        virtual void writeMotor(uint8_t index, uint16_t packet) = 0;
 
         DshotEsc(vector<uint8_t> & pins, protocol_t protocol=DSHOT600) 
             : Esc(pins)
@@ -252,25 +257,6 @@ class DshotEsc : public Esc {
             return false;
         }
 
-        uint8_t commandGetCurrent(const uint8_t index)
-        {
-            return m_commandQueue[m_commandQueueTail].command[index];
-        }
-
-        bool commandIsProcessing(void)
-        {
-            if (commandQueueIsEmpty()) {
-                return false;
-            }
-
-            commandControl_t* command = &m_commandQueue[m_commandQueueTail];
-
-            return
-                command->state == COMMAND_STATE_STARTDELAY ||
-                command->state == COMMAND_STATE_ACTIVE ||
-                (command->state == COMMAND_STATE_POSTDELAY && !isLastCommand()); 
-        }
-
         uint16_t prepareDshotPacket(uint16_t value)
         {
             uint16_t packet = value << 1;
@@ -288,6 +274,20 @@ class DshotEsc : public Esc {
             packet = (packet << 4) | csum;
 
             return packet;
+        }
+
+        bool commandIsProcessing(void)
+        {
+            if (commandQueueIsEmpty()) {
+                return false;
+            }
+
+            commandControl_t* command = &m_commandQueue[m_commandQueueTail];
+
+            return
+                command->state == COMMAND_STATE_STARTDELAY ||
+                command->state == COMMAND_STATE_ACTIVE ||
+                (command->state == COMMAND_STATE_POSTDELAY && !isLastCommand()); 
         }
 
     public:
@@ -365,7 +365,16 @@ class DshotEsc : public Esc {
                 updateStart();
 
                 for (auto i=0; i <m_motorCount; i++) {
-                    writeMotor(i, values[i]);
+
+                    uint16_t ivalue = (uint16_t)values[i];
+
+                    if (commandIsProcessing()) {
+                        ivalue = commandGetCurrent(i);
+                    }
+
+                    uint16_t packet = prepareDshotPacket(ivalue);
+
+                    writeMotor(i, packet);
                 }
 
                 if (!commandQueueIsEmpty()) {

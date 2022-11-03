@@ -977,16 +977,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             updateStartMotorPort(1);
         }
 
-        virtual void writeMotor(uint8_t index, float value) override
+        virtual void writeMotor(uint8_t index, uint16_t packet) override
         {
-            uint16_t ivalue = (uint16_t)value;
-
-            if (commandIsProcessing()) {
-                ivalue = commandGetCurrent(index);
-            }
-
             motor_t * const bbmotor = &m_motors[index];
-            uint16_t packet = prepareDshotPacket(ivalue);
             port_t *bbPort = bbmotor->bbPort;
             outputDataSet(bbPort->portOutputBuffer, bbmotor->pinIndex, packet); 
         }
