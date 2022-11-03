@@ -161,7 +161,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             // Output
             uint16_t outputARR;
             uint32_t *portOutputBuffer;
-            uint32_t portOutputCount;
 
             // TIM initialization
             uint16_t TIM_Prescaler;       
@@ -361,7 +360,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             DMAy_Streamx->FCR =
                 ((DMAy_Streamx->FCR & (uint32_t)~(DMA_SxFCR_DMDIS | DMA_SxFCR_FTH)) |
                  (DMA_FIFOMODE_ENABLE | DMA_FIFO_THRESHOLD_1QUARTERFULL));
-            DMAy_Streamx->NDTR = bbPort->portOutputCount;
+            DMAy_Streamx->NDTR = BUF_LENGTH;
             DMAy_Streamx->PAR = (uint32_t)&bbPort->gpio->BSRR;
             DMAy_Streamx->M0AR = (uint32_t)bbPort->portOutputBuffer;
 
@@ -712,9 +711,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             bbPort->gpio =_IO_GPIO(io);
 
-            bbPort->portOutputCount = BUF_LENGTH;
-            bbPort->portOutputBuffer =
-                &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
+            bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
 
             timebaseSetup(bbPort, m_protocol);
 
