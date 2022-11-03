@@ -193,14 +193,12 @@ class Stm32F405DshotEsc : public DshotEsc {
         } dmaTimerMapping_t;
 
         typedef struct bbMotor_s {
-            //uint16_t value;
             int32_t pinIndex;    
             int32_t portIndex;
             IO_t io;        
             uint8_t output;
             uint32_t iocfg;
             port_t *bbPort;
-            bool configured;
             bool enabled;
         } motor_t;
 
@@ -901,8 +899,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             TIM1->ARR = bbPort->outputARR;
 
-            bbMotor->configured = true;
-
             return true;
         }
 
@@ -1072,9 +1068,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
 
             for (auto i=0; i<m_motorCount; i++) {
-                if (m_motors[i].configured) {
-                    _IOConfigGPIO(i, m_motors[i].io, m_motors[i].iocfg);
-                }
+                _IOConfigGPIO(i, m_motors[i].io, m_motors[i].iocfg);
             }
         }        
 
@@ -1097,15 +1091,13 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             uint16_t ivalue = (uint16_t)value;
 
-            motor_t *const bbmotor = &m_motors[index];
+            motor_t * const bbmotor = &m_motors[index];
 
             if (commandIsProcessing()) {
                 ivalue = commandGetCurrent(index);
             }
 
-            // bbmotor->value = ivalue;
-
-            uint16_t packet = prepareDshotPacket(ivalue /*bbmotor->value*/);
+            uint16_t packet = prepareDshotPacket(ivalue);
 
             port_t *bbPort = bbmotor->bbPort;
 
