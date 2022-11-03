@@ -199,7 +199,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint8_t output;
             uint32_t iocfg;
             port_t *bbPort;
-            bool enabled;
         } motor_t;
 
         typedef struct {
@@ -1063,8 +1062,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                 if (!motorConfig(motorIndex)) {
                     return;
                 }
-
-                m_motors[motorIndex].enabled = true;
             }
 
             for (auto i=0; i<m_motorCount; i++) {
