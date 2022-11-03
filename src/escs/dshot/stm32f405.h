@@ -158,10 +158,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             dmaRegCache_t dmaRegOutput;
             dmaRegCache_t dmaRegInput;
 
-            // For direct manipulation of GPIO_MODER register
-            uint32_t gpioModeInput;
-            uint32_t gpioModeOutput;
-
             // Idle value
             uint32_t gpioIdleBSRR;
 
@@ -1002,9 +998,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 _IOInit(io, motorIndex+1);
 
-                bbPort->gpioModeInput |= (GPIO_Mode_IN << (pinIndex * 2));
-                bbPort->gpioModeOutput |= (GPIO_Mode_OUT << (pinIndex * 2));
-
                 bbPort->gpioIdleBSRR |= (1 << (pinIndex + 16));  // BR (higher half)
 
                 _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
@@ -1019,7 +1012,8 @@ class Stm32F405DshotEsc : public DshotEsc {
                 // Set GPIO to output
                 ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
                     uint32_t gpioModeMask = (GPIO_MODER_MODER0 << (pinIndex * 2));
-                    MODIFY_REG(bbPort->gpio->MODER, gpioModeMask, bbPort->gpioModeOutput);
+                    uint32_t gpioModeOutput = (GPIO_Mode_OUT << (pinIndex * 2));
+                    MODIFY_REG(bbPort->gpio->MODER, gpioModeMask, gpioModeOutput);
                 }
 
                 // Reinitialize port group DMA for output
