@@ -163,7 +163,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint32_t *portOutputBuffer;
 
             // TIM initialization
-            uint16_t TIM_Prescaler;       
             uint16_t TIM_CounterMode;       
             uint32_t TIM_Period;            
             uint16_t TIM_ClockDivision;     
@@ -715,7 +714,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             timebaseSetup(bbPort, m_protocol);
 
-            bbPort->TIM_Prescaler = 0; // Feed raw timerClock
             bbPort->TIM_ClockDivision = TIM_CLOCKDIVISION_DIV1;
             bbPort->TIM_CounterMode = TIM_COUNTERMODE_UP;
             bbPort->TIM_Period = bbPort->outputARR;
@@ -736,7 +734,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->ARR = bbPort->TIM_Period ;
 
             // Set the Prescaler value
-            TIM1->PSC = bbPort->TIM_Prescaler;
+            TIM1->PSC = 0;
 
             // Set the Repetition Counter value
             TIM1->RCR = bbPort->TIM_RepetitionCounter;
