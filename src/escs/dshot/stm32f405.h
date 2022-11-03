@@ -328,11 +328,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             DMA_Stream_TypeDef * DMAy_Streamx =
                 (DMA_Stream_TypeDef *)bbPort->dmaResource;
 
-            // Check if the DMA_IT parameter contains a Transfer interrupt 
-            if (DMA_IT_TC != DMA_IT_FE) {
-                // Enable the selected DMA transfer interrupts 
-                DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
-            }
+            DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
         }
 
         static void dmaPreconfigure(port_t *bbPort)
@@ -848,6 +844,68 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
+        void initMotor(uint8_t motorIndex, uint8_t pin)
+        {
+            const IO_t io = _IOGetByTag(pin);
+
+            int32_t pinIndex = MOTOR_PINS[motorIndex];
+
+            m_motors[motorIndex].pinIndex = pinIndex;
+
+            uint32_t iocfg =
+                io_config(GPIO_MODE_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, GPIO_PUPD_UP);
+
+            _IOInit(io, motorIndex+1);
+            _IOConfigGPIO(motorIndex, io, iocfg);
+
+            _IO_GPIO(io)->BSRR |= (uint32_t)_IO_Pin(io);
+
+            m_ports[motorIndex].channel = m_timer1channels[motorIndex];
+
+            int32_t portIndex = MOTOR_PORTS[motorIndex];
+
+            port_t *bbPort = findMotorPort(portIndex);
+
+            if (!bbPort) {
+                bbPort = allocateMotorPort(io, motorIndex, portIndex);
+            }
+
+            motor_t * bbMotor = &m_motors[motorIndex];
+
+            bbMotor->pinIndex = pinIndex;
+            bbMotor->bbPort = bbPort;
+
+            _IOInit(io, motorIndex+1);
+
+            _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
+
+            _IOConfigGPIO(motorIndex, io, io_config(GPIO_Mode_OUT,
+                        GPIO_FAST_SPEED, GPIO_OTYPE_PP, GPIO_PUPD_UP));
+
+            outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex)); 
+
+            bbPort->gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
+
+            // Set GPIO to output
+            ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
+                uint32_t gpioModeMask = (GPIO_MODER_MODER0 << (pinIndex * 2));
+                uint32_t gpioModeOutput = (GPIO_Mode_OUT << (pinIndex * 2));
+                MODIFY_REG(bbPort->gpio->MODER, gpioModeMask, gpioModeOutput);
+            }
+
+            // Reinitialize port group DMA for output
+
+            dmaResource_t *dmaResource = bbPort->dmaResource;
+            loadDmaRegs(dmaResource, &bbPort->dmaRegOutput);
+
+            // Reinitialize pacer timer for output
+
+            TIM1->ARR = m_outputARR;
+
+            _IOConfigGPIO(motorIndex, io, iocfg);
+
+        }
+
     protected: // DshotEsc method overrides =============================================
 
         virtual void deviceInit(uint32_t outputFreq) override
@@ -888,70 +946,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             TIM1->CR1 |= TIM_CR1_ARPE;
 
-            uint8_t motorIndex = 0;
-
-            for (auto pin : *m_pins) {
-
-                const IO_t io = _IOGetByTag(pin);
-
-                int32_t pinIndex = MOTOR_PINS[motorIndex];
-
-                m_motors[motorIndex].pinIndex = pinIndex;
-
-                uint32_t iocfg =
-                    io_config(GPIO_MODE_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, GPIO_PUPD_UP);
-
-                _IOInit(io, motorIndex+1);
-                _IOConfigGPIO(motorIndex, io, iocfg);
-
-                _IO_GPIO(io)->BSRR |= (uint32_t)_IO_Pin(io);
-
-                m_ports[motorIndex].channel = m_timer1channels[motorIndex];
-
-                int32_t portIndex = MOTOR_PORTS[motorIndex];
-
-                port_t *bbPort = findMotorPort(portIndex);
-
-                if (!bbPort) {
-                    bbPort = allocateMotorPort(io, motorIndex, portIndex);
-                }
-
-                motor_t * bbMotor = &m_motors[motorIndex];
-
-                bbMotor->pinIndex = pinIndex;
-                bbMotor->bbPort = bbPort;
-
-                _IOInit(io, motorIndex+1);
-
-                _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
-
-                _IOConfigGPIO(motorIndex, io, io_config(GPIO_Mode_OUT,
-                            GPIO_FAST_SPEED, GPIO_OTYPE_PP, GPIO_PUPD_UP));
-
-                outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex)); 
-
-                bbPort->gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
-
-                // Set GPIO to output
-                ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
-                    uint32_t gpioModeMask = (GPIO_MODER_MODER0 << (pinIndex * 2));
-                    uint32_t gpioModeOutput = (GPIO_Mode_OUT << (pinIndex * 2));
-                    MODIFY_REG(bbPort->gpio->MODER, gpioModeMask, gpioModeOutput);
-                }
-
-                // Reinitialize port group DMA for output
-
-                dmaResource_t *dmaResource = bbPort->dmaResource;
-                loadDmaRegs(dmaResource, &bbPort->dmaRegOutput);
-
-                // Reinitialize pacer timer for output
-
-                TIM1->ARR = m_outputARR;
-
-                _IOConfigGPIO(motorIndex, io, iocfg);
-
-                motorIndex++;
-            }
+            initMotor(0, (*m_pins)[0]);
+            initMotor(1, (*m_pins)[1]);
+            initMotor(2, (*m_pins)[2]);
+            initMotor(3, (*m_pins)[3]);
         }        
 
         virtual void updateComplete(void) override
