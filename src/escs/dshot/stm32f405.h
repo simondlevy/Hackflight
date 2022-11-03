@@ -132,12 +132,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint8_t                     resourceIndex;
         } dmaChannelDescriptor_t;
 
-        // Per pacer timer
-        typedef struct bbPacer_s {
-            TIM_TypeDef *tim;
-            uint16_t dmaSources;
-        } bbPacer_t;
-
         typedef struct dmaRegCache_s {
             uint32_t CR;
             uint32_t FCR;
@@ -546,8 +540,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         uint8_t m_ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
 
-        bbPacer_t m_pacers[MAX_MOTORS];  // TIM1 or TIM8
-
         port_t m_ports[MAX_MOTORS];
 
         int32_t m_usedMotorPorts;
@@ -578,6 +570,8 @@ class Stm32F405DshotEsc : public DshotEsc {
         };
 
         ioRec_t m_ioRecs[96];
+
+        uint16_t m_pacerDmaSources = 0;
 
         // Private instance methods =====================================================
 
@@ -691,25 +685,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CR1 |= TIM_CR1_CEN;
         }
 
-        bbPacer_t *findMotorPacer(void)
-        {
-            for (auto i=0; i<MAX_MOTORS; i++) {
-
-                bbPacer_t *bbPacer = &m_pacers[i];
-
-                if (bbPacer->tim == NULL) {
-                    bbPacer->tim = TIM1;
-                    return bbPacer;
-                }
-
-                if (bbPacer->tim == TIM1) {
-                    return bbPacer;
-                }
-            }
-
-            return NULL;
-        }
-
     public:
 
         port_t *findMotorPort(int32_t portIndex)
@@ -783,19 +758,13 @@ class Stm32F405DshotEsc : public DshotEsc {
 
     public:
 
-        void * g_pacers[4];
-
         void setupDma(uint8_t motorIndex, port_t *bbPort)
         {
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
             bbPort->dmaSource = timerDmaSource(bbPort->channel);
 
-            bbPacer_t *bbPacer = findMotorPacer();
-
-            g_pacers[motorIndex] = bbPacer;
-
-            bbPacer->dmaSources |= bbPort->dmaSource;
+            m_pacerDmaSources |= bbPort->dmaSource;
 
             dmaSetHandler(
                     dmaGetIdentifier(bbPort->dmaResource),
@@ -1134,10 +1103,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 dmaCmd(bbPort, ENABLE);
             }
 
-            for (auto i=0; i<1; i++) {
-                bbPacer_t *bbPacer = &m_pacers[i];
-                timDmaCmd(bbPacer->dmaSources, ENABLE);
-            }
+            timDmaCmd(m_pacerDmaSources, ENABLE);
         }
 
         virtual void updateStart(void) override
