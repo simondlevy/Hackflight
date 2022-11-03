@@ -802,10 +802,10 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             initChannel(0, TIM1, TIM_CHANNEL_1, 1, 2, 1, 6); 
             initChannel(1, TIM1, TIM_CHANNEL_2, 1, 2, 2, 6); 
-            initChannel(2, TIM2, TIM_CHANNEL_1, 0, 1, 5, 3); 
-            initChannel(3, TIM2, TIM_CHANNEL_3, 0, 1, 1, 3); 
-            initChannel(4, TIM5, TIM_CHANNEL_2, 0, 1, 4, 6); 
-            initChannel(5, TIM5, TIM_CHANNEL_4, 0, 1, 1, 6); 
+            //initChannel(2, TIM2, TIM_CHANNEL_1, 0, 1, 5, 3); 
+            //initChannel(3, TIM2, TIM_CHANNEL_3, 0, 1, 1, 3); 
+            //initChannel(4, TIM5, TIM_CHANNEL_2, 0, 1, 4, 6); 
+            //initChannel(5, TIM5, TIM_CHANNEL_4, 0, 1, 1, 6); 
         }
 
         void initTimerDefinition(uint8_t id, TIM_TypeDef * tim, uint32_t apb, uint32_t en)
@@ -817,7 +817,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         void initTimerDefinitions(void)
         {
             initTimerDefinition(0, TIM1, RCC_APB2, RCC_APB2ENR_TIM1EN);
-            initTimerDefinition(1, TIM2, RCC_APB1, RCC_APB1ENR_TIM2EN);
+            //initTimerDefinition(1, TIM2, RCC_APB1, RCC_APB1ENR_TIM2EN);
             initTimerDefinition(2, TIM5, RCC_APB1, RCC_APB1ENR_TIM5EN);
         }
 
@@ -869,8 +869,8 @@ class Stm32F405DshotEsc : public DshotEsc {
         void timerInit(void)
         {
             RCC_ClockEnable(timerRCC(TIM5));
-            RCC_ClockEnable(timerRCC(TIM2));
-            RCC_ClockEnable(timerRCC(TIM2));
+            //RCC_ClockEnable(timerRCC(TIM2));
+            //RCC_ClockEnable(timerRCC(TIM2));
             RCC_ClockEnable(timerRCC(TIM5));
         }
 
