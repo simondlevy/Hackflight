@@ -517,8 +517,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         uint32_t m_outputBuffer[BUF_LENGTH * MAX_MOTORS];
 
-        uint8_t m_puPdMode;
-
         dmaChannelDescriptor_t m_dmaDescriptors[DMA_LAST_HANDLER];
 
         dmaTimerMapping_t m_dmaTimerMapping[DMA_TIMER_MAPPING_COUNT] = {};
@@ -910,14 +908,12 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 const IO_t io = _IOGetByTag(pin);
 
-                m_puPdMode = GPIO_PUPD_UP;
-
                 int32_t pinIndex = MOTOR_PINS[motorIndex];
 
                 m_motors[motorIndex].pinIndex = pinIndex;
 
                 uint32_t iocfg =
-                    io_config(GPIO_MODE_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, m_puPdMode);
+                    io_config(GPIO_MODE_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, GPIO_PUPD_UP);
 
                 _IOInit(io, motorIndex+1);
                 _IOConfigGPIO(motorIndex, io, iocfg);
@@ -944,7 +940,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
 
                 _IOConfigGPIO(motorIndex, io, io_config(GPIO_Mode_OUT,
-                            GPIO_FAST_SPEED, GPIO_OTYPE_PP, m_puPdMode));
+                            GPIO_FAST_SPEED, GPIO_OTYPE_PP, GPIO_PUPD_UP));
 
                 outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex)); 
 
