@@ -193,7 +193,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         } dmaTimerMapping_t;
 
         typedef struct bbMotor_s {
-            uint16_t value;
+            //uint16_t value;
             int32_t pinIndex;    
             int32_t portIndex;
             IO_t io;        
@@ -1103,9 +1103,9 @@ class Stm32F405DshotEsc : public DshotEsc {
                 ivalue = commandGetCurrent(index);
             }
 
-            bbmotor->value = ivalue;
+            // bbmotor->value = ivalue;
 
-            uint16_t packet = prepareDshotPacket(bbmotor->value);
+            uint16_t packet = prepareDshotPacket(ivalue /*bbmotor->value*/);
 
             port_t *bbPort = bbmotor->bbPort;
 
