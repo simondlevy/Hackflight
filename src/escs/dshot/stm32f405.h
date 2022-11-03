@@ -891,8 +891,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             TIM1->ARR = m_outputARR;
 
-            _IOConfigGPIO(motorIndex, io, iocfg);
-
+            //_IOConfigGPIO(motorIndex, io, iocfg);
         }
 
     protected: // DshotEsc method overrides =============================================
