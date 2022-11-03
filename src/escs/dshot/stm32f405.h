@@ -703,6 +703,17 @@ class Stm32F405DshotEsc : public DshotEsc {
             return NULL;
         }
 
+        dmaIdentifier_e findDmaIdentifier(const dmaResource_t* channel)
+        {
+            for (uint8_t i=0; i<DMA_LAST_HANDLER; i++) {
+                if (m_dmaDescriptors[i].ref == channel) {
+                    return (dmaIdentifier_e)(i + 1);
+                }
+            }
+
+            return DMA_NONE;
+        }
+
         port_t *allocateMotorPort(int32_t portIndex)
         {
             port_t *bbPort = &m_ports[m_usedMotorPorts];
@@ -712,17 +723,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             ++m_usedMotorPorts;
 
             return bbPort;
-        }
-
-        dmaIdentifier_e dmaGetIdentifier(const dmaResource_t* channel)
-        {
-            for (uint8_t i=0; i<DMA_LAST_HANDLER; i++) {
-                if (m_dmaDescriptors[i].ref == channel) {
-                    return (dmaIdentifier_e)(i + 1);
-                }
-            }
-
-            return DMA_NONE;
         }
 
         void dmaSetHandler(
@@ -767,7 +767,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             m_pacerDmaSources |= bbPort->dmaSource;
 
             dmaSetHandler(
-                    dmaGetIdentifier(bbPort->dmaResource),
+                    findDmaIdentifier(bbPort->dmaResource),
                     dmaIrqHandler,
                     nvic_build_priority(2, 1),
                     (uint32_t)bbPort);
