@@ -29,6 +29,14 @@
 
 class DshotEsc : public Esc {
 
+    protected:
+
+        typedef enum {
+            DSHOT150,
+            DSHOT300,
+            DSHOT600,
+        } protocol_t;
+
     private:
 
         static const uint16_t MIN_VALUE = 48;
@@ -195,34 +203,9 @@ class DshotEsc : public Esc {
             return m_commandQueue[m_commandQueueTail].command[index];
         }
 
-    protected:
-
-        typedef enum {
-            DSHOT150,
-            DSHOT300,
-            DSHOT600,
-        } protocol_t;
-
         protocol_t m_protocol;
 
         uint8_t m_motorCount;
-
-        virtual void deviceInit(uint32_t outputFreq) = 0;
-        virtual void updateComplete(void) = 0;
-        virtual void updateStart(void) = 0;
-        virtual void writeMotor(uint8_t index, uint16_t packet) = 0;
-
-        DshotEsc(vector<uint8_t> & pins, protocol_t protocol=DSHOT600) 
-            : Esc(pins)
-        {
-            m_protocol = protocol;
-
-            m_motorCount = pins.size();
-
-            for (auto i=0; i<m_motorCount; ++i) {
-                m_motorPins[i] = pins[i];
-            }
-        }
 
         bool commandQueueUpdate(void)
         {
@@ -274,6 +257,25 @@ class DshotEsc : public Esc {
                 command->state == COMMAND_STATE_STARTDELAY ||
                 command->state == COMMAND_STATE_ACTIVE ||
                 (command->state == COMMAND_STATE_POSTDELAY && !isLastCommand()); 
+        }
+
+    protected:
+
+        virtual void deviceInit(uint32_t outputFreq) = 0;
+        virtual void updateComplete(void) = 0;
+        virtual void updateStart(void) = 0;
+        virtual void writeMotor(uint8_t index, uint16_t packet) = 0;
+
+        DshotEsc(vector<uint8_t> & pins, protocol_t protocol=DSHOT600) 
+            : Esc(pins)
+        {
+            m_protocol = protocol;
+
+            m_motorCount = pins.size();
+
+            for (auto i=0; i<m_motorCount; ++i) {
+                m_motorPins[i] = pins[i];
+            }
         }
 
     public:
