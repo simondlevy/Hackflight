@@ -221,7 +221,7 @@ class DshotEsc : public Esc {
         }
 
 
-        virtual void deviceInit(void) = 0;
+        virtual void deviceInit(uint32_t outputFreq) = 0;
         virtual void updateComplete(void) = 0;
         virtual void updateStart(void) = 0;
         virtual void writeMotor(uint8_t index, uint16_t packet) = 0;
@@ -294,7 +294,7 @@ class DshotEsc : public Esc {
 
         virtual void begin(void) override 
         {
-            deviceInit();
+            deviceInit(1000 * getDshotBaseFrequency(m_protocol));
 
             m_enabled = true;
         }

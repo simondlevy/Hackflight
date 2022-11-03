@@ -857,7 +857,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
     protected: // DshotEsc method overrides =============================================
 
-        virtual void deviceInit(void) override
+        virtual void deviceInit(uint32_t outputFreq) override
         {
             rccInit();
 
@@ -871,7 +871,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             dmaInit();
 
-            uint32_t outputFreq = 1000 * getDshotBaseFrequency(m_protocol);
             m_outputARR = SystemCoreClock / outputFreq - 1;
 
             memset(m_outputBuffer, 0, sizeof(m_outputBuffer));
