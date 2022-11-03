@@ -526,7 +526,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void _IOConfigGPIO(IO_t io, uint8_t cfg)
+        void _IOConfigGPIO(uint8_t motorIndex, IO_t io, uint8_t cfg)
         {
             const uint8_t ioPortDefs[6] = {
                 { rcc_ahb1(RCC_AHB1ENR_GPIOAEN_MSK) },
@@ -537,7 +537,9 @@ class Stm32F405DshotEsc : public DshotEsc {
                 { rcc_ahb1(RCC_AHB1ENR_GPIOFEN_MSK) },
             };
 
-            const uint8_t rcc = ioPortDefs[_IO_GPIOPortIdx(io)];
+            uint8_t portIndex = MOTOR_PORTS[motorIndex]; // _IO_GPIOPortIdx(io);
+
+            const uint8_t rcc = ioPortDefs[portIndex];
 
             RCC_ClockEnable(rcc);
 
@@ -699,9 +701,15 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CR1 |= TIM_CR1_CEN;
         }
 
+    public:
+
+        uint8_t g_pacerIndex;
+
         bbPacer_t *findMotorPacer(void)
         {
             for (auto i=0; i<MAX_MOTORS; i++) {
+
+                g_pacerIndex = i;
 
                 bbPacer_t *bbPacer = &m_pacers[i];
 
@@ -923,7 +931,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
 
-            _IOConfigGPIO(io,
+            _IOConfigGPIO(motorIndex, io,
                     io_config(GPIO_Mode_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, m_puPdMode));
 
             outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex)); 
@@ -1100,7 +1108,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                     io_config(GPIO_MODE_OUT, GPIO_FAST_SPEED, GPIO_OTYPE_PP, m_puPdMode);
 
                 _IOInit(io, motorIndex+1);
-                _IOConfigGPIO(io, m_motors[motorIndex].iocfg);
+                _IOConfigGPIO(motorIndex, io, m_motors[motorIndex].iocfg);
 
                 _IO_GPIO(io)->BSRR |= (uint32_t)_IO_Pin(io);
 
@@ -1124,7 +1132,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             for (auto i=0; i<m_motorCount; i++) {
                 if (m_motors[i].configured) {
-                    _IOConfigGPIO(m_motors[i].io, m_motors[i].iocfg);
+                    _IOConfigGPIO(i, m_motors[i].io, m_motors[i].iocfg);
                 }
             }
         }        

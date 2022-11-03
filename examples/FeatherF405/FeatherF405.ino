@@ -73,9 +73,5 @@ void setup(void)
 void loop(void)
 {
     _hf->step();
-
-    Serial.print(" 3: ");
-    Serial.print(_esc->g_pinIndex);
-    Serial.print(", ");
-    Serial.println(_esc->g_portIndex);
+    Serial.println(_esc->g_pacerIndex);
 }
