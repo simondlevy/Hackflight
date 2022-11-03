@@ -813,7 +813,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         void initTimerDefinitions(void)
         {
             initTimerDefinition(0, TIM1, RCC_APB2, RCC_APB2ENR_TIM1EN);
-            //initTimerDefinition(2, TIM5, RCC_APB1, RCC_APB1ENR_TIM5EN);
         }
 
         void initTimer1Hardware(void)
@@ -861,12 +860,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             return 0;
         }
 
-        void timerInit(void)
-        {
-            //RCC_ClockEnable(timerRCC(TIM5));
-            //RCC_ClockEnable(timerRCC(TIM5));
-        }
-
         void ioInit(void)
         {
             ioRec_t *ioRec = m_ioRecs;
@@ -887,8 +880,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             rccInit();
 
             ioInit();
-
-            timerInit();
 
             initTimerMapping();
 
