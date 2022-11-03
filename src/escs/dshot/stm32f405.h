@@ -685,7 +685,11 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CR1 |= TIM_CR1_CEN;
         }
 
-    public:
+        void updateStartMotorPort(uint8_t index)
+        {
+            dmaCmd(&m_ports[index], DISABLE);
+            outputDataClear(m_ports[index].portOutputBuffer);
+        }
 
         port_t *findMotorPort(int32_t portIndex)
         {
@@ -701,10 +705,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         port_t *allocateMotorPort(int32_t portIndex)
         {
-            if (m_usedMotorPorts >= MAX_MOTORS) {
-                return NULL;
-            }
-
             port_t *bbPort = &m_ports[m_usedMotorPorts];
 
             bbPort->portIndex = portIndex;
@@ -1097,21 +1097,17 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         virtual void updateComplete(void) override
         {
-            for (auto i=0; i<m_usedMotorPorts; i++) {
-                port_t *bbPort = &m_ports[i];
 
-                dmaCmd(bbPort, ENABLE);
-            }
+            dmaCmd(&m_ports[0], ENABLE);
+            dmaCmd(&m_ports[1], ENABLE);
 
             timDmaCmd(m_pacerDmaSources, ENABLE);
         }
 
         virtual void updateStart(void) override
         {
-            for (auto i=0; i<m_usedMotorPorts; i++) {
-                dmaCmd(&m_ports[i], DISABLE);
-                outputDataClear(m_ports[i].portOutputBuffer);
-            }
+            updateStartMotorPort(0);
+            updateStartMotorPort(1);
         }
 
         virtual void write(uint8_t index, float value) override
