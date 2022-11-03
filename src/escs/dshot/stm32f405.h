@@ -88,6 +88,9 @@ class Stm32F405DshotEsc : public DshotEsc {
         static const uint8_t FRAME_BITS = 16;
         static const uint8_t BUF_LENGTH = FRAME_BITS * STATE_PER_SYMBOL;
 
+        const uint32_t MOTOR_PINS[4]  = {0, 1, 3, 2};
+        const uint32_t MOTOR_PORTS[4] = {1, 1, 0, 0};
+
         // Typedefs =====================================================================
 
         typedef enum { 
@@ -546,11 +549,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             GPIO_Init(_IO_GPIO(io), pin, mode, speed, pull);
         }
 
-        static int32_t _IO_GPIOPinIdx(IO_t io)
-        {
-            return 31 - __builtin_clz(_IO_Pin(io));  // CLZ is a bit faster than FFS
-        }
-
         // Instance variables ===========================================================
 
         uint8_t m_ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
@@ -834,14 +832,11 @@ class Stm32F405DshotEsc : public DshotEsc {
         bool motorConfig(uint8_t motorIndex)
         {
             IO_t io = m_motors[motorIndex].io;
+
             uint8_t output = m_motors[motorIndex].output;
 
-            const uint32_t pinIdx[4] = {0, 1, 3, 2};
-            const uint32_t prtIdx[4] = {1, 1, 0, 0};
-
-            int32_t pinIndex = pinIdx[motorIndex]; // _IO_GPIOPinIdx(io);
-
-            int32_t portIndex = prtIdx[motorIndex]; // _IO_GPIOPortIdx(io);
+            int32_t pinIndex  = MOTOR_PINS[motorIndex]; 
+            int32_t portIndex = MOTOR_PORTS[motorIndex]; // _IO_GPIOPortIdx(io);
 
             port_t *bbPort = findMotorPort(portIndex);
 
@@ -1096,7 +1091,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 m_puPdMode = GPIO_PUPD_UP;
 
-                int32_t pinIndex = _IO_GPIOPinIdx(io);
+                int32_t pinIndex = MOTOR_PINS[motorIndex];
 
                 m_motors[motorIndex].pinIndex = pinIndex;
                 m_motors[motorIndex].io = io;
