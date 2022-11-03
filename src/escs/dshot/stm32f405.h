@@ -701,26 +701,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
 
-            uint16_t tmpcr1 = TIM1->CR1;  
-
-            // Select the Counter Mode
-            tmpcr1 &= (uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS));
-            tmpcr1 |= (uint32_t)TIM_COUNTERMODE_UP;
-
-            // Set the clock division 
-            tmpcr1 &=  (uint16_t)(~TIM_CR1_CKD);
-            tmpcr1 |= (uint32_t)TIM_CLOCKDIVISION_DIV1;
-
-            TIM1->CR1 = tmpcr1;
-
-            // Set the Autoreload value 
-            TIM1->ARR = m_outputARR;
-            TIM1->PSC = 0;
-            TIM1->RCR = 0;
-            TIM1->EGR = 0x0001;          
-
-            TIM1->CR1 |= TIM_CR1_ARPE;
-
             timerChannelInit(bbPort);
 
             setupDma(motorIndex, bbPort);
@@ -931,6 +911,26 @@ class Stm32F405DshotEsc : public DshotEsc {
             m_outputARR = SystemCoreClock / outputFreq - 1;
 
             memset(m_outputBuffer, 0, sizeof(m_outputBuffer));
+
+            uint16_t tmpcr1 = TIM1->CR1;  
+
+            // Select the Counter Mode
+            tmpcr1 &= (uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS));
+            tmpcr1 |= (uint32_t)TIM_COUNTERMODE_UP;
+
+            // Set the clock division 
+            tmpcr1 &=  (uint16_t)(~TIM_CR1_CKD);
+            tmpcr1 |= (uint32_t)TIM_CLOCKDIVISION_DIV1;
+
+            TIM1->CR1 = tmpcr1;
+
+            // Set the Autoreload value 
+            TIM1->ARR = m_outputARR;
+            TIM1->PSC = 0;
+            TIM1->RCR = 0;
+            TIM1->EGR = 0x0001;          
+
+            TIM1->CR1 |= TIM_CR1_ARPE;
 
             uint8_t motorIndex = 0;
 
