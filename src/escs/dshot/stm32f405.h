@@ -115,13 +115,11 @@ class Stm32F405DshotEsc : public DshotEsc {
         typedef struct dmaChannelDescriptor_s {
             DMA_TypeDef*                dma;
             dmaResource_t               *ref;
-            uint8_t                     stream;
             uint32_t                    channel;
             dmaCallbackHandlerFuncPtr   irqHandlerCallback;
             uint8_t                     flagsShift;
             IRQn_Type                   irqN;
             uint32_t                    userParam;
-            uint8_t                     resourceIndex;
         } dmaChannelDescriptor_t;
 
         typedef struct dmaRegCache_s {
@@ -771,7 +769,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             desc->dma = DMA2;
             desc->ref = (dmaResource_t *)ref;
-            desc->stream = stream;
             desc->flagsShift = flagsShift;
             desc->irqN = irqN;
         }
