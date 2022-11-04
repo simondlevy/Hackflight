@@ -107,11 +107,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef void * IO_t; 
 
-        typedef struct {
-            TIM_TypeDef *TIMx;
-            uint8_t rcc;
-        } timerDef_t;
-
         struct dmaChannelDescriptor_s;
 
         typedef void (*dmaCallbackHandlerFuncPtr)(
