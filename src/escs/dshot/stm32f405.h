@@ -644,6 +644,21 @@ class Stm32F405DshotEsc : public DshotEsc {
             return DMA_NONE;
         }
 
+        const dmaChannelSpec_t *findDmaChannelSpec(uint8_t channel, int8_t dmaOpt)
+        {
+            for (uint8_t i=0 ; i<DMA_TIMER_MAPPING_COUNT; i++) {
+                const dmaTimerMapping_t *timerMapping = &m_dmaTimerMapping[i];
+
+                if (timerMapping->tim == TIM1 && timerMapping->channel == channel &&
+                        timerMapping->channelSpec[dmaOpt].ref) {
+
+                    return &timerMapping->channelSpec[dmaOpt];
+                }
+            }
+
+            return NULL;
+        }
+
         port_t *allocateMotorPort(IO_t io, uint8_t motorIndex, int32_t portIndex)
         {
             port_t *bbPort = &m_ports[m_usedMotorPorts];
@@ -652,8 +667,8 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             static uint8_t options[4] = {1, 0, 1, 0};
             const int8_t option = options[motorIndex];
-            const dmaChannelSpec_t *dmaChannelSpec =
-                findDmaChannelSpec(TIM1, bbPort->channel, option); 
+            const dmaChannelSpec_t * dmaChannelSpec =
+                findDmaChannelSpec(bbPort->channel, option); 
             bbPort->dmaResource = dmaChannelSpec->ref;
             bbPort->dmaChannel = dmaChannelSpec->channel;
 
@@ -713,28 +728,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             NVIC->ISER[irqChannel >> 0x05] =
                 (uint32_t)0x01 << (irqChannel & (uint8_t)0x1F);
-        }
-
-    public:
-
-        const dmaChannelSpec_t *findDmaChannelSpec(
-                TIM_TypeDef *tim, uint8_t channel, int8_t dmaOpt)
-        {
-            if (dmaOpt < 0 || dmaOpt >= MAX_TIMER_DMA_OPTIONS) {
-                return NULL;
-            }
-
-            for (uint8_t i=0 ; i<DMA_TIMER_MAPPING_COUNT; i++) {
-                const dmaTimerMapping_t *timerMapping = &m_dmaTimerMapping[i];
-
-                if (timerMapping->tim == tim && timerMapping->channel == channel &&
-                        timerMapping->channelSpec[dmaOpt].ref) {
-
-                    return &timerMapping->channelSpec[dmaOpt];
-                }
-            }
-
-            return NULL;
         }
 
         void initChannel(
