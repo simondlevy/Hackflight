@@ -860,9 +860,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             // Reinitialize port group DMA for output
             loadDmaRegs(bbPort->dmaResource, &bbPort->dmaRegOutput);
-
-            // Reinitialize pacer timer for output
-            TIM1->ARR = m_outputARR;
         }
 
     protected: // DshotEsc method overrides =============================================
@@ -907,6 +904,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             initMotor(1, 1, 1, (*m_pins)[1]);
             initMotor(2, 0, 3, (*m_pins)[2]);
             initMotor(3, 0, 2, (*m_pins)[3]);
+
+            // Reinitialize pacer timer for output
+            TIM1->ARR = m_outputARR;
         }        
 
         virtual void updateComplete(void) override
