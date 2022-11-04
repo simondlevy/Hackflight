@@ -766,14 +766,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             initChannel(1, TIM_CHANNEL_2, 1, 2, 2, 6); 
         }
 
-        void initTimer1Hardware(void)
-        {
-            m_timer1channels[0] = TIM_CHANNEL_1;
-            m_timer1channels[1] = TIM_CHANNEL_2;
-            m_timer1channels[2] = TIM_CHANNEL_3;
-            m_timer1channels[3] = TIM_CHANNEL_4;
-        }
-
         void defineDma2Channel(
                 uint8_t stream,
                 DMA_Stream_TypeDef * ref,
@@ -815,7 +807,11 @@ class Stm32F405DshotEsc : public DshotEsc {
         }
 
         void initMotor(
-                uint8_t motorIndex, uint8_t portIndex, uint8_t pinIndex, uint8_t pin)
+                uint8_t motorIndex,
+                uint8_t portIndex,
+                uint8_t pinIndex,
+                uint8_t pin,
+                uint8_t timerChannel)
         {
             m_motors[motorIndex].pinIndex = pinIndex;
 
@@ -835,7 +831,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             _IO_GPIO(io)->BSRR |= (uint32_t)_IO_Pin(io);
 
-            m_ports[motorIndex].channel = m_timer1channels[motorIndex];
+            m_ports[motorIndex].channel = timerChannel;
 
             port_t *bbPort = findMotorPort(portIndex);
 
@@ -872,8 +868,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             initTimerMapping();
 
-            initTimer1Hardware();
-
             dmaInit();
 
             m_outputARR = SystemCoreClock / outputFreq - 1;
@@ -900,10 +894,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             TIM1->CR1 |= TIM_CR1_ARPE;
 
-            initMotor(0, 1, 0, (*m_pins)[0]);
-            initMotor(1, 1, 1, (*m_pins)[1]);
-            initMotor(2, 0, 3, (*m_pins)[2]);
-            initMotor(3, 0, 2, (*m_pins)[3]);
+            initMotor(0, 1, 0, (*m_pins)[0], TIM_CHANNEL_1);
+            initMotor(1, 1, 1, (*m_pins)[1], TIM_CHANNEL_2);
+            initMotor(2, 0, 3, (*m_pins)[2], TIM_CHANNEL_3);
+            initMotor(3, 0, 2, (*m_pins)[3], TIM_CHANNEL_4);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = m_outputARR;
