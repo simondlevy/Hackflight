@@ -653,7 +653,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             static uint8_t options[4] = {1, 0, 1, 0};
             const int8_t option = options[motorIndex];
             const dmaChannelSpec_t *dmaChannelSpec =
-                dmaGetChannelSpecByTimerValue(TIM1, bbPort->channel, option); 
+                findDmaChannelSpec(TIM1, bbPort->channel, option); 
             bbPort->dmaResource = dmaChannelSpec->ref;
             bbPort->dmaChannel = dmaChannelSpec->channel;
 
@@ -717,7 +717,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
     public:
 
-        const dmaChannelSpec_t *dmaGetChannelSpecByTimerValue(
+        const dmaChannelSpec_t *findDmaChannelSpec(
                 TIM_TypeDef *tim, uint8_t channel, int8_t dmaOpt)
         {
             if (dmaOpt < 0 || dmaOpt >= MAX_TIMER_DMA_OPTIONS) {
