@@ -498,8 +498,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         dmaTimerMapping_t m_dmaTimerMapping[DMA_TIMER_MAPPING_COUNT] = {};
 
-        timerDef_t m_timerDefinitions[HARDWARE_TIMER_DEFINITION_COUNT] = {};
-
         uint8_t m_timer1channels[4] = {};
 
         static constexpr DMA_Stream_TypeDef * m_streams[8] = {
@@ -768,17 +766,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             initChannel(1, TIM_CHANNEL_2, 1, 2, 2, 6); 
         }
 
-        void initTimerDefinition(uint8_t id, TIM_TypeDef * tim, uint32_t apb, uint32_t en)
-        {
-            m_timerDefinitions[id].TIMx = tim;
-            m_timerDefinitions[id].rcc = rcc_encode(apb, en);
-        }
-
-        void initTimerDefinitions(void)
-        {
-            initTimerDefinition(0, TIM1, RCC_APB2, RCC_APB2ENR_TIM1EN);
-        }
-
         void initTimer1Hardware(void)
         {
             m_timer1channels[0] = TIM_CHANNEL_1;
@@ -887,8 +874,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             ioInit();
 
             initTimerMapping();
-
-            initTimerDefinitions();
 
             initTimer1Hardware();
 
