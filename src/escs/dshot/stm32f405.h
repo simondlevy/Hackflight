@@ -305,41 +305,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             return (uint8_t)rcc_encode(RCC_AHB1, gpio); 
         }
 
-        static void GPIO_Init(
-                GPIO_TypeDef* GPIOx,
-                uint32_t pin,
-                uint32_t mode,
-                uint32_t speed,
-                uint32_t pull
-                )
-        {
-            uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
-
-            for (pinpos = 0x00; pinpos < 0x10; pinpos++)
-            {
-                pos = ((uint32_t)0x01) << pinpos;
-
-                currentpin = pin & pos;
-
-                if (currentpin == pos)
-                {
-                    GPIOx->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
-                    GPIOx->MODER |= (mode << (pinpos * 2));
-
-                    if ((mode == GPIO_Mode_OUT) || (mode == GPIO_Mode_AF)) {
-
-                        GPIOx->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
-                        GPIOx->OSPEEDR |= (speed << (pinpos * 2));
-
-                        GPIOx->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
-                    }
-
-                    GPIOx->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
-                    GPIOx->PUPDR |= (pull << (pinpos * 2)); 
-                }
-            }
-        }
-
         void _IOConfigGPIO(uint8_t motorIndex, uint8_t portIndex, IO_t io, uint8_t cfg)
         {
             const uint8_t ioPortDefs[6] = {
@@ -373,7 +338,33 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint32_t speed = (cfg >> 2) & 0x03;
             uint32_t pull  = (cfg >> 5) & 0x03;
 
-            GPIO_Init(_IO_GPIO(io), pin, mode, speed, pull);
+            GPIO_TypeDef * GPIOx = _IO_GPIO(io);
+
+            uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
+
+            for (pinpos = 0x00; pinpos < 0x10; pinpos++)
+            {
+                pos = ((uint32_t)0x01) << pinpos;
+
+                currentpin = pin & pos;
+
+                if (currentpin == pos)
+                {
+                    GPIOx->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
+                    GPIOx->MODER |= (mode << (pinpos * 2));
+
+                    if ((mode == GPIO_Mode_OUT) || (mode == GPIO_Mode_AF)) {
+
+                        GPIOx->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
+                        GPIOx->OSPEEDR |= (speed << (pinpos * 2));
+
+                        GPIOx->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
+                    }
+
+                    GPIOx->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
+                    GPIOx->PUPDR |= (pull << (pinpos * 2)); 
+                }
+            }
         }
 
         // Instance variables ===========================================================
