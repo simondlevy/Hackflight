@@ -135,9 +135,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             dmaResource_t *dmaResource; // DMA resource for this port & timer channel
 
-            /////////////////////////////////////
-
-            int32_t portIndex;
+            int32_t index;
 
             GPIO_TypeDef *gpio;
 
@@ -389,7 +387,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         port_t *findMotorPort(int32_t portIndex)
         {
             for (auto i=0; i<m_usedMotorPorts; i++) {
-                if (m_ports[i].portIndex == portIndex) {
+                if (m_ports[i].index == portIndex) {
                     return &m_ports[i];
                 }
             }
@@ -425,7 +423,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         port_t *allocateMotorPort(IO_t io, uint8_t motorIndex, int32_t portIndex)
         {
             port_t *port = &m_ports[m_usedMotorPorts];
-            port->portIndex = portIndex;
+            port->index = portIndex;
             ++m_usedMotorPorts;
 
             static uint8_t options[4] = {1, 0, 1, 0};
