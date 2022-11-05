@@ -147,7 +147,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         } dmaChannelSpec_t;
 
         typedef struct {
-            TIM_TypeDef *tim;
             uint8_t channel;
             dmaChannelSpec_t channelSpec[MAX_TIMER_DMA_OPTIONS];
         } dmaTimerMapping_t;
@@ -384,9 +383,10 @@ class Stm32F405DshotEsc : public DshotEsc {
         const dmaChannelSpec_t *findDmaChannelSpec(uint8_t channel, int8_t dmaOpt)
         {
             for (uint8_t i=0 ; i<DMA_TIMER_MAPPING_COUNT; i++) {
+
                 const dmaTimerMapping_t *timerMapping = &m_dmaTimerMapping[i];
 
-                if (timerMapping->tim == TIM1 && timerMapping->channel == channel &&
+                if (timerMapping->channel == channel &&
                         timerMapping->channelSpec[dmaOpt].ref) {
 
                     return &timerMapping->channelSpec[dmaOpt];
@@ -503,7 +503,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void initChannel(const uint8_t timerId, const uint8_t channel)
         {
-            m_dmaTimerMapping[timerId].tim = TIM1;
             m_dmaTimerMapping[timerId].channel = channel;
 
             dmaChannelSpec_t * spec = &m_dmaTimerMapping[timerId].channelSpec[1];
