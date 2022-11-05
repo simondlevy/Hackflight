@@ -149,7 +149,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             dmaRegCache_t dmaRegInput;
 
             // Output
-            uint32_t *portOutputBuffer;
+            uint32_t *outputBuffer;
 
         } port_t;
 
@@ -331,7 +331,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                  (DMA_FIFOMODE_ENABLE | DMA_FIFO_THRESHOLD_1QUARTERFULL));
             DMAy_Streamx->NDTR = BUF_LENGTH;
             DMAy_Streamx->PAR = (uint32_t)&port->gpio->BSRR;
-            DMAy_Streamx->M0AR = (uint32_t)port->portOutputBuffer;
+            DMAy_Streamx->M0AR = (uint32_t)port->outputBuffer;
 
             saveDmaRegs(port->dmaResource, &port->dmaRegOutput);
         }
@@ -616,10 +616,10 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CR1 |= TIM_CR1_CEN;
         }
 
-        void updateStartMotorPort(uint8_t index)
+        void updateStartMotorPort(port_t * port)
         {
-            dmaCmd(&m_ports[index], DISABLE);
-            outputDataClear(m_ports[index].portOutputBuffer);
+            dmaCmd(port, DISABLE);
+            outputDataClear(port->outputBuffer);
         }
 
         port_t *findMotorPort(int32_t portIndex)
@@ -673,7 +673,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             port->gpio =_IO_GPIO(io);
 
-            port->portOutputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
+            port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
 
             timerChannelInit(port);
 
@@ -827,7 +827,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
 
-            outputDataInit(port->portOutputBuffer, (1 << pinIndex)); 
+            outputDataInit(port->outputBuffer, (1 << pinIndex)); 
 
             port->gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
 
@@ -898,15 +898,15 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         virtual void updateStart(void) override
         {
-            updateStartMotorPort(0);
-            updateStartMotorPort(1);
+            updateStartMotorPort(&m_ports[0]);
+            updateStartMotorPort(&m_ports[1]);
         }
 
         virtual void writeMotor(uint8_t index, uint16_t packet) override
         {
             motor_t * const motor = &m_motors[index];
             port_t *port = motor->port;
-            outputDataSet(port->portOutputBuffer, motor->pinIndex, packet); 
+            outputDataSet(port->outputBuffer, motor->pinIndex, packet); 
         }
 
     public:
