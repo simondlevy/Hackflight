@@ -377,40 +377,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CCER = tmpccer;
         }
 
-        void timerChannelInit(port_t *port)
-        {
-            const uint8_t channel = port->channel;
-
-            // Disable the TIM Counter
-            TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
-
-            switch (channel) {
-                case TIM_CHANNEL_1:
-                    timOcInit( &TIM1->CCMR1, &TIM1->CCR1, TIM_CCER_CC1E,
-                            TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
-                            TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
-                    break;
-                case TIM_CHANNEL_2:
-                    timOcInit( &TIM1->CCMR1, &TIM1->CCR2, TIM_CCER_CC2E,
-                            TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
-                            TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
-                    break;
-                case TIM_CHANNEL_3:
-                    timOcInit( &TIM1->CCMR2, &TIM1->CCR3, TIM_CCER_CC3E,
-                            TIM_CCMR2_OC3M, TIM_CCMR2_CC3S, TIM_CCER_CC3P,
-                            TIM_CCER_CC3NP, TIM_CR2_OIS3, 0, 8, 8, 8);
-                    break;
-                case TIM_CHANNEL_4:
-                    timOcInit( &TIM1->CCMR2, &TIM1->CCR4, TIM_CCER_CC4E,
-                            TIM_CCMR2_OC4M, TIM_CCMR2_CC4S, TIM_CCER_CC4P,
-                            TIM_CCER_CC4NP, TIM_CR2_OIS4, 8, 12, 12, 4);
-                    break;
-            }
-
-            // Enable the TIM Counter
-            TIM1->CR1 |= TIM_CR1_CEN;
-        }
-
         void updateStartMotorPort(port_t * port)
         {
             dmaCmd(port, DISABLE);
@@ -473,8 +439,36 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
 
-            timerChannelInit(port);
+            const uint8_t channel = port->channel;
 
+            TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
+
+            switch (channel) {
+                case TIM_CHANNEL_1:
+                    timOcInit( &TIM1->CCMR1, &TIM1->CCR1, TIM_CCER_CC1E,
+                            TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
+                            TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
+                    break;
+                case TIM_CHANNEL_2:
+                    timOcInit( &TIM1->CCMR1, &TIM1->CCR2, TIM_CCER_CC2E,
+                            TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
+                            TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
+                    break;
+                case TIM_CHANNEL_3:
+                    timOcInit( &TIM1->CCMR2, &TIM1->CCR3, TIM_CCER_CC3E,
+                            TIM_CCMR2_OC3M, TIM_CCMR2_CC3S, TIM_CCER_CC3P,
+                            TIM_CCER_CC3NP, TIM_CR2_OIS3, 0, 8, 8, 8);
+                    break;
+                case TIM_CHANNEL_4:
+                    timOcInit( &TIM1->CCMR2, &TIM1->CCR4, TIM_CCER_CC4E,
+                            TIM_CCMR2_OC4M, TIM_CCMR2_CC4S, TIM_CCER_CC4P,
+                            TIM_CCER_CC4NP, TIM_CR2_OIS4, 8, 12, 12, 4);
+                    break;
+            }
+
+            // Enable the TIM Counter
+            TIM1->CR1 |= TIM_CR1_CEN;
+ 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
             port->dmaSource =
