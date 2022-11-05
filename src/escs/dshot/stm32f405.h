@@ -49,7 +49,8 @@ static inline uint8_t __basepriSetMemRetVal(uint8_t prio)
 
 class Stm32F405DshotEsc : public DshotEsc {
 
-    private:
+    // private:
+    public:
 
         // Constants ====================================================================
 
@@ -464,12 +465,13 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             m_pacerDmaSources |= port->dmaSource;
 
-            dmaIdentifier_e identifier = findDmaIdentifier(port->dmaResource);
             dmaCallbackHandlerFuncPtr callback = dmaIrqHandler;
             uint32_t priority = nvic_build_priority(2, 1);
             uint32_t userParam = (uint32_t)port;
 
-            const int8_t index = identifier - 1;
+            dmaIdentifier_e identifier = findDmaIdentifier(port->dmaResource);
+
+            const int8_t index = portIndex == 0 ? 9 : 10;//identifier - 1;
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
             m_dmaDescriptors[index].irqHandlerCallback = callback;

@@ -74,5 +74,7 @@ void loop(void)
 {
     _hf->step();
 
-    Serial.println(DMA_IT_TC != DMA_IT_FE);
+    Serial.print(_esc->g_index0);
+    Serial.print(" ");
+    Serial.println(_esc->g_index1);
 }
