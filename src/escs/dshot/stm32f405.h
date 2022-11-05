@@ -157,7 +157,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef struct {
             GPIO_TypeDef *gpio;
-            uint16_t pin;
+            //uint16_t pin;
         } ioRec_t;
 
         // Static local funs ============================================================
@@ -649,7 +649,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             for (uint8_t port=0; port<4; port++) {
                 for (uint8_t pin=0; pin < 16; pin++) {
                     ioRec->gpio = (GPIO_TypeDef *)(GPIOA_BASE + (port << 10));
-                    ioRec->pin = 1 << pin;
+                    //ioRec->pin = 1 << pin;
                     ioRec++;
                 }
             }
