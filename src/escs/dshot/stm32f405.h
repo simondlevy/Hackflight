@@ -541,7 +541,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             int32_t offset = __builtin_popcount(((1 << pinIdx) - 1) & 0xffff);
             offset += ioDefUsedOffset[portIdx];
             const IO_t io =  m_ioRecs + offset;
-            GPIO_TypeDef * GPIOx = _IO_GPIO(io);
+            GPIO_TypeDef * gpio = _IO_GPIO(io);
 
             uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
 
@@ -555,23 +555,23 @@ class Stm32F405DshotEsc : public DshotEsc {
 
                 if (currentpin == pos)
                 {
-                    GPIOx->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
-                    GPIOx->MODER |= (mode << (pinpos * 2));
+                    gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
+                    gpio->MODER |= (mode << (pinpos * 2));
 
                     if ((mode == GPIO_Mode_OUT) || (mode == GPIO_Mode_AF)) {
 
-                        GPIOx->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
-                        GPIOx->OSPEEDR |= (speed << (pinpos * 2));
+                        gpio->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
+                        gpio->OSPEEDR |= (speed << (pinpos * 2));
 
-                        GPIOx->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
+                        gpio->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
                     }
 
-                    GPIOx->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
-                    GPIOx->PUPDR |= (pull << (pinpos * 2)); 
+                    gpio->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
+                    gpio->PUPDR |= (pull << (pinpos * 2)); 
                 }
             }
 
-            _IO_GPIO(io)->BSRR |= pinmask;
+            gpio->BSRR |= pinmask;
 
             m_ports[motorIndex].channel = timerChannel;
 
