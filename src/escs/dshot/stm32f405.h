@@ -236,17 +236,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC->AHB1ENR |= mask;
         }
 
-        static void clearDmaFlag(
-                dmaChannelDescriptor_t * descriptor, uint32_t flag) 
-        {
-            if (descriptor->flagsShift > 31) {
-                descriptor->dma->HIFCR = (flag << (descriptor->flagsShift - 32)); 
-            }
-            else {
-                descriptor->dma->LIFCR = (flag << descriptor->flagsShift);
-            }
-        }
-
         static void dmaCmd(port_t *port, FunctionalState newState)
         {
             DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)port->dmaResource;
@@ -274,7 +263,12 @@ class Stm32F405DshotEsc : public DshotEsc {
                 while (1) {};
             }
 
-            clearDmaFlag(descriptor, DMA_IT_TCIF);
+            if (descriptor->flagsShift > 31) {
+                descriptor->dma->HIFCR = (DMA_IT_TCIF << (descriptor->flagsShift - 32)); 
+            }
+            else {
+                descriptor->dma->LIFCR = (DMA_IT_TCIF << descriptor->flagsShift);
+            }
         }
 
         static void dmaItConfig(port_t *port)
