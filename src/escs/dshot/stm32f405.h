@@ -265,14 +265,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static ioRec_t * _IORec(IO_t io)
-        {
-            return (ioRec_t *)io;
-        }
-
         static GPIO_TypeDef * _IO_GPIO(IO_t io)
         {
-            const ioRec_t *ioRec =_IORec(io);
+            const ioRec_t *ioRec = (ioRec_t *)io;
             return ioRec->gpio;
         }
 
