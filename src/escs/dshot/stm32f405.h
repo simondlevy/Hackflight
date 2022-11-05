@@ -283,8 +283,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         // Instance variables ===========================================================
 
-        uint8_t m_ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
-
         port_t m_ports[MAX_MOTORS];
         int32_t m_usedMotorPorts;
 
@@ -507,12 +505,14 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             m_motors[motorIndex].pinIndex = pinIndex;
 
+            uint8_t ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
+
             const int32_t portIdx = (pin >> 4) - 1;
             const int32_t pinIdx = pin & 0x0F;
 
             int32_t offset = __builtin_popcount(((1 << pinIdx) - 1) & 0xffff);
 
-            offset += m_ioDefUsedOffset[portIdx];
+            offset += ioDefUsedOffset[portIdx];
             const IO_t io =  m_ioRecs + offset;
 
             uint8_t config = io_config(
