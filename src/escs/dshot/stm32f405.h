@@ -271,14 +271,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void dmaItConfig(port_t *port)
-        {
-            DMA_Stream_TypeDef * DMAy_Streamx =
-                (DMA_Stream_TypeDef *)port->dmaResource;
-
-            DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
-        }
-
         static void dmaPreconfigure(port_t *port)
         {
             DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)port->dmaResource;
@@ -683,11 +675,13 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             NVIC->ISER[irqChannel >> 0x05] =
                 (uint32_t)0x01 << (irqChannel & (uint8_t)0x1F);
-            dmaItConfig(port);
 
             dmaPreconfigure(port);
 
-            dmaItConfig(port);
+            DMA_Stream_TypeDef * DMAy_Streamx =
+                (DMA_Stream_TypeDef *)port->dmaResource;
+
+            DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
 
             return port;
         }
