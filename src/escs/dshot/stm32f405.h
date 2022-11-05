@@ -377,24 +377,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CCER = tmpccer;
         }
 
-        static void rccInit(void)
-        {
-            RCC_APB2PeriphClockEnable(
-                    RCC_APB2LPENR_TIM1LPEN_Msk   |
-                    RCC_APB2LPENR_TIM8LPEN_Msk   |
-                    RCC_APB2LPENR_USART1LPEN_Msk |
-                    RCC_APB2LPENR_USART6LPEN_Msk |
-                    RCC_APB2LPENR_ADC1LPEN_Msk   |
-                    RCC_APB2LPENR_ADC2LPEN_Msk   |
-                    RCC_APB2LPENR_ADC3LPEN_Msk   |
-                    RCC_APB2LPENR_SDIOLPEN_Msk   |
-                    RCC_APB2LPENR_SPI1LPEN_Msk   |
-                    RCC_APB2LPENR_SYSCFGLPEN_Msk |
-                    RCC_APB2LPENR_TIM9LPEN_Msk   |
-                    RCC_APB2LPENR_TIM10LPEN_Msk  |
-                    RCC_APB2LPENR_TIM11LPEN_Msk);
-        }
-
         void timerChannelInit(port_t *port)
         {
             const uint8_t channel = port->channel;
@@ -734,8 +716,21 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         virtual void deviceInit(uint32_t outputFreq) override
         {
-            rccInit();
-
+            RCC_APB2PeriphClockEnable(
+                    RCC_APB2LPENR_TIM1LPEN_Msk   |
+                    RCC_APB2LPENR_TIM8LPEN_Msk   |
+                    RCC_APB2LPENR_USART1LPEN_Msk |
+                    RCC_APB2LPENR_USART6LPEN_Msk |
+                    RCC_APB2LPENR_ADC1LPEN_Msk   |
+                    RCC_APB2LPENR_ADC2LPEN_Msk   |
+                    RCC_APB2LPENR_ADC3LPEN_Msk   |
+                    RCC_APB2LPENR_SDIOLPEN_Msk   |
+                    RCC_APB2LPENR_SPI1LPEN_Msk   |
+                    RCC_APB2LPENR_SYSCFGLPEN_Msk |
+                    RCC_APB2LPENR_TIM9LPEN_Msk   |
+                    RCC_APB2LPENR_TIM10LPEN_Msk  |
+                    RCC_APB2LPENR_TIM11LPEN_Msk);
+ 
             ioInit();
 
             initChannel(0, TIM_CHANNEL_1, 1, 2, 1, 6); 
