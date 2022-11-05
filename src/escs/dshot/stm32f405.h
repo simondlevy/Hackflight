@@ -283,18 +283,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void outputDataSet(uint32_t *buffer, int32_t pinNumber, uint16_t value)
-        {
-            uint32_t middleBit = (1 << (pinNumber + 16));
-
-            for (auto pos=0; pos<16; pos++) {
-                if (!(value & 0x8000)) {
-                    buffer[pos * 3 + 1] |= middleBit;
-                }
-                value <<= 1;
-            }
-        }
-
         static void outputDataClear(uint32_t *buffer)
         {
             // Middle position to no change
@@ -847,7 +835,15 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             motor_t * const motor = &m_motors[index];
             port_t *port = motor->port;
-            outputDataSet(port->outputBuffer, motor->pinIndex, packet); 
+
+            uint32_t middleBit = (1 << (motor->pinIndex + 16));
+
+            for (auto pos=0; pos<16; pos++) {
+                if (!(packet & 0x8000)) {
+                    port->outputBuffer[pos * 3 + 1] |= middleBit;
+                }
+                packet <<= 1;
+            }        
         }
 
     public:
