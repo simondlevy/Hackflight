@@ -283,14 +283,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void outputDataClear(uint32_t *buffer)
-        {
-            // Middle position to no change
-            for (auto bitpos=0; bitpos<16; bitpos++) {
-                buffer[bitpos * 3 + 1] = 0;
-            }
-        }
-
         static uint16_t timerDmaSource(uint8_t channel)
         {
             switch (channel) {
@@ -543,7 +535,10 @@ class Stm32F405DshotEsc : public DshotEsc {
         void updateStartMotorPort(port_t * port)
         {
             dmaCmd(port, DISABLE);
-            outputDataClear(port->outputBuffer);
+
+            for (auto bitpos=0; bitpos<16; bitpos++) {
+                port->outputBuffer[bitpos * 3 + 1] = 0;
+            }
         }
 
         port_t *findMotorPort(int32_t portIndex)
