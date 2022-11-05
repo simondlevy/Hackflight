@@ -381,17 +381,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             return NULL;
         }
 
-        dmaIdentifier_e findDmaIdentifier(const dmaResource_t* channel)
-        {
-            for (uint8_t i=0; i<DMA_LAST_HANDLER; i++) {
-                if (m_dmaDescriptors[i].ref == channel) {
-                    return (dmaIdentifier_e)(i + 1);
-                }
-            }
-
-            return DMA_NONE;
-        }
-
         const dmaChannelSpec_t *findDmaChannelSpec(uint8_t channel, int8_t dmaOpt)
         {
             for (uint8_t i=0 ; i<DMA_TIMER_MAPPING_COUNT; i++) {
@@ -469,9 +458,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint32_t priority = nvic_build_priority(2, 1);
             uint32_t userParam = (uint32_t)port;
 
-            dmaIdentifier_e identifier = findDmaIdentifier(port->dmaResource);
-
-            const int8_t index = portIndex == 0 ? 9 : 10;//identifier - 1;
+            const int8_t index = portIndex == 0 ? 9 : 10;
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
             m_dmaDescriptors[index].irqHandlerCallback = callback;
