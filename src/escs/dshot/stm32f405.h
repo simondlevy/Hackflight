@@ -283,18 +283,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void outputDataInit(uint32_t *buffer, uint16_t portMask)
-        {
-            uint32_t resetMask = (portMask << 16);
-            uint32_t setMask = portMask;
-
-            for (auto bitpos=0; bitpos<16; bitpos++) {
-                buffer[bitpos * 3 + 0] |= setMask ; // Always set all ports
-                buffer[bitpos * 3 + 1] = 0;          // Reset bits are port dependent
-                buffer[bitpos * 3 + 2] |= resetMask; // Always reset all ports
-            }
-        }
-
         static void outputDataSet(uint32_t *buffer, int32_t pinNumber, uint16_t value)
         {
             uint32_t middleBit = (1 << (pinNumber + 16));
@@ -770,8 +758,17 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
 
-            outputDataInit(port->outputBuffer, (1 << pinIndex)); 
+            uint32_t *buffer = port->outputBuffer;
+            uint16_t portMask = 1 << pinIndex;
+            uint32_t resetMask = (portMask << 16);
+            uint32_t setMask = portMask;
 
+            for (auto bitpos=0; bitpos<16; bitpos++) {
+                buffer[bitpos * 3 + 0] |= setMask ; // Always set all ports
+                buffer[bitpos * 3 + 1] = 0;          // Reset bits are port dependent
+                buffer[bitpos * 3 + 2] |= resetMask; // Always reset all ports
+            }
+    
             port->gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
 
             // Set GPIO to output
