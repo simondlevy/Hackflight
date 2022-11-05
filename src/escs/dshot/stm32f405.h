@@ -157,7 +157,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef struct {
             GPIO_TypeDef *gpio;
-            //uint16_t pin;
         } ioRec_t;
 
         // Static local funs ============================================================
@@ -313,8 +312,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         ioRec_t m_ioRecs[96];
 
         uint16_t m_pacerDmaSources = 0;
-
-        uint16_t m_outputARR;
 
         // Private instance methods =====================================================
 
@@ -518,8 +515,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             offset += m_ioDefUsedOffset[portIdx];
             const IO_t io =  m_ioRecs + offset;
 
-            ioRec_t *ioRec =_IORec(io);
-
             uint8_t config = io_config(
                     GPIO_MODE_OUT,
                     GPIO_FAST_SPEED,
@@ -649,7 +644,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             for (uint8_t port=0; port<4; port++) {
                 for (uint8_t pin=0; pin < 16; pin++) {
                     ioRec->gpio = (GPIO_TypeDef *)(GPIOA_BASE + (port << 10));
-                    //ioRec->pin = 1 << pin;
                     ioRec++;
                 }
             }
@@ -666,7 +660,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             defineDma2Channel(6, DMA2_Stream6, 48, DMA2_Stream6_IRQn); 
             defineDma2Channel(7, DMA2_Stream7, 54, DMA2_Stream7_IRQn); 
 
-            m_outputARR = SystemCoreClock / outputFreq - 1;
+            uint16_t outputARR = SystemCoreClock / outputFreq - 1;
 
             memset(m_outputBuffer, 0, sizeof(m_outputBuffer));
 
@@ -683,7 +677,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CR1 = tmpcr1;
 
             // Set the Autoreload value 
-            TIM1->ARR = m_outputARR;
+            TIM1->ARR = outputARR;
             TIM1->PSC = 0;
             TIM1->RCR = 0;
             TIM1->EGR = 0x0001;          
@@ -696,7 +690,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             initMotor(3, 1, 2, (*m_pins)[3], TIM_CHANNEL_4);
 
             // Reinitialize pacer timer for output
-            TIM1->ARR = m_outputARR;
+            TIM1->ARR = outputARR;
         }        
 
         virtual void updateComplete(void) override
