@@ -305,68 +305,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             return (uint8_t)rcc_encode(RCC_AHB1, gpio); 
         }
 
-        void _IOConfigGPIO(uint8_t motorIndex, uint8_t portIndex, IO_t io, uint8_t cfg)
-        {
-            const uint8_t ioPortDefs[6] = {
-                { rcc_ahb1(RCC_AHB1ENR_GPIOAEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIOBEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIOCEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIODEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIOEEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIOFEN_MSK) },
-            };
-
-            const uint8_t rcc = ioPortDefs[portIndex];
-
-            int tag = rcc >> 5;
-            uint32_t mask = 1 << (rcc & 0x1f);
-
-            switch (tag) {
-                case RCC_APB2:
-                    RCC_APB2PeriphClockEnable(mask);
-                    break;
-                case RCC_APB1:
-                    RCC->APB1ENR |= mask;
-                    break;
-                case RCC_AHB1:
-                    RCC_AHB1PeriphClockEnable(mask);
-                    break;
-            }
-
-            uint32_t pin =_IO_Pin(io);
-            uint32_t mode  = (cfg >> 0) & 0x03;
-            uint32_t speed = (cfg >> 2) & 0x03;
-            uint32_t pull  = (cfg >> 5) & 0x03;
-
-            GPIO_TypeDef * GPIOx = _IO_GPIO(io);
-
-            uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
-
-            for (pinpos = 0x00; pinpos < 0x10; pinpos++)
-            {
-                pos = ((uint32_t)0x01) << pinpos;
-
-                currentpin = pin & pos;
-
-                if (currentpin == pos)
-                {
-                    GPIOx->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
-                    GPIOx->MODER |= (mode << (pinpos * 2));
-
-                    if ((mode == GPIO_Mode_OUT) || (mode == GPIO_Mode_AF)) {
-
-                        GPIOx->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
-                        GPIOx->OSPEEDR |= (speed << (pinpos * 2));
-
-                        GPIOx->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
-                    }
-
-                    GPIOx->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
-                    GPIOx->PUPDR |= (pull << (pinpos * 2)); 
-                }
-            }
-        }
-
         // Instance variables ===========================================================
 
         uint8_t m_ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
@@ -700,16 +638,70 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             ioRec_t *ioRec =_IORec(io);
 
-            _IOConfigGPIO(
-                    motorIndex,
-                    portIndex,
-                    io, 
-                    io_config(
-                        GPIO_MODE_OUT,
-                        GPIO_FAST_SPEED,
-                        GPIO_OTYPE_PP,
-                        GPIO_PUPD_UP));
+            uint8_t config = io_config(
+                    GPIO_MODE_OUT,
+                    GPIO_FAST_SPEED,
+                    GPIO_OTYPE_PP,
+                    GPIO_PUPD_UP);
 
+            const uint8_t ioPortDefs[6] = {
+                { rcc_ahb1(RCC_AHB1ENR_GPIOAEN_MSK) },
+                { rcc_ahb1(RCC_AHB1ENR_GPIOBEN_MSK) },
+                { rcc_ahb1(RCC_AHB1ENR_GPIOCEN_MSK) },
+                { rcc_ahb1(RCC_AHB1ENR_GPIODEN_MSK) },
+                { rcc_ahb1(RCC_AHB1ENR_GPIOEEN_MSK) },
+                { rcc_ahb1(RCC_AHB1ENR_GPIOFEN_MSK) },
+            };
+
+            const uint8_t rcc = ioPortDefs[portIndex];
+
+            int tag = rcc >> 5;
+            uint32_t mask = 1 << (rcc & 0x1f);
+
+            switch (tag) {
+                case RCC_APB2:
+                    RCC_APB2PeriphClockEnable(mask);
+                    break;
+                case RCC_APB1:
+                    RCC->APB1ENR |= mask;
+                    break;
+                case RCC_AHB1:
+                    RCC_AHB1PeriphClockEnable(mask);
+                    break;
+            }
+
+            uint32_t newpin =_IO_Pin(io);
+            uint32_t mode  = (config >> 0) & 0x03;
+            uint32_t speed = (config >> 2) & 0x03;
+            uint32_t pull  = (config >> 5) & 0x03;
+
+            GPIO_TypeDef * GPIOx = _IO_GPIO(io);
+
+            uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
+
+            for (pinpos = 0x00; pinpos < 0x10; pinpos++)
+            {
+                pos = ((uint32_t)0x01) << pinpos;
+
+                currentpin = newpin & pos;
+
+                if (currentpin == pos)
+                {
+                    GPIOx->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
+                    GPIOx->MODER |= (mode << (pinpos * 2));
+
+                    if ((mode == GPIO_Mode_OUT) || (mode == GPIO_Mode_AF)) {
+
+                        GPIOx->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
+                        GPIOx->OSPEEDR |= (speed << (pinpos * 2));
+
+                        GPIOx->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
+                    }
+
+                    GPIOx->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
+                    GPIOx->PUPDR |= (pull << (pinpos * 2)); 
+                }
+            }
             _IO_GPIO(io)->BSRR |= (uint32_t)_IO_Pin(io);
 
             m_ports[motorIndex].channel = timerChannel;
