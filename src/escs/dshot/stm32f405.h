@@ -265,12 +265,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static GPIO_TypeDef * _IO_GPIO(IO_t io)
-        {
-            const ioRec_t *ioRec = (ioRec_t *)io;
-            return ioRec->gpio;
-        }
-
         static uint8_t rcc_ahb1(uint32_t gpio)
         {
             return (uint8_t)rcc_encode(RCC_AHB1, gpio); 
@@ -541,7 +535,8 @@ class Stm32F405DshotEsc : public DshotEsc {
             int32_t offset = __builtin_popcount(((1 << pinIdx) - 1) & 0xffff);
             offset += ioDefUsedOffset[portIdx];
             const IO_t io =  m_ioRecs + offset;
-            GPIO_TypeDef * gpio = _IO_GPIO(io);
+            const ioRec_t * ioRec = (ioRec_t *)io;
+            GPIO_TypeDef * gpio = ioRec->gpio;
 
             uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
 
@@ -584,7 +579,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             m_motors[motorIndex].port = port;
 
-            _IO_GPIO(io)->BSRR |= (pinmask << 16);
+            gpio->BSRR |= (pinmask << 16);
 
             uint32_t *buffer = port->outputBuffer;
             uint16_t portMask = 1 << pinIndex;
