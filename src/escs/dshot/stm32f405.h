@@ -136,7 +136,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             GPIO_TypeDef *gpio;
             uint8_t channel;
             uint16_t dmaSource;
-            uint32_t dmaChannel;        
             dmaRegCache_t dmaRegOutput;
             uint32_t *outputBuffer;
         } port_t;
@@ -418,7 +417,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             const dmaChannelSpec_t * dmaChannelSpec =
                 findDmaChannelSpec(port->channel, option); 
             port->dmaResource = dmaChannelSpec->ref;
-            port->dmaChannel = dmaChannelSpec->channel;
 
             port->gpio =_IO_GPIO(io);
 
