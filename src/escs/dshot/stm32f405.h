@@ -277,12 +277,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             return ioRec->gpio;
         }
 
-        static uint16_t _IO_Pin(IO_t io)
-        {
-            const ioRec_t *ioRec =_IORec(io);
-            return ioRec->pin;
-        }
-
         static uint8_t rcc_ahb1(uint32_t gpio)
         {
             return (uint8_t)rcc_encode(RCC_AHB1, gpio); 
@@ -512,7 +506,8 @@ class Stm32F405DshotEsc : public DshotEsc {
                 uint8_t portIndex,
                 uint8_t pinIndex,
                 uint8_t pin,
-                uint8_t timerChannel)
+                uint8_t timerChannel,
+                uint8_t newpin)
         {
             m_motors[motorIndex].pinIndex = pinIndex;
 
@@ -565,8 +560,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             GPIO_TypeDef * GPIOx = _IO_GPIO(io);
 
             uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
-
-            uint32_t newpin =_IO_Pin(io);
 
             for (pinpos = 0x00; pinpos < 0x10; pinpos++)
             {
@@ -696,10 +689,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             TIM1->CR1 |= TIM_CR1_ARPE;
 
-            initMotor(0, 0, 0, (*m_pins)[0], TIM_CHANNEL_1);
-            initMotor(1, 0, 1, (*m_pins)[1], TIM_CHANNEL_2);
-            initMotor(2, 1, 3, (*m_pins)[2], TIM_CHANNEL_3);
-            initMotor(3, 1, 2, (*m_pins)[3], TIM_CHANNEL_4);
+            initMotor(0, 0, 0, (*m_pins)[0], TIM_CHANNEL_1, 1);
+            initMotor(1, 0, 1, (*m_pins)[1], TIM_CHANNEL_2, 2);
+            initMotor(2, 1, 3, (*m_pins)[2], TIM_CHANNEL_3, 8);
+            initMotor(3, 1, 2, (*m_pins)[3], TIM_CHANNEL_4, 4);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = m_outputARR;
