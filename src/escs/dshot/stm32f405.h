@@ -637,11 +637,11 @@ class Stm32F405DshotEsc : public DshotEsc {
                     RCC_APB2LPENR_TIM10LPEN_Msk  |
                     RCC_APB2LPENR_TIM11LPEN_Msk);
  
-            ioRec_t *ioRec = m_ioRecs;
+            uint8_t k = 0;
             for (uint8_t port=0; port<4; port++) {
                 for (uint8_t pin=0; pin < 16; pin++) {
-                    ioRec->gpio = (GPIO_TypeDef *)(GPIOA_BASE + (port << 10));
-                    ioRec++;
+                    m_ioRecs[k].gpio = (GPIO_TypeDef *)(GPIOA_BASE + (port << 10));
+                    k++;
                 }
             }
 
