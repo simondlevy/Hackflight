@@ -49,8 +49,7 @@ static inline uint8_t __basepriSetMemRetVal(uint8_t prio)
 
 class Stm32F405DshotEsc : public DshotEsc {
 
-    // private:
-    public:
+    private:
 
         // Constants ====================================================================
 
@@ -267,12 +266,12 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static ioRec_t* _IORec(IO_t io)
+        static ioRec_t * _IORec(IO_t io)
         {
             return (ioRec_t *)io;
         }
 
-        static GPIO_TypeDef* _IO_GPIO(IO_t io)
+        static GPIO_TypeDef * _IO_GPIO(IO_t io)
         {
             const ioRec_t *ioRec =_IORec(io);
             return ioRec->gpio;
@@ -522,7 +521,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             int32_t offset = __builtin_popcount(((1 << pinIdx) - 1) & 0xffff);
 
-            // and add port offset
             offset += m_ioDefUsedOffset[portIdx];
             const IO_t io =  m_ioRecs + offset;
 
@@ -560,7 +558,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                     break;
             }
 
-            uint32_t newpin =_IO_Pin(io);
             uint32_t mode  = (config >> 0) & 0x03;
             uint32_t speed = (config >> 2) & 0x03;
             uint32_t pull  = (config >> 5) & 0x03;
@@ -568,6 +565,8 @@ class Stm32F405DshotEsc : public DshotEsc {
             GPIO_TypeDef * GPIOx = _IO_GPIO(io);
 
             uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
+
+            uint32_t newpin =_IO_Pin(io);
 
             for (pinpos = 0x00; pinpos < 0x10; pinpos++)
             {
@@ -592,7 +591,8 @@ class Stm32F405DshotEsc : public DshotEsc {
                     GPIOx->PUPDR |= (pull << (pinpos * 2)); 
                 }
             }
-            _IO_GPIO(io)->BSRR |= (uint32_t)_IO_Pin(io);
+
+            _IO_GPIO(io)->BSRR |= newpin;
 
             m_ports[motorIndex].channel = timerChannel;
 
@@ -605,7 +605,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             m_motors[motorIndex].port = port;
 
-            _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
+            _IO_GPIO(io)->BSRR |= (newpin << 16);
 
             uint32_t *buffer = port->outputBuffer;
             uint16_t portMask = 1 << pinIndex;
