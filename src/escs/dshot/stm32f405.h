@@ -259,16 +259,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void loadDmaRegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
-        {
-            ((DMA_Stream_TypeDef *)dmaResource)->CR = dmaRegCache->CR;
-        }
-
-        static void saveDmaRegs(dmaResource_t *dmaResource, dmaRegCache_t *dmaRegCache)
-        {
-            dmaRegCache->CR = ((DMA_Stream_TypeDef *)dmaResource)->CR;
-        }
-
         static uint32_t getDmaFlagStatus(
                 dmaChannelDescriptor_t * descriptor, uint32_t flag) 
         {
@@ -336,7 +326,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             DMAy_Streamx->PAR = (uint32_t)&port->gpio->BSRR;
             DMAy_Streamx->M0AR = (uint32_t)port->outputBuffer;
 
-            saveDmaRegs(port->dmaResource, &port->dmaRegOutput);
+            port->dmaRegOutput.CR = ((DMA_Stream_TypeDef *)port->dmaResource)->CR;
         }
 
         static void timDmaCmd(uint16_t TIM_DMASource, FunctionalState newState)
@@ -739,12 +729,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             spec->channel = c << 25;
         }
 
-        void initTimerMapping(void)
-        {
-            initChannel(0, TIM_CHANNEL_1, 1, 2, 1, 6); 
-            initChannel(1, TIM_CHANNEL_2, 1, 2, 2, 6); 
-        }
-
         void defineDma2Channel(
                 uint8_t stream,
                 DMA_Stream_TypeDef * ref,
@@ -833,7 +817,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
 
             // Reinitialize port group DMA for output
-            loadDmaRegs(port->dmaResource, &port->dmaRegOutput);
+            ((DMA_Stream_TypeDef *)port->dmaResource)->CR = port->dmaRegOutput.CR;
         }
 
     protected: // DshotEsc method overrides =============================================
@@ -844,7 +828,8 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             ioInit();
 
-            initTimerMapping();
+            initChannel(0, TIM_CHANNEL_1, 1, 2, 1, 6); 
+            initChannel(1, TIM_CHANNEL_2, 1, 2, 2, 6); 
 
             dmaInit();
 
