@@ -236,24 +236,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC->AHB1ENR |= mask;
         }
 
-        static void RCC_ClockEnable(uint8_t periphTag)
-        {
-            int tag = periphTag >> 5;
-            uint32_t mask = 1 << (periphTag & 0x1f);
-
-            switch (tag) {
-                case RCC_APB2:
-                    RCC_APB2PeriphClockEnable(mask);
-                    break;
-                case RCC_APB1:
-                    RCC->APB1ENR |= mask;
-                    break;
-                case RCC_AHB1:
-                    RCC_AHB1PeriphClockEnable(mask);
-                    break;
-            }
-        }
-
         static uint32_t getDmaFlagStatus(
                 dmaChannelDescriptor_t * descriptor, uint32_t flag) 
         {
@@ -453,7 +435,20 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             const uint8_t rcc = ioPortDefs[portIndex];
 
-            RCC_ClockEnable(rcc);
+            int tag = rcc >> 5;
+            uint32_t mask = 1 << (rcc & 0x1f);
+
+            switch (tag) {
+                case RCC_APB2:
+                    RCC_APB2PeriphClockEnable(mask);
+                    break;
+                case RCC_APB1:
+                    RCC->APB1ENR |= mask;
+                    break;
+                case RCC_AHB1:
+                    RCC_AHB1PeriphClockEnable(mask);
+                    break;
+            }
 
             uint32_t pin =_IO_Pin(io);
             uint32_t mode  = (cfg >> 0) & 0x03;
