@@ -130,28 +130,15 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint32_t M0AR;
         } dmaRegCache_t;
 
-        // Per GPIO port and timer channel
         typedef struct {
-
-            dmaResource_t *dmaResource; // DMA resource for this port & timer channel
-
+            dmaResource_t *dmaResource;
             int32_t index;
-
             GPIO_TypeDef *gpio;
-
             uint8_t channel;
-
             uint16_t dmaSource;
-
-            uint32_t dmaChannel;        // DMA channel or peripheral request
-
-            // DMA resource register cache
+            uint32_t dmaChannel;        
             dmaRegCache_t dmaRegOutput;
-            dmaRegCache_t dmaRegInput;
-
-            // Output
             uint32_t *outputBuffer;
-
         } port_t;
 
         typedef struct {
@@ -420,7 +407,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             return NULL;
         }
 
-        port_t *allocateMotorPort(IO_t io, uint8_t motorIndex, int32_t portIndex)
+        port_t *allocatePort(IO_t io, uint8_t motorIndex, int32_t portIndex)
         {
             port_t *port = &m_ports[m_usedMotorPorts];
             port->index = portIndex;
@@ -525,7 +512,8 @@ class Stm32F405DshotEsc : public DshotEsc {
             DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
 
             return port;
-        }
+
+        } // allocatePort
 
         void initChannel(
                 const uint8_t timerId,
@@ -648,7 +636,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             port_t *port = findMotorPort(portIndex);
 
             if (!port) {
-                port = allocateMotorPort(io, motorIndex, portIndex);
+                port = allocatePort(io, motorIndex, portIndex);
             }
 
             m_motors[motorIndex].port = port;
@@ -677,7 +665,8 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             // Reinitialize port group DMA for output
             ((DMA_Stream_TypeDef *)port->dmaResource)->CR = port->dmaRegOutput.CR;
-        }
+
+        } // initMotor
 
     protected: // DshotEsc method overrides =============================================
 
