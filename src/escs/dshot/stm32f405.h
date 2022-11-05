@@ -283,21 +283,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static uint16_t timerDmaSource(uint8_t channel)
-        {
-            switch (channel) {
-                case TIM_CHANNEL_1:
-                    return TIM_DMA_CC1;
-                case TIM_CHANNEL_2:
-                    return TIM_DMA_CC2;
-                case TIM_CHANNEL_3:
-                    return TIM_DMA_CC3;
-                case TIM_CHANNEL_4:
-                    return TIM_DMA_CC4;
-            }
-            return 0;
-        }
-
         static ioRec_t* _IORec(IO_t io)
         {
             return (ioRec_t *)io;
@@ -598,7 +583,14 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
-            port->dmaSource = timerDmaSource(port->channel);
+            port->dmaSource =
+                port->channel == TIM_CHANNEL_1 ?
+                TIM_DMA_CC1 :
+                port->channel == TIM_CHANNEL_2 ?
+                TIM_DMA_CC2 :
+                port->channel == TIM_CHANNEL_3 ?
+                TIM_DMA_CC3 :
+                TIM_DMA_CC4;
 
             m_pacerDmaSources |= port->dmaSource;
 
