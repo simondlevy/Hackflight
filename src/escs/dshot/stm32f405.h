@@ -112,16 +112,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         typedef void (*dmaCallbackHandlerFuncPtr)(
                 struct dmaChannelDescriptor_s *channelDescriptor);
 
-        typedef struct dmaChannelDescriptor_s {
-            DMA_TypeDef*                dma;
-            dmaResource_t               *ref;
-            uint32_t                    channel;
-            dmaCallbackHandlerFuncPtr   irqHandlerCallback;
-            uint8_t                     flagsShift;
-            IRQn_Type                   irqN;
-            uint32_t                    userParam;
-        } dmaChannelDescriptor_t;
-
         typedef struct dmaRegCache_s {
             uint32_t CR;
             uint32_t FCR;
@@ -139,6 +129,16 @@ class Stm32F405DshotEsc : public DshotEsc {
             dmaRegCache_t dmaRegOutput;
             uint32_t *outputBuffer;
         } port_t;
+
+        typedef struct dmaChannelDescriptor_s {
+            DMA_TypeDef *             dma;
+            dmaResource_t *           ref;
+            uint32_t                  channel;
+            dmaCallbackHandlerFuncPtr irqHandlerCallback;
+            uint8_t                   flagsShift;
+            IRQn_Type                 irqN;
+            port_t *                  port;
+        } dmaChannelDescriptor_t;
 
         typedef struct {
             dmaResource_t * ref;
@@ -232,7 +232,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void dmaIrqHandler(dmaChannelDescriptor_t *descriptor)
         {
-            port_t *port = (port_t *)descriptor->userParam;
+            port_t *port = descriptor->port;
 
             dmaCmd(port, DISABLE);
 
@@ -293,8 +293,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         dmaChannelDescriptor_t m_dmaDescriptors[DMA_LAST_HANDLER];
 
         dmaTimerMapping_t m_dmaTimerMapping[DMA_TIMER_MAPPING_COUNT] = {};
-
-        uint8_t m_timer1channels[4] = {};
 
         ioRec_t m_ioRecs[96];
 
@@ -417,13 +415,12 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             dmaCallbackHandlerFuncPtr callback = dmaIrqHandler;
             uint32_t priority = nvic_build_priority(2, 1);
-            uint32_t userParam = (uint32_t)port;
 
             const int8_t index = portIndex == 0 ? 9 : 10;
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
             m_dmaDescriptors[index].irqHandlerCallback = callback;
-            m_dmaDescriptors[index].userParam = userParam;
+            m_dmaDescriptors[index].port = port;
 
             uint8_t irqChannel = m_dmaDescriptors[index].irqN;
 
