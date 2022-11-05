@@ -271,22 +271,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void dmaPreconfigure(port_t *port)
-        {
-            DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)port->dmaResource;
-
-            DMAy_Streamx->CR = 0x0c025450;
-
-            DMAy_Streamx->FCR =
-                ((DMAy_Streamx->FCR & (uint32_t)~(DMA_SxFCR_DMDIS | DMA_SxFCR_FTH)) |
-                 (DMA_FIFOMODE_ENABLE | DMA_FIFO_THRESHOLD_1QUARTERFULL));
-            DMAy_Streamx->NDTR = BUF_LENGTH;
-            DMAy_Streamx->PAR = (uint32_t)&port->gpio->BSRR;
-            DMAy_Streamx->M0AR = (uint32_t)port->outputBuffer;
-
-            port->dmaRegOutput.CR = ((DMA_Stream_TypeDef *)port->dmaResource)->CR;
-        }
-
         static void timDmaCmd(uint16_t TIM_DMASource, FunctionalState newState)
         {
             if (newState != DISABLE) {
@@ -676,10 +660,18 @@ class Stm32F405DshotEsc : public DshotEsc {
             NVIC->ISER[irqChannel >> 0x05] =
                 (uint32_t)0x01 << (irqChannel & (uint8_t)0x1F);
 
-            dmaPreconfigure(port);
+            DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)port->dmaResource;
 
-            DMA_Stream_TypeDef * DMAy_Streamx =
-                (DMA_Stream_TypeDef *)port->dmaResource;
+            DMAy_Streamx->CR = 0x0c025450;
+
+            DMAy_Streamx->FCR =
+                ((DMAy_Streamx->FCR & (uint32_t)~(DMA_SxFCR_DMDIS | DMA_SxFCR_FTH)) |
+                 (DMA_FIFOMODE_ENABLE | DMA_FIFO_THRESHOLD_1QUARTERFULL));
+            DMAy_Streamx->NDTR = BUF_LENGTH;
+            DMAy_Streamx->PAR = (uint32_t)&port->gpio->BSRR;
+            DMAy_Streamx->M0AR = (uint32_t)port->outputBuffer;
+
+            port->dmaRegOutput.CR = ((DMA_Stream_TypeDef *)port->dmaResource)->CR;
 
             DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
 
