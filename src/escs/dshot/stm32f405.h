@@ -236,14 +236,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC->AHB1ENR |= mask;
         }
 
-        static uint32_t getDmaFlagStatus(
-                dmaChannelDescriptor_t * descriptor, uint32_t flag) 
-        {
-            return descriptor->flagsShift > 31 ?
-                descriptor->dma->HISR & (flag << (descriptor->flagsShift - 32)) :
-                descriptor->dma->LISR & (flag << descriptor->flagsShift);
-        }
-
         static void clearDmaFlag(
                 dmaChannelDescriptor_t * descriptor, uint32_t flag) 
         {
@@ -275,7 +267,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             timDmaCmd(port->dmaSource, DISABLE);
 
-            if (getDmaFlagStatus(descriptor, DMA_IT_TEIF)) {
+            if (descriptor->flagsShift > 31 ?
+                descriptor->dma->HISR & (DMA_IT_TEIF << (descriptor->flagsShift - 32)) :
+                descriptor->dma->LISR & (DMA_IT_TEIF << descriptor->flagsShift)) {
+ 
                 while (1) {};
             }
 
