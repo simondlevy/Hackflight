@@ -350,7 +350,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             return NULL;
         }
 
-        port_t *allocatePort(IO_t io, uint8_t option, int32_t portIndex)
+        port_t *allocatePort(GPIO_TypeDef * gpio, uint8_t option, int32_t portIndex)
         {
             port_t *port = &m_ports[m_usedMotorPorts];
             port->index = portIndex;
@@ -361,7 +361,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             port->dmaResource = dmaChannelSpec->ref;
 
-            port->gpio =_IO_GPIO(io);
+            port->gpio = gpio;
 
             port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
 
@@ -579,7 +579,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             if (!port) {
                 static uint8_t options[4] = {1, 0, 1, 0};
-                port = allocatePort(io, options[motorIndex], portIndex);
+                port = allocatePort(gpio, options[motorIndex], portIndex);
             }
 
             m_motors[motorIndex].port = port;
