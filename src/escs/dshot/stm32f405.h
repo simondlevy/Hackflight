@@ -559,19 +559,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             desc->irqN = irqN;
         }
 
-        void ioInit(void)
-        {
-            ioRec_t *ioRec = m_ioRecs;
-
-            for (uint8_t port=0; port<4; port++) {
-                for (uint8_t pin=0; pin < 16; pin++) {
-                    ioRec->gpio = (GPIO_TypeDef *)(GPIOA_BASE + (port << 10));
-                    ioRec->pin = 1 << pin;
-                    ioRec++;
-                }
-            }
-        }
-
         void initMotor(
                 uint8_t motorIndex,
                 uint8_t portIndex,
@@ -713,7 +700,14 @@ class Stm32F405DshotEsc : public DshotEsc {
                     RCC_APB2LPENR_TIM10LPEN_Msk  |
                     RCC_APB2LPENR_TIM11LPEN_Msk);
  
-            ioInit();
+            ioRec_t *ioRec = m_ioRecs;
+            for (uint8_t port=0; port<4; port++) {
+                for (uint8_t pin=0; pin < 16; pin++) {
+                    ioRec->gpio = (GPIO_TypeDef *)(GPIOA_BASE + (port << 10));
+                    ioRec->pin = 1 << pin;
+                    ioRec++;
+                }
+            }
 
             initChannel(0, TIM_CHANNEL_1, 1, 2, 1, 6); 
             initChannel(1, TIM_CHANNEL_2, 1, 2, 2, 6); 
