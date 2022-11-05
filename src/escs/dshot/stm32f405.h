@@ -226,19 +226,14 @@ class Stm32F405DshotEsc : public DshotEsc {
             return (((prio)&(0x0f>>(7-(NVIC_PRIORITY_GROUPING>>8))))>>4);
         }
 
-        static void RCC_APB2PeriphClockEnable(uint32_t RCC_APB2Periph)
+        static void RCC_APB2PeriphClockEnable(uint32_t mask)
         {
-            RCC->APB2ENR |= RCC_APB2Periph;
+            RCC->APB2ENR |= mask;
         }
 
-        static void RCC_AHB1PeriphClockEnable(uint32_t RCC_AHB1Periph)
+        static void RCC_AHB1PeriphClockEnable(uint32_t mask)
         {
-            RCC->AHB1ENR |= RCC_AHB1Periph;
-        }
-
-        static void RCC_APB1PeriphClockEnable(uint32_t RCC_APB1Periph)
-        {
-            RCC->APB1ENR |= RCC_APB1Periph;
+            RCC->AHB1ENR |= mask;
         }
 
         static void RCC_ClockEnable(uint8_t periphTag)
@@ -251,7 +246,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                     RCC_APB2PeriphClockEnable(mask);
                     break;
                 case RCC_APB1:
-                    RCC_APB1PeriphClockEnable(mask);
+                    RCC->APB1ENR |= mask;
                     break;
                 case RCC_AHB1:
                     RCC_AHB1PeriphClockEnable(mask);
