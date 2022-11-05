@@ -164,9 +164,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             dmaChannelSpec_t channelSpec[MAX_TIMER_DMA_OPTIONS];
         } dmaTimerMapping_t;
 
-        typedef struct bbMotor_s {
+        typedef struct {
             int32_t pinIndex;    
-            port_t *bbPort;
+            port_t *port;
         } motor_t;
 
         typedef struct {
@@ -285,9 +285,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        static void dmaCmd(port_t *bbPort, FunctionalState newState)
+        static void dmaCmd(port_t *port, FunctionalState newState)
         {
-            DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)bbPort->dmaResource;
+            DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)port->dmaResource;
 
             if (newState != DISABLE) {
                 DMAy_Streamx->CR |= (uint32_t)DMA_SxCR_EN;
@@ -299,11 +299,11 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void dmaIrqHandler(dmaChannelDescriptor_t *descriptor)
         {
-            port_t *bbPort = (port_t *)descriptor->userParam;
+            port_t *port = (port_t *)descriptor->userParam;
 
-            dmaCmd(bbPort, DISABLE);
+            dmaCmd(port, DISABLE);
 
-            timDmaCmd(bbPort->dmaSource, DISABLE);
+            timDmaCmd(port->dmaSource, DISABLE);
 
             if (getDmaFlagStatus(descriptor, DMA_IT_TEIF)) {
                 while (1) {};
@@ -312,17 +312,17 @@ class Stm32F405DshotEsc : public DshotEsc {
             clearDmaFlag(descriptor, DMA_IT_TCIF);
         }
 
-        static void dmaItConfig(port_t *bbPort)
+        static void dmaItConfig(port_t *port)
         {
             DMA_Stream_TypeDef * DMAy_Streamx =
-                (DMA_Stream_TypeDef *)bbPort->dmaResource;
+                (DMA_Stream_TypeDef *)port->dmaResource;
 
             DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
         }
 
-        static void dmaPreconfigure(port_t *bbPort)
+        static void dmaPreconfigure(port_t *port)
         {
-            DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)bbPort->dmaResource;
+            DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)port->dmaResource;
 
             DMAy_Streamx->CR = 0x0c025450;
 
@@ -330,10 +330,10 @@ class Stm32F405DshotEsc : public DshotEsc {
                 ((DMAy_Streamx->FCR & (uint32_t)~(DMA_SxFCR_DMDIS | DMA_SxFCR_FTH)) |
                  (DMA_FIFOMODE_ENABLE | DMA_FIFO_THRESHOLD_1QUARTERFULL));
             DMAy_Streamx->NDTR = BUF_LENGTH;
-            DMAy_Streamx->PAR = (uint32_t)&bbPort->gpio->BSRR;
-            DMAy_Streamx->M0AR = (uint32_t)bbPort->portOutputBuffer;
+            DMAy_Streamx->PAR = (uint32_t)&port->gpio->BSRR;
+            DMAy_Streamx->M0AR = (uint32_t)port->portOutputBuffer;
 
-            saveDmaRegs(bbPort->dmaResource, &bbPort->dmaRegOutput);
+            saveDmaRegs(port->dmaResource, &port->dmaRegOutput);
         }
 
         static void timDmaCmd(uint16_t TIM_DMASource, FunctionalState newState)
@@ -582,9 +582,9 @@ class Stm32F405DshotEsc : public DshotEsc {
                     RCC_APB2LPENR_TIM11LPEN_Msk);
         }
 
-        void timerChannelInit(port_t *bbPort)
+        void timerChannelInit(port_t *port)
         {
-            const uint8_t channel = bbPort->channel;
+            const uint8_t channel = port->channel;
 
             // Disable the TIM Counter
             TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
@@ -660,42 +660,42 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         port_t *allocateMotorPort(IO_t io, uint8_t motorIndex, int32_t portIndex)
         {
-            port_t *bbPort = &m_ports[m_usedMotorPorts];
-            bbPort->portIndex = portIndex;
+            port_t *port = &m_ports[m_usedMotorPorts];
+            port->portIndex = portIndex;
             ++m_usedMotorPorts;
 
             static uint8_t options[4] = {1, 0, 1, 0};
             const int8_t option = options[motorIndex];
             const dmaChannelSpec_t * dmaChannelSpec =
-                findDmaChannelSpec(bbPort->channel, option); 
-            bbPort->dmaResource = dmaChannelSpec->ref;
-            bbPort->dmaChannel = dmaChannelSpec->channel;
+                findDmaChannelSpec(port->channel, option); 
+            port->dmaResource = dmaChannelSpec->ref;
+            port->dmaChannel = dmaChannelSpec->channel;
 
-            bbPort->gpio =_IO_GPIO(io);
+            port->gpio =_IO_GPIO(io);
 
-            bbPort->portOutputBuffer = &m_outputBuffer[(bbPort - m_ports) * BUF_LENGTH];
+            port->portOutputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
 
-            timerChannelInit(bbPort);
+            timerChannelInit(port);
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
-            bbPort->dmaSource = timerDmaSource(bbPort->channel);
+            port->dmaSource = timerDmaSource(port->channel);
 
-            m_pacerDmaSources |= bbPort->dmaSource;
+            m_pacerDmaSources |= port->dmaSource;
 
             dmaSetHandler(
-                    findDmaIdentifier(bbPort->dmaResource),
+                    findDmaIdentifier(port->dmaResource),
                     dmaIrqHandler,
                     nvic_build_priority(2, 1),
-                    (uint32_t)bbPort);
+                    (uint32_t)port);
 
-            dmaItConfig(bbPort);
+            dmaItConfig(port);
 
-            dmaPreconfigure(bbPort);
+            dmaPreconfigure(port);
 
-            dmaItConfig(bbPort);
+            dmaItConfig(port);
 
-            return bbPort;
+            return port;
         }
 
         void dmaSetHandler(
@@ -817,29 +817,29 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             m_ports[motorIndex].channel = timerChannel;
 
-            port_t *bbPort = findMotorPort(portIndex);
+            port_t *port = findMotorPort(portIndex);
 
-            if (!bbPort) {
-                bbPort = allocateMotorPort(io, motorIndex, portIndex);
+            if (!port) {
+                port = allocateMotorPort(io, motorIndex, portIndex);
             }
 
-            m_motors[motorIndex].bbPort = bbPort;
+            m_motors[motorIndex].port = port;
 
             _IO_GPIO(io)->BSRR |= (((uint32_t)(_IO_Pin(io))) << 16);
 
-            outputDataInit(bbPort->portOutputBuffer, (1 << pinIndex)); 
+            outputDataInit(port->portOutputBuffer, (1 << pinIndex)); 
 
-            bbPort->gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
+            port->gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
 
             // Set GPIO to output
             ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
                 uint32_t gpioModeMask = (GPIO_MODER_MODER0 << (pinIndex * 2));
                 uint32_t gpioModeOutput = (GPIO_Mode_OUT << (pinIndex * 2));
-                MODIFY_REG(bbPort->gpio->MODER, gpioModeMask, gpioModeOutput);
+                MODIFY_REG(port->gpio->MODER, gpioModeMask, gpioModeOutput);
             }
 
             // Reinitialize port group DMA for output
-            loadDmaRegs(bbPort->dmaResource, &bbPort->dmaRegOutput);
+            loadDmaRegs(port->dmaResource, &port->dmaRegOutput);
         }
 
     protected: // DshotEsc method overrides =============================================
@@ -904,9 +904,9 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         virtual void writeMotor(uint8_t index, uint16_t packet) override
         {
-            motor_t * const bbmotor = &m_motors[index];
-            port_t *bbPort = bbmotor->bbPort;
-            outputDataSet(bbPort->portOutputBuffer, bbmotor->pinIndex, packet); 
+            motor_t * const motor = &m_motors[index];
+            port_t *port = motor->port;
+            outputDataSet(port->portOutputBuffer, motor->pinIndex, packet); 
         }
 
     public:
