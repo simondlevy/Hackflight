@@ -105,8 +105,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC_AHB1,
         };
 
-        typedef void * IO_t; 
-
         struct dmaChannelDescriptor_s;
 
         typedef void (*dmaCallbackHandlerFuncPtr)(
@@ -534,7 +532,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             int32_t offset = __builtin_popcount(((1 << pinIdx) - 1) & 0xffff);
             offset += ioDefUsedOffset[portIdx];
-            const IO_t io =  m_ioRecs + offset;
+            const void * io =  m_ioRecs + offset;
             const ioRec_t * ioRec = (ioRec_t *)io;
             GPIO_TypeDef * gpio = ioRec->gpio;
 
