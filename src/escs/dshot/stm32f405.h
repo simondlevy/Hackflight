@@ -133,6 +133,10 @@ class Stm32F405DshotEsc : public DshotEsc {
         // Per GPIO port and timer channel
         typedef struct {
 
+            dmaResource_t *dmaResource; // DMA resource for this port & timer channel
+
+            /////////////////////////////////////
+
             int32_t portIndex;
 
             GPIO_TypeDef *gpio;
@@ -141,7 +145,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             uint16_t dmaSource;
 
-            dmaResource_t *dmaResource; // DMA resource for this port & timer channel
             uint32_t dmaChannel;        // DMA channel or peripheral request
 
             // DMA resource register cache
@@ -683,27 +686,11 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             m_pacerDmaSources |= port->dmaSource;
 
-            dmaSetHandler(
-                    findDmaIdentifier(port->dmaResource),
-                    dmaIrqHandler,
-                    nvic_build_priority(2, 1),
-                    (uint32_t)port);
+            dmaIdentifier_e identifier = findDmaIdentifier(port->dmaResource);
+            dmaCallbackHandlerFuncPtr callback = dmaIrqHandler;
+            uint32_t priority = nvic_build_priority(2, 1);
+            uint32_t userParam = (uint32_t)port;
 
-            dmaItConfig(port);
-
-            dmaPreconfigure(port);
-
-            dmaItConfig(port);
-
-            return port;
-        }
-
-        void dmaSetHandler(
-                dmaIdentifier_e identifier,
-                dmaCallbackHandlerFuncPtr callback,
-                uint32_t priority,
-                uint32_t userParam)
-        {
             const int8_t index = identifier - 1;
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
@@ -727,6 +714,13 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             NVIC->ISER[irqChannel >> 0x05] =
                 (uint32_t)0x01 << (irqChannel & (uint8_t)0x1F);
+            dmaItConfig(port);
+
+            dmaPreconfigure(port);
+
+            dmaItConfig(port);
+
+            return port;
         }
 
         void initChannel(
