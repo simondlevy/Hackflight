@@ -341,23 +341,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         // Private instance methods =====================================================
 
-        IO_t _IOGetByTag(uint8_t tag)
-        {
-            const int32_t portIdx = (tag >> 4) - 1;
-            const int32_t pinIdx = tag & 0x0F;
-
-            if (portIdx < 0 || portIdx >= DEFIO_PORT_USED_COUNT) {
-                return NULL;
-            }
-
-            // count bits before this pin on single port
-            int32_t offset = __builtin_popcount(((1 << pinIdx) - 1) & 0xffff);
-
-            // and add port offset
-            offset += m_ioDefUsedOffset[portIdx];
-            return m_ioRecs + offset;
-        }
-
         static void timOcInit(
                 volatile uint32_t * ccmr,
                 volatile uint32_t * ccr,
@@ -634,7 +617,14 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             m_motors[motorIndex].pinIndex = pinIndex;
 
-            const IO_t io = _IOGetByTag(pin);
+            const int32_t portIdx = (pin >> 4) - 1;
+            const int32_t pinIdx = pin & 0x0F;
+
+            int32_t offset = __builtin_popcount(((1 << pinIdx) - 1) & 0xffff);
+
+            // and add port offset
+            offset += m_ioDefUsedOffset[portIdx];
+            const IO_t io =  m_ioRecs + offset;
 
             ioRec_t *ioRec =_IORec(io);
 
