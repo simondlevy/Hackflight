@@ -512,20 +512,14 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         } // allocatePort
 
-        void initChannel(
-                const uint8_t timerId,
-                const uint8_t channel,
-                const uint8_t specId,
-                const uint32_t d,
-                const uint32_t s,
-                const uint32_t c)
+        void initChannel(const uint8_t timerId, const uint8_t channel)
         {
             m_dmaTimerMapping[timerId].tim = TIM1;
             m_dmaTimerMapping[timerId].channel = channel;
 
-            dmaChannelSpec_t * spec = &m_dmaTimerMapping[timerId].channelSpec[specId];
-            spec->ref = (dmaResource_t *)m_streams[s];
-            spec->channel = c << 25;
+            dmaChannelSpec_t * spec = &m_dmaTimerMapping[timerId].channelSpec[1];
+            spec->ref = (dmaResource_t *)m_streams[timerId+1];
+            spec->channel = 6 << 25;
         }
 
         void defineDma2Channel(
@@ -694,8 +688,8 @@ class Stm32F405DshotEsc : public DshotEsc {
                 }
             }
 
-            initChannel(0, TIM_CHANNEL_1, 1, 2, 1, 6); 
-            initChannel(1, TIM_CHANNEL_2, 1, 2, 2, 6); 
+            initChannel(0, TIM_CHANNEL_1); 
+            initChannel(1, TIM_CHANNEL_2); 
 
             defineDma2Channel(0, DMA2_Stream0, 0,  DMA2_Stream0_IRQn); 
             defineDma2Channel(1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
