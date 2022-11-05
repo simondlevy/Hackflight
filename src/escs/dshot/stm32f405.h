@@ -380,18 +380,14 @@ class Stm32F405DshotEsc : public DshotEsc {
             return NULL;
         }
 
-        const dmaChannelSpec_t *findDmaChannelSpec(uint8_t portIndex, int8_t option)
-        {
-            return &m_dmaTimerMapping[portIndex].channelSpec[option];
-        }
-
         port_t *allocatePort(IO_t io, uint8_t option, int32_t portIndex)
         {
             port_t *port = &m_ports[m_usedMotorPorts];
             port->index = portIndex;
             ++m_usedMotorPorts;
 
-            const dmaChannelSpec_t * dmaChannelSpec = findDmaChannelSpec(portIndex, option); 
+            const dmaChannelSpec_t * dmaChannelSpec =
+                &m_dmaTimerMapping[portIndex].channelSpec[option];
 
             port->dmaResource = dmaChannelSpec->ref;
 
