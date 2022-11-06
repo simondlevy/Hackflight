@@ -131,7 +131,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         typedef struct dmaChannelDescriptor_s {
             DMA_TypeDef *             dma;
             dmaResource_t *           ref;
-            uint32_t                  channel;
             dmaCallbackHandlerFuncPtr irqHandlerCallback;
             uint8_t                   flagsShift;
             IRQn_Type                 irqN;
@@ -140,7 +139,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef struct {
             dmaResource_t * ref;
-            uint32_t        channel;
         } dmaChannelSpec_t;
 
         typedef struct {
@@ -463,7 +461,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             dmaChannelSpec_t * spec = &m_dmaTimerMapping[timerId].channelSpec[1];
             spec->ref = (dmaResource_t *)streams[timerId+1];
-            spec->channel = 6 << 25;
         }
 
         void defineDma2Channel(
