@@ -74,12 +74,12 @@ void loop(void)
 {
     _hf->step();
 
-    Serial.print(_esc->g_pin0);
+    Serial.print(_esc->t1);
     Serial.print(" ");
-    Serial.print(_esc->g_pin1);
+    Serial.print(_esc->t2);
     Serial.print(" ");
-    Serial.print(_esc->g_pin2);
+    Serial.print(_esc->t3);
     Serial.print(" ");
-    Serial.print(_esc->g_pin3);
+    Serial.print(_esc->t4);
     Serial.println();
 }

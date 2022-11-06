@@ -370,16 +370,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                             TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                             TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
                     break;
-                case TIM_CHANNEL_3:
-                    timOcInit( &TIM1->CCMR2, &TIM1->CCR3, TIM_CCER_CC3E,
-                            TIM_CCMR2_OC3M, TIM_CCMR2_CC3S, TIM_CCER_CC3P,
-                            TIM_CCER_CC3NP, TIM_CR2_OIS3, 0, 8, 8, 8);
-                    break;
-                case TIM_CHANNEL_4:
-                    timOcInit( &TIM1->CCMR2, &TIM1->CCR4, TIM_CCER_CC4E,
-                            TIM_CCMR2_OC4M, TIM_CCMR2_CC4S, TIM_CCER_CC4P,
-                            TIM_CCER_CC4NP, TIM_CR2_OIS4, 8, 12, 12, 4);
-                    break;
             }
 
             // Enable the TIM Counter
@@ -388,13 +378,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
             port->dmaSource =
-                port->channel == TIM_CHANNEL_1 ?
-                TIM_DMA_CC1 :
-                port->channel == TIM_CHANNEL_2 ?
-                TIM_DMA_CC2 :
-                port->channel == TIM_CHANNEL_3 ?
-                TIM_DMA_CC3 :
-                TIM_DMA_CC4;
+                port->channel == TIM_CHANNEL_1 ?  TIM_DMA_CC1 : TIM_DMA_CC2;
 
             m_pacerDmaSources |= port->dmaSource;
 
