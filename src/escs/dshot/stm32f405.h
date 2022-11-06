@@ -359,19 +359,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
 
-            switch (channel) {
-                case TIM_CHANNEL_1:
-                    timOcInit( &TIM1->CCMR1, &TIM1->CCR1, TIM_CCER_CC1E,
-                            TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
-                            TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
-                    break;
-                case TIM_CHANNEL_2:
-                    timOcInit( &TIM1->CCMR1, &TIM1->CCR2, TIM_CCER_CC2E,
-                            TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
-                            TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
-                    break;
-            }
-
             // Enable the TIM Counter
             TIM1->CR1 |= TIM_CR1_CEN;
  
@@ -648,6 +635,14 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->EGR = 0x0001;          
 
             TIM1->CR1 |= TIM_CR1_ARPE;
+
+            timOcInit( &TIM1->CCMR1, &TIM1->CCR1, TIM_CCER_CC1E,
+                    TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
+                    TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
+
+            timOcInit( &TIM1->CCMR1, &TIM1->CCR2, TIM_CCER_CC2E,
+                    TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
+                    TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
             initMotor(0, 0, 0, TIM_CHANNEL_1);
             initMotor(1, 0, 1, TIM_CHANNEL_2);
