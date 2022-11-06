@@ -121,7 +121,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         typedef struct {
             dmaResource_t *dmaResource;
             int32_t index;
-            GPIO_TypeDef *gpio;
+            GPIO_TypeDef * gpio;
             uint8_t channel;
             uint16_t dmaSource;
             dmaRegCache_t dmaRegOutput;
@@ -130,7 +130,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef struct {
             int32_t pinIndex;    
-            port_t *port;
+            port_t * port;
         } motor_t;
 
         typedef struct dmaChannelDescriptor_s {
@@ -460,9 +460,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             uint8_t ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
 
-            const int32_t portIdx = (pin >> 4) - 1;
-            const int32_t pinIdx = pin & 0x0F;
-
             uint8_t config = io_config(
                     GPIO_MODE_OUT,
                     GPIO_FAST_SPEED,
@@ -499,8 +496,8 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint32_t speed = (config >> 2) & 0x03;
             uint32_t pull  = (config >> 5) & 0x03;
 
-            int32_t offset = __builtin_popcount(((1 << pinIdx) - 1) & 0xffff);
-            offset += ioDefUsedOffset[portIdx];
+            int32_t offset = __builtin_popcount(((1 << (pin & 0x0f)) - 1) & 0xffff);
+            offset += ioDefUsedOffset[(pin >> 4) - 1];
             const void * io =  m_ioRecs + offset;
             const ioRec_t * ioRec = (ioRec_t *)io;
             GPIO_TypeDef * gpio = ioRec->gpio;
@@ -655,7 +652,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         virtual void updateComplete(void) override
         {
-
             dmaCmd(&m_ports[0], ENABLE);
             dmaCmd(&m_ports[1], ENABLE);
 
