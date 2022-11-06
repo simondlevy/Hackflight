@@ -128,6 +128,11 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint32_t *outputBuffer;
         } port_t;
 
+        typedef struct {
+            int32_t pinIndex;    
+            port_t *port;
+        } motor_t;
+
         typedef struct dmaChannelDescriptor_s {
             DMA_TypeDef *             dma;
             dmaResource_t *           ref;
@@ -145,11 +150,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint8_t channel;
             dmaChannelSpec_t channelSpec[MAX_TIMER_DMA_OPTIONS];
         } dmaTimerMapping_t;
-
-        typedef struct {
-            int32_t pinIndex;    
-            port_t *port;
-        } motor_t;
 
         typedef struct {
             GPIO_TypeDef *gpio;
