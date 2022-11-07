@@ -530,9 +530,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             gpio->BSRR |= pinmask;
 
+            /*
             if (motorIndex < 2) {
                 m_ports[motorIndex].channel = timerChannel;
-            }
+            }*/
 
             port_t *port = findMotorPort(portIndex);
 
@@ -639,6 +640,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             timOcInit( &TIM1->CCMR1, &TIM1->CCR2, TIM_CCER_CC2E,
                     TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
+
+            m_ports[0].channel = TIM_CHANNEL_1;
+            m_ports[1].channel = TIM_CHANNEL_2;
 
             initMotor(0, 0, 0, TIM_CHANNEL_1);
             initMotor(1, 0, 1, TIM_CHANNEL_2);
