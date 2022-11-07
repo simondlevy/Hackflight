@@ -118,7 +118,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         } dmaChannelDescriptor_t;
 
         typedef struct {
-            uint8_t channel;
             dmaResource_t * ref;
         } dmaTimerMapping_t;
 
@@ -290,7 +289,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                 DMA2_Stream7
             };
 
-            m_dmaTimerMapping[timerIndex].channel = channel;
             m_dmaTimerMapping[timerIndex].ref = (dmaResource_t *)streams[timerIndex+1];
         }
 
