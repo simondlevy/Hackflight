@@ -121,7 +121,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef struct {
             dmaResource_t *dmaResource;
-            int32_t index;
             uint8_t channel;
             uint16_t dmaSource;
             dmaRegCache_t dmaRegOutput;
