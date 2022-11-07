@@ -74,12 +74,12 @@ void loop(void)
 {
     _hf->step();
 
-    Serial.print(_esc->t1);
+    Serial.print((uint32_t)_esc->m_motors[0].port, HEX);
     Serial.print(" ");
-    Serial.print(_esc->t2);
+    Serial.print((uint32_t)_esc->m_motors[1].port, HEX);
     Serial.print(" ");
-    Serial.print(_esc->t3);
+    Serial.print((uint32_t)_esc->m_motors[2].port, HEX);
     Serial.print(" ");
-    Serial.print(_esc->t4);
+    Serial.print((uint32_t)_esc->m_motors[3].port, HEX);
     Serial.println();
 }
