@@ -116,7 +116,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         } motor_t;
 
         typedef struct dmaChannelDescriptor_s {
-            DMA_TypeDef *             dma;
             dmaCallbackHandlerFuncPtr irqHandlerCallback;
             uint8_t                   flagsShift;
             IRQn_Type                 irqN;
@@ -212,17 +211,17 @@ class Stm32F405DshotEsc : public DshotEsc {
             timDmaCmd(port->dmaSource, DISABLE);
 
             if (descriptor->flagsShift > 31 ?
-                descriptor->dma->HISR & (DMA_IT_TEIF << (descriptor->flagsShift - 32)) :
-                descriptor->dma->LISR & (DMA_IT_TEIF << descriptor->flagsShift)) {
+                DMA2->HISR & (DMA_IT_TEIF << (descriptor->flagsShift - 32)) :
+                DMA2->LISR & (DMA_IT_TEIF << descriptor->flagsShift)) {
  
                 while (1) {};
             }
 
             if (descriptor->flagsShift > 31) {
-                descriptor->dma->HIFCR = (DMA_IT_TCIF << (descriptor->flagsShift - 32)); 
+                DMA2->HIFCR = (DMA_IT_TCIF << (descriptor->flagsShift - 32)); 
             }
             else {
-                descriptor->dma->LIFCR = (DMA_IT_TCIF << descriptor->flagsShift);
+                DMA2->LIFCR = (DMA_IT_TCIF << descriptor->flagsShift);
             }
         }
 
@@ -331,7 +330,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             dmaChannelDescriptor_t * desc = &m_dmaDescriptors[stream+8];
 
-            desc->dma = DMA2;
             desc->flagsShift = flagsShift;
             desc->irqN = irqN;
         }
