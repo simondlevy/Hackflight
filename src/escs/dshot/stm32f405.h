@@ -483,14 +483,14 @@ class Stm32F405DshotEsc : public DshotEsc {
             initChannel(0, DMA2_Stream1); 
             initChannel(1, DMA2_Stream2); 
 
-            defineDma2Channel(0, DMA2_Stream0, 0,  DMA2_Stream0_IRQn); 
+            //defineDma2Channel(0, DMA2_Stream0, 0,  DMA2_Stream0_IRQn); 
             defineDma2Channel(1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
             defineDma2Channel(2, DMA2_Stream2, 16, DMA2_Stream2_IRQn); 
-            defineDma2Channel(3, DMA2_Stream3, 22, DMA2_Stream3_IRQn); 
-            defineDma2Channel(4, DMA2_Stream4, 32, DMA2_Stream4_IRQn); 
-            defineDma2Channel(5, DMA2_Stream5, 38, DMA2_Stream5_IRQn); 
-            defineDma2Channel(6, DMA2_Stream6, 48, DMA2_Stream6_IRQn); 
-            defineDma2Channel(7, DMA2_Stream7, 54, DMA2_Stream7_IRQn); 
+            //defineDma2Channel(3, DMA2_Stream3, 22, DMA2_Stream3_IRQn); 
+            //defineDma2Channel(4, DMA2_Stream4, 32, DMA2_Stream4_IRQn); 
+            //defineDma2Channel(5, DMA2_Stream5, 38, DMA2_Stream5_IRQn); 
+            //defineDma2Channel(6, DMA2_Stream6, 48, DMA2_Stream6_IRQn); 
+            //defineDma2Channel(7, DMA2_Stream7, 54, DMA2_Stream7_IRQn); 
 
             uint16_t outputARR = SystemCoreClock / outputFreq - 1;
 
