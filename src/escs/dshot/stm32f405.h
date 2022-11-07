@@ -259,7 +259,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         // Instance variables ===========================================================
 
         port_t m_ports[2];
-        int32_t m_usedMotorPorts;
 
         motor_t m_motors[MAX_SUPPORTED_MOTORS];
 
@@ -430,13 +429,9 @@ class Stm32F405DshotEsc : public DshotEsc {
                     GPIO_OTYPE_PP,
                     GPIO_PUPD_UP);
 
-            const uint8_t ioPortDefs[6] = {
+            const uint8_t ioPortDefs[2] = {
                 { rcc_ahb1(RCC_AHB1ENR_GPIOAEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIOBEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIOCEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIODEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIOEEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIOFEN_MSK) },
+                { rcc_ahb1(RCC_AHB1ENR_GPIOBEN_MSK) }
             };
 
             const uint8_t rcc = ioPortDefs[portIndex];
