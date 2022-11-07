@@ -49,8 +49,7 @@ static inline uint8_t __basepriSetMemRetVal(uint8_t prio)
 
 class Stm32F405DshotEsc : public DshotEsc {
 
-    // XXX private:
-    public:
+    private:
 
         // Constants ====================================================================
 
@@ -63,7 +62,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static const uint32_t RCC_AHB1PERIPH_DMA2 = 0x00400000;
 
-        static const uint8_t DMA_TIMER_MAPPING_COUNT = 6;
+        static const uint8_t DMA_TIMER_MAPPING_COUNT = 2;
 
         static const uint32_t NVIC_PRIORITY_GROUPING = 0x500;
 
@@ -278,7 +277,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        void initChannel(const uint8_t timerId, const uint8_t channel)
+        void initChannel(const uint8_t timerIndex, const uint8_t channel)
         {
             static constexpr DMA_Stream_TypeDef * streams[8] = {
                 DMA2_Stream0,
@@ -291,8 +290,8 @@ class Stm32F405DshotEsc : public DshotEsc {
                 DMA2_Stream7
             };
 
-            m_dmaTimerMapping[timerId].channel = channel;
-            m_dmaTimerMapping[timerId].ref = (dmaResource_t *)streams[timerId+1];
+            m_dmaTimerMapping[timerIndex].channel = channel;
+            m_dmaTimerMapping[timerIndex].ref = (dmaResource_t *)streams[timerIndex+1];
         }
 
         void defineDma2Channel(
@@ -602,7 +601,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             else {
                 DMA2->LIFCR = (DMA_IT_TCIF << descriptor->flagsShift);
             }
-
         }
 
 }; // class Stm32F4DshotEsc
