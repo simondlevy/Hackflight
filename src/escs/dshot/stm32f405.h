@@ -340,6 +340,79 @@ class Stm32F405DshotEsc : public DshotEsc {
             return NULL;
         }
 
+        void initPort(
+                port_t * port,
+                uint8_t portIndex,
+                GPIO_TypeDef * gpio,
+                uint8_t option)
+        {
+            const dmaChannelSpec_t * dmaChannelSpec =
+                &m_dmaTimerMapping[portIndex].channelSpec[option];
+
+            port->dmaResource = dmaChannelSpec->ref;
+
+            port->gpio = gpio;
+
+            port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
+
+            const uint8_t channel = port->channel;
+
+            TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
+
+            // Enable the TIM Counter
+            TIM1->CR1 |= TIM_CR1_CEN;
+ 
+            RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
+
+            port->dmaSource =
+                port->channel == TIM_CHANNEL_1 ?  TIM_DMA_CC1 : TIM_DMA_CC2;
+
+            m_pacerDmaSources |= port->dmaSource;
+
+            dmaCallbackHandlerFuncPtr callback = dmaIrqHandler;
+            uint32_t priority = nvic_build_priority(2, 1);
+
+            const int8_t index = portIndex == 0 ? 9 : 10;
+
+            RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
+            m_dmaDescriptors[index].irqHandlerCallback = callback;
+            m_dmaDescriptors[index].port = port;
+
+            uint8_t irqChannel = m_dmaDescriptors[index].irqN;
+
+            uint8_t tmppriority = 0x00, tmppre = 0x00, tmpsub = 0x0F;
+
+            tmppriority = (0x700 - ((SCB->AIRCR) & (uint32_t)0x700))>> 0x08;
+            tmppre = (0x4 - tmppriority);
+            tmpsub = tmpsub >> tmppriority;
+
+            tmppriority = nvic_priority_base(priority) << tmppre;
+            tmppriority |= (uint8_t)(nvic_priority_sub(priority) & tmpsub);
+
+            tmppriority = tmppriority << 0x04;
+
+            NVIC->IP[irqChannel] = tmppriority;
+
+            NVIC->ISER[irqChannel >> 0x05] =
+                (uint32_t)0x01 << (irqChannel & (uint8_t)0x1F);
+
+            DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)port->dmaResource;
+
+            DMAy_Streamx->CR = 0x0c025450;
+
+            DMAy_Streamx->FCR =
+                ((DMAy_Streamx->FCR & (uint32_t)~(DMA_SxFCR_DMDIS | DMA_SxFCR_FTH)) |
+                 (DMA_FIFOMODE_ENABLE | DMA_FIFO_THRESHOLD_1QUARTERFULL));
+            DMAy_Streamx->NDTR = BUF_LENGTH;
+            DMAy_Streamx->PAR = (uint32_t)&port->gpio->BSRR;
+            DMAy_Streamx->M0AR = (uint32_t)port->outputBuffer;
+
+            port->dmaRegOutput.CR = ((DMA_Stream_TypeDef *)port->dmaResource)->CR;
+
+            DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
+
+        } // initPort
+
         port_t *allocatePort(GPIO_TypeDef * gpio, uint8_t option, int32_t portIndex)
         {
             port_t *port = &m_ports[m_usedMotorPorts];
