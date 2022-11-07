@@ -122,7 +122,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         typedef struct {
             dmaResource_t *dmaResource;
             int32_t index;
-            GPIO_TypeDef * gpio;
+            // GPIO_TypeDef * gpio;
             uint8_t channel;
             uint16_t dmaSource;
             dmaRegCache_t dmaRegOutput;
@@ -352,7 +352,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             port->dmaResource = dmaChannelSpec->ref;
 
-            port->gpio = gpio;
+            // port->gpio = gpio;
 
             port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
 
@@ -565,7 +565,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
                 uint32_t gpioModeMask = (GPIO_MODER_MODER0 << (pinIndex * 2));
                 uint32_t gpioModeOutput = (GPIO_Mode_OUT << (pinIndex * 2));
-                MODIFY_REG(/*port->*/gpio->MODER, gpioModeMask, gpioModeOutput);
+                MODIFY_REG(gpio->MODER, gpioModeMask, gpioModeOutput);
             }
 
             // Reinitialize port group DMA for output
