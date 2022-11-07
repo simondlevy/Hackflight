@@ -20,11 +20,6 @@
 
 void handleDmaIrq(uint8_t id);
 
-void DMA2_Stream0_IRQHandler(void) 
-{
-    handleDmaIrq(DMA2_ST0_HANDLER);
-}
-
 void DMA2_Stream1_IRQHandler(void) 
 {
     handleDmaIrq(DMA2_ST1_HANDLER);
@@ -33,29 +28,4 @@ void DMA2_Stream1_IRQHandler(void)
 void DMA2_Stream2_IRQHandler(void) 
 {
     handleDmaIrq(DMA2_ST2_HANDLER);
-}
-
-void DMA2_Stream3_IRQHandler(void) 
-{
-    handleDmaIrq(DMA2_ST3_HANDLER);
-}
-
-void DMA2_Stream4_IRQHandler(void) 
-{
-    handleDmaIrq(DMA2_ST4_HANDLER);
-}
-
-void DMA2_Stream5_IRQHandler(void) 
-{
-    handleDmaIrq(DMA2_ST5_HANDLER);
-}
-
-void DMA2_Stream6_IRQHandler(void) 
-{
-    handleDmaIrq(DMA2_ST6_HANDLER);
-}
-
-void DMA2_Stream7_IRQHandler(void) 
-{
-    handleDmaIrq(DMA2_ST7_HANDLER);
 }
