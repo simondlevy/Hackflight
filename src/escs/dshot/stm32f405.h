@@ -446,6 +446,11 @@ class Stm32F405DshotEsc : public DshotEsc {
             desc->irqN = irqN;
         }
 
+        void initPort(uint8_t index, uint8_t timerChannel)
+        {
+            m_ports[index].channel = timerChannel;
+        }
+
         void initMotor(uint8_t motorIndex, uint8_t portIndex, uint8_t pinIndex)
         {
             uint8_t pin = (*m_pins)[motorIndex];
@@ -632,8 +637,8 @@ class Stm32F405DshotEsc : public DshotEsc {
                     TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
-            m_ports[0].channel = TIM_CHANNEL_1;
-            m_ports[1].channel = TIM_CHANNEL_2;
+            initPort(0, TIM_CHANNEL_1);
+            initPort(1, TIM_CHANNEL_2);
 
             initMotor(0, 0, 0);
             initMotor(1, 0, 1);
