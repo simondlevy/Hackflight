@@ -436,20 +436,9 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             const uint8_t rcc = ioPortDefs[portIndex];
 
-            int tag = rcc >> 5;
             uint32_t mask = 1 << (rcc & 0x1f);
 
-            switch (tag) {
-                case RCC_APB2:
-                    RCC_APB2PeriphClockEnable(mask);
-                    break;
-                case RCC_APB1:
-                    RCC->APB1ENR |= mask;
-                    break;
-                case RCC_AHB1:
-                    RCC_AHB1PeriphClockEnable(mask);
-                    break;
-            }
+            RCC_AHB1PeriphClockEnable(mask);
 
             uint32_t mode  = (config >> 0) & 0x03;
             uint32_t speed = (config >> 2) & 0x03;
