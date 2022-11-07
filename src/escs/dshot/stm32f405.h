@@ -117,7 +117,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef struct dmaChannelDescriptor_s {
             DMA_TypeDef *             dma;
-            dmaResource_t *           ref;
             dmaCallbackHandlerFuncPtr irqHandlerCallback;
             uint8_t                   flagsShift;
             IRQn_Type                 irqN;
@@ -333,7 +332,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             dmaChannelDescriptor_t * desc = &m_dmaDescriptors[stream+8];
 
             desc->dma = DMA2;
-            desc->ref = (dmaResource_t *)ref;
             desc->flagsShift = flagsShift;
             desc->irqN = irqN;
         }
