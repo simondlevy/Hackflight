@@ -280,24 +280,19 @@ class Stm32F405DshotEsc : public DshotEsc {
             m_dmaTimerMapping[timerIndex].ref = (dmaResource_t *)stream;
         }
 
-        void defineDma2Channel(
-                uint8_t stream,
+        void initPort(
+                uint8_t portIndex,
+                uint16_t dmaSource,
                 DMA_Stream_TypeDef * ref,
                 uint8_t flagsShift,
                 IRQn_Type irqN)
         {
-            dmaChannelDescriptor_t * desc = &m_dmaDescriptors[stream+9];
-
+            dmaChannelDescriptor_t * desc = &m_dmaDescriptors[portIndex+9];
             desc->flagsShift = flagsShift;
             desc->irqN = irqN;
-        }
 
-        void initPort(uint8_t portIndex, uint16_t dmaSource)
-        {
             port_t * port = &m_ports[portIndex];
-
             port->dmaResource = m_dmaTimerMapping[portIndex].ref;
-
             port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
 
             TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
@@ -512,11 +507,8 @@ class Stm32F405DshotEsc : public DshotEsc {
             initChannel(0, DMA2_Stream1); 
             initChannel(1, DMA2_Stream2); 
 
-            defineDma2Channel(0, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
-            defineDma2Channel(1, DMA2_Stream2, 16, DMA2_Stream2_IRQn); 
-
-            initPort(0, TIM_DMA_CC1);
-            initPort(1, TIM_DMA_CC2);
+            initPort(0, TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
+            initPort(1, TIM_DMA_CC2, DMA2_Stream2, 16, DMA2_Stream2_IRQn); 
 
             initMotor(0, 0, 0);
             initMotor(1, 1, 0);
