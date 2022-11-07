@@ -289,7 +289,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 uint8_t flagsShift,
                 IRQn_Type irqN)
         {
-            dmaChannelDescriptor_t * desc = &m_dmaDescriptors[stream+8];
+            dmaChannelDescriptor_t * desc = &m_dmaDescriptors[stream+9];
 
             desc->flagsShift = flagsShift;
             desc->irqN = irqN;
@@ -480,12 +480,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                 }
             }
 
-            initChannel(0, DMA2_Stream1); 
-            initChannel(1, DMA2_Stream2); 
-
-            defineDma2Channel(1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
-            defineDma2Channel(2, DMA2_Stream2, 16, DMA2_Stream2_IRQn); 
-
             uint16_t outputARR = SystemCoreClock / outputFreq - 1;
 
             memset(m_outputBuffer, 0, sizeof(m_outputBuffer));
@@ -517,6 +511,12 @@ class Stm32F405DshotEsc : public DshotEsc {
             timOcInit( &TIM1->CCMR1, &TIM1->CCR2, TIM_CCER_CC2E,
                     TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
+
+            initChannel(0, DMA2_Stream1); 
+            initChannel(1, DMA2_Stream2); 
+
+            defineDma2Channel(0, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
+            defineDma2Channel(1, DMA2_Stream2, 16, DMA2_Stream2_IRQn); 
 
             initPort(0, TIM_DMA_CC1);
             initPort(1, TIM_DMA_CC2);
