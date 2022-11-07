@@ -58,7 +58,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         static const uint32_t RCC_AHB1ENR_GPIOBEN_MSK = 0x00000002;
 
         static const uint8_t GPIO_FAST_SPEED = 0x02;
-        static const uint8_t GPIO_MODE_OUT   = 0x01;
         static const uint8_t GPIO_PUPD_UP    = 0x01;
         static const uint8_t GPIO_OTYPE_PP   = 0x00;
 
@@ -70,17 +69,12 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static const uint8_t DEFIO_PORT_USED_COUNT = 6;
 
-        static const uint8_t HARDWARE_TIMER_DEFINITION_COUNT = 14;
-
-        static const uint8_t MAX_TIMER_DMA_OPTIONS = 3;
-
         static const uint32_t TRANSFER_IT_ENABLE_MASK = 
             (uint32_t)(DMA_SxCR_TCIE | DMA_SxCR_HTIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE);
 
         static const uint32_t DMA_IT_TCIF  = 0x00000020;
         static const uint32_t DMA_IT_TEIF  = 0x00000008;
 
-        static const uint8_t MAX_MOTORS = 4;
         static const uint8_t STATE_PER_SYMBOL = 3;
         static const uint8_t FRAME_BITS = 16;
         static const uint8_t BUF_LENGTH = FRAME_BITS * STATE_PER_SYMBOL;
@@ -88,11 +82,11 @@ class Stm32F405DshotEsc : public DshotEsc {
         // Typedefs =====================================================================
 
         typedef enum { 
-            GPIO_Mode_IN, 
-            GPIO_Mode_OUT, 
-            GPIO_Mode_AF, 
-            GPIO_Mode_AN
-        } GPIOMode_TypeDef;
+            GPIO_MODE_IN, 
+            GPIO_MODE_OUT, 
+            GPIO_MODE_AF, 
+            GPIO_MODE_AN
+        } GPIOMODE_TypeDef;
 
         enum rcc_reg {
             RCC_EMPTY,
@@ -134,7 +128,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef struct {
             uint8_t channel;
-            dmaChannelSpec_t channelSpec[MAX_TIMER_DMA_OPTIONS];
+            dmaChannelSpec_t channelSpec;
         } dmaTimerMapping_t;
 
         typedef struct {
@@ -258,7 +252,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         motor_t m_motors[MAX_SUPPORTED_MOTORS];
 
-        uint32_t m_outputBuffer[BUF_LENGTH * MAX_MOTORS];
+        uint32_t m_outputBuffer[BUF_LENGTH * MAX_SUPPORTED_MOTORS];
 
         dmaChannelDescriptor_t m_dmaDescriptors[DMA_LAST_HANDLER];
 
@@ -330,7 +324,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             m_dmaTimerMapping[timerId].channel = channel;
 
-            dmaChannelSpec_t * spec = &m_dmaTimerMapping[timerId].channelSpec[1];
+            dmaChannelSpec_t * spec = &m_dmaTimerMapping[timerId].channelSpec;
             spec->ref = (dmaResource_t *)streams[timerId+1];
         }
 
@@ -353,7 +347,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             port_t * port = &m_ports[portIndex];
 
             const dmaChannelSpec_t * dmaChannelSpec =
-                &m_dmaTimerMapping[portIndex].channelSpec[1];
+                &m_dmaTimerMapping[portIndex].channelSpec;
 
             port->dmaResource = dmaChannelSpec->ref;
 
@@ -461,7 +455,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                     gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
                     gpio->MODER |= (mode << (pinpos * 2));
 
-                    if ((mode == GPIO_Mode_OUT) || (mode == GPIO_Mode_AF)) {
+                    if ((mode == GPIO_MODE_OUT) || (mode == GPIO_MODE_AF)) {
 
                         gpio->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
                         gpio->OSPEEDR |= (speed << (pinpos * 2));
@@ -502,7 +496,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             // Set GPIO to output
             ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
                 uint32_t gpioModeMask = (GPIO_MODER_MODER0 << (pinIndex * 2));
-                uint32_t gpioModeOutput = (GPIO_Mode_OUT << (pinIndex * 2));
+                uint32_t gpioModeOutput = (GPIO_MODE_OUT << (pinIndex * 2));
                 MODIFY_REG(gpio->MODER, gpioModeMask, gpioModeOutput);
             }
 
