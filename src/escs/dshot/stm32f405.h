@@ -268,7 +268,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         // Instance variables ===========================================================
 
-        port_t m_ports[MAX_MOTORS];
+        port_t m_ports[2];
         int32_t m_usedMotorPorts;
 
         motor_t m_motors[MAX_SUPPORTED_MOTORS];
