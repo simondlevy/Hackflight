@@ -510,9 +510,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             m_motors[motorIndex].port = port;
 
             if (motorIndex == 0 || motorIndex == 2) {
-                DMA_Stream_TypeDef * DMAy_Streamx =
-                    (DMA_Stream_TypeDef *)port->dmaResource;
-                DMAy_Streamx->PAR = (uint32_t)&gpio->BSRR;
+                ((DMA_Stream_TypeDef *)port->dmaResource)->PAR = (uint32_t)&gpio->BSRR;
             }
 
             gpio->BSRR |= (pinmask << 16);
