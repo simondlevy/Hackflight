@@ -97,8 +97,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         // Typedefs =====================================================================
 
-        struct dmaChannelDescriptor_s;
-
         typedef struct {
             dmaResource_t * dmaResource;
             uint16_t dmaSource;
