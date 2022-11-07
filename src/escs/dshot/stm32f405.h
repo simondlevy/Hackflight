@@ -113,10 +113,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef struct dmaRegCache_s {
             uint32_t CR;
-            uint32_t FCR;
-            uint32_t NDTR;
-            uint32_t PAR;
-            uint32_t M0AR;
+            //uint32_t FCR;
+            //uint32_t NDTR;
+            //uint32_t PAR;
+            //uint32_t M0AR;
         } dmaRegCache_t;
 
         typedef struct {
@@ -422,7 +422,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             port->dmaRegOutput.CR = ((DMA_Stream_TypeDef *)port->dmaResource)->CR;
 
             DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
-
         }
 
         void initMotor(uint8_t motorIndex, uint8_t pinIndex, uint8_t portIndex)
