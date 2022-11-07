@@ -79,14 +79,14 @@ class Stm32F405DshotEsc : public DshotEsc {
         static const uint8_t FRAME_BITS = 16;
         static const uint8_t BUF_LENGTH = FRAME_BITS * STATE_PER_SYMBOL;
 
-        // Typedefs =====================================================================
+        // Enums =======================================================================
 
-        typedef enum { 
+        enum { 
             GPIO_MODE_IN, 
             GPIO_MODE_OUT, 
             GPIO_MODE_AF, 
             GPIO_MODE_AN
-        } GPIOMODE_TypeDef;
+        } ;
 
         enum rcc_reg {
             RCC_EMPTY,
@@ -95,6 +95,8 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC_APB1,
             RCC_AHB1,
         };
+
+        // Typedefs =====================================================================
 
         struct dmaChannelDescriptor_s;
 
