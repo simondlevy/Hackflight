@@ -559,13 +559,13 @@ class Stm32F405DshotEsc : public DshotEsc {
                 buffer[bitpos * 3 + 2] |= resetMask; // Always reset all ports
             }
     
-            /*port->*/gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
+            gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
 
             // Set GPIO to output
             ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
                 uint32_t gpioModeMask = (GPIO_MODER_MODER0 << (pinIndex * 2));
                 uint32_t gpioModeOutput = (GPIO_Mode_OUT << (pinIndex * 2));
-                MODIFY_REG(port->gpio->MODER, gpioModeMask, gpioModeOutput);
+                MODIFY_REG(/*port->*/gpio->MODER, gpioModeMask, gpioModeOutput);
             }
 
             // Reinitialize port group DMA for output
