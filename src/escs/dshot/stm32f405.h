@@ -596,13 +596,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             timDmaCmd(port->dmaSource, DISABLE);
 
-            if (descriptor->flagsShift > 31 ?
-                DMA2->HISR & (DMA_IT_TEIF << (descriptor->flagsShift - 32)) :
-                DMA2->LISR & (DMA_IT_TEIF << descriptor->flagsShift)) {
- 
-                while (1) {};
-            }
-
             if (descriptor->flagsShift > 31) {
                 DMA2->HIFCR = (DMA_IT_TCIF << (descriptor->flagsShift - 32)); 
             }
