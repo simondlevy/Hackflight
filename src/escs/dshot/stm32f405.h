@@ -232,7 +232,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         // Private instance methods =====================================================
 
         static void timOcInit(
-                volatile uint32_t * ccmr,
                 volatile uint32_t * ccr,
                 const uint32_t ccer_cc_e,
                 const uint32_t ccmr_oc,
@@ -249,7 +248,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             TIM1->CCER &= (uint16_t)~ccer_cc_e;
             uint16_t tmpccer = TIM1->CCER;
             uint16_t tmpcr2 =  TIM1->CR2;
-            uint16_t tmpccmrx = *ccmr;
+            uint16_t tmpccmrx = TIM1->CCMR1;
             tmpccmrx &= (uint16_t)~ccmr_oc;
             tmpccmrx &= (uint16_t)~ccmr_cc;
             tmpccmrx |= (TIM_OCMODE_TIMING << mode_shift);
@@ -262,7 +261,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             tmpcr2 &= (uint16_t)~cr2_ois;
 
             TIM1->CR2 = tmpcr2;
-            *ccmr = tmpccmrx;
+            TIM1->CCMR1 = tmpccmrx;
             *ccr = 0x00000000;
             TIM1->CCER = tmpccer;
         }
@@ -504,11 +503,11 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             TIM1->CR1 |= TIM_CR1_ARPE;
 
-            timOcInit( &TIM1->CCMR1, &TIM1->CCR1, TIM_CCER_CC1E,
+            timOcInit(&TIM1->CCR1, TIM_CCER_CC1E,
                     TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
                     TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
 
-            timOcInit( &TIM1->CCMR1, &TIM1->CCR2, TIM_CCER_CC2E,
+            timOcInit(&TIM1->CCR2, TIM_CCER_CC2E,
                     TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
