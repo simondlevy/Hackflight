@@ -276,20 +276,11 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
         }
 
-        void initChannel(const uint8_t timerIndex, const uint8_t channel)
+        void initChannel(
+                const uint8_t timerIndex,
+                const DMA_Stream_TypeDef * stream)
         {
-            static constexpr DMA_Stream_TypeDef * streams[8] = {
-                DMA2_Stream0,
-                DMA2_Stream1,
-                DMA2_Stream2,
-                DMA2_Stream3,
-                DMA2_Stream4,
-                DMA2_Stream5,
-                DMA2_Stream6,
-                DMA2_Stream7
-            };
-
-            m_dmaTimerMapping[timerIndex].ref = (dmaResource_t *)streams[timerIndex+1];
+            m_dmaTimerMapping[timerIndex].ref = (dmaResource_t *)stream;
         }
 
         void defineDma2Channel(
@@ -489,8 +480,8 @@ class Stm32F405DshotEsc : public DshotEsc {
                 }
             }
 
-            initChannel(0, TIM_CHANNEL_1); 
-            initChannel(1, TIM_CHANNEL_2); 
+            initChannel(0, DMA2_Stream1); 
+            initChannel(1, DMA2_Stream2); 
 
             defineDma2Channel(0, DMA2_Stream0, 0,  DMA2_Stream0_IRQn); 
             defineDma2Channel(1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
