@@ -120,11 +120,10 @@ class Stm32F405DshotEsc : public DshotEsc {
         } dmaRegCache_t;
 
         typedef struct {
-            dmaResource_t *dmaResource;
-            uint8_t channel;
+            dmaResource_t * dmaResource;
             uint16_t dmaSource;
             dmaRegCache_t dmaRegOutput;
-            uint32_t *outputBuffer;
+            uint32_t * outputBuffer;
         } port_t;
 
         typedef struct {
@@ -362,13 +361,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             desc->irqN = irqN;
         }
 
-        void initPort(
-                uint8_t portIndex,
-                uint8_t timerChannel)
+        void initPort(uint8_t portIndex, uint16_t dmaSource)
         {
             port_t * port = &m_ports[portIndex];
-
-            port->channel = timerChannel;
 
             const dmaChannelSpec_t * dmaChannelSpec =
                 &m_dmaTimerMapping[portIndex].channelSpec[1];
@@ -379,13 +374,11 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
 
-            // Enable the TIM Counter
             TIM1->CR1 |= TIM_CR1_CEN;
  
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
-            port->dmaSource =
-                port->channel == TIM_CHANNEL_1 ?  TIM_DMA_CC1 : TIM_DMA_CC2;
+            port->dmaSource = dmaSource;
 
             m_pacerDmaSources |= port->dmaSource;
 
@@ -620,8 +613,8 @@ class Stm32F405DshotEsc : public DshotEsc {
                     TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
-            initPort(0, TIM_CHANNEL_1);
-            initPort(1, TIM_CHANNEL_2);
+            initPort(0, TIM_DMA_CC1);
+            initPort(1, TIM_DMA_CC2);
 
             initMotor(0, 0, 0);
             initMotor(1, 1, 0);
