@@ -123,12 +123,8 @@ class Stm32F405DshotEsc : public DshotEsc {
         } dmaChannelDescriptor_t;
 
         typedef struct {
-            dmaResource_t * ref;
-        } dmaChannelSpec_t;
-
-        typedef struct {
             uint8_t channel;
-            dmaChannelSpec_t channelSpec;
+            dmaResource_t * ref;
         } dmaTimerMapping_t;
 
         typedef struct {
@@ -260,7 +256,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         ioRec_t m_ioRecs[96];
 
-        uint16_t m_pacerDmaSources = 0;
+        uint16_t m_pacerDmaSources = 0x0000;
 
         // Private instance methods =====================================================
 
@@ -323,9 +319,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             };
 
             m_dmaTimerMapping[timerId].channel = channel;
-
-            dmaChannelSpec_t * spec = &m_dmaTimerMapping[timerId].channelSpec;
-            spec->ref = (dmaResource_t *)streams[timerId+1];
+            m_dmaTimerMapping[timerId].ref = (dmaResource_t *)streams[timerId+1];
         }
 
         void defineDma2Channel(
@@ -346,10 +340,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
             port_t * port = &m_ports[portIndex];
 
-            const dmaChannelSpec_t * dmaChannelSpec =
-                &m_dmaTimerMapping[portIndex].channelSpec;
-
-            port->dmaResource = dmaChannelSpec->ref;
+            port->dmaResource = m_dmaTimerMapping[portIndex].ref;
 
             port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
 
