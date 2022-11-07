@@ -100,9 +100,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         struct dmaChannelDescriptor_s;
 
-        typedef void (*dmaCallbackHandlerFuncPtr)(
-                struct dmaChannelDescriptor_s *channelDescriptor);
-
         typedef struct {
             dmaResource_t * dmaResource;
             uint16_t dmaSource;
@@ -116,7 +113,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         } motor_t;
 
         typedef struct dmaChannelDescriptor_s {
-            dmaCallbackHandlerFuncPtr irqHandlerCallback;
             uint8_t                   flagsShift;
             IRQn_Type                 irqN;
             port_t *                  port;
@@ -199,29 +195,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
             else {
                 DMAy_Streamx->CR &= ~(uint32_t)DMA_SxCR_EN;
-            }
-        }
-
-        static void dmaIrqHandler(dmaChannelDescriptor_t *descriptor)
-        {
-            port_t *port = descriptor->port;
-
-            dmaCmd(port, DISABLE);
-
-            timDmaCmd(port->dmaSource, DISABLE);
-
-            if (descriptor->flagsShift > 31 ?
-                DMA2->HISR & (DMA_IT_TEIF << (descriptor->flagsShift - 32)) :
-                DMA2->LISR & (DMA_IT_TEIF << descriptor->flagsShift)) {
- 
-                while (1) {};
-            }
-
-            if (descriptor->flagsShift > 31) {
-                DMA2->HIFCR = (DMA_IT_TCIF << (descriptor->flagsShift - 32)); 
-            }
-            else {
-                DMA2->LIFCR = (DMA_IT_TCIF << descriptor->flagsShift);
             }
         }
 
@@ -352,13 +325,11 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             m_pacerDmaSources |= port->dmaSource;
 
-            dmaCallbackHandlerFuncPtr callback = dmaIrqHandler;
             uint32_t priority = nvic_build_priority(2, 1);
 
             const int8_t index = portIndex == 0 ? 9 : 10;
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
-            m_dmaDescriptors[index].irqHandlerCallback = callback;
             m_dmaDescriptors[index].port = port;
 
             uint8_t irqChannel = m_dmaDescriptors[index].irqN;
@@ -616,13 +587,29 @@ class Stm32F405DshotEsc : public DshotEsc {
         void handleDmaIrq(const uint8_t id)
         {
             const uint8_t index = id - 1;
+            
+            dmaChannelDescriptor_t * descriptor = &m_dmaDescriptors[index];
 
-            dmaCallbackHandlerFuncPtr handler =
-                m_dmaDescriptors[index].irqHandlerCallback;
+            port_t *port = descriptor->port;
 
-            if (handler) {
-                handler(&m_dmaDescriptors[index]);
+            dmaCmd(port, DISABLE);
+
+            timDmaCmd(port->dmaSource, DISABLE);
+
+            if (descriptor->flagsShift > 31 ?
+                DMA2->HISR & (DMA_IT_TEIF << (descriptor->flagsShift - 32)) :
+                DMA2->LISR & (DMA_IT_TEIF << descriptor->flagsShift)) {
+ 
+                while (1) {};
             }
+
+            if (descriptor->flagsShift > 31) {
+                DMA2->HIFCR = (DMA_IT_TCIF << (descriptor->flagsShift - 32)); 
+            }
+            else {
+                DMA2->LIFCR = (DMA_IT_TCIF << descriptor->flagsShift);
+            }
+
         }
 
 }; // class Stm32F4DshotEsc
