@@ -346,15 +346,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             port->index = portIndex;
             ++m_usedMotorPorts;
 
-            const dmaChannelSpec_t * dmaChannelSpec =
-                &m_dmaTimerMapping[portIndex].channelSpec[1];
-
-            port->dmaResource = dmaChannelSpec->ref;
-
-            port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
-
-            const uint8_t channel = port->channel;
-
             TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
 
             // Enable the TIM Counter
@@ -446,9 +437,20 @@ class Stm32F405DshotEsc : public DshotEsc {
             desc->irqN = irqN;
         }
 
-        void initPort(uint8_t index, uint8_t timerChannel)
+        void initPort(
+                uint8_t index,
+                uint8_t timerChannel)
         {
-            m_ports[index].channel = timerChannel;
+            port_t * port = &m_ports[index];
+
+            port->channel = timerChannel;
+
+            const dmaChannelSpec_t * dmaChannelSpec =
+                &m_dmaTimerMapping[index].channelSpec[1];
+
+            port->dmaResource = dmaChannelSpec->ref;
+
+            port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
         }
 
         void initMotor(uint8_t motorIndex, uint8_t portIndex, uint8_t pinIndex)
