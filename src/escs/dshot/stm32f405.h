@@ -111,19 +111,11 @@ class Stm32F405DshotEsc : public DshotEsc {
         typedef void (*dmaCallbackHandlerFuncPtr)(
                 struct dmaChannelDescriptor_s *channelDescriptor);
 
-        typedef struct dmaRegCache_s {
-            uint32_t CR;
-            //uint32_t FCR;
-            //uint32_t NDTR;
-            //uint32_t PAR;
-            //uint32_t M0AR;
-        } dmaRegCache_t;
-
         typedef struct {
             dmaResource_t * dmaResource;
             uint16_t dmaSource;
-            dmaRegCache_t dmaRegOutput;
             uint32_t * outputBuffer;
+            uint32_t CR;
         } port_t;
 
         typedef struct {
@@ -419,7 +411,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             DMAy_Streamx->NDTR = BUF_LENGTH;
             DMAy_Streamx->M0AR = (uint32_t)port->outputBuffer;
 
-            port->dmaRegOutput.CR = ((DMA_Stream_TypeDef *)port->dmaResource)->CR;
+            port->CR = ((DMA_Stream_TypeDef *)port->dmaResource)->CR;
 
             DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
         }
@@ -535,7 +527,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
 
             // Reinitialize port group DMA for output
-            ((DMA_Stream_TypeDef *)port->dmaResource)->CR = port->dmaRegOutput.CR;
+            ((DMA_Stream_TypeDef *)port->dmaResource)->CR = port->CR;
 
         } // initMotor
 
