@@ -446,11 +446,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             desc->irqN = irqN;
         }
 
-        void initMotor(
-                uint8_t motorIndex,
-                uint8_t portIndex,
-                uint8_t pinIndex,
-                uint8_t timerChannel)
+        void initMotor(uint8_t motorIndex, uint8_t portIndex, uint8_t pinIndex)
         {
             uint8_t pin = (*m_pins)[motorIndex];
 
@@ -529,11 +525,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
 
             gpio->BSRR |= pinmask;
-
-            /*
-            if (motorIndex < 2) {
-                m_ports[motorIndex].channel = timerChannel;
-            }*/
 
             port_t *port = findMotorPort(portIndex);
 
@@ -644,10 +635,10 @@ class Stm32F405DshotEsc : public DshotEsc {
             m_ports[0].channel = TIM_CHANNEL_1;
             m_ports[1].channel = TIM_CHANNEL_2;
 
-            initMotor(0, 0, 0, TIM_CHANNEL_1);
-            initMotor(1, 0, 1, TIM_CHANNEL_2);
-            initMotor(2, 1, 3, TIM_CHANNEL_3);
-            initMotor(3, 1, 2, TIM_CHANNEL_4);
+            initMotor(0, 0, 0);
+            initMotor(1, 0, 1);
+            initMotor(2, 1, 3);
+            initMotor(3, 1, 2);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = outputARR;
