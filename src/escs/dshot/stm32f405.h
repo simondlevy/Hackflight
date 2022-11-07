@@ -56,10 +56,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static const uint32_t RCC_AHB1ENR_GPIOAEN_MSK = 0x00000001;
         static const uint32_t RCC_AHB1ENR_GPIOBEN_MSK = 0x00000002;
-        static const uint32_t RCC_AHB1ENR_GPIOCEN_MSK = 0x00000004;
-        static const uint32_t RCC_AHB1ENR_GPIODEN_MSK = 0x00000008;
-        static const uint32_t RCC_AHB1ENR_GPIOEEN_MSK = 0x00000010;
-        static const uint32_t RCC_AHB1ENR_GPIOFEN_MSK = 0x00000020;
 
         static const uint8_t GPIO_FAST_SPEED = 0x02;
         static const uint8_t GPIO_MODE_OUT   = 0x01;
