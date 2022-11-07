@@ -16,7 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-typedef enum {
+enum {
     DMA_NONE,
     DMA1_ST0_HANDLER,
     DMA1_ST1_HANDLER,
@@ -35,7 +35,7 @@ typedef enum {
     DMA2_ST6_HANDLER,
     DMA2_ST7_HANDLER,
     DMA_LAST_HANDLER = DMA2_ST7_HANDLER
-} dmaIdentifier_e;
+};
 
 // dmaResource_t is a opaque data type which represents a single DMA engine,
 // called and implemented differently in different families of STM32s.

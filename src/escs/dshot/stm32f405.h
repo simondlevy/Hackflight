@@ -111,10 +111,10 @@ class Stm32F405DshotEsc : public DshotEsc {
             port_t * port;
         } motor_t;
 
-        typedef struct dmaChannelDescriptor_s {
-            uint8_t                   flagsShift;
-            IRQn_Type                 irqN;
-            port_t *                  port;
+        typedef struct {
+            uint8_t    flagsShift;
+            IRQn_Type  irqN;
+            port_t *   port;
         } dmaChannelDescriptor_t;
 
         typedef struct {
