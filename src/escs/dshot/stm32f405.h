@@ -405,7 +405,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                 ((DMAy_Streamx->FCR & (uint32_t)~(DMA_SxFCR_DMDIS | DMA_SxFCR_FTH)) |
                  (DMA_FIFOMODE_ENABLE | DMA_FIFO_THRESHOLD_1QUARTERFULL));
             DMAy_Streamx->NDTR = BUF_LENGTH;
-            // DMAy_Streamx->PAR = (uint32_t)&port->gpio->BSRR;
             DMAy_Streamx->PAR = (uint32_t)&gpio->BSRR;
             DMAy_Streamx->M0AR = (uint32_t)port->outputBuffer;
 
@@ -560,7 +559,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 buffer[bitpos * 3 + 2] |= resetMask; // Always reset all ports
             }
     
-            port->gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
+            /*port->*/gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
 
             // Set GPIO to output
             ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
