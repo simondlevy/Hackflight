@@ -25,6 +25,26 @@
 
 class UsfsImu : public Imu {
 
+    private:
+
+        static const uint8_t  GYRO_RATE_TENTH = 100;   // 1/10th actual rate
+        static const uint16_t GYRO_SCALE_DPS  = 2000;
+
+        // Arbitrary; unused
+        static const uint8_t  ACCEL_BANDWIDTH  = 3;
+        static const uint8_t  GYRO_BANDWIDTH   = 3;
+        static const uint8_t  QUAT_DIVISOR     = 1;
+        static const uint8_t  MAG_RATE         = 100;
+        static const uint8_t  ACCEL_RATE_TENTH = 20; // Multiply by 10 to get actual rate
+        static const uint8_t  BARO_RATE        = 50;
+        static const uint16_t ACCEL_SCALE      = 8;
+        static const uint16_t MAG_SCALE        = 1000;
+
+        static const uint8_t INTERRUPT_ENABLE = USFS_INTERRUPT_RESET_REQUIRED |
+            USFS_INTERRUPT_ERROR |
+            USFS_INTERRUPT_GYRO | 
+            USFS_INTERRUPT_QUAT;
+
     protected:
 
         virtual void begin(void) override 
