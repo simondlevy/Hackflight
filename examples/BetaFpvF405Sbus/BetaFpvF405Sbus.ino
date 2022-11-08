@@ -19,8 +19,7 @@
 
 #include <hackflight.h>
 #include <alignment/rotate270.h>
-#include <boards/stm32/stm32f.h>
-//#include <core/clock.h>
+#include <boards/stm32/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot/stm32f405.h>
 #include <leds/real.h>
@@ -73,7 +72,7 @@ void setup(void)
 
     static SbusReceiver rx(Serial3);
 
-    static Stm32FBoard board;
+    static Stm32F4Board board;
 
     vector<uint8_t> pins = {0x20, 0x21, 0x13, 0x12};
 

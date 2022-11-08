@@ -18,7 +18,7 @@
 
 #include "boards/stm32.h"
 
-class Stm32FBoard : public Stm32Board {
+class Stm32F4Board : public Stm32Board {
 
     virtual void reboot(void) override
     {
