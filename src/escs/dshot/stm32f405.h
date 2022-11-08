@@ -23,7 +23,6 @@
 #include "escs/dshot.h"
 
 #include "stm32f4xx.h"
-#include "dma.h"
 
 __attribute__( ( always_inline ) ) static inline void __set_BASEPRI_nb(uint32_t basePri)
 {
@@ -96,11 +95,11 @@ class Stm32F405DshotEsc : public DshotEsc {
         // Typedefs ====================================================================
 
         typedef struct {
-            dmaResource_t * dmaResource;
-            uint16_t        dmaSource;
-            uint32_t *      outputBuffer;
-            uint32_t        cr;
-            uint8_t         flagsShift;
+            DMA_Stream_TypeDef * dmaStream;
+            uint16_t             dmaSource;
+            uint32_t *           outputBuffer;
+            uint32_t             cr;
+            uint8_t              flagsShift;
         } port_t;
 
         typedef struct {
@@ -173,7 +172,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static void dmaCmd(port_t *port, FunctionalState newState)
         {
-            DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)port->dmaResource;
+            DMA_Stream_TypeDef * DMAy_Streamx = port->dmaStream;
 
             if (newState != DISABLE) {
                 DMAy_Streamx->CR |= (uint32_t)DMA_SxCR_EN;
@@ -242,7 +241,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 const uint8_t polarity_shift2)
          {
             port_t * port = &m_ports[portIndex];
-            port->dmaResource = (dmaResource_t *)stream;
+            port->dmaStream = stream;
             port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
             port->flagsShift = flagsShift;
 
@@ -278,7 +277,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             NVIC->ISER[irqChannel >> 0x05] =
                 (uint32_t)0x01 << (irqChannel & (uint8_t)0x1F);
 
-            DMA_Stream_TypeDef * DMAy_Streamx = (DMA_Stream_TypeDef *)port->dmaResource;
+            DMA_Stream_TypeDef * DMAy_Streamx = port->dmaStream;
 
             DMAy_Streamx->CR = 0x0c025450;
 
@@ -288,7 +287,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             DMAy_Streamx->NDTR = BUF_LENGTH;
             DMAy_Streamx->M0AR = (uint32_t)port->outputBuffer;
 
-            port->cr = ((DMA_Stream_TypeDef *)port->dmaResource)->CR;
+            port->cr = port->dmaStream->CR;
 
             DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
 
@@ -384,7 +383,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             m_motors[motorIndex].port = port;
 
             if (motorIndex == 0 || motorIndex == 2) {
-                ((DMA_Stream_TypeDef *)port->dmaResource)->PAR = (uint32_t)&gpio->BSRR;
+                port->dmaStream->PAR = (uint32_t)&gpio->BSRR;
             }
 
             gpio->BSRR |= (pinmask << 16);
@@ -410,7 +409,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             }
 
             // Reinitialize port group DMA for output
-            ((DMA_Stream_TypeDef *)port->dmaResource)->CR = port->cr;
+            port->dmaStream->CR = port->cr;
 
         } // initMotor
 
