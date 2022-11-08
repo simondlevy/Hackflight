@@ -19,8 +19,12 @@
 
 #include <hackflight.h>
 #include <boards/stm32/ladybug.h>
+#include <core/mixers/fixedpitch/quadxbf.h>
+#include <escs/mock.h>
 #include <imus//mock.h>
+#include <leds//real.h>
 #include <tasks/receivers/mock.h>
+#include <alignment/rotate0.h>
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -31,11 +35,16 @@ static AnglePidController _anglePid(
 
 static vector<PidController *> _pids = {&_anglePid};
 
+static Mixer _mixer = QuadXbfMixer::make();
+
 void setup(void)
 {
     static MockReceiver rx;
-
     static LadybugBoard board;
+    static MockImu imu;
+    static RealLed led(18);
+
+    //static Hackflight hf(board, rx, imu, imuRotate270, _pids, _mixer, esc, led);
 }
 
 void loop(void)
