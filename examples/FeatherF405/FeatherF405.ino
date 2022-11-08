@@ -50,6 +50,7 @@ extern "C" void handleDmaIrq(uint8_t id)
 
 void setup(void)
 {
+    /*
     static MockReceiver rx;
 
     static Stm32FBoard board;
@@ -67,19 +68,22 @@ void setup(void)
     _esc = &esc;
     _hf = &hf;
 
-    hf.begin();
+    hf.begin();*/
+
+    Serial.begin(115200);
 }
 
 void loop(void)
 {
-    _hf->step();
+    // _hf->step();
 
-    Serial.print((uint32_t)_esc->tags[0]);
+    Serial.print(PA0, HEX);
     Serial.print(" ");
-    Serial.print((uint32_t)_esc->tags[1]);
+    Serial.print(PA1, HEX);
     Serial.print(" ");
-    Serial.print((uint32_t)_esc->tags[2]);
+    Serial.print(PA2, HEX);
     Serial.print(" ");
-    Serial.print((uint32_t)_esc->tags[3]);
+    Serial.print(PA3, HEX);
+    Serial.print(" ");
     Serial.println();
 }
