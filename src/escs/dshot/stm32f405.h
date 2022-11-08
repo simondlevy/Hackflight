@@ -224,11 +224,11 @@ class Stm32F405DshotEsc : public DshotEsc {
         }
 
         void initPort(
-                uint8_t portIndex,
-                uint16_t dmaSource,
+                const uint8_t portIndex,
+                const uint16_t dmaSource,
                 DMA_Stream_TypeDef * stream,
-                uint8_t flagsShift,
-                IRQn_Type irqChannel,
+                const uint8_t flagsShift,
+                const IRQn_Type irqChannel,
                 volatile uint32_t * ccr,
                 const uint32_t ccer_cc_e,
                 const uint32_t ccmr_oc,
