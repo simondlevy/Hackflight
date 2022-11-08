@@ -104,7 +104,7 @@ class Stm32F405DshotEsc : public DshotEsc {
         } port_t;
 
         typedef struct {
-            int32_t pinIndex;    
+            uint32_t middleBit;    
             port_t * port;
         } motor_t;
 
@@ -316,9 +316,9 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void initMotor(uint8_t motorIndex, uint8_t pinIndex, uint8_t portIndex)
         {
-            uint8_t pin = (*m_pins)[motorIndex];
+            m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
-            m_motors[motorIndex].pinIndex = pinIndex;
+            uint8_t pin = (*m_pins)[motorIndex];
 
             uint8_t ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
 
@@ -503,11 +503,9 @@ class Stm32F405DshotEsc : public DshotEsc {
             motor_t * const motor = &m_motors[index];
             port_t *port = motor->port;
 
-            uint32_t middleBit = (1 << (motor->pinIndex + 16));
-
             for (auto pos=0; pos<16; pos++) {
                 if (!(packet & 0x8000)) {
-                    port->outputBuffer[pos * 3 + 1] |= middleBit;
+                    port->outputBuffer[pos * 3 + 1] |= motor->middleBit;
                 }
                 packet <<= 1;
             }        
