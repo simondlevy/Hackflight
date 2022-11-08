@@ -20,12 +20,17 @@
 
 #include "imu.h"
 
+#include <Wire.h>
+
 class UsfsImu : public Imu {
 
     protected:
 
         virtual void begin(void) override 
         {
+            Wire.begin();
+            Wire.setClock(400000); 
+            delay(100);
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
