@@ -51,8 +51,8 @@ static void handleImuInterrupt(void)
 
 void setup(void)
 {
-    //pinMode(IMU_INTERRUPT_PIN, INPUT);
-    //attachInterrupt(IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
+    pinMode(IMU_INTERRUPT_PIN, INPUT);
+    attachInterrupt(IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
 
     static LadybugBoard board;
     static MockReceiver rx;
