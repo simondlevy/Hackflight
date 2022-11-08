@@ -49,6 +49,13 @@ class UsfsImu : public Imu {
         uint32_t m_gyroInterruptCount;
         uint32_t m_gyroSyncTime;
 
+        float m_qw;
+        float m_qx;
+        float m_qy;
+        float m_qz;
+
+        int16_t m_gyroAdc[3];
+
     protected:
 
         virtual void begin(void) override 
@@ -127,7 +134,29 @@ class UsfsImu : public Imu {
 
         virtual bool gyroIsReady(void) override
         {
-            return false;
+            bool result = false;
+
+            if (m_gotNewData) { 
+
+                m_gotNewData = false;  
+
+                uint8_t eventStatus = usfsCheckStatus(); 
+
+                if (usfsEventStatusIsError(eventStatus)) { 
+                    usfsReportError(eventStatus);
+                }
+
+                if (usfsEventStatusIsGyrometer(eventStatus)) { 
+                    usfsReadGyrometerRaw(m_gyroAdc);
+                    result = true;
+                }
+
+                if (usfsEventStatusIsQuaternion(eventStatus)) { 
+                    usfsReadQuaternion(m_qw, m_qx, m_qy, m_qz);
+                }
+            } 
+
+            return result;
         }
 
         virtual auto readGyroDps(const align_fun align) -> Axes  override
