@@ -223,41 +223,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         // Private instance methods =====================================================
 
-        static void timOcInit(
-                volatile uint32_t * ccr,
-                const uint32_t ccer_cc_e,
-                const uint32_t ccmr_oc,
-                const uint32_t ccmr_cc,
-                const uint32_t ccer_ccp,
-                const uint32_t ccer_ccnp,
-                const uint32_t cr2_ois,
-                const uint8_t mode_shift,
-                const uint8_t polarity_shift1,
-                const uint8_t state_shift,
-                const uint8_t polarity_shift2
-                )
-        {
-            TIM1->CCER &= (uint16_t)~ccer_cc_e;
-            uint16_t tmpccer = TIM1->CCER;
-            uint16_t tmpcr2 =  TIM1->CR2;
-            uint16_t tmpccmrx = TIM1->CCMR1;
-            tmpccmrx &= (uint16_t)~ccmr_oc;
-            tmpccmrx &= (uint16_t)~ccmr_cc;
-            tmpccmrx |= (TIM_OCMODE_TIMING << mode_shift);
-            tmpccer &= (uint16_t)~ccer_ccp;
-            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift1);
-            tmpccer |= (TIM_OUTPUTSTATE_ENABLE < state_shift);
-
-            tmpccer &= (uint16_t)~ccer_ccnp;
-            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift2);
-            tmpcr2 &= (uint16_t)~cr2_ois;
-
-            TIM1->CR2 = tmpcr2;
-            TIM1->CCMR1 = tmpccmrx;
-            *ccr = 0x00000000;
-            TIM1->CCER = tmpccer;
-        }
-
         void updateStartMotorPort(port_t * port)
         {
             dmaCmd(port, DISABLE);
@@ -272,8 +237,19 @@ class Stm32F405DshotEsc : public DshotEsc {
                 uint16_t dmaSource,
                 DMA_Stream_TypeDef * stream,
                 uint8_t flagsShift,
-                IRQn_Type irqN)
-        {
+                IRQn_Type irqN,
+                volatile uint32_t * ccr,
+                const uint32_t ccer_cc_e,
+                const uint32_t ccmr_oc,
+                const uint32_t ccmr_cc,
+                const uint32_t ccer_ccp,
+                const uint32_t ccer_ccnp,
+                const uint32_t cr2_ois,
+                const uint8_t mode_shift,
+                const uint8_t polarity_shift1,
+                const uint8_t state_shift,
+                const uint8_t polarity_shift2)
+         {
             dmaChannelDescriptor_t * desc = &m_dmaDescriptors[portIndex+9];
             desc->flagsShift = flagsShift;
             desc->irqN = irqN;
@@ -330,7 +306,28 @@ class Stm32F405DshotEsc : public DshotEsc {
             port->CR = ((DMA_Stream_TypeDef *)port->dmaResource)->CR;
 
             DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
-        }
+
+            TIM1->CCER &= (uint16_t)~ccer_cc_e;
+            uint16_t tmpccer = TIM1->CCER;
+            uint16_t tmpcr2 =  TIM1->CR2;
+            uint16_t tmpccmrx = TIM1->CCMR1;
+            tmpccmrx &= (uint16_t)~ccmr_oc;
+            tmpccmrx &= (uint16_t)~ccmr_cc;
+            tmpccmrx |= (TIM_OCMODE_TIMING << mode_shift);
+            tmpccer &= (uint16_t)~ccer_ccp;
+            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift1);
+            tmpccer |= (TIM_OUTPUTSTATE_ENABLE < state_shift);
+
+            tmpccer &= (uint16_t)~ccer_ccnp;
+            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift2);
+            tmpcr2 &= (uint16_t)~cr2_ois;
+
+            TIM1->CR2 = tmpcr2;
+            TIM1->CCMR1 = tmpccmrx;
+            *ccr = 0x00000000;
+            TIM1->CCER = tmpccer;
+
+         } // initPort
 
         void initMotor(uint8_t motorIndex, uint8_t pinIndex, uint8_t portIndex)
         {
@@ -483,16 +480,15 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             TIM1->CR1 |= TIM_CR1_ARPE;
 
-            timOcInit(&TIM1->CCR1, TIM_CCER_CC1E,
-                    TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
-                    TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
+            initPort(0, TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn,
+                &TIM1->CCR1, TIM_CCER_CC1E,
+                TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
+                TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
 
-            timOcInit(&TIM1->CCR2, TIM_CCER_CC2E,
-                    TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
-                    TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
-
-            initPort(0, TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn); 
-            initPort(1, TIM_DMA_CC2, DMA2_Stream2, 16, DMA2_Stream2_IRQn); 
+            initPort(1, TIM_DMA_CC2, DMA2_Stream2, 16, DMA2_Stream2_IRQn,
+                &TIM1->CCR2, TIM_CCER_CC2E,
+                TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
+                TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
             initMotor(0, 0, 0);
             initMotor(1, 1, 0);
@@ -551,12 +547,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             timDmaCmd(port->dmaSource, DISABLE);
 
-            //if (descriptor->flagsShift > 31) {
-            //    DMA2->HIFCR = (DMA_IT_TCIF << (descriptor->flagsShift - 32)); 
-            //}
-            //else {
-                DMA2->LIFCR = (DMA_IT_TCIF << descriptor->flagsShift);
-            //}
+            DMA2->LIFCR = (DMA_IT_TCIF << descriptor->flagsShift);
         }
 
 }; // class Stm32F4DshotEsc
