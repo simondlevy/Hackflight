@@ -114,9 +114,10 @@ class UsfsImu : public Imu {
                 const uint32_t nextTargetCycles,
                 const int32_t desiredPeriodCycles) override
         {
-            (void)nextTargetCycles;
-            (void)desiredPeriodCycles;
-            return 0;
+            const auto skew =
+                cmpTimeCycles(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;
+
+            return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
         }
 
         virtual bool gyroIsCalibrating(void) override
