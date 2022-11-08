@@ -99,17 +99,7 @@ class UsfsImu : public Imu {
 
         virtual uint32_t getGyroInterruptCount(void) override
         {
-            static uint32_t _count;
-            static uint32_t _tprev;
-
-            // Simulate 8kHz interrupts
-            uint32_t time = micros();
-            if (time - _tprev > 125) {
-                _count++;
-                _tprev = time;
-            }
-
-            return _count;
+            return m_gyroInterruptCount;
         }
 
         virtual int32_t getGyroSkew(
