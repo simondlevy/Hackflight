@@ -234,7 +234,7 @@ class Stm32F405DshotEsc : public DshotEsc {
                 uint16_t dmaSource,
                 DMA_Stream_TypeDef * stream,
                 uint8_t flagsShift,
-                IRQn_Type irqN,
+                IRQn_Type irqChannel,
                 volatile uint32_t * ccr,
                 const uint32_t ccer_cc_e,
                 const uint32_t ccmr_oc,
@@ -270,8 +270,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
             m_dmaDescriptors[index].port = port;
-
-            uint8_t irqChannel = irqN;
 
             uint8_t tmppriority = 0x00, tmppre = 0x00, tmpsub = 0x0F;
 
