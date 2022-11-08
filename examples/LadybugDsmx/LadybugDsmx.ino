@@ -21,7 +21,8 @@
 #include <boards/stm32/ladybug.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/mock.h>
-#include <imus//mock.h>
+#include <imus/mock.h>
+#include <imus/real/usfs.h>
 #include <leds//real.h>
 #include <tasks/receivers/mock.h>
 #include <alignment/rotate0.h>
@@ -39,17 +40,24 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 static Hackflight * _hf;
 
+static UsfsImu * _imu;
+
 void setup(void)
 {
     static LadybugBoard board;
     static MockReceiver rx;
-    static MockImu imu;
     static MockEsc esc;
+
     static RealLed led(18);
+
+    static MockImu imu;
+
+    static UsfsImu imu2;
 
     static Hackflight hf(board, rx, imu, imuRotate0, _pids, _mixer, esc, led);
 
     _hf = &hf;
+    _imu = &imu2;
 
     hf.begin();
 }
