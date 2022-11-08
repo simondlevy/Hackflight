@@ -109,10 +109,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         } motor_t;
 
         typedef struct {
-            port_t *   port;
-        } dmaChannelDescriptor_t;
-
-        typedef struct {
             GPIO_TypeDef *gpio;
         } ioRec_t;
 
