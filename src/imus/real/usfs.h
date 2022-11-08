@@ -64,6 +64,9 @@ class UsfsImu : public Imu {
                     GYRO_RATE_TENTH,
                     BARO_RATE,
                     INTERRUPT_ENABLE);
+
+            // Clear interrupts
+            usfsCheckStatus();
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
