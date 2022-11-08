@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "board.h"
 #include "core/clock.h"
 #include "core/constrain.h"
 #include "esc.h"
