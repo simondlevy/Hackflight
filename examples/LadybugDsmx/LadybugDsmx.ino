@@ -27,6 +27,9 @@
 #include <tasks/receivers/mock.h>
 #include <alignment/rotate0.h>
 
+static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
+static const uint8_t LED_PIN = 0x12;
+
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -48,7 +51,7 @@ void setup(void)
     static MockReceiver rx;
     static MockEsc esc;
 
-    static RealLed led(18);
+    static RealLed led(LED_PIN);
 
     static MockImu imu;
 
