@@ -345,13 +345,13 @@ class Stm32F405DshotEsc : public DshotEsc {
             uint32_t speed = (config >> 2) & 0x03;
             uint32_t pull  = (config >> 5) & 0x03;
 
-            int32_t offset = __builtin_popcount(((1 << (pin & 0x0f)) - 1) & 0xffff);
+            int32_t offset = __builtin_popcount(((1 << pinIndex) - 1) & 0xffff);
             offset += ioDefUsedOffset[(pin >> 4) - 1];
             const void * io =  m_ioRecs + offset;
             const ioRec_t * ioRec = (ioRec_t *)io;
             GPIO_TypeDef * gpio = ioRec->gpio;
 
-            uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
+            uint32_t pinpos = 0x00, pos = 0x00;
 
             uint8_t pinmask = 1 << pinIndex;
 
@@ -359,9 +359,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             {
                 pos = ((uint32_t)0x01) << pinpos;
 
-                currentpin = pinmask & pos;
-
-                if (currentpin == pos)
+                if (pinmask & pos == pos)
                 {
                     gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
                     gpio->MODER |= (mode << (pinpos * 2));
