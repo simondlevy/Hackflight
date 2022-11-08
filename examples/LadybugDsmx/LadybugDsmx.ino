@@ -21,7 +21,7 @@
 #include <boards/stm32/ladybug.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/mock.h>
-#include <imus/real/foo.h>
+#include <imus/real/usfs.h>
 #include <leds//real.h>
 #include <tasks/receivers/mock.h>
 #include <alignment/rotate0.h>
