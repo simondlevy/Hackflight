@@ -44,9 +44,13 @@ static Hackflight * _hf;
 
 static UsfsImu * _imu;
 
+static volatile uint32_t _icount;
+
 static void handleImuInterrupt(void)
 {
     _imu->handleInterrupt();
+
+    _icount++;
 }
 
 void setup(void)
@@ -55,6 +59,7 @@ void setup(void)
     attachInterrupt(IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
 
     static LadybugBoard board;
+
     static MockReceiver rx;
     static MockEsc esc;
 
