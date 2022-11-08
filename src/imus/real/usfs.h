@@ -20,13 +20,31 @@
 #include "imus/real.h"
 
 #include <USFS.h>
+#include <Wire.h>
 
 class UsfsImu : public Imu {
 
-    protected:
+    private:
+
+        uint32_t m_gyroInterruptCount;
+        uint32_t m_gyroSyncTime;
+
+     protected:
+
+        void devInit(uint32_t * m_gyroInterruptCount, uint32_t * m_gyroSyncTime)
+        {
+            (void)m_gyroInterruptCount;
+            (void)m_gyroSyncTime;
+
+            Wire.begin();
+            Wire.setClock(400000);
+            delay(100);
+
+        }
 
         virtual void begin(void) override 
         {
+            devInit(&m_gyroSyncTime, &m_gyroInterruptCount);
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
