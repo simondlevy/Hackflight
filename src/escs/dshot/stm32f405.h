@@ -51,7 +51,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
     private:
 
-        // Constants ====================================================================
+        // Constants ===================================================================
 
         static const uint32_t RCC_AHB1ENR_GPIOAEN_MSK = 0x00000001;
         static const uint32_t RCC_AHB1ENR_GPIOBEN_MSK = 0x00000002;
@@ -97,9 +97,10 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         typedef struct {
             dmaResource_t * dmaResource;
-            uint16_t dmaSource;
-            uint32_t * outputBuffer;
-            uint32_t CR;
+            uint16_t        dmaSource;
+            uint32_t *      outputBuffer;
+            uint32_t        CR;
+            uint8_t         flagsShift;
         } port_t;
 
         typedef struct {
@@ -108,8 +109,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         } motor_t;
 
         typedef struct {
-            uint8_t    flagsShift;
-            IRQn_Type  irqN;
             port_t *   port;
         } dmaChannelDescriptor_t;
 
@@ -249,12 +248,11 @@ class Stm32F405DshotEsc : public DshotEsc {
                 const uint8_t polarity_shift2)
          {
             dmaChannelDescriptor_t * desc = &m_dmaDescriptors[portIndex+9];
-            desc->flagsShift = flagsShift;
-            desc->irqN = irqN;
 
             port_t * port = &m_ports[portIndex];
             port->dmaResource = (dmaResource_t *)stream;
             port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
+            port->flagsShift = flagsShift;
 
             TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
 
@@ -273,7 +271,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
             m_dmaDescriptors[index].port = port;
 
-            uint8_t irqChannel = m_dmaDescriptors[index].irqN;
+            uint8_t irqChannel = irqN;
 
             uint8_t tmppriority = 0x00, tmppre = 0x00, tmpsub = 0x0F;
 
@@ -545,7 +543,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             timDmaCmd(port->dmaSource, DISABLE);
 
-            DMA2->LIFCR = (DMA_IT_TCIF << descriptor->flagsShift);
+            DMA2->LIFCR = (DMA_IT_TCIF << port->flagsShift);
         }
 
 }; // class Stm32F4DshotEsc
