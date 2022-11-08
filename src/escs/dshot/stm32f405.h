@@ -116,10 +116,6 @@ class Stm32F405DshotEsc : public DshotEsc {
         } dmaChannelDescriptor_t;
 
         typedef struct {
-            dmaResource_t * ref;
-        } dmaTimerMapping_t;
-
-        typedef struct {
             GPIO_TypeDef *gpio;
         } ioRec_t;
 
@@ -221,8 +217,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         dmaChannelDescriptor_t m_dmaDescriptors[DMA_LAST_HANDLER];
 
-        dmaTimerMapping_t m_dmaTimerMapping[DMA_TIMER_MAPPING_COUNT] = {};
-
         ioRec_t m_ioRecs[96];
 
         uint16_t m_pacerDmaSources = 0x0000;
@@ -280,14 +274,12 @@ class Stm32F405DshotEsc : public DshotEsc {
                 uint8_t flagsShift,
                 IRQn_Type irqN)
         {
-            m_dmaTimerMapping[portIndex].ref = (dmaResource_t *)stream;
-
             dmaChannelDescriptor_t * desc = &m_dmaDescriptors[portIndex+9];
             desc->flagsShift = flagsShift;
             desc->irqN = irqN;
 
             port_t * port = &m_ports[portIndex];
-            port->dmaResource = m_dmaTimerMapping[portIndex].ref;
+            port->dmaResource = (dmaResource_t *)stream;
             port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
 
             TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
