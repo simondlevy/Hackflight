@@ -62,8 +62,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         static const uint32_t RCC_AHB1PERIPH_DMA2 = 0x00400000;
 
-        static const uint8_t DMA_TIMER_MAPPING_COUNT = 2;
-
         static const uint32_t NVIC_PRIORITY_GROUPING = 0x500;
 
         static const uint8_t DEFIO_PORT_USED_COUNT = 6;
