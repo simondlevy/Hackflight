@@ -82,24 +82,19 @@ class UsfsImu : public Imu {
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
         {
-            // Simulates rocking in the X (phi) axis
-
             (void)time;
 
-            static float phi;
-            static int8_t dir = +1;
+            const auto qw = m_qw;
+            const auto qx = m_qx;
+            const auto qy = m_qy;
+            const auto qz = m_qz;
 
-            phi += .01 * dir;
+            const auto phi = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
+            const auto theta = asin(2.0f*(qx*qz-qw*qy));
+            const auto psi = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
 
-            if (phi >= 1.0) {
-                dir = -1;
-            }
-
-            if (phi <= -1.0) {
-                dir = +1;
-            }
-
-            return Axes(phi, 0.1, 0.1);
+            // Convert heading from [-pi,+pi] to [0,2*pi]
+            return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
         }
 
         virtual uint32_t getGyroInterruptCount(void) override
