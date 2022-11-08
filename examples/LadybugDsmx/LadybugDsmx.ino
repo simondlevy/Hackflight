@@ -19,6 +19,7 @@
 
 #include <hackflight.h>
 #include <boards/stm32/ladybug.h>
+#include <imus//mock.h>
 #include <tasks/receivers/mock.h>
 
 static AnglePidController _anglePid(
