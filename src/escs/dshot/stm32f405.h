@@ -314,11 +314,13 @@ class Stm32F405DshotEsc : public DshotEsc {
 
          } // initPort
 
-        void initMotor(uint8_t motorIndex, uint8_t pinIndex, uint8_t portIndex)
+        void initMotor(uint8_t motorIndex, uint8_t portIndex)
         {
-            m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
-
             uint8_t pin = (*m_pins)[motorIndex];
+
+            uint8_t pinIndex = pin & 0x0f;
+
+            m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
             uint8_t ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
 
@@ -475,10 +477,11 @@ class Stm32F405DshotEsc : public DshotEsc {
                 TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                 TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
-            initMotor(0, 0, 0);
-            initMotor(1, 1, 0);
-            initMotor(2, 3, 1);
-            initMotor(3, 2, 1);
+            // initMotor(motorIndex, portIndex)
+            initMotor(0, 0); 
+            initMotor(1, 0);
+            initMotor(2, 1);
+            initMotor(3, 1);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = outputARR;
