@@ -212,8 +212,6 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         uint32_t m_outputBuffer[BUF_LENGTH * MAX_SUPPORTED_MOTORS];
 
-        dmaChannelDescriptor_t m_dmaDescriptors[DMA_LAST_HANDLER];
-
         ioRec_t m_ioRecs[96];
 
         uint16_t m_pacerDmaMask = 0x0000;
@@ -247,8 +245,6 @@ class Stm32F405DshotEsc : public DshotEsc {
                 const uint8_t state_shift,
                 const uint8_t polarity_shift2)
          {
-            dmaChannelDescriptor_t * desc = &m_dmaDescriptors[portIndex+9];
-
             port_t * port = &m_ports[portIndex];
             port->dmaResource = (dmaResource_t *)stream;
             port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
@@ -269,7 +265,6 @@ class Stm32F405DshotEsc : public DshotEsc {
             const int8_t index = portIndex == 0 ? 9 : 10;
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
-            m_dmaDescriptors[index].port = port;
 
             uint8_t tmppriority = 0x00, tmppre = 0x00, tmpsub = 0x0F;
 
@@ -529,13 +524,9 @@ class Stm32F405DshotEsc : public DshotEsc {
         {
         }
 
-        void handleDmaIrq(const uint8_t id)
+        void handleDmaIrq(const uint8_t index)
         {
-            const uint8_t index = id - 1;
-            
-            dmaChannelDescriptor_t * descriptor = &m_dmaDescriptors[index];
-
-            port_t *port = descriptor->port;
+            port_t *port = &m_ports[index];
 
             dmaCmd(port, DISABLE);
 
