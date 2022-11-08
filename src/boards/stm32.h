@@ -18,8 +18,6 @@
 
 #include "board.h"
 
-#include "stm32f4xx.h"
-
 class Stm32Board : public Board {
 
     virtual uint32_t getClockSpeed(void) override

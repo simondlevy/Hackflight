@@ -18,6 +18,8 @@
 
 #include "boards/stm32.h"
 
+#include <stm32f4xx.h>
+
 class Stm32F4Board : public Stm32Board {
 
     virtual void reboot(void) override
