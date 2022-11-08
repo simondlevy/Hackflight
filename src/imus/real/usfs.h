@@ -52,9 +52,18 @@ class UsfsImu : public Imu {
             Wire.begin();
             Wire.setClock(400000); 
             delay(100);
-            
+
             usfsLoadFirmware(); 
 
+            usfsBegin(
+                    ACCEL_BANDWIDTH,
+                    GYRO_BANDWIDTH,
+                    QUAT_DIVISOR,
+                    MAG_RATE,
+                    ACCEL_RATE_TENTH,
+                    GYRO_RATE_TENTH,
+                    BARO_RATE,
+                    INTERRUPT_ENABLE);
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
