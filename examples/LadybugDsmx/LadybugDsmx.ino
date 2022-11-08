@@ -42,7 +42,7 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 static Hackflight * _hf;
 
-static FooImu * _imu;
+static UsfsImu * _imu;
 
 static void handleImuInterrupt(void)
 {
@@ -60,7 +60,7 @@ void setup(void)
 
     static RealLed led(LED_PIN);
 
-    static FooImu imu;
+    static UsfsImu imu;
 
     static Hackflight hf(board, rx, imu, imuRotate0, _pids, _mixer, esc, led);
 

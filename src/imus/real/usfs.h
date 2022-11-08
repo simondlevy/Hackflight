@@ -20,7 +20,7 @@
 
 #include "imu.h"
 
-class FooImu : public Imu {
+class UsfsImu : public Imu {
 
     protected:
 
