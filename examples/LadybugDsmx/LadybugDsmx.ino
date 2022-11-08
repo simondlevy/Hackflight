@@ -1,4 +1,3 @@
-
 /*
    Copyright (c) 2022 Simon D. Levy
 
@@ -19,19 +18,22 @@
  */
 
 #include <hackflight.h>
-#include <arduino/ladybug.h>
-#include <tasks/receivers/real/dsmx.h>
+#include <tasks/receivers/mock.h>
 
-static DsmxReceiver _receiver;
+static AnglePidController _anglePid(
+        1.441305,     // Rate Kp
+        48.8762,      // Rate Ki
+        0.021160,     // Rate Kd
+        0.0165048,    // Rate Kf
+        0.0); // 3.0; // Level Kp
 
-static LadybugFc _ladybug = LadybugFc(_receiver);
+static vector<PidController *> _pids = {&_anglePid};
 
 void setup(void)
 {
-    _ladybug.begin();
+    static MockReceiver rx;
 }
 
 void loop(void)
 {
-    _ladybug.step();
 }
