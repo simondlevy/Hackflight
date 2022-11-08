@@ -39,12 +39,13 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 void setup(void)
 {
-    static MockReceiver rx;
     static LadybugBoard board;
+    static MockReceiver rx;
     static MockImu imu;
+    static MockEsc esc;
     static RealLed led(18);
 
-    //static Hackflight hf(board, rx, imu, imuRotate270, _pids, _mixer, esc, led);
+    static Hackflight hf(board, rx, imu, imuRotate0, _pids, _mixer, esc, led);
 }
 
 void loop(void)
