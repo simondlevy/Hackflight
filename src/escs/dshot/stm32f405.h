@@ -93,7 +93,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             RCC_AHB1,
         };
 
-        // Typedefs =====================================================================
+        // Typedefs ====================================================================
 
         typedef struct {
             dmaResource_t * dmaResource;
@@ -117,7 +117,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             GPIO_TypeDef *gpio;
         } ioRec_t;
 
-        // Static local funs ============================================================
+        // Static local funs ===========================================================
 
         static uint8_t io_config(
                 const uint8_t mode,
@@ -205,7 +205,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             return (uint8_t)rcc_encode(RCC_AHB1, gpio); 
         }
 
-        // Instance variables ===========================================================
+        // Instance variables ==========================================================
 
         port_t m_ports[2];
 
@@ -217,9 +217,9 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         ioRec_t m_ioRecs[96];
 
-        uint16_t m_pacerDmaSources = 0x0000;
+        uint16_t m_pacerDmaMask = 0x0000;
 
-        // Private instance methods =====================================================
+        // Private instance methods ====================================================
 
         void updateStartMotorPort(port_t * port)
         {
@@ -264,7 +264,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             port->dmaSource = dmaSource;
 
-            m_pacerDmaSources |= port->dmaSource;
+            m_pacerDmaMask |= port->dmaSource;
 
             uint32_t priority = nvic_build_priority(2, 1);
 
@@ -427,7 +427,7 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         } // initMotor
 
-    protected: // DshotEsc method overrides =============================================
+    protected: // DshotEsc method overrides ============================================
 
         virtual void deviceInit(uint32_t outputFreq) override
         {
@@ -502,7 +502,7 @@ class Stm32F405DshotEsc : public DshotEsc {
             dmaCmd(&m_ports[0], ENABLE);
             dmaCmd(&m_ports[1], ENABLE);
 
-            timDmaCmd(m_pacerDmaSources, ENABLE);
+            timDmaCmd(m_pacerDmaMask, ENABLE);
         }
 
         virtual void updateStart(void) override
