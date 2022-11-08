@@ -82,6 +82,8 @@ class DshotEsc : public Esc {
 
         uint8_t m_motorPins[MAX_SUPPORTED_MOTORS];
 
+        Board * m_board;
+
         bool isLastCommand(void)
         {
             return ((m_commandQueueTail + 1) % (MAX_COMMANDS + 1) == m_commandQueueHead);
@@ -267,9 +269,11 @@ class DshotEsc : public Esc {
         virtual void updateStart(void) = 0;
         virtual void writeMotor(uint8_t index, uint16_t packet) = 0;
 
-        DshotEsc(vector<uint8_t> & pins, protocol_t protocol=DSHOT600) 
+        DshotEsc(Board & board, vector<uint8_t> & pins, protocol_t protocol=DSHOT600) 
             : Esc(pins)
         {
+            m_board = &board;
+
             m_protocol = protocol;
 
             m_motorCount = pins.size();

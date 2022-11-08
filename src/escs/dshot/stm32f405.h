@@ -513,8 +513,9 @@ class Stm32F405DshotEsc : public DshotEsc {
 
     public:
 
-        Stm32F405DshotEsc(vector<uint8_t> & pins, protocol_t protocol=DSHOT600)
-            : DshotEsc(pins, protocol)
+        Stm32F405DshotEsc(
+                Board & board, vector<uint8_t> & pins, protocol_t protocol=DSHOT600)
+            : DshotEsc(board, pins, protocol)
         {
         }
 

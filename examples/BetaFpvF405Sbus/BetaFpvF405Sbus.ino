@@ -77,7 +77,7 @@ void setup(void)
 
     vector<uint8_t> pins = {0x20, 0x21, 0x13, 0x12};
 
-    static Stm32F405DshotEsc esc(pins);
+    static Stm32F405DshotEsc esc(board, pins);
 
     static Mpu6000 imu(CS_PIN, &board);
 
