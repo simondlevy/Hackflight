@@ -316,15 +316,15 @@ class Stm32F405DshotEsc : public DshotEsc {
 
         void initMotor(uint8_t motorIndex, uint8_t portIndex)
         {
-            uint8_t pin = (*m_pins)[motorIndex];
+            const uint8_t pin = (*m_pins)[motorIndex];
 
-            uint8_t pinIndex = pin & 0x0f;
+            const uint8_t pinIndex = pin & 0x0f;
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
             uint8_t ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
 
-            uint8_t config = io_config(
+            const uint8_t config = io_config(
                     GPIO_MODE_OUT,
                     GPIO_FAST_SPEED,
                     GPIO_OTYPE_PP,
@@ -337,27 +337,27 @@ class Stm32F405DshotEsc : public DshotEsc {
 
             const uint8_t rcc = ioPortDefs[portIndex];
 
-            uint32_t mask = 1 << (rcc & 0x1f);
+            RCC_AHB1PeriphClockEnable(1 << (rcc & 0x1f));
 
-            RCC_AHB1PeriphClockEnable(mask);
+            const uint32_t mode  = (config >> 0) & 0x03;
+            const uint32_t speed = (config >> 2) & 0x03;
+            const uint32_t pull  = (config >> 5) & 0x03;
 
-            uint32_t mode  = (config >> 0) & 0x03;
-            uint32_t speed = (config >> 2) & 0x03;
-            uint32_t pull  = (config >> 5) & 0x03;
+            const int32_t offset =
+                __builtin_popcount(((1 << pinIndex) - 1) & 0xffff) + 
+                ioDefUsedOffset[(pin >> 4) - 1];
 
-            int32_t offset = __builtin_popcount(((1 << pinIndex) - 1) & 0xffff);
-            offset += ioDefUsedOffset[(pin >> 4) - 1];
             const void * io =  m_ioRecs + offset;
-            const ioRec_t * ioRec = (ioRec_t *)io;
-            GPIO_TypeDef * gpio = ioRec->gpio;
 
-            uint32_t pinpos = 0x00, pos = 0x00;
+            const ioRec_t * ioRec = (ioRec_t *)io;
+
+            GPIO_TypeDef * gpio = ioRec->gpio;
 
             uint8_t pinmask = 1 << pinIndex;
 
-            for (pinpos = 0x00; pinpos < 0x10; pinpos++)
+            for (auto pinpos = 0; pinpos < 16; pinpos++)
             {
-                pos = ((uint32_t)0x01) << pinpos;
+                uint32_t pos = ((uint32_t)0x01) << pinpos;
 
                 if (pinmask & pos == pos)
                 {
