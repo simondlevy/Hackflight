@@ -33,6 +33,8 @@ static vector<PidController *> _pids = {&_anglePid};
 void setup(void)
 {
     static MockReceiver rx;
+
+    static LadybugBoard board;
 }
 
 void loop(void)
