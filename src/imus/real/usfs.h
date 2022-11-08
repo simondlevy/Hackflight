@@ -45,9 +45,9 @@ class UsfsImu : public Imu {
             USFS_INTERRUPT_GYRO | 
             USFS_INTERRUPT_QUAT;
 
-        bool       m_gotNewData;
-        uint32_t * m_syncTimePtr;
-        uint32_t * m_interruptCountPtr;
+        bool     m_gotNewData;
+        uint32_t m_gyroInterruptCount;
+        uint32_t m_gyroSyncTime;
 
     protected:
 
@@ -140,7 +140,7 @@ class UsfsImu : public Imu {
         void handleInterrupt(void)
         {
             m_gotNewData = true;
-            //*m_interruptCountPtr += 1;
-            //*m_syncTimePtr = micros();
+            m_gyroInterruptCount++;
+            m_gyroSyncTime = micros();
         }
 };
