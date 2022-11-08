@@ -46,7 +46,7 @@ static UsfsImu * _imu;
 
 static void handleImuInterrupt(void)
 {
-    //_imu->handleInterrupt();
+    _imu->handleInterrupt();
 }
 
 void setup(void)

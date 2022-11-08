@@ -89,4 +89,10 @@ class UsfsImu : public Imu {
             (void)align;
             return Axes(0, 0, 0);
         }
+
+    public:
+
+        void handleInterrupt(void)
+        {
+        }
 };
