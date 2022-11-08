@@ -29,10 +29,9 @@
 #include <vector>
 using namespace std;
 
-// See https://github.com/betaflight/unified-targets/blob/master/configs/default/BEFH-BETAFPVF405.config
-static const uint8_t CS_PIN   = PA4;
-static const uint8_t LED_PIN  = PB5;
-static const uint8_t EXTI_PIN = PC4;
+static const uint8_t IMU_CHIP_SELECT_PIN = PA4;
+static const uint8_t IMU_INTERRUPT_PIN = PC4;
+static const uint8_t LED_PIN = PB5;
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -67,8 +66,8 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 void setup(void)
 {
-    pinMode(EXTI_PIN, INPUT);
-    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+    pinMode(IMU_INTERRUPT_PIN, INPUT);
+    attachInterrupt(IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
 
     static SbusReceiver rx(Serial3);
 
@@ -78,7 +77,7 @@ void setup(void)
 
     static Stm32F405DshotEsc esc(board, pins);
 
-    static Mpu6000 imu(CS_PIN, &board);
+    static Mpu6000 imu(IMU_CHIP_SELECT_PIN, &board);
 
     static RealLed led(LED_PIN);
 
