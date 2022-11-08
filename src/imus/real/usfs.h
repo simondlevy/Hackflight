@@ -20,6 +20,7 @@
 
 #include "imu.h"
 
+#include <USFS.h>
 #include <Wire.h>
 
 class UsfsImu : public Imu {
