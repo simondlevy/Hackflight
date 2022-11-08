@@ -37,6 +37,8 @@ static vector<PidController *> _pids = {&_anglePid};
 
 static Mixer _mixer = QuadXbfMixer::make();
 
+static Hackflight * _hf;
+
 void setup(void)
 {
     static LadybugBoard board;
@@ -46,8 +48,13 @@ void setup(void)
     static RealLed led(18);
 
     static Hackflight hf(board, rx, imu, imuRotate0, _pids, _mixer, esc, led);
+
+    _hf = &hf;
+
+    hf.begin();
 }
 
 void loop(void)
 {
+    _hf->step();
 }
