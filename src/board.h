@@ -161,7 +161,11 @@ class Board {
 
             m_attitude.update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
-            // m_msp.update(usec, &selectedTask, &selectedTaskDynamicPriority);
+            m_msp.update(usec, &selectedTask, &selectedTaskDynamicPriority);
+
+            if (m_msp.gotRebootRequest()) {
+                reboot();
+            }
 
             if (selectedTask) {
 
