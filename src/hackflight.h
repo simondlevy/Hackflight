@@ -19,9 +19,6 @@
 
 #pragma once
 
-#undef min
-#undef max
-
 #include <math.h>
 #include <stdint.h>
 
