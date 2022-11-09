@@ -149,6 +149,49 @@ class Board {
 
         } // checkCoreTasks
 
+        void checkDynamicTasks(void)
+        {
+            Task *selectedTask = NULL;
+            uint16_t selectedTaskDynamicPriority = 0;
+
+            const uint32_t usec = micros(); //timeMicros();
+
+            m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority);
+
+            m_attitude.update(usec, &selectedTask, &selectedTaskDynamicPriority);
+
+            // m_msp.update(usec, &selectedTask, &selectedTaskDynamicPriority);
+
+            if (selectedTask) {
+
+                const auto nextTargetCycles = m_scheduler.getNextTargetCycles();
+
+                const auto taskRequiredTimeUs = selectedTask->getRequiredTime();
+
+                const auto nowCycles = getCycleCounter();
+
+                const auto loopRemainingCycles =
+                    cmpTimeCycles(nextTargetCycles, nowCycles);
+
+                // Allow a little extra time
+                const auto taskRequiredCycles =
+                    (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
+                    m_scheduler.getTaskGuardCycles();
+
+                if (taskRequiredCycles < loopRemainingCycles) {
+
+                    const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+
+                    selectedTask->execute(usec);
+
+                    m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
+                } else {
+                    selectedTask->enableRun();
+                }
+            }
+
+        } // checkDyanmicTasks
+
      protected:
 
         Board(const uint8_t ledPin)
