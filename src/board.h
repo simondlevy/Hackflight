@@ -58,6 +58,97 @@ class Board {
         Scheduler      m_scheduler;
         VehicleState   m_vstate;
 
+        void checkCoreTasks(uint32_t nowCycles)
+        {
+            int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
+            uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
+
+            m_scheduler.corePreUpdate();
+
+            while (loopRemainingCycles > 0) {
+                nowCycles = getCycleCounter();
+                loopRemainingCycles =
+                    cmpTimeCycles(nextTargetCycles, nowCycles);
+            }
+
+            if (m_imu->gyroIsReady()) {
+
+                auto angvels = m_imu->readGyroDps(m_imuAlignFun);
+
+                m_vstate.dphi   = angvels.x;
+                m_vstate.dtheta = angvels.y;
+                m_vstate.dpsi   = angvels.z;
+            }
+
+            auto usec = micros();
+
+            Demands demands = m_receiver->getDemands();
+
+            delayMicroseconds(10);
+
+            auto motors = m_mixer->step(
+                    demands,
+                    m_vstate,
+                    m_pidControllers,
+                    m_receiver->gotPidReset(),
+                    usec);
+
+            float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
+
+            for (auto i=0; i<m_mixer->getMotorCount(); i++) {
+
+                mixmotors[i] = m_esc->getMotorValue(motors.values[i], m_failsafeIsActive);
+            }
+
+            // m_esc->write(m_arming.isArmed() ?  mixmotors : m_msp.motors);
+
+            m_scheduler.corePostUpdate(nowCycles);
+
+            // Bring the scheduler into lock with the gyro Track the actual
+            // gyro rate over given number of cycle times and set the expected
+            // timebase
+            static uint32_t _terminalGyroRateCount;
+            static int32_t _sampleRateStartCycles;
+
+            if ((_terminalGyroRateCount == 0)) {
+                _terminalGyroRateCount = m_imu->getGyroInterruptCount() + CORE_RATE_COUNT;
+                _sampleRateStartCycles = nowCycles;
+            }
+
+            if (m_imu->getGyroInterruptCount() >= _terminalGyroRateCount) {
+                // Calculate number of clock cycles on average between gyro
+                // interrupts
+                uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
+                m_scheduler.desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
+                _sampleRateStartCycles = nowCycles;
+                _terminalGyroRateCount += CORE_RATE_COUNT;
+            }
+
+            // Track actual gyro rate over given number of cycle times and
+            // remove skew
+            static uint32_t _terminalGyroLockCount;
+            static int32_t _gyroSkewAccum;
+
+            auto gyroSkew =
+                m_imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
+
+            _gyroSkewAccum += gyroSkew;
+
+            if ((_terminalGyroLockCount == 0)) {
+                _terminalGyroLockCount = m_imu->getGyroInterruptCount() + GYRO_LOCK_COUNT;
+            }
+
+            if (m_imu->getGyroInterruptCount() >= _terminalGyroLockCount) {
+                _terminalGyroLockCount += GYRO_LOCK_COUNT;
+
+                // Move the desired start time of the gyroSampleTask
+                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
+
+                _gyroSkewAccum = 0;
+            }
+
+        } // checkCoreTasks
+
      protected:
 
         Board(const uint8_t ledPin)

@@ -32,6 +32,7 @@ static HardwareSerial * m_port;
 
 class Receiver : public Task {
 
+    friend class Board;
     friend class Hackflight;
     friend class Msp;
 
