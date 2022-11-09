@@ -101,7 +101,7 @@ class Board {
                 mixmotors[i] = m_esc->getMotorValue(motors.values[i], m_failsafeIsActive);
             }
 
-            // m_esc->write(m_arming.isArmed() ?  mixmotors : m_msp.motors);
+            m_esc->write(m_arming.isArmed() ?  mixmotors : m_msp.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
