@@ -418,12 +418,9 @@ class Stm32F4Board : public Stm32Board {
         {
             RCC_APB2PeriphClockEnable(
                     RCC_APB2LPENR_TIM1LPEN_Msk   |
-                    RCC_APB2LPENR_TIM8LPEN_Msk   |
                     RCC_APB2LPENR_USART1LPEN_Msk |
                     RCC_APB2LPENR_USART6LPEN_Msk |
                     RCC_APB2LPENR_ADC1LPEN_Msk   |
-                    RCC_APB2LPENR_ADC2LPEN_Msk   |
-                    RCC_APB2LPENR_ADC3LPEN_Msk   |
                     RCC_APB2LPENR_SDIOLPEN_Msk   |
                     RCC_APB2LPENR_SPI1LPEN_Msk   |
                     RCC_APB2LPENR_SYSCFGLPEN_Msk |
