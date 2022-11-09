@@ -34,7 +34,6 @@ class Msp : public Task {
 
     static const int OUTBUF_SIZE = 128;
 
-    Board *         m_board;
     Esc *           m_esc;
     Arming *        m_arming;
     Receiver *      m_receiver;
@@ -151,7 +150,7 @@ class Msp : public Task {
 
         if (parser_state == IDLE && c == 'R') {
             _gotRebootRequest = true;
-            m_board->reboot();
+            return;
         }
 
         // Payload functions
@@ -301,14 +300,11 @@ class Msp : public Task {
     Msp() : Task(100) { } // Hz
 
     void begin(
-            Board * board,
             Esc * esc,
             Arming * arming,
             Receiver * receiver,
             VehicleState * vstate)
     {
-        m_board = board;
-
         m_esc = esc;
 
         m_arming = arming;
@@ -331,6 +327,11 @@ class Msp : public Task {
         while (Serial.available()) {
             parse(Serial.read());
         }
+    }
+
+    bool gotRebootRequest(void)
+    {
+        return _gotRebootRequest;
     }
 
 }; // class Msp

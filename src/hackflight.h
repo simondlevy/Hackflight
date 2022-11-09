@@ -170,6 +170,10 @@ class Hackflight {
 
             m_msp.update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
+            if (m_msp.gotRebootRequest()) {
+                m_board->reboot();
+            }
+
             if (selectedTask) {
 
                 const auto nextTargetCycles = m_scheduler.getNextTargetCycles();
@@ -233,7 +237,7 @@ class Hackflight {
 
             m_attitude.begin(m_imu, &m_arming, &m_vstate);
 
-            m_msp.begin(m_board, m_esc, &m_arming, m_receiver, &m_vstate);
+            m_msp.begin(m_esc, &m_arming, m_receiver, &m_vstate);
 
             m_receiver->begin(&m_arming);
 
