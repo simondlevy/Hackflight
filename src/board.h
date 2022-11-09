@@ -18,6 +18,19 @@
 
 #include <stdint.h>
 
+#include <vector>
+using namespace std;
+
+#include "arming.h"
+#include "core/mixer.h"
+#include "esc.h"
+#include "imu.h"
+#include "led.h"
+#include "maths.h"
+#include "scheduler.h"
+#include "tasks/attitude.h"
+#include "tasks/receiver.h"
+
 class Board {
 
     private:
