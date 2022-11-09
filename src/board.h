@@ -265,8 +265,8 @@ class Board {
 
             m_esc->begin();
 
-            // XXX m_led->begin();
-            // XXX m_led->flash(10, 50);
+            m_led.begin();
+            m_led.flash(10, 50);
         }
 
         void step(void)
