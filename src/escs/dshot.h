@@ -82,8 +82,6 @@ class DshotEsc : public Esc {
 
         bool m_enabled = false;
 
-        Board * m_board;
-
         bool isLastCommand(void)
         {
             return ((m_commandQueueTail + 1) % (MAX_COMMANDS + 1) == m_commandQueueHead);
@@ -262,9 +260,8 @@ class DshotEsc : public Esc {
 
     public:
 
-        DshotEsc(Board & board, protocol_t protocol=DSHOT600) 
+        DshotEsc(protocol_t protocol=DSHOT600) 
         {
-            m_board = &board;
             m_protocol = protocol;
         }
 

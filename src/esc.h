@@ -32,6 +32,8 @@ class Esc {
 
     protected:
 
+        class Board * m_board;
+
         virtual void  begin(void) = 0;
 
         virtual float convertFromExternal(const uint16_t value) = 0;

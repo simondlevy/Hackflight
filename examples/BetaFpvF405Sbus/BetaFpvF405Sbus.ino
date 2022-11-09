@@ -79,7 +79,7 @@ void setup(void)
 
     static Mpu6000 imu(CS_PIN);
 
-    static DshotEsc esc(board);
+    static DshotEsc esc;
 
     static Led led(LED_PIN);
 

@@ -227,6 +227,7 @@ class Hackflight {
             m_led = &led;
 
             m_imu->m_board = m_board;
+            m_esc->m_board = m_board;
 
             m_pidControllers = &pidControllers;
         }
