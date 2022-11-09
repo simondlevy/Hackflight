@@ -19,6 +19,7 @@
 #pragma once
 
 #include "arming.h"
+#include "board.h"
 #include "core/axes.h"
 #include "core/clock.h"
 #include "core/constrain.h"
@@ -29,6 +30,13 @@
 #include "time.h"
 
 class Imu {
+
+    friend class Board;
+    friend class Hackflight;
+
+    protected:
+
+        class Board * m_board;
 
     public:
 
