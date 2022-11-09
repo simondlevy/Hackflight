@@ -29,7 +29,6 @@
 #include <vector>
 using namespace std;
 
-// See https://github.com/betaflight/unified-targets/blob/master/configs/default/BEFH-BETAFPVF405.config
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t LED_PIN  = PB5;
 static const uint8_t EXTI_PIN = PC4;
@@ -72,7 +71,7 @@ void setup(void)
 
     static SbusReceiver rx(Serial3);
 
-    static Stm32F4Board board;
+    static Stm32F4Board board(LED_PIN);
 
     static DshotEsc esc(board);
 

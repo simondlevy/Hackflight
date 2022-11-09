@@ -20,6 +20,13 @@
 
 class Board {
 
+    protected:
+
+        Board(uint8_t ledPin)
+        {
+            (void)ledPin;
+        }
+
     public:
 
         uint32_t microsToCycles(uint32_t micros)

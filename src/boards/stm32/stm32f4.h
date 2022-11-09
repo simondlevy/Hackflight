@@ -512,6 +512,11 @@ class Stm32F4Board : public Stm32Board {
 
     public:
 
+        Stm32F4Board(uint8_t ledPin) 
+            : Stm32Board(ledPin)
+        {
+        }
+
         void handleDmaIrq(const uint8_t index)
         {
             port_t *port = &m_ports[index];

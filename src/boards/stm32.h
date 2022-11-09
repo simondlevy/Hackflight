@@ -20,29 +20,38 @@
 
 class Stm32Board : public Board {
 
-    virtual uint32_t getClockSpeed(void) override
-    {
-        return SystemCoreClock;
-    }
+    protected:
 
-    virtual uint32_t getCycleCounter(void) override
-    {
-        return DWT->CYCCNT;
-    }
+        Stm32Board(uint8_t ledPin) 
+            : Board(ledPin)
+        {
+        }
 
-    virtual void reboot(void)
-    {
-    }
+    private:
 
-    virtual void startCycleCounter(void) override
-    {
-        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+        virtual uint32_t getClockSpeed(void) override
+        {
+            return SystemCoreClock;
+        }
 
-        __O uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
-        *(DWTLAR) = 0xC5ACCE55;
+        virtual uint32_t getCycleCounter(void) override
+        {
+            return DWT->CYCCNT;
+        }
 
-        DWT->CYCCNT = 0;
-        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-    }
+        virtual void reboot(void)
+        {
+        }
+
+        virtual void startCycleCounter(void) override
+        {
+            CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+
+            __O uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
+            *(DWTLAR) = 0xC5ACCE55;
+
+            DWT->CYCCNT = 0;
+            DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+        }
 
 };
