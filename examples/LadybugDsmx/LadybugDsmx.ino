@@ -61,7 +61,7 @@ void setup(void)
 
     static MockEsc esc;
 
-    static RealLed led(LadybugBoard::LED_PIN);
+    static RealLed led(LadybugBoard::LED_PIN, true);
 
     static UsfsImu imu;
 
