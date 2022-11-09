@@ -266,4 +266,18 @@ class Board {
             //m_led->flash(10, 50);
         }
 
-}; 
+        void step(void)
+        {
+            // Realtime gyro/filtering/PID tasks get complete priority
+            auto nowCycles = getCycleCounter();
+
+            if (m_scheduler.isCoreReady(nowCycles)) {
+                checkCoreTasks(nowCycles);
+            }
+
+            if (m_scheduler.isDynamicReady(getCycleCounter())) {
+                checkDynamicTasks();
+            }
+        }
+
+}; // class Board
