@@ -92,8 +92,8 @@ class RealImu : public Imu {
             }
 
             // Sum up CALIBRATING_GYRO_TIME_US readings
-            m_calibration.sum[index] += devReadRawGyro(index);
-            m_calibration.stats[index].push(devReadRawGyro(index));
+            m_calibration.sum[index] += readRawGyro(index);
+            m_calibration.stats[index].push(readRawGyro(index));
 
             if (m_calibrationCyclesRemaining == 1) {
                 const float stddev = m_calibration.stats[index].stdev();
@@ -135,7 +135,7 @@ class RealImu : public Imu {
 
         float readCalibratedGyro(axis_t & axis, uint8_t index)
         {
-            return devReadRawGyro(index) - axis.zero;
+            return readRawGyro(index) - axis.zero;
         }
 
     protected:
@@ -149,7 +149,7 @@ class RealImu : public Imu {
             setCalibrationCycles(); // start calibrating
         }
 
-        virtual int16_t devReadRawGyro(uint8_t k) = 0;
+        virtual int16_t readRawGyro(uint8_t k) = 0;
 
         typedef void (*align_fun)(Axes * axes);
 

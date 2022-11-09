@@ -129,7 +129,7 @@ class UsfsImu : public RealImu {
             return result;
         }
 
-        virtual int16_t devReadRawGyro(uint8_t k) override
+        virtual int16_t readRawGyro(uint8_t k) override
         {
             return m_gyroAdc[k];
         }

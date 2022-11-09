@@ -192,7 +192,7 @@ class Mpu6000 : public SoftQuatImu {
             SPI.setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
         }
 
-        virtual int16_t devReadRawGyro(uint8_t k) override
+        virtual int16_t readRawGyro(uint8_t k) override
         {
             return getValue(1 + k*2);
         }
