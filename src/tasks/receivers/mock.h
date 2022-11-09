@@ -43,7 +43,7 @@ class MockReceiver : public Receiver {
             static float _roll;
             static int8_t dir = +1;
 
-            _roll += .005 * dir;
+            _roll += .00001 * dir;
 
             if (_roll >= 1.0) {
                 dir = -1;
