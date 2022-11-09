@@ -35,9 +35,19 @@ class Board {
 
     private:
 
+        // Gyro interrupt counts over which to measure loop time and skew
+        static const uint32_t CORE_RATE_COUNT = 25000;
+        static const uint32_t GYRO_LOCK_COUNT = 400;
+
         uint8_t m_ledPin;
 
-    protected:
+        Imu *      m_imu;
+        Esc *      m_esc;
+        Led *      m_led;
+        Mixer *    m_mixer;
+        Receiver * m_receiver;
+
+     protected:
 
         Board(const uint8_t ledPin)
         {
