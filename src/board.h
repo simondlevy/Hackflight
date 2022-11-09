@@ -245,4 +245,25 @@ class Board {
             (void)index;
             (void)packet;
         }
+
+        void begin(void)
+        {
+            startCycleCounter();
+
+            //m_arming.begin(m_esc, m_led);
+
+            m_attitude.begin(m_imu, &m_arming, &m_vstate);
+
+            // m_msp.begin(m_board, m_esc, &m_arming, m_receiver, &m_vstate);
+
+            m_receiver->begin(&m_arming);
+
+            m_imu->begin();
+
+            m_esc->begin();
+
+            //m_led->begin();
+            //m_led->flash(10, 50);
+        }
+
 }; 
