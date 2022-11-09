@@ -68,7 +68,6 @@ class RealImu : public Imu {
         int32_t  m_calibrationCyclesRemaining;
         uint32_t m_gyroInterruptCount;
         uint16_t m_gyroScale;
-        uint32_t m_gyroSyncTime;
         uint8_t  m_interruptPin;
         bool     m_isCalibrating;
 
@@ -141,7 +140,7 @@ class RealImu : public Imu {
 
     protected:
 
-        uint32_t * m_interruptCountPtr;
+        uint32_t m_gyroSyncTime;
 
         RealImu(uint16_t gyroScale) 
         {
@@ -149,9 +148,6 @@ class RealImu : public Imu {
 
             setCalibrationCycles(); // start calibrating
         }
-
-        virtual bool devInit(
-                uint32_t * gyroSyncTimePtr, uint32_t * gyroInterruptCountPtr) = 0;
 
         virtual int16_t devReadRawGyro(uint8_t k) = 0;
 
@@ -224,11 +220,6 @@ class RealImu : public Imu {
             return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
         }
 
-        virtual void begin(void) override
-        {
-            devInit(&m_gyroSyncTime, &m_gyroInterruptCount);
-        }
-
         virtual uint32_t getGyroInterruptCount(void) override
         {
             return m_gyroInterruptCount;
@@ -236,7 +227,7 @@ class RealImu : public Imu {
 
         void handleInterrupt(void)
         {
-            *m_interruptCountPtr += 1;
+            m_gyroInterruptCount++;
         }
 
 }; // class Imu

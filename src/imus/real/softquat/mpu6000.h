@@ -79,8 +79,6 @@ class Mpu6000 : public SoftQuatImu {
 
         Board * m_board;
 
-        uint32_t * m_syncTimePtr;
-
         uint8_t m_buffer[15];
 
         void writeRegister(const uint8_t reg, const uint8_t val)
@@ -132,13 +130,8 @@ class Mpu6000 : public SoftQuatImu {
             return true;
         }
 
-        virtual bool devInit(
-                uint32_t * gyroSyncTimePtr,
-                uint32_t * gyroInterruptCountPtr) override
+        virtual void begin(void) override
         {
-            m_syncTimePtr = gyroSyncTimePtr;
-            m_interruptCountPtr = gyroInterruptCountPtr;
-
             m_shortPeriod = m_board->getClockSpeed() / 1000000 * SHORT_THRESHOLD;
 
             SPI.begin();
@@ -154,9 +147,6 @@ class Mpu6000 : public SoftQuatImu {
 
             // Check ID
             uint8_t id = readRegister(REG_WHO_AM_I);
-            if (id != 0x68) {
-                return false;
-            }
 
             // Clock Source PPL with Z axis gyro reference
             writeRegister(REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
@@ -200,8 +190,6 @@ class Mpu6000 : public SoftQuatImu {
             delayMicroseconds(1);
 
             SPI.setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
-
-            return true;
         }
 
         virtual int16_t devReadRawGyro(uint8_t k) override
@@ -243,7 +231,7 @@ class Mpu6000 : public SoftQuatImu {
             // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
             if ((m_shortPeriod == 0) || (gyroLastPeriod < m_shortPeriod)) {
 
-                *m_syncTimePtr = prevTime;
+                m_gyroSyncTime = prevTime;
             }
 
             prevTime = nowCycles;
