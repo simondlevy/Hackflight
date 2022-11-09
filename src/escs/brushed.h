@@ -20,13 +20,20 @@
 
 #include "esc.h"
 
-class ArduinoBrushedEsc : public Esc {
+#include <vector>
+using namespace std;
+
+class BrushedEsc : public Esc {
+
+    private:
+
+        vector<uint8_t> * m_pins;
 
     public:
 
-        ArduinoBrushedEsc(vector<uint8_t> & pins)  
-            : Esc(pins)
+        BrushedEsc(vector<uint8_t> & pins)  
         {
+            m_pins = &pins;
         }
 
         virtual void begin(void) override

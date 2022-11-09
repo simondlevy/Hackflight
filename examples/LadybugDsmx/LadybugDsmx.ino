@@ -20,7 +20,7 @@
 #include <hackflight.h>
 #include <boards/stm32/ladybug.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/mock.h>
+#include <escs/brushed.h>
 #include <imus/real/usfs.h>
 #include <leds//real.h>
 #include <tasks/receivers/real/dsmx.h>
@@ -50,6 +50,8 @@ void serialEvent1(void)
     _rx->handleEvent();
 }
 
+static vector<uint8_t> _motorPins = {13, 16, 3, 11};
+
 void setup(void)
 {
     pinMode(LadybugBoard::IMU_INTERRUPT_PIN, INPUT);
@@ -59,7 +61,7 @@ void setup(void)
 
     static DsmxReceiver rx(Serial1);
 
-    static MockEsc esc;
+    static BrushedEsc esc(_motorPins);
 
     static RealLed led(LadybugBoard::LED_PIN, true);
 

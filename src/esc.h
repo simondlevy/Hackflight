@@ -21,9 +21,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <vector>
-using namespace std;
-
 #include "maxmotors.h"
 
 class Esc {
