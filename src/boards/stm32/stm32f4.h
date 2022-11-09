@@ -512,7 +512,7 @@ class Stm32F4Board : public Stm32Board {
 
     public:
 
-        Stm32F4Board(uint8_t ledPin) 
+        Stm32F4Board(const uint8_t ledPin) 
             : Stm32Board(ledPin)
         {
         }

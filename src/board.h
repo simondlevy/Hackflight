@@ -20,11 +20,15 @@
 
 class Board {
 
+    private:
+
+        uint8_t m_ledPin;
+
     protected:
 
-        Board(uint8_t ledPin)
+        Board(const uint8_t ledPin)
         {
-            (void)ledPin;
+            m_ledPin = ledPin;
         }
 
     public:

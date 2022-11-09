@@ -22,7 +22,7 @@ class Stm32Board : public Board {
 
     protected:
 
-        Stm32Board(uint8_t ledPin) 
+        Stm32Board(const uint8_t ledPin) 
             : Board(ledPin)
         {
         }
