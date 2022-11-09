@@ -219,7 +219,7 @@ class SoftQuatImu : public RealImu {
 
     protected:
 
-        SoftQuatImu(const uint16_t gyroScale)
+        SoftQuatImu(const float gyroScale)
             : RealImu(gyroScale)
         {
             // Initialize quaternion in upright position

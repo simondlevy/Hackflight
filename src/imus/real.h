@@ -67,7 +67,7 @@ class RealImu : public Imu {
 
         int32_t  m_calibrationCyclesRemaining;
         uint32_t m_gyroInterruptCount;
-        uint16_t m_gyroScale;
+        float    m_gyroScale;
         uint8_t  m_interruptPin;
         bool     m_isCalibrating;
 
@@ -130,7 +130,7 @@ class RealImu : public Imu {
 
         void scaleGyro(axis_t & axis, const float adc)
         {
-            axis.dps = adc * (m_gyroScale / 32768.);
+            axis.dps = adc * m_gyroScale; 
         }
 
         float readCalibratedGyro(axis_t & axis, uint8_t index)
@@ -142,7 +142,7 @@ class RealImu : public Imu {
 
         uint32_t m_gyroSyncTime;
 
-        RealImu(uint16_t gyroScale) 
+        RealImu(const float gyroScale) 
         {
             m_gyroScale = gyroScale;
 

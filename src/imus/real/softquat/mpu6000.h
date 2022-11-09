@@ -206,17 +206,17 @@ class Mpu6000 : public SoftQuatImu {
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
             : SoftQuatImu(
-                    gyroScale == GYRO_250DPS ?  250 : 
-                    gyroScale == GYRO_500DPS ?  500 : 
-                    gyroScale == GYRO_1000DPS ?  1000 : 
-                    2000)
-        {
-            m_board = &board;
-            m_csPin = csPin;
-            m_sampleRateDivisor = sampleRateDivisor;
-            m_gyroScale = gyroScale;
-            m_accelScale = accelScale;
-        }
+                    (gyroScale == GYRO_250DPS ?  250 : 
+                     gyroScale == GYRO_500DPS ?  500 : 
+                     gyroScale == GYRO_1000DPS ?  1000 : 
+                     2000) / 32768.)
+            {
+                m_board = &board;
+                m_csPin = csPin;
+                m_sampleRateDivisor = sampleRateDivisor;
+                m_gyroScale = gyroScale;
+                m_accelScale = accelScale;
+            }
 
         void handleInterrupt(void)
         {

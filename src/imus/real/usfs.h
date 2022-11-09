@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include "imu.h"
+#include "imus/real.h"
 
 #include <USFS.h>
 #include <Wire.h>
 
-class UsfsImu : public Imu {
+class UsfsImu : public RealImu {
 
     private:
 
@@ -102,21 +102,6 @@ class UsfsImu : public Imu {
             return m_gyroInterruptCount;
         }
 
-        virtual int32_t getGyroSkew(
-                const uint32_t nextTargetCycles,
-                const int32_t desiredPeriodCycles) override
-        {
-            const auto skew =
-                cmpTimeCycles(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;
-
-            return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
-        }
-
-        virtual bool gyroIsCalibrating(void) override
-        {
-            return false;
-        }
-
         virtual bool gyroIsReady(void) override
         {
             bool result = false;
@@ -144,14 +129,18 @@ class UsfsImu : public Imu {
             return result;
         }
 
-        virtual auto readGyroDps(const align_fun align) -> Axes  override
+        virtual int16_t devReadRawGyro(uint8_t k) override
         {
-            (void)align;
-
-            return Axes(0, 0, 0);
+            (void)k;
+            return 0;
         }
 
     public:
+
+        UsfsImu(void) 
+            : RealImu(1.53e-1) // gyro rate fixed in master mode
+        {
+        }
 
         void handleInterrupt(void)
         {
