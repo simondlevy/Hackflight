@@ -214,7 +214,7 @@ class Mpu6000 : public SoftQuatImu {
 
         Mpu6000(
                 const uint8_t csPin,
-                Board * board,
+                Board & board,
                 const uint8_t sampleRateDivisor = 19,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
@@ -224,7 +224,7 @@ class Mpu6000 : public SoftQuatImu {
                     gyroScale == GYRO_1000DPS ?  1000 : 
                     2000)
         {
-            m_board = board;
+            m_board = &board;
             m_csPin = csPin;
             m_sampleRateDivisor = sampleRateDivisor;
             m_gyroScale = gyroScale;

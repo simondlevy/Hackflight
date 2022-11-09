@@ -34,18 +34,6 @@ class Esc {
 
     protected:
 
-        vector<uint8_t> * m_pins;
-
-        Esc(vector<uint8_t> & pins)
-        {
-            m_pins = &pins;
-        }
-
-        Esc(void)
-        {
-            m_pins = NULL;
-        }
-
         virtual void  begin(void) = 0;
 
         virtual float convertFromExternal(const uint16_t value) = 0;

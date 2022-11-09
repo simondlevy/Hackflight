@@ -20,4 +20,10 @@
 
 class LadybugBoard : public Stm32Board {
 
-};
+    public:
+
+        static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
+
+        static const uint8_t LED_PIN = 0x12;
+
+}; // class LadybugBoard

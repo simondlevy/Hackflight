@@ -21,7 +21,7 @@
 #include <alignment/rotate270.h>
 #include <boards/stm32/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/dshot/stm32f405.h>
+#include <escs/dshot.h>
 #include <leds/real.h>
 #include <imus/real/softquat/mpu6000.h>
 #include <tasks/receivers/real/sbus.h>
@@ -29,9 +29,10 @@
 #include <vector>
 using namespace std;
 
-static const uint8_t IMU_CHIP_SELECT_PIN = PA4;
-static const uint8_t IMU_INTERRUPT_PIN = PC4;
-static const uint8_t LED_PIN = PB5;
+// See https://github.com/betaflight/unified-targets/blob/master/configs/default/BEFH-BETAFPVF405.config
+static const uint8_t CS_PIN   = PA4;
+static const uint8_t LED_PIN  = PB5;
+static const uint8_t EXTI_PIN = PC4;
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -40,7 +41,7 @@ static AnglePidController _anglePid(
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-static Stm32F405DshotEsc * _esc;
+static Stm32F4Board * _board;
 static Hackflight * _hf;
 static Mpu6000 * _imu;
 static SbusReceiver * _rx;
@@ -49,7 +50,7 @@ static vector<PidController *> _pids = {&_anglePid};
 
 extern "C" void handleDmaIrq(uint8_t id)
 {
-    _esc->handleDmaIrq(id);
+    _board->handleDmaIrq(id);
 }
 
 static void handleImuInterrupt(void)
@@ -66,26 +67,24 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 void setup(void)
 {
-    pinMode(IMU_INTERRUPT_PIN, INPUT);
-    attachInterrupt(IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
+    pinMode(EXTI_PIN, INPUT);
+    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
     static SbusReceiver rx(Serial3);
 
     static Stm32F4Board board;
 
-    vector<uint8_t> pins = {0x20, 0x21, 0x13, 0x12};
+    static DshotEsc esc(board);
 
-    static Stm32F405DshotEsc esc(board, pins);
-
-    static Mpu6000 imu(IMU_CHIP_SELECT_PIN, &board);
+    static Mpu6000 imu(CS_PIN, board);
 
     static RealLed led(LED_PIN);
 
     static Hackflight hf(board, rx, imu, imuRotate270, _pids, _mixer, esc, led);
 
+    _board = &board;
     _rx = &rx;
     _imu = &imu;
-    _esc = &esc;
     _hf = &hf;
 
     hf.begin();

@@ -26,9 +26,6 @@
 #include <tasks/receivers/mock.h>
 #include <alignment/rotate0.h>
 
-static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
-static const uint8_t LED_PIN = 0x12;
-
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -44,26 +41,22 @@ static Hackflight * _hf;
 
 static UsfsImu * _imu;
 
-static volatile uint32_t _icount;
-
 static void handleImuInterrupt(void)
 {
     _imu->handleInterrupt();
-
-    _icount++;
 }
 
 void setup(void)
 {
-    pinMode(IMU_INTERRUPT_PIN, INPUT);
-    attachInterrupt(IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
+    pinMode(LadybugBoard::IMU_INTERRUPT_PIN, INPUT);
+    attachInterrupt(LadybugBoard::IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
 
     static LadybugBoard board;
 
     static MockReceiver rx;
     static MockEsc esc;
 
-    static RealLed led(LED_PIN);
+    static RealLed led(LadybugBoard::LED_PIN);
 
     static UsfsImu imu;
 

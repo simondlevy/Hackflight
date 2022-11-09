@@ -35,21 +35,20 @@ class Board {
 
         virtual void startCycleCounter(void) = 0;
 
-    protected:
-
-        virtual void dshotDeviceInit(uint32_t outputFreq) 
+        virtual void dmaInit(uint32_t outputFreq)
         {
             (void)outputFreq;
         }
 
-        virtual void dshotUpdateComplete(void) 
-        {
-        }
-        virtual void dshotUpdateStart(void) 
+        virtual void dmaUpdateComplete(void)
         {
         }
 
-        virtual void dshotWriteMotor(uint8_t index, uint16_t packet) 
+        virtual void dmaUpdateStart(void)
+        {
+        }
+
+        virtual void dmaWriteMotor(uint8_t index, uint16_t packet)
         {
             (void)index;
             (void)packet;

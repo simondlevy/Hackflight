@@ -40,6 +40,8 @@ class DshotEsc : public Esc {
 
     private:
 
+        static const uint8_t MOTOR_COUNT = 4;
+
         static const uint16_t MIN_VALUE = 48;
         static const uint16_t MAX_VALUE = 2047;
         static const uint16_t STOP_VALUE = 0;
@@ -80,8 +82,6 @@ class DshotEsc : public Esc {
 
         bool m_enabled = false;
 
-        uint8_t m_motorPins[MAX_SUPPORTED_MOTORS];
-
         Board * m_board;
 
         bool isLastCommand(void)
@@ -91,7 +91,7 @@ class DshotEsc : public Esc {
 
         bool allMotorsAreIdle()
         {
-            for (auto i=0; i<m_motorCount; i++) {
+            for (auto i=0; i<MOTOR_COUNT; i++) {
                 if (m_dmaMotors[i]) {
                     return false;
                 }
@@ -208,8 +208,6 @@ class DshotEsc : public Esc {
 
         protocol_t m_protocol;
 
-        uint8_t m_motorCount;
-
         bool commandQueueUpdate(void)
         {
             if (!commandQueueIsEmpty()) {
@@ -262,28 +260,13 @@ class DshotEsc : public Esc {
                 (command->state == COMMAND_STATE_POSTDELAY && !isLastCommand()); 
         }
 
-    protected:
+    public:
 
-        virtual void deviceInit(uint32_t outputFreq) = 0;
-        virtual void updateComplete(void) = 0;
-        virtual void updateStart(void) = 0;
-        virtual void writeMotor(uint8_t index, uint16_t packet) = 0;
-
-        DshotEsc(Board & board, vector<uint8_t> & pins, protocol_t protocol=DSHOT600) 
-            : Esc(pins)
+        DshotEsc(Board & board, protocol_t protocol=DSHOT600) 
         {
             m_board = &board;
-
             m_protocol = protocol;
-
-            m_motorCount = pins.size();
-
-            for (auto i=0; i<m_motorCount; ++i) {
-                m_motorPins[i] = pins[i];
-            }
         }
-
-    public:
 
         virtual void begin(void) override 
         {
@@ -292,7 +275,7 @@ class DshotEsc : public Esc {
                 m_protocol == DSHOT300 ? 300 :
                 600;
                 
-            deviceInit(1000 * outputFreq);
+            m_board->dmaInit(1000 * outputFreq);
 
             m_enabled = true;
         }
@@ -339,7 +322,7 @@ class DshotEsc : public Esc {
             if (commandControl) {
                 commandControl->repeats = 10;
                 commandControl->delayAfterCommandUs = COMMAND_DELAY_US;
-                for (auto i=0; i<m_motorCount; i++) {
+                for (auto i=0; i<MOTOR_COUNT; i++) {
                     commandControl->command[i] = CMD_SPIN_DIRECTION_NORMAL;
                 }
                 if (allMotorsAreIdle()) {
@@ -360,9 +343,9 @@ class DshotEsc : public Esc {
         {
             if (m_enabled) {
 
-                updateStart();
+                m_board->dmaUpdateStart();
 
-                for (auto i=0; i <m_motorCount; i++) {
+                for (auto i=0; i <MOTOR_COUNT; i++) {
 
                     uint16_t ivalue = (uint16_t)values[i];
 
@@ -372,7 +355,7 @@ class DshotEsc : public Esc {
 
                     uint16_t packet = prepareDshotPacket(ivalue);
 
-                    writeMotor(i, packet);
+                    m_board->dmaWriteMotor(i, packet);
                 }
 
                 if (!commandQueueIsEmpty()) {
@@ -380,7 +363,7 @@ class DshotEsc : public Esc {
                         return;
                     }
                 }
-                updateComplete();
+                m_board->dmaUpdateComplete();
             }
         }
 
