@@ -194,12 +194,25 @@ class Board {
 
      protected:
 
-        Board(const uint8_t ledPin)
+        Board(
+                Receiver & receiver,
+                Imu & imu,
+                Imu::align_fun imuAlignFun,
+                vector<PidController *> & pidControllers,
+                Mixer & mixer,
+                Esc & esc,
+                const uint8_t ledPin)
         {
+            m_receiver = &receiver;
+            m_imu = &imu;
+            m_imuAlignFun = imuAlignFun;
+            m_pidControllers = &pidControllers;
+            m_mixer = &mixer;
+            m_esc = &esc;
             m_ledPin = ledPin;
         }
 
-    public:
+     public:
 
         uint32_t microsToCycles(uint32_t micros)
         {

@@ -16,14 +16,25 @@
 
 #pragma once
 
+#include "alignment/rotate0.h"
 #include "boards/stm32.h"
+#include "escs/brushed.h"
+#include "imus/real/usfs.h"
 
 class LadybugBoard : public Stm32Board {
 
+    private:
+
+        vector<uint8_t> motorPins = {13, 16, 3, 11};
+
+        UsfsImu imu;
+
+        BrushedEsc esc = BrushedEsc(motorPins);
+
     public:
 
-        LadybugBoard(void) 
-            : Stm32Board(0x012)
+        LadybugBoard( Receiver & rx, vector<PidController *> & pids, Mixer & mixer)
+            : Stm32Board(rx, imu, imuRotate0, pids, mixer, esc, 0x12)
         {
         }
 

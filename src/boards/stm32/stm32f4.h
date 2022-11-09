@@ -512,8 +512,15 @@ class Stm32F4Board : public Stm32Board {
 
     public:
 
-        Stm32F4Board(const uint8_t ledPin) 
-            : Stm32Board(ledPin)
+        Stm32F4Board(
+                Receiver & receiver,
+                Imu & imu,
+                Imu::align_fun align,
+                vector<PidController *> & pids,
+                Mixer & mixer,
+                Esc & esc,
+                const uint8_t ledPin) 
+            : Stm32Board(receiver, imu, align, pids, mixer, esc, ledPin)
         {
         }
 

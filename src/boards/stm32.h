@@ -22,12 +22,19 @@ class Stm32Board : public Board {
 
     protected:
 
-        Stm32Board(const uint8_t ledPin) 
-            : Board(ledPin)
+        Stm32Board(
+                Receiver & receiver,
+                Imu & imu,
+                Imu::align_fun align,
+                vector<PidController *> & pids,
+                Mixer & mixer,
+                Esc & esc,
+                const uint8_t ledPin) 
+            : Board(receiver, imu, align, pids, mixer, esc, ledPin)
         {
         }
 
-    private:
+     private:
 
         virtual uint32_t getClockSpeed(void) override
         {

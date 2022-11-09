@@ -57,9 +57,9 @@ void setup(void)
     pinMode(LadybugBoard::IMU_INTERRUPT_PIN, INPUT);
     attachInterrupt(LadybugBoard::IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
 
-    static LadybugBoard board;
-
     static DsmxReceiver rx(Serial1);
+
+    static LadybugBoard board(rx, _pids, _mixer);
 
     static BrushedEsc esc(_motorPins);
 

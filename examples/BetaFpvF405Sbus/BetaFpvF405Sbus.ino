@@ -22,7 +22,9 @@
 #include <boards/stm32/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot.h>
+#include <escs/mock.h>
 #include <leds/real.h>
+#include <imus/mock.h>
 #include <imus/real/softquat/mpu6000.h>
 #include <tasks/receivers/real/sbus.h>
 
@@ -71,11 +73,13 @@ void setup(void)
 
     static SbusReceiver rx(Serial3);
 
-    static Stm32F4Board board(LED_PIN);
-
-    static DshotEsc esc(board);
+    static MockImu mockImu;
+    static MockEsc mockEsc;
+    static Stm32F4Board board(rx, mockImu, imuRotate270, _pids, _mixer, mockEsc, LED_PIN);
 
     static Mpu6000 imu(CS_PIN, board);
+
+    static DshotEsc esc(board);
 
     static RealLed led(LED_PIN);
 

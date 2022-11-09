@@ -30,13 +30,7 @@
 
 class Imu {
 
-    friend class Board;
-    friend class Hackflight;
-    friend class Task;
-    friend class AttitudeTask;
-    friend class Receiver;
-
-    protected:
+    public:
 
         typedef void (*align_fun)(Axes * axes);
 
