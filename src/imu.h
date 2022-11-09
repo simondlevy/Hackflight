@@ -30,6 +30,7 @@
 
 class Imu {
 
+    friend class Board;
     friend class Hackflight;
     friend class Task;
     friend class AttitudeTask;

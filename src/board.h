@@ -41,11 +41,22 @@ class Board {
 
         uint8_t m_ledPin;
 
-        Imu *      m_imu;
-        Esc *      m_esc;
-        Led *      m_led;
-        Mixer *    m_mixer;
-        Receiver * m_receiver;
+        // Initialzed in main()
+        Imu *                     m_imu;
+        Esc *                     m_esc;
+        Led *                     m_led;
+        Mixer *                   m_mixer;
+        vector<PidController *> * m_pidControllers;
+        Receiver *                m_receiver;
+
+        // Initialzed here
+        Arming         m_arming;
+        AttitudeTask   m_attitude;
+        bool           m_failsafeIsActive;
+        Imu::align_fun m_imuAlignFun;
+        // Msp            m_msp;
+        Scheduler      m_scheduler;
+        VehicleState   m_vstate;
 
      protected:
 
