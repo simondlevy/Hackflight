@@ -213,6 +213,9 @@ class Board {
             m_mixer = &mixer;
             m_esc = &esc;
             m_led.m_pin = ledPin;
+
+            m_imu->m_board = this;
+            m_esc->m_board = this;
         }
 
      public:
