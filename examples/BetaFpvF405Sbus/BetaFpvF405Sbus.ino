@@ -74,8 +74,6 @@ void setup(void)
 
     static DshotEsc esc;
 
-    static Led led(LED_PIN);
-
     static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
