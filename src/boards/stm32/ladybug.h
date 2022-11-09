@@ -33,13 +33,13 @@ class LadybugBoard : public Stm32Board {
 
     public:
 
+        static const uint8_t LED_PIN = 0x12;
+
         LadybugBoard( Receiver & rx, vector<PidController *> & pids, Mixer & mixer)
-            : Stm32Board(rx, imu, imuRotate0, pids, mixer, esc, 0x12)
+            : Stm32Board(rx, imu, imuRotate0, pids, mixer, esc, LED_PIN)
         {
         }
 
         static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
-
-        static const uint8_t LED_PIN = 0x12;
 
 }; // class LadybugBoard

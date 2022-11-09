@@ -23,7 +23,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot.h>
 #include <escs/mock.h>
-#include <leds/real.h>
+#include <led.h>
 #include <imus/mock.h>
 #include <imus/real/softquat/mpu6000.h>
 #include <tasks/receivers/real/sbus.h>
@@ -81,7 +81,7 @@ void setup(void)
 
     static DshotEsc esc(board);
 
-    static RealLed led(LED_PIN);
+    static Led led(LED_PIN);
 
     static Hackflight hf(board, rx, imu, imuRotate270, _pids, _mixer, esc, led);
 

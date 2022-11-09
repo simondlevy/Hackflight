@@ -22,7 +22,6 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/brushed.h>
 #include <imus/real/usfs.h>
-#include <leds//real.h>
 #include <tasks/receivers/real/dsmx.h>
 #include <alignment/rotate0.h>
 
@@ -63,7 +62,7 @@ void setup(void)
 
     static BrushedEsc esc(_motorPins);
 
-    static RealLed led(LadybugBoard::LED_PIN, true);
+    static Led led(LadybugBoard::LED_PIN, true);
 
     static UsfsImu imu;
 

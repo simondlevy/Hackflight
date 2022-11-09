@@ -40,12 +40,9 @@ class Board {
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
-        uint8_t m_ledPin;
-
         // Initialzed in main()
         Imu *                     m_imu;
         Esc *                     m_esc;
-        Led *                     m_led;
         Mixer *                   m_mixer;
         vector<PidController *> * m_pidControllers;
         Receiver *                m_receiver;
@@ -55,6 +52,7 @@ class Board {
         AttitudeTask   m_attitude;
         bool           m_failsafeIsActive;
         Imu::align_fun m_imuAlignFun;
+        Led            m_led;
         Msp            m_msp;
         Scheduler      m_scheduler;
         VehicleState   m_vstate;
@@ -214,7 +212,7 @@ class Board {
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
             m_esc = &esc;
-            m_ledPin = ledPin;
+            m_led.m_pin = ledPin;
         }
 
      public:
@@ -267,8 +265,8 @@ class Board {
 
             m_esc->begin();
 
-            //m_led->begin();
-            //m_led->flash(10, 50);
+            // XXX m_led->begin();
+            // XXX m_led->flash(10, 50);
         }
 
         void step(void)

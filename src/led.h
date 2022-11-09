@@ -26,6 +26,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 class Led {
 
     friend class Arming;
+    friend class Board;
     friend class Hackflight;
 
     private:
@@ -36,21 +37,31 @@ class Led {
             WARNING_LED_FLASH
         } warningLedVehicleState_e;
 
+        uint8_t m_pin;
+        bool m_on;
+        bool m_inverted;
+
         warningLedVehicleState_e m_warningLedVehicleState = WARNING_LED_OFF;
 
         uint32_t m_warningLedTimer = 0;
+
+        void toggle(void)
+        {
+            m_on = !m_on;
+            set(m_on);
+        }
 
         void warningRefresh(void)
         {
             switch (m_warningLedVehicleState) {
                 case WARNING_LED_OFF:
-                    devSet(false);
+                    set(false);
                     break;
                 case WARNING_LED_ON:
-                    devSet(true);
+                    set(true);
                     break;
                 case WARNING_LED_FLASH:
-                    devToggle();
+                    toggle();
                     break;
             }
 
@@ -58,24 +69,25 @@ class Led {
             m_warningLedTimer = now + 500000;
         }
 
+        void set(bool on)
+        {
+            digitalWrite(m_pin, m_inverted ? on : !on);
+            m_on = on;
+        }
+
         void begin(void)
         {
-            devInit();
+            pinMode(m_pin, OUTPUT);
         }
 
         void flash(uint8_t reps, uint16_t delayMs)
         {
-            devSet(false);
+            set(false);
             for (auto i=0; i<reps; i++) {
-                devToggle();
+                toggle();
                 delay(delayMs);
             }
-            devSet(false);
-        }
-
-        void set (bool onOff)
-        {
-            devSet(onOff);
+            set(false);
         }
 
         void warningDisable(void)
@@ -99,11 +111,19 @@ class Led {
             warningRefresh();
         }
 
-    protected:
+    public:
 
-        virtual void devInit(void) = 0;
+        Led(bool inverted=false) 
+        {
+            m_inverted = inverted;
+            m_on = false;
+        }
 
-        virtual void devSet(bool on) = 0;
+        Led(uint8_t pin, bool inverted=false) 
+        {
+            m_pin = pin;
+            m_inverted = inverted;
+            m_on = false;
+        }
 
-        virtual void devToggle(void) = 0;
-};
+}; // class Led
