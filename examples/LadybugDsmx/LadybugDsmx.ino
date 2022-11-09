@@ -23,7 +23,7 @@
 #include <escs/mock.h>
 #include <imus/real/usfs.h>
 #include <leds//real.h>
-#include <tasks/receivers/mock.h>
+#include <tasks/receivers/real/dsmx.h>
 #include <alignment/rotate0.h>
 
 static AnglePidController _anglePid(
@@ -36,14 +36,18 @@ static AnglePidController _anglePid(
 static vector<PidController *> _pids = {&_anglePid};
 
 static Mixer _mixer = QuadXbfMixer::make();
-
 static Hackflight * _hf;
-
 static UsfsImu * _imu;
+static DsmxReceiver * _rx;
 
 static void handleImuInterrupt(void)
 {
     _imu->handleInterrupt();
+}
+
+void serialEvent1(void)
+{
+    _rx->handleEvent();
 }
 
 void setup(void)
@@ -53,7 +57,8 @@ void setup(void)
 
     static LadybugBoard board;
 
-    static MockReceiver rx;
+    static DsmxReceiver rx(Serial1);
+
     static MockEsc esc;
 
     static RealLed led(LadybugBoard::LED_PIN);
@@ -62,8 +67,9 @@ void setup(void)
 
     static Hackflight hf(board, rx, imu, imuRotate0, _pids, _mixer, esc, led);
 
-    _hf = &hf;
+    _rx = &rx;
     _imu = &imu;
+    _hf = &hf;
 
     hf.begin();
 }
