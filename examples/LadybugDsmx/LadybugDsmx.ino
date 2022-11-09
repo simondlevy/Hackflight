@@ -20,10 +20,7 @@
 #include <hackflight.h>
 #include <boards/stm32/ladybug.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/brushed.h>
-#include <imus/real/usfs.h>
 #include <tasks/receivers/real/dsmx.h>
-#include <alignment/rotate0.h>
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -35,21 +32,19 @@ static AnglePidController _anglePid(
 static vector<PidController *> _pids = {&_anglePid};
 
 static Mixer _mixer = QuadXbfMixer::make();
-static Hackflight * _hf;
-static UsfsImu * _imu;
+
+static LadybugBoard * _board;
 static DsmxReceiver * _rx;
 
 static void handleImuInterrupt(void)
 {
-    _imu->handleInterrupt();
+    _board->handleInterrupt();
 }
 
 void serialEvent1(void)
 {
     _rx->handleEvent();
 }
-
-static vector<uint8_t> _motorPins = {13, 16, 3, 11};
 
 void setup(void)
 {
@@ -60,22 +55,13 @@ void setup(void)
 
     static LadybugBoard board(rx, _pids, _mixer);
 
-    static BrushedEsc esc(_motorPins);
-
-    static Led led(LadybugBoard::LED_PIN, true);
-
-    static UsfsImu imu;
-
-    static Hackflight hf(board, rx, imu, imuRotate0, _pids, _mixer, esc, led);
-
+    _board = &board;
     _rx = &rx;
-    _imu = &imu;
-    _hf = &hf;
 
-    hf.begin();
+    _board->begin();
 }
 
 void loop(void)
 {
-    _hf->step();
+    _board->step();
 }

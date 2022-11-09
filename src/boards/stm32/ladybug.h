@@ -40,6 +40,11 @@ class LadybugBoard : public Stm32Board {
         {
         }
 
+        void handleInterrupt(void)
+        {
+            imu.handleInterrupt();
+        }
+
         static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
 
 }; // class LadybugBoard
