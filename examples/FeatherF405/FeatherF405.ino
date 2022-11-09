@@ -19,10 +19,9 @@
 
 #include <hackflight.h>
 #include <alignment/rotate270.h>
-#include <boards/stm32/stm32f.h>
+#include <boards/stm32/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/dshot/stm32f405.h>
-#include <leds/mock.h>
+#include <escs/dshot.h>
 #include <imus//mock.h>
 #include <tasks/receivers/mock.h>
 
@@ -38,48 +37,31 @@ static AnglePidController _anglePid(
 
 static vector<PidController *> _pids = {&_anglePid};
 
-static Hackflight * _hf;
-static Stm32F405DshotEsc * _esc;
+static Stm32F4Board * _board;
 
 static Mixer _mixer = QuadXbfMixer::make();
 
 extern "C" void handleDmaIrq(uint8_t id)
 {
-    _esc->handleDmaIrq(id);
+    _board->handleDmaIrq(id);
 }
 
 void setup(void)
 {
     static MockReceiver rx;
 
-    static Stm32FBoard board;
-
-    vector<uint8_t> pins = {0x20, 0x21, 0x13, 0x12};
-
-    static Stm32F405DshotEsc esc(pins);
-
     static MockImu imu;
 
-    static MockLed led;
+    static DshotEsc esc;
 
-    static Hackflight hf(board, rx, imu, imuRotate270, _pids, _mixer, esc, led);
+    static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, 0);
 
-    _esc = &esc;
-    _hf = &hf;
+    _board = &board;
 
-    hf.begin();
+    _board->begin();
 }
 
 void loop(void)
 {
-    _hf->step();
-
-    Serial.print((uint32_t)_esc->tags[0]);
-    Serial.print(" ");
-    Serial.print((uint32_t)_esc->tags[1]);
-    Serial.print(" ");
-    Serial.print((uint32_t)_esc->tags[2]);
-    Serial.print(" ");
-    Serial.print((uint32_t)_esc->tags[3]);
-    Serial.println();
+    _board->step();
 }
