@@ -28,6 +28,8 @@
 #include <vector>
 using namespace std;
 
+static const uint8_t LED_PIN  = PC14;
+
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -54,7 +56,7 @@ void setup(void)
 
     static MockEsc esc;
 
-    static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, 0);
+    static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
 
