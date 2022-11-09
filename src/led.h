@@ -71,13 +71,18 @@ class Led {
 
         void set(bool on)
         {
-            digitalWrite(m_pin, m_inverted ? on : !on);
+            if (m_pin > 0) {
+                digitalWrite(m_pin, m_inverted ? on : !on);
+            }
+
             m_on = on;
         }
 
         void begin(void)
         {
-            pinMode(m_pin, OUTPUT);
+            if (m_pin > 0) {
+                pinMode(m_pin, OUTPUT);
+            }
         }
 
         void flash(uint8_t reps, uint16_t delayMs)
