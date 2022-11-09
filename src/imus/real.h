@@ -141,6 +141,8 @@ class RealImu : public Imu {
 
     protected:
 
+        uint32_t * m_interruptCountPtr;
+
         RealImu(uint16_t gyroScale) 
         {
             m_gyroScale = gyroScale;
@@ -230,6 +232,11 @@ class RealImu : public Imu {
         virtual uint32_t getGyroInterruptCount(void) override
         {
             return m_gyroInterruptCount;
+        }
+
+        void handleInterrupt(void)
+        {
+            *m_interruptCountPtr += 1;
         }
 
 }; // class Imu

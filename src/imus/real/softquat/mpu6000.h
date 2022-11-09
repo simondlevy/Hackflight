@@ -80,7 +80,6 @@ class Mpu6000 : public SoftQuatImu {
         Board * m_board;
 
         uint32_t * m_syncTimePtr;
-        uint32_t * m_interruptCountPtr;
 
         uint8_t m_buffer[15];
 
@@ -249,7 +248,7 @@ class Mpu6000 : public SoftQuatImu {
 
             prevTime = nowCycles;
 
-            *m_interruptCountPtr += 1;
+            RealImu::handleInterrupt();
         }
 
         void readGyro(void)

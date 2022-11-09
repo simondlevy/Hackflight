@@ -147,6 +147,7 @@ class UsfsImu : public Imu {
         virtual auto readGyroDps(const align_fun align) -> Axes  override
         {
             (void)align;
+
             return Axes(0, 0, 0);
         }
 
