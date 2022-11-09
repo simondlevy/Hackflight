@@ -49,6 +49,8 @@ class Msp : public Task {
 
     float  motors[MAX_SUPPORTED_MOTORS];
 
+    bool    _gotRebootRequest;
+
     void serialize16(int16_t a)
     {
         serialize8(a & 0xFF);
@@ -148,6 +150,7 @@ class Msp : public Task {
         static uint8_t index;
 
         if (parser_state == IDLE && c == 'R') {
+            _gotRebootRequest = true;
             m_board->reboot();
         }
 
