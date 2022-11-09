@@ -29,6 +29,7 @@ using namespace std;
 #include "maths.h"
 #include "scheduler.h"
 #include "tasks/attitude.h"
+#include "tasks/msp.h"
 #include "tasks/receiver.h"
 
 class Board {
@@ -54,7 +55,7 @@ class Board {
         AttitudeTask   m_attitude;
         bool           m_failsafeIsActive;
         Imu::align_fun m_imuAlignFun;
-        // Msp            m_msp;
+        Msp            m_msp;
         Scheduler      m_scheduler;
         VehicleState   m_vstate;
 

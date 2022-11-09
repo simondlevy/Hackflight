@@ -28,6 +28,7 @@
 
 class Msp : public Task {
 
+    friend class Board;
     friend class Hackflight;
 
     static const uint8_t MAXMSG = 255;
