@@ -41,7 +41,7 @@ static AnglePidController _anglePid(
         0.0); // 3.0; // Level Kp
 
 static Stm32F4Board * _board;
-static Hackflight * _hf;
+//static Hackflight * _hf;
 static Mpu6000 * _imu;
 static SbusReceiver * _rx;
 
@@ -79,17 +79,19 @@ void setup(void)
 
     static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
-    static Hackflight hf(board, rx, imu, imuRotate270, _pids, _mixer, esc, led);
+    //static Hackflight hf(board, rx, imu, imuRotate270, _pids, _mixer, esc, led);
 
     _board = &board;
     _rx = &rx;
     _imu = &imu;
-    _hf = &hf;
+    //_hf = &hf;
 
-    hf.begin();
+    // hf.begin();
+    _board->begin();
 }
 
 void loop(void)
 {
-    _hf->step();
+    //_hf->step();
+    _board->step();
 }
