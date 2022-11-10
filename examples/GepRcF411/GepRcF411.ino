@@ -29,6 +29,7 @@
 using namespace std;
 
 static const uint8_t LED_PIN  = PC14;
+static const uint8_t EXTI_PIN = PA1;
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -48,8 +49,16 @@ extern "C" void handleDmaIrq(uint8_t id)
     _board->handleDmaIrq(id);
 }
 
+static void handleImuInterrupt(void)
+{
+    //_imu->handleInterrupt();
+}
+
 void setup(void)
 {
+    pinMode(EXTI_PIN, INPUT);
+    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+
     static MockReceiver rx;
 
     static MockImu imu;
