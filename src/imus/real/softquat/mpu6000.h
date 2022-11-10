@@ -65,6 +65,8 @@ class Mpu6000 : public SoftQuatImu {
         // 20 MHz max SPI frequency
         static const uint32_t MAX_SPI_CLK_HZ = 20000000;
 
+        SPIClass * m_spi;
+
         uint8_t m_csPin;
 
         // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
@@ -84,8 +86,8 @@ class Mpu6000 : public SoftQuatImu {
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
             digitalWrite(m_csPin, LOW);
-            SPI.transfer(reg);
-            SPI.transfer(val);
+            m_spi->transfer(reg);
+            m_spi->transfer(val);
             digitalWrite(m_csPin, HIGH);
         }
 
@@ -111,7 +113,7 @@ class Mpu6000 : public SoftQuatImu {
         {
             digitalWrite(m_csPin, LOW);
             m_buffer[0] = addr | 0x80;
-            SPI.transfer(m_buffer, count);
+            m_spi->transfer(m_buffer, count);
             digitalWrite(m_csPin, HIGH);
         }
 
@@ -134,10 +136,10 @@ class Mpu6000 : public SoftQuatImu {
         {
             m_shortPeriod = m_board->getClockSpeed() / 1000000 * SHORT_THRESHOLD;
 
-            SPI.begin();
-            SPI.setBitOrder(MSBFIRST);
-            SPI.setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
-            SPI.setDataMode(SPI_MODE3);
+            m_spi->begin();
+            m_spi->setBitOrder(MSBFIRST);
+            m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
+            m_spi->setDataMode(SPI_MODE3);
 
             pinMode(m_csPin, OUTPUT);
 
@@ -180,16 +182,16 @@ class Mpu6000 : public SoftQuatImu {
             writeRegister(REG_INT_ENABLE, BIT_RAW_RDY_EN);
             delayMicroseconds(15);
 
-            SPI.setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
+            m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
             delayMicroseconds(1);
 
-            SPI.setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
+            m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
             // Accel and Gyro DLPF Setting
             writeRegister(REG_CONFIG, 0); // no gyro DLPF
             delayMicroseconds(1);
 
-            SPI.setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
+            m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
@@ -200,6 +202,7 @@ class Mpu6000 : public SoftQuatImu {
     public:
 
         Mpu6000(
+                SPIClass & spi,
                 const uint8_t csPin,
                 const uint8_t sampleRateDivisor = 19,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
@@ -210,6 +213,7 @@ class Mpu6000 : public SoftQuatImu {
                      gyroScale == GYRO_1000DPS ?  1000 : 
                      2000) / 32768.)
             {
+                m_spi = &spi;
                 m_csPin = csPin;
                 m_sampleRateDivisor = sampleRateDivisor;
                 m_gyroScale = gyroScale;
