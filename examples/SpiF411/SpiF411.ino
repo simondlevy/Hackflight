@@ -22,13 +22,14 @@
 
 static const uint8_t LED_PIN  = PC14;
 
-static SPIClass spi(PA7, PA6, PA5, PA4);
+// ---------------- mosi miso sclk
+static SPIClass _spi(PA7, PA6, PA5);
 
 void setup(void)
 {
     Serial.begin(115200);
 
-    spi.begin();
+    _spi.begin();
 
     pinMode(LED_PIN, OUTPUT);
 }
@@ -39,4 +40,6 @@ void loop(void)
     delay(500);
     digitalWrite(LED_PIN, LOW);
     delay(500);
+
+    Serial.println(millis());
 }

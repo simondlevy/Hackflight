@@ -26,12 +26,17 @@
 #include <imus/real/softquat/mpu6000.h>
 #include <tasks/receivers/real/sbus.h>
 
+#include <SPI.h>
+
 #include <vector>
 using namespace std;
 
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t LED_PIN  = PB5;
 static const uint8_t EXTI_PIN = PC4;
+
+// ---------------- mosi miso sckl ssel
+static SPIClass _spi(PA7, PA6, PA5, PA4);
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -70,7 +75,7 @@ void setup(void)
 
     static SbusReceiver rx(Serial3);
 
-    static Mpu6000 imu(CS_PIN);
+    static Mpu6000 imu(_spi);
 
     static DshotEsc esc;
 
