@@ -31,12 +31,14 @@
 #include <vector>
 using namespace std;
 
+static const uint8_t MOSI_PIN = PA7;
+static const uint8_t MISO_PIN = PA6;
+static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t LED_PIN  = PB5;
 static const uint8_t EXTI_PIN = PC4;
 
-// ---------------- mosi miso sckl ssel
-static SPIClass _spi(PA7, PA6, PA5, PA4);
+static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -75,7 +77,7 @@ void setup(void)
 
     static SbusReceiver rx(Serial3);
 
-    static Mpu6000 imu(_spi);
+    static Mpu6000 imu(_spi, CS_PIN);
 
     static DshotEsc esc;
 

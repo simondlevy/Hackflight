@@ -20,10 +20,13 @@
 
 #include <SPI.h>
 
+static const uint8_t MOSI_PIN = PA7;  
+static const uint8_t MISO_PIN = PA6;  
+static const uint8_t SCLK_PIN = PA5;  
+static const uint8_t CS_PIN   = PA4;
 static const uint8_t LED_PIN  = PC14;
 
-// ---------------- mosi miso sclk
-static SPIClass _spi(PA7, PA6, PA5);
+static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
 void setup(void)
 {
