@@ -34,8 +34,8 @@ static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PB0;
 
-static const uint8_t LED_PIN  = PC13; // blue
-// static const uint8_t LED_PIN  = PC14; // green
+//static const uint8_t LED_PIN  = PC13; // orange
+static const uint8_t LED_PIN  = PC14; // blue
 
 static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
@@ -58,9 +58,13 @@ extern "C" void handleDmaIrq(uint8_t id)
     _board->handleDmaIrq(id);
 }
 
+static volatile uint32_t _count;
+
 static void handleImuInterrupt(void)
 {
     _imu->handleInterrupt();
+
+    _count++;
 }
 
 void setup(void)
@@ -86,5 +90,5 @@ void loop(void)
 {
     _board->step();
 
-    Serial.println(_imu->m_id, HEX);
+    Serial.println(_count);
 }
