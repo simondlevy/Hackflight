@@ -22,7 +22,6 @@
 #include <boards/stm32/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot.h>
-#include <led.h>
 #include <imus/real/softquat/mpu6000.h>
 #include <tasks/receivers/real/sbus.h>
 
