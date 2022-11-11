@@ -33,8 +33,6 @@ class Mpu6000 : public SoftQuatImu {
 
         } accelScale_e;
 
-        uint8_t m_id;
-
     private:
 
         // Registers
@@ -150,7 +148,7 @@ class Mpu6000 : public SoftQuatImu {
             delay(100);
 
             // Check ID
-            m_id = readRegister(REG_WHO_AM_I);
+            readRegister(REG_WHO_AM_I);
 
             // Clock Source PPL with Z axis gyro reference
             writeRegister(REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);

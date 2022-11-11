@@ -58,13 +58,9 @@ extern "C" void handleDmaIrq(uint8_t id)
     _board->handleDmaIrq(id);
 }
 
-static volatile uint32_t _count;
-
 static void handleImuInterrupt(void)
 {
     _imu->handleInterrupt();
-
-    _count++;
 }
 
 void setup(void)
@@ -89,6 +85,4 @@ void setup(void)
 void loop(void)
 {
     _board->step();
-
-    Serial.println(_count);
 }
