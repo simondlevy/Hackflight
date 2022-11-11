@@ -20,17 +20,17 @@
 
 #include <stm32f4xx.h>
 
-__attribute__( ( always_inline ) ) static inline void __set_BASEPRI_nb(uint32_t basePri)
+__attribute__( ( always_inline ) ) static inline void __set_BASEPRI_nb(const uint32_t basePri)
 {
     __ASM volatile ("\tMSR basepri, %0\n" : : "r" (basePri) );
 }
 
-static inline void __basepriRestoreMem(uint8_t *val)
+static inline void __basepriRestoreMem(const uint8_t *val)
 {
     __set_BASEPRI(*val);
 }
 
-static inline uint8_t __basepriSetMemRetVal(uint8_t prio)
+static inline uint8_t __basepriSetMemRetVal(const uint8_t prio)
 {
     __set_BASEPRI_MAX(prio);
     return 1;
@@ -136,38 +136,38 @@ class Stm32F4Board : public Stm32Board {
         }
 
 
-        static uint32_t rcc_encode(uint32_t reg, uint32_t mask) 
+        static uint32_t rcc_encode(const uint32_t reg, const uint32_t mask) 
         {
             return (reg << 5) | log2_32bit(mask);
         }
 
-        static uint32_t nvic_build_priority(uint32_t base, uint32_t sub) 
+        static const uint32_t nvic_build_priority(const uint32_t base, const uint32_t sub) 
         {
             return (((((base)<<(4-(7-(NVIC_PRIORITY_GROUPING>>8))))|
                             ((sub)&(0x0f>>(7-(NVIC_PRIORITY_GROUPING>>8)))))<<4)&0xf0);
         }
 
-        static uint32_t nvic_priority_base(uint32_t prio) 
+        static const uint32_t nvic_priority_base(const uint32_t prio) 
         {
             return (((prio)>>(4-(7-(NVIC_PRIORITY_GROUPING>>8))))>>4);
         }
 
-        static uint32_t nvic_priority_sub(uint32_t prio) 
+        static const uint32_t nvic_priority_sub(const uint32_t prio) 
         {
             return (((prio)&(0x0f>>(7-(NVIC_PRIORITY_GROUPING>>8))))>>4);
         }
 
-        static void RCC_APB2PeriphClockEnable(uint32_t mask)
+        static void RCC_APB2PeriphClockEnable(const uint32_t mask)
         {
             RCC->APB2ENR |= mask;
         }
 
-        static void RCC_AHB1PeriphClockEnable(uint32_t mask)
+        static void RCC_AHB1PeriphClockEnable(const uint32_t mask)
         {
             RCC->AHB1ENR |= mask;
         }
 
-        static void dmaCmd(port_t *port, FunctionalState newState)
+        static void dmaCmd(const port_t * port, const FunctionalState newState)
         {
             DMA_Stream_TypeDef * DMAy_Streamx = port->dmaStream;
 
@@ -179,7 +179,7 @@ class Stm32F4Board : public Stm32Board {
             }
         }
 
-        static void timDmaCmd(uint16_t TIM_DMASource, FunctionalState newState)
+        static void timDmaCmd(const uint16_t TIM_DMASource, const FunctionalState newState)
         {
             if (newState != DISABLE) {
                 // Enable the DMA sources
@@ -191,7 +191,7 @@ class Stm32F4Board : public Stm32Board {
             }
         }
 
-        static uint8_t rcc_ahb1(uint32_t gpio)
+        static uint8_t rcc_ahb1(const uint32_t gpio)
         {
             return (uint8_t)rcc_encode(RCC_AHB1, gpio); 
         }
@@ -220,11 +220,11 @@ class Stm32F4Board : public Stm32Board {
         }
 
         void initPort(
-                uint8_t portIndex,
-                uint16_t dmaSource,
+                const uint8_t portIndex,
+                const uint16_t dmaSource,
                 DMA_Stream_TypeDef * stream,
-                uint8_t flagsShift,
-                IRQn_Type irqChannel,
+                const uint8_t flagsShift,
+                const IRQn_Type irqChannel,
                 volatile uint32_t * ccr,
                 const uint32_t ccer_cc_e,
                 const uint32_t ccmr_oc,
@@ -310,17 +310,17 @@ class Stm32F4Board : public Stm32Board {
 
         } // initPort
 
-        void initMotor(uint8_t motorIndex, uint8_t portIndex)
+        void initMotor(const uint8_t motorIndex, const uint8_t portIndex)
         {
-            uint8_t pin = MOTOR_PINS[motorIndex];
+            const uint8_t pin = MOTOR_PINS[motorIndex];
 
-            uint8_t pinIndex = pin & 0x0f;
+            const uint8_t pinIndex = pin & 0x0f;
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
-            uint8_t ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
+            const uint8_t ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
 
-            uint8_t config = io_config(
+            const uint8_t config = io_config(
                     GPIO_MODE_OUT,
                     GPIO_FAST_SPEED,
                     GPIO_OTYPE_PP,
@@ -333,7 +333,7 @@ class Stm32F4Board : public Stm32Board {
 
             const uint8_t rcc = ioPortDefs[portIndex];
 
-            uint32_t mask = 1 << (rcc & 0x1f);
+            const uint32_t mask = 1 << (rcc & 0x1f);
 
             RCC_AHB1PeriphClockEnable(mask);
 
@@ -341,21 +341,19 @@ class Stm32F4Board : public Stm32Board {
             uint32_t speed = (config >> 2) & 0x03;
             uint32_t pull  = (config >> 5) & 0x03;
 
-            int32_t offset = __builtin_popcount(((1 << (pin & 0x0f)) - 1) & 0xffff);
-            offset += ioDefUsedOffset[(pin >> 4) - 1];
+            const int32_t offset = __builtin_popcount(((1 << (pin & 0x0f)) - 1) & 0xffff) +
+                ioDefUsedOffset[(pin >> 4) - 1];
             const void * io =  m_ioRecs + offset;
             const ioRec_t * ioRec = (ioRec_t *)io;
             GPIO_TypeDef * gpio = ioRec->gpio;
 
-            uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
+            const uint8_t pinmask = 1 << pinIndex;
 
-            uint8_t pinmask = 1 << pinIndex;
-
-            for (pinpos = 0x00; pinpos < 0x10; pinpos++)
+            for (uint32_t pinpos=0; pinpos <16; pinpos++)
             {
-                pos = ((uint32_t)0x01) << pinpos;
+                const uint32_t pos = ((uint32_t)0x01) << pinpos;
 
-                currentpin = pinmask & pos;
+                const uint32_t currentpin = pinmask & pos;
 
                 if (currentpin == pos)
                 {
@@ -387,10 +385,10 @@ class Stm32F4Board : public Stm32Board {
 
             gpio->BSRR |= (pinmask << 16);
 
-            uint32_t *buffer = port->outputBuffer;
-            uint16_t portMask = 1 << pinIndex;
-            uint32_t resetMask = (portMask << 16);
-            uint32_t setMask = portMask;
+            uint32_t * buffer = port->outputBuffer;
+            const uint16_t portMask = 1 << pinIndex;
+            const uint32_t resetMask = (portMask << 16);
+            const uint32_t setMask = portMask;
 
             for (auto bitpos=0; bitpos<16; bitpos++) {
                 buffer[bitpos * 3 + 0] |= setMask ; // Always set all ports
@@ -414,7 +412,7 @@ class Stm32F4Board : public Stm32Board {
 
     protected: // DshotEsc method overrides ============================================
 
-        virtual void dmaInit(uint32_t outputFreq) override
+        virtual void dmaInit(const uint32_t outputFreq) override
         {
             RCC_APB2PeriphClockEnable(
                     RCC_APB2LPENR_TIM1LPEN_Msk   |

@@ -23,7 +23,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/mock.h>
 #include <imus/real/softquat/mpu6000.h>
-#include <tasks/receivers/real/sbus.h>
+#include <tasks/receivers/mock.h>
 
 #include <vector>
 using namespace std;
@@ -50,7 +50,6 @@ static vector<PidController *> _pids = {&_anglePid};
 
 static Stm32F4Board * _board;
 static Mpu6000 * _imu;
-static SbusReceiver * _rx;
 
 static Mixer _mixer = QuadXbfMixer::make();
 
@@ -64,17 +63,12 @@ static void handleImuInterrupt(void)
     _imu->handleInterrupt();
 }
 
-void serialEvent1(void)
-{
-    _rx->handleEvent();
-}
-
 void setup(void)
 {
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static SbusReceiver rx(Serial1);
+    static MockReceiver rx;
 
     static Mpu6000 imu(_spi, CS_PIN);
 
@@ -83,7 +77,6 @@ void setup(void)
     static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
-    _rx = &rx;
     _imu = &imu;
 
     _board->begin();
