@@ -310,6 +310,29 @@ class Stm32F4Board : public Stm32Board {
 
         } // initPort
 
+        void initGpio(
+                GPIO_TypeDef * gpio,
+                const uint32_t mode,
+                const uint32_t speed,
+                const uint32_t pull,
+                const uint8_t pinpos)
+        {
+
+            gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
+            gpio->MODER |= (mode << (pinpos * 2));
+
+            if ((mode == GPIO_MODE_OUT) || (mode == GPIO_MODE_AF)) {
+
+                gpio->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
+                gpio->OSPEEDR |= (speed << (pinpos * 2));
+
+                gpio->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
+            }
+
+            gpio->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
+            gpio->PUPDR |= (pull << (pinpos * 2)); 
+        }
+
         void initMotor(const uint8_t motorIndex, const uint8_t portIndex)
         {
             const uint8_t pin = MOTOR_PINS[motorIndex];
@@ -337,11 +360,12 @@ class Stm32F4Board : public Stm32Board {
 
             RCC_AHB1PeriphClockEnable(mask);
 
-            uint32_t mode  = (config >> 0) & 0x03;
-            uint32_t speed = (config >> 2) & 0x03;
-            uint32_t pull  = (config >> 5) & 0x03;
+            const uint32_t mode  = (config >> 0) & 0x03;
+            const uint32_t speed = (config >> 2) & 0x03;
+            const uint32_t pull  = (config >> 5) & 0x03;
 
-            const int32_t offset = __builtin_popcount(((1 << (pin & 0x0f)) - 1) & 0xffff) +
+            const int32_t offset = 
+                __builtin_popcount(((1 << (pin & 0x0f)) - 1) &0xffff) +
                 ioDefUsedOffset[(pin >> 4) - 1];
             const void * io =  m_ioRecs + offset;
             const ioRec_t * ioRec = (ioRec_t *)io;
@@ -349,29 +373,10 @@ class Stm32F4Board : public Stm32Board {
 
             const uint8_t pinmask = 1 << pinIndex;
 
-            for (uint32_t pinpos=0; pinpos <16; pinpos++)
-            {
-                const uint32_t pos = ((uint32_t)0x01) << pinpos;
-
-                const uint32_t currentpin = pinmask & pos;
-
-                if (currentpin == pos)
-                {
-                    gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
-                    gpio->MODER |= (mode << (pinpos * 2));
-
-                    if ((mode == GPIO_MODE_OUT) || (mode == GPIO_MODE_AF)) {
-
-                        gpio->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
-                        gpio->OSPEEDR |= (speed << (pinpos * 2));
-
-                        gpio->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
-                    }
-
-                    gpio->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
-                    gpio->PUPDR |= (pull << (pinpos * 2)); 
-                }
-            }
+            initGpio(gpio, mode, speed, pull, 0);
+            initGpio(gpio, mode, speed, pull, 1);
+            initGpio(gpio, mode, speed, pull, 3);
+            initGpio(gpio, mode, speed, pull, 2);
 
             gpio->BSRR |= pinmask;
 

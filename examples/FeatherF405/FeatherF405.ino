@@ -64,6 +64,4 @@ void setup(void)
 void loop(void)
 {
     _board->step();
-
-    Serial.println(micros());
 }
