@@ -32,7 +32,7 @@ static const uint8_t MOSI_PIN = PA7;
 static const uint8_t MISO_PIN = PA6;
 static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
-static const uint8_t EXTI_PIN = PA1;
+static const uint8_t EXTI_PIN = PB0;
 
 static const uint8_t LED_PIN  = PC13; // blue
 // static const uint8_t LED_PIN  = PC14; // green
