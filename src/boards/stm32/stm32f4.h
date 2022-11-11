@@ -434,29 +434,22 @@ class Stm32F4Board : public Stm32Board {
                 }
             }
 
-            uint16_t outputARR = SystemCoreClock / outputFreq - 1;
+            const uint16_t outputARR = SystemCoreClock / outputFreq - 1;
 
             memset(m_outputBuffer, 0, sizeof(m_outputBuffer));
 
-            uint16_t tmpcr1 = TIM1->CR1;  
-
-            // Select the Counter Mode
-            tmpcr1 &= (uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS));
-            tmpcr1 |= (uint32_t)TIM_COUNTERMODE_UP;
-
-            // Set the clock division 
-            tmpcr1 &=  (uint16_t)(~TIM_CR1_CKD);
-            tmpcr1 |= (uint32_t)TIM_CLOCKDIVISION_DIV1;
-
-            TIM1->CR1 = tmpcr1;
+            TIM1->CR1 = TIM1->CR1 &
+                ((uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS))) |
+                ((uint32_t)TIM_COUNTERMODE_UP) &
+                ((uint16_t)(~TIM_CR1_CKD)) | 
+                ((uint32_t)TIM_CLOCKDIVISION_DIV1) |
+                TIM_CR1_ARPE;
 
             // Set the Autoreload value 
             TIM1->ARR = outputARR;
             TIM1->PSC = 0;
             TIM1->RCR = 0;
             TIM1->EGR = 0x0001;          
-
-            TIM1->CR1 |= TIM_CR1_ARPE;
 
             initPort(0, TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn,
                     &TIM1->CCR1, TIM_CCER_CC1E,
