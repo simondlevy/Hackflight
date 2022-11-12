@@ -309,13 +309,10 @@ class Stm32F4Board : public Stm32Board {
             gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
             gpio->MODER |= (mode << (pinpos * 2));
 
-            if ((mode == GPIO_MODE_OUT) || (mode == GPIO_MODE_AF)) {
+            gpio->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
+            gpio->OSPEEDR |= (speed << (pinpos * 2));
 
-                gpio->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
-                gpio->OSPEEDR |= (speed << (pinpos * 2));
-
-                gpio->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
-            }
+            gpio->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
 
             gpio->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
             gpio->PUPDR |= (pull << (pinpos * 2)); 
