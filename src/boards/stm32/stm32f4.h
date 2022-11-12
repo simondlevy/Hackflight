@@ -362,9 +362,6 @@ class Stm32F4Board : public Stm32Board {
                 MODIFY_REG(gpio->MODER, gpioModeMask, gpioModeOutput);
             }
 
-            // Reinitialize port group DMA for output
-            port->dmaStream->CR = port->CR;
-
         } // initMotor
 
     protected: // DshotEsc method overrides ============================================
