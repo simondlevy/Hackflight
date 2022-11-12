@@ -297,9 +297,7 @@ class Stm32F4Board : public Stm32Board {
             const uint32_t speed = (config >> 2) & 0x03;
             const uint32_t pull  = (config >> 5) & 0x03;
 
-            const uint8_t offset = motorPin - 16;
-
-            GPIO_TypeDef * gpio = m_gpios[offset];
+            GPIO_TypeDef * gpio = m_gpios[motorPin - 16];
 
             gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinIndex * 2));
             gpio->MODER |= (mode << (pinIndex * 2));
