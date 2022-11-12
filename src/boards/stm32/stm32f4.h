@@ -288,25 +288,21 @@ class Stm32F4Board : public Stm32Board {
 
             DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
 
-            TIM1->CCER &= (uint16_t)~ccer_cc_e;
-            uint16_t tmpccer = TIM1->CCER;
-            uint16_t tmpcr2 =  TIM1->CR2;
-            uint16_t tmpccmrx = TIM1->CCMR1;
-            tmpccmrx &= (uint16_t)~ccmr_oc;
-            tmpccmrx &= (uint16_t)~ccmr_cc;
-            tmpccmrx |= (TIM_OCMODE_TIMING << mode_shift);
-            tmpccer &= (uint16_t)~ccer_ccp;
-            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift1);
-            tmpccer |= (TIM_OUTPUTSTATE_ENABLE < state_shift);
+            TIM1->CR2 = TIM1->CR2 & (uint16_t)~cr2_ois;
 
-            tmpccer &= (uint16_t)~ccer_ccnp;
-            tmpccer |= (TIM_OCPOLARITY_HIGH << polarity_shift2);
-            tmpcr2 &= (uint16_t)~cr2_ois;
+            TIM1->CCMR1 = TIM1->CCMR1 &
+                (uint16_t)~ccmr_oc & (uint16_t)~ccmr_cc |
+                (TIM_OCMODE_TIMING << mode_shift);
 
-            TIM1->CR2 = tmpcr2;
-            TIM1->CCMR1 = tmpccmrx;
+            TIM1->CCER = TIM1->CCER & 
+                 (uint16_t)~ccer_cc_e &
+                (uint16_t)~ccer_ccp |
+                (TIM_OCPOLARITY_HIGH << polarity_shift1) | 
+                (TIM_OUTPUTSTATE_ENABLE < state_shift) &
+                (uint16_t)~ccer_ccnp |
+                (TIM_OCPOLARITY_HIGH << polarity_shift2);
+
             *ccr = 0x00000000;
-            TIM1->CCER = tmpccer;
 
         } // initPort
 
