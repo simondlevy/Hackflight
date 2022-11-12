@@ -179,14 +179,10 @@ class Stm32F4Board : public Stm32Board {
 
         static void timDmaCmd(const uint16_t TIM_DMASource, const FunctionalState newState)
         {
-            if (newState != DISABLE) {
-                // Enable the DMA sources
-                TIM1->DIER |= TIM_DMASource; 
-            }
-            else {
-                // Disable the DMA sources
-                TIM1->DIER &= (uint16_t)~TIM_DMASource;
-            }
+            TIM1->DIER = 
+                newState == DISABLE ? 
+                TIM1->DIER & ~(uint16_t)TIM_DMASource :
+                TIM1->DIER | TIM_DMASource;
         }
 
         static uint8_t rcc_ahb1(const uint32_t gpio)
