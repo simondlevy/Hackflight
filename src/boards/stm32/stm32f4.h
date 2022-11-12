@@ -294,8 +294,10 @@ class Stm32F4Board : public Stm32Board {
 
         void initMotor(const uint8_t motorIndex, const uint8_t portIndex)
         {
+            uint8_t motorPin = MOTOR_PINS[motorIndex];
+
             // 0, 1, 2, 3, ...
-            const uint8_t pinIndex = MOTOR_PINS[motorIndex] & 0x0f;
+            const uint8_t pinIndex = motorPin & 0x0f;
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
@@ -320,9 +322,7 @@ class Stm32F4Board : public Stm32Board {
             const uint32_t speed = (config >> 2) & 0x03;
             const uint32_t pull  = (config >> 5) & 0x03;
 
-            const uint8_t offsets[4] = {16, 17, 3, 2};
-
-            const uint8_t offset = offsets[motorIndex];
+            const uint8_t offset = motorPin - 16;
 
             const void * io =  &m_ioRecs[offset];
 
