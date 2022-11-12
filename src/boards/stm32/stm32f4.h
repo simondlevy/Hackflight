@@ -185,7 +185,7 @@ class Stm32F4Board : public Stm32Board {
 
         motor_t m_motors[4];
 
-        ioRec_t m_ioRecs[96];
+        GPIO_TypeDef * m_gpios[96];
 
         uint16_t m_pacerDmaMask = 0x0000;
 
@@ -308,11 +308,7 @@ class Stm32F4Board : public Stm32Board {
 
             const uint8_t offset = motorPin - 16;
 
-            const void * io =  &m_ioRecs[offset];
-
-            const ioRec_t * ioRec = (ioRec_t *)io;
-
-            GPIO_TypeDef * gpio = ioRec->gpio;
+            GPIO_TypeDef * gpio = m_gpios[offset];
 
             gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinIndex * 2));
             gpio->MODER |= (mode << (pinIndex * 2));
@@ -380,7 +376,7 @@ class Stm32F4Board : public Stm32Board {
             uint8_t k = 0;
             for (uint8_t port=0; port<4; port++) {
                 for (uint8_t pin=0; pin < 16; pin++) {
-                    m_ioRecs[k].gpio = (GPIO_TypeDef *)(GPIOA_BASE + (port << 10));
+                    m_gpios[k] = (GPIO_TypeDef *)(GPIOA_BASE + (port << 10));
                     k++;
                 }
             }
