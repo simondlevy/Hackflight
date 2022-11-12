@@ -171,12 +171,10 @@ class Stm32F4Board : public Stm32Board {
         {
             DMA_Stream_TypeDef * DMAy_Streamx = port->dmaStream;
 
-            if (newState != DISABLE) {
-                DMAy_Streamx->CR |= (uint32_t)DMA_SxCR_EN;
-            }
-            else {
-                DMAy_Streamx->CR &= ~(uint32_t)DMA_SxCR_EN;
-            }
+            DMAy_Streamx->CR  = 
+                newState == DISABLE ?
+                DMAy_Streamx->CR & ~(uint32_t)DMA_SxCR_EN :
+                DMAy_Streamx->CR | (uint32_t)DMA_SxCR_EN;
         }
 
         static void timDmaCmd(const uint16_t TIM_DMASource, const FunctionalState newState)
