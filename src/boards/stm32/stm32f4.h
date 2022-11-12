@@ -59,7 +59,6 @@ class Stm32F4Board : public Stm32Board {
             (uint32_t)(DMA_SxCR_TCIE | DMA_SxCR_HTIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE);
 
         static const uint32_t DMA_IT_TCIF  = 0x00000020;
-        static const uint32_t DMA_IT_TEIF  = 0x00000008;
 
         static const uint8_t STATE_PER_SYMBOL = 3;
         static const uint8_t FRAME_BITS = 16;
