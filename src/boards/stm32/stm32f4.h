@@ -236,9 +236,7 @@ class Stm32F4Board : public Stm32Board {
             port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
             port->flagsShift = flagsShift;
 
-            TIM1->CR1 &= (uint16_t)~TIM_CR1_CEN;
-
-            TIM1->CR1 |= TIM_CR1_CEN;
+            TIM1->CR1 = TIM1->CR1 & (uint16_t)~TIM_CR1_CEN | TIM_CR1_CEN;
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
