@@ -20,7 +20,7 @@
 #include <hackflight.h>
 #include <boards/stm32/ladybug.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <tasks/receivers/real/dsmx.h>
+#include <tasks/receivers/dsmx.h>
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp

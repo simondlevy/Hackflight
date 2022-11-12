@@ -23,7 +23,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/mock.h>
 #include <imus/mock.h>
-#include <tasks/receivers/real/sbus.h>
+#include <tasks/receivers/sbus.h>
 
 #include <vector>
 using namespace std;

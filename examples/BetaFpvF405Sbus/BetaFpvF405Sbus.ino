@@ -23,7 +23,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot.h>
 #include <imus/real/softquat/mpu6000.h>
-#include <tasks/receivers/real/sbus.h>
+#include <tasks/receivers/sbus.h>
 
 #include <SPI.h>
 
