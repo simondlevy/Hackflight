@@ -47,9 +47,6 @@ class Stm32F4Board : public Stm32Board {
 
         // Constants ===================================================================
 
-        static const uint32_t RCC_AHB1ENR_GPIOAEN_MSK = 0x00000001;
-        static const uint32_t RCC_AHB1ENR_GPIOBEN_MSK = 0x00000002;
-
         static const uint8_t GPIO_FAST_SPEED = 0x02;
         static const uint8_t GPIO_PUPD_UP    = 0x01;
         static const uint8_t GPIO_OTYPE_PP   = 0x00;
@@ -57,8 +54,6 @@ class Stm32F4Board : public Stm32Board {
         static const uint32_t RCC_AHB1PERIPH_DMA2 = 0x00400000;
 
         static const uint32_t NVIC_PRIORITY_GROUPING = 0x500;
-
-        static const uint8_t DEFIO_PORT_USED_COUNT = 6;
 
         static const uint32_t TRANSFER_IT_ENABLE_MASK = 
             (uint32_t)(DMA_SxCR_TCIE | DMA_SxCR_HTIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE);
@@ -278,10 +273,7 @@ class Stm32F4Board : public Stm32Board {
 
         } // initPort
 
-        void initMotor(
-                const uint8_t motorIndex,
-                const uint32_t portId,
-                const uint8_t portIndex)
+        void initMotor(const uint8_t motorIndex, const uint8_t portIndex)
         {
             uint8_t motorPin = MOTOR_PINS[motorIndex];
 
@@ -290,7 +282,7 @@ class Stm32F4Board : public Stm32Board {
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
-            const uint8_t rcc = rcc_ahb1(portId);
+            const uint8_t rcc = rcc_ahb1(portIndex+1);
 
             const uint32_t mask = 1 << (rcc & 0x1f);
 
@@ -406,10 +398,10 @@ class Stm32F4Board : public Stm32Board {
                     TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
-            initMotor(0, RCC_AHB1ENR_GPIOAEN_MSK, 0); 
-            initMotor(1, RCC_AHB1ENR_GPIOAEN_MSK,0);
-            initMotor(2, RCC_AHB1ENR_GPIOBEN_MSK,1);
-            initMotor(3, RCC_AHB1ENR_GPIOBEN_MSK,1);
+            initMotor(0, 0); 
+            initMotor(1, 0);
+            initMotor(2, 1);
+            initMotor(3, 1);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = outputARR;
