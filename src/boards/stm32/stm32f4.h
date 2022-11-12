@@ -246,8 +246,6 @@ class Stm32F4Board : public Stm32Board {
 
             uint32_t priority = nvic_build_priority(2, 1);
 
-            const int8_t index = portIndex == 0 ? 9 : 10;
-
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
             uint8_t tmppriority = 0x00, tmppre = 0x00, tmpsub = 0x0F;
@@ -259,9 +257,7 @@ class Stm32F4Board : public Stm32Board {
             tmppriority = nvic_priority_base(priority) << tmppre;
             tmppriority |= (uint8_t)(nvic_priority_sub(priority) & tmpsub);
 
-            tmppriority = tmppriority << 0x04;
-
-            NVIC->IP[irqChannel] = tmppriority;
+            NVIC->IP[irqChannel] = tmppriority << 0x04;
 
             NVIC->ISER[irqChannel >> 0x05] =
                 (uint32_t)0x01 << (irqChannel & (uint8_t)0x1F);
