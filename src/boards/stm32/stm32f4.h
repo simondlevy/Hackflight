@@ -314,6 +314,7 @@ class Stm32F4Board : public Stm32Board {
 
         void initMotor(const uint8_t motorIndex, const uint8_t portIndex)
         {
+            // 0, 1, 2, 3, ...
             const uint8_t pinIndex = MOTOR_PINS[motorIndex] & 0x0f;
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
@@ -351,10 +352,7 @@ class Stm32F4Board : public Stm32Board {
 
             GPIO_TypeDef * gpio = ioRec->gpio;
 
-            initGpio(gpio, mode, speed, pull, 0);
-            initGpio(gpio, mode, speed, pull, 1);
-            initGpio(gpio, mode, speed, pull, 2);
-            initGpio(gpio, mode, speed, pull, 3);
+            initGpio(gpio, mode, speed, pull, pinIndex);
 
             const uint8_t pinmask = 1 << pinIndex;
 
