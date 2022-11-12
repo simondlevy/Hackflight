@@ -292,26 +292,6 @@ class Stm32F4Board : public Stm32Board {
 
         } // initPort
 
-        void initGpio(
-                GPIO_TypeDef * gpio,
-                const uint32_t mode,
-                const uint32_t speed,
-                const uint32_t pull,
-                const uint8_t pinpos)
-        {
-
-            gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinpos * 2));
-            gpio->MODER |= (mode << (pinpos * 2));
-
-            gpio->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinpos * 2));
-            gpio->OSPEEDR |= (speed << (pinpos * 2));
-
-            gpio->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinpos)) ;
-
-            gpio->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinpos * 2));
-            gpio->PUPDR |= (pull << (pinpos * 2)); 
-        }
-
         void initMotor(const uint8_t motorIndex, const uint8_t portIndex)
         {
             // 0, 1, 2, 3, ...
@@ -352,7 +332,16 @@ class Stm32F4Board : public Stm32Board {
 
             GPIO_TypeDef * gpio = ioRec->gpio;
 
-            initGpio(gpio, mode, speed, pull, pinIndex);
+            gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinIndex * 2));
+            gpio->MODER |= (mode << (pinIndex * 2));
+
+            gpio->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinIndex * 2));
+            gpio->OSPEEDR |= (speed << (pinIndex * 2));
+
+            gpio->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinIndex)) ;
+
+            gpio->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinIndex * 2));
+            gpio->PUPDR |= (pull << (pinIndex * 2)); 
 
             const uint8_t pinmask = 1 << pinIndex;
 
