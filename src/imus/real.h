@@ -30,7 +30,6 @@
 
 class RealImu : public Imu {
 
-    friend class Hackflight;
     friend class Task;
     friend class AttitudeTask;
     friend class Receiver;

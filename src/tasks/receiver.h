@@ -33,7 +33,6 @@ static HardwareSerial * m_port;
 class Receiver : public Task {
 
     friend class Board;
-    friend class Hackflight;
     friend class Msp;
 
     static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;

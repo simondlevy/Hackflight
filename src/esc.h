@@ -27,7 +27,6 @@ class Esc {
 
     friend class Arming;
     friend class Board;
-    friend class Hackflight;
     friend class Msp;
 
     protected:

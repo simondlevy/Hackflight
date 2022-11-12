@@ -32,7 +32,6 @@
 class Imu {
 
     friend class Board;
-    friend class Hackflight;
 
     protected:
 

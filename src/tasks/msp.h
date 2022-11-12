@@ -29,7 +29,6 @@
 class Msp : public Task {
 
     friend class Board;
-    friend class Hackflight;
 
     static const uint8_t MAXMSG = 255;
 
@@ -40,16 +39,16 @@ class Msp : public Task {
     Receiver *      m_receiver;
     VehicleState *  m_vstate;
 
-    uint8_t _outBufChecksum;
-    uint8_t _outBuf[OUTBUF_SIZE];
-    uint8_t _outBufIndex;
-    uint8_t _outBufSize;
+    uint8_t m_outBufChecksum;
+    uint8_t m_outBuf[OUTBUF_SIZE];
+    uint8_t m_outBufIndex;
+    uint8_t m_outBufSize;
 
-    uint8_t _payload[128] = {};
+    uint8_t m_payload[128] = {};
 
-    float  motors[MAX_SUPPORTED_MOTORS];
+    float m_motors[MAX_SUPPORTED_MOTORS];
 
-    bool    _gotRebootRequest;
+    bool m_gotRebootRequest;
 
     void serialize16(int16_t a)
     {
@@ -59,9 +58,9 @@ class Msp : public Task {
 
     void prepareToSend(uint8_t type, uint8_t count, uint8_t size)
     {
-        _outBufSize = 0;
-        _outBufIndex = 0;
-        _outBufChecksum = 0;
+        m_outBufSize = 0;
+        m_outBufIndex = 0;
+        m_outBufChecksum = 0;
 
         addToOutBuf('$');
         addToOutBuf('M');
@@ -72,19 +71,19 @@ class Msp : public Task {
 
     void addToOutBuf(uint8_t a)
     {
-        _outBuf[_outBufSize++] = a;
+        m_outBuf[m_outBufSize++] = a;
     }
 
     void completeSend(void)
     {
-        serialize8(_outBufChecksum);
-        Serial.write(_outBuf, _outBufSize);
+        serialize8(m_outBufChecksum);
+        Serial.write(m_outBuf, m_outBufSize);
     }
 
     void serialize8(uint8_t a)
     {
         addToOutBuf(a);
-        _outBufChecksum ^= a;
+        m_outBufChecksum ^= a;
     }
 
     void prepareToSendBytes(uint8_t type, uint8_t count)
@@ -121,18 +120,18 @@ class Msp : public Task {
 
     uint8_t availableBytes(void)
     {
-        return _outBufSize;
+        return m_outBufSize;
     }
 
     uint8_t readByte(void)
     {
-        _outBufSize--;
-        return _outBuf[_outBufIndex++];
+        m_outBufSize--;
+        return m_outBuf[m_outBufIndex++];
     }
 
-    void parse(uint8_t c)
+    void parse(const uint8_t c)
     {
-        enum {
+        typedef enum {
             IDLE,
             GOT_START,
             GOT_M,
@@ -140,62 +139,60 @@ class Msp : public Task {
             GOT_SIZE,
             IN_PAYLOAD,
             GOT_CRC
-        }; 
+        } parser_state_t; 
 
-        static uint8_t parser_state;
+        static parser_state_t _parser_state;
+        static uint8_t _type;
+        static uint8_t _crc;
+        static uint8_t _size;
+        static uint8_t _index;
 
-        static uint8_t type;
-        static uint8_t crc;
-        static uint8_t size;
-        static uint8_t index;
-
-        if (parser_state == IDLE && c == 'R') {
-            _gotRebootRequest = true;
+        if (_parser_state == IDLE && c == 'R') {
+            m_gotRebootRequest = true;
             return;
         }
 
         // Payload functions
-        size = parser_state == GOT_ARROW ? c : size;
-        index = parser_state == IN_PAYLOAD ? index + 1 : 0;
-        bool incoming = type >= 200;
-        bool in_payload = incoming && parser_state == IN_PAYLOAD;
+        _size = _parser_state == GOT_ARROW ? c : _size;
+        _index = _parser_state == IN_PAYLOAD ? _index + 1 : 0;
+        const bool incoming = _type >= 200;
+        const bool in_payload = incoming && _parser_state == IN_PAYLOAD;
 
         // Command acquisition function
-        type = parser_state == GOT_SIZE ? c : type;
+        _type = _parser_state == GOT_SIZE ? c : _type;
 
         // Parser state transition function (final transition below)
-        parser_state
-            = parser_state == IDLE && c == '$' ? GOT_START
-            : parser_state == GOT_START && c == 'M' ? GOT_M
-            : parser_state == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
-            : parser_state == GOT_ARROW ? GOT_SIZE
-            : parser_state == GOT_SIZE ? IN_PAYLOAD
-            : parser_state == IN_PAYLOAD && index <= size ? IN_PAYLOAD
-            : parser_state == IN_PAYLOAD ? GOT_CRC
-            : parser_state;
+        _parser_state
+            = _parser_state == IDLE && c == '$' ? GOT_START
+            : _parser_state == GOT_START && c == 'M' ? GOT_M
+            : _parser_state == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
+            : _parser_state == GOT_ARROW ? GOT_SIZE
+            : _parser_state == GOT_SIZE ? IN_PAYLOAD
+            : _parser_state == IN_PAYLOAD && _index <= _size ? IN_PAYLOAD
+            : _parser_state == IN_PAYLOAD ? GOT_CRC
+            : _parser_state;
 
         // Checksum transition function
-        crc 
-            = parser_state == GOT_SIZE ?  c
-            : parser_state == IN_PAYLOAD ? crc ^ c
-            : parser_state == GOT_CRC ? crc 
+        _crc 
+            = _parser_state == GOT_SIZE ?  c
+            : _parser_state == IN_PAYLOAD ? _crc ^ c
+            : _parser_state == GOT_CRC ? _crc 
             : 0;
 
         // Payload accumulation
         if (in_payload) {
-            _payload[index-1] = c;
+            m_payload[_index-1] = c;
         }
 
-        if (parser_state == GOT_CRC) {
+        if (_parser_state == GOT_CRC) {
 
             // Message dispatch
-            if (crc == c) {
-                dispatchMessage(type);
+            if (_crc == c) {
+                dispatchMessage(_type);
             }
 
-            parser_state = IDLE;
+            _parser_state = IDLE;
         }
-
 
     } // parse
 
@@ -211,10 +208,10 @@ class Msp : public Task {
 
     void handle_SET_MOTOR(uint16_t  m1, uint16_t  m2, uint16_t  m3, uint16_t  m4)
     {
-        motors[0] = m_esc->convertFromExternal(m1);
-        motors[1] = m_esc->convertFromExternal(m2);
-        motors[2] = m_esc->convertFromExternal(m3);
-        motors[3] = m_esc->convertFromExternal(m4);
+        m_motors[0] = m_esc->convertFromExternal(m1);
+        m_motors[1] = m_esc->convertFromExternal(m2);
+        m_motors[2] = m_esc->convertFromExternal(m3);
+        m_motors[3] = m_esc->convertFromExternal(m4);
     }
 
     void handle_RC_Request(
@@ -247,16 +244,16 @@ class Msp : public Task {
             case 214:
                 {
                     uint16_t m1 = 0;
-                    memcpy(&m1,  &_payload[0], sizeof(uint16_t));
+                    memcpy(&m1,  &m_payload[0], sizeof(uint16_t));
 
                     uint16_t m2 = 0;
-                    memcpy(&m2,  &_payload[2], sizeof(uint16_t));
+                    memcpy(&m2,  &m_payload[2], sizeof(uint16_t));
 
                     uint16_t m3 = 0;
-                    memcpy(&m3,  &_payload[4], sizeof(uint16_t));
+                    memcpy(&m3,  &m_payload[4], sizeof(uint16_t));
 
                     uint16_t m4 = 0;
-                    memcpy(&m4,  &_payload[6], sizeof(uint16_t));
+                    memcpy(&m4,  &m_payload[6], sizeof(uint16_t));
 
                     handle_SET_MOTOR(m1, m2, m3, m4);
 
@@ -316,9 +313,9 @@ class Msp : public Task {
 
         m_receiver = receiver;
 
-        _outBufChecksum = 0;
-        _outBufIndex = 0;
-        _outBufSize = 0;
+        m_outBufChecksum = 0;
+        m_outBufIndex = 0;
+        m_outBufSize = 0;
     }
 
     virtual void fun(uint32_t usec) override
@@ -332,7 +329,7 @@ class Msp : public Task {
 
     bool gotRebootRequest(void)
     {
-        return _gotRebootRequest;
+        return m_gotRebootRequest;
     }
 
 }; // class Msp

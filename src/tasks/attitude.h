@@ -24,7 +24,6 @@
 class AttitudeTask : public Task {
 
     friend class Board;
-    friend class Hackflight;
 
     private:
 

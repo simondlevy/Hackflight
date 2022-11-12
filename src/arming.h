@@ -28,7 +28,6 @@ class Arming {
 
     friend class AttitudeTask;
     friend class Board;
-    friend class Hackflight;
     friend class Msp;
     friend class Receiver;
 
