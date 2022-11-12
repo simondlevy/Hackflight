@@ -95,7 +95,6 @@ class Stm32F4Board : public Stm32Board {
             DMA_Stream_TypeDef * dmaStream;
             uint16_t             dmaSource;
             uint32_t             outputBuffer[BUF_LENGTH];
-            uint32_t             CR;
             uint8_t              flagsShift;
         } port_t;
 
@@ -258,8 +257,6 @@ class Stm32F4Board : public Stm32Board {
                  (DMA_FIFOMODE_ENABLE | DMA_FIFO_THRESHOLD_1QUARTERFULL));
             DMAy_Streamx->NDTR = BUF_LENGTH;
             DMAy_Streamx->M0AR = (uint32_t)port->outputBuffer;
-
-            port->CR = port->dmaStream->CR;
 
             DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
 
