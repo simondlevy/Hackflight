@@ -341,7 +341,7 @@ class Stm32F4Board : public Stm32Board {
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
-            const uint8_t ioDefUsedOffset[DEFIO_PORT_USED_COUNT] = { 0, 16, 32, 48, 64, 80 };
+            const uint8_t ioDefUsedOffset[DEFIO_PORT_USED_COUNT] ={ 0, 16, 32, 48, 64, 80 };
 
             const uint8_t config = io_config(
                     GPIO_MODE_OUT,
@@ -375,8 +375,8 @@ class Stm32F4Board : public Stm32Board {
 
             initGpio(gpio, mode, speed, pull, 0);
             initGpio(gpio, mode, speed, pull, 1);
-            initGpio(gpio, mode, speed, pull, 3);
             initGpio(gpio, mode, speed, pull, 2);
+            initGpio(gpio, mode, speed, pull, 3);
 
             gpio->BSRR |= pinmask;
 
