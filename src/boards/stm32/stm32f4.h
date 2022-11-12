@@ -299,8 +299,6 @@ class Stm32F4Board : public Stm32Board {
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
-            const uint8_t ioDefUsedOffset[DEFIO_PORT_USED_COUNT] ={ 0, 16, 32, 48, 64, 80 };
-
             const uint8_t config = io_config(
                     GPIO_MODE_OUT,
                     GPIO_FAST_SPEED,
