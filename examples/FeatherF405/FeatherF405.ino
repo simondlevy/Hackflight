@@ -64,4 +64,13 @@ void setup(void)
 void loop(void)
 {
     _board->step();
+
+    Serial.print(_board->offsets[0]);
+    Serial.print(" ");
+    Serial.print(_board->offsets[1]);
+    Serial.print(" ");
+    Serial.print(_board->offsets[2]);
+    Serial.print(" ");
+    Serial.print(_board->offsets[3]);
+    Serial.println();
 }

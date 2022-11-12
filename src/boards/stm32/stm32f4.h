@@ -314,9 +314,7 @@ class Stm32F4Board : public Stm32Board {
 
         void initMotor(const uint8_t motorIndex, const uint8_t portIndex)
         {
-            const uint8_t pin = MOTOR_PINS[motorIndex];
-
-            const uint8_t pinIndex = pin & 0x0f;
+            const uint8_t pinIndex = MOTOR_PINS[motorIndex] & 0x0f;
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
@@ -343,19 +341,22 @@ class Stm32F4Board : public Stm32Board {
             const uint32_t speed = (config >> 2) & 0x03;
             const uint32_t pull  = (config >> 5) & 0x03;
 
-            const int32_t offset = 
-                __builtin_popcount(((1 << (pin & 0x0f)) - 1) &0xffff) +
-                ioDefUsedOffset[(pin >> 4) - 1];
-            const void * io =  m_ioRecs + offset;
-            const ioRec_t * ioRec = (ioRec_t *)io;
-            GPIO_TypeDef * gpio = ioRec->gpio;
+            const uint8_t offsets[4] = {16, 17, 3, 2};
 
-            const uint8_t pinmask = 1 << pinIndex;
+            const uint8_t offset = offsets[motorIndex];
+
+            const void * io =  &m_ioRecs[offset];
+
+            const ioRec_t * ioRec = (ioRec_t *)io;
+
+            GPIO_TypeDef * gpio = ioRec->gpio;
 
             initGpio(gpio, mode, speed, pull, 0);
             initGpio(gpio, mode, speed, pull, 1);
             initGpio(gpio, mode, speed, pull, 2);
             initGpio(gpio, mode, speed, pull, 3);
+
+            const uint8_t pinmask = 1 << pinIndex;
 
             gpio->BSRR |= pinmask;
 
