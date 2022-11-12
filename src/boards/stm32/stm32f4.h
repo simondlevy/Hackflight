@@ -94,7 +94,7 @@ class Stm32F4Board : public Stm32Board {
         typedef struct {
             DMA_Stream_TypeDef * dmaStream;
             uint16_t             dmaSource;
-            uint32_t *           outputBuffer;
+            uint32_t             outputBuffer[BUF_LENGTH];
             uint32_t             CR;
             uint8_t              flagsShift;
         } port_t;
@@ -184,9 +184,7 @@ class Stm32F4Board : public Stm32Board {
 
         port_t m_ports[2];
 
-        motor_t m_motors[MAX_SUPPORTED_MOTORS];
-
-        uint32_t m_outputBuffer[BUF_LENGTH * MAX_SUPPORTED_MOTORS];
+        motor_t m_motors[4];
 
         ioRec_t m_ioRecs[96];
 
@@ -223,8 +221,9 @@ class Stm32F4Board : public Stm32Board {
         {
             port_t * port = &m_ports[portIndex];
             port->dmaStream = stream;
-            port->outputBuffer = &m_outputBuffer[(port - m_ports) * BUF_LENGTH];
             port->flagsShift = flagsShift;
+
+            memset(port->outputBuffer, 0, sizeof(port->outputBuffer));
 
             TIM1->CR1 = TIM1->CR1 & (uint16_t)~TIM_CR1_CEN | TIM_CR1_CEN;
 
@@ -394,8 +393,6 @@ class Stm32F4Board : public Stm32Board {
 
             const uint16_t outputARR = SystemCoreClock / outputFreq - 1;
 
-            memset(m_outputBuffer, 0, sizeof(m_outputBuffer));
-
             TIM1->CR1 = TIM1->CR1 &
                 ((uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS))) |
                 ((uint32_t)TIM_COUNTERMODE_UP) &
@@ -419,7 +416,6 @@ class Stm32F4Board : public Stm32Board {
                     TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
-            // initMotor(motorIndex, portIndex)
             initMotor(0, RCC_AHB1ENR_GPIOAEN_MSK, 0); 
             initMotor(1, RCC_AHB1ENR_GPIOAEN_MSK,0);
             initMotor(2, RCC_AHB1ENR_GPIOBEN_MSK,1);
