@@ -65,12 +65,12 @@ void loop(void)
 {
     _board->step();
 
-    Serial.print(_board->offsets[0]);
+    Serial.print(PB0, HEX);
     Serial.print(" ");
-    Serial.print(_board->offsets[1]);
+    Serial.print(PB1, HEX);
     Serial.print(" ");
-    Serial.print(_board->offsets[2]);
+    Serial.print(PC9, HEX);
     Serial.print(" ");
-    Serial.print(_board->offsets[3]);
+    Serial.print(PC8, HEX);
     Serial.println();
 }

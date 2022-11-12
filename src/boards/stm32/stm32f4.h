@@ -110,16 +110,6 @@ class Stm32F4Board : public Stm32Board {
 
         // Static local funs ===========================================================
 
-        static uint8_t io_config(
-                const uint8_t mode,
-                const uint8_t speed,
-                const uint8_t otype,
-                const uint8_t pupd) 
-        {
-            return mode | (speed << 2) | (otype << 4) | (pupd << 5);
-        }
-
-
         static uint32_t log2_8bit(uint32_t v)  
         {
             return 8 - 90/((v/4+14)|1) - 2/(v/2+1);
@@ -292,7 +282,10 @@ class Stm32F4Board : public Stm32Board {
 
         } // initPort
 
-        void initMotor(const uint8_t motorIndex, const uint8_t portIndex)
+        void initMotor(
+                const uint8_t motorIndex,
+                const uint32_t portId,
+                const uint8_t portIndex)
         {
             uint8_t motorPin = MOTOR_PINS[motorIndex];
 
@@ -301,22 +294,17 @@ class Stm32F4Board : public Stm32Board {
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
-            const uint8_t config = io_config(
-                    GPIO_MODE_OUT,
-                    GPIO_FAST_SPEED,
-                    GPIO_OTYPE_PP,
-                    GPIO_PUPD_UP);
-
-            const uint8_t ioPortDefs[2] = {
-                { rcc_ahb1(RCC_AHB1ENR_GPIOAEN_MSK) },
-                { rcc_ahb1(RCC_AHB1ENR_GPIOBEN_MSK) }
-            };
-
-            const uint8_t rcc = ioPortDefs[portIndex];
+            const uint8_t rcc = rcc_ahb1(portId);
 
             const uint32_t mask = 1 << (rcc & 0x1f);
 
             RCC_AHB1PeriphClockEnable(mask);
+
+            const uint8_t config =
+                GPIO_MODE_OUT |
+                (GPIO_FAST_SPEED << 2) |
+                (GPIO_OTYPE_PP << 4) |
+                (GPIO_PUPD_UP << 5);
 
             const uint32_t mode  = (config >> 0) & 0x03;
             const uint32_t speed = (config >> 2) & 0x03;
@@ -432,10 +420,10 @@ class Stm32F4Board : public Stm32Board {
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
             // initMotor(motorIndex, portIndex)
-            initMotor(0, 0); 
-            initMotor(1, 0);
-            initMotor(2, 1);
-            initMotor(3, 1);
+            initMotor(0, RCC_AHB1ENR_GPIOAEN_MSK, 0); 
+            initMotor(1, RCC_AHB1ENR_GPIOAEN_MSK,0);
+            initMotor(2, RCC_AHB1ENR_GPIOBEN_MSK,1);
+            initMotor(3, RCC_AHB1ENR_GPIOBEN_MSK,1);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = outputARR;
