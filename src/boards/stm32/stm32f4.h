@@ -124,18 +124,18 @@ class Stm32F4Board : public Stm32Board {
             return (reg << 5) | log2_32bit(mask);
         }
 
-        static const uint32_t nvic_build_priority(const uint32_t base, const uint32_t sub) 
+        static uint32_t nvic_build_priority(const uint32_t base, const uint32_t sub) 
         {
             return (((((base)<<(4-(7-(NVIC_PRIORITY_GROUPING>>8))))|
                             ((sub)&(0x0f>>(7-(NVIC_PRIORITY_GROUPING>>8)))))<<4)&0xf0);
         }
 
-        static const uint32_t nvic_priority_base(const uint32_t prio) 
+        static uint32_t nvic_priority_base(const uint32_t prio) 
         {
             return (((prio)>>(4-(7-(NVIC_PRIORITY_GROUPING>>8))))>>4);
         }
 
-        static const uint32_t nvic_priority_sub(const uint32_t prio) 
+        static uint32_t nvic_priority_sub(const uint32_t prio) 
         {
             return (((prio)&(0x0f>>(7-(NVIC_PRIORITY_GROUPING>>8))))>>4);
         }
@@ -218,7 +218,7 @@ class Stm32F4Board : public Stm32Board {
 
             memset(port->outputBuffer, 0, sizeof(port->outputBuffer));
 
-            TIM1->CR1 = TIM1->CR1 & (uint16_t)~TIM_CR1_CEN | TIM_CR1_CEN;
+            TIM1->CR1 = (TIM1->CR1 & (uint16_t)~TIM_CR1_CEN) | TIM_CR1_CEN;
 
             RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
 
@@ -232,10 +232,7 @@ class Stm32F4Board : public Stm32Board {
 
             const uint8_t tmppriority = (0x700 - ((SCB->AIRCR) & (uint32_t)0x700))>> 0x08;
             const uint8_t tmppre = (0x4 - tmppriority);
-            const uint8_t tmpsub = tmpsub >> tmppriority;
-
-            const uint8_t tmppriority2 = nvic_priority_base(priority) << tmppre |
-                (uint8_t)(nvic_priority_sub(priority) & tmpsub);
+            const uint8_t tmppriority2 = nvic_priority_base(priority) << tmppre;
 
             NVIC->IP[irqChannel] = tmppriority2 << 0x04;
 
@@ -256,16 +253,12 @@ class Stm32F4Board : public Stm32Board {
 
             TIM1->CR2 = TIM1->CR2 & (uint16_t)~cr2_ois;
 
-            TIM1->CCMR1 = TIM1->CCMR1 &
-                (uint16_t)~ccmr_oc & (uint16_t)~ccmr_cc |
+            TIM1->CCMR1 = (TIM1->CCMR1 & (uint16_t)~ccmr_oc & (uint16_t)~ccmr_cc) |
                 (TIM_OCMODE_TIMING << mode_shift);
 
-            TIM1->CCER = TIM1->CCER & 
-                 (uint16_t)~ccer_cc_e &
-                (uint16_t)~ccer_ccp |
+            TIM1->CCER = (TIM1->CCER & (uint16_t)~ccer_cc_e & (uint16_t)~ccer_ccp) |
                 (TIM_OCPOLARITY_HIGH << polarity_shift1) | 
-                (TIM_OUTPUTSTATE_ENABLE < state_shift) &
-                (uint16_t)~ccer_ccnp |
+                ((TIM_OUTPUTSTATE_ENABLE < state_shift) & (uint16_t)~ccer_ccnp) |
                 (TIM_OCPOLARITY_HIGH << polarity_shift2);
 
             *ccr = 0x00000000;
@@ -370,14 +363,12 @@ class Stm32F4Board : public Stm32Board {
                 }
             }
 
-            const uint16_t outputARR = SystemCoreClock / outputFreq - 1;
-
-            TIM1->CR1 = TIM1->CR1 &
-                ((uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS))) |
-                ((uint32_t)TIM_COUNTERMODE_UP) &
-                ((uint16_t)(~TIM_CR1_CKD)) | 
+            TIM1->CR1 = (TIM1->CR1 & ((uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS)))) |
+                (((uint32_t)TIM_COUNTERMODE_UP) & ((uint16_t)(~TIM_CR1_CKD))) | 
                 ((uint32_t)TIM_CLOCKDIVISION_DIV1) |
                 TIM_CR1_ARPE;
+
+            const uint16_t outputARR = SystemCoreClock / outputFreq - 1;
 
             // Set the Autoreload value 
             TIM1->ARR = outputARR;
