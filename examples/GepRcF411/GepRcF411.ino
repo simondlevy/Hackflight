@@ -54,7 +54,9 @@ void setup(void)
 {
     static SbusReceiver rx(Serial2);
 
+    // XXX GepRC F411 uses a BMI270 IMU
     static MockImu imu;
+
     static MockEsc esc;
 
     static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
