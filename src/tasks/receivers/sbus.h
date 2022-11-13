@@ -130,6 +130,7 @@ class SbusReceiver : public Receiver {
 
         virtual void devStart(void) override
         {
+            m_board->sbusInit(m_port);
 #if defined(TEENSYSUINO)
             m_port->begin(100000, SERIAL_8E2_RXINV_TXINV);
 #elif defined(ESP32)

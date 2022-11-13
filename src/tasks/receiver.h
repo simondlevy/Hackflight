@@ -289,6 +289,8 @@ class Receiver : public Task {
 
     protected:
 
+    Board * m_board;
+
     static float convert(
             const uint16_t value,
             const uint16_t srcmin,

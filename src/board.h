@@ -214,8 +214,9 @@ class Board {
             m_esc = &esc;
             m_led.m_pin = ledPin;
 
-            m_imu->m_board = this;
-            m_esc->m_board = this;
+            imu.m_board = this;
+            esc.m_board = this;
+            receiver.m_board = this;
         }
 
      public:
@@ -250,6 +251,11 @@ class Board {
         {
             (void)index;
             (void)packet;
+        }
+
+        virtual void sbusInit(HardwareSerial * port)
+        {
+            (void)port;
         }
 
         void begin(void)

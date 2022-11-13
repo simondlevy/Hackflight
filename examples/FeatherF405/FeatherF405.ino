@@ -64,13 +64,4 @@ void setup(void)
 void loop(void)
 {
     _board->step();
-
-    Serial.print(PB0, HEX);
-    Serial.print(" ");
-    Serial.print(PB1, HEX);
-    Serial.print(" ");
-    Serial.print(PC9, HEX);
-    Serial.print(" ");
-    Serial.print(PC8, HEX);
-    Serial.println();
 }
