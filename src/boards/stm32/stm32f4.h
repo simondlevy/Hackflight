@@ -64,6 +64,7 @@ class Stm32F4Board : public Stm32Board {
         static const uint8_t FRAME_BITS = 16;
         static const uint8_t BUF_LENGTH = FRAME_BITS * STATE_PER_SYMBOL;
 
+        // ---------------------- PB0   PB1   PA3   PA2
         uint8_t MOTOR_PINS[4] = {0x20, 0x21, 0x13, 0x12};
 
         // Enums =======================================================================

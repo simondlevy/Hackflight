@@ -61,7 +61,18 @@ void setup(void)
     _board->begin();
 }
 
+static void dump(uint8_t val, const char * term=" ")
+{
+    Serial.print(val, HEX);
+    Serial.print(term);
+}
+
 void loop(void)
 {
     _board->step();
+
+    dump(PB0);
+    dump(PB1);
+    dump(PA3);
+    dump(PA2, "\n");
 }
