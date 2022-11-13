@@ -20,25 +20,11 @@
 
 #include "board.h"
 
-class Teensy40 : public Board {
-
-    virtual uint32_t getCycleCounter(void) override
-    {
-        return ARM_DWT_CYCCNT;
-    }
-
-    virtual uint32_t getClockSpeed(void) override
-    {
-        return F_CPU;
-    }
-
-    virtual void startCycleCounter(void) override
-    {
-        ARM_DEMCR |= ARM_DEMCR_TRCENA;
-        ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA;
-    }
+class Esp32 : public Board {
 
     virtual void sbusInit(HardwareSerial * port) override
     {
-        port->begin(100000, SERIAL_8E2_RXINV_TXINV);
-    };
+        port->begin(100000, SERIAL_8E2, rxpin, txpin, true);
+    }
+
+}; // class Esp32
