@@ -21,9 +21,9 @@
 #include <alignment/rotate270.h>
 #include <boards/stm32/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/mock.h>
+#include <escs/dshot.h>
 #include <imus/real/softquat/mpu6000.h>
-#include <tasks/receivers/mock.h>
+#include <tasks/receivers/sbus.h>
 
 #include <vector>
 using namespace std;
@@ -46,12 +46,11 @@ static AnglePidController _anglePid(
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-static vector<PidController *> _pids = {&_anglePid};
-
 static Stm32F4Board * _board;
 static Mpu6000 * _imu;
+static SbusReceiver * _rx;
 
-static Mixer _mixer = QuadXbfMixer::make();
+static vector<PidController *> _pids = {&_anglePid};
 
 extern "C" void handleDmaIrq(uint8_t id)
 {
@@ -63,20 +62,28 @@ static void handleImuInterrupt(void)
     _imu->handleInterrupt();
 }
 
+void serialEvent1(void)
+{
+    _rx->handleEvent();
+}
+
+static Mixer _mixer = QuadXbfMixer::make();
+
 void setup(void)
 {
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static MockReceiver rx;
+    static SbusReceiver rx(Serial1);
 
     static Mpu6000 imu(_spi, CS_PIN);
 
-    static MockEsc esc;
+    static DshotEsc esc;
 
     static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
+    _rx = &rx;
     _imu = &imu;
 
     _board->begin();

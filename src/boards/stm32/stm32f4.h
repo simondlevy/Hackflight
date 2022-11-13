@@ -47,6 +47,12 @@ class Stm32F4Board : public Stm32Board {
 
         // Constants ===================================================================
 
+        //  --------------------- PB0    PB1  PA3   PA2
+        uint8_t MOTOR_PINS[4] = {0x20, 0x21, 0x13, 0x12};
+
+        // ------------------------- PB3   PB4   PB6   PB7
+        // uint8_t MOTOR_PINS[4] = {0x23, 0x24, 0x26, 0x27};
+
         static const uint8_t GPIO_FAST_SPEED = 0x02;
         static const uint8_t GPIO_PUPD_UP    = 0x01;
         static const uint8_t GPIO_OTYPE_PP   = 0x00;
@@ -63,9 +69,6 @@ class Stm32F4Board : public Stm32Board {
         static const uint8_t STATE_PER_SYMBOL = 3;
         static const uint8_t FRAME_BITS = 16;
         static const uint8_t BUF_LENGTH = FRAME_BITS * STATE_PER_SYMBOL;
-
-        // ---------------------- PB0   PB1   PA3   PA2
-        uint8_t MOTOR_PINS[4] = {0x20, 0x21, 0x13, 0x12};
 
         // Enums =======================================================================
 
