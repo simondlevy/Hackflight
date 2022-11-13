@@ -136,7 +136,7 @@ class SbusReceiver : public Receiver {
 #elif defined(ESP32)
             m_port->begin(100000, SERIAL_8E2, rxpin, txpin, true);
 #else // default to STM32
-            m_port->begin(100000, SERIAL_8E2);
+            //m_port->begin(100000, SERIAL_8E2);
 #endif
         }
 
