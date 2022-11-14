@@ -22,8 +22,3 @@ void DMA2_Stream1_IRQHandler(void)
 {
     handleDmaIrq();
 }
-
-void DMA2_Stream2_IRQHandler(void) 
-{
-    handleDmaIrq();
-}
