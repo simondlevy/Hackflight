@@ -193,7 +193,6 @@ class Stm32F411Board : public Stm32Board {
         }
 
         void initPort(
-                const uint8_t portIndex,
                 const uint16_t dmaSource,
                 DMA_Stream_TypeDef * stream,
                 const uint8_t flagsShift,
@@ -263,10 +262,7 @@ class Stm32F411Board : public Stm32Board {
 
         } // initPort
 
-        void initMotor(
-                vector<uint8_t> * motorPins,
-                const uint8_t motorIndex,
-                const uint8_t portIndex)
+        void initMotor( vector<uint8_t> * motorPins, const uint8_t motorIndex)
         {
             const uint8_t motorPin = (*motorPins)[motorIndex];
 
@@ -275,7 +271,7 @@ class Stm32F411Board : public Stm32Board {
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
-            const uint8_t rcc = rcc_ahb1(portIndex+1);
+            const uint8_t rcc = rcc_ahb1(1);
 
             const uint32_t mask = 1 << (rcc & 0x1f);
 
@@ -378,20 +374,15 @@ class Stm32F411Board : public Stm32Board {
             TIM1->RCR = 0;
             TIM1->EGR = 0x0001;          
 
-            initPort(0, TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn,
+            initPort(TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn,
                     &TIM1->CCR1, TIM_CCER_CC1E,
                     TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
                     TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
 
-            initPort(1, TIM_DMA_CC2, DMA2_Stream2, 16, DMA2_Stream2_IRQn,
-                    &TIM1->CCR2, TIM_CCER_CC2E,
-                    TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
-                    TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
-
-            initMotor(motorPins, 0, 0); 
-            initMotor(motorPins, 1, 0);
-            initMotor(motorPins, 2, 0);
-            initMotor(motorPins, 3, 0);
+            initMotor(motorPins, 0); 
+            initMotor(motorPins, 1);
+            initMotor(motorPins, 2);
+            initMotor(motorPins, 3);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = outputARR;
