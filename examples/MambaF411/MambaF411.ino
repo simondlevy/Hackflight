@@ -54,9 +54,9 @@ static SbusReceiver * _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
 
-extern "C" void handleDmaIrq(uint8_t id)
+extern "C" void handleDmaIrq(void)
 {
-    _board->handleDmaIrq(id);
+    _board->handleDmaIrq();
 }
 
 static void handleImuInterrupt(void)

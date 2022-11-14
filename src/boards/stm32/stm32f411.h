@@ -427,7 +427,7 @@ class Stm32F411Board : public Stm32Board {
         {
         }
 
-        void handleDmaIrq(const uint8_t index)
+        void handleDmaIrq(void)
         {
             port_t *port = &m_port;
 

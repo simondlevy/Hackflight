@@ -16,15 +16,14 @@
 
 #include <stm32f4xx.h>
 
-
-void handleDmaIrq(uint8_t id);
+void handleDmaIrq(void);
 
 void DMA2_Stream1_IRQHandler(void) 
 {
-    handleDmaIrq(0);
+    handleDmaIrq();
 }
 
 void DMA2_Stream2_IRQHandler(void) 
 {
-    handleDmaIrq(1);
+    handleDmaIrq();
 }
