@@ -388,10 +388,10 @@ class Stm32F411Board : public Stm32Board {
                     TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
-            initMotor(motorPins, 0, 1); 
-            initMotor(motorPins, 1, 1);
-            initMotor(motorPins, 2, 1);
-            initMotor(motorPins, 3, 1);
+            initMotor(motorPins, 0, 0); 
+            initMotor(motorPins, 1, 0);
+            initMotor(motorPins, 2, 0);
+            initMotor(motorPins, 3, 0);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = outputARR;
