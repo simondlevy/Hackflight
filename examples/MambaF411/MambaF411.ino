@@ -34,6 +34,9 @@ static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PB0;
 
+// ------------------------- PB3   PB4   PB6   PB7
+// uint8_t MOTOR_PINS[4] = {0x23, 0x24, 0x26, 0x27};
+
 //static const uint8_t LED_PIN  = PC13; // orange
 static const uint8_t LED_PIN  = PC14; // blue
 

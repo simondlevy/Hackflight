@@ -66,8 +66,6 @@ class DshotEsc : public Esc {
             COMMAND_STATE_POSTDELAY   // delay period after the cmd has been sent
         } commandVehicleState_e;
 
-        vector<uint8_t> * m_pins;
-
         typedef struct {
             commandVehicleState_e state;
             uint32_t nextCommandCycleDelay;
@@ -81,6 +79,8 @@ class DshotEsc : public Esc {
         uint8_t m_commandQueueTail;
 
         bool m_enabled = false;
+
+        vector <uint8_t> * m_pins;
 
         bool isLastCommand(void)
         {
@@ -249,7 +249,7 @@ class DshotEsc : public Esc {
 
         DshotEsc(vector<uint8_t> * motorPins, protocol_t protocol=DSHOT600) 
         {
-            (void)motorPins;
+            m_pins = motorPins;
             m_protocol = protocol;
         }
 
@@ -260,7 +260,7 @@ class DshotEsc : public Esc {
                 m_protocol == DSHOT300 ? 300 :
                 600;
 
-            m_board->dmaInit(NULL, 1000 * outputFreq);
+            m_board->dmaInit(m_pins, 1000 * outputFreq);
 
             m_enabled = true;
         }

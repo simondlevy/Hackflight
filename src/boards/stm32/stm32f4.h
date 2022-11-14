@@ -47,12 +47,6 @@ class Stm32F4Board : public Stm32Board {
 
         // Constants ===================================================================
 
-        //  --------------------- PB0    PB1  PA3   PA2
-        uint8_t MOTOR_PINS[4] = {0x20, 0x21, 0x13, 0x12};
-
-        // ------------------------- PB3   PB4   PB6   PB7
-        // uint8_t MOTOR_PINS[4] = {0x23, 0x24, 0x26, 0x27};
-
         static const uint8_t GPIO_FAST_SPEED = 0x02;
         static const uint8_t GPIO_PUPD_UP    = 0x01;
         static const uint8_t GPIO_OTYPE_PP   = 0x00;
@@ -269,9 +263,12 @@ class Stm32F4Board : public Stm32Board {
 
         } // initPort
 
-        void initMotor(const uint8_t motorIndex, const uint8_t portIndex)
+        void initMotor(
+                vector<uint8_t> * motorPins,
+                const uint8_t motorIndex,
+                const uint8_t portIndex)
         {
-            uint8_t motorPin = MOTOR_PINS[motorIndex];
+            const uint8_t motorPin = (*motorPins)[motorIndex];
 
             // 0, 1, 2, 3, ...
             const uint8_t pinIndex = motorPin & 0x0f;
@@ -393,10 +390,10 @@ class Stm32F4Board : public Stm32Board {
                     TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
-            initMotor(0, 0); 
-            initMotor(1, 0);
-            initMotor(2, 1);
-            initMotor(3, 1);
+            initMotor(motorPins, 0, 0); 
+            initMotor(motorPins, 1, 0);
+            initMotor(motorPins, 2, 1);
+            initMotor(motorPins, 3, 1);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = outputARR;
