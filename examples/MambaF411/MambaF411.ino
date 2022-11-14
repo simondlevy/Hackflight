@@ -34,8 +34,8 @@ static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PB0;
 
-// -------------------------------------- PB3   PB4   PB6   PB7
-static vector <uint8_t> MOTOR_PINS = {0x23, 0x24, 0x26, 0x27};
+// ----------------------------------- PB3   PB4   PB6   PB7
+static vector <uint8_t> MOTOR_PINS = {0x13, 0x14, 0x16, 0x17};
 
 //static const uint8_t LED_PIN  = PC13; // orange
 static const uint8_t LED_PIN  = PC14; // blue
@@ -95,4 +95,6 @@ void setup(void)
 void loop(void)
 {
     _board->step();
+
+    Serial.println(PB3, HEX);
 }

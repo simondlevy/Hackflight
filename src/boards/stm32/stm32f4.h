@@ -291,7 +291,7 @@ class Stm32F4Board : public Stm32Board {
             const uint32_t speed = (config >> 2) & 0x03;
             const uint32_t pull  = (config >> 5) & 0x03;
 
-            GPIO_TypeDef * gpio = m_gpios[motorPin - 16];
+            GPIO_TypeDef * gpio = m_gpios[motorPin]; // XXX
 
             gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinIndex * 2));
             gpio->MODER |= (mode << (pinIndex * 2));
@@ -345,8 +345,6 @@ class Stm32F4Board : public Stm32Board {
         virtual void dmaInit(
                 vector<uint8_t> * motorPins, uint32_t outputFreq) override
         {
-            (void)motorPins;
-
             RCC_APB2PeriphClockEnable(
                     RCC_APB2LPENR_TIM1LPEN_Msk   |
                     RCC_APB2LPENR_USART1LPEN_Msk |
