@@ -263,12 +263,11 @@ class Stm32F405Board : public Stm32Board {
 
         } // initPort
 
-        void initMotor(
-                vector<uint8_t> * motorPins,
-                const uint8_t motorIndex,
-                const uint8_t portIndex)
+        void initMotor(vector<uint8_t> * motorPins, const uint8_t motorIndex)
         {
             const uint8_t motorPin = (*motorPins)[motorIndex];
+
+            const uint8_t portIndex = (motorPin & 0xf0) >> 4;
 
             // 0, 1, 2, 3, ...
             const uint8_t pinIndex = motorPin & 0x0f;
@@ -388,10 +387,10 @@ class Stm32F405Board : public Stm32Board {
                     TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
 
-            initMotor(motorPins, 0, 1); 
-            initMotor(motorPins, 1, 1);
-            initMotor(motorPins, 2, 0);
-            initMotor(motorPins, 3, 0);
+            initMotor(motorPins, 0); 
+            initMotor(motorPins, 1);
+            initMotor(motorPins, 2);
+            initMotor(motorPins, 3);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = outputARR;
