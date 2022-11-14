@@ -19,7 +19,7 @@
 
 #include <hackflight.h>
 #include <alignment/rotate270.h>
-#include <boards/stm32/stm32f4.h>
+#include <boards/stm32/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot.h>
 #include <imus/real/softquat/mpu6000.h>
@@ -35,7 +35,7 @@ static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PC4;
 
 //  --------------------------------- PB0    PB1  PA3   PA2
-static vector<uint8_t> MOTOR_PINS = {0x10, 0x11, 0x03, 0x02};
+ static vector<uint8_t> MOTOR_PINS = {0x10, 0x11, 0x03, 0x02};
 
 static const uint8_t LED_PIN  = PB5;
 
@@ -48,7 +48,7 @@ static AnglePidController _anglePid(
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-static Stm32F4Board * _board;
+static Stm32F405Board * _board;
 static Mpu6000 * _imu;
 static SbusReceiver * _rx;
 
@@ -82,7 +82,7 @@ void setup(void)
 
     static DshotEsc esc(&MOTOR_PINS);
 
-    static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
+    static Stm32F405Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     _rx = &rx;

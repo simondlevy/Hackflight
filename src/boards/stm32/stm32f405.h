@@ -41,7 +41,7 @@ static inline uint8_t __basepriSetMemRetVal(const uint8_t prio)
             ((__cleanup__ (__basepriRestoreMem), __unused__)) = __get_BASEPRI(), \
             __ToDo = __basepriSetMemRetVal(prio); __ToDo ; __ToDo = 0 )
 
-class Stm32F4Board : public Stm32Board {
+class Stm32F405Board : public Stm32Board {
 
     private:
 
@@ -426,7 +426,7 @@ class Stm32F4Board : public Stm32Board {
 
     public:
 
-        Stm32F4Board(
+        Stm32F405Board(
                 Receiver & receiver,
                 Imu & imu,
                 Imu::align_fun align,
