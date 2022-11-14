@@ -234,8 +234,9 @@ class Board {
 
         virtual void startCycleCounter(void) = 0;
 
-        virtual void dmaInit(uint32_t outputFreq)
+        virtual void dmaInit(vector<uint8_t> * motorPins, uint32_t outputFreq)
         {
+            (void)motorPins;
             (void)outputFreq;
         }
 

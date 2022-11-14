@@ -66,7 +66,7 @@ class DshotEsc : public Esc {
             COMMAND_STATE_POSTDELAY   // delay period after the cmd has been sent
         } commandVehicleState_e;
 
-        uint16_t m_dmaMotors[MAX_SUPPORTED_MOTORS];
+        vector<uint8_t> * m_pins;
 
         typedef struct {
             commandVehicleState_e state;
@@ -85,17 +85,6 @@ class DshotEsc : public Esc {
         bool isLastCommand(void)
         {
             return ((m_commandQueueTail + 1) % (MAX_COMMANDS + 1) == m_commandQueueHead);
-        }
-
-        bool allMotorsAreIdle()
-        {
-            for (auto i=0; i<MOTOR_COUNT; i++) {
-                if (m_dmaMotors[i]) {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         commandControl_t * addCommand(void)
@@ -140,11 +129,9 @@ class DshotEsc : public Esc {
             commandControl_t* command = &m_commandQueue[m_commandQueueTail];
             switch (command->state) {
                 case COMMAND_STATE_IDLEWAIT:
-                    if (allMotorsAreIdle()) {
-                        command->state = COMMAND_STATE_STARTDELAY;
-                        command->nextCommandCycleDelay =
-                            commandCyclesFromTime(INITIAL_DELAY_US);
-                    }
+                    command->state = COMMAND_STATE_STARTDELAY;
+                    command->nextCommandCycleDelay =
+                        commandCyclesFromTime(INITIAL_DELAY_US);
                     break;
 
                 case COMMAND_STATE_STARTDELAY:
@@ -260,8 +247,9 @@ class DshotEsc : public Esc {
 
     public:
 
-        DshotEsc(protocol_t protocol=DSHOT600) 
+        DshotEsc(vector<uint8_t> * motorPins, protocol_t protocol=DSHOT600) 
         {
+            (void)motorPins;
             m_protocol = protocol;
         }
 
@@ -271,8 +259,8 @@ class DshotEsc : public Esc {
                 m_protocol == DSHOT150 ? 150 :
                 m_protocol == DSHOT300 ? 300 :
                 600;
-                
-            m_board->dmaInit(1000 * outputFreq);
+
+            m_board->dmaInit(NULL, 1000 * outputFreq);
 
             m_enabled = true;
         }
@@ -322,17 +310,10 @@ class DshotEsc : public Esc {
                 for (auto i=0; i<MOTOR_COUNT; i++) {
                     commandControl->command[i] = CMD_SPIN_DIRECTION_NORMAL;
                 }
-                if (allMotorsAreIdle()) {
-                    // we can skip the motors idle wait state
-                    commandControl->state = COMMAND_STATE_STARTDELAY;
-                    commandControl->nextCommandCycleDelay =
-                        commandCyclesFromTime(INITIAL_DELAY_US);
-                } else {
-                    commandControl->state = COMMAND_STATE_IDLEWAIT;
-
-                    // will be set after idle wait completes
-                    commandControl->nextCommandCycleDelay = 0;  
-                }
+                // we can skip the motors idle wait state
+                commandControl->state = COMMAND_STATE_STARTDELAY;
+                commandControl->nextCommandCycleDelay =
+                    commandCyclesFromTime(INITIAL_DELAY_US);
             }
         }
 

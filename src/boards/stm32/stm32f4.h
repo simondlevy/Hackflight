@@ -345,8 +345,11 @@ class Stm32F4Board : public Stm32Board {
 
     protected: // DshotEsc method overrides ============================================
 
-        virtual void dmaInit(const uint32_t outputFreq) override
+        virtual void dmaInit(
+                vector<uint8_t> * motorPins, uint32_t outputFreq) override
         {
+            (void)motorPins;
+
             RCC_APB2PeriphClockEnable(
                     RCC_APB2LPENR_TIM1LPEN_Msk   |
                     RCC_APB2LPENR_USART1LPEN_Msk |

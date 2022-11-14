@@ -34,6 +34,8 @@ static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PC4;
 
+//  --------------------------------- PB0    PB1  PA3   PA2
+static vector<uint8_t> MOTOR_PINS = {0x20, 0x21, 0x13, 0x12};
 
 static const uint8_t LED_PIN  = PB5;
 
@@ -78,7 +80,7 @@ void setup(void)
 
     static Mpu6000 imu(_spi, CS_PIN);
 
-    static DshotEsc esc;
+    static DshotEsc esc(&MOTOR_PINS);
 
     static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
