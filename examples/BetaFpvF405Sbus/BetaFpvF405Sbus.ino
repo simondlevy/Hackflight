@@ -34,9 +34,7 @@ static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PC4;
 
-//  --------------------------------- PB0    PB1  PA3   PA2
-static vector<uint8_t> MOTOR_PINS = {0x10, 0x11, 0x03, 0x02};
-//static vector<uint8_t> MOTOR_PINS = {PB0, PB1, PA3, PA2};
+static vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
 
 static const uint8_t LED_PIN  = PB5;
 
