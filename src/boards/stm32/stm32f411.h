@@ -173,7 +173,7 @@ class Stm32F411Board : public Stm32Board {
 
         // Instance variables ==========================================================
 
-        port_t m_ports[2];
+        port_t m_port;
 
         motor_t m_motors[4];
 
@@ -210,7 +210,7 @@ class Stm32F411Board : public Stm32Board {
                 const uint8_t state_shift,
                 const uint8_t polarity_shift2)
         {
-            port_t * port = &m_ports[portIndex];
+            port_t * port = &m_port;
             port->dmaStream = stream;
             port->flagsShift = flagsShift;
 
@@ -308,7 +308,7 @@ class Stm32F411Board : public Stm32Board {
 
             gpio->BSRR |= pinmask;
 
-            port_t * port = &m_ports[portIndex];
+            port_t * port = &m_port;
 
             m_motors[motorIndex].port = port;
 
@@ -399,16 +399,14 @@ class Stm32F411Board : public Stm32Board {
 
         virtual void dmaUpdateComplete(void) override
         {
-            dmaCmd(&m_ports[0], ENABLE);
-            dmaCmd(&m_ports[1], ENABLE);
+            dmaCmd(&m_port, ENABLE);
 
             timDmaCmd(m_pacerDmaMask, ENABLE);
         }
 
         virtual void dmaUpdateStart(void) override
         {
-            dmaUpdateStartMotorPort(&m_ports[0]);
-            dmaUpdateStartMotorPort(&m_ports[1]);
+            dmaUpdateStartMotorPort(&m_port);
         }
 
         virtual void dmaWriteMotor(uint8_t index, uint16_t packet) override
@@ -440,7 +438,7 @@ class Stm32F411Board : public Stm32Board {
 
         void handleDmaIrq(const uint8_t index)
         {
-            port_t *port = &m_ports[index];
+            port_t *port = &m_port;
 
             dmaCmd(port, DISABLE);
 
