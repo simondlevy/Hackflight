@@ -175,6 +175,8 @@ class Stm32F4Board : public Stm32Board {
 
         port_t m_ports[2];
 
+        uint8_t m_portCount;
+
         motor_t m_motors[4];
 
         GPIO_TypeDef * m_gpios[96];
@@ -276,9 +278,26 @@ class Stm32F4Board : public Stm32Board {
 
         } // initPort
 
-     public:
+        virtual void dmaUpdateComplete(void) override
+        {
+            for (auto k=0; k<m_portCount; ++k) {
+                dmaCmd(&m_ports[k], ENABLE);
+            }
+
+            timDmaCmd(m_pacerDmaMask, ENABLE);
+        }
+
+        virtual void dmaUpdateStart(void) override
+        {
+            for (auto k=0; k<m_portCount; ++k) {
+                dmaUpdateStartMotorPort(&m_ports[k]);
+            }
+        }
+
+    public:
 
         Stm32F4Board(
+                const uint8_t portCount,
                 Receiver & receiver,
                 Imu & imu,
                 Imu::align_fun align,
@@ -288,6 +307,7 @@ class Stm32F4Board : public Stm32Board {
                 const uint8_t ledPin) 
             : Stm32Board(receiver, imu, align, pids, mixer, esc, ledPin)
         {
+            m_portCount = portCount;
         }
 
         void handleDmaIrq(const uint8_t index)
@@ -318,4 +338,5 @@ class Stm32F4Board : public Stm32Board {
 
             NVIC_SystemReset();
         }
+
 }; // class Stm32F4Board

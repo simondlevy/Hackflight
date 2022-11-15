@@ -152,18 +152,6 @@ class Stm32F411Board : public Stm32F4Board {
             TIM1->ARR = outputARR;
         }        
 
-        virtual void dmaUpdateComplete(void) override
-        {
-            dmaCmd(&m_ports[0], ENABLE);
-
-            timDmaCmd(m_pacerDmaMask, ENABLE);
-        }
-
-        virtual void dmaUpdateStart(void) override
-        {
-            dmaUpdateStartMotorPort(&m_ports[0]);
-        }
-
     public:
 
         Stm32F411Board(
@@ -174,7 +162,7 @@ class Stm32F411Board : public Stm32F4Board {
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 
-            : Stm32F4Board(receiver, imu, align, pids, mixer, esc, ledPin)
+            : Stm32F4Board(1, receiver, imu, align, pids, mixer, esc, ledPin)
         {
         }
 };
