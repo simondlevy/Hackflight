@@ -60,6 +60,9 @@ class Stm32F411Board : public Stm32F4Board {
             TIM1->RCR = 0;
             TIM1->EGR = 0x0001;          
 
+            // Reinitialize pacer timer for output
+            TIM1->ARR = outputARR;
+
             initPort(0, TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn,
                     &TIM1->CCR1, TIM_CCER_CC1E,
                     TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
@@ -69,9 +72,6 @@ class Stm32F411Board : public Stm32F4Board {
             initMotor(motorPins, 1, 0);
             initMotor(motorPins, 2, 0);
             initMotor(motorPins, 3, 0);
-
-            // Reinitialize pacer timer for output
-            TIM1->ARR = outputARR;
         }        
 
     public:
