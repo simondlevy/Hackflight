@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "boards/stm32.h"
+#include "boards/stm32/stm32f4.h"
 
 #include <stm32f4xx.h>
 
@@ -41,7 +41,7 @@ static inline uint8_t __basepriSetMemRetVal(const uint8_t prio)
             ((__cleanup__ (__basepriRestoreMem), __unused__)) = __get_BASEPRI(), \
             __ToDo = __basepriSetMemRetVal(prio); __ToDo ; __ToDo = 0 )
 
-class Stm32F405Board : public Stm32Board {
+class Stm32F405Board : public Stm32F4Board {
 
     private:
 
@@ -433,7 +433,7 @@ class Stm32F405Board : public Stm32Board {
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 
-            : Stm32Board(receiver, imu, align, pids, mixer, esc, ledPin)
+            : Stm32F4Board(receiver, imu, align, pids, mixer, esc, ledPin)
         {
         }
 
