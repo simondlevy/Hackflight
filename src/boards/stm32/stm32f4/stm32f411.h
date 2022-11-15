@@ -24,81 +24,7 @@ class Stm32F411Board : public Stm32F4Board {
 
     private:
 
-        // Instance variables ==========================================================
-
-        port_t m_ports[2];
-
         // Private instance methods ====================================================
-
-        void initPort(
-                const uint16_t dmaSource,
-                DMA_Stream_TypeDef * stream,
-                const uint8_t flagsShift,
-                const IRQn_Type irqChannel,
-                volatile uint32_t * ccr,
-                const uint32_t ccer_cc_e,
-                const uint32_t ccmr_oc,
-                const uint32_t ccmr_cc,
-                const uint32_t ccer_ccp,
-                const uint32_t ccer_ccnp,
-                const uint32_t cr2_ois,
-                const uint8_t mode_shift,
-                const uint8_t polarity_shift1,
-                const uint8_t state_shift,
-                const uint8_t polarity_shift2)
-        {
-            port_t * port = &m_ports[0];
-            port->dmaStream = stream;
-            port->flagsShift = flagsShift;
-
-            memset(port->outputBuffer, 0, sizeof(port->outputBuffer));
-
-            TIM1->CR1 = (TIM1->CR1 & (uint16_t)~TIM_CR1_CEN) | TIM_CR1_CEN;
-
-            RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
-
-            port->dmaSource = dmaSource;
-
-            m_pacerDmaMask |= port->dmaSource;
-
-            const uint32_t priority = nvic_build_priority(2, 1);
-
-            RCC_AHB1PeriphClockEnable(RCC_AHB1PERIPH_DMA2);
-
-            const uint8_t tmppriority = (0x700 - ((SCB->AIRCR) & (uint32_t)0x700))>> 0x08;
-            const uint8_t tmppre = (0x4 - tmppriority);
-            const uint8_t tmppriority2 = nvic_priority_base(priority) << tmppre;
-
-            NVIC->IP[irqChannel] = tmppriority2 << 0x04;
-
-            NVIC->ISER[irqChannel >> 0x05] =
-                (uint32_t)0x01 << (irqChannel & (uint8_t)0x1F);
-
-            DMA_Stream_TypeDef * DMAy_Streamx = port->dmaStream;
-
-            DMAy_Streamx->CR = 0x0c025450;
-
-            DMAy_Streamx->FCR =
-                ((DMAy_Streamx->FCR & (uint32_t)~(DMA_SxFCR_DMDIS | DMA_SxFCR_FTH)) |
-                 (DMA_FIFOMODE_ENABLE | DMA_FIFO_THRESHOLD_1QUARTERFULL));
-            DMAy_Streamx->NDTR = BUF_LENGTH;
-            DMAy_Streamx->M0AR = (uint32_t)port->outputBuffer;
-
-            DMAy_Streamx->CR |= (uint32_t)(DMA_IT_TC  & TRANSFER_IT_ENABLE_MASK);
-
-            TIM1->CR2 = TIM1->CR2 & (uint16_t)~cr2_ois;
-
-            TIM1->CCMR1 = (TIM1->CCMR1 & (uint16_t)~ccmr_oc & (uint16_t)~ccmr_cc) |
-                (TIM_OCMODE_TIMING << mode_shift);
-
-            TIM1->CCER = (TIM1->CCER & (uint16_t)~ccer_cc_e & (uint16_t)~ccer_ccp) |
-                (TIM_OCPOLARITY_HIGH << polarity_shift1) | 
-                ((TIM_OUTPUTSTATE_ENABLE < state_shift) & (uint16_t)~ccer_ccnp) |
-                (TIM_OCPOLARITY_HIGH << polarity_shift2);
-
-            *ccr = 0x00000000;
-
-        } // initPort
 
         void initMotor( vector<uint8_t> * motorPins, const uint8_t motorIndex)
         {
@@ -212,7 +138,7 @@ class Stm32F411Board : public Stm32F4Board {
             TIM1->RCR = 0;
             TIM1->EGR = 0x0001;          
 
-            initPort(TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn,
+            initPort(0, TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn,
                     &TIM1->CCR1, TIM_CCER_CC1E,
                     TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
                     TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
