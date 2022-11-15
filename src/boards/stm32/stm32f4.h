@@ -290,6 +290,17 @@ class Stm32F4Board : public Stm32Board {
         {
         }
 
+        void handleDmaIrq(const uint8_t index)
+        {
+            port_t *port = &m_ports[index];
+
+            dmaCmd(port, DISABLE);
+
+            timDmaCmd(port->dmaSource, DISABLE);
+
+            DMA2->LIFCR = (DMA_IT_TCIF << port->flagsShift);
+        }
+
         virtual void reboot(void) override
         {
             __enable_irq();

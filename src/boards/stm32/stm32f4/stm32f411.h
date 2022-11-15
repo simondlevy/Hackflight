@@ -26,7 +26,7 @@ class Stm32F411Board : public Stm32F4Board {
 
         // Private instance methods ====================================================
 
-        void initMotor( vector<uint8_t> * motorPins, const uint8_t motorIndex)
+        void initMotor(vector<uint8_t> * motorPins, const uint8_t motorIndex)
         {
             const uint8_t motorPin = (*motorPins)[motorIndex];
 
@@ -176,16 +176,5 @@ class Stm32F411Board : public Stm32F4Board {
                 const uint8_t ledPin) 
             : Stm32F4Board(receiver, imu, align, pids, mixer, esc, ledPin)
         {
-        }
-
-        void handleDmaIrq(void)
-        {
-            port_t *port = &m_ports[0];
-
-            dmaCmd(port, DISABLE);
-
-            timDmaCmd(port->dmaSource, DISABLE);
-
-            DMA2->LIFCR = (DMA_IT_TCIF << port->flagsShift);
         }
 };

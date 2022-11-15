@@ -182,16 +182,4 @@ class Stm32F405Board : public Stm32F4Board {
             : Stm32F4Board(receiver, imu, align, pids, mixer, esc, ledPin)
         {
         }
-
-        void handleDmaIrq(const uint8_t index)
-        {
-            port_t *port = &m_ports[index];
-
-            dmaCmd(port, DISABLE);
-
-            timDmaCmd(port->dmaSource, DISABLE);
-
-            DMA2->LIFCR = (DMA_IT_TCIF << port->flagsShift);
-        }
-
 };

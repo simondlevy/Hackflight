@@ -56,7 +56,7 @@ static vector<PidController *> _pids = {&_anglePid};
 
 extern "C" void handleDmaIrq(void)
 {
-    _board->handleDmaIrq();
+    _board->handleDmaIrq(0);
 }
 
 static void handleImuInterrupt(void)
@@ -94,6 +94,4 @@ void setup(void)
 void loop(void)
 {
     _board->step();
-
-    Serial.println(PB3, HEX);
 }
