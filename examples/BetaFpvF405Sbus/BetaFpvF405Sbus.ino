@@ -19,7 +19,7 @@
 
 #include <hackflight.h>
 #include <alignment/rotate270.h>
-#include <boards/stm32/stm32f405.h>
+#include <boards/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot.h>
 #include <imus/real/softquat/mpu6000.h>
