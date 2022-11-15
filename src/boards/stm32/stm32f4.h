@@ -190,6 +190,19 @@ class Stm32F4Board : public Stm32Board {
             }
         }
 
+        virtual void dmaWriteMotor(uint8_t index, uint16_t packet) override
+        {
+            motor_t * const motor = &m_motors[index];
+            port_t *port = motor->port;
+
+            for (auto pos=0; pos<16; pos++) {
+                if (!(packet & 0x8000)) {
+                    port->outputBuffer[pos * 3 + 1] |= motor->middleBit;
+                }
+                packet <<= 1;
+            }        
+        }
+
     public:
 
         Stm32F4Board(
