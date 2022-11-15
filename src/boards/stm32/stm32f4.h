@@ -20,7 +20,8 @@
 
 #include <stm32f4xx.h>
 
-__attribute__( ( always_inline ) ) static inline void __set_BASEPRI_nb(const uint32_t basePri)
+__attribute__( ( always_inline ) )
+static inline void __set_BASEPRI_nb(const uint32_t basePri)
 {
     __ASM volatile ("\tMSR basepri, %0\n" : : "r" (basePri) );
 }
@@ -43,7 +44,7 @@ static inline uint8_t __basepriSetMemRetVal(const uint8_t prio)
 
 class Stm32F4Board : public Stm32Board {
 
-    protected:
+    private:
 
         // Constants ===================================================================
 
@@ -207,83 +208,6 @@ class Stm32F4Board : public Stm32Board {
             }        
         }
 
-       void initMotor(
-               vector<uint8_t> * motorPins,
-               const uint8_t motorIndex,
-               const uint8_t portIndex)
-        {
-            const uint8_t motorPin = (*motorPins)[motorIndex];
-
-            // 0, 1, 2, 3, ...
-            const uint8_t pinIndex = motorPin & 0x0f;
-
-            m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
-
-            const uint8_t rcc = rcc_ahb1(portIndex+1);
-
-            const uint32_t mask = 1 << (rcc & 0x1f);
-
-            RCC_AHB1PeriphClockEnable(mask);
-
-            const uint8_t config =
-                GPIO_MODE_OUT |
-                (GPIO_FAST_SPEED << 2) |
-                (GPIO_OTYPE_PP << 4) |
-                (GPIO_PUPD_UP << 5);
-
-            const uint32_t mode  = (config >> 0) & 0x03;
-            const uint32_t speed = (config >> 2) & 0x03;
-            const uint32_t pull  = (config >> 5) & 0x03;
-
-            GPIO_TypeDef * gpio = m_gpios[motorPin]; // XXX
-
-            gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinIndex * 2));
-            gpio->MODER |= (mode << (pinIndex * 2));
-
-            gpio->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinIndex * 2));
-            gpio->OSPEEDR |= (speed << (pinIndex * 2));
-
-            gpio->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinIndex)) ;
-
-            gpio->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinIndex * 2));
-            gpio->PUPDR |= (pull << (pinIndex * 2)); 
-
-            const uint8_t pinmask = 1 << pinIndex;
-
-            gpio->BSRR |= pinmask;
-
-            port_t * port = &m_ports[portIndex];
-
-            m_motors[motorIndex].port = port;
-
-            if (motorIndex == 0 || motorIndex == 2) {
-                port->dmaStream->PAR = (uint32_t)&gpio->BSRR;
-            }
-
-            gpio->BSRR |= (pinmask << 16);
-
-            uint32_t * buffer = port->outputBuffer;
-            const uint16_t portMask = 1 << pinIndex;
-            const uint32_t resetMask = (portMask << 16);
-            const uint32_t setMask = portMask;
-
-            for (auto bitpos=0; bitpos<16; bitpos++) {
-                buffer[bitpos * 3 + 0] |= setMask ; // Always set all ports
-                buffer[bitpos * 3 + 1] = 0;          // Reset bits are port dependent
-                buffer[bitpos * 3 + 2] |= resetMask; // Always reset all ports
-            }
-
-            gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
-
-            // Set GPIO to output
-            ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
-                uint32_t gpioModeMask = (GPIO_MODER_MODER0 << (pinIndex * 2));
-                uint32_t gpioModeOutput = (GPIO_MODE_OUT << (pinIndex * 2));
-                MODIFY_REG(gpio->MODER, gpioModeMask, gpioModeOutput);
-            }
-
-        } // initMotor
-
         void initPort(
                 const uint8_t portIndex,
                 const uint16_t dmaSource,
@@ -412,6 +336,85 @@ class Stm32F4Board : public Stm32Board {
                 dmaUpdateStartMotorPort(&m_ports[k]);
             }
         }
+
+    protected:
+
+        void initMotor(
+                vector<uint8_t> * motorPins,
+                const uint8_t motorIndex,
+                const uint8_t portIndex)
+        {
+            const uint8_t motorPin = (*motorPins)[motorIndex];
+
+            // 0, 1, 2, 3, ...
+            const uint8_t pinIndex = motorPin & 0x0f;
+
+            m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
+
+            const uint8_t rcc = rcc_ahb1(portIndex+1);
+
+            const uint32_t mask = 1 << (rcc & 0x1f);
+
+            RCC_AHB1PeriphClockEnable(mask);
+
+            const uint8_t config =
+                GPIO_MODE_OUT |
+                (GPIO_FAST_SPEED << 2) |
+                (GPIO_OTYPE_PP << 4) |
+                (GPIO_PUPD_UP << 5);
+
+            const uint32_t mode  = (config >> 0) & 0x03;
+            const uint32_t speed = (config >> 2) & 0x03;
+            const uint32_t pull  = (config >> 5) & 0x03;
+
+            GPIO_TypeDef * gpio = m_gpios[motorPin]; // XXX
+
+            gpio->MODER  &= ~(GPIO_MODER_MODER0 << (pinIndex * 2));
+            gpio->MODER |= (mode << (pinIndex * 2));
+
+            gpio->OSPEEDR &= ~(GPIO_OSPEEDER_OSPEEDR0 << (pinIndex * 2));
+            gpio->OSPEEDR |= (speed << (pinIndex * 2));
+
+            gpio->OTYPER  &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)pinIndex)) ;
+
+            gpio->PUPDR &= ~(GPIO_PUPDR_PUPDR0 << ((uint16_t)pinIndex * 2));
+            gpio->PUPDR |= (pull << (pinIndex * 2)); 
+
+            const uint8_t pinmask = 1 << pinIndex;
+
+            gpio->BSRR |= pinmask;
+
+            port_t * port = &m_ports[portIndex];
+
+            m_motors[motorIndex].port = port;
+
+            if (motorIndex == 0 || motorIndex == 2) {
+                port->dmaStream->PAR = (uint32_t)&gpio->BSRR;
+            }
+
+            gpio->BSRR |= (pinmask << 16);
+
+            uint32_t * buffer = port->outputBuffer;
+            const uint16_t portMask = 1 << pinIndex;
+            const uint32_t resetMask = (portMask << 16);
+            const uint32_t setMask = portMask;
+
+            for (auto bitpos=0; bitpos<16; bitpos++) {
+                buffer[bitpos * 3 + 0] |= setMask ; // Always set all ports
+                buffer[bitpos * 3 + 1] = 0;          // Reset bits are port dependent
+                buffer[bitpos * 3 + 2] |= resetMask; // Always reset all ports
+            }
+
+            gpio->BSRR = (1 << (pinIndex + 16));  // BR (higher half)
+
+            // Set GPIO to output
+            ATOMIC_BLOCK(nvic_build_priority(1, 1)) {
+                uint32_t gpioModeMask = (GPIO_MODER_MODER0 << (pinIndex * 2));
+                uint32_t gpioModeOutput = (GPIO_MODE_OUT << (pinIndex * 2));
+                MODIFY_REG(gpio->MODER, gpioModeMask, gpioModeOutput);
+            }
+
+        } // initMotor
 
         void initStream1(uint8_t portIndex)
         {

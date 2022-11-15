@@ -22,28 +22,30 @@
 
 class Stm32F405Board : public Stm32F4Board {
 
-    virtual void initPortsAndMotors(vector<uint8_t> * motorPins) override
-    {
-        initStream1(1);
-        initStream2(0);
+    protected:
 
-        initMotor(motorPins, 0, 0); 
-        initMotor(motorPins, 1, 0);
-        initMotor(motorPins, 2, 1);
-        initMotor(motorPins, 3, 1);
-    }        
+        virtual void initPortsAndMotors(vector<uint8_t> * motorPins) override
+        {
+            initStream1(1);
+            initStream2(0);
+
+            initMotor(motorPins, 0, 0); 
+            initMotor(motorPins, 1, 0);
+            initMotor(motorPins, 2, 1);
+            initMotor(motorPins, 3, 1);
+        }        
 
     public:
 
-    Stm32F405Board(
-            Receiver & receiver,
-            Imu & imu,
-            Imu::align_fun align,
-            vector<PidController *> & pids,
-            Mixer & mixer,
-            Esc & esc,
-            const uint8_t ledPin) 
-        : Stm32F4Board(2, receiver, imu, align, pids, mixer, esc, ledPin)
-    {
-    }
+        Stm32F405Board(
+                Receiver & receiver,
+                Imu & imu,
+                Imu::align_fun align,
+                vector<PidController *> & pids,
+                Mixer & mixer,
+                Esc & esc,
+                const uint8_t ledPin) 
+            : Stm32F4Board(2, receiver, imu, align, pids, mixer, esc, ledPin)
+        {
+        }
 };
