@@ -355,7 +355,49 @@ class Stm32F4Board : public Stm32Board {
 
         } // initPort
 
-        virtual void dmaUpdateComplete(void) override
+        virtual void dmaInit(
+                vector<uint8_t> * motorPins, uint32_t outputFreq) override
+        {
+            RCC_APB2PeriphClockEnable(
+                    RCC_APB2LPENR_TIM1LPEN_Msk   |
+                    RCC_APB2LPENR_USART1LPEN_Msk |
+                    RCC_APB2LPENR_USART6LPEN_Msk |
+                    RCC_APB2LPENR_ADC1LPEN_Msk   |
+                    RCC_APB2LPENR_SDIOLPEN_Msk   |
+                    RCC_APB2LPENR_SPI1LPEN_Msk   |
+                    RCC_APB2LPENR_SYSCFGLPEN_Msk |
+                    RCC_APB2LPENR_TIM9LPEN_Msk   |
+                    RCC_APB2LPENR_TIM10LPEN_Msk  |
+                    RCC_APB2LPENR_TIM11LPEN_Msk);
+
+            uint8_t k = 0;
+            for (uint8_t port=0; port<4; port++) {
+                for (uint8_t pin=0; pin < 16; pin++) {
+                    m_gpios[k] = (GPIO_TypeDef *)(GPIOA_BASE + (port << 10));
+                    k++;
+                }
+            }
+
+            TIM1->CR1 = (TIM1->CR1 & ((uint16_t)(~(TIM_CR1_DIR | TIM_CR1_CMS)))) |
+                (((uint32_t)TIM_COUNTERMODE_UP) & ((uint16_t)(~TIM_CR1_CKD))) | 
+                ((uint32_t)TIM_CLOCKDIVISION_DIV1) |
+                TIM_CR1_ARPE;
+
+            const uint16_t outputARR = SystemCoreClock / outputFreq - 1;
+
+            // Set the Autoreload value 
+            TIM1->ARR = outputARR;
+            TIM1->PSC = 0;
+            TIM1->RCR = 0;
+            TIM1->EGR = 0x0001;          
+
+            // Reinitialize pacer timer for output
+            TIM1->ARR = outputARR;
+
+            initPortsAndMotors(motorPins);
+        }
+
+         virtual void dmaUpdateComplete(void) override
         {
             for (auto k=0; k<m_portCount; ++k) {
                 dmaCmd(&m_ports[k], ENABLE);
@@ -370,6 +412,8 @@ class Stm32F4Board : public Stm32Board {
                 dmaUpdateStartMotorPort(&m_ports[k]);
             }
         }
+
+       virtual void initPortsAndMotors(vector<uint8_t> * motorPins) = 0;
 
     public:
 
