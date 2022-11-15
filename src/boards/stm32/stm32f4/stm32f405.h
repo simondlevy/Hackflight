@@ -24,7 +24,7 @@ class Stm32F405Board : public Stm32F4Board {
 
     protected:
 
-        virtual void initPortsAndMotors(vector<uint8_t> * motorPins) override
+        virtual void initPortsAndMotors(const vector<uint8_t> * motorPins) override
         {
             initStream1(1);
             initStream2(0);

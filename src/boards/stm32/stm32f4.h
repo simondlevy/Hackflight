@@ -102,17 +102,17 @@ class Stm32F4Board : public Stm32Board {
 
         // Static local funs ===========================================================
 
-        static uint32_t log2_8bit(uint32_t v)  
+        static uint32_t log2_8bit(const uint32_t v)  
         {
             return 8 - 90/((v/4+14)|1) - 2/(v/2+1);
         }
 
-        static uint32_t log2_16bit(uint32_t v) 
+        static uint32_t log2_16bit(const uint32_t v) 
         {
             return 8*(v>255) + log2_8bit(v >>8*(v>255));
         }
 
-        static uint32_t log2_32bit(uint32_t v) 
+        static uint32_t log2_32bit(const uint32_t v) 
         {
             return 16*(v>65535L) + log2_16bit(v*1L >>16*(v>65535L));
         }
@@ -195,7 +195,7 @@ class Stm32F4Board : public Stm32Board {
             }
         }
 
-        virtual void dmaWriteMotor(uint8_t index, uint16_t packet) override
+        virtual void dmaWriteMotor(const uint8_t index, uint16_t packet) override
         {
             motor_t * const motor = &m_motors[index];
             port_t *port = motor->port;
@@ -280,7 +280,7 @@ class Stm32F4Board : public Stm32Board {
         } // initPort
 
         virtual void dmaInit(
-                vector<uint8_t> * motorPins, uint32_t outputFreq) override
+                const vector<uint8_t> * motorPins, const uint32_t outputFreq) override
         {
             RCC_APB2PeriphClockEnable(
                     RCC_APB2LPENR_TIM1LPEN_Msk   |
@@ -340,7 +340,7 @@ class Stm32F4Board : public Stm32Board {
     protected:
 
         void initMotor(
-                vector<uint8_t> * motorPins,
+                const vector<uint8_t> * motorPins,
                 const uint8_t motorIndex,
                 const uint8_t portIndex)
         {
@@ -432,7 +432,7 @@ class Stm32F4Board : public Stm32Board {
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
         }
 
-        virtual void initPortsAndMotors(vector<uint8_t> * motorPins) = 0;
+        virtual void initPortsAndMotors(const vector<uint8_t> * motorPins) = 0;
 
     public:
 

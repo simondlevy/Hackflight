@@ -24,7 +24,7 @@ class Stm32F411Board : public Stm32F4Board {
 
     protected:
 
-       virtual void initPortsAndMotors(vector<uint8_t> * motorPins)
+       virtual void initPortsAndMotors(const vector<uint8_t> * motorPins)
         {
             initStream1(0);
 
