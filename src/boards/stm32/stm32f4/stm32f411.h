@@ -26,7 +26,7 @@ class Stm32F411Board : public Stm32F4Board {
 
         // Instance variables ==========================================================
 
-        port_t m_port;
+        port_t m_ports[2];
 
         // Private instance methods ====================================================
 
@@ -47,7 +47,7 @@ class Stm32F411Board : public Stm32F4Board {
                 const uint8_t state_shift,
                 const uint8_t polarity_shift2)
         {
-            port_t * port = &m_port;
+            port_t * port = &m_ports[0];
             port->dmaStream = stream;
             port->flagsShift = flagsShift;
 
@@ -142,7 +142,7 @@ class Stm32F411Board : public Stm32F4Board {
 
             gpio->BSRR |= pinmask;
 
-            port_t * port = &m_port;
+            port_t * port = &m_ports[0];
 
             m_motors[motorIndex].port = port;
 
@@ -228,14 +228,14 @@ class Stm32F411Board : public Stm32F4Board {
 
         virtual void dmaUpdateComplete(void) override
         {
-            dmaCmd(&m_port, ENABLE);
+            dmaCmd(&m_ports[0], ENABLE);
 
             timDmaCmd(m_pacerDmaMask, ENABLE);
         }
 
         virtual void dmaUpdateStart(void) override
         {
-            dmaUpdateStartMotorPort(&m_port);
+            dmaUpdateStartMotorPort(&m_ports[0]);
         }
 
     public:
@@ -254,7 +254,7 @@ class Stm32F411Board : public Stm32F4Board {
 
         void handleDmaIrq(void)
         {
-            port_t *port = &m_port;
+            port_t *port = &m_ports[0];
 
             dmaCmd(port, DISABLE);
 
