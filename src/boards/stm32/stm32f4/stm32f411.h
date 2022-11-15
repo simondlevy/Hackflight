@@ -26,7 +26,10 @@ class Stm32F411Board : public Stm32F4Board {
 
         // Private instance methods ====================================================
 
-        void initMotor(vector<uint8_t> * motorPins, const uint8_t motorIndex)
+        void initMotor(
+                vector<uint8_t> * motorPins,
+                const uint8_t motorIndex,
+                const uint8_t portIndex)
         {
             const uint8_t motorPin = (*motorPins)[motorIndex];
 
@@ -35,7 +38,7 @@ class Stm32F411Board : public Stm32F4Board {
 
             m_motors[motorIndex].middleBit = (1 << (pinIndex + 16));
 
-            const uint8_t rcc = rcc_ahb1(1);
+            const uint8_t rcc = rcc_ahb1(portIndex+1);
 
             const uint32_t mask = 1 << (rcc & 0x1f);
 
@@ -68,7 +71,7 @@ class Stm32F411Board : public Stm32F4Board {
 
             gpio->BSRR |= pinmask;
 
-            port_t * port = &m_ports[0];
+            port_t * port = &m_ports[portIndex];
 
             m_motors[motorIndex].port = port;
 
@@ -143,10 +146,10 @@ class Stm32F411Board : public Stm32F4Board {
                     TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
                     TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
 
-            initMotor(motorPins, 0); 
-            initMotor(motorPins, 1);
-            initMotor(motorPins, 2);
-            initMotor(motorPins, 3);
+            initMotor(motorPins, 0, 0); 
+            initMotor(motorPins, 1, 0);
+            initMotor(motorPins, 2, 0);
+            initMotor(motorPins, 3, 0);
 
             // Reinitialize pacer timer for output
             TIM1->ARR = outputARR;
