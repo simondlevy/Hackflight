@@ -79,8 +79,6 @@ class Board {
                 m_vstate.dpsi   = angvels.z;
             }
 
-            auto usec = micros();
-
             Demands demands = m_receiver->getDemands();
 
             delayMicroseconds(10);
@@ -90,7 +88,7 @@ class Board {
                     m_vstate,
                     m_pidControllers,
                     m_receiver->gotPidReset(),
-                    usec);
+                    micros());
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
 
@@ -153,7 +151,7 @@ class Board {
             Task *selectedTask = NULL;
             uint16_t selectedTaskDynamicPriority = 0;
 
-            const uint32_t usec = micros(); //timeMicros();
+            const uint32_t usec = micros();
 
             m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
