@@ -26,10 +26,7 @@ class Stm32F411Board : public Stm32F4Board {
 
        virtual void initPortsAndMotors(vector<uint8_t> * motorPins)
         {
-            initPort(0, TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn,
-                    &TIM1->CCR1, TIM_CCER_CC1E,
-                    TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
-                    TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
+            initStream1(0);
 
             initMotor(motorPins, 0, 0); 
             initMotor(motorPins, 1, 0);

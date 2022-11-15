@@ -413,7 +413,23 @@ class Stm32F4Board : public Stm32Board {
             }
         }
 
-       virtual void initPortsAndMotors(vector<uint8_t> * motorPins) = 0;
+        void initStream1(uint8_t portIndex)
+        {
+            initPort(portIndex, TIM_DMA_CC1, DMA2_Stream1, 6,  DMA2_Stream1_IRQn,
+                    &TIM1->CCR1, TIM_CCER_CC1E,
+                    TIM_CCMR1_OC1M, TIM_CCMR1_CC1S, TIM_CCER_CC1P,
+                    TIM_CCER_CC1NP, TIM_CR2_OIS1, 0, 0, 0, 0);
+        }
+
+        void initStream2(uint8_t portIndex)
+        {
+            initPort(portIndex, TIM_DMA_CC2, DMA2_Stream2, 16, DMA2_Stream2_IRQn,
+                    &TIM1->CCR2, TIM_CCER_CC2E,
+                    TIM_CCMR1_OC2M, TIM_CCMR1_CC2S, TIM_CCER_CC2P,
+                    TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
+        }
+
+        virtual void initPortsAndMotors(vector<uint8_t> * motorPins) = 0;
 
     public:
 
