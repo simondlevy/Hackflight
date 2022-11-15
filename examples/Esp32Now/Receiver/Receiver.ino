@@ -23,7 +23,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <WiFi.h>
 
 // REPLACE WITH THE MAC Address of your sender 
-uint8_t senderAddress[] = {0x98, 0xCD, 0xAC, 0xD3, 0x42, 0x3C};
+uint8_t senderAddress[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6E, 0x84};
 
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {

@@ -24,8 +24,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 
 // REPLACE WITH THE MAC Address of your receiver 
-uint8_t receiverAddress[] = {0x98, 0xCD, 0xAC, 0xD3, 0x42, 0xE0};
-
+static uint8_t receiverAddress[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x69, 0xA0};
 
 // Callback when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
