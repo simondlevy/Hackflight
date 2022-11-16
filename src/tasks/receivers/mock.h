@@ -25,10 +25,6 @@ class MockReceiver : public Receiver {
 
     protected:
 
-        virtual void devStart(void) override
-        {
-        }
-
         virtual bool devRead(
                 float & throttle,
                 float & roll,

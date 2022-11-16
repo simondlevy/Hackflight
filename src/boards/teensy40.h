@@ -38,7 +38,4 @@ class Teensy40 : public Board {
         ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA;
     }
 
-    virtual void sbusInit(HardwareSerial * port) override
-    {
-        port->begin(100000, SERIAL_8E2_RXINV_TXINV);
-    };
+};  //class Teensy40

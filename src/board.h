@@ -252,11 +252,6 @@ class Board {
             (void)packet;
         }
 
-        virtual void sbusInit(HardwareSerial * port)
-        {
-            (void)port;
-        }
-
         void begin(void)
         {
             startCycleCounter();

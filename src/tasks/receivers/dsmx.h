@@ -74,11 +74,6 @@ class DsmxReceiver : public Receiver {
             }
         }
 
-        virtual void devStart(void) override
-        {
-            m_port->begin(115200);
-        }
-
         virtual bool devRead(
                 float & throttle,
                 float & roll,

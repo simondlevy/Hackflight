@@ -128,11 +128,6 @@ class SbusReceiver : public Receiver {
             }
         }
 
-        virtual void devStart(void) override
-        {
-            m_board->sbusInit(m_port);
-        }
-
         virtual bool devRead(
                 float & throttle,
                 float & roll,

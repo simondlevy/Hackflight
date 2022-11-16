@@ -33,6 +33,8 @@ void serialEvent3(void)
 void setup(void)
 {
     Serial.begin(115200);
+
+    Serial1.begin(100000, SERIAL_8E2, RX_PIN, TX_PIN, true);
 }
 
 void loop(void)

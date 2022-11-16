@@ -24,7 +24,6 @@ class Esp32 : public Board {
 
     virtual void sbusInit(HardwareSerial * port) override
     {
-        port->begin(100000, SERIAL_8E2, rxpin, txpin, true);
     }
 
 }; // class Esp32

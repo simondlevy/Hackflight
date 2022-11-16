@@ -60,9 +60,4 @@ class Stm32Board : public Board {
             DWT->CYCCNT = 0;
             DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
         }
-
-        virtual void sbusInit(HardwareSerial * port) override
-        {
-            port->begin(100000, SERIAL_8E2);
-        }
 };

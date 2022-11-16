@@ -261,8 +261,6 @@ class Receiver : public Task {
     void begin(Arming * arming)
     {
         m_arming = arming;
-
-        devStart();
     }
 
     bool gotPidReset(void)
@@ -300,8 +298,6 @@ class Receiver : public Task {
     {
         return dstmin + (dstmax-dstmin) * ((float)value - srcmin) / (srcmax - srcmin);
     }
-
-    virtual void devStart(void) = 0;
 
     virtual bool devRead(
             float & rawThrottle,

@@ -87,6 +87,8 @@ void setup(void)
     _rx = &rx;
     _imu = &imu;
 
+    Serial3.begin(100000, SERIAL_8E2);
+
     _board->begin();
 }
 
