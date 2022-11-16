@@ -58,6 +58,8 @@ void setup(void)
     _board = &board;
     _rx = &rx;
 
+    Serial1.begin(115200);
+
     _board->begin();
 }
 
