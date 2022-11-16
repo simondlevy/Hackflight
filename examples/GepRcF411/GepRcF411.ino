@@ -19,7 +19,7 @@
 
 #include <hackflight.h>
 #include <alignment/rotate270.h>
-#include <boards/stm32/stm32f4.h>
+#include <boards/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/mock.h>
 #include <imus/mock.h>
@@ -40,7 +40,7 @@ static AnglePidController _anglePid(
 
 static vector<PidController *> _pids = {&_anglePid};
 
-static Stm32F4Board * _board;
+static Stm32F411Board * _board;
 static SbusReceiver * _rx;
 
 static Mixer _mixer = QuadXbfMixer::make();
@@ -59,10 +59,12 @@ void setup(void)
 
     static MockEsc esc;
 
-    static Stm32F4Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
+    static Stm32F411Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     _rx = &rx;
+
+    Serial2.begin(100000, SERIAL_8E2);
 
     _board->begin();
 }
