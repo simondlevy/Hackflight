@@ -163,5 +163,10 @@ class SbusReceiver : public Receiver {
             }
         }
 
+        bool ready(void)
+        {
+            return m_frameData.done;
+        }
+
 }; // class SbusReceiver
 

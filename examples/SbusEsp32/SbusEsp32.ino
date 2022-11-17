@@ -23,12 +23,8 @@
 static const uint8_t RX_PIN = 4;
 static const uint8_t TX_PIN = 14; // unused
 
-static SbusReceiver * _rx;
+static SbusReceiver _rx;
 
-void serialEvent3(void)
-{
-    _rx->handleEvent();
-}
 
 void setup(void)
 {
@@ -39,4 +35,11 @@ void setup(void)
 
 void loop(void)
 {
+    while (Serial1.available()) {
+        _rx.parse(Serial1.read());
+    }
+
+    Serial.println(_rx.ready());
+
+    delay(5);
 }
