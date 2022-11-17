@@ -22,7 +22,7 @@
 #include <boards/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/mock.h>
-#include <imus/mock.h>
+#include <imus/real/softquat/bmi270.h>
 #include <tasks/receivers/sbus.h>
 
 #include <vector>
@@ -53,8 +53,7 @@ void serialEvent2(void)
 
 void setup(void)
 {
-    // XXX GepRC F411 uses a BMI270 IMU
-    static MockImu imu;
+    static Bmi270Imu imu;
 
     static MockEsc esc;
 
