@@ -168,5 +168,10 @@ class SbusReceiver : public Receiver {
             return m_frameData.done;
         }
 
+        uint16_t readChannel0(void)
+        {
+            return m_frameData.frame.frame.channels.chan0;
+        }
+
 }; // class SbusReceiver
 

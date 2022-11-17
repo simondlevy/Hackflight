@@ -39,7 +39,9 @@ void loop(void)
         _rx.parse(Serial1.read());
     }
 
-    Serial.println(_rx.ready());
+    if (_rx.ready()) {
+        Serial.println(_rx.readChannel0());
+    }
 
     delay(5);
 }
