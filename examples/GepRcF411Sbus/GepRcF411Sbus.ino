@@ -25,11 +25,20 @@
 #include <imus/real/softquat/bmi270.h>
 #include <tasks/receivers/sbus.h>
 
+// IMU
+static const uint8_t MOSI_PIN = PA7;
+static const uint8_t MISO_PIN = PA6;
+static const uint8_t SCLK_PIN = PA5;
+static const uint8_t CS_PIN   = PA4;
+static const uint8_t EXTI_PIN = PA1;
+
 #include <vector>
 using namespace std;
 
 //static const uint8_t LED_PIN  = PC13; // orange
 static const uint8_t LED_PIN  = PC14; // blue
+
+static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp

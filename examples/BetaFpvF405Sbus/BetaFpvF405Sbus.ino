@@ -28,6 +28,7 @@
 #include <vector>
 using namespace std;
 
+// IMU
 static const uint8_t MOSI_PIN = PA7;
 static const uint8_t MISO_PIN = PA6;
 static const uint8_t SCLK_PIN = PA5;

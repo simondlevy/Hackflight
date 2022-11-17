@@ -6,7 +6,6 @@
    MIT License
 */
 
-#include "board.h"
 #include "imus/real/softquat.h"
 
 #include <SPI.h>
@@ -78,8 +77,6 @@ class Mpu6000 : public SoftQuatImu {
         accelScale_e m_accelScale;
 
         int32_t m_shortPeriod;
-
-        // Board * m_board;
 
         uint8_t m_buffer[15];
 

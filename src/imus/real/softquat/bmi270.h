@@ -18,7 +18,9 @@
 
 #pragma once
 
-#include "imu.h"
+#include "imus/real/softquat.h"
+
+#include <SPI.h>
 
 class Bmi270Imu : public Imu {
 
