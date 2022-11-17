@@ -62,7 +62,7 @@ void serialEvent2(void)
 
 void setup(void)
 {
-    static Bmi270Imu imu;
+    static Bmi270 imu(_spi, CS_PIN);
 
     static MockEsc esc;
 

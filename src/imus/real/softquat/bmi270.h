@@ -22,7 +22,12 @@
 
 #include <SPI.h>
 
-class Bmi270Imu : public Imu {
+class Bmi270 : public Imu {
+
+    private:
+
+        SPIClass * m_spi;
+        uint8_t m_csPin;
 
     protected:
 
@@ -91,4 +96,13 @@ class Bmi270Imu : public Imu {
             (void)align;
             return Axes(0, 0, 0);
         }
-};
+
+    public:
+
+        Bmi270(SPIClass & spi, const uint8_t csPin)
+        {
+            m_spi = &spi;
+            m_csPin = csPin;
+        }
+
+}; // class Bmi270
