@@ -29,8 +29,9 @@ class Stm32Board : public Board {
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
-                const uint8_t ledPin) 
-            : Board(receiver, imu, align, pids, mixer, esc, ledPin)
+                const uint8_t ledPin,
+                const bool ledInverted) 
+            : Board(receiver, imu, align, pids, mixer, esc, ledPin, ledInverted)
         {
         }
 
