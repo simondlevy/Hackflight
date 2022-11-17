@@ -44,9 +44,7 @@ static void handleImuInterrupt(void)
 
 void serialEvent1(void)
 {
-    while (Serial1.available()) {
-        _rx.parse(Serial1.read());
-    }
+    _rx.read(Serial1);
 }
 
 void setup(void)

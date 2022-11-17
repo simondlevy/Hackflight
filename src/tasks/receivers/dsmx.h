@@ -100,8 +100,6 @@ class DsmxReceiver : public Receiver {
             return result;
         }
 
-    public:
-
         virtual void parse(const uint8_t c) override
         {
             const uint32_t usec = micros();

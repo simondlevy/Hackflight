@@ -48,9 +48,7 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 void serialEvent2(void)
 {
-    while (Serial2.available()) {
-        _rx.parse(Serial2.read());
-    }
+    _rx.read(Serial2);
 }
 
 void setup(void)

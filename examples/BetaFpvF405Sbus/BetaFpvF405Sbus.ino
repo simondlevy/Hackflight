@@ -66,9 +66,7 @@ static void handleImuInterrupt(void)
 
 void serialEvent3(void)
 {
-    while (Serial3.available()) {
-        _rx.parse(Serial3.read());
-    }
+    _rx.read(Serial3);
 }
 
 static Mixer _mixer = QuadXbfMixer::make();
