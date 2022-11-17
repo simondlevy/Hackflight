@@ -25,7 +25,7 @@ class LadybugBoard : public Stm32Board {
 
     private:
 
-        vector<uint8_t> motorPins = {13, 16, 3, 11};
+        vector<uint8_t> motorPins = {0x0D, 0x10, 0x03, 0x0B};
 
         UsfsImu imu;
 
