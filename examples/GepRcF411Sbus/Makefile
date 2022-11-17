@@ -1,4 +1,4 @@
-SKETCH = GepRcF411
+SKETCH = GepRcF411Sbus
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
 
