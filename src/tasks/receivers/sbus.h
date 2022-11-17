@@ -101,33 +101,6 @@ class SbusReceiver : public Receiver {
 
     protected:
 
-        virtual void parse(const uint8_t c) override
-        {
-            const uint32_t usec = micros();
-            const int32_t timeInterval = cmpTimeUs(usec, m_frameData.startAtUs);
-
-            if (timeInterval > 3500) {
-                m_frameData.position = 0;
-            }
-
-            if (m_frameData.position == 0) {
-
-                if (c != 0x0F) {
-                    return;
-                }
-                m_frameData.startAtUs = usec;
-            }
-
-            if (m_frameData.position < FRAME_SIZE) {
-                m_frameData.frame.bytes[m_frameData.position++] = c;
-                if (m_frameData.position < FRAME_SIZE) {
-                    m_frameData.done = false;
-                } else {
-                    m_frameData.done = true;
-                }
-            }
-        }
-
         virtual bool devRead(
                 float & throttle,
                 float & roll,
@@ -163,9 +136,31 @@ class SbusReceiver : public Receiver {
 
     public:
 
-        SbusReceiver(HardwareSerial & port)
-            : Receiver(port)
+        virtual void parse(const uint8_t c) override
         {
+            const uint32_t usec = micros();
+            const int32_t timeInterval = cmpTimeUs(usec, m_frameData.startAtUs);
+
+            if (timeInterval > 3500) {
+                m_frameData.position = 0;
+            }
+
+            if (m_frameData.position == 0) {
+
+                if (c != 0x0F) {
+                    return;
+                }
+                m_frameData.startAtUs = usec;
+            }
+
+            if (m_frameData.position < FRAME_SIZE) {
+                m_frameData.frame.bytes[m_frameData.position++] = c;
+                if (m_frameData.position < FRAME_SIZE) {
+                    m_frameData.done = false;
+                } else {
+                    m_frameData.done = true;
+                }
+            }
         }
 
 }; // class SbusReceiver

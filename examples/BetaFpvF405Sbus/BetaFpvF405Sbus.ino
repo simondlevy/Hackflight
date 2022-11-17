@@ -49,7 +49,8 @@ static AnglePidController _anglePid(
 
 static Stm32F405Board * _board;
 static Mpu6000 * _imu;
-static SbusReceiver * _rx;
+
+static SbusReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
 
@@ -65,7 +66,9 @@ static void handleImuInterrupt(void)
 
 void serialEvent3(void)
 {
-    _rx->handleEvent();
+    while (Serial3.available()) {
+        _rx.parse(Serial3.read());
+    }
 }
 
 static Mixer _mixer = QuadXbfMixer::make();
@@ -75,16 +78,13 @@ void setup(void)
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static SbusReceiver rx(Serial3);
-
     static Mpu6000 imu(_spi, CS_PIN);
 
     static DshotEsc esc(&MOTOR_PINS);
 
-    static Stm32F405Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
+    static Stm32F405Board board(_rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
-    _rx = &rx;
     _imu = &imu;
 
     Serial3.begin(100000, SERIAL_8E2);

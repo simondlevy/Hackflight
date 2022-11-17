@@ -444,9 +444,8 @@ class Stm32F4Board : public Stm32Board {
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
-                const uint8_t ledPin,
-                const bool ledInverted) 
-            : Stm32Board(receiver, imu, align, pids, mixer, esc, ledPin, ledInverted)
+                const uint8_t ledPin) 
+            : Stm32Board(receiver, imu, align, pids, mixer, esc, ledPin)
         {
             m_portCount = portCount;
         }
