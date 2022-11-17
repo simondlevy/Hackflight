@@ -30,6 +30,14 @@ static uint16_t convert(uint16_t chanval)
     return (uint16_t)SbusReceiver::convert(chanval);
 }
 
+static void report (
+        const uint16_t value, const char * label, const char * delim="   ")
+{
+    Serial.print(label);
+    Serial.print(value);
+    Serial.print(delim);
+}
+
 void setup(void)
 {
     Serial.begin(115200);
@@ -42,7 +50,16 @@ void loop(void)
     _rx.read(Serial1);
 
     if (_rx.ready()) {
-        Serial.println(convert(_rx.readChannel0()));
+
+        const uint16_t c1 = convert(_rx.readChannel1());
+        const uint16_t c2 = convert(_rx.readChannel2());
+        const uint16_t c3 = convert(_rx.readChannel3());
+        const uint16_t c4 = convert(_rx.readChannel4());
+        
+        report(c1, "C1=");
+        report(c2, "C2=");
+        report(c3, "C3=");
+        report(c4, "C4=", "\n");
     }
 
     delay(5);

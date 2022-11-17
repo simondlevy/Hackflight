@@ -160,9 +160,24 @@ class SbusReceiver : public Receiver {
             return m_frameData.done;
         }
 
-        uint16_t readChannel0(void)
+        uint16_t readChannel1(void)
         {
             return m_frameData.frame.frame.channels.chan0;
+        }
+
+        uint16_t readChannel2(void)
+        {
+            return m_frameData.frame.frame.channels.chan1;
+        }
+
+        uint16_t readChannel3(void)
+        {
+            return m_frameData.frame.frame.channels.chan2;
+        }
+
+        uint16_t readChannel4(void)
+        {
+            return m_frameData.frame.frame.channels.chan3;
         }
 
         static float convert(
