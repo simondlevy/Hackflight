@@ -55,11 +55,15 @@ void loop(void)
         const uint16_t c2 = convert(_rx.readChannel2());
         const uint16_t c3 = convert(_rx.readChannel3());
         const uint16_t c4 = convert(_rx.readChannel4());
+        const uint16_t c5 = convert(_rx.readChannel5());
+        const uint16_t c6 = convert(_rx.readChannel6());
         
         report(c1, "C1=");
         report(c2, "C2=");
         report(c3, "C3=");
-        report(c4, "C4=", "\n");
+        report(c4, "C4=");
+        report(c5, "C5=");
+        report(c6, "C6=", "\n");
     }
 
     delay(5);

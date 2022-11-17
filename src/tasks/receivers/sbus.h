@@ -180,6 +180,16 @@ class SbusReceiver : public Receiver {
             return m_frameData.frame.frame.channels.chan3;
         }
 
+        uint16_t readChannel5(void)
+        {
+            return m_frameData.frame.frame.channels.chan4;
+        }
+
+        uint16_t readChannel6(void)
+        {
+            return m_frameData.frame.frame.channels.chan5;
+        }
+
         static float convert(
                 const uint16_t value,
                 const uint16_t dstmin=1000,
