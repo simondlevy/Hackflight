@@ -165,7 +165,7 @@ class SbusReceiver : public Receiver {
             return m_frameData.frame.frame.channels.chan0;
         }
 
-        float convert(
+        static float convert(
                 const uint16_t value,
                 const uint16_t dstmin=1000,
                 const uint16_t dstmax=2000)

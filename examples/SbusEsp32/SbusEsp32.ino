@@ -25,6 +25,11 @@ static const uint8_t TX_PIN = 14; // unused
 
 static SbusReceiver _rx;
 
+static uint16_t convert(uint16_t chanval)
+{
+    return (uint16_t)SbusReceiver::convert(chanval);
+}
+
 void setup(void)
 {
     Serial.begin(115200);
@@ -37,7 +42,7 @@ void loop(void)
     _rx.read(Serial1);
 
     if (_rx.ready()) {
-        Serial.println(_rx.readChannel0());
+        Serial.println(convert(_rx.readChannel0()));
     }
 
     delay(5);
