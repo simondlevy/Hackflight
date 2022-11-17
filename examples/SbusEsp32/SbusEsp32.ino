@@ -25,7 +25,6 @@ static const uint8_t TX_PIN = 14; // unused
 
 static SbusReceiver _rx;
 
-
 void setup(void)
 {
     Serial.begin(115200);
@@ -35,9 +34,7 @@ void setup(void)
 
 void loop(void)
 {
-    while (Serial1.available()) {
-        _rx.parse(Serial1.read());
-    }
+    _rx.read(Serial1);
 
     if (_rx.ready()) {
         Serial.println(_rx.readChannel0());

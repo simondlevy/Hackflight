@@ -354,6 +354,8 @@ class Receiver : public Task {
         }
     }
 
+    virtual void parse(const uint8_t c) = 0;
+
     float getRawThrottle(void)
     {
         return m_rawThrottle;
@@ -386,5 +388,10 @@ class Receiver : public Task {
 
     public:
 
-    virtual void parse(const uint8_t c) = 0;
+    void read(HardwareSerial & port)
+    {
+        while (port.available()) {
+            parse(port.read());
+        }
+    }
 };
