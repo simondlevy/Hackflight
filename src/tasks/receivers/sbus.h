@@ -82,14 +82,10 @@ class SbusReceiver : public Receiver {
             struct sbusFrame_s frame;
         } frame_t;
 
-        typedef struct {
-            frame_t frame;
-            uint32_t startAtUs;
-            uint8_t position;
-            bool done;
-        } frameData_t;
-
-        frameData_t m_frameData;
+        frame_t  m_frame;
+        uint32_t m_startAtUs;
+        uint8_t  m_position;
+        bool     m_done;
 
     protected:
 
@@ -104,16 +100,16 @@ class SbusReceiver : public Receiver {
         {
             auto result = false;
 
-            if (m_frameData.done) {
+            if (m_done) {
 
-                m_frameData.done = false;
+                m_done = false;
 
                 result = true;
 
-                auto channels = &m_frameData.frame.frame.channels;
+                auto channels = &m_frame.frame.channels;
 
                 // Update frame time only if there are no channel errors (timeout)
-                frameTimeUs = channels->flags ? frameTimeUs : m_frameData.startAtUs;
+                frameTimeUs = channels->flags ? frameTimeUs : m_startAtUs;
                 throttle = convert(channels->chan0);
 
                 roll  = convert(channels->chan1);
@@ -131,63 +127,63 @@ class SbusReceiver : public Receiver {
         virtual void parse(const uint8_t c) override
         {
             const uint32_t usec = micros();
-            const int32_t timeInterval = cmpTimeUs(usec, m_frameData.startAtUs);
+            const int32_t timeInterval = cmpTimeUs(usec, m_startAtUs);
 
             if (timeInterval > 3500) {
-                m_frameData.position = 0;
+                m_position = 0;
             }
 
-            if (m_frameData.position == 0) {
+            if (m_position == 0) {
 
                 if (c != 0x0F) {
                     return;
                 }
-                m_frameData.startAtUs = usec;
+                m_startAtUs = usec;
             }
 
-            if (m_frameData.position < FRAME_SIZE) {
-                m_frameData.frame.bytes[m_frameData.position++] = c;
-                if (m_frameData.position < FRAME_SIZE) {
-                    m_frameData.done = false;
+            if (m_position < FRAME_SIZE) {
+                m_frame.bytes[m_position++] = c;
+                if (m_position < FRAME_SIZE) {
+                    m_done = false;
                 } else {
-                    m_frameData.done = true;
+                    m_done = true;
                 }
             }
         }
 
         bool ready(void)
         {
-            return m_frameData.done;
+            return m_done;
         }
 
         uint16_t readChannel1(void)
         {
-            return m_frameData.frame.frame.channels.chan0;
+            return m_frame.frame.channels.chan0;
         }
 
         uint16_t readChannel2(void)
         {
-            return m_frameData.frame.frame.channels.chan1;
+            return m_frame.frame.channels.chan1;
         }
 
         uint16_t readChannel3(void)
         {
-            return m_frameData.frame.frame.channels.chan2;
+            return m_frame.frame.channels.chan2;
         }
 
         uint16_t readChannel4(void)
         {
-            return m_frameData.frame.frame.channels.chan3;
+            return m_frame.frame.channels.chan3;
         }
 
         uint16_t readChannel5(void)
         {
-            return m_frameData.frame.frame.channels.chan4;
+            return m_frame.frame.channels.chan4;
         }
 
         uint16_t readChannel6(void)
         {
-            return m_frameData.frame.frame.channels.chan5;
+            return m_frame.frame.channels.chan5;
         }
 
         static float convert(
