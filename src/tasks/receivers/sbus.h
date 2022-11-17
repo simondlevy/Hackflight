@@ -89,14 +89,6 @@ class SbusReceiver : public Receiver {
             bool done;
         } frameData_t;
 
-        float convert(
-                const uint16_t value,
-                const uint16_t dstmin=1000,
-                const uint16_t dstmax=2000)
-        {
-            return Receiver::convert(value, 172, 1811, dstmin, dstmax);
-        }
-
         frameData_t m_frameData;
 
     protected:
@@ -171,6 +163,14 @@ class SbusReceiver : public Receiver {
         uint16_t readChannel0(void)
         {
             return m_frameData.frame.frame.channels.chan0;
+        }
+
+        float convert(
+                const uint16_t value,
+                const uint16_t dstmin=1000,
+                const uint16_t dstmax=2000)
+        {
+            return Receiver::convert(value, 172, 1811, dstmin, dstmax);
         }
 
 }; // class SbusReceiver
