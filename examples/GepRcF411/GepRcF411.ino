@@ -41,28 +41,28 @@ static AnglePidController _anglePid(
 static vector<PidController *> _pids = {&_anglePid};
 
 static Stm32F411Board * _board;
-static SbusReceiver * _rx;
+
+static SbusReceiver _rx;
 
 static Mixer _mixer = QuadXbfMixer::make();
 
 void serialEvent2(void)
 {
-    _rx->handleEvent();
+    while (Serial2.available()) {
+        _rx.parse(Serial2.read());
+    }
 }
 
 void setup(void)
 {
-    static SbusReceiver rx(Serial2);
-
     // XXX GepRC F411 uses a BMI270 IMU
     static MockImu imu;
 
     static MockEsc esc;
 
-    static Stm32F411Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
+    static Stm32F411Board board(_rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
-    _rx = &rx;
 
     Serial2.begin(100000, SERIAL_8E2);
 
