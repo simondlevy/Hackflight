@@ -79,7 +79,7 @@ class SbusReceiver : public Receiver {
 
         typedef union {
             uint8_t bytes[FRAME_SIZE];
-            struct sbusFrame_s frame;
+            struct sbusFrame_s sbframe;
         } frame_t;
 
         frame_t  m_frame;
@@ -106,7 +106,7 @@ class SbusReceiver : public Receiver {
 
                 result = true;
 
-                auto channels = &m_frame.frame.channels;
+                auto channels = &m_frame.sbframe.channels;
 
                 // Update frame time only if there are no channel errors (timeout)
                 frameTimeUs = channels->flags ? frameTimeUs : m_startAtUs;
@@ -158,32 +158,32 @@ class SbusReceiver : public Receiver {
 
         uint16_t readChannel1(void)
         {
-            return m_frame.frame.channels.chan0;
+            return m_frame.sbframe.channels.chan0;
         }
 
         uint16_t readChannel2(void)
         {
-            return m_frame.frame.channels.chan1;
+            return m_frame.sbframe.channels.chan1;
         }
 
         uint16_t readChannel3(void)
         {
-            return m_frame.frame.channels.chan2;
+            return m_frame.sbframe.channels.chan2;
         }
 
         uint16_t readChannel4(void)
         {
-            return m_frame.frame.channels.chan3;
+            return m_frame.sbframe.channels.chan3;
         }
 
         uint16_t readChannel5(void)
         {
-            return m_frame.frame.channels.chan4;
+            return m_frame.sbframe.channels.chan4;
         }
 
         uint16_t readChannel6(void)
         {
-            return m_frame.frame.channels.chan5;
+            return m_frame.sbframe.channels.chan5;
         }
 
         static float convert(
