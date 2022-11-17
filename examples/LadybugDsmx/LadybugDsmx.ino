@@ -34,7 +34,8 @@ static vector<PidController *> _pids = {&_anglePid};
 static Mixer _mixer = QuadXbfMixer::make();
 
 static LadybugBoard * _board;
-static DsmxReceiver * _rx;
+
+static DsmxReceiver _rx;
 
 static void handleImuInterrupt(void)
 {
@@ -43,7 +44,9 @@ static void handleImuInterrupt(void)
 
 void serialEvent1(void)
 {
-    _rx->handleEvent();
+    while (Serial1.available()) {
+        _rx.parse(Serial1.read());
+    }
 }
 
 void setup(void)
@@ -51,12 +54,9 @@ void setup(void)
     pinMode(LadybugBoard::IMU_INTERRUPT_PIN, INPUT);
     attachInterrupt(LadybugBoard::IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
 
-    static DsmxReceiver rx(Serial1);
-
-    static LadybugBoard board(rx, _pids, _mixer);
+    static LadybugBoard board(_rx, _pids, _mixer);
 
     _board = &board;
-    _rx = &rx;
 
     Serial1.begin(115200);
 

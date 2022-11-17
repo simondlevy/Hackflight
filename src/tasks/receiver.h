@@ -28,8 +28,6 @@
 #include "task.h"
 #include "time.h"
 
-static HardwareSerial * m_port;
-
 class Receiver : public Task {
 
     friend class Board;
@@ -308,18 +306,9 @@ class Receiver : public Task {
             float & rawAux2,
             uint32_t & frameTimeUs) = 0;
 
-    virtual void parse(const uint8_t c) = 0;
-
     Receiver(void)
         : Task(33) // Hz
     {
-        m_port = NULL;
-    }
-
-    Receiver(HardwareSerial & port)
-        : Receiver() 
-    {
-        m_port = &port;
     }
 
     // Task function, called periodically
@@ -397,10 +386,5 @@ class Receiver : public Task {
 
     public:
 
-    void handleEvent(void)
-    {
-        while (m_port->available()) {
-            parse(m_port->read());
-        }
-    }
+    virtual void parse(const uint8_t c) = 0;
 };

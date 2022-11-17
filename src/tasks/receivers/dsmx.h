@@ -52,28 +52,6 @@ class DsmxReceiver : public Receiver {
 
     protected:
 
-        virtual void parse(const uint8_t c) override
-        {
-            const uint32_t usec = micros();
-            const uint32_t timeInterval = cmpTimeUs(usec, m_frameData.lastTimeUs);
-
-            m_frameData.lastTimeUs = usec;
-
-            if (timeInterval > 5000) {
-                m_frameData.position = 0;
-            }
-
-            if (m_frameData.position < FRAME_SIZE) {
-                m_frameData.bytes[m_frameData.position++] = (uint8_t)c;
-                if (m_frameData.position < FRAME_SIZE) {
-                    m_frameData.done = false;
-                } else {
-                    m_frameData.lastTimeUs = usec;
-                    m_frameData.done = true;
-                }
-            }
-        }
-
         virtual bool devRead(
                 float & throttle,
                 float & roll,
@@ -124,9 +102,26 @@ class DsmxReceiver : public Receiver {
 
     public:
 
-        DsmxReceiver(HardwareSerial & port) 
-            : Receiver(port)
+        virtual void parse(const uint8_t c) override
         {
+            const uint32_t usec = micros();
+            const uint32_t timeInterval = cmpTimeUs(usec, m_frameData.lastTimeUs);
+
+            m_frameData.lastTimeUs = usec;
+
+            if (timeInterval > 5000) {
+                m_frameData.position = 0;
+            }
+
+            if (m_frameData.position < FRAME_SIZE) {
+                m_frameData.bytes[m_frameData.position++] = (uint8_t)c;
+                if (m_frameData.position < FRAME_SIZE) {
+                    m_frameData.done = false;
+                } else {
+                    m_frameData.lastTimeUs = usec;
+                    m_frameData.done = true;
+                }
+            }
         }
 
 }; // class DsmxReceiver
