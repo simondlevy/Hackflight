@@ -24,11 +24,22 @@
 
 class Bmi270 : public SpiImu {
 
+    public:
+
+        uint8_t id;
+
+    private:
+
+        // Registers
+        static const uint8_t REG_CHIP_ID = 0x00;
+
     protected:
 
         virtual void begin(void) override 
         {
             m_spi->begin();
+
+            id = readRegister(REG_CHIP_ID);
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
@@ -100,8 +111,6 @@ class Bmi270 : public SpiImu {
         }
 
     public:
-
-        uint8_t id;
 
         Bmi270(SPIClass & spi, const uint8_t csPin)
             : SpiImu(spi, csPin, 2000 / 32768.)
