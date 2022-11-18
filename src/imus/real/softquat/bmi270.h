@@ -33,6 +33,7 @@ class Bmi270 : public Imu {
 
         virtual void begin(void) override 
         {
+            m_spi->begin();
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
