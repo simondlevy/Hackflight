@@ -100,6 +100,8 @@ class Bmi270 : public Imu {
 
     public:
 
+        uint8_t id;
+
         Bmi270(SPIClass & spi, const uint8_t csPin)
         {
             m_spi = &spi;

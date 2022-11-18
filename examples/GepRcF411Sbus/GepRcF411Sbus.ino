@@ -50,6 +50,7 @@ static AnglePidController _anglePid(
 static vector<PidController *> _pids = {&_anglePid};
 
 static Stm32F411Board * _board;
+static Bmi270 * _imu;
 
 static SbusReceiver _rx;
 
@@ -69,6 +70,7 @@ void setup(void)
     static Stm32F411Board board(_rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
+    _imu = &imu;
 
     Serial2.begin(100000, SERIAL_8E2);
 
@@ -78,4 +80,6 @@ void setup(void)
 void loop(void)
 {
     _board->step();
+
+    Serial.println(_imu->id);
 }
