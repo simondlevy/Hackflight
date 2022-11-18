@@ -18,16 +18,11 @@
 
 #pragma once
 
-#include "imus/real/softquat.h"
+#include "imus/real/softquat/spi.h"
 
 #include <SPI.h>
 
-class Bmi270 : public Imu {
-
-    private:
-
-        SPIClass * m_spi;
-        uint8_t m_csPin;
+class Bmi270 : public SpiImu {
 
     protected:
 
@@ -98,14 +93,19 @@ class Bmi270 : public Imu {
             return Axes(0, 0, 0);
         }
 
+        virtual int16_t readRawGyro(uint8_t k) override
+        {
+            (void)k;
+            return 0;
+        }
+
     public:
 
         uint8_t id;
 
         Bmi270(SPIClass & spi, const uint8_t csPin)
+            : SpiImu(spi, csPin, 2000 / 32768.)
         {
-            m_spi = &spi;
-            m_csPin = csPin;
         }
 
 }; // class Bmi270

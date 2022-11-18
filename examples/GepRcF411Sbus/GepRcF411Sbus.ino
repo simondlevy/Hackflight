@@ -22,7 +22,7 @@
 #include <boards/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/mock.h>
-#include <imus/real/softquat/bmi270.h>
+#include <imus/real/softquat/spi/bmi270.h>
 #include <tasks/receivers/sbus.h>
 
 // IMU

@@ -6,11 +6,11 @@
    MIT License
 */
 
-#include "imus/real/softquat.h"
+#include "imus/real/softquat/spi.h"
 
 #include <SPI.h>
 
-class Mpu6000 : public SoftQuatImu {
+class Mpu6000 : public SpiImu {
 
     public:
 
@@ -64,10 +64,6 @@ class Mpu6000 : public SoftQuatImu {
         // 20 MHz max SPI frequency
         static const uint32_t MAX_SPI_CLK_HZ = 20000000;
 
-        SPIClass * m_spi;
-
-        uint8_t m_csPin;
-
         // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
         // Sample rate = 50Hz    Fsample= 1Khz/(19+1) = 50Hz     
         uint8_t m_sampleRateDivisor;
@@ -79,14 +75,6 @@ class Mpu6000 : public SoftQuatImu {
         int32_t m_shortPeriod;
 
         uint8_t m_buffer[15];
-
-        void writeRegister(const uint8_t reg, const uint8_t val)
-        {
-            digitalWrite(m_csPin, LOW);
-            m_spi->transfer(reg);
-            m_spi->transfer(val);
-            digitalWrite(m_csPin, HIGH);
-        }
 
         int16_t getValue(const uint8_t k)
         {
@@ -104,20 +92,6 @@ class Mpu6000 : public SoftQuatImu {
             for (; (clk > freq) && (divisor < 256); divisor <<= 1, clk >>= 1);
 
             return divisor;
-        }
-
-        void readRegisters(const uint8_t addr, const uint8_t count)
-        {
-            digitalWrite(m_csPin, LOW);
-            m_buffer[0] = addr | 0x80;
-            m_spi->transfer(m_buffer, count);
-            digitalWrite(m_csPin, HIGH);
-        }
-
-        uint8_t readRegister(const uint8_t addr)
-        {
-            readRegisters(addr, 2);
-            return m_buffer[1];
         }
 
     protected:
@@ -204,14 +178,13 @@ class Mpu6000 : public SoftQuatImu {
                 const uint8_t sampleRateDivisor = 19,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
-            : SoftQuatImu(
+            : SpiImu(spi, csPin,
                     (gyroScale == GYRO_250DPS ?  250 : 
                      gyroScale == GYRO_500DPS ?  500 : 
                      gyroScale == GYRO_1000DPS ?  1000 : 
-                     2000) / 32768.)
+                     2000) 
+                    / 32768.)
             {
-                m_spi = &spi;
-                m_csPin = csPin;
                 m_sampleRateDivisor = sampleRateDivisor;
                 m_gyroScale = gyroScale;
                 m_accelScale = accelScale;
@@ -240,7 +213,7 @@ class Mpu6000 : public SoftQuatImu {
 
         void readGyro(void)
         {
-            readRegisters(REG_GYRO_XOUT_H, 7);
+            readRegisters(REG_GYRO_XOUT_H, m_buffer, 7);
         }
 
 }; // class Mpu6000
