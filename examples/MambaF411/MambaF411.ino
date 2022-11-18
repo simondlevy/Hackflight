@@ -22,7 +22,7 @@
 #include <boards/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot.h>
-#include <imus/real/softquat/mpu6000.h>
+#include <imus/real/softquat/spi/mpu6000.h>
 #include <tasks/receivers/sbus.h>
 
 #include <vector>
@@ -50,7 +50,7 @@ static AnglePidController _anglePid(
 
 static Stm32F411Board * _board;
 static Mpu6000 * _imu;
-static SbusReceiver * _rx;
+static SbusReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
 
@@ -66,7 +66,7 @@ static void handleImuInterrupt(void)
 
 void serialEvent1(void)
 {
-    _rx->handleEvent();
+    _rx.read(Serial1);
 }
 
 static Mixer _mixer = QuadXbfMixer::make();
@@ -76,17 +76,16 @@ void setup(void)
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static SbusReceiver rx(Serial1);
-
     static Mpu6000 imu(_spi, CS_PIN);
 
     static DshotEsc esc(&MOTOR_PINS);
 
-    static Stm32F411Board board(rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
+    static Stm32F411Board board(_rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
-    _rx = &rx;
     _imu = &imu;
+
+    Serial1.begin(100000, SERIAL_8E2);
 
     _board->begin();
 }
