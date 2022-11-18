@@ -1,4 +1,4 @@
-SKETCH = MambaF411
+SKETCH = MambaF411Dsmx
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
 

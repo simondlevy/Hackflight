@@ -23,7 +23,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot.h>
 #include <imus/real/softquat/spi/mpu6000.h>
-#include <tasks/receivers/sbus.h>
+#include <tasks/receivers/dsmx.h>
 
 #include <vector>
 using namespace std;
@@ -50,7 +50,7 @@ static AnglePidController _anglePid(
 
 static Stm32F411Board * _board;
 static Mpu6000 * _imu;
-static SbusReceiver _rx;
+static DsmxReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
 
@@ -85,7 +85,7 @@ void setup(void)
     _board = &board;
     _imu = &imu;
 
-    Serial1.begin(100000, SERIAL_8E2);
+    Serial1.begin(115200);
 
     _board->begin();
 }
