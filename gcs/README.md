@@ -10,7 +10,8 @@ GCS is not meant to help you configure your flight-control firmware, since
 that is supposed to be done using C++ coding.
 
 To build Hackflight GCS for Windows, double-click on the <b>buildgcs.bat</b>
-file.  This will create a new folder <b>HackflightGCS<b> that you can drag
+file.  This will create a new folder <b>HackflightGCS</b> folder containing
+an executable and support files.  You can drag this new folder
 into your <b>Program Files</b> folder or other convenient location.
 
 
