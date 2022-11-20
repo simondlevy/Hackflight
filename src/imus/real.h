@@ -177,7 +177,7 @@ class RealImu : public Imu {
             (void)gz;
         }
 
-        auto readGyroDps(const align_fun align) -> Axes
+        auto readGyroDps(void) -> Axes
         {
             const auto calibrationComplete = m_calibrationCyclesRemaining <= 0;
 
@@ -192,7 +192,7 @@ class RealImu : public Imu {
                 _adc.y = readCalibratedGyro(m_y, 1);
                 _adc.z = readCalibratedGyro(m_z, 2);
 
-                align(&_adc);
+                _adc = m_rotateFun(_adc);
 
             } else {
                 calibrate();

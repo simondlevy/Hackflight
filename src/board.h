@@ -72,7 +72,7 @@ class Board {
 
             if (m_imu->gyroIsReady()) {
 
-                auto angvels = m_imu->readGyroDps(m_imuAlignFun);
+                auto angvels = m_imu->readGyroDps();
 
                 m_vstate.dphi   = angvels.x;
                 m_vstate.dtheta = angvels.y;

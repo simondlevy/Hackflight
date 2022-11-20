@@ -54,6 +54,6 @@ class Imu {
 
         virtual bool gyroIsReady(void) = 0;
 
-        virtual auto readGyroDps(const align_fun align) -> Axes = 0;
+        virtual auto readGyroDps(void) -> Axes = 0;
 
 }; // class Imu
