@@ -1,0 +1,8 @@
+ [Desktop Entry]
+ Name=Hackflight
+ Comment=Hackflight Visualizer
+ Exec=/home/levys@ad.wlu.edu/Documents/Arduino/libraries/Hackflight/viz/hfviz.sh
+ Icon=/home/levys@ad.wlu.edu/Documents/Arduino/libraries/Hackflight/media/icon.png
+ Terminal=false
+ Type=Application
+ Categories=Utility;Application;Development;
