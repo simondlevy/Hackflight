@@ -18,14 +18,9 @@ have safety mechanisms that Hackflight lacks, which will help avoid injury to
 you and damage to your vehicle.
 
 
-## Supported platforms
+## Use cases
 
-To make it easy to develop flight firmware using Arduino-compatible
-microcontrollers, Hackflight is laid out as an Arduino library; however,
-this does not limit your ability to use it on other hardware platforms 
-and simulators.
-
-Currently, Hackflight has been tested on the following platforms:
+Hackflight has been tested on the following platforms:
 
 * [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller) from Tlera Corp.
 
@@ -34,6 +29,10 @@ from BetaFPV
 
 * [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine
 
+To make it easy to develop flight firmware using Arduino-compatible
+microcontrollers, Hackflight is laid out as an Arduino library; however,
+this does not limit your ability to use it on other hardware platforms 
+and simulators.
 ## Design principles
 
 Hackflight attempts to maintain a simple relationship between
