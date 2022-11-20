@@ -22,10 +22,14 @@ you and damage to your vehicle.
 
 Hackflight has been tested on the following platforms:
 
-* [Ladybug Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller) from Tlera Corp.
+* [Ladybug Brushed Flight Controller](https://www.tindie.com/products/TleraCorp/ladybug-flight-controller) from Tlera Corp.
 
-* [STM32F405 AIO flight controller](https://betafpv.com/products/f405-20a-aio-2-4s-brushless-flight-controllerblheli_s-v3)
-from BetaFPV
+* [BetaFVP 75mm Brushless Whoop Quadcopter](https://betafpv.com/products/beta75x-2s-whoop-quadcopter) with
+[FrSky XSR SBUS receiver](https://www.frsky-rc.com/product/xsr/).
+
+
+* [Diatone Cube 229 Brushless Quadcopter](www.diatoneusa.com/store/p659/Diatone_Toothpick_Cube_229_8500_PNF.html) with
+[Spektrum DSMX micro receiver](https://betafpv.com/products/fullspeed-dsmx-receiver).
 
 * [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine
 
@@ -33,6 +37,7 @@ To make it easy to develop flight firmware using Arduino-compatible
 microcontrollers, Hackflight is laid out as an Arduino library; however,
 this does not limit your ability to use it on other hardware platforms 
 and simulators.
+
 ## Design principles
 
 Hackflight attempts to maintain a simple relationship between
