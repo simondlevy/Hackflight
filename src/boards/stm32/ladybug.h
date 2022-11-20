@@ -27,8 +27,7 @@ class LadybugBoard : public Stm32Board {
 
         vector<uint8_t> motorPins = {0x0D, 0x10, 0x03, 0x0B};
 
-        // UsfsImu imu(RealImu::rotate0);
-        MockImu imu;
+        UsfsImu imu = UsfsImu(RealImu::rotate0);
 
         BrushedEsc esc = BrushedEsc(motorPins);
 
@@ -43,7 +42,7 @@ class LadybugBoard : public Stm32Board {
 
         void handleInterrupt(void)
         {
-            // imu.handleInterrupt();
+            imu.handleInterrupt();
         }
 
         static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
