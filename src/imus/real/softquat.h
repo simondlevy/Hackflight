@@ -162,32 +162,6 @@ class SoftQuatImu : public RealImu {
             return x * x;
         }
 
-        static auto quat2euler(const Quaternion & quat, Axes & rot) -> Axes
-        {
-            const auto qw = quat.w;
-            const auto qx = quat.x;
-            const auto qy = quat.y;
-            const auto qz = quat.z;
-
-            const auto r00 = 1 - 2 * qy*qy - 2 * qz*qz;
-            const auto r10 = 2 * (qx*qy + qw*qz);
-            const auto r20 = 2 * (qx*qz - qw*qy);
-            const auto r21 = 2 * (qy*qz + qw*qx);
-            const auto r22 = 1 - 2 * qx*qx - 2 * qy*qy;
-
-            const auto psi = -atan2_approx(r10, r00); 
-
-            // Additional output
-            rot.x = r20;
-            rot.y = r21;
-            rot.z = r22;
-
-            return Axes(
-                    atan2_approx(r21, r22),
-                    (0.5f * M_PI) - acos_approx(-r20),
-                    psi + ((psi < 0) ? 2 * M_PI : 0));
-        }
-
         static auto mahony(
                 const float dt,
                 const Axes & gyro,
@@ -244,6 +218,6 @@ class SoftQuatImu : public RealImu {
 
             m_gyroAccum.reset();
 
-            return quat2euler(quat, m_fusionPrev.rot);
+            return quat2euler(quat.w, quat.x, quat.y, quat.z);
         }
 };

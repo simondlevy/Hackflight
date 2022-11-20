@@ -84,17 +84,7 @@ class UsfsImu : public RealImu {
         {
             (void)time;
 
-            const auto qw = m_qw;
-            const auto qx = m_qx;
-            const auto qy = m_qy;
-            const auto qz = m_qz;
-
-            const auto phi = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-            const auto theta = asin(2.0f*(qx*qz-qw*qy));
-            const auto psi = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
-
-            // Convert heading from [-pi,+pi] to [0,2*pi]
-            return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
+            return quat2euler(m_qw, m_qx, m_qy, m_qz);
         }
 
         virtual uint32_t getGyroInterruptCount(void) override
