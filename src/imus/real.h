@@ -41,6 +41,8 @@ class RealImu : public Imu {
         static const uint16_t GYRO_LPF2_STATIC_HZ            = 500;
         static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
 
+        typedef Axes (*rotateFun_t)(Axes & axes);
+
         typedef struct {
             float sum[3];
             Stats stats[3];
