@@ -59,7 +59,7 @@ class GCS(MspParser):
 
         # Do basic Tk initialization
         self.root = tk.Tk()
-        self.root.configure(bg=BACKGROUND_COLOR)
+        self.root.configure(bg=BACKGROUND_COLOR, highlightbackground='black', highlightthickness=3)
         self.root.resizable(False, False)
         self.root.title('Hackflight Visualizer')
         left = (self.root.winfo_screenwidth() - DISPLAY_WIDTH) / 2

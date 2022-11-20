@@ -1,3 +1,3 @@
 #!/usr/bin/bash
-cd $HOME/Documents/Arduino/libraries/Hackflight/gcs
-/usr/bin/python3 gcs.py
+cd $HOME/Documents/Arduino/libraries/Hackflight/viz
+/usr/bin/python3 hfviz.py
