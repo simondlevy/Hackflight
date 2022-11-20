@@ -57,12 +57,12 @@ approach to taming the complexity of flight control.  Check out this
 [example program](https://github.com/simondlevy/Hackflight/blob/master/examples/LadybugDsmx/LadybugDsmx.ino)
 to get an idea of how this approach works.
 
-## Ground Control Station
+## Desktop visualizer app
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
-channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program
-that allows you to connect to the board and see what's going on. Check out the GCS
-[README](https://github.com/simondlevy/Hackflight/blob/master/gcs/README.md) for more information.
+channel values,  we also provide <b>HFViz</b> a very simple visualizer program
+that allows you to connect to the board and see what's going on. Check out the 
+[README](https://github.com/simondlevy/Hackflight/blob/master/viz/README.md) for more information.
 
 ## Citing Hackflight
 

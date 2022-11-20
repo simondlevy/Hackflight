@@ -61,7 +61,7 @@ class GCS(MspParser):
         self.root = tk.Tk()
         self.root.configure(bg=BACKGROUND_COLOR)
         self.root.resizable(False, False)
-        self.root.title('Hackflight Ground Control Station')
+        self.root.title('Hackflight Visualizer')
         left = (self.root.winfo_screenwidth() - DISPLAY_WIDTH) / 2
         top = (self.root.winfo_screenheight() - DISPLAY_HEIGHT) / 2
         self.root.geometry('%dx%d+%d+%d' % (DISPLAY_WIDTH, DISPLAY_HEIGHT,

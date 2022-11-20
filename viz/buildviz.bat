@@ -13,7 +13,7 @@
 ::Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 pyinstaller --onefile gcs.py --windowed --noconsole
-mkdir HackflightGCS
-mkdir HackflightGCS\media
-copy dist\gcs.exe HackflightGCS
-copy media\* HackflightGCS\media
+mkdir HFViz
+mkdir HFViz\media
+copy dist\gcs.exe HFViz
+copy media\* HFViz\media
