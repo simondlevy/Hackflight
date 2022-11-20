@@ -149,6 +149,7 @@ class RealImu : public Imu {
 
         RealImu(const rotateFun_t rotateFun, const float gyroScale) 
         {
+            m_rotateFun = rotateFun;
             m_gyroScale = gyroScale;
 
             setCalibrationCycles(); // start calibrating
