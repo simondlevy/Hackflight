@@ -84,7 +84,9 @@ class UsfsImu : public RealImu {
         {
             (void)time;
 
-            return quat2euler(m_qw, m_qx, m_qy, m_qz);
+            Axes angles = quat2euler(m_qw, m_qx, m_qy, m_qz);
+
+            return Axes(angles.x, -angles.y, -angles.z);
         }
 
         virtual uint32_t getGyroInterruptCount(void) override
