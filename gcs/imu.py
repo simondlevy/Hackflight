@@ -146,10 +146,9 @@ class IMU(Dialog):
         # Convert angles to X,Y,Z rotation matrices
 
         # Negate incoming angles for display
-        rollAngle = -self.roll_pitch_yaw[0]
-        # pitchAngle = -self.roll_pitch_yaw[1]
-        pitchAngle = self.roll_pitch_yaw[1]
-        yawAngle = -self.roll_pitch_yaw[2]
+        rollAngle  = -self.roll_pitch_yaw[0]
+        pitchAngle = -self.roll_pitch_yaw[1]
+        yawAngle   =  self.roll_pitch_yaw[2]
 
         self.rollrot[0][0] = +cos(rollAngle)
         self.rollrot[0][1] = -sin(rollAngle)
