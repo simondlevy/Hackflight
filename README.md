@@ -28,7 +28,7 @@ Hackflight has been tested on the following platforms:
 [FrSky XSR SBUS receiver](https://www.frsky-rc.com/product/xsr/).
 
 
-* [Diatone Cube 229 Brushless Quadcopter](www.diatoneusa.com/store/p659/Diatone_Toothpick_Cube_229_8500_PNF.html) with
+* [Diatone Cube 229 Brushless Quadcopter](https://www.diatoneusa.com/store/p659/Diatone_Toothpick_Cube_229_8500_PNF.html) with
 [Spektrum DSMX micro receiver](https://betafpv.com/products/fullspeed-dsmx-receiver).
 
 * [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine
