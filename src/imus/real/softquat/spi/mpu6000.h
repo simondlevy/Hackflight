@@ -173,6 +173,7 @@ class Mpu6000 : public SpiImu {
     public:
 
         Mpu6000(
+                rotateFun_t rotateFun,
                 SPIClass & spi,
                 const uint8_t csPin,
                 const uint8_t sampleRateDivisor = 19,

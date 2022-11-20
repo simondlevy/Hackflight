@@ -77,7 +77,7 @@ void setup(void)
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static Mpu6000 imu(_spi, CS_PIN);
+    static Mpu6000 imu(RealImu::rotate270, _spi, CS_PIN);
 
     static DshotEsc esc(&MOTOR_PINS);
 

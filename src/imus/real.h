@@ -34,14 +34,16 @@ class RealImu : public Imu {
     friend class AttitudeTask;
     friend class Receiver;
 
+    public:
+
+        typedef Axes (*rotateFun_t)(Axes & axes);
+
     private:
 
         static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
         static const uint16_t GYRO_LPF1_DYN_MIN_HZ           = 250;
         static const uint16_t GYRO_LPF2_STATIC_HZ            = 500;
         static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
-
-        typedef Axes (*rotateFun_t)(Axes & axes);
 
         typedef struct {
             float sum[3];
@@ -65,6 +67,8 @@ class RealImu : public Imu {
         axis_t m_z;
 
         calibration_t m_calibration;
+
+        rotateFun_t m_rotateFun;
 
         int32_t  m_calibrationCyclesRemaining;
         uint32_t m_gyroInterruptCount;
@@ -244,42 +248,42 @@ class RealImu : public Imu {
 
     public:
 
-        auto rotate0(Axes axes) -> Axes
+        static auto rotate0(Axes & axes) -> Axes
         {
             return Axes(axes.x, axes.y, axes.z);
         }
 
-        auto rotate90(Axes axes) -> Axes
+        static auto rotate90(Axes & axes) -> Axes
         {
             return Axes(axes.y, -axes.x, axes.z);
         }
 
-        auto rotate180(Axes axes) -> Axes
+        static auto rotate180(Axes & axes) -> Axes
         {
             return Axes(-axes.x, -axes.y, axes.z);
         }
 
-        auto rotate270(Axes axes) -> Axes
+        static auto rotate270(Axes & axes) -> Axes
         {
             return Axes(-axes.y, axes.x, axes.z);
         }
 
-        auto rotate0Flip(Axes axes) -> Axes
+        static auto rotate0Flip(Axes & axes) -> Axes
         {
             return Axes(-axes.x, axes.y, -axes.z);
         }
 
-        auto rotate90Flip(Axes axes) -> Axes
+        static auto rotate90Flip(Axes & axes) -> Axes
         {
             return Axes(axes.y, axes.x, -axes.z);
         }
 
-        auto rotate180Flip(Axes axes) -> Axes
+        static auto rotate180Flip(Axes & axes) -> Axes
         {
             return Axes(axes.x, -axes.y, -axes.z);
         }
 
-        auto rotate270Flip(Axes axes) -> Axes
+        static auto rotate270Flip(Axes & axes) -> Axes
         {
             return Axes(-axes.y, -axes.x, -axes.z);
         }
