@@ -19,6 +19,7 @@
 #include "boards/stm32.h"
 #include "escs/brushed.h"
 #include "imus/real/usfs.h"
+#include "imus/mock.h"
 
 class LadybugBoard : public Stm32Board {
 
@@ -26,7 +27,8 @@ class LadybugBoard : public Stm32Board {
 
         vector<uint8_t> motorPins = {0x0D, 0x10, 0x03, 0x0B};
 
-        UsfsImu imu(RealImu::rotate0);
+        // UsfsImu imu(RealImu::rotate0);
+        MockImu imu;
 
         BrushedEsc esc = BrushedEsc(motorPins);
 
@@ -34,14 +36,14 @@ class LadybugBoard : public Stm32Board {
 
         static const uint8_t LED_PIN = 0x12;
 
-        LadybugBoard( Receiver & rx, vector<PidController *> & pids, Mixer & mixer)
+        LadybugBoard(Receiver & rx, vector<PidController *> & pids, Mixer & mixer)
             : Stm32Board(rx, imu, pids, mixer, esc, LED_PIN, true)
         {
         }
 
         void handleInterrupt(void)
         {
-            imu.handleInterrupt();
+            // imu.handleInterrupt();
         }
 
         static const uint8_t IMU_INTERRUPT_PIN = 0x0C;

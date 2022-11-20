@@ -84,9 +84,8 @@ class MockImu : public Imu {
             return false;
         }
 
-        virtual auto readGyroDps(const align_fun align) -> Axes  override
+        virtual auto readGyroDps(void) -> Axes  override
         {
-            (void)align;
             return Axes(0, 0, 0);
         }
 };
