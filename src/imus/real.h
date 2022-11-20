@@ -240,4 +240,70 @@ class RealImu : public Imu {
             m_gyroInterruptCount++;
         }
 
+    public:
+
+        auto rotate0(Axes axes) -> Axes
+        {
+            //dest[X] = x;
+            //dest[Y] = y;
+            //dest[Z] = z;
+            return Axes(0, 0, 0);
+        }
+
+        auto rotate90(Axes axes) -> Axes
+        {
+            //dest[X] = y;
+            //dest[Y] = -x;
+            //dest[Z] = z;
+            return Axes(0, 0, 0);
+        }
+
+        auto rotate180(Axes axes) -> Axes
+        {
+            //dest[X] = -x;
+            //dest[Y] = -y;
+            //dest[Z] = z;
+            return Axes(0, 0, 0);
+        }
+
+        auto rotate270(Axes axes) -> Axes
+        {
+            //dest[X] = -y;
+            //dest[Y] = x;
+            //dest[Z] = z;
+            return Axes(0, 0, 0);
+        }
+
+        auto rotate0_FLIP(Axes axes) -> Axes
+        {
+            //dest[X] = -x;
+            //dest[Y] = y;
+            //dest[Z] = -z;
+            return Axes(0, 0, 0);
+        }
+
+        auto rotate90_FLIP(Axes axes) -> Axes
+        {
+            //dest[X] = y;
+            //dest[Y] = x;
+            //dest[Z] = -z;
+            return Axes(0, 0, 0);
+        }
+
+        auto rotate180_FLIP(Axes axes) -> Axes
+        {
+            //dest[X] = x;
+            //dest[Y] = -y;
+            //dest[Z] = -z;
+            return Axes(0, 0, 0);
+        }
+
+        auto rotate270_FLIP(Axes axes) -> Axes
+        {
+            //dest[X] = -y;
+            //dest[Y] = -x;
+            //dest[Z] = -z;
+            return Axes(0, 0, 0);
+        }
+        
 }; // class Imu
