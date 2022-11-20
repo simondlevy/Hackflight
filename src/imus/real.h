@@ -147,7 +147,7 @@ class RealImu : public Imu {
 
         uint32_t m_gyroSyncTime;
 
-        RealImu(const float gyroScale) 
+        RealImu(const rotateFun_t rotateFun, const float gyroScale) 
         {
             m_gyroScale = gyroScale;
 
