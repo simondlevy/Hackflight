@@ -61,10 +61,8 @@ to get an idea of how this approach works.
 
 Because it is useful to get some visual feedback on things like vehicle orientation and RC receiver
 channel values,  we also provide a very simple &ldquo;Ground Control Station&rdquo; (GCS) program
-that allows you to connect to the board and see what's going on. Windows users
-can run this program directly: just clone the [HackflightGCS](https://github.com/simondlevy/HackflightGCS)
-repository and double-click on <b>hackflight.exe</b>.  Others can run the
-<b>gcs.py</b> Python script in the <b>gcs</b> folder.
+that allows you to connect to the board and see what's going on. Check out the GCS
+[README](https://github.com/simondlevy/Hackflight/blob/master/gcs/README.md) for more information.
 
 ## Citing Hackflight
 
