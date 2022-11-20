@@ -244,66 +244,42 @@ class RealImu : public Imu {
 
         auto rotate0(Axes axes) -> Axes
         {
-            //dest[X] = x;
-            //dest[Y] = y;
-            //dest[Z] = z;
-            return Axes(0, 0, 0);
+            return Axes(axes.x, axes.y, axes.z);
         }
 
         auto rotate90(Axes axes) -> Axes
         {
-            //dest[X] = y;
-            //dest[Y] = -x;
-            //dest[Z] = z;
-            return Axes(0, 0, 0);
+            return Axes(axes.y, -axes.x, axes.z);
         }
 
         auto rotate180(Axes axes) -> Axes
         {
-            //dest[X] = -x;
-            //dest[Y] = -y;
-            //dest[Z] = z;
-            return Axes(0, 0, 0);
+            return Axes(-axes.x, -axes.y, axes.z);
         }
 
         auto rotate270(Axes axes) -> Axes
         {
-            //dest[X] = -y;
-            //dest[Y] = x;
-            //dest[Z] = z;
-            return Axes(0, 0, 0);
+            return Axes(-axes.y, axes.x, axes.z);
         }
 
-        auto rotate0_FLIP(Axes axes) -> Axes
+        auto rotate0Flip(Axes axes) -> Axes
         {
-            //dest[X] = -x;
-            //dest[Y] = y;
-            //dest[Z] = -z;
-            return Axes(0, 0, 0);
+            return Axes(-axes.x, axes.y, -axes.z);
         }
 
-        auto rotate90_FLIP(Axes axes) -> Axes
+        auto rotate90Flip(Axes axes) -> Axes
         {
-            //dest[X] = y;
-            //dest[Y] = x;
-            //dest[Z] = -z;
-            return Axes(0, 0, 0);
+            return Axes(axes.y, axes.x, -axes.z);
         }
 
-        auto rotate180_FLIP(Axes axes) -> Axes
+        auto rotate180Flip(Axes axes) -> Axes
         {
-            //dest[X] = x;
-            //dest[Y] = -y;
-            //dest[Z] = -z;
-            return Axes(0, 0, 0);
+            return Axes(axes.x, -axes.y, -axes.z);
         }
 
-        auto rotate270_FLIP(Axes axes) -> Axes
+        auto rotate270Flip(Axes axes) -> Axes
         {
-            //dest[X] = -y;
-            //dest[Y] = -x;
-            //dest[Z] = -z;
-            return Axes(0, 0, 0);
+            return Axes(-axes.y, -axes.x, -axes.z);
         }
         
 }; // class Imu
