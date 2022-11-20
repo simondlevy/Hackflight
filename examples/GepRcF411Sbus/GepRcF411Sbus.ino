@@ -18,7 +18,6 @@
  */
 
 #include <hackflight.h>
-#include <alignment/rotate270.h>
 #include <boards/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/mock.h>
@@ -63,11 +62,11 @@ void serialEvent2(void)
 
 void setup(void)
 {
-    static Bmi270 imu(_spi, CS_PIN);
+    static Bmi270 imu(RealImu::rotate270, _spi, CS_PIN);
 
     static MockEsc esc;
 
-    static Stm32F411Board board(_rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
+    static Stm32F411Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     _imu = &imu;

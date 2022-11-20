@@ -100,7 +100,6 @@ class Bmi270 : public SpiImu {
 
         virtual auto readGyroDps(void) -> Axes  override
         {
-            (void)align;
             return Axes(0, 0, 0);
         }
 
@@ -112,8 +111,11 @@ class Bmi270 : public SpiImu {
 
     public:
 
-        Bmi270(SPIClass & spi, const uint8_t csPin)
-            : SpiImu(spi, csPin, 2000 / 32768.)
+        Bmi270(
+                const rotateFun_t rotateFun,
+                SPIClass & spi,
+                const uint8_t csPin)
+            : SpiImu(rotateFun, spi, csPin, 2000 / 32768.)
         {
         }
 
