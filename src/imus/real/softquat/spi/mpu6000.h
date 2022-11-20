@@ -179,7 +179,10 @@ class Mpu6000 : public SpiImu {
                 const uint8_t sampleRateDivisor = 19,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
-            : SpiImu(spi, csPin,
+            : SpiImu(
+                    rotateFun, 
+                    spi,
+                    csPin,
                     (gyroScale == GYRO_250DPS ?  250 : 
                      gyroScale == GYRO_500DPS ?  500 : 
                      gyroScale == GYRO_1000DPS ?  1000 : 
