@@ -32,7 +32,7 @@ Currently, Hackflight has been tested on the following platforms:
 * [STM32F405 AIO flight controller](https://betafpv.com/products/f405-20a-aio-2-4s-brushless-flight-controllerblheli_s-v3)
 from BetaFPV
 
-* [MultiSim](https://github.com/simondlevy/MultiSim) flight simulator based on UnrealEngine
+* [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine
 
 ## Design principles
 
@@ -61,3 +61,20 @@ that allows you to connect to the board and see what's going on. Windows users
 can run this program directly: just clone the [HackflightGCS](https://github.com/simondlevy/HackflightGCS)
 repository and double-click on <b>hackflight.exe</b>.  Others can run the
 <b>gcs.py</b> Python script in the <b>gcs</b> folder.
+
+## Citing Hackflight
+
+Please cite Hackflight as:
+
+```
+@ARTICLE{10.3389/fnbot.2020.00016,
+AUTHOR={Levy, Simon D.},   
+TITLE={Robustness Through Simplicity: A Minimalist Gateway to Neurorobotic Flight},      
+JOURNAL={Frontiers in Neurorobotics},      
+VOLUME={14},           
+YEAR={2020},      
+URL={https://www.frontiersin.org/articles/10.3389/fnbot.2020.00016},       
+DOI={10.3389/fnbot.2020.00016},      
+ISSN={1662-5218}
+}
+```
