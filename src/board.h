@@ -51,7 +51,6 @@ class Board {
         Arming         m_arming;
         AttitudeTask   m_attitude;
         bool           m_failsafeIsActive;
-        Imu::align_fun m_imuAlignFun;
         Led            m_led;
         Msp            m_msp;
         Scheduler      m_scheduler;
@@ -72,7 +71,7 @@ class Board {
 
             if (m_imu->gyroIsReady()) {
 
-                auto angvels = m_imu->readGyroDps(m_imuAlignFun);
+                auto angvels = m_imu->readGyroDps();
 
                 m_vstate.dphi   = angvels.x;
                 m_vstate.dtheta = angvels.y;
@@ -198,7 +197,6 @@ class Board {
         Board(
                 Receiver & receiver,
                 Imu & imu,
-                Imu::align_fun imuAlignFun,
                 vector<PidController *> & pidControllers,
                 Mixer & mixer,
                 Esc & esc,
@@ -207,7 +205,6 @@ class Board {
         {
             m_receiver = &receiver;
             m_imu = &imu;
-            m_imuAlignFun = imuAlignFun;
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
             m_esc = &esc;

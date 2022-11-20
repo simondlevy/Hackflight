@@ -25,13 +25,12 @@ class Stm32Board : public Board {
         Stm32Board(
                 Receiver & receiver,
                 Imu & imu,
-                Imu::align_fun align,
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin,
                 const bool ledInverted=false) 
-            : Board(receiver, imu, align, pids, mixer, esc, ledPin, ledInverted)
+            : Board(receiver, imu, pids, mixer, esc, ledPin, ledInverted)
         {
         }
 

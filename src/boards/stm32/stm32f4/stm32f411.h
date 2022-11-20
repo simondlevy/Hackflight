@@ -39,12 +39,11 @@ class Stm32F411Board : public Stm32F4Board {
         Stm32F411Board(
                 Receiver & receiver,
                 Imu & imu,
-                Imu::align_fun align,
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 
-            : Stm32F4Board(1, receiver, imu, align, pids, mixer, esc, ledPin)
+            : Stm32F4Board(1, receiver, imu, pids, mixer, esc, ledPin)
         {
         }
 };

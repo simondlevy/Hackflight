@@ -18,8 +18,12 @@ class SpiImu : public SoftQuatImu {
 
         uint8_t m_csPin;
 
-        SpiImu(SPIClass & spi, const uint8_t csPin, const float gyroScale)
-            : SoftQuatImu(gyroScale)
+        SpiImu(
+                const rotateFun_t rotateFun,
+                SPIClass & spi,
+                const uint8_t csPin,
+                const float gyroScale)
+            : SoftQuatImu(rotateFun, gyroScale)
         {
             m_spi = &spi;
             m_csPin = csPin;

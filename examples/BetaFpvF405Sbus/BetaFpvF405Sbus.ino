@@ -18,7 +18,6 @@
  */
 
 #include <hackflight.h>
-#include <alignment/rotate270.h>
 #include <boards/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <escs/dshot.h>
@@ -77,11 +76,11 @@ void setup(void)
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static Mpu6000 imu(_spi, CS_PIN);
+    static Mpu6000 imu(RealImu::rotate270, _spi, CS_PIN);
 
     static DshotEsc esc(&MOTOR_PINS);
 
-    static Stm32F405Board board(_rx, imu, imuRotate270, _pids, _mixer, esc, LED_PIN);
+    static Stm32F405Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     _imu = &imu;

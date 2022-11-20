@@ -128,8 +128,8 @@ class UsfsImu : public RealImu {
 
     public:
 
-        UsfsImu(void) 
-            : RealImu(1.53e-1) // gyro rate fixed in master mode
+        UsfsImu(rotateFun_t rotateFun) 
+            : RealImu(rotateFun, 1.53e-1) // gyro rate fixed in master mode
         {
         }
 

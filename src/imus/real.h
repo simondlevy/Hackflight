@@ -34,6 +34,10 @@ class RealImu : public Imu {
     friend class AttitudeTask;
     friend class Receiver;
 
+    public:
+
+        typedef Axes (*rotateFun_t)(Axes & axes);
+
     private:
 
         static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
@@ -63,6 +67,8 @@ class RealImu : public Imu {
         axis_t m_z;
 
         calibration_t m_calibration;
+
+        rotateFun_t m_rotateFun;
 
         int32_t  m_calibrationCyclesRemaining;
         uint32_t m_gyroInterruptCount;
@@ -141,8 +147,9 @@ class RealImu : public Imu {
 
         uint32_t m_gyroSyncTime;
 
-        RealImu(const float gyroScale) 
+        RealImu(const rotateFun_t rotateFun, const float gyroScale) 
         {
+            m_rotateFun = rotateFun;
             m_gyroScale = gyroScale;
 
             setCalibrationCycles(); // start calibrating
@@ -170,7 +177,7 @@ class RealImu : public Imu {
             (void)gz;
         }
 
-        auto readGyroDps(const align_fun align) -> Axes
+        auto readGyroDps(void) -> Axes
         {
             const auto calibrationComplete = m_calibrationCyclesRemaining <= 0;
 
@@ -185,7 +192,7 @@ class RealImu : public Imu {
                 _adc.y = readCalibratedGyro(m_y, 1);
                 _adc.z = readCalibratedGyro(m_z, 2);
 
-                align(&_adc);
+                _adc = m_rotateFun(_adc);
 
             } else {
                 calibrate();
@@ -240,4 +247,46 @@ class RealImu : public Imu {
             m_gyroInterruptCount++;
         }
 
+    public:
+
+        static auto rotate0(Axes & axes) -> Axes
+        {
+            return Axes(axes.x, axes.y, axes.z);
+        }
+
+        static auto rotate90(Axes & axes) -> Axes
+        {
+            return Axes(axes.y, -axes.x, axes.z);
+        }
+
+        static auto rotate180(Axes & axes) -> Axes
+        {
+            return Axes(-axes.x, -axes.y, axes.z);
+        }
+
+        static auto rotate270(Axes & axes) -> Axes
+        {
+            return Axes(-axes.y, axes.x, axes.z);
+        }
+
+        static auto rotate0Flip(Axes & axes) -> Axes
+        {
+            return Axes(-axes.x, axes.y, -axes.z);
+        }
+
+        static auto rotate90Flip(Axes & axes) -> Axes
+        {
+            return Axes(axes.y, axes.x, -axes.z);
+        }
+
+        static auto rotate180Flip(Axes & axes) -> Axes
+        {
+            return Axes(axes.x, -axes.y, -axes.z);
+        }
+
+        static auto rotate270Flip(Axes & axes) -> Axes
+        {
+            return Axes(-axes.y, -axes.x, -axes.z);
+        }
+        
 }; // class Imu
