@@ -20,7 +20,7 @@
 
 #include <stm32f4xx.h>
 
-__attribute__( ( always_inline ) )
+    __attribute__( ( always_inline ) )
 static inline void __set_BASEPRI_nb(const uint32_t basePri)
 {
     __ASM volatile ("\tMSR basepri, %0\n" : : "r" (basePri) );
@@ -321,7 +321,7 @@ class Stm32F4Board : public Stm32Board {
             initPortsAndMotors(motorPins);
         }
 
-         virtual void dmaUpdateComplete(void) override
+        virtual void dmaUpdateComplete(void) override
         {
             for (auto k=0; k<m_portCount; ++k) {
                 dmaCmd(&m_ports[k], ENABLE);
