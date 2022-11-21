@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <esp_now.h>
+
 #include "task/msp.h"
 
 class Esp32Msp : public Msp {
@@ -48,13 +50,14 @@ class Esp32Msp : public Msp {
 
         virtual void serialWrite(const uint8_t buf[], const uint8_t count) override
         {
+            esp_now_send(m_receiverAddress, buf, count);
         }
 
     public:
 
-        Esp32Msp(const uint8_t receiverAddress[6])
-        {
-            memcpy(m_receiverAddress, receiverAddress, 6);
-        }
+            Esp32Msp(const uint8_t receiverAddress[6])
+            {
+                memcpy(m_receiverAddress, receiverAddress, 6);
+            }
 
 }; // class Esp32Msp
