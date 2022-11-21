@@ -319,6 +319,8 @@ class Msp : public Task {
                 Receiver * receiver,
                 VehicleState * vstate)
         {
+            Serial.begin(115200);
+
             m_esc = esc;
 
             m_arming = arming;
