@@ -20,28 +20,12 @@
 
 #include <stdint.h>
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-    static inline int32_t cmpTimeUs(uint32_t a, uint32_t b)
-    {
-        return (int32_t)(a - b);
-    }
-
-    static inline int32_t cmpTimeCycles(uint32_t a, uint32_t b)
-    {
-        return (int32_t)(a - b);
-    }
-
-    void delayMicroseconds(uint32_t us);
-    void delayMillis(uint32_t ms);
-
-    uint32_t microsISR(void);
-
-    uint32_t ticks(void);
-    int32_t ticks_diff_us(uint32_t begin, uint32_t end);
-
-#if defined(__cplusplus)
+static inline int32_t cmpTimeUs(uint32_t a, uint32_t b)
+{
+    return (int32_t)(a - b);
 }
-#endif
+
+static inline int32_t cmpTimeCycles(uint32_t a, uint32_t b)
+{
+    return (int32_t)(a - b);
+}

@@ -26,102 +26,104 @@
 
 class Arming {
 
-    bool readyToArm(void)
-    {
-        return 
-            m_accDoneCalibrating &&
-            m_angleOkay &&
-            !m_gotFailsafe &&
-            m_haveSignal &&
-            m_gyroDoneCalibrating &&
-            m_switchOkay &&
-            m_throttleIsDown;
-    }
+    private:
 
-    Esc  * m_esc;
-    Led  * m_led;
-
-    bool m_accDoneCalibrating;
-    bool m_angleOkay;
-    bool m_gotFailsafe;
-    bool m_gyroDoneCalibrating;
-    bool m_haveSignal;
-    bool m_isArmed;
-    bool m_switchOkay;
-    bool m_throttleIsDown;
-
-    void disarm(void)
-    {
-        if (m_isArmed) {
-            m_esc->stop();
+        bool readyToArm(void)
+        {
+            return 
+                m_accDoneCalibrating &&
+                m_angleOkay &&
+                !m_gotFailsafe &&
+                m_haveSignal &&
+                m_gyroDoneCalibrating &&
+                m_switchOkay &&
+                m_throttleIsDown;
         }
 
-        m_isArmed = false;
-    }
+        Esc  * m_esc;
+        Led  * m_led;
+
+        bool m_accDoneCalibrating;
+        bool m_angleOkay;
+        bool m_gotFailsafe;
+        bool m_gyroDoneCalibrating;
+        bool m_haveSignal;
+        bool m_isArmed;
+        bool m_switchOkay;
+        bool m_throttleIsDown;
+
+        void disarm(void)
+        {
+            if (m_isArmed) {
+                m_esc->stop();
+            }
+
+            m_isArmed = false;
+        }
 
     public:
 
-    void begin(Esc * esc, Led * led)
-    {
-        m_led = led;
-        m_esc = esc;
-    }
+        void begin(Esc * esc, Led * led)
+        {
+            m_led = led;
+            m_esc = esc;
+        }
 
-    void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
-    {
-        m_angleOkay = imuIsLevel;
+        void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
+        {
+            m_angleOkay = imuIsLevel;
 
-        m_gyroDoneCalibrating = !gyroIsCalibrating;
+            m_gyroDoneCalibrating = !gyroIsCalibrating;
 
-        m_accDoneCalibrating = true; // XXX
-    }
+            m_accDoneCalibrating = true; // XXX
+        }
 
-    bool isArmed(void)
-    {
-        return m_isArmed;
-    }
+        bool isArmed(void)
+        {
+            return m_isArmed;
+        }
 
-    // Called by Receiver
-    void attempt(const uint32_t usec, const bool aux1IsSet)
-    {
-        static bool _doNotRepeat;
+        // Called by Receiver
+        void attempt(const uint32_t usec, const bool aux1IsSet)
+        {
+            static bool _doNotRepeat;
 
-        if (aux1IsSet) {
+            if (aux1IsSet) {
 
-            if (readyToArm()) {
+                if (readyToArm()) {
+
+                    if (m_isArmed) {
+                        return;
+                    }
+
+                    if (!m_esc->isReady(usec)) {
+                        return;
+                    }
+
+                    m_isArmed = true;
+                }
+
+            } else {
 
                 if (m_isArmed) {
-                    return;
+                    disarm();
+                    m_isArmed = false;
                 }
-
-                if (!m_esc->isReady(usec)) {
-                    return;
-                }
-
-                m_isArmed = true;
             }
 
-        } else {
+            if (!(m_isArmed || _doNotRepeat || !readyToArm())) {
+                _doNotRepeat = true;
+            }
+        }
 
+        void updateFromReceiver(
+                const bool throttleIsDown, const bool aux1IsSet, const bool haveSignal)
+        {
             if (m_isArmed) {
-                disarm();
-                m_isArmed = false;
-            }
-        }
 
-        if (!(m_isArmed || _doNotRepeat || !readyToArm())) {
-            _doNotRepeat = true;
-        }
-    }
-
-    void updateFromReceiver(
-            const bool throttleIsDown, const bool aux1IsSet, const bool haveSignal)
-    {
-        if (m_isArmed) {
-
-            if (!haveSignal && m_haveSignal) {
-                m_gotFailsafe = true;
-                disarm();
+                if (!haveSignal && m_haveSignal) {
+                    m_gotFailsafe = true;
+                    disarm();
             }
             else {
                 m_led->set(true);
