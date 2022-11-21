@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "imus/real/softquat/spi.h"
+#include "imu/real/softquat/spi.h"
 
 #include <SPI.h>
 

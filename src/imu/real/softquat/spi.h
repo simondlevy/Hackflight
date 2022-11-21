@@ -6,7 +6,7 @@
    MIT License
 */
 
-#include "imus/real/softquat.h"
+#include "imu/real/softquat.h"
 
 #include <SPI.h>
 

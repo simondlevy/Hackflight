@@ -20,9 +20,9 @@
 #include <hackflight.h>
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/dshot.h>
-#include <imus/real/softquat/spi/mpu6000.h>
-#include <tasks/receivers/dsmx.h>
+#include <esc/dshot.h>
+#include <imu/real/softquat/spi/mpu6000.h>
+#include <task/receiver/dsmx.h>
 
 #include <vector>
 using namespace std;

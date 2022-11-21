@@ -26,12 +26,12 @@ class Task {
 
     private:
 
-        // Some tasks have occasional peaks in execution time so normal moving
+        // Some task have occasional peaks in execution time so normal moving
         // average duration estimation doesn't work Decay the estimated max
         // task duration by 1/(1 << EXEC_TIME_SHIFT) on every invocation
         static const uint32_t EXEC_TIME_SHIFT = 7;
 
-        // Make aged tasks more schedulable
+        // Make aged task more schedulable
         static const uint32_t AGE_EXPEDITE_COUNT = 1;   
 
         // By scaling their expected execution time

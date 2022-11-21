@@ -17,9 +17,9 @@
 #pragma once
 
 #include "board/stm32.h"
-#include "escs/brushed.h"
-#include "imus/real/usfs.h"
-#include "imus/mock.h"
+#include "esc/brushed.h"
+#include "imu/real/usfs.h"
+#include "imu/mock.h"
 
 class LadybugBoard : public Stm32Board {
 

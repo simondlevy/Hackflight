@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "imus/real.h"
+#include "imu/real.h"
 
 #include <USFS.h>
 #include <Wire.h>

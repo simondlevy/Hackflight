@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 //   Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
 
 #include <hackflight.h>
-#include <tasks/receivers/sbus.h>
+#include <task/receiver/sbus.h>
 
 #include <esp_now.h>
 #include <WiFi.h>

@@ -20,9 +20,9 @@
 #include <hackflight.h>
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <escs/mock.h>
-#include <imus/real/softquat/spi/bmi270.h>
-#include <tasks/receivers/sbus.h>
+#include <esc/mock.h>
+#include <imu/real/softquat/spi/bmi270.h>
+#include <task/receiver/sbus.h>
 
 // IMU
 static const uint8_t MOSI_PIN = PA7;

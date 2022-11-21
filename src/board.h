@@ -28,9 +28,9 @@ using namespace std;
 #include "led.h"
 #include "maths.h"
 #include "scheduler.h"
-#include "tasks/attitude.h"
-#include "tasks/msp.h"
-#include "tasks/receiver.h"
+#include "task/attitude.h"
+#include "task/msp.h"
+#include "task/receiver.h"
 
 class Board {
 
@@ -274,7 +274,7 @@ class Board {
 
         void step(void)
         {
-            // Realtime gyro/filtering/PID tasks get complete priority
+            // Realtime gyro/filtering/PID task get complete priority
             auto nowCycles = getCycleCounter();
 
             if (m_scheduler.isCoreReady(nowCycles)) {

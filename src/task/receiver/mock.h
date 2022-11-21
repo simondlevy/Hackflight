@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "tasks/receiver.h"
+#include "task/receiver.h"
 
 class MockReceiver : public Receiver {
 

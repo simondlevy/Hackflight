@@ -23,7 +23,7 @@
 #include "core/axes.h"
 #include "core/clock.h"
 #include "core/vstate.h"
-#include "imus/real.h"
+#include "imu/real.h"
 #include "maths.h"
 
 class SoftQuatImu : public RealImu {
