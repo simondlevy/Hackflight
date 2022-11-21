@@ -20,6 +20,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include <hackflight.h>
 #include <task/receiver/sbus.h>
+#include <task/msp/esp32.h>
 
 #include <esp_now.h>
 #include <WiFi.h>

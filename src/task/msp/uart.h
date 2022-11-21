@@ -23,28 +23,39 @@
 
 #include "task/msp.h"
 
-class UsbMsp : public Msp {
+class UartMsp : public Msp {
+
+    private:
+
+        HardwareSerial * m_port;
 
     protected:
 
         virtual void serialBegin(uint32_t baud) override
         {
-            Serial.begin(baud);
+            m_port->begin(baud);
         }
 
         virtual uint32_t serialAvailable(void) override
         {
-            return Serial.available();
+            return m_port->available();
         }
 
         virtual uint8_t serialRead(void) override
         {
-            return Serial.read();
+            return m_port->read();
         }
 
         virtual void serialWrite(uint8_t buf[], uint8_t count) override
         {
-            Serial.write(buf, count);
+            m_port->write(buf, count);
         }
 
-}; // class UsbMsp
+    public:
+
+        UartMsp(HardwareSerial & port)
+        {
+            m_port = &port;
+        }
+
+}; // class UartMsp

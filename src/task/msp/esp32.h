@@ -23,28 +23,34 @@
 
 #include "task/msp.h"
 
-class UsbMsp : public Msp {
+class Esp32Msp : public Msp {
+
+    private:
 
     protected:
 
         virtual void serialBegin(uint32_t baud) override
         {
-            Serial.begin(baud);
         }
 
         virtual uint32_t serialAvailable(void) override
         {
-            return Serial.available();
+            return 0;
         }
 
         virtual uint8_t serialRead(void) override
         {
-            return Serial.read();
+            return 0;
         }
 
         virtual void serialWrite(uint8_t buf[], uint8_t count) override
         {
-            Serial.write(buf, count);
         }
 
-}; // class UsbMsp
+    public:
+
+        Esp32Msp(void)
+        {
+        }
+
+}; // class Esp32Msp
