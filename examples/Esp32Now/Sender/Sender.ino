@@ -18,6 +18,9 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 //   Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
 
+#include <hackflight.h>
+#include <tasks/receivers/sbus.h>
+
 #include <esp_now.h>
 #include <WiFi.h>
 
@@ -27,6 +30,25 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 static uint8_t receiverAddress[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x69, 0xA0};
 
 // Callback when data is sent
+static const uint8_t RX_PIN = 4;
+static const uint8_t TX_PIN = 14; // unused
+
+static SbusReceiver _rx;
+
+static uint16_t convert(uint16_t chanval)
+{
+    return (uint16_t)SbusReceiver::convert(chanval);
+}
+
+static void report (
+        const uint16_t value, const char * label, const char * delim="   ")
+{
+    Serial.print(label);
+    Serial.print(value);
+    Serial.print(delim);
+}
+
+
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
   Serial.print("\r\nLast Packet Send Status:\t");
@@ -37,6 +59,9 @@ void setup()
 {
 
   Serial.begin(115200);
+
+  // Start receiver
+  Serial1.begin(100000, SERIAL_8E2, RX_PIN, TX_PIN, true);
 
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
@@ -71,6 +96,26 @@ void setup()
 
 void loop()
 {
+    _rx.read(Serial1);
+
+    if (_rx.ready()) {
+
+        const uint16_t c1 = convert(_rx.readChannel1());
+        const uint16_t c2 = convert(_rx.readChannel2());
+        const uint16_t c3 = convert(_rx.readChannel3());
+        const uint16_t c4 = convert(_rx.readChannel4());
+        const uint16_t c5 = convert(_rx.readChannel5());
+        const uint16_t c6 = convert(_rx.readChannel6());
+        
+        report(c1, "C1=");
+        report(c2, "C2=");
+        report(c3, "C3=");
+        report(c4, "C4=");
+        report(c5, "C5=");
+        report(c6, "C6=", "\n");
+    }
+
+    /*
   static const char * message = "hello how are you";
 
   // Send message via ESP-NOW
@@ -82,7 +127,7 @@ void loop()
   }
   else {
     Serial.println("Error sending the data");
-  }
+  }*/
   
-  delay(1000);
+  delay(5);
 }
