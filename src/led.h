@@ -25,9 +25,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 class Led {
 
-    friend class Arming;
-    friend class Board;
-
     private:
 
         typedef enum {
@@ -36,9 +33,7 @@ class Led {
             WARNING_LED_FLASH
         } warningLedVehicleState_e;
 
-        uint8_t m_pin;
         bool m_on;
-        bool m_inverted;
 
         warningLedVehicleState_e m_warningLedVehicleState = WARNING_LED_OFF;
 
@@ -68,10 +63,15 @@ class Led {
             m_warningLedTimer = now + 500000;
         }
 
+    public:
+
+        uint8_t pin;
+        bool inverted;
+
         void set(bool on)
         {
-            if (m_pin > 0) {
-                digitalWrite(m_pin, m_inverted ? on : !on);
+            if (pin > 0) {
+                digitalWrite(pin, inverted ? on : !on);
             }
 
             m_on = on;
@@ -79,8 +79,8 @@ class Led {
 
         void begin(void)
         {
-            if (m_pin > 0) {
-                pinMode(m_pin, OUTPUT);
+            if (pin > 0) {
+                pinMode(pin, OUTPUT);
             }
         }
 
@@ -94,14 +94,14 @@ class Led {
             set(false);
         }
 
-        void warningDisable(void)
-        {
-            m_warningLedVehicleState = WARNING_LED_OFF;
-        }
-
         void warningFlash(void)
         {
             m_warningLedVehicleState = WARNING_LED_FLASH;
+        }
+
+        void warningDisable(void)
+        {
+            m_warningLedVehicleState = WARNING_LED_OFF;
         }
 
         void warningUpdate(void)
@@ -113,21 +113,6 @@ class Led {
             }
 
             warningRefresh();
-        }
-
-    public:
-
-        Led(bool inverted=false) 
-        {
-            m_inverted = inverted;
-            m_on = false;
-        }
-
-        Led(uint8_t pin, bool inverted=false) 
-        {
-            m_pin = pin;
-            m_inverted = inverted;
-            m_on = false;
         }
 
 }; // class Led

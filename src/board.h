@@ -208,8 +208,9 @@ class Board {
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
             m_esc = &esc;
-            m_led.m_pin = ledPin;
-            m_led.m_inverted = ledInverted;
+
+            m_led.pin = ledPin;
+            m_led.inverted = ledInverted;
 
             imu.m_board = this;
             esc.m_board = this;
