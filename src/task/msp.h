@@ -344,4 +344,14 @@ class Msp : public Task {
             m_outBufSize = 0;
         }
 
+        void sendSetRc(
+                uint16_t c1,
+                uint16_t c2,
+                uint16_t c3,
+                uint16_t c4,
+                uint16_t c5,
+                uint16_t c6)
+        {
+        }
+
 }; // class Msp

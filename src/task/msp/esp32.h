@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <WiFi.h>
 #include <esp_now.h>
 
 #include "task/msp.h"
@@ -31,6 +32,14 @@ class Esp32Msp : public Msp {
     private:
 
         uint8_t m_receiverAddress[6];
+
+        static void error(const char * msg)
+        {
+            while (true) {
+                Serial.println(msg);
+                delay(100);
+            }
+        }
 
     protected:
 
@@ -55,9 +64,36 @@ class Esp32Msp : public Msp {
 
     public:
 
-            Esp32Msp(const uint8_t receiverAddress[6])
-            {
-                memcpy(m_receiverAddress, receiverAddress, 6);
+        Esp32Msp(const uint8_t receiverAddress[6])
+        {
+            memcpy(m_receiverAddress, receiverAddress, 6);
+        }
+
+        void begin(void)
+        {
+            // Set device as a Wi-Fi Station
+            WiFi.mode(WIFI_STA);
+
+            // Init ESP-NOW
+            if (esp_now_init() != ESP_OK) {
+                error("Error initializing ESP-NOW");
             }
+
+            // Once ESPNow is successfully Init, we will register for Send CB to
+            // get the status of Trasnmitted packet
+            //esp_now_register_send_cb(OnDataSent);
+
+            // Register peer
+            esp_now_peer_info_t peerInfo = {};
+            memcpy(peerInfo.peer_addr, m_receiverAddress, 6);
+            peerInfo.channel = 0;  
+            peerInfo.encrypt = false;
+
+            // Add peer        
+            if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+                error("Failed to add peer");
+            }
+
+        }
 
 }; // class Esp32Msp

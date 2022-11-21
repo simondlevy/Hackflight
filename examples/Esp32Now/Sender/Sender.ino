@@ -63,7 +63,7 @@ void setup()
 
   Serial.begin(115200);
 
-  // Start receiver
+  // Start SBUS receiver
   Serial1.begin(100000, SERIAL_8E2, RX_PIN, TX_PIN, true);
 
   // Set device as a Wi-Fi Station
