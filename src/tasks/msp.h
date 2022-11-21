@@ -28,8 +28,6 @@
 
 class Msp : public Task {
 
-    friend class Board;
-
     static const uint8_t MAXMSG = 255;
 
     static const int OUTBUF_SIZE = 128;
@@ -45,8 +43,6 @@ class Msp : public Task {
     uint8_t m_outBufSize;
 
     uint8_t m_payload[128] = {};
-
-    float m_motors[MAX_SUPPORTED_MOTORS];
 
     bool m_gotRebootRequest;
 
@@ -208,10 +204,10 @@ class Msp : public Task {
 
     void handle_SET_MOTOR(uint16_t  m1, uint16_t  m2, uint16_t  m3, uint16_t  m4)
     {
-        m_motors[0] = m_esc->convertFromExternal(m1);
-        m_motors[1] = m_esc->convertFromExternal(m2);
-        m_motors[2] = m_esc->convertFromExternal(m3);
-        m_motors[3] = m_esc->convertFromExternal(m4);
+        motors[0] = m_esc->convertFromExternal(m1);
+        motors[1] = m_esc->convertFromExternal(m2);
+        motors[2] = m_esc->convertFromExternal(m3);
+        motors[3] = m_esc->convertFromExternal(m4);
     }
 
     void handle_RC_Request(
@@ -228,7 +224,7 @@ class Msp : public Task {
         c4 = (uint16_t)m_receiver->getRawYaw();
         c5 = scale(m_receiver->getRawAux1());
         c6 = scale(m_receiver->getRawAux2());
-     }
+    }
 
     void handle_ATTITUDE_Request(uint16_t & phi, uint16_t & theta, uint16_t & psi)
     {
@@ -295,7 +291,25 @@ class Msp : public Task {
 
     } // dispatchMessage 
 
+    virtual void fun(uint32_t usec) override
+    {
+        (void)usec;
+
+        while (Serial.available()) {
+            parse(Serial.read());
+        }
+    }
+
+    public:
+
+    float motors[MAX_SUPPORTED_MOTORS];
+
     Msp() : Task(100) { } // Hz
+
+    bool gotRebootRequest(void)
+    {
+        return m_gotRebootRequest;
+    }
 
     void begin(
             Esc * esc,
@@ -316,20 +330,6 @@ class Msp : public Task {
         m_outBufChecksum = 0;
         m_outBufIndex = 0;
         m_outBufSize = 0;
-    }
-
-    virtual void fun(uint32_t usec) override
-    {
-        (void)usec;
-
-        while (Serial.available()) {
-            parse(Serial.read());
-        }
-    }
-
-    bool gotRebootRequest(void)
-    {
-        return m_gotRebootRequest;
     }
 
 }; // class Msp
