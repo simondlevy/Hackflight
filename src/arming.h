@@ -26,7 +26,6 @@
 
 class Arming {
 
-    friend class AttitudeTask;
     friend class Board;
     friend class Msp;
     friend class Receiver;
@@ -73,15 +72,6 @@ class Arming {
     bool isArmed(void)
     {
         return m_isArmed;
-    }
-
-    void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
-    {
-        m_angleOkay = imuIsLevel;
-
-        m_gyroDoneCalibrating = !gyroIsCalibrating;
-
-        m_accDoneCalibrating = true; // XXX
     }
 
     // Called by Receiver
@@ -150,6 +140,17 @@ class Arming {
         }
 
         m_haveSignal = haveSignal;
+    }
+
+    public:
+
+    void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
+    {
+        m_angleOkay = imuIsLevel;
+
+        m_gyroDoneCalibrating = !gyroIsCalibrating;
+
+        m_accDoneCalibrating = true; // XXX
     }
 
 }; // class Arming
