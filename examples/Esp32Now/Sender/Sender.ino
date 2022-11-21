@@ -43,7 +43,7 @@ static uint16_t convert(uint16_t chanval)
     return (uint16_t)SbusReceiver::convert(chanval);
 }
 
-static void report (
+static void report(
         const uint16_t value, const char * label, const char * delim="   ")
 {
     Serial.print(label);
@@ -51,17 +51,16 @@ static void report (
     Serial.print(delim);
 }
 
-
 void setup()
 {
 
-  Serial.begin(115200);
+    Serial.begin(115200);
 
-  // Start SBUS receiver
-  Serial1.begin(100000, SERIAL_8E2, RX_PIN, TX_PIN, true);
+    // Start SBUS receiver
+    Serial1.begin(100000, SERIAL_8E2, RX_PIN, TX_PIN, true);
 
-  // Start ESP32 MSP
-  _msp.begin();
+    // Start ESP32 MSP
+    _msp.begin();
 }
 
 void loop()
@@ -76,28 +75,16 @@ void loop()
         const uint16_t c4 = convert(_rx.readChannel4());
         const uint16_t c5 = convert(_rx.readChannel5());
         const uint16_t c6 = convert(_rx.readChannel6());
-        
+
         report(c1, "C1=");
         report(c2, "C2=");
         report(c3, "C3=");
         report(c4, "C4=");
         report(c5, "C5=");
         report(c6, "C6=", "\n");
+
+        _msp.sendSetRc(c1, c2, c3, c4, c5, c6);
     }
 
-    /*
-  static const char * message = "hello how are you";
-
-  // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(RECEIVER_ADDRESS, (uint8_t *)message,
-          strlen(message));
-   
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
-  }
-  else {
-    Serial.println("Error sending the data");
-  }*/
-  
-  delay(5);
+    delay(5);
 }

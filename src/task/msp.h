@@ -345,13 +345,21 @@ class Msp : public Task {
         }
 
         void sendSetRc(
-                uint16_t c1,
-                uint16_t c2,
-                uint16_t c3,
-                uint16_t c4,
-                uint16_t c5,
-                uint16_t c6)
+                const uint16_t c1,
+                const uint16_t c2,
+                const uint16_t c3,
+                const uint16_t c4,
+                const uint16_t c5,
+                const uint16_t c6)
         {
+            prepareToSendShorts(200, 6);
+            sendShort(c1);
+            sendShort(c2);
+            sendShort(c3);
+            sendShort(c4);
+            sendShort(c5);
+            sendShort(c6);
+            completeSend();
         }
 
 }; // class Msp
