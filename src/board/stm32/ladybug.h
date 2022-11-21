@@ -16,34 +16,35 @@
 
 #pragma once
 
-#include "boards/stm32/stm32f4.h"
+#include "board/stm32.h"
+#include "escs/brushed.h"
+#include "imus/real/usfs.h"
+#include "imus/mock.h"
 
-#include <stm32f4xx.h>
+class LadybugBoard : public Stm32Board {
 
-class Stm32F411Board : public Stm32F4Board {
+    private:
 
-    protected:
+        vector<uint8_t> motorPins = {0x0D, 0x10, 0x03, 0x0B};
 
-       virtual void initPortsAndMotors(const vector<uint8_t> * motorPins)
-        {
-            initStream1(0);
+        UsfsImu imu = UsfsImu(RealImu::rotate0);
 
-            initMotor(motorPins, 0, 0); 
-            initMotor(motorPins, 1, 0);
-            initMotor(motorPins, 2, 0);
-            initMotor(motorPins, 3, 0);
-        }        
+        BrushedEsc esc = BrushedEsc(motorPins);
 
     public:
 
-        Stm32F411Board(
-                Receiver & receiver,
-                Imu & imu,
-                vector<PidController *> & pids,
-                Mixer & mixer,
-                Esc & esc,
-                const uint8_t ledPin) 
-            : Stm32F4Board(1, receiver, imu, pids, mixer, esc, ledPin)
+        static const uint8_t LED_PIN = 0x12;
+
+        LadybugBoard(Receiver & rx, vector<PidController *> & pids, Mixer & mixer)
+            : Stm32Board(rx, imu, pids, mixer, esc, LED_PIN, true)
         {
         }
-};
+
+        void handleInterrupt(void)
+        {
+            imu.handleInterrupt();
+        }
+
+        static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
+
+}; // class LadybugBoard

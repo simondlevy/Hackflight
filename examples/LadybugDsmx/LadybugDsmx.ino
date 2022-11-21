@@ -18,7 +18,7 @@
  */
 
 #include <hackflight.h>
-#include <boards/stm32/ladybug.h>
+#include <board/stm32/ladybug.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <tasks/receivers/dsmx.h>
 

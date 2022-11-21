@@ -1,4 +1,6 @@
 /*
+   Copyright (c) 2022 Simon D. Levy
+
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify it under the
@@ -16,35 +18,20 @@
 
 #pragma once
 
-#include "boards/stm32.h"
-#include "escs/brushed.h"
-#include "imus/real/usfs.h"
-#include "imus/mock.h"
+#include <stdint.h>
 
-class LadybugBoard : public Stm32Board {
-
-    private:
-
-        vector<uint8_t> motorPins = {0x0D, 0x10, 0x03, 0x0B};
-
-        UsfsImu imu = UsfsImu(RealImu::rotate0);
-
-        BrushedEsc esc = BrushedEsc(motorPins);
+/**
+ * Abstract class for serial comms
+ */
+class Serial {
 
     public:
 
-        static const uint8_t LED_PIN = 0x12;
+        virtual uint32_t available(void) = 0;
 
-        LadybugBoard(Receiver & rx, vector<PidController *> & pids, Mixer & mixer)
-            : Stm32Board(rx, imu, pids, mixer, esc, LED_PIN, true)
-        {
-        }
+        virtual uint8_t read(void) = 0;
 
-        void handleInterrupt(void)
-        {
-            imu.handleInterrupt();
-        }
+        virtual void write(uint8_t byte) = 0;
 
-        static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
 
-}; // class LadybugBoard
+};  // class Serial
