@@ -36,6 +36,8 @@ static const uint8_t TX_PIN = 14; // unused
 
 static SbusReceiver _rx;
 
+static Esp32Msp _msp;
+
 static uint16_t convert(uint16_t chanval)
 {
     return (uint16_t)SbusReceiver::convert(chanval);

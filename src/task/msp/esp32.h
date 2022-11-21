@@ -27,9 +27,11 @@ class Esp32Msp : public Msp {
 
     private:
 
+        uint8_t m_receiverAddress[8];
+
     protected:
 
-        virtual void serialBegin(uint32_t baud) override
+        virtual void serialBegin(const uint32_t baud) override
         {
         }
 
@@ -43,13 +45,13 @@ class Esp32Msp : public Msp {
             return 0;
         }
 
-        virtual void serialWrite(uint8_t buf[], uint8_t count) override
+        virtual void serialWrite(const uint8_t buf[], const uint8_t count) override
         {
         }
 
     public:
 
-        Esp32Msp(void)
+        Esp32Msp(/*const uint8_t receiverAddress[8]*/)
         {
         }
 

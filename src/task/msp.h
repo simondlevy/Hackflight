@@ -304,13 +304,13 @@ class Msp : public Task {
 
     protected:
 
-        virtual void serialBegin(uint32_t baud) = 0;
+        virtual void serialBegin(const uint32_t baud) = 0;
 
         virtual uint32_t serialAvailable(void) = 0;
 
         virtual uint8_t serialRead(void) = 0;
 
-        virtual void serialWrite(uint8_t buf[], uint8_t count) = 0;
+        virtual void serialWrite(const uint8_t buf[], const uint8_t count) = 0;
 
     public:
 

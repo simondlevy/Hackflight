@@ -31,7 +31,7 @@ class UartMsp : public Msp {
 
     protected:
 
-        virtual void serialBegin(uint32_t baud) override
+        virtual void serialBegin(const uint32_t baud) override
         {
             m_port->begin(baud);
         }
@@ -46,7 +46,7 @@ class UartMsp : public Msp {
             return m_port->read();
         }
 
-        virtual void serialWrite(uint8_t buf[], uint8_t count) override
+        virtual void serialWrite(const uint8_t buf[], const uint8_t count) override
         {
             m_port->write(buf, count);
         }

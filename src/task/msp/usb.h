@@ -27,7 +27,7 @@ class UsbMsp : public Msp {
 
     protected:
 
-        virtual void serialBegin(uint32_t baud) override
+        virtual void serialBegin(const uint32_t baud) override
         {
             Serial.begin(baud);
         }
@@ -42,7 +42,7 @@ class UsbMsp : public Msp {
             return Serial.read();
         }
 
-        virtual void serialWrite(uint8_t buf[], uint8_t count) override
+        virtual void serialWrite(const uint8_t buf[], const uint8_t count) override
         {
             Serial.write(buf, count);
         }
