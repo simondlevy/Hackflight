@@ -23,7 +23,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <WiFi.h>
 
 // REPLACE WITH THE MAC Address of your sender 
-uint8_t senderAddress[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6E, 0x84};
+static const uint8_t SENDER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04};
 
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
@@ -33,6 +33,14 @@ static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
     }
 
     delay(1);
+}
+
+static void error(const char * msg)
+{
+    while (true) {
+        Serial.println(msg);
+        delay(100);
+    }
 }
  
 void setup()
@@ -45,8 +53,7 @@ void setup()
 
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK) {
-    Serial.println("Error initializing ESP-NOW");
-    return;
+    error("Error initializing ESP-NOW");
   }
 
   // Once ESPNow is successfully Init, we will register for Send CB to
@@ -55,14 +62,13 @@ void setup()
   
   // Register peer
   esp_now_peer_info_t peerInfo;
-  memcpy(peerInfo.peer_addr, senderAddress, 6);
+  memcpy(peerInfo.peer_addr, SENDER_ADDRESS, 6);
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
   
   // Add peer        
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
-    Serial.println("Failed to add peer");
-    return;
+    error("Failed to add peer");
   }
 
   // Register for a callback function that will be called when data is received
