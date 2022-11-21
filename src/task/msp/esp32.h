@@ -41,6 +41,16 @@ class Esp32Msp : public Msp {
             }
         }
 
+        void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
+        {
+            Serial.print("\r\nLast Packet Send Status:\t");
+
+            Serial.println(
+                    status == ESP_NOW_SEND_SUCCESS ?
+                    "Delivery Success" :
+                    "Delivery Fail");
+        }
+
     protected:
 
         virtual void serialBegin(const uint32_t baud) override
@@ -81,7 +91,7 @@ class Esp32Msp : public Msp {
 
             // Once ESPNow is successfully Init, we will register for Send CB to
             // get the status of Trasnmitted packet
-            //esp_now_register_send_cb(OnDataSent);
+            //esp_now_register_send_cb(onDataSent);
 
             // Register peer
             esp_now_peer_info_t peerInfo = {};
