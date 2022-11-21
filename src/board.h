@@ -29,7 +29,7 @@ using namespace std;
 #include "maths.h"
 #include "scheduler.h"
 #include "task/attitude.h"
-#include "task/msp.h"
+#include "task/msp/usb.h"
 #include "task/receiver.h"
 
 class Board {
@@ -52,7 +52,7 @@ class Board {
         AttitudeTask   m_attitude;
         bool           m_failsafeIsActive;
         Led            m_led;
-        Msp            m_msp;
+        UsbMsp         m_msp;
         Scheduler      m_scheduler;
         VehicleState   m_vstate;
 

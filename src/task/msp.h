@@ -75,7 +75,7 @@ class Msp : public Task {
         void completeSend(void)
         {
             serialize8(m_outBufChecksum);
-            Serial.write(m_outBuf, m_outBufSize);
+            serialWrite(m_outBuf, m_outBufSize);
         }
 
         void serialize8(uint8_t a)
@@ -297,10 +297,20 @@ class Msp : public Task {
         {
             (void)usec;
 
-            while (Serial.available()) {
-                parse(Serial.read());
+            while (serialAvailable()) {
+                parse(serialRead());
             }
         }
+
+    protected:
+
+        virtual void serialBegin(uint32_t baud) = 0;
+
+        virtual uint32_t serialAvailable(void) = 0;
+
+        virtual uint8_t serialRead(void) = 0;
+
+        virtual void serialWrite(uint8_t buf[], uint8_t count) = 0;
 
     public:
 
@@ -319,7 +329,7 @@ class Msp : public Task {
                 Receiver * receiver,
                 VehicleState * vstate)
         {
-            Serial.begin(115200);
+            serialBegin(115200);
 
             m_esc = esc;
 
