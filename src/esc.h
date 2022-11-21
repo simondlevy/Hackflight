@@ -21,13 +21,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "maxmotors.h"
-
 class Esc {
 
-    friend class Arming;
     friend class Board;
-    friend class Msp;
 
     protected:
 
@@ -35,12 +31,14 @@ class Esc {
 
         virtual void  begin(void) = 0;
 
-        virtual float convertFromExternal(const uint16_t value) = 0;
-
         virtual float getMotorValue(
                 const float input, const bool failsafeIsActive) = 0;
 
         virtual void  write(const float values[]) = 0;
+
+    public:
+
+        virtual float convertFromExternal(const uint16_t value) = 0;
 
         virtual bool  isReady(const uint32_t currentTime) 
         {

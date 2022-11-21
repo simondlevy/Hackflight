@@ -30,10 +30,6 @@
 
 class RealImu : public Imu {
 
-    friend class Task;
-    friend class AttitudeTask;
-    friend class Receiver;
-
     public:
 
         typedef Axes (*rotateFun_t)(Axes & axes);

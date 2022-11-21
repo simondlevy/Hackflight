@@ -24,8 +24,6 @@
 
 class PidController {
 
-    friend class Mixer;
-
     protected:
 
          virtual auto getDemands(
@@ -33,6 +31,8 @@ class PidController {
                 const Demands & demands,
                 const VehicleState & vstate,
                 const bool reset) -> Demands = 0;
+
+    public:
 
          auto update(
                 const uint32_t usec,

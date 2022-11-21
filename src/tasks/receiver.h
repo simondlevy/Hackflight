@@ -31,7 +31,8 @@
 class Receiver : public Task {
 
     friend class Board;
-    friend class Msp;
+
+    private:
 
     static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
 
@@ -108,10 +109,10 @@ class Receiver : public Task {
 
         // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
         return (float)(m_lookupThrottleRc[tmp3] + (tmp - tmp3 * 100) *
-            (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100);
+                (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100);
     }
 
-     // [1000,2000] => [-1,+1]
+    // [1000,2000] => [-1,+1]
     static float rescaleCommand(const float raw, const float sgn)
     {
         const auto tmp = fminf(fabs(raw - 1500), 500);
@@ -356,6 +357,8 @@ class Receiver : public Task {
 
     virtual void parse(const uint8_t c) = 0;
 
+    public:
+
     float getRawThrottle(void)
     {
         return m_rawThrottle;
@@ -385,8 +388,6 @@ class Receiver : public Task {
     {
         return m_rawAux2;
     }
-
-    public:
 
     void read(HardwareSerial & port)
     {

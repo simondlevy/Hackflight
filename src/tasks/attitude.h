@@ -23,8 +23,6 @@
 
 class AttitudeTask : public Task {
 
-    friend class Board;
-
     private:
 
         static constexpr float MAX_ARMING_ANGLE = 25;
@@ -35,7 +33,7 @@ class AttitudeTask : public Task {
 
         float m_maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
 
-    protected:
+    public:
 
         AttitudeTask()
             : Task(100) // Hz
