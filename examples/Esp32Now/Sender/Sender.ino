@@ -28,7 +28,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 
 // REPLACE WITH THE MAC Address of your receiver 
-static uint8_t receiverAddress[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x69, 0xA0};
+static const uint8_t RECEIVER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x69, 0xA0};
 
 // Callback when data is sent
 static const uint8_t RX_PIN = 4;
@@ -36,7 +36,7 @@ static const uint8_t TX_PIN = 14; // unused
 
 static SbusReceiver _rx;
 
-static Esp32Msp _msp;
+static Esp32Msp _msp = Esp32Msp(RECEIVER_ADDRESS);
 
 static uint16_t convert(uint16_t chanval)
 {
@@ -81,7 +81,7 @@ void setup()
   
   // Register peer
   esp_now_peer_info_t peerInfo = {};
-  memcpy(peerInfo.peer_addr, receiverAddress, 6);
+  memcpy(peerInfo.peer_addr, RECEIVER_ADDRESS, 6);
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
   
@@ -122,7 +122,7 @@ void loop()
   static const char * message = "hello how are you";
 
   // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(receiverAddress, (uint8_t *)message,
+  esp_err_t result = esp_now_send(RECEIVER_ADDRESS, (uint8_t *)message,
           strlen(message));
    
   if (result == ESP_OK) {

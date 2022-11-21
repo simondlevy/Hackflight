@@ -20,6 +20,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string.h>
 
 #include "task/msp.h"
 
@@ -27,7 +28,7 @@ class Esp32Msp : public Msp {
 
     private:
 
-        uint8_t m_receiverAddress[8];
+        uint8_t m_receiverAddress[6];
 
     protected:
 
@@ -51,8 +52,9 @@ class Esp32Msp : public Msp {
 
     public:
 
-        Esp32Msp(/*const uint8_t receiverAddress[8]*/)
+        Esp32Msp(const uint8_t receiverAddress[6])
         {
+            memcpy(m_receiverAddress, receiverAddress, 6);
         }
 
 }; // class Esp32Msp
