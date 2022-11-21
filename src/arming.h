@@ -26,10 +26,6 @@
 
 class Arming {
 
-    friend class Board;
-    friend class Msp;
-    friend class Receiver;
-
     bool readyToArm(void)
     {
         return 
@@ -54,12 +50,6 @@ class Arming {
     bool m_switchOkay;
     bool m_throttleIsDown;
 
-    void begin(Esc * esc, Led * led)
-    {
-        m_led = led;
-        m_esc = esc;
-    }
-
     void disarm(void)
     {
         if (m_isArmed) {
@@ -67,6 +57,23 @@ class Arming {
         }
 
         m_isArmed = false;
+    }
+
+    public:
+
+    void begin(Esc * esc, Led * led)
+    {
+        m_led = led;
+        m_esc = esc;
+    }
+
+    void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
+    {
+        m_angleOkay = imuIsLevel;
+
+        m_gyroDoneCalibrating = !gyroIsCalibrating;
+
+        m_accDoneCalibrating = true; // XXX
     }
 
     bool isArmed(void)
@@ -142,15 +149,5 @@ class Arming {
         m_haveSignal = haveSignal;
     }
 
-    public:
-
-    void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
-    {
-        m_angleOkay = imuIsLevel;
-
-        m_gyroDoneCalibrating = !gyroIsCalibrating;
-
-        m_accDoneCalibrating = true; // XXX
-    }
 
 }; // class Arming
