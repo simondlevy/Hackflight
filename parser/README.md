@@ -37,9 +37,9 @@ To use the Python class, you should also install the support code for the **Pars
 The sample [messages.json](https://github.com/simondlevy/RoboFirmwareToolkit/blob/main/extras/parser/messages.json)
 file specifies three message types (get normalized R/C channel values; get vehicle attitude in radians;
 set motor values) that were used to generate the MSP code in the
-[firmware](https://github.com/simondlevy/Hackflight/blob/master/src/serialtask.hpp)
+[firmware](https://github.com/simondlevy/Hackflight/blob/master/src/task/msp/usb.h)
 and
-[Ground Control Station](https://github.com/simondlevy/Hackflight/blob/master/extras/gcs/python/mspparser.py)
+[Desktop Visualizer](https://github.com/simondlevy/Hackflight/blob/master/viz)
 of the Hackflight project.
 
 ## Extending
