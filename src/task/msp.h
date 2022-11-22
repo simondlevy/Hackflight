@@ -212,6 +212,27 @@ class Msp : public Task {
             motors[3] = m_esc->convertFromExternal(m4);
         }
 
+        void sendRawRc(
+                const uint8_t command,
+                const uint16_t c1,
+                const uint16_t c2,
+                const uint16_t c3,
+                const uint16_t c4,
+                const uint16_t c5,
+                const uint16_t c6)
+        {
+            prepareToSendShorts(command, 6);
+
+            sendShort(c1);
+            sendShort(c2);
+            sendShort(c3);
+            sendShort(c4);
+            sendShort(c5);
+            sendShort(c6);
+
+            completeSend();
+        }
+
         void handle_RC_Request(
                 uint16_t & c1,
                 uint16_t & c2,
@@ -266,14 +287,9 @@ class Msp : public Task {
                         uint16_t c5 = 0;
                         uint16_t c6 = 0;
                         handle_RC_Request(c1, c2, c3, c4, c5, c6);
-                        prepareToSendShorts(command, 6);
-                        sendShort(c1);
-                        sendShort(c2);
-                        sendShort(c3);
-                        sendShort(c4);
-                        sendShort(c5);
-                        sendShort(c6);
-                        completeSend();
+
+                        sendRawRc(105, c1, c2, c3, c4, c4, c6);
+
                     } break;
 
                 case 108:
@@ -352,14 +368,7 @@ class Msp : public Task {
                 const uint16_t c5,
                 const uint16_t c6)
         {
-            prepareToSendShorts(200, 6);
-            sendShort(c1);
-            sendShort(c2);
-            sendShort(c3);
-            sendShort(c4);
-            sendShort(c5);
-            sendShort(c6);
-            completeSend();
+            sendRawRc(200, c1, c2, c3, c4, c5, c6);
         }
 
 }; // class Msp
