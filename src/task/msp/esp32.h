@@ -52,9 +52,8 @@ class Esp32Msp : public Msp {
                         Serial.println("Set RX");
                     }
 
-            } // switch (_command)
-
-        } // dispatchMessage 
+            } 
+        } 
 
         virtual void serialBegin(const uint32_t baud) override
         {

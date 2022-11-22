@@ -165,9 +165,8 @@ class Msp : public Task {
                         Serial.println(command);
                     }
 
-            } // switch (_command)
-
-        } // dispatchMessage 
+            }
+        } 
 
         virtual void serialBegin(const uint32_t baud) = 0;
 
