@@ -138,7 +138,7 @@ class Msp : public Task {
             return (int16_t)Math::rad2deg(rad);
         }
 
-        void handle_SET_MOTOR(uint16_t  m1, uint16_t  m2, uint16_t  m3, uint16_t  m4)
+        void handleSetMotor(uint16_t  m1, uint16_t  m2, uint16_t  m3, uint16_t  m4)
         {
             motors[0] = m_esc->convertFromExternal(m1);
             motors[1] = m_esc->convertFromExternal(m2);
@@ -167,7 +167,7 @@ class Msp : public Task {
             completeSend();
         }
 
-        void handle_RC_Request(
+        void handleRcRequest(
                 uint16_t & c1,
                 uint16_t & c2,
                 uint16_t & c3,
@@ -183,7 +183,7 @@ class Msp : public Task {
             c6 = scale(m_receiver->getRawAux2());
         }
 
-        void handle_ATTITUDE_Request(uint16_t & phi, uint16_t & theta, uint16_t & psi)
+        void handleAttitudeRequest(uint16_t & phi, uint16_t & theta, uint16_t & psi)
         {
             phi   = 10 * rad2degi(m_vstate->phi);
             theta = 10 * rad2degi(m_vstate->theta);
@@ -208,7 +208,7 @@ class Msp : public Task {
                         uint16_t m4 = 0;
                         memcpy(&m4,  &m_payload[6], sizeof(uint16_t));
 
-                        handle_SET_MOTOR(m1, m2, m3, m4);
+                        handleSetMotor(m1, m2, m3, m4);
 
                     } break;
 
@@ -220,7 +220,7 @@ class Msp : public Task {
                         uint16_t c4 = 0;
                         uint16_t c5 = 0;
                         uint16_t c6 = 0;
-                        handle_RC_Request(c1, c2, c3, c4, c5, c6);
+                        handleRcRequest(c1, c2, c3, c4, c5, c6);
 
                         sendRawRc(105, c1, c2, c3, c4, c4, c6);
 
@@ -231,7 +231,7 @@ class Msp : public Task {
                         uint16_t phi = 0;
                         uint16_t theta = 0;
                         uint16_t psi = 0;
-                        handle_ATTITUDE_Request(phi, theta, psi);
+                        handleAttitudeRequest(phi, theta, psi);
                         prepareToSendShorts(command, 3);
                         sendShort(phi);
                         sendShort(theta);
