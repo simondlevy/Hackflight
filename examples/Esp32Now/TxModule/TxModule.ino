@@ -44,6 +44,16 @@ static void report(
     Serial.print(delim);
 }
 
+void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
+{
+    Serial.print("\r\nLast Packet Send Status:\t");
+
+    Serial.println(
+            status == ESP_NOW_SEND_SUCCESS ?
+            "Delivery Success" :
+            "Delivery Fail");
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -53,6 +63,10 @@ void setup()
 
     // Start ESP32 MSP
     _msp.begin();
+
+    // Once ESPNow is successfully Init, we will register for Send CB to
+    // get the status of Trasnmitted packet
+    //esp_now_register_send_cb(onDataSent);
 }
 
 void loop()
@@ -69,13 +83,13 @@ void loop()
         const uint16_t c6 = convert(_rx.readChannel6());
 
         /*
-        report(c1, "C1=");
-        report(c2, "C2=");
-        report(c3, "C3=");
-        report(c4, "C4=");
-        report(c5, "C5=");
-        report(c6, "C6=", "\n");
-        */
+           report(c1, "C1=");
+           report(c2, "C2=");
+           report(c3, "C3=");
+           report(c4, "C4=");
+           report(c5, "C5=");
+           report(c6, "C6=", "\n");
+         */
 
         _msp.sendSetRc(c1, c2, c3, c4, c5, c6);
     }

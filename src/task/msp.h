@@ -127,72 +127,6 @@ class Msp : public Task {
             return m_outBuf[m_outBufIndex++];
         }
 
-        void parse(const uint8_t c)
-        {
-            typedef enum {
-                IDLE,
-                GOT_START,
-                GOT_M,
-                GOT_ARROW,
-                GOT_SIZE,
-                IN_PAYLOAD,
-                GOT_CRC
-            } parser_state_t; 
-
-            static parser_state_t _parser_state;
-            static uint8_t _type;
-            static uint8_t _crc;
-            static uint8_t _size;
-            static uint8_t _index;
-
-            if (_parser_state == IDLE && c == 'R') {
-                m_gotRebootRequest = true;
-                return;
-            }
-
-            // Payload functions
-            _size = _parser_state == GOT_ARROW ? c : _size;
-            _index = _parser_state == IN_PAYLOAD ? _index + 1 : 0;
-            const bool incoming = _type >= 200;
-            const bool in_payload = incoming && _parser_state == IN_PAYLOAD;
-
-            // Command acquisition function
-            _type = _parser_state == GOT_SIZE ? c : _type;
-
-            // Parser state transition function (final transition below)
-            _parser_state
-                = _parser_state == IDLE && c == '$' ? GOT_START
-                : _parser_state == GOT_START && c == 'M' ? GOT_M
-                : _parser_state == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
-                : _parser_state == GOT_ARROW ? GOT_SIZE
-                : _parser_state == GOT_SIZE ? IN_PAYLOAD
-                : _parser_state == IN_PAYLOAD && _index <= _size ? IN_PAYLOAD
-                : _parser_state == IN_PAYLOAD ? GOT_CRC
-                : _parser_state;
-
-            // Checksum transition function
-            _crc 
-                = _parser_state == GOT_SIZE ?  c
-                : _parser_state == IN_PAYLOAD ? _crc ^ c
-                : _parser_state == GOT_CRC ? _crc 
-                : 0;
-
-            // Payload accumulation
-            if (in_payload) {
-                m_payload[_index-1] = c;
-            }
-
-            if (_parser_state == GOT_CRC) {
-
-                // Message dispatch
-                if (_crc == c) {
-                    dispatchMessage(_type);
-                }
-
-                _parser_state = IDLE;
-            }
-
-        } // parse
 
         static float scale(const float value)
         {
@@ -325,6 +259,7 @@ class Msp : public Task {
 
     protected:
 
+
         virtual void serialBegin(const uint32_t baud) = 0;
 
         virtual uint32_t serialAvailable(void) = 0;
@@ -338,6 +273,73 @@ class Msp : public Task {
         float motors[MAX_SUPPORTED_MOTORS];
 
         Msp() : Task(100) { } // Hz
+
+        void parse(const uint8_t c)
+        {
+            typedef enum {
+                IDLE,
+                GOT_START,
+                GOT_M,
+                GOT_ARROW,
+                GOT_SIZE,
+                IN_PAYLOAD,
+                GOT_CRC
+            } parser_state_t; 
+
+            static parser_state_t _parser_state;
+            static uint8_t _type;
+            static uint8_t _crc;
+            static uint8_t _size;
+            static uint8_t _index;
+
+            if (_parser_state == IDLE && c == 'R') {
+                m_gotRebootRequest = true;
+                return;
+            }
+
+            // Payload functions
+            _size = _parser_state == GOT_ARROW ? c : _size;
+            _index = _parser_state == IN_PAYLOAD ? _index + 1 : 0;
+            const bool incoming = _type >= 200;
+            const bool in_payload = incoming && _parser_state == IN_PAYLOAD;
+
+            // Command acquisition function
+            _type = _parser_state == GOT_SIZE ? c : _type;
+
+            // Parser state transition function (final transition below)
+            _parser_state
+                = _parser_state == IDLE && c == '$' ? GOT_START
+                : _parser_state == GOT_START && c == 'M' ? GOT_M
+                : _parser_state == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
+                : _parser_state == GOT_ARROW ? GOT_SIZE
+                : _parser_state == GOT_SIZE ? IN_PAYLOAD
+                : _parser_state == IN_PAYLOAD && _index <= _size ? IN_PAYLOAD
+                : _parser_state == IN_PAYLOAD ? GOT_CRC
+                : _parser_state;
+
+            // Checksum transition function
+            _crc 
+                = _parser_state == GOT_SIZE ?  c
+                : _parser_state == IN_PAYLOAD ? _crc ^ c
+                : _parser_state == GOT_CRC ? _crc 
+                : 0;
+
+            // Payload accumulation
+            if (in_payload) {
+                m_payload[_index-1] = c;
+            }
+
+            if (_parser_state == GOT_CRC) {
+
+                // Message dispatch
+                if (_crc == c) {
+                    dispatchMessage(_type);
+                }
+
+                _parser_state = IDLE;
+            }
+
+        } // parse
 
         bool gotRebootRequest(void)
         {

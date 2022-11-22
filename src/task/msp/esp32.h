@@ -41,28 +41,6 @@ class Esp32Msp : public Msp {
             }
         }
 
-        void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
-        {
-            Serial.print("\r\nLast Packet Send Status:\t");
-
-            Serial.println(
-                    status == ESP_NOW_SEND_SUCCESS ?
-                    "Delivery Success" :
-                    "Delivery Fail");
-        }
-
-        static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
-        {
-            (void)mac;
-
-            for (uint8_t k=0; k<len; ++k) {
-                uint8_t byte = incomingData[k];
-                printf("%s%02X ", byte==0x24 ? "\n" : "", byte);
-            }
-
-            delay(1);
-        }
-
     protected:
 
         virtual void serialBegin(const uint32_t baud) override
@@ -112,11 +90,7 @@ class Esp32Msp : public Msp {
                 error("Error initializing ESP-NOW");
             }
 
-            // Once ESPNow is successfully Init, we will register for Send CB to
-            // get the status of Trasnmitted packet
-            //esp_now_register_send_cb(onDataSent);
-
-            // Register peer
+           // Register peer
             esp_now_peer_info_t peerInfo = {};
             memcpy(peerInfo.peer_addr, m_peerAddress, 6);
             peerInfo.channel = 0;  
@@ -127,8 +101,6 @@ class Esp32Msp : public Msp {
                 error("Failed to add peer");
             }
 
-            // Register for a callback function that will be called when data is received
-            esp_now_register_recv_cb(onDataRecv);
         }
 
 }; // class Esp32Msp

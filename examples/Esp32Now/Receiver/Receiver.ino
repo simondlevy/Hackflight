@@ -27,12 +27,26 @@
 // Replace with the MAC Address of your sender 
 static Esp32Msp _msp = Esp32Msp(0xAC, 0x0B, 0xFB, 0x6F, 0x6E, 0x84);
 
+static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
+{
+    (void)mac;
+
+    for (uint8_t k=0; k<len; ++k) {
+        _msp.parse(incomingData[k]);
+    }
+
+    delay(1);
+}
+
 void setup()
 {
     Serial.begin(115200);
 
     // Start ESP32 MSP
     _msp.begin();
+
+    // Register for a callback function that will be called when data is received
+    esp_now_register_recv_cb(onDataRecv);
 }
 
 void loop()
