@@ -34,17 +34,10 @@ class Msp : public Task {
 
         static const int OUTBUF_SIZE = 128;
 
-        Esc *            m_esc;
-        Arming *         m_arming;
-        Receiver *       m_receiver;
-        VehicleState *   m_vstate;
-
         uint8_t m_outBufChecksum;
         uint8_t m_outBuf[OUTBUF_SIZE];
         uint8_t m_outBufIndex;
         uint8_t m_outBufSize;
-
-        uint8_t m_payload[128] = {};
 
         bool m_gotRebootRequest;
 
@@ -72,12 +65,6 @@ class Msp : public Task {
             m_outBuf[m_outBufSize++] = a;
         }
 
-        void completeSend(void)
-        {
-            serialize8(m_outBufChecksum);
-            serialWrite(m_outBuf, m_outBufSize);
-        }
-
         void serialize8(uint8_t a)
         {
             addToOutBuf(a);
@@ -92,18 +79,6 @@ class Msp : public Task {
         void sendByte(uint8_t src)
         {
             serialize8(src);
-        }
-
-        void prepareToSendShorts(uint8_t type, uint8_t count)
-        {
-            prepareToSend(type, count, 2);
-        }
-
-        void sendShort(uint16_t src)
-        {
-            uint16_t a;
-            memcpy(&a, &src, 2);
-            serialize16(a);
         }
 
         void prepareToSendInts(uint8_t type, uint8_t count)
@@ -127,23 +102,37 @@ class Msp : public Task {
             return m_outBuf[m_outBufIndex++];
         }
 
-
-        static float scale(const float value)
+        virtual void fun(uint32_t usec) override
         {
-            return 1000 + 1000 * value;
+            (void)usec;
+
+            while (serialAvailable()) {
+                parse(serialRead());
+            }
         }
 
-        static int16_t rad2degi(float rad)
+    protected:
+
+        uint8_t m_payload[128] = {};
+
+        Msp() : Task(100) { } // Hz
+
+        void completeSend(void)
         {
-            return (int16_t)Math::rad2deg(rad);
+            serialize8(m_outBufChecksum);
+            serialWrite(m_outBuf, m_outBufSize);
         }
 
-        void handleSetMotor(uint16_t  m1, uint16_t  m2, uint16_t  m3, uint16_t  m4)
+        void sendShort(uint16_t src)
         {
-            motors[0] = m_esc->convertFromExternal(m1);
-            motors[1] = m_esc->convertFromExternal(m2);
-            motors[2] = m_esc->convertFromExternal(m3);
-            motors[3] = m_esc->convertFromExternal(m4);
+            uint16_t a;
+            memcpy(&a, &src, 2);
+            serialize16(a);
+        }
+
+        void prepareToSendShorts(uint8_t type, uint8_t count)
+        {
+            prepareToSend(type, count, 2);
         }
 
         void sendRawRc(
@@ -167,77 +156,9 @@ class Msp : public Task {
             completeSend();
         }
 
-        void handleRcRequest(
-                uint16_t & c1,
-                uint16_t & c2,
-                uint16_t & c3,
-                uint16_t & c4,
-                uint16_t & c5,
-                uint16_t & c6)
-        {
-            c1 = (uint16_t)m_receiver->getRawThrottle();
-            c2 = (uint16_t)m_receiver->getRawRoll();
-            c3 = (uint16_t)m_receiver->getRawPitch();
-            c4 = (uint16_t)m_receiver->getRawYaw();
-            c5 = scale(m_receiver->getRawAux1());
-            c6 = scale(m_receiver->getRawAux2());
-        }
-
-        void handleAttitudeRequest(uint16_t & phi, uint16_t & theta, uint16_t & psi)
-        {
-            phi   = 10 * rad2degi(m_vstate->phi);
-            theta = 10 * rad2degi(m_vstate->theta);
-            psi   = rad2degi(m_vstate->psi);
-        }
-
-        void dispatchMessage(uint8_t command)
+        virtual void dispatchMessage(uint8_t command)
         {
             switch (command) {
-
-                case 214:
-                    {
-                        uint16_t m1 = 0;
-                        memcpy(&m1,  &m_payload[0], sizeof(uint16_t));
-
-                        uint16_t m2 = 0;
-                        memcpy(&m2,  &m_payload[2], sizeof(uint16_t));
-
-                        uint16_t m3 = 0;
-                        memcpy(&m3,  &m_payload[4], sizeof(uint16_t));
-
-                        uint16_t m4 = 0;
-                        memcpy(&m4,  &m_payload[6], sizeof(uint16_t));
-
-                        handleSetMotor(m1, m2, m3, m4);
-
-                    } break;
-
-                case 105:
-                    {
-                        uint16_t c1 = 0;
-                        uint16_t c2 = 0;
-                        uint16_t c3 = 0;
-                        uint16_t c4 = 0;
-                        uint16_t c5 = 0;
-                        uint16_t c6 = 0;
-                        handleRcRequest(c1, c2, c3, c4, c5, c6);
-
-                        sendRawRc(105, c1, c2, c3, c4, c4, c6);
-
-                    } break;
-
-                case 108:
-                    {
-                        uint16_t phi = 0;
-                        uint16_t theta = 0;
-                        uint16_t psi = 0;
-                        handleAttitudeRequest(phi, theta, psi);
-                        prepareToSendShorts(command, 3);
-                        sendShort(phi);
-                        sendShort(theta);
-                        sendShort(psi);
-                        completeSend();
-                    } break;
 
                 default:
                     {
@@ -248,18 +169,6 @@ class Msp : public Task {
 
         } // dispatchMessage 
 
-        virtual void fun(uint32_t usec) override
-        {
-            (void)usec;
-
-            while (serialAvailable()) {
-                parse(serialRead());
-            }
-        }
-
-    protected:
-
-
         virtual void serialBegin(const uint32_t baud) = 0;
 
         virtual uint32_t serialAvailable(void) = 0;
@@ -269,10 +178,6 @@ class Msp : public Task {
         virtual void serialWrite(const uint8_t buf[], const uint8_t count) = 0;
 
     public:
-
-        float motors[MAX_SUPPORTED_MOTORS];
-
-        Msp() : Task(100) { } // Hz
 
         void parse(const uint8_t c)
         {
@@ -344,27 +249,6 @@ class Msp : public Task {
         bool gotRebootRequest(void)
         {
             return m_gotRebootRequest;
-        }
-
-        void begin(
-                Esc * esc,
-                Arming * arming,
-                Receiver * receiver,
-                VehicleState * vstate)
-        {
-            serialBegin(115200);
-
-            m_esc = esc;
-
-            m_arming = arming;
-
-            m_vstate = vstate;
-
-            m_receiver = receiver;
-
-            m_outBufChecksum = 0;
-            m_outBufIndex = 0;
-            m_outBufSize = 0;
         }
 
         void sendSetRc(
