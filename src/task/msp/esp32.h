@@ -49,9 +49,13 @@ class Esp32Msp : public Msp {
 
                 case 200:
                     {
-                        Serial.println("Set RX");
+                        int16_t c1 = parseShort(0);
+                        int16_t c2 = parseShort(1);
+                        int16_t c3 = parseShort(2);
+                        int16_t c4 = parseShort(3);
+                        int16_t c5 = parseShort(4);
+                        int16_t c6 = parseShort(5);
                     }
-
             } 
         } 
 
@@ -102,7 +106,7 @@ class Esp32Msp : public Msp {
                 error("Error initializing ESP-NOW");
             }
 
-           // Register peer
+            // Register peer
             esp_now_peer_info_t peerInfo = {};
             memcpy(peerInfo.peer_addr, m_peerAddress, 6);
             peerInfo.channel = 0;  

@@ -135,6 +135,14 @@ class Msp : public Task {
             prepareToSend(type, count, 2);
         }
 
+        int16_t parseShort(uint8_t index)
+        {
+            int16_t s = 0;
+            memcpy(&s,  &m_payload[2*index], sizeof(int16_t));
+            return s;
+
+        }
+
         void sendRawRc(
                 const uint8_t command,
                 const uint16_t c1,
