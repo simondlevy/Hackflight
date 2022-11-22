@@ -47,9 +47,9 @@ class Esp32Msp : public Msp {
         {
             switch (command) {
 
-                default:
+                case 200:
                     {
-                        Serial.println(command);
+                        Serial.println("Set RX");
                     }
 
             } // switch (_command)
