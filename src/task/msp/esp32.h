@@ -41,6 +41,12 @@ class Esp32Msp : public Msp {
             }
         }
 
+        static void dump(int16_t val)
+        {
+            Serial.print(val);
+            Serial.print("  ");
+        }
+
     protected:
 
         virtual void dispatchMessage(uint8_t command)
@@ -55,6 +61,14 @@ class Esp32Msp : public Msp {
                         int16_t c4 = parseShort(3);
                         int16_t c5 = parseShort(4);
                         int16_t c6 = parseShort(5);
+
+                        dump(c1);
+                        dump(c1);
+                        dump(c1);
+                        dump(c1);
+                        dump(c1);
+                        dump(c1);
+                        Serial.println();
                     }
             } 
         } 

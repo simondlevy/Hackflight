@@ -90,7 +90,6 @@ class UsbMsp : public Msp {
                         uint16_t c5 = 0;
                         uint16_t c6 = 0;
                         handleRcRequest(c1, c2, c3, c4, c5, c6);
-
                         sendRawRc(105, c1, c2, c3, c4, c4, c6);
 
                     } break;
