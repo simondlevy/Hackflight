@@ -74,9 +74,20 @@ class Esp32Msp : public Msp {
 
     public:
 
-        Esp32Msp(const uint8_t receiverAddress[6])
+        Esp32Msp(
+                const uint8_t peerAddr1,
+                const uint8_t peerAddr2,
+                const uint8_t peerAddr3,
+                const uint8_t peerAddr4,
+                const uint8_t peerAddr5,
+                const uint8_t peerAddr6)
         {
-            memcpy(m_peerAddress, receiverAddress, 6);
+            m_peerAddress[0] = peerAddr1;
+            m_peerAddress[1] = peerAddr2;
+            m_peerAddress[2] = peerAddr3;
+            m_peerAddress[3] = peerAddr4;
+            m_peerAddress[4] = peerAddr5;
+            m_peerAddress[5] = peerAddr6;
         }
 
         void begin(void)

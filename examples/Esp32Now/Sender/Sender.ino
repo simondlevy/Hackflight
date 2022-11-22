@@ -22,19 +22,14 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <task/receiver/sbus.h>
 #include <task/msp/esp32.h>
 
-#include <esp_now.h>
-#include <WiFi.h>
-
-// REPLACE WITH THE MAC Address of your receiver 
-static const uint8_t RECEIVER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x69, 0xA0};
-
 // Callback when data is sent
 static const uint8_t RX_PIN = 4;
 static const uint8_t TX_PIN = 14; // unused
 
 static SbusReceiver _rx;
 
-static Esp32Msp _msp = Esp32Msp(RECEIVER_ADDRESS);
+// Replace with the MAC Address of your receiver 
+static Esp32Msp _msp = Esp32Msp(0xAC, 0x0B, 0xFB, 0x6F, 0x69, 0xA0);
 
 static uint16_t convert(uint16_t chanval)
 {

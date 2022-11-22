@@ -23,13 +23,9 @@
 #include <task/msp/esp32.h>
 
 #include <esp_now.h>
-#include <WiFi.h>
 
-
-// REPLACE WITH THE MAC Address of your sender 
-static const uint8_t SENDER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04};
-
-static Esp32Msp _msp = Esp32Msp(SENDER_ADDRESS);
+// Replace with the MAC Address of your sender 
+static Esp32Msp _msp = Esp32Msp(0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04);
 
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
