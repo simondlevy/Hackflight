@@ -51,6 +51,18 @@ class Esp32Msp : public Msp {
                     "Delivery Fail");
         }
 
+        static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
+        {
+            (void)mac;
+
+            for (uint8_t k=0; k<len; ++k) {
+                uint8_t byte = incomingData[k];
+                printf("%s%02X ", byte==0x24 ? "\n" : "", byte);
+            }
+
+            delay(1);
+        }
+
     protected:
 
         virtual void serialBegin(const uint32_t baud) override
@@ -114,6 +126,9 @@ class Esp32Msp : public Msp {
             if (esp_now_add_peer(&peerInfo) != ESP_OK) {
                 error("Failed to add peer");
             }
+
+            // Register for a callback function that will be called when data is received
+            esp_now_register_recv_cb(onDataRecv);
         }
 
 }; // class Esp32Msp

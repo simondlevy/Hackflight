@@ -305,6 +305,11 @@ class Msp : public Task {
                         completeSend();
                     } break;
 
+                default:
+                    {
+                        Serial.println(command);
+                    }
+
             } // switch (_command)
 
         } // dispatchMessage 
