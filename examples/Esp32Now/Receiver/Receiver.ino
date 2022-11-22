@@ -62,6 +62,7 @@ void setup()
   
   // Register peer
   esp_now_peer_info_t peerInfo;
+  memset(&peerInfo, 0, sizeof(peerInfo));
   memcpy(peerInfo.peer_addr, SENDER_ADDRESS, 6);
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
