@@ -110,18 +110,10 @@ class UsbMsp : public Msp {
 
                 case 214:
                     {
-                        uint16_t m1 = 0;
-                        memcpy(&m1,  &m_payload[0], sizeof(uint16_t));
-
-                        uint16_t m2 = 0;
-                        memcpy(&m2,  &m_payload[2], sizeof(uint16_t));
-
-                        uint16_t m3 = 0;
-                        memcpy(&m3,  &m_payload[4], sizeof(uint16_t));
-
-                        uint16_t m4 = 0;
-                        memcpy(&m4,  &m_payload[6], sizeof(uint16_t));
-
+                        uint16_t m1 = parseShort(0);
+                        uint16_t m2 = parseShort(1);
+                        uint16_t m3 = parseShort(2);
+                        uint16_t m4 = parseShort(3);
                         handleSetMotor(m1, m2, m3, m4);
 
                     } break;
