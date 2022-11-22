@@ -25,8 +25,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <esp_now.h>
 #include <WiFi.h>
 
-#include <string.h>
-
 // REPLACE WITH THE MAC Address of your receiver 
 static const uint8_t RECEIVER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x69, 0xA0};
 
@@ -53,7 +51,6 @@ static void report(
 
 void setup()
 {
-
     Serial.begin(115200);
 
     // Start SBUS receiver

@@ -31,7 +31,7 @@ class Esp32Msp : public Msp {
 
     private:
 
-        uint8_t m_receiverAddress[6];
+        uint8_t m_peerAddress[6];
 
         static void error(const char * msg)
         {
@@ -69,14 +69,14 @@ class Esp32Msp : public Msp {
 
         virtual void serialWrite(const uint8_t buf[], const uint8_t count) override
         {
-            esp_now_send(m_receiverAddress, buf, count);
+            esp_now_send(m_peerAddress, buf, count);
         }
 
     public:
 
         Esp32Msp(const uint8_t receiverAddress[6])
         {
-            memcpy(m_receiverAddress, receiverAddress, 6);
+            memcpy(m_peerAddress, receiverAddress, 6);
         }
 
         void begin(void)
@@ -95,7 +95,7 @@ class Esp32Msp : public Msp {
 
             // Register peer
             esp_now_peer_info_t peerInfo = {};
-            memcpy(peerInfo.peer_addr, m_receiverAddress, 6);
+            memcpy(peerInfo.peer_addr, m_peerAddress, 6);
             peerInfo.channel = 0;  
             peerInfo.encrypt = false;
 
@@ -103,7 +103,6 @@ class Esp32Msp : public Msp {
             if (esp_now_add_peer(&peerInfo) != ESP_OK) {
                 error("Failed to add peer");
             }
-
         }
 
 }; // class Esp32Msp
