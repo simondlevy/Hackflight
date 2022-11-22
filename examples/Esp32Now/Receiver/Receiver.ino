@@ -25,7 +25,7 @@
 #include <esp_now.h>
 
 // Replace with the MAC Address of your sender 
-static Esp32Msp _msp = Esp32Msp(0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04);
+static Esp32Msp _msp = Esp32Msp(0xAC, 0x0B, 0xFB, 0x6F, 0x6E, 0x84);
 
 static void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {

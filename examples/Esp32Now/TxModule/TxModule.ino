@@ -23,8 +23,8 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <task/msp/esp32.h>
 
 // Callback when data is sent
-static const uint8_t RX_PIN = 4;
-static const uint8_t TX_PIN = 14; // unused
+static const uint8_t RX_PIN = 25;
+static const uint8_t TX_PIN = 26; // unused
 
 static SbusReceiver _rx;
 
