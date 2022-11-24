@@ -20,19 +20,27 @@
 //  Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
 
 #include <hackflight.h>
-#include <task/msp/esp32.h>
+#include <msp.h>
+#include <espnow.h>
 
 #include <esp_now.h>
 
 // Replace with the MAC Address of your sender 
-static Esp32Msp _msp = Esp32Msp(0xAC, 0x0B, 0xFB, 0x6F, 0x6E, 0x84);
+static EspNow _esp = EspNow(0xAC, 0x0B, 0xFB, 0x6F, 0x6E, 0x84);
+
+static MspParser _parser;
 
 static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
     (void)mac;
 
+    static uint32_t _count;
+
     for (uint8_t k=0; k<len; ++k) {
-        _msp.parse(incomingData[k]);
+
+        if (_parser.parse(incomingData[k]) == 200) {
+            Serial.println(_count++);
+        }
     }
 
     delay(1);
@@ -43,7 +51,7 @@ void setup()
     Serial.begin(115200);
 
     // Start ESP32 MSP
-    _msp.begin();
+    _esp.begin();
 
     // Register for a callback function that will be called when data is received
     esp_now_register_recv_cb(onDataRecv);

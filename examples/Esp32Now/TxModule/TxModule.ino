@@ -65,7 +65,7 @@ void setup()
     // Start SBUS receiver
     Serial1.begin(100000, SERIAL_8E2, RX_PIN, TX_PIN, true);
 
-    // Start ESP32 MSP
+    // Start ESP-NOW
     _esp.begin();
 
     // Once ESPNow is successfully Init, we will register for Send CB to
