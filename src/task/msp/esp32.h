@@ -63,11 +63,11 @@ class Esp32Msp : public Msp {
                         int16_t c6 = parseShort(5);
 
                         dump(c1);
-                        dump(c1);
-                        dump(c1);
-                        dump(c1);
-                        dump(c1);
-                        dump(c1);
+                        dump(c2);
+                        dump(c3);
+                        dump(c4);
+                        dump(c5);
+                        dump(c6);
                         Serial.println();
                     }
             } 
