@@ -12,8 +12,8 @@
 ::You should have received a copy of the GNU General Public License along with
 ::Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
-pyinstaller --onefile gcs.py --windowed --noconsole
+pyinstaller --onefile hfviz.py --windowed --noconsole
 mkdir HFViz
 mkdir HFViz\media
-copy dist\gcs.exe HFViz
+copy dist\hfviz.exe HFViz\hackflight.exe
 copy media\* HFViz\media
