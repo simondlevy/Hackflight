@@ -39,40 +39,6 @@ class EspNow {
             }
         }
 
-        static void dump(int16_t val)
-        {
-            Serial.print(val);
-            Serial.print("  ");
-        }
-
-    protected:
-
-        /*
-        virtual void dispatchMessage(uint8_t command)
-        {
-            switch (command) {
-
-                case 200:
-                    {
-                        int16_t c1 = parseShort(0);
-                        int16_t c2 = parseShort(1);
-                        int16_t c3 = parseShort(2);
-                        int16_t c4 = parseShort(3);
-                        int16_t c5 = parseShort(4);
-                        int16_t c6 = parseShort(5);
-
-                        dump(c1);
-                        dump(c2);
-                        dump(c3);
-                        dump(c4);
-                        dump(c5);
-                        dump(c6);
-                        Serial.println();
-                    }
-            } 
-        }
-        */
-
     public:
 
         EspNow(
