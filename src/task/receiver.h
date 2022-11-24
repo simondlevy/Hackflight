@@ -207,6 +207,7 @@ class Receiver : public Task {
 
         if (frameStatus) {
             signalReceived = true;
+            Serial.println(m_rawRoll);
         }
 
         if ((signalReceived && useDataDrivenProcessing) ||
