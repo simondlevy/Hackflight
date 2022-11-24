@@ -28,6 +28,19 @@
 
 class Msp : public Task {
 
+    protected:
+
+        static int16_t rad2degi(float rad)
+        {
+            return (int16_t)Math::rad2deg(rad);
+        }
+
+        static float scale(const float value)
+        {
+            return 1000 + 1000 * value;
+        }
+
+
     private:
 
         static const uint8_t MAXMSG = 255;

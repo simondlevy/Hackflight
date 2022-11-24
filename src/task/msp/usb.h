@@ -27,16 +27,6 @@ class UsbMsp : public Msp {
 
     private:
 
-        static int16_t rad2degi(float rad)
-        {
-            return (int16_t)Math::rad2deg(rad);
-        }
-
-        static float scale(const float value)
-        {
-            return 1000 + 1000 * value;
-        }
-
         Esc *            m_esc;
         Arming *         m_arming;
         Receiver *       m_receiver;
