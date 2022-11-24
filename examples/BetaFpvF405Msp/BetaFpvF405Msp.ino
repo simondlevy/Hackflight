@@ -64,11 +64,10 @@ static void handleImuInterrupt(void)
     _imu->handleInterrupt();
 }
 
-/*
 void serialEvent3(void)
 {
-    _rx.read(Serial3);
-}*/
+    // _rx.read(Serial3);
+}
 
 static Mixer _mixer = QuadXbfMixer::make();
 
@@ -86,7 +85,7 @@ void setup(void)
     _board = &board;
     _imu = &imu;
 
-    //Serial3.begin(100000, SERIAL_8E2);
+    Serial3.begin(115200);
 
     _board->begin();
 }
