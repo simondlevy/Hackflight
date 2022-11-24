@@ -29,7 +29,7 @@ using namespace std;
 #include "maths.h"
 #include "scheduler.h"
 #include "task/attitude.h"
-#include "task/msp/usb.h"
+#include "task/usb.h"
 #include "task/receiver.h"
 
 class Board {
@@ -49,10 +49,10 @@ class Board {
 
         // Initialzed here
         Arming         m_arming;
-        AttitudeTask   m_attitude;
+        AttitudeTask   m_attitudeTask;
         bool           m_failsafeIsActive;
         Led            m_led;
-        UsbMsp         m_msp;
+        UsbTask        m_usbTask;
         Scheduler      m_scheduler;
         VehicleState   m_vstate;
 
@@ -96,7 +96,7 @@ class Board {
                 mixmotors[i] = m_esc->getMotorValue(motors.values[i], m_failsafeIsActive);
             }
 
-            m_esc->write(m_arming.isArmed() ?  mixmotors : m_msp.motors);
+            m_esc->write(m_arming.isArmed() ?  mixmotors : m_usbTask.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -154,11 +154,11 @@ class Board {
 
             m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
-            m_attitude.update(usec, &selectedTask, &selectedTaskDynamicPriority);
+            m_attitudeTask.update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
-            m_msp.update(usec, &selectedTask, &selectedTaskDynamicPriority);
+            m_usbTask.update(usec, &selectedTask, &selectedTaskDynamicPriority);
 
-            if (m_msp.gotRebootRequest()) {
+            if (m_usbTask.gotRebootRequest()) {
                 reboot();
             }
 
@@ -258,9 +258,9 @@ class Board {
 
             m_arming.begin(m_esc, &m_led);
 
-            m_attitude.begin(m_imu, &m_arming, &m_vstate);
+            m_attitudeTask.begin(m_imu, &m_arming, &m_vstate);
 
-            m_msp.begin(m_esc, &m_arming, m_receiver, &m_vstate);
+            m_usbTask.begin(m_esc, &m_arming, m_receiver, &m_vstate);
 
             m_receiver->begin(&m_arming);
 
