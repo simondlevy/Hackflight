@@ -71,12 +71,6 @@ class EspNow {
                     }
             } 
         }
-
-
-        virtual void serialWrite(const uint8_t buf[], const uint8_t count) override
-        {
-            esp_now_send(m_peerAddress, buf, count);
-        }
         */
 
     public:
@@ -118,6 +112,11 @@ class EspNow {
                 error("Failed to add peer");
             }
 
+        }
+
+        void send(const uint8_t buf[], const uint8_t count)
+        {
+            esp_now_send(m_peerAddress, buf, count);
         }
 
 }; // class EspNow
