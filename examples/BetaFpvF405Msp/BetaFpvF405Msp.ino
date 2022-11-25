@@ -23,6 +23,7 @@
 #include <esc/dshot.h>
 #include <imu/real/softquat/spi/mpu6000.h>
 #include <task/receiver/msp.h>
+#include <task/receiver/mock.h>
 
 #include <vector>
 using namespace std;
@@ -50,7 +51,8 @@ static AnglePidController _anglePid(
 static Stm32F405Board * _board;
 static Mpu6000 * _imu;
 
-static MspReceiver _rx;
+// static MspReceiver _rx;
+static MockReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
 
@@ -85,7 +87,7 @@ void setup(void)
     _board = &board;
     _imu = &imu;
 
-    Serial3.begin(115200);
+    //Serial3.begin(115200);
 
     _board->begin();
 }
@@ -93,4 +95,11 @@ void setup(void)
 void loop(void)
 {
     _board->step();
+
+    Serial.println(Serial3.available());
+
+    /*
+    while (Serial3.available()) {
+        Serial.println(Serial3.read());
+    }*/
 }

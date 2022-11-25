@@ -21,7 +21,7 @@
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
-#include <imu/real/softquat/spi/mpu6000.h>
+#include <imu/real/softquat/mpu6000.h>
 #include <task/receiver/sbus.h>
 
 #include <vector>

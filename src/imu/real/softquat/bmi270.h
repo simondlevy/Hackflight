@@ -33,11 +33,23 @@ class Bmi270 : public SpiImu {
         // Registers
         static const uint8_t REG_CHIP_ID = 0x00;
 
+        // Toggle the CS to switch the device into SPI mode.
+        // Device switches initializes as I2C and switches to SPI on a low to high CS transition
+        void enableSpi(void)
+        {
+            digitalWrite(csnPin, LOW);
+            delay(1);
+            digitalWrite(spi.csnPin, HIGH);
+            delay(10);
+        }
+
     protected:
 
         virtual void begin(void) override 
         {
             m_spi->begin();
+
+            delay(100);
 
             id = readRegister(REG_CHIP_ID);
         }

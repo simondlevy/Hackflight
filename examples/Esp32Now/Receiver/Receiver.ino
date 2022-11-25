@@ -25,8 +25,8 @@
 
 #include <esp_now.h>
 
-static const uint8_t RX_PIN = 25; // unused
-static const uint8_t TX_PIN = 26;
+static const uint8_t RX_PIN = 26; // unused
+static const uint8_t TX_PIN = 25;
 
 // Replace with the MAC Address of your sender 
 static EspNow _esp = EspNow(0xAC, 0x0B, 0xFB, 0x6F, 0x6E, 0x84);
@@ -71,13 +71,20 @@ void setup()
 {
     Serial.begin(115200);
 
+    // Start outgoing serial connection to FC
+    Serial1.begin(115200, RX_PIN, TX_PIN);
+
     // Start ESP32 MSP
-    _esp.begin();
+    //_esp.begin();
 
     // Register for a callback function that will be called when data is received
-    esp_now_register_recv_cb(onDataRecv);
+    //esp_now_register_recv_cb(onDataRecv);
 }
 
 void loop()
 {
+    static uint8_t _count;
+    Serial1.write(_count);
+    _count = (_count + 1) % 256;
+    delay(1);
 }

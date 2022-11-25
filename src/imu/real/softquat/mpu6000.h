@@ -6,11 +6,11 @@
    MIT License
 */
 
-#include "imu/real/softquat/spi.h"
+#include "imu/real/softquat.h"
 
 #include <SPI.h>
 
-class Mpu6000 : public SpiImu {
+class Mpu6000 : public SoftQuatImu {
 
     public:
 
@@ -94,6 +94,32 @@ class Mpu6000 : public SpiImu {
             return divisor;
         }
 
+        SPIClass * m_spi;
+
+        uint8_t m_csPin;
+
+        void writeRegister(const uint8_t reg, const uint8_t val)
+        {
+            digitalWrite(m_csPin, LOW);
+            m_spi->transfer(reg);
+            m_spi->transfer(val);
+            digitalWrite(m_csPin, HIGH);
+        }
+
+        void readRegisters(const uint8_t addr, uint8_t * buffer, const uint8_t count)
+        {
+            digitalWrite(m_csPin, LOW);
+            buffer[0] = addr | 0x80;
+            m_spi->transfer(buffer, count);
+            digitalWrite(m_csPin, HIGH);
+        }
+
+        uint8_t readRegister(const uint8_t addr)
+        {
+            uint8_t buffer[2] = {};
+            readRegisters(addr, buffer, 2);
+            return buffer[1];
+        }
     protected:
 
         virtual bool gyroIsReady(void) override
@@ -179,16 +205,17 @@ class Mpu6000 : public SpiImu {
                 const uint8_t sampleRateDivisor = 19,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
-            : SpiImu(
+            : SoftQuatImu(
                     rotateFun, 
-                    spi,
-                    csPin,
                     (gyroScale == GYRO_250DPS ?  250 : 
                      gyroScale == GYRO_500DPS ?  500 : 
                      gyroScale == GYRO_1000DPS ?  1000 : 
                      2000) 
                     / 32768.)
             {
+                m_spi = &spi;
+                m_csPin = csPin;
+
                 m_sampleRateDivisor = sampleRateDivisor;
                 m_gyroScale = gyroScale;
                 m_accelScale = accelScale;
