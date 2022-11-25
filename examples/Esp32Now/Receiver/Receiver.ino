@@ -20,7 +20,7 @@
 //  Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
 
 #include <hackflight.h>
-#include <msp.h>
+#include <msp/parser.h>
 #include <espnow.h>
 
 #include <esp_now.h>

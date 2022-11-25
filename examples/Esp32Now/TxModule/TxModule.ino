@@ -19,7 +19,7 @@
 //   Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
 
 #include <hackflight.h>
-#include <msp.h>
+#include <msp/serializer.h>
 #include <task/receiver/sbus.h>
 #include <espnow.h>
 
@@ -28,7 +28,7 @@ static const uint8_t TX_PIN = 26; // unused
 
 static SbusReceiver _rx;
 
-static MspParser _parser;
+static MspSerializer _serializer;
 
 // Replace with the MAC Address of your receiver 
 static EspNow _esp = EspNow(0xAC, 0x0B, 0xFB, 0x6F, 0x69, 0xA0);
@@ -94,9 +94,9 @@ void loop()
            report(c6, "C6=", "\n");
          */
 
-        _parser.serializeRawRc(200, c1, c2, c3, c4, c5, c6);
+        _serializer.serializeRawRc(200, c1, c2, c3, c4, c5, c6);
 
-        _esp.send(_parser.outBuf, _parser.outBufSize);
+        _esp.send(_serializer.outBuf, _serializer.outBufSize);
     }
 
     // delay(5);
