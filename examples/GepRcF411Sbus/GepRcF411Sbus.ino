@@ -21,7 +21,7 @@
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/mock.h>
-#include <imu/real/softquat/spi/bmi270.h>
+#include <imu/real/softquat/bmi270.h>
 #include <task/receiver/sbus.h>
 
 // IMU

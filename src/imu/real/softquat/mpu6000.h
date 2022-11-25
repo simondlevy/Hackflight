@@ -120,6 +120,16 @@ class Mpu6000 : public SoftQuatImu {
             readRegisters(addr, buffer, 2);
             return buffer[1];
         }
+
+        static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
+        {
+            return
+                gyroScale == GYRO_250DPS ?  250 : 
+                gyroScale == GYRO_500DPS ?  500 : 
+                gyroScale == GYRO_1000DPS ?  1000 : 
+                2000;
+        }
+
     protected:
 
         virtual bool gyroIsReady(void) override
@@ -205,13 +215,7 @@ class Mpu6000 : public SoftQuatImu {
                 const uint8_t sampleRateDivisor = 19,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
-            : SoftQuatImu(
-                    rotateFun, 
-                    (gyroScale == GYRO_250DPS ?  250 : 
-                     gyroScale == GYRO_500DPS ?  500 : 
-                     gyroScale == GYRO_1000DPS ?  1000 : 
-                     2000) 
-                    / 32768.)
+            : SoftQuatImu(rotateFun, gyroScaleToInt(gyroScale) / 32768.)
             {
                 m_spi = &spi;
                 m_csPin = csPin;

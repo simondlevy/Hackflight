@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include "imu/real/softquat/spi.h"
+#include "imu/real/softquat.h"
 
 #include <SPI.h>
 
-class Bmi270 : public SpiImu {
+class Bmi270 : public SoftQuatImu {
 
     public:
 
@@ -33,13 +33,19 @@ class Bmi270 : public SpiImu {
         // Registers
         static const uint8_t REG_CHIP_ID = 0x00;
 
-        // Toggle the CS to switch the device into SPI mode.
-        // Device switches initializes as I2C and switches to SPI on a low to high CS transition
+
+        SPIClass * m_spi;
+
+        uint8_t m_csPin;
+
+         // Toggle the CS to switch the device into SPI mode.  Device switches
+         // initializes as I2C and switches to SPI on a low to high CS
+         // transition
         void enableSpi(void)
         {
-            digitalWrite(csnPin, LOW);
+            digitalWrite(m_csnPin, LOW);
             delay(1);
-            digitalWrite(spi.csnPin, HIGH);
+            digitalWrite(m_csnPin, HIGH);
             delay(10);
         }
 
@@ -127,8 +133,11 @@ class Bmi270 : public SpiImu {
                 const rotateFun_t rotateFun,
                 SPIClass & spi,
                 const uint8_t csPin)
-            : SpiImu(rotateFun, spi, csPin, 2000 / 32768.)
+            : SoftQuatImu(rotateFun, 2000 / 32768.)
         {
+            m_spi = &spi;
+            m_csPin = csPin;
+
         }
 
 }; // class Bmi270
