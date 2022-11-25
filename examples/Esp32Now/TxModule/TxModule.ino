@@ -23,7 +23,6 @@
 #include <task/receiver/sbus.h>
 #include <espnow.h>
 
-// Callback when data is sent
 static const uint8_t RX_PIN = 25;
 static const uint8_t TX_PIN = 26; // unused
 
@@ -62,7 +61,7 @@ void setup()
 {
     Serial.begin(115200);
 
-    // Start SBUS receiver
+    // Start incoming SBUS connection from TX
     Serial1.begin(100000, SERIAL_8E2, RX_PIN, TX_PIN, true);
 
     // Start ESP-NOW

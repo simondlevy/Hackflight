@@ -21,23 +21,9 @@
 
 #include <stdint.h>
 
-class MspParser {
+class MspSerializer {
 
     private:
-
-        typedef enum {
-            IDLE,
-            GOT_START,
-            GOT_M,
-            GOT_ARROW,
-            GOT_SIZE,
-            IN_PAYLOAD,
-            GOT_CRC
-        } parserState_t; 
-
-        parserState_t m_parserState;
-
-        static const uint8_t MAXMSG = 255;
 
         static const int OUTBUF_SIZE = 128;
 
@@ -94,90 +80,10 @@ class MspParser {
             prepareToSerialize(type, count, 4);
         }
 
-        uint8_t availableBytes(void)
-        {
-            return outBufSize;
-        }
-
-        uint8_t readByte(void)
-        {
-            outBufSize--;
-            return outBuf[outBufIndex++];
-        }
-
-        uint8_t m_payload[128] = {};
-
     public:
 
         uint8_t outBuf[OUTBUF_SIZE];
         uint8_t outBufSize;
-
-        parserState_t getParserState(void)
-        {
-            return m_parserState;
-        }
-
-        /**
-          * Returns message type or 0 for not  ready
-          */
-        uint8_t parse(const uint8_t c)
-        {
-            uint8_t messageType = 0;
-
-            static uint8_t _type;
-            static uint8_t _crc;
-            static uint8_t _size;
-            static uint8_t _index;
-
-            // Payload functions
-            _size = m_parserState == GOT_ARROW ? c : _size;
-            _index = m_parserState == IN_PAYLOAD ? _index + 1 : 0;
-            const bool incoming = _type >= 200;
-            const bool in_payload = incoming && m_parserState == IN_PAYLOAD;
-            // Command acquisition function
-            _type = m_parserState == GOT_SIZE ? c : _type;
-
-            // Parser state transition function (final transition below)
-            m_parserState
-                = m_parserState == IDLE && c == '$' ? GOT_START
-                : m_parserState == GOT_START && c == 'M' ? GOT_M
-                : m_parserState == GOT_M && (c == '<' || c == '>') ? GOT_ARROW
-                : m_parserState == GOT_ARROW ? GOT_SIZE
-                : m_parserState == GOT_SIZE ? IN_PAYLOAD
-                : m_parserState == IN_PAYLOAD && _index <= _size ? IN_PAYLOAD
-                : m_parserState == IN_PAYLOAD ? GOT_CRC
-                : m_parserState;
-
-            // Checksum transition function
-            _crc 
-                = m_parserState == GOT_SIZE ?  c
-                : m_parserState == IN_PAYLOAD ? _crc ^ c
-                : m_parserState == GOT_CRC ? _crc 
-                : 0;
-
-            // Payload accumulation
-            if (in_payload) {
-                m_payload[_index-1] = c;
-            }
-
-            if (m_parserState == GOT_CRC) {
-
-                // Message dispatch
-                if (_crc == c) {
-                    messageType = _type;
-                }
-
-                m_parserState = IDLE;
-            }
-
-            return messageType;
-
-        } // parse
-
-        bool isIdle(void)
-        {
-            return m_parserState == IDLE;
-        }
 
         void prepareToSerializeShorts(uint8_t type, uint8_t count)
         {
@@ -187,14 +93,6 @@ class MspParser {
         void completeSerialize(void)
         {
             serialize8(outBufChecksum);
-        }
-
-        int16_t parseShort(uint8_t index)
-        {
-            int16_t s = 0;
-            memcpy(&s,  &m_payload[2*index], sizeof(int16_t));
-            return s;
-
         }
 
         void serializeShort(uint16_t src)
@@ -225,4 +123,4 @@ class MspParser {
             completeSerialize();
         }
 
-}; // class MspParser
+}; // class MspSerializer

@@ -25,6 +25,9 @@
 
 #include <esp_now.h>
 
+static const uint8_t RX_PIN = 25; // unused
+static const uint8_t TX_PIN = 26;
+
 // Replace with the MAC Address of your sender 
 static EspNow _esp = EspNow(0xAC, 0x0B, 0xFB, 0x6F, 0x6E, 0x84);
 

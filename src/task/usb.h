@@ -24,7 +24,8 @@
 #include "task.h"
 #include "esc.h"
 #include "imu.h"
-#include "msp.h"
+#include "msp/parser.h"
+#include "msp/serializer.h"
 #include "receiver.h"
 
 class UsbTask : public Task {
@@ -47,12 +48,13 @@ class UsbTask : public Task {
         VehicleState *   m_vstate;
 
         MspParser m_parser;
+        MspSerializer m_serializer;
 
         bool m_gotRebootRequest;
 
         void sendOutBuf(void)
         {
-            Serial.write(m_parser.outBuf, m_parser.outBufSize);
+            Serial.write(m_serializer.outBuf, m_serializer.outBufSize);
         }
 
     protected:
@@ -81,18 +83,18 @@ class UsbTask : public Task {
                             uint16_t c4 = (uint16_t)m_receiver->getRawYaw();
                             uint16_t c5 = scale(m_receiver->getRawAux1());
                             uint16_t c6 = scale(m_receiver->getRawAux2());
-                            m_parser.serializeRawRc(105, c1, c2, c3, c4, c4, c6);
+                            m_serializer.serializeRawRc(105, c1, c2, c3, c4, c4, c6);
                             sendOutBuf();
 
                         } break;
 
                     case 108: // ATTITUDE
                         {
-                            m_parser.prepareToSerializeShorts(messageType, 3);
-                            m_parser.serializeShort(10 * rad2degi(m_vstate->phi));
-                            m_parser.serializeShort(10 * rad2degi(m_vstate->theta));
-                            m_parser.serializeShort(rad2degi(m_vstate->psi));
-                            m_parser.completeSerialize();
+                            m_serializer.prepareToSerializeShorts(messageType, 3);
+                            m_serializer.serializeShort(10 * rad2degi(m_vstate->phi));
+                            m_serializer.serializeShort(10 * rad2degi(m_vstate->theta));
+                            m_serializer.serializeShort(rad2degi(m_vstate->psi));
+                            m_serializer.completeSerialize();
                             sendOutBuf();
                         } break;
 
