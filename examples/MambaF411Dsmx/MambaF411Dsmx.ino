@@ -22,7 +22,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
 #include <imu/real/softquat/spi/mpu6000.h>
-#include <task/receiver/dsmx.h>
+#include <task/receiver/real/dsmx.h>
 
 #include <vector>
 using namespace std;
