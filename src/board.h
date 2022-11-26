@@ -220,9 +220,10 @@ class Board {
                 Esc & esc,
                 const uint8_t ledPin,
                 const bool ledInverted)
+            : Board( receiver, imu, pidControllers, mixer, esc, ledPin, ledInverted)
         {
         }
- 
+
      public:
 
         uint32_t microsToCycles(uint32_t micros)
