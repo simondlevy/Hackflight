@@ -36,6 +36,8 @@ class MspReceiver : public RealReceiver {
 
         float m_throttle;
 
+        uint32_t m_frameTimeUs;
+
     protected:
 
         virtual bool devRead(
@@ -69,7 +71,7 @@ class MspReceiver : public RealReceiver {
             aux1 = 0;
             aux2 = 0;
 
-            (void)frameTimeUs;
+            frameTimeUs = m_frameTimeUs;
 
             return false;
         }
@@ -84,6 +86,8 @@ class MspReceiver : public RealReceiver {
                 uint16_t c4 = m_parser.parseShort(3);
                 uint16_t c5 = m_parser.parseShort(4);
                 uint16_t c6 = m_parser.parseShort(5);
+
+                m_frameTimeUs = micros();
 
                 /*
                 dump(c1);
