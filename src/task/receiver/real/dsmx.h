@@ -19,10 +19,10 @@
 
 #include <stdlib.h>
 
-#include "task/receiver.h"
+#include "task/receiver/real.h"
 #include "time.h"
 
-class DsmxReceiver : public Receiver {
+class DsmxReceiver : public RealReceiver {
 
     private:
 

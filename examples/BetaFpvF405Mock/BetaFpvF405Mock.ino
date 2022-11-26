@@ -18,25 +18,25 @@
  */
 
 #include <hackflight.h>
-#include <board/stm32/stm32f4/stm32f411.h>
+#include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
 #include <imu/real/softquat/mpu6000.h>
-#include <task/receiver/real/dsmx.h>
+#include <task/receiver/mock.h>
 
 #include <vector>
 using namespace std;
 
+// IMU
 static const uint8_t MOSI_PIN = PA7;
 static const uint8_t MISO_PIN = PA6;
 static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
-static const uint8_t EXTI_PIN = PB0;
+static const uint8_t EXTI_PIN = PC4;
 
-static vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
+static vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
 
-//static const uint8_t LED_PIN  = PC13; // orange
-static const uint8_t LED_PIN  = PC14; // blue
+static const uint8_t LED_PIN  = PB5;
 
 static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
@@ -47,25 +47,21 @@ static AnglePidController _anglePid(
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-static Stm32F411Board * _board;
+static Stm32F405Board * _board;
 static Mpu6000 * _imu;
-static DsmxReceiver _rx;
+
+static MockReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
 
-extern "C" void handleDmaIrq(void)
+extern "C" void handleDmaIrq(uint8_t id)
 {
-    _board->handleDmaIrq(0);
+    _board->handleDmaIrq(id);
 }
 
 static void handleImuInterrupt(void)
 {
     _imu->handleInterrupt();
-}
-
-void serialEvent1(void)
-{
-    _rx.read(Serial1);
 }
 
 static Mixer _mixer = QuadXbfMixer::make();
@@ -75,16 +71,14 @@ void setup(void)
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static Mpu6000 imu(RealImu::rotate180, _spi, CS_PIN);
+    static Mpu6000 imu(RealImu::rotate270, _spi, CS_PIN);
 
     static DshotEsc esc(&MOTOR_PINS);
 
-    static Stm32F411Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
+    static Stm32F405Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     _imu = &imu;
-
-    Serial1.begin(115200);
 
     _board->begin();
 }

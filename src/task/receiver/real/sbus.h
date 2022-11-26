@@ -21,11 +21,11 @@
 
 #include <stdlib.h>
 
-#include "task/receiver.h"
+#include "task/receiver/real.h"
 #include "time.h"
 
 
-class SbusReceiver : public Receiver {
+class SbusReceiver : public RealReceiver {
 
     private:
 
