@@ -55,13 +55,14 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
             int16_t c5 = _parser.parseShort(4);
             int16_t c6 = _parser.parseShort(5);
 
+            /*
             dump(c1);
             dump(c2);
             dump(c3);
             dump(c4);
             dump(c5);
             dump(c6);
-            Serial.println();
+            Serial.println();*/
 
             _serializer.serializeRawRc(200, c1, c2, c3, c4, c5, c6);
 

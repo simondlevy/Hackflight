@@ -20,8 +20,13 @@
 #pragma once
 
 #include "task/receiver.h"
+#include "msp/parser.h"
 
 class MspReceiver : public Receiver {
+
+    private:
+
+        MspParser _parser;
 
     protected:
 
@@ -63,7 +68,10 @@ class MspReceiver : public Receiver {
 
     virtual void parse(const uint8_t c) override
     {
-        Serial.println(c, HEX);
+        static uint32_t _count;
+        if (_parser.parse(c) == 200) {
+            Serial.println(_count++);
+        }
     }
 
 }; // class MspReceiver

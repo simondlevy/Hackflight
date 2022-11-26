@@ -50,7 +50,6 @@ static AnglePidController _anglePid(
 static Stm32F405Board * _board;
 static Mpu6000 * _imu;
 
-// static MspReceiver _rx;
 static MspReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
