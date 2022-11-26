@@ -48,12 +48,12 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
 
         if (_parser.parse(incomingData[k]) == 200) {
 
-            int16_t c1 = _parser.parseShort(0);
-            int16_t c2 = _parser.parseShort(1);
-            int16_t c3 = _parser.parseShort(2);
-            int16_t c4 = _parser.parseShort(3);
-            int16_t c5 = _parser.parseShort(4);
-            int16_t c6 = _parser.parseShort(5);
+            uint16_t c1 = _parser.parseShort(0);
+            uint16_t c2 = _parser.parseShort(1);
+            uint16_t c3 = _parser.parseShort(2);
+            uint16_t c4 = _parser.parseShort(3);
+            uint16_t c5 = _parser.parseShort(4);
+            uint16_t c6 = _parser.parseShort(5);
 
             /*
             dump(c1);
