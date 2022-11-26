@@ -23,7 +23,6 @@
 #include <esc/dshot.h>
 #include <imu/real/softquat/mpu6000.h>
 #include <task/receiver/msp.h>
-#include <task/receiver/mock.h>
 
 #include <vector>
 using namespace std;
@@ -52,7 +51,7 @@ static Stm32F405Board * _board;
 static Mpu6000 * _imu;
 
 // static MspReceiver _rx;
-static MockReceiver _rx;
+static MspReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
 
@@ -68,7 +67,7 @@ static void handleImuInterrupt(void)
 
 void serialEvent3(void)
 {
-    // _rx.read(Serial3);
+    _rx.read(Serial3);
 }
 
 static Mixer _mixer = QuadXbfMixer::make();
@@ -95,8 +94,4 @@ void setup(void)
 void loop(void)
 {
     _board->step();
-
-    while (Serial3.available()) {
-        Serial.println(Serial3.read());
-    }
 }

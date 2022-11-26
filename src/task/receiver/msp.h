@@ -63,7 +63,7 @@ class MspReceiver : public Receiver {
 
     virtual void parse(const uint8_t c) override
     {
-        (void)c;
+        Serial.println(c, HEX);
     }
 
 }; // class MspReceiver
