@@ -44,7 +44,7 @@ class Stm32Board : public Board {
                 Esc & esc,
                 const uint8_t ledPin,
                 const bool ledInverted=false) 
-            : Board(receiver, imu, pids, mixer, esc, ledPin, ledInverted)
+            : Board(receiver, imu, sr, pids, mixer, esc, ledPin, ledInverted)
         {
         }
 

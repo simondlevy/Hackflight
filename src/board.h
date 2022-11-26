@@ -27,6 +27,7 @@ using namespace std;
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
+#include "sr.h"
 #include "scheduler.h"
 #include "task/attitude.h"
 #include "task/usb.h"
@@ -46,6 +47,7 @@ class Board {
         Mixer *                   m_mixer;
         vector<PidController *> * m_pidControllers;
         Receiver *                m_receiver;
+        SR *                      m_sr;
 
         // Initialzed here
         Arming         m_arming;
@@ -150,15 +152,7 @@ class Board {
             Task *selectedTask = NULL;
             uint16_t selectedTaskDynamicPriority = 0;
 
-            const uint32_t usec = micros();
-
-            m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority);
-
-            m_attitudeTask.update(usec, &selectedTask, &selectedTaskDynamicPriority);
-
-            m_usbTask.update(usec, &selectedTask, &selectedTaskDynamicPriority);
-
-            if (m_usbTask.gotRebootRequest()) {
+            const uint32_t usec = micros(); m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority); m_attitudeTask.update(usec, &selectedTask, &selectedTaskDynamicPriority); m_usbTask.update(usec, &selectedTask, &selectedTaskDynamicPriority); if (m_usbTask.gotRebootRequest()) {
                 reboot();
             }
 
@@ -217,6 +211,18 @@ class Board {
             receiver.m_board = this;
         }
 
+        Board(
+                Receiver & receiver,
+                Imu & imu,
+                SR & sr,
+                vector<PidController *> & pidControllers,
+                Mixer & mixer,
+                Esc & esc,
+                const uint8_t ledPin,
+                const bool ledInverted)
+        {
+        }
+ 
      public:
 
         uint32_t microsToCycles(uint32_t micros)
