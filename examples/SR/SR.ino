@@ -25,7 +25,7 @@
 
 #include <esp_now.h>
 
-static const bool INVERTED = true;
+static const bool UART_INVERTED = true;
 
 static const uint8_t RX_PIN = 4; // unused
 static const uint8_t TX_PIN = 14;
@@ -37,7 +37,7 @@ void setup()
     Serial.begin(115200);
 
     // Start outgoing serial connection to FC, inverted
-    Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN, INVERTED);
+    Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN, UART_INVERTED);
 }
 
 void loop()

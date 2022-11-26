@@ -219,8 +219,7 @@ class Board {
                 vector<PidController *> & pidControllers,
                 Mixer & mixer,
                 Esc & esc,
-                const uint8_t ledPin,
-                const bool ledInverted)
+                const int8_t ledPin)
         {
             m_receiver = &receiver;
             m_imu = &imu;
@@ -228,8 +227,8 @@ class Board {
             m_mixer = &mixer;
             m_esc = &esc;
 
-            m_led.pin = ledPin;
-            m_led.inverted = ledInverted;
+            m_led.pin = ledPin < 0 ? -ledPin : ledPin;
+            m_led.inverted = ledPin < 0;
 
             imu.m_board = this;
             esc.m_board = this;
@@ -243,9 +242,8 @@ class Board {
                 vector<PidController *> & pidControllers,
                 Mixer & mixer,
                 Esc & esc,
-                const uint8_t ledPin,
-                const bool ledInverted)
-            : Board( receiver, imu, pidControllers, mixer, esc, ledPin, ledInverted)
+                const int8_t ledPin)
+            : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
         {
         }
 
