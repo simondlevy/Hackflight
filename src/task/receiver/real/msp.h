@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include "task/receiver.h"
+#include "task/receiver/real.h"
 #include "msp/parser.h"
 
-class MspReceiver : public Receiver {
+class MspReceiver : public RealReceiver {
 
     private:
 
