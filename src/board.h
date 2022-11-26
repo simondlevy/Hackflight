@@ -191,7 +191,7 @@ class Board {
             virtual void runSR(void) = 0;
         };
 
-        class SrBoardDecorator : protected BoardDecorator {
+        class SrBoardDecorator : public BoardDecorator {
 
             virtual void runSR(void) override
             {
@@ -199,7 +199,7 @@ class Board {
 
         };
 
-        class NullBoardDecorator : protected BoardDecorator {
+        class NullBoardDecorator : public BoardDecorator {
 
             virtual void runSR(void) override
             {
@@ -233,6 +233,8 @@ class Board {
             imu.m_board = this;
             esc.m_board = this;
             receiver.m_board = this;
+
+            m_decorator = &m_nullDecorator;
         }
 
         Board(
@@ -245,6 +247,7 @@ class Board {
                 const int8_t ledPin)
             : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
         {
+            m_decorator = &m_srDecorator;
         }
 
      public:
