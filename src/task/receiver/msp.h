@@ -28,6 +28,12 @@ class MspReceiver : public Receiver {
 
         MspParser _parser;
 
+        static void dump(int16_t val)
+        {
+            Serial.print(val);
+            Serial.print("  ");
+        }
+
     protected:
 
         virtual bool devRead(
@@ -66,13 +72,26 @@ class MspReceiver : public Receiver {
             return false;
         }
 
-    virtual void parse(const uint8_t c) override
-    {
-        static uint32_t _count;
-        if (_parser.parse(c) == 200) {
-            Serial.println(_count++);
+        virtual void parse(const uint8_t c) override
+        {
+            if (_parser.parse(c) == 200) {
+
+                uint16_t c1 = _parser.parseShort(0);
+                uint16_t c2 = _parser.parseShort(1);
+                uint16_t c3 = _parser.parseShort(2);
+                uint16_t c4 = _parser.parseShort(3);
+                uint16_t c5 = _parser.parseShort(4);
+                uint16_t c6 = _parser.parseShort(5);
+
+                dump(c1);
+                dump(c2);
+                dump(c3);
+                dump(c4);
+                dump(c5);
+                dump(c6);
+                Serial.println();
+            }
         }
-    }
 
 }; // class MspReceiver
 
