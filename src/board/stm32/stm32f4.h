@@ -17,6 +17,7 @@
 #pragma once
 
 #include "board/stm32.h"
+#include "sr.h"
 
 #include <stm32f4xx.h>
 
@@ -440,6 +441,20 @@ class Stm32F4Board : public Stm32Board {
                 const uint8_t portCount,
                 Receiver & receiver,
                 Imu & imu,
+                vector<PidController *> & pids,
+                Mixer & mixer,
+                Esc & esc,
+                const uint8_t ledPin) 
+            : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
+        {
+            m_portCount = portCount;
+        }
+
+        Stm32F4Board(
+                const uint8_t portCount,
+                Receiver & receiver,
+                Imu & imu,
+                SR & sr,
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
