@@ -64,6 +64,10 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
         }
     }
 
+    static uint8_t _count;
+    Serial1.write(_count);
+    _count = (_count + 1) % 256;
+
     delay(1);
 }
 
@@ -83,8 +87,4 @@ void setup()
 
 void loop()
 {
-    static uint8_t _count;
-    Serial1.write(_count);
-    _count = (_count + 1) % 256;
-    delay(1);
 }
