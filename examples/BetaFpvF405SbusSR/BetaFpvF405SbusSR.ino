@@ -85,7 +85,11 @@ void setup(void)
     _board = &board;
     _imu = &imu;
 
+    // Start SBUS receiver
     Serial3.begin(100000, SERIAL_8E2);
+
+    // Start SR
+    Serial4.begin(115200);
 
     _board->begin();
 }
