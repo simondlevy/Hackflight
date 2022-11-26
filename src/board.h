@@ -186,6 +186,31 @@ class Board {
 
         } // checkDyanmicTasks
 
+        class BoardDecorator {
+
+            virtual void runSR(void) = 0;
+        };
+
+        class SrBoardDecorator : protected BoardDecorator {
+
+            virtual void runSR(void) override
+            {
+            }
+
+        };
+
+        class NullBoardDecorator : protected BoardDecorator {
+
+            virtual void runSR(void) override
+            {
+            }
+
+        };
+
+        BoardDecorator * m_decorator;
+        SrBoardDecorator m_srDecorator;
+        NullBoardDecorator m_nullDecorator;
+
      protected:
 
         Board(
