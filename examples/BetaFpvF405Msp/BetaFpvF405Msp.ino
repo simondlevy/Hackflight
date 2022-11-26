@@ -21,7 +21,7 @@
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
-#include <imu/real/softquat/spi/mpu6000.h>
+#include <imu/real/softquat/mpu6000.h>
 #include <task/receiver/msp.h>
 #include <task/receiver/mock.h>
 
@@ -87,7 +87,7 @@ void setup(void)
     _board = &board;
     _imu = &imu;
 
-    //Serial3.begin(115200);
+    Serial3.begin(115200);
 
     _board->begin();
 }
@@ -96,10 +96,7 @@ void loop(void)
 {
     _board->step();
 
-    Serial.println(Serial3.available());
-
-    /*
     while (Serial3.available()) {
         Serial.println(Serial3.read());
-    }*/
+    }
 }

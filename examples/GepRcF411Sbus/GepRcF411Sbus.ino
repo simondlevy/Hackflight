@@ -25,9 +25,9 @@
 #include <task/receiver/sbus.h>
 
 // IMU
-static const uint8_t MOSI_PIN = PA7;
-static const uint8_t MISO_PIN = PA6;
-static const uint8_t SCLK_PIN = PA5;
+static const uint8_t MOSI_PIN = PA7; // PB15
+static const uint8_t MISO_PIN = PA6; // PB14
+static const uint8_t SCLK_PIN = PA5; // PB13
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PA1;
 
@@ -79,4 +79,6 @@ void setup(void)
 void loop(void)
 {
     _board->step();
+
+    Serial.println(_imu->id, HEX);
 }

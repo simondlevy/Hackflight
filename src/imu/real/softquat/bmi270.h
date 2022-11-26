@@ -43,10 +43,25 @@ class Bmi270 : public SoftQuatImu {
          // transition
         void enableSpi(void)
         {
-            digitalWrite(m_csnPin, LOW);
+            digitalWrite(m_csPin, LOW);
             delay(1);
-            digitalWrite(m_csnPin, HIGH);
+            digitalWrite(m_csPin, HIGH);
             delay(10);
+        }
+
+        void readRegisters(const uint8_t addr, uint8_t * buffer, const uint8_t count)
+        {
+            digitalWrite(m_csPin, LOW);
+            //buffer[0] = addr | 0x80;
+            m_spi->transfer(buffer, count);
+            digitalWrite(m_csPin, HIGH);
+        }
+
+        uint8_t readRegister(const uint8_t addr)
+        {
+            uint8_t buffer[2] = {};
+            readRegisters(addr, buffer, 2);
+            return buffer[1];
         }
 
     protected:
@@ -55,7 +70,7 @@ class Bmi270 : public SoftQuatImu {
         {
             m_spi->begin();
 
-            delay(100);
+            enableSpi();
 
             id = readRegister(REG_CHIP_ID);
         }
@@ -137,6 +152,8 @@ class Bmi270 : public SoftQuatImu {
         {
             m_spi = &spi;
             m_csPin = csPin;
+
+            id = 0;
 
         }
 
