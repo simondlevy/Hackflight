@@ -35,6 +35,7 @@ class MspReceiver : public RealReceiver {
         MspParser m_parser;
 
         float m_throttle;
+        float m_roll;
 
         uint32_t m_frameTimeUs;
 
@@ -49,23 +50,8 @@ class MspReceiver : public RealReceiver {
                 float & aux2,
                 uint32_t & frameTimeUs) override
         {
-            // Simulates moving the roll stick
-
-            static float _roll;
-            static int8_t dir = +1;
-
-            _roll += .00001 * dir;
-
-            if (_roll >= 1.0) {
-                dir = -1;
-            }
-
-            if (_roll <= -1.0) {
-                dir = +1;
-            }
-
             throttle = m_throttle;
-            roll     = 1500 + _roll * 500;
+            roll     = m_roll;
             pitch    = 1500;
             yaw      = 1500;
             aux1 = 0;
@@ -81,7 +67,7 @@ class MspReceiver : public RealReceiver {
             if (m_parser.parse(c) == 200) {
 
                 m_throttle = (float)m_parser.parseShort(0);
-                uint16_t c2 = m_parser.parseShort(1);
+                m_roll     = (float)m_parser.parseShort(1);
                 uint16_t c3 = m_parser.parseShort(2);
                 uint16_t c4 = m_parser.parseShort(3);
                 uint16_t c5 = m_parser.parseShort(4);
