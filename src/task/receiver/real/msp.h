@@ -26,13 +26,15 @@ class MspReceiver : public RealReceiver {
 
     private:
 
-        MspParser _parser;
-
         static void dump(int16_t val)
         {
             Serial.print(val);
             Serial.print("  ");
         }
+
+        MspParser m_parser;
+
+        float m_throttle;
 
     protected:
 
@@ -60,7 +62,7 @@ class MspReceiver : public RealReceiver {
                 dir = +1;
             }
 
-            throttle = 1000;
+            throttle = m_throttle;
             roll     = 1500 + _roll * 500;
             pitch    = 1500;
             yaw      = 1500;
@@ -74,15 +76,16 @@ class MspReceiver : public RealReceiver {
 
         virtual void parse(const uint8_t c) override
         {
-            if (_parser.parse(c) == 200) {
+            if (m_parser.parse(c) == 200) {
 
-                uint16_t c1 = _parser.parseShort(0);
-                uint16_t c2 = _parser.parseShort(1);
-                uint16_t c3 = _parser.parseShort(2);
-                uint16_t c4 = _parser.parseShort(3);
-                uint16_t c5 = _parser.parseShort(4);
-                uint16_t c6 = _parser.parseShort(5);
+                m_throttle = (float)m_parser.parseShort(0);
+                uint16_t c2 = m_parser.parseShort(1);
+                uint16_t c3 = m_parser.parseShort(2);
+                uint16_t c4 = m_parser.parseShort(3);
+                uint16_t c5 = m_parser.parseShort(4);
+                uint16_t c6 = m_parser.parseShort(5);
 
+                /*
                 dump(c1);
                 dump(c2);
                 dump(c3);
@@ -90,6 +93,7 @@ class MspReceiver : public RealReceiver {
                 dump(c5);
                 dump(c6);
                 Serial.println();
+                */
             }
         }
 
