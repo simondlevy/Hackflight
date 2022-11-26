@@ -72,7 +72,7 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
         }
     }
 
-    delay(1);
+    //delay(1);
 }
 
 void setup()
@@ -91,4 +91,5 @@ void setup()
 
 void loop()
 {
+    delay(1);
 }

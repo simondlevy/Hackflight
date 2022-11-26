@@ -15,6 +15,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 '''
 
 
+from debugging import debug
 from dialog import Dialog
 import tkinter as tk
 
