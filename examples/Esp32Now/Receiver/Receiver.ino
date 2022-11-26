@@ -31,7 +31,8 @@ static const uint8_t TX_PIN = 14;
 // Replace with the MAC Address of your sender 
 static EspNow _esp = EspNow(0xAC, 0x0B, 0xFB, 0x6F, 0x6E, 0x84);
 
-static MspParser m_parser;
+static MspParser _parser;
+static MspSerializer _serializer;
 
 static void dump(int16_t val)
 {
@@ -45,14 +46,14 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
 
     for (uint8_t k=0; k<len; ++k) {
 
-        if (m_parser.parse(incomingData[k]) == 200) {
+        if (_parser.parse(incomingData[k]) == 200) {
 
-            int16_t c1 = m_parser.parseShort(0);
-            int16_t c2 = m_parser.parseShort(1);
-            int16_t c3 = m_parser.parseShort(2);
-            int16_t c4 = m_parser.parseShort(3);
-            int16_t c5 = m_parser.parseShort(4);
-            int16_t c6 = m_parser.parseShort(5);
+            int16_t c1 = _parser.parseShort(0);
+            int16_t c2 = _parser.parseShort(1);
+            int16_t c3 = _parser.parseShort(2);
+            int16_t c4 = _parser.parseShort(3);
+            int16_t c5 = _parser.parseShort(4);
+            int16_t c6 = _parser.parseShort(5);
 
             dump(c1);
             dump(c2);
@@ -61,12 +62,14 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
             dump(c5);
             dump(c6);
             Serial.println();
+
+            _serializer.serializeRawRc(200, c1, c2, c3, c4, c5, c6);
+
+            for (uint8_t k=0; k<_serializer.outBufSize; ++k) {
+                Serial1.write(_serializer.outBuf[k]);
+            }
         }
     }
-
-    static uint8_t _count;
-    Serial1.write(_count);
-    _count = (_count + 1) % 256;
 
     delay(1);
 }
