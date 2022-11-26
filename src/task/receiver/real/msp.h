@@ -36,8 +36,14 @@ class MspReceiver : public RealReceiver {
 
         float m_throttle;
         float m_roll;
+        float m_pitch;
+        float m_yaw;
+        float m_aux1;
+        float m_aux2;
 
         uint32_t m_frameTimeUs;
+
+        volatile bool m_done;
 
     protected:
 
@@ -50,16 +56,22 @@ class MspReceiver : public RealReceiver {
                 float & aux2,
                 uint32_t & frameTimeUs) override
         {
-            throttle = m_throttle;
-            roll     = m_roll;
-            pitch    = 1500;
-            yaw      = 1500;
-            aux1 = 0;
-            aux2 = 0;
+            bool done = m_done;
 
-            frameTimeUs = m_frameTimeUs;
+            if (done) {
+                throttle = m_throttle;
+                roll     = m_roll;
+                pitch    = m_pitch;
+                yaw      = m_yaw;
+                aux1     = m_aux1;
+                aux2     = m_aux2;
 
-            return false;
+                frameTimeUs = m_frameTimeUs;
+
+                m_done = false;
+            }
+
+            return done;
         }
 
         virtual void parse(const uint8_t c) override
@@ -68,22 +80,24 @@ class MspReceiver : public RealReceiver {
 
                 m_throttle = (float)m_parser.parseShort(0);
                 m_roll     = (float)m_parser.parseShort(1);
-                uint16_t c3 = m_parser.parseShort(2);
-                uint16_t c4 = m_parser.parseShort(3);
-                uint16_t c5 = m_parser.parseShort(4);
-                uint16_t c6 = m_parser.parseShort(5);
+                m_pitch    = (float)m_parser.parseShort(2);
+                m_yaw      = (float)m_parser.parseShort(3);
+                m_aux1     = ((float)m_parser.parseShort(4) - 1000) / 1000;
+                m_aux2     = ((float)m_parser.parseShort(5) - 1000) / 1000;
 
                 m_frameTimeUs = micros();
 
+                m_done = true;
+
                 /*
-                dump(c1);
-                dump(c2);
-                dump(c3);
-                dump(c4);
-                dump(c5);
-                dump(c6);
-                Serial.println();
-                */
+                   dump(c1);
+                   dump(c2);
+                   dump(c3);
+                   dump(c4);
+                   dump(c5);
+                   dump(c6);
+                   Serial.println();
+                 */
             }
         }
 

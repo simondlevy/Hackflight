@@ -205,9 +205,13 @@ class Receiver : public Task {
                         m_rawAux2,
                         m_lastFrameTimeUs);
 
+            /*
+            m_rawAux1 = (m_rawAux1 - 1000) / 1000;
+            m_rawAux2 = (m_rawAux2 - 1000) / 1000;
+            */
+
             if (frameStatus) {
                 signalReceived = true;
-                Serial.println(m_rawRoll);
             }
 
             if ((signalReceived && useDataDrivenProcessing) ||
