@@ -75,10 +75,10 @@ void setup()
     Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN, true);
 
     // Start ESP32 MSP
-    //_esp.begin();
+    _esp.begin();
 
     // Register for a callback function that will be called when data is received
-    //esp_now_register_recv_cb(onDataRecv);
+    esp_now_register_recv_cb(onDataRecv);
 }
 
 void loop()
