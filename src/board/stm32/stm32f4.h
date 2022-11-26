@@ -459,7 +459,7 @@ class Stm32F4Board : public Stm32Board {
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 
-            : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
+            : Stm32Board(receiver, imu, sr, pids, mixer, esc, ledPin)
         {
             m_portCount = portCount;
         }
