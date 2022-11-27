@@ -75,7 +75,9 @@ void setup(void)
 
     static DshotEsc esc(&MOTOR_PINS);
 
-    static Stm32F405Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
+    static SR sr;
+
+    static Stm32F405Board board(_rx, imu, sr, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     _imu = &imu;

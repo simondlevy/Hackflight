@@ -185,6 +185,8 @@ class Stm32F4Board : public Stm32Board {
 
         uint16_t m_pacerDmaMask = 0x0000;
 
+        SR * m_sr;
+
         // Private instance methods ====================================================
 
         void dmaUpdateStartMotorPort(port_t * port)
@@ -441,27 +443,15 @@ class Stm32F4Board : public Stm32Board {
                 const uint8_t portCount,
                 Receiver & receiver,
                 Imu & imu,
-                vector<PidController *> & pids,
-                Mixer & mixer,
-                Esc & esc,
-                const int8_t ledPin) 
-            : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
-        {
-            m_portCount = portCount;
-        }
-
-        Stm32F4Board(
-                const uint8_t portCount,
-                Receiver & receiver,
-                Imu & imu,
                 SR & sr,
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 
-            : Stm32Board(receiver, imu, sr, pids, mixer, esc, ledPin)
+            : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
         {
             m_portCount = portCount;
+            m_sr = &sr;
         }
 
         void handleDmaIrq(const uint8_t index)

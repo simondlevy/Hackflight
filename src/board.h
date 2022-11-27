@@ -27,7 +27,6 @@ using namespace std;
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
-#include "sr.h"
 #include "scheduler.h"
 #include "task/attitude.h"
 #include "task/usb.h"
@@ -47,7 +46,6 @@ class Board {
         Mixer *                   m_mixer;
         vector<PidController *> * m_pidControllers;
         Receiver *                m_receiver;
-        SR *                      m_sr;
 
         // Initialzed here
         Arming         m_arming;
@@ -186,31 +184,6 @@ class Board {
 
         } // checkDyanmicTasks
 
-        class BoardDecorator {
-
-            virtual void runSR(void) = 0;
-        };
-
-        class SrBoardDecorator : public BoardDecorator {
-
-            virtual void runSR(void) override
-            {
-            }
-
-        };
-
-        class NullBoardDecorator : public BoardDecorator {
-
-            virtual void runSR(void) override
-            {
-            }
-
-        };
-
-        BoardDecorator * m_decorator;
-        SrBoardDecorator m_srDecorator;
-        NullBoardDecorator m_nullDecorator;
-
      protected:
 
         Board(
@@ -234,20 +207,6 @@ class Board {
             esc.m_board = this;
             receiver.m_board = this;
 
-            m_decorator = &m_nullDecorator;
-        }
-
-        Board(
-                Receiver & receiver,
-                Imu & imu,
-                SR & sr,
-                vector<PidController *> & pidControllers,
-                Mixer & mixer,
-                Esc & esc,
-                const int8_t ledPin)
-            : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
-        {
-            m_decorator = &m_srDecorator;
         }
 
      public:

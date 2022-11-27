@@ -67,9 +67,11 @@ void setup(void)
 
     static MockImu imu;
 
+    static SR sr;
+
     static MockEsc esc;
 
-    static Stm32F411Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
+    static Stm32F411Board board(_rx, imu, sr, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     //_imu = &imu;

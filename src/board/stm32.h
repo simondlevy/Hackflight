@@ -17,7 +17,6 @@
 #pragma once
 
 #include "board.h"
-#include "sr.h"
 
 class Stm32Board : public Board {
 
@@ -31,18 +30,6 @@ class Stm32Board : public Board {
                 Esc & esc,
                 const int8_t ledPin)
             : Board(receiver, imu, pids, mixer, esc, ledPin)
-        {
-        }
-
-        Stm32Board(
-                Receiver & receiver,
-                Imu & imu,
-                SR & sr,
-                vector<PidController *> & pids,
-                Mixer & mixer,
-                Esc & esc,
-                const int8_t ledPin)
-            : Board(receiver, imu, sr, pids, mixer, esc, ledPin)
         {
         }
 
