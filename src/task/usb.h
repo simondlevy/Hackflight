@@ -83,7 +83,7 @@ class UsbTask : public Task {
                             uint16_t c4 = (uint16_t)m_receiver->getRawYaw();
                             uint16_t c5 = scale(m_receiver->getRawAux1());
                             uint16_t c6 = scale(m_receiver->getRawAux2());
-                            m_serializer.serializeRawRc(105, c1, c2, c3, c4, c4, c6);
+                            m_serializer.serializeRawRc(105, c1, c2, c3, c4, c5, c6);
                             sendOutBuf();
 
                         } break;

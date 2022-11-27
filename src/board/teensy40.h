@@ -22,20 +22,36 @@
 
 class Teensy40 : public Board {
 
-    virtual uint32_t getCycleCounter(void) override
-    {
-        return ARM_DWT_CYCCNT;
-    }
+    protected:
 
-    virtual uint32_t getClockSpeed(void) override
-    {
-        return F_CPU;
-    }
+        virtual uint32_t getCycleCounter(void) override
+        {
+            return ARM_DWT_CYCCNT;
+        }
 
-    virtual void startCycleCounter(void) override
-    {
-        ARM_DEMCR |= ARM_DEMCR_TRCENA;
-        ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA;
-    }
+        virtual uint32_t getClockSpeed(void) override
+        {
+            return F_CPU;
+        }
+
+        virtual void startCycleCounter(void) override
+        {
+            ARM_DEMCR |= ARM_DEMCR_TRCENA;
+            ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA;
+        }
+
+    public:
+
+        Teensy40(
+                Receiver & receiver,
+                Imu & imu,
+                vector<PidController *> & pids,
+                Mixer & mixer,
+                Esc & esc,
+                const int8_t ledPin)
+            : Board(receiver, imu, pids, mixer, esc, ledPin)
+        {
+        }
+
 
 };  //class Teensy40
