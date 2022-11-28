@@ -1,4 +1,4 @@
-SKETCH = BetaFpvF405Mock
+SKETCH = F405Mock
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
