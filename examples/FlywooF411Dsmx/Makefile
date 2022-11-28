@@ -1,4 +1,4 @@
-SKETCH = FlywooF411Sbus
+SKETCH = FlywooF411Dsmx
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
 
