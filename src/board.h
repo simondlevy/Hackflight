@@ -150,7 +150,13 @@ class Board {
             Task *selectedTask = NULL;
             uint16_t selectedTaskDynamicPriority = 0;
 
-            const uint32_t usec = micros(); m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority); m_attitudeTask.update(usec, &selectedTask, &selectedTaskDynamicPriority); m_usbTask.update(usec, &selectedTask, &selectedTaskDynamicPriority); if (m_usbTask.gotRebootRequest()) {
+            const uint32_t usec = micros();
+
+            m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority);
+            m_attitudeTask.update(usec, &selectedTask, &selectedTaskDynamicPriority);
+            m_usbTask.update(usec, &selectedTask, &selectedTaskDynamicPriority);
+
+            if (m_usbTask.gotRebootRequest()) {
                 reboot();
             }
 
@@ -184,7 +190,7 @@ class Board {
 
         } // checkDyanmicTasks
 
-     protected:
+    protected:
 
         Board(
                 Receiver & receiver,
@@ -209,7 +215,7 @@ class Board {
 
         }
 
-     public:
+    public:
 
         uint32_t microsToCycles(uint32_t micros)
         {

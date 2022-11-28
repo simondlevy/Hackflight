@@ -20,25 +20,14 @@
 #include <hackflight.h>
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <esc/dshot.h>
-#include <imu/real/softquat/mpu6000.h>
+#include <esc/mock.h>
+#include <imu/mock.h>
 #include <task/receiver/mock.h>
 
 #include <vector>
 using namespace std;
 
-// IMU
-static const uint8_t MOSI_PIN = PA7;
-static const uint8_t MISO_PIN = PA6;
-static const uint8_t SCLK_PIN = PA5;
-static const uint8_t CS_PIN   = PA4;
-static const uint8_t EXTI_PIN = PC4;
-
-static vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
-
 static const uint8_t LED_PIN  = PB5;
-
-static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -48,41 +37,24 @@ static AnglePidController _anglePid(
         0.0); // 3.0; // Level Kp
 
 static Stm32F405Board * _board;
-static Mpu6000 * _imu;
-
-static MockReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
-
-extern "C" void handleDmaIrq(uint8_t id)
-{
-    _board->handleDmaIrq(id);
-}
-
-static void handleImuInterrupt(void)
-{
-    _imu->handleInterrupt();
-}
 
 static Mixer _mixer = QuadXbfMixer::make();
 
 void setup(void)
 {
-    pinMode(EXTI_PIN, INPUT);
-    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+    static MockImu imu;
+    static MockReceiver rx;
+    static MockEsc esc;
 
-    static Mpu6000 imu(RealImu::rotate270, _spi, CS_PIN);
-
-    static DshotEsc esc(&MOTOR_PINS);
-
-    static SR sr;
-
-    static Stm32F405Board board(_rx, imu, sr, _pids, _mixer, esc, LED_PIN);
+    static Stm32F405Board board(rx, imu, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
-    _imu = &imu;
 
     _board->begin();
+
+    //Serial4.begin(115200);
 }
 
 void loop(void)

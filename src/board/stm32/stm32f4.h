@@ -17,7 +17,6 @@
 #pragma once
 
 #include "board/stm32.h"
-#include "sr.h"
 
 #include <stm32f4xx.h>
 
@@ -184,8 +183,6 @@ class Stm32F4Board : public Stm32Board {
         GPIO_TypeDef * m_gpios[96];
 
         uint16_t m_pacerDmaMask = 0x0000;
-
-        SR * m_sr;
 
         // Private instance methods ====================================================
 
@@ -443,7 +440,6 @@ class Stm32F4Board : public Stm32Board {
                 const uint8_t portCount,
                 Receiver & receiver,
                 Imu & imu,
-                SR & sr,
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
@@ -451,7 +447,6 @@ class Stm32F4Board : public Stm32Board {
             : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
         {
             m_portCount = portCount;
-            m_sr = &sr;
         }
 
         void handleDmaIrq(const uint8_t index)

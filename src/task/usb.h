@@ -67,6 +67,8 @@ class UsbTask : public Task {
 
                 uint8_t byte = Serial.read();
 
+                //Serial4.println(byte, HEX);
+
                 if (m_parser.isIdle() && byte == 'R') {
                     m_gotRebootRequest = true;
                 }

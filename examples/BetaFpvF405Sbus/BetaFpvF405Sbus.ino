@@ -78,11 +78,9 @@ void setup(void)
 
     static Mpu6000 imu(RealImu::rotate270, _spi, CS_PIN);
 
-    static SR sr;
-
     static DshotEsc esc(&MOTOR_PINS);
 
-    static Stm32F405Board board(_rx, imu, sr, _pids, _mixer, esc, LED_PIN);
+    static Stm32F405Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     _imu = &imu;
