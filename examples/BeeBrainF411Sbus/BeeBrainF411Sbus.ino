@@ -20,7 +20,7 @@
 #include <hackflight.h>
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <esc/mock.h>
+#include <esc/dshot.h>
 #include <imu/real/softquat/mpu6000.h>
 #include <task/receiver/mock.h>
 
@@ -32,6 +32,8 @@ static const uint8_t MISO_PIN = PB4;
 static const uint8_t SCLK_PIN = PB3;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PB0;
+
+static vector <uint8_t> MOTOR_PINS = {PB9, PB7, PB6, PB8};
 
 //static const uint8_t LED_PIN  = PC13; // orange
 static const uint8_t LED_PIN  = PC14; // blue
@@ -71,7 +73,7 @@ void setup(void)
 
     static Mpu6000 imu(RealImu::rotate180, _spi, CS_PIN);
 
-    static MockEsc esc;
+    static DshotEsc esc(&MOTOR_PINS);
 
     static Stm32F411Board board(rx, imu, _pids, _mixer, esc, LED_PIN);
 
