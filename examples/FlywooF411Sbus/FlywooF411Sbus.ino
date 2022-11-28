@@ -61,7 +61,7 @@ void setup(void)
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static Mpu6000 imu(RealImu::rotate180, _spi, CS_PIN);
+    static Mpu6000 imu(RealImu::rotate0Flip, _spi, CS_PIN);
 
     static MockReceiver rx;
     static MockEsc esc;
