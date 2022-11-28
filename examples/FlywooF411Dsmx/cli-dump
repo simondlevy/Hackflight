@@ -1,9 +1,3 @@
-# dump
-###WARNING: NO CUSTOM DEFAULTS FOUND###
-
-# version
-# Betaflight / STM32F411 (S411) 4.2.8 Feb 15 2021 / 12:09:04 (101738d8e) MSP API: 1.43
-###ERROR: dump: NO CONFIG FOUND###
 # start the command batch
 batch start
 

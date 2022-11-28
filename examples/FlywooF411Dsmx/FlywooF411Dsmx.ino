@@ -20,7 +20,7 @@
 #include <hackflight.h>
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <esc/mock.h>
+#include <esc/dshot.h>
 #include <imu/real/softquat/mpu6000.h>
 #include <task/receiver/real/dsmx.h>
 
@@ -32,6 +32,8 @@ static const uint8_t MISO_PIN = PA6;
 static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PB2;
+
+static vector <uint8_t> MOTOR_PINS = {PA8, PB3, PB10, PA15};
 
 static const uint8_t LED_PIN  = PC13;
 
@@ -46,10 +48,14 @@ static AnglePidController _anglePid(
 
 static Stm32F411Board * _board;
 static Mpu6000 * _imu;
-
 static DsmxReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
+
+extern "C" void handleDmaIrq(void)
+{
+    _board->handleDmaIrq(0);
+}
 
 static void handleImuInterrupt(void)
 {
@@ -70,7 +76,7 @@ void setup(void)
 
     static Mpu6000 imu(RealImu::rotate0Flip, _spi, CS_PIN);
 
-    static MockEsc esc;
+    static DshotEsc esc(&MOTOR_PINS);
 
     static Stm32F411Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
 

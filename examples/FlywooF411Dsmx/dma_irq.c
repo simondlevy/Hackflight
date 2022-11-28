@@ -1,6 +1,4 @@
 /*
-   Copyright (c) 2022 Simon D. Levy
-
    This file is part of Hackflight.
 
    Hackflight is free software: you can redistribute it and/or modify it under the
@@ -16,35 +14,11 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <stm32f4xx.h>
 
-//  Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
+void handleDmaIrq(void);
 
-#include <hackflight.h>
-#include <msp/parser.h>
-#include <espnow.h>
-
-#include <esp_now.h>
-
-static const bool UART_INVERTED = false;
-
-static const uint8_t RX_PIN = 4; // unused
-static const uint8_t TX_PIN = 14;
-
-static MspSerializer _serializer;
-
-void setup()
+void DMA2_Stream1_IRQHandler(void) 
 {
-    Serial.begin(115200);
-
-    // Start outgoing serial connection to FC, inverted
-    Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN, UART_INVERTED);
-}
-
-void loop()
-{
-    static uint8_t _count;
-    Serial1.write(_count);
-    _count = (_count + 1) % 256;
-
-    delay(5);
+    handleDmaIrq();
 }

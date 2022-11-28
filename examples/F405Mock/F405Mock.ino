@@ -54,10 +54,14 @@ void setup(void)
 
     _board->begin();
 
-    //Serial4.begin(115200);
+    Serial4.begin(115200);
 }
 
 void loop(void)
 {
     _board->step();
+
+    while (Serial4.available()) {
+        Serial.println(Serial4.read());
+    }
 }
