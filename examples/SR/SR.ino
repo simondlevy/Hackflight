@@ -19,9 +19,13 @@
 
 //  Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
 
+#include <Wire.h>
+
 #include <VL53L5cx.h>
 
-//#include <hackflight.h>
+#include <hackflight.h>
+#include <debugger.h>
+
 //#include <msp/parser.h>
 //#include <espnow.h>
 //#include <esp_now.h>
@@ -33,7 +37,14 @@ static const uint8_t VL53L5_LPN_PIN =  14;
 // Set to 0 for continuous mode
 static const uint8_t VL53L5_INTEGRAL_TIME_MS = 10;
 
-static VL53L5cx _vl53l5(VL53L5_LPN_PIN, VL53L5_INTEGRAL_TIME_MS, VL53L5cx::RES_4X4_HZ_1);
+static VL53L5cx _ranger(VL53L5_LPN_PIN, VL53L5_INTEGRAL_TIME_MS, VL53L5cx::RES_4X4_HZ_1);
+
+static volatile bool _gotRangerInterrupt;
+
+static void rangerInterruptHandler() 
+{
+    _gotRangerInterrupt = true;
+}
 
 
 //static const bool UART_INVERTED = false;
@@ -46,6 +57,18 @@ void setup()
 {
     Serial.begin(115200);
 
+    pinMode(VL53L5_INT_PIN, INPUT);     
+
+    Wire.begin();                
+    Wire.setClock(400000);      
+    delay(1000);
+
+    if (VL53L5_INT_PIN > 0) {
+        attachInterrupt(VL53L5_INT_PIN, rangerInterruptHandler, FALLING);
+    }
+
+    _ranger.begin();
+
     // Start outgoing serial connection to FC, inverted
     //Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN, UART_INVERTED);
 }
@@ -56,5 +79,31 @@ void loop()
     //Serial1.write(_count);
     //_count = (_count + 1) % 256;
 
-    delay(5);
+    if (VL53L5_INT_PIN == 0 || _gotRangerInterrupt) {
+
+        _gotRangerInterrupt = false;
+
+        while (!_ranger.dataIsReady()) {
+            delay(10);
+        }
+
+        _ranger.readData();
+
+        for (auto i=0; i<_ranger.getPixelCount(); i++) {
+
+            // Print per zone results 
+            Debugger::printf("Zone : %2d, Nb targets : %2u, Ambient : %4lu Kcps/spads, ",
+                    i, _ranger.getTargetDetectedCount(i), _ranger.getAmbientPerSpad(i));
+
+            // Print per target results 
+            if (_ranger.getTargetDetectedCount(i) > 0) {
+                Debugger::printf("Target status : %3u, Distance : %4d mm\n",
+                        _ranger.getTargetStatus(i), _ranger.getDistanceMm(i));
+            }
+            else {
+                Debugger::printf("Target status : 255, Distance : No target\n");
+            }
+        }
+        Debugger::printf("\n");
+    } 
 }
