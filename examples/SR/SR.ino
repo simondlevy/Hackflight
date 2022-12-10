@@ -19,32 +19,42 @@
 
 //  Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
 
-#include <hackflight.h>
-#include <msp/parser.h>
-#include <espnow.h>
+#include <VL53L5cx.h>
 
-#include <esp_now.h>
+//#include <hackflight.h>
+//#include <msp/parser.h>
+//#include <espnow.h>
+//#include <esp_now.h>
 
-static const bool UART_INVERTED = false;
 
-static const uint8_t RX_PIN = 4; // unused
-static const uint8_t TX_PIN = 14;
+static const uint8_t VL53L5_INT_PIN = 4; // Set to 0 for polling
+static const uint8_t VL53L5_LPN_PIN =  14;
 
-static MspSerializer _serializer;
+// Set to 0 for continuous mode
+static const uint8_t VL53L5_INTEGRAL_TIME_MS = 10;
+
+static VL53L5cx _vl53l5(VL53L5_LPN_PIN, VL53L5_INTEGRAL_TIME_MS, VL53L5cx::RES_4X4_HZ_1);
+
+
+//static const bool UART_INVERTED = false;
+//static const uint8_t RX_PIN = 4; // unused
+//static const uint8_t TX_PIN = 14;
+
+//static MspSerializer _serializer;
 
 void setup()
 {
     Serial.begin(115200);
 
     // Start outgoing serial connection to FC, inverted
-    Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN, UART_INVERTED);
+    //Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN, UART_INVERTED);
 }
 
 void loop()
 {
-    static uint8_t _count;
-    Serial1.write(_count);
-    _count = (_count + 1) % 256;
+    //static uint8_t _count;
+    //Serial1.write(_count);
+    //_count = (_count + 1) % 256;
 
     delay(5);
 }
