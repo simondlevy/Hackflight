@@ -7,6 +7,7 @@
 */
 
 #include "imu/real/softquat.h"
+#include "spihelp.h"
 
 #include <SPI.h>
 
@@ -68,6 +69,10 @@ class Mpu6000 : public SoftQuatImu {
         // Sample rate = 50Hz    Fsample= 1Khz/(19+1) = 50Hz     
         uint8_t m_sampleRateDivisor;
 
+        SPIClass * m_spi;
+
+        uint8_t m_csPin;
+
         gyroScale_e m_gyroScale;
 
         accelScale_e m_accelScale;
@@ -92,33 +97,6 @@ class Mpu6000 : public SoftQuatImu {
             for (; (clk > freq) && (divisor < 256); divisor <<= 1, clk >>= 1);
 
             return divisor;
-        }
-
-        SPIClass * m_spi;
-
-        uint8_t m_csPin;
-
-        void writeRegister(const uint8_t reg, const uint8_t val)
-        {
-            digitalWrite(m_csPin, LOW);
-            m_spi->transfer(reg);
-            m_spi->transfer(val);
-            digitalWrite(m_csPin, HIGH);
-        }
-
-        void readRegisters(const uint8_t addr, uint8_t * buffer, const uint8_t count)
-        {
-            digitalWrite(m_csPin, LOW);
-            buffer[0] = addr | 0x80;
-            m_spi->transfer(buffer, count);
-            digitalWrite(m_csPin, HIGH);
-        }
-
-        uint8_t readRegister(const uint8_t addr)
-        {
-            uint8_t buffer[2] = {};
-            readRegisters(addr, buffer, 2);
-            return buffer[1];
         }
 
         static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
@@ -151,42 +129,42 @@ class Mpu6000 : public SoftQuatImu {
             pinMode(m_csPin, OUTPUT);
 
             // Chip reset
-            writeRegister(REG_PWR_MGMT_1, BIT_H_RESET);
+            SpiHelper::writeRegister(m_spi, m_csPin, REG_PWR_MGMT_1, BIT_H_RESET);
             delay(100);
 
             // Check ID
-            readRegister(REG_WHO_AM_I);
+            SpiHelper::readRegister(m_spi, m_csPin, REG_WHO_AM_I);
 
             // Clock Source PPL with Z axis gyro reference
-            writeRegister(REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
+            SpiHelper::writeRegister(m_spi, m_csPin, REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
             delayMicroseconds(7);
 
             // Disable Primary I2C Interface
-            writeRegister(REG_USER_CTRL, BIT_I2C_IF_DIS);
+            SpiHelper::writeRegister(m_spi, m_csPin, REG_USER_CTRL, BIT_I2C_IF_DIS);
             delayMicroseconds(15);
 
-            writeRegister(REG_PWR_MGMT_2, 0x00);
+            SpiHelper::writeRegister(m_spi, m_csPin, REG_PWR_MGMT_2, 0x00);
             delayMicroseconds(15);
 
             // Accel Sample Rate 1kHz
             // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-            writeRegister(REG_SMPLRT_DIV, 0);
+            SpiHelper::writeRegister(m_spi, m_csPin, REG_SMPLRT_DIV, 0);
             delayMicroseconds(15);
 
             // Gyro +/- 2000 DPS Full Scale
-            writeRegister(REG_GYRO_CONFIG, m_gyroScale << 3);
+            SpiHelper::writeRegister(m_spi, m_csPin, REG_GYRO_CONFIG, m_gyroScale << 3);
             delayMicroseconds(15);
 
             // Accel +/- 16 G Full Scale
-            writeRegister(REG_ACCEL_CONFIG, m_accelScale << 3);
+            SpiHelper::writeRegister(m_spi, m_csPin, REG_ACCEL_CONFIG, m_accelScale << 3);
             delayMicroseconds(15);
 
             // INT_ANYRD_2CLEAR
-            writeRegister(REG_INT_PIN_CFG, 0x10);
+            SpiHelper::writeRegister(m_spi, m_csPin, REG_INT_PIN_CFG, 0x10);
 
             delayMicroseconds(15);
 
-            writeRegister(REG_INT_ENABLE, BIT_RAW_RDY_EN);
+            SpiHelper::writeRegister(m_spi, m_csPin, REG_INT_ENABLE, BIT_RAW_RDY_EN);
             delayMicroseconds(15);
 
             m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
@@ -195,7 +173,7 @@ class Mpu6000 : public SoftQuatImu {
             m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
             // Accel and Gyro DLPF Setting
-            writeRegister(REG_CONFIG, 0); // no gyro DLPF
+            SpiHelper::writeRegister(m_spi, m_csPin, REG_CONFIG, 0); // no gyro DLPF
             delayMicroseconds(1);
 
             m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
@@ -248,7 +226,7 @@ class Mpu6000 : public SoftQuatImu {
 
         void readGyro(void)
         {
-            readRegisters(REG_GYRO_XOUT_H, m_buffer, 7);
+            SpiHelper::readRegisters(m_spi, m_csPin, REG_GYRO_XOUT_H, m_buffer, 7);
         }
 
 }; // class Mpu6000
