@@ -1,0 +1,11 @@
+[package]
+name = "hackflight"
+version = "0.1.2"
+authors = ["Simon D. Levy<simon.d.levy@gmail.com>"]
+license = "MIT"
+description = "Simple flight-control software for makers in Rust"
+documentation = "https://github.com/simondlevy/Hackflight"
+repository = "https://github.com/simondlevy/Hackflight/rust"
+readme = "README.md"
+
+[dependencies]
