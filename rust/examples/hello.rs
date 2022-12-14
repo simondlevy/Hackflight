@@ -2,10 +2,10 @@ extern crate hackflight;
 
 use std::net::UdpSocket;
 
-//use datatypes::datatypes::Demands;
-//use datatypes::datatypes::Motors;
+use hackflight::datatypes::Demands;
+use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
-//
+
 //use pids::pids::new_controller as new_pid_controller;
 //use hackflight::hackflight::run_hackflight;
 //use mixers::fixedpitch::quadxbf as mixer;
@@ -45,7 +45,7 @@ fn main() -> std::io::Result<()> {
             dpsi:read_float(buf, 12)
         }
     }
-/*
+
     fn read_demands(buf:[u8; IN_BUF_SIZE]) -> Demands {
         Demands {
             throttle:read_float(buf, 13),
@@ -66,7 +66,7 @@ fn main() -> std::io::Result<()> {
         }
         buf
     }
-    */
+
     // We have to bind client socket to some address
     let motor_client_socket = UdpSocket::bind("0.0.0.0:0")?;
 
@@ -86,11 +86,11 @@ fn main() -> std::io::Result<()> {
 
         if time < 0.0 { break Ok(()); }
 
-        /*
         let vehicle_state = read_vehicle_state(in_buf);
 
         let demands = read_demands(in_buf);
 
+        /*
         let (motors, new_pid_controller) =
             run_hackflight(demands, vehicle_state, pid_controller, &mixer::run);
 
