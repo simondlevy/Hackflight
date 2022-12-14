@@ -2,6 +2,11 @@
 name = "hackflight"
 version = "0.1.5"
 edition = "2022"
+license = "MIT"
+description = "Simple flight-control software for makers in Rust"
+documentation = "https://github.com/simondlevy/Hackflight"
+repository = "https://github.com/simondlevy/Hackflight/rust"
+readme = "README.md"
 
 [lib]
 name = "hackflight"
