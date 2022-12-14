@@ -35,9 +35,8 @@ fn main() -> std::io::Result<()> {
         f64::from_le_bytes(dst) as f32
     }
 
-    /*
-    fn read_vehicle_state(buf:[u8; IN_BUF_SIZE]) -> VehicleState {
-        VehicleState {
+    fn read_vehicle_state(buf:[u8; IN_BUF_SIZE]) -> hackflight::datatypes::VehicleState {
+        hackflight::datatypes::VehicleState {
             x:read_float(buf, 1),
             dx:read_float(buf, 2),
             y:read_float(buf, 3),
@@ -52,7 +51,7 @@ fn main() -> std::io::Result<()> {
             dpsi:read_float(buf, 12)
         }
     }
-
+/*
     fn read_demands(buf:[u8; IN_BUF_SIZE]) -> Demands {
         Demands {
             throttle:read_float(buf, 13),
