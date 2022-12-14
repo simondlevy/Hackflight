@@ -1,16 +1,10 @@
 extern crate hackflight;
 
-/*
-fn main() {
-
-    let _motors = hackflight::datatypes::Motors {m1:0.0, m2:0.0, m3:0.0, m4:0.0};
-}*/
-
 use std::net::UdpSocket;
 
 //use datatypes::datatypes::Demands;
 //use datatypes::datatypes::Motors;
-//use datatypes::datatypes::VehicleState;
+use hackflight::datatypes::VehicleState;
 //
 //use pids::pids::new_controller as new_pid_controller;
 //use hackflight::hackflight::run_hackflight;
@@ -35,8 +29,8 @@ fn main() -> std::io::Result<()> {
         f64::from_le_bytes(dst) as f32
     }
 
-    fn read_vehicle_state(buf:[u8; IN_BUF_SIZE]) -> hackflight::datatypes::VehicleState {
-        hackflight::datatypes::VehicleState {
+    fn read_vehicle_state(buf:[u8; IN_BUF_SIZE]) -> VehicleState {
+        VehicleState {
             x:read_float(buf, 1),
             dx:read_float(buf, 2),
             y:read_float(buf, 3),
