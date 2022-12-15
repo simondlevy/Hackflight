@@ -10,12 +10,6 @@ use hackflight::datatypes::VehicleState;
 //use hackflight::hackflight::run_hackflight;
 //use mixers::fixedpitch::quadxbf as mixer;
 
-//pub mod datatypes;
-//pub mod hackflight;
-//pub mod mixers;
-//pub mod pids;
-//pub mod utils;
-
 fn main() -> std::io::Result<()> {
 
     const IN_BUF_SIZE:usize  = 17*8; // 17 doubles in

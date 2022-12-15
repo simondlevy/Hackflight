@@ -1,4 +1,21 @@
+/*
+   Hackflight Rust library
+
+   Copyright (C) 2022 Simon D. Levy
+
+   MIT License
+*/
+
+pub mod utils;
+
 pub mod datatypes {
+
+    use crate::utils::utils;
+
+    pub fn foo(bar : f32) -> f32 {
+        utils::fabs(bar)
+    }
+    
 
     #[derive(Clone)]
     pub struct Demands {
@@ -32,7 +49,20 @@ pub mod datatypes {
         pub m4: f32
     }
 
-    pub fn foo () -> i32 {
-        2
-    }
+/*
+    pub fn run(
+        demands: Demands,
+        vehicle_state: VehicleState, 
+        pid_controller: Controller,
+        mixfun: &dyn Fn(Demands) -> Motors) -> (Motors, Controller) {
+
+        let (demands, new_pid_controller) =
+           run_pids(pid_controller, demands, vehicle_state);
+
+        let new_motors = mixfun(demands.clone());
+        
+        (new_motors, new_pid_controller)
+
+    } // run_hackflight
+*/
 }
