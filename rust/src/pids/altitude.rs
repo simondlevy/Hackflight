@@ -6,6 +6,13 @@
    MIT License
  */
 
+#[derive(Clone)]
+pub struct AltitudePid {
+    pub error_integral:f32,
+    pub in_band:bool,
+    pub target:f32
+}
+
 /*
 use datatypes::datatypes::Demands;
 use datatypes::datatypes::VehicleState;
@@ -13,13 +20,6 @@ use datatypes::datatypes::VehicleState;
 use utils::utils::fabs;
 use utils::utils::constrain;
 use utils::utils::constrain_abs;
-
-#[derive(Clone)]
-pub struct AltitudePid {
-    pub error_integral:f32,
-    pub in_band:bool,
-    pub target:f32
-}
 
 pub fn run(
     demands:Demands,
