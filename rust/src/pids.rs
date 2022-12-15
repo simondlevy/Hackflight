@@ -37,7 +37,7 @@ pub mod pids {
         Controller { alt:alt_pid::new(), yaw:yaw_pid::new(), rate:rate_pid::new() }
     }
 
-    pub fn run_pids(
+    pub fn run(
         controller:Controller,
         demands: Demands,
         vehicle_state: VehicleState) -> (Demands, Controller) {

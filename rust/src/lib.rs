@@ -51,20 +51,18 @@ pub mod datatypes {
         pub m4: f32
     }
 
-/*
     pub fn run(
         demands: Demands,
         vehicle_state: VehicleState, 
-        pid_controller: Controller,
-        mixfun: &dyn Fn(Demands) -> Motors) -> (Motors, Controller) {
+        pid_controller: pids::Controller,
+        mixfun: &dyn Fn(Demands) -> Motors) -> (Motors, pids::Controller) {
 
         let (demands, new_pid_controller) =
-           run_pids(pid_controller, demands, vehicle_state);
+           pids::run(pid_controller, demands, vehicle_state);
 
         let new_motors = mixfun(demands.clone());
         
         (new_motors, new_pid_controller)
 
-    } // run_hackflight
-*/
+    }
 }
