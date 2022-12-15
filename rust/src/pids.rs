@@ -25,7 +25,6 @@ pub mod pids {
     use crate::pids::rate as rate_pid;
     use crate::pids::rate::RatePid;
 
-    /*
     pub struct Controller {
 
         alt: AltitudePid,
@@ -56,6 +55,5 @@ pub mod pids {
 
         (new_demands, new_controller)
     }
-    */
 }
 
