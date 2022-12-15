@@ -7,10 +7,12 @@
 */
 
 pub mod utils;
+pub mod pids;
 
 pub mod datatypes {
 
     use crate::utils::utils;
+    use crate::pids::pids;
 
     pub fn foo(bar : f32) -> f32 {
         utils::fabs(bar)
