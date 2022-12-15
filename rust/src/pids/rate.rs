@@ -11,13 +11,13 @@ use crate::datatypes::VehicleState;
 
 use crate::utils::utils;
 
-#[derive(Clone)]
+#[derive(Copy,Clone)]
 struct AxisPid {
     error_integral: f32,
     previous_error: f32
 }
 
-#[derive(Clone)]
+#[derive(Copy,Clone)]
 pub struct RatePid {
     roll: AxisPid,
     pitch: AxisPid

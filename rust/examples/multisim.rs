@@ -85,10 +85,10 @@ fn main() -> std::io::Result<()> {
 
         let demands = read_demands(in_buf);
 
-        /*
         let (motors, new_pid_controller) =
-            run_hackflight(demands, vehicle_state, pid_controller, run_quad_xbf);
+            run_hackflight(demands, vehicle_state, pid_controller, &run_quad_xbf);
 
+        /*
         pid_controller = new_pid_controller;
 
         let out_buf = write_motors(motors);

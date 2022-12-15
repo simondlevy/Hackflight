@@ -11,7 +11,7 @@ use crate::datatypes::VehicleState;
 
 use crate::utils::utils;
 
-#[derive(Clone)]
+#[derive(Copy,Clone)]
 pub struct YawPid{
     error_integral: f32
 }

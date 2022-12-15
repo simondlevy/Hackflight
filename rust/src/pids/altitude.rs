@@ -10,7 +10,7 @@ use crate::datatypes::Demands;
 use crate::datatypes::VehicleState;
 use crate::utils::utils;
 
-#[derive(Clone)]
+#[derive(Copy,Clone)]
 pub struct AltitudePid {
     pub error_integral:f32,
     pub in_band:bool,
