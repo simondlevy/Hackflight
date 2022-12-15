@@ -41,13 +41,8 @@ pub fn run(
     // Is stick demand in deadband, above a minimum altitude?
     let in_band = utils::fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
-    (demands, pid)
-}
-
-
-/*
-// Zero throttle will reset error integral
-let at_zero_throttle = throttle == 0.0;
+    // Zero throttle will reset error integral
+    let at_zero_throttle = throttle == 0.0;
 
     // Reset altitude target at zero throttle
     let altitude_target = if at_zero_throttle {0.0} else {pid.target};
@@ -65,14 +60,14 @@ let at_zero_throttle = throttle == 0.0;
     let error = target_velocity - climb_rate;
 
     // Compute I term, avoiding windup
-    let new_error_integral = constrain_abs(pid.error_integral + error, WINDUP_MAX);
+    let new_error_integral = utils::constrain_abs(pid.error_integral + error, WINDUP_MAX);
 
     // Run PI controller
     let correction = error * KP + new_error_integral * KI;
 
     // Add correction to throttle, constraining output to [0,1]
     let new_demands = Demands {
-        throttle:constrain(throttle+correction, 0.0, 1.0),
+        throttle:utils::constrain(throttle+correction, 0.0, 1.0),
         roll:demands.roll,
         pitch:demands.pitch,
         yaw:demands.yaw
@@ -95,4 +90,3 @@ fn make(error_integral:f32, in_band:bool, target:f32) -> AltitudePid {
 pub fn new() -> AltitudePid {
     make(0.0, false, 0.0)
 }
-*/
