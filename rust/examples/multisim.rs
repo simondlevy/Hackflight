@@ -88,12 +88,10 @@ fn main() -> std::io::Result<()> {
         let (motors, new_pid_controller) =
             run_hackflight(demands, vehicle_state, pid_controller, &run_quad_xbf);
 
-        /*
         pid_controller = new_pid_controller;
 
         let out_buf = write_motors(motors);
 
         motor_client_socket.send_to(&out_buf, "127.0.0.1:5000")?;
-        */
     }
 }
