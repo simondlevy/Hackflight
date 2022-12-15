@@ -6,9 +6,9 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
-//use pids::pids::new_controller as new_pid_controller;
 use hackflight::datatypes::run_hackflight;
-//use hackflight::mixers::fixedpitch::quadxbf as mixer;
+
+use hackflight::mixers::mixers::run_quad_xbf;
 
 fn main() -> std::io::Result<()> {
 
