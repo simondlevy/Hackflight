@@ -22,11 +22,6 @@ pub fn run(
     vstate:&VehicleState,
     pid: AltitudePid) -> (Demands, AltitudePid) {
 
-        (demands, pid)
-
-}
-
-/*
     const KP: f32 = 0.75;
     const KI: f32 = 1.5;
 
@@ -44,10 +39,15 @@ pub fn run(
     let sthrottle = throttle; // 2.0 * throttle - 1.0; 
 
     // Is stick demand in deadband, above a minimum altitude?
-    let in_band = fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+    let in_band = utils::fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
-    // Zero throttle will reset error integral
-    let at_zero_throttle = throttle == 0.0;
+    (demands, pid)
+}
+
+
+/*
+// Zero throttle will reset error integral
+let at_zero_throttle = throttle == 0.0;
 
     // Reset altitude target at zero throttle
     let altitude_target = if at_zero_throttle {0.0} else {pid.target};
