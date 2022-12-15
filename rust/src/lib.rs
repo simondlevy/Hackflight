@@ -11,13 +11,7 @@ pub mod pids;
 
 pub mod datatypes {
 
-    use crate::utils::utils;
     use crate::pids::pids;
-
-    pub fn foo(bar : f32) -> f32 {
-        utils::fabs(bar)
-    }
-    
 
     #[derive(Clone)]
     pub struct Demands {
@@ -63,6 +57,5 @@ pub mod datatypes {
         let new_motors = mixfun(demands.clone());
         
         (new_motors, new_pid_controller)
-
     }
 }
