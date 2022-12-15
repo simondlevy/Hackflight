@@ -8,6 +8,7 @@
 
 pub mod utils;
 pub mod pids;
+pub mod mixers;
 
 pub mod datatypes {
 
@@ -45,7 +46,7 @@ pub mod datatypes {
         pub m4: f32
     }
 
-    pub fn run(
+    pub fn run_hackflight(
         demands: Demands,
         vehicle_state: VehicleState, 
         pid_controller: pids::Controller,
