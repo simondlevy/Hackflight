@@ -6,6 +6,7 @@
    MIT License
  */
 
+/*
 use datatypes::datatypes::Demands;
 use datatypes::datatypes::VehicleState;
 
@@ -93,3 +94,4 @@ fn make(error_integral:f32, in_band:bool, target:f32) -> AltitudePid {
 pub fn new() -> AltitudePid {
     make(0.0, false, 0.0)
 }
+*/
