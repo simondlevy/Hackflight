@@ -17,14 +17,16 @@ use crate::datatypes::Demands;
 use crate::datatypes::VehicleState;
 use crate::utils::utils;
 
-
-/*
-
 pub fn run(
     demands:Demands,
     vstate:&VehicleState,
     pid: AltitudePid) -> (Demands, AltitudePid) {
 
+        (demands, pid)
+
+}
+
+/*
     const KP: f32 = 0.75;
     const KI: f32 = 1.5;
 
