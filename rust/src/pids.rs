@@ -12,19 +12,20 @@ pub mod yaw;
 
 pub mod pids {
 
+    use crate::datatypes::Demands;
+    use crate::datatypes::VehicleState;
+
+    use crate::pids::altitude as alt_pid;
+
+    use crate::pids::altitude::AltitudePid;
+
+    use crate::pids::yaw as yaw_pid;
+    use crate::pids::yaw::YawPid;
+
+    use crate::pids::rate as rate_pid;
+    use crate::pids::rate::RatePid;
+
     /*
-    use datatypes::datatypes::Demands;
-    use datatypes::datatypes::VehicleState;
-
-    use pids::altitude as alt_pid;
-    use pids::altitude::AltitudePid;
-
-    use pids::yaw as yaw_pid;
-    use pids::yaw::YawPid;
-
-    use pids::rate as rate_pid;
-    use pids::rate::RatePid;
-
     pub struct Controller {
 
         alt: AltitudePid,
