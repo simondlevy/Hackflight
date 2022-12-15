@@ -8,6 +8,7 @@ use hackflight::datatypes::VehicleState;
 
 use hackflight::datatypes::run_hackflight;
 
+use hackflight::pids::pids::new_controller as new_pid_controller;
 use hackflight::mixers::mixers::run_quad_xbf;
 
 fn main() -> std::io::Result<()> {
@@ -67,7 +68,7 @@ fn main() -> std::io::Result<()> {
     // Bind server socket to address,port that client will connect to
     let telemetry_server_socket = UdpSocket::bind("127.0.0.1:5001")?;
 
-    // let mut pid_controller = new_pid_controller();
+    let mut pid_controller = new_pid_controller();
 
     println!("Hit the Play button ...");
 
@@ -86,7 +87,7 @@ fn main() -> std::io::Result<()> {
 
         /*
         let (motors, new_pid_controller) =
-            run_hackflight(demands, vehicle_state, pid_controller, &mixer::run);
+            run_hackflight(demands, vehicle_state, pid_controller, run_quad_xbf);
 
         pid_controller = new_pid_controller;
 
