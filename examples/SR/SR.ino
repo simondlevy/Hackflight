@@ -73,28 +73,6 @@ void setup()
     //Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN, UART_INVERTED);
 }
 
-static void readRanger(void)
-{
-    _ranger.readData();
-
-    for (auto i=0; i<_ranger.getPixelCount(); i++) {
-
-        // Print per zone results 
-        Debugger::printf("Zone : %2d, Nb targets : %2u, Ambient : %4lu Kcps/spads, ",
-                i, _ranger.getTargetDetectedCount(i), _ranger.getAmbientPerSpad(i));
-
-        // Print per target results 
-        if (_ranger.getTargetDetectedCount(i) > 0) {
-            Debugger::printf("Target status : %3u, Distance : %4d mm\n",
-                    _ranger.getTargetStatus(i), _ranger.getDistanceMm(i));
-        }
-        else {
-            Debugger::printf("Target status : 255, Distance : No target\n");
-        }
-    }
-    Debugger::printf("\n");
-}
-
 void loop()
 {
     //static uint8_t _count;
@@ -109,6 +87,10 @@ void loop()
             delay(10);
         }
 
-        readRanger();
+        uint16_t dists[16] = {};
+
+        for (auto i=0; i<16; ++i) {
+            dists[i] = _ranger.getDistanceMm(i);
+        }
     } 
 }
