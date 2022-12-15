@@ -6,12 +6,10 @@
    MIT License
 */
 
-use datatypes::datatypes::Demands;
-use datatypes::datatypes::VehicleState;
+use crate::datatypes::Demands;
+use crate::datatypes::VehicleState;
 
-use utils::utils::fabs;
-use utils::utils::constrain_abs;
-use utils::utils::deg2rad;
+use crate::utils::utils;
 
 #[derive(Clone)]
 pub struct YawPid{
@@ -34,10 +32,10 @@ pub fn run(
 
     // Reset integral on quick angular velocity change
     let error_integral =
-        if fabs(error) > deg2rad(RATE_MAX_DPS) {0.0} else {pid.error_integral};
+        if utils::fabs(error) > utils::deg2rad(RATE_MAX_DPS) {0.0} else {pid.error_integral};
 
     // Constrain integral to avoid windup
-    let bounded_error_integral = constrain_abs(error_integral + error, WINDUP_MAX);
+    let bounded_error_integral = utils::constrain_abs(error_integral + error, WINDUP_MAX);
 
     // Adjust yaw demand based on error
     let new_demands = Demands {

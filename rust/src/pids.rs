@@ -7,10 +7,8 @@
 */
 
 pub mod altitude;
-/*
 pub mod rate;
 pub mod yaw;
-*/
 
 pub mod pids {
 

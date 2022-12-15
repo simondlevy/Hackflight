@@ -6,10 +6,10 @@
    MIT License
 */
 
-use datatypes::datatypes::Demands;
-use datatypes::datatypes::VehicleState;
+use crate::datatypes::Demands;
+use crate::datatypes::VehicleState;
 
-use utils::utils::constrain_abs;
+use crate::utils::utils;
 
 #[derive(Clone)]
 struct AxisPid {
@@ -33,7 +33,7 @@ fn run_axis(demand: f32, angvel: f32, axis_pid: AxisPid) -> (f32, AxisPid) {
 
     let error = demand - angvel;
 
-    let error_integral = constrain_abs(axis_pid.error_integral, WINDUP_MAX);
+    let error_integral = utils::constrain_abs(axis_pid.error_integral, WINDUP_MAX);
 
     let error_derivative = error - axis_pid.previous_error;
 

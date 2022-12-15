@@ -6,16 +6,16 @@
    MIT License
  */
 
+use crate::datatypes::Demands;
+use crate::datatypes::VehicleState;
+use crate::utils::utils;
+
 #[derive(Clone)]
 pub struct AltitudePid {
     pub error_integral:f32,
     pub in_band:bool,
     pub target:f32
 }
-
-use crate::datatypes::Demands;
-use crate::datatypes::VehicleState;
-use crate::utils::utils;
 
 pub fn run(
     demands:Demands,
