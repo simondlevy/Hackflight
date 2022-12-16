@@ -28,5 +28,15 @@ pub mod newpids {
         },
     }
 
+    fn area(shape: &PidController) -> f32 {
+        match shape {
+            PidController::AnglePid { x:_, y:_, s } => {
+                s*s
+            },
+            PidController::AltitudePid { x:_, y:_, r } => {
+                std::f32::consts::PI*r*r
+            },
+        }
+    }
 }
 
