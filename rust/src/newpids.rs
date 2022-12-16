@@ -12,6 +12,7 @@ pub mod newpids {
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
     use crate::utils::utils::constrain_abs;
+    use crate::filters::filters::foo;
 
     #[derive(Debug,Clone)]
     enum PidController {
@@ -238,4 +239,4 @@ pub mod newpids {
         previous_dterm: f32
     }
 
-} // pub mod newpids
+} // mod newpids
