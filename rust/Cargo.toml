@@ -1,11 +1,11 @@
 [package]
 name = "hackflight"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 license = "MIT"
 description = "Simple flight-control software for makers in Rust"
 documentation = "https://github.com/simondlevy/Hackflight"
-repository = "https://github.com/simondlevy/Hackflight/rust"
+repository = "https://github.com/simondlevy/Hackflight/tree/master/rust"
 readme = "README.md"
 
 [lib]
