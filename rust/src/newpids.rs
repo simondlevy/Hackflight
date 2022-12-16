@@ -22,9 +22,9 @@ pub mod newpids {
         },
 
         AltitudePid {
-            x: f32,
-            y: f32,
-            r: f32 
+            in_band_prev: bool,
+            error_integral: f32,
+            altitude_target: f32 
         },
     }
 
@@ -43,9 +43,17 @@ pub mod newpids {
                     sum) 
             },
 
-            PidController::AltitudePid { x, y, r } => {
-                get_alt_hold_demands(x, y, r)
+            PidController::AltitudePid {
+                in_band_prev,  
+                error_integral,
+                altitude_target,
+            } => { 
+                get_alt_hold_demands(
+                    in_band_prev,  
+                    error_integral,
+                    altitude_target) 
             },
+
         }
     }
 
@@ -62,9 +70,9 @@ pub mod newpids {
     }
 
     fn get_alt_hold_demands(
-                    x: &f32,  
-                    y: &f32,
-                    z: &f32) -> Demands  {
+            in_band_prev: &bool,
+            error_integral: &f32,
+            altitude_target: &f32) -> Demands  {
         Demands { 
             throttle : 0.0,
             roll : 0.0,
