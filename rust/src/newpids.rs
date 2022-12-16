@@ -16,8 +16,8 @@ pub mod newpids {
     enum PidController {
 
         AnglePid {
-            dynLpfPreviousQuantizedThrottle: i32,  
-            feedforwardLpfInitialized: bool,
+            dyn_lpf_previous_quantized_throttle: i32,  
+            feedforward_lpf_initialized: bool,
             sum: f32,
         },
 
@@ -28,13 +28,13 @@ pub mod newpids {
         },
     }
 
-    fn getDemands(pid: &PidController) -> f32 {
+    fn get_demands(pid: &PidController) -> f32 {
 
         match pid {
 
             PidController::AnglePid {
-                dynLpfPreviousQuantizedThrottle: _,  
-                feedforwardLpfInitialized: _,
+                dyn_lpf_previous_quantized_throttle: _,  
+                feedforward_lpf_initialized: _,
                 sum: _,
             } => { 0. },
 
