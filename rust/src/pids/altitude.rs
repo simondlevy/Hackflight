@@ -39,7 +39,7 @@ pub fn run(
     let sthrottle = throttle; // 2.0 * throttle - 1.0; 
 
     // Is stick demand in deadband, above a minimum altitude?
-    let in_band = utils::fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+    let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
     // Zero throttle will reset error integral
     let at_zero_throttle = throttle == 0.0;

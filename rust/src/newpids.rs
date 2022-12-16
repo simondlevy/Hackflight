@@ -163,6 +163,22 @@ pub mod newpids {
         in_band_prev: &bool,
         error_integral: &f32,
         altitude_target: &f32) -> Demands  {
+
+        const ALTITUDE_MIN   :f32 = 1.0;
+        const PILOT_VELZ_MAX :f32 = 2.5;
+        const STICK_DEADBAND :f32 = 0.2;
+        const WINDUP_MAX     :f32 = 0.4;
+
+        let altitude = vstate.z;
+        let dz = vstate.dz;
+
+        // [0,1] => [-1,+1]
+        let sthrottle = 2.0 * demands.throttle - 1.0; 
+
+        // Is stick demand in deadband, above a minimum altitude?
+        let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+
+
         Demands { 
             throttle : 0.0,
             roll : 0.0,

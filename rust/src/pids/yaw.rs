@@ -32,7 +32,7 @@ pub fn run(
 
     // Reset integral on quick angular velocity change
     let error_integral =
-        if utils::fabs(error) > utils::deg2rad(RATE_MAX_DPS) {0.0} else {pid.error_integral};
+        if error.abs() > utils::deg2rad(RATE_MAX_DPS) {0.0} else {pid.error_integral};
 
     // Constrain integral to avoid windup
     let bounded_error_integral = utils::constrain_abs(error_integral + error, WINDUP_MAX);
