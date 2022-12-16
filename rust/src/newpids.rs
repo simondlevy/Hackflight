@@ -35,7 +35,7 @@ pub mod newpids {
         },
     }
 
-    fn get_demands(pid: &PidController) -> Demands {
+    fn get_demands(pid: &PidController, usec: &u32) -> Demands {
 
         match pid {
 
@@ -88,7 +88,6 @@ pub mod newpids {
                     feedforward_lpf_initialized: &bool,
                     sum: &f32) -> Demands  {
 
-
         // minimum of 5ms between updates
         const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
 
@@ -96,13 +95,13 @@ pub mod newpids {
 
         // Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
         const ITERM_RELAX_SETPOINT_THRESHOLD: u8 = 40;
-        const ITERM_RELAX_CUTOFF: u8     = 15;
+        const ITERM_RELAX_CUTOFF: u8 = 15;
 
         const DTERM_LPF1_DYN_MIN_HZ: u16 = 75;
         const DTERM_LPF1_DYN_MAX_HZ: u16 = 150;
-        const DTERM_LPF2_HZ: u16         = 150;
+        const DTERM_LPF2_HZ: u16 = 150;
 
-        const YAW_LOWPASS_HZ: u16        = 100;
+        const YAW_LOWPASS_HZ: u16 = 100;
 
         const ITERM_WINDUP_POINT_PERCENT: u8 = 85;        
 
@@ -115,11 +114,11 @@ pub mod newpids {
         const DYN_LPF_CURVE_EXPO: u8 = 5;
 
         // PT2 lowpass input cutoff to peak D around propwash frequencies
-        const D_MIN_RANGE_HZ: f32   = 85.0;  
+        const D_MIN_RANGE_HZ: f32 = 85.0;  
 
         // PT2 lowpass cutoff to smooth the boost effect
         const D_MIN_LOWPASS_HZ: f32 = 35.0;  
-        const D_MIN_GAIN_FACTOR: f32          = 0.00008;
+        const D_MIN_GAIN_FACTOR: f32  = 0.00008;
         const D_MIN_SETPOINT_GAIN_FACTOR: f32 = 0.00008;
 
         const RATE_ACCEL_LIMIT: u16 = 0;
@@ -129,8 +128,8 @@ pub mod newpids {
         const LEVEL_ANGLE_LIMIT: f32 = 45.0;
 
         const OUTPUT_SCALING: f32 = 1000.0;
-        const  LIMIT_YAW: u16  = 400;
-        const  LIMIT: u16      = 500;
+        const  LIMIT_YAW: u16 = 400;
+        const  LIMIT: u16 = 500;
 
         Demands { 
             throttle : 0.0,
