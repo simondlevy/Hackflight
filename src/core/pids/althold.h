@@ -88,8 +88,7 @@ class AltHoldPidController : public PidController {
 
             m_altitudeTarget = gotNewTarget ? altitude : m_altitudeTarget;
 
-            // Target velocity is a setpoint inside deadband, scaled
-            // constant outside
+            // Target velocity is a setpoint inside deadband, scaled constant outside
             const auto targetVelocity = inBand ?
                 m_altitudeTarget - altitude :
                 PILOT_VELZ_MAX * sthrottle;

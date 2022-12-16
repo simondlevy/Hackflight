@@ -182,6 +182,14 @@ pub mod newpids {
         let got_new_target = in_band && !in_band_prev;
         let new_error_integral = if got_new_target || *reset { 0.0 } else { *error_integral };
 
+        let new_in_band_prev = in_band;
+
+        let new_altitude_target = if *reset { 0.0 } else { *altitude_target };
+
+        // Target velocity is a setpoint inside deadband, scaled constant outside
+        let target_velocity = if {in_band } {new_altitude_target - altitude } else { PILOT_VELZ_MAX * sthrottle};
+
+
         Demands { 
             throttle : 0.0,
             roll : 0.0,
