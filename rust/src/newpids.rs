@@ -16,9 +16,9 @@ pub mod newpids {
     enum PidController {
 
         AnglePid {
-            x: f32,
-            y: f32,
-            s: f32 
+            dynLpfPreviousQuantizedThrottle: i32,  
+            feedforwardLpfInitialized: bool,
+            sum: f32,
         },
 
         AltitudePid {
@@ -29,10 +29,15 @@ pub mod newpids {
     }
 
     fn area(shape: &PidController) -> f32 {
+
         match shape {
-            PidController::AnglePid { x:_, y:_, s } => {
-                s*s
-            },
+
+            PidController::AnglePid {
+                dynLpfPreviousQuantizedThrottle: _,  
+                feedforwardLpfInitialized: _,
+                sum: _,
+            } => { 0. },
+
             PidController::AltitudePid { x:_, y:_, r } => {
                 std::f32::consts::PI*r*r
             },
