@@ -195,7 +195,7 @@ pub mod newpids {
         let error = target_velocity - dz;
 
         // Compute I term, avoiding windup
-        let new_new_error_integral = constrain_abs(new_error_integral + error, WINDUP_MAX);
+        let new_error_integral = constrain_abs(new_error_integral + error, WINDUP_MAX);
 
         Demands { 
             throttle : 0.0,
