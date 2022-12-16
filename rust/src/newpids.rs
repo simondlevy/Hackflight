@@ -180,8 +180,7 @@ pub mod newpids {
 
         // Reset controller when moving into deadband above a minimum altitude
         let got_new_target = in_band && !in_band_prev;
-        //m_errorI = gotNewTarget || reset ? 0 : m_errorI;
-
+        let new_error_integral = if got_new_target || *reset { 0.0 } else { *error_integral };
 
         Demands { 
             throttle : 0.0,
