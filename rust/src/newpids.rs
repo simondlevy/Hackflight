@@ -147,6 +147,10 @@ pub mod newpids {
         const  LIMIT_YAW: u16 = 400;
         const  LIMIT: u16 = 500;
 
+        let roll_demand  = rescale(demands.roll);
+        let pitch_demand = rescale(demands.pitch);
+        let yaw_demand   = rescale(demands.yaw);
+
         Demands { 
             throttle : 0.0,
             roll : 0.0,
@@ -189,7 +193,7 @@ pub mod newpids {
 
         // Target velocity is a setpoint inside deadband, scaled constant outside
         let target_velocity =
-            if {in_band } {altitude_target - altitude } else { PILOT_VELZ_MAX * sthrottle};
+            if in_band {altitude_target - altitude } else { PILOT_VELZ_MAX * sthrottle};
 
         // Compute error as scaled target minus actual
         let error = target_velocity - dz;
@@ -203,6 +207,18 @@ pub mod newpids {
             pitch : demands.pitch,
             yaw : demands.yaw
         }
-    }
-}
 
+    } // get_alt_hold_demands
+
+    // [-1,+1] => [-670,+670] with nonlinearity
+    fn rescale(command: f32) -> f32 {
+
+        const CTR: f32 = 0.104;
+
+        let expof = command * command.abs();
+        let angle_rate = command * CTR + (1.0 - CTR) * expof;
+
+        670.0 * angle_rate
+    }
+
+} // pub mod newpids
