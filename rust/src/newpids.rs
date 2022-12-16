@@ -198,10 +198,10 @@ pub mod newpids {
         let error_integral = constrain_abs(error_integral + error, WINDUP_MAX);
 
         Demands { 
-            throttle : 0.0,
-            roll : 0.0,
-            pitch : 0.0,
-            yaw : 0.0
+            throttle : demands.throttle + (error * k_p + error_integral * k_i),
+            roll : demands.roll,
+            pitch : demands.pitch,
+            yaw : demands.yaw
         }
     }
 }
