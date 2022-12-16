@@ -180,22 +180,22 @@ pub mod newpids {
         let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
         // Reset controller when moving into deadband above a minimum altitude
-        let got_new_target = in_band && !in_band_prev;
-        let new_error_integral = if got_new_target || *reset { 0.0 } else { *error_integral };
+        let got_target = in_band && !in_band_prev;
+        let error_integral = if got_target || *reset { 0.0 } else { *error_integral };
 
-        let new_in_band_prev = in_band;
+        let in_band_prev = in_band;
 
-        let new_altitude_target = if *reset { 0.0 } else { *altitude_target };
+        let altitude_target = if *reset { 0.0 } else { *altitude_target };
 
         // Target velocity is a setpoint inside deadband, scaled constant outside
         let target_velocity =
-            if {in_band } {new_altitude_target - altitude } else { PILOT_VELZ_MAX * sthrottle};
+            if {in_band } {altitude_target - altitude } else { PILOT_VELZ_MAX * sthrottle};
 
         // Compute error as scaled target minus actual
         let error = target_velocity - dz;
 
         // Compute I term, avoiding windup
-        let new_error_integral = constrain_abs(new_error_integral + error, WINDUP_MAX);
+        let error_integral = constrain_abs(error_integral + error, WINDUP_MAX);
 
         Demands { 
             throttle : 0.0,
