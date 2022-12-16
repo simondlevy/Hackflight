@@ -41,7 +41,7 @@ and simulators.
 ## Design principles
 
 Hackflight attempts to maintain a simple relationship between
-the code and the elements of the flight-control flow diagram shown below.
+the code and the elements of the flight-control dataflow diagram shown below.
 Boxes represent data, ovals represent functions, and feedback arrows
 represent the need for functions that have state (instance variables); for
 example, the maintenance of an error integral in a PID controller:
