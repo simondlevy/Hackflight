@@ -77,13 +77,15 @@ pub mod newpids {
                 altitude_target,
             } => { 
                 get_alt_hold_demands(
+                    demands,
+                    vstate,
+                    reset,
                     k_p,
                     k_i,
                     in_band_prev,  
                     error_integral,
                     altitude_target) 
             },
-
         }
     }
 
@@ -153,6 +155,9 @@ pub mod newpids {
     }
 
     fn get_alt_hold_demands(
+        demands: &Demands,
+        vstate: &VehicleState,
+        reset: &bool,
         k_p: &f32,
         k_i: &f32,
         in_band_prev: &bool,
