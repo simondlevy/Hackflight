@@ -11,6 +11,7 @@ pub mod newpids {
 
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
+    use crate::utils::utils::constrain_abs;
 
     #[derive(Debug,Clone)]
     enum PidController {
@@ -194,7 +195,7 @@ pub mod newpids {
         let error = target_velocity - dz;
 
         // Compute I term, avoiding windup
-        //m_errorI = constrainAbs(m_errorI + error, WINDUP_MAX);
+        let new_new_error_integral = constrain_abs(new_error_integral + error, WINDUP_MAX);
 
         Demands { 
             throttle : 0.0,
