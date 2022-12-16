@@ -55,6 +55,10 @@ pub mod newpids {
                 sum,
             } => { 
                 get_angle_demands(
+                    d_usec,
+                    demands,
+                    vstate,
+                    reset,
                     k_rate_p,
                     k_rate_i,
                     k_rate_d,
@@ -84,6 +88,10 @@ pub mod newpids {
     }
 
     fn get_angle_demands(
+        d_usec: &u32,
+        demands: &Demands,
+        vstate: &VehicleState,
+        reset: &bool,
         k_rate_p: &f32,
         k_rate_i: &f32,
         k_rate_d: &f32,
