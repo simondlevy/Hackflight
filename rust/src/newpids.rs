@@ -33,15 +33,27 @@ pub mod newpids {
         match pid {
 
             PidController::AnglePid {
-                dyn_lpf_previous_quantized_throttle: _,  
-                feedforward_lpf_initialized: _,
-                sum: _,
-            } => { 0. },
+                dyn_lpf_previous_quantized_throttle,  
+                feedforward_lpf_initialized,
+                sum,
+            } => { 
+                get_angle_demands(
+                    dyn_lpf_previous_quantized_throttle,  
+                    feedforward_lpf_initialized,
+                    sum) 
+            },
 
             PidController::AltitudePid { x:_, y:_, r } => {
                 std::f32::consts::PI*r*r
             },
         }
+    }
+
+    fn get_angle_demands(
+                    dyn_lpf_previous_quantized_throttle: &i32,  
+                    feedforward_lpf_initialized: &bool,
+                    sum: &f32) -> f32  {
+        0.0
     }
 }
 
