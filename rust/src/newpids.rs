@@ -178,6 +178,10 @@ pub mod newpids {
         // Is stick demand in deadband, above a minimum altitude?
         let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
+        // Reset controller when moving into deadband above a minimum altitude
+        let got_new_target = in_band && !in_band_prev;
+        //m_errorI = gotNewTarget || reset ? 0 : m_errorI;
+
 
         Demands { 
             throttle : 0.0,
