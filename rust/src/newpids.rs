@@ -22,6 +22,8 @@ pub mod newpids {
         },
 
         AltitudePid {
+            kp: f32,
+            ki: f32,
             in_band_prev: bool,
             error_integral: f32,
             altitude_target: f32 
@@ -44,11 +46,15 @@ pub mod newpids {
             },
 
             PidController::AltitudePid {
+                kp,
+                ki,
                 in_band_prev,  
                 error_integral,
                 altitude_target,
             } => { 
                 get_alt_hold_demands(
+                    kp,
+                    ki,
                     in_band_prev,  
                     error_integral,
                     altitude_target) 
@@ -70,6 +76,8 @@ pub mod newpids {
     }
 
     fn get_alt_hold_demands(
+            kp: &f32,
+            ki: &f32,
             in_band_prev: &bool,
             error_integral: &f32,
             altitude_target: &f32) -> Demands  {
