@@ -35,7 +35,12 @@ pub mod newpids {
         },
     }
 
-    fn get_demands(pid: &PidController, usec: &u32) -> Demands {
+    fn get_demands(
+        pid: &PidController,
+        d_usec: &u32,
+        demands: &Demands,
+        vstate: &VehicleState,
+        reset: &bool) -> Demands {
 
         match pid {
 
@@ -79,14 +84,14 @@ pub mod newpids {
     }
 
     fn get_angle_demands(
-                    k_rate_p: &f32,
-                    k_rate_i: &f32,
-                    k_rate_d: &f32,
-                    k_rate_f: &f32,
-                    k_level_p: &f32,
-                    dyn_lpf_previous_quantized_throttle: &i32,  
-                    feedforward_lpf_initialized: &bool,
-                    sum: &f32) -> Demands  {
+        k_rate_p: &f32,
+        k_rate_i: &f32,
+        k_rate_d: &f32,
+        k_rate_f: &f32,
+        k_level_p: &f32,
+        dyn_lpf_previous_quantized_throttle: &i32,  
+        feedforward_lpf_initialized: &bool,
+        sum: &f32) -> Demands  {
 
         // minimum of 5ms between updates
         const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
