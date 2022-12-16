@@ -53,8 +53,11 @@ example, the maintenance of an error integral in a PID controller:
 By using header-only C++ classes whenever possible, and avoiding C-style macros and
  [complicated inheritance](https://queue.acm.org/detail.cfm?id=2038036), 
 Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-beckman-dont-fear-the-monad) 
-approach to taming the complexity of flight control.  Check out this
-[example program](https://github.com/simondlevy/Hackflight/blob/master/examples/LadybugDsmx/LadybugDsmx.ino)
+approach to taming the complexity of flight control.  In your ```setup()``` function you
+instantiate a Board subclass, then pass it the objects for your receiver, IMU,
+PID controller list, mixer, ESC, and LED pin number).  In your loop function, you just call 
+the ```step()``` method on the Board object.  Check out this [example
+program](https://github.com/simondlevy/Hackflight/blob/master/examples/BetaFPVF405Sbus/BetaFPVF405Sbus.ino)
 to get an idea of how this approach works.
 
 ## Desktop visualizer app
