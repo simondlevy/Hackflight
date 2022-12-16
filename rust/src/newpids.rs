@@ -151,6 +151,11 @@ pub mod newpids {
         let pitch_demand = rescale(demands.pitch);
         let yaw_demand   = rescale(demands.yaw);
 
+        //let roll = update_cyclic(roll_demand, vstate.phi, vstate.dphi, m_roll);
+
+        //let pitch = update_cyclic(pitch_demand, vstate.theta, vstate.dtheta, m_pitch);
+
+
         Demands { 
             throttle : 0.0,
             roll : 0.0,
@@ -219,6 +224,18 @@ pub mod newpids {
         let angle_rate = command * CTR + (1.0 - CTR) * expof;
 
         670.0 * angle_rate
+    }
+
+    struct Axis {
+
+        previous_setpoint : f32,
+        integral : f32
+    }
+
+    struct CyclicAxis {
+
+        axis: Axis,
+        previous_dterm: f32
     }
 
 } // pub mod newpids
