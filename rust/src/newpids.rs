@@ -90,50 +90,47 @@ pub mod newpids {
 
 
         // minimum of 5ms between updates
-        const DYN_LPF_THROTTLE_UPDATE_DELAY_US : u16 = 5000; 
+        const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
 
-        /*
-        const uint16_t DYN_LPF_THROTTLE_STEPS = 100;
+        const DYN_LPF_THROTTLE_STEPS: u16 = 100;
 
-        // Full iterm suppression in setpoint mode at high-passed setpoint rate
-        // > 40deg/sec
-        constexpr float ITERM_RELAX_SETPOINT_THRESHOLD = 40;
-        const uint8_t   ITERM_RELAX_CUTOFF     = 15;
+        // Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
+        const ITERM_RELAX_SETPOINT_THRESHOLD: u8 = 40;
+        const ITERM_RELAX_CUTOFF: u8     = 15;
 
-        const uint16_t DTERM_LPF1_DYN_MIN_HZ = 75;
-        const uint16_t DTERM_LPF1_DYN_MAX_HZ = 150;
-        const uint16_t DTERM_LPF2_HZ         = 150;
+        const DTERM_LPF1_DYN_MIN_HZ: u16 = 75;
+        const DTERM_LPF1_DYN_MAX_HZ: u16 = 150;
+        const DTERM_LPF2_HZ: u16         = 150;
 
-        const uint16_t YAW_LOWPASS_HZ        = 100;
+        const YAW_LOWPASS_HZ: u16        = 100;
 
-        const uint8_t  ITERM_WINDUP_POINT_PERCENT = 85;        
+        const ITERM_WINDUP_POINT_PERCENT: u8 = 85;        
 
-        const uint8_t D_MIN = 30;
-        const uint8_t D_MIN_GAIN = 37;
-        const uint8_t D_MIN_ADVANCE = 20;
+        const D_MIN: u8 = 30;
+        const D_MIN_GAIN: u8 = 37;
+        const D_MIN_ADVANCE: u8 = 20;
 
-        const uint8_t FEEDFORWARD_MAX_RATE_LIMIT = 90;
+        const FEEDFORWARD_MAX_RATE_LIMIT: u8 = 90;
 
-        const uint8_t DYN_LPF_CURVE_EXPO = 5;
+        const DYN_LPF_CURVE_EXPO: u8 = 5;
 
         // PT2 lowpass input cutoff to peak D around propwash frequencies
-        constexpr float D_MIN_RANGE_HZ   = 85;  
+        const D_MIN_RANGE_HZ: f32   = 85.0;  
 
         // PT2 lowpass cutoff to smooth the boost effect
-        constexpr float D_MIN_LOWPASS_HZ = 35;  
-        constexpr float D_MIN_GAIN_FACTOR          = 0.00008;
-        constexpr float D_MIN_SETPOINT_GAIN_FACTOR = 0.00008f;
+        const D_MIN_LOWPASS_HZ: f32 = 35.0;  
+        const D_MIN_GAIN_FACTOR: f32          = 0.00008;
+        const D_MIN_SETPOINT_GAIN_FACTOR: f32 = 0.00008;
 
-        const uint16_t RATE_ACCEL_LIMIT = 0;
-        const uint16_t YAW_RATE_ACCEL_LIMIT = 0;
-        const uint16_t ITERM_LIMIT = 400;
+        const RATE_ACCEL_LIMIT: u16 = 0;
+        const YAW_RATE_ACCEL_LIMIT: u16 = 0;
+        const ITERM_LIMIT: u16 = 400;
 
-        constexpr float LEVEL_ANGLE_LIMIT = 45;
+        const LEVEL_ANGLE_LIMIT: f32 = 45.0;
 
-        constexpr float OUTPUT_SCALING = 1000;
-        const uint16_t  LIMIT_YAW  = 400;
-        const uint16_t  LIMIT      = 500;
-        */
+        const OUTPUT_SCALING: f32 = 1000.0;
+        const  LIMIT_YAW: u16  = 400;
+        const  LIMIT: u16      = 500;
 
         Demands { 
             throttle : 0.0,
