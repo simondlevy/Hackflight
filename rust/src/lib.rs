@@ -8,6 +8,7 @@
 
 pub mod utils;
 pub mod pids;
+pub mod newpids;
 pub mod mixers;
 
 pub mod datatypes {
