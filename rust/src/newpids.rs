@@ -28,7 +28,7 @@ pub mod newpids {
         },
     }
 
-    fn get_demands(pid: &PidController) -> f32 {
+    fn get_demands(pid: &PidController) -> Demands {
 
         match pid {
 
@@ -43,8 +43,8 @@ pub mod newpids {
                     sum) 
             },
 
-            PidController::AltitudePid { x:_, y:_, r } => {
-                std::f32::consts::PI*r*r
+            PidController::AltitudePid { x, y, r } => {
+                get_alt_hold_demands(x, y, r)
             },
         }
     }
@@ -52,8 +52,25 @@ pub mod newpids {
     fn get_angle_demands(
                     dyn_lpf_previous_quantized_throttle: &i32,  
                     feedforward_lpf_initialized: &bool,
-                    sum: &f32) -> f32  {
-        0.0
+                    sum: &f32) -> Demands  {
+        Demands { 
+            throttle : 0.0,
+            roll : 0.0,
+            pitch : 0.0,
+            yaw : 0.0
+        }
+    }
+
+    fn get_alt_hold_demands(
+                    x: &f32,  
+                    y: &f32,
+                    z: &f32) -> Demands  {
+        Demands { 
+            throttle : 0.0,
+            roll : 0.0,
+            pitch : 0.0,
+            yaw : 0.0
+        }
     }
 }
 
