@@ -466,7 +466,7 @@ class AnglePidController : public PidController {
                     constrainOutput(pitch, LIMIT),
                     -constrainOutput(yaw, LIMIT_YAW));
 
-        } // update
+        } // getDemands
 
 }; // class AnglePidController
 

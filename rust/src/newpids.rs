@@ -28,9 +28,9 @@ pub mod newpids {
         },
     }
 
-    fn area(shape: &PidController) -> f32 {
+    fn getDemands(pid: &PidController) -> f32 {
 
-        match shape {
+        match pid {
 
             PidController::AnglePid {
                 dynLpfPreviousQuantizedThrottle: _,  
