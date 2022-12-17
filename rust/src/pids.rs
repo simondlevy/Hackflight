@@ -29,6 +29,7 @@ pub mod pids {
     use crate::pids::rate::RatePid;
 
     use crate::pids::angle::AnglePid;
+    use crate::pids::angle::makeAnglePid;
     use crate::pids::althold::AltitudeHoldPid;
 
     #[derive(Clone)]
@@ -38,6 +39,19 @@ pub mod pids {
 
         AltitudeHold { ahp : AltitudeHoldPid, },
     }
+
+    pub fn makeAnglePidController( 
+        kRateP: f32,
+        kRateI: f32,
+        kRateD: f32,
+        kRateF: f32,
+        kLevelP: f32) -> PidController {
+
+        PidController::Angle {ap : makeAnglePid(kRateP, kRateI, kRateD, kRateF, kLevelP)}
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
 
     #[derive(Copy,Clone)]
     pub struct Controller {
