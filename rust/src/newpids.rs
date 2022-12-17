@@ -14,21 +14,10 @@ pub mod newpids {
     use crate::utils::utils::constrain_abs;
     use crate::filters::filters;
 
-    // #[derive(Debug,Clone)]
     #[derive(Clone)]
     pub enum PidController {
 
-        Angle {
-            k_rate_p: f32,
-            k_rate_i: f32,
-            k_rate_d: f32,
-            k_rate_f: f32,
-            k_level_p: f32,
-            dyn_lpf_previous_quantized_throttle: i32,  
-            feedforward_lpf_initialized: bool,
-            sum: f32,
-            pterm_yaw_lpf: filters::Pt1
-        },
+        Angle { foo : AnglePid, },
 
         AltitudeHold {
             k_p: f32,
@@ -48,31 +37,8 @@ pub mod newpids {
 
         match pid {
 
-            PidController::Angle {
-                k_rate_p,
-                k_rate_i,
-                k_rate_d,
-                k_rate_f,
-                k_level_p,
-                dyn_lpf_previous_quantized_throttle,  
-                feedforward_lpf_initialized,
-                sum,
-                pterm_yaw_lpf
-            } => { 
-                get_angle_demands(
-                    d_usec,
-                    demands,
-                    vstate,
-                    reset,
-                    k_rate_p,
-                    k_rate_i,
-                    k_rate_d,
-                    k_rate_f,
-                    k_level_p,
-                    dyn_lpf_previous_quantized_throttle,  
-                    feedforward_lpf_initialized,
-                    sum,
-                    pterm_yaw_lpf) 
+            PidController::Angle { foo } => { 
+                get_angle_demands(foo, demands, vstate)
             },
 
             PidController::AltitudeHold {
@@ -97,42 +63,45 @@ pub mod newpids {
 
     // Angle ---------------------------------------------------------------
 
+    #[derive(Clone)]
+    pub struct AnglePid {
+        k_rate_p: f32,
+        k_rate_i: f32,
+        k_rate_d: f32,
+        k_rate_f: f32,
+        k_level_p: f32,
+        dyn_lpf_previous_quantized_throttle: i32,  
+        feedforward_lpf_initialized: bool,
+        sum: f32,
+        pterm_yaw_lpf: filters::Pt1
+    }
+
+
     pub fn makeAnglePid( 
-            k_rate_p: f32,
-            k_rate_i: f32,
-            k_rate_d: f32,
-            k_rate_f: f32,
-            k_level_p: f32) -> PidController {
+        k_rate_p: f32,
+        k_rate_i: f32,
+        k_rate_d: f32,
+        k_rate_f: f32,
+        k_level_p: f32) -> PidController {
 
         const YAW_LOWPASS_HZ: f32 = 100.0;
 
         PidController::Angle {
-            k_rate_p: k_rate_p, 
-            k_rate_i: k_rate_i, 
-            k_rate_d: k_rate_d, 
-            k_rate_f: k_rate_f, 
-            k_level_p: k_level_p, 
-            dyn_lpf_previous_quantized_throttle: 0,
-            feedforward_lpf_initialized: false,
-            sum: 0.0,
-            pterm_yaw_lpf : filters::makePt1(YAW_LOWPASS_HZ)
+            foo : AnglePid {
+                k_rate_p: k_rate_p, 
+                k_rate_i: k_rate_i, 
+                k_rate_d: k_rate_d, 
+                k_rate_f: k_rate_f, 
+                k_level_p: k_level_p, 
+                dyn_lpf_previous_quantized_throttle: 0,
+                feedforward_lpf_initialized: false,
+                sum: 0.0,
+                pterm_yaw_lpf : filters::makePt1(YAW_LOWPASS_HZ)
+            }
         }
     }
- 
-    fn get_angle_demands(
-        d_usec: &u32,
-        demands: &Demands,
-        vstate: &VehicleState,
-        reset: &bool,
-        k_rate_p: &f32,
-        k_rate_i: &f32,
-        k_rate_d: &f32,
-        k_rate_f: &f32,
-        k_level_p: &f32,
-        dyn_lpf_previous_quantized_throttle: &i32,  
-        feedforward_lpf_initialized: &bool,
-        sum: &f32,
-        pterm_yaw_lpf: &filters::Pt1) -> Demands  {
+
+    fn get_angle_demands(pid: &AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
 
         // minimum of 5ms between updates
         const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
