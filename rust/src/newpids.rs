@@ -50,7 +50,7 @@ pub mod newpids {
         kRateI: f32,
         kRateD: f32,
         kRateF: f32,
-        k_level_p: f32,
+        kLevelP: f32,
         roll : CyclicAxis,
         pitch : CyclicAxis,
         dynLpfPreviousQuantizedThrottle: i32,  
@@ -64,7 +64,7 @@ pub mod newpids {
         kRateI: f32,
         kRateD: f32,
         kRateF: f32,
-        k_level_p: f32) -> PidController {
+        kLevelP: f32) -> PidController {
 
         const YAW_LOWPASS_HZ: f32 = 100.0;
 
@@ -74,7 +74,7 @@ pub mod newpids {
                 kRateI: kRateI, 
                 kRateD: kRateD, 
                 kRateF: kRateF, 
-                k_level_p: k_level_p, 
+                kLevelP: kLevelP, 
                 roll: makeCyclicAxis(),
                 pitch: makeCyclicAxis(),
                 dynLpfPreviousQuantizedThrottle: 0,
@@ -208,7 +208,7 @@ pub mod newpids {
         newSetpoint
     }
 
-    fn levelPid(currentSetpoint: f32, currentAngle: f32) -> f32
+    fn levelPid(kLevelP: f32, currentSetpoint: f32, currentAngle: f32) -> f32
     {
         // calculate error angle and limit the angle to the max inclination
         // rcDeflection in [-1.0, 1.0]
@@ -219,7 +219,7 @@ pub mod newpids {
 
         let angleError = angle - (currentAngle / 10.0);
 
-        0.0 // if m_k_level_p > 0  {angleError * m_k_level_p } else {currentSetpoint}
+        if kLevelP > 0.0  {angleError * kLevelP } else {currentSetpoint}
     }
 
 
@@ -236,7 +236,7 @@ pub mod newpids {
         let currentSetpoint =
             if { maxVelocity > 0.0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
 
-         let newSetpoint = levelPid(currentSetpoint, angle);
+         let newSetpoint = levelPid(pid.kLevelP, currentSetpoint, angle);
 
            /*
         // -----calculate error rate
