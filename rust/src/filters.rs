@@ -9,8 +9,6 @@
 
 pub mod filters {
 
-    use std::f32::consts::PI;
-
     // Pt1 --------------------------------------------------------------------
 
     #[derive(Clone,Copy)]
@@ -92,7 +90,7 @@ pub mod filters {
 
     fn computeK(cutoff_correction:f32, f_cut:f32, dt:f32) -> f32 {
 
-        let rc = 1.0 / (2.0 * cutoff_correction * PI * f_cut);
+        let rc = 1.0 / (2.0 * cutoff_correction * std::f32::consts::PI * f_cut);
 
         dt / (rc + dt)
     }
