@@ -19,13 +19,7 @@ pub mod newpids {
 
         Angle { ap : AnglePid, },
 
-        AltitudeHold {
-            k_p: f32,
-            k_i: f32,
-            in_band_prev: bool,
-            error_integral: f32,
-            altitude_target: f32 
-        },
+        AltitudeHold { ahp : AltitudeHoldPid, },
     }
 
     fn get_demands(
@@ -41,23 +35,9 @@ pub mod newpids {
                 get_angle_demands(ap, demands, vstate)
             },
 
-            PidController::AltitudeHold {
-                k_p,
-                k_i,
-                in_band_prev,  
-                error_integral,
-                altitude_target,
-            } => { 
-                get_alt_hold_demands(
-                    demands,
-                    vstate,
-                    reset,
-                    k_p,
-                    k_i,
-                    in_band_prev,  
-                    error_integral,
-                    altitude_target) 
-            },
+            PidController::AltitudeHold { ahp } => {
+                get_altitude_hold_demands(ahp, demands, vstate, reset)
+            }
         }
     }
 
@@ -163,26 +143,34 @@ pub mod newpids {
 
     // AltHoldPid -------------------------------------------------------------
 
+    #[derive(Clone)]
+    pub struct AltitudeHoldPid {
+        k_p : f32,
+        k_i: f32, 
+        in_band_prev: bool,
+        error_integral: f32,
+        altitude_target: f32
+    }
+
     pub fn makeAltitudeHoldPid(k_p: f32, k_i: f32) -> PidController {
 
         PidController::AltitudeHold {
-            k_p: k_p, 
-            k_i: k_i, 
-            in_band_prev: false,
-            error_integral: 0.0,
-            altitude_target: 0.0 
+            ahp : AltitudeHoldPid {
+                k_p: k_p, 
+                k_i: k_i, 
+                in_band_prev: false,
+                error_integral: 0.0,
+                altitude_target: 0.0 
+            }
         }
     }
 
-    fn get_alt_hold_demands(
+    fn get_altitude_hold_demands(
+        pid: &AltitudeHoldPid,
         demands: &Demands,
         vstate: &VehicleState,
-        reset: &bool,
-        k_p: &f32,
-        k_i: &f32,
-        in_band_prev: &bool,
-        error_integral: &f32,
-        altitude_target: &f32) -> Demands  {
+        reset: &bool
+        ) -> Demands  {
 
         const ALTITUDE_MIN   :f32 = 1.0;
         const PILOT_VELZ_MAX :f32 = 2.5;
@@ -199,12 +187,12 @@ pub mod newpids {
         let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
         // Reset controller when moving into deadband above a minimum altitude
-        let got_target = in_band && !in_band_prev;
-        let error_integral = if got_target || *reset { 0.0 } else { *error_integral };
+        let got_target = in_band && !pid.in_band_prev;
+        let error_integral = if got_target || *reset { 0.0 } else { pid.error_integral };
 
         let in_band_prev = in_band;
 
-        let altitude_target = if *reset { 0.0 } else { *altitude_target };
+        let altitude_target = if *reset { 0.0 } else { pid.altitude_target };
 
         // Target velocity is a setpoint inside deadband, scaled constant outside
         let target_velocity =
@@ -217,7 +205,7 @@ pub mod newpids {
         let error_integral = constrain_abs(error_integral + error, WINDUP_MAX);
 
         Demands { 
-            throttle : demands.throttle + (error * k_p + error_integral * k_i),
+            throttle : demands.throttle + (error * pid.k_p + error_integral * pid.k_i),
             roll : demands.roll,
             pitch : demands.pitch,
             yaw : demands.yaw
@@ -253,4 +241,4 @@ pub mod newpids {
         previous_dterm: f32
     }
 
-} // mod newpids
+    } // mod newpids
