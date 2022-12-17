@@ -193,13 +193,13 @@ pub mod newpids {
 
         let currentVelocity = currentSetpoint - axis.previousSetpoint;
 
-        let newSetpoint : f32 = 0.0;
-        /*
-            fabsf(currentVelocity) > maxVelocity ?
-            currentVelocity > 0 ?
-            axis->previousSetpoint + maxVelocity :
-            axis->previousSetpoint - maxVelocity :
-            currentSetpoint;*/
+        let newSetpoint = 
+            if currentVelocity.abs() > maxVelocity 
+            { if currentVelocity > 0.0 
+                 { axis.previousSetpoint + maxVelocity } 
+                 else { axis.previousSetpoint - maxVelocity } 
+            }
+            else { currentSetpoint };
 
         // axis->previousSetpoint = newSetpoint;
 
