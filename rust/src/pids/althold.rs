@@ -30,6 +30,54 @@ pub fn makeAltHoldPid(kP: f32, kI: f32) -> AltHoldPid {
     }
 }
 
+fn getAltHoldDemands(
+    mut pid: &AltHoldPid,
+    demands: &Demands,
+    vstate: &VehicleState,
+    reset: &bool
+    ) -> Demands  {
+
+    const ALTITUDE_MIN   :f32 = 1.0;
+    const PILOT_VELZ_MAX :f32 = 2.5;
+    const STICK_DEADBAND :f32 = 0.2;
+    const WINDUP_MAX     :f32 = 0.4;
+
+    let altitude = vstate.z;
+    let dz = vstate.dz;
+
+    // [0,1] => [-1,+1]
+    let sthrottle = 2.0 * demands.throttle - 1.0; 
+
+    // Is stick demand in deadband, above a minimum altitude?
+    let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+
+    // Reset controller when moving into deadband above a minimum altitude
+    let gotNewTarget = in_band && !pid.inBandPrev;
+    let errorIntegral = if gotNewTarget || *reset { 0.0 } else { pid.errorIntegral };
+
+    let inBandPrev = in_band;
+
+    let altitudeTarget = if *reset { 0.0 } else { pid.altitudeTarget };
+
+    // Target velocity is a setpoint inside deadband, scaled constant outside
+    let target_velocity =
+        if in_band {altitudeTarget - altitude } else { PILOT_VELZ_MAX * sthrottle};
+
+    // Compute error as scaled target minus actual
+    let error = target_velocity - dz;
+
+    // Compute I term, avoiding windup
+    let errorIntegral = utils::constrain_abs(errorIntegral + error, WINDUP_MAX);
+
+    Demands { 
+        throttle : demands.throttle + (error * pid.kP + errorIntegral * pid.kI),
+        roll : demands.roll,
+        pitch : demands.pitch,
+        yaw : demands.yaw
+    }
+
+} // getAltHoldDemands
+
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
