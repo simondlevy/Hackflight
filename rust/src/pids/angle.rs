@@ -46,6 +46,31 @@ pub struct AnglePid {
     ptermYawLpf: filters::Pt1
 }
 
+pub fn makeAnglePid( 
+    kRateP: f32,
+    kRateI: f32,
+    kRateD: f32,
+    kRateF: f32,
+    kLevelP: f32) -> PidController {
+
+    const YAW_LOWPASS_HZ: f32 = 100.0;
+
+    AnglePid {
+        kRateP: kRateP, 
+        kRateI: kRateI, 
+        kRateD: kRateD, 
+        kRateF: kRateF, 
+        kLevelP: kLevelP, 
+        roll: makeCyclicAxis(),
+        pitch: makeCyclicAxis(),
+        dynLpfPreviousQuantizedThrottle: 0,
+        feedforwardLpfInitialized: false,
+        sum: 0.0,
+        ptermYawLpf : filters::makePt1(YAW_LOWPASS_HZ)
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////
 
 #[derive(Copy,Clone)]
 struct AxisPid {
