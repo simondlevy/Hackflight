@@ -216,7 +216,7 @@ pub mod newpids {
     }
 
     fn applyItermRelax(
-        cyclicAxis: &CyclicAxis,
+        mut cyclicAxis: &CyclicAxis,
         iterm: f32,
         currentSetpoint: f32,
         itermErrorRate: f32) -> f32
