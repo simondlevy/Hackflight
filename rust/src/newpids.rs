@@ -11,8 +11,8 @@ pub mod newpids {
 
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
-    use crate::utils::utils::constrain_abs;
-    use crate::filters::filters;
+    use crate::utils::constrain_abs;
+    use crate::filters;
 
     #[derive(Clone)]
     pub enum PidController {
