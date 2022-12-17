@@ -30,7 +30,7 @@ pub fn makeAltHoldPid(kP: f32, kI: f32) -> AltHoldPid {
     }
 }
 
-fn getAltHoldDemands(
+pub fn getAltHoldDemands(
     mut pid: &AltHoldPid,
     demands: &Demands,
     vstate: &VehicleState,

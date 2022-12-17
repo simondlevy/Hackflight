@@ -30,9 +30,11 @@ pub mod pids {
 
     use crate::pids::angle::AnglePid;
     use crate::pids::angle::makeAnglePid;
+    use crate::pids::angle::getAngleDemands;
 
     use crate::pids::althold::AltHoldPid;
     use crate::pids::althold::makeAltHoldPid;
+    use crate::pids::althold::getAltHoldDemands;
 
     #[derive(Clone)]
     pub enum PidController {
@@ -40,6 +42,25 @@ pub mod pids {
         Angle { ap : AnglePid, },
 
         AltHold { ahp : AltHoldPid, },
+    }
+
+    pub fn getDemands(
+        pid: &PidController,
+        dUsec: &u32,
+        demands: &Demands,
+        vstate: &VehicleState,
+        reset: &bool) -> Demands {
+
+        match pid {
+
+            PidController::Angle { ap } => { 
+                getAngleDemands(ap, demands, vstate)
+            },
+
+            PidController::AltHold { ahp } => {
+                getAltHoldDemands(ahp, demands, vstate, reset)
+            }
+        }
     }
 
     pub fn makeAnglePidController( 

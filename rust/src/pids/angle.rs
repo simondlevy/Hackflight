@@ -70,6 +70,15 @@ pub fn makeAnglePid(
     }
 }
 
+pub fn getAngleDemands(
+    mut pid: &AnglePid,
+    demands: &Demands,
+    vstate: &VehicleState,
+    ) -> Demands  {
+
+    Demands {throttle: 0.0, roll: 0.0, pitch: 0.0, yaw: 0.0 }
+}
+
 fn makeCyclicAxis() -> CyclicAxis {
 
     const DTERM_LPF1_DYN_MIN_HZ: f32 = 75.0;
