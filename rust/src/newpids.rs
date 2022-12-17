@@ -8,8 +8,6 @@
 
 pub mod newpids {
 
-    use std::cmp;
-
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
     use crate::utils::constrain_abs;
