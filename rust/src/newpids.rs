@@ -51,6 +51,7 @@ pub mod newpids {
         k_rate_f: f32,
         k_level_p: f32,
         roll : CyclicAxis,
+        pitch : CyclicAxis,
         dyn_lpf_previous_quantized_throttle: i32,  
         feedforward_lpf_initialized: bool,
         sum: f32,
@@ -74,6 +75,7 @@ pub mod newpids {
                 k_rate_f: k_rate_f, 
                 k_level_p: k_level_p, 
                 roll: make_cyclic_axis(),
+                pitch: make_cyclic_axis(),
                 dyn_lpf_previous_quantized_throttle: 0,
                 feedforward_lpf_initialized: false,
                 sum: 0.0,
@@ -146,9 +148,8 @@ pub mod newpids {
 
         let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
-        let roll = update_cyclic(roll_demand, vstate.phi, vstate.dphi, pid.roll.clone(), max_velocity);
-
-        //let pitch = update_cyclic(pitch_demand, vstate.theta, vstate.dtheta, m_pitch);
+        let roll  = update_cyclic(roll_demand,  vstate.phi,   vstate.dphi, pid.roll.clone(), max_velocity);
+        let pitch = update_cyclic(pitch_demand, vstate.theta, vstate.dtheta, pid.pitch.clone(), max_velocity);
 
         Demands { 
             throttle : 0.0,
