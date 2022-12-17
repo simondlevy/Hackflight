@@ -134,7 +134,6 @@ pub mod newpids {
 
         const RATE_ACCEL_LIMIT: f32 = 0.0;
         const YAW_RATE_ACCEL_LIMIT: u16 = 0;
-        const ITERM_LIMIT: u16 = 400;
 
         const OUTPUT_SCALING: f32 = 1000.0;
         const  LIMIT_YAW: u16 = 400;
@@ -250,6 +249,8 @@ pub mod newpids {
         cyclicAxis: &CyclicAxis,
         maxVelocity: f32) -> f32
     {
+        const ITERM_LIMIT: f32 = 400.0;
+
         let axis = cyclicAxis.axis.clone();
 
         let currentSetpoint =
@@ -267,12 +268,11 @@ pub mod newpids {
         // -----calculate P component
         let P = pid.kRateP * errorRate;
 
-        /*
-        // -----calculate I component
-        axis->I =
-        constrain_f(axis->I + (m_kRateI * Clock::DT()) * itermErrorRate,
-        -ITERM_LIMIT, +ITERM_LIMIT);
+        // -----calculate I component XXX need to store in axis
+        let I = constrain_f(axis.integral + (pid.kRateI * DT) * itermErrorRate,
+                           -ITERM_LIMIT, ITERM_LIMIT);
 
+        /*
         // -----calculate D component
         const auto dterm =
         cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
