@@ -11,13 +11,27 @@ use crate::datatypes::VehicleState;
 use crate::utils;
 
 #[derive(Clone)]
-pub struct AltitudeHoldPid {
+pub struct AltHoldPid {
     kP : f32,
     kI: f32, 
     inBandPrev: bool,
     errorIntegral: f32,
     altitudeTarget: f32
 }
+
+pub fn makeAltHoldPid(kP: f32, kI: f32) -> AltHoldPid {
+
+    AltHoldPid {
+        kP: kP, 
+        kI: kI, 
+        inBandPrev: false,
+        errorIntegral: 0.0,
+        altitudeTarget: 0.0 
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////
 
 #[derive(Copy,Clone)]
 pub struct AltitudePid {

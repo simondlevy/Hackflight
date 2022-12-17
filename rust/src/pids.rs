@@ -30,14 +30,16 @@ pub mod pids {
 
     use crate::pids::angle::AnglePid;
     use crate::pids::angle::makeAnglePid;
-    use crate::pids::althold::AltitudeHoldPid;
+
+    use crate::pids::althold::AltHoldPid;
+    use crate::pids::althold::makeAltHoldPid;
 
     #[derive(Clone)]
     pub enum PidController {
 
         Angle { ap : AnglePid, },
 
-        AltitudeHold { ahp : AltitudeHoldPid, },
+        AltitudeHold { ahp : AltHoldPid, },
     }
 
     pub fn makeAnglePidController( 
