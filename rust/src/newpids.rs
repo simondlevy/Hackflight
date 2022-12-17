@@ -262,22 +262,22 @@ pub mod newpids {
 
     #[derive(Clone)]
     pub struct AltitudeHoldPid {
-        k_p : f32,
-        k_i: f32, 
-        in_band_prev: bool,
-        error_integral: f32,
-        altitude_target: f32
+        kP : f32,
+        kI: f32, 
+        inBandPrev: bool,
+        errorIntegral: f32,
+        altitudeTarget: f32
     }
 
-    pub fn makeAltitudeHoldPidController(k_p: f32, k_i: f32) -> PidController {
+    pub fn makeAltitudeHoldPidController(kP: f32, kI: f32) -> PidController {
 
         PidController::AltitudeHold {
             ahp : AltitudeHoldPid {
-                k_p: k_p, 
-                k_i: k_i, 
-                in_band_prev: false,
-                error_integral: 0.0,
-                altitude_target: 0.0 
+                kP: kP, 
+                kI: kI, 
+                inBandPrev: false,
+                errorIntegral: 0.0,
+                altitudeTarget: 0.0 
             }
         }
     }
@@ -304,25 +304,25 @@ pub mod newpids {
         let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
         // Reset controller when moving into deadband above a minimum altitude
-        let got_target = in_band && !pid.in_band_prev;
-        let error_integral = if got_target || *reset { 0.0 } else { pid.error_integral };
+        let got_target = in_band && !pid.inBandPrev;
+        let errorIntegral = if got_target || *reset { 0.0 } else { pid.errorIntegral };
 
-        let in_band_prev = in_band;
+        let inBandPrev = in_band;
 
-        let altitude_target = if *reset { 0.0 } else { pid.altitude_target };
+        let altitudeTarget = if *reset { 0.0 } else { pid.altitudeTarget };
 
         // Target velocity is a setpoint inside deadband, scaled constant outside
         let target_velocity =
-            if in_band {altitude_target - altitude } else { PILOT_VELZ_MAX * sthrottle};
+            if in_band {altitudeTarget - altitude } else { PILOT_VELZ_MAX * sthrottle};
 
         // Compute error as scaled target minus actual
         let error = target_velocity - dz;
 
         // Compute I term, avoiding windup
-        let error_integral = constrain_abs(error_integral + error, WINDUP_MAX);
+        let errorIntegral = constrain_abs(errorIntegral + error, WINDUP_MAX);
 
         Demands { 
-            throttle : demands.throttle + (error * pid.k_p + error_integral * pid.k_i),
+            throttle : demands.throttle + (error * pid.kP + errorIntegral * pid.kI),
             roll : demands.roll,
             pitch : demands.pitch,
             yaw : demands.yaw
