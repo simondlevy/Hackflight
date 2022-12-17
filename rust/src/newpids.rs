@@ -192,9 +192,9 @@ pub mod newpids {
 
     fn update_cyclic(demand: f32, angle: f32, angvel: f32, cyclic_axis: CyclicAxis, max_velocity: f32) -> f32
     {
-        /*
         let axis = cyclic_axis.axis;
 
+        /*
         const auto currentSetpoint = 
             maxVelocity ?
             accelerationLimit(axis, demand, maxVelocity) :
