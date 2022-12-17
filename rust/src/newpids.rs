@@ -8,6 +8,8 @@
 
 pub mod newpids {
 
+    use std::cmp;
+
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
     use crate::utils::constrain_abs;
@@ -116,9 +118,6 @@ pub mod newpids {
 
         const DYN_LPF_THROTTLE_STEPS: u16 = 100;
 
-        // Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
-        const ITERM_RELAX_SETPOINT_THRESHOLD: u8 = 40;
-
         const ITERM_WINDUP_POINT_PERCENT: u8 = 85;        
 
         const D_MIN: u8 = 30;
@@ -223,15 +222,18 @@ pub mod newpids {
         currentSetpoint: f32,
         itermErrorRate: f32) -> f32
     {
+        // Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
+        const ITERM_RELAX_SETPOINT_THRESHOLD: f32 = 40.0;
+
         let (setpointLpf, newWindupLpf) =
             filters::applyPt1(cyclicAxis.windupLpf, currentSetpoint);
 
         let setpointHpf = (currentSetpoint - setpointLpf).abs();
 
-        /*
-        const auto itermRelaxFactor =
-            fmaxf(0, 1 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD);
+        let itermRelaxFactor =
+            (1.0 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD).max(0.0);
 
+        /*
         const auto isDecreasingI =
             ((iterm > 0) && (itermErrorRate < 0)) ||
             ((iterm < 0) && (itermErrorRate > 0));
