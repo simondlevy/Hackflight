@@ -242,7 +242,7 @@ pub mod newpids {
 
 
     fn updateCyclic(
-        pid: &AnglePid,
+        mut pid: &AnglePid,
         demand: f32,
         angle: f32,
         angvel: f32,
