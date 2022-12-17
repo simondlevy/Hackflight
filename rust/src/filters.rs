@@ -46,26 +46,26 @@ pub mod filters {
 
         state: f32,
         state1: f32,
+        k: f32
     }
 
-    pub fn applyPt2(filter: Pt2, f_cut: f32, input: f32, dt: f32) -> (f32, Pt2) {
+    pub fn applyPt2(filter: Pt2, input: f32) -> (f32, Pt2) {
 
-        let k = computeGainPt2(filter, f_cut, dt);
+        let state1 = filter.state1 + filter.k * (input - filter.state1);
+        let state = filter.state + filter.k * (state1 - filter.state);
 
-        let state1 = filter.state1 + k * (input - filter.state1);
-        let state = filter.state + k * (state1 - filter.state);
-
-        (state, Pt2 {state: state, state1: state1})
+        (state, Pt2 {state: state, state1: state1, k: filter.k})
     }
 
-    fn computeGainPt2(filter: Pt2, f_cut: f32, dt: f32) -> f32 {
+    pub fn makePt2(f_cut: f32, dt: f32) -> Pt2 {
 
         let order: f32 = 2.0;
         let two: f32 = 2.0;
         let order_cutoff_correction = 1.0 / (two.powf(1.0 / order) - 1.0).sqrt();
         let rc = 1.0 / (2.0 * order_cutoff_correction * PI * f_cut);
+        let k = dt / (rc + dt);
 
-        dt / (rc + dt)
+        Pt2 {state: 0.0, state1: 0.0, k: k }
     }
 
 } // pub mod filters
