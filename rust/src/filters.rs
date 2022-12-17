@@ -29,18 +29,9 @@ pub mod filters {
 
     pub fn makePt1(f_cut: f32, dt: f32) -> Pt1 {
 
-        let rc = 1.0 / (2.0 * PI * f_cut);
-        let k = dt / (rc + dt);
+        let k = computeK(1.0, f_cut, dt);
 
         Pt1 {state: 0.0, k: k }
-
-    }
-
-    fn computeGainPt1(filter: Pt1, f_cut: f32, dt: f32) -> f32 {
-
-        let rc = 1.0 / (2.0 * PI * f_cut);
-
-        dt / (rc + dt)
     }
 
     // Pt2 --------------------------------------------------------------------
@@ -63,8 +54,8 @@ pub mod filters {
 
     pub fn makePt2(f_cut: f32, dt: f32) -> Pt2 {
 
-        let rc = computeRc(2.0, f_cut);
-        let k = dt / (rc + dt);
+        let cutoff_correction = computeCutoffCorrection(2.0, f_cut);
+        let k = computeK(cutoff_correction, f_cut, dt);
 
         Pt2 {state: 0.0, state1: 0.0, k: k }
     }
@@ -91,28 +82,26 @@ pub mod filters {
 
     pub fn makePt3(f_cut: f32, dt: f32) -> Pt3 {
 
-        let rc = computeRc(3.0, f_cut);
-
-        let k = dt / (rc + dt);
+        let cutoff_correction = computeCutoffCorrection(3.0, f_cut);
+        let k = computeK(cutoff_correction, f_cut, dt);
 
         Pt3 {state: 0.0, state1: 0.0, state2: 0.0, k: k }
     }
 
     // helpers -----------------------------------------------------------------
 
-    fn computeOrderCutoffCorrection(order: f32, f_cut: f32) -> f32 {
+    fn computeK(cutoff_correction:f32, f_cut:f32, dt:f32) -> f32 {
+
+        let rc = 1.0 / (2.0 * cutoff_correction * PI * f_cut);
+
+        dt / (rc + dt)
+    }
+
+    fn computeCutoffCorrection(order: f32, f_cut: f32) -> f32 {
 
         let two: f32 = 2.0;
 
         1.0 / (two.powf(1.0 / order) - 1.0).sqrt()
-    }
-
-    fn computeRc(order: f32, f_cut: f32) -> f32 {
-
-        let two: f32 = 2.0;
-        let order_cutoff_correction = 1.0 / (two.powf(1.0 / order) - 1.0).sqrt();
-
-        1.0 / (2.0 * order_cutoff_correction * PI * f_cut)
     }
 
 } // pub mod filters
