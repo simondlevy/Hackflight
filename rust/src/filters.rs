@@ -9,6 +9,9 @@
 
 // Pt1 --------------------------------------------------------------------
 
+use crate::utils::constrain_abs;
+use crate::utils::DT;
+
 #[derive(Clone,Copy)]
 pub struct Pt1 {
 
@@ -88,7 +91,6 @@ pub fn makePt3(f_cut: f32) -> Pt3 {
 
 fn computeK(cutoff_correction:f32, f_cut:f32) -> f32 {
 
-    const DT: f32 = 100.0; // XXX should come from system clock
     let rc = 1.0 / (2.0 * cutoff_correction * std::f32::consts::PI * f_cut);
 
     DT / (rc + DT)

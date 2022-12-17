@@ -6,6 +6,8 @@
    MIT License
  */
 
+pub const DT: f32 = 100.0;
+
 pub fn constrain(value: f32, lo: f32, hi: f32) -> f32 {
     if value  < lo {lo} else if value > hi {hi} else {value}
 }
