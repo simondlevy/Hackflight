@@ -271,6 +271,10 @@ pub mod newpids {
 
         axis: Axis,
         dtermLpf1 : filters::Pt1,
+        dtermLpf2 : filters::Pt1,
+        dMinLpf: filters::Pt2,
+        dMinRange: filters::Pt2,
+        windupLpf: filters::Pt1,
         previous_dterm: f32
     }
 
