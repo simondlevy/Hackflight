@@ -31,6 +31,14 @@ pub mod pids {
     use crate::pids::angle::AnglePid;
     use crate::pids::althold::AltitudeHoldPid;
 
+    #[derive(Clone)]
+    pub enum PidController {
+
+        Angle { ap : AnglePid, },
+
+        AltitudeHold { ahp : AltitudeHoldPid, },
+    }
+
     #[derive(Copy,Clone)]
     pub struct Controller {
 
