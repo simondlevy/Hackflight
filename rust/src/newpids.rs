@@ -148,10 +148,10 @@ pub mod newpids {
         let maxVelocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
         let roll = 
-            updateCyclic(pid, roll_demand, vstate.phi, vstate.dphi, pid.roll.clone(), maxVelocity);
+            updateCyclic(pid, roll_demand, vstate.phi, vstate.dphi, &pid.roll, maxVelocity);
 
         let pitch = 
-            updateCyclic(pid, pitch_demand, vstate.theta, vstate.dtheta, pid.pitch.clone(), maxVelocity);
+            updateCyclic(pid, pitch_demand, vstate.theta, vstate.dtheta, &pid.pitch, maxVelocity);
 
         Demands { 
             throttle : 0.0,
@@ -172,7 +172,7 @@ pub mod newpids {
         670.0 * angleRate
     }
 
-    #[derive(Clone)]
+    #[derive(Clone,Copy)]
     struct Axis {
 
         previousSetpoint : f32,
@@ -222,16 +222,39 @@ pub mod newpids {
         if kLevelP > 0.0  {angleError * kLevelP } else {currentSetpoint}
     }
 
+    fn applyItermRelax(
+        cyclicAxis: &CyclicAxis,
+        iterm: f32,
+        currentSetpoint: f32,
+        itermErrorRate: f32) -> f32
+    {
+        /*
+        let setpointLpf = cyclicAxis.windupLpf.apply(currentSetpoint);
+
+        const float setpointHpf = fabsf(currentSetpoint - setpointLpf);
+
+        const auto itermRelaxFactor =
+            fmaxf(0, 1 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD);
+
+        const auto isDecreasingI =
+            ((iterm > 0) && (itermErrorRate < 0)) ||
+            ((iterm < 0) && (itermErrorRate > 0));
+
+        return itermErrorRate * (!isDecreasingI ? itermRelaxFactor : 1);
+        */
+        0.0
+    }
+
 
     fn updateCyclic(
         pid: &AnglePid,
         demand: f32,
         angle: f32,
         angvel: f32,
-        cyclicAxis: CyclicAxis,
+        cyclicAxis: &CyclicAxis,
         maxVelocity: f32) -> f32
     {
-        let axis = cyclicAxis.axis;
+        let axis = cyclicAxis.axis.clone();
 
         let currentSetpoint =
             if { maxVelocity > 0.0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
@@ -241,13 +264,9 @@ pub mod newpids {
         // -----calculate error rate
         let errorRate = newSetpoint - angvel;
 
-        /*
-        const auto itermErrorRate = applyItermRelax(
-        cyclicAxis,
-        axis->I,
-        newSetpoint,
-        errorRate);
+        let itermErrorRate = applyItermRelax(cyclicAxis, axis.integral, newSetpoint, errorRate);
 
+        /*
         // -----calculate P component
         const auto P = m_kRateP * errorRate;
 
