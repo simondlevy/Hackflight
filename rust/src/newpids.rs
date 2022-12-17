@@ -12,6 +12,7 @@ pub mod newpids {
     use crate::datatypes::VehicleState;
     use crate::utils::constrain_abs;
     use crate::filters;
+    use crate::utils::DT;
 
     #[derive(Clone)]
     pub enum PidController {
@@ -113,7 +114,7 @@ pub mod newpids {
         const D_MIN_GAIN_FACTOR: f32  = 0.00008;
         const D_MIN_SETPOINT_GAIN_FACTOR: f32 = 0.00008;
 
-        const RATE_ACCEL_LIMIT: u16 = 0;
+        const RATE_ACCEL_LIMIT: f32 = 0.0;
         const YAW_RATE_ACCEL_LIMIT: u16 = 0;
         const ITERM_LIMIT: u16 = 400;
 
@@ -127,10 +128,11 @@ pub mod newpids {
         let pitch_demand = rescale(demands.pitch);
         let yaw_demand   = rescale(demands.yaw);
 
+        let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
+
         // let roll = update_cyclic(roll_demand, vstate.phi, vstate.dphi, m_roll);
 
         //let pitch = update_cyclic(pitch_demand, vstate.theta, vstate.dtheta, m_pitch);
-
 
         Demands { 
             throttle : 0.0,
@@ -167,6 +169,7 @@ pub mod newpids {
         windupLpf: filters::Pt1,
         previous_dterm: f32
     }
+
 
     fn update_cyclic(demand: f32, angle: f32, angvel: f32, cyclic_axes: CyclicAxis) -> f32
     {
