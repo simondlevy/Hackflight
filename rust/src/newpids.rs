@@ -195,17 +195,12 @@ pub mod newpids {
 
         let currentVelocity = currentSetpoint - axis.previousSetpoint;
 
-        let newSetpoint = 
-            if currentVelocity.abs() > maxVelocity 
-            { if currentVelocity > 0.0 
-                { axis.previousSetpoint + maxVelocity } 
-                else { axis.previousSetpoint - maxVelocity } 
-            }
-            else { currentSetpoint };
-
-        // XXX axis.previousSetpoint = newSetpoint;
-
-        newSetpoint
+        if currentVelocity.abs() > maxVelocity 
+        { if currentVelocity > 0.0 
+            { axis.previousSetpoint + maxVelocity } 
+            else { axis.previousSetpoint - maxVelocity } 
+        }
+        else { currentSetpoint }
     }
 
     fn levelPid(kLevelP: f32, currentSetpoint: f32, currentAngle: f32) -> f32
@@ -258,6 +253,8 @@ pub mod newpids {
 
         let currentSetpoint =
             if { maxVelocity > 0.0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
+
+        // XXX axis.previousSetpoint = newSetpoint;
 
         let newSetpoint = levelPid(pid.kLevelP, currentSetpoint, angle);
 
