@@ -270,6 +270,7 @@ pub mod newpids {
     struct CyclicAxis {
 
         axis: Axis,
+        dtermLpf1 : filters::Pt1,
         previous_dterm: f32
     }
 
