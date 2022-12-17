@@ -8,8 +8,16 @@
 
 use crate::datatypes::Demands;
 use crate::datatypes::VehicleState;
-//use crate::utils::utils;
 use crate::utils;
+
+#[derive(Clone)]
+pub struct AltitudeHoldPid {
+    kP : f32,
+    kI: f32, 
+    inBandPrev: bool,
+    errorIntegral: f32,
+    altitudeTarget: f32
+}
 
 #[derive(Copy,Clone)]
 pub struct AltitudePid {
