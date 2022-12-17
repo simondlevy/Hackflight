@@ -74,8 +74,8 @@ pub mod newpids {
                 k_rate_d: k_rate_d, 
                 k_rate_f: k_rate_f, 
                 k_level_p: k_level_p, 
-                roll: make_cyclic_axis(),
-                pitch: make_cyclic_axis(),
+                roll: makeCyclicAxis(),
+                pitch: makeCyclicAxis(),
                 dyn_lpf_previous_quantized_throttle: 0,
                 feedforward_lpf_initialized: false,
                 sum: 0.0,
@@ -84,7 +84,7 @@ pub mod newpids {
         }
     }
 
-    fn make_cyclic_axis() -> CyclicAxis {
+    fn makeCyclicAxis() -> CyclicAxis {
 
         const DTERM_LPF1_DYN_MIN_HZ: f32 = 75.0;
         const DTERM_LPF1_DYN_MAX_HZ: f32 = 150.0;
