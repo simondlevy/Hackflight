@@ -246,7 +246,7 @@ pub mod newpids {
         demand: f32,
         angle: f32,
         angvel: f32,
-        cyclicAxis: &CyclicAxis,
+        mut cyclicAxis: &CyclicAxis,
         maxVelocity: f32) -> f32
     {
         const ITERM_LIMIT: f32 = 400.0;
