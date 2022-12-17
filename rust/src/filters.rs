@@ -7,8 +7,9 @@
 */
 
 
-
 pub mod filters {
+
+    use std::f32::consts::PI;
 
     #[derive(Clone,Copy)]
     pub struct Pt1 {
@@ -29,7 +30,7 @@ pub mod filters {
 
     fn computeGainPt1(filter: Pt1, f_cut: f32) -> f32 {
 
-        let rc = 1.0 / (2.0 * std::f32::consts::PI * f_cut);
+        let rc = 1.0 / (2.0 * PI * f_cut);
 
         filter.dt / (rc + filter.dt)
     }
