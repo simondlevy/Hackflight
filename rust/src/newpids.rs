@@ -147,8 +147,11 @@ pub mod newpids {
 
         let maxVelocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
-        let roll  = updateCyclic(roll_demand,  vstate.phi,   vstate.dphi, pid.roll.clone(), maxVelocity);
-        let pitch = updateCyclic(pitch_demand, vstate.theta, vstate.dtheta, pid.pitch.clone(), maxVelocity);
+        let roll = 
+            updateCyclic(pid, roll_demand, vstate.phi, vstate.dphi, pid.roll.clone(), maxVelocity);
+
+        let pitch = 
+            updateCyclic(pid, pitch_demand, vstate.theta, vstate.dtheta, pid.pitch.clone(), maxVelocity);
 
         Demands { 
             throttle : 0.0,
@@ -216,26 +219,26 @@ pub mod newpids {
 
         let angleError = angle - (currentAngle / 10.0);
 
-        /*
-        return m_k_level_p > 0 ?
-            angleError * m_k_level_p :
-            currentSetpoint;
-            */
-
-        0.0
+        0.0 // if m_k_level_p > 0  {angleError * m_k_level_p } else {currentSetpoint}
     }
 
 
-    fn updateCyclic(demand: f32, angle: f32, angvel: f32, cyclicAxis: CyclicAxis, maxVelocity: f32) -> f32
+    fn updateCyclic(
+        pid: &AnglePid,
+        demand: f32,
+        angle: f32,
+        angvel: f32,
+        cyclicAxis: CyclicAxis,
+        maxVelocity: f32) -> f32
     {
         let axis = cyclicAxis.axis;
 
         let currentSetpoint =
             if { maxVelocity > 0.0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
 
-        /*
-           const auto newSetpoint = levelPid(currentSetpoint, angle);
+         let newSetpoint = levelPid(currentSetpoint, angle);
 
+           /*
         // -----calculate error rate
         const auto errorRate = newSetpoint - angvel;
 
