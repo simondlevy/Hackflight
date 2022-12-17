@@ -12,7 +12,7 @@ pub mod newpids {
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
     use crate::utils::utils::constrain_abs;
-    use crate::filters::filters::foo;
+    use crate::filters::filters;
 
     #[derive(Debug,Clone)]
     enum PidController {
