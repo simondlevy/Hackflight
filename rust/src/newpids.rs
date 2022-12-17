@@ -189,19 +189,19 @@ pub mod newpids {
         previousDterm: f32
     }
 
-    fn accelerationLimit(axis: Axis, currentSetpoint: f32, maxVelocity: f32) -> f32 {
+    fn accelerationLimit(mut axis: Axis, currentSetpoint: f32, maxVelocity: f32) -> f32 {
 
         let currentVelocity = currentSetpoint - axis.previousSetpoint;
 
         let newSetpoint = 
             if currentVelocity.abs() > maxVelocity 
             { if currentVelocity > 0.0 
-                 { axis.previousSetpoint + maxVelocity } 
-                 else { axis.previousSetpoint - maxVelocity } 
+                { axis.previousSetpoint + maxVelocity } 
+                else { axis.previousSetpoint - maxVelocity } 
             }
             else { currentSetpoint };
 
-        // axis->previousSetpoint = newSetpoint;
+        axis.previousSetpoint = newSetpoint;
 
         newSetpoint
     }
