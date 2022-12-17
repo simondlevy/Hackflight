@@ -105,7 +105,7 @@ pub mod newpids {
 
     fn makeAxis() -> Axis {
 
-        Axis { previous_setpoint: 0.0, integral: 0.0 }
+        Axis { previousSetpoint: 0.0, integral: 0.0 }
     }
 
     fn getAngleDemands(pid: &AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
@@ -146,10 +146,10 @@ pub mod newpids {
         let pitch_demand = rescale(demands.pitch);
         let yaw_demand   = rescale(demands.yaw);
 
-        let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
+        let maxVelocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
-        let roll  = updateCyclic(roll_demand,  vstate.phi,   vstate.dphi, pid.roll.clone(), max_velocity);
-        let pitch = updateCyclic(pitch_demand, vstate.theta, vstate.dtheta, pid.pitch.clone(), max_velocity);
+        let roll  = updateCyclic(roll_demand,  vstate.phi,   vstate.dphi, pid.roll.clone(), maxVelocity);
+        let pitch = updateCyclic(pitch_demand, vstate.theta, vstate.dtheta, pid.pitch.clone(), maxVelocity);
 
         Demands { 
             throttle : 0.0,
@@ -173,7 +173,7 @@ pub mod newpids {
     #[derive(Clone)]
     struct Axis {
 
-        previous_setpoint : f32,
+        previousSetpoint : f32,
         integral : f32
     }
 
@@ -189,33 +189,32 @@ pub mod newpids {
         previousDterm: f32
     }
 
-    /*
-    fn accelerationLimit(Axis &axis, current_setpoint: f32, max_velocity: f32) -> f32 {
+    fn accelerationLimit(axis: Axis, currentSetpoint: f32, maxVelocity: f32) -> f32 {
 
-        const float current_velocity = current_setpoint - axis->previousSetpoint;
+        let currentVelocity = currentSetpoint - axis.previousSetpoint;
 
-        const float newSetpoint = 
-            fabsf(current_velocity) > maxVelocity ?
-            current_velocity > 0 ?
+        let newSetpoint : f32 = 0.0;
+        /*
+            fabsf(currentVelocity) > maxVelocity ?
+            currentVelocity > 0 ?
             axis->previousSetpoint + maxVelocity :
             axis->previousSetpoint - maxVelocity :
-            current_setpoint;
+            currentSetpoint;*/
 
-        axis->previousSetpoint = newSetpoint;
+        // axis->previousSetpoint = newSetpoint;
 
-        return newSetpoint;
-    }*/
+        newSetpoint
+    }
 
-
-    fn updateCyclic(demand: f32, angle: f32, angvel: f32, cyclicAxis: CyclicAxis, max_velocity: f32) -> f32
+    fn updateCyclic(demand: f32, angle: f32, angvel: f32, cyclicAxis: CyclicAxis, maxVelocity: f32) -> f32
     {
         let axis = cyclicAxis.axis;
 
-        /*
-        let current_setpoint =
-            if { max_velocity > 0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
+        let currentSetpoint =
+            if { maxVelocity > 0.0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
 
-           const auto newSetpoint = levelPid(current_setpoint, angle);
+        /*
+        const auto newSetpoint = levelPid(currentSetpoint, angle);
 
         // -----calculate error rate
         const auto errorRate = newSetpoint - angvel;
