@@ -39,7 +39,7 @@ pub mod pids {
 
         Angle { ap : AnglePid, },
 
-        AltitudeHold { ahp : AltHoldPid, },
+        AltHold { ahp : AltHoldPid, },
     }
 
     pub fn makeAnglePidController( 
@@ -50,6 +50,11 @@ pub mod pids {
         kLevelP: f32) -> PidController {
 
         PidController::Angle {ap : makeAnglePid(kRateP, kRateI, kRateD, kRateF, kLevelP)}
+    }
+
+    pub fn makeAltHoldPidController(kP: f32, kI: f32) -> PidController {
+
+        PidController::AltHold {ahp : makeAltHoldPid(kP, kI)}
     }
 
 
