@@ -15,9 +15,9 @@ pub mod newpids {
     use crate::filters::filters;
 
     #[derive(Debug,Clone)]
-    enum PidController {
+    pub enum PidController {
 
-        AnglePid {
+        Angle {
             k_rate_p: f32,
             k_rate_i: f32,
             k_rate_d: f32,
@@ -28,7 +28,7 @@ pub mod newpids {
             sum: f32,
         },
 
-        AltitudePid {
+        AltitudeHold {
             k_p: f32,
             k_i: f32,
             in_band_prev: bool,
@@ -46,7 +46,7 @@ pub mod newpids {
 
         match pid {
 
-            PidController::AnglePid {
+            PidController::Angle {
                 k_rate_p,
                 k_rate_i,
                 k_rate_d,
@@ -71,7 +71,7 @@ pub mod newpids {
                     sum) 
             },
 
-            PidController::AltitudePid {
+            PidController::AltitudeHold {
                 k_p,
                 k_i,
                 in_band_prev,  
@@ -91,6 +91,27 @@ pub mod newpids {
         }
     }
 
+    // Angle ---------------------------------------------------------------
+
+    pub fn makeAnglePid( 
+            k_rate_p: f32,
+            k_rate_i: f32,
+            k_rate_d: f32,
+            k_rate_f: f32,
+            k_level_p: f32) -> PidController {
+
+        PidController::Angle {
+            k_rate_p: k_rate_p, 
+            k_rate_i: k_rate_i, 
+            k_rate_d: k_rate_d, 
+            k_rate_f: k_rate_f, 
+            k_level_p: k_level_p, 
+            dyn_lpf_previous_quantized_throttle: 0,
+            feedforward_lpf_initialized: false,
+            sum: 0.0 
+        }
+    }
+ 
     fn get_angle_demands(
         d_usec: &u32,
         demands: &Demands,
@@ -164,6 +185,8 @@ pub mod newpids {
             yaw : 0.0
         }
     }
+
+    // AltHoldPid -------------------------------------------------------------
 
     fn get_alt_hold_demands(
         demands: &Demands,
