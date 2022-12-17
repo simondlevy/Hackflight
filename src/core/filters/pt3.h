@@ -54,8 +54,7 @@ class Pt3Filter {
         void computeGain(const float f_cut)
         {
             const float order = 3.0f;
-            const float orderCutoffCorrection =
-                1 / sqrtf(powf(2, 1.0f / order) - 1);
+            const float orderCutoffCorrection = 1 / sqrtf(powf(2, 1.0f / order) - 1);
             float rc = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
             // float rc = 1 / (2 * 1.961459177f * M_PI * f_cut);
             // where 1.961459177 = 1 / sqrt( (2^(1 / order) - 1) ) and order is 3
