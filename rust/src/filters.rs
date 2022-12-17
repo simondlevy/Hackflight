@@ -63,10 +63,7 @@ pub mod filters {
 
     pub fn makePt2(f_cut: f32, dt: f32) -> Pt2 {
 
-        let order: f32 = 2.0;
-        let two: f32 = 2.0;
-        let order_cutoff_correction = 1.0 / (two.powf(1.0 / order) - 1.0).sqrt();
-        let rc = 1.0 / (2.0 * order_cutoff_correction * PI * f_cut);
+        let rc = computeRc(2.0, f_cut);
         let k = dt / (rc + dt);
 
         Pt2 {state: 0.0, state1: 0.0, k: k }
