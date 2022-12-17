@@ -236,12 +236,12 @@ pub mod newpids {
         let currentSetpoint =
             if { maxVelocity > 0.0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
 
-         let newSetpoint = levelPid(pid.kLevelP, currentSetpoint, angle);
+        let newSetpoint = levelPid(pid.kLevelP, currentSetpoint, angle);
 
-           /*
         // -----calculate error rate
-        const auto errorRate = newSetpoint - angvel;
+        let errorRate = newSetpoint - angvel;
 
+        /*
         const auto itermErrorRate = applyItermRelax(
         cyclicAxis,
         axis->I,
@@ -348,7 +348,7 @@ pub mod newpids {
             roll : demands.roll,
             pitch : demands.pitch,
             yaw : demands.yaw
-        }
+            }
 
     } // getAltitudeHoldDemands
 
