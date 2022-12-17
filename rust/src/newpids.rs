@@ -24,7 +24,7 @@ pub mod newpids {
 
     fn getDemands(
         pid: &PidController,
-        d_usec: &u32,
+        dUsec: &u32,
         demands: &Demands,
         vstate: &VehicleState,
         reset: &bool) -> Demands {
@@ -45,41 +45,41 @@ pub mod newpids {
 
     #[derive(Clone)]
     pub struct AnglePid {
-        k_rate_p: f32,
-        k_rate_i: f32,
-        k_rate_d: f32,
-        k_rate_f: f32,
+        kRateP: f32,
+        kRateI: f32,
+        kRateD: f32,
+        kRateF: f32,
         k_level_p: f32,
         roll : CyclicAxis,
         pitch : CyclicAxis,
-        dyn_lpf_previous_quantized_throttle: i32,  
-        feedforward_lpf_initialized: bool,
+        dynLpfPreviousQuantizedThrottle: i32,  
+        feedforwardLpfInitialized: bool,
         sum: f32,
-        pterm_yaw_lpf: filters::Pt1
+        ptermYawLpf: filters::Pt1
     }
 
     pub fn makeAnglePidController( 
-        k_rate_p: f32,
-        k_rate_i: f32,
-        k_rate_d: f32,
-        k_rate_f: f32,
+        kRateP: f32,
+        kRateI: f32,
+        kRateD: f32,
+        kRateF: f32,
         k_level_p: f32) -> PidController {
 
         const YAW_LOWPASS_HZ: f32 = 100.0;
 
         PidController::Angle {
             ap : AnglePid {
-                k_rate_p: k_rate_p, 
-                k_rate_i: k_rate_i, 
-                k_rate_d: k_rate_d, 
-                k_rate_f: k_rate_f, 
+                kRateP: kRateP, 
+                kRateI: kRateI, 
+                kRateD: kRateD, 
+                kRateF: kRateF, 
                 k_level_p: k_level_p, 
                 roll: makeCyclicAxis(),
                 pitch: makeCyclicAxis(),
-                dyn_lpf_previous_quantized_throttle: 0,
-                feedforward_lpf_initialized: false,
+                dynLpfPreviousQuantizedThrottle: 0,
+                feedforwardLpfInitialized: false,
                 sum: 0.0,
-                pterm_yaw_lpf : filters::makePt1(YAW_LOWPASS_HZ)
+                ptermYawLpf : filters::makePt1(YAW_LOWPASS_HZ)
             }
         }
     }
@@ -100,7 +100,7 @@ pub mod newpids {
             dMinLpf: filters::makePt2(D_MIN_LOWPASS_HZ),
             dMinRange: filters::makePt2(D_MIN_RANGE_HZ),
             windupLpf: filters::makePt1(ITERM_RELAX_CUTOFF),
-            previous_dterm: 0.0 }
+            previousDterm: 0.0 }
     }
 
     fn makeAxis() -> Axis {
@@ -165,9 +165,9 @@ pub mod newpids {
         const CTR: f32 = 0.104;
 
         let expof = command * command.abs();
-        let angle_rate = command * CTR + (1.0 - CTR) * expof;
+        let angleRate = command * CTR + (1.0 - CTR) * expof;
 
-        670.0 * angle_rate
+        670.0 * angleRate
     }
 
     #[derive(Clone)]
@@ -186,57 +186,72 @@ pub mod newpids {
         dMinLpf: filters::Pt2,
         dMinRange: filters::Pt2,
         windupLpf: filters::Pt1,
-        previous_dterm: f32
+        previousDterm: f32
     }
 
+    /*
+    fn accelerationLimit(Axis &axis, current_setpoint: f32, max_velocity: f32) -> f32 {
 
-    fn updateCyclic(demand: f32, angle: f32, angvel: f32, cyclic_axis: CyclicAxis, max_velocity: f32) -> f32
+        const float current_velocity = current_setpoint - axis->previousSetpoint;
+
+        const float newSetpoint = 
+            fabsf(current_velocity) > maxVelocity ?
+            current_velocity > 0 ?
+            axis->previousSetpoint + maxVelocity :
+            axis->previousSetpoint - maxVelocity :
+            current_setpoint;
+
+        axis->previousSetpoint = newSetpoint;
+
+        return newSetpoint;
+    }*/
+
+
+    fn updateCyclic(demand: f32, angle: f32, angvel: f32, cyclicAxis: CyclicAxis, max_velocity: f32) -> f32
     {
-        let axis = cyclic_axis.axis;
+        let axis = cyclicAxis.axis;
 
         /*
-        const auto currentSetpoint = 
-            maxVelocity ?
-            accelerationLimit(axis, demand, maxVelocity) :
-            demand;
+        let current_setpoint =
+            if { max_velocity > 0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
 
-        const auto newSetpoint = levelPid(currentSetpoint, angle);
+           const auto newSetpoint = levelPid(current_setpoint, angle);
 
         // -----calculate error rate
         const auto errorRate = newSetpoint - angvel;
 
         const auto itermErrorRate = applyItermRelax(
-            cyclicAxis,
-            axis->I,
-            newSetpoint,
-            errorRate);
+        cyclicAxis,
+        axis->I,
+        newSetpoint,
+        errorRate);
 
         // -----calculate P component
-        const auto P = m_k_rate_p * errorRate;
+        const auto P = m_kRateP * errorRate;
 
         // -----calculate I component
         axis->I =
-            constrain_f(axis->I + (m_k_rate_i * Clock::DT()) * itermErrorRate,
-            -ITERM_LIMIT, +ITERM_LIMIT);
+        constrain_f(axis->I + (m_kRateI * Clock::DT()) * itermErrorRate,
+        -ITERM_LIMIT, +ITERM_LIMIT);
 
         // -----calculate D component
         const auto dterm =
-            cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
+        cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
         const auto D =
-            m_k_rate_d > 0 ?
-            computeDerivative(cyclicAxis, 0, dterm) :
-            0;
+        m_kRateD > 0 ?
+        computeDerivative(cyclicAxis, 0, dterm) :
+        0;
 
         cyclicAxis.previousDterm = dterm;
 
         // -----calculate feedforward component
         const auto F =
-            m_k_rate_f > 0 ?
-            computeFeedforward(newSetpoint, 670, 0) :
-            0;
+        m_kRateF > 0 ?
+        computeFeedforward(newSetpoint, 670, 0) :
+        0;
 
         return P + axis->I + D + F;
-        */
+         */
 
         0.0
 
