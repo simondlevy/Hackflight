@@ -10,6 +10,7 @@
 pub mod filters {
 
     use std::f32::consts::PI;
+    //use std::f32::sqrt;
 
     #[derive(Clone,Copy)]
     pub struct Pt1 {
@@ -53,7 +54,8 @@ pub mod filters {
     fn computeGainPt2(filter: Pt2, f_cut: f32, dt: f32) -> f32 {
 
         let order: f32 = 2.0;
-        let order_cutoff_correction: f32 = 1.0; //1 / sqrt(pow(2.0, 1.0 / order) - 1);
+        let two: f32 = 2.0;
+        let order_cutoff_correction = 1.0 / (two.powf(1.0 / order) - 1.0).sqrt();
         let rc = 1.0 / (2.0 * order_cutoff_correction * PI * f_cut);
 
         dt / (rc + dt)

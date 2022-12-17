@@ -53,8 +53,7 @@ class Pt2Filter {
         void computeGain(const float f_cut)
         {
             const float order = 2.0f;
-            const float orderCutoffCorrection =
-                1 / sqrtf(powf(2, 1.0f / order) - 1);
+            const float orderCutoffCorrection = 1 / sqrtf(powf(2, 1.0f / order) - 1);
             float rc = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
             m_k = m_dt / (rc + m_dt);
          }
