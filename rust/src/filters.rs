@@ -18,11 +18,9 @@ pub mod filters {
         k: f32
     }
 
-    pub fn applyPt1(filter: Pt1, f_cut: f32, input: f32, dt: f32) -> (f32, Pt1) {
+    pub fn applyPt1(filter: Pt1, input: f32) -> (f32, Pt1) {
 
-        let k = computeGainPt1(filter, f_cut, dt);
-
-        let state = filter.state + k * (input - filter.state);
+        let state = filter.state + filter.k * (input - filter.state);
 
         (state, Pt1 {state: state, k: filter.k})
     }
