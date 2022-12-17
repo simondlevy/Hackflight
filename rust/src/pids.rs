@@ -11,6 +11,7 @@ pub mod rate;
 pub mod yaw;
 
 pub mod angle;
+pub mod althold;
 
 pub mod pids {
 
