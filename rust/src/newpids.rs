@@ -13,6 +13,7 @@ pub mod newpids {
     use crate::utils::constrain_abs;
     use crate::filters;
     use crate::utils::DT;
+    use crate::utils::constrain_f;
 
     #[derive(Clone)]
     pub enum PidController {
@@ -136,8 +137,6 @@ pub mod newpids {
         const YAW_RATE_ACCEL_LIMIT: u16 = 0;
         const ITERM_LIMIT: u16 = 400;
 
-        const LEVEL_ANGLE_LIMIT: f32 = 45.0;
-
         const OUTPUT_SCALING: f32 = 1000.0;
         const  LIMIT_YAW: u16 = 400;
         const  LIMIT: u16 = 500;
@@ -211,10 +210,11 @@ pub mod newpids {
         // calculate error angle and limit the angle to the max inclination
         // rcDeflection in [-1.0, 1.0]
 
-        /*
-        const auto angle = constrain_f(LEVEL_ANGLE_LIMIT * currentSetpoint,
-            -LEVEL_ANGLE_LIMIT, +LEVEL_ANGLE_LIMIT);
+        const LEVEL_ANGLE_LIMIT: f32 = 45.0;
 
+        let angle = constrain_f(LEVEL_ANGLE_LIMIT * currentSetpoint, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
+
+        /*
         const auto angleError = angle - (currentAngle / 10);
 
         return m_k_level_p > 0 ?
