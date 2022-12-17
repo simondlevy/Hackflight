@@ -169,6 +169,61 @@ pub mod newpids {
         previous_dterm: f32
     }
 
+    fn update_cyclic(demand: f32, angle: f32, angvel: f32, cyclic_axes: CyclicAxis) -> f32
+    {
+        0.0
+
+        /*
+        const auto maxVelocity = MAX_VELOCITY_CYCLIC();
+
+        axis_t * axis = &cyclicAxis.axis;
+
+        const auto currentSetpoint = 
+            maxVelocity ?
+            accelerationLimit(axis, demand, maxVelocity) :
+            demand;
+
+        const auto newSetpoint = levelPid(currentSetpoint, angle);
+
+        // -----calculate error rate
+        const auto errorRate = newSetpoint - angvel;
+
+        const auto itermErrorRate = applyItermRelax(
+            cyclicAxis,
+            axis->I,
+            newSetpoint,
+            errorRate);
+
+        // -----calculate P component
+        const auto P = m_k_rate_p * errorRate;
+
+        // -----calculate I component
+        axis->I =
+            constrain_f(axis->I + (m_k_rate_i * Clock::DT()) * itermErrorRate,
+            -ITERM_LIMIT, +ITERM_LIMIT);
+
+        // -----calculate D component
+        const auto dterm =
+            cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
+        const auto D =
+            m_k_rate_d > 0 ?
+            computeDerivative(cyclicAxis, 0, dterm) :
+            0;
+
+        cyclicAxis.previousDterm = dterm;
+
+        // -----calculate feedforward component
+        const auto F =
+            m_k_rate_f > 0 ?
+            computeFeedforward(newSetpoint, 670, 0) :
+            0;
+
+        return P + axis->I + D + F;
+        */
+
+    } // update_cyclic
+
+
     // AltHoldPid -------------------------------------------------------------
 
     #[derive(Clone)]
@@ -198,7 +253,7 @@ pub mod newpids {
         demands: &Demands,
         vstate: &VehicleState,
         reset: &bool
-        ) -> Demands  {
+    ) -> Demands  {
 
         const ALTITUDE_MIN   :f32 = 1.0;
         const PILOT_VELZ_MAX :f32 = 2.5;
