@@ -10,12 +10,12 @@
 pub mod filters {
 
     use std::f32::consts::PI;
-    //use std::f32::sqrt;
 
     #[derive(Clone,Copy)]
     pub struct Pt1 {
 
         state: f32,
+        k: f32
     }
 
     pub fn applyPt1(filter: Pt1, f_cut: f32, input: f32, dt: f32) -> (f32, Pt1) {
@@ -24,7 +24,16 @@ pub mod filters {
 
         let state = filter.state + k * (input - filter.state);
 
-        (state, Pt1 {state: state})
+        (state, Pt1 {state: state, k: filter.k})
+    }
+
+    pub fn makePt1(f_cut: f32, dt: f32) -> Pt1 {
+
+        let rc = 1.0 / (2.0 * PI * f_cut);
+        let k = dt / (rc + dt);
+
+        Pt1 {state: 0.0, k: k }
+
     }
 
     fn computeGainPt1(filter: Pt1, f_cut: f32, dt: f32) -> f32 {
