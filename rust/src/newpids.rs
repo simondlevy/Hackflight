@@ -206,6 +206,26 @@ pub mod newpids {
         newSetpoint
     }
 
+    fn levelPid(currentSetpoint: f32, currentAngle: f32) -> f32
+    {
+        // calculate error angle and limit the angle to the max inclination
+        // rcDeflection in [-1.0, 1.0]
+
+        /*
+        const auto angle = constrain_f(LEVEL_ANGLE_LIMIT * currentSetpoint,
+            -LEVEL_ANGLE_LIMIT, +LEVEL_ANGLE_LIMIT);
+
+        const auto angleError = angle - (currentAngle / 10);
+
+        return m_k_level_p > 0 ?
+            angleError * m_k_level_p :
+            currentSetpoint;
+            */
+
+        0.0
+    }
+
+
     fn updateCyclic(demand: f32, angle: f32, angvel: f32, cyclicAxis: CyclicAxis, maxVelocity: f32) -> f32
     {
         let axis = cyclicAxis.axis;
@@ -214,7 +234,7 @@ pub mod newpids {
             if { maxVelocity > 0.0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
 
         /*
-        const auto newSetpoint = levelPid(currentSetpoint, angle);
+           const auto newSetpoint = levelPid(currentSetpoint, angle);
 
         // -----calculate error rate
         const auto errorRate = newSetpoint - angvel;
