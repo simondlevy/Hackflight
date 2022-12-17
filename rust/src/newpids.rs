@@ -320,7 +320,7 @@ pub mod newpids {
     }
 
     fn getAltitudeHoldDemands(
-        pid: &AltitudeHoldPid,
+        mut pid: &AltitudeHoldPid,
         demands: &Demands,
         vstate: &VehicleState,
         reset: &bool
