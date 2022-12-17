@@ -25,9 +25,9 @@ pub mod filters {
         (state, Pt1 {state: state, k: filter.k})
     }
 
-    pub fn makePt1(f_cut: f32, dt: f32) -> Pt1 {
+    pub fn makePt1(f_cut: f32) -> Pt1 {
 
-        let k = computeK(1.0, f_cut, dt);
+        let k = computeK(1.0, f_cut);
 
         Pt1 {state: 0.0, k: k }
     }
@@ -50,10 +50,10 @@ pub mod filters {
         (state, Pt2 {state: state, state1: state1, k: filter.k})
     }
 
-    pub fn makePt2(f_cut: f32, dt: f32) -> Pt2 {
+    pub fn makePt2(f_cut: f32) -> Pt2 {
 
         let cutoff_correction = computeCutoffCorrection(2.0, f_cut);
-        let k = computeK(cutoff_correction, f_cut, dt);
+        let k = computeK(cutoff_correction, f_cut);
 
         Pt2 {state: 0.0, state1: 0.0, k: k }
     }
@@ -78,21 +78,22 @@ pub mod filters {
         (state, Pt3 {state: state, state1: state1, state2: state2, k: filter.k})
     }
 
-    pub fn makePt3(f_cut: f32, dt: f32) -> Pt3 {
+    pub fn makePt3(f_cut: f32) -> Pt3 {
 
         let cutoff_correction = computeCutoffCorrection(3.0, f_cut);
-        let k = computeK(cutoff_correction, f_cut, dt);
+        let k = computeK(cutoff_correction, f_cut);
 
         Pt3 {state: 0.0, state1: 0.0, state2: 0.0, k: k }
     }
 
     // helpers -----------------------------------------------------------------
 
-    fn computeK(cutoff_correction:f32, f_cut:f32, dt:f32) -> f32 {
+    fn computeK(cutoff_correction:f32, f_cut:f32) -> f32 {
 
+        const DT: f32 = 100.0; // XXX should come from system clock
         let rc = 1.0 / (2.0 * cutoff_correction * std::f32::consts::PI * f_cut);
 
-        dt / (rc + dt)
+        DT / (rc + DT)
     }
 
     fn computeCutoffCorrection(order: f32, f_cut: f32) -> f32 {

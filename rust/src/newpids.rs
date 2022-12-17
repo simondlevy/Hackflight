@@ -14,7 +14,8 @@ pub mod newpids {
     use crate::utils::utils::constrain_abs;
     use crate::filters::filters;
 
-    #[derive(Debug,Clone)]
+    // #[derive(Debug,Clone)]
+    #[derive(Clone)]
     pub enum PidController {
 
         Angle {
@@ -26,6 +27,7 @@ pub mod newpids {
             dyn_lpf_previous_quantized_throttle: i32,  
             feedforward_lpf_initialized: bool,
             sum: f32,
+            pterm_yaw_lpf: filters::Pt1
         },
 
         AltitudeHold {
@@ -55,6 +57,7 @@ pub mod newpids {
                 dyn_lpf_previous_quantized_throttle,  
                 feedforward_lpf_initialized,
                 sum,
+                pterm_yaw_lpf
             } => { 
                 get_angle_demands(
                     d_usec,
@@ -68,7 +71,8 @@ pub mod newpids {
                     k_level_p,
                     dyn_lpf_previous_quantized_throttle,  
                     feedforward_lpf_initialized,
-                    sum) 
+                    sum,
+                    pterm_yaw_lpf) 
             },
 
             PidController::AltitudeHold {
@@ -100,6 +104,8 @@ pub mod newpids {
             k_rate_f: f32,
             k_level_p: f32) -> PidController {
 
+        const YAW_LOWPASS_HZ: f32 = 100.0;
+
         PidController::Angle {
             k_rate_p: k_rate_p, 
             k_rate_i: k_rate_i, 
@@ -108,7 +114,8 @@ pub mod newpids {
             k_level_p: k_level_p, 
             dyn_lpf_previous_quantized_throttle: 0,
             feedforward_lpf_initialized: false,
-            sum: 0.0 
+            sum: 0.0,
+            pterm_yaw_lpf : filters::makePt1(YAW_LOWPASS_HZ)
         }
     }
  
@@ -124,7 +131,8 @@ pub mod newpids {
         k_level_p: &f32,
         dyn_lpf_previous_quantized_throttle: &i32,  
         feedforward_lpf_initialized: &bool,
-        sum: &f32) -> Demands  {
+        sum: &f32,
+        pterm_yaw_lpf: &filters::Pt1) -> Demands  {
 
         // minimum of 5ms between updates
         const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
@@ -138,8 +146,6 @@ pub mod newpids {
         const DTERM_LPF1_DYN_MIN_HZ: u16 = 75;
         const DTERM_LPF1_DYN_MAX_HZ: u16 = 150;
         const DTERM_LPF2_HZ: u16 = 150;
-
-        const YAW_LOWPASS_HZ: u16 = 100;
 
         const ITERM_WINDUP_POINT_PERCENT: u8 = 85;        
 
