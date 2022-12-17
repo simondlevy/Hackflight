@@ -336,8 +336,7 @@ class AnglePidController : public PidController {
                     -ITERM_LIMIT, +ITERM_LIMIT);
 
             // -----calculate D component
-            const auto dterm =
-                cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
+            const auto dterm = cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
             const auto D =
                 m_k_rate_d > 0 ?
                 computeDerivative(cyclicAxis, 0, dterm) :

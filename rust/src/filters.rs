@@ -19,6 +19,13 @@ pub struct Pt1 {
     k: f32
 }
 
+pub fn applyPt1Mut(mut filter: Pt1, input: f32) -> f32 {
+
+    filter.state = filter.state + filter.k * (input - filter.state);
+
+    filter.state
+}
+
 pub fn applyPt1(filter: Pt1, input: f32) -> (f32, Pt1) {
 
     let state = filter.state + filter.k * (input - filter.state);

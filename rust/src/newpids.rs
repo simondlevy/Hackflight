@@ -274,12 +274,9 @@ pub mod newpids {
 
         /*
         // -----calculate D component
-        const auto dterm =
-        cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
-        const auto D =
-        m_kRateD > 0 ?
-        computeDerivative(cyclicAxis, 0, dterm) :
-        0;
+        let dterm = cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
+
+        const auto D = m_kRateD > 0 ?  computeDerivative(cyclicAxis, 0, dterm) : 0;
 
         cyclicAxis.previousDterm = dterm;
 
