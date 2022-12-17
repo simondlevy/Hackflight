@@ -233,13 +233,12 @@ pub mod newpids {
         let itermRelaxFactor =
             (1.0 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD).max(0.0);
 
-        /*
-        const auto isDecreasingI =
-            ((iterm > 0) && (itermErrorRate < 0)) ||
-            ((iterm < 0) && (itermErrorRate > 0));
+        let isDecreasingI =
+            ((iterm > 0.0) && (itermErrorRate < 0.0)) ||
+            ((iterm < 0.0) && (itermErrorRate > 0.0));
 
-        return itermErrorRate * (!isDecreasingI ? itermRelaxFactor : 1);
-        */
+        // return itermErrorRate * (!isDecreasingI ? itermRelaxFactor : 1);
+        
         0.0
     }
 
