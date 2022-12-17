@@ -10,6 +10,8 @@ pub mod altitude;
 pub mod rate;
 pub mod yaw;
 
+pub mod angle;
+
 pub mod pids {
 
     use crate::datatypes::Demands;
