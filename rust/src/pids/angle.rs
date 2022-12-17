@@ -51,7 +51,7 @@ pub fn makeAnglePid(
     kRateI: f32,
     kRateD: f32,
     kRateF: f32,
-    kLevelP: f32) -> PidController {
+    kLevelP: f32) -> AnglePid {
 
     const YAW_LOWPASS_HZ: f32 = 100.0;
 
@@ -68,6 +68,30 @@ pub fn makeAnglePid(
         sum: 0.0,
         ptermYawLpf : filters::makePt1(YAW_LOWPASS_HZ)
     }
+}
+
+fn makeCyclicAxis() -> CyclicAxis {
+
+    const DTERM_LPF1_DYN_MIN_HZ: f32 = 75.0;
+    const DTERM_LPF1_DYN_MAX_HZ: f32 = 150.0;
+    const DTERM_LPF2_HZ: f32 = 150.0;
+    const D_MIN_LOWPASS_HZ: f32 = 35.0;  
+    const ITERM_RELAX_CUTOFF: f32 = 15.0;
+    const D_MIN_RANGE_HZ: f32 = 85.0;  
+
+    CyclicAxis {
+        axis: makeAxis(),
+        dtermLpf1 : filters::makePt1(DTERM_LPF1_DYN_MIN_HZ),
+        dtermLpf2 : filters::makePt1(DTERM_LPF2_HZ),
+        dMinLpf: filters::makePt2(D_MIN_LOWPASS_HZ),
+        dMinRange: filters::makePt2(D_MIN_RANGE_HZ),
+        windupLpf: filters::makePt1(ITERM_RELAX_CUTOFF),
+        previousDterm: 0.0 }
+}
+
+fn makeAxis() -> Axis {
+
+    Axis { previousSetpoint: 0.0, integral: 0.0 }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
