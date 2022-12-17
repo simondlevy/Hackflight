@@ -264,10 +264,10 @@ pub mod newpids {
 
         let itermErrorRate = applyItermRelax(cyclicAxis, axis.integral, newSetpoint, errorRate);
 
-        /*
         // -----calculate P component
-        const auto P = m_kRateP * errorRate;
+        let P = pid.kRateP * errorRate;
 
+        /*
         // -----calculate I component
         axis->I =
         constrain_f(axis->I + (m_kRateI * Clock::DT()) * itermErrorRate,
