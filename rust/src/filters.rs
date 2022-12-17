@@ -100,6 +100,13 @@ pub mod filters {
 
     // helpers -----------------------------------------------------------------
 
+    fn computeOrderCutoffCorrection(order: f32, f_cut: f32) -> f32 {
+
+        let two: f32 = 2.0;
+
+        1.0 / (two.powf(1.0 / order) - 1.0).sqrt()
+    }
+
     fn computeRc(order: f32, f_cut: f32) -> f32 {
 
         let two: f32 = 2.0;
