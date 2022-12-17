@@ -214,9 +214,9 @@ pub mod newpids {
 
         let angle = constrain_f(LEVEL_ANGLE_LIMIT * currentSetpoint, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
 
-        /*
-        const auto angleError = angle - (currentAngle / 10);
+        let angleError = angle - (currentAngle / 10.0);
 
+        /*
         return m_k_level_p > 0 ?
             angleError * m_k_level_p :
             currentSetpoint;
