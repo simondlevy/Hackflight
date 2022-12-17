@@ -21,7 +21,8 @@ pub mod filters {
 
         let rc = 1.0 / (2.0 * std::f32::consts::PI * f_cut);
         let k = filter.dt / (rc + filter.dt);
+        let state = filter.state + k * (input - filter.state);
 
-        (0.0, Pt1 {state: 0.0, dt: 0.0, k: 0.0})
+        (state, Pt1 {state: state, dt: filter.dt, k: k})
     }
 }
