@@ -341,8 +341,8 @@ pub mod newpids {
         let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
         // Reset controller when moving into deadband above a minimum altitude
-        let got_target = in_band && !pid.inBandPrev;
-        let errorIntegral = if got_target || *reset { 0.0 } else { pid.errorIntegral };
+        let gotNewTarget = in_band && !pid.inBandPrev;
+        let errorIntegral = if gotNewTarget || *reset { 0.0 } else { pid.errorIntegral };
 
         let inBandPrev = in_band;
 
