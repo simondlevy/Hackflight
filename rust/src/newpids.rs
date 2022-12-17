@@ -128,7 +128,7 @@ pub mod newpids {
         let pitch_demand = rescale(demands.pitch);
         let yaw_demand   = rescale(demands.yaw);
 
-        //let roll = update_cyclic(roll_demand, vstate.phi, vstate.dphi, m_roll);
+        // let roll = update_cyclic(roll_demand, vstate.phi, vstate.dphi, m_roll);
 
         //let pitch = update_cyclic(pitch_demand, vstate.theta, vstate.dtheta, m_pitch);
 
@@ -139,6 +139,34 @@ pub mod newpids {
             pitch : 0.0,
             yaw : 0.0
         }
+    }
+
+    // [-1,+1] => [-670,+670] with nonlinearity
+    fn rescale(command: f32) -> f32 {
+
+        const CTR: f32 = 0.104;
+
+        let expof = command * command.abs();
+        let angle_rate = command * CTR + (1.0 - CTR) * expof;
+
+        670.0 * angle_rate
+    }
+
+    struct Axis {
+
+        previous_setpoint : f32,
+        integral : f32
+    }
+
+    struct CyclicAxis {
+
+        axis: Axis,
+        dtermLpf1 : filters::Pt1,
+        dtermLpf2 : filters::Pt1,
+        dMinLpf: filters::Pt2,
+        dMinRange: filters::Pt2,
+        windupLpf: filters::Pt1,
+        previous_dterm: f32
     }
 
     // AltHoldPid -------------------------------------------------------------
@@ -213,32 +241,4 @@ pub mod newpids {
 
     } // get_alt_hold_demands
 
-    // [-1,+1] => [-670,+670] with nonlinearity
-    fn rescale(command: f32) -> f32 {
-
-        const CTR: f32 = 0.104;
-
-        let expof = command * command.abs();
-        let angle_rate = command * CTR + (1.0 - CTR) * expof;
-
-        670.0 * angle_rate
-    }
-
-    struct Axis {
-
-        previous_setpoint : f32,
-        integral : f32
-    }
-
-    struct CyclicAxis {
-
-        axis: Axis,
-        dtermLpf1 : filters::Pt1,
-        dtermLpf2 : filters::Pt1,
-        dMinLpf: filters::Pt2,
-        dMinRange: filters::Pt2,
-        windupLpf: filters::Pt1,
-        previous_dterm: f32
-    }
-
-    } // mod newpids
+} // mod newpids
