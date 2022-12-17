@@ -27,6 +27,8 @@ pub mod pids {
     use crate::pids::rate as rate_pid;
     use crate::pids::rate::RatePid;
 
+    use crate::pids::angle::AnglePid;
+
     #[derive(Copy,Clone)]
     pub struct Controller {
 
