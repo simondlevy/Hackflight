@@ -50,14 +50,14 @@ pub mod newpids {
         k_rate_d: f32,
         k_rate_f: f32,
         k_level_p: f32,
+        roll : CyclicAxis,
         dyn_lpf_previous_quantized_throttle: i32,  
         feedforward_lpf_initialized: bool,
         sum: f32,
         pterm_yaw_lpf: filters::Pt1
     }
 
-
-    pub fn makeAnglePid( 
+    pub fn makeAnglePidController( 
         k_rate_p: f32,
         k_rate_i: f32,
         k_rate_d: f32,
@@ -73,12 +73,37 @@ pub mod newpids {
                 k_rate_d: k_rate_d, 
                 k_rate_f: k_rate_f, 
                 k_level_p: k_level_p, 
+                roll: make_cyclic_axis(),
                 dyn_lpf_previous_quantized_throttle: 0,
                 feedforward_lpf_initialized: false,
                 sum: 0.0,
                 pterm_yaw_lpf : filters::makePt1(YAW_LOWPASS_HZ)
             }
         }
+    }
+
+    fn make_cyclic_axis() -> CyclicAxis {
+
+        const DTERM_LPF1_DYN_MIN_HZ: f32 = 75.0;
+        const DTERM_LPF1_DYN_MAX_HZ: f32 = 150.0;
+        const DTERM_LPF2_HZ: f32 = 150.0;
+        const D_MIN_LOWPASS_HZ: f32 = 35.0;  
+        const ITERM_RELAX_CUTOFF: f32 = 15.0;
+        const D_MIN_RANGE_HZ: f32 = 85.0;  
+
+        CyclicAxis {
+            axis: makeAxis(),
+            dtermLpf1 : filters::makePt1(DTERM_LPF1_DYN_MIN_HZ),
+            dtermLpf2 : filters::makePt1(DTERM_LPF2_HZ),
+            dMinLpf: filters::makePt2(D_MIN_LOWPASS_HZ),
+            dMinRange: filters::makePt2(D_MIN_RANGE_HZ),
+            windupLpf: filters::makePt1(ITERM_RELAX_CUTOFF),
+            previous_dterm: 0.0 }
+    }
+
+    fn makeAxis() -> Axis {
+
+        Axis { previous_setpoint: 0.0, integral: 0.0 }
     }
 
     fn get_angle_demands(pid: &AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
@@ -90,11 +115,6 @@ pub mod newpids {
 
         // Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
         const ITERM_RELAX_SETPOINT_THRESHOLD: u8 = 40;
-        const ITERM_RELAX_CUTOFF: u8 = 15;
-
-        const DTERM_LPF1_DYN_MIN_HZ: u16 = 75;
-        const DTERM_LPF1_DYN_MAX_HZ: u16 = 150;
-        const DTERM_LPF2_HZ: u16 = 150;
 
         const ITERM_WINDUP_POINT_PERCENT: u8 = 85;        
 
@@ -106,11 +126,7 @@ pub mod newpids {
 
         const DYN_LPF_CURVE_EXPO: u8 = 5;
 
-        // PT2 lowpass input cutoff to peak D around propwash frequencies
-        const D_MIN_RANGE_HZ: f32 = 85.0;  
-
         // PT2 lowpass cutoff to smooth the boost effect
-        const D_MIN_LOWPASS_HZ: f32 = 35.0;  
         const D_MIN_GAIN_FACTOR: f32  = 0.00008;
         const D_MIN_SETPOINT_GAIN_FACTOR: f32 = 0.00008;
 
@@ -130,7 +146,7 @@ pub mod newpids {
 
         let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
-        // let roll = update_cyclic(roll_demand, vstate.phi, vstate.dphi, m_roll);
+        let roll = update_cyclic(roll_demand, vstate.phi, vstate.dphi, pid.roll.clone(), max_velocity);
 
         //let pitch = update_cyclic(pitch_demand, vstate.theta, vstate.dtheta, m_pitch);
 
@@ -153,12 +169,14 @@ pub mod newpids {
         670.0 * angle_rate
     }
 
+    #[derive(Clone)]
     struct Axis {
 
         previous_setpoint : f32,
         integral : f32
     }
 
+    #[derive(Clone)]
     struct CyclicAxis {
 
         axis: Axis,
@@ -171,14 +189,10 @@ pub mod newpids {
     }
 
 
-    fn update_cyclic(demand: f32, angle: f32, angvel: f32, cyclic_axes: CyclicAxis) -> f32
+    fn update_cyclic(demand: f32, angle: f32, angvel: f32, cyclic_axis: CyclicAxis, max_velocity: f32) -> f32
     {
-        0.0
-
         /*
-        const auto maxVelocity = MAX_VELOCITY_CYCLIC();
-
-        axis_t * axis = &cyclicAxis.axis;
+        let axis = cyclic_axis.axis;
 
         const auto currentSetpoint = 
             maxVelocity ?
@@ -223,6 +237,8 @@ pub mod newpids {
         return P + axis->I + D + F;
         */
 
+        0.0
+
     } // update_cyclic
 
 
@@ -237,7 +253,7 @@ pub mod newpids {
         altitude_target: f32
     }
 
-    pub fn makeAltitudeHoldPid(k_p: f32, k_i: f32) -> PidController {
+    pub fn makeAltitudeHoldPidController(k_p: f32, k_i: f32) -> PidController {
 
         PidController::AltitudeHold {
             ahp : AltitudeHoldPid {
