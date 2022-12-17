@@ -111,7 +111,8 @@ pub mod newpids {
         Axis { previousSetpoint: 0.0, integral: 0.0 }
     }
 
-    fn getAngleDemands(pid: &AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
+    fn getAngleDemands(
+        mut pid: &AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
 
         // minimum of 5ms between updates
         const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
