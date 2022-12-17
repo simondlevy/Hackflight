@@ -225,6 +225,7 @@ pub mod newpids {
         // Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
         const ITERM_RELAX_SETPOINT_THRESHOLD: f32 = 40.0;
 
+        // XXX need to use newWindupLpf
         let (setpointLpf, newWindupLpf) =
             filters::applyPt1(cyclicAxis.windupLpf, currentSetpoint);
 
@@ -237,9 +238,7 @@ pub mod newpids {
             ((iterm > 0.0) && (itermErrorRate < 0.0)) ||
             ((iterm < 0.0) && (itermErrorRate > 0.0));
 
-        // return itermErrorRate * (!isDecreasingI ? itermRelaxFactor : 1);
-        
-        0.0
+        itermErrorRate * (if !isDecreasingI  {itermRelaxFactor} else {1.0} )
     }
 
 
