@@ -22,7 +22,7 @@ pub mod newpids {
         AltitudeHold { ahp : AltitudeHoldPid, },
     }
 
-    fn get_demands(
+    fn getDemands(
         pid: &PidController,
         d_usec: &u32,
         demands: &Demands,
@@ -32,11 +32,11 @@ pub mod newpids {
         match pid {
 
             PidController::Angle { ap } => { 
-                get_angle_demands(ap, demands, vstate)
+                getAngleDemands(ap, demands, vstate)
             },
 
             PidController::AltitudeHold { ahp } => {
-                get_altitude_hold_demands(ahp, demands, vstate, reset)
+                getAltitudeHoldDemands(ahp, demands, vstate, reset)
             }
         }
     }
@@ -108,7 +108,7 @@ pub mod newpids {
         Axis { previous_setpoint: 0.0, integral: 0.0 }
     }
 
-    fn get_angle_demands(pid: &AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
+    fn getAngleDemands(pid: &AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
 
         // minimum of 5ms between updates
         const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
@@ -148,8 +148,8 @@ pub mod newpids {
 
         let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
-        let roll  = update_cyclic(roll_demand,  vstate.phi,   vstate.dphi, pid.roll.clone(), max_velocity);
-        let pitch = update_cyclic(pitch_demand, vstate.theta, vstate.dtheta, pid.pitch.clone(), max_velocity);
+        let roll  = updateCyclic(roll_demand,  vstate.phi,   vstate.dphi, pid.roll.clone(), max_velocity);
+        let pitch = updateCyclic(pitch_demand, vstate.theta, vstate.dtheta, pid.pitch.clone(), max_velocity);
 
         Demands { 
             throttle : 0.0,
@@ -190,7 +190,7 @@ pub mod newpids {
     }
 
 
-    fn update_cyclic(demand: f32, angle: f32, angvel: f32, cyclic_axis: CyclicAxis, max_velocity: f32) -> f32
+    fn updateCyclic(demand: f32, angle: f32, angvel: f32, cyclic_axis: CyclicAxis, max_velocity: f32) -> f32
     {
         let axis = cyclic_axis.axis;
 
@@ -240,7 +240,7 @@ pub mod newpids {
 
         0.0
 
-    } // update_cyclic
+    } // updateCyclic
 
 
     // AltHoldPid -------------------------------------------------------------
@@ -267,7 +267,7 @@ pub mod newpids {
         }
     }
 
-    fn get_altitude_hold_demands(
+    fn getAltitudeHoldDemands(
         pid: &AltitudeHoldPid,
         demands: &Demands,
         vstate: &VehicleState,
@@ -313,6 +313,6 @@ pub mod newpids {
             yaw : demands.yaw
         }
 
-    } // get_alt_hold_demands
+    } // getAltitudeHoldDemands
 
 } // mod newpids
