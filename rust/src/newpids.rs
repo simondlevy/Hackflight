@@ -223,9 +223,9 @@ pub mod newpids {
         currentSetpoint: f32,
         itermErrorRate: f32) -> f32
     {
-        /*
-        let setpointLpf = cyclicAxis.windupLpf.apply(currentSetpoint);
+        let setpointLpf = filters::applyPt1(cyclicAxis.windupLpf, currentSetpoint);
 
+        /*
         const float setpointHpf = fabsf(currentSetpoint - setpointLpf);
 
         const auto itermRelaxFactor =
