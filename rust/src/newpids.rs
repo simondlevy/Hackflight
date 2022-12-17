@@ -17,7 +17,7 @@ pub mod newpids {
     #[derive(Clone)]
     pub enum PidController {
 
-        Angle { foo : AnglePid, },
+        Angle { ap : AnglePid, },
 
         AltitudeHold {
             k_p: f32,
@@ -37,8 +37,8 @@ pub mod newpids {
 
         match pid {
 
-            PidController::Angle { foo } => { 
-                get_angle_demands(foo, demands, vstate)
+            PidController::Angle { ap } => { 
+                get_angle_demands(ap, demands, vstate)
             },
 
             PidController::AltitudeHold {
@@ -87,7 +87,7 @@ pub mod newpids {
         const YAW_LOWPASS_HZ: f32 = 100.0;
 
         PidController::Angle {
-            foo : AnglePid {
+            ap : AnglePid {
                 k_rate_p: k_rate_p, 
                 k_rate_i: k_rate_i, 
                 k_rate_d: k_rate_d, 
