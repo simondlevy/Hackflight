@@ -188,6 +188,17 @@ pub mod newpids {
 
     // AltHoldPid -------------------------------------------------------------
 
+    pub fn makeAltitudeHoldPid(k_p: f32, k_i: f32) -> PidController {
+
+        PidController::AltitudeHold {
+            k_p: k_p, 
+            k_i: k_i, 
+            in_band_prev: false,
+            error_integral: 0.0,
+            altitude_target: 0.0 
+        }
+    }
+
     fn get_alt_hold_demands(
         demands: &Demands,
         vstate: &VehicleState,
