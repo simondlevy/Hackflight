@@ -43,12 +43,13 @@ pub struct Pt2 {
     k: f32
 }
 
-pub fn applyPt2(filter: Pt2, input: f32) -> (f32, Pt2) {
+pub fn applyPt2(mut filter: Pt2, input: f32) -> f32 {
 
     let state1 = filter.state1 + filter.k * (input - filter.state1);
-    let state = filter.state + filter.k * (state1 - filter.state);
 
-    (state, Pt2 {state: state, state1: state1, k: filter.k})
+    filter.state = filter.state + filter.k * (state1 - filter.state);
+
+    filter.state
 }
 
 pub fn makePt2(f_cut: f32) -> Pt2 {
@@ -70,13 +71,14 @@ pub struct Pt3 {
     k: f32
 }
 
-pub fn applyPt3(filter: Pt3, input: f32) -> (f32, Pt3) {
+pub fn applyPt3(mut filter: Pt3, input: f32) -> f32 {
 
     let state1 = filter.state1 + filter.k * (input - filter.state1);
     let state2 = filter.state2 + filter.k * (state1 - filter.state2);
-    let state = filter.state + filter.k * (state2 - filter.state);
 
-    (state, Pt3 {state: state, state1: state1, state2: state2, k: filter.k})
+    filter.state = filter.state + filter.k * (state2 - filter.state);
+
+    filter.state
 }
 
 pub fn makePt3(f_cut: f32) -> Pt3 {
