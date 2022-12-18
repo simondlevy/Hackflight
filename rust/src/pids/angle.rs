@@ -288,10 +288,12 @@ fn updateCyclic(
     let I = constrain_f(axis.integral + (kRateI * DT) * itermErrorRate,
                         -ITERM_LIMIT, ITERM_LIMIT);
 
-    /*
     // -----calculate D component
-    let dterm = cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
+    let dterm = filters::applyPt1(
+        cyclicAxis.dtermLpf2, 
+        filters::applyPt1(cyclicAxis.dtermLpf1, angvel));
 
+    /*
     let D = m_kRateD > 0 ?  computeDerivative(cyclicAxis, 0, dterm) : 0;
 
     cyclicAxis.previousDterm = dterm;
