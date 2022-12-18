@@ -36,11 +36,7 @@ pub fn makeAltHoldPid(kP: f32, kI: f32) -> AltHoldPid {
 }
 
 pub fn getAltHoldDemands(
-    pid: &mut AltHoldPid,
-    demands: &Demands,
-    vstate: &VehicleState,
-    reset: &bool
-    ) -> Demands  {
+    pid: &mut AltHoldPid, demands: &Demands, vstate: &VehicleState, reset: &bool) -> Demands  {
 
     let altitude = vstate.z;
     let dz = vstate.dz;

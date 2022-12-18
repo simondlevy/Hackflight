@@ -98,7 +98,7 @@ fn makeAxis() -> Axis {
 }
 
 pub fn getAngleDemands(
-    mut pid: &AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
+    pid: &mut AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
 
     // minimum of 5ms between updates
     const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
