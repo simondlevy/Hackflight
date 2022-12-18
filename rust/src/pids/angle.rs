@@ -131,7 +131,11 @@ fn makeAxis() -> Axis {
 }
 
 pub fn getDemands(
-    pid: &mut Pid, demands: &Demands, vstate: &VehicleState, reset: &bool) -> Demands {
+    pid: &mut Pid,
+    dUsec: &u32,
+    demands: &Demands,
+    vstate: &VehicleState,
+    reset: &bool) -> Demands {
 
     let rollDemand  = rescale(demands.roll);
     let pitchDemand = rescale(demands.pitch);
@@ -176,6 +180,25 @@ pub fn getDemands(
     pid.roll.axis.integral = if *reset { 0.0 } else { pid.roll.axis.integral };
     pid.pitch.axis.integral = if *reset { 0.0 } else { pid.pitch.axis.integral };
     pid.yaw.integral = if *reset { 0.0 } else { pid.yaw.integral };
+
+    pid.dynLpfPreviousQuantizedThrottle = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     Demands { 
         throttle : demands.throttle,

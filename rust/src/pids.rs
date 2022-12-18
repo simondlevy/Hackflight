@@ -48,7 +48,7 @@ pub mod pids {
         match pid {
 
             PidController::Angle { ap } => { 
-                angle::getDemands(ap, demands, vstate, reset)
+                angle::getDemands(ap, dUsec, demands, vstate, reset)
             },
 
             PidController::AltHold { ahp } => {
