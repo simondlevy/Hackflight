@@ -238,7 +238,7 @@ fn levelPid(kLevelP: f32, currentSetpoint: f32, currentAngle: f32) -> f32
 }
 
 fn applyItermRelax(
-    mut cyclicAxis: &CyclicAxis,
+    cyclicAxis: &mut CyclicAxis,
     iterm: f32,
     currentSetpoint: f32,
     itermErrorRate: f32) -> f32
@@ -279,6 +279,16 @@ fn updateCyclic(
     // -----calculate error rate
     let errorRate = newSetpoint - angvel;
 
+    let setpointLpf = filters::applyPt1Mut(cyclicAxis.windupLpf, currentSetpoint);
+
+    let setpointHpf = (currentSetpoint - setpointLpf).abs();
+
+    let itermRelaxFactor =
+        (1.0 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD).max(0.0);
+
+    let isDecreasingI =
+        ((axis.integral > 0.0) && (errorRate < 0.0)) ||
+        ((axis.integral < 0.0) && (errorRate > 0.0));
     /*
     let itermErrorRate = applyItermRelax(cyclicAxis, axis.integral, newSetpoint, errorRate);
 
