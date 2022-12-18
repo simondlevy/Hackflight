@@ -297,7 +297,11 @@ fn updateCyclic(
         cyclicAxis.dtermLpf2, 
         filters::applyPt1(cyclicAxis.dtermLpf1, angvel));
 
-    let D = if kRateD > 0.0 {computeDerivative(cyclicAxis, 0.0, dterm)} else {0.0};
+    let D = if kRateD > 0.0 {
+        computeDerivative(cyclicAxis.previousDterm, 0.0, dterm)
+    } else {
+        0.0
+    };
 
     cyclicAxis.previousDterm = dterm;
 
@@ -310,15 +314,18 @@ fn updateCyclic(
     0.0 // P + axis.integral + D + F
 }
 
-fn computeDerivative(cyclicAxis: &mut CyclicAxis, demandDelta: f32, dterm: f32) -> f32 {
-    /*
+fn computeDerivative(
+    previousDterm: f32,
+    demandDelta: f32,
+    dterm: f32) -> f32 {
     // Divide rate change by dT to get differential (ie dr/dt).
     // dT is fixed and calculated from the target PID loop time
     // This is done to avoid DTerm spikes that occur with
     // dynamically calculated deltaT whenever another task causes
     // the PID loop execution to be delayed.
-    const float delta = -(dterm - cyclicAxis.previousDterm) * frequency();
+    let delta = -(dterm - previousDterm) * frequency();
 
+    /*
     let preTpaD = m_k_rate_d * delta;
 
     let dMinPercent = 
