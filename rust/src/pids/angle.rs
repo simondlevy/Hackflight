@@ -24,7 +24,7 @@ const D_MIN_RANGE_HZ: f32 = 85.0;
 // minimum of 5ms between updates
 const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u32 = 5000; 
 
-//const DYN_LPF_THROTTLE_STEPS: u16 = 100;
+const DYN_LPF_THROTTLE_STEPS: f32 = 100.0;
 
 const ITERM_LIMIT: f32 = 400.0;
 
@@ -182,7 +182,12 @@ pub fn getDemands(
     pid.yaw.integral = if *reset { 0.0 } else { pid.yaw.integral };
 
     pid.dynLpfPreviousQuantizedThrottle = 
+
         if *dUsec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US {
+
+            // Quantize the throttle to reduce the number of filter updates
+            let quantizedThrottle = (demands.throttle * DYN_LPF_THROTTLE_STEPS) as u8; 
+
             0
         } 
         else {
