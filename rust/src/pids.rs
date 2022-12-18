@@ -27,9 +27,7 @@ pub mod pids {
     use crate::pids::rate as rate_pid;
     use crate::pids::rate::RatePid;
 
-    use crate::pids::angle::AnglePid;
-    use crate::pids::angle::makeAnglePid;
-    use crate::pids::angle::getAngleDemands;
+    use crate::pids::angle;
 
     use crate::pids::althold::AltHoldPid;
     use crate::pids::althold::makeAltHoldPid;
@@ -38,7 +36,7 @@ pub mod pids {
     #[derive(Clone)]
     pub enum PidController {
 
-        Angle { ap : AnglePid, },
+        Angle { ap : angle::AnglePid, },
 
         AltHold { ahp : AltHoldPid, },
     }
@@ -53,7 +51,7 @@ pub mod pids {
         match pid {
 
             PidController::Angle { ap } => { 
-                getAngleDemands(ap, demands, vstate, reset)
+                angle::getAngleDemands(ap, demands, vstate, reset)
             },
 
             PidController::AltHold { ahp } => {
@@ -69,7 +67,7 @@ pub mod pids {
         kRateF: f32,
         kLevelP: f32) -> PidController {
 
-        PidController::Angle {ap : makeAnglePid(kRateP, kRateI, kRateD, kRateF, kLevelP)}
+        PidController::Angle {ap : angle::makeAnglePid(kRateP, kRateI, kRateD, kRateF, kLevelP)}
     }
 
     pub fn makeAltHoldPidController(kP: f32, kI: f32) -> PidController {
