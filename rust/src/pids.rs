@@ -6,7 +6,6 @@
    MIT License
 */
 
-pub mod altitude;
 pub mod rate;
 pub mod yaw;
 
@@ -18,9 +17,9 @@ pub mod pids {
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
 
-    use crate::pids::altitude as alt_pid;
+    use crate::pids::althold as alt_pid;
 
-    use crate::pids::altitude::AltitudePid;
+    use crate::pids::althold::AltitudePid;
 
     use crate::pids::yaw as yaw_pid;
     use crate::pids::yaw::YawPid;
