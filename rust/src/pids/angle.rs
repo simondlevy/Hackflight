@@ -34,7 +34,7 @@ const ITERM_WINDUP_POINT_PERCENT: f32 = 85.0;
 // Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
 const ITERM_RELAX_SETPOINT_THRESHOLD: f32 = 40.0;
 
-const D_MIN: u8 = 30;
+const D_MIN: f32 = 30.0;
 const D_MIN_GAIN: f32 = 37.0;
 const D_MIN_ADVANCE: f32 = 20.0;
 
@@ -329,12 +329,9 @@ fn computeDerivative(
 
     let preTpaD = kRateD * delta;
 
-    /*
-    let dMinPercent = 
-        D_MIN > 0 && D_MIN < kRateD ?
-        D_MIN / kRateD :
-        0.0f;
+    let dMinPercent = if D_MIN > 0.0 && D_MIN < kRateD { D_MIN / kRateD } else { 0.0 };
 
+    /*
     let dMinFactor =
         dMinPercent > 0 ?
         computeDMinFactor(cyclicAxis, dMinPercent, demandDelta, delta) :
