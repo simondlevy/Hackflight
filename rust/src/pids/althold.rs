@@ -10,6 +10,14 @@ use crate::datatypes::Demands;
 use crate::datatypes::VehicleState;
 use crate::utils;
 
+const KP: f32 = 0.75;
+const KI: f32 = 1.5;
+
+const ALTITUDE_MIN: f32   = 1.0;
+const PILOT_VELZ_MAX: f32 = 2.5;
+const STICK_DEADBAND: f32 = 0.2;
+const WINDUP_MAX: f32     = 0.4;
+
 #[derive(Clone)]
 pub struct AltHoldPid {
     kP : f32,
@@ -36,11 +44,6 @@ pub fn getAltHoldDemands(
     vstate: &VehicleState,
     reset: &bool
     ) -> Demands  {
-
-    const ALTITUDE_MIN   :f32 = 1.0;
-    const PILOT_VELZ_MAX :f32 = 2.5;
-    const STICK_DEADBAND :f32 = 0.2;
-    const WINDUP_MAX     :f32 = 0.4;
 
     let altitude = vstate.z;
     let dz = vstate.dz;
@@ -92,14 +95,6 @@ pub fn run(
     demands:Demands,
     vstate:&VehicleState,
     pid: AltitudePid) -> (Demands, AltitudePid) {
-
-    const KP: f32 = 0.75;
-    const KI: f32 = 1.5;
-
-    const ALTITUDE_MIN: f32   = 1.0;
-    const PILOT_VELZ_MAX: f32 = 2.5;
-    const STICK_DEADBAND: f32 = 0.2;
-    const WINDUP_MAX: f32     = 0.4;
 
     let throttle = demands.throttle;
 
