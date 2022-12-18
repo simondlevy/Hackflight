@@ -22,7 +22,7 @@ const ITERM_RELAX_CUTOFF: f32 = 15.0;
 const D_MIN_RANGE_HZ: f32 = 85.0;  
 
 // minimum of 5ms between updates
-//const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
+const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u32 = 5000; 
 
 //const DYN_LPF_THROTTLE_STEPS: u16 = 100;
 
@@ -181,24 +181,13 @@ pub fn getDemands(
     pid.pitch.axis.integral = if *reset { 0.0 } else { pid.pitch.axis.integral };
     pid.yaw.integral = if *reset { 0.0 } else { pid.yaw.integral };
 
-    pid.dynLpfPreviousQuantizedThrottle = 0;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    pid.dynLpfPreviousQuantizedThrottle = 
+        if *dUsec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US {
+            0
+        } 
+        else {
+            pid.dynLpfPreviousQuantizedThrottle
+        };
 
     Demands { 
         throttle : demands.throttle,
