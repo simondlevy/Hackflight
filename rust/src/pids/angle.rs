@@ -212,8 +212,9 @@ pub fn getDemands(
     }
 }
 
-fn initLpf1(axis: &mut CyclicAxis, cutoffFreq: f32)
+fn initLpf1(cyclicAxis: &mut CyclicAxis, cutoffFreq: f32)
 {
+    filters::adjustPt1Gain(cyclicAxis.dtermLpf1, cutoffFreq);
 }
 
 

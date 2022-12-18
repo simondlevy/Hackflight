@@ -33,6 +33,12 @@ pub fn makePt1(f_cut: f32) -> Pt1 {
     Pt1 {state: 0.0, k: k }
 }
 
+pub fn adjustPt1Gain(mut filter: Pt1, f_cut: f32)
+{
+    filter.k = computeK(1.0, f_cut);
+}
+
+
 // Pt2 --------------------------------------------------------------------
 
 #[derive(Clone,Copy)]
