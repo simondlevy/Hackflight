@@ -157,13 +157,14 @@ fn updateYaw(axis: &mut Axis, demand: f32, angvel: f32) -> f32
 {
     let maxVelocity = YAW_RATE_ACCEL_LIMIT * 100.0 * DT; 
 
-    /*
     // gradually scale back integration when above windup point
     let itermWindupPointInv = 1.0 / (1.0 - (ITERM_WINDUP_POINT_PERCENT / 100.0));
 
-    let dynCi = DT * 
-        (if itermWindupPointInv > 1.0 {constrain_f(itermWindupPointInv, 0, 1)} else {1.0})
+    let dynCi = DT * (if itermWindupPointInv > 1.0
+                      {constrain_f(itermWindupPointInv, 0.0, 1.0)}
+                      else {1.0});
 
+    /*
     let currentSetpoint =
         if maxVelocity > 0.0 {accelerationLimit(axis, demand, maxVelocity)} else {demand}
 
