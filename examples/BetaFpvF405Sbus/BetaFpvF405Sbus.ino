@@ -73,10 +73,6 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 void setup(void)
 {
-    int foo;
-
-    int bar = 3 * foo;
-
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 

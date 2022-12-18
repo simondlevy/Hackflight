@@ -10,7 +10,6 @@ use crate::datatypes::Demands;
 use crate::datatypes::VehicleState;
 
 use crate::filters;
-use crate::utils;
 use crate::utils::constrain_abs;
 use crate::utils::DT;
 use crate::utils::constrain_f;
@@ -23,9 +22,9 @@ const ITERM_RELAX_CUTOFF: f32 = 15.0;
 const D_MIN_RANGE_HZ: f32 = 85.0;  
 
 // minimum of 5ms between updates
-const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
+//const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
 
-const DYN_LPF_THROTTLE_STEPS: u16 = 100;
+//const DYN_LPF_THROTTLE_STEPS: u16 = 100;
 
 const ITERM_LIMIT: f32 = 400.0;
 
@@ -40,7 +39,7 @@ const D_MIN_ADVANCE: f32 = 20.0;
 
 const FEEDFORWARD_MAX_RATE_LIMIT: f32 = 900.0;
 
-const DYN_LPF_CURVE_EXPO: u8 = 5;
+//const DYN_LPF_CURVE_EXPO: u8 = 5;
 
 // PT2 lowpass cutoff to smooth the boost effect
 const D_MIN_GAIN_FACTOR: f32  = 0.00008;
@@ -50,8 +49,8 @@ const RATE_ACCEL_LIMIT: f32 = 0.0;
 const YAW_RATE_ACCEL_LIMIT: f32 = 0.0;
 
 const OUTPUT_SCALING: f32 = 1000.0;
-const  LIMIT_YAW: u16 = 400;
-const  LIMIT: u16 = 500;
+//const  LIMIT_YAW: u16 = 400;
+//const  LIMIT: u16 = 500;
 
 
 #[derive(Clone)]
@@ -153,8 +152,18 @@ pub fn getDemands(
             vstate.dphi,
             maxVelocity);
 
-    /*let pitch = 
-        updateCyclic(&pid.pitch pitchDemand, vstate.theta, vstate.dtheta, maxVelocity);*/
+    let pitch = 
+        updateCyclic(
+            &mut pid.pitch,
+            pid.kLevelP,
+            pid.kRateP,
+            pid.kRateI,
+            pid.kRateD,
+            pid.kRateF,
+            pitchDemand,
+            vstate.theta,
+            vstate.dtheta,
+            maxVelocity);
 
     let yaw = updateYaw(
         &mut pid.yaw,
@@ -239,7 +248,8 @@ fn levelPid(kLevelP: f32, currentSetpoint: f32, currentAngle: f32) -> f32
 
     const LEVEL_ANGLE_LIMIT: f32 = 45.0;
 
-    let angle = constrain_f(LEVEL_ANGLE_LIMIT * currentSetpoint, -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
+    let angle = constrain_f(LEVEL_ANGLE_LIMIT * currentSetpoint,
+                           -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
 
     let angleError = angle - (currentAngle / 10.0);
 

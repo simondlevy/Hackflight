@@ -468,4 +468,3 @@ class AnglePidController : public PidController {
         } // getDemands
 
 }; // class AnglePidController
-
