@@ -197,8 +197,8 @@ pub fn getDemands(
                                               DTERM_LPF1_DYN_MAX_HZ,
                                               DYN_LPF_CURVE_EXPO);
 
-            //initLpf1(m_roll, cutoffFreq);
-            //initLpf1(m_pitch, cutoffFreq);
+            initLpf1(&mut pid.roll, cutoffFreq);
+            // initLpf1(m_pitch, cutoffFreq);
 
             pid.dynLpfPreviousQuantizedThrottle = quantizedThrottle;
         }
@@ -211,6 +211,11 @@ pub fn getDemands(
         yaw : 0.0
     }
 }
+
+fn initLpf1(axis: &mut CyclicAxis, cutoffFreq: f32)
+{
+}
+
 
 fn dynLpfCutoffFreq(throttle: f32, dynLpfMin: f32, dynLpfMax: f32, expo: f32) -> f32 {
     let expof = expo / 10.0;
