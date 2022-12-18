@@ -355,7 +355,7 @@ fn updateCyclic(
         feedForward 
     };
 
-    0.0 // P + axis.integral + D + F
+    P + axis.integral + D + F
 }
 
 fn applyFeedforwardLimit(
