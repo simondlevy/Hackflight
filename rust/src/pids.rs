@@ -28,17 +28,14 @@ pub mod pids {
     use crate::pids::rate::RatePid;
 
     use crate::pids::angle;
-
-    use crate::pids::althold::AltHoldPid;
-    use crate::pids::althold::makeAltHoldPid;
-    use crate::pids::althold::getAltHoldDemands;
+    use crate::pids::althold;
 
     #[derive(Clone)]
     pub enum PidController {
 
         Angle { ap : angle::Pid, },
 
-        AltHold { ahp : AltHoldPid, },
+        AltHold { ahp : althold::Pid, },
     }
 
     pub fn getDemands(
@@ -55,7 +52,7 @@ pub mod pids {
             },
 
             PidController::AltHold { ahp } => {
-                getAltHoldDemands(ahp, demands, vstate, reset)
+                althold::getDemands(ahp, demands, vstate, reset)
             }
         }
     }
@@ -72,7 +69,7 @@ pub mod pids {
 
     pub fn makeAltHoldPidController(kP: f32, kI: f32) -> PidController {
 
-        PidController::AltHold {ahp : makeAltHoldPid(kP, kI)}
+        PidController::AltHold {ahp : althold::makePid(kP, kI)}
     }
 
 

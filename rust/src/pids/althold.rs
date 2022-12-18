@@ -16,7 +16,7 @@ const STICK_DEADBAND: f32 = 0.2;
 const WINDUP_MAX: f32     = 0.4;
 
 #[derive(Clone)]
-pub struct AltHoldPid {
+pub struct Pid {
     kP : f32,
     kI: f32, 
     inBandPrev: bool,
@@ -24,9 +24,9 @@ pub struct AltHoldPid {
     altitudeTarget: f32
 }
 
-pub fn makeAltHoldPid(kP: f32, kI: f32) -> AltHoldPid {
+pub fn makePid(kP: f32, kI: f32) -> Pid {
 
-    AltHoldPid {
+    Pid {
         kP: kP, 
         kI: kI, 
         inBandPrev: false,
@@ -35,8 +35,8 @@ pub fn makeAltHoldPid(kP: f32, kI: f32) -> AltHoldPid {
     }
 }
 
-pub fn getAltHoldDemands(
-    pid: &mut AltHoldPid, demands: &Demands, vstate: &VehicleState, reset: &bool) -> Demands  {
+pub fn getDemands(
+    pid: &mut Pid, demands: &Demands, vstate: &VehicleState, reset: &bool) -> Demands  {
 
     let altitude = vstate.z;
     let dz = vstate.dz;
@@ -72,7 +72,7 @@ pub fn getAltHoldDemands(
         yaw : demands.yaw
     }
 
-} // getAltHoldDemands
+} // getDemands
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
