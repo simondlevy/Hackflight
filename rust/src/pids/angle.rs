@@ -174,6 +174,8 @@ pub fn getDemands(
         vstate.dpsi);
 
     pid.roll.axis.integral = if *reset { 0.0 } else { pid.roll.axis.integral };
+    pid.pitch.axis.integral = if *reset { 0.0 } else { pid.pitch.axis.integral };
+    pid.yaw.integral = if *reset { 0.0 } else { pid.yaw.integral };
 
     Demands { 
         throttle : 0.0,
