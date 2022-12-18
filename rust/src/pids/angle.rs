@@ -31,6 +31,9 @@ const ITERM_LIMIT: f32 = 400.0;
 
 const ITERM_WINDUP_POINT_PERCENT: f32 = 85.0;        
 
+// Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
+const ITERM_RELAX_SETPOINT_THRESHOLD: f32 = 40.0;
+
 const D_MIN: u8 = 30;
 const D_MIN_GAIN: u8 = 37;
 const D_MIN_ADVANCE: u8 = 20;
@@ -240,9 +243,6 @@ fn applyItermRelax(
     currentSetpoint: f32,
     itermErrorRate: f32) -> f32
 {
-    // Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
-    const ITERM_RELAX_SETPOINT_THRESHOLD: f32 = 40.0;
-
     // XXX need to use newWindupLpf
     let (setpointLpf, newWindupLpf) =
         filters::applyPt1(cyclicAxis.windupLpf, currentSetpoint);
@@ -278,10 +278,10 @@ fn updateCyclic(
 
     let newSetpoint = levelPid(kLevelP, currentSetpoint, angle);
 
-    /*
     // -----calculate error rate
     let errorRate = newSetpoint - angvel;
 
+    /*
     let itermErrorRate = applyItermRelax(cyclicAxis, axis.integral, newSetpoint, errorRate);
 
     // -----calculate P component
