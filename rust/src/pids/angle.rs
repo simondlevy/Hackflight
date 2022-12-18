@@ -293,55 +293,57 @@ fn updateCyclic(
                         -ITERM_LIMIT, ITERM_LIMIT);
 
     // Calculate D component --------------------------------------------------
+
     let dterm = filters::applyPt1(
         cyclicAxis.dtermLpf2, 
         filters::applyPt1(cyclicAxis.dtermLpf1, angvel));
-
-    let D = if kRateD > 0.0 {
-        computeDerivative(kRateD, cyclicAxis.previousDterm, 0.0, dterm)
-    } else {
-        0.0
-    };
-
-    cyclicAxis.previousDterm = dterm;
-
-    // Calculate feedforward component -----------------------------------------
-    let F = 
-        if kRateF > 0.0
-        {computeFeedforward(newSetpoint, kRateF, kRateP, 670.0, 0.0)}
-        else {0.0};
-
-    0.0 // P + axis.integral + D + F
-}
-
-fn computeDerivative(
-    kRateD: f32,
-    previousDterm: f32,
-    demandDelta: f32,
-    dterm: f32) -> f32 {
 
     // Divide rate change by dT to get differential (ie dr/dt).
     // dT is fixed and calculated from the target PID loop time
     // This is done to avoid DTerm spikes that occur with
     // dynamically calculated deltaT whenever another task causes
     // the PID loop execution to be delayed.
-    let delta = -(dterm - previousDterm) * frequency();
+    let delta = -(dterm - cyclicAxis.previousDterm) * frequency();
 
     let preTpaD = kRateD * delta;
 
     let dMinPercent = if D_MIN > 0.0 && D_MIN < kRateD { D_MIN / kRateD } else { 0.0 };
 
-    /*
-    let dMinFactor =
-        dMinPercent > 0 ?
-        computeDMinFactor(cyclicAxis, dMinPercent, demandDelta, delta) :
-        1.0f;
+    let demandDelta: f32 = 0.0;
+
+    let dMinGyroGain = D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
+
+    let dMinGyroFactor = (filters::applyPt2(cyclicAxis.dMinRange, delta)).abs() * dMinGyroGain;
+
+    let dMinSetpointGain =
+        D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR * D_MIN_ADVANCE * frequency() /
+        (100.0 * D_MIN_LOWPASS_HZ);
+
+    let dMinSetpointFactor = (demandDelta).abs() * dMinSetpointGain;
+
+    let dMinFactor = 
+        dMinPercent + (1.0 - dMinPercent) * dMinGyroFactor.max(dMinSetpointFactor);
+
+    let dMinFactorFiltered = filters::applyPt2(cyclicAxis.dMinLpf, dMinFactor);
+
+    let dMinFactor = dMinFactorFiltered.min(1.0);
 
     // Apply the dMinFactor
-    return preTpaD * dMinFactor;
-    */
+    let D = preTpaD * dMinFactor;
 
-    0.0
+    cyclicAxis.previousDterm = dterm;
+
+    // Calculate feedforward component -----------------------------------------
+
+    let F = 
+        if kRateF > 0.0 {
+            computeFeedforward(newSetpoint, kRateF, kRateP, 670.0, 0.0)
+        }
+        else {
+            0.0
+        };
+
+    0.0 // P + axis.integral + D + F
 }
 
 fn computeFeedforward(
@@ -390,33 +392,6 @@ fn applyFeedforwardLimit(
         0.0
     }
 }
-
-fn computeDMinFactor(
-    dMinRange: &mut filters::Pt2,
-    dMinFactor: &mut filters::Pt2,
-    dMinLpf: &mut filters::Pt2,
-    dMinPercent: f32,
-    demandDelta: f32,
-    delta: f32) -> f32 {
-
-    let dMinGyroGain = D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
-
-    let dMinGyroFactor = (filters::applyPt2(*dMinRange, delta)).abs() * dMinGyroGain;
-
-    let dMinSetpointGain =
-        D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR * D_MIN_ADVANCE * frequency() /
-        (100.0 * D_MIN_LOWPASS_HZ);
-
-    let dMinSetpointFactor = (demandDelta).abs() * dMinSetpointGain;
-
-    let dMinFactor = 
-        dMinPercent + (1.0 - dMinPercent) * dMinGyroFactor.max(dMinSetpointFactor);
-
-    let dMinFactorFiltered = filters::applyPt2(*dMinLpf, dMinFactor);
-
-    dMinFactorFiltered.min(1.0)
-}
-
 
 fn frequency() -> f32 {
     1.0 / DT
