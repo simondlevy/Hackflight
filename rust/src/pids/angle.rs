@@ -49,9 +49,8 @@ const RATE_ACCEL_LIMIT: f32 = 0.0;
 const YAW_RATE_ACCEL_LIMIT: f32 = 0.0;
 
 const OUTPUT_SCALING: f32 = 1000.0;
-//const  LIMIT_YAW: u16 = 400;
-//const  LIMIT: u16 = 500;
-
+const  LIMIT_CYCLIC: f32 = 500.0; 
+const  LIMIT_YAW: f32 = 400.0;
 
 #[derive(Clone)]
 pub struct Pid {
@@ -206,9 +205,9 @@ pub fn getDemands(
 
     Demands { 
         throttle : demands.throttle,
-        roll : 0.0,
-        pitch : 0.0,
-        yaw : 0.0
+        roll : constrainOutput(roll, LIMIT_CYCLIC),
+        pitch : constrainOutput(pitch, LIMIT_CYCLIC),
+        yaw : constrainOutput(roll, LIMIT_YAW)
     }
 }
 
