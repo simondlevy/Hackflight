@@ -146,6 +146,7 @@ pub fn getDemands(
             pid.kLevelP,
             pid.kRateP,
             pid.kRateI,
+            pid.kRateD,
             rollDemand,
             vstate.phi,
             vstate.dphi,
@@ -249,6 +250,7 @@ fn updateCyclic(
     kLevelP: f32,
     kRateP: f32,
     kRateI: f32,
+    kRateD: f32,
     demand: f32,
     angle: f32,
     angvel: f32,
@@ -293,9 +295,9 @@ fn updateCyclic(
         cyclicAxis.dtermLpf2, 
         filters::applyPt1(cyclicAxis.dtermLpf1, angvel));
 
-    /*
-    let D = m_kRateD > 0 ?  computeDerivative(cyclicAxis, 0, dterm) : 0;
+    let D = if kRateD > 0.0 {computeDerivative(cyclicAxis, 0.0, dterm)} else {0.0};
 
+    /*
     cyclicAxis.previousDterm = dterm;
 
     // -----calculate feedforward component
@@ -308,5 +310,32 @@ fn updateCyclic(
      */
 
     0.0
+}
 
+fn computeDerivative(cyclicAxis: &mut CyclicAxis, demandDelta: f32, dterm: f32) -> f32 {
+    /*
+    // Divide rate change by dT to get differential (ie dr/dt).
+    // dT is fixed and calculated from the target PID loop time
+    // This is done to avoid DTerm spikes that occur with
+    // dynamically calculated deltaT whenever another task causes
+    // the PID loop execution to be delayed.
+    const float delta = -(dterm - cyclicAxis.previousDterm) * FREQUENCY();
+
+    const auto preTpaD = m_k_rate_d * delta;
+
+    const auto dMinPercent = 
+        D_MIN > 0 && D_MIN < m_k_rate_d ?
+        D_MIN / m_k_rate_d :
+        0.0f;
+
+    const auto dMinFactor =
+        dMinPercent > 0 ?
+        computeDMinFactor(cyclicAxis, dMinPercent, demandDelta, delta) :
+        1.0f;
+
+    // Apply the dMinFactor
+    return preTpaD * dMinFactor;
+    */
+
+    0.0
 }
