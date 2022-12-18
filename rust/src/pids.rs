@@ -38,9 +38,9 @@ pub mod pids {
         AltHold { ahp : althold::Pid, },
     }
 
-    pub fn getDemands(
+    pub fn get_demands(
         pid: &mut PidController,
-        dUsec: &u32,
+        d_usec: &u32,
         demands: &Demands,
         vstate: &VehicleState,
         reset: &bool) -> Demands {
@@ -48,28 +48,28 @@ pub mod pids {
         match pid {
 
             PidController::Angle { ap } => { 
-                angle::getDemands(ap, dUsec, demands, vstate, reset)
+                angle::get_demands(ap, d_usec, demands, vstate, reset)
             },
 
             PidController::AltHold { ahp } => {
-                althold::getDemands(ahp, demands, vstate, reset)
+                althold::get_demands(ahp, demands, vstate, reset)
             }
         }
     }
 
-    pub fn makeAnglePidController( 
-        kRateP: f32,
-        kRateI: f32,
-        kRateD: f32,
-        kRateF: f32,
-        kLevelP: f32) -> PidController {
+    pub fn make_angle_pid_controller( 
+        k_rate_p: f32,
+        k_rate_i: f32,
+        k_rate_d: f32,
+        k_rate_f: f32,
+        k_level_p: f32) -> PidController {
 
-        PidController::Angle {ap: angle::makePid(kRateP, kRateI, kRateD, kRateF, kLevelP)}
+        PidController::Angle {ap: angle::make_pid(k_rate_p, k_rate_i, k_rate_d, k_rate_f, k_level_p)}
     }
 
-    pub fn makeAltHoldPidController(kP: f32, kI: f32) -> PidController {
+    pub fn make_alt_hold_pid_controller(k_p: f32, k_i: f32) -> PidController {
 
-        PidController::AltHold {ahp : althold::makePid(kP, kI)}
+        PidController::AltHold {ahp : althold::make_pid(k_p, k_i)}
     }
 
 

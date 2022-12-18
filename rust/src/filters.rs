@@ -19,23 +19,23 @@ pub struct Pt1 {
     k: f32
 }
 
-pub fn applyPt1(mut filter: Pt1, input: f32) -> f32 {
+pub fn apply_pt1(mut filter: Pt1, input: f32) -> f32 {
 
     filter.state = filter.state + filter.k * (input - filter.state);
 
     filter.state
 }
 
-pub fn makePt1(f_cut: f32) -> Pt1 {
+pub fn make_pt1(f_cut: f32) -> Pt1 {
 
-    let k = computeK(1.0, f_cut);
+    let k = compute_k(1.0, f_cut);
 
     Pt1 {state: 0.0, k: k }
 }
 
-pub fn adjustPt1Gain(mut filter: Pt1, f_cut: f32)
+pub fn adjust_pt1_gain(mut filter: Pt1, f_cut: f32)
 {
-    filter.k = computeK(1.0, f_cut);
+    filter.k = compute_k(1.0, f_cut);
 }
 
 
@@ -49,7 +49,7 @@ pub struct Pt2 {
     k: f32
 }
 
-pub fn applyPt2(mut filter: Pt2, input: f32) -> f32 {
+pub fn apply_pt2(mut filter: Pt2, input: f32) -> f32 {
 
     let state1 = filter.state1 + filter.k * (input - filter.state1);
 
@@ -58,10 +58,10 @@ pub fn applyPt2(mut filter: Pt2, input: f32) -> f32 {
     filter.state
 }
 
-pub fn makePt2(f_cut: f32) -> Pt2 {
+pub fn make_pt2(f_cut: f32) -> Pt2 {
 
-    let cutoff_correction = computeCutoffCorrection(2.0, f_cut);
-    let k = computeK(cutoff_correction, f_cut);
+    let cutoff_correction = compute_cutoff_correction(2.0, f_cut);
+    let k = compute_k(cutoff_correction, f_cut);
 
     Pt2 {state: 0.0, state1: 0.0, k: k }
 }
@@ -77,7 +77,7 @@ pub struct Pt3 {
     k: f32
 }
 
-pub fn applyPt3(mut filter: Pt3, input: f32) -> f32 {
+pub fn apply_pt3(mut filter: Pt3, input: f32) -> f32 {
 
     let state1 = filter.state1 + filter.k * (input - filter.state1);
     let state2 = filter.state2 + filter.k * (state1 - filter.state2);
@@ -87,24 +87,24 @@ pub fn applyPt3(mut filter: Pt3, input: f32) -> f32 {
     filter.state
 }
 
-pub fn makePt3(f_cut: f32) -> Pt3 {
+pub fn make_pt3(f_cut: f32) -> Pt3 {
 
-    let cutoff_correction = computeCutoffCorrection(3.0, f_cut);
-    let k = computeK(cutoff_correction, f_cut);
+    let cutoff_correction = compute_cutoff_correction(3.0, f_cut);
+    let k = compute_k(cutoff_correction, f_cut);
 
     Pt3 {state: 0.0, state1: 0.0, state2: 0.0, k: k }
 }
 
 // helpers -----------------------------------------------------------------
 
-fn computeK(cutoff_correction:f32, f_cut:f32) -> f32 {
+fn compute_k(cutoff_correction:f32, f_cut:f32) -> f32 {
 
     let rc = 1.0 / (2.0 * cutoff_correction * std::f32::consts::PI * f_cut);
 
     DT / (rc + DT)
 }
 
-fn computeCutoffCorrection(order: f32, f_cut: f32) -> f32 {
+fn compute_cutoff_correction(order: f32, f_cut: f32) -> f32 {
 
     let two: f32 = 2.0;
 

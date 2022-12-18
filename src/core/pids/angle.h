@@ -126,7 +126,6 @@ class AnglePidController : public PidController {
         float    m_k_rate_d;
         float    m_k_rate_f;
         float    m_k_level_p;
-        float    m_sum;
 
         float applyFeedforwardLimit(
                 const float value,
