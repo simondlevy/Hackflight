@@ -266,14 +266,15 @@ fn updateCyclic(
     angvel: f32,
     maxVelocity: f32) -> f32
 {
+    let axis: &mut Axis = &mut cyclicAxis.axis;
+
     let currentSetpoint =
         if maxVelocity > 0.0
-        {accelerationLimit(&mut cyclicAxis.axis, demand, maxVelocity)}
+        // {accelerationLimit(&mut cyclicAxis.axis, demand, maxVelocity)}
+        {accelerationLimit(axis, demand, maxVelocity)}
         else {demand};
 
     /*
-    // XXX axis.previousSetpoint = newSetpoint;
-
     let newSetpoint = levelPid(pid.kLevelP, currentSetpoint, angle);
 
     // -----calculate error rate
