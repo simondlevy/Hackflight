@@ -335,33 +335,17 @@ fn updateCyclic(
 
     // Calculate feedforward component -----------------------------------------
 
-    let F = 
-        if kRateF > 0.0 {
-            computeFeedforward(newSetpoint, kRateF, kRateP, 670.0, 0.0)
-        }
-        else {
-            0.0
-        };
-
-    0.0 // P + axis.integral + D + F
-}
-
-fn computeFeedforward(
-    currentSetpoint: f32,
-    kRateP : f32,
-    kRateF : f32,
-    feedforwardMaxRate: f32,
-    demandDelta: f32) -> f32 {
-
     // halve feedforward in Level mode since stick sensitivity is
     // weaker by about half transition now calculated in
     // feedforward.c when new RC data arrives 
     let feedForward = kRateF * demandDelta * frequency();
 
+    let feedforwardMaxRate: f32 = 670.0;
+
     let feedforwardMaxRateLimit =
         feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01;
 
-    if feedforwardMaxRateLimit != 0.0 {
+    let F = if feedforwardMaxRateLimit != 0.0 {
         applyFeedforwardLimit(
             feedForward,
             currentSetpoint,
@@ -369,9 +353,10 @@ fn computeFeedforward(
             feedforwardMaxRateLimit) }
     else {
         feedForward 
-    }
-}
+    };
 
+    0.0 // P + axis.integral + D + F
+}
 
 fn applyFeedforwardLimit(
     value: f32,
