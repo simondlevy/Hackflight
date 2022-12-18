@@ -36,7 +36,7 @@ pub mod pids {
     #[derive(Clone)]
     pub enum PidController {
 
-        Angle { ap : angle::AnglePid, },
+        Angle { ap : angle::Pid, },
 
         AltHold { ahp : AltHoldPid, },
     }
@@ -51,7 +51,7 @@ pub mod pids {
         match pid {
 
             PidController::Angle { ap } => { 
-                angle::getAngleDemands(ap, demands, vstate, reset)
+                angle::getDemands(ap, demands, vstate, reset)
             },
 
             PidController::AltHold { ahp } => {
@@ -67,7 +67,7 @@ pub mod pids {
         kRateF: f32,
         kLevelP: f32) -> PidController {
 
-        PidController::Angle {ap : angle::makeAnglePid(kRateP, kRateI, kRateD, kRateF, kLevelP)}
+        PidController::Angle {ap: angle::makePid(kRateP, kRateI, kRateD, kRateF, kLevelP)}
     }
 
     pub fn makeAltHoldPidController(kP: f32, kI: f32) -> PidController {

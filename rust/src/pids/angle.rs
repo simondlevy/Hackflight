@@ -52,7 +52,7 @@ const  LIMIT: u16 = 500;
 
 
 #[derive(Clone)]
-pub struct AnglePid {
+pub struct Pid {
     kRateP: f32,
     kRateI: f32,
     kRateD: f32,
@@ -67,16 +67,16 @@ pub struct AnglePid {
     ptermYawLpf: filters::Pt1
 }
 
-pub fn makeAnglePid( 
+pub fn makePid( 
     kRateP: f32,
     kRateI: f32,
     kRateD: f32,
     kRateF: f32,
-    kLevelP: f32) -> AnglePid {
+    kLevelP: f32) -> Pid {
 
     const YAW_LOWPASS_HZ: f32 = 100.0;
 
-    AnglePid {
+    Pid {
         kRateP: kRateP, 
         kRateI: kRateI, 
         kRateD: kRateD, 
@@ -128,8 +128,8 @@ fn makeAxis() -> Axis {
     Axis { previousSetpoint: 0.0, integral: 0.0 }
 }
 
-pub fn getAngleDemands(
-    pid: &mut AnglePid, demands: &Demands, vstate: &VehicleState, reset: &bool) -> Demands {
+pub fn getDemands(
+    pid: &mut Pid, demands: &Demands, vstate: &VehicleState, reset: &bool) -> Demands {
 
     let rollDemand  = rescale(demands.roll);
     let pitchDemand = rescale(demands.pitch);
@@ -251,7 +251,7 @@ fn applyItermRelax(
 
 
 fn updateCyclic(
-    mut pid: &AnglePid,
+    mut pid: &Pid,
     demand: f32,
     angle: f32,
     angvel: f32,
