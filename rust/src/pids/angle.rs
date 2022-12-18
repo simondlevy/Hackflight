@@ -181,18 +181,14 @@ pub fn getDemands(
     pid.pitch.axis.integral = if *reset { 0.0 } else { pid.pitch.axis.integral };
     pid.yaw.integral = if *reset { 0.0 } else { pid.yaw.integral };
 
-    pid.dynLpfPreviousQuantizedThrottle = 
+    if *dUsec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US {
 
-        if *dUsec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US {
+        // Quantize the throttle to reduce the number of filter updates
+        let quantizedThrottle = (demands.throttle * DYN_LPF_THROTTLE_STEPS) as i32; 
 
-            // Quantize the throttle to reduce the number of filter updates
-            let quantizedThrottle = (demands.throttle * DYN_LPF_THROTTLE_STEPS) as i32; 
-
-            0
-        } 
-        else {
-            pid.dynLpfPreviousQuantizedThrottle
-        };
+    }
+    else {
+    }
 
     Demands { 
         throttle : demands.throttle,
