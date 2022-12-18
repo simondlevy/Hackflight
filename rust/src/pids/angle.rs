@@ -198,133 +198,65 @@ fn applyItermRelax(
 
     let setpointHpf = (currentSetpoint - setpointLpf).abs();
 
-        let itermRelaxFactor =
-            (1.0 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD).max(0.0);
+    let itermRelaxFactor =
+        (1.0 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD).max(0.0);
 
-        let isDecreasingI =
-            ((iterm > 0.0) && (itermErrorRate < 0.0)) ||
-            ((iterm < 0.0) && (itermErrorRate > 0.0));
+    let isDecreasingI =
+        ((iterm > 0.0) && (itermErrorRate < 0.0)) ||
+        ((iterm < 0.0) && (itermErrorRate > 0.0));
 
-        itermErrorRate * (if !isDecreasingI  {itermRelaxFactor} else {1.0} )
-    }
-
-
-    fn updateCyclic(
-        mut pid: &AnglePid,
-        demand: f32,
-        angle: f32,
-        angvel: f32,
-        mut cyclicAxis: &CyclicAxis,
-        maxVelocity: f32) -> f32
-    {
-        const ITERM_LIMIT: f32 = 400.0;
-
-        let axis = cyclicAxis.axis.clone();
-
-        let currentSetpoint =
-            if { maxVelocity > 0.0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
-
-        // XXX axis.previousSetpoint = newSetpoint;
-
-        let newSetpoint = levelPid(pid.kLevelP, currentSetpoint, angle);
-
-        // -----calculate error rate
-        let errorRate = newSetpoint - angvel;
-
-        let itermErrorRate = applyItermRelax(cyclicAxis, axis.integral, newSetpoint, errorRate);
-
-        // -----calculate P component
-        let P = pid.kRateP * errorRate;
-
-        // -----calculate I component XXX need to store in axis
-        let I = constrain_f(axis.integral + (pid.kRateI * DT) * itermErrorRate,
-                           -ITERM_LIMIT, ITERM_LIMIT);
-
-        /*
-        // -----calculate D component
-        let dterm = cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
-
-        const auto D = m_kRateD > 0 ?  computeDerivative(cyclicAxis, 0, dterm) : 0;
-
-        cyclicAxis.previousDterm = dterm;
-
-        // -----calculate feedforward component
-        const auto F =
-        m_kRateF > 0 ?
-        computeFeedforward(newSetpoint, 670, 0) :
-        0;
-
-        return P + axis->I + D + F;
-         */
-
-        0.0
-
-    } // updateCyclic
-///////////////////////////////////////////////////////////////////////////////////
-
-#[derive(Copy,Clone)]
-struct AxisPid {
-    error_integral: f32,
-    previous_error: f32
+    itermErrorRate * (if !isDecreasingI  {itermRelaxFactor} else {1.0} )
 }
 
-#[derive(Copy,Clone)]
-pub struct RatePid {
-    roll: AxisPid,
-    pitch: AxisPid
-}
 
-fn run_axis(demand: f32, angvel: f32, axis_pid: AxisPid) -> (f32, AxisPid) {
+fn updateCyclic(
+    mut pid: &AnglePid,
+    demand: f32,
+    angle: f32,
+    angvel: f32,
+    mut cyclicAxis: &CyclicAxis,
+    maxVelocity: f32) -> f32
+{
+    const ITERM_LIMIT: f32 = 400.0;
 
-    const KP: f32 = 0.225;
-    const KI: f32 = 0.001875;
-    const KD: f32 = 0.375;
+    let axis = cyclicAxis.axis.clone();
 
-    const WINDUP_MAX: f32 = 6.0;
+    let currentSetpoint =
+        if { maxVelocity > 0.0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
 
-    let error = demand - angvel;
+    // XXX axis.previousSetpoint = newSetpoint;
 
-    let error_integral = utils::constrain_abs(axis_pid.error_integral, WINDUP_MAX);
+    let newSetpoint = levelPid(pid.kLevelP, currentSetpoint, angle);
 
-    let error_derivative = error - axis_pid.previous_error;
+    // -----calculate error rate
+    let errorRate = newSetpoint - angvel;
 
-    let new_demand = KP * error + KI * error_integral + KD * error_derivative;
+    let itermErrorRate = applyItermRelax(cyclicAxis, axis.integral, newSetpoint, errorRate);
 
-    let new_pid = AxisPid { error_integral:error_integral, previous_error:error };
+    // -----calculate P component
+    let P = pid.kRateP * errorRate;
 
-    (new_demand, new_pid)
-}
+    // -----calculate I component XXX need to store in axis
+    let I = constrain_f(axis.integral + (pid.kRateI * DT) * itermErrorRate,
+    -ITERM_LIMIT, ITERM_LIMIT);
 
-pub fn run(
-    demands:Demands,
-    vstate:&VehicleState,
-    pid: RatePid) -> (Demands, RatePid) {
+    /*
+    // -----calculate D component
+    let dterm = cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
 
-    let (roll_demand, roll_pid) = run_axis(demands.roll, vstate.dphi, pid.roll);
+    const auto D = m_kRateD > 0 ?  computeDerivative(cyclicAxis, 0, dterm) : 0;
 
-    // Pitch demand is nose-down positive, so we negate pitch-forward rate
-    // (nose-down negative)
-    let (pitch_demand, pitch_pid) = run_axis(demands.pitch, -vstate.dtheta, pid.pitch);
+    cyclicAxis.previousDterm = dterm;
 
-    let new_demands = Demands {
-        throttle:demands.throttle,
-        roll:roll_demand,
-        pitch:pitch_demand,
-        yaw:demands.yaw
-    };
+    // -----calculate feedforward component
+    const auto F =
+    m_kRateF > 0 ?
+    computeFeedforward(newSetpoint, 670, 0) :
+    0;
 
-    let new_pid = RatePid { roll: roll_pid, pitch: pitch_pid };
+    return P + axis->I + D + F;
+     */
 
-    (new_demands, new_pid)
-}
+    0.0
 
-fn make_axis(error_integral:f32, previous_error:f32) -> AxisPid {
-    AxisPid {
-        error_integral:error_integral,
-        previous_error:previous_error
-    }
-}
-
-pub fn new() -> RatePid {
-    RatePid {roll:make_axis(0.0, 0.0), pitch:make_axis(0.0, 0.0) }
-}
+} // updateCyclic
