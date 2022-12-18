@@ -142,7 +142,13 @@ pub fn getDemands(
 
     let roll = 
         updateCyclic(
-            &mut pid.roll, pid.kLevelP, rollDemand, vstate.phi, vstate.dphi, maxVelocity);
+            &mut pid.roll,
+            pid.kLevelP,
+            pid.kRateP,
+            rollDemand,
+            vstate.phi,
+            vstate.dphi,
+            maxVelocity);
 
     /*let pitch = 
         updateCyclic(&pid.pitch pitchDemand, vstate.theta, vstate.dtheta, maxVelocity);*/
@@ -237,30 +243,10 @@ fn levelPid(kLevelP: f32, currentSetpoint: f32, currentAngle: f32) -> f32
     if kLevelP > 0.0  {angleError * kLevelP } else {currentSetpoint}
 }
 
-fn applyItermRelax(
-    cyclicAxis: &mut CyclicAxis,
-    iterm: f32,
-    currentSetpoint: f32,
-    itermErrorRate: f32) -> f32
-{
-    let setpointLpf = filters::applyPt1Mut(cyclicAxis.windupLpf, currentSetpoint);
-
-    let setpointHpf = (currentSetpoint - setpointLpf).abs();
-
-    let itermRelaxFactor =
-        (1.0 - setpointHpf / ITERM_RELAX_SETPOINT_THRESHOLD).max(0.0);
-
-    let isDecreasingI =
-        ((iterm > 0.0) && (itermErrorRate < 0.0)) ||
-        ((iterm < 0.0) && (itermErrorRate > 0.0));
-
-    itermErrorRate * (if !isDecreasingI  {itermRelaxFactor} else {1.0} )
-}
-
-
 fn updateCyclic(
     cyclicAxis: &mut CyclicAxis,
     kLevelP: f32,
+    kRateP: f32,
     demand: f32,
     angle: f32,
     angvel: f32,
@@ -290,14 +276,13 @@ fn updateCyclic(
         ((axis.integral > 0.0) && (errorRate < 0.0)) ||
         ((axis.integral < 0.0) && (errorRate > 0.0));
 
+    // applyItermRelax in original
     let itermErrorRate = errorRate * (if !isDecreasingI  {itermRelaxFactor} else {1.0} );
 
-    /*
-    let itermErrorRate = applyItermRelax(cyclicAxis, axis.integral, newSetpoint, errorRate);
-
     // -----calculate P component
-    let P = pid.kRateP * errorRate;
+    let P = kRateP * errorRate;
 
+    /*
     // -----calculate I component XXX need to store in axis
     let I = constrain_f(axis.integral + (pid.kRateI * DT) * itermErrorRate,
     -ITERM_LIMIT, ITERM_LIMIT);
