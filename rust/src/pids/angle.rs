@@ -186,7 +186,7 @@ pub fn getDemands(
         if *dUsec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US {
 
             // Quantize the throttle to reduce the number of filter updates
-            let quantizedThrottle = (demands.throttle * DYN_LPF_THROTTLE_STEPS) as u8; 
+            let quantizedThrottle = (demands.throttle * DYN_LPF_THROTTLE_STEPS) as i32; 
 
             0
         } 
