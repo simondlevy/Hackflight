@@ -434,3 +434,8 @@ fn applyFeedforwardLimit(
         0.0
     }
 }
+
+fn constrainOutput(demand: f32, limit: f32) -> f32 {
+
+    constrain_f(demand, -limit, limit) / OUTPUT_SCALING
+}
