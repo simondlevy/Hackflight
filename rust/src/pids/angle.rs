@@ -285,6 +285,8 @@ fn updateCyclic(
     // Was applyItermRelax in original
     let itermErrorRate = errorRate * (if !isDecreasingI  {itermRelaxFactor} else {1.0} );
 
+    let frequency = 1.0 / DT;
+
     // Calculate P component --------------------------------------------------
     let P = kRateP * errorRate;
 
@@ -303,7 +305,7 @@ fn updateCyclic(
     // This is done to avoid DTerm spikes that occur with
     // dynamically calculated deltaT whenever another task causes
     // the PID loop execution to be delayed.
-    let delta = -(dterm - cyclicAxis.previousDterm) * frequency();
+    let delta = -(dterm - cyclicAxis.previousDterm) * frequency;
 
     let preTpaD = kRateD * delta;
 
@@ -316,7 +318,7 @@ fn updateCyclic(
     let dMinGyroFactor = (filters::applyPt2(cyclicAxis.dMinRange, delta)).abs() * dMinGyroGain;
 
     let dMinSetpointGain =
-        D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR * D_MIN_ADVANCE * frequency() /
+        D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR * D_MIN_ADVANCE * frequency /
         (100.0 * D_MIN_LOWPASS_HZ);
 
     let dMinSetpointFactor = (demandDelta).abs() * dMinSetpointGain;
@@ -338,7 +340,7 @@ fn updateCyclic(
     // halve feedforward in Level mode since stick sensitivity is
     // weaker by about half transition now calculated in
     // feedforward.c when new RC data arrives 
-    let feedForward = kRateF * demandDelta * frequency();
+    let feedForward = kRateF * demandDelta * frequency;
 
     let feedforwardMaxRate: f32 = 670.0;
 
@@ -376,8 +378,4 @@ fn applyFeedforwardLimit(
     else {
         0.0
     }
-}
-
-fn frequency() -> f32 {
-    1.0 / DT
 }
