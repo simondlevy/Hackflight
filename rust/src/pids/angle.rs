@@ -38,7 +38,7 @@ const D_MIN: u8 = 30;
 const D_MIN_GAIN: u8 = 37;
 const D_MIN_ADVANCE: u8 = 20;
 
-const FEEDFORWARD_MAX_RATE_LIMIT: u8 = 90;
+const FEEDFORWARD_MAX_RATE_LIMIT: f32 = 900.0;
 
 const DYN_LPF_CURVE_EXPO: u8 = 5;
 
@@ -147,6 +147,7 @@ pub fn getDemands(
             pid.kRateP,
             pid.kRateI,
             pid.kRateD,
+            pid.kRateF,
             rollDemand,
             vstate.phi,
             vstate.dphi,
@@ -251,6 +252,7 @@ fn updateCyclic(
     kRateP: f32,
     kRateI: f32,
     kRateD: f32,
+    kRateF: f32,
     demand: f32,
     angle: f32,
     angvel: f32,
@@ -287,7 +289,7 @@ fn updateCyclic(
     let P = kRateP * errorRate;
 
     // -----calculate I component XXX need to store in axis
-    let I = constrain_f(axis.integral + (kRateI * DT) * itermErrorRate,
+    axis.integral = constrain_f(axis.integral + (kRateI * DT) * itermErrorRate,
                         -ITERM_LIMIT, ITERM_LIMIT);
 
     // -----calculate D component
@@ -297,19 +299,15 @@ fn updateCyclic(
 
     let D = if kRateD > 0.0 {computeDerivative(cyclicAxis, 0.0, dterm)} else {0.0};
 
-    /*
     cyclicAxis.previousDterm = dterm;
 
     // -----calculate feedforward component
-    let F =
-    m_kRateF > 0 ?
-    computeFeedforward(newSetpoint, 670, 0) :
-    0;
+    let F = 
+        if kRateF > 0.0
+        {computeFeedforward(newSetpoint, kRateF, kRateP, 670.0, 0.0)}
+        else {0.0};
 
-    return P + axis->I + D + F;
-     */
-
-    0.0
+    0.0 // P + axis.integral + D + F
 }
 
 fn computeDerivative(cyclicAxis: &mut CyclicAxis, demandDelta: f32, dterm: f32) -> f32 {
@@ -319,7 +317,7 @@ fn computeDerivative(cyclicAxis: &mut CyclicAxis, demandDelta: f32, dterm: f32) 
     // This is done to avoid DTerm spikes that occur with
     // dynamically calculated deltaT whenever another task causes
     // the PID loop execution to be delayed.
-    const float delta = -(dterm - cyclicAxis.previousDterm) * FREQUENCY();
+    const float delta = -(dterm - cyclicAxis.previousDterm) * frequency();
 
     const auto preTpaD = m_k_rate_d * delta;
 
@@ -338,4 +336,55 @@ fn computeDerivative(cyclicAxis: &mut CyclicAxis, demandDelta: f32, dterm: f32) 
     */
 
     0.0
+}
+
+fn computeFeedforward(
+    currentSetpoint: f32,
+    kRateP : f32,
+    kRateF : f32,
+    feedforwardMaxRate: f32,
+    demandDelta: f32) -> f32 {
+
+    // halve feedforward in Level mode since stick sensitivity is
+    // weaker by about half transition now calculated in
+    // feedforward.c when new RC data arrives 
+    let feedForward = kRateF * demandDelta * frequency();
+
+    let feedforwardMaxRateLimit =
+        feedforwardMaxRate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01;
+
+    if feedforwardMaxRateLimit != 0.0 {
+        applyFeedforwardLimit(
+            feedForward,
+            currentSetpoint,
+            kRateP,
+            feedforwardMaxRateLimit) }
+    else {
+        feedForward 
+    }
+}
+
+
+fn applyFeedforwardLimit(
+    value: f32,
+    currentSetpoint: f32,
+    kRateP : f32,
+    maxRateLimit: f32) -> f32 {
+
+    if value * currentSetpoint > 0.0 {
+        if currentSetpoint.abs() <= maxRateLimit
+        { constrain_f(value, (-maxRateLimit -
+                              currentSetpoint) * kRateP,
+                              (maxRateLimit - currentSetpoint) * kRateP)}
+        else {
+            0.0
+        }
+    }
+    else {
+        0.0
+    }
+}
+
+fn frequency() -> f32 {
+    1.0 / DT
 }
