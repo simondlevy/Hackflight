@@ -173,6 +173,8 @@ pub fn getDemands(
         yawDemand,
         vstate.dpsi);
 
+    pid.roll.axis.integral = if *reset { 0.0 } else { pid.roll.axis.integral };
+
     Demands { 
         throttle : 0.0,
         roll : 0.0,
