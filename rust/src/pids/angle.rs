@@ -218,8 +218,8 @@ pub fn getDemands(
 fn dynLpfCutoffFreq(throttle: f32, dynLpfMin: f32, dynLpfMax: f32, expo: f32) -> f32 {
     let expof = expo / 10.0;
     let curve = throttle * (1.0 - throttle) * expof + throttle;
-    //return (dynLpfMax - dynLpfMin) * curve + dynLpfMin;
-    0.0
+
+    (dynLpfMax - dynLpfMin) * curve + dynLpfMin
 }
 
 
