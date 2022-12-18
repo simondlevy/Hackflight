@@ -266,12 +266,12 @@ fn updateCyclic(
     angvel: f32,
     maxVelocity: f32) -> f32
 {
-    /*
-    let axis = cyclicAxis.axis.clone();
-
     let currentSetpoint =
-        if { maxVelocity > 0.0 } { accelerationLimit(axis, demand, maxVelocity) } else { demand };
+        if maxVelocity > 0.0
+        {accelerationLimit(&mut cyclicAxis.axis, demand, maxVelocity)}
+        else {demand};
 
+    /*
     // XXX axis.previousSetpoint = newSetpoint;
 
     let newSetpoint = levelPid(pid.kLevelP, currentSetpoint, angle);
