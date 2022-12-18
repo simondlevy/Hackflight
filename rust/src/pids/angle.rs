@@ -188,9 +188,9 @@ pub fn getDemands(
 
         if (quantizedThrottle != pid.dynLpfPreviousQuantizedThrottle) {
 
-            // scale the quantized value back to the throttle range so the
+            // Scale the quantized value back to the throttle range so the
             // filter cutoff steps are repeatable
-            //const auto dynLpfThrottle = (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
+            let dynLpfThrottle = (quantizedThrottle as f32) / DYN_LPF_THROTTLE_STEPS;
             //pidDynLpfDTermUpdate(dynLpfThrottle);
             //m_dynLpfPreviousQuantizedThrottle = quantizedThrottle;
         }
