@@ -138,7 +138,8 @@ pub fn getDemands(
     let maxVelocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
     let roll = 
-        updateCyclic(&mut pid.roll, rollDemand, vstate.phi, vstate.dphi, maxVelocity);
+        updateCyclic(
+            &mut pid.roll, pid.kLevelP, rollDemand, vstate.phi, vstate.dphi, maxVelocity);
 
     /*let pitch = 
         updateCyclic(&pid.pitch pitchDemand, vstate.theta, vstate.dtheta, maxVelocity);*/
@@ -261,6 +262,7 @@ fn applyItermRelax(
 
 fn updateCyclic(
     cyclicAxis: &mut CyclicAxis,
+    kLevelP: f32,
     demand: f32,
     angle: f32,
     angvel: f32,
@@ -274,9 +276,9 @@ fn updateCyclic(
         {accelerationLimit(axis, demand, maxVelocity)}
         else {demand};
 
-    /*
-    let newSetpoint = levelPid(pid.kLevelP, currentSetpoint, angle);
+    let newSetpoint = levelPid(kLevelP, currentSetpoint, angle);
 
+    /*
     // -----calculate error rate
     let errorRate = newSetpoint - angvel;
 
