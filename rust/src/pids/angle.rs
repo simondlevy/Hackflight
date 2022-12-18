@@ -202,9 +202,6 @@ pub fn getDemands(
 
             pid.dynLpfPreviousQuantizedThrottle = quantizedThrottle;
         }
-
-    }
-    else {
     }
 
     Demands { 
