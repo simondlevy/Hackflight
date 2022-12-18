@@ -289,6 +289,9 @@ fn updateCyclic(
     let isDecreasingI =
         ((axis.integral > 0.0) && (errorRate < 0.0)) ||
         ((axis.integral < 0.0) && (errorRate > 0.0));
+
+    let itermErrorRate = errorRate * (if !isDecreasingI  {itermRelaxFactor} else {1.0} );
+
     /*
     let itermErrorRate = applyItermRelax(cyclicAxis, axis.integral, newSetpoint, errorRate);
 
