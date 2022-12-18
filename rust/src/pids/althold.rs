@@ -57,17 +57,17 @@ pub fn getAltHoldDemands(
 
     pid.inBandPrev = inBand;
 
-    let altitudeTarget = if *reset { 0.0 } else { pid.altitudeTarget };
+    pid.altitudeTarget = if *reset { 0.0 } else { pid.altitudeTarget };
 
     // Target velocity is a setpoint inside deadband, scaled constant outside
-    let target_velocity =
-        if inBand {altitudeTarget - altitude } else { PILOT_VELZ_MAX * sthrottle};
+    let targetVelocity =
+        if inBand {pid.altitudeTarget - altitude } else { PILOT_VELZ_MAX * sthrottle};
 
     // Compute error as scaled target minus actual
-    let error = target_velocity - dz;
+    let error = targetVelocity - dz;
 
     // Compute I term, avoiding windup
-    let errorIntegral = utils::constrain_abs(errorIntegral + error, WINDUP_MAX);
+    pid.errorIntegral = utils::constrain_abs(pid.errorIntegral + error, WINDUP_MAX);
 
     Demands { 
         throttle : demands.throttle + (error * pid.kP + errorIntegral * pid.kI),
@@ -119,11 +119,11 @@ pub fn run(
 
     // Target velocity is a setpoint inside deadband, scaled
     // constant outside
-    let target_velocity =
+    let targetVelocity =
         if inBand {new_target - altitude} else {PILOT_VELZ_MAX * sthrottle};
 
     // Compute error as scaled target minus actual
-    let error = target_velocity - climb_rate;
+    let error = targetVelocity - climb_rate;
 
     // Compute I term, avoiding windup
     let new_error_integral = utils::constrain_abs(pid.error_integral + error, WINDUP_MAX);
