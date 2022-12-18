@@ -145,6 +145,7 @@ pub fn getDemands(
             &mut pid.roll,
             pid.kLevelP,
             pid.kRateP,
+            pid.kRateI,
             rollDemand,
             vstate.phi,
             vstate.dphi,
@@ -247,6 +248,7 @@ fn updateCyclic(
     cyclicAxis: &mut CyclicAxis,
     kLevelP: f32,
     kRateP: f32,
+    kRateI: f32,
     demand: f32,
     angle: f32,
     angvel: f32,
@@ -282,11 +284,11 @@ fn updateCyclic(
     // -----calculate P component
     let P = kRateP * errorRate;
 
-    /*
     // -----calculate I component XXX need to store in axis
-    let I = constrain_f(axis.integral + (pid.kRateI * DT) * itermErrorRate,
-    -ITERM_LIMIT, ITERM_LIMIT);
+    let I = constrain_f(axis.integral + (kRateI * DT) * itermErrorRate,
+                        -ITERM_LIMIT, ITERM_LIMIT);
 
+    /*
     // -----calculate D component
     let dterm = cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
 
