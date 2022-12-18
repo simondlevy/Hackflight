@@ -73,8 +73,7 @@ class AltHoldPidController : public PidController {
             const auto sthrottle = 2 * demands.throttle - 1; 
 
             // Is stick demand in deadband, above a minimum altitude?
-            const auto inBand =
-                fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+            const auto inBand = fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
             // Reset controller when moving into deadband above a minimum altitude
             const auto gotNewTarget = inBand && !m_inBandPrev;

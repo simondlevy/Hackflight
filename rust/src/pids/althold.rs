@@ -36,7 +36,7 @@ pub fn makeAltHoldPid(kP: f32, kI: f32) -> AltHoldPid {
 }
 
 pub fn getAltHoldDemands(
-    mut pid: &AltHoldPid,
+    pid: &mut AltHoldPid,
     demands: &Demands,
     vstate: &VehicleState,
     reset: &bool
@@ -49,19 +49,19 @@ pub fn getAltHoldDemands(
     let sthrottle = 2.0 * demands.throttle - 1.0; 
 
     // Is stick demand in deadband, above a minimum altitude?
-    let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+    let inBand = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
     // Reset controller when moving into deadband above a minimum altitude
-    let gotNewTarget = in_band && !pid.inBandPrev;
+    let gotNewTarget = inBand && !pid.inBandPrev;
     let errorIntegral = if gotNewTarget || *reset { 0.0 } else { pid.errorIntegral };
 
-    let inBandPrev = in_band;
+    pid.inBandPrev = inBand;
 
     let altitudeTarget = if *reset { 0.0 } else { pid.altitudeTarget };
 
     // Target velocity is a setpoint inside deadband, scaled constant outside
     let target_velocity =
-        if in_band {altitudeTarget - altitude } else { PILOT_VELZ_MAX * sthrottle};
+        if inBand {altitudeTarget - altitude } else { PILOT_VELZ_MAX * sthrottle};
 
     // Compute error as scaled target minus actual
     let error = target_velocity - dz;
@@ -84,7 +84,7 @@ pub fn getAltHoldDemands(
 #[derive(Copy,Clone)]
 pub struct AltitudePid {
     pub error_integral:f32,
-    pub in_band:bool,
+    pub inBand:bool,
     pub target:f32
 }
 
@@ -105,7 +105,7 @@ pub fn run(
     let sthrottle = throttle; // 2.0 * throttle - 1.0; 
 
     // Is stick demand in deadband, above a minimum altitude?
-    let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+    let inBand = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
 
     // Zero throttle will reset error integral
     let at_zero_throttle = throttle == 0.0;
@@ -115,12 +115,12 @@ pub fn run(
 
     // If stick just moved into deadband, set new target altitude; otherwise,
     // keep previous
-    let new_target = if in_band && !pid.in_band {altitude} else {altitude_target};
+    let new_target = if inBand && !pid.inBand {altitude} else {altitude_target};
 
     // Target velocity is a setpoint inside deadband, scaled
     // constant outside
     let target_velocity =
-        if in_band {new_target - altitude} else {PILOT_VELZ_MAX * sthrottle};
+        if inBand {new_target - altitude} else {PILOT_VELZ_MAX * sthrottle};
 
     // Compute error as scaled target minus actual
     let error = target_velocity - climb_rate;
@@ -140,15 +140,15 @@ pub fn run(
     };
 
     // Capture new state of PID controller
-    let new_altitude_pid = make(new_error_integral, in_band, new_target);
+    let new_altitude_pid = make(new_error_integral, inBand, new_target);
 
     (new_demands, new_altitude_pid)
 }
 
-fn make(error_integral:f32, in_band:bool, target:f32) -> AltitudePid {
+fn make(error_integral:f32, inBand:bool, target:f32) -> AltitudePid {
     AltitudePid {
         error_integral: error_integral,
-        in_band: in_band,
+        inBand: inBand,
         target: target
     }
 }

@@ -44,7 +44,7 @@ pub mod pids {
     }
 
     pub fn getDemands(
-        pid: &PidController,
+        pid: &mut PidController,
         dUsec: &u32,
         demands: &Demands,
         vstate: &VehicleState,
