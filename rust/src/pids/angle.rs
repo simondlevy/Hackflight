@@ -143,7 +143,13 @@ pub fn getDemands(
     let pitch = 
         updateCyclic(pid, pitchDemand, vstate.theta, vstate.dtheta, &pid.pitch, maxVelocity);
 
-    let yaw = updateYaw(&mut pid.yaw, pid.ptermYawLpf, pid.kRateP, yawDemand, vstate.dpsi);
+    let yaw = updateYaw(
+        &mut pid.yaw,
+        pid.ptermYawLpf,
+        pid.kRateP,
+        pid.kRateI,
+        yawDemand,
+        vstate.dpsi);
 
     Demands { 
         throttle : 0.0,
@@ -157,6 +163,7 @@ fn updateYaw(
     axis: &mut Axis,
     ptermLpf: filters::Pt1,
     kp: f32,
+    ki: f32,
     demand: f32,
     angvel: f32) -> f32 {
 
@@ -175,17 +182,13 @@ fn updateYaw(
     let errorRate = currentSetpoint - angvel;
 
     // -----calculate P component
-    let P = filters::applyPt1(ptermLpf, kp * errorRate);
+    let P = filters::applyPt1Mut(ptermLpf, kp * errorRate);
 
-    /*
     // -----calculate I component, constraining windup
-    axis.I = constrain_f(axis.I + (m_k_rate_i * dynCi) * errorRate,
-        -ITERM_LIMIT, ITERM_LIMIT);
+    axis.integral =
+        constrain_f(axis.integral + (ki * dynCi) * errorRate, -ITERM_LIMIT, ITERM_LIMIT);
 
-    P + axis.I
-    */
-
-    0.0
+    P + axis.integral
 }
 
 fn accelerationLimit(axis: &mut Axis, currentSetpoint: f32, maxVelocity: f32) -> f32 {
