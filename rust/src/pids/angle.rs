@@ -138,10 +138,10 @@ pub fn getDemands(
     let maxVelocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
     let roll = 
-        updateCyclic(pid, rollDemand, vstate.phi, vstate.dphi, &pid.roll, maxVelocity);
+        updateCyclic(&mut pid.roll, rollDemand, vstate.phi, vstate.dphi, maxVelocity);
 
-    let pitch = 
-        updateCyclic(pid, pitchDemand, vstate.theta, vstate.dtheta, &pid.pitch, maxVelocity);
+    /*let pitch = 
+        updateCyclic(&pid.pitch pitchDemand, vstate.theta, vstate.dtheta, maxVelocity);*/
 
     let yaw = updateYaw(
         &mut pid.yaw,
@@ -260,11 +260,10 @@ fn applyItermRelax(
 
 
 fn updateCyclic(
-    mut pid: &Pid,
+    cyclicAxis: &mut CyclicAxis,
     demand: f32,
     angle: f32,
     angvel: f32,
-    mut cyclicAxis: &CyclicAxis,
     maxVelocity: f32) -> f32
 {
     /*
@@ -307,4 +306,4 @@ fn updateCyclic(
 
     0.0
 
-} // updateCyclic
+}
