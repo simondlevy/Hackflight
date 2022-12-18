@@ -243,9 +243,7 @@ fn applyItermRelax(
     currentSetpoint: f32,
     itermErrorRate: f32) -> f32
 {
-    // XXX need to use newWindupLpf
-    let (setpointLpf, newWindupLpf) =
-        filters::applyPt1(cyclicAxis.windupLpf, currentSetpoint);
+    let setpointLpf = filters::applyPt1Mut(cyclicAxis.windupLpf, currentSetpoint);
 
     let setpointHpf = (currentSetpoint - setpointLpf).abs();
 
