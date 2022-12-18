@@ -35,8 +35,8 @@ const ITERM_WINDUP_POINT_PERCENT: f32 = 85.0;
 const ITERM_RELAX_SETPOINT_THRESHOLD: f32 = 40.0;
 
 const D_MIN: u8 = 30;
-const D_MIN_GAIN: u8 = 37;
-const D_MIN_ADVANCE: u8 = 20;
+const D_MIN_GAIN: f32 = 37.0;
+const D_MIN_ADVANCE: f32 = 20.0;
 
 const FEEDFORWARD_MAX_RATE_LIMIT: f32 = 900.0;
 
@@ -282,17 +282,17 @@ fn updateCyclic(
         ((axis.integral > 0.0) && (errorRate < 0.0)) ||
         ((axis.integral < 0.0) && (errorRate > 0.0));
 
-    // applyItermRelax in original
+    // Was applyItermRelax in original
     let itermErrorRate = errorRate * (if !isDecreasingI  {itermRelaxFactor} else {1.0} );
 
-    // -----calculate P component
+    // Calculate P component --------------------------------------------------
     let P = kRateP * errorRate;
 
-    // -----calculate I component XXX need to store in axis
+    // Calculate I component --------------------------------------------------
     axis.integral = constrain_f(axis.integral + (kRateI * DT) * itermErrorRate,
                         -ITERM_LIMIT, ITERM_LIMIT);
 
-    // -----calculate D component
+    // Calculate D component --------------------------------------------------
     let dterm = filters::applyPt1(
         cyclicAxis.dtermLpf2, 
         filters::applyPt1(cyclicAxis.dtermLpf1, angvel));
@@ -301,7 +301,7 @@ fn updateCyclic(
 
     cyclicAxis.previousDterm = dterm;
 
-    // -----calculate feedforward component
+    // Calculate feedforward component -----------------------------------------
     let F = 
         if kRateF > 0.0
         {computeFeedforward(newSetpoint, kRateF, kRateP, 670.0, 0.0)}
@@ -319,14 +319,14 @@ fn computeDerivative(cyclicAxis: &mut CyclicAxis, demandDelta: f32, dterm: f32) 
     // the PID loop execution to be delayed.
     const float delta = -(dterm - cyclicAxis.previousDterm) * frequency();
 
-    const auto preTpaD = m_k_rate_d * delta;
+    let preTpaD = m_k_rate_d * delta;
 
-    const auto dMinPercent = 
+    let dMinPercent = 
         D_MIN > 0 && D_MIN < m_k_rate_d ?
         D_MIN / m_k_rate_d :
         0.0f;
 
-    const auto dMinFactor =
+    let dMinFactor =
         dMinPercent > 0 ?
         computeDMinFactor(cyclicAxis, dMinPercent, demandDelta, delta) :
         1.0f;
@@ -384,6 +384,33 @@ fn applyFeedforwardLimit(
         0.0
     }
 }
+
+fn computeDMinFactor(
+    dMinRange: &mut filters::Pt2,
+    dMinFactor: &mut filters::Pt2,
+    dMinLpf: &mut filters::Pt2,
+    dMinPercent: f32,
+    demandDelta: f32,
+    delta: f32) -> f32 {
+
+    let dMinGyroGain = D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
+
+    let dMinGyroFactor = (filters::applyPt2(*dMinRange, delta)).abs() * dMinGyroGain;
+
+    let dMinSetpointGain =
+        D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR * D_MIN_ADVANCE * frequency() /
+        (100.0 * D_MIN_LOWPASS_HZ);
+
+    let dMinSetpointFactor = (demandDelta).abs() * dMinSetpointGain;
+
+    let dMinFactor = 
+        dMinPercent + (1.0 - dMinPercent) * dMinGyroFactor.max(dMinSetpointFactor);
+
+    let dMinFactorFiltered = filters::applyPt2(*dMinLpf, dMinFactor);
+
+    dMinFactorFiltered.min(1.0)
+}
+
 
 fn frequency() -> f32 {
     1.0 / DT
