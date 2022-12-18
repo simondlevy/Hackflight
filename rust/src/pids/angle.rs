@@ -186,6 +186,15 @@ pub fn getDemands(
         // Quantize the throttle to reduce the number of filter updates
         let quantizedThrottle = (demands.throttle * DYN_LPF_THROTTLE_STEPS) as i32; 
 
+        if (quantizedThrottle != pid.dynLpfPreviousQuantizedThrottle) {
+
+            // scale the quantized value back to the throttle range so the
+            // filter cutoff steps are repeatable
+            //const auto dynLpfThrottle = (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
+            //pidDynLpfDTermUpdate(dynLpfThrottle);
+            //m_dynLpfPreviousQuantizedThrottle = quantizedThrottle;
+        }
+
     }
     else {
     }
@@ -266,7 +275,7 @@ fn levelPid(kLevelP: f32, currentSetpoint: f32, currentAngle: f32) -> f32
     const LEVEL_ANGLE_LIMIT: f32 = 45.0;
 
     let angle = constrain_f(LEVEL_ANGLE_LIMIT * currentSetpoint,
-                           -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
+                            -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
 
     let angleError = angle - (currentAngle / 10.0);
 
