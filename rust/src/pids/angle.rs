@@ -15,12 +15,21 @@ use crate::utils::constrain_abs;
 use crate::utils::DT;
 use crate::utils::constrain_f;
 
+const DTERM_LPF1_DYN_MIN_HZ: f32 = 75.0;
+const DTERM_LPF1_DYN_MAX_HZ: f32 = 150.0;
+const DTERM_LPF2_HZ: f32 = 150.0;
+const D_MIN_LOWPASS_HZ: f32 = 35.0;  
+const ITERM_RELAX_CUTOFF: f32 = 15.0;
+const D_MIN_RANGE_HZ: f32 = 85.0;  
+
 // minimum of 5ms between updates
 const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
 
 const DYN_LPF_THROTTLE_STEPS: u16 = 100;
 
-const ITERM_WINDUP_POINT_PERCENT: u8 = 85;        
+const ITERM_LIMIT: f32 = 400.0;
+
+const ITERM_WINDUP_POINT_PERCENT: f32 = 85.0;        
 
 const D_MIN: u8 = 30;
 const D_MIN_GAIN: u8 = 37;
@@ -35,7 +44,7 @@ const D_MIN_GAIN_FACTOR: f32  = 0.00008;
 const D_MIN_SETPOINT_GAIN_FACTOR: f32 = 0.00008;
 
 const RATE_ACCEL_LIMIT: f32 = 0.0;
-const YAW_RATE_ACCEL_LIMIT: u16 = 0;
+const YAW_RATE_ACCEL_LIMIT: f32 = 0.0;
 
 const OUTPUT_SCALING: f32 = 1000.0;
 const  LIMIT_YAW: u16 = 400;
@@ -51,6 +60,7 @@ pub struct AnglePid {
     kLevelP: f32,
     roll : CyclicAxis,
     pitch : CyclicAxis,
+    yaw: Axis,
     dynLpfPreviousQuantizedThrottle: i32,  
     feedforwardLpfInitialized: bool,
     sum: f32,
@@ -74,6 +84,7 @@ pub fn makeAnglePid(
         kLevelP: kLevelP, 
         roll: makeCyclicAxis(),
         pitch: makeCyclicAxis(),
+        yaw: makeAxis(),
         dynLpfPreviousQuantizedThrottle: 0,
         feedforwardLpfInitialized: false,
         sum: 0.0,
@@ -102,13 +113,6 @@ struct CyclicAxis {
 
 fn makeCyclicAxis() -> CyclicAxis {
 
-    const DTERM_LPF1_DYN_MIN_HZ: f32 = 75.0;
-    const DTERM_LPF1_DYN_MAX_HZ: f32 = 150.0;
-    const DTERM_LPF2_HZ: f32 = 150.0;
-    const D_MIN_LOWPASS_HZ: f32 = 35.0;  
-    const ITERM_RELAX_CUTOFF: f32 = 15.0;
-    const D_MIN_RANGE_HZ: f32 = 85.0;  
-
     CyclicAxis {
         axis: makeAxis(),
         dtermLpf1 : filters::makePt1(DTERM_LPF1_DYN_MIN_HZ),
@@ -125,19 +129,21 @@ fn makeAxis() -> Axis {
 }
 
 pub fn getAngleDemands(
-    pid: &mut AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
+    pid: &mut AnglePid, demands: &Demands, vstate: &VehicleState, reset: &bool) -> Demands {
 
-    let roll_demand  = rescale(demands.roll);
-    let pitch_demand = rescale(demands.pitch);
-    let yaw_demand   = rescale(demands.yaw);
+    let rollDemand  = rescale(demands.roll);
+    let pitchDemand = rescale(demands.pitch);
+    let yawDemand   = rescale(demands.yaw);
 
     let maxVelocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
     let roll = 
-        updateCyclic(pid, roll_demand, vstate.phi, vstate.dphi, &pid.roll, maxVelocity);
+        updateCyclic(pid, rollDemand, vstate.phi, vstate.dphi, &pid.roll, maxVelocity);
 
     let pitch = 
-        updateCyclic(pid, pitch_demand, vstate.theta, vstate.dtheta, &pid.pitch, maxVelocity);
+        updateCyclic(pid, pitchDemand, vstate.theta, vstate.dtheta, &pid.pitch, maxVelocity);
+
+    let yaw = updateYaw(&mut pid.yaw, yawDemand, vstate.dpsi);
 
     Demands { 
         throttle : 0.0,
@@ -145,6 +151,52 @@ pub fn getAngleDemands(
         pitch : 0.0,
         yaw : 0.0
     }
+}
+
+fn updateYaw(axis: &mut Axis, demand: f32, angvel: f32) -> f32
+{
+    let maxVelocity = YAW_RATE_ACCEL_LIMIT * 100.0 * DT; 
+
+    /*
+    // gradually scale back integration when above windup point
+    let itermWindupPointInv = 1.0 / (1.0 - (ITERM_WINDUP_POINT_PERCENT / 100.0));
+
+    let dynCi = DT * 
+        (if itermWindupPointInv > 1.0 {constrain_f(itermWindupPointInv, 0, 1)} else {1.0})
+
+    let currentSetpoint =
+        if maxVelocity > 0.0 {accelerationLimit(axis, demand, maxVelocity)} else {demand}
+
+    let errorRate = currentSetpoint - angvel;
+
+    // -----calculate P component
+    let P = m_ptermYawLpf.apply(m_k_rate_p * errorRate);
+
+    // -----calculate I component, constraining windup
+    axis.I = constrain_f(axis.I + (m_k_rate_i * dynCi) * errorRate,
+        -ITERM_LIMIT, ITERM_LIMIT);
+
+    P + axis.I
+    */
+
+    0.0
+}
+
+fn accelerationLimit(axis: &mut Axis, currentSetpoint: f32, maxVelocity: f32) -> f32 {
+
+    let currentVelocity = currentSetpoint - axis.previousSetpoint;
+
+    let newSetpoint = 
+        if currentVelocity.abs() > maxVelocity 
+        { if currentVelocity > 0.0 
+            { axis.previousSetpoint + maxVelocity } 
+            else { axis.previousSetpoint - maxVelocity } 
+        }
+        else { currentSetpoint };
+
+    axis.previousSetpoint = newSetpoint;
+
+    newSetpoint
 }
 
 // [-1,+1] => [-670,+670] with nonlinearity
@@ -156,18 +208,6 @@ fn rescale(command: f32) -> f32 {
     let angleRate = command * CTR + (1.0 - CTR) * expof;
 
     670.0 * angleRate
-}
-
-fn accelerationLimit(axis: Axis, currentSetpoint: f32, maxVelocity: f32) -> f32 {
-
-    let currentVelocity = currentSetpoint - axis.previousSetpoint;
-
-    if currentVelocity.abs() > maxVelocity 
-    { if currentVelocity > 0.0 
-        { axis.previousSetpoint + maxVelocity } 
-        else { axis.previousSetpoint - maxVelocity } 
-    }
-    else { currentSetpoint }
 }
 
 fn levelPid(kLevelP: f32, currentSetpoint: f32, currentAngle: f32) -> f32
@@ -218,8 +258,7 @@ fn updateCyclic(
     mut cyclicAxis: &CyclicAxis,
     maxVelocity: f32) -> f32
 {
-    const ITERM_LIMIT: f32 = 400.0;
-
+    /*
     let axis = cyclicAxis.axis.clone();
 
     let currentSetpoint =
@@ -241,16 +280,15 @@ fn updateCyclic(
     let I = constrain_f(axis.integral + (pid.kRateI * DT) * itermErrorRate,
     -ITERM_LIMIT, ITERM_LIMIT);
 
-    /*
     // -----calculate D component
     let dterm = cyclicAxis.dtermLpf2.apply(cyclicAxis.dtermLpf1.apply(angvel));
 
-    const auto D = m_kRateD > 0 ?  computeDerivative(cyclicAxis, 0, dterm) : 0;
+    let D = m_kRateD > 0 ?  computeDerivative(cyclicAxis, 0, dterm) : 0;
 
     cyclicAxis.previousDterm = dterm;
 
     // -----calculate feedforward component
-    const auto F =
+    let F =
     m_kRateF > 0 ?
     computeFeedforward(newSetpoint, 670, 0) :
     0;
