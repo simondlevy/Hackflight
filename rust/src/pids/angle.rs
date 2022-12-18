@@ -198,7 +198,7 @@ pub fn getDemands(
                                               DYN_LPF_CURVE_EXPO);
 
             initLpf1(&mut pid.roll, cutoffFreq);
-            // initLpf1(m_pitch, cutoffFreq);
+            initLpf1(&mut pid.pitch, cutoffFreq);
 
             pid.dynLpfPreviousQuantizedThrottle = quantizedThrottle;
         }
