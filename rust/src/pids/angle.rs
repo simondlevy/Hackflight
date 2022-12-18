@@ -178,7 +178,7 @@ pub fn getDemands(
     pid.yaw.integral = if *reset { 0.0 } else { pid.yaw.integral };
 
     Demands { 
-        throttle : 0.0,
+        throttle : demands.throttle,
         roll : 0.0,
         pitch : 0.0,
         yaw : 0.0
