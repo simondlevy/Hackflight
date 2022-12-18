@@ -39,7 +39,7 @@ const D_MIN_ADVANCE: f32 = 20.0;
 
 const FEEDFORWARD_MAX_RATE_LIMIT: f32 = 900.0;
 
-//const DYN_LPF_CURVE_EXPO: u8 = 5;
+const DYN_LPF_CURVE_EXPO: f32 = 5.0;
 
 // PT2 lowpass cutoff to smooth the boost effect
 const D_MIN_GAIN_FACTOR: f32  = 0.00008;
@@ -192,7 +192,13 @@ pub fn getDemands(
             // filter cutoff steps are repeatable
             let dynLpfThrottle = (quantizedThrottle as f32) / DYN_LPF_THROTTLE_STEPS;
 
-            //pidDynLpfDTermUpdate(dynLpfThrottle);
+            let cutoffFreq = dynLpfCutoffFreq(dynLpfThrottle,
+                                              DTERM_LPF1_DYN_MIN_HZ,
+                                              DTERM_LPF1_DYN_MAX_HZ,
+                                              DYN_LPF_CURVE_EXPO);
+
+            //initLpf1(m_roll, cutoffFreq);
+            //initLpf1(m_pitch, cutoffFreq);
 
             pid.dynLpfPreviousQuantizedThrottle = quantizedThrottle;
         }
@@ -208,6 +214,14 @@ pub fn getDemands(
         yaw : 0.0
     }
 }
+
+fn dynLpfCutoffFreq(throttle: f32, dynLpfMin: f32, dynLpfMax: f32, expo: f32) -> f32 {
+    //const float expof = expo / 10.0f;
+    //const auto curve = throttle * (1 - throttle) * expof + throttle;
+    //return (dynLpfMax - dynLpfMin) * curve + dynLpfMin;
+    0.0
+}
+
 
 fn updateYaw(
     axis: &mut Axis,
