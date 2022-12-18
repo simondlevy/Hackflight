@@ -19,18 +19,11 @@ pub struct Pt1 {
     k: f32
 }
 
-pub fn applyPt1Mut(mut filter: Pt1, input: f32) -> f32 {
+pub fn applyPt1(mut filter: Pt1, input: f32) -> f32 {
 
     filter.state = filter.state + filter.k * (input - filter.state);
 
     filter.state
-}
-
-pub fn applyPt1(filter: Pt1, input: f32) -> (f32, Pt1) {
-
-    let state = filter.state + filter.k * (input - filter.state);
-
-    (state, Pt1 {state: state, k: filter.k})
 }
 
 pub fn makePt1(f_cut: f32) -> Pt1 {

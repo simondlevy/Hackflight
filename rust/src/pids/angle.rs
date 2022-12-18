@@ -193,7 +193,7 @@ fn updateYaw(
     let errorRate = currentSetpoint - angvel;
 
     // -----calculate P component
-    let P = filters::applyPt1Mut(ptermLpf, kp * errorRate);
+    let P = filters::applyPt1(ptermLpf, kp * errorRate);
 
     // -----calculate I component, constraining windup
     axis.integral =
@@ -267,7 +267,7 @@ fn updateCyclic(
     // -----calculate error rate
     let errorRate = newSetpoint - angvel;
 
-    let setpointLpf = filters::applyPt1Mut(cyclicAxis.windupLpf, currentSetpoint);
+    let setpointLpf = filters::applyPt1(cyclicAxis.windupLpf, currentSetpoint);
 
     let setpointHpf = (currentSetpoint - setpointLpf).abs();
 
