@@ -12,25 +12,6 @@ use crate::datatypes::VehicleState;
 use crate::filters;
 use crate::utils;
 
-#[derive(Clone,Copy)]
-struct Axis {
-
-    previousSetpoint : f32,
-    integral : f32
-}
-
-#[derive(Clone)]
-struct CyclicAxis {
-
-    axis: Axis,
-    dtermLpf1 : filters::Pt1,
-    dtermLpf2 : filters::Pt1,
-    dMinLpf: filters::Pt2,
-    dMinRange: filters::Pt2,
-    windupLpf: filters::Pt1,
-    previousDterm: f32
-}
-
 #[derive(Clone)]
 pub struct AnglePid {
     kRateP: f32,
@@ -77,6 +58,25 @@ pub fn getAngleDemands(
     ) -> Demands  {
 
     Demands {throttle: 0.0, roll: 0.0, pitch: 0.0, yaw: 0.0 }
+}
+
+#[derive(Clone,Copy)]
+struct Axis {
+
+    previousSetpoint : f32,
+    integral : f32
+}
+
+#[derive(Clone)]
+struct CyclicAxis {
+
+    axis: Axis,
+    dtermLpf1 : filters::Pt1,
+    dtermLpf2 : filters::Pt1,
+    dMinLpf: filters::Pt2,
+    dMinRange: filters::Pt2,
+    windupLpf: filters::Pt1,
+    previousDterm: f32
 }
 
 fn makeCyclicAxis() -> CyclicAxis {
