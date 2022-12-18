@@ -15,6 +15,33 @@ use crate::utils::constrain_abs;
 use crate::utils::DT;
 use crate::utils::constrain_f;
 
+// minimum of 5ms between updates
+const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
+
+const DYN_LPF_THROTTLE_STEPS: u16 = 100;
+
+const ITERM_WINDUP_POINT_PERCENT: u8 = 85;        
+
+const D_MIN: u8 = 30;
+const D_MIN_GAIN: u8 = 37;
+const D_MIN_ADVANCE: u8 = 20;
+
+const FEEDFORWARD_MAX_RATE_LIMIT: u8 = 90;
+
+const DYN_LPF_CURVE_EXPO: u8 = 5;
+
+// PT2 lowpass cutoff to smooth the boost effect
+const D_MIN_GAIN_FACTOR: f32  = 0.00008;
+const D_MIN_SETPOINT_GAIN_FACTOR: f32 = 0.00008;
+
+const RATE_ACCEL_LIMIT: f32 = 0.0;
+const YAW_RATE_ACCEL_LIMIT: u16 = 0;
+
+const OUTPUT_SCALING: f32 = 1000.0;
+const  LIMIT_YAW: u16 = 400;
+const  LIMIT: u16 = 500;
+
+
 #[derive(Clone)]
 pub struct AnglePid {
     kRateP: f32,
@@ -99,32 +126,6 @@ fn makeAxis() -> Axis {
 
 pub fn getAngleDemands(
     pid: &mut AnglePid, demands: &Demands, vstate: &VehicleState) -> Demands  {
-
-    // minimum of 5ms between updates
-    const DYN_LPF_THROTTLE_UPDATE_DELAY_US: u16 = 5000; 
-
-    const DYN_LPF_THROTTLE_STEPS: u16 = 100;
-
-    const ITERM_WINDUP_POINT_PERCENT: u8 = 85;        
-
-    const D_MIN: u8 = 30;
-    const D_MIN_GAIN: u8 = 37;
-    const D_MIN_ADVANCE: u8 = 20;
-
-    const FEEDFORWARD_MAX_RATE_LIMIT: u8 = 90;
-
-    const DYN_LPF_CURVE_EXPO: u8 = 5;
-
-    // PT2 lowpass cutoff to smooth the boost effect
-    const D_MIN_GAIN_FACTOR: f32  = 0.00008;
-    const D_MIN_SETPOINT_GAIN_FACTOR: f32 = 0.00008;
-
-    const RATE_ACCEL_LIMIT: f32 = 0.0;
-    const YAW_RATE_ACCEL_LIMIT: u16 = 0;
-
-    const OUTPUT_SCALING: f32 = 1000.0;
-    const  LIMIT_YAW: u16 = 400;
-    const  LIMIT: u16 = 500;
 
     let roll_demand  = rescale(demands.roll);
     let pitch_demand = rescale(demands.pitch);
