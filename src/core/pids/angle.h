@@ -120,7 +120,6 @@ class AnglePidController : public PidController {
         axis_t       m_yaw;
 
         int32_t  m_dynLpfPreviousQuantizedThrottle;  
-        bool     m_feedforwardLpfInitialized;
         float    m_k_rate_p;
         float    m_k_rate_i;
         float    m_k_rate_d;
