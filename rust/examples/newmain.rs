@@ -6,9 +6,9 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
-use hackflight::newpids;
-use hackflight::newaltpid;
-use hackflight::newanglepid;
+use hackflight::newpids::newpids::PidControllerTrait;
+use hackflight::newaltpid::newaltpid;
+use hackflight::newanglepid::newanglepid;
 
 fn main() -> std::io::Result<()> {
 
@@ -72,7 +72,9 @@ fn main() -> std::io::Result<()> {
     let angle_pid = newanglepid::make(0.0, 0.0, 0.0, 0.0, 0.0);
     let alt_hold_pid = newaltpid::make(0.0, 0.0);
 
-    let mut pids : Vec<&PidControllerTrait> = Vec::new();
+    let mut pids : Vec<&dyn PidControllerTrait> = Vec::new();
+    pids.push(&angle_pid);
+    pids.push(&alt_hold_pid);
 
     println!("Hit the Play button ...");
 
