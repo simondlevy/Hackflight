@@ -10,6 +10,7 @@ pub mod utils;
 pub mod pids;
 pub mod newpids;
 pub mod newaltpid;
+pub mod newanglepid;
 pub mod filters;
 pub mod mixers;
 

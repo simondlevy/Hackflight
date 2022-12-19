@@ -7,6 +7,7 @@ use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
 use hackflight::newaltpid;
+use hackflight::newanglepid;
 
 fn main() -> std::io::Result<()> {
 
