@@ -62,7 +62,6 @@ pub struct Pid {
     pitch : CyclicAxis,
     yaw: Axis,
     dyn_lpf_previous_quantized_throttle: i32,  
-    feedforward_lpf_initialized: bool,
     pterm_yaw_lpf: filters::Pt1
 }
 
@@ -85,7 +84,6 @@ pub fn make_pid(
         pitch: make_cyclic_axes(),
         yaw: make_axis(),
         dyn_lpf_previous_quantized_throttle: 0,
-        feedforward_lpf_initialized: false,
         pterm_yaw_lpf : filters::make_pt1(YAW_LOWPASS_HZ)
     }
 }
@@ -204,7 +202,7 @@ pub fn get_demands(
         throttle : demands.throttle,
         roll : constrain_output(roll, LIMIT_CYCLIC),
         pitch : constrain_output(pitch, LIMIT_CYCLIC),
-        yaw : constrain_output(roll, LIMIT_YAW)
+        yaw : constrain_output(yaw, LIMIT_YAW)
     }
 }
 
@@ -384,7 +382,7 @@ fn update_cyclic(
     cyclic_axis.previous_dterm = dterm;
 
     // Apply the d_min_factor
-    let determ = pre_t_pa_d * d_min_factor;
+    let dterm = pre_t_pa_d * d_min_factor;
 
     // Calculate feedforward component -----------------------------------------
 

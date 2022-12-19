@@ -6,10 +6,10 @@
    MIT License
  */
 
+use std::f32::consts::PI;
 
 // Pt1 --------------------------------------------------------------------
 
-use crate::utils::constrain_abs;
 use crate::utils::DT;
 
 #[derive(Clone,Copy)]
@@ -28,16 +28,23 @@ pub fn apply_pt1(mut filter: Pt1, input: f32) -> f32 {
 
 pub fn make_pt1(f_cut: f32) -> Pt1 {
 
-    let k = compute_k(1.0, f_cut);
+    let k = compute_pt1_gain(f_cut);
 
     Pt1 {state: 0.0, k: k }
 }
 
 pub fn adjust_pt1_gain(mut filter: Pt1, f_cut: f32)
 {
-    filter.k = compute_k(1.0, f_cut);
+    filter.k = compute_pt1_gain(f_cut);
 }
 
+
+fn compute_pt1_gain(f_cut:f32) -> f32 {
+
+    let rc = 1.0 / (2.0 * PI * f_cut);
+
+    DT / (rc + DT)
+}
 
 // Pt2 --------------------------------------------------------------------
 
@@ -60,11 +67,21 @@ pub fn apply_pt2(mut filter: Pt2, input: f32) -> f32 {
 
 pub fn make_pt2(f_cut: f32) -> Pt2 {
 
-    let cutoff_correction = compute_cutoff_correction(2.0, f_cut);
-    let k = compute_k(cutoff_correction, f_cut);
+    let k = compute_pt2_gain(f_cut);
 
     Pt2 {state: 0.0, state1: 0.0, k: k }
 }
+
+fn compute_pt2_gain(f_cut: f32) -> f32 {
+
+    let order: f32 = 2.0;
+    let two: f32 = 2.0;
+    let order_cutoff_correction = 1.0 / (two.powf(1.0 / order) - 1.0).sqrt();
+    let rc = 1.0 / (2.0 * order_cutoff_correction * PI * f_cut);
+
+    DT / (rc + DT)
+}
+
 
 // Pt3 --------------------------------------------------------------------
 
@@ -89,24 +106,20 @@ pub fn apply_pt3(mut filter: Pt3, input: f32) -> f32 {
 
 pub fn make_pt3(f_cut: f32) -> Pt3 {
 
-    let cutoff_correction = compute_cutoff_correction(3.0, f_cut);
-    let k = compute_k(cutoff_correction, f_cut);
+    let k = compute_pt3_gain(f_cut);
 
     Pt3 {state: 0.0, state1: 0.0, state2: 0.0, k: k }
 }
 
-// helpers -----------------------------------------------------------------
 
-fn compute_k(cutoff_correction:f32, f_cut:f32) -> f32 {
+fn compute_pt3_gain(f_cut: f32) -> f32 {
 
-    let rc = 1.0 / (2.0 * cutoff_correction * std::f32::consts::PI * f_cut);
+    let order: f32 = 3.0;
+    let two: f32 = 2.0;
+    let order_cutoff_correction = 1.0 / (two.powf(1.0 / order) - 1.0).sqrt();
+    let rc = 1.0 / (2.0 * order_cutoff_correction * PI * f_cut);
 
     DT / (rc + DT)
 }
 
-fn compute_cutoff_correction(order: f32, f_cut: f32) -> f32 {
 
-    let two: f32 = 2.0;
-
-    1.0 / (two.powf(1.0 / order) - 1.0).sqrt()
-}
