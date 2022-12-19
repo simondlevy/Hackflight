@@ -91,7 +91,7 @@ pub mod newanglepid {
 
     impl PidControllerTrait for Pid {
 
-        fn get_demands_trait(
+        fn get_demands(
             &self,
             _d_usec: &u32,
             _demands: &Demands,

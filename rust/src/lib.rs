@@ -51,7 +51,7 @@ pub mod datatypes {
 
     pub trait PidControllerTrait {
 
-        fn get_demands_trait(
+        fn get_demands(
             &self,
             d_usec: &u32,
             demands: &Demands,
@@ -85,7 +85,8 @@ pub mod datatypes {
 
         for pid in pids {
 
-            let demands = pid.get_demands_trait(&d_usec, &demands, &vehicle_state, &pid_reset);
+            let demands =
+                pid.get_demands(&d_usec, &demands, &vehicle_state, &pid_reset);
         }
 
         Motors { m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0 }
