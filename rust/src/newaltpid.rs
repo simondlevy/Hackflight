@@ -10,8 +10,7 @@ pub mod newaltpid {
 
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
-    use crate::newpids::newpids;
-    // use crate::utils;
+    use crate::datatypes::PidControllerTrait;
 
     const _ALTITUDE_MIN: f32   = 1.0;
     const _PILOT_VELZ_MAX: f32 = 2.5;
@@ -37,7 +36,7 @@ pub mod newaltpid {
         }
     }
 
-    impl newpids::PidControllerTrait for Pid {
+    impl PidControllerTrait for Pid {
 
         fn get_demands_trait(
             &self,

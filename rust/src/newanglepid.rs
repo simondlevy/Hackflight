@@ -10,7 +10,7 @@ pub mod newanglepid {
 
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
-    use crate::newpids::newpids;
+    use crate::datatypes::PidControllerTrait;
     use crate::filters;
     use crate::utils::DT;
     use crate::utils::constrain_f;
@@ -89,7 +89,7 @@ pub mod newanglepid {
             }
     }
 
-    impl newpids::PidControllerTrait for Pid {
+    impl PidControllerTrait for Pid {
 
         fn get_demands_trait(
             &self,

@@ -5,9 +5,9 @@ use std::net::UdpSocket;
 use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
+use hackflight::datatypes::PidControllerTrait;
 use hackflight::datatypes::newrun;
 
-use hackflight::newpids::newpids::PidControllerTrait;
 use hackflight::newaltpid::newaltpid;
 use hackflight::newanglepid::newanglepid;
 use hackflight::mixers::mixers::run_quad_xbf;

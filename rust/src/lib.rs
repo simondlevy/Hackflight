@@ -8,7 +8,6 @@
 
 pub mod utils;
 pub mod pids;
-pub mod newpids;
 pub mod newaltpid;
 pub mod newanglepid;
 pub mod filters;
@@ -17,7 +16,6 @@ pub mod mixers;
 pub mod datatypes {
 
     use crate::pids::pids;
-    use crate::newpids::newpids::PidControllerTrait;
 
     #[derive(Clone)]
     pub struct Demands {
@@ -51,6 +49,16 @@ pub mod datatypes {
         pub m4: f32
     }
 
+    pub trait PidControllerTrait {
+
+        fn get_demands_trait(
+            &self,
+            d_usec: &u32,
+            demands: &Demands,
+            vstate: &VehicleState,
+            reset: &bool) -> Demands; 
+    }
+
     pub fn run_hackflight(
         demands: Demands,
         vehicle_state: VehicleState, 
@@ -58,10 +66,10 @@ pub mod datatypes {
         mixfun: &dyn Fn(Demands) -> Motors) -> (Motors, pids::Controller) {
 
         let (demands, new_pid_controller) =
-           pids::run(pid_controller, demands, vehicle_state);
+            pids::run(pid_controller, demands, vehicle_state);
 
         let new_motors = mixfun(demands.clone());
-        
+
         (new_motors, new_pid_controller)
     }
 
