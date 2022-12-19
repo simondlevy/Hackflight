@@ -17,6 +17,7 @@ pub mod mixers;
 pub mod datatypes {
 
     use crate::pids::pids;
+    use crate::newpids::newpids::PidControllerTrait;
 
     #[derive(Clone)]
     pub struct Demands {
@@ -65,6 +66,7 @@ pub mod datatypes {
     }
 
     pub fn newrun(
+        pids: &Vec<&dyn PidControllerTrait>,
         demands: Demands,
         vehicle_state: VehicleState, 
         mixfun: &dyn Fn(Demands) -> Motors) -> Motors {
