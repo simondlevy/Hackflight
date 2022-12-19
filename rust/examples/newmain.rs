@@ -6,11 +6,6 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
-use hackflight::datatypes::run_hackflight;
-
-use hackflight::pids::pids;
-use hackflight::mixers::mixers::run_quad_xbf;
-
 fn main() -> std::io::Result<()> {
 
     const IN_BUF_SIZE:usize  = 17*8; // 17 doubles in
@@ -68,7 +63,7 @@ fn main() -> std::io::Result<()> {
     // Bind server socket to address,port that client will connect to
     let telemetry_server_socket = UdpSocket::bind("127.0.0.1:5001")?;
 
-    let mut pid_controller = pids::make_controller();
+    // let mut pid_controller = pids::make_controller();
 
     println!("Hit the Play button ...");
 
@@ -85,10 +80,12 @@ fn main() -> std::io::Result<()> {
 
         let demands = read_demands(in_buf);
 
-        let (motors, new_pid_controller) =
-            run_hackflight(demands, vehicle_state, pid_controller, &run_quad_xbf);
+        // let (motors, new_pid_controller) =
+        //     run_hackflight(demands, vehicle_state, pid_controller, &run_quad_xbf);
 
-        pid_controller = new_pid_controller;
+        // pid_controller = new_pid_controller;
+
+        let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
 
         let out_buf = write_motors(motors);
 
