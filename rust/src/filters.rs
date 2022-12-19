@@ -67,21 +67,10 @@ pub fn apply_pt2(mut filter: Pt2, input: f32) -> f32 {
 
 pub fn make_pt2(f_cut: f32) -> Pt2 {
 
-    let k = compute_pt2_gain(f_cut);
+    let k = compute_gain(2.0, f_cut);
 
     Pt2 {state: 0.0, state1: 0.0, k: k }
 }
-
-fn compute_pt2_gain(f_cut: f32) -> f32 {
-
-    let order: f32 = 2.0;
-    let two: f32 = 2.0;
-    let order_cutoff_correction = 1.0 / (two.powf(1.0 / order) - 1.0).sqrt();
-    let rc = 1.0 / (2.0 * order_cutoff_correction * PI * f_cut);
-
-    DT / (rc + DT)
-}
-
 
 // Pt3 --------------------------------------------------------------------
 
@@ -106,20 +95,19 @@ pub fn apply_pt3(mut filter: Pt3, input: f32) -> f32 {
 
 pub fn make_pt3(f_cut: f32) -> Pt3 {
 
-    let k = compute_pt3_gain(f_cut);
+    let k = compute_gain(3.0, f_cut);
 
     Pt3 {state: 0.0, state1: 0.0, state2: 0.0, k: k }
 }
 
 
-fn compute_pt3_gain(f_cut: f32) -> f32 {
+// Helpers --------------------------------------------------------------------
 
-    let order: f32 = 3.0;
+fn compute_gain(order: f32, f_cut: f32) -> f32 {
+
     let two: f32 = 2.0;
     let order_cutoff_correction = 1.0 / (two.powf(1.0 / order) - 1.0).sqrt();
     let rc = 1.0 / (2.0 * order_cutoff_correction * PI * f_cut);
 
     DT / (rc + DT)
 }
-
-
