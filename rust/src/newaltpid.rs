@@ -11,6 +11,7 @@ pub mod newaltpid {
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
     use crate::newpids::newpids;
+    use crate::utils;
 
     const ALTITUDE_MIN: f32   = 1.0;
     const PILOT_VELZ_MAX: f32 = 2.5;
