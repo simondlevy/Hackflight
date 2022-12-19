@@ -53,7 +53,7 @@ pub mod angle {
     const  LIMIT_CYCLIC: f32 = 500.0; 
     const  LIMIT_YAW: f32 = 400.0;
 
-#[derive(Clone)]
+    #[derive(Clone)]
     pub struct Pid {
         k_rate_p: f32,
         k_rate_i: f32,
@@ -90,14 +90,14 @@ pub mod angle {
             }
     }
 
-#[derive(Clone,Copy)]
+    #[derive(Clone,Copy)]
     struct Axis {
 
         previous_setpoint : f32,
         integral : f32
     }
 
-#[derive(Clone)]
+    #[derive(Clone)]
     struct CyclicAxis {
 
         axis: Axis,
