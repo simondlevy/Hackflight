@@ -69,8 +69,6 @@ fn main() -> std::io::Result<()> {
     // Bind server socket to address,port that client will connect to
     let telemetry_server_socket = UdpSocket::bind("127.0.0.1:5001")?;
 
-    // let mut pid_controller = pids::make_controller();
-
     let angle_pid = newanglepid::make(0.0, 0.0, 0.0, 0.0, 0.0);
     let alt_hold_pid = newaltpid::make(0.0, 0.0);
 
@@ -94,8 +92,6 @@ fn main() -> std::io::Result<()> {
         let demands = read_demands(in_buf);
 
         let motors = newrun(&pids, demands, vehicle_state, &run_quad_xbf);
-
-        let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
 
         let out_buf = write_motors(motors);
 
