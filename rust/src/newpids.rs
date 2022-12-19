@@ -11,7 +11,7 @@ pub mod newpids {
     use crate::datatypes::Demands;
     use crate::datatypes::VehicleState;
 
-    trait PidControllerTrait {
+    pub trait PidControllerTrait {
 
         fn get_demands_trait(
             &self,
