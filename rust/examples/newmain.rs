@@ -6,6 +6,8 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
+use hackflight::newaltpid;
+
 fn main() -> std::io::Result<()> {
 
     const IN_BUF_SIZE:usize  = 17*8; // 17 doubles in
