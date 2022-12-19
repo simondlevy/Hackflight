@@ -68,7 +68,8 @@ fn main() -> std::io::Result<()> {
 
     // let mut pid_controller = pids::make_controller();
 
-    let alt_pid = newaltpid::make(0.0, 0.0);
+    let angle_pid = newanglepid::make(0.0, 0.0, 0.0, 0.0, 0.0);
+    let alt_hold_pid = newaltpid::make(0.0, 0.0);
 
     println!("Hit the Play button ...");
 
