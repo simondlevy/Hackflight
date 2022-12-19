@@ -41,9 +41,7 @@ pub fn adjust_pt1_gain(mut filter: Pt1, f_cut: f32)
 
 fn compute_pt1_gain(f_cut:f32) -> f32 {
 
-    let rc = 1.0 / (2.0 * PI * f_cut);
-
-    DT / (rc + DT)
+    gain_helper(1.0, f_cut)
 }
 
 // Pt2 --------------------------------------------------------------------
@@ -107,6 +105,12 @@ fn compute_gain(order: f32, f_cut: f32) -> f32 {
 
     let two: f32 = 2.0;
     let order_cutoff_correction = 1.0 / (two.powf(1.0 / order) - 1.0).sqrt();
+
+    gain_helper(order_cutoff_correction, f_cut)
+}
+
+fn gain_helper(order_cutoff_correction: f32, f_cut: f32) -> f32 {
+
     let rc = 1.0 / (2.0 * order_cutoff_correction * PI * f_cut);
 
     DT / (rc + DT)
