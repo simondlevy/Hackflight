@@ -45,16 +45,16 @@ pub mod pids {
         vstate: &VehicleState,
         reset: &bool) -> Demands {
 
-        match pid {
+            match pid {
 
-            PidController::Angle { ap } => { 
-                angle::get_demands(ap, d_usec, demands, vstate, reset)
-            },
+                PidController::Angle { ap } => { 
+                    angle::get_demands(ap, d_usec, demands, vstate, reset)
+                },
 
-            PidController::AltHold { ahp } => {
-                althold::get_demands(ahp, demands, vstate, reset)
+                PidController::AltHold { ahp } => {
+                    althold::get_demands(ahp, demands, vstate, reset)
+                }
             }
-        }
     }
 
     pub fn make_angle_pid_controller( 
@@ -64,7 +64,7 @@ pub mod pids {
         k_rate_f: f32,
         k_level_p: f32) -> PidController {
 
-        PidController::Angle {ap: angle::make_pid(k_rate_p, k_rate_i, k_rate_d, k_rate_f, k_level_p)}
+            PidController::Angle {ap: angle::make_pid(k_rate_p, k_rate_i, k_rate_d, k_rate_f, k_level_p)}
     }
 
     pub fn make_alt_hold_pid_controller(k_p: f32, k_i: f32) -> PidController {
@@ -93,18 +93,18 @@ pub mod pids {
         demands: Demands,
         vehicle_state: VehicleState) -> (Demands, Controller) {
 
-        let (new_demands, new_alt_pid) =
-            alt_pid::run(demands, &vehicle_state, controller.alt);
+            let (new_demands, new_alt_pid) =
+                alt_pid::run(demands, &vehicle_state, controller.alt);
 
-        let (new_demands, new_yaw_pid) =
-            yaw_pid::run(new_demands, &vehicle_state, controller.yaw);
+            let (new_demands, new_yaw_pid) =
+                yaw_pid::run(new_demands, &vehicle_state, controller.yaw);
 
-        let (new_demands, new_rate_pid) =
-            rate_pid::run(new_demands, &vehicle_state, controller.rate);
+            let (new_demands, new_rate_pid) =
+                rate_pid::run(new_demands, &vehicle_state, controller.rate);
 
-        let new_controller = Controller {alt:new_alt_pid, yaw:new_yaw_pid, rate:new_rate_pid};
+            let new_controller = Controller {alt:new_alt_pid, yaw:new_yaw_pid, rate:new_rate_pid};
 
-        (new_demands, new_controller)
+            (new_demands, new_controller)
     }
 }
 
