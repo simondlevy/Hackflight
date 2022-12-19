@@ -87,9 +87,9 @@ fn main() -> std::io::Result<()> {
 
         if time < 0.0 { break Ok(()); }
 
-        let vehicle_state = read_vehicle_state(in_buf);
+        let _vehicle_state = read_vehicle_state(in_buf);
 
-        let demands = read_demands(in_buf);
+        let _demands = read_demands(in_buf);
 
         // let (motors, new_pid_controller) =
         //     run_hackflight(demands, vehicle_state, pid_controller, &run_quad_xbf);

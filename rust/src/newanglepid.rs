@@ -93,10 +93,10 @@ pub mod newanglepid {
 
         fn get_demands_trait(
             &self,
-            d_usec: &u32,
-            demands: &Demands,
-            vstate: &VehicleState,
-            reset: &bool) -> Demands {
+            _d_usec: &u32,
+            _demands: &Demands,
+            _vstate: &VehicleState,
+            _reset: &bool) -> Demands {
 
                 Demands { throttle: 0.0, roll: 0.0, pitch: 0.0, yaw: 0.0 }
         }
