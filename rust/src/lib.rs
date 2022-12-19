@@ -79,7 +79,16 @@ pub mod datatypes {
         vehicle_state: VehicleState, 
         mixfun: &dyn Fn(Demands) -> Motors) -> Motors {
 
-            Motors { m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0 }
+        // XXX
+        let d_usec: u32 = 1;
+        let pid_reset = false;
+
+        for pid in pids {
+
+            let demands = pid.get_demands_trait(&d_usec, &demands, &vehicle_state, &pid_reset);
+        }
+
+        Motors { m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0 }
     }
 
 }
