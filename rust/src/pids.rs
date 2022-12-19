@@ -83,7 +83,7 @@ pub mod pids {
         rate: RatePid
     }
 
-    pub fn new_controller() -> Controller {
+    pub fn make_controller() -> Controller {
 
         Controller { alt:alt_pid::new(), yaw:yaw_pid::new(), rate:rate_pid::new() }
     }
