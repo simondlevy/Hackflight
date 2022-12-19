@@ -5,10 +5,12 @@ use std::net::UdpSocket;
 use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
+use hackflight::datatypes::newrun;
 
 use hackflight::newpids::newpids::PidControllerTrait;
 use hackflight::newaltpid::newaltpid;
 use hackflight::newanglepid::newanglepid;
+use hackflight::mixers::mixers::run_quad_xbf;
 
 fn main() -> std::io::Result<()> {
 
@@ -87,9 +89,11 @@ fn main() -> std::io::Result<()> {
 
         if time < 0.0 { break Ok(()); }
 
-        let _vehicle_state = read_vehicle_state(in_buf);
+        let vehicle_state = read_vehicle_state(in_buf);
 
-        let _demands = read_demands(in_buf);
+        let demands = read_demands(in_buf);
+
+        let motors = newrun(demands, vehicle_state, &run_quad_xbf);
 
         // let (motors, new_pid_controller) =
         //     run_hackflight(demands, vehicle_state, pid_controller, &run_quad_xbf);

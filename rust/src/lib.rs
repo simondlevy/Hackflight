@@ -63,4 +63,13 @@ pub mod datatypes {
         
         (new_motors, new_pid_controller)
     }
+
+    pub fn newrun(
+        demands: Demands,
+        vehicle_state: VehicleState, 
+        mixfun: &dyn Fn(Demands) -> Motors) -> Motors {
+
+            Motors { m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0 }
+    }
+
 }
