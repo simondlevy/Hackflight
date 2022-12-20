@@ -7,9 +7,10 @@
  */
 
 pub mod pids;
-pub mod utils;
-pub mod filters;
 pub mod mixers;
+
+mod utils;
+mod filters;
 
 #[derive(Clone)]
 pub struct Demands {
@@ -62,5 +63,3 @@ pub fn run_pids(
 
     new_demands
 }
-
-
