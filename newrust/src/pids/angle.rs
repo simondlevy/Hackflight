@@ -96,6 +96,8 @@ pub fn get_demands(
         let pitch_demand = rescale(demands.pitch);
         let yaw_demand   = rescale(demands.yaw);
 
+        let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
+
         Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
 }
 
