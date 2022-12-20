@@ -6,6 +6,8 @@
    MIT License
  */
 
+use crate::datatypes::Demands;
+use crate::datatypes::VehicleState;
 
 #[derive(Debug,Clone)]
 pub enum PidController {
@@ -60,7 +62,7 @@ pub fn make_alt_hold(k_p: f32, k_i: f32) -> PidController {
     }
 }
 
-pub fn get_demands(t: &mut PidController, _dx: f32, _dy: f32) {
+pub fn get_demands(t: &mut PidController, _dx: f32, _dy: f32) -> Demands {
 
     match *t {
 
@@ -73,7 +75,9 @@ pub fn get_demands(t: &mut PidController, _dx: f32, _dy: f32) {
             ref mut dyn_lpf_previous_quantized_throttle
         } => {
 
-            *dyn_lpf_previous_quantized_throttle = 0
+            *dyn_lpf_previous_quantized_throttle = 0;
+
+            Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
         },
 
         PidController::AltHoldPid {
@@ -87,6 +91,8 @@ pub fn get_demands(t: &mut PidController, _dx: f32, _dy: f32) {
             *in_band_prev = false;
             *error_integral = 0.0;
             *altitude_target = 0.0;
+
+            Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
         },
     }
 }
