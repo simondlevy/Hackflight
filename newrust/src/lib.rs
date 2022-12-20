@@ -7,13 +7,10 @@
 */
 
 pub mod utils;
-pub mod pids;
 pub mod filters;
 pub mod mixers;
 
 pub mod datatypes {
-
-    use crate::pids::pids;
 
     #[derive(Clone)]
     pub struct Demands {
@@ -47,17 +44,4 @@ pub mod datatypes {
         pub m4: f32
     }
 
-    pub fn run_hackflight(
-        demands: Demands,
-        vehicle_state: VehicleState, 
-        pid_controller: pids::Controller,
-        mixfun: &dyn Fn(Demands) -> Motors) -> (Motors, pids::Controller) {
-
-        let (demands, new_pid_controller) =
-            pids::run(pid_controller, demands, vehicle_state);
-
-        let new_motors = mixfun(demands.clone());
-
-        (new_motors, new_pid_controller)
-    }
 }

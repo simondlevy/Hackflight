@@ -6,8 +6,6 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
-use hackflight::pids;
-
 fn main() -> std::io::Result<()> {
 
     const IN_BUF_SIZE:usize  = 17*8; // 17 doubles in
@@ -57,6 +55,15 @@ fn main() -> std::io::Result<()> {
             }
         }
         buf
+    }
+
+    fn run_hackflight(
+        demands: Demands,
+        vehicle_state: VehicleState, 
+        mixfun: &dyn Fn(Demands) -> Motors) -> Motors {
+
+        Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0 }
+
     }
 
     // We have to bind client socket to some address
