@@ -21,6 +21,46 @@ pub enum PidController {
     AltHold { ahp : AltHoldPid, },
 }
 
+pub fn get_angle_demands(
+    pid: &mut AnglePid,
+    d_usec: &u32,
+    demands: &Demands,
+    vstate: &VehicleState,
+    reset: &bool) -> Demands {
+
+    Demands {throttle: 0.0, roll: 0.0, pitch: 0.0, yaw: 0.0 }
+}
+
+pub fn get_alt_hold_demands(
+    pid: &mut AltHoldPid,
+    d_usec: &u32,
+    demands: &Demands,
+    vstate: &VehicleState,
+    reset: &bool) -> Demands {
+
+    Demands {throttle: 0.0, roll: 0.0, pitch: 0.0, yaw: 0.0 }
+}
+
+
+pub fn get_demands(
+    pid: &mut PidController,
+    d_usec: &u32,
+    demands: &Demands,
+    vstate: &VehicleState,
+    reset: &bool) -> Demands {
+
+    match pid {
+
+        PidController::Angle { ap } => { 
+            get_angle_demands(ap, d_usec, demands, vstate, reset)
+        },
+
+        PidController::AltHold { ahp } => {
+            get_alt_hold_demands(ahp, d_usec, demands, vstate, reset)
+        }
+    }
+}
+
 fn main() -> std::io::Result<()> {
 
     const IN_BUF_SIZE:usize  = 17*8; // 17 doubles in
