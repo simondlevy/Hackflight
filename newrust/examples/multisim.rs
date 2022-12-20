@@ -8,10 +8,13 @@ use hackflight::datatypes::VehicleState;
 
 pub struct AnglePid {
 
+    var: bool
+
 }
 
 pub struct AltHoldPid {
 
+    var: bool
 }
 
 pub enum PidController {
@@ -28,6 +31,8 @@ pub fn get_angle_demands(
     vstate: &VehicleState,
     reset: &bool) -> Demands {
 
+    pid.var = true;
+
     Demands {throttle: 0.0, roll: 0.0, pitch: 0.0, yaw: 0.0 }
 }
 
@@ -37,6 +42,8 @@ pub fn get_alt_hold_demands(
     demands: &Demands,
     vstate: &VehicleState,
     reset: &bool) -> Demands {
+
+    pid.var = false;
 
     Demands {throttle: 0.0, roll: 0.0, pitch: 0.0, yaw: 0.0 }
 }
