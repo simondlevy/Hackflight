@@ -9,8 +9,7 @@
 pub mod pids;
 pub mod mixers;
 pub mod filters;
-
-mod utils;
+pub mod utils;
 
 #[derive(Clone)]
 pub struct Demands {
