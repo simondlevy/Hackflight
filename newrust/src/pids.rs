@@ -33,7 +33,7 @@ pub mod pids {
         },
     }
 
-    pub fn makeAngle(
+    pub fn make_angle(
             k_rate_p: f32,
             k_rate_i: f32,
             k_rate_d: f32,
@@ -50,7 +50,7 @@ pub mod pids {
          }
     }
 
-    pub fn makeAltHold(k_p: f32, k_i: f32) -> PidController {
+    pub fn make_alt_hold(k_p: f32, k_i: f32) -> PidController {
 
         PidController::AltHoldPid {
             k_p : k_p,
@@ -61,16 +61,16 @@ pub mod pids {
         }
     }
 
-    pub fn get_demands(t: &mut PidController, dx: f32, dy: f32) {
+    pub fn get_demands(t: &mut PidController, _dx: f32, _dy: f32) {
 
         match *t {
 
             PidController::AnglePid {
-                k_rate_p,
-                k_rate_i,
-                k_rate_d,
-                k_rate_f,
-                k_level_p,
+                k_rate_p: _,
+                k_rate_i: _,
+                k_rate_d: _,
+                k_rate_f: _,
+                k_level_p: _,
                 ref mut dyn_lpf_previous_quantized_throttle
             } => {
 
@@ -78,14 +78,16 @@ pub mod pids {
             },
 
             PidController::AltHoldPid {
-                k_p,
-                k_i, 
+                k_p: _,
+                k_i: _, 
                 ref mut in_band_prev,
                 ref mut error_integral,
                 ref mut altitude_target
             } => {
 
-                *in_band_prev = false
+                *in_band_prev = false;
+                *error_integral = 0.0;
+                *altitude_target = 0.0;
             },
         }
     }
