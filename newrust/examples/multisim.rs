@@ -59,7 +59,7 @@ fn main() -> std::io::Result<()> {
         buf
     }
 
-    fn update_demands(arr: &mut [pids::PidController]) {
+    fn update_demands(arr: &mut [pids::Controller]) {
     }
 
     // We have to bind client socket to some address
@@ -74,7 +74,7 @@ fn main() -> std::io::Result<()> {
 
     let angle_pid = pids::make_angle(0.0, 0.0, 0.0, 0.0, 0.0);
 
-    let mut pids: [pids::PidController; 2] = [angle_pid, alt_hold_pid];
+    let mut pids: [pids::Controller; 2] = [angle_pid, alt_hold_pid];
 
     loop {
 
