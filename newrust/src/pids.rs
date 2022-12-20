@@ -50,7 +50,8 @@ pub fn get_demands(
     match *t {
 
         Controller::Angle {ref mut angpid} => {
-                angle::get_demands(angpid, &demands, &vstate, &reset)
+                let d_usec: u32 = 1; // XXX
+                angle::get_demands(angpid, &d_usec, &demands, &vstate, &reset)
             },
 
         Controller::AltHold {ref mut altpid} => {

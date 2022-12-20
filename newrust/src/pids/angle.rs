@@ -87,6 +87,7 @@ pub fn make(
 
 pub fn get_demands(
     pid: &mut Pid,
+    d_usec: &u32,
     demands: &Demands,
     vstate: &VehicleState,
     reset: &bool) -> Demands {
