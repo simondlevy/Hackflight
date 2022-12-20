@@ -9,7 +9,7 @@ use hackflight::datatypes::VehicleState;
 #[derive(Debug,Clone)]
 enum PidController {
     AnglePid { x: f32, y: f32, s: f32 },
-    Circle { x: f32, y: f32, r: f32 },
+    AltHoldPid { x: f32, y: f32, r: f32 },
 }
 
 fn area(shape: &PidController) -> f32 {
@@ -17,7 +17,7 @@ fn area(shape: &PidController) -> f32 {
         PidController::AnglePid { x:_, y:_, s } => {
             s*s
         },
-        PidController::Circle { x:_, y:_, r } => {
+        PidController::AltHoldPid { x:_, y:_, r } => {
             std::f32::consts::PI*r*r
         },
     }
@@ -28,7 +28,7 @@ fn transpose(t: &mut PidController, dx: f32, dy: f32) {
     match *t {
 
         PidController::AnglePid{ref mut x, ref mut y, s: _} => {*x += dx; *y += dy},
-        PidController::Circle{ref mut x, ref mut y, r: _} => {*x += dx; *y += dy},
+        PidController::AltHoldPid{ref mut x, ref mut y, r: _} => {*x += dx; *y += dy},
     }
 }
 
@@ -91,10 +91,10 @@ fn main() -> std::io::Result<()> {
 
     println!("Hit the Play button ...");
 
-    let circle = PidController::Circle { x: 10.0, y: 20.0, r: 1.0 };
-    let square = PidController::AnglePid { x: -5.0, y: 10.0, s: 2.0 };
+    let alt_hold_pid = PidController::AltHoldPid { x: 10.0, y: 20.0, r: 1.0 };
+    let angle_pid = PidController::AnglePid { x: -5.0, y: 10.0, s: 2.0 };
 
-    let mut shapes: [PidController; 2] = [square, circle];
+    let mut pids: [PidController; 2] = [angle_pid, alt_hold_pid];
 
     loop {
 
@@ -109,7 +109,7 @@ fn main() -> std::io::Result<()> {
 
         let mut demands = read_demands(in_buf);
 
-        for shape in shapes.iter_mut() {
+        for shape in pids.iter_mut() {
             transpose(&mut *shape, 2.0, -3.5);
         }
 
