@@ -43,7 +43,10 @@ pub fn make(
     }
 } 
 
-pub fn get_demands(pid: &mut Pid, vstate: &VehicleState) -> Demands {
+pub fn get_demands(
+    pid: &mut Pid,
+    vstate: &VehicleState,
+    demands: &Demands) -> Demands {
 
     pid.dyn_lpf_previous_quantized_throttle = 0;
 

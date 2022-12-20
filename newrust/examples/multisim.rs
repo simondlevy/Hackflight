@@ -87,7 +87,7 @@ fn main() -> std::io::Result<()> {
         let mut demands = read_demands(in_buf);
 
         for pid in pids.iter_mut() {
-            demands = pids::get_demands(&mut *pid, vstate);
+            demands = pids::get_demands(&mut *pid, vstate, demands);
         }
 
         let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
