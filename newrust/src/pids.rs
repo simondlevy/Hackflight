@@ -50,20 +50,41 @@ pub fn angpid_get_demands(angpid: &mut AnglePid) -> Demands {
     Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+
+#[derive(Debug,Clone)]
+pub struct AltHoldPid { 
+    k_p : f32,
+    k_i: f32, 
+    in_band_prev: bool,
+}
+
+pub fn make_alt_hold_pid(
+    k_p: f32,
+    k_i: f32) -> AltHoldPid {
+
+    AltHoldPid {
+        k_p: k_p,
+        k_i: k_i,
+        in_band_prev: false
+    }
+} 
+
+pub fn altpid_get_demands(altpid: &mut AltHoldPid) -> Demands {
+
+    altpid.in_band_prev = false;
+
+    Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
 #[derive(Debug,Clone)]
 pub enum PidController {
 
-    Angle {
-        angpid: AnglePid
-    },
+    Angle { angpid: AnglePid },
 
-    AltHoldPid { 
-        k_p : f32,
-        k_i: f32, 
-        in_band_prev: bool,
-        error_integral: f32,
-        altitude_target: f32
-    },
+    AltHold { altpid: AltHoldPid },
 }
 
 pub fn make_angle(
@@ -74,24 +95,16 @@ pub fn make_angle(
     k_level_p: f32 ) -> PidController {
 
     PidController::Angle {
-        angpid: make_angle_pid(
-                    k_rate_p,
-                    k_rate_i,
-                    k_rate_d,
-                    k_rate_f,
-                    k_level_p,
-                    )
+        angpid: make_angle_pid(k_rate_p, k_rate_i, k_rate_d, k_rate_f, k_level_p)
     }
 }
 
-pub fn make_alt_hold(k_p: f32, k_i: f32) -> PidController {
+pub fn make_alt_hold(
+    k_p: f32,
+    k_i: f32) -> PidController {
 
-    PidController::AltHoldPid {
-        k_p : k_p,
-        k_i: k_i,
-        in_band_prev: false,
-        error_integral: 0.0,
-        altitude_target: 0.0
+    PidController::AltHold {
+        altpid: make_alt_hold_pid(k_p, k_i) 
     }
 }
 
@@ -99,21 +112,8 @@ pub fn get_demands(t: &mut PidController, vstate: VehicleState) -> Demands {
 
     match *t {
 
-        PidController::Angle { ref mut angpid } => { angpid_get_demands(angpid) }
+        PidController::Angle {ref mut angpid} => {angpid_get_demands(angpid)},
 
-        PidController::AltHoldPid {
-            k_p: _,
-            k_i: _, 
-            ref mut in_band_prev,
-            ref mut error_integral,
-            ref mut altitude_target
-        } => {
-
-            *in_band_prev = false;
-            *error_integral = 0.0;
-            *altitude_target = 0.0;
-
-            Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
-        },
+        PidController::AltHold {ref mut altpid} => {altpid_get_demands(altpid)}
     }
 }
