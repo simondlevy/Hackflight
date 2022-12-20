@@ -26,7 +26,7 @@ pub mod pids {
         },
     }
 
-    pub fn makeAltHold(k_p: f32, k_i: f32) {
+    pub fn makeAltHold(k_p: f32, k_i: f32) -> PidController {
 
         PidController::AltHoldPid {
             k_p : k_p,
