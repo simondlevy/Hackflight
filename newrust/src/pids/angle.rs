@@ -120,6 +120,122 @@ struct CyclicAxis {
     previous_dterm: f32
 }
 
+fn update_cyclic(
+    cyclic_axis: &mut CyclicAxis,
+    k_level_p: f32,
+    k_rate_p: f32,
+    k_rate_i: f32,
+    k_rate_d: f32,
+    k_rate_f: f32,
+    demand: f32,
+    angle: f32,
+    angvel: f32,
+    max_velocity: f32) -> f32
+{
+    let axis: &mut Axis = &mut cyclic_axis.axis;
+
+    let current_setpoint =
+        if max_velocity > 0.0
+            // {acceleration_limit(&mut cyclic_axis.axis, demand, max_velocity)}
+        {acceleration_limit(axis, demand, max_velocity)}
+        else {demand};
+
+    let new_setpoint = level_pid(k_level_p, current_setpoint, angle);
+
+    // -----calculate error rate
+    let error_rate = new_setpoint - angvel;
+
+    let setpoint_lpf = filters::apply_pt1(cyclic_axis.windup_lpf, current_setpoint);
+
+    let setpoint_hpf = (current_setpoint - setpoint_lpf).abs();
+
+    let iterm_relax_factor =
+        (1.0 - setpoint_hpf / ITERM_RELAX_SETPOINT_THRESHOLD).max(0.0);
+
+    let is_decreasing_i =
+        ((axis.integral > 0.0) && (error_rate < 0.0)) ||
+        ((axis.integral < 0.0) && (error_rate > 0.0));
+
+    // Was applyItermRelax in original
+    let iterm_error_rate = error_rate * (if !is_decreasing_i  {iterm_relax_factor} else {1.0} );
+
+    let frequency = 1.0 / DT;
+
+    // Calculate P component --------------------------------------------------
+    let pterm = k_rate_p * error_rate;
+
+    // Calculate I component --------------------------------------------------
+    axis.integral = constrain_f(axis.integral + (k_rate_i * DT) * iterm_error_rate,
+    -ITERM_LIMIT, ITERM_LIMIT);
+
+    // Calculate D component --------------------------------------------------
+
+    let dterm = filters::apply_pt1(
+        cyclic_axis.dterm_lpf2, 
+        filters::apply_pt1(cyclic_axis.dterm_lpf1, angvel));
+
+    // Divide rate change by dT to get differential (ie dr/dt).
+    // dT is fixed and calculated from the target PID loop time
+    // This is done to avoid DTerm spikes that occur with
+    // dynamically calculated deltaT whenever another task causes
+    // the PID loop execution to be delayed.
+    let delta = -(dterm - cyclic_axis.previous_dterm) * frequency;
+
+    let pre_t_pa_d = k_rate_d * delta;
+
+    let d_min_percent = if D_MIN > 0.0 && D_MIN < k_rate_d { D_MIN / k_rate_d } else { 0.0 };
+
+    let demand_delta: f32 = 0.0;
+
+    let d_min_gyro_gain = D_MIN_GAIN * D_MIN_GAIN_FACTOR / D_MIN_LOWPASS_HZ;
+
+    let d_min_gyro_factor = (filters::apply_pt2(cyclic_axis.d_min_range, delta)).abs() * d_min_gyro_gain;
+
+    let d_min_setpoint_gain =
+        D_MIN_GAIN * D_MIN_SETPOINT_GAIN_FACTOR * D_MIN_ADVANCE * frequency /
+        (100.0 * D_MIN_LOWPASS_HZ);
+
+    let d_min_setpoint_factor = (demand_delta).abs() * d_min_setpoint_gain;
+
+    let d_min_factor = 
+        d_min_percent + (1.0 - d_min_percent) * d_min_gyro_factor.max(d_min_setpoint_factor);
+
+    let d_min_factor_filtered = filters::apply_pt2(cyclic_axis.d_min_lpf, d_min_factor);
+
+    let d_min_factor = d_min_factor_filtered.min(1.0);
+
+    cyclic_axis.previous_dterm = dterm;
+
+    // Apply the d_min_factor
+    let dterm = pre_t_pa_d * d_min_factor;
+
+    // Calculate feedforward component -----------------------------------------
+
+    // halve feedforward in Level mode since stick sensitivity is
+    // weaker by about half transition now calculated in
+    // feedforward.c when new RC data arrives 
+    let feed_forward = k_rate_f * demand_delta * frequency;
+
+    let feedforward_max_rate: f32 = 670.0;
+
+    let feedforward_max_rate_limit =
+        feedforward_max_rate * FEEDFORWARD_MAX_RATE_LIMIT * 0.01;
+
+    let fterm = if feedforward_max_rate_limit != 0.0 {
+        apply_feeedforward_limit(
+            feed_forward,
+            current_setpoint,
+            k_rate_p,
+            feedforward_max_rate_limit) }
+    else {
+        feed_forward 
+    };
+
+    pterm + axis.integral + dterm + fterm
+
+} // update_cyclic
+
+
 fn update_yaw(
     axis: &mut Axis,
     pterm_lpf: filters::Pt1,
