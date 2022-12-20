@@ -22,7 +22,7 @@ use crate::Motors;
 
    MIT License
  */
-pub fn run_quad_xbf(demands:Demands) -> Motors {
+pub fn quad_xbf(demands:Demands) -> Motors {
 
     Motors {
 

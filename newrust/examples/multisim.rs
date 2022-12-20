@@ -8,6 +8,8 @@ use hackflight::VehicleState;
 
 use hackflight::pids;
 
+use hackflight::mixers;
+
 fn main() -> std::io::Result<()> {
 
     const IN_BUF_SIZE:usize  = 17*8; // 17 doubles in
@@ -90,7 +92,7 @@ fn main() -> std::io::Result<()> {
             demands = pids::get_demands(&mut *pid, vstate, demands);
         }
 
-        let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
+        let motors = mixers::quad_xbf(demands);
 
         let out_buf = write_motors(motors);
 
