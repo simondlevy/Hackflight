@@ -59,7 +59,11 @@ fn main() -> std::io::Result<()> {
         buf
     }
 
-    fn update_demands(arr: &mut [pids::Controller], demands: &mut Demands) {
+    fn update_demands(
+        arr: &mut [pids::Controller],
+        vstate: &VehicleState,
+        demands: &Demands) {
+
     }
 
     // We have to bind client socket to some address
@@ -90,6 +94,8 @@ fn main() -> std::io::Result<()> {
         let vstate = read_vehicle_state(in_buf);
 
         let mut demands = read_demands(in_buf);
+
+        update_demands(&mut pids, &vstate, &demands);
 
         for pid in pids.iter_mut() {
             demands = pids::get_demands(&mut *pid, vstate, demands);
