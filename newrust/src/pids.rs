@@ -62,7 +62,7 @@ pub fn make_alt_hold(k_p: f32, k_i: f32) -> PidController {
     }
 }
 
-pub fn get_demands(t: &mut PidController, _dx: f32, _dy: f32) -> Demands {
+pub fn get_demands(t: &mut PidController, vstate: VehicleState) -> Demands {
 
     match *t {
 

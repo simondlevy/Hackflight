@@ -21,6 +21,7 @@ pub mod datatypes {
         pub yaw:      f32
     } 
 
+    #[derive(Clone,Copy)]
     pub struct VehicleState {
 
         pub x:      f32,
