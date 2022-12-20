@@ -8,27 +8,33 @@ use hackflight::datatypes::VehicleState;
 
 #[derive(Debug,Clone)]
 enum PidController {
-    AnglePid { x: f32, y: f32, s: f32 },
-    AltHoldPid { x: f32, y: f32, r: f32 },
-}
 
-fn area(shape: &PidController) -> f32 {
-    match shape {
-        PidController::AnglePid { x:_, y:_, s } => {
-            s*s
-        },
-        PidController::AltHoldPid { x:_, y:_, r } => {
-            std::f32::consts::PI*r*r
-        },
-    }
+    AnglePid { 
+        x: f32,
+        y: f32,
+        s: f32 
+    },
+
+    AltHoldPid { 
+        x: f32,
+        y: f32,
+        r: f32 
+    },
 }
 
 fn get_demands(t: &mut PidController, dx: f32, dy: f32) {
 
     match *t {
 
-        PidController::AnglePid{ref mut x, ref mut y, s: _} => {*x += dx; *y += dy},
-        PidController::AltHoldPid{ref mut x, ref mut y, r: _} => {*x += dx; *y += dy},
+        PidController::AnglePid{ref mut x, ref mut y, s: _} => {
+            *x += dx;
+            *y += dy
+        },
+
+        PidController::AltHoldPid{ref mut x, ref mut y, r: _} => {
+            *x += dx;
+            *y += dy
+        },
     }
 }
 
