@@ -93,7 +93,8 @@ fn main() -> std::io::Result<()> {
 
         println!("{}", rxdemands.throttle);
 
-        let motors = Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0}; //run(&mut pids, &vstate, &rxdemands, &mixer);
+        // let motors = Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0};
+        let motors = run(&mut pids, &vstate, &rxdemands, &mixer);
 
         let out_buf = write_motors(motors);
 
