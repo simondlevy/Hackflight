@@ -120,6 +120,39 @@ struct CyclicAxis {
     previous_dterm: f32
 }
 
+fn update_yaw(
+    axis: &mut Axis,
+    pterm_lpf: filters::Pt1,
+    kp: f32,
+    ki: f32,
+    demand: f32,
+    angvel: f32) -> f32 {
+
+        let max_velocity = YAW_RATE_ACCEL_LIMIT * 100.0 * DT; 
+
+        // gradually scale back integration when above windup point
+        let iterm_windup_point_inv = 1.0 / (1.0 - (ITERM_WINDUP_POINT_PERCENT / 100.0));
+
+        let dyn_ci = DT * (if iterm_windup_point_inv > 1.0
+            {constrain_f(iterm_windup_point_inv, 0.0, 1.0)}
+            else {1.0});
+
+        let current_setpoint =
+            if max_velocity > 0.0 {acceleration_limit(axis, demand, max_velocity)} else {demand};
+
+        let error_rate = current_setpoint - angvel;
+
+        // -----calculate P component
+        let pterm = filters::apply_pt1(pterm_lpf, kp * error_rate);
+
+        // -----calculate I component, constraining windup
+        axis.integral =
+            constrain_f(axis.integral + (ki * dyn_ci) * error_rate, -ITERM_LIMIT, ITERM_LIMIT);
+
+        pterm + axis.integral
+    }
+
+
 fn make_cyclic_axis() -> CyclicAxis {
 
     CyclicAxis {
@@ -200,6 +233,19 @@ fn apply_feeedforward_limit(
             0.0
         }
     }
+
+fn init_lpf1(cyclic_axis: &mut CyclicAxis, cutoff_freq: f32) {
+
+    filters::adjust_pt1_gain(cyclic_axis.dterm_lpf1, cutoff_freq);
+}
+
+
+fn dyn_lpf_cutoff_freq(throttle: f32, dyn_lpf_min: f32, dyn_lpf_max: f32, expo: f32) -> f32 {
+    let expof = expo / 10.0;
+    let curve = throttle * (1.0 - throttle) * expof + throttle;
+
+    (dyn_lpf_max - dyn_lpf_min) * curve + dyn_lpf_min
+}
 
 
 fn constrain_output(demand: f32, limit: f32) -> f32 {
