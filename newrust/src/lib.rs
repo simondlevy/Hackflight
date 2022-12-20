@@ -7,7 +7,6 @@
  */
 
 pub mod pids;
-pub mod mixers;
 
 mod utils;
 
@@ -101,18 +100,4 @@ pub fn run(
     }
 
     mixer.get_motors(&demands)
-}
-
-pub fn run_pids(
-    arr: &mut [pids::Controller],
-    vstate: &VehicleState,
-    rxdemands: &Demands) -> Demands {
-
-    let mut demands = rxdemands.clone();
-
-    for pid in arr.iter_mut() {
-        demands = pids::get_demands(&mut *pid, *vstate, demands);
-    }
-
-    demands
 }
