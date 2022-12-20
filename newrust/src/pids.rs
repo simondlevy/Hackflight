@@ -26,6 +26,17 @@ pub mod pids {
         },
     }
 
+    pub fn makeAltHold(k_p: f32, k_i: f32) {
+
+        PidController::AltHoldPid {
+            k_p : k_p,
+            k_i: k_i,
+            in_band_prev: false,
+            error_integral: 0.0,
+            altitude_target: 0.0
+        }
+    }
+
     pub fn get_demands(t: &mut PidController, dx: f32, dy: f32) {
 
         match *t {
