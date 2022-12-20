@@ -69,7 +69,8 @@ fn main() -> std::io::Result<()> {
 
     let alt_hold_pid = pids::makeAltHold(0.0, 0.0);
 
-    let angle_pid = pids::PidController::AnglePid { x: -5.0, y: 10.0, s: 2.0 };
+    let angle_pid = pids::makeAngle(0.0, 0.0, 0.0, 0.0, 0.0);
+
 
     //let mut pids: [pids::PidController; 2] = [angle_pid, alt_hold_pid];
 

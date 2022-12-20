@@ -12,9 +12,16 @@ pub mod pids {
     pub enum PidController {
 
         AnglePid { 
-            x: f32,
-            y: f32,
-            s: f32 
+            k_rate_p: f32,
+            k_rate_i: f32,
+            k_rate_d: f32,
+            k_rate_f: f32,
+            k_level_p: f32,
+            //roll : CyclicAxis,
+            //pitch : CyclicAxis,
+            //yaw: Axis,
+            dyn_lpf_previous_quantized_throttle: i32,  
+            //pterm_yaw_lpf: filters::Pt1
         },
 
         AltHoldPid { 
@@ -24,6 +31,23 @@ pub mod pids {
             error_integral: f32,
             altitude_target: f32
         },
+    }
+
+    pub fn makeAngle(
+            k_rate_p: f32,
+            k_rate_i: f32,
+            k_rate_d: f32,
+            k_rate_f: f32,
+            k_level_p: f32 ) -> PidController {
+ 
+        PidController::AnglePid {
+            k_rate_p: k_rate_p,
+            k_rate_i: k_rate_i,
+            k_rate_d: k_rate_d,
+            k_rate_f: k_rate_f,
+            k_level_p: k_level_p,
+            dyn_lpf_previous_quantized_throttle: 0  
+         }
     }
 
     pub fn makeAltHold(k_p: f32, k_i: f32) -> PidController {
@@ -42,13 +66,15 @@ pub mod pids {
         match *t {
 
             PidController::AnglePid {
-                ref mut x,
-                ref mut y,
-                s: _
+                k_rate_p,
+                k_rate_i,
+                k_rate_d,
+                k_rate_f,
+                k_level_p,
+                ref mut dyn_lpf_previous_quantized_throttle
             } => {
 
-                *x += dx;
-                *y += dy
+                *dyn_lpf_previous_quantized_throttle = 0
             },
 
             PidController::AltHoldPid {
