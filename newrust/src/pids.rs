@@ -20,10 +20,14 @@ pub struct NewAnglePid {
     //pitch : CyclicAxis,
     //yaw: Axis,
     dyn_lpf_previous_quantized_throttle: i32,  
+    foo: bool,
     //pterm_yaw_lpf: filters::Pt1
 }
 
 pub fn angpid_get_demands(angpid: &mut NewAnglePid) -> Demands {
+
+    angpid.foo = true;
+
     Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
 }
 
