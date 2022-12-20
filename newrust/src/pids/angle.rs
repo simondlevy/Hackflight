@@ -148,4 +148,44 @@ fn rescale(command: f32) -> f32 {
     670.0 * angle_rate
 }
 
+fn level_pid(k_level_p: f32, current_setpoint: f32, current_angle: f32) -> f32
+{
+    // calculate error angle and limit the angle to the max inclination
+    // rcDeflection in [-1.0, 1.0]
 
+    const LEVEL_ANGLE_LIMIT: f32 = 45.0;
+
+    let angle = constrain_f(LEVEL_ANGLE_LIMIT * current_setpoint,
+        -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
+
+    let angle_error = angle - (current_angle / 10.0);
+
+    if k_level_p > 0.0  {angle_error * k_level_p } else {current_setpoint}
+}
+
+
+fn apply_feeedforward_limit(
+    value: f32,
+    current_setpoint: f32,
+    k_rate_p : f32,
+    max_rate_limit: f32) -> f32 {
+
+        if value * current_setpoint > 0.0 {
+            if current_setpoint.abs() <= max_rate_limit
+            { constrain_f(value, (-max_rate_limit -
+                    current_setpoint) * k_rate_p,
+                    (max_rate_limit - current_setpoint) * k_rate_p)}
+            else {
+                0.0
+            }
+        }
+        else {
+            0.0
+        }
+    }
+
+
+fn constrain_output(demand: f32, limit: f32) -> f32 {
+
+    constrain_f(demand, -limit, limit) / OUTPUT_SCALING
+}
