@@ -6,52 +6,7 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
-use hackflight::pids;
-
-#[derive(Debug,Clone)]
-enum PidController {
-
-    AnglePid { 
-        x: f32,
-        y: f32,
-        s: f32 
-    },
-
-    AltHoldPid { 
-        k_p : f32,
-        k_i: f32, 
-        in_band_prev: bool,
-        error_integral: f32,
-        altitude_target: f32
-    },
-}
-
-fn get_demands(t: &mut PidController, dx: f32, dy: f32) {
-
-    match *t {
-
-        PidController::AnglePid {
-            ref mut x,
-            ref mut y,
-            s: _
-        } => {
-
-            *x += dx;
-            *y += dy
-        },
-
-        PidController::AltHoldPid {
-            k_p,
-            k_i, 
-            ref mut in_band_prev,
-            ref mut error_integral,
-            ref mut altitude_target
-        } => {
-
-            *in_band_prev = false
-        },
-    }
-}
+use hackflight::pids::pids;
 
 fn main() -> std::io::Result<()> {
 
@@ -112,17 +67,18 @@ fn main() -> std::io::Result<()> {
 
     println!("Hit the Play button ...");
 
-    let alt_hold_pid = PidController::AltHoldPid {
+    /*
+    let alt_hold_pid = pids::PidController::AltHoldPid {
         k_p : 0.0,
         k_i: 0.0, 
         in_band_prev: false,
         error_integral: 0.0,
         altitude_target: 0.0
-     };
+     };*/
 
-    let angle_pid = PidController::AnglePid { x: -5.0, y: 10.0, s: 2.0 };
+    let angle_pid = pids::PidController::AnglePid { x: -5.0, y: 10.0, s: 2.0 };
 
-    let mut pids: [PidController; 2] = [angle_pid, alt_hold_pid];
+    //let mut pids: [pids::PidController; 2] = [angle_pid, alt_hold_pid];
 
     loop {
 
@@ -137,9 +93,9 @@ fn main() -> std::io::Result<()> {
 
         let mut demands = read_demands(in_buf);
 
-        for shape in pids.iter_mut() {
-            get_demands(&mut *shape, 2.0, -3.5);
-        }
+        //for shape in pids.iter_mut() {
+        //    get_demands(&mut *shape, 2.0, -3.5);
+        //}
 
         let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
 

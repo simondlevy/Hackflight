@@ -9,7 +9,7 @@
 pub mod pids {
 
     #[derive(Debug,Clone)]
-    enum PidController {
+    pub enum PidController {
 
         AnglePid { 
             x: f32,
@@ -26,7 +26,7 @@ pub mod pids {
         },
     }
 
-    fn get_demands(t: &mut PidController, dx: f32, dy: f32) {
+    pub fn get_demands(t: &mut PidController, dx: f32, dy: f32) {
 
         match *t {
 
