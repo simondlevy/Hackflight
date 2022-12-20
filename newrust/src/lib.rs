@@ -8,6 +8,7 @@
 
 pub mod pids;
 pub mod mixers;
+pub mod filters;
 
 mod utils;
 

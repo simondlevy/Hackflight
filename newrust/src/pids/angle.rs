@@ -9,6 +9,10 @@
 use crate::Demands;
 use crate::VehicleState;
 
+use crate::filters;
+use crate::utils::DT;
+use crate::utils::constrain_f;
+
 const DTERM_LPF1_DYN_MIN_HZ: f32 = 75.0;
 const DTERM_LPF1_DYN_MAX_HZ: f32 = 150.0;
 const DTERM_LPF2_HZ: f32 = 150.0;
@@ -91,3 +95,24 @@ pub fn get_demands(
 
         Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
 }
+
+#[derive(Clone,Copy)]
+struct Axis {
+
+    previous_setpoint : f32,
+    integral : f32
+}
+
+#[derive(Clone)]
+struct CyclicAxis {
+
+    axis: Axis,
+    dterm_lpf1 : filters::Pt1,
+    dterm_lpf2 : filters::Pt1,
+    d_min_lpf: filters::Pt2,
+    d_min_range: filters::Pt2,
+    windup_lpf: filters::Pt1,
+    previous_dterm: f32
+}
+
+
