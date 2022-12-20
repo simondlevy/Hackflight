@@ -61,9 +61,15 @@ fn main() -> std::io::Result<()> {
 
     fn update_demands(
         arr: &mut [pids::Controller],
-        vstate: &VehicleState) -> Demands {
+        vstate: &VehicleState,
+        demands: &Demands) -> Demands {
         
-        let mut new_demands = Demands {throttle:0.0, roll:0.0, pitch:0.0, yaw:0.0};
+        let mut new_demands = Demands {
+            throttle: demands.throttle, 
+            roll: demands.roll,
+            pitch: demands.pitch,
+            yaw: demands.yaw
+        };
 
         for pid in arr.iter_mut() {
             new_demands = pids::get_demands(&mut *pid, *vstate, new_demands);
@@ -99,15 +105,15 @@ fn main() -> std::io::Result<()> {
 
         let vstate = read_vehicle_state(in_buf);
 
-        let mut demands = read_demands(in_buf);
+        let demands = read_demands(in_buf);
 
-        update_demands(&mut pids, &vstate);
+        let new_demands = update_demands(&mut pids, &vstate, &demands);
 
-        for pid in pids.iter_mut() {
-            demands = pids::get_demands(&mut *pid, vstate, demands);
-        }
+        //for pid in pids.iter_mut() {
+        //    demands = pids::get_demands(&mut *pid, vstate, demands);
+        //}
 
-        let motors = mixers::quad_xbf(demands);
+        let motors = mixers::quad_xbf(new_demands);
 
         let out_buf = write_motors(motors);
 
