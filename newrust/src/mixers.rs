@@ -8,8 +8,8 @@
 
 pub mod mixers {
 
-    use crate::datatypes::Demands;
-    use crate::datatypes::Motors;
+    use crate::Demands;
+    use crate::Motors;
 
     /*
        Mixer values for quad-X frames using Betaflight motor layout:

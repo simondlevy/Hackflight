@@ -6,8 +6,8 @@
    MIT License
  */
 
-use crate::datatypes::Demands;
-use crate::datatypes::VehicleState;
+use crate::Demands;
+use crate::VehicleState;
 
 #[derive(Debug,Clone)]
 pub enum PidController {

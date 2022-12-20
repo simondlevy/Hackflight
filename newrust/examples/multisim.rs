@@ -2,9 +2,9 @@ extern crate hackflight;
 
 use std::net::UdpSocket;
 
-use hackflight::datatypes::Demands;
-use hackflight::datatypes::Motors;
-use hackflight::datatypes::VehicleState;
+use hackflight::Demands;
+use hackflight::Motors;
+use hackflight::VehicleState;
 
 use hackflight::pids;
 
