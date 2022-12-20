@@ -91,7 +91,7 @@ impl Mixer for QuadXbf {
 pub fn run(
     arr: &mut [pids::Controller],
     vstate: &VehicleState,
-    demands: &Demands,
+    rxdemands: &Demands,
     mixer: &dyn Mixer) -> Motors{
 
     Motors { m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0 }
@@ -103,12 +103,7 @@ pub fn run_pids(
     vstate: &VehicleState,
     rxdemands: &Demands) -> Demands {
 
-    let mut demands = Demands {
-        throttle: rxdemands.throttle, 
-        roll: rxdemands.roll,
-        pitch: rxdemands.pitch,
-        yaw: rxdemands.yaw
-    };
+    let mut demands = rxdemands.clone();
 
     for pid in arr.iter_mut() {
         demands = pids::get_demands(&mut *pid, *vstate, demands);
