@@ -60,13 +60,11 @@ pub fn run(
 
         let mut demands = rxdemands.clone();
 
-        /*
         for pid in arr.iter_mut() {
             demands = pids::get_demands(&mut *pid, demands, *vstate, reset);
         }
 
-        mixer.get_motors(&demands)
-        */
+        // mixer.get_motors(&demands)
 
         Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0}
 
