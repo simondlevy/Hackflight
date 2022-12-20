@@ -59,7 +59,7 @@ fn main() -> std::io::Result<()> {
         buf
     }
 
-    fn update_demands(arr: &mut [pids::Controller]) {
+    fn update_demands(arr: &mut [pids::Controller], demands: &mut Demands) {
     }
 
     // We have to bind client socket to some address
