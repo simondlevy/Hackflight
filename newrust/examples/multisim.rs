@@ -6,68 +6,34 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
-#[derive(Clone,Copy)]
-pub struct AnglePid {
-
-    var: bool
-
+#[derive(Debug,Clone)]
+enum Shape {
+    Square { x: f32, y: f32, s: f32 },
+    Circle { x: f32, y: f32, r: f32 },
+    Triangle { x: f32, y: f32, w: f32, h:f32 },
 }
 
-#[derive(Clone,Copy)]
-pub struct AltHoldPid {
-
-    var: bool
-}
-
-#[derive(Clone,Copy)]
-pub enum PidController {
-
-    Angle { ap : AnglePid },
-
-    AltHold { ahp : AltHoldPid, },
-}
-
-pub fn get_angle_demands(
-    pid: &mut AnglePid,
-    d_usec: &u32,
-    demands: &Demands,
-    vstate: &VehicleState,
-    reset: &bool) -> Demands {
-
-    pid.var = true;
-
-    Demands {throttle: 0.0, roll: 0.0, pitch: 0.0, yaw: 0.0 }
-}
-
-pub fn get_alt_hold_demands(
-    pid: &mut AltHoldPid,
-    d_usec: &u32,
-    demands: &Demands,
-    vstate: &VehicleState,
-    reset: &bool) -> Demands {
-
-    pid.var = false;
-
-    Demands {throttle: 0.0, roll: 0.0, pitch: 0.0, yaw: 0.0 }
-}
-
-
-pub fn get_demands(
-    pid: &mut PidController,
-    d_usec: &u32,
-    demands: &Demands,
-    vstate: &VehicleState,
-    reset: &bool) -> Demands {
-
-    match pid {
-
-        PidController::Angle { ap } => { 
-            get_angle_demands(ap, d_usec, demands, vstate, reset)
+fn area(shape: &Shape) -> f32 {
+    match shape {
+        Shape::Square { x:_, y:_, s } => {
+            s*s
         },
+        Shape::Circle { x:_, y:_, r } => {
+            std::f32::consts::PI*r*r
+        },
+        Shape::Triangle { x:_, y:_, w, h } => {
+            (w + h) / 2.0
+        },
+    }
+}
 
-        PidController::AltHold { ahp } => {
-            get_alt_hold_demands(ahp, d_usec, demands, vstate, reset)
-        }
+fn transpose(t: &mut Shape, dx: f32, dy: f32) {
+
+    match *t {
+
+        Shape::Square{ref mut x, ref mut y, s: _} => {*x += dx; *y += dy},
+        Shape::Circle{ref mut x, ref mut y, r: _} => {*x += dx; *y += dy},
+        Shape::Triangle{ref mut x, ref mut y, w: _, h: _ } => {*x += dx; *y += dy}
     }
 }
 
@@ -122,28 +88,11 @@ fn main() -> std::io::Result<()> {
         buf
     }
 
-    fn run_hackflight(
-        demands: Demands,
-        vehicle_state: VehicleState, 
-        mixfun: &dyn Fn(Demands) -> Motors) -> Motors {
-
-        Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0 }
-
-    }
-
     // We have to bind client socket to some address
     let motor_client_socket = UdpSocket::bind("0.0.0.0:0")?;
 
     // Bind server socket to address,port that client will connect to
     let telemetry_server_socket = UdpSocket::bind("127.0.0.1:5001")?;
-
-    let ap   = AnglePid { var: false };
-    let ahp  = AltHoldPid { var: true };
-
-    let angle   = PidController::Angle { ap: ap};
-    let althold = PidController::AltHold { ahp: ahp};
-
-    let pids = [angle, althold];
 
     println!("Hit the Play button ...");
 
@@ -159,9 +108,6 @@ fn main() -> std::io::Result<()> {
         let vehicle_state = read_vehicle_state(in_buf);
 
         let mut demands = read_demands(in_buf);
-
-        for pid in pids.into_iter() {
-        }
 
         let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
 
