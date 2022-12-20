@@ -10,7 +10,6 @@ pub mod pids;
 pub mod mixers;
 
 mod utils;
-mod filters;
 
 #[derive(Clone)]
 pub struct Demands {
@@ -43,6 +42,11 @@ pub struct Motors {
     pub m2: f32,
     pub m3: f32,
     pub m4: f32
+}
+
+pub trait Mixer {
+
+    fn get_motors(&self, demands: & Demands) -> Motors;
 }
 
 pub fn run_pids(
