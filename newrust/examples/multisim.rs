@@ -96,6 +96,15 @@ fn main() -> std::io::Result<()> {
 
     println!("Hit the Play button ...");
 
+    let circle = Shape::Circle { x: 10.0, y: 20.0, r: 1.0 };
+    let square = Shape::Square { x: -5.0, y: 10.0, s: 2.0 };
+
+    let mut shapes: [Shape; 2] = [square, circle];
+
+    for shape in shapes.iter_mut() {
+        transpose(&mut *shape, 2.0, -3.5);
+    }
+
     loop {
 
         let mut in_buf = [0; IN_BUF_SIZE]; 
