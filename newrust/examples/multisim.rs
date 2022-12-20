@@ -73,6 +73,8 @@ fn main() -> std::io::Result<()> {
 
     let angle_pid = pids::make_angle(0.0, 0.0, 0.0, 0.0, 0.0);
 
+    let mixer = QuadXbf { };
+
     let mut pids: [pids::Controller; 2] = [angle_pid, alt_hold_pid];
 
     loop {
