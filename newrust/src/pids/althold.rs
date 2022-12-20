@@ -9,6 +9,11 @@
 use crate::Demands;
 use crate::VehicleState;
 
+const ALTITUDE_MIN: f32   = 1.0;
+const PILOT_VELZ_MAX: f32 = 2.5;
+const STICK_DEADBAND: f32 = 0.2;
+const WINDUP_MAX: f32     = 0.4;
+
 #[derive(Debug,Clone)]
 pub struct Pid { 
     k_p : f32,
@@ -29,8 +34,9 @@ pub fn make(
 
 pub fn get_demands(
     pid: &mut Pid,
+    demands: &Demands,
     vstate: &VehicleState,
-    demands: &Demands) -> Demands {
+    reset: &bool) -> Demands {
 
     pid.in_band_prev = false;
 

@@ -43,17 +43,18 @@ pub fn make_alt_hold(
 
 pub fn get_demands(
     t: &mut Controller,
+    demands: Demands,
     vstate: VehicleState,
-    demands: Demands) -> Demands {
+    reset: bool) -> Demands {
 
     match *t {
 
         Controller::Angle {ref mut angpid} => {
-                angle::get_demands(angpid, &vstate, &demands)
+                angle::get_demands(angpid, &demands, &vstate, &reset)
             },
 
         Controller::AltHold {ref mut altpid} => {
-            althold::get_demands(altpid, &vstate, &demands)
+            althold::get_demands(altpid, &demands, &vstate, &reset)
         }
     }
 }
