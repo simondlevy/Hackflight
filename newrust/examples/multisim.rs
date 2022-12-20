@@ -134,6 +134,12 @@ fn main() -> std::io::Result<()> {
     // Bind server socket to address,port that client will connect to
     let telemetry_server_socket = UdpSocket::bind("127.0.0.1:5001")?;
 
+    let ap   = AnglePid { var: false };
+    let ahp  = AltHoldPid { var: true };
+
+    let angle = PidController::Angle { ap: ap};
+
+
     println!("Hit the Play button ...");
 
     loop {
