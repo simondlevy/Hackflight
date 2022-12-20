@@ -10,7 +10,29 @@ use crate::Demands;
 use crate::VehicleState;
 
 #[derive(Debug,Clone)]
+pub struct NewAnglePid { 
+    k_rate_p: f32,
+    k_rate_i: f32,
+    k_rate_d: f32,
+    k_rate_f: f32,
+    k_level_p: f32,
+    //roll : CyclicAxis,
+    //pitch : CyclicAxis,
+    //yaw: Axis,
+    dyn_lpf_previous_quantized_throttle: i32,  
+    //pterm_yaw_lpf: filters::Pt1
+}
+
+pub fn angpid_get_demands(angpid: &mut NewAnglePid) -> Demands {
+    Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
+}
+
+#[derive(Debug,Clone)]
 pub enum PidController {
+
+    New {
+        angpid: NewAnglePid
+    },
 
     AnglePid { 
         k_rate_p: f32,
@@ -25,13 +47,13 @@ pub enum PidController {
         //pterm_yaw_lpf: filters::Pt1
     },
 
-        AltHoldPid { 
-            k_p : f32,
-            k_i: f32, 
-            in_band_prev: bool,
-            error_integral: f32,
-            altitude_target: f32
-        },
+    AltHoldPid { 
+        k_p : f32,
+        k_i: f32, 
+        in_band_prev: bool,
+        error_integral: f32,
+        altitude_target: f32
+    },
 }
 
 pub fn make_angle(
@@ -65,6 +87,14 @@ pub fn make_alt_hold(k_p: f32, k_i: f32) -> PidController {
 pub fn get_demands(t: &mut PidController, vstate: VehicleState) -> Demands {
 
     match *t {
+
+        PidController::New {
+            ref mut angpid
+        } => {
+
+            angpid_get_demands(angpid)
+        }
+
 
         PidController::AnglePid {
             k_rate_p: _,
