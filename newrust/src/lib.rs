@@ -8,8 +8,6 @@
 
 pub mod utils;
 pub mod pids;
-pub mod newaltpid;
-pub mod newanglepid;
 pub mod filters;
 pub mod mixers;
 
@@ -49,20 +47,10 @@ pub mod datatypes {
         pub m4: f32
     }
 
-    pub trait PidControllerTrait {
-
-        fn get_demands(
-            &self,
-            d_usec: &u32,
-            demands: &Demands,
-            vstate: &VehicleState,
-            reset: &bool) -> Demands; 
-    }
-
     pub fn run_hackflight(
         demands: Demands,
         vehicle_state: VehicleState, 
-        pid_controller: &mut pids::Controller,
+        pid_controller: pids::Controller,
         mixfun: &dyn Fn(Demands) -> Motors) -> (Motors, pids::Controller) {
 
         let (demands, new_pid_controller) =

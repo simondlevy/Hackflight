@@ -5,12 +5,8 @@ use std::net::UdpSocket;
 use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
-use hackflight::datatypes::PidControllerTrait;
-use hackflight::datatypes::newrun;
 
-use hackflight::newaltpid::newaltpid;
-use hackflight::newanglepid::newanglepid;
-use hackflight::mixers::mixers::run_quad_xbf;
+use hackflight::pids;
 
 fn main() -> std::io::Result<()> {
 
@@ -69,13 +65,6 @@ fn main() -> std::io::Result<()> {
     // Bind server socket to address,port that client will connect to
     let telemetry_server_socket = UdpSocket::bind("127.0.0.1:5001")?;
 
-    let angle_pid = newanglepid::make(0.0, 0.0, 0.0, 0.0, 0.0);
-    let alt_hold_pid = newaltpid::make(0.0, 0.0);
-
-    let mut pids : Vec<&dyn PidControllerTrait> = Vec::new();
-    pids.push(&angle_pid);
-    pids.push(&alt_hold_pid);
-
     println!("Hit the Play button ...");
 
     loop {
@@ -91,7 +80,7 @@ fn main() -> std::io::Result<()> {
 
         let demands = read_demands(in_buf);
 
-        let motors = newrun(&pids, demands, vehicle_state, &run_quad_xbf);
+        let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
 
         let out_buf = write_motors(motors);
 
