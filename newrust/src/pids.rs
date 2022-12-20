@@ -9,16 +9,15 @@
 use crate::Demands;
 use crate::VehicleState;
 
-mod anglepid;
-mod altholdpid;
+mod angle;
+mod althold;
 
 #[derive(Debug,Clone)]
-
 pub enum Controller {
 
-    Angle { angpid: anglepid::Pid },
+    Angle { angpid: angle::Pid },
 
-    AltHold { altpid: altholdpid::Pid },
+    AltHold { altpid: althold::Pid },
 }
 
 pub fn make_angle(
@@ -29,7 +28,7 @@ pub fn make_angle(
     k_level_p: f32 ) -> Controller {
 
     Controller::Angle {
-        angpid: anglepid::make(k_rate_p, k_rate_i, k_rate_d, k_rate_f, k_level_p)
+        angpid: angle::make(k_rate_p, k_rate_i, k_rate_d, k_rate_f, k_level_p)
     }
 }
 
@@ -38,7 +37,7 @@ pub fn make_alt_hold(
     k_i: f32) -> Controller {
 
     Controller::AltHold {
-        altpid: altholdpid::make(k_p, k_i) 
+        altpid: althold::make(k_p, k_i) 
     }
 }
 
@@ -50,11 +49,11 @@ pub fn get_demands(
     match *t {
 
         Controller::Angle {ref mut angpid} => {
-                anglepid::get_demands(angpid, &vstate, &demands)
+                angle::get_demands(angpid, &vstate, &demands)
             },
 
         Controller::AltHold {ref mut altpid} => {
-            altholdpid::get_demands(altpid, &vstate, &demands)
+            althold::get_demands(altpid, &vstate, &demands)
         }
     }
 }
