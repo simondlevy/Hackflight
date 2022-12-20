@@ -10,7 +10,6 @@ use hackflight::datatypes::VehicleState;
 enum Shape {
     Square { x: f32, y: f32, s: f32 },
     Circle { x: f32, y: f32, r: f32 },
-    Triangle { x: f32, y: f32, w: f32, h:f32 },
 }
 
 fn area(shape: &Shape) -> f32 {
@@ -21,9 +20,6 @@ fn area(shape: &Shape) -> f32 {
         Shape::Circle { x:_, y:_, r } => {
             std::f32::consts::PI*r*r
         },
-        Shape::Triangle { x:_, y:_, w, h } => {
-            (w + h) / 2.0
-        },
     }
 }
 
@@ -33,7 +29,6 @@ fn transpose(t: &mut Shape, dx: f32, dy: f32) {
 
         Shape::Square{ref mut x, ref mut y, s: _} => {*x += dx; *y += dy},
         Shape::Circle{ref mut x, ref mut y, r: _} => {*x += dx; *y += dy},
-        Shape::Triangle{ref mut x, ref mut y, w: _, h: _ } => {*x += dx; *y += dy}
     }
 }
 
