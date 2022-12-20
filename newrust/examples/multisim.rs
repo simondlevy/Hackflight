@@ -6,6 +6,21 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
+pub struct AnglePid {
+
+}
+
+pub struct AltHoldPid {
+
+}
+
+pub enum PidController {
+
+    Angle { ap : AnglePid },
+
+    AltHold { ahp : AltHoldPid, },
+}
+
 fn main() -> std::io::Result<()> {
 
     const IN_BUF_SIZE:usize  = 17*8; // 17 doubles in
