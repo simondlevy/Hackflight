@@ -24,7 +24,7 @@ impl Mixer for QuadXbf {
 
     fn get_motors(&self, demands: &Demands) -> Motors {
         
-        println!("thr={}  rol={}  pit={}  yaw={}",  
+        println!("thr={:.6}  rol={:.6}  pit={:.6}  yaw={:.6}",  
             demands.throttle, demands.roll, demands.pitch, demands.yaw);
 
         Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0}

@@ -93,6 +93,9 @@ pub mod pids {
         demands: Demands,
         vehicle_state: VehicleState) -> (Demands, Controller) {
 
+            println!("thr={:.6}  rol={:.6}  pit={:.6}  yaw={:.6}",  
+                demands.throttle, demands.roll, demands.pitch, demands.yaw);
+
             let (new_demands, new_alt_pid) =
                 alt_pid::run(demands, &vehicle_state, controller.alt);
 
