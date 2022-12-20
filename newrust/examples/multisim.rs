@@ -16,9 +16,11 @@ enum PidController {
     },
 
     AltHoldPid { 
-        x: f32,
-        y: f32,
-        r: f32 
+        k_p : f32,
+        k_i: f32, 
+        in_band_prev: bool,
+        error_integral: f32,
+        altitude_target: f32
     },
 }
 
@@ -26,14 +28,25 @@ fn get_demands(t: &mut PidController, dx: f32, dy: f32) {
 
     match *t {
 
-        PidController::AnglePid{ref mut x, ref mut y, s: _} => {
+        PidController::AnglePid {
+            ref mut x,
+            ref mut y,
+            s: _
+        } => {
+
             *x += dx;
             *y += dy
         },
 
-        PidController::AltHoldPid{ref mut x, ref mut y, r: _} => {
-            *x += dx;
-            *y += dy
+        PidController::AltHoldPid {
+            ref mut k_p ,
+            ref mut k_i, 
+            ref mut in_band_prev,
+            ref mut error_integral,
+            ref mut altitude_target
+        } => {
+
+            *in_band_prev = false
         },
     }
 }
@@ -97,7 +110,14 @@ fn main() -> std::io::Result<()> {
 
     println!("Hit the Play button ...");
 
-    let alt_hold_pid = PidController::AltHoldPid { x: 10.0, y: 20.0, r: 1.0 };
+    let alt_hold_pid = PidController::AltHoldPid {
+        k_p : 0.0,
+        k_i: 0.0, 
+        in_band_prev: false,
+        error_integral: 0.0,
+        altitude_target: 0.0
+     };
+
     let angle_pid = PidController::AnglePid { x: -5.0, y: 10.0, s: 2.0 };
 
     let mut pids: [PidController; 2] = [angle_pid, alt_hold_pid];
