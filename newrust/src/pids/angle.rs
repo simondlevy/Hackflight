@@ -51,6 +51,8 @@ const OUTPUT_SCALING: f32 = 1000.0;
 const  LIMIT_CYCLIC: f32 = 500.0; 
 const  LIMIT_YAW: f32 = 400.0;
 
+const YAW_LOWPASS_HZ: f32 = 100.0;
+
 #[derive(Clone)]
 pub struct Pid { 
     k_rate_p: f32,
@@ -62,7 +64,7 @@ pub struct Pid {
     pitch : CyclicAxis,
     yaw: Axis,
     dyn_lpf_previous_quantized_throttle: i32,  
-    //pterm_yaw_lpf: filters::Pt1
+    pterm_yaw_lpf: filters::Pt1
 }
 
 pub fn make(
@@ -82,6 +84,7 @@ pub fn make(
             pitch : make_cyclic_axis(),
             yaw: make_axis(),
             dyn_lpf_previous_quantized_throttle: 0, 
+            pterm_yaw_lpf : filters::make_pt1(YAW_LOWPASS_HZ)
         }
 } 
 
@@ -97,6 +100,41 @@ pub fn get_demands(
         let yaw_demand   = rescale(demands.yaw);
 
         let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
+
+        let roll = 
+            update_cyclic(
+                &mut pid.roll,
+                pid.k_level_p,
+                pid.k_rate_p,
+                pid.k_rate_i,
+                pid.k_rate_d,
+                pid.k_rate_f,
+                roll_demand,
+                vstate.phi,
+                vstate.dphi,
+                max_velocity);
+
+
+        let pitch = 
+            update_cyclic(
+                &mut pid.pitch,
+                pid.k_level_p,
+                pid.k_rate_p,
+                pid.k_rate_i,
+                pid.k_rate_d,
+                pid.k_rate_f,
+                pitch_demand,
+                vstate.theta,
+                vstate.dtheta,
+                max_velocity);
+
+        let yaw = update_yaw(
+            &mut pid.yaw,
+            pid.pterm_yaw_lpf,
+            pid.k_rate_p,
+            pid.k_rate_i,
+            yaw_demand,
+            vstate.dpsi);
 
         Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
 }
