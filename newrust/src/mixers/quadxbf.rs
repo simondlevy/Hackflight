@@ -23,6 +23,9 @@ pub struct QuadXbf {
 impl Mixer for QuadXbf {
 
     fn get_motors(&self, demands: &Demands) -> Motors {
+        
+        println!("thr={}  rol={}  pit={}  yaw={}",  
+            demands.throttle, demands.roll, demands.pitch, demands.yaw);
 
         Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0}
 

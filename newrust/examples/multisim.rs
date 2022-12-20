@@ -91,8 +91,6 @@ fn main() -> std::io::Result<()> {
 
         let rxdemands = read_demands(in_buf);
 
-        println!("{}", rxdemands.throttle);
-
         // let motors = Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0};
         let motors = run(&mut pids, &vstate, &rxdemands, &mixer);
 

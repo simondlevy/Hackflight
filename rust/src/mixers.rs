@@ -26,6 +26,9 @@ pub mod mixers {
      */
     pub fn run_quad_xbf(demands:Demands) -> Motors {
 
+        println!("thr={}  rol={}  pit={}  yaw={}",  
+            demands.throttle, demands.roll, demands.pitch, demands.yaw);
+
         Motors {
 
             // right rear
