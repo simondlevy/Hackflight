@@ -88,6 +88,16 @@ impl Mixer for QuadXbf {
     }
 }
 
+pub fn run(
+    arr: &mut [pids::Controller],
+    vstate: &VehicleState,
+    demands: &Demands,
+    mixer: &dyn Mixer) -> Motors{
+
+    Motors { m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0 }
+
+}
+
 pub fn run_pids(
     arr: &mut [pids::Controller],
     vstate: &VehicleState,

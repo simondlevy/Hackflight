@@ -8,6 +8,7 @@ use hackflight::VehicleState;
 use hackflight::pids;
 use hackflight::mixers;
 use hackflight::run_pids;
+use hackflight::run;
 use hackflight::QuadXbf;
 
 fn main() -> std::io::Result<()> {
