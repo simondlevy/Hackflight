@@ -7,28 +7,28 @@ use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
 #[derive(Debug,Clone)]
-enum Shape {
-    Square { x: f32, y: f32, s: f32 },
+enum PidController {
+    AnglePid { x: f32, y: f32, s: f32 },
     Circle { x: f32, y: f32, r: f32 },
 }
 
-fn area(shape: &Shape) -> f32 {
+fn area(shape: &PidController) -> f32 {
     match shape {
-        Shape::Square { x:_, y:_, s } => {
+        PidController::AnglePid { x:_, y:_, s } => {
             s*s
         },
-        Shape::Circle { x:_, y:_, r } => {
+        PidController::Circle { x:_, y:_, r } => {
             std::f32::consts::PI*r*r
         },
     }
 }
 
-fn transpose(t: &mut Shape, dx: f32, dy: f32) {
+fn transpose(t: &mut PidController, dx: f32, dy: f32) {
 
     match *t {
 
-        Shape::Square{ref mut x, ref mut y, s: _} => {*x += dx; *y += dy},
-        Shape::Circle{ref mut x, ref mut y, r: _} => {*x += dx; *y += dy},
+        PidController::AnglePid{ref mut x, ref mut y, s: _} => {*x += dx; *y += dy},
+        PidController::Circle{ref mut x, ref mut y, r: _} => {*x += dx; *y += dy},
     }
 }
 
@@ -91,10 +91,10 @@ fn main() -> std::io::Result<()> {
 
     println!("Hit the Play button ...");
 
-    let circle = Shape::Circle { x: 10.0, y: 20.0, r: 1.0 };
-    let square = Shape::Square { x: -5.0, y: 10.0, s: 2.0 };
+    let circle = PidController::Circle { x: 10.0, y: 20.0, r: 1.0 };
+    let square = PidController::AnglePid { x: -5.0, y: 10.0, s: 2.0 };
 
-    let mut shapes: [Shape; 2] = [square, circle];
+    let mut shapes: [PidController; 2] = [square, circle];
 
     loop {
 
