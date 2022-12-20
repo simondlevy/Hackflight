@@ -137,7 +137,8 @@ fn main() -> std::io::Result<()> {
     let ap   = AnglePid { var: false };
     let ahp  = AltHoldPid { var: true };
 
-    let angle = PidController::Angle { ap: ap};
+    let angle   = PidController::Angle { ap: ap};
+    let althold = PidController::AltHold { ahp: ahp};
 
 
     println!("Hit the Play button ...");
