@@ -39,8 +39,8 @@ fn get_demands(t: &mut PidController, dx: f32, dy: f32) {
         },
 
         PidController::AltHoldPid {
-            ref mut k_p ,
-            ref mut k_i, 
+            k_p,
+            k_i, 
             ref mut in_band_prev,
             ref mut error_integral,
             ref mut altitude_target
