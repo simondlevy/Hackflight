@@ -101,18 +101,18 @@ pub fn run(
 pub fn run_pids(
     arr: &mut [pids::Controller],
     vstate: &VehicleState,
-    demands: &Demands) -> Demands {
+    rxdemands: &Demands) -> Demands {
 
-    let mut new_demands = Demands {
-        throttle: demands.throttle, 
-        roll: demands.roll,
-        pitch: demands.pitch,
-        yaw: demands.yaw
+    let mut demands = Demands {
+        throttle: rxdemands.throttle, 
+        roll: rxdemands.roll,
+        pitch: rxdemands.pitch,
+        yaw: rxdemands.yaw
     };
 
     for pid in arr.iter_mut() {
-        new_demands = pids::get_demands(&mut *pid, *vstate, new_demands);
+        demands = pids::get_demands(&mut *pid, *vstate, demands);
     }
 
-    new_demands
+    demands
 }
