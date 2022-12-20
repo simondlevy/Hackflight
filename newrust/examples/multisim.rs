@@ -67,13 +67,7 @@ fn main() -> std::io::Result<()> {
 
     println!("Hit the Play button ...");
 
-    let alt_hold_pid = pids::PidController::AltHoldPid {
-        k_p : 0.0,
-        k_i: 0.0, 
-        in_band_prev: false,
-        error_integral: 0.0,
-        altitude_target: 0.0
-     };
+    let alt_hold_pid = pids::makeAltHold(0.0, 0.0);
 
     let angle_pid = pids::PidController::AnglePid { x: -5.0, y: 10.0, s: 2.0 };
 
