@@ -12,7 +12,7 @@ use crate::VehicleState;
 mod angle;
 mod althold;
 
-#[derive(Debug,Clone)]
+#[derive(Clone)]
 pub enum Controller {
 
     Angle { angpid: angle::Pid },

@@ -51,7 +51,7 @@ const OUTPUT_SCALING: f32 = 1000.0;
 const  LIMIT_CYCLIC: f32 = 500.0; 
 const  LIMIT_YAW: f32 = 400.0;
 
-#[derive(Debug,Clone)]
+#[derive(Clone)]
 pub struct Pid { 
     k_rate_p: f32,
     k_rate_i: f32,
@@ -60,7 +60,7 @@ pub struct Pid {
     k_level_p: f32,
     //roll : CyclicAxis,
     //pitch : CyclicAxis,
-    //yaw: Axis,
+    yaw: Axis,
     dyn_lpf_previous_quantized_throttle: i32,  
     //pterm_yaw_lpf: filters::Pt1
 }
@@ -80,7 +80,7 @@ pub fn make(
             k_level_p: k_level_p,
             //roll : CyclicAxis,
             //pitch : CyclicAxis,
-            //yaw: Axis,
+            yaw: make_axis(),
             dyn_lpf_previous_quantized_throttle: 0, 
         }
 } 
@@ -115,4 +115,7 @@ struct CyclicAxis {
     previous_dterm: f32
 }
 
+fn make_axis() -> Axis {
 
+    Axis { previous_setpoint: 0.0, integral: 0.0 }
+}
