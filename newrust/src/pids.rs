@@ -99,12 +99,7 @@ pub fn get_demands(t: &mut PidController, vstate: VehicleState) -> Demands {
 
     match *t {
 
-        PidController::Angle {
-            ref mut angpid
-        } => {
-
-            angpid_get_demands(angpid)
-        }
+        PidController::Angle { ref mut angpid } => { angpid_get_demands(angpid) }
 
         PidController::AltHoldPid {
             k_p: _,
