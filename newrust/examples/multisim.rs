@@ -7,7 +7,7 @@ use hackflight::Motors;
 use hackflight::VehicleState;
 use hackflight::pids;
 use hackflight::mixers;
-use hackflight::update_demands;
+use hackflight::run_pids;
 
 fn main() -> std::io::Result<()> {
 
@@ -89,7 +89,7 @@ fn main() -> std::io::Result<()> {
 
         let demands = read_demands(in_buf);
 
-        let new_demands = update_demands(&mut pids, &vstate, &demands);
+        let new_demands = run_pids(&mut pids, &vstate, &demands);
 
         let motors = mixers::quad_xbf(new_demands);
 

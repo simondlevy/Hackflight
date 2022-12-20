@@ -47,7 +47,7 @@ pub struct Motors {
     pub m4: f32
 }
 
-pub fn update_demands(
+pub fn run_pids(
     arr: &mut [pids::Controller],
     vstate: &VehicleState,
     demands: &Demands) -> Demands {
