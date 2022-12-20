@@ -95,11 +95,11 @@ pub fn get_demands(
     vstate: &VehicleState,
     reset: &bool) -> Demands {
 
-        println!("rol={:.6}  pit={:.6}  yaw={:.6}", demands.roll, demands.pitch, demands.yaw);
+        let roll_demand  = rescale_axis(demands.roll);
+        let pitch_demand = rescale_axis(demands.pitch);
+        let yaw_demand   = rescale_axis(demands.yaw);
 
-        let roll_demand  = rescale(demands.roll);
-        let pitch_demand = rescale(demands.pitch);
-        let yaw_demand   = rescale(demands.yaw);
+        println!("rol={:.6}", roll_demand);
 
         let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
@@ -359,7 +359,7 @@ fn make_axis() -> Axis {
 }
 
 // [-1,+1] => [-670,+670] with nonlinearity
-fn rescale(command: f32) -> f32 {
+fn rescale_axis(command: f32) -> f32 {
 
     const CTR: f32 = 0.104;
 

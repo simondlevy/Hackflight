@@ -61,10 +61,6 @@ fn main() -> std::io::Result<()> {
         buf
     }
 
-    fn rescale_axis(val: f32) -> f32 {
-        rescale(val, -1.0, 1.0, 1000.0, 2000.0)
-    }
-
     // We have to bind client socket to some address
     let motor_client_socket = UdpSocket::bind("0.0.0.0:0")?;
 
@@ -97,12 +93,7 @@ fn main() -> std::io::Result<()> {
         let mut rxdemands = read_demands(in_buf);
 
         // Rescale throttle [-1,+1] => [0,1]
-        rxdemands.throttle = (rxdemands.throttle + 1.0) / 2.0;
-
-        // Rescale other axes [-1,+1] => [1000,2000]
-        rxdemands.roll = rescale_axis(rxdemands.roll);
-        rxdemands.pitch = rescale_axis(rxdemands.pitch);
-        rxdemands.yaw = rescale_axis(rxdemands.yaw);
+        rxdemands.throttle = rescale(rxdemands.throttle, -1.0, 1.0, 0.0, 1.0);
 
         // let motors = Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0};
         let motors = run(&mut pids, &vstate, &rxdemands, &mixer);
