@@ -6,17 +6,20 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
+#[derive(Clone,Copy)]
 pub struct AnglePid {
 
     var: bool
 
 }
 
+#[derive(Clone,Copy)]
 pub struct AltHoldPid {
 
     var: bool
 }
 
+#[derive(Clone,Copy)]
 pub enum PidController {
 
     Angle { ap : AnglePid },
@@ -155,7 +158,10 @@ fn main() -> std::io::Result<()> {
 
         let vehicle_state = read_vehicle_state(in_buf);
 
-        let demands = read_demands(in_buf);
+        let mut demands = read_demands(in_buf);
+
+        for pid in pids.into_iter() {
+        }
 
         let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
 
