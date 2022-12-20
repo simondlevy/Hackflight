@@ -163,6 +163,23 @@ fn level_pid(k_level_p: f32, current_setpoint: f32, current_angle: f32) -> f32
     if k_level_p > 0.0  {angle_error * k_level_p } else {current_setpoint}
 }
 
+fn acceleration_limit(axis: &mut Axis, current_setpoint: f32, max_velocity: f32) -> f32 {
+
+    let current_velocity = current_setpoint - axis.previous_setpoint;
+
+    let new_setpoint = 
+        if current_velocity.abs() > max_velocity 
+        { if current_velocity > 0.0 
+            { axis.previous_setpoint + max_velocity } 
+            else { axis.previous_setpoint - max_velocity } 
+        }
+        else { current_setpoint };
+
+    axis.previous_setpoint = new_setpoint;
+
+    new_setpoint
+}
+
 
 fn apply_feeedforward_limit(
     value: f32,
