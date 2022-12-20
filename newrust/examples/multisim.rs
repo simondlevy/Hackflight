@@ -5,9 +5,7 @@ use std::net::UdpSocket;
 use hackflight::Demands;
 use hackflight::Motors;
 use hackflight::VehicleState;
-
 use hackflight::pids;
-
 use hackflight::mixers;
 
 fn main() -> std::io::Result<()> {
@@ -59,6 +57,9 @@ fn main() -> std::io::Result<()> {
             }
         }
         buf
+    }
+
+    fn update_demands(arr: &mut [pids::PidController]) {
     }
 
     // We have to bind client socket to some address
