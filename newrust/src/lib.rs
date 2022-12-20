@@ -46,11 +46,24 @@ pub struct Motors {
     pub m3: f32,
     pub m4: f32
 }
-        
-/*
-fn run_pids(demands: &mut Demands) -> Demands {
 
-    for pid in pids.iter_mut() {
-        demands = pids::get_demands(&mut *pid, vstate, demands);
+pub fn update_demands(
+    arr: &mut [pids::Controller],
+    vstate: &VehicleState,
+    demands: &Demands) -> Demands {
+
+    let mut new_demands = Demands {
+        throttle: demands.throttle, 
+        roll: demands.roll,
+        pitch: demands.pitch,
+        yaw: demands.yaw
+    };
+
+    for pid in arr.iter_mut() {
+        new_demands = pids::get_demands(&mut *pid, *vstate, new_demands);
     }
-}*/
+
+    new_demands
+}
+
+

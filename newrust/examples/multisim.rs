@@ -7,6 +7,7 @@ use hackflight::Motors;
 use hackflight::VehicleState;
 use hackflight::pids;
 use hackflight::mixers;
+use hackflight::update_demands;
 
 fn main() -> std::io::Result<()> {
 
@@ -59,25 +60,6 @@ fn main() -> std::io::Result<()> {
         buf
     }
 
-    fn update_demands(
-        arr: &mut [pids::Controller],
-        vstate: &VehicleState,
-        demands: &Demands) -> Demands {
-        
-        let mut new_demands = Demands {
-            throttle: demands.throttle, 
-            roll: demands.roll,
-            pitch: demands.pitch,
-            yaw: demands.yaw
-        };
-
-        for pid in arr.iter_mut() {
-            new_demands = pids::get_demands(&mut *pid, *vstate, new_demands);
-        }
-
-        new_demands
-    }
-
     // We have to bind client socket to some address
     let motor_client_socket = UdpSocket::bind("0.0.0.0:0")?;
 
@@ -108,10 +90,6 @@ fn main() -> std::io::Result<()> {
         let demands = read_demands(in_buf);
 
         let new_demands = update_demands(&mut pids, &vstate, &demands);
-
-        //for pid in pids.iter_mut() {
-        //    demands = pids::get_demands(&mut *pid, vstate, demands);
-        //}
 
         let motors = mixers::quad_xbf(new_demands);
 
