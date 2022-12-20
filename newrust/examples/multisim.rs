@@ -89,7 +89,10 @@ fn main() -> std::io::Result<()> {
 
         let vstate = read_vehicle_state(in_buf);
 
-        let rxdemands = read_demands(in_buf);
+        let mut rxdemands = read_demands(in_buf);
+
+        // Rescale throttle [-1,+1] => [0,1]
+        rxdemands.throttle = (rxdemands.throttle + 1.0) / 2.0;
 
         // let motors = Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0};
         let motors = run(&mut pids, &vstate, &rxdemands, &mixer);
