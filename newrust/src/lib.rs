@@ -6,6 +6,7 @@
    MIT License
 */
 
+pub mod pids;
 pub mod utils;
 pub mod filters;
 pub mod mixers;

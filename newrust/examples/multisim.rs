@@ -6,6 +6,8 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
+use hackflight::pids;
+
 #[derive(Debug,Clone)]
 enum PidController {
 
