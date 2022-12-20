@@ -11,9 +11,6 @@ pub mod utils;
 pub mod filters;
 pub mod mixers;
 
-pub mod anglepid;
-pub mod altholdpid;
-
 #[derive(Clone)]
 pub struct Demands {
     pub throttle: f32,

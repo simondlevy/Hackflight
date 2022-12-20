@@ -9,8 +9,8 @@
 use crate::Demands;
 use crate::VehicleState;
 
-use crate::anglepid;
-use crate::altholdpid;
+mod anglepid;
+mod altholdpid;
 
 #[derive(Debug,Clone)]
 
