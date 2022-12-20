@@ -115,6 +115,18 @@ struct CyclicAxis {
     previous_dterm: f32
 }
 
+fn make_cyclic_axes() -> CyclicAxis {
+
+    CyclicAxis {
+        axis: make_axis(),
+        dterm_lpf1 : filters::make_pt1(DTERM_LPF1_DYN_MIN_HZ),
+        dterm_lpf2 : filters::make_pt1(DTERM_LPF2_HZ),
+        d_min_lpf: filters::make_pt2(D_MIN_LOWPASS_HZ),
+        d_min_range: filters::make_pt2(D_MIN_RANGE_HZ),
+        windup_lpf: filters::make_pt1(ITERM_RELAX_CUTOFF),
+        previous_dterm: 0.0 }
+}
+
 fn make_axis() -> Axis {
 
     Axis { previous_setpoint: 0.0, integral: 0.0 }
