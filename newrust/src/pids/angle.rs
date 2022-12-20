@@ -136,8 +136,40 @@ pub fn get_demands(
             yaw_demand,
             vstate.dpsi);
 
-        Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
-}
+        pid.roll.axis.integral = if *reset { 0.0 } else { pid.roll.axis.integral };
+        pid.pitch.axis.integral = if *reset { 0.0 } else { pid.pitch.axis.integral };
+        pid.yaw.integral = if *reset { 0.0 } else { pid.yaw.integral };
+
+        if *d_usec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US {
+
+            // Quantize the throttle to reduce the number of filter updates
+            let quantized_throttle = (demands.throttle * DYN_LPF_THROTTLE_STEPS) as i32; 
+
+            if quantized_throttle != pid.dyn_lpf_previous_quantized_throttle {
+
+                // Scale the quantized value back to the throttle range so the
+                // filter cutoff steps are repeatable
+                let dyn_lpf_throttle = (quantized_throttle as f32) / DYN_LPF_THROTTLE_STEPS;
+
+                let cutoff_freq = dyn_lpf_cutoff_freq(dyn_lpf_throttle,
+                    DTERM_LPF1_DYN_MIN_HZ,
+                    DTERM_LPF1_DYN_MAX_HZ,
+                    DYN_LPF_CURVE_EXPO);
+
+                init_lpf1(&mut pid.roll, cutoff_freq);
+                init_lpf1(&mut pid.pitch, cutoff_freq);
+
+                pid.dyn_lpf_previous_quantized_throttle = quantized_throttle;
+            }
+        }
+
+        Demands { 
+            throttle : demands.throttle,
+            roll : constrain_output(roll, LIMIT_CYCLIC),
+            pitch : constrain_output(pitch, LIMIT_CYCLIC),
+            yaw : constrain_output(yaw, LIMIT_YAW)
+        }
+    }
 
 #[derive(Clone,Copy)]
 struct Axis {
