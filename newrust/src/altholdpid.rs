@@ -10,26 +10,26 @@ use crate::Demands;
 use crate::VehicleState;
 
 #[derive(Debug,Clone)]
-pub struct AltHoldPid { 
+pub struct Pid { 
     k_p : f32,
     k_i: f32, 
     in_band_prev: bool,
 }
 
-pub fn make_alt_hold_pid(
+pub fn make(
     k_p: f32,
-    k_i: f32) -> AltHoldPid {
+    k_i: f32) -> Pid {
 
-    AltHoldPid {
+    Pid {
         k_p: k_p,
         k_i: k_i,
         in_band_prev: false
     }
 } 
 
-pub fn altpid_get_demands(altpid: &mut AltHoldPid) -> Demands {
+pub fn get_demands(pid: &mut Pid) -> Demands {
 
-    altpid.in_band_prev = false;
+    pid.in_band_prev = false;
 
     Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
 }
