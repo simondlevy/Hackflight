@@ -140,6 +140,7 @@ fn main() -> std::io::Result<()> {
     let angle   = PidController::Angle { ap: ap};
     let althold = PidController::AltHold { ahp: ahp};
 
+    let pids = [angle, althold];
 
     println!("Hit the Play button ...");
 
