@@ -66,6 +66,7 @@ fn main() -> std::io::Result<()> {
         let mut new_demands = Demands {throttle:0.0, roll:0.0, pitch:0.0, yaw:0.0};
 
         for pid in arr.iter_mut() {
+            new_demands = pids::get_demands(&mut *pid, *vstate, new_demands);
         }
 
         new_demands
