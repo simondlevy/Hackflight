@@ -54,11 +54,11 @@ pub fn run(
     arr: &mut [pids::Controller],
     vstate: &VehicleState,
     rxdemands: &Demands,
-    mixer: &dyn Mixer) -> Motors{
-
-    let mut demands = rxdemands.clone();
+    mixer: &dyn Mixer) -> Motors {
 
     let reset = false;
+
+    let mut demands = rxdemands.clone();
 
     for pid in arr.iter_mut() {
         demands = pids::get_demands(&mut *pid, demands, *vstate, reset);
