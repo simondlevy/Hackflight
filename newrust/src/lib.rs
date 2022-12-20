@@ -64,8 +64,5 @@ pub fn run(
             demands = pids::get_demands(&mut *pid, demands, *vstate, reset);
         }
 
-        // mixer.get_motors(&demands)
-
-        Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0}
-
+        mixer.get_motors(&demands)
 }

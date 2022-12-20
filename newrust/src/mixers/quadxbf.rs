@@ -24,7 +24,9 @@ impl Mixer for QuadXbf {
 
     fn get_motors(&self, demands: &Demands) -> Motors {
 
+        Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0}
 
+        /*
         Motors {
 
             // right rear
@@ -38,6 +40,6 @@ impl Mixer for QuadXbf {
 
             // left front
             m4: demands.throttle + demands.roll - demands.pitch + demands.yaw  
-        }
+        }*/
     }
 }
