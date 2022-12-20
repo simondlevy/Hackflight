@@ -83,10 +83,12 @@ fn main() -> std::io::Result<()> {
 
         let vehicle_state = read_vehicle_state(in_buf);
 
-        let demands = read_demands(in_buf);
+        let rxdemands = read_demands(in_buf);
+
+        println!("{}", rxdemands.throttle);
 
         let (motors, new_pid_controller) =
-            run_hackflight(demands, vehicle_state, &mut pid_controller, &run_quad_xbf);
+            run_hackflight(rxdemands, vehicle_state, &mut pid_controller, &run_quad_xbf);
 
         pid_controller = new_pid_controller;
 
