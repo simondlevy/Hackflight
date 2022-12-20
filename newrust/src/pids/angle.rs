@@ -58,8 +58,8 @@ pub struct Pid {
     k_rate_d: f32,
     k_rate_f: f32,
     k_level_p: f32,
-    //roll : CyclicAxis,
-    //pitch : CyclicAxis,
+    roll : CyclicAxis,
+    pitch : CyclicAxis,
     yaw: Axis,
     dyn_lpf_previous_quantized_throttle: i32,  
     //pterm_yaw_lpf: filters::Pt1
@@ -78,8 +78,8 @@ pub fn make(
             k_rate_d: k_rate_d,
             k_rate_f: k_rate_f,
             k_level_p: k_level_p,
-            //roll : CyclicAxis,
-            //pitch : CyclicAxis,
+            roll : make_cyclic_axis(),
+            pitch : make_cyclic_axis(),
             yaw: make_axis(),
             dyn_lpf_previous_quantized_throttle: 0, 
         }
@@ -115,7 +115,7 @@ struct CyclicAxis {
     previous_dterm: f32
 }
 
-fn make_cyclic_axes() -> CyclicAxis {
+fn make_cyclic_axis() -> CyclicAxis {
 
     CyclicAxis {
         axis: make_axis(),
