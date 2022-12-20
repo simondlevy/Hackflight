@@ -91,7 +91,9 @@ pub fn get_demands(
     vstate: &VehicleState,
     reset: &bool) -> Demands {
 
-        pid.dyn_lpf_previous_quantized_throttle = 0;
+        let roll_demand  = rescale(demands.roll);
+        let pitch_demand = rescale(demands.pitch);
+        let yaw_demand   = rescale(demands.yaw);
 
         Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
 }
@@ -131,3 +133,16 @@ fn make_axis() -> Axis {
 
     Axis { previous_setpoint: 0.0, integral: 0.0 }
 }
+
+// [-1,+1] => [-670,+670] with nonlinearity
+fn rescale(command: f32) -> f32 {
+
+    const CTR: f32 = 0.104;
+
+    let expof = command * command.abs();
+    let angle_rate = command * CTR + (1.0 - CTR) * expof;
+
+    670.0 * angle_rate
+}
+
+
