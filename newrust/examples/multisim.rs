@@ -82,7 +82,9 @@ fn main() -> std::io::Result<()> {
 
         let time = read_float(in_buf, 0);
 
-        if time < 0.0 { break Ok(()); }
+        if time < 0.0 { 
+            break Ok(()); 
+        }
 
         let vstate = read_vehicle_state(in_buf);
 
