@@ -71,8 +71,7 @@ fn main() -> std::io::Result<()> {
 
     let angle_pid = pids::make_angle(0.0, 0.0, 0.0, 0.0, 0.0);
 
-
-    //let mut pids: [pids::PidController; 2] = [angle_pid, alt_hold_pid];
+    let mut pids: [pids::PidController; 2] = [angle_pid, alt_hold_pid];
 
     loop {
 
@@ -87,9 +86,9 @@ fn main() -> std::io::Result<()> {
 
         let mut demands = read_demands(in_buf);
 
-        //for shape in pids.iter_mut() {
-        //    get_demands(&mut *shape, 2.0, -3.5);
-        //}
+        for pid in pids.iter_mut() {
+            demands = pids::get_demands(&mut *pid, 2.0, -3.5);
+        }
 
         let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
 
