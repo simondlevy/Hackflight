@@ -23,7 +23,7 @@ fn area(shape: &PidController) -> f32 {
     }
 }
 
-fn transpose(t: &mut PidController, dx: f32, dy: f32) {
+fn get_demands(t: &mut PidController, dx: f32, dy: f32) {
 
     match *t {
 
@@ -110,7 +110,7 @@ fn main() -> std::io::Result<()> {
         let mut demands = read_demands(in_buf);
 
         for shape in pids.iter_mut() {
-            transpose(&mut *shape, 2.0, -3.5);
+            get_demands(&mut *shape, 2.0, -3.5);
         }
 
         let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
