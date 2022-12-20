@@ -6,7 +6,7 @@ use hackflight::datatypes::Demands;
 use hackflight::datatypes::Motors;
 use hackflight::datatypes::VehicleState;
 
-use hackflight::pids::pids;
+use hackflight::pids;
 
 fn main() -> std::io::Result<()> {
 
