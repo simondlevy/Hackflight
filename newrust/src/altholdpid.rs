@@ -27,7 +27,7 @@ pub fn make(
     }
 } 
 
-pub fn get_demands(pid: &mut Pid) -> Demands {
+pub fn get_demands(pid: &mut Pid, vstate: &VehicleState) -> Demands {
 
     pid.in_band_prev = false;
 

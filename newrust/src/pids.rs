@@ -46,8 +46,12 @@ pub fn get_demands(t: &mut PidController, vstate: VehicleState) -> Demands {
 
     match *t {
 
-        PidController::Angle {ref mut angpid} => {anglepid::get_demands(angpid)},
+        PidController::Angle {ref mut angpid} => {
+                anglepid::get_demands(angpid, &vstate)
+            },
 
-        PidController::AltHold {ref mut altpid} => {altholdpid::get_demands(altpid)}
+        PidController::AltHold {ref mut altpid} => {
+            altholdpid::get_demands(altpid, &vstate)
+        }
     }
 }
