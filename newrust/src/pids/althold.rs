@@ -8,6 +8,7 @@
 
 use crate::Demands;
 use crate::VehicleState;
+use crate::utils;
 
 const ALTITUDE_MIN: f32   = 1.0;
 const PILOT_VELZ_MAX: f32 = 2.5;
@@ -19,6 +20,8 @@ pub struct Pid {
     k_p : f32,
     k_i: f32, 
     in_band_prev: bool,
+    error_integral: f32,
+    altitude_target: f32
 }
 
 pub fn make(
@@ -28,7 +31,9 @@ pub fn make(
     Pid {
         k_p: k_p,
         k_i: k_i,
-        in_band_prev: false
+        in_band_prev: false,
+        error_integral: 0.0,
+        altitude_target: 0.0
     }
 } 
 
@@ -38,7 +43,37 @@ pub fn get_demands(
     vstate: &VehicleState,
     reset: &bool) -> Demands {
 
-    pid.in_band_prev = false;
+    let altitude = vstate.z;
+    let dz = vstate.dz;
 
-    Demands {throttle: 0.0, roll:0.0, pitch: 0.0, yaw: 0.0}
+    // [0,1] => [-1,+1]
+    let sthrottle = 2.0 * demands.throttle - 1.0; 
+
+    // Is stick demand in deadband, above a minimum altitude?
+    let in_band = sthrottle.abs() < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+
+    // Reset controller when moving into deadband above a minimum altitude
+    let got_new_target = in_band && !pid.in_band_prev;
+    let error_integral = if got_new_target || *reset { 0.0 } else { pid.error_integral };
+
+    pid.in_band_prev = in_band;
+
+    pid.altitude_target = if *reset { 0.0 } else { pid.altitude_target };
+
+    // Target velocity is a setpoint inside deadband, scaled constant outside
+    let target_velocity =
+        if in_band {pid.altitude_target - altitude } else { PILOT_VELZ_MAX * sthrottle};
+
+    // Compute error as scaled target minus actual
+    let error = target_velocity - dz;
+
+    // Compute I term, avoiding windup
+    pid.error_integral = utils::constrain_abs(pid.error_integral + error, WINDUP_MAX);
+
+    Demands { 
+        throttle : demands.throttle + (error * pid.k_p + error_integral * pid.k_i),
+        roll : demands.roll,
+        pitch : demands.pitch,
+        yaw : demands.yaw
+    }
 }
