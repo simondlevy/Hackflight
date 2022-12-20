@@ -101,10 +101,6 @@ fn main() -> std::io::Result<()> {
 
     let mut shapes: [Shape; 2] = [square, circle];
 
-    for shape in shapes.iter_mut() {
-        transpose(&mut *shape, 2.0, -3.5);
-    }
-
     loop {
 
         let mut in_buf = [0; IN_BUF_SIZE]; 
@@ -117,6 +113,10 @@ fn main() -> std::io::Result<()> {
         let vehicle_state = read_vehicle_state(in_buf);
 
         let mut demands = read_demands(in_buf);
+
+        for shape in shapes.iter_mut() {
+            transpose(&mut *shape, 2.0, -3.5);
+        }
 
         let motors = Motors {m1: 0.0, m2: 0.0, m3: 0.0, m4: 0.0};
 
