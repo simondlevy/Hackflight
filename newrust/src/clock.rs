@@ -17,8 +17,8 @@
  */
 
 
-const RATE: u32 = 10000;
+const RATE: u32 = 1_000_000;
 
-const PERIOD: u32 = 1000000 / RATE;
+const PERIOD: u32 = 1_000_000 / RATE;
 
 pub const DT: f32 = (PERIOD as f32) * 1e-6;
