@@ -9,6 +9,7 @@ use hackflight::pids;
 use hackflight::step;
 use hackflight::mixers::quadxbf;
 use hackflight::utils::rescale;
+use hackflight::utils::rad2deg;
 
 const RATE_KP  : f32 = 1.441305;
 const RATE_KI  : f32 = 48.8762;
@@ -32,14 +33,18 @@ fn main() -> std::io::Result<()> {
         f64::from_le_bytes(dst) as f32
     }
 
+    fn read_degrees(buf:[u8; IN_BUF_SIZE], idx:usize) -> f32 {
+        rad2deg(read_float(buf, idx))
+    }
+
     fn state_from_telemetry(buf:[u8; IN_BUF_SIZE]) -> VehicleState {
         VehicleState {
-            x:read_float(buf, 1),
+            x:read_float(buf, 1),       
             dx:read_float(buf, 2),
             y:read_float(buf, 3),
             dy:read_float(buf, 4),
-            z:-read_float(buf, 5),      // z [NED => ENU]
-            dz:-read_float(buf, 6),     // dz [NED => ENU]
+            z:-read_float(buf, 5),      // NED => ENU
+            dz:-read_float(buf, 6),     // NED => ENU
             phi:read_float(buf, 7),
             dphi:read_float(buf, 8),
             theta:read_float(buf, 9),
