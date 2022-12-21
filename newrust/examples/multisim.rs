@@ -10,6 +10,15 @@ use hackflight::run;
 use hackflight::mixers::quadxbf;
 use hackflight::utils::rescale;
 
+const RATE_KP  : f32 = 1.441305;
+const RATE_KI  : f32 = 48.8762;
+const RATE_KD  : f32 = 0.021160;
+const RATE_KF  : f32 = 0.0165048;
+const LEVEL_KP : f32 = 0.0;
+
+const ALT_HOLD_KP : f32 = 7.5e-2;
+const ALT_HOLD_KI : f32 = 1.5e-1;
+
 fn main() -> std::io::Result<()> {
 
     const IN_BUF_SIZE:usize  = 17*8; // 17 doubles in
@@ -69,9 +78,9 @@ fn main() -> std::io::Result<()> {
 
     println!("Hit the Play button ...");
 
-    let alt_hold_pid = pids::make_alt_hold(0.0, 0.0);
+    let alt_hold_pid = pids::make_alt_hold(ALT_HOLD_KP, ALT_HOLD_KI);
 
-    let angle_pid = pids::make_angle(0.0, 0.0, 0.0, 0.0, 0.0);
+    let angle_pid = pids::make_angle(RATE_KP, RATE_KI, RATE_KD, RATE_KF, LEVEL_KP);
 
     let mixer = quadxbf::QuadXbf { };
 
@@ -88,7 +97,11 @@ fn main() -> std::io::Result<()> {
             break Ok(()); 
         }
 
-        let vstate = read_vehicle_state(in_buf);
+        let mut vstate = read_vehicle_state(in_buf);
+
+        // NED => ENU
+        vstate.z = -vstate.z;
+        vstate.dz = -vstate.dz;
 
         let mut rxdemands = read_demands(in_buf);
 

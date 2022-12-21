@@ -99,8 +99,6 @@ pub fn get_demands(
         let pitch_demand = rescale_axis(demands.pitch);
         let yaw_demand   = rescale_axis(demands.yaw);
 
-        println!("rol={:.6}", roll_demand);
-
         let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
 
         let roll = 
@@ -303,7 +301,9 @@ fn update_cyclic(
         feed_forward 
     };
 
-    pterm + axis.integral + dterm + fterm
+    0.0
+
+    // pterm + axis.integral + dterm + fterm
 
 } // update_cyclic
 
@@ -337,7 +337,9 @@ fn update_yaw(
         axis.integral =
             constrain_f(axis.integral + (ki * dyn_ci) * error_rate, -ITERM_LIMIT, ITERM_LIMIT);
 
-        pterm + axis.integral
+        // pterm + axis.integral
+
+        0.0
     }
 
 

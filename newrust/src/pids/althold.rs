@@ -54,11 +54,13 @@ pub fn get_demands(
 
     // Reset controller when moving into deadband above a minimum altitude
     let got_new_target = in_band && !pid.in_band_prev;
-    let error_integral = if got_new_target || *reset { 0.0 } else { pid.error_integral };
+    pid.error_integral = if got_new_target || *reset { 0.0 } else { pid.error_integral };
 
     pid.in_band_prev = in_band;
 
-    pid.altitude_target = if *reset { 0.0 } else { pid.altitude_target };
+    pid.altitude_target = if *reset { 0.0 } else { pid.altitude_target }; 
+
+    pid.altitude_target = if got_new_target { altitude } else { pid.altitude_target };
 
     // Target velocity is a setpoint inside deadband, scaled constant outside
     let target_velocity =
@@ -67,13 +69,25 @@ pub fn get_demands(
     // Compute error as scaled target minus actual
     let error = target_velocity - dz;
 
+    println!("{}", error);
+
     // Compute I term, avoiding windup
     pid.error_integral = utils::constrain_abs(pid.error_integral + error, WINDUP_MAX);
 
+    // Adjust throttle demand based on error
     Demands { 
-        throttle : demands.throttle + (error * pid.k_p + error_integral * pid.k_i),
+        throttle : demands.throttle + (error * pid.k_p + pid.error_integral * pid.k_i),
         roll : demands.roll,
         pitch : demands.pitch,
         yaw : demands.yaw
     }
 }
+
+
+
+
+
+
+
+
+
