@@ -10,8 +10,10 @@ use crate::Demands;
 use crate::VehicleState;
 
 use crate::filters;
-use crate::utils::DT;
+
 use crate::utils::constrain_f;
+
+use crate::clock::DT;
 
 const DTERM_LPF1_DYN_MIN_HZ: f32 = 75.0;
 const DTERM_LPF1_DYN_MAX_HZ: f32 = 150.0;
@@ -171,7 +173,7 @@ pub fn get_demands(
         Demands { 
             throttle : demands.throttle,
             roll : constrain_output(roll, LIMIT_CYCLIC),
-            pitch : 0.0, // constrain_output(pitch, LIMIT_CYCLIC),
+            pitch : constrain_output(pitch, LIMIT_CYCLIC),
             yaw : constrain_output(yaw, LIMIT_YAW)
         }
     }

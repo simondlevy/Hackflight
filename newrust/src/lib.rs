@@ -9,6 +9,7 @@
 pub mod pids;
 pub mod mixers;
 pub mod filters;
+pub mod clock;
 pub mod utils;
 
 #[derive(Clone)]
