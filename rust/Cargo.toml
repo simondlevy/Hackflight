@@ -2,7 +2,7 @@
 name = "hackflight"
 version = "0.1.7"
 edition = "2021"
-license = "GPL"
+license = "MIT"
 description = "Simple flight-control software for makers in Rust"
 documentation = "https://github.com/simondlevy/Hackflight"
 repository = "https://github.com/simondlevy/Hackflight/tree/master/rust"
