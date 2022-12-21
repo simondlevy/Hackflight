@@ -45,12 +45,12 @@ fn main() -> std::io::Result<()> {
             dy:read_float(buf, 4),
             z:-read_float(buf, 5),      // NED => ENU
             dz:-read_float(buf, 6),     // NED => ENU
-            phi:read_float(buf, 7),
-            dphi:read_float(buf, 8),
-            theta:read_float(buf, 9),
-            dtheta:read_float(buf, 10),
-            psi:read_float(buf, 11),
-            dpsi:read_float(buf, 12)
+            phi:read_degrees(buf, 7),
+            dphi:read_degrees(buf, 8),
+            theta:read_degrees(buf, 9),
+            dtheta:read_degrees(buf, 10),
+            psi:read_degrees(buf, 11),
+            dpsi:read_degrees(buf, 12)
         }
     }
 
