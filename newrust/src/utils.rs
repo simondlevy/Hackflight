@@ -24,3 +24,8 @@ pub fn rescale(val: f32, oldmin: f32, oldmax: f32, newmin: f32, newmax: f32) -> 
 
     newmin + (val - oldmin) / (oldmax - oldmin) * (newmax - newmin)
 }
+
+pub fn rad2deg(rad: f32) -> f32 {
+
+    180.0 * rad / std::f32::consts::PI
+}

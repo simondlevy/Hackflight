@@ -32,7 +32,7 @@ fn main() -> std::io::Result<()> {
         f64::from_le_bytes(dst) as f32
     }
 
-    fn read_vehicle_state(buf:[u8; IN_BUF_SIZE]) -> VehicleState {
+    fn state_from_telemetry(buf:[u8; IN_BUF_SIZE]) -> VehicleState {
         VehicleState {
             x:read_float(buf, 1),
             dx:read_float(buf, 2),
@@ -49,7 +49,7 @@ fn main() -> std::io::Result<()> {
         }
     }
 
-    fn read_demands(buf:[u8; IN_BUF_SIZE]) -> Demands {
+    fn demands_from_telemetry(buf:[u8; IN_BUF_SIZE]) -> Demands {
         Demands {
             throttle:read_float(buf, 13),
             roll:read_float(buf, 14),
@@ -103,14 +103,14 @@ fn main() -> std::io::Result<()> {
         let usec = (time * 1e6) as u32;
 
         // Build vehicle state 
-        let mut vstate = read_vehicle_state(in_buf);
+        let mut vstate = state_from_telemetry(in_buf);
 
         // NED => ENU
         vstate.z = -vstate.z;
         vstate.dz = -vstate.dz;
 
         // Get incoming stick demands
-        let mut stick_demands = read_demands(in_buf);
+        let mut stick_demands = demands_from_telemetry(in_buf);
 
         // Reset PID controllers on zero throttle
         let pid_reset = stick_demands.throttle < 0.05;
