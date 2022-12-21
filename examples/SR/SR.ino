@@ -30,6 +30,7 @@
 //#include <espnow.h>
 //#include <esp_now.h>
 
+// VL53L5 -------------------------------------------------------------
 
 static const uint8_t VL53L5_INT_PIN = 4; // Set to 0 for polling
 static const uint8_t VL53L5_LPN_PIN =  14;
@@ -37,7 +38,11 @@ static const uint8_t VL53L5_LPN_PIN =  14;
 // Set to 0 for continuous mode
 static const uint8_t VL53L5_INTEGRAL_TIME_MS = 10;
 
-static VL53L5cx _ranger(VL53L5_LPN_PIN, VL53L5_INTEGRAL_TIME_MS, VL53L5cx::RES_4X4_HZ_1);
+static VL53L5cx _ranger(
+        Wire, 
+        VL53L5_LPN_PIN, 
+        VL53L5_INTEGRAL_TIME_MS,
+        VL53L5cx::RES_4X4_HZ_1);
 
 static volatile bool _gotRangerInterrupt;
 
@@ -45,6 +50,10 @@ static void rangerInterruptHandler()
 {
     _gotRangerInterrupt = true;
 }
+
+// PAA3905 -----------------------------------------------------------
+
+// ------------------------------------------------------------------
 
 
 //static const bool UART_INVERTED = false;
@@ -87,10 +96,23 @@ void loop()
             delay(10);
         }
 
-        uint16_t dists[16] = {};
+        _ranger.readData();
 
-        for (auto i=0; i<16; ++i) {
-            dists[i] = _ranger.getDistanceMm(i);
+        for (auto i=0; i<_ranger.getPixelCount(); i++) {
+
+            // Print per zone results 
+            Debugger::printf("Zone : %2d, Nb targets : %2u, Ambient : %4lu Kcps/spads, ",
+                    i, _ranger.getTargetDetectedCount(i), _ranger.getAmbientPerSpad(i));
+
+            // Print per target results 
+            if (_ranger.getTargetDetectedCount(i) > 0) {
+                Debugger::printf("Target status : %3u, Distance : %4d mm\n",
+                        _ranger.getTargetStatus(i), _ranger.getDistanceMm(i));
+            }
+            else {
+                Debugger::printf("Target status : 255, Distance : No target\n");
+            }
         }
+        Debugger::printf("\n");
     } 
 }
