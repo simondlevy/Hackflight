@@ -38,8 +38,8 @@ fn main() -> std::io::Result<()> {
             dx:read_float(buf, 2),
             y:read_float(buf, 3),
             dy:read_float(buf, 4),
-            z:-read_float(buf, 5),
-            dz:-read_float(buf, 6),
+            z:-read_float(buf, 5),      // z [NED => ENU]
+            dz:-read_float(buf, 6),     // dz [NED => ENU]
             phi:read_float(buf, 7),
             dphi:read_float(buf, 8),
             theta:read_float(buf, 9),
@@ -103,11 +103,7 @@ fn main() -> std::io::Result<()> {
         let usec = (time * 1e6) as u32;
 
         // Build vehicle state 
-        let mut vstate = state_from_telemetry(in_buf);
-
-        // NED => ENU
-        //vstate.z = -vstate.z;
-        //vstate.dz = -vstate.dz;
+        let vstate = state_from_telemetry(in_buf);
 
         // Get incoming stick demands
         let mut stick_demands = demands_from_telemetry(in_buf);
