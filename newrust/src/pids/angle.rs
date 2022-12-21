@@ -171,7 +171,7 @@ pub fn get_demands(
         Demands { 
             throttle : demands.throttle,
             roll : constrain_output(roll, LIMIT_CYCLIC),
-            pitch : constrain_output(pitch, LIMIT_CYCLIC),
+            pitch : 0.0, // constrain_output(pitch, LIMIT_CYCLIC),
             yaw : constrain_output(yaw, LIMIT_YAW)
         }
     }
@@ -306,9 +306,7 @@ fn update_cyclic(
         feed_forward 
     };
 
-    0.0
-
-    // pterm + axis.integral + dterm + fterm
+    pterm + axis.integral + dterm + fterm
 
 } // update_cyclic
 
