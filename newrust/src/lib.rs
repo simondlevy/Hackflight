@@ -51,18 +51,22 @@ pub trait Mixer {
 
 // Corresponds to C++ Mixer::step()
 pub fn step(
+    stick_demands: &Demands,
+    state: &VehicleState,
     arr: &mut [pids::Controller],
-    vstate: &VehicleState,
-    rxdemands: &Demands,
+    pid_reset: &bool,
+    usec: & u32,
     mixer: &dyn Mixer) -> Motors {
 
         let reset = false;
 
-        let mut demands = rxdemands.clone();
+        let mut demands = stick_demands.clone();
 
         for pid in arr.iter_mut() {
-            demands = pids::get_demands(&mut *pid, demands, *vstate, reset);
+            demands = pids::get_demands(&mut *pid, demands, *state, reset);
         }
 
         mixer.get_motors(&demands)
 }
+
+

@@ -103,13 +103,17 @@ fn main() -> std::io::Result<()> {
         vstate.z = -vstate.z;
         vstate.dz = -vstate.dz;
 
-        let mut rxdemands = read_demands(in_buf);
+        let mut stick_demands = read_demands(in_buf);
 
         // Rescale throttle [-1,+1] => [0,1]
-        rxdemands.throttle = rescale(rxdemands.throttle, -1.0, 1.0, 0.0, 1.0);
+        stick_demands.throttle = rescale(stick_demands.throttle, -1.0, 1.0, 0.0, 1.0);
+
+        // XXX
+        let pid_reset = false;
+        let usec : u32 = 0;
 
         // let motors = Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0};
-        let motors = step(&mut pids, &vstate, &rxdemands, &mixer);
+        let motors = step(&stick_demands, &vstate, &mut pids, &pid_reset, &usec, &mixer);
 
         let out_buf = write_motors(motors);
 
