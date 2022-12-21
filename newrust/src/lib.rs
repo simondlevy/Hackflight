@@ -58,12 +58,10 @@ pub fn step(
     usec: & u32,
     mixer: &dyn Mixer) -> Motors {
 
-        let reset = false;
-
         let mut demands = stick_demands.clone();
 
         for pid in arr.iter_mut() {
-            demands = pids::get_demands(&mut *pid, demands, *state, reset);
+            demands = pids::update(&mut *pid, *usec, demands, *state, *pid_reset);
         }
 
         mixer.get_motors(&demands)

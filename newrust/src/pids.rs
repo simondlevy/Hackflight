@@ -41,21 +41,21 @@ pub fn make_alt_hold(
     }
 }
 
-pub fn get_demands(
+pub fn update(
     t: &mut Controller,
+    usec: u32,
     demands: Demands,
     vstate: VehicleState,
-    reset: bool) -> Demands {
+    pid_reset: bool) -> Demands {
 
     match *t {
 
         Controller::Angle {ref mut angpid} => {
-                let d_usec: u32 = 1; // XXX
-                angle::get_demands(angpid, &d_usec, &demands, &vstate, &reset)
+                angle::get_demands(angpid, &usec, &demands, &vstate, &pid_reset)
             },
 
         Controller::AltHold {ref mut altpid} => {
-            althold::get_demands(altpid, &demands, &vstate, &reset)
+            althold::get_demands(altpid, &demands, &vstate, &pid_reset)
         }
     }
 }

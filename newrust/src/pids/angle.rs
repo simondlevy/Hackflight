@@ -60,6 +60,7 @@ pub struct Pid {
     k_rate_d: f32,
     k_rate_f: f32,
     k_level_p: f32,
+    usec_prev: u32,
     roll : CyclicAxis,
     pitch : CyclicAxis,
     yaw: Axis,
@@ -80,6 +81,7 @@ pub fn make(
             k_rate_d: k_rate_d,
             k_rate_f: k_rate_f,
             k_level_p: k_level_p,
+            usec_prev: 0,
             roll : make_cyclic_axis(),
             pitch : make_cyclic_axis(),
             yaw: make_axis(),
@@ -90,10 +92,13 @@ pub fn make(
 
 pub fn get_demands(
     pid: &mut Pid,
-    d_usec: &u32,
+    usec: &u32,
     demands: &Demands,
     vstate: &VehicleState,
     reset: &bool) -> Demands {
+
+        let d_usec = *usec - pid.usec_prev;
+        pid.usec_prev = *usec;
 
         let roll_demand  = rescale_axis(demands.roll);
         let pitch_demand = rescale_axis(demands.pitch);
@@ -140,7 +145,7 @@ pub fn get_demands(
         pid.pitch.axis.integral = if *reset { 0.0 } else { pid.pitch.axis.integral };
         pid.yaw.integral = if *reset { 0.0 } else { pid.yaw.integral };
 
-        if *d_usec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US {
+        if d_usec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US {
 
             // Quantize the throttle to reduce the number of filter updates
             let quantized_throttle = (demands.throttle * DYN_LPF_THROTTLE_STEPS) as i32; 
@@ -426,7 +431,6 @@ fn init_lpf1(cyclic_axis: &mut CyclicAxis, cutoff_freq: f32) {
 
     filters::adjust_pt1_gain(cyclic_axis.dterm_lpf1, cutoff_freq);
 }
-
 
 fn dyn_lpf_cutoff_freq(throttle: f32, dyn_lpf_min: f32, dyn_lpf_max: f32, expo: f32) -> f32 {
     let expof = expo / 10.0;
