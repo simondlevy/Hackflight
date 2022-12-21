@@ -86,23 +86,30 @@ fn main() -> std::io::Result<()> {
 
     let mut pids: [pids::Controller; 2] = [angle_pid, alt_hold_pid];
 
+    // Loop forever, waiting for client
     loop {
 
+        // Get incoming telemetry values
         let mut in_buf = [0; IN_BUF_SIZE]; 
         telemetry_server_socket.recv_from(&mut in_buf)?;
 
+        // Sim sends negative time value on halt
         let time = read_float(in_buf, 0);
-
         if time < 0.0 { 
             break Ok(()); 
         }
 
+        // Convert simulator time to microseconds
+        let usec = (time * 1e6) as u32;
+
+        // Build vehicle state 
         let mut vstate = read_vehicle_state(in_buf);
 
         // NED => ENU
         vstate.z = -vstate.z;
         vstate.dz = -vstate.dz;
 
+        // Get incoming stick demands
         let mut stick_demands = read_demands(in_buf);
 
         // Reset PID controllers on zero throttle
@@ -110,9 +117,6 @@ fn main() -> std::io::Result<()> {
 
         // Rescale throttle [-1,+1] => [0,1]
         stick_demands.throttle = rescale(stick_demands.throttle, -1.0, 1.0, 0.0, 1.0);
-
-        // XXX
-        let usec : u32 = 0;
 
         // let motors = Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0};
         let motors = step(&stick_demands, &vstate, &mut pids, &pid_reset, &usec, &mixer);
