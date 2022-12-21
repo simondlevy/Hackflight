@@ -20,8 +20,10 @@
 //  Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
 
 #include <Wire.h>
+#include <SPI.h>
 
 #include <VL53L5cx.h>
+#include <PAA3905_MotionCapture.h>
 
 #include <hackflight.h>
 #include <debugger.h>
@@ -33,7 +35,7 @@
 // VL53L5 -------------------------------------------------------------
 
 static const uint8_t VL53L5_INT_PIN = 4; // Set to 0 for polling
-static const uint8_t VL53L5_LPN_PIN =  14;
+static const uint8_t VL53L5_LPN_PIN = 14;
 
 // Set to 0 for continuous mode
 static const uint8_t VL53L5_INTEGRAL_TIME_MS = 10;
@@ -52,6 +54,24 @@ static void rangerInterruptHandler()
 }
 
 // PAA3905 -----------------------------------------------------------
+
+static const uint8_t PAA3905_CS_PIN  = 5; 
+static const uint8_t PAA3905_MOT_PIN = 32; 
+
+PAA3905_MotionCapture _mocap(
+        SPI,
+        PAA3905_CS_PIN,
+        PAA3905::DETECTION_STANDARD,
+        PAA3905::AUTO_MODE_01,
+        PAA3905::ORIENTATION_NORMAL,
+        0x2A); // resolution 0x00 to 0xFF
+
+static volatile bool _gotMotionInterrupt;
+
+void motionInterruptHandler()
+{
+    _gotMotionInterrupt = true;
+}
 
 // ------------------------------------------------------------------
 
@@ -78,16 +98,27 @@ void setup()
 
     _ranger.begin();
 
+    // Start SPI
+    SPI.begin();
+
+    delay(100);
+
+    // Check device ID as a test of SPI communications
+    if (!_mocap.begin()) {
+        Debugger::reportForever("PAA3905 initialization failed");
+    }
+
+    Debugger::printf("Resolution is %0.1f CPI per meter height\n", _mocap.getResolution());
+
+    pinMode(PAA3905_MOT_PIN, INPUT); 
+    attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
+
     // Start outgoing serial connection to FC, inverted
     //Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN, UART_INVERTED);
 }
 
-void loop()
+static void checkRanger(void)
 {
-    //static uint8_t _count;
-    //Serial1.write(_count);
-    //_count = (_count + 1) % 256;
-
     if (VL53L5_INT_PIN == 0 || _gotRangerInterrupt) {
 
         _gotRangerInterrupt = false;
@@ -115,4 +146,65 @@ void loop()
         }
         Debugger::printf("\n");
     } 
+
+} // checkRanger
+
+static void checkMocap(void)
+{
+    if (_gotMotionInterrupt) {
+
+        _gotMotionInterrupt = false;
+
+        _mocap.readBurstMode(); // use burst mode to read all of the data
+
+        if (_mocap.motionDataAvailable()) { 
+
+            static uint32_t _count;
+
+            Debugger::printf("\n%05d ---------------------------------\n", _count++);
+
+            if (_mocap.challengingSurfaceDetected()) {
+                Debugger::printf("Challenging surface detected!\n");
+            }
+
+            int16_t deltaX = _mocap.getDeltaX();
+            int16_t deltaY = _mocap.getDeltaY();
+
+            uint8_t surfaceQuality = _mocap.getSurfaceQuality();
+            uint8_t rawDataSum = _mocap.getRawDataSum();
+            uint8_t rawDataMax = _mocap.getRawDataMax();
+            uint8_t rawDataMin = _mocap.getRawDataMin();
+
+            uint32_t shutter = _mocap.getShutter();
+
+            PAA3905_MotionCapture::lightMode_t lightMode = _mocap.getLightMode();
+
+            static const char * light_mode_names[4] = {"Bright", "Low", "Super-low", "Unknown"};
+            Debugger::printf("%s light mode\n", light_mode_names[lightMode]);
+
+            // Don't report X,Y if surface quality and shutter are under thresholds
+            if (_mocap.dataAboveThresholds(lightMode, surfaceQuality, shutter)) {
+                Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
+            }
+            else {
+                Debugger::printf("Data is below thresholds for X,Y reporting\n");
+            }
+
+            Debugger::printf("Number of Valid Features: %d, shutter: 0x%X\n",
+                    4*surfaceQuality, shutter);
+            Debugger::printf("Max raw data: %d  Min raw data: %d  Avg raw data: %d\n",
+                    rawDataMax, rawDataMin, rawDataSum);
+        }
+    }
+
+} // checkMocap
+
+void loop()
+{
+    //static uint8_t _count;
+    //Serial1.write(_count);
+    //_count = (_count + 1) % 256;
+
+    checkRanger();
+    checkMocap();
 }
