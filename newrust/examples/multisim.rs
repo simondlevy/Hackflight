@@ -43,12 +43,12 @@ fn main() -> std::io::Result<()> {
             dx:read_float(buf, 2),
             y:read_float(buf, 3),
             dy:read_float(buf, 4),
-            z:-read_float(buf, 5),      // NED => ENU
-            dz:-read_float(buf, 6),     // NED => ENU
+            z:-read_float(buf, 5),         // NED => ENU
+            dz:-read_float(buf, 6),        // NED => ENU
             phi:read_degrees(buf, 7),
             dphi:read_degrees(buf, 8),
-            theta:read_degrees(buf, 9),
-            dtheta:read_degrees(buf, 10),
+            theta:-read_degrees(buf, 9),   // note sign reversal
+            dtheta:-read_degrees(buf, 10), // note sign reversal
             psi:read_degrees(buf, 11),
             dpsi:read_degrees(buf, 12)
         }
