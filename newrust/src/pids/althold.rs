@@ -69,8 +69,6 @@ pub fn get_demands(
     // Compute error as scaled target minus actual
     let error = target_velocity - dz;
 
-    println!("{}", error);
-
     // Compute I term, avoiding windup
     pid.error_integral = utils::constrain_abs(pid.error_integral + error, WINDUP_MAX);
 

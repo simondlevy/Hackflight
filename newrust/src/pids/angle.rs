@@ -316,14 +316,14 @@ fn update_yaw(
     demand: f32,
     angvel: f32) -> f32 {
 
-        let max_velocity = YAW_RATE_ACCEL_LIMIT * 100.0 * DT; 
-
         // gradually scale back integration when above windup point
         let iterm_windup_point_inv = 1.0 / (1.0 - (ITERM_WINDUP_POINT_PERCENT / 100.0));
 
         let dyn_ci = DT * (if iterm_windup_point_inv > 1.0
             {constrain_f(iterm_windup_point_inv, 0.0, 1.0)}
             else {1.0});
+
+        let max_velocity = YAW_RATE_ACCEL_LIMIT * 100.0 * DT; 
 
         let current_setpoint =
             if max_velocity > 0.0 {acceleration_limit(axis, demand, max_velocity)} else {demand};
@@ -337,9 +337,7 @@ fn update_yaw(
         axis.integral =
             constrain_f(axis.integral + (ki * dyn_ci) * error_rate, -ITERM_LIMIT, ITERM_LIMIT);
 
-        // pterm + axis.integral
-
-        0.0
+        pterm + axis.integral
     }
 
 
