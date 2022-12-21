@@ -1,17 +1,19 @@
 /*
-   Roll/pitch rate PID controller
+   Hackflight angle PID controller support
 
    Copyright (C) 2022 Simon D. Levy
 
    MIT License
  */
 
-use crate::datatypes::Demands;
-use crate::datatypes::VehicleState;
+use crate::Demands;
+use crate::VehicleState;
 
 use crate::filters;
-use crate::utils::DT;
+
 use crate::utils::constrain_f;
+
+use crate::clock::DT;
 
 const DTERM_LPF1_DYN_MIN_HZ: f32 = 75.0;
 const DTERM_LPF1_DYN_MAX_HZ: f32 = 150.0;
@@ -51,13 +53,16 @@ const OUTPUT_SCALING: f32 = 1000.0;
 const  LIMIT_CYCLIC: f32 = 500.0; 
 const  LIMIT_YAW: f32 = 400.0;
 
+const YAW_LOWPASS_HZ: f32 = 100.0;
+
 #[derive(Clone)]
-pub struct Pid {
+pub struct Pid { 
     k_rate_p: f32,
     k_rate_i: f32,
     k_rate_d: f32,
     k_rate_f: f32,
     k_level_p: f32,
+    usec_prev: u32,
     roll : CyclicAxis,
     pitch : CyclicAxis,
     yaw: Axis,
@@ -65,28 +70,113 @@ pub struct Pid {
     pterm_yaw_lpf: filters::Pt1
 }
 
-pub fn make_pid( 
+pub fn make(
     k_rate_p: f32,
     k_rate_i: f32,
     k_rate_d: f32,
     k_rate_f: f32,
     k_level_p: f32) -> Pid {
 
-    const YAW_LOWPASS_HZ: f32 = 100.0;
+        Pid {
+            k_rate_p: k_rate_p,
+            k_rate_i: k_rate_i,
+            k_rate_d: k_rate_d,
+            k_rate_f: k_rate_f,
+            k_level_p: k_level_p,
+            usec_prev: 0,
+            roll : make_cyclic_axis(),
+            pitch : make_cyclic_axis(),
+            yaw: make_axis(),
+            dyn_lpf_previous_quantized_throttle: 0, 
+            pterm_yaw_lpf : filters::make_pt1(YAW_LOWPASS_HZ)
+        }
+} 
 
-    Pid {
-        k_rate_p: k_rate_p, 
-        k_rate_i: k_rate_i, 
-        k_rate_d: k_rate_d, 
-        k_rate_f: k_rate_f, 
-        k_level_p: k_level_p, 
-        roll: make_cyclic_axes(),
-        pitch: make_cyclic_axes(),
-        yaw: make_axis(),
-        dyn_lpf_previous_quantized_throttle: 0,
-        pterm_yaw_lpf : filters::make_pt1(YAW_LOWPASS_HZ)
+pub fn get_demands(
+    pid: &mut Pid,
+    usec: &u32,
+    demands: &Demands,
+    vstate: &VehicleState,
+    reset: &bool) -> Demands {
+
+        let d_usec = *usec - pid.usec_prev;
+        pid.usec_prev = *usec;
+
+        let roll_demand  = rescale_axis(demands.roll);
+        let pitch_demand = rescale_axis(demands.pitch);
+        let yaw_demand   = rescale_axis(demands.yaw);
+
+        let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
+
+        let roll = 
+            update_cyclic(
+                &mut pid.roll,
+                pid.k_level_p,
+                pid.k_rate_p,
+                pid.k_rate_i,
+                pid.k_rate_d,
+                pid.k_rate_f,
+                roll_demand,
+                vstate.phi,
+                vstate.dphi,
+                max_velocity);
+
+
+        let pitch = 
+            update_cyclic(
+                &mut pid.pitch,
+                pid.k_level_p,
+                pid.k_rate_p,
+                pid.k_rate_i,
+                pid.k_rate_d,
+                pid.k_rate_f,
+                pitch_demand,
+                vstate.theta,
+                vstate.dtheta,
+                max_velocity);
+
+        let yaw = update_yaw(
+            &mut pid.yaw,
+            pid.pterm_yaw_lpf,
+            pid.k_rate_p,
+            pid.k_rate_i,
+            yaw_demand,
+            vstate.dpsi);
+
+        pid.roll.axis.integral = if *reset { 0.0 } else { pid.roll.axis.integral };
+        pid.pitch.axis.integral = if *reset { 0.0 } else { pid.pitch.axis.integral };
+        pid.yaw.integral = if *reset { 0.0 } else { pid.yaw.integral };
+
+        if d_usec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US {
+
+            // Quantize the throttle to reduce the number of filter updates
+            let quantized_throttle = (demands.throttle * DYN_LPF_THROTTLE_STEPS) as i32; 
+
+            if quantized_throttle != pid.dyn_lpf_previous_quantized_throttle {
+
+                // Scale the quantized value back to the throttle range so the
+                // filter cutoff steps are repeatable
+                let dyn_lpf_throttle = (quantized_throttle as f32) / DYN_LPF_THROTTLE_STEPS;
+
+                let cutoff_freq = dyn_lpf_cutoff_freq(dyn_lpf_throttle,
+                    DTERM_LPF1_DYN_MIN_HZ,
+                    DTERM_LPF1_DYN_MAX_HZ,
+                    DYN_LPF_CURVE_EXPO);
+
+                init_lpf1(&mut pid.roll, cutoff_freq);
+                init_lpf1(&mut pid.pitch, cutoff_freq);
+
+                pid.dyn_lpf_previous_quantized_throttle = quantized_throttle;
+            }
+        }
+
+        Demands { 
+            throttle : demands.throttle,
+            roll : constrain_output(roll, LIMIT_CYCLIC),
+            pitch : constrain_output(pitch, LIMIT_CYCLIC),
+            yaw : constrain_output(yaw, LIMIT_YAW)
+        }
     }
-}
 
 #[derive(Clone,Copy)]
 struct Axis {
@@ -107,194 +197,6 @@ struct CyclicAxis {
     previous_dterm: f32
 }
 
-fn make_cyclic_axes() -> CyclicAxis {
-
-    CyclicAxis {
-        axis: make_axis(),
-        dterm_lpf1 : filters::make_pt1(DTERM_LPF1_DYN_MIN_HZ),
-        dterm_lpf2 : filters::make_pt1(DTERM_LPF2_HZ),
-        d_min_lpf: filters::make_pt2(D_MIN_LOWPASS_HZ),
-        d_min_range: filters::make_pt2(D_MIN_RANGE_HZ),
-        windup_lpf: filters::make_pt1(ITERM_RELAX_CUTOFF),
-        previous_dterm: 0.0 }
-}
-
-fn make_axis() -> Axis {
-
-    Axis { previous_setpoint: 0.0, integral: 0.0 }
-}
-
-pub fn get_demands(
-    pid: &mut Pid,
-    d_usec: &u32,
-    demands: &Demands,
-    vstate: &VehicleState,
-    reset: &bool) -> Demands {
-
-    let roll_demand  = rescale(demands.roll);
-    let pitch_demand = rescale(demands.pitch);
-    let yaw_demand   = rescale(demands.yaw);
-
-    let max_velocity = RATE_ACCEL_LIMIT * 100.0 * DT;
-
-    let roll = 
-        update_cyclic(
-            &mut pid.roll,
-            pid.k_level_p,
-            pid.k_rate_p,
-            pid.k_rate_i,
-            pid.k_rate_d,
-            pid.k_rate_f,
-            roll_demand,
-            vstate.phi,
-            vstate.dphi,
-            max_velocity);
-
-    let pitch = 
-        update_cyclic(
-            &mut pid.pitch,
-            pid.k_level_p,
-            pid.k_rate_p,
-            pid.k_rate_i,
-            pid.k_rate_d,
-            pid.k_rate_f,
-            pitch_demand,
-            vstate.theta,
-            vstate.dtheta,
-            max_velocity);
-
-    let yaw = update_yaw(
-        &mut pid.yaw,
-        pid.pterm_yaw_lpf,
-        pid.k_rate_p,
-        pid.k_rate_i,
-        yaw_demand,
-        vstate.dpsi);
-
-    pid.roll.axis.integral = if *reset { 0.0 } else { pid.roll.axis.integral };
-    pid.pitch.axis.integral = if *reset { 0.0 } else { pid.pitch.axis.integral };
-    pid.yaw.integral = if *reset { 0.0 } else { pid.yaw.integral };
-
-    if *d_usec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US {
-
-        // Quantize the throttle to reduce the number of filter updates
-        let quantized_throttle = (demands.throttle * DYN_LPF_THROTTLE_STEPS) as i32; 
-
-        if quantized_throttle != pid.dyn_lpf_previous_quantized_throttle {
-
-            // Scale the quantized value back to the throttle range so the
-            // filter cutoff steps are repeatable
-            let dyn_lpf_throttle = (quantized_throttle as f32) / DYN_LPF_THROTTLE_STEPS;
-
-            let cutoff_freq = dyn_lpf_cutoff_freq(dyn_lpf_throttle,
-                                              DTERM_LPF1_DYN_MIN_HZ,
-                                              DTERM_LPF1_DYN_MAX_HZ,
-                                              DYN_LPF_CURVE_EXPO);
-
-            init_lpf1(&mut pid.roll, cutoff_freq);
-            init_lpf1(&mut pid.pitch, cutoff_freq);
-
-            pid.dyn_lpf_previous_quantized_throttle = quantized_throttle;
-        }
-    }
-
-    Demands { 
-        throttle : demands.throttle,
-        roll : constrain_output(roll, LIMIT_CYCLIC),
-        pitch : constrain_output(pitch, LIMIT_CYCLIC),
-        yaw : constrain_output(yaw, LIMIT_YAW)
-    }
-}
-
-fn init_lpf1(cyclic_axis: &mut CyclicAxis, cutoff_freq: f32)
-{
-    filters::adjust_pt1_gain(cyclic_axis.dterm_lpf1, cutoff_freq);
-}
-
-
-fn dyn_lpf_cutoff_freq(throttle: f32, dyn_lpf_min: f32, dyn_lpf_max: f32, expo: f32) -> f32 {
-    let expof = expo / 10.0;
-    let curve = throttle * (1.0 - throttle) * expof + throttle;
-
-    (dyn_lpf_max - dyn_lpf_min) * curve + dyn_lpf_min
-}
-
-
-fn update_yaw(
-    axis: &mut Axis,
-    pterm_lpf: filters::Pt1,
-    kp: f32,
-    ki: f32,
-    demand: f32,
-    angvel: f32) -> f32 {
-
-    let max_velocity = YAW_RATE_ACCEL_LIMIT * 100.0 * DT; 
-
-    // gradually scale back integration when above windup point
-    let iterm_windup_point_inv = 1.0 / (1.0 - (ITERM_WINDUP_POINT_PERCENT / 100.0));
-
-    let dyn_ci = DT * (if iterm_windup_point_inv > 1.0
-                      {constrain_f(iterm_windup_point_inv, 0.0, 1.0)}
-                      else {1.0});
-
-    let current_setpoint =
-        if max_velocity > 0.0 {acceleration_limit(axis, demand, max_velocity)} else {demand};
-
-    let error_rate = current_setpoint - angvel;
-
-    // -----calculate P component
-    let pterm = filters::apply_pt1(pterm_lpf, kp * error_rate);
-
-    // -----calculate I component, constraining windup
-    axis.integral =
-        constrain_f(axis.integral + (ki * dyn_ci) * error_rate, -ITERM_LIMIT, ITERM_LIMIT);
-
-    pterm + axis.integral
-}
-
-fn acceleration_limit(axis: &mut Axis, current_setpoint: f32, max_velocity: f32) -> f32 {
-
-    let current_velocity = current_setpoint - axis.previous_setpoint;
-
-    let new_setpoint = 
-        if current_velocity.abs() > max_velocity 
-        { if current_velocity > 0.0 
-            { axis.previous_setpoint + max_velocity } 
-            else { axis.previous_setpoint - max_velocity } 
-        }
-        else { current_setpoint };
-
-    axis.previous_setpoint = new_setpoint;
-
-    new_setpoint
-}
-
-// [-1,+1] => [-670,+670] with nonlinearity
-fn rescale(command: f32) -> f32 {
-
-    const CTR: f32 = 0.104;
-
-    let expof = command * command.abs();
-    let angle_rate = command * CTR + (1.0 - CTR) * expof;
-
-    670.0 * angle_rate
-}
-
-fn level_pid(k_level_p: f32, current_setpoint: f32, current_angle: f32) -> f32
-{
-    // calculate error angle and limit the angle to the max inclination
-    // rcDeflection in [-1.0, 1.0]
-
-    const LEVEL_ANGLE_LIMIT: f32 = 45.0;
-
-    let angle = constrain_f(LEVEL_ANGLE_LIMIT * current_setpoint,
-                            -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
-
-    let angle_error = angle - (current_angle / 10.0);
-
-    if k_level_p > 0.0  {angle_error * k_level_p } else {current_setpoint}
-}
-
 fn update_cyclic(
     cyclic_axis: &mut CyclicAxis,
     k_level_p: f32,
@@ -311,7 +213,7 @@ fn update_cyclic(
 
     let current_setpoint =
         if max_velocity > 0.0
-        // {acceleration_limit(&mut cyclic_axis.axis, demand, max_velocity)}
+            // {acceleration_limit(&mut cyclic_axis.axis, demand, max_velocity)}
         {acceleration_limit(axis, demand, max_velocity)}
         else {demand};
 
@@ -341,7 +243,7 @@ fn update_cyclic(
 
     // Calculate I component --------------------------------------------------
     axis.integral = constrain_f(axis.integral + (k_rate_i * DT) * iterm_error_rate,
-                        -ITERM_LIMIT, ITERM_LIMIT);
+    -ITERM_LIMIT, ITERM_LIMIT);
 
     // Calculate D component --------------------------------------------------
 
@@ -407,7 +309,103 @@ fn update_cyclic(
     };
 
     pterm + axis.integral + dterm + fterm
+
+} // update_cyclic
+
+
+fn update_yaw(
+    axis: &mut Axis,
+    pterm_lpf: filters::Pt1,
+    kp: f32,
+    ki: f32,
+    demand: f32,
+    angvel: f32) -> f32 {
+
+        // gradually scale back integration when above windup point
+        let iterm_windup_point_inv = 1.0 / (1.0 - (ITERM_WINDUP_POINT_PERCENT / 100.0));
+
+        let dyn_ci = DT * (if iterm_windup_point_inv > 1.0
+            {constrain_f(iterm_windup_point_inv, 0.0, 1.0)}
+            else {1.0});
+
+        let max_velocity = YAW_RATE_ACCEL_LIMIT * 100.0 * DT; 
+
+        let current_setpoint =
+            if max_velocity > 0.0 {acceleration_limit(axis, demand, max_velocity)} else {demand};
+
+        let error_rate = current_setpoint - angvel;
+
+        // -----calculate P component
+        let pterm = filters::apply_pt1(pterm_lpf, kp * error_rate);
+
+        // -----calculate I component, constraining windup
+        axis.integral =
+            constrain_f(axis.integral + (ki * dyn_ci) * error_rate, -ITERM_LIMIT, ITERM_LIMIT);
+
+        pterm + axis.integral
+    }
+
+
+fn make_cyclic_axis() -> CyclicAxis {
+
+    CyclicAxis {
+        axis: make_axis(),
+        dterm_lpf1 : filters::make_pt1(DTERM_LPF1_DYN_MIN_HZ),
+        dterm_lpf2 : filters::make_pt1(DTERM_LPF2_HZ),
+        d_min_lpf: filters::make_pt2(D_MIN_LOWPASS_HZ),
+        d_min_range: filters::make_pt2(D_MIN_RANGE_HZ),
+        windup_lpf: filters::make_pt1(ITERM_RELAX_CUTOFF),
+        previous_dterm: 0.0 }
 }
+
+fn make_axis() -> Axis {
+
+    Axis { previous_setpoint: 0.0, integral: 0.0 }
+}
+
+// [-1,+1] => [-670,+670] with nonlinearity
+fn rescale_axis(command: f32) -> f32 {
+
+    const CTR: f32 = 0.104;
+
+    let expof = command * command.abs();
+    let angle_rate = command * CTR + (1.0 - CTR) * expof;
+
+    670.0 * angle_rate
+}
+
+fn level_pid(k_level_p: f32, current_setpoint: f32, current_angle: f32) -> f32
+{
+    // calculate error angle and limit the angle to the max inclination
+    // rcDeflection in [-1.0, 1.0]
+
+    const LEVEL_ANGLE_LIMIT: f32 = 45.0;
+
+    let angle = constrain_f(LEVEL_ANGLE_LIMIT * current_setpoint,
+        -LEVEL_ANGLE_LIMIT, LEVEL_ANGLE_LIMIT);
+
+    let angle_error = angle - (current_angle / 10.0);
+
+    if k_level_p > 0.0  {angle_error * k_level_p } else {current_setpoint}
+}
+
+fn acceleration_limit(axis: &mut Axis, current_setpoint: f32, max_velocity: f32) -> f32 {
+
+    let current_velocity = current_setpoint - axis.previous_setpoint;
+
+    let new_setpoint = 
+        if current_velocity.abs() > max_velocity 
+        { if current_velocity > 0.0 
+            { axis.previous_setpoint + max_velocity } 
+            else { axis.previous_setpoint - max_velocity } 
+        }
+        else { current_setpoint };
+
+    axis.previous_setpoint = new_setpoint;
+
+    new_setpoint
+}
+
 
 fn apply_feeedforward_limit(
     value: f32,
@@ -415,19 +413,32 @@ fn apply_feeedforward_limit(
     k_rate_p : f32,
     max_rate_limit: f32) -> f32 {
 
-    if value * current_setpoint > 0.0 {
-        if current_setpoint.abs() <= max_rate_limit
-        { constrain_f(value, (-max_rate_limit -
-                              current_setpoint) * k_rate_p,
-                              (max_rate_limit - current_setpoint) * k_rate_p)}
+        if value * current_setpoint > 0.0 {
+            if current_setpoint.abs() <= max_rate_limit
+            { constrain_f(value, (-max_rate_limit -
+                    current_setpoint) * k_rate_p,
+                    (max_rate_limit - current_setpoint) * k_rate_p)}
+            else {
+                0.0
+            }
+        }
         else {
             0.0
         }
     }
-    else {
-        0.0
-    }
+
+fn init_lpf1(cyclic_axis: &mut CyclicAxis, cutoff_freq: f32) {
+
+    filters::adjust_pt1_gain(cyclic_axis.dterm_lpf1, cutoff_freq);
 }
+
+fn dyn_lpf_cutoff_freq(throttle: f32, dyn_lpf_min: f32, dyn_lpf_max: f32, expo: f32) -> f32 {
+    let expof = expo / 10.0;
+    let curve = throttle * (1.0 - throttle) * expof + throttle;
+
+    (dyn_lpf_max - dyn_lpf_min) * curve + dyn_lpf_min
+}
+
 
 fn constrain_output(demand: f32, limit: f32) -> f32 {
 

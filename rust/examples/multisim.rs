@@ -2,14 +2,23 @@ extern crate hackflight;
 
 use std::net::UdpSocket;
 
-use hackflight::datatypes::Demands;
-use hackflight::datatypes::Motors;
-use hackflight::datatypes::VehicleState;
+use hackflight::Demands;
+use hackflight::Motors;
+use hackflight::VehicleState;
+use hackflight::pids;
+use hackflight::step;
+use hackflight::mixers::quadxbf;
+use hackflight::utils::rescale;
+use hackflight::utils::rad2deg;
 
-use hackflight::datatypes::run_hackflight;
+const RATE_KP  : f32 = 1.441305;
+const RATE_KI  : f32 = 48.8762;
+const RATE_KD  : f32 = 0.021160;
+const RATE_KF  : f32 = 0.0165048;
+const LEVEL_KP : f32 = 0.0;
 
-use hackflight::pids::pids;
-use hackflight::mixers::mixers::run_quad_xbf;
+const ALT_HOLD_KP : f32 = 7.5e-2;
+const ALT_HOLD_KI : f32 = 1.5e-1;
 
 fn main() -> std::io::Result<()> {
 
@@ -24,24 +33,28 @@ fn main() -> std::io::Result<()> {
         f64::from_le_bytes(dst) as f32
     }
 
-    fn read_vehicle_state(buf:[u8; IN_BUF_SIZE]) -> VehicleState {
+    fn read_degrees(buf:[u8; IN_BUF_SIZE], idx:usize) -> f32 {
+        rad2deg(read_float(buf, idx))
+    }
+
+    fn state_from_telemetry(buf:[u8; IN_BUF_SIZE]) -> VehicleState {
         VehicleState {
-            x:read_float(buf, 1),
+            x:read_float(buf, 1),       
             dx:read_float(buf, 2),
             y:read_float(buf, 3),
             dy:read_float(buf, 4),
-            z:read_float(buf, 5),
-            dz:read_float(buf, 6),
-            phi:read_float(buf, 7),
-            dphi:read_float(buf, 8),
-            theta:read_float(buf, 9),
-            dtheta:read_float(buf, 10),
-            psi:read_float(buf, 11),
-            dpsi:read_float(buf, 12)
+            z:-read_float(buf, 5),         // NED => ENU
+            dz:-read_float(buf, 6),        // NED => ENU
+            phi:read_degrees(buf, 7),
+            dphi:read_degrees(buf, 8),
+            theta:-read_degrees(buf, 9),   // note sign reversal
+            dtheta:-read_degrees(buf, 10), // note sign reversal
+            psi:read_degrees(buf, 11),
+            dpsi:read_degrees(buf, 12)
         }
     }
 
-    fn read_demands(buf:[u8; IN_BUF_SIZE]) -> Demands {
+    fn demands_from_telemetry(buf:[u8; IN_BUF_SIZE]) -> Demands {
         Demands {
             throttle:read_float(buf, 13),
             roll:read_float(buf, 14),
@@ -68,27 +81,46 @@ fn main() -> std::io::Result<()> {
     // Bind server socket to address,port that client will connect to
     let telemetry_server_socket = UdpSocket::bind("127.0.0.1:5001")?;
 
-    let mut pid_controller = pids::make_controller();
-
     println!("Hit the Play button ...");
 
+    let alt_hold_pid = pids::make_alt_hold(ALT_HOLD_KP, ALT_HOLD_KI);
+
+    let angle_pid = pids::make_angle(RATE_KP, RATE_KI, RATE_KD, RATE_KF, LEVEL_KP);
+
+    let mixer = quadxbf::QuadXbf { };
+
+    let mut pids: [pids::Controller; 2] = [angle_pid, alt_hold_pid];
+
+    // Loop forever, waiting for client
     loop {
 
+        // Get incoming telemetry values
         let mut in_buf = [0; IN_BUF_SIZE]; 
         telemetry_server_socket.recv_from(&mut in_buf)?;
 
+        // Sim sends negative time value on halt
         let time = read_float(in_buf, 0);
+        if time < 0.0 { 
+            break Ok(()); 
+        }
 
-        if time < 0.0 { break Ok(()); }
+        // Convert simulator time to microseconds
+        let usec = (time * 1e6) as u32;
 
-        let vehicle_state = read_vehicle_state(in_buf);
+        // Build vehicle state 
+        let vstate = state_from_telemetry(in_buf);
 
-        let rxdemands = read_demands(in_buf);
+        // Get incoming stick demands
+        let mut stick_demands = demands_from_telemetry(in_buf);
 
-        let (motors, new_pid_controller) =
-            run_hackflight(rxdemands, vehicle_state, &mut pid_controller, &run_quad_xbf);
+        // Reset PID controllers on zero throttle
+        let pid_reset = stick_demands.throttle < 0.05;
 
-        pid_controller = new_pid_controller;
+        // Rescale throttle [-1,+1] => [0,1]
+        stick_demands.throttle = rescale(stick_demands.throttle, -1.0, 1.0, 0.0, 1.0);
+
+        // let motors = Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0};
+        let motors = step(&stick_demands, &vstate, &mut pids, &pid_reset, &usec, &mixer);
 
         let out_buf = write_motors(motors);
 

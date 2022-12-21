@@ -4,108 +4,58 @@
    Copyright (C) 2022 Simon D. Levy
 
    MIT License
-*/
+ */
 
-pub mod rate;
-pub mod yaw;
+use crate::Demands;
+use crate::VehicleState;
 
-pub mod angle;
-pub mod althold;
+mod angle;
+mod althold;
 
-pub mod pids {
+#[derive(Clone)]
+pub enum Controller {
 
-    use crate::datatypes::Demands;
-    use crate::datatypes::VehicleState;
+    Angle { angpid: angle::Pid },
 
-    use crate::pids::althold as alt_pid;
+    AltHold { altpid: althold::Pid },
+}
 
-    use crate::pids::althold::AltitudePid;
+pub fn make_angle(
+    k_rate_p: f32,
+    k_rate_i: f32,
+    k_rate_d: f32,
+    k_rate_f: f32,
+    k_level_p: f32 ) -> Controller {
 
-    use crate::pids::yaw as yaw_pid;
-    use crate::pids::yaw::YawPid;
-
-    use crate::pids::rate as rate_pid;
-    use crate::pids::rate::RatePid;
-
-    use crate::pids::angle;
-    use crate::pids::althold;
-
-    #[derive(Clone)]
-    pub enum PidController {
-
-        Angle { ap : angle::Pid, },
-
-        AltHold { ahp : althold::Pid, },
-    }
-
-    pub fn get_demands(
-        pid: &mut PidController,
-        d_usec: &u32,
-        demands: &Demands,
-        vstate: &VehicleState,
-        reset: &bool) -> Demands {
-
-            match pid {
-
-                PidController::Angle { ap } => { 
-                    angle::get_demands(ap, d_usec, demands, vstate, reset)
-                },
-
-                PidController::AltHold { ahp } => {
-                    althold::get_demands(ahp, demands, vstate, reset)
-                }
-            }
-    }
-
-    pub fn make_angle_pid_controller( 
-        k_rate_p: f32,
-        k_rate_i: f32,
-        k_rate_d: f32,
-        k_rate_f: f32,
-        k_level_p: f32) -> PidController {
-
-            PidController::Angle {ap: angle::make_pid(k_rate_p, k_rate_i, k_rate_d, k_rate_f, k_level_p)}
-    }
-
-    pub fn make_alt_hold_pid_controller(k_p: f32, k_i: f32) -> PidController {
-
-        PidController::AltHold {ahp : althold::make_pid(k_p, k_i)}
-    }
-
-
-    ///////////////////////////////////////////////////////////////////////////
-
-    #[derive(Copy,Clone)]
-    pub struct Controller {
-
-        alt: AltitudePid,
-        yaw: YawPid,
-        rate: RatePid
-    }
-
-    pub fn make_controller() -> Controller {
-
-        Controller { alt:alt_pid::new(), yaw:yaw_pid::new(), rate:rate_pid::new() }
-    }
-
-    pub fn run(
-        controller: &mut Controller,
-        demands: Demands,
-        vehicle_state: VehicleState) -> (Demands, Controller) {
-
-            let (new_demands, new_alt_pid) =
-                alt_pid::run(demands, &vehicle_state, controller.alt);
-
-            let (new_demands, new_yaw_pid) =
-                yaw_pid::run(new_demands, &vehicle_state, controller.yaw);
-
-            let (new_demands, new_rate_pid) =
-                rate_pid::run(new_demands, &vehicle_state, controller.rate);
-
-            let new_controller =
-                Controller {alt:new_alt_pid, yaw:new_yaw_pid, rate:new_rate_pid};
-
-            (new_demands, new_controller)
+    Controller::Angle {
+        angpid: angle::make(k_rate_p, k_rate_i, k_rate_d, k_rate_f, k_level_p)
     }
 }
 
+pub fn make_alt_hold(
+    k_p: f32,
+    k_i: f32) -> Controller {
+
+    Controller::AltHold {
+        altpid: althold::make(k_p, k_i) 
+    }
+}
+
+pub fn update(
+    t: &mut Controller,
+    usec: u32,
+    demands: Demands,
+    vstate: VehicleState,
+    pid_reset: bool) -> Demands {
+
+    match *t {
+
+        Controller::Angle {ref mut angpid} => {
+                angle::get_demands(angpid, &usec, &demands, &vstate, &pid_reset)
+            },
+
+        Controller::AltHold {ref mut altpid} => {
+            althold::get_demands(altpid, &demands, &vstate, &pid_reset)
+        }
+    }
+}
