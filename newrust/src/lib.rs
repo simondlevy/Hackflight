@@ -49,7 +49,8 @@ pub trait Mixer {
     fn get_motors(&self, demands: & Demands) -> Motors;
 }
 
-pub fn run(
+// Corresponds to C++ Mixer::step()
+pub fn step(
     arr: &mut [pids::Controller],
     vstate: &VehicleState,
     rxdemands: &Demands,
