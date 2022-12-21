@@ -38,8 +38,8 @@ fn main() -> std::io::Result<()> {
             dx:read_float(buf, 2),
             y:read_float(buf, 3),
             dy:read_float(buf, 4),
-            z:read_float(buf, 5),
-            dz:read_float(buf, 6),
+            z:-read_float(buf, 5),
+            dz:-read_float(buf, 6),
             phi:read_float(buf, 7),
             dphi:read_float(buf, 8),
             theta:read_float(buf, 9),
@@ -106,8 +106,8 @@ fn main() -> std::io::Result<()> {
         let mut vstate = state_from_telemetry(in_buf);
 
         // NED => ENU
-        vstate.z = -vstate.z;
-        vstate.dz = -vstate.dz;
+        //vstate.z = -vstate.z;
+        //vstate.dz = -vstate.dz;
 
         // Get incoming stick demands
         let mut stick_demands = demands_from_telemetry(in_buf);
