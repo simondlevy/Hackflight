@@ -105,11 +105,13 @@ fn main() -> std::io::Result<()> {
 
         let mut stick_demands = read_demands(in_buf);
 
+        // Reset PID controllers on zero throttle
+        let pid_reset = stick_demands.throttle < 0.05;
+
         // Rescale throttle [-1,+1] => [0,1]
         stick_demands.throttle = rescale(stick_demands.throttle, -1.0, 1.0, 0.0, 1.0);
 
         // XXX
-        let pid_reset = false;
         let usec : u32 = 0;
 
         // let motors = Motors {m1: 0.0, m2: 0.0, m3:0.0, m4:0.0};
