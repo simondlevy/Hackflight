@@ -23,15 +23,14 @@
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <debugger.h>
-#include <task/receiver/mock.h>
+#include <task/receiver/real/sbus.h>
 #include <imu/real/softquat/mpu6x00.h>
 #include <esc/mock.h>
-
-// IMU
 
 #include <vector>
 using namespace std;
 
+// IMU
 static const uint8_t MOSI_PIN = PA7;
 static const uint8_t MISO_PIN = PA6;
 static const uint8_t SCLK_PIN = PA5;
@@ -53,6 +52,7 @@ static vector<PidController *> _pids = {&_anglePid};
 
 static Stm32F411Board * _board;
 static Mpu6x00 * _imu;
+static SbusReceiver _rx;
 
 static Mixer _mixer = QuadXbfMixer::make();
 
@@ -61,9 +61,13 @@ static void handleImuInterrupt(void)
     _imu->handleInterrupt();
 }
 
+void serialEvent1(void)
+{
+    _rx.read(Serial1);
+}
+
 void setup(void)
 {
-    static MockReceiver rx;
     static MockEsc esc;
 
     pinMode(EXTI_PIN, INPUT);
@@ -71,10 +75,12 @@ void setup(void)
 
     static Mpu6x00 imu(RealImu::rotate180, _spi, CS_PIN);
 
-    static Stm32F411Board board(rx, imu, _pids, _mixer, esc, LED_PIN);
+    static Stm32F411Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     _imu = &imu;
+
+    Serial1.begin(100000, SERIAL_8E2);
 
     _board->begin();
 }
