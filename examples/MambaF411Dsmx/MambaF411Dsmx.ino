@@ -54,16 +54,19 @@ static DsmxReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
 
+// Motor interrupt
 extern "C" void handleDmaIrq(void)
 {
     _board->handleDmaIrq(0);
 }
 
+// IMU interrupt
 static void handleImuInterrupt(void)
 {
     _imu->handleInterrupt();
 }
 
+// Receiver interrupt
 void serialEvent1(void)
 {
     _rx.read(Serial1);

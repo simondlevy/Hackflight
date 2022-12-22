@@ -25,7 +25,7 @@
 #include <debugger.h>
 #include <task/receiver/real/sbus.h>
 #include <imu/real/softquat/mpu6x00.h>
-#include <esc/mock.h>
+#include <esc/dshot.h>
 
 #include <vector>
 using namespace std;
@@ -36,6 +36,8 @@ static const uint8_t MISO_PIN = PA6;
 static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PA1;
+
+static vector <uint8_t> MOTOR_PINS = {PB4, PB5, PB6, PB7};
 
 static const uint8_t LED_PIN  = PC13; 
 
@@ -56,11 +58,19 @@ static SbusReceiver _rx;
 
 static Mixer _mixer = QuadXbfMixer::make();
 
+// Motor interrupt
+extern "C" void handleDmaIrq(void)
+{
+    _board->handleDmaIrq(0);
+}
+
+// IMU interrupt
 static void handleImuInterrupt(void)
 {
     _imu->handleInterrupt();
 }
 
+// Receiver interrupt
 void serialEvent1(void)
 {
     _rx.read(Serial1);
@@ -68,12 +78,12 @@ void serialEvent1(void)
 
 void setup(void)
 {
-    static MockEsc esc;
-
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
     static Mpu6x00 imu(RealImu::rotate180, _spi, CS_PIN);
+
+    static DshotEsc esc(&MOTOR_PINS);
 
     static Stm32F411Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
 
