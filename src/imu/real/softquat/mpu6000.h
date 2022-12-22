@@ -1,5 +1,5 @@
 /*
-   Header-only class definition for MPU6000 sensor using SPI bus
+   Class definition for MPU6000 sensor using SPI bus
 
    Copyright (c) 2022 Simon D. Levy
 
@@ -7,7 +7,7 @@
 */
 
 #include "imu/real/softquat.h"
-#include "spihelp.h"
+#include "spihelper.h"
 
 #include <SPI.h>
 
@@ -125,22 +125,24 @@ class Mpu6000 : public SoftQuatImu {
             m_spi->setBitOrder(MSBFIRST);
             m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
             m_spi->setDataMode(SPI_MODE3);
-
             pinMode(m_csPin, OUTPUT);
 
             // Chip reset
-            SpiHelper::writeRegister(m_spi, m_csPin, REG_PWR_MGMT_1, BIT_H_RESET);
+            SpiHelper::writeRegister(
+                    m_spi, m_csPin, REG_PWR_MGMT_1, BIT_H_RESET);
             delay(100);
 
             // Check ID
             SpiHelper::readRegister(m_spi, m_csPin, REG_WHO_AM_I);
 
             // Clock Source PPL with Z axis gyro reference
-            SpiHelper::writeRegister(m_spi, m_csPin, REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
+            SpiHelper::writeRegister(
+                    m_spi, m_csPin, REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
             delayMicroseconds(7);
 
             // Disable Primary I2C Interface
-            SpiHelper::writeRegister(m_spi, m_csPin, REG_USER_CTRL, BIT_I2C_IF_DIS);
+            SpiHelper::writeRegister(
+                    m_spi, m_csPin, REG_USER_CTRL, BIT_I2C_IF_DIS);
             delayMicroseconds(15);
 
             SpiHelper::writeRegister(m_spi, m_csPin, REG_PWR_MGMT_2, 0x00);
@@ -152,11 +154,13 @@ class Mpu6000 : public SoftQuatImu {
             delayMicroseconds(15);
 
             // Gyro +/- 2000 DPS Full Scale
-            SpiHelper::writeRegister(m_spi, m_csPin, REG_GYRO_CONFIG, m_gyroScale << 3);
+            SpiHelper::writeRegister(
+                    m_spi, m_csPin, REG_GYRO_CONFIG, m_gyroScale << 3);
             delayMicroseconds(15);
 
             // Accel +/- 16 G Full Scale
-            SpiHelper::writeRegister(m_spi, m_csPin, REG_ACCEL_CONFIG, m_accelScale << 3);
+            SpiHelper::writeRegister(
+                    m_spi, m_csPin, REG_ACCEL_CONFIG, m_accelScale << 3);
             delayMicroseconds(15);
 
             // INT_ANYRD_2CLEAR
@@ -164,7 +168,8 @@ class Mpu6000 : public SoftQuatImu {
 
             delayMicroseconds(15);
 
-            SpiHelper::writeRegister(m_spi, m_csPin, REG_INT_ENABLE, BIT_RAW_RDY_EN);
+            SpiHelper::writeRegister(
+                    m_spi, m_csPin, REG_INT_ENABLE, BIT_RAW_RDY_EN);
             delayMicroseconds(15);
 
             m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
@@ -173,7 +178,8 @@ class Mpu6000 : public SoftQuatImu {
             m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
 
             // Accel and Gyro DLPF Setting
-            SpiHelper::writeRegister(m_spi, m_csPin, REG_CONFIG, 0); // no gyro DLPF
+            SpiHelper::writeRegister(
+                    m_spi, m_csPin, REG_CONFIG, 0); // no gyro DLPF
             delayMicroseconds(1);
 
             m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
@@ -226,7 +232,8 @@ class Mpu6000 : public SoftQuatImu {
 
         void readGyro(void)
         {
-            SpiHelper::readRegisters(m_spi, m_csPin, REG_GYRO_XOUT_H, m_buffer, 7);
+            SpiHelper::readRegisters(
+                    m_spi, m_csPin, REG_GYRO_XOUT_H, m_buffer, 7);
         }
 
 }; // class Mpu6000
