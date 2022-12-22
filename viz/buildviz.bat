@@ -13,7 +13,7 @@
 ::Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 pyinstaller --onefile hfviz.py --windowed --noconsole
-mkdir HFViz
-mkdir HFViz\media
-copy dist\hfviz.exe HFViz\hackflight.exe
-copy media\* HFViz\media
+mkdir HackflightViz
+mkdir HackflightViz\media
+copy dist\hfviz.exe HackflightViz\hackflight.exe
+copy media\* HackflightViz\media
