@@ -37,8 +37,7 @@
 #include <vector>
 using namespace std;
 
-//static const uint8_t LED_PIN  = PC13; // orange
-static const uint8_t LED_PIN  = PC14; // blue
+static const uint8_t LED_PIN  = PC13; 
 
 //static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
