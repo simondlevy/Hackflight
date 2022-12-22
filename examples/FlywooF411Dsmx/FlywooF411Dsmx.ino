@@ -21,7 +21,7 @@
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
-#include <imu/real/softquat/mpu6000.h>
+#include <imu/real/softquat/mpu6x00.h>
 #include <task/receiver/real/dsmx.h>
 
 #include <vector>
@@ -47,7 +47,7 @@ static AnglePidController _anglePid(
         0.0); // 3.0; // Level Kp
 
 static Stm32F411Board * _board;
-static Mpu6000 * _imu;
+static Mpu6x00 * _imu;
 static DsmxReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
@@ -74,7 +74,7 @@ void setup(void)
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static Mpu6000 imu(RealImu::rotate0Flip, _spi, CS_PIN);
+    static Mpu6x00 imu(RealImu::rotate0Flip, _spi, CS_PIN);
 
     static DshotEsc esc(&MOTOR_PINS);
 

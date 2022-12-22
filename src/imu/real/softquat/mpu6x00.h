@@ -1,5 +1,5 @@
 /*
-   Class definition for MPU6000 sensor using SPI bus
+   Class definition for MPU6000, MPU6500 IMUs using SPI bus
 
    Copyright (c) 2022 Simon D. Levy
 
@@ -11,7 +11,7 @@
 
 #include <SPI.h>
 
-class Mpu6000 : public SoftQuatImu {
+class Mpu6x00 : public SoftQuatImu {
 
     public:
 
@@ -192,7 +192,7 @@ class Mpu6000 : public SoftQuatImu {
 
     public:
 
-        Mpu6000(
+        Mpu6x00(
                 const rotateFun_t rotateFun,
                 SPIClass & spi,
                 const uint8_t csPin,
@@ -236,4 +236,4 @@ class Mpu6000 : public SoftQuatImu {
                     m_spi, m_csPin, REG_GYRO_XOUT_H, m_buffer, 7);
         }
 
-}; // class Mpu6000
+}; // class Mpu6x00
