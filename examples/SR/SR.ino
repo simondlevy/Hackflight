@@ -34,8 +34,8 @@
 
 // VL53L5 -------------------------------------------------------------
 
-static const uint8_t VL53L5_INT_PIN = 4; // Set to 0 for polling
-static const uint8_t VL53L5_LPN_PIN = 14;
+static const uint8_t VL53L5_INT_PIN = 15; // Set to 0 for polling
+static const uint8_t VL53L5_LPN_PIN = 2;
 
 // Set to 0 for continuous mode
 static const uint8_t VL53L5_INTEGRAL_TIME_MS = 10;
