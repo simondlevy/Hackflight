@@ -13,10 +13,15 @@ manufacturer_id MTKS
 
 # resources
 resource BEEPER 1 B02
+
+# motors ######################
 resource MOTOR 1 B04
 resource MOTOR 2 B05
 resource MOTOR 3 B06
 resource MOTOR 4 B07
+###############################
+
+
 resource MOTOR 5 B03
 resource MOTOR 6 B10
 resource MOTOR 7 NONE
@@ -146,6 +151,8 @@ resource PULLDOWN 4 NONE
 # timer
 timer A03 AF3
 # pin A03: TIM9 CH2 (AF3)
+
+# motors ######################
 timer B04 AF2
 # pin B04: TIM3 CH1 (AF2)
 timer B05 AF2
@@ -154,6 +161,8 @@ timer B06 AF2
 # pin B06: TIM4 CH1 (AF2)
 timer B07 AF2
 # pin B07: TIM4 CH2 (AF2)
+###############################
+
 timer B03 AF1
 # pin B03: TIM2 CH2 (AF1)
 timer B10 AF1
@@ -193,6 +202,8 @@ dma UART_RX 6 NONE
 dma UART_RX 7 NONE
 dma UART_RX 8 NONE
 dma pin A03 NONE
+
+# motors ######################
 dma pin B04 0
 # pin B04: DMA1 Stream 4 Channel 5
 dma pin B05 0
@@ -201,6 +212,8 @@ dma pin B06 0
 # pin B06: DMA1 Stream 0 Channel 2
 dma pin B07 0
 # pin B07: DMA1 Stream 3 Channel 2
+###############################
+
 dma pin B03 0
 # pin B03: DMA1 Stream 6 Channel 3
 dma pin B10 0

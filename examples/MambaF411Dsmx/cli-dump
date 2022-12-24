@@ -12,10 +12,14 @@ manufacturer_id DIAT
 
 # resources
 resource BEEPER 1 B02
+
+# motors ######################
 resource MOTOR 1 B03
 resource MOTOR 2 B04
 resource MOTOR 3 B06
 resource MOTOR 4 B07
+###############################
+
 resource MOTOR 5 NONE
 resource MOTOR 6 NONE
 resource MOTOR 7 NONE
@@ -138,6 +142,9 @@ resource PULLDOWN 4 NONE
 # timer
 timer B09 AF3
 # pin B09: TIM11 CH1 (AF3)
+
+
+# motors ######################
 timer B03 AF1
 # pin B03: TIM2 CH2 (AF1)
 timer B04 AF2
@@ -146,6 +153,8 @@ timer B06 AF2
 # pin B06: TIM4 CH1 (AF2)
 timer B07 AF2
 # pin B07: TIM4 CH2 (AF2)
+###############################
+
 timer A15 AF1
 # pin A15: TIM2 CH1 (AF1)
 timer B08 AF3
@@ -187,14 +196,22 @@ dma UART_RX 6 NONE
 dma UART_RX 7 NONE
 dma UART_RX 8 NONE
 dma pin B09 NONE
+
+
+# motors ######################
 dma pin B03 0
 # pin B03: DMA1 Stream 6 Channel 3
+
 dma pin B04 0
 # pin B04: DMA1 Stream 4 Channel 5
+
 dma pin B06 0
 # pin B06: DMA1 Stream 0 Channel 2
+
 dma pin B07 0
 # pin B07: DMA1 Stream 3 Channel 2
+###############################
+
 dma pin A15 0
 # pin A15: DMA1 Stream 5 Channel 3
 dma pin B08 NONE
