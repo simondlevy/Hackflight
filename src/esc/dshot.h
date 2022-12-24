@@ -271,8 +271,7 @@ class DshotEsc : public Esc {
 
             return constrainedValue == PWM_MIN ?
                 (float)CMD_MOTOR_STOP :
-                scaleRangef(constrainedValue, PWM_MIN + 1, PWM_MAX,
-                        MIN_VALUE, MAX_VALUE);
+                scaleRangef(constrainedValue, PWM_MIN + 1, PWM_MAX, MIN_VALUE, MAX_VALUE);
         }
 
         virtual float getMotorValue(
