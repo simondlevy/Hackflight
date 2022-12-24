@@ -32,10 +32,22 @@
 //#include <espnow.h>
 //#include <esp_now.h>
 
+// MCU choice --------------------------------------------------------
+
+static const uint8_t SR_INT_PIN = 15;
+static const uint8_t SR_LPN_PIN = 2;
+static const uint8_t SR_CS_PIN  = 5;
+static const uint8_t SR_MOT_PIN = 4;
+
+static const uint8_t TP_INT_PIN = 16;
+static const uint8_t TP_LPN_PIN = 17;
+static const uint8_t TP_CS_PIN  = 5;
+static const uint8_t TP_MOT_PIN = 32;
+
 // VL53L5 -------------------------------------------------------------
 
-static const uint8_t VL53L5_INT_PIN = 15; // Set to 0 for polling
-static const uint8_t VL53L5_LPN_PIN = 2;
+static const uint8_t VL53L5_INT_PIN = TP_INT_PIN; // Set to 0 for polling
+static const uint8_t VL53L5_LPN_PIN = TP_LPN_PIN;
 
 // Set to 0 for continuous mode
 static const uint8_t VL53L5_INTEGRAL_TIME_MS = 10;
@@ -55,8 +67,8 @@ static void rangerInterruptHandler()
 
 // PAA3905 -----------------------------------------------------------
 
-static const uint8_t PAA3905_CS_PIN  = 5; 
-static const uint8_t PAA3905_MOT_PIN = 32; 
+static const uint8_t PAA3905_CS_PIN  = TP_CS_PIN; 
+static const uint8_t PAA3905_MOT_PIN = TP_MOT_PIN; 
 
 PAA3905_MotionCapture _mocap(
         SPI,
