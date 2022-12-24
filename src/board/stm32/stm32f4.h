@@ -195,9 +195,9 @@ class Stm32F4Board : public Stm32Board {
             }
         }
 
-        virtual void dmaWriteMotor(const uint8_t index, uint16_t packet) override
+        virtual void dmaWriteMotor(const uint8_t motorIndex, uint16_t packet) override
         {
-            motor_t * const motor = &m_motors[index];
+            motor_t * const motor = &m_motors[motorIndex];
             port_t *port = motor->port;
 
             for (auto pos=0; pos<16; pos++) {
@@ -449,9 +449,9 @@ class Stm32F4Board : public Stm32Board {
             m_portCount = portCount;
         }
 
-        void handleDmaIrq(const uint8_t index)
+        void handleDmaIrq(const uint8_t portIndex)
         {
-            port_t *port = &m_ports[index];
+            port_t *port = &m_ports[portIndex];
 
             dmaCmd(port, DISABLE);
 
