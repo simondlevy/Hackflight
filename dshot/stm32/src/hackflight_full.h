@@ -21,10 +21,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "arming.h"
 #include "debug.h"
 #include "deg2rad.h"
-#include "failsafe.h"
 #include "led.h"
 #include "motor.h"
 #include "msp.h"
@@ -54,8 +52,6 @@ class Hackflight {
             imu_align_fun imuAlignFun;
             Task::data_t   taskData;
             Scheduler     scheduler;
-
-            Failsafe      failsafe;
 
             AttitudeTask attitudeTask;
             MspTask      mspTask;
@@ -213,17 +209,10 @@ class Hackflight {
             //imuInit(0);
             ledInit(ledPin);
             ledFlash(10, 50);
-            failsafeInit();
-            failsafeReset();
 
             //full->imuAlignFun = imuAlign;
 
             taskData->motorDevice = motorDevice;
-
-            // Initialize quaternion in upright position
-            //taskData->imuFusionPrev.quat.w = 1;
-
-            taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 
         } // init
 

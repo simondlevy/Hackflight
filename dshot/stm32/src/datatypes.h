@@ -292,12 +292,3 @@ typedef struct {
     bool isDshot;
 
 } motor_config_t;
-
-
-// Mixer -----------------------------------------------------------------------
-
-typedef void (*mixer_t)(
-        demands_t * demands,
-        bool failsafe,
-        motor_config_t * motorConfig,
-        float * motors);

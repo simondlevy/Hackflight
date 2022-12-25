@@ -33,10 +33,6 @@ class MspTask : public Task {
         {
             (void)usec;
 
-            mspUpdate(
-                    &core->vstate,
-                    Arming::isArmed(&data->arming),
-                    data->motorDevice,
-                    data->mspMotors);
+            mspUpdate(&core->vstate, data->motorDevice, data->mspMotors);
         }
 };

@@ -30,10 +30,6 @@ class Task {
 
         typedef struct {
 
-            Arming::data_t   arming;
-            gyro_t           gyro;
-            imu_fusion_t     imuFusionPrev;
-            float            maxArmingAngle;
             void *           motorDevice;
             float            mspMotors[4];
 

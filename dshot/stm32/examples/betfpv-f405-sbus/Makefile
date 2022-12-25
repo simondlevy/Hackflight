@@ -270,7 +270,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/hardware_init.o \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/debug.o \
-		  $(OBJECT_DIR)/failsafe.o \
 		  $(OBJECT_DIR)/led.o \
 		  $(OBJECT_DIR)/maths.o \
 		  $(OBJECT_DIR)/msp.o \
@@ -322,13 +321,6 @@ $(OBJECT_DIR)/debug.o: $(HFSRC_DIR)/debug.cpp \
 	  $(HFSRC_DIR)/datatypes.h
 	$(V1) $(call compile_cpp)
 	@echo g++ debug.cpp
-
-$(OBJECT_DIR)/failsafe.o: $(HFSRC_DIR)/failsafe.cpp \
-	  $(HFSRC_DIR)/arming.h \
-	  $(HFSRC_DIR)/debug.h \
-	  $(HFSRC_DIR)/failsafe.h \
-	  $(HFSRC_DIR)/time.h
-	$(V1) $(call compile_cpp)
 
 $(OBJECT_DIR)/led.o: $(HFSRC_DIR)/led.cpp \
 	  $(HFSRC_DIR)/led.h \

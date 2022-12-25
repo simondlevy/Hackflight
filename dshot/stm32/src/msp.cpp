@@ -531,7 +531,6 @@ void mspTriggerDebugging(void)
 
 void mspUpdate(
         vehicle_state_t * vstate,
-        bool armed,
         void * motorDevice,
         float * motors)
 {
@@ -560,7 +559,7 @@ void mspUpdate(
                 const uint8_t c = serialRead(mspPort->port);
                 const bool consumed = serialProcessReceivedData(mspPort, c);
 
-                if (!consumed && !armed) {
+                if (!consumed) {
                     evaualteNonMspData(mspPort, c);
                 }
 

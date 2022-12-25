@@ -28,11 +28,7 @@ void mspInit(void);
 
 void mspTriggerDebugging(void);
 
-void mspUpdate(
-        vehicle_state_t * state,
-        bool armed,
-        void * motorDevice,
-        float * motors);
+void mspUpdate(vehicle_state_t * state, void * motorDevice, float * motors);
 
 #if defined(__cplusplus)
 }
