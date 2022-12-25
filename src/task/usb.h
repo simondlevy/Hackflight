@@ -80,13 +80,13 @@ class UsbTask : public Task {
                     case 105: // RC
                         {
 
-                            uint16_t channels[6] = {
-                                (uint16_t)m_receiver->getRawThrottle(),
-                                (uint16_t)m_receiver->getRawRoll(),
-                                (uint16_t)m_receiver->getRawPitch(),
-                                (uint16_t)m_receiver->getRawYaw(),
-                                (uint16_t)scale(m_receiver->getRawAux1()),
-                                (uint16_t)scale(m_receiver->getRawAux2())
+                            int16_t channels[] = {
+                                (int16_t)m_receiver->getRawThrottle(),
+                                (int16_t)m_receiver->getRawRoll(),
+                                (int16_t)m_receiver->getRawPitch(),
+                                (int16_t)m_receiver->getRawYaw(),
+                                (int16_t)scale(m_receiver->getRawAux1()),
+                                (int16_t)scale(m_receiver->getRawAux2())
                             };
 
                             m_serializer.serializeShorts(105, channels, 6);
@@ -97,13 +97,16 @@ class UsbTask : public Task {
 
                     case 108: // ATTITUDE
                         {
-                            m_serializer.prepareToSerializeShorts(messageType, 3);
-                            m_serializer.serializeShort(10 * rad2degi(m_vstate->phi));
-                            m_serializer.serializeShort(10 * rad2degi(m_vstate->theta));
-                            m_serializer.serializeShort(rad2degi(m_vstate->psi));
-                            m_serializer.completeSerialize();
+                            int16_t angles[] = {
+                                (int16_t)(10 * rad2degi(m_vstate->phi)),
+                                (int16_t)(10 * rad2degi(m_vstate->theta)),
+                                (int16_t)rad2degi(m_vstate->psi)
+                            };
+
+                            m_serializer.serializeShorts(108, angles, 3);
 
                             sendOutBuf();
+
                         } break;
 
                     case 214: // SET_MOTORS

@@ -102,7 +102,7 @@ class MspSerializer {
             serialize16(a);
         }
 
-        void serializeShorts(uint8_t messageType, uint16_t src[], uint8_t count)
+        void serializeShorts(uint8_t messageType, int16_t src[], uint8_t count)
         {
             prepareToSerializeShorts(messageType, count);
 
