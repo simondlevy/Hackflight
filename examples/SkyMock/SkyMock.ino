@@ -21,10 +21,14 @@ void loop(void)
         switch (messageType) {
 
             case 121: // PAA3905
+
                 _serializer.prepareToSerializeShorts(messageType, 2);
                 _serializer.serializeShort(x);
                 _serializer.serializeShort(y);
                 _serializer.completeSerialize();
+
+                Serial.write(_serializer.outBuf, _serializer.outBufSize);
+
                 break;
         }
     }

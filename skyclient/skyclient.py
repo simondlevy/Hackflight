@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-import argparse
+from argparse import ArgumentParser
+from serial import Serial
 
 from mspparser import MspParser
 
@@ -10,14 +11,11 @@ class SkyParser(MspParser):
 
         print(x, y)
 
-cmdparser = argparse.ArgumentParser()
+cmdparser = ArgumentParser()
 cmdparser.add_argument('-p', '--port', default='/dev/ttyUSB0', help='COM port')
 args = cmdparser.parse_args()
-
-print(args.port)
 
 msp = SkyParser()
 
 msg = SkyParser.serialize_PAA3905_Request()
 
-print(msg)
