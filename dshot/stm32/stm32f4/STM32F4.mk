@@ -104,7 +104,6 @@ DEVICE_FLAGS    += -DHSE_VALUE=$(HSE_VALUE)
 
 MCU_COMMON_SRC = \
             startup/system_stm32f4xx.c \
-            bus_spi_stdperiph.c \
             dma_stm32f4xx.c \
             dshot_bitbang.c \
             dshot_bitbang_decode.c \

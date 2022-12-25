@@ -31,7 +31,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #define FLASH_MAX_SPI_INIT_CLK 5000000
 
 static ioTag_t CS_TAG = 44;
-static const uint8_t SPI_DEVICE = 2;
 
 static extDevice_t devInstance;
 static extDevice_t *dev;
