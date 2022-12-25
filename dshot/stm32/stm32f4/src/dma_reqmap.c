@@ -110,12 +110,13 @@ const dmaChannelSpec_t *dmaGetChannelSpecByPeripheral(dmaPeripheral_e device, ui
         return NULL;
     }
 
+    /*
     for (unsigned i = 0 ; i < ARRAYLEN(dmaPeripheralMapping) ; i++) {
         const dmaPeripheralMapping_t *periph = &dmaPeripheralMapping[i];
         if (periph->device == device && periph->index == index && periph->channelSpec[opt].ref) {
             return &periph->channelSpec[opt];
         }
-    }
+    }*/
 
     return NULL;
 }
