@@ -177,9 +177,5 @@ const timerHardware_t fullTimerHardware[FULL_TIMER_CHANNEL_COUNT] = {
 
 uint32_t timerClock(TIM_TypeDef *tim)
 {
-    if (tim == TIM8 || tim == TIM1 || tim == TIM9 || tim == TIM10 || tim == TIM11) {
-        return SystemCoreClock;
-    } else {
-        return SystemCoreClock / 2;
-    }
+    return SystemCoreClock;
 }
