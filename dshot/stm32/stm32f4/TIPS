@@ -1,0 +1,7 @@
+If board gets bricked, first download, build, and flash original Betaflight from source.
+
+Soft serial appears necessary for RX.
+
+For ESP32 telemetry set UART4 to MSP.  For debugging leave UART4 off.
+
+Don't forget to send Arming range with Aux1.
