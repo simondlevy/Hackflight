@@ -25,7 +25,6 @@
 #include "debug.h"
 #include "deg2rad.h"
 #include "failsafe.h"
-#include "gyro.h"
 #include "led.h"
 #include "motor.h"
 #include "msp.h"
@@ -33,6 +32,7 @@
 #include "system.h"
 #include "tasks/attitude.h"
 #include "tasks/msp.h"
+#include "time.h"
 
 class Hackflight {
 
@@ -64,12 +64,27 @@ class Hackflight {
 
     private:
 
+        static uint32_t gyroInterruptCount(void)
+        {
+            static uint32_t _count;
+            static uint32_t _tprev;
+
+            // Simulate 8kHz interrupts
+            uint32_t time = timeMicros();
+            if (time - _tprev > 125) {
+                _count++;
+                _tprev = time;
+            }
+
+            return _count;
+        }
+
+
         static void checkCoreTasks(
                 data_t * data,
                 Scheduler * scheduler,
                 uint32_t nowCycles)
         {
-            HackflightCore::data_t * coreData = &data->coreData;
             Task::data_t * taskData = &data->taskData;
 
             int32_t loopRemainingCycles = scheduler->getLoopRemainingCycles();
@@ -83,8 +98,8 @@ class Hackflight {
                     cmpTimeCycles(nextTargetCycles, nowCycles);
             }
 
-            gyroReadScaled(
-                    &taskData->gyro, data->imuAlignFun, &coreData->vstate);
+            //gyroReadScaled(
+            //        &taskData->gyro, data->imuAlignFun, &coreData->vstate);
 
             motorWrite(taskData->motorDevice,taskData->mspMotors);
 
@@ -115,8 +130,7 @@ class Hackflight {
             static uint32_t _terminalGyroLockCount;
             static int32_t _gyroSkewAccum;
 
-            int32_t gyroSkew =
-                gyroGetSkew(nextTargetCycles, scheduler->desiredPeriodCycles);
+            int32_t gyroSkew = 0;
 
             _gyroSkewAccum += gyroSkew;
 
@@ -189,29 +203,25 @@ class Hackflight {
 
     public:
 
-        static void init(
-                data_t * full,
-                void * motorDevice,
-                imu_align_fun imuAlign,
-                uint8_t ledPin)
+        static void init(data_t * full, void * motorDevice, uint8_t ledPin)
         {
             //HackflightCore::data_t * coreData = &full->coreData;
             Task::data_t * taskData = &full->taskData;
 
             mspInit();
-            gyroInit(&taskData->gyro);
-            imuInit(0);
+            //gyroInit(&taskData->gyro);
+            //imuInit(0);
             ledInit(ledPin);
             ledFlash(10, 50);
             failsafeInit();
             failsafeReset();
 
-            full->imuAlignFun = imuAlign;
+            //full->imuAlignFun = imuAlign;
 
             taskData->motorDevice = motorDevice;
 
             // Initialize quaternion in upright position
-            taskData->imuFusionPrev.quat.w = 1;
+            //taskData->imuFusionPrev.quat.w = 1;
 
             taskData->maxArmingAngle = deg2rad(MAX_ARMING_ANGLE);
 

@@ -21,6 +21,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "system.h"
+#include "time.h"
+
 class Scheduler {
 
     private:

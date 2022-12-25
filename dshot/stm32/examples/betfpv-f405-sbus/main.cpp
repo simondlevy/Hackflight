@@ -23,8 +23,6 @@
 #include <core_rate.h>
 #include <datatypes.h>
 #include <hackflight_full.h>
-#include <imu.h>
-#include <imu_alignment/rotate_270.h>
 #include <serial.h>
 
 #include "hardware_init.h"
@@ -35,11 +33,7 @@ int main(void)
 
     Hackflight::data_t hf = {};
 
-    Hackflight::init(
-            &hf,
-            motorDevice,
-            imuRotate270,
-            37);                // LED pin
+    Hackflight::init(&hf, motorDevice, 37);
 
     while (true) {
 
