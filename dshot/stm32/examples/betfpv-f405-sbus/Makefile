@@ -312,7 +312,6 @@ $(OBJECT_DIR)/main.o: main.cpp \
       $(HFSRC_DIR)/datatypes.h \
       $(HFSRC_DIR)/hackflight_core.h \
       $(HFSRC_DIR)/hackflight_full.h \
-      $(HFSRC_DIR)/mixers/fixedpitch/quadxbf.h \
       $(HFSRC_DIR)/serial.h
 	$(V1) $(call compile_cpp)
 
