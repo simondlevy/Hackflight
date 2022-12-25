@@ -25,7 +25,6 @@
 #include <hackflight_full.h>
 #include <imu.h>
 #include <imu_alignment/rotate_270.h>
-#include <mixers/fixedpitch/quadxbf.h>
 #include <serial.h>
 
 #include "hardware_init.h"
@@ -38,7 +37,6 @@ int main(void)
 
     Hackflight::init(
             &hf,
-            mixerQuadXbf,
             motorDevice,
             0,                  // dummy value for IMU interrupt pin
             imuRotate270,

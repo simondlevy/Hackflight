@@ -22,7 +22,7 @@
 #include "datatypes.h"
 #include "debug.h"
 #include "maths.h"
-#include "pids/angle.h"
+//#include "pids/angle.h"
 
 class HackflightCore {
 
@@ -51,6 +51,7 @@ class HackflightCore {
 
         } data_t;
 
+        /*
         static void init(
                 data_t * hc,
                 anglePidConstants_t * anglePidConstants,
@@ -102,7 +103,7 @@ class HackflightCore {
 
             // Run the mixer to get motors from demands
             hc->mixer(&hc->demands, failsafe, motorConfig, motorvals);
-        }
+        }*/
 
 }; // class HackflightCore
 

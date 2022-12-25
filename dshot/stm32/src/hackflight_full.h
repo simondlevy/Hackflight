@@ -192,13 +192,12 @@ class Hackflight {
 
         static void init(
                 data_t * full,
-                mixer_t mixer,
                 void * motorDevice,
                 uint8_t imuInterruptPin,
                 imu_align_fun imuAlign,
                 uint8_t ledPin)
         {
-            HackflightCore::data_t * coreData = &full->coreData;
+            //HackflightCore::data_t * coreData = &full->coreData;
             Task::data_t * taskData = &full->taskData;
 
             mspInit();
