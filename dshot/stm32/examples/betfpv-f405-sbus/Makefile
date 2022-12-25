@@ -120,9 +120,6 @@ STM32_SRC = \
             dshot_dpwm.c \
             dshot_command.c \
             bus.c \
-            bus_spi.c \
-            bus_spi_config.c \
-            bus_spi_pinconfig.c \
             dma_common.c \
             dma_reqmap.c \
             exti.c \
@@ -281,7 +278,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 $(OBJECT_DIR)/hardware_init.o: hardware_init.c \
 	  hardware_init.h \
 	  dshot_command.h \
-      bus_spi.h \
       dshot_command.h \
       exti.h \
       flash.h \

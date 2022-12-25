@@ -20,7 +20,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "bus_spi.h"
 #include "dshot_command.h"
 #include "exti.h"
 #include "flash.h"
@@ -52,15 +51,11 @@ void * hardwareInit(uint32_t core_period)
     serialInit(-1);
     void * motorDevice = motorInitDshot(4);
     inverterInit();
-    spiPinConfigure();
-    spiPreInit();
-    spiInit(0x07); // mask for devices 0,1,2
     dshotSetPidLoopTime(core_period);
     pinioInit();
     usbCableDetectInit();
     flashInit();
     timerStart();
-    spiInitBusDMA();
     motorPostInit(motorDevice);
     motorEnable(motorDevice);
     systemInitUnusedPins();

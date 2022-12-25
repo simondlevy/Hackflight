@@ -22,7 +22,6 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 #include "platform.h"
 #include "flash_impl.h"
-#include "bus_spi.h"
 #include "io.h"
 #include "io_types.h"
 
@@ -45,7 +44,6 @@ static int flashPartitions = 0;
 
 void flashPreInit(void)
 {
-    spiPreinitRegister(CS_TAG, IOCFG_IPU, 1);
 }
 
 bool flashIsReady(void)
@@ -208,7 +206,6 @@ void flashInit(void)
     dev = &devInstance;
     dev->busType_u.spi.csnPin = IOGetByTag(CS_TAG);
     IOIsFreeOrPreinit(dev->busType_u.spi.csnPin);
-    spiSetBusInstance(dev, SPI_DEVICE);
 
     flashConfigurePartitions();
 }
