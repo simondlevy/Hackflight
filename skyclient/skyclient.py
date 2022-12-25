@@ -21,3 +21,16 @@ msg = SkyParser.serialize_PAA3905_Request()
 
 port = Serial(args.port, 115200)
 
+port.write(msg)
+
+while True:
+
+    try:
+
+        byte = port.read(1)
+
+        print('x%02X' % ord(byte))
+
+    except KeyboardInterrupt:
+
+        break
