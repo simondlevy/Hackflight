@@ -79,13 +79,15 @@ class UsbTask : public Task {
 
                     case 105: // RC
                         {
-                            auto c1 = (uint16_t)m_receiver->getRawThrottle();
-                            auto c2 = (uint16_t)m_receiver->getRawRoll();
-                            auto c3 = (uint16_t)m_receiver->getRawPitch();
-                            auto c4 = (uint16_t)m_receiver->getRawYaw();
-                            auto c5 = scale(m_receiver->getRawAux1());
-                            auto c6 = scale(m_receiver->getRawAux2());
-                            m_serializer.serializeRawRc(105, c1, c2, c3, c4, c5, c6);
+
+                            m_serializer.prepareToSerializeShorts(messageType, 6);
+                            m_serializer.serializeShort((uint16_t)m_receiver->getRawThrottle());
+                            m_serializer.serializeShort((uint16_t)m_receiver->getRawRoll());
+                            m_serializer.serializeShort((uint16_t)m_receiver->getRawPitch());
+                            m_serializer.serializeShort((uint16_t)m_receiver->getRawYaw());
+                            m_serializer.serializeShort(scale(m_receiver->getRawAux1()));
+                            m_serializer.serializeShort(scale(m_receiver->getRawAux2()));
+                            m_serializer.completeSerialize();
                             sendOutBuf();
 
                         } break;

@@ -102,25 +102,4 @@ class MspSerializer {
             serialize16(a);
         }
 
-        void serializeRawRc(
-                const uint8_t messageType,
-                const uint16_t c1,
-                const uint16_t c2,
-                const uint16_t c3,
-                const uint16_t c4,
-                const uint16_t c5,
-                const uint16_t c6)
-        {
-            prepareToSerializeShorts(messageType, 6);
-
-            serializeShort(c1);
-            serializeShort(c2);
-            serializeShort(c3);
-            serializeShort(c4);
-            serializeShort(c5);
-            serializeShort(c6);
-
-            completeSerialize();
-        }
-
 }; // class MspSerializer
