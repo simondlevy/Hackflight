@@ -52,8 +52,10 @@ class UsbTask : public Task {
 
         bool m_gotRebootRequest;
 
-        void sendOutBuf(void)
+        void sendShorts(
+                const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
+            m_serializer.serializeShorts(messageType, src, count);
             Serial.write(m_serializer.outBuf, m_serializer.outBufSize);
         }
 
@@ -89,9 +91,7 @@ class UsbTask : public Task {
                                 (int16_t)scale(m_receiver->getRawAux2())
                             };
 
-                            m_serializer.serializeShorts(105, channels, 6);
-
-                            sendOutBuf();
+                            sendShorts(105, channels, 6);
 
                         } break;
 
@@ -103,9 +103,7 @@ class UsbTask : public Task {
                                 (int16_t)rad2degi(m_vstate->psi)
                             };
 
-                            m_serializer.serializeShorts(108, angles, 3);
-
-                            sendOutBuf();
+                            sendShorts(108, angles, 3);
 
                         } break;
 
