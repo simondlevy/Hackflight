@@ -80,10 +80,14 @@ class MspSerializer {
             prepareToSerialize(type, count, 4);
         }
 
-    public:
-
         uint8_t outBuf[OUTBUF_SIZE];
         uint8_t outBufSize;
+
+    protected:
+
+        virtual void write(const uint8_t buf[], const uint8_t size) = 0;
+
+    public:
 
         void prepareToSerializeShorts(uint8_t messageType, uint8_t count)
         {
@@ -93,6 +97,7 @@ class MspSerializer {
         void completeSerialize(void)
         {
             serialize8(outBufChecksum);
+            write(outBuf, outBufSize);
         }
 
         void serializeShort(uint16_t src)

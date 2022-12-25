@@ -25,7 +25,7 @@
 #include "esc.h"
 #include "imu.h"
 #include "msp/parser.h"
-#include "msp/serializer.h"
+#include "msp/serializer/usb.h"
 #include "receiver.h"
 
 class UsbTask : public Task {
@@ -48,7 +48,7 @@ class UsbTask : public Task {
         VehicleState *   m_vstate;
 
         MspParser m_parser;
-        MspSerializer m_serializer;
+        UsbMspSerializer m_serializer;
 
         bool m_gotRebootRequest;
 
@@ -56,7 +56,6 @@ class UsbTask : public Task {
                 const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
             m_serializer.serializeShorts(messageType, src, count);
-            Serial.write(m_serializer.outBuf, m_serializer.outBufSize);
         }
 
     protected:
@@ -81,7 +80,6 @@ class UsbTask : public Task {
 
                     case 105: // RC
                         {
-
                             int16_t channels[] = {
                                 (int16_t)m_receiver->getRawThrottle(),
                                 (int16_t)m_receiver->getRawRoll(),

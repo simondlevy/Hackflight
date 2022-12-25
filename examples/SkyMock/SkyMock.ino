@@ -22,10 +22,9 @@ void loop(void)
 
             case 121: // PAA3905
 
-                _serializer.prepareToSerializeShorts(messageType, 2);
-                _serializer.serializeShort(x);
-                _serializer.serializeShort(y);
-                _serializer.completeSerialize();
+                int16_t msg[] = {x, y};
+
+                _serializer.sendShorts(121, msg, 2);
 
                 Serial.write(_serializer.outBuf, _serializer.outBufSize);
 
