@@ -65,7 +65,7 @@ class UsbTask : public Task {
 
             while (Serial.available()) {
 
-                uint8_t byte = Serial.read();
+                auto byte = Serial.read();
 
                 //Serial4.println(byte, HEX);
 
@@ -73,18 +73,18 @@ class UsbTask : public Task {
                     m_gotRebootRequest = true;
                 }
 
-                uint8_t messageType = m_parser.parse(byte);
+                auto messageType = m_parser.parse(byte);
 
                 switch (messageType) {
 
                     case 105: // RC
                         {
-                            uint16_t c1 = (uint16_t)m_receiver->getRawThrottle();
-                            uint16_t c2 = (uint16_t)m_receiver->getRawRoll();
-                            uint16_t c3 = (uint16_t)m_receiver->getRawPitch();
-                            uint16_t c4 = (uint16_t)m_receiver->getRawYaw();
-                            uint16_t c5 = scale(m_receiver->getRawAux1());
-                            uint16_t c6 = scale(m_receiver->getRawAux2());
+                            auto c1 = (uint16_t)m_receiver->getRawThrottle();
+                            auto c2 = (uint16_t)m_receiver->getRawRoll();
+                            auto c3 = (uint16_t)m_receiver->getRawPitch();
+                            auto c4 = (uint16_t)m_receiver->getRawYaw();
+                            auto c5 = scale(m_receiver->getRawAux1());
+                            auto c6 = scale(m_receiver->getRawAux2());
                             m_serializer.serializeRawRc(105, c1, c2, c3, c4, c5, c6);
                             sendOutBuf();
 
