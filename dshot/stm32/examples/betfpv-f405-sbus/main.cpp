@@ -34,18 +34,10 @@ int main(void)
 {
     void * motorDevice = hardwareInit(CORE_PERIOD());
 
-    static anglePidConstants_t anglePidConstants = {
-        1.441305,     // Rate Kp
-        19.55048,     // Rate Ki
-        0.021160,     // Rate Kd
-        0.0165048,    // Rate Kf
-        0.0}; // 3.0; // Level Kp
-
     Hackflight::data_t hf = {};
 
     Hackflight::init(
             &hf,
-            &anglePidConstants,
             mixerQuadXbf,
             motorDevice,
             0,                  // dummy value for IMU interrupt pin
