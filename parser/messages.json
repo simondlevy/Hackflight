@@ -15,6 +15,12 @@
    {"c5": "short"}, 
    {"c6": "short"}],
 
+  "PAA3905": 
+  [{"ID": 121},
+   {"comment": "https://www.tindie.com/products/onehorse/paa3905-optical-flow-camera/"}, 
+   {"x": "short"}, 
+   {"y": "short"}],
+
    "SET_RAW_RC": 
   [{"ID": 200},
    {"comment": "16 channels in http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol"}, 
