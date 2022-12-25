@@ -25,7 +25,6 @@
 #include "debug.h"
 #include "motor.h"
 #include "msp.h"
-#include "rad2deg.h"
 #include "serial.h"
 #include "system.h"
 #include "time.h"
@@ -43,6 +42,12 @@
 
 #define ARRAYEND(x) (&(x)[ARRAYLEN(x)])
 #define ARRAYLEN(x) (sizeof(x) / sizeof((x)[0]))
+
+static float rad2deg(float rad)
+{
+    return 180 * rad / M_PI;
+}
+
 
 static int16_t rad2degi(float rad)
 {

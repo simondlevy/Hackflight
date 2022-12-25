@@ -335,7 +335,6 @@ $(OBJECT_DIR)/msp.o: $(HFSRC_DIR)/msp.cpp \
 	  $(HFSRC_DIR)/debug.h \
 	  $(HFSRC_DIR)/motor.h \
 	  $(HFSRC_DIR)/msp.h \
-	  $(HFSRC_DIR)/rad2deg.h \
 	  $(HFSRC_DIR)/serial.h \
 	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
