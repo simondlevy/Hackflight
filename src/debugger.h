@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-class Debugger {
+class HfDebugger {
 
     protected:
 
