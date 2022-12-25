@@ -19,3 +19,5 @@ msp = SkyParser()
 
 msg = SkyParser.serialize_PAA3905_Request()
 
+port = Serial(args.port, 115200)
+
