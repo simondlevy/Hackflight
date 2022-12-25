@@ -48,11 +48,16 @@ class AttitudeTask : public Task {
                 Task::data_t * data,
                 uint32_t time) override
         {
+            vehicle_state_t * vstate = &core->vstate;
+            vstate->phi = 0.1;
+            vstate->theta = 0.1;
+            vstate->psi = 0.1;
+            /*
             imuGetEulerAngles(
                     &data->gyro,
                     &data->imuFusionPrev,
                     &data->arming,
                     time,
-                    &core->vstate);
+                    &core->vstate);*/
         }
 };
