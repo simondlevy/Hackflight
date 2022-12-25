@@ -80,14 +80,17 @@ class UsbTask : public Task {
                     case 105: // RC
                         {
 
-                            m_serializer.prepareToSerializeShorts(messageType, 6);
-                            m_serializer.serializeShort((uint16_t)m_receiver->getRawThrottle());
-                            m_serializer.serializeShort((uint16_t)m_receiver->getRawRoll());
-                            m_serializer.serializeShort((uint16_t)m_receiver->getRawPitch());
-                            m_serializer.serializeShort((uint16_t)m_receiver->getRawYaw());
-                            m_serializer.serializeShort(scale(m_receiver->getRawAux1()));
-                            m_serializer.serializeShort(scale(m_receiver->getRawAux2()));
-                            m_serializer.completeSerialize();
+                            uint16_t channels[6] = {
+                                (uint16_t)m_receiver->getRawThrottle(),
+                                (uint16_t)m_receiver->getRawRoll(),
+                                (uint16_t)m_receiver->getRawPitch(),
+                                (uint16_t)m_receiver->getRawYaw(),
+                                (uint16_t)scale(m_receiver->getRawAux1()),
+                                (uint16_t)scale(m_receiver->getRawAux2())
+                            };
+
+                            m_serializer.serializeShorts(105, channels, 6);
+
                             sendOutBuf();
 
                         } break;
@@ -99,6 +102,7 @@ class UsbTask : public Task {
                             m_serializer.serializeShort(10 * rad2degi(m_vstate->theta));
                             m_serializer.serializeShort(rad2degi(m_vstate->psi));
                             m_serializer.completeSerialize();
+
                             sendOutBuf();
                         } break;
 

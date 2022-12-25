@@ -85,9 +85,9 @@ class MspSerializer {
         uint8_t outBuf[OUTBUF_SIZE];
         uint8_t outBufSize;
 
-        void prepareToSerializeShorts(uint8_t type, uint8_t count)
+        void prepareToSerializeShorts(uint8_t messageType, uint8_t count)
         {
-            prepareToSerialize(type, count, 2);
+            prepareToSerialize(messageType, count, 2);
         }
 
         void completeSerialize(void)
@@ -100,6 +100,17 @@ class MspSerializer {
             uint16_t a;
             memcpy(&a, &src, 2);
             serialize16(a);
+        }
+
+        void serializeShorts(uint8_t messageType, uint16_t src[], uint8_t count)
+        {
+            prepareToSerializeShorts(messageType, count);
+
+            for (auto k=0; k<count; ++k) {
+                serializeShort(src[k]);
+            }
+
+            completeSerialize();
         }
 
 }; // class MspSerializer
