@@ -27,9 +27,7 @@ while True:
 
     try:
 
-        byte = port.read(1)
-
-        print('x%02X' % ord(byte))
+        msp.parse(port.read(1))
 
     except KeyboardInterrupt:
 
