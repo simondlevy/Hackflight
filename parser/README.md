@@ -1,6 +1,6 @@
 # MSPPG: Multiwii Serial Protocol Parser Generator
 
-<img src="https://github.com/simondlevy/RoboFirmwareToolkit/blob/main/extras/media/msppg.png" width=600>
+<img src="https://github.com/simondlevy/Hackflight/blob/main/media/msppg.png" width=600>
 
 **msppgy.py** is a standalone Python script that outputs code for parsing and generating
 [MSP](http://www.armazila.com/MultiwiiSerialProtocol(draft)v02.pdf) messages
@@ -9,19 +9,13 @@ lengthy and error-prone task of writing your own parsing code from scratch.
 
 ## Usage
 
-Running **msppg.py** in a directory that contains a file **messages.json** will produce a new **output** directory
-containing:
-
-* **serialtask.hpp**, a C++ header file that you can include in your firmware to parse the messages defined in
-**messages.json**
+Running **msppg.py** in a directory that contains a file **messages.json** will produce the following files:
 
 * **mspparser.py**, a Python module containing a **Parser** class that you can subclass to implement your
 message-handling methods
 
 * **MspParser.java**, a Java module containing a **Parser** class that you can subclass to implement your
 message-handling methods
-
-To use the C++ header, you should add code in the places commented with ```XXX``` in **serialask.hpp**.
 
 To use the Python class, you should also install the support code for the **Parser** class:
 

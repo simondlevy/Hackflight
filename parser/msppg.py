@@ -81,126 +81,6 @@ class CodeEmitter(object):
         outfile.write(')')
 
 
-# C++ emitter =================================================================
-
-
-class Cpp_Emitter(CodeEmitter):
-
-    def __init__(self, msgdict):
-
-        CodeEmitter.__init__(self, msgdict,
-                             ('uint8_t', 'int16_t', 'float', 'int32_t'))
-
-    def emit(self):
-
-        # Open output file
-        output = self._openw('serialtask.hpp')
-
-        # Write header
-        output.write('/*\n')
-        output.write('   Timer task for serial comms\n\n')
-        output.write('   Gnu Public License\n')
-        output.write(' */\n\n')
-        output.write('#pragma once\n\n')
-        output.write('#include <RFT_board.hpp>\n')
-        output.write('#include <RFT_debugger.hpp>\n')
-        output.write('#include <RFT_actuator.hpp>\n')
-        output.write('#include <RFT_parser.hpp>\n')
-        output.write('#include <RFT_serialtask.hpp>\n\n')
-
-        # Add namespace
-        output.write('namespace /* XXX */ {\n\n')
-
-        # Add classname
-        output.write('\n    class SerialTask : public rft::SerialTask {')
-
-        # Add friend class declaration
-        output.write('\n\n        friend class /* XXX */;')
-
-        # Add stubbed declarations for handler methods
-
-        output.write('\n\n        private:\n')
-        output.write('\n            uint8_t _payload[128] = {};\n')
-
-        for msgtype in self.msgdict.keys():
-
-            msgstuff = self.msgdict[msgtype]
-            msgid = msgstuff[0]
-
-            argnames = self._getargnames(msgstuff)
-            argtypes = self._getargtypes(msgstuff)
-
-            output.write('\n            void handle_%s%s' %
-                         (msgtype, '_Request' if msgid < 200 else ''))
-            self._write_params(output, argtypes, argnames,
-                               ampersand=('&' if msgid < 200 else ''))
-            output.write('\n            {')
-            output.write('\n                // XXX')
-            output.write('\n            }\n')
-
-        output.write('\n        protected:\n\n')
-
-        # Add collectPayload() method
-        output.write('            virtual void collectPayload(uint8_t index, uint8_t value) override\n')
-        output.write('            {\n')
-        output.write('                _payload[index] = value;\n')
-        output.write('            }\n\n')
-
-        # Add dispatchMessage() method
-
-        output.write('            virtual void dispatchMessage(uint8_t command) override\n')
-        output.write('            {\n')
-        output.write('                switch (command) {\n\n')
-
-        for msgtype in self.msgdict.keys():
-
-            msgstuff = self.msgdict[msgtype]
-            msgid = msgstuff[0]
-
-            argnames = self._getargnames(msgstuff)
-            argtypes = self._getargtypes(msgstuff)
-
-            output.write('                    case %s:' %
-                         self.msgdict[msgtype][0])
-            output.write('\n                        {')
-            nargs = len(argnames)
-            offset = 0
-            for k in range(nargs):
-                argname = argnames[k]
-                argtype = argtypes[k]
-                decl = self.typedict[argtype]
-                output.write('\n                            ' +
-                             decl + ' ' + argname + ' = 0;')
-                if msgid >= 200:
-                    fmt = 'memcpy(&%s,  &_payload[%d], sizeof(%s));\n'
-                    output.write('\n                            ')
-                    output.write(fmt % (argname, offset, decl))
-                offset += self.sizedict[argtype]
-            output.write('\n                            handle_%s%s(' %
-                         (msgtype, '_Request' if msgid < 200 else ''))
-            for k in range(nargs):
-                output.write(argnames[k])
-                if k < nargs-1:
-                    output.write(', ')
-            output.write(');\n')
-            if msgid < 200:
-                # XXX enforce uniform type for now
-                argtype = argtypes[0].capitalize()
-                output.write('                            ')
-                output.write('prepareToSend%ss(command, %d);\n' % (argtype, nargs))
-                for argname in argnames:
-                    output.write('                            send%s(%s);\n' %
-                                 (argtype, argname))
-                output.write('                            ')
-                output.write('completeSend();\n')
-            output.write('                        } break;\n\n')
-
-        output.write('                } // switch (_command)\n\n')
-        output.write('            } // dispatchMessage \n\n')
-        output.write('        }; // class SerialTask\n\n')
-        output.write('} // namespace XXX\n')
-
-
 # Python emitter ==============================================================
 
 
@@ -455,8 +335,8 @@ def main():
                         default='messages.json',
                         help='Input file')
     argparser.add_argument('--language', type=str, required=False,
-                        default='all',
-                        help='Language to emit (java, python, cpp, or all)')
+                        default='both',
+                        help='Language to emit (java, python, both)')
     args = argparser.parse_args()
 
     data = json.load(open(args.infile, 'r'))
@@ -496,15 +376,11 @@ def main():
         msgdict[msgtype] = (msgid, argnames, argtypes)
 
     # Emit Python
-    if args.language in ('python', 'all'):
+    if args.language in ('python', 'both'):
         Python_Emitter(msgdict).emit()
 
-    # Emit C++
-    if args.language in ('cpp', 'all'):
-        Cpp_Emitter(msgdict).emit()
-
     # Emit Java
-    if args.language in ('java', 'all'):
+    if args.language in ('java', 'both'):
         Java_Emitter(msgdict).emit()
 
 
