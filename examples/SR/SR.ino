@@ -39,8 +39,8 @@ static const uint8_t SR_LPN_PIN = 2;
 static const uint8_t SR_CS_PIN  = 5;
 static const uint8_t SR_MOT_PIN = 4;
 
-static const uint8_t TP_INT_PIN = 16;
-static const uint8_t TP_LPN_PIN = 17;
+static const uint8_t TP_INT_PIN = 4;
+static const uint8_t TP_LPN_PIN = 14;
 static const uint8_t TP_CS_PIN  = 5;
 static const uint8_t TP_MOT_PIN = 32;
 
