@@ -192,7 +192,6 @@ class Hackflight {
         static void init(
                 data_t * full,
                 void * motorDevice,
-                uint8_t imuInterruptPin,
                 imu_align_fun imuAlign,
                 uint8_t ledPin)
         {
@@ -201,7 +200,7 @@ class Hackflight {
 
             mspInit();
             gyroInit(&taskData->gyro);
-            imuInit(imuInterruptPin);
+            imuInit(0);
             ledInit(ledPin);
             ledFlash(10, 50);
             failsafeInit();
