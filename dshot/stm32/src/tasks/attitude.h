@@ -19,21 +19,8 @@
 #pragma once
 
 #include "datatypes.h"
-#include "imu.h"
 #include "task.h"
 
-static void task_attitude(
-        HackflightCore::data_t * core,
-        Task::data_t * data,
-        uint32_t usec)
-{
-    imuGetEulerAngles(
-            &data->gyro,
-            &data->imuFusionPrev,
-            &data->arming,
-            usec,
-            &core->vstate);
-}
 class AttitudeTask : public Task {
 
     public:
@@ -48,16 +35,28 @@ class AttitudeTask : public Task {
                 Task::data_t * data,
                 uint32_t time) override
         {
+            (void)data;
+            (void)time;
+            
+            // Simulates rocking in the X (phi) axis
+
+            static float phi;
+            static int8_t dir = +1;
+
+            phi += .01 * dir;
+
+            if (phi >= 1.0) {
+                dir = -1;
+            }
+
+            if (phi <= -1.0) {
+                dir = +1;
+            }
+
+
             vehicle_state_t * vstate = &core->vstate;
-            vstate->phi = 0.1;
+            vstate->phi = phi;
             vstate->theta = 0.1;
             vstate->psi = 0.1;
-            /*
-            imuGetEulerAngles(
-                    &data->gyro,
-                    &data->imuFusionPrev,
-                    &data->arming,
-                    time,
-                    &core->vstate);*/
         }
 };
