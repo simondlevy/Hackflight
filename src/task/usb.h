@@ -68,8 +68,6 @@ class UsbTask : public Task {
 
                 auto byte = Serial.read();
 
-                //Serial4.println(byte, HEX);
-
                 if (m_parser.isIdle() && byte == 'R') {
                     m_gotRebootRequest = true;
                 }

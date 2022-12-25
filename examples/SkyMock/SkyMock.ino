@@ -1,5 +1,6 @@
 #include "hackflight.h"
 #include "msp/parser.h"
+#include "msp/serializer/usb.h"
 
 void setup(void)
 {
@@ -9,7 +10,7 @@ void setup(void)
 void loop(void)
 {
     static MspParser _parser;
-    static MspSerializer _serializer;
+    static UsbMspSerializer _serializer;
 
     while (Serial.available()) {
 
@@ -24,9 +25,7 @@ void loop(void)
 
                 int16_t msg[] = {x, y};
 
-                _serializer.sendShorts(121, msg, 2);
-
-                Serial.write(_serializer.outBuf, _serializer.outBufSize);
+                _serializer.serializeShorts(121, msg, 2);
 
                 break;
         }
