@@ -18,6 +18,6 @@ print(args.port)
 
 msp = SkyParser()
 
-print(dir(msp))
+msg = SkyParser.serialize_PAA3905_Request()
 
-
+print(msg)
