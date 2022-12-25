@@ -271,8 +271,6 @@ $(TARGET_ELF): $(TARGET_OBJS) \
 		  $(OBJECT_DIR)/main.o \
 		  $(OBJECT_DIR)/debug.o \
 		  $(OBJECT_DIR)/failsafe.o \
-		  $(OBJECT_DIR)/gyro.o \
-		  $(OBJECT_DIR)/imu.o \
 		  $(OBJECT_DIR)/led.o \
 		  $(OBJECT_DIR)/maths.o \
 		  $(OBJECT_DIR)/msp.o \
@@ -315,8 +313,6 @@ $(OBJECT_DIR)/main.o: main.cpp \
       $(HFSRC_DIR)/datatypes.h \
       $(HFSRC_DIR)/hackflight_core.h \
       $(HFSRC_DIR)/hackflight_full.h \
-      $(HFSRC_DIR)/imu.h \
-      $(HFSRC_DIR)/imu_alignment/rotate_270.h \
       $(HFSRC_DIR)/mixers/fixedpitch/quadxbf.h \
       $(HFSRC_DIR)/serial.h
 	$(V1) $(call compile_cpp)
@@ -331,29 +327,6 @@ $(OBJECT_DIR)/failsafe.o: $(HFSRC_DIR)/failsafe.cpp \
 	  $(HFSRC_DIR)/arming.h \
 	  $(HFSRC_DIR)/debug.h \
 	  $(HFSRC_DIR)/failsafe.h \
-	  $(HFSRC_DIR)/time.h
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/gyro.o: $(HFSRC_DIR)/gyro.cpp \
-	  $(HFSRC_DIR)/core_rate.h \
-	  $(HFSRC_DIR)/datatypes.h \
-	  $(HFSRC_DIR)/debug.h \
-	  $(HFSRC_DIR)/filters/pt1.h \
-	  $(HFSRC_DIR)/gyro.h \
-	  $(HFSRC_DIR)/imu.h \
-	  $(HFSRC_DIR)/maths.h \
-	  $(HFSRC_DIR)/stats.h \
-	  $(HFSRC_DIR)/system.h \
-	  $(HFSRC_DIR)/time.h
-	$(V1) $(call compile_cpp)
-
-$(OBJECT_DIR)/imu.o: $(HFSRC_DIR)/imu.cpp \
-	  $(HFSRC_DIR)/arming.h \
-	  $(HFSRC_DIR)/core_rate.h \
-	  $(HFSRC_DIR)/datatypes.h \
-	  $(HFSRC_DIR)/deg2rad.h \
-	  $(HFSRC_DIR)/maths.h \
-	  $(HFSRC_DIR)/system.h \
 	  $(HFSRC_DIR)/time.h
 	$(V1) $(call compile_cpp)
 
