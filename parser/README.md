@@ -1,6 +1,6 @@
 # MSPPG: Multiwii Serial Protocol Parser Generator
 
-<img src="https://github.com/simondlevy/Hackflight/blob/main/media/msppg.png" width=600>
+<img src="https://github.com/simondlevy/Hackflight/blob/master/media/msppg.png" width=600>
 
 **msppgy.py** is a standalone Python script that outputs code for parsing and generating
 [MSP](http://www.armazila.com/MultiwiiSerialProtocol(draft)v02.pdf) messages
