@@ -38,6 +38,10 @@ int main(void)
     while (true) {
 
         Hackflight::step(&hf);
+
+        extern uint8_t g_pin;
+
+        debugPrintf("x%02X\n", g_pin);
     }
 
     return 0;

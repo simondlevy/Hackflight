@@ -29,13 +29,13 @@ void debugFlush(void)
 
 void debugPrintf(const char *fmt, ...)
 {
-    void mspTriggerDebugging(void);
+    //void mspTriggerDebugging(void);
 
     va_list va;
     va_start(va, fmt);
     tfp_format(NULL, stdout_putf, fmt, va);
     va_end(va);
-    mspTriggerDebugging();
+    //mspTriggerDebugging();
 }
 
 void debugSetPort(void * p)

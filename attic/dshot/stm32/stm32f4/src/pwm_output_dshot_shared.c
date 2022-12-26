@@ -49,7 +49,9 @@ FAST_DATA_ZERO_INIT dshotDMAHandlerCycleCounters_t dshotDMAHandlerCycleCounters;
 
 motorDmaOutput_t *getMotorDmaOutput(uint8_t index)
 {
-    return &dmaMotors[index];
+    motorDmaOutput_t * motor = &dmaMotors[index];
+
+    return motor;
 }
 
 uint8_t getTimerIndex(TIM_TypeDef *timer)

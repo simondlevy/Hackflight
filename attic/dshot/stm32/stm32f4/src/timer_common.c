@@ -55,13 +55,16 @@ const timerHardware_t *timerGetByTagAndIndex(ioTag_t ioTag, unsigned timerIndex)
     return NULL;
 }
 
+uint8_t g_pin;
+
 const timerHardware_t *timerGetConfiguredByTag(ioTag_t ioTag)
 {
+    g_pin = ioTag;
+
     uint8_t timerIndex = 0;
     for (unsigned i = 0; i < MAX_TIMER_PINMAP_COUNT; i++) {
         if (timerIOConfig[i].ioTag == ioTag) {
             timerIndex = timerIOConfig[i].index;
-
             break;
         }
     }
