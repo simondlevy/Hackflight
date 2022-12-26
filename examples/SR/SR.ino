@@ -80,6 +80,8 @@ static void startRanger(void)
 
 static void checkRanger(UsbMspSerializer & serializer, const uint8_t messageType)
 {
+    static int16_t data[16];
+
     if (VL53L5_INT_PIN == 0 || _gotRangerInterrupt) {
 
         _gotRangerInterrupt = false;
@@ -91,12 +93,11 @@ static void checkRanger(UsbMspSerializer & serializer, const uint8_t messageType
         _ranger.readData();
 
         for (auto i=0; i<_ranger.getPixelCount(); i++) {
-
-            _ranger.getDistanceMm(i);
+            data[i] = _ranger.getDistanceMm(i);
         }
-
-        // serializer.serializeShorts(messageType, vmsg, 16);
     } 
+
+    serializer.serializeShorts(messageType, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
