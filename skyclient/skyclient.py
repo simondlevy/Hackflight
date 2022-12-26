@@ -12,12 +12,13 @@ class SkyParser(MspParser):
 
         MspParser.__init__(self)
         self.port = port
-        self.msg = self.serialize_PAA3905_Request()
-        self._send()
+        self.msgVL53L5 = self.serialize_VL53L5_Request()
+        self.msgPAA3905 = self.serialize_PAA3905_Request()
+        self._sendPAA3905()
 
-    def _send(self):
+    def _sendPAA3905(self):
 
-        self.port.write(self.msg)
+        self.port.write(self.msgPAA3905)
 
     def handle_VL53L5(self, p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34, p41, p42, p43, p44):
 
@@ -26,7 +27,7 @@ class SkyParser(MspParser):
     def handle_PAA3905(self, x, y):
 
         print(x, y)
-        self._send()
+        self._sendPAA3905()
 
 
 cmdparser = ArgumentParser()
