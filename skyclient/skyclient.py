@@ -21,7 +21,8 @@ class SkyParser(MspParser):
 
     def handle_VL53L5(self, p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34, p41, p42, p43, p44):
 
-        pass
+        print(p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34, p41, p42, p43, p44)
+        self._sendVL53L5()
 
     def _sendVL53L5(self):
 
