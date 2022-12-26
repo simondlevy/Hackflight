@@ -119,7 +119,7 @@ class Scheduler {
         void corePostUpdate(uint32_t nowCycles)
         {
             // CPU busy
-            if (cmpTimeCycles(m_nextTimingCycles, nowCycles) < 0) {
+            if (intcmp(m_nextTimingCycles, nowCycles) < 0) {
                 m_nextTimingCycles += m_clockRate;
             }
             lastTargetCycles = m_nextTargetCycles;
@@ -144,7 +144,7 @@ class Scheduler {
         {
             m_nextTargetCycles = lastTargetCycles + desiredPeriodCycles;
 
-            m_loopRemainingCycles = cmpTimeCycles(m_nextTargetCycles, nowCycles);
+            m_loopRemainingCycles = intcmp(m_nextTargetCycles, nowCycles);
 
             if (m_loopRemainingCycles < -desiredPeriodCycles) {
                 // A task has so grossly overrun that at entire gyro cycle has
@@ -154,7 +154,7 @@ class Scheduler {
                 // scheduling by a whole number of cycles
                 m_nextTargetCycles += desiredPeriodCycles * (1 +
                         (m_loopRemainingCycles / -desiredPeriodCycles));
-                m_loopRemainingCycles = cmpTimeCycles(
+                m_loopRemainingCycles = intcmp(
                         m_nextTargetCycles, nowCycles);
             }
 
@@ -172,14 +172,14 @@ class Scheduler {
         bool isDynamicReady(uint32_t nowCycles) 
         {
             auto newLoopRemainingCyles =
-                cmpTimeCycles(m_nextTargetCycles, nowCycles);
+                intcmp(m_nextTargetCycles, nowCycles);
 
             return newLoopRemainingCyles > m_guardMargin;
         }
 
         void updateDynamic(uint32_t nowCycles, uint32_t anticipatedEndCycles)
         {
-            auto cyclesOverdue = cmpTimeCycles(nowCycles, anticipatedEndCycles);
+            auto cyclesOverdue = intcmp(nowCycles, anticipatedEndCycles);
 
             if ((cyclesOverdue > 0) || (-cyclesOverdue < m_taskGuardMinCycles)) {
 

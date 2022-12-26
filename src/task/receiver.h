@@ -26,7 +26,7 @@
 #include "core/pids/angle.h"
 #include "pwm.h"
 #include "task.h"
-#include "time.h"
+#include "utils.h"
 
 class Receiver : public Task {
 
@@ -146,9 +146,9 @@ class Receiver : public Task {
         {
             auto frameTimeUs = m_lastFrameTimeUs;
 
-            *frameAgeUs = cmpTimeUs(usec, frameTimeUs);
+            *frameAgeUs = intcmp(usec, frameTimeUs);
 
-            const auto deltaUs = cmpTimeUs(frameTimeUs, m_previousFrameTimeUs);
+            const auto deltaUs = intcmp(frameTimeUs, m_previousFrameTimeUs);
 
             if (deltaUs) {
                 m_frameTimeDeltaUs = deltaUs;
@@ -166,10 +166,10 @@ class Receiver : public Task {
 
             auto refreshPeriodUs = getFrameDelta(usec, &frameAgeUs);
 
-            if (!refreshPeriodUs || cmpTimeUs(usec, _lastRxTimeUs) <= frameAgeUs) {
+            if (!refreshPeriodUs || intcmp(usec, _lastRxTimeUs) <= frameAgeUs) {
 
                 // calculate a delta here if not supplied by the protocol
-                refreshPeriodUs = cmpTimeUs(usec, _lastRxTimeUs); 
+                refreshPeriodUs = intcmp(usec, _lastRxTimeUs); 
             }
 
             _lastRxTimeUs = usec;
@@ -215,7 +215,7 @@ class Receiver : public Task {
             }
 
             if ((signalReceived && useDataDrivenProcessing) ||
-                    cmpTimeUs(usec, m_nextUpdateAtUs) > 0) {
+                    intcmp(usec, m_nextUpdateAtUs) > 0) {
                 m_dataProcessingRequired = true;
             }
 
@@ -276,7 +276,7 @@ class Receiver : public Task {
         void adjustDynamicPriority(uint32_t usec) 
         {
             if (m_dynamicPriority > 0) {
-                m_ageCycles = 1 + (cmpTimeUs(usec, m_lastSignaledAtUs) / m_desiredPeriodUs);
+                m_ageCycles = 1 + (intcmp(usec, m_lastSignaledAtUs) / m_desiredPeriodUs);
                 m_dynamicPriority = 1 + m_ageCycles;
             } else  {
                 if (check(usec)) {

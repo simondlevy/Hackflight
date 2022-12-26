@@ -20,12 +20,7 @@
 
 #include <stdint.h>
 
-static inline int32_t cmpTimeUs(uint32_t a, uint32_t b)
-{
-    return (int32_t)(a - b);
-}
-
-static inline int32_t cmpTimeCycles(uint32_t a, uint32_t b)
+static inline int32_t intcmp(uint32_t a, uint32_t b)
 {
     return (int32_t)(a - b);
 }

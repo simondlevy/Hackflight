@@ -60,7 +60,7 @@ class Task {
             // (measured in desiredPeriods). Task age is calculated from last
             // execution.
             m_ageCycles =
-                (cmpTimeUs(usec, m_lastExecutedAtUs) / m_desiredPeriodUs);
+                (intcmp(usec, m_lastExecutedAtUs) / m_desiredPeriodUs);
             if (m_ageCycles > 0) {
                 m_dynamicPriority = 1 + m_ageCycles;
             }

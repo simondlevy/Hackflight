@@ -19,7 +19,7 @@
 #pragma once
 
 #include "demands.h"
-#include "time.h"
+#include "utils.h"
 #include "vstate.h"
 
 class PidController {
@@ -42,7 +42,7 @@ class PidController {
          {
              static uint32_t _prev;
 
-             const auto dusec = cmpTimeUs(usec, _prev);
+             const auto dusec = intcmp(usec, _prev);
 
              _prev = usec;
 
