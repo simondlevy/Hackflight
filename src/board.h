@@ -66,7 +66,7 @@ class Board {
             while (loopRemainingCycles > 0) {
                 nowCycles = getCycleCounter();
                 loopRemainingCycles =
-                    cmpTimeCycles(nextTargetCycles, nowCycles);
+                    intcmp(nextTargetCycles, nowCycles);
             }
 
             if (m_imu->gyroIsReady()) {
@@ -169,7 +169,7 @@ class Board {
                 const auto nowCycles = getCycleCounter();
 
                 const auto loopRemainingCycles =
-                    cmpTimeCycles(nextTargetCycles, nowCycles);
+                    intcmp(nextTargetCycles, nowCycles);
 
                 // Allow a little extra time
                 const auto taskRequiredCycles =

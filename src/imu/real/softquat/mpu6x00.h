@@ -217,7 +217,7 @@ class Mpu6x00 : public SoftQuatImu {
             // unfortunately the port used for EXTI interrupt does not have an
             // associated timer
             uint32_t nowCycles = m_board->getCycleCounter();
-            int32_t gyroLastPeriod = cmpTimeCycles(nowCycles, prevTime);
+            int32_t gyroLastPeriod = intcmp(nowCycles, prevTime);
 
             // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
             if ((m_shortPeriod == 0) || (gyroLastPeriod < m_shortPeriod)) {

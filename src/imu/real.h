@@ -26,7 +26,7 @@
 #include "core/vstate.h"
 #include "imu.h"
 #include "stats.h"
-#include "time.h"
+#include "utils.h"
 
 class RealImu : public Imu {
 
@@ -228,7 +228,7 @@ class RealImu : public Imu {
                 const int32_t desiredPeriodCycles) override
         {
             const auto skew =
-                cmpTimeCycles(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;
+                intcmp(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;
 
             return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
         }

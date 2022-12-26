@@ -24,8 +24,7 @@
 #include "task.h"
 #include "esc.h"
 #include "imu.h"
-#include "msp/parser.h"
-#include "msp/serializer.h"
+#include "msp/usb.h"
 #include "receiver.h"
 
 class UsbTask : public Task {
@@ -47,14 +46,14 @@ class UsbTask : public Task {
         Receiver *       m_receiver;
         VehicleState *   m_vstate;
 
-        MspParser m_parser;
-        MspSerializer m_serializer;
+        UsbMsp m_msp;
 
         bool m_gotRebootRequest;
 
-        void sendOutBuf(void)
+        void sendShorts(
+                const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
-            Serial.write(m_serializer.outBuf, m_serializer.outBufSize);
+            m_msp.serializeShorts(messageType, src, count);
         }
 
     protected:
@@ -63,53 +62,55 @@ class UsbTask : public Task {
         {
             (void)usec;
 
-            while (Serial.available()) {
+            while (m_msp.available()) {
 
-                auto byte = Serial.read();
+                auto byte = m_msp.read();
 
-                //Serial4.println(byte, HEX);
-
-                if (m_parser.isIdle() && byte == 'R') {
+                if (m_msp.isIdle() && byte == 'R') {
                     m_gotRebootRequest = true;
                 }
 
-                auto messageType = m_parser.parse(byte);
+                auto messageType = m_msp.parse(byte);
 
                 switch (messageType) {
 
                     case 105: // RC
                         {
-                            auto c1 = (uint16_t)m_receiver->getRawThrottle();
-                            auto c2 = (uint16_t)m_receiver->getRawRoll();
-                            auto c3 = (uint16_t)m_receiver->getRawPitch();
-                            auto c4 = (uint16_t)m_receiver->getRawYaw();
-                            auto c5 = scale(m_receiver->getRawAux1());
-                            auto c6 = scale(m_receiver->getRawAux2());
-                            m_serializer.serializeRawRc(105, c1, c2, c3, c4, c5, c6);
-                            sendOutBuf();
+                            int16_t channels[] = {
+                                (int16_t)m_receiver->getRawThrottle(),
+                                (int16_t)m_receiver->getRawRoll(),
+                                (int16_t)m_receiver->getRawPitch(),
+                                (int16_t)m_receiver->getRawYaw(),
+                                (int16_t)scale(m_receiver->getRawAux1()),
+                                (int16_t)scale(m_receiver->getRawAux2())
+                            };
+
+                            sendShorts(105, channels, 6);
 
                         } break;
 
                     case 108: // ATTITUDE
                         {
-                            m_serializer.prepareToSerializeShorts(messageType, 3);
-                            m_serializer.serializeShort(10 * rad2degi(m_vstate->phi));
-                            m_serializer.serializeShort(10 * rad2degi(m_vstate->theta));
-                            m_serializer.serializeShort(rad2degi(m_vstate->psi));
-                            m_serializer.completeSerialize();
-                            sendOutBuf();
+                            int16_t angles[] = {
+                                (int16_t)(10 * rad2degi(m_vstate->phi)),
+                                (int16_t)(10 * rad2degi(m_vstate->theta)),
+                                (int16_t)rad2degi(m_vstate->psi)
+                            };
+
+                            sendShorts(108, angles, 3);
+
                         } break;
 
                     case 214: // SET_MOTORS
                         {
                             motors[0] =
-                                m_esc->convertFromExternal(m_parser.parseShort(0));
+                                m_esc->convertFromExternal(m_msp.parseShort(0));
                             motors[1] =
-                                m_esc->convertFromExternal(m_parser.parseShort(1));
+                                m_esc->convertFromExternal(m_msp.parseShort(1));
                             motors[2] =
-                                m_esc->convertFromExternal(m_parser.parseShort(2));
+                                m_esc->convertFromExternal(m_msp.parseShort(2));
                             motors[3] =
-                                m_esc->convertFromExternal(m_parser.parseShort(3));
+                                m_esc->convertFromExternal(m_msp.parseShort(3));
 
                         } break;
 
@@ -134,7 +135,7 @@ class UsbTask : public Task {
                 Receiver * receiver,
                 VehicleState * vstate)
         {
-            Serial.begin(115200);
+            m_msp.begin();
 
             m_esc = esc;
             m_arming = arming;

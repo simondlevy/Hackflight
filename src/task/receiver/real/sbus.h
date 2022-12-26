@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 #include "task/receiver/real.h"
-#include "time.h"
+#include "utils.h"
 
 
 class SbusReceiver : public RealReceiver {
@@ -127,7 +127,7 @@ class SbusReceiver : public RealReceiver {
         virtual void parse(const uint8_t c) override
         {
             const uint32_t usec = micros();
-            const int32_t timeInterval = cmpTimeUs(usec, m_startAtUs);
+            const int32_t timeInterval = intcmp(usec, m_startAtUs);
 
             if (timeInterval > 3500) {
                 m_position = 0;

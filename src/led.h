@@ -21,7 +21,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "time.h"
+#include "utils.h"
 
 class Led {
 

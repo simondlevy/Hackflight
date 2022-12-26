@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include "task/receiver/real.h"
-#include "time.h"
+#include "utils.h"
 
 class DsmxReceiver : public RealReceiver {
 
@@ -103,7 +103,7 @@ class DsmxReceiver : public RealReceiver {
         virtual void parse(const uint8_t c) override
         {
             const uint32_t usec = micros();
-            const uint32_t timeInterval = cmpTimeUs(usec, m_frameData.lastTimeUs);
+            const uint32_t timeInterval = intcmp(usec, m_frameData.lastTimeUs);
 
             m_frameData.lastTimeUs = usec;
 
