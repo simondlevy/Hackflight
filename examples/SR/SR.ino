@@ -27,10 +27,8 @@
 
 #include <hackflight.h>
 #include <debugger.h>
-
-//#include <msp/parser.h>
-//#include <espnow.h>
-//#include <esp_now.h>
+#include "msp/parser.h"
+#include "msp/serializer/usb.h"
 
 // MCU choice --------------------------------------------------------
 
@@ -65,6 +63,42 @@ static void rangerInterruptHandler()
     _gotRangerInterrupt = true;
 }
 
+static void startRanger(void)
+{
+    Wire.begin();                
+    Wire.setClock(400000);      
+    delay(1000);
+
+    pinMode(VL53L5_INT_PIN, INPUT);     
+
+    if (VL53L5_INT_PIN > 0) {
+        attachInterrupt(VL53L5_INT_PIN, rangerInterruptHandler, FALLING);
+    }
+
+    _ranger.begin();
+}
+
+static void checkRanger(UsbMspSerializer & serializer, const uint8_t messageType)
+{
+    if (VL53L5_INT_PIN == 0 || _gotRangerInterrupt) {
+
+        _gotRangerInterrupt = false;
+
+        while (!_ranger.dataIsReady()) {
+            delay(10);
+        }
+
+        _ranger.readData();
+
+        for (auto i=0; i<_ranger.getPixelCount(); i++) {
+
+            _ranger.getDistanceMm(i);
+        }
+
+        // serializer.serializeShorts(messageType, vmsg, 16);
+    } 
+}
+
 // PAA3905 -----------------------------------------------------------
 
 static const uint8_t PAA3905_CS_PIN  = TP_CS_PIN; 
@@ -85,31 +119,9 @@ void motionInterruptHandler()
     _gotMotionInterrupt = true;
 }
 
-// ------------------------------------------------------------------
 
-
-//static const bool UART_INVERTED = false;
-//static const uint8_t RX_PIN = 4; // unused
-//static const uint8_t TX_PIN = 14;
-
-//static MspSerializer _serializer;
-
-void setup()
+static void startMocap(void)
 {
-    Serial.begin(115200);
-
-    pinMode(VL53L5_INT_PIN, INPUT);     
-
-    Wire.begin();                
-    Wire.setClock(400000);      
-    delay(1000);
-
-    if (VL53L5_INT_PIN > 0) {
-        attachInterrupt(VL53L5_INT_PIN, rangerInterruptHandler, FALLING);
-    }
-
-    _ranger.begin();
-
     // Start SPI
     SPI.begin();
 
@@ -124,45 +136,12 @@ void setup()
 
     pinMode(PAA3905_MOT_PIN, INPUT); 
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
-
-    // Start outgoing serial connection to FC, inverted
-    //Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN, UART_INVERTED);
 }
 
-static void checkRanger(void)
+static void checkMocap(UsbMspSerializer & serializer, const uint8_t messageType)
 {
-    if (VL53L5_INT_PIN == 0 || _gotRangerInterrupt) {
+    static int16_t data[2];
 
-        _gotRangerInterrupt = false;
-
-        while (!_ranger.dataIsReady()) {
-            delay(10);
-        }
-
-        _ranger.readData();
-
-        for (auto i=0; i<_ranger.getPixelCount(); i++) {
-
-            // Print per zone results 
-            Debugger::printf("Zone : %2d, Nb targets : %2u, Ambient : %4lu Kcps/spads, ",
-                    i, _ranger.getTargetDetectedCount(i), _ranger.getAmbientPerSpad(i));
-
-            // Print per target results 
-            if (_ranger.getTargetDetectedCount(i) > 0) {
-                Debugger::printf("Target status : %3u, Distance : %4d mm\n",
-                        _ranger.getTargetStatus(i), _ranger.getDistanceMm(i));
-            }
-            else {
-                Debugger::printf("Target status : 255, Distance : No target\n");
-            }
-        }
-        Debugger::printf("\n");
-    } 
-
-} // checkRanger
-
-static void checkMocap(void)
-{
     if (_gotMotionInterrupt) {
 
         _gotMotionInterrupt = false;
@@ -171,52 +150,50 @@ static void checkMocap(void)
 
         if (_mocap.motionDataAvailable()) { 
 
-            static uint32_t _count;
-
-            Debugger::printf("\n%05d ---------------------------------\n", _count++);
-
-            if (_mocap.challengingSurfaceDetected()) {
-                Debugger::printf("Challenging surface detected!\n");
-            }
-
-            int16_t deltaX = _mocap.getDeltaX();
-            int16_t deltaY = _mocap.getDeltaY();
-
             uint8_t surfaceQuality = _mocap.getSurfaceQuality();
-            uint8_t rawDataSum = _mocap.getRawDataSum();
-            uint8_t rawDataMax = _mocap.getRawDataMax();
-            uint8_t rawDataMin = _mocap.getRawDataMin();
 
             uint32_t shutter = _mocap.getShutter();
 
             PAA3905_MotionCapture::lightMode_t lightMode = _mocap.getLightMode();
 
-            static const char * light_mode_names[4] = {"Bright", "Low", "Super-low", "Unknown"};
-            Debugger::printf("%s light mode\n", light_mode_names[lightMode]);
-
-            // Don't report X,Y if surface quality and shutter are under thresholds
+            // Send X,Y if surface quality and shutter are above thresholds
             if (_mocap.dataAboveThresholds(lightMode, surfaceQuality, shutter)) {
-                Debugger::printf("X: %d  Y: %d\n", deltaX, deltaY);
+                data[0] = _mocap.getDeltaX();
+                data[1] = _mocap.getDeltaY();
             }
-            else {
-                Debugger::printf("Data is below thresholds for X,Y reporting\n");
-            }
-
-            Debugger::printf("Number of Valid Features: %d, shutter: 0x%X\n",
-                    4*surfaceQuality, shutter);
-            Debugger::printf("Max raw data: %d  Min raw data: %d  Avg raw data: %d\n",
-                    rawDataMax, rawDataMin, rawDataSum);
         }
     }
 
-} // checkMocap
+    serializer.serializeShorts(messageType, data, 2);
+}
+
+// ------------------------------------------------------------------
+
+void setup()
+{
+    Serial.begin(115200);
+    startRanger();
+    startMocap();
+}
 
 void loop()
 {
-    //static uint8_t _count;
-    //Serial1.write(_count);
-    //_count = (_count + 1) % 256;
+    static MspParser _parser;
+    static UsbMspSerializer _serializer;
 
-    checkRanger();
-    checkMocap();
+    while (Serial.available()) {
+
+        auto messageType = _parser.parse(Serial.read());
+
+        switch (messageType) {
+
+            case 121:   // VL53L5
+                checkRanger(_serializer, messageType);
+                break;
+
+            case 122: // PAA3905
+                checkMocap(_serializer, messageType);
+                break;
+        }
+    }
 }
