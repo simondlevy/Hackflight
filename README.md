@@ -54,7 +54,7 @@ Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-b
 approach to taming the complexity of flight control.  In your ```setup()``` function you
 instantiate a Board subclass, passing it the objects for your receiver, IMU,
 PID controllers, mixer, ESC, and LED pin number.  In your ```loop``` function, you just call 
-the ```step()``` method on the Board object.  Check out this
+the ```step()``` method on the Board object.  Look at this
 [example program](https://github.com/simondlevy/Hackflight/blob/master/examples/BetaFpvF405Sbus/BetaFpvF405Sbus.ino)
 to get an idea of how this approach works.
 
