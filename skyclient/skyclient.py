@@ -19,6 +19,10 @@ class SkyParser(MspParser):
 
         self.port.write(self.msg)
 
+    def handle_VL53L5(self, p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34, p41, p42, p43, p44):
+
+        pass
+
     def handle_PAA3905(self, x, y):
 
         print(x, y)

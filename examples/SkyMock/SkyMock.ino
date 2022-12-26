@@ -21,11 +21,11 @@ void loop(void)
 
         switch (messageType) {
 
-            case 121: // PAA3905
+            case 122: // PAA3905
 
                 int16_t msg[] = {x, y};
 
-                _serializer.serializeShorts(121, msg, 2);
+                _serializer.serializeShorts(messageType, msg, 2);
 
                 break;
         }

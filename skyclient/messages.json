@@ -1,6 +1,26 @@
 {
-  "PAA3905": 
+  "VL53L5": 
   [{"ID": 121},
+   {"comment": "https://www.tindie.com/products/onehorse/vl53l5cx-ranging-camera/"}, 
+   {"p11": "short"}, 
+   {"p12": "short"}, 
+   {"p13": "short"}, 
+   {"p14": "short"}, 
+   {"p21": "short"}, 
+   {"p22": "short"}, 
+   {"p23": "short"}, 
+   {"p24": "short"}, 
+   {"p31": "short"}, 
+   {"p32": "short"}, 
+   {"p33": "short"}, 
+   {"p34": "short"}, 
+   {"p41": "short"}, 
+   {"p42": "short"}, 
+   {"p43": "short"}, 
+   {"p44": "short"}],
+
+  "PAA3905": 
+  [{"ID": 122},
    {"comment": "https://www.tindie.com/products/onehorse/paa3905-optical-flow-camera/"}, 
    {"x": "short"}, 
    {"y": "short"}]
