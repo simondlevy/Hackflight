@@ -5,7 +5,7 @@
 ## Intro
 
 Hackflight is a C++ software toolkit for building multirotor flight
-controllers and simulators.  It is geared toward people like me who want to tinker with
+controllers.  It is geared toward people like me who want to tinker with
 flight-control firmware, and use it to teach students about ideas like inertial
 measurement and PID tuning.  <b>If you are in the 99% percent of users who just
 want to get your vehicle flying without getting into firmware hacking, I
@@ -35,8 +35,7 @@ Hackflight has been tested on the following platforms:
 
 To make it easy to develop flight firmware using Arduino-compatible
 microcontrollers, Hackflight is laid out as an Arduino library; however,
-this does not limit your ability to use it on other hardware platforms 
-and simulators.
+the core flight-control algorithm is hardware-independent.
 
 ## Design principles
 
@@ -50,14 +49,13 @@ example, the maintenance of an error integral in a PID controller:
 <img src="media/dataflow2.png" width=700>
 </p>
 
-By using header-only C++ classes whenever possible, and avoiding C-style macros and
- [complicated inheritance](https://queue.acm.org/detail.cfm?id=2038036), 
+By using header-only C++ classes whenever possible, and avoiding C-style macros,
 Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-beckman-dont-fear-the-monad) 
 approach to taming the complexity of flight control.  In your ```setup()``` function you
 instantiate a Board subclass, passing it the objects for your receiver, IMU,
 PID controllers, mixer, ESC, and LED pin number.  In your ```loop``` function, you just call 
-the ```step()``` method on the Board object.  Check out this [example
-program](https://github.com/simondlevy/Hackflight/blob/master/examples/BetaFPVF405Sbus/BetaFPVF405Sbus.ino)
+the ```step()``` method on the Board object.  Check out this
+[example program](https://github.com/simondlevy/Hackflight/blob/master/examples/BetaFpvF405Sbus/BetaFpvF405Sbus.ino)
 to get an idea of how this approach works.
 
 ## Desktop visualizer app
