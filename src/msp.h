@@ -21,9 +21,11 @@
 
 #include <stdint.h>
 
-class MspParser {
+class Msp {
 
     private:
+
+        static const uint8_t BUF_SIZE = 128;
 
         typedef enum {
             IDLE,
@@ -37,9 +39,75 @@ class MspParser {
 
         parserState_t m_parserState;
 
-        uint8_t m_payload[128] = {};
+        uint8_t m_payload[BUF_SIZE] = {};
+
+        uint8_t outBufChecksum;
+        uint8_t outBufIndex;
+
+        void serialize16(int16_t a)
+        {
+            serialize8(a & 0xFF);
+            serialize8((a >> 8) & 0xFF);
+        }
+
+        void prepareToSerialize(uint8_t type, uint8_t count, uint8_t size)
+        {
+            outBufSize = 0;
+            outBufIndex = 0;
+            outBufChecksum = 0;
+
+            addToOutBuf('$');
+            addToOutBuf('M');
+            addToOutBuf('>');
+            serialize8(count*size);
+            serialize8(type);
+        }
+
+        void addToOutBuf(uint8_t a)
+        {
+            outBuf[outBufSize++] = a;
+        }
+
+        void serialize8(uint8_t a)
+        {
+            addToOutBuf(a);
+            outBufChecksum ^= a;
+        }
+
+        void prepareToSerializeBytes(uint8_t type, uint8_t count)
+        {
+            prepareToSerialize(type, count, 1);
+        }
+
+        void serializeByte(uint8_t src)
+        {
+            serialize8(src);
+        }
+
+        void prepareToSerializeInts(uint8_t type, uint8_t count)
+        {
+            prepareToSerialize(type, count, 4);
+        }
+
+        void prepareToSerializeFloats(uint8_t type, uint8_t count)
+        {
+            prepareToSerialize(type, count, 4);
+        }
+
+        uint8_t outBuf[BUF_SIZE];
+        uint8_t outBufSize;
+
+    protected:
+
+        virtual void write(const uint8_t buf[], const uint8_t size) = 0;
 
     public:
+
+        virtual uint32_t available(void) = 0;
+
+        virtual void begin(void) = 0;
+
+        virtual uint8_t read(void) = 0;
 
         parserState_t getParserState(void)
         {
@@ -116,4 +184,34 @@ class MspParser {
 
         }
 
-}; // class MspParser
+        void prepareToSerializeShorts(uint8_t messageType, uint8_t count)
+        {
+            prepareToSerialize(messageType, count, 2);
+        }
+
+        void completeSerialize(void)
+        {
+            serialize8(outBufChecksum);
+            write(outBuf, outBufSize);
+        }
+
+        void serializeShort(uint16_t src)
+        {
+            uint16_t a;
+            memcpy(&a, &src, 2);
+            serialize16(a);
+        }
+
+        void serializeShorts(
+                const uint8_t messageType, const int16_t src[], const uint8_t count)
+        {
+            prepareToSerializeShorts(messageType, count);
+
+            for (auto k=0; k<count; ++k) {
+                serializeShort(src[k]);
+            }
+
+            completeSerialize();
+        }
+
+}; // class Msp

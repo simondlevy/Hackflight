@@ -21,9 +21,9 @@
 
 #include <stdint.h>
 
-#include "msp/serializer.h"
+#include "msp.h"
 
-class UsbMspSerializer : public MspSerializer {
+class UsbMsp : public Msp {
 
     protected:
 
@@ -32,4 +32,21 @@ class UsbMspSerializer : public MspSerializer {
             Serial.write(buf, size);
         }
 
-}; // class UsbMspSerializer
+    public:
+
+        virtual uint32_t available(void) override
+        {
+            return Serial.available();
+        }
+
+        virtual void begin(void) override
+        {
+            Serial.begin(115200);
+        }
+
+        virtual uint8_t read(void) override
+        {
+            return Serial.read();
+        }
+
+};

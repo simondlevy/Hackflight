@@ -24,8 +24,7 @@
 #include "task.h"
 #include "esc.h"
 #include "imu.h"
-#include "msp/parser.h"
-#include "msp/serializer/usb.h"
+#include "msp/usb.h"
 #include "receiver.h"
 
 class UsbTask : public Task {
@@ -47,15 +46,14 @@ class UsbTask : public Task {
         Receiver *       m_receiver;
         VehicleState *   m_vstate;
 
-        MspParser m_parser;
-        UsbMspSerializer m_serializer;
+        UsbMsp m_msp;
 
         bool m_gotRebootRequest;
 
         void sendShorts(
                 const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
-            m_serializer.serializeShorts(messageType, src, count);
+            m_msp.serializeShorts(messageType, src, count);
         }
 
     protected:
@@ -64,15 +62,15 @@ class UsbTask : public Task {
         {
             (void)usec;
 
-            while (Serial.available()) {
+            while (m_msp.available()) {
 
-                auto byte = Serial.read();
+                auto byte = m_msp.read();
 
-                if (m_parser.isIdle() && byte == 'R') {
+                if (m_msp.isIdle() && byte == 'R') {
                     m_gotRebootRequest = true;
                 }
 
-                auto messageType = m_parser.parse(byte);
+                auto messageType = m_msp.parse(byte);
 
                 switch (messageType) {
 
@@ -106,13 +104,13 @@ class UsbTask : public Task {
                     case 214: // SET_MOTORS
                         {
                             motors[0] =
-                                m_esc->convertFromExternal(m_parser.parseShort(0));
+                                m_esc->convertFromExternal(m_msp.parseShort(0));
                             motors[1] =
-                                m_esc->convertFromExternal(m_parser.parseShort(1));
+                                m_esc->convertFromExternal(m_msp.parseShort(1));
                             motors[2] =
-                                m_esc->convertFromExternal(m_parser.parseShort(2));
+                                m_esc->convertFromExternal(m_msp.parseShort(2));
                             motors[3] =
-                                m_esc->convertFromExternal(m_parser.parseShort(3));
+                                m_esc->convertFromExternal(m_msp.parseShort(3));
 
                         } break;
 
@@ -137,7 +135,7 @@ class UsbTask : public Task {
                 Receiver * receiver,
                 VehicleState * vstate)
         {
-            Serial.begin(115200);
+            m_msp.begin();
 
             m_esc = esc;
             m_arming = arming;

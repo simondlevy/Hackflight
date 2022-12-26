@@ -27,8 +27,7 @@
 
 #include <hackflight.h>
 #include <debugger.h>
-#include "msp/parser.h"
-#include "msp/serializer/usb.h"
+#include "msp/usb.h"
 
 // MCU choice --------------------------------------------------------
 
@@ -78,7 +77,7 @@ static void startRanger(void)
     _ranger.begin();
 }
 
-static void checkRanger(UsbMspSerializer & serializer, const uint8_t messageType)
+static void checkRanger(UsbMsp & msp, const uint8_t messageType)
 {
     static int16_t data[16];
 
@@ -97,7 +96,7 @@ static void checkRanger(UsbMspSerializer & serializer, const uint8_t messageType
         }
     } 
 
-    serializer.serializeShorts(messageType, data, 16);
+    msp.serializeShorts(messageType, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -120,7 +119,6 @@ void motionInterruptHandler()
     _gotMotionInterrupt = true;
 }
 
-
 static void startMocap(void)
 {
     // Start SPI
@@ -139,7 +137,7 @@ static void startMocap(void)
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
 }
 
-static void checkMocap(UsbMspSerializer & serializer, const uint8_t messageType)
+static void checkMocap(UsbMsp & msp, const uint8_t messageType)
 {
     static int16_t data[2];
 
@@ -165,35 +163,35 @@ static void checkMocap(UsbMspSerializer & serializer, const uint8_t messageType)
         }
     }
 
-    serializer.serializeShorts(messageType, data, 2);
+    msp.serializeShorts(messageType, data, 2);
 }
 
 // ------------------------------------------------------------------
 
+static UsbMsp _msp;
+
 void setup()
 {
-    Serial.begin(115200);
+    _msp.begin();
+
     startRanger();
     startMocap();
 }
 
 void loop()
 {
-    static MspParser _parser;
-    static UsbMspSerializer _serializer;
-
     while (Serial.available()) {
 
-        auto messageType = _parser.parse(Serial.read());
+        auto messageType = _msp.parse(Serial.read());
 
         switch (messageType) {
 
             case 121:   // VL53L5
-                checkRanger(_serializer, messageType);
+                checkRanger(_msp, messageType);
                 break;
 
             case 122: // PAA3905
-                checkMocap(_serializer, messageType);
+                checkMocap(_msp, messageType);
                 break;
         }
     }

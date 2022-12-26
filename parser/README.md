@@ -7,8 +7,7 @@
 based on a simple JSON specification.  By using this script you can avoid the
 lengthy and error-prone task of writing your own parsing code from scratch.
 Python and Java outputs are currently supported.  (For C++ you can use the
-existing [MspParser](https://github.com/simondlevy/Hackflight/blob/master/src/msp/parser.h)
-and [MspSerializer](https://github.com/simondlevy/Hackflight/blob/master/src/msp/serializer.h) classes.)
+existing [Msp](https://github.com/simondlevy/Hackflight/blob/master/src/msp/parser.h) class.)
 
 ## Usage
 
