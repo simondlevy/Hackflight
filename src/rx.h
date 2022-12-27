@@ -274,25 +274,6 @@ class Rx {
             return m_gotPidReset;
         }
 
-#if 0
-        // Increase priority for RX task
-        void adjustDynamicPriority(uint32_t usec) 
-        {
-            if (m_dynamicPriority > 0) {
-                m_ageCycles = 1 + (intcmp(usec, m_lastSignaledAtUs) / m_desiredPeriodUs);
-                m_dynamicPriority = 1 + m_ageCycles;
-            } else  {
-                if (check(usec)) {
-                    m_lastSignaledAtUs = usec;
-                    m_ageCycles = 1;
-                    m_dynamicPriority = 2;
-                } else {
-                    m_ageCycles = 0;
-                }
-            }
-        }    
-#endif
-
     protected:
 
         Board * m_board;
