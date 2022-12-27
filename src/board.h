@@ -192,6 +192,13 @@ class Board {
 
     protected:
 
+        enum {
+            TASK_NONE,
+            TASK_ATTITUDE,
+            TASK_USB,
+            TASK_RECEIVER
+        };
+
         Board(
                 Receiver & receiver,
                 Imu & imu,

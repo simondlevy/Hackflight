@@ -33,7 +33,23 @@ class Stm32Board : public Board {
         {
         }
 
+        Stm32Board(
+                Receiver & receiver,
+                Imu & imu,
+                vector<PidController *> & pids,
+                Mixer & mixer,
+                Esc & esc,
+                HardwareSerial & uart,
+                const int8_t ledPin)
+            : Board(receiver, imu, pids, mixer, esc, ledPin)
+        {
+            (void)uart;
+        }
+
      private:
+
+
+        void (*uartFun)(void);
 
         virtual uint32_t getClockSpeed(void) override
         {
