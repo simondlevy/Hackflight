@@ -148,13 +148,17 @@ class Board {
         void checkDynamicTasks(void)
         {
             Task *selectedTask = NULL;
-            uint16_t selectedTaskDynamicPriority = 0;
 
             const uint32_t usec = micros();
 
-            m_receiver->update(usec, &selectedTask, &selectedTaskDynamicPriority);
-            m_attitudeTask.update(usec, &selectedTask, &selectedTaskDynamicPriority);
-            m_usbTask.update(usec, &selectedTask, &selectedTaskDynamicPriority);
+            uint16_t selectedPriority =
+                m_receiver->update(usec, &selectedTask, 0);
+
+            selectedPriority = 
+                m_attitudeTask.update(usec, &selectedTask, selectedPriority);
+
+            selectedPriority =
+                m_usbTask.update(usec, &selectedTask, selectedPriority);
 
             if (m_usbTask.gotRebootRequest()) {
                 reboot();
@@ -192,12 +196,12 @@ class Board {
 
     protected:
 
-        enum {
+        typedef enum {
             TASK_NONE,
             TASK_ATTITUDE,
             TASK_USB,
             TASK_RECEIVER
-        };
+        } task_t;
 
         Board(
                 Receiver & receiver,

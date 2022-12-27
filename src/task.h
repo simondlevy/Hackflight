@@ -100,14 +100,16 @@ class Task {
             return m_anticipatedExecutionTime >> EXEC_TIME_SHIFT;
         }
 
-        void update(uint32_t usec, Task ** selected, uint16_t * selectedPriority)
+        uint16_t update(uint32_t usec, Task ** selected, uint16_t selectedPriority)
         {
             adjustDynamicPriority(usec);
 
-            if (m_dynamicPriority > *selectedPriority) {
-                *selectedPriority = m_dynamicPriority;
+            if (m_dynamicPriority > selectedPriority) {
+                selectedPriority = m_dynamicPriority;
                 *selected = this;
             }
+
+            return selectedPriority;
         }
 
         virtual void fun(uint32_t usec) = 0;
