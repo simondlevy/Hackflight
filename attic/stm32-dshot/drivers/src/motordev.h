@@ -19,7 +19,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 #include <motor.h>
 #include <time.h>
 
-static const uint8_t  MOTOR_IO_TAGS[] = {32, 33, 19, 18};
+static const uint8_t  MOTOR_IO_TAGS[] = {0x20, 0x21, 0x13, 0x12};
 
 static const uint8_t MOTOR_PWM_PROTOCOL = 7;
 
