@@ -27,7 +27,7 @@
 
 #include <hackflight.h>
 #include <debugger.h>
-#include "msp/usb.h"
+#include "msp/uart.h"
 
 // MCU choice --------------------------------------------------------
 
@@ -40,6 +40,10 @@ static const uint8_t TP_INT_PIN = 4;
 static const uint8_t TP_LPN_PIN = 14;
 static const uint8_t TP_CS_PIN  = 5;
 static const uint8_t TP_MOT_PIN = 32;
+
+// TP
+static const uint8_t RX1_PIN = 15;
+static const uint8_t TX1_PIN = 27;
 
 // VL53L5 -------------------------------------------------------------
 
@@ -77,7 +81,7 @@ static void startRanger(void)
     _ranger.begin();
 }
 
-static void checkRanger(UsbMsp & msp, const uint8_t messageType)
+static void checkRanger(UartMsp & msp, const uint8_t messageType)
 {
     static int16_t data[16];
 
@@ -137,7 +141,7 @@ static void startMocap(void)
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
 }
 
-static void checkMocap(UsbMsp & msp, const uint8_t messageType)
+static void checkMocap(UartMsp & msp, const uint8_t messageType)
 {
     static int16_t data[2];
 
@@ -168,10 +172,12 @@ static void checkMocap(UsbMsp & msp, const uint8_t messageType)
 
 // ------------------------------------------------------------------
 
-static UsbMsp _msp;
+static UartMsp _msp(Serial1);
 
 void setup()
 {
+    Serial1.begin(115200, SERIAL_8N1, RX1_PIN, TX1_PIN);
+
     _msp.begin();
 
     startRanger();

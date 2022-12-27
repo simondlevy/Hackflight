@@ -18,6 +18,7 @@
  */
 
 #include <hackflight.h>
+#include <debugger.h>
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
@@ -72,6 +73,8 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 void setup(void)
 {
+    Serial4.begin(115200);
+
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
@@ -92,4 +95,8 @@ void setup(void)
 void loop(void)
 {
     _board->step();
+
+    while (Serial4.available()) {
+        HfDebugger::printf("x%02x\n", Serial4.read());
+    }
 }
