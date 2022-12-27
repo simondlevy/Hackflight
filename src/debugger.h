@@ -65,7 +65,7 @@ class HfDebugger {
                 sgn = '-';
             }
             uint32_t bigval = (uint32_t)(val*mul);
-            Debugger::printf("%c%d.%d", sgn, bigval/mul, bigval % mul);
+            HfDebugger::printf("%c%d.%d", sgn, bigval/mul, bigval % mul);
         }
 
         static void printlnfloat(float val, uint8_t prec=3)
