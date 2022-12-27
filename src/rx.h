@@ -3,14 +3,15 @@
 
    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+   Hackflight is free software: you can redistribute it and/or modify it under
+   the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
@@ -18,22 +19,10 @@
 
 #pragma once
 
-#include "arming.h"
-#include "core/clock.h"
-#include "core/constrain.h"
-#include "core/demands.h"
-#include "core/filters/pt3.h"
-#include "core/pids/angle.h"
-#include "pwm.h"
-#include "rx.h"
-#include "task.h"
-#include "utils.h"
+#include <stdbool.h>
+#include <stdint.h>
 
-class ReceiverTask : public Task {
-
-    friend class Board;
-
-    private:
+class Rx {
 
         static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
 
@@ -52,6 +41,7 @@ class ReceiverTask : public Task {
         // maximum PWM pulse width which is considered valid
         static const uint16_t PWM_PULSE_MAX   = 2250;  
 
+#if 0
         Arming * m_arming;
 
         typedef enum {
@@ -321,7 +311,7 @@ class ReceiverTask : public Task {
         }
 
         // Task function, called periodically
-        virtual void fun(uint32_t usec) override
+        void fun(uint32_t usec)
         {
             const auto haveSignal = (usec - m_lastFrameTimeUs) < (int32_t)(1000*TIMEOUT_MS);
 
@@ -394,5 +384,6 @@ class ReceiverTask : public Task {
         {
             return m_rawAux2;
         }
+#endif
 
-};
+}; // class Rx
