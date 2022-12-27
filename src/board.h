@@ -196,13 +196,6 @@ class Board {
 
     protected:
 
-        typedef enum {
-            TASK_NONE,
-            TASK_ATTITUDE,
-            TASK_USB,
-            TASK_RECEIVER
-        } task_t;
-
         Board(
                 Receiver & receiver,
                 Imu & imu,

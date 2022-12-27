@@ -24,6 +24,15 @@
 
 class Task {
 
+    public:
+
+        typedef enum {
+            NONE,
+            ATTITUDE,
+            USB,
+            RECEIVER
+        } task_t;
+
     private:
 
         // Some task have occasional peaks in execution time so normal moving
