@@ -39,9 +39,8 @@ int main(void)
 
         Hackflight::step(&hf);
 
-        extern uint8_t g_pin;
-
-        debugPrintf("x%02X\n", g_pin);
+        //extern uint8_t g_pin;
+        // debugPrintf("x%02X\n", g_pin);
     }
 
     return 0;
