@@ -31,7 +31,7 @@ class Task {
             ATTITUDE,
             USB,
             RECEIVER
-        } task_t;
+        } id_t;
 
     private:
 
