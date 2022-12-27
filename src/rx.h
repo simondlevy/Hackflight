@@ -297,9 +297,8 @@ class Rx {
                 float & rawAux2,
                 uint32_t & frameTimeUs) = 0;
 
-#if 0
-        // Task function, called periodically
-        void fun(uint32_t usec)
+        // Called perioidically by receiverTask::fun()
+        void update(uint32_t usec)
         {
             const auto haveSignal = (usec - m_lastFrameTimeUs) < (int32_t)(1000*TIMEOUT_MS);
 
@@ -340,7 +339,6 @@ class Rx {
                 m_gotPidReset = pidItermResetValue;
             }
         }
-#endif
 
 
     public:
