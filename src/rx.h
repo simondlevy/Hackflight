@@ -22,6 +22,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "arming.h"
+#include "core/clock.h"
+#include "core/constrain.h"
+#include "core/demands.h"
+#include "core/filters/pt3.h"
+#include "core/pids/angle.h"
+#include "pwm.h"
+#include "utils.h"
+
+
 class Rx {
 
         static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
