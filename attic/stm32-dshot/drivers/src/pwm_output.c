@@ -182,7 +182,7 @@ motorDevice_t *motorPwmDevInit(uint16_t idlePulse, uint8_t motorCount, bool useU
     motorPwmDevice.vTable.updateStart = motorUpdateStartNull;
     motorPwmDevice.vTable.updateComplete = useUnsyncedPwm ? motorUpdateCompleteNull : pwmCompleteOneshotMotorUpdate;
 
-    for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex < motorCount; motorIndex++) {
+    for (int motorIndex = 0; motorIndex < 4; motorIndex++) {
         const ioTag_t tag = MOTOR_IO_TAGS[motorIndex];
         const timerHardware_t *timerHardware = timerAllocate(tag, OWNER_MOTOR, RESOURCE_INDEX(motorIndex));
 

@@ -547,7 +547,7 @@ motorDevice_t *dshotBitbangDevInit(uint8_t count)
 
     memset(bbOutputBuffer, 0, sizeof(bbOutputBuffer));
 
-    for (int motorIndex = 0; motorIndex < MAX_SUPPORTED_MOTORS && motorIndex < motorCount; motorIndex++) {
+    for (int motorIndex = 0; motorIndex < 4; motorIndex++) {
         const timerHardware_t *timerHardware = timerGetConfiguredByTag(MOTOR_IO_TAGS[motorIndex]);
         const IO_t io = IOGetByTag(MOTOR_IO_TAGS[motorIndex]);
 
