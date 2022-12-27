@@ -45,7 +45,7 @@ class Board {
         Esc *                     m_esc;
         Mixer *                   m_mixer;
         vector<PidController *> * m_pidControllers;
-        Receiver *                m_receiver;
+        ReceiverTask *            m_receiverTask;
 
         // Initialzed here
         Arming         m_arming;
@@ -78,7 +78,7 @@ class Board {
                 m_vstate.dpsi   = angvels.z;
             }
 
-            Demands demands = m_receiver->getDemands();
+            Demands demands = m_receiverTask->getDemands();
 
             delayMicroseconds(10);
 
@@ -86,7 +86,7 @@ class Board {
                     demands,
                     m_vstate,
                     m_pidControllers,
-                    m_receiver->gotPidReset(),
+                    m_receiverTask->gotPidReset(),
                     micros());
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
@@ -152,7 +152,7 @@ class Board {
             const uint32_t usec = micros();
 
             uint16_t selectedPriority =
-                m_receiver->update(usec, &selectedTask, 0);
+                m_receiverTask->update(usec, &selectedTask, 0);
 
             selectedPriority = 
                 m_attitudeTask.update(usec, &selectedTask, selectedPriority);
@@ -197,14 +197,14 @@ class Board {
     protected:
 
         Board(
-                Receiver & receiver,
+                ReceiverTask & receiver,
                 Imu & imu,
                 vector<PidController *> & pidControllers,
                 Mixer & mixer,
                 Esc & esc,
                 const int8_t ledPin)
         {
-            m_receiver = &receiver;
+            m_receiverTask = &receiver;
             m_imu = &imu;
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
@@ -262,9 +262,9 @@ class Board {
 
             m_attitudeTask.begin(m_imu, &m_arming, &m_vstate);
 
-            m_usbTask.begin(m_esc, &m_arming, m_receiver, &m_vstate);
+            m_usbTask.begin(m_esc, &m_arming, m_receiverTask, &m_vstate);
 
-            m_receiver->begin(&m_arming);
+            m_receiverTask->begin(&m_arming);
 
             m_imu->begin();
 

@@ -21,7 +21,7 @@
 
 #include "task/receiver.h"
 
-class MockReceiver : public Receiver {
+class MockReceiver : public ReceiverTask {
 
     protected:
 

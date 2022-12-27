@@ -38,7 +38,7 @@ class Stm32F405Board : public Stm32F4Board {
     public:
 
         Stm32F405Board(
-                Receiver & receiver,
+                ReceiverTask & receiver,
                 Imu & imu,
                 vector<PidController *> & pids,
                 Mixer & mixer,

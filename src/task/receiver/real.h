@@ -21,7 +21,7 @@
 
 #include "task/receiver.h"
 
-class RealReceiver : public Receiver {
+class RealReceiver : public ReceiverTask {
 
     protected:
 

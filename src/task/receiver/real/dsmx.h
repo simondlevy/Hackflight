@@ -47,7 +47,7 @@ class DsmxReceiver : public RealReceiver {
                 const uint16_t dstmin=1000,
                 const uint16_t dstmax=2000)
         {
-            return Receiver::convert(value, 0, 2048, dstmin, dstmax);
+            return ReceiverTask::convert(value, 0, 2048, dstmin, dstmax);
         }
 
     protected:

@@ -37,7 +37,7 @@ class Stm32F411Board : public Stm32F4Board {
     public:
 
         Stm32F411Board(
-                Receiver & receiver,
+                ReceiverTask & receiver,
                 Imu & imu,
                 vector<PidController *> & pids,
                 Mixer & mixer,

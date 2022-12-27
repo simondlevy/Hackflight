@@ -23,7 +23,7 @@ class Stm32Board : public Board {
     protected:
 
         Stm32Board(
-                Receiver & receiver,
+                ReceiverTask & receiver,
                 Imu & imu,
                 vector<PidController *> & pids,
                 Mixer & mixer,
@@ -34,7 +34,7 @@ class Stm32Board : public Board {
         }
 
         Stm32Board(
-                Receiver & receiver,
+                ReceiverTask & receiver,
                 Imu & imu,
                 vector<PidController *> & pids,
                 Mixer & mixer,

@@ -28,7 +28,7 @@
 #include "task.h"
 #include "utils.h"
 
-class Receiver : public Task {
+class ReceiverTask : public Task {
 
     friend class Board;
 
@@ -312,7 +312,7 @@ class Receiver : public Task {
                 float & rawAux2,
                 uint32_t & frameTimeUs) = 0;
 
-        Receiver(void)
+        ReceiverTask(void)
             : Task(33) // Hz
         {
         }
