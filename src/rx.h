@@ -80,7 +80,6 @@ class Rx {
         float    m_rawAux2;
         state_e  m_state;
 
-#if 0
         float constrainRaw(const float value)
         {
             return value == 0 ?  value : constrain_f(value, PWM_PULSE_MIN, PWM_PULSE_MAX);
@@ -275,6 +274,7 @@ class Rx {
             return m_gotPidReset;
         }
 
+#if 0
         // Increase priority for RX task
         void adjustDynamicPriority(uint32_t usec) 
         {
@@ -291,6 +291,7 @@ class Rx {
                 }
             }
         }    
+#endif
 
     protected:
 
@@ -315,11 +316,7 @@ class Rx {
                 float & rawAux2,
                 uint32_t & frameTimeUs) = 0;
 
-        ReceiverTask(void)
-            : Task(33) // Hz
-        {
-        }
-
+#if 0
         // Task function, called periodically
         void fun(uint32_t usec)
         {
@@ -362,6 +359,8 @@ class Rx {
                 m_gotPidReset = pidItermResetValue;
             }
         }
+#endif
+
 
     public:
 
@@ -394,6 +393,4 @@ class Rx {
         {
             return m_rawAux2;
         }
-#endif
-
 }; // class Rx

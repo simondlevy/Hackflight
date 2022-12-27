@@ -276,7 +276,7 @@ class ReceiverTask : public Task {
         }
 
         // Increase priority for RX task
-        void adjustDynamicPriority(uint32_t usec) 
+        virtual void adjustDynamicPriority(uint32_t usec) override
         {
             if (m_dynamicPriority > 0) {
                 m_ageCycles = 1 + (intcmp(usec, m_lastSignaledAtUs) / m_desiredPeriodUs);
