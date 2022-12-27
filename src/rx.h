@@ -51,7 +51,6 @@ class Rx {
         // maximum PWM pulse width which is considered valid
         static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-#if 0
         Arming * m_arming;
 
         typedef enum {
@@ -81,6 +80,7 @@ class Rx {
         float    m_rawAux2;
         state_e  m_state;
 
+#if 0
         float constrainRaw(const float value)
         {
             return value == 0 ?  value : constrain_f(value, PWM_PULSE_MIN, PWM_PULSE_MAX);
