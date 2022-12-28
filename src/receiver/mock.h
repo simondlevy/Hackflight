@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "task/receiver.h"
+#include "receiver.h"
 
-class MockReceiver : public ReceiverTask {
+class MockReceiver : public Receiver {
 
     protected:
 

@@ -32,7 +32,10 @@
 #include "utils.h"
 
 
-class Rx {
+class Receiver {
+
+        friend class Board;
+        friend class ReceiverTask;
 
         static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
 
@@ -60,8 +63,6 @@ class Rx {
             STATE_UPDATE,
             STATE_COUNT
         } state_e;
-
-        Rx * m_receiver;
 
         bool     m_auxiliaryProcessingRequired;
         bool     m_dataProcessingRequired;

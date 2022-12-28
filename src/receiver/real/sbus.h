@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 
-#include "task/receiver/real.h"
+#include "receiver/real.h"
 #include "utils.h"
 
 
@@ -191,7 +191,7 @@ class SbusReceiver : public RealReceiver {
                 const uint16_t dstmin=1000,
                 const uint16_t dstmax=2000)
         {
-            return ReceiverTask::convert(value, 172, 1811, dstmin, dstmax);
+            return Receiver::convert(value, 172, 1811, dstmin, dstmax);
         }
 
 }; // class SbusReceiver

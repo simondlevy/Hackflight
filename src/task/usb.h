@@ -41,10 +41,10 @@ class UsbTask : public Task {
             return 1000 + 1000 * value;
         }
 
-        Esc *            m_esc;
-        Arming *         m_arming;
-        ReceiverTask *   m_receiver;
-        VehicleState *   m_vstate;
+        Esc *           m_esc;
+        Arming *        m_arming;
+        Receiver *      m_receiver;
+        VehicleState *  m_vstate;
 
         UsbMsp m_msp;
 
@@ -132,7 +132,7 @@ class UsbTask : public Task {
         void begin(
                 Esc * esc,
                 Arming * arming,
-                ReceiverTask * receiver,
+                Receiver * receiver,
                 VehicleState * vstate)
         {
             m_msp.begin();
