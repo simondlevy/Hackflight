@@ -123,7 +123,7 @@ class UsbTask : public Task {
     public:
 
         UsbTask(void) 
-            : Task(100) // Hz
+            : Task(USBTASK, 100) // Hz
         { 
         }
 

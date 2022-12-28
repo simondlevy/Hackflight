@@ -36,7 +36,7 @@ class AttitudeTask : public Task {
     public:
 
         AttitudeTask()
-            : Task(100) // Hz
+            : Task(ATTITUDE, 100) // Hz
         {
         }
 

@@ -146,54 +146,62 @@ class Board {
 
         } // checkCoreTasks
 
+        void runTask(Task & task, uint32_t usec)
+        {
+            const auto nextTargetCycles = m_scheduler.getNextTargetCycles();
+
+            const auto taskRequiredTimeUs = task.getRequiredTime();
+
+            const auto nowCycles = getCycleCounter();
+
+            const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
+
+            // Allow a little extra time
+            const auto taskRequiredCycles =
+                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
+                m_scheduler.getTaskGuardCycles();
+
+            if (taskRequiredCycles < loopRemainingCycles) {
+
+                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+
+                task.execute(usec);
+
+                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
+            } else {
+                task.enableRun();
+            }
+        }
+
         void checkDynamicTasks(void)
         {
-            Task * selectedTask = NULL;
-
             const uint32_t usec = micros();
 
-            uint16_t selectedPriority =
-                m_receiverTask.update(usec, &selectedTask, 0);
+            Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
-            selectedPriority = 
-                m_attitudeTask.update(usec, &selectedTask, selectedPriority);
-
-            selectedPriority =
-                m_usbTask.update(usec, &selectedTask, selectedPriority);
+            m_receiverTask.prioritize(usec, prioritizer);
+            m_attitudeTask.prioritize(usec, prioritizer);
+            m_usbTask.prioritize(usec, prioritizer);
 
             if (m_usbTask.gotRebootRequest()) {
                 reboot();
             }
 
-            if (selectedTask) {
+            switch (prioritizer.id) {
+                
+                case Task::ATTITUDE:
+                    runTask(m_attitudeTask, usec);
+                    break;
 
-                const auto nextTargetCycles = m_scheduler.getNextTargetCycles();
+                case Task::USBTASK:
+                    runTask(m_usbTask, usec);
+                    break;
 
-                const auto taskRequiredTimeUs = selectedTask->getRequiredTime();
-
-                const auto nowCycles = getCycleCounter();
-
-                const auto loopRemainingCycles =
-                    intcmp(nextTargetCycles, nowCycles);
-
-                // Allow a little extra time
-                const auto taskRequiredCycles =
-                    (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
-                    m_scheduler.getTaskGuardCycles();
-
-                if (taskRequiredCycles < loopRemainingCycles) {
-
-                    const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
-
-                    selectedTask->execute(usec);
-
-                    m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
-                } else {
-                    selectedTask->enableRun();
-                }
+                case Task::RECEIVER:
+                    runTask(m_receiverTask, usec);
+                    break;
             }
-
-        } // checkDyanmicTasks
+        }
 
     protected:
 
@@ -206,7 +214,7 @@ class Board {
                 const int8_t ledPin)
         {
             m_receiverTask.receiver = &receiver;
-            
+
             m_imu = &imu;
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;

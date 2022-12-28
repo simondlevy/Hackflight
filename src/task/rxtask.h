@@ -33,7 +33,7 @@ class ReceiverTask : public Task {
     protected:
 
         ReceiverTask(void)
-            : Task(33) // Hz
+            : Task(RECEIVER, 33) // Hz
         {
         }
 

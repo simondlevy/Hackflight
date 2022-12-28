@@ -29,9 +29,14 @@ class Task {
         typedef enum {
             NONE,
             ATTITUDE,
-            VIZUALIZER,
+            USBTASK,
             RECEIVER
         } id_t;
+
+        typedef struct {
+            id_t id;
+            uint16_t priority;
+        } prioritizer_t;
 
     private:
 
@@ -46,6 +51,8 @@ class Task {
         // By scaling their expected execution time
         static constexpr float AGE_EXPEDITE_SCALE = 0.9; 
 
+        id_t m_id;
+
         uint32_t m_anticipatedExecutionTime;
 
     protected:
@@ -56,8 +63,9 @@ class Task {
         uint32_t m_lastExecutedAtUs;          
         uint32_t m_lastSignaledAtUs;         
 
-        Task(uint32_t rate) 
+        Task(id_t id, uint32_t rate) 
         {
+            m_id = id;
             m_desiredPeriodUs = 1000000 / rate;
         }
 
@@ -109,16 +117,14 @@ class Task {
             return m_anticipatedExecutionTime >> EXEC_TIME_SHIFT;
         }
 
-        uint16_t update(uint32_t usec, Task ** selected, uint16_t selectedPriority)
+        void prioritize( uint32_t usec, prioritizer_t & prioritizer)
         {
             adjustDynamicPriority(usec);
 
-            if (m_dynamicPriority > selectedPriority) {
-                selectedPriority = m_dynamicPriority;
-                *selected = this;
+            if (m_dynamicPriority > prioritizer.priority) {
+                prioritizer.id = m_id;
+                prioritizer.priority = m_dynamicPriority;
             }
-
-            return selectedPriority;
         }
 
         virtual void fun(uint32_t usec) = 0;
