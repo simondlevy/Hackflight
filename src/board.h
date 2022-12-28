@@ -30,7 +30,7 @@ using namespace std;
 #include "receiver.h"
 #include "scheduler.h"
 #include "task/attitude.h"
-#include "task/usb.h"
+#include "task/visualizer.h"
 #include "task/rxtask.h"
 
 class Board {
@@ -47,7 +47,7 @@ class Board {
 
         bool           m_failsafeIsActive;
         Led            m_led;
-        UsbTask        m_usbTask;
+        VisualizerTask m_visualizerTask;
         Scheduler      m_scheduler;
         VehicleState   m_vstate;
 
@@ -97,7 +97,7 @@ class Board {
                 mixmotors[i] = m_esc->getMotorValue(motors.values[i], m_failsafeIsActive);
             }
 
-            m_esc->write(m_arming.isArmed() ?  mixmotors : m_usbTask.motors);
+            m_esc->write(m_arming.isArmed() ?  mixmotors : m_visualizerTask.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -181,9 +181,9 @@ class Board {
 
             m_receiverTask.prioritize(usec, prioritizer);
             m_attitudeTask.prioritize(usec, prioritizer);
-            m_usbTask.prioritize(usec, prioritizer);
+            m_visualizerTask.prioritize(usec, prioritizer);
 
-            if (m_usbTask.gotRebootRequest()) {
+            if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
             }
 
@@ -193,14 +193,17 @@ class Board {
                     runTask(m_attitudeTask, usec);
                     break;
 
-                case Task::USBTASK:
-                    runTask(m_usbTask, usec);
+                case Task::VISUALIZER:
+                    runTask(m_visualizerTask, usec);
                     break;
 
                 case Task::RECEIVER:
                     runTask(m_receiverTask, usec);
                     break;
-            }
+
+                case Task::UART:
+                    break;
+             }
         }
 
     protected:
@@ -272,7 +275,7 @@ class Board {
 
             m_attitudeTask.begin(m_imu, &m_arming, &m_vstate);
 
-            m_usbTask.begin(m_esc, &m_arming, m_receiverTask.receiver, &m_vstate);
+            m_visualizerTask.begin(m_esc, &m_arming, m_receiverTask.receiver, &m_vstate);
 
             m_receiverTask.receiver->begin(&m_arming);
 

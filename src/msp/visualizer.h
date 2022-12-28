@@ -23,7 +23,7 @@
 
 #include "msp.h"
 
-class UsbMsp : public Msp {
+class VisualizerMsp : public Msp {
 
     protected:
 

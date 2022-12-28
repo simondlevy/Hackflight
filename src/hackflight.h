@@ -34,5 +34,5 @@ using namespace std;
 #include "maths.h"
 #include "scheduler.h"
 #include "task/attitude.h"
-#include "task/usb.h"
+#include "task/visualizer.h"
 #include "task/rxtask.h"

@@ -29,8 +29,9 @@ class Task {
         typedef enum {
             NONE,
             ATTITUDE,
-            USBTASK,
-            RECEIVER
+            VISUALIZER,
+            RECEIVER,
+            UART
         } id_t;
 
         typedef struct {

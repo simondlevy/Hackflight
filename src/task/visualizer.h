@@ -24,10 +24,10 @@
 #include "task.h"
 #include "esc.h"
 #include "imu.h"
-#include "msp/usb.h"
+#include "msp/visualizer.h"
 #include "receiver.h"
 
-class UsbTask : public Task {
+class VisualizerTask : public Task {
 
     private:
 
@@ -46,7 +46,7 @@ class UsbTask : public Task {
         Receiver *      m_receiver;
         VehicleState *  m_vstate;
 
-        UsbMsp m_msp;
+        VisualizerMsp m_msp;
 
         bool m_gotRebootRequest;
 
@@ -122,8 +122,8 @@ class UsbTask : public Task {
 
     public:
 
-        UsbTask(void) 
-            : Task(USBTASK, 100) // Hz
+        VisualizerTask(void) 
+            : Task(VISUALIZER, 100) // Hz
         { 
         }
 
@@ -148,4 +148,4 @@ class UsbTask : public Task {
             return m_gotRebootRequest;
         }
 
-}; // class UsbMsp
+}; // class VisualizerTask
