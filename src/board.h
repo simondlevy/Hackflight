@@ -60,6 +60,20 @@ class Board {
         Mixer *                   m_mixer;
         vector<PidController *> * m_pidControllers;
 
+        typedef void (*skyRangerPrioritizerFun_t)(SkyRangerTask &);
+
+        skyRangerPrioritizerFun_t m_skyRangerPrioritizer;
+
+        static void skyRangerPrioritize(SkyRangerTask & skyRangerTask)
+        {
+            (void)skyRangerTask;
+        }
+
+        static void skyRangerIgnore(SkyRangerTask & skyRangerTask)
+        {
+            (void)skyRangerTask;
+        }
+
         void checkCoreTasks(uint32_t nowCycles)
         {
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
@@ -236,6 +250,7 @@ class Board {
             esc.m_board = this;
             receiver.m_board = this;
 
+            m_skyRangerPrioritizer = skyRangerIgnore;
         }
 
         Board(
@@ -249,6 +264,7 @@ class Board {
             : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
         {
             m_uart = &uart;
+            m_skyRangerPrioritizer = skyRangerPrioritize;
         }
 
     public:
