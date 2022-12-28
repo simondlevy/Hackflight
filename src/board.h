@@ -240,6 +240,8 @@ class Board {
             imu.m_board = this;
             esc.m_board = this;
             receiver.m_board = this;
+
+            m_skyRangerTask = &m_mockSkyRangerTask;
         }
 
         Board(
@@ -253,6 +255,8 @@ class Board {
             : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
         {
             m_uart = &uart;
+
+            m_skyRangerTask = &m_realSkyRangerTask;
         }
 
     public:
