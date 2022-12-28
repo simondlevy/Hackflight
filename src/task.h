@@ -29,7 +29,7 @@ class Task {
         typedef enum {
             NONE,
             ATTITUDE,
-            USB,
+            VIZUALIZER,
             RECEIVER
         } id_t;
 

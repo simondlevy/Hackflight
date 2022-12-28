@@ -27,7 +27,7 @@
 //#include <imu/real/softquat/bmi270.h>
 #include <imu/mock.h>
 #include <spihelper.h>
-#include <task/receiver/real/sbus.h>
+#include <receiver/real/sbus.h>
 
 // IMU
 static const uint8_t MOSI_PIN = PB_5;

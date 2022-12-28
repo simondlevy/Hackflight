@@ -22,7 +22,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-class Rx {
+#include "arming.h"
+#include "core/clock.h"
+#include "core/constrain.h"
+#include "core/demands.h"
+#include "core/filters/pt3.h"
+#include "core/pids/angle.h"
+#include "pwm.h"
+#include "utils.h"
+
+
+class Receiver {
+
+        friend class Board;
+        friend class ReceiverTask;
 
         static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
 
@@ -41,7 +54,6 @@ class Rx {
         // maximum PWM pulse width which is considered valid
         static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-#if 0
         Arming * m_arming;
 
         typedef enum {
@@ -51,8 +63,6 @@ class Rx {
             STATE_UPDATE,
             STATE_COUNT
         } state_e;
-
-        Rx * m_receiver;
 
         bool     m_auxiliaryProcessingRequired;
         bool     m_dataProcessingRequired;
@@ -265,23 +275,6 @@ class Rx {
             return m_gotPidReset;
         }
 
-        // Increase priority for RX task
-        void adjustDynamicPriority(uint32_t usec) 
-        {
-            if (m_dynamicPriority > 0) {
-                m_ageCycles = 1 + (intcmp(usec, m_lastSignaledAtUs) / m_desiredPeriodUs);
-                m_dynamicPriority = 1 + m_ageCycles;
-            } else  {
-                if (check(usec)) {
-                    m_lastSignaledAtUs = usec;
-                    m_ageCycles = 1;
-                    m_dynamicPriority = 2;
-                } else {
-                    m_ageCycles = 0;
-                }
-            }
-        }    
-
     protected:
 
         Board * m_board;
@@ -305,13 +298,8 @@ class Rx {
                 float & rawAux2,
                 uint32_t & frameTimeUs) = 0;
 
-        ReceiverTask(void)
-            : Task(33) // Hz
-        {
-        }
-
-        // Task function, called periodically
-        void fun(uint32_t usec)
+        // Called perioidically by receiverTask::fun()
+        void update(uint32_t usec)
         {
             const auto haveSignal = (usec - m_lastFrameTimeUs) < (int32_t)(1000*TIMEOUT_MS);
 
@@ -353,6 +341,7 @@ class Rx {
             }
         }
 
+
     public:
 
         float getRawThrottle(void)
@@ -384,6 +373,4 @@ class Rx {
         {
             return m_rawAux2;
         }
-#endif
-
 }; // class Rx

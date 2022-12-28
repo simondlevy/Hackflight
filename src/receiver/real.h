@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "task/receiver.h"
+#include "receiver.h"
 
-class RealReceiver : public ReceiverTask {
+class RealReceiver : public Receiver {
 
     protected:
 

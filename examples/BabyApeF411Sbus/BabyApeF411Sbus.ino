@@ -23,7 +23,7 @@
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <debugger.h>
-#include <task/receiver/real/sbus.h>
+#include <receiver/real/sbus.h>
 #include <imu/real/softquat/mpu6x00.h>
 #include <esc/dshot.h>
 

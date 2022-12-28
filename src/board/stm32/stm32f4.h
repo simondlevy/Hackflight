@@ -438,7 +438,7 @@ class Stm32F4Board : public Stm32Board {
 
         Stm32F4Board(
                 const uint8_t portCount,
-                ReceiverTask & receiver,
+                Receiver & receiver,
                 Imu & imu,
                 vector<PidController *> & pids,
                 Mixer & mixer,

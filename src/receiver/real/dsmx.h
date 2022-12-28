@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 
-#include "task/receiver/real.h"
+#include "receiver/real.h"
 #include "utils.h"
 
 class DsmxReceiver : public RealReceiver {
@@ -47,7 +47,7 @@ class DsmxReceiver : public RealReceiver {
                 const uint16_t dstmin=1000,
                 const uint16_t dstmax=2000)
         {
-            return ReceiverTask::convert(value, 0, 2048, dstmin, dstmax);
+            return Receiver::convert(value, 0, 2048, dstmin, dstmax);
         }
 
     protected:

@@ -27,10 +27,11 @@ using namespace std;
 #include "imu.h"
 #include "led.h"
 #include "maths.h"
+#include "receiver.h"
 #include "scheduler.h"
 #include "task/attitude.h"
 #include "task/usb.h"
-#include "task/receiver.h"
+#include "task/rxtask.h"
 
 class Board {
 
@@ -40,21 +41,21 @@ class Board {
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
-        // Initialzed in main()
-        Imu *                     m_imu;
-        Esc *                     m_esc;
-        Mixer *                   m_mixer;
-        vector<PidController *> * m_pidControllers;
-        ReceiverTask *            m_receiverTask;
-
-        // Initialzed here
         Arming         m_arming;
         AttitudeTask   m_attitudeTask;
+        ReceiverTask   m_receiverTask;
+
         bool           m_failsafeIsActive;
         Led            m_led;
         UsbTask        m_usbTask;
         Scheduler      m_scheduler;
         VehicleState   m_vstate;
+
+        // Initialzed in main()
+        Imu *                     m_imu;
+        Esc *                     m_esc;
+        Mixer *                   m_mixer;
+        vector<PidController *> * m_pidControllers;
 
         void checkCoreTasks(uint32_t nowCycles)
         {
@@ -78,7 +79,7 @@ class Board {
                 m_vstate.dpsi   = angvels.z;
             }
 
-            Demands demands = m_receiverTask->getDemands();
+            Demands demands = m_receiverTask.receiver->getDemands();
 
             delayMicroseconds(10);
 
@@ -86,7 +87,7 @@ class Board {
                     demands,
                     m_vstate,
                     m_pidControllers,
-                    m_receiverTask->gotPidReset(),
+                    m_receiverTask.receiver->gotPidReset(),
                     micros());
 
             float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
@@ -147,12 +148,12 @@ class Board {
 
         void checkDynamicTasks(void)
         {
-            Task *selectedTask = NULL;
+            Task * selectedTask = NULL;
 
             const uint32_t usec = micros();
 
             uint16_t selectedPriority =
-                m_receiverTask->update(usec, &selectedTask, 0);
+                m_receiverTask.update(usec, &selectedTask, 0);
 
             selectedPriority = 
                 m_attitudeTask.update(usec, &selectedTask, selectedPriority);
@@ -197,14 +198,15 @@ class Board {
     protected:
 
         Board(
-                ReceiverTask & receiver,
+                Receiver & receiver,
                 Imu & imu,
                 vector<PidController *> & pidControllers,
                 Mixer & mixer,
                 Esc & esc,
                 const int8_t ledPin)
         {
-            m_receiverTask = &receiver;
+            m_receiverTask.receiver = &receiver;
+            
             m_imu = &imu;
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
@@ -262,9 +264,9 @@ class Board {
 
             m_attitudeTask.begin(m_imu, &m_arming, &m_vstate);
 
-            m_usbTask.begin(m_esc, &m_arming, m_receiverTask, &m_vstate);
+            m_usbTask.begin(m_esc, &m_arming, m_receiverTask.receiver, &m_vstate);
 
-            m_receiverTask->begin(&m_arming);
+            m_receiverTask.receiver->begin(&m_arming);
 
             m_imu->begin();
 
