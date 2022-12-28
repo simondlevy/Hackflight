@@ -202,7 +202,7 @@ class Board {
                     runTask(m_receiverTask, usec);
                     break;
 
-                case Task::UART:
+                case Task::SKYRANGER:
                     break;
             
                 case Task::NONE:
