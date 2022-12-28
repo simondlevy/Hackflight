@@ -118,7 +118,7 @@ class Task {
             return m_anticipatedExecutionTime >> EXEC_TIME_SHIFT;
         }
 
-        void prioritize( uint32_t usec, prioritizer_t & prioritizer)
+        virtual void prioritize( uint32_t usec, prioritizer_t & prioritizer)
         {
             adjustDynamicPriority(usec);
 

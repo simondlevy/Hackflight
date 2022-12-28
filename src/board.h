@@ -33,6 +33,8 @@ using namespace std;
 #include "task/visualizer.h"
 #include "task/receiver.h"
 #include "task/skyranger.h"
+#include "task/skyranger/real.h"
+#include "task/skyranger/mock.h"
 
 class Board {
 
@@ -45,7 +47,10 @@ class Board {
         AttitudeTask   m_attitudeTask;
         ReceiverTask   m_receiverTask;
         VisualizerTask m_visualizerTask;
-        SkyRangerTask  m_skyRangerTask;
+
+        RealSkyRangerTask    m_realSkyRangerTask;
+        MockSkyRangerTask    m_mockSkyRangerTask;
+        SkyRangerTask *      m_skyRangerTask;
 
         Arming         m_arming;
         bool           m_failsafeIsActive;
@@ -59,20 +64,6 @@ class Board {
         Esc *                     m_esc;
         Mixer *                   m_mixer;
         vector<PidController *> * m_pidControllers;
-
-        typedef void (*skyRangerPrioritizerFun_t)(SkyRangerTask &);
-
-        skyRangerPrioritizerFun_t m_skyRangerPrioritizer;
-
-        static void skyRangerPrioritize(SkyRangerTask & skyRangerTask)
-        {
-            (void)skyRangerTask;
-        }
-
-        static void skyRangerIgnore(SkyRangerTask & skyRangerTask)
-        {
-            (void)skyRangerTask;
-        }
 
         void checkCoreTasks(uint32_t nowCycles)
         {
@@ -249,8 +240,6 @@ class Board {
             imu.m_board = this;
             esc.m_board = this;
             receiver.m_board = this;
-
-            m_skyRangerPrioritizer = skyRangerIgnore;
         }
 
         Board(
@@ -264,7 +253,6 @@ class Board {
             : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
         {
             m_uart = &uart;
-            m_skyRangerPrioritizer = skyRangerPrioritize;
         }
 
     public:
