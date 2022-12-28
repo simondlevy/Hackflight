@@ -36,14 +36,13 @@ class Stm32Board : public Board {
         Stm32Board(
                 Receiver & receiver,
                 Imu & imu,
+                HardwareSerial & uart,
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
-                HardwareSerial & uart,
                 const int8_t ledPin)
-            : Board(receiver, imu, pids, mixer, esc, ledPin)
+            : Board(receiver, imu, uart, pids, mixer, esc, ledPin)
         {
-            (void)uart;
         }
 
      private:

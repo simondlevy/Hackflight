@@ -449,6 +449,20 @@ class Stm32F4Board : public Stm32Board {
             m_portCount = portCount;
         }
 
+        Stm32F4Board(
+                const uint8_t portCount,
+                Receiver & receiver,
+                Imu & imu,
+                HardwareSerial & uart,
+                vector<PidController *> & pids,
+                Mixer & mixer,
+                Esc & esc,
+                const uint8_t ledPin) 
+            : Stm32Board(receiver, imu, uart, pids, mixer, esc, ledPin)
+        {
+            m_portCount = portCount;
+        }
+
         void handleDmaIrq(const uint8_t portIndex)
         {
             port_t *port = &m_ports[portIndex];

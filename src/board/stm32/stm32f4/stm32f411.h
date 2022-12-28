@@ -46,4 +46,16 @@ class Stm32F411Board : public Stm32F4Board {
             : Stm32F4Board(1, receiver, imu, pids, mixer, esc, ledPin)
         {
         }
+
+        Stm32F411Board(
+                Receiver & receiver,
+                Imu & imu,
+                HardwareSerial & uart,
+                vector<PidController *> & pids,
+                Mixer & mixer,
+                Esc & esc,
+                const uint8_t ledPin) 
+            : Stm32F4Board(1, receiver, imu, uart, pids, mixer, esc, ledPin)
+        {
+        }
 };

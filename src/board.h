@@ -53,6 +53,7 @@ class Board {
 
         // Initialzed in main()
         Imu *                     m_imu;
+        HardwareSerial *          m_uart;
         Esc *                     m_esc;
         Mixer *                   m_mixer;
         vector<PidController *> * m_pidControllers;
@@ -233,6 +234,19 @@ class Board {
             esc.m_board = this;
             receiver.m_board = this;
 
+        }
+
+        Board(
+                Receiver & receiver,
+                Imu & imu,
+                HardwareSerial & uart,
+                vector<PidController *> & pidControllers,
+                Mixer & mixer,
+                Esc & esc,
+                const int8_t ledPin)
+            : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
+        {
+            m_uart = &uart;
         }
 
     public:
