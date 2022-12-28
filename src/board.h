@@ -32,6 +32,7 @@ using namespace std;
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
+#include "task/skyranger.h"
 
 class Board {
 
@@ -41,13 +42,14 @@ class Board {
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
-        Arming         m_arming;
         AttitudeTask   m_attitudeTask;
         ReceiverTask   m_receiverTask;
+        VisualizerTask m_visualizerTask;
+        SkyRangerTask  m_skyRangerTask;
 
+        Arming         m_arming;
         bool           m_failsafeIsActive;
         Led            m_led;
-        VisualizerTask m_visualizerTask;
         Scheduler      m_scheduler;
         VehicleState   m_vstate;
 

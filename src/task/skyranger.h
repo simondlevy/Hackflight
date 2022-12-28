@@ -26,7 +26,7 @@ class SkyRangerTask : public Task {
     public:
 
         SkyRangerTask()
-            : Task(SKYRANGERS, 61) // Hz
+            : Task(SKYRANGER, 61) // Hz
         {
         }
 
