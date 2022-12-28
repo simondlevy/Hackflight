@@ -31,7 +31,7 @@ using namespace std;
 #include "scheduler.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
-#include "task/rxtask.h"
+#include "task/receiver.h"
 
 class Board {
 
@@ -202,6 +202,9 @@ class Board {
                     break;
 
                 case Task::UART:
+                    break;
+            
+                case Task::NONE:
                     break;
              }
         }

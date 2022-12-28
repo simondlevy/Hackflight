@@ -35,4 +35,4 @@ using namespace std;
 #include "scheduler.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
-#include "task/rxtask.h"
+#include "task/receiver.h"
