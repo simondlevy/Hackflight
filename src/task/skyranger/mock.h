@@ -20,6 +20,12 @@
 
 #include "task/skyranger.h"
 
-class MockSkyRangerTask : public SkyRangerTask {
+class MockSkyrangerTask : public SkyrangerTask {
+
+        virtual void prioritize( uint32_t usec, prioritizer_t & prioritizer) override
+        {
+            (void)usec;
+            (void)prioritizer;
+        }
 
 };

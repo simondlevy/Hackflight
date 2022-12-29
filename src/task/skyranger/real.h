@@ -20,6 +20,6 @@
 
 #include "task/skyranger.h"
 
-class RealSkyRangerTask : public SkyRangerTask {
+class RealSkyrangerTask : public SkyrangerTask {
 
 };

@@ -21,11 +21,11 @@
 #include "imu.h"
 #include "task.h"
 
-class SkyRangerTask : public Task {
+class SkyrangerTask : public Task {
 
     public:
 
-        SkyRangerTask()
+        SkyrangerTask()
             : Task(SKYRANGER, 61) // Hz
         {
         }

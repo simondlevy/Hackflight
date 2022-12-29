@@ -48,9 +48,9 @@ class Board {
         ReceiverTask   m_receiverTask;
         VisualizerTask m_visualizerTask;
 
-        RealSkyRangerTask    m_realSkyRangerTask;
-        MockSkyRangerTask    m_mockSkyRangerTask;
-        SkyRangerTask *      m_skyRangerTask;
+        RealSkyrangerTask    m_realSkyrangerTask;
+        MockSkyrangerTask    m_mockSkyrangerTask;
+        SkyrangerTask *      m_skyrangerTask;
 
         Arming         m_arming;
         bool           m_failsafeIsActive;
@@ -191,6 +191,8 @@ class Board {
             m_attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
 
+            m_skyrangerTask->prioritize(usec, prioritizer);
+
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
             }
@@ -241,7 +243,7 @@ class Board {
             esc.m_board = this;
             receiver.m_board = this;
 
-            m_skyRangerTask = &m_mockSkyRangerTask;
+            m_skyrangerTask = &m_mockSkyrangerTask;
         }
 
         Board(
@@ -256,7 +258,7 @@ class Board {
         {
             m_uart = &uart;
 
-            m_skyRangerTask = &m_realSkyRangerTask;
+            m_skyrangerTask = &m_realSkyrangerTask;
         }
 
     public:
