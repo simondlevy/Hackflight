@@ -25,7 +25,20 @@ class SkyrangerTask : public Task {
 
     private:
 
+        static const uint8_t RANGER_ID = 121;  // VL53L5 ranger
+        static const uint8_t MOCAP_ID  = 122;  // PAA3905 motion capture
+
         UartMsp m_msp;
+
+        void serializeRangerRequest(void)
+        {
+            m_msp.serializeRequest(RANGER_ID);
+        }
+
+        void serializeMocapRequest(void)
+        {
+            m_msp.serializeRequest(MOCAP_ID);
+        }
 
     public:
 
@@ -46,10 +59,10 @@ class SkyrangerTask : public Task {
 
                 switch (messageType) {
 
-                    case 121: // VL53L5
+                    case RANGER_ID: 
                         break;
 
-                    case 122: // PAA3906
+                    case MOCAP_ID:
                         break;
 
                 }
