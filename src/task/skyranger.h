@@ -45,6 +45,13 @@ class SkyrangerTask : public Task {
                 auto messageType = m_msp.parse(byte);
 
                 switch (messageType) {
+
+                    case 121: // VL53L5
+                        break;
+
+                    case 122: // PAA3906
+                        break;
+
                 }
             }
         }
