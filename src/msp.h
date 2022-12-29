@@ -105,8 +105,6 @@ class Msp {
 
         virtual uint32_t available(void) = 0;
 
-        virtual void begin(void) = 0;
-
         virtual uint8_t read(void) = 0;
 
         parserState_t getParserState(void)

@@ -24,7 +24,7 @@
 #include "task.h"
 #include "esc.h"
 #include "imu.h"
-#include "msp/visualizer.h"
+#include "msp/usb.h"
 #include "receiver.h"
 
 class VisualizerTask : public Task {
@@ -46,7 +46,7 @@ class VisualizerTask : public Task {
         Receiver *      m_receiver;
         VehicleState *  m_vstate;
 
-        VisualizerMsp m_msp;
+        UsbMsp m_msp;
 
         bool m_gotRebootRequest;
 

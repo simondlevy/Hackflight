@@ -23,30 +23,35 @@
 
 #include "msp.h"
 
-class VisualizerMsp : public Msp {
+class UartMsp : public Msp {
+
+    private:
+
+        HardwareSerial * m_port;
 
     protected:
 
         virtual void write(const uint8_t buf[], const uint8_t size) override
         {
-            Serial.write(buf, size);
+            m_port->write(buf, size);
         }
 
     public:
 
         virtual uint32_t available(void) override
         {
-            return Serial.available();
+            return m_port->available();
         }
 
-        virtual void begin(void) override
+        virtual void begin(HardwareSerial * port)
         {
-            Serial.begin(115200);
+            m_port = port;
+            m_port->begin(115200);
         }
 
         virtual uint8_t read(void) override
         {
-            return Serial.read();
+            return m_port->read();
         }
 
 };

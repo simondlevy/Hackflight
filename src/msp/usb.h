@@ -23,39 +23,31 @@
 
 #include "msp.h"
 
-class SkyrangerMsp : public Msp {
-
-    private:
-
-        HardwareSerial * m_port;
+class UsbMsp : public Msp {
 
     protected:
 
         virtual void write(const uint8_t buf[], const uint8_t size) override
         {
-            m_port->write(buf, size);
+            Serial.write(buf, size);
         }
 
     public:
 
-        SkyrangerMsp(HardwareSerial & port)
-        {
-            m_port = &port;
-        }
-
         virtual uint32_t available(void) override
         {
-            return m_port->available();
-        }
-
-        virtual void begin(void) override
-        {
-            m_port->begin(115200);
+            return Serial.available();
         }
 
         virtual uint8_t read(void) override
         {
-            return m_port->read();
+            return Serial.read();
         }
+
+        void begin(void)
+        {
+            Serial.begin(115200);
+        }
+
 
 };

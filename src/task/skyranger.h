@@ -19,18 +19,18 @@
 #pragma once
 
 #include "task.h"
-#include "msp/skyranger.h"
+#include "msp/uart.h"
 
 class SkyrangerTask : public Task {
 
-    protected:
+    private:
 
-        HardwareSerial * m_uart;
+        UartMsp m_msp;
 
     public:
 
         SkyrangerTask()
-            : Task(SKYRANGER, 61) // Hz
+            : Task(SKYRANGER, 50) // Hz
         {
         }
 
@@ -41,6 +41,6 @@ class SkyrangerTask : public Task {
 
         void begin(HardwareSerial * uart)
         {
-            m_uart = uart;
+            m_msp.begin(uart);
         }
 };
