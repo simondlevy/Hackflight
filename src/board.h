@@ -60,7 +60,6 @@ class Board {
 
         // Initialzed in main()
         Imu *                     m_imu;
-        HardwareSerial *          m_uart;
         Esc *                     m_esc;
         Mixer *                   m_mixer;
         vector<PidController *> * m_pidControllers;
@@ -256,8 +255,7 @@ class Board {
                 const int8_t ledPin)
             : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
         {
-            m_uart = &uart;
-
+            m_realSkyrangerTask.m_uart = &uart;
             m_skyrangerTask = &m_realSkyrangerTask;
         }
 

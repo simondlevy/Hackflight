@@ -27,5 +27,4 @@ class MockSkyrangerTask : public SkyrangerTask {
             (void)usec;
             (void)prioritizer;
         }
-
 };
