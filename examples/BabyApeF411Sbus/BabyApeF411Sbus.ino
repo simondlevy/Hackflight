@@ -58,10 +58,14 @@ static SbusReceiver _rx;
 
 static Mixer _mixer = QuadXbfMixer::make();
 
+static uint32_t _count;
+
 // Motor interrupt
 extern "C" void handleDmaIrq(void)
 {
     _board->handleDmaIrq(0);
+
+    _count++;
 }
 
 // IMU interrupt
@@ -98,4 +102,6 @@ void setup(void)
 void loop(void)
 {
     _board->step();
+
+    Serial.println(_count);
 }
