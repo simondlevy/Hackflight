@@ -94,6 +94,4 @@ void setup(void)
 void loop(void)
 {
     _board->step();
-
-    HfDebugger::printf("%d\n", _board->dbg_count);
 }
