@@ -212,7 +212,7 @@ class Board {
                     break;
 
                 case Task::SKYRANGER:
-                    runTask(m_skyrangerTask, usec);
+                    runTask(*m_skyrangerTask, usec);
                     dbg_count++;
                     break;
             
@@ -258,6 +258,7 @@ class Board {
                 const int8_t ledPin)
             : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
         {
+            (void)uart;
             //m_skyrangerUart = &uart;
             m_skyrangerTask = &m_realSkyrangerTask;
         }
