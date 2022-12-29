@@ -39,10 +39,13 @@ class Msp {
 
         parserState_t m_parserState;
 
-        uint8_t m_payload[BUF_SIZE] = {};
+        uint8_t m_payload[BUF_SIZE];
 
-        uint8_t outBufChecksum;
-        uint8_t outBufIndex;
+        uint8_t m_outBuf[BUF_SIZE];
+        uint8_t m_outBufSize;
+
+        uint8_t m_outBufChecksum;
+        uint8_t m_outBufIndex;
 
         void serialize16(int16_t a)
         {
@@ -52,9 +55,9 @@ class Msp {
 
         void prepareToSerialize(uint8_t type, uint8_t count, uint8_t size)
         {
-            outBufSize = 0;
-            outBufIndex = 0;
-            outBufChecksum = 0;
+            m_outBufSize = 0;
+            m_outBufIndex = 0;
+            m_outBufChecksum = 0;
 
             addToOutBuf('$');
             addToOutBuf('M');
@@ -65,13 +68,13 @@ class Msp {
 
         void addToOutBuf(uint8_t a)
         {
-            outBuf[outBufSize++] = a;
+            m_outBuf[m_outBufSize++] = a;
         }
 
         void serialize8(uint8_t a)
         {
             addToOutBuf(a);
-            outBufChecksum ^= a;
+            m_outBufChecksum ^= a;
         }
 
         void prepareToSerializeBytes(uint8_t type, uint8_t count)
@@ -93,9 +96,6 @@ class Msp {
         {
             prepareToSerialize(type, count, 4);
         }
-
-        uint8_t outBuf[BUF_SIZE];
-        uint8_t outBufSize;
 
     protected:
 
@@ -189,8 +189,8 @@ class Msp {
 
         void completeSerialize(void)
         {
-            serialize8(outBufChecksum);
-            write(outBuf, outBufSize);
+            serialize8(m_outBufChecksum);
+            write(m_outBuf, m_outBufSize);
         }
 
         void serializeShort(uint16_t src)
@@ -214,12 +214,14 @@ class Msp {
 
         void serializeRequest(const uint8_t messageType)
         {
-            m_payload[0] = '$';
-            m_payload[1] = 'M';
-            m_payload[2] = '<';
-            m_payload[3] = 0;
-            m_payload[4] = messageType;
-            m_payload[5] = messageType;
+            m_outBuf[0] = '$';
+            m_outBuf[1] = 'M';
+            m_outBuf[2] = '<';
+            m_outBuf[3] = 0;
+            m_outBuf[4] = messageType;
+            m_outBuf[5] = messageType;
+
+            write(m_outBuf, 6);
         }
 
 }; // class Msp
