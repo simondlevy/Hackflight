@@ -1,7 +1,0 @@
-./debugger.h
-./espnow.h
-./imu/real/softquat/bmi270.h
-./imu/real/softquat/mpu6x00.h
-./imu/real/usfs.h
-./msp/usb.h
-./spihelper.h

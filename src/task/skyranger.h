@@ -34,9 +34,19 @@ class SkyrangerTask : public Task {
         {
         }
 
-        virtual void fun(uint32_t time) override
+        virtual void fun(uint32_t usec) override
         {
-            (void)time;
+            (void)usec;
+
+            while (m_msp.available()) {
+
+                auto byte = m_msp.read();
+
+                auto messageType = m_msp.parse(byte);
+
+                switch (messageType) {
+                }
+            }
         }
 
         void begin(HardwareSerial * uart)
