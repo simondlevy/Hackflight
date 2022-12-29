@@ -212,4 +212,14 @@ class Msp {
             completeSerialize();
         }
 
+        void serializeRequest(const uint8_t messageType)
+        {
+            m_payload[0] = '$';
+            m_payload[1] = 'M';
+            m_payload[2] = '<';
+            m_payload[3] = 0;
+            m_payload[4] = messageType;
+            m_payload[5] = messageType;
+        }
+
 }; // class Msp
