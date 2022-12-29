@@ -28,16 +28,16 @@ class SkyrangerTask : public Task {
         static const uint8_t RANGER_ID = 121;  // VL53L5 ranger
         static const uint8_t MOCAP_ID  = 122;  // PAA3905 motion capture
 
-        UartMsp m_msp;
+        //UartMsp m_msp;
 
         void serializeRangerRequest(void)
         {
-            m_msp.serializeRequest(RANGER_ID);
+            //m_msp.serializeRequest(RANGER_ID);
         }
 
         void serializeMocapRequest(void)
         {
-            m_msp.serializeRequest(MOCAP_ID);
+            //m_msp.serializeRequest(MOCAP_ID);
         }
 
     public:
@@ -51,6 +51,7 @@ class SkyrangerTask : public Task {
         {
             (void)usec;
 
+            /*
             while (m_msp.available()) {
 
                 auto byte = m_msp.read();
@@ -66,11 +67,12 @@ class SkyrangerTask : public Task {
                         break;
 
                 }
-            }
+            }*/
         }
 
         void begin(HardwareSerial * uart)
         {
-            m_msp.begin(uart);
+            (void)uart;
+            //m_msp.begin(uart);
         }
 };

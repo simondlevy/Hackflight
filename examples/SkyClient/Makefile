@@ -20,7 +20,7 @@ $(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
 	arduino-cli compile -b $(FQBN) --libraries $(LIB) --build-path $(OBJ) --warnings "all"
 	rm -f *.bin *.elf
 
-unbrick: 
+unbrick: $(DFU)
 	dfu-util -a 0 -D $(DFU) -s :leave	
 
 flash: $(DFU)
@@ -35,5 +35,5 @@ edit:
 	vim $(SKETCH).ino
 
 listen:
-	miniterm $(PORT) 115200
+	miniterm.py $(PORT) 115200
 

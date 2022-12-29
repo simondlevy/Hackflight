@@ -212,6 +212,8 @@ class Board {
                     break;
 
                 case Task::SKYRANGER:
+                    runTask(m_skyrangerTask, usec);
+                    dbg_count++;
                     break;
             
                 case Task::NONE:
@@ -256,11 +258,13 @@ class Board {
                 const int8_t ledPin)
             : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
         {
-            m_skyrangerUart = &uart;
+            //m_skyrangerUart = &uart;
             m_skyrangerTask = &m_realSkyrangerTask;
         }
 
     public:
+
+        uint32_t dbg_count;
 
         uint32_t microsToCycles(uint32_t micros)
         {

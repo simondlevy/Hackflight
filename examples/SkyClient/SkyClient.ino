@@ -21,6 +21,7 @@
 #include <debugger.h>
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
+#include <debugger.h>
 #include <esc/dshot.h>
 #include <imu/real/softquat/mpu6x00.h>
 #include <receiver/real/sbus.h>
@@ -73,8 +74,6 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 void setup(void)
 {
-    Serial4.begin(115200);
-
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
@@ -82,7 +81,7 @@ void setup(void)
 
     static DshotEsc esc(&MOTOR_PINS);
 
-    static Stm32F405Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
+    static Stm32F405Board board(_rx, imu, Serial4, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     _imu = &imu;
@@ -96,7 +95,5 @@ void loop(void)
 {
     _board->step();
 
-    while (Serial4.available()) {
-        HfDebugger::printf("x%02x\n", Serial4.read());
-    }
+    //HfDebugger::printf("%d\n", _board->dbg_count);
 }
