@@ -48,9 +48,10 @@ class Board {
         ReceiverTask   m_receiverTask;
         VisualizerTask m_visualizerTask;
 
-        RealSkyrangerTask    m_realSkyrangerTask;
-        MockSkyrangerTask    m_mockSkyrangerTask;
-        SkyrangerTask *      m_skyrangerTask;
+        RealSkyrangerTask m_realSkyrangerTask;
+        MockSkyrangerTask m_mockSkyrangerTask;
+        SkyrangerTask *   m_skyrangerTask;
+        HardwareSerial *  m_skyrangerUart;
 
         Arming         m_arming;
         bool           m_failsafeIsActive;
@@ -255,7 +256,7 @@ class Board {
                 const int8_t ledPin)
             : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
         {
-            m_realSkyrangerTask.m_uart = &uart;
+            m_skyrangerUart = &uart;
             m_skyrangerTask = &m_realSkyrangerTask;
         }
 
@@ -305,6 +306,8 @@ class Board {
             m_visualizerTask.begin(m_esc, &m_arming, m_receiverTask.receiver, &m_vstate);
 
             m_receiverTask.receiver->begin(&m_arming);
+
+            // m_skyrangerTask->begin(m_skyrangerUart);
 
             m_imu->begin();
 

@@ -22,8 +22,6 @@
 
 class RealSkyrangerTask : public SkyrangerTask {
 
-    friend class Board;
-
     private:
 
         HardwareSerial * m_uart;
