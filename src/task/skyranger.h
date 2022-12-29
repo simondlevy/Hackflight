@@ -23,6 +23,10 @@
 
 class SkyrangerTask : public Task {
 
+    protected:
+
+        HardwareSerial * m_uart;
+
     public:
 
         SkyrangerTask()
@@ -33,5 +37,10 @@ class SkyrangerTask : public Task {
         virtual void fun(uint32_t time) override
         {
             (void)time;
+        }
+
+        void begin(HardwareSerial * uart)
+        {
+            m_uart = uart;
         }
 };

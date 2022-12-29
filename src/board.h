@@ -307,7 +307,7 @@ class Board {
 
             m_receiverTask.receiver->begin(&m_arming);
 
-            // m_skyrangerTask->begin(m_skyrangerUart);
+            m_skyrangerTask->begin(m_skyrangerUart);
 
             m_imu->begin();
 

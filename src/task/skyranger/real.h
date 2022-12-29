@@ -22,7 +22,5 @@
 
 class RealSkyrangerTask : public SkyrangerTask {
 
-    private:
-
-        HardwareSerial * m_uart;
+    // By not overriding Task::prioritizer(), this task prioritizes itself
 };

@@ -22,6 +22,7 @@
 
 class MockSkyrangerTask : public SkyrangerTask {
 
+        // By not modifying the prioritizer, this task never runs
         virtual void prioritize( uint32_t usec, prioritizer_t & prioritizer) override
         {
             (void)usec;
