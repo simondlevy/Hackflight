@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "imu.h"
 #include "task.h"
+#include "msp/skyranger.h"
 
 class SkyrangerTask : public Task {
 

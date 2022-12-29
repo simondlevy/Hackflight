@@ -23,7 +23,7 @@
 
 #include "msp.h"
 
-class UartMsp : public Msp {
+class SkyrangerMsp : public Msp {
 
     private:
 
@@ -38,7 +38,7 @@ class UartMsp : public Msp {
 
     public:
 
-        UartMsp(HardwareSerial & port)
+        SkyrangerMsp(HardwareSerial & port)
         {
             m_port = &port;
         }
