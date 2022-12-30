@@ -45,6 +45,18 @@ static const uint8_t TP_MOT_PIN = 32;
 static const uint8_t RX1_PIN = 15;
 static const uint8_t TX1_PIN = 27;
 
+// Helper -------------------------------------------------------------
+
+static void sendData(
+        Msp & msp, const uint8_t messageType, const int16_t data[], const uint8_t count) 
+{
+    msp.serializeShorts(messageType, data, count);
+
+    for (uint8_t k=0; k<msp.payloadSize; ++k) {
+        Serial1.write(msp.payload[k]);
+    }
+}
+
 // VL53L5 -------------------------------------------------------------
 
 static const uint8_t VL53L5_INT_PIN = TP_INT_PIN; // Set to 0 for polling
@@ -100,7 +112,7 @@ static void checkRanger(Msp & msp, const uint8_t messageType)
         }
     } 
 
-    msp.serializeShorts(messageType, data, 16);
+    sendData(msp, messageType, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -167,10 +179,7 @@ static void checkMocap(Msp & msp, const uint8_t messageType)
         }
     }
 
-    static uint32_t count;
-    Serial.println(count++);
-
-    msp.serializeShorts(messageType, data, 2);
+    sendData(msp, messageType, data, 2);
 }
 
 // ------------------------------------------------------------------
@@ -202,6 +211,4 @@ void loop()
                 break;
         }
     }
-
-    Serial.println(count);
 }
