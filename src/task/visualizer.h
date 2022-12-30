@@ -55,8 +55,8 @@ class VisualizerTask : public Task {
         {
             m_msp.serializeShorts(messageType, src, count);
 
-            for (auto byte : m_msp.m_payload) {
-                Serial.write(byte);
+            for (uint8_t k=0; k<m_msp.payloadSize; ++k) {
+                Serial.write(m_msp.payload[k]);
             }
         }
 

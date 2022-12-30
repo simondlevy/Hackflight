@@ -27,7 +27,7 @@
 
 #include <hackflight.h>
 #include <debugger.h>
-#include "msp/uart.h"
+#include "msp.h"
 
 // MCU choice --------------------------------------------------------
 
@@ -81,7 +81,7 @@ static void startRanger(void)
     _ranger.begin();
 }
 
-static void checkRanger(UartMsp & msp, const uint8_t messageType)
+static void checkRanger(Msp & msp, const uint8_t messageType)
 {
     static int16_t data[16];
 
@@ -141,7 +141,7 @@ static void startMocap(void)
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
 }
 
-static void checkMocap(UartMsp & msp, const uint8_t messageType)
+static void checkMocap(Msp & msp, const uint8_t messageType)
 {
     static int16_t data[2];
 
@@ -175,12 +175,8 @@ static void checkMocap(UartMsp & msp, const uint8_t messageType)
 
 // ------------------------------------------------------------------
 
-static UartMsp _msp(Serial1);
-
 void setup()
 {
-    Serial.begin(115200);
-
     Serial1.begin(115200, SERIAL_8N1, RX1_PIN, TX1_PIN);
 
     startRanger();
@@ -189,13 +185,11 @@ void setup()
 
 void loop()
 {
-    static uint32_t count;
+    static Msp _msp;
 
     while (Serial1.available()) {
 
-        count++;
-
-        auto messageType = _msp.parse(Serial.read());
+        auto messageType = _msp.parse(Serial1.read());
 
         switch (messageType) {
 
