@@ -172,13 +172,13 @@ static void checkMocap(UartMsp & msp, const uint8_t messageType)
 
 // ------------------------------------------------------------------
 
-static UartMsp _msp(Serial1);
+static UartMsp _msp;
 
 void setup()
 {
     Serial1.begin(115200, SERIAL_8N1, RX1_PIN, TX1_PIN);
 
-    _msp.begin();
+    _msp.begin(&Serial1);
 
     startRanger();
     startMocap();
