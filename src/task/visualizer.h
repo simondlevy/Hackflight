@@ -24,7 +24,7 @@
 #include "task.h"
 #include "esc.h"
 #include "imu.h"
-#include "msp/usb.h"
+#include "msp.h"
 #include "receiver.h"
 
 class VisualizerTask : public Task {
@@ -46,7 +46,7 @@ class VisualizerTask : public Task {
         Receiver *      m_receiver;
         VehicleState *  m_vstate;
 
-        UsbMsp m_msp;
+        Msp m_msp;
 
         bool m_gotRebootRequest;
 
@@ -54,6 +54,10 @@ class VisualizerTask : public Task {
                 const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
             m_msp.serializeShorts(messageType, src, count);
+
+            for (auto byte : m_msp.m_payload) {
+                Serial.write(byte);
+            }
         }
 
     protected:
@@ -62,9 +66,9 @@ class VisualizerTask : public Task {
         {
             (void)usec;
 
-            while (m_msp.available()) {
+            while (Serial.available()) {
 
-                auto byte = m_msp.read();
+                auto byte = Serial.read();
 
                 if (m_msp.isIdle() && byte == 'R') {
                     m_gotRebootRequest = true;
@@ -135,8 +139,6 @@ class VisualizerTask : public Task {
                 Receiver * receiver,
                 VehicleState * vstate)
         {
-            m_msp.begin();
-
             m_esc = esc;
             m_arming = arming;
             m_vstate = vstate;

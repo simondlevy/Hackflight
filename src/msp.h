@@ -25,6 +25,8 @@ class Msp {
 
     private:
 
+        friend class VisualizerTask;
+
         static const uint8_t BUF_SIZE = 128;
 
         typedef enum {
@@ -94,15 +96,7 @@ class Msp {
             prepareToSerialize(type, count, 4);
         }
 
-    protected:
-
-        virtual void write(const uint8_t buf[], const uint8_t size) = 0;
-
     public:
-
-        virtual uint32_t available(void) = 0;
-
-        virtual uint8_t read(void) = 0;
 
         parserState_t getParserState(void)
         {
@@ -187,7 +181,6 @@ class Msp {
         void completeSerialize(void)
         {
             serialize8(m_payloadChecksum);
-            write(m_payload, m_payloadSize);
         }
 
         void serializeShort(uint16_t src)
@@ -209,16 +202,14 @@ class Msp {
             completeSerialize();
         }
 
-        void sendRequest(const uint8_t messageType)
+        void serializeRequest(const uint8_t messageType)
         {
             m_payload[0] = '$';
             m_payload[1] = 'M';
             m_payload[2] = '<';
             m_payload[3] = 0;
             m_payload[4] = messageType;
-            m_payload[5] = messageType;
-
-            write(m_payload, 6);
+            m_payload[5] = messageType; // checksum (CRC)
         }
 
 }; // class Msp

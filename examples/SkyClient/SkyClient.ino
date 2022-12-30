@@ -86,6 +86,10 @@ void setup(void)
     _board = &board;
     _imu = &imu;
 
+    // Skyranger connection
+    Serial4.begin(115200);
+
+    // Receiver, SBUS protocol
     Serial3.begin(100000, SERIAL_8E2);
 
     _board->begin();

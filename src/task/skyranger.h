@@ -19,7 +19,7 @@
 #pragma once
 
 #include "task.h"
-#include "msp/uart.h"
+#include "msp.h"
 
 class SkyrangerTask : public Task {
 
@@ -28,16 +28,16 @@ class SkyrangerTask : public Task {
         static const uint8_t RANGER_ID = 121;  // VL53L5 ranger
         static const uint8_t MOCAP_ID  = 122;  // PAA3905 motion capture
 
-        UartMsp m_msp;
+        Msp m_msp;
 
         void sendRangerRequest(void)
         {
-            m_msp.sendRequest(RANGER_ID);
+            //m_msp.sendRequest(RANGER_ID);
         }
 
         void sendMocapRequest(void)
         {
-            m_msp.sendRequest(MOCAP_ID);
+            //m_msp.sendRequest(MOCAP_ID);
         }
 
     public:
@@ -51,6 +51,7 @@ class SkyrangerTask : public Task {
         {
             (void)usec;
 
+            /*
             while (m_msp.available()) {
 
                 auto byte = m_msp.read();
@@ -69,13 +70,11 @@ class SkyrangerTask : public Task {
                         sendMocapRequest();
                         break;
                 }
-            }
+            }*/
         }
 
-        void begin(HardwareSerial * uart)
+        void begin(void)
         {
-            m_msp.begin(uart);
-
             sendRangerRequest();
             sendMocapRequest();
         }

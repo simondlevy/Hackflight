@@ -167,18 +167,21 @@ static void checkMocap(UartMsp & msp, const uint8_t messageType)
         }
     }
 
+    static uint32_t count;
+    Serial.println(count++);
+
     msp.serializeShorts(messageType, data, 2);
 }
 
 // ------------------------------------------------------------------
 
-static UartMsp _msp;
+static UartMsp _msp(Serial1);
 
 void setup()
 {
-    Serial1.begin(115200, SERIAL_8N1, RX1_PIN, TX1_PIN);
+    Serial.begin(115200);
 
-    _msp.begin(&Serial1);
+    Serial1.begin(115200, SERIAL_8N1, RX1_PIN, TX1_PIN);
 
     startRanger();
     startMocap();
@@ -186,7 +189,11 @@ void setup()
 
 void loop()
 {
-    while (Serial.available()) {
+    static uint32_t count;
+
+    while (Serial1.available()) {
+
+        count++;
 
         auto messageType = _msp.parse(Serial.read());
 
@@ -201,4 +208,6 @@ void loop()
                 break;
         }
     }
+
+    Serial.println(count);
 }
