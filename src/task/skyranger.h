@@ -30,6 +30,8 @@ class SkyrangerTask : public Task {
 
         Msp m_msp;
 
+        HardwareSerial * m_uart;
+
         void sendRangerRequest(void)
         {
             //m_msp.sendRequest(RANGER_ID);
@@ -73,8 +75,10 @@ class SkyrangerTask : public Task {
             }*/
         }
 
-        void begin(void)
+        void begin(HardwareSerial * uart)
         {
+            m_uart = uart;
+
             sendRangerRequest();
             sendMocapRequest();
         }
