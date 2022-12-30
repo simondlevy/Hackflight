@@ -209,7 +209,7 @@ class Msp {
             completeSerialize();
         }
 
-        void serializeRequest(const uint8_t messageType)
+        void sendRequest(const uint8_t messageType)
         {
             m_payload[0] = '$';
             m_payload[1] = 'M';
