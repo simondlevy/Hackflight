@@ -60,9 +60,13 @@ class SkyrangerTask : public Task {
                 switch (messageType) {
 
                     case RANGER_ID: 
+                        Serial.println("ranger");
+                        sendRangerRequest();
                         break;
 
                     case MOCAP_ID:
+                        Serial.println("mocap");
+                        sendMocapRequest();
                         break;
                 }
             }
