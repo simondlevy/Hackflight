@@ -51,7 +51,6 @@ class SkyrangerTask : public Task {
         {
             (void)usec;
 
-            /*
             while (m_msp.available()) {
 
                 auto byte = m_msp.read();
@@ -65,9 +64,8 @@ class SkyrangerTask : public Task {
 
                     case MOCAP_ID:
                         break;
-
                 }
-            }*/
+            }
         }
 
         void begin(HardwareSerial * uart)
