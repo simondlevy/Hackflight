@@ -48,7 +48,7 @@ class SkyclientTask : public Task {
 
             while (m_uart->available()) {
 
-                Serial.println(m_uart->read());
+                Serial.println(m_uart->read(), HEX);
 
                 /*
                 auto messageType = m_msp.parse(m_uart->read());

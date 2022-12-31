@@ -45,6 +45,11 @@ static const uint8_t TP_MOT_PIN = 32;
 static const uint8_t RX1_PIN = 15;
 static const uint8_t TX1_PIN = 27;
 
+// MSP message IDs ----------------------------------------------------
+
+static const uint8_t RANGER_MSG_TYPE = 121;  // VL53L5 ranger
+static const uint8_t MOCAP_MSG_TYPE  = 122;  // PAA3905 motion capture
+
 // Helper -------------------------------------------------------------
 
 static void sendData(
@@ -90,7 +95,7 @@ static void startRanger(void)
     _ranger.begin();
 }
 
-static void checkRanger(Msp & msp, const uint8_t messageType)
+static void checkRanger(Msp & msp)
 {
     static int16_t data[16];
 
@@ -109,7 +114,7 @@ static void checkRanger(Msp & msp, const uint8_t messageType)
         }
     } 
 
-    sendData(msp, messageType, data, 16);
+    sendData(msp, RANGER_MSG_TYPE, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -150,7 +155,7 @@ static void startMocap(void)
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
 }
 
-static void checkMocap(Msp & msp, const uint8_t messageType)
+static void checkMocap(Msp & msp)
 {
     static int16_t data[2];
 
@@ -176,7 +181,7 @@ static void checkMocap(Msp & msp, const uint8_t messageType)
         }
     }
 
-    sendData(msp, messageType, data, 2);
+    sendData(msp, MOCAP_MSG_TYPE, data, 2);
 }
 
 // ------------------------------------------------------------------
@@ -195,23 +200,6 @@ void loop()
 {
     static Msp _msp;
 
-    static uint32_t count;
-
-    count = (count + 1) % 256;
-
-    Serial1.write(count);
-
-    /*
-       auto messageType = _msp.parse(Serial1.read());
-
-       switch (messageType) {
-
-       case 121:   // VL53L5
-       checkRanger(_msp, messageType);
-       break;
-
-       case 122: // PAA3905
-       checkMocap(_msp, messageType);
-       break;
-       }*/
+    checkRanger(_msp);
+    checkMocap(_msp);
 }
