@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <Wire.h>
+
 #include "msp/arduino.h"
 #include "board/stm32.h"
 #include "esc/brushed.h"
@@ -41,6 +43,15 @@ class LadybugBoard : public Stm32Board {
         LadybugBoard(Receiver & rx, vector<PidController *> & pids, Mixer & mixer)
             : Stm32Board(msp, rx, imu, pids, mixer, esc, -LED_PIN)
         {
+        }
+
+        void begin(void)
+        {
+            Wire.begin();
+            Wire.setClock(400000); 
+            delay(100);
+
+            Board::begin();
         }
 
         void handleInterrupt(void)

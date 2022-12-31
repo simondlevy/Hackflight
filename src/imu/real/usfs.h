@@ -21,7 +21,6 @@
 #include "imu/real.h"
 
 #include <USFS.h>
-#include <Wire.h>
 
 class UsfsImu : public RealImu {
 
@@ -60,10 +59,6 @@ class UsfsImu : public RealImu {
 
         virtual void begin(void) override 
         {
-            Wire.begin();
-            Wire.setClock(400000); 
-            delay(100);
-
             usfsLoadFirmware(); 
 
             usfsBegin(

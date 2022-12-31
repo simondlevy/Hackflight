@@ -22,7 +22,7 @@
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
-#include <imu/real/softquat/mpu6x00.h>
+#include <imu/real/softquat/mpu6x00/arduino.h>
 #include <receiver/dsmx.h>
 
 #include <vector>
@@ -84,7 +84,7 @@ void setup(void)
 
     static ArduinoMsp msp;
 
-    static Mpu6x00 imu(RealImu::rotate180, _spi, CS_PIN);
+    static ArduinoMpu6x00 imu(_spi, RealImu::rotate180, CS_PIN);
 
     static DshotEsc esc(&MOTOR_PINS);
 
