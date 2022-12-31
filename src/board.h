@@ -307,8 +307,9 @@ class Board {
             m_led.flash(10, 50);
         }
 
-        void useSkyClient(void)
+        void parseSkyRanger(const uint8_t byte)
         {
+            (void)byte;
         }
 
         void step(void)

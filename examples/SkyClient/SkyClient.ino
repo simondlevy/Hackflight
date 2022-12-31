@@ -36,6 +36,14 @@ static vector<PidController *> _pids = {};
 
 static Mixer _mixer = QuadXbfMixer::make();
 
+void serialEvent4(void)
+{
+    while (Serial4.available()) {
+        _board->parseSkyRanger(Serial4.read());
+    }
+}
+
+
 void setup(void)
 {
     static ArduinoMsp msp;
@@ -45,8 +53,6 @@ void setup(void)
     static MockEsc esc;
 
     static Stm32F405Board board(msp, rx, imu, _pids, _mixer, esc, LED_PIN);
-
-    board.useSkyClient();
 
     // Skyranger connection
     Serial4.begin(115200);
