@@ -183,6 +183,8 @@ static void checkMocap(Msp & msp, const uint8_t messageType)
 
 void setup()
 {
+    Serial.begin(115200);
+
     Serial1.begin(115200, SERIAL_8N1, RX1_PIN, TX1_PIN);
 
     startRanger();
@@ -193,19 +195,23 @@ void loop()
 {
     static Msp _msp;
 
-    while (Serial1.available()) {
+    static uint32_t count;
 
-        auto messageType = _msp.parse(Serial1.read());
+    count = (count + 1) % 256;
 
-        switch (messageType) {
+    Serial1.write(count);
 
-            case 121:   // VL53L5
-                checkRanger(_msp, messageType);
-                break;
+    /*
+       auto messageType = _msp.parse(Serial1.read());
 
-            case 122: // PAA3905
-                checkMocap(_msp, messageType);
-                break;
-        }
-    }
+       switch (messageType) {
+
+       case 121:   // VL53L5
+       checkRanger(_msp, messageType);
+       break;
+
+       case 122: // PAA3905
+       checkMocap(_msp, messageType);
+       break;
+       }*/
 }

@@ -18,9 +18,14 @@
 
 #pragma once
 
-#include "task/skyranger.h"
+#include "task/skyclient.h"
 
-class RealSkyrangerTask : public SkyrangerTask {
+class MockSkyclientTask : public SkyclientTask {
 
-    // By not overriding Task::prioritizer(), this task prioritizes itself
+        // By not modifying the prioritizer, this task never runs
+        virtual void prioritize( uint32_t usec, prioritizer_t & prioritizer) override
+        {
+            (void)usec;
+            (void)prioritizer;
+        }
 };

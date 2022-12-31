@@ -89,7 +89,7 @@ void setup(void)
     // Skyranger connection
     Serial4.begin(115200);
 
-    // Receiver, SBUS protocol
+    // Receiver connection, SBUS protocol
     Serial3.begin(100000, SERIAL_8E2);
 
     _board->begin();
@@ -99,6 +99,6 @@ void loop(void)
 {
     _board->step();
 
-    extern uint32_t g_count;
-    Serial.println(g_count);
+    //extern uint32_t g_rangerCount, g_mocapCount;
+    //HfDebugger::printf("ranger=%06d  mocap=%06d\n", g_rangerCount, g_mocapCount);
 }
