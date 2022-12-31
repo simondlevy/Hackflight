@@ -45,6 +45,12 @@ static vector<PidController *> _pids = {&_anglePid};
 
 static Mixer _mixer = QuadXbfMixer::make();
 
+void serialEvent4(void)
+{
+    while (Serial4.available()) {
+    }
+}
+
 void setup(void)
 {
     static MockReceiver rx;
