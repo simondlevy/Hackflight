@@ -33,8 +33,6 @@ class SkyclientTask : public Task {
 
         Msp m_msp;
 
-        HardwareSerial * m_uart;
-
     public:
 
         SkyclientTask()
@@ -46,12 +44,12 @@ class SkyclientTask : public Task {
         {
             (void)usec;
 
+            /*
             while (m_uart->available()) {
 
-                Serial.println(m_uart->read(), HEX);
+                auto byte = m_uart->read();
 
-                /*
-                auto messageType = m_msp.parse(m_uart->read());
+                auto messageType = m_msp.parse(byte);
 
                 switch (messageType) {
 
@@ -62,12 +60,8 @@ class SkyclientTask : public Task {
                     case MOCAP_ID:
                         g_mocapCount++;
                         break;
-                }*/
-            }
+                }
+            }*/
         }
 
-        void begin(HardwareSerial * uart)
-        {
-            m_uart = uart;
-        }
 };

@@ -449,6 +449,7 @@ class Stm32F4Board : public Stm32Board {
             m_portCount = portCount;
         }
 
+        /*
         Stm32F4Board(
                 const uint8_t portCount,
                 Receiver & receiver,
@@ -461,7 +462,7 @@ class Stm32F4Board : public Stm32Board {
             : Stm32Board(receiver, imu, uart, pids, mixer, esc, ledPin)
         {
             m_portCount = portCount;
-        }
+        }*/
 
         void handleDmaIrq(const uint8_t portIndex)
         {

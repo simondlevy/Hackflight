@@ -32,9 +32,9 @@ using namespace std;
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
-#include "task/skyclient.h"
-#include "task/skyclient/real.h"
-#include "task/skyclient/mock.h"
+//#include "task/skyclient.h"
+//#include "task/skyclient/real.h"
+//#include "task/skyclient/mock.h"
 
 class Board {
 
@@ -48,10 +48,10 @@ class Board {
         ReceiverTask   m_receiverTask;
         VisualizerTask m_visualizerTask;
 
-        RealSkyclientTask m_realSkyclientTask;
-        MockSkyclientTask m_mockSkyclientTask;
-        SkyclientTask *   m_skyclientTask;
-        HardwareSerial *  m_skyclientUart;
+        //RealSkyclientTask m_realSkyclientTask;
+        //MockSkyclientTask m_mockSkyclientTask;
+        //SkyclientTask *   m_skyclientTask;
+        //HardwareSerial *  m_skyclientUart;
 
         Arming         m_arming;
         bool           m_failsafeIsActive;
@@ -191,7 +191,7 @@ class Board {
             m_attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
 
-            m_skyclientTask->prioritize(usec, prioritizer);
+            //m_skyclientTask->prioritize(usec, prioritizer);
 
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
@@ -212,7 +212,7 @@ class Board {
                     break;
 
                 case Task::SKYRANGER:
-                    runTask(*m_skyclientTask, usec);
+                    //runTask(*m_skyclientTask, usec);
                     break;
             
                 case Task::NONE:
@@ -244,9 +244,10 @@ class Board {
             esc.m_board = this;
             receiver.m_board = this;
 
-            m_skyclientTask = &m_mockSkyclientTask;
+            //m_skyclientTask = &m_mockSkyclientTask;
         }
 
+        /*
         Board(
                 Receiver & receiver,
                 Imu & imu,
@@ -259,7 +260,7 @@ class Board {
         {
             m_skyclientUart = &uart;
             m_skyclientTask = &m_realSkyclientTask;
-        }
+        }*/
 
     public:
 
@@ -308,7 +309,7 @@ class Board {
 
             m_receiverTask.receiver->begin(&m_arming);
 
-            m_skyclientTask->begin(m_skyclientUart);
+            //m_skyclientTask->begin(m_skyclientUart);
 
             m_imu->begin();
 

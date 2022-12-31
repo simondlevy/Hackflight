@@ -99,6 +99,6 @@ void loop(void)
 {
     _board->step();
 
-    //extern uint32_t g_rangerCount, g_mocapCount;
-    //HfDebugger::printf("ranger=%06d  mocap=%06d\n", g_rangerCount, g_mocapCount);
+    extern uint32_t g_rangerCount, g_mocapCount;
+    HfDebugger::printf("ranger=%06d  mocap=%06d\n", g_rangerCount, g_mocapCount);
 }

@@ -21,11 +21,11 @@
 
 #include <stdlib.h>
 
-#include "receiver/real.h"
+#include "receiver.h"
 #include "utils.h"
 
 
-class SbusReceiver : public RealReceiver {
+class SbusReceiver : public Receiver {
 
     private:
 
@@ -124,7 +124,7 @@ class SbusReceiver : public RealReceiver {
 
     public:
 
-        virtual void parse(const uint8_t c) override
+        void parse(const uint8_t c)
         {
             const uint32_t usec = micros();
             const int32_t timeInterval = intcmp(usec, m_startAtUs);

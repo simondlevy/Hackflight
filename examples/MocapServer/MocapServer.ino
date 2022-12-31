@@ -19,10 +19,6 @@
 
 //  Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
 
-#include <Wire.h>
-#include <SPI.h>
-
-#include <VL53L5cx.h>
 #include <PAA3905_MotionCapture.h>
 
 #include <hackflight.h>
@@ -31,13 +27,9 @@
 
 // MCU choice --------------------------------------------------------
 
-static const uint8_t SR_INT_PIN = 15;
-static const uint8_t SR_LPN_PIN = 2;
 static const uint8_t SR_CS_PIN  = 5;
 static const uint8_t SR_MOT_PIN = 4;
 
-static const uint8_t TP_INT_PIN = 4;
-static const uint8_t TP_LPN_PIN = 14;
 static const uint8_t TP_CS_PIN  = 5;
 static const uint8_t TP_MOT_PIN = 32;
 
@@ -47,7 +39,6 @@ static const uint8_t TX1_PIN = 27;
 
 // MSP message IDs ----------------------------------------------------
 
-static const uint8_t RANGER_MSG_TYPE = 121;  // VL53L5 ranger
 static const uint8_t MOCAP_MSG_TYPE  = 122;  // PAA3905 motion capture
 
 // Helper -------------------------------------------------------------
@@ -57,66 +48,6 @@ static void sendData(
 {
     msp.serializeShorts(messageType, data, count);
     msp.sendPayload(Serial1);
-}
-
-// VL53L5 -------------------------------------------------------------
-
-static const uint8_t VL53L5_INT_PIN = TP_INT_PIN; // Set to 0 for polling
-static const uint8_t VL53L5_LPN_PIN = TP_LPN_PIN;
-
-// Set to 0 for continuous mode
-static const uint8_t VL53L5_INTEGRAL_TIME_MS = 10;
-
-static VL53L5cx _ranger(
-        Wire, 
-        VL53L5_LPN_PIN, 
-        VL53L5_INTEGRAL_TIME_MS,
-        VL53L5cx::RES_4X4_HZ_1);
-
-static volatile bool _gotRangerInterrupt;
-
-static void rangerInterruptHandler() 
-{
-    _gotRangerInterrupt = true;
-}
-
-static void startRanger(void)
-{
-    Wire.begin();                
-    Wire.setClock(400000);      
-    delay(1000);
-
-    pinMode(VL53L5_INT_PIN, INPUT);     
-
-    if (VL53L5_INT_PIN > 0) {
-        attachInterrupt(VL53L5_INT_PIN, rangerInterruptHandler, FALLING);
-    }
-
-    _ranger.begin();
-}
-
-static void checkRanger(Msp & msp)
-{
-    static int16_t data[16];
-
-    if (VL53L5_INT_PIN == 0 || _gotRangerInterrupt) {
-
-        //Serial.println("ranger");
-
-        _gotRangerInterrupt = false;
-
-        while (!_ranger.dataIsReady()) {
-            delay(10);
-        }
-
-        _ranger.readData();
-
-        for (auto i=0; i<_ranger.getPixelCount(); i++) {
-            data[i] = _ranger.getDistanceMm(i);
-        }
-    } 
-
-    // sendData(msp, RANGER_MSG_TYPE, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -148,10 +79,11 @@ static void startMocap(void)
 
     // Check device ID as a test of SPI communications
     if (!_mocap.begin()) {
-        Debugger::reportForever("PAA3905 initialization failed");
+        HfDebugger::reportForever("PAA3905 initialization failed");
     }
 
-    Debugger::printf("Resolution is %0.1f CPI per meter height\n", _mocap.getResolution());
+    HfDebugger::printf(
+            "Resolution is %0.1f CPI per meter height\n", _mocap.getResolution());
 
     pinMode(PAA3905_MOT_PIN, INPUT); 
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
@@ -198,7 +130,6 @@ void setup()
 
     Serial1.begin(115200, SERIAL_8N1, RX1_PIN, TX1_PIN);
 
-    startRanger();
     startMocap();
 }
 
@@ -206,6 +137,5 @@ void loop()
 {
     static Msp _msp;
 
-    checkRanger(_msp);
     checkMocap(_msp);
 }
