@@ -28,36 +28,11 @@
 #include <vector>
 using namespace std;
 
-static vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
-
-static const uint8_t LED_PIN  = PB5;
-
-static AnglePidController _anglePid(
-        1.441305,     // Rate Kp
-        48.8762,      // Rate Ki
-        0.021160,     // Rate Kd
-        0.0165048,    // Rate Kf
-        0.0); // 3.0; // Level Kp
+static const uint8_t LED_PIN = PB5;
 
 static Stm32F405Board * _board;
 
-static vector<PidController *> _pids = {&_anglePid};
-
-/*
-
-extern "C" void handleDmaIrq(uint8_t id)
-{
-    _board->handleDmaIrq(id);
-}
-*/
-
-/*
-void serialEvent3(void)
-{
-    while (Serial3.available()) {
-        _rx.parse(Serial3.read());
-    }
-}*/
+static vector<PidController *> _pids = {};
 
 static Mixer _mixer = QuadXbfMixer::make();
 
@@ -72,8 +47,6 @@ void setup(void)
     static Stm32F405Board board(msp, rx, imu, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
-
-    Serial3.begin(100000, SERIAL_8E2);
 
     _board->begin();
 }
