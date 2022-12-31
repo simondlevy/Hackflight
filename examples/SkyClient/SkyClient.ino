@@ -18,6 +18,7 @@
  */
 
 #include <hackflight.h>
+#include <msp/arduino.h>
 #include <debugger.h>
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
@@ -50,7 +51,12 @@ void setup(void)
     static MockImu  imu;
     static MockEsc esc;
 
-    static Stm32F405Board board(rx, imu, _pids, _mixer, esc, LED_PIN);
+    static ArduinoMsp msp;
+
+    static Stm32F405Board board(msp, rx, imu, _pids, _mixer, esc, LED_PIN);
+
+    // Skyranger connection
+    Serial4.begin(115200);
 
     _board->begin();
 }
