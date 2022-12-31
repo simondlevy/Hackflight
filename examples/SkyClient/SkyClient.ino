@@ -19,18 +19,28 @@
 
 #include <hackflight.h>
 #include <msp/arduino.h>
-#include <debugger.h>
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <debugger.h>
-#include <esc/mock.h>
+#include <esc/dshot.h>
+#include <imu/real/softquat/mpu6x00/arduino.h>
 #include <imu/mock.h>
-#include <receiver/mock.h>
+#include <receiver/sbus.h>
 
 #include <vector>
 using namespace std;
 
+// IMU
+static const uint8_t MOSI_PIN = PA7;
+static const uint8_t MISO_PIN = PA6;
+static const uint8_t SCLK_PIN = PA5;
+static const uint8_t CS_PIN   = PA4;
+static const uint8_t EXTI_PIN = PC4;
+
+static vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
+
 static const uint8_t LED_PIN  = PB5;
+
+static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -40,29 +50,49 @@ static AnglePidController _anglePid(
         0.0); // 3.0; // Level Kp
 
 static Stm32F405Board * _board;
+//static Mpu6x00 * _imu;
+static SbusReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
 
-static Mixer _mixer = QuadXbfMixer::make();
-
-void serialEvent4(void)
+extern "C" void handleDmaIrq(uint8_t id)
 {
-    while (Serial4.available()) {
+    _board->handleDmaIrq(id);
+}
+
+static void handleImuInterrupt(void)
+{
+    //_imu->handleInterrupt();
+}
+
+void serialEvent3(void)
+{
+    while (Serial3.available()) {
+        _rx.parse(Serial3.read());
     }
 }
 
+static Mixer _mixer = QuadXbfMixer::make();
+
 void setup(void)
 {
-    static MockReceiver rx;
-    static MockImu  imu;
-    static MockEsc esc;
+    //pinMode(EXTI_PIN, INPUT);
+    //attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
     static ArduinoMsp msp;
 
-    static Stm32F405Board board(msp, rx, imu, _pids, _mixer, esc, LED_PIN);
+    // static ArduinoMpu6x00 imu(_spi, RealImu::rotate270, CS_PIN);
 
-    // Skyranger connection
-    Serial4.begin(115200);
+    static MockImu imu;
+
+    static DshotEsc esc(&MOTOR_PINS);
+
+    static Stm32F405Board board(msp, _rx, imu, _pids, _mixer, esc, LED_PIN);
+
+    _board = &board;
+    //_imu = &imu;
+
+    Serial3.begin(100000, SERIAL_8E2);
 
     _board->begin();
 }
