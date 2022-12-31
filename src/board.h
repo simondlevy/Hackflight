@@ -307,6 +307,10 @@ class Board {
             m_led.flash(10, 50);
         }
 
+        void useSkyClient(void)
+        {
+        }
+
         void step(void)
         {
             // Realtime gyro/filtering/PID task get complete priority

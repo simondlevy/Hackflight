@@ -46,6 +46,11 @@ void setup(void)
 
     static Stm32F405Board board(msp, rx, imu, _pids, _mixer, esc, LED_PIN);
 
+    board.useSkyClient();
+
+    // Skyranger connection
+    Serial4.begin(115200);
+
     _board = &board;
 
     _board->begin();
