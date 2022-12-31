@@ -32,9 +32,7 @@ using namespace std;
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
-//#include "task/skyclient.h"
-//#include "task/skyclient/real.h"
-//#include "task/skyclient/mock.h"
+#include "task/skyranger.h"
 
 class Board {
 
@@ -47,11 +45,7 @@ class Board {
         AttitudeTask   m_attitudeTask;
         ReceiverTask   m_receiverTask;
         VisualizerTask m_visualizerTask;
-
-        //RealSkyclientTask m_realSkyclientTask;
-        //MockSkyclientTask m_mockSkyclientTask;
-        //SkyclientTask *   m_skyclientTask;
-        //HardwareSerial *  m_skyclientUart;
+        SkyrangerTask  m_skyrangerTask;
 
         Arming         m_arming;
         bool           m_failsafeIsActive;
@@ -191,8 +185,7 @@ class Board {
             m_receiverTask.prioritize(usec, prioritizer);
             m_attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
-
-            //m_skyclientTask->prioritize(usec, prioritizer);
+            m_skyrangerTask.prioritize(usec, prioritizer);
 
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
@@ -213,7 +206,7 @@ class Board {
                     break;
 
                 case Task::SKYRANGER:
-                    //runTask(*m_skyclientTask, usec);
+                    runTask(m_skyrangerTask, usec);
                     break;
             
                 case Task::NONE:
@@ -246,8 +239,6 @@ class Board {
             imu.m_board = this;
             esc.m_board = this;
             receiver.m_board = this;
-
-            //m_skyclientTask = &m_mockSkyclientTask;
         }
 
     public:
@@ -297,8 +288,6 @@ class Board {
 
             m_receiverTask.receiver->begin(&m_arming);
 
-            //m_skyclientTask->begin(m_skyclientUart);
-
             m_imu->begin();
 
             m_esc->begin();
@@ -309,7 +298,7 @@ class Board {
 
         void parseSkyRanger(const uint8_t byte)
         {
-            (void)byte;
+            m_skyrangerTask.parse(byte);
         }
 
         void step(void)
