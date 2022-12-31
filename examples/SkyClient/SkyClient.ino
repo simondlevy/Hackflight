@@ -21,9 +21,8 @@
 #include <msp/arduino.h>
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <esc/dshot.h>
+#include <esc/mock.h>
 #include <imu/mock.h>
-#include <receiver/sbus.h>
 #include <receiver/mock.h>
 
 #include <vector>
@@ -41,14 +40,16 @@ static AnglePidController _anglePid(
         0.0); // 3.0; // Level Kp
 
 static Stm32F405Board * _board;
-//static SbusReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
+
+/*
 
 extern "C" void handleDmaIrq(uint8_t id)
 {
     _board->handleDmaIrq(id);
 }
+*/
 
 /*
 void serialEvent3(void)
@@ -62,15 +63,11 @@ static Mixer _mixer = QuadXbfMixer::make();
 
 void setup(void)
 {
-    //pinMode(EXTI_PIN, INPUT);
-    //attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
-
     static ArduinoMsp msp;
 
     static MockImu imu;
     static MockReceiver rx;
-
-    static DshotEsc esc(&MOTOR_PINS);
+    static MockEsc esc;
 
     static Stm32F405Board board(msp, rx, imu, _pids, _mixer, esc, LED_PIN);
 
