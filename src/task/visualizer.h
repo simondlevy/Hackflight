@@ -54,10 +54,7 @@ class VisualizerTask : public Task {
                 const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
             m_msp.serializeShorts(messageType, src, count);
-
-            for (uint8_t k=0; k<m_msp.payloadSize; ++k) {
-                Serial.write(m_msp.payload[k]);
-            }
+            m_msp.sendPayload();
         }
 
     protected:

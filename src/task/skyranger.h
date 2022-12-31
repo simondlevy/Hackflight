@@ -34,13 +34,10 @@ class SkyrangerTask : public Task {
 
         HardwareSerial * m_uart;
 
-        void sendRequest(uint8_t messageType) {
-
+        void sendRequest(uint8_t messageType) 
+        {
             m_msp.serializeRequest(messageType);
-
-            for (uint8_t k=0; k<m_msp.payloadSize; ++k) {
-                m_uart->write(m_msp.payload[k]);
-            }
+            m_msp.sendPayload();
         }
 
         void sendRangerRequest(void)

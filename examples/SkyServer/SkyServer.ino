@@ -51,10 +51,7 @@ static void sendData(
         Msp & msp, const uint8_t messageType, const int16_t data[], const uint8_t count) 
 {
     msp.serializeShorts(messageType, data, count);
-
-    for (uint8_t k=0; k<msp.payloadSize; ++k) {
-        Serial1.write(msp.payload[k]);
-    }
+    msp.sendPayload(Serial1);
 }
 
 // VL53L5 -------------------------------------------------------------

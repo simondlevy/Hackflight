@@ -39,8 +39,10 @@ class Msp {
 
         parserState_t m_parserState;
 
-        uint8_t payloadChecksum;
-        uint8_t payloadIndex;
+        uint8_t m_payload[BUF_SIZE];
+        uint8_t m_payloadSize;
+        uint8_t m_payloadChecksum;
+        uint8_t m_payloadIndex;
 
         void serialize16(int16_t a)
         {
@@ -50,9 +52,9 @@ class Msp {
 
         void prepareToSerialize(uint8_t type, uint8_t count, uint8_t size)
         {
-            payloadSize = 0;
-            payloadIndex = 0;
-            payloadChecksum = 0;
+            m_payloadSize = 0;
+            m_payloadIndex = 0;
+            m_payloadChecksum = 0;
 
             addToOutBuf('$');
             addToOutBuf('M');
@@ -63,13 +65,13 @@ class Msp {
 
         void addToOutBuf(uint8_t a)
         {
-            payload[payloadSize++] = a;
+            m_payload[m_payloadSize++] = a;
         }
 
         void serialize8(uint8_t a)
         {
             addToOutBuf(a);
-            payloadChecksum ^= a;
+            m_payloadChecksum ^= a;
         }
 
         void prepareToSerializeBytes(uint8_t type, uint8_t count)
@@ -93,9 +95,6 @@ class Msp {
         }
 
     public:
-
-        uint8_t payload[BUF_SIZE];
-        uint8_t payloadSize;
 
         parserState_t getParserState(void)
         {
@@ -142,7 +141,7 @@ class Msp {
 
             // Payload accumulation
             if (in_payload) {
-                payload[_index-1] = c;
+                m_payload[_index-1] = c;
             }
 
             if (m_parserState == GOT_CRC) {
@@ -167,7 +166,7 @@ class Msp {
         int16_t parseShort(uint8_t index)
         {
             int16_t s = 0;
-            memcpy(&s,  &payload[2*index], sizeof(int16_t));
+            memcpy(&s,  &m_payload[2*index], sizeof(int16_t));
             return s;
 
         }
@@ -179,7 +178,7 @@ class Msp {
 
         void completeSerialize(void)
         {
-            serialize8(payloadChecksum);
+            serialize8(m_payloadChecksum);
         }
 
         void serializeShort(uint16_t src)
@@ -203,12 +202,26 @@ class Msp {
 
         void serializeRequest(const uint8_t messageType)
         {
-            payload[0] = '$';
-            payload[1] = 'M';
-            payload[2] = '<';
-            payload[3] = 0;
-            payload[4] = messageType;
-            payload[5] = messageType; // checksum (CRC)
+            m_payload[0] = '$';
+            m_payload[1] = 'M';
+            m_payload[2] = '<';
+            m_payload[3] = 0;
+            m_payload[4] = messageType;
+            m_payload[5] = messageType; // checksum (CRC)
+        }
+
+        void sendPayload(void)
+        {
+            for (auto k=0; k<m_payloadSize; ++k) {
+                Serial.write(m_payload[k]);
+            }
+        }
+
+        void sendPayload(HardwareSerial & uart)
+        {
+            for (auto k=0; k<m_payloadSize; ++k) {
+                uart.write(m_payload[k]);
+            }
         }
 
 }; // class Msp
