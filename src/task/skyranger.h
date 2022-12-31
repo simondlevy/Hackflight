@@ -21,6 +21,8 @@
 #include "task.h"
 #include "msp.h"
 
+uint32_t g_count;
+
 class SkyrangerTask : public Task {
 
     private:
@@ -32,14 +34,23 @@ class SkyrangerTask : public Task {
 
         HardwareSerial * m_uart;
 
+        void sendRequest(uint8_t messageType) {
+
+            m_msp.serializeRequest(messageType);
+
+            for (uint8_t k=0; k<m_msp.payloadSize; ++k) {
+                m_uart->write(m_msp.payload[k]);
+            }
+        }
+
         void sendRangerRequest(void)
         {
-            //m_msp.sendRequest(RANGER_ID);
+            sendRequest(RANGER_ID);
         }
 
         void sendMocapRequest(void)
         {
-            //m_msp.sendRequest(MOCAP_ID);
+            sendRequest(MOCAP_ID);
         }
 
     public:
@@ -53,26 +64,25 @@ class SkyrangerTask : public Task {
         {
             (void)usec;
 
-            /*
-            while (m_msp.available()) {
+            g_count++;
 
-                auto byte = m_msp.read();
+            while (m_uart->available()) {
+
+                auto byte = m_uart->read();
 
                 auto messageType = m_msp.parse(byte);
 
                 switch (messageType) {
 
                     case RANGER_ID: 
-                        Serial.println("ranger");
                         sendRangerRequest();
                         break;
 
                     case MOCAP_ID:
-                        Serial.println("mocap");
                         sendMocapRequest();
                         break;
                 }
-            }*/
+            }
         }
 
         void begin(HardwareSerial * uart)

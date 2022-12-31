@@ -98,4 +98,7 @@ void setup(void)
 void loop(void)
 {
     _board->step();
+
+    extern uint32_t g_count;
+    Serial.println(g_count);
 }
