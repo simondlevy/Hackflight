@@ -20,7 +20,7 @@
 #include <hackflight.h>
 #include <board/stm32/ladybug.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <receiver/real/dsmx.h>
+#include <receiver/dsmx.h>
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -44,7 +44,9 @@ static void handleImuInterrupt(void)
 
 void serialEvent1(void)
 {
-    _rx.read(Serial1);
+    while (Serial1.available()) {
+        _rx.parse(Serial1.read());
+    }
 }
 
 void setup(void)

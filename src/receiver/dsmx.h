@@ -19,10 +19,10 @@
 
 #include <stdlib.h>
 
-#include "receiver/real.h"
+#include "receiver.h"
 #include "utils.h"
 
-class DsmxReceiver : public RealReceiver {
+class DsmxReceiver : public Receiver {
 
     private:
 
@@ -100,7 +100,9 @@ class DsmxReceiver : public RealReceiver {
             return result;
         }
 
-        virtual void parse(const uint8_t c) override
+    public:
+
+        void parse(const uint8_t c)
         {
             const uint32_t usec = micros();
             const uint32_t timeInterval = intcmp(usec, m_frameData.lastTimeUs);

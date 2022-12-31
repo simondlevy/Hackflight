@@ -47,6 +47,7 @@ class Stm32F411Board : public Stm32F4Board {
         {
         }
 
+        /*
         Stm32F411Board(
                 Receiver & receiver,
                 Imu & imu,
@@ -57,5 +58,5 @@ class Stm32F411Board : public Stm32F4Board {
                 const uint8_t ledPin) 
             : Stm32F4Board(1, receiver, imu, uart, pids, mixer, esc, ledPin)
         {
-        }
+        }*/
 };

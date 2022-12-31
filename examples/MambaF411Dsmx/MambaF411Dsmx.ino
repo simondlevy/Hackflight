@@ -22,7 +22,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
 #include <imu/real/softquat/mpu6x00.h>
-#include <receiver/real/dsmx.h>
+#include <receiver/dsmx.h>
 
 #include <vector>
 using namespace std;
@@ -69,7 +69,9 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent1(void)
 {
-    _rx.read(Serial1);
+    while (Serial1.available()) {
+        _rx.parse(Serial1.read());
+    }
 }
 
 static Mixer _mixer = QuadXbfMixer::make();
