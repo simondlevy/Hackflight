@@ -23,28 +23,16 @@ class Stm32Board : public Board {
     protected:
 
         Stm32Board(
+                Msp & msp,
                 Receiver & receiver,
                 Imu & imu,
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const int8_t ledPin)
-            : Board(receiver, imu, pids, mixer, esc, ledPin)
+            : Board(msp, receiver, imu, pids, mixer, esc, ledPin)
         {
         }
-
-        /*
-        Stm32Board(
-                Receiver & receiver,
-                Imu & imu,
-                HardwareSerial & uart,
-                vector<PidController *> & pids,
-                Mixer & mixer,
-                Esc & esc,
-                const int8_t ledPin)
-            : Board(receiver, imu, uart, pids, mixer, esc, ledPin)
-        {
-        }*/
 
      private:
 

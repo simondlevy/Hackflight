@@ -46,15 +46,15 @@ class VisualizerTask : public Task {
         Receiver *      m_receiver;
         VehicleState *  m_vstate;
 
-        Msp m_msp;
+        Msp * m_msp;
 
         bool m_gotRebootRequest;
 
         void sendShorts(
                 const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
-            m_msp.serializeShorts(messageType, src, count);
-            m_msp.sendPayload();
+            m_msp->serializeShorts(messageType, src, count);
+            m_msp->sendPayload();
         }
 
     protected:
@@ -67,11 +67,11 @@ class VisualizerTask : public Task {
 
                 auto byte = Serial.read();
 
-                if (m_msp.isIdle() && byte == 'R') {
+                if (m_msp->isIdle() && byte == 'R') {
                     m_gotRebootRequest = true;
                 }
 
-                auto messageType = m_msp.parse(byte);
+                auto messageType = m_msp->parse(byte);
 
                 switch (messageType) {
 
@@ -105,13 +105,13 @@ class VisualizerTask : public Task {
                     case 214: // SET_MOTORS
                         {
                             motors[0] =
-                                m_esc->convertFromExternal(m_msp.parseShort(0));
+                                m_esc->convertFromExternal(m_msp->parseShort(0));
                             motors[1] =
-                                m_esc->convertFromExternal(m_msp.parseShort(1));
+                                m_esc->convertFromExternal(m_msp->parseShort(1));
                             motors[2] =
-                                m_esc->convertFromExternal(m_msp.parseShort(2));
+                                m_esc->convertFromExternal(m_msp->parseShort(2));
                             motors[3] =
-                                m_esc->convertFromExternal(m_msp.parseShort(3));
+                                m_esc->convertFromExternal(m_msp->parseShort(3));
 
                         } break;
 
@@ -131,11 +131,13 @@ class VisualizerTask : public Task {
         float motors[MAX_SUPPORTED_MOTORS];
 
         void begin(
+                Msp * msp,
                 Esc * esc,
                 Arming * arming,
                 Receiver * receiver,
                 VehicleState * vstate)
         {
+            m_msp = msp;
             m_esc = esc;
             m_arming = arming;
             m_vstate = vstate;

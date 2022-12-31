@@ -22,25 +22,14 @@
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <debugger.h>
-#include <esc/dshot.h>
-#include <imu/real/softquat/mpu6x00.h>
-#include <receiver/real/sbus.h>
+#include <esc/mock.h>
+#include <imu/mock.h>
+#include <receiver/mock.h>
 
 #include <vector>
 using namespace std;
 
-// IMU
-static const uint8_t MOSI_PIN = PA7;
-static const uint8_t MISO_PIN = PA6;
-static const uint8_t SCLK_PIN = PA5;
-static const uint8_t CS_PIN   = PA4;
-static const uint8_t EXTI_PIN = PC4;
-
-static vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
-
 static const uint8_t LED_PIN  = PB5;
-
-static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
 static AnglePidController _anglePid(
         1.441305,     // Rate Kp
@@ -50,47 +39,18 @@ static AnglePidController _anglePid(
         0.0); // 3.0; // Level Kp
 
 static Stm32F405Board * _board;
-static Mpu6x00 * _imu;
-static SbusReceiver _rx;
 
 static vector<PidController *> _pids = {&_anglePid};
-
-extern "C" void handleDmaIrq(uint8_t id)
-{
-    _board->handleDmaIrq(id);
-}
-
-static void handleImuInterrupt(void)
-{
-    _imu->handleInterrupt();
-}
-
-void serialEvent3(void)
-{
-    _rx.read(Serial3);
-}
 
 static Mixer _mixer = QuadXbfMixer::make();
 
 void setup(void)
 {
-    pinMode(EXTI_PIN, INPUT);
-    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+    static MockReceiver rx;
+    static MockImu  imu;
+    static MockEsc esc;
 
-    static Mpu6x00 imu(RealImu::rotate270, _spi, CS_PIN);
-
-    static DshotEsc esc(&MOTOR_PINS);
-
-    static Stm32F405Board board(_rx, imu, Serial4, _pids, _mixer, esc, LED_PIN);
-
-    _board = &board;
-    _imu = &imu;
-
-    // Skyranger connection
-    Serial4.begin(115200);
-
-    // Receiver connection, SBUS protocol
-    Serial3.begin(100000, SERIAL_8E2);
+    static Stm32F405Board board(rx, imu, _pids, _mixer, esc, LED_PIN);
 
     _board->begin();
 }
@@ -98,7 +58,4 @@ void setup(void)
 void loop(void)
 {
     _board->step();
-
-    extern uint32_t g_rangerCount, g_mocapCount;
-    HfDebugger::printf("ranger=%06d  mocap=%06d\n", g_rangerCount, g_mocapCount);
 }

@@ -59,10 +59,11 @@ class Board {
         Scheduler      m_scheduler;
         VehicleState   m_vstate;
 
-        // Initialzed in main()
-        Imu *                     m_imu;
-        Esc *                     m_esc;
-        Mixer *                   m_mixer;
+        // Initialzed in sketch()
+        Msp *   m_msp;
+        Imu *   m_imu;
+        Esc *   m_esc;
+        Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
         void checkCoreTasks(uint32_t nowCycles)
@@ -223,6 +224,7 @@ class Board {
     protected:
 
         Board(
+                Msp & msp,
                 Receiver & receiver,
                 Imu & imu,
                 vector<PidController *> & pidControllers,
@@ -232,6 +234,7 @@ class Board {
         {
             m_receiverTask.receiver = &receiver;
 
+            m_msp = &msp;
             m_imu = &imu;
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
@@ -246,21 +249,6 @@ class Board {
 
             //m_skyclientTask = &m_mockSkyclientTask;
         }
-
-        /*
-        Board(
-                Receiver & receiver,
-                Imu & imu,
-                HardwareSerial & uart,
-                vector<PidController *> & pidControllers,
-                Mixer & mixer,
-                Esc & esc,
-                const int8_t ledPin)
-            : Board(receiver, imu, pidControllers, mixer, esc, ledPin)
-        {
-            m_skyclientUart = &uart;
-            m_skyclientTask = &m_realSkyclientTask;
-        }*/
 
     public:
 
@@ -305,7 +293,7 @@ class Board {
 
             m_attitudeTask.begin(m_imu, &m_arming, &m_vstate);
 
-            m_visualizerTask.begin(m_esc, &m_arming, m_receiverTask.receiver, &m_vstate);
+            m_visualizerTask.begin(m_msp, m_esc, &m_arming, m_receiverTask.receiver, &m_vstate);
 
             m_receiverTask.receiver->begin(&m_arming);
 

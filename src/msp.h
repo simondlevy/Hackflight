@@ -39,8 +39,6 @@ class Msp {
 
         parserState_t m_parserState;
 
-        uint8_t m_payload[BUF_SIZE];
-        uint8_t m_payloadSize;
         uint8_t m_payloadChecksum;
         uint8_t m_payloadIndex;
 
@@ -93,6 +91,11 @@ class Msp {
         {
             prepareToSerialize(type, count, 4);
         }
+
+    protected:
+
+        uint8_t m_payload[BUF_SIZE];
+        uint8_t m_payloadSize;
 
     public:
 
@@ -210,18 +213,6 @@ class Msp {
             m_payload[5] = messageType; // checksum (CRC)
         }
 
-        void sendPayload(void)
-        {
-            for (auto k=0; k<m_payloadSize; ++k) {
-                Serial.write(m_payload[k]);
-            }
-        }
-
-        void sendPayload(HardwareSerial & uart)
-        {
-            for (auto k=0; k<m_payloadSize; ++k) {
-                uart.write(m_payload[k]);
-            }
-        }
+        virtual void sendPayload(void) = 0;
 
 }; // class Msp

@@ -18,6 +18,7 @@
  */
 
 #include <hackflight.h>
+#include <msp/arduino.h>
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
@@ -77,11 +78,13 @@ void setup(void)
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
+    static ArduinoMsp msp;
+
     static Mpu6x00 imu(RealImu::rotate270, _spi, CS_PIN);
 
     static DshotEsc esc(&MOTOR_PINS);
 
-    static Stm32F405Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
+    static Stm32F405Board board(msp, _rx, imu, _pids, _mixer, esc, LED_PIN);
 
     _board = &board;
     _imu = &imu;
