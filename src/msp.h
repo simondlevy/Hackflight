@@ -99,11 +99,6 @@ class Msp {
 
     public:
 
-        parserState_t getParserState(void)
-        {
-            return m_parserState;
-        }
-
         /**
           * Returns message type or 0 for not  ready
           */
@@ -213,6 +208,8 @@ class Msp {
             m_payload[5] = messageType; // checksum (CRC)
         }
 
-        virtual void sendPayload(void) = 0;
+        virtual void sendPayload(void) 
+        {
+        }
 
 }; // class Msp

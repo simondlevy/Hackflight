@@ -27,7 +27,7 @@
 
 #include <hackflight.h>
 #include <debugger.h>
-#include "msp.h"
+#include "msp/arduino.h"
 
 // MCU choice --------------------------------------------------------
 
@@ -53,7 +53,10 @@ static const uint8_t MOCAP_MSG_TYPE  = 122;  // PAA3905 motion capture
 // Helper -------------------------------------------------------------
 
 static void sendData(
-        Msp & msp, const uint8_t messageType, const int16_t data[], const uint8_t count) 
+        ArduinoMsp & msp,
+        const uint8_t messageType,
+        const int16_t data[],
+        const uint8_t count) 
 {
     msp.serializeShorts(messageType, data, count);
     msp.sendPayload(Serial1);
@@ -95,7 +98,7 @@ static void startRanger(void)
     _ranger.begin();
 }
 
-static void checkRanger(Msp & msp)
+static void checkRanger(ArduinoMsp & msp)
 {
     static int16_t data[16];
 
@@ -157,7 +160,7 @@ static void startMocap(void)
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
 }
 
-static void checkMocap(Msp & msp)
+static void checkMocap(ArduinoMsp & msp)
 {
     static int16_t data[2];
 
@@ -204,7 +207,7 @@ void setup()
 
 void loop()
 {
-    static Msp _msp;
+    static ArduinoMsp _msp;
 
     checkRanger(_msp);
     checkMocap(_msp);
