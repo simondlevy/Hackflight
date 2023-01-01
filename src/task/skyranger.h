@@ -29,7 +29,10 @@ class SkyrangerTask : public Task {
         static const uint8_t RANGER_ID = 121;  // VL53L5 ranger
         static const uint8_t MOCAP_ID  = 122;  // PAA3905 motion capture
 
-        Msp m_msp;
+        int16_t m_mocapData[2];
+        int16_t m_rangerData[16];
+
+        Msp m_parser;
 
     public:
 
@@ -41,22 +44,25 @@ class SkyrangerTask : public Task {
         virtual void fun(uint32_t usec) override
         {
             (void)usec;
+
+            HfDebugger::printf("mocap: %d %d\n", m_mocapData[0], m_mocapData[1]);
         }
 
         virtual void parse(const uint8_t byte)
         {
-            auto messageType = m_msp.parse(byte);
+            auto messageType = m_parser.parse(byte);
 
             switch (messageType) {
 
                 case 221: // VL53L5 ranger
-                    HfDebugger::printf("ranger\n");
+                    for (uint8_t k=0; k<16; ++k) {
+                        m_rangerData[k] = m_parser.parseShort(k);
+                    }
                     break;
 
                 case 222: // PAA3906 mocap
-                    auto dx = m_msp.parseShort(0);
-                    auto dy = m_msp.parseShort(1);
-                    HfDebugger::printf("mocap: %d %d\n", dx, dy);
+                    m_mocapData[0] = m_parser.parseShort(0);
+                    m_mocapData[1] = m_parser.parseShort(1);
                     break;
             }
         }

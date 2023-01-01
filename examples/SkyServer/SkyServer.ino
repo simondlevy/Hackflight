@@ -135,10 +135,8 @@ static void startMocap(void)
 
     // Check device ID as a test of SPI communications
     if (!_mocap.begin()) {
-        Debugger::reportForever("PAA3905 initialization failed");
+        HfDebugger::reportForever("PAA3905 initialization failed");
     }
-
-    Debugger::printf("Resolution is %0.1f CPI per meter height\n", _mocap.getResolution());
 
     pinMode(PAA3905_MOT_PIN, INPUT); 
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
