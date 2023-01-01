@@ -48,20 +48,28 @@ static AnglePidController _anglePid(
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-static Stm32F405Board * _board;
-static Mpu6x00 * _imu;
+static Mixer _mixer = QuadXbfMixer::make();
+
+static ArduinoMsp msp;
+
+static DshotEsc esc(&MOTOR_PINS);
+
 static SbusReceiver _rx;
+
+static ArduinoMpu6x00 _imu(_spi, RealImu::rotate270, CS_PIN);
 
 static vector<PidController *> _pids = {&_anglePid};
 
+static Stm32F405Board _board(msp, _rx, _imu, _pids, _mixer, esc, LED_PIN);
+
 extern "C" void handleDmaIrq(uint8_t id)
 {
-    _board->handleDmaIrq(id);
+    _board.handleDmaIrq(id);
 }
 
 static void handleImuInterrupt(void)
 {
-    _imu->handleInterrupt();
+    _imu.handleInterrupt();
 }
 
 void serialEvent3(void)
@@ -71,30 +79,17 @@ void serialEvent3(void)
     }
 }
 
-static Mixer _mixer = QuadXbfMixer::make();
-
 void setup(void)
 {
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static ArduinoMsp msp;
-
-    static ArduinoMpu6x00 imu(_spi, RealImu::rotate270, CS_PIN);
-
-    static DshotEsc esc(&MOTOR_PINS);
-
-    static Stm32F405Board board(msp, _rx, imu, _pids, _mixer, esc, LED_PIN);
-
-    _board = &board;
-    _imu = &imu;
-
     Serial3.begin(100000, SERIAL_8E2);
 
-    _board->begin();
+    _board.begin();
 }
 
 void loop(void)
 {
-    _board->step();
+    _board.step();
 }
