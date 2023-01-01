@@ -20,6 +20,7 @@
 
 #include "task.h"
 #include "msp.h"
+#include "debugger.h"
 
 class SkyrangerTask : public Task {
 
@@ -46,8 +47,13 @@ class SkyrangerTask : public Task {
         {
             auto messageType = m_msp.parse(byte);
 
-            if (messageType != 0) {
-                Serial.println(messageType);
+            switch (messageType) {
+
+                case 222: // PAA3906 mocap
+                    auto dx = m_msp.parseShort(0);
+                    auto dy = m_msp.parseShort(1);
+                    HfDebugger::printf("%d %d\n", dx, dy);
+                    break;
             }
         }
 

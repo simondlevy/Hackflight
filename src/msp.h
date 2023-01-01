@@ -21,8 +21,6 @@
 
 #include <stdint.h>
 
-#include "debugger.h"
-
 class Msp {
 
     private:
