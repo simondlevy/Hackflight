@@ -58,7 +58,7 @@ approach to taming the complexity of flight control.  In your ```setup()``` func
 instantiate a Board subclass, passing it the objects for your receiver, IMU,
 PID controllers, mixer, ESC, and LED pin number.  In your ```loop``` function, you just call 
 the ```step()``` method on the Board object.  Look at this
-[example program](https://github.com/simondlevy/Hackflight/blob/master/examples/BetaFpvF405Sbus/BetaFpvF405Sbus.ino)
+[example program](https://github.com/simondlevy/Hackflight/blob/master/examples/MambaF411Dsmx/MambaF411Dsmx.ino)
 to get an idea of how this approach works.
 
 ## Desktop visualizer app
