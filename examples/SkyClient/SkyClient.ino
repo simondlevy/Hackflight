@@ -28,41 +28,52 @@
 #include <vector>
 using namespace std;
 
+// IMU
+static const uint8_t MOSI_PIN = PA7;
+static const uint8_t MISO_PIN = PA6;
+static const uint8_t SCLK_PIN = PA5;
+static const uint8_t CS_PIN   = PA4;
+static const uint8_t EXTI_PIN = PC4;
+
+static vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
+
 static const uint8_t LED_PIN = PB5;
 
-static Stm32F405Board * _board;
+static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
-static vector<PidController *> _pids = {};
+static AnglePidController _anglePid(
+        1.441305,     // Rate Kp
+        48.8762,      // Rate Ki
+        0.021160,     // Rate Kd
+        0.0165048,    // Rate Kf
+        0.0); // 3.0; // Level Kp
 
 static Mixer _mixer = QuadXbfMixer::make();
+
+static ArduinoMsp msp;
+
+static MockImu imu;
+static MockReceiver rx;
+static MockEsc esc;
+
+static Stm32F405Board board(msp, rx, imu, _pids, _mixer, esc, LED_PIN);
 
 void serialEvent4(void)
 {
     while (Serial4.available()) {
-        _board->parseSkyRanger(Serial4.read());
+        _board.parseSkyRanger(Serial4.read());
     }
 }
 
-
 void setup(void)
 {
-    static ArduinoMsp msp;
-
-    static MockImu imu;
-    static MockReceiver rx;
-    static MockEsc esc;
-
-    static Stm32F405Board board(msp, rx, imu, _pids, _mixer, esc, LED_PIN);
-
     // Skyranger connection
     Serial4.begin(115200);
 
-    _board = &board;
-
-    _board->begin();
+    _board.begin();
 }
 
 void loop(void)
 {
-    _board->step();
+    _board.step();
 }

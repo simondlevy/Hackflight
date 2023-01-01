@@ -22,30 +22,30 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <receiver/dsmx.h>
 
-static AnglePidController _anglePid(
+static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
         0.021160,     // Rate Kd
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-static vector<PidController *> _pids = {&_anglePid};
+static vector<PidController *> pids = {&anglePid};
 
-static Mixer _mixer = QuadXbfMixer::make();
+static Mixer mixer = QuadXbfMixer::make();
 
-static LadybugBoard * _board;
+static DsmxReceiver rx;
 
-static DsmxReceiver _rx;
+static LadybugBoard board(rx, pids, mixer);
 
 static void handleImuInterrupt(void)
 {
-    _board->handleInterrupt();
+    board.handleInterrupt();
 }
 
 void serialEvent1(void)
 {
     while (Serial1.available()) {
-        _rx.parse(Serial1.read());
+        rx.parse(Serial1.read());
     }
 }
 
@@ -54,16 +54,12 @@ void setup(void)
     pinMode(LadybugBoard::IMU_INTERRUPT_PIN, INPUT);
     attachInterrupt(LadybugBoard::IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
 
-    static LadybugBoard board(_rx, _pids, _mixer);
-
-    _board = &board;
-
     Serial1.begin(115200);
 
-    _board->begin();
+    board.begin();
 }
 
 void loop(void)
 {
-    _board->step();
+    board.step();
 }

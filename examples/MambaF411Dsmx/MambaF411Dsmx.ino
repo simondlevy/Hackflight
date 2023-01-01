@@ -40,46 +40,46 @@ static vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
 //static const uint8_t LED_PIN  = PC13; // orange
 static const uint8_t LED_PIN  = PC14; // blue
 
-static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
+static SPIClass spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
-static AnglePidController _anglePid(
+static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
         0.021160,     // Rate Kd
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-static Mixer _mixer = QuadXbfMixer::make();
+static Mixer mixer = QuadXbfMixer::make();
 
 static ArduinoMsp msp;
 
 static DshotEsc esc(&MOTOR_PINS);
 
-static DsmxReceiver _rx;
+static DsmxReceiver rx;
 
-static ArduinoMpu6x00 _imu(_spi, RealImu::rotate180, CS_PIN);
+static ArduinoMpu6x00 imu(spi, RealImu::rotate180, CS_PIN);
 
-static vector<PidController *> _pids = {&_anglePid};
+static vector<PidController *> pids = {&anglePid};
 
-static Stm32F411Board _board(msp, _rx, _imu, _pids, _mixer, esc, LED_PIN);
+static Stm32F411Board board(msp, rx, imu, pids, mixer, esc, LED_PIN);
 
 // Motor interrupt
 extern "C" void handleDmaIrq(void)
 {
-    _board.handleDmaIrq(0);
+    board.handleDmaIrq(0);
 }
 
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    _imu.handleInterrupt();
+    imu.handleInterrupt();
 }
 
 // Receiver interrupt
 void serialEvent1(void)
 {
     while (Serial1.available()) {
-        _rx.parse(Serial1.read());
+        rx.parse(Serial1.read());
     }
 }
 
@@ -90,10 +90,10 @@ void setup(void)
 
     Serial1.begin(115200);
 
-    _board.begin();
+    board.begin();
 }
 
 void loop(void)
 {
-    _board.step();
+    board.step();
 }
