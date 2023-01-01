@@ -23,7 +23,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/mock.h>
 #include <imu/real/softquat/mpu6x00/arduino.h>
-#include <receiver/mock.h>
+#include <receiver/sbus.h>
 
 #include <vector>
 using namespace std;
@@ -52,7 +52,7 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static ArduinoMsp msp;
 
-static MockReceiver rx;
+static SbusReceiver rx;
 
 static ArduinoMpu6x00 imu(spi, RealImu::rotate270, CS_PIN);
 
@@ -67,7 +67,15 @@ static void handleImuInterrupt(void)
     imu.handleInterrupt();
 }
 
-// Incoming data from Skyranger
+// Receiver interrupt
+void serialEvent3(void)
+{
+    while (Serial3.available()) {
+        rx.parse(Serial3.read());
+    }
+}
+
+// Skyranger interrupt
 void serialEvent4(void)
 {
     while (Serial4.available()) {
@@ -79,6 +87,9 @@ void setup(void)
 {
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+
+    // Receiver connection
+    Serial3.begin(100000, SERIAL_8E2);
 
     // Skyranger connection
     Serial4.begin(115200);
