@@ -1,6 +1,5 @@
-## Hackflight Visualizer app
-
 <p align="center"> 
+## Hackflight Visualizer app
 <img src="hfviz.png" width=500>
 </p>
 
