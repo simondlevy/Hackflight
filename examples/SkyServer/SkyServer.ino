@@ -16,9 +16,6 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-//  Adapted from https://randomnerdtutorials.com/esp-now-two-way-communication-esp32/
-
 #include <Wire.h>
 #include <SPI.h>
 
