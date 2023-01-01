@@ -25,30 +25,22 @@
 #include <VL53L5cx.h>
 #include <PAA3905_MotionCapture.h>
 
-#include <hackflight.h>
-#include <debugger.h>
+#include "hackflight.h"
+#include "debugger.h"
 #include "msp/arduino.h"
 
-// MCU choice --------------------------------------------------------
+// Pins ---------------------------------------------------------------
 
-static const uint8_t SR_INT_PIN = 15;
-static const uint8_t SR_LPN_PIN = 2;
-static const uint8_t SR_CS_PIN  = 5;
-static const uint8_t SR_MOT_PIN = 4;
-
-static const uint8_t TP_INT_PIN = 4;
-static const uint8_t TP_LPN_PIN = 14;
-static const uint8_t TP_CS_PIN  = 5;
-static const uint8_t TP_MOT_PIN = 32;
-
-// TP
-static const uint8_t RX1_PIN = 15;
-static const uint8_t TX1_PIN = 27;
+static const uint8_t VL53L5_INT_PIN  = 15;
+static const uint8_t VL53L5_LPN_PIN  = 2;
+static const uint8_t PAA3905_CS_PIN  = 5;
+static const uint8_t PAA3905_MOT_PIN = 4;
+static const uint8_t LED_PIN         = 25;
 
 // MSP message IDs ----------------------------------------------------
 
-static const uint8_t RANGER_MSG_TYPE = 121;  // VL53L5 ranger
-static const uint8_t MOCAP_MSG_TYPE  = 122;  // PAA3905 motion capture
+static const uint8_t RANGER_MSG_TYPE = 221;  // VL53L5 ranger
+static const uint8_t MOCAP_MSG_TYPE  = 222;  // PAA3905 motion capture
 
 // Helper -------------------------------------------------------------
 
@@ -59,13 +51,10 @@ static void sendData(
         const uint8_t count) 
 {
     msp.serializeShorts(messageType, data, count);
-    msp.sendPayload(Serial1);
+    msp.sendPayload();
 }
 
 // VL53L5 -------------------------------------------------------------
-
-static const uint8_t VL53L5_INT_PIN = TP_INT_PIN; // Set to 0 for polling
-static const uint8_t VL53L5_LPN_PIN = TP_LPN_PIN;
 
 // Set to 0 for continuous mode
 static const uint8_t VL53L5_INTEGRAL_TIME_MS = 10;
@@ -123,9 +112,6 @@ static void checkRanger(ArduinoMsp & msp)
 }
 
 // PAA3905 -----------------------------------------------------------
-
-static const uint8_t PAA3905_CS_PIN  = TP_CS_PIN; 
-static const uint8_t PAA3905_MOT_PIN = TP_MOT_PIN; 
 
 PAA3905_MotionCapture _mocap(
         SPI,
@@ -193,13 +179,27 @@ static void checkMocap(ArduinoMsp & msp)
     sendData(msp, MOCAP_MSG_TYPE, data, 2);
 }
 
+static void updateLed(void)
+{
+    static uint32_t _prev;
+    static bool _state;
+
+    uint32_t msec = millis();
+
+    if (msec - _prev > 500) {
+        _state = !_state;
+        digitalWrite(LED_PIN, _state);
+        _prev = msec;
+    }
+}
+
 // ------------------------------------------------------------------
 
 void setup()
 {
     Serial.begin(115200);
 
-    Serial1.begin(115200, SERIAL_8N1, RX1_PIN, TX1_PIN);
+    pinMode(LED_PIN, OUTPUT);
 
     startRanger();
     startMocap();
@@ -211,4 +211,6 @@ void loop()
 
     checkRanger(_msp);
     checkMocap(_msp);
+
+    updateLed();
 }
