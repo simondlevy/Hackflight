@@ -93,8 +93,6 @@ static void checkRanger(ArduinoMsp & msp)
 
     if (VL53L5_INT_PIN == 0 || _gotRangerInterrupt) {
 
-        //Serial.println("ranger");
-
         _gotRangerInterrupt = false;
 
         while (!_ranger.dataIsReady()) {
@@ -108,7 +106,7 @@ static void checkRanger(ArduinoMsp & msp)
         }
     } 
 
-    // sendData(msp, RANGER_MSG_TYPE, data, 16);
+    sendData(msp, RANGER_MSG_TYPE, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -151,10 +149,6 @@ static void checkMocap(ArduinoMsp & msp)
     static int16_t data[2];
 
     if (_gotMotionInterrupt) {
-
-        static uint32_t count;
-
-        HfDebugger::printf("mocap %d\n", count++);
 
         _gotMotionInterrupt = false;
 

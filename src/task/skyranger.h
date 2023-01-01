@@ -49,10 +49,14 @@ class SkyrangerTask : public Task {
 
             switch (messageType) {
 
+                case 221: // VL53L5 ranger
+                    HfDebugger::printf("ranger\n");
+                    break;
+
                 case 222: // PAA3906 mocap
                     auto dx = m_msp.parseShort(0);
                     auto dy = m_msp.parseShort(1);
-                    HfDebugger::printf("%d %d\n", dx, dy);
+                    HfDebugger::printf("mocap: %d %d\n", dx, dy);
                     break;
             }
         }
