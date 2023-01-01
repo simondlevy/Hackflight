@@ -114,8 +114,8 @@ class Msp {
             // Payload functions
             _size = m_parserState == GOT_ARROW ? c : _size;
             _index = m_parserState == IN_PAYLOAD ? _index + 1 : 0;
-            const bool incoming = _type >= 200;
-            const bool in_payload = incoming && m_parserState == IN_PAYLOAD;
+            const bool isCommand = _type >= 200;
+            const bool inPayload = isCommand && m_parserState == IN_PAYLOAD;
             // Command acquisition function
             _type = m_parserState == GOT_SIZE ? c : _type;
 
@@ -138,7 +138,7 @@ class Msp {
                 : 0;
 
             // Payload accumulation
-            if (in_payload) {
+            if (inPayload) {
                 m_payload[_index-1] = c;
             }
 
