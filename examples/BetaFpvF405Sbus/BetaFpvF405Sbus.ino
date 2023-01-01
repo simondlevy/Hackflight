@@ -37,7 +37,7 @@ static const uint8_t EXTI_PIN = PC4;
 
 static vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
 
-static const uint8_t LED_PIN  = PB5;
+static const uint8_t LED_PIN = PB5;
 
 static SPIClass spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
@@ -52,26 +52,29 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static ArduinoMsp msp;
 
-static DshotEsc esc(&MOTOR_PINS);
-
 static SbusReceiver rx;
 
 static ArduinoMpu6x00 imu(spi, RealImu::rotate270, CS_PIN);
 
 static vector<PidController *> pids = {&_anglePid};
 
+static DshotEsc esc(&MOTOR_PINS);
+
 static Stm32F405Board board(msp, rx, imu, pids, mixer, esc, LED_PIN);
 
+// DSHOT timer interrupt
 extern "C" void handleDmaIrq(uint8_t id)
 {
     board.handleDmaIrq(id);
 }
 
+// IMU interrupt
 static void handleImuInterrupt(void)
 {
     imu.handleInterrupt();
 }
 
+// Receiver interrupt
 void serialEvent3(void)
 {
     while (Serial3.available()) {
@@ -79,12 +82,25 @@ void serialEvent3(void)
     }
 }
 
+// Skyranger interrupt
+void serialEvent4(void)
+{
+    while (Serial4.available()) {
+        board.parseSkyRanger(Serial4.read());
+    }
+}
+
 void setup(void)
 {
+    // Set up IMU interrupt
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
+    // Start receiver UART
     Serial3.begin(100000, SERIAL_8E2);
+
+    // Start Skyranger UART
+    Serial4.begin(115200);
 
     board.begin();
 }
