@@ -46,6 +46,8 @@ class SkyrangerTask : public Task {
             (void)usec;
 
             HfDebugger::printf("mocap: %d %d\n", m_mocapData[0], m_mocapData[1]);
+
+            HfDebugger::printf("ranger: %d\n", m_rangerData[5]);
         }
 
         virtual void parse(const uint8_t byte)
