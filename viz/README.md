@@ -1,6 +1,8 @@
 ## Hackflight Visualizer app
 
+<p align="center"> 
 <img src="hfviz.png" width=500>
+</p>
 
 HFViz is a simple visualization app that lets you see the
 orientation of your vehicle and your RC channels and individually test the
