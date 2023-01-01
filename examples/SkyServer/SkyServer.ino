@@ -42,13 +42,13 @@ static const uint8_t MOCAP_MSG_TYPE  = 222;  // PAA3905 motion capture
 // Helper -------------------------------------------------------------
 
 static void sendData(
-        ArduinoMsp & msp,
+        ArduinoMsp & serializer,
         const uint8_t messageType,
         const int16_t data[],
         const uint8_t count) 
 {
-    msp.serializeShorts(messageType, data, count);
-    msp.sendPayload();
+    serializer.serializeShorts(messageType, data, count);
+    serializer.sendPayload();
 }
 
 // VL53L5 -------------------------------------------------------------
@@ -84,7 +84,7 @@ static void startRanger(void)
     _ranger.begin();
 }
 
-static void checkRanger(ArduinoMsp & msp)
+static void checkRanger(ArduinoMsp & serializer)
 {
     static int16_t data[16];
 
@@ -103,7 +103,7 @@ static void checkRanger(ArduinoMsp & msp)
         }
     } 
 
-    sendData(msp, RANGER_MSG_TYPE, data, 16);
+    sendData(serializer, RANGER_MSG_TYPE, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -139,7 +139,7 @@ static void startMocap(void)
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
 }
 
-static void checkMocap(ArduinoMsp & msp)
+static void checkMocap(ArduinoMsp & serializer)
 {
     static int16_t data[2];
 
@@ -165,7 +165,7 @@ static void checkMocap(ArduinoMsp & msp)
         }
     }
 
-    sendData(msp, MOCAP_MSG_TYPE, data, 2);
+    sendData(serializer, MOCAP_MSG_TYPE, data, 2);
 }
 
 static void updateLed(void)
@@ -196,10 +196,10 @@ void setup()
 
 void loop()
 {
-    static ArduinoMsp _msp;
+    static ArduinoMsp _serializer;
 
-    checkRanger(_msp);
-    checkMocap(_msp);
+    checkRanger(_serializer);
+    checkMocap(_serializer);
 
     updateLed();
 }
