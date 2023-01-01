@@ -21,6 +21,8 @@
 
 #include <stdint.h>
 
+#include "debugger.h"
+
 class Msp {
 
     private:
@@ -111,12 +113,13 @@ class Msp {
             static uint8_t _size;
             static uint8_t _index;
 
-            // Payload functions
+            // Payload transition functions
             _size = m_parserState == GOT_ARROW ? c : _size;
             _index = m_parserState == IN_PAYLOAD ? _index + 1 : 0;
             const bool isCommand = _type >= 200;
             const bool inPayload = isCommand && m_parserState == IN_PAYLOAD;
-            // Command acquisition function
+
+            // Message-type transition function
             _type = m_parserState == GOT_SIZE ? c : _type;
 
             // Parser state transition function (final transition below)

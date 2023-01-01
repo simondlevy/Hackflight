@@ -39,7 +39,7 @@ static const uint8_t TX1_PIN = 27;
 
 // MSP message IDs ----------------------------------------------------
 
-static const uint8_t MOCAP_MSG_TYPE  = 122;  // PAA3905 motion capture
+static const uint8_t MOCAP_MSG_TYPE  = 222;  // PAA3905 motion capture
 
 // Helper -------------------------------------------------------------
 
