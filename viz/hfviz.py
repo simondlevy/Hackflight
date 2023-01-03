@@ -184,7 +184,11 @@ class Viz(MspParser):
     def getRollPitchYaw(self):
 
         # configure button to show connected
-        self._enable_buttons()
+        self._enable_button(self.button_imu)
+        self._enable_button(self.button_motors)
+        self._enable_button(self.button_receiver)
+        self._enable_button(self.button_sensors)
+
         self.button_connect['text'] = 'Disconnect'
         self._enable_button(self.button_connect)
 
@@ -375,7 +379,10 @@ class Viz(MspParser):
 
             self._clear()
 
-            self._disable_buttons()
+            self._disable_button(self.button_imu)
+            self._disable_button(self.button_motors)
+            self._disable_button(self.button_receiver)
+            self._disable_button(self.button_sensors)
 
             self.button_connect['text'] = 'Connect'
 
@@ -454,20 +461,6 @@ class Viz(MspParser):
     def _schedule_connection_task(self):
 
         self.root.after(USB_UPDATE_MSEC, self._connection_task)
-
-    def _disable_buttons(self):
-
-        self._disable_button(self.button_imu)
-        self._disable_button(self.button_motors)
-        self._disable_button(self.button_receiver)
-        self._disable_button(self.button_sensors)
-
-    def _enable_buttons(self):
-
-        self._enable_button(self.button_imu)
-        self._enable_button(self.button_motors)
-        self._enable_button(self.button_receiver)
-        self._enable_button(self.button_sensors)
 
     def _enable_button(self, button):
 
