@@ -296,7 +296,7 @@ class Board {
             m_led.flash(10, 50);
         }
 
-        void parseSkyRanger(const uint8_t byte)
+        void parseSensors(const uint8_t byte)
         {
             m_sensorsTask.parse(byte);
         }

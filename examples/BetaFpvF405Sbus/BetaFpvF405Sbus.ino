@@ -82,11 +82,11 @@ void serialEvent3(void)
     }
 }
 
-// Skyranger interrupt
+// Sensors interrupt
 void serialEvent4(void)
 {
     while (Serial4.available()) {
-        board.parseSkyRanger(Serial4.read());
+        board.parseSensors(Serial4.read());
     }
 }
 
