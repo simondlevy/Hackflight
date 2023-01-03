@@ -106,6 +106,10 @@ class VisualizerTask : public Task {
 
                         } break;
 
+                    case 121: // VL53L5 ranging camera
+                        sendShorts(121, m_sensorsTask->rangerData, 16);
+                        break;
+
                     case 122: // PAA3905 mocap
                         sendShorts(122, m_sensorsTask->mocapData, 2);
                         break;
