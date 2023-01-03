@@ -119,6 +119,9 @@ class GCS(MspParser):
         # Create receiver dialog
         self.receiver = Receiver(self)
 
+        # Creaate sensors dialog
+        self.sensors = Sensors(self)
+
         # Create IMU dialog
         self.imu = IMU(self)
         self._schedule_connection_task()
@@ -130,10 +133,17 @@ class GCS(MspParser):
         # Set up parser's request strings
         self.attitude_request = MspParser.serialize_ATTITUDE_Request()
         self.rc_request = MspParser.serialize_RC_Request()
+        # self.paa3905_request = MspParser.serialize_PAA3905_Request()
+        # self.vl53l5_request = MspParser.serialize_VL53L5_Request()
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
         self.rxchannels = [0]*6
+
+        self.mock_mocap_xdir = +1
+        self.mock_mocap_ydir = -1
+        self.mock_mocap_dx = 0
+        self.mock_mocap_dy = 0
 
     def quit(self):
         self.motors_quadxmw.stop()
@@ -147,6 +157,29 @@ class GCS(MspParser):
     def getChannels(self):
 
         return self.rxchannels
+
+    def getRanger(self):
+
+        import numpy.random as random
+        return (random.randint(0, 256) for _ in range(16))
+
+    def getMocap(self):
+
+        SCALE = 0.1
+
+        self.mock_mocap_dx += self.mock_mocap_xdir * SCALE
+        if self.mock_mocap_dx > 100:
+            self.mock_mocap_xdir = -1
+        if self.mock_mocap_dx < -100:
+            self.mock_mocap_xdir = +1
+
+        self.mock_mocap_dy += self.mock_mocap_ydir * SCALE
+        if self.mock_mocap_dy > 100:
+            self.mock_mocap_ydir = -1
+        if self.mock_mocap_dy < -100:
+            self.mock_mocap_ydir = +1
+
+        return self.mock_mocap_dx, self.mock_mocap_dy
 
     def getRollPitchYaw(self):
 
@@ -239,6 +272,7 @@ class GCS(MspParser):
         self.motors_quadxmw.stop()
         self.motors_coaxial.stop()
         self.receiver.stop()
+        self.sensors.stop()
         self._send_attitude_request()
         self.imu.start()
 
@@ -271,6 +305,14 @@ class GCS(MspParser):
 
         self.comms.send_request(self.rc_request)
 
+    # Sends sensor requests to FC
+    def _send_sensors_request(self):
+
+        return
+
+        # self.comms.send_request(self.vl53l5_request)
+        # self.comms.send_request(self.paa3905_request)
+
     # Callback for Motors button
     def _motors_button_callback(self):
 
@@ -280,6 +322,7 @@ class GCS(MspParser):
 
         self.imu.stop()
         self.receiver.stop()
+        self.sensors.stop()
         self.motors_quadxmw.start()
 
     def _clear(self):
@@ -292,6 +335,7 @@ class GCS(MspParser):
         self._clear()
 
         self.imu.stop()
+        self.sensors.stop()
         self.motors_quadxmw.stop()
         self.motors_coaxial.stop()
         self._send_rc_request()
@@ -410,12 +454,14 @@ class GCS(MspParser):
         self._disable_button(self.button_imu)
         self._disable_button(self.button_motors)
         self._disable_button(self.button_receiver)
+        self._disable_button(self.button_sensors)
 
     def _enable_buttons(self):
 
         self._enable_button(self.button_imu)
         self._enable_button(self.button_motors)
         self._enable_button(self.button_receiver)
+        self._enable_button(self.button_sensors)
 
     def _enable_button(self, button):
 
