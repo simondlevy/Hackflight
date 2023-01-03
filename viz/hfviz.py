@@ -44,10 +44,10 @@ CONNECTION_DELAY_MSEC = 4000
 
 USB_UPDATE_MSEC = 200
 
-# GCS class runs the show =====================================================
+# Viz class runs the show =====================================================
 
 
-class GCS(MspParser):
+class Viz(MspParser):
 
     def __init__(self):
 
@@ -517,7 +517,7 @@ class GCS(MspParser):
 
 def main():
 
-    GCS()
+    Viz()
     tk.mainloop()
 
 
