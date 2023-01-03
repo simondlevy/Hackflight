@@ -15,8 +15,6 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 '''
 
-#!/usr/bin/env python3
-
 from comms import Comms
 from serial.tools.list_ports import comports
 import os
@@ -60,7 +58,9 @@ class Viz(MspParser):
 
         # Do basic Tk initialization
         self.root = tk.Tk()
-        self.root.configure(bg=BACKGROUND_COLOR, highlightbackground='black', highlightthickness=3)
+        self.root.configure(bg=BACKGROUND_COLOR,
+                            highlightbackground='black',
+                            highlightthickness=3)
         self.root.resizable(False, False)
         self.root.title('Hackflight Visualizer')
         left = (self.root.winfo_screenwidth() - DISPLAY_WIDTH) / 2
@@ -212,7 +212,12 @@ class Viz(MspParser):
             return 2 * norm(x) - 1
 
         # Scale throttle from [-1,+1] to [0,1]
-        self.rxchannels = norm(c1), scale(c2), scale(c3), scale(c4), scale(c5), scale(c6)
+        self.rxchannels = (norm(c1),
+                           scale(c2),
+                           scale(c3),
+                           scale(c4),
+                           scale(c5),
+                           scale(c6))
 
         # As soon as we handle the callback from one request, send another
         # request, if receiver dialog is running
@@ -230,7 +235,9 @@ class Viz(MspParser):
         if self.imu.running:
             self._send_attitude_request()
 
-    def handle_VL53L5(self, p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34, p41, p42, p43, p44):
+    def handle_VL53L5(self,
+                      p11, p12, p13, p14, p21, p22, p23, p24,
+                      p31, p32, p33, p34, p41, p42, p43, p44):
         return
 
     def handle_PAA3905(self, x, y):
@@ -474,8 +481,12 @@ class Viz(MspParser):
 
     def sendMotorMessage(self, motors):
 
-        if self.comms is not None: # Guard at startup
-                self.comms.send_message(MspParser.serialize_SET_MOTOR, (motors[0], motors[1], motors[2], motors[3]))
+        if self.comms is not None:  # Guard at startup
+            self.comms.send_message(MspParser.serialize_SET_MOTOR,
+                                    (motors[0],
+                                     motors[1],
+                                     motors[2],
+                                     motors[3]))
 
     def _show_splash(self):
 

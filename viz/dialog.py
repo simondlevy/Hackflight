@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with
 Hackflight. If not, see <https://www.gnu.org/licenses/>.
 '''
 
+
 class Dialog(object):
 
     def __init__(self, viz):
