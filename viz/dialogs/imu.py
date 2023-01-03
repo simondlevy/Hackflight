@@ -167,9 +167,6 @@ class IMU(Dialog):
 
         rot = np.dot(np.dot(self.yawrot, self.pitchrot), self.rollrot)
 
-        # Add a label for arming if needed
-        self.viz.checkArmed()
-
         # Draw polygons
         for i in range(len(self.vehicle_faces)):
 

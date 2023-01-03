@@ -62,9 +62,6 @@ class Receiver(Dialog):
 
             self.schedule_display_task(UPDATE_MSEC)
 
-            # Add a label for arming if needed
-            self.viz.checkArmed()
-
     def _new_gauge(self, offset, name, color, minval=-1):
 
         return HorizontalGauge(self, 100, 60+85*offset, 600, 40, color, name,

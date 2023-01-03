@@ -184,7 +184,7 @@ class Viz(MspParser):
     def getRollPitchYaw(self):
 
         # configure button to show connected
-        self._enable_button(self.button_imu)
+        # self._enable_button(self.button_imu)
         self._enable_button(self.button_motors)
         self._enable_button(self.button_receiver)
         self._enable_button(self.button_sensors)
@@ -193,22 +193,6 @@ class Viz(MspParser):
         self._enable_button(self.button_connect)
 
         return self.roll_pitch_yaw
-
-    def checkArmed(self):
-
-        if self.armed:
-
-            self._show_armed(self.root)
-            self._show_armed(self.pane1)
-            self._show_armed(self.pane2)
-
-            self._disable_button(self.button_motors)
-
-        else:
-
-            self._show_disarmed(self.root)
-            self._show_disarmed(self.pane1)
-            self._show_disarmed(self.pane2)
 
     def scheduleTask(self, delay_msec, task):
 
@@ -398,7 +382,7 @@ class Viz(MspParser):
             self.button_connect['text'] = 'Connecting ...'
             self._disable_button(self.button_connect)
 
-            self._hide_splash()
+            self.canvas.delete(self.splash)
 
             self.scheduleTask(CONNECTION_DELAY_MSEC, self._start)
 
@@ -479,39 +463,6 @@ class Viz(MspParser):
 
         self.splash = self.canvas.create_image(SPLASH_LOCATION,
                                                image=self.splashimage)
-
-    def _hide_splash(self):
-
-        self.canvas.delete(self.splash)
-
-    def _show_armed(self, widget):
-
-        widget.configure(bg='red')
-
-    def _show_disarmed(self, widget):
-
-        widget.configure(bg=BACKGROUND_COLOR)
-
-    def _handle_calibrate_response(self):
-
-        self.imu.showCalibrated()
-
-    def _handle_params_response(self, pitchroll_kp_percent, yaw_kp_percent):
-
-        # Only handle parms from firmware on a fresh connection
-        if self.newconnect:
-
-            self.imu.setParams(pitchroll_kp_percent, yaw_kp_percent)
-
-        self.newconnect = False
-
-    def _handle_arm_status(self, armed):
-
-        self.armed = armed
-
-    def _handle_battery_status(self, volts, amps):
-
-        return
 
 
 def main():
