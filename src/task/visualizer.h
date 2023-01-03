@@ -107,10 +107,8 @@ class VisualizerTask : public Task {
                         } break;
 
                     case 122: // PAA3905 mocap
-                        {
-                            int16_t dummy[2] = {-100, 200};
-                            sendShorts(122, dummy, 2);
-                        } break;
+                        sendShorts(122, m_sensorsTask->mocapData, 2);
+                        break;
 
                     case 214: // SET_MOTORS
                         {

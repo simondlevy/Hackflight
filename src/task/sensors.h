@@ -29,12 +29,12 @@ class SensorsTask : public Task {
         static const uint8_t RANGER_ID = 121;  // VL53L5 ranger
         static const uint8_t MOCAP_ID  = 122;  // PAA3905 motion capture
 
-        int16_t m_mocapData[2];
-        int16_t m_rangerData[16];
-
         Msp m_parser;
 
     public:
+
+        int16_t mocapData[2];
+        int16_t rangerData[16];
 
         SensorsTask()
             : Task(SENSORS, 50) // Hz
@@ -45,8 +45,6 @@ class SensorsTask : public Task {
         {
             (void)usec;
 
-            // HfDebugger::printf("mocap: %d %d\n", m_mocapData[0], m_mocapData[1]);
-            // HfDebugger::printf("ranger: %d\n", m_rangerData[5]);
         }
 
         virtual void parse(const uint8_t byte)
@@ -57,13 +55,13 @@ class SensorsTask : public Task {
 
                 case 221: // VL53L5 ranger
                     for (uint8_t k=0; k<16; ++k) {
-                        m_rangerData[k] = m_parser.parseShort(k);
+                        rangerData[k] = m_parser.parseShort(k);
                     }
                     break;
 
                 case 222: // PAA3906 mocap
-                    m_mocapData[0] = m_parser.parseShort(0);
-                    m_mocapData[1] = m_parser.parseShort(1);
+                    mocapData[0] = m_parser.parseShort(0);
+                    mocapData[1] = m_parser.parseShort(1);
                     break;
             }
         }
