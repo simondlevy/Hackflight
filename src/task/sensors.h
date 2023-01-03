@@ -22,7 +22,7 @@
 #include "msp.h"
 #include "debugger.h"
 
-class SkyrangerTask : public Task {
+class SensorsTask : public Task {
 
     private:
 
@@ -36,8 +36,8 @@ class SkyrangerTask : public Task {
 
     public:
 
-        SkyrangerTask()
-            : Task(SKYRANGER, 50) // Hz
+        SensorsTask()
+            : Task(SENSORS, 50) // Hz
         {
         }
 

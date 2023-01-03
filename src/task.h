@@ -31,7 +31,7 @@ class Task {
             ATTITUDE,
             VISUALIZER,
             RECEIVER,
-            SKYRANGER
+            SENSORS
         } id_t;
 
         typedef struct {

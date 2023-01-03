@@ -32,7 +32,7 @@ using namespace std;
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
-#include "task/skyranger.h"
+#include "task/sensors.h"
 
 class Board {
 
@@ -45,7 +45,7 @@ class Board {
         AttitudeTask   m_attitudeTask;
         ReceiverTask   m_receiverTask;
         VisualizerTask m_visualizerTask;
-        SkyrangerTask  m_skyrangerTask;
+        SensorsTask  m_sensorsTask;
 
         Arming         m_arming;
         bool           m_failsafeIsActive;
@@ -185,7 +185,7 @@ class Board {
             m_receiverTask.prioritize(usec, prioritizer);
             m_attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
-            m_skyrangerTask.prioritize(usec, prioritizer);
+            m_sensorsTask.prioritize(usec, prioritizer);
 
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
@@ -205,8 +205,8 @@ class Board {
                     runTask(m_receiverTask, usec);
                     break;
 
-                case Task::SKYRANGER:
-                    runTask(m_skyrangerTask, usec);
+                case Task::SENSORS:
+                    runTask(m_sensorsTask, usec);
                     break;
             
                 case Task::NONE:
@@ -298,7 +298,7 @@ class Board {
 
         void parseSkyRanger(const uint8_t byte)
         {
-            m_skyrangerTask.parse(byte);
+            m_sensorsTask.parse(byte);
         }
 
         void step(void)
