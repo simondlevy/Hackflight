@@ -183,14 +183,14 @@ class Viz(MspParser):
 
     def getRollPitchYaw(self):
 
-        # configure button to show connected
-        # self._enable_button(self.button_imu)
-        self._enable_button(self.button_motors)
-        self._enable_button(self.button_receiver)
-        self._enable_button(self.button_sensors)
+        # Configure widgets to show connected
+        self._enable_widget(self.button_motors)
+        self._enable_widget(self.button_receiver)
+        self._enable_widget(self.button_sensors)
+        self._disable_widget(self.portsmenu)
 
         self.button_connect['text'] = 'Disconnect'
-        self._enable_button(self.button_connect)
+        self._enable_widget(self.button_connect)
 
         return self.roll_pitch_yaw
 
@@ -270,10 +270,10 @@ class Viz(MspParser):
 
         self._clear()
 
-        self._disable_button(self.button_imu)
-        self._enable_button(self.button_motors)
-        self._enable_button(self.button_receiver)
-        self._enable_button(self.button_sensors)
+        self._disable_widget(self.button_imu)
+        self._enable_widget(self.button_motors)
+        self._enable_widget(self.button_receiver)
+        self._enable_widget(self.button_sensors)
 
         self.motors_quadxmw.stop()
         self.motors_coaxial.stop()
@@ -297,9 +297,9 @@ class Viz(MspParser):
 
             self.imu.stop()
             self.error_label.place(x=50, y=50)
-            self._disable_button(self.button_imu)
-            self._disable_button(self.button_motors)
-            self._disable_button(self.button_receiver)
+            self._disable_widget(self.button_imu)
+            self._disable_widget(self.button_motors)
+            self._disable_widget(self.button_receiver)
 
     # Sends state request to FC
     def _send_attitude_request(self):
@@ -324,10 +324,10 @@ class Viz(MspParser):
 
         self._clear()
 
-        self._enable_button(self.button_imu)
-        self._disable_button(self.button_motors)
-        self._enable_button(self.button_receiver)
-        self._enable_button(self.button_sensors)
+        self._enable_widget(self.button_imu)
+        self._disable_widget(self.button_motors)
+        self._enable_widget(self.button_receiver)
+        self._enable_widget(self.button_sensors)
 
         self.imu.stop()
         self.receiver.stop()
@@ -343,10 +343,10 @@ class Viz(MspParser):
 
         self._clear()
 
-        self._enable_button(self.button_imu)
-        self._enable_button(self.button_motors)
-        self._disable_button(self.button_receiver)
-        self._enable_button(self.button_sensors)
+        self._enable_widget(self.button_imu)
+        self._enable_widget(self.button_motors)
+        self._disable_widget(self.button_receiver)
+        self._enable_widget(self.button_sensors)
 
         self.imu.stop()
         self.sensors.stop()
@@ -360,10 +360,10 @@ class Viz(MspParser):
 
         self._clear()
 
-        self._enable_button(self.button_imu)
-        self._enable_button(self.button_motors)
-        self._enable_button(self.button_receiver)
-        self._disable_button(self.button_sensors)
+        self._enable_widget(self.button_imu)
+        self._enable_widget(self.button_motors)
+        self._enable_widget(self.button_receiver)
+        self._disable_widget(self.button_sensors)
 
         self.imu.stop()
         self.receiver.stop()
@@ -388,12 +388,13 @@ class Viz(MspParser):
 
             self._clear()
 
-            self._disable_button(self.button_imu)
-            self._disable_button(self.button_motors)
-            self._disable_button(self.button_receiver)
-            self._disable_button(self.button_sensors)
+            self._disable_widget(self.button_imu)
+            self._disable_widget(self.button_motors)
+            self._disable_widget(self.button_receiver)
+            self._disable_widget(self.button_sensors)
 
             self.button_connect['text'] = 'Connect'
+            self._enable_widget(self.portsmenu)
 
             self.hide(self.error_label)
 
@@ -405,7 +406,7 @@ class Viz(MspParser):
             self.comms.start()
 
             self.button_connect['text'] = 'Connecting ...'
-            self._disable_button(self.button_connect)
+            self._disable_widget(self.button_connect)
 
             self.canvas.delete(self.splash)
 
@@ -452,15 +453,13 @@ class Viz(MspParser):
 
             # Disconnected
             if len(ports) < len(self.ports):
-
                 debug('disconnected')
-
                 exit(0)
 
             # Connected
             else:
                 self.portsvar.set(ports[0])  # default value
-                self._enable_button(self.button_connect)
+                self._enable_widget(self.button_connect)
 
             self.ports = ports
 
@@ -471,11 +470,11 @@ class Viz(MspParser):
 
         self.root.after(USB_UPDATE_MSEC, self._connection_task)
 
-    def _enable_button(self, button):
+    def _enable_widget(self, button):
 
         button['state'] = 'normal'
 
-    def _disable_button(self, button):
+    def _disable_widget(self, button):
 
         button['state'] = 'disabled'
 
