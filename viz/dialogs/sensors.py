@@ -30,6 +30,8 @@ class SensorsDialog(Dialog):
     MOCAP_CTR_X = 190
     MOCAP_DOT_SIZE = 10
 
+    MOCAP_RANGE = 50
+
     RANGER_CTR_X = 600
 
     SQUARE_SIZE = 150
@@ -93,25 +95,31 @@ class SensorsDialog(Dialog):
         if self.running:
 
             mocap_dx, mocap_dy = self.viz.getMocap()
+
+            debug((mocap_dx, SensorsDialog._scale_mocap(mocap_dx)))
+
             debug((mocap_dx, mocap_dy))
 
-            debug(self.viz.getRanger())
 
             '''
             for k, val in enumerate(self.viz.getRanger()):
                 self.canvas.itemconfig(self.ranger_pixels[k],
                                        fill='#' + ('%02X' % val)*3)
-
-            mocap_dot_x = mocap_dx + SensorsDialog.MOCAP_CTR_X
-            mocap_dot_y = mocap_dy + SensorsDialog.SQUARE_CTR_Y
-
-            size = SensorsDialog.MOCAP_DOT_SIZE // 2
-
-            self.canvas.coords(self.mocap_dot,
-                               (mocap_dot_x - size,
-                                mocap_dot_y - size,
-                                mocap_dot_x + size,
-                                mocap_dot_y + size))
             '''
 
+            mocap_dot_x = SensorsDialog._scale_mocap(mocap_dx) + SensorsDialog.MOCAP_CTR_X
+            mocap_dot_y = SensorsDialog._scale_mocap(mocap_dy) + SensorsDialog.SQUARE_CTR_Y
+
+            mocap_dot_size = SensorsDialog.MOCAP_DOT_SIZE // 2
+
+            self.canvas.coords(self.mocap_dot,
+                               (mocap_dot_x - mocap_dot_size,
+                                mocap_dot_y - mocap_dot_size,
+                                mocap_dot_x + mocap_dot_size,
+                                mocap_dot_y + mocap_dot_size))
+
             self.schedule_display_task(SensorsDialog.UPDATE_MSEC)
+
+    def _scale_mocap(val):
+
+        return int(val / SensorsDialog.MOCAP_RANGE * SensorsDialog.SQUARE_SIZE)
