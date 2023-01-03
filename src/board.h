@@ -47,11 +47,12 @@ class Board {
         VisualizerTask m_visualizerTask;
         SensorsTask  m_sensorsTask;
 
-        Arming         m_arming;
         bool           m_failsafeIsActive;
         Led            m_led;
         Scheduler      m_scheduler;
         VehicleState   m_vstate;
+
+        Arming m_arming = Arming(m_led);
 
         // Initialzed in sketch()
         Msp *   m_msp;
@@ -280,7 +281,7 @@ class Board {
         {
             startCycleCounter();
 
-            m_arming.begin(m_esc, &m_led);
+            m_arming.begin(m_esc);
 
             m_attitudeTask.begin(m_imu, &m_arming, &m_vstate);
 

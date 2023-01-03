@@ -63,9 +63,13 @@ class Arming {
 
     public:
 
-        void begin(Esc * esc, Led * led)
+        Arming(Led & led)
         {
-            m_led = led;
+            m_led = &led;
+        }
+
+        void begin(Esc * esc)
+        {
             m_esc = esc;
         }
 
