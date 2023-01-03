@@ -48,9 +48,9 @@ class VisualizerTask : public Task {
         SensorsTask *  m_sensorsTask;
 
         // Initialized in begin()
+        Msp *      m_msp;
         Esc *      m_esc;
         Receiver * m_receiver;
-        Msp *      m_msp;
 
         bool m_gotRebootRequest;
 
@@ -104,6 +104,12 @@ class VisualizerTask : public Task {
 
                             sendShorts(108, angles, 3);
 
+                        } break;
+
+                    case 122: // PAA3905 mocap
+                        {
+                            int16_t dummy[2] = {-100, 200};
+                            sendShorts(122, dummy, 2);
                         } break;
 
                     case 214: // SET_MOTORS

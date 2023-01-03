@@ -238,12 +238,23 @@ class Viz(MspParser):
     def handle_VL53L5(self,
                       p11, p12, p13, p14, p21, p22, p23, p24,
                       p31, p32, p33, p34, p41, p42, p43, p44):
-        # XXX
-        return
+
+        debug((p11, p12, p13, p14, p21, p22, p23, p24,
+               p31, p32, p33, p34, p41, p42, p43, p44))
+
+        # As soon as we handle the callback from one request, send another
+        # request, if receiver dialog is running
+        if self.sensors_dialog.running:
+            self._send_vl53l5_request()
 
     def handle_PAA3905(self, x, y):
-        # XXX
-        return
+
+        debug((x,y))
+
+        # As soon as we handle the callback from one request, send another
+        # request, if receiver dialog is running
+        if self.sensors_dialog.running:
+            self._send_paa3905_request()
 
     def _add_pane(self):
 
@@ -313,13 +324,13 @@ class Viz(MspParser):
 
         self.comms.send_request(self.rc_request)
 
-    # Sends sensor requests to FC
-    def _send_sensors_request(self):
+    # Sends VL53L5 request to FC
+    def _send_vl53l5_request(self):
+        self.comms.send_request(self.vl53l5_request)
 
-        return
-
-        # self.comms.send_request(self.vl53l5_request)
-        # self.comms.send_request(self.paa3905_request)
+    # Sends PAA3905 request to FC
+    def _send_paa3905_request(self):
+        self.comms.send_request(self.paa3905_request)
 
     # Callback for Motors button
     def _motors_button_callback(self):
@@ -371,7 +382,8 @@ class Viz(MspParser):
         self.receiver_dialog.stop()
         self.motors_quadxmw_dialog.stop()
         self.motors_coaxial_dialog.stop()
-        self._send_sensors_request()
+        self._send_vl53l5_request()
+        self._send_paa3905_request()
         self.sensors_dialog.start()
 
     # Callback for Connect / Disconnect button
