@@ -25,12 +25,12 @@ from numpy import radians as rad
 
 from mspparser import MspParser
 
-from imu import IMU
-from motors import MotorsQuadXMW, MotorsCoaxial
-from receiver import Receiver
-from resources import resource_path
-from sensors import Sensors
+from dialogs.imu import IMU
+from dialogs.motors import MotorsQuadXMW, MotorsCoaxial
+from dialogs.receiver import Receiver
+from dialogs.sensors import Sensors
 
+from resources import resource_path
 from debugging import debug
 
 DISPLAY_WIDTH = 800
