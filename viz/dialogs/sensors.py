@@ -16,6 +16,7 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 
 from dialog import Dialog
+from debugging import debug
 
 import tkinter as tk
 
@@ -91,11 +92,15 @@ class SensorsDialog(Dialog):
 
         if self.running:
 
+            mocap_dx, mocap_dy = self.viz.getMocap()
+            debug((mocap_dx, mocap_dy))
+
+            debug(self.viz.getRanger())
+
+            '''
             for k, val in enumerate(self.viz.getRanger()):
                 self.canvas.itemconfig(self.ranger_pixels[k],
                                        fill='#' + ('%02X' % val)*3)
-
-            mocap_dx, mocap_dy = self.viz.getMocap()
 
             mocap_dot_x = mocap_dx + SensorsDialog.MOCAP_CTR_X
             mocap_dot_y = mocap_dy + SensorsDialog.SQUARE_CTR_Y
@@ -107,5 +112,6 @@ class SensorsDialog(Dialog):
                                 mocap_dot_y - size,
                                 mocap_dot_x + size,
                                 mocap_dot_y + size))
+            '''
 
             self.schedule_display_task(SensorsDialog.UPDATE_MSEC)

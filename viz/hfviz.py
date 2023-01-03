@@ -139,6 +139,8 @@ class Viz(MspParser):
         # No messages yet
         self.roll_pitch_yaw = [0]*3
         self.rxchannels = [0]*6
+        self.mocap = [0]*2
+        self.ranger = [16]*2
 
         self.mock_mocap_xdir = +1
         self.mock_mocap_ydir = -1
@@ -160,26 +162,11 @@ class Viz(MspParser):
 
     def getRanger(self):
 
-        import numpy.random as random
-        return (random.randint(0, 256) for _ in range(16))
+        return self.ranger
 
     def getMocap(self):
 
-        SCALE = 0.1
-
-        self.mock_mocap_dx += self.mock_mocap_xdir * SCALE
-        if self.mock_mocap_dx > 100:
-            self.mock_mocap_xdir = -1
-        if self.mock_mocap_dx < -100:
-            self.mock_mocap_xdir = +1
-
-        self.mock_mocap_dy += self.mock_mocap_ydir * SCALE
-        if self.mock_mocap_dy > 100:
-            self.mock_mocap_ydir = -1
-        if self.mock_mocap_dy < -100:
-            self.mock_mocap_ydir = +1
-
-        return self.mock_mocap_dx, self.mock_mocap_dy
+        return self.mocap
 
     def getRollPitchYaw(self):
 
@@ -239,8 +226,8 @@ class Viz(MspParser):
                       p11, p12, p13, p14, p21, p22, p23, p24,
                       p31, p32, p33, p34, p41, p42, p43, p44):
 
-        debug((p11, p12, p13, p14, p21, p22, p23, p24,
-               p31, p32, p33, p34, p41, p42, p43, p44))
+        self.ranger = (p11, p12, p13, p14, p21, p22, p23, p24,
+                       p31, p32, p33, p34, p41, p42, p43, p44)
 
         # As soon as we handle the callback from one request, send another
         # request, if receiver dialog is running
@@ -249,7 +236,7 @@ class Viz(MspParser):
 
     def handle_PAA3905(self, x, y):
 
-        debug((x,y))
+        self.mocap = (x, y)
 
         # As soon as we handle the callback from one request, send another
         # request, if receiver dialog is running
