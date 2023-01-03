@@ -1,19 +1,10 @@
-'''
-This file is part of Hackflight.
+#  MSP Parser subclass and message builders
 
-Hackflight is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+#  Copyright (C) 2021 Simon D. Levy
 
-Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#  AUTO-GENERATED CODE; DO NOT MODIFY
 
-You should have received a copy of the GNU General Public License along with
-Hackflight. If not, see <https://www.gnu.org/licenses/>.
-'''
-
+#  Gnu Public License
 
 import struct
 
@@ -98,12 +89,28 @@ class MspParser(metaclass=abc.ABCMeta):
         if self.message_id == 108:
             self.handle_ATTITUDE(*struct.unpack('=hhh', self.message_buffer))
 
+        if self.message_id == 121:
+            self.handle_VL53L5(*struct.unpack('=hhhhhhhhhhhhhhhh', self.message_buffer))
+
+        if self.message_id == 122:
+            self.handle_PAA3905(*struct.unpack('=hh', self.message_buffer))
+
+        return
+
     @abc.abstractmethod
     def handle_RC(self, c1, c2, c3, c4, c5, c6):
         return
 
     @abc.abstractmethod
     def handle_ATTITUDE(self, angx, angy, heading):
+        return
+
+    @abc.abstractmethod
+    def handle_VL53L5(self, p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34, p41, p42, p43, p44):
+        return
+
+    @abc.abstractmethod
+    def handle_PAA3905(self, x, y):
         return
 
     @staticmethod
@@ -115,6 +122,22 @@ class MspParser(metaclass=abc.ABCMeta):
     def serialize_ATTITUDE_Request():
         msg = '$M<' + chr(0) + chr(108) + chr(108)
         return bytes(msg, 'utf-8')
+
+    @staticmethod
+    def serialize_VL53L5_Request():
+        msg = '$M<' + chr(0) + chr(121) + chr(121)
+        return bytes(msg, 'utf-8')
+
+    @staticmethod
+    def serialize_PAA3905_Request():
+        msg = '$M<' + chr(0) + chr(122) + chr(122)
+        return bytes(msg, 'utf-8')
+
+    @staticmethod
+    def serialize_SET_RAW_RC(c1, c2, c3, c4, c5, c6):
+        message_buffer = struct.pack('hhhhhh', c1, c2, c3, c4, c5, c6)
+        msg = [len(message_buffer), 200] + list(message_buffer)
+        return bytes([ord('$'), ord('M'), ord('<')] + msg + [MspParser.crc8(msg)])
 
     @staticmethod
     def serialize_SET_MOTOR(m1, m2, m3, m4):

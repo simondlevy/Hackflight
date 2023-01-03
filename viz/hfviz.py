@@ -242,6 +242,12 @@ class Viz(MspParser):
         if self.imu.running:
             self._send_attitude_request()
 
+    def handle_VL53L5(self, p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34, p41, p42, p43, p44):
+        return
+
+    def handle_PAA3905(self, x, y):
+        return
+
     def _add_pane(self):
 
         pane = tk.PanedWindow(self.frame, bg=BACKGROUND_COLOR)
