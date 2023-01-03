@@ -92,7 +92,7 @@ class ServoScale(MotorScale):
         MotorScale.__init__(self, dialog, x, index, label, -45, +45)
 
 
-class Motors(Dialog):
+class MotorsDialog(Dialog):
 
     WARNING_TEXT = ('I have removed the rotors and am ready to spin the ' +
                     'motors safely.')
@@ -125,7 +125,7 @@ class Motors(Dialog):
         self.hide(self.warning)
 
 
-class MotorsQuadXMW(Motors):
+class MotorsQuadXmwDialog(MotorsDialog):
 
     MOTORS_IMAGE_FILE = resource_path('motors.gif')
     MOTORS1_IMAGE_FILE = resource_path('motors1.gif')
@@ -148,7 +148,7 @@ class MotorsQuadXMW(Motors):
 
     def __init__(self, viz):
 
-        Motors.__init__(self, viz)
+        MotorsDialog.__init__(self, viz)
 
         # Add a quadcopter image for motor testing
         self.image_motors, self.label_motors = \
@@ -171,13 +171,13 @@ class MotorsQuadXMW(Motors):
 
     def start(self):
 
-        Motors.start(self)
+        MotorsDialog.start(self)
 
         self._show_motors_image(self.label_motors)
 
     def stop(self):
 
-        Motors.stop(self)
+        MotorsDialog.stop(self)
 
         self.hide(self.label_motors)
         self.scale.stop()
@@ -271,7 +271,7 @@ class MotorsQuadXMW(Motors):
             self.scale.setIndex(0)
 
 
-class MotorsCoaxial(Motors):
+class MotorsCoaxialDialog(MotorsDialog):
 
     SERVO1_X = 150
     SERVO2_X = 300
@@ -280,7 +280,7 @@ class MotorsCoaxial(Motors):
 
     def __init__(self, viz):
 
-        Motors.__init__(self, viz)
+        MotorsDialog.__init__(self, viz)
 
         # Add scales for servos, motors
         self.motor1_scale = MotorScale(self, self.MOTOR1_X, 1, 'Motor 1')
@@ -290,14 +290,14 @@ class MotorsCoaxial(Motors):
 
     def start(self):
 
-        Motors.start(self)
+        MotorsDialog.start(self)
 
         self.servo1_scale.start()
         self.servo2_scale.start()
 
     def stop(self):
 
-        Motors.stop(self)
+        MotorsDialog.stop(self)
 
         self.servo1_scale.hide()
         self.servo2_scale.hide()

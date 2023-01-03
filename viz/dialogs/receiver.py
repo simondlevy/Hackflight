@@ -22,7 +22,7 @@ import tkinter as tk
 UPDATE_MSEC = 1
 
 
-class Receiver(Dialog):
+class ReceiverDialog(Dialog):
 
     def __init__(self, viz):
 

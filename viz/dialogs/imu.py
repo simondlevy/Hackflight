@@ -29,7 +29,7 @@ from dialog import Dialog
 from vehicle import get_vehicle
 
 
-class IMU(Dialog):
+class ImuDialog(Dialog):
 
     def __init__(self, viz, simulation=False, vehicleScale=0.1, updateMsec=10):
 

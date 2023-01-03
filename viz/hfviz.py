@@ -23,10 +23,10 @@ from numpy import radians as rad
 
 from mspparser import MspParser
 
-from dialogs.imu import IMU
-from dialogs.motors import MotorsQuadXMW, MotorsCoaxial
-from dialogs.receiver import Receiver
-from dialogs.sensors import Sensors
+from dialogs.imu import ImuDialog
+from dialogs.motors import MotorsQuadXmwDialog, MotorsCoaxialDialog
+from dialogs.receiver import ReceiverDialog
+from dialogs.sensors import SensorsDialog
 
 from resources import resource_path
 from debugging import debug
@@ -113,17 +113,17 @@ class Viz(MspParser):
         self.hide(self.error_label)
 
         # Add widgets for motor-testing dialogs; hide them immediately
-        self.motors_quadxmw = self._add_motor_dialog(MotorsQuadXMW)
-        self.motors_coaxial = self._add_motor_dialog(MotorsCoaxial)
+        self.motors_quadxmw = self._add_motor_dialog(MotorsQuadXmwDialog)
+        self.motors_coaxial = self._add_motor_dialog(MotorsCoaxialDialog)
 
         # Create receiver dialog
-        self.receiver = Receiver(self)
+        self.receiver = ReceiverDialog(self)
 
         # Creaate sensors dialog
-        self.sensors = Sensors(self)
+        self.sensors = SensorsDialog(self)
 
         # Create IMU dialog
-        self.imu = IMU(self)
+        self.imu = ImuDialog(self)
         self._schedule_connection_task()
 
         # Create a splash image

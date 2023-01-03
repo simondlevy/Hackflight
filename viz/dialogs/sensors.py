@@ -20,7 +20,7 @@ from dialog import Dialog
 import tkinter as tk
 
 
-class Sensors(Dialog):
+class SensorsDialog(Dialog):
 
     UPDATE_MSEC = 1
 
@@ -47,23 +47,23 @@ class Sensors(Dialog):
         self.mocap_dot = self.canvas.create_rectangle((0, 0, 0, 0),
                                                       fill='green')
 
-        self._add_box(Sensors.MOCAP_CTR_X, 'Motion Capture')
+        self._add_box(SensorsDialog.MOCAP_CTR_X, 'Motion Capture')
 
-        self._add_box(Sensors.RANGER_CTR_X, 'Ranging Camera')
+        self._add_box(SensorsDialog.RANGER_CTR_X, 'Ranging Camera')
 
-        pixel_size = Sensors.SQUARE_SIZE // 2
+        pixel_size = SensorsDialog.SQUARE_SIZE // 2
 
-        ranger_corner_x = Sensors.RANGER_CTR_X - Sensors.SQUARE_SIZE
-        ranger_corner_y = Sensors.SQUARE_CTR_Y - Sensors.SQUARE_SIZE
+        ranger_corner_x = SensorsDialog.RANGER_CTR_X - SensorsDialog.SQUARE_SIZE
+        ranger_corner_y = SensorsDialog.SQUARE_CTR_Y - SensorsDialog.SQUARE_SIZE
 
         pixpos = list(((
             ranger_corner_x + pixel_size * (k % 4),
             ranger_corner_y + pixel_size * (k // 4))
-            for k in range(Sensors.RANGER_PIXEL_COUNT)))
+            for k in range(SensorsDialog.RANGER_PIXEL_COUNT)))
 
-        self.ranger_pixels = [None for _ in range(Sensors.RANGER_PIXEL_COUNT)]
+        self.ranger_pixels = [None for _ in range(SensorsDialog.RANGER_PIXEL_COUNT)]
 
-        for k in range(Sensors.RANGER_PIXEL_COUNT):
+        for k in range(SensorsDialog.RANGER_PIXEL_COUNT):
             self.ranger_pixels[k] = self.canvas.create_rectangle(
                         (pixpos[k][0],
                          pixpos[k][1],
@@ -74,8 +74,8 @@ class Sensors(Dialog):
 
     def _add_box(self, ctr_x, label):
 
-        ctr_y = Sensors.SQUARE_CTR_Y
-        size = Sensors.SQUARE_SIZE
+        ctr_y = SensorsDialog.SQUARE_CTR_Y
+        size = SensorsDialog.SQUARE_SIZE
 
         self.canvas.create_rectangle((ctr_x - size - 1,
                                       ctr_y - size - 1,
@@ -97,10 +97,10 @@ class Sensors(Dialog):
 
             mocap_dx, mocap_dy = self.viz.getMocap()
 
-            mocap_dot_x = mocap_dx + Sensors.MOCAP_CTR_X
-            mocap_dot_y = mocap_dy + Sensors.SQUARE_CTR_Y
+            mocap_dot_x = mocap_dx + SensorsDialog.MOCAP_CTR_X
+            mocap_dot_y = mocap_dy + SensorsDialog.SQUARE_CTR_Y
 
-            size = Sensors.MOCAP_DOT_SIZE // 2
+            size = SensorsDialog.MOCAP_DOT_SIZE // 2
 
             self.canvas.coords(self.mocap_dot,
                                (mocap_dot_x - size,
@@ -108,4 +108,4 @@ class Sensors(Dialog):
                                 mocap_dot_x + size,
                                 mocap_dot_y + size))
 
-            self.schedule_display_task(Sensors.UPDATE_MSEC)
+            self.schedule_display_task(SensorsDialog.UPDATE_MSEC)
