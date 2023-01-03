@@ -29,6 +29,7 @@ from imu import IMU
 from motors import MotorsQuadXMW, MotorsCoaxial
 from receiver import Receiver
 from resources import resource_path
+from sensors import Sensors
 
 from debugging import debug
 
@@ -79,15 +80,17 @@ class GCS(MspParser):
         self.pane1 = self._add_pane()
         self.pane2 = self._add_pane()
 
-        # Add a buttons
+        # Add buttons with callbacks
         self.button_connect = self._add_button('Connect', self.pane1,
-                                               self._connect_callback)
+                                               self._connect_button_callback)
         self.button_imu = self._add_button('IMU', self.pane2,
-                                           self._imu_callback)
+                                           self._imu_button_callback)
         self.button_motors = self._add_button('Motors', self.pane2,
                                               self._motors_button_callback)
         self.button_receiver = self._add_button('Receiver', self.pane2,
                                                 self._receiver_button_callback)
+        self.button_sensors = self._add_button('Sensors', self.pane2,
+                                               self._sensors_button_callback)
 
         # Prepare for adding ports as they are detected by our timer task
         self.portsvar = tk.StringVar(self.root)
@@ -229,7 +232,7 @@ class GCS(MspParser):
         return intval / 1000 - 2
 
     # Callback for IMU button
-    def _imu_callback(self):
+    def _imu_button_callback(self):
 
         self._clear()
 
@@ -294,8 +297,20 @@ class GCS(MspParser):
         self._send_rc_request()
         self.receiver.start()
 
+    # Callback for Sensors button
+    def _sensors_button_callback(self):
+
+        self._clear()
+
+        self.imu.stop()
+        self.receiver.stop()
+        self.motors_quadxmw.stop()
+        self.motors_coaxial.stop()
+        self._send_sensors_request()
+        self.sensors.start()
+
     # Callback for Connect / Disconnect button
-    def _connect_callback(self):
+    def _connect_button_callback(self):
 
         if self.connected:
 
