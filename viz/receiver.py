@@ -24,9 +24,9 @@ UPDATE_MSEC = 1
 
 class Receiver(Dialog):
 
-    def __init__(self, gcs):
+    def __init__(self, viz):
 
-        Dialog.__init__(self, gcs)
+        Dialog.__init__(self, viz)
 
         self.running = False
 
@@ -51,7 +51,7 @@ class Receiver(Dialog):
 
         if self.running:
 
-            channels = self.gcs.getChannels()
+            channels = self.viz.getChannels()
 
             self.throttle_gauge.update(channels[0])  # Throttle
             self.roll_gauge.update(channels[1])      # Roll
@@ -63,7 +63,7 @@ class Receiver(Dialog):
             self.schedule_display_task(UPDATE_MSEC)
 
             # Add a label for arming if needed
-            self.gcs.checkArmed()
+            self.viz.checkArmed()
 
     def _new_gauge(self, offset, name, color, minval=-1):
 
@@ -87,8 +87,8 @@ class HorizontalGauge(object):
         top = bottom - height
         bbox = (left, bottom, right, top)
         self.bbox = bbox
-        self.rect = self.owner.gcs.canvas.create_rectangle(bbox, fill=color)
-        self.owner.gcs.canvas.create_rectangle((bbox[0]-1, bbox[1]-1,
+        self.rect = self.owner.viz.canvas.create_rectangle(bbox, fill=color)
+        self.owner.viz.canvas.create_rectangle((bbox[0]-1, bbox[1]-1,
                                                bbox[2]+1, bbox[3]+1),
                                                outline='white')
 
@@ -105,17 +105,17 @@ class HorizontalGauge(object):
         new_width = self.width * (newval-self.minval) / (self.maxval -
                                                          self.minval)
         bbox = self.bbox
-        self.owner.gcs.canvas.coords(self.rect,
+        self.owner.viz.canvas.coords(self.rect,
                                      (bbox[0],
                                       bbox[1],
                                       bbox[0]+new_width,
                                       bbox[3]))
 
-        self.owner.gcs.canvas.itemconfigure(self.label,
+        self.owner.viz.canvas.itemconfigure(self.label,
                                             text=('%0.2f' % newval))
 
     def _create_label(self, x, y, text=''):
 
-        return self.owner.gcs.canvas.create_text(x, y, anchor=tk.W,
+        return self.owner.viz.canvas.create_text(x, y, anchor=tk.W,
                                                  font=('Helvetica', 12),
                                                  fill='white', text=text)

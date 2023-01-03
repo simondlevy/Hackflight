@@ -16,28 +16,28 @@ Hackflight. If not, see <https://www.gnu.org/licenses/>.
 
 class Dialog(object):
 
-    def __init__(self, gcs):
+    def __init__(self, viz):
 
         self.running = False
 
-        self.gcs = gcs
+        self.viz = viz
 
-        self.width = int(self.gcs.canvas['width'])
-        self.height = int(self.gcs.canvas['height'])
+        self.width = int(self.viz.canvas['width'])
+        self.height = int(self.viz.canvas['height'])
 
-        self.gcs.root.bind("<Key>", self._check_quit)
+        self.viz.root.bind("<Key>", self._check_quit)
 
     def hide(self, widget):
 
-        self.gcs.hide(widget)
+        self.viz.hide(widget)
 
     def schedule_display_task(self, delay_msec):
 
-        self.gcs.scheduleTask(delay_msec, self._task)
+        self.viz.scheduleTask(delay_msec, self._task)
 
     def delete(self, widget):
 
-        self.gcs.canvas.delete(widget)
+        self.viz.canvas.delete(widget)
 
     def place(self, widget, x, y):
 

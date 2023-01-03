@@ -34,15 +34,15 @@ class Sensors(Dialog):
     SQUARE_SIZE = 150
     SQUARE_CTR_Y = 220
 
-    def __init__(self, gcs):
+    def __init__(self, viz):
 
-        Dialog.__init__(self, gcs)
+        Dialog.__init__(self, viz)
 
     def start(self, delay_msec=UPDATE_MSEC):
 
         Dialog.start(self)
 
-        self.canvas = self.gcs.canvas
+        self.canvas = self.viz.canvas
 
         self.mocap_dot = self.canvas.create_rectangle((0, 0, 0, 0),
                                                       fill='green')
@@ -91,11 +91,11 @@ class Sensors(Dialog):
 
         if self.running:
 
-            for k, val in enumerate(self.gcs.getRanger()):
+            for k, val in enumerate(self.viz.getRanger()):
                 self.canvas.itemconfig(self.ranger_pixels[k],
                                        fill='#' + ('%02X' % val)*3)
 
-            mocap_dx, mocap_dy = self.gcs.getMocap()
+            mocap_dx, mocap_dy = self.viz.getMocap()
 
             mocap_dot_x = mocap_dx + Sensors.MOCAP_CTR_X
             mocap_dot_y = mocap_dy + Sensors.SQUARE_CTR_Y

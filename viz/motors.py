@@ -34,7 +34,7 @@ class MotorScale(object):
         self.y = y
         self.length = length
 
-        canvas = dialog.gcs.canvas
+        canvas = dialog.viz.canvas
 
         # A a scale for motors
         self.scale = tk.Scale(canvas, from_=maxval, to_=minval,
@@ -63,10 +63,10 @@ class MotorScale(object):
 
     def callback(self, valstr):
 
-        if self.dialog.gcs is not None: # Guard at startup
+        if self.dialog.viz is not None: # Guard at startup
             motors = [1000] * 4
             motors[self.index-1] = int(1000 * (1 +  float(valstr)/100))
-            self.dialog.gcs.sendMotorMessage(motors)
+            self.dialog.viz.sendMotorMessage(motors)
 
     def setValue(self, value):
 
@@ -99,13 +99,13 @@ class Motors(Dialog):
     WARNING_X = 40
     WARNING_Y = 350
 
-    def __init__(self, gcs):
+    def __init__(self, viz):
 
-        Dialog.__init__(self, gcs)
+        Dialog.__init__(self, viz)
 
         # Add a warning checkbox for motor testing
         self.checkbox_var = tk.IntVar()
-        self.warning = tk.Checkbutton(self.gcs.canvas,
+        self.warning = tk.Checkbutton(self.viz.canvas,
                                       variable=self.checkbox_var,
                                       command=self._checkbox_callback,
                                       text=self.WARNING_TEXT,
@@ -146,9 +146,9 @@ class MotorsQuadXMW(Motors):
     MOTORS_BOTTOM_Y = 220
     MOTORS_RADIUS = 20
 
-    def __init__(self, gcs):
+    def __init__(self, viz):
 
-        Motors.__init__(self, gcs)
+        Motors.__init__(self, viz)
 
         # Add a quadcopter image for motor testing
         self.image_motors, self.label_motors = \
@@ -166,7 +166,7 @@ class MotorsQuadXMW(Motors):
         self.scale = MotorScale(self, self.MOTOR_SCALE_X)
 
         # A label for the scale
-        self.scale_label = tk.Label(self.gcs.canvas, text='%', bg='black',
+        self.scale_label = tk.Label(self.viz.canvas, text='%', bg='black',
                                     fg='white')
 
     def start(self):
@@ -226,7 +226,7 @@ class MotorsQuadXMW(Motors):
         the_file = tk.PhotoImage(file=filename)
         the_image = the_file.subsample(self.MOTORS_IMAGE_SCALEDOWN,
                                        self.MOTORS_IMAGE_SCALEDOWN)
-        the_label = tk.Label(self.gcs.canvas,
+        the_label = tk.Label(self.viz.canvas,
                              image=the_image, borderwidth=0)
         the_label.bind('<Button-1>', self._on_click)
         return the_image, the_label
@@ -267,7 +267,7 @@ class MotorsQuadXMW(Motors):
             self._turn_off_active()
 
     def _turn_off_active(self):
-        if self.gcs.connected and self.scale.getIndex() > 0:
+        if self.viz.connected and self.scale.getIndex() > 0:
             self.scale.setIndex(0)
 
 
@@ -278,9 +278,9 @@ class MotorsCoaxial(Motors):
     MOTOR1_X = 450
     MOTOR2_X = 600
 
-    def __init__(self, gcs):
+    def __init__(self, viz):
 
-        Motors.__init__(self, gcs)
+        Motors.__init__(self, viz)
 
         # Add scales for servos, motors
         self.motor1_scale = MotorScale(self, self.MOTOR1_X, 1, 'Motor 1')
@@ -329,9 +329,9 @@ class MotorsCoaxial(Motors):
 
     def _cut_motors(self):
         try:
-            self.gcs.sendMotorMessage(1, 0)
-            self.gcs.sendMotorMessage(2, 0)
-            self.gcs.sendMotorMessage(3, 0)
-            self.gcs.sendMotorMessage(4, 0)
+            self.viz.sendMotorMessage(1, 0)
+            self.viz.sendMotorMessage(2, 0)
+            self.viz.sendMotorMessage(3, 0)
+            self.viz.sendMotorMessage(4, 0)
         except Exception:
             return

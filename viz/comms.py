@@ -21,11 +21,11 @@ BAUD = 115200
 
 class Comms:
 
-    def __init__(self, gcs):
+    def __init__(self, viz):
 
-        self.gcs = gcs
+        self.viz = viz
 
-        portname = gcs.portsvar.get()
+        portname = viz.portsvar.get()
 
         baud = BAUD
 
@@ -52,7 +52,7 @@ class Comms:
         while self.running:
             try:
                 byte = self.port.read(1)
-                self.gcs.parse(byte)
+                self.viz.parse(byte)
             except Exception:
                 None
 
@@ -62,7 +62,7 @@ class Comms:
 
         self.thread.start()
 
-        self.gcs.newconnect = True
+        self.viz.newconnect = True
 
     def stop(self):
 
