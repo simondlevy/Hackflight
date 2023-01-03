@@ -123,24 +123,19 @@ class VisualizerTask : public Task {
 
     public:
 
-        VisualizerTask(void) 
+        VisualizerTask(Arming & arming, VehicleState & vstate) 
             : Task(VISUALIZER, 100) // Hz
         { 
+            m_arming = &arming;
+            m_vstate = &vstate;
         }
 
         float motors[MAX_SUPPORTED_MOTORS];
 
-        void begin(
-                Msp * msp,
-                Esc * esc,
-                Arming & arming,
-                Receiver * receiver,
-                VehicleState & vstate)
+        void begin(Msp * msp, Esc * esc, Receiver * receiver)
         {
             m_msp = msp;
             m_esc = esc;
-            m_arming = &arming;
-            m_vstate = &vstate;
             m_receiver = receiver;
         }
 

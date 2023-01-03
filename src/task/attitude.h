@@ -35,16 +35,16 @@ class AttitudeTask : public Task {
 
     public:
 
-        AttitudeTask()
+        AttitudeTask(Arming & arming, VehicleState & vstate)
             : Task(ATTITUDE, 100) // Hz
         {
+            m_arming = &arming;
+            m_vstate = &vstate;
         }
 
-        void begin(Imu * imu, Arming * arming, VehicleState * vstate)
+        void begin(Imu * imu)
         {
             m_imu = imu;
-            m_arming = arming;
-            m_vstate = vstate;
         }
 
         virtual void fun(uint32_t time) override

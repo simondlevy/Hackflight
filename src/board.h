@@ -42,9 +42,6 @@ class Board {
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
-        AttitudeTask   m_attitudeTask;
-        ReceiverTask   m_receiverTask;
-        VisualizerTask m_visualizerTask;
         SensorsTask  m_sensorsTask;
 
         bool           m_failsafeIsActive;
@@ -53,6 +50,10 @@ class Board {
         VehicleState   m_vstate;
 
         Arming m_arming = Arming(m_led);
+
+        AttitudeTask   m_attitudeTask   = AttitudeTask(m_arming, m_vstate);
+        VisualizerTask m_visualizerTask = VisualizerTask(m_arming, m_vstate);
+        ReceiverTask   m_receiverTask   = ReceiverTask(m_arming);
 
         // Initialzed in sketch()
         Msp *   m_msp;
@@ -283,12 +284,9 @@ class Board {
 
             m_arming.begin(m_esc);
 
-            m_attitudeTask.begin(m_imu, &m_arming, &m_vstate);
+            m_attitudeTask.begin(m_imu);
 
-            m_visualizerTask.begin(
-                    m_msp, m_esc, m_arming, m_receiverTask.receiver, m_vstate);
-
-            m_receiverTask.receiver->begin(&m_arming);
+            m_visualizerTask.begin(m_msp, m_esc, m_receiverTask.receiver);
 
             m_imu->begin();
 

@@ -54,8 +54,6 @@ class Receiver {
         // maximum PWM pulse width which is considered valid
         static const uint16_t PWM_PULSE_MAX   = 2250;  
 
-        Arming * m_arming;
-
         typedef enum {
             STATE_CHECK,
             STATE_PROCESS,
@@ -265,11 +263,6 @@ class Receiver {
                     _axes.z);
         }
 
-        void begin(Arming * arming)
-        {
-            m_arming = arming;
-        }
-
         bool gotPidReset(void)
         {
             return m_gotPidReset;
@@ -299,7 +292,7 @@ class Receiver {
                 uint32_t & frameTimeUs) = 0;
 
         // Called perioidically by receiverTask::fun()
-        void update(uint32_t usec)
+        void update(uint32_t usec, Arming * arming)
         {
             const auto haveSignal = (usec - m_lastFrameTimeUs) < (int32_t)(1000*TIMEOUT_MS);
 
@@ -325,13 +318,13 @@ class Receiver {
                     break;
 
                 case STATE_MODES:
-                    m_arming->attempt(usec, aux1IsSet());
+                    arming->attempt(usec, aux1IsSet());
                     m_state = STATE_UPDATE;
                     break;
 
                 case STATE_UPDATE:
                     m_gotNewData = true;
-                    m_arming->updateFromReceiver(throttleIsDown(), aux1IsSet(), haveSignal);
+                    arming->updateFromReceiver(throttleIsDown(), aux1IsSet(), haveSignal);
                     m_state = STATE_CHECK;
                     break;
             }
