@@ -83,13 +83,13 @@ class Viz(MspParser):
         # Add buttons with callbacks
         self.button_connect = self._add_button('Connect', self.pane1,
                                                self._connect_button_callback)
-        self.button_imu = self._add_button('IMU', self.pane2,
+        self.imu_button = self._add_button('IMU', self.pane2,
                                            self._imu_button_callback)
-        self.button_motors = self._add_button('Motors', self.pane2,
+        self.motors_button = self._add_button('Motors', self.pane2,
                                               self._motors_button_callback)
-        self.button_receiver = self._add_button('Receiver', self.pane2,
+        self.receiver_button = self._add_button('Receiver', self.pane2,
                                                 self._receiver_button_callback)
-        self.button_sensors = self._add_button('Sensors', self.pane2,
+        self.sensors_button = self._add_button('Sensors', self.pane2,
                                                self._sensors_button_callback)
 
         # Prepare for adding ports as they are detected by our timer task
@@ -113,17 +113,17 @@ class Viz(MspParser):
         self.hide(self.error_label)
 
         # Add widgets for motor-testing dialogs; hide them immediately
-        self.motors_quadxmw = self._add_motor_dialog(MotorsQuadXmwDialog)
-        self.motors_coaxial = self._add_motor_dialog(MotorsCoaxialDialog)
+        self.motors_quadxmw_dialog = self._add_motor_dialog(MotorsQuadXmwDialog)
+        self.motors_coaxial_dialog = self._add_motor_dialog(MotorsCoaxialDialog)
 
         # Create receiver dialog
-        self.receiver = ReceiverDialog(self)
+        self.receiver_dialog = ReceiverDialog(self)
 
         # Creaate sensors dialog
         self.sensors = SensorsDialog(self)
 
         # Create IMU dialog
-        self.imu = ImuDialog(self)
+        self.imu_dialog = ImuDialog(self)
         self._schedule_connection_task()
 
         # Create a splash image
@@ -146,8 +146,8 @@ class Viz(MspParser):
         self.mock_mocap_dy = 0
 
     def quit(self):
-        self.motors_quadxmw.stop()
-        self.motors_coaxial.stop()
+        self.motors_quadxmw_dialog.stop()
+        self.motors_coaxial_dialog.stop()
         self.root.destroy()
 
     def hide(self, widget):
@@ -184,9 +184,9 @@ class Viz(MspParser):
     def getRollPitchYaw(self):
 
         # Configure widgets to show connected
-        self._enable_widget(self.button_motors)
-        self._enable_widget(self.button_receiver)
-        self._enable_widget(self.button_sensors)
+        self._enable_widget(self.motors_button)
+        self._enable_widget(self.receiver_button)
+        self._enable_widget(self.sensors_button)
         self._disable_widget(self.portsmenu)
 
         self.button_connect['text'] = 'Disconnect'
@@ -221,7 +221,7 @@ class Viz(MspParser):
 
         # As soon as we handle the callback from one request, send another
         # request, if receiver dialog is running
-        if self.receiver.running:
+        if self.receiver_dialog.running:
             self._send_rc_request()
 
     def handle_ATTITUDE(self, angx, angy, heading):
@@ -232,7 +232,7 @@ class Viz(MspParser):
 
         # As soon as we handle the callback from one request, send another
         # request, if receiver dialog is running
-        if self.imu.running:
+        if self.imu_dialog.running:
             self._send_attitude_request()
 
     def handle_VL53L5(self,
@@ -270,22 +270,22 @@ class Viz(MspParser):
 
         self._clear()
 
-        self._disable_widget(self.button_imu)
-        self._enable_widget(self.button_motors)
-        self._enable_widget(self.button_receiver)
-        self._enable_widget(self.button_sensors)
+        self._disable_widget(self.imu_button)
+        self._enable_widget(self.motors_button)
+        self._enable_widget(self.receiver_button)
+        self._enable_widget(self.sensors_button)
 
-        self.motors_quadxmw.stop()
-        self.motors_coaxial.stop()
-        self.receiver.stop()
+        self.motors_quadxmw_dialog.stop()
+        self.motors_coaxial_dialog.stop()
+        self.receiver_dialog.stop()
         self.sensors.stop()
         self._send_attitude_request()
-        self.imu.start()
+        self.imu_dialog.start()
 
     def _start(self):
 
         self._send_attitude_request()
-        self.imu.start()
+        self.imu_dialog.start()
 
         self.gotimu = False
         self.hide(self.error_label)
@@ -295,11 +295,11 @@ class Viz(MspParser):
 
         if not self.gotimu:
 
-            self.imu.stop()
+            self.imu_dialog.stop()
             self.error_label.place(x=50, y=50)
-            self._disable_widget(self.button_imu)
-            self._disable_widget(self.button_motors)
-            self._disable_widget(self.button_receiver)
+            self._disable_widget(self.imu_button)
+            self._disable_widget(self.motors_button)
+            self._disable_widget(self.receiver_button)
 
     # Sends state request to FC
     def _send_attitude_request(self):
@@ -324,15 +324,15 @@ class Viz(MspParser):
 
         self._clear()
 
-        self._enable_widget(self.button_imu)
-        self._disable_widget(self.button_motors)
-        self._enable_widget(self.button_receiver)
-        self._enable_widget(self.button_sensors)
+        self._enable_widget(self.imu_button)
+        self._disable_widget(self.motors_button)
+        self._enable_widget(self.receiver_button)
+        self._enable_widget(self.sensors_button)
 
-        self.imu.stop()
-        self.receiver.stop()
+        self.imu_dialog.stop()
+        self.receiver_dialog.stop()
         self.sensors.stop()
-        self.motors_quadxmw.start()
+        self.motors_quadxmw_dialog.start()
 
     def _clear(self):
 
@@ -343,32 +343,32 @@ class Viz(MspParser):
 
         self._clear()
 
-        self._enable_widget(self.button_imu)
-        self._enable_widget(self.button_motors)
-        self._disable_widget(self.button_receiver)
-        self._enable_widget(self.button_sensors)
+        self._enable_widget(self.imu_button)
+        self._enable_widget(self.motors_button)
+        self._disable_widget(self.receiver_button)
+        self._enable_widget(self.sensors_button)
 
-        self.imu.stop()
+        self.imu_dialog.stop()
         self.sensors.stop()
-        self.motors_quadxmw.stop()
-        self.motors_coaxial.stop()
+        self.motors_quadxmw_dialog.stop()
+        self.motors_coaxial_dialog.stop()
         self._send_rc_request()
-        self.receiver.start()
+        self.receiver_dialog.start()
 
     # Callback for Sensors button
     def _sensors_button_callback(self):
 
         self._clear()
 
-        self._enable_widget(self.button_imu)
-        self._enable_widget(self.button_motors)
-        self._enable_widget(self.button_receiver)
-        self._disable_widget(self.button_sensors)
+        self._enable_widget(self.imu_button)
+        self._enable_widget(self.motors_button)
+        self._enable_widget(self.receiver_button)
+        self._disable_widget(self.sensors_button)
 
-        self.imu.stop()
-        self.receiver.stop()
-        self.motors_quadxmw.stop()
-        self.motors_coaxial.stop()
+        self.imu_dialog.stop()
+        self.receiver_dialog.stop()
+        self.motors_quadxmw_dialog.stop()
+        self.motors_coaxial_dialog.stop()
         self._send_sensors_request()
         self.sensors.start()
 
@@ -377,10 +377,10 @@ class Viz(MspParser):
 
         if self.connected:
 
-            self.imu.stop()
-            self.motors_quadxmw.stop()
-            self.motors_coaxial.stop()
-            self.receiver.stop()
+            self.imu_dialog.stop()
+            self.motors_quadxmw_dialog.stop()
+            self.motors_coaxial_dialog.stop()
+            self.receiver_dialog.stop()
 
             if self.comms is not None:
 
@@ -388,10 +388,10 @@ class Viz(MspParser):
 
             self._clear()
 
-            self._disable_widget(self.button_imu)
-            self._disable_widget(self.button_motors)
-            self._disable_widget(self.button_receiver)
-            self._disable_widget(self.button_sensors)
+            self._disable_widget(self.imu_button)
+            self._disable_widget(self.motors_button)
+            self._disable_widget(self.receiver_button)
+            self._disable_widget(self.sensors_button)
 
             self.button_connect['text'] = 'Connect'
             self._enable_widget(self.portsmenu)
