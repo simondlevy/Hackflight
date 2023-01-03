@@ -42,13 +42,15 @@ class VisualizerTask : public Task {
             return 1000 + 1000 * value;
         }
 
-        Esc *           m_esc;
-        Arming *        m_arming;
-        Receiver *      m_receiver;
-        VehicleState *  m_vstate;
-        SensorsTask *   m_sensorsTask;
+        // Initialized in constructor
+        Arming *       m_arming;
+        VehicleState * m_vstate;
+        SensorsTask *  m_sensorsTask;
 
-        Msp * m_msp;
+        // Initialized in begin()
+        Esc *      m_esc;
+        Receiver * m_receiver;
+        Msp *      m_msp;
 
         bool m_gotRebootRequest;
 
