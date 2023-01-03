@@ -25,14 +25,13 @@ class SensorsDialog(Dialog):
 
     UPDATE_MSEC = 1
 
-    RANGER_PIXEL_COUNT = 16
-
     MOCAP_CTR_X = 190
     MOCAP_DOT_SIZE = 10
+    MOCAP_MAXVAL = 50
 
-    MOCAP_RANGE = 50
-
+    RANGER_PIXEL_COUNT = 16
     RANGER_CTR_X = 600
+    RANGER_MAXVAL = 6000 # mm
 
     SQUARE_SIZE = 150
     SQUARE_CTR_Y = 220
@@ -94,18 +93,9 @@ class SensorsDialog(Dialog):
 
         if self.running:
 
+            # Display PAA3905 mocap -------------------------------------------
+
             mocap_dx, mocap_dy = self.viz.getMocap()
-
-            debug((mocap_dx, SensorsDialog._scale_mocap(mocap_dx)))
-
-            debug((mocap_dx, mocap_dy))
-
-
-            '''
-            for k, val in enumerate(self.viz.getRanger()):
-                self.canvas.itemconfig(self.ranger_pixels[k],
-                                       fill='#' + ('%02X' % val)*3)
-            '''
 
             mocap_dot_x = SensorsDialog._scale_mocap(mocap_dx) + SensorsDialog.MOCAP_CTR_X
             mocap_dot_y = SensorsDialog._scale_mocap(mocap_dy) + SensorsDialog.SQUARE_CTR_Y
@@ -118,8 +108,17 @@ class SensorsDialog(Dialog):
                                 mocap_dot_x + mocap_dot_size,
                                 mocap_dot_y + mocap_dot_size))
 
+            # Display VL53l% ranging --------------------------------------------
+
+            for k, val in enumerate(self.viz.getRanger()):
+                scaled = int(val / SensorsDialog.RANGER_MAXVAL * 256)
+                self.canvas.itemconfig(self.ranger_pixels[k],
+                                       fill='#' + ('%02X' % scaled)*3)
+            debug('')
+
+            # Reschedule this display task
             self.schedule_display_task(SensorsDialog.UPDATE_MSEC)
 
     def _scale_mocap(val):
 
-        return int(val / SensorsDialog.MOCAP_RANGE * SensorsDialog.SQUARE_SIZE)
+        return int(val / SensorsDialog.MOCAP_MAXVAL * SensorsDialog.SQUARE_SIZE)
