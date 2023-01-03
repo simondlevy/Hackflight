@@ -26,6 +26,7 @@
 #include "imu.h"
 #include "msp.h"
 #include "receiver.h"
+#include "task/sensors.h"
 
 class VisualizerTask : public Task {
 
@@ -45,6 +46,7 @@ class VisualizerTask : public Task {
         Arming *        m_arming;
         Receiver *      m_receiver;
         VehicleState *  m_vstate;
+        SensorsTask *   m_sensorsTask;
 
         Msp * m_msp;
 
@@ -123,11 +125,12 @@ class VisualizerTask : public Task {
 
     public:
 
-        VisualizerTask(Arming & arming, VehicleState & vstate) 
+        VisualizerTask(Arming & arming, VehicleState & vstate, SensorsTask & sensorsTask) 
             : Task(VISUALIZER, 100) // Hz
         { 
             m_arming = &arming;
             m_vstate = &vstate;
+            m_sensorsTask = & sensorsTask;
         }
 
         float motors[MAX_SUPPORTED_MOTORS];

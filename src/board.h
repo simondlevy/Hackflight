@@ -42,18 +42,21 @@ class Board {
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
-        SensorsTask  m_sensorsTask;
-
-        bool           m_failsafeIsActive;
-        Led            m_led;
-        Scheduler      m_scheduler;
-        VehicleState   m_vstate;
+        bool         m_failsafeIsActive;
+        Led          m_led;
+        Scheduler    m_scheduler;
+        VehicleState m_vstate;
 
         Arming m_arming = Arming(m_led);
 
-        AttitudeTask   m_attitudeTask   = AttitudeTask(m_arming, m_vstate);
-        VisualizerTask m_visualizerTask = VisualizerTask(m_arming, m_vstate);
-        ReceiverTask   m_receiverTask   = ReceiverTask(m_arming);
+        SensorsTask m_sensorsTask;
+
+        AttitudeTask m_attitudeTask   = AttitudeTask(m_arming, m_vstate);
+
+        VisualizerTask m_visualizerTask =
+            VisualizerTask(m_arming, m_vstate, m_sensorsTask);
+
+        ReceiverTask m_receiverTask   = ReceiverTask(m_arming);
 
         // Initialzed in sketch()
         Msp *   m_msp;
