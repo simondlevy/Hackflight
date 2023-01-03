@@ -263,6 +263,11 @@ class Viz(MspParser):
 
         self._clear()
 
+        self._disable_button(self.button_imu)
+        self._enable_button(self.button_motors)
+        self._enable_button(self.button_receiver)
+        self._enable_button(self.button_sensors)
+
         self.motors_quadxmw.stop()
         self.motors_coaxial.stop()
         self.receiver.stop()
@@ -312,7 +317,10 @@ class Viz(MspParser):
 
         self._clear()
 
-        # self.comms.send_request(self.actuator_type_request)
+        self._enable_button(self.button_imu)
+        self._disable_button(self.button_motors)
+        self._enable_button(self.button_receiver)
+        self._enable_button(self.button_sensors)
 
         self.imu.stop()
         self.receiver.stop()
@@ -328,6 +336,11 @@ class Viz(MspParser):
 
         self._clear()
 
+        self._enable_button(self.button_imu)
+        self._enable_button(self.button_motors)
+        self._disable_button(self.button_receiver)
+        self._enable_button(self.button_sensors)
+
         self.imu.stop()
         self.sensors.stop()
         self.motors_quadxmw.stop()
@@ -339,6 +352,11 @@ class Viz(MspParser):
     def _sensors_button_callback(self):
 
         self._clear()
+
+        self._enable_button(self.button_imu)
+        self._enable_button(self.button_motors)
+        self._enable_button(self.button_receiver)
+        self._disable_button(self.button_sensors)
 
         self.imu.stop()
         self.receiver.stop()
