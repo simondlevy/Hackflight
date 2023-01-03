@@ -133,14 +133,14 @@ class VisualizerTask : public Task {
         void begin(
                 Msp * msp,
                 Esc * esc,
-                Arming * arming,
+                Arming & arming,
                 Receiver * receiver,
-                VehicleState * vstate)
+                VehicleState & vstate)
         {
             m_msp = msp;
             m_esc = esc;
-            m_arming = arming;
-            m_vstate = vstate;
+            m_arming = &arming;
+            m_vstate = &vstate;
             m_receiver = receiver;
         }
 

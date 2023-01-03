@@ -284,7 +284,8 @@ class Board {
 
             m_attitudeTask.begin(m_imu, &m_arming, &m_vstate);
 
-            m_visualizerTask.begin(m_msp, m_esc, &m_arming, m_receiverTask.receiver, &m_vstate);
+            m_visualizerTask.begin(
+                    m_msp, m_esc, m_arming, m_receiverTask.receiver, m_vstate);
 
             m_receiverTask.receiver->begin(&m_arming);
 
