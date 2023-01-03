@@ -120,7 +120,7 @@ class Viz(MspParser):
         self.receiver_dialog = ReceiverDialog(self)
 
         # Creaate sensors dialog
-        self.sensors = SensorsDialog(self)
+        self.sensors_dialog = SensorsDialog(self)
 
         # Create IMU dialog
         self.imu_dialog = ImuDialog(self)
@@ -238,9 +238,11 @@ class Viz(MspParser):
     def handle_VL53L5(self,
                       p11, p12, p13, p14, p21, p22, p23, p24,
                       p31, p32, p33, p34, p41, p42, p43, p44):
+        # XXX
         return
 
     def handle_PAA3905(self, x, y):
+        # XXX
         return
 
     def _add_pane(self):
@@ -278,7 +280,7 @@ class Viz(MspParser):
         self.motors_quadxmw_dialog.stop()
         self.motors_coaxial_dialog.stop()
         self.receiver_dialog.stop()
-        self.sensors.stop()
+        self.sensors_dialog.stop()
         self._send_attitude_request()
         self.imu_dialog.start()
 
@@ -331,7 +333,7 @@ class Viz(MspParser):
 
         self.imu_dialog.stop()
         self.receiver_dialog.stop()
-        self.sensors.stop()
+        self.sensors_dialog.stop()
         self.motors_quadxmw_dialog.start()
 
     def _clear(self):
@@ -349,7 +351,7 @@ class Viz(MspParser):
         self._enable_widget(self.sensors_button)
 
         self.imu_dialog.stop()
-        self.sensors.stop()
+        self.sensors_dialog.stop()
         self.motors_quadxmw_dialog.stop()
         self.motors_coaxial_dialog.stop()
         self._send_rc_request()
@@ -370,7 +372,7 @@ class Viz(MspParser):
         self.motors_quadxmw_dialog.stop()
         self.motors_coaxial_dialog.stop()
         self._send_sensors_request()
-        self.sensors.start()
+        self.sensors_dialog.start()
 
     # Callback for Connect / Disconnect button
     def _connect_button_callback(self):
