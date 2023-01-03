@@ -133,8 +133,8 @@ class Viz(MspParser):
         # Set up parser's request strings
         self.attitude_request = MspParser.serialize_ATTITUDE_Request()
         self.rc_request = MspParser.serialize_RC_Request()
-        # self.paa3905_request = MspParser.serialize_PAA3905_Request()
-        # self.vl53l5_request = MspParser.serialize_VL53L5_Request()
+        self.paa3905_request = MspParser.serialize_PAA3905_Request()
+        self.vl53l5_request = MspParser.serialize_VL53L5_Request()
 
         # No messages yet
         self.roll_pitch_yaw = [0]*3
