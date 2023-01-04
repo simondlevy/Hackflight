@@ -16,19 +16,11 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*
 #include <espnow.h>
 
 // Replace with the MAC Address of your sender 
 static EspNow _esp = EspNow(0xD8, 0xA0, 0x1D, 0x62, 0xD4, 0xF0);
-
-void setup(void)
-{
-    Serial.begin(115200);
-
-    _esp.begin();
-
-    esp_now_register_recv_cb(onDataRecv);
-}
 
 static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
@@ -38,9 +30,18 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
         Serial.println(incomingData[k]);
     }
 }
+*/
+
+void setup(void)
+{
+    Serial.begin(115200);
+
+    //_esp.begin();
+    //esp_now_register_recv_cb(onDataRecv);
+}
 
  
 void loop(void)
 {
-    delay(1);
+    Serial.println(micros());
 }

@@ -10,7 +10,7 @@ DFU = $(OBJ)/$(SKETCH).dfu
 HEX = $(OBJ)/$(SKETCH).ino.hex
 SRC = $(LIB)/src
 
-all: $(DFU)
+# all: $(DFU)
 all: $(HEX)
 
 $(DFU): $(HEX)
