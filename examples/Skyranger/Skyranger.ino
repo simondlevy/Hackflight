@@ -139,9 +139,9 @@ static void checkMocap(ArduinoMsp & serializer)
 
         if (_mocap.motionDataAvailable()) { 
 
-            uint8_t surfaceQuality = _mocap.getSurfaceQuality();
+            auto surfaceQuality = _mocap.getSurfaceQuality();
 
-            uint32_t shutter = _mocap.getShutter();
+            auto shutter = _mocap.getShutter();
 
             PAA3905_MotionCapture::lightMode_t lightMode = _mocap.getLightMode();
 
