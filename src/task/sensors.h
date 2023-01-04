@@ -31,14 +31,17 @@ class SensorsTask : public Task {
 
         Msp m_parser;
 
+        VehicleState * m_vstate;
+
     public:
 
         int16_t mocapData[2];
         int16_t rangerData[16];
 
-        SensorsTask()
+        SensorsTask(VehicleState & vstate)
             : Task(SENSORS, 50) // Hz
         {
+            m_vstate = &vstate;
         }
 
         virtual void fun(uint32_t usec) override

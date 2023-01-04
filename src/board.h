@@ -49,9 +49,9 @@ class Board {
 
         Arming m_arming = Arming(m_led);
 
-        SensorsTask m_sensorsTask;
+        SensorsTask m_sensorsTask = SensorsTask(m_vstate);
 
-        AttitudeTask m_attitudeTask   = AttitudeTask(m_arming, m_vstate);
+        AttitudeTask m_attitudeTask = AttitudeTask(m_arming, m_vstate);
 
         VisualizerTask m_visualizerTask =
             VisualizerTask(m_arming, m_vstate, m_sensorsTask);
