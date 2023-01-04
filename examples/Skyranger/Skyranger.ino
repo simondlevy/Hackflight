@@ -18,6 +18,7 @@
 
 #include <Wire.h>
 #include <SPI.h>
+#include <espnow.h>
 
 #include <VL53L5cx.h>
 #include <PAA3905_MotionCapture.h>
@@ -156,6 +157,8 @@ static void checkMocap(ArduinoMsp & serializer)
     serializer.sendShorts(MSP_SET_PAA3905, data, 2);
 }
 
+// Helpers ---------------------------------------------------------
+
 static void updateLed(void)
 {
     static uint32_t _prev;
@@ -170,6 +173,12 @@ static void updateLed(void)
     }
 }
 
+
+// ESPNOW -----------------------------------------------------------
+
+// Replace with the MAC Address of your receiver 
+static EspNow _esp = EspNow(0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04);
+
 // ------------------------------------------------------------------
 
 void setup()
@@ -177,6 +186,8 @@ void setup()
     Serial.begin(115200);
 
     pinMode(LED_PIN, OUTPUT);
+
+    _esp.begin();
 
     startRanger();
     startMocap();
@@ -190,4 +201,10 @@ void loop()
     checkMocap(_serializer);
 
     updateLed();
+
+    static uint8_t count;
+
+    _esp.send(&count, 1);
+
+    count = (count+1) % 256;
 }
