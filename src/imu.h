@@ -26,12 +26,20 @@
 #include "core/filters/pt1.h"
 #include "core/vstate.h"
 #include "imu.h"
+#include "maths.h"
 #include "stats.h"
 #include "utils.h"
 
 class Imu {
 
     friend class Board;
+
+    private:
+
+        static int16_t rad2degi(float rad)
+        {
+            return (int16_t)Math::rad2deg(rad);
+        }
 
     protected:
 
@@ -55,5 +63,12 @@ class Imu {
         virtual bool gyroIsReady(void) = 0;
 
         virtual auto readGyroDps(void) -> Axes = 0;
+
+        static void getEulerAngles(const VehicleState * vstate, int16_t angles[3])
+        {
+            angles[0] = (int16_t)(10 * rad2degi(vstate->phi));
+            angles[1] = (int16_t)(10 * rad2degi(vstate->theta));
+            angles[2] = (int16_t)rad2degi(vstate->psi);
+        }
 
 }; // class Imu

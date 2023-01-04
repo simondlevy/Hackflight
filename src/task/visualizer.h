@@ -32,11 +32,6 @@ class VisualizerTask : public Task {
 
     private:
 
-        static int16_t rad2degi(float rad)
-        {
-            return (int16_t)Math::rad2deg(rad);
-        }
-
         static float scale(const float value)
         {
             return 1000 + 1000 * value;
@@ -95,14 +90,9 @@ class VisualizerTask : public Task {
 
                     case 108: // ATTITUDE
                         {
-                            int16_t angles[] = {
-                                (int16_t)(10 * rad2degi(m_vstate->phi)),
-                                (int16_t)(10 * rad2degi(m_vstate->theta)),
-                                (int16_t)rad2degi(m_vstate->psi)
-                            };
-
+                            int16_t angles[3] = {};
+                            Imu::getEulerAngles(m_vstate, angles);
                             sendShorts(108, angles, 3);
-
                         } break;
 
                     case 121: // VL53L5 ranging camera

@@ -48,6 +48,8 @@ class SensorsTask : public Task {
         {
             (void)usec;
 
+            int16_t angles[3] = {};
+            Imu::getEulerAngles(m_vstate, angles);
         }
 
         virtual void parse(const uint8_t byte)
