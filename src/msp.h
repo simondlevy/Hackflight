@@ -42,13 +42,14 @@ class Msp {
         uint8_t m_payloadChecksum;
         uint8_t m_payloadIndex;
 
-        void serialize16(int16_t a)
+        void serialize16(const int16_t a)
         {
             serialize8(a & 0xFF);
             serialize8((a >> 8) & 0xFF);
         }
 
-        void prepareToSerialize(uint8_t type, uint8_t count, uint8_t size)
+        void prepareToSerialize(
+                const uint8_t type, const uint8_t count, const uint8_t size)
         {
             m_payloadSize = 0;
             m_payloadIndex = 0;
@@ -61,33 +62,33 @@ class Msp {
             serialize8(type);
         }
 
-        void addToOutBuf(uint8_t a)
+        void addToOutBuf(const uint8_t a)
         {
             m_payload[m_payloadSize++] = a;
         }
 
-        void serialize8(uint8_t a)
+        void serialize8(const uint8_t a)
         {
             addToOutBuf(a);
             m_payloadChecksum ^= a;
         }
 
-        void prepareToSerializeBytes(uint8_t type, uint8_t count)
+        void prepareToSerializeBytes(const uint8_t type, const uint8_t count)
         {
             prepareToSerialize(type, count, 1);
         }
 
-        void serializeByte(uint8_t src)
+        void serializeByte(const uint8_t src)
         {
             serialize8(src);
         }
 
-        void prepareToSerializeInts(uint8_t type, uint8_t count)
+        void prepareToSerializeInts(const uint8_t type, const uint8_t count)
         {
             prepareToSerialize(type, count, 4);
         }
 
-        void prepareToSerializeFloats(uint8_t type, uint8_t count)
+        void prepareToSerializeFloats(const uint8_t type, const uint8_t count)
         {
             prepareToSerialize(type, count, 4);
         }
@@ -162,7 +163,7 @@ class Msp {
             return m_parserState == IDLE;
         }
 
-        int16_t parseShort(uint8_t index)
+        int16_t parseShort(const uint8_t index)
         {
             int16_t s = 0;
             memcpy(&s,  &m_payload[2*index], sizeof(int16_t));
@@ -170,7 +171,7 @@ class Msp {
 
         }
 
-        void prepareToSerializeShorts(uint8_t messageType, uint8_t count)
+        void prepareToSerializeShorts(const uint8_t messageType, const uint8_t count)
         {
             prepareToSerialize(messageType, count, 2);
         }
@@ -180,7 +181,7 @@ class Msp {
             serialize8(m_payloadChecksum);
         }
 
-        void serializeShort(uint16_t src)
+        void serializeShort(const uint16_t src)
         {
             uint16_t a;
             memcpy(&a, &src, 2);
