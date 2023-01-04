@@ -39,18 +39,6 @@ static const uint8_t LED_PIN         = 25;
 static const uint8_t RANGER_MSG_TYPE = 221;  // VL53L5 ranger
 static const uint8_t MOCAP_MSG_TYPE  = 222;  // PAA3905 motion capture
 
-// Helper -------------------------------------------------------------
-
-static void sendData(
-        ArduinoMsp & serializer,
-        const uint8_t messageType,
-        const int16_t data[],
-        const uint8_t count) 
-{
-    serializer.serializeShorts(messageType, data, count);
-    serializer.sendPayload();
-}
-
 // VL53L5 -------------------------------------------------------------
 
 // Set to 0 for continuous mode
@@ -103,7 +91,7 @@ static void checkRanger(ArduinoMsp & serializer)
         }
     } 
 
-    sendData(serializer, RANGER_MSG_TYPE, data, 16);
+    serializer.sendShorts(RANGER_MSG_TYPE, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -165,7 +153,7 @@ static void checkMocap(ArduinoMsp & serializer)
         }
     }
 
-    sendData(serializer, MOCAP_MSG_TYPE, data, 2);
+    serializer.sendShorts(MOCAP_MSG_TYPE, data, 2);
 }
 
 static void updateLed(void)
