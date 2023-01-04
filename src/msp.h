@@ -93,10 +93,43 @@ class Msp {
             prepareToSerialize(type, count, 4);
         }
 
+        void prepareToSerializeShorts(const uint8_t messageType, const uint8_t count)
+        {
+            prepareToSerialize(messageType, count, 2);
+        }
+
+        void completeSerialize(void)
+        {
+            serialize8(m_payloadChecksum);
+        }
+
+        void serializeShort(const uint16_t src)
+        {
+            uint16_t a;
+            memcpy(&a, &src, 2);
+            serialize16(a);
+        }
+
+        void serializeShorts(
+                const uint8_t messageType, const int16_t src[], const uint8_t count)
+        {
+            prepareToSerializeShorts(messageType, count);
+
+            for (auto k=0; k<count; ++k) {
+                serializeShort(src[k]);
+            }
+
+            completeSerialize();
+        }
+
     protected:
 
         uint8_t m_payload[BUF_SIZE];
         uint8_t m_payloadSize;
+
+        virtual void sendPayload(void) 
+        {
+        }
 
     public:
 
@@ -171,54 +204,11 @@ class Msp {
 
         }
 
-        void prepareToSerializeShorts(const uint8_t messageType, const uint8_t count)
-        {
-            prepareToSerialize(messageType, count, 2);
-        }
-
-        void completeSerialize(void)
-        {
-            serialize8(m_payloadChecksum);
-        }
-
-        void serializeShort(const uint16_t src)
-        {
-            uint16_t a;
-            memcpy(&a, &src, 2);
-            serialize16(a);
-        }
-
-        void serializeShorts(
-                const uint8_t messageType, const int16_t src[], const uint8_t count)
-        {
-            prepareToSerializeShorts(messageType, count);
-
-            for (auto k=0; k<count; ++k) {
-                serializeShort(src[k]);
-            }
-
-            completeSerialize();
-        }
-
         void sendShorts(
                 const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
             serializeShorts(messageType, src, count);
             sendPayload();
-        }
-
-        void serializeRequest(const uint8_t messageType)
-        {
-            m_payload[0] = '$';
-            m_payload[1] = 'M';
-            m_payload[2] = '<';
-            m_payload[3] = 0;
-            m_payload[4] = messageType;
-            m_payload[5] = messageType; // checksum (CRC)
-        }
-
-        virtual void sendPayload(void) 
-        {
         }
 
 }; // class Msp
