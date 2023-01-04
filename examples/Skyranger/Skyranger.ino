@@ -36,8 +36,8 @@ static const uint8_t LED_PIN         = 25;
 
 // MSP message IDs ----------------------------------------------------
 
-static const uint8_t RANGER_MSG_TYPE = 221;  // VL53L5 ranger
-static const uint8_t MOCAP_MSG_TYPE  = 222;  // PAA3905 motion capture
+static const uint8_t MSP_SET_VL53L5 = 221;  // VL53L5 ranger
+static const uint8_t MSP_SET_PAA3905  = 222;  // PAA3905 motion capture
 
 // VL53L5 -------------------------------------------------------------
 
@@ -91,7 +91,7 @@ static void checkRanger(ArduinoMsp & serializer)
         }
     } 
 
-    serializer.sendShorts(RANGER_MSG_TYPE, data, 16);
+    serializer.sendShorts(MSP_SET_VL53L5, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -153,7 +153,7 @@ static void checkMocap(ArduinoMsp & serializer)
         }
     }
 
-    serializer.sendShorts(MOCAP_MSG_TYPE, data, 2);
+    serializer.sendShorts(MSP_SET_PAA3905, data, 2);
 }
 
 static void updateLed(void)

@@ -26,8 +26,8 @@ class SensorsTask : public Task {
 
     private:
 
-        static const uint8_t RANGER_ID = 121;  // VL53L5 ranger
-        static const uint8_t MOCAP_ID  = 122;  // PAA3905 motion capture
+        static const uint8_t MSP_VL53L5  = 121;  
+        static const uint8_t MSP_PAA3905 = 122;
 
         Msp m_parser;
 
