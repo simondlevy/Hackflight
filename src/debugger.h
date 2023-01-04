@@ -56,7 +56,7 @@ class HfDebugger {
         static void printfloat(float val, uint8_t prec=3)
         {
             uint16_t mul = 1;
-            for (uint8_t k=0; k<prec; ++k) {
+            for (auto k=0; k<prec; ++k) {
                 mul *= 10;
             }
             char sgn = '+';
