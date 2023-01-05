@@ -17,15 +17,13 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <SPI.h>
-
 #include <hackflight.h>
+#include <msp/arduino.h>
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <debugger.h>
-#include <receiver/real/sbus.h>
-#include <imu/real/softquat/mpu6x00.h>
-#include <esc/dshot.h>
+#include <receiver/sbus.h>
+#include <imu/real/softquat/mpu6x00/arduino.h>
+#include <esc/mock.h>
 
 #include <vector>
 using namespace std;
@@ -37,71 +35,60 @@ static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PA1;
 
-static vector <uint8_t> MOTOR_PINS = {PB4, PB5, PB6, PB7};
-
 static const uint8_t LED_PIN  = PC13; 
 
-static SPIClass _spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
+static SPIClass spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
-static AnglePidController _anglePid(
+static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
         0.021160,     // Rate Kd
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-static vector<PidController *> _pids = {&_anglePid};
+static vector<PidController *> _pids = {&anglePid};
 
-static Stm32F411Board * _board;
-static Mpu6x00 * _imu;
-static SbusReceiver _rx;
+static Mixer mixer = QuadXbfMixer::make();
 
-static Mixer _mixer = QuadXbfMixer::make();
+static ArduinoMsp msp;
 
-static uint32_t _count;
+static SbusReceiver rx;
 
-// Motor interrupt
-extern "C" void handleDmaIrq(void)
-{
-    _board->handleDmaIrq(0);
+static ArduinoMpu6x00 imu(spi, RealImu::rotate180, CS_PIN);
 
-    _count++;
-}
+static vector<PidController *> pids = {&anglePid};
+
+static MockEsc esc;
+
+static Stm32F411Board board(msp, rx, imu, pids, mixer, esc, LED_PIN);
 
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    _imu->handleInterrupt();
+    imu.handleInterrupt();
 }
 
 // Receiver interrupt
 void serialEvent1(void)
 {
-    _rx.read(Serial1);
+    while (Serial1.available()) {
+        rx.parse(Serial1.read());
+    }
 }
 
 void setup(void)
 {
+    // Set up IMU interrupt
     pinMode(EXTI_PIN, INPUT);
     attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    static Mpu6x00 imu(RealImu::rotate180, _spi, CS_PIN);
-
-    static DshotEsc esc(&MOTOR_PINS);
-
-    static Stm32F411Board board(_rx, imu, _pids, _mixer, esc, LED_PIN);
-
-    _board = &board;
-    _imu = &imu;
-
+    // Start receiver UART
     Serial1.begin(100000, SERIAL_8E2);
 
-    _board->begin();
+    board.begin();
 }
 
 void loop(void)
 {
-    _board->step();
-
-    Serial.println(_count);
+    board.step();
 }

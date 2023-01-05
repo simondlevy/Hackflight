@@ -21,9 +21,9 @@
 #include <msp/arduino.h>
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <esc/dshot.h>
-#include <imu/real/softquat/mpu6x00/arduino.h>
 #include <receiver/sbus.h>
+#include <imu/real/softquat/mpu6x00/arduino.h>
+#include <esc/dshot.h>
 
 #include <vector>
 using namespace std;
@@ -41,7 +41,7 @@ static const uint8_t LED_PIN = PB5;
 
 static SPIClass spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
-static AnglePidController _anglePid(
+static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
         0.021160,     // Rate Kd
@@ -56,7 +56,7 @@ static SbusReceiver rx;
 
 static ArduinoMpu6x00 imu(spi, RealImu::rotate270, CS_PIN);
 
-static vector<PidController *> pids = {&_anglePid};
+static vector<PidController *> pids = {&anglePid};
 
 static DshotEsc esc(&MOTOR_PINS);
 
