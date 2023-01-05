@@ -17,7 +17,7 @@ $(DFU): $(HEX)
 	../../utils/dfuse-pack.py -i $(HEX) $(DFU)
 
 $(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
-	arduino-cli compile -b $(FQBN) --libraries $(LIB) --build-path $(OBJ) --warnings "all"
+	arduino-cli compile --fqbn $(FQBN) --libraries $(LIB) --build-path $(OBJ) --warnings "all"
 	rm -f *.bin *.elf
 
 unbrick: $(DFU)
