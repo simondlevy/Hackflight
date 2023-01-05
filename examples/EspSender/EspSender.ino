@@ -16,9 +16,13 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <espnow.h>
+#include <esp_now.h>
+#include <WiFi.h>
 
-static const uint8_t LED_PIN         = 25;
+// Replace with the MAC Address of your receiver 
+static uint8_t RECEIVER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04};
+
+static const uint8_t LED_PIN = 25;
 
 static void updateLed(void)
 {
@@ -34,16 +38,32 @@ static void updateLed(void)
     }
 }
 
-// Replace with the MAC Address of your receiver 
-static EspNow _esp = EspNow(0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04);
-
 void setup()
 {
     Serial.begin(115200);
-
     pinMode(LED_PIN, OUTPUT);
 
-    _esp.begin();
+    WiFi.mode(WIFI_STA);
+
+    if (esp_now_init() != ESP_OK) {
+        while (true) {
+            Serial.println("Error initializing ESP-NOW");
+            delay(500);
+        }
+    }
+
+    static esp_now_peer_info_t peerInfo;
+
+    memcpy(peerInfo.peer_addr, RECEIVER_ADDRESS, 6);
+    peerInfo.channel = 0;
+    peerInfo.encrypt = false;
+
+    if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+        while (true) {
+            Serial.println("Failed to add peer");
+            delay(500);
+        }
+    }
 }
 
 void loop()
@@ -51,6 +71,6 @@ void loop()
     updateLed();
 
     static uint8_t count;
-    _esp.send(&count, 1);
+    esp_now_send(RECEIVER_ADDRESS, &count, 1);
     count = (count+1) % 256;
 }
