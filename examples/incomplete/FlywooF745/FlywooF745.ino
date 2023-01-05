@@ -22,30 +22,49 @@
 #include <board/stm32/stm32f745.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/mock.h>
-#include <imu/mock.h>
+#include <imu/real/softquat/mpu6x00/arduino.h>
 #include <receiver/mock.h>
 
 #include <vector>
 using namespace std;
 
+// IMU
+static const uint8_t MOSI_PIN = PB15;
+static const uint8_t MISO_PIN = PB14;
+static const uint8_t SCLK_PIN = PB13;
+static const uint8_t CS_PIN   = PE4;
+static const uint8_t EXTI_PIN = PE1;
+
 static const uint8_t LED_PIN  = PA_2;
 
-static ArduinoMsp _msp;
+static SPIClass spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
-static MockReceiver _rx;
+static ArduinoMsp msp;
 
-static MockImu _imu;
+static MockReceiver rx;
 
-static vector<PidController *> _pids = {};
+static ArduinoMpu6x00 imu(spi, RealImu::rotate270, CS_PIN);
 
-static Mixer _mixer = QuadXbfMixer::make();
+static vector<PidController *> pids = {};
 
-static MockEsc _esc;
+static Mixer mixer = QuadXbfMixer::make();
 
-static Stm32F745Board _board(_msp, _rx, _imu, _pids, _mixer, _esc, LED_PIN);
+static MockEsc esc;
+
+static Stm32F745Board _board(msp, rx, imu, pids, mixer, esc, LED_PIN);
+
+// IMU interrupt
+static void handleImuInterrupt(void)
+{
+    imu.handleInterrupt();
+}
 
 void setup(void)
 {
+    // Set up IMU interrupt
+    pinMode(EXTI_PIN, INPUT);
+    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+
     _board.begin();
 }
 
