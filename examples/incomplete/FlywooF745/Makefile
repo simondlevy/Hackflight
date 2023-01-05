@@ -1,11 +1,11 @@
-SKETCH = FlywooF411Dsmx
+SKETCH = FlywooF745
 
-FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
+FQBN = STMicroelectronics:stm32:GenF7:pnum=GENERIC_F745ZGTX,usb=CDCgen
 
 PORT = /dev/ttyACM0
 
 OBJ = $(PWD)/obj
-LIB = ../../
+LIB = ../../..
 DFU = $(OBJ)/$(SKETCH).dfu 
 HEX = $(OBJ)/$(SKETCH).ino.hex
 SRC = $(LIB)/src
@@ -14,7 +14,7 @@ all: $(DFU)
 all: $(HEX)
 
 $(DFU): $(HEX)
-	../../utils/dfuse-pack.py -i $(HEX) $(DFU)
+	$(LIB)/utils/dfuse-pack.py -i $(HEX) $(DFU)
 
 $(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
 	arduino-cli compile -b $(FQBN) --libraries $(LIB) --build-path $(OBJ)
