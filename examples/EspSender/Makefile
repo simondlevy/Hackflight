@@ -1,8 +1,8 @@
-SKETCH = EspReceiver
+SKETCH = EspSender
 
-FQBN = esp32:esp32:tinypico
+FQBN = esp32:esp32:pico32
 
-PORT = /dev/ttyUSB1
+PORT = /dev/ttyUSB0
 
 all:
 	arduino-cli compile --fqbn $(FQBN) . --warnings "all"
