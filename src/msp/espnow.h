@@ -19,9 +19,11 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "msp.h"
 
-class ArduinoMsp : public Msp {
+class EspNowMsp : public Msp {
 
     public:
 

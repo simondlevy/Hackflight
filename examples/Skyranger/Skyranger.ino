@@ -27,6 +27,7 @@
 #include "hackflight.h"
 #include "debugger.h"
 #include "msp/arduino.h"
+#include "msp/espnow.h"
 
 // Pins ---------------------------------------------------------------
 
@@ -48,12 +49,14 @@ static uint8_t ESP_RECEIVER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04};
 // Helpers -----------------------------------------------------------
 
 static void sendBytes(
-        Msp & serializer,
+        Msp & fc_serializer,
+        Msp & esp_serializer,
         const uint8_t msgId,
         const int16_t data[],
         const uint8_t count)
 {
-    serializer.sendShorts(msgId, data, count);
+    fc_serializer.sendShorts(msgId, data, count);
+    esp_serializer.sendShorts(msgId, data, count);
 }
 
 // VL53L5 -------------------------------------------------------------
@@ -89,7 +92,7 @@ static void startRanger(void)
     _ranger.begin();
 }
 
-static void checkRanger(ArduinoMsp & serializer)
+static void checkRanger(ArduinoMsp & fc_serializer, EspNowMsp & esp_serializer)
 {
     static int16_t data[16];
 
@@ -108,7 +111,7 @@ static void checkRanger(ArduinoMsp & serializer)
         }
     } 
 
-    sendBytes(serializer, MSP_SET_VL53L5, data, 16);
+    sendBytes(fc_serializer, esp_serializer, MSP_SET_VL53L5, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -144,7 +147,7 @@ static void startMocap(void)
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
 }
 
-static void checkMocap(ArduinoMsp & serializer)
+static void checkMocap(ArduinoMsp & fc_serializer, EspNowMsp & esp_serializer)
 {
     static int16_t data[2];
 
@@ -170,7 +173,7 @@ static void checkMocap(ArduinoMsp & serializer)
         }
     }
 
-    sendBytes(serializer, MSP_SET_PAA3905, data, 2);
+    sendBytes(fc_serializer, esp_serializer, MSP_SET_PAA3905, data, 2);
 }
 
 // Helpers ---------------------------------------------------------
@@ -234,10 +237,11 @@ void setup()
 
 void loop()
 {
-    static ArduinoMsp _serializer;
+    static ArduinoMsp _fc_serializer;
+    static EspNowMsp _esp_serializer;
 
-    checkRanger(_serializer);
-    checkMocap(_serializer);
+    checkRanger(_fc_serializer, _esp_serializer);
+    checkMocap(_fc_serializer, _esp_serializer);
 
     updateLed();
 }
