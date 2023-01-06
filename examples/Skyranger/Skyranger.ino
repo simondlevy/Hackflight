@@ -42,10 +42,6 @@ static const uint8_t LED_PIN         = 25;
 static const uint8_t MSP_SET_VL53L5 = 221;  // VL53L5 ranger
 static const uint8_t MSP_SET_PAA3905  = 222;  // PAA3905 motion capture
 
-// Replace with the MAC Address of your ESPNOW receiver ---------------
-
-static uint8_t ESP_RECEIVER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04};
-
 // Helpers -----------------------------------------------------------
 
 static void sendBytes(
@@ -192,43 +188,17 @@ static void updateLed(void)
     }
 }
 
-
-// ESPNOW -----------------------------------------------------------
-
-static void startEspNow()
-{
-    WiFi.mode(WIFI_STA);
-
-    if (esp_now_init() != ESP_OK) {
-        while (true) {
-            Serial.println("Error initializing ESP-NOW");
-            delay(500);
-        }
-    }
-
-    static esp_now_peer_info_t peerInfo;
-
-    memcpy(peerInfo.peer_addr, ESP_RECEIVER_ADDRESS, 6);
-    peerInfo.channel = 0;
-    peerInfo.encrypt = false;
-
-    if (esp_now_add_peer(&peerInfo) != ESP_OK) {
-        while (true) {
-            Serial.println("Failed to add peer");
-            delay(500);
-        }
-    }
-}
-
 // ------------------------------------------------------------------
+
+static EspNowMsp _esp_serializer;
 
 void setup()
 {
     Serial.begin(115200);
 
-    pinMode(LED_PIN, OUTPUT);
+    _esp_serializer.begin();
 
-    startEspNow();
+    pinMode(LED_PIN, OUTPUT);
 
     startRanger();
 
@@ -238,7 +208,6 @@ void setup()
 void loop()
 {
     static ArduinoMsp _fc_serializer;
-    static EspNowMsp _esp_serializer;
 
     checkRanger(_fc_serializer, _esp_serializer);
     checkMocap(_fc_serializer, _esp_serializer);

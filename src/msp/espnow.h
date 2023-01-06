@@ -19,17 +19,43 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <esp_now.h>
+#include <WiFi.h>
 
 #include "msp.h"
+#include "debugger.h"
 
 class EspNowMsp : public Msp {
 
+    private:
+
+        // Replace with the MAC Address of your ESPNOW receiver ---------------
+        const uint8_t RECEIVER_ADDRESS[6] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04};
+
     public:
+
+        void begin(void)
+        {
+            WiFi.mode(WIFI_STA);
+
+            if (esp_now_init() != ESP_OK) {
+                HfDebugger::reportForever("Error initializing ESP-NOW");
+            }
+
+            static esp_now_peer_info_t peerInfo;
+
+            memcpy(peerInfo.peer_addr, RECEIVER_ADDRESS, 6);
+            peerInfo.channel = 0;
+            peerInfo.encrypt = false;
+
+            if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+                HfDebugger::reportForever("Failed to add peer");
+            }
+        }
 
         void sendPayload(void) override
         {
-            Serial.write(m_payload, m_payloadSize);
+            esp_now_send(RECEIVER_ADDRESS, m_payload, m_payloadSize);
         }
 
 }; // class ArduinoMsp
