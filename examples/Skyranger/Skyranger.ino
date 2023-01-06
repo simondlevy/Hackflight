@@ -53,16 +53,7 @@ static void sendBytes(
         const int16_t data[],
         const uint8_t count)
 {
-    serializer.serializeShorts(msgId, data, count);
-
-    for (auto k=0; k<serializer.getMessageSize(); ++k) {
-
-        uint8_t byte = serializer.getByte(k);
-
-        Serial.write(byte); // send byte to FC
-
-        // esp_now_send(ESP_RECEIVER_ADDRESS, data, count);
-    }
+    serializer.sendShorts(msgId, data, count);
 }
 
 // VL53L5 -------------------------------------------------------------
