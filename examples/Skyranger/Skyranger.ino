@@ -18,7 +18,8 @@
 
 #include <Wire.h>
 #include <SPI.h>
-#include <espnow.h>
+#include <esp_now.h>
+#include <WiFi.h>
 
 #include <VL53L5cx.h>
 #include <PAA3905_MotionCapture.h>
@@ -39,6 +40,30 @@ static const uint8_t LED_PIN         = 25;
 
 static const uint8_t MSP_SET_VL53L5 = 221;  // VL53L5 ranger
 static const uint8_t MSP_SET_PAA3905  = 222;  // PAA3905 motion capture
+
+// Replace with the MAC Address of your ESPNOW receiver ---------------
+
+static uint8_t ESP_RECEIVER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04};
+
+// Helpers -----------------------------------------------------------
+
+static void sendBytes(
+        Msp & serializer,
+        const uint8_t msgId,
+        const int16_t data[],
+        const uint8_t count)
+{
+    serializer.serializeShorts(msgId, data, count);
+
+    for (auto k=0; k<serializer.getMessageSize(); ++k) {
+
+        uint8_t byte = serializer.getByte(k);
+
+        Serial.write(byte); // send byte to FC
+
+        // esp_now_send(ESP_RECEIVER_ADDRESS, data, count);
+    }
+}
 
 // VL53L5 -------------------------------------------------------------
 
@@ -92,7 +117,7 @@ static void checkRanger(ArduinoMsp & serializer)
         }
     } 
 
-    serializer.sendShorts(MSP_SET_VL53L5, data, 16);
+    sendBytes(serializer, MSP_SET_VL53L5, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -154,7 +179,7 @@ static void checkMocap(ArduinoMsp & serializer)
         }
     }
 
-    serializer.sendShorts(MSP_SET_PAA3905, data, 2);
+    sendBytes(serializer, MSP_SET_PAA3905, data, 2);
 }
 
 // Helpers ---------------------------------------------------------
@@ -176,8 +201,30 @@ static void updateLed(void)
 
 // ESPNOW -----------------------------------------------------------
 
-// Replace with the MAC Address of your receiver 
-static EspNow _esp = EspNow(0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04);
+static void startEspNow()
+{
+    WiFi.mode(WIFI_STA);
+
+    if (esp_now_init() != ESP_OK) {
+        while (true) {
+            Serial.println("Error initializing ESP-NOW");
+            delay(500);
+        }
+    }
+
+    static esp_now_peer_info_t peerInfo;
+
+    memcpy(peerInfo.peer_addr, ESP_RECEIVER_ADDRESS, 6);
+    peerInfo.channel = 0;
+    peerInfo.encrypt = false;
+
+    if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+        while (true) {
+            Serial.println("Failed to add peer");
+            delay(500);
+        }
+    }
+}
 
 // ------------------------------------------------------------------
 
@@ -187,9 +234,10 @@ void setup()
 
     pinMode(LED_PIN, OUTPUT);
 
-    _esp.begin();
+    startEspNow();
 
     startRanger();
+
     startMocap();
 }
 
@@ -201,10 +249,4 @@ void loop()
     checkMocap(_serializer);
 
     updateLed();
-
-    static uint8_t count;
-
-    _esp.send(&count, 1);
-
-    count = (count+1) % 256;
 }

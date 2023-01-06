@@ -29,16 +29,12 @@ class ArduinoMsp : public Msp {
 
         void sendPayload(void) override
         {
-            for (auto k=0; k<m_payloadSize; ++k) {
-                Serial.write(m_payload[k]);
-            }
+            Serial.write(m_payload, m_payloadSize);
         }
 
         void sendPayload(HardwareSerial & uart)
         {
-            for (auto k=0; k<m_payloadSize; ++k) {
-                uart.write(m_payload[k]);
-            }
+            uart.write(m_payload, m_payloadSize);
         }
 
 }; // class Msp
