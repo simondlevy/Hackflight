@@ -32,9 +32,4 @@ class ArduinoMsp : public Msp {
             Serial.write(m_payload, m_payloadSize);
         }
 
-        void sendPayload(HardwareSerial & uart)
-        {
-            uart.write(m_payload, m_payloadSize);
-        }
-
-}; // class Msp
+}; // class ArduinoMsp

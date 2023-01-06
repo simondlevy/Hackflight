@@ -119,6 +119,18 @@ class Msp {
         {
         }
 
+        void serializeShorts(
+                const uint8_t messageType, const int16_t src[], const uint8_t count)
+        {
+            prepareToSerializeShorts(messageType, count);
+
+            for (auto k=0; k<count; ++k) {
+                serializeShort(src[k]);
+            }
+
+            completeSerialize();
+        }
+
     public:
 
         /**
@@ -190,28 +202,6 @@ class Msp {
             memcpy(&s,  &m_payload[2*index], sizeof(int16_t));
             return s;
 
-        }
-
-        void serializeShorts(
-                const uint8_t messageType, const int16_t src[], const uint8_t count)
-        {
-            prepareToSerializeShorts(messageType, count);
-
-            for (auto k=0; k<count; ++k) {
-                serializeShort(src[k]);
-            }
-
-            completeSerialize();
-        }
-
-        uint8_t getMessageSize(void) 
-        {
-            return m_payloadSize;
-        }
-
-        uint8_t getByte(uint8_t k) 
-        {
-            return m_payload[k];
         }
 
         void sendShorts(
