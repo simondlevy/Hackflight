@@ -39,8 +39,9 @@ static const uint8_t LED_PIN         = 25;
 
 // MSP message IDs ----------------------------------------------------
 
-static const uint8_t MSP_SET_VL53L5 = 221;  // VL53L5 ranger
-static const uint8_t MSP_SET_PAA3905  = 222;  // PAA3905 motion capture
+static const uint8_t MSP_SET_ATTITUDE = 213;
+static const uint8_t MSP_SET_VL53L5   = 221;
+static const uint8_t MSP_SET_PAA3905  = 222;
 
 // Helpers -----------------------------------------------------------
 
@@ -211,6 +212,10 @@ void loop()
 
     checkRanger(_fc_serializer, _esp_serializer);
     checkMocap(_fc_serializer, _esp_serializer);
+
+    int16_t attitude[3] = {0, 0, 0};
+
+    sendBytes(_fc_serializer, _esp_serializer, MSP_SET_ATTITUDE, attitude, 3);
 
     updateLed();
 }
