@@ -32,14 +32,13 @@ static const uint8_t MOSI_PIN = PA7;
 static const uint8_t MISO_PIN = PA6;
 static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
+
 static const uint8_t EXTI_PIN = PB0;
 
 static vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
 
 //static const uint8_t LED_PIN  = PC13; // orange
 static const uint8_t LED_PIN  = PC14; // blue
-
-static SPIClass spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -54,7 +53,7 @@ static DshotEsc esc(&MOTOR_PINS);
 
 static DsmxReceiver rx;
 
-static Mpu6x00 imu(spi, RealImu::rotate180, CS_PIN);
+static Mpu6x00 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, RealImu::rotate180);
 
 static vector<PidController *> pids = {&anglePid};
 

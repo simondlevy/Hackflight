@@ -34,8 +34,8 @@ Hackflight has been tested on the following platforms:
 * [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine
 
 To make it easy to develop flight firmware using Arduino-compatible
-microcontrollers, Hackflight is laid out as an Arduino library; however,
-the core flight-control algorithm is hardware-independent.
+microcontrollers, Hackflight is laid out as an Arduino library and uses
+the Arduino API; however, the core flight-control algorithm is hardware-independent.
 
 ## Design principles
 

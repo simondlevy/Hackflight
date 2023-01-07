@@ -38,8 +38,6 @@ static vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
 
 static const uint8_t LED_PIN = PB5;
 
-static SPIClass spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
-
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -51,7 +49,7 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static SbusReceiver rx;
 
-static Mpu6x00 imu(spi, RealImu::rotate270, CS_PIN);
+static Mpu6x00 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, RealImu::rotate270);
 
 static vector<PidController *> pids = {&anglePid};
 
