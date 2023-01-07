@@ -3,23 +3,37 @@
 from argparse import ArgumentParser
 from serial import Serial
 
-cmdparser = ArgumentParser()
-cmdparser.add_argument('-p', '--port', default='/dev/ttyUSB0', help='COM port')
-args = cmdparser.parse_args()
+from mspparser import MspParser
 
-port = Serial(args.port, 115200)
 
-while True:
+class SkyParser(MspParser):
 
-    try:
+    def dispatchMessage(self):
 
-        byte = ord(port.read(1))
+        print(self.message_id)
 
-        if byte == 0x24:
-            print()
 
-        print('x%02x' % byte, end=' ')
+def main():
 
-    except KeyboardInterrupt:
+    cmdparser = ArgumentParser()
+    cmdparser.add_argument('-p', '--port',
+                           default='/dev/ttyUSB0',
+                           help='COM port')
+    args = cmdparser.parse_args()
 
-        break
+    port = Serial(args.port, 115200)
+
+    skyparser = SkyParser()
+
+    while True:
+
+        try:
+
+            skyparser.parse(port.read(1))
+
+        except KeyboardInterrupt:
+
+            break
+
+
+main()

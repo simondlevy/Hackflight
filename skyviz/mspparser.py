@@ -74,37 +74,7 @@ class MspParser(metaclass=abc.ABCMeta):
         else:
             print("Unknown state detected: %d" % self.state)
 
-    @staticmethod
-    def crc8(data):
-        crc = 0x00
-        for c in data:
-            crc ^= c
-        return crc
 
+    @abc.abstractmethod
     def dispatchMessage(self):
-
-        if self.message_id == 121:
-            self.handle_VL53L5(*struct.unpack('=hhhhhhhhhhhhhhhh', self.message_buffer))
-
-        if self.message_id == 122:
-            self.handle_PAA3905(*struct.unpack('=hh', self.message_buffer))
-
-        return
-
-    @abc.abstractmethod
-    def handle_VL53L5(self, p11, p12, p13, p14, p21, p22, p23, p24, p31, p32, p33, p34, p41, p42, p43, p44):
-        return
-
-    @abc.abstractmethod
-    def handle_PAA3905(self, x, y):
-        return
-
-    @staticmethod
-    def serialize_VL53L5_Request():
-        msg = '$M<' + chr(0) + chr(121) + chr(121)
-        return bytes(msg, 'utf-8')
-
-    @staticmethod
-    def serialize_PAA3905_Request():
-        msg = '$M<' + chr(0) + chr(122) + chr(122)
-        return bytes(msg, 'utf-8')
+        pass
