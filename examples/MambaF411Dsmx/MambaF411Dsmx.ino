@@ -18,7 +18,6 @@
  */
 
 #include <hackflight.h>
-#include <msp/arduino.h>
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
@@ -51,8 +50,6 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static ArduinoMsp msp;
-
 static DshotEsc esc(&MOTOR_PINS);
 
 static DsmxReceiver rx;
@@ -61,7 +58,7 @@ static ArduinoMpu6x00 imu(spi, RealImu::rotate180, CS_PIN);
 
 static vector<PidController *> pids = {&anglePid};
 
-static Stm32F411Board board(msp, rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
 
 // Motor interrupt
 extern "C" void handleDmaIrq(void)

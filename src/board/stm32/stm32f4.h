@@ -438,14 +438,13 @@ class Stm32F4Board : public Stm32Board {
 
         Stm32F4Board(
                 const uint8_t portCount,
-                Msp & msp,
                 Receiver & receiver,
                 Imu & imu,
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 
-            : Stm32Board(msp, receiver, imu, pids, mixer, esc, ledPin)
+            : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
         {
             m_portCount = portCount;
         }
