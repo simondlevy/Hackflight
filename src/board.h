@@ -219,6 +219,11 @@ class Board {
              }
         }
 
+        void parseSensors(const uint8_t byte)
+        {
+            m_sensorsTask.parse(byte);
+        }
+
     protected:
 
         Board(
@@ -313,9 +318,11 @@ class Board {
             }
         }
 
-        void parseSensors(const uint8_t byte)
+        void handleSerialEvent(HardwareSerial & serial)
         {
-            m_sensorsTask.parse(byte);
+            while (serial.available()) {
+                parseSensors(serial.read());
+            }
         }
 
         uint8_t imuDataAvailable(void)

@@ -80,9 +80,7 @@ void serialEvent3(void)
 // Sensors interrupt
 void serialEvent4(void)
 {
-    while (Serial4.available()) {
-        board.parseSensors(Serial4.read());
-    }
+    board.handleSerialEvent(Serial4);
 }
 
 void setup(void)
