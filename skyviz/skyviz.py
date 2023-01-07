@@ -13,16 +13,17 @@ class SkyParser(MspParser):
 
         # VL53L5 ranging camera
         if self.message_id == 221:
-            print(*unpack('=hhhhhhhhhhhhhhhh', self.message_buffer))
+            print('ranger:', *unpack('=hhhhhhhhhhhhhhhh', self.message_buffer))
 
         # PAA3905 mocap
         if self.message_id == 222:
-            print(*unpack('=hh', self.message_buffer))
+            print('mocap: ', *unpack('=hh', self.message_buffer))
 
 
 def main():
 
     cmdparser = ArgumentParser()
+
     cmdparser.add_argument('-p', '--port',
                            default='/dev/ttyUSB0',
                            help='COM port')
