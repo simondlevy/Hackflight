@@ -1,8 +1,8 @@
-SKETCH = EspSender
+SKETCH = Skydongle
 
-FQBN = esp32:esp32:pico32
+FQBN = esp32:esp32:tinypico
 
-PORT = /dev/ttyUSB0
+PORT = /dev/ttyUSB1
 
 all:
 	arduino-cli compile --fqbn $(FQBN) . --warnings "all"

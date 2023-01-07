@@ -24,7 +24,11 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
     (void)mac;
 
     for (auto k=0; k<len; ++k) {
-        Serial.println(incomingData[k]);
+        auto b = incomingData[k];
+        if (b == 0x24) {
+            Serial.println();
+        }
+        Serial.println(b, HEX);
     }
 }
 
