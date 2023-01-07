@@ -88,8 +88,7 @@ void serialEvent4(void)
 void setup(void)
 {
     // Set up IMU interrupt
-    pinMode(EXTI_PIN, INPUT);
-    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+    Board::setInterrupt(EXTI_PIN, handleImuInterrupt, RISING);
 
     // Start receiver UART
     Serial3.begin(100000, SERIAL_8E2);

@@ -328,4 +328,10 @@ class Board {
             return m_sensorsTask.readImuData();
         }
 
+        static void setInterrupt(const uint8_t pin, void (*irq)(void), const uint32_t mode)
+        {
+            pinMode(pin, INPUT);
+            attachInterrupt(pin, irq, mode);  
+        }
+
 }; // class Board

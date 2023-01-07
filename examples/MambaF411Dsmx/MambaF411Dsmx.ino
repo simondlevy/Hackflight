@@ -80,8 +80,7 @@ void serialEvent1(void)
 
 void setup(void)
 {
-    pinMode(EXTI_PIN, INPUT);
-    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+    Board::setInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
     Serial1.begin(115200);
 
