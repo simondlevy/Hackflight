@@ -106,8 +106,7 @@ void loop(void)
 {
     board.step();
 
-    /*
     while (board.imuDataAvailable()) {
         Serial4.write(board.readImuData());
-    }*/
+    }
 }

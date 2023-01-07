@@ -299,21 +299,6 @@ class Board {
             m_led.flash(10, 50);
         }
 
-        void parseSensors(const uint8_t byte)
-        {
-            m_sensorsTask.parse(byte);
-        }
-
-        uint8_t imuDataAvailable(void)
-        {
-            return 0;
-        }
-
-        uint8_t readImuData(void)
-        {
-            return 0;
-        }
-
         void step(void)
         {
             // Realtime gyro/filtering/PID task get complete priority
@@ -326,6 +311,21 @@ class Board {
             if (m_scheduler.isDynamicReady(getCycleCounter())) {
                 checkDynamicTasks();
             }
+        }
+
+        void parseSensors(const uint8_t byte)
+        {
+            m_sensorsTask.parse(byte);
+        }
+
+        uint8_t imuDataAvailable(void)
+        {
+            return m_sensorsTask.imuDataAvailable();
+        }
+
+        uint8_t readImuData(void)
+        {
+            return m_sensorsTask.readImuData();
         }
 
 }; // class Board

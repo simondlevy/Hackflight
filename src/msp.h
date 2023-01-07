@@ -101,6 +101,7 @@ class Msp {
         void completeSerialize(void)
         {
             serialize8(m_payloadChecksum);
+            m_payloadIndex = 0;
         }
 
         void serializeShort(const uint16_t src)
@@ -117,18 +118,6 @@ class Msp {
 
         virtual void sendPayload(void) 
         {
-        }
-
-        void serializeShorts(
-                const uint8_t messageType, const int16_t src[], const uint8_t count)
-        {
-            prepareToSerializeShorts(messageType, count);
-
-            for (auto k=0; k<count; ++k) {
-                serializeShort(src[k]);
-            }
-
-            completeSerialize();
         }
 
     public:
@@ -209,6 +198,29 @@ class Msp {
         {
             serializeShorts(messageType, src, count);
             sendPayload();
+        }
+
+        void serializeShorts(
+                const uint8_t messageType, const int16_t src[], const uint8_t count)
+        {
+            prepareToSerializeShorts(messageType, count);
+
+            for (auto k=0; k<count; ++k) {
+                serializeShort(src[k]);
+            }
+
+            completeSerialize();
+        }
+
+        uint8_t dataAvailable(void)
+        {
+            return m_payloadSize;
+        }
+
+        uint8_t read(void)
+        {
+            m_payloadSize--;
+            return m_payload[m_payloadIndex++];
         }
 
 }; // class Msp
