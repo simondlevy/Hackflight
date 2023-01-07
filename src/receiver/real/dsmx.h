@@ -19,10 +19,10 @@
 
 #include <stdlib.h>
 
-#include "receiver.h"
+#include "receiver/real.h"
 #include "utils.h"
 
-class DsmxReceiver : public Receiver {
+class DsmxReceiver : public RealReceiver {
 
     private:
 
@@ -100,16 +100,7 @@ class DsmxReceiver : public Receiver {
             return result;
         }
 
-    public:
-
-        void handleSerialEvent(HardwareSerial & serial) {
-
-            while (serial.available()) {
-                parse(serial.read());
-            }
-        }
-
-        void parse(const uint8_t c)
+        void parse(const uint8_t c) override
         {
             const uint32_t usec = micros();
             const uint32_t timeInterval = intcmp(usec, m_frameData.lastTimeUs);

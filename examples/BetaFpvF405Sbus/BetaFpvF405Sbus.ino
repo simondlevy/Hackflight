@@ -20,7 +20,7 @@
 #include <hackflight.h>
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <receiver/sbus.h>
+#include <receiver/real/sbus.h>
 #include <imu/real/softquat/mpu6x00/arduino.h>
 #include <esc/dshot.h>
 

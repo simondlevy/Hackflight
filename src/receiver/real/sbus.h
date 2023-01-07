@@ -21,11 +21,11 @@
 
 #include <stdlib.h>
 
-#include "receiver.h"
+#include "receiver/real.h"
 #include "utils.h"
 
 
-class SbusReceiver : public Receiver {
+class SbusReceiver : public RealReceiver {
 
     private:
 
@@ -122,16 +122,7 @@ class SbusReceiver : public Receiver {
             return result;
         }
 
-    public:
-
-        void handleSerialEvent(HardwareSerial & serial) {
-
-            while (serial.available()) {
-                parse(serial.read());
-            }
-        }
-
-        void parse(const uint8_t c)
+        virtual void parse(const uint8_t c) override
         {
             const uint32_t usec = micros();
             const int32_t timeInterval = intcmp(usec, m_startAtUs);
@@ -157,6 +148,8 @@ class SbusReceiver : public Receiver {
                 }
             }
         }
+
+    public:
 
         bool ready(void)
         {
