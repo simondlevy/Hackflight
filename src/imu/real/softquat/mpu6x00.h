@@ -6,6 +6,8 @@
    MIT License
  */
 
+#include <SPI.h>
+
 #include <stdint.h>
 
 #include "imu/real/softquat.h"
@@ -73,6 +75,8 @@ class Mpu6x00 : public SoftQuatImu {
 
         uint8_t m_buffer[15];
 
+        SPIClass * m_spi;
+
         int16_t getValue(const uint8_t k)
         {
             return (int16_t)(m_buffer[k] << 8 | m_buffer[k+1]);
@@ -87,21 +91,41 @@ class Mpu6x00 : public SoftQuatImu {
                 2000;
         }
 
+        void writeRegister(const uint8_t reg, const uint8_t val)
+        {
+            digitalWrite(m_csPin, LOW);
+            m_spi->transfer(reg);
+            m_spi->transfer(val);
+            digitalWrite(m_csPin, HIGH);
+        }
+
+        void readRegisters(
+                const uint8_t addr, uint8_t * buffer, const uint8_t count)
+        {
+            digitalWrite(m_csPin, LOW);
+            buffer[0] = addr | 0x80;
+            m_spi->transfer(buffer, count);
+            digitalWrite(m_csPin, HIGH);
+        }
+
+        uint8_t readRegister(const uint8_t addr)
+        {
+            uint8_t buffer[2] = {};
+            readRegisters(addr, buffer, 2);
+            return buffer[1];
+        }
+
+        void setClockDivider(uint32_t divider)
+        {
+            m_spi->setClockDivider(divider);
+        }
+
     protected:
 
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
         uint8_t m_csPin;
-
-        virtual void writeRegister(const uint8_t reg, const uint8_t val) = 0;
-
-        virtual void readRegisters(
-                const uint8_t addr, uint8_t * buffer, const uint8_t count) = 0;
-
-        virtual uint8_t readRegister(const uint8_t addr) = 0;
-
-        virtual void setClockDivider(uint32_t divider) = 0;
 
         uint16_t calculateSpiDivisor(const uint32_t freq)
         {
@@ -125,6 +149,12 @@ class Mpu6x00 : public SoftQuatImu {
 
         virtual void begin(void) override
         {
+            m_spi->begin();
+            m_spi->setBitOrder(MSBFIRST);
+            m_spi->setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
+            m_spi->setDataMode(SPI_MODE3);
+            pinMode(m_csPin, OUTPUT);
+
             m_shortPeriod = m_board->getClockSpeed() / 1000000 * SHORT_THRESHOLD;
 
             // Chip reset
@@ -199,6 +229,19 @@ class Mpu6x00 : public SoftQuatImu {
         }
 
     public:
+
+        Mpu6x00(
+                SPIClass & spi,
+                const rotateFun_t rotateFun,
+                const uint8_t csPin,
+                const uint8_t sampleRateDivisor = 19,
+                const gyroScale_e gyroScale = GYRO_2000DPS,
+                const accelScale_e accelScale = ACCEL_2G)
+            : Mpu6x00(rotateFun, csPin, sampleRateDivisor, gyroScale, accelScale)
+ 
+        {
+            m_spi = &spi;
+        }
 
         void handleInterrupt(void)
         {

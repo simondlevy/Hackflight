@@ -21,7 +21,7 @@
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
-#include <imu/real/softquat/mpu6x00/arduino.h>
+#include <imu/real/softquat/mpu6x00.h>
 #include <receiver/real/dsmx.h>
 
 #include <vector>
@@ -54,7 +54,7 @@ static DshotEsc esc(&MOTOR_PINS);
 
 static DsmxReceiver rx;
 
-static ArduinoMpu6x00 imu(spi, RealImu::rotate180, CS_PIN);
+static Mpu6x00 imu(spi, RealImu::rotate180, CS_PIN);
 
 static vector<PidController *> pids = {&anglePid};
 
