@@ -22,16 +22,24 @@
 #include <hackflight.h>
 #include <msp.h>
 
+static Msp _parser;
+
 static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
     (void)mac;
 
     for (auto k=0; k<len; ++k) {
-        auto b = incomingData[k];
-        if (b == 0x24) {
-            Serial.println();
+
+        auto msgId = _parser.parse(incomingData[k]);
+
+        switch (msgId) {
+
+            case 0:
+                break;
+
+            default:
+                Serial.println(msgId);
         }
-        Serial.println(b, HEX);
     }
 }
 
