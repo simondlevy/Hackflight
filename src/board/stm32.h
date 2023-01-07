@@ -17,20 +17,22 @@
 #pragma once
 
 #include "board.h"
+#include "msp/arduino.h"
 
 class Stm32Board : public Board {
 
     protected:
 
+        ArduinoMsp m_msp;
+
         Stm32Board(
-                Msp & msp,
                 Receiver & receiver,
                 Imu & imu,
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const int8_t ledPin)
-            : Board(msp, receiver, imu, pids, mixer, esc, ledPin)
+            : Board(m_msp, receiver, imu, pids, mixer, esc, ledPin)
         {
         }
 

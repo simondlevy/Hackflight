@@ -124,6 +124,13 @@ class SbusReceiver : public Receiver {
 
     public:
 
+        void handleSerialEvent(HardwareSerial & serial) {
+
+            while (serial.available()) {
+                parse(serial.read());
+            }
+        }
+
         void parse(const uint8_t c)
         {
             const uint32_t usec = micros();

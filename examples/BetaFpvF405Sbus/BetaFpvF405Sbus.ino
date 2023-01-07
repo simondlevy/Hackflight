@@ -18,7 +18,6 @@
  */
 
 #include <hackflight.h>
-#include <msp/arduino.h>
 #include <board/stm32/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <receiver/sbus.h>
@@ -50,8 +49,6 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static ArduinoMsp msp;
-
 static SbusReceiver rx;
 
 static ArduinoMpu6x00 imu(spi, RealImu::rotate270, CS_PIN);
@@ -60,7 +57,7 @@ static vector<PidController *> pids = {&anglePid};
 
 static DshotEsc esc(&MOTOR_PINS);
 
-static Stm32F405Board board(msp, rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F405Board board(rx, imu, pids, mixer, esc, LED_PIN);
 
 // DSHOT timer interrupt
 extern "C" void handleDmaIrq(uint8_t id)
@@ -77,9 +74,7 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent3(void)
 {
-    while (Serial3.available()) {
-        rx.parse(Serial3.read());
-    }
+    rx.handleSerialEvent(Serial3);
 }
 
 // Sensors interrupt
