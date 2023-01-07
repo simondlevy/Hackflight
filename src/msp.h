@@ -116,10 +116,6 @@ class Msp {
         uint8_t m_payload[BUF_SIZE];
         uint8_t m_payloadSize;
 
-        virtual void sendPayload(void) 
-        {
-        }
-
     public:
 
         /**
@@ -197,7 +193,7 @@ class Msp {
                 const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
             serializeShorts(messageType, src, count);
-            sendPayload();
+            Serial.write(m_payload, m_payloadSize);
         }
 
         void serializeShorts(

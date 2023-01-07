@@ -17,13 +17,10 @@
 #pragma once
 
 #include "board.h"
-#include "msp/arduino.h"
 
 class Stm32Board : public Board {
 
     protected:
-
-        ArduinoMsp m_msp;
 
         Stm32Board(
                 Receiver & receiver,
@@ -32,7 +29,7 @@ class Stm32Board : public Board {
                 Mixer & mixer,
                 Esc & esc,
                 const int8_t ledPin)
-            : Board(m_msp, receiver, imu, pids, mixer, esc, ledPin)
+            : Board(receiver, imu, pids, mixer, esc, ledPin)
         {
         }
 

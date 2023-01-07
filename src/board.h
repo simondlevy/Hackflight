@@ -53,13 +53,14 @@ class Board {
 
         AttitudeTask m_attitudeTask = AttitudeTask(m_arming, m_vstate);
 
+        Msp m_msp;
+
         VisualizerTask m_visualizerTask =
-            VisualizerTask(m_arming, m_vstate, m_sensorsTask);
+            VisualizerTask(m_msp, m_arming, m_vstate, m_sensorsTask);
 
         ReceiverTask m_receiverTask   = ReceiverTask(m_arming);
 
         // Initialzed in sketch()
-        Msp *   m_msp;
         Imu *   m_imu;
         Esc *   m_esc;
         Mixer * m_mixer;
@@ -227,7 +228,6 @@ class Board {
     protected:
 
         Board(
-                Msp & msp,
                 Receiver & receiver,
                 Imu & imu,
                 vector<PidController *> & pidControllers,
@@ -237,7 +237,6 @@ class Board {
         {
             m_receiverTask.receiver = &receiver;
 
-            m_msp = &msp;
             m_imu = &imu;
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
@@ -294,7 +293,7 @@ class Board {
 
             m_attitudeTask.begin(m_imu);
 
-            m_visualizerTask.begin(m_msp, m_esc, m_receiverTask.receiver);
+            m_visualizerTask.begin(m_esc, m_receiverTask.receiver);
 
             m_imu->begin();
 
