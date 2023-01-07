@@ -304,6 +304,16 @@ class Board {
             m_sensorsTask.parse(byte);
         }
 
+        uint8_t imuDataAvailable(void)
+        {
+            return 0;
+        }
+
+        uint8_t readImuData(void)
+        {
+            return 0;
+        }
+
         void step(void)
         {
             // Realtime gyro/filtering/PID task get complete priority

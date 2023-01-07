@@ -99,7 +99,7 @@ void setup(void)
     // Start receiver UART
     Serial3.begin(100000, SERIAL_8E2);
 
-    // Start Skyranger UART
+    // Start sensors UART
     Serial4.begin(115200);
 
     board.begin();
@@ -108,4 +108,8 @@ void setup(void)
 void loop(void)
 {
     board.step();
+
+    while (board.imuDataAvailable()) {
+        Serial4.write(board.readImuData());
+    }
 }
