@@ -77,7 +77,7 @@ void serialEvent3(void)
     rx.handleSerialEvent(Serial3);
 }
 
-// Sensors interrupt
+// Interupt from Skyranger
 void serialEvent4(void)
 {
     board.handleSerialEvent(Serial4);
@@ -99,9 +99,6 @@ void setup(void)
 
 void loop(void)
 {
-    board.step();
-
-    while (board.imuDataAvailable()) {
-        Serial4.write(board.readImuData());
-    }
+    // Support sending IMU data to Skyranger
+    board.step(Serial4);
 }

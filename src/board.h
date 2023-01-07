@@ -318,21 +318,20 @@ class Board {
             }
         }
 
+        void step(HardwareSerial & serial)
+        {
+            step();
+            
+            while (m_sensorsTask.imuDataAvailable()) {
+                serial.write(m_sensorsTask.readImuData());
+            }
+        }
+
         void handleSerialEvent(HardwareSerial & serial)
         {
             while (serial.available()) {
                 parseSensors(serial.read());
             }
-        }
-
-        uint8_t imuDataAvailable(void)
-        {
-            return m_sensorsTask.imuDataAvailable();
-        }
-
-        uint8_t readImuData(void)
-        {
-            return m_sensorsTask.readImuData();
         }
 
         static void setInterrupt(const uint8_t pin, void (*irq)(void), const uint32_t mode)
