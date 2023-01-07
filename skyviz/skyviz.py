@@ -13,7 +13,12 @@ while True:
 
     try:
 
-        print('x%02x' % ord(port.read(1)))
+        byte = ord(port.read(1))
+
+        if byte == 0x24:
+            print()
+
+        print('x%02x' % byte, end=' ')
 
     except KeyboardInterrupt:
 
