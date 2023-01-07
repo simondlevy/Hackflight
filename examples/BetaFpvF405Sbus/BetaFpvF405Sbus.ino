@@ -74,9 +74,7 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent3(void)
 {
-    while (Serial3.available()) {
-        rx.parse(Serial3.read());
-    }
+    rx.handleSerialEvent(Serial3);
 }
 
 // Sensors interrupt
