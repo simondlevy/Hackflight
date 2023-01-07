@@ -4,8 +4,10 @@ FQBN = esp32:esp32:tinypico
 
 PORT = /dev/ttyUSB1
 
+HACKFLIGHT = ../../../Hackflight
+
 all:
-	arduino-cli compile --fqbn $(FQBN) . --warnings "all"
+	arduino-cli compile --fqbn $(FQBN) . --warnings "all" --libraries $(HACKFLIGHT)
 
 flash: 
 	arduino-cli upload --port $(PORT) --fqbn $(FQBN)

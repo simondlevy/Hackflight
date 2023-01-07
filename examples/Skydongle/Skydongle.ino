@@ -19,6 +19,9 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+#include <hackflight.h>
+#include <msp.h>
+
 static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
     (void)mac;
