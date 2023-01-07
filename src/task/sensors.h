@@ -26,9 +26,6 @@ class SensorsTask : public Task {
 
     private:
 
-        static const uint8_t MSP_VL53L5  = 121;  
-        static const uint8_t MSP_PAA3905 = 122;
-
         Msp m_parser;
 
         VehicleState * m_vstate;
@@ -54,9 +51,7 @@ class SensorsTask : public Task {
 
         virtual void parse(const uint8_t byte)
         {
-            auto messageType = m_parser.parse(byte);
-
-            switch (messageType) {
+            switch (m_parser.parse(byte)) {
 
                 case 221: // VL53L5 ranger
                     for (uint8_t k=0; k<16; ++k) {

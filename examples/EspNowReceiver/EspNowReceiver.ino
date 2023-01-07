@@ -19,27 +19,20 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-#include <hackflight.h>
-#include <msp.h>
-
-static Msp _parser;
-
 static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
     (void)mac;
 
     for (auto k=0; k<len; ++k) {
 
-        auto msgId = _parser.parse(incomingData[k]);
+        auto b = incomingData[k];
 
-        switch (msgId) {
-
-            case 0:
-                break;
-
-            default:
-                Serial.println(msgId);
+        if (b == 0x24) {
+            Serial.println();
         }
+
+        Serial.print(b, HEX);
+        Serial.print(" ");
     }
 }
 
@@ -50,6 +43,7 @@ void setup(void)
     WiFi.mode(WIFI_STA);
 
     if (esp_now_init() != ESP_OK) {
+
         while (true) {
             Serial.println("Error initializing ESP-NOW");
             delay(500);
