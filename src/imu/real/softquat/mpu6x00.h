@@ -37,17 +37,18 @@ class Mpu6x00 : public SoftQuatImu {
     private:
 
         // Registers
-        static const uint8_t REG_SMPLRT_DIV   = 0x19;
-        static const uint8_t REG_CONFIG       = 0x1A;
-        static const uint8_t REG_GYRO_CONFIG  = 0x1B;
-        static const uint8_t REG_ACCEL_CONFIG = 0x1C;
-        static const uint8_t REG_INT_PIN_CFG  = 0x37;
-        static const uint8_t REG_INT_ENABLE   = 0x38;
-        static const uint8_t REG_GYRO_XOUT_H  = 0x43;
-        static const uint8_t REG_USER_CTRL    = 0x6A;
-        static const uint8_t REG_PWR_MGMT_1   = 0x6B;
-        static const uint8_t REG_PWR_MGMT_2   = 0x6C;
-        static const uint8_t REG_WHO_AM_I     = 0x75;
+        static const uint8_t REG_SMPLRT_DIV    = 0x19;
+        static const uint8_t REG_CONFIG        = 0x1A;
+        static const uint8_t REG_GYRO_CONFIG   = 0x1B;
+        static const uint8_t REG_ACCEL_CONFIG  = 0x1C;
+        static const uint8_t REG_ACCEL_XOUT_H  = 0x3B;
+        static const uint8_t REG_INT_PIN_CFG   = 0x37;
+        static const uint8_t REG_INT_ENABLE    = 0x38;
+        static const uint8_t REG_GYRO_XOUT_H   = 0x43;
+        static const uint8_t REG_USER_CTRL     = 0x6A;
+        static const uint8_t REG_PWR_MGMT_1    = 0x6B;
+        static const uint8_t REG_PWR_MGMT_2    = 0x6C;
+        static const uint8_t REG_WHO_AM_I      = 0x75;
 
         // Configuration bits  
         static const uint8_t BIT_RAW_RDY_EN       = 0x01;
@@ -118,6 +119,11 @@ class Mpu6x00 : public SoftQuatImu {
         void setClockDivider(uint32_t divider)
         {
             m_spi.setClockDivider(divider);
+        }
+
+        void readGyro(void)
+        {
+            readRegisters(REG_GYRO_XOUT_H, m_buffer, 7);
         }
 
     protected:
@@ -261,11 +267,6 @@ class Mpu6x00 : public SoftQuatImu {
             prevTime = nowCycles;
 
             RealImu::handleInterrupt();
-        }
-
-        void readGyro(void)
-        {
-            readRegisters(REG_GYRO_XOUT_H, m_buffer, 7);
         }
 
 }; // class Mpu6x00
