@@ -105,14 +105,14 @@ class Mpu6x00 : public SoftQuatImu {
         {
             digitalWrite(m_csPin, LOW);
             buffer[0] = addr | 0x80;
-            m_spi.transfer(buffer, count);
+            m_spi.transfer(buffer, count+1);
             digitalWrite(m_csPin, HIGH);
         }
 
         uint8_t readRegister(const uint8_t addr)
         {
             uint8_t buffer[2] = {};
-            readRegisters(addr, buffer, 2);
+            readRegisters(addr, buffer, 1);
             return buffer[1];
         }
 
@@ -123,7 +123,7 @@ class Mpu6x00 : public SoftQuatImu {
 
         void readGyro(void)
         {
-            readRegisters(REG_GYRO_XOUT_H, m_buffer, 7);
+            readRegisters(REG_GYRO_XOUT_H, m_buffer, 6);
         }
 
     protected:
