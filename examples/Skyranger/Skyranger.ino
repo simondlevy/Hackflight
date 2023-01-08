@@ -226,6 +226,18 @@ static void checkAttitude(Msp & serializer)
     sendEspNow(serializer);
 }
 
+void serialEvent(void)
+{
+    static Msp _parser;
+
+    while (Serial.available()) {
+
+        if (_parser.parse(Serial.read()) == MSP_SET_ATTITUDE) {
+            digitalWrite(LED_PIN, true);
+        }
+    }
+}
+
 void setup()
 {
     Serial.begin(115200);
