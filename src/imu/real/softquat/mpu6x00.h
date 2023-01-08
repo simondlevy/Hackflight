@@ -149,7 +149,7 @@ class Mpu6x00 : public SoftQuatImu {
         virtual bool gyroIsReady(void) override
         {
 
-            readRegisters(REG_GYRO_XOUT_H, m_buffer, 6);
+            readRegisters(REG_ACCEL_XOUT_H, m_buffer, 14);
 
             // If we call this infrequently enough, gyro will always be ready
             return true;
@@ -222,7 +222,7 @@ class Mpu6x00 : public SoftQuatImu {
 
         virtual int16_t readRawGyro(uint8_t k) override
         {
-            return getValue(1 + k*2);
+            return getValue(9 + k*2);
         }
 
     public:
