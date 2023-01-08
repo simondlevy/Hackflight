@@ -29,7 +29,7 @@ def main():
     cmdparser = ArgumentParser()
 
     cmdparser.add_argument('-p', '--port',
-                           default='/dev/ttyUSB0',
+                           default='/dev/ttyUSB1',
                            help='COM port')
 
     args = cmdparser.parse_args()

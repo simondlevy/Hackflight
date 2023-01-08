@@ -218,6 +218,14 @@ static void checkMocap(Msp & serializer)
 
 // ------------------------------------------------------------------
 
+static void checkAttitude(Msp & serializer)
+{
+    // XXX should get this from FC via Serial1 event
+    int16_t attitude[3] = {0, 0, 0};
+    serializer.serializeShorts(MSP_SET_ATTITUDE, attitude, 3);
+    sendEspNow(serializer);
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -238,12 +246,7 @@ void loop()
     checkRanger(_serializer);
     checkMocap(_serializer);
 
-    // XXX should get this from FC via Serial1 event
-    int16_t attitude[3] = {0, 0, 0};
-
-    _serializer.serializeShorts(MSP_SET_ATTITUDE, attitude, 3);
-
-    sendEspNow(_serializer);
+    checkAttitude(_serializer);
 
     updateLed();
 }
