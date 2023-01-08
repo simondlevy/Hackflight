@@ -45,9 +45,9 @@ static const uint8_t MSP_SET_PAA3905  = 222;
 
 // Helpers -----------------------------------------------------------
 
-static void sendEspNow(Msp & serializer)
+static void sendEspNow(Msp & msp)
 {
-    esp_now_send(ESP_RECEIVER_ADDRESS, serializer.payload, serializer.payloadSize);
+    esp_now_send(ESP_RECEIVER_ADDRESS, msp.payload, msp.payloadSize);
 }
 
 static void sendBytes(
@@ -216,27 +216,30 @@ static void checkMocap(Msp & serializer)
 }
 
 
-// ------------------------------------------------------------------
+// Attitude messages from FC ----------------------------------------
 
-static void checkAttitude(Msp & serializer)
-{
-    // XXX should get this from FC via Serial1 event
-    int16_t attitude[3] = {0, 0, 0};
-    serializer.serializeShorts(MSP_SET_ATTITUDE, attitude, 3);
-    sendEspNow(serializer);
-}
+static Msp _parser;
+static bool _gotNewAttitude;
 
 void serialEvent(void)
 {
-    static Msp _parser;
-
     while (Serial.available()) {
 
         if (_parser.parse(Serial.read()) == MSP_SET_ATTITUDE) {
-            digitalWrite(LED_PIN, true);
+            _gotNewAttitude = true;
         }
     }
 }
+
+static void checkAttitude(void)
+{
+    if (_gotNewAttitude) {
+        sendEspNow(_parser);
+        _gotNewAttitude = false;
+    }
+}
+
+// ------------------------------------------------------------------
 
 void setup()
 {
@@ -258,7 +261,7 @@ void loop()
     checkRanger(_serializer);
     checkMocap(_serializer);
 
-    checkAttitude(_serializer);
+    checkAttitude();
 
     updateLed();
 }
