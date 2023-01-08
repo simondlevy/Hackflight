@@ -61,10 +61,7 @@ void setup(void)
 
     if (esp_now_init() != ESP_OK) {
 
-        while (true) {
-            Serial.println("Error initializing ESP-NOW");
-            delay(500);
-        }
+        HfDebugger::reportForever("Error initializing ESP-NOW");
     }
 
     esp_now_register_recv_cb(onDataRecv);
