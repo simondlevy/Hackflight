@@ -74,6 +74,8 @@ class Mpu6x00 : public SoftQuatImu {
 
         int32_t m_shortPeriod;
 
+        // Enough room for seven two-byte integers (gyro XYZ, temperature,
+        // accel XYZ) plus one byte for SPI transfer
         uint8_t m_buffer[15];
 
         SPIClass m_spi;
@@ -121,11 +123,6 @@ class Mpu6x00 : public SoftQuatImu {
             m_spi.setClockDivider(divider);
         }
 
-        void readGyro(void)
-        {
-            readRegisters(REG_GYRO_XOUT_H, m_buffer, 6);
-        }
-
     protected:
 
         // 1 MHz max SPI frequency for initialisation
@@ -151,8 +148,10 @@ class Mpu6x00 : public SoftQuatImu {
 
         virtual bool gyroIsReady(void) override
         {
+
+            readRegisters(REG_GYRO_XOUT_H, m_buffer, 6);
+
             // If we call this infrequently enough, gyro will always be ready
-            readGyro();
             return true;
         }
 
