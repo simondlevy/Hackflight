@@ -21,13 +21,35 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+#include <hackflight.h>
+#include <msp.h>
+#include <debugger.h>
+
+// Message IDs
+static const uint8_t MSP_SET_VL53L5   = 221;
+static const uint8_t MSP_SET_PAA3905  = 222;
+
+static Msp _parser;
+
+static uint32_t _vl53l5_count;
+static uint32_t _paa3905_count;
+
 static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
     (void)mac;
 
     for (auto k=0; k<len; ++k) {
 
-        Serial.println(incomingData[k], HEX);
+        switch (_parser.parse(incomingData[k])) {
+            
+            case MSP_SET_VL53L5:
+                _vl53l5_count++;
+                break;
+
+            case MSP_SET_PAA3905:
+                _paa3905_count++;
+                break;
+        }
     }
 }
 
@@ -51,4 +73,6 @@ void setup(void)
 
 void loop(void)
 {
+    HfDebugger::printf("Got %d VL53L5 messages and %d PAA3905 messages\n",
+            _vl53l5_count, _paa3905_count);
 }
