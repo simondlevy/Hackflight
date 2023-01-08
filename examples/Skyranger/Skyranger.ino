@@ -33,22 +33,19 @@
 // Replace with the MAC Address of your ESPNOW receiver
 static const uint8_t ESP_RECEIVER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04};
 
+// Pins
 static const uint8_t VL53L5_INT_PIN  = 15;
 static const uint8_t VL53L5_LPN_PIN  = 2;
 static const uint8_t PAA3905_CS_PIN  = 5;
 static const uint8_t PAA3905_MOT_PIN = 4;
 static const uint8_t LED_PIN         = 25;
 
+// Serial message IDs
 static const uint8_t MSP_SET_ATTITUDE = 213;
 static const uint8_t MSP_SET_VL53L5   = 221;
 static const uint8_t MSP_SET_PAA3905  = 222;
 
 // Helpers -----------------------------------------------------------
-
-static void sendEspNow(Msp & msp)
-{
-    esp_now_send(ESP_RECEIVER_ADDRESS, msp.payload, msp.payloadSize);
-}
 
 static void sendBytes(
         Msp & serializer,
@@ -62,7 +59,7 @@ static void sendBytes(
     Serial.write(serializer.payload, serializer.payloadSize);
 
     // Send our sensor data to ESP-NOW receiver
-    sendEspNow(serializer);
+    esp_now_send(ESP_RECEIVER_ADDRESS, serializer.payload, serializer.payloadSize);
 }
 
 static void updateLed(void)
@@ -218,24 +215,14 @@ static void checkMocap(Msp & serializer)
 
 // Attitude messages from FC ----------------------------------------
 
-static Msp _parser;
-static bool _gotNewAttitude;
-
 void serialEvent(void)
 {
     while (Serial.available()) {
 
-        if (_parser.parse(Serial.read()) == MSP_SET_ATTITUDE) {
-            _gotNewAttitude = true;
-        }
-    }
-}
+        uint8_t byte = Serial.read();
 
-static void checkAttitude(void)
-{
-    if (_gotNewAttitude) {
-        sendEspNow(_parser);
-        _gotNewAttitude = false;
+        // Send message bytes directly to ESP receiver
+        esp_now_send(ESP_RECEIVER_ADDRESS, &byte, 1);
     }
 }
 
@@ -260,8 +247,6 @@ void loop()
 
     checkRanger(_serializer);
     checkMocap(_serializer);
-
-    checkAttitude();
 
     updateLed();
 }

@@ -15,7 +15,6 @@ class SkyParser(MspParser):
         if self.message_id == 213:
             print('attitude:', *unpack('=hhh', self.message_buffer))
 
-        '''
         # VL53L5 ranging camera
         if self.message_id == 221:
             print('ranger:  ', *unpack('=hhhhhhhhhhhhhhhh', self.message_buffer))
@@ -23,7 +22,6 @@ class SkyParser(MspParser):
         # PAA3905 mocap
         if self.message_id == 222:
             print('mocap:   ', *unpack('=hh', self.message_buffer))
-        '''
 
 
 def main():
