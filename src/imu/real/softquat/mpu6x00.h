@@ -44,7 +44,6 @@ class Mpu6x00 : public SoftQuatImu {
         static const uint8_t REG_ACCEL_XOUT_H  = 0x3B;
         static const uint8_t REG_INT_PIN_CFG   = 0x37;
         static const uint8_t REG_INT_ENABLE    = 0x38;
-        static const uint8_t REG_GYRO_XOUT_H   = 0x43;
         static const uint8_t REG_USER_CTRL     = 0x6A;
         static const uint8_t REG_PWR_MGMT_1    = 0x6B;
         static const uint8_t REG_PWR_MGMT_2    = 0x6C;
@@ -226,6 +225,11 @@ class Mpu6x00 : public SoftQuatImu {
         }
 
     public:
+
+        /*virtual*/ int16_t readRawAccel(uint8_t k) // override
+        {
+            return getValue(1 + k*2);
+        }
 
         Mpu6x00(
                 const uint8_t mosiPin,

@@ -65,4 +65,10 @@ void setup(void)
 void loop(void)
 {
     board.step();
+
+    auto accel_x = imu.readRawAccel(0);
+    auto accel_y = imu.readRawAccel(1);
+    auto accel_z = imu.readRawAccel(2);
+
+    HfDebugger::printf("x=%+06d  x=%+06d  z=%+06d \n", accel_x, accel_y, accel_z);
 }
