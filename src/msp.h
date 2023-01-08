@@ -51,7 +51,7 @@ class Msp {
         void prepareToSerialize(
                 const uint8_t type, const uint8_t count, const uint8_t size)
         {
-            m_payloadSize = 0;
+            payloadSize = 0;
             m_payloadIndex = 0;
             m_payloadChecksum = 0;
 
@@ -64,7 +64,7 @@ class Msp {
 
         void addToOutBuf(const uint8_t a)
         {
-            m_payload[m_payloadSize++] = a;
+            payload[payloadSize++] = a;
         }
 
         void serialize8(const uint8_t a)
@@ -111,12 +111,10 @@ class Msp {
             serialize16(a);
         }
 
-    protected:
-
-        uint8_t m_payload[BUF_SIZE];
-        uint8_t m_payloadSize;
-
     public:
+
+        uint8_t payload[BUF_SIZE];
+        uint8_t payloadSize;
 
         /**
           * Returns message type or 0 for not  ready
@@ -159,7 +157,7 @@ class Msp {
 
             // Payload accumulation
             if (inPayload) {
-                m_payload[_index-1] = c;
+                payload[_index-1] = c;
             }
 
             if (m_parserState == GOT_CRC) {
@@ -184,7 +182,7 @@ class Msp {
         int16_t parseShort(const uint8_t index)
         {
             int16_t s = 0;
-            memcpy(&s,  &m_payload[2*index], sizeof(int16_t));
+            memcpy(&s,  &payload[2*index], sizeof(int16_t));
             return s;
 
         }
@@ -193,7 +191,7 @@ class Msp {
                 const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
             serializeShorts(messageType, src, count);
-            Serial.write(m_payload, m_payloadSize);
+            Serial.write(payload, payloadSize);
         }
 
         void serializeShorts(
@@ -210,13 +208,13 @@ class Msp {
 
         uint8_t dataAvailable(void)
         {
-            return m_payloadSize;
+            return payloadSize;
         }
 
         uint8_t read(void)
         {
-            m_payloadSize--;
-            return m_payload[m_payloadIndex++];
+            payloadSize--;
+            return payload[m_payloadIndex++];
         }
 
 }; // class Msp

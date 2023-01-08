@@ -97,6 +97,6 @@ void setup(void)
 
 void loop(void)
 {
-    // Support sending IMU data to Skyranger
+    // Support sending IMU data to Skyranger over Serial4
     board.step(Serial4);
 }

@@ -26,10 +26,12 @@
 
 #include "hackflight.h"
 #include "debugger.h"
-#include "msp/arduino.h"
-#include "msp/espnow.h"
+#include "msp.h"
 
-// Pins ---------------------------------------------------------------
+// Constants ----------------------------------------------------------
+
+// Replace with the MAC Address of your ESPNOW receiver
+static const uint8_t ESP_RECEIVER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04};
 
 static const uint8_t VL53L5_INT_PIN  = 15;
 static const uint8_t VL53L5_LPN_PIN  = 2;
@@ -37,23 +39,63 @@ static const uint8_t PAA3905_CS_PIN  = 5;
 static const uint8_t PAA3905_MOT_PIN = 4;
 static const uint8_t LED_PIN         = 25;
 
-// MSP message IDs ----------------------------------------------------
-
 static const uint8_t MSP_SET_ATTITUDE = 213;
 static const uint8_t MSP_SET_VL53L5   = 221;
 static const uint8_t MSP_SET_PAA3905  = 222;
 
 // Helpers -----------------------------------------------------------
 
+static void sendEspNow(Msp & serializer)
+{
+    esp_now_send(ESP_RECEIVER_ADDRESS, serializer.payload, serializer.payloadSize);
+}
+
 static void sendBytes(
-        Msp & fc_serializer,
-        Msp & esp_serializer,
+        Msp & serializer,
         const uint8_t msgId,
         const int16_t data[],
         const uint8_t count)
 {
-    fc_serializer.sendShorts(msgId, data, count);
-    esp_serializer.sendShorts(msgId, data, count);
+    serializer.serializeShorts(msgId, data, count);
+
+    // Send our sensor data to flight controller
+    Serial.write(serializer.payload, serializer.payloadSize);
+
+    // Send our sensor data to ESP-NOW receiver
+    sendEspNow(serializer);
+}
+
+static void updateLed(void)
+{
+    static uint32_t _prev;
+    static bool _state;
+
+    uint32_t msec = millis();
+
+    if (msec - _prev > 500) {
+        _state = !_state;
+        digitalWrite(LED_PIN, _state);
+        _prev = msec;
+    }
+}
+
+void startEspNow(void)
+{
+    WiFi.mode(WIFI_STA);
+
+    if (esp_now_init() != ESP_OK) {
+        HfDebugger::reportForever("Error initializing ESP-NOW");
+    }
+
+    static esp_now_peer_info_t peerInfo;
+
+    memcpy(peerInfo.peer_addr, ESP_RECEIVER_ADDRESS, 6);
+    peerInfo.channel = 0;
+    peerInfo.encrypt = false;
+
+    if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+        HfDebugger::reportForever("Failed to add peer");
+    }
 }
 
 // VL53L5 -------------------------------------------------------------
@@ -89,7 +131,7 @@ static void startRanger(void)
     _ranger.begin();
 }
 
-static void checkRanger(ArduinoMsp & fc_serializer, EspNowMsp & esp_serializer)
+static void checkRanger(Msp & serializer)
 {
     static int16_t data[16];
 
@@ -108,7 +150,7 @@ static void checkRanger(ArduinoMsp & fc_serializer, EspNowMsp & esp_serializer)
         }
     } 
 
-    sendBytes(fc_serializer, esp_serializer, MSP_SET_VL53L5, data, 16);
+    sendBytes(serializer, MSP_SET_VL53L5, data, 16);
 }
 
 // PAA3905 -----------------------------------------------------------
@@ -144,7 +186,7 @@ static void startMocap(void)
     attachInterrupt(PAA3905_MOT_PIN, motionInterruptHandler, FALLING);
 }
 
-static void checkMocap(ArduinoMsp & fc_serializer, EspNowMsp & esp_serializer)
+static void checkMocap(Msp & serializer)
 {
     static int16_t data[2];
 
@@ -170,36 +212,19 @@ static void checkMocap(ArduinoMsp & fc_serializer, EspNowMsp & esp_serializer)
         }
     }
 
-    sendBytes(fc_serializer, esp_serializer, MSP_SET_PAA3905, data, 2);
+    sendBytes(serializer, MSP_SET_PAA3905, data, 2);
 }
 
-// Helpers ---------------------------------------------------------
-
-static void updateLed(void)
-{
-    static uint32_t _prev;
-    static bool _state;
-
-    uint32_t msec = millis();
-
-    if (msec - _prev > 500) {
-        _state = !_state;
-        digitalWrite(LED_PIN, _state);
-        _prev = msec;
-    }
-}
 
 // ------------------------------------------------------------------
-
-static EspNowMsp _esp_serializer;
 
 void setup()
 {
     Serial.begin(115200);
 
-    _esp_serializer.begin();
-
     pinMode(LED_PIN, OUTPUT);
+
+    startEspNow();
 
     startRanger();
 
@@ -208,14 +233,17 @@ void setup()
 
 void loop()
 {
-    static ArduinoMsp _fc_serializer;
+    static Msp _serializer;
 
-    checkRanger(_fc_serializer, _esp_serializer);
-    checkMocap(_fc_serializer, _esp_serializer);
+    checkRanger(_serializer);
+    checkMocap(_serializer);
 
+    // XXX should get this from FC via Serial1 event
     int16_t attitude[3] = {0, 0, 0};
 
-    sendBytes(_fc_serializer, _esp_serializer, MSP_SET_ATTITUDE, attitude, 3);
+    _serializer.serializeShorts(MSP_SET_ATTITUDE, attitude, 3);
+
+    sendEspNow(_serializer);
 
     updateLed();
 }
