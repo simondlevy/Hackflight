@@ -122,8 +122,6 @@ class Mpu6x00 : public SoftQuatImu {
             m_spi.setClockDivider(divider);
         }
 
-    protected:
-
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
