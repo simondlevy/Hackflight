@@ -14,6 +14,26 @@
 
 class Bmi270 : public SoftQuatImu {
 
+    public:
+
+        typedef enum {
+
+            GYRO_250DPS,
+            GYRO_500DPS,
+            GYRO_1000DPS,
+            GYRO_2000DPS
+
+        } gyroScale_e;
+
+        typedef enum {
+
+            ACCEL_2G,
+            ACCEL_4G,  
+            ACCEL_8G,  
+            ACCEL_16G
+
+        } accelScale_e;
+
     private:
 
         // Registers
@@ -50,8 +70,6 @@ class Bmi270 : public SoftQuatImu {
             m_spi.setClockDivider(divider);
         }
 
-    protected:
-
         uint8_t m_mosiPin;
         uint8_t m_misoPin;
         uint8_t m_sclkPin;
@@ -73,8 +91,6 @@ class Bmi270 : public SoftQuatImu {
         virtual bool gyroIsReady(void) override
         {
 
-            readRegisters(REG_ACCEL_XOUT_H, m_buffer, 14);
-
             // If we call this infrequently enough, gyro will always be ready
             return true;
         }
@@ -87,74 +103,26 @@ class Bmi270 : public SoftQuatImu {
 
             m_spi.begin();
             m_spi.setBitOrder(MSBFIRST);
-            m_spi.setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
+            // m_spi.setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
             m_spi.setDataMode(SPI_MODE3);
             pinMode(m_csPin, OUTPUT);
-
-            m_shortPeriod = m_board->getClockSpeed() / 1000000 * SHORT_THRESHOLD;
-
-            // Chip reset
-            writeRegister(REG_PWR_MGMT_1, BIT_H_RESET);
-            delay(100);
-
-            // Check ID
-            readRegister(REG_WHO_AM_I);
-
-            // Clock Source PPL with Z axis gyro reference
-            writeRegister(REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
-            delayMicroseconds(7);
-
-            // Disable Primary I2C Interface
-            writeRegister(REG_USER_CTRL, BIT_I2C_IF_DIS);
-            delayMicroseconds(15);
-
-            writeRegister(REG_PWR_MGMT_2, 0x00);
-            delayMicroseconds(15);
-
-            // Accel Sample Rate 1kHz
-            // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-            writeRegister(REG_SMPLRT_DIV, 0);
-            delayMicroseconds(15);
-
-            // Gyro +/- 2000 DPS Full Scale
-            writeRegister(REG_GYRO_CONFIG, m_gyroScale << 3);
-            delayMicroseconds(15);
-
-            // Accel +/- 16 G Full Scale
-            writeRegister(REG_ACCEL_CONFIG, m_accelScale << 3);
-            delayMicroseconds(15);
-
-            // INT_ANYRD_2CLEAR
-            writeRegister(REG_INT_PIN_CFG, 0x10);
-
-            delayMicroseconds(15);
-
-            writeRegister(REG_INT_ENABLE, BIT_RAW_RDY_EN);
-            delayMicroseconds(15);
-
-            setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
-            delayMicroseconds(1);
-
-            setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
-
-            // Accel and Gyro DLPF Setting
-            writeRegister(REG_CONFIG, 0); // no gyro DLPF
-            delayMicroseconds(1);
-
-            setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
         {
-            return getValue(9 + k*2);
+            return 0;
+        }
+
+        static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
+        {
+            return
+                gyroScale == GYRO_250DPS ?  250 : 
+                gyroScale == GYRO_500DPS ?  500 : 
+                gyroScale == GYRO_1000DPS ?  1000 : 
+                2000;
         }
 
     public:
-
-        /*virtual*/ int16_t readRawAccel(uint8_t k) // override
-        {
-            return getValue(1 + k*2);
-        }
 
         Bmi270(
                 const uint8_t mosiPin,
@@ -171,30 +139,9 @@ class Bmi270 : public SoftQuatImu {
             m_misoPin = misoPin;
             m_sclkPin = sclkPin;
             m_csPin = csPin;
-            m_sampleRateDivisor = sampleRateDivisor;
-            m_gyroScale = gyroScale;
-            m_accelScale = accelScale;
-        }
-
-        void handleInterrupt(void)
-        {
-            static uint32_t prevTime;
-
-            // Ideally we'd use a time to capture such information, but
-            // unfortunately the port used for EXTI interrupt does not have an
-            // associated timer
-            uint32_t nowCycles = m_board->getCycleCounter();
-            int32_t gyroLastPeriod = intcmp(nowCycles, prevTime);
-
-            // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
-            if ((m_shortPeriod == 0) || (gyroLastPeriod < m_shortPeriod)) {
-
-                m_gyroSyncTime = prevTime;
-            }
-
-            prevTime = nowCycles;
-
-            RealImu::handleInterrupt();
+            //m_sampleRateDivisor = sampleRateDivisor;
+            //m_gyroScale = gyroScale;
+            //m_accelScale = accelScale;
         }
 
 }; // class Bmi270
