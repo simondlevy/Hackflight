@@ -27,6 +27,13 @@
 #include <vector>
 using namespace std;
 
+// IMU
+static const uint8_t MOSI_PIN = PB15;
+static const uint8_t MISO_PIN = PB14;
+static const uint8_t SCLK_PIN = PB13;
+static const uint8_t CS_PIN   = PB12;
+static const uint8_t EXTI_PIN = PC4;
+
 //static const uint8_t LED_PIN  = PA13; // orange
 static const uint8_t LED_PIN  = PA14; // blue
 
