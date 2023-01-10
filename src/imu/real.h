@@ -143,12 +143,16 @@ class RealImu : public Imu {
         gyroAxis_t m_gyroY;
         gyroAxis_t m_gyroZ;
 
-        RealImu( const rotateFun_t rotateFun, const uint16_t gyroScale)
+        RealImu(const rotateFun_t rotateFun, const uint16_t gyroScale)
         {
             m_rotateFun = rotateFun;
             m_gyroScale = gyroScale / 32768.;
 
-            // Start calibrating
+        }
+
+        void begin(void)
+        {
+            // Start calibrating gyro
             setGyroCalibrationCycles(); 
         }
 

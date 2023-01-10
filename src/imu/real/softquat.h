@@ -207,11 +207,15 @@ class SoftQuatImu : public RealImu {
             m_accelScale = accelScale / 32768.;
         }
 
+        void begin(void)
+        {
+            RealImu::begin();
+        }
+
         auto readGyroDps(void) -> Axes
         {
             m_gyroAccum.accumulate(
                     m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
-
 
             return RealImu::readGyroDps();
         }

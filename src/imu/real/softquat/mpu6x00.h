@@ -229,6 +229,8 @@ class Mpu6x00 : public SoftQuatImu {
             delayMicroseconds(1);
 
             setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
+
+            SoftQuatImu::begin();
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
