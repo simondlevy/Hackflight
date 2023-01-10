@@ -56,11 +56,11 @@ class RealImu : public Imu {
             Pt1Filter lowpassFilter1 = Pt1Filter(GYRO_LPF1_DYN_MIN_HZ);
             Pt1Filter lowpassFilter2 = Pt1Filter(GYRO_LPF2_STATIC_HZ);
 
-        } axis_t;
+        } gyroAxis_t;
 
-        axis_t m_x;
-        axis_t m_y;
-        axis_t m_z;
+        gyroAxis_t m_x;
+        gyroAxis_t m_y;
+        gyroAxis_t m_z;
 
         calibration_t m_calibration;
 
@@ -82,7 +82,7 @@ class RealImu : public Imu {
             m_calibrationCyclesRemaining = (int32_t)calculateCalibratingCycles();
         }
 
-        void calibrateAxis(axis_t & axis, const uint8_t index)
+        void calibrateAxis(gyroAxis_t & axis, const uint8_t index)
         {
             // Reset at start of calibration
             if (m_calibrationCyclesRemaining == (int32_t)calculateCalibratingCycles()) {
@@ -119,22 +119,22 @@ class RealImu : public Imu {
             --m_calibrationCyclesRemaining;
         }
 
-        void applyLpf1(axis_t & axis)
+        void applyLpf1(gyroAxis_t & axis)
         {
             axis.dpsFiltered = axis.lowpassFilter1.apply(axis.sampleSum);
         }
 
-        void applyLpf2(axis_t & axis)
+        void applyLpf2(gyroAxis_t & axis)
         {
             axis.sampleSum = axis.lowpassFilter2.apply(axis.dps);
         }
 
-        void scaleGyro(axis_t & axis, const float adc)
+        void scaleGyro(gyroAxis_t & axis, const float adc)
         {
             axis.dps = adc * m_gyroScale; 
         }
 
-        float readCalibratedGyro(axis_t & axis, uint8_t index)
+        float readCalibratedGyro(gyroAxis_t & axis, uint8_t index)
         {
             return readRawGyro(index) - axis.zero;
         }
