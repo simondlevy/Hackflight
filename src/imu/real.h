@@ -149,7 +149,8 @@ class RealImu : public Imu {
             m_rotateFun = rotateFun;
             m_gyroScale = gyroScale;
 
-            setGyroCalibrationCycles(); // start calibrating
+            // Start calibrating
+            setGyroCalibrationCycles(); 
         }
 
         virtual int16_t readRawGyro(uint8_t k) = 0;

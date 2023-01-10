@@ -93,6 +93,15 @@ class Mpu6x00 : public SoftQuatImu {
                 2000;
         }
 
+        static uint16_t accelScaleToInt(const accelScale_e accelScale)
+        {
+            return
+                accelScale == ACCEL_2G ?  2 : 
+                accelScale == ACCEL_4G ?  4 : 
+                accelScale == ACCEL_8G ?  8 : 
+                16;
+        }
+
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
             digitalWrite(m_csPin, LOW);
