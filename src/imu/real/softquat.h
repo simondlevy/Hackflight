@@ -191,16 +191,20 @@ class SoftQuatImu : public RealImu {
 
         ImuSensor m_gyroAccum;
 
+        float m_accelScale;
+
     protected:
 
         SoftQuatImu(
                 const rotateFun_t rotateFun,
                 const uint16_t gyroScale,
                 const uint16_t accelScale)
-            : RealImu(rotateFun, gyroScale, accelScale)
+            : RealImu(rotateFun, gyroScale)
         {
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
+
+            m_accelScale = accelScale / 32768.;
         }
 
         virtual void accumulateGyro(

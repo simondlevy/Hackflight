@@ -45,8 +45,6 @@ class RealImu : public Imu {
 
         uint8_t  m_interruptPin;
 
-        // Gyro --------------------------------------------------------------
-
         static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
         static const uint16_t GYRO_LPF1_DYN_MIN_HZ           = 250;
         static const uint16_t GYRO_LPF2_STATIC_HZ            = 500;
@@ -142,20 +140,12 @@ class RealImu : public Imu {
             return readRawGyro(index) - axis.zero;
         }
 
-        // Accel --------------------------------------------------------------
-
-        float m_accelScale;
-
     protected:
 
-        RealImu(
-                const rotateFun_t rotateFun,
-                const uint16_t gyroScale,
-                const uint16_t accelScale) 
+        RealImu( const rotateFun_t rotateFun, const uint16_t gyroScale)
         {
             m_rotateFun = rotateFun;
             m_gyroScale = gyroScale / 32768.;
-            m_accelScale = accelScale / 32768.;
 
             // Start calibrating
             setGyroCalibrationCycles(); 
@@ -172,8 +162,6 @@ class RealImu : public Imu {
             return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
         }
 
-
-        // Gyro --------------------------------------------------------------
 
         uint32_t m_gyroSyncTime;
 
