@@ -23,6 +23,7 @@
 
 #include "esc.h"
 #include "led.h"
+#include "debugger.h"
 
 class Arming {
 
