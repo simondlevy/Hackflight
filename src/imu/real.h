@@ -148,8 +148,6 @@ class RealImu : public Imu {
 
     protected:
 
-        uint32_t m_gyroSyncTime;
-
         RealImu(
                 const rotateFun_t rotateFun,
                 const uint16_t gyroScale,
@@ -163,10 +161,6 @@ class RealImu : public Imu {
             setGyroCalibrationCycles(); 
         }
 
-        virtual int16_t readRawGyro(uint8_t k) = 0;
-
-        typedef void (*align_fun)(Axes * axes);
-
         static auto quat2euler(
                 const float qw, const float qx, const float qy, const float qz) -> Axes 
         {
@@ -177,6 +171,13 @@ class RealImu : public Imu {
             // Convert heading from [-pi,+pi] to [0,2*pi]
             return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
         }
+
+
+        // Gyro --------------------------------------------------------------
+
+        uint32_t m_gyroSyncTime;
+
+        virtual int16_t readRawGyro(uint8_t k) = 0;
 
         virtual void accumulateGyro(const float gx, const float gy, const float gz)
         {
