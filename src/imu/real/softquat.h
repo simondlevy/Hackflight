@@ -207,10 +207,13 @@ class SoftQuatImu : public RealImu {
             m_accelScale = accelScale / 32768.;
         }
 
-        virtual void accumulateGyro(
-                const float gx, const float gy, const float gz) override
+        auto readGyroDps(void) -> Axes
         {
-            m_gyroAccum.accumulate(gx, gy, gz);
+            m_gyroAccum.accumulate(
+                    m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
+
+
+            return RealImu::readGyroDps();
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override

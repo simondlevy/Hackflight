@@ -62,9 +62,6 @@ class RealImu : public Imu {
 
         } gyroAxis_t;
 
-        gyroAxis_t m_gyroX;
-        gyroAxis_t m_gyroY;
-        gyroAxis_t m_gyroZ;
 
         calibration_t m_gyroCalibration;
 
@@ -142,6 +139,10 @@ class RealImu : public Imu {
 
     protected:
 
+        gyroAxis_t m_gyroX;
+        gyroAxis_t m_gyroY;
+        gyroAxis_t m_gyroZ;
+
         RealImu( const rotateFun_t rotateFun, const uint16_t gyroScale)
         {
             m_rotateFun = rotateFun;
@@ -166,13 +167,6 @@ class RealImu : public Imu {
         uint32_t m_gyroSyncTime;
 
         virtual int16_t readRawGyro(uint8_t k) = 0;
-
-        virtual void accumulateGyro(const float gx, const float gy, const float gz)
-        {
-            (void)gx;
-            (void)gy;
-            (void)gz;
-        }
 
         auto readGyroDps(void) -> Axes
         {
@@ -212,7 +206,7 @@ class RealImu : public Imu {
             applyGyroLpf1(m_gyroZ);
 
             // Used for fusion with accelerometer
-            accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
+            //accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
 
             m_gyroIsCalibrating = !calibrationComplete;
 
