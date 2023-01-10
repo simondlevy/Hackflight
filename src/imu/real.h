@@ -36,15 +36,21 @@ class RealImu : public Imu {
 
     private:
 
-        static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
-        static const uint16_t GYRO_LPF1_DYN_MIN_HZ           = 250;
-        static const uint16_t GYRO_LPF2_STATIC_HZ            = 500;
-        static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
-
         typedef struct {
             float sum[3];
             Stats stats[3];
         } calibration_t;
+
+        rotateFun_t m_rotateFun;
+
+        uint8_t  m_interruptPin;
+
+        // Gyro --------------------------------------------------------------
+
+        static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
+        static const uint16_t GYRO_LPF1_DYN_MIN_HZ           = 250;
+        static const uint16_t GYRO_LPF2_STATIC_HZ            = 500;
+        static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
 
         typedef struct {
 
@@ -68,12 +74,6 @@ class RealImu : public Imu {
         uint32_t m_gyroInterruptCount;
         float    m_gyroScale;
         bool     m_gyroIsCalibrating;
-
-        float m_accelScale;
-
-        rotateFun_t m_rotateFun;
-
-        uint8_t  m_interruptPin;
 
         static uint32_t calculateGyroCalibratingCycles(void)
         {
@@ -141,6 +141,10 @@ class RealImu : public Imu {
         {
             return readRawGyro(index) - axis.zero;
         }
+
+        // Accel --------------------------------------------------------------
+
+        float m_accelScale;
 
     protected:
 
