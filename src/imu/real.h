@@ -62,9 +62,9 @@ class RealImu : public Imu {
 
         } gyroAxis_t;
 
-        gyroAxis_t m_x;
-        gyroAxis_t m_y;
-        gyroAxis_t m_z;
+        gyroAxis_t m_gyroX;
+        gyroAxis_t m_gyroY;
+        gyroAxis_t m_gyroZ;
 
         calibration_t m_gyroCalibration;
 
@@ -113,9 +113,9 @@ class RealImu : public Imu {
 
         void calibrateGyro(void)
         {
-            calibrateGyroAxis(m_x, 0);
-            calibrateGyroAxis(m_y, 1);
-            calibrateGyroAxis(m_z, 2);
+            calibrateGyroAxis(m_gyroX, 0);
+            calibrateGyroAxis(m_gyroY, 1);
+            calibrateGyroAxis(m_gyroZ, 2);
 
             --m_gyroCalibrationCyclesRemaining;
         }
@@ -185,9 +185,9 @@ class RealImu : public Imu {
                 // move 16-bit gyro data into floats to avoid overflows in
                 // calculations
 
-                _adc.x = readCalibratedGyro(m_x, 0);
-                _adc.y = readCalibratedGyro(m_y, 1);
-                _adc.z = readCalibratedGyro(m_z, 2);
+                _adc.x = readCalibratedGyro(m_gyroX, 0);
+                _adc.y = readCalibratedGyro(m_gyroY, 1);
+                _adc.z = readCalibratedGyro(m_gyroZ, 2);
 
                 _adc = m_rotateFun(_adc);
 
@@ -196,27 +196,27 @@ class RealImu : public Imu {
             }
 
             if (calibrationComplete) {
-                scaleGyro(m_x, _adc.x);
-                scaleGyro(m_y, _adc.y);
-                scaleGyro(m_z, _adc.z);
+                scaleGyro(m_gyroX, _adc.x);
+                scaleGyro(m_gyroY, _adc.y);
+                scaleGyro(m_gyroZ, _adc.z);
             }
 
             // Use gyro lowpass 2 filter for downsampling
-            applyGyroLpf2(m_x);
-            applyGyroLpf2(m_y);
-            applyGyroLpf2(m_z);
+            applyGyroLpf2(m_gyroX);
+            applyGyroLpf2(m_gyroY);
+            applyGyroLpf2(m_gyroZ);
 
             // Then apply lowpass 1
-            applyGyroLpf1(m_x);
-            applyGyroLpf1(m_y);
-            applyGyroLpf1(m_z);
+            applyGyroLpf1(m_gyroX);
+            applyGyroLpf1(m_gyroY);
+            applyGyroLpf1(m_gyroZ);
 
             // Used for fusion with accelerometer
-            accumulateGyro(m_x.dpsFiltered, m_y.dpsFiltered, m_z.dpsFiltered);
+            accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
 
             m_gyroIsCalibrating = !calibrationComplete;
 
-            return Axes(m_x.dpsFiltered, m_y.dpsFiltered, m_z.dpsFiltered);
+            return Axes(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
         }
 
         bool gyroIsCalibrating(void)
