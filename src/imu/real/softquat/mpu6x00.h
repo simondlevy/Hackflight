@@ -93,6 +93,20 @@ class Mpu6x00 : public SoftQuatImu {
                 2000;
         }
 
+        static uint16_t accelScaleToInt(const accelScale_e accelScale)
+        {
+            return
+                accelScale == ACCEL_2G ?  2 : 
+                accelScale == ACCEL_4G ?  4 : 
+                accelScale == ACCEL_8G ?  8 : 
+                16;
+        }
+
+        static float scale(const uint16_t n)
+        {
+            return n / 32768.0;
+        }
+
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
             digitalWrite(m_csPin, LOW);
@@ -238,7 +252,7 @@ class Mpu6x00 : public SoftQuatImu {
                 const uint8_t sampleRateDivisor = 19,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
-            : SoftQuatImu(rotateFun, gyroScaleToInt(gyroScale) / 32768.)
+            : SoftQuatImu(rotateFun, gyroScaleToInt(gyroScale), accelScaleToInt(accelScale))
         {
             m_mosiPin = mosiPin;
             m_misoPin = misoPin;
