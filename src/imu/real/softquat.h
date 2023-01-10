@@ -193,8 +193,11 @@ class SoftQuatImu : public RealImu {
 
     protected:
 
-        SoftQuatImu(const rotateFun_t rotateFun, const float gyroScale)
-            : RealImu(rotateFun, gyroScale)
+        SoftQuatImu(
+                const rotateFun_t rotateFun,
+                const uint16_t gyroScale,
+                const uint16_t accelScale)
+            : RealImu(rotateFun, gyroScale, accelScale)
         {
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;

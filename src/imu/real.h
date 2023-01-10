@@ -69,6 +69,8 @@ class RealImu : public Imu {
         float    m_gyroScale;
         bool     m_gyroIsCalibrating;
 
+        float m_accelScale;
+
         rotateFun_t m_rotateFun;
 
         uint8_t  m_interruptPin;
@@ -144,10 +146,14 @@ class RealImu : public Imu {
 
         uint32_t m_gyroSyncTime;
 
-        RealImu(const rotateFun_t rotateFun, const float gyroScale) 
+        RealImu(
+                const rotateFun_t rotateFun,
+                const uint16_t gyroScale,
+                const uint16_t accelScale) 
         {
             m_rotateFun = rotateFun;
-            m_gyroScale = gyroScale;
+            m_gyroScale = gyroScale / 32768.;
+            m_accelScale = accelScale / 32768.;
 
             // Start calibrating
             setGyroCalibrationCycles(); 
