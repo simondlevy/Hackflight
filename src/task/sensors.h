@@ -82,4 +82,5 @@ class SensorsTask : public Task {
         {
             return m_serializer.read();
         }
-};
+
+}; // class SensorsTask

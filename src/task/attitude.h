@@ -61,4 +61,5 @@ class AttitudeTask : public Task {
 
             m_arming->updateFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
-};
+
+}; // class AttitudeTask
