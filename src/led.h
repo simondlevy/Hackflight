@@ -28,39 +28,39 @@ class Led {
     private:
 
         typedef enum {
-            WARNING_LED_OFF = 0,
-            WARNING_LED_ON,
-            WARNING_LED_FLASH
-        } warningLedVehicleState_e;
+            LED_WARNING_OFF = 0,
+            LED_WARNING_ON,
+            LED_WARNING_FLASH
+        } ledWarningVehicleState_e;
 
-        bool m_on;
+        bool m_ledOn;
 
-        warningLedVehicleState_e m_warningLedVehicleState = WARNING_LED_OFF;
+        ledWarningVehicleState_e m_ledWarningVehicleState = LED_WARNING_OFF;
 
-        uint32_t m_warningLedTimer = 0;
+        uint32_t m_ledWarningTimer = 0;
 
-        void toggle(void)
+        void ledToggle(void)
         {
-            m_on = !m_on;
-            set(m_on);
+            m_ledOn = !m_ledOn;
+            set(m_ledOn);
         }
 
-        void warningRefresh(void)
+        void ledWarningRefresh(void)
         {
-            switch (m_warningLedVehicleState) {
-                case WARNING_LED_OFF:
+            switch (m_ledWarningVehicleState) {
+                case LED_WARNING_OFF:
                     set(false);
                     break;
-                case WARNING_LED_ON:
+                case LED_WARNING_ON:
                     set(true);
                     break;
-                case WARNING_LED_FLASH:
-                    toggle();
+                case LED_WARNING_FLASH:
+                    ledToggle();
                     break;
             }
 
             auto now = micros();
-            m_warningLedTimer = now + 500000;
+            m_ledWarningTimer = now + 500000;
         }
 
     public:
@@ -74,7 +74,7 @@ class Led {
                 digitalWrite(pin, inverted ? on : !on);
             }
 
-            m_on = on;
+            m_ledOn = on;
         }
 
         void begin(void)
@@ -88,7 +88,7 @@ class Led {
         {
             set(false);
             for (auto i=0; i<reps; i++) {
-                toggle();
+                ledToggle();
                 delay(delayMs);
             }
             set(false);
@@ -96,23 +96,23 @@ class Led {
 
         void warningFlash(void)
         {
-            m_warningLedVehicleState = WARNING_LED_FLASH;
+            m_ledWarningVehicleState = LED_WARNING_FLASH;
         }
 
         void warningDisable(void)
         {
-            m_warningLedVehicleState = WARNING_LED_OFF;
+            m_ledWarningVehicleState = LED_WARNING_OFF;
         }
 
         void warningUpdate(void)
         {
             uint32_t now = micros();
 
-            if ((int32_t)(now - m_warningLedTimer) < 0) {
+            if ((int32_t)(now - m_ledWarningTimer) < 0) {
                 return;
             }
 
-            warningRefresh();
+            ledWarningRefresh();
         }
 
 }; // class Led
