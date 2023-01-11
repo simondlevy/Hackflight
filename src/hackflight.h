@@ -29,7 +29,6 @@ using namespace std;
 #include "core/mixer.h"
 #include "esc.h"
 #include "imu.h"
-#include "led.h"
 #include "maths.h"
 #include "scheduler.h"
 #include "task/attitude.h"

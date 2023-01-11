@@ -25,7 +25,6 @@ using namespace std;
 #include "core/mixer.h"
 #include "esc.h"
 #include "imu.h"
-#include "led.h"
 #include "maths.h"
 #include "receiver.h"
 #include "scheduler.h"
@@ -46,7 +45,6 @@ class Board {
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
         bool         m_failsafeIsActive;
-        Led          m_led;
         Scheduler    m_scheduler;
         VehicleState m_vstate;
 
@@ -59,6 +57,9 @@ class Board {
         bool m_isArmed;
         bool m_switchOkay;
         bool m_throttleIsDown;
+
+        uint8_t m_ledPin;
+        bool m_ledInverted;
 
         float m_maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
 
@@ -361,7 +362,7 @@ class Board {
                     disarm();
             }
             else {
-                m_led.ledSet(true);
+                ledSet(true);
             }
         } else {
 
@@ -375,16 +376,99 @@ class Board {
             }
 
             if (!readyToArm()) {
-                m_led.ledWarningFlash();
+                ledWarningFlash();
             } else {
-                m_led.ledWarningDisable();
+                ledWarningDisable();
             }
 
-            m_led.ledWarningUpdate();
+            ledWarningUpdate();
         }
 
         m_haveSignal = haveSignal;
     }
+
+        typedef enum {
+            LED_WARNING_OFF = 0,
+            LED_WARNING_ON,
+            LED_WARNING_FLASH
+        } ledWarningVehicleState_e;
+
+        bool m_ledOn;
+
+        ledWarningVehicleState_e m_ledWarningVehicleState = LED_WARNING_OFF;
+
+        uint32_t m_ledWarningTimer = 0;
+
+        void ledToggle(void)
+        {
+            m_ledOn = !m_ledOn;
+            ledSet(m_ledOn);
+        }
+
+        void ledWarningRefresh(void)
+        {
+            switch (m_ledWarningVehicleState) {
+                case LED_WARNING_OFF:
+                    ledSet(false);
+                    break;
+                case LED_WARNING_ON:
+                    ledSet(true);
+                    break;
+                case LED_WARNING_FLASH:
+                    ledToggle();
+                    break;
+            }
+
+            auto now = micros();
+            m_ledWarningTimer = now + 500000;
+        }
+
+        void ledSet(bool on)
+        {
+            if (m_ledPin > 0) {
+                digitalWrite(m_ledPin, m_ledInverted ? on : !on);
+            }
+
+            m_ledOn = on;
+        }
+
+        void ledBegin(void)
+        {
+            if (m_ledPin > 0) {
+                pinMode(m_ledPin, OUTPUT);
+            }
+        }
+
+        void ledFlash(uint8_t reps, uint16_t delayMs)
+        {
+            ledSet(false);
+            for (auto i=0; i<reps; i++) {
+                ledToggle();
+                delay(delayMs);
+            }
+            ledSet(false);
+        }
+
+        void ledWarningFlash(void)
+        {
+            m_ledWarningVehicleState = LED_WARNING_FLASH;
+        }
+
+        void ledWarningDisable(void)
+        {
+            m_ledWarningVehicleState = LED_WARNING_OFF;
+        }
+
+        void ledWarningUpdate(void)
+        {
+            uint32_t now = micros();
+
+            if ((int32_t)(now - m_ledWarningTimer) < 0) {
+                return;
+            }
+
+            ledWarningRefresh();
+        }
     protected:
 
         Board(
@@ -402,8 +486,8 @@ class Board {
             m_mixer = &mixer;
             m_esc = &esc;
 
-            m_led.m_ledPin = ledPin < 0 ? -ledPin : ledPin;
-            m_led.m_ledInverted = ledPin < 0;
+            m_ledPin = ledPin < 0 ? -ledPin : ledPin;
+            m_ledInverted = ledPin < 0;
 
             imu.m_board = this;
             esc.m_board = this;
@@ -457,8 +541,8 @@ class Board {
 
             m_esc->begin();
 
-            m_led.ledBegin();
-            m_led.ledFlash(10, 50);
+            ledBegin();
+            ledFlash(10, 50);
         }
 
         void step(void)
