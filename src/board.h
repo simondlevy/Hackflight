@@ -88,7 +88,6 @@ class Board {
         uint32_t lastTargetCycles;
 
         bool         m_failsafeIsActive;
-        VehicleState m_vstate;
 
         // Arming guards
         bool m_accDoneCalibrating;
@@ -483,11 +482,11 @@ class Board {
 
     protected:
 
-        SensorsTask m_sensorsTask = SensorsTask(m_vstate);
+        VehicleState m_vstate;
 
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
-        AccelerometerTask m_accelerometerTask;
+        SensorsTask m_sensorsTask = SensorsTask(m_vstate);
 
         VisualizerTask m_visualizerTask =
             VisualizerTask(m_msp, m_vstate, m_sensorsTask);
@@ -555,17 +554,11 @@ class Board {
 
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
-            m_accelerometerTask.prioritize(usec, prioritizer);
             m_receiverTask.prioritize(usec, prioritizer);
             m_attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
-            m_sensorsTask.prioritize(usec, prioritizer);
 
             switch (prioritizer.id) {
-
-                case Task::ACCELEROMETER:
-                    runTask(m_accelerometerTask, usec);
-                    break;
 
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask, usec);
@@ -579,10 +572,6 @@ class Board {
                 case Task::RECEIVER:
                     runTask(m_receiverTask, usec);
                     updateArmingFromReceiver();
-                    break;
-
-                case Task::SENSORS:
-                    runTask(m_sensorsTask, usec);
                     break;
 
                 case Task::NONE:

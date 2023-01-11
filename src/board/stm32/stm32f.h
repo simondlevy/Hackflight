@@ -23,19 +23,9 @@
 
 class Stm32FBoard : public Stm32Board {
 
-    public:
+    private:
 
-        Stm32FBoard(
-                Receiver & receiver,
-                Imu & imu,
-                vector<PidController *> & pids,
-                Mixer & mixer,
-                Esc & esc,
-                const uint8_t ledPin) 
-            : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
-        {
-        }
-
+        AccelerometerTask m_accelerometerTask;
 
     protected:
 
@@ -61,6 +51,10 @@ class Stm32FBoard : public Stm32Board {
                     runTask(m_accelerometerTask, usec);
                     break;
 
+                case Task::SENSORS:
+                    runTask(m_sensorsTask, usec);
+                    break;
+
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask, usec);
                     updateArmingFromImu();
@@ -75,15 +69,24 @@ class Stm32FBoard : public Stm32Board {
                     updateArmingFromReceiver();
                     break;
 
-                case Task::SENSORS:
-                    runTask(m_sensorsTask, usec);
-                    break;
-
                 case Task::NONE:
                     break;
             }
         }
 
         virtual void reboot(void) { }
+
+    public:
+
+        Stm32FBoard(
+                Receiver & receiver,
+                Imu & imu,
+                vector<PidController *> & pids,
+                Mixer & mixer,
+                Esc & esc,
+                const uint8_t ledPin) 
+            : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
+        {
+        }
 
 }; // class Stm32FBoard
