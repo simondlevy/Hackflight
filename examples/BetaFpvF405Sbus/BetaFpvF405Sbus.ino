@@ -78,7 +78,7 @@ void serialEvent3(void)
 // Interupt from Skyranger
 void serialEvent4(void)
 {
-    board.handleSerialEvent(Serial4);
+    board.handleSkyrangerEvent(Serial4);
 }
 
 void setup(void)

@@ -27,6 +27,11 @@ class Stm32FBoard : public Stm32Board {
 
         AccelerometerTask m_accelerometerTask;
 
+        void parseSkyranger(const uint8_t byte)
+        {
+            m_skyrangerTask.parse(byte);
+        }
+
     protected:
 
         virtual void checkDynamicTasks(void) override
@@ -74,6 +79,13 @@ class Stm32FBoard : public Stm32Board {
                 const uint8_t ledPin) 
             : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
         {
+        }
+
+        void handleSkyrangerEvent(HardwareSerial & serial)
+        {
+            while (serial.available()) {
+                parseSkyranger(serial.read());
+            }
         }
 
 }; // class Stm32FBoard

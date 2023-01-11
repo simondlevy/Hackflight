@@ -38,6 +38,9 @@ class Board {
 
         static constexpr float MAX_ARMING_ANGLE = 25;
 
+        // Avoid repeated degrees-to-radians conversion
+        float m_maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE);
+
         // Scheduling constants ------------------------------------------------
 
         // Wait at start of scheduler loop if gyroSampleTask is nearly due
@@ -86,7 +89,8 @@ class Board {
         int32_t  desiredPeriodCycles;
         uint32_t lastTargetCycles;
 
-        bool         m_failsafeIsActive;
+        // Motor safety
+        bool m_failsafeIsActive;
 
         // Arming guards
         bool m_accDoneCalibrating;
@@ -98,10 +102,9 @@ class Board {
         bool m_switchOkay;
         bool m_throttleIsDown;
 
+        // LED
         uint8_t m_ledPin;
         bool m_ledInverted;
-
-        float m_maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE);
 
         Msp m_msp;
 
@@ -199,11 +202,6 @@ class Board {
             }
 
         } // checkCoreTasks
-
-        void parseSkyranger(const uint8_t byte)
-        {
-            m_skyrangerTask.parse(byte);
-        }
 
         static void outbuf(char * buf)
         {
@@ -719,13 +717,6 @@ class Board {
             
             while (m_skyrangerTask.imuDataAvailable()) {
                 serial.write(m_skyrangerTask.readImuData());
-            }
-        }
-
-        void handleSerialEvent(HardwareSerial & serial)
-        {
-            while (serial.available()) {
-                parseSkyranger(serial.read());
             }
         }
 
