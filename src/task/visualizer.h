@@ -38,7 +38,6 @@ class VisualizerTask : public Task {
         }
 
         // Initialized in constructor
-        Arming *       m_arming;
         VehicleState * m_vstate;
         SensorsTask *  m_sensorsTask;
 
@@ -126,13 +125,11 @@ class VisualizerTask : public Task {
 
         VisualizerTask(
                 Msp & msp,
-                Arming & arming,
                 VehicleState & vstate,
                 SensorsTask & sensorsTask) 
             : Task(VISUALIZER, 100) // Hz
         { 
             m_msp = &msp;
-            m_arming = &arming;
             m_vstate = &vstate;
             m_sensorsTask = & sensorsTask;
         }

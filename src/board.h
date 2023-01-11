@@ -59,7 +59,7 @@ class Board {
         Msp m_msp;
 
         VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_arming, m_vstate, m_sensorsTask);
+            VisualizerTask(m_msp, m_vstate, m_sensorsTask);
 
         ReceiverTask m_receiverTask   = ReceiverTask(m_arming);
 
