@@ -26,7 +26,7 @@ class AccelerometerTask : public Task {
     public:
 
         AccelerometerTask(void)
-            : Task(ATTITUDE, 1000) // Hz
+            : Task(ACCELEROMETER, 1000) // Hz
         {
         }
 

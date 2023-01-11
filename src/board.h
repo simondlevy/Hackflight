@@ -29,6 +29,7 @@ using namespace std;
 #include "maths.h"
 #include "receiver.h"
 #include "scheduler.h"
+#include "task/accelerometer.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
@@ -52,6 +53,8 @@ class Board {
         SensorsTask m_sensorsTask = SensorsTask(m_vstate);
 
         AttitudeTask m_attitudeTask = AttitudeTask(m_arming, m_vstate);
+
+        AccelerometerTask m_accelerometerTask;
 
         Msp m_msp;
 
@@ -188,6 +191,7 @@ class Board {
 
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
+            m_accelerometerTask.prioritize(usec, prioritizer);
             m_receiverTask.prioritize(usec, prioritizer);
             m_attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
@@ -199,6 +203,10 @@ class Board {
 
             switch (prioritizer.id) {
                 
+                case Task::ACCELEROMETER:
+                    runTask(m_accelerometerTask, usec);
+                    break;
+
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask, usec);
                     break;
