@@ -41,6 +41,10 @@ class Stm32FBoard : public Stm32Board {
 
         virtual void checkDynamicTasks(void) override
         {
+            if (m_visualizerTask.gotRebootRequest()) {
+                reboot();
+            }
+
             const uint32_t usec = micros();
 
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
@@ -50,10 +54,6 @@ class Stm32FBoard : public Stm32Board {
             m_attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
             m_sensorsTask.prioritize(usec, prioritizer);
-
-            if (m_visualizerTask.gotRebootRequest()) {
-                reboot();
-            }
 
             switch (prioritizer.id) {
 
