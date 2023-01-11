@@ -115,7 +115,6 @@ class Board {
         Msp m_msp;
 
         // Initialzed in sketch()
-        Imu *   m_imu;
         Esc *   m_esc;
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
@@ -484,6 +483,9 @@ class Board {
 
 
     protected:
+
+        // Initialized in sketch
+        Imu * m_imu;
 
         SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
 

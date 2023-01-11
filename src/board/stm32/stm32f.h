@@ -25,7 +25,7 @@ class Stm32FBoard : public Stm32Board {
 
     private:
 
-        AccelerometerTask m_accelerometerTask;
+        AccelerometerTask m_accelerometerTask = AccelerometerTask(m_imu);
 
         void parseSkyranger(const uint8_t byte)
         {
@@ -34,9 +34,12 @@ class Stm32FBoard : public Stm32Board {
 
     protected:
 
+        // STM32F boards have no auto-reset bootloader support, so we reboot on
+        // an external input
+        virtual void reboot(void) { }
+
         virtual void checkDynamicTasks(void) override
         {
-            // STM32F boards have no auto-reset bootloader support, so we reboot
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
             }
@@ -65,8 +68,6 @@ class Stm32FBoard : public Stm32Board {
                     break;
             }
         }
-
-        virtual void reboot(void) { }
 
     public:
 

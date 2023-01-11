@@ -23,11 +23,16 @@
 
 class AccelerometerTask : public Task {
 
+    private:
+
+        Imu * m_imu;
+
     public:
 
-        AccelerometerTask(void)
+        AccelerometerTask(Imu * imu)
             : Task(ACCELEROMETER, 1000) // Hz
         {
+            m_imu = imu;
         }
 
         void begin(void)
