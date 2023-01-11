@@ -41,9 +41,9 @@ class Stm32FBoard : public Stm32Board {
             // Prioritize primary dynamic tasks (attitude, visualizer, receiver)
             Task::prioritizer_t prioritizer = prioritizeDynamicTasks(usec);
 
-            // Add in accelerometer and sensors tasks
+            // Add in accelerometer and skyranger tasks
             m_accelerometerTask.prioritize(usec, prioritizer);
-            m_sensorsTask.prioritize(usec, prioritizer);
+            m_skyrangerTask.prioritize(usec, prioritizer);
 
             switch (prioritizer.id) {
 
@@ -51,8 +51,8 @@ class Stm32FBoard : public Stm32Board {
                     runTask(m_accelerometerTask, usec);
                     break;
 
-                case Task::SENSORS:
-                    runTask(m_sensorsTask, usec);
+                case Task::SKYRANGER:
+                    runTask(m_skyrangerTask, usec);
                     break;
 
                 default:

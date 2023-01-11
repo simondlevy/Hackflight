@@ -31,7 +31,6 @@ using namespace std;
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
-#include "task/sensors.h"
 
 class Board {
 
@@ -201,9 +200,9 @@ class Board {
 
         } // checkCoreTasks
 
-        void parseSensors(const uint8_t byte)
+        void parseSkyranger(const uint8_t byte)
         {
-            m_sensorsTask.parse(byte);
+            m_skyrangerTask.parse(byte);
         }
 
         static void outbuf(char * buf)
@@ -486,10 +485,10 @@ class Board {
 
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
-        SensorsTask m_sensorsTask = SensorsTask(m_vstate);
+        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
 
         VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_vstate, m_sensorsTask);
+            VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
 
         ReceiverTask m_receiverTask;
 
@@ -718,15 +717,15 @@ class Board {
         {
             step();
             
-            while (m_sensorsTask.imuDataAvailable()) {
-                serial.write(m_sensorsTask.readImuData());
+            while (m_skyrangerTask.imuDataAvailable()) {
+                serial.write(m_skyrangerTask.readImuData());
             }
         }
 
         void handleSerialEvent(HardwareSerial & serial)
         {
             while (serial.available()) {
-                parseSensors(serial.read());
+                parseSkyranger(serial.read());
             }
         }
 

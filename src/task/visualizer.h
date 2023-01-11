@@ -27,7 +27,7 @@
 #include "msp.h"
 #include "receiver.h"
 #include "task.h"
-#include "task/sensors.h"
+#include "task/skyranger.h"
 
 class VisualizerTask : public Task {
 
@@ -40,7 +40,7 @@ class VisualizerTask : public Task {
 
         // Initialized in constructor
         VehicleState * m_vstate;
-        SensorsTask *  m_sensorsTask;
+        SkyrangerTask *  m_skyrangerTask;
 
         // Initialized in begin()
         Msp *      m_msp;
@@ -96,11 +96,11 @@ class VisualizerTask : public Task {
                         } break;
 
                     case 121: // VL53L5 ranging camera
-                        sendShorts(121, m_sensorsTask->rangerData, 16);
+                        sendShorts(121, m_skyrangerTask->rangerData, 16);
                         break;
 
                     case 122: // PAA3905 mocap
-                        sendShorts(122, m_sensorsTask->mocapData, 2);
+                        sendShorts(122, m_skyrangerTask->mocapData, 2);
                         break;
 
                     case 214: // SET_MOTORS
@@ -127,12 +127,12 @@ class VisualizerTask : public Task {
         VisualizerTask(
                 Msp & msp,
                 VehicleState & vstate,
-                SensorsTask & sensorsTask) 
+                SkyrangerTask & skyrangerTask) 
             : Task(VISUALIZER, 100) // Hz
         { 
             m_msp = &msp;
             m_vstate = &vstate;
-            m_sensorsTask = & sensorsTask;
+            m_skyrangerTask = & skyrangerTask;
         }
 
         float motors[Motors::MAX_SUPPORTED];

@@ -21,7 +21,7 @@
 #include "task.h"
 #include "msp.h"
 
-class SensorsTask : public Task {
+class SkyrangerTask : public Task {
 
     private:
 
@@ -39,8 +39,8 @@ class SensorsTask : public Task {
         int16_t mocapData[2];
         int16_t rangerData[16];
 
-        SensorsTask(VehicleState & vstate)
-            : Task(SENSORS, 50) // Hz
+        SkyrangerTask(VehicleState & vstate)
+            : Task(SKYRANGER, 50) // Hz
         {
             m_vstate = &vstate;
         }
@@ -82,4 +82,4 @@ class SensorsTask : public Task {
             return m_serializer.read();
         }
 
-}; // class SensorsTask
+}; // class SkyrangerTask
