@@ -30,7 +30,6 @@ using namespace std;
 #include "esc.h"
 #include "imu.h"
 #include "maths.h"
-#include "scheduler.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
