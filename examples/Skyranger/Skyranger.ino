@@ -25,7 +25,6 @@
 #include <PAA3905_MotionCapture.h>
 
 #include "hackflight.h"
-#include "debugger.h"
 #include "msp.h"
 
 // Constants ----------------------------------------------------------
@@ -81,7 +80,7 @@ void startEspNow(void)
     WiFi.mode(WIFI_STA);
 
     if (esp_now_init() != ESP_OK) {
-        HfDebugger::reportForever("Error initializing ESP-NOW");
+        Board::reportForever("Error initializing ESP-NOW");
     }
 
     static esp_now_peer_info_t peerInfo;
@@ -91,7 +90,7 @@ void startEspNow(void)
     peerInfo.encrypt = false;
 
     if (esp_now_add_peer(&peerInfo) != ESP_OK) {
-        HfDebugger::reportForever("Failed to add peer");
+        Board::reportForever("Failed to add peer");
     }
 }
 
@@ -176,7 +175,7 @@ static void startMocap(void)
 
     // Check device ID as a test of SPI communications
     if (!_mocap.begin()) {
-        HfDebugger::reportForever("PAA3905 initialization failed");
+        Board::reportForever("PAA3905 initialization failed");
     }
 
     pinMode(PAA3905_MOT_PIN, INPUT); 

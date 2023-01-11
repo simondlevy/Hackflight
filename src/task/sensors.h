@@ -20,7 +20,6 @@
 
 #include "task.h"
 #include "msp.h"
-#include "debugger.h"
 
 class SensorsTask : public Task {
 

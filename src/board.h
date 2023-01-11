@@ -233,6 +233,12 @@ class Board {
             m_sensorsTask.parse(byte);
         }
 
+        static void outbuf(char * buf)
+        {
+            Serial.print(buf);
+            Serial.flush();
+        }
+
     protected:
 
         Board(
@@ -345,6 +351,32 @@ class Board {
         {
             pinMode(pin, INPUT);
             attachInterrupt(pin, irq, mode);  
+        }
+
+        static void printf(const char * fmt, ...)
+        {
+            va_list ap;
+            va_start(ap, fmt);
+            char buf[200];
+            vsnprintf(buf, 200, fmt, ap); 
+            outbuf(buf);
+            va_end(ap);
+        }
+
+        static void reportForever(const char * fmt, ...)
+        {
+            va_list ap;
+            va_start(ap, fmt);
+            char buf[200];
+            vsnprintf(buf, 200, fmt, ap); 
+            va_end(ap);
+
+            strcat(buf, "\n");
+
+            while (true) {
+                outbuf(buf);
+                delay(500);
+            }
         }
 
 }; // class Board

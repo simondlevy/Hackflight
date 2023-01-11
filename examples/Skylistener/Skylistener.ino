@@ -23,7 +23,6 @@
 
 #include <hackflight.h>
 #include <msp.h>
-#include <debugger.h>
 
 // Message IDs
 static const uint8_t MSP_SET_VL53L5   = 221;
@@ -61,7 +60,7 @@ void setup(void)
 
     if (esp_now_init() != ESP_OK) {
 
-        HfDebugger::reportForever("Error initializing ESP-NOW");
+        Board::reportForever("Error initializing ESP-NOW");
     }
 
     esp_now_register_recv_cb(onDataRecv);
@@ -70,6 +69,6 @@ void setup(void)
 
 void loop(void)
 {
-    HfDebugger::printf("Got %d VL53L5 messages and %d PAA3905 messages\n",
+    Board::printf("Got %d VL53L5 messages and %d PAA3905 messages\n",
             _vl53l5_count, _paa3905_count);
 }
