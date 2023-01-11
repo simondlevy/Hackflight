@@ -65,7 +65,7 @@ class Task {
         uint32_t m_lastExecutedAtUs;          
         uint32_t m_lastSignaledAtUs;         
 
-        Task(id_t id, uint32_t rate) 
+        Task(const id_t id, const uint32_t rate) 
         {
             m_id = id;
             m_desiredPeriodUs = 1000000 / rate;
@@ -73,7 +73,7 @@ class Task {
 
     public:
 
-        virtual void adjustDynamicPriority(uint32_t usec)
+        virtual void adjustDynamicPriority(const uint32_t usec)
         {
             // Task is time-driven, dynamicPriority is last execution age
             // (measured in desiredPeriods). Task age is calculated from last
@@ -94,7 +94,7 @@ class Task {
             }
         }
 
-        void execute(uint32_t usec)
+        void execute(const uint32_t usec)
         {
             m_lastExecutedAtUs = usec;
             m_dynamicPriority = 0;
@@ -119,7 +119,7 @@ class Task {
             return m_anticipatedExecutionTime >> EXEC_TIME_SHIFT;
         }
 
-        virtual void prioritize( uint32_t usec, prioritizer_t & prioritizer)
+        virtual void prioritize(const uint32_t usec, prioritizer_t & prioritizer)
         {
             adjustDynamicPriority(usec);
 
@@ -129,5 +129,5 @@ class Task {
             }
         }
 
-        virtual void fun(uint32_t usec) = 0;
+        virtual void fun(const uint32_t usec) = 0;
 }; 

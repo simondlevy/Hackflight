@@ -38,7 +38,7 @@ class ReceiverTask : public Task {
         }
 
         // Task function, called periodically
-        virtual void fun(uint32_t usec) override
+        virtual void fun(const uint32_t usec) override
         {
             receiver->update(usec);
         }

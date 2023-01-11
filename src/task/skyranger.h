@@ -45,7 +45,7 @@ class SkyrangerTask : public Task {
             m_vstate = &vstate;
         }
 
-        virtual void fun(uint32_t usec) override
+        virtual void fun(const uint32_t usec) override
         {
             (void)usec;
 

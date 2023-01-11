@@ -25,7 +25,7 @@ class Stm32FBoard : public Stm32Board {
 
     private:
 
-        AccelerometerTask m_accelerometerTask = AccelerometerTask(m_imu);
+        AccelerometerTask m_accelerometerTask; 
 
         void parseSkyranger(const uint8_t byte)
         {
@@ -80,6 +80,13 @@ class Stm32FBoard : public Stm32Board {
                 const uint8_t ledPin) 
             : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
         {
+        }
+
+        void begin(void)
+        {
+            Board::begin();
+
+            m_accelerometerTask.begin(m_imu);
         }
 
         void handleSkyrangerEvent(HardwareSerial & serial)

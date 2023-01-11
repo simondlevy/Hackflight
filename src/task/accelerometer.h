@@ -29,18 +29,26 @@ class AccelerometerTask : public Task {
 
     public:
 
-        AccelerometerTask(Imu * imu)
+        AccelerometerTask(void)
             : Task(ACCELEROMETER, 1000) // Hz
+        {
+        }
+
+        void begin(Imu * imu)
         {
             m_imu = imu;
         }
 
-        void begin(void)
-        {
-        }
-
-        virtual void fun(uint32_t time) override
+        virtual void fun(const uint32_t time) override
         {
             (void)time;
+
+            const int16_t accelX = m_imu->readRawAccel(0);
+            const int16_t accelY = m_imu->readRawAccel(1);
+            const int16_t accelZ = m_imu->readRawAccel(2);
+
+            (void)accelX;
+            (void)accelY;
+            (void)accelZ;
         }
 };

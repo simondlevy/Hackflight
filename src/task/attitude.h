@@ -41,7 +41,7 @@ class AttitudeTask : public Task {
             m_imu = imu;
         }
 
-        virtual void fun(uint32_t time) override
+        virtual void fun(const uint32_t time) override
         {
             const auto angles = m_imu->getEulerAngles(time);
 
