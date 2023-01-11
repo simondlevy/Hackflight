@@ -548,16 +548,20 @@ class Board {
             m_clockRate = microsecondsToClockCycles(1000000);
         }
 
-        virtual void checkDynamicTasks(void)
+        auto prioritizeDynamicTasks(const uint32_t usec) -> Task::prioritizer_t
         {
-            const uint32_t usec = micros();
-
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
             m_receiverTask.prioritize(usec, prioritizer);
             m_attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
 
+            return prioritizer;
+        }
+
+        virtual void runPrioritizedTask(
+                const Task::prioritizer_t prioritizer, const uint32_t usec)
+        {
             switch (prioritizer.id) {
 
                 case Task::ATTITUDE:
@@ -574,9 +578,18 @@ class Board {
                     updateArmingFromReceiver();
                     break;
 
-                case Task::NONE:
+                default:
                     break;
             }
+         }
+
+        virtual void checkDynamicTasks(void)
+        {
+            const uint32_t usec = micros();
+
+            Task::prioritizer_t prioritizer = prioritizeDynamicTasks(usec);
+
+            runPrioritizedTask(prioritizer, usec);
         }
 
         void runTask(Task & task, uint32_t usec)

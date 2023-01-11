@@ -31,18 +31,18 @@ class Stm32FBoard : public Stm32Board {
 
         virtual void checkDynamicTasks(void) override
         {
+            // STM32F boards have no auto-reset bootloader support, so we reboot
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
             }
 
             const uint32_t usec = micros();
 
-            Task::prioritizer_t prioritizer = {Task::NONE, 0};
+            // Prioritize primary dynamic tasks (attitude, visualizer, receiver)
+            Task::prioritizer_t prioritizer = prioritizeDynamicTasks(usec);
 
+            // Add in accelerometer and sensors tasks
             m_accelerometerTask.prioritize(usec, prioritizer);
-            m_receiverTask.prioritize(usec, prioritizer);
-            m_attitudeTask.prioritize(usec, prioritizer);
-            m_visualizerTask.prioritize(usec, prioritizer);
             m_sensorsTask.prioritize(usec, prioritizer);
 
             switch (prioritizer.id) {
@@ -55,21 +55,8 @@ class Stm32FBoard : public Stm32Board {
                     runTask(m_sensorsTask, usec);
                     break;
 
-                case Task::ATTITUDE:
-                    runTask(m_attitudeTask, usec);
-                    updateArmingFromImu();
-                    break;
-
-                case Task::VISUALIZER:
-                    runTask(m_visualizerTask, usec);
-                    break;
-
-                case Task::RECEIVER:
-                    runTask(m_receiverTask, usec);
-                    updateArmingFromReceiver();
-                    break;
-
-                case Task::NONE:
+                default:
+                    runPrioritizedTask(prioritizer, usec);
                     break;
             }
         }
