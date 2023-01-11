@@ -202,65 +202,6 @@ class Board {
 
         } // checkCoreTasks
 
-        void runTask(Task & task, uint32_t usec)
-        {
-            const auto nextTargetCycles = getNextTargetCycles();
-
-            const auto taskRequiredTimeUs = task.getRequiredTime();
-
-            const auto nowCycles = getCycleCounter();
-
-            const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
-
-            // Allow a little extra time
-            const auto taskRequiredCycles =
-                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
-                getTaskGuardCycles();
-
-            if (taskRequiredCycles < loopRemainingCycles) {
-
-                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
-
-                task.execute(usec);
-
-                updateDynamic(getCycleCounter(), anticipatedEndCycles);
-            } else {
-                task.enableRun();
-            }
-        }
-
-        void updateArmingFromReceiver(void)
-        {
-            Receiver * receiver = m_receiverTask.receiver;
-
-            switch (receiver->getState()) {
-
-                case Receiver::STATE_UPDATE:
-                    attemptToArm(micros(), receiver->aux1IsSet());
-                    break;
-
-                case Receiver::STATE_CHECK:
-                    updateFromReceiver(
-                            receiver->throttleIsDown(),
-                            receiver->aux1IsSet(),
-                            receiver->hasSignal());
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        void updateArmingFromImu(void)
-        {
-            const auto imuIsLevel =
-                fabsf(m_vstate.phi) < m_maxArmingAngle &&
-                fabsf(m_vstate.theta) < m_maxArmingAngle;
-
-            updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
-        }
-
-
         void parseSensors(const uint8_t byte)
         {
             m_sensorsTask.parse(byte);
@@ -620,10 +561,6 @@ class Board {
             m_visualizerTask.prioritize(usec, prioritizer);
             m_sensorsTask.prioritize(usec, prioritizer);
 
-            if (m_visualizerTask.gotRebootRequest()) {
-                reboot();
-            }
-
             switch (prioritizer.id) {
 
                 case Task::ACCELEROMETER:
@@ -652,6 +589,66 @@ class Board {
                     break;
             }
         }
+
+        void runTask(Task & task, uint32_t usec)
+        {
+            const auto nextTargetCycles = getNextTargetCycles();
+
+            const auto taskRequiredTimeUs = task.getRequiredTime();
+
+            const auto nowCycles = getCycleCounter();
+
+            const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
+
+            // Allow a little extra time
+            const auto taskRequiredCycles =
+                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
+                getTaskGuardCycles();
+
+            if (taskRequiredCycles < loopRemainingCycles) {
+
+                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+
+                task.execute(usec);
+
+                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+            } else {
+                task.enableRun();
+            }
+        }
+
+        void updateArmingFromReceiver(void)
+        {
+            Receiver * receiver = m_receiverTask.receiver;
+
+            switch (receiver->getState()) {
+
+                case Receiver::STATE_UPDATE:
+                    attemptToArm(micros(), receiver->aux1IsSet());
+                    break;
+
+                case Receiver::STATE_CHECK:
+                    updateFromReceiver(
+                            receiver->throttleIsDown(),
+                            receiver->aux1IsSet(),
+                            receiver->hasSignal());
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        void updateArmingFromImu(void)
+        {
+            const auto imuIsLevel =
+                fabsf(m_vstate.phi) < m_maxArmingAngle &&
+                fabsf(m_vstate.theta) < m_maxArmingAngle;
+
+            updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
+        }
+
+
     public:
 
         uint32_t microsToCycles(uint32_t micros)
@@ -662,8 +659,6 @@ class Board {
         virtual uint32_t getClockSpeed(void)  = 0;
 
         virtual uint32_t getCycleCounter(void) = 0;
-
-        virtual void reboot(void) { }
 
         virtual void startCycleCounter(void) = 0;
 
