@@ -271,7 +271,7 @@ class Board {
             updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
 
-        void checkDynamicTasks(void)
+        virtual void checkDynamicTasks(void)
         {
             const uint32_t usec = micros();
 

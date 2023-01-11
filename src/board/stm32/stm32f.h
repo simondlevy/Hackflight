@@ -16,22 +16,25 @@
 
 #pragma once
 
-#include "board/stm32/stm32f.h"
+#include <Wire.h>
 
-class Stm32F745Board : public Stm32FBoard {
+#include "board/stm32.h"
+#include "imu.h"
+
+class Stm32FBoard : public Stm32Board {
 
     public:
 
-        Stm32F745Board(
-                Msp & msp,
+        Stm32FBoard(
                 Receiver & receiver,
                 Imu & imu,
                 vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 
-            : Stm32FBoard(msp, receiver, imu, pids, mixer, esc, ledPin)
+            : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
         {
         }
 
-}; // class Stm32F745Board
+
+}; // class Stm32FBoard
