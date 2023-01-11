@@ -26,7 +26,6 @@
 #include "core/utils.h"
 #include "core/vstate.h"
 #include "imu.h"
-#include "maths.h"
 #include "stats.h"
 
 class Imu {
@@ -35,9 +34,14 @@ class Imu {
 
     private:
 
+        static float rad2deg(float rad)
+        {
+            return 180 * rad / M_PI;
+        }
+
         static int16_t rad2degi(float rad)
         {
-            return (int16_t)Math::rad2deg(rad);
+            return (int16_t)rad2deg(rad);
         }
 
     protected:
@@ -45,6 +49,11 @@ class Imu {
         class Board * m_board;
 
     public:
+
+        static float deg2rad(float deg)
+        {
+            return deg * M_PI / 180;
+        }
 
         typedef void (*align_fun)(Axes * axes);
 

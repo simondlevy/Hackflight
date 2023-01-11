@@ -25,7 +25,6 @@ using namespace std;
 #include "core/mixer.h"
 #include "esc.h"
 #include "imu.h"
-#include "maths.h"
 #include "receiver.h"
 #include "task/accelerometer.h"
 #include "task/attitude.h"
@@ -103,7 +102,7 @@ class Board {
         uint8_t m_ledPin;
         bool m_ledInverted;
 
-        float m_maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
+        float m_maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE);
 
         SensorsTask m_sensorsTask = SensorsTask(m_vstate);
 

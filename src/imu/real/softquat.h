@@ -24,7 +24,6 @@
 #include "core/clock.h"
 #include "core/vstate.h"
 #include "imu/real.h"
-#include "maths.h"
 
 class SoftQuatImu : public RealImu {
 
@@ -168,9 +167,9 @@ class SoftQuatImu : public RealImu {
                 const Quaternion & q_old) -> Quaternion
         {
             // Convert gyro degrees to radians
-            const auto gx = Math::deg2rad(gyro.x);
-            const auto gy = Math::deg2rad(gyro.y);
-            const auto gz = Math::deg2rad(gyro.z);
+            const auto gx = deg2rad(gyro.x);
+            const auto gy = deg2rad(gyro.y);
+            const auto gz = deg2rad(gyro.z);
 
             // Apply proportional and integral feedback, then integrate rate-of-change
             const auto gx1 = gx * dt / 2;
