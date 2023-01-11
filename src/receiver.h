@@ -27,8 +27,8 @@
 #include "core/demands.h"
 #include "core/filters/pt3.h"
 #include "core/pids/angle.h"
+#include "core/utils.h"
 #include "pwm.h"
-#include "utils.h"
 
 
 class Receiver {

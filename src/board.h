@@ -17,11 +17,11 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdarg.h>
 
 #include <vector>
 using namespace std;
 
-#include "arming.h"
 #include "core/mixer.h"
 #include "esc.h"
 #include "imu.h"
@@ -50,7 +50,15 @@ class Board {
         Scheduler    m_scheduler;
         VehicleState m_vstate;
 
-        Arming m_arming = Arming(m_led);
+        // Arming guards
+        bool m_accDoneCalibrating;
+        bool m_angleOkay;
+        bool m_gotFailsafe;
+        bool m_gyroDoneCalibrating;
+        bool m_haveSignal;
+        bool m_isArmed;
+        bool m_switchOkay;
+        bool m_throttleIsDown;
 
         float m_maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
 
@@ -113,7 +121,7 @@ class Board {
                 mixmotors[i] = m_esc->getMotorValue(motors.values[i], m_failsafeIsActive);
             }
 
-            m_esc->write(m_arming.isArmed() ?  mixmotors : m_visualizerTask.motors);
+            m_esc->write(isArmed() ?  mixmotors : m_visualizerTask.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -196,11 +204,11 @@ class Board {
             switch (receiver->getState()) {
 
                 case Receiver::STATE_UPDATE:
-                    m_arming.attemptToArm(micros(), receiver->aux1IsSet());
+                    attemptToArm(micros(), receiver->aux1IsSet());
                     break;
 
                 case Receiver::STATE_CHECK:
-                    m_arming.updateFromReceiver(
+                    updateFromReceiver(
                             receiver->throttleIsDown(),
                             receiver->aux1IsSet(),
                             receiver->hasSignal());
@@ -217,7 +225,7 @@ class Board {
                 fabsf(m_vstate.phi) < m_maxArmingAngle &&
                 fabsf(m_vstate.theta) < m_maxArmingAngle;
 
-            m_arming.updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
+            updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
 
         void checkDynamicTasks(void)
@@ -276,6 +284,107 @@ class Board {
             Serial.flush();
         }
 
+        bool readyToArm(void)
+        {
+            return 
+                m_accDoneCalibrating &&
+                m_angleOkay &&
+                !m_gotFailsafe &&
+                m_haveSignal &&
+                m_gyroDoneCalibrating &&
+                m_switchOkay &&
+                m_throttleIsDown;
+        }
+
+        void disarm(void)
+        {
+            if (m_isArmed) {
+                m_esc->stop();
+            }
+
+            m_isArmed = false;
+        }
+
+        void updateArmingFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
+        {
+            m_angleOkay = imuIsLevel;
+
+            m_gyroDoneCalibrating = !gyroIsCalibrating;
+
+            m_accDoneCalibrating = true; // XXX
+        }
+
+        bool isArmed(void)
+        {
+            return m_isArmed;
+        }
+
+        void attemptToArm(const uint32_t usec, const bool aux1IsSet)
+        {
+            static bool _doNotRepeat;
+
+            if (aux1IsSet) {
+
+                if (readyToArm()) {
+
+                    if (m_isArmed) {
+                        return;
+                    }
+
+                    if (!m_esc->isReady(usec)) {
+                        return;
+                    }
+
+                    m_isArmed = true;
+                }
+
+            } else {
+
+                if (m_isArmed) {
+                    disarm();
+                    m_isArmed = false;
+                }
+            }
+
+            if (!(m_isArmed || _doNotRepeat || !readyToArm())) {
+                _doNotRepeat = true;
+            }
+        }
+
+        void updateFromReceiver(
+                const bool throttleIsDown, const bool aux1IsSet, const bool haveSignal)
+        {
+            if (m_isArmed) {
+
+                if (!haveSignal && m_haveSignal) {
+                    m_gotFailsafe = true;
+                    disarm();
+            }
+            else {
+                m_led.ledSet(true);
+            }
+        } else {
+
+            m_throttleIsDown = throttleIsDown;
+
+            // If arming is disabled and the ARM switch is on
+            if (!readyToArm() && aux1IsSet) {
+                m_switchOkay = false;
+            } else if (!aux1IsSet) {
+                m_switchOkay = true;
+            }
+
+            if (!readyToArm()) {
+                m_led.ledWarningFlash();
+            } else {
+                m_led.ledWarningDisable();
+            }
+
+            m_led.ledWarningUpdate();
+        }
+
+        m_haveSignal = haveSignal;
+    }
     protected:
 
         Board(
@@ -339,8 +448,6 @@ class Board {
         void begin(void)
         {
             startCycleCounter();
-
-            m_arming.armingBegin(m_esc);
 
             m_attitudeTask.begin(m_imu);
 

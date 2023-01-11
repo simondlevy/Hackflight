@@ -21,8 +21,8 @@
 
 #include <stdlib.h>
 
+#include "core/utils.h"
 #include "receiver/real.h"
-#include "utils.h"
 
 
 class SbusReceiver : public RealReceiver {
