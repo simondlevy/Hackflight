@@ -37,6 +37,18 @@ class Receiver {
         friend class Board;
         friend class ReceiverTask;
 
+    public:
+
+        typedef enum {
+            STATE_CHECK,
+            STATE_PROCESS,
+            STATE_MODES,
+            STATE_UPDATE,
+            STATE_COUNT
+        } state_e;
+
+    private:
+
         static const uint8_t THROTTLE_LOOKUP_TABLE_SIZE = 12;
 
         static const uint32_t TIMEOUT_MS = 500;
@@ -53,14 +65,6 @@ class Receiver {
 
         // maximum PWM pulse width which is considered valid
         static const uint16_t PWM_PULSE_MAX   = 2250;  
-
-        typedef enum {
-            STATE_CHECK,
-            STATE_PROCESS,
-            STATE_MODES,
-            STATE_UPDATE,
-            STATE_COUNT
-        } state_e;
 
         bool     m_auxiliaryProcessingRequired;
         bool     m_dataProcessingRequired;
@@ -318,7 +322,7 @@ class Receiver {
                     break;
 
                 case STATE_MODES:
-                    arming->attempt(usec, aux1IsSet());
+                    arming->attempt(micros(), aux1IsSet());
                     m_state = STATE_UPDATE;
                     break;
 
@@ -336,6 +340,11 @@ class Receiver {
 
 
     public:
+
+        state_e getState(void)
+        {
+            return m_state;
+        }
 
         float getRawThrottle(void)
         {

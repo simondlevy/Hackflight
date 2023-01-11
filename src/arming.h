@@ -68,7 +68,7 @@ class Arming {
             m_led = &led;
         }
 
-        void begin(Esc * esc)
+        void armingBegin(Esc * esc)
         {
             m_esc = esc;
         }

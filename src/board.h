@@ -185,6 +185,23 @@ class Board {
             }
         }
 
+        void updateArmingFromReceiver(void)
+        {
+            Receiver * receiver = m_receiverTask.receiver;
+
+            switch (receiver->getState()) {
+
+                case Receiver::STATE_UPDATE:
+                    break;
+
+                case Receiver::STATE_CHECK:
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
         void checkDynamicTasks(void)
         {
             const uint32_t usec = micros();
@@ -202,7 +219,7 @@ class Board {
             }
 
             switch (prioritizer.id) {
-                
+
                 case Task::ACCELEROMETER:
                     runTask(m_accelerometerTask, usec);
                     break;
@@ -217,15 +234,16 @@ class Board {
 
                 case Task::RECEIVER:
                     runTask(m_receiverTask, usec);
+                    updateArmingFromReceiver();
                     break;
 
                 case Task::SENSORS:
                     runTask(m_sensorsTask, usec);
                     break;
-            
+
                 case Task::NONE:
                     break;
-             }
+            }
         }
 
         void parseSensors(const uint8_t byte)
@@ -303,7 +321,7 @@ class Board {
         {
             startCycleCounter();
 
-            m_arming.begin(m_esc);
+            m_arming.armingBegin(m_esc);
 
             m_attitudeTask.begin(m_imu);
 
