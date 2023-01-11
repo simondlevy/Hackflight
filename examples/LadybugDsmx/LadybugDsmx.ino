@@ -49,11 +49,9 @@ void serialEvent1(void)
 
 void setup(void)
 {
-    Board::setInterrupt(LadybugBoard::IMU_INTERRUPT_PIN, handleImuInterrupt, RISING);  
-
     Serial1.begin(115200);
 
-    board.begin();
+    board.begin(handleImuInterrupt);
 }
 
 void loop(void)

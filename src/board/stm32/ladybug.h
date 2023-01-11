@@ -27,6 +27,8 @@ class LadybugBoard : public Stm32Board {
 
     private:
 
+        static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
+
         vector<uint8_t> motorPins = {0x0D, 0x10, 0x03, 0x0B};
 
         UsfsImu imu = UsfsImu(RealImu::rotate0);
@@ -42,13 +44,15 @@ class LadybugBoard : public Stm32Board {
         {
         }
 
-        void begin(void)
+        void begin(void (*isr)(void))
         {
             Serial.begin(115200);
 
             Wire.begin();
             Wire.setClock(400000); 
             delay(100);
+
+            Board::setInterrupt(IMU_INTERRUPT_PIN, isr, RISING);  
 
             Board::begin();
         }
@@ -57,7 +61,5 @@ class LadybugBoard : public Stm32Board {
         {
             imu.handleInterrupt();
         }
-
-        static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
 
 }; // class LadybugBoard
