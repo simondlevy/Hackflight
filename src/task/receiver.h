@@ -30,20 +30,17 @@ class ReceiverTask : public Task {
         // Set in Board constructor
         Receiver * receiver;
 
-        Arming * m_arming;
-
     protected:
 
-        ReceiverTask(Arming & arming)
+        ReceiverTask()
             : Task(RECEIVER, 33) // Hz
         {
-            m_arming = & arming;
         }
 
         // Task function, called periodically
         virtual void fun(uint32_t usec) override
         {
-            receiver->update(usec, m_arming);
+            receiver->update(usec);
         }
 
         // Increase priority for RX task

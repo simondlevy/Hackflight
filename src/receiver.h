@@ -71,6 +71,7 @@ class Receiver {
         int32_t  m_frameTimeDeltaUs;
         bool     m_gotNewData;
         bool     m_gotPidReset;
+        bool     m_haveSignal;
         uint32_t m_lastFrameTimeUs;
         int16_t  m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
         uint32_t m_nextUpdateAtUs;
@@ -187,6 +188,11 @@ class Receiver {
             return m_rawAux1 > 0.2;
         }
 
+        bool hasSignal(void)
+        {
+            return m_haveSignal;
+        }
+
         bool throttleIsDown(void)
         {
             return m_rawThrottle < 1050;
@@ -296,9 +302,9 @@ class Receiver {
                 uint32_t & frameTimeUs) = 0;
 
         // Called perioidically by receiverTask::fun()
-        void update(uint32_t usec, Arming * arming)
+        void update(uint32_t usec)
         {
-            const auto haveSignal = (usec - m_lastFrameTimeUs) < (int32_t)(1000*TIMEOUT_MS);
+            m_haveSignal = (usec - m_lastFrameTimeUs) < (int32_t)(1000*TIMEOUT_MS);
 
             auto pidItermResetReady = false;
             auto pidItermResetValue = false;
@@ -322,13 +328,11 @@ class Receiver {
                     break;
 
                 case STATE_MODES:
-                    arming->attempt(micros(), aux1IsSet());
                     m_state = STATE_UPDATE;
                     break;
 
                 case STATE_UPDATE:
                     m_gotNewData = true;
-                    arming->updateFromReceiver(throttleIsDown(), aux1IsSet(), haveSignal);
                     m_state = STATE_CHECK;
                     break;
             }

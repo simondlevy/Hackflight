@@ -61,7 +61,7 @@ class Board {
         VisualizerTask m_visualizerTask =
             VisualizerTask(m_msp, m_vstate, m_sensorsTask);
 
-        ReceiverTask m_receiverTask   = ReceiverTask(m_arming);
+        ReceiverTask m_receiverTask;
 
         // Initialzed in sketch()
         Imu *   m_imu;
@@ -192,9 +192,14 @@ class Board {
             switch (receiver->getState()) {
 
                 case Receiver::STATE_UPDATE:
+                    m_arming.attempt(micros(), receiver->aux1IsSet());
                     break;
 
                 case Receiver::STATE_CHECK:
+                    m_arming.updateFromReceiver(
+                            receiver->throttleIsDown(),
+                            receiver->aux1IsSet(),
+                            receiver->hasSignal());
                     break;
 
                 default:
