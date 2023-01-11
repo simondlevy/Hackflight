@@ -1,3 +1,5 @@
+<img src="../media/rust.png" height=150 align="left">
+
 # Hackflight in Rust
 
 This folder contains an experimental implemenation of the Hackflight 
