@@ -25,7 +25,9 @@
 #include "core/utils.h"
 #include "core/vstate.h"
 #include "imu.h"
-#include "stats.h"
+
+#include <stdint.h>
+#include <math.h>
 
 class RealImu : public Imu {
 
@@ -34,6 +36,49 @@ class RealImu : public Imu {
         typedef Axes (*rotateFun_t)(Axes & axes);
 
     private:
+
+        class Stats {
+
+            private:
+
+                float m_oldM;
+                float  m_newM;
+                float  m_oldS;
+                float  m_newS;
+                int32_t m_n;
+
+                float variance(void)
+                {
+                    return ((m_n > 1) ? m_newS / (m_n - 1) : 0.0f);
+                }
+
+            public:
+
+                void stdevClear(void)
+                {
+                    m_n = 0;
+                }
+
+                void stdevPush(float x)
+                {
+                    m_n++;
+
+                    if (m_n == 1) {
+                        m_oldM = m_newM = x;
+                        m_oldS = 0.0f;
+                    } else {
+                        m_newM = m_oldM + (x - m_oldM) / m_n;
+                        m_newS = m_oldS + (x - m_oldM) * (x - m_newM);
+                        m_oldM = m_newM;
+                        m_oldS = m_newS;
+                    }
+                }
+
+                float stdevCompute(void)
+                {
+                    return sqrtf(variance());
+                }
+        }; 
 
         typedef struct {
             float sum[3];

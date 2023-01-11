@@ -25,8 +25,6 @@
 #include "core/filters/pt1.h"
 #include "core/utils.h"
 #include "core/vstate.h"
-#include "imu.h"
-#include "stats.h"
 
 class Imu {
 
