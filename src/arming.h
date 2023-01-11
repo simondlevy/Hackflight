@@ -73,7 +73,7 @@ class Arming {
             m_esc = esc;
         }
 
-        void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
+        void updateArmingFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
         {
             m_angleOkay = imuIsLevel;
 
@@ -87,8 +87,7 @@ class Arming {
             return m_isArmed;
         }
 
-        // Called by Receiver
-        void attempt(const uint32_t usec, const bool aux1IsSet)
+        void attemptToArm(const uint32_t usec, const bool aux1IsSet)
         {
             static bool _doNotRepeat;
 

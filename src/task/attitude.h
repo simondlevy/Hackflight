@@ -25,20 +25,14 @@ class AttitudeTask : public Task {
 
     private:
 
-        static constexpr float MAX_ARMING_ANGLE = 25;
-
-        Arming *       m_arming;
         Imu *          m_imu;
         VehicleState * m_vstate;
 
-        float m_maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
-
     public:
 
-        AttitudeTask(Arming & arming, VehicleState & vstate)
+        AttitudeTask(VehicleState & vstate)
             : Task(ATTITUDE, 100) // Hz
         {
-            m_arming = &arming;
             m_vstate = &vstate;
         }
 
@@ -54,12 +48,6 @@ class AttitudeTask : public Task {
             m_vstate->phi   = angles.x;
             m_vstate->theta = angles.y;
             m_vstate->psi   = angles.z;
-
-            const auto imuIsLevel =
-                fabsf(m_vstate->phi) < m_maxArmingAngle &&
-                fabsf(m_vstate->theta) < m_maxArmingAngle;
-
-            m_arming->updateFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
 
 }; // class AttitudeTask

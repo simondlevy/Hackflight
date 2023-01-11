@@ -39,6 +39,8 @@ class Board {
 
     private:
 
+        static constexpr float MAX_ARMING_ANGLE = 25;
+
         // Gyro interrupt counts over which to measure loop time and skew
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
@@ -50,9 +52,11 @@ class Board {
 
         Arming m_arming = Arming(m_led);
 
+        float m_maxArmingAngle = Math::deg2rad(MAX_ARMING_ANGLE);
+
         SensorsTask m_sensorsTask = SensorsTask(m_vstate);
 
-        AttitudeTask m_attitudeTask = AttitudeTask(m_arming, m_vstate);
+        AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
         AccelerometerTask m_accelerometerTask;
 
@@ -192,7 +196,7 @@ class Board {
             switch (receiver->getState()) {
 
                 case Receiver::STATE_UPDATE:
-                    m_arming.attempt(micros(), receiver->aux1IsSet());
+                    m_arming.attemptToArm(micros(), receiver->aux1IsSet());
                     break;
 
                 case Receiver::STATE_CHECK:
@@ -205,6 +209,15 @@ class Board {
                 default:
                     break;
             }
+        }
+
+        void updateArmingFromImu(void)
+        {
+            const auto imuIsLevel =
+                fabsf(m_vstate.phi) < m_maxArmingAngle &&
+                fabsf(m_vstate.theta) < m_maxArmingAngle;
+
+            m_arming.updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
 
         void checkDynamicTasks(void)
@@ -231,6 +244,7 @@ class Board {
 
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask, usec);
+                    updateArmingFromImu();
                     break;
 
                 case Task::VISUALIZER:

@@ -25,7 +25,6 @@
 #include <vector>
 using namespace std;
 
-#include "arming.h"
 #include "board.h"
 #include "core/mixer.h"
 #include "esc.h"
