@@ -44,6 +44,8 @@ class LadybugBoard : public Stm32Board {
 
         void begin(void)
         {
+            Serial.begin(115200);
+
             Wire.begin();
             Wire.setClock(400000); 
             delay(100);
