@@ -22,13 +22,14 @@
 #include <stdbool.h>
 
 #include "utils.h"
-#include "maxmotors.h"
 
 class Motors {
 
     public:
 
-        float values[MAX_SUPPORTED_MOTORS];
+        static const uint8_t MAX_SUPPORTED = 8;
+
+        float values[MAX_SUPPORTED];
 
         uint8_t m_count;
 

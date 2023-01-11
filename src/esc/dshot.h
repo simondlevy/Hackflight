@@ -24,8 +24,8 @@
 #include "board.h"
 #include "core/clock.h"
 #include "core/constrain.h"
+#include "core/motors.h"
 #include "esc.h"
-#include "maxmotors.h"
 
 class DshotEsc : public Esc {
 
@@ -70,7 +70,7 @@ class DshotEsc : public Esc {
             uint32_t nextCommandCycleDelay;
             uint32_t delayAfterCommandUs;
             uint8_t repeats;
-            uint8_t command[MAX_SUPPORTED_MOTORS];
+            uint8_t command[Motors::MAX_SUPPORTED];
         } commandControl_t;
 
         commandControl_t m_commandQueue[MAX_COMMANDS + 1];

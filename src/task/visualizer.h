@@ -21,11 +21,12 @@
 
 #include <stdint.h>
 
-#include "task.h"
+#include "core/motors.h"
 #include "esc.h"
 #include "imu.h"
 #include "msp.h"
 #include "receiver.h"
+#include "task.h"
 #include "task/sensors.h"
 
 class VisualizerTask : public Task {
@@ -134,7 +135,7 @@ class VisualizerTask : public Task {
             m_sensorsTask = & sensorsTask;
         }
 
-        float motors[MAX_SUPPORTED_MOTORS];
+        float motors[Motors::MAX_SUPPORTED];
 
         void begin(Esc * esc, Receiver * receiver)
         {

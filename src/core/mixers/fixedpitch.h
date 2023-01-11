@@ -36,7 +36,7 @@ class FixedPitchMixer {
                 const Axes spins[],
                 float motorvals[])
         {
-            float mix[MAX_SUPPORTED_MOTORS];
+            float mix[Motors::MAX_SUPPORTED];
 
             float mixMax = 0, mixMin = 0;
 

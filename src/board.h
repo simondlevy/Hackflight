@@ -23,6 +23,7 @@
 using namespace std;
 
 #include "core/mixer.h"
+#include "core/motors.h"
 #include "esc.h"
 #include "imu.h"
 #include "receiver.h"
@@ -156,7 +157,7 @@ class Board {
                     m_receiverTask.receiver->gotPidReset(),
                     micros());
 
-            float mixmotors[MAX_SUPPORTED_MOTORS] = {0};
+            float mixmotors[Motors::MAX_SUPPORTED] = {};
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
