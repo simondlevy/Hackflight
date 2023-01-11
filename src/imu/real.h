@@ -84,17 +84,17 @@ class RealImu : public Imu {
             // Reset at start of calibration
             if (m_gyroCalibrationCyclesRemaining == (int32_t)calculateGyroCalibratingCycles()) {
                 m_gyroCalibration.sum[index] = 0.0f;
-                m_gyroCalibration.stats[index].clear();
+                m_gyroCalibration.stats[index].stdevClear();
                 // zero is set to zero until calibration complete
                 axis.zero = 0.0f;
             }
 
             // Sum up CALIBRATING_GYRO_TIME_US readings
             m_gyroCalibration.sum[index] += readRawGyro(index);
-            m_gyroCalibration.stats[index].push(readRawGyro(index));
+            m_gyroCalibration.stats[index].stdevPush(readRawGyro(index));
 
             if (m_gyroCalibrationCyclesRemaining == 1) {
-                const float stddev = m_gyroCalibration.stats[index].stdev();
+                const float stddev = m_gyroCalibration.stats[index].stdevCompute();
 
                 // check deviation and startover in case the model was moved
                 if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >

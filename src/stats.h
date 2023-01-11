@@ -38,12 +38,12 @@ class Stats {
 
     public:
 
-        void clear(void)
+        void stdevClear(void)
         {
             m_n = 0;
         }
 
-        void push(float x)
+        void stdevPush(float x)
         {
             m_n++;
 
@@ -58,7 +58,7 @@ class Stats {
             }
         }
 
-        float stdev(void)
+        float stdevCompute(void)
         {
             return sqrtf(variance());
         }
