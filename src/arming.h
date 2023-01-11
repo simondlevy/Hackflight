@@ -130,7 +130,7 @@ class Arming {
                     disarm();
             }
             else {
-                m_led->set(true);
+                m_led->ledSet(true);
             }
         } else {
 
@@ -144,12 +144,12 @@ class Arming {
             }
 
             if (!readyToArm()) {
-                m_led->warningFlash();
+                m_led->ledWarningFlash();
             } else {
-                m_led->warningDisable();
+                m_led->ledWarningDisable();
             }
 
-            m_led->warningUpdate();
+            m_led->ledWarningUpdate();
         }
 
         m_haveSignal = haveSignal;

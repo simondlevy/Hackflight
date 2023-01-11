@@ -256,8 +256,8 @@ class Board {
             m_mixer = &mixer;
             m_esc = &esc;
 
-            m_led.pin = ledPin < 0 ? -ledPin : ledPin;
-            m_led.inverted = ledPin < 0;
+            m_led.m_ledPin = ledPin < 0 ? -ledPin : ledPin;
+            m_led.m_ledInverted = ledPin < 0;
 
             imu.m_board = this;
             esc.m_board = this;
@@ -313,8 +313,8 @@ class Board {
 
             m_esc->begin();
 
-            m_led.begin();
-            m_led.flash(10, 50);
+            m_led.ledBegin();
+            m_led.ledFlash(10, 50);
         }
 
         void step(void)

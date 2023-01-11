@@ -42,17 +42,17 @@ class Led {
         void ledToggle(void)
         {
             m_ledOn = !m_ledOn;
-            set(m_ledOn);
+            ledSet(m_ledOn);
         }
 
         void ledWarningRefresh(void)
         {
             switch (m_ledWarningVehicleState) {
                 case LED_WARNING_OFF:
-                    set(false);
+                    ledSet(false);
                     break;
                 case LED_WARNING_ON:
-                    set(true);
+                    ledSet(true);
                     break;
                 case LED_WARNING_FLASH:
                     ledToggle();
@@ -65,46 +65,46 @@ class Led {
 
     public:
 
-        uint8_t pin;
-        bool inverted;
+        uint8_t m_ledPin;
+        bool m_ledInverted;
 
-        void set(bool on)
+        void ledSet(bool on)
         {
-            if (pin > 0) {
-                digitalWrite(pin, inverted ? on : !on);
+            if (m_ledPin > 0) {
+                digitalWrite(m_ledPin, m_ledInverted ? on : !on);
             }
 
             m_ledOn = on;
         }
 
-        void begin(void)
+        void ledBegin(void)
         {
-            if (pin > 0) {
-                pinMode(pin, OUTPUT);
+            if (m_ledPin > 0) {
+                pinMode(m_ledPin, OUTPUT);
             }
         }
 
-        void flash(uint8_t reps, uint16_t delayMs)
+        void ledFlash(uint8_t reps, uint16_t delayMs)
         {
-            set(false);
+            ledSet(false);
             for (auto i=0; i<reps; i++) {
                 ledToggle();
                 delay(delayMs);
             }
-            set(false);
+            ledSet(false);
         }
 
-        void warningFlash(void)
+        void ledWarningFlash(void)
         {
             m_ledWarningVehicleState = LED_WARNING_FLASH;
         }
 
-        void warningDisable(void)
+        void ledWarningDisable(void)
         {
             m_ledWarningVehicleState = LED_WARNING_OFF;
         }
 
-        void warningUpdate(void)
+        void ledWarningUpdate(void)
         {
             uint32_t now = micros();
 
