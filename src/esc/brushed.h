@@ -46,7 +46,7 @@ class BrushedEsc : public Esc {
 
         virtual float  convertFromExternal(const uint16_t value) override 
         {
-            return (value - PWM_MIN) / (float)(PWM_MAX - PWM_MIN);
+            return (value - 1000) / 1000.;
         }
 
         virtual float getMotorValue(

@@ -26,7 +26,6 @@
 #include "core/constrain.h"
 #include "esc.h"
 #include "maxmotors.h"
-#include "pwm.h"
 
 class DshotEsc : public Esc {
 
@@ -267,11 +266,11 @@ class DshotEsc : public Esc {
 
         virtual float convertFromExternal(const uint16_t value) override 
         {
-            auto constrainedValue = constrain_u16(value, PWM_MIN, PWM_MAX);
+            auto constrainedValue = constrain_u16(value, 1000, 2000);
 
-            return constrainedValue == PWM_MIN ?
+            return constrainedValue == 1000 ?
                 (float)CMD_MOTOR_STOP :
-                scaleRangef(constrainedValue, PWM_MIN + 1, PWM_MAX, MIN_VALUE, MAX_VALUE);
+                scaleRangef(constrainedValue, 1001, 2000, MIN_VALUE, MAX_VALUE);
         }
 
         virtual float getMotorValue(

@@ -18,4 +18,4 @@
 
 #pragma once
 
-#define MAX_SUPPORTED_MOTORS 8
+static const uint8_t MAX_SUPPORTED_MOTORS = 8;

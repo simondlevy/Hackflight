@@ -28,8 +28,6 @@
 #include "core/filters/pt3.h"
 #include "core/pids/angle.h"
 #include "core/utils.h"
-#include "pwm.h"
-
 
 class Receiver {
 
@@ -103,8 +101,7 @@ class Receiver {
                     m_lookupThrottleRc[i] =
                         10 * THR_MID8 + tmp2 * (100 - THR_EXPO8 + (int32_t)
                                 THR_EXPO8 * (tmp2 * tmp2) / (y * y)) / 10;
-                    m_lookupThrottleRc[i] = PWM_MIN + (PWM_MAX - PWM_MIN) *
-                        m_lookupThrottleRc[i] / 1000; 
+                    m_lookupThrottleRc[i] = 1000 + m_lookupThrottleRc[i];
                 }
             }
 
@@ -240,8 +237,8 @@ class Receiver {
             m_previousFrameTimeUs = m_gotNewData ? 0 : m_previousFrameTimeUs;
 
             // Throttle [1000,2000] => [1000,2000]
-            auto tmp = constrain_f_i32(m_rawThrottle, 1050, PWM_MAX);
-            auto tmp2 = (uint32_t)(tmp - 1050) * PWM_MIN / (PWM_MAX - 1050);
+            auto tmp = constrain_f_i32(m_rawThrottle, 1050, 2000);
+            auto tmp2 = (uint32_t)(tmp - 1050) * 1000 / 950;
             auto commandThrottle = lookupThrottle(tmp2);
 
             Axes rawSetpoints = m_gotNewData ?
@@ -266,7 +263,7 @@ class Receiver {
             m_gotNewData = false;
 
             return Demands(
-                    constrain_f((commandThrottle - PWM_MIN) / (PWM_MAX - PWM_MIN), 0, 1),
+                    constrain_f((commandThrottle - 1000) / 1000, 0, 1),
                     _axes.x,
                     _axes.y,
                     _axes.z);
