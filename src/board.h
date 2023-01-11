@@ -106,6 +106,12 @@ class Board {
         uint8_t m_ledPin;
         bool m_ledInverted;
 
+        VehicleState m_vstate;
+
+        AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
+
+        ReceiverTask m_receiverTask;
+
         Msp m_msp;
 
         // Initialzed in sketch()
@@ -479,16 +485,9 @@ class Board {
 
     protected:
 
-        VehicleState m_vstate;
-
-        AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
-
         SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
 
-        VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
-
-        ReceiverTask m_receiverTask;
+        VisualizerTask m_visualizerTask = VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
 
         Board(
                 Receiver & receiver,
