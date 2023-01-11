@@ -22,7 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "arming.h"
 #include "core/clock.h"
 #include "core/constrain.h"
 #include "core/demands.h"

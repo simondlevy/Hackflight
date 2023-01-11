@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "arming.h"
 #include "core/axes.h"
 #include "core/clock.h"
 #include "core/constrain.h"
