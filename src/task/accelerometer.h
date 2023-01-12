@@ -43,12 +43,6 @@ class AccelerometerTask : public Task {
         {
             (void)time;
 
-            const int16_t accelX = m_imu->readRawAccel(0);
-            const int16_t accelY = m_imu->readRawAccel(1);
-            const int16_t accelZ = m_imu->readRawAccel(2);
-
-            (void)accelX;
-            (void)accelY;
-            (void)accelZ;
+            m_imu->updateAccelerometer();
         }
 };

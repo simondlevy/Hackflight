@@ -233,4 +233,17 @@ class SoftQuatImu : public RealImu {
 
             return quat2euler(quat.w, quat.x, quat.y, quat.z);
         }
+
+        virtual int16_t readRawAccel(uint8_t k) = 0;
+
+        virtual void updateAccelerometer(void) override
+        {
+            const int16_t accelX = readRawAccel(0);
+            const int16_t accelY = readRawAccel(1);
+            const int16_t accelZ = readRawAccel(2);
+
+            (void)accelX;
+            (void)accelY;
+            (void)accelZ;
+        }
 };

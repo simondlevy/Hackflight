@@ -79,8 +79,9 @@ class Mpu6x00 : public SoftQuatImu {
 
         SPIClass m_spi;
 
-        int16_t getValue(const uint8_t k)
+        int16_t getValue(const uint8_t offset, const uint8_t index)
         {
+            const uint8_t k = offset + index * 2;
             return (int16_t)(m_buffer[k] << 8 | m_buffer[k+1]);
         }
 
@@ -235,15 +236,15 @@ class Mpu6x00 : public SoftQuatImu {
 
         virtual int16_t readRawGyro(uint8_t k) override
         {
-            return getValue(9 + k*2);
+            return getValue(9, k);
+        }
+
+        virtual int16_t readRawAccel(uint8_t k) override
+        {
+            return getValue(1, k);
         }
 
     public:
-
-        /*virtual*/ int16_t readRawAccel(uint8_t k) // override
-        {
-            return getValue(1 + k*2);
-        }
 
         Mpu6x00(
                 const uint8_t mosiPin,

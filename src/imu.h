@@ -70,10 +70,8 @@ class Imu {
 
         virtual auto readGyroDps(void) -> Axes = 0;
 
-        virtual auto readRawAccel(uint8_t k) -> int16_t
+        virtual void updateAccelerometer(void)
         {
-            (void)k;
-            return 0;
         }
 
         static void getEulerAngles(const VehicleState * vstate, int16_t angles[3])

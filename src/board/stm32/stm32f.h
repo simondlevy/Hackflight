@@ -19,6 +19,7 @@
 #include <Wire.h>
 
 #include "board/stm32.h"
+#include "task/accelerometer.h"
 #include "imu.h"
 
 class Stm32FBoard : public Stm32Board {

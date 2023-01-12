@@ -27,7 +27,6 @@ using namespace std;
 #include "esc.h"
 #include "imu.h"
 #include "receiver.h"
-#include "task/accelerometer.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
