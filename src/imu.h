@@ -42,10 +42,6 @@ class Imu {
             return (int16_t)rad2deg(rad);
         }
 
-    protected:
-
-        class Board * m_board;
-
     public:
 
         static float deg2rad(float deg)

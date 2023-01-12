@@ -20,6 +20,13 @@
 
 class Stm32Board : public Board {
 
+    public:
+
+        virtual uint32_t getCycleCounter(void) override
+        {
+            return DWT->CYCCNT;
+        }
+
     protected:
 
         Stm32Board(
@@ -41,11 +48,6 @@ class Stm32Board : public Board {
         virtual uint32_t getClockSpeed(void) override
         {
             return SystemCoreClock;
-        }
-
-        virtual uint32_t getCycleCounter(void) override
-        {
-            return DWT->CYCCNT;
         }
 
         virtual void reboot(void)

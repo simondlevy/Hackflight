@@ -508,7 +508,6 @@ class Board {
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
             m_ledInverted = ledPin < 0;
 
-            imu.m_board = this;
             esc.m_board = this;
             receiver.m_board = this;
 
