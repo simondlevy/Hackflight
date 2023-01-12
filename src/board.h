@@ -508,7 +508,6 @@ class Board {
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
             m_ledInverted = ledPin < 0;
 
-            imu.m_board = this;
             esc.m_board = this;
             receiver.m_board = this;
 
@@ -689,7 +688,7 @@ class Board {
 
             m_visualizerTask.begin(m_esc, m_receiverTask.receiver);
 
-            m_imu->begin();
+            m_imu->begin(getClockSpeed());
 
             m_esc->begin();
 

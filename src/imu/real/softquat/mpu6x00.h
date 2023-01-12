@@ -145,9 +145,9 @@ class Mpu6x00 : public SoftQuatImu {
         uint8_t m_sclkPin;
         uint8_t m_csPin;
 
-        uint16_t calculateSpiDivisor(const uint32_t freq)
+        uint16_t calculateSpiDivisor(const uint32_t clockSpeed, const uint32_t freq)
         {
-            uint32_t clk = m_board->getClockSpeed() / 2;
+            uint32_t clk = clockSpeed / 2;
 
             uint16_t divisor = 2;
 
@@ -167,7 +167,7 @@ class Mpu6x00 : public SoftQuatImu {
             return true;
         }
 
-        virtual void begin(void) override
+        virtual void begin(uint32_t clockSpeed) override
         {
             m_spi.setMOSI(m_mosiPin);
             m_spi.setMISO(m_misoPin);
@@ -175,11 +175,11 @@ class Mpu6x00 : public SoftQuatImu {
 
             m_spi.begin();
             m_spi.setBitOrder(MSBFIRST);
-            m_spi.setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
+            m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_INIT_CLK_HZ));
             m_spi.setDataMode(SPI_MODE3);
             pinMode(m_csPin, OUTPUT);
 
-            m_shortPeriod = m_board->getClockSpeed() / 1000000 * SHORT_THRESHOLD;
+            m_shortPeriod = clockSpeed / 1000000 * SHORT_THRESHOLD;
 
             // Chip reset
             writeRegister(REG_PWR_MGMT_1, BIT_H_RESET);
@@ -220,18 +220,18 @@ class Mpu6x00 : public SoftQuatImu {
             writeRegister(REG_INT_ENABLE, BIT_RAW_RDY_EN);
             delayMicroseconds(15);
 
-            setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
+            setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLK_HZ));
             delayMicroseconds(1);
 
-            setClockDivider(calculateSpiDivisor(MAX_SPI_INIT_CLK_HZ));
+            setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_INIT_CLK_HZ));
 
             // Accel and Gyro DLPF Setting
             writeRegister(REG_CONFIG, 0); // no gyro DLPF
             delayMicroseconds(1);
 
-            setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
+            setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLK_HZ));
 
-            SoftQuatImu::begin();
+            SoftQuatImu::begin(clockSpeed);
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
@@ -266,14 +266,14 @@ class Mpu6x00 : public SoftQuatImu {
             m_accelScale = accelScale;
         }
 
-        void handleInterrupt(void)
+        void handleInterrupt(uint32_t cycleCounter)
         {
             static uint32_t prevTime;
 
             // Ideally we'd use a time to capture such information, but
             // unfortunately the port used for EXTI interrupt does not have an
             // associated timer
-            uint32_t nowCycles = m_board->getCycleCounter();
+            uint32_t nowCycles = cycleCounter;
             int32_t gyroLastPeriod = intcmp(nowCycles, prevTime);
 
             // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
