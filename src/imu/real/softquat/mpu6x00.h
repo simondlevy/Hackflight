@@ -167,7 +167,7 @@ class Mpu6x00 : public SoftQuatImu {
             return true;
         }
 
-        virtual void begin(void) override
+        virtual void begin(uint32_t clockSpeed) override
         {
             m_spi.setMOSI(m_mosiPin);
             m_spi.setMISO(m_misoPin);
@@ -231,7 +231,7 @@ class Mpu6x00 : public SoftQuatImu {
 
             setClockDivider(calculateSpiDivisor(MAX_SPI_CLK_HZ));
 
-            SoftQuatImu::begin();
+            SoftQuatImu::begin(clockSpeed);
         }
 
         virtual int16_t readRawGyro(uint8_t k) override

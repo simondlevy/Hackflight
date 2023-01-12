@@ -206,9 +206,9 @@ class SoftQuatImu : public RealImu {
             m_accelScale = accelScale / 32768.;
         }
 
-        void begin(void)
+        void begin(uint32_t clockSpeed)
         {
-            RealImu::begin();
+            RealImu::begin(clockSpeed);
         }
 
         auto readGyroDps(void) -> Axes

@@ -689,7 +689,7 @@ class Board {
 
             m_visualizerTask.begin(m_esc, m_receiverTask.receiver);
 
-            m_imu->begin();
+            m_imu->begin(getClockSpeed());
 
             m_esc->begin();
 

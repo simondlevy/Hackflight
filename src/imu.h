@@ -55,7 +55,7 @@ class Imu {
 
         typedef void (*align_fun)(Axes * axes);
 
-        virtual void begin(void) = 0;
+        virtual void begin(uint32_t clockSpeed) = 0;
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 
