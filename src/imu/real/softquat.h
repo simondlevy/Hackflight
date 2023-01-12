@@ -22,15 +22,17 @@
 
 #include "core/axes.h"
 #include "core/clock.h"
+#include "core/filters/pt2.h"
 #include "core/vstate.h"
 #include "imu/real.h"
 
 class SoftQuatImu : public RealImu {
 
+    friend class AccelerometerTask;
+
     private:
 
         // Constants for trig functions
-
         static constexpr float atanPolyCoef1  = 3.14551665884836e-07f;
         static constexpr float atanPolyCoef2  = 0.99997356613987f;
         static constexpr float atanPolyCoef3  = 0.14744007058297684f;
@@ -38,6 +40,10 @@ class SoftQuatImu : public RealImu {
         static constexpr float atanPolyCoef5  = 0.05030176425872175f;
         static constexpr float atanPolyCoef6  = 0.1471039133652469f;
         static constexpr float atanPolyCoef7  = 0.6444640676891548f;
+
+        // Acceleromter params
+        static const uint32_t  ACCEL_SAMPLE_RATE     = 1000;
+        static constexpr float ACCEL_LPF_CUTOFF_FREQ = 10;
 
         class Quaternion {
 
@@ -112,6 +118,15 @@ class SoftQuatImu : public RealImu {
         };
 
         Fusion m_fusionPrev;
+
+        Pt2Filter m_accelFilterX = accelFilterInit();
+        Pt2Filter m_accelFilterY = accelFilterInit();
+        Pt2Filter m_accelFilterZ = accelFilterInit();
+
+        static Pt2Filter accelFilterInit(void)
+        {
+            return Pt2Filter(ACCEL_LPF_CUTOFF_FREQ, 1. / ACCEL_SAMPLE_RATE);
+        }
 
         // http://http.developer.nvidia.com/Cg/acos.html Handbook of
         // Mathematical Functions M. Abramowitz and I.A. Stegun, Ed.
@@ -192,6 +207,13 @@ class SoftQuatImu : public RealImu {
 
         float m_accelScale;
 
+        Axes m_accelAxes;
+
+        auto readAndFilterAccelAxis(Pt2Filter & lpf, const uint8_t k) -> float
+        {
+            return lpf.apply((float)readRawAccel(k));
+        }
+
     protected:
 
         SoftQuatImu(
@@ -238,12 +260,14 @@ class SoftQuatImu : public RealImu {
 
         virtual void updateAccelerometer(void) override
         {
-            const int16_t accelX = readRawAccel(0);
-            const int16_t accelY = readRawAccel(1);
-            const int16_t accelZ = readRawAccel(2);
+            Axes adc = Axes(
+                    readAndFilterAccelAxis(m_accelFilterX, 0),
+                    readAndFilterAccelAxis(m_accelFilterY, 1),
+                    readAndFilterAccelAxis(m_accelFilterZ, 2));
 
-            (void)accelX;
-            (void)accelY;
-            (void)accelZ;
+            m_accelAxes = m_rotateFun(adc);
+
+            // XXX should calibrate too
+
         }
 };

@@ -41,7 +41,7 @@ class RealImu : public Imu {
 
             private:
 
-                float m_oldM;
+                float  m_oldM;
                 float  m_newM;
                 float  m_oldS;
                 float  m_newS;
@@ -84,8 +84,6 @@ class RealImu : public Imu {
             float sum[3];
             Stats stats[3];
         } calibration_t;
-
-        rotateFun_t m_rotateFun;
 
         uint8_t  m_interruptPin;
 
@@ -186,6 +184,8 @@ class RealImu : public Imu {
         gyroAxis_t m_gyroX;
         gyroAxis_t m_gyroY;
         gyroAxis_t m_gyroZ;
+
+        rotateFun_t m_rotateFun;
 
         RealImu(const rotateFun_t rotateFun, const uint16_t gyroScale)
         {

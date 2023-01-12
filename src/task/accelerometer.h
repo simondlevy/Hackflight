@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "imu.h"
+#include "imu/real/softquat.h"
 #include "task.h"
 
 class AccelerometerTask : public Task {
@@ -30,7 +30,7 @@ class AccelerometerTask : public Task {
     public:
 
         AccelerometerTask(void)
-            : Task(ACCELEROMETER, 1000) // Hz
+            : Task(ACCELEROMETER, SoftQuatImu::ACCEL_SAMPLE_RATE)
         {
         }
 
