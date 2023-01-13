@@ -21,11 +21,15 @@
 #include <board/stm32/f/stm32f722.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/mock.h>
-#include <imu/mock.h>
+#include <imu/real/softquat/icm42688.h>
 #include <receiver/mock.h>
 
 #include <vector>
 using namespace std;
+
+// IMU
+static const uint8_t CS_PIN   = PA4;
+static const uint8_t EXTI_PIN = PC4;
 
 static const uint8_t LED_PIN  = PC14;   // orange
 //static const uint8_t LED_PIN  = PC15; // blue
@@ -36,11 +40,17 @@ static MockEsc esc;
 
 static MockReceiver rx;
 
-static MockImu imu;
+Icm42688 imu(CS_PIN, RealImu::rotate0);
 
 static vector<PidController *> pids = {};
 
 static Stm32F722Board board(rx, imu, pids, mixer, esc, LED_PIN);
+
+// IMU interrupt
+static void handleImuInterrupt(void)
+{
+    imu.handleInterrupt(board.getCycleCounter());
+}
 
 void setup(void)
 {
