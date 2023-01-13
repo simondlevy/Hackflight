@@ -136,8 +136,6 @@ class Icm42688 : public SoftQuatImu {
             delay(1);
 
             chipId = readRegister(0x75);
-
-            SoftQuatImu::begin(clockSpeed);
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
