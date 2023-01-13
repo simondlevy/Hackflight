@@ -1,8 +1,6 @@
 /*
    Class definition for ICM42688 IMU using SPI bus
 
-   Adapted from https://github.com/finani/ICM42688
-
    Copyright (c) 2023 Simon D. Levy
 
    This file is part of Hackflight.
@@ -70,7 +68,13 @@ class Icm42688 : public SoftQuatImu {
 
     private:
 
-        static constexpr uint8_t REG_BANK_SEL          = 0x76;
+        static constexpr uint8_t REG_PWR_MGMT0 = 0x4E;
+        static constexpr uint8_t REG_BANK_SEL  = 0x76;
+
+        static const uint8_t PWR_MGMT0_ACCEL_MODE_LN    = (3 << 0);
+        static const uint8_t PWR_MGMT0_GYRO_MODE_LN     = (3 << 2);
+        static const uint8_t PWR_MGMT0_TEMP_DISABLE_OFF = (0 << 5);
+
         static constexpr uint8_t UB0_REG_DEVICE_CONFIG = 0x11;
 
         static const uint32_t MAX_SPI_CLOCK_RATE = 24000000;
@@ -126,13 +130,15 @@ class Icm42688 : public SoftQuatImu {
 
             m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLOCK_RATE));
 
-            /*
-            mpuGyroInit(gyro);
-            gyro->accDataReg = ICM426XX_RA_ACCEL_DATA_X1;
-            gyro->gyroDataReg = ICM426XX_RA_GYRO_DATA_X1;
+            writeRegister(REG_PWR_MGMT0,
+                    PWR_MGMT0_TEMP_DISABLE_OFF |
+                    PWR_MGMT0_ACCEL_MODE_LN |
+                    PWR_MGMT0_GYRO_MODE_LN);
 
-            spiWriteReg(dev, ICM426XX_RA_PWR_MGMT0, ICM426XX_PWR_MGMT0_TEMP_DISABLE_OFF | ICM426XX_PWR_MGMT0_ACCEL_MODE_LN | ICM426XX_PWR_MGMT0_GYRO_MODE_LN);
             delay(15);
+
+            /*
+
 
             // Get desired output data rate
             uint8_t odrConfig;
@@ -145,39 +151,39 @@ class Icm42688 : public SoftQuatImu {
             }
 
             STATIC_ASSERT(INV_FSR_2000DPS == 3, "INV_FSR_2000DPS must be 3 to generate correct value");
-            spiWriteReg(dev, ICM426XX_RA_GYRO_CONFIG0, (3 - INV_FSR_2000DPS) << 5 | (odrConfig & 0x0F));
+            writeRegister(ICM426XX_RA_GYRO_CONFIG0, (3 - INV_FSR_2000DPS) << 5 | (odrConfig & 0x0F));
             delay(15);
 
             STATIC_ASSERT(INV_FSR_16G == 3, "INV_FSR_16G must be 3 to generate correct value");
-            spiWriteReg(dev, ICM426XX_RA_ACCEL_CONFIG0, (3 - INV_FSR_16G) << 5 | (odrConfig & 0x0F));
+            writeRegister(ICM426XX_RA_ACCEL_CONFIG0, (3 - INV_FSR_16G) << 5 | (odrConfig & 0x0F));
             delay(15);
 
             // Configure gyro Anti-Alias Filter (see section 5.3 "ANTI-ALIAS FILTER")
             aafConfig_t aafConfig = getGyroAafConfig();
-            spiWriteReg(dev, ICM426XX_RA_GYRO_CONFIG_STATIC3, aafConfig.delt);
-            spiWriteReg(dev, ICM426XX_RA_GYRO_CONFIG_STATIC4, aafConfig.deltSqr & 0xFF);
-            spiWriteReg(dev, ICM426XX_RA_GYRO_CONFIG_STATIC5, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
+            writeRegister(ICM426XX_RA_GYRO_CONFIG_STATIC3, aafConfig.delt);
+            writeRegister(ICM426XX_RA_GYRO_CONFIG_STATIC4, aafConfig.deltSqr & 0xFF);
+            writeRegister(ICM426XX_RA_GYRO_CONFIG_STATIC5, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
 
             // Configure acc Anti-Alias Filter for 1kHz sample rate (see tasks.c)
             aafConfig = aafLUT[AAF_CONFIG_258HZ];
-            spiWriteReg(dev, ICM426XX_RA_ACCEL_CONFIG_STATIC2, aafConfig.delt << 1);
-            spiWriteReg(dev, ICM426XX_RA_ACCEL_CONFIG_STATIC3, aafConfig.deltSqr & 0xFF);
-            spiWriteReg(dev, ICM426XX_RA_ACCEL_CONFIG_STATIC4, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
+            writeRegister(ICM426XX_RA_ACCEL_CONFIG_STATIC2, aafConfig.delt << 1);
+            writeRegister(ICM426XX_RA_ACCEL_CONFIG_STATIC3, aafConfig.deltSqr & 0xFF);
+            writeRegister(ICM426XX_RA_ACCEL_CONFIG_STATIC4, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
 
             // Configure gyro and acc UI Filters
-            spiWriteReg(dev, ICM426XX_RA_GYRO_ACCEL_CONFIG0, ICM426XX_ACCEL_UI_FILT_BW_LOW_LATENCY | ICM426XX_GYRO_UI_FILT_BW_LOW_LATENCY);
+            writeRegister(ICM426XX_RA_GYRO_ACCEL_CONFIG0, ICM426XX_ACCEL_UI_FILT_BW_LOW_LATENCY | ICM426XX_GYRO_UI_FILT_BW_LOW_LATENCY);
 
-            spiWriteReg(dev, ICM426XX_RA_INT_CONFIG, ICM426XX_INT1_MODE_PULSED | ICM426XX_INT1_DRIVE_CIRCUIT_PP | ICM426XX_INT1_POLARITY_ACTIVE_HIGH);
-            spiWriteReg(dev, ICM426XX_RA_INT_CONFIG0, ICM426XX_UI_DRDY_INT_CLEAR_ON_SBR);
+            writeRegister(ICM426XX_RA_INT_CONFIG, ICM426XX_INT1_MODE_PULSED | ICM426XX_INT1_DRIVE_CIRCUIT_PP | ICM426XX_INT1_POLARITY_ACTIVE_HIGH);
+            writeRegister(ICM426XX_RA_INT_CONFIG0, ICM426XX_UI_DRDY_INT_CLEAR_ON_SBR);
 
-            spiWriteReg(dev, ICM426XX_RA_INT_SOURCE0, ICM426XX_UI_DRDY_INT1_EN_ENABLED);
+            writeRegister(ICM426XX_RA_INT_SOURCE0, ICM426XX_UI_DRDY_INT1_EN_ENABLED);
 
             uint8_t intConfig1Value = spiReadRegMsk(dev, ICM426XX_RA_INT_CONFIG1);
             // Datasheet says: "User should change setting to 0 from default setting of 1, for proper INT1 and INT2 pin operation"
             intConfig1Value &= ~(1 << ICM426XX_INT_ASYNC_RESET_BIT);
             intConfig1Value |= (ICM426XX_INT_TPULSE_DURATION_8 | ICM426XX_INT_TDEASSERT_DISABLED);
 
-            spiWriteReg(dev, ICM426XX_RA_INT_CONFIG1, intConfig1Value);*/
+            writeRegister(ICM426XX_RA_INT_CONFIG1, intConfig1Value);*/
 
         }
 
