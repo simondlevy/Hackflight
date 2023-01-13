@@ -1,7 +1,7 @@
 /*
-   Class definition for MPU6000, MPU6500 IMUs using SPI bus
+   Class definition for ICM42688 IMU using SPI bus
 
-   Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2023 Simon D. Levy
 
    This file is part of Hackflight.
 
