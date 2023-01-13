@@ -73,7 +73,7 @@ class Icm42688 : public SoftQuatImu {
         static constexpr uint8_t REG_BANK_SEL          = 0x76;
         static constexpr uint8_t UB0_REG_DEVICE_CONFIG = 0x11;
 
-        SPIClass * m_spi;
+        SPIClass m_spi;
 
         // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
         // Sample rate = 50Hz    Fsample= 1Khz/(19+1) = 50Hz     
@@ -109,8 +109,8 @@ class Icm42688 : public SoftQuatImu {
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
             digitalWrite(m_csPin, LOW);
-            m_spi->transfer(reg);
-            m_spi->transfer(val);
+            m_spi.transfer(reg);
+            m_spi.transfer(val);
             digitalWrite(m_csPin, HIGH);
         }
 
@@ -119,7 +119,7 @@ class Icm42688 : public SoftQuatImu {
         {
             digitalWrite(m_csPin, LOW);
             buffer[0] = addr | 0x80;
-            m_spi->transfer(buffer, count+1);
+            m_spi.transfer(buffer, count+1);
             digitalWrite(m_csPin, HIGH);
         }
 
@@ -132,12 +132,15 @@ class Icm42688 : public SoftQuatImu {
 
         void setClockDivider(uint32_t divider)
         {
-            m_spi->setClockDivider(divider);
+            m_spi.setClockDivider(divider);
         }
 
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
+        uint8_t m_mosiPin;
+        uint8_t m_misoPin;
+        uint8_t m_sclkPin;
         uint8_t m_csPin;
 
         uint16_t calculateSpiDivisor(const uint32_t clockSpeed, const uint32_t freq)
@@ -167,7 +170,7 @@ class Icm42688 : public SoftQuatImu {
             pinMode(m_csPin, OUTPUT);
             pinMode(m_csPin, OUTPUT);
 
-            m_spi->begin();
+            m_spi.begin();
 
             writeRegister(REG_BANK_SEL, 0);
 
@@ -197,7 +200,9 @@ class Icm42688 : public SoftQuatImu {
     public:
 
         Icm42688(
-                SPIClass & spi,
+                const uint8_t mosiPin,
+                const uint8_t misoPin,
+                const uint8_t sclkPin,
                 const uint8_t csPin,
                 const rotateFun_t rotateFun,
                 const uint8_t sampleRateDivisor = 19,
@@ -205,8 +210,8 @@ class Icm42688 : public SoftQuatImu {
                 const accelScale_e accelScale = ACCEL_2G)
             : SoftQuatImu(rotateFun, gyroScaleToInt(gyroScale), accelScaleToInt(accelScale))
         {
-            m_spi = &spi;
-
+            m_mosiPin = mosiPin;
+            m_misoPin = misoPin;
             m_csPin = csPin;
             m_sampleRateDivisor = sampleRateDivisor;
             m_gyroScale = gyroScale;
