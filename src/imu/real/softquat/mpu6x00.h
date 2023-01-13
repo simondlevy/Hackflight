@@ -74,10 +74,6 @@ class Mpu6x00 : public SoftQuatImu {
         // 20 MHz max SPI frequency
         static const uint32_t MAX_SPI_CLK_HZ = 20000000;
 
-        // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
-        // Sample rate = 50Hz    Fsample= 1Khz/(19+1) = 50Hz     
-        uint8_t m_sampleRateDivisor;
-
         gyroScale_e m_gyroScale;
 
         accelScale_e m_accelScale;
@@ -87,8 +83,6 @@ class Mpu6x00 : public SoftQuatImu {
         // Enough room for seven two-byte integers (gyro XYZ, temperature,
         // accel XYZ) plus one byte for SPI transfer
         uint8_t m_buffer[15];
-
-        SPIClass m_spi;
 
         int16_t getValue(const uint8_t offset, const uint8_t index)
         {
@@ -119,42 +113,9 @@ class Mpu6x00 : public SoftQuatImu {
             return n / 32768.0;
         }
 
-        void writeRegister(const uint8_t reg, const uint8_t val)
-        {
-            digitalWrite(m_csPin, LOW);
-            m_spi.transfer(reg);
-            m_spi.transfer(val);
-            digitalWrite(m_csPin, HIGH);
-        }
-
-        void readRegisters(
-                const uint8_t addr, uint8_t * buffer, const uint8_t count)
-        {
-            digitalWrite(m_csPin, LOW);
-            buffer[0] = addr | 0x80;
-            m_spi.transfer(buffer, count+1);
-            digitalWrite(m_csPin, HIGH);
-        }
-
-        uint8_t readRegister(const uint8_t addr)
-        {
-            uint8_t buffer[2] = {};
-            readRegisters(addr, buffer, 1);
-            return buffer[1];
-        }
-
-        void setClockDivider(uint32_t divider)
-        {
-            m_spi.setClockDivider(divider);
-        }
 
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
-
-        uint8_t m_mosiPin;
-        uint8_t m_misoPin;
-        uint8_t m_sclkPin;
-        uint8_t m_csPin;
 
         uint16_t calculateSpiDivisor(const uint32_t clockSpeed, const uint32_t freq)
         {
@@ -180,15 +141,11 @@ class Mpu6x00 : public SoftQuatImu {
 
         virtual void begin(uint32_t clockSpeed) override
         {
-            m_spi.setMOSI(m_mosiPin);
-            m_spi.setMISO(m_misoPin);
-            m_spi.setSCLK(m_sclkPin);
+            SoftQuatImu::begin(clockSpeed);
 
-            m_spi.begin();
             m_spi.setBitOrder(MSBFIRST);
             m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_INIT_CLK_HZ));
             m_spi.setDataMode(SPI_MODE3);
-            pinMode(m_csPin, OUTPUT);
 
             m_shortPeriod = clockSpeed / 1000000 * SHORT_THRESHOLD;
 
@@ -239,7 +196,6 @@ class Mpu6x00 : public SoftQuatImu {
 
             setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLK_HZ));
 
-            SoftQuatImu::begin(clockSpeed);
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
@@ -260,16 +216,17 @@ class Mpu6x00 : public SoftQuatImu {
                 const uint8_t sclkPin,
                 const uint8_t csPin,
                 const rotateFun_t rotateFun,
-                const uint8_t sampleRateDivisor = 19,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
-            : SoftQuatImu(rotateFun, gyroScaleToInt(gyroScale), accelScaleToInt(accelScale))
+            : SoftQuatImu(
+                    mosiPin,
+                    misoPin,
+                    sclkPin,
+                    csPin,
+                    rotateFun,
+                    gyroScaleToInt(gyroScale),
+                    accelScaleToInt(accelScale))
         {
-            m_mosiPin = mosiPin;
-            m_misoPin = misoPin;
-            m_sclkPin = sclkPin;
-            m_csPin = csPin;
-            m_sampleRateDivisor = sampleRateDivisor;
             m_gyroScale = gyroScale;
             m_accelScale = accelScale;
         }

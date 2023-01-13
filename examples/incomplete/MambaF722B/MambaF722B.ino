@@ -65,4 +65,6 @@ void setup(void)
 void loop(void)
 {
     board.step();
+
+    Board::printf("chip id=0x%02X\n", imu.chipId);
 }

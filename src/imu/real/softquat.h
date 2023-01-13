@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <SPI.h>
+
 #include <string.h>
 
 #include "core/axes.h"
@@ -123,6 +125,11 @@ class SoftQuatImu : public RealImu {
         Pt2Filter m_accelFilterY = accelFilterInit();
         Pt2Filter m_accelFilterZ = accelFilterInit();
 
+        uint8_t m_misoPin;
+        uint8_t m_mosiPin;
+        uint8_t m_sclkPin;
+        uint8_t m_csPin;
+
         static Pt2Filter accelFilterInit(void)
         {
             return Pt2Filter(ACCEL_LPF_CUTOFF_FREQ, 1. / ACCEL_SAMPLE_RATE);
@@ -216,12 +223,23 @@ class SoftQuatImu : public RealImu {
 
     protected:
 
+        SPIClass m_spi;
+
         SoftQuatImu(
+                const uint8_t mosiPin,
+                const uint8_t misoPin,
+                const uint8_t sclkPin,
+                const uint8_t csPin,
                 const rotateFun_t rotateFun,
                 const uint16_t gyroScale,
                 const uint16_t accelScale)
             : RealImu(rotateFun, gyroScale)
         {
+            m_mosiPin = mosiPin;
+            m_misoPin = misoPin;
+            m_sclkPin = sclkPin;
+            m_csPin = csPin;
+
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
 
@@ -230,6 +248,13 @@ class SoftQuatImu : public RealImu {
 
         void begin(uint32_t clockSpeed)
         {
+            m_spi.setMOSI(m_mosiPin);
+            m_spi.setMISO(m_misoPin);
+            m_spi.setSCLK(m_sclkPin);
+            m_spi.begin();
+
+            pinMode(m_csPin, OUTPUT);
+
             RealImu::begin(clockSpeed);
         }
 
@@ -269,5 +294,34 @@ class SoftQuatImu : public RealImu {
 
             // XXX should calibrate too
 
+        }
+
+        void writeRegister(const uint8_t reg, const uint8_t val)
+        {
+            digitalWrite(m_csPin, LOW);
+            m_spi.transfer(reg);
+            m_spi.transfer(val);
+            digitalWrite(m_csPin, HIGH);
+        }
+
+        void readRegisters(
+                const uint8_t addr, uint8_t * buffer, const uint8_t count)
+        {
+            digitalWrite(m_csPin, LOW);
+            buffer[0] = addr | 0x80;
+            m_spi.transfer(buffer, count+1);
+            digitalWrite(m_csPin, HIGH);
+        }
+
+        uint8_t readRegister(const uint8_t addr)
+        {
+            uint8_t buffer[2] = {};
+            readRegisters(addr, buffer, 1);
+            return buffer[1];
+        }
+
+        void setClockDivider(uint32_t divider)
+        {
+            m_spi.setClockDivider(divider);
         }
 };
