@@ -177,9 +177,4 @@ class Icm42688 : public SoftQuatImu {
             m_accelScale = accelScale;
         }
 
-        void handleInterrupt(uint32_t cycleCounter)
-        {
-            (void)cycleCounter;
-        }
-
 }; // class Icm42688
