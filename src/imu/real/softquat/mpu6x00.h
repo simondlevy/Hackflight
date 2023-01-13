@@ -67,18 +67,12 @@ class Mpu6x00 : public SoftQuatImu {
         static const uint8_t BIT_I2C_IF_DIS       = 0x10;
         static const uint8_t BIT_H_RESET          = 0x80;
 
-        // Any interrupt interval less than this will be recognised as the
-        // short interval of ~79us
-        static const uint8_t SHORT_THRESHOLD = 82 ;
-
         // 20 MHz max SPI frequency
         static const uint32_t MAX_SPI_CLK_HZ = 20000000;
 
         gyroScale_e m_gyroScale;
 
         accelScale_e m_accelScale;
-
-        int32_t m_shortPeriod;
 
         // Enough room for seven two-byte integers (gyro XYZ, temperature,
         // accel XYZ) plus one byte for SPI transfer
@@ -146,8 +140,6 @@ class Mpu6x00 : public SoftQuatImu {
             m_spi.setBitOrder(MSBFIRST);
             m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_INIT_CLK_HZ));
             m_spi.setDataMode(SPI_MODE3);
-
-            m_shortPeriod = clockSpeed / 1000000 * SHORT_THRESHOLD;
 
             // Chip reset
             writeRegister(REG_PWR_MGMT_1, BIT_H_RESET);
@@ -229,27 +221,6 @@ class Mpu6x00 : public SoftQuatImu {
         {
             m_gyroScale = gyroScale;
             m_accelScale = accelScale;
-        }
-
-        void handleInterrupt(uint32_t cycleCounter)
-        {
-            static uint32_t prevTime;
-
-            // Ideally we'd use a time to capture such information, but
-            // unfortunately the port used for EXTI interrupt does not have an
-            // associated timer
-            uint32_t nowCycles = cycleCounter;
-            int32_t gyroLastPeriod = intcmp(nowCycles, prevTime);
-
-            // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
-            if ((m_shortPeriod == 0) || (gyroLastPeriod < m_shortPeriod)) {
-
-                m_gyroSyncTime = prevTime;
-            }
-
-            prevTime = nowCycles;
-
-            RealImu::handleInterrupt();
         }
 
 }; // class Mpu6x00

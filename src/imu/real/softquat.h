@@ -47,6 +47,10 @@ class SoftQuatImu : public RealImu {
         static const uint32_t  ACCEL_SAMPLE_RATE     = 1000;
         static constexpr float ACCEL_LPF_CUTOFF_FREQ = 10;
 
+        // Any interrupt interval less than this will be recognised as the
+        // short interval of ~79us
+        static const uint8_t SHORT_THRESHOLD = 82 ;
+
         class Quaternion {
 
             public:
@@ -221,6 +225,8 @@ class SoftQuatImu : public RealImu {
             return lpf.apply((float)readRawAccel(k));
         }
 
+        int32_t m_shortPeriod;
+
     protected:
 
         SPIClass m_spi;
@@ -254,6 +260,8 @@ class SoftQuatImu : public RealImu {
             m_spi.begin();
 
             pinMode(m_csPin, OUTPUT);
+
+            m_shortPeriod = clockSpeed / 1000000 * SHORT_THRESHOLD;
 
             RealImu::begin(clockSpeed);
         }
@@ -323,5 +331,28 @@ class SoftQuatImu : public RealImu {
         void setClockDivider(uint32_t divider)
         {
             m_spi.setClockDivider(divider);
+        }
+
+    public:
+
+        void handleInterrupt(uint32_t cycleCounter)
+        {
+            static uint32_t prevTime;
+
+            // Ideally we'd use a time to capture such information, but
+            // unfortunately the port used for EXTI interrupt does not have an
+            // associated timer
+            uint32_t nowCycles = cycleCounter;
+            int32_t gyroLastPeriod = intcmp(nowCycles, prevTime);
+
+            // This detects the short (~79us) EXTI interval of an MPU6xxx gyro
+            if ((m_shortPeriod == 0) || (gyroLastPeriod < m_shortPeriod)) {
+
+                m_gyroSyncTime = prevTime;
+            }
+
+            prevTime = nowCycles;
+
+            RealImu::handleInterrupt();
         }
 };
