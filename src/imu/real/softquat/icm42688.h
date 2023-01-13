@@ -1,6 +1,8 @@
 /*
    Class definition for ICM42688 IMU using SPI bus
 
+   Adapted from https://github.com/finani/ICM42688
+
    Copyright (c) 2023 Simon D. Levy
 
    This file is part of Hackflight.
@@ -67,6 +69,9 @@ class Icm42688 : public SoftQuatImu {
         };
 
     private:
+
+        static constexpr uint8_t REG_BANK_SEL          = 0x76;
+        static constexpr uint8_t UB0_REG_DEVICE_CONFIG = 0x11;
 
         SPIClass * m_spi;
 
@@ -163,6 +168,12 @@ class Icm42688 : public SoftQuatImu {
             pinMode(m_csPin, OUTPUT);
 
             m_spi->begin();
+
+            writeRegister(REG_BANK_SEL, 0);
+
+            writeRegister(UB0_REG_DEVICE_CONFIG, 0x01);
+
+            delay(1);
 
             SoftQuatImu::begin(clockSpeed);
         }

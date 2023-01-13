@@ -59,7 +59,6 @@ class Mpu6x00 : public SoftQuatImu {
         static const uint8_t REG_USER_CTRL     = 0x6A;
         static const uint8_t REG_PWR_MGMT_1    = 0x6B;
         static const uint8_t REG_PWR_MGMT_2    = 0x6C;
-        static const uint8_t REG_WHO_AM_I      = 0x75;
 
         // Configuration bits  
         static const uint8_t BIT_RAW_RDY_EN       = 0x01;
@@ -196,9 +195,6 @@ class Mpu6x00 : public SoftQuatImu {
             // Chip reset
             writeRegister(REG_PWR_MGMT_1, BIT_H_RESET);
             delay(100);
-
-            // Check ID
-            readRegister(REG_WHO_AM_I);
 
             // Clock Source PPL with Z axis gyro reference
             writeRegister(REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
