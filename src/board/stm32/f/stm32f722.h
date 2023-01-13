@@ -18,11 +18,11 @@
 
 #include "board/stm32/stm32f.h"
 
-class Stm32F745Board : public Stm32FBoard {
+class Stm32F722Board : public Stm32FBoard {
 
     public:
 
-        Stm32F745Board(
+        Stm32F722Board(
                 Receiver & receiver,
                 Imu & imu,
                 vector<PidController *> & pids,
@@ -33,4 +33,4 @@ class Stm32F745Board : public Stm32FBoard {
         {
         }
 
-}; // class Stm32F745Board
+}; // class Stm32F722Board

@@ -1,11 +1,11 @@
-SKETCH = MambaF411Dsmx
+SKETCH = MambaF722B
 
-FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
+FQBN = STMicroelectronics:stm32:GenF7:pnum=GENERIC_F722RETX,usb=CDCgen
 
 PORT = /dev/ttyACM0
 
 OBJ = $(PWD)/obj
-LIB = ../../
+LIB = ../../..
 DFU = $(OBJ)/$(SKETCH).dfu 
 HEX = $(OBJ)/$(SKETCH).ino.hex
 SRC = $(LIB)/src

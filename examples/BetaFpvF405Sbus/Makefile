@@ -14,7 +14,7 @@ SRC = $(LIB)/src
 all: $(HEX)
 
 $(DFU): $(HEX)
-	../../utils/dfuse-pack.py -i $(HEX) $(DFU)
+	$(LIB)/utils/dfuse-pack.py -i $(HEX) $(DFU)
 
 $(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
 	arduino-cli compile --fqbn $(FQBN) --libraries $(LIB) --build-path $(OBJ) --warnings "all"

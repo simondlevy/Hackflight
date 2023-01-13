@@ -24,8 +24,9 @@ class MockImu : public Imu {
 
     protected:
 
-        virtual void begin(void) override 
+        virtual void begin(uint32_t clockSpeed) override 
         {
+            (void)clockSpeed;
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
