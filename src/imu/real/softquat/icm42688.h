@@ -73,6 +73,8 @@ class Icm42688 : public SoftQuatImu {
         static constexpr uint8_t REG_BANK_SEL          = 0x76;
         static constexpr uint8_t UB0_REG_DEVICE_CONFIG = 0x11;
 
+        static const uint32_t MAX_SPI_CLOCK_RATE = 24000000;
+
         gyroScale_e m_gyroScale;
 
         accelScale_e m_accelScale;
@@ -103,19 +105,6 @@ class Icm42688 : public SoftQuatImu {
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
-        uint16_t calculateSpiDivisor(const uint32_t clockSpeed, const uint32_t freq)
-        {
-            uint32_t clk = clockSpeed / 2;
-
-            uint16_t divisor = 2;
-
-            clk >>= 1;
-
-            for (; (clk > freq) && (divisor < 256); divisor <<= 1, clk >>= 1);
-
-            return divisor;
-        }
-
         virtual bool gyroIsReady(void) override
         {
 
@@ -135,7 +124,61 @@ class Icm42688 : public SoftQuatImu {
 
             delay(1);
 
-            chipId = readRegister(0x75);
+            m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLOCK_RATE));
+
+            /*
+            mpuGyroInit(gyro);
+            gyro->accDataReg = ICM426XX_RA_ACCEL_DATA_X1;
+            gyro->gyroDataReg = ICM426XX_RA_GYRO_DATA_X1;
+
+            spiWriteReg(dev, ICM426XX_RA_PWR_MGMT0, ICM426XX_PWR_MGMT0_TEMP_DISABLE_OFF | ICM426XX_PWR_MGMT0_ACCEL_MODE_LN | ICM426XX_PWR_MGMT0_GYRO_MODE_LN);
+            delay(15);
+
+            // Get desired output data rate
+            uint8_t odrConfig;
+            const unsigned decim = llog2(gyro->mpuDividerDrops + 1);
+            if (gyro->gyroRateKHz && decim < ODR_CONFIG_COUNT) {
+                odrConfig = odrLUT[decim];
+            } else {
+                odrConfig = odrLUT[ODR_CONFIG_1K];
+                gyro->gyroRateKHz = GYRO_RATE_1_kHz;
+            }
+
+            STATIC_ASSERT(INV_FSR_2000DPS == 3, "INV_FSR_2000DPS must be 3 to generate correct value");
+            spiWriteReg(dev, ICM426XX_RA_GYRO_CONFIG0, (3 - INV_FSR_2000DPS) << 5 | (odrConfig & 0x0F));
+            delay(15);
+
+            STATIC_ASSERT(INV_FSR_16G == 3, "INV_FSR_16G must be 3 to generate correct value");
+            spiWriteReg(dev, ICM426XX_RA_ACCEL_CONFIG0, (3 - INV_FSR_16G) << 5 | (odrConfig & 0x0F));
+            delay(15);
+
+            // Configure gyro Anti-Alias Filter (see section 5.3 "ANTI-ALIAS FILTER")
+            aafConfig_t aafConfig = getGyroAafConfig();
+            spiWriteReg(dev, ICM426XX_RA_GYRO_CONFIG_STATIC3, aafConfig.delt);
+            spiWriteReg(dev, ICM426XX_RA_GYRO_CONFIG_STATIC4, aafConfig.deltSqr & 0xFF);
+            spiWriteReg(dev, ICM426XX_RA_GYRO_CONFIG_STATIC5, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
+
+            // Configure acc Anti-Alias Filter for 1kHz sample rate (see tasks.c)
+            aafConfig = aafLUT[AAF_CONFIG_258HZ];
+            spiWriteReg(dev, ICM426XX_RA_ACCEL_CONFIG_STATIC2, aafConfig.delt << 1);
+            spiWriteReg(dev, ICM426XX_RA_ACCEL_CONFIG_STATIC3, aafConfig.deltSqr & 0xFF);
+            spiWriteReg(dev, ICM426XX_RA_ACCEL_CONFIG_STATIC4, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
+
+            // Configure gyro and acc UI Filters
+            spiWriteReg(dev, ICM426XX_RA_GYRO_ACCEL_CONFIG0, ICM426XX_ACCEL_UI_FILT_BW_LOW_LATENCY | ICM426XX_GYRO_UI_FILT_BW_LOW_LATENCY);
+
+            spiWriteReg(dev, ICM426XX_RA_INT_CONFIG, ICM426XX_INT1_MODE_PULSED | ICM426XX_INT1_DRIVE_CIRCUIT_PP | ICM426XX_INT1_POLARITY_ACTIVE_HIGH);
+            spiWriteReg(dev, ICM426XX_RA_INT_CONFIG0, ICM426XX_UI_DRDY_INT_CLEAR_ON_SBR);
+
+            spiWriteReg(dev, ICM426XX_RA_INT_SOURCE0, ICM426XX_UI_DRDY_INT1_EN_ENABLED);
+
+            uint8_t intConfig1Value = spiReadRegMsk(dev, ICM426XX_RA_INT_CONFIG1);
+            // Datasheet says: "User should change setting to 0 from default setting of 1, for proper INT1 and INT2 pin operation"
+            intConfig1Value &= ~(1 << ICM426XX_INT_ASYNC_RESET_BIT);
+            intConfig1Value |= (ICM426XX_INT_TPULSE_DURATION_8 | ICM426XX_INT_TDEASSERT_DISABLED);
+
+            spiWriteReg(dev, ICM426XX_RA_INT_CONFIG1, intConfig1Value);*/
+
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
@@ -151,8 +194,6 @@ class Icm42688 : public SoftQuatImu {
         }
 
     public:
-
-        uint8_t chipId;
 
         Icm42688(
                 const uint8_t mosiPin,
@@ -170,9 +211,9 @@ class Icm42688 : public SoftQuatImu {
                     rotateFun,
                     gyroScaleToInt(gyroScale),
                     accelScaleToInt(accelScale))
-        {
-            m_gyroScale = gyroScale;
-            m_accelScale = accelScale;
-        }
+    {
+        m_gyroScale = gyroScale;
+        m_accelScale = accelScale;
+    }
 
 }; // class Icm42688

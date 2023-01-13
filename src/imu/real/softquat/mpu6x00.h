@@ -111,19 +111,6 @@ class Mpu6x00 : public SoftQuatImu {
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
-        uint16_t calculateSpiDivisor(const uint32_t clockSpeed, const uint32_t freq)
-        {
-            uint32_t clk = clockSpeed / 2;
-
-            uint16_t divisor = 2;
-
-            clk >>= 1;
-
-            for (; (clk > freq) && (divisor < 256); divisor <<= 1, clk >>= 1);
-
-            return divisor;
-        }
-
         virtual bool gyroIsReady(void) override
         {
 
