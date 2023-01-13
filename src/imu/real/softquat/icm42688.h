@@ -175,6 +175,10 @@ class Icm42688 : public SoftQuatImu {
 
             delay(1);
 
+            while (true) {
+                Serial.println(readRegister(0x75), HEX);
+            }
+
             SoftQuatImu::begin(clockSpeed);
         }
 
