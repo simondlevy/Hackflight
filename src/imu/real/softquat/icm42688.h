@@ -68,7 +68,7 @@ class Icm42688 : public SoftQuatImu {
 
     private:
 
-        SPIClass m_spi;
+        SPIClass * m_spi;
 
         // Sample rate = 200Hz    Fsample= 1Khz/(4+1) = 200Hz     
         // Sample rate = 50Hz    Fsample= 1Khz/(19+1) = 50Hz     
@@ -104,8 +104,8 @@ class Icm42688 : public SoftQuatImu {
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
             digitalWrite(m_csPin, LOW);
-            m_spi.transfer(reg);
-            m_spi.transfer(val);
+            m_spi->transfer(reg);
+            m_spi->transfer(val);
             digitalWrite(m_csPin, HIGH);
         }
 
@@ -114,7 +114,7 @@ class Icm42688 : public SoftQuatImu {
         {
             digitalWrite(m_csPin, LOW);
             buffer[0] = addr | 0x80;
-            m_spi.transfer(buffer, count+1);
+            m_spi->transfer(buffer, count+1);
             digitalWrite(m_csPin, HIGH);
         }
 
@@ -127,7 +127,7 @@ class Icm42688 : public SoftQuatImu {
 
         void setClockDivider(uint32_t divider)
         {
-            m_spi.setClockDivider(divider);
+            m_spi->setClockDivider(divider);
         }
 
         // 1 MHz max SPI frequency for initialisation
@@ -159,6 +159,11 @@ class Icm42688 : public SoftQuatImu {
 
         virtual void begin(uint32_t clockSpeed) override
         {
+            pinMode(m_csPin, OUTPUT);
+            pinMode(m_csPin, OUTPUT);
+
+            m_spi->begin();
+
             SoftQuatImu::begin(clockSpeed);
         }
 
@@ -177,6 +182,7 @@ class Icm42688 : public SoftQuatImu {
     public:
 
         Icm42688(
+                SPIClass & spi,
                 const uint8_t csPin,
                 const rotateFun_t rotateFun,
                 const uint8_t sampleRateDivisor = 19,
@@ -184,6 +190,8 @@ class Icm42688 : public SoftQuatImu {
                 const accelScale_e accelScale = ACCEL_2G)
             : SoftQuatImu(rotateFun, gyroScaleToInt(gyroScale), accelScaleToInt(accelScale))
         {
+            m_spi = &spi;
+
             m_csPin = csPin;
             m_sampleRateDivisor = sampleRateDivisor;
             m_gyroScale = gyroScale;

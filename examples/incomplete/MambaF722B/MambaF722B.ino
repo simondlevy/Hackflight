@@ -17,6 +17,8 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <SPI.h>
+
 #include <hackflight.h>
 #include <board/stm32/f/stm32f722.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
@@ -40,7 +42,7 @@ static MockEsc esc;
 
 static MockReceiver rx;
 
-Icm42688 imu(CS_PIN, RealImu::rotate0);
+Icm42688 imu(SPI, CS_PIN, RealImu::rotate0);
 
 static vector<PidController *> pids = {};
 
