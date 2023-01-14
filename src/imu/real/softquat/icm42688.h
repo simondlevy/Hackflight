@@ -40,10 +40,10 @@ class Icm42688 : public SoftQuatImu {
 
         typedef enum {
 
-            ACCEL_16G,
+            ACCEL_2G,
             ACCEL_4G,  
             ACCEL_8G,  
-            ACCEL_2G
+            ACCEL_16G
 
         } accelScale_e;
 
@@ -59,10 +59,10 @@ class Icm42688 : public SoftQuatImu {
     private:
 
         // Registers
-        static const uint8_t REG_PWR_MGMT0    = 0x4E;
-        static const uint8_t REG_GYRO_CONFIG0 = 0x4F;
-        static const uint8_t REG_BANK_SEL     = 0x76;
-
+        static const uint8_t REG_PWR_MGMT0     = 0x4E;
+        static const uint8_t REG_GYRO_CONFIG0  = 0x4F;
+        static const uint8_t REG_ACCEL_CONFIG0 = 0x50;
+        static const uint8_t REG_BANK_SEL      = 0x76;
 
         static const uint8_t PWR_MGMT0_ACCEL_MODE_LN    = (3 << 0);
         static const uint8_t PWR_MGMT0_GYRO_MODE_LN     = (3 << 2);
@@ -132,36 +132,36 @@ class Icm42688 : public SoftQuatImu {
             writeRegister(REG_GYRO_CONFIG0, (3 - GYRO_2000DPS) << 5 | (m_odr & 0x0F));
             delay(15);
 
-            /*
-            writeRegister(ICM426XX_RA_ACCEL_CONFIG0, (3 - INV_FSR_16G) << 5 | (odrConfig & 0x0F));
+            writeRegister(REG_ACCEL_CONFIG0, (3 - ACCEL_16G) << 5 | (m_odr & 0x0F));
             delay(15);
 
+            /*
             // Configure gyro Anti-Alias Filter (see section 5.3 "ANTI-ALIAS FILTER")
             aafConfig_t aafConfig = getGyroAafConfig();
-            writeRegister(ICM426XX_RA_GYRO_CONFIG_STATIC3, aafConfig.delt);
-            writeRegister(ICM426XX_RA_GYRO_CONFIG_STATIC4, aafConfig.deltSqr & 0xFF);
-            writeRegister(ICM426XX_RA_GYRO_CONFIG_STATIC5, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
+            writeRegister(REG_GYRO_CONFIG_STATIC3, aafConfig.delt);
+            writeRegister(REG_GYRO_CONFIG_STATIC4, aafConfig.deltSqr & 0xFF);
+            writeRegister(REG_GYRO_CONFIG_STATIC5, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
 
             // Configure acc Anti-Alias Filter for 1kHz sample rate (see tasks.c)
             aafConfig = aafLUT[AAF_CONFIG_258HZ];
-            writeRegister(ICM426XX_RA_ACCEL_CONFIG_STATIC2, aafConfig.delt << 1);
-            writeRegister(ICM426XX_RA_ACCEL_CONFIG_STATIC3, aafConfig.deltSqr & 0xFF);
-            writeRegister(ICM426XX_RA_ACCEL_CONFIG_STATIC4, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
+            writeRegister(REG_ACCEL_CONFIG_STATIC2, aafConfig.delt << 1);
+            writeRegister(REG_ACCEL_CONFIG_STATIC3, aafConfig.deltSqr & 0xFF);
+            writeRegister(REG_ACCEL_CONFIG_STATIC4, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
 
             // Configure gyro and acc UI Filters
-            writeRegister(ICM426XX_RA_GYRO_ACCEL_CONFIG0, ICM426XX_ACCEL_UI_FILT_BW_LOW_LATENCY | ICM426XX_GYRO_UI_FILT_BW_LOW_LATENCY);
+            writeRegister(REG_GYRO_ACCEL_CONFIG0, ICM426XX_ACCEL_UI_FILT_BW_LOW_LATENCY | ICM426XX_GYRO_UI_FILT_BW_LOW_LATENCY);
 
-            writeRegister(ICM426XX_RA_INT_CONFIG, ICM426XX_INT1_MODE_PULSED | ICM426XX_INT1_DRIVE_CIRCUIT_PP | ICM426XX_INT1_POLARITY_ACTIVE_HIGH);
-            writeRegister(ICM426XX_RA_INT_CONFIG0, ICM426XX_UI_DRDY_INT_CLEAR_ON_SBR);
+            writeRegister(REG_INT_CONFIG, ICM426XX_INT1_MODE_PULSED | ICM426XX_INT1_DRIVE_CIRCUIT_PP | ICM426XX_INT1_POLARITY_ACTIVE_HIGH);
+            writeRegister(REG_INT_CONFIG0, ICM426XX_UI_DRDY_INT_CLEAR_ON_SBR);
 
-            writeRegister(ICM426XX_RA_INT_SOURCE0, ICM426XX_UI_DRDY_INT1_EN_ENABLED);
+            writeRegister(REG_INT_SOURCE0, ICM426XX_UI_DRDY_INT1_EN_ENABLED);
 
-            uint8_t intConfig1Value = spiReadRegMsk(dev, ICM426XX_RA_INT_CONFIG1);
+            uint8_t intConfig1Value = spiReadRegMsk(dev, REG_INT_CONFIG1);
             // Datasheet says: "User should change setting to 0 from default setting of 1, for proper INT1 and INT2 pin operation"
             intConfig1Value &= ~(1 << ICM426XX_INT_ASYNC_RESET_BIT);
             intConfig1Value |= (ICM426XX_INT_TPULSE_DURATION_8 | ICM426XX_INT_TDEASSERT_DISABLED);
 
-            writeRegister(ICM426XX_RA_INT_CONFIG1, intConfig1Value);*/
+            writeRegister(REG_INT_CONFIG1, intConfig1Value);*/
 
         }
 
