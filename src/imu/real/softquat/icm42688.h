@@ -71,9 +71,14 @@ class Icm42688 : public SoftQuatImu {
         static const uint8_t REG_GYRO_CONFIG_STATIC4 = 0x0D;        
         static const uint8_t REG_GYRO_CONFIG_STATIC5 = 0x0E;
 
-        static const uint8_t PWR_MGMT0_ACCEL_MODE_LN    = (3 << 0);
-        static const uint8_t PWR_MGMT0_GYRO_MODE_LN     = (3 << 2);
-        static const uint8_t PWR_MGMT0_TEMP_DISABLE_OFF = (0 << 5);
+        static const uint8_t REG_GYRO_ACCEL_CONFIG0 = 0x52;
+
+        static const uint8_t PWR_MGMT0_ACCEL_MODE_LN    = 3 << 0;
+        static const uint8_t PWR_MGMT0_GYRO_MODE_LN     = 3 << 2;
+        static const uint8_t PWR_MGMT0_TEMP_DISABLE_OFF = 0 << 5;
+
+        static const uint8_t ACCEL_UI_FILT_BW_LOW_LATENCY = 14 << 4;
+        static const uint8_t GYRO_UI_FILT_BW_LOW_LATENCY  = 14 << 0;
 
         static constexpr uint8_t UB0_REG_DEVICE_CONFIG = 0x11;
 
@@ -155,19 +160,20 @@ class Icm42688 : public SoftQuatImu {
             writeRegister(REG_ACCEL_CONFIG_STATIC3, deltSqr & 0xFF);
             writeRegister(REG_ACCEL_CONFIG_STATIC4, (deltSqr >> 8) | (m_antiAliasBitshift << 4));
 
-            /*
             // Configure gyro and acc UI Filters
-            writeRegister(REG_GYRO_ACCEL_CONFIG0, ICM426XX_ACCEL_UI_FILT_BW_LOW_LATENCY | ICM426XX_GYRO_UI_FILT_BW_LOW_LATENCY);
+            writeRegister(REG_GYRO_ACCEL_CONFIG0, ACCEL_UI_FILT_BW_LOW_LATENCY | GYRO_UI_FILT_BW_LOW_LATENCY);
 
-            writeRegister(REG_INT_CONFIG, ICM426XX_INT1_MODE_PULSED | ICM426XX_INT1_DRIVE_CIRCUIT_PP | ICM426XX_INT1_POLARITY_ACTIVE_HIGH);
-            writeRegister(REG_INT_CONFIG0, ICM426XX_UI_DRDY_INT_CLEAR_ON_SBR);
+            /*
+            writeRegister(REG_INT_CONFIG, INT1_MODE_PULSED | INT1_DRIVE_CIRCUIT_PP | INT1_POLARITY_ACTIVE_HIGH);
+            writeRegister(REG_INT_CONFIG0, UI_DRDY_INT_CLEAR_ON_SBR);
 
-            writeRegister(REG_INT_SOURCE0, ICM426XX_UI_DRDY_INT1_EN_ENABLED);
+            writeRegister(REG_INT_SOURCE0, UI_DRDY_INT1_EN_ENABLED);
 
             uint8_t intConfig1Value = spiReadRegMsk(dev, REG_INT_CONFIG1);
+
             // Datasheet says: "User should change setting to 0 from default setting of 1, for proper INT1 and INT2 pin operation"
-            intConfig1Value &= ~(1 << ICM426XX_INT_ASYNC_RESET_BIT);
-            intConfig1Value |= (ICM426XX_INT_TPULSE_DURATION_8 | ICM426XX_INT_TDEASSERT_DISABLED);
+            intConfig1Value &= ~(1 << INT_ASYNC_RESET_BIT);
+            intConfig1Value |= (INT_TPULSE_DURATION_8 | INT_TDEASSERT_DISABLED);
 
             writeRegister(REG_INT_CONFIG1, intConfig1Value);*/
 
