@@ -58,11 +58,14 @@ class Icm42688 : public SoftQuatImu {
 
     private:
 
-        // Registers
         static const uint8_t REG_PWR_MGMT0     = 0x4E;
         static const uint8_t REG_GYRO_CONFIG0  = 0x4F;
         static const uint8_t REG_ACCEL_CONFIG0 = 0x50;
         static const uint8_t REG_BANK_SEL      = 0x76;
+
+        static const uint8_t REG_GYRO_CONFIG_STATIC3 = 0x0C;
+        static const uint8_t REG_GYRO_CONFIG_STATIC4 = 0x0D;        
+        static const uint8_t REG_GYRO_CONFIG_STATIC5 = 0x0E;
 
         static const uint8_t PWR_MGMT0_ACCEL_MODE_LN    = (3 << 0);
         static const uint8_t PWR_MGMT0_GYRO_MODE_LN     = (3 << 2);
@@ -75,6 +78,7 @@ class Icm42688 : public SoftQuatImu {
         gyroScale_e  m_gyroScale;
         accelScale_e m_accelScale;
         odr_e        m_odr;
+        uint8_t      m_antiAliasDelta;
 
         static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
         {
@@ -135,10 +139,10 @@ class Icm42688 : public SoftQuatImu {
             writeRegister(REG_ACCEL_CONFIG0, (3 - ACCEL_16G) << 5 | (m_odr & 0x0F));
             delay(15);
 
-            /*
             // Configure gyro Anti-Alias Filter (see section 5.3 "ANTI-ALIAS FILTER")
-            aafConfig_t aafConfig = getGyroAafConfig();
-            writeRegister(REG_GYRO_CONFIG_STATIC3, aafConfig.delt);
+            writeRegister(REG_GYRO_CONFIG_STATIC3, m_antiAliasDelta);
+
+            /*
             writeRegister(REG_GYRO_CONFIG_STATIC4, aafConfig.deltSqr & 0xFF);
             writeRegister(REG_GYRO_CONFIG_STATIC5, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
 
@@ -187,7 +191,8 @@ class Icm42688 : public SoftQuatImu {
                 const rotateFun_t rotateFun,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G,
-                const odr_e odr = ODR_8K)
+                const odr_e odr = ODR_8K,
+                const uint8_t antiAliasDelta = 6)
             : SoftQuatImu(
                     mosiPin,
                     misoPin,
@@ -200,6 +205,7 @@ class Icm42688 : public SoftQuatImu {
         m_gyroScale = gyroScale;
         m_accelScale = accelScale;
         m_odr = odr;
+        m_antiAliasDelta = antiAliasDelta;
     }
 
 }; // class Icm42688
