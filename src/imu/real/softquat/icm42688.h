@@ -58,8 +58,11 @@ class Icm42688 : public SoftQuatImu {
 
     private:
 
-        static constexpr uint8_t REG_PWR_MGMT0 = 0x4E;
-        static constexpr uint8_t REG_BANK_SEL  = 0x76;
+        // Registers
+        static const uint8_t REG_PWR_MGMT0    = 0x4E;
+        static const uint8_t REG_GYRO_CONFIG0 = 0x4F;
+        static const uint8_t REG_BANK_SEL     = 0x76;
+
 
         static const uint8_t PWR_MGMT0_ACCEL_MODE_LN    = (3 << 0);
         static const uint8_t PWR_MGMT0_GYRO_MODE_LN     = (3 << 2);
@@ -124,25 +127,12 @@ class Icm42688 : public SoftQuatImu {
                     PWR_MGMT0_TEMP_DISABLE_OFF |
                     PWR_MGMT0_ACCEL_MODE_LN |
                     PWR_MGMT0_GYRO_MODE_LN);
+            delay(15);
 
+            writeRegister(REG_GYRO_CONFIG0, (3 - GYRO_2000DPS) << 5 | (m_odr & 0x0F));
             delay(15);
 
             /*
-
-
-            // Get desired output data rate
-            uint8_t odrConfig;
-            const unsigned decim = llog2(gyro->mpuDividerDrops + 1);
-            if (gyro->gyroRateKHz && decim < ODR_CONFIG_COUNT) {
-                odrConfig = odrLUT[decim];
-            } else {
-                odrConfig = odrLUT[ODR_CONFIG_1K];
-                gyro->gyroRateKHz = GYRO_RATE_1_kHz;
-            }
-
-            writeRegister(ICM426XX_RA_GYRO_CONFIG0, (3 - INV_FSR_2000DPS) << 5 | (odrConfig & 0x0F));
-            delay(15);
-
             writeRegister(ICM426XX_RA_ACCEL_CONFIG0, (3 - INV_FSR_16G) << 5 | (odrConfig & 0x0F));
             delay(15);
 
