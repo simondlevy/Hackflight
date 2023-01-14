@@ -63,6 +63,10 @@ class Icm42688 : public SoftQuatImu {
         static const uint8_t REG_ACCEL_CONFIG0 = 0x50;
         static const uint8_t REG_BANK_SEL      = 0x76;
 
+        static const uint8_t REG_ACCEL_CONFIG_STATIC2 = 0x03;
+        static const uint8_t REG_ACCEL_CONFIG_STATIC3 = 0x04;
+        static const uint8_t REG_ACCEL_CONFIG_STATIC4 = 0x05;
+
         static const uint8_t REG_GYRO_CONFIG_STATIC3 = 0x0C;
         static const uint8_t REG_GYRO_CONFIG_STATIC4 = 0x0D;        
         static const uint8_t REG_GYRO_CONFIG_STATIC5 = 0x0E;
@@ -147,12 +151,11 @@ class Icm42688 : public SoftQuatImu {
             writeRegister(REG_GYRO_CONFIG_STATIC5, (deltSqr >> 8) | (m_antiAliasBitshift << 4));
 
             // Configure acc Anti-Alias Filter for 1kHz sample rate (see tasks.c)
-            /*
-            aafConfig = aafLUT[AAF_CONFIG_258HZ];
-            writeRegister(REG_ACCEL_CONFIG_STATIC2, aafConfig.delt << 1);
-            writeRegister(REG_ACCEL_CONFIG_STATIC3, aafConfig.deltSqr & 0xFF);
-            writeRegister(REG_ACCEL_CONFIG_STATIC4, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
+            writeRegister(REG_ACCEL_CONFIG_STATIC2, m_antiAliasDelta << 1);
+            writeRegister(REG_ACCEL_CONFIG_STATIC3, deltSqr & 0xFF);
+            writeRegister(REG_ACCEL_CONFIG_STATIC4, (deltSqr >> 8) | (m_antiAliasBitshift << 4));
 
+            /*
             // Configure gyro and acc UI Filters
             writeRegister(REG_GYRO_ACCEL_CONFIG0, ICM426XX_ACCEL_UI_FILT_BW_LOW_LATENCY | ICM426XX_GYRO_UI_FILT_BW_LOW_LATENCY);
 
