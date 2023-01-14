@@ -73,12 +73,23 @@ class Icm42688 : public SoftQuatImu {
 
         static const uint8_t REG_GYRO_ACCEL_CONFIG0 = 0x52;
 
+        static const uint8_t REG_INT_CONFIG  = 0x14;
+        static const uint8_t REG_INT_CONFIG0 = 0x63;
+        static const uint8_t REG_INT_SOURCE0 = 0x65;
+
         static const uint8_t PWR_MGMT0_ACCEL_MODE_LN    = 3 << 0;
         static const uint8_t PWR_MGMT0_GYRO_MODE_LN     = 3 << 2;
         static const uint8_t PWR_MGMT0_TEMP_DISABLE_OFF = 0 << 5;
 
         static const uint8_t ACCEL_UI_FILT_BW_LOW_LATENCY = 14 << 4;
         static const uint8_t GYRO_UI_FILT_BW_LOW_LATENCY  = 14 << 0;
+
+        static const uint8_t INT1_MODE_PULSED          = 0 << 2;
+        static const uint8_t INT1_DRIVE_CIRCUIT_PP     = 1 << 1;
+        static const uint8_t INT1_POLARITY_ACTIVE_HIGH = 1 << 0;
+
+        static const uint8_t UI_DRDY_INT_CLEAR_ON_SBR  = (0 << 5) || (0 << 4);
+        static const uint8_t UI_DRDY_INT1_EN_ENABLED  = 1 << 3;
 
         static constexpr uint8_t UB0_REG_DEVICE_CONFIG = 0x11;
 
@@ -162,13 +173,11 @@ class Icm42688 : public SoftQuatImu {
 
             // Configure gyro and acc UI Filters
             writeRegister(REG_GYRO_ACCEL_CONFIG0, ACCEL_UI_FILT_BW_LOW_LATENCY | GYRO_UI_FILT_BW_LOW_LATENCY);
-
-            /*
             writeRegister(REG_INT_CONFIG, INT1_MODE_PULSED | INT1_DRIVE_CIRCUIT_PP | INT1_POLARITY_ACTIVE_HIGH);
             writeRegister(REG_INT_CONFIG0, UI_DRDY_INT_CLEAR_ON_SBR);
-
             writeRegister(REG_INT_SOURCE0, UI_DRDY_INT1_EN_ENABLED);
 
+            /*
             uint8_t intConfig1Value = spiReadRegMsk(dev, REG_INT_CONFIG1);
 
             // Datasheet says: "User should change setting to 0 from default setting of 1, for proper INT1 and INT2 pin operation"
