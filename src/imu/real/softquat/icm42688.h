@@ -79,6 +79,7 @@ class Icm42688 : public SoftQuatImu {
         accelScale_e m_accelScale;
         odr_e        m_odr;
         uint8_t      m_antiAliasDelta;
+        uint8_t      m_antiAliasBitshift;
 
         static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
         {
@@ -141,12 +142,12 @@ class Icm42688 : public SoftQuatImu {
 
             // Configure gyro Anti-Alias Filter (see section 5.3 "ANTI-ALIAS FILTER")
             writeRegister(REG_GYRO_CONFIG_STATIC3, m_antiAliasDelta);
-
-            /*
-            writeRegister(REG_GYRO_CONFIG_STATIC4, aafConfig.deltSqr & 0xFF);
-            writeRegister(REG_GYRO_CONFIG_STATIC5, (aafConfig.deltSqr >> 8) | (aafConfig.bitshift << 4));
+            uint16_t deltSqr = m_antiAliasDelta * m_antiAliasDelta;
+            writeRegister(REG_GYRO_CONFIG_STATIC4, deltSqr & 0xFF);
+            writeRegister(REG_GYRO_CONFIG_STATIC5, (deltSqr >> 8) | (m_antiAliasBitshift << 4));
 
             // Configure acc Anti-Alias Filter for 1kHz sample rate (see tasks.c)
+            /*
             aafConfig = aafLUT[AAF_CONFIG_258HZ];
             writeRegister(REG_ACCEL_CONFIG_STATIC2, aafConfig.delt << 1);
             writeRegister(REG_ACCEL_CONFIG_STATIC3, aafConfig.deltSqr & 0xFF);
@@ -192,7 +193,8 @@ class Icm42688 : public SoftQuatImu {
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G,
                 const odr_e odr = ODR_8K,
-                const uint8_t antiAliasDelta = 6)
+                const uint8_t antiAliasDelta = 6,
+                const uint8_t antiAliasBitshift = 10)
             : SoftQuatImu(
                     mosiPin,
                     misoPin,
@@ -206,6 +208,7 @@ class Icm42688 : public SoftQuatImu {
         m_accelScale = accelScale;
         m_odr = odr;
         m_antiAliasDelta = antiAliasDelta;
+        m_antiAliasBitshift = antiAliasBitshift;
     }
 
 }; // class Icm42688
