@@ -49,22 +49,12 @@ class Icm42688 : public SoftQuatImu {
 
         typedef enum {
 
-            ODR_32K, // LN mode only
-            ODR_16K, // LN mode only
-            ODR_8K,  // LN mode only
-            ODR_4K,  // LN mode only
-            ODR_2K,  // LN mode only
-            ODR_1K,  // LN mode only
-            ODR_200,
-            ODR_100,
-            ODR_50,
-            ODR_25,
-            ODR_12_5,
-            ODR_6a25,   // LP mode only (accel only)
-            ODR_3a125,  // LP mode only (accel only)
-            ODR_1a5625, // LP mode only (accel only)
-            ODR_500
-        };
+            ODR_8K = 3,  
+            ODR_4K, 
+            ODR_2K, 
+            ODR_1K
+
+        } odr_e;
 
     private:
 
@@ -79,9 +69,9 @@ class Icm42688 : public SoftQuatImu {
 
         static const uint32_t MAX_SPI_CLOCK_RATE = 24000000;
 
-        gyroScale_e m_gyroScale;
-
+        gyroScale_e  m_gyroScale;
         accelScale_e m_accelScale;
+        odr_e        m_odr;
 
         static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
         {
@@ -150,11 +140,9 @@ class Icm42688 : public SoftQuatImu {
                 gyro->gyroRateKHz = GYRO_RATE_1_kHz;
             }
 
-            STATIC_ASSERT(INV_FSR_2000DPS == 3, "INV_FSR_2000DPS must be 3 to generate correct value");
             writeRegister(ICM426XX_RA_GYRO_CONFIG0, (3 - INV_FSR_2000DPS) << 5 | (odrConfig & 0x0F));
             delay(15);
 
-            STATIC_ASSERT(INV_FSR_16G == 3, "INV_FSR_16G must be 3 to generate correct value");
             writeRegister(ICM426XX_RA_ACCEL_CONFIG0, (3 - INV_FSR_16G) << 5 | (odrConfig & 0x0F));
             delay(15);
 
@@ -208,7 +196,8 @@ class Icm42688 : public SoftQuatImu {
                 const uint8_t csPin,
                 const rotateFun_t rotateFun,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
-                const accelScale_e accelScale = ACCEL_2G)
+                const accelScale_e accelScale = ACCEL_2G,
+                const odr_e odr = ODR_8K)
             : SoftQuatImu(
                     mosiPin,
                     misoPin,
@@ -220,6 +209,7 @@ class Icm42688 : public SoftQuatImu {
     {
         m_gyroScale = gyroScale;
         m_accelScale = accelScale;
+        m_odr = odr;
     }
 
 }; // class Icm42688
