@@ -258,6 +258,8 @@ class InvenSenseImu : public RealImu {
 
     protected:
 
+        gyroScale_e  m_gyroScale;
+
         static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
         {
             return

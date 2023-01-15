@@ -81,7 +81,6 @@ class Icm42688 : public InvenSenseImu {
 
         static const uint32_t MAX_SPI_CLOCK_RATE = 24000000;
 
-        gyroScale_e  m_gyroScale;
         accelScale_e m_accelScale;
 
         odr_e        m_odr;
