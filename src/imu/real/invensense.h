@@ -32,6 +32,26 @@ class InvenSenseImu : public RealImu {
 
     friend class AccelerometerTask;
 
+    public:
+
+        typedef enum {
+
+            GYRO_250DPS,
+            GYRO_500DPS,
+            GYRO_1000DPS,
+            GYRO_2000DPS
+
+        } gyroScale_e;
+
+        typedef enum {
+
+            ACCEL_2G,
+            ACCEL_4G,  
+            ACCEL_8G,  
+            ACCEL_16G
+
+        } accelScale_e;
+
     private:
 
         // Constants for trig functions
@@ -238,6 +258,15 @@ class InvenSenseImu : public RealImu {
 
     protected:
 
+        static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
+        {
+            return
+                gyroScale == GYRO_250DPS ?  250 : 
+                gyroScale == GYRO_500DPS ?  500 : 
+                gyroScale == GYRO_1000DPS ?  1000 : 
+                2000;
+        }
+
         static float scale(const uint16_t n)
         {
             return n / 32768.0;
@@ -368,24 +397,6 @@ class InvenSenseImu : public RealImu {
 
 
     public:
-
-        typedef enum {
-
-            GYRO_250DPS,
-            GYRO_500DPS,
-            GYRO_1000DPS,
-            GYRO_2000DPS
-
-        } gyroScale_e;
-
-        typedef enum {
-
-            ACCEL_2G,
-            ACCEL_4G,  
-            ACCEL_8G,  
-            ACCEL_16G
-
-        } accelScale_e;
 
         void handleInterrupt(uint32_t cycleCounter)
         {

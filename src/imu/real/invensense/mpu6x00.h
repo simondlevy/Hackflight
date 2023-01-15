@@ -54,15 +54,6 @@ class Mpu6x00 : public InvenSenseImu {
 
         accelScale_e m_accelScale;
 
-        static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
-        {
-            return
-                gyroScale == GYRO_250DPS ?  250 : 
-                gyroScale == GYRO_500DPS ?  500 : 
-                gyroScale == GYRO_1000DPS ?  1000 : 
-                2000;
-        }
-
         static uint16_t accelScaleToInt(const accelScale_e accelScale)
         {
             return

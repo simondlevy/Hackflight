@@ -83,18 +83,10 @@ class Icm42688 : public InvenSenseImu {
 
         gyroScale_e  m_gyroScale;
         accelScale_e m_accelScale;
+
         odr_e        m_odr;
         uint8_t      m_antiAliasDelta;
         uint8_t      m_antiAliasBitshift;
-
-        static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
-        {
-            return
-                gyroScale == GYRO_250DPS ?  250 : 
-                gyroScale == GYRO_500DPS ?  500 : 
-                gyroScale == GYRO_1000DPS ?  1000 : 
-                2000;
-        }
 
         static uint16_t accelScaleToInt(const accelScale_e accelScale)
         {
