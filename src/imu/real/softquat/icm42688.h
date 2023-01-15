@@ -75,6 +75,7 @@ class Icm42688 : public SoftQuatImu {
 
         static const uint8_t REG_INT_CONFIG  = 0x14;
         static const uint8_t REG_INT_CONFIG0 = 0x63;
+        static const uint8_t REG_INT_CONFIG1 = 0x64;
         static const uint8_t REG_INT_SOURCE0 = 0x65;
 
         static const uint8_t PWR_MGMT0_ACCEL_MODE_LN    = 3 << 0;
@@ -87,6 +88,13 @@ class Icm42688 : public SoftQuatImu {
         static const uint8_t INT1_MODE_PULSED          = 0 << 2;
         static const uint8_t INT1_DRIVE_CIRCUIT_PP     = 1 << 1;
         static const uint8_t INT1_POLARITY_ACTIVE_HIGH = 1 << 0;
+
+        static const uint8_t INT_ASYNC_RESET_BIT       = 4;
+        static const uint8_t INT_TDEASSERT_DISABLE_BIT = 5;
+        static const uint8_t INT_TPULSE_DURATION_BIT   = 6;
+
+        static const uint8_t INT_TPULSE_DURATION_8  = 1 << INT_TPULSE_DURATION_BIT;
+        static const uint8_t INT_TDEASSERT_DISABLED = 1 << INT_TDEASSERT_DISABLE_BIT;
 
         static const uint8_t UI_DRDY_INT_CLEAR_ON_SBR  = (0 << 5) || (0 << 4);
         static const uint8_t UI_DRDY_INT1_EN_ENABLED  = 1 << 3;
@@ -169,23 +177,23 @@ class Icm42688 : public SoftQuatImu {
             // Configure acc Anti-Alias Filter for 1kHz sample rate (see tasks.c)
             writeRegister(REG_ACCEL_CONFIG_STATIC2, m_antiAliasDelta << 1);
             writeRegister(REG_ACCEL_CONFIG_STATIC3, deltSqr & 0xFF);
-            writeRegister(REG_ACCEL_CONFIG_STATIC4, (deltSqr >> 8) | (m_antiAliasBitshift << 4));
+            writeRegister(REG_ACCEL_CONFIG_STATIC4,
+                    (deltSqr >> 8) | (m_antiAliasBitshift << 4));
 
             // Configure gyro and acc UI Filters
-            writeRegister(REG_GYRO_ACCEL_CONFIG0, ACCEL_UI_FILT_BW_LOW_LATENCY | GYRO_UI_FILT_BW_LOW_LATENCY);
-            writeRegister(REG_INT_CONFIG, INT1_MODE_PULSED | INT1_DRIVE_CIRCUIT_PP | INT1_POLARITY_ACTIVE_HIGH);
+            writeRegister(REG_GYRO_ACCEL_CONFIG0,
+                    ACCEL_UI_FILT_BW_LOW_LATENCY | GYRO_UI_FILT_BW_LOW_LATENCY);
+            writeRegister(REG_INT_CONFIG,
+                    INT1_MODE_PULSED | INT1_DRIVE_CIRCUIT_PP | INT1_POLARITY_ACTIVE_HIGH);
             writeRegister(REG_INT_CONFIG0, UI_DRDY_INT_CLEAR_ON_SBR);
             writeRegister(REG_INT_SOURCE0, UI_DRDY_INT1_EN_ENABLED);
 
-            /*
-            uint8_t intConfig1Value = spiReadRegMsk(dev, REG_INT_CONFIG1);
-
-            // Datasheet says: "User should change setting to 0 from default setting of 1, for proper INT1 and INT2 pin operation"
+            // Datasheet says: "User should change setting to 0 from default
+            // setting of 1, for proper INT1 and INT2 pin operation"
+            uint8_t intConfig1Value = readRegister(REG_INT_CONFIG1);
             intConfig1Value &= ~(1 << INT_ASYNC_RESET_BIT);
             intConfig1Value |= (INT_TPULSE_DURATION_8 | INT_TDEASSERT_DISABLED);
-
-            writeRegister(REG_INT_CONFIG1, intConfig1Value);*/
-
+            writeRegister(REG_INT_CONFIG1, intConfig1Value);
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
@@ -201,6 +209,8 @@ class Icm42688 : public SoftQuatImu {
         }
 
     public:
+
+        uint8_t intConfig1Value;
 
         Icm42688(
                 const uint8_t mosiPin,

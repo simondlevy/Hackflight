@@ -51,18 +51,27 @@ static vector<PidController *> pids = {};
 
 static Stm32F722Board board(rx, imu, pids, mixer, esc, LED_PIN);
 
+static volatile uint32_t _count;
+
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
     imu.handleInterrupt(board.getCycleCounter());
+
+    _count++;
 }
 
 void setup(void)
 {
+    // Set up IMU interrupt
+    Board::setInterrupt(EXTI_PIN, handleImuInterrupt, RISING);
+
     board.begin();
 }
 
 void loop(void)
 {
     board.step();
+
+    Serial.println(_count);
 }
