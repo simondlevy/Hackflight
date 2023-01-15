@@ -18,20 +18,21 @@
  */
 
 #include <hackflight.h>
-#include <board/stm32/stm32f4/stm32f411.h>
+#include <board/stm32/f/4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/mock.h>
-#include <imu/real/invensense/bmi270.h>
+#include <imu/mock.h>
 #include <receiver/mock.h>
 
 #include <vector>
 using namespace std;
 
 // IMU
-static const uint8_t MOSI_PIN = PB15;
-static const uint8_t MISO_PIN = PB14;
-static const uint8_t SCLK_PIN = PB13;
-static const uint8_t CS_PIN   = PC13;
+static const uint8_t MOSI_PIN = PB_15;
+static const uint8_t MISO_PIN = PB_14;
+static const uint8_t SCLK_PIN = PB_13;
+
+static const uint8_t CS_PIN   = PC_13;
 
 //static const uint8_t LED_PIN  = PA13; // orange
 static const uint8_t LED_PIN  = PA14; // blue
@@ -42,7 +43,7 @@ static MockEsc esc;
 
 static MockReceiver rx;
 
-static Bmi270 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, RealImu::rotate270);
+static MockImu imu;
 
 static vector<PidController *> pids = {};
 
