@@ -28,25 +28,6 @@ class Icm42688 : public SoftQuatImu {
 
     public:
 
-        // No need to support gyro rates below 250
-        typedef enum {
-
-            GYRO_2000DPS,
-            GYRO_1000DPS,
-            GYRO_500DPS,
-            GYRO_250DPS
-
-        } gyroScale_e;
-
-        typedef enum {
-
-            ACCEL_2G,
-            ACCEL_4G,  
-            ACCEL_8G,  
-            ACCEL_16G
-
-        } accelScale_e;
-
         typedef enum {
 
             ODR_8K = 3,  

@@ -26,26 +26,6 @@
 
 class Mpu6x00 : public SoftQuatImu {
 
-    public:
-
-        typedef enum {
-
-            GYRO_250DPS,
-            GYRO_500DPS,
-            GYRO_1000DPS,
-            GYRO_2000DPS
-
-        } gyroScale_e;
-
-        typedef enum {
-
-            ACCEL_2G,
-            ACCEL_4G,  
-            ACCEL_8G,  
-            ACCEL_16G
-
-        } accelScale_e;
-
     private:
 
         // Registers
