@@ -22,9 +22,9 @@
 
 #include <stdint.h>
 
-#include "imu/real/softquat.h"
+#include "imu/real/invensense.h"
 
-class Mpu6x00 : public SoftQuatImu {
+class Mpu6x00 : public InvenSenseImu {
 
     private:
 
@@ -91,7 +91,7 @@ class Mpu6x00 : public SoftQuatImu {
 
         virtual void begin(uint32_t clockSpeed) override
         {
-            SoftQuatImu::begin(clockSpeed);
+            InvenSenseImu::begin(clockSpeed);
 
             m_spi.setBitOrder(MSBFIRST);
             m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_INIT_CLK_HZ));
@@ -166,7 +166,7 @@ class Mpu6x00 : public SoftQuatImu {
                 const rotateFun_t rotateFun,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
-            : SoftQuatImu(
+            : InvenSenseImu(
                     mosiPin,
                     misoPin,
                     sclkPin,

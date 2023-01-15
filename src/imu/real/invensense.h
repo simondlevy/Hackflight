@@ -28,7 +28,7 @@
 #include "core/vstate.h"
 #include "imu/real.h"
 
-class SoftQuatImu : public RealImu {
+class InvenSenseImu : public RealImu {
 
     friend class AccelerometerTask;
 
@@ -250,7 +250,7 @@ class SoftQuatImu : public RealImu {
             return (int16_t)(m_buffer[k] << 8 | m_buffer[k+1]);
         }
 
-        SoftQuatImu(
+        InvenSenseImu(
                 const uint8_t mosiPin,
                 const uint8_t misoPin,
                 const uint8_t sclkPin,

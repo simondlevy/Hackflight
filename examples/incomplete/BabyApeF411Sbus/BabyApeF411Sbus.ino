@@ -22,7 +22,7 @@
 #include <board/stm32/stm32f4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <receiver/sbus.h>
-#include <imu/real/softquat/mpu6x00/arduino.h>
+#include <imu/real/invensense/mpu6x00/arduino.h>
 #include <esc/mock.h>
 
 #include <vector>

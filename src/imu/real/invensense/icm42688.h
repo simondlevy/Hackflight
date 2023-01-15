@@ -22,9 +22,9 @@
 
 #include <stdint.h>
 
-#include "imu/real/softquat.h"
+#include "imu/real/invensense.h"
 
-class Icm42688 : public SoftQuatImu {
+class Icm42688 : public InvenSenseImu {
 
     public:
 
@@ -123,7 +123,7 @@ class Icm42688 : public SoftQuatImu {
 
         virtual void begin(uint32_t clockSpeed) override
         {
-            SoftQuatImu::begin(clockSpeed);
+            InvenSenseImu::begin(clockSpeed);
 
             writeRegister(REG_BANK_SEL, 0);
 
@@ -199,7 +199,7 @@ class Icm42688 : public SoftQuatImu {
                 const odr_e odr = ODR_8K,
                 const uint8_t antiAliasDelta = 6,
                 const uint8_t antiAliasBitshift = 10)
-            : SoftQuatImu(
+            : InvenSenseImu(
                     mosiPin,
                     misoPin,
                     sclkPin,
