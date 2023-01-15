@@ -88,15 +88,6 @@ class Icm42688 : public InvenSenseImu {
         uint8_t      m_antiAliasDelta;
         uint8_t      m_antiAliasBitshift;
 
-        static uint16_t accelScaleToInt(const accelScale_e accelScale)
-        {
-            return
-                accelScale == ACCEL_2G ?  2 : 
-                accelScale == ACCEL_4G ?  4 : 
-                accelScale == ACCEL_8G ?  8 : 
-                16;
-        }
-
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
