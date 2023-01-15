@@ -236,8 +236,6 @@ class InvenSenseImu : public RealImu {
 
         ImuSensor m_gyroAccum;
 
-        float m_accelScale;
-
         Axes m_accelAxes;
 
         auto readAndFilterAccelAxis(Pt2Filter & lpf, const uint8_t k) -> float
@@ -259,6 +257,7 @@ class InvenSenseImu : public RealImu {
     protected:
 
         gyroScale_e  m_gyroScale;
+        accelScale_e m_accelScale;
 
         static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
         {
@@ -296,10 +295,13 @@ class InvenSenseImu : public RealImu {
                 const uint8_t sclkPin,
                 const uint8_t csPin,
                 const rotateFun_t rotateFun,
-                const uint16_t gyroScale,
-                const uint16_t accelScale)
-            : RealImu(rotateFun, gyroScale)
+                const gyroScale_e gyroScale,
+                const accelScale_e accelScale)
+            : RealImu(rotateFun, gyroScaleToInt(gyroScale))
         {
+            m_gyroScale = gyroScale;
+            m_accelScale = accelScale;
+
             m_mosiPin = mosiPin;
             m_misoPin = misoPin;
             m_sclkPin = sclkPin;
@@ -308,7 +310,7 @@ class InvenSenseImu : public RealImu {
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
 
-            m_accelScale = accelScale / 32768.;
+            // m_accelScale = accelScale / 32768.;
         }
 
         void begin(uint32_t clockSpeed)

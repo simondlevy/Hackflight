@@ -50,8 +50,6 @@ class Mpu6x00 : public InvenSenseImu {
         // 20 MHz max SPI frequency
         static const uint32_t MAX_SPI_CLK_HZ = 20000000;
 
-        accelScale_e m_accelScale;
-
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
@@ -141,16 +139,8 @@ class Mpu6x00 : public InvenSenseImu {
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
             : InvenSenseImu(
-                    mosiPin,
-                    misoPin,
-                    sclkPin,
-                    csPin,
-                    rotateFun,
-                    gyroScaleToInt(gyroScale),
-                    accelScaleToInt(accelScale))
+                    mosiPin, misoPin, sclkPin, csPin, rotateFun, gyroScale, accelScale)
         {
-            m_gyroScale = gyroScale;
-            m_accelScale = accelScale;
         }
 
 }; // class Mpu6x00
