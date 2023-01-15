@@ -238,6 +238,11 @@ class InvenSenseImu : public RealImu {
 
     protected:
 
+        static float scale(const uint16_t n)
+        {
+            return n / 32768.0;
+        }
+
         SPIClass m_spi;
 
         // Enough room for seven two-byte integers (gyro XYZ, temperature,

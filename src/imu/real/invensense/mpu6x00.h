@@ -72,11 +72,6 @@ class Mpu6x00 : public InvenSenseImu {
                 16;
         }
 
-        static float scale(const uint16_t n)
-        {
-            return n / 32768.0;
-        }
-
 
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
