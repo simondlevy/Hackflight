@@ -74,16 +74,6 @@ class Mpu6x00 : public SoftQuatImu {
 
         accelScale_e m_accelScale;
 
-        // Enough room for seven two-byte integers (gyro XYZ, temperature,
-        // accel XYZ) plus one byte for SPI transfer
-        uint8_t m_buffer[15];
-
-        int16_t getValue(const uint8_t offset, const uint8_t index)
-        {
-            const uint8_t k = offset + index * 2;
-            return (int16_t)(m_buffer[k] << 8 | m_buffer[k+1]);
-        }
-
         static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
         {
             return
@@ -113,8 +103,7 @@ class Mpu6x00 : public SoftQuatImu {
 
         virtual bool gyroIsReady(void) override
         {
-
-            readRegisters(REG_ACCEL_XOUT_H, m_buffer, 14);
+            readRegisters(REG_ACCEL_XOUT_H);
 
             // If we call this infrequently enough, gyro will always be ready
             return true;
@@ -179,12 +168,12 @@ class Mpu6x00 : public SoftQuatImu {
 
         virtual int16_t readRawGyro(uint8_t k) override
         {
-            return getValue(9, k);
+            return getShortFromBuffer(4, k);
         }
 
         virtual int16_t readRawAccel(uint8_t k) override
         {
-            return getValue(1, k);
+            return getShortFromBuffer(0, k);
         }
 
     public:

@@ -58,25 +58,22 @@ class Icm42688 : public SoftQuatImu {
 
     private:
 
-        static const uint8_t REG_PWR_MGMT0     = 0x4E;
-        static const uint8_t REG_GYRO_CONFIG0  = 0x4F;
-        static const uint8_t REG_ACCEL_CONFIG0 = 0x50;
-        static const uint8_t REG_BANK_SEL      = 0x76;
-
         static const uint8_t REG_ACCEL_CONFIG_STATIC2 = 0x03;
         static const uint8_t REG_ACCEL_CONFIG_STATIC3 = 0x04;
         static const uint8_t REG_ACCEL_CONFIG_STATIC4 = 0x05;
-
-        static const uint8_t REG_GYRO_CONFIG_STATIC3 = 0x0C;
-        static const uint8_t REG_GYRO_CONFIG_STATIC4 = 0x0D;        
-        static const uint8_t REG_GYRO_CONFIG_STATIC5 = 0x0E;
-
-        static const uint8_t REG_GYRO_ACCEL_CONFIG0 = 0x52;
-
-        static const uint8_t REG_INT_CONFIG  = 0x14;
-        static const uint8_t REG_INT_CONFIG0 = 0x63;
-        static const uint8_t REG_INT_CONFIG1 = 0x64;
-        static const uint8_t REG_INT_SOURCE0 = 0x65;
+        static const uint8_t REG_GYRO_CONFIG_STATIC3  = 0x0C;
+        static const uint8_t REG_GYRO_CONFIG_STATIC4  = 0x0D;        
+        static const uint8_t REG_GYRO_CONFIG_STATIC5  = 0x0E;
+        static const uint8_t REG_INT_CONFIG           = 0x14;
+        static const uint8_t REG_TEMP_DATA_A1         = 0x1D;
+        static const uint8_t REG_PWR_MGMT0            = 0x4E;
+        static const uint8_t REG_GYRO_CONFIG0         = 0x4F;
+        static const uint8_t REG_ACCEL_CONFIG0        = 0x50;
+        static const uint8_t REG_GYRO_ACCEL_CONFIG0   = 0x52;
+        static const uint8_t REG_INT_CONFIG0          = 0x63;
+        static const uint8_t REG_INT_CONFIG1          = 0x64;
+        static const uint8_t REG_INT_SOURCE0          = 0x65;
+        static const uint8_t REG_BANK_SEL             = 0x76;
 
         static const uint8_t PWR_MGMT0_ACCEL_MODE_LN    = 3 << 0;
         static const uint8_t PWR_MGMT0_GYRO_MODE_LN     = 3 << 2;
@@ -137,8 +134,7 @@ class Icm42688 : public SoftQuatImu {
 
         virtual bool gyroIsReady(void) override
         {
-
-            // readRegisters(REG_ACCEL_XOUT_H, m_buffer, 14);
+             readRegisters(REG_TEMP_DATA_A1);
 
             // If we call this infrequently enough, gyro will always be ready
             return true;
@@ -172,7 +168,8 @@ class Icm42688 : public SoftQuatImu {
             writeRegister(REG_GYRO_CONFIG_STATIC3, m_antiAliasDelta);
             uint16_t deltSqr = m_antiAliasDelta * m_antiAliasDelta;
             writeRegister(REG_GYRO_CONFIG_STATIC4, deltSqr & 0xFF);
-            writeRegister(REG_GYRO_CONFIG_STATIC5, (deltSqr >> 8) | (m_antiAliasBitshift << 4));
+            writeRegister(REG_GYRO_CONFIG_STATIC5,
+                    (deltSqr >> 8) | (m_antiAliasBitshift << 4));
 
             // Configure acc Anti-Alias Filter for 1kHz sample rate (see tasks.c)
             writeRegister(REG_ACCEL_CONFIG_STATIC2, m_antiAliasDelta << 1);
@@ -198,19 +195,17 @@ class Icm42688 : public SoftQuatImu {
 
         virtual int16_t readRawGyro(uint8_t k) override
         {
-            (void)k;
-            return 0;
+            // Gyro data is fifth value
+            return getShortFromBuffer(4, k);
         }
 
         virtual int16_t readRawAccel(uint8_t k) override
         {
-            (void)k;
-            return 0;
+            // Accel data is second value, after temperature
+            return getShortFromBuffer(1, k);
         }
 
     public:
-
-        uint8_t intConfig1Value;
 
         Icm42688(
                 const uint8_t mosiPin,

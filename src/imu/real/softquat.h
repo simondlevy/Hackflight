@@ -227,9 +227,28 @@ class SoftQuatImu : public RealImu {
 
         int32_t m_shortPeriod;
 
+        void readRegisters(
+                const uint8_t addr, uint8_t * buffer, const uint8_t count)
+        {
+            digitalWrite(m_csPin, LOW);
+            buffer[0] = addr | 0x80;
+            m_spi.transfer(buffer, count+1);
+            digitalWrite(m_csPin, HIGH);
+        }
+
     protected:
 
         SPIClass m_spi;
+
+        // Enough room for seven two-byte integers (gyro XYZ, temperature,
+        // accel XYZ) plus one byte for SPI transfer
+        uint8_t m_buffer[15];
+
+        int16_t getShortFromBuffer(const uint8_t offset, const uint8_t index)
+        {
+            const uint8_t k = 2 * (offset + index) + 1;
+            return (int16_t)(m_buffer[k] << 8 | m_buffer[k+1]);
+        }
 
         SoftQuatImu(
                 const uint8_t mosiPin,
@@ -312,13 +331,9 @@ class SoftQuatImu : public RealImu {
             digitalWrite(m_csPin, HIGH);
         }
 
-        void readRegisters(
-                const uint8_t addr, uint8_t * buffer, const uint8_t count)
+        void readRegisters(const uint8_t addr)
         {
-            digitalWrite(m_csPin, LOW);
-            buffer[0] = addr | 0x80;
-            m_spi.transfer(buffer, count+1);
-            digitalWrite(m_csPin, HIGH);
+            readRegisters(addr, m_buffer, 14);
         }
 
         uint8_t readRegister(const uint8_t addr)
