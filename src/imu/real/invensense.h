@@ -369,6 +369,14 @@ class InvenSenseImu : public RealImu {
 
         }
 
+        virtual void readGyro(void) = 0;
+
+        virtual bool gyroIsReady(void) override
+        {
+            readGyro();
+            return true;
+        }
+
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
             digitalWrite(m_csPin, LOW);

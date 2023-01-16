@@ -53,12 +53,9 @@ class Mpu6x00 : public InvenSenseImu {
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
-        virtual bool gyroIsReady(void) override
+        virtual void readGyro(void) override
         {
             readRegisters(REG_ACCEL_XOUT_H);
-
-            // If we call this infrequently enough, gyro will always be ready
-            return true;
         }
 
         virtual void begin(uint32_t clockSpeed) override
