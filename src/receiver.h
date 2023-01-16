@@ -341,6 +341,12 @@ class Receiver {
 
     public:
 
+        virtual void parse(const uint8_t byte, const uint32_t usec)
+        {
+            (void)byte;
+            (void)usec;
+        }
+
         state_e getState(void)
         {
             return m_state;
@@ -375,4 +381,5 @@ class Receiver {
         {
             return m_rawAux2;
         }
+
 }; // class Rx

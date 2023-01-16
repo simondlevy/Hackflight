@@ -20,9 +20,9 @@
 #include <stdlib.h>
 
 #include "core/utils.h"
-#include "receiver/real.h"
+#include "receiver.h"
 
-class DsmxReceiver : public RealReceiver {
+class DsmxReceiver : public Receiver {
 
     private:
 
@@ -100,7 +100,7 @@ class DsmxReceiver : public RealReceiver {
             return result;
         }
 
-        void parse(const uint8_t c, const uint32_t usec) override
+        void parse(const uint8_t c, const uint32_t usec)
         {
             const uint32_t timeInterval = intcmp(usec, m_frameData.lastTimeUs);
 

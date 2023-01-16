@@ -22,7 +22,8 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
 #include <imu/real/invensense/mpu6x00.h>
-#include <receiver/real/dsmx.h>
+#include <receiver/dsmx.h>
+#include <unsafe/serial.h>
 
 #include <vector>
 using namespace std;
@@ -74,7 +75,7 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent1(void)
 {
-    rx.handleSerialEvent(Serial1);
+    handleReceiverSerialEvent(rx, Serial1);
 }
 
 void setup(void)
