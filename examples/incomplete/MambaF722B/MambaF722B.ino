@@ -23,7 +23,7 @@
 #include <board/stm32/f/stm32f722.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/mock.h>
-#include <imu/real/invensense/icm42688.h>
+#include <imu/real/softquat/invensense/icm42688.h>
 #include <receiver/mock.h>
 
 #include <vector>

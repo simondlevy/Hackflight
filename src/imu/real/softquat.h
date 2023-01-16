@@ -28,7 +28,7 @@
 #include "core/vstate.h"
 #include "imu/real.h"
 
-class InvenSenseImu : public RealImu {
+class SoftQuatImu : public RealImu {
 
     friend class AccelerometerTask;
 
@@ -129,11 +129,6 @@ class InvenSenseImu : public RealImu {
         Pt2Filter m_accelFilterY = accelFilterInit();
         Pt2Filter m_accelFilterZ = accelFilterInit();
 
-        uint8_t m_misoPin;
-        uint8_t m_mosiPin;
-        uint8_t m_sclkPin;
-        uint8_t m_csPin;
-
         static Pt2Filter accelFilterInit(void)
         {
             return Pt2Filter(ACCEL_LPF_CUTOFF_FREQ, 1. / ACCEL_SAMPLE_RATE);
@@ -227,44 +222,14 @@ class InvenSenseImu : public RealImu {
 
         int32_t m_shortPeriod;
 
-        void readRegisters(
-                const uint8_t addr, uint8_t * buffer, const uint8_t count)
-        {
-            digitalWrite(m_csPin, LOW);
-            buffer[0] = addr | 0x80;
-            m_spi.transfer(buffer, count+1);
-            digitalWrite(m_csPin, HIGH);
-        }
-
     protected:
 
-        SPIClass m_spi;
-
-        // Enough room for seven two-byte integers (gyro XYZ, temperature,
-        // accel XYZ) plus one byte for SPI transfer
-        uint8_t m_buffer[15];
-
-        int16_t getShortFromBuffer(const uint8_t offset, const uint8_t index)
-        {
-            const uint8_t k = 2 * (offset + index) + 1;
-            return (int16_t)(m_buffer[k] << 8 | m_buffer[k+1]);
-        }
-
-        InvenSenseImu(
-                const uint8_t mosiPin,
-                const uint8_t misoPin,
-                const uint8_t sclkPin,
-                const uint8_t csPin,
+        SoftQuatImu(
                 const rotateFun_t rotateFun,
                 const uint16_t gyroScale,
                 const uint16_t accelScale)
             : RealImu(rotateFun, gyroScale)
         {
-            m_mosiPin = mosiPin;
-            m_misoPin = misoPin;
-            m_sclkPin = sclkPin;
-            m_csPin = csPin;
-
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
 
@@ -273,13 +238,6 @@ class InvenSenseImu : public RealImu {
 
         void begin(uint32_t clockSpeed)
         {
-            m_spi.setMOSI(m_mosiPin);
-            m_spi.setMISO(m_misoPin);
-            m_spi.setSCLK(m_sclkPin);
-            m_spi.begin();
-
-            pinMode(m_csPin, OUTPUT);
-
             m_shortPeriod = clockSpeed / 1000000 * SHORT_THRESHOLD;
 
             RealImu::begin(clockSpeed);
@@ -323,31 +281,6 @@ class InvenSenseImu : public RealImu {
 
         }
 
-        void writeRegister(const uint8_t reg, const uint8_t val)
-        {
-            digitalWrite(m_csPin, LOW);
-            m_spi.transfer(reg);
-            m_spi.transfer(val);
-            digitalWrite(m_csPin, HIGH);
-        }
-
-        void readRegisters(const uint8_t addr)
-        {
-            readRegisters(addr, m_buffer, 14);
-        }
-
-        uint8_t readRegister(const uint8_t addr)
-        {
-            uint8_t buffer[2] = {};
-            readRegisters(addr, buffer, 1);
-            return buffer[1];
-        }
-
-        void setClockDivider(uint32_t divider)
-        {
-            m_spi.setClockDivider(divider);
-        }
-
         uint16_t calculateSpiDivisor(const uint32_t clockSpeed, const uint32_t freq)
         {
             uint32_t clk = clockSpeed / 2;
@@ -363,24 +296,6 @@ class InvenSenseImu : public RealImu {
 
 
     public:
-
-        typedef enum {
-
-            GYRO_250DPS,
-            GYRO_500DPS,
-            GYRO_1000DPS,
-            GYRO_2000DPS
-
-        } gyroScale_e;
-
-        typedef enum {
-
-            ACCEL_2G,
-            ACCEL_4G,  
-            ACCEL_8G,  
-            ACCEL_16G
-
-        } accelScale_e;
 
         void handleInterrupt(uint32_t cycleCounter)
         {

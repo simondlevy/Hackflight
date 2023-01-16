@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 
-#include "imu/real/invensense.h"
+#include "imu/real/softquat/invensense.h"
 
 class Icm42688 : public InvenSenseImu {
 
@@ -81,8 +81,6 @@ class Icm42688 : public InvenSenseImu {
 
         static const uint32_t MAX_SPI_CLOCK_RATE = 24000000;
 
-        gyroScale_e  m_gyroScale;
-        accelScale_e m_accelScale;
         odr_e        m_odr;
         uint8_t      m_antiAliasDelta;
         uint8_t      m_antiAliasBitshift;
@@ -200,16 +198,8 @@ class Icm42688 : public InvenSenseImu {
                 const uint8_t antiAliasDelta = 6,
                 const uint8_t antiAliasBitshift = 10)
             : InvenSenseImu(
-                    mosiPin,
-                    misoPin,
-                    sclkPin,
-                    csPin,
-                    rotateFun,
-                    gyroScaleToInt(gyroScale),
-                    accelScaleToInt(accelScale))
+                    mosiPin, misoPin, sclkPin, csPin, rotateFun, gyroScale, accelScale)
     {
-        m_gyroScale = gyroScale;
-        m_accelScale = accelScale;
         m_odr = odr;
         m_antiAliasDelta = antiAliasDelta;
         m_antiAliasBitshift = antiAliasBitshift;

@@ -55,6 +55,8 @@ class LadybugBoard : public Stm32Board {
             Board::setInterrupt(IMU_INTERRUPT_PIN, isr, RISING);  
 
             Board::begin();
+
+            imu.begin();
         }
 
         void handleInterrupt(void)

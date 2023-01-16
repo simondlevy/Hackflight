@@ -57,24 +57,6 @@ class UsfsImu : public RealImu {
 
     protected:
 
-        virtual void begin(void) override 
-        {
-            usfsLoadFirmware(); 
-
-            usfsBegin(
-                    ACCEL_BANDWIDTH,
-                    GYRO_BANDWIDTH,
-                    QUAT_DIVISOR,
-                    MAG_RATE,
-                    ACCEL_RATE_TENTH,
-                    GYRO_RATE_TENTH,
-                    BARO_RATE,
-                    INTERRUPT_ENABLE);
-
-            // Clear interrupts
-            usfsCheckStatus();
-        }
-
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
         {
             (void)time;
@@ -126,6 +108,24 @@ class UsfsImu : public RealImu {
         UsfsImu(rotateFun_t rotateFun) 
             : RealImu(rotateFun, 1.53e-1) // gyro rate fixed in master mode
         {
+        }
+
+        void begin(void)
+        {
+            usfsLoadFirmware(); 
+
+            usfsBegin(
+                    ACCEL_BANDWIDTH,
+                    GYRO_BANDWIDTH,
+                    QUAT_DIVISOR,
+                    MAG_RATE,
+                    ACCEL_RATE_TENTH,
+                    GYRO_RATE_TENTH,
+                    BARO_RATE,
+                    INTERRUPT_ENABLE);
+
+            // Clear interrupts
+            usfsCheckStatus();
         }
 
         void handleInterrupt(void)

@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 
-#include "imu/real/invensense.h"
+#include "imu/real/softquat/invensense.h"
 
 class Mpu6x00 : public InvenSenseImu {
 
@@ -53,24 +53,6 @@ class Mpu6x00 : public InvenSenseImu {
         gyroScale_e m_gyroScale;
 
         accelScale_e m_accelScale;
-
-        static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
-        {
-            return
-                gyroScale == GYRO_250DPS ?  250 : 
-                gyroScale == GYRO_500DPS ?  500 : 
-                gyroScale == GYRO_1000DPS ?  1000 : 
-                2000;
-        }
-
-        static uint16_t accelScaleToInt(const accelScale_e accelScale)
-        {
-            return
-                accelScale == ACCEL_2G ?  2 : 
-                accelScale == ACCEL_4G ?  4 : 
-                accelScale == ACCEL_8G ?  8 : 
-                16;
-        }
 
         static float scale(const uint16_t n)
         {
@@ -172,8 +154,8 @@ class Mpu6x00 : public InvenSenseImu {
                     sclkPin,
                     csPin,
                     rotateFun,
-                    gyroScaleToInt(gyroScale),
-                    accelScaleToInt(accelScale))
+                    gyroScale,
+                    accelScale)
         {
             m_gyroScale = gyroScale;
             m_accelScale = accelScale;
