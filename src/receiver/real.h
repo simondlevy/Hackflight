@@ -29,14 +29,14 @@ class RealReceiver : public Receiver {
 
     protected:
 
-        virtual void parse(const uint8_t c) = 0;
+        virtual void parse(const uint8_t c, const uint32_t usec) = 0;
 
     public:
 
         void handleSerialEvent(HardwareSerial & serial) {
 
             while (serial.available()) {
-                parse(serial.read());
+                parse(serial.read(), micros());
             }
         }
 

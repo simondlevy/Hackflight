@@ -122,9 +122,8 @@ class SbusReceiver : public RealReceiver {
             return result;
         }
 
-        virtual void parse(const uint8_t c) override
+        virtual void parse(const uint8_t c, const uint32_t usec) override
         {
-            const uint32_t usec = micros();
             const int32_t timeInterval = intcmp(usec, m_startAtUs);
 
             if (timeInterval > 3500) {

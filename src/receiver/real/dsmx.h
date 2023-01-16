@@ -100,9 +100,8 @@ class DsmxReceiver : public RealReceiver {
             return result;
         }
 
-        void parse(const uint8_t c) override
+        void parse(const uint8_t c, const uint32_t usec) override
         {
-            const uint32_t usec = micros();
             const uint32_t timeInterval = intcmp(usec, m_frameData.lastTimeUs);
 
             m_frameData.lastTimeUs = usec;
