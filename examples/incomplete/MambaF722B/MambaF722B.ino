@@ -45,7 +45,7 @@ static MockEsc esc;
 
 static MockReceiver rx;
 
-Icm42688 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, RealImu::rotate0);
+Icm42688 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, RealImu::rotate270);
 
 static vector<PidController *> pids = {};
 
