@@ -210,8 +210,11 @@ class InvenSenseImu : public RealImu {
         static auto mahony(
                 const float dt,
                 const Axes & gyro,
+                const Axes & accel,
                 const Quaternion & q_old) -> Quaternion
         {
+            (void)accel;
+
             // Convert gyro degrees to radians
             const auto gx = deg2rad(gyro.x);
             const auto gy = deg2rad(gyro.y);
@@ -340,6 +343,7 @@ class InvenSenseImu : public RealImu {
             auto quat = mahony(
                     (time - m_fusionPrev.time) * 1e-6,
                     m_gyroAccum.getAverage(),
+                    m_accelAxes,
                     m_fusionPrev.quat);
 
             m_fusionPrev.time = time;
