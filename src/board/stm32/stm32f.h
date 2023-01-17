@@ -59,17 +59,15 @@ class Stm32FBoard : public Stm32Board {
 
         void runSkyrangerTask(void)
         {
-            const auto nextTargetCycles = m_nextTargetCycles;
-            const auto taskRequiredTimeUs = m_skyrangerTask.getRequiredTime();
             const auto nowCycles = getCycleCounter();
-            const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
 
-            // Allow a little extra time
-            const auto taskRequiredCycles =
-                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
-                getTaskGuardCycles();
+            const uint32_t taskRequiredCycles = 
+                m_skyrangerTask.checkReady(
+                        m_nextTargetCycles,
+                        nowCycles,
+                        getTaskGuardCycles());
 
-            if (taskRequiredCycles < loopRemainingCycles) {
+            if (taskRequiredCycles > 0) {
 
                 const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
 
@@ -80,10 +78,8 @@ class Stm32FBoard : public Stm32Board {
                 m_skyrangerTask.update(usec, micros()-usec);
 
                 updateDynamic(getCycleCounter(), anticipatedEndCycles);
-            } else {
-                m_skyrangerTask.enableRun();
-            }
-        }
+            } 
+         }
 
     protected:
 
