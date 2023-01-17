@@ -123,6 +123,8 @@ class Imu {
         float    m_gyroScale;
         bool     m_gyroIsCalibrating;
 
+        uint32_t m_gyroSyncTime;
+
         virtual int16_t readRawGyro(uint8_t k) = 0;
 
         static uint32_t calculateGyroCalibratingCycles(void)
@@ -192,6 +194,22 @@ class Imu {
             return readRawGyro(index) - axis.zero;
         }
 
+        static auto quat2euler(
+                const float qw, const float qx, const float qy, const float qz) -> Axes 
+        {
+            const auto phi = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
+            const auto theta = asin(2.0f*(qx*qz-qw*qy));
+            const auto psi = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
+
+            // Convert heading from [-pi,+pi] to [0,2*pi]
+            return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
+        }
+
+        void handleInterrupt(void)
+        {
+            m_gyroInterruptCount++;
+        }
+
     public:
 
         typedef Axes (*rotateFun_t)(Axes & axes);
@@ -228,5 +246,49 @@ class Imu {
             angles[1] = (int16_t)(10 * rad2degi(vstate->theta));
             angles[2] = (int16_t)rad2degi(vstate->psi);
         }
+
+        static auto rotate0(Axes & axes) -> Axes
+        {
+            return Axes(axes.x, axes.y, axes.z);
+        }
+
+        static auto rotate90(Axes & axes) -> Axes
+        {
+            return Axes(axes.y, -axes.x, axes.z);
+        }
+
+        static auto rotate180(Axes & axes) -> Axes
+        {
+            return Axes(-axes.x, -axes.y, axes.z);
+        }
+
+        static auto rotate270(Axes & axes) -> Axes
+        {
+            return Axes(-axes.y, axes.x, axes.z);
+        }
+
+        static auto rotate0Flip(Axes & axes) -> Axes
+        {
+            return Axes(-axes.x, axes.y, -axes.z);
+        }
+
+        static auto rotate90Flip(Axes & axes) -> Axes
+        {
+            return Axes(axes.y, axes.x, -axes.z);
+        }
+
+        static auto rotate180Flip(Axes & axes) -> Axes
+        {
+            return Axes(axes.x, -axes.y, -axes.z);
+        }
+
+        static auto rotate270Flip(Axes & axes) -> Axes
+        {
+            return Axes(-axes.y, -axes.x, -axes.z);
+        }
+        
+    protected:
+
+        rotateFun_t m_rotateFun;
 
 }; // class Imu

@@ -35,8 +35,6 @@ class RealImu : public Imu {
 
     protected:
 
-        rotateFun_t m_rotateFun;
-
         RealImu(const rotateFun_t rotateFun, const uint16_t gyroScale)
         {
             m_rotateFun = rotateFun;
@@ -52,21 +50,8 @@ class RealImu : public Imu {
             setGyroCalibrationCycles(); 
         }
 
-        static auto quat2euler(
-                const float qw, const float qx, const float qy, const float qz) -> Axes 
-        {
-            const auto phi = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-            const auto theta = asin(2.0f*(qx*qz-qw*qy));
-            const auto psi = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
 
-            // Convert heading from [-pi,+pi] to [0,2*pi]
-            return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
-        }
-
-
-        uint32_t m_gyroSyncTime;
-
-        auto readGyroDps(void) -> Axes
+        virtual auto readGyroDps(void) -> Axes
         {
             const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
 
@@ -131,51 +116,6 @@ class RealImu : public Imu {
             return m_gyroInterruptCount;
         }
 
-        void handleInterrupt(void)
-        {
-            m_gyroInterruptCount++;
-        }
-
     public:
 
-        static auto rotate0(Axes & axes) -> Axes
-        {
-            return Axes(axes.x, axes.y, axes.z);
-        }
-
-        static auto rotate90(Axes & axes) -> Axes
-        {
-            return Axes(axes.y, -axes.x, axes.z);
-        }
-
-        static auto rotate180(Axes & axes) -> Axes
-        {
-            return Axes(-axes.x, -axes.y, axes.z);
-        }
-
-        static auto rotate270(Axes & axes) -> Axes
-        {
-            return Axes(-axes.y, axes.x, axes.z);
-        }
-
-        static auto rotate0Flip(Axes & axes) -> Axes
-        {
-            return Axes(-axes.x, axes.y, -axes.z);
-        }
-
-        static auto rotate90Flip(Axes & axes) -> Axes
-        {
-            return Axes(axes.y, axes.x, -axes.z);
-        }
-
-        static auto rotate180Flip(Axes & axes) -> Axes
-        {
-            return Axes(axes.x, -axes.y, -axes.z);
-        }
-
-        static auto rotate270Flip(Axes & axes) -> Axes
-        {
-            return Axes(-axes.y, -axes.x, -axes.z);
-        }
-        
-}; // class Imu
+}; // class RealImu
