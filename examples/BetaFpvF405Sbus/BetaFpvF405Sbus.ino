@@ -18,7 +18,6 @@
  */
 
 #include <hackflight.h>
-#include <arduino/serial.h>
 #include <board/stm32/f/4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <receiver/sbus.h>
@@ -73,7 +72,7 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent3(void)
 {
-    handleReceiverSerialEvent(rx, Serial3);
+    Board::handleReceiverSerialEvent(rx, Serial3);
 }
 
 // Interupt from Skyranger

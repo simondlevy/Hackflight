@@ -723,6 +723,14 @@ class Board {
             attachInterrupt(pin, irq, mode);  
         }
 
+        static void handleReceiverSerialEvent(Receiver & rx, HardwareSerial & serial) {
+
+            while (serial.available()) {
+
+                rx.parse(serial.read(), micros());
+            }
+        }
+
         static void printf(const char * fmt, ...)
         {
             va_list ap;

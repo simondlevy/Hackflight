@@ -18,7 +18,6 @@
  */
 
 #include <hackflight.h>
-#include <arduino/serial.h>
 #include <board/stm32/ladybug.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <receiver/dsmx.h>
@@ -45,7 +44,7 @@ static void handleImuInterrupt(void)
 
 void serialEvent1(void)
 {
-    handleReceiverSerialEvent(rx, Serial1);
+    Board::handleReceiverSerialEvent(rx, Serial1);
 }
 
 void setup(void)
