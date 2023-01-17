@@ -31,10 +31,6 @@
 
 class RealImu : public Imu {
 
-    public:
-
-        typedef Axes (*rotateFun_t)(Axes & axes);
-
     private:
 
         class Stats {

@@ -44,6 +44,8 @@ class Imu {
 
     public:
 
+        typedef Axes (*rotateFun_t)(Axes & axes);
+
         static float deg2rad(float deg)
         {
             return deg * M_PI / 180;
