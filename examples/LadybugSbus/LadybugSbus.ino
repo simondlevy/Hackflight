@@ -18,9 +18,10 @@
  */
 
 #include <hackflight.h>
+#include <arduino/serial.h>
 #include <board/stm32/ladybug.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <receiver/real/sbus.h>
+#include <receiver/sbus.h>
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -44,7 +45,7 @@ static void handleImuInterrupt(void)
 
 void serialEvent1(void)
 {
-    rx.handleSerialEvent(Serial1);
+    handleReceiverSerialEvent(rx, Serial1);
 }
 
 void setup(void)

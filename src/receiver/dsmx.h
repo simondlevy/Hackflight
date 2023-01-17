@@ -20,9 +20,9 @@
 #include <stdlib.h>
 
 #include "core/utils.h"
-#include "receiver/real.h"
+#include "receiver.h"
 
-class DsmxReceiver : public RealReceiver {
+class DsmxReceiver : public Receiver {
 
     private:
 

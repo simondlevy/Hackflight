@@ -18,11 +18,12 @@
  */
 
 #include <hackflight.h>
+#include <arduino/serial.h>
 #include <board/stm32/f/4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/dshot.h>
-#include <imu/real/invensense/mpu6x00.h>
-#include <receiver/real/dsmx.h>
+#include <imu/real/softquat/invensense/mpu6x00.h>
+#include <receiver/dsmx.h>
 
 #include <vector>
 using namespace std;
@@ -74,7 +75,7 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent1(void)
 {
-    rx.handleSerialEvent(Serial1);
+    handleReceiverSerialEvent(rx, Serial1);
 }
 
 void setup(void)

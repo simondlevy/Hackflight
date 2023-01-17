@@ -22,10 +22,10 @@
 #include <stdlib.h>
 
 #include "core/utils.h"
-#include "receiver/real.h"
+#include "receiver.h"
 
 
-class SbusReceiver : public RealReceiver {
+class SbusReceiver : public Receiver {
 
     private:
 

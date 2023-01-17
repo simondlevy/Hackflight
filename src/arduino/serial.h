@@ -19,26 +19,11 @@
 
 #pragma once
 
-#include <stdlib.h>
+#include <receiver.h>
 
-#include "core/utils.h"
-#include "receiver.h"
+static void handleReceiverSerialEvent(Receiver & rx, HardwareSerial & serial) {
 
-
-class RealReceiver : public Receiver {
-
-    protected:
-
-        virtual void parse(const uint8_t c) = 0;
-
-    public:
-
-        void handleSerialEvent(HardwareSerial & serial) {
-
-            while (serial.available()) {
-                parse(serial.read());
-            }
-        }
-
-}; // class RealReceiver
-
+    while (serial.available()) {
+        rx.parse(serial.read());
+    }
+}

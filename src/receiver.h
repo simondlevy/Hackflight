@@ -341,6 +341,11 @@ class Receiver {
 
     public:
 
+        virtual void parse(const uint8_t c) 
+        {
+            (void)c;
+        }
+
         state_e getState(void)
         {
             return m_state;

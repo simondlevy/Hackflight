@@ -182,6 +182,8 @@ class SoftQuatImu : public RealImu {
             return x * x;
         }
 
+        // Adapted from
+        //  https://github.com/jremington/MPU-6050-Fusion/blob/main/MPU6050_MahonyIMU.ino
         static auto mahony(
                 const float dt,
                 const Axes & gyro,
