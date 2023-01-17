@@ -35,7 +35,7 @@ class Stm32FBoard : public Stm32Board {
 
         void runAccelerometerTask(void)
         {
-            const auto nextTargetCycles = getNextTargetCycles();
+            const auto nextTargetCycles = m_nextTargetCycles;
             const auto taskRequiredTimeUs = m_accelerometerTask.getRequiredTime();
             const auto nowCycles = getCycleCounter();
             const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
@@ -63,7 +63,7 @@ class Stm32FBoard : public Stm32Board {
 
         void runSkyrangerTask(void)
         {
-            const auto nextTargetCycles = getNextTargetCycles();
+            const auto nextTargetCycles = m_nextTargetCycles;
             const auto taskRequiredTimeUs = m_skyrangerTask.getRequiredTime();
             const auto nowCycles = getCycleCounter();
             const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);

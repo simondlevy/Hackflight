@@ -78,7 +78,6 @@ class Board {
         uint32_t m_loopStartDeltaUpCycles;
         int32_t  m_loopStartMaxCycles;
         int32_t  m_loopStartMinCycles;
-        uint32_t m_nextTargetCycles;
         uint32_t m_nextTimingCycles;
         int32_t  m_taskGuardCycles;
         uint32_t m_taskGuardDeltaDownCycles;
@@ -121,7 +120,7 @@ class Board {
         void checkCoreTasks(uint32_t nowCycles)
         {
             int32_t loopRemainingCycles = getLoopRemainingCycles();
-            uint32_t nextTargetCycles = getNextTargetCycles();
+            uint32_t nextTargetCycles = m_nextTargetCycles;
 
             corePreUpdate();
 
@@ -457,6 +456,8 @@ class Board {
 
     protected:
 
+        uint32_t m_nextTargetCycles;
+
         // Initialized in sketch
         Imu * m_imu;
 
@@ -529,11 +530,6 @@ class Board {
             return prioritizer;
         }
 
-        uint32_t getNextTargetCycles(void)
-        {
-            return m_nextTargetCycles;
-        }
-
         int32_t getTaskGuardCycles(void)
         {
             return m_taskGuardCycles;
@@ -583,7 +579,7 @@ class Board {
 
         void runAttitudeTask(void)
         {
-            const auto nextTargetCycles = getNextTargetCycles();
+            const auto nextTargetCycles = m_nextTargetCycles;
             const auto taskRequiredTimeUs = m_attitudeTask.getRequiredTime();
             const auto nowCycles = getCycleCounter();
             const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
@@ -614,7 +610,7 @@ class Board {
         void runReceiverTask(void)
         {
 
-            const auto nextTargetCycles = getNextTargetCycles();
+            const auto nextTargetCycles = m_nextTargetCycles;
             const auto taskRequiredTimeUs = m_receiverTask.getRequiredTime();
             const auto nowCycles = getCycleCounter();
             const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
@@ -644,7 +640,7 @@ class Board {
 
         void runVisualizerTask(void)
         {
-            const auto nextTargetCycles = getNextTargetCycles();
+            const auto nextTargetCycles = m_nextTargetCycles;
             const auto taskRequiredTimeUs = m_visualizerTask.getRequiredTime();
             const auto nowCycles = getCycleCounter();
             const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
@@ -668,7 +664,6 @@ class Board {
                 }
 
                 m_visualizerTask.update(usec, micros()-usec);
-
                 updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } else {
                 m_visualizerTask.enableRun();

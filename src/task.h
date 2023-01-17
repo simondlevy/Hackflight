@@ -73,6 +73,43 @@ class Task {
 
     public:
 
+        bool checkRun(void)
+        {
+            bool retval = false;
+
+            /*
+            const auto nextTargetCycles = getNextTargetCycles();
+            const auto taskRequiredTimeUs = getRequiredTime();
+            const auto nowCycles = getCycleCounter();
+            const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
+
+            // Allow a little extra time
+            const auto taskRequiredCycles =
+                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
+                getTaskGuardCycles();
+
+            if (taskRequiredCycles < loopRemainingCycles) {
+
+                retval = true;
+
+                while (Serial.available()) {
+
+                    if (m_visualizerTask.parse(Serial.read())) {
+                        Serial.write(m_msp.payload, m_msp.payloadSize);
+                    }
+                }
+
+                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+                update(usec, micros()-usec);
+                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+
+            } else {
+                enableRun();
+            }
+            */
+            return retval;
+         }
+
         virtual void adjustDynamicPriority(const uint32_t usec)
         {
             // Task is time-driven, dynamicPriority is last execution age
