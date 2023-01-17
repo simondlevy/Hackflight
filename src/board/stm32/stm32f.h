@@ -35,18 +35,8 @@ class Stm32FBoard : public Stm32Board {
 
         void runAccelerometerTask(void)
         {
-            runTask(m_accelerometerTask);
-        }
-
-        void runSkyrangerTask(void)
-        {
-            runTask(m_skyrangerTask);
-        }
-
-        void runTask(Task & task)
-        {
             const auto nextTargetCycles = getNextTargetCycles();
-            const auto taskRequiredTimeUs = task.getRequiredTime();
+            const auto taskRequiredTimeUs = m_accelerometerTask.getRequiredTime();
             const auto nowCycles = getCycleCounter();
             const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
 
@@ -61,13 +51,41 @@ class Stm32FBoard : public Stm32Board {
 
                 const auto usec = micros();
 
-                task.execute(usec);
+                m_accelerometerTask.execute(usec);
 
-                task.update(micros()-usec);
+                m_accelerometerTask.update(micros()-usec);
 
                 updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } else {
-                task.enableRun();
+                m_accelerometerTask.enableRun();
+            }
+        }
+
+        void runSkyrangerTask(void)
+        {
+            const auto nextTargetCycles = getNextTargetCycles();
+            const auto taskRequiredTimeUs = m_skyrangerTask.getRequiredTime();
+            const auto nowCycles = getCycleCounter();
+            const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
+
+            // Allow a little extra time
+            const auto taskRequiredCycles =
+                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
+                getTaskGuardCycles();
+
+            if (taskRequiredCycles < loopRemainingCycles) {
+
+                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+
+                const auto usec = micros();
+
+                m_skyrangerTask.execute(usec);
+
+                m_skyrangerTask.update(micros()-usec);
+
+                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+            } else {
+                m_skyrangerTask.enableRun();
             }
         }
 
