@@ -601,7 +601,11 @@ class Board {
 
                 const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
 
-                task.execute(micros());
+                const auto usec = micros();
+
+                task.execute(usec);
+
+                task.update(micros()-usec);
 
                 updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } else {

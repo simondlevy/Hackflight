@@ -97,15 +97,16 @@ class Task {
         void execute(const uint32_t usec)
         {
             fun(usec);
-            const uint32_t taskExecutionTimeUs = micros() - usec;
 
             m_lastExecutedAtUs = usec;
+        }
+
+        void update(const uint32_t executionTimeUs)
+        {
             m_dynamicPriority = 0;
 
-            if (taskExecutionTimeUs >
-                    (m_anticipatedExecutionTime >> EXEC_TIME_SHIFT)) {
-                m_anticipatedExecutionTime =
-                    taskExecutionTimeUs << EXEC_TIME_SHIFT;
+            if (executionTimeUs > (m_anticipatedExecutionTime >> EXEC_TIME_SHIFT)) {
+                m_anticipatedExecutionTime = executionTimeUs << EXEC_TIME_SHIFT;
             } else if (m_anticipatedExecutionTime > 1) {
                 // Slowly decay the max time
                 m_anticipatedExecutionTime--;
