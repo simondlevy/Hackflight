@@ -122,9 +122,8 @@ class SbusReceiver : public Receiver {
             return result;
         }
 
-        virtual void parse(const uint8_t c) override
+        virtual void parse(const uint8_t byte, const uint32_t usec) override
         {
-            const uint32_t usec = micros();
             const int32_t timeInterval = intcmp(usec, m_startAtUs);
 
             if (timeInterval > 3500) {
@@ -133,14 +132,14 @@ class SbusReceiver : public Receiver {
 
             if (m_position == 0) {
 
-                if (c != 0x0F) {
+                if (byte != 0x0F) {
                     return;
                 }
                 m_startAtUs = usec;
             }
 
             if (m_position < FRAME_SIZE) {
-                m_frame.bytes[m_position++] = c;
+                m_frame.bytes[m_position++] = byte;
                 if (m_position < FRAME_SIZE) {
                     m_done = false;
                 } else {

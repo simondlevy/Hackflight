@@ -24,6 +24,7 @@
 static void handleReceiverSerialEvent(Receiver & rx, HardwareSerial & serial) {
 
     while (serial.available()) {
-        rx.parse(serial.read());
+
+        rx.parse(serial.read(), micros());
     }
 }

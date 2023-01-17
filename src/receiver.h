@@ -341,9 +341,10 @@ class Receiver {
 
     public:
 
-        virtual void parse(const uint8_t c) 
+        virtual void parse(const uint8_t byte, const uint32_t usec) 
         {
-            (void)c;
+            (void)byte;
+            (void)usec;
         }
 
         state_e getState(void)

@@ -100,9 +100,8 @@ class DsmxReceiver : public Receiver {
             return result;
         }
 
-        void parse(const uint8_t c) override
+        void parse(const uint8_t byte, const uint32_t usec) override
         {
-            const uint32_t usec = micros();
             const uint32_t timeInterval = intcmp(usec, m_frameData.lastTimeUs);
 
             m_frameData.lastTimeUs = usec;
@@ -112,7 +111,7 @@ class DsmxReceiver : public Receiver {
             }
 
             if (m_frameData.position < FRAME_SIZE) {
-                m_frameData.bytes[m_frameData.position++] = (uint8_t)c;
+                m_frameData.bytes[m_frameData.position++] = byte;
                 if (m_frameData.position < FRAME_SIZE) {
                     m_frameData.done = false;
                 } else {
