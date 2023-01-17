@@ -56,68 +56,69 @@ class VisualizerTask : public Task {
             Serial.write(m_msp->payload, m_msp->payloadSize);
         }
 
+        uint8_t parse(const uint8_t byte)
+        {
+            if (m_msp->isIdle() && byte == 'R') {
+                m_gotRebootRequest = true;
+            }
+
+            switch (m_msp->parse(byte)) {
+
+                case 105: // RC
+                    {
+                        int16_t channels[] = {
+                            (int16_t)m_receiver->getRawThrottle(),
+                            (int16_t)m_receiver->getRawRoll(),
+                            (int16_t)m_receiver->getRawPitch(),
+                            (int16_t)m_receiver->getRawYaw(),
+                            (int16_t)scale(m_receiver->getRawAux1()),
+                            (int16_t)scale(m_receiver->getRawAux2())
+                        };
+
+                        sendShorts(105, channels, 6);
+
+                    } return 6;
+
+                case 108: // ATTITUDE
+                    {
+                        int16_t angles[3] = {};
+                        Imu::getEulerAngles(m_vstate, angles);
+                        sendShorts(108, angles, 3);
+                    } return 3;
+
+                case 121: // VL53L5 ranging camera
+                    sendShorts(121, m_skyrangerTask->rangerData, 16);
+                    return 16;
+
+                case 122: // PAA3905 mocap
+                    sendShorts(122, m_skyrangerTask->mocapData, 2);
+                    return 2;
+
+                case 214: // SET_MOTORS
+                    {
+                        motors[0] =
+                            m_esc->convertFromExternal(m_msp->parseShort(0));
+                        motors[1] =
+                            m_esc->convertFromExternal(m_msp->parseShort(1));
+                        motors[2] =
+                            m_esc->convertFromExternal(m_msp->parseShort(2));
+                        motors[3] =
+                            m_esc->convertFromExternal(m_msp->parseShort(3));
+
+                    } return 0;
+
+                default:
+                    return 0;
+            }
+        }
+
     public:
 
         void run(void)
         {
             while (Serial.available()) {
 
-                auto byte = Serial.read();
-
-                if (m_msp->isIdle() && byte == 'R') {
-                    m_gotRebootRequest = true;
-                }
-
-                auto messageType = m_msp->parse(byte);
-
-                switch (messageType) {
-
-                    case 105: // RC
-                        {
-                            int16_t channels[] = {
-                                (int16_t)m_receiver->getRawThrottle(),
-                                (int16_t)m_receiver->getRawRoll(),
-                                (int16_t)m_receiver->getRawPitch(),
-                                (int16_t)m_receiver->getRawYaw(),
-                                (int16_t)scale(m_receiver->getRawAux1()),
-                                (int16_t)scale(m_receiver->getRawAux2())
-                            };
-
-                            sendShorts(105, channels, 6);
-
-                        } break;
-
-                    case 108: // ATTITUDE
-                        {
-                            int16_t angles[3] = {};
-                            Imu::getEulerAngles(m_vstate, angles);
-                            sendShorts(108, angles, 3);
-                        } break;
-
-                    case 121: // VL53L5 ranging camera
-                        sendShorts(121, m_skyrangerTask->rangerData, 16);
-                        break;
-
-                    case 122: // PAA3905 mocap
-                        sendShorts(122, m_skyrangerTask->mocapData, 2);
-                        break;
-
-                    case 214: // SET_MOTORS
-                        {
-                            motors[0] =
-                                m_esc->convertFromExternal(m_msp->parseShort(0));
-                            motors[1] =
-                                m_esc->convertFromExternal(m_msp->parseShort(1));
-                            motors[2] =
-                                m_esc->convertFromExternal(m_msp->parseShort(2));
-                            motors[3] =
-                                m_esc->convertFromExternal(m_msp->parseShort(3));
-
-                        } break;
-
-                    default:
-                        break;
-                }
+                parse(Serial.read());
             }
         }
 
