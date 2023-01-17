@@ -32,6 +32,11 @@ class Imu {
 
     private:
 
+        static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
+        static const uint16_t GYRO_LPF1_DYN_MIN_HZ           = 250;
+        static const uint16_t GYRO_LPF2_STATIC_HZ            = 500;
+        static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
+
         static float rad2deg(float rad)
         {
             return 180 * rad / M_PI;
@@ -41,13 +46,6 @@ class Imu {
         {
             return (int16_t)rad2deg(rad);
         }
-
-    protected:
-
-        static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
-        static const uint16_t GYRO_LPF1_DYN_MIN_HZ           = 250;
-        static const uint16_t GYRO_LPF2_STATIC_HZ            = 500;
-        static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
 
         class Stats {
 
@@ -97,8 +95,6 @@ class Imu {
             Stats stats[3];
         } calibration_t;
 
-        uint8_t  m_interruptPin;
-
         typedef struct {
 
             float dps;           // aligned, calibrated, scaled, unfiltered
@@ -111,21 +107,12 @@ class Imu {
 
         } gyroAxis_t;
 
-
-        gyroAxis_t m_gyroX;
-        gyroAxis_t m_gyroY;
-        gyroAxis_t m_gyroZ;
-
         calibration_t m_gyroCalibration;
 
         int32_t  m_gyroCalibrationCyclesRemaining;
         uint32_t m_gyroInterruptCount;
         float    m_gyroScale;
         bool     m_gyroIsCalibrating;
-
-        uint32_t m_gyroSyncTime;
-
-        virtual int16_t readRawGyro(uint8_t k) = 0;
 
         static uint32_t calculateGyroCalibratingCycles(void)
         {
@@ -193,6 +180,16 @@ class Imu {
         {
             return readRawGyro(index) - axis.zero;
         }
+
+    protected:
+
+        uint32_t m_gyroSyncTime;
+
+        gyroAxis_t m_gyroX;
+        gyroAxis_t m_gyroY;
+        gyroAxis_t m_gyroZ;
+
+        virtual int16_t readRawGyro(uint8_t k) = 0;
 
         static auto quat2euler(
                 const float qw, const float qx, const float qy, const float qz) -> Axes 
@@ -262,6 +259,7 @@ class Imu {
 
         typedef Axes (*rotateFun_t)(Axes & axes);
 
+        rotateFun_t m_rotateFun;
 
         Imu(void) 
         {
@@ -361,9 +359,5 @@ class Imu {
         {
             return Axes(-axes.y, -axes.x, -axes.z);
         }
-        
-    protected:
-
-        rotateFun_t m_rotateFun;
 
 }; // class Imu
