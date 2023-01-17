@@ -609,17 +609,15 @@ class Board {
 
         void runReceiverTask(void)
         {
-            const auto nextTargetCycles = m_nextTargetCycles;
-            const auto taskRequiredTimeUs = m_receiverTask.getRequiredTime();
             const auto nowCycles = getCycleCounter();
-            const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
 
-            // Allow a little extra time
-            const auto taskRequiredCycles =
-                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
-                getTaskGuardCycles();
+            const uint32_t taskRequiredCycles = 
+                m_receiverTask.checkReady(
+                        m_nextTargetCycles,
+                        nowCycles,
+                        getTaskGuardCycles());
 
-            if (taskRequiredCycles < loopRemainingCycles) {
+            if (taskRequiredCycles > 0) {
 
                 const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
 
@@ -630,9 +628,7 @@ class Board {
                 m_receiverTask.update(usec, micros()-usec);
 
                 updateDynamic(getCycleCounter(), anticipatedEndCycles);
-            } else {
-                m_receiverTask.enableRun();
-            }
+            } 
 
             updateArmingFromReceiver();
         }
