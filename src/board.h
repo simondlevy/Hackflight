@@ -347,8 +347,7 @@ class Board {
                     break;
             }
 
-            auto now = micros();
-            m_ledWarningTimer = now + 500000;
+            m_ledWarningTimer = micros() + 500000;
         }
 
         void ledSet(bool on)
@@ -389,9 +388,7 @@ class Board {
 
         void ledWarningUpdate(void)
         {
-            uint32_t now = micros();
-
-            if ((int32_t)(now - m_ledWarningTimer) < 0) {
+            if ((int32_t)(micros() - m_ledWarningTimer) < 0) {
                 return;
             }
 

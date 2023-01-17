@@ -99,10 +99,10 @@ class Task {
             m_lastExecutedAtUs = usec;
             m_dynamicPriority = 0;
 
-            uint32_t time = micros(); //timeMicros();
+            uint32_t time = micros();
             fun(usec);
 
-            uint32_t taskExecutionTimeUs = micros() /*timeMicros()*/ - time;
+            uint32_t taskExecutionTimeUs = micros() - time;
 
             if (taskExecutionTimeUs >
                     (m_anticipatedExecutionTime >> EXEC_TIME_SHIFT)) {
