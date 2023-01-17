@@ -552,22 +552,21 @@ class Board {
             return prioritizer;
         }
 
-        virtual void runPrioritizedTask(
-                const Task::prioritizer_t prioritizer, const uint32_t usec)
+        virtual void runPrioritizedTask(const Task::prioritizer_t prioritizer)
         {
             switch (prioritizer.id) {
 
                 case Task::ATTITUDE:
-                    runTask(m_attitudeTask, usec);
+                    runTask(m_attitudeTask);
                     updateArmingFromImu();
                     break;
 
                 case Task::VISUALIZER:
-                    runTask(m_visualizerTask, usec);
+                    runTask(m_visualizerTask);
                     break;
 
                 case Task::RECEIVER:
-                    runTask(m_receiverTask, usec);
+                    runTask(m_receiverTask);
                     updateArmingFromReceiver();
                     break;
 
@@ -578,14 +577,12 @@ class Board {
 
         virtual void checkDynamicTasks(void)
         {
-            const uint32_t usec = micros();
+            Task::prioritizer_t prioritizer = prioritizeDynamicTasks(micros());
 
-            Task::prioritizer_t prioritizer = prioritizeDynamicTasks(usec);
-
-            runPrioritizedTask(prioritizer, usec);
+            runPrioritizedTask(prioritizer);
         }
 
-        void runTask(Task & task, uint32_t usec)
+        void runTask(Task & task)
         {
             const auto nextTargetCycles = getNextTargetCycles();
 
@@ -604,7 +601,7 @@ class Board {
 
                 const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
 
-                task.execute(usec);
+                task.execute(micros());
 
                 updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } else {

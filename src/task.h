@@ -96,9 +96,8 @@ class Task {
 
         void execute(const uint32_t usec)
         {
-            const uint32_t time = micros();
             fun(usec);
-            const uint32_t taskExecutionTimeUs = micros() - time;
+            const uint32_t taskExecutionTimeUs = micros() - usec;
 
             m_lastExecutedAtUs = usec;
             m_dynamicPriority = 0;

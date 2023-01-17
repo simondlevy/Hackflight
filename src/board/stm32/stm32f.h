@@ -57,15 +57,15 @@ class Stm32FBoard : public Stm32Board {
             switch (prioritizer.id) {
 
                 case Task::ACCELEROMETER:
-                    runTask(m_accelerometerTask, usec);
+                    runTask(m_accelerometerTask);
                     break;
 
                 case Task::SKYRANGER:
-                    runTask(m_skyrangerTask, usec);
+                    runTask(m_skyrangerTask);
                     break;
 
                 default:
-                    runPrioritizedTask(prioritizer, usec);
+                    runPrioritizedTask(prioritizer);
                     break;
             }
         }
