@@ -128,10 +128,10 @@ class UsfsImu : public Imu {
             usfsCheckStatus();
         }
 
-        void handleInterrupt(void)
+        void handleInterrupt(const uint32_t usec)
         {
             m_gotNewData = true;
             m_gyroInterruptCount++;
-            m_gyroSyncTime = micros();
+            m_gyroSyncTime = usec;
         }
 };
