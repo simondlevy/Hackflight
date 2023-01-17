@@ -40,12 +40,4 @@ class RealImu : public Imu {
 
         }
 
-        void begin(uint32_t clockSpeed) 
-        {
-            (void)clockSpeed;
-
-            // Start calibrating gyro
-            setGyroCalibrationCycles(); 
-        }
-
 }; // class RealImu

@@ -271,7 +271,14 @@ class Imu {
 
         typedef void (*align_fun)(Axes * axes);
 
-        virtual void begin(uint32_t clockSpeed) = 0;
+        virtual void begin(uint32_t clockSpeed) 
+        {
+            (void)clockSpeed;
+
+            // Start calibrating gyro
+            setGyroCalibrationCycles(); 
+        }
+
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 
