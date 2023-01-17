@@ -731,6 +731,11 @@ class Board {
             }
         }
 
+        static void serialWrite(const uint8_t buffer[], const uint8_t size)
+        {
+            Serial.write(buffer, size);
+        }
+
         static void printf(const char * fmt, ...)
         {
             va_list ap;
