@@ -59,17 +59,17 @@ class MockImu : public Imu {
 
         virtual uint32_t getGyroInterruptCount(void) override
         {
+            static uint32_t _result;
             static uint32_t _count;
-            static uint32_t _tprev;
 
-            // Simulate 8kHz interrupts
-            uint32_t time = micros();
-            if (time - _tprev > 125) {
-                _count++;
-                _tprev = time;
+            _count += 1;
+
+            if (_count == 1000) {
+                _result++;
+                _count = 0;
             }
 
-            return _count;
+            return _result;
         }
 
         virtual int32_t getGyroSkew(
