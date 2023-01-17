@@ -73,40 +73,29 @@ class Task {
 
     public:
 
-        bool checkRun(void)
+        uint32_t checkReady(
+                const uint32_t nextTargetCycles,
+                const uint32_t nowCycles,
+                const uint32_t taskGuardCycles)
         {
-            bool retval = false;
+            bool retval = 0;
 
-            /*
-            const auto nextTargetCycles = getNextTargetCycles();
             const auto taskRequiredTimeUs = getRequiredTime();
-            const auto nowCycles = getCycleCounter();
+
             const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
 
             // Allow a little extra time
             const auto taskRequiredCycles =
-                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
-                getTaskGuardCycles();
+                microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) + taskGuardCycles;
 
-            if (taskRequiredCycles < loopRemainingCycles) {
+            if ((int32_t)taskRequiredCycles < loopRemainingCycles) {
 
-                retval = true;
-
-                while (Serial.available()) {
-
-                    if (m_visualizerTask.parse(Serial.read())) {
-                        Serial.write(m_msp.payload, m_msp.payloadSize);
-                    }
-                }
-
-                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
-                update(usec, micros()-usec);
-                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+                retval = taskRequiredCycles;
 
             } else {
                 enableRun();
             }
-            */
+            
             return retval;
          }
 
