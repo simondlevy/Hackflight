@@ -24,6 +24,12 @@ class MockImu : public Imu {
 
     protected:
 
+        virtual int16_t readRawGyro(uint8_t k) 
+        {
+            (void)k;
+            return 0;
+        }
+
         virtual void begin(uint32_t clockSpeed) override 
         {
             (void)clockSpeed;

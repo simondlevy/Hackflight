@@ -33,105 +33,7 @@ class RealImu : public Imu {
 
     private:
 
-        uint8_t  m_interruptPin;
-
-        static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
-        static const uint16_t GYRO_LPF1_DYN_MIN_HZ           = 250;
-        static const uint16_t GYRO_LPF2_STATIC_HZ            = 500;
-        static const uint8_t  MOVEMENT_CALIBRATION_THRESHOLD = 48;
-
-        typedef struct {
-
-            float dps;           // aligned, calibrated, scaled, unfiltered
-            float dpsFiltered;   // filtered 
-            float sampleSum;     // summed samples used for downsampling
-            float zero;
-
-            Pt1Filter lowpassFilter1 = Pt1Filter(GYRO_LPF1_DYN_MIN_HZ);
-            Pt1Filter lowpassFilter2 = Pt1Filter(GYRO_LPF2_STATIC_HZ);
-
-        } gyroAxis_t;
-
-
-        calibration_t m_gyroCalibration;
-
-        int32_t  m_gyroCalibrationCyclesRemaining;
-        uint32_t m_gyroInterruptCount;
-        float    m_gyroScale;
-        bool     m_gyroIsCalibrating;
-
-        static uint32_t calculateGyroCalibratingCycles(void)
-        {
-            return GYRO_CALIBRATION_DURATION / Clock::PERIOD();
-        }
-
-        void setGyroCalibrationCycles(void)
-        {
-            m_gyroCalibrationCyclesRemaining = (int32_t)calculateGyroCalibratingCycles();
-        }
-
-        void calibrateGyroAxis(gyroAxis_t & axis, const uint8_t index)
-        {
-            // Reset at start of calibration
-            if (m_gyroCalibrationCyclesRemaining == (int32_t)calculateGyroCalibratingCycles()) {
-                m_gyroCalibration.sum[index] = 0.0f;
-                m_gyroCalibration.stats[index].stdevClear();
-                // zero is set to zero until calibration complete
-                axis.zero = 0.0f;
-            }
-
-            // Sum up CALIBRATING_GYRO_TIME_US readings
-            m_gyroCalibration.sum[index] += readRawGyro(index);
-            m_gyroCalibration.stats[index].stdevPush(readRawGyro(index));
-
-            if (m_gyroCalibrationCyclesRemaining == 1) {
-                const float stddev = m_gyroCalibration.stats[index].stdevCompute();
-
-                // check deviation and startover in case the model was moved
-                if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
-                        MOVEMENT_CALIBRATION_THRESHOLD) {
-                    setGyroCalibrationCycles();
-                    return;
-                }
-
-                axis.zero = m_gyroCalibration.sum[index] / calculateGyroCalibratingCycles();
-            }
-        }
-
-        void calibrateGyro(void)
-        {
-            calibrateGyroAxis(m_gyroX, 0);
-            calibrateGyroAxis(m_gyroY, 1);
-            calibrateGyroAxis(m_gyroZ, 2);
-
-            --m_gyroCalibrationCyclesRemaining;
-        }
-
-        void applyGyroLpf1(gyroAxis_t & axis)
-        {
-            axis.dpsFiltered = axis.lowpassFilter1.apply(axis.sampleSum);
-        }
-
-        void applyGyroLpf2(gyroAxis_t & axis)
-        {
-            axis.sampleSum = axis.lowpassFilter2.apply(axis.dps);
-        }
-
-        void scaleGyro(gyroAxis_t & axis, const float adc)
-        {
-            axis.dps = adc * m_gyroScale; 
-        }
-
-        float readCalibratedGyro(gyroAxis_t & axis, uint8_t index)
-        {
-            return readRawGyro(index) - axis.zero;
-        }
-
     protected:
-
-        gyroAxis_t m_gyroX;
-        gyroAxis_t m_gyroY;
-        gyroAxis_t m_gyroZ;
 
         rotateFun_t m_rotateFun;
 
@@ -163,8 +65,6 @@ class RealImu : public Imu {
 
 
         uint32_t m_gyroSyncTime;
-
-        virtual int16_t readRawGyro(uint8_t k) = 0;
 
         auto readGyroDps(void) -> Axes
         {
