@@ -55,6 +55,8 @@ class VisualizerTask : public Task {
             m_msp->serializeShorts(messageType, src, count);
         }
 
+    public:
+
         bool parse(const uint8_t byte)
         {
             if (m_msp->isIdle() && byte == 'R') {
@@ -114,18 +116,6 @@ class VisualizerTask : public Task {
             }
 
             return false;
-        }
-
-    public:
-
-        void run(void)
-        {
-            while (Serial.available()) {
-
-                if (parse(Serial.read())) {
-                    Serial.write(m_msp->payload, m_msp->payloadSize);
-                }
-            }
         }
 
         VisualizerTask(

@@ -660,7 +660,12 @@ class Board {
 
                 const auto usec = micros();
 
-                m_visualizerTask.run();
+                while (Serial.available()) {
+
+                    if (m_visualizerTask.parse(Serial.read())) {
+                        Serial.write(m_msp.payload, m_msp.payloadSize);
+                    }
+                }
 
                 m_visualizerTask.update(usec, micros()-usec);
 
