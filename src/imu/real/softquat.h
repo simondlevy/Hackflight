@@ -185,29 +185,96 @@ class SoftQuatImu : public RealImu {
         static auto mahony(
                 const float dt,
                 const Axes & gyro,
-                const Quaternion & q_old) -> Quaternion
+                const Axes & accel,
+                const Quaternion & q_old,
+                const float Kp = 30.0,
+                const float Ki = 0.0) -> Quaternion
         {
-            // Convert gyro degrees to radians
-            const auto gx = deg2rad(gyro.x);
-            const auto gy = deg2rad(gyro.y);
-            const auto gz = deg2rad(gyro.z);
+            auto gx = deg2rad(gyro.x);
+            auto gy = deg2rad(gyro.y);
+            auto gz = deg2rad(gyro.z);
 
-            // Apply proportional and integral feedback, then integrate rate-of-change
-            const auto gx1 = gx * dt / 2;
-            const auto gy1 = gy * dt / 2;
-            const auto gz1 = gz * dt / 2;
+            auto ax = accel.x;
+            auto ay = accel.y;
+            auto az = accel.z;
 
-            // Update quaternion
-            const auto qw = q_old.w - q_old.x * gx1 - q_old.y * gy1 - q_old.z * gz1;
-            const auto qx = q_old.x + q_old.w * gx1 + q_old.y * gz1 - q_old.z * gy1;
-            const auto qy = q_old.y + q_old.w * gy1 - q_old.x * gz1 + q_old.z * gx1;
-            const auto qz = q_old.z + q_old.w * gz1 + q_old.x * gy1 - q_old.y * gx1;
+            auto qw = q_old.w;
+            auto qx = q_old.x;
+            auto qy = q_old.y;
+            auto qz = q_old.z;
 
-            // Normalise quaternion
-            float norm = invSqrt(square(qw) + square(qx) + square(qy) + square(qz));
+            const auto recipAccNorm = square(ax) + square(ay) + square(az);
 
-            return Quaternion(qw * norm, qx * norm, qy * norm, qz * norm);
-        }
+            if (recipAccNorm > 0.0) {
+
+                static float ix;
+                static float iy;
+                static float iz;
+
+                // Normalise accelerometer (assumed to measure the direction of
+                // gravity in body frame)
+                auto recipNorm = 1.0 / sqrt(recipAccNorm);
+                ax *= recipNorm;
+                ay *= recipNorm;
+                az *= recipNorm;
+
+                // Estimated direction of gravity in the body frame (factor of
+                // two divided out)
+                const auto vx = qx * qz - qw * qy;  //to normalize these terms,
+                const auto vy = qw * qx + qy * qz;
+                const auto vz = qw * qw - 0.5 + qz * qz;
+
+                // Error is cross product between estimated and measured
+                // direction of gravity in body frame (half the actual
+                // magnitude)
+                const auto ex = (ay * vz - az * vy);
+                const auto ey = (az * vx - ax * vz);
+                const auto ez = (ax * vy - ay * vx);
+
+                // Compute and apply to gyro term the integral feedback, if enabled
+                if (Ki > 0.0) {
+                    ix += Ki * ex * dt;  // integral error scaled by Ki
+                    iy += Ki * ey * dt;
+                    iz += Ki * ez * dt;
+                    gx += ix;  // apply integral feedback
+                    gy += iy;
+                    gz += iz;
+                }
+
+                // Apply proportional feedback to gyro term
+                gx += Kp * ex;
+                gy += Kp * ey;
+                gz += Kp * ez;
+            }
+
+            // Integrate rate of change of quaternion, q cross gyro term
+
+            const auto dtnew = 0.5 * dt;
+
+            gx *= dtnew;   
+            gy *= dtnew;
+            gz *= dtnew;
+
+            const auto qa = qw;
+            const auto qb = qx;
+            const auto qc = qy;
+
+            qw += (-qb * gx - qc * gy - qz * gz);
+            qx += (qa * gx + qc * gz - qz * gy);
+            qy += (qa * gy - qb * gz + qz * gx);
+            qz += (qa * gz + qb * gy - qc * gx);
+
+            // renormalise quaternion
+            auto recipNorm = 1.0 /
+                (sqrt(square(qw) + square(qx) + square(qy) + square(qz)));
+
+            return Quaternion(
+                    qw * recipNorm,
+                    qx * recipNorm,
+                    qy * recipNorm,
+                    qz * recipNorm);
+
+        } // mahony
 
         ImuSensor m_gyroAccum;
 
@@ -256,6 +323,7 @@ class SoftQuatImu : public RealImu {
             auto quat = mahony(
                     (time - m_fusionPrev.time) * 1e-6,
                     m_gyroAccum.getAverage(),
+                    m_accelAxes,
                     m_fusionPrev.quat);
 
             m_fusionPrev.time = time;
