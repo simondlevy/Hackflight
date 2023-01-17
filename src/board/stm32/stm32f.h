@@ -43,6 +43,34 @@ class Stm32FBoard : public Stm32Board {
             runTask(m_skyrangerTask);
         }
 
+        void runTask(Task & task)
+        {
+            const auto nextTargetCycles = getNextTargetCycles();
+            const auto taskRequiredTimeUs = task.getRequiredTime();
+            const auto nowCycles = getCycleCounter();
+            const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
+
+            // Allow a little extra time
+            const auto taskRequiredCycles =
+                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
+                getTaskGuardCycles();
+
+            if (taskRequiredCycles < loopRemainingCycles) {
+
+                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+
+                const auto usec = micros();
+
+                task.execute(usec);
+
+                task.update(micros()-usec);
+
+                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+            } else {
+                task.enableRun();
+            }
+        }
+
     protected:
 
         // STM32F boards have no auto-reset bootloader support, so we reboot on

@@ -411,21 +411,12 @@ class Board {
             lastTargetCycles = m_nextTargetCycles;
         }
 
-        int32_t getTaskGuardCycles(void)
-        {
-            return m_taskGuardCycles;
-        }
-        
+       
         int32_t getLoopRemainingCycles(void)
         {
             return m_loopRemainingCycles;
         }
         
-        uint32_t getNextTargetCycles(void)
-        {
-            return m_nextTargetCycles;
-        }
-
         bool isCoreReady(uint32_t nowCycles)
         {
             m_nextTargetCycles = lastTargetCycles + desiredPeriodCycles;
@@ -461,20 +452,6 @@ class Board {
                 intcmp(m_nextTargetCycles, nowCycles);
 
             return newLoopRemainingCyles > m_guardMargin;
-        }
-
-        void updateDynamic(uint32_t nowCycles, uint32_t anticipatedEndCycles)
-        {
-            auto cyclesOverdue = intcmp(nowCycles, anticipatedEndCycles);
-
-            if ((cyclesOverdue > 0) || (-cyclesOverdue < m_taskGuardMinCycles)) {
-
-                if (m_taskGuardCycles < m_taskGuardMaxCycles) {
-                    m_taskGuardCycles += m_taskGuardDeltaUpCycles;
-                }
-            } else if (m_taskGuardCycles > m_taskGuardMinCycles) {
-                m_taskGuardCycles -= m_taskGuardDeltaDownCycles;
-            }        
         }
 
 
@@ -550,6 +527,30 @@ class Board {
             m_visualizerTask.prioritize(usec, prioritizer);
 
             return prioritizer;
+        }
+
+        uint32_t getNextTargetCycles(void)
+        {
+            return m_nextTargetCycles;
+        }
+
+        int32_t getTaskGuardCycles(void)
+        {
+            return m_taskGuardCycles;
+        }
+
+        void updateDynamic(uint32_t nowCycles, uint32_t anticipatedEndCycles)
+        {
+            auto cyclesOverdue = intcmp(nowCycles, anticipatedEndCycles);
+
+            if ((cyclesOverdue > 0) || (-cyclesOverdue < m_taskGuardMinCycles)) {
+
+                if (m_taskGuardCycles < m_taskGuardMaxCycles) {
+                    m_taskGuardCycles += m_taskGuardDeltaUpCycles;
+                }
+            } else if (m_taskGuardCycles > m_taskGuardMinCycles) {
+                m_taskGuardCycles -= m_taskGuardDeltaDownCycles;
+            }        
         }
 
         void runPrioritizedTask(Task::prioritizer_t prioritizer)
@@ -643,13 +644,8 @@ class Board {
 
         void runVisualizerTask(void)
         {
-            runTask(m_visualizerTask);
-        }
-
-        void runTask(Task & task)
-        {
             const auto nextTargetCycles = getNextTargetCycles();
-            const auto taskRequiredTimeUs = task.getRequiredTime();
+            const auto taskRequiredTimeUs = m_visualizerTask.getRequiredTime();
             const auto nowCycles = getCycleCounter();
             const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
 
@@ -664,13 +660,13 @@ class Board {
 
                 const auto usec = micros();
 
-                task.execute(usec);
+                m_visualizerTask.execute(usec);
 
-                task.update(micros()-usec);
+                m_visualizerTask.update(micros()-usec);
 
                 updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } else {
-                task.enableRun();
+                m_visualizerTask.enableRun();
             }
         }
 
