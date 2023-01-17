@@ -33,6 +33,16 @@ class Stm32FBoard : public Stm32Board {
             m_skyrangerTask.parse(byte);
         }
 
+        void runAccelerometerTask(void)
+        {
+            runTask(m_accelerometerTask);
+        }
+
+        void runSkyrangerTask(void)
+        {
+            runTask(m_skyrangerTask);
+        }
+
     protected:
 
         // STM32F boards have no auto-reset bootloader support, so we reboot on
@@ -57,11 +67,11 @@ class Stm32FBoard : public Stm32Board {
             switch (prioritizer.id) {
 
                 case Task::ACCELEROMETER:
-                    runTask(m_accelerometerTask);
+                    runAccelerometerTask();
                     break;
 
                 case Task::SKYRANGER:
-                    runTask(m_skyrangerTask);
+                    runSkyrangerTask();
                     break;
 
                 default:

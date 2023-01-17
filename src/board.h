@@ -552,28 +552,26 @@ class Board {
             return prioritizer;
         }
 
-        virtual void runPrioritizedTask(const Task::prioritizer_t prioritizer)
+        void runPrioritizedTask(Task::prioritizer_t prioritizer)
         {
             switch (prioritizer.id) {
 
                 case Task::ATTITUDE:
-                    runTask(m_attitudeTask);
-                    updateArmingFromImu();
+                    runAttitudeTask();
                     break;
 
                 case Task::VISUALIZER:
-                    runTask(m_visualizerTask);
+                    runVisualizerTask();
                     break;
 
                 case Task::RECEIVER:
-                    runTask(m_receiverTask);
-                    updateArmingFromReceiver();
+                    runReceiverTask();
                     break;
 
                 default:
                     break;
             }
-         }
+        }
 
         virtual void checkDynamicTasks(void)
         {
@@ -582,14 +580,52 @@ class Board {
             runPrioritizedTask(prioritizer);
         }
 
+        void runAttitudeTask(void)
+        {
+            const auto nextTargetCycles = getNextTargetCycles();
+            const auto taskRequiredTimeUs = m_attitudeTask.getRequiredTime();
+            const auto nowCycles = getCycleCounter();
+            const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
+
+            // Allow a little extra time
+            const auto taskRequiredCycles =
+                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
+                getTaskGuardCycles();
+
+            if (taskRequiredCycles < loopRemainingCycles) {
+
+                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+
+                const auto usec = micros();
+
+                m_attitudeTask.run(usec);
+
+                m_attitudeTask.update(micros()-usec);
+
+                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+            } else {
+                m_attitudeTask.enableRun();
+            }
+
+            updateArmingFromImu();
+        }
+
+        void runReceiverTask(void)
+        {
+            runTask(m_receiverTask);
+            updateArmingFromReceiver();
+        }
+
+        void runVisualizerTask(void)
+        {
+            runTask(m_visualizerTask);
+        }
+
         void runTask(Task & task)
         {
             const auto nextTargetCycles = getNextTargetCycles();
-
             const auto taskRequiredTimeUs = task.getRequiredTime();
-
             const auto nowCycles = getCycleCounter();
-
             const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
 
             // Allow a little extra time
