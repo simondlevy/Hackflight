@@ -31,8 +31,6 @@
 
 class RealImu : public Imu {
 
-    private:
-
     protected:
 
         RealImu(const rotateFun_t rotateFun, const uint16_t gyroScale)
@@ -51,52 +49,7 @@ class RealImu : public Imu {
         }
 
 
-        virtual auto readGyroDps(void) -> Axes
-        {
-            const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
-
-            static Axes _adc;
-
-            if (calibrationComplete) {
-
-                // move 16-bit gyro data into floats to avoid overflows in
-                // calculations
-
-                _adc.x = readCalibratedGyro(m_gyroX, 0);
-                _adc.y = readCalibratedGyro(m_gyroY, 1);
-                _adc.z = readCalibratedGyro(m_gyroZ, 2);
-
-                _adc = m_rotateFun(_adc);
-
-            } else {
-                calibrateGyro();
-            }
-
-            if (calibrationComplete) {
-                scaleGyro(m_gyroX, _adc.x);
-                scaleGyro(m_gyroY, _adc.y);
-                scaleGyro(m_gyroZ, _adc.z);
-            }
-
-            // Use gyro lowpass 2 filter for downsampling
-            applyGyroLpf2(m_gyroX);
-            applyGyroLpf2(m_gyroY);
-            applyGyroLpf2(m_gyroZ);
-
-            // Then apply lowpass 1
-            applyGyroLpf1(m_gyroX);
-            applyGyroLpf1(m_gyroY);
-            applyGyroLpf1(m_gyroZ);
-
-            // Used for fusion with accelerometer
-            //accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
-
-            m_gyroIsCalibrating = !calibrationComplete;
-
-            return Axes(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
-        }
-
-        bool gyroIsCalibrating(void)
+       bool gyroIsCalibrating(void)
         {
             return m_gyroIsCalibrating;
         }
@@ -116,6 +69,5 @@ class RealImu : public Imu {
             return m_gyroInterruptCount;
         }
 
-    public:
 
 }; // class RealImu
