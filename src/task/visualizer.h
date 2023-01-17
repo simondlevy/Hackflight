@@ -49,14 +49,13 @@ class VisualizerTask : public Task {
 
         bool m_gotRebootRequest;
 
-        void sendShorts(
+        void serializeShorts(
                 const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
             m_msp->serializeShorts(messageType, src, count);
-            Serial.write(m_msp->payload, m_msp->payloadSize);
         }
 
-        uint8_t parse(const uint8_t byte)
+        bool parse(const uint8_t byte)
         {
             if (m_msp->isIdle() && byte == 'R') {
                 m_gotRebootRequest = true;
@@ -75,24 +74,26 @@ class VisualizerTask : public Task {
                             (int16_t)scale(m_receiver->getRawAux2())
                         };
 
-                        sendShorts(105, channels, 6);
+                        serializeShorts(105, channels, 6);
 
-                    } return 6;
+                    } 
+                    return true;
 
                 case 108: // ATTITUDE
                     {
                         int16_t angles[3] = {};
                         Imu::getEulerAngles(m_vstate, angles);
-                        sendShorts(108, angles, 3);
-                    } return 3;
+                        serializeShorts(108, angles, 3);
+                    } 
+                    return true;
 
                 case 121: // VL53L5 ranging camera
-                    sendShorts(121, m_skyrangerTask->rangerData, 16);
-                    return 16;
+                    serializeShorts(121, m_skyrangerTask->rangerData, 16);
+                    return true;
 
                 case 122: // PAA3905 mocap
-                    sendShorts(122, m_skyrangerTask->mocapData, 2);
-                    return 2;
+                    serializeShorts(122, m_skyrangerTask->mocapData, 2);
+                    return true;
 
                 case 214: // SET_MOTORS
                     {
@@ -105,11 +106,14 @@ class VisualizerTask : public Task {
                         motors[3] =
                             m_esc->convertFromExternal(m_msp->parseShort(3));
 
-                    } return 0;
+                    } 
+                    break;
 
                 default:
-                    return 0;
+                    break;
             }
+
+            return false;
         }
 
     public:
@@ -118,7 +122,9 @@ class VisualizerTask : public Task {
         {
             while (Serial.available()) {
 
-                parse(Serial.read());
+                if (parse(Serial.read())) {
+                    Serial.write(m_msp->payload, m_msp->payloadSize);
+                }
             }
         }
 
