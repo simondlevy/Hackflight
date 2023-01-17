@@ -255,14 +255,26 @@ class Imu {
             return Axes(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
         }
 
-       virtual bool gyroIsCalibrating(void)
+        virtual bool gyroIsCalibrating(void)
         {
             return m_gyroIsCalibrating;
         }
 
-     public:
-
         typedef Axes (*rotateFun_t)(Axes & axes);
+
+
+        Imu(void) 
+        {
+        }
+
+        Imu(const rotateFun_t rotateFun, const uint16_t gyroScale)
+        {
+            m_rotateFun = rotateFun;
+            m_gyroScale = gyroScale / 32768.;
+
+        }
+
+    public:
 
         static float deg2rad(float deg)
         {
@@ -278,7 +290,6 @@ class Imu {
             // Start calibrating gyro
             setGyroCalibrationCycles(); 
         }
-
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 

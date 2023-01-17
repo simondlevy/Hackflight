@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include "imu/real.h"
+#include "imu.h"
 
 #include <USFS.h>
 
-class UsfsImu : public RealImu {
+class UsfsImu : public Imu {
 
     private:
 
@@ -106,7 +106,7 @@ class UsfsImu : public RealImu {
     public:
 
         UsfsImu(rotateFun_t rotateFun) 
-            : RealImu(rotateFun, 1.53e-1) // gyro rate fixed in master mode
+            : Imu(rotateFun, 1.53e-1) // gyro rate fixed in master mode
         {
         }
 

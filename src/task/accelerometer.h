@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "imu/real/softquat.h"
+#include "imu/softquat.h"
 #include "task.h"
 
 class AccelerometerTask : public Task {

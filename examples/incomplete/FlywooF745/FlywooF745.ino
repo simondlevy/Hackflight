@@ -18,11 +18,10 @@
  */
 
 #include <hackflight.h>
-#include <msp/arduino.h>
-#include <board/stm32/stm32f745.h>
+#include <board/stm32/f/stm32f745.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
+#include <imu/softquat/invensense/mpu6x00.h>
 #include <esc/mock.h>
-#include <imu/real/invensense/mpu6x00/arduino.h>
 #include <receiver/mock.h>
 
 #include <vector>
@@ -37,13 +36,9 @@ static const uint8_t EXTI_PIN = PE1;
 
 static const uint8_t LED_PIN  = PA_2;
 
-static SPIClass spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
-
-static ArduinoMsp msp;
-
 static MockReceiver rx;
 
-static ArduinoMpu6x00 imu(spi, RealImu::rotate270, CS_PIN);
+static Mpu6x00 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, Imu::rotate270);
 
 static vector<PidController *> pids = {};
 
@@ -51,24 +46,23 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static MockEsc esc;
 
-static Stm32F745Board _board(msp, rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F745Board board(rx, imu, pids, mixer, esc, LED_PIN);
 
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    imu.handleInterrupt();
+    imu.handleInterrupt(board.getCycleCounter());
 }
 
 void setup(void)
 {
     // Set up IMU interrupt
-    pinMode(EXTI_PIN, INPUT);
-    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+    Board::setInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
-    _board.begin();
+    board.begin();
 }
 
 void loop(void)
 {
-    _board.step();
+    board.step();
 }

@@ -23,7 +23,7 @@
 #include <board/stm32/f/stm32f722.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/mock.h>
-#include <imu/real/softquat/invensense/icm42688.h>
+#include <imu/softquat/invensense/icm42688.h>
 #include <receiver/mock.h>
 
 #include <vector>
@@ -45,7 +45,7 @@ static MockEsc esc;
 
 static MockReceiver rx;
 
-Icm42688 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, RealImu::rotate0);
+Icm42688 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, Imu::rotate0);
 
 static vector<PidController *> pids = {};
 

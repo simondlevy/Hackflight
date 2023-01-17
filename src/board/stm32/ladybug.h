@@ -20,7 +20,7 @@
 
 #include "board/stm32.h"
 #include "esc/brushed.h"
-#include "imu/real/usfs.h"
+#include "imu/usfs.h"
 #include "imu/mock.h"
 
 class LadybugBoard : public Stm32Board {
@@ -31,7 +31,7 @@ class LadybugBoard : public Stm32Board {
 
         vector<uint8_t> motorPins = {0x0D, 0x10, 0x03, 0x0B};
 
-        UsfsImu imu = UsfsImu(RealImu::rotate0);
+        UsfsImu imu = UsfsImu(Imu::rotate0);
 
         BrushedEsc esc = BrushedEsc(motorPins);
 

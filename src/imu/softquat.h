@@ -26,9 +26,9 @@
 #include "core/clock.h"
 #include "core/filters/pt2.h"
 #include "core/vstate.h"
-#include "imu/real.h"
+#include "imu.h"
 
-class SoftQuatImu : public RealImu {
+class SoftQuatImu : public Imu {
 
     friend class AccelerometerTask;
 
@@ -297,7 +297,7 @@ class SoftQuatImu : public RealImu {
                 const rotateFun_t rotateFun,
                 const uint16_t gyroScale,
                 const uint16_t accelScale)
-            : RealImu(rotateFun, gyroScale)
+            : Imu(rotateFun, gyroScale)
         {
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
@@ -309,7 +309,7 @@ class SoftQuatImu : public RealImu {
         {
             m_shortPeriod = clockSpeed / 1000000 * SHORT_THRESHOLD;
 
-            RealImu::begin(clockSpeed);
+            Imu::begin(clockSpeed);
         }
 
         auto readGyroDps(void) -> Axes
@@ -317,7 +317,7 @@ class SoftQuatImu : public RealImu {
             m_gyroAccum.accumulate(
                     m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
 
-            return RealImu::readGyroDps();
+            return Imu::readGyroDps();
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
@@ -385,6 +385,6 @@ class SoftQuatImu : public RealImu {
 
             prevTime = nowCycles;
 
-            RealImu::handleInterrupt();
+            Imu::handleInterrupt();
         }
 };

@@ -22,7 +22,7 @@
 #include <board/stm32/f/4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <receiver/sbus.h>
-#include <imu/real/softquat/invensense/mpu6x00.h>
+#include <imu/softquat/invensense/mpu6x00.h>
 #include <esc/dshot.h>
 
 #include <vector>
@@ -50,7 +50,7 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static SbusReceiver rx;
 
-static Mpu6x00 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, RealImu::rotate270);
+static Mpu6x00 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, Imu::rotate270);
 
 static vector<PidController *> pids = {&anglePid};
 

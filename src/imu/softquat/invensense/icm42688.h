@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 
-#include "imu/real/softquat/invensense.h"
+#include "imu/softquat/invensense.h"
 
 class Icm42688 : public InvenSenseImu {
 

@@ -26,7 +26,7 @@
 #include "core/clock.h"
 #include "core/filters/pt2.h"
 #include "core/vstate.h"
-#include "imu/real/softquat.h"
+#include "imu/softquat.h"
 
 class InvenSenseImu : public SoftQuatImu {
 

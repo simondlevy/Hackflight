@@ -18,11 +18,11 @@
  */
 
 #include <hackflight.h>
-#include <msp/arduino.h>
-#include <board/stm32/stm32f4/stm32f411.h>
+#include <arduino/serial.h>
+#include <board/stm32/f/4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <receiver/sbus.h>
-#include <imu/real/invensense/mpu6x00/arduino.h>
+#include <imu/softquat/invensense/mpu6x00.h>
 #include <esc/mock.h>
 
 #include <vector>
@@ -37,8 +37,6 @@ static const uint8_t EXTI_PIN = PA1;
 
 static const uint8_t LED_PIN  = PC13; 
 
-static SPIClass spi(MOSI_PIN, MISO_PIN, SCLK_PIN);
-
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -50,37 +48,32 @@ static vector<PidController *> _pids = {&anglePid};
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static ArduinoMsp msp;
-
 static SbusReceiver rx;
 
-static ArduinoMpu6x00 imu(spi, RealImu::rotate180, CS_PIN);
+static Mpu6x00 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, Imu::rotate180);
 
 static vector<PidController *> pids = {&anglePid};
 
 static MockEsc esc;
 
-static Stm32F411Board board(msp, rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
 
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    imu.handleInterrupt();
+    imu.handleInterrupt(board.getCycleCounter());
 }
 
 // Receiver interrupt
 void serialEvent1(void)
 {
-    while (Serial1.available()) {
-        rx.parse(Serial1.read());
-    }
+    handleReceiverSerialEvent(rx, Serial1);
 }
 
 void setup(void)
 {
     // Set up IMU interrupt
-    pinMode(EXTI_PIN, INPUT);
-    attachInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+    Board::setInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
 
     // Start receiver UART
     Serial1.begin(100000, SERIAL_8E2);
