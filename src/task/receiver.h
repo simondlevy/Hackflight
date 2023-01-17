@@ -37,10 +37,16 @@ class ReceiverTask : public Task {
         {
         }
 
-        // Task function, called periodically
-        virtual void fun(const uint32_t usec) override
+        void run(const uint32_t usec)
         {
             receiver->update(usec);
+
+            m_lastExecutedAtUs = usec;
+        }
+
+        virtual void fun(const uint32_t usec) override
+        {
+            (void)usec;
         }
 
         // Increase priority for RX task

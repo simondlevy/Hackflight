@@ -612,7 +612,32 @@ class Board {
 
         void runReceiverTask(void)
         {
-            runTask(m_receiverTask);
+
+            const auto nextTargetCycles = getNextTargetCycles();
+            const auto taskRequiredTimeUs = m_receiverTask.getRequiredTime();
+            const auto nowCycles = getCycleCounter();
+            const auto loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
+
+            // Allow a little extra time
+            const auto taskRequiredCycles =
+                (int32_t)microsecondsToClockCycles((uint32_t)taskRequiredTimeUs) +
+                getTaskGuardCycles();
+
+            if (taskRequiredCycles < loopRemainingCycles) {
+
+                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+
+                const auto usec = micros();
+
+                m_receiverTask.run(usec);
+
+                m_receiverTask.update(micros()-usec);
+
+                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+            } else {
+                m_receiverTask.enableRun();
+            }
+
             updateArmingFromReceiver();
         }
 
