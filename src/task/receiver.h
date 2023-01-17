@@ -44,11 +44,6 @@ class ReceiverTask : public Task {
             m_lastExecutedAtUs = usec;
         }
 
-        virtual void fun(const uint32_t usec) override
-        {
-            (void)usec;
-        }
-
         // Increase priority for RX task
         virtual void adjustDynamicPriority(uint32_t usec) override
         {

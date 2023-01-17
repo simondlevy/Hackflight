@@ -51,7 +51,7 @@ class Stm32FBoard : public Stm32Board {
 
                 const auto usec = micros();
 
-                m_accelerometerTask.execute(usec);
+                m_accelerometerTask.run(usec);
 
                 m_accelerometerTask.update(micros()-usec);
 
@@ -79,7 +79,7 @@ class Stm32FBoard : public Stm32Board {
 
                 const auto usec = micros();
 
-                m_skyrangerTask.execute(usec);
+                m_skyrangerTask.run(usec);
 
                 m_skyrangerTask.update(micros()-usec);
 

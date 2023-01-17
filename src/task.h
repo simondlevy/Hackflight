@@ -94,13 +94,6 @@ class Task {
             }
         }
 
-        void execute(const uint32_t usec)
-        {
-            fun(usec);
-
-            m_lastExecutedAtUs = usec;
-        }
-
         void update(const uint32_t executionTimeUs)
         {
             m_dynamicPriority = 0;
@@ -127,6 +120,4 @@ class Task {
                 prioritizer.priority = m_dynamicPriority;
             }
         }
-
-        virtual void fun(const uint32_t usec) = 0;
 }; 

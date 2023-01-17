@@ -52,9 +52,4 @@ class AttitudeTask : public Task {
             m_lastExecutedAtUs = usec;
         }
 
-        virtual void fun(const uint32_t time) override
-        {
-            (void)time;
-        }
-
 }; // class AttitudeTask

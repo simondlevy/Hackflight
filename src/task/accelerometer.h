@@ -39,10 +39,10 @@ class AccelerometerTask : public Task {
             m_imu = imu;
         }
 
-        virtual void fun(const uint32_t time) override
+        void run(const uint32_t usec)
         {
-            (void)time;
-
             m_imu->updateAccelerometer();
+
+            m_lastExecutedAtUs = usec;
         }
 };

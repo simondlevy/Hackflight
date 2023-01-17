@@ -56,12 +56,10 @@ class VisualizerTask : public Task {
             Serial.write(m_msp->payload, m_msp->payloadSize);
         }
 
-    protected:
+    public:
 
-        virtual void fun(uint32_t usec) override
+        void run(uint32_t usec)
         {
-            (void)usec;
-
             while (Serial.available()) {
 
                 auto byte = Serial.read();
@@ -121,9 +119,9 @@ class VisualizerTask : public Task {
                         break;
                 }
             }
-        }
 
-    public:
+            m_lastExecutedAtUs = usec;
+        }
 
         VisualizerTask(
                 Msp & msp,

@@ -45,14 +45,14 @@ class SkyrangerTask : public Task {
             m_vstate = &vstate;
         }
 
-        virtual void fun(const uint32_t usec) override
+        void run(const uint32_t usec)
         {
-            (void)usec;
-
             int16_t angles[3] = {};
             Imu::getEulerAngles(m_vstate, angles);
 
             m_serializer.serializeShorts(MSP_SET_ATTITUDE, angles, 3);
+
+            m_lastExecutedAtUs = usec;
         }
 
         virtual void parse(const uint8_t byte)

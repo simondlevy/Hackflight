@@ -660,7 +660,7 @@ class Board {
 
                 const auto usec = micros();
 
-                m_visualizerTask.execute(usec);
+                m_visualizerTask.run(usec);
 
                 m_visualizerTask.update(micros()-usec);
 
