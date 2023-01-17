@@ -255,6 +255,11 @@ class Imu {
             return Axes(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
         }
 
+       virtual bool gyroIsCalibrating(void)
+        {
+            return m_gyroIsCalibrating;
+        }
+
      public:
 
         typedef Axes (*rotateFun_t)(Axes & axes);
@@ -270,17 +275,26 @@ class Imu {
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 
-        virtual uint32_t getGyroInterruptCount(void) = 0;
-
-        virtual int32_t getGyroSkew(
-                const uint32_t nextTargetCycles, const int32_t desiredPeriodCycles) = 0;
-
-        virtual bool gyroIsCalibrating(void) = 0;
-
         virtual bool gyroIsReady(void) = 0;
 
         virtual void updateAccelerometer(void)
         {
+        }
+
+        virtual uint32_t getGyroInterruptCount(void)
+        {
+            return m_gyroInterruptCount;
+        }
+
+
+        virtual int32_t getGyroSkew(
+                const uint32_t nextTargetCycles,
+                const int32_t desiredPeriodCycles)
+        {
+            const auto skew =
+                intcmp(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;
+
+            return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
         }
 
         static void getEulerAngles(const VehicleState * vstate, int16_t angles[3])

@@ -48,26 +48,4 @@ class RealImu : public Imu {
             setGyroCalibrationCycles(); 
         }
 
-
-       bool gyroIsCalibrating(void)
-        {
-            return m_gyroIsCalibrating;
-        }
-
-        virtual int32_t getGyroSkew(
-                const uint32_t nextTargetCycles,
-                const int32_t desiredPeriodCycles) override
-        {
-            const auto skew =
-                intcmp(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;
-
-            return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
-        }
-
-        virtual uint32_t getGyroInterruptCount(void) override
-        {
-            return m_gyroInterruptCount;
-        }
-
-
 }; // class RealImu
