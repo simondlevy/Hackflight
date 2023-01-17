@@ -96,13 +96,12 @@ class Task {
 
         void execute(const uint32_t usec)
         {
+            const uint32_t time = micros();
+            fun(usec);
+            const uint32_t taskExecutionTimeUs = micros() - time;
+
             m_lastExecutedAtUs = usec;
             m_dynamicPriority = 0;
-
-            uint32_t time = micros();
-            fun(usec);
-
-            uint32_t taskExecutionTimeUs = micros() - time;
 
             if (taskExecutionTimeUs >
                     (m_anticipatedExecutionTime >> EXEC_TIME_SHIFT)) {
