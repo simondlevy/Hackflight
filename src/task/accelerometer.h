@@ -39,10 +39,8 @@ class AccelerometerTask : public Task {
             m_imu = imu;
         }
 
-        void run(const uint32_t usec)
+        void run(void)
         {
             m_imu->updateAccelerometer();
-
-            m_lastExecutedAtUs = usec;
         }
 };

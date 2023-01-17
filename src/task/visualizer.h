@@ -58,7 +58,7 @@ class VisualizerTask : public Task {
 
     public:
 
-        void run(uint32_t usec)
+        void run(void)
         {
             while (Serial.available()) {
 
@@ -119,8 +119,6 @@ class VisualizerTask : public Task {
                         break;
                 }
             }
-
-            m_lastExecutedAtUs = usec;
         }
 
         VisualizerTask(

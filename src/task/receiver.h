@@ -40,8 +40,6 @@ class ReceiverTask : public Task {
         void run(const uint32_t usec)
         {
             receiver->update(usec);
-
-            m_lastExecutedAtUs = usec;
         }
 
         // Increase priority for RX task

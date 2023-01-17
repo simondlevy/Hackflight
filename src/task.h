@@ -94,12 +94,14 @@ class Task {
             }
         }
 
-        void update(const uint32_t executionTimeUs)
+        void update(const uint32_t startTimeUs, const uint32_t timeTakenUs)
         {
+            m_lastExecutedAtUs = startTimeUs;
+
             m_dynamicPriority = 0;
 
-            if (executionTimeUs > (m_anticipatedExecutionTime >> EXEC_TIME_SHIFT)) {
-                m_anticipatedExecutionTime = executionTimeUs << EXEC_TIME_SHIFT;
+            if (timeTakenUs > (m_anticipatedExecutionTime >> EXEC_TIME_SHIFT)) {
+                m_anticipatedExecutionTime = timeTakenUs << EXEC_TIME_SHIFT;
             } else if (m_anticipatedExecutionTime > 1) {
                 // Slowly decay the max time
                 m_anticipatedExecutionTime--;

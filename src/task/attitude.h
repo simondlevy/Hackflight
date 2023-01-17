@@ -48,8 +48,6 @@ class AttitudeTask : public Task {
             m_vstate->phi   = angles.x;
             m_vstate->theta = angles.y;
             m_vstate->psi   = angles.z;
-
-            m_lastExecutedAtUs = usec;
         }
 
 }; // class AttitudeTask

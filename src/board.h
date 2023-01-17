@@ -601,7 +601,7 @@ class Board {
 
                 m_attitudeTask.run(usec);
 
-                m_attitudeTask.update(micros()-usec);
+                m_attitudeTask.update(usec, micros()-usec);
 
                 updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } else {
@@ -632,7 +632,7 @@ class Board {
 
                 m_receiverTask.run(usec);
 
-                m_receiverTask.update(micros()-usec);
+                m_receiverTask.update(usec, micros()-usec);
 
                 updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } else {
@@ -660,9 +660,9 @@ class Board {
 
                 const auto usec = micros();
 
-                m_visualizerTask.run(usec);
+                m_visualizerTask.run();
 
-                m_visualizerTask.update(micros()-usec);
+                m_visualizerTask.update(usec, micros()-usec);
 
                 updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } else {
