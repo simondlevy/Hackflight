@@ -84,13 +84,15 @@ class Board {
 
         void checkCoreTasks(uint32_t nowCycles)
         {
+            const uint32_t usec = micros(); // unsafe
+
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
             uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
 
             m_scheduler.corePreUpdate();
 
             while (loopRemainingCycles > 0) {
-                nowCycles = getCycleCounter();
+                nowCycles = getCycleCounter(); // unsafe
                 loopRemainingCycles =
                     intcmp(nextTargetCycles, nowCycles);
             }
@@ -106,14 +108,15 @@ class Board {
 
             Demands demands = m_receiverTask.receiver->getDemands();
 
-            delayMicroseconds(10);
+            //delayMicroseconds(10);
 
             auto motors = m_mixer->step(
                     demands,
                     m_vstate,
                     m_pidControllers,
                     m_receiverTask.receiver->gotPidReset(),
-                    micros()); // unsafe
+                    usec);
+                    // micros()); // unsafe
 
             float mixmotors[Motors::MAX_SUPPORTED] = {};
 
@@ -234,41 +237,6 @@ class Board {
             }
         }
 
-        void updateFromReceiver(
-                const bool throttleIsDown, const bool aux1IsSet, const bool haveSignal)
-        {
-            if (m_isArmed) {
-
-                if (!haveSignal && m_haveSignal) {
-                    m_gotFailsafe = true;
-                    disarm();
-                }
-                else {
-                    ledSet(true);
-                }
-            } else {
-
-                m_throttleIsDown = throttleIsDown;
-
-                // If arming is disabled and the ARM switch is on
-                if (!readyToArm() && aux1IsSet) {
-                    m_switchOkay = false;
-                } else if (!aux1IsSet) {
-                    m_switchOkay = true;
-                }
-
-                if (!readyToArm()) {
-                    ledWarningFlash();
-                } else {
-                    ledWarningDisable();
-                }
-
-                ledWarningUpdate();
-            }
-
-            m_haveSignal = haveSignal;
-        }
-
         typedef enum {
             LED_WARNING_OFF = 0,
             LED_WARNING_ON,
@@ -297,76 +265,21 @@ class Board {
             m_ledWarningState = LED_WARNING_OFF;
         }
 
-        void ledWarningUpdate(void)
-        {
-            if ((int32_t)(micros() - m_ledWarningTimer) < 0) { // unsafe
-                return;
-            }
-
-            switch (m_ledWarningState) {
-                case LED_WARNING_OFF:
-                    ledSet(false);
-                    break;
-                case LED_WARNING_ON:
-                    ledSet(true);
-                    break;
-                case LED_WARNING_FLASH:
-                    ledToggle();
-                    break;
-            }
-
-            m_ledWarningTimer = micros() + 500000; // unsafe
-        }
-
         int32_t getTaskGuardCycles(void)
         {
             return m_scheduler.getTaskGuardCycles();
         }
 
-        void checkDynamicTasks(void)
+        void updateArmingFromImu(void)
         {
-            if (m_visualizerTask.gotRebootRequest()) {
-                reboot();
-            }
+            const auto imuIsLevel =
+                fabsf(m_vstate.phi) < m_maxArmingAngle &&
+                fabsf(m_vstate.theta) < m_maxArmingAngle;
 
-            Task::prioritizer_t prioritizer = {Task::NONE, 0};
-
-            const uint32_t usec = micros(); // unsafe
-
-            m_receiverTask.prioritize(usec, prioritizer);
-            m_attitudeTask.prioritize(usec, prioritizer);
-            m_visualizerTask.prioritize(usec, prioritizer);
-
-            prioritizeExtraTasks(prioritizer, usec);
-
-            switch (prioritizer.id) {
-
-                case Task::ATTITUDE:
-                    runTask(m_attitudeTask);
-                    updateArmingFromImu();
-                    break;
-
-                case Task::VISUALIZER:
-                    runVisualizerTask();
-                    break;
-
-                case Task::RECEIVER:
-                    runTask(m_receiverTask);
-                    updateArmingFromReceiver(m_receiverTask.receiver, micros()); // unsafe
-                    break;
-
-                case Task::ACCELEROMETER:
-                    runTask(m_accelerometerTask);
-                    break;
-
-                case Task::SKYRANGER:
-                    runTask(m_skyrangerTask);
-                    break;
-
-                default:
-                    break;
-            }
+            updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
+
+        //////////////////////// unsafe below here ////////////////////////////
 
         uint32_t getAnticipatedEndCycles(Task & task)
         {
@@ -403,16 +316,106 @@ class Board {
             }
         }
 
-        void updateArmingFromImu(void)
+        void updateFromReceiver(
+                const bool throttleIsDown, const bool aux1IsSet, const bool haveSignal)
         {
-            const auto imuIsLevel =
-                fabsf(m_vstate.phi) < m_maxArmingAngle &&
-                fabsf(m_vstate.theta) < m_maxArmingAngle;
+            if (m_isArmed) {
 
-            updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
+                if (!haveSignal && m_haveSignal) {
+                    m_gotFailsafe = true;
+                    disarm();
+                }
+                else {
+                    ledSet(true);
+                }
+            } else {
+
+                m_throttleIsDown = throttleIsDown;
+
+                // If arming is disabled and the ARM switch is on
+                if (!readyToArm() && aux1IsSet) {
+                    m_switchOkay = false;
+                } else if (!aux1IsSet) {
+                    m_switchOkay = true;
+                }
+
+                if (!readyToArm()) {
+                    ledWarningFlash();
+                } else {
+                    ledWarningDisable();
+                }
+
+                ledWarningUpdate();
+            }
+
+            m_haveSignal = haveSignal;
         }
 
-        // unsafe below here --------------------------------------------------
+        void ledWarningUpdate(void)
+        {
+            if ((int32_t)(micros() - m_ledWarningTimer) < 0) {
+                return;
+            }
+
+            switch (m_ledWarningState) {
+                case LED_WARNING_OFF:
+                    ledSet(false);
+                    break;
+                case LED_WARNING_ON:
+                    ledSet(true);
+                    break;
+                case LED_WARNING_FLASH:
+                    ledToggle();
+                    break;
+            }
+
+            m_ledWarningTimer = micros() + 500000;
+        }
+
+        void checkDynamicTasks(void)
+        {
+            if (m_visualizerTask.gotRebootRequest()) {
+                reboot();
+            }
+
+            Task::prioritizer_t prioritizer = {Task::NONE, 0};
+
+            const uint32_t usec = micros(); 
+
+            m_receiverTask.prioritize(usec, prioritizer);
+            m_attitudeTask.prioritize(usec, prioritizer);
+            m_visualizerTask.prioritize(usec, prioritizer);
+
+            prioritizeExtraTasks(prioritizer, usec);
+
+            switch (prioritizer.id) {
+
+                case Task::ATTITUDE:
+                    runTask(m_attitudeTask);
+                    updateArmingFromImu();
+                    break;
+
+                case Task::VISUALIZER:
+                    runVisualizerTask();
+                    break;
+
+                case Task::RECEIVER:
+                    runTask(m_receiverTask);
+                    updateArmingFromReceiver(m_receiverTask.receiver, micros());
+                    break;
+
+                case Task::ACCELEROMETER:
+                    runTask(m_accelerometerTask);
+                    break;
+
+                case Task::SKYRANGER:
+                    runTask(m_skyrangerTask);
+                    break;
+
+                default:
+                    break;
+            }
+        }
 
         void runTask(Task & task)
         {
@@ -420,7 +423,7 @@ class Board {
 
             if (anticipatedEndCycles > 0) {
 
-                const uint32_t usec = micros(); // unsafe
+                const uint32_t usec = micros();
 
                 task.run(usec);
 
@@ -433,7 +436,7 @@ class Board {
                 const uint32_t usec,
                 const uint32_t anticipatedEndCycles)
         {
-            task.update(usec, micros()-usec); // unsafe
+            task.update(usec, micros()-usec);
             m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
         }
 
@@ -458,7 +461,7 @@ class Board {
             ledSet(false);
             for (auto i=0; i<reps; i++) {
                 ledToggle();
-                delay(delayMs); // unsafe
+                delay(delayMs);
             }
             ledSet(false);
         }
@@ -619,7 +622,7 @@ class Board {
 
             while (serial.available()) {
 
-                rx.parse(serial.read(), micros()); // unsafe
+                rx.parse(serial.read(), micros());
             }
         }
 
