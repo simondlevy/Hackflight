@@ -352,38 +352,6 @@ class Board {
             ledWarningRefresh();
         }
 
-        /*
-        bool isCoreReady(uint32_t nowCycles)
-        {
-            m_scheduler.m_nextTargetCycles = m_scheduler.lastTargetCycles +
-                m_scheduler.desiredPeriodCycles;
-
-            m_scheduler.m_loopRemainingCycles = intcmp(m_scheduler.m_nextTargetCycles, nowCycles);
-
-            if (m_scheduler.m_loopRemainingCycles < -m_scheduler.desiredPeriodCycles) {
-                // A task has so grossly overrun that at entire gyro cycle has
-                // been skipped This is most likely to occur when connected to
-                // the configurator via USB as the serial task is
-                // non-deterministic Recover as best we can, advancing
-                // scheduling by a whole number of cycles
-                m_scheduler.m_nextTargetCycles += m_scheduler.desiredPeriodCycles * (1 +
-                        (m_scheduler.m_loopRemainingCycles / -m_scheduler.desiredPeriodCycles));
-                m_scheduler.m_loopRemainingCycles = intcmp(
-                        m_scheduler.getNextTargetCycles(), nowCycles);
-            }
-
-            // Tune out the time lost between completing the last task
-            // execution and re-entering the scheduler
-            if ((m_scheduler.m_loopRemainingCycles < m_scheduler.m_loopStartMinCycles) &&
-                    (m_scheduler.m_loopStartCycles < m_scheduler.m_loopStartMaxCycles)) {
-                m_scheduler.m_loopStartCycles += m_scheduler.m_loopStartDeltaUpCycles;
-            }
-
-            // Once close to the timing boundary, poll for its arrival
-            return m_scheduler.m_loopRemainingCycles < m_scheduler.m_loopStartCycles;
-        }
-        */
-
         bool isDynamicReady(uint32_t nowCycles) 
         {
             auto newLoopRemainingCyles =
@@ -655,7 +623,7 @@ class Board {
                 checkCoreTasks(nowCycles);
             }
 
-            if (isDynamicReady(getCycleCounter())) {
+            if (m_scheduler.isDynamicReady(getCycleCounter())) {
                 checkDynamicTasks();
             }
         }
