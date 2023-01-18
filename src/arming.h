@@ -28,15 +28,16 @@ class Arming {
 
         static constexpr float MAX_ANGLE = 25;
 
+        bool accDoneCalibrating;
+        bool angleOkay;
+        bool gyroDoneCalibrating;
+
     public:
 
         // Avoid repeated degrees-to-radians conversion
         const float maxAngle = Imu::deg2rad(MAX_ANGLE);
 
-        bool accDoneCalibrating;
-        bool angleOkay;
         bool gotFailsafe;
-        bool gyroDoneCalibrating;
         bool haveSignal;
         bool isArmed;
         bool switchOkay;
