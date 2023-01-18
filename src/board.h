@@ -450,6 +450,7 @@ class Board {
             esc.m_board = this;
             receiver.m_board = this;
 
+            /*
             m_scheduler.m_loopStartCycles =
                 microsecondsToClockCycles(SCHED_START_LOOP_MIN_US);
             m_scheduler.m_loopStartMinCycles =
@@ -478,6 +479,7 @@ class Board {
                 (int32_t)microsecondsToClockCycles(CHECK_GUARD_MARGIN_US);
 
             m_scheduler.m_clockRate = microsecondsToClockCycles(1000000);
+            */
         }
 
         auto prioritizeDynamicTasks(const uint32_t usec) -> Task::prioritizer_t
