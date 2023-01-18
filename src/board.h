@@ -104,10 +104,10 @@ class Board {
 
         void checkCoreTasks(uint32_t nowCycles)
         {
-            int32_t loopRemainingCycles = getLoopRemainingCycles();
+            int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
             uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
 
-            corePreUpdate();
+            m_scheduler.corePreUpdate();
 
             while (loopRemainingCycles > 0) {
                 nowCycles = getCycleCounter();
@@ -379,46 +379,34 @@ class Board {
             ledWarningRefresh();
         }
 
-        void corePreUpdate(void) 
-        {
-            if (m_loopStartCycles > m_loopStartMinCycles) {
-                m_loopStartCycles -= m_loopStartDeltaDownCycles;
-            }
-        }
-
-        int32_t getLoopRemainingCycles(void)
-        {
-            return m_loopRemainingCycles;
-        }
-        
         bool isCoreReady(uint32_t nowCycles)
         {
             m_scheduler.m_nextTargetCycles = m_scheduler.lastTargetCycles +
                 m_scheduler.desiredPeriodCycles;
 
-            m_loopRemainingCycles = intcmp(m_scheduler.m_nextTargetCycles, nowCycles);
+            m_scheduler.m_loopRemainingCycles = intcmp(m_scheduler.m_nextTargetCycles, nowCycles);
 
-            if (m_loopRemainingCycles < -m_scheduler.desiredPeriodCycles) {
+            if (m_scheduler.m_loopRemainingCycles < -m_scheduler.desiredPeriodCycles) {
                 // A task has so grossly overrun that at entire gyro cycle has
                 // been skipped This is most likely to occur when connected to
                 // the configurator via USB as the serial task is
                 // non-deterministic Recover as best we can, advancing
                 // scheduling by a whole number of cycles
                 m_scheduler.m_nextTargetCycles += m_scheduler.desiredPeriodCycles * (1 +
-                        (m_loopRemainingCycles / -m_scheduler.desiredPeriodCycles));
-                m_loopRemainingCycles = intcmp(
+                        (m_scheduler.m_loopRemainingCycles / -m_scheduler.desiredPeriodCycles));
+                m_scheduler.m_loopRemainingCycles = intcmp(
                         m_scheduler.getNextTargetCycles(), nowCycles);
             }
 
             // Tune out the time lost between completing the last task
             // execution and re-entering the scheduler
-            if ((m_loopRemainingCycles < m_loopStartMinCycles) &&
-                    (m_loopStartCycles < m_loopStartMaxCycles)) {
-                m_loopStartCycles += m_loopStartDeltaUpCycles;
+            if ((m_scheduler.m_loopRemainingCycles < m_scheduler.m_loopStartMinCycles) &&
+                    (m_scheduler.m_loopStartCycles < m_scheduler.m_loopStartMaxCycles)) {
+                m_scheduler.m_loopStartCycles += m_scheduler.m_loopStartDeltaUpCycles;
             }
 
             // Once close to the timing boundary, poll for its arrival
-            return m_loopRemainingCycles < m_loopStartCycles;
+            return m_scheduler.m_loopRemainingCycles < m_scheduler.m_loopStartCycles;
         }
 
         bool isDynamicReady(uint32_t nowCycles) 
@@ -426,7 +414,7 @@ class Board {
             auto newLoopRemainingCyles =
                 intcmp(m_scheduler.getNextTargetCycles(), nowCycles);
 
-            return newLoopRemainingCyles > m_guardMargin;
+            return newLoopRemainingCyles > m_scheduler.m_guardMargin;
         }
 
 
@@ -477,7 +465,7 @@ class Board {
                 microsecondsToClockCycles(TASK_GUARD_MARGIN_MIN_US);
             m_scheduler.m_taskGuardMaxCycles =
                 microsecondsToClockCycles(TASK_GUARD_MARGIN_MAX_US);
-            m_scheduler.m_taskGuardCycles = m_taskGuardMinCycles;
+            m_scheduler.m_taskGuardCycles = m_scheduler.m_taskGuardMinCycles;
             m_scheduler.m_taskGuardDeltaDownCycles =
                 microsecondsToClockCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
             m_scheduler.m_taskGuardDeltaUpCycles =
@@ -505,20 +493,20 @@ class Board {
 
         int32_t getTaskGuardCycles(void)
         {
-            return m_taskGuardCycles;
+            return m_scheduler.m_taskGuardCycles;
         }
 
         void updateDynamic(uint32_t nowCycles, uint32_t anticipatedEndCycles)
         {
             auto cyclesOverdue = intcmp(nowCycles, anticipatedEndCycles);
 
-            if ((cyclesOverdue > 0) || (-cyclesOverdue < m_taskGuardMinCycles)) {
+            if ((cyclesOverdue > 0) || (-cyclesOverdue < m_scheduler.m_taskGuardMinCycles)) {
 
-                if (m_taskGuardCycles < m_taskGuardMaxCycles) {
-                    m_taskGuardCycles += m_taskGuardDeltaUpCycles;
+                if (m_scheduler.m_taskGuardCycles < m_scheduler.m_taskGuardMaxCycles) {
+                    m_scheduler.m_taskGuardCycles += m_scheduler.m_taskGuardDeltaUpCycles;
                 }
-            } else if (m_taskGuardCycles > m_taskGuardMinCycles) {
-                m_taskGuardCycles -= m_taskGuardDeltaDownCycles;
+            } else if (m_scheduler.m_taskGuardCycles > m_scheduler.m_taskGuardMinCycles) {
+                m_scheduler.m_taskGuardCycles -= m_scheduler.m_taskGuardDeltaDownCycles;
             }        
         }
 
