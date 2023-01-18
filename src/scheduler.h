@@ -70,7 +70,7 @@ class Scheduler {
 
     public:
 
-        // These can be modified by hffull
+        // These can be modified by Board
         int32_t  desiredPeriodCycles;
         uint32_t lastTargetCycles;
 

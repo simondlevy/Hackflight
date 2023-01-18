@@ -85,8 +85,6 @@ class Board {
         uint32_t m_taskGuardDeltaUpCycles;
         int32_t  m_taskGuardMinCycles;
         int32_t  m_taskGuardMaxCycles;
-        int32_t  desiredPeriodCycles;
-        uint32_t lastTargetCycles;
 
         Scheduler m_scheduler;
 
@@ -179,7 +177,7 @@ class Board {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-                desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
+                m_scheduler.desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
                 _terminalGyroRateCount += CORE_RATE_COUNT;
             }
@@ -190,7 +188,7 @@ class Board {
             static int32_t _gyroSkewAccum;
 
             auto gyroSkew =
-                m_imu->getGyroSkew(nextTargetCycles, desiredPeriodCycles);
+                m_imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 
@@ -202,7 +200,7 @@ class Board {
                 _terminalGyroLockCount += GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
-                lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
+                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
 
                 _gyroSkewAccum = 0;
             }
@@ -410,7 +408,7 @@ class Board {
             if (intcmp(m_nextTimingCycles, nowCycles) < 0) {
                 m_nextTimingCycles += m_clockRate;
             }
-            lastTargetCycles = m_nextTargetCycles;
+            m_scheduler.lastTargetCycles = m_nextTargetCycles;
         }
 
         int32_t getLoopRemainingCycles(void)
@@ -420,18 +418,19 @@ class Board {
         
         bool isCoreReady(uint32_t nowCycles)
         {
-            m_nextTargetCycles = lastTargetCycles + desiredPeriodCycles;
+            m_nextTargetCycles = m_scheduler.lastTargetCycles +
+                m_scheduler.desiredPeriodCycles;
 
             m_loopRemainingCycles = intcmp(m_nextTargetCycles, nowCycles);
 
-            if (m_loopRemainingCycles < -desiredPeriodCycles) {
+            if (m_loopRemainingCycles < -m_scheduler.desiredPeriodCycles) {
                 // A task has so grossly overrun that at entire gyro cycle has
                 // been skipped This is most likely to occur when connected to
                 // the configurator via USB as the serial task is
                 // non-deterministic Recover as best we can, advancing
                 // scheduling by a whole number of cycles
-                m_nextTargetCycles += desiredPeriodCycles * (1 +
-                        (m_loopRemainingCycles / -desiredPeriodCycles));
+                m_nextTargetCycles += m_scheduler.desiredPeriodCycles * (1 +
+                        (m_loopRemainingCycles / -m_scheduler.desiredPeriodCycles));
                 m_loopRemainingCycles = intcmp(
                         m_nextTargetCycles, nowCycles);
             }
@@ -509,10 +508,7 @@ class Board {
             m_taskGuardDeltaUpCycles =
                 microsecondsToClockCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
 
-            lastTargetCycles = 0;
-            m_nextTimingCycles = 0;
-
-            desiredPeriodCycles =
+            m_scheduler.desiredPeriodCycles =
                 (int32_t)microsecondsToClockCycles(Clock::PERIOD());
 
             m_guardMargin =
