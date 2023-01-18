@@ -185,13 +185,6 @@ class Board {
             m_arming.isArmed = false;
         }
 
-        void updateArmingFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
-        {
-            m_arming.angleOkay = imuIsLevel;
-            m_arming.gyroDoneCalibrating = !gyroIsCalibrating;
-            m_arming.accDoneCalibrating = true; // XXX
-        }
-
         void attemptToArm(const uint32_t usec, const bool aux1IsSet)
         {
             static bool _doNotRepeat;
@@ -237,7 +230,7 @@ class Board {
                 fabsf(m_vstate.phi) < m_arming.maxAngle &&
                 fabsf(m_vstate.theta) < m_arming.maxAngle;
 
-            updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
+            m_arming.updateFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
 
         //////////////////////// unsafe below here ////////////////////////////

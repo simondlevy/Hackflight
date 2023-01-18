@@ -41,4 +41,11 @@ class Arming {
         bool switchOkay;
         bool throttleIsDown;
 
+        void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
+        {
+            angleOkay = imuIsLevel;
+            gyroDoneCalibrating = !gyroIsCalibrating;
+            accDoneCalibrating = true; // XXX
+        }
+
 }; // class Arming
