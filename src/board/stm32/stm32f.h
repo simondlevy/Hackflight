@@ -53,7 +53,7 @@ class Stm32FBoard : public Stm32Board {
 
                 m_accelerometerTask.update(usec, micros()-usec);
 
-                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } 
         }
 
@@ -77,7 +77,7 @@ class Stm32FBoard : public Stm32Board {
 
                 m_skyrangerTask.update(usec, micros()-usec);
 
-                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } 
          }
 

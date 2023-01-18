@@ -352,15 +352,6 @@ class Board {
             ledWarningRefresh();
         }
 
-        bool isDynamicReady(uint32_t nowCycles) 
-        {
-            auto newLoopRemainingCyles =
-                intcmp(m_scheduler.getNextTargetCycles(), nowCycles);
-
-            return newLoopRemainingCyles > m_scheduler.m_guardMargin;
-        }
-
-
     protected:
 
         Scheduler m_scheduler;
@@ -407,21 +398,7 @@ class Board {
 
         int32_t getTaskGuardCycles(void)
         {
-            return m_scheduler.m_taskGuardCycles;
-        }
-
-        void updateDynamic(uint32_t nowCycles, uint32_t anticipatedEndCycles)
-        {
-            auto cyclesOverdue = intcmp(nowCycles, anticipatedEndCycles);
-
-            if ((cyclesOverdue > 0) || (-cyclesOverdue < m_scheduler.m_taskGuardMinCycles)) {
-
-                if (m_scheduler.m_taskGuardCycles < m_scheduler.m_taskGuardMaxCycles) {
-                    m_scheduler.m_taskGuardCycles += m_scheduler.m_taskGuardDeltaUpCycles;
-                }
-            } else if (m_scheduler.m_taskGuardCycles > m_scheduler.m_taskGuardMinCycles) {
-                m_scheduler.m_taskGuardCycles -= m_scheduler.m_taskGuardDeltaDownCycles;
-            }        
+            return m_scheduler.getTaskGuardCycles();
         }
 
         void runPrioritizedTask(Task::prioritizer_t prioritizer)
@@ -472,7 +449,7 @@ class Board {
 
                 m_attitudeTask.update(usec, micros()-usec);
 
-                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } 
 
             updateArmingFromImu();
@@ -498,7 +475,7 @@ class Board {
 
                 m_receiverTask.update(usec, micros()-usec);
 
-                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
             } 
 
             updateArmingFromReceiver();
@@ -529,7 +506,7 @@ class Board {
 
                 m_visualizerTask.update(usec, micros()-usec);
 
-                updateDynamic(getCycleCounter(), anticipatedEndCycles);
+                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
             }
         }
 

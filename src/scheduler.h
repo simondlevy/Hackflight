@@ -30,14 +30,14 @@ class Scheduler {
         // Constants -------------------------------------------------------
 
         // Wait at start of scheduler loop if gyroSampleTask is nearly due
-        static const uint32_t SCHED_START_LOOP_MIN_US = 1;   
-        static const uint32_t SCHED_START_LOOP_MAX_US = 12;
+        static const uint32_t START_LOOP_MIN_US = 1;   
+        static const uint32_t START_LOOP_MAX_US = 12;
 
         // Fraction of a us to reduce start loop wait
-        static const uint32_t SCHED_START_LOOP_DOWN_STEP = 50;  
+        static const uint32_t START_LOOP_DOWN_STEP = 50;  
 
         // Fraction of a us to increase start loop wait
-        static const uint32_t SCHED_START_LOOP_UP_STEP = 1;   
+        static const uint32_t START_LOOP_UP_STEP = 1;   
 
         // Add an amount to the estimate of a task duration
         static const uint32_t TASK_GUARD_MARGIN_MIN_US = 3;   
@@ -52,8 +52,7 @@ class Scheduler {
         // Add a margin to the amount of time allowed for a check function to run
         static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
 
-    public:
-
+        // State variables
         uint32_t m_clockRate;
         int32_t  m_guardMargin;
         int32_t  m_loopRemainingCycles;
@@ -79,15 +78,15 @@ class Scheduler {
         Scheduler(void)
         {
             m_loopStartCycles =
-                microsecondsToClockCycles(SCHED_START_LOOP_MIN_US);
+                microsecondsToClockCycles(START_LOOP_MIN_US);
             m_loopStartMinCycles =
-                microsecondsToClockCycles(SCHED_START_LOOP_MIN_US);
+                microsecondsToClockCycles(START_LOOP_MIN_US);
             m_loopStartMaxCycles =
-                microsecondsToClockCycles(SCHED_START_LOOP_MAX_US);
+                microsecondsToClockCycles(START_LOOP_MAX_US);
             m_loopStartDeltaDownCycles =
-                microsecondsToClockCycles(1) / SCHED_START_LOOP_DOWN_STEP;
+                microsecondsToClockCycles(1) / START_LOOP_DOWN_STEP;
             m_loopStartDeltaUpCycles =
-                microsecondsToClockCycles(1) / SCHED_START_LOOP_UP_STEP;
+                microsecondsToClockCycles(1) / START_LOOP_UP_STEP;
 
             m_taskGuardMinCycles =
                 microsecondsToClockCycles(TASK_GUARD_MARGIN_MIN_US);
