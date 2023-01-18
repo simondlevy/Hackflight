@@ -23,6 +23,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "task.h"
+
 class Scheduler {
 
     private:
@@ -124,6 +126,16 @@ class Scheduler {
                 m_nextTimingCycles += m_clockRate;
             }
             lastTargetCycles = m_nextTargetCycles;
+        }
+
+        uint32_t getAnticipatedEndCycles(Task & task, uint32_t nowCycles)
+        {
+            const uint32_t taskRequiredCycles = 
+                task.checkReady(m_nextTargetCycles, nowCycles, m_taskGuardCycles);
+
+            return taskRequiredCycles > 0 ? 
+                    nowCycles + taskRequiredCycles :
+                    0;
         }
 
         int32_t getTaskGuardCycles(void)

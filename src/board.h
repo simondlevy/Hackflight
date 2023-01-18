@@ -171,21 +171,6 @@ class Board {
         //////////////////////// unsafe below here ////////////////////////////
         ///////////////////////////////////////////////////////////////////////
 
-        uint32_t getAnticipatedEndCycles(Task & task)
-        {
-            const auto nowCycles = getCycleCounter();
-
-            const uint32_t taskRequiredCycles = 
-                task.checkReady(
-                        m_scheduler.getNextTargetCycles(),
-                        nowCycles,
-                        getTaskGuardCycles());
-
-            return taskRequiredCycles > 0 ? 
-                    nowCycles + taskRequiredCycles :
-                    0;
-        }
-
         void updateArmingFromReceiver(Receiver * receiver, const uint32_t usec)
         {
             switch (receiver->getState()) {
@@ -394,6 +379,10 @@ class Board {
             }
         }
 
+        uint32_t getAnticipatedEndCycles(Task & task)
+        {
+            return m_scheduler.getAnticipatedEndCycles(task, getCycleCounter());
+        }
 
     protected:
 
