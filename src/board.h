@@ -352,6 +352,7 @@ class Board {
             ledWarningRefresh();
         }
 
+        /*
         bool isCoreReady(uint32_t nowCycles)
         {
             m_scheduler.m_nextTargetCycles = m_scheduler.lastTargetCycles +
@@ -381,6 +382,7 @@ class Board {
             // Once close to the timing boundary, poll for its arrival
             return m_scheduler.m_loopRemainingCycles < m_scheduler.m_loopStartCycles;
         }
+        */
 
         bool isDynamicReady(uint32_t nowCycles) 
         {
@@ -649,7 +651,7 @@ class Board {
             // Realtime gyro/filtering/PID task get complete priority
             auto nowCycles = getCycleCounter();
 
-            if (isCoreReady(nowCycles)) {
+            if (m_scheduler.isCoreReady(nowCycles)) {
                 checkCoreTasks(nowCycles);
             }
 
