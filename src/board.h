@@ -122,7 +122,7 @@ class Board {
                     m_esc->getMotorValue(motors.values[i], m_failsafeIsActive);
             }
 
-            m_esc->write(isArmed() ?  mixmotors : m_visualizerTask.motors);
+            m_esc->write(m_isArmed ?  mixmotors : m_visualizerTask.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -207,11 +207,6 @@ class Board {
             m_gyroDoneCalibrating = !gyroIsCalibrating;
 
             m_accDoneCalibrating = true; // XXX
-        }
-
-        bool isArmed(void)
-        {
-            return m_isArmed;
         }
 
         void attemptToArm(const uint32_t usec, const bool aux1IsSet)
