@@ -30,5 +30,8 @@ class Warning {
 
         } state_e;
 
+        state_e state;
+
+        bool ledOn;
 
 }; // class Warning

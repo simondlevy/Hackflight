@@ -236,20 +236,18 @@ class Board {
             }
         }
 
-        bool m_ledOn;
+        Warning m_warning;
 
-        Warning::state_e m_ledWarningState = Warning::OFF;
-
-        uint32_t m_ledWarningTimer = 0;
+        uint32_t m_ledWarningTimer;
 
         void ledWarningFlash(void)
         {
-            m_ledWarningState = Warning::BLINK;
+            m_warning.state = Warning::BLINK;
         }
 
         void ledWarningDisable(void)
         {
-            m_ledWarningState = Warning::OFF;
+            m_warning.state = Warning::OFF;
         }
 
         int32_t getTaskGuardCycles(void)
@@ -340,8 +338,8 @@ class Board {
 
         void ledToggle(void)
         {
-            m_ledOn = !m_ledOn;
-            ledSet(m_ledOn);
+            m_warning.ledOn = !m_warning.ledOn;
+            ledSet(m_warning.ledOn);
         }
 
         void ledWarningUpdate(void)
@@ -350,7 +348,7 @@ class Board {
                 return;
             }
 
-            switch (m_ledWarningState) {
+            switch (m_warning.state) {
                 case Warning::OFF:
                     ledSet(false);
                     break;
@@ -439,7 +437,7 @@ class Board {
                 digitalWrite(m_ledPin, m_ledInverted ? on : !on);
             }
 
-            m_ledOn = on;
+            m_warning.ledOn = on;
         }
 
         void ledBegin(void)
