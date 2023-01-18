@@ -226,16 +226,6 @@ class Board {
 
         Warning m_warning;
 
-        void ledWarningFlash(void)
-        {
-            m_warning.state = Warning::BLINK;
-        }
-
-        void ledWarningDisable(void)
-        {
-            m_warning.state = Warning::OFF;
-        }
-
         int32_t getTaskGuardCycles(void)
         {
             return m_scheduler.getTaskGuardCycles();
@@ -311,9 +301,9 @@ class Board {
                 }
 
                 if (!readyToArm()) {
-                    ledWarningFlash();
+                    m_warning.blink();
                 } else {
-                    ledWarningDisable();
+                    m_warning.disable();
                 }
 
                 ledWarningUpdate();

@@ -46,4 +46,14 @@ class Warning {
             ledOn = !ledOn;
         }
 
+        void disable(void)
+        {
+            state = OFF;
+        }
+
+        void blink(void)
+        {
+            state = Warning::BLINK;
+        }
+
 }; // class Warning
