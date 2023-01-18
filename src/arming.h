@@ -21,37 +21,15 @@
 
 class Arming {
 
-    private:
-
-        bool m_accDoneCalibrating;
-        bool m_angleOkay;
-        bool m_gotFailsafe;
-        bool m_gyroDoneCalibrating;
-        bool m_haveSignal;
-        bool m_isArmed;
-        bool m_switchOkay;
-        bool m_throttleIsDown;
-
-
     public:
 
-        bool ready(void)
-        {
-            return 
-                m_accDoneCalibrating &&
-                m_angleOkay &&
-                !m_gotFailsafe &&
-                m_haveSignal &&
-                m_gyroDoneCalibrating &&
-                m_switchOkay &&
-                m_throttleIsDown;
-        }
-
-        void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
-        {
-            m_angleOkay = imuIsLevel;
-            m_gyroDoneCalibrating = !gyroIsCalibrating;
-            m_accDoneCalibrating = true; // XXX
-        }
+        bool accDoneCalibrating;
+        bool angleOkay;
+        bool gotFailsafe;
+        bool gyroDoneCalibrating;
+        bool haveSignal;
+        bool isArmed;
+        bool switchOkay;
+        bool throttleIsDown;
 
 }; // class Arming

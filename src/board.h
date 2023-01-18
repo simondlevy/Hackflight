@@ -51,15 +51,8 @@ class Board {
         // Motor safety
         bool m_failsafeIsActive;
 
-        // Arming guards
-        bool m_accDoneCalibrating;
-        bool m_angleOkay;
-        bool m_gotFailsafe;
-        bool m_gyroDoneCalibrating;
-        bool m_haveSignal;
-        bool m_isArmed;
-        bool m_switchOkay;
-        bool m_throttleIsDown;
+        // Arming safety
+        Arming m_arming;
 
         // LED
         uint8_t m_ledPin;
@@ -125,7 +118,7 @@ class Board {
             }
 
             // unsafe; we should move unsafe ESC code to Board class
-            m_esc->write(m_isArmed ?  mixmotors : m_visualizerTask.motors);
+            m_esc->write(m_arming.isArmed ?  mixmotors : m_visualizerTask.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -179,29 +172,29 @@ class Board {
         bool readyToArm(void)
         {
             return 
-                m_accDoneCalibrating &&
-                m_angleOkay &&
-                !m_gotFailsafe &&
-                m_haveSignal &&
-                m_gyroDoneCalibrating &&
-                m_switchOkay &&
-                m_throttleIsDown;
+                m_arming.accDoneCalibrating &&
+                m_arming.angleOkay &&
+                !m_arming.gotFailsafe &&
+                m_arming.haveSignal &&
+                m_arming.gyroDoneCalibrating &&
+                m_arming.switchOkay &&
+                m_arming.throttleIsDown;
         }
 
         void disarm(void)
         {
-            if (m_isArmed) {
+            if (m_arming.isArmed) {
                 m_esc->stop();
             }
 
-            m_isArmed = false;
+            m_arming.isArmed = false;
         }
 
         void updateArmingFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
         {
-            m_angleOkay = imuIsLevel;
-            m_gyroDoneCalibrating = !gyroIsCalibrating;
-            m_accDoneCalibrating = true; // XXX
+            m_arming.angleOkay = imuIsLevel;
+            m_arming.gyroDoneCalibrating = !gyroIsCalibrating;
+            m_arming.accDoneCalibrating = true; // XXX
         }
 
         void attemptToArm(const uint32_t usec, const bool aux1IsSet)
@@ -212,7 +205,7 @@ class Board {
 
                 if (readyToArm()) {
 
-                    if (m_isArmed) {
+                    if (m_arming.isArmed) {
                         return;
                     }
 
@@ -220,18 +213,18 @@ class Board {
                         return;
                     }
 
-                    m_isArmed = true;
+                    m_arming.isArmed = true;
                 }
 
             } else {
 
-                if (m_isArmed) {
+                if (m_arming.isArmed) {
                     disarm();
-                    m_isArmed = false;
+                    m_arming.isArmed = false;
                 }
             }
 
-            if (!(m_isArmed || _doNotRepeat || !readyToArm())) {
+            if (!(m_arming.isArmed || _doNotRepeat || !readyToArm())) {
                 _doNotRepeat = true;
             }
         }
@@ -302,10 +295,10 @@ class Board {
         void updateFromReceiver(
                 const bool throttleIsDown, const bool aux1IsSet, const bool haveSignal)
         {
-            if (m_isArmed) {
+            if (m_arming.isArmed) {
 
-                if (!haveSignal && m_haveSignal) {
-                    m_gotFailsafe = true;
+                if (!haveSignal && m_arming.haveSignal) {
+                    m_arming.gotFailsafe = true;
                     disarm();
                 }
                 else {
@@ -313,13 +306,13 @@ class Board {
                 }
             } else {
 
-                m_throttleIsDown = throttleIsDown;
+                m_arming.throttleIsDown = throttleIsDown;
 
                 // If arming is disabled and the ARM switch is on
                 if (!readyToArm() && aux1IsSet) {
-                    m_switchOkay = false;
+                    m_arming.switchOkay = false;
                 } else if (!aux1IsSet) {
-                    m_switchOkay = true;
+                    m_arming.switchOkay = true;
                 }
 
                 if (!readyToArm()) {
@@ -331,7 +324,7 @@ class Board {
                 ledWarningUpdate();
             }
 
-            m_haveSignal = haveSignal;
+            m_arming.haveSignal = haveSignal;
         }
 
         void ledToggle(void)
