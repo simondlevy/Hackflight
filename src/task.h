@@ -148,4 +148,15 @@ class Task {
                 prioritizer.priority = m_dynamicPriority;
             }
         }
+
+        // For tasks that need to know the current time
+        virtual void run(const uint32_t usec)
+        {
+            (void)usec;
+        }
+
+        // For tasks that don't
+        virtual void run(void)
+        {
+        }
 }; 

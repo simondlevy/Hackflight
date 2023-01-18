@@ -24,98 +24,14 @@
 
 class Stm32FBoard : public Stm32Board {
 
-    private:
-
-        AccelerometerTask m_accelerometerTask; 
-
-        void parseSkyranger(const uint8_t byte)
-        {
-            m_skyrangerTask.parse(byte);
-        }
-
-        void runAccelerometerTask(void)
-        {
-            const auto nowCycles = getCycleCounter();
-
-            const uint32_t taskRequiredCycles = 
-                m_accelerometerTask.checkReady(
-                        m_scheduler.getNextTargetCycles(),
-                        nowCycles,
-                        getTaskGuardCycles());
-
-            if (taskRequiredCycles > 0) {
-
-                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
-
-                const auto usec = micros();
-
-                m_accelerometerTask.run();
-
-                m_accelerometerTask.update(usec, micros()-usec);
-
-                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
-            } 
-        }
-
-        void runSkyrangerTask(void)
-        {
-            const auto nowCycles = getCycleCounter();
-
-            const uint32_t taskRequiredCycles = 
-                m_skyrangerTask.checkReady(
-                        m_scheduler.getNextTargetCycles(),
-                        nowCycles,
-                        getTaskGuardCycles());
-
-            if (taskRequiredCycles > 0) {
-
-                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
-
-                const auto usec = micros();
-
-                m_skyrangerTask.run();
-
-                m_skyrangerTask.update(usec, micros()-usec);
-
-                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
-            } 
-         }
-
     protected:
-
-        // STM32F boards have no auto-reset bootloader support, so we reboot on
-        // an external input
-        virtual void reboot(void) { }
-
-        virtual void checkDynamicTasks(void) override
+        
+        virtual void prioritizeExtraTasks(
+                Task::prioritizer_t & prioritizer,
+                const uint32_t usec) override
         {
-            if (m_visualizerTask.gotRebootRequest()) {
-                reboot();
-            }
-
-            const uint32_t usec = micros();
-
-            // Prioritize primary dynamic tasks (attitude, visualizer, receiver)
-            Task::prioritizer_t prioritizer = prioritizeDynamicTasks(usec);
-
-            // Add in accelerometer and skyranger tasks
             m_accelerometerTask.prioritize(usec, prioritizer);
             m_skyrangerTask.prioritize(usec, prioritizer);
-
-            switch (prioritizer.id) {
-
-                case Task::ACCELEROMETER:
-                    runAccelerometerTask();
-                    break;
-
-                case Task::SKYRANGER:
-                    runSkyrangerTask();
-                    break;
-
-                default:
-                    runPrioritizedTask(prioritizer);
-                    break;
-            }
         }
 
     public:

@@ -50,10 +50,6 @@ class Stm32Board : public Board {
             return SystemCoreClock;
         }
 
-        virtual void reboot(void)
-        {
-        }
-
         virtual void startCycleCounter(void) override
         {
             CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;

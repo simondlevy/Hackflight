@@ -39,7 +39,7 @@ class AccelerometerTask : public Task {
             m_imu = imu;
         }
 
-        void run(void)
+        virtual void run(void) override
         {
             m_imu->updateAccelerometer();
         }

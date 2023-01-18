@@ -28,6 +28,7 @@ using namespace std;
 #include "imu.h"
 #include "receiver.h"
 #include "scheduler.h"
+#include "task/accelerometer.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
@@ -359,9 +360,12 @@ class Board {
         // Initialized in sketch
         Imu * m_imu;
 
+        AccelerometerTask m_accelerometerTask; 
+
         SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
 
-        VisualizerTask m_visualizerTask = VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
+        VisualizerTask m_visualizerTask =
+            VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
 
         Board(
                 Receiver & receiver,
@@ -385,15 +389,40 @@ class Board {
             receiver.m_board = this;
         }
 
-        auto prioritizeDynamicTasks(const uint32_t usec) -> Task::prioritizer_t
+        virtual void prioritizeExtraTasks(
+                Task::prioritizer_t & prioritizer, const uint32_t usec)
         {
-            Task::prioritizer_t prioritizer = {Task::NONE, 0};
+            (void)prioritizer;
+            (void)usec;
+        }
 
-            m_receiverTask.prioritize(usec, prioritizer);
-            m_attitudeTask.prioritize(usec, prioritizer);
-            m_visualizerTask.prioritize(usec, prioritizer);
+        void runTask(Task & task)
+        {
+            const auto nowCycles = getCycleCounter();
 
-            return prioritizer;
+            const uint32_t taskRequiredCycles = 
+                task.checkReady(
+                        m_scheduler.getNextTargetCycles(),
+                        nowCycles,
+                        getTaskGuardCycles());
+
+            if (taskRequiredCycles > 0) {
+
+                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+
+                const auto usec = micros();
+
+                task.run();
+
+                task.update(usec, micros()-usec);
+
+                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
+            } 
+        }
+
+        void parseSkyranger(const uint8_t byte)
+        {
+            m_skyrangerTask.parse(byte);
         }
 
         int32_t getTaskGuardCycles(void)
@@ -401,8 +430,22 @@ class Board {
             return m_scheduler.getTaskGuardCycles();
         }
 
-        void runPrioritizedTask(Task::prioritizer_t prioritizer)
+        void checkDynamicTasks(void)
         {
+            if (m_visualizerTask.gotRebootRequest()) {
+                reboot();
+            }
+
+            Task::prioritizer_t prioritizer = {Task::NONE, 0};
+
+            const uint32_t usec = micros();
+
+            m_receiverTask.prioritize(usec, prioritizer);
+            m_attitudeTask.prioritize(usec, prioritizer);
+            m_visualizerTask.prioritize(usec, prioritizer);
+
+            prioritizeExtraTasks(prioritizer, usec);
+
             switch (prioritizer.id) {
 
                 case Task::ATTITUDE:
@@ -417,16 +460,17 @@ class Board {
                     runReceiverTask();
                     break;
 
+                case Task::ACCELEROMETER:
+                    runTask(m_accelerometerTask);
+                    break;
+
+                case Task::SKYRANGER:
+                    runTask(m_skyrangerTask);
+                    break;
+
                 default:
                     break;
             }
-        }
-
-        virtual void checkDynamicTasks(void)
-        {
-            Task::prioritizer_t prioritizer = prioritizeDynamicTasks(micros());
-
-            runPrioritizedTask(prioritizer);
         }
 
         void runAttitudeTask(void)
@@ -541,6 +585,11 @@ class Board {
             updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
 
+        // STM32F boards have no auto-reset bootloader support, so we reboot on
+        // an external input
+        virtual void reboot(void)
+        {
+        }
 
     public:
 
@@ -608,7 +657,7 @@ class Board {
         void step(HardwareSerial & serial)
         {
             step();
-            
+
             while (m_skyrangerTask.imuDataAvailable()) {
                 serial.write(m_skyrangerTask.readImuData());
             }
