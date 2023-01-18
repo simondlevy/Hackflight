@@ -27,6 +27,7 @@ using namespace std;
 #include "esc.h"
 #include "imu.h"
 #include "receiver.h"
+#include "scheduler.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
@@ -86,6 +87,8 @@ class Board {
         int32_t  m_taskGuardMaxCycles;
         int32_t  desiredPeriodCycles;
         uint32_t lastTargetCycles;
+
+        Scheduler m_scheduler;
 
         // Motor safety
         bool m_failsafeIsActive;
@@ -410,7 +413,6 @@ class Board {
             lastTargetCycles = m_nextTargetCycles;
         }
 
-       
         int32_t getLoopRemainingCycles(void)
         {
             return m_loopRemainingCycles;
