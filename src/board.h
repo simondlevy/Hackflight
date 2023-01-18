@@ -41,33 +41,6 @@ class Board {
         // Avoid repeated degrees-to-radians conversion
         float m_maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE);
 
-        // Scheduling constants //////////////////////////////////////////////////
-
-        // Wait at start of scheduler loop if gyroSampleTask is nearly due
-        static const uint32_t SCHED_START_LOOP_MIN_US = 1;   
-        static const uint32_t SCHED_START_LOOP_MAX_US = 12;
-
-        // Fraction of a us to reduce start loop wait
-        static const uint32_t SCHED_START_LOOP_DOWN_STEP = 50;  
-
-        // Fraction of a us to increase start loop wait
-        static const uint32_t SCHED_START_LOOP_UP_STEP = 1;   
-
-        // Add an amount to the estimate of a task duration
-        static const uint32_t TASK_GUARD_MARGIN_MIN_US = 3;   
-        static const uint32_t TASK_GUARD_MARGIN_MAX_US = 6;
-
-        // Fraction of a us to reduce task guard margin
-        static const uint32_t TASK_GUARD_MARGIN_DOWN_STEP = 50;  
-
-        // Fraction of a us to increase task guard margin
-        static const uint32_t TASK_GUARD_MARGIN_UP_STEP = 1;   
-
-        // Add a margin to the amount of time allowed for a check function to run
-        static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
-
-        ///////////////////////////////////////////////////////////////////////
-
         // Gyro interrupt counts over which to measure loop time and skew
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
@@ -449,37 +422,6 @@ class Board {
 
             esc.m_board = this;
             receiver.m_board = this;
-
-            /*
-            m_scheduler.m_loopStartCycles =
-                microsecondsToClockCycles(SCHED_START_LOOP_MIN_US);
-            m_scheduler.m_loopStartMinCycles =
-                microsecondsToClockCycles(SCHED_START_LOOP_MIN_US);
-            m_scheduler.m_loopStartMaxCycles =
-                microsecondsToClockCycles(SCHED_START_LOOP_MAX_US);
-            m_scheduler.m_loopStartDeltaDownCycles =
-                microsecondsToClockCycles(1) / SCHED_START_LOOP_DOWN_STEP;
-            m_scheduler.m_loopStartDeltaUpCycles =
-                microsecondsToClockCycles(1) / SCHED_START_LOOP_UP_STEP;
-
-            m_scheduler.m_taskGuardMinCycles =
-                microsecondsToClockCycles(TASK_GUARD_MARGIN_MIN_US);
-            m_scheduler.m_taskGuardMaxCycles =
-                microsecondsToClockCycles(TASK_GUARD_MARGIN_MAX_US);
-            m_scheduler.m_taskGuardCycles = m_scheduler.m_taskGuardMinCycles;
-            m_scheduler.m_taskGuardDeltaDownCycles =
-                microsecondsToClockCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
-            m_scheduler.m_taskGuardDeltaUpCycles =
-                microsecondsToClockCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
-
-            m_scheduler.desiredPeriodCycles =
-                (int32_t)microsecondsToClockCycles(Clock::PERIOD());
-
-            m_scheduler.m_guardMargin =
-                (int32_t)microsecondsToClockCycles(CHECK_GUARD_MARGIN_US);
-
-            m_scheduler.m_clockRate = microsecondsToClockCycles(1000000);
-            */
         }
 
         auto prioritizeDynamicTasks(const uint32_t usec) -> Task::prioritizer_t
