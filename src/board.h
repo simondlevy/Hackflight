@@ -412,7 +412,7 @@ class Board {
 
                 const auto usec = micros();
 
-                task.run();
+                task.run(usec);
 
                 task.update(usec, micros()-usec);
 
@@ -449,7 +449,8 @@ class Board {
             switch (prioritizer.id) {
 
                 case Task::ATTITUDE:
-                    runAttitudeTask();
+                    runTask(m_attitudeTask);
+                    updateArmingFromImu();
                     break;
 
                 case Task::VISUALIZER:
@@ -457,7 +458,8 @@ class Board {
                     break;
 
                 case Task::RECEIVER:
-                    runReceiverTask();
+                    runTask(m_receiverTask);
+                    updateArmingFromReceiver();
                     break;
 
                 case Task::ACCELEROMETER:
@@ -471,58 +473,6 @@ class Board {
                 default:
                     break;
             }
-        }
-
-        void runAttitudeTask(void)
-        {
-            const auto nowCycles = getCycleCounter();
-
-            const uint32_t taskRequiredCycles = 
-                m_attitudeTask.checkReady(
-                        m_scheduler.getNextTargetCycles(),
-                        nowCycles,
-                        getTaskGuardCycles());
-
-            if (taskRequiredCycles > 0) {
-
-                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
-
-                const auto usec = micros();
-
-                m_attitudeTask.run(usec);
-
-                m_attitudeTask.update(usec, micros()-usec);
-
-                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
-            } 
-
-            updateArmingFromImu();
-        }
-
-        void runReceiverTask(void)
-        {
-            const auto nowCycles = getCycleCounter();
-
-            const uint32_t taskRequiredCycles = 
-                m_receiverTask.checkReady(
-                        m_scheduler.getNextTargetCycles(),
-                        nowCycles,
-                        getTaskGuardCycles());
-
-            if (taskRequiredCycles > 0) {
-
-                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
-
-                const auto usec = micros();
-
-                m_receiverTask.run(usec);
-
-                m_receiverTask.update(usec, micros()-usec);
-
-                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
-            } 
-
-            updateArmingFromReceiver();
         }
 
         void runVisualizerTask(void)

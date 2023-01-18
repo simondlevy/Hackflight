@@ -37,7 +37,7 @@ class ReceiverTask : public Task {
         {
         }
 
-        void run(const uint32_t usec)
+        virtual void run(const uint32_t usec) override
         {
             receiver->update(usec);
         }
@@ -46,7 +46,8 @@ class ReceiverTask : public Task {
         virtual void adjustDynamicPriority(uint32_t usec) override
         {
             if (m_dynamicPriority > 0) {
-                m_ageCycles = 1 + (intcmp(usec, m_lastSignaledAtUs) / m_desiredPeriodUs);
+                m_ageCycles =
+                    1 + (intcmp(usec, m_lastSignaledAtUs) / m_desiredPeriodUs);
                 m_dynamicPriority = 1 + m_ageCycles;
             } else  {
                 if (receiver->check(usec)) {

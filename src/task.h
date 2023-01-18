@@ -154,9 +154,4 @@ class Task {
         {
             (void)usec;
         }
-
-        // For tasks that don't
-        virtual void run(void)
-        {
-        }
 }; 

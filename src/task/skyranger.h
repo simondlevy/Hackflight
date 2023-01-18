@@ -45,8 +45,10 @@ class SkyrangerTask : public Task {
             m_vstate = &vstate;
         }
 
-        void run(void)
+        virtual void run(const uint32_t usec) override
         {
+            (void)usec;
+
             int16_t angles[3] = {};
             Imu::getEulerAngles(m_vstate, angles);
 
