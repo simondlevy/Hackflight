@@ -336,7 +336,7 @@ class Board {
 
         void ledToggle(void)
         {
-            m_warning.ledOn = !m_warning.ledOn;
+            m_warning.toggleLed();
             ledSet(m_warning.ledOn);
         }
 

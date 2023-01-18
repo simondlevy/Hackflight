@@ -41,4 +41,9 @@ class Warning {
             timer = usec + 500000;
         }
 
+        void toggleLed(void)
+        {
+            ledOn = !ledOn;
+        }
+
 }; // class Warning
