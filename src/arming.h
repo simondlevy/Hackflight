@@ -20,6 +20,7 @@
 #include <stdbool.h>
 
 #include "imu.h"
+#include "core/vstate.h"
 
 class Arming {
 
@@ -30,7 +31,7 @@ class Arming {
     public:
 
         // Avoid repeated degrees-to-radians conversion
-        float maxAngle = Imu::deg2rad(MAX_ANGLE);
+        const float maxAngle = Imu::deg2rad(MAX_ANGLE);
 
         bool accDoneCalibrating;
         bool angleOkay;
@@ -41,10 +42,15 @@ class Arming {
         bool switchOkay;
         bool throttleIsDown;
 
-        void updateFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
+        void updateFromImu(Imu & imu, VehicleState & vstate)
         {
+            const auto imuIsLevel =
+                fabsf(vstate.phi) < maxAngle && fabsf(vstate.theta) < maxAngle;
+
             angleOkay = imuIsLevel;
-            gyroDoneCalibrating = !gyroIsCalibrating;
+
+            gyroDoneCalibrating = !imu.gyroIsCalibrating();
+
             accDoneCalibrating = true; // XXX
         }
 

@@ -224,15 +224,6 @@ class Board {
             return m_scheduler.getTaskGuardCycles();
         }
 
-        void updateArmingFromImu(void)
-        {
-            const auto imuIsLevel =
-                fabsf(m_vstate.phi) < m_arming.maxAngle &&
-                fabsf(m_vstate.theta) < m_arming.maxAngle;
-
-            m_arming.updateFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
-        }
-
         //////////////////////// unsafe below here ////////////////////////////
 
         uint32_t getAnticipatedEndCycles(Task & task)
@@ -352,7 +343,7 @@ class Board {
 
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask);
-                    updateArmingFromImu();
+                    m_arming.updateFromImu(*m_imu, m_vstate);
                     break;
 
                 case Task::VISUALIZER:

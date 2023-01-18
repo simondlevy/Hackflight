@@ -28,8 +28,6 @@
 
 class Imu {
 
-    friend class Board;
-
     private:
 
         static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
@@ -207,6 +205,23 @@ class Imu {
             m_gyroInterruptCount++;
         }
 
+       typedef Axes (*rotateFun_t)(Axes & axes);
+
+        rotateFun_t m_rotateFun;
+
+        Imu(void) 
+        {
+        }
+
+        Imu(const rotateFun_t rotateFun, const uint16_t gyroScale)
+        {
+            m_rotateFun = rotateFun;
+            m_gyroScale = gyroScale / 32768.;
+
+        }
+
+    public:
+
         virtual auto readGyroDps(void) -> Axes
         {
             const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
@@ -252,27 +267,10 @@ class Imu {
             return Axes(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
         }
 
-        virtual bool gyroIsCalibrating(void)
+         virtual bool gyroIsCalibrating(void)
         {
             return m_gyroIsCalibrating;
         }
-
-        typedef Axes (*rotateFun_t)(Axes & axes);
-
-        rotateFun_t m_rotateFun;
-
-        Imu(void) 
-        {
-        }
-
-        Imu(const rotateFun_t rotateFun, const uint16_t gyroScale)
-        {
-            m_rotateFun = rotateFun;
-            m_gyroScale = gyroScale / 32768.;
-
-        }
-
-    public:
 
         static float deg2rad(float deg)
         {
