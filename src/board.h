@@ -33,6 +33,7 @@ using namespace std;
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
+#include "warning.h"
 
 class Board {
 
@@ -235,26 +236,20 @@ class Board {
             }
         }
 
-        typedef enum {
-            LED_WARNING_OFF = 0,
-            LED_WARNING_ON,
-            LED_WARNING_FLASH
-        } ledWarningState_e;
-
         bool m_ledOn;
 
-        ledWarningState_e m_ledWarningState = LED_WARNING_OFF;
+        Warning::state_e m_ledWarningState = Warning::OFF;
 
         uint32_t m_ledWarningTimer = 0;
 
         void ledWarningFlash(void)
         {
-            m_ledWarningState = LED_WARNING_FLASH;
+            m_ledWarningState = Warning::BLINK;
         }
 
         void ledWarningDisable(void)
         {
-            m_ledWarningState = LED_WARNING_OFF;
+            m_ledWarningState = Warning::OFF;
         }
 
         int32_t getTaskGuardCycles(void)
@@ -356,13 +351,13 @@ class Board {
             }
 
             switch (m_ledWarningState) {
-                case LED_WARNING_OFF:
+                case Warning::OFF:
                     ledSet(false);
                     break;
-                case LED_WARNING_ON:
+                case Warning::ON:
                     ledSet(true);
                     break;
-                case LED_WARNING_FLASH:
+                case Warning::BLINK:
                     ledToggle();
                     break;
             }
