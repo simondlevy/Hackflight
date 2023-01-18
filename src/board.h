@@ -396,30 +396,6 @@ class Board {
             (void)usec;
         }
 
-        void runTask(Task & task)
-        {
-            const auto nowCycles = getCycleCounter();
-
-            const uint32_t taskRequiredCycles = 
-                task.checkReady(
-                        m_scheduler.getNextTargetCycles(),
-                        nowCycles,
-                        getTaskGuardCycles());
-
-            if (taskRequiredCycles > 0) {
-
-                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
-
-                const auto usec = micros();
-
-                task.run(usec);
-
-                task.update(usec, micros()-usec);
-
-                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
-            } 
-        }
-
         void parseSkyranger(const uint8_t byte)
         {
             m_skyrangerTask.parse(byte);
@@ -475,6 +451,37 @@ class Board {
             }
         }
 
+        void runTask(Task & task)
+        {
+            const auto nowCycles = getCycleCounter();
+
+            const uint32_t taskRequiredCycles = 
+                task.checkReady(
+                        m_scheduler.getNextTargetCycles(),
+                        nowCycles,
+                        getTaskGuardCycles());
+
+            if (taskRequiredCycles > 0) {
+
+                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+
+                const auto usec = micros();
+
+                task.run(usec);
+
+                postRunTask(task, usec, anticipatedEndCycles);
+            } 
+        }
+
+        void postRunTask(
+                Task & task,
+                const uint32_t usec,
+                const uint32_t anticipatedEndCycles)
+        {
+            task.update(usec, micros()-usec);
+            m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
+        }
+
         void runVisualizerTask(void)
         {
             const auto nowCycles = getCycleCounter();
@@ -498,9 +505,7 @@ class Board {
                     }
                 }
 
-                m_visualizerTask.update(usec, micros()-usec);
-
-                m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
+                postRunTask(m_visualizerTask, usec, anticipatedEndCycles);
             }
         }
 
