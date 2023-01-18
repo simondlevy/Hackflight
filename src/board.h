@@ -273,11 +273,11 @@ class Board {
             LED_WARNING_OFF = 0,
             LED_WARNING_ON,
             LED_WARNING_FLASH
-        } ledWarningVehicleState_e;
+        } ledWarningState_e;
 
         bool m_ledOn;
 
-        ledWarningVehicleState_e m_ledWarningVehicleState = LED_WARNING_OFF;
+        ledWarningState_e m_ledWarningState = LED_WARNING_OFF;
 
         uint32_t m_ledWarningTimer = 0;
 
@@ -287,40 +287,14 @@ class Board {
             ledSet(m_ledOn);
         }
 
-        void ledSet(bool on)
-        {
-            if (m_ledPin > 0) {
-                digitalWrite(m_ledPin, m_ledInverted ? on : !on);
-            }
-
-            m_ledOn = on;
-        }
-
-        void ledBegin(void)
-        {
-            if (m_ledPin > 0) {
-                pinMode(m_ledPin, OUTPUT);
-            }
-        }
-
-        void ledFlash(uint8_t reps, uint16_t delayMs)
-        {
-            ledSet(false);
-            for (auto i=0; i<reps; i++) {
-                ledToggle();
-                delay(delayMs); // unsafe
-            }
-            ledSet(false);
-        }
-
         void ledWarningFlash(void)
         {
-            m_ledWarningVehicleState = LED_WARNING_FLASH;
+            m_ledWarningState = LED_WARNING_FLASH;
         }
 
         void ledWarningDisable(void)
         {
-            m_ledWarningVehicleState = LED_WARNING_OFF;
+            m_ledWarningState = LED_WARNING_OFF;
         }
 
         void ledWarningUpdate(void)
@@ -329,7 +303,7 @@ class Board {
                 return;
             }
 
-            switch (m_ledWarningVehicleState) {
+            switch (m_ledWarningState) {
                 case LED_WARNING_OFF:
                     ledSet(false);
                     break;
@@ -409,29 +383,6 @@ class Board {
                     0;
         }
 
-        void runTask(Task & task)
-        {
-            const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(task);
-
-            if (anticipatedEndCycles > 0) {
-
-                const uint32_t usec = micros(); // unsafe
-
-                task.run(usec);
-
-                postRunTask(task, usec, anticipatedEndCycles);
-            } 
-        }
-
-        void postRunTask(
-                Task & task,
-                const uint32_t usec,
-                const uint32_t anticipatedEndCycles)
-        {
-            task.update(usec, micros()-usec); // unsafe
-            m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
-        }
-
         void updateArmingFromReceiver(Receiver * receiver, const uint32_t usec)
         {
             switch (receiver->getState()) {
@@ -462,6 +413,55 @@ class Board {
         }
 
         // unsafe below here --------------------------------------------------
+
+        void runTask(Task & task)
+        {
+            const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(task);
+
+            if (anticipatedEndCycles > 0) {
+
+                const uint32_t usec = micros(); // unsafe
+
+                task.run(usec);
+
+                postRunTask(task, usec, anticipatedEndCycles);
+            } 
+        }
+
+        void postRunTask(
+                Task & task,
+                const uint32_t usec,
+                const uint32_t anticipatedEndCycles)
+        {
+            task.update(usec, micros()-usec); // unsafe
+            m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
+        }
+
+        void ledSet(bool on)
+        {
+            if (m_ledPin > 0) {
+                digitalWrite(m_ledPin, m_ledInverted ? on : !on);
+            }
+
+            m_ledOn = on;
+        }
+
+        void ledBegin(void)
+        {
+            if (m_ledPin > 0) {
+                pinMode(m_ledPin, OUTPUT);
+            }
+        }
+
+        void ledFlash(uint8_t reps, uint16_t delayMs)
+        {
+            ledSet(false);
+            for (auto i=0; i<reps; i++) {
+                ledToggle();
+                delay(delayMs); // unsafe
+            }
+            ledSet(false);
+        }
 
         // STM32F boards have no auto-reset bootloader support, so we reboot on
         // an external input
