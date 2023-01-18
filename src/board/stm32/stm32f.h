@@ -39,7 +39,7 @@ class Stm32FBoard : public Stm32Board {
 
             const uint32_t taskRequiredCycles = 
                 m_accelerometerTask.checkReady(
-                        m_nextTargetCycles,
+                        m_scheduler.getNextTargetCycles(),
                         nowCycles,
                         getTaskGuardCycles());
 
@@ -63,7 +63,7 @@ class Stm32FBoard : public Stm32Board {
 
             const uint32_t taskRequiredCycles = 
                 m_skyrangerTask.checkReady(
-                        m_nextTargetCycles,
+                        m_scheduler.getNextTargetCycles(),
                         nowCycles,
                         getTaskGuardCycles());
 

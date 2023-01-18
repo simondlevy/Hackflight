@@ -52,6 +52,8 @@ class Scheduler {
         // Add a margin to the amount of time allowed for a check function to run
         static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
 
+    public:
+
         uint32_t m_clockRate;
         int32_t  m_guardMargin;
         int32_t  m_loopRemainingCycles;

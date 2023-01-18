@@ -41,7 +41,7 @@ class Board {
         // Avoid repeated degrees-to-radians conversion
         float m_maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE);
 
-        // Scheduling constants ------------------------------------------------
+        // Scheduling constants //////////////////////////////////////////////////
 
         // Wait at start of scheduler loop if gyroSampleTask is nearly due
         static const uint32_t SCHED_START_LOOP_MIN_US = 1;   
@@ -66,10 +66,6 @@ class Board {
         // Add a margin to the amount of time allowed for a check function to run
         static const uint32_t CHECK_GUARD_MARGIN_US = 2 ;  
 
-        // Gyro interrupt counts over which to measure loop time and skew
-        static const uint32_t CORE_RATE_COUNT = 25000;
-        static const uint32_t GYRO_LOCK_COUNT = 400;
-
         // Scheduler variables
         uint32_t m_clockRate;
         int32_t  m_guardMargin;
@@ -86,7 +82,11 @@ class Board {
         int32_t  m_taskGuardMinCycles;
         int32_t  m_taskGuardMaxCycles;
 
-        Scheduler m_scheduler;
+        ///////////////////////////////////////////////////////////////////////
+
+        // Gyro interrupt counts over which to measure loop time and skew
+        static const uint32_t CORE_RATE_COUNT = 25000;
+        static const uint32_t GYRO_LOCK_COUNT = 400;
 
         // Motor safety
         bool m_failsafeIsActive;
@@ -121,7 +121,7 @@ class Board {
         void checkCoreTasks(uint32_t nowCycles)
         {
             int32_t loopRemainingCycles = getLoopRemainingCycles();
-            uint32_t nextTargetCycles = m_nextTargetCycles;
+            uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
 
             corePreUpdate();
 
@@ -160,7 +160,7 @@ class Board {
 
             m_esc->write(isArmed() ?  mixmotors : m_visualizerTask.motors);
 
-            corePostUpdate(nowCycles);
+            m_scheduler.corePostUpdate(nowCycles);
 
             // Bring the scheduler into lock with the gyro Track the actual
             // gyro rate over given number of cycle times and set the expected
@@ -402,15 +402,6 @@ class Board {
             }
         }
 
-        void corePostUpdate(uint32_t nowCycles)
-        {
-            // CPU busy
-            if (intcmp(m_nextTimingCycles, nowCycles) < 0) {
-                m_nextTimingCycles += m_clockRate;
-            }
-            m_scheduler.lastTargetCycles = m_nextTargetCycles;
-        }
-
         int32_t getLoopRemainingCycles(void)
         {
             return m_loopRemainingCycles;
@@ -418,10 +409,10 @@ class Board {
         
         bool isCoreReady(uint32_t nowCycles)
         {
-            m_nextTargetCycles = m_scheduler.lastTargetCycles +
+            m_scheduler.m_nextTargetCycles = m_scheduler.lastTargetCycles +
                 m_scheduler.desiredPeriodCycles;
 
-            m_loopRemainingCycles = intcmp(m_nextTargetCycles, nowCycles);
+            m_loopRemainingCycles = intcmp(m_scheduler.m_nextTargetCycles, nowCycles);
 
             if (m_loopRemainingCycles < -m_scheduler.desiredPeriodCycles) {
                 // A task has so grossly overrun that at entire gyro cycle has
@@ -429,10 +420,10 @@ class Board {
                 // the configurator via USB as the serial task is
                 // non-deterministic Recover as best we can, advancing
                 // scheduling by a whole number of cycles
-                m_nextTargetCycles += m_scheduler.desiredPeriodCycles * (1 +
+                m_scheduler.m_nextTargetCycles += m_scheduler.desiredPeriodCycles * (1 +
                         (m_loopRemainingCycles / -m_scheduler.desiredPeriodCycles));
                 m_loopRemainingCycles = intcmp(
-                        m_nextTargetCycles, nowCycles);
+                        m_scheduler.getNextTargetCycles(), nowCycles);
             }
 
             // Tune out the time lost between completing the last task
@@ -449,7 +440,7 @@ class Board {
         bool isDynamicReady(uint32_t nowCycles) 
         {
             auto newLoopRemainingCyles =
-                intcmp(m_nextTargetCycles, nowCycles);
+                intcmp(m_scheduler.getNextTargetCycles(), nowCycles);
 
             return newLoopRemainingCyles > m_guardMargin;
         }
@@ -457,7 +448,7 @@ class Board {
 
     protected:
 
-        uint32_t m_nextTargetCycles;
+        Scheduler m_scheduler;
 
         // Initialized in sketch
         Imu * m_imu;
@@ -581,7 +572,7 @@ class Board {
 
             const uint32_t taskRequiredCycles = 
                 m_attitudeTask.checkReady(
-                        m_nextTargetCycles,
+                        m_scheduler.getNextTargetCycles(),
                         nowCycles,
                         getTaskGuardCycles());
 
@@ -607,7 +598,7 @@ class Board {
 
             const uint32_t taskRequiredCycles = 
                 m_receiverTask.checkReady(
-                        m_nextTargetCycles,
+                        m_scheduler.getNextTargetCycles(),
                         nowCycles,
                         getTaskGuardCycles());
 
@@ -633,7 +624,7 @@ class Board {
 
             const uint32_t taskRequiredCycles = 
                 m_visualizerTask.checkReady(
-                        m_nextTargetCycles,
+                        m_scheduler.getNextTargetCycles(),
                         nowCycles,
                         getTaskGuardCycles());
 
