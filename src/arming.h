@@ -42,6 +42,18 @@ class Arming {
         bool switchOkay;
         bool throttleIsDown;
 
+        bool ready(void)
+        {
+            return 
+                accDoneCalibrating &&
+                angleOkay &&
+                !gotFailsafe &&
+                haveSignal &&
+                gyroDoneCalibrating &&
+                switchOkay &&
+                throttleIsDown;
+        }
+
         void updateFromImu(Imu & imu, VehicleState & vstate)
         {
             const auto imuIsLevel =

@@ -164,18 +164,6 @@ class Board {
 
         } // checkCoreTasks
 
-        bool readyToArm(void)
-        {
-            return 
-                m_arming.accDoneCalibrating &&
-                m_arming.angleOkay &&
-                !m_arming.gotFailsafe &&
-                m_arming.haveSignal &&
-                m_arming.gyroDoneCalibrating &&
-                m_arming.switchOkay &&
-                m_arming.throttleIsDown;
-        }
-
         void disarm(void)
         {
             if (m_arming.isArmed) {
@@ -191,7 +179,7 @@ class Board {
 
             if (aux1IsSet) {
 
-                if (readyToArm()) {
+                if (m_arming.ready()) {
 
                     if (m_arming.isArmed) {
                         return;
@@ -212,7 +200,7 @@ class Board {
                 }
             }
 
-            if (!(m_arming.isArmed || _doNotRepeat || !readyToArm())) {
+            if (!(m_arming.isArmed || _doNotRepeat || !m_arming.ready())) {
                 _doNotRepeat = true;
             }
         }
@@ -278,13 +266,13 @@ class Board {
                 m_arming.throttleIsDown = throttleIsDown;
 
                 // If arming is disabled and the ARM switch is on
-                if (!readyToArm() && aux1IsSet) {
+                if (!m_arming.ready() && aux1IsSet) {
                     m_arming.switchOkay = false;
                 } else if (!aux1IsSet) {
                     m_arming.switchOkay = true;
                 }
 
-                if (!readyToArm()) {
+                if (!m_arming.ready()) {
                     m_warning.blink();
                 } else {
                     m_warning.disable();
