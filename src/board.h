@@ -63,11 +63,16 @@ class Board {
         uint8_t m_ledPin;
         bool m_ledInverted;
 
+        Scheduler m_scheduler;
+
         VehicleState m_vstate;
 
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
         ReceiverTask m_receiverTask;
+
+        VisualizerTask m_visualizerTask =
+            VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
 
         Msp m_msp;
 
@@ -113,7 +118,8 @@ class Board {
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
-                mixmotors[i] = m_esc->getMotorValue(motors.values[i], m_failsafeIsActive);
+                mixmotors[i] =
+                    m_esc->getMotorValue(motors.values[i], m_failsafeIsActive);
             }
 
             m_esc->write(isArmed() ?  mixmotors : m_visualizerTask.motors);
@@ -127,7 +133,8 @@ class Board {
             static int32_t _sampleRateStartCycles;
 
             if ((_terminalGyroRateCount == 0)) {
-                _terminalGyroRateCount = m_imu->getGyroInterruptCount() + CORE_RATE_COUNT;
+                _terminalGyroRateCount =
+                    m_imu->getGyroInterruptCount() + CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
             }
 
@@ -151,7 +158,8 @@ class Board {
             _gyroSkewAccum += gyroSkew;
 
             if ((_terminalGyroLockCount == 0)) {
-                _terminalGyroLockCount = m_imu->getGyroInterruptCount() + GYRO_LOCK_COUNT;
+                _terminalGyroLockCount =
+                    m_imu->getGyroInterruptCount() + GYRO_LOCK_COUNT;
             }
 
             if (m_imu->getGyroInterruptCount() >= _terminalGyroLockCount) {
@@ -353,54 +361,6 @@ class Board {
             ledWarningRefresh();
         }
 
-    protected:
-
-        Scheduler m_scheduler;
-
-        // Initialized in sketch
-        Imu * m_imu;
-
-        AccelerometerTask m_accelerometerTask; 
-
-        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
-
-        VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
-
-        Board(
-                Receiver & receiver,
-                Imu & imu,
-                vector<PidController *> & pidControllers,
-                Mixer & mixer,
-                Esc & esc,
-                const int8_t ledPin)
-        {
-            m_receiverTask.receiver = &receiver;
-
-            m_imu = &imu;
-            m_pidControllers = &pidControllers;
-            m_mixer = &mixer;
-            m_esc = &esc;
-
-            m_ledPin = ledPin < 0 ? -ledPin : ledPin;
-            m_ledInverted = ledPin < 0;
-
-            esc.m_board = this;
-            receiver.m_board = this;
-        }
-
-        virtual void prioritizeExtraTasks(
-                Task::prioritizer_t & prioritizer, const uint32_t usec)
-        {
-            (void)prioritizer;
-            (void)usec;
-        }
-
-        void parseSkyranger(const uint8_t byte)
-        {
-            m_skyrangerTask.parse(byte);
-        }
-
         int32_t getTaskGuardCycles(void)
         {
             return m_scheduler.getTaskGuardCycles();
@@ -546,6 +506,44 @@ class Board {
         {
         }
 
+    protected:
+
+        // Initialized in sketch
+        Imu * m_imu;
+
+        AccelerometerTask m_accelerometerTask; 
+
+        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
+
+        Board(
+                Receiver & receiver,
+                Imu & imu,
+                vector<PidController *> & pidControllers,
+                Mixer & mixer,
+                Esc & esc,
+                const int8_t ledPin)
+        {
+            m_receiverTask.receiver = &receiver;
+
+            m_imu = &imu;
+            m_pidControllers = &pidControllers;
+            m_mixer = &mixer;
+            m_esc = &esc;
+
+            m_ledPin = ledPin < 0 ? -ledPin : ledPin;
+            m_ledInverted = ledPin < 0;
+
+            esc.m_board = this;
+            receiver.m_board = this;
+        }
+
+        virtual void prioritizeExtraTasks(
+                Task::prioritizer_t & prioritizer, const uint32_t usec)
+        {
+            (void)prioritizer;
+            (void)usec;
+        }
+
     public:
 
         uint32_t microsToCycles(uint32_t micros)
@@ -559,7 +557,8 @@ class Board {
 
         virtual void startCycleCounter(void) = 0;
 
-        virtual void dmaInit(const vector<uint8_t> * motorPins, const uint32_t outputFreq)
+        virtual void dmaInit(
+                const vector<uint8_t> * motorPins, const uint32_t outputFreq)
         {
             (void)motorPins;
             (void)outputFreq;
@@ -618,13 +617,15 @@ class Board {
             }
         }
 
-        static void setInterrupt(const uint8_t pin, void (*irq)(void), const uint32_t mode)
+        static void setInterrupt(
+                const uint8_t pin, void (*irq)(void), const uint32_t mode)
         {
             pinMode(pin, INPUT);
             attachInterrupt(pin, irq, mode);  
         }
 
-        static void handleReceiverSerialEvent(Receiver & rx, HardwareSerial & serial) {
+        static void handleReceiverSerialEvent(
+                Receiver & rx, HardwareSerial & serial) {
 
             while (serial.available()) {
 
