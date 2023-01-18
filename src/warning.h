@@ -32,6 +32,13 @@ class Warning {
 
         state_e state;
 
+        uint32_t timer;
+
         bool ledOn;
+
+        void setTimer(const uint32_t usec)
+        {
+            timer = usec + 500000;
+        }
 
 }; // class Warning

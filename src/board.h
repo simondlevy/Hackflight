@@ -238,8 +238,6 @@ class Board {
 
         Warning m_warning;
 
-        uint32_t m_ledWarningTimer;
-
         void ledWarningFlash(void)
         {
             m_warning.state = Warning::BLINK;
@@ -344,7 +342,7 @@ class Board {
 
         void ledWarningUpdate(void)
         {
-            if ((int32_t)(micros() - m_ledWarningTimer) < 0) {
+            if ((int32_t)(micros() - m_warning.timer) < 0) {
                 return;
             }
 
@@ -360,7 +358,7 @@ class Board {
                     break;
             }
 
-            m_ledWarningTimer = micros() + 500000;
+            m_warning.setTimer(micros());
         }
 
         void checkDynamicTasks(void)
