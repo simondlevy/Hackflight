@@ -113,7 +113,7 @@ class Board {
             }
 
             // unsafe; we should move unsafe ESC code to Board class
-            m_esc->write(m_arming.isArmed ?  mixmotors : m_visualizerTask.motors);
+            m_esc->write(m_arming.isArmed() ?  mixmotors : m_visualizerTask.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -211,7 +211,7 @@ class Board {
         void updateFromReceiver(
                 const bool throttleIsDown, const bool aux1IsSet, const bool haveSignal)
         {
-            if (m_arming.isArmed) {
+            if (m_arming.isArmed()) {
 
                 if (!haveSignal && m_arming.haveSignal) {
                     m_arming.gotFailsafe = true;

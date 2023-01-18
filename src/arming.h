@@ -30,9 +30,10 @@ class Arming {
 
         static constexpr float MAX_ANGLE = 25;
 
-        bool accDoneCalibrating;
-        bool angleOkay;
-        bool gyroDoneCalibrating;
+        bool m_accDoneCalibrating;
+        bool m_angleOkay;
+        bool m_gyroDoneCalibrating;
+        bool m_isArmed;
 
     public:
 
@@ -41,7 +42,6 @@ class Arming {
 
         bool gotFailsafe;
         bool haveSignal;
-        bool isArmed;
         bool switchOkay;
         bool throttleIsDown;
 
@@ -53,7 +53,7 @@ class Arming {
 
                 if (ready()) {
 
-                    if (isArmed) {
+                    if (m_isArmed) {
                         return;
                     }
 
@@ -61,7 +61,7 @@ class Arming {
                         return;
                     }
 
-                    isArmed = true;
+                    m_isArmed = true;
                 }
 
             } else {
@@ -69,27 +69,32 @@ class Arming {
                 disarm(esc);
             }
 
-            if (!(isArmed || _doNotRepeat || !ready())) {
+            if (!(m_isArmed || _doNotRepeat || !ready())) {
                 _doNotRepeat = true;
             }
         }
 
         void disarm(Esc & esc)
         {
-            if (isArmed) {
+            if (m_isArmed) {
                 esc.stop();
             }
-            isArmed = false;
+            m_isArmed = false;
+        }
+
+        bool isArmed(void)
+        {
+            return m_isArmed;
         }
 
         bool ready(void)
         {
             return 
-                accDoneCalibrating &&
-                angleOkay &&
+                m_accDoneCalibrating &&
+                m_angleOkay &&
                 !gotFailsafe &&
                 haveSignal &&
-                gyroDoneCalibrating &&
+                m_gyroDoneCalibrating &&
                 switchOkay &&
                 throttleIsDown;
         }
@@ -99,11 +104,11 @@ class Arming {
             const auto imuIsLevel =
                 fabsf(vstate.phi) < maxAngle && fabsf(vstate.theta) < maxAngle;
 
-            angleOkay = imuIsLevel;
+            m_angleOkay = imuIsLevel;
 
-            gyroDoneCalibrating = !imu.gyroIsCalibrating();
+            m_gyroDoneCalibrating = !imu.gyroIsCalibrating();
 
-            accDoneCalibrating = true; // XXX
+            m_accDoneCalibrating = true; // XXX
         }
 
 }; // class Arming
