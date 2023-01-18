@@ -451,7 +451,7 @@ class Board {
             }
         }
 
-        void runTask(Task & task)
+        uint32_t getAnticipatedEndCycles(Task & task)
         {
             const auto nowCycles = getCycleCounter();
 
@@ -461,11 +461,18 @@ class Board {
                         nowCycles,
                         getTaskGuardCycles());
 
-            if (taskRequiredCycles > 0) {
+            return taskRequiredCycles > 0 ? 
+                    nowCycles + taskRequiredCycles :
+                    0;
+        }
 
-                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+        void runTask(Task & task)
+        {
+            const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(task);
 
-                const auto usec = micros();
+            if (anticipatedEndCycles > 0) {
+
+                const uint32_t usec = micros();
 
                 task.run(usec);
 
@@ -473,28 +480,12 @@ class Board {
             } 
         }
 
-        void postRunTask(
-                Task & task,
-                const uint32_t usec,
-                const uint32_t anticipatedEndCycles)
-        {
-            task.update(usec, micros()-usec);
-            m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
-        }
-
         void runVisualizerTask(void)
         {
-            const auto nowCycles = getCycleCounter();
+            const uint32_t anticipatedEndCycles =
+                getAnticipatedEndCycles(m_visualizerTask);
 
-            const uint32_t taskRequiredCycles = 
-                m_visualizerTask.checkReady(
-                        m_scheduler.getNextTargetCycles(),
-                        nowCycles,
-                        getTaskGuardCycles());
-
-            if (taskRequiredCycles > 0) {
-
-                const auto anticipatedEndCycles = nowCycles + taskRequiredCycles;
+            if (anticipatedEndCycles > 0) {
 
                 const auto usec = micros();
 
@@ -507,6 +498,15 @@ class Board {
 
                 postRunTask(m_visualizerTask, usec, anticipatedEndCycles);
             }
+        }
+
+        void postRunTask(
+                Task & task,
+                const uint32_t usec,
+                const uint32_t anticipatedEndCycles)
+        {
+            task.update(usec, micros()-usec);
+            m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
         }
 
         void updateArmingFromReceiver(void)
