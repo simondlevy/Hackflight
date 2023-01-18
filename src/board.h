@@ -108,15 +108,12 @@ class Board {
 
             Demands demands = m_receiverTask.receiver->getDemands();
 
-            //delayMicroseconds(10);
-
             auto motors = m_mixer->step(
                     demands,
                     m_vstate,
                     m_pidControllers,
                     m_receiverTask.receiver->gotPidReset(),
                     usec);
-                    // micros()); // unsafe
 
             float mixmotors[Motors::MAX_SUPPORTED] = {};
 
@@ -126,6 +123,7 @@ class Board {
                     m_esc->getMotorValue(motors.values[i], m_failsafeIsActive);
             }
 
+            // unsafe; we should move unsafe ESC code to Board class
             m_esc->write(m_isArmed ?  mixmotors : m_visualizerTask.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
@@ -249,12 +247,6 @@ class Board {
 
         uint32_t m_ledWarningTimer = 0;
 
-        void ledToggle(void)
-        {
-            m_ledOn = !m_ledOn;
-            ledSet(m_ledOn);
-        }
-
         void ledWarningFlash(void)
         {
             m_ledWarningState = LED_WARNING_FLASH;
@@ -349,6 +341,12 @@ class Board {
             }
 
             m_haveSignal = haveSignal;
+        }
+
+        void ledToggle(void)
+        {
+            m_ledOn = !m_ledOn;
+            ledSet(m_ledOn);
         }
 
         void ledWarningUpdate(void)

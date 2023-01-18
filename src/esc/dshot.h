@@ -315,6 +315,7 @@ class DshotEsc : public Esc {
             }
         }
 
+        // unsafe
         virtual void write(const float values[]) override
         {
             if (m_enabled) {
