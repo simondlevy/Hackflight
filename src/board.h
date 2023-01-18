@@ -22,6 +22,7 @@
 #include <vector>
 using namespace std;
 
+#include "arming.h"
 #include "core/mixer.h"
 #include "core/motors.h"
 #include "esc.h"
@@ -112,7 +113,7 @@ class Board {
                     m_vstate,
                     m_pidControllers,
                     m_receiverTask.receiver->gotPidReset(),
-                    micros());
+                    micros()); // unsafe
 
             float mixmotors[Motors::MAX_SUPPORTED] = {};
 
@@ -173,12 +174,6 @@ class Board {
 
         } // checkCoreTasks
 
-        static void outbuf(char * buf)
-        {
-            Serial.print(buf);
-            Serial.flush();
-        }
-
         bool readyToArm(void)
         {
             return 
@@ -203,9 +198,7 @@ class Board {
         void updateArmingFromImu(const bool imuIsLevel, const bool gyroIsCalibrating)
         {
             m_angleOkay = imuIsLevel;
-
             m_gyroDoneCalibrating = !gyroIsCalibrating;
-
             m_accDoneCalibrating = true; // XXX
         }
 
@@ -249,32 +242,32 @@ class Board {
                 if (!haveSignal && m_haveSignal) {
                     m_gotFailsafe = true;
                     disarm();
-            }
-            else {
-                ledSet(true);
-            }
-        } else {
-
-            m_throttleIsDown = throttleIsDown;
-
-            // If arming is disabled and the ARM switch is on
-            if (!readyToArm() && aux1IsSet) {
-                m_switchOkay = false;
-            } else if (!aux1IsSet) {
-                m_switchOkay = true;
-            }
-
-            if (!readyToArm()) {
-                ledWarningFlash();
+                }
+                else {
+                    ledSet(true);
+                }
             } else {
-                ledWarningDisable();
+
+                m_throttleIsDown = throttleIsDown;
+
+                // If arming is disabled and the ARM switch is on
+                if (!readyToArm() && aux1IsSet) {
+                    m_switchOkay = false;
+                } else if (!aux1IsSet) {
+                    m_switchOkay = true;
+                }
+
+                if (!readyToArm()) {
+                    ledWarningFlash();
+                } else {
+                    ledWarningDisable();
+                }
+
+                ledWarningUpdate();
             }
 
-            ledWarningUpdate();
+            m_haveSignal = haveSignal;
         }
-
-        m_haveSignal = haveSignal;
-    }
 
         typedef enum {
             LED_WARNING_OFF = 0,
@@ -292,23 +285,6 @@ class Board {
         {
             m_ledOn = !m_ledOn;
             ledSet(m_ledOn);
-        }
-
-        void ledWarningRefresh(void)
-        {
-            switch (m_ledWarningVehicleState) {
-                case LED_WARNING_OFF:
-                    ledSet(false);
-                    break;
-                case LED_WARNING_ON:
-                    ledSet(true);
-                    break;
-                case LED_WARNING_FLASH:
-                    ledToggle();
-                    break;
-            }
-
-            m_ledWarningTimer = micros() + 500000;
         }
 
         void ledSet(bool on)
@@ -332,7 +308,7 @@ class Board {
             ledSet(false);
             for (auto i=0; i<reps; i++) {
                 ledToggle();
-                delay(delayMs);
+                delay(delayMs); // unsafe
             }
             ledSet(false);
         }
@@ -349,11 +325,23 @@ class Board {
 
         void ledWarningUpdate(void)
         {
-            if ((int32_t)(micros() - m_ledWarningTimer) < 0) {
+            if ((int32_t)(micros() - m_ledWarningTimer) < 0) { // unsafe
                 return;
             }
 
-            ledWarningRefresh();
+            switch (m_ledWarningVehicleState) {
+                case LED_WARNING_OFF:
+                    ledSet(false);
+                    break;
+                case LED_WARNING_ON:
+                    ledSet(true);
+                    break;
+                case LED_WARNING_FLASH:
+                    ledToggle();
+                    break;
+            }
+
+            m_ledWarningTimer = micros() + 500000; // unsafe
         }
 
         int32_t getTaskGuardCycles(void)
@@ -369,7 +357,7 @@ class Board {
 
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
-            const uint32_t usec = micros();
+            const uint32_t usec = micros(); // unsafe
 
             m_receiverTask.prioritize(usec, prioritizer);
             m_attitudeTask.prioritize(usec, prioritizer);
@@ -390,7 +378,7 @@ class Board {
 
                 case Task::RECEIVER:
                     runTask(m_receiverTask);
-                    updateArmingFromReceiver();
+                    updateArmingFromReceiver(m_receiverTask.receiver, micros()); // unsafe
                     break;
 
                 case Task::ACCELEROMETER:
@@ -427,7 +415,7 @@ class Board {
 
             if (anticipatedEndCycles > 0) {
 
-                const uint32_t usec = micros();
+                const uint32_t usec = micros(); // unsafe
 
                 task.run(usec);
 
@@ -435,43 +423,21 @@ class Board {
             } 
         }
 
-        void runVisualizerTask(void)
-        {
-            const uint32_t anticipatedEndCycles =
-                getAnticipatedEndCycles(m_visualizerTask);
-
-            if (anticipatedEndCycles > 0) {
-
-                const auto usec = micros();
-
-                while (Serial.available()) {
-
-                    if (m_visualizerTask.parse(Serial.read())) {
-                        Serial.write(m_msp.payload, m_msp.payloadSize);
-                    }
-                }
-
-                postRunTask(m_visualizerTask, usec, anticipatedEndCycles);
-            }
-        }
-
         void postRunTask(
                 Task & task,
                 const uint32_t usec,
                 const uint32_t anticipatedEndCycles)
         {
-            task.update(usec, micros()-usec);
+            task.update(usec, micros()-usec); // unsafe
             m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
         }
 
-        void updateArmingFromReceiver(void)
+        void updateArmingFromReceiver(Receiver * receiver, const uint32_t usec)
         {
-            Receiver * receiver = m_receiverTask.receiver;
-
             switch (receiver->getState()) {
 
                 case Receiver::STATE_UPDATE:
-                    attemptToArm(micros(), receiver->aux1IsSet());
+                    attemptToArm(usec, receiver->aux1IsSet());
                     break;
 
                 case Receiver::STATE_CHECK:
@@ -495,11 +461,40 @@ class Board {
             updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
 
+        // unsafe below here --------------------------------------------------
+
         // STM32F boards have no auto-reset bootloader support, so we reboot on
         // an external input
         virtual void reboot(void)
         {
         }
+
+        static void outbuf(char * buf)
+        {
+            Serial.print(buf); 
+            Serial.flush();
+        }
+
+        void runVisualizerTask(void)
+        {
+            const uint32_t anticipatedEndCycles =
+                getAnticipatedEndCycles(m_visualizerTask);
+
+            if (anticipatedEndCycles > 0) {
+
+                const auto usec = micros();
+
+                while (Serial.available()) {
+
+                    if (m_visualizerTask.parse(Serial.read())) {
+                        Serial.write(m_msp.payload, m_msp.payloadSize);
+                    }
+                }
+
+                postRunTask(m_visualizerTask, usec, anticipatedEndCycles);
+            }
+        }
+
 
     protected:
 
@@ -624,13 +619,8 @@ class Board {
 
             while (serial.available()) {
 
-                rx.parse(serial.read(), micros());
+                rx.parse(serial.read(), micros()); // unsafe
             }
-        }
-
-        static void serialWrite(const uint8_t buffer[], const uint8_t size)
-        {
-            Serial.write(buffer, size);
         }
 
         static void printf(const char * fmt, ...)
