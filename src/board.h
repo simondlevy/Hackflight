@@ -164,47 +164,6 @@ class Board {
 
         } // checkCoreTasks
 
-        void disarm(void)
-        {
-            if (m_arming.isArmed) {
-                m_esc->stop();
-            }
-
-            m_arming.isArmed = false;
-        }
-
-        void attemptToArm(const uint32_t usec, const bool aux1IsSet)
-        {
-            static bool _doNotRepeat;
-
-            if (aux1IsSet) {
-
-                if (m_arming.ready()) {
-
-                    if (m_arming.isArmed) {
-                        return;
-                    }
-
-                    if (!m_esc->isReady(usec)) {
-                        return;
-                    }
-
-                    m_arming.isArmed = true;
-                }
-
-            } else {
-
-                if (m_arming.isArmed) {
-                    disarm();
-                    m_arming.isArmed = false;
-                }
-            }
-
-            if (!(m_arming.isArmed || _doNotRepeat || !m_arming.ready())) {
-                _doNotRepeat = true;
-            }
-        }
-
         Warning m_warning;
 
         int32_t getTaskGuardCycles(void)
@@ -234,7 +193,7 @@ class Board {
             switch (receiver->getState()) {
 
                 case Receiver::STATE_UPDATE:
-                    attemptToArm(usec, receiver->aux1IsSet());
+                    m_arming.attempt(*receiver, *m_esc, usec);
                     break;
 
                 case Receiver::STATE_CHECK:
@@ -256,7 +215,7 @@ class Board {
 
                 if (!haveSignal && m_arming.haveSignal) {
                     m_arming.gotFailsafe = true;
-                    disarm();
+                    m_arming.disarm(*m_esc);
                 }
                 else {
                     ledSet(true);
@@ -465,8 +424,8 @@ class Board {
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
             m_ledInverted = ledPin < 0;
 
-            esc.m_board = this;
-            receiver.m_board = this;
+            esc.board = this;
+            receiver.board = this;
         }
 
         virtual void prioritizeExtraTasks(

@@ -23,20 +23,16 @@
 
 class Esc {
 
-    friend class Board;
+    public:
 
-    protected:
-
-        class Board * m_board;
+        class Board * board;
 
         virtual void  begin(void) = 0;
 
-        virtual float getMotorValue(
-                const float input, const bool failsafeIsActive) = 0;
-
         virtual void  write(const float values[]) = 0;
 
-    public:
+        virtual float getMotorValue(
+                const float input, const bool failsafeIsActive) = 0;
 
         virtual float convertFromExternal(const uint16_t value) = 0;
 

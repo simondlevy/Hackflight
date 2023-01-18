@@ -31,9 +31,6 @@
 
 class Receiver {
 
-        friend class Board;
-        friend class ReceiverTask;
-
     public:
 
         typedef enum {
@@ -179,10 +176,30 @@ class Receiver {
             return throttleIsDown();
         }
 
-        bool aux1IsSet(void)
+    protected:
+
+        static float convert(
+                const uint16_t value,
+                const uint16_t srcmin,
+                const uint16_t srcmax,
+                const float dstmin=1000,
+                const float dstmax=2000)
         {
-            return m_rawAux1 > 0.2;
+            return dstmin + (dstmax-dstmin) * ((float)value - srcmin) / (srcmax - srcmin);
         }
+
+        virtual bool devRead(
+                float & rawThrottle,
+                float & rawRoll,
+                float & rawPitch,
+                float & rawYaw,
+                float & rawAux1,
+                float & rawAux2,
+                uint32_t & frameTimeUs) = 0;
+
+    public:
+
+        Board * board;
 
         bool hasSignal(void)
         {
@@ -194,42 +211,10 @@ class Receiver {
             return m_rawThrottle < 1050;
         }
 
-        bool check(const uint32_t usec)
+        bool gotPidReset(void)
         {
-            auto signalReceived = false;
-            auto useDataDrivenProcessing = true;
-
-            if (m_state != STATE_CHECK) {
-                return true;
-            }
-
-            const auto frameStatus = 
-                devRead(m_rawThrottle,
-                        m_rawRoll,
-                        m_rawPitch,
-                        m_rawYaw,
-                        m_rawAux1,
-                        m_rawAux2,
-                        m_lastFrameTimeUs);
-
-            /*
-            m_rawAux1 = (m_rawAux1 - 1000) / 1000;
-            m_rawAux2 = (m_rawAux2 - 1000) / 1000;
-            */
-
-            if (frameStatus) {
-                signalReceived = true;
-            }
-
-            if ((signalReceived && useDataDrivenProcessing) ||
-                    intcmp(usec, m_nextUpdateAtUs) > 0) {
-                m_dataProcessingRequired = true;
-            }
-
-            // data driven or 50Hz
-            return m_dataProcessingRequired || m_auxiliaryProcessingRequired; 
-
-        } // check
+            return m_gotPidReset;
+        }
 
         // Runs in fast (inner, core) loop
         auto getDemands(void) -> Demands
@@ -269,33 +254,37 @@ class Receiver {
                     _axes.z);
         }
 
-        bool gotPidReset(void)
+        bool check(const uint32_t usec)
         {
-            return m_gotPidReset;
-        }
+            auto signalReceived = false;
+            auto useDataDrivenProcessing = true;
 
-    protected:
+            if (m_state != STATE_CHECK) {
+                return true;
+            }
 
-        Board * m_board;
+            const auto frameStatus = 
+                devRead(m_rawThrottle,
+                        m_rawRoll,
+                        m_rawPitch,
+                        m_rawYaw,
+                        m_rawAux1,
+                        m_rawAux2,
+                        m_lastFrameTimeUs);
 
-        static float convert(
-                const uint16_t value,
-                const uint16_t srcmin,
-                const uint16_t srcmax,
-                const float dstmin=1000,
-                const float dstmax=2000)
-        {
-            return dstmin + (dstmax-dstmin) * ((float)value - srcmin) / (srcmax - srcmin);
-        }
+            if (frameStatus) {
+                signalReceived = true;
+            }
 
-        virtual bool devRead(
-                float & rawThrottle,
-                float & rawRoll,
-                float & rawPitch,
-                float & rawYaw,
-                float & rawAux1,
-                float & rawAux2,
-                uint32_t & frameTimeUs) = 0;
+            if ((signalReceived && useDataDrivenProcessing) ||
+                    intcmp(usec, m_nextUpdateAtUs) > 0) {
+                m_dataProcessingRequired = true;
+            }
+
+            // data driven or 50Hz
+            return m_dataProcessingRequired || m_auxiliaryProcessingRequired; 
+
+        } // check
 
         // Called perioidically by receiverTask::fun()
         void update(uint32_t usec)
@@ -339,7 +328,10 @@ class Receiver {
         }
 
 
-    public:
+        bool aux1IsSet(void)
+        {
+            return m_rawAux1 > 0.2;
+        }
 
         virtual void parse(const uint8_t byte, const uint32_t usec) 
         {

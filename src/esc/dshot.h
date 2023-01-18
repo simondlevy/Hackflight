@@ -259,7 +259,7 @@ class DshotEsc : public Esc {
                 m_protocol == DSHOT300 ? 300 :
                 600;
 
-            m_board->dmaInit(m_pins, 1000 * outputFreq);
+            board->dmaInit(m_pins, 1000 * outputFreq);
 
             m_enabled = true;
         }
@@ -320,7 +320,7 @@ class DshotEsc : public Esc {
         {
             if (m_enabled) {
 
-                m_board->dmaUpdateStart();
+                board->dmaUpdateStart();
 
                 for (auto i=0; i <MOTOR_COUNT; i++) {
 
@@ -332,7 +332,7 @@ class DshotEsc : public Esc {
 
                     uint16_t packet = prepareDshotPacket(ivalue);
 
-                    m_board->dmaWriteMotor(i, packet);
+                    board->dmaWriteMotor(i, packet);
                 }
 
                 if (!commandQueueIsEmpty()) {
@@ -340,7 +340,7 @@ class DshotEsc : public Esc {
                         return;
                     }
                 }
-                m_board->dmaUpdateComplete();
+                board->dmaUpdateComplete();
             }
         }
 

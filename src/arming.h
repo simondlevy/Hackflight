@@ -19,8 +19,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "esc.h"
 #include "imu.h"
 #include "core/vstate.h"
+#include "receiver.h"
 
 class Arming {
 
@@ -42,6 +44,43 @@ class Arming {
         bool isArmed;
         bool switchOkay;
         bool throttleIsDown;
+
+        void attempt(Receiver & receiver, Esc & esc, const uint32_t usec)
+        {
+            static bool _doNotRepeat;
+
+            if (receiver.aux1IsSet()) {
+
+                if (ready()) {
+
+                    if (isArmed) {
+                        return;
+                    }
+
+                    if (!esc.isReady(usec)) {
+                        return;
+                    }
+
+                    isArmed = true;
+                }
+
+            } else {
+
+                disarm(esc);
+            }
+
+            if (!(isArmed || _doNotRepeat || !ready())) {
+                _doNotRepeat = true;
+            }
+        }
+
+        void disarm(Esc & esc)
+        {
+            if (isArmed) {
+                esc.stop();
+            }
+            isArmed = false;
+        }
 
         bool ready(void)
         {
