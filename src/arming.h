@@ -19,9 +19,18 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "imu.h"
+
 class Arming {
 
+    private:
+
+        static constexpr float MAX_ANGLE = 25;
+
     public:
+
+        // Avoid repeated degrees-to-radians conversion
+        float maxAngle = Imu::deg2rad(MAX_ANGLE);
 
         bool accDoneCalibrating;
         bool angleOkay;

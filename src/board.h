@@ -39,11 +39,6 @@ class Board {
 
     private:
 
-        static constexpr float MAX_ARMING_ANGLE = 25;
-
-        // Avoid repeated degrees-to-radians conversion
-        float m_maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE);
-
         // Gyro interrupt counts over which to measure loop time and skew
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
@@ -249,8 +244,8 @@ class Board {
         void updateArmingFromImu(void)
         {
             const auto imuIsLevel =
-                fabsf(m_vstate.phi) < m_maxArmingAngle &&
-                fabsf(m_vstate.theta) < m_maxArmingAngle;
+                fabsf(m_vstate.phi) < m_arming.maxAngle &&
+                fabsf(m_vstate.theta) < m_arming.maxAngle;
 
             updateArmingFromImu(imuIsLevel, m_imu->gyroIsCalibrating()); 
         }
