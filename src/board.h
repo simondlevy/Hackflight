@@ -39,10 +39,6 @@ class Board {
 
     private:
 
-        // Gyro interrupt counts over which to measure loop time and skew
-        static const uint32_t CORE_RATE_COUNT = 25000;
-        static const uint32_t GYRO_LOCK_COUNT = 400;
-
         // Motor safety
         bool m_failsafeIsActive;
 
@@ -125,7 +121,7 @@ class Board {
 
             if ((_terminalGyroRateCount == 0)) {
                 _terminalGyroRateCount =
-                    m_imu->getGyroInterruptCount() + CORE_RATE_COUNT;
+                    m_imu->getGyroInterruptCount() + Imu::CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
             }
 
@@ -133,9 +129,9 @@ class Board {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-                m_scheduler.desiredPeriodCycles = sampleCycles / CORE_RATE_COUNT;
+                m_scheduler.desiredPeriodCycles = sampleCycles / Imu::CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
-                _terminalGyroRateCount += CORE_RATE_COUNT;
+                _terminalGyroRateCount += Imu::CORE_RATE_COUNT;
             }
 
             // Track actual gyro rate over given number of cycle times and
@@ -150,14 +146,14 @@ class Board {
 
             if ((_terminalGyroLockCount == 0)) {
                 _terminalGyroLockCount =
-                    m_imu->getGyroInterruptCount() + GYRO_LOCK_COUNT;
+                    m_imu->getGyroInterruptCount() + Imu::GYRO_LOCK_COUNT;
             }
 
             if (m_imu->getGyroInterruptCount() >= _terminalGyroLockCount) {
-                _terminalGyroLockCount += GYRO_LOCK_COUNT;
+                _terminalGyroLockCount += Imu::GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
-                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
+                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/Imu::GYRO_LOCK_COUNT);
 
                 _gyroSkewAccum = 0;
             }
@@ -171,7 +167,9 @@ class Board {
             return m_scheduler.getTaskGuardCycles();
         }
 
+        ///////////////////////////////////////////////////////////////////////
         //////////////////////// unsafe below here ////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
 
         uint32_t getAnticipatedEndCycles(Task & task)
         {

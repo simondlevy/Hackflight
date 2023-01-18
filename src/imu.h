@@ -222,6 +222,10 @@ class Imu {
 
     public:
 
+        // Gyro interrupt counts over which to measure loop time and skew
+        static const uint32_t CORE_RATE_COUNT = 25000;
+        static const uint32_t GYRO_LOCK_COUNT = 400;
+
         virtual auto readGyroDps(void) -> Axes
         {
             const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
