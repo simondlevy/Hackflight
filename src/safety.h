@@ -28,14 +28,6 @@ class Safety {
 
     private:
 
-        typedef enum {
-
-            OFF,
-            ON,
-            BLINK
-
-        } state_e;
-
         static constexpr float MAX_ARMING_ANGLE = 25;
 
         // Avoid repeated degrees-to-radians conversion
@@ -170,19 +162,12 @@ class Safety {
                         return ledChange;
                     }
 
-                    state_e state = !isReady() ? BLINK : OFF;
-
-                    switch (state) {
-                        case OFF:
-                            ledChange = LED_TURN_OFF;
-                            break;
-                        case ON:
-                            ledChange = LED_TURN_ON;
-                            break;
-                        case BLINK:
-                            m_ledOn = !m_ledOn;
-                            ledChange = m_ledOn ? LED_TURN_ON : LED_TURN_OFF;
-                            break;
+                    if (isReady()) {
+                        ledChange = LED_TURN_OFF;
+                    }
+                    else {
+                        m_ledOn = !m_ledOn;
+                        ledChange = m_ledOn ? LED_TURN_ON : LED_TURN_OFF;
                     }
 
                     m_timer = usec + 500000;
@@ -194,4 +179,4 @@ class Safety {
             return ledChange;
         }
 
- }; // class Safety
+}; // class Safety
