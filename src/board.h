@@ -90,54 +90,6 @@ class Board {
             }
         }
 
-        void completeCoreTask(const uint32_t nowCycles, const uint32_t nextTargetCycles)
-        {
-            m_core.scheduler.corePostUpdate(nowCycles);
-
-            // Bring the scheduler into lock with the gyro Track the actual
-            // gyro rate over given number of cycle times and set the expected
-            // timebase
-            static uint32_t _terminalGyroRateCount;
-            static int32_t _sampleRateStartCycles;
-
-            if ((_terminalGyroRateCount == 0)) {
-                _terminalGyroRateCount = m_imuInterruptCount + Imu::CORE_RATE_COUNT;
-                _sampleRateStartCycles = nowCycles;
-            }
-
-            if (m_imuInterruptCount >= _terminalGyroRateCount) {
-                // Calculate number of clock cycles on average between gyro
-                // interrupts
-                uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-                m_core.scheduler.desiredPeriodCycles = sampleCycles / Imu::CORE_RATE_COUNT;
-                _sampleRateStartCycles = nowCycles;
-                _terminalGyroRateCount += Imu::CORE_RATE_COUNT;
-            }
-
-            // Track actual gyro rate over given number of cycle times and
-            // remove skew
-            static uint32_t _terminalGyroLockCount;
-            static int32_t _gyroSkewAccum;
-
-            auto gyroSkew =
-                m_imu->getGyroSkew(nextTargetCycles, m_core.scheduler.desiredPeriodCycles);
-
-            _gyroSkewAccum += gyroSkew;
-
-            if ((_terminalGyroLockCount == 0)) {
-                _terminalGyroLockCount = m_imuInterruptCount + Imu::GYRO_LOCK_COUNT;
-            }
-
-            if (m_imuInterruptCount >= _terminalGyroLockCount) {
-                _terminalGyroLockCount += Imu::GYRO_LOCK_COUNT;
-
-                // Move the desired start time of the gyroSampleTask
-                m_core.scheduler.lastTargetCycles -= (_gyroSkewAccum/Imu::GYRO_LOCK_COUNT);
-
-                _gyroSkewAccum = 0;
-            }
-        }
-
         Safety m_saftey;
 
     protected:
@@ -393,8 +345,8 @@ class Board {
 
                 m_esc->write(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
 
-                completeCoreTask(nowCycles, nextTargetCycles);
-
+                m_core.completeTask(
+                        m_imu, m_imuInterruptCount, nowCycles, nextTargetCycles);
             }
 
             if (m_core.scheduler.isDynamicReady(getCycleCounter())) {
