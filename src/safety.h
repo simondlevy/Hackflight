@@ -45,6 +45,14 @@ class Safety {
 
         } state_e;
 
+        typedef enum {
+
+            LED_UNCHANGED,
+            LED_TURN_ON,
+            LED_TURN_OFF
+
+        } ledChange_e;
+
         state_e state;
 
         uint32_t timer;

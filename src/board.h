@@ -196,8 +196,11 @@ class Board {
 
     private:
 
-        void updateArmingFromReceiver(Receiver * receiver, const uint32_t usec)
+        auto updateArmingFromReceiver(Receiver * receiver, const uint32_t usec) 
+            -> Safety::ledChange_e
         {
+            Safety::ledChange_e ledChange = Safety::LED_UNCHANGED;
+
             if (receiver->getState() == Receiver::STATE_UPDATE) {
                 m_safety.attemptToArm(*receiver, *m_esc, usec);
             }
@@ -212,6 +215,7 @@ class Board {
                     }
                     else {
                         ledSet(true); // unsafe
+                        ledChange = Safety::LED_TURN_ON;
                     }
                 } 
                 else {
@@ -232,19 +236,22 @@ class Board {
                     }
 
                     if ((int32_t)(usec - m_saftey.timer) < 0) {
-                        return;
+                        return ledChange;
                     }
 
                     switch (m_saftey.state) {
                         case Safety::OFF:
                             ledSet(false);
+                            ledChange = Safety::LED_TURN_OFF;
                             break;
                         case Safety::ON:
                             ledSet(true);
+                            ledChange = Safety::LED_TURN_ON;
                             break;
                         case Safety::BLINK:
                             m_ledOn = !m_ledOn;
                             ledSet(m_ledOn);
+                            ledChange = m_ledOn ? Safety::LED_TURN_ON : Safety::LED_TURN_OFF;
                             break;
                     }
 
@@ -253,6 +260,8 @@ class Board {
 
                 m_safety.haveSignal = receiver->hasSignal();
             }
+
+            return ledChange;
         }
 
         void checkDynamicTasks(void)
