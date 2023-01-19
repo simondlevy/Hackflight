@@ -208,7 +208,8 @@ class Board {
                     updateFromReceiver(
                             receiver->throttleIsDown(),
                             receiver->aux1IsSet(),
-                            receiver->hasSignal());
+                            receiver->hasSignal(),
+                            usec);
                     break;
 
                 default:
@@ -217,7 +218,10 @@ class Board {
         }
 
         void updateFromReceiver(
-                const bool throttleIsDown, const bool aux1IsSet, const bool haveSignal)
+                const bool throttleIsDown,
+                const bool aux1IsSet,
+                const bool haveSignal,
+                const uint32_t usec)
         {
             if (m_arming.isArmed()) {
 
@@ -245,7 +249,7 @@ class Board {
                     m_warning.disable();
                 }
 
-                if ((int32_t)(micros() - m_warning.timer) < 0) {
+                if ((int32_t)(usec - m_warning.timer) < 0) {
                     return;
                 }
 
@@ -257,20 +261,15 @@ class Board {
                         ledSet(true);
                         break;
                     case Warning::BLINK:
-                        ledToggle();
+                        m_warning.toggleLed();
+                        ledSet(m_warning.ledOn);
                         break;
                 }
 
-                m_warning.setTimer(micros());
+                m_warning.setTimer(usec);
             }
 
             m_arming.haveSignal = haveSignal;
-        }
-
-        void ledToggle(void)
-        {
-            m_warning.toggleLed();
-            ledSet(m_warning.ledOn);
         }
 
         void checkDynamicTasks(void)
@@ -354,7 +353,8 @@ class Board {
         {
             ledSet(false);
             for (auto i=0; i<reps; i++) {
-                ledToggle();
+                m_warning.toggleLed();
+                ledSet(m_warning.ledOn);
                 delay(delayMs);
             }
             ledSet(false);
