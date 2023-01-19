@@ -22,18 +22,17 @@
 #include <vector>
 using namespace std;
 
-#include "arming.h"
 #include "core/mixer.h"
 #include "core/motors.h"
 #include "esc.h"
 #include "imu.h"
 #include "receiver.h"
+#include "safety.h"
 #include "scheduler.h"
 #include "task/accelerometer.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
 #include "task/receiver.h"
-#include "warning.h"
 
 class Board {
 

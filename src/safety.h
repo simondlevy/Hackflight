@@ -112,3 +112,44 @@ class Arming {
         }
 
 }; // class Arming
+
+
+class Warning {
+
+    public:
+
+        typedef enum {
+
+            OFF,
+            ON,
+            BLINK
+
+        } state_e;
+
+        state_e state;
+
+        uint32_t timer;
+
+        bool ledOn;
+
+        void setTimer(const uint32_t usec)
+        {
+            timer = usec + 500000;
+        }
+
+        void toggleLed(void)
+        {
+            ledOn = !ledOn;
+        }
+
+        void disable(void)
+        {
+            state = OFF;
+        }
+
+        void blink(void)
+        {
+            state = Warning::BLINK;
+        }
+
+}; // class Warning
