@@ -41,9 +41,6 @@ class Board {
         // Motor safety
         bool m_failsafeIsActive;
 
-        // Arming safety
-        Arming m_arming;
-
         // LED
         uint8_t m_ledPin;
         bool m_ledInverted;
@@ -60,6 +57,8 @@ class Board {
             VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
 
         Msp m_msp;
+
+        Safety m_safety;
 
         // Initialzed in sketch()
         Esc *   m_esc;
@@ -106,7 +105,7 @@ class Board {
             }
 
             // unsafe; we should move unsafe ESC code to Board class
-            m_esc->write(m_arming.isArmed() ?  mixmotors : m_visualizerTask.motors);
+            m_esc->write(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
 
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -157,7 +156,7 @@ class Board {
 
         }
 
-        Warning m_warning;
+        Safety m_saftey;
 
         int32_t getTaskGuardCycles(void)
         {
@@ -198,7 +197,7 @@ class Board {
         void updateArmingFromReceiver(Receiver * receiver, const uint32_t usec)
         {
             if (receiver->getState() == Receiver::STATE_UPDATE) {
-                m_arming.attempt(*receiver, *m_esc, usec);
+                m_safety.attempt(*receiver, *m_esc, usec);
             }
             else  if (receiver->getState() == Receiver::STATE_CHECK) {
 
@@ -216,11 +215,11 @@ class Board {
                 const bool haveSignal,
                 const uint32_t usec)
         {
-            if (m_arming.isArmed()) {
+            if (m_safety.isArmed()) {
 
-                if (!haveSignal && m_arming.haveSignal) {
-                    m_arming.gotFailsafe = true;
-                    m_arming.disarm(*m_esc);
+                if (!haveSignal && m_safety.haveSignal) {
+                    m_safety.gotFailsafe = true;
+                    m_safety.disarm(*m_esc);
                 }
                 else {
                     ledSet(true); // unsafe
@@ -228,42 +227,42 @@ class Board {
             } 
             else {
 
-                m_arming.throttleIsDown = throttleIsDown;
+                m_safety.throttleIsDown = throttleIsDown;
 
                 // If arming is disabled and the ARM switch is on
-                if (!m_arming.ready() && aux1IsSet) {
-                    m_arming.switchOkay = false;
+                if (!m_safety.ready() && aux1IsSet) {
+                    m_safety.switchOkay = false;
                 } else if (!aux1IsSet) {
-                    m_arming.switchOkay = true;
+                    m_safety.switchOkay = true;
                 }
 
-                if (!m_arming.ready()) {
-                    m_warning.blink();
+                if (!m_safety.ready()) {
+                    m_saftey.blink();
                 } else {
-                    m_warning.disable();
+                    m_saftey.disable();
                 }
 
-                if ((int32_t)(usec - m_warning.timer) < 0) {
+                if ((int32_t)(usec - m_saftey.timer) < 0) {
                     return;
                 }
 
-                switch (m_warning.state) {
-                    case Warning::OFF:
+                switch (m_saftey.state) {
+                    case Safety::OFF:
                         ledSet(false);
                         break;
-                    case Warning::ON:
+                    case Safety::ON:
                         ledSet(true);
                         break;
-                    case Warning::BLINK:
-                        m_warning.toggleLed();
-                        ledSet(m_warning.ledOn);
+                    case Safety::BLINK:
+                        m_saftey.toggleLed();
+                        ledSet(m_saftey.ledOn);
                         break;
                 }
 
-                m_warning.setTimer(usec);
+                m_saftey.setTimer(usec);
             }
 
-            m_arming.haveSignal = haveSignal;
+            m_safety.haveSignal = haveSignal;
         }
 
         void checkDynamicTasks(void)
@@ -286,7 +285,7 @@ class Board {
 
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask);
-                    m_arming.updateFromImu(*m_imu, m_vstate);
+                    m_safety.updateFromImu(*m_imu, m_vstate);
                     break;
 
                 case Task::VISUALIZER:
@@ -340,15 +339,15 @@ class Board {
                 digitalWrite(m_ledPin, m_ledInverted ? on : !on);
             }
 
-            m_warning.ledOn = on;
+            m_saftey.ledOn = on;
         }
 
         void ledFlash(uint8_t reps, uint16_t delayMs)
         {
             ledSet(false);
             for (auto i=0; i<reps; i++) {
-                m_warning.toggleLed();
-                ledSet(m_warning.ledOn);
+                m_saftey.toggleLed();
+                ledSet(m_saftey.ledOn);
                 delay(delayMs);
             }
             ledSet(false);

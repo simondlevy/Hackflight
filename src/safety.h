@@ -24,11 +24,11 @@
 #include "core/vstate.h"
 #include "receiver.h"
 
-class Arming {
+class Safety {
 
     private:
 
-        static constexpr float MAX_ANGLE = 25;
+        static constexpr float MAX_ARMING_ANGLE = 25;
 
         bool m_accDoneCalibrating;
         bool m_angleOkay;
@@ -37,8 +37,42 @@ class Arming {
 
     public:
 
+        typedef enum {
+
+            OFF,
+            ON,
+            BLINK
+
+        } state_e;
+
+        state_e state;
+
+        uint32_t timer;
+
+        bool ledOn;
+
+        void setTimer(const uint32_t usec)
+        {
+            timer = usec + 500000;
+        }
+
+        void toggleLed(void)
+        {
+            ledOn = !ledOn;
+        }
+
+        void disable(void)
+        {
+            state = OFF;
+        }
+
+        void blink(void)
+        {
+            state = BLINK;
+        }
+
         // Avoid repeated degrees-to-radians conversion
-        const float maxAngle = Imu::deg2rad(MAX_ANGLE);
+        const float maxAngle = Imu::deg2rad(MAX_ARMING_ANGLE);
 
         bool gotFailsafe;
         bool haveSignal;
@@ -111,45 +145,4 @@ class Arming {
             m_accDoneCalibrating = true; // XXX
         }
 
-}; // class Arming
-
-
-class Warning {
-
-    public:
-
-        typedef enum {
-
-            OFF,
-            ON,
-            BLINK
-
-        } state_e;
-
-        state_e state;
-
-        uint32_t timer;
-
-        bool ledOn;
-
-        void setTimer(const uint32_t usec)
-        {
-            timer = usec + 500000;
-        }
-
-        void toggleLed(void)
-        {
-            ledOn = !ledOn;
-        }
-
-        void disable(void)
-        {
-            state = OFF;
-        }
-
-        void blink(void)
-        {
-            state = Warning::BLINK;
-        }
-
-}; // class Warning
+}; // class Safety
