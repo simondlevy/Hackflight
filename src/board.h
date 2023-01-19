@@ -22,6 +22,7 @@
 #include <vector>
 using namespace std;
 
+#include "core.h"
 #include "core/mixer.h"
 #include "core/motors.h"
 #include "esc.h"
@@ -38,10 +39,6 @@ class Board {
 
     private:
 
-        // Motor safety
-        bool m_failsafeIsActive;
-
-        // LED
         uint8_t m_ledPin;
         bool m_ledInverted;
 
@@ -60,23 +57,13 @@ class Board {
 
         Safety m_safety;
 
-        // Initialzed in sketch()
+        // Initialzed in sketch
         Esc *   m_esc;
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
-        void runCoreTasks(const uint32_t usec, uint32_t nowCycles)
+        void startCoreTask(const uint32_t usec, float mixmotors[])
         {
-            int32_t  loopRemainingCycles = 0;
-
-            const uint32_t nextTargetCycles =
-                m_scheduler.corePreUpdate(loopRemainingCycles);
-
-            while (loopRemainingCycles > 0) {
-                nowCycles = getCycleCounter(); // unsafe
-                loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
-            }
-
             if (m_imu->gyroIsReady()) {
 
                 auto angvels = m_imu->readGyroDps();
@@ -95,16 +82,14 @@ class Board {
                     m_receiverTask.receiver->gotPidReset(),
                     usec);
 
-            float mixmotors[Motors::MAX_SUPPORTED] = {};
-
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
                 mixmotors[i] = m_esc->getMotorValue(motors.values[i]);
             }
+        }
 
-            // unsafe; we should move unsafe ESC code to Board class
-            m_esc->write(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
-
+        void completeCoreTask(const uint32_t nowCycles, const uint32_t nextTargetCycles)
+        {
             m_scheduler.corePostUpdate(nowCycles);
 
             // Bring the scheduler into lock with the gyro Track the actual
@@ -385,11 +370,30 @@ class Board {
 
         void step(void)
         {
-            // Realtime gyro/filtering/PID task get complete priority
             auto nowCycles = getCycleCounter();
 
             if (m_scheduler.isCoreReady(nowCycles)) {
-                runCoreTasks(micros(), nowCycles);
+
+                const uint32_t usec = micros();
+
+                int32_t loopRemainingCycles = 0;
+
+                const uint32_t nextTargetCycles =
+                    m_scheduler.corePreUpdate(loopRemainingCycles);
+
+                while (loopRemainingCycles > 0) {
+                    nowCycles = getCycleCounter();
+                    loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
+                }
+                
+                float mixmotors[Motors::MAX_SUPPORTED] = {};
+
+                startCoreTask(usec, mixmotors);
+
+                m_esc->write(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
+
+                completeCoreTask(nowCycles, nextTargetCycles);
+
             }
 
             if (m_scheduler.isDynamicReady(getCycleCounter())) {

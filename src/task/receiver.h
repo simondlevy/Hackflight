@@ -23,14 +23,8 @@
 
 class ReceiverTask : public Task {
 
-    friend class Board;
 
-    private:
-
-        // Set in Board constructor
-        Receiver * receiver;
-
-    protected:
+    public:
 
         ReceiverTask()
             : Task(RECEIVER, 33) // Hz
@@ -59,5 +53,7 @@ class ReceiverTask : public Task {
                 }
             }
         }    
+
+        Receiver * receiver;
 
 }; // class ReceiverTask
