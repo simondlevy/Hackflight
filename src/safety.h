@@ -43,16 +43,15 @@ class Safety {
 
         bool m_accDoneCalibrating;
         bool m_angleOkay;
+        bool m_gotFailsafe;
         bool m_gyroDoneCalibrating;
         bool m_isArmed;
         bool m_ledOn;
-        bool haveSignal;
+        bool m_haveSignal;
+        bool m_switchOkay;
+        bool m_throttleIsDown;
 
-        state_e state;
-        bool gotFailsafe;
-        bool switchOkay;
-        bool throttleIsDown;
-        uint32_t timer;
+        uint32_t m_timer;
 
         void disarm(Esc * esc)
         {
@@ -67,11 +66,11 @@ class Safety {
             return 
                 m_accDoneCalibrating &&
                 m_angleOkay &&
-                !gotFailsafe &&
-                haveSignal &&
+                !m_gotFailsafe &&
+                m_haveSignal &&
                 m_gyroDoneCalibrating &&
-                switchOkay &&
-                throttleIsDown;
+                m_switchOkay &&
+                m_throttleIsDown;
         }
 
     public:
@@ -148,8 +147,8 @@ class Safety {
 
                 if (isArmed()) {
 
-                    if (!receiver->hasSignal() && haveSignal) {
-                        gotFailsafe = true;
+                    if (!receiver->hasSignal() && m_haveSignal) {
+                        m_gotFailsafe = true;
                         disarm(esc);
                     }
                     else {
@@ -158,24 +157,20 @@ class Safety {
                 } 
                 else {
 
-                    throttleIsDown = receiver->throttleIsDown();
+                    m_throttleIsDown = receiver->throttleIsDown();
 
                     // If arming is disabled and the ARM switch is on
                     if (!isReady() && receiver->aux1IsSet()) {
-                        switchOkay = false;
+                        m_switchOkay = false;
                     } else if (!receiver->aux1IsSet()) {
-                        switchOkay = true;
+                        m_switchOkay = true;
                     }
 
-                    if (!isReady()) {
-                        state = BLINK;
-                    } else {
-                        state = OFF;
-                    }
-
-                    if ((int32_t)(usec - timer) < 0) {
+                    if ((int32_t)(usec - m_timer) < 0) {
                         return ledChange;
                     }
+
+                    state_e state = !isReady() ? BLINK : OFF;
 
                     switch (state) {
                         case OFF:
@@ -190,10 +185,10 @@ class Safety {
                             break;
                     }
 
-                    timer = usec + 500000;
+                    m_timer = usec + 500000;
                 }
 
-                haveSignal = receiver->hasSignal();
+                m_haveSignal = receiver->hasSignal();
             }
 
             return ledChange;
