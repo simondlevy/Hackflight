@@ -214,7 +214,6 @@ class Board {
                         m_safety.disarm(*m_esc);
                     }
                     else {
-                        ledSet(true); // unsafe
                         ledChange = Safety::LED_TURN_ON;
                     }
                 } 
@@ -241,16 +240,13 @@ class Board {
 
                     switch (m_saftey.state) {
                         case Safety::OFF:
-                            ledSet(false);
                             ledChange = Safety::LED_TURN_OFF;
                             break;
                         case Safety::ON:
-                            ledSet(true);
                             ledChange = Safety::LED_TURN_ON;
                             break;
                         case Safety::BLINK:
                             m_ledOn = !m_ledOn;
-                            ledSet(m_ledOn);
                             ledChange = m_ledOn ? Safety::LED_TURN_ON : Safety::LED_TURN_OFF;
                             break;
                     }
@@ -293,8 +289,8 @@ class Board {
 
                 case Task::RECEIVER:
                     runTask(m_receiverTask);
-                    updateArmingFromReceiver(m_receiverTask.receiver, micros());
-                    break;
+                    updateFromReceiver();
+                   break;
 
                 case Task::ACCELEROMETER:
                     runTask(m_accelerometerTask);
@@ -306,6 +302,15 @@ class Board {
 
                 default:
                     break;
+            }
+        }
+
+        void updateFromReceiver(void)
+        {
+            Safety::ledChange_e ledChange = 
+                updateArmingFromReceiver(m_receiverTask.receiver, micros());
+            if (ledChange != Safety::LED_UNCHANGED) {
+                ledSet(ledChange == Safety::LED_TURN_ON);
             }
         }
 
