@@ -38,6 +38,9 @@ class Safety {
 
     public:
 
+        static const uint8_t  STARTUP_BLINK_LED_REPS  = 10;
+        static const uint32_t STARTUP_BLINK_LED_DELAY = 50;
+
         typedef enum {
 
             OFF,

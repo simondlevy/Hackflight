@@ -382,11 +382,11 @@ class Board {
             }
 
             ledSet(false);
-            for (auto i=0; i<10; i++) {
+            for (auto i=0; i<Safety::STARTUP_BLINK_LED_REPS; i++) {
                 static bool ledOn;
                 ledOn = !ledOn;
                 ledSet(ledOn);
-                delay(50);
+                delay(Safety::STARTUP_BLINK_LED_DELAY);
             }
             ledSet(false);
         }
