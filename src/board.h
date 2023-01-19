@@ -65,18 +65,11 @@ class Board {
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
-        void runCoreTasks(const uint32_t usec, uint32_t nowCycles)
+        void runCoreTask(
+                const uint32_t usec,
+                const uint32_t nowCycles,
+                const uint32_t nextTargetCycles)
         {
-            int32_t  loopRemainingCycles = 0;
-
-            const uint32_t nextTargetCycles =
-                m_scheduler.corePreUpdate(loopRemainingCycles);
-
-            while (loopRemainingCycles > 0) {
-                nowCycles = getCycleCounter(); // unsafe
-                loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
-            }
-
             if (m_imu->gyroIsReady()) {
 
                 auto angvels = m_imu->readGyroDps();
@@ -385,11 +378,23 @@ class Board {
 
         void step(void)
         {
-            // Realtime gyro/filtering/PID task get complete priority
             auto nowCycles = getCycleCounter();
 
             if (m_scheduler.isCoreReady(nowCycles)) {
-                runCoreTasks(micros(), nowCycles);
+
+                const uint32_t usec = micros();
+
+                int32_t  loopRemainingCycles = 0;
+
+                const uint32_t nextTargetCycles =
+                    m_scheduler.corePreUpdate(loopRemainingCycles);
+
+                while (loopRemainingCycles > 0) {
+                    nowCycles = getCycleCounter(); // unsafe
+                    loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
+                }
+
+                runCoreTask(usec, nowCycles, nextTargetCycles);
             }
 
             if (m_scheduler.isDynamicReady(getCycleCounter())) {
