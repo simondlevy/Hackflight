@@ -42,8 +42,6 @@ class Board {
         uint8_t m_ledPin;
         bool m_ledInverted;
 
-        Scheduler m_scheduler;
-
         VehicleState m_vstate;
 
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
@@ -56,6 +54,8 @@ class Board {
         Msp m_msp;
 
         Safety m_safety;
+
+        Core m_core;
 
         // Initialzed in sketch
         Esc *   m_esc;
@@ -90,7 +90,7 @@ class Board {
 
         void completeCoreTask(const uint32_t nowCycles, const uint32_t nextTargetCycles)
         {
-            m_scheduler.corePostUpdate(nowCycles);
+            m_core.scheduler.corePostUpdate(nowCycles);
 
             // Bring the scheduler into lock with the gyro Track the actual
             // gyro rate over given number of cycle times and set the expected
@@ -108,7 +108,7 @@ class Board {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-                m_scheduler.desiredPeriodCycles = sampleCycles / Imu::CORE_RATE_COUNT;
+                m_core.scheduler.desiredPeriodCycles = sampleCycles / Imu::CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
                 _terminalGyroRateCount += Imu::CORE_RATE_COUNT;
             }
@@ -119,7 +119,7 @@ class Board {
             static int32_t _gyroSkewAccum;
 
             auto gyroSkew =
-                m_imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
+                m_imu->getGyroSkew(nextTargetCycles, m_core.scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 
@@ -132,7 +132,7 @@ class Board {
                 _terminalGyroLockCount += Imu::GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
-                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/Imu::GYRO_LOCK_COUNT);
+                m_core.scheduler.lastTargetCycles -= (_gyroSkewAccum/Imu::GYRO_LOCK_COUNT);
 
                 _gyroSkewAccum = 0;
             }
@@ -245,7 +245,7 @@ class Board {
                 const uint32_t anticipatedEndCycles)
         {
             task.update(usec, micros()-usec);
-            m_scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
+            m_core.scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
         }
 
         void ledSet(bool on)
@@ -289,7 +289,7 @@ class Board {
 
         uint32_t getAnticipatedEndCycles(Task & task)
         {
-            return m_scheduler.getAnticipatedEndCycles(task, getCycleCounter());
+            return m_core.scheduler.getAnticipatedEndCycles(task, getCycleCounter());
         }
 
     protected:
@@ -372,14 +372,14 @@ class Board {
         {
             auto nowCycles = getCycleCounter();
 
-            if (m_scheduler.isCoreReady(nowCycles)) {
+            if (m_core.scheduler.isCoreReady(nowCycles)) {
 
                 const uint32_t usec = micros();
 
                 int32_t loopRemainingCycles = 0;
 
                 const uint32_t nextTargetCycles =
-                    m_scheduler.corePreUpdate(loopRemainingCycles);
+                    m_core.scheduler.corePreUpdate(loopRemainingCycles);
 
                 while (loopRemainingCycles > 0) {
                     nowCycles = getCycleCounter();
@@ -396,7 +396,7 @@ class Board {
 
             }
 
-            if (m_scheduler.isDynamicReady(getCycleCounter())) {
+            if (m_core.scheduler.isDynamicReady(getCycleCounter())) {
                 runDynamicTasks();
             }
         }
