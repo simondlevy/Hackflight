@@ -201,68 +201,55 @@ class Board {
             }
             else  if (receiver->getState() == Receiver::STATE_CHECK) {
 
-                updateFromReceiver(
-                        receiver->throttleIsDown(),
-                        receiver->aux1IsSet(),
-                        receiver->hasSignal(),
-                        usec);
-            }
-        }
+                if (m_safety.isArmed()) {
 
-        void updateFromReceiver(
-                const bool throttleIsDown,
-                const bool aux1IsSet,
-                const bool haveSignal,
-                const uint32_t usec)
-        {
-            if (m_safety.isArmed()) {
-
-                if (!haveSignal && m_safety.haveSignal) {
-                    m_safety.gotFailsafe = true;
-                    m_safety.disarm(*m_esc);
-                }
+                    if (!receiver->hasSignal() && m_safety.haveSignal) {
+                        m_safety.gotFailsafe = true;
+                        m_safety.disarm(*m_esc);
+                    }
+                    else {
+                        ledSet(true); // unsafe
+                    }
+                } 
                 else {
-                    ledSet(true); // unsafe
+
+                    m_safety.throttleIsDown = receiver->throttleIsDown();
+
+                    // If arming is disabled and the ARM switch is on
+                    if (!m_safety.ready() && receiver->aux1IsSet()) {
+                        m_safety.switchOkay = false;
+                    } else if (!receiver->aux1IsSet()) {
+                        m_safety.switchOkay = true;
+                    }
+
+                    if (!m_safety.ready()) {
+                        m_saftey.blink();
+                    } else {
+                        m_saftey.disable();
+                    }
+
+                    if ((int32_t)(usec - m_saftey.timer) < 0) {
+                        return;
+                    }
+
+                    switch (m_saftey.state) {
+                        case Safety::OFF:
+                            ledSet(false);
+                            break;
+                        case Safety::ON:
+                            ledSet(true);
+                            break;
+                        case Safety::BLINK:
+                            m_saftey.toggleLed();
+                            ledSet(m_saftey.ledOn);
+                            break;
+                    }
+
+                    m_saftey.setTimer(usec);
                 }
-            } 
-            else {
 
-                m_safety.throttleIsDown = throttleIsDown;
-
-                // If arming is disabled and the ARM switch is on
-                if (!m_safety.ready() && aux1IsSet) {
-                    m_safety.switchOkay = false;
-                } else if (!aux1IsSet) {
-                    m_safety.switchOkay = true;
-                }
-
-                if (!m_safety.ready()) {
-                    m_saftey.blink();
-                } else {
-                    m_saftey.disable();
-                }
-
-                if ((int32_t)(usec - m_saftey.timer) < 0) {
-                    return;
-                }
-
-                switch (m_saftey.state) {
-                    case Safety::OFF:
-                        ledSet(false);
-                        break;
-                    case Safety::ON:
-                        ledSet(true);
-                        break;
-                    case Safety::BLINK:
-                        m_saftey.toggleLed();
-                        ledSet(m_saftey.ledOn);
-                        break;
-                }
-
-                m_saftey.setTimer(usec);
+                m_safety.haveSignal = receiver->hasSignal();
             }
-
-            m_safety.haveSignal = haveSignal;
         }
 
         void checkDynamicTasks(void)
