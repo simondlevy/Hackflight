@@ -22,6 +22,7 @@
 #include <vector>
 using namespace std;
 
+#include "core.h"
 #include "core/mixer.h"
 #include "core/motors.h"
 #include "esc.h"
@@ -38,10 +39,8 @@ class Board {
 
     private:
 
-        // Motor safety
         bool m_failsafeIsActive;
 
-        // LED
         uint8_t m_ledPin;
         bool m_ledInverted;
 
@@ -60,7 +59,7 @@ class Board {
 
         Safety m_safety;
 
-        // Initialzed in sketch()
+        // Initialzed in sketch
         Esc *   m_esc;
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
