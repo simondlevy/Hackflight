@@ -65,10 +65,7 @@ class Board {
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
-        void runCoreTask(
-                const uint32_t usec,
-                const uint32_t nowCycles,
-                const uint32_t nextTargetCycles)
+        void startCoreTask(const uint32_t usec, float mixmotors[])
         {
             if (m_imu->gyroIsReady()) {
 
@@ -88,16 +85,14 @@ class Board {
                     m_receiverTask.receiver->gotPidReset(),
                     usec);
 
-            float mixmotors[Motors::MAX_SUPPORTED] = {};
-
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
                 mixmotors[i] = m_esc->getMotorValue(motors.values[i]);
             }
+        }
 
-            // unsafe; we should move unsafe ESC code to Board class
-            m_esc->write(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
-
+        void completeCoreTask(const uint32_t nowCycles, const uint32_t nextTargetCycles)
+        {
             m_scheduler.corePostUpdate(nowCycles);
 
             // Bring the scheduler into lock with the gyro Track the actual
@@ -384,17 +379,24 @@ class Board {
 
                 const uint32_t usec = micros();
 
-                int32_t  loopRemainingCycles = 0;
+                int32_t loopRemainingCycles = 0;
 
                 const uint32_t nextTargetCycles =
                     m_scheduler.corePreUpdate(loopRemainingCycles);
 
                 while (loopRemainingCycles > 0) {
-                    nowCycles = getCycleCounter(); // unsafe
+                    nowCycles = getCycleCounter();
                     loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
                 }
+                
+                float mixmotors[Motors::MAX_SUPPORTED] = {};
 
-                runCoreTask(usec, nowCycles, nextTargetCycles);
+                startCoreTask(usec, mixmotors);
+
+                m_esc->write(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
+
+                completeCoreTask(nowCycles, nextTargetCycles);
+
             }
 
             if (m_scheduler.isDynamicReady(getCycleCounter())) {
