@@ -198,22 +198,16 @@ class Board {
 
         void updateArmingFromReceiver(Receiver * receiver, const uint32_t usec)
         {
-            switch (receiver->getState()) {
+            if (receiver->getState() == Receiver::STATE_UPDATE) {
+                m_arming.attempt(*receiver, *m_esc, usec);
+            }
+            else  if (receiver->getState() == Receiver::STATE_CHECK) {
 
-                case Receiver::STATE_UPDATE:
-                    m_arming.attempt(*receiver, *m_esc, usec);
-                    break;
-
-                case Receiver::STATE_CHECK:
-                    updateFromReceiver(
-                            receiver->throttleIsDown(),
-                            receiver->aux1IsSet(),
-                            receiver->hasSignal(),
-                            usec);
-                    break;
-
-                default:
-                    break;
+                updateFromReceiver(
+                        receiver->throttleIsDown(),
+                        receiver->aux1IsSet(),
+                        receiver->hasSignal(),
+                        usec);
             }
         }
 
@@ -232,7 +226,8 @@ class Board {
                 else {
                     ledSet(true); // unsafe
                 }
-            } else {
+            } 
+            else {
 
                 m_arming.throttleIsDown = throttleIsDown;
 
