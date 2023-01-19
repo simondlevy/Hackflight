@@ -40,7 +40,28 @@ class Core {
 
         Scheduler scheduler;
 
-        void completeTask(
+        void postRunTask(
+                Task & task,
+                const uint32_t usecStart,
+                const uint32_t usecEnd,
+                const uint32_t nowCycles,
+                const uint32_t anticipatedEndCycles)
+        {
+            task.update(usecStart, usecEnd-usecStart);
+            scheduler.updateDynamic(nowCycles, anticipatedEndCycles);
+        }
+ 
+        uint32_t getAnticipatedEndCycles(Task & task, const uint32_t nowCycles)
+        {
+            return scheduler.getAnticipatedEndCycles(task, nowCycles);
+        }
+
+        bool isCoreTaskReady(const uint32_t nowCycles)
+        {
+            return scheduler.isCoreReady(nowCycles);
+        }
+
+        void completeCoreTask(
                 Imu * imu,
                 const uint32_t imuInterruptCount,
                 const uint32_t nowCycles,

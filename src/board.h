@@ -188,11 +188,11 @@ class Board {
 
         void postRunTask(
                 Task & task,
-                const uint32_t usec,
+                const uint32_t usecStart,
                 const uint32_t anticipatedEndCycles)
         {
-            task.update(usec, micros()-usec);
-            m_core.scheduler.updateDynamic(getCycleCounter(), anticipatedEndCycles);
+            m_core.postRunTask(
+                    task, usecStart, micros(), getCycleCounter(), anticipatedEndCycles);
         }
 
         void ledSet(bool on)
@@ -236,12 +236,12 @@ class Board {
 
         uint32_t getAnticipatedEndCycles(Task & task)
         {
-            return m_core.scheduler.getAnticipatedEndCycles(task, getCycleCounter());
+            return m_core.getAnticipatedEndCycles(task, getCycleCounter());
         }
 
     protected:
 
-        // Initialized in sketch
+       // Initialized in sketch
         Imu * m_imu;
 
         AccelerometerTask m_accelerometerTask; 
@@ -325,7 +325,7 @@ class Board {
         {
             auto nowCycles = getCycleCounter();
 
-            if (m_core.scheduler.isCoreReady(nowCycles)) {
+            if (m_core.isCoreTaskReady(nowCycles)) {
 
                 const uint32_t usec = micros();
 
@@ -345,7 +345,7 @@ class Board {
 
                 m_esc->write(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
 
-                m_core.completeTask(
+                m_core.completeCoreTask(
                         m_imu, m_imuInterruptCount, nowCycles, nextTargetCycles);
             }
 
