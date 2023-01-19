@@ -245,7 +245,23 @@ class Board {
                     m_warning.disable();
                 }
 
-                ledWarningUpdate(); // unsafe
+                if ((int32_t)(micros() - m_warning.timer) < 0) {
+                    return;
+                }
+
+                switch (m_warning.state) {
+                    case Warning::OFF:
+                        ledSet(false);
+                        break;
+                    case Warning::ON:
+                        ledSet(true);
+                        break;
+                    case Warning::BLINK:
+                        ledToggle();
+                        break;
+                }
+
+                m_warning.setTimer(micros());
             }
 
             m_arming.haveSignal = haveSignal;
@@ -255,27 +271,6 @@ class Board {
         {
             m_warning.toggleLed();
             ledSet(m_warning.ledOn);
-        }
-
-        void ledWarningUpdate(void)
-        {
-            if ((int32_t)(micros() - m_warning.timer) < 0) {
-                return;
-            }
-
-            switch (m_warning.state) {
-                case Warning::OFF:
-                    ledSet(false);
-                    break;
-                case Warning::ON:
-                    ledSet(true);
-                    break;
-                case Warning::BLINK:
-                    ledToggle();
-                    break;
-            }
-
-            m_warning.setTimer(micros());
         }
 
         void checkDynamicTasks(void)
