@@ -36,7 +36,6 @@ using namespace std;
 
 class Core {
 
-    /*
     private:
 
         bool m_failsafeIsActive;
@@ -46,6 +45,8 @@ class Core {
         VehicleState m_vstate;
 
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
+
+        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
 
         ReceiverTask m_receiverTask;
 
@@ -61,6 +62,7 @@ class Core {
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
+        /*
         void start(const uint32_t usec, float mixmotors[])
         {
             if (m_imu->gyroIsReady()) {
