@@ -65,8 +65,6 @@ class Board {
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
-        bool m_ledOn;
-
         void checkCoreTasks(const uint32_t usec, uint32_t nowCycles)
         {
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
@@ -278,18 +276,6 @@ class Board {
             if (m_ledPin > 0) {
                 digitalWrite(m_ledPin, m_ledInverted ? on : !on);
             }
-
-            m_ledOn = on;
-        }
-
-        void ledFlash(uint8_t reps, uint16_t delayMs)
-        {
-            ledSet(false);
-            for (auto i=0; i<reps; i++) {
-                m_ledOn = !m_ledOn;
-                delay(delayMs);
-            }
-            ledSet(false);
         }
 
         // STM32F boards have no auto-reset bootloader support, so we reboot on
@@ -395,7 +381,14 @@ class Board {
                 pinMode(m_ledPin, OUTPUT);
             }
 
-            ledFlash(10, 50);
+            ledSet(false);
+            for (auto i=0; i<10; i++) {
+                static bool ledOn;
+                ledOn = !ledOn;
+                ledSet(ledOn);
+                delay(50);
+            }
+            ledSet(false);
         }
 
         void step(void)
