@@ -39,8 +39,6 @@ class Board {
 
     private:
 
-        bool m_failsafeIsActive;
-
         uint8_t m_ledPin;
         bool m_ledInverted;
 

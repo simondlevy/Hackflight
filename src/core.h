@@ -65,7 +65,7 @@ class Core {
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
-        void start(const uint32_t usec, float mixmotors[])
+        void startTask(const uint32_t usec, float mixmotors[])
         {
             if (m_imu->gyroIsReady()) {
 
@@ -91,7 +91,7 @@ class Core {
             }
         }
 
-        void complete(const uint32_t nowCycles, const uint32_t nextTargetCycles)
+        void completeTask(const uint32_t nowCycles, const uint32_t nextTargetCycles)
         {
             m_scheduler.corePostUpdate(nowCycles);
 
