@@ -273,17 +273,11 @@ class DshotEsc : public Esc {
                 scaleRangef(constrainedValue, 1001, 2000, MIN_VALUE, MAX_VALUE);
         }
 
-        virtual float getMotorValue(
-                const float input, const bool failsafeIsActive) override
+        virtual float getMotorValue(const float input) override
         {
-            const auto scaled = valueLow() + (MAX_VALUE - valueLow()) * input;
+            const auto output = valueLow() + (MAX_VALUE - valueLow()) * input;
 
-            const auto output =
-                failsafeIsActive && scaled < valueLow() ?
-                STOP_VALUE :
-                scaled;
-
-            const auto lowValue = failsafeIsActive ? STOP_VALUE : valueLow();
+            const auto lowValue = valueLow();
 
             return constrain_f(output, lowValue, MAX_VALUE);
         }

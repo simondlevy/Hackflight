@@ -49,11 +49,8 @@ class BrushedEsc : public Esc {
             return (value - 1000) / 1000.;
         }
 
-        virtual float getMotorValue(
-                const float input, const bool failsafeIsActive) override
+        virtual float getMotorValue(const float input) override
         {
-            (void)failsafeIsActive;
-
             return constrain_f(input, 0, 1);
         }
 

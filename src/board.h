@@ -100,8 +100,7 @@ class Board {
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
-                mixmotors[i] =
-                    m_esc->getMotorValue(motors.values[i], m_failsafeIsActive);
+                mixmotors[i] = m_esc->getMotorValue(motors.values[i]);
             }
 
             // unsafe; we should move unsafe ESC code to Board class

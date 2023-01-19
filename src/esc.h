@@ -31,8 +31,7 @@ class Esc {
 
         virtual void  write(const float values[]) = 0;
 
-        virtual float getMotorValue(
-                const float input, const bool failsafeIsActive) = 0;
+        virtual float getMotorValue(const float input) = 0;
 
         virtual float convertFromExternal(const uint16_t value) = 0;
 

@@ -34,11 +34,9 @@ class MockEsc : public Esc {
             return 0;
         }
 
-        virtual float getMotorValue(
-                const float input, const bool failsafeIsActive) override
+        virtual float getMotorValue(const float input) override
         {
             (void)input;
-            (void)failsafeIsActive;
             return 0;
         }
 

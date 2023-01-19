@@ -28,19 +28,6 @@ class Safety {
 
     private:
 
-        static constexpr float MAX_ARMING_ANGLE = 25;
-
-        bool m_accDoneCalibrating;
-        bool m_angleOkay;
-        bool m_gyroDoneCalibrating;
-        bool m_isArmed;
-        bool m_ledOn;
-
-    public:
-
-        static const uint8_t  STARTUP_BLINK_LED_REPS  = 10;
-        static const uint32_t STARTUP_BLINK_LED_DELAY = 50;
-
         typedef enum {
 
             OFF,
@@ -48,6 +35,49 @@ class Safety {
             BLINK
 
         } state_e;
+
+        static constexpr float MAX_ARMING_ANGLE = 25;
+
+        // Avoid repeated degrees-to-radians conversion
+        const float maxAngle = Imu::deg2rad(MAX_ARMING_ANGLE);
+
+        bool m_accDoneCalibrating;
+        bool m_angleOkay;
+        bool m_gyroDoneCalibrating;
+        bool m_isArmed;
+        bool m_ledOn;
+        bool haveSignal;
+
+        state_e state;
+        bool gotFailsafe;
+        bool switchOkay;
+        bool throttleIsDown;
+        uint32_t timer;
+
+        void disarm(Esc * esc)
+        {
+            if (m_isArmed) {
+                esc->stop();
+            }
+            m_isArmed = false;
+        }
+
+        bool isReady(void)
+        {
+            return 
+                m_accDoneCalibrating &&
+                m_angleOkay &&
+                !gotFailsafe &&
+                haveSignal &&
+                m_gyroDoneCalibrating &&
+                switchOkay &&
+                throttleIsDown;
+        }
+
+    public:
+
+        static const uint8_t  STARTUP_BLINK_LED_REPS  = 10;
+        static const uint32_t STARTUP_BLINK_LED_DELAY = 50;
 
         typedef enum {
 
@@ -57,40 +87,13 @@ class Safety {
 
         } ledChange_e;
 
-        state_e state;
-
-        uint32_t timer;
-
-        void setTimer(const uint32_t usec)
-        {
-            timer = usec + 500000;
-        }
-
-        void disable(void)
-        {
-            state = OFF;
-        }
-
-        void blink(void)
-        {
-            state = BLINK;
-        }
-
-        // Avoid repeated degrees-to-radians conversion
-        const float maxAngle = Imu::deg2rad(MAX_ARMING_ANGLE);
-
-        bool gotFailsafe;
-        bool haveSignal;
-        bool switchOkay;
-        bool throttleIsDown;
-
         void attemptToArm(Receiver & receiver, Esc * esc, const uint32_t usec)
         {
             static bool _doNotRepeat;
 
             if (receiver.aux1IsSet()) {
 
-                if (ready()) {
+                if (isReady()) {
 
                     if (m_isArmed) {
                         return;
@@ -108,34 +111,14 @@ class Safety {
                 disarm(esc);
             }
 
-            if (!(m_isArmed || _doNotRepeat || !ready())) {
+            if (!(m_isArmed || _doNotRepeat || !isReady())) {
                 _doNotRepeat = true;
             }
-        }
-
-        void disarm(Esc * esc)
-        {
-            if (m_isArmed) {
-                esc->stop();
-            }
-            m_isArmed = false;
         }
 
         bool isArmed(void)
         {
             return m_isArmed;
-        }
-
-        bool ready(void)
-        {
-            return 
-                m_accDoneCalibrating &&
-                m_angleOkay &&
-                !gotFailsafe &&
-                haveSignal &&
-                m_gyroDoneCalibrating &&
-                switchOkay &&
-                throttleIsDown;
         }
 
         void updateFromImu(Imu & imu, VehicleState & vstate)
@@ -178,16 +161,16 @@ class Safety {
                     throttleIsDown = receiver->throttleIsDown();
 
                     // If arming is disabled and the ARM switch is on
-                    if (!ready() && receiver->aux1IsSet()) {
+                    if (!isReady() && receiver->aux1IsSet()) {
                         switchOkay = false;
                     } else if (!receiver->aux1IsSet()) {
                         switchOkay = true;
                     }
 
-                    if (!ready()) {
-                        blink();
+                    if (!isReady()) {
+                        state = BLINK;
                     } else {
-                        disable();
+                        state = OFF;
                     }
 
                     if ((int32_t)(usec - timer) < 0) {
@@ -207,7 +190,7 @@ class Safety {
                             break;
                     }
 
-                    setTimer(usec);
+                    timer = usec + 500000;
                 }
 
                 haveSignal = receiver->hasSignal();
