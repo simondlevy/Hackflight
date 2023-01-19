@@ -36,9 +36,21 @@ using namespace std;
 
 class Core {
 
+    private:
+
+        Scheduler m_scheduler;
+
     public:
 
-        Scheduler scheduler;
+        bool isDynamicTaskReady(const uint32_t nowCycles)
+        {
+            return m_scheduler.isDynamicReady(nowCycles);
+        }
+
+        uint32_t coreTaskPreUpdate(int32_t & loopRemainingCycles)
+        {
+            return m_scheduler.corePreUpdate(loopRemainingCycles);
+        }
 
         void postRunTask(
                 Task & task,
@@ -48,17 +60,17 @@ class Core {
                 const uint32_t anticipatedEndCycles)
         {
             task.update(usecStart, usecEnd-usecStart);
-            scheduler.updateDynamic(nowCycles, anticipatedEndCycles);
+            m_scheduler.updateDynamic(nowCycles, anticipatedEndCycles);
         }
  
         uint32_t getAnticipatedEndCycles(Task & task, const uint32_t nowCycles)
         {
-            return scheduler.getAnticipatedEndCycles(task, nowCycles);
+            return m_scheduler.getAnticipatedEndCycles(task, nowCycles);
         }
 
         bool isCoreTaskReady(const uint32_t nowCycles)
         {
-            return scheduler.isCoreReady(nowCycles);
+            return m_scheduler.isCoreReady(nowCycles);
         }
 
         void completeCoreTask(
@@ -67,9 +79,9 @@ class Core {
                 const uint32_t nowCycles,
                 const uint32_t nextTargetCycles)
         {
-            scheduler.corePostUpdate(nowCycles);
+            m_scheduler.corePostUpdate(nowCycles);
 
-            // Bring the scheduler into lock with the gyro Track the actual
+            // Bring the m_scheduler into lock with the gyro Track the actual
             // gyro rate over given number of cycle times and set the expected
             // timebase
             static uint32_t _terminalGyroRateCount;
@@ -84,7 +96,7 @@ class Core {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-                scheduler.desiredPeriodCycles = sampleCycles / Imu::CORE_RATE_COUNT;
+                m_scheduler.desiredPeriodCycles = sampleCycles / Imu::CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
                 _terminalGyroRateCount += Imu::CORE_RATE_COUNT;
             }
@@ -95,7 +107,7 @@ class Core {
             static int32_t _gyroSkewAccum;
 
             auto gyroSkew =
-                imu->getGyroSkew(nextTargetCycles, scheduler.desiredPeriodCycles);
+                imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 
@@ -107,7 +119,7 @@ class Core {
                 _terminalGyroLockCount += Imu::GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
-                scheduler.lastTargetCycles -= (_gyroSkewAccum/Imu::GYRO_LOCK_COUNT);
+                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/Imu::GYRO_LOCK_COUNT);
 
                 _gyroSkewAccum = 0;
             }

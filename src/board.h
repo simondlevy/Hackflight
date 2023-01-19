@@ -29,7 +29,6 @@ using namespace std;
 #include "imu.h"
 #include "receiver.h"
 #include "safety.h"
-#include "scheduler.h"
 #include "task/accelerometer.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
@@ -332,7 +331,7 @@ class Board {
                 int32_t loopRemainingCycles = 0;
 
                 const uint32_t nextTargetCycles =
-                    m_core.scheduler.corePreUpdate(loopRemainingCycles);
+                    m_core.coreTaskPreUpdate(loopRemainingCycles);
 
                 while (loopRemainingCycles > 0) {
                     nowCycles = getCycleCounter();
@@ -349,7 +348,7 @@ class Board {
                         m_imu, m_imuInterruptCount, nowCycles, nextTargetCycles);
             }
 
-            if (m_core.scheduler.isDynamicReady(getCycleCounter())) {
+            if (m_core.isDynamicTaskReady(getCycleCounter())) {
                 runDynamicTasks();
             }
         }
