@@ -157,11 +157,6 @@ class Board {
 
         Safety m_saftey;
 
-        int32_t getTaskGuardCycles(void)
-        {
-            return m_scheduler.getTaskGuardCycles();
-        }
-
     protected:
 
         Board(
