@@ -63,32 +63,6 @@ class Board {
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
-        void startCoreTask(const uint32_t usec, float mixmotors[])
-        {
-            if (m_imu->gyroIsReady()) {
-
-                auto angvels = m_imu->readGyroDps();
-
-                m_vstate.dphi   = angvels.x;
-                m_vstate.dtheta = angvels.y;
-                m_vstate.dpsi   = angvels.z;
-            }
-
-            Demands demands = m_receiverTask.receiver->getDemands();
-
-            auto motors = m_mixer->step(
-                    demands,
-                    m_vstate,
-                    m_pidControllers,
-                    m_receiverTask.receiver->gotPidReset(),
-                    usec);
-
-            for (auto i=0; i<m_mixer->getMotorCount(); i++) {
-
-                mixmotors[i] = m_esc->getMotorValue(motors.values[i]);
-            }
-        }
-
         Safety m_saftey;
 
     protected:
@@ -340,7 +314,15 @@ class Board {
                 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
-                startCoreTask(usec, mixmotors);
+                m_core.startCoreTask(
+                        m_imu,
+                        m_vstate,
+                        m_receiverTask.receiver,
+                        m_pidControllers,
+                        m_mixer,
+                        m_esc,
+                        usec,
+                        mixmotors);
 
                 m_esc->write(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
 

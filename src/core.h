@@ -18,7 +18,13 @@
 
 #include <stdint.h>
 
+#include <vector>
+using namespace std;
+
+#include "core/mixer.h"
+#include "esc.h"
 #include "imu.h"
+#include "receiver.h"
 #include "safety.h"
 #include "scheduler.h"
 
@@ -29,6 +35,37 @@ class Core {
         Scheduler m_scheduler;
 
     public:
+
+        void startCoreTask(
+                Imu * imu,
+                VehicleState & vstate,
+                Receiver * receiver,
+                vector<PidController *> * pidControllers,
+                Mixer * mixer,
+                Esc * esc,
+                const uint32_t usec,
+                float mixmotors[])
+        {
+            if (imu->gyroIsReady()) {
+
+                auto angvels = imu->readGyroDps();
+
+                vstate.dphi   = angvels.x;
+                vstate.dtheta = angvels.y;
+                vstate.dpsi   = angvels.z;
+            }
+
+            Demands demands = receiver->getDemands();
+
+            auto motors = mixer->step(
+                    demands, vstate, pidControllers, receiver->gotPidReset(), usec);
+
+            for (auto i=0; i<mixer->getMotorCount(); i++) {
+
+                mixmotors[i] = esc->getMotorValue(motors.values[i]);
+            }
+        }
+
 
         bool isDynamicTaskReady(const uint32_t nowCycles)
         {
