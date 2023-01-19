@@ -44,6 +44,8 @@ class Core {
 
         VehicleState m_vstate;
 
+        AccelerometerTask m_accelerometerTask; 
+
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
         SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
@@ -59,10 +61,10 @@ class Core {
 
         // Initialzed in sketch
         Esc *   m_esc;
+        Imu * m_imu;
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
-        /*
         void start(const uint32_t usec, float mixmotors[])
         {
             if (m_imu->gyroIsReady()) {
@@ -139,10 +141,6 @@ class Core {
             }
         }
 
-        Safety m_saftey;
-
-    protected:
-
         Core(
                 Receiver & receiver,
                 Imu & imu,
@@ -158,30 +156,10 @@ class Core {
             m_esc = &esc;
         }
 
-    private:
-
-        uint32_t getAnticipatedEndCycles(Task & task)
+        uint32_t getAnticipatedEndCycles(Task & task, const uint32_t nowCycles)
         {
-            return m_scheduler.getAnticipatedEndCycles(task, getCycleCounter());
+            return m_scheduler.getAnticipatedEndCycles(task, nowCycles);
         }
-
-    protected:
-
-        // Initialized in sketch
-        Imu * m_imu;
-
-        AccelerometerTask m_accelerometerTask; 
-
-        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
-
-        virtual void prioritizeExtraTasks(
-                Task::prioritizer_t & prioritizer, const uint32_t usec)
-        {
-            (void)prioritizer;
-            (void)usec;
-        }
-
-    public:
 
         void begin(const uint32_t clockSpeed)
         {
@@ -192,5 +170,6 @@ class Core {
             m_imu->begin(clockSpeed);
 
             m_esc->begin();
-*/
+        }
+
 }; // class Core
