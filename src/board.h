@@ -167,9 +167,36 @@ class Board {
             return m_scheduler.getTaskGuardCycles();
         }
 
+    protected:
+
+        Board(
+                Receiver & receiver,
+                Imu & imu,
+                vector<PidController *> & pidControllers,
+                Mixer & mixer,
+                Esc & esc,
+                const int8_t ledPin)
+        {
+            m_receiverTask.receiver = &receiver;
+
+            m_imu = &imu;
+            m_pidControllers = &pidControllers;
+            m_mixer = &mixer;
+            m_esc = &esc;
+
+            m_ledPin = ledPin < 0 ? -ledPin : ledPin;
+            m_ledInverted = ledPin < 0;
+
+            esc.board = this;
+            receiver.board = this;
+        }
+
+
         ///////////////////////////////////////////////////////////////////////
         //////////////////////// unsafe below here ////////////////////////////
         ///////////////////////////////////////////////////////////////////////
+
+    private:
 
         void updateArmingFromReceiver(Receiver * receiver, const uint32_t usec)
         {
@@ -201,7 +228,7 @@ class Board {
                     m_arming.disarm(*m_esc);
                 }
                 else {
-                    ledSet(true);
+                    ledSet(true); // unsafe
                 }
             } else {
 
@@ -220,7 +247,7 @@ class Board {
                     m_warning.disable();
                 }
 
-                ledWarningUpdate();
+                ledWarningUpdate(); // unsafe
             }
 
             m_arming.haveSignal = haveSignal;
@@ -330,13 +357,6 @@ class Board {
             m_warning.ledOn = on;
         }
 
-        void ledBegin(void)
-        {
-            if (m_ledPin > 0) {
-                pinMode(m_ledPin, OUTPUT);
-            }
-        }
-
         void ledFlash(uint8_t reps, uint16_t delayMs)
         {
             ledSet(false);
@@ -393,28 +413,6 @@ class Board {
 
         SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
 
-        Board(
-                Receiver & receiver,
-                Imu & imu,
-                vector<PidController *> & pidControllers,
-                Mixer & mixer,
-                Esc & esc,
-                const int8_t ledPin)
-        {
-            m_receiverTask.receiver = &receiver;
-
-            m_imu = &imu;
-            m_pidControllers = &pidControllers;
-            m_mixer = &mixer;
-            m_esc = &esc;
-
-            m_ledPin = ledPin < 0 ? -ledPin : ledPin;
-            m_ledInverted = ledPin < 0;
-
-            esc.board = this;
-            receiver.board = this;
-        }
-
         virtual void prioritizeExtraTasks(
                 Task::prioritizer_t & prioritizer, const uint32_t usec)
         {
@@ -468,7 +466,10 @@ class Board {
 
             m_esc->begin();
 
-            ledBegin();
+            if (m_ledPin > 0) {
+                pinMode(m_ledPin, OUTPUT);
+            }
+
             ledFlash(10, 50);
         }
 
