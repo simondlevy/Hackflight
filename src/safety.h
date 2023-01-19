@@ -49,16 +49,9 @@ class Safety {
 
         uint32_t timer;
 
-        bool ledOn;
-
         void setTimer(const uint32_t usec)
         {
             timer = usec + 500000;
-        }
-
-        void toggleLed(void)
-        {
-            ledOn = !ledOn;
         }
 
         void disable(void)
@@ -79,7 +72,7 @@ class Safety {
         bool switchOkay;
         bool throttleIsDown;
 
-        void attempt(Receiver & receiver, Esc & esc, const uint32_t usec)
+        void attemptToArm(Receiver & receiver, Esc & esc, const uint32_t usec)
         {
             static bool _doNotRepeat;
 

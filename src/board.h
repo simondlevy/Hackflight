@@ -65,6 +65,8 @@ class Board {
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
+        bool m_ledOn;
+
         void checkCoreTasks(const uint32_t usec, uint32_t nowCycles)
         {
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
@@ -197,8 +199,9 @@ class Board {
         void updateArmingFromReceiver(Receiver * receiver, const uint32_t usec)
         {
             if (receiver->getState() == Receiver::STATE_UPDATE) {
-                m_safety.attempt(*receiver, *m_esc, usec);
+                m_safety.attemptToArm(*receiver, *m_esc, usec);
             }
+
             else  if (receiver->getState() == Receiver::STATE_CHECK) {
 
                 if (m_safety.isArmed()) {
@@ -240,8 +243,8 @@ class Board {
                             ledSet(true);
                             break;
                         case Safety::BLINK:
-                            m_saftey.toggleLed();
-                            ledSet(m_saftey.ledOn);
+                            m_ledOn = !m_ledOn;
+                            ledSet(m_ledOn);
                             break;
                     }
 
@@ -326,15 +329,14 @@ class Board {
                 digitalWrite(m_ledPin, m_ledInverted ? on : !on);
             }
 
-            m_saftey.ledOn = on;
+            m_ledOn = on;
         }
 
         void ledFlash(uint8_t reps, uint16_t delayMs)
         {
             ledSet(false);
             for (auto i=0; i<reps; i++) {
-                m_saftey.toggleLed();
-                ledSet(m_saftey.ledOn);
+                m_ledOn = !m_ledOn;
                 delay(delayMs);
             }
             ledSet(false);
