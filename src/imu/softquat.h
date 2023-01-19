@@ -367,7 +367,7 @@ class SoftQuatImu : public Imu {
 
     public:
 
-        void handleInterrupt(uint32_t cycleCounter)
+        virtual void handleInterrupt(uint32_t cycleCounter) override
         {
             static uint32_t prevTime;
 
@@ -384,7 +384,5 @@ class SoftQuatImu : public Imu {
             }
 
             prevTime = nowCycles;
-
-            Imu::handleInterrupt();
         }
 };

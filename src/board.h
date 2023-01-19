@@ -42,6 +42,8 @@ class Board {
         uint8_t m_ledPin;
         bool m_ledInverted;
 
+        uint32_t m_imuInterruptCount;
+
         VehicleState m_vstate;
 
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
@@ -99,12 +101,11 @@ class Board {
             static int32_t _sampleRateStartCycles;
 
             if ((_terminalGyroRateCount == 0)) {
-                _terminalGyroRateCount =
-                    m_imu->getGyroInterruptCount() + Imu::CORE_RATE_COUNT;
+                _terminalGyroRateCount = m_imuInterruptCount + Imu::CORE_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
             }
 
-            if (m_imu->getGyroInterruptCount() >= _terminalGyroRateCount) {
+            if (m_imuInterruptCount >= _terminalGyroRateCount) {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
@@ -124,11 +125,10 @@ class Board {
             _gyroSkewAccum += gyroSkew;
 
             if ((_terminalGyroLockCount == 0)) {
-                _terminalGyroLockCount =
-                    m_imu->getGyroInterruptCount() + Imu::GYRO_LOCK_COUNT;
+                _terminalGyroLockCount = m_imuInterruptCount + Imu::GYRO_LOCK_COUNT;
             }
 
-            if (m_imu->getGyroInterruptCount() >= _terminalGyroLockCount) {
+            if (m_imuInterruptCount >= _terminalGyroLockCount) {
                 _terminalGyroLockCount += Imu::GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
@@ -163,11 +163,6 @@ class Board {
             esc.board = this;
             receiver.board = this;
         }
-
-
-        ///////////////////////////////////////////////////////////////////////
-        //////////////////////// unsafe below here ////////////////////////////
-        ///////////////////////////////////////////////////////////////////////
 
     private:
 
@@ -309,6 +304,12 @@ class Board {
         }
 
     public:
+
+        void handleImuInterrupt(void)
+        {
+            m_imuInterruptCount++;
+            m_imu->handleInterrupt(getCycleCounter());
+        }
 
         uint32_t microsToCycles(uint32_t micros)
         {

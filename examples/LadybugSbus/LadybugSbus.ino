@@ -39,7 +39,7 @@ static LadybugBoard board(rx, pids, mixer);
 
 static void handleImuInterrupt(void)
 {
-    board.handleInterrupt();
+    board.handleImuInterrupt();
 }
 
 void serialEvent1(void)

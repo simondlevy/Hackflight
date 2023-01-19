@@ -68,7 +68,7 @@ extern "C" void handleDmaIrq(void)
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    imu.handleInterrupt(board.getCycleCounter());
+    board.handleImuInterrupt();
 }
 
 // Receiver interrupt

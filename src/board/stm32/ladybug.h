@@ -59,7 +59,7 @@ class LadybugBoard : public Stm32Board {
             imu.begin();
         }
 
-        void handleInterrupt(void)
+        void handleImuInterrupt(void)
         {
             imu.handleInterrupt(micros());
         }

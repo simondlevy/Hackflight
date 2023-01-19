@@ -45,8 +45,6 @@ class UsfsImu : public Imu {
             USFS_INTERRUPT_QUAT;
 
         bool     m_gotNewData;
-        uint32_t m_gyroInterruptCount;
-        uint32_t m_gyroSyncTime;
 
         float m_qw;
         float m_qx;
@@ -64,11 +62,6 @@ class UsfsImu : public Imu {
             Axes angles = quat2euler(m_qw, m_qx, m_qy, m_qz);
 
             return Axes(angles.x, -angles.y, -angles.z);
-        }
-
-        virtual uint32_t getGyroInterruptCount(void) override
-        {
-            return m_gyroInterruptCount;
         }
 
         virtual bool gyroIsReady(void) override
@@ -128,10 +121,10 @@ class UsfsImu : public Imu {
             usfsCheckStatus();
         }
 
-        void handleInterrupt(const uint32_t usec)
+        void handleInterrupt(const uint32_t cycleCounter)
         {
+            (void)cycleCounter;
+
             m_gotNewData = true;
-            m_gyroInterruptCount++;
-            m_gyroSyncTime = usec;
         }
 };

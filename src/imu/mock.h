@@ -57,21 +57,6 @@ class MockImu : public Imu {
             return Axes(phi, 0.1, 0.1);
         }
 
-        virtual uint32_t getGyroInterruptCount(void) override
-        {
-            static uint32_t _result;
-            static uint32_t _count;
-
-            _count += 1;
-
-            if (_count == 1000) {
-                _result++;
-                _count = 0;
-            }
-
-            return _result;
-        }
-
         virtual int32_t getGyroSkew(
                 const uint32_t nextTargetCycles,
                 const int32_t desiredPeriodCycles) override

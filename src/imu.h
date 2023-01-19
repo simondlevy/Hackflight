@@ -108,7 +108,6 @@ class Imu {
         calibration_t m_gyroCalibration;
 
         int32_t  m_gyroCalibrationCyclesRemaining;
-        uint32_t m_gyroInterruptCount;
         float    m_gyroScale;
         bool     m_gyroIsCalibrating;
 
@@ -200,11 +199,6 @@ class Imu {
             return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
         }
 
-        void handleInterrupt(void)
-        {
-            m_gyroInterruptCount++;
-        }
-
        typedef Axes (*rotateFun_t)(Axes & axes);
 
         rotateFun_t m_rotateFun;
@@ -225,6 +219,8 @@ class Imu {
         // Gyro interrupt counts over which to measure loop time and skew
         static const uint32_t CORE_RATE_COUNT = 25000;
         static const uint32_t GYRO_LOCK_COUNT = 400;
+
+        virtual void handleInterrupt(const uint32_t cycleCounter) = 0;
 
         virtual auto readGyroDps(void) -> Axes
         {
@@ -298,12 +294,6 @@ class Imu {
         virtual void updateAccelerometer(void)
         {
         }
-
-        virtual uint32_t getGyroInterruptCount(void)
-        {
-            return m_gyroInterruptCount;
-        }
-
 
         virtual int32_t getGyroSkew(
                 const uint32_t nextTargetCycles,
