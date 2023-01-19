@@ -67,10 +67,8 @@ class Board {
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
-        void checkCoreTasks(uint32_t nowCycles)
+        void checkCoreTasks(const uint32_t usec, uint32_t nowCycles)
         {
-            const uint32_t usec = micros(); // unsafe
-
             int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
             uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
 
@@ -158,7 +156,7 @@ class Board {
                 _gyroSkewAccum = 0;
             }
 
-        } // checkCoreTasks
+        }
 
         Warning m_warning;
 
@@ -479,7 +477,7 @@ class Board {
             auto nowCycles = getCycleCounter();
 
             if (m_scheduler.isCoreReady(nowCycles)) {
-                checkCoreTasks(nowCycles);
+                checkCoreTasks(micros(), nowCycles);
             }
 
             if (m_scheduler.isDynamicReady(getCycleCounter())) {
