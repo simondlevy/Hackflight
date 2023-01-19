@@ -196,71 +196,7 @@ class Board {
 
     private:
 
-        auto updateArmingFromReceiver(Receiver * receiver, const uint32_t usec) 
-            -> Safety::ledChange_e
-        {
-            Safety::ledChange_e ledChange = Safety::LED_UNCHANGED;
-
-            if (receiver->getState() == Receiver::STATE_UPDATE) {
-                m_safety.attemptToArm(*receiver, *m_esc, usec);
-            }
-
-            else  if (receiver->getState() == Receiver::STATE_CHECK) {
-
-                if (m_safety.isArmed()) {
-
-                    if (!receiver->hasSignal() && m_safety.haveSignal) {
-                        m_safety.gotFailsafe = true;
-                        m_safety.disarm(*m_esc);
-                    }
-                    else {
-                        ledChange = Safety::LED_TURN_ON;
-                    }
-                } 
-                else {
-
-                    m_safety.throttleIsDown = receiver->throttleIsDown();
-
-                    // If arming is disabled and the ARM switch is on
-                    if (!m_safety.ready() && receiver->aux1IsSet()) {
-                        m_safety.switchOkay = false;
-                    } else if (!receiver->aux1IsSet()) {
-                        m_safety.switchOkay = true;
-                    }
-
-                    if (!m_safety.ready()) {
-                        m_saftey.blink();
-                    } else {
-                        m_saftey.disable();
-                    }
-
-                    if ((int32_t)(usec - m_saftey.timer) < 0) {
-                        return ledChange;
-                    }
-
-                    switch (m_saftey.state) {
-                        case Safety::OFF:
-                            ledChange = Safety::LED_TURN_OFF;
-                            break;
-                        case Safety::ON:
-                            ledChange = Safety::LED_TURN_ON;
-                            break;
-                        case Safety::BLINK:
-                            m_ledOn = !m_ledOn;
-                            ledChange = m_ledOn ? Safety::LED_TURN_ON : Safety::LED_TURN_OFF;
-                            break;
-                    }
-
-                    m_saftey.setTimer(usec);
-                }
-
-                m_safety.haveSignal = receiver->hasSignal();
-            }
-
-            return ledChange;
-        }
-
-        void checkDynamicTasks(void)
+       void checkDynamicTasks(void)
         {
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
@@ -289,7 +225,7 @@ class Board {
 
                 case Task::RECEIVER:
                     runTask(m_receiverTask);
-                    updateFromReceiver();
+                    updateSafetyFromReceiver();
                    break;
 
                 case Task::ACCELEROMETER:
@@ -305,10 +241,10 @@ class Board {
             }
         }
 
-        void updateFromReceiver(void)
+        void updateSafetyFromReceiver(void)
         {
             Safety::ledChange_e ledChange = 
-                updateArmingFromReceiver(m_receiverTask.receiver, micros());
+                m_safety.updateFromReceiver(m_receiverTask.receiver, m_esc, micros());
             if (ledChange != Safety::LED_UNCHANGED) {
                 ledSet(ledChange == Safety::LED_TURN_ON);
             }

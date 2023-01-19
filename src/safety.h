@@ -19,9 +19,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "core/vstate.h"
 #include "esc.h"
 #include "imu.h"
-#include "core/vstate.h"
 #include "receiver.h"
 
 class Safety {
@@ -34,6 +34,7 @@ class Safety {
         bool m_angleOkay;
         bool m_gyroDoneCalibrating;
         bool m_isArmed;
+        bool m_ledOn;
 
     public:
 
@@ -80,7 +81,7 @@ class Safety {
         bool switchOkay;
         bool throttleIsDown;
 
-        void attemptToArm(Receiver & receiver, Esc & esc, const uint32_t usec)
+        void attemptToArm(Receiver & receiver, Esc * esc, const uint32_t usec)
         {
             static bool _doNotRepeat;
 
@@ -92,7 +93,7 @@ class Safety {
                         return;
                     }
 
-                    if (!esc.isReady(usec)) {
+                    if (!esc->isReady(usec)) {
                         return;
                     }
 
@@ -109,10 +110,10 @@ class Safety {
             }
         }
 
-        void disarm(Esc & esc)
+        void disarm(Esc * esc)
         {
             if (m_isArmed) {
-                esc.stop();
+                esc->stop();
             }
             m_isArmed = false;
         }
@@ -146,4 +147,70 @@ class Safety {
             m_accDoneCalibrating = true; // XXX
         }
 
-}; // class Safety
+        auto updateFromReceiver(
+                Receiver * receiver,
+                Esc * esc,
+                const uint32_t usec) -> ledChange_e
+        {
+            ledChange_e ledChange = LED_UNCHANGED;
+
+            if (receiver->getState() == Receiver::STATE_UPDATE) {
+                attemptToArm(*receiver, esc, usec);
+            }
+
+            else  if (receiver->getState() == Receiver::STATE_CHECK) {
+
+                if (isArmed()) {
+
+                    if (!receiver->hasSignal() && haveSignal) {
+                        gotFailsafe = true;
+                        disarm(esc);
+                    }
+                    else {
+                        ledChange = LED_TURN_ON;
+                    }
+                } 
+                else {
+
+                    throttleIsDown = receiver->throttleIsDown();
+
+                    // If arming is disabled and the ARM switch is on
+                    if (!ready() && receiver->aux1IsSet()) {
+                        switchOkay = false;
+                    } else if (!receiver->aux1IsSet()) {
+                        switchOkay = true;
+                    }
+
+                    if (!ready()) {
+                        blink();
+                    } else {
+                        disable();
+                    }
+
+                    if ((int32_t)(usec - timer) < 0) {
+                        return ledChange;
+                    }
+
+                    switch (state) {
+                        case OFF:
+                            ledChange = LED_TURN_OFF;
+                            break;
+                        case ON:
+                            ledChange = LED_TURN_ON;
+                            break;
+                        case BLINK:
+                            m_ledOn = !m_ledOn;
+                            ledChange = m_ledOn ? LED_TURN_ON : LED_TURN_OFF;
+                            break;
+                    }
+
+                    setTimer(usec);
+                }
+
+                haveSignal = receiver->hasSignal();
+            }
+
+            return ledChange;
+        }
+
+ }; // class Safety
