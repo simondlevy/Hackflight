@@ -112,11 +112,15 @@ class Scheduler {
             m_clockRate = microsecondsToClockCycles(1000000);
         }
 
-        void corePreUpdate(void) 
+        uint32_t corePreUpdate(int32_t & loopRemainingCycles) 
         {
             if (m_loopStartCycles > m_loopStartMinCycles) {
                 m_loopStartCycles -= m_loopStartDeltaDownCycles;
             }
+
+            loopRemainingCycles = m_loopRemainingCycles;
+
+            return m_nextTargetCycles;
         }
 
         void corePostUpdate(uint32_t nowCycles)
@@ -143,16 +147,6 @@ class Scheduler {
             return m_taskGuardCycles;
         }
         
-        int32_t getLoopRemainingCycles(void)
-        {
-            return m_loopRemainingCycles;
-        }
-        
-        uint32_t getNextTargetCycles(void)
-        {
-            return m_nextTargetCycles;
-        }
-
         bool isCoreReady(uint32_t nowCycles)
         {
             m_nextTargetCycles = lastTargetCycles + desiredPeriodCycles;

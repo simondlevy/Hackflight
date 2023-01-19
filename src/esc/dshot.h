@@ -334,6 +334,7 @@ class DshotEsc : public Esc {
                         return;
                     }
                 }
+
                 board->dmaUpdateComplete();
             }
         }

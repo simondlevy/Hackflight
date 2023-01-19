@@ -65,17 +65,16 @@ class Board {
         Mixer * m_mixer;
         vector<PidController *> * m_pidControllers;
 
-        void checkCoreTasks(const uint32_t usec, uint32_t nowCycles)
+        void runCoreTasks(const uint32_t usec, uint32_t nowCycles)
         {
-            int32_t loopRemainingCycles = m_scheduler.getLoopRemainingCycles();
-            uint32_t nextTargetCycles = m_scheduler.getNextTargetCycles();
+            int32_t  loopRemainingCycles = 0;
 
-            m_scheduler.corePreUpdate();
+            const uint32_t nextTargetCycles =
+                m_scheduler.corePreUpdate(loopRemainingCycles);
 
             while (loopRemainingCycles > 0) {
                 nowCycles = getCycleCounter(); // unsafe
-                loopRemainingCycles =
-                    intcmp(nextTargetCycles, nowCycles);
+                loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
             }
 
             if (m_imu->gyroIsReady()) {
@@ -152,7 +151,6 @@ class Board {
 
                 _gyroSkewAccum = 0;
             }
-
         }
 
         Safety m_saftey;
@@ -188,7 +186,7 @@ class Board {
 
     private:
 
-       void checkDynamicTasks(void)
+       void runDynamicTasks(void)
         {
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
@@ -391,11 +389,11 @@ class Board {
             auto nowCycles = getCycleCounter();
 
             if (m_scheduler.isCoreReady(nowCycles)) {
-                checkCoreTasks(micros(), nowCycles);
+                runCoreTasks(micros(), nowCycles);
             }
 
             if (m_scheduler.isDynamicReady(getCycleCounter())) {
-                checkDynamicTasks();
+                runDynamicTasks();
             }
         }
 
