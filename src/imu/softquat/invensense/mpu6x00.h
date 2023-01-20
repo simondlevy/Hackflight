@@ -75,9 +75,7 @@ class Mpu6x00 : public InvenSenseImu {
         {
             InvenSenseImu::begin(clockSpeed);
 
-            m_spi.setBitOrder(MSBFIRST);
             m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_INIT_CLK_HZ));
-            m_spi.setDataMode(SPI_MODE3);
 
             // Chip reset
             writeRegister(REG_PWR_MGMT_1, BIT_H_RESET);
