@@ -38,7 +38,7 @@ class BrushedEsc : public Esc {
         virtual void begin(void) override
         {
             for (auto pin : *m_pins) {
-                analogWriteFrequency(pin, 10000);
+                // analogWriteFrequency(pin, 10000);
                 analogWrite(pin, 0);
             }
         }

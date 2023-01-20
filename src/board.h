@@ -25,6 +25,7 @@
 #include "core/mixer.h"
 #include "core/motors.h"
 #include "esc.h"
+#include "esc/mock.h"
 #include "imu.h"
 #include "receiver.h"
 #include "safety.h"
