@@ -113,10 +113,10 @@ class Mpu6x00 : public InvenSenseImu {
             writeRegister(REG_INT_ENABLE, BIT_RAW_RDY_EN);
             delayMicroseconds(15);
 
-            setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLK_HZ));
-            delayMicroseconds(1);
+            //setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLK_HZ));
+            //delayMicroseconds(1);
 
-            setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_INIT_CLK_HZ));
+            //setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_INIT_CLK_HZ));
 
             // Accel and Gyro DLPF Setting
             writeRegister(REG_CONFIG, 0); // no gyro DLPF
