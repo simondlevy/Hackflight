@@ -212,6 +212,21 @@ class Board {
             return m_core.getAnticipatedEndCycles(task, getCycleCounter());
         }
 
+        void startEsc(void)
+        {
+            switch (m_esc->type) {
+
+                case Esc::BRUSHED:
+                    break;
+
+                case Esc::DSHOT:
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
     protected:
 
        // Initialized in sketch
@@ -279,6 +294,8 @@ class Board {
             m_imu->begin(getClockSpeed());
 
             m_esc->begin();
+
+            startEsc();
 
             if (m_ledPin > 0) {
                 pinMode(m_ledPin, OUTPUT);

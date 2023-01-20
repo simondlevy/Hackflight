@@ -23,6 +23,8 @@
 
 class Esc {
 
+    friend class Board;
+
     protected:
 
         typedef enum {
