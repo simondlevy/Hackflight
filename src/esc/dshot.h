@@ -247,6 +247,7 @@ class DshotEsc : public Esc {
     public:
 
         DshotEsc(std::vector<uint8_t> * motorPins, protocol_t protocol=DSHOT600) 
+            : Esc(DSHOT)
         {
             m_pins = motorPins;
             m_protocol = protocol;
@@ -259,7 +260,7 @@ class DshotEsc : public Esc {
                 m_protocol == DSHOT300 ? 300 :
                 600;
 
-            board->dmaInit(m_pins, 1000 * outputFreq);
+            board->dmaInit(m_pins, 1000 * outputFreq); // unsafe
 
             m_enabled = true;
         }
@@ -309,12 +310,11 @@ class DshotEsc : public Esc {
             }
         }
 
-        // unsafe
         virtual void write(const float values[]) override
         {
             if (m_enabled) {
 
-                board->dmaUpdateStart();
+                board->dmaUpdateStart(); // unsafe
 
                 for (auto i=0; i <MOTOR_COUNT; i++) {
 
@@ -326,7 +326,7 @@ class DshotEsc : public Esc {
 
                     uint16_t packet = prepareDshotPacket(ivalue);
 
-                    board->dmaWriteMotor(i, packet);
+                    board->dmaWriteMotor(i, packet); // unsafe
                 }
 
                 if (!commandQueueIsEmpty()) {
@@ -335,7 +335,7 @@ class DshotEsc : public Esc {
                     }
                 }
 
-                board->dmaUpdateComplete();
+                board->dmaUpdateComplete(); // unsafe
             }
         }
 

@@ -22,10 +22,22 @@
 
 class MockEsc : public Esc {
 
+    public:
+
+        MockEsc(void) 
+            : Esc(MOCK)
+        {
+        }
+
     protected:
 
         virtual void begin(void) override
         {
+        }
+
+        virtual void write(const float values[]) override
+        {
+            (void)values;
         }
 
         virtual float convertFromExternal(const uint16_t value) override
@@ -40,9 +52,4 @@ class MockEsc : public Esc {
             return 0;
         }
 
-
-        virtual void write(const float values[]) override
-        {
-            (void)values;
-        }
 };

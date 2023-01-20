@@ -23,6 +23,23 @@
 
 class Esc {
 
+    protected:
+
+        typedef enum {
+
+            MOCK,
+            BRUSHED,
+            DSHOT
+
+        } type_e;
+
+        type_e type;
+
+        Esc(type_e type)
+        {
+            this->type = type;
+        }
+
     public:
 
         class Board * board;

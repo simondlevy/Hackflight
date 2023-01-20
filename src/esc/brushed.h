@@ -31,6 +31,7 @@ class BrushedEsc : public Esc {
     public:
 
         BrushedEsc(std::vector<uint8_t> & pins)  
+            : Esc(BRUSHED)
         {
             m_pins = &pins;
         }
@@ -40,6 +41,14 @@ class BrushedEsc : public Esc {
             for (auto pin : *m_pins) {
                 // analogWriteFrequency(pin, 10000);
                 analogWrite(pin, 0);
+            }
+        }
+
+        virtual void write(const float values[]) override 
+        {
+            uint8_t k=0;
+            for (auto p: *m_pins) {
+                analogWrite(p, (uint8_t)(values[k++] * 255));
             }
         }
 
@@ -53,11 +62,4 @@ class BrushedEsc : public Esc {
             return constrain_f(input, 0, 1);
         }
 
-        virtual void write(const float values[]) override 
-        {
-            uint8_t k=0;
-            for (auto p: *m_pins) {
-                analogWrite(p, (uint8_t)(values[k++] * 255));
-            }
-        }
 };
