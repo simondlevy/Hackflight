@@ -81,9 +81,9 @@ class Icm42688 : public InvenSenseImu {
 
         static const uint32_t MAX_SPI_CLOCK_RATE = 24000000;
 
-        odr_e        m_odr;
-        uint8_t      m_antiAliasDelta;
-        uint8_t      m_antiAliasBitshift;
+        odr_e   m_odr;
+        uint8_t m_antiAliasDelta;
+        uint8_t m_antiAliasBitshift;
 
         static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
         {
@@ -123,13 +123,13 @@ class Icm42688 : public InvenSenseImu {
         {
             InvenSenseImu::begin(clockSpeed);
 
+            m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLOCK_RATE));
+
             writeRegister(REG_BANK_SEL, 0);
 
             writeRegister(UB0_REG_DEVICE_CONFIG, 0x01);
 
             delay(1);
-
-            m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLOCK_RATE));
 
             writeRegister(REG_PWR_MGMT0,
                     PWR_MGMT0_TEMP_DISABLE_OFF |

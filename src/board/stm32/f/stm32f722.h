@@ -18,6 +18,8 @@
 
 #include "board/stm32/stm32f.h"
 
+#include <vector>
+
 class Stm32F722Board : public Stm32FBoard {
 
     public:
@@ -25,7 +27,7 @@ class Stm32F722Board : public Stm32FBoard {
         Stm32F722Board(
                 Receiver & receiver,
                 Imu & imu,
-                vector<PidController *> & pids,
+                std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 

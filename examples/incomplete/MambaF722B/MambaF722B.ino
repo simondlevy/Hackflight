@@ -17,8 +17,6 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <SPI.h>
-
 #include <hackflight.h>
 #include <board/stm32/f/stm32f722.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
@@ -27,7 +25,6 @@
 #include <receiver/mock.h>
 
 #include <vector>
-using namespace std;
 
 // IMU
 static const uint8_t MOSI_PIN = PA7;
@@ -47,7 +44,7 @@ static MockReceiver rx;
 
 Icm42688 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, Imu::rotate0);
 
-static vector<PidController *> pids = {};
+static std::vector<PidController *> pids = {};
 
 static Stm32F722Board board(rx, imu, pids, mixer, esc, LED_PIN);
 

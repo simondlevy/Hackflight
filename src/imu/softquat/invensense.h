@@ -49,6 +49,7 @@ class InvenSenseImu : public SoftQuatImu {
             ACCEL_16G
 
         } accelScale_e;
+
     private:
 
         uint8_t m_misoPin;
