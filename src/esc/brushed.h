@@ -24,10 +24,6 @@
 
 class BrushedEsc : public Esc {
 
-    private:
-
-        std::vector<uint8_t> * m_pins;
-
     public:
 
         BrushedEsc(std::vector<uint8_t> & pins)  

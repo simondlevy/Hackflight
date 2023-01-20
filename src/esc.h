@@ -21,6 +21,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <vector>
+
 class Esc {
 
     friend class Board;
@@ -41,6 +43,8 @@ class Esc {
         {
             this->type = type;
         }
+
+        std::vector<uint8_t> * m_pins;
 
     public:
 

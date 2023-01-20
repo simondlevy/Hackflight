@@ -79,8 +79,6 @@ class DshotEsc : public Esc {
 
         bool m_enabled = false;
 
-        std::vector <uint8_t> * m_pins;
-
         bool isLastCommand(void)
         {
             return ((m_commandQueueTail + 1) % (MAX_COMMANDS + 1) == m_commandQueueHead);
