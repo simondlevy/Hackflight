@@ -199,8 +199,6 @@ class Receiver {
 
     public:
 
-        Board * board;
-
         bool hasSignal(void)
         {
             return m_haveSignal;

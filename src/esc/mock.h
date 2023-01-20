@@ -25,31 +25,7 @@ class MockEsc : public Esc {
     public:
 
         MockEsc(void) 
-            : Esc(MOCK)
+            : Esc()
         {
         }
-
-    protected:
-
-        virtual void begin(void) override
-        {
-        }
-
-        virtual void write(const float values[]) override
-        {
-            (void)values;
-        }
-
-        virtual float convertFromExternal(const uint16_t value) override
-        {
-            (void)value;
-            return 0;
-        }
-
-        virtual float getMotorValue(const float input) override
-        {
-            (void)input;
-            return 0;
-        }
-
 };

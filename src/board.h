@@ -65,6 +65,8 @@ class Board {
 
         Safety m_saftey;
 
+        bool m_dshotEnabled;
+
     protected:
 
         Board(
@@ -84,9 +86,6 @@ class Board {
 
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
             m_ledInverted = ledPin < 0;
-
-            esc.board = this;
-            receiver.board = this;
         }
 
     private:
@@ -212,14 +211,57 @@ class Board {
             return m_core.getAnticipatedEndCycles(task, getCycleCounter());
         }
 
-        void startEsc(void)
+        void escBegin(void)
         {
             switch (m_esc->type) {
 
                 case Esc::BRUSHED:
+                    for (auto pin : *m_esc->motorPins) {
+                        // analogWriteFrequency(pin, 10000);
+                        analogWrite(pin, 0);
+                    }
                     break;
 
                 case Esc::DSHOT:
+                    dmaInit(m_esc->motorPins, 1000 * m_esc->dshotOutputFreq);
+                    m_dshotEnabled = true;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        void dshotWrite(const float motorValues[])
+        {
+            dmaUpdateStart();
+
+            for (uint8_t k=0; k<m_esc->motorPins->size(); k++) {
+
+                auto packet = m_esc->prepareDshotPacket(k, motorValues[k]);
+
+                dmaWriteMotor(k, packet);
+            }
+
+            m_esc->dshotComplete();
+
+            dmaUpdateComplete();
+        }
+
+        void escWrite(const float motorValues[])
+        {
+            switch (m_esc->type) {
+
+                case Esc::BRUSHED:
+                    for (uint8_t k=0; k<m_esc->motorPins->size(); ++k) {
+                        analogWrite((*m_esc->motorPins)[k], (uint8_t)(motorValues[k] * 255));
+                    }
+                    break;
+
+                case Esc::DSHOT:
+                    if (m_dshotEnabled) {
+                        dshotWrite(motorValues);
+                    }
                     break;
 
                 default:
@@ -229,7 +271,7 @@ class Board {
 
     protected:
 
-       // Initialized in sketch
+        // Initialized in sketch
         Imu * m_imu;
 
         AccelerometerTask m_accelerometerTask; 
@@ -263,10 +305,10 @@ class Board {
         virtual void startCycleCounter(void) = 0;
 
         virtual void dmaInit(
-                const std::vector<uint8_t> * motorPins, const uint32_t outputFreq)
+                const std::vector<uint8_t> * motorPins, const uint32_t dshotOutputFreq)
         {
             (void)motorPins;
-            (void)outputFreq;
+            (void)dshotOutputFreq;
         }
 
         virtual void dmaUpdateComplete(void)
@@ -293,9 +335,7 @@ class Board {
 
             m_imu->begin(getClockSpeed());
 
-            m_esc->begin();
-
-            startEsc();
+            escBegin();
 
             if (m_ledPin > 0) {
                 pinMode(m_ledPin, OUTPUT);
@@ -341,7 +381,7 @@ class Board {
                         usec,
                         mixmotors);
 
-                m_esc->write(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
+                escWrite(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
 
                 m_core.completeCoreTask(
                         m_imu, m_imuInterruptCount, nowCycles, nextTargetCycles);

@@ -52,7 +52,7 @@ static Mpu6x00 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, Imu::rotate270);
 
 static std::vector<PidController *> pids = {&anglePid};
 
-static DshotEsc esc(&MOTOR_PINS);
+static DshotEsc esc(MOTOR_PINS);
 
 static Stm32F405Board board(rx, imu, pids, mixer, esc, LED_PIN);
 

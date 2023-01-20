@@ -39,24 +39,45 @@ class Esc {
 
         type_e type;
 
-        Esc(type_e type)
+        std::vector<uint8_t> * motorPins;
+
+        uint32_t dshotOutputFreq;
+
+        Esc(type_e type, std::vector<uint8_t> &motorPins)
         {
             this->type = type;
+            this->motorPins = &motorPins;
         }
 
-        std::vector<uint8_t> * m_pins;
+        Esc(void)
+        {
+            this->type = MOCK;
+        }
 
+        virtual uint16_t prepareDshotPacket(const uint8_t i, const float motorValue)
+        {
+            (void)i;
+            (void)motorValue;
+            return 0;
+        }
+
+        virtual void dshotComplete(void) 
+        {
+        }
+ 
     public:
 
-        class Board * board;
+        virtual float convertFromExternal(const uint16_t value)
+        {
+            (void)value;
+            return 0;
+        }
 
-        virtual void  begin(void) = 0;
-
-        virtual void  write(const float values[]) = 0;
-
-        virtual float getMotorValue(const float input) = 0;
-
-        virtual float convertFromExternal(const uint16_t value) = 0;
+        virtual float getMotorValue(const float input)
+        {
+            (void)input;
+            return 0;
+        }
 
         virtual bool  isReady(const uint32_t currentTime) 
         {

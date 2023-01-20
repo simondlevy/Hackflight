@@ -77,8 +77,6 @@ class DshotEsc : public Esc {
         uint8_t m_commandQueueHead;
         uint8_t m_commandQueueTail;
 
-        bool m_enabled = false;
-
         bool isLastCommand(void)
         {
             return ((m_commandQueueTail + 1) % (MAX_COMMANDS + 1) == m_commandQueueHead);
@@ -188,8 +186,6 @@ class DshotEsc : public Esc {
             return m_commandQueue[m_commandQueueTail].command[index];
         }
 
-        protocol_t m_protocol;
-
         bool commandQueueUpdate(void)
         {
             if (!commandQueueIsEmpty()) {
@@ -209,25 +205,6 @@ class DshotEsc : public Esc {
             return false;
         }
 
-        uint16_t prepareDshotPacket(uint16_t value)
-        {
-            uint16_t packet = value << 1;
-
-            // compute checksum
-            unsigned csum = 0;
-            unsigned csum_data = packet;
-            for (auto i=0; i<3; i++) {
-                csum ^=  csum_data;   // xor data by nibbles
-                csum_data >>= 4;
-            }
-
-            // append checksum
-            csum &= 0xf;
-            packet = (packet << 4) | csum;
-
-            return packet;
-        }
-
         bool commandIsProcessing(void)
         {
             if (commandQueueIsEmpty()) {
@@ -244,23 +221,13 @@ class DshotEsc : public Esc {
 
     public:
 
-        DshotEsc(std::vector<uint8_t> * motorPins, protocol_t protocol=DSHOT600) 
-            : Esc(DSHOT)
+        DshotEsc(std::vector<uint8_t> & motorPins, protocol_t protocol=DSHOT600) 
+            : Esc(DSHOT, motorPins)
         {
-            m_pins = motorPins;
-            m_protocol = protocol;
-        }
-
-        virtual void begin(void) override 
-        {
-            uint32_t outputFreq =
-                m_protocol == DSHOT150 ? 150 :
-                m_protocol == DSHOT300 ? 300 :
-                600;
-
-            board->dmaInit(m_pins, 1000 * outputFreq); // unsafe
-
-            m_enabled = true;
+            dshotOutputFreq =
+                protocol == DSHOT150 ?
+                150 : protocol == DSHOT300 ?
+                300 : 600;
         }
 
         virtual float convertFromExternal(const uint16_t value) override 
@@ -307,33 +274,39 @@ class DshotEsc : public Esc {
                     commandCyclesFromTime(INITIAL_DELAY_US);
             }
         }
-
-        virtual void write(const float values[]) override
+        
+        virtual uint16_t prepareDshotPacket(
+                const uint8_t i, const float motorValue) override
         {
-            if (m_enabled) {
+            uint16_t value = (uint16_t)motorValue;
 
-                board->dmaUpdateStart(); // unsafe
+            if (commandIsProcessing()) {
+                value = commandGetCurrent(i);
+            }
 
-                for (auto i=0; i <MOTOR_COUNT; i++) {
+            uint16_t packet = value << 1;
 
-                    uint16_t ivalue = (uint16_t)values[i];
+            // compute checksum
+            unsigned csum = 0;
+            unsigned csum_data = packet;
+            for (auto i=0; i<3; i++) {
+                csum ^=  csum_data;   // xor data by nibbles
+                csum_data >>= 4;
+            }
 
-                    if (commandIsProcessing()) {
-                        ivalue = commandGetCurrent(i);
-                    }
+            // append checksum
+            csum &= 0xf;
+            packet = (packet << 4) | csum;
 
-                    uint16_t packet = prepareDshotPacket(ivalue);
+            return packet;
+        }
 
-                    board->dmaWriteMotor(i, packet); // unsafe
+        virtual void dshotComplete(void) override
+        {
+            if (!commandQueueIsEmpty()) {
+                if (!commandOutputIsEnabled()) {
+                    return;
                 }
-
-                if (!commandQueueIsEmpty()) {
-                    if (!commandOutputIsEnabled()) {
-                        return;
-                    }
-                }
-
-                board->dmaUpdateComplete(); // unsafe
             }
         }
 

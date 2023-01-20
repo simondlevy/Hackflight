@@ -26,26 +26,9 @@ class BrushedEsc : public Esc {
 
     public:
 
-        BrushedEsc(std::vector<uint8_t> & pins)  
-            : Esc(BRUSHED)
+        BrushedEsc(std::vector<uint8_t> & motorPins)  
+            : Esc(BRUSHED, motorPins)
         {
-            m_pins = &pins;
-        }
-
-        virtual void begin(void) override
-        {
-            for (auto pin : *m_pins) {
-                // analogWriteFrequency(pin, 10000);
-                analogWrite(pin, 0);
-            }
-        }
-
-        virtual void write(const float values[]) override 
-        {
-            uint8_t k=0;
-            for (auto p: *m_pins) {
-                analogWrite(p, (uint8_t)(values[k++] * 255));
-            }
         }
 
         virtual float  convertFromExternal(const uint16_t value) override 
