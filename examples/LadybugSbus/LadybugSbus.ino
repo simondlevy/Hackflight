@@ -29,7 +29,7 @@ static AnglePidController anglePid(
         0.0165048,    // Rate Kf
         0.0); // 3.0; // Level Kp
 
-static vector<PidController *> pids = {&anglePid};
+static std::vector<PidController *> pids = {&anglePid};
 
 static Mixer mixer = QuadXbfMixer::make();
 

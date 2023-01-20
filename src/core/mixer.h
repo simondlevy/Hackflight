@@ -25,7 +25,6 @@
 #include "vstate.h"
 
 #include <vector>
-using namespace std;
 
 class Mixer {
 
@@ -53,7 +52,7 @@ class Mixer {
         auto step(
                 const Demands & stickDemands,
                 const VehicleState & state,
-                vector<PidController *> * pidControllers,
+                std::vector<PidController *> * pidControllers,
                 const bool pidReset,
                 const uint32_t usec) -> Motors
         {

@@ -21,17 +21,16 @@
 #include "esc.h"
 
 #include <vector>
-using namespace std;
 
 class BrushedEsc : public Esc {
 
     private:
 
-        vector<uint8_t> * m_pins;
+        std::vector<uint8_t> * m_pins;
 
     public:
 
-        BrushedEsc(vector<uint8_t> & pins)  
+        BrushedEsc(std::vector<uint8_t> & pins)  
         {
             m_pins = &pins;
         }

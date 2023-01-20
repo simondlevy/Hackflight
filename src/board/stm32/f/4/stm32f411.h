@@ -24,7 +24,7 @@ class Stm32F411Board : public Stm32F4Board {
 
     protected:
 
-       virtual void initPortsAndMotors(const vector<uint8_t> * motorPins)
+       virtual void initPortsAndMotors(const std::vector<uint8_t> * motorPins)
         {
             initStream1(0);
 
@@ -39,7 +39,7 @@ class Stm32F411Board : public Stm32F4Board {
         Stm32F411Board(
                 Receiver & receiver,
                 Imu & imu,
-                vector<PidController *> & pids,
+                std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 

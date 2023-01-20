@@ -19,7 +19,6 @@
 #include <stdint.h>
 
 #include <vector>
-using namespace std;
 
 #include "core/mixer.h"
 #include "esc.h"
@@ -40,7 +39,7 @@ class Core {
                 Imu * imu,
                 VehicleState & vstate,
                 Receiver * receiver,
-                vector<PidController *> * pidControllers,
+                std::vector<PidController *> * pidControllers,
                 Mixer * mixer,
                 Esc * esc,
                 const uint32_t usec,

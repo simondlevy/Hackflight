@@ -20,7 +20,6 @@
 #include <stdarg.h>
 
 #include <vector>
-using namespace std;
 
 #include "core.h"
 #include "core/mixer.h"
@@ -61,7 +60,7 @@ class Board {
         // Initialzed in sketch
         Esc *   m_esc;
         Mixer * m_mixer;
-        vector<PidController *> * m_pidControllers;
+        std::vector<PidController *> * m_pidControllers;
 
         Safety m_saftey;
 
@@ -70,7 +69,7 @@ class Board {
         Board(
                 Receiver & receiver,
                 Imu & imu,
-                vector<PidController *> & pidControllers,
+                std::vector<PidController *> & pidControllers,
                 Mixer & mixer,
                 Esc & esc,
                 const int8_t ledPin)
@@ -248,7 +247,7 @@ class Board {
         virtual void startCycleCounter(void) = 0;
 
         virtual void dmaInit(
-                const vector<uint8_t> * motorPins, const uint32_t outputFreq)
+                const std::vector<uint8_t> * motorPins, const uint32_t outputFreq)
         {
             (void)motorPins;
             (void)outputFreq;

@@ -25,7 +25,6 @@
 #include <esc/dshot.h>
 
 #include <vector>
-using namespace std;
 
 // IMU
 static const uint8_t MOSI_PIN = PA7;
@@ -34,7 +33,7 @@ static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PC4;
 
-static vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
+static std::vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
 
 static const uint8_t LED_PIN = PB5;
 
@@ -51,7 +50,7 @@ static SbusReceiver rx;
 
 static Mpu6x00 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, Imu::rotate270);
 
-static vector<PidController *> pids = {&anglePid};
+static std::vector<PidController *> pids = {&anglePid};
 
 static DshotEsc esc(&MOTOR_PINS);
 

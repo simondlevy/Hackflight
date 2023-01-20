@@ -25,7 +25,6 @@
 #include <receiver/dsmx.h>
 
 #include <vector>
-using namespace std;
 
 // IMU
 static const uint8_t MOSI_PIN = PA7;
@@ -35,7 +34,7 @@ static const uint8_t CS_PIN   = PA4;
 
 static const uint8_t EXTI_PIN = PB0;
 
-static vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
+static std::vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
 
 //static const uint8_t LED_PIN  = PC13; // orange
 static const uint8_t LED_PIN  = PC14; // blue
@@ -55,7 +54,7 @@ static DsmxReceiver rx;
 
 static Mpu6x00 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, Imu::rotate180);
 
-static vector<PidController *> pids = {&anglePid};
+static std::vector<PidController *> pids = {&anglePid};
 
 static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
 

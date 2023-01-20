@@ -280,7 +280,7 @@ class Stm32F4Board : public Stm32FBoard {
         } // initPort
 
         virtual void dmaInit(
-                const vector<uint8_t> * motorPins, const uint32_t outputFreq) override
+                const std::vector<uint8_t> * motorPins, const uint32_t outputFreq) override
         {
             RCC_APB2PeriphClockEnable(
                     RCC_APB2LPENR_TIM1LPEN_Msk   |
@@ -340,7 +340,7 @@ class Stm32F4Board : public Stm32FBoard {
     protected:
 
         void initMotor(
-                const vector<uint8_t> * motorPins,
+                const std::vector<uint8_t> * motorPins,
                 const uint8_t motorIndex,
                 const uint8_t portIndex)
         {
@@ -432,7 +432,7 @@ class Stm32F4Board : public Stm32FBoard {
                     TIM_CCER_CC2NP, TIM_CR2_OIS2, 8, 4, 4, 4);
         }
 
-        virtual void initPortsAndMotors(const vector<uint8_t> * motorPins) = 0;
+        virtual void initPortsAndMotors(const std::vector<uint8_t> * motorPins) = 0;
 
     public:
 
@@ -440,7 +440,7 @@ class Stm32F4Board : public Stm32FBoard {
                 const uint8_t portCount,
                 Receiver & receiver,
                 Imu & imu,
-                vector<PidController *> & pids,
+                std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 

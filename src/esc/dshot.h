@@ -79,7 +79,7 @@ class DshotEsc : public Esc {
 
         bool m_enabled = false;
 
-        vector <uint8_t> * m_pins;
+        std::vector <uint8_t> * m_pins;
 
         bool isLastCommand(void)
         {
@@ -246,7 +246,7 @@ class DshotEsc : public Esc {
 
     public:
 
-        DshotEsc(vector<uint8_t> * motorPins, protocol_t protocol=DSHOT600) 
+        DshotEsc(std::vector<uint8_t> * motorPins, protocol_t protocol=DSHOT600) 
         {
             m_pins = motorPins;
             m_protocol = protocol;

@@ -22,9 +22,6 @@
 #include <math.h>
 #include <stdint.h>
 
-#include <vector>
-using namespace std;
-
 #include "board.h"
 #include "core/mixer.h"
 #include "esc.h"

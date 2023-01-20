@@ -29,7 +29,7 @@ class LadybugBoard : public Stm32Board {
 
         static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
 
-        vector<uint8_t> motorPins = {0x0D, 0x10, 0x03, 0x0B};
+        std::vector<uint8_t> motorPins = {0x0D, 0x10, 0x03, 0x0B};
 
         UsfsImu imu = UsfsImu(Imu::rotate0);
 
@@ -39,7 +39,7 @@ class LadybugBoard : public Stm32Board {
 
         static const uint8_t LED_PIN = 0x12;
 
-        LadybugBoard(Receiver & rx, vector<PidController *> & pids, Mixer & mixer)
+        LadybugBoard(Receiver & rx, std::vector<PidController *> & pids, Mixer & mixer)
             : Stm32Board(rx, imu, pids, mixer, esc, -LED_PIN) // note inverted LED pin
         {
         }

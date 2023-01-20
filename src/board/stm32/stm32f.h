@@ -39,7 +39,7 @@ class Stm32FBoard : public Stm32Board {
         Stm32FBoard(
                 Receiver & receiver,
                 Imu & imu,
-                vector<PidController *> & pids,
+                std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 
