@@ -129,7 +129,7 @@ class Icm42688 : public InvenSenseImu {
 
             writeRegister(UB0_REG_DEVICE_CONFIG, 0x01);
 
-            delay(1);
+            delay(15);
 
             writeRegister(REG_PWR_MGMT0,
                     PWR_MGMT0_TEMP_DISABLE_OFF |
@@ -145,31 +145,50 @@ class Icm42688 : public InvenSenseImu {
 
             // Configure gyro Anti-Alias Filter (see section 5.3 "ANTI-ALIAS FILTER")
             writeRegister(REG_GYRO_CONFIG_STATIC3, m_antiAliasDelta);
+            delay(15);
+
             uint16_t deltSqr = m_antiAliasDelta * m_antiAliasDelta;
             writeRegister(REG_GYRO_CONFIG_STATIC4, deltSqr & 0xFF);
+            delay(15);
+
             writeRegister(REG_GYRO_CONFIG_STATIC5,
                     (deltSqr >> 8) | (m_antiAliasBitshift << 4));
+            delay(15);
 
             // Configure acc Anti-Alias Filter for 1kHz sample rate (see tasks.c)
             writeRegister(REG_ACCEL_CONFIG_STATIC2, m_antiAliasDelta << 1);
+            delay(15);
+
             writeRegister(REG_ACCEL_CONFIG_STATIC3, deltSqr & 0xFF);
+            delay(15);
+
             writeRegister(REG_ACCEL_CONFIG_STATIC4,
                     (deltSqr >> 8) | (m_antiAliasBitshift << 4));
+            delay(15);
 
             // Configure gyro and acc UI Filters
             writeRegister(REG_GYRO_ACCEL_CONFIG0,
                     ACCEL_UI_FILT_BW_LOW_LATENCY | GYRO_UI_FILT_BW_LOW_LATENCY);
+            delay(15);
+
             writeRegister(REG_INT_CONFIG,
                     INT1_MODE_PULSED | INT1_DRIVE_CIRCUIT_PP | INT1_POLARITY_ACTIVE_HIGH);
+            delay(15);
+
             writeRegister(REG_INT_CONFIG0, UI_DRDY_INT_CLEAR_ON_SBR);
+            delay(15);
+
             writeRegister(REG_INT_SOURCE0, UI_DRDY_INT1_EN_ENABLED);
+            delay(15);
 
             // Datasheet says: "User should change setting to 0 from default
             // setting of 1, for proper INT1 and INT2 pin operation"
             uint8_t intConfig1Value = readRegister(REG_INT_CONFIG1);
             intConfig1Value &= ~(1 << INT_ASYNC_RESET_BIT);
+
             intConfig1Value |= (INT_TPULSE_DURATION_8 | INT_TDEASSERT_DISABLED);
             writeRegister(REG_INT_CONFIG1, intConfig1Value);
+            delay(15);
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
