@@ -33,7 +33,7 @@ class Imu {
         typedef enum {
 
             MOCK,
-            SOFTQUAT,
+            INVENSENSE,
             USFS
 
         } type_e;
@@ -227,7 +227,6 @@ class Imu {
 
             m_rotateFun = rotateFun;
             m_gyroScale = gyroScale / 32768.;
-
         }
 
     public:
