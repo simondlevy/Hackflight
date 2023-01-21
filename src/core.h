@@ -36,7 +36,6 @@ class Core {
     public:
 
         void getMotorValues(
-                Imu * imu,
                 VehicleState & vstate,
                 Receiver * receiver,
                 std::vector<PidController *> * pidControllers,
@@ -45,15 +44,6 @@ class Core {
                 const uint32_t usec,
                 float mixmotors[])
         {
-            if (imu->gyroIsReady()) {
-
-                auto angvels = imu->readGyroDps();
-
-                vstate.dphi   = angvels.x;
-                vstate.dtheta = angvels.y;
-                vstate.dpsi   = angvels.z;
-            }
-
             Demands demands = receiver->getDemands();
 
             auto motors = mixer->step(
