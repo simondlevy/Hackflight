@@ -79,48 +79,42 @@ class Mpu6x00 : public InvenSenseImu {
 
             // Chip reset
             writeRegister(REG_PWR_MGMT_1, BIT_H_RESET);
-            delay(100);
+            delay(15);
 
             // Clock Source PPL with Z axis gyro reference
             writeRegister(REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
-            delayMicroseconds(7);
+            delay(15);
 
             // Disable Primary I2C Interface
             writeRegister(REG_USER_CTRL, BIT_I2C_IF_DIS);
-            delayMicroseconds(15);
+            delay(15);
 
             writeRegister(REG_PWR_MGMT_2, 0x00);
-            delayMicroseconds(15);
+            delay(15);
 
             // Accel Sample Rate 1kHz
             // Gyroscope Output Rate =  1kHz when the DLPF is enabled
             writeRegister(REG_SMPLRT_DIV, 0);
-            delayMicroseconds(15);
+            delay(15);
 
             // Gyro +/- 2000 DPS Full Scale
             writeRegister(REG_GYRO_CONFIG, m_gyroScale << 3);
-            delayMicroseconds(15);
+            delay(15);
 
             // Accel +/- 16 G Full Scale
             writeRegister(REG_ACCEL_CONFIG, m_accelScale << 3);
-            delayMicroseconds(15);
+            delay(15);
 
             // INT_ANYRD_2CLEAR
             writeRegister(REG_INT_PIN_CFG, 0x10);
-
-            delayMicroseconds(15);
+            delay(15);
 
             writeRegister(REG_INT_ENABLE, BIT_RAW_RDY_EN);
-            delayMicroseconds(15);
-
-            //setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLK_HZ));
-            //delayMicroseconds(1);
-
-            //setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_INIT_CLK_HZ));
+            delay(15);
 
             // Accel and Gyro DLPF Setting
             writeRegister(REG_CONFIG, 0); // no gyro DLPF
-            delayMicroseconds(1);
+            delay(15);
 
             setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLK_HZ));
 
