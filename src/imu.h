@@ -133,7 +133,7 @@ class Imu {
             m_gyroCalibrationCyclesRemaining = (int32_t)calculateGyroCalibratingCycles();
         }
 
-        void calibrateGyroAxis(gyroAxis_t & axis, const uint8_t index)
+        void calibrateGyroAxis(int16_t rawGyro[3], gyroAxis_t & axis, const uint8_t index)
         {
             // Reset at start of calibration
             if (m_gyroCalibrationCyclesRemaining ==
@@ -145,8 +145,8 @@ class Imu {
             }
 
             // Sum up CALIBRATING_GYRO_TIME_US readings
-            m_gyroCalibration.sum[index] += readRawGyro(index);
-            m_gyroCalibration.stats[index].stdevPush(readRawGyro(index));
+            m_gyroCalibration.sum[index] += rawGyro[index];
+            m_gyroCalibration.stats[index].stdevPush(rawGyro[index]);
 
             if (m_gyroCalibrationCyclesRemaining == 1) {
                 const float stddev = m_gyroCalibration.stats[index].stdevCompute();
@@ -162,11 +162,11 @@ class Imu {
             }
         }
 
-        void calibrateGyro(void)
+        void calibrateGyro(int16_t rawGyro[3])
         {
-            calibrateGyroAxis(m_gyroX, 0);
-            calibrateGyroAxis(m_gyroY, 1);
-            calibrateGyroAxis(m_gyroZ, 2);
+            calibrateGyroAxis(rawGyro, m_gyroX, 0);
+            calibrateGyroAxis(rawGyro, m_gyroY, 1);
+            calibrateGyroAxis(rawGyro, m_gyroZ, 2);
 
             --m_gyroCalibrationCyclesRemaining;
         }
@@ -186,9 +186,9 @@ class Imu {
             axis.dps = adc * m_gyroScale; 
         }
 
-        float readCalibratedGyro(gyroAxis_t & axis, uint8_t index)
+        float readCalibratedGyro(int16_t rawGyro[3], gyroAxis_t & axis, uint8_t index)
         {
-            return readRawGyro(index) - axis.zero;
+            return rawGyro[index] - axis.zero;
         }
 
     protected:
@@ -198,8 +198,6 @@ class Imu {
         gyroAxis_t m_gyroX;
         gyroAxis_t m_gyroY;
         gyroAxis_t m_gyroZ;
-
-        virtual int16_t readRawGyro(uint8_t k) = 0;
 
         static auto quat2euler(
                 const float qw, const float qx, const float qy, const float qz) -> Axes 
@@ -237,7 +235,7 @@ class Imu {
 
         virtual void handleInterrupt(const uint32_t cycleCounter) = 0;
 
-        virtual auto readGyroDps(void) -> Axes
+        virtual auto gyroRawToDps(int16_t rawGyro[3]) -> Axes
         {
             const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
 
@@ -248,14 +246,14 @@ class Imu {
                 // move 16-bit gyro data into floats to avoid overflows in
                 // calculations
 
-                _adc.x = readCalibratedGyro(m_gyroX, 0);
-                _adc.y = readCalibratedGyro(m_gyroY, 1);
-                _adc.z = readCalibratedGyro(m_gyroZ, 2);
+                _adc.x = readCalibratedGyro(rawGyro, m_gyroX, 0);
+                _adc.y = readCalibratedGyro(rawGyro, m_gyroY, 1);
+                _adc.z = readCalibratedGyro(rawGyro, m_gyroZ, 2);
 
                 _adc = m_rotateFun(_adc);
 
             } else {
-                calibrateGyro();
+                calibrateGyro(rawGyro);
             }
 
             if (calibrationComplete) {
@@ -282,7 +280,7 @@ class Imu {
             return Axes(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
         }
 
-         virtual bool gyroIsCalibrating(void)
+        virtual bool gyroIsCalibrating(void)
         {
             return m_gyroIsCalibrating;
         }
@@ -302,9 +300,9 @@ class Imu {
             setGyroCalibrationCycles(); 
         }
 
-        virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
+        virtual void getRawGyro(int16_t rawGyro[3]) = 0;
 
-        virtual void getRawData(void) = 0;
+        virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 
         virtual void updateAccelerometer(void)
         {

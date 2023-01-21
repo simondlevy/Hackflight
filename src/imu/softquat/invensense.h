@@ -185,9 +185,13 @@ class InvenSenseImu : public SoftQuatImu {
             m_spi.setClockDivider(divider);
         }
 
-        virtual void getRawData(void) override
+        virtual void getRawGyro(int16_t rawGyro[3]) override
         {
             readRegisters(m_dataRegister);
+
+            rawGyro[0] = getShortFromBuffer(4, 0);
+            rawGyro[1] = getShortFromBuffer(4, 1);
+            rawGyro[2] = getShortFromBuffer(4, 2);
         }
 
 };

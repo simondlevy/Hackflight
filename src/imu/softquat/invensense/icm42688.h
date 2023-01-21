@@ -160,12 +160,6 @@ class Icm42688 : public InvenSenseImu {
             settings.push_back({REG_INT_CONFIG1, intConfig1Value});
         }
 
-        virtual int16_t readRawGyro(uint8_t k) override
-        {
-            // Gyro data is fifth value
-            return getShortFromBuffer(4, k);
-        }
-
         virtual int16_t readRawAccel(uint8_t k) override
         {
             // Accel data is second value, after temperature

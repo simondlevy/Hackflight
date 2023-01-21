@@ -313,12 +313,12 @@ class SoftQuatImu : public Imu {
             Imu::begin(clockSpeed);
         }
 
-        auto readGyroDps(void) -> Axes
+        auto gyroRawToDps(int16_t rawGyro[3]) -> Axes
         {
             m_gyroAccum.accumulate(
                     m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
 
-            return Imu::readGyroDps();
+            return Imu::gyroRawToDps(rawGyro);
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override

@@ -60,11 +60,6 @@ class Mpu6x00 : public InvenSenseImu {
             InvenSenseImu::begin(clockSpeed, MAX_SPI_INIT_CLK_HZ, MAX_SPI_CLK_HZ);
         }
 
-        virtual int16_t readRawGyro(uint8_t k) override
-        {
-            return getShortFromBuffer(4, k);
-        }
-
         virtual int16_t readRawAccel(uint8_t k) override
         {
             return getShortFromBuffer(0, k);

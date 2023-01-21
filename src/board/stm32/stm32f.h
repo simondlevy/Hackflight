@@ -105,9 +105,9 @@ class Stm32FBoard : public Stm32Board {
             return true;
         }
 
-        virtual void getRawImuData(void) 
+        virtual void getRawGyro(int16_t rawGyro[3])
         {
-            m_imu->getRawData();
+            return m_imu->getRawGyro(rawGyro);
         }
 
     public:

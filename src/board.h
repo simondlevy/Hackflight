@@ -90,6 +90,8 @@ class Board {
 
         virtual bool gyroIsReady(void) = 0;
 
+        virtual void getRawGyro(int16_t rawGyro[3]) = 0;
+
     private:
 
        void runDynamicTasks(void)
@@ -287,8 +289,6 @@ class Board {
             (void)usec;
         }
         
-        virtual void getRawImuData(void) = 0;
-
     public:
 
         void handleImuInterrupt(void)
@@ -375,9 +375,11 @@ class Board {
 
                 if (gyroIsReady()) {
 
-                    getRawImuData();
+                    int16_t rawGyro[3] = {};
 
-                    auto angvels = m_imu->readGyroDps();
+                    getRawGyro(rawGyro);
+
+                    auto angvels = m_imu->gyroRawToDps(rawGyro);
 
                     m_vstate.dphi   = angvels.x;
                     m_vstate.dtheta = angvels.y;
