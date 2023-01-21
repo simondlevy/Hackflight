@@ -36,6 +36,8 @@ class Core {
     public:
 
         void getMotorValues(
+                int16_t rawGyro[3],
+                Imu * imu,
                 VehicleState & vstate,
                 Receiver * receiver,
                 std::vector<PidController *> * pidControllers,
@@ -44,6 +46,12 @@ class Core {
                 const uint32_t usec,
                 float mixmotors[])
         {
+            auto angvels = imu->gyroRawToDps(rawGyro);
+
+            vstate.dphi   = angvels.x;
+            vstate.dtheta = angvels.y;
+            vstate.dpsi   = angvels.z;
+
             Demands demands = receiver->getDemands();
 
             auto motors = mixer->step(
@@ -54,7 +62,6 @@ class Core {
                 mixmotors[i] = esc->getMotorValue(motors.values[i]);
             }
         }
-
 
         bool isDynamicTaskReady(const uint32_t nowCycles)
         {
@@ -76,7 +83,7 @@ class Core {
             task.update(usecStart, usecEnd-usecStart);
             m_scheduler.updateDynamic(nowCycles, anticipatedEndCycles);
         }
- 
+
         uint32_t getAnticipatedEndCycles(Task & task, const uint32_t nowCycles)
         {
             return m_scheduler.getAnticipatedEndCycles(task, nowCycles);

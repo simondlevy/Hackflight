@@ -373,22 +373,18 @@ class Board {
                     loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
                 }
 
+                static int16_t rawGyro[3];
+
                 if (gyroIsReady()) {
 
-                    int16_t rawGyro[3] = {};
-
                     getRawGyro(rawGyro);
-
-                    auto angvels = m_imu->gyroRawToDps(rawGyro);
-
-                    m_vstate.dphi   = angvels.x;
-                    m_vstate.dtheta = angvels.y;
-                    m_vstate.dpsi   = angvels.z;
-                }
+               }
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
                 m_core.getMotorValues(
+                        rawGyro,
+                        m_imu,
                         m_vstate,
                         m_receiverTask.receiver,
                         m_pidControllers,
