@@ -52,6 +52,8 @@ class InvenSenseImu : public SoftQuatImu {
 
     private:
 
+        uint8_t m_dataRegister;
+
         uint8_t m_misoPin;
         uint8_t m_mosiPin;
         uint8_t m_sclkPin;
@@ -122,6 +124,7 @@ class InvenSenseImu : public SoftQuatImu {
                     gyroScaleToInt(gyroScale),
                     accelScaleToInt(accelScale))
         {
+            m_dataRegister = dataRegister;
             m_mosiPin = mosiPin;
             m_misoPin = misoPin;
             m_sclkPin = sclkPin;
@@ -180,6 +183,11 @@ class InvenSenseImu : public SoftQuatImu {
         void setClockDivider(uint32_t divider)
         {
             m_spi.setClockDivider(divider);
+        }
+
+        virtual void getRawData(void) override
+        {
+            readRegisters(m_dataRegister);
         }
 
 };

@@ -55,11 +55,6 @@ class Mpu6x00 : public InvenSenseImu {
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
-        virtual void getRawData(void) override
-        {
-            readRegisters(REG_ACCEL_XOUT_H);
-        }
-
         virtual void begin(uint32_t clockSpeed) override
         {
             InvenSenseImu::begin(clockSpeed, MAX_SPI_INIT_CLK_HZ, MAX_SPI_CLK_HZ);

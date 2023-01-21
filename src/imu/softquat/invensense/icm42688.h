@@ -104,14 +104,6 @@ class Icm42688 : public InvenSenseImu {
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
-        virtual bool gyroIsReady(void) override
-        {
-             readRegisters(REG_TEMP_DATA_A1);
-
-            // If we call this infrequently enough, gyro will always be ready
-            return true;
-        }
-
         virtual void begin(uint32_t clockSpeed) override
         {
             InvenSenseImu::begin(clockSpeed, MAX_SPI_CLOCK_RATE, MAX_SPI_CLOCK_RATE);
@@ -194,7 +186,14 @@ class Icm42688 : public InvenSenseImu {
                 const uint8_t antiAliasDelta = 6,
                 const uint8_t antiAliasBitshift = 10)
             : InvenSenseImu(
-                    mosiPin, misoPin, sclkPin, csPin, rotateFun, gyroScale, accelScale)
+                    REG_TEMP_DATA_A1,
+                    mosiPin,
+                    misoPin,
+                    sclkPin,
+                    csPin,
+                    rotateFun,
+                    gyroScale,
+                    accelScale)
     {
         m_odr = odr;
         m_antiAliasDelta = antiAliasDelta;
