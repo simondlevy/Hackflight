@@ -81,6 +81,15 @@ class Stm32FBoard : public Stm32Board {
             m_spi.setClockDivider(divider);
         }
 
+        void imuBegin(void)
+        {
+            switch (m_imu->type) {
+
+                default:
+                    break;
+            }
+        }
+
     protected:
 
         virtual void prioritizeExtraTasks(
@@ -107,6 +116,8 @@ class Stm32FBoard : public Stm32Board {
         void begin(void)
         {
             Board::begin();
+
+            imuBegin();
 
             m_accelerometerTask.begin(m_imu);
         }
