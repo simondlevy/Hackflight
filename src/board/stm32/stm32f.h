@@ -105,6 +105,11 @@ class Stm32FBoard : public Stm32Board {
             return true;
         }
 
+        virtual void getRawImuData(void) 
+        {
+            m_imu->getRawData();
+        }
+
     public:
 
         Stm32FBoard(

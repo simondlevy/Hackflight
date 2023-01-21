@@ -286,6 +286,8 @@ class Board {
             (void)prioritizer;
             (void)usec;
         }
+        
+        virtual void getRawImuData(void) = 0;
 
     public:
 
@@ -373,7 +375,7 @@ class Board {
 
                 if (gyroIsReady()) {
 
-                    m_imu->getRawData();
+                    getRawImuData();
 
                     auto angvels = m_imu->readGyroDps();
 
