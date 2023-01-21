@@ -88,6 +88,8 @@ class Board {
             m_ledInverted = ledPin < 0;
         }
 
+        virtual bool gyroIsReady(void) = 0;
+
     private:
 
        void runDynamicTasks(void)
@@ -369,7 +371,7 @@ class Board {
                     loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
                 }
 
-                if (m_imu->gyroIsReady()) {
+                if (gyroIsReady()) {
 
                     m_imu->getRawData();
 

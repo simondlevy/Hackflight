@@ -304,8 +304,6 @@ class Imu {
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 
-        virtual bool gyroIsReady(void) = 0;
-
         virtual void getRawData(void) = 0;
 
         virtual void updateAccelerometer(void)

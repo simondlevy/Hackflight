@@ -100,6 +100,11 @@ class Stm32FBoard : public Stm32Board {
             m_skyrangerTask.prioritize(usec, prioritizer);
         }
 
+        virtual bool gyroIsReady(void) 
+        {
+            return true;
+        }
+
     public:
 
         Stm32FBoard(
