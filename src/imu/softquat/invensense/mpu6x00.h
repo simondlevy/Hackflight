@@ -57,10 +57,13 @@ class Mpu6x00 : public InvenSenseImu {
 
         virtual bool gyroIsReady(void) override
         {
-            readRegisters(REG_ACCEL_XOUT_H);
-
             // If we call this infrequently enough, gyro will always be ready
             return true;
+        }
+
+        virtual void getRawData(void) override
+        {
+            readRegisters(REG_ACCEL_XOUT_H);
         }
 
         virtual void begin(uint32_t clockSpeed) override

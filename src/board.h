@@ -371,6 +371,8 @@ class Board {
 
                 if (m_imu->gyroIsReady()) {
 
+                    m_imu->getRawData();
+
                     auto angvels = m_imu->readGyroDps();
 
                     m_vstate.dphi   = angvels.x;

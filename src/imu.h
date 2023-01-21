@@ -306,6 +306,8 @@ class Imu {
 
         virtual bool gyroIsReady(void) = 0;
 
+        virtual void getRawData(void) = 0;
+
         virtual void updateAccelerometer(void)
         {
         }
