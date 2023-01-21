@@ -28,6 +28,18 @@
 
 class Imu {
 
+    public:
+
+        typedef enum {
+
+            MOCK,
+            SOFTQUAT,
+            USFS
+
+        } type_e;
+
+        type_e type;
+
     private:
 
         static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
@@ -124,7 +136,8 @@ class Imu {
         void calibrateGyroAxis(gyroAxis_t & axis, const uint8_t index)
         {
             // Reset at start of calibration
-            if (m_gyroCalibrationCyclesRemaining == (int32_t)calculateGyroCalibratingCycles()) {
+            if (m_gyroCalibrationCyclesRemaining ==
+                    (int32_t)calculateGyroCalibratingCycles()) {
                 m_gyroCalibration.sum[index] = 0.0f;
                 m_gyroCalibration.stats[index].stdevClear();
                 // zero is set to zero until calibration complete
@@ -205,10 +218,13 @@ class Imu {
 
         Imu(void) 
         {
+           this->type = MOCK;
         }
 
-        Imu(const rotateFun_t rotateFun, const uint16_t gyroScale)
+        Imu(const type_e type, const rotateFun_t rotateFun, const uint16_t gyroScale)
         {
+            this->type = type;
+
             m_rotateFun = rotateFun;
             m_gyroScale = gyroScale / 32768.;
 

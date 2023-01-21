@@ -297,7 +297,7 @@ class SoftQuatImu : public Imu {
                 const rotateFun_t rotateFun,
                 const uint16_t gyroScale,
                 const uint16_t accelScale)
-            : Imu(rotateFun, gyroScale)
+            : Imu(SOFTQUAT, rotateFun, gyroScale)
         {
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;

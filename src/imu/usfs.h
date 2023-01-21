@@ -99,7 +99,7 @@ class UsfsImu : public Imu {
     public:
 
         UsfsImu(rotateFun_t rotateFun) 
-            : Imu(rotateFun, 1.53e-1) // gyro rate fixed in master mode
+            : Imu(USFS, rotateFun, GYRO_SCALE_DPS)
         {
         }
 
