@@ -18,8 +18,6 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <SPI.h>
-
 #include <stdint.h>
 
 #include "imu/softquat/invensense.h"
@@ -54,12 +52,6 @@ class Mpu6x00 : public InvenSenseImu {
 
         accelScale_e m_accelScale;
 
-        static float scale(const uint16_t n)
-        {
-            return n / 32768.0;
-        }
-
-
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
@@ -73,51 +65,7 @@ class Mpu6x00 : public InvenSenseImu {
 
         virtual void begin(uint32_t clockSpeed) override
         {
-            InvenSenseImu::begin(clockSpeed);
-
-            m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_INIT_CLK_HZ));
-
-            // Chip reset
-            writeRegister(REG_PWR_MGMT_1, BIT_H_RESET);
-            delay(15);
-
-            // Clock Source PPL with Z axis gyro reference
-            writeRegister(REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
-            delay(15);
-
-            // Disable Primary I2C Interface
-            writeRegister(REG_USER_CTRL, BIT_I2C_IF_DIS);
-            delay(15);
-
-            writeRegister(REG_PWR_MGMT_2, 0x00);
-            delay(15);
-
-            // Accel Sample Rate 1kHz
-            // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-            writeRegister(REG_SMPLRT_DIV, 0);
-            delay(15);
-
-            // Gyro +/- 2000 DPS Full Scale
-            writeRegister(REG_GYRO_CONFIG, m_gyroScale << 3);
-            delay(15);
-
-            // Accel +/- 16 G Full Scale
-            writeRegister(REG_ACCEL_CONFIG, m_accelScale << 3);
-            delay(15);
-
-            // INT_ANYRD_2CLEAR
-            writeRegister(REG_INT_PIN_CFG, 0x10);
-            delay(15);
-
-            writeRegister(REG_INT_ENABLE, BIT_RAW_RDY_EN);
-            delay(15);
-
-            // Accel and Gyro DLPF Setting
-            writeRegister(REG_CONFIG, 0); // no gyro DLPF
-            delay(15);
-
-            setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLK_HZ));
-
+            InvenSenseImu::begin(clockSpeed, MAX_SPI_INIT_CLK_HZ, MAX_SPI_CLK_HZ);
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
@@ -128,6 +76,23 @@ class Mpu6x00 : public InvenSenseImu {
         virtual int16_t readRawAccel(uint8_t k) override
         {
             return getShortFromBuffer(0, k);
+        }
+
+    protected:
+
+        virtual void getRegisterSettings(
+                std::vector<registerSetting_t> & settings) override
+        {
+            settings.push_back({REG_PWR_MGMT_1, BIT_H_RESET});
+            settings.push_back({REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ});
+            settings.push_back({REG_USER_CTRL, BIT_I2C_IF_DIS});
+            settings.push_back({REG_PWR_MGMT_2, 0x00});
+            settings.push_back({REG_SMPLRT_DIV, 0});
+            settings.push_back({REG_GYRO_CONFIG, (uint8_t)(m_gyroScale << 3)});
+            settings.push_back({REG_ACCEL_CONFIG, (uint8_t)(m_accelScale << 3)});
+            settings.push_back({REG_INT_PIN_CFG, 0x10});
+            settings.push_back({REG_INT_ENABLE, BIT_RAW_RDY_EN});
+            settings.push_back({REG_CONFIG, 0});
         }
 
     public:
@@ -148,9 +113,9 @@ class Mpu6x00 : public InvenSenseImu {
                     rotateFun,
                     gyroScale,
                     accelScale)
-        {
-            m_gyroScale = gyroScale;
-            m_accelScale = accelScale;
-        }
+    {
+        m_gyroScale = gyroScale;
+        m_accelScale = accelScale;
+    }
 
 }; // class Mpu6x00

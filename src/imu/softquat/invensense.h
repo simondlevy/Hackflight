@@ -84,9 +84,17 @@ class InvenSenseImu : public SoftQuatImu {
                 16;
         }
 
-
     protected:
 
+        typedef struct {
+
+            uint8_t address;
+            uint8_t value;
+
+        } registerSetting_t;
+
+        virtual void getRegisterSettings(std::vector<registerSetting_t> & settings) = 0;
+ 
         SPIClass m_spi;
 
         // Enough room for seven two-byte integers (gyro XYZ, temperature,
@@ -116,14 +124,31 @@ class InvenSenseImu : public SoftQuatImu {
             m_csPin = csPin;
         }
 
-        void begin(uint32_t clockSpeed)
+        void begin(
+                const uint32_t clockSpeed,
+                const uint32_t initClockFreq,
+                const uint32_t maxClockFreq)
         {
             m_spi.setMOSI(m_mosiPin);
             m_spi.setMISO(m_misoPin);
             m_spi.setSCLK(m_sclkPin);
+
             m_spi.begin();
 
             pinMode(m_csPin, OUTPUT);
+
+            m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, initClockFreq));
+
+            std::vector<registerSetting_t> registerSettings;
+
+            getRegisterSettings(registerSettings);
+
+            for (auto r : registerSettings) {
+                writeRegister(r.address, r.value);
+                delay(15);
+            }
+
+            m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, maxClockFreq));
 
             SoftQuatImu::begin(clockSpeed);
         }

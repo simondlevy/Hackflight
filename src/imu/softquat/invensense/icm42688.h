@@ -189,6 +189,8 @@ class Icm42688 : public InvenSenseImu {
             intConfig1Value |= (INT_TPULSE_DURATION_8 | INT_TDEASSERT_DISABLED);
             writeRegister(REG_INT_CONFIG1, intConfig1Value);
             delay(15);
+
+            m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, MAX_SPI_CLOCK_RATE));
         }
 
         virtual int16_t readRawGyro(uint8_t k) override
