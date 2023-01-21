@@ -31,7 +31,7 @@ class Stm32Board : public Board {
 
         Stm32Board(
                 Receiver & receiver,
-                Imu & imu,
+                Imu * imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,

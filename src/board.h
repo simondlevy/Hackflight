@@ -71,7 +71,7 @@ class Board {
 
         Board(
                 Receiver & receiver,
-                Imu & imu,
+                Imu * imu,
                 std::vector<PidController *> & pidControllers,
                 Mixer & mixer,
                 Esc & esc,
@@ -79,7 +79,7 @@ class Board {
         {
             m_receiverTask.receiver = &receiver;
 
-            m_imu = &imu;
+            m_imu = imu;
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
             m_esc = &esc;

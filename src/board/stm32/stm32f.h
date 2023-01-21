@@ -21,12 +21,15 @@
 #include "board/stm32.h"
 #include "task/accelerometer.h"
 #include "imu.h"
+#include "imu/softquat.h"
 
 class Stm32FBoard : public Stm32Board {
 
     private:
 
         SPIClass m_spi;
+
+        SoftQuatImu * m_softQuatImu;
 
         uint8_t m_csPin;
 
@@ -81,15 +84,6 @@ class Stm32FBoard : public Stm32Board {
             m_spi.setClockDivider(divider);
         }
 
-        void imuBegin(void)
-        {
-            switch (m_imu->type) {
-
-                default:
-                    break;
-            }
-        }
-
     protected:
 
         virtual void prioritizeExtraTasks(
@@ -114,20 +108,21 @@ class Stm32FBoard : public Stm32Board {
 
         Stm32FBoard(
                 Receiver & receiver,
-                Imu & imu,
+                SoftQuatImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 
-            : Stm32Board(receiver, imu, pids, mixer, esc, ledPin)
+            : Stm32Board(receiver, &imu, pids, mixer, esc, ledPin)
         {
+            m_softQuatImu = &imu;
         }
 
         void begin(void)
         {
             Board::begin();
 
-            imuBegin();
+            // XXX start SPI here
 
             m_accelerometerTask.begin(m_imu);
         }
