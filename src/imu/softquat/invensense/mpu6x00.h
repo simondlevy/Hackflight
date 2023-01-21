@@ -103,6 +103,7 @@ class Mpu6x00 : public InvenSenseImu {
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
             : InvenSenseImu(
+                    REG_ACCEL_XOUT_H,
                     mosiPin,
                     misoPin,
                     sclkPin,

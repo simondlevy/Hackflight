@@ -108,6 +108,7 @@ class InvenSenseImu : public SoftQuatImu {
         }
 
         InvenSenseImu(
+                const uint8_t dataRegister,
                 const uint8_t mosiPin,
                 const uint8_t misoPin,
                 const uint8_t sclkPin,
