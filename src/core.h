@@ -35,7 +35,7 @@ class Core {
 
     public:
 
-        void startCoreTask(
+        void getMotorValues(
                 Imu * imu,
                 VehicleState & vstate,
                 Receiver * receiver,
@@ -97,7 +97,7 @@ class Core {
             return m_scheduler.isCoreReady(nowCycles);
         }
 
-        void completeCoreTask(
+        void updateScheduler(
                 Imu * imu,
                 const uint32_t imuInterruptCount,
                 const uint32_t nowCycles,

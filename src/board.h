@@ -371,7 +371,7 @@ class Board {
                 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
-                m_core.startCoreTask(
+                m_core.getMotorValues(
                         m_imu,
                         m_vstate,
                         m_receiverTask.receiver,
@@ -383,7 +383,7 @@ class Board {
 
                 escWrite(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
 
-                m_core.completeCoreTask(
+                m_core.updateScheduler(
                         m_imu, m_imuInterruptCount, nowCycles, nextTargetCycles);
             }
 
