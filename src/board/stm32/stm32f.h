@@ -20,8 +20,7 @@
 
 #include "board/stm32.h"
 #include "task/accelerometer.h"
-#include "imu.h"
-#include "imu/softquat.h"
+#include "imu/softquat/invensense.h"
 
 class Stm32FBoard : public Stm32Board {
 
@@ -29,7 +28,7 @@ class Stm32FBoard : public Stm32Board {
 
         SPIClass m_spi;
 
-        SoftQuatImu * m_softQuatImu;
+        InvenSenseImu * m_invenSenseImu;
 
         uint8_t m_csPin;
 
@@ -108,14 +107,14 @@ class Stm32FBoard : public Stm32Board {
 
         Stm32FBoard(
                 Receiver & receiver,
-                SoftQuatImu & imu,
+                InvenSenseImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin) 
             : Stm32Board(receiver, &imu, pids, mixer, esc, ledPin)
         {
-            m_softQuatImu = &imu;
+            m_invenSenseImu = &imu;
         }
 
         void begin(void)
