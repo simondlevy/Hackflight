@@ -20,9 +20,9 @@
 #include <hackflight.h>
 #include <board/stm32/f/4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <esc/dshot.h>
-#include <imu/softquat/invensense/mpu6x00.h>
 #include <receiver/dsmx.h>
+#include <imu/softquat/invensense/mpu6x00.h>
+#include <esc/dshot.h>
 
 #include <vector>
 
@@ -31,13 +31,11 @@ static const uint8_t MOSI_PIN = PA7;
 static const uint8_t MISO_PIN = PA6;
 static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
-
 static const uint8_t EXTI_PIN = PB0;
 
 static std::vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
 
-//static const uint8_t LED_PIN  = PC13; // orange
-static const uint8_t LED_PIN  = PC14; // blue
+static const uint8_t LED_PIN  = PC14;
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -48,13 +46,13 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static DshotEsc esc(&MOTOR_PINS);
-
 static DsmxReceiver rx;
 
 static Mpu6x00 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, Imu::rotate180);
 
 static std::vector<PidController *> pids = {&anglePid};
+
+static DshotEsc esc(MOTOR_PINS);
 
 static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
 

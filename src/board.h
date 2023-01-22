@@ -71,7 +71,7 @@ class Board {
 
         Board(
                 Receiver & receiver,
-                Imu & imu,
+                Imu * imu,
                 std::vector<PidController *> & pidControllers,
                 Mixer & mixer,
                 Esc & esc,
@@ -79,7 +79,7 @@ class Board {
         {
             m_receiverTask.receiver = &receiver;
 
-            m_imu = &imu;
+            m_imu = imu;
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
             m_esc = &esc;
@@ -87,6 +87,10 @@ class Board {
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
             m_ledInverted = ledPin < 0;
         }
+
+        virtual bool gyroIsReady(void) = 0;
+
+        virtual void getRawGyro(int16_t rawGyro[3]) = 0;
 
     private:
 
@@ -284,7 +288,7 @@ class Board {
             (void)prioritizer;
             (void)usec;
         }
-
+        
     public:
 
         void handleImuInterrupt(void)
@@ -368,10 +372,18 @@ class Board {
                     nowCycles = getCycleCounter();
                     loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
                 }
-                
+
+                static int16_t rawGyro[3];
+
+                if (gyroIsReady()) {
+
+                    getRawGyro(rawGyro);
+               }
+
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
-                m_core.startCoreTask(
+                m_core.getMotorValues(
+                        rawGyro,
                         m_imu,
                         m_vstate,
                         m_receiverTask.receiver,
@@ -383,7 +395,7 @@ class Board {
 
                 escWrite(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
 
-                m_core.completeCoreTask(
+                m_core.updateScheduler(
                         m_imu, m_imuInterruptCount, nowCycles, nextTargetCycles);
             }
 

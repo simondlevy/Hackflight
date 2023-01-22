@@ -35,7 +35,8 @@ class Core {
 
     public:
 
-        void startCoreTask(
+        void getMotorValues(
+                int16_t rawGyro[3],
                 Imu * imu,
                 VehicleState & vstate,
                 Receiver * receiver,
@@ -45,14 +46,11 @@ class Core {
                 const uint32_t usec,
                 float mixmotors[])
         {
-            if (imu->gyroIsReady()) {
+            auto angvels = imu->gyroRawToDps(rawGyro);
 
-                auto angvels = imu->readGyroDps();
-
-                vstate.dphi   = angvels.x;
-                vstate.dtheta = angvels.y;
-                vstate.dpsi   = angvels.z;
-            }
+            vstate.dphi   = angvels.x;
+            vstate.dtheta = angvels.y;
+            vstate.dpsi   = angvels.z;
 
             Demands demands = receiver->getDemands();
 
@@ -64,7 +62,6 @@ class Core {
                 mixmotors[i] = esc->getMotorValue(motors.values[i]);
             }
         }
-
 
         bool isDynamicTaskReady(const uint32_t nowCycles)
         {
@@ -86,7 +83,7 @@ class Core {
             task.update(usecStart, usecEnd-usecStart);
             m_scheduler.updateDynamic(nowCycles, anticipatedEndCycles);
         }
- 
+
         uint32_t getAnticipatedEndCycles(Task & task, const uint32_t nowCycles)
         {
             return m_scheduler.getAnticipatedEndCycles(task, nowCycles);
@@ -97,7 +94,7 @@ class Core {
             return m_scheduler.isCoreReady(nowCycles);
         }
 
-        void completeCoreTask(
+        void updateScheduler(
                 Imu * imu,
                 const uint32_t imuInterruptCount,
                 const uint32_t nowCycles,

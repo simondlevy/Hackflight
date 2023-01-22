@@ -17,8 +17,7 @@
 #pragma once
 
 #include "board/stm32/f/stm32f4.h"
-
-#include <stm32f4xx.h>
+#include "imu/softquat/invensense.h"
 
 class Stm32F405Board : public Stm32F4Board {
 
@@ -39,7 +38,7 @@ class Stm32F405Board : public Stm32F4Board {
 
         Stm32F405Board(
                 Receiver & receiver,
-                Imu & imu,
+                InvenSenseImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,

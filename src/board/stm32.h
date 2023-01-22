@@ -31,7 +31,7 @@ class Stm32Board : public Board {
 
         Stm32Board(
                 Receiver & receiver,
-                Imu & imu,
+                Imu * imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
@@ -40,15 +40,15 @@ class Stm32Board : public Board {
         {
         }
 
-     private:
-
-
-        void (*uartFun)(void);
-
         virtual uint32_t getClockSpeed(void) override
         {
             return SystemCoreClock;
         }
+
+     private:
+
+
+        void (*uartFun)(void);
 
         virtual void startCycleCounter(void) override
         {

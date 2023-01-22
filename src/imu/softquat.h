@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <SPI.h>
-
 #include <string.h>
 
 #include "core/axes.h"
@@ -294,11 +292,10 @@ class SoftQuatImu : public Imu {
     protected:
 
         SoftQuatImu(
-                const type_e type,
                 const rotateFun_t rotateFun,
                 const uint16_t gyroScale,
                 const uint16_t accelScale)
-            : Imu(type, rotateFun, gyroScale)
+            : Imu(rotateFun, gyroScale)
         {
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
@@ -313,12 +310,12 @@ class SoftQuatImu : public Imu {
             Imu::begin(clockSpeed);
         }
 
-        auto readGyroDps(void) -> Axes
+        auto gyroRawToDps(int16_t rawGyro[3]) -> Axes
         {
             m_gyroAccum.accumulate(
                     m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
 
-            return Imu::readGyroDps();
+            return Imu::gyroRawToDps(rawGyro);
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
@@ -350,19 +347,6 @@ class SoftQuatImu : public Imu {
 
             // XXX should calibrate too
 
-        }
-
-        uint16_t calculateSpiDivisor(const uint32_t clockSpeed, const uint32_t freq)
-        {
-            uint32_t clk = clockSpeed / 2;
-
-            uint16_t divisor = 2;
-
-            clk >>= 1;
-
-            for (; (clk > freq) && (divisor < 256); divisor <<= 1, clk >>= 1);
-
-            return divisor;
         }
 
 
