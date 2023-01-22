@@ -19,8 +19,6 @@
 #include "board/stm32/f/stm32f4.h"
 #include "imu/softquat/invensense.h"
 
-#include <stm32f4xx.h>
-
 class Stm32F405Board : public Stm32F4Board {
 
     protected:
