@@ -34,7 +34,7 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static DsmxReceiver rx;
 
-static Mpu6x00 imu(CS_PIN, Imu::rotate180);
+static Mpu6x00 imu(CS_PIN, Imu::rotate0Flip);
 
 static std::vector<PidController *> pids = {};
 
