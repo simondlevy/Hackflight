@@ -26,9 +26,9 @@
 
 #include <vector>
 
-static const uint8_t CS_PIN   = PA4;
-static const uint8_t EXTI_PIN = PB0;
-static const uint8_t LED_PIN  = PC14;
+static const uint8_t LED_PIN     = PC14;
+static const uint8_t IMU_CS_PIN  = PA4;
+static const uint8_t IMU_INT_PIN = PB0;
 
 static std::vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
 
@@ -43,13 +43,13 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static DsmxReceiver rx;
 
-static Mpu6x00 imu(CS_PIN, Imu::rotate180);
+static Mpu6x00 imu(Imu::rotate180);
 
 static std::vector<PidController *> pids = {&anglePid};
 
 static DshotEsc esc(MOTOR_PINS);
 
-static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN, IMU_CS_PIN);
 
 // Motor interrupt
 extern "C" void handleDmaIrq(void)
@@ -71,7 +71,7 @@ void serialEvent1(void)
 
 void setup(void)
 {
-    Board::setInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
 
     Serial1.begin(115200);
 

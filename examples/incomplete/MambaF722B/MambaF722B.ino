@@ -26,10 +26,9 @@
 
 #include <vector>
 
-static const uint8_t CS_PIN   = PA4;
-static const uint8_t EXTI_PIN = PC4;
-static const uint8_t LED_PIN  = PC14;   // orange
-//static const uint8_t LED_PIN  = PC15; // blue
+static const uint8_t LED_PIN     = PC15; // PC15=blue; PC14=orange
+static const uint8_t IMU_CS_PIN  = PA4;
+static const uint8_t IMU_INT_PIN = PC4;
 
 static Mixer mixer = QuadXbfMixer::make();
 
@@ -37,11 +36,11 @@ static MockEsc esc;
 
 static MockReceiver rx;
 
-Icm42688 imu(CS_PIN, Imu::rotate0);
+Icm42688 imu(Imu::rotate0);
 
 static std::vector<PidController *> pids = {};
 
-static Stm32F722Board board(rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F722Board board(rx, imu, pids, mixer, esc, LED_PIN, IMU_CS_PIN);
 
 // IMU interrupt
 static void handleImuInterrupt(void)
@@ -52,7 +51,7 @@ static void handleImuInterrupt(void)
 void setup(void)
 {
     // Set up IMU interrupt
-    Board::setInterrupt(EXTI_PIN, handleImuInterrupt, RISING);
+    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
 
     board.begin();
 }

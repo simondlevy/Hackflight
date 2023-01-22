@@ -26,21 +26,21 @@
 
 #include <vector>
 
-static const uint8_t CS_PIN   = PA4;
-static const uint8_t EXTI_PIN = PB2;
-static const uint8_t LED_PIN  = PC13;
+static const uint8_t LED_PIN     = PC13;
+static const uint8_t IMU_CS_PIN  = PA4;
+static const uint8_t IMU_INT_PIN = PB2;
 
 static Mixer mixer = QuadXbfMixer::make();
 
 static DsmxReceiver rx;
 
-static Mpu6x00 imu(CS_PIN, Imu::rotate0Flip);
+static Mpu6x00 imu(Imu::rotate0Flip);
 
 static std::vector<PidController *> pids = {};
 
 static MockEsc esc;
 
-static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN, IMU_CS_PIN);
 
 // IMU interrupt
 static void handleImuInterrupt(void)
@@ -56,7 +56,7 @@ void serialEvent2(void)
 
 void setup(void)
 {
-    Board::setInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
 
     Serial2.begin(115200);
 

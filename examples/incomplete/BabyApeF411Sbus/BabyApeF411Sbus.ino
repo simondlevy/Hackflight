@@ -27,8 +27,8 @@
 #include <vector>
 using namespace std;
 
-static const uint8_t CS_PIN   = PA4;
-static const uint8_t EXTI_PIN = PA1;
+static const uint8_t IMU_CS_PIN   = PA4;
+static const uint8_t IMU_INT_PIN = PA1;
 static const uint8_t LED_PIN  = PC13; 
 
 static AnglePidController anglePid(
@@ -44,13 +44,13 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static SbusReceiver rx;
 
-static Mpu6x00 imu(CS_PIN, Imu::rotate180);
+static Mpu6x00 imu(Imu::rotate180);
 
 static vector<PidController *> pids = {&anglePid};
 
 static MockEsc esc;
 
-static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN, IMU_CS_PIN);
 
 // IMU interrupt
 static void handleImuInterrupt(void)
@@ -67,7 +67,7 @@ void serialEvent1(void)
 void setup(void)
 {
     // Set up IMU interrupt
-    Board::setInterrupt(EXTI_PIN, handleImuInterrupt, RISING);  
+    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
 
     // Start receiver UART
     Serial1.begin(100000, SERIAL_8E2);

@@ -42,8 +42,9 @@ class Stm32F405Board : public Stm32F4Board {
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
-                const uint8_t ledPin) 
-            : Stm32F4Board(2, receiver, imu, pids, mixer, esc, ledPin)
+                const uint8_t ledPin,
+                const uint8_t imuCsPin) 
+            : Stm32F4Board(2, receiver, imu, pids, mixer, esc, ledPin, imuCsPin)
         {
         }
 };

@@ -146,7 +146,6 @@ class Icm42688 : public InvenSenseImu {
     public:
 
         Icm42688(
-                const uint8_t csPin,
                 const rotateFun_t rotateFun,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G,
@@ -156,7 +155,6 @@ class Icm42688 : public InvenSenseImu {
             : InvenSenseImu(
                     MAX_SPI_CLOCK_RATE,
                     MAX_SPI_CLOCK_RATE,
-                    csPin,
                     REG_TEMP_DATA_A1,
                     rotateFun,
                     gyroScale,

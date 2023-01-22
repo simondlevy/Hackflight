@@ -80,14 +80,12 @@ class Mpu6x00 : public InvenSenseImu {
     public:
 
         Mpu6x00(
-                const uint8_t csPin,
                 const rotateFun_t rotateFun,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G)
             : InvenSenseImu(
                     MAX_SPI_INIT_CLK_HZ,
                     MAX_SPI_CLK_HZ,
-                    csPin,
                     REG_ACCEL_XOUT_H,
                     rotateFun,
                     gyroScale,
