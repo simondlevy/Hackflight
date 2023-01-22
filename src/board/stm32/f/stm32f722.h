@@ -26,7 +26,7 @@ class Stm32F722Board : public Stm32FBoard {
 
         Stm32F722Board(
                 Receiver & receiver,
-                Imu & imu,
+                InvenSenseImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,

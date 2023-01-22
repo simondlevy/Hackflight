@@ -104,11 +104,6 @@ class Icm42688 : public InvenSenseImu {
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
-        virtual void begin(uint32_t clockSpeed) override
-        {
-            InvenSenseImu::begin(clockSpeed, MAX_SPI_CLOCK_RATE, MAX_SPI_CLOCK_RATE);
-        }
-
         virtual void getRegisterSettings(
                 std::vector<registerSetting_t> & settings) override
         {
@@ -154,10 +149,10 @@ class Icm42688 : public InvenSenseImu {
 
             // Datasheet says: "User should change setting to 0 from default
             // setting of 1, for proper INT1 and INT2 pin operation"
-            uint8_t intConfig1Value = readRegister(REG_INT_CONFIG1);
-            intConfig1Value &= ~(1 << INT_ASYNC_RESET_BIT);
-            intConfig1Value |= (INT_TPULSE_DURATION_8 | INT_TDEASSERT_DISABLED);
-            settings.push_back({REG_INT_CONFIG1, intConfig1Value});
+            //uint8_t intConfig1Value = readRegister(REG_INT_CONFIG1);
+            //intConfig1Value &= ~(1 << INT_ASYNC_RESET_BIT);
+            //intConfig1Value |= (INT_TPULSE_DURATION_8 | INT_TDEASSERT_DISABLED);
+            //settings.push_back({REG_INT_CONFIG1, intConfig1Value});
         }
 
         virtual int16_t readRawAccel(uint8_t k) override
@@ -180,11 +175,13 @@ class Icm42688 : public InvenSenseImu {
                 const uint8_t antiAliasDelta = 6,
                 const uint8_t antiAliasBitshift = 10)
             : InvenSenseImu(
-                    REG_TEMP_DATA_A1,
+                    MAX_SPI_CLOCK_RATE,
+                    MAX_SPI_CLOCK_RATE,
                     mosiPin,
                     misoPin,
                     sclkPin,
                     csPin,
+                    REG_TEMP_DATA_A1,
                     rotateFun,
                     gyroScale,
                     accelScale)
