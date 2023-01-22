@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <SPI.h>
-
 #include <string.h>
 
 #include "core/axes.h"
@@ -353,12 +351,6 @@ class SoftQuatImu : public Imu {
 
 
     public:
-
-        // Assume SPI
-        uint8_t mosiPin;
-        uint8_t misoPin;
-        uint8_t sclkPin;
-        uint8_t csPin;
 
         virtual void handleInterrupt(uint32_t cycleCounter) override
         {
