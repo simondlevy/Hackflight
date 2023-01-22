@@ -351,19 +351,6 @@ class SoftQuatImu : public Imu {
 
         }
 
-        uint16_t calculateSpiDivisor(const uint32_t clockSpeed, const uint32_t freq)
-        {
-            uint32_t clk = clockSpeed / 2;
-
-            uint16_t divisor = 2;
-
-            clk >>= 1;
-
-            for (; (clk > freq) && (divisor < 256); divisor <<= 1, clk >>= 1);
-
-            return divisor;
-        }
-
 
     public:
 

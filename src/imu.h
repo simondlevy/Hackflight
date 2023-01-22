@@ -285,8 +285,6 @@ class Imu {
             setGyroCalibrationCycles(); 
         }
 
-        virtual void getRawGyro(int16_t rawGyro[3]) = 0;
-
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 
         virtual void updateAccelerometer(void)

@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <SPI.h>
-
 #include <string.h>
 
 #include "core/axes.h"
@@ -29,6 +27,8 @@
 #include "imu/softquat.h"
 
 class InvenSenseImu : public SoftQuatImu {
+
+    friend class Stm32FBoard;
 
     public:
 
@@ -52,21 +52,14 @@ class InvenSenseImu : public SoftQuatImu {
 
     private:
 
-        uint8_t m_dataRegister;
-
-        uint8_t m_misoPin;
-        uint8_t m_mosiPin;
-        uint8_t m_sclkPin;
-        uint8_t m_csPin;
-
-        void readRegisters(
-                const uint8_t addr, uint8_t * buffer, const uint8_t count)
-        {
-            digitalWrite(m_csPin, LOW);
-            buffer[0] = addr | 0x80;
-            m_spi.transfer(buffer, count+1);
-            digitalWrite(m_csPin, HIGH);
-        }
+        // Shared with Stm32FBoard
+        uint8_t misoPin;
+        uint8_t mosiPin;
+        uint8_t sclkPin;
+        uint8_t csPin;
+        uint8_t dataRegister;
+        uint32_t initialSpiFreq;
+        uint32_t maxSpiFreq;
 
         static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
         {
@@ -86,6 +79,19 @@ class InvenSenseImu : public SoftQuatImu {
                 16;
         }
 
+        static uint16_t calculateSpiDivisor(const uint32_t clockSpeed, const uint32_t freq)
+        {
+            uint32_t clk = clockSpeed / 2;
+
+            uint16_t divisor = 2;
+
+            clk >>= 1;
+
+            for (; (clk > freq) && (divisor < 256); divisor <<= 1, clk >>= 1);
+
+            return divisor;
+        }
+
     protected:
 
         typedef struct {
@@ -97,24 +103,38 @@ class InvenSenseImu : public SoftQuatImu {
 
         virtual void getRegisterSettings(std::vector<registerSetting_t> & settings) = 0;
  
-        SPIClass m_spi;
-
         // Enough room for seven two-byte integers (gyro XYZ, temperature,
         // accel XYZ) plus one byte for SPI transfer
-        uint8_t m_buffer[15];
+        static const uint8_t BUFFER_SIZE = 15;
+
+        uint8_t buffer[BUFFER_SIZE];
 
         int16_t getShortFromBuffer(const uint8_t offset, const uint8_t index)
         {
             const uint8_t k = 2 * (offset + index) + 1;
-            return (int16_t)(m_buffer[k] << 8 | m_buffer[k+1]);
+            return (int16_t)(buffer[k] << 8 | buffer[k+1]);
+        }
+
+        int16_t getGyroValFromBuffer(uint8_t k)
+        {
+            return getShortFromBuffer(4, k);
+        }
+
+        void bufferToRawGyro(int16_t rawGyro[3])
+        {
+            rawGyro[0] = getGyroValFromBuffer(0);
+            rawGyro[1] = getGyroValFromBuffer(1);
+            rawGyro[2] = getGyroValFromBuffer(2);
         }
 
         InvenSenseImu(
-                const uint8_t dataRegister,
+                const uint32_t initialSpiFreq,
+                const uint32_t maxSpiFreq,
                 const uint8_t mosiPin,
                 const uint8_t misoPin,
                 const uint8_t sclkPin,
                 const uint8_t csPin,
+                const uint8_t dataRegister,
                 const rotateFun_t rotateFun,
                 const gyroScale_e gyroScale,
                 const accelScale_e accelScale)
@@ -123,71 +143,24 @@ class InvenSenseImu : public SoftQuatImu {
                     gyroScaleToInt(gyroScale),
                     accelScaleToInt(accelScale))
         {
-            m_dataRegister = dataRegister;
-            m_mosiPin = mosiPin;
-            m_misoPin = misoPin;
-            m_sclkPin = sclkPin;
-            m_csPin = csPin;
+            this->dataRegister = dataRegister;
+
+            this->initialSpiFreq = initialSpiFreq;
+            this->maxSpiFreq = maxSpiFreq;
+
+            this->mosiPin = mosiPin;
+            this->misoPin = misoPin;
+            this->sclkPin = sclkPin;
+            this->csPin = csPin;
         }
 
-        void begin(
-                const uint32_t clockSpeed,
-                const uint32_t initClockFreq,
-                const uint32_t maxClockFreq)
+        void begin(const uint32_t mcuClockSpeed)
         {
-            m_spi.setMOSI(m_mosiPin);
-            m_spi.setMISO(m_misoPin);
-            m_spi.setSCLK(m_sclkPin);
-
-            m_spi.begin();
-
-            pinMode(m_csPin, OUTPUT);
-
-            m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, initClockFreq));
-
-            std::vector<registerSetting_t> registerSettings;
-
-            getRegisterSettings(registerSettings);
-
-            for (auto r : registerSettings) {
-                writeRegister(r.address, r.value);
-                delay(15);
-            }
-
-            m_spi.setClockDivider(calculateSpiDivisor(clockSpeed, maxClockFreq));
-
-            SoftQuatImu::begin(clockSpeed);
+            SoftQuatImu::begin(mcuClockSpeed);
         }
 
-        void writeRegister(const uint8_t reg, const uint8_t val)
+        void getRawGyro(int16_t rawGyro[3])
         {
-            digitalWrite(m_csPin, LOW);
-            m_spi.transfer(reg);
-            m_spi.transfer(val);
-            digitalWrite(m_csPin, HIGH);
-        }
-
-        void readRegisters(const uint8_t addr)
-        {
-            readRegisters(addr, m_buffer, 14);
-        }
-
-        uint8_t readRegister(const uint8_t addr)
-        {
-            uint8_t buffer[2] = {};
-            readRegisters(addr, buffer, 1);
-            return buffer[1];
-        }
-
-        void setClockDivider(uint32_t divider)
-        {
-            m_spi.setClockDivider(divider);
-        }
-
-        virtual void getRawGyro(int16_t rawGyro[3]) override
-        {
-            readRegisters(m_dataRegister);
-
             rawGyro[0] = getShortFromBuffer(4, 0);
             rawGyro[1] = getShortFromBuffer(4, 1);
             rawGyro[2] = getShortFromBuffer(4, 2);

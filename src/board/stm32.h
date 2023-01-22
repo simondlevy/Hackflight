@@ -40,15 +40,15 @@ class Stm32Board : public Board {
         {
         }
 
-     private:
-
-
-        void (*uartFun)(void);
-
         virtual uint32_t getClockSpeed(void) override
         {
             return SystemCoreClock;
         }
+
+     private:
+
+
+        void (*uartFun)(void);
 
         virtual void startCycleCounter(void) override
         {

@@ -30,25 +30,18 @@ class Stm32FBoard : public Stm32Board {
 
         InvenSenseImu * m_invenSenseImu;
 
+        uint8_t m_mosiPin;
+        uint8_t m_misoPin;
+        uint8_t m_sclkPin;
         uint8_t m_csPin;
+
+        uint32_t m_initialSpiFreq; 
+        uint32_t m_maxSpiFreq;
 
         // Enough room for seven two-byte integers (gyro XYZ, temperature,
         // accel XYZ) plus one byte for SPI transfer
         uint8_t m_buffer[15];
 
-        void spiInit(        
-                const uint8_t mosiPin,
-                const uint8_t misoPin,
-                const uint8_t sclkPin,
-                const uint8_t csPin)
-        {
-            m_spi.setMOSI(mosiPin);
-            m_spi.setMISO(misoPin);
-            m_spi.setSCLK(sclkPin);
-
-            m_csPin = csPin;
-        }
- 
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
             digitalWrite(m_csPin, LOW);
@@ -100,7 +93,12 @@ class Stm32FBoard : public Stm32Board {
 
         virtual void getRawGyro(int16_t rawGyro[3])
         {
-            return m_imu->getRawGyro(rawGyro);
+            readRegisters(
+                    m_invenSenseImu->dataRegister,
+                    m_invenSenseImu->buffer,
+                    InvenSenseImu::BUFFER_SIZE);
+
+            m_invenSenseImu->bufferToRawGyro(rawGyro);
         }
 
     public:
@@ -115,13 +113,44 @@ class Stm32FBoard : public Stm32Board {
             : Stm32Board(receiver, &imu, pids, mixer, esc, ledPin)
         {
             m_invenSenseImu = &imu;
+
+            m_initialSpiFreq = imu.initialSpiFreq;
+            m_maxSpiFreq = imu.maxSpiFreq;
+
+            m_mosiPin = imu.mosiPin;
+            m_misoPin = imu.misoPin;
+            m_sclkPin = imu.sclkPin;
+            m_csPin = imu.csPin;
         }
 
         void begin(void)
         {
             Board::begin();
 
-            // XXX start SPI here
+            m_spi.setMOSI(m_mosiPin);
+            m_spi.setMISO(m_misoPin);
+            m_spi.setSCLK(m_sclkPin);
+
+            m_spi.begin();
+
+            pinMode(m_csPin, OUTPUT);
+
+            const uint32_t clockSpeed = getClockSpeed();
+
+            m_spi.setClockDivider(
+                    InvenSenseImu::calculateSpiDivisor(clockSpeed, m_initialSpiFreq));
+
+            std::vector<InvenSenseImu::registerSetting_t> registerSettings;
+
+            m_invenSenseImu->getRegisterSettings(registerSettings);
+
+            for (auto r : registerSettings) {
+                writeRegister(r.address, r.value);
+                delay(15);
+            }
+
+            m_spi.setClockDivider(
+                    InvenSenseImu::calculateSpiDivisor(clockSpeed, m_maxSpiFreq));
 
             m_accelerometerTask.begin(m_imu);
         }
