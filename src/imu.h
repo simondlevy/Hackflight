@@ -28,18 +28,6 @@
 
 class Imu {
 
-    public:
-
-        typedef enum {
-
-            MOCK,
-            INVENSENSE,
-            USFS
-
-        } type_e;
-
-        type_e type;
-
     private:
 
         static const uint32_t GYRO_CALIBRATION_DURATION      = 1250000;
@@ -216,13 +204,10 @@ class Imu {
 
         Imu(void) 
         {
-           this->type = MOCK;
         }
 
-        Imu(const type_e type, const rotateFun_t rotateFun, const uint16_t gyroScale)
+        Imu(const rotateFun_t rotateFun, const uint16_t gyroScale)
         {
-            this->type = type;
-
             m_rotateFun = rotateFun;
             m_gyroScale = gyroScale / 32768.;
         }

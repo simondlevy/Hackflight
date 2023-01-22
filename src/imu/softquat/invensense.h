@@ -119,7 +119,6 @@ class InvenSenseImu : public SoftQuatImu {
                 const gyroScale_e gyroScale,
                 const accelScale_e accelScale)
             : SoftQuatImu(
-                    INVENSENSE,
                     rotateFun,
                     gyroScaleToInt(gyroScale),
                     accelScaleToInt(accelScale))

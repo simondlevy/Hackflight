@@ -294,11 +294,10 @@ class SoftQuatImu : public Imu {
     protected:
 
         SoftQuatImu(
-                const type_e type,
                 const rotateFun_t rotateFun,
                 const uint16_t gyroScale,
                 const uint16_t accelScale)
-            : Imu(type, rotateFun, gyroScale)
+            : Imu(rotateFun, gyroScale)
         {
             // Initialize quaternion in upright position
             m_fusionPrev.quat.w = 1;
@@ -367,6 +366,12 @@ class SoftQuatImu : public Imu {
 
 
     public:
+
+        // Assume SPI
+        uint8_t mosiPin;
+        uint8_t misoPin;
+        uint8_t sclkPin;
+        uint8_t csPin;
 
         virtual void handleInterrupt(uint32_t cycleCounter) override
         {
