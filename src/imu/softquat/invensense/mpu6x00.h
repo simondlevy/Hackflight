@@ -80,9 +80,6 @@ class Mpu6x00 : public InvenSenseImu {
     public:
 
         Mpu6x00(
-                const uint8_t mosiPin,
-                const uint8_t misoPin,
-                const uint8_t sclkPin,
                 const uint8_t csPin,
                 const rotateFun_t rotateFun,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
@@ -90,9 +87,6 @@ class Mpu6x00 : public InvenSenseImu {
             : InvenSenseImu(
                     MAX_SPI_INIT_CLK_HZ,
                     MAX_SPI_CLK_HZ,
-                    mosiPin,
-                    misoPin,
-                    sclkPin,
                     csPin,
                     REG_ACCEL_XOUT_H,
                     rotateFun,

@@ -53,9 +53,6 @@ class InvenSenseImu : public SoftQuatImu {
     private:
 
         // Shared with Stm32FBoard
-        uint8_t misoPin;
-        uint8_t mosiPin;
-        uint8_t sclkPin;
         uint8_t csPin;
         uint8_t dataRegister;
         uint32_t initialSpiFreq;
@@ -130,9 +127,6 @@ class InvenSenseImu : public SoftQuatImu {
         InvenSenseImu(
                 const uint32_t initialSpiFreq,
                 const uint32_t maxSpiFreq,
-                const uint8_t mosiPin,
-                const uint8_t misoPin,
-                const uint8_t sclkPin,
                 const uint8_t csPin,
                 const uint8_t dataRegister,
                 const rotateFun_t rotateFun,
@@ -148,9 +142,6 @@ class InvenSenseImu : public SoftQuatImu {
             this->initialSpiFreq = initialSpiFreq;
             this->maxSpiFreq = maxSpiFreq;
 
-            this->mosiPin = mosiPin;
-            this->misoPin = misoPin;
-            this->sclkPin = sclkPin;
             this->csPin = csPin;
         }
 

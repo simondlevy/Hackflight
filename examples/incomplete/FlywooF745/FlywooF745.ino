@@ -28,9 +28,10 @@
 using namespace std;
 
 // IMU
-static const uint8_t MOSI_PIN = PB15;
-static const uint8_t MISO_PIN = PB14;
-static const uint8_t SCLK_PIN = PB13;
+static const uint8_t MOSI_PIN = PA7;
+static const uint8_t MISO_PIN = PA6;
+static const uint8_t SCLK_PIN = PA5;
+
 static const uint8_t CS_PIN   = PE4;
 static const uint8_t EXTI_PIN = PE1;
 

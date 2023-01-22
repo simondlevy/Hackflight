@@ -26,13 +26,14 @@ class Stm32FBoard : public Stm32Board {
 
     private:
 
-        SPIClass m_spi;
+        static const uint8_t IMU_MOSI_PIN = PA7;
+        static const uint8_t IMU_MISO_PIN = PA6;
+        static const uint8_t IMU_SCLK_PIN = PA5;
+
+        SPIClass m_spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
         InvenSenseImu * m_invenSenseImu;
 
-        uint8_t m_mosiPin;
-        uint8_t m_misoPin;
-        uint8_t m_sclkPin;
         uint8_t m_csPin;
 
         uint32_t m_initialSpiFreq; 
@@ -117,19 +118,12 @@ class Stm32FBoard : public Stm32Board {
             m_initialSpiFreq = imu.initialSpiFreq;
             m_maxSpiFreq = imu.maxSpiFreq;
 
-            m_mosiPin = imu.mosiPin;
-            m_misoPin = imu.misoPin;
-            m_sclkPin = imu.sclkPin;
             m_csPin = imu.csPin;
         }
 
         void begin(void)
         {
             Board::begin();
-
-            m_spi.setMOSI(m_mosiPin);
-            m_spi.setMISO(m_misoPin);
-            m_spi.setSCLK(m_sclkPin);
 
             m_spi.begin();
 
