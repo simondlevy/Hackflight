@@ -26,13 +26,8 @@
 
 #include <vector>
 
-// IMU
-static const uint8_t MOSI_PIN = PA7;
-static const uint8_t MISO_PIN = PA6;
-static const uint8_t SCLK_PIN = PA5;
 static const uint8_t CS_PIN   = PA4;
 static const uint8_t EXTI_PIN = PC4;
-
 static const uint8_t LED_PIN  = PC14;   // orange
 //static const uint8_t LED_PIN  = PC15; // blue
 
@@ -42,7 +37,7 @@ static MockEsc esc;
 
 static MockReceiver rx;
 
-Icm42688 imu(MOSI_PIN, MISO_PIN, SCLK_PIN, CS_PIN, Imu::rotate0);
+Icm42688 imu(CS_PIN, Imu::rotate0);
 
 static std::vector<PidController *> pids = {};
 
