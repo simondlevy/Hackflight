@@ -66,18 +66,13 @@ class MockImu : public Imu {
             return 0;
         }
 
+        virtual void handleInterrupt(const uint32_t cycleCounter) override
+        {
+            (void)cycleCounter;
+        }
+
         virtual bool gyroIsCalibrating(void) override
         {
             return false;
-        }
-
-        virtual bool gyroIsReady(void) override
-        {
-            return false;
-        }
-
-        virtual auto readGyroDps(void) -> Axes  override
-        {
-            return Axes(0, 0, 0);
         }
 };
