@@ -28,17 +28,14 @@ class Mpu6x00 : public InvenSenseImu {
 
         static const uint8_t REG_ACCEL_XOUT_H = 0x3B;
 
+        static const uint8_t ACCEL_BUFFER_OFFSET = 0;
+        static const uint8_t GYRO_BUFFER_OFFSET = 4;
+
         // 20 MHz max SPI frequency
         static const uint32_t MAX_SPI_CLK_HZ = 20000000;
 
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
-
-        virtual int16_t readRawAccel(uint8_t k) override
-        {
-            // Accel data is first value in buffer
-            return getShortFromBuffer(0, k);
-        }
 
     protected:
 
@@ -71,6 +68,8 @@ class Mpu6x00 : public InvenSenseImu {
                     MAX_SPI_INIT_CLK_HZ,
                     MAX_SPI_CLK_HZ,
                     REG_ACCEL_XOUT_H,
+                    ACCEL_BUFFER_OFFSET,
+                    GYRO_BUFFER_OFFSET,
                     rotateFun,
                     gyroFsr,
                     accelFsr)

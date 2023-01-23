@@ -34,7 +34,7 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static MockReceiver rx;
 
-static Icm20689 imu(Imu::rotate180, IMU_CS_PIN);
+static Icm20689 imu(Imu::rotate90, IMU_CS_PIN);
 
 static MockEsc esc;
 

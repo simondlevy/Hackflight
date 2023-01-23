@@ -127,6 +127,9 @@ class InvenSenseImu : public SoftQuatImu {
         gyroFsr_e m_gyroFsr;
         accelFsr_e m_accelFsr;
 
+        uint8_t m_accelBufferOffset;
+        uint8_t m_gyroBufferOffset;
+
         virtual void getRegisterSettings(std::vector<registerSetting_t> & settings) = 0;
  
         // Enough room for seven two-byte integers (gyro XYZ, temperature,
@@ -143,7 +146,13 @@ class InvenSenseImu : public SoftQuatImu {
 
         int16_t getGyroValFromBuffer(uint8_t k)
         {
-            return getShortFromBuffer(4, k);
+            return getShortFromBuffer(m_gyroBufferOffset, k);
+        }
+
+        virtual int16_t readRawAccel(uint8_t k) override
+        {
+            // Accel data is first value in buffer
+            return getShortFromBuffer(m_accelBufferOffset, k);
         }
 
         void bufferToRawGyro(int16_t rawGyro[3])
@@ -158,6 +167,8 @@ class InvenSenseImu : public SoftQuatImu {
                 const uint32_t initialSpiFreq,
                 const uint32_t maxSpiFreq,
                 const uint8_t dataRegister,
+                const uint8_t accelBufferOffset,
+                const uint8_t gyroBufferOffset,
                 const rotateFun_t rotateFun = rotate0,
                 const gyroFsr_e gyroFsr = GYRO_2000DPS,
                 const accelFsr_e accelFsr = ACCEL_16G)
@@ -170,6 +181,9 @@ class InvenSenseImu : public SoftQuatImu {
             this->dataRegister = dataRegister;
             this->initialSpiFreq = initialSpiFreq;
             this->maxSpiFreq = maxSpiFreq;
+
+            m_accelBufferOffset = accelBufferOffset;
+            m_gyroBufferOffset = gyroBufferOffset;
 
             m_gyroFsr = gyroFsr;
             m_accelFsr = accelFsr;

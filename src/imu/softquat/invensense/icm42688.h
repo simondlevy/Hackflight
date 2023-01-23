@@ -37,6 +37,9 @@ class Icm42688 : public InvenSenseImu {
 
     private:
 
+        static const uint8_t ACCEL_BUFFER_OFFSET = 1;
+        static const uint8_t GYRO_BUFFER_OFFSET = 4;
+
         static const uint8_t REG_ACCEL_CONFIG_STATIC2 = 0x03;
         static const uint8_t REG_ACCEL_CONFIG_STATIC3 = 0x04;
         static const uint8_t REG_ACCEL_CONFIG_STATIC4 = 0x05;
@@ -155,6 +158,8 @@ class Icm42688 : public InvenSenseImu {
                     MAX_SPI_CLOCK_RATE,
                     MAX_SPI_CLOCK_RATE,
                     REG_TEMP_DATA_A1,
+                    ACCEL_BUFFER_OFFSET,
+                    GYRO_BUFFER_OFFSET,
                     rotateFun,
                     gyroFsr,
                     accelFsr)

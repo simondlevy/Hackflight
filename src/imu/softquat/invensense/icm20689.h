@@ -26,6 +26,9 @@ class Icm20689 : public InvenSenseImu {
 
     private:
 
+        static const uint8_t ACCEL_BUFFER_OFFSET = 0;
+        static const uint8_t GYRO_BUFFER_OFFSET = 4;
+
         static const uint8_t REG_ACCEL_XOUT_H = 0x3B;
 
         static const uint8_t TEMP_RST         = 0x01;
@@ -57,13 +60,6 @@ class Icm20689 : public InvenSenseImu {
             settings.push_back({REG_INT_ENABLE, BIT_RAW_RDY_EN});
         }
 
-        virtual int16_t readRawAccel(uint8_t k) override
-        {
-            // Accel data is first value in buffer
-            return getShortFromBuffer(0, k);
-        }
-
-
     public:
 
         Icm20689(
@@ -76,6 +72,8 @@ class Icm20689 : public InvenSenseImu {
                     MAX_SPI_CLK_HZ,
                     MAX_SPI_CLK_HZ,
                     REG_ACCEL_XOUT_H,
+                    ACCEL_BUFFER_OFFSET,
+                    GYRO_BUFFER_OFFSET,
                     rotateFun,
                     gyroFsr,
                     accelFsr)
