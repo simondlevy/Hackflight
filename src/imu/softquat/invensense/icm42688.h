@@ -98,11 +98,16 @@ class Icm42688 : public InvenSenseImu {
                     PWR_MGMT0_ACCEL_MODE_LN |
                     PWR_MGMT0_GYRO_MODE_LN});
 
+            settings.push_back({REG_GYRO_CONFIG, (uint8_t)(m_gyroFsr << 3)});
+            settings.push_back({REG_ACCEL_CONFIG, (uint8_t)(m_accelFsr << 3)});
+
+            /*
             settings.push_back({REG_GYRO_CONFIG0,
-                    (3 - (uint8_t)(m_gyroScale << 3)) << 5 | (m_odr & 0x0F)});
+                    (3 - ((uint8_t)m_gyroFsr << 3)) << 5 | (m_odr & 0x0F)});
 
             settings.push_back({REG_ACCEL_CONFIG0,
-                    (3 - (uint8_t)(m_accelScale << 3)) << 5 | (m_odr & 0x0F)});
+                    (3 - ((uint8_t)m_accelFsr << 3)) << 5 | (m_odr & 0x0F)});
+                    */
 
             settings.push_back({REG_GYRO_CONFIG_STATIC3, m_antiAliasDelta});
 
@@ -148,8 +153,8 @@ class Icm42688 : public InvenSenseImu {
         Icm42688(
                 const rotateFun_t rotateFun,
                 const uint8_t csPin,
-                const gyroScale_e gyroScale = GYRO_2000DPS,
-                const accelScale_e accelScale = ACCEL_16G,
+                const gyroFsr_e gyroFsr = GYRO_2000DPS,
+                const accelFsr_e accelFsr = ACCEL_16G,
                 const odr_e odr = ODR_8K,
                 const uint8_t antiAliasDelta = 6,
                 const uint8_t antiAliasBitshift = 10)
@@ -159,8 +164,8 @@ class Icm42688 : public InvenSenseImu {
                     MAX_SPI_CLOCK_RATE,
                     REG_TEMP_DATA_A1,
                     rotateFun,
-                    gyroScale,
-                    accelScale)
+                    gyroFsr,
+                    accelFsr)
     {
         m_odr = odr;
         m_antiAliasDelta = antiAliasDelta;

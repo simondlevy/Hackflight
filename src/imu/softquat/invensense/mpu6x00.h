@@ -26,19 +26,8 @@ class Mpu6x00 : public InvenSenseImu {
 
     private:
 
-        // Configuration bits  
-        static const uint8_t BIT_RAW_RDY_EN       = 0x01;
-        static const uint8_t BIT_CLK_SEL_PLLGYROZ = 0x03;
-        static const uint8_t BIT_INT_ANYRD_2CLEAR = 0x10;
-        static const uint8_t BIT_I2C_IF_DIS       = 0x10;
-        static const uint8_t BIT_H_RESET          = 0x80;
-
         // 20 MHz max SPI frequency
         static const uint32_t MAX_SPI_CLK_HZ = 20000000;
-
-        gyroScale_e m_gyroScale;
-
-        accelScale_e m_accelScale;
 
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
@@ -54,14 +43,14 @@ class Mpu6x00 : public InvenSenseImu {
         virtual void getRegisterSettings(
                 std::vector<registerSetting_t> & settings) override
         {
-            settings.push_back({REG_PWR_MGMT_1, BIT_H_RESET});
+            settings.push_back({REG_PWR_MGMT_1, BIT_RESET});
             settings.push_back({REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ});
             settings.push_back({REG_USER_CTRL, BIT_I2C_IF_DIS});
             settings.push_back({REG_PWR_MGMT_2, 0x00});
             settings.push_back({REG_SMPLRT_DIV, 0});
 
-            settings.push_back({REG_GYRO_CONFIG, (uint8_t)(m_gyroScale << 3)});
-            settings.push_back({REG_ACCEL_CONFIG, (uint8_t)(m_accelScale << 3)});
+            settings.push_back({REG_GYRO_CONFIG, (uint8_t)(m_gyroFsr << 3)});
+            settings.push_back({REG_ACCEL_CONFIG, (uint8_t)(m_accelFsr << 3)});
 
             settings.push_back({REG_INT_PIN_CFG, 0x10});
             settings.push_back({REG_INT_ENABLE, BIT_RAW_RDY_EN});
@@ -73,19 +62,17 @@ class Mpu6x00 : public InvenSenseImu {
         Mpu6x00(
                 const rotateFun_t rotateFun,
                 const uint8_t csPin,
-                const gyroScale_e gyroScale = GYRO_2000DPS,
-                const accelScale_e accelScale = ACCEL_16G)
+                const gyroFsr_e gyroFsr = GYRO_2000DPS,
+                const accelFsr_e accelFsr = ACCEL_16G)
             : InvenSenseImu(
                     csPin,
                     MAX_SPI_INIT_CLK_HZ,
                     MAX_SPI_CLK_HZ,
                     REG_ACCEL_XOUT_H,
                     rotateFun,
-                    gyroScale,
-                    accelScale)
+                    gyroFsr,
+                    accelFsr)
     {
-        m_gyroScale = gyroScale;
-        m_accelScale = accelScale;
     }
 
 }; // class Mpu6x00

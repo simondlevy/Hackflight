@@ -39,7 +39,7 @@ class InvenSenseImu : public SoftQuatImu {
             GYRO_1000DPS,
             GYRO_2000DPS
 
-        } gyroScale_e;
+        } gyroFsr_e;
 
         typedef enum {
 
@@ -48,13 +48,21 @@ class InvenSenseImu : public SoftQuatImu {
             ACCEL_8G,  
             ACCEL_16G
 
-        } accelScale_e;
+        } accelFsr_e;
 
         typedef enum {
             INV_CLK_INTERNAL,
             INV_CLK_PLL,
             NUM_CLK
         } clockSel_e;
+
+        // Configuration bits  
+        static const uint8_t BIT_RAW_RDY_EN       = 0x01;
+        static const uint8_t BIT_CLK_SEL_PLLGYROZ = 0x03;
+        static const uint8_t BIT_I2C_IF_DIS       = 0x10;
+        static const uint8_t BIT_RESET            = 0x80;
+
+        static const uint8_t GYRO_HARDWARE_LPF_NORMAL = 0x00;
 
     private:
 
@@ -64,21 +72,21 @@ class InvenSenseImu : public SoftQuatImu {
         uint32_t initialSpiFreq;
         uint32_t maxSpiFreq;
 
-        static uint16_t gyroScaleToInt(const gyroScale_e gyroScale)
+        static uint16_t gyroFsrToInt(const gyroFsr_e gyroFsr)
         {
             return
-                gyroScale == GYRO_250DPS ?  250 : 
-                gyroScale == GYRO_500DPS ?  500 : 
-                gyroScale == GYRO_1000DPS ?  1000 : 
+                gyroFsr == GYRO_250DPS ?  250 : 
+                gyroFsr == GYRO_500DPS ?  500 : 
+                gyroFsr == GYRO_1000DPS ?  1000 : 
                 2000;
         }
 
-        static uint16_t accelScaleToInt(const accelScale_e accelScale)
+        static uint16_t accelFsrToInt(const accelFsr_e accelFsr)
         {
             return
-                accelScale == ACCEL_2G ?  2 : 
-                accelScale == ACCEL_4G ?  4 : 
-                accelScale == ACCEL_8G ?  8 : 
+                accelFsr == ACCEL_2G ?  2 : 
+                accelFsr == ACCEL_4G ?  4 : 
+                accelFsr == ACCEL_8G ?  8 : 
                 16;
         }
 
@@ -98,17 +106,17 @@ class InvenSenseImu : public SoftQuatImu {
     protected:
 
         // Registers
-        static const uint8_t REG_SMPLRT_DIV    = 0x19;
-        static const uint8_t REG_CONFIG        = 0x1A;
-        static const uint8_t REG_GYRO_CONFIG   = 0x1B;
-        static const uint8_t REG_ACCEL_CONFIG  = 0x1C;
-        static const uint8_t REG_ACCEL_XOUT_H  = 0x3B;
-        static const uint8_t REG_INT_PIN_CFG   = 0x37;
-        static const uint8_t REG_INT_ENABLE    = 0x38;
+        static const uint8_t REG_SMPLRT_DIV        = 0x19;
+        static const uint8_t REG_CONFIG            = 0x1A;
+        static const uint8_t REG_GYRO_CONFIG       = 0x1B;
+        static const uint8_t REG_ACCEL_CONFIG      = 0x1C;
+        static const uint8_t REG_ACCEL_XOUT_H      = 0x3B;
+        static const uint8_t REG_INT_PIN_CFG       = 0x37;
+        static const uint8_t REG_INT_ENABLE        = 0x38;
         static const uint8_t REG_SIGNAL_PATH_RESET = 0x6A;
-        static const uint8_t REG_USER_CTRL     = 0x6A;
-        static const uint8_t REG_PWR_MGMT_1    = 0x6B;
-        static const uint8_t REG_PWR_MGMT_2    = 0x6C;
+        static const uint8_t REG_USER_CTRL         = 0x6A;
+        static const uint8_t REG_PWR_MGMT_1        = 0x6B;
+        static const uint8_t REG_PWR_MGMT_2        = 0x6C;
 
         typedef struct {
 
@@ -116,6 +124,9 @@ class InvenSenseImu : public SoftQuatImu {
             uint8_t value;
 
         } registerSetting_t;
+
+        gyroFsr_e m_gyroFsr;
+        accelFsr_e m_accelFsr;
 
         virtual void getRegisterSettings(std::vector<registerSetting_t> & settings) = 0;
  
@@ -149,17 +160,20 @@ class InvenSenseImu : public SoftQuatImu {
                 const uint32_t maxSpiFreq,
                 const uint8_t dataRegister,
                 const rotateFun_t rotateFun,
-                const gyroScale_e gyroScale,
-                const accelScale_e accelScale)
+                const gyroFsr_e gyroFsr,
+                const accelFsr_e accelFsr)
             : SoftQuatImu(
                     rotateFun,
-                    gyroScaleToInt(gyroScale),
-                    accelScaleToInt(accelScale))
+                    gyroFsrToInt(gyroFsr),
+                    accelFsrToInt(accelFsr))
         {
             this->csPin = csPin;
             this->dataRegister = dataRegister;
             this->initialSpiFreq = initialSpiFreq;
             this->maxSpiFreq = maxSpiFreq;
+
+            m_gyroFsr = gyroFsr;
+            m_accelFsr = accelFsr;
         }
 
         void begin(const uint32_t mcuClockSpeed)
