@@ -26,18 +26,6 @@ class Mpu6x00 : public InvenSenseImu {
 
     private:
 
-        // Registers
-        static const uint8_t REG_SMPLRT_DIV    = 0x19;
-        static const uint8_t REG_CONFIG        = 0x1A;
-        static const uint8_t REG_GYRO_CONFIG   = 0x1B;
-        static const uint8_t REG_ACCEL_CONFIG  = 0x1C;
-        static const uint8_t REG_ACCEL_XOUT_H  = 0x3B;
-        static const uint8_t REG_INT_PIN_CFG   = 0x37;
-        static const uint8_t REG_INT_ENABLE    = 0x38;
-        static const uint8_t REG_USER_CTRL     = 0x6A;
-        static const uint8_t REG_PWR_MGMT_1    = 0x6B;
-        static const uint8_t REG_PWR_MGMT_2    = 0x6C;
-
         // Configuration bits  
         static const uint8_t BIT_RAW_RDY_EN       = 0x01;
         static const uint8_t BIT_CLK_SEL_PLLGYROZ = 0x03;
@@ -57,6 +45,7 @@ class Mpu6x00 : public InvenSenseImu {
 
         virtual int16_t readRawAccel(uint8_t k) override
         {
+            // Accel data is first value in buffer
             return getShortFromBuffer(0, k);
         }
 
@@ -70,8 +59,10 @@ class Mpu6x00 : public InvenSenseImu {
             settings.push_back({REG_USER_CTRL, BIT_I2C_IF_DIS});
             settings.push_back({REG_PWR_MGMT_2, 0x00});
             settings.push_back({REG_SMPLRT_DIV, 0});
+
             settings.push_back({REG_GYRO_CONFIG, (uint8_t)(m_gyroScale << 3)});
             settings.push_back({REG_ACCEL_CONFIG, (uint8_t)(m_accelScale << 3)});
+
             settings.push_back({REG_INT_PIN_CFG, 0x10});
             settings.push_back({REG_INT_ENABLE, BIT_RAW_RDY_EN});
             settings.push_back({REG_CONFIG, 0});
@@ -83,7 +74,7 @@ class Mpu6x00 : public InvenSenseImu {
                 const rotateFun_t rotateFun,
                 const uint8_t csPin,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
-                const accelScale_e accelScale = ACCEL_2G)
+                const accelScale_e accelScale = ACCEL_16G)
             : InvenSenseImu(
                     csPin,
                     MAX_SPI_INIT_CLK_HZ,

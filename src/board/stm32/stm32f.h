@@ -136,7 +136,7 @@ class Stm32FBoard : public Stm32Board {
 
             for (auto r : registerSettings) {
                 writeRegister(r.address, r.value);
-                delay(15);
+                delay(100);
             }
 
             m_spi.setClockDivider(

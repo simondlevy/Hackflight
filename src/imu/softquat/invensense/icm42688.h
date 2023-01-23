@@ -99,10 +99,10 @@ class Icm42688 : public InvenSenseImu {
                     PWR_MGMT0_GYRO_MODE_LN});
 
             settings.push_back({REG_GYRO_CONFIG0,
-                    (3 - GYRO_2000DPS) << 5 | (m_odr & 0x0F)});
+                    (3 - (uint8_t)(m_gyroScale << 3)) << 5 | (m_odr & 0x0F)});
 
             settings.push_back({REG_ACCEL_CONFIG0,
-                    (3 - ACCEL_16G) << 5 | (m_odr & 0x0F)});
+                    (3 - (uint8_t)(m_accelScale << 3)) << 5 | (m_odr & 0x0F)});
 
             settings.push_back({REG_GYRO_CONFIG_STATIC3, m_antiAliasDelta});
 
@@ -139,7 +139,7 @@ class Icm42688 : public InvenSenseImu {
 
         virtual int16_t readRawAccel(uint8_t k) override
         {
-            // Accel data is second value, after temperature
+            // Accel data is second value in buffer, after temperature
             return getShortFromBuffer(1, k);
         }
 
@@ -149,7 +149,7 @@ class Icm42688 : public InvenSenseImu {
                 const rotateFun_t rotateFun,
                 const uint8_t csPin,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
-                const accelScale_e accelScale = ACCEL_2G,
+                const accelScale_e accelScale = ACCEL_16G,
                 const odr_e odr = ODR_8K,
                 const uint8_t antiAliasDelta = 6,
                 const uint8_t antiAliasBitshift = 10)

@@ -50,6 +50,12 @@ class InvenSenseImu : public SoftQuatImu {
 
         } accelScale_e;
 
+        typedef enum {
+            INV_CLK_INTERNAL,
+            INV_CLK_PLL,
+            NUM_CLK
+        } clockSel_e;
+
     private:
 
         // Shared with Stm32FBoard
@@ -90,6 +96,19 @@ class InvenSenseImu : public SoftQuatImu {
         }
 
     protected:
+
+        // Registers
+        static const uint8_t REG_SMPLRT_DIV    = 0x19;
+        static const uint8_t REG_CONFIG        = 0x1A;
+        static const uint8_t REG_GYRO_CONFIG   = 0x1B;
+        static const uint8_t REG_ACCEL_CONFIG  = 0x1C;
+        static const uint8_t REG_ACCEL_XOUT_H  = 0x3B;
+        static const uint8_t REG_INT_PIN_CFG   = 0x37;
+        static const uint8_t REG_INT_ENABLE    = 0x38;
+        static const uint8_t REG_SIGNAL_PATH_RESET = 0x6A;
+        static const uint8_t REG_USER_CTRL     = 0x6A;
+        static const uint8_t REG_PWR_MGMT_1    = 0x6B;
+        static const uint8_t REG_PWR_MGMT_2    = 0x6C;
 
         typedef struct {
 

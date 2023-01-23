@@ -26,77 +26,40 @@ class Icm20689 : public InvenSenseImu {
 
     public:
 
-        typedef enum {
-
-            ODR_8K = 3,  
-            ODR_4K, 
-            ODR_2K, 
-            ODR_1K
-
-        } odr_e;
 
     private:
 
-        static const uint8_t REG_ACCEL_CONFIG_STATIC2 = 0x03;
-        static const uint8_t REG_ACCEL_CONFIG_STATIC3 = 0x04;
-        static const uint8_t REG_ACCEL_CONFIG_STATIC4 = 0x05;
-        static const uint8_t REG_GYRO_CONFIG_STATIC3  = 0x0C;
-        static const uint8_t REG_GYRO_CONFIG_STATIC4  = 0x0D;        
-        static const uint8_t REG_GYRO_CONFIG_STATIC5  = 0x0E;
-        static const uint8_t REG_INT_CONFIG           = 0x14;
-        static const uint8_t REG_TEMP_DATA_A1         = 0x1D;
-        static const uint8_t REG_PWR_MGMT0            = 0x4E;
-        static const uint8_t REG_GYRO_CONFIG0         = 0x4F;
-        static const uint8_t REG_ACCEL_CONFIG0        = 0x50;
-        static const uint8_t REG_GYRO_ACCEL_CONFIG0   = 0x52;
-        static const uint8_t REG_INT_CONFIG0          = 0x63;
-        static const uint8_t REG_INT_CONFIG1          = 0x64;
-        static const uint8_t REG_INT_SOURCE0          = 0x65;
-        static const uint8_t REG_BANK_SEL             = 0x76;
+        static const uint8_t TEMP_RST  = 0x01;
+        static const uint8_t ACCEL_RST = 0x02;
+        static const uint8_t BIT_RESET  = 0x80;
+        static const uint8_t I2C_IF_DIS = 0x10;
 
-        static const uint8_t PWR_MGMT0_ACCEL_MODE_LN    = 3 << 0;
-        static const uint8_t PWR_MGMT0_GYRO_MODE_LN     = 3 << 2;
-        static const uint8_t PWR_MGMT0_TEMP_DISABLE_OFF = 0 << 5;
-
-        static const uint8_t ACCEL_UI_FILT_BW_LOW_LATENCY = 14 << 4;
-        static const uint8_t GYRO_UI_FILT_BW_LOW_LATENCY  = 14 << 0;
-
-        static const uint8_t INT1_MODE_PULSED          = 0 << 2;
-        static const uint8_t INT1_DRIVE_CIRCUIT_PP     = 1 << 1;
-        static const uint8_t INT1_POLARITY_ACTIVE_HIGH = 1 << 0;
-
-        static const uint8_t INT_ASYNC_RESET_BIT       = 4;
-        static const uint8_t INT_TDEASSERT_DISABLE_BIT = 5;
-        static const uint8_t INT_TPULSE_DURATION_BIT   = 6;
-
-        static const uint8_t INT_TPULSE_DURATION_8  = 1 << INT_TPULSE_DURATION_BIT;
-        static const uint8_t INT_TDEASSERT_DISABLED = 1 << INT_TDEASSERT_DISABLE_BIT;
-
-        static const uint8_t UI_DRDY_INT_CLEAR_ON_SBR  = (0 << 5) || (0 << 4);
-        static const uint8_t UI_DRDY_INT1_EN_ENABLED  = 1 << 3;
-
-        static constexpr uint8_t UB0_REG_DEVICE_CONFIG = 0x11;
-
-        static const uint32_t MAX_SPI_CLOCK_RATE = 24000000;
-
-        odr_e   m_odr;
-        uint8_t m_antiAliasDelta;
-        uint8_t m_antiAliasBitshift;
-
-        // 1 MHz max SPI frequency for initialisation
-        static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
+        static const uint32_t MAX_SPI_CLK_HZ 8000000;
 
         virtual void getRegisterSettings(
                 std::vector<registerSetting_t> & settings) override
         {
-            (void)settings;
+            settings.push_back(REG_PWR_MGMT_1, BIT_RESET);
+            settings.push_back(REG_USER_CTRL, I2C_IF_DIS);
+            settings.push_back(REG_SIGNAL_PATH_RESET, ACCEL_RST | TEMP_RST);
+            settings.push_back(REG_PWR_MGMT_1, (uint8_t)INV_CLK_PLL);
+
+            settings.push_back(REG_GYRO_CONFIG, INV_FSR_2000DPS << 3);
+            settings.push_back(REG_ACCEL_CONFIG, INV_FSR_16G << 3);
+
+            settings.push_back(REG_CONFIG, mpuGyroDLPF(gyro));
+            settings.push_back(REG_SMPLRT_DIV, gyro->mpuDividerDrops);
+            settings.push_back(REG_INT_PIN_CFG, ICM20689_INT_ANYRD_2CLEAR);
+            settings.push_back(REG_INT_ENABLE, MPU_RF_DATA_RDY_EN);
+
         }
 
         virtual int16_t readRawAccel(uint8_t k) override
         {
-            // Accel data is second value, after temperature
-            return getShortFromBuffer(1, k);
+            // Accel data is first value in buffer
+            return getShortFromBuffer(0, k);
         }
+
 
     public:
 
@@ -104,12 +67,9 @@ class Icm20689 : public InvenSenseImu {
                 const uint8_t csPin,
                 const rotateFun_t rotateFun)
             : InvenSenseImu(
-                    MAX_SPI_CLOCK_RATE,
-                    MAX_SPI_CLOCK_RATE,
-                    mosiPin,
-                    misoPin,
-                    sclkPin,
                     csPin,
+                    MAX_SPI_CLOCK_HZ,
+                    MAX_SPI_CLOCK_HZ,
                     REG_TEMP_DATA_A1,
                     rotateFun,
                     gyroScale,
