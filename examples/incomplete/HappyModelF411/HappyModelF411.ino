@@ -18,7 +18,7 @@
  */
 
 #include <hackflight.h>
-#include <board/stm32/stm32f.h>
+#include <board/stm32/f/4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/mock.h>
 #include <imu/softquat/invensense/mock.h>
@@ -38,7 +38,7 @@ MockImu imu;
 
 static std::vector<PidController *> pids = {};
 
-static Stm32FBoard board(rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
 
 void setup(void)
 {

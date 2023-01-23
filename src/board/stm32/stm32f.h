@@ -100,8 +100,6 @@ class Stm32FBoard : public Stm32Board {
             m_invenSenseImu->bufferToRawGyro(rawGyro);
         }
 
-    public:
-
         Stm32FBoard(
                 Receiver & receiver,
                 InvenSenseImu & imu,
@@ -116,6 +114,8 @@ class Stm32FBoard : public Stm32Board {
             m_initialSpiFreq = imu.initialSpiFreq;
             m_maxSpiFreq = imu.maxSpiFreq;
         }
+
+    public:
 
         void begin(void)
         {
