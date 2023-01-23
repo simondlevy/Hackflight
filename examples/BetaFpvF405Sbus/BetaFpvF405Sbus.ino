@@ -83,7 +83,7 @@ void setup(void)
     // Start receiver UART
     Serial3.begin(100000, SERIAL_8E2);
 
-    // Start sensors UART
+    // Start Skyranger UART
     Serial4.begin(115200);
 
     board.begin();

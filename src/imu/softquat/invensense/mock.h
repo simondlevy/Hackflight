@@ -20,21 +20,16 @@
 
 #include "imu.h"
 
-class MockImu : public Imu {
+class MockImu : public InvenSenseImu {
 
     protected:
 
-        virtual int16_t readRawGyro(uint8_t k) 
+        virtual void getRegisterSettings(
+                std::vector<registerSetting_t> & settings) override
         {
-            (void)k;
-            return 0;
+            (void)settings;
         }
-
-        virtual void begin(uint32_t clockSpeed) override 
-        {
-            (void)clockSpeed;
-        }
-
+ 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
         {
             // Simulates rocking in the X (phi) axis
@@ -57,22 +52,15 @@ class MockImu : public Imu {
             return Axes(phi, 0.1, 0.1);
         }
 
-        virtual int32_t getGyroSkew(
-                const uint32_t nextTargetCycles,
-                const int32_t desiredPeriodCycles) override
+        virtual int16_t readRawAccel(uint8_t k) override
         {
-            (void)nextTargetCycles;
-            (void)desiredPeriodCycles;
             return 0;
         }
 
-        virtual void handleInterrupt(const uint32_t cycleCounter) override
-        {
-            (void)cycleCounter;
-        }
+    public:
 
-        virtual bool gyroIsCalibrating(void) override
-        {
-            return false;
-        }
-};
+        MockImu(void)
+            : InvenSenseImu(0, 0, 0, 0)
+            {
+            }
+ };

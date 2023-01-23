@@ -101,14 +101,6 @@ class Icm42688 : public InvenSenseImu {
             settings.push_back({REG_GYRO_CONFIG, (uint8_t)(m_gyroFsr << 3)});
             settings.push_back({REG_ACCEL_CONFIG, (uint8_t)(m_accelFsr << 3)});
 
-            /*
-            settings.push_back({REG_GYRO_CONFIG0,
-                    (3 - ((uint8_t)m_gyroFsr << 3)) << 5 | (m_odr & 0x0F)});
-
-            settings.push_back({REG_ACCEL_CONFIG0,
-                    (3 - ((uint8_t)m_accelFsr << 3)) << 5 | (m_odr & 0x0F)});
-                    */
-
             settings.push_back({REG_GYRO_CONFIG_STATIC3, m_antiAliasDelta});
 
             uint16_t deltSqr = m_antiAliasDelta * m_antiAliasDelta;

@@ -21,12 +21,12 @@
 #include <board/stm32/stm32f.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/mock.h>
-#include <imu/mock.h>
+#include <imu/softquat/invensense/mock.h>
 #include <receiver/mock.h>
 
 #include <vector>
 
-static const uint8_t LED_PIN  = PC13;
+static const uint8_t LED_PIN     = PC13;
 
 static Mixer mixer = QuadXbfMixer::make();
 

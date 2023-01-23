@@ -26,6 +26,8 @@ class Mpu6x00 : public InvenSenseImu {
 
     private:
 
+        static const uint8_t REG_ACCEL_XOUT_H = 0x3B;
+
         // 20 MHz max SPI frequency
         static const uint32_t MAX_SPI_CLK_HZ = 20000000;
 

@@ -121,26 +121,30 @@ class Stm32FBoard : public Stm32Board {
         {
             Board::begin();
 
-            m_spi.begin();
+            // Support MockImu
+            if (m_invenSenseImu->csPin != 0) {
 
-            pinMode(m_invenSenseImu->csPin, OUTPUT);
+                m_spi.begin();
 
-            const uint32_t clockSpeed = getClockSpeed();
+                pinMode(m_invenSenseImu->csPin, OUTPUT);
 
-            m_spi.setClockDivider(
-                    InvenSenseImu::calculateSpiDivisor(clockSpeed, m_initialSpiFreq));
+                const uint32_t clockSpeed = getClockSpeed();
 
-            std::vector<InvenSenseImu::registerSetting_t> registerSettings;
+                m_spi.setClockDivider(
+                        InvenSenseImu::calculateSpiDivisor(clockSpeed, m_initialSpiFreq));
 
-            m_invenSenseImu->getRegisterSettings(registerSettings);
+                std::vector<InvenSenseImu::registerSetting_t> registerSettings;
 
-            for (auto r : registerSettings) {
-                writeRegister(r.address, r.value);
-                delay(100);
+                m_invenSenseImu->getRegisterSettings(registerSettings);
+
+                for (auto r : registerSettings) {
+                    writeRegister(r.address, r.value);
+                    delay(100);
+                }
+
+                m_spi.setClockDivider(
+                        InvenSenseImu::calculateSpiDivisor(clockSpeed, m_maxSpiFreq));
             }
-
-            m_spi.setClockDivider(
-                    InvenSenseImu::calculateSpiDivisor(clockSpeed, m_maxSpiFreq));
 
             m_accelerometerTask.begin(m_imu);
         }

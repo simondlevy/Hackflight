@@ -110,7 +110,6 @@ class InvenSenseImu : public SoftQuatImu {
         static const uint8_t REG_CONFIG            = 0x1A;
         static const uint8_t REG_GYRO_CONFIG       = 0x1B;
         static const uint8_t REG_ACCEL_CONFIG      = 0x1C;
-        static const uint8_t REG_ACCEL_XOUT_H      = 0x3B;
         static const uint8_t REG_INT_PIN_CFG       = 0x37;
         static const uint8_t REG_INT_ENABLE        = 0x38;
         static const uint8_t REG_SIGNAL_PATH_RESET = 0x6A;
@@ -159,9 +158,9 @@ class InvenSenseImu : public SoftQuatImu {
                 const uint32_t initialSpiFreq,
                 const uint32_t maxSpiFreq,
                 const uint8_t dataRegister,
-                const rotateFun_t rotateFun,
-                const gyroFsr_e gyroFsr,
-                const accelFsr_e accelFsr)
+                const rotateFun_t rotateFun = rotate0,
+                const gyroFsr_e gyroFsr = GYRO_2000DPS,
+                const accelFsr_e accelFsr = ACCEL_16G)
             : SoftQuatImu(
                     rotateFun,
                     gyroFsrToInt(gyroFsr),
