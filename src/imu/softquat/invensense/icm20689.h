@@ -101,9 +101,6 @@ class Icm20689 : public InvenSenseImu {
     public:
 
         Icm20689(
-                const uint8_t mosiPin,
-                const uint8_t misoPin,
-                const uint8_t sclkPin,
                 const uint8_t csPin,
                 const rotateFun_t rotateFun)
             : InvenSenseImu(

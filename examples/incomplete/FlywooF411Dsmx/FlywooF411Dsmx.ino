@@ -34,13 +34,13 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static DsmxReceiver rx;
 
-static Mpu6x00 imu(Imu::rotate0Flip);
+static Mpu6x00 imu(Imu::rotate0Flip, IMU_CS_PIN);
 
 static std::vector<PidController *> pids = {};
 
 static MockEsc esc;
 
-static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN, IMU_CS_PIN);
+static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
 
 // IMU interrupt
 static void handleImuInterrupt(void)

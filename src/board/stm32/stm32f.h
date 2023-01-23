@@ -34,8 +34,6 @@ class Stm32FBoard : public Stm32Board {
 
         InvenSenseImu * m_invenSenseImu;
 
-        uint8_t m_imuCsPin;
-
         uint32_t m_initialSpiFreq; 
         uint32_t m_maxSpiFreq;
 
@@ -45,19 +43,19 @@ class Stm32FBoard : public Stm32Board {
 
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
-            digitalWrite(m_imuCsPin, LOW);
+            digitalWrite(m_invenSenseImu->csPin, LOW);
             m_spi.transfer(reg);
             m_spi.transfer(val);
-            digitalWrite(m_imuCsPin, HIGH);
+            digitalWrite(m_invenSenseImu->csPin, HIGH);
         }
 
         void readRegisters(
                 const uint8_t addr, uint8_t * buffer, const uint8_t count)
         {
-            digitalWrite(m_imuCsPin, LOW);
+            digitalWrite(m_invenSenseImu->csPin, LOW);
             buffer[0] = addr | 0x80;
             m_spi.transfer(buffer, count+1);
-            digitalWrite(m_imuCsPin, HIGH);
+            digitalWrite(m_invenSenseImu->csPin, HIGH);
         }
 
         void readRegisters(const uint8_t addr)
@@ -110,16 +108,13 @@ class Stm32FBoard : public Stm32Board {
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
-                const uint8_t ledPin, 
-                const uint8_t imuCsPin) 
+                const uint8_t ledPin)
             : Stm32Board(receiver, &imu, pids, mixer, esc, ledPin)
         {
             m_invenSenseImu = &imu;
 
             m_initialSpiFreq = imu.initialSpiFreq;
             m_maxSpiFreq = imu.maxSpiFreq;
-
-            m_imuCsPin = imuCsPin;
         }
 
         void begin(void)
@@ -128,7 +123,7 @@ class Stm32FBoard : public Stm32Board {
 
             m_spi.begin();
 
-            pinMode(m_imuCsPin, OUTPUT);
+            pinMode(m_invenSenseImu->csPin, OUTPUT);
 
             const uint32_t clockSpeed = getClockSpeed();
 

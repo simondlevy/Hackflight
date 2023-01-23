@@ -147,12 +147,14 @@ class Icm42688 : public InvenSenseImu {
 
         Icm42688(
                 const rotateFun_t rotateFun,
+                const uint8_t csPin,
                 const gyroScale_e gyroScale = GYRO_2000DPS,
                 const accelScale_e accelScale = ACCEL_2G,
                 const odr_e odr = ODR_8K,
                 const uint8_t antiAliasDelta = 6,
                 const uint8_t antiAliasBitshift = 10)
             : InvenSenseImu(
+                    csPin,
                     MAX_SPI_CLOCK_RATE,
                     MAX_SPI_CLOCK_RATE,
                     REG_TEMP_DATA_A1,

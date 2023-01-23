@@ -53,6 +53,7 @@ class InvenSenseImu : public SoftQuatImu {
     private:
 
         // Shared with Stm32FBoard
+        uint8_t csPin;
         uint8_t dataRegister;
         uint32_t initialSpiFreq;
         uint32_t maxSpiFreq;
@@ -124,6 +125,7 @@ class InvenSenseImu : public SoftQuatImu {
         }
 
         InvenSenseImu(
+                const uint8_t csPin,
                 const uint32_t initialSpiFreq,
                 const uint32_t maxSpiFreq,
                 const uint8_t dataRegister,
@@ -135,8 +137,8 @@ class InvenSenseImu : public SoftQuatImu {
                     gyroScaleToInt(gyroScale),
                     accelScaleToInt(accelScale))
         {
+            this->csPin = csPin;
             this->dataRegister = dataRegister;
-
             this->initialSpiFreq = initialSpiFreq;
             this->maxSpiFreq = maxSpiFreq;
         }

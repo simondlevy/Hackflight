@@ -43,13 +43,13 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static SbusReceiver rx;
 
-static Mpu6x00 imu(Imu::rotate270);
+static Mpu6x00 imu(Imu::rotate270, IMU_CS_PIN);
 
 static std::vector<PidController *> pids = {&anglePid};
 
 static DshotEsc esc(MOTOR_PINS);
 
-static Stm32F405Board board(rx, imu, pids, mixer, esc, LED_PIN, IMU_CS_PIN);
+static Stm32F405Board board(rx, imu, pids, mixer, esc, LED_PIN);
 
 // DSHOT timer interrupt
 extern "C" void handleDmaIrq(uint8_t id)

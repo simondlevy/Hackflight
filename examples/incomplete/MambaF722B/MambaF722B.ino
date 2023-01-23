@@ -36,11 +36,11 @@ static MockEsc esc;
 
 static MockReceiver rx;
 
-Icm42688 imu(Imu::rotate0);
+Icm42688 imu(Imu::rotate0, IMU_CS_PIN);
 
 static std::vector<PidController *> pids = {};
 
-static Stm32F722Board board(rx, imu, pids, mixer, esc, LED_PIN, IMU_CS_PIN);
+static Stm32F722Board board(rx, imu, pids, mixer, esc, LED_PIN);
 
 // IMU interrupt
 static void handleImuInterrupt(void)
