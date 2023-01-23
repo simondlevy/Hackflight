@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2023 Simon D. Levy
+   Copyright (c) 2022 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -20,21 +20,21 @@
 #include <hackflight.h>
 #include <board/stm32/f/4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <esc/mock.h>
-#include <imu/softquat/invensense/mock.h>
 #include <receiver/mock.h>
+#include <imu/softquat/invensense/mock.h>
+#include <esc/mock.h>
 
 #include <vector>
 
-static const uint8_t LED_PIN     = PC13;
+static const uint8_t LED_PIN = PC13;
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static MockEsc esc;
-
 static MockReceiver rx;
 
-MockImu imu;
+static MockImu imu;
+
+static MockEsc esc;
 
 static std::vector<PidController *> pids = {};
 

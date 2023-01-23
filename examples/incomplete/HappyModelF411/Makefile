@@ -1,6 +1,6 @@
 SKETCH = HappyModelF411
 
-FQBN = STMicroelectronics:stm32:GenF7:pnum=GENERIC_F722RETX,usb=CDCgen
+FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
 
 PORT = /dev/ttyACM0
 
