@@ -18,6 +18,8 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <stdint.h>
 
 #include "imu/softquat/invensense.h"
@@ -35,7 +37,7 @@ class Icm42688 : public InvenSenseImu {
 
         } odr_e;
 
-    private:
+    // XXX private:
 
         static const uint8_t ACCEL_BUFFER_OFFSET = 1;
         static const uint8_t GYRO_BUFFER_OFFSET = 4;

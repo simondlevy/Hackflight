@@ -21,6 +21,7 @@
 #include "board/stm32.h"
 #include "task/accelerometer.h"
 #include "imu/softquat/invensense.h"
+#include "imu/softquat/invensense/icm42688.h"
 
 class Stm32FBoard : public Stm32Board {
 
@@ -144,12 +145,10 @@ class Stm32FBoard : public Stm32Board {
 
                 // push-pull, pulsed, active HIGH interrupts
                 // need to clear bit 4 to allow proper INT1 and INT2 operation
-                static constexpr uint8_t UB0_REG_INT_CONFIG = 0x14;
-                static constexpr uint8_t UB0_REG_INT_CONFIG1 = 0x64;
-                writeRegister(UB0_REG_INT_CONFIG, 0x18 | 0x03);
-                uint8_t reg = readRegister(UB0_REG_INT_CONFIG1);
+                writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
+                uint8_t reg = readRegister(Icm42688::REG_INT_CONFIG1);
                 reg &= ~0x10;
-                writeRegister(UB0_REG_INT_CONFIG1, reg);
+                writeRegister(Icm42688::REG_INT_CONFIG1, reg);
                 delay(100);
 
                 m_spi.setClockDivider(
