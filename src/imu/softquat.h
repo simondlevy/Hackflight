@@ -203,7 +203,7 @@ class SoftQuatImu : public Imu {
             auto qy = q_old.y;
             auto qz = q_old.z;
 
-            const auto recipAccNorm = 0;//square(ax) + square(ay) + square(az);
+            const auto recipAccNorm = square(ax) + square(ay) + square(az);
 
             if (recipAccNorm > 0.0) {
 

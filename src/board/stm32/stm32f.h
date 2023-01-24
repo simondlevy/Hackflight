@@ -142,17 +142,14 @@ class Stm32FBoard : public Stm32Board {
                     delay(100); // arbitrary; should be long enough for any delays
                 }
 
-                // ICM42688 requires register reset for interrupt
-                const uint8_t ICM426XX_RA_INT_CONFIG1 = 0x64;
-                const uint8_t ICM426XX_INT_ASYNC_RESET_BIT = 4;
-                const uint8_t ICM426XX_INT_TDEASSERT_DISABLE_BIT  = 5;
-                const uint8_t ICM426XX_INT_TPULSE_DURATION_BIT = 6;
-                const uint8_t ICM426XX_INT_TPULSE_DURATION_8 = (1 << ICM426XX_INT_TPULSE_DURATION_BIT);
-                const uint8_t ICM426XX_INT_TDEASSERT_DISABLED  = (1 << ICM426XX_INT_TDEASSERT_DISABLE_BIT);
-                uint8_t intConfig1Value = readRegister(ICM426XX_RA_INT_CONFIG1);
-                intConfig1Value &= ~(1 << ICM426XX_INT_ASYNC_RESET_BIT);
-                intConfig1Value |= (ICM426XX_INT_TPULSE_DURATION_8 | ICM426XX_INT_TDEASSERT_DISABLED);
-                writeRegister(ICM426XX_RA_INT_CONFIG1, intConfig1Value);
+                // push-pull, pulsed, active HIGH interrupts
+                // need to clear bit 4 to allow proper INT1 and INT2 operation
+                static constexpr uint8_t UB0_REG_INT_CONFIG = 0x14;
+                static constexpr uint8_t UB0_REG_INT_CONFIG1 = 0x64;
+                writeRegister(UB0_REG_INT_CONFIG, 0x18 | 0x03);
+                uint8_t reg = readRegister(UB0_REG_INT_CONFIG1);
+                reg &= ~0x10;
+                writeRegister(UB0_REG_INT_CONFIG1, reg);
                 delay(100);
 
                 m_spi.setClockDivider(
