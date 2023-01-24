@@ -21,6 +21,7 @@
 #include "board/stm32.h"
 #include "task/accelerometer.h"
 #include "imu/softquat/invensense.h"
+#include "imu/softquat/invensense/icm42688.h"
 
 class Stm32FBoard : public Stm32Board {
 
@@ -139,6 +140,16 @@ class Stm32FBoard : public Stm32Board {
 
                 for (auto r : registerSettings) {
                     writeRegister(r.address, r.value);
+                    delay(100); // arbitrary; should be long enough for any delays
+                }
+
+                // Enable data-ready interrupt on ICM42688
+                // https://github.com/finani/ICM42688/blob/master/src/ICM42688.cpp
+                if (m_invenSenseImu->isIcm42688()) {
+                    writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
+                    uint8_t reg = readRegister(Icm42688::REG_INT_CONFIG1);
+                    reg &= ~0x10;
+                    writeRegister(Icm42688::REG_INT_CONFIG1, reg);
                     delay(100);
                 }
 

@@ -18,11 +18,15 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <stdint.h>
 
 #include "imu/softquat/invensense.h"
 
 class Icm42688 : public InvenSenseImu {
+
+    friend class Stm32FBoard;
 
     public:
 
@@ -107,17 +111,19 @@ class Icm42688 : public InvenSenseImu {
             settings.push_back({REG_GYRO_CONFIG_STATIC3, m_antiAliasDelta});
 
             uint16_t deltSqr = m_antiAliasDelta * m_antiAliasDelta;
-            settings.push_back({REG_GYRO_CONFIG_STATIC4, deltSqr & 0xFF});
+            settings.push_back({REG_GYRO_CONFIG_STATIC4, (uint8_t)(deltSqr & 0xFF)});
 
-            settings.push_back({REG_GYRO_CONFIG_STATIC5,
-                    (deltSqr >> 8) | (m_antiAliasBitshift << 4)});
+            uint8_t tmp = (uint8_t)(deltSqr >> 8) | (uint8_t)(m_antiAliasBitshift << 4);
 
-            settings.push_back({REG_ACCEL_CONFIG_STATIC2, m_antiAliasDelta << 1});
+            settings.push_back({REG_GYRO_CONFIG_STATIC5, tmp});
 
-            settings.push_back({REG_ACCEL_CONFIG_STATIC3, deltSqr & 0xFF});
+            settings.push_back({REG_ACCEL_CONFIG_STATIC2, (uint8_t)(m_antiAliasDelta << 1)});
 
-            settings.push_back({REG_ACCEL_CONFIG_STATIC4,
-                    (deltSqr >> 8) | (m_antiAliasBitshift << 4)});
+            settings.push_back({REG_ACCEL_CONFIG_STATIC3, (uint8_t)(deltSqr & 0xFF)});
+
+            tmp = (deltSqr >> 8) | (m_antiAliasBitshift << 4);
+
+            settings.push_back({REG_ACCEL_CONFIG_STATIC4, tmp});
 
             settings.push_back({REG_GYRO_ACCEL_CONFIG0,
                     ACCEL_UI_FILT_BW_LOW_LATENCY | GYRO_UI_FILT_BW_LOW_LATENCY});
