@@ -72,6 +72,11 @@ class InvenSenseImu : public SoftQuatImu {
         uint32_t initialSpiFreq;
         uint32_t maxSpiFreq;
 
+        virtual bool isIcm42688(void) 
+        {
+            return false;
+        }
+
         static uint16_t gyroFsrToInt(const gyroFsr_e gyroFsr)
         {
             return

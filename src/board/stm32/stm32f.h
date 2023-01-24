@@ -143,13 +143,15 @@ class Stm32FBoard : public Stm32Board {
                     delay(100); // arbitrary; should be long enough for any delays
                 }
 
-                // push-pull, pulsed, active HIGH interrupts
-                // need to clear bit 4 to allow proper INT1 and INT2 operation
-                writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
-                uint8_t reg = readRegister(Icm42688::REG_INT_CONFIG1);
-                reg &= ~0x10;
-                writeRegister(Icm42688::REG_INT_CONFIG1, reg);
-                delay(100);
+                // Enable data-ready interrupt on ICM42688
+                // https://github.com/finani/ICM42688/blob/master/src/ICM42688.cpp
+                if (m_invenSenseImu->isIcm42688()) {
+                    writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
+                    uint8_t reg = readRegister(Icm42688::REG_INT_CONFIG1);
+                    reg &= ~0x10;
+                    writeRegister(Icm42688::REG_INT_CONFIG1, reg);
+                    delay(100);
+                }
 
                 m_spi.setClockDivider(
                         InvenSenseImu::calculateSpiDivisor(clockSpeed, m_maxSpiFreq));

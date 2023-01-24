@@ -26,6 +26,8 @@
 
 class Icm42688 : public InvenSenseImu {
 
+    friend class Stm32FBoard;
+
     public:
 
         typedef enum {
@@ -37,7 +39,7 @@ class Icm42688 : public InvenSenseImu {
 
         } odr_e;
 
-    // XXX private:
+    private:
 
         static const uint8_t ACCEL_BUFFER_OFFSET = 1;
         static const uint8_t GYRO_BUFFER_OFFSET = 4;
