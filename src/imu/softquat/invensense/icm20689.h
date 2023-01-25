@@ -108,14 +108,8 @@ class ICM20689 {
 
             digitalWrite(_csPin,LOW); 
 
-            _spi->transfer(addr | 0x80); 
-            for(uint8_t i = 0; i < count; i++) {
-                buffer[i] = _spi->transfer(0x00); 
-            }
-
             buffer[0] = addr | 0x80;
-            m_spi.transfer(buffer, count+1);
-
+            _spi->transfer(buffer, count+1);
 
             digitalWrite(_csPin,HIGH); 
 
@@ -170,12 +164,12 @@ class ICM20689 {
 
             readRegisters(ACCEL_OUT, 15, _buffer, SPI_CLK_HZ);
 
-            accelCounts[0] = (((int16_t)_buffer[0]) << 8) | _buffer[1];
-            accelCounts[1] = (((int16_t)_buffer[2]) << 8) | _buffer[3];
-            accelCounts[2] = (((int16_t)_buffer[4]) << 8) | _buffer[5];
+            accelCounts[0] = (((int16_t)_buffer[1]) << 8) | _buffer[2];
+            accelCounts[1] = (((int16_t)_buffer[3]) << 8) | _buffer[4];
+            accelCounts[2] = (((int16_t)_buffer[5]) << 8) | _buffer[6];
 
-            gyroCounts[0] = (((int16_t)_buffer[8]) << 8) | _buffer[9];
-            gyroCounts[1] = (((int16_t)_buffer[10]) << 8) | _buffer[11];
-            gyroCounts[2] = (((int16_t)_buffer[12]) << 8) | _buffer[13];
+            gyroCounts[0] = (((int16_t)_buffer[9]) << 8) | _buffer[10];
+            gyroCounts[1] = (((int16_t)_buffer[11]) << 8) | _buffer[12];
+            gyroCounts[2] = (((int16_t)_buffer[13]) << 8) | _buffer[14];
         }
 }; 
