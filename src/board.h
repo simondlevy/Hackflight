@@ -84,6 +84,7 @@ class Board {
             m_mixer = &mixer;
             m_esc = &esc;
 
+            // Support negative LED pin number for inversion
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
             m_ledInverted = ledPin < 0;
         }
@@ -173,9 +174,7 @@ class Board {
 
         void ledSet(bool on)
         {
-            if (m_ledPin > 0) {
-                digitalWrite(m_ledPin, m_ledInverted ? on : !on);
-            }
+            digitalWrite(m_ledPin, m_ledInverted ? on : !on);
         }
 
         // STM32F boards have no auto-reset bootloader support, so we reboot on
@@ -341,9 +340,7 @@ class Board {
 
             escBegin();
 
-            if (m_ledPin > 0) {
-                pinMode(m_ledPin, OUTPUT);
-            }
+            pinMode(m_ledPin, OUTPUT);
 
             ledSet(false);
             for (auto i=0; i<Safety::STARTUP_BLINK_LED_REPS; i++) {

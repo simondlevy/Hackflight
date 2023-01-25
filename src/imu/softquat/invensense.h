@@ -77,6 +77,11 @@ class InvenSenseImu : public SoftQuatImu {
             return false;
         }
 
+        virtual bool isIcm20689(void) 
+        {
+            return false;
+        }
+
         static uint16_t gyroFsrToInt(const gyroFsr_e gyroFsr)
         {
             return

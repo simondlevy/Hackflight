@@ -18,44 +18,75 @@
  */
 
 #include <hackflight.h>
-#include <board/stm32/f/4/stm32f411.h>
-#include <core/mixers/fixedpitch/quadxbf.h>
-#include <receiver/mock.h>
 #include <imu/softquat/invensense/icm20689.h>
-#include <esc/mock.h>
 
-#include <vector>
+static const uint8_t IMU_MOSI_PIN = PA7;
+static const uint8_t IMU_MISO_PIN = PA6;
+static const uint8_t IMU_SCLK_PIN = PA5;
 
 static const uint8_t LED_PIN     = PC13;
 static const uint8_t IMU_CS_PIN  = PA4;
 static const uint8_t IMU_INT_PIN = PA1;
 
-static Mixer mixer = QuadXbfMixer::make();
+static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
-static MockReceiver rx;
+static ICM20689 imu(spi, IMU_CS_PIN);
 
-static Icm20689 imu(Imu::rotate90, IMU_CS_PIN);
+static volatile bool gotInterrupt;
 
-static MockEsc esc;
-
-static std::vector<PidController *> pids = {};
-
-static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
-
-// IMU interrupt
-static void handleImuInterrupt(void)
+static void getIMU() 
 {
-    board.handleImuInterrupt();
+    gotInterrupt = true;
 }
 
-void setup(void)
+static void blinkLed(void)
 {
-    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
+    static uint32_t prev;
+    static bool led;
 
-    board.begin();
+    uint32_t msec = millis();
+
+    if (msec-prev > 500) {
+        led = !led;
+        digitalWrite(LED_PIN, led);
+        prev = msec;
+    }
 }
 
-void loop(void)
+void setup() {
+
+  Serial.begin(115200);
+
+  pinMode(LED_PIN, OUTPUT);
+
+  imu.begin();
+
+  pinMode(IMU_INT_PIN,INPUT);
+  attachInterrupt(IMU_INT_PIN,getIMU,RISING);
+
+}
+
+void loop() 
 {
-    board.step();
+    blinkLed();
+
+    if (gotInterrupt) {
+
+        gotInterrupt = false;
+
+        imu.readSensor();
+
+        Serial.print(imu.accelCounts[0]);
+        Serial.print("\t");
+        Serial.print(imu.accelCounts[1]);
+        Serial.print("\t");
+        Serial.print(imu.accelCounts[2]);
+        Serial.print("\t");
+        Serial.print(imu.gyroCounts[0]);
+        Serial.print("\t");
+        Serial.print(imu.gyroCounts[1]);
+        Serial.print("\t");
+        Serial.print(imu.gyroCounts[2]);
+        Serial.print("\n");
+    }
 }
