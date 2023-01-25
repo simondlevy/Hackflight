@@ -79,7 +79,7 @@ class Icm42688 : public InvenSenseImu {
         static const uint8_t INT_TPULSE_DURATION_8  = 1 << INT_TPULSE_DURATION_BIT;
         static const uint8_t INT_TDEASSERT_DISABLED = 1 << INT_TDEASSERT_DISABLE_BIT;
 
-        static const uint8_t UI_DRDY_INT_CLEAR_ON_SBR  = (0 << 5) || (0 << 4);
+        static const uint8_t UI_DRDY_INT_CLEAR_ON_SBR  = (0 << 5) | (0 << 4);
         static const uint8_t UI_DRDY_INT1_EN_ENABLED  = 1 << 3;
 
         static constexpr uint8_t UB0_REG_DEVICE_CONFIG = 0x11;

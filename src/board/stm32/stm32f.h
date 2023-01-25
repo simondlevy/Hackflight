@@ -118,63 +118,6 @@ class Stm32FBoard : public Stm32Board {
             m_maxSpiFreq = imu.maxSpiFreq;
         }
 
-        void beginIcm20689(void)
-        {
-            const uint8_t PWR_MGMT_1 = 0x6B;
-            const uint8_t CLOCK_SEL_PLL = 0x01;
-            const uint8_t PWR_RESET = 0x80;
-            const uint8_t PWR_MGMT_2 = 0x6C;
-            const uint8_t SEN_ENABLE = 0x00;
-            const uint8_t ACCEL_CONFIG = 0x1C;
-            const uint8_t ACCEL_FS_SEL_16G = 0x18;
-            const uint8_t GYRO_CONFIG = 0x1B;
-            const uint8_t GYRO_FS_SEL_2000DPS = 0x18;
-            const uint8_t ACCEL_CONFIG2 = 0x1D;
-            const uint8_t ACCEL_DLPF_1046HZ = 0x08;
-            const uint8_t CONFIG = 0x1A;
-            const uint8_t GYRO_DLPF_250HZ = 0x00;
-            const uint8_t SMPLRT_DIV = 0x19;
-            const uint8_t INT_PIN_CFG = 0x37;
-            const uint8_t INT_ENABLE = 0x38;
-            const uint8_t INT_PULSE_50US = 0x00;
-            const uint8_t INT_RAW_RDY_EN = 0x01;
-
-            // select clock source to gyro
-            writeRegister(PWR_MGMT_1, CLOCK_SEL_PLL);
-
-            // reset the ICM20689
-            writeRegister(PWR_MGMT_1, PWR_RESET);
-
-            // wait for ICM20689 to come back up
-            delay(1);
-
-            // select clock source to gyro
-            writeRegister(PWR_MGMT_1, CLOCK_SEL_PLL);
-
-            // enable accelerometer and gyro
-            writeRegister(PWR_MGMT_2, SEN_ENABLE);
-
-            // set accel range to 16G as default
-            writeRegister(ACCEL_CONFIG, ACCEL_FS_SEL_16G);
-
-            // set the gyro range to 2000DPS as default
-            writeRegister(GYRO_CONFIG, GYRO_FS_SEL_2000DPS);
-
-            // set bandwidth to 1046Hz as default
-            writeRegister(ACCEL_CONFIG2, ACCEL_DLPF_1046HZ);
-
-            writeRegister(CONFIG, GYRO_DLPF_250HZ);
-
-            writeRegister(SMPLRT_DIV, 19);
-
-            // setDlpfBandwidth(ICM20689::DLPF_BANDWIDTH_21HZ);
-            //writeRegister(SMPLRT_DIV, 19);
-            //writeRegister(SMPLRT_DIV, 19);
-
-            writeRegister(INT_PIN_CFG, INT_PULSE_50US); // setup interrupt, 50 us pulse
-            writeRegister(INT_ENABLE, INT_RAW_RDY_EN);  // set to data ready
-        }
-
     public:
 
         void begin(void)
@@ -193,30 +136,23 @@ class Stm32FBoard : public Stm32Board {
                 m_spi.setClockDivider(
                         InvenSenseImu::calculateSpiDivisor(clockSpeed, m_initialSpiFreq));
 
-                if (m_invenSenseImu->isIcm20689()) {
-                    beginIcm20689();
+                std::vector<InvenSenseImu::registerSetting_t> registerSettings;
+
+                m_invenSenseImu->getRegisterSettings(registerSettings);
+
+                for (auto r : registerSettings) {
+                    writeRegister(r.address, r.value);
+                    delay(100); // arbitrary; should be long enough for any delays
                 }
 
-                else {
-
-                    std::vector<InvenSenseImu::registerSetting_t> registerSettings;
-
-                    m_invenSenseImu->getRegisterSettings(registerSettings);
-
-                    for (auto r : registerSettings) {
-                        writeRegister(r.address, r.value);
-                        delay(100); // arbitrary; should be long enough for any delays
-                    }
-
-                    // Enable data-ready interrupt on ICM42688
-                    // https://github.com/finani/ICM42688/blob/master/src/ICM42688.cpp
-                    if (m_invenSenseImu->isIcm42688()) {
-                        writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
-                        uint8_t reg = readRegister(Icm42688::REG_INT_CONFIG1);
-                        reg &= ~0x10;
-                        writeRegister(Icm42688::REG_INT_CONFIG1, reg);
-                        delay(100);
-                    }
+                // Enable data-ready interrupt on ICM42688
+                // https://github.com/finani/ICM42688/blob/master/src/ICM42688.cpp
+                if (m_invenSenseImu->isIcm42688()) {
+                    writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
+                    uint8_t reg = readRegister(Icm42688::REG_INT_CONFIG1);
+                    reg &= ~0x10;
+                    writeRegister(Icm42688::REG_INT_CONFIG1, reg);
+                    delay(100);
                 }
 
                 m_spi.setClockDivider(
