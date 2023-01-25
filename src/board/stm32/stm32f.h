@@ -131,6 +131,8 @@ class Stm32FBoard : public Stm32Board {
 
                 pinMode(m_invenSenseImu->csPin, OUTPUT);
 
+                digitalWrite(m_invenSenseImu->csPin, HIGH);
+
                 const uint32_t clockSpeed = getClockSpeed();
 
                 m_spi.setClockDivider(
