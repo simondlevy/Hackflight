@@ -76,16 +76,15 @@ class ICM20689 {
 
         SPIClass * _spi;
         uint8_t _csPin;
-        bool _useSPIHS = false;
 
-        const uint32_t SPI_LS_CLOCK = 1000000; 
-        const uint32_t SPI_HS_CLOCK = 8000000; 
+        const uint32_t SPI_INIT_CLK_HZ = 1000000; 
+        const uint32_t SPI_CLK_HZ      = 8000000; 
         
         uint8_t _buffer[15] = {};
         
         void writeRegister(uint8_t subAddress, uint8_t data) 
         {
-            _spi->beginTransaction(SPISettings(SPI_LS_CLOCK, MSBFIRST, SPI_MODE3)); 
+            _spi->beginTransaction(SPISettings(SPI_INIT_CLK_HZ, MSBFIRST, SPI_MODE3)); 
 
             digitalWrite(_csPin,LOW); 
             _spi->transfer(subAddress); 
@@ -96,17 +95,14 @@ class ICM20689 {
 
             delay(10);
 
-            readRegisters(subAddress,1,_buffer);
+            readRegisters(subAddress, 1, _buffer, SPI_INIT_CLK_HZ);
         }
 
-        int readRegisters(uint8_t subAddress, uint8_t count, uint8_t* dest) {
+        void readRegisters(
+                uint8_t subAddress, uint8_t count, uint8_t * dest, uint32_t spiClkHz) {
 
-            if (_useSPIHS) {
-                _spi->beginTransaction(SPISettings(SPI_HS_CLOCK, MSBFIRST, SPI_MODE3));
-            }
-            else{
-                _spi->beginTransaction(SPISettings(SPI_LS_CLOCK, MSBFIRST, SPI_MODE3));
-            }
+            _spi->beginTransaction(SPISettings(spiClkHz, MSBFIRST, SPI_MODE3));
+
             digitalWrite(_csPin,LOW); 
             _spi->transfer(subAddress | 0x80); 
             for(uint8_t i = 0; i < count; i++) {
@@ -114,7 +110,6 @@ class ICM20689 {
             }
             digitalWrite(_csPin,HIGH); 
             _spi->endTransaction(); 
-            return 1;
         }
 
     public:
@@ -130,8 +125,6 @@ class ICM20689 {
 
         void begin() 
         {
-            _useSPIHS = false;
-
             pinMode(_csPin,OUTPUT);
 
             digitalWrite(_csPin,HIGH);
@@ -165,9 +158,7 @@ class ICM20689 {
 
         void readSensor() {
 
-            _useSPIHS = true; 
-
-            readRegisters(ACCEL_OUT, 15, _buffer);
+            readRegisters(ACCEL_OUT, 15, _buffer, SPI_CLK_HZ);
 
             accelCounts[0] = (((int16_t)_buffer[0]) << 8) | _buffer[1];
             accelCounts[1] = (((int16_t)_buffer[2]) << 8) | _buffer[3];
