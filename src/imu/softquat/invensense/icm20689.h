@@ -109,10 +109,13 @@ class ICM20689 {
             digitalWrite(_csPin,LOW); 
 
             _spi->transfer(addr | 0x80); 
-
             for(uint8_t i = 0; i < count; i++) {
                 buffer[i] = _spi->transfer(0x00); 
             }
+
+            buffer[0] = addr | 0x80;
+            m_spi.transfer(buffer, count+1);
+
 
             digitalWrite(_csPin,HIGH); 
 

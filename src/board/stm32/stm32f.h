@@ -61,11 +61,6 @@ class Stm32FBoard : public Stm32Board {
             digitalWrite(m_invenSenseImu->csPin, HIGH);
         }
 
-        void readRegisters(const uint8_t addr)
-        {
-            readRegisters(addr, m_buffer, 14);
-        }
-
         void setClockDivider(uint32_t divider)
         {
             m_spi.setClockDivider(divider);
