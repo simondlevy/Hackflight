@@ -51,8 +51,13 @@ class Stm32FBoard : public Stm32Board {
         }
 
         void readRegisters(
-                const uint8_t addr, uint8_t * buffer, const uint8_t count)
+                const uint8_t addr,
+                uint8_t * buffer,
+                const uint8_t count,
+                const uint32_t spiClkHz) 
         {
+            (void)spiClkHz;
+
             digitalWrite(m_invenSenseImu->csPin, LOW);
 
             buffer[0] = addr | 0x80;
@@ -86,7 +91,8 @@ class Stm32FBoard : public Stm32Board {
             readRegisters(
                     m_invenSenseImu->dataRegister,
                     m_invenSenseImu->buffer,
-                    InvenSenseImu::BUFFER_SIZE);
+                    InvenSenseImu::BUFFER_SIZE,
+                    m_maxSpiFreq);
 
             m_invenSenseImu->bufferToRawGyro(rawGyro);
         }
@@ -140,7 +146,7 @@ class Stm32FBoard : public Stm32Board {
                 if (m_invenSenseImu->isIcm42688()) {
                     writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
                     uint8_t buf[2] = {};
-                    readRegisters(Icm42688::REG_INT_CONFIG1, buf, 1);
+                    readRegisters(Icm42688::REG_INT_CONFIG1, buf, 1, m_initialSpiFreq);
                     writeRegister(Icm42688::REG_INT_CONFIG1, buf[1] & ~0x10);
                     delay(100);
                 }
