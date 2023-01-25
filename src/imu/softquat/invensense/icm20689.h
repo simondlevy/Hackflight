@@ -83,25 +83,20 @@ class ICM20689 {
         
         uint8_t _buffer[15] = {};
         
-        int writeRegister(uint8_t subAddress, uint8_t data) 
+        void writeRegister(uint8_t subAddress, uint8_t data) 
         {
             _spi->beginTransaction(SPISettings(SPI_LS_CLOCK, MSBFIRST, SPI_MODE3)); 
+
             digitalWrite(_csPin,LOW); 
             _spi->transfer(subAddress); 
             _spi->transfer(data); 
             digitalWrite(_csPin,HIGH); 
+
             _spi->endTransaction(); 
 
             delay(10);
 
             readRegisters(subAddress,1,_buffer);
-
-            if (_buffer[0] == data) {
-                return 1;
-            }
-            else{
-                return -1;
-            }
         }
 
         int readRegisters(uint8_t subAddress, uint8_t count, uint8_t* dest) {
