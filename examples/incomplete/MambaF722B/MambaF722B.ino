@@ -36,7 +36,7 @@ static MockEsc esc;
 
 static MockReceiver rx;
 
-Icm42688 imu(Imu::rotate0, IMU_CS_PIN);
+Icm42688 imu(Imu::rotate270, IMU_CS_PIN);
 
 static std::vector<PidController *> pids = {};
 
