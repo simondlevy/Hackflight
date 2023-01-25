@@ -66,6 +66,15 @@ class InvenSenseImu : public SoftQuatImu {
 
     private:
 
+        typedef enum {
+
+            MOCK,
+            MPU6000,
+            ICM42688,
+            ICM20689
+
+        } product_e;
+
         // Shared with Stm32FBoard
         uint8_t csPin;
         uint8_t dataRegister;
