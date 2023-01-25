@@ -82,33 +82,40 @@ class ICM20689 {
         
         uint8_t _buffer[15] = {};
         
-        void writeRegister(uint8_t subAddress, uint8_t data) 
+        void writeRegister(const uint8_t addr, const uint8_t val) 
         {
             _spi->beginTransaction(SPISettings(SPI_INIT_CLK_HZ, MSBFIRST, SPI_MODE3)); 
 
             digitalWrite(_csPin,LOW); 
-            _spi->transfer(subAddress); 
-            _spi->transfer(data); 
+            _spi->transfer(addr); 
+            _spi->transfer(val); 
             digitalWrite(_csPin,HIGH); 
 
             _spi->endTransaction(); 
 
             delay(10);
 
-            readRegisters(subAddress, 1, _buffer, SPI_INIT_CLK_HZ);
+            readRegisters(addr, 1, _buffer, SPI_INIT_CLK_HZ);
         }
 
         void readRegisters(
-                uint8_t subAddress, uint8_t count, uint8_t * dest, uint32_t spiClkHz) {
+                const uint8_t addr,
+                const uint8_t count,
+                uint8_t * buffer,
+                const uint32_t spiClkHz) {
 
             _spi->beginTransaction(SPISettings(spiClkHz, MSBFIRST, SPI_MODE3));
 
             digitalWrite(_csPin,LOW); 
-            _spi->transfer(subAddress | 0x80); 
+
+            _spi->transfer(addr | 0x80); 
+
             for(uint8_t i = 0; i < count; i++) {
-                dest[i] = _spi->transfer(0x00); 
+                buffer[i] = _spi->transfer(0x00); 
             }
+
             digitalWrite(_csPin,HIGH); 
+
             _spi->endTransaction(); 
         }
 

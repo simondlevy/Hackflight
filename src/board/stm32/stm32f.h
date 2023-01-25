@@ -54,8 +54,10 @@ class Stm32FBoard : public Stm32Board {
                 const uint8_t addr, uint8_t * buffer, const uint8_t count)
         {
             digitalWrite(m_invenSenseImu->csPin, LOW);
+
             buffer[0] = addr | 0x80;
             m_spi.transfer(buffer, count+1);
+
             digitalWrite(m_invenSenseImu->csPin, HIGH);
         }
 
