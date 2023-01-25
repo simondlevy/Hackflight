@@ -36,7 +36,7 @@ class Stm32FBoard : public Stm32Board {
         InvenSenseImu * m_invenSenseImu;
 
         uint32_t m_initialSpiFreq; 
-        uint32_t m_maxSpiFreq;
+        uint32_t m_fullSpiFreq;
 
         // Enough room for seven two-byte integers (gyro XYZ, temperature,
         // accel XYZ) plus one byte for SPI transfer
@@ -44,10 +44,14 @@ class Stm32FBoard : public Stm32Board {
 
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
+            m_spi.beginTransaction(SPISettings(m_initialSpiFreq, MSBFIRST, SPI_MODE3)); 
+
             digitalWrite(m_invenSenseImu->csPin, LOW);
             m_spi.transfer(reg);
             m_spi.transfer(val);
             digitalWrite(m_invenSenseImu->csPin, HIGH);
+
+            m_spi.endTransaction(); 
         }
 
         void readRegisters(
@@ -56,7 +60,7 @@ class Stm32FBoard : public Stm32Board {
                 const uint8_t count,
                 const uint32_t spiClkHz) 
         {
-            (void)spiClkHz;
+            m_spi.beginTransaction(SPISettings(spiClkHz, MSBFIRST, SPI_MODE3)); 
 
             digitalWrite(m_invenSenseImu->csPin, LOW);
 
@@ -64,11 +68,8 @@ class Stm32FBoard : public Stm32Board {
             m_spi.transfer(buffer, count+1);
 
             digitalWrite(m_invenSenseImu->csPin, HIGH);
-        }
 
-        void setClockDivider(uint32_t divider)
-        {
-            m_spi.setClockDivider(divider);
+            m_spi.endTransaction(); 
         }
 
     protected:
@@ -92,7 +93,7 @@ class Stm32FBoard : public Stm32Board {
                     m_invenSenseImu->dataRegister,
                     m_invenSenseImu->buffer,
                     InvenSenseImu::BUFFER_SIZE,
-                    m_maxSpiFreq);
+                    m_fullSpiFreq);
 
             m_invenSenseImu->bufferToRawGyro(rawGyro);
         }
@@ -109,7 +110,7 @@ class Stm32FBoard : public Stm32Board {
             m_invenSenseImu = &imu;
 
             m_initialSpiFreq = imu.initialSpiFreq;
-            m_maxSpiFreq = imu.maxSpiFreq;
+            m_fullSpiFreq = imu.maxSpiFreq;
         }
 
     public:
@@ -126,11 +127,6 @@ class Stm32FBoard : public Stm32Board {
                 pinMode(m_invenSenseImu->csPin, OUTPUT);
 
                 digitalWrite(m_invenSenseImu->csPin, HIGH);
-
-                const uint32_t clockSpeed = getClockSpeed();
-
-                m_spi.setClockDivider(
-                        InvenSenseImu::calculateSpiDivisor(clockSpeed, m_initialSpiFreq));
 
                 std::vector<InvenSenseImu::registerSetting_t> registerSettings;
 
@@ -150,9 +146,6 @@ class Stm32FBoard : public Stm32Board {
                     writeRegister(Icm42688::REG_INT_CONFIG1, buf[1] & ~0x10);
                     delay(100);
                 }
-
-                m_spi.setClockDivider(
-                        InvenSenseImu::calculateSpiDivisor(clockSpeed, m_maxSpiFreq));
             }
 
             m_accelerometerTask.begin(m_imu);
