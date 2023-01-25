@@ -66,13 +66,6 @@ class Stm32FBoard : public Stm32Board {
             readRegisters(addr, m_buffer, 14);
         }
 
-        uint8_t readRegister(const uint8_t addr)
-        {
-            uint8_t buffer[2] = {};
-            readRegisters(addr, buffer, 1);
-            return buffer[1];
-        }
-
         void setClockDivider(uint32_t divider)
         {
             m_spi.setClockDivider(divider);
@@ -151,9 +144,9 @@ class Stm32FBoard : public Stm32Board {
                 // https://github.com/finani/ICM42688/blob/master/src/ICM42688.cpp
                 if (m_invenSenseImu->isIcm42688()) {
                     writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
-                    uint8_t reg = readRegister(Icm42688::REG_INT_CONFIG1);
-                    reg &= ~0x10;
-                    writeRegister(Icm42688::REG_INT_CONFIG1, reg);
+                    uint8_t buf[2] = {};
+                    readRegisters(Icm42688::REG_INT_CONFIG1, buf, 1);
+                    writeRegister(Icm42688::REG_INT_CONFIG1, buf[1] & ~0x10);
                     delay(100);
                 }
 
