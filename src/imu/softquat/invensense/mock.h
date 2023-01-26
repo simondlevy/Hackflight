@@ -18,18 +18,12 @@
 
 #pragma once
 
-#include "imu.h"
+#include "imu/softquat/invensense.h"
 
 class MockImu : public InvenSenseImu {
 
     protected:
 
-        virtual void getRegisterSettings(
-                std::vector<registerSetting_t> & settings) override
-        {
-            (void)settings;
-        }
- 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
         {
             // Simulates rocking in the X (phi) axis
@@ -52,15 +46,11 @@ class MockImu : public InvenSenseImu {
             return Axes(phi, 0.1, 0.1);
         }
 
-        virtual int16_t readRawAccel(uint8_t k) override
-        {
-            return 0;
-        }
-
     public:
 
         MockImu(void)
-            : InvenSenseImu(0, 0, 0, 0)
-            {
-            }
+            : InvenSenseImu(0, 0, 0, 0, 0, 0)
+        {
+        }
+
  };
