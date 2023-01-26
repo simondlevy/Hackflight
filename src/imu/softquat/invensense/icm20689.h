@@ -80,6 +80,42 @@ class ICM20689 {
         const uint32_t SPI_INIT_CLK_HZ = 1000000; 
         const uint32_t SPI_CLK_HZ      = 8000000; 
         
+        uint8_t _buffer[15] = {};
+        
+        void writeRegister(const uint8_t addr, const uint8_t val) 
+        {
+            _spi->beginTransaction(SPISettings(SPI_INIT_CLK_HZ, MSBFIRST, SPI_MODE3)); 
+
+            digitalWrite(_csPin,LOW); 
+            _spi->transfer(addr); 
+            _spi->transfer(val); 
+            digitalWrite(_csPin,HIGH); 
+
+            _spi->endTransaction(); 
+
+            delay(10);
+
+            readRegisters(addr, 1, _buffer, SPI_INIT_CLK_HZ);
+        }
+
+        void readRegisters(
+                const uint8_t addr,
+                const uint8_t count,
+                uint8_t * buffer,
+                const uint32_t spiClkHz) {
+
+            _spi->beginTransaction(SPISettings(spiClkHz, MSBFIRST, SPI_MODE3));
+
+            digitalWrite(_csPin,LOW); 
+
+            buffer[0] = addr | 0x80;
+            _spi->transfer(buffer, count+1);
+
+            digitalWrite(_csPin,HIGH); 
+
+            _spi->endTransaction(); 
+        }
+
     public:
 
         int16_t accelCounts[3] = {};

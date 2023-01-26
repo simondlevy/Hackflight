@@ -21,8 +21,7 @@
 #include <board/stm32/f/stm32f722.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <esc/mock.h>
-// #include <imu/softquat/invensense/icm42688.h>
-#include <imu/softquat/invensense/mock.h>
+#include <imu/softquat/invensense/icm42688.h>
 #include <receiver/mock.h>
 
 #include <vector>
@@ -37,23 +36,26 @@ static MockEsc esc;
 
 static MockReceiver rx;
 
-// Icm42688 imu(Imu::rotate270, IMU_CS_PIN);
-MockImu imu;
+Icm42688 imu(Imu::rotate270, IMU_CS_PIN);
 
 static std::vector<PidController *> pids = {};
 
 static Stm32F722Board board(rx, imu, pids, mixer, esc, LED_PIN);
 
+static uint32_t count;
+
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
     imu.handleInterrupt(board.getCycleCounter());
+
+    count++;
 }
 
 void setup(void)
 {
     // Set up IMU interrupt
-    //Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
+    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
 
     board.begin();
 }
@@ -61,4 +63,6 @@ void setup(void)
 void loop(void)
 {
     board.step();
+
+    Serial.println(count);
 }

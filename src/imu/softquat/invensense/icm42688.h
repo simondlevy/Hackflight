@@ -26,19 +26,6 @@
 
 class Icm42688 : public InvenSenseImu {
 
-    friend class Stm32FBoard;
-
-    public:
-
-        typedef enum {
-
-            ODR_8K = 3,  
-            ODR_4K, 
-            ODR_2K, 
-            ODR_1K
-
-        } odr_e;
-
     private:
 
         static const uint8_t ACCEL_BUFFER_OFFSET = 1;
@@ -84,68 +71,74 @@ class Icm42688 : public InvenSenseImu {
 
         static constexpr uint8_t UB0_REG_DEVICE_CONFIG = 0x11;
 
-        static const uint32_t MAX_SPI_CLOCK_RATE = 24000000;
-
-        odr_e   m_odr;
-        uint8_t m_antiAliasDelta;
-        uint8_t m_antiAliasBitshift;
+        // 24 MHz max SPI frequency
+        static const uint32_t MAX_SPI_CLK_HZ = 24000000;
 
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
-        virtual void writeRegisters(void) override
+        uint8_t m_antiAliasDelta;
+        uint8_t m_antiAliasBitshift;
+
+    protected:
+
+        virtual void initRegisters(void) override
         {
-            settings.push_back({REG_BANK_SEL, 0});
+            writeRegister(REG_BANK_SEL, 0);
 
-            settings.push_back({UB0_REG_DEVICE_CONFIG, 0x01});
+            writeRegister(UB0_REG_DEVICE_CONFIG, 0x01);
 
-            settings.push_back({REG_PWR_MGMT0,
+            writeRegister(REG_PWR_MGMT0,
                     PWR_MGMT0_TEMP_DISABLE_OFF |
                     PWR_MGMT0_ACCEL_MODE_LN |
-                    PWR_MGMT0_GYRO_MODE_LN});
+                    PWR_MGMT0_GYRO_MODE_LN);
 
-            settings.push_back({REG_GYRO_CONFIG, (uint8_t)(m_gyroFsr << 3)});
-            settings.push_back({REG_ACCEL_CONFIG, (uint8_t)(m_accelFsr << 3)});
+            delay(150);
 
-            settings.push_back({REG_GYRO_CONFIG_STATIC3, m_antiAliasDelta});
+            writeRegister(REG_GYRO_CONFIG, (uint8_t)(m_gyroFsr << 3));
+            delay(15);
+
+            writeRegister(REG_ACCEL_CONFIG, (uint8_t)(m_accelFsr << 3));
+            delay(15);
+
+            writeRegister(REG_GYRO_CONFIG_STATIC3, m_antiAliasDelta);
 
             uint16_t deltSqr = m_antiAliasDelta * m_antiAliasDelta;
-            settings.push_back({REG_GYRO_CONFIG_STATIC4, (uint8_t)(deltSqr & 0xFF)});
+            writeRegister(REG_GYRO_CONFIG_STATIC4, (uint8_t)(deltSqr & 0xFF));
 
             uint8_t tmp = (uint8_t)(deltSqr >> 8) | (uint8_t)(m_antiAliasBitshift << 4);
 
-            settings.push_back({REG_GYRO_CONFIG_STATIC5, tmp});
+            writeRegister(REG_GYRO_CONFIG_STATIC5, tmp);
 
-            settings.push_back({REG_ACCEL_CONFIG_STATIC2, (uint8_t)(m_antiAliasDelta << 1)});
+            writeRegister(REG_ACCEL_CONFIG_STATIC2, (uint8_t)(m_antiAliasDelta << 1));
 
-            settings.push_back({REG_ACCEL_CONFIG_STATIC3, (uint8_t)(deltSqr & 0xFF)});
+            writeRegister(REG_ACCEL_CONFIG_STATIC3, (uint8_t)(deltSqr & 0xFF));
 
             tmp = (deltSqr >> 8) | (m_antiAliasBitshift << 4);
 
-            settings.push_back({REG_ACCEL_CONFIG_STATIC4, tmp});
+            writeRegister(REG_ACCEL_CONFIG_STATIC4, tmp);
 
-            settings.push_back({REG_GYRO_ACCEL_CONFIG0,
-                    ACCEL_UI_FILT_BW_LOW_LATENCY | GYRO_UI_FILT_BW_LOW_LATENCY});
+            writeRegister(REG_GYRO_ACCEL_CONFIG0,
+                    ACCEL_UI_FILT_BW_LOW_LATENCY | GYRO_UI_FILT_BW_LOW_LATENCY);
 
-            settings.push_back({REG_INT_CONFIG,
-                    INT1_MODE_PULSED | INT1_DRIVE_CIRCUIT_PP | INT1_POLARITY_ACTIVE_HIGH});
+            writeRegister(REG_INT_CONFIG,
+                    INT1_MODE_PULSED | INT1_DRIVE_CIRCUIT_PP | INT1_POLARITY_ACTIVE_HIGH);
 
-            settings.push_back({REG_INT_CONFIG0, UI_DRDY_INT_CLEAR_ON_SBR});
+            writeRegister(REG_INT_CONFIG0, UI_DRDY_INT_CLEAR_ON_SBR);
 
-            settings.push_back({REG_INT_SOURCE0, UI_DRDY_INT1_EN_ENABLED});
+            writeRegister(REG_INT_SOURCE0, UI_DRDY_INT1_EN_ENABLED);
 
-            writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
-            uint8_t buf[2] = {};
-            readRegisters(Icm42688::REG_INT_CONFIG1, buf, 1, m_initialSpiFreq);
-            writeRegister(Icm42688::REG_INT_CONFIG1, buf[1] & ~0x10);
-            delay(100);
+            // push-pull, pulsed, active HIGH interrupts
+            writeRegister(REG_INT_CONFIG, 0x18 | 0x03);
 
-        }
+            // need to clear bit 4 to allow proper INT1 and INT2 operation
+            uint8_t reg = 0;
+            readRegisters(REG_INT_CONFIG1, &reg, 1, MAX_SPI_INIT_CLK_HZ);
+            reg &= ~0x10;
+            writeRegister(REG_INT_CONFIG1, reg);
 
-        virtual int16_t readRawAccel(uint8_t k) override
-        {
-            // Accel data is second value in buffer, after temperature
-            return getShortFromBuffer(1, k);
+            // route UI data ready interrupt to INT1
+            //writeRegister(REG_INT_SOURCE0, 0x18);
         }
 
     public:
@@ -155,13 +148,12 @@ class Icm42688 : public InvenSenseImu {
                 const uint8_t csPin,
                 const gyroFsr_e gyroFsr = GYRO_2000DPS,
                 const accelFsr_e accelFsr = ACCEL_16G,
-                const odr_e odr = ODR_8K,
                 const uint8_t antiAliasDelta = 6,
                 const uint8_t antiAliasBitshift = 10)
             : InvenSenseImu(
                     csPin,
-                    MAX_SPI_CLOCK_RATE,
-                    MAX_SPI_CLOCK_RATE,
+                    MAX_SPI_CLK_HZ,
+                    MAX_SPI_CLK_HZ,
                     REG_TEMP_DATA_A1,
                     ACCEL_BUFFER_OFFSET,
                     GYRO_BUFFER_OFFSET,
@@ -169,7 +161,6 @@ class Icm42688 : public InvenSenseImu {
                     gyroFsr,
                     accelFsr)
     {
-        m_odr = odr;
         m_antiAliasDelta = antiAliasDelta;
         m_antiAliasBitshift = antiAliasBitshift;
     }
