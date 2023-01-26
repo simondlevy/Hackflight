@@ -307,7 +307,7 @@ class SoftQuatImu : public Imu {
         {
             m_shortPeriod = clockSpeed / 1000000 * SHORT_THRESHOLD;
 
-            Imu::begin(clockSpeed);
+            setGyroCalibrationCycles();
         }
 
         auto gyroRawToDps(int16_t rawGyro[3]) -> Axes
@@ -348,7 +348,6 @@ class SoftQuatImu : public Imu {
             // XXX should calibrate too
 
         }
-
 
     public:
 

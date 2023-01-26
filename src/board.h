@@ -89,9 +89,6 @@ class Board {
             m_ledInverted = ledPin < 0;
         }
 
-        virtual bool gyroIsReady(void) = 0;
-
-        virtual void getRawGyro(int16_t rawGyro[3]) = 0;
 
     private:
 
@@ -372,9 +369,9 @@ class Board {
 
                 static int16_t rawGyro[3];
 
-                if (gyroIsReady()) {
+                if (m_imu->gyroIsReady()) {
 
-                    getRawGyro(rawGyro);
+                    m_imu->getRawGyro(rawGyro);
                }
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};

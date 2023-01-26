@@ -21,56 +21,12 @@
 #include "board/stm32.h"
 #include "task/accelerometer.h"
 #include "imu/softquat/invensense.h"
-#include "imu/softquat/invensense/icm42688.h"
 
 class Stm32FBoard : public Stm32Board {
 
     private:
 
-        static const uint8_t IMU_MOSI_PIN = PA7;
-        static const uint8_t IMU_MISO_PIN = PA6;
-        static const uint8_t IMU_SCLK_PIN = PA5;
-
-        SPIClass m_spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
-
         InvenSenseImu * m_invenSenseImu;
-
-        uint32_t m_initialSpiFreq; 
-        uint32_t m_fullSpiFreq;
-
-        // Enough room for seven two-byte integers (gyro XYZ, temperature,
-        // accel XYZ) plus one byte for SPI transfer
-        uint8_t m_buffer[15];
-
-        void writeRegister(const uint8_t reg, const uint8_t val)
-        {
-            m_spi.beginTransaction(SPISettings(m_initialSpiFreq, MSBFIRST, SPI_MODE3)); 
-
-            digitalWrite(m_invenSenseImu->csPin, LOW);
-            m_spi.transfer(reg);
-            m_spi.transfer(val);
-            digitalWrite(m_invenSenseImu->csPin, HIGH);
-
-            m_spi.endTransaction(); 
-        }
-
-        void readRegisters(
-                const uint8_t addr,
-                uint8_t * buffer,
-                const uint8_t count,
-                const uint32_t spiClkHz) 
-        {
-            m_spi.beginTransaction(SPISettings(spiClkHz, MSBFIRST, SPI_MODE3)); 
-
-            digitalWrite(m_invenSenseImu->csPin, LOW);
-
-            buffer[0] = addr | 0x80;
-            m_spi.transfer(buffer, count+1);
-
-            digitalWrite(m_invenSenseImu->csPin, HIGH);
-
-            m_spi.endTransaction(); 
-        }
 
     protected:
 
@@ -80,22 +36,6 @@ class Stm32FBoard : public Stm32Board {
         {
             m_accelerometerTask.prioritize(usec, prioritizer);
             m_skyrangerTask.prioritize(usec, prioritizer);
-        }
-
-        virtual bool gyroIsReady(void) 
-        {
-            return true;
-        }
-
-        virtual void getRawGyro(int16_t rawGyro[3])
-        {
-            readRegisters(
-                    m_invenSenseImu->dataRegister,
-                    m_invenSenseImu->buffer,
-                    InvenSenseImu::BUFFER_SIZE,
-                    m_fullSpiFreq);
-
-            m_invenSenseImu->bufferToRawGyro(rawGyro);
         }
 
         Stm32FBoard(
@@ -108,9 +48,6 @@ class Stm32FBoard : public Stm32Board {
             : Stm32Board(receiver, &imu, pids, mixer, esc, ledPin)
         {
             m_invenSenseImu = &imu;
-
-            m_initialSpiFreq = imu.initialSpiFreq;
-            m_fullSpiFreq = imu.maxSpiFreq;
         }
 
     public:
@@ -120,34 +57,6 @@ class Stm32FBoard : public Stm32Board {
             Board::begin();
 
             // Support MockImu
-            if (m_invenSenseImu->csPin != 0) {
-
-                m_spi.begin();
-
-                pinMode(m_invenSenseImu->csPin, OUTPUT);
-
-                digitalWrite(m_invenSenseImu->csPin, HIGH);
-
-                std::vector<InvenSenseImu::registerSetting_t> registerSettings;
-
-                m_invenSenseImu->getRegisterSettings(registerSettings);
-
-                for (auto r : registerSettings) {
-                    writeRegister(r.address, r.value);
-                    delay(100); // arbitrary; should be long enough for any delays
-                }
-
-                // Enable data-ready interrupt on ICM42688
-                // https://github.com/finani/ICM42688/blob/master/src/ICM42688.cpp
-                if (m_invenSenseImu->isIcm42688()) {
-                    writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
-                    uint8_t buf[2] = {};
-                    readRegisters(Icm42688::REG_INT_CONFIG1, buf, 1, m_initialSpiFreq);
-                    writeRegister(Icm42688::REG_INT_CONFIG1, buf[1] & ~0x10);
-                    delay(100);
-                }
-            }
-
             m_accelerometerTask.begin(m_imu);
         }
 

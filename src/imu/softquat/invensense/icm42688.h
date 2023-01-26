@@ -93,8 +93,7 @@ class Icm42688 : public InvenSenseImu {
         // 1 MHz max SPI frequency for initialisation
         static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
 
-        virtual void getRegisterSettings(
-                std::vector<registerSetting_t> & settings) override
+        virtual void writeRegisters(void) override
         {
             settings.push_back({REG_BANK_SEL, 0});
 
@@ -135,12 +134,12 @@ class Icm42688 : public InvenSenseImu {
 
             settings.push_back({REG_INT_SOURCE0, UI_DRDY_INT1_EN_ENABLED});
 
-            // Datasheet says: "User should change setting to 0 from default
-            // setting of 1, for proper INT1 and INT2 pin operation"
-            //uint8_t intConfig1Value = readRegister(REG_INT_CONFIG1);
-            //intConfig1Value &= ~(1 << INT_ASYNC_RESET_BIT);
-            //intConfig1Value |= (INT_TPULSE_DURATION_8 | INT_TDEASSERT_DISABLED);
-            //settings.push_back({REG_INT_CONFIG1, intConfig1Value});
+            writeRegister(Icm42688::REG_INT_CONFIG, 0x18 | 0x03);
+            uint8_t buf[2] = {};
+            readRegisters(Icm42688::REG_INT_CONFIG1, buf, 1, m_initialSpiFreq);
+            writeRegister(Icm42688::REG_INT_CONFIG1, buf[1] & ~0x10);
+            delay(100);
+
         }
 
         virtual int16_t readRawAccel(uint8_t k) override

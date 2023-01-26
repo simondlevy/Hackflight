@@ -116,11 +116,6 @@ class Imu {
             return GYRO_CALIBRATION_DURATION / Clock::PERIOD();
         }
 
-        void setGyroCalibrationCycles(void)
-        {
-            m_gyroCalibrationCyclesRemaining = (int32_t)calculateGyroCalibratingCycles();
-        }
-
         void calibrateGyroAxis(int16_t rawGyro[3], gyroAxis_t & axis, const uint8_t index)
         {
             // Reset at start of calibration
@@ -187,6 +182,11 @@ class Imu {
         gyroAxis_t m_gyroY;
         gyroAxis_t m_gyroZ;
 
+        void setGyroCalibrationCycles(void)
+        {
+            m_gyroCalibrationCyclesRemaining = (int32_t)calculateGyroCalibratingCycles();
+        }
+
         static auto quat2euler(
                 const float qw, const float qx, const float qy, const float qz) -> Axes 
         {
@@ -219,6 +219,10 @@ class Imu {
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
         virtual void handleInterrupt(const uint32_t cycleCounter) = 0;
+
+        virtual bool gyroIsReady(void) = 0;
+
+        virtual void getRawGyro(int16_t rawGyro[3]) = 0;
 
         virtual auto gyroRawToDps(int16_t rawGyro[3]) -> Axes
         {
@@ -277,13 +281,7 @@ class Imu {
 
         typedef void (*align_fun)(Axes * axes);
 
-        virtual void begin(uint32_t clockSpeed) 
-        {
-            (void)clockSpeed;
-
-            // Start calibrating gyro
-            setGyroCalibrationCycles(); 
-        }
+        virtual void begin(const uint32_t clockSpeed) = 0;
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 

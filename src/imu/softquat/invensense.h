@@ -66,30 +66,16 @@ class InvenSenseImu : public SoftQuatImu {
 
     private:
 
-        typedef enum {
+        static const uint8_t IMU_MOSI_PIN = PA7;
+        static const uint8_t IMU_MISO_PIN = PA6;
+        static const uint8_t IMU_SCLK_PIN = PA5;
 
-            MOCK,
-            MPU6000,
-            ICM42688,
-            ICM20689
+        uint8_t  m_csPin;
+        uint8_t  m_dataRegister;
+        uint32_t m_initialSpiFreq;
+        uint32_t m_fullSpiFreq;
 
-        } product_e;
-
-        // Shared with Stm32FBoard
-        uint8_t csPin;
-        uint8_t dataRegister;
-        uint32_t initialSpiFreq;
-        uint32_t maxSpiFreq;
-
-        virtual bool isIcm42688(void) 
-        {
-            return false;
-        }
-
-        virtual bool isIcm20689(void) 
-        {
-            return false;
-        }
+        SPIClass m_spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
         static uint16_t gyroFsrToInt(const gyroFsr_e gyroFsr)
         {
@@ -136,31 +122,56 @@ class InvenSenseImu : public SoftQuatImu {
         static const uint8_t REG_PWR_MGMT_1        = 0x6B;
         static const uint8_t REG_PWR_MGMT_2        = 0x6C;
 
-        typedef struct {
-
-            uint8_t address;
-            uint8_t value;
-
-        } registerSetting_t;
-
         gyroFsr_e m_gyroFsr;
         accelFsr_e m_accelFsr;
 
         uint8_t m_accelBufferOffset;
         uint8_t m_gyroBufferOffset;
 
-        virtual void getRegisterSettings(std::vector<registerSetting_t> & settings) = 0;
- 
+        InvenSenseImu * m_invenSenseImu;
+
+        // Enough room for seven two-byte integers (gyro XYZ, temperature,
+        // accel XYZ) plus one byte for SPI transfer
+        uint8_t m_buffer[15];
+
+        void writeRegister(const uint8_t reg, const uint8_t val)
+        {
+            m_spi.beginTransaction(SPISettings(m_initialSpiFreq, MSBFIRST, SPI_MODE3)); 
+
+            digitalWrite(m_csPin, LOW);
+            m_spi.transfer(reg);
+            m_spi.transfer(val);
+            digitalWrite(m_csPin, HIGH);
+
+            m_spi.endTransaction(); 
+        }
+
+        void readRegisters(
+                const uint8_t addr,
+                uint8_t * buffer,
+                const uint8_t count,
+                const uint32_t spiClkHz) 
+        {
+            m_spi.beginTransaction(SPISettings(spiClkHz, MSBFIRST, SPI_MODE3)); 
+
+            digitalWrite(m_csPin, LOW);
+
+            buffer[0] = addr | 0x80;
+            m_spi.transfer(buffer, count+1);
+
+            digitalWrite(m_csPin, HIGH);
+
+            m_spi.endTransaction(); 
+        }
+
         // Enough room for seven two-byte integers (gyro XYZ, temperature,
         // accel XYZ) plus one byte for SPI transfer
         static const uint8_t BUFFER_SIZE = 15;
 
-        uint8_t buffer[BUFFER_SIZE];
-
         int16_t getShortFromBuffer(const uint8_t offset, const uint8_t index)
         {
             const uint8_t k = 2 * (offset + index) + 1;
-            return (int16_t)(buffer[k] << 8 | buffer[k+1]);
+            return (int16_t)(m_buffer[k] << 8 | m_buffer[k+1]);
         }
 
         int16_t getGyroValFromBuffer(uint8_t k)
@@ -174,32 +185,22 @@ class InvenSenseImu : public SoftQuatImu {
             return getShortFromBuffer(m_accelBufferOffset, k);
         }
 
-        void bufferToRawGyro(int16_t rawGyro[3])
-        {
-            rawGyro[0] = getGyroValFromBuffer(0);
-            rawGyro[1] = getGyroValFromBuffer(1);
-            rawGyro[2] = getGyroValFromBuffer(2);
-        }
-
         InvenSenseImu(
                 const uint8_t csPin,
                 const uint32_t initialSpiFreq,
-                const uint32_t maxSpiFreq,
+                const uint32_t fullSpiFreq,
                 const uint8_t dataRegister,
                 const uint8_t accelBufferOffset,
                 const uint8_t gyroBufferOffset,
                 const rotateFun_t rotateFun = rotate0,
                 const gyroFsr_e gyroFsr = GYRO_2000DPS,
                 const accelFsr_e accelFsr = ACCEL_16G)
-            : SoftQuatImu(
-                    rotateFun,
-                    gyroFsrToInt(gyroFsr),
-                    accelFsrToInt(accelFsr))
+            : SoftQuatImu(rotateFun, gyroFsrToInt(gyroFsr), accelFsrToInt(accelFsr))
         {
-            this->csPin = csPin;
-            this->dataRegister = dataRegister;
-            this->initialSpiFreq = initialSpiFreq;
-            this->maxSpiFreq = maxSpiFreq;
+            m_csPin = csPin;
+            m_dataRegister = dataRegister;
+            m_initialSpiFreq = initialSpiFreq;
+            m_fullSpiFreq = fullSpiFreq;
 
             m_accelBufferOffset = accelBufferOffset;
             m_gyroBufferOffset = gyroBufferOffset;
@@ -208,16 +209,42 @@ class InvenSenseImu : public SoftQuatImu {
             m_accelFsr = accelFsr;
         }
 
-        void begin(const uint32_t mcuClockSpeed)
+        virtual void initRegisters(void)
+        {
+        }
+
+        void begin(const uint32_t mcuClockSpeed) override
         {
             SoftQuatImu::begin(mcuClockSpeed);
+
+            // Support mock IMU
+            if (m_csPin != 0) {
+
+                m_spi.begin();
+
+                pinMode(m_csPin, OUTPUT);
+
+                digitalWrite(m_csPin, HIGH);
+
+                initRegisters();
+            }
         }
 
-        void getRawGyro(int16_t rawGyro[3])
+        virtual bool gyroIsReady(void)  override
         {
-            rawGyro[0] = getShortFromBuffer(4, 0);
-            rawGyro[1] = getShortFromBuffer(4, 1);
-            rawGyro[2] = getShortFromBuffer(4, 2);
+            return true;
         }
 
+        virtual void getRawGyro(int16_t rawGyro[3]) override
+        {
+            readRegisters(
+                    m_dataRegister,
+                    m_buffer,
+                    InvenSenseImu::BUFFER_SIZE,
+                    m_fullSpiFreq);
+
+            rawGyro[0] = getGyroValFromBuffer(0);
+            rawGyro[1] = getGyroValFromBuffer(1);
+            rawGyro[2] = getGyroValFromBuffer(2);
+        }
 };

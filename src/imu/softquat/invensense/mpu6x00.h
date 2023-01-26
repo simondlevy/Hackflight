@@ -39,21 +39,37 @@ class Mpu6x00 : public InvenSenseImu {
 
     protected:
 
-        virtual void getRegisterSettings(
-                std::vector<registerSetting_t> & settings) override
+        virtual void initRegisters(void) override
         {
-            settings.push_back({REG_PWR_MGMT_1, BIT_RESET});
-            settings.push_back({REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ});
-            settings.push_back({REG_USER_CTRL, BIT_I2C_IF_DIS});
-            settings.push_back({REG_PWR_MGMT_2, 0x00});
-            settings.push_back({REG_SMPLRT_DIV, 0});
+            writeRegister(REG_PWR_MGMT_1, BIT_RESET);
+            delay(100);
 
-            settings.push_back({REG_GYRO_CONFIG, (uint8_t)(m_gyroFsr << 3)});
-            settings.push_back({REG_ACCEL_CONFIG, (uint8_t)(m_accelFsr << 3)});
+            writeRegister(REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
+            delayMicroseconds(7);
 
-            settings.push_back({REG_INT_PIN_CFG, 0x10});
-            settings.push_back({REG_INT_ENABLE, BIT_RAW_RDY_EN});
-            settings.push_back({REG_CONFIG, 0});
+            writeRegister(REG_USER_CTRL, BIT_I2C_IF_DIS);
+            delayMicroseconds(15);
+
+            writeRegister(REG_PWR_MGMT_2, 0x00);
+            delayMicroseconds(15);
+
+            writeRegister(REG_SMPLRT_DIV, 0);
+            delayMicroseconds(15);
+
+            writeRegister(REG_GYRO_CONFIG, (uint8_t)(m_gyroFsr << 3));
+            delayMicroseconds(15);
+
+            writeRegister(REG_ACCEL_CONFIG, (uint8_t)(m_accelFsr << 3));
+            delayMicroseconds(15);
+
+            writeRegister(REG_INT_PIN_CFG, 0x10);
+            delayMicroseconds(15);
+
+            writeRegister(REG_INT_ENABLE, BIT_RAW_RDY_EN);
+            delayMicroseconds(15);
+
+            writeRegister(REG_CONFIG, 0);
+            delayMicroseconds(1);
         }
 
     public:
