@@ -27,7 +27,7 @@
 #include "esc.h"
 #include "esc/mock.h"
 #include "imu.h"
-#include "receiver.h"
+#include "receiver/mock.h"
 #include "safety.h"
 #include "task/accelerometer.h"
 #include "task/attitude.h"
@@ -48,6 +48,8 @@ class Board {
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
         ReceiverTask m_receiverTask;
+
+        MockReceiver m_receiver;
 
         VisualizerTask m_visualizerTask =
             VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
@@ -70,14 +72,13 @@ class Board {
     protected:
 
         Board(
-                Receiver & receiver,
                 Imu * imu,
                 std::vector<PidController *> & pidControllers,
                 Mixer & mixer,
                 Esc & esc,
                 const int8_t ledPin)
         {
-            m_receiverTask.receiver = &receiver;
+            m_receiverTask.receiver = &m_receiver;
 
             m_imu = imu;
             m_pidControllers = &pidControllers;

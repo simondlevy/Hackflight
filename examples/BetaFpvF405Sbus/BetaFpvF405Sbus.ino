@@ -20,7 +20,6 @@
 #include <hackflight.h>
 #include <board/stm32/f/4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <receiver/mock.h>
 #include <imu/softquat/invensense/mpu6x00.h>
 #include <esc/dshot.h>
 
@@ -43,15 +42,13 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static MockReceiver rx;
-
 static Mpu6x00 imu(Imu::rotate270, IMU_CS_PIN);
 
 static std::vector<PidController *> pids = {&anglePid};
 
 static DshotEsc esc(MOTOR_PINS);
 
-static Stm32F405Board board(rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F405Board board(imu, pids, mixer, esc, LED_PIN);
 
 // DSHOT timer interrupt
 extern "C" void handleDmaIrq(uint8_t id)

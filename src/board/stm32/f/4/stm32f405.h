@@ -37,13 +37,12 @@ class Stm32F405Board : public Stm32F4Board {
     public:
 
         Stm32F405Board(
-                Receiver & receiver,
                 InvenSenseImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin)
-            : Stm32F4Board(2, receiver, imu, pids, mixer, esc, ledPin)
+            : Stm32F4Board(2, imu, pids, mixer, esc, ledPin)
         {
         }
 };

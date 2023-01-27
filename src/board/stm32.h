@@ -30,13 +30,12 @@ class Stm32Board : public Board {
     protected:
 
         Stm32Board(
-                Receiver & receiver,
                 Imu * imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const int8_t ledPin)
-            : Board(receiver, imu, pids, mixer, esc, ledPin)
+            : Board(imu, pids, mixer, esc, ledPin)
         {
         }
 
