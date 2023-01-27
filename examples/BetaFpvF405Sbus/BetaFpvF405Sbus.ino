@@ -20,9 +20,11 @@
 #include <hackflight.h>
 #include <board/stm32/f/4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <receiver/sbus.h>
+#include <receiver/mock.h>
 #include <imu/softquat/invensense/mpu6x00.h>
 #include <esc/dshot.h>
+
+#include <sbus.h>
 
 #include <vector>
 
@@ -41,7 +43,7 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static SbusReceiver rx;
+static MockReceiver rx;
 
 static Mpu6x00 imu(Imu::rotate270, IMU_CS_PIN);
 
@@ -66,7 +68,6 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent3(void)
 {
-    Board::handleReceiverSerialEvent(rx, Serial3);
 }
 
 // Interupt from Skyranger
