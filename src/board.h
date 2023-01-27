@@ -332,7 +332,7 @@ class Board {
 
             m_attitudeTask.begin(m_imu);
 
-            m_visualizerTask.begin(m_esc, m_receiverTask.receiver);
+            m_visualizerTask.begin(m_esc, &m_receiverTask);
 
             m_imu->begin(getClockSpeed());
 
