@@ -56,7 +56,7 @@ class Board {
 
         Msp m_msp;
 
-        Safety m_safety;
+        // Safety m_safety;
 
         Core m_core;
 
@@ -113,7 +113,7 @@ class Board {
 
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask);
-                    m_safety.updateFromImu(*m_imu, m_vstate);
+                    // m_safety.updateFromImu(*m_imu, m_vstate);
                     break;
 
                 case Task::VISUALIZER:
@@ -140,11 +140,12 @@ class Board {
 
         void updateSafetyFromReceiver(void)
         {
+            /*
             Safety::ledChange_e ledChange = 
                 m_safety.updateFromReceiver(m_receiverTask.receiver, m_esc, micros());
             if (ledChange != Safety::LED_UNCHANGED) {
                 ledSet(ledChange == Safety::LED_TURN_ON);
-            }
+            }*/
         }
 
         void runTask(Task & task)
@@ -398,7 +399,7 @@ class Board {
                         usec,
                         mixmotors);
 
-                escWrite(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
+                escWrite(false ?  mixmotors : m_visualizerTask.motors);
 
                 m_core.updateScheduler(
                         m_imu, m_imuInterruptCount, nowCycles, nextTargetCycles);
