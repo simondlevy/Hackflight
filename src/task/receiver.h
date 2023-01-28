@@ -137,6 +137,11 @@ class ReceiverTask : public Task {
         virtual void run(const uint32_t usec) override
         {
             (void)usec;
+
+            m_rawThrottle = getRawThrottle();
+            m_rawRoll = getRawRoll();
+            m_rawPitch = getRawPitch();
+            m_rawYaw = getRawYaw();
         }
 
         auto getDemands(void) -> Demands 
