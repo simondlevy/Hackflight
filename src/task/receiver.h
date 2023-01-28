@@ -23,6 +23,21 @@
 
 class ReceiverTask : public Task {
 
+    private:
+
+        float m_channels[6];
+        bool  m_gotNewData;
+        uint32_t m_previousFrameTimeUs;
+
+        static float convert(
+                const uint16_t value,
+                const uint16_t srcmin,
+                const uint16_t srcmax,
+                const float dstmin=1000,
+                const float dstmax=2000)
+        {
+            return dstmin + (dstmax-dstmin) * ((float)value - srcmin) / (srcmax - srcmin);
+        }
 
     public:
 
@@ -53,6 +68,21 @@ class ReceiverTask : public Task {
                 }
             }
         }    
+
+        void setValues(
+                uint16_t channels[],
+                const uint32_t usec,
+                const uint16_t srcMin,
+                const uint16_t srcMax)
+        {
+            for (uint8_t k=0; k<6; ++k) {
+                m_channels[k] = convert(channels[k], srcMin, srcMax);
+            }
+
+            // m_lastSignaledAtUs = usec;
+            m_previousFrameTimeUs = usec;
+            m_gotNewData = true;
+        }
 
         Receiver * receiver;
 

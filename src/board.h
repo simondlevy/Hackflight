@@ -285,8 +285,18 @@ class Board {
             (void)prioritizer;
             (void)usec;
         }
-        
+
     public:
+
+        void setSbusValues(uint16_t chanvals[], const uint32_t usec)
+        {
+            m_receiverTask.setValues(chanvals, usec, 172, 1811);
+        }
+
+        void setDsmxValues(uint16_t chanvals[], const uint32_t usec)
+        {
+            m_receiverTask.setValues(chanvals, usec, 988, 2011);
+        }
 
         void handleImuInterrupt(void)
         {
