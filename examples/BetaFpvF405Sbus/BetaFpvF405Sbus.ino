@@ -20,9 +20,11 @@
 #include <hackflight.h>
 #include <board/stm32/f/4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <receiver/sbus.h>
+#include <core/pids/angle.h>
 #include <imu/softquat/invensense/mpu6x00.h>
 #include <esc/dshot.h>
+
+#include <sbus.h>
 
 #include <vector>
 
@@ -41,7 +43,7 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static SbusReceiver rx;
+static bfs::SbusRx rx(&Serial3);
 
 static Mpu6x00 imu(Imu::rotate270, IMU_CS_PIN);
 
@@ -49,7 +51,7 @@ static std::vector<PidController *> pids = {&anglePid};
 
 static DshotEsc esc(MOTOR_PINS);
 
-static Stm32F405Board board(rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F405Board board(imu, pids, mixer, esc, LED_PIN);
 
 // DSHOT timer interrupt
 extern "C" void handleDmaIrq(uint8_t id)
@@ -66,7 +68,10 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent3(void)
 {
-    Board::handleReceiverSerialEvent(rx, Serial3);
+    if (rx.Read()) {
+
+        board.setSbusValues((uint16_t *)rx.data().ch, micros());
+    }
 }
 
 // Interupt from Skyranger

@@ -27,8 +27,6 @@
 #include "esc.h"
 #include "esc/mock.h"
 #include "imu.h"
-#include "receiver.h"
-#include "safety.h"
 #include "task/accelerometer.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
@@ -37,6 +35,22 @@
 class Board {
 
     private:
+
+        static constexpr float MAX_ARMING_ANGLE_DEG = 25;
+
+        static const uint8_t  STARTUP_BLINK_LED_REPS  = 10;
+        static const uint32_t STARTUP_BLINK_LED_DELAY = 50;
+
+        typedef enum {
+
+            ARMING_UNREADY,
+            ARMING_READY,
+            ARMING_ARMED,
+            ARMING_FAILSAFE
+
+        } armingStatus_e;
+
+        armingStatus_e m_armingStatus;
 
         uint8_t m_ledPin;
         bool m_ledInverted;
@@ -50,11 +64,9 @@ class Board {
         ReceiverTask m_receiverTask;
 
         VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
+            VisualizerTask(m_msp, m_vstate, m_receiverTask, m_skyrangerTask);
 
         Msp m_msp;
-
-        Safety m_safety;
 
         Core m_core;
 
@@ -63,22 +75,17 @@ class Board {
         Mixer * m_mixer;
         std::vector<PidController *> * m_pidControllers;
 
-        Safety m_saftey;
-
         bool m_dshotEnabled;
 
     protected:
 
         Board(
-                Receiver & receiver,
                 Imu * imu,
                 std::vector<PidController *> & pidControllers,
                 Mixer & mixer,
                 Esc & esc,
                 const int8_t ledPin)
         {
-            m_receiverTask.receiver = &receiver;
-
             m_imu = imu;
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
@@ -92,7 +99,7 @@ class Board {
 
     private:
 
-       void runDynamicTasks(void)
+        void runDynamicTasks(void)
         {
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
@@ -112,7 +119,7 @@ class Board {
 
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask);
-                    m_safety.updateFromImu(*m_imu, m_vstate);
+                    updateArmingStatus();
                     break;
 
                 case Task::VISUALIZER:
@@ -120,9 +127,9 @@ class Board {
                     break;
 
                 case Task::RECEIVER:
+                    updateArmingStatus();
                     runTask(m_receiverTask);
-                    updateSafetyFromReceiver();
-                   break;
+                    break;
 
                 case Task::ACCELEROMETER:
                     runTask(m_accelerometerTask);
@@ -134,15 +141,6 @@ class Board {
 
                 default:
                     break;
-            }
-        }
-
-        void updateSafetyFromReceiver(void)
-        {
-            Safety::ledChange_e ledChange = 
-                m_safety.updateFromReceiver(m_receiverTask.receiver, m_esc, micros());
-            if (ledChange != Safety::LED_UNCHANGED) {
-                ledSet(ledChange == Safety::LED_TURN_ON);
             }
         }
 
@@ -168,6 +166,106 @@ class Board {
             m_core.postRunTask(
                     task, usecStart, micros(), getCycleCounter(), anticipatedEndCycles);
         }
+
+        void updateArmingStatus(void)
+        {
+            checkFailsafe();
+
+            switch (m_armingStatus) {
+
+                case ARMING_UNREADY:
+                    ledBlink(500);
+                    if (safeToArm()) {
+                        m_armingStatus = ARMING_READY;
+                    }
+                    break;
+
+                case ARMING_READY:
+                    ledSet(false);
+                    if (safeToArm()) {
+                        checkArmingSwitch();
+                    }
+                    else {
+                        m_armingStatus = ARMING_UNREADY;
+                    }
+                    break;
+
+                case ARMING_ARMED:
+                    ledSet(true);
+                    checkArmingSwitch();
+                    break;
+
+                default: // failsafe
+                    ledBlink(200);
+                    break;
+            }
+        }
+
+        void checkFailsafe(void)
+        {
+            static bool hadSignal;
+
+            const auto haveSignal = m_receiverTask.haveSignal(micros());
+
+            if (haveSignal) {
+                hadSignal = true;
+            }
+
+            if (hadSignal && !haveSignal) {
+                m_armingStatus = ARMING_FAILSAFE;
+            }
+        }
+
+        bool safeToArm(void)
+        {
+            const auto maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE_DEG);
+
+            const auto imuIsLevel =
+                fabsf(m_vstate.phi) < maxArmingAngle &&
+                fabsf(m_vstate.theta) < maxArmingAngle;
+
+            const auto gyroDoneCalibrating = !m_imu->gyroIsCalibrating();
+
+            const auto haveReceiverSignal = m_receiverTask.haveSignal(micros());
+
+            return
+                gyroDoneCalibrating &&
+                imuIsLevel &&
+                m_receiverTask.throttleIsDown() &&
+                haveReceiverSignal;
+        }
+
+        void checkArmingSwitch(void)
+        {
+            static bool aux1WasSet;
+
+            if (m_receiverTask.getRawAux1() > 1500) {
+                if (!aux1WasSet) {
+                    m_armingStatus = ARMING_ARMED;
+                }
+                aux1WasSet = true;
+            }
+            else {
+                if (aux1WasSet) {
+                    m_armingStatus = ARMING_READY;
+                }
+                aux1WasSet = false;
+            }
+        }
+
+        void ledBlink(const uint32_t msecDelay)
+        {
+            static bool ledPrev;
+            static uint32_t msecPrev;
+            const uint32_t msecCurr = millis();
+
+            if (msecCurr - msecPrev > msecDelay) {
+                ledPrev = !ledPrev;
+                ledSet(ledPrev);
+                msecPrev = msecCurr;
+            }
+        }
+
 
         void ledSet(bool on)
         {
@@ -284,8 +382,18 @@ class Board {
             (void)prioritizer;
             (void)usec;
         }
-        
+
     public:
+
+        void setSbusValues(uint16_t chanvals[], const uint32_t usec)
+        {
+            m_receiverTask.setValues(chanvals, usec, 172, 1811);
+        }
+
+        void setDsmxValues(uint16_t chanvals[], const uint32_t usec)
+        {
+            m_receiverTask.setValues(chanvals, usec, 988, 2011);
+        }
 
         void handleImuInterrupt(void)
         {
@@ -331,7 +439,7 @@ class Board {
 
             m_attitudeTask.begin(m_imu);
 
-            m_visualizerTask.begin(m_esc, m_receiverTask.receiver);
+            m_visualizerTask.begin(m_esc, &m_receiverTask);
 
             m_imu->begin(getClockSpeed());
 
@@ -340,11 +448,11 @@ class Board {
             pinMode(m_ledPin, OUTPUT);
 
             ledSet(false);
-            for (auto i=0; i<Safety::STARTUP_BLINK_LED_REPS; i++) {
+            for (auto i=0; i<10; i++) {
                 static bool ledOn;
                 ledOn = !ledOn;
                 ledSet(ledOn);
-                delay(Safety::STARTUP_BLINK_LED_DELAY);
+                delay(50);
             }
             ledSet(false);
         }
@@ -380,14 +488,17 @@ class Board {
                         rawGyro,
                         m_imu,
                         m_vstate,
-                        m_receiverTask.receiver,
+                        m_receiverTask,
                         m_pidControllers,
                         m_mixer,
                         m_esc,
                         usec,
                         mixmotors);
 
-                escWrite(m_safety.isArmed() ?  mixmotors : m_visualizerTask.motors);
+                escWrite(
+                        m_armingStatus == ARMING_ARMED ? 
+                        mixmotors :
+                        m_visualizerTask.motors);
 
                 m_core.updateScheduler(
                         m_imu, m_imuInterruptCount, nowCycles, nextTargetCycles);
@@ -412,15 +523,6 @@ class Board {
         {
             pinMode(pin, INPUT);
             attachInterrupt(pin, irq, mode);  
-        }
-
-        static void handleReceiverSerialEvent(
-                Receiver & rx, HardwareSerial & serial) {
-
-            while (serial.available()) {
-
-                rx.parse(serial.read(), micros());
-            }
         }
 
         static void printf(const char * fmt, ...)

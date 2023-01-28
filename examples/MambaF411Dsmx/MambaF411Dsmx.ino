@@ -20,9 +20,11 @@
 #include <hackflight.h>
 #include <board/stm32/f/4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <receiver/dsmx.h>
+#include <core/pids/angle.h>
 #include <imu/softquat/invensense/mpu6x00.h>
 #include <esc/dshot.h>
+
+#include <dsmrx.h>
 
 #include <vector>
 
@@ -41,7 +43,7 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static DsmxReceiver rx;
+static Dsm2048 rx;
 
 static Mpu6x00 imu(Imu::rotate180, IMU_CS_PIN);
 
@@ -49,7 +51,7 @@ static std::vector<PidController *> pids = {&anglePid};
 
 static DshotEsc esc(MOTOR_PINS);
 
-static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F411Board board(imu, pids, mixer, esc, LED_PIN);
 
 // Motor interrupt
 extern "C" void handleDmaIrq(void)
@@ -66,7 +68,17 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent1(void)
 {
-    Board::handleReceiverSerialEvent(rx, Serial1);
+    while (Serial1.available()) {
+
+        rx.handleSerialEvent(Serial1.read(), micros());
+
+        if (rx.gotNewFrame()) {
+
+            uint16_t values[8] = {};
+            rx.getChannelValues(values, 8);
+            board.setDsmxValues(values, micros());
+        }
+    }
 }
 
 void setup(void)

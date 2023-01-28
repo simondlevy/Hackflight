@@ -39,13 +39,12 @@ class Stm32FBoard : public Stm32Board {
         }
 
         Stm32FBoard(
-                Receiver & receiver,
                 InvenSenseImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin)
-            : Stm32Board(receiver, &imu, pids, mixer, esc, ledPin)
+            : Stm32Board(&imu, pids, mixer, esc, ledPin)
         {
             m_invenSenseImu = &imu;
         }

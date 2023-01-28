@@ -19,8 +19,12 @@
 
 #include <hackflight.h>
 #include <board/stm32/ladybug.h>
+#include <core/pids/angle.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <receiver/dsmx.h>
+
+#include <dsmrx.h>
+
+#include <vector>
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -31,20 +35,31 @@ static AnglePidController anglePid(
 
 static std::vector<PidController *> pids = {&anglePid};
 
+static Dsm2048 rx;
+
 static Mixer mixer = QuadXbfMixer::make();
 
-static DsmxReceiver rx;
-
-static LadybugBoard board(rx, pids, mixer);
+static LadybugBoard board(pids, mixer);
 
 static void handleImuInterrupt(void)
 {
     board.handleImuInterrupt();
 }
 
+// Receiver interrupt
 void serialEvent1(void)
 {
-    Board::handleReceiverSerialEvent(rx, Serial1);
+    while (Serial1.available()) {
+
+        rx.handleSerialEvent(Serial1.read(), micros());
+
+        if (rx.gotNewFrame()) {
+
+            uint16_t values[8] = {};
+            rx.getChannelValues(values, 8);
+            board.setDsmxValues(values, micros());
+        }
+    }
 }
 
 void setup(void)

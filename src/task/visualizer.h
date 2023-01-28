@@ -26,7 +26,7 @@
 #include "imu.h"
 #include "msp.h"
 #include "receiver.h"
-#include "task.h"
+#include "task/receiver.h"
 #include "task/skyranger.h"
 
 class VisualizerTask : public Task {
@@ -43,9 +43,9 @@ class VisualizerTask : public Task {
         SkyrangerTask *  m_skyrangerTask;
 
         // Initialized in begin()
-        Msp *      m_msp;
-        Esc *      m_esc;
-        Receiver * m_receiver;
+        Msp *          m_msp;
+        Esc *          m_esc;
+        ReceiverTask * m_receiverTask;
 
         bool m_gotRebootRequest;
 
@@ -68,12 +68,12 @@ class VisualizerTask : public Task {
                 case 105: // RC
                     {
                         int16_t channels[] = {
-                            (int16_t)m_receiver->getRawThrottle(),
-                            (int16_t)m_receiver->getRawRoll(),
-                            (int16_t)m_receiver->getRawPitch(),
-                            (int16_t)m_receiver->getRawYaw(),
-                            (int16_t)scale(m_receiver->getRawAux1()),
-                            (int16_t)scale(m_receiver->getRawAux2())
+                            (int16_t)m_receiverTask->getRawThrottle(),
+                            (int16_t)m_receiverTask->getRawRoll(),
+                            (int16_t)m_receiverTask->getRawPitch(),
+                            (int16_t)m_receiverTask->getRawYaw(),
+                            (int16_t)m_receiverTask->getRawAux1(),
+                            (int16_t)m_receiverTask->getRawAux2()
                         };
 
                         serializeShorts(105, channels, 6);
@@ -107,7 +107,6 @@ class VisualizerTask : public Task {
                             m_esc->convertFromExternal(m_msp->parseShort(2));
                         motors[3] =
                             m_esc->convertFromExternal(m_msp->parseShort(3));
-
                     } 
                     break;
 
@@ -121,20 +120,22 @@ class VisualizerTask : public Task {
         VisualizerTask(
                 Msp & msp,
                 VehicleState & vstate,
+                ReceiverTask & receiverTask,
                 SkyrangerTask & skyrangerTask) 
             : Task(VISUALIZER, 100) // Hz
         { 
             m_msp = &msp;
             m_vstate = &vstate;
+            m_receiverTask = &receiverTask;
             m_skyrangerTask = & skyrangerTask;
         }
 
         float motors[Motors::MAX_SUPPORTED];
 
-        void begin(Esc * esc, Receiver * receiver)
+        void begin(Esc * esc, ReceiverTask * receiverTask)
         {
             m_esc = esc;
-            m_receiver = receiver;
+            m_receiverTask = receiverTask;
         }
 
         bool gotRebootRequest(void)
