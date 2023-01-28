@@ -51,24 +51,15 @@ class ReceiverTask : public Task {
             (void)usec;
         }
 
-        /*
-        // Increase priority for RX task
-        virtual void adjustDynamicPriority(uint32_t usec) override
+        auto getDemands(void) -> Demands 
         {
-            if (m_dynamicPriority > 0) {
-                m_ageCycles =
-                    1 + (intcmp(usec, m_lastSignaledAtUs) / m_desiredPeriodUs);
-                m_dynamicPriority = 1 + m_ageCycles;
-            } else  {
-                if (receiver->check(usec)) {
-                    m_lastSignaledAtUs = usec;
-                    m_ageCycles = 1;
-                    m_dynamicPriority = 2;
-                } else {
-                    m_ageCycles = 0;
-                }
-            }
-        } */
+            return Demands(0, 0, 0, 0); // XXX
+        }
+
+        bool throttleIsDown(void) 
+        {
+            return false; // XXX
+        }
 
         void setValues(
                 uint16_t channels[],
@@ -84,7 +75,5 @@ class ReceiverTask : public Task {
             m_previousFrameTimeUs = usec;
             m_gotNewData = true;
         }
-
-        Receiver * receiver;
 
 }; // class ReceiverTask

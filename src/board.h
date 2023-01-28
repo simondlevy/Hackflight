@@ -73,8 +73,6 @@ class Board {
                 Esc & esc,
                 const int8_t ledPin)
         {
-            m_receiverTask.receiver = &m_receiver;
-
             m_imu = imu;
             m_pidControllers = &pidControllers;
             m_mixer = &mixer;
@@ -375,7 +373,7 @@ class Board {
                         rawGyro,
                         m_imu,
                         m_vstate,
-                        m_receiverTask.receiver,
+                        m_receiverTask,
                         m_pidControllers,
                         m_mixer,
                         m_esc,

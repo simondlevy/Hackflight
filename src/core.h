@@ -25,6 +25,7 @@
 #include "imu.h"
 #include "receiver.h"
 #include "scheduler.h"
+#include "task/receiver.h"
 
 class Core {
 
@@ -38,7 +39,7 @@ class Core {
                 int16_t rawGyro[3],
                 Imu * imu,
                 VehicleState & vstate,
-                Receiver * receiver,
+                ReceiverTask & receiverTask,
                 std::vector<PidController *> * pidControllers,
                 Mixer * mixer,
                 Esc * esc,
@@ -51,10 +52,10 @@ class Core {
             vstate.dtheta = angvels.y;
             vstate.dpsi   = angvels.z;
 
-            Demands demands = receiver->getDemands();
+            Demands demands = receiverTask.getDemands();
 
             auto motors = mixer->step(
-                    demands, vstate, pidControllers, receiver->gotPidReset(), usec);
+                    demands, vstate, pidControllers, receiverTask.throttleIsDown(), usec);
 
             for (auto i=0; i<mixer->getMotorCount(); i++) {
 
