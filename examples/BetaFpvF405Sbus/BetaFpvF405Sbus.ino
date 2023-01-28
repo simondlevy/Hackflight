@@ -42,6 +42,8 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
+static bfs::SbusRx rx(&Serial3);
+
 static Mpu6x00 imu(Imu::rotate270, IMU_CS_PIN);
 
 static std::vector<PidController *> pids = {&anglePid};
@@ -65,6 +67,10 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent3(void)
 {
+    if (rx.Read()) {
+
+        board.setSbusValues((uint16_t *)rx.data().ch, micros());
+    }
 }
 
 // Interupt from Skyranger
