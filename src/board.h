@@ -169,7 +169,7 @@ class Board {
 
         void updateArmingStatus(void)
         {
-            // checkFailsafe();
+            checkFailsafe();
 
             switch (m_armingStatus) {
 
@@ -198,6 +198,21 @@ class Board {
                 default: // failsafe
                     ledBlink(200);
                     break;
+            }
+        }
+
+        void checkFailsafe(void)
+        {
+            static bool hadSignal;
+
+            const auto haveSignal = m_receiverTask.haveSignal(micros());
+
+            if (haveSignal) {
+                hadSignal = true;
+            }
+
+            if (hadSignal && !haveSignal) {
+                m_armingStatus = ARMING_FAILSAFE;
             }
         }
 
