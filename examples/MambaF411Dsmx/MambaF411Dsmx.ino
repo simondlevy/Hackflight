@@ -68,6 +68,17 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent1(void)
 {
+    while (Serial1.available()) {
+
+        rx.handleSerialEvent(Serial1.read(), micros());
+
+        if (rx.gotNewFrame()) {
+
+            uint16_t values[8] = {};
+            rx.getChannelValues(values, 8);
+            board.setDsmxValues(values, micros());
+        }
+    }
 }
 
 void setup(void)
