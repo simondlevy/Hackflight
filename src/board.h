@@ -175,13 +175,13 @@ class Board {
 
                 case ARMING_UNREADY:
                     ledBlink(500);
-                    //if (safeToArm()) {
-                    //    m_armingStatus = ARMING_READY;
-                    //}
+                    if (safeToArm()) {
+                        m_armingStatus = ARMING_READY;
+                    }
                     break;
 
                 case ARMING_READY:
-                    //ledSet(false);
+                    ledSet(false);
                     //if (safeToArm()) {
                     //    checkArmingSwitch();
                     //}
@@ -191,7 +191,7 @@ class Board {
                     break;
 
                 case ARMING_ARMED:
-                    //ledSet(true);
+                    ledSet(true);
                     //checkArmingSwitch();
                     break;
 
@@ -199,6 +199,25 @@ class Board {
                     ledBlink(200);
                     break;
             }
+        }
+
+        bool safeToArm(void)
+        {
+            const auto maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE_DEG);
+
+            const auto imuIsLevel =
+                fabsf(m_vstate.phi) < maxArmingAngle &&
+                fabsf(m_vstate.theta) < maxArmingAngle;
+
+            const auto gyroDoneCalibrating = !m_imu->gyroIsCalibrating();
+
+            const auto haveReceiverSignal = m_receiverTask.haveSignal(micros());
+
+            return
+                gyroDoneCalibrating &&
+                imuIsLevel &&
+                m_receiverTask.throttleIsDown() &&
+                haveReceiverSignal;
         }
 
         void ledBlink(const uint32_t msecDelay)
