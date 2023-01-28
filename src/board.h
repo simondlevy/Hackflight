@@ -495,7 +495,10 @@ class Board {
                         usec,
                         mixmotors);
 
-                escWrite(false ?  mixmotors : m_visualizerTask.motors);
+                escWrite(
+                        m_armingStatus == ARMING_ARMED ? 
+                        mixmotors :
+                        m_visualizerTask.motors);
 
                 m_core.updateScheduler(
                         m_imu, m_imuInterruptCount, nowCycles, nextTargetCycles);
