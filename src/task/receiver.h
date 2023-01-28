@@ -48,9 +48,10 @@ class ReceiverTask : public Task {
 
         virtual void run(const uint32_t usec) override
         {
-            receiver->update(usec);
+            (void)usec;
         }
 
+        /*
         // Increase priority for RX task
         virtual void adjustDynamicPriority(uint32_t usec) override
         {
@@ -67,7 +68,7 @@ class ReceiverTask : public Task {
                     m_ageCycles = 0;
                 }
             }
-        }    
+        } */
 
         void setValues(
                 uint16_t channels[],
@@ -79,7 +80,7 @@ class ReceiverTask : public Task {
                 m_channels[k] = convert(channels[k], srcMin, srcMax);
             }
 
-            // m_lastSignaledAtUs = usec;
+            m_lastSignaledAtUs = usec;
             m_previousFrameTimeUs = usec;
             m_gotNewData = true;
         }
