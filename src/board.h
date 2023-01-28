@@ -182,17 +182,17 @@ class Board {
 
                 case ARMING_READY:
                     ledSet(false);
-                    //if (safeToArm()) {
-                    //    checkArmingSwitch();
-                    //}
-                    //else {
-                    //    m_armingStatus = ARMING_UNREADY;
-                    //}
+                    if (safeToArm()) {
+                        checkArmingSwitch();
+                    }
+                    else {
+                        m_armingStatus = ARMING_UNREADY;
+                    }
                     break;
 
                 case ARMING_ARMED:
                     ledSet(true);
-                    //checkArmingSwitch();
+                    checkArmingSwitch();
                     break;
 
                 default: // failsafe
