@@ -48,7 +48,7 @@ class Board {
         ReceiverTask m_receiverTask;
 
         VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
+            VisualizerTask(m_msp, m_vstate, m_receiverTask, m_skyrangerTask);
 
         Msp m_msp;
 

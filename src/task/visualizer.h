@@ -67,17 +67,16 @@ class VisualizerTask : public Task {
 
                 case 105: // RC
                     {
-                        /*
                         int16_t channels[] = {
-                            (int16_t)m_receiver->getRawThrottle(),
-                            (int16_t)m_receiver->getRawRoll(),
-                            (int16_t)m_receiver->getRawPitch(),
-                            (int16_t)m_receiver->getRawYaw(),
-                            (int16_t)scale(m_receiver->getRawAux1()),
-                            (int16_t)scale(m_receiver->getRawAux2())
+                            (int16_t)m_receiverTask->getRawThrottle(),
+                            (int16_t)m_receiverTask->getRawRoll(),
+                            (int16_t)m_receiverTask->getRawPitch(),
+                            (int16_t)m_receiverTask->getRawYaw(),
+                            (int16_t)m_receiverTask->getRawAux1(),
+                            (int16_t)m_receiverTask->getRawAux2()
                         };
 
-                        serializeShorts(105, channels, 6);*/
+                        serializeShorts(105, channels, 6);
 
                     } 
                     return true;
@@ -122,11 +121,13 @@ class VisualizerTask : public Task {
         VisualizerTask(
                 Msp & msp,
                 VehicleState & vstate,
+                ReceiverTask & receiverTask,
                 SkyrangerTask & skyrangerTask) 
             : Task(VISUALIZER, 100) // Hz
         { 
             m_msp = &msp;
             m_vstate = &vstate;
+            m_receiverTask = &receiverTask;
             m_skyrangerTask = & skyrangerTask;
         }
 
