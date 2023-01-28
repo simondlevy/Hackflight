@@ -24,7 +24,6 @@
 #include "esc.h"
 #include "imu.h"
 #include "receiver.h"
-#include "safety.h"
 #include "scheduler.h"
 
 class Core {

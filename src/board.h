@@ -28,7 +28,6 @@
 #include "esc/mock.h"
 #include "imu.h"
 #include "receiver/mock.h"
-#include "safety.h"
 #include "task/accelerometer.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
@@ -56,16 +55,12 @@ class Board {
 
         Msp m_msp;
 
-        // Safety m_safety;
-
         Core m_core;
 
         // Initialzed in sketch
         Esc *   m_esc;
         Mixer * m_mixer;
         std::vector<PidController *> * m_pidControllers;
-
-        Safety m_saftey;
 
         bool m_dshotEnabled;
 
@@ -113,7 +108,6 @@ class Board {
 
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask);
-                    // m_safety.updateFromImu(*m_imu, m_vstate);
                     break;
 
                 case Task::VISUALIZER:
@@ -122,7 +116,6 @@ class Board {
 
                 case Task::RECEIVER:
                     runTask(m_receiverTask);
-                    updateSafetyFromReceiver();
                    break;
 
                 case Task::ACCELEROMETER:
@@ -136,16 +129,6 @@ class Board {
                 default:
                     break;
             }
-        }
-
-        void updateSafetyFromReceiver(void)
-        {
-            /*
-            Safety::ledChange_e ledChange = 
-                m_safety.updateFromReceiver(m_receiverTask.receiver, m_esc, micros());
-            if (ledChange != Safety::LED_UNCHANGED) {
-                ledSet(ledChange == Safety::LED_TURN_ON);
-            }*/
         }
 
         void runTask(Task & task)
@@ -352,11 +335,11 @@ class Board {
             pinMode(m_ledPin, OUTPUT);
 
             ledSet(false);
-            for (auto i=0; i<Safety::STARTUP_BLINK_LED_REPS; i++) {
+            for (auto i=0; i<10; i++) {
                 static bool ledOn;
                 ledOn = !ledOn;
                 ledSet(ledOn);
-                delay(Safety::STARTUP_BLINK_LED_DELAY);
+                delay(50);
             }
             ledSet(false);
         }
