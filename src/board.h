@@ -220,6 +220,24 @@ class Board {
                 haveReceiverSignal;
         }
 
+        void checkArmingSwitch(void)
+        {
+            static bool aux1WasSet;
+
+            if (m_receiverTask.getRawAux1() > 1500) {
+                if (!aux1WasSet) {
+                    m_armingStatus = ARMING_ARMED;
+                }
+                aux1WasSet = true;
+            }
+            else {
+                if (aux1WasSet) {
+                    m_armingStatus = ARMING_READY;
+                }
+                aux1WasSet = false;
+            }
+        }
+
         void ledBlink(const uint32_t msecDelay)
         {
             static bool ledPrev;
