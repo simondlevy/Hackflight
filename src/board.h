@@ -27,7 +27,6 @@
 #include "esc.h"
 #include "esc/mock.h"
 #include "imu.h"
-#include "receiver/mock.h"
 #include "task/accelerometer.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"
@@ -47,8 +46,6 @@ class Board {
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
         ReceiverTask m_receiverTask;
-
-        MockReceiver m_receiver;
 
         VisualizerTask m_visualizerTask =
             VisualizerTask(m_msp, m_vstate, m_skyrangerTask);
@@ -405,15 +402,6 @@ class Board {
         {
             pinMode(pin, INPUT);
             attachInterrupt(pin, irq, mode);  
-        }
-
-        static void handleReceiverSerialEvent(
-                Receiver & rx, HardwareSerial & serial) {
-
-            while (serial.available()) {
-
-                rx.parse(serial.read(), micros());
-            }
         }
 
         static void printf(const char * fmt, ...)

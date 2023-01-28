@@ -23,7 +23,6 @@
 #include "core/mixer.h"
 #include "esc.h"
 #include "imu.h"
-#include "receiver.h"
 #include "scheduler.h"
 #include "task/receiver.h"
 

@@ -20,6 +20,7 @@
 #include <hackflight.h>
 #include <board/stm32/f/4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
+#include <core/pids/angle.h>
 #include <imu/softquat/invensense/mpu6x00.h>
 #include <esc/dshot.h>
 

@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "receiver.h"
 #include "task.h"
 
 class ReceiverTask : public Task {
