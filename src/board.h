@@ -174,7 +174,7 @@ class Board {
             switch (m_armingStatus) {
 
                 case ARMING_UNREADY:
-                    //ledBlink(500);
+                    ledBlink(500);
                     //if (safeToArm()) {
                     //    m_armingStatus = ARMING_READY;
                     //}
@@ -196,10 +196,24 @@ class Board {
                     break;
 
                 default: // failsafe
-                    //ledBlink(200);
+                    ledBlink(200);
                     break;
             }
         }
+
+        void ledBlink(const uint32_t msecDelay)
+        {
+            static bool ledPrev;
+            static uint32_t msecPrev;
+            const uint32_t msecCurr = millis();
+
+            if (msecCurr - msecPrev > msecDelay) {
+                ledPrev = !ledPrev;
+                ledSet(ledPrev);
+                msecPrev = msecCurr;
+            }
+        }
+
 
         void ledSet(bool on)
         {
