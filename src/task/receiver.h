@@ -146,7 +146,39 @@ class ReceiverTask : public Task {
 
         auto getDemands(void) -> Demands 
         {
-            return Demands(0, 0, 0, 0); // XXX
+            m_previousFrameTimeUs = m_gotNewData ? 0 : m_previousFrameTimeUs;
+
+            // Throttle [1000,2000] => [1000,2000]
+            auto tmp = constrain_f_i32(m_rawThrottle, 1050, 2000);
+            auto tmp2 = (uint32_t)(tmp - 1050) * 1000 / 950;
+            auto commandThrottle = lookupThrottle(tmp2);
+
+            Axes rawSetpoints = m_gotNewData ?
+
+                Axes(
+                        rescaleCommand(m_rawRoll, +1),
+                        rescaleCommand(m_rawPitch, +1),
+                        rescaleCommand(m_rawYaw, -1)
+                    ) :
+
+                    Axes(0,0,0);
+
+            static Axes _axes;
+
+            if (m_gotNewData) {
+
+                _axes.x = rawSetpoints.x;
+                _axes.y = rawSetpoints.y;
+                _axes.z = rawSetpoints.z;
+            }
+
+            m_gotNewData = false;
+
+            return Demands(
+                    constrain_f((commandThrottle - 1000) / 1000, 0, 1),
+                    _axes.x,
+                    _axes.y,
+                    _axes.z);
         }
 
         void setValues(
