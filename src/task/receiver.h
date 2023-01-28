@@ -24,9 +24,21 @@ class ReceiverTask : public Task {
 
     private:
 
-        float m_channels[6];
-        bool  m_gotNewData;
+       
+        static const uint32_t TIMEOUT_USEC = 30000;
+
+        static const uint8_t   THROTTLE_LOOKUP_TABLE_SIZE = 12;
+        static constexpr float THROTTLE_EXPO8 = 0;
+        static constexpr float THROTTLE_MID8  = 50;
+
+        float    m_channels[6];
+        bool     m_gotNewData;
+        int16_t  m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
         uint32_t m_previousFrameTimeUs;
+        float    m_rawThrottle;
+        float    m_rawRoll;
+        float    m_rawPitch;
+        float    m_rawYaw;
 
         static float convert(
                 const uint16_t value,
@@ -38,11 +50,88 @@ class ReceiverTask : public Task {
             return dstmin + (dstmax-dstmin) * ((float)value - srcmin) / (srcmax - srcmin);
         }
 
+        // [1000,2000] => [-1,+1]
+        static float rescaleCommand(const float raw, const float sgn)
+        {
+            const auto tmp = fminf(fabs(raw - 1500), 500);
+            const auto cmd = tmp * sgn;
+            const auto command = raw < 1500 ? -cmd : cmd;
+            return command / 500;
+        }
+
+        float lookupThrottle(const int32_t tmp)
+        {
+            static bool _initializedThrottleTable;
+
+            if (!_initializedThrottleTable) {
+                for (auto i = 0; i < THROTTLE_LOOKUP_TABLE_SIZE; i++) {
+                    const int16_t tmp2 = 10 * i - THROTTLE_MID8;
+                    uint8_t y = tmp2 > 0 ?
+                        100 - THROTTLE_MID8 :
+                        tmp2 < 0 ?
+                        THROTTLE_MID8 :
+                        1;
+                    m_lookupThrottleRc[i] =
+                        10 * THROTTLE_MID8 + tmp2 * (100 - THROTTLE_EXPO8 + (int32_t)
+                                THROTTLE_EXPO8 * (tmp2 * tmp2) / (y * y)) / 10;
+                    m_lookupThrottleRc[i] = 1000 + m_lookupThrottleRc[i];
+                }
+            }
+
+            _initializedThrottleTable = true;
+
+            const auto tmp3 = tmp / 100;
+
+            // [0;1000] -> expo -> [MINTHROTTLE;MAXTHROTTLE]
+            return (float)(m_lookupThrottleRc[tmp3] + (tmp - tmp3 * 100) *
+                    (m_lookupThrottleRc[tmp3 + 1] - m_lookupThrottleRc[tmp3]) / 100);
+        }
+
     public:
 
         ReceiverTask()
             : Task(RECEIVER, 33) // Hz
         {
+        }
+
+        bool throttleIsDown(void)
+        {
+            return getRawThrottle() < 1050;
+        }
+
+        bool haveSignal(const uint32_t usec)
+        {
+            return (usec - m_lastSignaledAtUs) < TIMEOUT_USEC;
+        }
+
+        float getRawThrottle(void)
+        {
+            return m_channels[0];
+        }
+
+        float getRawRoll(void)
+        {
+            return m_channels[1];
+        }
+
+        float getRawPitch(void)
+        {
+            return m_channels[2];
+        }
+
+        float getRawYaw(void)
+        {
+            return m_channels[3];
+        }
+
+        float getRawAux1(void)
+        {
+            return m_channels[4];
+        }
+
+        float getRawAux2(void)
+        {
+            return m_channels[5];
         }
 
         virtual void run(const uint32_t usec) override
@@ -53,11 +142,6 @@ class ReceiverTask : public Task {
         auto getDemands(void) -> Demands 
         {
             return Demands(0, 0, 0, 0); // XXX
-        }
-
-        bool throttleIsDown(void) 
-        {
-            return false; // XXX
         }
 
         void setValues(
