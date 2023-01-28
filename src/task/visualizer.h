@@ -107,7 +107,6 @@ class VisualizerTask : public Task {
                             m_esc->convertFromExternal(m_msp->parseShort(2));
                         motors[3] =
                             m_esc->convertFromExternal(m_msp->parseShort(3));
-
                     } 
                     break;
 

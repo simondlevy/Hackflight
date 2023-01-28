@@ -36,6 +36,22 @@ class Board {
 
     private:
 
+        static constexpr float MAX_ARMING_ANGLE_DEG = 25;
+
+        static const uint8_t  STARTUP_BLINK_LED_REPS  = 10;
+        static const uint32_t STARTUP_BLINK_LED_DELAY = 50;
+
+        typedef enum {
+
+            ARMING_UNREADY,
+            ARMING_READY,
+            ARMING_ARMED,
+            ARMING_FAILSAFE
+
+        } armingStatus_e;
+
+        armingStatus_e m_armingStatus;
+
         uint8_t m_ledPin;
         bool m_ledInverted;
 
@@ -83,7 +99,7 @@ class Board {
 
     private:
 
-       void runDynamicTasks(void)
+        void runDynamicTasks(void)
         {
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
@@ -103,6 +119,7 @@ class Board {
 
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask);
+                    updateArmingStatus();
                     break;
 
                 case Task::VISUALIZER:
@@ -110,8 +127,9 @@ class Board {
                     break;
 
                 case Task::RECEIVER:
+                    updateArmingStatus();
                     runTask(m_receiverTask);
-                   break;
+                    break;
 
                 case Task::ACCELEROMETER:
                     runTask(m_accelerometerTask);
@@ -147,6 +165,40 @@ class Board {
         {
             m_core.postRunTask(
                     task, usecStart, micros(), getCycleCounter(), anticipatedEndCycles);
+        }
+
+        void updateArmingStatus(void)
+        {
+            // checkFailsafe();
+
+            switch (m_armingStatus) {
+
+                case ARMING_UNREADY:
+                    //ledBlink(500);
+                    //if (safeToArm()) {
+                    //    m_armingStatus = ARMING_READY;
+                    //}
+                    break;
+
+                case ARMING_READY:
+                    //ledSet(false);
+                    //if (safeToArm()) {
+                    //    checkArmingSwitch();
+                    //}
+                    //else {
+                    //    m_armingStatus = ARMING_UNREADY;
+                    //}
+                    break;
+
+                case ARMING_ARMED:
+                    //ledSet(true);
+                    //checkArmingSwitch();
+                    break;
+
+                default: // failsafe
+                    //ledBlink(200);
+                    break;
+            }
         }
 
         void ledSet(bool on)
