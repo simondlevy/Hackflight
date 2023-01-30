@@ -99,7 +99,7 @@ class Board {
 
     private:
 
-        void runDynamicTasks(void)
+        void runDynamicTasks(const int16_t rawAccel[3])
         {
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
@@ -133,6 +133,7 @@ class Board {
 
                 case Task::ACCELEROMETER:
                     runTask(m_accelerometerTask);
+                    m_accelerometerTask.update(rawAccel);
                     break;
 
                 case Task::SKYRANGER:
@@ -459,7 +460,6 @@ class Board {
 
         void step(int16_t rawGyro[3], int16_t rawAccel[3])
         {
-            (void)rawGyro;
             (void)rawAccel;
 
             auto nowCycles = getCycleCounter();
@@ -477,10 +477,6 @@ class Board {
                     nowCycles = getCycleCounter();
                     loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
                 }
-
-                static int16_t rawGyro[3];
-
-                m_imu->getRawGyro(rawGyro);
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
@@ -505,7 +501,7 @@ class Board {
             }
 
             if (m_core.isDynamicTaskReady(getCycleCounter())) {
-                runDynamicTasks();
+                runDynamicTasks(rawAccel);
             }
         }
 

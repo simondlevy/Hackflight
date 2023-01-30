@@ -220,8 +220,6 @@ class Imu {
 
         virtual void handleInterrupt(const uint32_t cycleCounter) = 0;
 
-        virtual void getRawGyro(int16_t rawGyro[3]) = 0;
-
         virtual auto gyroRawToFilteredDps(int16_t rawGyro[3]) -> Axes
         {
             const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
@@ -284,8 +282,9 @@ class Imu {
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 
-        virtual void updateAccelerometer(void)
+        virtual void updateAccelerometer(const int16_t rawAccel[3])
         {
+            (void)rawAccel;
         }
 
         virtual int32_t getGyroSkew(

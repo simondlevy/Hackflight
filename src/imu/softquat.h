@@ -203,7 +203,7 @@ class SoftQuatImu : public Imu {
             auto qy = q_old.y;
             auto qz = q_old.z;
 
-            const auto recipAccNorm = 0.0; // square(ax) + square(ay) + square(az);
+            const auto recipAccNorm = square(ax) + square(ay) + square(az);
 
             if (recipAccNorm > 0.0) {
 
@@ -282,9 +282,9 @@ class SoftQuatImu : public Imu {
 
         Axes m_accelAxes;
 
-        auto readAndFilterAccelAxis(Pt2Filter & lpf, const uint8_t k) -> float
+        auto filterAccelAxis(Pt2Filter & lpf, const int16_t val) -> float
         {
-            return lpf.apply((float)readRawAccel(k));
+            return lpf.apply((float)val);
         }
 
         int32_t m_shortPeriod;
@@ -337,14 +337,12 @@ class SoftQuatImu : public Imu {
             return quat2euler(quat.w, quat.x, quat.y, quat.z);
         }
 
-        virtual int16_t readRawAccel(uint8_t k) = 0;
-
-        virtual void updateAccelerometer(void) override
+        virtual void updateAccelerometer(const int16_t rawAccel[3]) override
         {
             Axes adc = Axes(
-                    readAndFilterAccelAxis(m_accelFilterX, 0),
-                    readAndFilterAccelAxis(m_accelFilterY, 1),
-                    readAndFilterAccelAxis(m_accelFilterZ, 2));
+                    filterAccelAxis(m_accelFilterX, rawAccel[0]),
+                    filterAccelAxis(m_accelFilterY, rawAccel[1]),
+                    filterAccelAxis(m_accelFilterZ, rawAccel[2]));
 
             m_accelAxes = m_rotateFun(adc);
 

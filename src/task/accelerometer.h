@@ -39,10 +39,8 @@ class AccelerometerTask : public Task {
             m_imu = imu;
         }
 
-        virtual void run(const uint32_t usec) override
+        void update(const int16_t rawAccel[3])
         {
-            (void)usec;
-
-            m_imu->updateAccelerometer();
+            m_imu->updateAccelerometer(rawAccel);
         }
 };

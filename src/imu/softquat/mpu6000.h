@@ -54,21 +54,9 @@ class Mpu6000 : public SoftQuatImu {
 
     protected:
 
-        virtual int16_t readRawAccel(uint8_t k) override
-        {
-            return m_rawAccel[k];
-        }
-
         void begin(const uint32_t mcuClockSpeed) override
         {
             SoftQuatImu::begin(mcuClockSpeed);
-        }
-
-        virtual void getRawGyro(int16_t rawGyro[3]) override
-        {
-            m_mpu->readData();
-            m_mpu->getRawGyro(rawGyro[0], rawGyro[1], rawGyro[2]);
-            m_mpu->getRawAccel(m_rawAccel[0], m_rawAccel[1], m_rawAccel[2]);
         }
 
     public:
