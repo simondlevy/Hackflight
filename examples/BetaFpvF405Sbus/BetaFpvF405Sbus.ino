@@ -28,9 +28,20 @@
 
 #include <vector>
 
+#include <SPI.h>
+#include <mpu6x00.h>
+
 static const uint8_t LED_PIN     = PB5;
 static const uint8_t IMU_CS_PIN  = PA4;
 static const uint8_t IMU_INT_PIN = PC4;
+
+static const uint8_t IMU_MOSI_PIN = PA7;
+static const uint8_t IMU_MISO_PIN = PA6;
+static const uint8_t IMU_SCLK_PIN = PA5;
+
+static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
+
+static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
 
 static std::vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
 
@@ -45,7 +56,7 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static bfs::SbusRx rx(&Serial3);
 
-static Mpu6000 imu(Imu::rotate270, IMU_CS_PIN);
+static Mpu6000 imu(mpu, Imu::rotate270);
 
 static std::vector<PidController *> pids = {&anglePid};
 

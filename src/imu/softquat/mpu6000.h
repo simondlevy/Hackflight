@@ -30,12 +30,6 @@ class Mpu6000 : public SoftQuatImu {
 
     private:
 
-        static const uint8_t IMU_MOSI_PIN = PA7;
-        static const uint8_t IMU_MISO_PIN = PA6;
-        static const uint8_t IMU_SCLK_PIN = PA5;
-
-        SPIClass m_spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
-
         static uint16_t gyroFsrToInt(const Mpu6x00::gyroFsr_e gyroFsr)
         {
             return
@@ -54,14 +48,13 @@ class Mpu6000 : public SoftQuatImu {
                 16;
         }
 
-        static const uint8_t CS_PIN = PA4; // XXX
-
-        Mpu6x00 m_mpu = Mpu6x00(m_spi, CS_PIN); // XXX
+        Mpu6x00 * m_mpu;
 
     protected:
 
         virtual int16_t readRawAccel(uint8_t k) override
         {
+            (void)k;
             return 0; // XXX
         }
 
@@ -69,7 +62,7 @@ class Mpu6000 : public SoftQuatImu {
         {
             SoftQuatImu::begin(mcuClockSpeed);
 
-            m_mpu.begin();
+            m_mpu->begin();
         }
 
         virtual bool gyroIsReady(void)  override
@@ -79,21 +72,21 @@ class Mpu6000 : public SoftQuatImu {
 
         virtual void getRawGyro(int16_t rawGyro[3]) override
         {
-            m_mpu.readData();
+            m_mpu->readData();
 
-            m_mpu.getRawGyro(rawGyro[0], rawGyro[1], rawGyro[2]);
+            m_mpu->getRawGyro(rawGyro[0], rawGyro[1], rawGyro[2]);
         }
 
     public:
 
         Mpu6000(
+                Mpu6x00 & mpu,
                 const rotateFun_t rotateFun,
-                const uint8_t csPin,
                 const Mpu6x00::gyroFsr_e gyroFsr = Mpu6x00::GYRO_2000DPS,
                 const Mpu6x00::accelFsr_e accelFsr = Mpu6x00::ACCEL_16G)
             : SoftQuatImu(rotateFun, gyroFsrToInt(gyroFsr), accelFsrToInt(accelFsr))
         {
-            (void)csPin;
+            m_mpu = &mpu;
         }
 
 };
