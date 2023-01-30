@@ -261,12 +261,13 @@ class Imu {
             applyGyroLpf1(m_gyroY);
             applyGyroLpf1(m_gyroZ);
 
-            // Used for fusion with accelerometer
-            //accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
-
             m_gyroIsCalibrating = !calibrationComplete;
 
             return Axes(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
+        }
+
+        virtual void accumulateGyro(void)
+        {
         }
 
         virtual bool gyroIsCalibrating(void)

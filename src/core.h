@@ -45,6 +45,8 @@ class Core {
                 const uint32_t usec,
                 float mixmotors[])
         {
+            imu->accumulateGyro();
+
             auto angvels = imu->gyroRawToDps(rawGyro);
 
             vstate.dphi   = angvels.x;

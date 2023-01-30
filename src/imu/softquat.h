@@ -315,11 +315,14 @@ class SoftQuatImu : public Imu {
             return true; // semper paratus
         }
 
-        auto gyroRawToDps(int16_t rawGyro[3]) -> Axes
+        virtual void accumulateGyro(void) override
         {
             m_gyroAccum.accumulate(
                     m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
+        }
 
+        auto gyroRawToDps(int16_t rawGyro[3]) -> Axes
+        {
             return Imu::gyroRawToDps(rawGyro);
         }
 
