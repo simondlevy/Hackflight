@@ -82,7 +82,6 @@ class InvenSenseImu : public SoftQuatImu {
         static const uint32_t SPI_INIT_CLK_HZ = 1000000;
 
         uint8_t  m_csPin;
-        uint8_t  m_dataRegister;
 
         SPIClass m_spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
@@ -193,14 +192,12 @@ class InvenSenseImu : public SoftQuatImu {
 
         InvenSenseImu(
                 const uint8_t csPin,
-                const uint8_t dataRegister,
                 const rotateFun_t rotateFun = rotate0,
                 const gyroFsr_e gyroFsr = GYRO_2000DPS,
                 const accelFsr_e accelFsr = ACCEL_16G)
             : SoftQuatImu(rotateFun, gyroFsrToInt(gyroFsr), accelFsrToInt(accelFsr))
         {
             m_csPin = csPin;
-            m_dataRegister = dataRegister;
 
             m_gyroFsr = gyroFsr;
             m_accelFsr = accelFsr;
@@ -231,7 +228,7 @@ class InvenSenseImu : public SoftQuatImu {
         virtual void getRawGyro(int16_t rawGyro[3]) override
         {
             readRegisters(
-                    m_dataRegister,
+                    REG_ACCEL_XOUT_H,
                     m_buffer,
                     InvenSenseImu::BUFFER_SIZE,
                     MAX_SPI_CLK_HZ);
