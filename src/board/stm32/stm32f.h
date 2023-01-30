@@ -51,14 +51,6 @@ class Stm32FBoard : public Stm32Board {
 
     public:
 
-        void begin(void)
-        {
-            Board::begin();
-
-            // Support MockImu
-            m_accelerometerTask.begin(m_imu);
-        }
-
         void handleSkyrangerEvent(HardwareSerial & serial)
         {
             while (serial.available()) {

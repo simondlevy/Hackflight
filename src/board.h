@@ -133,7 +133,7 @@ class Board {
 
                 case Task::ACCELEROMETER:
                     runTask(m_accelerometerTask);
-                    m_accelerometerTask.update(rawAccel);
+                    m_imu->updateAccelerometer(rawAccel);
                     break;
 
                 case Task::SKYRANGER:

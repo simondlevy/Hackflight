@@ -23,24 +23,10 @@
 
 class AccelerometerTask : public Task {
 
-    private:
-
-        Imu * m_imu;
-
     public:
 
         AccelerometerTask(void)
             : Task(ACCELEROMETER, SoftQuatImu::ACCEL_SAMPLE_RATE)
         {
-        }
-
-        void begin(Imu * imu)
-        {
-            m_imu = imu;
-        }
-
-        void update(const int16_t rawAccel[3])
-        {
-            m_imu->updateAccelerometer(rawAccel);
         }
 };
