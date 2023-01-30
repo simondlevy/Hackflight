@@ -120,8 +120,6 @@ class Mpu6000 : public SoftQuatImu {
         gyroFsr_e m_gyroFsr;
         accelFsr_e m_accelFsr;
 
-        Mpu6000 * m_invenSenseImu;
-
         // Enough room for seven two-byte integers (gyro XYZ, temperature,
         // accel XYZ) plus one byte for SPI transfer
         uint8_t m_buffer[15];
