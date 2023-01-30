@@ -220,8 +220,6 @@ class Imu {
 
         virtual void handleInterrupt(const uint32_t cycleCounter) = 0;
 
-        virtual bool gyroIsReady(void) = 0;
-
         virtual void getRawGyro(int16_t rawGyro[3]) = 0;
 
         virtual auto gyroRawToFilteredDps(int16_t rawGyro[3]) -> Axes

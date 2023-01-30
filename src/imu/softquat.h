@@ -310,11 +310,6 @@ class SoftQuatImu : public Imu {
             setGyroCalibrationCycles();
         }
 
-        virtual bool gyroIsReady(void)  override
-        {
-            return true; // semper paratus
-        }
-
         virtual void accumulateGyro(void) override
         {
             m_gyroAccum.accumulate(

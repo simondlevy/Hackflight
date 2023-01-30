@@ -477,10 +477,7 @@ class Board {
 
                 static int16_t rawGyro[3];
 
-                if (m_imu->gyroIsReady()) {
-
-                    m_imu->getRawGyro(rawGyro);
-               }
+                m_imu->getRawGyro(rawGyro);
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
