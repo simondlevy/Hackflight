@@ -1,6 +1,4 @@
 /*
-   Class definition for MPU6000, MPU6500 IMUs using SPI bus
-
    Copyright (c) 2022 Simon D. Levy
 
    This file is part of Hackflight.
@@ -20,7 +18,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <string.h>
 
 #include "core/axes.h"
 #include "core/clock.h"
@@ -58,9 +56,19 @@ class Mpu6000 : public SoftQuatImu {
             NUM_CLK
         } clockSel_e;
 
-    private:
+        // Configuration bits  
+        static const uint8_t BIT_RAW_RDY_EN       = 0x01;
+        static const uint8_t BIT_CLK_SEL_PLLGYROZ = 0x03;
+        static const uint8_t BIT_I2C_IF_DIS       = 0x10;
+        static const uint8_t BIT_RESET            = 0x80;
 
         static const uint8_t GYRO_HARDWARE_LPF_NORMAL = 0x00;
+
+    private:
+
+        static const uint8_t IMU_MOSI_PIN = PA7;
+        static const uint8_t IMU_MISO_PIN = PA6;
+        static const uint8_t IMU_SCLK_PIN = PA5;
 
         static const uint8_t REG_ACCEL_XOUT_H = 0x3B;
 
@@ -71,42 +79,11 @@ class Mpu6000 : public SoftQuatImu {
         static const uint32_t MAX_SPI_CLK_HZ = 20000000;
 
         // 1 MHz max SPI frequency for initialisation
-        static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
-
-        // Configuration bits  
-        static const uint8_t BIT_RAW_RDY_EN       = 0x01;
-        static const uint8_t BIT_CLK_SEL_PLLGYROZ = 0x03;
-        static const uint8_t BIT_I2C_IF_DIS       = 0x10;
-        static const uint8_t BIT_RESET            = 0x80;
-
-        static const uint8_t IMU_MOSI_PIN = PA7;
-        static const uint8_t IMU_MISO_PIN = PA6;
-        static const uint8_t IMU_SCLK_PIN = PA5;
-
-        // Registers
-        static const uint8_t REG_SMPLRT_DIV        = 0x19;
-        static const uint8_t REG_CONFIG            = 0x1A;
-        static const uint8_t REG_GYRO_CONFIG       = 0x1B;
-        static const uint8_t REG_ACCEL_CONFIG      = 0x1C;
-        static const uint8_t REG_INT_PIN_CFG       = 0x37;
-        static const uint8_t REG_INT_ENABLE        = 0x38;
-        static const uint8_t REG_SIGNAL_PATH_RESET = 0x6A;
-        static const uint8_t REG_USER_CTRL         = 0x6A;
-        static const uint8_t REG_PWR_MGMT_1        = 0x6B;
-        static const uint8_t REG_PWR_MGMT_2        = 0x6C;
+        static const uint32_t SPI_INIT_CLK_HZ = 1000000;
 
         uint8_t  m_csPin;
-        uint8_t  m_dataRegister;
-        uint32_t m_initialSpiFreq;
 
         SPIClass m_spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
-
-        gyroFsr_e m_gyroFsr;
-        accelFsr_e m_accelFsr;
-
-        // Enough room for seven two-byte integers (gyro XYZ, temperature,
-        // accel XYZ) plus one byte for SPI transfer
-        uint8_t m_buffer[15];
 
         static uint16_t gyroFsrToInt(const gyroFsr_e gyroFsr)
         {
@@ -139,9 +116,32 @@ class Mpu6000 : public SoftQuatImu {
             return divisor;
         }
 
+    protected:
+
+        // Registers
+        static const uint8_t REG_SMPLRT_DIV        = 0x19;
+        static const uint8_t REG_CONFIG            = 0x1A;
+        static const uint8_t REG_GYRO_CONFIG       = 0x1B;
+        static const uint8_t REG_ACCEL_CONFIG      = 0x1C;
+        static const uint8_t REG_INT_PIN_CFG       = 0x37;
+        static const uint8_t REG_INT_ENABLE        = 0x38;
+        static const uint8_t REG_SIGNAL_PATH_RESET = 0x6A;
+        static const uint8_t REG_USER_CTRL         = 0x6A;
+        static const uint8_t REG_PWR_MGMT_1        = 0x6B;
+        static const uint8_t REG_PWR_MGMT_2        = 0x6C;
+
+        gyroFsr_e m_gyroFsr;
+        accelFsr_e m_accelFsr;
+
+        Mpu6000 * m_invenSenseImu;
+
+        // Enough room for seven two-byte integers (gyro XYZ, temperature,
+        // accel XYZ) plus one byte for SPI transfer
+        uint8_t m_buffer[15];
+
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
-            m_spi.beginTransaction(SPISettings(MAX_SPI_INIT_CLK_HZ, MSBFIRST, SPI_MODE3)); 
+            m_spi.beginTransaction(SPISettings(SPI_INIT_CLK_HZ, MSBFIRST, SPI_MODE3)); 
 
             digitalWrite(m_csPin, LOW);
             m_spi.transfer(reg);
@@ -151,9 +151,13 @@ class Mpu6000 : public SoftQuatImu {
             m_spi.endTransaction(); 
         }
 
-        void readRegisters( const uint8_t addr, uint8_t * buffer, const uint8_t count)
+        void readRegisters(
+                const uint8_t addr,
+                uint8_t * buffer,
+                const uint8_t count,
+                const uint32_t spiClkHz) 
         {
-            m_spi.beginTransaction(SPISettings(MAX_SPI_CLK_HZ, MSBFIRST, SPI_MODE3)); 
+            m_spi.beginTransaction(SPISettings(spiClkHz, MSBFIRST, SPI_MODE3)); 
 
             digitalWrite(m_csPin, LOW);
 
@@ -186,6 +190,41 @@ class Mpu6000 : public SoftQuatImu {
             return getShortFromBuffer(ACCEL_BUFFER_OFFSET, k);
         }
 
+        virtual void initRegisters(void)
+        {
+        }
+
+        void begin(const uint32_t mcuClockSpeed) override
+        {
+            SoftQuatImu::begin(mcuClockSpeed);
+
+            m_spi.begin();
+
+            pinMode(m_csPin, OUTPUT);
+
+            digitalWrite(m_csPin, HIGH);
+
+            initRegisters();
+        }
+
+        virtual bool gyroIsReady(void)  override
+        {
+            return true;
+        }
+
+        virtual void getRawGyro(int16_t rawGyro[3]) override
+        {
+            readRegisters(
+                    REG_ACCEL_XOUT_H,
+                    m_buffer,
+                    Mpu6000::BUFFER_SIZE,
+                    MAX_SPI_CLK_HZ);
+
+            rawGyro[0] = getGyroValFromBuffer(0);
+            rawGyro[1] = getGyroValFromBuffer(1);
+            rawGyro[2] = getGyroValFromBuffer(2);
+        }
+
     public:
 
         Mpu6000(
@@ -201,59 +240,4 @@ class Mpu6000 : public SoftQuatImu {
             m_accelFsr = accelFsr;
         }
 
-        void begin(const uint32_t mcuClockSpeed) override
-        {
-            SoftQuatImu::begin(mcuClockSpeed);
-
-            m_spi.begin();
-
-            pinMode(m_csPin, OUTPUT);
-
-            digitalWrite(m_csPin, HIGH);
-
-            writeRegister(REG_PWR_MGMT_1, BIT_RESET);
-            delay(100);
-
-            writeRegister(REG_PWR_MGMT_1, BIT_CLK_SEL_PLLGYROZ);
-            delayMicroseconds(7);
-
-            writeRegister(REG_USER_CTRL, BIT_I2C_IF_DIS);
-            delayMicroseconds(15);
-
-            writeRegister(REG_PWR_MGMT_2, 0x00);
-            delayMicroseconds(15);
-
-            writeRegister(REG_SMPLRT_DIV, 0);
-            delayMicroseconds(15);
-
-            writeRegister(REG_GYRO_CONFIG, (uint8_t)(m_gyroFsr << 3));
-            delayMicroseconds(15);
-
-            writeRegister(REG_ACCEL_CONFIG, (uint8_t)(m_accelFsr << 3));
-            delayMicroseconds(15);
-
-            writeRegister(REG_INT_PIN_CFG, 0x10);
-            delayMicroseconds(15);
-
-            writeRegister(REG_INT_ENABLE, BIT_RAW_RDY_EN);
-            delayMicroseconds(15);
-
-            writeRegister(REG_CONFIG, 0);
-            delayMicroseconds(1);
-        }
-
-        virtual bool gyroIsReady(void)  override
-        {
-            return true;
-        }
-
-        virtual void getRawGyro(int16_t rawGyro[3]) override
-        {
-            readRegisters(m_dataRegister, m_buffer, BUFFER_SIZE);
-
-            rawGyro[0] = getGyroValFromBuffer(0);
-            rawGyro[1] = getGyroValFromBuffer(1);
-            rawGyro[2] = getGyroValFromBuffer(2);
-        }
-
-}; // class Mpu6000
+};

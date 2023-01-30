@@ -21,7 +21,7 @@
 #include <board/stm32/f/4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
-#include <imu/softquat/invensense.h>
+#include <imu/softquat/mpu6000.h>
 #include <esc/dshot.h>
 
 #include <sbus.h>
@@ -45,7 +45,7 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static bfs::SbusRx rx(&Serial3);
 
-static InvenSenseImu imu(Imu::rotate270, IMU_CS_PIN);
+static Mpu6000 imu(Imu::rotate270, IMU_CS_PIN);
 
 static std::vector<PidController *> pids = {&anglePid};
 
