@@ -37,7 +37,7 @@ class Mpu6000 : public InvenSenseImu {
         static const uint32_t MAX_SPI_CLK_HZ = 20000000;
 
         // 1 MHz max SPI frequency for initialisation
-        static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
+        static const uint32_t SPI_INIT_CLK_HZ = 1000000;
 
 
     public:
@@ -49,11 +49,9 @@ class Mpu6000 : public InvenSenseImu {
                 const accelFsr_e accelFsr = ACCEL_16G)
             : InvenSenseImu(
                     csPin,
-                    MAX_SPI_INIT_CLK_HZ,
+                    SPI_INIT_CLK_HZ,
                     MAX_SPI_CLK_HZ,
                     REG_ACCEL_XOUT_H,
-                    ACCEL_BUFFER_OFFSET,
-                    GYRO_BUFFER_OFFSET,
                     rotateFun,
                     gyroFsr,
                     accelFsr)
