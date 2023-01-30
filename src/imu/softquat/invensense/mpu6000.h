@@ -24,7 +24,7 @@
 
 #include "imu/softquat/invensense.h"
 
-class Mpu6x00 : public InvenSenseImu {
+class Mpu6000 : public InvenSenseImu {
 
     private:
 
@@ -76,7 +76,7 @@ class Mpu6x00 : public InvenSenseImu {
 
     public:
 
-        Mpu6x00(
+        Mpu6000(
                 const rotateFun_t rotateFun,
                 const uint8_t csPin,
                 const gyroFsr_e gyroFsr = GYRO_2000DPS,
@@ -94,4 +94,4 @@ class Mpu6x00 : public InvenSenseImu {
     {
     }
 
-}; // class Mpu6x00
+}; // class Mpu6000
