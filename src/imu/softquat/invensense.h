@@ -190,19 +190,6 @@ class InvenSenseImu : public SoftQuatImu {
             return getShortFromBuffer(ACCEL_BUFFER_OFFSET, k);
         }
 
-        InvenSenseImu(
-                const uint8_t csPin,
-                const rotateFun_t rotateFun = rotate0,
-                const gyroFsr_e gyroFsr = GYRO_2000DPS,
-                const accelFsr_e accelFsr = ACCEL_16G)
-            : SoftQuatImu(rotateFun, gyroFsrToInt(gyroFsr), accelFsrToInt(accelFsr))
-        {
-            m_csPin = csPin;
-
-            m_gyroFsr = gyroFsr;
-            m_accelFsr = accelFsr;
-        }
-
         virtual void initRegisters(void)
         {
         }
@@ -237,4 +224,20 @@ class InvenSenseImu : public SoftQuatImu {
             rawGyro[1] = getGyroValFromBuffer(1);
             rawGyro[2] = getGyroValFromBuffer(2);
         }
+
+    public:
+
+        InvenSenseImu(
+                const rotateFun_t rotateFun,
+                const uint8_t csPin,
+                const gyroFsr_e gyroFsr = GYRO_2000DPS,
+                const accelFsr_e accelFsr = ACCEL_16G)
+            : SoftQuatImu(rotateFun, gyroFsrToInt(gyroFsr), accelFsrToInt(accelFsr))
+        {
+            m_csPin = csPin;
+
+            m_gyroFsr = gyroFsr;
+            m_accelFsr = accelFsr;
+        }
+
 };
