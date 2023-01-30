@@ -47,7 +47,7 @@ class Core {
         {
             imu->accumulateGyro();
 
-            auto angvels = imu->gyroRawToDps(rawGyro);
+            auto angvels = imu->gyroRawToFilteredDps(rawGyro);
 
             vstate.dphi   = angvels.x;
             vstate.dtheta = angvels.y;

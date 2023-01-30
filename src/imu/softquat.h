@@ -321,9 +321,9 @@ class SoftQuatImu : public Imu {
                     m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
         }
 
-        auto gyroRawToDps(int16_t rawGyro[3]) -> Axes
+        auto gyroRawToFilteredDps(int16_t rawGyro[3]) -> Axes
         {
-            return Imu::gyroRawToDps(rawGyro);
+            return Imu::gyroRawToFilteredDps(rawGyro);
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override

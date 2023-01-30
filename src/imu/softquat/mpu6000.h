@@ -62,8 +62,6 @@ class Mpu6000 : public SoftQuatImu {
         void begin(const uint32_t mcuClockSpeed) override
         {
             SoftQuatImu::begin(mcuClockSpeed);
-
-            m_mpu->begin();
         }
 
         virtual void getRawGyro(int16_t rawGyro[3]) override

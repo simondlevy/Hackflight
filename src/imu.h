@@ -224,7 +224,7 @@ class Imu {
 
         virtual void getRawGyro(int16_t rawGyro[3]) = 0;
 
-        virtual auto gyroRawToDps(int16_t rawGyro[3]) -> Axes
+        virtual auto gyroRawToFilteredDps(int16_t rawGyro[3]) -> Axes
         {
             const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
 
