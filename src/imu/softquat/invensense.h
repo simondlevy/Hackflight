@@ -70,6 +70,17 @@ class InvenSenseImu : public SoftQuatImu {
         static const uint8_t IMU_MISO_PIN = PA6;
         static const uint8_t IMU_SCLK_PIN = PA5;
 
+        static const uint8_t REG_ACCEL_XOUT_H = 0x3B;
+
+        static const uint8_t ACCEL_BUFFER_OFFSET = 0;
+        static const uint8_t GYRO_BUFFER_OFFSET = 4;
+
+        // 20 MHz max SPI frequency
+        static const uint32_t MAX_SPI_CLK_HZ = 20000000;
+
+        // 1 MHz max SPI frequency for initialisation
+        static const uint32_t MAX_SPI_INIT_CLK_HZ = 1000000;
+
         uint8_t  m_csPin;
         uint8_t  m_dataRegister;
         uint32_t m_initialSpiFreq;
@@ -217,17 +228,13 @@ class InvenSenseImu : public SoftQuatImu {
         {
             SoftQuatImu::begin(mcuClockSpeed);
 
-            // Support mock IMU
-            if (m_csPin != 0) {
+            m_spi.begin();
 
-                m_spi.begin();
+            pinMode(m_csPin, OUTPUT);
 
-                pinMode(m_csPin, OUTPUT);
+            digitalWrite(m_csPin, HIGH);
 
-                digitalWrite(m_csPin, HIGH);
-
-                initRegisters();
-            }
+            initRegisters();
         }
 
         virtual bool gyroIsReady(void)  override
