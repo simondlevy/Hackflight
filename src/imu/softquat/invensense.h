@@ -83,8 +83,6 @@ class InvenSenseImu : public SoftQuatImu {
 
         uint8_t  m_csPin;
         uint8_t  m_dataRegister;
-        uint32_t m_initialSpiFreq;
-        uint32_t m_fullSpiFreq;
 
         SPIClass m_spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
@@ -144,7 +142,7 @@ class InvenSenseImu : public SoftQuatImu {
 
         void writeRegister(const uint8_t reg, const uint8_t val)
         {
-            m_spi.beginTransaction(SPISettings(m_initialSpiFreq, MSBFIRST, SPI_MODE3)); 
+            m_spi.beginTransaction(SPISettings(SPI_INIT_CLK_HZ, MSBFIRST, SPI_MODE3)); 
 
             digitalWrite(m_csPin, LOW);
             m_spi.transfer(reg);
@@ -195,8 +193,6 @@ class InvenSenseImu : public SoftQuatImu {
 
         InvenSenseImu(
                 const uint8_t csPin,
-                const uint32_t initialSpiFreq,
-                const uint32_t fullSpiFreq,
                 const uint8_t dataRegister,
                 const rotateFun_t rotateFun = rotate0,
                 const gyroFsr_e gyroFsr = GYRO_2000DPS,
@@ -205,8 +201,6 @@ class InvenSenseImu : public SoftQuatImu {
         {
             m_csPin = csPin;
             m_dataRegister = dataRegister;
-            m_initialSpiFreq = initialSpiFreq;
-            m_fullSpiFreq = fullSpiFreq;
 
             m_gyroFsr = gyroFsr;
             m_accelFsr = accelFsr;
@@ -240,7 +234,7 @@ class InvenSenseImu : public SoftQuatImu {
                     m_dataRegister,
                     m_buffer,
                     InvenSenseImu::BUFFER_SIZE,
-                    m_fullSpiFreq);
+                    MAX_SPI_CLK_HZ);
 
             rawGyro[0] = getGyroValFromBuffer(0);
             rawGyro[1] = getGyroValFromBuffer(1);

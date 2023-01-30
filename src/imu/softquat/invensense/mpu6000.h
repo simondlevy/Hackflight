@@ -49,8 +49,6 @@ class Mpu6000 : public InvenSenseImu {
                 const accelFsr_e accelFsr = ACCEL_16G)
             : InvenSenseImu(
                     csPin,
-                    SPI_INIT_CLK_HZ,
-                    MAX_SPI_CLK_HZ,
                     REG_ACCEL_XOUT_H,
                     rotateFun,
                     gyroFsr,
