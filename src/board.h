@@ -457,8 +457,11 @@ class Board {
             ledSet(false);
         }
 
-        void step(void)
+        void step(int16_t rawGyro[3], int16_t rawAccel[3])
         {
+            (void)rawGyro;
+            (void)rawAccel;
+
             auto nowCycles = getCycleCounter();
 
             if (m_core.isCoreTaskReady(nowCycles)) {
@@ -506,9 +509,9 @@ class Board {
             }
         }
 
-        void step(HardwareSerial & serial)
+        void step(int16_t rawGyro[3], int16_t rawAccel[3], HardwareSerial & serial)
         {
-            step();
+            step(rawGyro, rawAccel);
 
             while (m_skyrangerTask.imuDataAvailable()) {
                 serial.write(m_skyrangerTask.readImuData());
