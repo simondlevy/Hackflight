@@ -45,10 +45,11 @@ class Core {
 
         armingStatus_e armingStatus;
 
+        VehicleState vstate;
+
         void getMotorValues(
 
                 Imu * imu,
-                VehicleState & vstate,
                 ReceiverTask & receiverTask,
                 std::vector<PidController *> * pidControllers,
                 Mixer * mixer,

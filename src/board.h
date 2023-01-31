@@ -46,14 +46,12 @@ class Board {
 
         uint32_t m_imuInterruptCount;
 
-        VehicleState m_vstate;
-
-        AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
+        AttitudeTask m_attitudeTask = AttitudeTask(m_core.vstate);
 
         ReceiverTask m_receiverTask;
 
         VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_vstate, m_receiverTask, m_skyrangerTask);
+            VisualizerTask(m_msp, m_core.vstate, m_receiverTask, m_skyrangerTask);
 
         Msp m_msp;
 
@@ -231,8 +229,8 @@ class Board {
             const auto maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE_DEG);
 
             const auto imuIsLevel =
-                fabsf(m_vstate.phi) < maxArmingAngle &&
-                fabsf(m_vstate.theta) < maxArmingAngle;
+                fabsf(m_core.vstate.phi) < maxArmingAngle &&
+                fabsf(m_core.vstate.theta) < maxArmingAngle;
 
             const auto gyroDoneCalibrating = !m_imu->gyroIsCalibrating();
 
@@ -384,7 +382,7 @@ class Board {
 
         AccelerometerTask m_accelerometerTask; 
 
-        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
+        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_core.vstate);
 
         virtual void prioritizeExtraTasks(
                 Task::prioritizer_t & prioritizer, const uint32_t usec)
@@ -490,7 +488,6 @@ class Board {
                 m_core.getMotorValues(
 
                         m_imu,
-                        m_vstate,
                         m_receiverTask,
                         m_pidControllers,
                         m_mixer,
