@@ -78,16 +78,5 @@ void loop()
 {
     icm.readSensor();
 
-    Serial.print(icm.accelCounts[0]);
-    Serial.print("\t");
-    Serial.print(icm.accelCounts[1]);
-    Serial.print("\t");
-    Serial.print(icm.accelCounts[2]);
-    Serial.print("\t");
-    Serial.print(icm.gyroCounts[0]);
-    Serial.print("\t");
-    Serial.print(icm.gyroCounts[1]);
-    Serial.print("\t");
-    Serial.print(icm.gyroCounts[2]);
-    Serial.print("\n");
+    board.step(icm.gyroCounts, icm.accelCounts);
 }
