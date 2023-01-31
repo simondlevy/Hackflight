@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2022 Simon D. Levy
+   Copyright (c) 2023 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -18,7 +18,16 @@
  */
 
 #include <hackflight.h>
-#include <imu/softquat/invensense/icm20689.h>
+#include <board/stm32/f/4/stm32f411.h>
+#include <core/mixers/fixedpitch/quadxbf.h>
+#include <core/pids/angle.h>
+#include <imu/softquat.h>
+#include <esc/mock.h>
+
+#include <vector>
+
+#include <SPI.h>
+#include <ICM20689.h>
 
 static const uint8_t IMU_MOSI_PIN = PA7;
 static const uint8_t IMU_MISO_PIN = PA6;
@@ -30,63 +39,55 @@ static const uint8_t IMU_INT_PIN = PA1;
 
 static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
-static ICM20689 imu(spi, IMU_CS_PIN);
+static ICM20689 icm(spi, IMU_CS_PIN);
 
 static volatile bool gotInterrupt;
 
-static void getIMU() 
+static AnglePidController anglePid(
+        1.441305,     // Rate Kp
+        48.8762,      // Rate Ki
+        0.021160,     // Rate Kd
+        0.0165048,    // Rate Kf
+        0.0); // 3.0; // Level Kp
+
+static Mixer mixer = QuadXbfMixer::make();
+
+static SoftQuatImu imu(Imu::rotate180);
+
+static std::vector<PidController *> pids = {&anglePid};
+
+static MockEsc esc;
+
+static Stm32F411Board board(imu, pids, mixer, esc, LED_PIN);
+
+static void handleImuInterrupt() 
 {
-    gotInterrupt = true;
-}
-
-static void blinkLed(void)
-{
-    static uint32_t prev;
-    static bool led;
-
-    uint32_t msec = millis();
-
-    if (msec-prev > 500) {
-        led = !led;
-        digitalWrite(LED_PIN, led);
-        prev = msec;
-    }
+    board.handleImuInterrupt();
 }
 
 void setup() {
 
-  Serial.begin(115200);
+    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
 
-  pinMode(LED_PIN, OUTPUT);
+    icm.begin();
 
-  imu.begin();
-
-  pinMode(IMU_INT_PIN,INPUT);
-  attachInterrupt(IMU_INT_PIN,getIMU,RISING);
-
+    board.begin();
 }
 
 void loop() 
 {
-    blinkLed();
+    icm.readSensor();
 
-    if (gotInterrupt) {
-
-        gotInterrupt = false;
-
-        imu.readSensor();
-
-        Serial.print(imu.accelCounts[0]);
-        Serial.print("\t");
-        Serial.print(imu.accelCounts[1]);
-        Serial.print("\t");
-        Serial.print(imu.accelCounts[2]);
-        Serial.print("\t");
-        Serial.print(imu.gyroCounts[0]);
-        Serial.print("\t");
-        Serial.print(imu.gyroCounts[1]);
-        Serial.print("\t");
-        Serial.print(imu.gyroCounts[2]);
-        Serial.print("\n");
-    }
+    Serial.print(icm.accelCounts[0]);
+    Serial.print("\t");
+    Serial.print(icm.accelCounts[1]);
+    Serial.print("\t");
+    Serial.print(icm.accelCounts[2]);
+    Serial.print("\t");
+    Serial.print(icm.gyroCounts[0]);
+    Serial.print("\t");
+    Serial.print(icm.gyroCounts[1]);
+    Serial.print("\t");
+    Serial.print(icm.gyroCounts[2]);
+    Serial.print("\n");
 }
