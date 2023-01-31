@@ -49,12 +49,12 @@ class Core {
 
         ReceiverTask receiverTask;
 
+        Mixer * mixer;
 
         void getMotorValues(
 
                 Imu * imu,
                 std::vector<PidController *> * pidControllers,
-                Mixer * mixer,
                 Esc * esc,
 
                 int16_t rawGyro[3],

@@ -57,7 +57,6 @@ class Board {
 
         // Initialzed in sketch
         Esc *   m_esc;
-        Mixer * m_mixer;
         std::vector<PidController *> * m_pidControllers;
 
         bool m_dshotEnabled;
@@ -73,7 +72,7 @@ class Board {
         {
             m_imu = imu;
             m_pidControllers = &pidControllers;
-            m_mixer = &mixer;
+            m_core.mixer = &mixer;
             m_esc = &esc;
 
             // Support negative LED pin number for inversion
@@ -487,7 +486,6 @@ class Board {
 
                         m_imu,
                         m_pidControllers,
-                        m_mixer,
                         m_esc,
 
                         rawGyro,
