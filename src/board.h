@@ -53,9 +53,6 @@ class Board {
 
         Core m_core;
 
-        // Initialzed in sketch
-        Esc *   m_esc;
-
         bool m_dshotEnabled;
 
     protected:
@@ -70,7 +67,7 @@ class Board {
             m_core.imu = imu;
             m_core.pidControllers = &pidControllers;
             m_core.mixer = &mixer;
-            m_esc = &esc;
+            m_core.esc = &esc;
 
             // Support negative LED pin number for inversion
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
@@ -313,17 +310,17 @@ class Board {
 
         void escBegin(void)
         {
-            switch (m_esc->type) {
+            switch (m_core.esc->type) {
 
                 case Esc::BRUSHED:
-                    for (auto pin : *m_esc->motorPins) {
+                    for (auto pin : *m_core.esc->motorPins) {
                         // analogWriteFrequency(pin, 10000);
                         analogWrite(pin, 0);
                     }
                     break;
 
                 case Esc::DSHOT:
-                    dmaInit(m_esc->motorPins, 1000 * m_esc->dshotOutputFreq);
+                    dmaInit(m_core.esc->motorPins, 1000 * m_core.esc->dshotOutputFreq);
                     m_dshotEnabled = true;
                     break;
 
@@ -336,25 +333,25 @@ class Board {
         {
             dmaUpdateStart();
 
-            for (uint8_t k=0; k<m_esc->motorPins->size(); k++) {
+            for (uint8_t k=0; k<m_core.esc->motorPins->size(); k++) {
 
-                auto packet = m_esc->prepareDshotPacket(k, motorValues[k]);
+                auto packet = m_core.esc->prepareDshotPacket(k, motorValues[k]);
 
                 dmaWriteMotor(k, packet);
             }
 
-            m_esc->dshotComplete();
+            m_core.esc->dshotComplete();
 
             dmaUpdateComplete();
         }
 
         void escWrite(const float motorValues[])
         {
-            switch (m_esc->type) {
+            switch (m_core.esc->type) {
 
                 case Esc::BRUSHED:
-                    for (uint8_t k=0; k<m_esc->motorPins->size(); ++k) {
-                        analogWrite((*m_esc->motorPins)[k], (uint8_t)(motorValues[k] * 255));
+                    for (uint8_t k=0; k<m_core.esc->motorPins->size(); ++k) {
+                        analogWrite((*m_core.esc->motorPins)[k], (uint8_t)(motorValues[k] * 255));
                     }
                     break;
 
@@ -438,7 +435,7 @@ class Board {
 
             m_attitudeTask.begin(m_core.imu);
 
-            m_visualizerTask.begin(m_esc, &m_core.receiverTask);
+            m_visualizerTask.begin(m_core.esc, &m_core.receiverTask);
 
             m_core.imu->begin(getClockSpeed());
 
@@ -476,13 +473,7 @@ class Board {
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
-                m_core.getMotorValues(
-
-                        m_esc,
-
-                        rawGyro,
-                        usec,
-                        mixmotors);
+                m_core.getMotorValues(rawGyro, usec, mixmotors);
 
                 escWrite(
                         m_core.armingStatus == Core::ARMING_ARMED ? 

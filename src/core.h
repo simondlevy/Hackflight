@@ -53,17 +53,13 @@ class Core {
 
         Imu * imu;
 
+        Esc * esc;
+
         std::vector<PidController *> * pidControllers;
 
         uint32_t imuInterruptCount;
         
-        void getMotorValues(
-
-                Esc * esc,
-
-                int16_t rawGyro[3],
-                const uint32_t usec,
-                float mixmotors[])
+        void getMotorValues(int16_t rawGyro[3], const uint32_t usec, float mixmotors[])
         {
             imu->accumulateGyro();
 
