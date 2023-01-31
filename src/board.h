@@ -460,8 +460,6 @@ class Board {
 
         void step(int16_t rawGyro[3], int16_t rawAccel[3])
         {
-            (void)rawAccel;
-
             auto nowCycles = getCycleCounter();
 
             if (m_core.isCoreTaskReady(nowCycles)) {
