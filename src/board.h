@@ -68,7 +68,7 @@ class Board {
                 Esc & esc,
                 const int8_t ledPin)
         {
-            m_imu = imu;
+            m_core.imu = imu;
             m_pidControllers = &pidControllers;
             m_core.mixer = &mixer;
             m_esc = &esc;
@@ -117,7 +117,7 @@ class Board {
 
                 case Task::ACCELEROMETER:
                     runTask(m_accelerometerTask);
-                    m_imu->updateAccelerometer(rawAccel);
+                    m_core.imu->updateAccelerometer(rawAccel);
                     break;
 
                 case Task::SKYRANGER:
@@ -227,7 +227,7 @@ class Board {
                 fabsf(m_core.vstate.phi) < maxArmingAngle &&
                 fabsf(m_core.vstate.theta) < maxArmingAngle;
 
-            const auto gyroDoneCalibrating = !m_imu->gyroIsCalibrating();
+            const auto gyroDoneCalibrating = !m_core.imu->gyroIsCalibrating();
 
             const auto haveReceiverSignal = m_core.receiverTask.haveSignal(usec);
 
@@ -372,9 +372,6 @@ class Board {
 
     protected:
 
-        // Initialized in sketch
-        Imu * m_imu;
-
         AccelerometerTask m_accelerometerTask; 
 
         SkyrangerTask m_skyrangerTask = SkyrangerTask(m_core.vstate);
@@ -401,7 +398,7 @@ class Board {
         void handleImuInterrupt(void)
         {
             m_core.imuInterruptCount++;
-            m_imu->handleInterrupt(getCycleCounter());
+            m_core.imu->handleInterrupt(getCycleCounter());
         }
 
         uint32_t microsToCycles(uint32_t micros)
@@ -440,11 +437,11 @@ class Board {
         {
             startCycleCounter();
 
-            m_attitudeTask.begin(m_imu);
+            m_attitudeTask.begin(m_core.imu);
 
             m_visualizerTask.begin(m_esc, &m_core.receiverTask);
 
-            m_imu->begin(getClockSpeed());
+            m_core.imu->begin(getClockSpeed());
 
             escBegin();
 
@@ -482,7 +479,6 @@ class Board {
 
                 m_core.getMotorValues(
 
-                        m_imu,
                         m_pidControllers,
                         m_esc,
 
@@ -495,7 +491,7 @@ class Board {
                         mixmotors :
                         m_visualizerTask.motors);
 
-                m_core.updateScheduler(m_imu, nowCycles, nextTargetCycles);
+                m_core.updateScheduler(nowCycles, nextTargetCycles);
             }
 
             if (m_core.isDynamicTaskReady(getCycleCounter())) {

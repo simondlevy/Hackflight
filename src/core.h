@@ -51,11 +51,12 @@ class Core {
 
         Mixer * mixer;
 
+        Imu * imu;
+
         uint32_t imuInterruptCount;
         
         void getMotorValues(
 
-                Imu * imu,
                 std::vector<PidController *> * pidControllers,
                 Esc * esc,
 
@@ -113,10 +114,7 @@ class Core {
             return m_scheduler.isCoreReady(nowCycles);
         }
 
-        void updateScheduler(
-                Imu * imu,
-                const uint32_t nowCycles,
-                const uint32_t nextTargetCycles)
+        void updateScheduler(const uint32_t nowCycles, const uint32_t nextTargetCycles)
         {
             m_scheduler.corePostUpdate(nowCycles);
 
