@@ -57,7 +57,8 @@ Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-b
 approach to taming the complexity of flight control: you instantiate a Board
 subclass, passing it the objects for your PID controllers, mixer, ESC, and LED
 pin number.  In your ```loop``` function, you just call the ```step()``` method
-on the Board object.  Look at this [example
+on the Board object, passing it the raw values from your IMU.  Look at this
+[example
 program](https://github.com/simondlevy/Hackflight/blob/master/examples/MambaF411Dsmx/MambaF411Dsmx.ino)
 to get an idea of how this approach works.
 
