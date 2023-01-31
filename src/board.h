@@ -41,8 +41,6 @@ class Board {
         static const uint8_t  STARTUP_BLINK_LED_REPS  = 10;
         static const uint32_t STARTUP_BLINK_LED_DELAY = 50;
 
-        Core::armingStatus_e m_armingStatus;
-
         uint8_t m_ledPin;
         bool m_ledInverted;
 
@@ -163,7 +161,7 @@ class Board {
 
         void updateLed(void)
         {
-            switch (m_armingStatus) {
+            switch (m_core.armingStatus) {
 
                 case Core::ARMING_UNREADY:
                     ledBlink(500);
@@ -187,11 +185,11 @@ class Board {
         {
             checkFailsafe(usec);
 
-            switch (m_armingStatus) {
+            switch (m_core.armingStatus) {
 
                 case Core::ARMING_UNREADY:
                     if (safeToArm(usec)) {
-                        m_armingStatus = Core::ARMING_READY;
+                        m_core.armingStatus = Core::ARMING_READY;
                     }
                     break;
 
@@ -200,7 +198,7 @@ class Board {
                         checkArmingSwitch();
                     }
                     else {
-                        m_armingStatus = Core::ARMING_UNREADY;
+                        m_core.armingStatus = Core::ARMING_UNREADY;
                     }
                     break;
 
@@ -224,7 +222,7 @@ class Board {
             }
 
             if (hadSignal && !haveSignal) {
-                m_armingStatus = Core::ARMING_FAILSAFE;
+                m_core.armingStatus = Core::ARMING_FAILSAFE;
             }
         }
 
@@ -253,13 +251,13 @@ class Board {
 
             if (m_receiverTask.getRawAux1() > 1500) {
                 if (!aux1WasSet) {
-                    m_armingStatus = Core::ARMING_ARMED;
+                    m_core.armingStatus = Core::ARMING_ARMED;
                 }
                 aux1WasSet = true;
             }
             else {
                 if (aux1WasSet) {
-                    m_armingStatus = Core::ARMING_READY;
+                    m_core.armingStatus = Core::ARMING_READY;
                 }
                 aux1WasSet = false;
             }
@@ -490,18 +488,20 @@ class Board {
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
                 m_core.getMotorValues(
-                        rawGyro,
+
                         m_imu,
                         m_vstate,
                         m_receiverTask,
                         m_pidControllers,
                         m_mixer,
                         m_esc,
+
+                        rawGyro,
                         usec,
                         mixmotors);
 
                 escWrite(
-                        m_armingStatus == Core::ARMING_ARMED ? 
+                        m_core.armingStatus == Core::ARMING_ARMED ? 
                         mixmotors :
                         m_visualizerTask.motors);
 

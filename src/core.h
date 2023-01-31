@@ -43,14 +43,18 @@ class Core {
 
         } armingStatus_e;
 
+        armingStatus_e armingStatus;
+
         void getMotorValues(
-                int16_t rawGyro[3],
+
                 Imu * imu,
                 VehicleState & vstate,
                 ReceiverTask & receiverTask,
                 std::vector<PidController *> * pidControllers,
                 Mixer * mixer,
                 Esc * esc,
+
+                int16_t rawGyro[3],
                 const uint32_t usec,
                 float mixmotors[])
         {
