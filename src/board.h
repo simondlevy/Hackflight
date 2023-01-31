@@ -53,28 +53,6 @@ class Board {
 
         bool m_dshotEnabled;
 
-    protected:
-
-        Board(
-                Imu * imu,
-                std::vector<PidController *> & pidControllers,
-                Mixer & mixer,
-                Esc & esc,
-                const int8_t ledPin)
-        {
-            m_core.imu = imu;
-            m_core.pidControllers = &pidControllers;
-            m_core.mixer = &mixer;
-            m_core.esc = &esc;
-
-            // Support negative LED pin number for inversion
-            m_ledPin = ledPin < 0 ? -ledPin : ledPin;
-            m_ledInverted = ledPin < 0;
-        }
-
-
-    private:
-
         void runDynamicTasks(const int16_t rawAccel[3])
         {
             if (m_visualizerTask.gotRebootRequest()) {
@@ -267,7 +245,9 @@ class Board {
 
                 case Esc::BRUSHED:
                     for (uint8_t k=0; k<m_core.esc->motorPins->size(); ++k) {
-                        analogWrite((*m_core.esc->motorPins)[k], (uint8_t)(motorValues[k] * 255));
+                        analogWrite(
+                                (*m_core.esc->motorPins)[k],
+                                (uint8_t)(motorValues[k] * 255));
                     }
                     break;
 
@@ -287,6 +267,23 @@ class Board {
         AccelerometerTask m_accelerometerTask; 
 
         SkyrangerTask m_skyrangerTask = SkyrangerTask(m_core.vstate);
+
+        Board(
+                Imu * imu,
+                std::vector<PidController *> & pidControllers,
+                Mixer & mixer,
+                Esc & esc,
+                const int8_t ledPin)
+        {
+            m_core.imu = imu;
+            m_core.pidControllers = &pidControllers;
+            m_core.mixer = &mixer;
+            m_core.esc = &esc;
+
+            // Support negative LED pin number for inversion
+            m_ledPin = ledPin < 0 ? -ledPin : ledPin;
+            m_ledInverted = ledPin < 0;
+        }
 
         virtual void prioritizeExtraTasks(
                 Task::prioritizer_t & prioritizer, const uint32_t usec)
