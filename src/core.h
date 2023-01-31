@@ -51,6 +51,8 @@ class Core {
 
         Mixer * mixer;
 
+        uint32_t imuInterruptCount;
+        
         void getMotorValues(
 
                 Imu * imu,
@@ -113,7 +115,6 @@ class Core {
 
         void updateScheduler(
                 Imu * imu,
-                const uint32_t imuInterruptCount,
                 const uint32_t nowCycles,
                 const uint32_t nextTargetCycles)
         {

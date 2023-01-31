@@ -44,8 +44,6 @@ class Board {
         uint8_t m_ledPin;
         bool m_ledInverted;
 
-        uint32_t m_imuInterruptCount;
-
         AttitudeTask m_attitudeTask = AttitudeTask(m_core.vstate);
 
         VisualizerTask m_visualizerTask =
@@ -402,7 +400,7 @@ class Board {
 
         void handleImuInterrupt(void)
         {
-            m_imuInterruptCount++;
+            m_core.imuInterruptCount++;
             m_imu->handleInterrupt(getCycleCounter());
         }
 
@@ -497,8 +495,7 @@ class Board {
                         mixmotors :
                         m_visualizerTask.motors);
 
-                m_core.updateScheduler(
-                        m_imu, m_imuInterruptCount, nowCycles, nextTargetCycles);
+                m_core.updateScheduler(m_imu, nowCycles, nextTargetCycles);
             }
 
             if (m_core.isDynamicTaskReady(getCycleCounter())) {
