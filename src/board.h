@@ -16,14 +16,9 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <stdarg.h>
 
-#include <vector>
-
 #include "core.h"
-#include "core/mixer.h"
-#include "core/motors.h"
 
 class Board {
 
@@ -151,12 +146,6 @@ class Board {
         // an external input
         virtual void reboot(void)
         {
-        }
-
-        static void outbuf(char * buf)
-        {
-            Serial.print(buf); 
-            Serial.flush();
         }
 
         void runVisualizerTask(void)
@@ -395,6 +384,14 @@ class Board {
         {
             pinMode(pin, INPUT);
             attachInterrupt(pin, irq, mode);  
+        }
+
+        // Support for serial debugging ---------------------------------------
+
+        static void outbuf(char * buf)
+        {
+            Serial.print(buf); 
+            Serial.flush();
         }
 
         static void printf(const char * fmt, ...)
