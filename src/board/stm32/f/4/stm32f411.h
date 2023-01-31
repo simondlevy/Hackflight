@@ -35,7 +35,7 @@ class Stm32F411Board : public Stm32F4Board {
     public:
 
         Stm32F411Board(
-                Mpu6000 & imu,
+                SoftQuatImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,

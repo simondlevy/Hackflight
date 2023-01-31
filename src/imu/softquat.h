@@ -291,18 +291,6 @@ class SoftQuatImu : public Imu {
 
     protected:
 
-        SoftQuatImu(
-                const rotateFun_t rotateFun,
-                const uint16_t gyroScale,
-                const uint16_t accelScale)
-            : Imu(rotateFun, gyroScale)
-        {
-            // Initialize quaternion in upright position
-            m_fusionPrev.quat.w = 1;
-
-            m_accelScale = accelScale / 32768.;
-        }
-
         void begin(uint32_t clockSpeed)
         {
             m_shortPeriod = clockSpeed / 1000000 * SHORT_THRESHOLD;
@@ -351,6 +339,18 @@ class SoftQuatImu : public Imu {
         }
 
     public:
+
+        SoftQuatImu(
+                const rotateFun_t rotateFun,
+                const uint16_t gyroScale=2000,
+                const uint16_t accelScale=16)
+            : Imu(rotateFun, gyroScale)
+        {
+            // Initialize quaternion in upright position
+            m_fusionPrev.quat.w = 1;
+
+            m_accelScale = accelScale / 32768.;
+        }
 
         virtual void handleInterrupt(uint32_t cycleCounter) override
         {
