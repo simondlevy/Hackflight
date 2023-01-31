@@ -30,9 +30,63 @@ class Core {
 
     private:
 
+        static constexpr float MAX_ARMING_ANGLE_DEG = 25;
+
         Scheduler m_scheduler;
 
-    public:
+        void checkFailsafe(const uint32_t usec)
+        {
+            static bool hadSignal;
+
+            const auto haveSignal = receiverTask.haveSignal(usec);
+
+            if (haveSignal) {
+                hadSignal = true;
+            }
+
+            if (hadSignal && !haveSignal) {
+                armingStatus = Core::ARMING_FAILSAFE;
+            }
+        }
+
+        bool safeToArm(const uint32_t usec)
+        {
+            const auto maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE_DEG);
+
+            const auto imuIsLevel =
+                fabsf(vstate.phi) < maxArmingAngle &&
+                fabsf(vstate.theta) < maxArmingAngle;
+
+            const auto gyroDoneCalibrating = !imu->gyroIsCalibrating();
+
+            const auto haveReceiverSignal = receiverTask.haveSignal(usec);
+
+            return
+                gyroDoneCalibrating &&
+                imuIsLevel &&
+                receiverTask.throttleIsDown() &&
+                haveReceiverSignal;
+        }
+
+       void checkArmingSwitch(void)
+        {
+            static bool aux1WasSet;
+
+            if (receiverTask.getRawAux1() > 1500) {
+                if (!aux1WasSet) {
+                    armingStatus = Core::ARMING_ARMED;
+                }
+                aux1WasSet = true;
+            }
+            else {
+                if (aux1WasSet) {
+                    armingStatus = Core::ARMING_READY;
+                }
+                aux1WasSet = false;
+            }
+        }
+
+     public:
 
         typedef enum {
 
@@ -58,7 +112,38 @@ class Core {
         std::vector<PidController *> * pidControllers;
 
         uint32_t imuInterruptCount;
-        
+
+        void updateArmingStatus(const uint32_t usec)
+        {
+            checkFailsafe(usec);
+
+            switch (armingStatus) {
+
+                case Core::ARMING_UNREADY:
+                    if (safeToArm(usec)) {
+                        armingStatus = Core::ARMING_READY;
+                    }
+                    break;
+
+                case Core::ARMING_READY:
+                    if (safeToArm(usec)) {
+                        checkArmingSwitch();
+                    }
+                    else {
+                        armingStatus = Core::ARMING_UNREADY;
+                    }
+                    break;
+
+                case Core::ARMING_ARMED:
+                    checkArmingSwitch();
+                    break;
+
+                default: // failsafe
+                    break;
+            }
+        }
+
+
         void getMotorValues(int16_t rawGyro[3], const uint32_t usec, float mixmotors[])
         {
             imu->accumulateGyro();

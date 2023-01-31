@@ -36,8 +36,6 @@ class Board {
 
     private:
 
-        static constexpr float MAX_ARMING_ANGLE_DEG = 25;
-
         static const uint8_t  STARTUP_BLINK_LED_REPS  = 10;
         static const uint32_t STARTUP_BLINK_LED_DELAY = 50;
 
@@ -97,7 +95,7 @@ class Board {
 
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask);
-                    updateArmingStatus(usec);
+                    m_core.updateArmingStatus(usec);
                     updateLed();
                     break;
 
@@ -106,7 +104,7 @@ class Board {
                     break;
 
                 case Task::RECEIVER:
-                    updateArmingStatus(usec);
+                    m_core.updateArmingStatus(usec);
                     updateLed();
                     runTask(m_core.receiverTask);
                     break;
@@ -168,88 +166,6 @@ class Board {
                     ledBlink(200);
                     break;
              }
-        }
-
-        void updateArmingStatus(const uint32_t usec)
-        {
-            checkFailsafe(usec);
-
-            switch (m_core.armingStatus) {
-
-                case Core::ARMING_UNREADY:
-                    if (safeToArm(usec)) {
-                        m_core.armingStatus = Core::ARMING_READY;
-                    }
-                    break;
-
-                case Core::ARMING_READY:
-                    if (safeToArm(usec)) {
-                        checkArmingSwitch();
-                    }
-                    else {
-                        m_core.armingStatus = Core::ARMING_UNREADY;
-                    }
-                    break;
-
-                case Core::ARMING_ARMED:
-                    checkArmingSwitch();
-                    break;
-
-                default: // failsafe
-                    break;
-            }
-        }
-
-        void checkFailsafe(const uint32_t usec)
-        {
-            static bool hadSignal;
-
-            const auto haveSignal = m_core.receiverTask.haveSignal(usec);
-
-            if (haveSignal) {
-                hadSignal = true;
-            }
-
-            if (hadSignal && !haveSignal) {
-                m_core.armingStatus = Core::ARMING_FAILSAFE;
-            }
-        }
-
-        bool safeToArm(const uint32_t usec)
-        {
-            const auto maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE_DEG);
-
-            const auto imuIsLevel =
-                fabsf(m_core.vstate.phi) < maxArmingAngle &&
-                fabsf(m_core.vstate.theta) < maxArmingAngle;
-
-            const auto gyroDoneCalibrating = !m_core.imu->gyroIsCalibrating();
-
-            const auto haveReceiverSignal = m_core.receiverTask.haveSignal(usec);
-
-            return
-                gyroDoneCalibrating &&
-                imuIsLevel &&
-                m_core.receiverTask.throttleIsDown() &&
-                haveReceiverSignal;
-        }
-
-        void checkArmingSwitch(void)
-        {
-            static bool aux1WasSet;
-
-            if (m_core.receiverTask.getRawAux1() > 1500) {
-                if (!aux1WasSet) {
-                    m_core.armingStatus = Core::ARMING_ARMED;
-                }
-                aux1WasSet = true;
-            }
-            else {
-                if (aux1WasSet) {
-                    m_core.armingStatus = Core::ARMING_READY;
-                }
-                aux1WasSet = false;
-            }
         }
 
         void ledBlink(const uint32_t msecDelay)
