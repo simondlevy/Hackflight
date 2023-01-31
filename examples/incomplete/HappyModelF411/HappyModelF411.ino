@@ -71,7 +71,11 @@ void setup() {
 
     icm.begin();
 
-    // icm.enableDataReadyInterrupt();
+    icm.enableDataReadyInterrupt();
+
+    icm.setDlpfBandwidth(ICM20689::DLPF_BANDWIDTH_21HZ);
+
+    icm.setSrd(19);
 
     board.begin();
 }
