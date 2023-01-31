@@ -52,7 +52,7 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static SoftQuatImu imu(Imu::rotate180);
+static SoftQuatImu imu(Imu::rotate90);
 
 static std::vector<PidController *> pids = {&anglePid};
 
