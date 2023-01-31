@@ -220,11 +220,7 @@ class Imu {
 
         virtual void handleInterrupt(const uint32_t cycleCounter) = 0;
 
-        virtual bool gyroIsReady(void) = 0;
-
-        virtual void getRawGyro(int16_t rawGyro[3]) = 0;
-
-        virtual auto gyroRawToDps(int16_t rawGyro[3]) -> Axes
+        virtual auto gyroRawToFilteredDps(int16_t rawGyro[3]) -> Axes
         {
             const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
 
@@ -261,12 +257,13 @@ class Imu {
             applyGyroLpf1(m_gyroY);
             applyGyroLpf1(m_gyroZ);
 
-            // Used for fusion with accelerometer
-            //accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
-
             m_gyroIsCalibrating = !calibrationComplete;
 
             return Axes(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
+        }
+
+        virtual void accumulateGyro(void)
+        {
         }
 
         virtual bool gyroIsCalibrating(void)
@@ -285,8 +282,9 @@ class Imu {
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
 
-        virtual void updateAccelerometer(void)
+        virtual void updateAccelerometer(const int16_t rawAccel[3])
         {
+            (void)rawAccel;
         }
 
         virtual int32_t getGyroSkew(

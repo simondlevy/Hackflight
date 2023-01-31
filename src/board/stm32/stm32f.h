@@ -20,13 +20,13 @@
 
 #include "board/stm32.h"
 #include "task/accelerometer.h"
-#include "imu/softquat/invensense.h"
+#include "imu/softquat/mpu6000.h"
 
 class Stm32FBoard : public Stm32Board {
 
     private:
 
-        InvenSenseImu * m_invenSenseImu;
+        Mpu6000 * m_invenSenseImu;
 
     protected:
 
@@ -39,7 +39,7 @@ class Stm32FBoard : public Stm32Board {
         }
 
         Stm32FBoard(
-                InvenSenseImu & imu,
+                Mpu6000 & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
@@ -50,14 +50,6 @@ class Stm32FBoard : public Stm32Board {
         }
 
     public:
-
-        void begin(void)
-        {
-            Board::begin();
-
-            // Support MockImu
-            m_accelerometerTask.begin(m_imu);
-        }
 
         void handleSkyrangerEvent(HardwareSerial & serial)
         {

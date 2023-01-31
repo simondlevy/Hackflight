@@ -1,4 +1,6 @@
 /*
+   Class definition for MPU6000, MPU6500 IMUs using SPI bus
+
    Copyright (c) 2022 Simon D. Levy
 
    This file is part of Hackflight.
@@ -18,39 +20,25 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "imu/softquat/invensense.h"
 
-class MockImu : public InvenSenseImu {
-
-    protected:
-
-        virtual auto getEulerAngles(const uint32_t time) -> Axes override
-        {
-            // Simulates rocking in the X (phi) axis
-
-            (void)time;
-
-            static float phi;
-            static int8_t dir = +1;
-
-            phi += .01 * dir;
-
-            if (phi >= 1.0) {
-                dir = -1;
-            }
-
-            if (phi <= -1.0) {
-                dir = +1;
-            }
-
-            return Axes(phi, 0.1, 0.1);
-        }
+class Mpu6000 : public InvenSenseImu {
 
     public:
 
-        MockImu(void)
-            : InvenSenseImu(0, 0, 0, 0, 0, 0)
-        {
-        }
+        Mpu6000(
+                const rotateFun_t rotateFun,
+                const uint8_t csPin,
+                const gyroFsr_e gyroFsr = GYRO_2000DPS,
+                const accelFsr_e accelFsr = ACCEL_16G)
+            : InvenSenseImu(
+                    csPin,
+                    rotateFun,
+                    gyroFsr,
+                    accelFsr)
+    {
+    }
 
- };
+}; // class Mpu6000

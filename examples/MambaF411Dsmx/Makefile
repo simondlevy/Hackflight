@@ -6,7 +6,7 @@ PORT = /dev/ttyACM0
 
 OBJ = $(PWD)/obj
 HFLIB = ../../
-DSLIB = ../../../DSMRX
+LIB = ../../..
 DFU = $(OBJ)/$(SKETCH).dfu 
 HEX = $(OBJ)/$(SKETCH).ino.hex
 SRC = $(HFLIB)/src
@@ -18,7 +18,7 @@ $(DFU): $(HEX)
 	$(HFLIB)/utils/dfuse-pack.py -i $(HEX) $(DFU)
 
 $(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
-	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(DSLIB) --build-path $(OBJ)
+	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) --build-path $(OBJ)
 	rm -f *.bin *.elf
 
 unbrick: $(DFU)

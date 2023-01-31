@@ -21,16 +21,27 @@
 #include <board/stm32/f/4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
-#include <imu/softquat/invensense/mpu6x00.h>
+#include <imu/softquat/mpu6000.h>
 #include <esc/dshot.h>
 
 #include <dsmrx.h>
 
 #include <vector>
 
+#include <SPI.h>
+#include <mpu6x00.h>
+
 static const uint8_t LED_PIN     = PC14;
 static const uint8_t IMU_CS_PIN  = PA4;
 static const uint8_t IMU_INT_PIN = PB0;
+
+static const uint8_t IMU_MOSI_PIN = PA7;
+static const uint8_t IMU_MISO_PIN = PA6;
+static const uint8_t IMU_SCLK_PIN = PA5;
+
+static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
+
+static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
 
 static std::vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
 
@@ -45,7 +56,7 @@ static Mixer mixer = QuadXbfMixer::make();
 
 static Dsm2048 rx;
 
-static Mpu6x00 imu(Imu::rotate180, IMU_CS_PIN);
+static Mpu6000 imu(mpu, Imu::rotate180);
 
 static std::vector<PidController *> pids = {&anglePid};
 
@@ -87,10 +98,18 @@ void setup(void)
 
     Serial1.begin(115200);
 
+    mpu.begin();
+
     board.begin();
 }
 
 void loop(void)
 {
-    board.step();
+    int16_t rawGyro[3] = {};
+    int16_t rawAccel[3] = {};
+    mpu.readData();
+    mpu.getRawGyro(rawGyro[0], rawGyro[1], rawGyro[2]);
+    mpu.getRawAccel(rawAccel[0], rawAccel[1], rawAccel[2]);
+
+    board.step(rawGyro, rawAccel);
 }

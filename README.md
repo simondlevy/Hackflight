@@ -35,7 +35,8 @@ Hackflight has been tested on the following platforms:
 
 To make it easy to develop flight firmware using Arduino-compatible
 microcontrollers, Hackflight is laid out as an Arduino library and uses
-the Arduino API; however, the core flight-control algorithm is hardware-independent.
+the Arduino API; however, the core flight-control algorithm is hardware-independent,
+and the only hardware-specific calls are in the Board class and its subclasses.
 
 ## Design principles
 

@@ -99,7 +99,7 @@ class Board {
 
     private:
 
-        void runDynamicTasks(void)
+        void runDynamicTasks(const int16_t rawAccel[3])
         {
             if (m_visualizerTask.gotRebootRequest()) {
                 reboot();
@@ -133,6 +133,7 @@ class Board {
 
                 case Task::ACCELEROMETER:
                     runTask(m_accelerometerTask);
+                    m_imu->updateAccelerometer(rawAccel);
                     break;
 
                 case Task::SKYRANGER:
@@ -457,7 +458,7 @@ class Board {
             ledSet(false);
         }
 
-        void step(void)
+        void step(int16_t rawGyro[3], int16_t rawAccel[3])
         {
             auto nowCycles = getCycleCounter();
 
@@ -474,13 +475,6 @@ class Board {
                     nowCycles = getCycleCounter();
                     loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
                 }
-
-                static int16_t rawGyro[3];
-
-                if (m_imu->gyroIsReady()) {
-
-                    m_imu->getRawGyro(rawGyro);
-               }
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
@@ -505,13 +499,13 @@ class Board {
             }
 
             if (m_core.isDynamicTaskReady(getCycleCounter())) {
-                runDynamicTasks();
+                runDynamicTasks(rawAccel);
             }
         }
 
-        void step(HardwareSerial & serial)
+        void step(int16_t rawGyro[3], int16_t rawAccel[3], HardwareSerial & serial)
         {
-            step();
+            step(rawGyro, rawAccel);
 
             while (m_skyrangerTask.imuDataAvailable()) {
                 serial.write(m_skyrangerTask.readImuData());

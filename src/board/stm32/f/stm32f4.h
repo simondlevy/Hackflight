@@ -17,7 +17,6 @@
 #pragma once
 
 #include "board/stm32/stm32f.h"
-#include "imu/softquat/invensense.h"
 
 #include <stm32f4xx.h>
 
@@ -439,7 +438,7 @@ class Stm32F4Board : public Stm32FBoard {
 
         Stm32F4Board(
                 const uint8_t portCount,
-                InvenSenseImu & imu,
+                Mpu6000 & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,

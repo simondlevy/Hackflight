@@ -23,26 +23,10 @@
 
 class AccelerometerTask : public Task {
 
-    private:
-
-        Imu * m_imu;
-
     public:
 
         AccelerometerTask(void)
             : Task(ACCELEROMETER, SoftQuatImu::ACCEL_SAMPLE_RATE)
         {
-        }
-
-        void begin(Imu * imu)
-        {
-            m_imu = imu;
-        }
-
-        virtual void run(const uint32_t usec) override
-        {
-            (void)usec;
-
-            m_imu->updateAccelerometer();
         }
 };
