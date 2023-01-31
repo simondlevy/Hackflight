@@ -32,8 +32,8 @@ class Stm32FBoard : public Stm32Board {
                 Task::prioritizer_t & prioritizer,
                 const uint32_t usec) override
         {
-            m_accelerometerTask.prioritize(usec, prioritizer);
-            m_skyrangerTask.prioritize(usec, prioritizer);
+            m_core.accelerometerTask.prioritize(usec, prioritizer);
+            m_core.skyrangerTask.prioritize(usec, prioritizer);
         }
 
         Stm32FBoard(
@@ -51,7 +51,7 @@ class Stm32FBoard : public Stm32Board {
         void handleSkyrangerEvent(HardwareSerial & serial)
         {
             while (serial.available()) {
-                m_skyrangerTask.parse(serial.read());
+                m_core.skyrangerTask.parse(serial.read());
             }
         }
 

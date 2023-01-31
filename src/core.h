@@ -24,8 +24,11 @@
 #include "esc.h"
 #include "imu.h"
 #include "scheduler.h"
+#include "task/accelerometer.h"
 #include "task/attitude.h"
 #include "task/receiver.h"
+#include "task/skyranger.h"
+#include "task/visualizer.h"
 
 class Core {
 
@@ -102,9 +105,18 @@ class Core {
 
         VehicleState vstate;
 
+        Msp msp;
+
         ReceiverTask receiverTask;
 
         AttitudeTask attitudeTask = AttitudeTask(vstate);
+
+        SkyrangerTask skyrangerTask = SkyrangerTask(vstate);
+
+        AccelerometerTask accelerometerTask; 
+
+        VisualizerTask visualizerTask =
+            VisualizerTask(msp, vstate, receiverTask, skyrangerTask);
 
         Mixer * mixer;
 

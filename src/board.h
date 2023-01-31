@@ -24,15 +24,12 @@
 #include "core.h"
 #include "core/mixer.h"
 #include "core/motors.h"
-#include "esc.h"
-#include "esc/mock.h"
-#include "imu.h"
-#include "task/accelerometer.h"
-#include "task/attitude.h"
-#include "task/visualizer.h"
-#include "task/receiver.h"
 
 class Board {
+
+    protected:
+
+        Core m_core;
 
     private:
 
@@ -42,18 +39,11 @@ class Board {
         uint8_t m_ledPin;
         bool m_ledInverted;
 
-        VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_core.vstate, m_core.receiverTask, m_skyrangerTask);
-
-        Msp m_msp;
-
-        Core m_core;
-
         bool m_dshotEnabled;
 
         void runDynamicTasks(const int16_t rawAccel[3])
         {
-            if (m_visualizerTask.gotRebootRequest()) {
+            if (m_core.visualizerTask.gotRebootRequest()) {
                 reboot();
             }
 
@@ -63,7 +53,7 @@ class Board {
 
             m_core.receiverTask.prioritize(usec, prioritizer);
             m_core.attitudeTask.prioritize(usec, prioritizer);
-            m_visualizerTask.prioritize(usec, prioritizer);
+            m_core.visualizerTask.prioritize(usec, prioritizer);
 
             prioritizeExtraTasks(prioritizer, usec);
 
@@ -86,12 +76,12 @@ class Board {
                     break;
 
                 case Task::ACCELEROMETER:
-                    runTask(m_accelerometerTask);
+                    runTask(m_core.accelerometerTask);
                     m_core.imu->updateAccelerometer(rawAccel);
                     break;
 
                 case Task::SKYRANGER:
-                    runTask(m_skyrangerTask);
+                    runTask(m_core.skyrangerTask);
                     break;
 
                 default:
@@ -178,7 +168,7 @@ class Board {
         void runVisualizerTask(void)
         {
             const uint32_t anticipatedEndCycles =
-                getAnticipatedEndCycles(m_visualizerTask);
+                getAnticipatedEndCycles(m_core.visualizerTask);
 
             if (anticipatedEndCycles > 0) {
 
@@ -186,12 +176,12 @@ class Board {
 
                 while (Serial.available()) {
 
-                    if (m_visualizerTask.parse(Serial.read())) {
-                        Serial.write(m_msp.payload, m_msp.payloadSize);
+                    if (m_core.visualizerTask.parse(Serial.read())) {
+                        Serial.write(m_core.msp.payload, m_core.msp.payloadSize);
                     }
                 }
 
-                postRunTask(m_visualizerTask, usec, anticipatedEndCycles);
+                postRunTask(m_core.visualizerTask, usec, anticipatedEndCycles);
             }
         }
 
@@ -261,10 +251,6 @@ class Board {
         }
 
     protected:
-
-        AccelerometerTask m_accelerometerTask; 
-
-        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_core.vstate);
 
         Board(
                 Imu * imu,
@@ -346,7 +332,7 @@ class Board {
 
             m_core.attitudeTask.begin(m_core.imu);
 
-            m_visualizerTask.begin(m_core.esc, &m_core.receiverTask);
+            m_core.visualizerTask.begin(m_core.esc, &m_core.receiverTask);
 
             m_core.imu->begin(getClockSpeed());
 
@@ -389,7 +375,7 @@ class Board {
                 escWrite(
                         m_core.armingStatus == Core::ARMING_ARMED ? 
                         mixmotors :
-                        m_visualizerTask.motors);
+                        m_core.visualizerTask.motors);
 
                 m_core.updateScheduler(nowCycles, nextTargetCycles);
             }
@@ -403,8 +389,8 @@ class Board {
         {
             step(rawGyro, rawAccel);
 
-            while (m_skyrangerTask.imuDataAvailable()) {
-                serial.write(m_skyrangerTask.readImuData());
+            while (m_core.skyrangerTask.imuDataAvailable()) {
+                serial.write(m_core.skyrangerTask.readImuData());
             }
         }
 
