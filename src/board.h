@@ -27,10 +27,6 @@
 
 class Board {
 
-    protected:
-
-        Core m_core;
-
     private:
 
         static const uint8_t  STARTUP_BLINK_LED_REPS  = 10;
@@ -249,6 +245,8 @@ class Board {
         }
 
     protected:
+
+        Core m_core;
 
         Board(
                 Imu * imu,
