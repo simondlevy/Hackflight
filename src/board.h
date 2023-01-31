@@ -48,10 +48,8 @@ class Board {
 
         AttitudeTask m_attitudeTask = AttitudeTask(m_core.vstate);
 
-        ReceiverTask m_receiverTask;
-
         VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_core.vstate, m_receiverTask, m_skyrangerTask);
+            VisualizerTask(m_msp, m_core.vstate, m_core.receiverTask, m_skyrangerTask);
 
         Msp m_msp;
 
@@ -96,7 +94,7 @@ class Board {
 
             const uint32_t usec = micros(); 
 
-            m_receiverTask.prioritize(usec, prioritizer);
+            m_core.receiverTask.prioritize(usec, prioritizer);
             m_attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
 
@@ -117,7 +115,7 @@ class Board {
                 case Task::RECEIVER:
                     updateArmingStatus(usec);
                     updateLed();
-                    runTask(m_receiverTask);
+                    runTask(m_core.receiverTask);
                     break;
 
                 case Task::ACCELEROMETER:
@@ -213,7 +211,7 @@ class Board {
         {
             static bool hadSignal;
 
-            const auto haveSignal = m_receiverTask.haveSignal(usec);
+            const auto haveSignal = m_core.receiverTask.haveSignal(usec);
 
             if (haveSignal) {
                 hadSignal = true;
@@ -234,12 +232,12 @@ class Board {
 
             const auto gyroDoneCalibrating = !m_imu->gyroIsCalibrating();
 
-            const auto haveReceiverSignal = m_receiverTask.haveSignal(usec);
+            const auto haveReceiverSignal = m_core.receiverTask.haveSignal(usec);
 
             return
                 gyroDoneCalibrating &&
                 imuIsLevel &&
-                m_receiverTask.throttleIsDown() &&
+                m_core.receiverTask.throttleIsDown() &&
                 haveReceiverSignal;
         }
 
@@ -247,7 +245,7 @@ class Board {
         {
             static bool aux1WasSet;
 
-            if (m_receiverTask.getRawAux1() > 1500) {
+            if (m_core.receiverTask.getRawAux1() > 1500) {
                 if (!aux1WasSet) {
                     m_core.armingStatus = Core::ARMING_ARMED;
                 }
@@ -395,12 +393,12 @@ class Board {
 
         void setSbusValues(uint16_t chanvals[], const uint32_t usec)
         {
-            m_receiverTask.setValues(chanvals, usec, 172, 1811);
+            m_core.receiverTask.setValues(chanvals, usec, 172, 1811);
         }
 
         void setDsmxValues(uint16_t chanvals[], const uint32_t usec)
         {
-            m_receiverTask.setValues(chanvals, usec, 988, 2011);
+            m_core.receiverTask.setValues(chanvals, usec, 988, 2011);
         }
 
         void handleImuInterrupt(void)
@@ -447,7 +445,7 @@ class Board {
 
             m_attitudeTask.begin(m_imu);
 
-            m_visualizerTask.begin(m_esc, &m_receiverTask);
+            m_visualizerTask.begin(m_esc, &m_core.receiverTask);
 
             m_imu->begin(getClockSpeed());
 
@@ -488,7 +486,6 @@ class Board {
                 m_core.getMotorValues(
 
                         m_imu,
-                        m_receiverTask,
                         m_pidControllers,
                         m_mixer,
                         m_esc,

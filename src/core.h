@@ -47,10 +47,12 @@ class Core {
 
         VehicleState vstate;
 
+        ReceiverTask receiverTask;
+
+
         void getMotorValues(
 
                 Imu * imu,
-                ReceiverTask & receiverTask,
                 std::vector<PidController *> * pidControllers,
                 Mixer * mixer,
                 Esc * esc,
