@@ -276,8 +276,6 @@ class Imu {
             return deg * M_PI / 180;
         }
 
-        typedef void (*align_fun)(Axes * axes);
-
         virtual void begin(const uint32_t clockSpeed) = 0;
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes = 0;
