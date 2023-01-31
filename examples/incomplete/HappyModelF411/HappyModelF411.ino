@@ -80,5 +80,17 @@ void loop()
 {
     icm.readSensor();
 
-    board.step(icm.gyroCounts, icm.accelCounts);
+    int16_t gyroCounts[3] = { 
+        icm.getGyroX_count(),
+        icm.getGyroY_count(),
+        icm.getGyroZ_count()
+    };
+
+    int16_t accelCounts[3] = { 
+        icm.getAccelX_count(),
+        icm.getAccelY_count(),
+        icm.getAccelZ_count()
+    };
+
+    board.step(gyroCounts, accelCounts);
 }
