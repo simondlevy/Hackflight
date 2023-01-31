@@ -259,4 +259,11 @@ class Core {
             }
         }
 
+        void prioritizeCoreTasks(Task::prioritizer_t & prioritizer, const uint32_t usec)
+        {
+            receiverTask.prioritize(usec, prioritizer);
+            attitudeTask.prioritize(usec, prioritizer);
+            visualizerTask.prioritize(usec, prioritizer);
+        }
+
 }; // class Core

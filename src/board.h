@@ -51,9 +51,7 @@ class Board {
 
             const uint32_t usec = micros(); 
 
-            m_core.receiverTask.prioritize(usec, prioritizer);
-            m_core.attitudeTask.prioritize(usec, prioritizer);
-            m_core.visualizerTask.prioritize(usec, prioritizer);
+            m_core.prioritizeCoreTasks(prioritizer, usec);
 
             prioritizeExtraTasks(prioritizer, usec);
 
