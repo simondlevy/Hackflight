@@ -36,7 +36,7 @@ class Stm32F405Board : public Stm32F4Board {
     public:
 
         Stm32F405Board(
-                Mpu6000 & imu,
+                SoftQuatImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,

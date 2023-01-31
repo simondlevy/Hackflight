@@ -438,7 +438,7 @@ class Stm32F4Board : public Stm32FBoard {
 
         Stm32F4Board(
                 const uint8_t portCount,
-                Mpu6000 & imu,
+                SoftQuatImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,

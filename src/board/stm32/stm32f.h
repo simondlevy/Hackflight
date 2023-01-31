@@ -20,13 +20,11 @@
 
 #include "board/stm32.h"
 #include "task/accelerometer.h"
-#include "imu/softquat/mpu6000.h"
+#include "imu/softquat.h"
 
 class Stm32FBoard : public Stm32Board {
 
     private:
-
-        Mpu6000 * m_invenSenseImu;
 
     protected:
 
@@ -39,14 +37,13 @@ class Stm32FBoard : public Stm32Board {
         }
 
         Stm32FBoard(
-                Mpu6000 & imu,
+                SoftQuatImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin)
             : Stm32Board(&imu, pids, mixer, esc, ledPin)
         {
-            m_invenSenseImu = &imu;
         }
 
     public:
