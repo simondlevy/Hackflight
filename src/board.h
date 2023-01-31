@@ -110,7 +110,7 @@ class Board {
 
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask);
-                    updateArmingStatus();
+                    updateArmingStatus(usec);
                     updateLed();
                     break;
 
@@ -119,7 +119,7 @@ class Board {
                     break;
 
                 case Task::RECEIVER:
-                    updateArmingStatus();
+                    updateArmingStatus(usec);
                     updateLed();
                     runTask(m_receiverTask);
                     break;
@@ -183,20 +183,20 @@ class Board {
              }
         }
 
-        void updateArmingStatus(void)
+        void updateArmingStatus(const uint32_t usec)
         {
-            checkFailsafe();
+            checkFailsafe(usec);
 
             switch (m_armingStatus) {
 
                 case Core::ARMING_UNREADY:
-                    if (safeToArm()) {
+                    if (safeToArm(usec)) {
                         m_armingStatus = Core::ARMING_READY;
                     }
                     break;
 
                 case Core::ARMING_READY:
-                    if (safeToArm()) {
+                    if (safeToArm(usec)) {
                         checkArmingSwitch();
                     }
                     else {
@@ -213,11 +213,11 @@ class Board {
             }
         }
 
-        void checkFailsafe(void)
+        void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
 
-            const auto haveSignal = m_receiverTask.haveSignal(micros());
+            const auto haveSignal = m_receiverTask.haveSignal(usec);
 
             if (haveSignal) {
                 hadSignal = true;
@@ -228,7 +228,7 @@ class Board {
             }
         }
 
-        bool safeToArm(void)
+        bool safeToArm(const uint32_t usec)
         {
             const auto maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE_DEG);
 
@@ -238,7 +238,7 @@ class Board {
 
             const auto gyroDoneCalibrating = !m_imu->gyroIsCalibrating();
 
-            const auto haveReceiverSignal = m_receiverTask.haveSignal(micros());
+            const auto haveReceiverSignal = m_receiverTask.haveSignal(usec);
 
             return
                 gyroDoneCalibrating &&
