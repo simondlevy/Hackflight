@@ -71,6 +71,8 @@ void setup() {
 
     icm.begin();
 
+    // icm.enableDataReadyInterrupt();
+
     board.begin();
 }
 
