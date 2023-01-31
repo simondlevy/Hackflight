@@ -109,12 +109,20 @@ void setup(void)
 
 void loop(void)
 {
-    int16_t rawGyro[3] = {};
-    int16_t rawAccel[3] = {};
-    mpu.readData();
-    mpu.getRawGyro(rawGyro[0], rawGyro[1], rawGyro[2]);
-    mpu.getRawAccel(rawAccel[0], rawAccel[1], rawAccel[2]);
+    mpu.readSensor();
+
+    int16_t gyroCounts[3] = { 
+        mpu.getGyroX_count(),
+        mpu.getGyroY_count(),
+        mpu.getGyroZ_count()
+    };
+
+    int16_t accelCounts[3] = { 
+        mpu.getAccelX_count(),
+        mpu.getAccelY_count(),
+        mpu.getAccelZ_count()
+    };
 
     // Support sending attitude data to Skyranger over Serial4
-    board.step(rawGyro, rawAccel, Serial4);
+    board.step(gyroCounts, accelCounts, Serial4);
 }
