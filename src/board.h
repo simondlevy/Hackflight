@@ -111,6 +111,7 @@ class Board {
                 case Task::ATTITUDE:
                     runTask(m_attitudeTask);
                     updateArmingStatus();
+                    updateLed();
                     break;
 
                 case Task::VISUALIZER:
@@ -119,6 +120,7 @@ class Board {
 
                 case Task::RECEIVER:
                     updateArmingStatus();
+                    updateLed();
                     runTask(m_receiverTask);
                     break;
 
@@ -159,6 +161,28 @@ class Board {
                     task, usecStart, micros(), getCycleCounter(), anticipatedEndCycles);
         }
 
+        void updateLed(void)
+        {
+            switch (m_armingStatus) {
+
+                case Core::ARMING_UNREADY:
+                    ledBlink(500);
+                    break;
+
+                case Core::ARMING_READY:
+                    ledSet(false);
+                    break;
+
+                case Core::ARMING_ARMED:
+                    ledSet(true);
+                    break;
+
+                default: // failsafe
+                    ledBlink(200);
+                    break;
+             }
+        }
+
         void updateArmingStatus(void)
         {
             checkFailsafe();
@@ -166,14 +190,12 @@ class Board {
             switch (m_armingStatus) {
 
                 case Core::ARMING_UNREADY:
-                    ledBlink(500);
                     if (safeToArm()) {
                         m_armingStatus = Core::ARMING_READY;
                     }
                     break;
 
                 case Core::ARMING_READY:
-                    ledSet(false);
                     if (safeToArm()) {
                         checkArmingSwitch();
                     }
@@ -183,12 +205,10 @@ class Board {
                     break;
 
                 case Core::ARMING_ARMED:
-                    ledSet(true);
                     checkArmingSwitch();
                     break;
 
                 default: // failsafe
-                    ledBlink(200);
                     break;
             }
         }
