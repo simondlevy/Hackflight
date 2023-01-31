@@ -42,8 +42,6 @@ class Board {
         uint8_t m_ledPin;
         bool m_ledInverted;
 
-        AttitudeTask m_attitudeTask = AttitudeTask(m_core.vstate);
-
         VisualizerTask m_visualizerTask =
             VisualizerTask(m_msp, m_core.vstate, m_core.receiverTask, m_skyrangerTask);
 
@@ -64,7 +62,7 @@ class Board {
             const uint32_t usec = micros(); 
 
             m_core.receiverTask.prioritize(usec, prioritizer);
-            m_attitudeTask.prioritize(usec, prioritizer);
+            m_core.attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
 
             prioritizeExtraTasks(prioritizer, usec);
@@ -72,7 +70,7 @@ class Board {
             switch (prioritizer.id) {
 
                 case Task::ATTITUDE:
-                    runTask(m_attitudeTask);
+                    runTask(m_core.attitudeTask);
                     m_core.updateArmingStatus(usec);
                     updateLed();
                     break;
@@ -346,7 +344,7 @@ class Board {
         {
             startCycleCounter();
 
-            m_attitudeTask.begin(m_core.imu);
+            m_core.attitudeTask.begin(m_core.imu);
 
             m_visualizerTask.begin(m_core.esc, &m_core.receiverTask);
 

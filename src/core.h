@@ -24,6 +24,7 @@
 #include "esc.h"
 #include "imu.h"
 #include "scheduler.h"
+#include "task/attitude.h"
 #include "task/receiver.h"
 
 class Core {
@@ -102,6 +103,8 @@ class Core {
         VehicleState vstate;
 
         ReceiverTask receiverTask;
+
+        AttitudeTask attitudeTask = AttitudeTask(vstate);
 
         Mixer * mixer;
 
