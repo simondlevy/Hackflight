@@ -55,7 +55,6 @@ class Board {
 
         // Initialzed in sketch
         Esc *   m_esc;
-        std::vector<PidController *> * m_pidControllers;
 
         bool m_dshotEnabled;
 
@@ -69,7 +68,7 @@ class Board {
                 const int8_t ledPin)
         {
             m_core.imu = imu;
-            m_pidControllers = &pidControllers;
+            m_core.pidControllers = &pidControllers;
             m_core.mixer = &mixer;
             m_esc = &esc;
 
@@ -479,7 +478,6 @@ class Board {
 
                 m_core.getMotorValues(
 
-                        m_pidControllers,
                         m_esc,
 
                         rawGyro,

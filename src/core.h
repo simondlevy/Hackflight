@@ -53,11 +53,12 @@ class Core {
 
         Imu * imu;
 
+        std::vector<PidController *> * pidControllers;
+
         uint32_t imuInterruptCount;
         
         void getMotorValues(
 
-                std::vector<PidController *> * pidControllers,
                 Esc * esc,
 
                 int16_t rawGyro[3],
