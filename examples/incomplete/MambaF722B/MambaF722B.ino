@@ -60,14 +60,10 @@ static MockEsc esc;
 
 static Stm32F722Board board(imu, pids, mixer, esc, LED_PIN);
 
-static uint32_t count;
-
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
     imu.handleInterrupt(board.getCycleCounter());
-
-    count++;
 }
 
 void setup(void)
@@ -76,8 +72,8 @@ void setup(void)
 
     icm.begin();
 
-    icm.setAccelODR(ICM42688::odr12_5);
-    icm.setGyroODR(ICM42688::odr12_5);
+    icm.setAccelODR(ICM42688::odr8k);
+    icm.setGyroODR(ICM42688::odr8k);
 
     icm.enableDataReadyInterrupt(); 
 
@@ -86,7 +82,19 @@ void setup(void)
 
 void loop(void)
 {
-    // board.step();
+    icm.getAGT();
 
-    Serial.println(count);
+    int16_t gyroCounts[3] = { 
+        icm.getGyroX_count(),
+        icm.getGyroY_count(),
+        icm.getGyroZ_count()
+    };
+
+    int16_t accelCounts[3] = { 
+        icm.getAccelX_count(),
+        icm.getAccelY_count(),
+        icm.getAccelZ_count()
+    };
+
+    board.step(gyroCounts, accelCounts);
 }

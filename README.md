@@ -55,7 +55,7 @@ By using header-only C++ classes whenever possible, avoiding C-style macros and
 and leveraging existing Arduino libraries for receivers and IMUs,
 Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-beckman-dont-fear-the-monad) 
 approach to taming the complexity of flight control: you instantiate a Board
-subclass, passing it the objects for your IMU, PID controllers, mixer, ESC, and LED
+subclass, passing it your IMU settings, PID controllers, mixer, ESC, and LED
 pin number.  In your ```loop``` function, you just call the ```step()``` method
 on the Board object, passing it the raw values from your IMU.  Look at this
 [example
