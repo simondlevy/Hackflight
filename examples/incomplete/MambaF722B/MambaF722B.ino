@@ -20,27 +20,45 @@
 #include <hackflight.h>
 #include <board/stm32/f/stm32f722.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
+#include <core/pids/angle.h>
+#include <imu/softquat.h>
 #include <esc/mock.h>
-#include <imu/softquat/invensense/icm42688.h>
-#include <receiver/mock.h>
 
 #include <vector>
+
+#include <SPI.h>
+#include <ICM42688.h>
+
+static const uint8_t IMU_MOSI_PIN = PA7;
+static const uint8_t IMU_MISO_PIN = PA6;
+static const uint8_t IMU_SCLK_PIN = PA5;
 
 static const uint8_t LED_PIN     = PC15; // PC15=blue; PC14=orange
 static const uint8_t IMU_CS_PIN  = PA4;
 static const uint8_t IMU_INT_PIN = PC4;
 
+static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
+
+static ICM42688 icm(spi, IMU_CS_PIN);
+
+static volatile bool gotInterrupt;
+
+static AnglePidController anglePid(
+        1.441305,     // Rate Kp
+        48.8762,      // Rate Ki
+        0.021160,     // Rate Kd
+        0.0165048,    // Rate Kf
+        0.0); // 3.0; // Level Kp
+
 static Mixer mixer = QuadXbfMixer::make();
+
+static SoftQuatImu imu(Imu::rotate270);
+
+static std::vector<PidController *> pids = {&anglePid};
 
 static MockEsc esc;
 
-static MockReceiver rx;
-
-Icm42688 imu(Imu::rotate270, IMU_CS_PIN);
-
-static std::vector<PidController *> pids = {};
-
-static Stm32F722Board board(rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F722Board board(imu, pids, mixer, esc, LED_PIN);
 
 static uint32_t count;
 
@@ -54,15 +72,21 @@ static void handleImuInterrupt(void)
 
 void setup(void)
 {
-    // Set up IMU interrupt
     Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
+
+    icm.begin();
+
+    icm.setAccelODR(ICM42688::odr12_5);
+    icm.setGyroODR(ICM42688::odr12_5);
+
+    icm.enableDataReadyInterrupt(); 
 
     board.begin();
 }
 
 void loop(void)
 {
-    board.step();
+    // board.step();
 
     Serial.println(count);
 }

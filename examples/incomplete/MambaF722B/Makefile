@@ -5,19 +5,20 @@ FQBN = STMicroelectronics:stm32:GenF7:pnum=GENERIC_F722RETX,usb=CDCgen
 PORT = /dev/ttyACM0
 
 OBJ = $(PWD)/obj
-LIB = ../../..
+HFLIB = ../../..
+LIB = ../../../..
 DFU = $(OBJ)/$(SKETCH).dfu 
 HEX = $(OBJ)/$(SKETCH).ino.hex
-SRC = $(LIB)/src
+SRC = $(HFLIB)/src
 
 all: $(DFU)
 all: $(HEX)
 
 $(DFU): $(HEX)
-	$(LIB)/utils/dfuse-pack.py -i $(HEX) $(DFU)
+	$(HFLIB)/utils/dfuse-pack.py -i $(HEX) $(DFU)
 
 $(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
-	arduino-cli compile --fqbn $(FQBN) --libraries $(LIB) --build-path $(OBJ)
+	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) --build-path $(OBJ)
 	rm -f *.bin *.elf
 
 unbrick: $(DFU)

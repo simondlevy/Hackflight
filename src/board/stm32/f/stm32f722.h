@@ -25,13 +25,12 @@ class Stm32F722Board : public Stm32FBoard {
     public:
 
         Stm32F722Board(
-                Receiver & receiver,
-                InvenSenseImu & imu,
+                SoftQuatImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin)
-            : Stm32FBoard(receiver, imu, pids, mixer, esc, ledPin)
+            : Stm32FBoard(imu, pids, mixer, esc, ledPin)
         {
         }
 
