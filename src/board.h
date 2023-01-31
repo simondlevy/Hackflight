@@ -41,16 +41,7 @@ class Board {
         static const uint8_t  STARTUP_BLINK_LED_REPS  = 10;
         static const uint32_t STARTUP_BLINK_LED_DELAY = 50;
 
-        typedef enum {
-
-            ARMING_UNREADY,
-            ARMING_READY,
-            ARMING_ARMED,
-            ARMING_FAILSAFE
-
-        } armingStatus_e;
-
-        armingStatus_e m_armingStatus;
+        Core::armingStatus_e m_armingStatus;
 
         uint8_t m_ledPin;
         bool m_ledInverted;
@@ -174,24 +165,24 @@ class Board {
 
             switch (m_armingStatus) {
 
-                case ARMING_UNREADY:
+                case Core::ARMING_UNREADY:
                     ledBlink(500);
                     if (safeToArm()) {
-                        m_armingStatus = ARMING_READY;
+                        m_armingStatus = Core::ARMING_READY;
                     }
                     break;
 
-                case ARMING_READY:
+                case Core::ARMING_READY:
                     ledSet(false);
                     if (safeToArm()) {
                         checkArmingSwitch();
                     }
                     else {
-                        m_armingStatus = ARMING_UNREADY;
+                        m_armingStatus = Core::ARMING_UNREADY;
                     }
                     break;
 
-                case ARMING_ARMED:
+                case Core::ARMING_ARMED:
                     ledSet(true);
                     checkArmingSwitch();
                     break;
@@ -213,7 +204,7 @@ class Board {
             }
 
             if (hadSignal && !haveSignal) {
-                m_armingStatus = ARMING_FAILSAFE;
+                m_armingStatus = Core::ARMING_FAILSAFE;
             }
         }
 
@@ -242,13 +233,13 @@ class Board {
 
             if (m_receiverTask.getRawAux1() > 1500) {
                 if (!aux1WasSet) {
-                    m_armingStatus = ARMING_ARMED;
+                    m_armingStatus = Core::ARMING_ARMED;
                 }
                 aux1WasSet = true;
             }
             else {
                 if (aux1WasSet) {
-                    m_armingStatus = ARMING_READY;
+                    m_armingStatus = Core::ARMING_READY;
                 }
                 aux1WasSet = false;
             }
@@ -490,7 +481,7 @@ class Board {
                         mixmotors);
 
                 escWrite(
-                        m_armingStatus == ARMING_ARMED ? 
+                        m_armingStatus == Core::ARMING_ARMED ? 
                         mixmotors :
                         m_visualizerTask.motors);
 

@@ -34,6 +34,15 @@ class Core {
 
     public:
 
+        typedef enum {
+
+            ARMING_UNREADY,
+            ARMING_READY,
+            ARMING_ARMED,
+            ARMING_FAILSAFE
+
+        } armingStatus_e;
+
         void getMotorValues(
                 int16_t rawGyro[3],
                 Imu * imu,
