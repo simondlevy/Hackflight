@@ -1,4 +1,4 @@
-SKETCH = HappyModelF411
+SKETCH = HappyModelF411Dsmx
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
 

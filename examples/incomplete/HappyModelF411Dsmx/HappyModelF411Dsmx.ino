@@ -24,6 +24,8 @@
 #include <imu/softquat.h>
 #include <esc/mock.h>
 
+#include <dsmrx.h>
+
 #include <vector>
 
 #include <SPI.h>
@@ -52,6 +54,8 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
+static Dsm2048 rx;
+
 static SoftQuatImu imu(Imu::rotate90);
 
 static std::vector<PidController *> pids = {&anglePid};
@@ -65,9 +69,27 @@ static void handleImuInterrupt()
     board.handleImuInterrupt();
 }
 
+// Receiver interrupt
+void serialEvent2(void)
+{
+    while (Serial2.available()) {
+
+        rx.handleSerialEvent(Serial2.read(), micros());
+
+        if (rx.gotNewFrame()) {
+
+            uint16_t values[8] = {};
+            rx.getChannelValues(values, 8);
+            board.setDsmxValues(values, micros());
+        }
+    }
+}
+
 void setup() {
 
     Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
+
+    Serial2.begin(115200);
 
     icm.begin();
 
