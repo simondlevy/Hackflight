@@ -64,13 +64,12 @@ manufacturer_id HAMO
 
 resource BEEPER 1 C15
 
+# motors ######################
 resource MOTOR 1 B10
-
 resource MOTOR 2 B06
-
 resource MOTOR 3 B07
-
 resource MOTOR 4 B08
+###############################
 
 resource MOTOR 5 NONE
 

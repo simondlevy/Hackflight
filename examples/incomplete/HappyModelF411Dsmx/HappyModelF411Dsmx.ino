@@ -22,7 +22,7 @@
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
 #include <imu/softquat.h>
-#include <esc/mock.h>
+#include <esc/dshot.h>
 
 #include <dsmrx.h>
 
@@ -43,7 +43,7 @@ static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
 static ICM20689 icm(spi, IMU_CS_PIN);
 
-static volatile bool gotInterrupt;
+static std::vector <uint8_t> MOTOR_PINS = {PB10, PB7, PB7, PB8};
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -60,10 +60,17 @@ static SoftQuatImu imu(Imu::rotate90);
 
 static std::vector<PidController *> pids = {&anglePid};
 
-static MockEsc esc;
+static DshotEsc esc(MOTOR_PINS);
 
 static Stm32F411Board board(imu, pids, mixer, esc, LED_PIN);
 
+// Motor interrupt
+extern "C" void handleDmaIrq(void)
+{
+    board.handleDmaIrq(0);
+}
+
+// IMU interrupt
 static void handleImuInterrupt() 
 {
     board.handleImuInterrupt();
