@@ -65,12 +65,16 @@ static Stm32F411Board board(imu, pids, mixer, esc, LED_PIN);
 
 static bool gotInterrupt;
 
+static uint32_t count;
+
 // IMU interrupt
 static void handleImuInterrupt() 
 {
     // board.handleImuInterrupt();
 
     gotInterrupt = true;
+
+    count++;
 }
 
 void setup() {
@@ -88,5 +92,5 @@ void loop()
 {
     bmi.readSensor();
 
-    Serial.println(bmi.getGyroZ());
+    Board::printf("%d %d\n", count, bmi.getGyroZ());
 }
