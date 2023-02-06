@@ -43,13 +43,12 @@ class Teensy40 : public Board {
     public:
 
         Teensy40(
-                Receiver & receiver,
                 Imu & imu,
-                vector<PidController *> & pids,
+                std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const int8_t ledPin)
-            : Board(receiver, imu, pids, mixer, esc, ledPin)
+            : Board(&imu, pids, mixer, esc, ledPin)
         {
         }
 
