@@ -6,12 +6,15 @@
    MIT License
  */
 
-#include "mpu6x00.h"
+#include <hackflight.h>
+#include <board/teensy40.h>
+
+#include <mpu6x00.h>
 
 static const uint8_t CS_PIN  = 10;
 static const uint8_t INT_PIN = 9;
 
-static Mpu6x00 imu = Mpu6x00(CS_PIN);
+static Mpu6x00 mpu = Mpu6x00(CS_PIN);
 
 static bool gotInterrupt;
 
@@ -34,7 +37,7 @@ void setup(void)
 
     SPI.begin();
 
-    if (!imu.begin()) {
+    if (!mpu.begin()) {
         errorForever();
     }
 
@@ -46,16 +49,11 @@ void loop(void)
 {
     if (gotInterrupt) {
 
-        imu.readSensor();
+        mpu.readSensor();
 
         Serial.printf(
-                "gx=%+06d gy=%+06d gz=%+06d | ax=%+06d ay=%+06d az=%+06d\n",
-                imu.getRawGyroX(),
-                imu.getRawGyroY(),
-                imu.getRawGyroZ(),
-                imu.getRawAccelX(),
-                imu.getRawAccelY(),
-                imu.getRawAccelZ());
+                "gx=%+06d gy=%+06d gz=%+06d\n",
+                mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawAccelZ());
 
         gotInterrupt = false;
     }
