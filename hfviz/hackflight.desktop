@@ -1,7 +1,7 @@
  [Desktop Entry]
  Name=Hackflight
  Comment=Hackflight Visualizer
- Exec=__home__/Documents/Arduino/libraries/Hackflight/viz/hfviz.sh
+ Exec=__home__/Documents/Arduino/libraries/Hackflight/hfviz/linux.sh
  Icon=__home__/Documents/Arduino/libraries/Hackflight/media/icon.png
  Terminal=false
  Type=Application
