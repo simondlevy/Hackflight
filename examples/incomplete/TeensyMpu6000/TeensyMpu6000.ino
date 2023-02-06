@@ -1,83 +1,62 @@
 /*
+   MPU6x00 IMU on Teensy MCU
+
    Copyright (c) 2023 Simon D. Levy
 
-   This file is part of Hackflight.
-
-   Hackflight is free software: you can redistribute it and/or modify it under
-   the terms of the GNU General Public License as published by the Free
-   Software Foundation, either version 3 of the License, or (at your option)
-   any later version.
-
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-   more details.
-
-   You should have received a copy of the GNU General Public License along with
-   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+   MIT License
  */
 
-#include <hackflight.h>
-#include <board/teensy40.h>
-#include <core/mixers/fixedpitch/quadxbf.h>
-#include <core/pids/angle.h>
-#include <imu/softquat.h>
-#include <esc/mock.h>
+#include "mpu6x00.h"
 
-#include <vector>
+static const uint8_t CS_PIN  = 10;
+static const uint8_t INT_PIN = 9;
 
-#include <SPI.h>
-#include <mpu6x00.h>
+static Mpu6x00 imu = Mpu6x00(CS_PIN);
 
-static const uint8_t IMU_CS_PIN  = 10;
-static const uint8_t IMU_INT_PIN = 9;
-static const uint8_t LED_PIN     = 0; // LED (pin 13) is taken by SPI SCLK
+static bool gotInterrupt;
 
-static Mpu6x00 mpu = Mpu6x00(IMU_CS_PIN);
-
-static AnglePidController anglePid(
-        1.441305,     // Rate Kp
-        48.8762,      // Rate Ki
-        0.021160,     // Rate Kd
-        0.0165048,    // Rate Kf
-        0.0); // 3.0; // Level Kp
-
-static Mixer mixer = QuadXbfMixer::make();
-
-static SoftQuatImu imu(Imu::rotate0);
-
-static std::vector<PidController *> pids = {&anglePid};
-
-static MockEsc esc;
-
-static Teensy40 board(imu, pids, mixer, esc, LED_PIN);
-
-// IMU interrupt
-static void handleImuInterrupt() 
+static void handleInterrupt(void)
 {
-    board.handleImuInterrupt();
+    gotInterrupt = true;
 }
 
-void setup() {
+static void errorForever(void)
+{
+    while (true) {
+        Serial.println("Error initializing IMU");
+        delay(500);
+    }
+}
 
-    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
+void setup(void)
+{
+    Serial.begin(115200);
 
     SPI.begin();
 
-    mpu.begin();
+    if (!imu.begin()) {
+        errorForever();
+    }
 
-    board.begin();
+    pinMode(INT_PIN, INPUT);
+    attachInterrupt(INT_PIN, handleInterrupt, RISING);
 }
 
-void loop() 
+void loop(void)
 {
-    mpu.readSensor();
+    if (gotInterrupt) {
 
-    int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
+        imu.readSensor();
 
-    int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
+        Serial.printf(
+                "gx=%+06d gy=%+06d gz=%+06d | ax=%+06d ay=%+06d az=%+06d\n",
+                imu.getRawGyroX(),
+                imu.getRawGyroY(),
+                imu.getRawGyroZ(),
+                imu.getRawAccelX(),
+                imu.getRawAccelY(),
+                imu.getRawAccelZ());
 
-    board.step(rawGyro, rawAccel);
-
-    Serial.println(rawGyro[2]);
+        gotInterrupt = false;
+    }
 }
