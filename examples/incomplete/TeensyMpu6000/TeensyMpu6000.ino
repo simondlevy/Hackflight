@@ -27,18 +27,13 @@
 #include <vector>
 
 #include <SPI.h>
-#include <BMI270.h>
+#include <mpu6x00.h>
 
 static const uint8_t IMU_CS_PIN  = 10;
 static const uint8_t IMU_INT_PIN = 9;
 static const uint8_t LED_PIN     = 0; // LED (pin 13) is taken by SPI SCLK
 
-static BMI270 bmi = BMI270(
-        IMU_CS_PIN,
-        BMI270::ACCEL_RANGE_2_G,
-        BMI270::ACCEL_ODR_100_HZ,
-        BMI270::GYRO_RANGE_2000_DPS,
-        BMI270::GYRO_ODR_3200_HZ);
+static Mpu6x00 mpu = Mpu6x00(IMU_CS_PIN);
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -69,20 +64,20 @@ void setup() {
 
     SPI.begin();
 
-    bmi.begin();
+    mpu.begin();
 
     board.begin();
 }
 
 void loop() 
 {
-    bmi.readSensor();
+    mpu.readSensor();
 
-    int16_t rawGyro[3] = { bmi.getRawGyroX(), bmi.getRawGyroY(), bmi.getRawGyroZ() };
+    int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
 
-    int16_t rawAccel[3] = { bmi.getRawAccelX(), bmi.getRawAccelY(), bmi.getRawAccelZ() };
+    int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
     board.step(rawGyro, rawAccel);
 
-    Serial.println(imu.debug);
+    Serial.println(rawGyro[2]);
 }
