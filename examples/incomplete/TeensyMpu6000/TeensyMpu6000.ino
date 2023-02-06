@@ -11,24 +11,16 @@
 
 #include <mpu6x00.h>
 
-static const uint8_t CS_PIN  = 10;
-static const uint8_t INT_PIN = 9;
+static const uint8_t IMU_CS_PIN  = 10;
+static const uint8_t IMU_INT_PIN = 9;
 
-static Mpu6x00 mpu = Mpu6x00(CS_PIN);
+static Mpu6x00 mpu = Mpu6x00(IMU_CS_PIN);
 
 static bool gotInterrupt;
 
-static void handleInterrupt(void)
+static void handleImuInterrupt(void)
 {
     gotInterrupt = true;
-}
-
-static void errorForever(void)
-{
-    while (true) {
-        Serial.println("Error initializing IMU");
-        delay(500);
-    }
 }
 
 void setup(void)
@@ -37,12 +29,9 @@ void setup(void)
 
     SPI.begin();
 
-    if (!mpu.begin()) {
-        errorForever();
-    }
+    mpu.begin();
 
-    pinMode(INT_PIN, INPUT);
-    attachInterrupt(INT_PIN, handleInterrupt, RISING);
+    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
 }
 
 void loop(void)
@@ -51,9 +40,8 @@ void loop(void)
 
         mpu.readSensor();
 
-        Serial.printf(
-                "gx=%+06d gy=%+06d gz=%+06d\n",
-                mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawAccelZ());
+        Serial.printf("gx=%+06d gy=%+06d gz=%+06d\n",
+                mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ());
 
         gotInterrupt = false;
     }
