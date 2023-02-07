@@ -77,7 +77,7 @@ void setup() {
 
     bmi.begin();
 
-    // board.begin();
+    board.begin();
 }
 
 void loop() 
