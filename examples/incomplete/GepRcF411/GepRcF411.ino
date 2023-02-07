@@ -82,7 +82,10 @@ void setup() {
 
 void loop() 
 {
+    bmi.readSensor();
+
     int16_t rawGyro[3] = {};
     int16_t rawAccel[3] = {};
+
     board.step(rawGyro, rawAccel);
 }
