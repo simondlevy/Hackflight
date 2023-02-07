@@ -84,8 +84,10 @@ void loop()
 {
     bmi.readSensor();
 
-    int16_t rawGyro[3] = {};
-    int16_t rawAccel[3] = {};
+    int16_t rawGyro[3] = { bmi.getRawGyroX(), bmi.getRawGyroY(), bmi.getRawGyroZ() };
+    int16_t rawAccel[3] = { bmi.getRawAccelX(), bmi.getRawAccelY(), bmi.getRawAccelZ() };
 
     board.step(rawGyro, rawAccel);
+
+    Board::printf("%+06d %+06d %+06d\n", rawGyro[0], rawGyro[1], rawGyro[2]);
 }
