@@ -30,8 +30,6 @@ class Board {
         uint8_t m_ledPin;
         bool m_ledInverted;
 
-        bool m_dshotEnabled;
-
         void runDynamicTasks(const int16_t rawAccel[3])
         {
             if (m_core.visualizerTask.gotRebootRequest()) {
@@ -173,7 +171,7 @@ class Board {
             return m_core.getAnticipatedEndCycles(task, getCycleCounter());
         }
 
-        void escBegin(void)
+        void escInit(void)
         {
             switch (m_core.esc->type) {
 
@@ -186,7 +184,6 @@ class Board {
 
                 case Esc::DSHOT:
                     dmaInit(m_core.esc->motorPins, 1000 * m_core.esc->dshotOutputFreq);
-                    m_dshotEnabled = true;
                     break;
 
                 default:
@@ -223,9 +220,7 @@ class Board {
                     break;
 
                 case Esc::DSHOT:
-                    if (m_dshotEnabled) {
-                        dshotWrite(motorValues);
-                    }
+                    dshotWrite(motorValues);
                     break;
 
                 default:
@@ -321,7 +316,7 @@ class Board {
 
             m_core.imu->begin(getClockSpeed());
 
-            escBegin();
+            escInit();
 
             pinMode(m_ledPin, OUTPUT);
 
