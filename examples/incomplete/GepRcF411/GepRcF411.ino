@@ -71,7 +71,7 @@ static void handleImuInterrupt()
 
 void setup() {
 
-    //Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
+    // Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
 
     spi.begin();
 
@@ -82,11 +82,7 @@ void setup() {
 
 void loop() 
 {
-    if (Serial.available() && Serial.read() == 'R') {
-        board.reboot();
-    }
-
-    //int16_t rawGyro[3] = {};
-    //int16_t rawAccel[3] = {};
-    //board.step(rawGyro, rawAccel);
+    int16_t rawGyro[3] = {};
+    int16_t rawAccel[3] = {};
+    board.step(rawGyro, rawAccel);
 }
