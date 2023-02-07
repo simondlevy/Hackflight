@@ -73,11 +73,11 @@ void setup() {
 
     //Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
 
-    //spi.begin();
+    spi.begin();
 
-    //bmi.begin();
+    bmi.begin();
 
-    board.begin();
+    // board.begin();
 }
 
 void loop() 
