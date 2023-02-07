@@ -20,27 +20,47 @@
 #include <hackflight.h>
 #include <board/stm32/f/4/stm32f411.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
-#include <receiver/dsmx.h>
-#include <imu/softquat/invensense/mpu6x00.h>
+#include <core/pids/angle.h>
+#include <imu/softquat.h>
 #include <esc/mock.h>
 
+#include <dsmrx.h>
+
 #include <vector>
+
+#include <SPI.h>
+#include <mpu6x00.h>
 
 static const uint8_t LED_PIN     = PC13;
 static const uint8_t IMU_CS_PIN  = PA4;
 static const uint8_t IMU_INT_PIN = PB2;
 
+static const uint8_t IMU_MOSI_PIN = PA7;
+static const uint8_t IMU_MISO_PIN = PA6;
+static const uint8_t IMU_SCLK_PIN = PA5;
+
+static AnglePidController anglePid(
+        1.441305,     // Rate Kp
+        48.8762,      // Rate Ki
+        0.021160,     // Rate Kd
+        0.0165048,    // Rate Kf
+        0.0); // 3.0; // Level Kp
+
 static Mixer mixer = QuadXbfMixer::make();
 
-static DsmxReceiver rx;
+static Dsm2048 rx;
 
-static Mpu6x00 imu(Imu::rotate0Flip, IMU_CS_PIN);
+static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
+
+static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
+
+static SoftQuatImu imu(Imu::rotate0Flip);
 
 static std::vector<PidController *> pids = {};
 
 static MockEsc esc;
 
-static Stm32F411Board board(rx, imu, pids, mixer, esc, LED_PIN);
+static Stm32F411Board board(imu, pids, mixer, esc, LED_PIN);
 
 // IMU interrupt
 static void handleImuInterrupt(void)
@@ -51,7 +71,17 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent2(void)
 {
-    Board::handleReceiverSerialEvent(rx, Serial2);
+    while (Serial2.available()) {
+
+        rx.handleSerialEvent(Serial2.read(), micros());
+
+        if (rx.gotNewFrame()) {
+
+            uint16_t values[8] = {};
+            rx.getChannelValues(values, 8);
+            board.setDsmxValues(values, micros());
+        }
+    }
 }
 
 void setup(void)
@@ -60,10 +90,17 @@ void setup(void)
 
     Serial2.begin(115200);
 
+    mpu.begin();
+
     board.begin();
 }
 
 void loop(void)
 {
-    board.step();
+    mpu.readSensor();
+
+    int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
+    int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
+
+    board.step(rawGyro, rawAccel);
 }
