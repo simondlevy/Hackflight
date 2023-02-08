@@ -30,10 +30,6 @@ class SoftQuatImu : public Imu {
 
     friend class AccelerometerTask;
 
-    public:
-
-        float debug;
-
     private:
 
         // Constants for trig functions
@@ -304,15 +300,8 @@ class SoftQuatImu : public Imu {
 
         virtual void accumulateGyro(void) override
         {
-            debug = m_gyroZ.dpsFiltered;
-
             m_gyroAccum.accumulate(
                     m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
-        }
-
-        auto gyroRawToFilteredDps(int16_t rawGyro[3]) -> Axes
-        {
-            return Imu::gyroRawToFilteredDps(rawGyro);
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
