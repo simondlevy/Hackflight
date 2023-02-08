@@ -64,9 +64,14 @@ static MockEsc esc;
 static Stm32F411Board board(imu, pids, mixer, esc, LED_PIN);
 
 // IMU interrupt
+
+static bool gotImuInterrupt;
+
 static void handleImuInterrupt() 
 {
     board.handleImuInterrupt();
+
+    gotImuInterrupt = true;
 }
 
 void setup() {
@@ -82,10 +87,22 @@ void setup() {
 
 void loop() 
 {
-    bmi.readSensor();
 
-    int16_t rawGyro[3] = { bmi.getRawGyroX(), bmi.getRawGyroY(), bmi.getRawGyroZ() };
-    int16_t rawAccel[3] = { bmi.getRawAccelX(), bmi.getRawAccelY(), bmi.getRawAccelZ() };
+    const auto usec = micros();
+    static uint32_t prev;
+
+    // XXX Calling BMI270::readSensor() slows down Board::step(), suggesting that
+    // we should configure the BMI270 FIFO.
+    if (usec-prev > 1000) {
+        // bmi.readSensor();
+        prev = usec;
+    }
+
+    int16_t rawGyro[3]
+        = { bmi.getRawGyroX(), bmi.getRawGyroY(), bmi.getRawGyroZ() };
+
+    int16_t rawAccel[3]
+        = { bmi.getRawAccelX(), bmi.getRawAccelY(), bmi.getRawAccelZ() };
 
     board.step(rawGyro, rawAccel);
 }
