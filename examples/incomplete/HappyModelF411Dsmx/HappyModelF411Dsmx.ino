@@ -43,7 +43,7 @@ static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
 static ICM20689 icm(spi, IMU_CS_PIN);
 
-static std::vector <uint8_t> MOTOR_PINS = {PB10, PB7, PB7, PB8};
+static std::vector <uint8_t> MOTOR_PINS = {PB_10, PB_7, PB_7, PB_8};
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
