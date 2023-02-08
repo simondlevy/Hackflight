@@ -74,7 +74,7 @@ class LadybugBoard : public Stm32Board {
             Wire.setClock(400000); 
             delay(100);
 
-            Board::setInterrupt(IMU_INTERRUPT_PIN, isr, RISING);  
+            setImuInterrupt(IMU_INTERRUPT_PIN, isr, RISING);  
 
             Board::begin();
 

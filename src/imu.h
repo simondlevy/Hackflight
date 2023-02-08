@@ -202,16 +202,13 @@ class Imu {
 
         rotateFun_t m_rotateFun;
 
-        Imu(void) 
-        {
-        }
-
         Imu(const rotateFun_t rotateFun, const uint16_t gyroScale)
         {
             m_rotateFun = rotateFun;
             m_gyroScale = gyroScale / 32768.;
         }
 
+        // For software quaternion
         virtual void accumulateGyro(float x, float y, float z)
         {
             (void)x;
@@ -225,7 +222,6 @@ class Imu {
 
         virtual auto gyroRawToFilteredDps(int16_t rawGyro[3]) -> Axes
         {
-            // For software quaternion
             accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
 
             const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
