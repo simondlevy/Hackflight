@@ -165,8 +165,6 @@ class Core {
 
         void step(int16_t rawGyro[3], const uint32_t usec, float mixmotors[])
         {
-            imu->accumulateGyro();
-
             auto angvels = imu->gyroRawToFilteredDps(rawGyro);
 
             vstate.dphi   = angvels.x;

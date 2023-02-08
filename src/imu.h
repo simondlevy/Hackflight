@@ -212,12 +212,19 @@ class Imu {
             m_gyroScale = gyroScale / 32768.;
         }
 
+        virtual void accumulateGyro(void)
+        {
+        }
+
     public:
 
         virtual void handleInterrupt(const uint32_t cycleCounter) = 0;
 
         virtual auto gyroRawToFilteredDps(int16_t rawGyro[3]) -> Axes
         {
+            // For software quaternion
+            accumulateGyro();
+
             const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
 
             static Axes _adc;
@@ -256,10 +263,6 @@ class Imu {
             m_gyroIsCalibrating = !calibrationComplete;
 
             return Axes(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
-        }
-
-        virtual void accumulateGyro(void)
-        {
         }
 
         virtual bool gyroIsCalibrating(void)
