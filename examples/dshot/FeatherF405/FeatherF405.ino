@@ -61,32 +61,32 @@ static void mockImuInterrupt(void)
     static uint32_t prev;
     const auto usec = micros();
 
-    if (usec - prev > 1000) {
+    if (usec - prev > 125) {
         prev = usec;
         board.handleImuInterrupt();
     }
 }
 
-static int16_t mockAccelX(void)
+static int16_t mockGyroX(void)
 {
-    static int16_t accelX;
+    static int16_t gyroX;
 
     static uint32_t prev;
     const auto usec = micros();
 
     if (usec - prev > 10000) {
         prev = usec;
-        static int8_t accelDir = +1;
-        accelX += accelDir;
-        accelDir = 
-            accelX > 10000 ?
+        static int8_t gyroDir = +1;
+        gyroX += gyroDir;
+        gyroDir = 
+            gyroX > 5000 ?
             -1 :
-            accelX < -10000 ?
+            gyroX < -5000 ?
             +1 :
-            accelDir;
+            gyroDir;
     }
 
-    return accelX;
+    return gyroX;
 }
 
 void setup(void)
@@ -98,10 +98,8 @@ void loop(void)
 {
     mockImuInterrupt();
 
-    int16_t rawGyro[3] = {};
-    int16_t rawAccel[3] = {mockAccelX(), 0, 0};
-
-    Serial.println(rawAccel[0]);
+    int16_t rawGyro[3] = {mockGyroX(), 0, 0};
+    int16_t rawAccel[3] = {};
 
     board.step(rawGyro, rawAccel);
 }
