@@ -353,7 +353,7 @@ class Board {
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
-                m_core.getMotorValues(rawGyro, usec, mixmotors);
+                m_core.step(rawGyro, usec, mixmotors);
 
                 escWrite(
                         m_core.armingStatus == Core::ARMING_ARMED ? 
