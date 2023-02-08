@@ -180,7 +180,11 @@ class Imu {
 
     protected:
 
+        typedef Axes (*rotateFun_t)(Axes & axes);
+
         uint32_t m_gyroSyncTime;
+
+        rotateFun_t m_rotateFun;
 
         void setGyroCalibrationCycles(void)
         {
@@ -197,10 +201,6 @@ class Imu {
             // Convert heading from [-pi,+pi] to [0,2*pi]
             return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
         }
-
-       typedef Axes (*rotateFun_t)(Axes & axes);
-
-        rotateFun_t m_rotateFun;
 
         Imu(const rotateFun_t rotateFun, const uint16_t gyroScale)
         {
@@ -239,14 +239,13 @@ class Imu {
 
                 _adc = m_rotateFun(_adc);
 
-            } else {
-                calibrateGyro(rawGyro);
-            }
-
-            if (calibrationComplete) {
                 scaleGyro(m_gyroX, _adc.x);
                 scaleGyro(m_gyroY, _adc.y);
                 scaleGyro(m_gyroZ, _adc.z);
+            } 
+            
+            else {
+                calibrateGyro(rawGyro);
             }
 
             // Use gyro lowpass 2 filter for downsampling
