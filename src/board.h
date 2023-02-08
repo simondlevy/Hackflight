@@ -35,7 +35,9 @@ class Board {
         void runDynamicTasks(const int16_t rawAccel[3])
         {
             if (m_core.visualizerTask.gotRebootRequest()) {
-                detachInterrupt(m_imuInterruptPin);
+                if (m_imuInterruptPin > 0) {
+                    detachInterrupt(m_imuInterruptPin);
+                }
                 reboot();
             }
 

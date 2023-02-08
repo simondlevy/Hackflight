@@ -43,7 +43,7 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static SoftQuatImu imu(Imu::rotate270);
+static SoftQuatImu imu(Imu::rotate0);
 
 static std::vector<PidController *> pids = {&anglePid};
 
@@ -56,6 +56,39 @@ extern "C" void handleDmaIrq(uint8_t id)
     board.handleDmaIrq(id);
 }*/
 
+static void mockImuInterrupt(void)
+{
+    static uint32_t prev;
+    const auto usec = micros();
+
+    if (usec - prev > 1000) {
+        prev = usec;
+        board.handleImuInterrupt();
+    }
+}
+
+static int16_t mockAccelX(void)
+{
+    static int16_t accelX;
+
+    static uint32_t prev;
+    const auto usec = micros();
+
+    if (usec - prev > 10000) {
+        prev = usec;
+        static int8_t accelDir = +1;
+        accelX += accelDir;
+        accelDir = 
+            accelX > 10000 ?
+            -1 :
+            accelX < -10000 ?
+            +1 :
+            accelDir;
+    }
+
+    return accelX;
+}
+
 void setup(void)
 {
     board.begin();
@@ -63,8 +96,12 @@ void setup(void)
 
 void loop(void)
 {
+    mockImuInterrupt();
+
     int16_t rawGyro[3] = {};
-    int16_t rawAccel[3] = {};
+    int16_t rawAccel[3] = {mockAccelX(), 0, 0};
+
+    Serial.println(rawAccel[0]);
 
     board.step(rawGyro, rawAccel);
 }
