@@ -22,9 +22,9 @@
 #include <stdint.h>
 
 #include "board.h"
-#include "core/clock.h"
 #include "core/constrain.h"
 #include "core/motors.h"
+#include "core/pid.h"
 #include "esc.h"
 
 class DshotEsc : public Esc {
@@ -98,7 +98,7 @@ class DshotEsc : public Esc {
             // Find the minimum number of motor output cycles needed to
             // provide at least delayUs time delay
 
-            return (delayUs + Clock::PERIOD() - 1) / Clock::PERIOD();
+            return (delayUs + PidController::PERIOD - 1) / PidController::PERIOD;
         }
 
         static float scaleRangef(

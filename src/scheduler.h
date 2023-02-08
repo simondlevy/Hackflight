@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "core/pid.h"
 #include "task.h"
 
 class Scheduler {
@@ -104,7 +105,7 @@ class Scheduler {
             m_nextTimingCycles = 0;
 
             desiredPeriodCycles =
-                (int32_t)microsecondsToClockCycles(Clock::PERIOD());
+                (int32_t)microsecondsToClockCycles(PidController::PERIOD);
 
             m_guardMargin =
                 (int32_t)microsecondsToClockCycles(CHECK_GUARD_MARGIN_US);

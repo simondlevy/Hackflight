@@ -20,9 +20,9 @@
 
 #include "board.h"
 #include "core/axes.h"
-#include "core/clock.h"
 #include "core/constrain.h"
 #include "core/filters/pt1.h"
+#include "core/pid.h"
 #include "core/utils.h"
 #include "core/vstate.h"
 
@@ -113,7 +113,7 @@ class Imu {
 
         static uint32_t calculateGyroCalibratingCycles(void)
         {
-            return GYRO_CALIBRATION_DURATION / Clock::PERIOD();
+            return GYRO_CALIBRATION_DURATION / PidController::PERIOD;
         }
 
         void calibrateGyroAxis(int16_t rawGyro[3], gyroAxis_t & axis, const uint8_t index)

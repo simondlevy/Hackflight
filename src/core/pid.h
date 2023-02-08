@@ -24,6 +24,10 @@
 
 class PidController {
 
+    private:
+
+        static const uint32_t FREQ_HZ = 8000;
+
     protected:
 
          virtual auto getDemands(
@@ -33,6 +37,10 @@ class PidController {
                 const bool reset) -> Demands = 0;
 
     public:
+
+        static const uint32_t PERIOD = 1000000 / FREQ_HZ;
+
+        static constexpr float DT = PERIOD * 1e-6f;
 
          auto update(
                 const uint32_t usec,

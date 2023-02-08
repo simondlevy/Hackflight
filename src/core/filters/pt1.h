@@ -20,7 +20,7 @@
 
 #include <math.h>
 
-#include "core/clock.h"
+#include "core/pid.h"
 
 // PT1 Low Pass filter
 class Pt1Filter {
@@ -33,7 +33,7 @@ class Pt1Filter {
 
     public:
 
-        Pt1Filter(const float f_cut, const float dt=Clock::DT())
+        Pt1Filter(const float f_cut, const float dt=PidController::DT)
         {
             m_state = 0.0;
             m_dt = dt;

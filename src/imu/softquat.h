@@ -21,8 +21,8 @@
 #include <string.h>
 
 #include "core/axes.h"
-#include "core/clock.h"
 #include "core/filters/pt2.h"
+#include "core/pid.h"
 #include "core/vstate.h"
 #include "imu.h"
 
@@ -95,9 +95,9 @@ class SoftQuatImu : public Imu {
                 void accumulate(const float x, const float y, const float z)
                 {
                     // integrate using trapezium rule to avoid bias
-                    values.x += 0.5f * (adcf.x + x) * Clock::PERIOD();
-                    values.y += 0.5f * (adcf.y + y) * Clock::PERIOD();
-                    values.z += 0.5f * (adcf.z + z) * Clock::PERIOD();
+                    values.x += 0.5f * (adcf.x + x) * PidController::PERIOD;
+                    values.y += 0.5f * (adcf.y + y) * PidController::PERIOD;
+                    values.z += 0.5f * (adcf.z + z) * PidController::PERIOD;
 
                     adcf.x = x;
                     adcf.y = y;
@@ -108,7 +108,7 @@ class SoftQuatImu : public Imu {
                 
                 Axes getAverage(void)
                 {
-                    auto denom = count * Clock::PERIOD();
+                    auto denom = count * PidController::PERIOD;
 
                     return Axes(
                             denom ? values.x / denom : 0,

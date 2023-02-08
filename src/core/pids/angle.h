@@ -21,7 +21,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "core/clock.h"
 #include "core/constrain.h"
 #include "core/filters/pt1.h"
 #include "core/filters/pt2.h"
@@ -78,17 +77,17 @@ class AnglePidController : public PidController {
 
         static float MAX_VELOCITY_CYCLIC() 
         {
-            return RATE_ACCEL_LIMIT * 100 * Clock::DT();
+            return RATE_ACCEL_LIMIT * 100 * DT;
         }
 
         static float MAX_VELOCITY_YAW() 
         {
-            return YAW_RATE_ACCEL_LIMIT * 100 * Clock::DT(); 
+            return YAW_RATE_ACCEL_LIMIT * 100 * DT; 
         }
 
         static float FREQUENCY() 
         {
-            return 1.0f / Clock::DT(); 
+            return 1.0f / DT; 
         }
 
         // Common values for all three axes
@@ -330,7 +329,7 @@ class AnglePidController : public PidController {
 
             // -----calculate I component
             axis->I =
-                constrain_f(axis->I + (m_k_rate_i * Clock::DT()) * itermErrorRate,
+                constrain_f(axis->I + (m_k_rate_i * DT) * itermErrorRate,
                     -ITERM_LIMIT, +ITERM_LIMIT);
 
             // -----calculate D component
@@ -357,7 +356,7 @@ class AnglePidController : public PidController {
             const auto itermWindupPointInv =
                 1 / (1 - (ITERM_WINDUP_POINT_PERCENT / 100));
 
-            const auto dynCi = Clock::DT() * 
+            const auto dynCi = DT * 
                 (itermWindupPointInv > 1 ?
                  constrain_f(itermWindupPointInv, 0, 1) :
                  1);
