@@ -111,6 +111,10 @@ class Imu {
         float    m_gyroScale;
         bool     m_gyroIsCalibrating;
 
+        gyroAxis_t m_gyroX;
+        gyroAxis_t m_gyroY;
+        gyroAxis_t m_gyroZ;
+
         static uint32_t calculateGyroCalibratingCycles(void)
         {
             return GYRO_CALIBRATION_DURATION / PidController::PERIOD;
@@ -178,10 +182,6 @@ class Imu {
 
         uint32_t m_gyroSyncTime;
 
-        gyroAxis_t m_gyroX;
-        gyroAxis_t m_gyroY;
-        gyroAxis_t m_gyroZ;
-
         void setGyroCalibrationCycles(void)
         {
             m_gyroCalibrationCyclesRemaining = (int32_t)calculateGyroCalibratingCycles();
@@ -212,8 +212,11 @@ class Imu {
             m_gyroScale = gyroScale / 32768.;
         }
 
-        virtual void accumulateGyro(void)
+        virtual void accumulateGyro(float x, float y, float z)
         {
+            (void)x;
+            (void)y;
+            (void)z;
         }
 
     public:
@@ -223,7 +226,7 @@ class Imu {
         virtual auto gyroRawToFilteredDps(int16_t rawGyro[3]) -> Axes
         {
             // For software quaternion
-            accumulateGyro();
+            accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
 
             const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
 

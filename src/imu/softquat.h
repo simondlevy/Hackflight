@@ -298,10 +298,9 @@ class SoftQuatImu : public Imu {
             setGyroCalibrationCycles();
         }
 
-        virtual void accumulateGyro(void) override
+        virtual void accumulateGyro(float x, float y, float z) override
         {
-            m_gyroAccum.accumulate(
-                    m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
+            m_gyroAccum.accumulate(x, y, z);
         }
 
         virtual auto getEulerAngles(const uint32_t time) -> Axes override
