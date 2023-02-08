@@ -68,7 +68,7 @@ static void handleImuInterrupt(void)
 
 void setup(void)
 {
-    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
+    board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
 
     icm.begin();
 

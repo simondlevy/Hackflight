@@ -94,7 +94,7 @@ void serialEvent4(void)
 void setup(void)
 {
     // Set up IMU interrupt
-    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
+    board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
 
     // Start receiver UART
     Serial3.begin(100000, SERIAL_8E2);

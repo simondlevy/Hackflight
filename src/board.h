@@ -30,9 +30,12 @@ class Board {
         uint8_t m_ledPin;
         bool m_ledInverted;
 
+        uint8_t m_imuInterruptPin;
+
         void runDynamicTasks(const int16_t rawAccel[3])
         {
             if (m_core.visualizerTask.gotRebootRequest()) {
+                detachInterrupt(m_imuInterruptPin);
                 reboot();
             }
 
@@ -374,11 +377,14 @@ class Board {
             }
         }
 
-        static void setInterrupt(
+        void setImuInterrupt(
                 const uint8_t pin, void (*irq)(void), const uint32_t mode)
         {
             pinMode(pin, INPUT);
             attachInterrupt(pin, irq, mode);  
+
+            // Store pin for call to detachInterrupt() for reboot
+            m_imuInterruptPin = pin;
         }
 
         // Support for serial debugging ---------------------------------------

@@ -94,7 +94,7 @@ void serialEvent2(void)
 
 void setup() {
 
-    Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
+    board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
 
     Serial2.begin(115200);
 

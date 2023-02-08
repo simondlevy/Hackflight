@@ -66,12 +66,12 @@ static Stm32F411Board board(imu, pids, mixer, esc, LED_PIN);
 // IMU interrupt
 static void handleImuInterrupt() 
 {
-    // board.handleImuInterrupt();
+    board.handleImuInterrupt();
 }
 
 void setup() {
 
-    // Board::setInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
+    board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
 
     spi.begin();
 
@@ -88,6 +88,5 @@ void loop()
     int16_t rawAccel[3] = { bmi.getRawAccelX(), bmi.getRawAccelY(), bmi.getRawAccelZ() };
 
     board.step(rawGyro, rawAccel);
-
-    Board::printf("%+06d %+06d %+06d\n", rawGyro[0], rawGyro[1], rawGyro[2]);
 }
+
