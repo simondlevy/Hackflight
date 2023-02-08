@@ -34,6 +34,10 @@ class Core {
 
     private:
 
+        // Gyro interrupt counts over which to measure loop time and skew
+        static const uint32_t GYRO_RATE_COUNT = 25000;
+        static const uint32_t GYRO_LOCK_COUNT = 400;
+
         static constexpr float MAX_ARMING_ANGLE_DEG = 25;
 
         Scheduler m_scheduler;
@@ -222,7 +226,7 @@ class Core {
             static int32_t _sampleRateStartCycles;
 
             if ((_terminalGyroRateCount == 0)) {
-                _terminalGyroRateCount = imuInterruptCount + Imu::CORE_RATE_COUNT;
+                _terminalGyroRateCount = imuInterruptCount + GYRO_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
             }
 
@@ -230,9 +234,9 @@ class Core {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
-                m_scheduler.desiredPeriodCycles = sampleCycles / Imu::CORE_RATE_COUNT;
+                m_scheduler.desiredPeriodCycles = sampleCycles / GYRO_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
-                _terminalGyroRateCount += Imu::CORE_RATE_COUNT;
+                _terminalGyroRateCount += GYRO_RATE_COUNT;
             }
 
             // Track actual gyro rate over given number of cycle times and
@@ -246,14 +250,14 @@ class Core {
             _gyroSkewAccum += gyroSkew;
 
             if ((_terminalGyroLockCount == 0)) {
-                _terminalGyroLockCount = imuInterruptCount + Imu::GYRO_LOCK_COUNT;
+                _terminalGyroLockCount = imuInterruptCount + GYRO_LOCK_COUNT;
             }
 
             if (imuInterruptCount >= _terminalGyroLockCount) {
-                _terminalGyroLockCount += Imu::GYRO_LOCK_COUNT;
+                _terminalGyroLockCount += GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
-                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/Imu::GYRO_LOCK_COUNT);
+                m_scheduler.lastTargetCycles -= (_gyroSkewAccum/GYRO_LOCK_COUNT);
 
                 _gyroSkewAccum = 0;
             }
