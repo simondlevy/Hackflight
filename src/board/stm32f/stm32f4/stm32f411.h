@@ -16,32 +16,31 @@
 
 #pragma once
 
-#include "board/stm32/stm32f/stm32f4.h"
+#include "board/stm32f/stm32f4.h"
 
-class Stm32F405Board : public Stm32F4Board {
+class Stm32F411Board : public Stm32F4Board {
 
     protected:
 
-        virtual void initPortsAndMotors(const std::vector<uint8_t> * motorPins) override
+       virtual void initPortsAndMotors(const std::vector<uint8_t> * motorPins)
         {
-            initStream1(1);
-            initStream2(0);
+            initStream1(0);
 
             initMotor(motorPins, 0, 0); 
             initMotor(motorPins, 1, 0);
-            initMotor(motorPins, 2, 1);
-            initMotor(motorPins, 3, 1);
+            initMotor(motorPins, 2, 0);
+            initMotor(motorPins, 3, 0);
         }        
 
     public:
 
-        Stm32F405Board(
+        Stm32F411Board(
                 SoftQuatImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
                 const uint8_t ledPin)
-            : Stm32F4Board(2, imu, pids, mixer, esc, ledPin)
+            : Stm32F4Board(1, imu, pids, mixer, esc, ledPin)
         {
         }
 };

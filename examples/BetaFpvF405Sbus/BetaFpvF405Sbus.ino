@@ -18,7 +18,7 @@
  */
 
 #include <hackflight.h>
-#include <board/stm32/stm32f/stm32f4/stm32f405.h>
+#include <board/stm32f/stm32f4/stm32f405.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
 #include <imu/softquat.h>

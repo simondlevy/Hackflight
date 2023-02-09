@@ -16,47 +16,41 @@
 
 #pragma once
 
+#include <SPI.h>
+
 #include "board.h"
+#include "task/accelerometer.h"
+#include "imu/softquat.h"
 
-class Stm32Board : public Board {
-
-    public:
-
-        virtual uint32_t getCycleCounter(void) override
-        {
-            return DWT->CYCCNT;
-        }
+class Stm32FBoard : public Stm32Board {
 
     protected:
 
-        Stm32Board(
-                Imu * imu,
+        virtual void prioritizeExtraTasks(
+                Task::prioritizer_t & prioritizer,
+                const uint32_t usec) override
+        {
+            m_core.accelerometerTask.prioritize(usec, prioritizer);
+            m_core.skyrangerTask.prioritize(usec, prioritizer);
+        }
+
+        Stm32FBoard(
+                SoftQuatImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 Esc & esc,
-                const int8_t ledPin)
-            : Board(imu, pids, mixer, esc, ledPin)
+                const uint8_t ledPin)
+            : Stm32Board(&imu, pids, mixer, esc, ledPin)
         {
         }
 
-        virtual uint32_t getClockSpeed(void) override
+    public:
+
+        void handleSkyrangerEvent(HardwareSerial & serial)
         {
-            return SystemCoreClock;
+            while (serial.available()) {
+                m_core.skyrangerTask.parse(serial.read());
+            }
         }
 
-     private:
-
-
-        void (*uartFun)(void);
-
-        virtual void startCycleCounter(void) override
-        {
-            CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-
-            __O uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
-            *(DWTLAR) = 0xC5ACCE55;
-
-            DWT->CYCCNT = 0;
-            DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-        }
-};
+}; // class Stm32FBoard

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "board/stm32/stm32f.h"
+#include "board/stm32f.h"
 
 #include <stm32f4xx.h>
 

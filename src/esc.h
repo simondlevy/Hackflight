@@ -25,7 +25,7 @@
 
 class Esc {
 
-    friend class Board;
+    friend class Stm32Board;
 
     protected:
 

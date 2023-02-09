@@ -20,7 +20,7 @@
 
 #include "core.h"
 
-class Board {
+class Stm32Board {
 
     private:
 
@@ -233,11 +233,27 @@ class Board {
             }
         }
 
+        uint32_t getClockSpeed(void) 
+        {
+            return SystemCoreClock;
+        }
+
+        void startCycleCounter(void)
+        {
+            CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+
+            __O uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
+            *(DWTLAR) = 0xC5ACCE55;
+
+            DWT->CYCCNT = 0;
+            DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+        }
+
     protected:
 
         Core m_core;
 
-        Board(
+        Stm32Board(
                 Imu * imu,
                 std::vector<PidController *> & pidControllers,
                 Mixer & mixer,
@@ -284,11 +300,10 @@ class Board {
             return getClockSpeed() / 1000000 * micros;
         }
 
-        virtual uint32_t getClockSpeed(void)  = 0;
-
-        virtual uint32_t getCycleCounter(void) = 0;
-
-        virtual void startCycleCounter(void) = 0;
+        uint32_t getCycleCounter(void)
+        {
+            return DWT->CYCCNT;
+        }
 
         virtual void dmaInit(
                 const std::vector<uint8_t> * motorPins, const uint32_t dshotOutputFreq)

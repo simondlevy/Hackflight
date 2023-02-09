@@ -20,7 +20,7 @@
 
 #include <USFS.h>
 
-#include "board/stm32.h"
+#include "board.h"
 #include "esc/brushed.h"
 #include "imu/ladybug.h"
 
