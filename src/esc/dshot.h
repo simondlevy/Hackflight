@@ -258,23 +258,6 @@ class DshotEsc : public Esc {
             return MIN_VALUE + 0.045 * VALUE_RANGE;
         }
 
-        virtual void stop(void) override 
-        {
-            commandControl_t *commandControl = addCommand();
-
-            if (commandControl) {
-                commandControl->repeats = 10;
-                commandControl->delayAfterCommandUs = COMMAND_DELAY_US;
-                for (auto i=0; i<MOTOR_COUNT; i++) {
-                    commandControl->command[i] = CMD_SPIN_DIRECTION_NORMAL;
-                }
-                // we can skip the motors idle wait state
-                commandControl->state = COMMAND_STATE_STARTDELAY;
-                commandControl->nextCommandCycleDelay =
-                    commandCyclesFromTime(INITIAL_DELAY_US);
-            }
-        }
-        
         virtual uint16_t prepareDshotPacket(
                 const uint8_t i, const float motorValue) override
         {
