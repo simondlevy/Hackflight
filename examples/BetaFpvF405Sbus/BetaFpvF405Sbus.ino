@@ -81,7 +81,9 @@ void serialEvent3(void)
 {
     if (rx.Read()) {
 
-        board.setSbusValues((uint16_t *)rx.data().ch, micros());
+        bfs::SbusData data = rx.data();
+
+        board.setSbusValues((uint16_t *)data.ch, micros(), data.lost_frame);
     }
 }
 

@@ -34,6 +34,7 @@ class ReceiverTask : public Task {
         float    m_channels[6];
         bool     m_gotNewData;
         int16_t  m_lookupThrottleRc[THROTTLE_LOOKUP_TABLE_SIZE];
+        bool     m_lostFrame;
         uint32_t m_previousFrameTimeUs;
         float    m_rawThrottle;
         float    m_rawRoll;
@@ -184,6 +185,7 @@ class ReceiverTask : public Task {
         void setValues(
                 uint16_t channels[],
                 const uint32_t usec,
+                const bool lostFrame,
                 const uint16_t srcMin,
                 const uint16_t srcMax)
         {
@@ -191,6 +193,7 @@ class ReceiverTask : public Task {
                 m_channels[k] = convert(channels[k], srcMin, srcMax);
             }
 
+            m_lostFrame = lostFrame;
             m_lastSignaledAtUs = usec;
             m_previousFrameTimeUs = usec;
             m_gotNewData = true;

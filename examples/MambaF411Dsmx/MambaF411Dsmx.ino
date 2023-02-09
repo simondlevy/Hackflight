@@ -81,13 +81,15 @@ void serialEvent1(void)
 {
     while (Serial1.available()) {
 
-        rx.handleSerialEvent(Serial1.read(), micros());
+        const auto usec = micros();
+
+        rx.handleSerialEvent(Serial1.read(), usec);
 
         if (rx.gotNewFrame()) {
 
             uint16_t values[8] = {};
             rx.getChannelValues(values, 8);
-            board.setDsmxValues(values, micros());
+            board.setDsmxValues(values, micros(), rx.timedOut(usec));
         }
     }
 }
