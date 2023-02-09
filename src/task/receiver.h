@@ -102,7 +102,7 @@ class ReceiverTask : public Task {
 
         bool haveSignal(const uint32_t usec)
         {
-            return (usec - m_lastSignaledAtUs) < TIMEOUT_USEC;
+            return !m_lostSignal && (usec - m_lastSignaledAtUs) < TIMEOUT_USEC;
         }
 
         float getRawThrottle(void)
