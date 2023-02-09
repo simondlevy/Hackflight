@@ -18,7 +18,7 @@
  */
 
 #include <hackflight.h>
-#include <board/stm32/ladybug.h>
+#include <board/ladybug.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
 
@@ -51,7 +51,9 @@ void serialEvent1(void)
 {
     if (rx.Read()) {
 
-        board.setSbusValues((uint16_t *)rx.data().ch, micros());
+        bfs::SbusData data = rx.data();
+
+        board.setSbusValues((uint16_t *)data.ch, micros(), data.lost_frame);
     }
 }
 

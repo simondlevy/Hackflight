@@ -76,7 +76,7 @@ class LadybugBoard : public Stm32Board {
 
             setImuInterrupt(IMU_INTERRUPT_PIN, isr, RISING);  
 
-            Board::begin();
+            Stm32Board::begin();
 
             m_usfs.loadFirmware(); 
 
@@ -118,7 +118,7 @@ class LadybugBoard : public Stm32Board {
                 }
             } 
 
-            Board::step(rawGyro, m_rawAccel);
+            Stm32Board::step(rawGyro, m_rawAccel);
         }
 
 }; // class LadybugBoard
