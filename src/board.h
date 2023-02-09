@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <stdarg.h>
-
 #include "core.h"
 
 class Stm32Board {
@@ -403,39 +401,4 @@ class Stm32Board {
             // Store pin for call to detachInterrupt() for reboot
             m_imuInterruptPin = pin;
         }
-
-        // Support for serial debugging ---------------------------------------
-
-        static void outbuf(char * buf)
-        {
-            Serial.print(buf); 
-            Serial.flush();
-        }
-
-        static void printf(const char * fmt, ...)
-        {
-            va_list ap;
-            va_start(ap, fmt);
-            char buf[200];
-            vsnprintf(buf, 200, fmt, ap); 
-            outbuf(buf);
-            va_end(ap);
-        }
-
-        static void reportForever(const char * fmt, ...)
-        {
-            va_list ap;
-            va_start(ap, fmt);
-            char buf[200];
-            vsnprintf(buf, 200, fmt, ap); 
-            va_end(ap);
-
-            strcat(buf, "\n");
-
-            while (true) {
-                outbuf(buf);
-                delay(500);
-            }
-        }
-
-}; // class Board
+};
