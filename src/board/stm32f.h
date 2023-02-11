@@ -38,9 +38,8 @@ class Stm32FBoard : public Stm32Board {
                 SoftQuatImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
-                Esc & esc,
                 const uint8_t ledPin)
-            : Stm32Board(&imu, pids, mixer, esc, ledPin)
+            : Stm32Board(&imu, pids, mixer, ledPin)
         {
         }
 

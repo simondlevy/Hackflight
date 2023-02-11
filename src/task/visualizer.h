@@ -22,7 +22,6 @@
 #include <stdint.h>
 
 #include "core/motors.h"
-#include "esc.h"
 #include "imu.h"
 #include "msp.h"
 #include "receiver.h"
@@ -44,7 +43,6 @@ class VisualizerTask : public Task {
 
         // Initialized in begin()
         Msp *          m_msp;
-        Esc *          m_esc;
         ReceiverTask * m_receiverTask;
 
         bool m_gotRebootRequest;
@@ -53,6 +51,11 @@ class VisualizerTask : public Task {
                 const uint8_t messageType, const int16_t src[], const uint8_t count)
         {
             m_msp->serializeShorts(messageType, src, count);
+        }
+
+        void  readAndConvertMotor(const uint8_t index)
+        {
+            motors[index] = (m_msp->parseShort(index) - 1000) / 1000.;
         }
 
     public:
@@ -99,14 +102,10 @@ class VisualizerTask : public Task {
 
                 case 214: // SET_MOTORS
                     {
-                        motors[0] =
-                            m_esc->convertFromExternal(m_msp->parseShort(0));
-                        motors[1] =
-                            m_esc->convertFromExternal(m_msp->parseShort(1));
-                        motors[2] =
-                            m_esc->convertFromExternal(m_msp->parseShort(2));
-                        motors[3] =
-                            m_esc->convertFromExternal(m_msp->parseShort(3));
+                        readAndConvertMotor(0);
+                        readAndConvertMotor(1);
+                        readAndConvertMotor(2);
+                        readAndConvertMotor(3);
                     } 
                     break;
 
@@ -132,9 +131,8 @@ class VisualizerTask : public Task {
 
         float motors[Motors::MAX_SUPPORTED];
 
-        void begin(Esc * esc, ReceiverTask * receiverTask)
+        void begin(ReceiverTask * receiverTask)
         {
-            m_esc = esc;
             m_receiverTask = receiverTask;
         }
 

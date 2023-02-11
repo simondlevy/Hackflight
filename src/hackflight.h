@@ -24,7 +24,6 @@
 
 #include "board.h"
 #include "core/mixer.h"
-#include "esc.h"
 #include "imu.h"
 #include "task/attitude.h"
 #include "task/visualizer.h"

@@ -174,63 +174,6 @@ class Stm32Board {
             return m_core.getAnticipatedEndCycles(task, getCycleCounter());
         }
 
-        void escInit(void)
-        {
-            switch (m_core.esc->type) {
-
-                case Esc::BRUSHED:
-                    for (auto pin : *m_core.esc->motorPins) {
-                        // analogWriteFrequency(pin, 10000);
-                        analogWrite(pin, 0);
-                    }
-                    break;
-
-                case Esc::DSHOT:
-                    dmaInit(m_core.esc->motorPins, 1000 * m_core.esc->dshotOutputFreq);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        void dshotWrite(const float motorValues[])
-        {
-            dmaUpdateStart();
-
-            for (uint8_t k=0; k<m_core.esc->motorPins->size(); k++) {
-
-                auto packet = m_core.esc->prepareDshotPacket(k, motorValues[k]);
-
-                dmaWriteMotor(k, packet);
-            }
-
-            m_core.esc->dshotComplete();
-
-            dmaUpdateComplete();
-        }
-
-        void escWrite(const float motorValues[])
-        {
-            switch (m_core.esc->type) {
-
-                case Esc::BRUSHED:
-                    for (uint8_t k=0; k<m_core.esc->motorPins->size(); ++k) {
-                        analogWrite(
-                                (*m_core.esc->motorPins)[k],
-                                (uint8_t)(motorValues[k] * 255));
-                    }
-                    break;
-
-                case Esc::DSHOT:
-                    dshotWrite(motorValues);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
         uint32_t getClockSpeed(void) 
         {
             return SystemCoreClock;
@@ -255,13 +198,11 @@ class Stm32Board {
                 Imu * imu,
                 std::vector<PidController *> & pidControllers,
                 Mixer & mixer,
-                Esc & esc,
                 const int8_t ledPin)
         {
             m_core.imu = imu;
             m_core.pidControllers = &pidControllers;
             m_core.mixer = &mixer;
-            m_core.esc = &esc;
 
             // Support negative LED pin number for inversion
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
@@ -303,38 +244,15 @@ class Stm32Board {
             return DWT->CYCCNT;
         }
 
-        virtual void dmaInit(
-                const std::vector<uint8_t> * motorPins, const uint32_t dshotOutputFreq)
-        {
-            (void)motorPins;
-            (void)dshotOutputFreq;
-        }
-
-        virtual void dmaUpdateComplete(void)
-        {
-        }
-
-        virtual void dmaUpdateStart(void)
-        {
-        }
-
-        virtual void dmaWriteMotor(uint8_t index, uint16_t packet)
-        {
-            (void)index;
-            (void)packet;
-        }
-
         void begin(void)
         {
             startCycleCounter();
 
             m_core.attitudeTask.begin(m_core.imu);
 
-            m_core.visualizerTask.begin(m_core.esc, &m_core.receiverTask);
+            m_core.visualizerTask.begin(&m_core.receiverTask);
 
             m_core.imu->begin(getClockSpeed());
-
-            escInit();
 
             pinMode(m_ledPin, OUTPUT);
 
@@ -348,8 +266,10 @@ class Stm32Board {
             ledSet(false);
         }
 
-        void step(int16_t rawGyro[3], int16_t rawAccel[3])
+        bool getMotors(int16_t rawGyro[3],  float motors[4])
         {
+            bool ready = false;
+
             auto nowCycles = getCycleCounter();
 
             if (m_core.isCoreTaskReady(nowCycles)) {
@@ -370,19 +290,28 @@ class Stm32Board {
 
                 m_core.step(rawGyro, usec, mixmotors);
 
-                escWrite(
-                        m_core.armingStatus == Core::ARMING_ARMED ? 
-                        mixmotors :
-                        m_core.visualizerTask.motors);
+                memcpy(motors, 
+                       m_core.armingStatus == Core::ARMING_ARMED ?
+                       mixmotors :
+                        m_core.visualizerTask.motors,
+                        4 * sizeof(float));
+
+                ready = true;
 
                 m_core.updateScheduler(nowCycles, nextTargetCycles);
             }
 
+            return ready;
+        }
+
+        void update(int16_t rawAccel[3])
+        {
             if (m_core.isDynamicTaskReady(getCycleCounter())) {
                 runDynamicTasks(rawAccel);
             }
         }
 
+        /*
         void step(int16_t rawGyro[3], int16_t rawAccel[3], HardwareSerial & serial)
         {
             step(rawGyro, rawAccel);
@@ -390,7 +319,7 @@ class Stm32Board {
             while (m_core.skyrangerTask.imuDataAvailable()) {
                 serial.write(m_core.skyrangerTask.readImuData());
             }
-        }
+        }*/
 
         void setImuInterrupt(
                 const uint8_t pin, void (*irq)(void), const uint32_t mode)
