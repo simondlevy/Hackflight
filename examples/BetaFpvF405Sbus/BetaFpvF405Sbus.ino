@@ -18,11 +18,10 @@
  */
 
 #include <hackflight.h>
-#include <board/stm32f/stm32f4/stm32f405.h>
+#include <board/stm32f/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
 #include <imu/softquat.h>
-#include <esc/dshot.h>
 
 #include <sbus.h>
 
@@ -30,6 +29,9 @@
 
 #include <SPI.h>
 #include <mpu6x00.h>
+
+#include <stm32_dshot.h>
+#include <dshot/stm32f4/stm32f405.h>
 
 static const uint8_t LED_PIN     = PB5;
 static const uint8_t IMU_CS_PIN  = PA4;
@@ -44,6 +46,8 @@ static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
 
 static std::vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
+
+static Stm32F405Dshot dshot(&MOTOR_PINS);
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -60,14 +64,12 @@ static SoftQuatImu imu(Imu::rotate270);
 
 static std::vector<PidController *> pids = {&anglePid};
 
-static DshotEsc esc(MOTOR_PINS);
-
-static Stm32F405Board board(imu, pids, mixer, esc, LED_PIN);
+static Stm32F4Board board(imu, pids, mixer, LED_PIN);
 
 // DSHOT timer interrupt
 extern "C" void handleDmaIrq(uint8_t id)
 {
-    board.handleDmaIrq(id);
+    dshot.handleDmaIrq(id);
 }
 
 // IMU interrupt
@@ -106,6 +108,8 @@ void setup(void)
 
     mpu.begin();
 
+    dshot.begin();
+
     board.begin();
 }
 
@@ -117,5 +121,12 @@ void loop(void)
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
     // Support sending attitude data to Skyranger over Serial4
-    board.step(rawGyro, rawAccel, Serial4);
+
+    float motors[4] = {};
+
+    if (board.getMotors(rawGyro, motors)) {
+        dshot.write(motors);
+    }
+
+    board.update(rawAccel);
 }
