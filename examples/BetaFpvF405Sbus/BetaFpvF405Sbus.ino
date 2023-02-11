@@ -120,7 +120,7 @@ void loop(void)
     int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
-    // XXX Support sending attitude data to Skyranger over Serial4
-    board.step(rawGyro, rawAccel, dshot);
+    // Support sending attitude data to Skyranger over Serial4
+    board.step(rawGyro, rawAccel, dshot, Serial4);
 
 }

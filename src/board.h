@@ -304,15 +304,18 @@ class Stm32Board {
             }
         }
 
-        /*
-        void step(int16_t rawGyro[3], int16_t rawAccel[3], HardwareSerial & serial)
+        void step(
+                int16_t rawGyro[3],
+                int16_t rawAccel[3],
+                Stm32Dshot & dshot,
+                HardwareSerial & serial)
         {
-            step(rawGyro, rawAccel);
+            step(rawGyro, rawAccel, dshot);
 
             while (m_core.skyrangerTask.imuDataAvailable()) {
                 serial.write(m_core.skyrangerTask.readImuData());
             }
-        }*/
+        }
 
         void setImuInterrupt(
                 const uint8_t pin, void (*irq)(void), const uint32_t mode)
