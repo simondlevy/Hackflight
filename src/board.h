@@ -18,6 +18,9 @@
 
 #include "core.h"
 
+#include <stm32_dshot.h>
+#include <dshot.h>
+
 class Stm32Board {
 
     private:
@@ -266,10 +269,8 @@ class Stm32Board {
             ledSet(false);
         }
 
-        bool getMotors(int16_t rawGyro[3],  float motors[4])
+        void step(int16_t rawGyro[3], int16_t rawAccel[3], Stm32Dshot & dshot)
         {
-            bool ready = false;
-
             auto nowCycles = getCycleCounter();
 
             if (m_core.isCoreTaskReady(nowCycles)) {
@@ -290,22 +291,14 @@ class Stm32Board {
 
                 m_core.step(rawGyro, usec, mixmotors);
 
-                memcpy(motors, 
-                       m_core.armingStatus == Core::ARMING_ARMED ?
-                       mixmotors :
-                        m_core.visualizerTask.motors,
-                        4 * sizeof(float));
-
-                ready = true;
+                dshot.write(
+                        m_core.armingStatus == Core::ARMING_ARMED ?
+                        mixmotors :
+                        m_core.visualizerTask.motors);
 
                 m_core.updateScheduler(nowCycles, nextTargetCycles);
             }
 
-            return ready;
-        }
-
-        void update(int16_t rawAccel[3])
-        {
             if (m_core.isDynamicTaskReady(getCycleCounter())) {
                 runDynamicTasks(rawAccel);
             }
