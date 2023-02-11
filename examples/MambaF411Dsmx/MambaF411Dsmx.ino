@@ -21,6 +21,7 @@
 #include <board/stm32f/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
+#include <esc/dshot.h>
 #include <imu/softquat.h>
 
 #include <dsmrx.h>
@@ -42,11 +43,13 @@ static const uint8_t IMU_MOSI_PIN = PA7;
 static const uint8_t IMU_MISO_PIN = PA6;
 static const uint8_t IMU_SCLK_PIN = PA5;
 
+static std::vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
+
 static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
 static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
 
-static std::vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
+static Dsm2048 rx;
 
 static Stm32F411Dshot dshot(&MOTOR_PINS);
 
@@ -58,8 +61,6 @@ static AnglePidController anglePid(
         0.0); // 3.0; // Level Kp
 
 static Mixer mixer = QuadXbfMixer::make();
-
-static Dsm2048 rx;
 
 static SoftQuatImu imu(Imu::rotate180);
 
