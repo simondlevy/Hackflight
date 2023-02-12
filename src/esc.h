@@ -19,28 +19,11 @@
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include <vector>
-
 class Esc {
-
-    private:
-
-        std::vector<uint8_t> * m_motorPins;
-
-    protected:
-
-        Esc(std::vector<uint8_t> * motorPins)
-        {
-            m_motorPins = motorPins;
-        }
 
     public:
 
         virtual void begin(void) = 0;
 
         virtual void write(float motors[]) = 0;
-
 }; 

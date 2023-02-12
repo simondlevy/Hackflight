@@ -24,23 +24,33 @@
 
 #include <vector>
 
+#include <stm32dshot.h>
+
 #include "esc.h"
 
 class DshotEsc : public Esc {
 
+    private:
+
+        Stm32Dshot * m_dshot;
+
+        std::vector<uint8_t> * m_motorPins;
+
     public:
 
-        DshotEsc(std::vector<uint8_t> * motorPins)
-            : Esc(motorPins)
+        DshotEsc(Stm32Dshot * dshot, std::vector<uint8_t> * motorPins)
         {
+            m_motorPins = motorPins;
+            m_dshot = dshot;
         }
 
         virtual void begin(void) override
         {
+            m_dshot->begin(*m_motorPins);
         }
 
         virtual void write(float motors[]) override
         {
-            (void)motors;
+            m_dshot->write(motors);
         }
 }; 

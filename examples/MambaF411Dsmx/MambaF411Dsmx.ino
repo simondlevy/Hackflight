@@ -53,6 +53,8 @@ static Dsm2048 rx;
 
 static Stm32F411Dshot dshot;
 
+static DshotEsc esc = DshotEsc(&dshot, &MOTOR_PINS);
+
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
