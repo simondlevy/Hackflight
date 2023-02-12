@@ -47,7 +47,7 @@ static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
 
 static std::vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
 
-static Stm32F405Dshot dshot(&MOTOR_PINS);
+static Stm32F405Dshot dshot;
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -108,7 +108,7 @@ void setup(void)
 
     mpu.begin();
 
-    dshot.begin();
+    dshot.begin(MOTOR_PINS);
 
     board.begin();
 }

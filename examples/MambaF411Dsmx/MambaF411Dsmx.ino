@@ -21,7 +21,6 @@
 #include <board/stm32f/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
-#include <esc/dshot.h>
 #include <imu/softquat.h>
 
 #include <dsmrx.h>
@@ -51,7 +50,7 @@ static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
 
 static Dsm2048 rx;
 
-static Stm32F411Dshot dshot(&MOTOR_PINS);
+static Stm32F411Dshot dshot;
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -106,7 +105,7 @@ void setup(void)
 
     mpu.begin();
 
-    dshot.begin();
+    dshot.begin(MOTOR_PINS);
 
     board.begin();
 }
