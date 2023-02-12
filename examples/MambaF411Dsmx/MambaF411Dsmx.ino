@@ -29,7 +29,6 @@
 #include <vector>
 
 #include <SPI.h>
-
 #include <mpu6x00.h>
 
 #include <stm32dshot.h>
@@ -68,7 +67,7 @@ static SoftQuatImu imu(Imu::rotate180);
 
 static std::vector<PidController *> pids = {&anglePid};
 
-static Stm32F4Board board(imu, pids, mixer, LED_PIN);
+static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
 
 // Motor interrupt
 extern "C" void handleDmaIrq(void)
@@ -108,8 +107,6 @@ void setup(void)
 
     mpu.begin();
 
-    dshot.begin(MOTOR_PINS);
-
     board.begin();
 }
 
@@ -121,5 +118,5 @@ void loop(void)
     int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
-    board.step(rawGyro, rawAccel, dshot);
+    board.step(rawGyro, rawAccel);
 }

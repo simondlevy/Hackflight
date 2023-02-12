@@ -17,6 +17,7 @@
 #pragma once
 
 #include "core.h"
+#include "esc.h"
 
 #include <stm32dshot.h>
 
@@ -31,6 +32,8 @@ class Stm32Board {
         bool m_ledInverted;
 
         uint8_t m_imuInterruptPin;
+
+        Esc * m_esc;
 
         void runDynamicTasks(const int16_t rawAccel[3])
         {
@@ -200,11 +203,13 @@ class Stm32Board {
                 Imu * imu,
                 std::vector<PidController *> & pidControllers,
                 Mixer & mixer,
+                Esc & esc,
                 const int8_t ledPin)
         {
             m_core.imu = imu;
             m_core.pidControllers = &pidControllers;
             m_core.mixer = &mixer;
+            m_esc = &esc;
 
             // Support negative LED pin number for inversion
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
@@ -256,6 +261,8 @@ class Stm32Board {
 
             m_core.imu->begin(getClockSpeed());
 
+            m_esc->begin();
+
             pinMode(m_ledPin, OUTPUT);
 
             ledSet(false);
@@ -268,7 +275,7 @@ class Stm32Board {
             ledSet(false);
         }
 
-        void step(int16_t rawGyro[3], int16_t rawAccel[3], Stm32Dshot & dshot)
+        void step(int16_t rawGyro[3], int16_t rawAccel[3])
         {
             auto nowCycles = getCycleCounter();
 
@@ -290,7 +297,7 @@ class Stm32Board {
 
                 m_core.step(rawGyro, usec, mixmotors);
 
-                dshot.write(
+                m_esc->write(
                         m_core.armingStatus == Core::ARMING_ARMED ?
                         mixmotors :
                         m_core.visualizerTask.motors);
@@ -303,13 +310,9 @@ class Stm32Board {
             }
         }
 
-        void step(
-                int16_t rawGyro[3],
-                int16_t rawAccel[3],
-                Stm32Dshot & dshot,
-                HardwareSerial & serial)
+        void step(int16_t rawGyro[3], int16_t rawAccel[3], HardwareSerial & serial)
         {
-            step(rawGyro, rawAccel, dshot);
+            step(rawGyro, rawAccel);
 
             while (m_core.skyrangerTask.imuDataAvailable()) {
                 serial.write(m_core.skyrangerTask.readImuData());
