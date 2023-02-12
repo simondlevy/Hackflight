@@ -18,8 +18,7 @@
 
 #include "core.h"
 
-#include <stm32_dshot.h>
-#include <dshot.h>
+#include <stm32dshot.h>
 
 class Stm32Board {
 
@@ -294,8 +293,7 @@ class Stm32Board {
                 dshot.write(
                         m_core.armingStatus == Core::ARMING_ARMED ?
                         mixmotors :
-                        m_core.visualizerTask.motors, 
-                        4); // XXX should be more general
+                        m_core.visualizerTask.motors);
 
                 m_core.updateScheduler(nowCycles, nextTargetCycles);
             }

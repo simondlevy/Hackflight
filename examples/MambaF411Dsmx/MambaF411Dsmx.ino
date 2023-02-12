@@ -31,7 +31,7 @@
 
 #include <mpu6x00.h>
 
-#include <stm32_dshot.h>
+#include <stm32dshot.h>
 #include <dshot/stm32f4/stm32f411.h>
 
 static const uint8_t LED_PIN     = PC14;

@@ -30,7 +30,7 @@
 #include <SPI.h>
 #include <mpu6x00.h>
 
-#include <stm32_dshot.h>
+#include <stm32dshot.h>
 #include <dshot/stm32f4/stm32f405.h>
 
 static const uint8_t LED_PIN     = PB5;
