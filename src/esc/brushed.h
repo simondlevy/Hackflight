@@ -24,33 +24,32 @@
 
 #include <vector>
 
-#include <stm32dshot.h>
-
 #include "esc.h"
 
-class DshotEsc : public Esc {
+class BrushedEsc : public Esc {
 
     private:
-
-        Stm32Dshot * m_dshot;
 
         std::vector<uint8_t> * m_motorPins;
 
     public:
 
-        DshotEsc(Stm32Dshot * dshot, std::vector<uint8_t> * motorPins)
+        BrushedEsc(std::vector<uint8_t> * motorPins)
         {
             m_motorPins = motorPins;
-            m_dshot = dshot;
         }
 
         virtual void begin(void) override
         {
-            m_dshot->begin(*m_motorPins);
+            for (auto pin : *m_motorPins) {
+                analogWrite(pin, 0);
+            }
         }
 
         virtual void write(float motorValues[]) override
         {
-            m_dshot->write(motorValues);
+            for (uint8_t k=0; k<m_motorPins->size(); ++k) {
+                analogWrite((*m_motorPins)[k], (uint8_t)(motorValues[k] * 255));
+            }
         }
 }; 
