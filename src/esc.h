@@ -19,7 +19,18 @@
 
 #pragma once
 
+#include <vector>
+
 class Esc {
+
+    protected:
+
+        std::vector<uint8_t> * m_motorPins;
+
+        Esc(std::vector<uint8_t> * motorPins)
+        {
+            m_motorPins = motorPins;
+        }
 
     public:
 

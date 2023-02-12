@@ -34,13 +34,11 @@ class DshotEsc : public Esc {
 
         Stm32Dshot * m_dshot;
 
-        std::vector<uint8_t> * m_motorPins;
-
     public:
 
         DshotEsc(Stm32Dshot * dshot, std::vector<uint8_t> * motorPins)
+            : Esc(motorPins)
         {
-            m_motorPins = motorPins;
             m_dshot = dshot;
         }
 
