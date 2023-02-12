@@ -19,26 +19,21 @@
 
 #pragma once
 
-#include <vector>
 
-class Esc {
-
-    protected:
-
-        std::vector<uint8_t> * m_motorPins;
-
-        Esc(std::vector<uint8_t> * motorPins)
-        {
-            m_motorPins = motorPins;
-        }
-
-        Esc(void)
-        {
-        }
+class MockEsc : public Esc {
 
     public:
 
-        virtual void begin(void) = 0;
+        MockEsc(void)
+        {
+        }
 
-        virtual void write(float motors[]) = 0;
+        virtual void begin(void) override
+        {
+        }
+
+        virtual void write(float motorValues[]) override
+        {
+            (void)motorValues;
+        }
 }; 
