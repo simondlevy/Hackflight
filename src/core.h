@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "core/mixer.h"
-#include "esc.h"
 #include "imu.h"
 #include "scheduler.h"
 #include "task/accelerometer.h"
@@ -126,8 +125,6 @@ class Core {
 
         Imu * imu;
 
-        Esc * esc;
-
         std::vector<PidController *> * pidControllers;
 
         uint32_t imuInterruptCount;
@@ -178,7 +175,7 @@ class Core {
 
             for (auto i=0; i<mixer->getMotorCount(); i++) {
 
-                mixmotors[i] = esc->getMotorValue(motors.values[i]);
+                mixmotors[i] = motors.values[i];
             }
         }
 

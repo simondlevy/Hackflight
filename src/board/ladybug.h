@@ -47,13 +47,13 @@ class LadybugBoard : public Stm32Board {
             Usfs::INTERRUPT_GYRO | 
             Usfs::INTERRUPT_QUAT;
 
-        std::vector<uint8_t> motorPins = {0x0D, 0x10, 0x03, 0x0B};
+        std::vector<uint8_t> MOTOR_PINS = {0x0D, 0x10, 0x03, 0x0B};
 
         Usfs m_usfs;
 
         LadybugImu m_imu; 
 
-        BrushedEsc esc = BrushedEsc(motorPins);
+        BrushedEsc esc = BrushedEsc(&MOTOR_PINS);
 
         int16_t m_rawAccel[3] = {};
 

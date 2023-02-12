@@ -18,11 +18,11 @@
  */
 
 #include <hackflight.h>
-#include <board/stm32f/stm32f4/stm32f411.h>
+#include <board/stm32f/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
-#include <imu/softquat.h>
 #include <esc/dshot.h>
+#include <imu/softquat.h>
 
 #include <dsmrx.h>
 
@@ -30,6 +30,9 @@
 
 #include <SPI.h>
 #include <mpu6x00.h>
+
+#include <stm32dshot.h>
+#include <dshot/stm32f4/stm32f411.h>
 
 static const uint8_t LED_PIN     = PC14;
 static const uint8_t IMU_CS_PIN  = PA4;
@@ -39,11 +42,17 @@ static const uint8_t IMU_MOSI_PIN = PA7;
 static const uint8_t IMU_MISO_PIN = PA6;
 static const uint8_t IMU_SCLK_PIN = PA5;
 
+static std::vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
+
 static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
 static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
 
-static std::vector <uint8_t> MOTOR_PINS = {PB3, PB4, PB6, PB7};
+static Dsm2048 rx;
+
+static Stm32F411Dshot dshot;
+
+static DshotEsc esc = DshotEsc(&dshot, &MOTOR_PINS);
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -54,20 +63,16 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static Dsm2048 rx;
-
 static SoftQuatImu imu(Imu::rotate180);
 
 static std::vector<PidController *> pids = {&anglePid};
 
-static DshotEsc esc(MOTOR_PINS);
-
-static Stm32F411Board board(imu, pids, mixer, esc, LED_PIN);
+static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
 
 // Motor interrupt
 extern "C" void handleDmaIrq(void)
 {
-    board.handleDmaIrq(0);
+    dshot.handleDmaIrq(0);
 }
 
 // IMU interrupt
