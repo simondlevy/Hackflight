@@ -143,7 +143,6 @@ resource PULLDOWN 4 NONE
 timer B09 AF3
 # pin B09: TIM11 CH1 (AF3)
 
-
 # motors ######################
 timer B03 AF1
 # pin B03: TIM2 CH2 (AF1)
