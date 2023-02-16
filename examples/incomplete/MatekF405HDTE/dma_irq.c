@@ -19,7 +19,6 @@
 
 void handleDmaIrq(uint8_t id);
 
-/*
 void DMA2_Stream1_IRQHandler(void) 
 {
     handleDmaIrq(0);
@@ -28,4 +27,4 @@ void DMA2_Stream1_IRQHandler(void)
 void DMA2_Stream2_IRQHandler(void) 
 {
     handleDmaIrq(1);
-}*/
+}

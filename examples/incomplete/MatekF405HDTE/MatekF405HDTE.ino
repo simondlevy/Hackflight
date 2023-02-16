@@ -21,8 +21,7 @@
 #include <board/stm32f/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
-//#include <esc/dshot.h>
-#include <esc/mock.h>
+#include <esc/dshot.h>
 #include <imu/softquat.h>
 
 #include <vector>
@@ -30,8 +29,8 @@
 #include <SPI.h>
 #include <ICM42688.h>
 
-//#include <stm32dshot.h>
-//#include <dshot/stm32f4/stm32f405.h>
+#include <stm32dshot.h>
+#include <dshot/stm32f4/stm32f405.h>
 
 static const uint8_t LED_PIN     = PA13;
 
@@ -42,17 +41,15 @@ static const uint8_t IMU_MOSI_PIN = PA7;
 static const uint8_t IMU_MISO_PIN = PB4;
 static const uint8_t IMU_SCLK_PIN = PA5;
 
-//static std::vector<uint8_t> MOTOR_PINS = {PC9, PC8, PB15, PA8};
+static std::vector<uint8_t> MOTOR_PINS = {PC9, PC8, PB15, PA8};
 
 static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
 static ICM42688 icm(spi, IMU_CS_PIN);
 
-//static Stm32F405Dshot dshot;
+static Stm32F405Dshot dshot;
 
-//static DshotEsc esc = DshotEsc(&dshot, &MOTOR_PINS);
-
-static MockEsc esc;
+static DshotEsc esc = DshotEsc(&dshot, &MOTOR_PINS);
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -69,19 +66,16 @@ static std::vector<PidController *> pids = {&anglePid};
 
 static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
 
-/*
 // DSHOT timer interrupt
 extern "C" void handleDmaIrq(uint8_t id)
 {
     dshot.handleDmaIrq(id);
-}*/
+}
 
 // IMU interrupt
-static uint32_t count;
 static void handleImuInterrupt(void)
 {
     board.handleImuInterrupt();
-    count++;
 }
 
 void setup(void)
@@ -109,7 +103,6 @@ void loop(void)
         icm.getAccelY_count(),
         icm.getAccelZ_count()
     };
-
 
     board.step(rawGyro, rawAccel);
 }
