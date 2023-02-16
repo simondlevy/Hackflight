@@ -27,25 +27,26 @@
 
 #include <vector>
 
-//#include <SPI.h>
-//#include <mpu6x00.h>
+#include <SPI.h>
+#include <ICM42688.h>
 
 //#include <stm32dshot.h>
 //#include <dshot/stm32f4/stm32f405.h>
 
 static const uint8_t LED_PIN     = PA13;
-//static const uint8_t IMU_CS_PIN  = PC14;
-//static const uint8_t IMU_INT_PIN = PC15;
 
-//static const uint8_t IMU_MOSI_PIN = PA7;
-//static const uint8_t IMU_MISO_PIN = PA6;
-//static const uint8_t IMU_SCLK_PIN = PA5;
+static const uint8_t IMU_CS_PIN  = PC14;
+static const uint8_t IMU_INT_PIN = PC15;
+
+static const uint8_t IMU_MOSI_PIN = PA7;
+static const uint8_t IMU_MISO_PIN = PB4;
+static const uint8_t IMU_SCLK_PIN = PA5;
 
 //static std::vector<uint8_t> MOTOR_PINS = {PC9, PC8, PB15, PA8};
 
-//static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
+static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
-//static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
+static ICM42688 icm(spi, IMU_CS_PIN);
 
 //static Stm32F405Dshot dshot;
 
@@ -62,42 +63,53 @@ static AnglePidController anglePid(
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static SoftQuatImu imu(Imu::rotate270);
+static SoftQuatImu imu(Imu::rotate270Flip);
 
 static std::vector<PidController *> pids = {&anglePid};
 
 static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
 
-// DSHOT timer interrupt
 /*
+// DSHOT timer interrupt
 extern "C" void handleDmaIrq(uint8_t id)
 {
     dshot.handleDmaIrq(id);
-}
+}*/
 
 // IMU interrupt
+static uint32_t count;
 static void handleImuInterrupt(void)
 {
     board.handleImuInterrupt();
-}*/
+    count++;
+}
 
 void setup(void)
 {
     // Set up IMU interrupt
-    //board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
+    board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
 
-    //mpu.begin();
+    icm.begin();
 
     board.begin();
 }
 
 void loop(void)
 {
-    //mpu.readSensor();
+    icm.getAGT();
 
-    int16_t rawGyro[3] = {/*mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ()*/};
-    int16_t rawAccel[3] = {/*mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ()*/};
+    int16_t rawGyro[3] = { 
+        icm.getGyroX_count(),
+        icm.getGyroY_count(),
+        icm.getGyroZ_count()
+    };
+
+    int16_t rawAccel[3] = { 
+        icm.getAccelX_count(),
+        icm.getAccelY_count(),
+        icm.getAccelZ_count()
+    };
+
 
     board.step(rawGyro, rawAccel);
-
 }

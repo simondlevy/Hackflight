@@ -1,6 +1,6 @@
 SKETCH = MatekF405HDTE
 
-FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
+FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F415RGTX,usb=CDCgen
 
 PORT = /dev/ttyACM0
 

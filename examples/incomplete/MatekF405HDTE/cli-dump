@@ -110,6 +110,7 @@ resource LED 3 NONE
 resource RX_BIND 1 NONE
 resource RX_BIND_PLUG 1 NONE
 resource TRANSPONDER 1 NONE
+
 resource SPI_SCK 1 A05
 resource SPI_SCK 2 B13
 resource SPI_SCK 3 NONE
@@ -119,6 +120,7 @@ resource SPI_MISO 3 NONE
 resource SPI_MOSI 1 A07
 resource SPI_MOSI 2 C03
 resource SPI_MOSI 3 NONE
+
 resource ESCSERIAL 1 NONE
 resource ADC_BATT 1 C04
 resource ADC_RSSI 1 B00

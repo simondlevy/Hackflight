@@ -84,17 +84,17 @@ void loop(void)
 {
     icm.getAGT();
 
-    int16_t gyroCounts[3] = { 
+    int16_t rawGyro[3] = { 
         icm.getGyroX_count(),
         icm.getGyroY_count(),
         icm.getGyroZ_count()
     };
 
-    int16_t accelCounts[3] = { 
+    int16_t rawAccel[3] = { 
         icm.getAccelX_count(),
         icm.getAccelY_count(),
         icm.getAccelZ_count()
     };
 
-    board.step(gyroCounts, accelCounts);
+    board.step(rawGyro, rawAccel);
 }
