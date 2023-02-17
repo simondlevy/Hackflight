@@ -28,14 +28,18 @@
 
 class BrushedEsc : public Esc {
 
+    private:
+
+        std::vector<uint8_t> * m_motorPins;
+
     public:
 
         BrushedEsc(std::vector<uint8_t> * motorPins)
-            : Esc(motorPins)
         {
+            m_motorPins = motorPins;
         }
 
-        virtual void begin(void) override
+        void begin(void)
         {
             for (auto pin : *m_motorPins) {
                 analogWrite(pin, 0);

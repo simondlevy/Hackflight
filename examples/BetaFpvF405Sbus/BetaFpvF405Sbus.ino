@@ -42,7 +42,10 @@ static const uint8_t IMU_MOSI_PIN = PA7;
 static const uint8_t IMU_MISO_PIN = PA6;
 static const uint8_t IMU_SCLK_PIN = PA5;
 
-static std::vector<uint8_t> MOTOR_PINS = {PB_0, PB_1, PA_3, PA_2};
+static const uint8_t MOTOR1_PIN = PB_0;
+static const uint8_t MOTOR2_PIN = PB_1;
+static const uint8_t MOTOR3_PIN = PA_3;
+static const uint8_t MOTOR4_PIN = PA_2;
 
 static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
@@ -52,7 +55,7 @@ static bfs::SbusRx rx(&Serial3);
 
 static Stm32F4Dshot dshot;
 
-static DshotEsc esc = DshotEsc(&dshot, &MOTOR_PINS);
+static DshotEsc esc = DshotEsc(&dshot);
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -113,10 +116,12 @@ void setup(void)
 
     board.begin();
 
-    dshot.initMotor(MOTOR_PINS, 0, 0); 
-    dshot.initMotor(MOTOR_PINS, 1, 0);
-    dshot.initMotor(MOTOR_PINS, 2, 1);
-    dshot.initMotor(MOTOR_PINS, 3, 1);
+    dshot.begin();
+
+    dshot.addMotor(MOTOR1_PIN, 0); 
+    dshot.addMotor(MOTOR2_PIN, 0);
+    dshot.addMotor(MOTOR3_PIN, 1);
+    dshot.addMotor(MOTOR4_PIN, 1);
 }
 
 void loop(void)

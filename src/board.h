@@ -261,8 +261,6 @@ class Stm32Board {
 
             m_core.imu->begin(getClockSpeed());
 
-            m_esc->begin();
-
             pinMode(m_ledPin, OUTPUT);
 
             ledSet(false);

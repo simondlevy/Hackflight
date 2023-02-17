@@ -93,6 +93,8 @@ class LadybugBoard : public Stm32Board {
             // Clear interrupts
             Usfs::checkStatus();
 
+
+            esc.begin();
         }
 
         void step(void)

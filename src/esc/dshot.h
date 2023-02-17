@@ -36,15 +36,9 @@ class DshotEsc : public Esc {
 
     public:
 
-        DshotEsc(Stm32Dshot * dshot, std::vector<uint8_t> * motorPins)
-            : Esc(motorPins)
+        DshotEsc(Stm32Dshot * dshot)
         {
             m_dshot = dshot;
-        }
-
-        virtual void begin(void) override
-        {
-            m_dshot->begin(*m_motorPins);
         }
 
         virtual void write(float motorValues[]) override

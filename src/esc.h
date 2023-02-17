@@ -23,22 +23,7 @@
 
 class Esc {
 
-    protected:
-
-        std::vector<uint8_t> * m_motorPins;
-
-        Esc(std::vector<uint8_t> * motorPins)
-        {
-            m_motorPins = motorPins;
-        }
-
-        Esc(void)
-        {
-        }
-
     public:
-
-        virtual void begin(void) = 0;
 
         virtual void write(float motors[]) = 0;
 }; 
