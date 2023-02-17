@@ -19,7 +19,7 @@
 #include "core.h"
 #include "esc.h"
 
-#include <stm32dshot.h>
+#include <dshot.h>
 
 class Stm32Board {
 

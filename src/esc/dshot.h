@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include <stm32dshot.h>
+#include <dshot.h>
 
 #include "esc.h"
 

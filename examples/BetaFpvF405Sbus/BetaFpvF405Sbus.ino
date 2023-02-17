@@ -31,8 +31,8 @@
 #include <SPI.h>
 #include <mpu6x00.h>
 
-#include <stm32dshot.h>
-#include <dshot/stm32f4/stm32f405.h>
+#include <dshot.h>
+#include <stm32/stm32f4/stm32f405.h>
 
 static const uint8_t LED_PIN     = PB5;
 static const uint8_t IMU_CS_PIN  = PA4;
