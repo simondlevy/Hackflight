@@ -32,7 +32,7 @@
 #include <mpu6x00.h>
 
 #include <dshot.h>
-#include <stm32/stm32f4/stm32f405.h>
+#include <stm32/stm32f4.h>
 
 static const uint8_t LED_PIN     = PB5;
 static const uint8_t IMU_CS_PIN  = PA4;
@@ -50,7 +50,7 @@ static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
 
 static bfs::SbusRx rx(&Serial3);
 
-static Stm32F405Dshot dshot;
+static Stm32F4Dshot dshot;
 
 static DshotEsc esc = DshotEsc(&dshot, &MOTOR_PINS);
 
@@ -112,6 +112,11 @@ void setup(void)
     mpu.begin();
 
     board.begin();
+
+    dshot.initMotor(MOTOR_PINS, 0, 0); 
+    dshot.initMotor(MOTOR_PINS, 1, 0);
+    dshot.initMotor(MOTOR_PINS, 2, 1);
+    dshot.initMotor(MOTOR_PINS, 3, 1);
 }
 
 void loop(void)
