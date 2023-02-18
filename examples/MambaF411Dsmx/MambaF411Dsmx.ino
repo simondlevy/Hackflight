@@ -73,7 +73,7 @@ static std::vector<PidController *> pids = {&anglePid};
 static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
 
 // Motor interrupt
-extern "C" void handleDmaIrq(void)
+extern "C" void DMA2_Stream1_IRQHandler(void) 
 {
     dshot.handleDmaIrq(0);
 }

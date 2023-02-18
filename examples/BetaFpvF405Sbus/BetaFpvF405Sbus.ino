@@ -72,10 +72,14 @@ static std::vector<PidController *> pids = {&anglePid};
 
 static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
 
-// DSHOT timer interrupt
-extern "C" void handleDmaIrq(uint8_t id)
+extern "C" void DMA2_Stream1_IRQHandler(void) 
 {
-    dshot.handleDmaIrq(id);
+    dshot.handleDmaIrq(0);
+}
+
+extern "C" void DMA2_Stream2_IRQHandler(void) 
+{
+    dshot.handleDmaIrq(1);
 }
 
 // IMU interrupt
