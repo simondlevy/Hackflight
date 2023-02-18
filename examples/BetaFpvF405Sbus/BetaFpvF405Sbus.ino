@@ -21,6 +21,7 @@
 #include <board/stm32f/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
+#include <debug.h>
 #include <esc/dshot.h>
 #include <imu/softquat.h>
 
@@ -137,5 +138,4 @@ void loop(void)
 
     // Support sending attitude data to Skyranger over Serial4
     board.step(rawGyro, rawAccel, Serial4);
-
 }
