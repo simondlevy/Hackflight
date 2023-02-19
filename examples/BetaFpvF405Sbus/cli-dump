@@ -194,13 +194,13 @@ dma pin C08 NONE
 
 # motors ######################
 dma pin B00 0
-# pin B00: DMA1 Stream 7 Channel 5
+# pin B00: DMA1 Stream 7 Channel 5 = TIM4_CH3
 dma pin B01 0
-# pin B01: DMA1 Stream 2 Channel 5
+# pin B01: DMA1 Stream 2 Channel 5 = TIM3_CH4
 dma pin A03 1
-# pin A03: DMA1 Stream 6 Channel 3
+# pin A03: DMA1 Stream 6 Channel 3 = TIM2_CH2/4
 dma pin A02 0
-# pin A02: DMA1 Stream 1 Channel 3
+# pin A02: DMA1 Stream 1 Channel 3 = TIMT2_CH3
 ###############################
 
 dma pin B06 0

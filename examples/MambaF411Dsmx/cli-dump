@@ -145,13 +145,13 @@ timer B09 AF3
 
 # motors ######################
 timer B03 AF1
-# pin B03: TIM2 CH2 (AF1)
+# pin B03: TIM2 CH2 (AF1) = Stream 6
 timer B04 AF2
-# pin B04: TIM3 CH1 (AF2)
+# pin B04: TIM3 CH1 (AF2) = Stream 4
 timer B06 AF2
-# pin B06: TIM4 CH1 (AF2)
+# pin B06: TIM4 CH1 (AF2) = Stream 0
 timer B07 AF2
-# pin B07: TIM4 CH2 (AF2)
+# pin B07: TIM4 CH2 (AF2) = Stream 3
 ###############################
 
 timer A15 AF1
