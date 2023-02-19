@@ -49,7 +49,7 @@ static const uint8_t MOTOR4_PIN = PB7;
 
 static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
-static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
+static Mpu6500 mpu = Mpu6500(spi, IMU_CS_PIN);
 
 static bfs::SbusRx rx(&Serial1);
 
