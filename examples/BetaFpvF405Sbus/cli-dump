@@ -200,7 +200,7 @@ dma pin B01 0
 dma pin A03 1
 # pin A03: DMA1 Stream 6 Channel 3 = TIM2_CH2/4
 dma pin A02 0
-# pin A02: DMA1 Stream 1 Channel 3 = TIMT2_CH3
+# pin A02: DMA1 Stream 1 Channel 3 = TIM2_CH3
 ###############################
 
 dma pin B06 0
