@@ -24,7 +24,7 @@
 #include <esc/dshot.h>
 #include <imu/softquat.h>
 
-#include <dsmrx.h>
+#include <sbus.h>
 
 #include <vector>
 
@@ -51,7 +51,7 @@ static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
 static Mpu6x00 mpu = Mpu6x00(spi, IMU_CS_PIN);
 
-static Dsm2048 rx;
+static bfs::SbusRx rx(&Serial1);
 
 static Stm32F4Dshot dshot;
 
@@ -87,18 +87,11 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent1(void)
 {
-    while (Serial1.available()) {
+    if (rx.Read()) {
 
-        const auto usec = micros();
+        bfs::SbusData data = rx.data();
 
-        rx.handleSerialEvent(Serial1.read(), usec);
-
-        if (rx.gotNewFrame()) {
-
-            uint16_t values[8] = {};
-            rx.getChannelValues(values, 8);
-            board.setDsmxValues(values, micros(), rx.timedOut(usec));
-        }
+        board.setSbusValues((uint16_t *)data.ch, micros(), data.lost_frame);
     }
 }
 
@@ -106,7 +99,8 @@ void setup(void)
 {
     board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
 
-    Serial1.begin(115200);
+    // Start receiver UART
+    Serial1.begin(100000, SERIAL_8E2);
 
     mpu.begin();
 

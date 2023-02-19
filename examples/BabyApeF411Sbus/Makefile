@@ -1,4 +1,4 @@
-SKETCH = BabyApeF411Dsmx
+SKETCH = BabyApeF411Sbus
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
 
