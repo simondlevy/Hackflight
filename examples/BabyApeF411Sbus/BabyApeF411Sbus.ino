@@ -36,7 +36,7 @@
 
 static const uint8_t LED_PIN     = PC13;
 static const uint8_t IMU_CS_PIN  = PA4;
-static const uint8_t IMU_INT_PIN = PB0;
+static const uint8_t IMU_INT_PIN = PA1;
 
 static const uint8_t IMU_MOSI_PIN = PA7;
 static const uint8_t IMU_MISO_PIN = PA6;

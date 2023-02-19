@@ -117,6 +117,8 @@ void setup(void)
     // Start Skyranger UART
     Serial4.begin(115200);
 
+    spi.begin();
+
     mpu.begin();
 
     board.begin();
