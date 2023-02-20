@@ -116,10 +116,10 @@ void setup(void)
 
     dshot.begin();
 
-    dshot.addMotor(MOTOR1_PIN, 0); // PB3
-    dshot.addMotor(MOTOR2_PIN, 0); // PB4
-    dshot.addMotor(MOTOR3_PIN, 0); // PB6
-    dshot.addMotor(MOTOR4_PIN, 0); // PB7
+    dshot.addMotorStream1(MOTOR1_PIN); // PB3
+    dshot.addMotorStream1(MOTOR2_PIN); // PB4
+    dshot.addMotorStream1(MOTOR3_PIN); // PB6
+    dshot.addMotorStream1(MOTOR4_PIN); // PB7
 }
 
 void loop(void)

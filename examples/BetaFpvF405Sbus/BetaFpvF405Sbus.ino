@@ -125,10 +125,10 @@ void setup(void)
 
     dshot.begin();
 
-    dshot.addMotor(MOTOR1_PIN, 0); // PB_0 = 0x10
-    dshot.addMotor(MOTOR2_PIN, 0); // PB_2 = 0x11
-    dshot.addMotor(MOTOR3_PIN, 1); // PA_3 = 0x03
-    dshot.addMotor(MOTOR4_PIN, 1); // PA_2 = 0x02
+    dshot.addMotorStream1(MOTOR1_PIN); // PB_0 = 0x10
+    dshot.addMotorStream1(MOTOR2_PIN); // PB_2 = 0x11
+    dshot.addMotorStream2(MOTOR3_PIN); // PA_3 = 0x03
+    dshot.addMotorStream2(MOTOR4_PIN); // PA_2 = 0x02
 }
 
 void loop(void)

@@ -100,13 +100,13 @@ void setup(void)
 
     dshot.begin();
 
-    dshot.addMotor(MOTOR1_PIN, 1); // PC9
-    dshot.addMotor(MOTOR2_PIN, 1); // PC8
-    dshot.addMotor(MOTOR3_PIN, 0); // PB15
+    dshot.addMotorStream2(MOTOR1_PIN); // PC9
+    dshot.addMotorStream2(MOTOR2_PIN); // PC8
+    dshot.addMotorStream1(MOTOR3_PIN); // PB15
 
-    dshot.addMotor(MOTOR5_PIN, 0); // PB11
-    dshot.addMotor(MOTOR6_PIN, 0); // PB10
-    dshot.addMotor(MOTOR7_PIN, 0); // PB3
+    dshot.addMotorStream1(MOTOR5_PIN); // PB11
+    dshot.addMotorStream1(MOTOR6_PIN); // PB10
+    dshot.addMotorStream1(MOTOR7_PIN); // PB3
 }
 
 void loop(void)
