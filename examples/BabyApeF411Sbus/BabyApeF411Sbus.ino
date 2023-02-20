@@ -75,7 +75,7 @@ static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
 // Motor interrupt
 extern "C" void DMA2_Stream1_IRQHandler(void) 
 {
-    dshot.handleDmaIrq(0);
+    dshot.handleDmaIrqStream1();
 }
 
 // IMU interrupt

@@ -75,12 +75,12 @@ static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
 
 extern "C" void DMA2_Stream1_IRQHandler(void) 
 {
-    dshot.handleDmaIrq(0);
+    dshot.handleDmaIrqStream1();
 }
 
 extern "C" void DMA2_Stream2_IRQHandler(void) 
 {
-    dshot.handleDmaIrq(1);
+    dshot.handleDmaIrqStream2();
 }
 
 // IMU interrupt
