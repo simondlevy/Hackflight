@@ -51,10 +51,13 @@ example, the maintenance of an error integral in a PID controller:
 
 By using header-only C++ classes whenever possible, avoiding C-style macros and 
 [null pointers](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/),
-and leveraging existing Arduino libraries for receivers, ESCs, and IMUs,
+and leveraging existing Arduino libraries for 
+[receivers](https://github.com/bolderflight/sbus),
+[ESCs](https://github.com/simondlevy/DshotSTM32),
+[and IMUs](https://github.com/simondlevy/MPU6x00),
 Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-beckman-dont-fear-the-monad) 
 approach to taming the complexity of flight control: you instantiate a Board
-subclass, passing it your IMU settings, PID controllers, mixer, ESC, and LED
+subclass, passing it your IMU settings, PID controllers, mixer, ESC type, and LED
 pin number.  In your ```loop``` function, you just call the ```step()``` method
 on the Board object, passing it the raw values from your IMU.  Look at this
 [example
