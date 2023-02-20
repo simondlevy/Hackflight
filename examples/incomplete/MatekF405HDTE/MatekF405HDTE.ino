@@ -29,8 +29,8 @@
 #include <SPI.h>
 #include <ICM42688.h>
 
-#include <stm32dshot.h>
-#include <dshot/stm32f4/stm32f405.h>
+#include <dshot.h>
+#include <stm32/stm32f4.h>
 
 static const uint8_t LED_PIN     = PA13;
 
@@ -41,15 +41,21 @@ static const uint8_t IMU_MOSI_PIN = PA7;
 static const uint8_t IMU_MISO_PIN = PB4;
 static const uint8_t IMU_SCLK_PIN = PA5;
 
-static std::vector<uint8_t> MOTOR_PINS = {PC9, PC8, PB15, PA8};
+static const uint8_t MOTOR1_PIN = PC9;
+static const uint8_t MOTOR2_PIN = PC8;
+static const uint8_t MOTOR3_PIN = PB15;
+
+static const uint8_t MOTOR5_PIN = PB11;
+static const uint8_t MOTOR6_PIN = PB10;
+static const uint8_t MOTOR7_PIN = PB3;
 
 static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
 static ICM42688 icm(spi, IMU_CS_PIN);
 
-static Stm32F405Dshot dshot;
+static Stm32F4Dshot dshot;
 
-static DshotEsc esc = DshotEsc(&dshot, &MOTOR_PINS);
+static DshotEsc esc = DshotEsc(&dshot);
 
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
@@ -86,6 +92,16 @@ void setup(void)
     icm.begin();
 
     board.begin();
+
+    dshot.begin();
+
+    dshot.addMotor(MOTOR1_PIN, 1);
+    dshot.addMotor(MOTOR2_PIN, 1);
+    dshot.addMotor(MOTOR3_PIN, 0);
+
+    dshot.addMotor(MOTOR5_PIN, 0);
+    dshot.addMotor(MOTOR6_PIN, 0);
+    dshot.addMotor(MOTOR7_PIN, 0);
 }
 
 void loop(void)
