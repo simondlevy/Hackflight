@@ -47,6 +47,8 @@ static const uint8_t MOTOR2_PIN = PB4;
 static const uint8_t MOTOR3_PIN = PB6;
 static const uint8_t MOTOR4_PIN = PB7;
 
+static std::vector<uint8_t> motorPins = {MOTOR1_PIN, MOTOR2_PIN, MOTOR3_PIN, MOTOR4_PIN};
+
 static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
 static Mpu6000 mpu = Mpu6000(spi, IMU_CS_PIN);
@@ -114,12 +116,7 @@ void setup(void)
 
     board.begin();
 
-    dshot.begin();
-
-    dshot.addMotorStream1(MOTOR1_PIN); // PB3
-    dshot.addMotorStream1(MOTOR2_PIN); // PB4
-    dshot.addMotorStream1(MOTOR3_PIN); // PB6
-    dshot.addMotorStream1(MOTOR4_PIN); // PB7
+    dshot.begin(motorPins);
 }
 
 void loop(void)

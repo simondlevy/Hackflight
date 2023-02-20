@@ -34,7 +34,6 @@
 #include <stm32/stm32f4.h>
 
 static const uint8_t LED_PIN     = PA13;
-
 static const uint8_t IMU_CS_PIN  = PC14;
 static const uint8_t IMU_INT_PIN = PC15;
 
@@ -49,6 +48,12 @@ static const uint8_t MOTOR3_PIN = PB15;
 static const uint8_t MOTOR5_PIN = PB11;
 static const uint8_t MOTOR6_PIN = PB10;
 static const uint8_t MOTOR7_PIN = PB3;
+
+static std::vector<uint8_t> stream1MotorPins = {
+    MOTOR3_PIN, MOTOR5_PIN, MOTOR6_PIN, MOTOR7_PIN
+};
+
+static std::vector<uint8_t> stream2MotorPins = {MOTOR1_PIN, MOTOR2_PIN};
 
 static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
 
@@ -83,7 +88,6 @@ extern "C" void DMA2_Stream2_IRQHandler(void)
     dshot.handleDmaIrqStream2();
 }
 
-// IMU interrupt
 static void handleImuInterrupt(void)
 {
     board.handleImuInterrupt();
@@ -91,22 +95,13 @@ static void handleImuInterrupt(void)
 
 void setup(void)
 {
-    // Set up IMU interrupt
     board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);
 
     icm.begin();
 
     board.begin();
 
-    dshot.begin();
-
-    dshot.addMotorStream2(MOTOR1_PIN); // PC9
-    dshot.addMotorStream2(MOTOR2_PIN); // PC8
-    dshot.addMotorStream1(MOTOR3_PIN); // PB15
-
-    dshot.addMotorStream1(MOTOR5_PIN); // PB11
-    dshot.addMotorStream1(MOTOR6_PIN); // PB10
-    dshot.addMotorStream1(MOTOR7_PIN); // PB3
+    dshot.begin(stream1MotorPins, stream2MotorPins);
 }
 
 void loop(void)
