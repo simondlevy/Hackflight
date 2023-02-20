@@ -126,12 +126,4 @@ void loop(void)
     };
 
     board.step(rawGyro, rawAccel);
-
-    Debug::printf("%x %x %x %x %x %x\n", 
-            MOTOR1_PIN, 
-            MOTOR2_PIN, 
-            MOTOR3_PIN, 
-            MOTOR5_PIN, 
-            MOTOR6_PIN, 
-            MOTOR7_PIN);
 }
