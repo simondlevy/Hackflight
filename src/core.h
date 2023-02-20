@@ -52,7 +52,7 @@ class Core {
             }
 
             if (hadSignal && !haveSignal) {
-                armingStatus = Core::ARMING_FAILSAFE;
+                armingStatus = ARMING_FAILSAFE;
             }
         }
 
@@ -81,13 +81,13 @@ class Core {
 
             if (receiverTask.getRawAux1() > 1500) {
                 if (!aux1WasSet) {
-                    armingStatus = Core::ARMING_ARMED;
+                    armingStatus = ARMING_ARMED;
                 }
                 aux1WasSet = true;
             }
             else {
                 if (aux1WasSet) {
-                    armingStatus = Core::ARMING_READY;
+                    armingStatus = ARMING_READY;
                 }
                 aux1WasSet = false;
             }
@@ -135,22 +135,22 @@ class Core {
 
             switch (armingStatus) {
 
-                case Core::ARMING_UNREADY:
+                case ARMING_UNREADY:
                     if (safeToArm(usec)) {
-                        armingStatus = Core::ARMING_READY;
+                        armingStatus = ARMING_READY;
                     }
                     break;
 
-                case Core::ARMING_READY:
+                case ARMING_READY:
                     if (safeToArm(usec)) {
                         checkArmingSwitch();
                     }
                     else {
-                        armingStatus = Core::ARMING_UNREADY;
+                        armingStatus = ARMING_UNREADY;
                     }
                     break;
 
-                case Core::ARMING_ARMED:
+                case ARMING_ARMED:
                     checkArmingSwitch();
                     break;
 
