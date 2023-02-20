@@ -108,10 +108,10 @@ void setup(void)
 
     dshot.begin();
 
-    dshot.addMotor(MOTOR1_PIN, 0); 
-    dshot.addMotor(MOTOR2_PIN, 0);
-    dshot.addMotor(MOTOR3_PIN, 0);
-    dshot.addMotor(MOTOR4_PIN, 0);
+    dshot.addMotor(MOTOR1_PIN, 0); // PB4
+    dshot.addMotor(MOTOR2_PIN, 0); // PB5
+    dshot.addMotor(MOTOR3_PIN, 0); // PB6
+    dshot.addMotor(MOTOR4_PIN, 0); // PB7
 }
 
 void loop(void)

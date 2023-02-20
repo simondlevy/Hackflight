@@ -21,6 +21,7 @@
 #include <board/stm32f/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
+#include <debug.h>
 #include <esc/dshot.h>
 #include <imu/softquat.h>
 
@@ -72,10 +73,14 @@ static std::vector<PidController *> pids = {&anglePid};
 
 static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
 
-// DSHOT timer interrupt
-extern "C" void handleDmaIrq(uint8_t id)
+extern "C" void DMA2_Stream1_IRQHandler(void) 
 {
-    dshot.handleDmaIrq(id);
+    dshot.handleDmaIrq(0);
+}
+
+extern "C" void DMA2_Stream2_IRQHandler(void) 
+{
+    dshot.handleDmaIrq(1);
 }
 
 // IMU interrupt
@@ -95,13 +100,13 @@ void setup(void)
 
     dshot.begin();
 
-    dshot.addMotor(MOTOR1_PIN, 1);
-    dshot.addMotor(MOTOR2_PIN, 1);
-    dshot.addMotor(MOTOR3_PIN, 0);
+    dshot.addMotor(MOTOR1_PIN, 1); // PC9
+    dshot.addMotor(MOTOR2_PIN, 1); // PC8
+    dshot.addMotor(MOTOR3_PIN, 0); // PB15
 
-    dshot.addMotor(MOTOR5_PIN, 0);
-    dshot.addMotor(MOTOR6_PIN, 0);
-    dshot.addMotor(MOTOR7_PIN, 0);
+    dshot.addMotor(MOTOR5_PIN, 0); // PB11
+    dshot.addMotor(MOTOR6_PIN, 0); // PB10
+    dshot.addMotor(MOTOR7_PIN, 0); // PB3
 }
 
 void loop(void)
@@ -121,4 +126,12 @@ void loop(void)
     };
 
     board.step(rawGyro, rawAccel);
+
+    Debug::printf("%x %x %x %x %x %x\n", 
+            MOTOR1_PIN, 
+            MOTOR2_PIN, 
+            MOTOR3_PIN, 
+            MOTOR5_PIN, 
+            MOTOR6_PIN, 
+            MOTOR7_PIN);
 }
