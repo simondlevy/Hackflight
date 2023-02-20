@@ -59,12 +59,12 @@ class Core {
         bool safeToArm(const uint32_t usec)
         {
             // Avoid arming if switch starts down
-            static bool armingSwitchWasOff;
+            static bool auxSwitchWasOff;
 
-            auto auxSwitchValue = receiverTask.getRawAux1();
+            auto auxSwitchValue = getAux1();
 
-            if (!armingSwitchWasOff) {
-                armingSwitchWasOff = auxSwitchValue > 900 && auxSwitchValue < 1200;
+            if (!auxSwitchWasOff) {
+                auxSwitchWasOff = auxSwitchValue > 900 && auxSwitchValue < 1200;
             }
 
             const auto maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE_DEG);
@@ -78,18 +78,23 @@ class Core {
             const auto haveReceiverSignal = receiverTask.haveSignal(usec);
 
             return
-                armingSwitchWasOff &&
+                auxSwitchWasOff &&
                 gyroDoneCalibrating &&
                 imuIsLevel &&
                 receiverTask.throttleIsDown() &&
                 haveReceiverSignal;
         }
 
-       void checkArmingSwitch(void)
+        float getAux1(void)
+        {
+            return receiverTask.getRawAux1();
+        }
+
+        void checkArmingSwitch(void)
         {
             static bool aux1WasSet;
 
-            if (receiverTask.getRawAux1() > 1500) {
+            if (getAux1() > 1500) {
                 if (!aux1WasSet) {
                     armingStatus = ARMING_ARMED;
                 }
