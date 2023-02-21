@@ -1,5 +1,0 @@
-vim stm32f4/src/dshot_bitbang.c
-vim stm32f4/src/dshot.c
-vim stm32f4/src/dshot_command.c
-vim stm32f4/src/pwm_output_dshot.c
-vim stm32f4/src/pwm_output_dshot_shared.c
