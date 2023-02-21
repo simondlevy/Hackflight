@@ -31,6 +31,8 @@ Hackflight has been tested on the following platforms:
 * [Diatone Cube 229 Brushless Quadcopter](https://www.diatoneusa.com/store/p659/Diatone_Toothpick_Cube_229_8500_PNF.html) with
 [Spektrum DSMX micro receiver](https://betafpv.com/products/fullspeed-dsmx-receiver).
 
+* [Darwin FPV BabyApe Quadcopter](https://www.getfpv.com/darwinfpv-baby-ape-pro-v2-3-quadcopter-w-caddx-ant.html)
+
 * [MulticopterSim](https://github.com/simondlevy/MulticopterSim) flight simulator based on UnrealEngine
 
 To make it easy to develop flight firmware using Arduino-compatible
