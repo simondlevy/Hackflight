@@ -21,8 +21,7 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-#include <hackflight.h>
-#include <msp.h>
+#include "msp.h"
 
 // Message IDs
 static const uint8_t MSP_SET_VL53L5   = 221;
@@ -52,6 +51,14 @@ static void onDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len
     }
 }
 
+static void reportForever(const char * msg)
+{
+    while (true) {
+        Serial.println(msg);
+        delay(500);
+    }
+}
+
 void setup(void)
 {
     Serial.begin(115200);
@@ -60,7 +67,7 @@ void setup(void)
 
     if (esp_now_init() != ESP_OK) {
 
-        Board::reportForever("Error initializing ESP-NOW");
+        reportForever("Error initializing ESP-NOW");
     }
 
     esp_now_register_recv_cb(onDataRecv);
@@ -69,6 +76,6 @@ void setup(void)
 
 void loop(void)
 {
-    Board::printf("Got %d VL53L5 messages and %d PAA3905 messages\n",
+    printf("Got %d VL53L5 messages and %d PAA3905 messages\n",
             _vl53l5_count, _paa3905_count);
 }

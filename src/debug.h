@@ -55,5 +55,4 @@ class Debug {
                 delay(500);
             }
         }
-
 };

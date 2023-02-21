@@ -24,7 +24,6 @@
 #include <VL53L5cx.h>
 #include <PAA3905_MotionCapture.h>
 
-#include "debug.h"
 #include "msp.h"
 
 // Constants ----------------------------------------------------------
@@ -75,12 +74,20 @@ static void updateLed(void)
     }
 }
 
+static void reportForever(const char * msg)
+{
+    while (true) {
+        Serial.println(msg);
+        delay(500);
+    }
+}
+
 void startEspNow(void)
 {
     WiFi.mode(WIFI_STA);
 
     if (esp_now_init() != ESP_OK) {
-        Debug::reportForever("Error initializing ESP-NOW");
+        reportForever("Error initializing ESP-NOW");
     }
 
     static esp_now_peer_info_t peerInfo;
@@ -90,7 +97,7 @@ void startEspNow(void)
     peerInfo.encrypt = false;
 
     if (esp_now_add_peer(&peerInfo) != ESP_OK) {
-        Debug::reportForever("Failed to add peer");
+        reportForever("Failed to add peer");
     }
 }
 
@@ -175,7 +182,7 @@ static void startMocap(void)
 
     // Check device ID as a test of SPI communications
     if (!_mocap.begin()) {
-        Debug::reportForever("PAA3905 initialization failed");
+        reportForever("PAA3905 initialization failed");
     }
 
     pinMode(PAA3905_MOT_PIN, INPUT); 
