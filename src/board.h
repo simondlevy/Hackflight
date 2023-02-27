@@ -107,7 +107,7 @@ class Stm32Board {
 
         void updateLed(Core & core)
         {
-            switch (core.armingStatus) {
+            switch (core.getArmingStatus()) {
 
                 case Core::ARMING_UNREADY:
                     ledBlink(500);
@@ -295,7 +295,7 @@ class Stm32Board {
                 core.step(rawGyro, usec, mixmotors);
 
                 m_esc->write(
-                        core.armingStatus == Core::ARMING_ARMED ?
+                        core.getArmingStatus() == Core::ARMING_ARMED ?
                         mixmotors :
                         core.visualizerTask.motors);
 

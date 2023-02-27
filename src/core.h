@@ -31,6 +31,17 @@
 
 class Core {
 
+    public:
+
+        typedef enum {
+
+            ARMING_UNREADY,
+            ARMING_READY,
+            ARMING_ARMED,
+            ARMING_FAILSAFE
+
+        } armingStatus_e;
+
     private:
 
         // Gyro interrupt counts over which to measure loop time and skew
@@ -40,6 +51,8 @@ class Core {
         static constexpr float MAX_ARMING_ANGLE_DEG = 25;
 
         Scheduler m_scheduler;
+
+        armingStatus_e m_armingStatus;
 
         void checkFailsafe(const uint32_t usec)
         {
@@ -52,7 +65,7 @@ class Core {
             }
 
             if (hadSignal && !haveSignal) {
-                armingStatus = ARMING_FAILSAFE;
+                m_armingStatus = ARMING_FAILSAFE;
             }
         }
 
@@ -96,30 +109,19 @@ class Core {
 
             if (getAux1() > 1500) {
                 if (!aux1WasSet) {
-                    armingStatus = ARMING_ARMED;
+                    m_armingStatus = ARMING_ARMED;
                 }
                 aux1WasSet = true;
             }
             else {
                 if (aux1WasSet) {
-                    armingStatus = ARMING_READY;
+                    m_armingStatus = ARMING_READY;
                 }
                 aux1WasSet = false;
             }
         }
 
-     public:
-
-        typedef enum {
-
-            ARMING_UNREADY,
-            ARMING_READY,
-            ARMING_ARMED,
-            ARMING_FAILSAFE
-
-        } armingStatus_e;
-
-        armingStatus_e armingStatus;
+    public:
 
         VehicleState vstate;
 
@@ -151,6 +153,11 @@ class Core {
             this->mixer = &mixer;
         }
 
+        armingStatus_e getArmingStatus(void)
+        {
+            return m_armingStatus;
+        }
+
         bool gotRebootRequest(void)
         {
             return visualizerTask.gotRebootRequest();
@@ -160,11 +167,11 @@ class Core {
         {
             checkFailsafe(usec);
 
-            switch (armingStatus) {
+            switch (m_armingStatus) {
 
                 case ARMING_UNREADY:
                     if (safeToArm(usec)) {
-                        armingStatus = ARMING_READY;
+                        m_armingStatus = ARMING_READY;
                     }
                     break;
 
@@ -173,7 +180,7 @@ class Core {
                         checkArmingSwitch();
                     }
                     else {
-                        armingStatus = ARMING_UNREADY;
+                        m_armingStatus = ARMING_UNREADY;
                     }
                     break;
 
