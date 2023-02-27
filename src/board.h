@@ -163,7 +163,7 @@ class Stm32Board {
 
                 while (Serial.available()) {
 
-                    if (core.visualizerTask.parse(Serial.read())) {
+                    if (core.mspParse(Serial.read())) {
                         Serial.write(core.msp.payload, core.msp.payloadSize);
                     }
                 }

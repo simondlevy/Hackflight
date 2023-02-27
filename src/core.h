@@ -153,6 +153,11 @@ class Core {
             m_mixer = &mixer;
         }
 
+        bool mspParse(const uint8_t byte)
+        {
+            return visualizerTask.parse(byte);
+        }
+
         void begin(const uint32_t clockSpeed)
         {
             attitudeTask.begin(m_imu);
