@@ -151,6 +151,11 @@ class Core {
             this->mixer = &mixer;
         }
 
+        bool gotRebootRequest(void)
+        {
+            return visualizerTask.gotRebootRequest();
+        }
+
         void updateArmingStatus(const uint32_t usec)
         {
             checkFailsafe(usec);
@@ -180,7 +185,6 @@ class Core {
                     break;
             }
         }
-
 
         void step(int16_t rawGyro[3], const uint32_t usec, float mixmotors[])
         {

@@ -34,7 +34,7 @@ class Stm32Board {
 
         void runDynamicTasks(Core & core, const int16_t rawAccel[3])
         {
-            if (core.visualizerTask.gotRebootRequest()) {
+            if (core.gotRebootRequest()) {
                 if (m_imuInterruptPin > 0) {
                     detachInterrupt(m_imuInterruptPin);
                 }
