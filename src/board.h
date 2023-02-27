@@ -164,7 +164,9 @@ class Stm32Board {
                 while (Serial.available()) {
 
                     if (core.mspParse(Serial.read())) {
-                        Serial.write(core.msp.payload, core.msp.payloadSize);
+                        while (core.mspBytesAvailable()) {
+                            Serial.write(core.mspGetByte());
+                        }
                     }
                 }
 

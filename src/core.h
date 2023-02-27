@@ -64,6 +64,10 @@ class Core {
 
         Mixer * m_mixer;
 
+        Msp m_msp;
+        uint8_t m_mspPayloadSize;
+        uint8_t m_mspPayloadIndex;
+
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
@@ -133,8 +137,6 @@ class Core {
 
     public:
 
-        Msp msp;
-
         ReceiverTask receiverTask;
 
         AttitudeTask attitudeTask = AttitudeTask(m_vstate);
@@ -144,7 +146,7 @@ class Core {
         AccelerometerTask accelerometerTask; 
 
         VisualizerTask visualizerTask =
-            VisualizerTask(msp, m_vstate, receiverTask, skyrangerTask);
+            VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
 
         Core(Imu * imu, std::vector<PidController *> & pids, Mixer & mixer)
         {
@@ -155,7 +157,25 @@ class Core {
 
         bool mspParse(const uint8_t byte)
         {
-            return visualizerTask.parse(byte);
+            bool result = visualizerTask.parse(byte);
+            if (result) {
+                m_mspPayloadSize = m_msp.payloadSize;
+                m_mspPayloadIndex = 0;
+            }
+            return result;
+        }
+
+        uint8_t mspBytesAvailable(void)
+        {
+            return m_mspPayloadSize;
+        }
+
+        uint8_t mspGetByte(void)
+        {
+            const auto byte = m_msp.payload[m_mspPayloadIndex];
+            m_mspPayloadIndex++;
+            m_mspPayloadSize--;
+            return byte;
         }
 
         void begin(const uint32_t clockSpeed)
