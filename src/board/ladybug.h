@@ -61,8 +61,8 @@ class LadybugBoard : public Stm32Board {
 
         static const uint8_t LED_PIN = 0x12;
 
-        LadybugBoard(std::vector<PidController *> & pids, Mixer & mixer)
-            : Stm32Board(&m_imu, pids, mixer, esc, -LED_PIN) // note inverted LED pin
+        LadybugBoard(void)
+            : Stm32Board(esc, -LED_PIN) // note inverted LED pin
         {
         }
 

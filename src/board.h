@@ -38,8 +38,6 @@ class Stm32Board {
 
             core.prioritizeTasks(prioritizer, usec);
 
-            // prioritizeExtraTasks(core, prioritizer, usec);
-
             bool ledUpdateNeeded = false;
 
             switch (prioritizer.id) {
@@ -199,16 +197,6 @@ class Stm32Board {
             // Support negative LED pin number for inversion
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
             m_ledInverted = ledPin < 0;
-        }
-
-        virtual void prioritizeExtraTasks(
-                Core & core,
-                Task::prioritizer_t & prioritizer,
-                const uint32_t usec)
-        {
-            (void)core;
-            (void)prioritizer;
-            (void)usec;
         }
 
     public:

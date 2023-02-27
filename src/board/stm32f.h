@@ -26,15 +26,6 @@ class Stm32FBoard : public Stm32Board {
 
     protected:
 
-        virtual void prioritizeExtraTasks(
-                Core & core,
-                Task::prioritizer_t & prioritizer,
-                const uint32_t usec) override
-        {
-            core.accelerometerTask.prioritize(usec, prioritizer);
-            core.skyrangerTask.prioritize(usec, prioritizer);
-        }
-
         Stm32FBoard(Esc & esc, const uint8_t ledPin)
             : Stm32Board(esc, ledPin)
         {
