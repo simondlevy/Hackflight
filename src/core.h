@@ -56,6 +56,12 @@ class Core {
 
         armingStatus_e m_armingStatus;
 
+        Imu * m_imu;
+
+        std::vector<PidController *> * m_pids;
+
+        Mixer * m_mixer;
+
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
@@ -88,7 +94,7 @@ class Core {
                 fabsf(vstate.phi) < maxArmingAngle &&
                 fabsf(vstate.theta) < maxArmingAngle;
 
-            const auto gyroDoneCalibrating = !imu->gyroIsCalibrating();
+            const auto gyroDoneCalibrating = !m_imu->gyroIsCalibrating();
 
             const auto haveReceiverSignal = receiverTask.haveSignal(usec);
 
@@ -140,26 +146,20 @@ class Core {
         VisualizerTask visualizerTask =
             VisualizerTask(msp, vstate, receiverTask, skyrangerTask);
 
-        Mixer * mixer;
-
-        Imu * imu;
-
-        std::vector<PidController *> * pids;
-
         Core(Imu * imu, std::vector<PidController *> & pids, Mixer & mixer)
         {
-            this->imu = imu;
-            this->pids = &pids;
-            this->mixer = &mixer;
+            m_imu = imu;
+            m_pids = &pids;
+            m_mixer = &mixer;
         }
 
         void begin(const uint32_t clockSpeed)
         {
-            attitudeTask.begin(imu);
+            attitudeTask.begin(m_imu);
 
             visualizerTask.begin(&receiverTask);
 
-            imu->begin(clockSpeed);
+            m_imu->begin(clockSpeed);
         }
 
         armingStatus_e getArmingStatus(void)
@@ -176,12 +176,12 @@ class Core {
         {
             m_imuInterruptCount++;
 
-            imu->handleInterrupt(cycleCounter);
+            m_imu->handleInterrupt(cycleCounter);
         }
 
         void updateAccelerometer(const int16_t rawAccel[3])
         {
-            imu->updateAccelerometer(rawAccel);
+            m_imu->updateAccelerometer(rawAccel);
         }
 
         void updateArmingStatus(const uint32_t usec)
@@ -216,7 +216,7 @@ class Core {
 
         void step(int16_t rawGyro[3], const uint32_t usec, float mixmotors[])
         {
-            auto angvels = imu->gyroRawToFilteredDps(rawGyro);
+            auto angvels = m_imu->gyroRawToFilteredDps(rawGyro);
 
             vstate.dphi   = angvels.x;
             vstate.dtheta = angvels.y;
@@ -224,10 +224,10 @@ class Core {
 
             Demands demands = receiverTask.getDemands();
 
-            auto motors = mixer->step(
-                    demands, vstate, pids, receiverTask.throttleIsDown(), usec);
+            auto motors = m_mixer->step(
+                    demands, vstate, m_pids, receiverTask.throttleIsDown(), usec);
 
-            for (auto i=0; i<mixer->getMotorCount(); i++) {
+            for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
                 mixmotors[i] = motors.values[i];
             }
@@ -294,7 +294,7 @@ class Core {
             static int32_t _gyroSkewAccum;
 
             auto gyroSkew =
-                imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
+                m_imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 
