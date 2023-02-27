@@ -193,24 +193,6 @@ class Stm32Board {
 
     public:
 
-        void setSbusValues(
-                Core & core,
-                uint16_t chanvals[],
-                const uint32_t usec,
-                const bool lostFrame)
-        {
-            core.receiverTask.setValues(chanvals, usec, lostFrame, 172, 1811);
-        }
-
-        void setDsmxValues(
-                Core & core, 
-                uint16_t chanvals[],
-                const uint32_t usec,
-                const bool lostFrame)
-        {
-            core.receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
-        }
-
         void handleImuInterrupt(Core & core)
         {
             core.handleImuInterrupt(getCycleCounter());

@@ -197,6 +197,16 @@ class Core {
             m_prioritizer = &m_ordinaryPrioritizer;
         }
 
+        void setSbusValues(uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
+        {
+            receiverTask.setValues(chanvals, usec, lostFrame, 172, 1811);
+        }
+
+        void setDsmxValues(uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
+        {
+            receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
+        }
+
         bool mspParse(const uint8_t byte)
         {
             bool result = visualizerTask.parse(byte);

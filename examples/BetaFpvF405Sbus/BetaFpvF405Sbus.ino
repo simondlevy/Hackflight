@@ -102,7 +102,7 @@ void serialEvent3(void)
 
         bfs::SbusData data = rx.data();
 
-        board.setSbusValues(core, (uint16_t *)data.ch, micros(), data.lost_frame);
+        core.setSbusValues((uint16_t *)data.ch, micros(), data.lost_frame);
     }
 }
 
