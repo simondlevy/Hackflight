@@ -331,8 +331,10 @@ class Core {
             m_scheduler.updateDynamic(nowCycles, anticipatedEndCycles);
         }
 
-        uint32_t getAnticipatedEndCycles(Task & task, const uint32_t nowCycles)
+        uint32_t getAnticipatedEndCycles(
+                Task & task, const uint32_t nowCycles, const Task::id_t taskId)
         {
+            (void)taskId;
             return m_scheduler.getAnticipatedEndCycles(task, nowCycles);
         }
 

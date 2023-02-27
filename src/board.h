@@ -39,7 +39,7 @@ class Stm32Board {
             switch (taskId) {
 
                 case Task::ATTITUDE:
-                    runTask(core, core.attitudeTask);
+                    runTask(core, core.attitudeTask, taskId);
                     break;
 
                 case Task::VISUALIZER:
@@ -47,15 +47,15 @@ class Stm32Board {
                     break;
 
                 case Task::RECEIVER:
-                    runTask(core, core.receiverTask);
+                    runTask(core, core.receiverTask, taskId);
                     break;
 
                 case Task::ACCELEROMETER:
-                    runTask(core, core.accelerometerTask);
+                    runTask(core, core.accelerometerTask, taskId);
                     break;
 
                 case Task::SKYRANGER:
-                    runTask(core, core.skyrangerTask);
+                    runTask(core, core.skyrangerTask, taskId);
                     break;
 
                 default:
@@ -66,9 +66,10 @@ class Stm32Board {
             return taskId == Task::ATTITUDE || taskId == Task::RECEIVER;
         }
 
-        void runTask(Core & core, Task & task)
+        void runTask(Core & core, Task & task, const Task::id_t taskId)
         {
-            const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(core, task);
+            const uint32_t anticipatedEndCycles =
+                getAnticipatedEndCycles(core, task, taskId);
 
             if (anticipatedEndCycles > 0) {
 
@@ -140,7 +141,7 @@ class Stm32Board {
         void runVisualizerTask(Core & core)
         {
             const uint32_t anticipatedEndCycles =
-                getAnticipatedEndCycles(core, core.visualizerTask);
+                getAnticipatedEndCycles(core, core.visualizerTask, Task::VISUALIZER);
 
             if (anticipatedEndCycles > 0) {
 
@@ -159,9 +160,9 @@ class Stm32Board {
             }
         }
 
-        uint32_t getAnticipatedEndCycles(Core & core, Task & task)
+        uint32_t getAnticipatedEndCycles(Core & core, Task & task, const Task::id_t taskId)
         {
-            return core.getAnticipatedEndCycles(task, getCycleCounter());
+            return core.getAnticipatedEndCycles(task, getCycleCounter(), taskId);
         }
 
         uint32_t getClockSpeed(void) 
