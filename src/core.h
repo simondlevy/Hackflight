@@ -153,6 +153,15 @@ class Core {
             this->mixer = &mixer;
         }
 
+        void begin(const uint32_t clockSpeed)
+        {
+            attitudeTask.begin(imu);
+
+            visualizerTask.begin(&receiverTask);
+
+            imu->begin(clockSpeed);
+        }
+
         armingStatus_e getArmingStatus(void)
         {
             return m_armingStatus;
@@ -166,6 +175,7 @@ class Core {
         void handleImuInterrupt(const uint32_t cycleCounter)
         {
             m_imuInterruptCount++;
+
             imu->handleInterrupt(cycleCounter);
         }
 

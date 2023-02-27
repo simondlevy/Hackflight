@@ -253,11 +253,7 @@ class Stm32Board {
         {
             startCycleCounter();
 
-            core.attitudeTask.begin(core.imu);
-
-            core.visualizerTask.begin(&core.receiverTask);
-
-            core.imu->begin(getClockSpeed());
+            core.begin(getClockSpeed());
 
             pinMode(m_ledPin, OUTPUT);
 
