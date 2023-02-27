@@ -29,7 +29,7 @@
 // Constants ----------------------------------------------------------
 
 // Replace with the MAC Address of your ESPNOW receiver
-static const uint8_t ESP_RECEIVER_ADDRESS[] = {0xAC, 0x0B, 0xFB, 0x6F, 0x6C, 0x04};
+static const uint8_t ESP_RECEIVER_ADDRESS[] = {0xD8, 0xA0, 0x1D, 0x54, 0x87, 0x44};
 
 // Pins
 static const uint8_t VL53L5_INT_PIN  = 15;

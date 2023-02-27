@@ -104,6 +104,8 @@ void setup(void)
     // Start receiver UART
     Serial1.begin(100000, SERIAL_8E2);
 
+    Serial2.begin(115200);
+
     mpu.begin();
 
     board.begin();
