@@ -69,7 +69,7 @@ class Stm32Board {
 
                 case Task::ACCELEROMETER:
                     runTask(core, core.accelerometerTask);
-                    core.imu->updateAccelerometer(rawAccel);
+                    core.updateAccelerometer(rawAccel);
                     break;
 
                 case Task::SKYRANGER:
@@ -236,8 +236,7 @@ class Stm32Board {
 
         void handleImuInterrupt(Core & core)
         {
-            core.imuInterruptCount++;
-            core.imu->handleInterrupt(getCycleCounter());
+            core.handleImuInterrupt(getCycleCounter());
         }
 
         uint32_t microsToCycles(uint32_t micros)

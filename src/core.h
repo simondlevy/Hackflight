@@ -50,6 +50,8 @@ class Core {
 
         static constexpr float MAX_ARMING_ANGLE_DEG = 25;
 
+        uint32_t m_imuInterruptCount;
+
         Scheduler m_scheduler;
 
         armingStatus_e m_armingStatus;
@@ -144,8 +146,6 @@ class Core {
 
         std::vector<PidController *> * pids;
 
-        uint32_t imuInterruptCount;
-
         Core(Imu * imu, std::vector<PidController *> & pids, Mixer & mixer)
         {
             this->imu = imu;
@@ -161,6 +161,17 @@ class Core {
         bool gotRebootRequest(void)
         {
             return visualizerTask.gotRebootRequest();
+        }
+
+        void handleImuInterrupt(const uint32_t cycleCounter)
+        {
+            m_imuInterruptCount++;
+            imu->handleInterrupt(cycleCounter);
+        }
+
+        void updateAccelerometer(const int16_t rawAccel[3])
+        {
+            imu->updateAccelerometer(rawAccel);
         }
 
         void updateArmingStatus(const uint32_t usec)
@@ -254,11 +265,11 @@ class Core {
             static int32_t _sampleRateStartCycles;
 
             if ((_terminalGyroRateCount == 0)) {
-                _terminalGyroRateCount = imuInterruptCount + GYRO_RATE_COUNT;
+                _terminalGyroRateCount = m_imuInterruptCount + GYRO_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
             }
 
-            if (imuInterruptCount >= _terminalGyroRateCount) {
+            if (m_imuInterruptCount >= _terminalGyroRateCount) {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
@@ -278,10 +289,10 @@ class Core {
             _gyroSkewAccum += gyroSkew;
 
             if ((_terminalGyroLockCount == 0)) {
-                _terminalGyroLockCount = imuInterruptCount + GYRO_LOCK_COUNT;
+                _terminalGyroLockCount = m_imuInterruptCount + GYRO_LOCK_COUNT;
             }
 
-            if (imuInterruptCount >= _terminalGyroLockCount) {
+            if (m_imuInterruptCount >= _terminalGyroLockCount) {
                 _terminalGyroLockCount += GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
