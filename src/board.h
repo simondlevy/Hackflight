@@ -36,7 +36,7 @@ class Stm32Board {
         {
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
-            core.prioritizeCoreTasks(prioritizer, usec);
+            core.prioritizeMainTasks(prioritizer, usec);
 
             prioritizeExtraTasks(core, prioritizer, usec);
 

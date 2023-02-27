@@ -141,12 +141,12 @@ class Core {
 
         AttitudeTask attitudeTask = AttitudeTask(m_vstate);
 
+        VisualizerTask visualizerTask =
+            VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
+
         SkyrangerTask skyrangerTask = SkyrangerTask(m_vstate);
 
         AccelerometerTask accelerometerTask; 
-
-        VisualizerTask visualizerTask =
-            VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
 
         Core(Imu * imu, std::vector<PidController *> & pids, Mixer & mixer)
         {
@@ -337,7 +337,7 @@ class Core {
             }
         }
 
-        void prioritizeCoreTasks(Task::prioritizer_t & prioritizer, const uint32_t usec)
+        void prioritizeMainTasks(Task::prioritizer_t & prioritizer, const uint32_t usec)
         {
             receiverTask.prioritize(usec, prioritizer);
             attitudeTask.prioritize(usec, prioritizer);
