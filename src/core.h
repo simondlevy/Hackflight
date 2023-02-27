@@ -331,11 +331,38 @@ class Core {
             m_scheduler.updateDynamic(nowCycles, anticipatedEndCycles);
         }
 
-        uint32_t getAnticipatedEndCycles(
-                Task & task, const uint32_t nowCycles, const Task::id_t taskId)
+        uint32_t getAnticipatedEndCycles(const uint32_t nowCycles, const Task::id_t taskId)
         {
-            (void)taskId;
-            return m_scheduler.getAnticipatedEndCycles(task, nowCycles);
+            uint32_t cycles = 0;
+
+            switch (taskId) {
+
+                case Task::ATTITUDE:
+                    cycles = m_scheduler.getAnticipatedEndCycles(attitudeTask, nowCycles);
+                    break;
+
+                case Task::RECEIVER:
+                    cycles = m_scheduler.getAnticipatedEndCycles(receiverTask, nowCycles);
+                    break;
+
+                case Task::VISUALIZER:
+                    cycles = m_scheduler.getAnticipatedEndCycles(visualizerTask, nowCycles);
+                    break;
+
+                case Task::ACCELEROMETER:
+                    cycles =
+                        m_scheduler.getAnticipatedEndCycles(accelerometerTask, nowCycles);
+                    break;
+
+                case Task::SKYRANGER:
+                    cycles = m_scheduler.getAnticipatedEndCycles(skyrangerTask, nowCycles);
+                    break;
+
+                default:
+                    break;
+            }
+
+            return cycles;
         }
 
         bool isCoreTaskReady(const uint32_t nowCycles)

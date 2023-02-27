@@ -68,8 +68,7 @@ class Stm32Board {
 
         void runTask(Core & core, Task & task, const Task::id_t taskId)
         {
-            const uint32_t anticipatedEndCycles =
-                getAnticipatedEndCycles(core, task, taskId);
+            const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(core, taskId);
 
             if (anticipatedEndCycles > 0) {
 
@@ -141,7 +140,7 @@ class Stm32Board {
         void runVisualizerTask(Core & core)
         {
             const uint32_t anticipatedEndCycles =
-                getAnticipatedEndCycles(core, core.visualizerTask, Task::VISUALIZER);
+                getAnticipatedEndCycles(core, Task::VISUALIZER);
 
             if (anticipatedEndCycles > 0) {
 
@@ -160,9 +159,9 @@ class Stm32Board {
             }
         }
 
-        uint32_t getAnticipatedEndCycles(Core & core, Task & task, const Task::id_t taskId)
+        uint32_t getAnticipatedEndCycles(Core & core, const Task::id_t taskId)
         {
-            return core.getAnticipatedEndCycles(task, getCycleCounter(), taskId);
+            return core.getAnticipatedEndCycles(getCycleCounter(), taskId);
         }
 
         uint32_t getClockSpeed(void) 
