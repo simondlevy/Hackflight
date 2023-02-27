@@ -34,13 +34,12 @@ class Stm32Board {
 
         bool runDynamicTasks(Core & core, const int16_t rawAccel[3], const uint32_t usec)
         {
-            bool ledUpdateNeeded = false;
+            auto taskId = core.prioritizeTasks(rawAccel, usec);
 
-            switch (core.prioritizeTasks(rawAccel, usec)) {
+            switch (taskId) {
 
                 case Task::ATTITUDE:
                     runTask(core, core.attitudeTask);
-                    ledUpdateNeeded = true;
                     break;
 
                 case Task::VISUALIZER:
@@ -49,7 +48,6 @@ class Stm32Board {
 
                 case Task::RECEIVER:
                     runTask(core, core.receiverTask);
-                    ledUpdateNeeded = true;
                     break;
 
                 case Task::ACCELEROMETER:
@@ -64,7 +62,8 @@ class Stm32Board {
                     break;
             }
 
-            return ledUpdateNeeded;
+            // LED udpate needed?
+            return taskId == Task::ATTITUDE || taskId == Task::RECEIVER;
         }
 
         void runTask(Core & core, Task & task)
