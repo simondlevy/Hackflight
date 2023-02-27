@@ -97,6 +97,14 @@ void serialEvent1(void)
     }
 }
 
+// SkyrRanger interrupt
+void serialEvent2(void)
+{
+    while (Serial2.available()) {
+        Serial.println((char)Serial2.read());
+    }
+}
+
 void setup(void)
 {
     board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
