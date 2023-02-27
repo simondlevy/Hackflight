@@ -34,17 +34,12 @@ class Stm32Board {
 
         bool runDynamicTasks(Core & core, const int16_t rawAccel[3], const uint32_t usec)
         {
-            Task::prioritizer_t prioritizer = {Task::NONE, 0};
-
-            core.prioritizeTasks(prioritizer, usec);
-
             bool ledUpdateNeeded = false;
 
-            switch (prioritizer.id) {
+            switch (core.prioritizeTasks(rawAccel, usec)) {
 
                 case Task::ATTITUDE:
                     runTask(core, core.attitudeTask);
-                    core.updateArmingStatus(usec);
                     ledUpdateNeeded = true;
                     break;
 
@@ -53,14 +48,12 @@ class Stm32Board {
                     break;
 
                 case Task::RECEIVER:
-                    core.updateArmingStatus(usec);
                     runTask(core, core.receiverTask);
                     ledUpdateNeeded = true;
                     break;
 
                 case Task::ACCELEROMETER:
                     runTask(core, core.accelerometerTask);
-                    core.updateAccelerometer(rawAccel);
                     break;
 
                 case Task::SKYRANGER:

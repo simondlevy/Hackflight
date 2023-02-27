@@ -379,14 +379,33 @@ class Core {
             }
         }
 
-        void prioritizeTasks(Task::prioritizer_t & prioritizer, const uint32_t usec)
+        Task::id_t prioritizeTasks(const int16_t rawAccel[3], const uint32_t usec)
         {
+            Task::prioritizer_t prioritizer = {Task::NONE, 0};
+
             receiverTask.prioritize(usec, prioritizer);
             attitudeTask.prioritize(usec, prioritizer);
             visualizerTask.prioritize(usec, prioritizer);
 
             m_prioritizer->prioritizeExtras(
                     prioritizer, usec, accelerometerTask, skyrangerTask);
+
+            switch (prioritizer.id) {
+
+                case Task::ATTITUDE:
+                case Task::RECEIVER:
+                    updateArmingStatus(usec);
+                    break;
+
+                case Task::ACCELEROMETER:
+                    updateAccelerometer(rawAccel);
+                    break;
+
+                default:
+                    break;
+            }
+
+            return prioritizer.id;
         }
 
 }; // class Core
