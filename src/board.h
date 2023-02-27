@@ -34,13 +34,6 @@ class Stm32Board {
 
         void runDynamicTasks(Core & core, const int16_t rawAccel[3], const uint32_t usec)
         {
-            if (core.gotRebootRequest()) {
-                if (m_imuInterruptPin > 0) {
-                    detachInterrupt(m_imuInterruptPin);
-                }
-                reboot();
-            }
-
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
             core.prioritizeCoreTasks(prioritizer, usec);
@@ -298,6 +291,14 @@ class Stm32Board {
             }
 
             if (core.isDynamicTaskReady(getCycleCounter())) {
+
+                if (core.gotRebootRequest()) {
+                    if (m_imuInterruptPin > 0) {
+                        detachInterrupt(m_imuInterruptPin);
+                    }
+                    reboot();
+                }
+
                 runDynamicTasks(core, rawAccel, micros());
             }
         }
