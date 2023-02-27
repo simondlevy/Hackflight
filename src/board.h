@@ -32,7 +32,7 @@ class Stm32Board {
 
         Esc * m_esc;
 
-        void runDynamicTasks(Core & core, const int16_t rawAccel[3], const uint32_t usec)
+        bool runDynamicTasks(Core & core, const int16_t rawAccel[3], const uint32_t usec)
         {
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
@@ -40,12 +40,14 @@ class Stm32Board {
 
             prioritizeExtraTasks(core, prioritizer, usec);
 
+            bool ledUpdateNeeded = false;
+
             switch (prioritizer.id) {
 
                 case Task::ATTITUDE:
                     runTask(core, core.attitudeTask);
                     core.updateArmingStatus(usec);
-                    updateLed(core);
+                    ledUpdateNeeded = true;
                     break;
 
                 case Task::VISUALIZER:
@@ -54,8 +56,8 @@ class Stm32Board {
 
                 case Task::RECEIVER:
                     core.updateArmingStatus(usec);
-                    updateLed(core);
                     runTask(core, core.receiverTask);
+                    ledUpdateNeeded = true;
                     break;
 
                 case Task::ACCELEROMETER:
@@ -70,6 +72,8 @@ class Stm32Board {
                 default:
                     break;
             }
+
+            return ledUpdateNeeded;
         }
 
         void runTask(Core & core, Task & task)
@@ -299,7 +303,9 @@ class Stm32Board {
                     reboot();
                 }
 
-                runDynamicTasks(core, rawAccel, micros());
+                if (runDynamicTasks(core, rawAccel, micros())) {
+                    updateLed(core);
+                }
             }
         }
 
