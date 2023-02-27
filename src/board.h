@@ -36,9 +36,9 @@ class Stm32Board {
         {
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
-            core.prioritizeMainTasks(prioritizer, usec);
+            core.prioritizeTasks(prioritizer, usec);
 
-            prioritizeExtraTasks(core, prioritizer, usec);
+            // prioritizeExtraTasks(core, prioritizer, usec);
 
             bool ledUpdateNeeded = false;
 

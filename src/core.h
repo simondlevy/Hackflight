@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "core/mixer.h"
-#include "imu.h"
+#include "imu/softquat.h"
 #include "scheduler.h"
 #include "task/accelerometer.h"
 #include "task/attitude.h"
@@ -135,6 +135,40 @@ class Core {
             }
         }
 
+        class Prioritizer {
+
+            public:
+
+                virtual void prioritizeExtras(
+                        Task::prioritizer_t & prioritizer,
+                        const uint32_t usec,
+                        AccelerometerTask accelerometerTask,
+                        SkyrangerTask skyrangerTask)
+                {
+                    (void)prioritizer;
+                    (void)usec;
+                    (void)accelerometerTask;
+                    (void)skyrangerTask;
+                }
+        };
+
+        class ExtraPrioritizer : public Prioritizer {
+
+            virtual void prioritizeExtras(
+                    Task::prioritizer_t & prioritizer,
+                    const uint32_t usec,
+                    AccelerometerTask accelerometerTask,
+                    SkyrangerTask skyrangerTask)
+            {
+                accelerometerTask.prioritize(usec, prioritizer);
+                skyrangerTask.prioritize(usec, prioritizer);
+            }
+        };
+
+        Prioritizer      m_ordinaryPrioritizer;
+        ExtraPrioritizer m_extraPrioritizer;
+        Prioritizer *    m_prioritizer;
+
     public:
 
         ReceiverTask receiverTask;
@@ -148,11 +182,19 @@ class Core {
 
         AccelerometerTask accelerometerTask; 
 
+        Core(SoftQuatImu * imu, std::vector<PidController *> & pids, Mixer & mixer)
+            : Core((Imu *)imu, pids, mixer)
+        {
+            m_prioritizer = &m_extraPrioritizer;
+        }
+
         Core(Imu * imu, std::vector<PidController *> & pids, Mixer & mixer)
         {
             m_imu = imu;
             m_pids = &pids;
             m_mixer = &mixer;
+
+            m_prioritizer = &m_ordinaryPrioritizer;
         }
 
         bool mspParse(const uint8_t byte)
@@ -337,11 +379,14 @@ class Core {
             }
         }
 
-        void prioritizeMainTasks(Task::prioritizer_t & prioritizer, const uint32_t usec)
+        void prioritizeTasks(Task::prioritizer_t & prioritizer, const uint32_t usec)
         {
             receiverTask.prioritize(usec, prioritizer);
             attitudeTask.prioritize(usec, prioritizer);
             visualizerTask.prioritize(usec, prioritizer);
+
+            m_prioritizer->prioritizeExtras(
+                    prioritizer, usec, accelerometerTask, skyrangerTask);
         }
 
 }; // class Core
