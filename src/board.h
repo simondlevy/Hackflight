@@ -25,9 +25,6 @@ class Stm32Board {
 
     private:
 
-        static const uint8_t  STARTUP_BLINK_LED_REPS  = 10;
-        static const uint32_t STARTUP_BLINK_LED_DELAY = 50;
-
         uint8_t m_ledPin;
         bool m_ledInverted;
 
