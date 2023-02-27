@@ -140,9 +140,16 @@ class Core {
 
         Imu * imu;
 
-        std::vector<PidController *> * pidControllers;
+        std::vector<PidController *> * pids;
 
         uint32_t imuInterruptCount;
+
+        Core(Imu * imu, std::vector<PidController *> & pids, Mixer & mixer)
+        {
+            this->imu = imu;
+            this->pids = &pids;
+            this->mixer = &mixer;
+        }
 
         void updateArmingStatus(const uint32_t usec)
         {
@@ -186,7 +193,7 @@ class Core {
             Demands demands = receiverTask.getDemands();
 
             auto motors = mixer->step(
-                    demands, vstate, pidControllers, receiverTask.throttleIsDown(), usec);
+                    demands, vstate, pids, receiverTask.throttleIsDown(), usec);
 
             for (auto i=0; i<mixer->getMotorCount(); i++) {
 

@@ -27,29 +27,25 @@ class Stm32FBoard : public Stm32Board {
     protected:
 
         virtual void prioritizeExtraTasks(
+                Core & core,
                 Task::prioritizer_t & prioritizer,
                 const uint32_t usec) override
         {
-            m_core.accelerometerTask.prioritize(usec, prioritizer);
-            m_core.skyrangerTask.prioritize(usec, prioritizer);
+            core.accelerometerTask.prioritize(usec, prioritizer);
+            core.skyrangerTask.prioritize(usec, prioritizer);
         }
 
-        Stm32FBoard(
-                SoftQuatImu & imu,
-                std::vector<PidController *> & pids,
-                Mixer & mixer,
-                Esc & esc,
-                const uint8_t ledPin)
-            : Stm32Board(&imu, pids, mixer, esc, ledPin)
+        Stm32FBoard(Esc & esc, const uint8_t ledPin)
+            : Stm32Board(esc, ledPin)
         {
         }
 
     public:
 
-        void handleSkyrangerEvent(HardwareSerial & serial)
+        void handleSkyrangerEvent(Core & core, HardwareSerial & serial)
         {
             while (serial.available()) {
-                m_core.skyrangerTask.parse(serial.read());
+                core.skyrangerTask.parse(serial.read());
             }
         }
 

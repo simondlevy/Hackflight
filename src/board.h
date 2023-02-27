@@ -32,9 +32,9 @@ class Stm32Board {
 
         Esc * m_esc;
 
-        void runDynamicTasks(const int16_t rawAccel[3])
+        void runDynamicTasks(Core & core, const int16_t rawAccel[3])
         {
-            if (m_core.visualizerTask.gotRebootRequest()) {
+            if (core.visualizerTask.gotRebootRequest()) {
                 if (m_imuInterruptPin > 0) {
                     detachInterrupt(m_imuInterruptPin);
                 }
@@ -45,35 +45,35 @@ class Stm32Board {
 
             const uint32_t usec = micros(); 
 
-            m_core.prioritizeCoreTasks(prioritizer, usec);
+            core.prioritizeCoreTasks(prioritizer, usec);
 
-            prioritizeExtraTasks(prioritizer, usec);
+            prioritizeExtraTasks(core, prioritizer, usec);
 
             switch (prioritizer.id) {
 
                 case Task::ATTITUDE:
-                    runTask(m_core.attitudeTask);
-                    m_core.updateArmingStatus(usec);
-                    updateLed();
+                    runTask(core, core.attitudeTask);
+                    core.updateArmingStatus(usec);
+                    updateLed(core);
                     break;
 
                 case Task::VISUALIZER:
-                    runVisualizerTask();
+                    runVisualizerTask(core);
                     break;
 
                 case Task::RECEIVER:
-                    m_core.updateArmingStatus(usec);
-                    updateLed();
-                    runTask(m_core.receiverTask);
+                    core.updateArmingStatus(usec);
+                    updateLed(core);
+                    runTask(core, core.receiverTask);
                     break;
 
                 case Task::ACCELEROMETER:
-                    runTask(m_core.accelerometerTask);
-                    m_core.imu->updateAccelerometer(rawAccel);
+                    runTask(core, core.accelerometerTask);
+                    core.imu->updateAccelerometer(rawAccel);
                     break;
 
                 case Task::SKYRANGER:
-                    runTask(m_core.skyrangerTask);
+                    runTask(core, core.skyrangerTask);
                     break;
 
                 default:
@@ -81,9 +81,9 @@ class Stm32Board {
             }
         }
 
-        void runTask(Task & task)
+        void runTask(Core & core, Task & task)
         {
-            const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(task);
+            const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(core, task);
 
             if (anticipatedEndCycles > 0) {
 
@@ -91,22 +91,23 @@ class Stm32Board {
 
                 task.run(usec);
 
-                postRunTask(task, usec, anticipatedEndCycles);
+                postRunTask(core, task, usec, anticipatedEndCycles);
             } 
         }
 
         void postRunTask(
+                Core & core,
                 Task & task,
                 const uint32_t usecStart,
                 const uint32_t anticipatedEndCycles)
         {
-            m_core.postRunTask(
+            core.postRunTask(
                     task, usecStart, micros(), getCycleCounter(), anticipatedEndCycles);
         }
 
-        void updateLed(void)
+        void updateLed(Core & core)
         {
-            switch (m_core.armingStatus) {
+            switch (core.armingStatus) {
 
                 case Core::ARMING_UNREADY:
                     ledBlink(500);
@@ -151,10 +152,10 @@ class Stm32Board {
         {
         }
 
-        void runVisualizerTask(void)
+        void runVisualizerTask(Core & core)
         {
             const uint32_t anticipatedEndCycles =
-                getAnticipatedEndCycles(m_core.visualizerTask);
+                getAnticipatedEndCycles(core, core.visualizerTask);
 
             if (anticipatedEndCycles > 0) {
 
@@ -162,18 +163,18 @@ class Stm32Board {
 
                 while (Serial.available()) {
 
-                    if (m_core.visualizerTask.parse(Serial.read())) {
-                        Serial.write(m_core.msp.payload, m_core.msp.payloadSize);
+                    if (core.visualizerTask.parse(Serial.read())) {
+                        Serial.write(core.msp.payload, core.msp.payloadSize);
                     }
                 }
 
-                postRunTask(m_core.visualizerTask, usec, anticipatedEndCycles);
+                postRunTask(core, core.visualizerTask, usec, anticipatedEndCycles);
             }
         }
 
-        uint32_t getAnticipatedEndCycles(Task & task)
+        uint32_t getAnticipatedEndCycles(Core & core, Task & task)
         {
-            return m_core.getAnticipatedEndCycles(task, getCycleCounter());
+            return core.getAnticipatedEndCycles(task, getCycleCounter());
         }
 
         uint32_t getClockSpeed(void) 
@@ -194,18 +195,8 @@ class Stm32Board {
 
     protected:
 
-        Core m_core;
-
-        Stm32Board(
-                Imu * imu,
-                std::vector<PidController *> & pidControllers,
-                Mixer & mixer,
-                Esc & esc,
-                const int8_t ledPin)
+        Stm32Board(Esc & esc, const int8_t ledPin)
         {
-            m_core.imu = imu;
-            m_core.pidControllers = &pidControllers;
-            m_core.mixer = &mixer;
             m_esc = &esc;
 
             // Support negative LED pin number for inversion
@@ -214,28 +205,39 @@ class Stm32Board {
         }
 
         virtual void prioritizeExtraTasks(
-                Task::prioritizer_t & prioritizer, const uint32_t usec)
+                Core & core,
+                Task::prioritizer_t & prioritizer,
+                const uint32_t usec)
         {
+            (void)core;
             (void)prioritizer;
             (void)usec;
         }
 
     public:
 
-        void setSbusValues(uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
+        void setSbusValues(
+                Core & core,
+                uint16_t chanvals[],
+                const uint32_t usec,
+                const bool lostFrame)
         {
-            m_core.receiverTask.setValues(chanvals, usec, lostFrame, 172, 1811);
+            core.receiverTask.setValues(chanvals, usec, lostFrame, 172, 1811);
         }
 
-        void setDsmxValues(uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
+        void setDsmxValues(
+                Core & core, 
+                uint16_t chanvals[],
+                const uint32_t usec,
+                const bool lostFrame)
         {
-            m_core.receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
+            core.receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
         }
 
-        void handleImuInterrupt(void)
+        void handleImuInterrupt(Core & core)
         {
-            m_core.imuInterruptCount++;
-            m_core.imu->handleInterrupt(getCycleCounter());
+            core.imuInterruptCount++;
+            core.imu->handleInterrupt(getCycleCounter());
         }
 
         uint32_t microsToCycles(uint32_t micros)
@@ -248,15 +250,15 @@ class Stm32Board {
             return DWT->CYCCNT;
         }
 
-        void begin(void)
+        void begin(Core & core)
         {
             startCycleCounter();
 
-            m_core.attitudeTask.begin(m_core.imu);
+            core.attitudeTask.begin(core.imu);
 
-            m_core.visualizerTask.begin(&m_core.receiverTask);
+            core.visualizerTask.begin(&core.receiverTask);
 
-            m_core.imu->begin(getClockSpeed());
+            core.imu->begin(getClockSpeed());
 
             pinMode(m_ledPin, OUTPUT);
 
@@ -270,18 +272,18 @@ class Stm32Board {
             ledSet(false);
         }
 
-        void step(int16_t rawGyro[3], int16_t rawAccel[3])
+        void step(Core & core, int16_t rawGyro[3], int16_t rawAccel[3])
         {
             auto nowCycles = getCycleCounter();
 
-            if (m_core.isCoreTaskReady(nowCycles)) {
+            if (core.isCoreTaskReady(nowCycles)) {
 
                 const uint32_t usec = micros();
 
                 int32_t loopRemainingCycles = 0;
 
                 const uint32_t nextTargetCycles =
-                    m_core.coreTaskPreUpdate(loopRemainingCycles);
+                    core.coreTaskPreUpdate(loopRemainingCycles);
 
                 while (loopRemainingCycles > 0) {
                     nowCycles = getCycleCounter();
@@ -290,27 +292,31 @@ class Stm32Board {
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
-                m_core.step(rawGyro, usec, mixmotors);
+                core.step(rawGyro, usec, mixmotors);
 
                 m_esc->write(
-                        m_core.armingStatus == Core::ARMING_ARMED ?
+                        core.armingStatus == Core::ARMING_ARMED ?
                         mixmotors :
-                        m_core.visualizerTask.motors);
+                        core.visualizerTask.motors);
 
-                m_core.updateScheduler(nowCycles, nextTargetCycles);
+                core.updateScheduler(nowCycles, nextTargetCycles);
             }
 
-            if (m_core.isDynamicTaskReady(getCycleCounter())) {
-                runDynamicTasks(rawAccel);
+            if (core.isDynamicTaskReady(getCycleCounter())) {
+                runDynamicTasks(core, rawAccel);
             }
         }
 
-        void step(int16_t rawGyro[3], int16_t rawAccel[3], HardwareSerial & serial)
+        void step(
+                Core & core,
+                int16_t rawGyro[3],
+                int16_t rawAccel[3],
+                HardwareSerial & serial)
         {
-            step(rawGyro, rawAccel);
+            step(core, rawGyro, rawAccel);
 
-            while (m_core.skyrangerTask.imuDataAvailable()) {
-                serial.write(m_core.skyrangerTask.readImuData());
+            while (core.skyrangerTask.imuDataAvailable()) {
+                serial.write(core.skyrangerTask.readImuData());
             }
         }
 

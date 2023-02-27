@@ -19,9 +19,10 @@
 
 #include <hackflight.h>
 #include <board/stm32f/stm32f4.h>
+
+#include <core.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
-#include <debug.h>
 #include <esc/dshot.h>
 #include <imu/softquat.h>
 
@@ -74,7 +75,9 @@ static SoftQuatImu imu(Imu::rotate270);
 
 static std::vector<PidController *> pids = {&anglePid};
 
-static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
+static Stm32F4Board board(esc, LED_PIN);
+
+static Core core(&imu, pids, mixer);
 
 extern "C" void DMA2_Stream1_IRQHandler(void) 
 {
@@ -89,7 +92,7 @@ extern "C" void DMA2_Stream2_IRQHandler(void)
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    board.handleImuInterrupt();
+    board.handleImuInterrupt(core);
 }
 
 // Receiver interrupt
@@ -99,14 +102,14 @@ void serialEvent3(void)
 
         bfs::SbusData data = rx.data();
 
-        board.setSbusValues((uint16_t *)data.ch, micros(), data.lost_frame);
+        board.setSbusValues(core, (uint16_t *)data.ch, micros(), data.lost_frame);
     }
 }
 
 // Interupt from Skyranger
 void serialEvent4(void)
 {
-    board.handleSkyrangerEvent(Serial4);
+    board.handleSkyrangerEvent(core, Serial4);
 }
 
 void setup(void)
@@ -124,7 +127,7 @@ void setup(void)
 
     mpu.begin();
 
-    board.begin();
+    board.begin(core);
 
     dshot.begin(stream1MotorPins, stream2MotorPins);
 }
@@ -137,5 +140,5 @@ void loop(void)
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
     // Support sending attitude data to Skyranger over Serial4
-    board.step(rawGyro, rawAccel, Serial4);
+    board.step(core, rawGyro, rawAccel, Serial4);
 }
