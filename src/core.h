@@ -68,6 +68,12 @@ class Core {
         uint8_t m_mspPayloadSize;
         uint8_t m_mspPayloadIndex;
 
+        ReceiverTask receiverTask;
+
+        AttitudeTask attitudeTask = AttitudeTask(m_vstate);
+
+        AccelerometerTask accelerometerTask; 
+
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
@@ -171,16 +177,10 @@ class Core {
 
     public:
 
-        ReceiverTask receiverTask;
-
-        AttitudeTask attitudeTask = AttitudeTask(m_vstate);
-
         VisualizerTask visualizerTask =
             VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
 
         SkyrangerTask skyrangerTask = SkyrangerTask(m_vstate);
-
-        AccelerometerTask accelerometerTask; 
 
         Core(SoftQuatImu * imu, std::vector<PidController *> & pids, Mixer & mixer)
             : Core((Imu *)imu, pids, mixer)
