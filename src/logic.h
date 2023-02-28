@@ -311,24 +311,6 @@ class Logic {
             }
         }
 
-        void step(int16_t rawGyro[3], const uint32_t usec, float mixmotors[])
-        {
-            auto angvels = m_imu->gyroRawToFilteredDps(rawGyro);
-
-            m_vstate.dphi   = angvels.x;
-            m_vstate.dtheta = angvels.y;
-            m_vstate.dpsi   = angvels.z;
-
-            Demands demands = m_receiverTask.getDemands();
-
-            auto motors = m_mixer->step(
-                    demands, m_vstate, m_pids, m_receiverTask.throttleIsDown(), usec);
-
-            for (auto i=0; i<m_mixer->getMotorCount(); i++) {
-                mixmotors[i] = motors.values[i];
-            }
-        }
-
         float * getMotors(int16_t rawGyro[3], const uint32_t usec)
         {
             auto angvels = m_imu->gyroRawToFilteredDps(rawGyro);
