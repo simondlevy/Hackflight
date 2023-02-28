@@ -38,22 +38,13 @@ class Stm32Board {
 
             switch (taskId) {
 
-                case Task::ATTITUDE:
-                    runTask(core, taskId);
-                    break;
-
                 case Task::VISUALIZER:
                     runVisualizerTask(core);
                     break;
 
+                case Task::ATTITUDE:
                 case Task::RECEIVER:
-                    runTask(core, taskId);
-                    break;
-
                 case Task::ACCELEROMETER:
-                    runTask(core, taskId);
-                    break;
-
                 case Task::SKYRANGER:
                     runTask(core, taskId);
                     break;
