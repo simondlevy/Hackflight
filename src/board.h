@@ -32,7 +32,7 @@ class Stm32Board {
 
         Esc * m_esc;
 
-        bool runDynamicTasks(Core & core, const int16_t rawAccel[3], const uint32_t usec)
+        bool runDynamicTasks(Logic & core, const int16_t rawAccel[3], const uint32_t usec)
         {
             auto taskId = core.prioritizeTasks(rawAccel, usec);
 
@@ -65,7 +65,7 @@ class Stm32Board {
             return taskId == Task::ATTITUDE || taskId == Task::RECEIVER;
         }
 
-        void runVisualizerTask( Core & core)
+        void runVisualizerTask( Logic & core)
         {
             while (Serial.available()) {
 
@@ -77,19 +77,19 @@ class Stm32Board {
             }
         }
 
-        void updateLed(Core & core)
+        void updateLed(Logic & core)
         {
             switch (core.getArmingStatus()) {
 
-                case Core::ARMING_UNREADY:
+                case Logic::ARMING_UNREADY:
                     ledBlink(500);
                     break;
 
-                case Core::ARMING_READY:
+                case Logic::ARMING_READY:
                     ledSet(false);
                     break;
 
-                case Core::ARMING_ARMED:
+                case Logic::ARMING_ARMED:
                     ledSet(true);
                     break;
 
@@ -153,7 +153,7 @@ class Stm32Board {
 
     public:
 
-        void handleImuInterrupt(Core & core)
+        void handleImuInterrupt(Logic & core)
         {
             core.handleImuInterrupt(getCycleCounter());
         }
@@ -168,7 +168,7 @@ class Stm32Board {
             return DWT->CYCCNT;
         }
 
-        void begin(Core & core)
+        void begin(Logic & core)
         {
             startCycleCounter();
 
@@ -186,7 +186,7 @@ class Stm32Board {
             ledSet(false);
         }
 
-        void step(Core & core, int16_t rawGyro[3], int16_t rawAccel[3])
+        void step(Logic & core, int16_t rawGyro[3], int16_t rawAccel[3])
         {
             auto nowCycles = getCycleCounter();
 
@@ -209,7 +209,7 @@ class Stm32Board {
                 core.step(rawGyro, usec, mixmotors);
 
                 m_esc->write(
-                        core.getArmingStatus() == Core::ARMING_ARMED ?
+                        core.getArmingStatus() == Logic::ARMING_ARMED ?
                         mixmotors :
                         core.getVisualizerMotors());
 
@@ -232,7 +232,7 @@ class Stm32Board {
         }
 
         void step(
-                Core & core,
+                Logic & core,
                 int16_t rawGyro[3],
                 int16_t rawAccel[3],
                 HardwareSerial & serial)

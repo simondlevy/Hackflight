@@ -77,7 +77,7 @@ static std::vector<PidController *> pids = {&anglePid};
 
 static Stm32F4Board board(esc, LED_PIN);
 
-static Core core(&imu, pids, mixer);
+static Logic core(&imu, pids, mixer);
 
 extern "C" void DMA2_Stream1_IRQHandler(void) 
 {

@@ -33,7 +33,7 @@ class Stm32FBoard : public Stm32Board {
 
     public:
 
-        void handleSkyrangerEvent(Core & core, HardwareSerial & serial)
+        void handleSkyrangerEvent(Logic & core, HardwareSerial & serial)
         {
             while (serial.available()) {
                 core.parseSkyrangerData(serial.read());

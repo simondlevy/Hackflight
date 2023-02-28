@@ -29,7 +29,7 @@
 #include "task/skyranger.h"
 #include "task/visualizer.h"
 
-class Core {
+class Logic {
 
     public:
 
@@ -182,13 +182,13 @@ class Core {
 
     public:
 
-        Core(SoftQuatImu * imu, std::vector<PidController *> & pids, Mixer & mixer)
-            : Core((Imu *)imu, pids, mixer)
+        Logic(SoftQuatImu * imu, std::vector<PidController *> & pids, Mixer & mixer)
+            : Logic((Imu *)imu, pids, mixer)
         {
             m_prioritizer = &m_extraPrioritizer;
         }
 
-        Core(Imu * imu, std::vector<PidController *> & pids, Mixer & mixer)
+        Logic(Imu * imu, std::vector<PidController *> & pids, Mixer & mixer)
         {
             m_imu = imu;
             m_pids = &pids;
@@ -523,4 +523,4 @@ class Core {
             return prioritizer.id;
         }
 
-}; // class Core
+}; // class Logic
