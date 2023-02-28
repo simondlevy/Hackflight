@@ -36,6 +36,23 @@
 #include <dshot.h>
 #include <stm32/stm32f4.h>
 
+///////////////////////////////////////////////////////////
+static AnglePidController anglePid(
+        1.441305,     // Rate Kp
+        48.8762,      // Rate Ki
+        0.021160,     // Rate Kd
+        0.0165048,    // Rate Kf
+        0.0); // 3.0; // Level Kp
+
+static Mixer mixer = QuadXbfMixer::make();
+
+static SoftQuatImu imu(Imu::rotate270);
+
+static std::vector<PidController *> pids = {&anglePid};
+
+static Logic logic(&imu, pids, mixer);
+///////////////////////////////////////////////////////////
+
 static const uint8_t LED_PIN     = PB5;
 static const uint8_t IMU_CS_PIN  = PA4;
 static const uint8_t IMU_INT_PIN = PC4;
@@ -62,22 +79,7 @@ static Stm32F4Dshot dshot;
 
 static DshotEsc esc = DshotEsc(&dshot);
 
-static AnglePidController anglePid(
-        1.441305,     // Rate Kp
-        48.8762,      // Rate Ki
-        0.021160,     // Rate Kd
-        0.0165048,    // Rate Kf
-        0.0); // 3.0; // Level Kp
-
-static Mixer mixer = QuadXbfMixer::make();
-
-static SoftQuatImu imu(Imu::rotate270);
-
-static std::vector<PidController *> pids = {&anglePid};
-
 static Stm32F4Board board(esc, LED_PIN);
-
-static Logic logic(&imu, pids, mixer);
 
 extern "C" void DMA2_Stream1_IRQHandler(void) 
 {
