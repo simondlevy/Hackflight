@@ -146,6 +146,41 @@ class Logic {
             }
         }
 
+        void updateAccelerometer(const int16_t rawAccel[3])
+        {
+            m_imu->updateAccelerometer(rawAccel);
+        }
+
+        void updateArmingStatus(const uint32_t usec)
+        {
+            checkFailsafe(usec);
+
+            switch (m_armingStatus) {
+
+                case ARMING_UNREADY:
+                    if (safeToArm(usec)) {
+                        m_armingStatus = ARMING_READY;
+                    }
+                    break;
+
+                case ARMING_READY:
+                    if (safeToArm(usec)) {
+                        checkArmingSwitch();
+                    }
+                    else {
+                        m_armingStatus = ARMING_UNREADY;
+                    }
+                    break;
+
+                case ARMING_ARMED:
+                    checkArmingSwitch();
+                    break;
+
+                default: // failsafe
+                    break;
+            }
+        }
+
         class Prioritizer {
 
             public:
@@ -195,11 +230,6 @@ class Logic {
             m_mixer = &mixer;
 
             m_prioritizer = &m_ordinaryPrioritizer;
-        }
-
-        float * getVisualizerMotors(void)
-        {
-            return m_visualizerTask.motors;
         }
 
         uint8_t skyrangerDataAvailable(void)
@@ -276,41 +306,6 @@ class Logic {
             m_imu->handleInterrupt(cycleCounter);
         }
 
-        void updateAccelerometer(const int16_t rawAccel[3])
-        {
-            m_imu->updateAccelerometer(rawAccel);
-        }
-
-        void updateArmingStatus(const uint32_t usec)
-        {
-            checkFailsafe(usec);
-
-            switch (m_armingStatus) {
-
-                case ARMING_UNREADY:
-                    if (safeToArm(usec)) {
-                        m_armingStatus = ARMING_READY;
-                    }
-                    break;
-
-                case ARMING_READY:
-                    if (safeToArm(usec)) {
-                        checkArmingSwitch();
-                    }
-                    else {
-                        m_armingStatus = ARMING_UNREADY;
-                    }
-                    break;
-
-                case ARMING_ARMED:
-                    checkArmingSwitch();
-                    break;
-
-                default: // failsafe
-                    break;
-            }
-        }
-
         float * getMotors(int16_t rawGyro[3], const uint32_t usec)
         {
             auto angvels = m_imu->gyroRawToFilteredDps(rawGyro);
@@ -332,7 +327,7 @@ class Logic {
 
             return m_armingStatus == ARMING_ARMED ?
                 mixmotors :
-                getVisualizerMotors();
+                m_visualizerTask.motors;
         }
 
         bool isDynamicTaskReady(const uint32_t nowCycles)
