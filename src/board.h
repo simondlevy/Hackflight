@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "core.h"
+#include "logic.h"
 #include "esc.h"
 
 #include <dshot.h>

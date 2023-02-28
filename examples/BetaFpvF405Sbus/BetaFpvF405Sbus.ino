@@ -20,11 +20,11 @@
 #include <hackflight.h>
 #include <board/stm32f/stm32f4.h>
 
-#include <core.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
 #include <esc/dshot.h>
 #include <imu/softquat.h>
+#include <logic.h>
 
 #include <sbus.h>
 
