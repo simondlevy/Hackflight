@@ -81,36 +81,36 @@ class Scheduler {
         Scheduler(void)
         {
             m_loopStartCycles =
-                microsecondsToClockCycles(START_LOOP_MIN_US);
+                Task::usecToClockCycles(START_LOOP_MIN_US);
             m_loopStartMinCycles =
-                microsecondsToClockCycles(START_LOOP_MIN_US);
+                Task::usecToClockCycles(START_LOOP_MIN_US);
             m_loopStartMaxCycles =
-                microsecondsToClockCycles(START_LOOP_MAX_US);
+                Task::usecToClockCycles(START_LOOP_MAX_US);
             m_loopStartDeltaDownCycles =
-                microsecondsToClockCycles(1) / START_LOOP_DOWN_STEP;
+                Task::usecToClockCycles(1) / START_LOOP_DOWN_STEP;
             m_loopStartDeltaUpCycles =
-                microsecondsToClockCycles(1) / START_LOOP_UP_STEP;
+                Task::usecToClockCycles(1) / START_LOOP_UP_STEP;
 
             m_taskGuardMinCycles =
-                microsecondsToClockCycles(TASK_GUARD_MARGIN_MIN_US);
+                Task::usecToClockCycles(TASK_GUARD_MARGIN_MIN_US);
             m_taskGuardMaxCycles =
-                microsecondsToClockCycles(TASK_GUARD_MARGIN_MAX_US);
+                Task::usecToClockCycles(TASK_GUARD_MARGIN_MAX_US);
             m_taskGuardCycles = m_taskGuardMinCycles;
             m_taskGuardDeltaDownCycles =
-                microsecondsToClockCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
+                Task::usecToClockCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
             m_taskGuardDeltaUpCycles =
-                microsecondsToClockCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
+                Task::usecToClockCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
 
             lastTargetCycles = 0;
             m_nextTimingCycles = 0;
 
             desiredPeriodCycles =
-                (int32_t)microsecondsToClockCycles(PidController::PERIOD);
+                (int32_t)Task::usecToClockCycles(PidController::PERIOD);
 
             m_guardMargin =
-                (int32_t)microsecondsToClockCycles(CHECK_GUARD_MARGIN_US);
+                (int32_t)Task::usecToClockCycles(CHECK_GUARD_MARGIN_US);
 
-            m_clockRate = microsecondsToClockCycles(1000000);
+            m_clockRate = Task::usecToClockCycles(1000000);
         }
 
         uint32_t corePreUpdate(int32_t & loopRemainingCycles) 
@@ -179,10 +179,10 @@ class Scheduler {
 
         bool isDynamicReady(uint32_t nowCycles) 
         {
-            auto newLoopRemainingCyles =
+            auto newLoopRemainingCycles =
                 intcmp(m_nextTargetCycles, nowCycles);
 
-            return newLoopRemainingCyles > m_guardMargin;
+            return newLoopRemainingCycles > m_guardMargin;
         }
 
         void updateDynamic(uint32_t nowCycles, uint32_t anticipatedEndCycles)
