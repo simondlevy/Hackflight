@@ -20,11 +20,11 @@
 
 #include <string.h>
 
-#include "core/axes.h"
-#include "core/filters/pt2.h"
-#include "core/pid.h"
-#include "core/vstate.h"
-#include "imu.h"
+#include "logic/core/axes.h"
+#include "logic/core/filters/pt2.h"
+#include "logic/core/pid.h"
+#include "logic/core/vstate.h"
+#include "logic/imu.h"
 
 class SoftQuatImu : public Imu {
 

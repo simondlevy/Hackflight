@@ -20,10 +20,10 @@
 #pragma once
 
 #include <hackflight.h>
-#include <core/mixers/fixedpitch/quadxbf.h>
-#include <core/pids/angle.h>
-#include <imu/softquat.h>
-#include <logic.h>
+#include <logic/core/mixers/fixedpitch/quadxbf.h>
+#include <logic/core/pids/angle.h>
+#include <logic/imu/softquat.h>
+#include <logic/logic.h>
 
 #include <vector>
 

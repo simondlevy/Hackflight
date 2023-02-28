@@ -21,12 +21,11 @@
 
 #include <stdint.h>
 
-#include "core/motors.h"
-#include "imu.h"
-#include "msp.h"
-#include "receiver.h"
-#include "task/receiver.h"
-#include "task/skyranger.h"
+#include "logic/core/motors.h"
+#include "logic/imu.h"
+#include "logic/msp.h"
+#include "logic/task/receiver.h"
+#include "logic/task/skyranger.h"
 
 class VisualizerTask : public Task {
 

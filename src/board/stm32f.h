@@ -19,8 +19,6 @@
 #include <SPI.h>
 
 #include "board.h"
-#include "task/accelerometer.h"
-#include "imu/softquat.h"
 
 class Stm32FBoard : public Stm32Board {
 

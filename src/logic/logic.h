@@ -20,14 +20,14 @@
 
 #include <vector>
 
-#include "core/mixer.h"
-#include "imu/softquat.h"
-#include "scheduler.h"
-#include "task/accelerometer.h"
-#include "task/attitude.h"
-#include "task/receiver.h"
-#include "task/skyranger.h"
-#include "task/visualizer.h"
+#include "logic/core/mixer.h"
+#include "logic/imu/softquat.h"
+#include "logic/scheduler.h"
+#include "logic/task/accelerometer.h"
+#include "logic/task/attitude.h"
+#include "logic/task/receiver.h"
+#include "logic/task/skyranger.h"
+#include "logic/task/visualizer.h"
 
 class Logic {
 

@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "task.h"
-#include "msp.h"
+#include "logic/task.h"
+#include "logic/msp.h"
 
 class SkyrangerTask : public Task {
 

@@ -18,18 +18,36 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "logic/imu.h"
+#include "logic/task.h"
 
-#include "core/motors.h"
+class AttitudeTask : public Task {
 
-class QuadMotors {
+    private:
+
+        Imu *          m_imu;
+        VehicleState * m_vstate;
 
     public:
 
-        static Motors make(const float vals[])
+        AttitudeTask(VehicleState & vstate)
+            : Task(ATTITUDE, 100) // Hz
         {
-            return Motors(vals, 4);
+            m_vstate = &vstate;
         }
 
-}; // class QuadMotors
+        void begin(Imu * imu)
+        {
+            m_imu = imu;
+        }
+
+        virtual void run(const uint32_t usec) override
+        {
+            const auto angles = m_imu->getEulerAngles(usec);
+
+            m_vstate->phi   = angles.x;
+            m_vstate->theta = angles.y;
+            m_vstate->psi   = angles.z;
+        }
+
+}; // class AttitudeTask

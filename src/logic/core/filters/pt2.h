@@ -20,7 +20,7 @@
 
 #include <math.h>
 
-#include "core/pid.h"
+#include "logic/core/pid.h"
 
 // PT2 Low Pass filter
 class Pt2Filter {

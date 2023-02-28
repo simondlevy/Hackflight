@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "imu/softquat.h"
-#include "task.h"
+#include "logic/imu/softquat.h"
+#include "logic/task.h"
 
 class AccelerometerTask : public Task {
 

@@ -18,36 +18,39 @@
 
 #pragma once
 
-#include "imu.h"
-#include "task.h"
+#include <math.h>
 
-class AttitudeTask : public Task {
+#include "logic/core/pid.h"
+
+// PT1 Low Pass filter
+class Pt1Filter {
 
     private:
 
-        Imu *          m_imu;
-        VehicleState * m_vstate;
+        float m_state;
+        float m_dt;
+        float m_k;
 
     public:
 
-        AttitudeTask(VehicleState & vstate)
-            : Task(ATTITUDE, 100) // Hz
+        Pt1Filter(const float f_cut, const float dt=PidController::DT)
         {
-            m_vstate = &vstate;
+            m_state = 0.0;
+            m_dt = dt;
+
+            computeGain(f_cut);
         }
 
-        void begin(Imu * imu)
+        float apply(const float input)
         {
-            m_imu = imu;
+            m_state = m_state + m_k * (input - m_state);
+            return m_state;
         }
 
-        virtual void run(const uint32_t usec) override
+        void computeGain(const float f_cut)
         {
-            const auto angles = m_imu->getEulerAngles(usec);
-
-            m_vstate->phi   = angles.x;
-            m_vstate->theta = angles.y;
-            m_vstate->psi   = angles.z;
+            float rc = 1 / (2 * M_PI * f_cut);
+            m_k = m_dt / (rc + m_dt);
         }
 
-}; // class AttitudeTask
+}; // class Pt1Filter

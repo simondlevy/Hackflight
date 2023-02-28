@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "imu.h"
+#include "logic/imu.h"
 
 class LadybugImu : public Imu {
 

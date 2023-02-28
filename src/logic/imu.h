@@ -19,12 +19,12 @@
 #pragma once
 
 #include "board.h"
-#include "core/axes.h"
-#include "core/constrain.h"
-#include "core/filters/pt1.h"
-#include "core/pid.h"
-#include "core/utils.h"
-#include "core/vstate.h"
+#include "logic/core/axes.h"
+#include "logic/core/constrain.h"
+#include "logic/core/filters/pt1.h"
+#include "logic/core/pid.h"
+#include "logic/core/utils.h"
+#include "logic/core/vstate.h"
 
 class Imu {
 

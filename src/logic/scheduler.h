@@ -23,8 +23,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "core/pid.h"
-#include "task.h"
+#include "logic/core/pid.h"
+#include "logic/task.h"
 
 class Scheduler {
 

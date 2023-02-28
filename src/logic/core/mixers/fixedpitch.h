@@ -21,10 +21,10 @@
 
 #include <stdbool.h>
 
-#include "core/axes.h"
-#include "core/constrain.h"
-#include "core/mixer.h"
-#include "core/motors.h"
+#include "logic/core/axes.h"
+#include "logic/core/constrain.h"
+#include "logic/core/mixer.h"
+#include "logic/core/motors.h"
 
 class FixedPitchMixer {
 

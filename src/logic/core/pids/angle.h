@@ -21,11 +21,11 @@
 #include <string.h>
 #include <math.h>
 
-#include "core/constrain.h"
-#include "core/filters/pt1.h"
-#include "core/filters/pt2.h"
-#include "core/pid.h"
-#include "core/utils.h"
+#include "logic/core/constrain.h"
+#include "logic/core/filters/pt1.h"
+#include "logic/core/filters/pt2.h"
+#include "logic/core/pid.h"
+#include "logic/core/utils.h"
 
 class AnglePidController : public PidController {
 
