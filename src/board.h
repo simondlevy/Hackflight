@@ -32,6 +32,11 @@ class Stm32Board {
 
         Esc * m_esc;
 
+        uint32_t getCycleCounter(void)
+        {
+            return DWT->CYCCNT;
+        }
+
         bool runDynamicTasks(Logic & logic, const int16_t rawAccel[3], const uint32_t usec)
         {
             auto taskId = logic.prioritizeTasks(rawAccel, usec);
@@ -156,16 +161,6 @@ class Stm32Board {
         void handleImuInterrupt(Logic & logic)
         {
             logic.handleImuInterrupt(getCycleCounter());
-        }
-
-        uint32_t microsToCycles(uint32_t micros)
-        {
-            return getClockSpeed() / 1000000 * micros;
-        }
-
-        uint32_t getCycleCounter(void)
-        {
-            return DWT->CYCCNT;
         }
 
         void begin(Logic & logic)
