@@ -38,40 +38,31 @@ class Stm32Board {
 
             if (taskId != Task::NONE) {
 
-                const auto anticipatedEndCycles = getAnticipatedEndCycles(core, taskId);
+                const auto anticipatedEndCycles = 
+                    core.getAnticipatedEndCycles(getCycleCounter(), taskId);
 
                 if (anticipatedEndCycles > 0) {
 
                     const uint32_t usec = micros();
 
-                    switch (taskId) {
-
-                        case Task::VISUALIZER:
-                            runVisualizerTask(core);
-                            break;
-
-                        case Task::ATTITUDE:
-                        case Task::RECEIVER:
-                        case Task::ACCELEROMETER:
-                        case Task::SKYRANGER:
-                            runTask(core, taskId, usec);
-                            break;
-
-                        default:
-                            break;
+                    if (taskId == Task::VISUALIZER) {
+                        runVisualizerTask(core);
+                    }
+                    else {
+                        core.runTask(taskId, usec);
                     }
 
-                    postRunTask(core, taskId, usec, anticipatedEndCycles);
+                    core.postRunTask(
+                            taskId,
+                            usec,
+                            micros(),
+                            getCycleCounter(),
+                            anticipatedEndCycles);
                 }
             }
 
             // LED udpate needed?
             return taskId == Task::ATTITUDE || taskId == Task::RECEIVER;
-        }
-
-        void runTask(Core & core, const Task::id_t taskId, const uint32_t usec)
-        {
-            core.runTask(taskId, usec);
         }
 
         void runVisualizerTask( Core & core)
@@ -84,16 +75,6 @@ class Stm32Board {
                     }
                 }
             }
-        }
-
-        void postRunTask(
-                Core & core,
-                const Task::id_t taskId,
-                const uint32_t usecStart,
-                const uint32_t anticipatedEndCycles)
-        {
-            core.postRunTask(
-                    taskId, usecStart, micros(), getCycleCounter(), anticipatedEndCycles);
         }
 
         void updateLed(Core & core)
@@ -141,11 +122,6 @@ class Stm32Board {
         // an external input
         virtual void reboot(void)
         {
-        }
-
-        uint32_t getAnticipatedEndCycles(Core & core, const Task::id_t taskId)
-        {
-            return core.getAnticipatedEndCycles(getCycleCounter(), taskId);
         }
 
         uint32_t getClockSpeed(void) 
