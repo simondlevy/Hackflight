@@ -320,6 +320,35 @@ class Core {
             return m_scheduler.corePreUpdate(loopRemainingCycles);
         }
 
+        void runTask(const Task::id_t taskId, const uint32_t usec)
+        {
+            switch (taskId) {
+
+                case Task::ATTITUDE:
+                    attitudeTask.run(usec);
+                    break;
+
+                case Task::RECEIVER:
+                    receiverTask.run(usec);
+                    break;
+
+                case Task::VISUALIZER:
+                    visualizerTask.run(usec);
+                    break;
+
+                case Task::ACCELEROMETER:
+                    accelerometerTask.run(usec);
+                    break;
+
+                case Task::SKYRANGER:
+                    skyrangerTask.run(usec);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
         void postRunTask(
                 const Task::id_t taskId,
                 const uint32_t usecStart,

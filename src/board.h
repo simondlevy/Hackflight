@@ -39,7 +39,7 @@ class Stm32Board {
             switch (taskId) {
 
                 case Task::ATTITUDE:
-                    runTask(core, core.attitudeTask, taskId);
+                    runTask(core, taskId);
                     break;
 
                 case Task::VISUALIZER:
@@ -47,15 +47,15 @@ class Stm32Board {
                     break;
 
                 case Task::RECEIVER:
-                    runTask(core, core.receiverTask, taskId);
+                    runTask(core, taskId);
                     break;
 
                 case Task::ACCELEROMETER:
-                    runTask(core, core.accelerometerTask, taskId);
+                    runTask(core, taskId);
                     break;
 
                 case Task::SKYRANGER:
-                    runTask(core, core.skyrangerTask, taskId);
+                    runTask(core, taskId);
                     break;
 
                 default:
@@ -66,7 +66,7 @@ class Stm32Board {
             return taskId == Task::ATTITUDE || taskId == Task::RECEIVER;
         }
 
-        void runTask(Core & core, Task & task, const Task::id_t taskId)
+        void runTask(Core & core, const Task::id_t taskId)
         {
             const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(core, taskId);
 
@@ -74,7 +74,7 @@ class Stm32Board {
 
                 const uint32_t usec = micros();
 
-                task.run(usec);
+                core.runTask(taskId, usec);
 
                 postRunTask(core, taskId, usec, anticipatedEndCycles);
             } 
