@@ -251,7 +251,7 @@ class Stm32Board {
                 m_esc->write(
                         core.getArmingStatus() == Core::ARMING_ARMED ?
                         mixmotors :
-                        core.visualizerTask.motors);
+                        core.getVisualizerMotors());
 
                 core.updateScheduler(nowCycles, nextTargetCycles);
             }
@@ -279,8 +279,8 @@ class Stm32Board {
         {
             step(core, rawGyro, rawAccel);
 
-            while (core.skyrangerTask.imuDataAvailable()) {
-                serial.write(core.skyrangerTask.readImuData());
+            while (core.skyrangerDataAvailable()) {
+                serial.write(core.readSkyrangerData());
             }
         }
 

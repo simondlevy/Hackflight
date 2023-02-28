@@ -74,6 +74,11 @@ class Core {
 
         AccelerometerTask accelerometerTask; 
 
+        SkyrangerTask skyrangerTask = SkyrangerTask(m_vstate);
+
+        VisualizerTask visualizerTask =
+            VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
+
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
@@ -177,11 +182,6 @@ class Core {
 
     public:
 
-        VisualizerTask visualizerTask =
-            VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
-
-        SkyrangerTask skyrangerTask = SkyrangerTask(m_vstate);
-
         Core(SoftQuatImu * imu, std::vector<PidController *> & pids, Mixer & mixer)
             : Core((Imu *)imu, pids, mixer)
         {
@@ -195,6 +195,26 @@ class Core {
             m_mixer = &mixer;
 
             m_prioritizer = &m_ordinaryPrioritizer;
+        }
+
+        float * getVisualizerMotors(void)
+        {
+            return visualizerTask.motors;
+        }
+
+        uint8_t skyrangerDataAvailable(void)
+        {
+            return skyrangerTask.imuDataAvailable();
+        }
+
+        uint8_t readSkyrangerData(void)
+        {
+            return skyrangerTask.readImuData();
+        }
+
+        void parseSkyrangerData(const uint8_t byte)
+        {
+            skyrangerTask.parse(byte);
         }
 
         void setSbusValues(uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
