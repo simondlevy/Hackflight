@@ -20,7 +20,6 @@
 #pragma once
 
 #include <hackflight.h>
-
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
 #include <imu/softquat.h>
@@ -28,6 +27,32 @@
 
 #include <vector>
 
+class QuadLogic : public Logic {
+
+    private:
+
+        AnglePidController anglePid = AnglePidController(
+                1.441305,     // Rate Kp
+                48.8762,      // Rate Ki
+                0.021160,     // Rate Kd
+                0.0165048,    // Rate Kf
+                0.0); // 3.0; // Level Kp
+
+        Mixer mixer = QuadXbfMixer::make();
+
+        SoftQuatImu imu = SoftQuatImu(Imu::rotate270);
+
+        std::vector<PidController *> pids = {&anglePid};
+
+    public:
+
+        QuadLogic(void) 
+            : Logic(&imu, pids, mixer)
+        {
+        }
+}; 
+
+/*
 static AnglePidController anglePid(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -42,3 +67,4 @@ static SoftQuatImu imu(Imu::rotate270);
 static std::vector<PidController *> pids = {&anglePid};
 
 static Logic logic(&imu, pids, mixer);
+*/

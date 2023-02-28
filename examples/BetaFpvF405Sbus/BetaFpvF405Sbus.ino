@@ -72,6 +72,8 @@ extern "C" void DMA2_Stream2_IRQHandler(void)
     dshot.handleDmaIrqStream2();
 }
 
+static QuadLogic logic;
+
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
