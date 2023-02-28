@@ -20,11 +20,7 @@
 #include <hackflight.h>
 #include <board/stm32f/stm32f4.h>
 
-#include <core/mixers/fixedpitch/quadxbf.h>
-#include <core/pids/angle.h>
 #include <esc/dshot.h>
-#include <imu/softquat.h>
-#include <logic.h>
 
 #include <sbus.h>
 
@@ -36,22 +32,7 @@
 #include <dshot.h>
 #include <stm32/stm32f4.h>
 
-///////////////////////////////////////////////////////////
-static AnglePidController anglePid(
-        1.441305,     // Rate Kp
-        48.8762,      // Rate Ki
-        0.021160,     // Rate Kd
-        0.0165048,    // Rate Kf
-        0.0); // 3.0; // Level Kp
-
-static Mixer mixer = QuadXbfMixer::make();
-
-static SoftQuatImu imu(Imu::rotate270);
-
-static std::vector<PidController *> pids = {&anglePid};
-
-static Logic logic(&imu, pids, mixer);
-///////////////////////////////////////////////////////////
+#include "quadlogic.h"
 
 static const uint8_t LED_PIN     = PB5;
 static const uint8_t IMU_CS_PIN  = PA4;
