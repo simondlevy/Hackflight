@@ -204,6 +204,7 @@ class Stm32Board {
                     loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
                 }
 
+                /*
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
                 logic.step(rawGyro, usec, mixmotors);
@@ -211,7 +212,9 @@ class Stm32Board {
                 m_esc->write(
                         logic.getArmingStatus() == Logic::ARMING_ARMED ?
                         mixmotors :
-                        logic.getVisualizerMotors());
+                        logic.getVisualizerMotors());*/
+
+                m_esc->write(logic.getMotors(rawGyro, usec));
 
                 logic.updateScheduler(nowCycles, nextTargetCycles);
             }
