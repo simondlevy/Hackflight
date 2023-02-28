@@ -68,22 +68,22 @@ class Core {
         uint8_t m_mspPayloadSize;
         uint8_t m_mspPayloadIndex;
 
-        ReceiverTask receiverTask;
+        ReceiverTask m_receiverTask;
 
-        AttitudeTask attitudeTask = AttitudeTask(m_vstate);
+        AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
-        AccelerometerTask accelerometerTask; 
+        AccelerometerTask m_accelerometerTask; 
 
-        SkyrangerTask skyrangerTask = SkyrangerTask(m_vstate);
+        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
 
-        VisualizerTask visualizerTask =
-            VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
+        VisualizerTask m_visualizerTask =
+            VisualizerTask(m_msp, m_vstate, m_receiverTask, m_skyrangerTask);
 
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
 
-            const auto haveSignal = receiverTask.haveSignal(usec);
+            const auto haveSignal = m_receiverTask.haveSignal(usec);
 
             if (haveSignal) {
                 hadSignal = true;
@@ -113,19 +113,19 @@ class Core {
 
             const auto gyroDoneCalibrating = !m_imu->gyroIsCalibrating();
 
-            const auto haveReceiverSignal = receiverTask.haveSignal(usec);
+            const auto haveReceiverSignal = m_receiverTask.haveSignal(usec);
 
             return
                 auxSwitchWasOff &&
                 gyroDoneCalibrating &&
                 imuIsLevel &&
-                receiverTask.throttleIsDown() &&
+                m_receiverTask.throttleIsDown() &&
                 haveReceiverSignal;
         }
 
         float getAux1(void)
         {
-            return receiverTask.getRawAux1();
+            return m_receiverTask.getRawAux1();
         }
 
         void checkArmingSwitch(void)
@@ -153,13 +153,13 @@ class Core {
                 virtual void prioritizeExtras(
                         Task::prioritizer_t & prioritizer,
                         const uint32_t usec,
-                        AccelerometerTask accelerometerTask,
-                        SkyrangerTask skyrangerTask)
+                        AccelerometerTask m_accelerometerTask,
+                        SkyrangerTask m_skyrangerTask)
                 {
                     (void)prioritizer;
                     (void)usec;
-                    (void)accelerometerTask;
-                    (void)skyrangerTask;
+                    (void)m_accelerometerTask;
+                    (void)m_skyrangerTask;
                 }
         };
 
@@ -168,11 +168,11 @@ class Core {
             virtual void prioritizeExtras(
                     Task::prioritizer_t & prioritizer,
                     const uint32_t usec,
-                    AccelerometerTask accelerometerTask,
-                    SkyrangerTask skyrangerTask)
+                    AccelerometerTask m_accelerometerTask,
+                    SkyrangerTask m_skyrangerTask)
             {
-                accelerometerTask.prioritize(usec, prioritizer);
-                skyrangerTask.prioritize(usec, prioritizer);
+                m_accelerometerTask.prioritize(usec, prioritizer);
+                m_skyrangerTask.prioritize(usec, prioritizer);
             }
         };
 
@@ -199,37 +199,37 @@ class Core {
 
         float * getVisualizerMotors(void)
         {
-            return visualizerTask.motors;
+            return m_visualizerTask.motors;
         }
 
         uint8_t skyrangerDataAvailable(void)
         {
-            return skyrangerTask.imuDataAvailable();
+            return m_skyrangerTask.imuDataAvailable();
         }
 
         uint8_t readSkyrangerData(void)
         {
-            return skyrangerTask.readImuData();
+            return m_skyrangerTask.readImuData();
         }
 
         void parseSkyrangerData(const uint8_t byte)
         {
-            skyrangerTask.parse(byte);
+            m_skyrangerTask.parse(byte);
         }
 
         void setSbusValues(uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
         {
-            receiverTask.setValues(chanvals, usec, lostFrame, 172, 1811);
+            m_receiverTask.setValues(chanvals, usec, lostFrame, 172, 1811);
         }
 
         void setDsmxValues(uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
         {
-            receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
+            m_receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
         }
 
         bool mspParse(const uint8_t byte)
         {
-            bool result = visualizerTask.parse(byte);
+            bool result = m_visualizerTask.parse(byte);
             if (result) {
                 m_mspPayloadSize = m_msp.payloadSize;
                 m_mspPayloadIndex = 0;
@@ -252,9 +252,9 @@ class Core {
 
         void begin(const uint32_t clockSpeed)
         {
-            attitudeTask.begin(m_imu);
+            m_attitudeTask.begin(m_imu);
 
-            visualizerTask.begin(&receiverTask);
+            m_visualizerTask.begin(&m_receiverTask);
 
             m_imu->begin(clockSpeed);
         }
@@ -266,7 +266,7 @@ class Core {
 
         bool gotRebootRequest(void)
         {
-            return visualizerTask.gotRebootRequest();
+            return m_visualizerTask.gotRebootRequest();
         }
 
         void handleImuInterrupt(const uint32_t cycleCounter)
@@ -319,10 +319,10 @@ class Core {
             m_vstate.dtheta = angvels.y;
             m_vstate.dpsi   = angvels.z;
 
-            Demands demands = receiverTask.getDemands();
+            Demands demands = m_receiverTask.getDemands();
 
             auto motors = m_mixer->step(
-                    demands, m_vstate, m_pids, receiverTask.throttleIsDown(), usec);
+                    demands, m_vstate, m_pids, m_receiverTask.throttleIsDown(), usec);
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
@@ -345,23 +345,23 @@ class Core {
             switch (taskId) {
 
                 case Task::ATTITUDE:
-                    attitudeTask.run(usec);
+                    m_attitudeTask.run(usec);
                     break;
 
                 case Task::RECEIVER:
-                    receiverTask.run(usec);
+                    m_receiverTask.run(usec);
                     break;
 
                 case Task::VISUALIZER:
-                    visualizerTask.run(usec);
+                    m_visualizerTask.run(usec);
                     break;
 
                 case Task::ACCELEROMETER:
-                    accelerometerTask.run(usec);
+                    m_accelerometerTask.run(usec);
                     break;
 
                 case Task::SKYRANGER:
-                    skyrangerTask.run(usec);
+                    m_skyrangerTask.run(usec);
                     break;
 
                 default:
@@ -381,23 +381,23 @@ class Core {
             switch (taskId) {
 
                 case Task::ATTITUDE:
-                    attitudeTask.update(usecStart, duration);
+                    m_attitudeTask.update(usecStart, duration);
                     break;
 
                 case Task::RECEIVER:
-                    receiverTask.update(usecStart, duration);
+                    m_receiverTask.update(usecStart, duration);
                     break;
 
                 case Task::VISUALIZER:
-                    visualizerTask.update(usecStart, duration);
+                    m_visualizerTask.update(usecStart, duration);
                     break;
 
                 case Task::ACCELEROMETER:
-                    accelerometerTask.update(usecStart, duration);
+                    m_accelerometerTask.update(usecStart, duration);
                     break;
 
                 case Task::SKYRANGER:
-                    skyrangerTask.update(usecStart, duration);
+                    m_skyrangerTask.update(usecStart, duration);
                     break;
 
                 default:
@@ -414,24 +414,24 @@ class Core {
             switch (taskId) {
 
                 case Task::ATTITUDE:
-                    cycles = m_scheduler.getAnticipatedEndCycles(attitudeTask, nowCycles);
+                    cycles = m_scheduler.getAnticipatedEndCycles(m_attitudeTask, nowCycles);
                     break;
 
                 case Task::RECEIVER:
-                    cycles = m_scheduler.getAnticipatedEndCycles(receiverTask, nowCycles);
+                    cycles = m_scheduler.getAnticipatedEndCycles(m_receiverTask, nowCycles);
                     break;
 
                 case Task::VISUALIZER:
-                    cycles = m_scheduler.getAnticipatedEndCycles(visualizerTask, nowCycles);
+                    cycles = m_scheduler.getAnticipatedEndCycles(m_visualizerTask, nowCycles);
                     break;
 
                 case Task::ACCELEROMETER:
                     cycles =
-                        m_scheduler.getAnticipatedEndCycles(accelerometerTask, nowCycles);
+                        m_scheduler.getAnticipatedEndCycles(m_accelerometerTask, nowCycles);
                     break;
 
                 case Task::SKYRANGER:
-                    cycles = m_scheduler.getAnticipatedEndCycles(skyrangerTask, nowCycles);
+                    cycles = m_scheduler.getAnticipatedEndCycles(m_skyrangerTask, nowCycles);
                     break;
 
                 default:
@@ -498,12 +498,12 @@ class Core {
         {
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
-            receiverTask.prioritize(usec, prioritizer);
-            attitudeTask.prioritize(usec, prioritizer);
-            visualizerTask.prioritize(usec, prioritizer);
+            m_receiverTask.prioritize(usec, prioritizer);
+            m_attitudeTask.prioritize(usec, prioritizer);
+            m_visualizerTask.prioritize(usec, prioritizer);
 
             m_prioritizer->prioritizeExtras(
-                    prioritizer, usec, accelerometerTask, skyrangerTask);
+                    prioritizer, usec, m_accelerometerTask, m_skyrangerTask);
 
             switch (prioritizer.id) {
 
