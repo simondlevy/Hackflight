@@ -76,18 +76,18 @@ class Stm32Board {
 
                 task.run(usec);
 
-                postRunTask(core, task, usec, anticipatedEndCycles);
+                postRunTask(core, taskId, usec, anticipatedEndCycles);
             } 
         }
 
         void postRunTask(
                 Core & core,
-                Task & task,
+                const Task::id_t taskId,
                 const uint32_t usecStart,
                 const uint32_t anticipatedEndCycles)
         {
             core.postRunTask(
-                    task, usecStart, micros(), getCycleCounter(), anticipatedEndCycles);
+                    taskId, usecStart, micros(), getCycleCounter(), anticipatedEndCycles);
         }
 
         void updateLed(Core & core)
@@ -155,7 +155,7 @@ class Stm32Board {
                     }
                 }
 
-                postRunTask(core, core.visualizerTask, usec, anticipatedEndCycles);
+                postRunTask(core, Task::VISUALIZER, usec, anticipatedEndCycles);
             }
         }
 

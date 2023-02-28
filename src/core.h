@@ -321,13 +321,40 @@ class Core {
         }
 
         void postRunTask(
-                Task & task,
+                const Task::id_t taskId,
                 const uint32_t usecStart,
                 const uint32_t usecEnd,
                 const uint32_t nowCycles,
                 const uint32_t anticipatedEndCycles)
         {
-            task.update(usecStart, usecEnd-usecStart);
+            auto duration = usecEnd-usecStart;
+
+            switch (taskId) {
+
+                case Task::ATTITUDE:
+                    attitudeTask.update(usecStart, duration);
+                    break;
+
+                case Task::RECEIVER:
+                    receiverTask.update(usecStart, duration);
+                    break;
+
+                case Task::VISUALIZER:
+                    visualizerTask.update(usecStart, duration);
+                    break;
+
+                case Task::ACCELEROMETER:
+                    accelerometerTask.update(usecStart, duration);
+                    break;
+
+                case Task::SKYRANGER:
+                    skyrangerTask.update(usecStart, duration);
+                    break;
+
+                default:
+                    break;
+            }
+
             m_scheduler.updateDynamic(nowCycles, anticipatedEndCycles);
         }
 
