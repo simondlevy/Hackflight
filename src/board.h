@@ -36,39 +36,54 @@ class Stm32Board {
         {
             auto taskId = core.prioritizeTasks(rawAccel, usec);
 
-            switch (taskId) {
+            if (taskId != Task::NONE) {
 
-                case Task::VISUALIZER:
-                    runVisualizerTask(core);
-                    break;
+                const auto anticipatedEndCycles = getAnticipatedEndCycles(core, taskId);
 
-                case Task::ATTITUDE:
-                case Task::RECEIVER:
-                case Task::ACCELEROMETER:
-                case Task::SKYRANGER:
-                    runTask(core, taskId);
-                    break;
+                if (anticipatedEndCycles > 0) {
 
-                default:
-                    break;
+                    const uint32_t usec = micros();
+
+                    switch (taskId) {
+
+                        case Task::VISUALIZER:
+                            runVisualizerTask(core);
+                            break;
+
+                        case Task::ATTITUDE:
+                        case Task::RECEIVER:
+                        case Task::ACCELEROMETER:
+                        case Task::SKYRANGER:
+                            runTask(core, taskId, usec);
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    postRunTask(core, taskId, usec, anticipatedEndCycles);
+                }
             }
 
             // LED udpate needed?
             return taskId == Task::ATTITUDE || taskId == Task::RECEIVER;
         }
 
-        void runTask(Core & core, const Task::id_t taskId)
+        void runTask(Core & core, const Task::id_t taskId, const uint32_t usec)
         {
-            const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(core, taskId);
+            core.runTask(taskId, usec);
+        }
 
-            if (anticipatedEndCycles > 0) {
+        void runVisualizerTask( Core & core)
+        {
+            while (Serial.available()) {
 
-                const uint32_t usec = micros();
-
-                core.runTask(taskId, usec);
-
-                postRunTask(core, taskId, usec, anticipatedEndCycles);
-            } 
+                if (core.mspParse(Serial.read())) {
+                    while (core.mspBytesAvailable()) {
+                        Serial.write(core.mspGetByte());
+                    }
+                }
+            }
         }
 
         void postRunTask(
@@ -100,7 +115,7 @@ class Stm32Board {
                 default: // failsafe
                     ledBlink(200);
                     break;
-             }
+            }
         }
 
         void ledBlink(const uint32_t msecDelay)
@@ -126,28 +141,6 @@ class Stm32Board {
         // an external input
         virtual void reboot(void)
         {
-        }
-
-        void runVisualizerTask(Core & core)
-        {
-            const uint32_t anticipatedEndCycles =
-                getAnticipatedEndCycles(core, Task::VISUALIZER);
-
-            if (anticipatedEndCycles > 0) {
-
-                const auto usec = micros();
-
-                while (Serial.available()) {
-
-                    if (core.mspParse(Serial.read())) {
-                        while (core.mspBytesAvailable()) {
-                            Serial.write(core.mspGetByte());
-                        }
-                    }
-                }
-
-                postRunTask(core, Task::VISUALIZER, usec, anticipatedEndCycles);
-            }
         }
 
         uint32_t getAnticipatedEndCycles(Core & core, const Task::id_t taskId)
