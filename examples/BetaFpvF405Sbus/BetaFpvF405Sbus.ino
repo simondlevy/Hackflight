@@ -77,7 +77,7 @@ static std::vector<PidController *> pids = {&anglePid};
 
 static Stm32F4Board board(esc, LED_PIN);
 
-static Logic core(&imu, pids, mixer);
+static Logic logic(&imu, pids, mixer);
 
 extern "C" void DMA2_Stream1_IRQHandler(void) 
 {
@@ -92,7 +92,7 @@ extern "C" void DMA2_Stream2_IRQHandler(void)
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    board.handleImuInterrupt(core);
+    board.handleImuInterrupt(logic);
 }
 
 // Receiver interrupt
@@ -102,14 +102,14 @@ void serialEvent3(void)
 
         bfs::SbusData data = rx.data();
 
-        core.setSbusValues((uint16_t *)data.ch, micros(), data.lost_frame);
+        logic.setSbusValues((uint16_t *)data.ch, micros(), data.lost_frame);
     }
 }
 
 // Interupt from Skyranger
 void serialEvent4(void)
 {
-    board.handleSkyrangerEvent(core, Serial4);
+    board.handleSkyrangerEvent(logic, Serial4);
 }
 
 void setup(void)
@@ -127,7 +127,7 @@ void setup(void)
 
     mpu.begin();
 
-    board.begin(core);
+    board.begin(logic);
 
     dshot.begin(stream1MotorPins, stream2MotorPins);
 }
@@ -140,5 +140,5 @@ void loop(void)
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
     // Support sending attitude data to Skyranger over Serial4
-    board.step(core, rawGyro, rawAccel, Serial4);
+    board.step(logic, rawGyro, rawAccel, Serial4);
 }
