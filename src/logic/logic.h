@@ -50,6 +50,36 @@ class Logic {
 
         static constexpr float MAX_ARMING_ANGLE_DEG = 25;
 
+        class Prioritizer {
+
+            public:
+
+                virtual void prioritizeExtras(
+                        Task::prioritizer_t & prioritizer,
+                        const uint32_t usec,
+                        AccelerometerTask m_accelerometerTask,
+                        SkyrangerTask m_skyrangerTask)
+                {
+                    (void)prioritizer;
+                    (void)usec;
+                    (void)m_accelerometerTask;
+                    (void)m_skyrangerTask;
+                }
+        };
+
+        class ExtraPrioritizer : public Prioritizer {
+
+            virtual void prioritizeExtras(
+                    Task::prioritizer_t & prioritizer,
+                    const uint32_t usec,
+                    AccelerometerTask m_accelerometerTask,
+                    SkyrangerTask m_skyrangerTask)
+            {
+                m_accelerometerTask.prioritize(usec, prioritizer);
+                m_skyrangerTask.prioritize(usec, prioritizer);
+            }
+        };
+
         VehicleState m_vstate;
 
         uint32_t m_imuInterruptCount;
@@ -78,6 +108,10 @@ class Logic {
 
         VisualizerTask m_visualizerTask =
             VisualizerTask(m_msp, m_vstate, m_receiverTask, m_skyrangerTask);
+
+        Prioritizer      m_ordinaryPrioritizer;
+        ExtraPrioritizer m_extraPrioritizer;
+        Prioritizer *    m_prioritizer;
 
         void checkFailsafe(const uint32_t usec)
         {
@@ -180,40 +214,6 @@ class Logic {
                     break;
             }
         }
-
-        class Prioritizer {
-
-            public:
-
-                virtual void prioritizeExtras(
-                        Task::prioritizer_t & prioritizer,
-                        const uint32_t usec,
-                        AccelerometerTask m_accelerometerTask,
-                        SkyrangerTask m_skyrangerTask)
-                {
-                    (void)prioritizer;
-                    (void)usec;
-                    (void)m_accelerometerTask;
-                    (void)m_skyrangerTask;
-                }
-        };
-
-        class ExtraPrioritizer : public Prioritizer {
-
-            virtual void prioritizeExtras(
-                    Task::prioritizer_t & prioritizer,
-                    const uint32_t usec,
-                    AccelerometerTask m_accelerometerTask,
-                    SkyrangerTask m_skyrangerTask)
-            {
-                m_accelerometerTask.prioritize(usec, prioritizer);
-                m_skyrangerTask.prioritize(usec, prioritizer);
-            }
-        };
-
-        Prioritizer      m_ordinaryPrioritizer;
-        ExtraPrioritizer m_extraPrioritizer;
-        Prioritizer *    m_prioritizer;
 
     public:
 
