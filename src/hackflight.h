@@ -23,8 +23,3 @@
 #include <stdint.h>
 
 #include "board.h"
-#include "core/mixer.h"
-#include "imu.h"
-#include "task/attitude.h"
-#include "task/visualizer.h"
-#include "task/receiver.h"
