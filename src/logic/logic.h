@@ -237,7 +237,7 @@ class Logic {
 
             m_prioritizer = &m_ordinaryPrioritizer;
 
-            m_scheduler.init();
+            m_scheduler.init(168);
         }
 
         uint8_t skyrangerDataAvailable(void)
