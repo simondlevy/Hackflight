@@ -145,7 +145,11 @@ class Scheduler {
         uint32_t getAnticipatedEndCycles(Task & task, uint32_t nowCycles)
         {
             const uint32_t taskRequiredCycles = 
-                task.checkReady(m_nextTargetCycles, nowCycles, m_taskGuardCycles);
+                task.checkReady(
+                        m_nextTargetCycles,
+                        nowCycles,
+                        m_taskGuardCycles,
+                        m_clockCyclesPerUsec);
 
             return taskRequiredCycles > 0 ? 
                     nowCycles + taskRequiredCycles :

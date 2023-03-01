@@ -81,7 +81,8 @@ class Task {
         uint32_t checkReady(
                 const uint32_t nextTargetCycles,
                 const uint32_t nowCycles,
-                const uint32_t taskGuardCycles)
+                const uint32_t taskGuardCycles,
+                const uint32_t clockCyclesPerUsec)
         {
             bool retval = 0;
 
@@ -91,7 +92,7 @@ class Task {
 
             // Allow a little extra time
             const auto taskRequiredCycles =
-                usecToClockCycles((uint32_t)taskRequiredTimeUs) + taskGuardCycles;
+                clockCyclesPerUsec * (uint32_t)taskRequiredTimeUs + taskGuardCycles;
 
             if ((int32_t)taskRequiredCycles < loopRemainingCycles) {
 
