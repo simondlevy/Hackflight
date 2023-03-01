@@ -1,3 +1,5 @@
+SKETCH=BetaFpvF405Sbus
+
 $HOME/.arduino15/packages/STMicroelectronics/tools/xpack-arm-none-eabi-gcc/10.3.1-2.3/bin/arm-none-eabi-gcc \
 -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Os -DNDEBUG --specs=nano.specs \
 -Wl,--defsym=LD_FLASH_OFFSET=0 \
@@ -10,7 +12,7 @@ $HOME/.arduino15/packages/STMicroelectronics/tools/xpack-arm-none-eabi-gcc/10.3.
 -Wl,--warn-common \
 -Wl,--default-script=$HOME/.arduino15/packages/STMicroelectronics/hardware/stm32/2.3.0/variants/STM32F4xx/F405RGT_F415RGT/ldscript.ld \
 -Wl,--script=$HOME/.arduino15/packages/STMicroelectronics/hardware/stm32/2.3.0/system/ldscript.ld \
--Wl,-Map,./obj/BetaFpvF405Sbus.ino.map \
+-Wl,-Map,./obj/$SKETCH.ino.map \
 -L$HOME/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.7.0/CMSIS/DSP/Lib/GCC/ \
 -larm_cortexM4lf_math -o ./obj/BetaFpvF405Sbus.ino.elf \
 -L./obj -Wl,--start-group ./obj/sketch/BetaFpvF405Sbus.ino.cpp.o \
