@@ -33,6 +33,7 @@ HFLIB = ../../
 LIB = ../../..
 
 STM32DUINO = $(HOME)/.arduino15/packages/STMicroelectronics
+STM32DVERSION = 2.3.0
 
 all: $(DFU)
 
@@ -57,8 +58,8 @@ $(ELF): $(SKETCH).ino
 	-Wl,--entry=Reset_Handler \
 	-Wl,--unresolved-symbols=report-all \
 	-Wl,--warn-common \
-	-Wl,--default-script=$(STM32DUINO)/hardware/stm32/2.3.0/variants/STM32F4xx/F405RGT_F415RGT/ldscript.ld \
-	-Wl,--script=$(STM32DUINO)/hardware/stm32/2.3.0/system/ldscript.ld \
+	-Wl,--default-script=$(STM32DUINO)/hardware/stm32/$(STM32DVERSION)/variants/STM32F4xx/F405RGT_F415RGT/ldscript.ld \
+	-Wl,--script=$(STM32DUINO)/hardware/stm32/$(STM32DVERSION)/system/ldscript.ld \
 	-Wl,-Map,./obj/$SKETCH.ino.map \
 	-L$(STM32DUINO)/tools/CMSIS/5.7.0/CMSIS/DSP/Lib/GCC/ \
 	-larm_cortexM4lf_math -o ./obj/$(SKETCH).ino.elf \
