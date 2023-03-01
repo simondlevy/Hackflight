@@ -14,8 +14,8 @@ $HOME/.arduino15/packages/STMicroelectronics/tools/xpack-arm-none-eabi-gcc/10.3.
 -Wl,--script=$HOME/.arduino15/packages/STMicroelectronics/hardware/stm32/2.3.0/system/ldscript.ld \
 -Wl,-Map,./obj/$SKETCH.ino.map \
 -L$HOME/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.7.0/CMSIS/DSP/Lib/GCC/ \
--larm_cortexM4lf_math -o ./obj/BetaFpvF405Sbus.ino.elf \
--L./obj -Wl,--start-group ./obj/sketch/BetaFpvF405Sbus.ino.cpp.o \
+-larm_cortexM4lf_math -o ./obj/$SKETCH.ino.elf \
+-L./obj -Wl,--start-group ./obj/sketch/$SKETCH.ino.cpp.o \
 ./obj/sketch/SrcWrapper.cpp.o \
 ./obj/sketch/logic.cpp.o \
 ./obj/libraries/SPI/SPI.cpp.o \
