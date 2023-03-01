@@ -72,45 +72,50 @@ class Scheduler {
         int32_t  m_taskGuardMinCycles;
         int32_t  m_taskGuardMaxCycles;
 
+        static uint32_t usecToClockCycles(const uint32_t usec)
+        {
+            return usec * 168;
+        }
+
     public:
 
         // These can be modified by Board
         int32_t  desiredPeriodCycles;
         uint32_t lastTargetCycles;
 
-        Scheduler(void)
+        void init(void)
         {
             m_loopStartCycles =
-                Task::usecToClockCycles(START_LOOP_MIN_US);
+                usecToClockCycles(START_LOOP_MIN_US);
             m_loopStartMinCycles =
-                Task::usecToClockCycles(START_LOOP_MIN_US);
+                usecToClockCycles(START_LOOP_MIN_US);
             m_loopStartMaxCycles =
-                Task::usecToClockCycles(START_LOOP_MAX_US);
+                usecToClockCycles(START_LOOP_MAX_US);
             m_loopStartDeltaDownCycles =
-                Task::usecToClockCycles(1) / START_LOOP_DOWN_STEP;
+                usecToClockCycles(1) / START_LOOP_DOWN_STEP;
             m_loopStartDeltaUpCycles =
-                Task::usecToClockCycles(1) / START_LOOP_UP_STEP;
+                usecToClockCycles(1) / START_LOOP_UP_STEP;
 
             m_taskGuardMinCycles =
-                Task::usecToClockCycles(TASK_GUARD_MARGIN_MIN_US);
+                usecToClockCycles(TASK_GUARD_MARGIN_MIN_US);
             m_taskGuardMaxCycles =
-                Task::usecToClockCycles(TASK_GUARD_MARGIN_MAX_US);
+                usecToClockCycles(TASK_GUARD_MARGIN_MAX_US);
             m_taskGuardCycles = m_taskGuardMinCycles;
             m_taskGuardDeltaDownCycles =
-                Task::usecToClockCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
+                usecToClockCycles(1) / TASK_GUARD_MARGIN_DOWN_STEP;
             m_taskGuardDeltaUpCycles =
-                Task::usecToClockCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
+                usecToClockCycles(1) / TASK_GUARD_MARGIN_UP_STEP;
 
             lastTargetCycles = 0;
             m_nextTimingCycles = 0;
 
             desiredPeriodCycles =
-                (int32_t)Task::usecToClockCycles(PidController::PERIOD);
+                (int32_t)usecToClockCycles(PidController::PERIOD);
 
             m_guardMargin =
-                (int32_t)Task::usecToClockCycles(CHECK_GUARD_MARGIN_US);
+                (int32_t)usecToClockCycles(CHECK_GUARD_MARGIN_US);
 
-            m_clockRate = Task::usecToClockCycles(1000000);
+            m_clockRate = usecToClockCycles(1000000);
         }
 
         uint32_t corePreUpdate(int32_t & loopRemainingCycles) 

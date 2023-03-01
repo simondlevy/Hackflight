@@ -217,19 +217,27 @@ class Logic {
 
     public:
 
-        Logic(SoftQuatImu * imu, std::vector<PidController *> & pids, Mixer & mixer)
+        Logic(
+                SoftQuatImu * imu,
+                std::vector<PidController *> & pids,
+                Mixer & mixer)
             : Logic((Imu *)imu, pids, mixer)
         {
             m_prioritizer = &m_extraPrioritizer;
         }
 
-        Logic(Imu * imu, std::vector<PidController *> & pids, Mixer & mixer)
+        Logic(
+                Imu * imu,
+                std::vector<PidController *> & pids,
+                Mixer & mixer)
         {
             m_imu = imu;
             m_pids = &pids;
             m_mixer = &mixer;
 
             m_prioritizer = &m_ordinaryPrioritizer;
+
+            m_scheduler.init();
         }
 
         uint8_t skyrangerDataAvailable(void)
