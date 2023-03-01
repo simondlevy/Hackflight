@@ -533,4 +533,143 @@ class Logic {
             return prioritizer.id;
         }
 
+        ///////////////////////////////////////////////////////////////////////
+
+        static uint8_t logic_skyrangerDataAvailable(void)
+        {
+            extern Logic g_logic;
+            return g_logic.skyrangerDataAvailable();
+        }
+        
+        static uint8_t logic_readSkyrangerData(void)
+        {
+            extern Logic g_logic;
+            return g_logic.readSkyrangerData();
+        }
+
+        static void logic_parseSkyrangerData(const uint8_t byte)
+        {
+            extern Logic g_logic;
+            g_logic.parseSkyrangerData(byte);
+        }
+
+        static void logic_setSbusValues(
+                uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
+        {
+            extern Logic g_logic;
+            g_logic.setSbusValues(chanvals, usec, lostFrame);
+        }
+
+        static void logic_setDsmxValues(
+                uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
+        {
+            extern Logic g_logic;
+            g_logic.setDsmxValues(chanvals, usec, lostFrame);
+        }
+
+        static bool logic_mspParse(const uint8_t byte)
+        {
+            extern Logic g_logic;
+            return g_logic.mspParse(byte);
+        }
+
+        static uint8_t logic_mspBytesAvailable(void)
+        {
+            extern Logic g_logic;
+            return g_logic.mspBytesAvailable();
+        }
+
+        static uint8_t logic_mspGetByte(void)
+        {
+            extern Logic g_logic;
+            return g_logic.mspGetByte();
+        }
+
+        static void logic_begin(const uint32_t clockSpeed)
+        {
+            extern Logic g_logic;
+            g_logic.begin(clockSpeed);
+        }
+
+        static armingStatus_e logic_getArmingStatus(void)
+        {
+            extern Logic g_logic;
+            return g_logic.getArmingStatus();
+        }
+
+        static bool logic_gotRebootRequest(void)
+        {
+            extern Logic g_logic;
+            return g_logic.gotRebootRequest();
+        }
+
+        static void logic_handleImuInterrupt(const uint32_t cycleCounter)
+        {
+            extern Logic g_logic;
+            g_logic.handleImuInterrupt(cycleCounter);
+        }
+
+        static float * logic_getMotors(int16_t rawGyro[3], const uint32_t usec)
+        {
+            extern Logic g_logic;
+            return g_logic.getMotors(rawGyro, usec);
+        }
+
+        static bool logic_isDynamicTaskReady(const uint32_t nowCycles)
+        {
+            extern Logic g_logic;
+            return g_logic.isDynamicTaskReady(nowCycles);
+        }
+
+        static uint32_t logic_coreTaskPreUpdate(int32_t & loopRemainingCycles)
+        {
+            extern Logic g_logic;
+            return g_logic.coreTaskPreUpdate(loopRemainingCycles);
+        }
+
+        static void logic_runTask(const Task::id_t taskId, const uint32_t usec)
+        {
+            extern Logic g_logic;
+            g_logic.runTask(taskId, usec);
+        }
+
+        static void logic_postRunTask(
+                const Task::id_t taskId,
+                const uint32_t usecStart,
+                const uint32_t usecEnd,
+                const uint32_t nowCycles,
+                const uint32_t anticipatedEndCycles)
+        {
+            extern Logic g_logic;
+            g_logic.postRunTask(
+                    taskId, usecStart, usecEnd, nowCycles, anticipatedEndCycles);
+        }
+
+        static uint32_t logic_getAnticipatedEndCycles(
+                const uint32_t nowCycles, const Task::id_t taskId)
+        {
+            extern Logic g_logic;
+            return g_logic.getAnticipatedEndCycles(nowCycles, taskId);
+        }
+
+        static bool logic_isCoreTaskReady(const uint32_t nowCycles)
+        {
+            extern Logic g_logic;
+            return g_logic.isCoreTaskReady(nowCycles);
+        }
+
+        static void logic_updateScheduler(
+                const uint32_t nowCycles, const uint32_t nextTargetCycles)
+        {
+            extern Logic g_logic;
+            g_logic.updateScheduler(nowCycles, nextTargetCycles);
+        }
+
+        static Task::id_t logic_prioritizeTasks(
+                const int16_t rawAccel[3], const uint32_t usec)
+        {
+            extern Logic g_logic;
+            return g_logic.prioritizeTasks(rawAccel, usec);
+        }
+
 }; // class Logic
