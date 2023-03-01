@@ -24,6 +24,8 @@
 
 #include <vector>
 
+static const uint32_t CLOCK_CYCLES_PER_USEC = 168;
+
 static AnglePidController anglePid = AnglePidController(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -37,4 +39,4 @@ static SoftQuatImu imu = SoftQuatImu(Imu::rotate270);
 
 static std::vector<PidController *> pids = {&anglePid};
 
-Logic g_logic = Logic(imu, pids, mixer, 168);
+Logic g_logic = Logic(imu, pids, mixer, CLOCK_CYCLES_PER_USEC);
