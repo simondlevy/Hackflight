@@ -73,11 +73,6 @@ class Task {
 
     public:
 
-        static uint32_t usecToClockCycles(const uint32_t usec)
-        {
-            return microsecondsToClockCycles(usec);
-        }
-
         uint32_t checkReady(
                 const uint32_t nextTargetCycles,
                 const uint32_t nowCycles,

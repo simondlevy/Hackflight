@@ -17,10 +17,10 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-//#include <logic/core/mixers/fixedpitch/quadxbf.h>
-//#include <logic/core/pids/angle.h>
-//#include <logic/imu/softquat.h>
-//#include <logic/logic.h>
+#include <logic/core/mixers/fixedpitch/quadxbf.h>
+#include <logic/core/pids/angle.h>
+#include <logic/imu/softquat.h>
+#include <logic/logic.h>
 
 #include <vector>
 
