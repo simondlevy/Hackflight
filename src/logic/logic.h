@@ -215,35 +215,6 @@ class Logic {
             }
         }
 
-    public:
-
-        Logic(
-                SoftQuatImu * imu,
-                std::vector<PidController *> & pids,
-                Mixer & mixer,
-                const uint32_t clockCyclesPerUsec)
-            : Logic((Imu *)imu, pids, mixer, clockCyclesPerUsec)
-        {
-            m_prioritizer = &m_extraPrioritizer;
-        }
-
-        Logic(
-                Imu * imu,
-                std::vector<PidController *> & pids,
-                Mixer & mixer,
-                const uint32_t clockCyclesPerUsec)
-        {
-            m_imu = imu;
-            m_pids = &pids;
-            m_mixer = &mixer;
-
-            m_prioritizer = &m_ordinaryPrioritizer;
-
-            m_scheduler.init(clockCyclesPerUsec);
-        }
-
-    private:
-
         uint8_t skyrangerDataAvailable(void)
         {
             return m_skyrangerTask.imuDataAvailable();
@@ -542,12 +513,37 @@ class Logic {
 
     public:
 
+        Logic(
+                SoftQuatImu * imu,
+                std::vector<PidController *> & pids,
+                Mixer & mixer,
+                const uint32_t clockCyclesPerUsec)
+            : Logic((Imu *)imu, pids, mixer, clockCyclesPerUsec)
+        {
+            m_prioritizer = &m_extraPrioritizer;
+        }
+
+        Logic(
+                Imu * imu,
+                std::vector<PidController *> & pids,
+                Mixer & mixer,
+                const uint32_t clockCyclesPerUsec)
+        {
+            m_imu = imu;
+            m_pids = &pids;
+            m_mixer = &mixer;
+
+            m_prioritizer = &m_ordinaryPrioritizer;
+
+            m_scheduler.init(clockCyclesPerUsec);
+        }
+
         static uint8_t _skyrangerDataAvailable(void)
         {
             extern Logic g_logic;
             return g_logic.skyrangerDataAvailable();
         }
-        
+
         static uint8_t _readSkyrangerData(void)
         {
             extern Logic g_logic;
