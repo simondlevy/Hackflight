@@ -113,6 +113,21 @@ class Logic {
         ExtraPrioritizer m_extraPrioritizer;
         Prioritizer *    m_prioritizer;
 
+        Logic(
+                Imu * imu,
+                std::vector<PidController *> & pids,
+                Mixer & mixer,
+                const uint32_t clockCyclesPerUsec)
+        {
+            m_imu = imu;
+            m_pids = &pids;
+            m_mixer = &mixer;
+
+            m_prioritizer = &m_ordinaryPrioritizer;
+
+            m_scheduler.init(clockCyclesPerUsec);
+        }
+
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
@@ -514,28 +529,13 @@ class Logic {
     public:
 
         Logic(
-                SoftQuatImu * imu,
+                SoftQuatImu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 const uint32_t clockCyclesPerUsec)
-            : Logic((Imu *)imu, pids, mixer, clockCyclesPerUsec)
+            : Logic((Imu *)&imu, pids, mixer, clockCyclesPerUsec)
         {
             m_prioritizer = &m_extraPrioritizer;
-        }
-
-        Logic(
-                Imu * imu,
-                std::vector<PidController *> & pids,
-                Mixer & mixer,
-                const uint32_t clockCyclesPerUsec)
-        {
-            m_imu = imu;
-            m_pids = &pids;
-            m_mixer = &mixer;
-
-            m_prioritizer = &m_ordinaryPrioritizer;
-
-            m_scheduler.init(clockCyclesPerUsec);
         }
 
         static uint8_t _skyrangerDataAvailable(void)

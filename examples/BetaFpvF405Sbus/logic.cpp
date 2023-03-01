@@ -37,4 +37,4 @@ static SoftQuatImu imu = SoftQuatImu(Imu::rotate270);
 
 static std::vector<PidController *> pids = {&anglePid};
 
-Logic g_logic = Logic(&imu, pids, mixer, 168);
+Logic g_logic = Logic(imu, pids, mixer, 168);
