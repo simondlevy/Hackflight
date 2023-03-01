@@ -67,46 +67,8 @@ $(ELF): $(SKETCH).ino
 	./obj/libraries/SPI/utility/spi_com.c.o \
 	./obj/libraries/sbus/sbus.cpp.o \
 	./obj/libraries/SrcWrapper/HAL/*.c.o \
-	./obj/libraries/SrcWrapper/HAL/stm32yyxx_hal_xspi.c.o \
 	./obj/libraries/SrcWrapper/HardwareTimer.cpp.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_adc.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_bdma.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_comp.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_cordic.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_crc.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_crs.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_dac.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_delayblock.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_dlyb.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_dma.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_dma2d.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_exti.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_fmac.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_fmc.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_fmpi2c.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_fsmc.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_gpio.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_hrtim.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_i2c.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_icache.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_lpgpio.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_lptim.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_lpuart.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_mdma.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_opamp.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_pka.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_pwr.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_rcc.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_rng.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_rtc.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_sdmmc.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_spi.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_swpmi.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_tim.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_ucpd.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_usart.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_usb.c.o \
-	./obj/libraries/SrcWrapper/LL/stm32yyxx_ll_utils.c.o \
+	./obj/libraries/SrcWrapper/LL/*.c.o \
 	./obj/libraries/SrcWrapper/new.cpp.o \
 	./obj/libraries/SrcWrapper/stm32/PortNames.c.o \
 	./obj/libraries/SrcWrapper/stm32/analog.cpp.o \
