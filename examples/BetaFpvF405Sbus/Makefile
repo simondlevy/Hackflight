@@ -34,6 +34,7 @@ LIB = ../../..
 
 STM32DUINO = $(HOME)/.arduino15/packages/STMicroelectronics
 STM32DVERSION = 2.3.0
+GCCVERSION = 10.3.1-2.3
 
 all: $(DFU)
 
@@ -48,7 +49,7 @@ $(ELF): $(SKETCH).ino
 	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) \
 		--build-path $(OBJDIR) --warnings "all"
 	mv /tmp/arduino-core-cache/*.a obj/core.a
-	$(STM32DUINO)/tools/xpack-arm-none-eabi-gcc/10.3.1-2.3/bin/arm-none-eabi-gcc \
+	$(STM32DUINO)/tools/xpack-arm-none-eabi-gcc/$(GCCVERSION)/bin/arm-none-eabi-gcc \
 	-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Os -DNDEBUG --specs=nano.specs \
 	-Wl,--defsym=LD_FLASH_OFFSET=0 \
 	-Wl,--defsym=LD_MAX_SIZE=1048576 \
