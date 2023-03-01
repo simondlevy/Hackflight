@@ -19,6 +19,7 @@
 
 #include <hackflight.h>
 #include <board/stm32f/stm32f4.h>
+#include <logic/logic.h>
 
 #include <esc/dshot.h>
 
@@ -32,7 +33,7 @@
 #include <dshot.h>
 #include <stm32/stm32f4.h>
 
-#include "quadlogic.h"
+extern Logic g_logic;
 
 static const uint8_t LED_PIN     = PB5;
 static const uint8_t IMU_CS_PIN  = PA4;
@@ -72,12 +73,10 @@ extern "C" void DMA2_Stream2_IRQHandler(void)
     dshot.handleDmaIrqStream2();
 }
 
-static QuadLogic logic;
-
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    board.handleImuInterrupt(logic);
+    board.handleImuInterrupt(g_logic);
 }
 
 // Receiver interrupt
@@ -87,14 +86,14 @@ void serialEvent3(void)
 
         bfs::SbusData data = rx.data();
 
-        logic.setSbusValues((uint16_t *)data.ch, micros(), data.lost_frame);
+        g_logic.setSbusValues((uint16_t *)data.ch, micros(), data.lost_frame);
     }
 }
 
 // Interupt from Skyranger
 void serialEvent4(void)
 {
-    board.handleSkyrangerEvent(logic, Serial4);
+    board.handleSkyrangerEvent(g_logic, Serial4);
 }
 
 void setup(void)
@@ -112,7 +111,7 @@ void setup(void)
 
     mpu.begin();
 
-    board.begin(logic);
+    board.begin(g_logic);
 
     dshot.begin(stream1MotorPins, stream2MotorPins);
 }
@@ -125,5 +124,5 @@ void loop(void)
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
     // Support sending attitude data to Skyranger over Serial4
-    board.step(logic, rawGyro, rawAccel, Serial4);
+    board.step(g_logic, rawGyro, rawAccel, Serial4);
 }

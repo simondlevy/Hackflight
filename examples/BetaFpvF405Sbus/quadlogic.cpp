@@ -24,7 +24,6 @@
 
 #include <vector>
 
-/*
 static AnglePidController anglePid = AnglePidController(
         1.441305,     // Rate Kp
         48.8762,      // Rate Ki
@@ -38,5 +37,4 @@ static SoftQuatImu imu = SoftQuatImu(Imu::rotate270);
 
 static std::vector<PidController *> pids = {&anglePid};
 
-Logic logic Logic(&imu, pids, mixer);
-*/
+Logic g_logic = Logic(&imu, pids, mixer, 168);
