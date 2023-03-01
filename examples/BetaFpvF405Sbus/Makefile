@@ -44,6 +44,8 @@ $(ELF): $(SKETCH).ino
 	rm -rf /tmp/arduino-core-cache/
 	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) \
 		--build-path $(OBJDIR) --warnings "all"
+	mv /tmp/arduino-core-cache/*.a obj/core.a
+	./makelink
 
 unbrick: $(DFU)
 	dfu-util -a 0 -D $(DFU) -s :leave	

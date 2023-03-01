@@ -83,4 +83,5 @@ $HOME/.arduino15/packages/STMicroelectronics/tools/xpack-arm-none-eabi-gcc/10.3.
 ./obj/core/generic_clock.c.o \
 ./obj/core/variant_FEATHER_F405.cpp.o \
 ./obj/core/variant_generic.cpp.o \
-/tmp/arduino-core-cache/core_8998c89c891408d3eecd881cb290355c.a -lc -Wl,--end-group -lm -lgcc -lstdc++
+./obj/core.a \
+-lc -Wl,--end-group -lm -lgcc -lstdc++
