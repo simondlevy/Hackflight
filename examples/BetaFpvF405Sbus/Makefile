@@ -32,6 +32,8 @@ ELF = $(OBJDIR)/$(SKETCH).ino.elf
 HFLIB = ../../
 LIB = ../../..
 
+STM32DUINO = $(HOME)/.arduino15/packages/STMicroelectronics
+
 all: $(DFU)
 
 $(DFU): $(HEX)
@@ -45,7 +47,7 @@ $(ELF): $(SKETCH).ino
 	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) \
 		--build-path $(OBJDIR) --warnings "all"
 	mv /tmp/arduino-core-cache/*.a obj/core.a
-	$(HOME)/.arduino15/packages/STMicroelectronics/tools/xpack-arm-none-eabi-gcc/10.3.1-2.3/bin/arm-none-eabi-gcc \
+	$(STM32DUINO)/tools/xpack-arm-none-eabi-gcc/10.3.1-2.3/bin/arm-none-eabi-gcc \
 	-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Os -DNDEBUG --specs=nano.specs \
 	-Wl,--defsym=LD_FLASH_OFFSET=0 \
 	-Wl,--defsym=LD_MAX_SIZE=1048576 \
@@ -55,10 +57,10 @@ $(ELF): $(SKETCH).ino
 	-Wl,--entry=Reset_Handler \
 	-Wl,--unresolved-symbols=report-all \
 	-Wl,--warn-common \
-	-Wl,--default-script=$(HOME)/.arduino15/packages/STMicroelectronics/hardware/stm32/2.3.0/variants/STM32F4xx/F405RGT_F415RGT/ldscript.ld \
-	-Wl,--script=$(HOME)/.arduino15/packages/STMicroelectronics/hardware/stm32/2.3.0/system/ldscript.ld \
+	-Wl,--default-script=$(STM32DUINO)/hardware/stm32/2.3.0/variants/STM32F4xx/F405RGT_F415RGT/ldscript.ld \
+	-Wl,--script=$(STM32DUINO)/hardware/stm32/2.3.0/system/ldscript.ld \
 	-Wl,-Map,./obj/$SKETCH.ino.map \
-	-L$(HOME)/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.7.0/CMSIS/DSP/Lib/GCC/ \
+	-L$(STM32DUINO)/tools/CMSIS/5.7.0/CMSIS/DSP/Lib/GCC/ \
 	-larm_cortexM4lf_math -o ./obj/$(SKETCH).ino.elf \
 	-L./obj -Wl,--start-group ./obj/sketch/$(SKETCH).ino.cpp.o \
 	./obj/sketch/SrcWrapper.cpp.o \
