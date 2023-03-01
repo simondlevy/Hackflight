@@ -4,22 +4,28 @@ FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
 
 PORT = /dev/ttyACM0
 
-OBJ = $(PWD)/obj
+OBJDIR = $(PWD)/obj
+
+DFU = $(OBJDIR)/$(SKETCH).ino.dfu
+
+HEX = $(OBJDIR)/$(SKETCH).ino.hex
+
+ELF = $(OBJDIR)/$(SKETCH).ino.elf
+
 HFLIB = ../../
 LIB = ../../..
-DFU = $(OBJ)/$(SKETCH).dfu 
-HEX = $(OBJ)/$(SKETCH).ino.hex
-SRC = $(HFLIB)/src
 
-# all: $(DFU)
-all: $(HEX)
+all: $(DFU)
 
 $(DFU): $(HEX)
 	$(HFLIB)/utils/dfuse-pack.py -i $(HEX) $(DFU)
 
-$(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
-	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) --build-path $(OBJ) --warnings "all" --verbose
-	rm -f *.bin *.elf
+$(HEX): $(ELF)
+	objcopy -O ihex --set-start 0x8000000 $< $@
+
+$(ELF): $(SKETCH).ino
+	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) \
+		--build-path $(OBJDIR) --warnings "all"
 
 unbrick: $(DFU)
 	dfu-util -a 0 -D $(DFU) -s :leave	
