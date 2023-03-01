@@ -66,9 +66,9 @@ $(ELF): $(SKETCH).ino
 	./obj/libraries/SPI/SPI.cpp.o \
 	./obj/libraries/SPI/utility/spi_com.c.o \
 	./obj/libraries/sbus/sbus.cpp.o \
-	./obj/libraries/SrcWrapper/HAL/*.c.o \
+	./obj/libraries/SrcWrapper/HAL/*.o \
 	./obj/libraries/SrcWrapper/HardwareTimer.cpp.o \
-	./obj/libraries/SrcWrapper/LL/*.c.o \
+	./obj/libraries/SrcWrapper/LL/*.o \
 	./obj/libraries/SrcWrapper/new.cpp.o \
 	./obj/libraries/SrcWrapper/stm32/PortNames.c.o \
 	./obj/libraries/SrcWrapper/stm32/analog.cpp.o \
