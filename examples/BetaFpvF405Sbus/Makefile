@@ -61,7 +61,7 @@ $(ELF): $(SKETCH).ino
 	-Wl,--warn-common \
 	-Wl,--default-script=$(STM32DUINO)/hardware/stm32/$(STM32DVERSION)/variants/STM32F4xx/F405RGT_F415RGT/ldscript.ld \
 	-Wl,--script=$(STM32DUINO)/hardware/stm32/$(STM32DVERSION)/system/ldscript.ld \
-	-Wl,-Map,./obj/$SKETCH.ino.map \
+	-Wl,-Map,./obj/$(SKETCH).ino.map \
 	-L$(STM32DUINO)/tools/CMSIS/5.7.0/CMSIS/DSP/Lib/GCC/ \
 	-larm_cortexM4lf_math -o ./obj/$(SKETCH).ino.elf \
 	-L./obj -Wl,--start-group ./obj/sketch/$(SKETCH).ino.cpp.o \
