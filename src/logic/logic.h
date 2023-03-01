@@ -242,6 +242,8 @@ class Logic {
             m_scheduler.init(clockCyclesPerUsec);
         }
 
+    private:
+
         uint8_t skyrangerDataAvailable(void)
         {
             return m_skyrangerTask.imuDataAvailable();
@@ -424,24 +426,29 @@ class Logic {
             switch (taskId) {
 
                 case Task::ATTITUDE:
-                    cycles = m_scheduler.getAnticipatedEndCycles(m_attitudeTask, nowCycles);
+                    cycles =
+                        m_scheduler.getAnticipatedEndCycles(m_attitudeTask, nowCycles);
                     break;
 
                 case Task::RECEIVER:
-                    cycles = m_scheduler.getAnticipatedEndCycles(m_receiverTask, nowCycles);
+                    cycles =
+                        m_scheduler.getAnticipatedEndCycles(m_receiverTask, nowCycles);
                     break;
 
                 case Task::VISUALIZER:
-                    cycles = m_scheduler.getAnticipatedEndCycles(m_visualizerTask, nowCycles);
+                    cycles =
+                        m_scheduler.getAnticipatedEndCycles(m_visualizerTask, nowCycles);
                     break;
 
                 case Task::ACCELEROMETER:
-                    cycles =
-                        m_scheduler.getAnticipatedEndCycles(m_accelerometerTask, nowCycles);
+                    cycles = 
+                        m_scheduler.getAnticipatedEndCycles(
+                                m_accelerometerTask, nowCycles);
                     break;
 
                 case Task::SKYRANGER:
-                    cycles = m_scheduler.getAnticipatedEndCycles(m_skyrangerTask, nowCycles);
+                    cycles =
+                        m_scheduler.getAnticipatedEndCycles(m_skyrangerTask, nowCycles);
                     break;
 
                 default:
@@ -533,107 +540,107 @@ class Logic {
             return prioritizer.id;
         }
 
-        ///////////////////////////////////////////////////////////////////////
+    public:
 
-        static uint8_t logic_skyrangerDataAvailable(void)
+        static uint8_t _skyrangerDataAvailable(void)
         {
             extern Logic g_logic;
             return g_logic.skyrangerDataAvailable();
         }
         
-        static uint8_t logic_readSkyrangerData(void)
+        static uint8_t _readSkyrangerData(void)
         {
             extern Logic g_logic;
             return g_logic.readSkyrangerData();
         }
 
-        static void logic_parseSkyrangerData(const uint8_t byte)
+        static void _parseSkyrangerData(const uint8_t byte)
         {
             extern Logic g_logic;
             g_logic.parseSkyrangerData(byte);
         }
 
-        static void logic_setSbusValues(
+        static void _setSbusValues(
                 uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
         {
             extern Logic g_logic;
             g_logic.setSbusValues(chanvals, usec, lostFrame);
         }
 
-        static void logic_setDsmxValues(
+        static void _setDsmxValues(
                 uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
         {
             extern Logic g_logic;
             g_logic.setDsmxValues(chanvals, usec, lostFrame);
         }
 
-        static bool logic_mspParse(const uint8_t byte)
+        static bool _mspParse(const uint8_t byte)
         {
             extern Logic g_logic;
             return g_logic.mspParse(byte);
         }
 
-        static uint8_t logic_mspBytesAvailable(void)
+        static uint8_t _mspBytesAvailable(void)
         {
             extern Logic g_logic;
             return g_logic.mspBytesAvailable();
         }
 
-        static uint8_t logic_mspGetByte(void)
+        static uint8_t _mspGetByte(void)
         {
             extern Logic g_logic;
             return g_logic.mspGetByte();
         }
 
-        static void logic_begin(const uint32_t clockSpeed)
+        static void _begin(const uint32_t clockSpeed)
         {
             extern Logic g_logic;
             g_logic.begin(clockSpeed);
         }
 
-        static armingStatus_e logic_getArmingStatus(void)
+        static armingStatus_e _getArmingStatus(void)
         {
             extern Logic g_logic;
             return g_logic.getArmingStatus();
         }
 
-        static bool logic_gotRebootRequest(void)
+        static bool _gotRebootRequest(void)
         {
             extern Logic g_logic;
             return g_logic.gotRebootRequest();
         }
 
-        static void logic_handleImuInterrupt(const uint32_t cycleCounter)
+        static void _handleImuInterrupt(const uint32_t cycleCounter)
         {
             extern Logic g_logic;
             g_logic.handleImuInterrupt(cycleCounter);
         }
 
-        static float * logic_getMotors(int16_t rawGyro[3], const uint32_t usec)
+        static float * _getMotors(int16_t rawGyro[3], const uint32_t usec)
         {
             extern Logic g_logic;
             return g_logic.getMotors(rawGyro, usec);
         }
 
-        static bool logic_isDynamicTaskReady(const uint32_t nowCycles)
+        static bool _isDynamicTaskReady(const uint32_t nowCycles)
         {
             extern Logic g_logic;
             return g_logic.isDynamicTaskReady(nowCycles);
         }
 
-        static uint32_t logic_coreTaskPreUpdate(int32_t & loopRemainingCycles)
+        static uint32_t _coreTaskPreUpdate(int32_t & loopRemainingCycles)
         {
             extern Logic g_logic;
             return g_logic.coreTaskPreUpdate(loopRemainingCycles);
         }
 
-        static void logic_runTask(const Task::id_t taskId, const uint32_t usec)
+        static void _runTask(const Task::id_t taskId, const uint32_t usec)
         {
             extern Logic g_logic;
             g_logic.runTask(taskId, usec);
         }
 
-        static void logic_postRunTask(
+        static void _postRunTask(
                 const Task::id_t taskId,
                 const uint32_t usecStart,
                 const uint32_t usecEnd,
@@ -645,27 +652,27 @@ class Logic {
                     taskId, usecStart, usecEnd, nowCycles, anticipatedEndCycles);
         }
 
-        static uint32_t logic_getAnticipatedEndCycles(
+        static uint32_t _getAnticipatedEndCycles(
                 const uint32_t nowCycles, const Task::id_t taskId)
         {
             extern Logic g_logic;
             return g_logic.getAnticipatedEndCycles(nowCycles, taskId);
         }
 
-        static bool logic_isCoreTaskReady(const uint32_t nowCycles)
+        static bool _isCoreTaskReady(const uint32_t nowCycles)
         {
             extern Logic g_logic;
             return g_logic.isCoreTaskReady(nowCycles);
         }
 
-        static void logic_updateScheduler(
+        static void _updateScheduler(
                 const uint32_t nowCycles, const uint32_t nextTargetCycles)
         {
             extern Logic g_logic;
             g_logic.updateScheduler(nowCycles, nextTargetCycles);
         }
 
-        static Task::id_t logic_prioritizeTasks(
+        static Task::id_t _prioritizeTasks(
                 const int16_t rawAccel[3], const uint32_t usec)
         {
             extern Logic g_logic;

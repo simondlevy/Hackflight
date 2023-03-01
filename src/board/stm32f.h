@@ -19,6 +19,7 @@
 #include <SPI.h>
 
 #include "board.h"
+#include "logic/logic.h"
 
 class Stm32FBoard : public Stm32Board {
 
@@ -31,10 +32,10 @@ class Stm32FBoard : public Stm32Board {
 
     public:
 
-        void handleSkyrangerEvent(Logic & logic, HardwareSerial & serial)
+        void handleSkyrangerEvent(HardwareSerial & serial)
         {
             while (serial.available()) {
-                logic.parseSkyrangerData(serial.read());
+                Logic::_parseSkyrangerData(serial.read());
             }
         }
 
