@@ -220,8 +220,9 @@ class Logic {
         Logic(
                 SoftQuatImu * imu,
                 std::vector<PidController *> & pids,
-                Mixer & mixer)
-            : Logic((Imu *)imu, pids, mixer)
+                Mixer & mixer,
+                const uint32_t clockCyclesPerUsec)
+            : Logic((Imu *)imu, pids, mixer, clockCyclesPerUsec)
         {
             m_prioritizer = &m_extraPrioritizer;
         }
@@ -229,7 +230,8 @@ class Logic {
         Logic(
                 Imu * imu,
                 std::vector<PidController *> & pids,
-                Mixer & mixer)
+                Mixer & mixer,
+                const uint32_t clockCyclesPerUsec)
         {
             m_imu = imu;
             m_pids = &pids;
@@ -237,7 +239,7 @@ class Logic {
 
             m_prioritizer = &m_ordinaryPrioritizer;
 
-            m_scheduler.init(168);
+            m_scheduler.init(clockCyclesPerUsec);
         }
 
         uint8_t skyrangerDataAvailable(void)

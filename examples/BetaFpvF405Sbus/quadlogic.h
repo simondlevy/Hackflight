@@ -47,7 +47,7 @@ class QuadLogic : public Logic {
     public:
 
         QuadLogic(void) 
-            : Logic(&imu, pids, mixer)
+            : Logic(&imu, pids, mixer, 168)
         {
         }
 }; 
