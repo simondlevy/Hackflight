@@ -19,7 +19,7 @@ panic-halt = "0.2.0"
 #panic-itm = "0.4.1"
 
 [lib]
-name = "math"
+name = "hackflight"
 crate-type = ["staticlib"]
 
 [profile.release]

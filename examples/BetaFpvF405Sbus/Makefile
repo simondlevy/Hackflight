@@ -17,7 +17,7 @@
 
 SKETCH = BetaFpvF405Sbus
 
-RUSTLIB = ./target/thumbv7em-none-eabihf/debug/libmath.a
+RUSTLIB = ./target/thumbv7em-none-eabihf/debug/libhackflight.a
 
 GEN = F4
 PNUM = GENERIC_F405RGTX
@@ -26,9 +26,6 @@ VARIANT = STM32F4xx/F405RGT_F415RGT
 PORT = /dev/ttyACM0
 
 OBJDIR = $(PWD)/obj
-
-$(RUSTLIB): src/lib.rs
-	cargo build
 
 DFU = $(OBJDIR)/$(SKETCH).ino.dfu
 
@@ -52,6 +49,9 @@ $(DFU): $(HEX)
 
 $(HEX): $(ELF)
 	objcopy -O ihex --set-start 0x8000000 $< $@
+
+$(RUSTLIB): src/lib.rs
+	cargo build
 
 $(ELF): $(SKETCH).ino $(RUSTLIB)
 	rm -rf /tmp/arduino-core-cache/
@@ -101,6 +101,7 @@ $(ELF): $(SKETCH).ino $(RUSTLIB)
 	./obj/core/PeripheralPins.c.o \
 	./obj/core/generic_clock.c.o \
 	./obj/core/variant_generic.cpp.o \
+	$(RUSTLIB) \
 	./obj/core.a \
 	-lc -Wl,--end-group -lm -lgcc -lstdc++
 
@@ -113,7 +114,7 @@ flash: $(DFU)
 	dfu-util -a 0 -D $(DFU) -s :leave
 
 clean:
-	rm -rf obj
+	rm -rf obj/ target/
 
 edit:
 	vim $(SKETCH).ino
