@@ -92,9 +92,7 @@ $(ELF): $(SKETCH).ino
 	./obj/libraries/SrcWrapper/stm32/uart.c.o \
 	./obj/libraries/SrcWrapper/syscalls.c.o \
 	./obj/core/PeripheralPins.c.o \
-	./obj/core/PeripheralPins_FEATHER_F405.c.o \
 	./obj/core/generic_clock.c.o \
-	./obj/core/variant_FEATHER_F405.cpp.o \
 	./obj/core/variant_generic.cpp.o \
 	./obj/core.a \
 	-lc -Wl,--end-group -lm -lgcc -lstdc++
