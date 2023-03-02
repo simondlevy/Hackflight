@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "board/stm32f.h"
+#include "boards/stm32f.h"
 
 #include <vector>
 

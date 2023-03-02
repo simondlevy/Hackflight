@@ -18,10 +18,10 @@
  */
 
 #include <hackflight.h>
-#include <board/stm32f/stm32f4.h>
+#include <boards/stm32f/stm32f4.h>
 #include <logic/logic.h>
 
-#include <esc/dshot.h>
+#include <escs/dshot.h>
 
 #include <sbus.h>
 

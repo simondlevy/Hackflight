@@ -24,6 +24,11 @@ use panic_halt as _;
 #[no_mangle]
 pub extern fn add(first: i32, second: i32) -> i32
 {
-        first + second
+    first + second
 }
 
+#[no_mangle]
+fn flip_things_around_rust(tup: (u32, u32)) -> (u32, u32) {
+    let (a, b) = tup;
+    (b + 1, a - 1)
+}
