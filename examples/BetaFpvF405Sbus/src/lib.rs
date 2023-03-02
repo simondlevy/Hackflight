@@ -22,13 +22,21 @@
 use panic_halt as _; 
 
 #[no_mangle]
-pub extern fn add(first: i32, second: i32) -> i32
-{
-    first + second
-}
+pub fn quadxbf_mix(demands: (f32, f32, f32, f32)) -> (f32, f32, f32, f32) {
 
-#[no_mangle]
-fn flip_things_around_rust(tup: (u32, u32)) -> (u32, u32) {
-    let (a, b) = tup;
-    (b + 1, a - 1)
+    let (throttle, roll, pitch, yaw) = demands;
+
+    // right rear
+    let m1 = throttle - roll + pitch + yaw; 
+
+    // right front
+    let m2 = throttle - roll - pitch - yaw; 
+
+    // left rear
+    let m3 = throttle + roll + pitch - yaw; 
+
+    // left front
+    let m4 = throttle + roll - pitch + yaw;
+
+    (m1, m2, m3, m4)
 }
