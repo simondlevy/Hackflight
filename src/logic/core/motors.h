@@ -33,13 +33,23 @@ class Motors {
 
         uint8_t m_count;
 
-        Motors(const float vals[], const uint8_t count) {
-
+        Motors(const float vals[], const uint8_t count) 
+        {
             for (auto k=0; k<count; ++k) {
                 values[k] = vals[k];
             }
 
             m_count = count;
+        }
+
+        Motors(const float m1, const float m2, const float m3, const float m4)
+        {
+            values[0] = m1;
+            values[1] = m2;
+            values[2] = m3;
+            values[3] = m4;
+
+            m_count = 4;
         }
         
 }; // class Motors
