@@ -38,7 +38,7 @@ class QuadXbfMixer {
         static auto fun(const Demands & demands) -> Motors
         {
             Axes SPINS[4] = {
-                //  rol   pit    yaw
+                //      rol   pit    yaw
                 Axes( -1.0f, +1.0f, -1.0f ), // REAR_R
                 Axes( -1.0f, -1.0f, +1.0f ), // FRONT_R
                 Axes( +1.0f, +1.0f, +1.0f ), // REAR_L

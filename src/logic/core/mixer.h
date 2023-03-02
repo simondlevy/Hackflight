@@ -26,17 +26,10 @@
 
 #include <vector>
 
-typedef struct {
-
-    float m1;
-    float m2;
-    float m3;
-    float m4;
-
-} quadMotors_t;
-
 extern "C" { 
-    void quadxbf_mix(float t); 
+    void quadxbf_mix(
+            float t, float r, float p, float y,
+            float * m1, float * m2, float * m3, float * m4);
 }
 
 class Mixer {
@@ -76,12 +69,19 @@ class Mixer {
                 demands = p->update(usec, demands, state, pidReset);
             }
 
-            quadxbf_mix(demands.throttle);
+            float m1=0, m2=0, m3=0, m4=0;
+
+            quadxbf_mix(
+                    demands.throttle,
+                    demands.roll,
+                    demands.pitch,
+                    demands.yaw,
+                    &m1, &m2, &m3, &m4);
 
             // Run the mixer to get motors from demands
-            //return Motors(motors.m1, motors.m2, motors.m3, motors.m4);
+            return Motors(m1, m2, m3, m4);
 
             // Run the mixer to get motors from demands
-            return m_fun(demands);
+            // return m_fun(demands);
         }
 };
