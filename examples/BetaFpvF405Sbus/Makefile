@@ -38,6 +38,8 @@ STM32DUINO = $(HOME)/.arduino15/packages/STMicroelectronics
 STM32DVERSION = 2.3.0
 GCCVERSION = 10.3.1-2.3
 
+RECEIVER = ./obj/libraries/sbus/sbus.cpp.o
+
 all: $(DFU)
 
 $(DFU): $(HEX)
@@ -71,7 +73,7 @@ $(ELF): $(SKETCH).ino
 	./obj/sketch/logic.cpp.o \
 	./obj/libraries/SPI/SPI.cpp.o \
 	./obj/libraries/SPI/utility/spi_com.c.o \
-	./obj/libraries/sbus/sbus.cpp.o \
+	$(RECEIVER) \
 	./obj/libraries/SrcWrapper/HAL/*.o \
 	./obj/libraries/SrcWrapper/HardwareTimer.cpp.o \
 	./obj/libraries/SrcWrapper/LL/*.o \
