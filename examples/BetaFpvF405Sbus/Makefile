@@ -17,7 +17,9 @@
 
 SKETCH = BetaFpvF405Sbus
 
-FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F405RGTX,usb=CDCgen
+GEN = F4
+PNUM = GENERIC_F405RGTX
+VARIANT = STM32F4xx/F405RGT_F415RGT
 
 PORT = /dev/ttyACM0
 
@@ -46,7 +48,7 @@ $(HEX): $(ELF)
 
 $(ELF): $(SKETCH).ino
 	rm -rf /tmp/arduino-core-cache/
-	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) \
+	arduino-cli compile --fqbn STMicroelectronics:stm32:Gen$(GEN):pnum=$(PNUM),usb=CDCgen,usb=CDCgen --libraries $(HFLIB),$(LIB) \
 		--build-path $(OBJDIR) --warnings "all"
 	mv /tmp/arduino-core-cache/*.a obj/core.a
 	$(STM32DUINO)/tools/xpack-arm-none-eabi-gcc/$(GCCVERSION)/bin/arm-none-eabi-gcc \
@@ -59,7 +61,7 @@ $(ELF): $(SKETCH).ino
 	-Wl,--entry=Reset_Handler \
 	-Wl,--unresolved-symbols=report-all \
 	-Wl,--warn-common \
-	-Wl,--default-script=$(STM32DUINO)/hardware/stm32/$(STM32DVERSION)/variants/STM32F4xx/F405RGT_F415RGT/ldscript.ld \
+	-Wl,--default-script=$(STM32DUINO)/hardware/stm32/$(STM32DVERSION)/variants/$(VARIANT)/ldscript.ld \
 	-Wl,--script=$(STM32DUINO)/hardware/stm32/$(STM32DVERSION)/system/ldscript.ld \
 	-Wl,-Map,./obj/$(SKETCH).ino.map \
 	-L$(STM32DUINO)/tools/CMSIS/5.7.0/CMSIS/DSP/Lib/GCC/ \
