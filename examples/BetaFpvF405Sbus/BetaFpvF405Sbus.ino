@@ -116,6 +116,8 @@ void setup(void)
 
 void loop(void)
 {
+    static uint32_t count;
+
     mpu.readSensor();
 
     int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
@@ -123,4 +125,13 @@ void loop(void)
 
     // Support sending attitude data to Skyranger over Serial4
     board.step(rawGyro, rawAccel, Serial4);
+
+    count++;
+
+    static uint32_t prev;
+    const auto msec = millis();
+    if (msec - prev > 1000) {
+        Serial.println(count);
+        prev = msec;
+    }
 }

@@ -21,11 +21,10 @@
 
 use panic_halt as _; 
 
+/*
 #[no_mangle]
-pub fn quadxbf_mix(demands: (f32, f32, f32, f32)) -> (f32, f32, f32, f32) {
-
-    let (throttle, roll, pitch, yaw) = demands;
-
+pub fn quadxbf_mix(throttle: f32, roll: f32, pitch: f32, yaw: f32) -> (f32, f32, f32, f32)
+{
     // right rear
     let m1 = throttle - roll + pitch + yaw; 
 
@@ -39,4 +38,11 @@ pub fn quadxbf_mix(demands: (f32, f32, f32, f32)) -> (f32, f32, f32, f32) {
     let m4 = throttle + roll - pitch + yaw;
 
     (m1, m2, m3, m4)
+}
+*/
+
+#[no_mangle]
+pub fn quadxbf_mix(t: f32) -> f32
+{
+    t
 }

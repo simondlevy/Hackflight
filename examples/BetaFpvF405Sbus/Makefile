@@ -17,7 +17,7 @@
 
 SKETCH = BetaFpvF405Sbus
 
-RUSTLIB = ./target/thumbv7em-none-eabihf/debug/libhackflight.a
+RUSTLIB = ./target/thumbv7em-none-eabihf/release/libhackflight.a
 
 GEN = F4
 PNUM = GENERIC_F405RGTX
@@ -51,11 +51,11 @@ $(HEX): $(ELF)
 	objcopy -O ihex --set-start 0x8000000 $< $@
 
 $(RUSTLIB): src/lib.rs
-	cargo build
+	cargo build --release
 
 $(ELF): $(SKETCH).ino $(RUSTLIB)
 	rm -rf /tmp/arduino-core-cache/
-	arduino-cli compile --fqbn STMicroelectronics:stm32:Gen$(GEN):pnum=$(PNUM),usb=CDCgen,usb=CDCgen --libraries $(HFLIB),$(LIB) \
+	- arduino-cli compile --fqbn STMicroelectronics:stm32:Gen$(GEN):pnum=$(PNUM),usb=CDCgen,usb=CDCgen --libraries $(HFLIB),$(LIB) \
 		--build-path $(OBJDIR) --warnings "all"
 	mv /tmp/arduino-core-cache/*.a obj/core.a
 	$(STM32DUINO)/tools/xpack-arm-none-eabi-gcc/$(GCCVERSION)/bin/arm-none-eabi-gcc \

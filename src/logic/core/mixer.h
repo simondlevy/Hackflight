@@ -26,6 +26,19 @@
 
 #include <vector>
 
+typedef struct {
+
+    float m1;
+    float m2;
+    float m3;
+    float m4;
+
+} quadMotors_t;
+
+extern "C" { 
+    void quadxbf_mix(float t); 
+}
+
 class Mixer {
 
     private:
@@ -35,15 +48,6 @@ class Mixer {
         uint8_t m_motorCount;
 
         mixerFun_t m_fun;
-
-        typedef struct {
-
-            float m1;
-            float m2;
-            float m3;
-            float m4;
-
-        } quadMotors_t;
 
     public:
 
@@ -65,8 +69,6 @@ class Mixer {
                 const bool pidReset,
                 const uint32_t usec) -> Motors
         {
-            extern quadMotors_t quadxbf_mix(Demands &);
-
             // Star with stick demands
             Demands demands(stickDemands);
 
@@ -74,12 +76,12 @@ class Mixer {
                 demands = p->update(usec, demands, state, pidReset);
             }
 
-            quadMotors_t motors = quadxbf_mix(demands);
+            quadxbf_mix(demands.throttle);
 
             // Run the mixer to get motors from demands
-            return Motors(motors.m1, motors.m2, motors.m3, motors.m4);
+            //return Motors(motors.m1, motors.m2, motors.m3, motors.m4);
 
             // Run the mixer to get motors from demands
-            //return m_fun(demands);
+            return m_fun(demands);
         }
 };
