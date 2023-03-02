@@ -17,6 +17,8 @@
 
 SKETCH = BetaFpvF405Sbus
 
+RUSTLIB = ./target/thumbv7em-none-eabihf/debug/libmath.a
+
 GEN = F4
 PNUM = GENERIC_F405RGTX
 VARIANT = STM32F4xx/F405RGT_F415RGT
@@ -24,6 +26,9 @@ VARIANT = STM32F4xx/F405RGT_F415RGT
 PORT = /dev/ttyACM0
 
 OBJDIR = $(PWD)/obj
+
+$(RUSTLIB): src/lib.rs
+	cargo build
 
 DFU = $(OBJDIR)/$(SKETCH).ino.dfu
 
@@ -48,7 +53,7 @@ $(DFU): $(HEX)
 $(HEX): $(ELF)
 	objcopy -O ihex --set-start 0x8000000 $< $@
 
-$(ELF): $(SKETCH).ino
+$(ELF): $(SKETCH).ino $(RUSTLIB)
 	rm -rf /tmp/arduino-core-cache/
 	arduino-cli compile --fqbn STMicroelectronics:stm32:Gen$(GEN):pnum=$(PNUM),usb=CDCgen,usb=CDCgen --libraries $(HFLIB),$(LIB) \
 		--build-path $(OBJDIR) --warnings "all"

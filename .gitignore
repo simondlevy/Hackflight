@@ -1,8 +1,12 @@
+libmath.a
+Cargo.lock
+*.swp
+target/
+obj/
 obj/
 *#
 *.pro
 *.job
-*.swp
 *~
 ~*
 
