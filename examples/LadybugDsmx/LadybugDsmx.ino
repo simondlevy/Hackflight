@@ -34,7 +34,7 @@ static Dsm2048 rx;
 
 static Mixer mixer = QuadXbfMixer::make();
 
-static LadybugBoard board(pids, mixer);
+static LadybugBoard board;
 
 static void handleImuInterrupt(void)
 {
@@ -63,7 +63,7 @@ void setup(void)
 {
     Serial1.begin(115200);
 
-    board.begin(handleImuInterrupt);
+    board.begin(&pids, &mixer, handleImuInterrupt);
 }
 
 void loop(void)
