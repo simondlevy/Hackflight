@@ -46,6 +46,10 @@ class Stm32FBoard : public Stm32Board {
 
     public:
 
+        static const uint8_t MOSI_PIN = PA7;
+        static const uint8_t MISO_PIN = PA6;
+        static const uint8_t SCLK_PIN = PA5;
+
         void handleSkyrangerEvent(HardwareSerial & serial)
         {
             while (serial.available()) {
