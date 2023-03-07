@@ -146,6 +146,15 @@ class Logic {
 
         uint32_t imuInterruptCount;
 
+        void begin(const uint32_t clockSpeed)
+        {
+            attitudeTask.begin(imu);
+
+            visualizerTask.begin(&receiverTask);
+
+            imu->begin(clockSpeed);
+        }
+
         armingStatus_e getArmingStatus(void)
         {
             return m_armingStatus;
