@@ -74,7 +74,7 @@ class SkyrangerTask : public Task {
 
         uint8_t imuDataAvailable(void)
         {
-            return m_serializer.dataAvailable();
+            return m_serializer.available();
         }
 
         uint8_t readImuData(void)

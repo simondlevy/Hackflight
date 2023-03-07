@@ -56,6 +56,8 @@ class Logic {
 
         VehicleState m_vstate;
 
+        Msp m_msp;
+
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
@@ -125,8 +127,6 @@ class Logic {
 
      public:
 
-        Msp msp;
-
         ReceiverTask receiverTask;
 
         AttitudeTask attitudeTask = AttitudeTask(m_vstate);
@@ -136,7 +136,7 @@ class Logic {
         AccelerometerTask accelerometerTask; 
 
         VisualizerTask visualizerTask =
-            VisualizerTask(msp, m_vstate, receiverTask, skyrangerTask);
+            VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
 
         Mixer * mixer;
 
@@ -288,6 +288,16 @@ class Logic {
             receiverTask.prioritize(usec, prioritizer);
             attitudeTask.prioritize(usec, prioritizer);
             visualizerTask.prioritize(usec, prioritizer);
+        }
+
+        uint8_t mspAvailable(void)
+        {
+            return m_msp.available();
+        }
+
+        uint8_t mspRead(void)
+        {
+            return m_msp.read();
         }
 
 }; // class Logic

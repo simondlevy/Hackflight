@@ -199,7 +199,7 @@ class Msp {
             completeSerialize();
         }
 
-        uint8_t dataAvailable(void)
+        uint8_t available(void)
         {
             return payloadSize;
         }
