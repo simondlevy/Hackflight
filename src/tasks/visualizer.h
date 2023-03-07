@@ -25,8 +25,8 @@
 #include "imu.h"
 #include "msp.h"
 #include "receiver.h"
-#include "task/receiver.h"
-#include "task/skyranger.h"
+#include "tasks/receiver.h"
+#include "tasks/skyranger.h"
 
 class VisualizerTask : public Task {
 

@@ -23,11 +23,11 @@
 #include "core/mixer.h"
 #include "imu.h"
 #include "scheduler.h"
-#include "task/accelerometer.h"
-#include "task/attitude.h"
-#include "task/receiver.h"
-#include "task/skyranger.h"
-#include "task/visualizer.h"
+#include "tasks/accelerometer.h"
+#include "tasks/attitude.h"
+#include "tasks/receiver.h"
+#include "tasks/skyranger.h"
+#include "tasks/visualizer.h"
 
 class Core {
 

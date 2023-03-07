@@ -18,7 +18,7 @@
  */
 
 #include <hackflight.h>
-#include <board/ladybug.h>
+#include <boards/ladybug.h>
 #include <core/pids/angle.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 

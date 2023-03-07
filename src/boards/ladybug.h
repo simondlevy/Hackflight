@@ -21,8 +21,8 @@
 #include <USFS.h>
 
 #include "board.h"
-#include "esc/brushed.h"
-#include "imu/ladybug.h"
+#include "escs/brushed.h"
+#include "imus/ladybug.h"
 
 class LadybugBoard : public Stm32Board {
 
