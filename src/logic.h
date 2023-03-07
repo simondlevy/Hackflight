@@ -29,7 +29,7 @@
 #include "tasks/skyranger.h"
 #include "tasks/visualizer.h"
 
-class Core {
+class Logic {
 
     private:
 
@@ -273,11 +273,11 @@ class Core {
             }
         }
 
-        void prioritizeCoreTasks(Task::prioritizer_t & prioritizer, const uint32_t usec)
+        void prioritizeTasks(Task::prioritizer_t & prioritizer, const uint32_t usec)
         {
             receiverTask.prioritize(usec, prioritizer);
             attitudeTask.prioritize(usec, prioritizer);
             visualizerTask.prioritize(usec, prioritizer);
         }
 
-}; // class Core
+}; // class Logic
