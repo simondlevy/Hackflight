@@ -58,6 +58,14 @@ class Logic {
 
         Msp m_msp;
 
+        Imu * m_imu;
+
+        std::vector<PidController *> * m_pidControllers;
+
+        Mixer * m_mixer;
+
+        uint32_t m_imuInterruptCount;
+
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
@@ -90,7 +98,7 @@ class Logic {
                 fabsf(m_vstate.phi) < maxArmingAngle &&
                 fabsf(m_vstate.theta) < maxArmingAngle;
 
-            const auto gyroDoneCalibrating = !imu->gyroIsCalibrating();
+            const auto gyroDoneCalibrating = !m_imu->gyroIsCalibrating();
 
             const auto haveReceiverSignal = receiverTask.haveSignal(usec);
 
@@ -138,29 +146,21 @@ class Logic {
         VisualizerTask visualizerTask =
             VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
 
-        Mixer * mixer;
-
-        Imu * imu;
-
-        std::vector<PidController *> * pidControllers;
-
-        uint32_t imuInterruptCount;
-
         void begin(
                 Imu * imu,
                 std::vector<PidController *> * pidControllers,
                 Mixer * mixer,
                 const uint32_t clockSpeed)
         {
-            this->imu = imu;
-            this->pidControllers = pidControllers;
-            this->mixer = mixer;
+            m_imu = imu;
+            m_mixer = mixer;
+            m_pidControllers = pidControllers;
 
             attitudeTask.begin(imu);
 
             visualizerTask.begin(&receiverTask);
 
-            imu->begin(clockSpeed);
+            m_imu->begin(clockSpeed);
         }
 
         armingStatus_e getArmingStatus(void)
@@ -170,12 +170,12 @@ class Logic {
 
         void updateAccelerometer(const int16_t rawAccel[3])
         {
-            imu->updateAccelerometer(rawAccel);
+            m_imu->updateAccelerometer(rawAccel);
         }
         void handleImuInterrupt(const uint32_t cycleCounter)
         {
-            imuInterruptCount++;
-            imu->handleInterrupt(cycleCounter);
+            m_imuInterruptCount++;
+            m_imu->handleInterrupt(cycleCounter);
         }
 
         void updateArmingStatus(const uint32_t usec)
@@ -211,7 +211,7 @@ class Logic {
 
         void step(int16_t rawGyro[3], const uint32_t usec, float mixmotors[])
         {
-            auto angvels = imu->gyroRawToFilteredDps(rawGyro);
+            auto angvels = m_imu->gyroRawToFilteredDps(rawGyro);
 
             m_vstate.dphi   = angvels.x;
             m_vstate.dtheta = angvels.y;
@@ -219,13 +219,13 @@ class Logic {
 
             Demands demands = receiverTask.getDemands();
 
-            auto motors = mixer->step(
+            auto motors = m_mixer->step(
                     demands, m_vstate,
-                    pidControllers,
+                    m_pidControllers,
                     receiverTask.throttleIsDown(),
                     usec);
 
-            for (auto i=0; i<mixer->getMotorCount(); i++) {
+            for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 
                 mixmotors[i] = motors.values[i];
             }
@@ -273,11 +273,11 @@ class Logic {
             static int32_t _sampleRateStartCycles;
 
             if ((_terminalGyroRateCount == 0)) {
-                _terminalGyroRateCount = imuInterruptCount + GYRO_RATE_COUNT;
+                _terminalGyroRateCount = m_imuInterruptCount + GYRO_RATE_COUNT;
                 _sampleRateStartCycles = nowCycles;
             }
 
-            if (imuInterruptCount >= _terminalGyroRateCount) {
+            if (m_imuInterruptCount >= _terminalGyroRateCount) {
                 // Calculate number of clock cycles on average between gyro
                 // interrupts
                 uint32_t sampleCycles = nowCycles - _sampleRateStartCycles;
@@ -292,15 +292,15 @@ class Logic {
             static int32_t _gyroSkewAccum;
 
             auto gyroSkew =
-                imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
+                m_imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 
             if ((_terminalGyroLockCount == 0)) {
-                _terminalGyroLockCount = imuInterruptCount + GYRO_LOCK_COUNT;
+                _terminalGyroLockCount = m_imuInterruptCount + GYRO_LOCK_COUNT;
             }
 
-            if (imuInterruptCount >= _terminalGyroLockCount) {
+            if (m_imuInterruptCount >= _terminalGyroLockCount) {
                 _terminalGyroLockCount += GYRO_LOCK_COUNT;
 
                 // Move the desired start time of the gyroSampleTask
