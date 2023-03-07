@@ -211,11 +211,7 @@ class Logic {
 
         void step(int16_t rawGyro[3], const uint32_t usec, float mixmotors[])
         {
-            auto angvels = m_imu->gyroRawToFilteredDps(rawGyro);
-
-            m_vstate.dphi   = angvels.x;
-            m_vstate.dtheta = angvels.y;
-            m_vstate.dpsi   = angvels.z;
+            m_imu->gyroRawToFilteredDps(rawGyro, m_vstate);
 
             Demands demands = receiverTask.getDemands();
 

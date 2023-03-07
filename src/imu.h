@@ -220,7 +220,7 @@ class Imu {
 
         virtual void handleInterrupt(const uint32_t cycleCounter) = 0;
 
-        virtual auto gyroRawToFilteredDps(int16_t rawGyro[3]) -> Axes
+        void gyroRawToFilteredDps(int16_t rawGyro[3], VehicleState & vstate)
         {
             accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
 
@@ -260,7 +260,9 @@ class Imu {
 
             m_gyroIsCalibrating = !calibrationComplete;
 
-            return Axes(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
+            vstate.dphi   = m_gyroX.dpsFiltered; 
+            vstate.dtheta = m_gyroY.dpsFiltered; 
+            vstate.dpsi   = m_gyroZ.dpsFiltered;
         }
 
         virtual bool gyroIsCalibrating(void)
