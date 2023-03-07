@@ -31,6 +31,17 @@
 
 class Logic {
 
+     public:
+
+        typedef enum {
+
+            ARMING_UNREADY,
+            ARMING_READY,
+            ARMING_ARMED,
+            ARMING_FAILSAFE
+
+        } armingStatus_e;
+
     private:
 
         // Gyro interrupt counts over which to measure loop time and skew
@@ -52,7 +63,7 @@ class Logic {
             }
 
             if (hadSignal && !haveSignal) {
-                armingStatus = ARMING_FAILSAFE;
+                m_armingStatus = ARMING_FAILSAFE;
             }
         }
 
@@ -96,30 +107,21 @@ class Logic {
 
             if (getAux1() > 1500) {
                 if (!aux1WasSet) {
-                    armingStatus = ARMING_ARMED;
+                    m_armingStatus = ARMING_ARMED;
                 }
                 aux1WasSet = true;
             }
             else {
                 if (aux1WasSet) {
-                    armingStatus = ARMING_READY;
+                    m_armingStatus = ARMING_READY;
                 }
                 aux1WasSet = false;
             }
         }
 
+        armingStatus_e m_armingStatus;
+
      public:
-
-        typedef enum {
-
-            ARMING_UNREADY,
-            ARMING_READY,
-            ARMING_ARMED,
-            ARMING_FAILSAFE
-
-        } armingStatus_e;
-
-        armingStatus_e armingStatus;
 
         VehicleState vstate;
 
@@ -144,15 +146,20 @@ class Logic {
 
         uint32_t imuInterruptCount;
 
+        armingStatus_e getArmingStatus(void)
+        {
+            return m_armingStatus;
+        }
+
         void updateArmingStatus(const uint32_t usec)
         {
             checkFailsafe(usec);
 
-            switch (armingStatus) {
+            switch (m_armingStatus) {
 
                 case ARMING_UNREADY:
                     if (safeToArm(usec)) {
-                        armingStatus = ARMING_READY;
+                        m_armingStatus = ARMING_READY;
                     }
                     break;
 
@@ -161,7 +168,7 @@ class Logic {
                         checkArmingSwitch();
                     }
                     else {
-                        armingStatus = ARMING_UNREADY;
+                        m_armingStatus = ARMING_UNREADY;
                     }
                     break;
 
