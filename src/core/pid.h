@@ -30,11 +30,11 @@ class PidController {
 
     protected:
 
-         virtual auto getDemands(
+         virtual void getDemands(
+                Demands & demands,
                 const int32_t dusec,
-                const Demands & demands,
                 const VehicleState & vstate,
-                const bool reset) -> Demands = 0;
+                const bool reset) = 0;
 
     public:
 
@@ -42,11 +42,11 @@ class PidController {
 
         static constexpr float DT = PERIOD * 1e-6f;
 
-         auto update(
+         void update(
+                Demands & demands,
                 const uint32_t usec,
-                const Demands & demands,
                 const VehicleState & vstate,
-                const bool reset) -> Demands 
+                const bool reset)
          {
              static uint32_t _prev;
 
@@ -54,7 +54,7 @@ class PidController {
 
              _prev = usec;
 
-             return getDemands(dusec, demands, vstate, reset);
+             getDemands(demands, dusec, vstate, reset);
          }
 
 };

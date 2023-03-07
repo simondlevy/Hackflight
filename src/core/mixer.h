@@ -60,7 +60,7 @@ class Mixer {
             Demands demands(stickDemands);
 
             for (auto p: *pidControllers) {
-                demands = p->update(usec, demands, state, pidReset);
+                p->update(demands, usec, state, pidReset);
             }
 
             // Run the mixer to get motors from demands

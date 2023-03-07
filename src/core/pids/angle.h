@@ -415,11 +415,11 @@ class AnglePidController : public PidController {
             m_dynLpfPreviousQuantizedThrottle = -1;  
         }
 
-        virtual auto getDemands(
+        virtual void getDemands(
+                Demands & demands,
                 const int32_t dusec,
-                const Demands & demands,
                 const VehicleState & vstate,
-                const bool reset) -> Demands override
+                const bool reset) override
         {
             const auto rollDemand  = rescale(demands.roll);
             const auto pitchDemand = rescale(demands.pitch);
@@ -456,11 +456,9 @@ class AnglePidController : public PidController {
                 }
             }
 
-            return Demands(
-                    demands.throttle,
-                    constrainOutput(roll, LIMIT),
-                    constrainOutput(pitch, LIMIT),
-                    -constrainOutput(yaw, LIMIT_YAW));
+            demands.roll = constrainOutput(roll, LIMIT);
+            demands.pitch = constrainOutput(pitch, LIMIT),
+            demands.yaw = -constrainOutput(yaw, LIMIT_YAW);
 
         } // getDemands
 
