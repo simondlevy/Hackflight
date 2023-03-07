@@ -52,6 +52,10 @@ class Logic {
 
         Scheduler m_scheduler;
 
+        armingStatus_e m_armingStatus;
+
+        VehicleState m_vstate;
+
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
@@ -81,8 +85,8 @@ class Logic {
             const auto maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE_DEG);
 
             const auto imuIsLevel =
-                fabsf(vstate.phi) < maxArmingAngle &&
-                fabsf(vstate.theta) < maxArmingAngle;
+                fabsf(m_vstate.phi) < maxArmingAngle &&
+                fabsf(m_vstate.theta) < maxArmingAngle;
 
             const auto gyroDoneCalibrating = !imu->gyroIsCalibrating();
 
@@ -119,24 +123,20 @@ class Logic {
             }
         }
 
-        armingStatus_e m_armingStatus;
-
      public:
-
-        VehicleState vstate;
 
         Msp msp;
 
         ReceiverTask receiverTask;
 
-        AttitudeTask attitudeTask = AttitudeTask(vstate);
+        AttitudeTask attitudeTask = AttitudeTask(m_vstate);
 
-        SkyrangerTask skyrangerTask = SkyrangerTask(vstate);
+        SkyrangerTask skyrangerTask = SkyrangerTask(m_vstate);
 
         AccelerometerTask accelerometerTask; 
 
         VisualizerTask visualizerTask =
-            VisualizerTask(msp, vstate, receiverTask, skyrangerTask);
+            VisualizerTask(msp, m_vstate, receiverTask, skyrangerTask);
 
         Mixer * mixer;
 
@@ -186,14 +186,17 @@ class Logic {
         {
             auto angvels = imu->gyroRawToFilteredDps(rawGyro);
 
-            vstate.dphi   = angvels.x;
-            vstate.dtheta = angvels.y;
-            vstate.dpsi   = angvels.z;
+            m_vstate.dphi   = angvels.x;
+            m_vstate.dtheta = angvels.y;
+            m_vstate.dpsi   = angvels.z;
 
             Demands demands = receiverTask.getDemands();
 
             auto motors = mixer->step(
-                    demands, vstate, pidControllers, receiverTask.throttleIsDown(), usec);
+                    demands, m_vstate,
+                    pidControllers,
+                    receiverTask.throttleIsDown(),
+                    usec);
 
             for (auto i=0; i<mixer->getMotorCount(); i++) {
 
