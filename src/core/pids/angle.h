@@ -399,11 +399,11 @@ class AnglePidController : public PidController {
     public:
 
         AnglePidController(
-                const float k_rate_p,
-                const float k_rate_i,
-                const float k_rate_d,
-                const float k_rate_f,
-                const float k_level_p)
+                const float k_rate_p = 1.441305,
+                const float k_rate_i = 48.8762 ,
+                const float k_rate_d = 0.021160,
+                const float k_rate_f = 0.0165048, 
+                const float k_level_p = 0.0) // 3.0
         {
             m_k_rate_p = k_rate_p;
             m_k_rate_i = k_rate_i;

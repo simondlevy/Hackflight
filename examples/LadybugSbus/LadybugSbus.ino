@@ -26,12 +26,7 @@
 
 #include <vector>
 
-static AnglePidController anglePid(
-        1.441305,     // Rate Kp
-        48.8762,      // Rate Ki
-        0.021160,     // Rate Kd
-        0.0165048,    // Rate Kf
-        0.0); // 3.0; // Level Kp
+static AnglePidController anglePid;
 
 static std::vector<PidController *> pids = {&anglePid};
 
