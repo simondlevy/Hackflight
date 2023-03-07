@@ -146,8 +146,16 @@ class Logic {
 
         uint32_t imuInterruptCount;
 
-        void begin(const uint32_t clockSpeed)
+        void begin(
+                Imu * imu,
+                std::vector<PidController *> * pidControllers,
+                Mixer * mixer,
+                const uint32_t clockSpeed)
         {
+            this->imu = imu;
+            this->pidControllers = pidControllers;
+            this->mixer = mixer;
+
             attitudeTask.begin(imu);
 
             visualizerTask.begin(&receiverTask);

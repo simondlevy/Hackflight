@@ -34,13 +34,8 @@ class Stm32FBoard : public Stm32Board {
             m_logic.skyrangerTask.prioritize(usec, prioritizer);
         }
 
-        Stm32FBoard(
-                SoftQuatImu & imu,
-                std::vector<PidController *> & pids,
-                Mixer & mixer,
-                Esc & esc,
-                const uint8_t ledPin)
-            : Stm32Board(&imu, pids, mixer, esc, ledPin)
+        Stm32FBoard(Esc & esc, const uint8_t ledPin)
+            : Stm32Board(esc, ledPin)
         {
         }
 

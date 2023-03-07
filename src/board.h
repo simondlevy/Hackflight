@@ -198,16 +198,8 @@ class Stm32Board {
 
         Logic m_logic;
 
-        Stm32Board(
-                Imu * imu,
-                std::vector<PidController *> & pidControllers,
-                Mixer & mixer,
-                Esc & esc,
-                const int8_t ledPin)
+        Stm32Board(Esc & esc, const int8_t ledPin)
         {
-            m_logic.imu = imu;
-            m_logic.pidControllers = &pidControllers;
-            m_logic.mixer = &mixer;
             m_esc = &esc;
 
             // Support negative LED pin number for inversion
@@ -250,11 +242,11 @@ class Stm32Board {
             return DWT->CYCCNT;
         }
 
-        void begin(void)
+        void begin(Imu * imu,  std::vector<PidController *> * pids, Mixer * mixer)
         {
             startCycleCounter();
 
-            m_logic.begin(getClockSpeed());
+            m_logic.begin(imu, pids, mixer, getClockSpeed());
 
             pinMode(m_ledPin, OUTPUT);
 

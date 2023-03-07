@@ -56,15 +56,14 @@ static Stm32F4Dshot dshot;
 
 static DshotEsc esc = DshotEsc(&dshot);
 
+///////////////////////////////////////////////////////
 static AnglePidController anglePid;
-
 static Mixer mixer = QuadXbfMixer::make();
-
 static SoftQuatImu imu(Imu::rotate180);
-
 static std::vector<PidController *> pids = {&anglePid};
+///////////////////////////////////////////////////////
 
-static Stm32F4Board board(imu, pids, mixer, esc, LED_PIN);
+static Stm32F4Board board(esc, LED_PIN);
 
 // Motor interrupt
 extern "C" void DMA2_Stream1_IRQHandler(void) 
@@ -108,7 +107,7 @@ void setup(void)
 
     mpu.begin();
 
-    board.begin();
+    board.begin(&imu, &pids, &mixer);
 
     dshot.begin(motorPins);
 }
