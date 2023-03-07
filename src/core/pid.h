@@ -57,4 +57,15 @@ class PidController {
              modifyDemands(demands, dusec, vstate, reset);
          }
 
+         static void run(
+                 std::vector<PidController *> * pidControllers,
+                 Demands & demands,
+                 const VehicleState & vstate,
+                 const uint32_t usec,
+                 const bool reset)
+         {
+             for (auto p: *pidControllers) {
+                 p->update(demands, usec, vstate, reset);
+             }
+         }
 };

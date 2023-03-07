@@ -214,12 +214,12 @@ class Logic {
             m_imu->gyroRawToFilteredDps(rawGyro, m_vstate);
 
             Demands demands = receiverTask.modifyDemands();
+            
+            auto pidReset = receiverTask.throttleIsDown();
 
-            auto motors = m_mixer->step(
-                    demands, m_vstate,
-                    m_pidControllers,
-                    receiverTask.throttleIsDown(),
-                    usec);
+            PidController::run(m_pidControllers, demands, m_vstate, usec, pidReset);
+
+            auto motors = m_mixer->step(demands);
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 

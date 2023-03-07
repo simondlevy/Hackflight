@@ -49,20 +49,8 @@ class Mixer {
             return m_motorCount;
         }
 
-        auto step(
-                const Demands & stickDemands,
-                const VehicleState & state,
-                std::vector<PidController *> * pidControllers,
-                const bool pidReset,
-                const uint32_t usec) -> Motors
+        auto step(const Demands & demands) -> Motors
         {
-            // Star with stick demands
-            Demands demands(stickDemands);
-
-            for (auto p: *pidControllers) {
-                p->update(demands, usec, state, pidReset);
-            }
-
             // Run the mixer to get motors from demands
             return m_fun(demands);
         }
