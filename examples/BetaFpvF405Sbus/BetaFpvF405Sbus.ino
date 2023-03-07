@@ -39,10 +39,6 @@ static const uint8_t LED_PIN     = PB5;
 static const uint8_t IMU_CS_PIN  = PA4;
 static const uint8_t IMU_INT_PIN = PC4;
 
-static const uint8_t IMU_MOSI_PIN = PA7;
-static const uint8_t IMU_MISO_PIN = PA6;
-static const uint8_t IMU_SCLK_PIN = PA5;
-
 static const uint8_t MOTOR1_PIN = PB_0;
 static const uint8_t MOTOR2_PIN = PB_1;
 static const uint8_t MOTOR3_PIN = PA_3;
@@ -51,7 +47,8 @@ static const uint8_t MOTOR4_PIN = PA_2;
 static std::vector<uint8_t> stream1MotorPins = {MOTOR3_PIN, MOTOR4_PIN};
 static std::vector<uint8_t> stream2MotorPins = {MOTOR1_PIN, MOTOR2_PIN};
 
-static SPIClass spi = SPIClass(IMU_MOSI_PIN, IMU_MISO_PIN, IMU_SCLK_PIN);
+static SPIClass spi = SPIClass(
+        Stm32FBoard::MOSI_PIN, Stm32FBoard::MISO_PIN, Stm32FBoard::SCLK_PIN);
 
 static Mpu6000 mpu = Mpu6000(spi, IMU_CS_PIN);
 
