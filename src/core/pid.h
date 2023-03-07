@@ -30,7 +30,7 @@ class PidController {
 
     protected:
 
-         virtual void getDemands(
+         virtual void modifyDemands(
                 Demands & demands,
                 const int32_t dusec,
                 const VehicleState & vstate,
@@ -54,7 +54,7 @@ class PidController {
 
              _prev = usec;
 
-             getDemands(demands, dusec, vstate, reset);
+             modifyDemands(demands, dusec, vstate, reset);
          }
 
 };

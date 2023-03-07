@@ -145,7 +145,7 @@ class ReceiverTask : public Task {
             m_rawYaw = getRawYaw();
         }
 
-        auto getDemands(void) -> Demands 
+        auto modifyDemands(void) -> Demands 
         {
             m_previousFrameTimeUs = m_gotNewData ? 0 : m_previousFrameTimeUs;
 

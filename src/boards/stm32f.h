@@ -30,12 +30,12 @@ class Stm32FBoard : public Stm32Board {
                 Task::prioritizer_t & prioritizer,
                 const uint32_t usec) override
         {
-            m_logic.accelerometerTask.prioritize(usec, prioritizer);
-            m_logic.skyrangerTask.prioritize(usec, prioritizer);
+            m_logic->accelerometerTask.prioritize(usec, prioritizer);
+            m_logic->skyrangerTask.prioritize(usec, prioritizer);
         }
 
-        Stm32FBoard(Esc & esc, const uint8_t ledPin)
-            : Stm32Board(esc, ledPin)
+        Stm32FBoard(Logic & logic, Esc & esc, const uint8_t ledPin)
+            : Stm32Board(logic, esc, ledPin)
         {
         }
 
@@ -48,7 +48,7 @@ class Stm32FBoard : public Stm32Board {
         void handleSkyrangerEvent(HardwareSerial & serial)
         {
             while (serial.available()) {
-                m_logic.skyrangerTask.parse(serial.read());
+                m_logic->skyrangerTask.parse(serial.read());
             }
         }
 

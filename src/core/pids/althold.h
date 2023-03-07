@@ -58,7 +58,7 @@ class AltHoldPidController : public PidController {
             m_altitudeTarget = 0;
         }
 
-        virtual auto getDemands(
+        virtual auto modifyDemands(
                 const int32_t dusec,
                 const Demands & demands,
                 const VehicleState & vstate,

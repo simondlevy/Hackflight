@@ -24,8 +24,8 @@ class Stm32F4Board : public Stm32FBoard {
 
     public:
 
-        Stm32F4Board(Esc & esc, const uint8_t ledPin)
-            : Stm32FBoard(esc, ledPin)
+        Stm32F4Board(Logic & logic, Esc & esc, const uint8_t ledPin)
+            : Stm32FBoard(logic, esc, ledPin)
         {
         }
 

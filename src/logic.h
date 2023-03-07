@@ -146,17 +146,17 @@ class Logic {
         VisualizerTask visualizerTask =
             VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
 
-        void begin(
-                Imu * imu,
-                std::vector<PidController *> * pidControllers,
-                Mixer * mixer,
-                const uint32_t clockSpeed)
+        Logic(Imu * imu, std::vector<PidController *> * pidControllers, Mixer * mixer)
         {
             m_imu = imu;
             m_mixer = mixer;
             m_pidControllers = pidControllers;
+        }
 
-            attitudeTask.begin(imu);
+        void begin(const uint32_t clockSpeed)
+        {
+
+            attitudeTask.begin(m_imu);
 
             visualizerTask.begin(&receiverTask);
 
@@ -213,7 +213,7 @@ class Logic {
         {
             m_imu->gyroRawToFilteredDps(rawGyro, m_vstate);
 
-            Demands demands = receiverTask.getDemands();
+            Demands demands = receiverTask.modifyDemands();
 
             auto motors = m_mixer->step(
                     demands, m_vstate,

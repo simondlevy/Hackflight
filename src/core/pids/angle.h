@@ -415,7 +415,7 @@ class AnglePidController : public PidController {
             m_dynLpfPreviousQuantizedThrottle = -1;  
         }
 
-        virtual void getDemands(
+        virtual void modifyDemands(
                 Demands & demands,
                 const int32_t dusec,
                 const VehicleState & vstate,
@@ -460,6 +460,6 @@ class AnglePidController : public PidController {
             demands.pitch = constrainOutput(pitch, LIMIT),
             demands.yaw = -constrainOutput(yaw, LIMIT_YAW);
 
-        } // getDemands
+        } // modifyDemands
 
 }; // class AnglePidController

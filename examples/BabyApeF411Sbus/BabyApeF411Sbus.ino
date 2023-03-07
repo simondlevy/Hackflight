@@ -23,6 +23,7 @@
 #include <core/pids/angle.h>
 #include <escs/dshot.h>
 #include <imus/softquat.h>
+#include "logic.h"
 
 #include <sbus.h>
 
@@ -61,9 +62,10 @@ static AnglePidController anglePid;
 static Mixer mixer = QuadXbfMixer::make();
 static SoftQuatImu imu(Imu::rotate180);
 static std::vector<PidController *> pids = {&anglePid};
+static Logic logic(&imu, &pids, &mixer);
 ///////////////////////////////////////////////////////
 
-static Stm32F4Board board(esc, LED_PIN);
+static Stm32F4Board board(logic, esc, LED_PIN);
 
 // Motor interrupt
 extern "C" void DMA2_Stream1_IRQHandler(void) 
@@ -107,7 +109,7 @@ void setup(void)
 
     mpu.begin();
 
-    board.begin(&imu, &pids, &mixer);
+    board.begin();
 
     dshot.begin(motorPins);
 }
