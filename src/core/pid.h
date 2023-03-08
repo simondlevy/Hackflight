@@ -58,13 +58,13 @@ class PidController {
          }
 
          static void run(
-                 std::vector<PidController *> * pidControllers,
+                 std::vector<PidController *> & pidControllers,
                  Demands & demands,
                  const VehicleState & vstate,
                  const uint32_t usec,
                  const bool reset)
          {
-             for (auto p: *pidControllers) {
+             for (auto p: pidControllers) {
                  p->update(demands, usec, vstate, reset);
              }
          }

@@ -275,6 +275,7 @@ class Stm32Board {
 
         void step(
                 Logic & logic,
+                std::vector<PidController *> pids,
                 Mixer & mixer,
                 int16_t rawGyro[3],
                 int16_t rawAccel[3])
@@ -297,7 +298,7 @@ class Stm32Board {
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
-                logic.step(mixer, rawGyro, usec, mixmotors);
+                logic.step(pids, mixer, rawGyro, usec, mixmotors);
 
                 m_esc->write(
                         logic.getArmingStatus() == Logic::ARMING_ARMED ?
@@ -314,12 +315,13 @@ class Stm32Board {
 
         void step(
                 Logic & logic,
+                std::vector<PidController *> pids,
                 Mixer & mixer,
                 int16_t rawGyro[3],
                 int16_t rawAccel[3],
                 HardwareSerial & serial)
         {
-            step(logic, mixer, rawGyro, rawAccel);
+            step(logic, pids, mixer, rawGyro, rawAccel);
 
             while (logic.skyrangerTask.imuDataAvailable()) {
                 serial.write(logic.skyrangerTask.readImuData());

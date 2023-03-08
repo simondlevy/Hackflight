@@ -120,5 +120,5 @@ void loop(void)
     int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
-    board.step(logic, mixer, rawGyro, rawAccel);
+    board.step(logic, pids, mixer, rawGyro, rawAccel);
 }
