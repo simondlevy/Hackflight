@@ -142,7 +142,7 @@ class Logic {
         VisualizerTask visualizerTask =
             VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
 
-        Logic(Imu * imu, std::vector<PidController *> * pids)
+        Logic(Imu * imu)
         {
             m_imu = imu;
         }
@@ -166,6 +166,7 @@ class Logic {
         {
             m_imu->updateAccelerometer(rawAccel);
         }
+
         void handleImuInterrupt(const uint32_t cycleCounter)
         {
             m_imuInterruptCount++;
