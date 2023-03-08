@@ -69,7 +69,7 @@ class Stm32Board {
 
                 case Task::ACCELEROMETER:
                     runTask(logic, logic.accelerometerTask);
-                    logic.updateAccelerometer(rawAccel);
+                    logic.updateAccelerometer(imu, rawAccel);
                     break;
 
                 case Task::SKYRANGER:

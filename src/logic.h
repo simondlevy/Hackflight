@@ -161,9 +161,9 @@ class Logic {
             return m_armingStatus;
         }
 
-        void updateAccelerometer(const int16_t rawAccel[3])
+        void updateAccelerometer(Imu & imu, const int16_t rawAccel[3])
         {
-            m_imu->updateAccelerometer(rawAccel);
+            imu.updateAccelerometer(rawAccel);
         }
 
         void handleImuInterrupt(const uint32_t cycleCounter)
