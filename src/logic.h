@@ -58,8 +58,6 @@ class Logic {
 
         Msp m_msp;
 
-        Imu * m_imu;
-
         uint32_t m_imuInterruptCount;
 
         void checkFailsafe(const uint32_t usec)
@@ -141,11 +139,6 @@ class Logic {
 
         VisualizerTask visualizerTask =
             VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
-
-        Logic(Imu * imu)
-        {
-            m_imu = imu;
-        }
 
         void begin(Imu & imu, const uint32_t clockSpeed)
         {

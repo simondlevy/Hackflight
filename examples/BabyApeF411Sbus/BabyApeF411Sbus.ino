@@ -62,7 +62,7 @@ static AnglePidController anglePid;
 static Mixer mixer = QuadXbfMixer::make();
 static SoftQuatImu imu(Imu::rotate180);
 static std::vector<PidController *> pids = {&anglePid};
-static Logic logic(&imu);
+static Logic logic;
 ///////////////////////////////////////////////////////
 
 static Stm32F4Board board(esc, LED_PIN);
