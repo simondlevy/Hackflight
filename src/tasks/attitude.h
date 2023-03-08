@@ -36,9 +36,9 @@ class AttitudeTask : public Task {
             m_vstate = &vstate;
         }
 
-        void begin(Imu * imu)
+        void begin(Imu & imu)
         {
-            m_imu = imu;
+            m_imu = &imu;
         }
 
         virtual void run(const uint32_t usec) override

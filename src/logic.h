@@ -149,7 +149,7 @@ class Logic {
 
         void begin(Imu & imu, const uint32_t clockSpeed)
         {
-            attitudeTask.begin(m_imu);
+            attitudeTask.begin(imu);
 
             visualizerTask.begin(&receiverTask);
 
