@@ -204,13 +204,14 @@ class Logic {
 
 
         void step(
+                Imu & imu,
                 std::vector<PidController *> & pids,
                 Mixer & mixer,
                 int16_t rawGyro[3],
                 const uint32_t usec,
                 float mixmotors[])
         {
-            m_imu->gyroRawToFilteredDps(rawGyro, m_vstate);
+            imu.gyroRawToFilteredDps(rawGyro, m_vstate);
 
             Demands demands = receiverTask.modifyDemands();
             

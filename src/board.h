@@ -303,7 +303,7 @@ class Stm32Board {
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
-                logic.step(pids, mixer, rawGyro, usec, mixmotors);
+                logic.step(imu, pids, mixer, rawGyro, usec, mixmotors);
 
                 m_esc->write(
                         logic.getArmingStatus() == Logic::ARMING_ARMED ?
