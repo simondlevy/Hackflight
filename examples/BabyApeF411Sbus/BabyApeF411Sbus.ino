@@ -107,7 +107,7 @@ void setup(void)
 
     mpu.begin();
 
-    board.begin(logic, IMU_INT_PIN, handleImuInterrupt);
+    board.begin(logic, imu, IMU_INT_PIN, handleImuInterrupt);
 
     dshot.begin(motorPins);
 }

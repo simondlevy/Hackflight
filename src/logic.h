@@ -77,7 +77,7 @@ class Logic {
             }
         }
 
-        bool safeToArm(const uint32_t usec)
+        bool safeToArm(Imu * imu, const uint32_t usec)
         {
             // Avoid arming if switch starts down
             static bool auxSwitchWasOff;
@@ -94,7 +94,7 @@ class Logic {
                 fabsf(m_vstate.phi) < maxArmingAngle &&
                 fabsf(m_vstate.theta) < maxArmingAngle;
 
-            const auto gyroDoneCalibrating = !m_imu->gyroIsCalibrating();
+            const auto gyroDoneCalibrating = !imu->gyroIsCalibrating();
 
             const auto haveReceiverSignal = receiverTask.haveSignal(usec);
 
@@ -147,14 +147,14 @@ class Logic {
             m_imu = imu;
         }
 
-        void begin(const uint32_t clockSpeed)
+        void begin(Imu & imu, const uint32_t clockSpeed)
         {
 
             attitudeTask.begin(m_imu);
 
             visualizerTask.begin(&receiverTask);
 
-            m_imu->begin(clockSpeed);
+            imu.begin(clockSpeed);
         }
 
         armingStatus_e getArmingStatus(void)
@@ -180,13 +180,13 @@ class Logic {
             switch (m_armingStatus) {
 
                 case ARMING_UNREADY:
-                    if (safeToArm(usec)) {
+                    if (safeToArm(m_imu, usec)) {
                         m_armingStatus = ARMING_READY;
                     }
                     break;
 
                 case ARMING_READY:
-                    if (safeToArm(usec)) {
+                    if (safeToArm(m_imu, usec)) {
                         checkArmingSwitch();
                     }
                     else {

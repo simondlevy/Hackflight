@@ -249,11 +249,15 @@ class Stm32Board {
             return DWT->CYCCNT;
         }
 
-        void begin(Logic & logic, const uint8_t imuInterruptPin, void (*irq)(void))
+        void begin(
+                Logic & logic,
+                Imu & imu,
+                const uint8_t imuInterruptPin,
+                void (*irq)(void))
         {
             startCycleCounter();
 
-            logic.begin(getClockSpeed());
+            logic.begin(imu, getClockSpeed());
 
             pinMode(m_ledPin, OUTPUT);
 
