@@ -22,6 +22,8 @@
 #include "utils.h"
 #include "vstate.h"
 
+#include <vector>
+
 class PidController {
 
     private:

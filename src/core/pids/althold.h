@@ -24,11 +24,6 @@ class AltHoldPidController : public PidController {
     
     private:
 
-        static constexpr float ALTITUDE_MIN   = 1.0;
-        static constexpr float PILOT_VELZ_MAX = 2.5;
-        static constexpr float STICK_DEADBAND = 0.2;
-        static constexpr float WINDUP_MAX     = 0.4;
-
         static bool inBand(const float value, const float band) 
         {
             return value > -band && value < band;
@@ -39,8 +34,13 @@ class AltHoldPidController : public PidController {
             return v < -lim ? -lim : v > +lim ? +lim : v;
         }
 
-        float m_kp;
-        float m_ki;
+        float k_p;
+        float k_i;
+
+        float k_alt_min;
+        float k_pilot_velz_max;
+        float k_stick_deadband;
+        float k_windup_max;
 
         bool m_inBandPrev;
         float m_errorI;
@@ -48,22 +48,37 @@ class AltHoldPidController : public PidController {
 
     public:
 
-        AltHoldPidController(const float kp, const float ki)
+        AltHoldPidController(
+
+                // Tunable
+                const float k_p = 0.075,
+                const float k_i = 0.15,
+
+                // Probably better left as-is
+                const float k_alt_min = 1.0,
+                const float k_pilot_velz_max = 2.5,
+                const float k_stick_deadband = 0.2,
+                const float k_windup_max = 0.4)
         {
-            m_kp = kp;
-            m_ki = ki;
+            this->k_p = k_p;
+            this->k_i = k_i;
+
+            this->k_alt_min = k_alt_min;
+            this->k_pilot_velz_max = k_pilot_velz_max;
+            this->k_stick_deadband = k_stick_deadband;
+            this->k_windup_max = k_windup_max;
 
             m_inBandPrev = false;
             m_errorI = 0;
             m_altitudeTarget = 0;
         }
 
-        virtual auto modifyDemands(
+        virtual void modifyDemands(
+                Demands & demands,
                 const int32_t dusec,
-                const Demands & demands,
                 const VehicleState & vstate,
-                const bool reset) -> Demands override
-        {
+                const bool reset) override
+         {
             (void)dusec;
 
             const auto altitude = vstate.z;
@@ -73,7 +88,7 @@ class AltHoldPidController : public PidController {
             const auto sthrottle = 2 * demands.throttle - 1; 
 
             // Is stick demand in deadband, above a minimum altitude?
-            const auto inBand = fabs(sthrottle) < STICK_DEADBAND && altitude > ALTITUDE_MIN; 
+            const auto inBand = fabs(sthrottle) < k_stick_deadband && altitude > k_alt_min; 
 
             // Reset controller when moving into deadband above a minimum altitude
             const auto gotNewTarget = inBand && !m_inBandPrev;
@@ -90,20 +105,16 @@ class AltHoldPidController : public PidController {
             // Target velocity is a setpoint inside deadband, scaled constant outside
             const auto targetVelocity = inBand ?
                 m_altitudeTarget - altitude :
-                PILOT_VELZ_MAX * sthrottle;
+                k_pilot_velz_max * sthrottle;
 
             // Compute error as scaled target minus actual
             const auto error = targetVelocity - dz;
 
             // Compute I term, avoiding windup
-            m_errorI = constrainAbs(m_errorI + error, WINDUP_MAX);
+            m_errorI = constrainAbs(m_errorI + error, k_windup_max);
 
             // Adjust throttle demand based on error
-            return Demands(
-                    demands.throttle + (error * m_kp + m_errorI * m_ki),
-                    demands.roll,
-                    demands.pitch,
-                    demands.yaw);
+            demands.throttle += error * k_p + m_errorI * k_i;
         }
 
 }; // class AltHoldPidController
