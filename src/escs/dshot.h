@@ -45,4 +45,15 @@ class DshotEsc : public Esc {
         {
             m_dshot->write(motorvals);
         }
+
+        virtual bool isReady(const uint32_t usec) override 
+        {
+            static bool ready;
+            static uint32_t prev;
+            if (usec-prev > 9000000) {
+                prev = usec;
+                ready = true;
+            }
+            return ready;
+        }
 }; 

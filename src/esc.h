@@ -26,4 +26,10 @@ class Esc {
     public:
 
         virtual void write(float motors[]) = 0;
+
+        virtual bool isReady(const uint32_t usec) 
+        {
+            (void)usec;
+            return true;
+        }
 }; 
