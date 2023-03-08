@@ -51,7 +51,7 @@ class Stm32Board {
             switch (prioritizer.id) {
 
                 case Task::ATTITUDE:
-                    runTask(m_logic.attitudeTask);
+                    runTask(m_logic.attitudeTask, prioritizer.id);
                     m_logic.updateArmingStatus(imu, usec);
                     updateLed();
                     break;
@@ -63,16 +63,16 @@ class Stm32Board {
                 case Task::RECEIVER:
                     m_logic.updateArmingStatus(imu, usec);
                     updateLed();
-                    runTask(m_logic.receiverTask);
+                    runTask(m_logic.receiverTask, prioritizer.id);
                     break;
 
                 case Task::ACCELEROMETER:
-                    runTask(m_logic.accelerometerTask);
+                    runTask(m_logic.accelerometerTask, prioritizer.id);
                     m_logic.updateAccelerometer(imu, rawAccel);
                     break;
 
                 case Task::SKYRANGER:
-                    runTask(m_logic.skyrangerTask);
+                    runTask(m_logic.skyrangerTask, prioritizer.id);
                     break;
 
                 default:
@@ -80,8 +80,10 @@ class Stm32Board {
             }
         }
 
-        void runTask(Task & task)
+        void runTask(Task & task, Task::id_e id)
         {
+            (void)id;
+
             const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(task);
 
             if (anticipatedEndCycles > 0) {

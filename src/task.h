@@ -33,10 +33,10 @@ class Task {
             VISUALIZER,
             RECEIVER,
             SKYRANGER
-        } id_t;
+        } id_e;
 
         typedef struct {
-            id_t id;
+            id_e id;
             uint16_t priority;
         } prioritizer_t;
 
@@ -53,7 +53,7 @@ class Task {
         // By scaling their expected execution time
         static constexpr float AGE_EXPEDITE_SCALE = 0.9; 
 
-        id_t m_id;
+        id_e m_id;
 
         uint32_t m_anticipatedExecutionTime;
 
@@ -65,7 +65,7 @@ class Task {
         uint32_t m_lastExecutedAtUs;          
         uint32_t m_lastSignaledAtUs;         
 
-        Task(const id_t id, const uint32_t rate) 
+        Task(const id_e id, const uint32_t rate) 
         {
             m_id = id;
             m_desiredPeriodUs = 1000000 / rate;
