@@ -212,8 +212,6 @@ class Stm32Board {
 
     public:
 
-        float m1_first, m1_second;
-
         void setSbusValues(
                 uint16_t chanvals[],
                 const uint32_t usec,
@@ -245,14 +243,8 @@ class Stm32Board {
             return DWT->CYCCNT;
         }
 
-        void begin(
-                Imu & imu,
-                const uint8_t imuInterruptPin,
-                void (*irq)(void))
+        void begin(Imu & imu, const uint8_t imuInterruptPin, void (*irq)(void))
         {
-            m1_first = -1;
-            m1_second = -1;
-
             startCycleCounter();
 
             m_logic.begin(imu, getClockSpeed());

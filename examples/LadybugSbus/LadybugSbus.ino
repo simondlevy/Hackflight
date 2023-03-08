@@ -26,11 +26,9 @@
 
 #include <vector>
 
-static AnglePidController anglePid;
-
-static std::vector<PidController *> pids = {&anglePid};
-
 static Mixer mixer = QuadXbfMixer::make();
+static AnglePidController anglePid;
+static std::vector<PidController *> pids = {&anglePid};
 
 static bfs::SbusRx rx(&Serial1);
 
@@ -56,10 +54,19 @@ void setup(void)
 {
     Serial1.begin(100000, SERIAL_SBUS);
 
-    board.begin(&pids, &mixer, handleImuInterrupt);
+    board.begin(handleImuInterrupt);
 }
 
 void loop(void)
 {
-    board.step();
+    board.step(pids, mixer);
+}
+
+namespace std {
+    void __throw_bad_alloc() {
+        while (true) {
+            Serial.println("Unable to allocate memory");
+            delay(500);
+        }
+    }
 }

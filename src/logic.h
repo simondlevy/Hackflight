@@ -195,7 +195,6 @@ class Logic {
             }
         }
 
-
         void step(
                 Imu & imu,
                 std::vector<PidController *> & pids,

@@ -26,12 +26,11 @@
 
 #include <vector>
 
-static std::vector<PidController *> pids = {&anglePid};
-
 static Dsm2048 rx;
 
-static AnglePidController anglePid;
 static Mixer mixer = QuadXbfMixer::make();
+static AnglePidController anglePid;
+static std::vector<PidController *> pids = {&anglePid};
 
 static LadybugBoard board;
 
@@ -62,10 +61,19 @@ void setup(void)
 {
     Serial1.begin(115200);
 
-    board.begin(&pids, &mixer, handleImuInterrupt);
+    board.begin(handleImuInterrupt);
 }
 
 void loop(void)
 {
-    board.step();
+    board.step(pids, mixer);
+}
+
+namespace std {
+    void __throw_bad_alloc() {
+        while (true) {
+            Serial.println("Unable to allocate memory");
+            delay(500);
+        }
+    }
 }

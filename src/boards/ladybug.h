@@ -62,11 +62,11 @@ class LadybugBoard : public Stm32Board {
         static const uint8_t LED_PIN = 0x12;
 
         LadybugBoard(void)
-            : Stm32Board(m_esc, -LED_PIN) // note inverted LED pin
+            : Stm32Board(-LED_PIN) // note inverted LED pin
         {
         }
 
-        void begin(std::vector<PidController *> * pids, Mixer * mixer, void (*isr)(void))
+        void begin(void (*isr)(void))
         {
             Serial.begin(115200);
 
@@ -74,9 +74,7 @@ class LadybugBoard : public Stm32Board {
             Wire.setClock(400000); 
             delay(100);
 
-            setImuInterrupt(IMU_INTERRUPT_PIN, isr, RISING);  
-
-            Stm32Board::begin(&m_imu, pids, mixer);
+            Stm32Board::begin(m_imu, IMU_INTERRUPT_PIN, isr);  
 
             m_usfs.loadFirmware(); 
 
@@ -97,7 +95,7 @@ class LadybugBoard : public Stm32Board {
             m_esc.begin();
         }
 
-        void step(void)
+        void step(std::vector<PidController *> pids, Mixer & mixer)
         {
             static int16_t rawGyro[3];
 
@@ -120,7 +118,12 @@ class LadybugBoard : public Stm32Board {
                 }
             } 
 
-            Stm32Board::step(rawGyro, m_rawAccel);
+            Stm32Board::step(m_imu, pids, mixer, m_esc, rawGyro, m_rawAccel);
+        }
+
+        void handleImuInterrupt(void)
+        {
+            Stm32Board::handleImuInterrupt(m_imu);
         }
 
 }; // class LadybugBoard

@@ -56,15 +56,14 @@ static Stm32F4Dshot dshot;
 
 static DshotEsc esc = DshotEsc(&dshot);
 
+///////////////////////////////////////////////////////
 static AnglePidController anglePid;
-
 static Mixer mixer = QuadXbfMixer::make();
-
 static SoftQuatImu imu(Imu::rotate180);
-
 static std::vector<PidController *> pids = {&anglePid};
+///////////////////////////////////////////////////////
 
-static Stm32F4Board board(esc, LED_PIN);
+static Stm32F4Board board(LED_PIN);
 
 // Motor interrupt
 extern "C" void DMA2_Stream1_IRQHandler(void) 
@@ -75,7 +74,7 @@ extern "C" void DMA2_Stream1_IRQHandler(void)
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    board.handleImuInterrupt();
+    board.handleImuInterrupt(imu);
 }
 
 // Receiver interrupt
@@ -98,15 +97,13 @@ void serialEvent1(void)
 
 void setup(void)
 {
-    board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
-
     Serial1.begin(115200);
 
     spi.begin();
 
     mpu.begin();
 
-    board.begin(&imu, &pids, &mixer);
+    board.begin(imu, IMU_INT_PIN, handleImuInterrupt);
 
     dshot.begin(motorPins);
 }
@@ -119,5 +116,5 @@ void loop(void)
     int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
-    board.step(rawGyro, rawAccel);
+    board.step(imu, pids, mixer, esc, rawGyro, rawAccel);
 }
