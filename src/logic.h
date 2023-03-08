@@ -149,7 +149,6 @@ class Logic {
 
         void begin(Imu & imu, const uint32_t clockSpeed)
         {
-
             attitudeTask.begin(m_imu);
 
             visualizerTask.begin(&receiverTask);
@@ -258,7 +257,10 @@ class Logic {
             return m_scheduler.isCoreReady(nowCycles);
         }
 
-        void updateScheduler(const uint32_t nowCycles, const uint32_t nextTargetCycles)
+        void updateScheduler(
+                Imu & imu,
+                const uint32_t nowCycles,
+                const uint32_t nextTargetCycles)
         {
             m_scheduler.corePostUpdate(nowCycles);
 
@@ -288,7 +290,7 @@ class Logic {
             static int32_t _gyroSkewAccum;
 
             auto gyroSkew =
-                m_imu->getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
+                imu.getGyroSkew(nextTargetCycles, m_scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 

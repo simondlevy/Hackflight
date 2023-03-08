@@ -279,6 +279,7 @@ class Stm32Board {
 
         void step(
                 Logic & logic,
+                Imu & imu,
                 std::vector<PidController *> pids,
                 Mixer & mixer,
                 int16_t rawGyro[3],
@@ -309,7 +310,7 @@ class Stm32Board {
                         mixmotors :
                         logic.visualizerTask.motors);
 
-                logic.updateScheduler(nowCycles, nextTargetCycles);
+                logic.updateScheduler(imu, nowCycles, nextTargetCycles);
             }
 
             if (logic.isDynamicTaskReady(getCycleCounter())) {
@@ -319,13 +320,14 @@ class Stm32Board {
 
         void step(
                 Logic & logic,
+                Imu & imu,
                 std::vector<PidController *> pids,
                 Mixer & mixer,
                 int16_t rawGyro[3],
                 int16_t rawAccel[3],
                 HardwareSerial & serial)
         {
-            step(logic, pids, mixer, rawGyro, rawAccel);
+            step(logic, imu, pids, mixer, rawGyro, rawAccel);
 
             while (logic.skyrangerTask.imuDataAvailable()) {
                 serial.write(logic.skyrangerTask.readImuData());
