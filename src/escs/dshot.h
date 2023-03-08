@@ -32,6 +32,8 @@ class DshotEsc : public Esc {
 
     private:
 
+        const uint32_t STARTUP_USEC = 5000000;
+
         Stm32Dshot * m_dshot;
 
     public:
@@ -50,7 +52,7 @@ class DshotEsc : public Esc {
         {
             static bool ready;
             static uint32_t prev;
-            if (usec-prev > 9000000) {
+            if (usec-prev > STARTUP_USEC) {
                 prev = usec;
                 ready = true;
             }
