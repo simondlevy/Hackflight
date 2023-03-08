@@ -273,7 +273,11 @@ class Stm32Board {
             m_imuInterruptPin = imuInterruptPin;
         }
 
-        void step(Logic & logic, int16_t rawGyro[3], int16_t rawAccel[3])
+        void step(
+                Logic & logic,
+                Mixer & mixer,
+                int16_t rawGyro[3],
+                int16_t rawAccel[3])
         {
             auto nowCycles = getCycleCounter();
 
@@ -293,7 +297,7 @@ class Stm32Board {
 
                 float mixmotors[Motors::MAX_SUPPORTED] = {};
 
-                logic.step(rawGyro, usec, mixmotors);
+                logic.step(mixer, rawGyro, usec, mixmotors);
 
                 m_esc->write(
                         logic.getArmingStatus() == Logic::ARMING_ARMED ?
@@ -310,11 +314,12 @@ class Stm32Board {
 
         void step(
                 Logic & logic,
+                Mixer & mixer,
                 int16_t rawGyro[3],
                 int16_t rawAccel[3],
                 HardwareSerial & serial)
         {
-            step(logic, rawGyro, rawAccel);
+            step(logic, mixer, rawGyro, rawAccel);
 
             while (logic.skyrangerTask.imuDataAvailable()) {
                 serial.write(logic.skyrangerTask.readImuData());

@@ -62,7 +62,7 @@ static AnglePidController anglePid;
 static Mixer mixer = QuadXbfMixer::make();
 static SoftQuatImu imu(Imu::rotate180);
 static std::vector<PidController *> pids = {&anglePid};
-static Logic logic(&imu, &pids, &mixer);
+static Logic logic(&imu, &pids);
 ///////////////////////////////////////////////////////
 
 static Stm32F4Board board(esc, LED_PIN);
@@ -120,5 +120,5 @@ void loop(void)
     int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
-    board.step(logic, rawGyro, rawAccel);
+    board.step(logic, mixer, rawGyro, rawAccel);
 }

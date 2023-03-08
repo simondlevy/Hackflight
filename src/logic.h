@@ -62,8 +62,6 @@ class Logic {
 
         std::vector<PidController *> * m_pidControllers;
 
-        Mixer * m_mixer;
-
         uint32_t m_imuInterruptCount;
 
         void checkFailsafe(const uint32_t usec)
@@ -146,10 +144,9 @@ class Logic {
         VisualizerTask visualizerTask =
             VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
 
-        Logic(Imu * imu, std::vector<PidController *> * pidControllers, Mixer * mixer)
+        Logic(Imu * imu, std::vector<PidController *> * pidControllers)
         {
             m_imu = imu;
-            m_mixer = mixer;
             m_pidControllers = pidControllers;
         }
 
@@ -209,7 +206,8 @@ class Logic {
         }
 
 
-        void step(int16_t rawGyro[3], const uint32_t usec, float mixmotors[])
+        void step(
+                Mixer & mixer, int16_t rawGyro[3], const uint32_t usec, float mixmotors[])
         {
             m_imu->gyroRawToFilteredDps(rawGyro, m_vstate);
 
@@ -219,9 +217,9 @@ class Logic {
 
             PidController::run(m_pidControllers, demands, m_vstate, usec, pidReset);
 
-            auto motors = m_mixer->getMotors(demands);
+            auto motors = mixer.getMotors(demands);
 
-            for (auto i=0; i<m_mixer->getMotorCount(); i++) {
+            for (auto i=0; i<mixer.getMotorCount(); i++) {
 
                 mixmotors[i] = motors.values[i];
             }
