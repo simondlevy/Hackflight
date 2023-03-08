@@ -219,7 +219,7 @@ class Logic {
 
             PidController::run(m_pidControllers, demands, m_vstate, usec, pidReset);
 
-            auto motors = m_mixer->step(demands);
+            auto motors = m_mixer->getMotors(demands);
 
             for (auto i=0; i<m_mixer->getMotorCount(); i++) {
 

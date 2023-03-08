@@ -49,9 +49,8 @@ class Mixer {
             return m_motorCount;
         }
 
-        auto step(const Demands & demands) -> Motors
+        auto getMotors(const Demands & demands) -> Motors
         {
-            // Run the mixer to get motors from demands
             return m_fun(demands);
         }
 };

@@ -242,7 +242,7 @@ class Stm32Board {
             return DWT->CYCCNT;
         }
 
-        void begin(void)
+        void begin(const uint8_t imuInterruptPin, void (*irq)(void))
         {
             startCycleCounter();
 
@@ -258,6 +258,12 @@ class Stm32Board {
                 delay(50);
             }
             ledSet(false);
+
+            pinMode(imuInterruptPin, INPUT);
+            attachInterrupt(imuInterruptPin, irq, RISING);  
+
+            // Store pin for call to detachInterrupt() for reboot
+            m_imuInterruptPin = imuInterruptPin;
         }
 
         void step(int16_t rawGyro[3], int16_t rawAccel[3])
@@ -307,10 +313,6 @@ class Stm32Board {
         void setImuInterrupt(
                 const uint8_t pin, void (*irq)(void), const uint32_t mode)
         {
-            pinMode(pin, INPUT);
-            attachInterrupt(pin, irq, mode);  
 
-            // Store pin for call to detachInterrupt() for reboot
-            m_imuInterruptPin = pin;
         }
 };

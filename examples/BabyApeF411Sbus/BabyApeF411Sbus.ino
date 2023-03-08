@@ -100,8 +100,6 @@ void serialEvent2(void)
 
 void setup(void)
 {
-    board.setImuInterrupt(IMU_INT_PIN, handleImuInterrupt, RISING);  
-
     // Start receiver UART
     Serial1.begin(100000, SERIAL_8E2);
 
@@ -109,7 +107,7 @@ void setup(void)
 
     mpu.begin();
 
-    board.begin();
+    board.begin(IMU_INT_PIN, handleImuInterrupt);
 
     dshot.begin(motorPins);
 }

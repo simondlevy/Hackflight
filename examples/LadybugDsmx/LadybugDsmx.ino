@@ -26,12 +26,11 @@
 
 #include <vector>
 
-static AnglePidController anglePid;
-
 static std::vector<PidController *> pids = {&anglePid};
 
 static Dsm2048 rx;
 
+static AnglePidController anglePid;
 static Mixer mixer = QuadXbfMixer::make();
 
 static LadybugBoard board;
