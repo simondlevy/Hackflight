@@ -32,7 +32,7 @@ class Stm32Board {
 
         Esc * m_esc;
 
-        void runDynamicTasks(Logic & logic, const int16_t rawAccel[3])
+        void runDynamicTasks(Logic & logic, Imu & imu, const int16_t rawAccel[3])
         {
             if (logic.visualizerTask.gotRebootRequest()) {
                 if (m_imuInterruptPin > 0) {
@@ -53,7 +53,7 @@ class Stm32Board {
 
                 case Task::ATTITUDE:
                     runTask(logic, logic.attitudeTask);
-                    logic.updateArmingStatus(usec);
+                    logic.updateArmingStatus(imu, usec);
                     updateLed(logic);
                     break;
 
@@ -62,7 +62,7 @@ class Stm32Board {
                     break;
 
                 case Task::RECEIVER:
-                    logic.updateArmingStatus(usec);
+                    logic.updateArmingStatus(imu, usec);
                     updateLed(logic);
                     runTask(logic, logic.receiverTask);
                     break;
@@ -314,7 +314,7 @@ class Stm32Board {
             }
 
             if (logic.isDynamicTaskReady(getCycleCounter())) {
-                runDynamicTasks(logic, rawAccel);
+                runDynamicTasks(logic, imu, rawAccel);
             }
         }
 

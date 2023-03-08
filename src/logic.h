@@ -172,7 +172,7 @@ class Logic {
             m_imu->handleInterrupt(cycleCounter);
         }
 
-        void updateArmingStatus(const uint32_t usec)
+        void updateArmingStatus(Imu & imu, const uint32_t usec)
         {
             checkFailsafe(usec);
 
