@@ -202,7 +202,7 @@ class Logic {
                 Mixer & mixer,
                 int16_t rawGyro[3],
                 const uint32_t usec,
-                float mixmotors[])
+                float motors[])
         {
             imu.gyroRawToFilteredDps(rawGyro, m_vstate);
 
@@ -212,12 +212,7 @@ class Logic {
 
             PidController::run(pids, demands, m_vstate, usec, pidReset);
 
-            auto motors = mixer.getMotors(demands);
-
-            for (auto i=0; i<mixer.getMotorCount(); i++) {
-
-                mixmotors[i] = motors.values[i];
-            }
+            mixer.getMotors(demands, motors);
         }
 
         bool isDynamicTaskReady(const uint32_t nowCycles)

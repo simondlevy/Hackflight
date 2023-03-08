@@ -27,12 +27,11 @@ class Stm32FBoard : public Stm32Board {
     protected:
 
         virtual void prioritizeExtraTasks(
-                Logic & logic,
                 Task::prioritizer_t & prioritizer,
                 const uint32_t usec) override
         {
-            logic.accelerometerTask.prioritize(usec, prioritizer);
-            logic.skyrangerTask.prioritize(usec, prioritizer);
+            m_logic.accelerometerTask.prioritize(usec, prioritizer);
+            m_logic.skyrangerTask.prioritize(usec, prioritizer);
         }
 
         Stm32FBoard(Esc & esc, const uint8_t ledPin)
@@ -46,10 +45,10 @@ class Stm32FBoard : public Stm32Board {
         static const uint8_t MISO_PIN = PA6;
         static const uint8_t SCLK_PIN = PA5;
 
-        void handleSkyrangerEvent(Logic & logic, HardwareSerial & serial)
+        void handleSkyrangerEvent(HardwareSerial & serial)
         {
             while (serial.available()) {
-                logic.skyrangerTask.parse(serial.read());
+                m_logic.skyrangerTask.parse(serial.read());
             }
         }
 

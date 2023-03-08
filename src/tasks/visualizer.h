@@ -21,7 +21,6 @@
 
 #include <stdint.h>
 
-#include "core/motors.h"
 #include "imu.h"
 #include "msp.h"
 #include "receiver.h"
@@ -129,7 +128,7 @@ class VisualizerTask : public Task {
             m_skyrangerTask = & skyrangerTask;
         }
 
-        float motors[Motors::MAX_SUPPORTED];
+        float motors[10];
 
         void begin(ReceiverTask * receiverTask)
         {

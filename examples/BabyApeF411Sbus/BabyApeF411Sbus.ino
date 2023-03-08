@@ -23,7 +23,6 @@
 #include <core/pids/angle.h>
 #include <escs/dshot.h>
 #include <imus/softquat.h>
-#include "logic.h"
 
 #include <sbus.h>
 
@@ -62,7 +61,6 @@ static AnglePidController anglePid;
 static Mixer mixer = QuadXbfMixer::make();
 static SoftQuatImu imu(Imu::rotate180);
 static std::vector<PidController *> pids = {&anglePid};
-static Logic logic;
 ///////////////////////////////////////////////////////
 
 static Stm32F4Board board(esc, LED_PIN);
@@ -76,7 +74,7 @@ extern "C" void DMA2_Stream1_IRQHandler(void)
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    board.handleImuInterrupt(logic, imu);
+    board.handleImuInterrupt(imu);
 }
 
 // Receiver interrupt
@@ -86,7 +84,7 @@ void serialEvent1(void)
 
         bfs::SbusData data = rx.data();
 
-        board.setSbusValues(logic, (uint16_t *)data.ch, micros(), data.lost_frame);
+        board.setSbusValues((uint16_t *)data.ch, micros(), data.lost_frame);
     }
 }
 
@@ -107,7 +105,7 @@ void setup(void)
 
     mpu.begin();
 
-    board.begin(logic, imu, IMU_INT_PIN, handleImuInterrupt);
+    board.begin(imu, IMU_INT_PIN, handleImuInterrupt);
 
     dshot.begin(motorPins);
 }
@@ -120,5 +118,5 @@ void loop(void)
     int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
-    board.step(logic, imu, pids, mixer, rawGyro, rawAccel);
+    board.step(imu, pids, mixer, rawGyro, rawAccel);
 }

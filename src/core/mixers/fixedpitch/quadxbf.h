@@ -29,13 +29,12 @@
 
 #include "core/axes.h"
 #include "core/mixers/fixedpitch.h"
-#include "core/motors/quad.h"
 
 class QuadXbfMixer {
 
     private:
 
-        static auto fun(const Demands & demands) -> Motors
+        static void fun(const Demands & demands, float motors[])
         {
             Axes SPINS[4] = {
                 //  rol   pit    yaw
@@ -45,11 +44,7 @@ class QuadXbfMixer {
                 Axes( +1.0f, -1.0f, -1.0f ), // FRONT_L
             };
 
-            float motorvals[4];
-
-            FixedPitchMixer::fun(demands, 4, SPINS, motorvals);
-
-            return QuadMotors::make(motorvals);
+            FixedPitchMixer::fun(demands, 4, SPINS, motors);
         }
 
     public:

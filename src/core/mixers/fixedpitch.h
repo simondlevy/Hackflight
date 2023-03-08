@@ -24,7 +24,6 @@
 #include "core/axes.h"
 #include "core/constrain.h"
 #include "core/mixer.h"
-#include "core/motors.h"
 
 class FixedPitchMixer {
 
@@ -36,7 +35,7 @@ class FixedPitchMixer {
                 const Axes spins[],
                 float motorvals[])
         {
-            float mix[Motors::MAX_SUPPORTED];
+            float mix[10];
 
             float mixMax = 0, mixMin = 0;
 

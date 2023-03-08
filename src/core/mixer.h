@@ -20,7 +20,6 @@
 
 #include "constrain.h"
 #include "demands.h"
-#include "motors.h"
 #include "pid.h"
 #include "vstate.h"
 
@@ -30,7 +29,7 @@ class Mixer {
 
     private:
 
-        typedef Motors (*mixerFun_t)(const Demands & demands);
+        typedef void (*mixerFun_t)(const Demands & demands, float motors[]);
 
         uint8_t m_motorCount;
 
@@ -49,8 +48,8 @@ class Mixer {
             return m_motorCount;
         }
 
-        auto getMotors(const Demands & demands) -> Motors
+        void getMotors(const Demands & demands, float motors[])
         {
-            return m_fun(demands);
+            m_fun(demands, motors);
         }
 };
