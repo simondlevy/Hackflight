@@ -253,13 +253,40 @@ class Logic {
          }
 
         void postRunTask(
-                Task & task,
+                Task::id_e id,
                 const uint32_t usecStart,
                 const uint32_t usecEnd,
                 const uint32_t nowCycles,
                 const uint32_t anticipatedEndCycles)
         {
-            task.update(usecStart, usecEnd-usecStart);
+            const auto usecTaken = usecEnd-usecStart;
+
+            switch (id) {
+
+                case Task::ATTITUDE:
+                    attitudeTask.update(usecStart, usecTaken);
+                    break;
+
+                case Task::VISUALIZER:
+                    visualizerTask.update(usecStart, usecTaken);
+                    break;
+
+                case Task::RECEIVER:
+                    receiverTask.update(usecStart, usecTaken);
+                    break;
+
+                case Task::ACCELEROMETER:
+                    accelerometerTask.update(usecStart, usecTaken);
+                    break;
+
+                case Task::SKYRANGER:
+                    skyrangerTask.update(usecStart, usecTaken);
+                    break;
+
+                default:
+                    break;
+            }
+
             m_scheduler.updateDynamic(nowCycles, anticipatedEndCycles);
         }
 

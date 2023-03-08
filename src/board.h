@@ -82,8 +82,6 @@ class Stm32Board {
 
         void runTask(Task & task, Task::id_e id)
         {
-            (void)id;
-
             const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(task);
 
             if (anticipatedEndCycles > 0) {
@@ -92,17 +90,17 @@ class Stm32Board {
 
                 m_logic.runTask(id, usec);
 
-                postRunTask(task, usec, anticipatedEndCycles);
+                postRunTask(id, usec, anticipatedEndCycles);
             } 
         }
 
         void postRunTask(
-                Task & task,
+                Task::id_e id,
                 const uint32_t usecStart,
                 const uint32_t anticipatedEndCycles)
         {
             m_logic.postRunTask(
-                    task, usecStart, micros(), getCycleCounter(), anticipatedEndCycles);
+                    id, usecStart, micros(), getCycleCounter(), anticipatedEndCycles);
         }
 
         void updateLed(void)
@@ -170,7 +168,7 @@ class Stm32Board {
                     }
                 }
 
-                postRunTask(m_logic.visualizerTask, usec, anticipatedEndCycles);
+                postRunTask(Task::VISUALIZER, usec, anticipatedEndCycles);
             }
         }
 
