@@ -90,7 +90,7 @@ class Stm32Board {
 
                 const uint32_t usec = micros();
 
-                task.run(usec);
+                m_logic.runTask(id, usec);
 
                 postRunTask(task, usec, anticipatedEndCycles);
             } 

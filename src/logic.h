@@ -224,6 +224,34 @@ class Logic {
             return m_scheduler.corePreUpdate(loopRemainingCycles);
         }
 
+        void runTask(const Task::id_e id, const uint32_t usec)
+        {
+            switch (id) {
+
+                case Task::ATTITUDE:
+                    attitudeTask.run(usec);
+                    break;
+
+                case Task::VISUALIZER:
+                    break;
+
+                case Task::RECEIVER:
+                    receiverTask.run(usec);
+                    break;
+
+                case Task::ACCELEROMETER:
+                    accelerometerTask.run(usec);
+                    break;
+
+                case Task::SKYRANGER:
+                    skyrangerTask.run(usec);
+                    break;
+
+                default:
+                    break;
+            }
+         }
+
         void postRunTask(
                 Task & task,
                 const uint32_t usecStart,
