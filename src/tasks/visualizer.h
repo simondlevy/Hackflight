@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 
+#include "core/mixer.h"
 #include "imu.h"
 #include "msp.h"
 #include "receiver.h"
@@ -128,7 +129,7 @@ class VisualizerTask : public Task {
             m_skyrangerTask = & skyrangerTask;
         }
 
-        float motors[10];
+        float motors[Mixer::MAX_MOTORS];
 
         void begin(ReceiverTask * receiverTask)
         {

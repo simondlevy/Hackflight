@@ -37,6 +37,8 @@ class Mixer {
 
     public:
 
+        static const uint8_t MAX_MOTORS = 20; // arbitrary
+
         Mixer(const uint8_t motorCount, const mixerFun_t fun)
         {
             m_motorCount = motorCount;

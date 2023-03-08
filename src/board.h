@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "core/mixer.h"
 #include "logic.h"
 #include "esc.h"
 
@@ -291,7 +292,7 @@ class Stm32Board {
                     loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
                 }
 
-                float mixmotors[10] = {};
+                float mixmotors[Mixer::MAX_MOTORS] = {};
 
                 m_logic.step(imu, pids, mixer, rawGyro, usec, mixmotors);
 

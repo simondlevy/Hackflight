@@ -25,7 +25,7 @@
 #include "core/constrain.h"
 #include "core/mixer.h"
 
-class FixedPitchMixer {
+class FixedPitchMixer : public Mixer {
 
     public:
 
@@ -35,7 +35,7 @@ class FixedPitchMixer {
                 const Axes spins[],
                 float motorvals[])
         {
-            float mix[10];
+            float mix[MAX_MOTORS];
 
             float mixMax = 0, mixMin = 0;
 
