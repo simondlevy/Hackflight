@@ -166,10 +166,10 @@ class Logic {
             imu.updateAccelerometer(rawAccel);
         }
 
-        void handleImuInterrupt(const uint32_t cycleCounter)
+        void handleImuInterrupt(Imu & imu, const uint32_t cycleCounter)
         {
             m_imuInterruptCount++;
-            m_imu->handleInterrupt(cycleCounter);
+            imu.handleInterrupt(cycleCounter);
         }
 
         void updateArmingStatus(Imu & imu, const uint32_t usec)

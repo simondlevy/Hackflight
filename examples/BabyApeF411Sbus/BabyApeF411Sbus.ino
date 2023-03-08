@@ -76,7 +76,7 @@ extern "C" void DMA2_Stream1_IRQHandler(void)
 // IMU interrupt
 static void handleImuInterrupt(void)
 {
-    board.handleImuInterrupt(logic);
+    board.handleImuInterrupt(logic, imu);
 }
 
 // Receiver interrupt

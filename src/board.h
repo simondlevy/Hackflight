@@ -234,9 +234,9 @@ class Stm32Board {
             logic.receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
         }
 
-        void handleImuInterrupt(Logic & logic)
+        void handleImuInterrupt(Logic & logic, Imu & imu)
         {
-            logic.handleImuInterrupt(getCycleCounter());
+            logic.handleImuInterrupt(imu, getCycleCounter());
         }
 
         uint32_t microsToCycles(uint32_t micros)
