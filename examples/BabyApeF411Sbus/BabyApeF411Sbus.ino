@@ -63,7 +63,7 @@ static SoftQuatImu imu(Imu::rotate180);
 static std::vector<PidController *> pids = {&anglePid};
 ///////////////////////////////////////////////////////
 
-static Stm32F4Board board(esc, LED_PIN);
+static Stm32F4Board board(LED_PIN);
 
 // Motor interrupt
 extern "C" void DMA2_Stream1_IRQHandler(void) 
@@ -118,5 +118,5 @@ void loop(void)
     int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
     int16_t rawAccel[3] = { mpu.getRawAccelX(), mpu.getRawAccelY(), mpu.getRawAccelZ() };
 
-    board.step(imu, pids, mixer, rawGyro, rawAccel);
+    board.step(imu, pids, mixer, esc, rawGyro, rawAccel);
 }

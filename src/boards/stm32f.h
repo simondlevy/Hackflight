@@ -34,8 +34,8 @@ class Stm32FBoard : public Stm32Board {
             m_logic.skyrangerTask.prioritize(usec, prioritizer);
         }
 
-        Stm32FBoard(Esc & esc, const uint8_t ledPin)
-            : Stm32Board(esc, ledPin)
+        Stm32FBoard(const uint8_t ledPin)
+            : Stm32Board(ledPin)
         {
         }
 

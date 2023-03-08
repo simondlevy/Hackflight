@@ -30,8 +30,6 @@ class Stm32Board {
 
         uint8_t m_imuInterruptPin;
 
-        Esc * m_esc;
-
         void runDynamicTasks(Imu & imu, const int16_t rawAccel[3])
         {
             if (m_logic.visualizerTask.gotRebootRequest()) {
@@ -198,10 +196,8 @@ class Stm32Board {
 
         Logic m_logic;
 
-        Stm32Board(Esc & esc, const int8_t ledPin)
+        Stm32Board(const int8_t ledPin)
         {
-            m_esc = &esc;
-
             // Support negative LED pin number for inversion
             m_ledPin = ledPin < 0 ? -ledPin : ledPin;
             m_ledInverted = ledPin < 0;
@@ -283,6 +279,7 @@ class Stm32Board {
                 Imu & imu,
                 std::vector<PidController *> pids,
                 Mixer & mixer,
+                Esc & esc,
                 int16_t rawGyro[3],
                 int16_t rawAccel[3])
         {
@@ -306,7 +303,7 @@ class Stm32Board {
 
                 m_logic.step(imu, pids, mixer, rawGyro, usec, mixmotors);
 
-                m_esc->write(
+                esc.write(
                         m_logic.getArmingStatus() == Logic::ARMING_ARMED ?
                         mixmotors :
                         m_logic.visualizerTask.motors);
@@ -323,11 +320,12 @@ class Stm32Board {
                 Imu & imu,
                 std::vector<PidController *> pids,
                 Mixer & mixer,
+                Esc & esc,
                 int16_t rawGyro[3],
                 int16_t rawAccel[3],
                 HardwareSerial & serial)
         {
-            step(imu, pids, mixer, rawGyro, rawAccel);
+            step(imu, pids, mixer, esc, rawGyro, rawAccel);
 
             while (m_logic.skyrangerTask.imuDataAvailable()) {
                 serial.write(m_logic.skyrangerTask.readImuData());

@@ -41,8 +41,8 @@ class DshotEsc : public Esc {
             m_dshot = dshot;
         }
 
-        virtual void write(float motorValues[]) override
+        virtual void write(float motorvals[]) override
         {
-            m_dshot->write(motorValues);
+            m_dshot->write(motorvals);
         }
 }; 
