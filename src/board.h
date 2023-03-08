@@ -294,7 +294,16 @@ class Stm32Board {
 
                 float mixmotors[Mixer::MAX_MOTORS] = {};
 
-                m_logic.step(imu, pids, mixer, rawGyro, usec, mixmotors);
+                static bool ready;
+                static uint32_t prev;
+                if (usec-prev > 9000000) {
+                    prev = usec;
+                    ready = true;
+                }
+
+                if (ready) {
+                    m_logic.step(imu, pids, mixer, rawGyro, usec, mixmotors);
+                }
 
                 esc.write(
                         m_logic.getArmingStatus() == Logic::ARMING_ARMED ?
