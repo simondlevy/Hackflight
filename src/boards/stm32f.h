@@ -27,10 +27,11 @@ class Stm32FBoard : public Stm32Board {
     protected:
 
         virtual void prioritizeExtraTasks(
+                Logic & logic,
                 Task::prioritizer_t & prioritizer,
                 const uint32_t usec) override
         {
-            m_logic.prioritizeExtraTasks(prioritizer, usec);
+            logic.prioritizeExtraTasks(prioritizer, usec);
         }
 
         Stm32FBoard(const uint8_t ledPin)

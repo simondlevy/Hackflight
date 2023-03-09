@@ -46,7 +46,7 @@ class Stm32Board {
 
             m_logic.prioritizeTasks(prioritizer, usec);
 
-            prioritizeExtraTasks(prioritizer, usec);
+            prioritizeExtraTasks(m_logic, prioritizer, usec);
 
             switch (prioritizer.id) {
 
@@ -205,8 +205,11 @@ class Stm32Board {
         }
 
         virtual void prioritizeExtraTasks(
-                Task::prioritizer_t & prioritizer, const uint32_t usec)
+                Logic & logic,
+                Task::prioritizer_t & prioritizer,
+                const uint32_t usec)
         {
+            (void)logic;
             (void)prioritizer;
             (void)usec;
         }
