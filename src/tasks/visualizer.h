@@ -37,48 +37,49 @@ class VisualizerTask : public Task {
             return 1000 + 1000 * value;
         }
 
-        // Initialized in begin()
-        Msp *          m_msp;
-        ReceiverTask * m_receiverTask;
-
         bool m_gotRebootRequest;
 
         void serializeShorts(
-                const uint8_t messageType, const int16_t src[], const uint8_t count)
+                Msp & msp,
+                const uint8_t messageType,
+                const int16_t src[],
+                const uint8_t count)
         {
-            m_msp->serializeShorts(messageType, src, count);
+            msp.serializeShorts(messageType, src, count);
         }
 
-        void  readAndConvertMotor(const uint8_t index)
+        void  readAndConvertMotor(Msp & msp, const uint8_t index)
         {
-            motors[index] = (m_msp->parseShort(index) - 1000) / 1000.;
+            motors[index] = (msp.parseShort(index) - 1000) / 1000.;
         }
 
     public:
 
         bool parse(
                 VehicleState & vstate,
+                ReceiverTask & receiverTask,
                 SkyrangerTask & skyrangerTask,
+                Msp & msp,
                 const uint8_t byte)
         {
-            if (m_msp->isIdle() && byte == 'R') {
+            if (msp.isIdle() && byte == 'R') {
                 m_gotRebootRequest = true;
             }
 
-            switch (m_msp->parse(byte)) {
+            switch (msp.parse(byte)) {
 
                 case 105: // RC
                     {
                         int16_t channels[] = {
-                            (int16_t)m_receiverTask->getRawThrottle(),
-                            (int16_t)m_receiverTask->getRawRoll(),
-                            (int16_t)m_receiverTask->getRawPitch(),
-                            (int16_t)m_receiverTask->getRawYaw(),
-                            (int16_t)m_receiverTask->getRawAux1(),
-                            (int16_t)m_receiverTask->getRawAux2()
+                            (int16_t)receiverTask.getRawThrottle(),
+                            (int16_t)receiverTask.getRawRoll(),
+                            (int16_t)receiverTask.getRawPitch(),
+                            (int16_t)receiverTask.getRawYaw(),
+                            (int16_t)receiverTask.getRawAux1(),
+                            (int16_t)receiverTask.getRawAux2()
                         };
 
-                        serializeShorts(105, channels, 6);
+                        serializeShorts(msp, 105, channels, 6);
 
                     } 
                     return true;
@@ -87,24 +88,24 @@ class VisualizerTask : public Task {
                     {
                         int16_t angles[3] = {};
                         Imu::getEulerAngles(vstate, angles);
-                        serializeShorts(108, angles, 3);
+                        serializeShorts(msp, 108, angles, 3);
                     } 
                     return true;
 
                 case 121: // VL53L5 ranging camera
-                    serializeShorts(121, skyrangerTask.rangerData, 16);
+                    serializeShorts(msp, 121, skyrangerTask.rangerData, 16);
                     return true;
 
                 case 122: // PAA3905 mocap
-                    serializeShorts(122, skyrangerTask.mocapData, 2);
+                    serializeShorts(msp, 122, skyrangerTask.mocapData, 2);
                     return true;
 
                 case 214: // SET_MOTORS
                     {
-                        readAndConvertMotor(0);
-                        readAndConvertMotor(1);
-                        readAndConvertMotor(2);
-                        readAndConvertMotor(3);
+                        readAndConvertMotor(msp, 0);
+                        readAndConvertMotor(msp, 1);
+                        readAndConvertMotor(msp, 2);
+                        readAndConvertMotor(msp, 3);
                     } 
                     break;
 
@@ -115,19 +116,12 @@ class VisualizerTask : public Task {
             return false;
         }
 
-        VisualizerTask( Msp & msp, ReceiverTask & receiverTask)
+        VisualizerTask(void)
             : Task(VISUALIZER, 100) // Hz
         { 
-            m_msp = &msp;
-            m_receiverTask = &receiverTask;
         }
 
         float motors[Mixer::MAX_MOTORS];
-
-        void begin(ReceiverTask * receiverTask)
-        {
-            m_receiverTask = receiverTask;
-        }
 
         bool gotRebootRequest(void)
         {

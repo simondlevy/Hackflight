@@ -64,7 +64,7 @@ class Logic {
 
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
-        VisualizerTask m_visualizerTask = VisualizerTask(m_msp, m_receiverTask);
+        VisualizerTask m_visualizerTask; 
 
         SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
 
@@ -142,8 +142,6 @@ class Logic {
         void begin(Imu & imu, const uint32_t clockSpeed)
         {
             m_attitudeTask.begin(imu);
-
-            m_visualizerTask.begin(&m_receiverTask);
 
             imu.begin(clockSpeed);
         }
@@ -402,7 +400,8 @@ class Logic {
 
         bool mspParse(const uint8_t byte)
         {
-            return m_visualizerTask.parse(m_vstate, m_skyrangerTask, byte);
+            return m_visualizerTask.parse(
+                    m_vstate, m_receiverTask, m_skyrangerTask, m_msp, byte);
         }
 
         uint8_t skyrangerDataAvailable(void)

@@ -1,9 +1,6 @@
-src/tasks/visualizer.h:        SkyrangerTask *  m_skyrangerTask;
-src/tasks/visualizer.h:        Msp *          m_msp;
-src/tasks/visualizer.h:        ReceiverTask * m_receiverTask;
-src/tasks/attitude.h:        Imu *          m_imu;
-src/tasks/attitude.h:        VehicleState * m_vstate;
-src/tasks/skyranger.h:        VehicleState * m_vstate;
+src/tasks/attitude.h:  Imu *          m_imu;
+src/tasks/attitude.h:  VehicleState * m_vstate;
+src/tasks/skyranger.h: VehicleState * m_vstate;
 
 src/core/pids/angle.h: axis_t * axis,
 src/escs/dshot.h:      Stm32Dshot * m_dshot;
