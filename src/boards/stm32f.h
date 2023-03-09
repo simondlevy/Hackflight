@@ -39,17 +39,18 @@ class Stm32FBoard : public Stm32Board {
         {
         }
 
+        virtual void handleSkyranger(
+                Logic & logic, HardwareSerial & serial) override
+        {
+            while (serial.available()) {
+                logic.skyrangerParseData(serial.read());
+            }
+        }
+
     public:
 
         static const uint8_t MOSI_PIN = PA7;
         static const uint8_t MISO_PIN = PA6;
         static const uint8_t SCLK_PIN = PA5;
-
-        void handleSkyrangerEvent(HardwareSerial & serial)
-        {
-            while (serial.available()) {
-                m_logic.skyrangerParseData(serial.read());
-            }
-        }
 
 }; // class Stm32FBoard

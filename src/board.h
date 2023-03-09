@@ -31,6 +31,8 @@ class Stm32Board {
 
         uint8_t m_imuInterruptPin;
 
+        Logic m_logic;
+
         void runDynamicTasks(Imu & imu, const int16_t rawAccel[3])
         {
             if (m_logic.gotRebootRequest()) {
@@ -195,8 +197,6 @@ class Stm32Board {
 
     protected:
 
-        Logic m_logic;
-
         Stm32Board(const int8_t ledPin)
         {
             // Support negative LED pin number for inversion
@@ -212,6 +212,12 @@ class Stm32Board {
             (void)logic;
             (void)prioritizer;
             (void)usec;
+        }
+
+        virtual void handleSkyranger(Logic & logic, HardwareSerial & serial)
+        {
+            (void)logic;
+            (void)serial;
         }
 
     public:
@@ -323,5 +329,10 @@ class Stm32Board {
             while (m_logic.skyrangerDataAvailable()) {
                 serial.write(m_logic.skyrangerReadData());
             }
+        }
+
+        void handleSkyrangerEvent(HardwareSerial & serial)
+        {
+            handleSkyranger(m_logic, serial);
         }
 };
