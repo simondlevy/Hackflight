@@ -60,15 +60,11 @@ class Logic {
 
         uint32_t m_imuInterruptCount;
 
-        ReceiverTask m_receiverTask;
-
-        AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
-
-        VisualizerTask m_visualizerTask; 
-
-        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
-
         AccelerometerTask m_acclerometerTask; 
+        AttitudeTask      m_attitudeTask;
+        ReceiverTask      m_receiverTask;
+        SkyrangerTask     m_skyrangerTask; 
+        VisualizerTask    m_visualizerTask; 
 
         void checkFailsafe(const uint32_t usec)
         {
@@ -226,7 +222,7 @@ class Logic {
             switch (id) {
 
                 case Task::ATTITUDE:
-                    m_attitudeTask.run(usec);
+                    m_attitudeTask.run(m_vstate, usec);
                     break;
 
                 case Task::RECEIVER:
@@ -234,7 +230,7 @@ class Logic {
                     break;
 
                 case Task::SKYRANGER:
-                    m_skyrangerTask.run();
+                    m_skyrangerTask.run(m_vstate);
                     break;
 
                 default:

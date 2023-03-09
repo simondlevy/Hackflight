@@ -26,14 +26,12 @@ class AttitudeTask : public Task {
     private:
 
         Imu *          m_imu;
-        VehicleState * m_vstate;
 
     public:
 
-        AttitudeTask(VehicleState & vstate)
+        AttitudeTask(void)
             : Task(ATTITUDE, 100) // Hz
         {
-            m_vstate = &vstate;
         }
 
         void begin(Imu & imu)
@@ -41,13 +39,13 @@ class AttitudeTask : public Task {
             m_imu = &imu;
         }
 
-        void run(const uint32_t usec)
+        void run(VehicleState & vstate, const uint32_t usec)
         {
             const auto angles = m_imu->getEulerAngles(usec);
 
-            m_vstate->phi   = angles.x;
-            m_vstate->theta = angles.y;
-            m_vstate->psi   = angles.z;
+            vstate.phi   = angles.x;
+            vstate.theta = angles.y;
+            vstate.psi   = angles.z;
         }
 
 }; // class AttitudeTask

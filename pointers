@@ -1,6 +1,4 @@
 src/tasks/attitude.h:  Imu *          m_imu;
-src/tasks/attitude.h:  VehicleState * m_vstate;
-src/tasks/skyranger.h: VehicleState * m_vstate;
 
 src/core/pids/angle.h: axis_t * axis,
 src/escs/dshot.h:      Stm32Dshot * m_dshot;

@@ -32,23 +32,20 @@ class SkyrangerTask : public Task {
         Msp m_parser;
         Msp m_serializer;
 
-        VehicleState * m_vstate;
-
     public:
 
         int16_t mocapData[2];
         int16_t rangerData[16];
 
-        SkyrangerTask(VehicleState & vstate)
+        SkyrangerTask(void)
             : Task(SKYRANGER, 50) // Hz
         {
-            m_vstate = &vstate;
         }
 
-        void run(void)
+        void run(VehicleState & vstate)
         {
             int16_t angles[3] = {};
-            Imu::getEulerAngles(*m_vstate, angles);
+            Imu::getEulerAngles(vstate, angles);
 
             m_serializer.serializeShorts(MSP_SET_ATTITUDE, angles, 3);
         }
