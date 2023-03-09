@@ -60,22 +60,22 @@ class Logic {
 
         uint32_t m_imuInterruptCount;
 
-        ReceiverTask receiverTask;
+        ReceiverTask m_receiverTask;
 
-        AttitudeTask attitudeTask = AttitudeTask(m_vstate);
+        AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
         VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
+            VisualizerTask(m_msp, m_vstate, m_receiverTask, m_skyrangerTask);
 
-        SkyrangerTask skyrangerTask = SkyrangerTask(m_vstate);
+        SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
 
-        AccelerometerTask accelerometerTask; 
+        AccelerometerTask m_acclerometerTask; 
 
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
 
-            const auto haveSignal = receiverTask.haveSignal(usec);
+            const auto haveSignal = m_receiverTask.haveSignal(usec);
 
             if (haveSignal) {
                 hadSignal = true;
@@ -105,19 +105,19 @@ class Logic {
 
             const auto gyroDoneCalibrating = !imu.gyroIsCalibrating();
 
-            const auto haveReceiverSignal = receiverTask.haveSignal(usec);
+            const auto haveReceiverSignal = m_receiverTask.haveSignal(usec);
 
             return
                 auxSwitchWasOff &&
                 gyroDoneCalibrating &&
                 imuIsLevel &&
-                receiverTask.throttleIsDown() &&
+                m_receiverTask.throttleIsDown() &&
                 haveReceiverSignal;
         }
 
         float getAux1(void)
         {
-            return receiverTask.getRawAux1();
+            return m_receiverTask.getRawAux1();
         }
 
         void checkArmingSwitch(void)
@@ -142,9 +142,9 @@ class Logic {
 
         void begin(Imu & imu, const uint32_t clockSpeed)
         {
-            attitudeTask.begin(imu);
+            m_attitudeTask.begin(imu);
 
-            m_visualizerTask.begin(&receiverTask);
+            m_visualizerTask.begin(&m_receiverTask);
 
             imu.begin(clockSpeed);
         }
@@ -205,9 +205,9 @@ class Logic {
         {
             imu.gyroRawToFilteredDps(rawGyro, m_vstate);
 
-            Demands demands = receiverTask.modifyDemands();
+            Demands demands = m_receiverTask.modifyDemands();
 
-            auto pidReset = receiverTask.throttleIsDown();
+            auto pidReset = m_receiverTask.throttleIsDown();
 
             PidController::run(pids, demands, m_vstate, usec, pidReset);
 
@@ -229,22 +229,22 @@ class Logic {
             switch (id) {
 
                 case Task::ATTITUDE:
-                    attitudeTask.run(usec);
+                    m_attitudeTask.run(usec);
                     break;
 
                 case Task::VISUALIZER:
                     break;
 
                 case Task::RECEIVER:
-                    receiverTask.run(usec);
+                    m_receiverTask.run(usec);
                     break;
 
                 case Task::ACCELEROMETER:
-                    accelerometerTask.run(usec);
+                    m_acclerometerTask.run(usec);
                     break;
 
                 case Task::SKYRANGER:
-                    skyrangerTask.run(usec);
+                    m_skyrangerTask.run(usec);
                     break;
 
                 default:
@@ -264,7 +264,7 @@ class Logic {
             switch (id) {
 
                 case Task::ATTITUDE:
-                    attitudeTask.update(usecStart, usecTaken);
+                    m_attitudeTask.update(usecStart, usecTaken);
                     break;
 
                 case Task::VISUALIZER:
@@ -272,15 +272,15 @@ class Logic {
                     break;
 
                 case Task::RECEIVER:
-                    receiverTask.update(usecStart, usecTaken);
+                    m_receiverTask.update(usecStart, usecTaken);
                     break;
 
                 case Task::ACCELEROMETER:
-                    accelerometerTask.update(usecStart, usecTaken);
+                    m_acclerometerTask.update(usecStart, usecTaken);
                     break;
 
                 case Task::SKYRANGER:
-                    skyrangerTask.update(usecStart, usecTaken);
+                    m_skyrangerTask.update(usecStart, usecTaken);
                     break;
 
                 default:
@@ -298,7 +298,7 @@ class Logic {
 
                 case Task::ATTITUDE:
                     endCycles = m_scheduler.getAnticipatedEndCycles(
-                            attitudeTask, nowCycles);
+                            m_attitudeTask, nowCycles);
                     break;
 
                 case Task::VISUALIZER:
@@ -308,17 +308,17 @@ class Logic {
 
                 case Task::RECEIVER:
                     endCycles = m_scheduler.getAnticipatedEndCycles(
-                            receiverTask, nowCycles);
+                            m_receiverTask, nowCycles);
                     break;
 
                 case Task::ACCELEROMETER:
                     endCycles = m_scheduler.getAnticipatedEndCycles(
-                            accelerometerTask, nowCycles);
+                            m_acclerometerTask, nowCycles);
                     break;
 
                 case Task::SKYRANGER:
                     endCycles = m_scheduler.getAnticipatedEndCycles(
-                            skyrangerTask, nowCycles);
+                            m_skyrangerTask, nowCycles);
                     break;
 
                 default:
@@ -386,8 +386,8 @@ class Logic {
 
         void prioritizeTasks(Task::prioritizer_t & prioritizer, const uint32_t usec)
         {
-            receiverTask.prioritize(usec, prioritizer);
-            attitudeTask.prioritize(usec, prioritizer);
+            m_receiverTask.prioritize(usec, prioritizer);
+            m_attitudeTask.prioritize(usec, prioritizer);
             m_visualizerTask.prioritize(usec, prioritizer);
         }
 
@@ -408,17 +408,17 @@ class Logic {
 
         uint8_t skyrangerDataAvailable(void)
         {
-            return skyrangerTask.imuDataAvailable();
+            return m_skyrangerTask.imuDataAvailable();
         }
 
         uint8_t skyrangerReadData(void)
         {
-            return skyrangerTask.readImuData();
+            return m_skyrangerTask.readImuData();
         }
 
         void skyrangerParseData(const uint8_t byte)
         {
-            skyrangerTask.parse(byte);
+            m_skyrangerTask.parse(byte);
         }
 
         float * getVisualizerMotors(void)
@@ -436,7 +436,7 @@ class Logic {
                 const uint32_t usec,
                 const bool lostFrame)
         {
-            receiverTask.setValues(chanvals, usec, lostFrame, 172, 1811);
+            m_receiverTask.setValues(chanvals, usec, lostFrame, 172, 1811);
         }
 
         void setDsmxValues(
@@ -444,14 +444,14 @@ class Logic {
                 const uint32_t usec,
                 const bool lostFrame)
         {
-            receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
+            m_receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
         }
 
         void prioritizeExtraTasks(
                 Task::prioritizer_t & prioritizer, const uint32_t usec)
         {
-            accelerometerTask.prioritize(usec, prioritizer);
-            skyrangerTask.prioritize(usec, prioritizer);
+            m_acclerometerTask.prioritize(usec, prioritizer);
+            m_skyrangerTask.prioritize(usec, prioritizer);
         }
 
 }; // class Logic
