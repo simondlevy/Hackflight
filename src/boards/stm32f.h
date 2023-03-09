@@ -30,8 +30,7 @@ class Stm32FBoard : public Stm32Board {
                 Task::prioritizer_t & prioritizer,
                 const uint32_t usec) override
         {
-            m_logic.accelerometerTask.prioritize(usec, prioritizer);
-            m_logic.skyrangerTask.prioritize(usec, prioritizer);
+            m_logic.prioritizeExtraTasks(prioritizer, usec);
         }
 
         Stm32FBoard(const uint8_t ledPin)

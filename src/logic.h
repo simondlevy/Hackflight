@@ -447,4 +447,11 @@ class Logic {
             receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
         }
 
+        void prioritizeExtraTasks(
+                Task::prioritizer_t & prioritizer, const uint32_t usec)
+        {
+            accelerometerTask.prioritize(usec, prioritizer);
+            skyrangerTask.prioritize(usec, prioritizer);
+        }
+
 }; // class Logic
