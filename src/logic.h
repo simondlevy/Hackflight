@@ -137,8 +137,6 @@ class Logic {
 
         void begin(Imu & imu, const uint32_t clockSpeed)
         {
-            m_attitudeTask.begin(imu);
-
             imu.begin(clockSpeed);
         }
 
@@ -217,12 +215,12 @@ class Logic {
             return m_scheduler.corePreUpdate(loopRemainingCycles);
         }
 
-        void runTask(const Task::id_e id, const uint32_t usec)
+        void runTask(Imu & imu, const Task::id_e id, const uint32_t usec)
         {
             switch (id) {
 
                 case Task::ATTITUDE:
-                    m_attitudeTask.run(m_vstate, usec);
+                    m_attitudeTask.run(imu, m_vstate, usec);
                     break;
 
                 case Task::RECEIVER:
