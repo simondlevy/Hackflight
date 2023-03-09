@@ -135,10 +135,8 @@ class ReceiverTask : public Task {
             return m_channels[5];
         }
 
-        virtual void run(const uint32_t usec) override
+        virtual void run(void)
         {
-            (void)usec;
-
             m_rawThrottle = getRawThrottle();
             m_rawRoll = getRawRoll();
             m_rawPitch = getRawPitch();

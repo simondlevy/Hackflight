@@ -229,19 +229,12 @@ class Logic {
                     m_attitudeTask.run(usec);
                     break;
 
-                case Task::VISUALIZER:
-                    break;
-
                 case Task::RECEIVER:
-                    m_receiverTask.run(usec);
-                    break;
-
-                case Task::ACCELEROMETER:
-                    m_acclerometerTask.run(usec);
+                    m_receiverTask.run();
                     break;
 
                 case Task::SKYRANGER:
-                    m_skyrangerTask.run(usec);
+                    m_skyrangerTask.run();
                     break;
 
                 default:
