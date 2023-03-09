@@ -317,8 +317,8 @@ class Stm32Board {
         {
             step(imu, pids, mixer, esc, rawGyro, rawAccel);
 
-            while (m_logic.skyrangerTask.imuDataAvailable()) {
-                serial.write(m_logic.skyrangerTask.readImuData());
+            while (m_logic.skyrangerDataAvailable()) {
+                serial.write(m_logic.skyrangerReadData());
             }
         }
 };

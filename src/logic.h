@@ -406,6 +406,16 @@ class Logic {
             return m_visualizerTask.parse(byte);
         }
 
+        uint8_t skyrangerDataAvailable(void)
+        {
+            return skyrangerTask.imuDataAvailable();
+        }
+
+        uint8_t skyrangerReadData(void)
+        {
+            return skyrangerTask.readImuData();
+        }
+
         float * getVisualizerMotors(void)
         {
             return m_visualizerTask.motors;
