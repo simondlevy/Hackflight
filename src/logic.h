@@ -401,7 +401,7 @@ class Logic {
             return m_msp.read();
         }
 
-        bool mspParse(uint8_t byte)
+        bool mspParse(const uint8_t byte)
         {
             return m_visualizerTask.parse(byte);
         }
@@ -414,6 +414,11 @@ class Logic {
         uint8_t skyrangerReadData(void)
         {
             return skyrangerTask.readImuData();
+        }
+
+        void skyrangerParseData(const uint8_t byte)
+        {
+            skyrangerTask.parse(byte);
         }
 
         float * getVisualizerMotors(void)

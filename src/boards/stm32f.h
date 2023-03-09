@@ -48,7 +48,7 @@ class Stm32FBoard : public Stm32Board {
         void handleSkyrangerEvent(HardwareSerial & serial)
         {
             while (serial.available()) {
-                m_logic.skyrangerTask.parse(serial.read());
+                m_logic.skyrangerParseData(serial.read());
             }
         }
 
