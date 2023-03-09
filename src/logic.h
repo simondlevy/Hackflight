@@ -31,7 +31,7 @@
 
 class Logic {
 
-     public:
+    public:
 
         typedef enum {
 
@@ -66,6 +66,10 @@ class Logic {
 
         VisualizerTask m_visualizerTask =
             VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
+
+        SkyrangerTask skyrangerTask = SkyrangerTask(m_vstate);
+
+        AccelerometerTask accelerometerTask; 
 
         void checkFailsafe(const uint32_t usec)
         {
@@ -134,11 +138,7 @@ class Logic {
             }
         }
 
-     public:
-
-        SkyrangerTask skyrangerTask = SkyrangerTask(m_vstate);
-
-        AccelerometerTask accelerometerTask; 
+    public:
 
         void begin(Imu & imu, const uint32_t clockSpeed)
         {
@@ -206,7 +206,7 @@ class Logic {
             imu.gyroRawToFilteredDps(rawGyro, m_vstate);
 
             Demands demands = receiverTask.modifyDemands();
-            
+
             auto pidReset = receiverTask.throttleIsDown();
 
             PidController::run(pids, demands, m_vstate, usec, pidReset);
@@ -250,7 +250,7 @@ class Logic {
                 default:
                     break;
             }
-         }
+        }
 
         void postRunTask(
                 Task::id_e id,
