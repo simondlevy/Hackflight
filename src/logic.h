@@ -60,6 +60,13 @@ class Logic {
 
         uint32_t m_imuInterruptCount;
 
+        ReceiverTask receiverTask;
+
+        AttitudeTask attitudeTask = AttitudeTask(m_vstate);
+
+        VisualizerTask m_visualizerTask =
+            VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
+
         void checkFailsafe(const uint32_t usec)
         {
             static bool hadSignal;
@@ -129,16 +136,9 @@ class Logic {
 
      public:
 
-        ReceiverTask receiverTask;
-
-        AttitudeTask attitudeTask = AttitudeTask(m_vstate);
-
         SkyrangerTask skyrangerTask = SkyrangerTask(m_vstate);
 
         AccelerometerTask accelerometerTask; 
-
-        VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
 
         void begin(Imu & imu, const uint32_t clockSpeed)
         {
