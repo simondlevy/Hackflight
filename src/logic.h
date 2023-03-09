@@ -416,4 +416,20 @@ class Logic {
             return m_visualizerTask.gotRebootRequest();
         }
 
+        void setSbusValues(
+                uint16_t chanvals[],
+                const uint32_t usec,
+                const bool lostFrame)
+        {
+            receiverTask.setValues(chanvals, usec, lostFrame, 172, 1811);
+        }
+
+        void setDsmxValues(
+                uint16_t chanvals[],
+                const uint32_t usec,
+                const bool lostFrame)
+        {
+            receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
+        }
+
 }; // class Logic

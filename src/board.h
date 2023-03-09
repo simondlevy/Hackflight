@@ -213,20 +213,14 @@ class Stm32Board {
 
     public:
 
-        void setSbusValues(
-                uint16_t chanvals[],
-                const uint32_t usec,
-                const bool lostFrame)
+        void setSbusValues(uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
         {
-            m_logic.receiverTask.setValues(chanvals, usec, lostFrame, 172, 1811);
+            m_logic.setSbusValues(chanvals, usec, lostFrame);
         }
 
-        void setDsmxValues(
-                uint16_t chanvals[],
-                const uint32_t usec,
-                const bool lostFrame)
+        void setDsmxValues(uint16_t chanvals[], const uint32_t usec, const bool lostFrame)
         {
-            m_logic.receiverTask.setValues(chanvals, usec, lostFrame, 988, 2011);
+            m_logic.setDsmxValues(chanvals, usec, lostFrame);
         }
 
         void handleImuInterrupt(Imu & imu)
