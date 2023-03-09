@@ -137,14 +137,14 @@ class Logic {
 
         AccelerometerTask accelerometerTask; 
 
-        VisualizerTask visualizerTask =
+        VisualizerTask m_visualizerTask =
             VisualizerTask(m_msp, m_vstate, receiverTask, skyrangerTask);
 
         void begin(Imu & imu, const uint32_t clockSpeed)
         {
             attitudeTask.begin(imu);
 
-            visualizerTask.begin(&receiverTask);
+            m_visualizerTask.begin(&receiverTask);
 
             imu.begin(clockSpeed);
         }
@@ -268,7 +268,7 @@ class Logic {
                     break;
 
                 case Task::VISUALIZER:
-                    visualizerTask.update(usecStart, usecTaken);
+                    m_visualizerTask.update(usecStart, usecTaken);
                     break;
 
                 case Task::RECEIVER:
@@ -303,7 +303,7 @@ class Logic {
 
                 case Task::VISUALIZER:
                     endCycles = m_scheduler.getAnticipatedEndCycles(
-                            visualizerTask, nowCycles);
+                            m_visualizerTask, nowCycles);
                     break;
 
                 case Task::RECEIVER:
@@ -388,7 +388,7 @@ class Logic {
         {
             receiverTask.prioritize(usec, prioritizer);
             attitudeTask.prioritize(usec, prioritizer);
-            visualizerTask.prioritize(usec, prioritizer);
+            m_visualizerTask.prioritize(usec, prioritizer);
         }
 
         uint8_t mspAvailable(void)
@@ -399,6 +399,21 @@ class Logic {
         uint8_t mspRead(void)
         {
             return m_msp.read();
+        }
+
+        bool mspParse(uint8_t byte)
+        {
+            return m_visualizerTask.parse(byte);
+        }
+
+        float * getVisualizerMotors(void)
+        {
+            return m_visualizerTask.motors;
+        }
+
+        bool gotRebootRequest(void)
+        {
+            return m_visualizerTask.gotRebootRequest();
         }
 
 }; // class Logic

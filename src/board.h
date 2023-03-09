@@ -33,7 +33,7 @@ class Stm32Board {
 
         void runDynamicTasks(Imu & imu, const int16_t rawAccel[3])
         {
-            if (m_logic.visualizerTask.gotRebootRequest()) {
+            if (m_logic.gotRebootRequest()) {
                 if (m_imuInterruptPin > 0) {
                     detachInterrupt(m_imuInterruptPin);
                 }
@@ -161,7 +161,7 @@ class Stm32Board {
 
                 while (Serial.available()) {
 
-                    if (m_logic.visualizerTask.parse(Serial.read())) {
+                    if (m_logic.mspParse(Serial.read())) {
                         while (m_logic.mspAvailable()) {
                             Serial.write(m_logic.mspRead());
                         }
@@ -302,7 +302,7 @@ class Stm32Board {
                 esc.write(
                         m_logic.getArmingStatus() == Logic::ARMING_ARMED ?
                         mixmotors :
-                        m_logic.visualizerTask.motors);
+                        m_logic.getVisualizerMotors());
 
                 m_logic.updateScheduler(imu, nowCycles, nextTargetCycles);
             }
