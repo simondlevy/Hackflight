@@ -65,7 +65,7 @@ class Logic {
         AttitudeTask m_attitudeTask = AttitudeTask(m_vstate);
 
         VisualizerTask m_visualizerTask =
-            VisualizerTask(m_msp, m_vstate, m_receiverTask, m_skyrangerTask);
+            VisualizerTask(m_msp, m_receiverTask, m_skyrangerTask);
 
         SkyrangerTask m_skyrangerTask = SkyrangerTask(m_vstate);
 
@@ -403,7 +403,7 @@ class Logic {
 
         bool mspParse(const uint8_t byte)
         {
-            return m_visualizerTask.parse(byte);
+            return m_visualizerTask.parse(m_vstate, byte);
         }
 
         uint8_t skyrangerDataAvailable(void)

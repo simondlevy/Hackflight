@@ -38,7 +38,6 @@ class VisualizerTask : public Task {
         }
 
         // Initialized in constructor
-        VehicleState * m_vstate;
         SkyrangerTask *  m_skyrangerTask;
 
         // Initialized in begin()
@@ -60,7 +59,7 @@ class VisualizerTask : public Task {
 
     public:
 
-        bool parse(const uint8_t byte)
+        bool parse(VehicleState & vstate, const uint8_t byte)
         {
             if (m_msp->isIdle() && byte == 'R') {
                 m_gotRebootRequest = true;
@@ -87,7 +86,7 @@ class VisualizerTask : public Task {
                 case 108: // ATTITUDE
                     {
                         int16_t angles[3] = {};
-                        Imu::getEulerAngles(m_vstate, angles);
+                        Imu::getEulerAngles(vstate, angles);
                         serializeShorts(108, angles, 3);
                     } 
                     return true;
@@ -118,13 +117,11 @@ class VisualizerTask : public Task {
 
         VisualizerTask(
                 Msp & msp,
-                VehicleState & vstate,
                 ReceiverTask & receiverTask,
                 SkyrangerTask & skyrangerTask) 
             : Task(VISUALIZER, 100) // Hz
         { 
             m_msp = &msp;
-            m_vstate = &vstate;
             m_receiverTask = &receiverTask;
             m_skyrangerTask = & skyrangerTask;
         }

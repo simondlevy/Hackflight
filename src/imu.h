@@ -294,11 +294,11 @@ class Imu {
             return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
         }
 
-        static void getEulerAngles(const VehicleState * vstate, int16_t angles[3])
+        static void getEulerAngles(const VehicleState & vstate, int16_t angles[3])
         {
-            angles[0] = (int16_t)(10 * rad2degi(vstate->phi));
-            angles[1] = (int16_t)(10 * rad2degi(vstate->theta));
-            angles[2] = (int16_t)rad2degi(vstate->psi);
+            angles[0] = (int16_t)(10 * rad2degi(vstate.phi));
+            angles[1] = (int16_t)(10 * rad2degi(vstate.theta));
+            angles[2] = (int16_t)rad2degi(vstate.psi);
         }
 
         static auto rotate0(Axes & axes) -> Axes

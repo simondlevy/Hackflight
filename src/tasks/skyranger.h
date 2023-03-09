@@ -50,7 +50,7 @@ class SkyrangerTask : public Task {
             (void)usec;
 
             int16_t angles[3] = {};
-            Imu::getEulerAngles(m_vstate, angles);
+            Imu::getEulerAngles(*m_vstate, angles);
 
             m_serializer.serializeShorts(MSP_SET_ATTITUDE, angles, 3);
         }
