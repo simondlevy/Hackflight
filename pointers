@@ -1,4 +1,3 @@
-src/tasks/visualizer.h:        VehicleState * m_vstate;
 src/tasks/visualizer.h:        SkyrangerTask *  m_skyrangerTask;
 src/tasks/visualizer.h:        Msp *          m_msp;
 src/tasks/visualizer.h:        ReceiverTask * m_receiverTask;

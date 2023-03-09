@@ -37,9 +37,6 @@ class VisualizerTask : public Task {
             return 1000 + 1000 * value;
         }
 
-        // Initialized in constructor
-        SkyrangerTask *  m_skyrangerTask;
-
         // Initialized in begin()
         Msp *          m_msp;
         ReceiverTask * m_receiverTask;
@@ -59,7 +56,10 @@ class VisualizerTask : public Task {
 
     public:
 
-        bool parse(VehicleState & vstate, const uint8_t byte)
+        bool parse(
+                VehicleState & vstate,
+                SkyrangerTask & skyrangerTask,
+                const uint8_t byte)
         {
             if (m_msp->isIdle() && byte == 'R') {
                 m_gotRebootRequest = true;
@@ -92,11 +92,11 @@ class VisualizerTask : public Task {
                     return true;
 
                 case 121: // VL53L5 ranging camera
-                    serializeShorts(121, m_skyrangerTask->rangerData, 16);
+                    serializeShorts(121, skyrangerTask.rangerData, 16);
                     return true;
 
                 case 122: // PAA3905 mocap
-                    serializeShorts(122, m_skyrangerTask->mocapData, 2);
+                    serializeShorts(122, skyrangerTask.mocapData, 2);
                     return true;
 
                 case 214: // SET_MOTORS
@@ -115,15 +115,11 @@ class VisualizerTask : public Task {
             return false;
         }
 
-        VisualizerTask(
-                Msp & msp,
-                ReceiverTask & receiverTask,
-                SkyrangerTask & skyrangerTask) 
+        VisualizerTask( Msp & msp, ReceiverTask & receiverTask)
             : Task(VISUALIZER, 100) // Hz
         { 
             m_msp = &msp;
             m_receiverTask = &receiverTask;
-            m_skyrangerTask = & skyrangerTask;
         }
 
         float motors[Mixer::MAX_MOTORS];
