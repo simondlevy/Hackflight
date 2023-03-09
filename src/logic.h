@@ -290,9 +290,42 @@ class Logic {
             m_scheduler.updateDynamic(nowCycles, anticipatedEndCycles);
         }
 
-        uint32_t getAnticipatedEndCycles(Task & task, const uint32_t nowCycles)
+        uint32_t getTaskAnticipatedEndCycles(Task::id_e id, const uint32_t nowCycles)
         {
-            return m_scheduler.getAnticipatedEndCycles(task, nowCycles);
+            uint32_t endCycles = 0;
+
+            switch (id) {
+
+                case Task::ATTITUDE:
+                    endCycles = m_scheduler.getAnticipatedEndCycles(
+                            attitudeTask, nowCycles);
+                    break;
+
+                case Task::VISUALIZER:
+                    endCycles = m_scheduler.getAnticipatedEndCycles(
+                            visualizerTask, nowCycles);
+                    break;
+
+                case Task::RECEIVER:
+                    endCycles = m_scheduler.getAnticipatedEndCycles(
+                            receiverTask, nowCycles);
+                    break;
+
+                case Task::ACCELEROMETER:
+                    endCycles = m_scheduler.getAnticipatedEndCycles(
+                            accelerometerTask, nowCycles);
+                    break;
+
+                case Task::SKYRANGER:
+                    endCycles = m_scheduler.getAnticipatedEndCycles(
+                            skyrangerTask, nowCycles);
+                    break;
+
+                default:
+                    break;
+            }
+
+            return endCycles;
         }
 
         bool isCoreTaskReady(const uint32_t nowCycles)

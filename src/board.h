@@ -51,7 +51,7 @@ class Stm32Board {
             switch (prioritizer.id) {
 
                 case Task::ATTITUDE:
-                    runTask(m_logic.attitudeTask, prioritizer.id);
+                    runTask(prioritizer.id);
                     m_logic.updateArmingStatus(imu, usec);
                     updateLed();
                     break;
@@ -63,16 +63,16 @@ class Stm32Board {
                 case Task::RECEIVER:
                     m_logic.updateArmingStatus(imu, usec);
                     updateLed();
-                    runTask(m_logic.receiverTask, prioritizer.id);
+                    runTask(prioritizer.id);
                     break;
 
                 case Task::ACCELEROMETER:
-                    runTask(m_logic.accelerometerTask, prioritizer.id);
+                    runTask(prioritizer.id);
                     m_logic.updateAccelerometer(imu, rawAccel);
                     break;
 
                 case Task::SKYRANGER:
-                    runTask(m_logic.skyrangerTask, prioritizer.id);
+                    runTask(prioritizer.id);
                     break;
 
                 default:
@@ -80,9 +80,9 @@ class Stm32Board {
             }
         }
 
-        void runTask(Task & task, Task::id_e id)
+        void runTask(Task::id_e id)
         {
-            const uint32_t anticipatedEndCycles = getAnticipatedEndCycles(task);
+            const uint32_t anticipatedEndCycles = getTaskAnticipatedEndCycles(id);
 
             if (anticipatedEndCycles > 0) {
 
@@ -152,8 +152,8 @@ class Stm32Board {
 
         void runVisualizerTask(void)
         {
-            const uint32_t anticipatedEndCycles =
-                getAnticipatedEndCycles(m_logic.visualizerTask);
+            const uint32_t anticipatedEndCycles = 
+                getTaskAnticipatedEndCycles(Task::VISUALIZER);
 
             if (anticipatedEndCycles > 0) {
 
@@ -172,9 +172,9 @@ class Stm32Board {
             }
         }
 
-        uint32_t getAnticipatedEndCycles(Task & task)
+        uint32_t getTaskAnticipatedEndCycles(Task::id_e id)
         {
-            return m_logic.getAnticipatedEndCycles(task, getCycleCounter());
+            return m_logic.getTaskAnticipatedEndCycles(id, getCycleCounter());
         }
 
         uint32_t getClockSpeed(void) 
