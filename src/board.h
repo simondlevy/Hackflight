@@ -20,7 +20,7 @@
 #include "logic.h"
 #include "esc.h"
 
-#include <dshot.h>
+#include <dshot_stm32.h>
 
 class Stm32Board {
 
