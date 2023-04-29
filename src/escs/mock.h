@@ -28,10 +28,6 @@ class MockEsc : public Esc {
         {
         }
 
-        virtual void begin(void) override
-        {
-        }
-
         virtual void write(float motorValues[]) override
         {
             (void)motorValues;
