@@ -1,4 +1,4 @@
-SKETCH = FlywooF411Sbus
+SKETCH = FlywooF411Dsmx
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
 
@@ -11,14 +11,14 @@ DFU = $(OBJ)/$(SKETCH).dfu
 HEX = $(OBJ)/$(SKETCH).ino.hex
 SRC = $(HFLIB)/src
 
-# all: $(DFU)
+all: $(DFU)
 all: $(HEX)
 
 $(DFU): $(HEX)
 	$(HFLIB)/utils/dfuse-pack.py -i $(HEX) $(DFU)
 
 $(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
-	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) --build-path $(OBJ) --warnings "all"
+	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) --build-path $(OBJ)
 	rm -f *.bin *.elf
 
 unbrick: $(DFU)

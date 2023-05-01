@@ -1,4 +1,5 @@
-/* Copyright (c) 2023 Simon D. Levy 
+/*
+   Copyright (c) 2022 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -20,16 +21,17 @@
 #include <boards/stm32f/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
-#include <debug.h>
-#include <imus/softquat.h>
 #include <escs/mock.h>
+#include <imus/softquat.h>
 
-#include <sbus.h>
+#include <dsmrx.h>
 
 #include <vector>
 
 #include <SPI.h>
 #include <mpu6x00.h>
+
+#include <dshot_stm32f4.h>
 
 static const uint8_t LED_PIN     = PC13;
 static const uint8_t IMU_CS_PIN  = PA4;
@@ -38,27 +40,49 @@ static const uint8_t IMU_INT_PIN = PB2;
 static SPIClass spi = SPIClass(
         Stm32FBoard::MOSI_PIN, Stm32FBoard::MISO_PIN, Stm32FBoard::SCLK_PIN);
 
-static Mpu6000 mpu = Mpu6000(spi, IMU_CS_PIN);
+static Mpu6500 mpu = Mpu6500(spi, IMU_CS_PIN);
+
+static Dsm2048 rx;
 
 static MockEsc esc;
 
 ///////////////////////////////////////////////////////
 static AnglePidController anglePid;
 static Mixer mixer = QuadXbfMixer::make();
-static SoftQuatImu imu(Imu::rotate0Flip);
+static SoftQuatImu imu(Imu::rotate180);
 static std::vector<PidController *> pids = {&anglePid};
 ///////////////////////////////////////////////////////
 
 static Stm32F4Board board(LED_PIN);
 
+// IMU interrupt
 static void handleImuInterrupt(void)
 {
     board.handleImuInterrupt(imu);
 }
 
+// Receiver interrupt
+void serialEvent1(void)
+{
+    while (Serial1.available()) {
+
+        const auto usec = micros();
+
+        rx.handleSerialEvent(Serial1.read(), usec);
+
+        if (rx.gotNewFrame()) {
+
+            uint16_t values[8] = {};
+            rx.getChannelValues(values, 8);
+            board.setDsmxValues(values, micros(), rx.timedOut(usec));
+        }
+    }
+}
+
 void setup(void)
 {
-    spi.begin();
+    // Start receiver UART
+    Serial1.begin(115200);
 
     mpu.begin();
 
@@ -67,6 +91,7 @@ void setup(void)
 
 void loop(void)
 {
+
     mpu.readSensor();
 
     int16_t rawGyro[3] = { mpu.getRawGyroX(), mpu.getRawGyroY(), mpu.getRawGyroZ() };
