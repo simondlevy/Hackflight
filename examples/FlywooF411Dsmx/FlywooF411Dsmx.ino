@@ -49,7 +49,7 @@ static MockEsc esc;
 ///////////////////////////////////////////////////////
 static AnglePidController anglePid;
 static Mixer mixer = QuadXbfMixer::make();
-static SoftQuatImu imu(Imu::rotate180);
+static SoftQuatImu imu(Imu::rotate0Flip);
 static std::vector<PidController *> pids = {&anglePid};
 ///////////////////////////////////////////////////////
 
