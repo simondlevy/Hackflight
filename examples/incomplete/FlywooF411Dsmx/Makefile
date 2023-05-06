@@ -18,6 +18,8 @@ $(DFU): $(HEX)
 	$(HFLIB)/utils/dfuse-pack.py -i $(HEX) $(DFU)
 
 $(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
+	cp prebuild.sh \
+		$(HOME)/.arduino15/packages/STMicroelectronics/hardware/stm32/2.5.0/system/extras
 	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) --build-path $(OBJ)
 	rm -f *.bin *.elf
 

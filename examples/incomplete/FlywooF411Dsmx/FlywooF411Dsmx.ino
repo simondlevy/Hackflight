@@ -21,7 +21,7 @@
 #include <boards/stm32f/stm32f4.h>
 #include <core/mixers/fixedpitch/quadxbf.h>
 #include <core/pids/angle.h>
-#include <escs/mock.h>
+#include <escs/dshot.h>
 #include <imus/softquat.h>
 
 #include <dsmrx.h>
@@ -37,6 +37,13 @@ static const uint8_t LED_PIN     = PC13;
 static const uint8_t IMU_CS_PIN  = PA4;
 static const uint8_t IMU_INT_PIN = PB2;
 
+static const uint8_t MOTOR1_PIN = PA8;
+static const uint8_t MOTOR2_PIN = PB6;
+static const uint8_t MOTOR3_PIN = PB10;
+static const uint8_t MOTOR4_PIN = PB7;
+
+static std::vector<uint8_t> motorPins = {MOTOR1_PIN, MOTOR2_PIN, MOTOR3_PIN, MOTOR4_PIN};
+
 static SPIClass spi = SPIClass(
         Stm32FBoard::MOSI_PIN, Stm32FBoard::MISO_PIN, Stm32FBoard::SCLK_PIN);
 
@@ -44,7 +51,9 @@ static Mpu6500 mpu = Mpu6500(spi, IMU_CS_PIN);
 
 static Dsm2048 rx;
 
-static MockEsc esc;
+static Stm32F4Dshot dshot;
+
+static DshotEsc esc = DshotEsc(&dshot);
 
 ///////////////////////////////////////////////////////
 static AnglePidController anglePid;
@@ -54,6 +63,12 @@ static std::vector<PidController *> pids = {&anglePid};
 ///////////////////////////////////////////////////////
 
 static Stm32F4Board board(LED_PIN);
+
+// Motor interrupt
+extern "C" void DMA2_Stream1_IRQHandler(void) 
+{
+    dshot.handleDmaIrqStream1();
+}
 
 // IMU interrupt
 static void handleImuInterrupt(void)
@@ -87,6 +102,8 @@ void setup(void)
     mpu.begin();
 
     board.begin(imu, IMU_INT_PIN, handleImuInterrupt);
+
+    dshot.begin(motorPins);
 }
 
 void loop(void)

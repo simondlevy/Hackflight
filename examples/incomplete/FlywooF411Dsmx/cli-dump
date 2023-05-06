@@ -15,10 +15,12 @@ manufacturer_id FLWO
 
 # resources
 resource BEEPER 1 C14
+
 resource MOTOR 1 A08
 resource MOTOR 2 B06
 resource MOTOR 3 B10
 resource MOTOR 4 B07
+
 resource MOTOR 5 NONE
 resource MOTOR 6 NONE
 resource MOTOR 7 NONE
@@ -141,6 +143,7 @@ resource PULLDOWN 4 NONE
 # timer
 timer A02 AF3
 # pin A02: TIM9 CH1 (AF3)
+
 timer A08 AF1
 # pin A08: TIM1 CH1 (AF1)
 timer B03 AF1
