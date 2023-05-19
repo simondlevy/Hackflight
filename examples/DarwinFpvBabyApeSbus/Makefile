@@ -1,4 +1,4 @@
-SKETCH = DarwinFpvF411Sbus
+SKETCH = DarwinFpvBabyApeSbus
 
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
 
