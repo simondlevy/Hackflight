@@ -1,0 +1,64 @@
+/*
+   Copyright (c) 2023 Simon D. Levy
+
+   This file is part of Hackflight.
+
+   Hackflight is free software: you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation, either version 3 of the License, or (at your option) any later
+   version.
+
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with
+   Hackflight. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+#include <string.h>
+#include <math.h>
+
+#include "core/constrain.h"
+#include "core/filters/pt1.h"
+#include "core/filters/pt2.h"
+#include "core/pid.h"
+#include "core/utils.h"
+
+class FlowHoldPidController : public PidController {
+
+    private:
+
+        float m_k_rate_p;
+        float m_k_rate_i;
+        float m_k_rate_d;
+
+    public:
+
+        FlowHoldPidController(
+                const float k_rate_p = 0,
+                const float k_rate_i = 0,
+                const float k_rate_d = 0)
+        {
+            m_k_rate_p = k_rate_p;
+            m_k_rate_i = k_rate_i;
+            m_k_rate_d = k_rate_d;
+        }
+
+        virtual void modifyDemands(
+                Demands & demands,
+                const int32_t dusec,
+                const VehicleState & vstate,
+                const bool reset) override
+        {
+
+            (void)demands;
+            (void)dusec;
+            (void)vstate;
+            (void)reset;
+
+        } // modifyDemands
+
+}; // class FlowHoldPidController
