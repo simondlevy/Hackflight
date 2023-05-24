@@ -32,14 +32,25 @@ class FlowHoldPidController : public PidController {
     private:
 
         static constexpr float MAX_ANGLE = 5;
+        static constexpr float MAX_SPEED = 1;
 
         float m_k_rate_p;
         float m_k_rate_i;
         float m_k_rate_d;
 
+        static bool safe(const float val, const float max)
+        {
+            return fabs(val) < max;
+        }
+
         static bool safeAngle(const float angle)
         {
-            return fabs(angle) < MAX_ANGLE;
+            return safe(angle, MAX_ANGLE);
+        }
+
+        static bool safeSpeed(const float speed)
+        {
+            return safe(speed, MAX_SPEED);
         }
 
     public:
@@ -65,7 +76,8 @@ class FlowHoldPidController : public PidController {
             (void)dusec;
             (void)reset;
 
-            if (safeAngle(vstate.phi) && safeAngle(vstate.theta)) {
+            if (safeAngle(vstate.phi) && safeAngle(vstate.theta) &&
+                    safeSpeed(vstate.dx) && safeSpeed(vstate.dy)) {
                 printf("dx=%+3.3f  dy=%+3.3f | phi=%+3.3f  theta=%+3.3f\n", 
                         vstate.dx, vstate.dy, vstate.phi, vstate.theta);
             }
