@@ -31,12 +31,17 @@ class FlowHoldPidController : public PidController {
 
     private:
 
-        static constexpr float MAX_ANGLE = 5;
-        static constexpr float MAX_SPEED = 1;
+        static constexpr float MAX_DEMAND = 0.2;
+        static constexpr float MAX_ANGLE = 45;
+        static constexpr float MAX_SPEED = 10;
+        static constexpr float WINDUP = 10;
 
-        float m_k_rate_p;
-        float m_k_rate_i;
-        float m_k_rate_d;
+        float m_k_p;
+        float m_k_i;
+        float m_k_d;
+
+        float m_err_integral_y;
+        float m_err_prev_y;
 
         static bool safe(const float val, const float max)
         {
@@ -53,28 +58,43 @@ class FlowHoldPidController : public PidController {
             return safe(speed, MAX_SPEED);
         }
 
-        float modifyDemand(
-                const float demand,
+        void modifyDemand(
                 const float speed,
-                const uint32_t dusec)
+                const uint32_t dusec,
+                float & demand,
+                float & err_prev,
+                float & err_integral)
         {
+            if (fabs(demand) > MAX_DEMAND) {
+                return;
+            }
             const auto du = dusec == 0 ? 1 : dusec;
 
             const auto err = -speed;
 
-            return demand + m_k_rate_p * err;
+            const auto derr = m_k_p * (err - err_prev) / du;
+
+            err_integral += m_k_i * (err * du);
+
+            err_integral = err_integral < - WINDUP ? -WINDUP : 
+                err_integral > WINDUP ? WINDUP :
+                err_integral;
+
+            demand = err + derr + err_integral;
+
+            err_prev = err;
         }
 
     public:
 
         FlowHoldPidController(
-                const float k_rate_p = 0.1,
-                const float k_rate_i = 0,
-                const float k_rate_d = 0)
+                const float k_p = 0.0,
+                const float k_i = 0.0000001,
+                const float k_d = 0.01)
         {
-            m_k_rate_p = k_rate_p;
-            m_k_rate_i = k_rate_i;
-            m_k_rate_d = k_rate_d;
+            m_k_p = k_p;
+            m_k_i = k_i;
+            m_k_d = k_d;
         }
 
         virtual void modifyDemands(
@@ -85,13 +105,20 @@ class FlowHoldPidController : public PidController {
         {
             (void)reset;
 
+            /*
             printf("dt=%d | dx=%+3.3f  dy=%+3.3f | phi=%+3.3f  theta=%+3.3f\n", 
                     dusec, vstate.dx, vstate.dy, vstate.phi, vstate.theta);
+                    */
 
             if (safeAngle(vstate.phi) && safeAngle(vstate.theta) &&
                     safeSpeed(vstate.dx) && safeSpeed(vstate.dy)) {
-                demands.roll = modifyDemand(demands.roll, vstate.dy, dusec);
-                demands.pitch = modifyDemand(demands.pitch, vstate.dx, dusec);
+                modifyDemand(
+                        vstate.dy,
+                        dusec,
+                        demands.roll,
+                        m_err_prev_y,
+                        m_err_integral_y);
+                //modifyDemand(vstate.dx, dusec, demands.pitch, m_err_prev_x);
             }
 
         } // modifyDemands
