@@ -53,13 +53,9 @@ class FlowHoldPidController : public PidController {
             return safe(speed, MAX_SPEED);
         }
 
-        static float runPid(
-                const float demand, const float vel, const float angle)
+        float runPid(const float demand, const float speed)
         {
-            (void)vel;
-            (void)angle;
-
-            return demand;
+            return demand - m_k_rate_p * speed;
         }
 
     public:
@@ -89,8 +85,8 @@ class FlowHoldPidController : public PidController {
                     safeSpeed(vstate.dx) && safeSpeed(vstate.dy)) {
                 printf("dx=%+3.3f  dy=%+3.3f | phi=%+3.3f  theta=%+3.3f\n", 
                         vstate.dx, vstate.dy, vstate.phi, vstate.theta);
-                demands.roll = runPid(demands.roll, vstate.dy, vstate.phi);
-                demands.pitch = runPid(demands.pitch, vstate.dx, vstate.theta);
+                demands.roll = runPid(demands.roll, vstate.dy);
+                demands.pitch = runPid(demands.pitch, vstate.dx);
             }
 
         } // modifyDemands
