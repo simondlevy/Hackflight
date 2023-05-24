@@ -53,15 +53,22 @@ class FlowHoldPidController : public PidController {
             return safe(speed, MAX_SPEED);
         }
 
-        float runPid(const float demand, const float speed)
+        float modifyDemand(
+                const float demand,
+                const float speed,
+                const uint32_t dusec)
         {
-            return demand - m_k_rate_p * speed;
+            const auto du = dusec == 0 ? 1 : dusec;
+
+            const auto err = -speed;
+
+            return demand + m_k_rate_p * err;
         }
 
     public:
 
         FlowHoldPidController(
-                const float k_rate_p = 0,
+                const float k_rate_p = 0.1,
                 const float k_rate_i = 0,
                 const float k_rate_d = 0)
         {
@@ -76,17 +83,15 @@ class FlowHoldPidController : public PidController {
                 const VehicleState & vstate,
                 const bool reset) override
         {
-
-            (void)demands;
-            (void)dusec;
             (void)reset;
+
+            printf("dt=%d | dx=%+3.3f  dy=%+3.3f | phi=%+3.3f  theta=%+3.3f\n", 
+                    dusec, vstate.dx, vstate.dy, vstate.phi, vstate.theta);
 
             if (safeAngle(vstate.phi) && safeAngle(vstate.theta) &&
                     safeSpeed(vstate.dx) && safeSpeed(vstate.dy)) {
-                printf("dx=%+3.3f  dy=%+3.3f | phi=%+3.3f  theta=%+3.3f\n", 
-                        vstate.dx, vstate.dy, vstate.phi, vstate.theta);
-                demands.roll = runPid(demands.roll, vstate.dy);
-                demands.pitch = runPid(demands.pitch, vstate.dx);
+                demands.roll = modifyDemand(demands.roll, vstate.dy, dusec);
+                demands.pitch = modifyDemand(demands.pitch, vstate.dx, dusec);
             }
 
         } // modifyDemands
