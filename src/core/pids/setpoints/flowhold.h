@@ -26,7 +26,8 @@ class FlowHoldPidController : public PidController {
     
     private:
 
-        SetPointPid pid;
+        SetPointPid xPid;
+        SetPointPid yPid;
 
         float k_p;
         float k_i;
@@ -34,6 +35,32 @@ class FlowHoldPidController : public PidController {
         float k_pilot_vely_max;
         float k_stick_deadband;
         float k_windup_max;
+
+        void modifyDemand(
+                const float velocity,
+                const bool reset,
+                SetPointPid & pid,
+                float & demand
+                ) 
+        {
+
+
+            bool movedIntoBand = false;
+
+            pid.modifyDemand(
+                    k_p,
+                    k_i,
+                    k_stick_deadband,
+                    k_pilot_vely_max,
+                    k_windup_max,
+                    velocity,
+                    0, // target velocity
+                    reset,
+                    demand,
+                    demand,
+                    movedIntoBand
+                    );
+        }
 
     public:
 
@@ -61,25 +88,11 @@ class FlowHoldPidController : public PidController {
                 const int32_t dusec,
                 const VehicleState & vstate,
                 const bool reset) override
-         {
+        {
             (void)dusec;
 
-            bool movedIntoBand = false;
+            modifyDemand(vstate.dy, reset, this->yPid, demands.roll);
 
-            pid.modifyDemand(
-                    k_p,
-                    k_i,
-                    k_stick_deadband,
-                    k_pilot_vely_max,
-                    k_windup_max,
-                    vstate.dy,
-                    0,
-                    reset,
-                    demands.roll,
-                    demands.roll,
-                    movedIntoBand
-                    );
-
-         }
+        }
 
 }; // class FlowHoldPidController
