@@ -21,7 +21,7 @@
 
 #include "core/pid.h"
 
-class SetPointPidController {
+class SetPointPid {
     
     private:
 
@@ -40,13 +40,7 @@ class SetPointPidController {
 
     public:
 
-        SetPointPidController(void)
-        {
-            this->inBandPrev = false;
-            this->errorI = 0;
-        }
-
-        virtual void modifyDemand(
+        void modifyDemand(
                 const float k_p,
                 const float k_i,
                 const float k_stick_deadband,
@@ -55,12 +49,13 @@ class SetPointPidController {
                 const float velocity,
                 const float target,
                 const bool reset,
+                const float center,
                 float & demand,
-                bool & movedIntoBand
+                bool & movedIntoBand 
                 ) 
-         {
+        {
             // Is stick demand in deadband?
-            const auto inBand = fabs(demand) < k_stick_deadband; 
+            const auto inBand = fabs(center) < k_stick_deadband; 
 
             // Reset controller when moving into deadband above a minimum
             movedIntoBand = inBand && !this->inBandPrev;
@@ -72,7 +67,7 @@ class SetPointPidController {
             // outside
             const auto targetVelocity = inBand ?
                 target :
-                k_pilot_vel_max * demand;
+                k_pilot_vel_max * center;
 
             // Compute error as scaled target minus actual
             const auto error = targetVelocity - velocity;
@@ -84,4 +79,4 @@ class SetPointPidController {
             demand += error * k_p + this->errorI * k_i;
         }
 
-}; // class SetPointPidController
+}; // class SetPointPid

@@ -26,6 +26,8 @@ class AltHoldPidController : public PidController {
     
     private:
 
+        SetPointPid pid;
+
         static bool inBand(const float value, const float band) 
         {
             return value > -band && value < band;
@@ -91,35 +93,24 @@ class AltHoldPidController : public PidController {
                 return;
             }
 
-            const auto dz = vstate.dz;
-
             // [0,1] => [-1,+1]
             const auto sthrottle = 2 * demands.throttle - 1; 
 
-            // Is stick demand in deadband?
-            const auto inBand = fabs(sthrottle) < k_stick_deadband; 
+            bool movedIntoBand = false;
 
-            // Reset controller when moving into deadband above a minimum
-            // z
-            const auto movedIntoBand = inBand && !this->inBandPrev;
-            this->errorI = movedIntoBand || reset ? 0 : this->errorI;
-
-            this->inBandPrev = inBand;
-
-            // Target velocity is a setpoint inside deadband, scaled constant
-            // outside
-            const auto targetVelocity = inBand ?
-                this->zTarget - z :
-                k_pilot_velz_max * sthrottle;
-
-            // Compute error as scaled target minus actual
-            const auto error = targetVelocity - dz;
-
-            // Compute I term, avoiding windup
-            this->errorI = constrainAbs(this->errorI + error, k_windup_max);
-
-            // Adjust throttle demand based on error
-            demands.throttle += error * k_p + this->errorI * k_i;
+            pid.modifyDemand(
+                k_p,
+                k_i,
+                k_stick_deadband,
+                k_pilot_velz_max,
+                k_windup_max,
+                vstate.dz,
+                this->zTarget - z,
+                reset,
+                sthrottle,
+                demands.throttle,
+                movedIntoBand
+                );
 
             if (reset) {
                 this->zTarget = 0;
