@@ -45,7 +45,7 @@ class AltHoldPidController : public PidController {
 
         bool m_inBandPrev;
         float m_errorI;
-        float m_altitudeTarget;
+        float m_zTarget;
 
     public:
 
@@ -71,7 +71,7 @@ class AltHoldPidController : public PidController {
 
             m_inBandPrev = false;
             m_errorI = 0;
-            m_altitudeTarget = 0;
+            m_zTarget = 0;
         }
 
         virtual void modifyDemands(
@@ -82,33 +82,33 @@ class AltHoldPidController : public PidController {
          {
             (void)dusec;
 
-            const auto altitude = vstate.z;
+            const auto z = vstate.z;
             const auto dz = vstate.dz;
 
             // [0,1] => [-1,+1]
             const auto sthrottle = 2 * demands.throttle - 1; 
 
-            // Is stick demand in deadband, above a minimum altitude?
+            // Is stick demand in deadband, above a minimum z?
             const auto inBand =
-                fabs(sthrottle) < k_stick_deadband && altitude > k_alt_min; 
+                fabs(sthrottle) < k_stick_deadband && z > k_alt_min; 
 
             // Reset controller when moving into deadband above a minimum
-            // altitude
+            // z
             const auto gotNewTarget = inBand && !m_inBandPrev;
             m_errorI = gotNewTarget || reset ? 0 : m_errorI;
 
             m_inBandPrev = inBand;
 
             if (reset) {
-                m_altitudeTarget = 0;
+                m_zTarget = 0;
             }
 
-            m_altitudeTarget = gotNewTarget ? altitude : m_altitudeTarget;
+            m_zTarget = gotNewTarget ? z : m_zTarget;
 
             // Target velocity is a setpoint inside deadband, scaled constant
             // outside
             const auto targetVelocity = inBand ?
-                m_altitudeTarget - altitude :
+                m_zTarget - z :
                 k_pilot_velz_max * sthrottle;
 
             // Compute error as scaled target minus actual

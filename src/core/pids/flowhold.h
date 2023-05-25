@@ -44,7 +44,6 @@ class FlowHoldPidController : public PidController {
 
         bool m_inBandPrev;
         float m_errorI;
-        float m_yTarget;
 
     public:
 
@@ -68,7 +67,6 @@ class FlowHoldPidController : public PidController {
 
             m_inBandPrev = false;
             m_errorI = 0;
-            m_yTarget = 0;
         }
 
         virtual void modifyDemands(
@@ -79,7 +77,6 @@ class FlowHoldPidController : public PidController {
          {
             (void)dusec;
 
-            const auto y = vstate.y;
             const auto dy = vstate.dy;
             const auto roll = demands.roll; 
 
@@ -92,12 +89,6 @@ class FlowHoldPidController : public PidController {
             m_errorI = gotNewTarget || reset ? 0 : m_errorI;
 
             m_inBandPrev = inBand;
-
-            if (reset) {
-                m_yTarget = 0;
-            }
-
-            m_yTarget = gotNewTarget ? y : m_yTarget;
 
             // Compute error as scaled target minus actual
             const auto error = 0 - dy;
