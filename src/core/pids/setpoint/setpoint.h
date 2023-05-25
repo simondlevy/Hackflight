@@ -35,53 +35,24 @@ class SetPointPidController {
             return v < -lim ? -lim : v > +lim ? +lim : v;
         }
 
-        float k_p;
-        float k_i;
-
-        float k_alt_min;
-        float k_pilot_velz_max;
-        float k_stick_deadband;
-        float k_windup_max;
-
-        bool m_inBandPrev;
-        float m_errorI;
-        float m_zTarget;
+        bool inBandPrev;
+        float errorI;
 
     public:
 
-        SetPointPidController(
-
-                // Tunable
-                const float k_p = 0.075,
-                const float k_i = 0.15,
-
-                // Probably better left as-is
-                const float k_alt_min = 1.0,
-                const float k_pilot_velz_max = 2.5,
-                const float k_stick_deadband = 0.2,
-                const float k_windup_max = 0.4)
+        SetPointPidController(void)
         {
-            this->k_p = k_p;
-            this->k_i = k_i;
-
-            this->k_alt_min = k_alt_min;
-            this->k_pilot_velz_max = k_pilot_velz_max;
-            this->k_stick_deadband = k_stick_deadband;
-            this->k_windup_max = k_windup_max;
-
-            m_inBandPrev = false;
-            m_errorI = 0;
-            m_zTarget = 0;
+            this->inBandPrev = false;
+            this->errorI = 0;
         }
 
-        virtual void modifyDemands(
-                Demands & demands,
-                const int32_t dusec,
+        virtual void modifyDemand(
                 const VehicleState & vstate,
-                const bool reset) override
+                const bool reset,
+                float & demand,
+                bool & movedIntoBand
+                ) 
          {
-            (void)dusec;
-
             const auto z = vstate.z;
 
             // Require a minimum altitude
@@ -99,31 +70,31 @@ class SetPointPidController {
 
             // Reset controller when moving into deadband above a minimum
             // z
-            const auto gotNewTarget = inBand && !m_inBandPrev;
-            m_errorI = gotNewTarget || reset ? 0 : m_errorI;
+            movedIntoBand = inBand && !this->inBandPrev;
+            this->errorI = movedIntoBand || reset ? 0 : this->errorI;
 
-            m_inBandPrev = inBand;
+            this->inBandPrev = inBand;
 
             if (reset) {
-                m_zTarget = 0;
+                this->zTarget = 0;
             }
 
-            m_zTarget = gotNewTarget ? z : m_zTarget;
+            this->zTarget = movedIntoBand ? z : this->zTarget;
 
             // Target velocity is a setpoint inside deadband, scaled constant
             // outside
             const auto targetVelocity = inBand ?
-                m_zTarget - z :
+                this->zTarget - z :
                 k_pilot_velz_max * sthrottle;
 
             // Compute error as scaled target minus actual
             const auto error = targetVelocity - dz;
 
             // Compute I term, avoiding windup
-            m_errorI = constrainAbs(m_errorI + error, k_windup_max);
+            this->errorI = constrainAbs(this->errorI + error, k_windup_max);
 
             // Adjust throttle demand based on error
-            demands.throttle += error * k_p + m_errorI * k_i;
+            demands.throttle += error * k_p + this->errorI * k_i;
         }
 
 }; // class SetPointPidController

@@ -100,16 +100,10 @@ class AltHoldPidController : public PidController {
 
             // Reset controller when moving into deadband above a minimum
             // z
-            const auto gotNewTarget = inBand && !this->inBandPrev;
-            this->errorI = gotNewTarget || reset ? 0 : this->errorI;
+            const auto movedIntoBand = inBand && !this->inBandPrev;
+            this->errorI = movedIntoBand || reset ? 0 : this->errorI;
 
             this->inBandPrev = inBand;
-
-            if (reset) {
-                this->zTarget = 0;
-            }
-
-            this->zTarget = gotNewTarget ? z : this->zTarget;
 
             // Target velocity is a setpoint inside deadband, scaled constant
             // outside
@@ -125,6 +119,12 @@ class AltHoldPidController : public PidController {
 
             // Adjust throttle demand based on error
             demands.throttle += error * k_p + this->errorI * k_i;
+
+            if (reset) {
+                this->zTarget = 0;
+            }
+
+            this->zTarget = movedIntoBand ? z : this->zTarget;
         }
 
 }; // class AltHoldPidController
