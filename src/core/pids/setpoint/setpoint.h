@@ -21,7 +21,7 @@
 
 #include "core/pid.h"
 
-class AltHoldPidController : public PidController {
+class SetPointPidController {
     
     private:
 
@@ -43,14 +43,13 @@ class AltHoldPidController : public PidController {
         float k_stick_deadband;
         float k_windup_max;
 
-        float zTarget;
-
-        bool inBandPrev;
-        float errorI;
+        bool m_inBandPrev;
+        float m_errorI;
+        float m_zTarget;
 
     public:
 
-        AltHoldPidController(
+        SetPointPidController(
 
                 // Tunable
                 const float k_p = 0.075,
@@ -70,9 +69,9 @@ class AltHoldPidController : public PidController {
             this->k_stick_deadband = k_stick_deadband;
             this->k_windup_max = k_windup_max;
 
-            this->inBandPrev = false;
-            this->errorI = 0;
-            this->zTarget = 0;
+            m_inBandPrev = false;
+            m_errorI = 0;
+            m_zTarget = 0;
         }
 
         virtual void modifyDemands(
@@ -100,31 +99,31 @@ class AltHoldPidController : public PidController {
 
             // Reset controller when moving into deadband above a minimum
             // z
-            const auto gotNewTarget = inBand && !this->inBandPrev;
-            this->errorI = gotNewTarget || reset ? 0 : this->errorI;
+            const auto gotNewTarget = inBand && !m_inBandPrev;
+            m_errorI = gotNewTarget || reset ? 0 : m_errorI;
 
-            this->inBandPrev = inBand;
+            m_inBandPrev = inBand;
 
             if (reset) {
-                this->zTarget = 0;
+                m_zTarget = 0;
             }
 
-            this->zTarget = gotNewTarget ? z : this->zTarget;
+            m_zTarget = gotNewTarget ? z : m_zTarget;
 
             // Target velocity is a setpoint inside deadband, scaled constant
             // outside
             const auto targetVelocity = inBand ?
-                this->zTarget - z :
+                m_zTarget - z :
                 k_pilot_velz_max * sthrottle;
 
             // Compute error as scaled target minus actual
             const auto error = targetVelocity - dz;
 
             // Compute I term, avoiding windup
-            this->errorI = constrainAbs(this->errorI + error, k_windup_max);
+            m_errorI = constrainAbs(m_errorI + error, k_windup_max);
 
             // Adjust throttle demand based on error
-            demands.throttle += error * k_p + this->errorI * k_i;
+            demands.throttle += error * k_p + m_errorI * k_i;
         }
 
-}; // class AltHoldPidController
+}; // class SetPointPidController
