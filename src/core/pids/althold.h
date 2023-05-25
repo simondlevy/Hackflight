@@ -3,14 +3,15 @@
 
    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+   Hackflight is free software: you can redistribute it and/or modify it under
+   the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
@@ -88,9 +89,11 @@ class AltHoldPidController : public PidController {
             const auto sthrottle = 2 * demands.throttle - 1; 
 
             // Is stick demand in deadband, above a minimum altitude?
-            const auto inBand = fabs(sthrottle) < k_stick_deadband && altitude > k_alt_min; 
+            const auto inBand =
+                fabs(sthrottle) < k_stick_deadband && altitude > k_alt_min; 
 
-            // Reset controller when moving into deadband above a minimum altitude
+            // Reset controller when moving into deadband above a minimum
+            // altitude
             const auto gotNewTarget = inBand && !m_inBandPrev;
             m_errorI = gotNewTarget || reset ? 0 : m_errorI;
 
@@ -102,7 +105,8 @@ class AltHoldPidController : public PidController {
 
             m_altitudeTarget = gotNewTarget ? altitude : m_altitudeTarget;
 
-            // Target velocity is a setpoint inside deadband, scaled constant outside
+            // Target velocity is a setpoint inside deadband, scaled constant
+            // outside
             const auto targetVelocity = inBand ?
                 m_altitudeTarget - altitude :
                 k_pilot_velz_max * sthrottle;

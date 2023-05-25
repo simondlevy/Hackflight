@@ -3,14 +3,15 @@
 
    This file is part of Hackflight.
 
-   Hackflight is free software: you can redistribute it and/or modify it under the
-   terms of the GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option) any later
-   version.
+   Hackflight is free software: you can redistribute it and/or modify it under
+   the terms of the GNU General Public License as published by the Free
+   Software Foundation, either version 3 of the License, or (at your option)
+   any later version.
 
-   Hackflight is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   Hackflight is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+   more details.
 
    You should have received a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
@@ -50,8 +51,8 @@ class FlowHoldPidController : public PidController {
         FlowHoldPidController(
 
                 // Tunable
-                const float k_p = 0.075,
-                const float k_i = 0.15,
+                const float k_p = 0.0005,
+                const float k_i = 0.25,
 
                 // Probably better left as-is
                 const float k_pilot_vely_max = 2.5,
@@ -85,7 +86,8 @@ class FlowHoldPidController : public PidController {
             // Is stick demand in deadband?
             const auto inBand = fabs(roll) < k_stick_deadband; 
 
-            // Reset controller when moving into deadband above a minimum altitude
+            // Reset controller when moving into deadband above a minimum
+            // altitude
             const auto gotNewTarget = inBand && !m_inBandPrev;
             m_errorI = gotNewTarget || reset ? 0 : m_errorI;
 
@@ -97,13 +99,8 @@ class FlowHoldPidController : public PidController {
 
             m_yTarget = gotNewTarget ? y : m_yTarget;
 
-            // Target velocity is a setpoint inside deadband, scaled constant outside
-            const auto targetVelocity = inBand ?
-                m_yTarget - y :
-                k_pilot_vely_max * roll;
-
             // Compute error as scaled target minus actual
-            const auto error = targetVelocity - dy;
+            const auto error = 0 - dy;
 
             // Compute I term, avoiding windup
             m_errorI = constrainAbs(m_errorI + error, k_windup_max);
