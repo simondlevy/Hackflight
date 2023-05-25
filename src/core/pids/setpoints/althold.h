@@ -20,6 +20,7 @@
 #pragma once
 
 #include "core/pid.h"
+#include "core/pids/setpoint.h"
 
 class AltHoldPidController : public PidController {
     

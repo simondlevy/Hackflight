@@ -47,54 +47,41 @@ class SetPointPidController {
         }
 
         virtual void modifyDemand(
-                const VehicleState & vstate,
+                const float k_p,
+                const float k_i,
+                const float k_stick_deadband,
+                const float k_pilot_vel_max,
+                const float k_windup_max,
+                const float velocity,
+                const float target,
                 const bool reset,
                 float & demand,
                 bool & movedIntoBand
                 ) 
          {
-            const auto z = vstate.z;
-
-            // Require a minimum altitude
-            if (z < k_alt_min) {
-                return;
-            }
-
-            const auto dz = vstate.dz;
-
-            // [0,1] => [-1,+1]
-            const auto sthrottle = 2 * demands.throttle - 1; 
-
             // Is stick demand in deadband?
-            const auto inBand = fabs(sthrottle) < k_stick_deadband; 
+            const auto inBand = fabs(demand) < k_stick_deadband; 
 
             // Reset controller when moving into deadband above a minimum
-            // z
             movedIntoBand = inBand && !this->inBandPrev;
             this->errorI = movedIntoBand || reset ? 0 : this->errorI;
 
             this->inBandPrev = inBand;
 
-            if (reset) {
-                this->zTarget = 0;
-            }
-
-            this->zTarget = movedIntoBand ? z : this->zTarget;
-
             // Target velocity is a setpoint inside deadband, scaled constant
             // outside
             const auto targetVelocity = inBand ?
-                this->zTarget - z :
-                k_pilot_velz_max * sthrottle;
+                target :
+                k_pilot_vel_max * demand;
 
             // Compute error as scaled target minus actual
-            const auto error = targetVelocity - dz;
+            const auto error = targetVelocity - velocity;
 
             // Compute I term, avoiding windup
             this->errorI = constrainAbs(this->errorI + error, k_windup_max);
 
-            // Adjust throttle demand based on error
-            demands.throttle += error * k_p + this->errorI * k_i;
+            // Adjust demand based on error
+            demand += error * k_p + this->errorI * k_i;
         }
 
 }; // class SetPointPidController
