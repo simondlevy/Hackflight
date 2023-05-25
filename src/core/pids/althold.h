@@ -83,14 +83,19 @@ class AltHoldPidController : public PidController {
             (void)dusec;
 
             const auto z = vstate.z;
+
+            // Require a minimum altitude
+            if (z < k_alt_min) {
+                return;
+            }
+
             const auto dz = vstate.dz;
 
             // [0,1] => [-1,+1]
             const auto sthrottle = 2 * demands.throttle - 1; 
 
-            // Is stick demand in deadband, above a minimum z?
-            const auto inBand =
-                fabs(sthrottle) < k_stick_deadband && z > k_alt_min; 
+            // Is stick demand in deadband?
+            const auto inBand = fabs(sthrottle) < k_stick_deadband; 
 
             // Reset controller when moving into deadband above a minimum
             // z
