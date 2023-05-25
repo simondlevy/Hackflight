@@ -18,83 +18,56 @@
 
 #pragma once
 
-#include <string.h>
-#include <math.h>
-
-#include "core/constrain.h"
-#include "core/filters/pt1.h"
-#include "core/filters/pt2.h"
 #include "core/pid.h"
-#include "core/utils.h"
 
 class FlowHoldPidController : public PidController {
-
+    
     private:
 
-        static constexpr float MAX_DEMAND = 0.2;
-        static constexpr float MAX_ANGLE = 45;
-        static constexpr float MAX_SPEED = 10;
-        static constexpr float WINDUP = 10;
-
-        float m_k_p;
-        float m_k_i;
-        float m_k_d;
-
-        float m_err_integral_y;
-        float m_err_prev_y;
-
-        static bool safe(const float val, const float max)
+        static bool inBand(const float value, const float band) 
         {
-            return fabs(val) < max;
+            return value > -band && value < band;
         }
 
-        static bool safeAngle(const float angle)
+        static float constrainAbs(const float v, const float lim)
         {
-            return safe(angle, MAX_ANGLE);
+            return v < -lim ? -lim : v > +lim ? +lim : v;
         }
 
-        static bool safeSpeed(const float speed)
-        {
-            return safe(speed, MAX_SPEED);
-        }
+        float k_p;
+        float k_i;
 
-        void modifyDemand(
-                const float speed,
-                const uint32_t dusec,
-                float & demand,
-                float & err_prev,
-                float & err_integral)
-        {
-            if (fabs(demand) > MAX_DEMAND) {
-                return;
-            }
-            const auto du = dusec == 0 ? 1 : dusec;
+        float k_pilot_vely_max;
+        float k_stick_deadband;
+        float k_windup_max;
 
-            const auto err = -speed;
-
-            const auto derr = m_k_p * (err - err_prev) / du;
-
-            err_integral += m_k_i * (err * du);
-
-            err_integral = err_integral < - WINDUP ? -WINDUP : 
-                err_integral > WINDUP ? WINDUP :
-                err_integral;
-
-            demand = err + derr + err_integral;
-
-            err_prev = err;
-        }
+        bool m_inBandPrev;
+        float m_errorI;
+        float m_yTarget;
 
     public:
 
         FlowHoldPidController(
-                const float k_p = 0.0,
-                const float k_i = 0.0000001,
-                const float k_d = 0.01)
+
+                // Tunable
+                const float k_p = 0.075,
+                const float k_i = 0.15,
+
+                // Probably better left as-is
+                const float k_pilot_vely_max = 2.5,
+                const float k_stick_deadband = 0.2,
+                const float k_windup_max = 0.4)
         {
-            m_k_p = k_p;
-            m_k_i = k_i;
-            m_k_d = k_d;
+            this->k_p = k_p;
+            this->k_i = k_i;
+
+            this->k_pilot_vely_max = k_pilot_vely_max;
+            this->k_stick_deadband = k_stick_deadband;
+            this->k_windup_max = k_windup_max;
+
+            m_inBandPrev = false;
+            m_errorI = 0;
+            m_yTarget = 0;
         }
 
         virtual void modifyDemands(
@@ -102,25 +75,41 @@ class FlowHoldPidController : public PidController {
                 const int32_t dusec,
                 const VehicleState & vstate,
                 const bool reset) override
-        {
-            (void)reset;
+         {
+            (void)dusec;
 
-            /*
-            printf("dt=%d | dx=%+3.3f  dy=%+3.3f | phi=%+3.3f  theta=%+3.3f\n", 
-                    dusec, vstate.dx, vstate.dy, vstate.phi, vstate.theta);
-                    */
+            const auto y = vstate.y;
+            const auto dy = vstate.dy;
+            const auto roll = demands.roll; 
 
-            if (safeAngle(vstate.phi) && safeAngle(vstate.theta) &&
-                    safeSpeed(vstate.dx) && safeSpeed(vstate.dy)) {
-                modifyDemand(
-                        vstate.dy,
-                        dusec,
-                        demands.roll,
-                        m_err_prev_y,
-                        m_err_integral_y);
-                //modifyDemand(vstate.dx, dusec, demands.pitch, m_err_prev_x);
+            // Is stick demand in deadband?
+            const auto inBand = fabs(roll) < k_stick_deadband; 
+
+            // Reset controller when moving into deadband above a minimum altitude
+            const auto gotNewTarget = inBand && !m_inBandPrev;
+            m_errorI = gotNewTarget || reset ? 0 : m_errorI;
+
+            m_inBandPrev = inBand;
+
+            if (reset) {
+                m_yTarget = 0;
             }
 
-        } // modifyDemands
+            m_yTarget = gotNewTarget ? y : m_yTarget;
+
+            // Target velocity is a setpoint inside deadband, scaled constant outside
+            const auto targetVelocity = inBand ?
+                m_yTarget - y :
+                k_pilot_vely_max * roll;
+
+            // Compute error as scaled target minus actual
+            const auto error = targetVelocity - dy;
+
+            // Compute I term, avoiding windup
+            m_errorI = constrainAbs(m_errorI + error, k_windup_max);
+
+            // Adjust throttle demand based on error
+            demands.roll += error * k_p + m_errorI * k_i;
+        }
 
 }; // class FlowHoldPidController
