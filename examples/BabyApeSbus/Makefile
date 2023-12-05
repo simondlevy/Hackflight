@@ -1,5 +1,7 @@
 SKETCH = BabyApeSbus
 
+STMVER = 2.6.0
+
 FQBN = STMicroelectronics:stm32:GenF4:pnum=GENERIC_F411CEUX,usb=CDCgen
 
 PORT = /dev/ttyACM0
@@ -19,12 +21,17 @@ $(DFU): $(HEX)
 
 $(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
 	cp prebuild.sh \
-		$(HOME)/.arduino15/packages/STMicroelectronics/hardware/stm32/2.5.0/system/extras
+		$(HOME)/.arduino15/packages/STMicroelectronics/hardware/stm32/$(STMVER)/system/extras
 	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) --build-path $(OBJ)
 	rm -f *.bin *.elf
 
 unbrick: $(DFU)
 	dfu-util -a 0 -D $(DFU) -s :leave	
+
+upload: $(DFU)
+	echo -n 'R' > $(PORT)
+	sleep 1
+	dfu-util -a 0 -D $(DFU) -s :leave
 
 flash: $(DFU)
 	echo -n 'R' > $(PORT)
