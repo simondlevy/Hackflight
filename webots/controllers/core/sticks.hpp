@@ -21,6 +21,14 @@ typedef struct {
 
 } joystickAxes_t;
 
+typedef enum {
+
+    JOYSTICK_NONE,
+    JOYSTICK_UNRECOGNIZED,
+    JOYSTICK_RECOGNIZED
+
+} joystickStatus_e;
+
 static std::map<std::string, joystickAxes_t> JOYSTICK__AXIS_MAP = {
 
     //                                                        T   R   P  Y
@@ -124,13 +132,14 @@ static demands_t readKeyboard(void)
 
 }
 
-static bool haveJoystick(void)
+static joystickStatus_e haveJoystick(void)
 {
-    bool have = true;
+    auto status = JOYSTICK_RECOGNIZED;
 
     const char * joyname = wb_joystick_get_model();
 
-    if (joyname == NULL || JOYSTICK__AXIS_MAP.count(joyname) == 0) {
+    // No joystick
+    if (joyname == NULL) {
 
         static bool didWarn;
 
@@ -143,10 +152,30 @@ static bool haveJoystick(void)
 
         didWarn = true;
 
-        have = false;
+        status = JOYSTICK_NONE;
     }
 
-    return have;
+    // Joystick unrecognized
+    else if (JOYSTICK__AXIS_MAP.count(joyname) == 0) {
+
+        status = JOYSTICK_UNRECOGNIZED;
+    }
+
+    return status;
+}
+
+static demands_t reportJoystick(void) 
+{
+    printf("Unrecognized joystick '%s' with axes ", wb_joystick_get_model()); 
+
+    for (uint8_t k=0; k<wb_joystick_get_number_of_axes(); ++k) {
+
+        printf("%2d=%+6d |", k, wb_joystick_get_axis_value(k));
+    }
+
+    printf("\n");
+
+    return demands_t {0, 0, 0, 0};
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -161,5 +190,9 @@ static void sticksInit(void)
 
 static demands_t sticksRead(void)
 {
-    return haveJoystick() ? readJoystick() : readKeyboard();
+    auto joystickStatus = haveJoystick();
+
+    return joystickStatus == JOYSTICK_RECOGNIZED ? readJoystick() : 
+        joystickStatus == JOYSTICK_UNRECOGNIZED ? reportJoystick() :
+        readKeyboard();
 }
