@@ -24,11 +24,15 @@ typedef struct {
 static std::map<std::string, joystickAxes_t> JOYSTICK__AXIS_MAP = {
 
     //                                                        T   R   P  Y
+    // Linux
     { "MY-POWER CO.,LTD. 2In1 USB Joystick", joystickAxes_t {-1, -2, -3, 0 } },
     { "SHANWAN Android Gamepad",             joystickAxes_t {-1, -2, -3, 0 } },
     { "Logitech Logitech Extreme 3D",        joystickAxes_t {-3,  0, -1, 2 } },
     { "FrSky FrSky Simulator",               joystickAxes_t { 0,  1,  2, 3 } },
     { "Horizon Hobby SPEKTRUM RECEIVER",     joystickAxes_t { 1,  2,  3, 0 } },
+
+    // Windows
+    { "SPEKTRUM RECEIVER",                   joystickAxes_t { 2,  1,  0, 3 } },  
 };
 
 static float scaleJoystickAxis(const int32_t rawval)
@@ -39,9 +43,7 @@ static float scaleJoystickAxis(const int32_t rawval)
 static int32_t readJoystickRaw(const int8_t index)
 {
     const auto axis = abs(index);
-
     const auto sign = index < 0 ? -1 : +1;
-
     return sign * wb_joystick_get_axis_value(axis);
 }
 
