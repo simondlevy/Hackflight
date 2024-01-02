@@ -23,8 +23,10 @@ typedef struct {
 
 static std::map<std::string, joystickAxes_t> JOYSTICK__AXIS_MAP = {
 
+    //                                                        T   R   P  Y
     { "MY-POWER CO.,LTD. 2In1 USB Joystick", joystickAxes_t {-1, -2, -3, 0 } },
     { "SHANWAN Android Gamepad",             joystickAxes_t {-1, -2, -3, 0 } },
+    { "Logitech Logitech Extreme 3D",        joystickAxes_t {-3,  0, -1, 2 } },
     { "FrSky FrSky Simulator",               joystickAxes_t { 0,  1,  2, 3 } },
     { "Horizon Hobby SPEKTRUM RECEIVER",     joystickAxes_t { 1,  2,  3, 0 } },
 };
