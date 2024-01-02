@@ -8,6 +8,11 @@
 
 4. Use the file dialog to open <b>Hackflight/webots/words/simple.wbt</b>
 
+5. Click on the the little [file-folder icon](media/screenshot.png) in the upper right,
+and use the file dialog to open <b>controllers/core/core.cpp</b>
+
+6. From the <b>Build</b> menu, choose <b>Buil</b> to build the simulation.
+
 Unless you've got a supported game controller plugged in, the output console at the 
 bottom will show a warning that no free joystick was found.  You can simply
 ignore this warning and fly the sim using the keyboard, as shown by the instructions
