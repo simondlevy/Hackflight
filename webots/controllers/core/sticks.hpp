@@ -41,6 +41,7 @@ static std::map<std::string, joystickAxes_t> JOYSTICK__AXIS_MAP = {
 
     // Windows
     { "SPEKTRUM RECEIVER",                   joystickAxes_t { 2,  1,  0, 3 } },  
+    { "FrSky Simulator",                     joystickAxes_t { 5,  4,  3, 2 } },
 };
 
 static float scaleJoystickAxis(const int32_t rawval)
