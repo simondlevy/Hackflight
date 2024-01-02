@@ -8,7 +8,7 @@
 
 4. Use the file dialog to open <b>Hackflight/webots/words/simple.wbt</b>
 
-Unless you've got a supported game controller plugged in, output console at the 
+Unless you've got a supported game controller plugged in, the output console at the 
 bottom will show a warning that no free joystick was found.  You can simply
 ignore this warning and fly the sim using the keyboard, as shown by the instructions
 in the console. Currently supported game controllers are:
