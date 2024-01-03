@@ -319,18 +319,18 @@ class Estimator {
             }
 
             // Incorporate the attitude error (Kalman filter state) with the attitude
-            auto v0 = _kalmanData.S[KC_STATE_D0];
-            auto v1 = _kalmanData.S[KC_STATE_D1];
-            auto v2 = _kalmanData.S[KC_STATE_D2];
+            const auto v0 = _kalmanData.S[KC_STATE_D0];
+            const auto v1 = _kalmanData.S[KC_STATE_D1];
+            const auto v2 = _kalmanData.S[KC_STATE_D2];
 
             // Move attitude error into attitude if any of the angle errors are
             // large enough
             if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
                         0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
                             fabsf(v2) < 10)) {
-                auto angle = fast_sqrt(v0*v0 + v1*v1 + v2*v2) + EPS;
-                auto ca = arm_cos_f32(angle / 2.0f);
-                auto sa = arm_sin_f32(angle / 2.0f);
+                const auto angle = fast_sqrt(v0*v0 + v1*v1 + v2*v2) + EPS;
+                const auto ca = arm_cos_f32(angle / 2.0f);
+                const auto sa = arm_sin_f32(angle / 2.0f);
                 float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
 
                 // rotate the quad's attitude by the delta quaternion vector computed above
@@ -344,7 +344,7 @@ class Estimator {
                     dq[1] * _kalmanData.q[2] + dq[0] * _kalmanData.q[3];
 
                 // normalize and store the result
-                auto norm = fast_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
+                const auto norm = fast_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
                         tmpq3 * tmpq3) + EPS;
                 _kalmanData.q[0] = tmpq0 / norm;
                 _kalmanData.q[1] = tmpq1 / norm;
@@ -438,7 +438,7 @@ class Estimator {
             // stay bounded
             for (int i=0; i<KC_STATE_DIM; i++) {
                 for (int j=i; j<KC_STATE_DIM; j++) {
-                    auto p = 0.5f*_kalmanData.P[i][j] + 0.5f*_kalmanData.P[j][i];
+                    const auto p = 0.5f*_kalmanData.P[i][j] + 0.5f*_kalmanData.P[j][i];
                     if (isnan(p) || p > MAX_COVARIANCE) {
                         _kalmanData.P[i][j] = _kalmanData.P[j][i] = MAX_COVARIANCE;
                     } else if ( i==j && p < MIN_COVARIANCE ) {
@@ -467,7 +467,7 @@ class Estimator {
 
         void addProcessNoise(const uint32_t nowMs) 
         {
-            auto dt = (nowMs - _kalmanData.lastProcessNoiseUpdateMs) / 1000.0f;
+            const auto dt = (nowMs - _kalmanData.lastProcessNoiseUpdateMs) / 1000.0f;
 
             if (dt > 0.0f) {
                 addProcessNoiseDt(dt);
@@ -764,15 +764,15 @@ class Estimator {
 
         static void GM_UWB(float e, float * GM_e)
         {
-            auto sigma = 2.0f;
-            auto GM_dn = sigma + e*e;
+            const auto sigma = 2.0f;
+            const auto GM_dn = sigma + e*e;
             *GM_e = (sigma * sigma)/(GM_dn * GM_dn);
         }
 
         static void GM_state(float e, float * GM_e)
         {
-            auto sigma = 1.5f;
-            auto GM_dn = sigma + e*e;
+            const auto sigma = 1.5f;
+            const auto GM_dn = sigma + e*e;
             *GM_e = (sigma * sigma)/(GM_dn * GM_dn);
         }
 
@@ -1023,9 +1023,9 @@ class Estimator {
              Attitude"
              * http://arc.aiaa.org/doi/abs/10.2514/1.G000848
              */
-            auto d0 = gyro->x*dt/2;
-            auto d1 = gyro->y*dt/2;
-            auto d2 = gyro->z*dt/2;
+            const auto d0 = gyro->x*dt/2;
+            const auto d1 = gyro->y*dt/2;
+            const auto d2 = gyro->z*dt/2;
 
             A[KC_STATE_D0][KC_STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
             A[KC_STATE_D0][KC_STATE_D1] =  d2 + d0*d1/2;
@@ -1050,13 +1050,13 @@ class Estimator {
             // When flying, the accelerometer directly measures thrust (hence is useless
             // to estimate body angle while flying)
 
-            auto dt2 = dt*dt;
+            const auto dt2 = dt*dt;
 
             if (quadIsFlying) { // only acceleration in z direction
 
                 // Use accelerometer and not commanded thrust, as this has
                 // proper physical units
-                auto zacc = acc->z;
+                const auto zacc = acc->z;
 
                 // position updates in the body frame (will be rotated to inertial frame)
                 auto dx = _kalmanData.S[KC_STATE_PX] * dt;
@@ -1123,14 +1123,14 @@ class Estimator {
 
             // Attitude update (rotate by gyroscope), we do this in quaternions
             // this is the gyroscope angular velocity integrated over the sample period
-            auto dtwx = dt*gyro->x;
-            auto dtwy = dt*gyro->y;
-            auto dtwz = dt*gyro->z;
+            const auto dtwx = dt*gyro->x;
+            const auto dtwy = dt*gyro->y;
+            const auto dtwz = dt*gyro->z;
 
             // compute the quaternion values in [w,x,y,z] order
-            auto angle = fast_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPS;
-            auto ca = arm_cos_f32(angle/2.0f);
-            auto sa = arm_sin_f32(angle/2.0f);
+            const auto angle = fast_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPS;
+            const auto ca = arm_cos_f32(angle/2.0f);
+            const auto sa = arm_sin_f32(angle/2.0f);
             float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
 
             // Rotate the quad's attitude by the delta quaternion vector computed above
@@ -1228,7 +1228,7 @@ class Estimator {
 
             mat_trans(Hm, HTm);
             mat_mult(&_kalmanData.Pm, HTm, PHTm); // PH'
-            auto R = stdMeasNoise*stdMeasNoise;
+            const auto R = stdMeasNoise*stdMeasNoise;
             auto HPHR = R; // HPH' + R
             for (int i=0; i<KC_STATE_DIM; i++) { 
 
@@ -1300,14 +1300,14 @@ class Estimator {
             auto dx = _kalmanData.S[KC_STATE_X] - d->x;
             auto dy = _kalmanData.S[KC_STATE_Y] - d->y;
             auto dz = _kalmanData.S[KC_STATE_Z] - d->z;
-            auto measuredDistance = d->distance;
+            const auto measuredDistance = d->distance;
 
-            auto predictedDistance = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
+            const auto predictedDistance = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
 
             // innovation term based on x_check
 
             // innovation term based on prior state
-            auto error_check = measuredDistance - predictedDistance;    
+            const auto error_check = measuredDistance - predictedDistance;    
 
             // ---------------------- matrix defination -----------------------------
             static float P_chol[KC_STATE_DIM][KC_STATE_DIM]; 
@@ -1373,7 +1373,7 @@ class Estimator {
             float P_iter[KC_STATE_DIM][KC_STATE_DIM];
             memcpy(P_iter, _kalmanData.P, sizeof(P_iter));
 
-            float R_iter = d->stdDev * d->stdDev;  // measurement covariance
+            auto R_iter = d->stdDev * d->stdDev;  // measurement covariance
 
             memcpy(X_state, _kalmanData.S, sizeof(X_state));
 
@@ -1386,17 +1386,17 @@ class Estimator {
                 mat_trans(&Pc_m, &Pc_tran_m);
 
                 // decomposition for measurement covariance (scalar case)
-                auto R_chol = sqrtf(R_iter);       
+                const auto R_chol = sqrtf(R_iter);       
                 // construct H matrix
                 // X_state updates in each iteration
-                auto x_iter = X_state[KC_STATE_X];
-                auto   y_iter = X_state[KC_STATE_Y];
-                auto  z_iter = X_state[KC_STATE_Z];   
+                const auto x_iter = X_state[KC_STATE_X];
+                const auto   y_iter = X_state[KC_STATE_Y];
+                const auto  z_iter = X_state[KC_STATE_Z];   
                 dx = x_iter - d->x;  dy = y_iter - d->y;   dz = z_iter - d->z;
 
-                auto predicted_iter = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
+                const auto predicted_iter = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
                 // innovation term based on x_check
-                auto error_iter = measuredDistance - predicted_iter; 
+                const auto error_iter = measuredDistance - predicted_iter; 
 
                 auto e_y = error_iter;
 
@@ -1435,7 +1435,7 @@ class Estimator {
                 }
                 // Matrix inversion is numerically sensitive.
                 // Add small values on the diagonal of P_chol to avoid numerical problems.
-                auto dummy_value = 1e-9f;
+                const auto dummy_value = 1e-9f;
                 for (int k=0; k<KC_STATE_DIM; k++){
                     P_chol[k][k] = P_chol[k][k] + dummy_value;
                 }
@@ -1542,9 +1542,9 @@ class Estimator {
             auto dy = _kalmanData.S[KC_STATE_Y] - d->y;
             auto dz = _kalmanData.S[KC_STATE_Z] - d->z;
 
-            auto measuredDistance = d->distance;
+            const auto measuredDistance = d->distance;
 
-            auto predictedDistance = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
+            const auto predictedDistance = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
             if (predictedDistance != 0.0f) {
 
                 // The measurement is: z = sqrt(dx^2 + dy^2 + dz^2). The
@@ -1581,8 +1581,8 @@ class Estimator {
 
             //~~~ Body rates ~~~
             // TODO check if this is feasible or if some filtering has to be done
-            auto omegax_b = gyro->x * DEGREES_TO_RADIANS;
-            auto omegay_b = gyro->y * DEGREES_TO_RADIANS;
+            const auto omegax_b = gyro->x * DEGREES_TO_RADIANS;
+            const auto omegay_b = gyro->y * DEGREES_TO_RADIANS;
 
             // ~~~ Moves the body velocity into the global coordinate system ~~~
             // [bar{x},bar{y},bar{z}]_G = R*[bar{x},bar{y},bar{z}]_B
@@ -1708,19 +1708,19 @@ class Estimator {
              * dR = dT + d1 - d0
              */
 
-            auto measurement = tdoa->distanceDiff;
+            const auto measurement = tdoa->distanceDiff;
 
             // predict based on current state
-            auto x = _kalmanData.S[KC_STATE_X];
-            auto y = _kalmanData.S[KC_STATE_Y];
-            auto z = _kalmanData.S[KC_STATE_Z];
+            const auto x = _kalmanData.S[KC_STATE_X];
+            const auto y = _kalmanData.S[KC_STATE_Y];
+            const auto z = _kalmanData.S[KC_STATE_Z];
 
-            auto x1 = tdoa->anchorPositions[1].x;
-            auto y1 = tdoa->anchorPositions[1].y; 
-            auto z1 = tdoa->anchorPositions[1].z;
-            auto x0 = tdoa->anchorPositions[0].x;
-            auto y0 = tdoa->anchorPositions[0].y;
-            auto z0 = tdoa->anchorPositions[0].z;
+            const auto x1 = tdoa->anchorPositions[1].x;
+            const auto y1 = tdoa->anchorPositions[1].y; 
+            const auto z1 = tdoa->anchorPositions[1].z;
+            const auto x0 = tdoa->anchorPositions[0].x;
+            const auto y0 = tdoa->anchorPositions[0].y;
+            const auto z0 = tdoa->anchorPositions[0].z;
 
             auto dx1 = x - x1;
             auto dy1 = y - y1;
@@ -1730,11 +1730,11 @@ class Estimator {
             auto dx0 = x - x0;
             auto dz0 = z - z0;
 
-            auto d1 = sqrtf(powf(dx1, 2) + powf(dy1, 2) + powf(dz1, 2));
-            auto d0 = sqrtf(powf(dx0, 2) + powf(dy0, 2) + powf(dz0, 2));
+            const auto d1 = sqrtf(powf(dx1, 2) + powf(dy1, 2) + powf(dz1, 2));
+            const auto d0 = sqrtf(powf(dx0, 2) + powf(dy0, 2) + powf(dz0, 2));
 
-            auto predicted = d1 - d0;
-            auto error = measurement - predicted;
+            const auto predicted = d1 - d0;
+            const auto error = measurement - predicted;
 
             float h[KC_STATE_DIM] = {};
             arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
@@ -1744,7 +1744,7 @@ class Estimator {
                 h[KC_STATE_Y] = (dy1 / d1 - dy0 / d0);
                 h[KC_STATE_Z] = (dz1 / d1 - dz0 / d0);
 
-                auto sampleIsGood = 
+                const auto sampleIsGood = 
                     _outlierFilterTdoa.validateIntegrator(tdoa, error, nowMs);
 
                 if (sampleIsGood) {
@@ -1764,11 +1764,11 @@ class Estimator {
             if (fabs(_kalmanData.R[2][2]) > 0.1f && _kalmanData.R[2][2] > 0) {
                 auto angle = 
                     fabsf(acosf(_kalmanData.R[2][2])) - DEGREES_TO_RADIANS * (15.0f / 2.0f);
-                if (angle < 0.0f) {
-                    angle = 0.0f;
+                if (angle < 0) {
+                    angle = 0;
                 }
-                auto predictedDistance = _kalmanData.S[KC_STATE_Z] / cosf(angle);
-                auto measuredDistance = tof->distance; // [m]
+                const auto predictedDistance = _kalmanData.S[KC_STATE_Z] / cosf(angle);
+                const auto measuredDistance = tof->distance; // [m]
 
                 // The sensor model (Pg.95-96,
                 // https://lup.lub.lu.se/student-papers/search/publication/8905295)
@@ -1809,31 +1809,36 @@ class Estimator {
         {
             // Measurement equation:
             // d_ij = d_j - d_i
-            auto measurement = 0.0f;
-            auto x = _kalmanData.S[KC_STATE_X];
-            auto y = _kalmanData.S[KC_STATE_Y];
-            auto z = _kalmanData.S[KC_STATE_Z];
+            const auto x = _kalmanData.S[KC_STATE_X];
+            const auto y = _kalmanData.S[KC_STATE_Y];
+            const auto z = _kalmanData.S[KC_STATE_Z];
 
-            auto x1 = tdoa->anchorPositions[1].x; 
-            auto y1 = tdoa->anchorPositions[1].y; 
-            auto z1 = tdoa->anchorPositions[1].z;
-            auto x0 = tdoa->anchorPositions[0].x; 
-            auto y0 = tdoa->anchorPositions[0].y; 
-            auto z0 = tdoa->anchorPositions[0].z;
+            const auto x1 = tdoa->anchorPositions[1].x; 
+            const auto y1 = tdoa->anchorPositions[1].y; 
+            const auto z1 = tdoa->anchorPositions[1].z;
+            const auto x0 = tdoa->anchorPositions[0].x; 
+            const auto y0 = tdoa->anchorPositions[0].y; 
+            const auto z0 = tdoa->anchorPositions[0].z;
 
-            auto dx1 = x - x1;   auto  dy1 = y - y1;   auto dz1 = z - z1;
-            auto dx0 = x - x0;   auto  dy0 = y - y0;   auto dz0 = z - z0;
+            float measurement = 0;
+
+            auto dx1 = x - x1;   
+            auto  dy1 = y - y1;   
+            auto dz1 = z - z1;
+            auto dx0 = x - x0;   
+            auto  dy0 = y - y0;   
+            auto dz0 = z - z0;
 
             auto d1 = sqrtf(powf(dx1, 2) + powf(dy1, 2) + powf(dz1, 2));
             auto d0 = sqrtf(powf(dx0, 2) + powf(dy0, 2) + powf(dz0, 2));
             // if measurements make sense
             if ((d0 != 0.0f) && (d1 != 0.0f)) {
-                auto predicted = d1 - d0;
+                const auto predicted = d1 - d0;
                 measurement = tdoa->distanceDiff;
 
                 // innovation term based on prior x
                 // innovation term based on prior state
-                auto error_check = measurement - predicted;    
+                const auto error_check = measurement - predicted;    
 
                 // ---------------------- matrix defination ----------------------------- //
                 static float P_chol[KC_STATE_DIM][KC_STATE_DIM];
@@ -1931,11 +1936,11 @@ class Estimator {
                     mat_trans(&Pc_m, &Pc_tran_m);
 
                     // decomposition for measurement covariance (scalar case)
-                    auto R_chol = sqrtf(R_iter);
+                    const auto R_chol = sqrtf(R_iter);
 
                     // construct H matrix
                     // X_state updates in each iteration
-                    auto x_iter = X_state[KC_STATE_X],  y_iter = 
+                    const auto x_iter = X_state[KC_STATE_X],  y_iter = 
                         X_state[KC_STATE_Y], z_iter = X_state[KC_STATE_Z];
 
                     dx1 = x_iter - x1;  dy1 = y_iter - y1;   dz1 = z_iter - z1;
@@ -1945,10 +1950,10 @@ class Estimator {
                     d0 = sqrtf(powf(dx0, 2) + powf(dy0, 2) + powf(dz0, 2));
 
                     // predicted measurements in each iteration based on X_state
-                    auto predicted_iter = d1 - d0;                           
+                    const auto predicted_iter = d1 - d0;                           
 
                     // innovation term based on iterated X_state
-                    auto error_iter = measurement - predicted_iter;          
+                    const auto error_iter = measurement - predicted_iter;          
                     auto e_y = error_iter;
 
                     if ((d0 != 0.0f) && (d1 != 0.0f)) {
