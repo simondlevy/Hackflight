@@ -20,12 +20,10 @@
 #include <closedloop.hpp>
 
 #include <ladybug/arduinostl.h>
-
-//#include "oldsrc/arduinostl.h"
-#include "oldsrc/hackflight.h"
-#include "oldsrc/ladybugfc.h"
-#include "oldsrc/core/mixers/fixedpitch/quadxbf.h"
-#include "oldsrc/core/pids/angle.h"
+#include <ladybug/hackflight.h>
+#include <ladybug/ladybugfc.h>
+#include <ladybug/core/mixers/fixedpitch/quadxbf.h>
+#include <ladybug/core/pids/angle.h>
 
 #include <dsmrx.hpp>
 
