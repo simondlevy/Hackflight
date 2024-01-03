@@ -26,7 +26,9 @@
 
 #include <Wire.h>
 
-#include "usfs.hpp"
+#include <usfs.hpp>
+
+#include <kalman.hpp>
 
 // Set to 0 for polling version
 static const uint8_t INTERRUPT_PIN = 12; 
