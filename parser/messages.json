@@ -1,0 +1,61 @@
+{
+  "RC": 
+  [{"ID": 105},
+   {"comment": "16 channels in original"}, 
+   {"c1": "short"}, 
+   {"c2": "short"}, 
+   {"c3": "short"}, 
+   {"c4": "short"}, 
+   {"c5": "short"}, 
+   {"c6": "short"}],
+
+   "ATTITUDE":
+  [{"ID": 108},
+   {"angx": "short"}, 
+   {"angy": "short"}, 
+   {"heading": "short"}],
+
+  "VL53L5": 
+  [{"ID": 121},
+   {"comment": "https://www.tindie.com/products/onehorse/vl53l5cx-ranging-camera/"}, 
+   {"p11": "short"}, 
+   {"p12": "short"}, 
+   {"p13": "short"}, 
+   {"p14": "short"}, 
+   {"p21": "short"}, 
+   {"p22": "short"}, 
+   {"p23": "short"}, 
+   {"p24": "short"}, 
+   {"p31": "short"}, 
+   {"p32": "short"}, 
+   {"p33": "short"}, 
+   {"p34": "short"}, 
+   {"p41": "short"}, 
+   {"p42": "short"}, 
+   {"p43": "short"}, 
+   {"p44": "short"}],
+
+  "PAA3905": 
+  [{"ID": 122},
+   {"comment": "https://www.tindie.com/products/onehorse/paa3905-optical-flow-camera/"}, 
+   {"x": "short"}, 
+   {"y": "short"}],
+
+   "SET_RAW_RC": 
+  [{"ID": 200},
+   {"comment": "16 channels in original "}, 
+   {"c1": "short"},
+   {"c2": "short"},
+   {"c3": "short"},
+   {"c4": "short"},
+   {"c5": "short"},
+   {"c6": "short"}],
+
+   "SET_MOTOR": 
+  [{"ID": 214},
+   {"comment": "16 values in original"}, 
+   {"m1": "short"},
+   {"m2": "short"},
+   {"m3": "short"},
+   {"m4": "short"}]
+}
