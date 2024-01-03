@@ -96,17 +96,14 @@ void setup()
         delay(10);
     }
 
-} // setup
+}
 
 void loop()
 {
     static uint32_t _interruptCount;
 
-    static float temperature, pressure;
     static float ax, ay, az;
     static float gx, gy, gz;
-    static float mx, my, mz; 
-    static float qw, qx, qy, qz;
 
     if ((INTERRUPT_PIN == 0) || _gotNewData) { 
 
@@ -132,27 +129,11 @@ void loop()
 
             usfs.readGyrometerScaled(gx, gy, gz);
         }
-
-        if (Usfs::eventStatusIsMagnetometer(eventStatus)) { 
-
-            usfs.readMagnetometerScaled(mx, my, mz);
-        }
-
-        if (Usfs::eventStatusIsQuaternion(eventStatus)) { 
-            usfs.readQuaternion(qw, qx, qy, qz);
-        }
-
-        if (Usfs::eventStatusIsBarometer(eventStatus)) { 
-            pressure = usfs.readBarometerRaw() * 0.01f + 1013.25f; 
-            temperature = usfs.readTemperatureRaw() * 0.01f; 
-        }
     } 
 
     static uint32_t _msec;
 
     uint32_t msec = millis();
-
-    static float yaw, pitch, roll;
 
     if (msec-_msec > 1000/REPORT_HZ) { 
 
@@ -178,64 +159,7 @@ void loop()
         Serial.print(" Gz = ");
         Serial.print( gz, 2);
         Serial.println(" deg/s");
-        Serial.print("Mx = ");
-        Serial.print( (int)mx);
-        Serial.print(" My = ");
-        Serial.print( (int)my);
-        Serial.print(" Mz = ");
-        Serial.print( (int)mz);
-        Serial.println(" mG");
 
-        Serial.println("Hardware quaternions:");
-        Serial.print("Qw = ");
-        Serial.print(qw);
-        Serial.print(" Qx = ");
-        Serial.print(qx);
-        Serial.print(" Qy = ");
-        Serial.print(qy);
-        Serial.print(" Qz = ");
-        Serial.println(qz);
+    }
 
-        float A12 =   2.0f * (qx * qy + qw * qz);
-        float A22 =   qw * qw + qx * qx - qy * qy - qz * qz;
-        float A31 =   2.0f * (qw * qx + qy * qz);
-        float A32 =   2.0f * (qx * qz - qw * qy);
-        float A33 =   qw * qw - qx * qx - qy * qy + qz * qz;
-        pitch = -asinf(A32);
-        roll  = atan2f(A31, A33);
-        yaw   = atan2f(A12, A22);
-        pitch *= 180.0f / M_PI;
-        yaw   *= 180.0f / M_PI;
-        yaw   += 13.8f; 
-        if (yaw < 0) yaw   += 360.0f ; 
-        roll  *= 180.0f / M_PI;
-
-        Serial.print("Hardware roll, pitch, yaw: ");
-        Serial.print(roll, 2);
-        Serial.print(", ");
-        Serial.print(pitch, 2);
-        Serial.print(", ");
-        Serial.print(yaw, 2);
-        Serial.println(" deg");
-
-        Serial.print("Hardware ax, ay, az: ");
-        Serial.print(ax * 1000, 2);
-        Serial.print(", ");
-        Serial.print(ay * 1000, 2);
-        Serial.print(", ");
-        Serial.print(az * 1000, 2);
-        Serial.println(" g");
-
-        Serial.println("MS5637:");
-        Serial.print("Altimeter temperature = ");
-        Serial.print(temperature, 2);
-        Serial.println(" C"); 
-        Serial.print("Altimeter pressure = ");
-        Serial.print(pressure, 2);
-        Serial.println(" mbar");
-        Serial.print("Altitude = ");
-        Serial.print(44307 * (1.0f - pow(((pressure) / 1013.25f), 0.190284f)));
-        Serial.println(" m\n");
-     } 
-
-}  // loop
+}

@@ -15,7 +15,7 @@ $(DFU): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
 	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIBS) --build-path obj --warnings "all"
 
 upload: $(DFU)
-	../../../utils/dfu-touch.py $(PORT)
+	../../utils/dfu-touch.py $(PORT)
 	$(HOME)/.arduino15/packages/arduino-STM32L4/stm32l4/tools/linux/stm32l4-upload \
 	   	0x1209 0x6669 obj/$(SKETCH).ino.dfu 10
 	rm -rf obj
