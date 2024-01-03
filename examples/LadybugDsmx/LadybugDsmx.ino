@@ -17,7 +17,11 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "oldsrc/arduinostl.h"
+#include <closedloop.hpp>
+
+#include <ladybug/arduinostl.h>
+
+//#include "oldsrc/arduinostl.h"
 #include "oldsrc/hackflight.h"
 #include "oldsrc/ladybugfc.h"
 #include "oldsrc/core/mixers/fixedpitch/quadxbf.h"
