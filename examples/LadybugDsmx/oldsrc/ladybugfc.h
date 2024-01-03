@@ -241,23 +241,6 @@ class LadybugFC {
             return DWT->CYCCNT;
         }
 
-        void runTask(Imu & imu, const Task::id_e id, const uint32_t usec)
-        {
-            switch (id) {
-
-                case Task::ESTIMATOR:
-                    _estimatorTask.run(imu, _vstate, usec);
-                    break;
-
-                case Task::RECEIVER:
-                    _receiverTask.run();
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
         void postRunTask(
                 Task::id_e id,
                 const uint32_t usecStart,
@@ -328,7 +311,19 @@ class LadybugFC {
 
                 const uint32_t usec = micros();
 
-                runTask(imu, id, usec);
+                switch (id) {
+
+                    case Task::ESTIMATOR:
+                        _estimatorTask.run(imu, _vstate, usec);
+                        break;
+
+                    case Task::RECEIVER:
+                        _receiverTask.run();
+                        break;
+
+                    default:
+                        break;
+                }
 
                 postRunTask(id, usec, anticipatedEndCycles);
             } 
