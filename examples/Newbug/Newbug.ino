@@ -28,6 +28,7 @@
 
 #include <usfs.hpp>
 
+#include <clock.hpp>
 #include <kalman.hpp>
 
 // Set to 0 for polling version
@@ -44,6 +45,9 @@ static const uint8_t BARO_RATE       = 50;
 static const uint8_t INTERRUPT_ENABLE = Usfs::INTERRUPT_RESET_REQUIRED |
                                         Usfs::INTERRUPT_ERROR |
                                         Usfs::INTERRUPT_QUAT;
+
+static const uint32_t PREDICT_RATE = Clock::RATE_100_HZ; 
+static const uint32_t PREDICTION_UPDATE_INTERVAL_MS = 1000 / PREDICT_RATE;
 
 static const bool VERBOSE = true;
 
@@ -100,66 +104,44 @@ void setup()
 
 void loop()
 {
-    static uint32_t _interruptCount;
-
-    static float ax, ay, az;
-    static float gx, gy, gz;
+    static Axis3f _accel;
+    static Axis3f _gyro;
 
     if ((INTERRUPT_PIN == 0) || _gotNewData) { 
 
         _gotNewData = false;  
 
-        if (INTERRUPT_PIN) {
-            _interruptCount++;
-        }
-
         uint8_t eventStatus = Usfs::checkStatus(); 
 
         if (Usfs::eventStatusIsError(eventStatus)) { 
-
             Usfs::reportError(eventStatus);
         }
 
         if (Usfs::eventStatusIsAccelerometer(eventStatus)) { 
-
-            usfs.readAccelerometerScaled(ax, ay, az);
+            usfs.readAccelerometerScaled(_accel.x, _accel.y, _accel.z);
         }
 
         if (Usfs::eventStatusIsGyrometer(eventStatus)) { 
-
-            usfs.readGyrometerScaled(gx, gy, gz);
+            usfs.readGyrometerScaled(_gyro.x, _gyro.y, _gyro.z);
         }
     } 
 
-    static uint32_t _msec;
+    static uint32_t _nextPredictionMs;
 
-    uint32_t msec = millis();
+    auto msec = millis();
 
-    if (msec-_msec > 1000/REPORT_HZ) { 
+    if (msec >= _nextPredictionMs) {
 
-        if (INTERRUPT_PIN) {
-            Serial.print("Interrupts/sec: ");
-            Serial.println(_interruptCount * REPORT_HZ);
-        }
+        _kalmanFilter.predict(msec, true); 
 
-        _interruptCount = 0;
-        _msec = msec;
-
-        Serial.print("Ax = ");
-        Serial.print((int)1000 * ax);
-        Serial.print(" Ay = ");
-        Serial.print((int)1000 * ay);
-        Serial.print(" Az = ");
-        Serial.print((int)1000 * az);
-        Serial.println(" g");
-        Serial.print("Gx = ");
-        Serial.print( gx, 2);
-        Serial.print(" Gy = ");
-        Serial.print( gy, 2);
-        Serial.print(" Gz = ");
-        Serial.print( gz, 2);
-        Serial.println(" deg/s");
-
+        _nextPredictionMs = msec + PREDICTION_UPDATE_INTERVAL_MS;
     }
 
+    _kalmanFilter.addProcessNoise(msec);
+
+    _kalmanFilter.updateWithAccel(_accel);
+
+    _kalmanFilter.updateWithGyro(_gyro);
+
+    _kalmanFilter.finalize();
 }
