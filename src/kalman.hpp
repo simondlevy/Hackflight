@@ -68,7 +68,7 @@
 #include <physicalConstants.h>
 #include <datatypes.h>
 
-class Estimator { 
+class KalmanFilter { 
 
     public:
 
