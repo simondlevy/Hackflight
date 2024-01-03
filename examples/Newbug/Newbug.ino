@@ -47,7 +47,7 @@ static const uint8_t INTERRUPT_ENABLE = Usfs::INTERRUPT_RESET_REQUIRED |
 
 static const bool VERBOSE = true;
 
-static const uint8_t REPORT_HZ = 2;
+static const uint8_t REPORT_HZ = 20;
 
 static volatile bool _gotNewData;
 
@@ -57,6 +57,8 @@ static void interruptHandler()
 }
 
 static Usfs usfs;
+
+static KalmanFilter _kalmanFilter;
 
 void setup()
 {
@@ -90,13 +92,9 @@ void setup()
     // Clear interrupts
     Usfs::checkStatus();
 
-    Serial.println("Enter '1' to proceed...");
-    while (true) {
-        if (Serial.read() == '1') {
-            break;
-        }
-        delay(10);
-    }
+    _kalmanFilter.setDefaultParams();
+
+    _kalmanFilter.init(millis());
 
 }
 
