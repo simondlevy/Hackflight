@@ -40,9 +40,10 @@ static std::map<std::string, joystickAxes_t> JOYSTICK__AXIS_MAP = {
     { "Horizon Hobby SPEKTRUM RECEIVER",     joystickAxes_t { 2,  3,  4, 1 } },
 
     // Windows
-    { "SPEKTRUM RECEIVER",                   joystickAxes_t { 3,  2,  1, 4 } },  
-    { "FrSky Simulator",                     joystickAxes_t { 6,  5,  4, 3 } },
+    { "2In1 USB Joystick",                   joystickAxes_t {-1,  4, -3, 2 } },
     { "Controller (XBOX 360 For Windows)",   joystickAxes_t {-1,  4, -3, 2 } },
+    { "FrSky Simulator",                     joystickAxes_t { 6,  5,  4, 3 } },
+    { "SPEKTRUM RECEIVER",                   joystickAxes_t { 3,  2,  1, 4 } },  
 };
 
 static float scaleJoystickAxis(const int32_t rawval)
