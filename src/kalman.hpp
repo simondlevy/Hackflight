@@ -319,32 +319,32 @@ class Estimator {
             }
 
             // Incorporate the attitude error (Kalman filter state) with the attitude
-            float v0 = _kalmanData.S[KC_STATE_D0];
-            float v1 = _kalmanData.S[KC_STATE_D1];
-            float v2 = _kalmanData.S[KC_STATE_D2];
+            auto v0 = _kalmanData.S[KC_STATE_D0];
+            auto v1 = _kalmanData.S[KC_STATE_D1];
+            auto v2 = _kalmanData.S[KC_STATE_D2];
 
             // Move attitude error into attitude if any of the angle errors are
             // large enough
             if ((fabsf(v0) > 0.1e-3f || fabsf(v1) > 0.1e-3f || fabsf(v2) >
                         0.1e-3f) && (fabsf(v0) < 10 && fabsf(v1) < 10 &&
                             fabsf(v2) < 10)) {
-                float angle = fast_sqrt(v0*v0 + v1*v1 + v2*v2) + EPS;
-                float ca = arm_cos_f32(angle / 2.0f);
-                float sa = arm_sin_f32(angle / 2.0f);
+                auto angle = fast_sqrt(v0*v0 + v1*v1 + v2*v2) + EPS;
+                auto ca = arm_cos_f32(angle / 2.0f);
+                auto sa = arm_sin_f32(angle / 2.0f);
                 float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
 
                 // rotate the quad's attitude by the delta quaternion vector computed above
-                float tmpq0 = dq[0] * _kalmanData.q[0] - dq[1] * _kalmanData.q[1] - 
+                auto tmpq0 = dq[0] * _kalmanData.q[0] - dq[1] * _kalmanData.q[1] - 
                     dq[2] * _kalmanData.q[2] - dq[3] * _kalmanData.q[3];
-                float tmpq1 = dq[1] * _kalmanData.q[0] + dq[0] * _kalmanData.q[1] + 
+                auto tmpq1 = dq[1] * _kalmanData.q[0] + dq[0] * _kalmanData.q[1] + 
                     dq[3] * _kalmanData.q[2] - dq[2] * _kalmanData.q[3];
-                float tmpq2 = dq[2] * _kalmanData.q[0] - dq[3] * _kalmanData.q[1] + 
+                auto tmpq2 = dq[2] * _kalmanData.q[0] - dq[3] * _kalmanData.q[1] + 
                     dq[0] * _kalmanData.q[2] + dq[1] * _kalmanData.q[3];
-                float tmpq3 = dq[3] * _kalmanData.q[0] + dq[2] * _kalmanData.q[1] - 
+                auto tmpq3 = dq[3] * _kalmanData.q[0] + dq[2] * _kalmanData.q[1] - 
                     dq[1] * _kalmanData.q[2] + dq[0] * _kalmanData.q[3];
 
                 // normalize and store the result
-                float norm = fast_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
+                auto norm = fast_sqrt(tmpq0 * tmpq0 + tmpq1 * tmpq1 + tmpq2 * tmpq2 + 
                         tmpq3 * tmpq3) + EPS;
                 _kalmanData.q[0] = tmpq0 / norm;
                 _kalmanData.q[1] = tmpq1 / norm;
@@ -438,7 +438,7 @@ class Estimator {
             // stay bounded
             for (int i=0; i<KC_STATE_DIM; i++) {
                 for (int j=i; j<KC_STATE_DIM; j++) {
-                    float p = 0.5f*_kalmanData.P[i][j] + 0.5f*_kalmanData.P[j][i];
+                    auto p = 0.5f*_kalmanData.P[i][j] + 0.5f*_kalmanData.P[j][i];
                     if (isnan(p) || p > MAX_COVARIANCE) {
                         _kalmanData.P[i][j] = _kalmanData.P[j][i] = MAX_COVARIANCE;
                     } else if ( i==j && p < MIN_COVARIANCE ) {
@@ -467,7 +467,7 @@ class Estimator {
 
         void addProcessNoise(const uint32_t nowMs) 
         {
-            float dt = (nowMs - _kalmanData.lastProcessNoiseUpdateMs) / 1000.0f;
+            auto dt = (nowMs - _kalmanData.lastProcessNoiseUpdateMs) / 1000.0f;
 
             if (dt > 0.0f) {
                 addProcessNoiseDt(dt);
@@ -764,15 +764,15 @@ class Estimator {
 
         static void GM_UWB(float e, float * GM_e)
         {
-            float sigma = 2.0;
-            float GM_dn = sigma + e*e;
+            auto sigma = 2.0f;
+            auto GM_dn = sigma + e*e;
             *GM_e = (sigma * sigma)/(GM_dn * GM_dn);
         }
 
         static void GM_state(float e, float * GM_e)
         {
-            float sigma = 1.5;
-            float GM_dn = sigma + e*e;
+            auto sigma = 1.5f;
+            auto GM_dn = sigma + e*e;
             *GM_e = (sigma * sigma)/(GM_dn * GM_dn);
         }
 
@@ -1023,9 +1023,9 @@ class Estimator {
              Attitude"
              * http://arc.aiaa.org/doi/abs/10.2514/1.G000848
              */
-            float d0 = gyro->x*dt/2;
-            float d1 = gyro->y*dt/2;
-            float d2 = gyro->z*dt/2;
+            auto d0 = gyro->x*dt/2;
+            auto d1 = gyro->y*dt/2;
+            auto d2 = gyro->z*dt/2;
 
             A[KC_STATE_D0][KC_STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
             A[KC_STATE_D0][KC_STATE_D1] =  d2 + d0*d1/2;
@@ -1050,22 +1050,18 @@ class Estimator {
             // When flying, the accelerometer directly measures thrust (hence is useless
             // to estimate body angle while flying)
 
-            float dx, dy, dz;
-            float tmpSPX, tmpSPY, tmpSPZ;
-            float zacc;
-
-            float dt2 = dt*dt;
+            auto dt2 = dt*dt;
 
             if (quadIsFlying) { // only acceleration in z direction
 
                 // Use accelerometer and not commanded thrust, as this has
                 // proper physical units
-                zacc = acc->z;
+                auto zacc = acc->z;
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                dx = _kalmanData.S[KC_STATE_PX] * dt;
-                dy = _kalmanData.S[KC_STATE_PY] * dt;
-                dz = _kalmanData.S[KC_STATE_PZ] * dt + zacc * dt2 / 2.0f; 
+                auto dx = _kalmanData.S[KC_STATE_PX] * dt;
+                auto dy = _kalmanData.S[KC_STATE_PY] * dt;
+                auto dz = _kalmanData.S[KC_STATE_PZ] * dt + zacc * dt2 / 2.0f; 
                 // thrust can only be produced in the body's Z direction
 
                 // position update
@@ -1078,9 +1074,9 @@ class Estimator {
                     GRAVITY_MAGNITUDE * dt2 / 2.0f;
 
                 // keep previous time step's state for the update
-                tmpSPX = _kalmanData.S[KC_STATE_PX];
-                tmpSPY = _kalmanData.S[KC_STATE_PY];
-                tmpSPZ = _kalmanData.S[KC_STATE_PZ];
+                auto tmpSPX = _kalmanData.S[KC_STATE_PX];
+                auto tmpSPY = _kalmanData.S[KC_STATE_PY];
+                auto tmpSPZ = _kalmanData.S[KC_STATE_PZ];
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
@@ -1096,9 +1092,9 @@ class Estimator {
                 // accelerometer. This occurs, eg. in freefall or while being carried.
 
                 // position updates in the body frame (will be rotated to inertial frame)
-                dx = _kalmanData.S[KC_STATE_PX] * dt + acc->x * dt2 / 2.0f;
-                dy = _kalmanData.S[KC_STATE_PY] * dt + acc->y * dt2 / 2.0f;
-                dz = _kalmanData.S[KC_STATE_PZ] * dt + acc->z * dt2 / 2.0f; 
+                auto dx = _kalmanData.S[KC_STATE_PX] * dt + acc->x * dt2 / 2.0f;
+                auto dy = _kalmanData.S[KC_STATE_PY] * dt + acc->y * dt2 / 2.0f;
+                auto dz = _kalmanData.S[KC_STATE_PZ] * dt + acc->z * dt2 / 2.0f; 
                 // thrust can only be produced in the body's Z direction
 
                 // position update
@@ -1111,9 +1107,9 @@ class Estimator {
                     GRAVITY_MAGNITUDE * dt2 / 2.0f;
 
                 // keep previous time step's state for the update
-                tmpSPX = _kalmanData.S[KC_STATE_PX];
-                tmpSPY = _kalmanData.S[KC_STATE_PY];
-                tmpSPZ = _kalmanData.S[KC_STATE_PZ];
+                auto tmpSPX = _kalmanData.S[KC_STATE_PX];
+                auto tmpSPY = _kalmanData.S[KC_STATE_PY];
+                auto tmpSPZ = _kalmanData.S[KC_STATE_PZ];
 
                 // Body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
@@ -1127,33 +1123,28 @@ class Estimator {
 
             // Attitude update (rotate by gyroscope), we do this in quaternions
             // this is the gyroscope angular velocity integrated over the sample period
-            float dtwx = dt*gyro->x;
-            float dtwy = dt*gyro->y;
-            float dtwz = dt*gyro->z;
+            auto dtwx = dt*gyro->x;
+            auto dtwy = dt*gyro->y;
+            auto dtwz = dt*gyro->z;
 
             // compute the quaternion values in [w,x,y,z] order
-            float angle = fast_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPS;
-            float ca = arm_cos_f32(angle/2.0f);
-            float sa = arm_sin_f32(angle/2.0f);
+            auto angle = fast_sqrt(dtwx*dtwx + dtwy*dtwy + dtwz*dtwz) + EPS;
+            auto ca = arm_cos_f32(angle/2.0f);
+            auto sa = arm_sin_f32(angle/2.0f);
             float dq[4] = {ca , sa*dtwx/angle , sa*dtwy/angle , sa*dtwz/angle};
-
-            float tmpq0;
-            float tmpq1;
-            float tmpq2;
-            float tmpq3;
 
             // Rotate the quad's attitude by the delta quaternion vector computed above
 
-            tmpq0 = dq[0]*_kalmanData.q[0] - dq[1]*_kalmanData.q[1] - 
+            auto tmpq0 = dq[0]*_kalmanData.q[0] - dq[1]*_kalmanData.q[1] - 
                 dq[2]*_kalmanData.q[2] - dq[3]*_kalmanData.q[3];
 
-            tmpq1 = dq[1]*_kalmanData.q[0] + dq[0]*_kalmanData.q[1] + 
+            auto tmpq1 = dq[1]*_kalmanData.q[0] + dq[0]*_kalmanData.q[1] + 
                 dq[3]*_kalmanData.q[2] - dq[2]*_kalmanData.q[3];
 
-            tmpq2 = dq[2]*_kalmanData.q[0] - dq[3]*_kalmanData.q[1] + 
+            auto tmpq2 = dq[2]*_kalmanData.q[0] - dq[3]*_kalmanData.q[1] + 
                 dq[0]*_kalmanData.q[2] + dq[1]*_kalmanData.q[3];
 
-            tmpq3 = dq[3]*_kalmanData.q[0] + dq[2]*_kalmanData.q[1] - 
+            auto tmpq3 = dq[3]*_kalmanData.q[0] + dq[2]*_kalmanData.q[1] - 
                 dq[1]*_kalmanData.q[2] + dq[0]*_kalmanData.q[3];
 
             if (! quadIsFlying) {
@@ -1237,8 +1228,8 @@ class Estimator {
 
             mat_trans(Hm, HTm);
             mat_mult(&_kalmanData.Pm, HTm, PHTm); // PH'
-            float R = stdMeasNoise*stdMeasNoise;
-            float HPHR = R; // HPH' + R
+            auto R = stdMeasNoise*stdMeasNoise;
+            auto HPHR = R; // HPH' + R
             for (int i=0; i<KC_STATE_DIM; i++) { 
 
                 // Add the element of HPH' to the above
@@ -1306,17 +1297,17 @@ class Estimator {
         // robust update function
         void robustUpdateWithDistance(distanceMeasurement_t *d)
         {
-            float dx = _kalmanData.S[KC_STATE_X] - d->x;
-            float dy = _kalmanData.S[KC_STATE_Y] - d->y;
-            float dz = _kalmanData.S[KC_STATE_Z] - d->z;
-            float measuredDistance = d->distance;
+            auto dx = _kalmanData.S[KC_STATE_X] - d->x;
+            auto dy = _kalmanData.S[KC_STATE_Y] - d->y;
+            auto dz = _kalmanData.S[KC_STATE_Z] - d->z;
+            auto measuredDistance = d->distance;
 
-            float predictedDistance = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
+            auto predictedDistance = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
 
             // innovation term based on x_check
 
             // innovation term based on prior state
-            float error_check = measuredDistance - predictedDistance;    
+            auto error_check = measuredDistance - predictedDistance;    
 
             // ---------------------- matrix defination -----------------------------
             static float P_chol[KC_STATE_DIM][KC_STATE_DIM]; 
@@ -1395,19 +1386,19 @@ class Estimator {
                 mat_trans(&Pc_m, &Pc_tran_m);
 
                 // decomposition for measurement covariance (scalar case)
-                float R_chol = sqrtf(R_iter);       
+                auto R_chol = sqrtf(R_iter);       
                 // construct H matrix
                 // X_state updates in each iteration
-                float x_iter = X_state[KC_STATE_X];
-                float   y_iter = X_state[KC_STATE_Y];
-                float  z_iter = X_state[KC_STATE_Z];   
+                auto x_iter = X_state[KC_STATE_X];
+                auto   y_iter = X_state[KC_STATE_Y];
+                auto  z_iter = X_state[KC_STATE_Z];   
                 dx = x_iter - d->x;  dy = y_iter - d->y;   dz = z_iter - d->z;
 
-                float predicted_iter = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
+                auto predicted_iter = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
                 // innovation term based on x_check
-                float error_iter = measuredDistance - predicted_iter; 
+                auto error_iter = measuredDistance - predicted_iter; 
 
-                float e_y = error_iter;
+                auto e_y = error_iter;
 
                 if (predicted_iter != 0.0f) {
 
@@ -1444,7 +1435,7 @@ class Estimator {
                 }
                 // Matrix inversion is numerically sensitive.
                 // Add small values on the diagonal of P_chol to avoid numerical problems.
-                float dummy_value = 1e-9f;
+                auto dummy_value = 1e-9f;
                 for (int k=0; k<KC_STATE_DIM; k++){
                     P_chol[k][k] = P_chol[k][k] + dummy_value;
                 }
@@ -1457,7 +1448,7 @@ class Estimator {
                 // Since w_x is diagnal matrix, directly compute the inverse
                 for (int state_k = 0; state_k < KC_STATE_DIM; state_k++){
                     GM_state(e_x[state_k], &wx_inv[state_k][state_k]);
-                    wx_inv[state_k][state_k] = (float)1.0 / wx_inv[state_k][state_k];
+                    wx_inv[state_k][state_k] = 1 / wx_inv[state_k][state_k];
                 }
 
                 // rescale covariance matrix P 
@@ -1470,7 +1461,8 @@ class Estimator {
                 mat_mult(&Pc_w_invm, &Pc_tran_m, &P_w_m);        
 
                 // rescale R matrix                 
-                float w_y=0.0;      float R_w = 0.0f;
+                float w_y = 0;
+                float R_w = 0;
                 GM_UWB(e_y, &w_y);// compute the weighted measurement error: w_y
                 if (fabsf(w_y - 0.0f) < 0.0001f){
                     R_w = (R_chol * R_chol) / 0.0001f;
@@ -1487,7 +1479,7 @@ class Estimator {
 
 
                 // HPH' + R.            The R is the updated R_w 
-                float HPHR = R_w;                     
+                auto HPHR = R_w;                     
 
                 // Add the element of HPH' to the above
                 for (int i=0; i<KC_STATE_DIM; i++) {  
@@ -1546,13 +1538,13 @@ class Estimator {
             float h[KC_STATE_DIM] = {};
             arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
 
-            float dx = _kalmanData.S[KC_STATE_X] - d->x;
-            float dy = _kalmanData.S[KC_STATE_Y] - d->y;
-            float dz = _kalmanData.S[KC_STATE_Z] - d->z;
+            auto dx = _kalmanData.S[KC_STATE_X] - d->x;
+            auto dy = _kalmanData.S[KC_STATE_Y] - d->y;
+            auto dz = _kalmanData.S[KC_STATE_Z] - d->z;
 
-            float measuredDistance = d->distance;
+            auto measuredDistance = d->distance;
 
-            float predictedDistance = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
+            auto predictedDistance = fast_sqrt(powf(dx, 2) + powf(dy, 2) + powf(dz, 2));
             if (predictedDistance != 0.0f) {
 
                 // The measurement is: z = sqrt(dx^2 + dy^2 + dz^2). The
@@ -1580,17 +1572,17 @@ class Estimator {
             // The angle of aperture is guessed from the raw data register and
             // thankfully look to be symmetric
 
-            float Npix = 35.0;                      // [pixels] (same in x and y)
+            float Npix = 35;                      // [pixels] (same in x and y)
             //float thetapix = DEGREES_TO_RADIANS * 4.0f;     // [rad]    (same in x and y)
 
             // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
             // corresponding ground length
-            float thetapix = 0.71674f;
+            float thetapix = 0.71674;
 
             //~~~ Body rates ~~~
             // TODO check if this is feasible or if some filtering has to be done
-            float omegax_b = gyro->x * DEGREES_TO_RADIANS;
-            float omegay_b = gyro->y * DEGREES_TO_RADIANS;
+            auto omegax_b = gyro->x * DEGREES_TO_RADIANS;
+            auto omegay_b = gyro->y * DEGREES_TO_RADIANS;
 
             // ~~~ Moves the body velocity into the global coordinate system ~~~
             // [bar{x},bar{y},bar{z}]_G = R*[bar{x},bar{y},bar{z}]_B
@@ -1608,9 +1600,9 @@ class Estimator {
             //  S[KC_STATE_PZ];
 
 
-            float dx_g = _kalmanData.S[KC_STATE_PX];
-            float dy_g = _kalmanData.S[KC_STATE_PY];
-            float z_g = 0.0;
+            auto dx_g = _kalmanData.S[KC_STATE_PX];
+            auto dy_g = _kalmanData.S[KC_STATE_PY];
+            float z_g = 0;
             // Saturate elevation in prediction and correction to avoid singularities
             if ( _kalmanData.S[KC_STATE_Z] < 0.1f ) {
                 z_g = 0.1;
@@ -1716,33 +1708,33 @@ class Estimator {
              * dR = dT + d1 - d0
              */
 
-            float measurement = tdoa->distanceDiff;
+            auto measurement = tdoa->distanceDiff;
 
             // predict based on current state
-            float x = _kalmanData.S[KC_STATE_X];
-            float y = _kalmanData.S[KC_STATE_Y];
-            float z = _kalmanData.S[KC_STATE_Z];
+            auto x = _kalmanData.S[KC_STATE_X];
+            auto y = _kalmanData.S[KC_STATE_Y];
+            auto z = _kalmanData.S[KC_STATE_Z];
 
-            float x1 = tdoa->anchorPositions[1].x;
-            float y1 = tdoa->anchorPositions[1].y; 
-            float z1 = tdoa->anchorPositions[1].z;
-            float x0 = tdoa->anchorPositions[0].x;
-            float y0 = tdoa->anchorPositions[0].y;
-            float z0 = tdoa->anchorPositions[0].z;
+            auto x1 = tdoa->anchorPositions[1].x;
+            auto y1 = tdoa->anchorPositions[1].y; 
+            auto z1 = tdoa->anchorPositions[1].z;
+            auto x0 = tdoa->anchorPositions[0].x;
+            auto y0 = tdoa->anchorPositions[0].y;
+            auto z0 = tdoa->anchorPositions[0].z;
 
-            float dx1 = x - x1;
-            float dy1 = y - y1;
-            float dz1 = z - z1;
+            auto dx1 = x - x1;
+            auto dy1 = y - y1;
+            auto dz1 = z - z1;
 
-            float dy0 = y - y0;
-            float dx0 = x - x0;
-            float dz0 = z - z0;
+            auto dy0 = y - y0;
+            auto dx0 = x - x0;
+            auto dz0 = z - z0;
 
-            float d1 = sqrtf(powf(dx1, 2) + powf(dy1, 2) + powf(dz1, 2));
-            float d0 = sqrtf(powf(dx0, 2) + powf(dy0, 2) + powf(dz0, 2));
+            auto d1 = sqrtf(powf(dx1, 2) + powf(dy1, 2) + powf(dz1, 2));
+            auto d0 = sqrtf(powf(dx0, 2) + powf(dy0, 2) + powf(dz0, 2));
 
-            float predicted = d1 - d0;
-            float error = measurement - predicted;
+            auto predicted = d1 - d0;
+            auto error = measurement - predicted;
 
             float h[KC_STATE_DIM] = {};
             arm_matrix_instance_f32 H = {1, KC_STATE_DIM, h};
@@ -1752,7 +1744,7 @@ class Estimator {
                 h[KC_STATE_Y] = (dy1 / d1 - dy0 / d0);
                 h[KC_STATE_Z] = (dz1 / d1 - dz0 / d0);
 
-                bool sampleIsGood = 
+                auto sampleIsGood = 
                     _outlierFilterTdoa.validateIntegrator(tdoa, error, nowMs);
 
                 if (sampleIsGood) {
@@ -1770,13 +1762,13 @@ class Estimator {
             // Only update the filter if the measurement is reliable 
             // (\hat{h} -> infty when R[2][2] -> 0)
             if (fabs(_kalmanData.R[2][2]) > 0.1f && _kalmanData.R[2][2] > 0) {
-                float angle = 
+                auto angle = 
                     fabsf(acosf(_kalmanData.R[2][2])) - DEGREES_TO_RADIANS * (15.0f / 2.0f);
                 if (angle < 0.0f) {
                     angle = 0.0f;
                 }
-                float predictedDistance = _kalmanData.S[KC_STATE_Z] / cosf(angle);
-                float measuredDistance = tof->distance; // [m]
+                auto predictedDistance = _kalmanData.S[KC_STATE_Z] / cosf(angle);
+                auto measuredDistance = tof->distance; // [m]
 
                 // The sensor model (Pg.95-96,
                 // https://lup.lub.lu.se/student-papers/search/publication/8905295)
@@ -1817,31 +1809,31 @@ class Estimator {
         {
             // Measurement equation:
             // d_ij = d_j - d_i
-            float measurement = 0.0f;
-            float x = _kalmanData.S[KC_STATE_X];
-            float y = _kalmanData.S[KC_STATE_Y];
-            float z = _kalmanData.S[KC_STATE_Z];
+            auto measurement = 0.0f;
+            auto x = _kalmanData.S[KC_STATE_X];
+            auto y = _kalmanData.S[KC_STATE_Y];
+            auto z = _kalmanData.S[KC_STATE_Z];
 
-            float x1 = tdoa->anchorPositions[1].x; 
-            float y1 = tdoa->anchorPositions[1].y; 
-            float z1 = tdoa->anchorPositions[1].z;
-            float x0 = tdoa->anchorPositions[0].x; 
-            float y0 = tdoa->anchorPositions[0].y; 
-            float z0 = tdoa->anchorPositions[0].z;
+            auto x1 = tdoa->anchorPositions[1].x; 
+            auto y1 = tdoa->anchorPositions[1].y; 
+            auto z1 = tdoa->anchorPositions[1].z;
+            auto x0 = tdoa->anchorPositions[0].x; 
+            auto y0 = tdoa->anchorPositions[0].y; 
+            auto z0 = tdoa->anchorPositions[0].z;
 
-            float dx1 = x - x1;   float  dy1 = y - y1;   float dz1 = z - z1;
-            float dx0 = x - x0;   float  dy0 = y - y0;   float dz0 = z - z0;
+            auto dx1 = x - x1;   auto  dy1 = y - y1;   auto dz1 = z - z1;
+            auto dx0 = x - x0;   auto  dy0 = y - y0;   auto dz0 = z - z0;
 
-            float d1 = sqrtf(powf(dx1, 2) + powf(dy1, 2) + powf(dz1, 2));
-            float d0 = sqrtf(powf(dx0, 2) + powf(dy0, 2) + powf(dz0, 2));
+            auto d1 = sqrtf(powf(dx1, 2) + powf(dy1, 2) + powf(dz1, 2));
+            auto d0 = sqrtf(powf(dx0, 2) + powf(dy0, 2) + powf(dz0, 2));
             // if measurements make sense
             if ((d0 != 0.0f) && (d1 != 0.0f)) {
-                float predicted = d1 - d0;
+                auto predicted = d1 - d0;
                 measurement = tdoa->distanceDiff;
 
                 // innovation term based on prior x
                 // innovation term based on prior state
-                float error_check = measurement - predicted;    
+                auto error_check = measurement - predicted;    
 
                 // ---------------------- matrix defination ----------------------------- //
                 static float P_chol[KC_STATE_DIM][KC_STATE_DIM];
@@ -1924,7 +1916,7 @@ class Estimator {
                 memcpy(P_iter, _kalmanData.P, sizeof(P_iter));                 
 
                 // measurement covariance
-                float R_iter = tdoa->stdDev * tdoa->stdDev;                    
+                auto R_iter = tdoa->stdDev * tdoa->stdDev;                    
 
                 // copy Xpr to X_State and then update in each iterations
                 memcpy(X_state, _kalmanData.S, sizeof(X_state));                     
@@ -1939,11 +1931,11 @@ class Estimator {
                     mat_trans(&Pc_m, &Pc_tran_m);
 
                     // decomposition for measurement covariance (scalar case)
-                    float R_chol = sqrtf(R_iter);
+                    auto R_chol = sqrtf(R_iter);
 
                     // construct H matrix
                     // X_state updates in each iteration
-                    float x_iter = X_state[KC_STATE_X],  y_iter = 
+                    auto x_iter = X_state[KC_STATE_X],  y_iter = 
                         X_state[KC_STATE_Y], z_iter = X_state[KC_STATE_Z];
 
                     dx1 = x_iter - x1;  dy1 = y_iter - y1;   dz1 = z_iter - z1;
@@ -1953,11 +1945,11 @@ class Estimator {
                     d0 = sqrtf(powf(dx0, 2) + powf(dy0, 2) + powf(dz0, 2));
 
                     // predicted measurements in each iteration based on X_state
-                    float predicted_iter = d1 - d0;                           
+                    auto predicted_iter = d1 - d0;                           
 
                     // innovation term based on iterated X_state
-                    float error_iter = measurement - predicted_iter;          
-                    float e_y = error_iter;
+                    auto error_iter = measurement - predicted_iter;          
+                    auto e_y = error_iter;
 
                     if ((d0 != 0.0f) && (d1 != 0.0f)) {
 
@@ -2013,7 +2005,8 @@ class Estimator {
                         mat_mult(&Pc_m, &wx_invm, &Pc_w_invm);                
                         mat_mult(&Pc_w_invm, &Pc_tran_m, &P_w_m);             
                         // rescale R matrix
-                        float w_y=0.0;      float R_w = 0.0f;
+                        float w_y = 0;      
+                        float R_w = 0;
                         GM_UWB(e_y, &w_y);                                    
                         if (fabsf(w_y - 0.0f) < 0.0001f){
                             R_w = (R_chol * R_chol) / 0.0001f;
@@ -2054,6 +2047,5 @@ class Estimator {
                 updateWithPKE(&H, &Kwm, &P_w_m, error_check);
             }
         }
-
 
 }; // class Estimator
