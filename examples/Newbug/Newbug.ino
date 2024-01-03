@@ -1,7 +1,7 @@
 /* 
    USFS interrupt example
 
-   Copyright (C) 2022 TleraCorp && Simon D. Levy
+   Copyright (C) 2024 Simon D. Levy
 
    Adapted from
 

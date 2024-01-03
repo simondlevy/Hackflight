@@ -5,14 +5,14 @@ FQBN = arduino-STM32L4:stm32l4:Ladybug-L432KC-FC
 PORT = /dev/ttyACM0
 
 HFLIB = ../../
-LIB = ../../../..
+LIBS = ../../../
 DFU = obj/$(SKETCH).ino.dfu 
 SRC = $(HFLIB)/src
 
 all: $(DFU)
 
 $(DFU): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
-	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) --build-path obj --warnings "all"
+	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIBS) --build-path obj --warnings "all"
 
 upload: $(DFU)
 	../../../utils/dfu-touch.py $(PORT)
