@@ -42,6 +42,7 @@ static std::map<std::string, joystickAxes_t> JOYSTICK__AXIS_MAP = {
     // Windows
     { "2In1 USB Joystick",                   joystickAxes_t {-1,  4, -3, 2 } },
     { "Controller (XBOX 360 For Windows)",   joystickAxes_t {-1,  4, -3, 2 } },
+    { "Logitech Extreme 3D",                 joystickAxes_t { 0,  2, -1, 3 } },
     { "FrSky Simulator",                     joystickAxes_t { 6,  5,  4, 3 } },
     { "SPEKTRUM RECEIVER",                   joystickAxes_t { 3,  2,  1, 4 } },  
 };
@@ -63,9 +64,7 @@ static float readJoystickAxis(const int8_t index)
     return scaleJoystickAxis(readJoystickRaw(index));
 }
 
-// Starting at low throttle (as we should) produces an initial stick value of
-// zero.  So we check for this and adjust as needed.
-static float readJoystickThrust(const joystickAxes_t axes)
+static float readThrottleNormal(joystickAxes_t axes)
 {
     static bool didMoveStick;
 
@@ -78,13 +77,44 @@ static float readJoystickThrust(const joystickAxes_t axes)
     return didMoveStick ? scaleJoystickAxis(raw) : -1;
 }
 
+static float readThrottleExtremeWindows(void)
+{
+    static bool didWarn;
+
+    if (!didWarn) {
+           printf("Use trigger to climb, side-button to descend\n");
+    }
+
+    didWarn = true;
+
+    auto button = wb_joystick_get_pressed_button();
+
+    return button == 0 ? + 0.5 : button == 1 ? -0.5 : 0;
+}
+
+// Special handling for throttle stick: 
+//
+// 1. Check for Logitech Extreme Pro 3D on Windows; have to use buttons for throttle.
+//
+// 2. Starting at low throttle (as we should) produces an initial stick value
+// of zero.  So we check for this and adjust as needed.
+//
+static float readJoystickThrust(const char * name, const joystickAxes_t axes)
+{
+    return !strcmp(name, "Logitech Extreme 3D") ? 
+        readThrottleExtremeWindows() : 
+        readThrottleNormal(axes);
+}
+
 static demands_t readJoystick(void)
 {
-    auto axes = JOYSTICK__AXIS_MAP[wb_joystick_get_model()];
+    auto joyname = wb_joystick_get_model();
+
+    auto axes = JOYSTICK__AXIS_MAP[joyname];
 
     return demands_t {
 
-        readJoystickThrust(axes), 
+        readJoystickThrust(joyname, axes), 
             -readJoystickAxis(axes.roll),  // postive roll-leftward
             readJoystickAxis(axes.pitch), 
             readJoystickAxis(axes.yaw)
@@ -139,7 +169,7 @@ static joystickStatus_e haveJoystick(void)
 {
     auto status = JOYSTICK_RECOGNIZED;
 
-    const char * joyname = wb_joystick_get_model();
+    auto joyname = wb_joystick_get_model();
 
     // No joystick
     if (joyname == NULL) {
@@ -195,7 +225,8 @@ static demands_t sticksRead(void)
 {
     auto joystickStatus = haveJoystick();
 
-    return joystickStatus == JOYSTICK_RECOGNIZED ? readJoystick() : 
+    return 
+        joystickStatus == JOYSTICK_RECOGNIZED ? readJoystick() : 
         joystickStatus == JOYSTICK_UNRECOGNIZED ? reportJoystick() :
         readKeyboard();
 }
