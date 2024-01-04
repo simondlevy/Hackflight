@@ -588,7 +588,7 @@ class LadybugFC {
                 fabsf(_state.phi) < MAX_ARMING_ANGLE_DEG &&
                 fabsf(_state.theta) < MAX_ARMING_ANGLE_DEG;
 
-            const auto gyroDoneCalibrating = false; // XXX
+            const auto gyroDoneCalibrating = true; // XXX
 
             const auto haveReceiverSignal = _receiverTask.haveSignal(usec);
 
