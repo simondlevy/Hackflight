@@ -34,7 +34,7 @@ class QuadXbfMixer {
 
     private:
 
-        static void fun(const Demands & demands, float motors[])
+        static void fun(const demands_t & demands, float motors[])
         {
             Axes SPINS[4] = {
                 //  rol   pit    yaw

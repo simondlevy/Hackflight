@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "demands.h"
 #include "utils.h"
 #include "datatypes.h"
 
@@ -33,7 +32,7 @@ class PidController {
     protected:
 
          virtual void modifyDemands(
-                Demands & demands,
+                demands_t & demands,
                 const int32_t dusec,
                 const vehicleState_t & state,
                 const bool reset) = 0;
@@ -45,7 +44,7 @@ class PidController {
         static constexpr float DT = PERIOD * 1e-6f;
 
          void update(
-                Demands & demands,
+                demands_t & demands,
                 const uint32_t usec,
                 const vehicleState_t & state,
                 const bool reset)
@@ -61,7 +60,7 @@ class PidController {
 
          static void run(
                  std::vector<PidController *> & pidControllers,
-                 Demands & demands,
+                 demands_t & demands,
                  const vehicleState_t & state,
                  const uint32_t usec,
                  const bool reset)

@@ -30,7 +30,7 @@ class FixedPitchMixer : public Mixer {
     public:
 
         static void fun(
-                const Demands & demands,
+                const demands_t & demands,
                 const uint8_t motorCount,
                 const Axes spins[],
                 float motorvals[])
@@ -56,14 +56,14 @@ class FixedPitchMixer : public Mixer {
 
             float motorRange = mixMax - mixMin;
 
-            float throttle = demands.throttle;
+            float throttle = demands.thrust;
 
             if (motorRange > 1.0f) {
                 for (auto i=0; i<motorCount; i++) {
                     mix[i] /= motorRange;
                 }
             } else {
-                if (demands.throttle > 0.5f) {
+                if (demands.thrust > 0.5f) {
                     throttle = constrain_f(throttle, -mixMin, 1.0f - mixMax);
                 }
             }

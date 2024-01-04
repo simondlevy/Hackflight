@@ -130,7 +130,9 @@ class LadybugFC {
 
                     _imu.gyroRawToFilteredDps(rawGyro, _state);
 
-                    Demands demands = _receiverTask.modifyDemands();
+                    demands_t demands = {0, 0, 0, 0};
+
+                    _receiverTask.getDemands(demands);
 
                     auto pidReset = _receiverTask.throttleIsDown();
 

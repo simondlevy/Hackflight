@@ -143,7 +143,7 @@ class ReceiverTask : public Task {
             m_rawYaw = getRawYaw();
         }
 
-        auto modifyDemands(void) -> Demands 
+        void getDemands(demands_t & demands)
         {
             m_previousFrameTimeUs = m_gotNewData ? 0 : m_previousFrameTimeUs;
 
@@ -173,11 +173,11 @@ class ReceiverTask : public Task {
 
             m_gotNewData = false;
 
-            return Demands(
-                    constrain_f((commandThrottle - 1000) / 1000, 0, 1),
-                    _axes.x,
-                    _axes.y,
-                    _axes.z);
+            demands.thrust = constrain_f((commandThrottle - 1000) / 1000, 0, 1);
+
+            demands.roll = _axes.x;
+            demands.pitch = _axes.y;
+            demands.yaw = _axes.z;
         }
 
         void setValues(

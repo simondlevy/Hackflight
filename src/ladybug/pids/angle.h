@@ -417,7 +417,7 @@ class AnglePidController : public PidController {
         }
 
         virtual void modifyDemands(
-                Demands & demands,
+                demands_t & demands,
                 const int32_t dusec,
                 const vehicleState_t & state,
                 const bool reset) override
@@ -444,7 +444,7 @@ class AnglePidController : public PidController {
 
                 // quantize the throttle reduce the number of filter updates
                 const int32_t quantizedThrottle =
-                    lrintf(demands.throttle * DYN_LPF_THROTTLE_STEPS); 
+                    lrintf(demands.thrust * DYN_LPF_THROTTLE_STEPS); 
 
                 if (quantizedThrottle != m_dynLpfPreviousQuantizedThrottle) {
 

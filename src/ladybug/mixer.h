@@ -19,7 +19,7 @@
 #pragma once
 
 #include "constrain.h"
-#include "demands.h"
+#include "datatypes.h"
 #include "pid.h"
 
 #include <vector>
@@ -28,7 +28,7 @@ class Mixer {
 
     private:
 
-        typedef void (*mixerFun_t)(const Demands & demands, float motors[]);
+        typedef void (*mixerFun_t)(const demands_t & demands, float motors[]);
 
         uint8_t m_motorCount;
 
@@ -49,7 +49,7 @@ class Mixer {
             return m_motorCount;
         }
 
-        void getMotors(const Demands & demands, float motors[])
+        void getMotors(const demands_t & demands, float motors[])
         {
             m_fun(demands, motors);
         }
