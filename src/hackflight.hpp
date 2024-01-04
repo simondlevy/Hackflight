@@ -1,4 +1,6 @@
 /**
+ * Hackflight class for real and simulated flight controllers.
+ *
  * Copyright (C) 2024 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
