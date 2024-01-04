@@ -25,7 +25,6 @@
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
 #include <crossplatform.h>
-#include <system.h>
 
 class EstimatorTask {
 

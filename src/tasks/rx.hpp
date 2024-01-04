@@ -25,10 +25,7 @@
 // Arduino library
 #include <dsmrx.hpp>
 
-extern "C" {
-#include <hal/uart1.h>
-}
-
+#include <crossplatform.h>
 #include <datatypes.h>
 
 class RxTask {
@@ -87,7 +84,6 @@ class RxTask {
         {
             systemWaitStart();
 
-            uart1Init(115200);
 
             _dsmrx.init();
 
@@ -95,7 +91,7 @@ class RxTask {
 
                 uint8_t byte = 0;
 
-                auto gotByte = uart1GetDataWithDefaultTimeout(&byte);
+                auto gotByte = serial1Read(&byte);
 
                 if (gotByte) {
 

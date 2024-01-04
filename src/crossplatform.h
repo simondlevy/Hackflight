@@ -10,12 +10,18 @@ extern "C" {
 
     bool hal_isInInterrupt(void);
 
+    bool serial1Read(uint8_t * byte);
+
     void systemWaitStart(void);
 
 #ifndef ARDUINO
+
     void delay(const uint32_t msec);
+
     void delayMicroseconds(const uint32_t usec);
+
     uint64_t micros(void);
+
 #endif
 
 #ifdef __cplusplus

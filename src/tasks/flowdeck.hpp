@@ -25,13 +25,10 @@
 // Arduino library
 #include <pmw3901.hpp>
 
-#include <datatypes.h>
-
 #include <tasks/estimator.hpp>
 
 #include <crossplatform.h>
-#include <pinmap.h>
-#include <system.h>
+#include <datatypes.h>
 
 void flowdeckInit(void);
 
@@ -39,7 +36,7 @@ class FlowDeckTask {
 
     public:
 
-        void init(EstimatorTask * estimatorTask)
+        void init(EstimatorTask * estimatorTask, const uint8_t _csPin)
         {
             if (_didInit) {
                 return;
@@ -48,7 +45,7 @@ class FlowDeckTask {
             _estimatorTask = estimatorTask;
 
 
-            if (_pmw3901.begin(PIN_FLOWDECK_CS)) {
+            if (_pmw3901.begin(_csPin)) {
 
                 xTaskCreate(flowdeckTask, "FLOW", STACKSIZE, this, 3, NULL);
 

@@ -47,6 +47,7 @@ class CoreTask {
         void init(
                 const float rollCalibration,
                 const float pitchCalibration,
+                const uint8_t flowDeckCsPin,
                 VL53L1 * vl53l1)
         {
             if (_didInit) {
@@ -63,7 +64,7 @@ class CoreTask {
             // Prevents arming until aux switch is off
             _wasAuxSet = true;
 
-            _flowDeckTask.init(&_estimatorTask);
+            _flowDeckTask.init(&_estimatorTask, flowDeckCsPin);
 
             _imuTask.init(&_estimatorTask, rollCalibration, pitchCalibration);
 
