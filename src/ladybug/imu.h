@@ -31,6 +31,12 @@ class Imu {
 
     public:
 
+        Imu(void)
+        {
+            m_gyroScale = GYRO_SCALE_DPS / 32768.;
+        }
+
+
         static float deg2rad(float deg)
         {
             return deg * M_PI / 180;
@@ -50,10 +56,6 @@ class Imu {
         float qy;
         float qz;
 
-        Imu(void) 
-            : Imu(Imu::rotate0, GYRO_SCALE_DPS)
-        {
-        }
 
         void begin(void)
         {
@@ -90,8 +92,6 @@ class Imu {
                 _adc.x = readCalibratedGyro(rawGyro, m_gyroX, 0);
                 _adc.y = readCalibratedGyro(rawGyro, m_gyroY, 1);
                 _adc.z = readCalibratedGyro(rawGyro, m_gyroZ, 2);
-
-                _adc = m_rotateFun(_adc);
 
                 scaleGyro(m_gyroX, _adc.x);
                 scaleGyro(m_gyroY, _adc.y);
@@ -300,8 +300,6 @@ class Imu {
 
         uint32_t m_gyroSyncTime;
 
-        rotateFun_t m_rotateFun;
-
         void setGyroCalibrationCycles(void)
         {
             m_gyroCalibrationCyclesRemaining = (int32_t)calculateGyroCalibratingCycles();
@@ -318,59 +316,12 @@ class Imu {
             return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 
         }
 
-        Imu(const rotateFun_t rotateFun, const uint16_t gyroScale)
-        {
-            m_rotateFun = rotateFun;
-            m_gyroScale = gyroScale / 32768.;
-        }
-
         // For software quaternion
         void accumulateGyro(float x, float y, float z)
         {
             (void)x;
             (void)y;
             (void)z;
-        }
-
-
-        static auto rotate0(Axes & axes) -> Axes
-        {
-            return Axes(axes.x, axes.y, axes.z);
-        }
-
-        static auto rotate90(Axes & axes) -> Axes
-        {
-            return Axes(axes.y, -axes.x, axes.z);
-        }
-
-        static auto rotate180(Axes & axes) -> Axes
-        {
-            return Axes(-axes.x, -axes.y, axes.z);
-        }
-
-        static auto rotate270(Axes & axes) -> Axes
-        {
-            return Axes(-axes.y, axes.x, axes.z);
-        }
-
-        static auto rotate0Flip(Axes & axes) -> Axes
-        {
-            return Axes(-axes.x, axes.y, -axes.z);
-        }
-
-        static auto rotate90Flip(Axes & axes) -> Axes
-        {
-            return Axes(axes.y, axes.x, -axes.z);
-        }
-
-        static auto rotate180Flip(Axes & axes) -> Axes
-        {
-            return Axes(axes.x, -axes.y, -axes.z);
-        }
-
-        static auto rotate270Flip(Axes & axes) -> Axes
-        {
-            return Axes(-axes.y, -axes.x, -axes.z);
         }
 
 }; // class Imu
