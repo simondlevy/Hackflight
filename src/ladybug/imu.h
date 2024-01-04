@@ -36,7 +36,6 @@ class Imu {
             _gyroScale = GYRO_SCALE_DPS / 32768.;
         }
 
-
         static float deg2rad(float deg)
         {
             return deg * M_PI / 180;
@@ -48,8 +47,6 @@ class Imu {
             angles[1] = (int16_t)(10 * rad2degi(state.theta));
             angles[2] = (int16_t)rad2degi(state.psi);
         }
-
-        bool gotNewData;
 
         float qw;
         float qx;
@@ -122,13 +119,6 @@ class Imu {
         void updateAccelerometer(const int16_t rawAccel[3])
         {
             (void)rawAccel;
-        }
-
-        void handleInterrupt(const uint32_t cycleCounter)
-        {
-            (void)cycleCounter;
-
-            gotNewData = true;
         }
 
         int32_t getGyroSkew(

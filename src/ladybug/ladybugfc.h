@@ -81,16 +81,16 @@ class LadybugFC {
         void handleImuInterrupt(void)
         {
             _imuInterruptCount++;
-            _imu.handleInterrupt(getCycleCounter());
+            _gotNewImuData = true;
         }
 
         void step(std::vector<PidController *> pids, Mixer & mixer)
         {
             static int16_t rawGyro[3];
 
-            if (_imu.gotNewData) { 
+            if (_gotNewImuData) { 
 
-                _imu.gotNewData = false;  
+                _gotNewImuData = false;  
 
                 uint8_t eventStatus = Usfs::checkStatus(); 
 
@@ -190,7 +190,6 @@ class LadybugFC {
 
         } armingStatus_e;
 
-
         static const uint8_t  GYRO_RATE_TENTH = 100;   // 1/10th actual rate
 
         static const uint8_t IMU_INTERRUPT_PIN = 0x0C;
@@ -205,6 +204,8 @@ class LadybugFC {
         static const uint32_t GYRO_LOCK_COUNT = 400;
 
         static constexpr float MAX_ARMING_ANGLE_DEG = 25;
+
+        bool _gotNewImuData;
 
         Scheduler _scheduler;
 
