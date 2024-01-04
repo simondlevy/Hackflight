@@ -40,14 +40,16 @@ class EstimatorTask : public Task {
         }
 
         void run(
-                const float qw,
-                const float qx,
-                const float qy,
-                const float qz,
+                const quaternion_t quat,
                 Axis3f & accel,
                 Axis3f & gyro,
                 vehicleState_t & state) 
         {
+            const auto qw = quat.w;
+            const auto qx = quat.x;
+            const auto qy = quat.y;
+            const auto qz = quat.z;
+
             state.phi = rad2deg(atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz));
             state.theta = rad2deg(asin(2.0f*(qx*qz-qw*qy)));
             state.psi = rad2deg(atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz));

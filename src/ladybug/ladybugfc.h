@@ -112,7 +112,7 @@ class LadybugFC {
                 }
 
                 if (Usfs::eventStatusIsQuaternion(eventStatus)) { 
-                    _usfs.readQuaternion(_qw, _qx, _qy, _qz);
+                    _usfs.readQuaternion(_quat.w, _quat.x, _quat.y, _quat.z);
                 }
             } 
 
@@ -228,10 +228,7 @@ class LadybugFC {
 
         std::vector<uint8_t> MOTOR_PINS = {0x0D, 0x10, 0x03, 0x0B};
 
-        float _qw;
-        float _qx;
-        float _qy;
-        float _qz;
+        quaternion_t _quat;
 
         Usfs _usfs;
 
@@ -332,7 +329,7 @@ class LadybugFC {
                 switch (id) {
 
                     case Task::ESTIMATOR:
-                        _estimatorTask.run(_qw, _qx, _qy, _qz, _accel, _gyro, _state);
+                        _estimatorTask.run(_quat, _accel, _gyro, _state);
                         break;
 
                     case Task::RECEIVER:
@@ -587,11 +584,9 @@ class LadybugFC {
                 auxSwitchWasOff = auxSwitchValue > 900 && auxSwitchValue < 1200;
             }
 
-            const auto maxArmingAngle = deg2rad(MAX_ARMING_ANGLE_DEG);
-
             const auto imuIsLevel =
-                fabsf(_state.phi) < maxArmingAngle &&
-                fabsf(_state.theta) < maxArmingAngle;
+                fabsf(_state.phi) < MAX_ARMING_ANGLE_DEG &&
+                fabsf(_state.theta) < MAX_ARMING_ANGLE_DEG;
 
             const auto gyroDoneCalibrating = false; // XXX
 
@@ -661,11 +656,6 @@ class LadybugFC {
                 default: // failsafe
                     break;
             }
-        }
-
-        static float deg2rad(const float deg)
-        {
-            return deg * M_PI / 180;
         }
 
         int32_t getGyroSkew(
