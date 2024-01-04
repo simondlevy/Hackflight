@@ -33,7 +33,7 @@ class Imu {
 
         Imu(void)
         {
-            m_gyroScale = GYRO_SCALE_DPS / 32768.;
+            _gyroScale = GYRO_SCALE_DPS / 32768.;
         }
 
 
@@ -56,7 +56,6 @@ class Imu {
         float qy;
         float qz;
 
-
         void begin(void)
         {
             setGyroCalibrationCycles();
@@ -73,14 +72,14 @@ class Imu {
 
         bool gyroIsCalibrating(void)
         {
-            return m_gyroIsCalibrating;
+            return _gyroIsCalibrating;
         }
 
         void gyroRawToFilteredDps(int16_t rawGyro[3], vehicleState_t & state)
         {
-            accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
+            accumulateGyro(_gyroX.dpsFiltered, _gyroY.dpsFiltered, _gyroZ.dpsFiltered);
 
-            const auto calibrationComplete = m_gyroCalibrationCyclesRemaining <= 0;
+            const auto calibrationComplete = _gyroCalibrationCyclesRemaining <= 0;
 
             static Axes _adc;
 
@@ -89,13 +88,13 @@ class Imu {
                 // move 16-bit gyro data into floats to avoid overflows in
                 // calculations
 
-                _adc.x = readCalibratedGyro(rawGyro, m_gyroX, 0);
-                _adc.y = readCalibratedGyro(rawGyro, m_gyroY, 1);
-                _adc.z = readCalibratedGyro(rawGyro, m_gyroZ, 2);
+                _adc.x = readCalibratedGyro(rawGyro, _gyroX, 0);
+                _adc.y = readCalibratedGyro(rawGyro, _gyroY, 1);
+                _adc.z = readCalibratedGyro(rawGyro, _gyroZ, 2);
 
-                scaleGyro(m_gyroX, _adc.x);
-                scaleGyro(m_gyroY, _adc.y);
-                scaleGyro(m_gyroZ, _adc.z);
+                scaleGyro(_gyroX, _adc.x);
+                scaleGyro(_gyroY, _adc.y);
+                scaleGyro(_gyroZ, _adc.z);
             } 
 
             else {
@@ -103,20 +102,20 @@ class Imu {
             }
 
             // Use gyro lowpass 2 filter for downsampling
-            applyGyroLpf2(m_gyroX);
-            applyGyroLpf2(m_gyroY);
-            applyGyroLpf2(m_gyroZ);
+            applyGyroLpf2(_gyroX);
+            applyGyroLpf2(_gyroY);
+            applyGyroLpf2(_gyroZ);
 
             // Then apply lowpass 1
-            applyGyroLpf1(m_gyroX);
-            applyGyroLpf1(m_gyroY);
-            applyGyroLpf1(m_gyroZ);
+            applyGyroLpf1(_gyroX);
+            applyGyroLpf1(_gyroY);
+            applyGyroLpf1(_gyroZ);
 
-            m_gyroIsCalibrating = !calibrationComplete;
+            _gyroIsCalibrating = !calibrationComplete;
 
-            state.dphi   = m_gyroX.dpsFiltered; 
-            state.dtheta = m_gyroY.dpsFiltered; 
-            state.dpsi   = m_gyroZ.dpsFiltered;
+            state.dphi   = _gyroX.dpsFiltered; 
+            state.dtheta = _gyroY.dpsFiltered; 
+            state.dpsi   = _gyroZ.dpsFiltered;
         }
 
 
@@ -137,7 +136,7 @@ class Imu {
                 const int32_t desiredPeriodCycles)
         {
             const auto skew =
-                intcmp(nextTargetCycles, m_gyroSyncTime) % desiredPeriodCycles;
+                intcmp(nextTargetCycles, _gyroSyncTime) % desiredPeriodCycles;
 
             return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
         }
@@ -167,36 +166,36 @@ class Imu {
 
             private:
 
-                float  m_oldM;
-                float  m_newM;
-                float  m_oldS;
-                float  m_newS;
-                int32_t m_n;
+                float  _oldM;
+                float  _newM;
+                float  _oldS;
+                float  _newS;
+                int32_t _n;
 
                 float variance(void)
                 {
-                    return ((m_n > 1) ? m_newS / (m_n - 1) : 0.0f);
+                    return ((_n > 1) ? _newS / (_n - 1) : 0.0f);
                 }
 
             public:
 
                 void stdevClear(void)
                 {
-                    m_n = 0;
+                    _n = 0;
                 }
 
                 void stdevPush(float x)
                 {
-                    m_n++;
+                    _n++;
 
-                    if (m_n == 1) {
-                        m_oldM = m_newM = x;
-                        m_oldS = 0.0f;
+                    if (_n == 1) {
+                        _oldM = _newM = x;
+                        _oldS = 0.0f;
                     } else {
-                        m_newM = m_oldM + (x - m_oldM) / m_n;
-                        m_newS = m_oldS + (x - m_oldM) * (x - m_newM);
-                        m_oldM = m_newM;
-                        m_oldS = m_newS;
+                        _newM = _oldM + (x - _oldM) / _n;
+                        _newS = _oldS + (x - _oldM) * (x - _newM);
+                        _oldM = _newM;
+                        _oldS = _newS;
                     }
                 }
 
@@ -223,15 +222,15 @@ class Imu {
 
         } gyroAxis_t;
 
-        calibration_t m_gyroCalibration;
+        calibration_t _gyroCalibration;
 
-        int32_t  m_gyroCalibrationCyclesRemaining;
-        float    m_gyroScale;
-        bool     m_gyroIsCalibrating;
+        int32_t  _gyroCalibrationCyclesRemaining;
+        float    _gyroScale;
+        bool     _gyroIsCalibrating;
 
-        gyroAxis_t m_gyroX;
-        gyroAxis_t m_gyroY;
-        gyroAxis_t m_gyroZ;
+        gyroAxis_t _gyroX;
+        gyroAxis_t _gyroY;
+        gyroAxis_t _gyroZ;
 
         static uint32_t calculateGyroCalibratingCycles(void)
         {
@@ -241,20 +240,20 @@ class Imu {
         void calibrateGyroAxis(int16_t rawGyro[3], gyroAxis_t & axis, const uint8_t index)
         {
             // Reset at start of calibration
-            if (m_gyroCalibrationCyclesRemaining ==
+            if (_gyroCalibrationCyclesRemaining ==
                     (int32_t)calculateGyroCalibratingCycles()) {
-                m_gyroCalibration.sum[index] = 0.0f;
-                m_gyroCalibration.stats[index].stdevClear();
+                _gyroCalibration.sum[index] = 0.0f;
+                _gyroCalibration.stats[index].stdevClear();
                 // zero is set to zero until calibration complete
                 axis.zero = 0.0f;
             }
 
             // Sum up CALIBRATING_GYRO_TIME_US readings
-            m_gyroCalibration.sum[index] += rawGyro[index];
-            m_gyroCalibration.stats[index].stdevPush(rawGyro[index]);
+            _gyroCalibration.sum[index] += rawGyro[index];
+            _gyroCalibration.stats[index].stdevPush(rawGyro[index]);
 
-            if (m_gyroCalibrationCyclesRemaining == 1) {
-                const float stddev = m_gyroCalibration.stats[index].stdevCompute();
+            if (_gyroCalibrationCyclesRemaining == 1) {
+                const float stddev = _gyroCalibration.stats[index].stdevCompute();
 
                 // check deviation and startover in case the model was moved
                 if (MOVEMENT_CALIBRATION_THRESHOLD && stddev >
@@ -263,17 +262,17 @@ class Imu {
                     return;
                 }
 
-                axis.zero = m_gyroCalibration.sum[index] / calculateGyroCalibratingCycles();
+                axis.zero = _gyroCalibration.sum[index] / calculateGyroCalibratingCycles();
             }
         }
 
         void calibrateGyro(int16_t rawGyro[3])
         {
-            calibrateGyroAxis(rawGyro, m_gyroX, 0);
-            calibrateGyroAxis(rawGyro, m_gyroY, 1);
-            calibrateGyroAxis(rawGyro, m_gyroZ, 2);
+            calibrateGyroAxis(rawGyro, _gyroX, 0);
+            calibrateGyroAxis(rawGyro, _gyroY, 1);
+            calibrateGyroAxis(rawGyro, _gyroZ, 2);
 
-            --m_gyroCalibrationCyclesRemaining;
+            --_gyroCalibrationCyclesRemaining;
         }
 
         void applyGyroLpf1(gyroAxis_t & axis)
@@ -288,7 +287,7 @@ class Imu {
 
         void scaleGyro(gyroAxis_t & axis, const float adc)
         {
-            axis.dps = adc * m_gyroScale; 
+            axis.dps = adc * _gyroScale; 
         }
 
         float readCalibratedGyro(int16_t rawGyro[3], gyroAxis_t & axis, uint8_t index)
@@ -298,11 +297,11 @@ class Imu {
 
         typedef Axes (*rotateFun_t)(Axes & axes);
 
-        uint32_t m_gyroSyncTime;
+        uint32_t _gyroSyncTime;
 
         void setGyroCalibrationCycles(void)
         {
-            m_gyroCalibrationCyclesRemaining = (int32_t)calculateGyroCalibratingCycles();
+            _gyroCalibrationCyclesRemaining = (int32_t)calculateGyroCalibratingCycles();
         }
 
         static auto quat2euler(

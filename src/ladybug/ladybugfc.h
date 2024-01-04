@@ -19,6 +19,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+#include <usfs.hpp>
+
 #include "escs/brushed.h"
 #include "mixer.h"
 #include "esc.h"
