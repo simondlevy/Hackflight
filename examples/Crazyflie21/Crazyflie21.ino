@@ -1,43 +1,23 @@
+#include <Wire.h>   
+
+#include "stm32f_reboot.hpp"
+
 static const uint8_t LED_RED_L_PIN = PC0;
-
-static void reboot(void)
-{
-    __enable_irq();
-    HAL_RCC_DeInit();
-    HAL_DeInit();
-    SysTick->CTRL = SysTick->LOAD = SysTick->VAL = 0;
-    __HAL_SYSCFG_REMAPMEMORY_SYSTEMFLASH();
-
-    const uint32_t p = (*((uint32_t *) 0x1FFF0000));
-    __set_MSP( p );
-
-    void (*SysMemBootJump)(void);
-    SysMemBootJump = (void (*)(void)) (*((uint32_t *) 0x1FFF0004));
-    SysMemBootJump();
-
-    NVIC_SystemReset();
-}
+static const uint8_t LED_GREEN_L_PIN = PC1;
+static const uint8_t LED_GREEN_R_PIN = PC2;
+static const uint8_t LED_RED_R_PIN = PC3;
 
 void setup(void)
 {
     Serial.begin(115200);
 
     pinMode(LED_RED_L_PIN, OUTPUT);
+
+    Wire.begin();
 }
 
 void loop(void)
 {
-    const auto msec = millis();
-
-    static uint32_t prev;
-
-    if (msec - prev > 1000) {
-        prev = msec;
-        static uint8_t ledOn;
-        digitalWrite(LED_RED_L_PIN, ledOn);
-        ledOn = 1 - ledOn;
-    }
-
     while (Serial.available()) {
 
         if (Serial.read() == 'R') {
