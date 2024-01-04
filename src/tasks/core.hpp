@@ -35,7 +35,6 @@
 #include <crossplatform.h>
 #include <motors.h>
 #include <rateSupervisor.hpp>
-#include <system.h>
 
 class CoreTask {
 

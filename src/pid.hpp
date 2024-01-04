@@ -96,10 +96,10 @@ class Pid {
 
             _error = _desired - measured;
 
-            return run(measured);
+            return run();
         }
 
-        float run(const float measured)
+        float run(void)
         {
             _outP = _kp * _error;
 

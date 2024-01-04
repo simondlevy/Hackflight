@@ -23,8 +23,6 @@
 
 #include <linalg.h>
 
-#include <system.h>
-
 #include <tasks/estimator.hpp>
 
 // Arduino class
