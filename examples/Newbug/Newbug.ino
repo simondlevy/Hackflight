@@ -119,6 +119,7 @@ void loop()
 
         if (Usfs::eventStatusIsAccelerometer(eventStatus)) { 
             usfs.readAccelerometerScaled(_accel.x, _accel.y, _accel.z);
+            _accel.x = -_accel.x; // negate for nose-up positive
         }
 
         if (Usfs::eventStatusIsGyrometer(eventStatus)) { 
@@ -144,4 +145,10 @@ void loop()
     _kalmanFilter.updateWithGyro(_gyro);
 
     _kalmanFilter.finalize();
+
+    static uint32_t prev;
+    if (msec - prev > 100) {
+        Serial.println(_accel.x);
+        prev = msec;
+    }
 }
