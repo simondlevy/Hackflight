@@ -1,4 +1,4 @@
-static const uint8_t LED_RED_L_PIN = 8;
+static const uint8_t LED_RED_L_PIN = PC0;
 
 static void reboot(void)
 {
@@ -27,11 +27,16 @@ void setup(void)
 
 void loop(void)
 {
-    /*
-       digitalWrite(LED_RED_L_PIN, HIGH);
-       delay(500);
-       digitalWrite(LED_RED_L_PIN, LOW);
-       delay(500);*/
+    const auto msec = millis();
+
+    static uint32_t prev;
+
+    if (msec - prev > 1000) {
+        prev = msec;
+        static uint8_t ledOn;
+        digitalWrite(LED_RED_L_PIN, ledOn);
+        ledOn = 1 - ledOn;
+    }
 
     while (Serial.available()) {
 
