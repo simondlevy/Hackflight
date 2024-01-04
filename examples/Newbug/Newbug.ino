@@ -109,6 +109,11 @@ void loop()
 
     static vehicleState_t _vehicleState;
 
+    // Get state vector angular velocities directly from gyro
+    _vehicleState.dphi =    _gyro.x;     
+    _vehicleState.dtheta = -_gyro.y; // (negate for ENU)
+    _vehicleState.dpsi =    _gyro.z; 
+
     if ((INTERRUPT_PIN == 0) || _gotNewData) { 
 
         _gotNewData = false;  
