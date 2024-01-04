@@ -611,9 +611,13 @@ class KalmanFilter {
                         _kalmanData.q[2]*_kalmanData.q[2] +
                         _kalmanData.q[3]*_kalmanData.q[3]);
 
+            state.dphi = _gyroLatest.x;     
+
             state.theta = -RADIANS_TO_DEGREES * // note negation
                 asinf(-2*(_kalmanData.q[1]*_kalmanData.q[3] -
-                        _kalmanData.q[0]*_kalmanData.q[2]));
+                            _kalmanData.q[0]*_kalmanData.q[2]));
+
+            state.dtheta = -_gyroLatest.y; // (negate for ENU)
 
             state.psi = RADIANS_TO_DEGREES *
                 atan2f(2*(_kalmanData.q[1]*_kalmanData.q[2]+_kalmanData.q[0]*
@@ -622,6 +626,8 @@ class KalmanFilter {
                         _kalmanData.q[1]*_kalmanData.q[1] -
                         _kalmanData.q[2]*_kalmanData.q[2] -
                         _kalmanData.q[3]*_kalmanData.q[3]);
+
+            state.dpsi = _gyroLatest.z; 
         }
 
         void updateWithAccel(Axis3f & acc)

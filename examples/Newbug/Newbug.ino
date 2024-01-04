@@ -107,6 +107,8 @@ void loop()
     static Axis3f _accel;
     static Axis3f _gyro;
 
+    static vehicleState_t _vehicleState;
+
     if ((INTERRUPT_PIN == 0) || _gotNewData) { 
 
         _gotNewData = false;  
@@ -124,8 +126,10 @@ void loop()
 
         if (Usfs::eventStatusIsGyrometer(eventStatus)) { 
             usfs.readGyrometerScaled(_gyro.x, _gyro.y, _gyro.z);
+
             _gyro.y = -_gyro.y; // negate for nose-down positive
             _gyro.z = -_gyro.z; // negate for nose-left positive
+
         }
     } 
 
@@ -148,9 +152,7 @@ void loop()
 
     _kalmanFilter.finalize();
 
-    static uint32_t prev;
-    if (msec - prev > 100) {
-        printf("%3.3f\n", _gyro.z);
-        prev = msec;
-    }
+    _kalmanFilter.getVehicleState(_vehicleState);
+
+    printf("%f\n", _vehicleState.dpsi);
 }
