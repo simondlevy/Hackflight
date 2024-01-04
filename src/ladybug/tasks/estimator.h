@@ -58,6 +58,7 @@ class EstimatorTask : public Task {
 
             _kalmanFilter.getVehicleState(state);
 
+            // Rotate 180 degrees
             state.phi = -state.phi;
             state.theta = -state.theta;
         }
