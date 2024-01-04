@@ -83,8 +83,12 @@ class VisualizerTask : public Task {
 
                 case 108: // ESTIMATOR
                     {
-                        int16_t angles[3] = {};
-                        Imu::getEulerAngles(state, angles);
+                        const int16_t angles[3] = {
+                            (int16_t)(10 * state.phi),
+                            (int16_t)(10 * state.theta),
+                            (int16_t)state.psi
+                        };
+
                         serializeShorts(msp, 108, angles, 3);
                     } 
                     return true;

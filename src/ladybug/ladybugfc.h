@@ -86,7 +86,12 @@ class LadybugFC {
 
         void step(std::vector<PidController *> pids, Mixer & mixer)
         {
-            static int16_t rawGyro[3];
+            static Axis3f _gyro;
+
+            // Get state vector angular velocities directly from gyro
+            _state.dphi =    _gyro.x;     
+            _state.dtheta = -_gyro.y; // (negate for ENU)
+            _state.dpsi =    _gyro.z; 
 
             if (_gotNewImuData) { 
 
@@ -99,11 +104,13 @@ class LadybugFC {
                 }
 
                 if (Usfs::eventStatusIsGyrometer(eventStatus)) { 
-                    _usfs.readGyrometerRaw(rawGyro);
+                    _usfs.readGyrometerScaled(_gyro.x, _gyro.y, _gyro.z);
                 }
 
                 if (Usfs::eventStatusIsQuaternion(eventStatus)) { 
                     _usfs.readQuaternion(_imu.qw, _imu.qx, _imu.qy, _imu.qz);
+                    _gyro.y = -_gyro.y; // negate for nose-down positive
+                    _gyro.z = -_gyro.z; // negate for nose-left positive
                 }
             } 
 
@@ -127,8 +134,6 @@ class LadybugFC {
 
                 if (_esc.isReady(usec)) {
 
-                    _imu.gyroRawToFilteredDps(rawGyro, _state);
-
                     demands_t demands = {0, 0, 0, 0};
 
                     _receiverTask.getDemands(demands);
@@ -145,7 +150,7 @@ class LadybugFC {
                         mixmotors :
                         getVisualizerMotors());
 
-                updateScheduler(_imu, nowCycles, nextTargetCycles);
+                updateScheduler(nowCycles, nextTargetCycles);
             }
 
             if (_scheduler.isDynamicReady(getCycleCounter())) {
@@ -224,6 +229,8 @@ class LadybugFC {
         Usfs _usfs;
 
         Imu _imu; 
+
+        uint32_t _gyroSyncTime;
 
         uint32_t _imuInterruptCount;
 
@@ -464,7 +471,6 @@ class LadybugFC {
         }
 
         void updateScheduler(
-                Imu & imu,
                 const uint32_t nowCycles,
                 const uint32_t nextTargetCycles)
         {
@@ -496,7 +502,7 @@ class LadybugFC {
             static int32_t _gyroSkewAccum;
 
             auto gyroSkew =
-                imu.getGyroSkew(nextTargetCycles, _scheduler.desiredPeriodCycles);
+                getGyroSkew(nextTargetCycles, _scheduler.desiredPeriodCycles);
 
             _gyroSkewAccum += gyroSkew;
 
@@ -572,7 +578,7 @@ class LadybugFC {
                 auxSwitchWasOff = auxSwitchValue > 900 && auxSwitchValue < 1200;
             }
 
-            const auto maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE_DEG);
+            const auto maxArmingAngle = deg2rad(MAX_ARMING_ANGLE_DEG);
 
             const auto imuIsLevel =
                 fabsf(_state.phi) < maxArmingAngle &&
@@ -648,5 +654,19 @@ class LadybugFC {
             }
         }
 
+        static float deg2rad(const float deg)
+        {
+            return deg * M_PI / 180;
+        }
+
+        int32_t getGyroSkew(
+                const uint32_t nextTargetCycles,
+                const int32_t desiredPeriodCycles)
+        {
+            const auto skew =
+                intcmp(nextTargetCycles, _gyroSyncTime) % desiredPeriodCycles;
+
+            return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
+        }
 
 }; // class LadybugFC

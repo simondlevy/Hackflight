@@ -36,18 +36,6 @@ class Imu {
             _gyroScale = GYRO_SCALE_DPS / 32768.;
         }
 
-        static float deg2rad(float deg)
-        {
-            return deg * M_PI / 180;
-        }
-
-        static void getEulerAngles(const vehicleState_t & state, int16_t angles[3])
-        {
-            angles[0] = (int16_t)(10 * rad2degi(state.phi));
-            angles[1] = (int16_t)(10 * rad2degi(state.theta));
-            angles[2] = (int16_t)rad2degi(state.psi);
-        }
-
         float qw;
         float qx;
         float qy;
@@ -72,63 +60,9 @@ class Imu {
             return _gyroIsCalibrating;
         }
 
-        void gyroRawToFilteredDps(int16_t rawGyro[3], vehicleState_t & state)
-        {
-            accumulateGyro(_gyroX.dpsFiltered, _gyroY.dpsFiltered, _gyroZ.dpsFiltered);
-
-            const auto calibrationComplete = _gyroCalibrationCyclesRemaining <= 0;
-
-            static Axes _adc;
-
-            if (calibrationComplete) {
-
-                // move 16-bit gyro data into floats to avoid overflows in
-                // calculations
-
-                _adc.x = readCalibratedGyro(rawGyro, _gyroX, 0);
-                _adc.y = readCalibratedGyro(rawGyro, _gyroY, 1);
-                _adc.z = readCalibratedGyro(rawGyro, _gyroZ, 2);
-
-                scaleGyro(_gyroX, _adc.x);
-                scaleGyro(_gyroY, _adc.y);
-                scaleGyro(_gyroZ, _adc.z);
-            } 
-
-            else {
-                calibrateGyro(rawGyro);
-            }
-
-            // Use gyro lowpass 2 filter for downsampling
-            applyGyroLpf2(_gyroX);
-            applyGyroLpf2(_gyroY);
-            applyGyroLpf2(_gyroZ);
-
-            // Then apply lowpass 1
-            applyGyroLpf1(_gyroX);
-            applyGyroLpf1(_gyroY);
-            applyGyroLpf1(_gyroZ);
-
-            _gyroIsCalibrating = !calibrationComplete;
-
-            state.dphi   = _gyroX.dpsFiltered; 
-            state.dtheta = _gyroY.dpsFiltered; 
-            state.dpsi   = _gyroZ.dpsFiltered;
-        }
-
-
         void updateAccelerometer(const int16_t rawAccel[3])
         {
             (void)rawAccel;
-        }
-
-        int32_t getGyroSkew(
-                const uint32_t nextTargetCycles,
-                const int32_t desiredPeriodCycles)
-        {
-            const auto skew =
-                intcmp(nextTargetCycles, _gyroSyncTime) % desiredPeriodCycles;
-
-            return skew > (desiredPeriodCycles / 2) ? skew - desiredPeriodCycles : skew;
         }
 
     private:
@@ -297,9 +231,9 @@ class Imu {
         static auto quat2euler(
                 const float qw, const float qx, const float qy, const float qz) -> Axes 
         {
-            const auto phi = atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz);
-            const auto theta = asin(2.0f*(qx*qz-qw*qy));
-            const auto psi = atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz);
+            const auto phi = rad2deg(atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz));
+            const auto theta = rad2deg(asin(2.0f*(qx*qz-qw*qy)));
+            const auto psi = rad2deg(atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz));
 
             // Convert heading from [-pi,+pi] to [0,2*pi]
             return Axes(phi, theta, psi + (psi < 0 ? 2*M_PI : 0)); 

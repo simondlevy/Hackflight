@@ -30,6 +30,76 @@
 
 class AnglePidController : public PidController {
 
+    public:
+
+        AnglePidController(
+                const float k_rate_p = 1.441305,
+                const float k_rate_i = 48.8762 ,
+                const float k_rate_d = 0.021160,
+                const float k_rate_f = 0.0165048, 
+                const float k_level_p = 0.0) // 3.0
+        {
+            m_k_rate_p = k_rate_p;
+            m_k_rate_i = k_rate_i;
+            m_k_rate_d = k_rate_d;
+            m_k_rate_f = k_rate_f;
+            m_k_level_p = k_level_p;
+
+            // to allow an initial zero throttle to set the filter cutoff
+            m_dynLpfPreviousQuantizedThrottle = -1;  
+        }
+
+        virtual void modifyDemands(
+                demands_t & demands,
+                const int32_t dusec,
+                const vehicleState_t & state,
+                const bool reset) override
+        {
+            const auto rollDemand  = rescale(demands.roll);
+            const auto pitchDemand = rescale(demands.pitch);
+            const auto yawDemand   = rescale(demands.yaw);
+
+            const auto phi = deg2rad(state.phi);
+            const auto theta = deg2rad(state.theta);
+            const auto dpsi = deg2rad(state.dpsi);
+
+            const auto roll= updateCyclic(
+                    rollDemand, phi, state.dphi, m_roll);
+
+            const auto pitch = updateCyclic(
+                    pitchDemand, theta, state.dtheta, m_pitch);
+
+            const auto yaw = updateYaw(yawDemand, dpsi);
+
+            if (reset) {
+                m_roll.axis.I = 0;
+                m_pitch.axis.I = 0;
+                m_yaw.I = 0;
+            }
+
+            if (dusec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
+
+                // quantize the throttle reduce the number of filter updates
+                const int32_t quantizedThrottle =
+                    lrintf(demands.thrust * DYN_LPF_THROTTLE_STEPS); 
+
+                if (quantizedThrottle != m_dynLpfPreviousQuantizedThrottle) {
+
+                    // scale the quantized value back to the throttle range so the
+                    // filter cutoff steps are repeatable
+                    const auto dynLpfThrottle =
+                        (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
+                    pidDynLpfDTermUpdate(dynLpfThrottle);
+                    m_dynLpfPreviousQuantizedThrottle = quantizedThrottle;
+                }
+            }
+
+            demands.roll = constrainOutput(roll, LIMIT);
+            demands.pitch = constrainOutput(pitch, LIMIT),
+            demands.yaw = -constrainOutput(yaw, LIMIT_YAW);
+
+        } // modifyDemands
+
     private:
 
         // minimum of 5ms between updates
@@ -397,70 +467,9 @@ class AnglePidController : public PidController {
             return 670 * angleRate;
         }
 
-    public:
-
-        AnglePidController(
-                const float k_rate_p = 1.441305,
-                const float k_rate_i = 48.8762 ,
-                const float k_rate_d = 0.021160,
-                const float k_rate_f = 0.0165048, 
-                const float k_level_p = 0.0) // 3.0
+        static float deg2rad(float deg)
         {
-            m_k_rate_p = k_rate_p;
-            m_k_rate_i = k_rate_i;
-            m_k_rate_d = k_rate_d;
-            m_k_rate_f = k_rate_f;
-            m_k_level_p = k_level_p;
-
-            // to allow an initial zero throttle to set the filter cutoff
-            m_dynLpfPreviousQuantizedThrottle = -1;  
+            return deg * M_PI / 180;
         }
-
-        virtual void modifyDemands(
-                demands_t & demands,
-                const int32_t dusec,
-                const vehicleState_t & state,
-                const bool reset) override
-        {
-            const auto rollDemand  = rescale(demands.roll);
-            const auto pitchDemand = rescale(demands.pitch);
-            const auto yawDemand   = rescale(demands.yaw);
-
-            const auto roll=
-                updateCyclic(rollDemand, state.phi, state.dphi, m_roll);
-
-            const auto pitch =
-                updateCyclic(pitchDemand, state.theta, state.dtheta, m_pitch);
-
-            const auto yaw = updateYaw(yawDemand, state.dpsi);
-
-            if (reset) {
-                m_roll.axis.I = 0;
-                m_pitch.axis.I = 0;
-                m_yaw.I = 0;
-            }
-
-            if (dusec >= DYN_LPF_THROTTLE_UPDATE_DELAY_US) {
-
-                // quantize the throttle reduce the number of filter updates
-                const int32_t quantizedThrottle =
-                    lrintf(demands.thrust * DYN_LPF_THROTTLE_STEPS); 
-
-                if (quantizedThrottle != m_dynLpfPreviousQuantizedThrottle) {
-
-                    // scale the quantized value back to the throttle range so the
-                    // filter cutoff steps are repeatable
-                    const auto dynLpfThrottle =
-                        (float)quantizedThrottle / DYN_LPF_THROTTLE_STEPS;
-                    pidDynLpfDTermUpdate(dynLpfThrottle);
-                    m_dynLpfPreviousQuantizedThrottle = quantizedThrottle;
-                }
-            }
-
-            demands.roll = constrainOutput(roll, LIMIT);
-            demands.pitch = constrainOutput(pitch, LIMIT),
-            demands.yaw = -constrainOutput(yaw, LIMIT_YAW);
-
-        } // modifyDemands
 
 }; // class AnglePidController

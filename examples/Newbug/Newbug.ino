@@ -146,7 +146,7 @@ void loop()
 
         _kalmanFilter.predict(msec, true); 
 
-        _nextPredictionMs = msec + PREDICTION_UPDATE_INTERVAL_MS;
+        _nextPredictionMs  = msec + PREDICTION_UPDATE_INTERVAL_MS;
     }
 
     _kalmanFilter.addProcessNoise(msec);
