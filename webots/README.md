@@ -9,7 +9,7 @@
 4. Use the file dialog to open <b>Hackflight/webots/words/simple.wbt</b>
 
 5. Click on the little [file-folder icon](media/screenshot.png) in the upper right,
-and use the file dialog to open <b>controllers/core/core.cpp</b>
+and use the file dialog to open <b>controllers/simple/simple.cpp</b>
 
 6. From the <b>Build</b> menu, choose <b>Build</b> to build the simulation.
 

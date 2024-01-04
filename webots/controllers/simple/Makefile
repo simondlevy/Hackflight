@@ -5,7 +5,7 @@ SRC = ../../../src
 # INCLUDE = -I$(HOME)/Desktop/simdvs/cpp -I$(SRC)
 INCLUDE = -I$(SRC)
 
-CXX_SOURCES = core.cpp console.cpp $(SRC)/mixers/quadrotor.cpp
+CXX_SOURCES = simple.cpp console.cpp $(SRC)/mixers/quadrotor.cpp
 
 #ifeq ($(OS),Windows_NT)
 #	OPENCV = "D:/opencv-mingw"
