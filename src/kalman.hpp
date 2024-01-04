@@ -630,16 +630,12 @@ class KalmanFilter {
             state.dpsi = _gyroLatest.z; 
         }
 
-        void updateWithAccel(Axis3f & acc)
+        void updateWithQuaternion(const quaternion_t & quat)
         {
-            axis3fSubSamplerAccumulate(&_accSubSampler, &acc);
-            _accLatest = acc;
-        }
-
-        void updateWithGyro(Axis3f & gyro)
-        {
-            axis3fSubSamplerAccumulate(&_gyroSubSampler, &gyro);
-            _gyroLatest = gyro;
+            _kalmanData.q[0] = quat.w;
+            _kalmanData.q[1] = quat.x;
+            _kalmanData.q[2] = quat.y;
+            _kalmanData.q[3] = quat.z;
         }
 
         float _predictedNX;
@@ -827,6 +823,18 @@ class KalmanFilter {
                     }
                 }
             }
+        }
+
+        void updateWithAccel(Axis3f & acc)
+        {
+            axis3fSubSamplerAccumulate(&_accSubSampler, &acc);
+            _accLatest = acc;
+        }
+
+        void updateWithGyro(Axis3f & gyro)
+        {
+            axis3fSubSamplerAccumulate(&_gyroSubSampler, &gyro);
+            _gyroLatest = gyro;
         }
 
         void updateWithPKE(

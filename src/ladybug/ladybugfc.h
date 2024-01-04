@@ -329,7 +329,7 @@ class LadybugFC {
                 switch (id) {
 
                     case Task::ESTIMATOR:
-                        _estimatorTask.run(_quat, _accel, _gyro, _state);
+                        _estimatorTask.run(_quat, _state);
                         break;
 
                     case Task::RECEIVER:

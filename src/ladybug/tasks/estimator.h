@@ -39,21 +39,8 @@ class EstimatorTask : public Task {
             _kalmanFilter.init(millis());
         }
 
-        void run(
-                const quaternion_t quat,
-                Axis3f & accel,
-                Axis3f & gyro,
-                vehicleState_t & state) 
+        void run(const quaternion_t quat, vehicleState_t & state)
         {
-            const auto qw = quat.w;
-            const auto qx = quat.x;
-            const auto qy = quat.y;
-            const auto qz = quat.z;
-
-            state.phi = rad2deg(atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz));
-            state.theta = rad2deg(asin(2.0f*(qx*qz-qw*qy)));
-            state.psi = rad2deg(atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz));
-
             auto msec = millis();
 
             if (msec >= _nextPredictionMs) {
@@ -65,13 +52,14 @@ class EstimatorTask : public Task {
 
             _kalmanFilter.addProcessNoise(msec);
 
-            _kalmanFilter.updateWithAccel(accel);
-
-            _kalmanFilter.updateWithGyro(gyro);
+            _kalmanFilter.updateWithQuaternion(quat);
 
             _kalmanFilter.finalize();
 
-            //_kalmanFilter.getVehicleState(state);
+            _kalmanFilter.getVehicleState(state);
+
+            state.phi = -state.phi;
+            state.theta = -state.theta;
         }
 
     private:
