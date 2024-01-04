@@ -124,6 +124,7 @@ void loop()
 
         if (Usfs::eventStatusIsGyrometer(eventStatus)) { 
             usfs.readGyrometerScaled(_gyro.x, _gyro.y, _gyro.z);
+            _gyro.y = -_gyro.y; // negate for nose-up negative
         }
     } 
 
@@ -148,7 +149,7 @@ void loop()
 
     static uint32_t prev;
     if (msec - prev > 100) {
-        Serial.println(_accel.x);
+        printf("%3.3f\n", _gyro.y);
         prev = msec;
     }
 }
