@@ -24,7 +24,6 @@
 #include "escs/brushed.h"
 #include "mixer.h"
 #include "esc.h"
-#include "imu.h"
 #include "scheduler.h"
 #include "tasks/estimator.h"
 #include "tasks/receiver.h"
@@ -43,8 +42,6 @@ class LadybugFC {
             delay(100);
 
             startCycleCounter();
-
-            _imu.begin();
 
             pinMode(LED_PIN, OUTPUT);
 
@@ -76,6 +73,8 @@ class LadybugFC {
             Usfs::checkStatus();
 
             _esc.begin();
+
+            _estimatorTask.begin();
         }
 
         void handleImuInterrupt(void)
@@ -86,8 +85,6 @@ class LadybugFC {
 
         void step(std::vector<PidController *> pids, Mixer & mixer)
         {
-            static Axis3f _gyro;
-
             // Get state vector angular velocities directly from gyro
             _state.dphi =    _gyro.x;     
             _state.dtheta = -_gyro.y; // (negate for ENU)
@@ -103,14 +100,19 @@ class LadybugFC {
                     Usfs::reportError(eventStatus);
                 }
 
+                if (Usfs::eventStatusIsAccelerometer(eventStatus)) { 
+                    _usfs.readAccelerometerScaled(_accel.x, _accel.y, _accel.z);
+                    _accel.x = -_accel.x; // negate for nose-up positive
+                }
+
                 if (Usfs::eventStatusIsGyrometer(eventStatus)) { 
                     _usfs.readGyrometerScaled(_gyro.x, _gyro.y, _gyro.z);
+                    _gyro.y = -_gyro.y; // negate for nose-down positive
+                    _gyro.z = -_gyro.z; // negate for nose-left positive
                 }
 
                 if (Usfs::eventStatusIsQuaternion(eventStatus)) { 
-                    _usfs.readQuaternion(_imu.qw, _imu.qx, _imu.qy, _imu.qz);
-                    _gyro.y = -_gyro.y; // negate for nose-down positive
-                    _gyro.z = -_gyro.z; // negate for nose-left positive
+                    _usfs.readQuaternion(_qw, _qx, _qy, _qz);
                 }
             } 
 
@@ -154,7 +156,7 @@ class LadybugFC {
             }
 
             if (_scheduler.isDynamicReady(getCycleCounter())) {
-                runDynamicTasks(_imu);
+                runDynamicTasks();
             }
         }
 
@@ -226,9 +228,16 @@ class LadybugFC {
 
         std::vector<uint8_t> MOTOR_PINS = {0x0D, 0x10, 0x03, 0x0B};
 
+        float _qw;
+        float _qx;
+        float _qy;
+        float _qz;
+
         Usfs _usfs;
 
-        Imu _imu; 
+        Axis3f _accel;
+
+        Axis3f _gyro;
 
         uint32_t _gyroSyncTime;
 
@@ -281,7 +290,7 @@ class LadybugFC {
         }
 
 
-        void runDynamicTasks(Imu & imu)
+        void runDynamicTasks(void)
         {
             Task::prioritizer_t prioritizer = {Task::NONE, 0};
 
@@ -292,8 +301,8 @@ class LadybugFC {
             switch (prioritizer.id) {
 
                 case Task::ESTIMATOR:
-                    runTask(imu, prioritizer.id);
-                    updateArmingStatus(imu, usec);
+                    runTask(prioritizer.id);
+                    updateArmingStatus(usec);
                     updateLed();
                     break;
 
@@ -302,9 +311,9 @@ class LadybugFC {
                     break;
 
                 case Task::RECEIVER:
-                    updateArmingStatus(imu, usec);
+                    updateArmingStatus(usec);
                     updateLed();
-                    runTask(imu, prioritizer.id);
+                    runTask(prioritizer.id);
                     break;
 
                 default:
@@ -312,7 +321,7 @@ class LadybugFC {
             }
         }
 
-        void runTask(Imu & imu, Task::id_e id)
+        void runTask(Task::id_e id)
         {
             const uint32_t anticipatedEndCycles = getTaskAnticipatedEndCycles(id);
 
@@ -323,7 +332,7 @@ class LadybugFC {
                 switch (id) {
 
                     case Task::ESTIMATOR:
-                        _estimatorTask.run(imu, _state, usec);
+                        _estimatorTask.run(_qw, _qx, _qy, _qz, _accel, _gyro, _state);
                         break;
 
                     case Task::RECEIVER:
@@ -567,7 +576,7 @@ class LadybugFC {
             }
         }
 
-        bool safeToArm(Imu & imu, const uint32_t usec)
+        bool safeToArm(const uint32_t usec)
         {
             // Avoid arming if switch starts down
             static bool auxSwitchWasOff;
@@ -584,7 +593,7 @@ class LadybugFC {
                 fabsf(_state.phi) < maxArmingAngle &&
                 fabsf(_state.theta) < maxArmingAngle;
 
-            const auto gyroDoneCalibrating = !imu.gyroIsCalibrating();
+            const auto gyroDoneCalibrating = false; // XXX
 
             const auto haveReceiverSignal = _receiverTask.haveSignal(usec);
 
@@ -624,20 +633,20 @@ class LadybugFC {
             return _armingStatus;
         }
 
-        void updateArmingStatus(Imu & imu, const uint32_t usec)
+        void updateArmingStatus(const uint32_t usec)
         {
             checkFailsafe(usec);
 
             switch (_armingStatus) {
 
                 case ARMING_UNREADY:
-                    if (safeToArm(imu, usec)) {
+                    if (safeToArm(usec)) {
                         _armingStatus = ARMING_READY;
                     }
                     break;
 
                 case ARMING_READY:
-                    if (safeToArm(imu, usec)) {
+                    if (safeToArm(usec)) {
                         checkArmingSwitch();
                     }
                     else {

@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "../imu.h"
 #include "../hftask.h"
 #include "datatypes.h"
+#include "kalman.hpp"
 
 class EstimatorTask : public Task {
 
@@ -29,15 +29,62 @@ class EstimatorTask : public Task {
         EstimatorTask(void)
             : Task(ESTIMATOR, 100) // Hz
         {
+            _predictionUpdateIntervalMsec = 1000 / PREDICT_RATE;
         }
 
-        void run(Imu & imu, vehicleState_t & state, const uint32_t usec)
+        void begin(void)
         {
-            const auto angles = imu.getEulerAngles(usec);
+            _kalmanFilter.setDefaultParams();
 
-            state.phi   = angles.x;
-            state.theta = angles.y;
-            state.psi   = angles.z;
+            _kalmanFilter.init(millis());
         }
+
+        void run(
+                const float qw,
+                const float qx,
+                const float qy,
+                const float qz,
+                Axis3f & accel,
+                Axis3f & gyro,
+                vehicleState_t & state) 
+        {
+            state.phi = rad2deg(atan2(2.0f*(qw*qx+qy*qz), qw*qw-qx*qx-qy*qy+qz*qz));
+            state.theta = rad2deg(asin(2.0f*(qx*qz-qw*qy)));
+            state.psi = rad2deg(atan2(2.0f*(qx*qy+qw*qz), qw*qw+qx*qx-qy*qy-qz*qz));
+
+            auto msec = millis();
+
+            if (msec >= _nextPredictionMs) {
+
+                _kalmanFilter.predict(msec, true); 
+
+                _nextPredictionMs  = msec + _predictionUpdateIntervalMsec;
+            }
+
+            _kalmanFilter.addProcessNoise(msec);
+
+            _kalmanFilter.updateWithAccel(accel);
+
+            _kalmanFilter.updateWithGyro(gyro);
+
+            _kalmanFilter.finalize();
+
+            //_kalmanFilter.getVehicleState(state);
+        }
+
+    private:
+
+        static const uint32_t PREDICT_RATE = Clock::RATE_100_HZ; 
+
+        static float rad2deg(float rad)
+        {
+            return 180 * rad / M_PI;
+        }
+
+        KalmanFilter _kalmanFilter;
+
+        uint32_t _predictionUpdateIntervalMsec;
+
+        uint32_t _nextPredictionMs;
 
 }; // class EstimatorTask

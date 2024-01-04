@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../hftask.h"
+#include "datatypes.h"
 
 class ReceiverTask : public Task {
 
@@ -152,17 +153,17 @@ class ReceiverTask : public Task {
             auto tmp2 = (uint32_t)(tmp - 1050) * 1000 / 950;
             auto commandThrottle = lookupThrottle(tmp2);
 
-            Axes rawSetpoints = m_gotNewData ?
+            Axis3f rawSetpoints = m_gotNewData ?
 
-                Axes(
+                Axis3f {
                         rescaleCommand(m_rawRoll, +1),
                         rescaleCommand(m_rawPitch, +1),
                         rescaleCommand(m_rawYaw, -1)
-                    ) :
+                    } :
 
-                    Axes(0,0,0);
+                    Axis3f{0, 0, 0};
 
-            static Axes _axes;
+            static Axis3f _axes;
 
             if (m_gotNewData) {
 
