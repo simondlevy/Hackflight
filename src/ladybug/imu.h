@@ -20,12 +20,12 @@
 
 #include <usfs.hpp>
 
-#include "core/axes.h"
-#include "core/constrain.h"
-#include "core/filters/pt1.h"
-#include "core/pid.h"
-#include "core/utils.h"
-#include "core/vstate.h"
+#include "axes.h"
+#include "constrain.h"
+#include "filters/pt1.h"
+#include "pid.h"
+#include "utils.h"
+#include "vstate.h"
 
 class Imu {
 

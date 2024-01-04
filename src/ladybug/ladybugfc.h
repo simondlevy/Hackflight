@@ -21,7 +21,7 @@
 
 #include "escs/brushed.h"
 #include "imu.h"
-#include "core/mixer.h"
+#include "mixer.h"
 #include "esc.h"
 #include "imu.h"
 #include "scheduler.h"

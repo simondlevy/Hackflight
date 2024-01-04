@@ -21,6 +21,7 @@
 #include "demands.h"
 #include "utils.h"
 #include "vstate.h"
+#include "../datatypes.h"
 
 #include <vector>
 

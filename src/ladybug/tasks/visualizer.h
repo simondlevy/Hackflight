@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 
-#include "../core/mixer.h"
+#include "../mixer.h"
 #include "../imu.h"
 #include "../msp.h"
 #include "receiver.h"

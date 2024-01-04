@@ -22,8 +22,8 @@
 #include <ladybug/arduinostl.h>
 #include <ladybug/hackflight.h>
 #include <ladybug/ladybugfc.h>
-#include <ladybug/core/mixers/fixedpitch/quadxbf.h>
-#include <ladybug/core/pids/angle.h>
+#include <ladybug/mixers/fixedpitch/quadxbf.h>
+#include <ladybug/pids/angle.h>
 
 #include <dsmrx.hpp>
 

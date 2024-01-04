@@ -22,7 +22,7 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "core/mixer.h"
+#include "mixer.h"
 #include "imu.h"
 #include "tasks/estimator.h"
 #include "tasks/visualizer.h"
