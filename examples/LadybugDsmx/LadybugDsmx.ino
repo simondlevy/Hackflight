@@ -20,7 +20,6 @@
 #include <closedloop.hpp>
 
 #include <ladybug/arduinostl.h>
-#include <ladybug/hackflight.h>
 #include <ladybug/ladybugfc.h>
 #include <ladybug/mixers/fixedpitch/quadxbf.h>
 #include <ladybug/pids/angle.h>
