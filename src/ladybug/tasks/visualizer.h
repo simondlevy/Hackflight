@@ -25,6 +25,7 @@
 #include "../imu.h"
 #include "../msp.h"
 #include "receiver.h"
+#include "datatypes.h"
 
 class VisualizerTask : public Task {
 
@@ -54,7 +55,7 @@ class VisualizerTask : public Task {
     public:
 
         bool parse(
-                VehicleState & vstate,
+                vehicleState_t & state,
                 ReceiverTask & receiverTask,
                 Msp & msp,
                 const uint8_t byte)
@@ -84,7 +85,7 @@ class VisualizerTask : public Task {
                 case 108: // ESTIMATOR
                     {
                         int16_t angles[3] = {};
-                        Imu::getEulerAngles(vstate, angles);
+                        Imu::getEulerAngles(state, angles);
                         serializeShorts(msp, 108, angles, 3);
                     } 
                     return true;

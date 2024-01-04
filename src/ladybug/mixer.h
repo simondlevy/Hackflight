@@ -21,7 +21,6 @@
 #include "constrain.h"
 #include "demands.h"
 #include "pid.h"
-#include "vstate.h"
 
 #include <vector>
 

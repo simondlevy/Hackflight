@@ -21,6 +21,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "datatypes.h"
 #include "../constrain.h"
 #include "../filters/pt1.h"
 #include "../filters/pt2.h"
@@ -418,7 +419,7 @@ class AnglePidController : public PidController {
         virtual void modifyDemands(
                 Demands & demands,
                 const int32_t dusec,
-                const VehicleState & vstate,
+                const vehicleState_t & state,
                 const bool reset) override
         {
             const auto rollDemand  = rescale(demands.roll);
@@ -426,12 +427,12 @@ class AnglePidController : public PidController {
             const auto yawDemand   = rescale(demands.yaw);
 
             const auto roll=
-                updateCyclic(rollDemand, vstate.phi, vstate.dphi, m_roll);
+                updateCyclic(rollDemand, state.phi, state.dphi, m_roll);
 
             const auto pitch =
-                updateCyclic(pitchDemand, vstate.theta, vstate.dtheta, m_pitch);
+                updateCyclic(pitchDemand, state.theta, state.dtheta, m_pitch);
 
-            const auto yaw = updateYaw(yawDemand, vstate.dpsi);
+            const auto yaw = updateYaw(yawDemand, state.dpsi);
 
             if (reset) {
                 m_roll.axis.I = 0;

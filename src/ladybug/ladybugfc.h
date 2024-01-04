@@ -128,13 +128,13 @@ class LadybugFC {
 
                 if (_esc.isReady(usec)) {
 
-                    _imu.gyroRawToFilteredDps(rawGyro, _vstate);
+                    _imu.gyroRawToFilteredDps(rawGyro, _state);
 
                     Demands demands = _receiverTask.modifyDemands();
 
                     auto pidReset = _receiverTask.throttleIsDown();
 
-                    PidController::run(pids, demands, _vstate, usec, pidReset);
+                    PidController::run(pids, demands, _state, usec, pidReset);
 
                     mixer.getMotors(demands, mixmotors);
                 }
@@ -209,7 +209,7 @@ class LadybugFC {
 
         armingStatus_e _armingStatus;
 
-        VehicleState _vstate;
+        vehicleState_t _state;
 
         Msp _msp;
 
@@ -314,7 +314,7 @@ class LadybugFC {
                 switch (id) {
 
                     case Task::ESTIMATOR:
-                        _estimatorTask.run(imu, _vstate, usec);
+                        _estimatorTask.run(imu, _state, usec);
                         break;
 
                     case Task::RECEIVER:
@@ -531,7 +531,7 @@ class LadybugFC {
 
         bool mspParse(const uint8_t byte)
         {
-            return _visualizerTask.parse(_vstate, _receiverTask, _msp, byte);
+            return _visualizerTask.parse(_state, _receiverTask, _msp, byte);
         }
 
         float * getVisualizerMotors(void)
@@ -573,8 +573,8 @@ class LadybugFC {
             const auto maxArmingAngle = Imu::deg2rad(MAX_ARMING_ANGLE_DEG);
 
             const auto imuIsLevel =
-                fabsf(_vstate.phi) < maxArmingAngle &&
-                fabsf(_vstate.theta) < maxArmingAngle;
+                fabsf(_state.phi) < maxArmingAngle &&
+                fabsf(_state.theta) < maxArmingAngle;
 
             const auto gyroDoneCalibrating = !imu.gyroIsCalibrating();
 

@@ -20,6 +20,7 @@
 
 #include "../imu.h"
 #include "../hftask.h"
+#include "datatypes.h"
 
 class EstimatorTask : public Task {
 
@@ -30,13 +31,13 @@ class EstimatorTask : public Task {
         {
         }
 
-        void run(Imu & imu, VehicleState & vstate, const uint32_t usec)
+        void run(Imu & imu, vehicleState_t & state, const uint32_t usec)
         {
             const auto angles = imu.getEulerAngles(usec);
 
-            vstate.phi   = angles.x;
-            vstate.theta = angles.y;
-            vstate.psi   = angles.z;
+            state.phi   = angles.x;
+            state.theta = angles.y;
+            state.psi   = angles.z;
         }
 
 }; // class EstimatorTask

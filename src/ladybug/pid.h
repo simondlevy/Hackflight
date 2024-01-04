@@ -20,8 +20,7 @@
 
 #include "demands.h"
 #include "utils.h"
-#include "vstate.h"
-#include "../datatypes.h"
+#include "datatypes.h"
 
 #include <vector>
 
@@ -36,7 +35,7 @@ class PidController {
          virtual void modifyDemands(
                 Demands & demands,
                 const int32_t dusec,
-                const VehicleState & vstate,
+                const vehicleState_t & state,
                 const bool reset) = 0;
 
     public:
@@ -48,7 +47,7 @@ class PidController {
          void update(
                 Demands & demands,
                 const uint32_t usec,
-                const VehicleState & vstate,
+                const vehicleState_t & state,
                 const bool reset)
          {
              static uint32_t _prev;
@@ -57,18 +56,18 @@ class PidController {
 
              _prev = usec;
 
-             modifyDemands(demands, dusec, vstate, reset);
+             modifyDemands(demands, dusec, state, reset);
          }
 
          static void run(
                  std::vector<PidController *> & pidControllers,
                  Demands & demands,
-                 const VehicleState & vstate,
+                 const vehicleState_t & state,
                  const uint32_t usec,
                  const bool reset)
          {
              for (auto p: pidControllers) {
-                 p->update(demands, usec, vstate, reset);
+                 p->update(demands, usec, state, reset);
              }
          }
 };

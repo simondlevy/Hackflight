@@ -25,7 +25,7 @@
 #include "filters/pt1.h"
 #include "pid.h"
 #include "utils.h"
-#include "vstate.h"
+#include "datatypes.h"
 
 class Imu {
 
@@ -36,11 +36,11 @@ class Imu {
             return deg * M_PI / 180;
         }
 
-        static void getEulerAngles(const VehicleState & vstate, int16_t angles[3])
+        static void getEulerAngles(const vehicleState_t & state, int16_t angles[3])
         {
-            angles[0] = (int16_t)(10 * rad2degi(vstate.phi));
-            angles[1] = (int16_t)(10 * rad2degi(vstate.theta));
-            angles[2] = (int16_t)rad2degi(vstate.psi);
+            angles[0] = (int16_t)(10 * rad2degi(state.phi));
+            angles[1] = (int16_t)(10 * rad2degi(state.theta));
+            angles[2] = (int16_t)rad2degi(state.psi);
         }
 
         bool gotNewData;
@@ -74,7 +74,7 @@ class Imu {
             return m_gyroIsCalibrating;
         }
 
-        void gyroRawToFilteredDps(int16_t rawGyro[3], VehicleState & vstate)
+        void gyroRawToFilteredDps(int16_t rawGyro[3], vehicleState_t & state)
         {
             accumulateGyro(m_gyroX.dpsFiltered, m_gyroY.dpsFiltered, m_gyroZ.dpsFiltered);
 
@@ -114,9 +114,9 @@ class Imu {
 
             m_gyroIsCalibrating = !calibrationComplete;
 
-            vstate.dphi   = m_gyroX.dpsFiltered; 
-            vstate.dtheta = m_gyroY.dpsFiltered; 
-            vstate.dpsi   = m_gyroZ.dpsFiltered;
+            state.dphi   = m_gyroX.dpsFiltered; 
+            state.dtheta = m_gyroY.dpsFiltered; 
+            state.dpsi   = m_gyroZ.dpsFiltered;
         }
 
 
