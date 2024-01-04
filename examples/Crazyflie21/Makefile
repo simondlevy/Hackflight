@@ -21,13 +21,13 @@ $(HEX): $(SKETCH).ino $(SRC)/*.h $(SRC)/*/*.h
 	arduino-cli compile --fqbn $(FQBN) --libraries $(HFLIB),$(LIB) --build-path $(OBJ) --warnings "all"
 	rm -f *.bin *.elf
 
-unbrick: $(DFU)
-	dfu-util -a 0 -D $(DFU) -s :leave	
-
-flash: $(DFU)
+upload: $(DFU)
 	echo -n 'R' > $(PORT)
 	sleep 1
 	dfu-util -a 0 -D $(DFU) -s :leave
+
+unbrick: $(DFU)
+	dfu-util -a 0 -D $(DFU) -s :leave	
 
 clean:
 	rm -rf obj
