@@ -22,7 +22,6 @@
 #include <stdint.h>
 
 #include "../mixer.h"
-#include "../imu.h"
 #include "../msp.h"
 #include "receiver.h"
 #include "datatypes.h"

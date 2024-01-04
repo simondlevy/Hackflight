@@ -20,7 +20,6 @@
 #include <Wire.h>
 
 #include "escs/brushed.h"
-#include "imu.h"
 #include "mixer.h"
 #include "esc.h"
 #include "imu.h"
@@ -28,8 +27,6 @@
 #include "tasks/estimator.h"
 #include "tasks/receiver.h"
 #include "tasks/visualizer.h"
-
-
 
 class LadybugFC {
 
