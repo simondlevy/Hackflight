@@ -239,9 +239,6 @@ class CoreTask {
 
                     _pitchRollRateController.run(state, demands);
 
-                    // Convert yaw demand in [-1,+1] to degrees in [-200,+200]
-                    demands.yaw *= 200;
-
                     _yawAngleController.run(state, demands);
 
                     _yawRateController.run(state, demands);

@@ -37,8 +37,8 @@ class YawAngleController : public ClosedLoopController {
         }
 
         /**
-          * Demand is input as angle in degrees and output as degrees per
-          * second, both nose-right positive.
+          * Demand is input as desired angle normalized to [-1,+1] and output
+          * as degrees per second, both nose-right positive.
           */
          virtual void run(const vehicleState_t & state, 
                 demands_t & demands) override 
@@ -48,7 +48,8 @@ class YawAngleController : public ClosedLoopController {
             // Yaw angle psi is positive nose-left, whereas yaw demand is
             // positive nose-right.  Hence we negate the yaw demand to
             // accumulate the angle target.
-            _angleTarget = cap(_angleTarget - demands.yaw * _dt);
+            _angleTarget = cap(
+                    _angleTarget - DEMAND_ANGLE_MAX * demands.yaw * _dt);
 
             const auto angleError = cap(_angleTarget - state.psi);
 
@@ -72,6 +73,7 @@ class YawAngleController : public ClosedLoopController {
 
     private:
 
+        static constexpr float DEMAND_ANGLE_MAX = 200;
         static constexpr float CUTOFF_FREQ = 30;
         static constexpr float INTEGRAL_LIMIT = 360;
 
