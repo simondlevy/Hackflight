@@ -169,6 +169,9 @@ int main(int argc, char ** argv)
         // Get open-loop demands from input device (keyboard, joystick, etc.)
         auto demands = sticksRead();
 
+        // Convert yaw demand to degrees
+        demands.yaw *= 200;
+
         // Get vehicle state from sensors
         auto state = getVehicleState(gyro, imu, gps);
 

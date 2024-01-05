@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../pid.hpp"
+#include <pid.hpp>
 
 class YawAngleController : public ClosedLoopController {
 
@@ -37,8 +37,8 @@ class YawAngleController : public ClosedLoopController {
         }
 
         /**
-          * Demand is input in[-1,+1] and output as degrees per second, both
-          * nose-right positive.
+          * Demand is input as angle in degrees and output as degrees per
+          * second, both nose-right positive.
           */
          virtual void run(const vehicleState_t & state, 
                 demands_t & demands) override 
@@ -48,12 +48,14 @@ class YawAngleController : public ClosedLoopController {
             // Yaw angle psi is positive nose-left, whereas yaw demand is
             // positive nose-right.  Hence we negate the yaw demand to
             // accumulate the angle target.
-            _angleTarget = cap(_angleTarget - ANGLE_SCALE * demands.yaw * _dt);
+            _angleTarget = cap(_angleTarget - demands.yaw * _dt);
 
             const auto angleError = cap(_angleTarget - state.psi);
 
             _pid.setError(angleError);
 
+            // Return the result negated, so demand will still be nose-right
+            // positive
             demands.yaw = -_pid.run();
 
             if (demands.thrust == 0) {
@@ -69,8 +71,6 @@ class YawAngleController : public ClosedLoopController {
         }
 
     private:
-
-        static constexpr float ANGLE_SCALE = 200;
 
         static constexpr float CUTOFF_FREQ = 30;
         static constexpr float INTEGRAL_LIMIT = 360;
