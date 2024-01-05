@@ -80,15 +80,14 @@ class Hackflight {
                 setStatus(STATUS_TAKEOFF);
             }
 
-            // If in takeoff and initial target altitude reached, switch status
-            // to flying
-            if (_status == STATUS_TAKEOFF && 
-                    vehicleState.z > INITIAL_ALTITUDE_TARGET) {
+            if (_status == STATUS_TAKEOFF)  {
+                _demands.thrust = 56; 
+            }
+
+            if (vehicleState.z > INITIAL_ALTITUDE_TARGET) {
                 setStatus(STATUS_FLYING);
             }
 
-            // If we're flying and altitude drops below a minimum, set thrust to 
-            // minimum and status to landed
             if (_status == STATUS_FLYING) {
 
                 if (vehicleState.z < LANDING_ALTITUDE) {
@@ -97,9 +96,7 @@ class Hackflight {
                 }
             }
 
-            // If we're flying or taking off, run the closed-loop controllers
-            // to get the final demands
-            if (_status == STATUS_FLYING || _status == STATUS_TAKEOFF) {
+            if (_status == STATUS_FLYING) {
 
                 // Run closed-loop controllers to update demands
                 runClosedLoopControllers(vehicleState);
