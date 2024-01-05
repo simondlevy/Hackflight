@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../pid.hpp"
+#include <pid.hpp>
 
 class YawRateController : public ClosedLoopController {
 
@@ -36,9 +36,9 @@ class YawRateController : public ClosedLoopController {
         }
 
         /**
-          * Demand is input as degrees per second, nose-right positive, and
-          * output as arbitrary nose-right positive value to be scaled
-          * according to motor characteristics.
+          * Demand is input and output as degrees per second, nose-right
+          * positive, and output as arbitrary nose-right positive value to be
+          * scaled according to motor characteristics.
           */
          virtual void run(const vehicleState_t & state, 
                 demands_t & demands) override 
