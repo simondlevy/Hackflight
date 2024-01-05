@@ -1,25 +1,8 @@
-/**
- *
- * Copyright (C) 2011-2022 Bitcraze AB, 2024 Simon D. Levy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 #pragma once
 
-#include "../closedloop.hpp"
-#include "../math3d.h"
-#include "../pid.hpp"
+#include <closedloop.hpp>
+#include <math3d.h>
+#include <pid.hpp>
 
 class PositionController : public ClosedLoopController {
 
@@ -27,13 +10,10 @@ class PositionController : public ClosedLoopController {
 
         void init(
                 const Clock::rate_t updateRate, 
-                const float altitudeMin,
                 const float kp=25, 
                 const float ki=1)
         {
             ClosedLoopController::init(updateRate);
-
-            _altitudeMin = altitudeMin;
 
             initAxis(_pidX, kp, ki);
             initAxis(_pidY, kp, ki);
@@ -43,7 +23,7 @@ class PositionController : public ClosedLoopController {
           * Demands are input as normalized interval [-1,+1] and output as
           * angles in degrees.
           *
-          * roll:  input right negative => output negative
+          * roll:  input left positive => output negative
           *
           * pitch: input forward positive => output negative
           */
@@ -60,8 +40,8 @@ class PositionController : public ClosedLoopController {
             const auto dyb = -dxw * sinpsi + dyw * cospsi;       
 
             // Run PID closedloops on body-coordinate velocities
-            demands.roll  = runAxis(state, demands.roll, dyb, _pidY);
-            demands.pitch = runAxis(state, demands.pitch, dxb, _pidX);
+            demands.roll = runAxis(demands.roll, dyb, _pidY);
+            demands.pitch = runAxis(demands.pitch, dxb, _pidX);
         }
 
         void resetPids(void)
@@ -90,8 +70,6 @@ class PositionController : public ClosedLoopController {
         Pid _pidX;
         Pid _pidY;
 
-        float _altitudeMin;
-
         void resetFilter(Pid & pid)
         {
             pid.filterReset(_updateRate, FILTER_CUTOFF, true);
@@ -103,18 +81,10 @@ class PositionController : public ClosedLoopController {
             pid.setOutputLimit(LIMIT * LIMIT_OVERHEAD);
         }
 
-        float runAxis(
-                const vehicleState_t & state, 
-                const float demand, 
-                const float measured, Pid & pid)
+        float runAxis(const float demand, const float measured, Pid & pid)
         {
-            // Position data is unreliable below a certain altitude, below
-            // which we return a zero demand.  To accommodate the demand and
-            // state conventions (+Y left / roll left negative; +X forward /
-            // nose-up positive), we negate the output of the PID controller.
-            return state. z > _altitudeMin ? 
-                Num::fconstrain(-pid.run(demand, measured), -LIMIT, +LIMIT) :
-                0;
+            // note negation
+            return Num::fconstrain(-pid.run(demand, measured), -LIMIT, +LIMIT);
         }
 
 };

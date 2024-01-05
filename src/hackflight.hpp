@@ -209,7 +209,7 @@ class Hackflight {
             _pitchRollRateController.init(pidUpdateRate);
             _yawAngleController.init(pidUpdateRate);
             _yawRateController.init(pidUpdateRate);
-            _positionController.init(pidUpdateRate, INITIAL_ALTITUDE_TARGET);
+            _positionController.init(pidUpdateRate);
             _altitudeController.init(pidUpdateRate, INITIAL_ALTITUDE_TARGET);
         }
 
