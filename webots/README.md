@@ -19,7 +19,7 @@ ignore this warning and fly the sim using the keyboard, as shown by the instruct
 in the console. Currently supported game controllers are:
 
 1. Spektrum R/C transmitters, via 
-[Spektrum Wireless Spektrum Wireless USB Simulator Dongle WS1000](https://us.amazon.com/Spektrum-Wireless-Simulator-Dongle-WS1000/dp/B06XCP7Z5Y?th=1)
+[Spektrum Wireless Flight Simulator Dongle](https://www.amazon.com/dp/B07ZK1R32H?ref=ppx_yo2ov_dt_b_product_details&th=1)
 
 
 2. FrSky R/C/ transmitters, via 
