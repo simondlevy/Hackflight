@@ -9,7 +9,7 @@
 // Arduino library
 #include <pmw3901.hpp>
 
-#include <types.h>
+#include <datatypes.h>
 
 #include <tasks/estimator.hpp>
 

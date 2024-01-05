@@ -36,7 +36,7 @@
 
 #include <linalg.h>
 #include <num.hpp>
-#include <types.h>
+#include <datatypes.h>
 #include <config.h>
 
 class Commander {

@@ -23,7 +23,7 @@ class YawAngleController : public ClosedLoopController {
           * Demand is input as angle in degrees and output as degrees per
           * second, both nose-right positive.
           */
-         virtual void run(const state_t & state, 
+         virtual void run(const vehicleState_t & state, 
                 demands_t & demands) override 
         {
             static float _angleTarget;

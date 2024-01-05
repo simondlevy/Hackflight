@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../pid.hpp"
-#include "../closedloop.hpp"
+#include <pid.hpp>
+#include <closedloop.hpp>
 
 class AltitudeController : public ClosedLoopController {
 
@@ -30,7 +30,7 @@ class AltitudeController : public ClosedLoopController {
          * arbitrary positive value to be scaled according to motor
          * characteristics.
          */
-        virtual void run(const state_t & state, 
+        virtual void run(const vehicleState_t & state, 
                 demands_t & demands) override 
         {
             // Set climb rate based on target altitude

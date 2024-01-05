@@ -62,7 +62,7 @@ class EstimatorTask {
             return _estimator.didInit();
         }
 
-        void getState(state_t * state)
+        void getState(vehicleState_t * state)
         {
             // This function is called from the stabilizer loop. It is important that
             // this call returns as quickly as possible. The dataMutex must only be
@@ -70,7 +70,7 @@ class EstimatorTask {
             xSemaphoreTake(_dataMutex, portMAX_DELAY);
 
             // Copy the latest state, calculated by the task
-            memcpy(state, &_state, sizeof(state_t));
+            memcpy(state, &_state, sizeof(vehicleState_t));
             xSemaphoreGive(_dataMutex);
 
             xSemaphoreGive(_runTaskSemaphore);
@@ -161,7 +161,7 @@ class EstimatorTask {
 
         // Data used to enable the task and stabilizer loop to run with minimal locking
         // The estimator state produced by the task, copied to the stabilizer when needed.
-        state_t _state;
+        vehicleState_t _state;
 
         static uint32_t msec(void)
         {

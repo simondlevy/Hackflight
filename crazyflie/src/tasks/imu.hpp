@@ -35,7 +35,7 @@
 #include <lpf.hpp>
 #include <num.hpp>
 #include <physicalConstants.h>
-#include <types.h>
+#include <datatypes.h>
 
 class ImuTask {
 

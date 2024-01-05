@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../closedloop.hpp"
-#include "../math3d.h"
-#include "../pid.hpp"
+#include <closedloop.hpp>
+#include <math3d.h>
+#include <pid.hpp>
 
 class PositionController : public ClosedLoopController {
 
@@ -27,7 +27,7 @@ class PositionController : public ClosedLoopController {
           *
           * pitch: input forward positive => output negative
           */
-         virtual void run(const state_t & state,
+         virtual void run(const vehicleState_t & state,
                 demands_t & demands) override 
         {
             // Rotate world-coordinate velocities into body coordinates

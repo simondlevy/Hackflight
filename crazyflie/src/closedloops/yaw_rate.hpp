@@ -23,7 +23,7 @@ class YawRateController : public ClosedLoopController {
           * positive, and output as arbitrary nose-right positive value to be
           * scaled according to motor characteristics.
           */
-         virtual void run(const state_t & state, 
+         virtual void run(const vehicleState_t & state, 
                 demands_t & demands) override 
         {
             // Yaw demand is nose-right positive, whereas yaw angle psi and its first

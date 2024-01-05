@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../closedloop.hpp"
-#include "../num.hpp"
-#include "../pid.hpp"
+#include <closedloop.hpp>
+#include <num.hpp>
+#include <pid.hpp>
 
 class PitchRollRateController : public ClosedLoopController {
 
@@ -31,7 +31,7 @@ class PitchRollRateController : public ClosedLoopController {
           * pitch: input nose-up positive => output positive
           */
          virtual void run(
-                const state_t & state, demands_t & demands) override
+                const vehicleState_t & state, demands_t & demands) override
         {
             demands.roll = _rollPid.run(demands.roll, state.dphi);
 

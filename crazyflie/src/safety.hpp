@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <console.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,7 +15,7 @@
 #include <motors.h>
 #include <safety.hpp>
 #include <system.h>
-#include <types.h>
+#include <datatypes.h>
 
 class Safety {
 
@@ -232,7 +233,7 @@ class Safety {
             const auto newState = stateUpdate(state, conditions);
 
             if (state != newState) {
-                const state_t previousState = state;
+                const vehicleState_t previousState = state;
                 state = newState;
                 postTransitionActions(previousState);
             }
@@ -290,7 +291,7 @@ class Safety {
             stateExceptFreeFall,
             stateLocked,
             state_NrOfStates,
-        } state_t;
+        } vehicleState_t;
 
         typedef enum {
             conditionCombinerAll,
@@ -326,7 +327,7 @@ class Safety {
         static const auto AUTO_ARMING = false;
 
         typedef struct stateTransition {
-            state_t newState;
+            vehicleState_t newState;
             uint32_t triggers;
             uint32_t negatedTriggers;
             conditionCombiner_t triggerCombiner;
@@ -406,15 +407,15 @@ class Safety {
         bool isArmingActivated;
         uint32_t initialTumbleTick;
         uint32_t latestThrustTick;
-        state_t state;
+        vehicleState_t state;
         uint32_t latestConditions;
 
-        state_t findTransition(
-                const state_t currentState, 
+        vehicleState_t findTransition(
+                const vehicleState_t currentState, 
                 const uint32_t conditions, 
                 const stateTransition * transitions) 
         {
-            state_t newState = currentState;
+            vehicleState_t newState = currentState;
 
             for (auto transition=transitions; transition; transition=transition->next) {
 
@@ -515,7 +516,7 @@ class Safety {
             return false;
         }
 
-        state_t stateUpdate(const state_t currentState, const uint32_t conditions) 
+        vehicleState_t stateUpdate(const vehicleState_t currentState, const uint32_t conditions) 
         {
             const auto transitions = &(stateTransitions[currentState][0]);
 
@@ -523,12 +524,12 @@ class Safety {
         }
 
 
-        const char* getStateName(const state_t state) 
+        const char* getStateName(const vehicleState_t state) 
         {
             return stateNames[state];
         }
 
-        const char* getConditionName(const state_t condition) 
+        const char* getConditionName(const vehicleState_t condition) 
         {
             return conditionNames[condition];
         }
@@ -548,12 +549,12 @@ class Safety {
                 }
 
                 consolePrintf("SAFETY:   %s (0x%lx): %u\n",
-                        getConditionName((state_t)condition), 
+                        getConditionName((vehicleState_t)condition), 
                         bit, bitValue);
             }
         }
 
-        void postTransitionActions(const state_t previousState) 
+        void postTransitionActions(const vehicleState_t previousState) 
         {
             const auto newState = state;
 

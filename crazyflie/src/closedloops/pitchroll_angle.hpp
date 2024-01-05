@@ -29,7 +29,7 @@ class PitchRollAngleController : public ClosedLoopController {
           *
           * pitch: nose-up positive
           */
-         virtual void run(const state_t & state, 
+         virtual void run(const vehicleState_t & state, 
                 demands_t & demands) override
         {
             demands.roll = _rollPid.run(demands.roll, state.phi);

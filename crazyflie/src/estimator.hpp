@@ -66,7 +66,7 @@
 #include <math3d.h>
 #include <outlierFilterTdoa.hpp>
 #include <physicalConstants.h>
-#include <types.h>
+#include <datatypes.h>
 
 class Estimator { 
 
@@ -559,7 +559,7 @@ class Estimator {
             return true;
         }
 
-        void getState(state_t & state)
+        void getState(vehicleState_t & state)
         {
             state.x = _kalmanData.S[KC_STATE_X];
 

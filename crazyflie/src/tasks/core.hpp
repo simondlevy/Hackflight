@@ -30,7 +30,7 @@ class CoreTask {
 
         // Shared with logger
         demands_t demands;
-        state_t state;
+        vehicleState_t state;
 
         void init(
                 OpenLoop * openLoop,

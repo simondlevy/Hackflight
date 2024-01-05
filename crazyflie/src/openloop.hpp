@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include <types.h>
+#include <datatypes.h>
 
 class OpenLoop {
 

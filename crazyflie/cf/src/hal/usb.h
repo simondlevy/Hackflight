@@ -1,7 +1,5 @@
 #pragma once
 
-#include <types.h>
-
 #include <tasks/syslink.hpp>
 
 #define USB_RX_TX_PACKET_SIZE   (64)
