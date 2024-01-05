@@ -50,7 +50,7 @@ static std::map<std::string, joystickAxes_t> JOYSTICK__AXIS_MAP = {
     //                                                        T   R   P  Y
     // Linux
     { "MY-POWER CO.,LTD. 2In1 USB Joystick", joystickAxes_t {-2,  3, -4, 1 } },
-    { "SHANWAN Android Gamepad",             joystickAxes_t {-2, -3, -4, 1 } },
+    { "SHANWAN Android Gamepad",             joystickAxes_t {-2,  3, -4, 1 } },
     { "Logitech Logitech Extreme 3D",        joystickAxes_t {-4,  1, -2, 3 } },
     { "FrSky FrSky Simulator",               joystickAxes_t { 1,  2,  3, 4 } },
     { "Horizon Hobby SPEKTRUM RECEIVER",     joystickAxes_t { 2,  3,  4, 1 } },
