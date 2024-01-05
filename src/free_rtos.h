@@ -20,7 +20,7 @@
 #if defined(TEENSYDUINO)
 #include <FreeRTOS_TEENSY4.h>
 #else
-#include <FreeRTOS.h>
+#include <free_rtos/include/FreeRTOS.h>
 #endif
 
 #define M2T(X) ((unsigned int)(X))
