@@ -81,11 +81,12 @@ class Hackflight {
             }
 
             if (_status == STATUS_TAKEOFF)  {
-                _demands.thrust = _thrustBase * TAKEOFF_THRUST_SCALE; 
-            }
 
-            if (vehicleState.z > INITIAL_ALTITUDE_TARGET) {
-                setStatus(STATUS_FLYING);
+                _demands.thrust = _thrustBase * TAKEOFF_THRUST_SCALE; 
+
+                if (vehicleState.z > INITIAL_ALTITUDE_TARGET) {
+                    setStatus(STATUS_FLYING);
+                }
             }
 
             if (_status == STATUS_FLYING) {
