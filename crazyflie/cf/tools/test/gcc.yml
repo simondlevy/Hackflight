@@ -1,0 +1,144 @@
+---
+kconfig:
+  config_file: 'build/.config'
+compiler:
+  path: gcc
+  source_path:     &source_path 'src/'
+  unit_tests_path: &unit_tests_path 'test/**/'
+  mocks_path:      &mocks_path 'generated/test/mocks/'
+  build_path:      &build_path 'generated/test/build/'
+  options:
+    - '-c'
+    - '-Wall'
+    - '-Wextra'
+    - '-Wunused-parameter'
+    - '-Wmissing-braces'
+    - '-Wno-address'
+    - '-std=c11'
+    - '-pedantic'
+    - '-O0'
+    - '-g3'
+    - '-fsanitize=address'
+    - '-fno-omit-frame-pointer'
+  includes:
+    prefix: '-I'
+    items:
+      - *source_path
+      - *unit_tests_path
+      - *mocks_path
+      - 'build/include/generated'
+      - 'src/config'
+      - 'src/deck/drivers/interface/'
+      - 'src/deck/drivers/src/'
+      - 'src/deck/core/'
+      - 'src/deck/interface/'
+      - 'src/utils/interface/'
+      - 'src/utils/interface/tdoa/'
+      - 'src/utils/interface/lighthouse/'
+      - 'src/utils/src/'
+      - 'src/utils/src/tdoa/'
+      - 'src/utils/src/lighthouse/'
+      - 'vendor/FreeRTOS/include/'
+      - 'src/config/'
+      - 'src/drivers/interface/'
+      - 'src/drivers/src'
+      - 'src/drivers/esp32/interface/'
+      - 'src/drivers/esp32/src/'
+      - 'src/hal/interface/'
+      - 'src/lib/CMSIS/STM32F4xx/Include'
+      - 'src/lib/STM32F4xx_StdPeriph_Driver/inc'
+      - 'src/modules/interface/'
+      - 'src/modules/interface/kalman_core/'
+      - 'src/modules/interface/lighthouse/'
+      - 'src/modules/interface/estimator/'
+      - 'src/modules/interface/controller/'
+      - 'src/modules/interface/outlierfilter/'
+      - 'src/modules/src/'
+      - 'src/modules/src/kalman_core/'
+      - 'src/modules/src/lighthouse/'
+      - 'src/modules/src/outlierfilter/'
+      - 'src/platform/interface/'
+      - 'src/platform/src/'
+      - 'src/utils/interface/'
+      - 'src/utils/interface/lighthouse/'
+      - 'src/utils/interface/tdoa'
+      - 'src/modules/interface/cpx'
+      - 'src/utils/src/'
+      - 'src/utils/src/lighthouse/'
+      - 'src/utils/src/tdoa/'
+      - 'test/testSupport/'
+      - 'vendor/CMSIS/CMSIS/Core/Include'
+      - 'vendor/CMSIS/CMSIS/DSP/Include'
+      - 'vendor/FreeRTOS/include'
+      - 'vendor/FreeRTOS/portable/GCC/ARM_CM4F'
+      - 'vendor/cmock/src/'
+      - 'vendor/libdw1000/inc/'
+      - 'vendor/unity/src/'
+  defines:
+    prefix: '-D'
+    items:
+      - CMOCK
+      - 'UNIT_TEST_MODE'
+      - 'UNITY_SUPPORT_64'
+      - 'HSI48_VALUE="((uint32_t)48000000)"'
+      - 'STM32F072xB'
+      - 'ARM_MATH_CM4'
+      - '__fp16=float'
+  object_files:
+    prefix: '-o'
+    extension: '.o'
+    destination: *build_path
+  libs:
+    TEST_SUPPORT:
+      files:
+        - 'test/testSupport/cfassert_in_test.c'
+    ARM_DSP_MATH:
+      files:
+        - 'vendor/CMSIS/CMSIS/DSP/Source/BasicMathFunctions/arm_add_f32.c'
+        - 'vendor/CMSIS/CMSIS/DSP/Source/BasicMathFunctions/arm_dot_prod_f32.c'
+        - 'vendor/CMSIS/CMSIS/DSP/Source/BasicMathFunctions/arm_scale_f32.c'
+        - 'vendor/CMSIS/CMSIS/DSP/Source/BasicMathFunctions/arm_sub_f32.c'
+        - 'vendor/CMSIS/CMSIS/DSP/Source/CommonTables/arm_common_tables.c'
+        - 'vendor/CMSIS/CMSIS/DSP/Source/FastMathFunctions/arm_cos_f32.c'
+        - 'vendor/CMSIS/CMSIS/DSP/Source/FastMathFunctions/arm_sin_f32.c'
+        - 'vendor/CMSIS/CMSIS/DSP/Source/MatrixFunctions/arm_mat_mult_f32.c'
+        - 'vendor/CMSIS/CMSIS/DSP/Source/StatisticsFunctions/arm_power_f32.c'
+      extra_options:
+        - '-Wno-overflow'
+
+
+linker:
+  path: gcc
+  options:
+    - '-lm'
+    - '-fsanitize=address'
+    - '-fno-omit-frame-pointer'
+  includes:
+    prefix: '-I'
+  object_files:
+    path: *build_path
+    extension: '.o'
+  bin_files:
+    prefix: '-o'
+    extension: '.exe'
+    destination: *build_path
+
+unsupported:
+  - out_of_memory
+  - unity_64bit_support
+  - callingconv
+
+colour: true
+
+env:
+  # There seems to be problems on some platforms (on travis for instance) with LeakSanitizer that craches. Turn it off
+  'LSAN_OPTIONS' : 'detect_leaks=0'
+
+:cmock:
+  :plugins:
+    - :ignore_arg
+    - :ignore
+    - :array
+    - :callback
+  :mock_path: *mocks_path
+  :mock_prefix: mock_

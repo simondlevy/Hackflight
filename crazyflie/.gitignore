@@ -1,0 +1,11 @@
+*.wbproj
+*.o.*
+*.swp
+*.bin
+*.elf
+*.hex
+*.map
+obj/
+build/
+cache/
+__pycache__/

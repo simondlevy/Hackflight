@@ -1,0 +1,3 @@
+obj-$(CONFIG_PLATFORM_BOLT) += platform_bolt.o
+obj-$(CONFIG_PLATFORM_CF2) += platform_cf2.o
+obj-y += platform.o

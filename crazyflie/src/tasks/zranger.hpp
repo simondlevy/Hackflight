@@ -1,0 +1,105 @@
+#pragma once
+
+#include <stdint.h>
+
+#include <free_rtos.h>
+#include <task.h>
+
+#include <linalg.h>
+
+#include <system.h>
+
+#include <tasks/estimator.hpp>
+
+// Arduino class
+#include <vl53l1.hpp>
+
+class ZRangerTask {
+
+    public:
+
+        // Shared with params
+        bool didInit;
+
+
+        void init(VL53L1 * vl53l1, EstimatorTask * estimatorTask)
+        {
+            if (didInit){
+                return;
+            }
+
+            _vl53l1 = vl53l1;
+
+            _estimatorTask = estimatorTask;
+
+            xTaskCreate(zrangerTask, "ZRANGER2", STACKSIZE, this, 2, NULL);
+
+            // pre-compute constant in the measurement noise model for kalman
+            _expCoeff = logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
+
+            didInit = true;
+        }
+
+    private:
+
+        static const auto STACKSIZE = 2 * configMINIMAL_STACK_SIZE;
+
+        static const uint8_t DEFAULT_ADDRESS = 0x29;
+        static const uint8_t NEW_ADDRESS = 0x31;
+
+        static const uint16_t OUTLIER_LIMIT_MM = 5000;
+
+        // Measurement noise model
+        static constexpr float EXP_POINT_A = 2.5;
+        static constexpr float EXP_STD_A = 0.0025; 
+        static constexpr float EXP_POINT_B = 4.0;
+        static constexpr float EXP_STD_B = 0.2;   
+
+        static void zrangerTask(void * param)
+        {
+            ((ZRangerTask *)param)->run();
+        }
+
+        VL53L1 * _vl53l1;
+
+        float _expCoeff;
+
+        EstimatorTask * _estimatorTask;
+
+        void run(void)
+        {
+            TickType_t lastWakeTime;
+
+            systemWaitStart();
+
+            _vl53l1->setDistanceMode(VL53L1::DISTANCE_MODE_MEDIUM);
+            _vl53l1->setTimingBudgetMsec(25);
+
+            lastWakeTime = xTaskGetTickCount();
+
+            while (true) {
+
+                vTaskDelayUntil(&lastWakeTime, M2T(25));
+
+                auto range = _vl53l1->readDistance();
+
+                // check if range is feasible and push into the estimator
+                // the sensor should not be able to measure >5 [m], and outliers typically
+                // occur as >8 [m] measurements
+                if (range < OUTLIER_LIMIT_MM) {
+
+                    float distance = range * 0.001; // Scale from [mm] to [m]
+
+                    float stdDev =
+                        EXP_STD_A * (1 + expf(_expCoeff * (distance - EXP_POINT_A)));
+
+                    tofMeasurement_t tofData;
+                    tofData.timestamp = xTaskGetTickCount();
+                    tofData.distance = distance;
+                    tofData.stdDev = stdDev;
+
+                    _estimatorTask->enqueueRange(&tofData, hal_isInInterrupt());
+                }
+            }
+        }
+};

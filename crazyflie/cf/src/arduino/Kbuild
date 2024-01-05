@@ -1,0 +1,4 @@
+obj-y += analog.o
+obj-y += digital.o
+obj-y += SPI.o
+obj-y += time.o

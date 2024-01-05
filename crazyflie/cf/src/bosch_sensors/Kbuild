@@ -1,0 +1,3 @@
+obj-y += bosch_sensors.o
+obj-$(CONFIG_SENSORS_BMI088_I2C) += bmi088_i2c.o
+obj-$(CONFIG_SENSORS_BMI088_SPI) += bmi088_spi.o

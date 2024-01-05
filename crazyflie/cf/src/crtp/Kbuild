@@ -1,0 +1,6 @@
+obj-y += crtp.o
+obj-y += crtp_commander.o
+obj-y += crtp_commander_generic.o
+obj-y += crtp_commander_openloop.o
+
+

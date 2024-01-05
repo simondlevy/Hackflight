@@ -1,0 +1,2 @@
+obj-y += startup_stm32f40xx.o
+obj-y += system_stm32f4xx.o
