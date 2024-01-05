@@ -81,7 +81,7 @@ class Hackflight {
             }
 
             if (_status == STATUS_TAKEOFF)  {
-                _demands.thrust = 56; 
+                _demands.thrust = _thrustBase * TAKEOFF_THRUST_SCALE; 
             }
 
             if (vehicleState.z > INITIAL_ALTITUDE_TARGET) {
@@ -165,6 +165,8 @@ class Hackflight {
         static constexpr float INITIAL_ALTITUDE_TARGET = 0.4;
 
         static constexpr float LANDING_ALTITUDE = 0.04;
+
+        static constexpr float TAKEOFF_THRUST_SCALE = 1.17;
 
         //////////////////////////////////////////////////////////////////////
 
