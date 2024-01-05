@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../pid.hpp"
+#include <pid.hpp>
 
 class YawRateController : public ClosedLoopController {
 

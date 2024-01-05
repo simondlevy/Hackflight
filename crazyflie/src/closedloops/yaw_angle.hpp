@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../pid.hpp"
+#include <pid.hpp>
 
 class YawAngleController : public ClosedLoopController {
 
@@ -37,10 +37,9 @@ class YawAngleController : public ClosedLoopController {
 
             _pid.setError(angleError);
 
-            // To get the demand, we negative the yaw angle psi, run the PID closedloop
-            // on the negated angle, and return the negative of the result, so demand
-            // will still be nose-right positive
-            demands.yaw = -_pid.run(-state.psi);
+            // Return the result negated, so demand will still be nose-right
+            // positive
+            demands.yaw = -_pid.run();
 
             if (demands.thrust == 0) {
 
