@@ -1,7 +1,7 @@
 #include <Wire.h>   
 
 #include "stm32f_reboot.hpp"
-#include "tasks/core.hpp"
+//#include "tasks/core.hpp"
 
 static const uint8_t LED_RED_L_PIN = PC0;
 static const uint8_t LED_GREEN_L_PIN = PC1;

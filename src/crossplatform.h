@@ -22,6 +22,7 @@ extern "C" {
 
     uint64_t micros(void);
 
+
 #endif
 
 #ifdef __cplusplus
