@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../closedloop.hpp"
-#include "../num.hpp"
-#include "../pid.hpp"
+#include <closedloop.hpp>
+#include <num.hpp>
+#include <pid.hpp>
 
 class PitchRollRateController : public ClosedLoopController {
 

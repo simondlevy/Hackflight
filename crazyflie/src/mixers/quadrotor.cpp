@@ -1,4 +1,4 @@
-#include "../mixer.hpp"
+#include <mixer.hpp>
 
 void Mixer::init(void)
 {
