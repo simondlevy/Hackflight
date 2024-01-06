@@ -87,6 +87,12 @@ class Hackflight {
                 // In non-hover mode, thrust demand comes in as [0,1], so we
                 // scale it up for motors
                 demands.thrust *= _thrustMax;
+
+                // In non-hover mode, pitch/roll demands come in as
+                // [-1,+1], which we convert to degrees for input to
+                // pitch/roll controller
+                demands.roll *= 30;
+                demands.pitch *= 30;
             }
 
             _pitchRollAngleController.run(vehicleState, demands);
