@@ -29,3 +29,7 @@ in the console. Currently supported game controllers are:
 get a message saying it wasn't recognized, create a new issue with that info, and
 I'll try to get it working.
 
+For gamepad controllers like PS3 and XBox with a springy throttle, you can use
+the right shoulder button to enter hover mode.  For all other kinds of controllers
+and the keyboard, you are always in hover mode.
+

@@ -48,7 +48,7 @@ typedef enum {
 
 static std::map<std::string, joystickAxes_t> JOYSTICK_AXIS_MAP = {
 
-    //                                                        T   R   P  Y       
+    //                                                        T   R   P  Y   H
     // Linux   
     { "MY-POWER CO.,LTD. 2In1 USB Joystick", joystickAxes_t {-2,  3, -4, 1,  5 } }, 
     { "SHANWAN Android Gamepad",             joystickAxes_t {-2,  3, -4, 1,  7 } },
@@ -57,8 +57,8 @@ static std::map<std::string, joystickAxes_t> JOYSTICK_AXIS_MAP = {
     { "Horizon Hobby SPEKTRUM RECEIVER",     joystickAxes_t { 2,  3,  4, 1,  0 } },
 
     // Windows
-    { "2In1 USB Joystick",                   joystickAxes_t {-1,  4, -3, 2, 0 } },
-    { "Controller (XBOX 360 For Windows)",   joystickAxes_t {-1,  4, -3, 2, 0 } },
+    { "2In1 USB Joystick",                   joystickAxes_t {-1,  4, -3, 2, 5 } },
+    { "Controller (XBOX 360 For Windows)",   joystickAxes_t {-1,  4, -3, 2, 5 } },
     { "Logitech Extreme 3D",                 joystickAxes_t { 0,  2, -1, 3, 0 } },
     { "FrSky Simulator",                     joystickAxes_t { 6,  5,  4, 3, 0 } },
     { "SPEKTRUM RECEIVER",                   joystickAxes_t { 3,  2,  1, 4, 0 } },  
@@ -223,7 +223,7 @@ static demands_t reportJoystick(void)
         printf("%2d=%+6d |", k+1, wb_joystick_get_axis_value(k));
     }
 
-    printf("\n");
+    printf(" Button pressed = %d\n", wb_joystick_get_pressed_button());
 
     return demands_t {0, 0, 0, 0};
 }
