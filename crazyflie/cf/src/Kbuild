@@ -1,5 +1,3 @@
-obj-y += ../../src/
-
 obj-y += arduino/
 obj-y += bosch_sensors/
 obj-y += crtp/
@@ -7,6 +5,8 @@ obj-y += hal/
 obj-y += platform/
 obj-y += stm32f4/
 obj-y += tasks/
+
+obj-y += ../../../src/mixers/quadrotor.o
 
 obj-y += bootloader.o
 obj-y += cfassert.o
