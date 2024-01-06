@@ -8,4 +8,4 @@
 obj/
 build/
 cache/
-__pycache__/
+src/mixers
