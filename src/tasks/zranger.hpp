@@ -1,19 +1,3 @@
-/**
- * Copyright (C) 2011-2022 Bitcraze AB, 2024 Simon D. Levy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 #pragma once
 
 #include <stdint.h>
@@ -22,6 +6,8 @@
 #include <task.h>
 
 #include <linalg.h>
+
+#include <system.h>
 
 #include <tasks/estimator.hpp>
 
@@ -32,10 +18,13 @@ class ZRangerTask {
 
     public:
 
+        // Shared with params
+        bool didInit;
+
 
         void init(VL53L1 * vl53l1, EstimatorTask * estimatorTask)
         {
-            if (_didInit){
+            if (didInit){
                 return;
             }
 
@@ -48,7 +37,7 @@ class ZRangerTask {
             // pre-compute constant in the measurement noise model for kalman
             _expCoeff = logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
 
-            _didInit = true;
+            didInit = true;
         }
 
     private:
@@ -70,8 +59,6 @@ class ZRangerTask {
         {
             ((ZRangerTask *)param)->run();
         }
-
-        bool _didInit;
 
         VL53L1 * _vl53l1;
 

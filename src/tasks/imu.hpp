@@ -30,7 +30,6 @@
 #include <semphr.h>
 
 #include <tasks/estimator.hpp>
-#include <tasks/imu.hpp>
 
 #include <crossplatform.h>
 #include <lpf.hpp>
@@ -93,8 +92,7 @@ class ImuTask {
 
             calibrate(calibRoll, calibPitch);
 
-            interruptInit(this);
-
+            interruptInit();
             taskInit();
 
             didInit = true;
@@ -586,7 +584,7 @@ class ImuTask {
 
         // Hardware-dependent
         bool gyroSelfTest();
-        void interruptInit(ImuTask * imuTask);
+        void interruptInit(void);
         void deviceInit(void); 
         uint16_t readGyro(Axis3i16* dataOut);
         void readAccel(Axis3i16* dataOut);

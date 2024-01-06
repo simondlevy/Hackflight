@@ -1,33 +1,38 @@
+/**
+ * Copyright (C) 2011-2022 Bitcraze AB, 2024 Simon D. Levy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, in version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include <free_rtos.h>
 #include <semphr.h>
 #include <task.h>
 
-#include <estimator.hpp>
+#include <clock.hpp>
+#include <console.h>
+#include <kalman.hpp>
 #include <rateSupervisor.hpp>
-
 #include <crossplatform.h>
-#include <safety.hpp>
-#include <system.h>
 
 class EstimatorTask {
 
     public:
 
-        // Shared with logger
-        Estimator::kalmanCoreData_t kalmanData;        
-        float predictedNX;
-        float predictedNY;
-        float measuredNX;
-        float measuredNY;
-
-        // Shared with params
-        bool didResetEstimation;
-
-        void init(Safety * safety)
+        void init(void)
         {
-            _safety = safety;
+            _isFlying = false;
 
             // Created in the 'empty' state, meaning the semaphore must first be given,
             // that is it will block in the task until released by the stabilizer loop
@@ -35,7 +40,7 @@ class EstimatorTask {
 
             _dataMutex = xSemaphoreCreateMutexStatic(&_dataMutexBuffer);
 
-            _estimator.setDefaultParams();
+            _kalmanFilter.setDefaultParams();
 
             _measurementsQueue = xQueueCreateStatic(
                     QUEUE_LENGTH, 
@@ -54,15 +59,15 @@ class EstimatorTask {
 
             consolePrintf("ESTIMATOR: estimatorTaskStart\n");
 
-            _estimator.init(msec());
-            consolePrintf("ESTIMATOR: Using %s estimator\n", _estimator.getName());        }
+            _kalmanFilter.init(msec());
+        }
 
         bool didInit(void)
         {
-            return _estimator.didInit();
+            return _kalmanFilter.didInit();
         }
 
-        void getState(vehicleState_t * state)
+        void getVehicleState(vehicleState_t * state)
         {
             // This function is called from the stabilizer loop. It is important that
             // this call returns as quickly as possible. The dataMutex must only be
@@ -74,53 +79,49 @@ class EstimatorTask {
             xSemaphoreGive(_dataMutex);
 
             xSemaphoreGive(_runTaskSemaphore);
+        }
 
-            memcpy(&kalmanData, &_estimator._kalmanData, 
-                    sizeof(Estimator::kalmanCoreData_t));
-
-            predictedNX = _estimator._predictedNX;
-            predictedNY = _estimator._predictedNY;
-
-            measuredNX = _estimator._measuredNX;
-            measuredNY = _estimator._measuredNY;
+        void setFlyingStatus(const bool isFlying)
+        {
+            _isFlying = isFlying;
         }
 
         void enqueueGyro(const Axis3f * gyro, const bool isInInterrupt)
         {
-            Estimator::measurement_t m = {};
-            m.type = Estimator::MeasurementTypeGyroscope;
+            KalmanFilter::measurement_t m = {};
+            m.type = KalmanFilter::MeasurementTypeGyroscope;
             m.data.gyroscope.gyro = *gyro;
             enqueue(&m, isInInterrupt);
         }
 
         void enqueueAccel(const Axis3f * accel, const bool isInInterrupt)
         {
-            Estimator::measurement_t m = {};
-            m.type = Estimator::MeasurementTypeAcceleration;
+            KalmanFilter::measurement_t m = {};
+            m.type = KalmanFilter::MeasurementTypeAcceleration;
             m.data.acceleration.acc = *accel;
             enqueue(&m, isInInterrupt);
         }
 
         void enqueueBaro(const baro_t * baro, const bool isInInterrupt)
         {
-            Estimator::measurement_t m = {};
-            m.type = Estimator::MeasurementTypeBarometer;
+            KalmanFilter::measurement_t m = {};
+            m.type = KalmanFilter::MeasurementTypeBarometer;
             m.data.barometer.baro = *baro;
             enqueue(&m, isInInterrupt);
         }
 
         void enqueueFlow(const flowMeasurement_t * flow, const bool isInInterrupt)
         {
-            Estimator::measurement_t m = {};
-            m.type = Estimator::MeasurementTypeFlow;
+            KalmanFilter::measurement_t m = {};
+            m.type = KalmanFilter::MeasurementTypeFlow;
             m.data.flow = *flow;
             enqueue(&m, isInInterrupt);
         }
 
         void enqueueRange(const tofMeasurement_t * tof, const bool isInInterrupt)
         {
-            Estimator::measurement_t m = {};
-            m.type = Estimator::MeasurementTypeTOF;
+            KalmanFilter::measurement_t m = {};
+            m.type = KalmanFilter::MeasurementTypeTOF;
             m.data.tof = *tof;
             enqueue(&m, isInInterrupt);
         }
@@ -138,10 +139,14 @@ class EstimatorTask {
         StaticTask_t taskTaskBuffer;
 
         static const size_t QUEUE_LENGTH = 20;
-        static const auto QUEUE_ITEM_SIZE = sizeof(Estimator::measurement_t);
+        static const auto QUEUE_ITEM_SIZE = sizeof(KalmanFilter::measurement_t);
         uint8_t measurementsQueueStorage[QUEUE_LENGTH * QUEUE_ITEM_SIZE];
         StaticQueue_t measurementsQueueBuffer;
         xQueueHandle _measurementsQueue;
+
+        bool _didResetEstimation;
+
+        bool _isFlying;
 
         RateSupervisor _rateSupervisor;
 
@@ -155,9 +160,7 @@ class EstimatorTask {
 
         uint32_t _warningBlockTimeMs;
 
-        Safety * _safety;
-
-        Estimator _estimator;
+        KalmanFilter _kalmanFilter;
 
         // Data used to enable the task and stabilizer loop to run with minimal locking
         // The estimator state produced by the task, copied to the stabilizer when needed.
@@ -172,15 +175,15 @@ class EstimatorTask {
         {
             xSemaphoreTake(_runTaskSemaphore, portMAX_DELAY);
 
-            if (didResetEstimation) {
-                _estimator.init(nowMs);
-                didResetEstimation = false;
+            if (_didResetEstimation) {
+                _kalmanFilter.init(nowMs);
+                _didResetEstimation = false;
             }
 
             // Run the system dynamics to predict the state forward.
             if (nowMs >= nextPredictionMs) {
 
-                _estimator.predict(nowMs, _safety->isFlying()); 
+                _kalmanFilter.predict(nowMs, _isFlying); 
 
                 nextPredictionMs = nowMs + PREDICTION_UPDATE_INTERVAL_MS;
 
@@ -192,7 +195,7 @@ class EstimatorTask {
             }
 
             // Add process noise every loop, rather than every prediction
-            _estimator.addProcessNoise(nowMs);
+            _kalmanFilter.addProcessNoise(nowMs);
 
             // Sensor measurements can come in sporadically and faster
             // than the stabilizer loop frequency, we therefore consume all
@@ -200,18 +203,18 @@ class EstimatorTask {
 
             // Pull the latest sensors values of interest; discard the rest
 
-            Estimator::measurement_t m = {};
+            KalmanFilter::measurement_t m = {};
 
             while (pdTRUE == xQueueReceive(_measurementsQueue, &m, 0)) {
 
-                _estimator.update(m, nowMs);
+                _kalmanFilter.update(m, nowMs);
             }
 
-            _estimator.finalize();
+            _kalmanFilter.finalize();
 
-            if (!_estimator.isStateWithinBounds()) {
+            if (!_kalmanFilter.isStateWithinBounds()) {
 
-                didResetEstimation = true;
+                _didResetEstimation = true;
 
                 if (nowMs > _warningBlockTimeMs) {
                     _warningBlockTimeMs = nowMs + WARNING_HOLD_BACK_TIME_MS;
@@ -220,7 +223,7 @@ class EstimatorTask {
             }
 
             xSemaphoreTake(_dataMutex, portMAX_DELAY);
-            _estimator.getState(_state);
+            _kalmanFilter.getVehicleState(_state);
             xSemaphoreGive(_dataMutex);
 
             return nextPredictionMs;
@@ -249,7 +252,7 @@ class EstimatorTask {
         }
 
         void enqueue(
-                const Estimator::measurement_t * measurement, 
+                const KalmanFilter::measurement_t * measurement, 
                 const bool isInInterrupt)
         {
             if (!_measurementsQueue) {

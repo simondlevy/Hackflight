@@ -1,19 +1,3 @@
-/**
- * Copyright (C) 2011-2022 Bitcraze AB, 2024 Simon D. Levy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, in version 3.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 #pragma once
 
 #include <math.h>
@@ -21,57 +5,56 @@
 #include <free_rtos.h>
 #include <task.h>
 
-// Arduino class
-#include <vl53l1.hpp>
-
-#include <hackflight.hpp>
+#include <closedloops/altitude.hpp>
+#include <closedloops/pitchroll_angle.hpp>
+#include <closedloops/pitchroll_rate.hpp>
+#include <closedloops/position.hpp>
+#include <closedloops/yaw_angle.hpp>
+#include <closedloops/yaw_rate.hpp>
 
 #include <tasks/estimator.hpp>
-#include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/rx.hpp>
-#include <tasks/zranger.hpp>
 
 #include <crossplatform.h>
+#include <estimator.hpp>
+#include <mixer.hpp>
 #include <motors.h>
+#include <openloop.hpp>
 #include <rateSupervisor.hpp>
+#include <safety.hpp>
+#include <system.h>
 
 class CoreTask {
 
     public:
 
         // Shared with logger
-        vehicleState_t vehicleState;
+        demands_t demands;
+        vehicleState_t state;
 
         void init(
-                const float rollCalibration,
-                const float pitchCalibration,
-                const uint8_t flowDeckCsPin,
-                VL53L1 * vl53l1)
+                OpenLoop * openLoop,
+                ImuTask * imuTask,
+                EstimatorTask * estimatorTask,
+                Safety * safety)
         {
             if (_didInit) {
                 return;
             }
 
-            _hackflight.init(
-                    PID_UPDATE_RATE,
-                    THRUST_SCALE,
-                    THRUST_BASE,
-                    THRUST_MIN,
-                    THRUST_MAX);
+            _openLoop = openLoop;
+            _imuTask = imuTask;
+            _estimatorTask = estimatorTask;
+            _safety = safety;
 
-            // Prevents arming until aux switch is off
-            _wasAuxSet = true;
+            _mixer.init();
 
-            _flowDeckTask.init(&_estimatorTask, flowDeckCsPin);
-
-            _imuTask.init(&_estimatorTask, rollCalibration, pitchCalibration);
-
-            _estimatorTask.init();
-
-            _zrangerTask.init(vl53l1, &_estimatorTask);
-
-            _rxTask.init();
+            _pitchRollAngleController.init(PID_UPDATE_RATE);
+            _pitchRollRateController.init(PID_UPDATE_RATE);
+            _yawAngleController.init(PID_UPDATE_RATE);
+            _yawRateController.init(PID_UPDATE_RATE);
+            _positionController.init(PID_UPDATE_RATE);
+            _altitudeController.init(PID_UPDATE_RATE);
 
             motorsInit();
 
@@ -84,72 +67,81 @@ class CoreTask {
                     taskStackBuffer,
                     &taskTaskBuffer);
 
-            _didInit = true;
+             _didInit = true;
         }
+
 
         bool test(void)
         {
             auto pass = true;
 
-            pass &= _imuTask.test();
-            pass &= _estimatorTask.didInit();
+            pass &= _imuTask->test();
+            pass &= _estimatorTask->didInit();
             pass &= motorsTest();
 
             return pass;
         }
 
-        // Called by estimator task
-        bool isFlying(void)
-        {
-            return _hackflight.isFlying();
-        }
-
         void resetControllers(void)
         {
-            _hackflight.resetClosedLoopControllers();
+            _pitchRollAngleController.resetPids();
+            _pitchRollRateController.resetPids();
+            _positionController.resetPids();
+
+            _altitudeController.resetFilters();
+            _positionController.resetFilters();
         }
 
     private:
-
-        static constexpr float THROTTLE_DOWN_TOLERANCE = 0.01;
-
-        static constexpr float MAX_ARMING_ANGLE_DEGREES = 25;
 
         // approximate thrust needed when in perfect hover. More weight/older
         // battery can use a higher value
         static constexpr float THRUST_BASE  = 36000;
         static constexpr float THRUST_MIN   = 20000;
         static constexpr float THRUST_SCALE = 1000;
-        static constexpr float THRUST_MAX   = UINT16_MAX;
 
         static const uint8_t MAX_MOTOR_COUNT = 20;
 
-        static const auto PID_UPDATE_RATE = Clock::RATE_500_HZ;
+        static constexpr float THRUST_MAX   = UINT16_MAX;
 
-        Hackflight _hackflight;
+        static const auto PID_UPDATE_RATE = Clock::RATE_500_HZ;
 
         static const auto TASK_STACK_DEPTH = 3* configMINIMAL_STACK_SIZE;
         StackType_t  taskStackBuffer[TASK_STACK_DEPTH]; 
         StaticTask_t taskTaskBuffer;
 
-        EstimatorTask _estimatorTask;
-        ZRangerTask _zrangerTask;
-        FlowDeckTask _flowDeckTask;
-        RxTask _rxTask;
-        ImuTask _imuTask;
+        PitchRollAngleController _pitchRollAngleController;
+        PitchRollRateController _pitchRollRateController;
+        PositionController _positionController;
+        AltitudeController _altitudeController;
+        YawAngleController _yawAngleController;
+        YawRateController _yawRateController;
 
-        bool _didInit;
+        Mixer _mixer;
 
-        bool _wasAuxSet;
+        OpenLoop * _openLoop;
+        EstimatorTask * _estimatorTask;
+        ImuTask * _imuTask;
+        Safety * _safety;
+
+        bool _didInit = false;
+
+        void runMotors(void) 
+        {
+            static uint16_t motorsPwm[MAX_MOTOR_COUNT];
+
+            float motorsUncapped[MAX_MOTOR_COUNT] = {};
+
+            _mixer.run(demands, motorsUncapped);
+
+            _mixer.capMotors(motorsUncapped, motorsPwm);
+
+            motorsSetRatios(motorsPwm);
+        }
 
         static void runTask(void* param)
         {
             ((CoreTask *)param)->run();
-        }
-
-        static bool isShallowAngle(const float degrees)
-        {
-            return fabs(degrees) < MAX_ARMING_ANGLE_DEGREES;
         }
 
         /* The core loop runs at 1kHz. It is the
@@ -162,59 +154,116 @@ class CoreTask {
 
             vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_CORE_ID_NBR);
 
-            // Wait for the system to be fully started to start core loop
+            //Wait for the system to be fully started to start core loop
             systemWaitStart();
 
             consolePrintf("CORE: Wait for sensor calibration...\n");
 
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
-            while(!_imuTask.areCalibrated()) {
+            while(!_imuTask->areCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
             }
+            // Initialize step to something else than 0
+            uint32_t step = 1;
+
             systemWaitStart();
             consolePrintf("CORE: Starting loop\n");
             rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
 
-            for (uint32_t step=1; ; step++) {
-
-                // Reset everything on throttle stick down
-                if (isThrottleDown()) {
-                    _hackflight.resetDemands();
-                    _hackflight.resetClosedLoopControllers();
-                }
+            while (true) {
 
                 // The sensor should unlock at 1kHz
-                _imuTask.waitDataReady();
+                _imuTask->waitDataReady();
+                sensorData_t sensorData = {};
+                _imuTask->acquire(&sensorData);
 
                 // Get state vector linear positions and velocities and
                 // angles from estimator
-                _estimatorTask.getVehicleState(&vehicleState);
+                _estimatorTask->getState(&state);
+
+                // Get state vector angular velocities directly from gyro
+                state.dphi =    sensorData.gyro.x;     
+                state.dtheta = -sensorData.gyro.y; // (negate for ENU)
+                state.dpsi =    sensorData.gyro.z; 
+
+                const auto areMotorsAllowedToRun = _safety->areMotorsAllowedToRun();
 
                 // Run closed-loop controllers periodically
                 if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
 
-                    // Use safety algorithm to enable/disable arming demands
-                    // based on vehicle state and RX activity
-                    updateSafety();
+                    uint32_t timestamp = 0;
+                    auto inHoverMode = false;
 
-                    _hackflight.runClosedLoop(_rxTask.demands, vehicleState);
+                    // Get open-loop demands in [-1,+1], as well as timestamp
+                    // when they received, and whether hover mode is indicated
+                    _openLoop->getDemands(demands, timestamp, inHoverMode);
+
+                    // Use safety algorithm to modify demands based on sensor data
+                    // and open-loop info
+                    _safety->update(sensorData, step, timestamp, demands);
+
+                    if (inHoverMode) {
+
+                        // In hover mode, thrust demand comes in as [-1,+1], so
+                        // we convert it to a target altitude in meters
+                        demands.thrust = Num::rescale(
+                                demands.thrust, -1, +1, 0.2, 2.0);
+
+                        // Position controller converts meters per second to
+                        // degrees
+                        _positionController.run(state, demands); 
+
+                        _altitudeController.run(state, demands); 
+
+                        // Scale up thrust demand for motors
+                        demands.thrust = Num::fconstrain(
+                                demands.thrust * THRUST_SCALE + THRUST_BASE,
+                                THRUST_MIN, THRUST_MAX);
+                    }
+
+                    else {
+
+                        // In non-hover mode, thrust demand comes in as [0,1],
+                        // so we convert it to [0, 2^16] for motors
+                        demands.thrust *= UINT16_MAX;
+
+                        // In non-hover mode, pitch/roll demands come in as
+                        // [-1,+1], which we convert to degrees for input to
+                        // pitch/roll controller
+                        demands.roll *= 30;
+                        demands.pitch *= 30;
+                    }
+
+                    _pitchRollAngleController.run(state, demands);
+
+                    _pitchRollRateController.run(state, demands);
+
+                    _yawAngleController.run(state, demands);
+
+                    _yawRateController.run(state, demands);
                 }
 
-                // Start with motors zeroed-out for safety
-                uint16_t motorsPwm[MAX_MOTOR_COUNT] = {};
+                // Reset closed-loop controllers on zero thrust
+                if (demands.thrust == 0) {
 
-                // Run mixer and motors if safe
-                if (_hackflight.isFlying()) {
+                    demands.roll = 0;
+                    demands.pitch = 0;
+                    demands.yaw = 0;
 
-                    float motorsUncapped[MAX_MOTOR_COUNT] = {};
+                    resetControllers();
+                }
 
-                    _hackflight.runMixer(motorsUncapped);
+                // Critical for safety, be careful if you modify this code!
+                // The safety will already set thrust to 0 if needed, but to be
+                // extra sure prevent motors from running.
+                if (areMotorsAllowedToRun) {
+                    runMotors();
+                } else {
+                    motorsStop();
+                }
 
-                    _hackflight.capMotors(motorsUncapped, motorsPwm);
-                } 
-
-                motorsSetRatios(motorsPwm);                
+                step++;
 
                 if (!rateSupervisor.validate(xTaskGetTickCount())) {
                     static bool rateWarningDisplayed;
@@ -225,40 +274,7 @@ class CoreTask {
                     }
                 }
 
-                // motorsCheckDshot();
+                motorsCheckDshot();
             }
-        }
-
-        bool isThrottleDown(void)
-        {
-            return _rxTask.demands.thrust < -(1 - THROTTLE_DOWN_TOLERANCE);
-        }
-
-        void updateSafety(void)
-        { 
-            const auto isAuxSet = _rxTask.isAuxSet;
-
-            // If aux switch is off, disarm
-            if (!isAuxSet) {
-
-                if (!_hackflight.isDisarmed()) {
-                    _hackflight.setStatus(STATUS_DISARMED);
-                }
-            }
-
-            // If aux switch turns on and throttle is down and pitch/roll angles are
-            // shallow, we can arm
-            else if (
-                    !_wasAuxSet && 
-                    isThrottleDown() &&
-                    isShallowAngle(vehicleState.phi) &&
-                    isShallowAngle(vehicleState.theta)
-                    ) {
-
-                _hackflight.setStatus(STATUS_ARMED);
-            }
-
-            // Track previous aux switch state to detect transition
-            _wasAuxSet = isAuxSet;
         }
 };
