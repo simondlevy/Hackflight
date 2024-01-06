@@ -37,9 +37,6 @@ class Hackflight {
 
     public:
 
-        // Shared with logger
-        vehicleState_t vehicleState;
-
         void init(
                 const Clock::rate_t pidUpdateRate,
                 const float thrustScale,
@@ -56,132 +53,57 @@ class Hackflight {
             _pitchRollScale = pitchRollScale;
             _yawScale = yawScale;
 
-            setStatus(STATUS_DISARMED);
-
             initClosedLoopControllers(pidUpdateRate);
 
             _mixer.init();
         }
 
         void runClosedLoop(
-                const demands_t & openLoopDemands,
-                const vehicleState_t & vehicleState)
+                const bool inHoverMode,
+                const vehicleState_t & vehicleState,
+                demands_t & demands)
         {
-            // Start with open-loop demands
-            memcpy(&_demands, &openLoopDemands, sizeof(demands_t));
+            if (inHoverMode) {
 
-            // Run throttle and yaw demandthrough deadband
-            _demands.thrust = deadband(_demands.thrust);
-            _demands.yaw = deadband(_demands.yaw);
+                // In hover mode, thrust demand comes in as [-1,+1], so
+                // we convert it to a target altitude in meters
+                demands.thrust = Num::rescale(
+                        demands.thrust, -1, +1, 0.2, 2.0);
 
-            // If armed, transition to takeoff when throttle stick moves
-            // into deadband
-            if (_status == STATUS_ARMED && inband(_demands.thrust)) {
-                setStatus(STATUS_TAKEOFF);
+                // Position controller converts meters per second to
+                // degrees
+                _positionController.run(vehicleState, demands); 
+
+                _altitudeController.run(vehicleState, demands); 
+
+                // Scale up thrust demand for motors
+                demands.thrust = Num::fconstrain(
+                        demands.thrust * _thrustScale + _thrustBase,
+                        _thrustMin, _thrustMax);
             }
 
-            if (_status == STATUS_TAKEOFF)  {
+            else {
 
-                _demands.thrust = _thrustBase * TAKEOFF_THRUST_SCALE; 
-
-                if (vehicleState.z > INITIAL_ALTITUDE_TARGET) {
-                    setStatus(STATUS_FLYING);
-                }
+                // In non-hover mode, thrust demand comes in as [0,1], so we
+                // scale it up for motors
+                demands.thrust *= _thrustMax;
             }
 
-            if (_status == STATUS_FLYING) {
+            _pitchRollAngleController.run(vehicleState, demands);
 
-                if (vehicleState.z < LANDING_ALTITUDE) {
-                    _demands.thrust = -1;
-                    setStatus(STATUS_ARMED);
-                }
-            }
+            _pitchRollRateController.run(vehicleState, demands);
 
-            if (_status == STATUS_FLYING) {
+            _yawAngleController.run(vehicleState, demands);
 
-                // Run closed-loop controllers to update demands
-                runClosedLoopControllers(vehicleState);
-
-                // Scale demands for motors
-                scaleDemands();
-            }
+            _yawRateController.run(vehicleState, demands);
         }
 
-        void runMixer(float motorvals[])
+        void runMixer(const demands_t demands, float motorvals[])
         {
-            _mixer.run(_demands, motorvals);
-        }
-
-        //////////////////////////////////////////////////////////////////////
-
-        bool isDisarmed(void)
-        {
-            return _status == STATUS_DISARMED;
-        }
-
-        void setStatus(const flightStatus_e status)
-        {
-            _status = status;
-
-            static const char * labels[4] = {
-                "disarmed", "armed", "takeoff", "flying"
-            };
-
-            consolePrintf("STATUS: %s\n", labels[status]);
-        }
-
-        void resetDemands(void)
-        {
-            _demands.roll = 0;
-            _demands.pitch = 0;
-            _demands.yaw = 0;
-        }
-
-        void capMotors(float motorsUncapped[], uint16_t motorsPwm[])
-        {
-            _mixer.capMotors(motorsUncapped, motorsPwm);
-        }
-
-
-        // Called by estimator task
-        bool isFlying(void)
-        {
-            return _status == STATUS_FLYING || _status == STATUS_TAKEOFF;
-        }
-
-        void resetClosedLoopControllers(void)
-        {
-            _pitchRollAngleController.resetPids();
-            _pitchRollRateController.resetPids();
-            _positionController.resetPids();
-
-            _altitudeController.resetFilters();
-            _positionController.resetFilters();
+            _mixer.run(demands, motorvals);
         }
 
     private:
-
-        static constexpr float STICK_DEADBAND = 0.25;
-
-        static constexpr float INITIAL_ALTITUDE_TARGET = 0.4;
-
-        static constexpr float LANDING_ALTITUDE = 0.04;
-
-        static constexpr float TAKEOFF_THRUST_SCALE = 1.17;
-
-        //////////////////////////////////////////////////////////////////////
-
-        static float deadband(const float stickValue)
-        {
-            return inband(stickValue) ? 0 : stickValue;
-        }
-
-        static float inband(const float stickValue)
-        {
-            return fabs(stickValue) < STICK_DEADBAND;
-        }
-
-        //////////////////////////////////////////////////////////////////////
 
         float _thrustScale;
         float _thrustBase;
@@ -189,10 +111,6 @@ class Hackflight {
         float _thrustMax;
         float _pitchRollScale;
         float _yawScale;
-
-        flightStatus_e _status;
-
-        demands_t _demands;
 
         Mixer _mixer;
 
@@ -210,46 +128,6 @@ class Hackflight {
             _yawAngleController.init(pidUpdateRate);
             _yawRateController.init(pidUpdateRate);
             _positionController.init(pidUpdateRate);
-            _altitudeController.init(pidUpdateRate, INITIAL_ALTITUDE_TARGET);
-        }
-
-        void runClosedLoopControllers(const vehicleState_t vehicleState)
-        {
-            // Altitude controller converts throttle demand into unscaled
-            // motors spin
-            _altitudeController.run(vehicleState, _demands);
-
-            // Position controller converts meters per second to
-            // angles in degrees
-            _positionController.run(vehicleState, _demands); 
-
-            // Pitch/roll angle controller converts angles in degrees
-            // into angular rates in degrees per second
-            _pitchRollAngleController.run(vehicleState, _demands);
-
-            // Pitch/roll rate controller converts angular rates in
-            // degrees per second into unscaled motor spin
-            _pitchRollRateController.run(vehicleState, _demands);
-
-            // Yaw angle controller converts [-1,+1] stick demand into angular
-            // rate in degrees per second
-            _yawAngleController.run(vehicleState, _demands);
-
-            // Yaw rate controller converts angular rate into 
-            // unscaled motor spins
-            _yawRateController.run(vehicleState, _demands);
-        }
-
-        void scaleDemands(void)
-        {
-            _demands.thrust = Num::fconstrain(
-                    _demands.thrust * _thrustScale + _thrustBase,
-                    _thrustMin, _thrustMax);
-
-            _demands.roll *= _pitchRollScale;
-
-            _demands.pitch *= _pitchRollScale;
-
-            _demands.yaw *= _yawScale;
+            _altitudeController.init(pidUpdateRate);
         }
 };

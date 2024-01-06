@@ -34,7 +34,7 @@
 static const float THRUST_BASE = 48;
 static const float THRUST_SCALE = 0.25;
 static const float THRUST_MIN = 0;
-static const float THRUST_MAX   = UINT16_MAX;
+static const float THRUST_MAX   = 60;
 static const float PITCH_ROLL_SCALE = 1e-4;
 static const float YAW_SCALE = 4e-5;
 
@@ -160,8 +160,6 @@ int main(int argc, char ** argv)
 
     sticksInit();
 
-    hackflight.setStatus(STATUS_ARMED);
-
     while (wb_robot_step(timestep) != -1) {
 
         runCamera(camera);
@@ -169,22 +167,47 @@ int main(int argc, char ** argv)
         // Get open-loop demands from input device (keyboard, joystick, etc.)
         auto demands = sticksRead();
 
+        // Check where we're in hover mode (button press or aux switch toggle)
+        auto inHoverMode = sticksInHoverMode();
+
+        // Altitude target, normalized to [-1,+1]
+        static float _altitudeTarget;
+
+        // Hover mode: integrate stick demand
+        if (inHoverMode) {
+            const float DT = .01;
+            _altitudeTarget = Num::fconstrain(
+                    _altitudeTarget + demands.thrust * DT, -1, +1);
+            demands.thrust = _altitudeTarget;
+        }
+
+
+        // Non-hover mode: use raw stick value with min 0
+        else {
+            demands.thrust = Num::fconstrain(demands.thrust, 0, 1);
+            _altitudeTarget = 0;
+        }
+
         // Get vehicle state from sensors
         auto state = getVehicleState(gyro, imu, gps);
 
         // Run hackflight algorithm on open-loop demands and vehicle state
-        hackflight.runClosedLoop(demands, state);
+        hackflight.runClosedLoop(inHoverMode, state, demands);
+
+        demands.yaw *= YAW_SCALE;
+        demands.roll *= PITCH_ROLL_SCALE;
+        demands.pitch *= PITCH_ROLL_SCALE;
 
         // Run hackflight mixer to get motor values from closed-loop demands
         float motorvals[4] = {};
-        hackflight.runMixer(motorvals);
+        hackflight.runMixer(demands, motorvals);
 
         // Set simulated motor values
         wb_motor_set_velocity(m1_motor, +motorvals[0]);
         wb_motor_set_velocity(m2_motor, -motorvals[1]);
         wb_motor_set_velocity(m3_motor, +motorvals[2]);
         wb_motor_set_velocity(m4_motor, -motorvals[3]);
-    };
+    }
 
     wb_robot_cleanup();
 

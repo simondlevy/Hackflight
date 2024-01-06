@@ -34,6 +34,7 @@ typedef struct {
     int8_t roll;
     int8_t pitch;
     int8_t yaw;
+    int8_t hover;
 
 } joystickAxes_t;
 
@@ -45,22 +46,22 @@ typedef enum {
 
 } joystickStatus_e;
 
-static std::map<std::string, joystickAxes_t> JOYSTICK__AXIS_MAP = {
+static std::map<std::string, joystickAxes_t> JOYSTICK_AXIS_MAP = {
 
-    //                                                        T   R   P  Y
-    // Linux
-    { "MY-POWER CO.,LTD. 2In1 USB Joystick", joystickAxes_t {-2,  3, -4, 1 } },
-    { "SHANWAN Android Gamepad",             joystickAxes_t {-2,  3, -4, 1 } },
-    { "Logitech Logitech Extreme 3D",        joystickAxes_t {-4,  1, -2, 3 } },
-    { "FrSky FrSky Simulator",               joystickAxes_t { 1,  2,  3, 4 } },
-    { "Horizon Hobby SPEKTRUM RECEIVER",     joystickAxes_t { 2,  3,  4, 1 } },
+    //                                                        T   R   P  Y       
+    // Linux   
+    { "MY-POWER CO.,LTD. 2In1 USB Joystick", joystickAxes_t {-2,  3, -4, 1,  5 } }, 
+    { "SHANWAN Android Gamepad",             joystickAxes_t {-2,  3, -4, 1,  7 } },
+    { "Logitech Logitech Extreme 3D",        joystickAxes_t {-4,  1, -2, 3,  0 }  },
+    { "FrSky FrSky Simulator",               joystickAxes_t { 1,  2,  3, 4, -4 } },
+    { "Horizon Hobby SPEKTRUM RECEIVER",     joystickAxes_t { 2,  3,  4, 1, -4 } },
 
     // Windows
-    { "2In1 USB Joystick",                   joystickAxes_t {-1,  4, -3, 2 } },
-    { "Controller (XBOX 360 For Windows)",   joystickAxes_t {-1,  4, -3, 2 } },
-    { "Logitech Extreme 3D",                 joystickAxes_t { 0,  2, -1, 3 } },
-    { "FrSky Simulator",                     joystickAxes_t { 6,  5,  4, 3 } },
-    { "SPEKTRUM RECEIVER",                   joystickAxes_t { 3,  2,  1, 4 } },  
+    { "2In1 USB Joystick",                   joystickAxes_t {-1,  4, -3, 2, 0 } },
+    { "Controller (XBOX 360 For Windows)",   joystickAxes_t {-1,  4, -3, 2, 0 } },
+    { "Logitech Extreme 3D",                 joystickAxes_t { 0,  2, -1, 3, 0 } },
+    { "FrSky Simulator",                     joystickAxes_t { 6,  5,  4, 3, 0 } },
+    { "SPEKTRUM RECEIVER",                   joystickAxes_t { 3,  2,  1, 4, 0 } },  
 };
 
 static float scaleJoystickAxis(const int32_t rawval)
@@ -126,7 +127,7 @@ static demands_t readJoystick(void)
 {
     auto joyname = wb_joystick_get_model();
 
-    auto axes = JOYSTICK__AXIS_MAP[joyname];
+    auto axes = JOYSTICK_AXIS_MAP[joyname];
 
     return demands_t {
 
@@ -205,7 +206,7 @@ static joystickStatus_e haveJoystick(void)
     }
 
     // Joystick unrecognized
-    else if (JOYSTICK__AXIS_MAP.count(joyname) == 0) {
+    else if (JOYSTICK_AXIS_MAP.count(joyname) == 0) {
 
         status = JOYSTICK_UNRECOGNIZED;
     }
@@ -225,6 +226,32 @@ static demands_t reportJoystick(void)
     printf("\n");
 
     return demands_t {0, 0, 0, 0};
+}
+
+
+static bool getHoverModeFromJoystick(void)
+{
+    auto joyname = wb_joystick_get_model();
+
+    auto axes = JOYSTICK_AXIS_MAP[joyname];
+
+    auto hover = axes.hover;
+
+    return 
+        hover > 0  ? // button
+        wb_joystick_get_pressed_button() == abs(hover) :
+        hover < 0 ? // aux switch
+        wb_joystick_get_axis_value(abs(hover)) > 0 : 
+        0;          // unsupported
+}
+
+static bool sticksInHoverMode(void)
+{
+    auto joystickStatus = haveJoystick();
+
+    return 
+        joystickStatus == JOYSTICK_RECOGNIZED ? getHoverModeFromJoystick() : 
+        false;
 }
 
 //////////////////////////////////////////////////////////////////////////////
