@@ -102,6 +102,16 @@ class Hackflight {
             _yawAngleController.run(vehicleState, demands);
 
             _yawRateController.run(vehicleState, demands);
+
+            // Reset closed-loop controllers on zero thrust
+            if (demands.thrust == 0) {
+
+                demands.roll = 0;
+                demands.pitch = 0;
+                demands.yaw = 0;
+
+                resetControllers();
+            }
         }
 
         void runMixer(const demands_t demands, float motorvals[])
@@ -136,4 +146,15 @@ class Hackflight {
             _positionController.init(pidUpdateRate);
             _altitudeController.init(pidUpdateRate);
         }
+
+        void resetControllers(void)
+        {
+            _pitchRollAngleController.resetPids();
+            _pitchRollRateController.resetPids();
+            _positionController.resetPids();
+
+            _altitudeController.resetFilters();
+            _positionController.resetFilters();
+        }
+
 };
