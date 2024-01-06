@@ -53,8 +53,8 @@ static std::map<std::string, joystickAxes_t> JOYSTICK_AXIS_MAP = {
     { "MY-POWER CO.,LTD. 2In1 USB Joystick", joystickAxes_t {-2,  3, -4, 1,  5 } }, 
     { "SHANWAN Android Gamepad",             joystickAxes_t {-2,  3, -4, 1,  7 } },
     { "Logitech Logitech Extreme 3D",        joystickAxes_t {-4,  1, -2, 3,  0 }  },
-    { "FrSky FrSky Simulator",               joystickAxes_t { 1,  2,  3, 4, -4 } },
-    { "Horizon Hobby SPEKTRUM RECEIVER",     joystickAxes_t { 2,  3,  4, 1, -4 } },
+    { "FrSky FrSky Simulator",               joystickAxes_t { 1,  2,  3, 4,  0 } },
+    { "Horizon Hobby SPEKTRUM RECEIVER",     joystickAxes_t { 2,  3,  4, 1,  0 } },
 
     // Windows
     { "2In1 USB Joystick",                   joystickAxes_t {-1,  4, -3, 2, 0 } },
@@ -237,21 +237,19 @@ static bool getHoverModeFromJoystick(void)
 
     auto hover = axes.hover;
 
+    // For gamepad with shoulder buttons, allow use to enter/exit hover mode;
+    // for R/C/ transmitters and keyboard, always in hover mode
     return 
-        hover > 0  ? // button
+        hover > 0  ? 
         wb_joystick_get_pressed_button() == abs(hover) :
-        hover < 0 ? // aux switch
-        wb_joystick_get_axis_value(abs(hover)) > 0 : 
-        0;          // unsupported
+        true;         
 }
 
 static bool sticksInHoverMode(void)
 {
-    auto joystickStatus = haveJoystick();
-
     return 
-        joystickStatus == JOYSTICK_RECOGNIZED ? getHoverModeFromJoystick() : 
-        false;
+        haveJoystick() == JOYSTICK_RECOGNIZED ? getHoverModeFromJoystick() : 
+        true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
