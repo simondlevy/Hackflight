@@ -16,7 +16,7 @@
 #include <tasks/imu.hpp>
 
 #include <crossplatform.h>
-#include <estimator.hpp>
+#include <kalman.hpp>
 #include <mixer.hpp>
 #include <motors.h>
 #include <openloop.hpp>
