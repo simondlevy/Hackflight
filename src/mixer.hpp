@@ -26,38 +26,41 @@ class Mixer {
 
         void run(const demands_t & demands, float motors[]);
 
-        void capMotors(const float uncapped[], uint16_t capped[])
+    protected:
+
+        static const uint8_t MAX_MOTOR_COUNT = 20;
+
+        float _uncapped[MAX_MOTOR_COUNT];
+
+        void init(const uint8_t motorCount)
         {
-            const int32_t maxAllowedThrust = UINT16_MAX;
+            _motorCount = motorCount;
+        }
+
+        void cap(float capped[])
+        {
+            const float maxAllowedThrust = UINT16_MAX;
 
             // Find highest thrust
-            int32_t highestThrustFound = 0;
-            for (int motorIndex = 0; motorIndex < _motorCount; motorIndex++) {
+            float highestThrustFound = 0;
+            for (uint8_t k=0; k<_motorCount; k++) {
 
-                const auto thrust = uncapped[motorIndex];
+                const auto thrust = _uncapped[k];
 
                 if (thrust > highestThrustFound) {
                     highestThrustFound = thrust;
                 }
             }
 
-            int32_t reduction = 0;
-
+            float reduction = 0;
             if (highestThrustFound > maxAllowedThrust) {
                 reduction = highestThrustFound - maxAllowedThrust;
             }
 
-            for (int motorIndex = 0; motorIndex < _motorCount; motorIndex++) {
-                int32_t thrustCappedUpper = uncapped[motorIndex] - reduction;
-                capped[motorIndex] = capMinThrust(thrustCappedUpper);
+            for (uint8_t k = 0; k < _motorCount; k++) {
+                float thrustCappedUpper = _uncapped[k] - reduction;
+                capped[k] = capMinThrust(thrustCappedUpper);
             }
-        }
-
-    protected:
-
-        void init(const uint8_t motorCount)
-        {
-            _motorCount = motorCount;
         }
 
     private:

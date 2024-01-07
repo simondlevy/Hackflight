@@ -12,10 +12,12 @@ void Mixer::run(const demands_t & demands, float motors[])
     auto p = demands.pitch;
     auto y = demands.yaw;
 
-    motors[0] = t - r + p + y;
-    motors[1] = t - r - p - y;
-    motors[2] = t + r - p + y;
-    motors[3] = t + r + p - y;
+    _uncapped[0] = t - r + p + y;
+    _uncapped[1] = t - r - p - y;
+    _uncapped[2] = t + r - p + y;
+    _uncapped[3] = t + r + p - y;
+
+    Mixer::cap(motors);
 }
 
 

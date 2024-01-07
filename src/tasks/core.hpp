@@ -100,9 +100,7 @@ class CoreTask {
         static constexpr float THRUST_MIN   = 20000;
         static constexpr float THRUST_SCALE = 1000;
 
-        static const uint8_t MAX_MOTOR_COUNT = 20;
-
-        static constexpr float THRUST_MAX   = UINT16_MAX;
+        static constexpr float THRUST_MAX = UINT16_MAX;
 
         static const auto PID_UPDATE_RATE = Clock::RATE_500_HZ;
 
@@ -128,13 +126,16 @@ class CoreTask {
 
         void runMotors(void) 
         {
-            static uint16_t motorsPwm[MAX_MOTOR_COUNT];
+            float motorvals[4] = {};
 
-            float motorsUncapped[MAX_MOTOR_COUNT] = {};
+            _mixer.run(demands, motorvals);
 
-            _mixer.run(demands, motorsUncapped);
-
-            _mixer.capMotors(motorsUncapped, motorsPwm);
+            const uint16_t motorsPwm[4]  = {
+                (uint16_t)motorvals[0],
+                (uint16_t)motorvals[1],
+                (uint16_t)motorvals[2],
+                (uint16_t)motorvals[3]
+            };
 
             motorsSetRatios(motorsPwm);
         }
