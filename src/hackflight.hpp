@@ -148,6 +148,16 @@ class Hackflight {
             _mixer.run(demands, motorvals);
         }
 
+        void resetControllers(void)
+        {
+            _pitchRollAngleController.resetPids();
+            _pitchRollRateController.resetPids();
+            _positionController.resetPids();
+
+            _altitudeController.resetFilters();
+            _positionController.resetFilters();
+        }
+
     private:
 
         float _thrustScale;
@@ -174,16 +184,6 @@ class Hackflight {
             _yawRateController.init(pidUpdateRate);
             _positionController.init(pidUpdateRate);
             _altitudeController.init(pidUpdateRate);
-        }
-
-        void resetControllers(void)
-        {
-            _pitchRollAngleController.resetPids();
-            _pitchRollRateController.resetPids();
-            _positionController.resetPids();
-
-            _altitudeController.resetFilters();
-            _positionController.resetFilters();
         }
 
 };

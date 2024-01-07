@@ -5,19 +5,12 @@
 #include <free_rtos.h>
 #include <task.h>
 
-#include <closedloops/altitude.hpp>
-#include <closedloops/pitchroll_angle.hpp>
-#include <closedloops/pitchroll_rate.hpp>
-#include <closedloops/position.hpp>
-#include <closedloops/yaw_angle.hpp>
-#include <closedloops/yaw_rate.hpp>
-
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 
 #include <crossplatform.h>
+#include <hackflight.hpp>
 #include <kalman.hpp>
-#include <mixer.hpp>
 #include <motors.h>
 #include <openloop.hpp>
 #include <rateSupervisor.hpp>
@@ -47,14 +40,13 @@ class CoreTask {
             _estimatorTask = estimatorTask;
             _safety = safety;
 
-            _mixer.init();
-
-            _pitchRollAngleController.init(PID_UPDATE_RATE);
-            _pitchRollRateController.init(PID_UPDATE_RATE);
-            _yawAngleController.init(PID_UPDATE_RATE);
-            _yawRateController.init(PID_UPDATE_RATE);
-            _positionController.init(PID_UPDATE_RATE);
-            _altitudeController.init(PID_UPDATE_RATE);
+            _hackflight.init(
+                    PID_UPDATE_RATE,
+                    THRUST_SCALE,
+                    THRUST_BASE,
+                    THRUST_MIN,
+                    THRUST_MAX
+                    );
 
             motorsInit();
 
@@ -84,12 +76,7 @@ class CoreTask {
 
         void resetControllers(void)
         {
-            _pitchRollAngleController.resetPids();
-            _pitchRollRateController.resetPids();
-            _positionController.resetPids();
-
-            _altitudeController.resetFilters();
-            _positionController.resetFilters();
+            _hackflight.resetControllers();
         }
 
     private:
@@ -108,14 +95,7 @@ class CoreTask {
         StackType_t  taskStackBuffer[TASK_STACK_DEPTH]; 
         StaticTask_t taskTaskBuffer;
 
-        PitchRollAngleController _pitchRollAngleController;
-        PitchRollRateController _pitchRollRateController;
-        PositionController _positionController;
-        AltitudeController _altitudeController;
-        YawAngleController _yawAngleController;
-        YawRateController _yawRateController;
-
-        Mixer _mixer;
+        Hackflight _hackflight;
 
         OpenLoop * _openLoop;
         EstimatorTask * _estimatorTask;
@@ -124,12 +104,8 @@ class CoreTask {
 
         bool _didInit = false;
 
-        void runMotors(void) 
+        void runMotors(const float motorvals[4]) 
         {
-            float motorvals[4] = {};
-
-            _mixer.run(demands, motorvals);
-
             const uint16_t motorsPwm[4]  = {
                 (uint16_t)motorvals[0],
                 (uint16_t)motorvals[1],
@@ -190,7 +166,8 @@ class CoreTask {
 
                 const auto areMotorsAllowedToRun = _safety->areMotorsAllowedToRun();
 
-                // Run closed-loop controllers periodically
+                static float _motorvals[4];
+
                 if (Clock::rateDoExecute(PID_UPDATE_RATE, step)) {
 
                     uint32_t timestamp = 0;
@@ -204,62 +181,13 @@ class CoreTask {
                     // and open-loop info
                     _safety->update(sensorData, step, timestamp, demands);
 
-                    if (inHoverMode) {
-
-                        // In hover mode, thrust demand comes in as [-1,+1], so
-                        // we convert it to a target altitude in meters
-                        demands.thrust = Num::rescale(
-                                demands.thrust, -1, +1, 0.2, 2.0);
-
-                        // Position controller converts meters per second to
-                        // degrees
-                        _positionController.run(state, demands); 
-
-                        _altitudeController.run(state, demands); 
-
-                        // Scale up thrust demand for motors
-                        demands.thrust = Num::fconstrain(
-                                demands.thrust * THRUST_SCALE + THRUST_BASE,
-                                THRUST_MIN, THRUST_MAX);
-                    }
-
-                    else {
-
-                        // In non-hover mode, thrust demand comes in as [0,1],
-                        // so we convert it to [0, 2^16] for motors
-                        demands.thrust *= UINT16_MAX;
-
-                        // In non-hover mode, pitch/roll demands come in as
-                        // [-1,+1], which we convert to degrees for input to
-                        // pitch/roll controller
-                        demands.roll *= 30;
-                        demands.pitch *= 30;
-                    }
-
-                    _pitchRollAngleController.run(state, demands);
-
-                    _pitchRollRateController.run(state, demands);
-
-                    _yawAngleController.run(state, demands);
-
-                    _yawRateController.run(state, demands);
+                    // Run hackflight core algorithm to get motor spins from open
+                    // loop demands via closed-loop control and mixer
+                    _hackflight.step(inHoverMode, state, demands, _motorvals);
                 }
 
-                // Reset closed-loop controllers on zero thrust
-                if (demands.thrust == 0) {
-
-                    demands.roll = 0;
-                    demands.pitch = 0;
-                    demands.yaw = 0;
-
-                    resetControllers();
-                }
-
-                // Critical for safety, be careful if you modify this code!
-                // The safety will already set thrust to 0 if needed, but to be
-                // extra sure prevent motors from running.
                 if (areMotorsAllowedToRun) {
-                    runMotors();
+                    runMotors(_motorvals);
                 } else {
                     motorsStop();
                 }
