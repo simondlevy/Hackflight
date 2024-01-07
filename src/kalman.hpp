@@ -333,7 +333,8 @@ class KalmanFilter {
                 float sa = arm_sin_f32(angle / 2.0f);
                 float dq[4] = {ca, sa * v0 / angle, sa * v1 / angle, sa * v2 / angle};
 
-                // rotate the quad's attitude by the delta quaternion vector computed above
+                // Rotate the quad's attitude by the delta quaternion vector
+                // computed above
                 float tmpq0 = dq[0] * _kalmanData.q[0] - dq[1] * _kalmanData.q[1] - 
                     dq[2] * _kalmanData.q[2] - dq[3] * _kalmanData.q[3];
                 float tmpq1 = dq[1] * _kalmanData.q[0] + dq[0] * _kalmanData.q[1] + 
@@ -396,29 +397,38 @@ class KalmanFilter {
                 mat_mult(tmpNN2m, tmpNN1m, &_kalmanData.Pm); //APA'
             }
 
-            // convert the new attitude to a rotation matrix, such that we can
+            // Convert the new attitude to a rotation matrix, such that we can
             // rotate body-frame velocity and acc
-            _kalmanData.R[0][0] = _kalmanData.q[0] * _kalmanData.q[0] + _kalmanData.q[1] * 
-                _kalmanData.q[1] - _kalmanData.q[2] * _kalmanData.q[2] - _kalmanData.q[3] * 
-                _kalmanData.q[3];
-            _kalmanData.R[0][1] = 2 * _kalmanData.q[1] * _kalmanData.q[2] - 2 * _kalmanData.q[0] *
-                _kalmanData.q[3];
-            _kalmanData.R[0][2] = 2 * _kalmanData.q[1] * _kalmanData.q[3] + 2 * _kalmanData.q[0] *
-                _kalmanData.q[2];
-            _kalmanData.R[1][0] = 2 * _kalmanData.q[1] * _kalmanData.q[2] + 2 * _kalmanData.q[0] *
-                _kalmanData.q[3];
-            _kalmanData.R[1][1] = _kalmanData.q[0] * _kalmanData.q[0] - _kalmanData.q[1] * 
-                _kalmanData.q[1] + _kalmanData.q[2] * _kalmanData.q[2] - _kalmanData.q[3] * 
-                _kalmanData.q[3];
-            _kalmanData.R[1][2] = 2 * _kalmanData.q[2] * _kalmanData.q[3] - 2 * _kalmanData.q[0] *
-                _kalmanData.q[1];
-            _kalmanData.R[2][0] = 2 * _kalmanData.q[1] * _kalmanData.q[3] - 2 * _kalmanData.q[0] *
-                _kalmanData.q[2];
-            _kalmanData.R[2][1] = 2 * _kalmanData.q[2] * _kalmanData.q[3] + 2 * _kalmanData.q[0] *
-                _kalmanData.q[1];
-            _kalmanData.R[2][2] = _kalmanData.q[0] * _kalmanData.q[0] - _kalmanData.q[1] * 
-                _kalmanData.q[1] - _kalmanData.q[2] * _kalmanData.q[2] + _kalmanData.q[3] * 
-                _kalmanData.q[3];
+
+            _kalmanData.R[0][0] = _kalmanData.q[0] * _kalmanData.q[0] + 
+                _kalmanData.q[1] * _kalmanData.q[1] - _kalmanData.q[2] * 
+                _kalmanData.q[2] - _kalmanData.q[3] * _kalmanData.q[3];
+
+            _kalmanData.R[0][1] = 2 * _kalmanData.q[1] * _kalmanData.q[2] - 
+                2 * _kalmanData.q[0] * _kalmanData.q[3];
+
+            _kalmanData.R[0][2] = 2 * _kalmanData.q[1] * _kalmanData.q[3] + 
+                2 * _kalmanData.q[0] * _kalmanData.q[2];
+
+            _kalmanData.R[1][0] = 2 * _kalmanData.q[1] * _kalmanData.q[2] + 
+                2 * _kalmanData.q[0] * _kalmanData.q[3];
+
+            _kalmanData.R[1][1] = _kalmanData.q[0] * _kalmanData.q[0] - 
+                _kalmanData.q[1] * _kalmanData.q[1] + _kalmanData.q[2] * 
+                _kalmanData.q[2] - _kalmanData.q[3] * _kalmanData.q[3];
+
+            _kalmanData.R[1][2] = 2 * _kalmanData.q[2] * _kalmanData.q[3] - 
+                2 * _kalmanData.q[0] * _kalmanData.q[1];
+
+            _kalmanData.R[2][0] = 2 * _kalmanData.q[1] * _kalmanData.q[3] - 
+                2 * _kalmanData.q[0] * _kalmanData.q[2];
+
+            _kalmanData.R[2][1] = 2 * _kalmanData.q[2] * _kalmanData.q[3] + 
+                2 * _kalmanData.q[0] * _kalmanData.q[1];
+
+            _kalmanData.R[2][2] = _kalmanData.q[0] * _kalmanData.q[0] - 
+                _kalmanData.q[1] * _kalmanData.q[1] - _kalmanData.q[2] * 
+                _kalmanData.q[2] + _kalmanData.q[3] * _kalmanData.q[3];
 
             // reset the attitude error
             _kalmanData.S[KC_STATE_D0] = 0;
@@ -523,14 +533,20 @@ class KalmanFilter {
         {
             // Matrix to rotate the attitude covariances once updated
             static float A[KC_STATE_DIM][KC_STATE_DIM];
-            static arm_matrix_instance_f32 Am = {KC_STATE_DIM, KC_STATE_DIM, (float *)A};
+            static arm_matrix_instance_f32 Am = {
+                KC_STATE_DIM, KC_STATE_DIM, (float *)A
+            };
 
             // Temporary matrices for the covariance updates
             static float tmpNN1d[KC_STATE_DIM * KC_STATE_DIM];
-            static arm_matrix_instance_f32 tmpNN1m = {KC_STATE_DIM, KC_STATE_DIM, tmpNN1d};
+            static arm_matrix_instance_f32 tmpNN1m = {
+                KC_STATE_DIM, KC_STATE_DIM, tmpNN1d
+            };
 
             static float tmpNN2d[KC_STATE_DIM * KC_STATE_DIM];
-            static arm_matrix_instance_f32 tmpNN2m = {KC_STATE_DIM, KC_STATE_DIM, tmpNN2d}; 
+            static arm_matrix_instance_f32 tmpNN2m = {
+                KC_STATE_DIM, KC_STATE_DIM, tmpNN2d
+            }; 
             return finalize(A, &Am, &tmpNN1m, &tmpNN2m);
         }
 
@@ -1108,14 +1124,18 @@ class KalmanFilter {
             float tmpq3;
 
             // rotate the quad's attitude by the delta quaternion vector computed above
-            tmpq0 = dq[0]*_kalmanData.q[0] - dq[1]*_kalmanData.q[1] - dq[2]*_kalmanData.q[2] - 
-                dq[3]*_kalmanData.q[3];
-            tmpq1 = dq[1]*_kalmanData.q[0] + dq[0]*_kalmanData.q[1] + dq[3]*_kalmanData.q[2] - 
-                dq[2]*_kalmanData.q[3];
-            tmpq2 = dq[2]*_kalmanData.q[0] - dq[3]*_kalmanData.q[1] + dq[0]*_kalmanData.q[2] + 
-                dq[1]*_kalmanData.q[3];
-            tmpq3 = dq[3]*_kalmanData.q[0] + dq[2]*_kalmanData.q[1] - dq[1]*_kalmanData.q[2] + 
-                dq[0]*_kalmanData.q[3];
+
+            tmpq0 = dq[0]*_kalmanData.q[0] - dq[1]*_kalmanData.q[1] - 
+                dq[2]*_kalmanData.q[2] - dq[3]*_kalmanData.q[3];
+
+            tmpq1 = dq[1]*_kalmanData.q[0] + dq[0]*_kalmanData.q[1] + 
+                dq[3]*_kalmanData.q[2] - dq[2]*_kalmanData.q[3];
+
+            tmpq2 = dq[2]*_kalmanData.q[0] - dq[3]*_kalmanData.q[1] + 
+                dq[0]*_kalmanData.q[2] + dq[1]*_kalmanData.q[3];
+
+            tmpq3 = dq[3]*_kalmanData.q[0] + dq[2]*_kalmanData.q[1] - 
+                dq[1]*_kalmanData.q[2] + dq[0]*_kalmanData.q[3];
 
             if (! quadIsFlying) {
 
@@ -1155,13 +1175,19 @@ class KalmanFilter {
 
             // Temporary matrices for the covariance updates
             static float tmpNN1d[KC_STATE_DIM * KC_STATE_DIM];
-            static arm_matrix_instance_f32 tmpNN1m = {KC_STATE_DIM, KC_STATE_DIM, tmpNN1d};
+            static arm_matrix_instance_f32 tmpNN1m = {
+                KC_STATE_DIM, KC_STATE_DIM, tmpNN1d
+            };
 
             static float tmpNN2d[KC_STATE_DIM * KC_STATE_DIM];
-            static arm_matrix_instance_f32 tmpNN2m = {KC_STATE_DIM, KC_STATE_DIM, tmpNN2d};
+            static arm_matrix_instance_f32 tmpNN2m = {
+                KC_STATE_DIM, KC_STATE_DIM, tmpNN2d
+            };
 
             static float tmpNN3d[KC_STATE_DIM * KC_STATE_DIM];
-            static arm_matrix_instance_f32 tmpNN3m = {KC_STATE_DIM, KC_STATE_DIM, tmpNN3d};
+            static arm_matrix_instance_f32 tmpNN3m = {
+                KC_STATE_DIM, KC_STATE_DIM, tmpNN3d
+            };
 
             static float HTd[KC_STATE_DIM * 1];
             static arm_matrix_instance_f32 HTm = {KC_STATE_DIM, 1, HTd};
@@ -1623,7 +1649,11 @@ class KalmanFilter {
 
             // compute orientation error
             const quat_t q_ekf = 
-                mkquat(_kalmanData.q[1], _kalmanData.q[2], _kalmanData.q[3], _kalmanData.q[0]);
+                mkquat(
+                        _kalmanData.q[1], 
+                        _kalmanData.q[2], 
+                        _kalmanData.q[3], 
+                        _kalmanData.q[0]);
             const quat_t q_measured = 
                 mkquat(pose->quat.x, pose->quat.y, pose->quat.z, pose->quat.w);
             const quat_t q_residual = qqmul(qinv(q_ekf), q_measured);
@@ -1726,29 +1756,29 @@ class KalmanFilter {
             // (\hat{h} -> infty when R[2][2] -> 0)
             if (fabs(_kalmanData.R[2][2]) > 0.1f && _kalmanData.R[2][2] > 0) {
                 float angle = 
-                    fabsf(acosf(_kalmanData.R[2][2])) - DEGREES_TO_RADIANS * (15.0f / 2.0f);
+                    fabsf(acosf(_kalmanData.R[2][2])) - 
+                    DEGREES_TO_RADIANS * (15.0f / 2.0f);
                 if (angle < 0.0f) {
                     angle = 0.0f;
                 }
                 float predictedDistance = _kalmanData.S[KC_STATE_Z] / cosf(angle);
                 float measuredDistance = tof->distance; // [m]
 
-                /*
-                   The sensor model (Pg.95-96,
-https://lup.lub.lu.se/student-papers/search/publication/8905295)
 
-h = z/((R*z_b).z_b) = z/cos(alpha)
-
-Here,
-h (Measured variable)[m] = Distance given by TOF sensor. This is the 
-closest point from any surface to the sensor in the measurement cone
-z (Estimated variable)[m] = THe actual elevation of the crazyflie
-z_b = Basis vector in z direction of body coordinate system
-R = Rotation matrix made from ZYX Tait-Bryan angles. Assumed to be 
-stationary
-alpha = angle between [line made by measured point <---> sensor] 
-and [the intertial z-axis] 
-                 */
+                // The sensor model (Pg.95-96,
+                // https://lup.lub.lu.se/student-papers/search/publication/8905295)
+                //
+                // h = z/((R*z_b).z_b) = z/cos(alpha)
+                //
+                // Here,
+                // h (Measured variable)[m] = Distance given by TOF sensor. This is the 
+                // closest point from any surface to the sensor in the measurement cone
+                // z (Estimated variable)[m] = THe actual elevation of the crazyflie
+                // z_b = Basis vector in z direction of body coordinate system
+                // R = Rotation matrix made from ZYX Tait-Bryan angles. Assumed to be 
+                // stationary
+                // alpha = angle between [line made by measured point <---> sensor] 
+                // and [the intertial z-axis] 
 
                 // This just acts like a gain for the sensor model. Further
                 // updates are done in the scalar update function below
@@ -1801,7 +1831,8 @@ and [the intertial z-axis]
                 // innovation term based on prior state
                 float error_check = measurement - predicted;    
 
-                // ---------------------- matrix defination ----------------------------- //
+                // ------------------ matrix definition --------------------------- //
+
                 static float P_chol[KC_STATE_DIM][KC_STATE_DIM];
                 static arm_matrix_instance_f32 Pc_m = {
                     KC_STATE_DIM, KC_STATE_DIM, (float *)P_chol
@@ -2025,5 +2056,4 @@ and [the intertial z-axis]
             _gyroLatest = m.data.gyroscope.gyro;
         }
 
-
-}; // class Estimator
+};
