@@ -100,11 +100,6 @@ class LadybugFC {
                     Usfs::reportError(eventStatus);
                 }
 
-                if (Usfs::eventStatusIsAccelerometer(eventStatus)) { 
-                    _usfs.readAccelerometerScaled(_accel.x, _accel.y, _accel.z);
-                    _accel.x = -_accel.x; // negate for nose-up positive
-                }
-
                 if (Usfs::eventStatusIsGyrometer(eventStatus)) { 
                     _usfs.readGyrometerScaled(_gyro.x, _gyro.y, _gyro.z);
                     _gyro.y = -_gyro.y; // negate for nose-down positive
@@ -231,8 +226,6 @@ class LadybugFC {
         quaternion_t _quat;
 
         Usfs _usfs;
-
-        Axis3f _accel;
 
         Axis3f _gyro;
 
