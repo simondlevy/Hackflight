@@ -8,9 +8,9 @@
 extern "C" {
 #endif
 
-    bool hal_isInInterrupt(void);
+    int consolePrintf(const char * fmt, ...);
 
-    bool serial1Read(uint8_t * byte);
+    bool hal_isInInterrupt(void);
 
     void systemWaitStart(void);
 

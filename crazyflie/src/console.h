@@ -22,4 +22,3 @@ void consoleInit(void);
 
 bool consoleTest(void);
 
-int consolePrintf(const char * fmt, ...);

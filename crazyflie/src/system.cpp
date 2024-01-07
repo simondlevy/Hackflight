@@ -20,14 +20,15 @@
 
 #include <platform/platform.h>
 
-#include <tasks/estimator.hpp>
-#include <tasks/flowdeck.hpp>
 #include <tasks/log.h>
 #include <tasks/power.hpp>
-#include <tasks/imu.hpp>
-#include <tasks/core.hpp>
 #include <tasks/syslink.hpp>
 #include <tasks/usblink.hpp>
+
+#include <tasks/estimator.hpp>
+#include <tasks/flowdeck.hpp>
+#include <tasks/imu.hpp>
+#include <tasks/core.hpp>
 #include <tasks/zranger.hpp>
 
 #include <commander.hpp>
@@ -499,7 +500,6 @@ extern "C" {
         { __asm volatile ("wfi"); }
     }
 
-#ifndef TEENSYDUINO
     void vApplicationMallocFailedHook( void )
     {
         portDISABLE_INTERRUPTS();
@@ -511,7 +511,6 @@ extern "C" {
         storeAssertTextData("Malloc failed");
         while(1);
     }
-#endif
 
     void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
     {
