@@ -150,14 +150,14 @@ class CoreTask {
 
             while (true) {
 
-                // The sensor should unlock at 1kHz
+                // The IMU should unlock at 1kHz
                 _imuTask->waitDataReady();
                 sensorData_t sensorData = {};
                 _imuTask->acquire(&sensorData);
 
                 // Get state vector linear positions and velocities and
                 // angles from estimator
-                _estimatorTask->getState(&state);
+                _estimatorTask->getVehicleState(&state);
 
                 // Get state vector angular velocities directly from gyro
                 state.dphi =    sensorData.gyro.x;     

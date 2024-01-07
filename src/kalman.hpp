@@ -575,7 +575,15 @@ class KalmanFilter {
             return true;
         }
 
-        void getState(vehicleState_t & state)
+        void updateWithQuaternion(const quaternion_t & quat)
+        {
+            _kalmanData.q[0] = quat.w;
+            _kalmanData.q[1] = quat.x;
+            _kalmanData.q[2] = quat.y;
+            _kalmanData.q[3] = quat.z;
+        }
+
+        void getVehicleState(vehicleState_t & state)
         {
             state.x = _kalmanData.S[KC_STATE_X];
 

@@ -62,7 +62,7 @@ class EstimatorTask {
             return _kalmanFilter.didInit();
         }
 
-        void getState(vehicleState_t * state)
+        void getVehicleState(vehicleState_t * state)
         {
             // This function is called from the stabilizer loop. It is important that
             // this call returns as quickly as possible. The dataMutex must only be
@@ -220,7 +220,7 @@ class EstimatorTask {
             }
 
             xSemaphoreTake(_dataMutex, portMAX_DELAY);
-            _kalmanFilter.getState(_state);
+            _kalmanFilter.getVehicleState(_state);
             xSemaphoreGive(_dataMutex);
 
             return nextPredictionMs;
