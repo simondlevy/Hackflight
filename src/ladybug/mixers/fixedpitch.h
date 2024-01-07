@@ -21,7 +21,8 @@
 
 #include <stdbool.h>
 
-#include "../axes.h"
+#include <datatypes.h>
+
 #include "../constrain.h"
 #include "../mixer.h"
 
@@ -32,7 +33,7 @@ class FixedPitchMixer : public Mixer {
         static void fun(
                 const demands_t & demands,
                 const uint8_t motorCount,
-                const Axes spins[],
+                const Axis3f spins[],
                 float motorvals[])
         {
             float mix[MAX_MOTORS];

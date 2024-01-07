@@ -27,7 +27,8 @@
    with Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../axes.h"
+#include <datatypes.h>
+
 #include "../fixedpitch.h"
 
 class QuadXbfMixer {
@@ -36,12 +37,12 @@ class QuadXbfMixer {
 
         static void fun(const demands_t & demands, float motors[])
         {
-            Axes SPINS[4] = {
+            Axis3f SPINS[4] = {
                 //  rol   pit    yaw
-                Axes( -1.0f, +1.0f, -1.0f ), // REAR_R
-                Axes( -1.0f, -1.0f, +1.0f ), // FRONT_R
-                Axes( +1.0f, +1.0f, +1.0f ), // REAR_L
-                Axes( +1.0f, -1.0f, -1.0f ), // FRONT_L
+                Axis3f { -1.0f, +1.0f, -1.0f }, // REAR_R
+                Axis3f { -1.0f, -1.0f, +1.0f }, // FRONT_R
+                Axis3f { +1.0f, +1.0f, +1.0f }, // REAR_L
+                Axis3f { +1.0f, -1.0f, -1.0f }, // FRONT_L
             };
 
             FixedPitchMixer::fun(demands, 4, SPINS, motors);
