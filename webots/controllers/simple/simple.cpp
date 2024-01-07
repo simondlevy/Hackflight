@@ -167,7 +167,7 @@ int main(int argc, char ** argv)
         // Get open-loop demands from input device (keyboard, joystick, etc.)
         auto demands = sticksRead();
 
-        // Check where we're in hover mode (button press or aux switch toggle)
+        // Check where we're in hover mode (button press on game controller)
         auto inHoverMode = sticksInHoverMode();
 
         // Altitude target, normalized to [-1,+1]
@@ -191,16 +191,10 @@ int main(int argc, char ** argv)
         // Get vehicle state from sensors
         auto state = getVehicleState(gyro, imu, gps);
 
-        // Run hackflight algorithm on open-loop demands and vehicle state
-        hackflight.runClosedLoop(inHoverMode, state, demands);
-
-        demands.yaw *= YAW_SCALE;
-        demands.roll *= PITCH_ROLL_SCALE;
-        demands.pitch *= PITCH_ROLL_SCALE;
-
-        // Run hackflight mixer to get motor values from closed-loop demands
+        // Run hackflight algorithm on open-loop demands and vehicle state to 
+        // get motor values
         float motorvals[4] = {};
-        hackflight.runMixer(demands, motorvals);
+        hackflight.step(inHoverMode, state, demands, motorvals);
 
         // Set simulated motor values
         wb_motor_set_velocity(m1_motor, +motorvals[0]);

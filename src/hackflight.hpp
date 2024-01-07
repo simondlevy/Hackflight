@@ -42,9 +42,26 @@ class Hackflight {
                 const float thrustScale,
                 const float thrustBase,
                 const float thrustMin,
+                const float thrustMax)
+        {
+            init(
+                    pidUpdateRate, 
+                    thrustScale, 
+                    thrustBase, 
+                    thrustMin, 
+                    thrustMax, 
+                    1, 
+                    1);
+         }
+
+        void init(
+                const Clock::rate_t pidUpdateRate,
+                const float thrustScale,
+                const float thrustBase,
+                const float thrustMin,
                 const float thrustMax,
-                const float pitchRollScale=1,
-                const float yawScale=1)
+                const float pitchRollScale,
+                const float yawScale)
         {
             _thrustScale = thrustScale;
             _thrustBase = thrustBase;
@@ -58,10 +75,11 @@ class Hackflight {
             _mixer.init();
         }
 
-        void runClosedLoop(
+        void step(
                 const bool inHoverMode,
                 const vehicleState_t & vehicleState,
-                demands_t & demands)
+                demands_t & demands,
+                float motorvals[])
         {
             if (inHoverMode) {
 
@@ -112,10 +130,13 @@ class Hackflight {
 
                 resetControllers();
             }
-        }
 
-        void runMixer(const demands_t demands, float motorvals[])
-        {
+            // Scale yaw, pitch and roll demands for mixer
+            demands.yaw *= _yawScale;
+            demands.roll *= _pitchRollScale;
+            demands.pitch *= _pitchRollScale;
+
+            // Run mixer on demands to get motors
             _mixer.run(demands, motorvals);
         }
 
