@@ -78,9 +78,17 @@ class Hackflight {
         void step(
                 const bool inHoverMode,
                 const vehicleState_t & vehicleState,
-                demands_t & demands,
+                const demands_t & openLoopDemands,
                 float motorvals[])
         {
+            // Start with open-loop demands
+            demands_t demands = {
+                openLoopDemands.thrust,
+                openLoopDemands.roll,
+                openLoopDemands.pitch,
+                openLoopDemands.yaw,
+            };
+
             if (inHoverMode) {
 
                 // In hover mode, thrust demand comes in as [-1,+1], so

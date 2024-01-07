@@ -181,7 +181,6 @@ int main(int argc, char ** argv)
             demands.thrust = _altitudeTarget;
         }
 
-
         // Non-hover mode: use raw stick value with min 0
         else {
             demands.thrust = Num::fconstrain(demands.thrust, 0, 1);
