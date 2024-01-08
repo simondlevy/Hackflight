@@ -53,10 +53,12 @@
 
 #pragma once
 
-#include <stdint.h>
-
 #include <config.h>
 #include <cfassert.h>
+
+#define FREERTOS_HEAP_SIZE      30000
+#define FREERTOS_MIN_STACK_SIZE 150       
+#define FREERTOS_MCU_CLOCK_HZ   168000000
 
 /*-----------------------------------------------------------
  * Application specific definitions.

@@ -29,6 +29,8 @@
 
 #include <nvicconf.h>
 
+#include <cfassert.h>
+
 #include <arduino/time.h>
 
 #include "i2cdev.h"

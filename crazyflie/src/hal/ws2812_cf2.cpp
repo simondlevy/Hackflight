@@ -31,6 +31,8 @@
 #include <free_rtos.h>
 #include <semphr.h>
 
+#include <cfassert.h>
+
 #include "../../../build/include/generated/autoconf.h"
 
 #include "../stm32f4/stm32fxxx.h"

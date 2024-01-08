@@ -39,6 +39,7 @@
 #include <tasks/usblink.hpp>
 #include <tasks/syslink.hpp>
 
+#include <cfassert.h>
 #include <config.h>
 #include <configblock.hpp>
 #include <ledseq.h>

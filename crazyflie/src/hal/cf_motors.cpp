@@ -35,6 +35,7 @@
 #include <task.h>
 
 #include <autoconf.h>
+#include <cfassert.h>
 
 #include <arduino/time.h>
 
