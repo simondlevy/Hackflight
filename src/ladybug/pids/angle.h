@@ -23,9 +23,9 @@
 
 #include "datatypes.h"
 #include "../constrain.h"
-#include "../filters/pt1.h"
-#include "../filters/pt2.h"
-#include "../pid.h"
+#include "../filters/pt1.hpp"
+#include "../filters/pt2.hpp"
+#include "../pid.hpp"
 #include "../utils.h"
 
 class AnglePidController : public PidController {

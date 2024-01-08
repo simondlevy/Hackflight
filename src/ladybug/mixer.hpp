@@ -20,7 +20,7 @@
 
 #include "constrain.h"
 #include "datatypes.h"
-#include "pid.h"
+#include "pid.hpp"
 
 #include <vector>
 

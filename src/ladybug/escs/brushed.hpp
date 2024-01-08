@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include "../esc.h"
+#include "../esc.hpp"
 
 class BrushedEsc : public Esc {
 

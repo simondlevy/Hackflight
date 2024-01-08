@@ -21,10 +21,9 @@
 
 #include <usfs.hpp>
 
-#include "escs/brushed.h"
-#include "mixer.h"
-#include "esc.h"
-#include "scheduler.h"
+#include "escs/brushed.hpp"
+#include "mixer.hpp"
+#include "scheduler.hpp"
 #include "tasks/estimator.h"
 #include "tasks/receiver.h"
 #include "tasks/visualizer.h"

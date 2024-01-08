@@ -21,8 +21,8 @@
 
 #include <stdint.h>
 
-#include "../mixer.h"
-#include "../msp.h"
+#include "../mixer.hpp"
+#include "../msp.hpp"
 #include "receiver.h"
 #include "datatypes.h"
 

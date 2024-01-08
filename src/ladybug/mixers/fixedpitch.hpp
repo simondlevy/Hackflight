@@ -24,7 +24,7 @@
 #include <datatypes.h>
 
 #include "../constrain.h"
-#include "../mixer.h"
+#include "../mixer.hpp"
 
 class FixedPitchMixer : public Mixer {
 

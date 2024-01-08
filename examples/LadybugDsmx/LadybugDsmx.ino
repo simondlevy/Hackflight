@@ -20,8 +20,8 @@
 #include <closedloop.hpp>
 
 #include <ladybug/arduinostl.h>
-#include <ladybug/ladybugfc.h>
-#include <ladybug/mixers/fixedpitch/quadxbf.h>
+#include <ladybug/ladybugfc.hpp>
+#include <ladybug/mixers/fixedpitch/quadxbf.hpp>
 #include <ladybug/pids/angle.h>
 
 #include <dsmrx.hpp>

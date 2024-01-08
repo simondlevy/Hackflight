@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "../hftask.h"
+#include "../task.hpp"
 #include "datatypes.h"
 #include "kalman.hpp"
 

@@ -23,8 +23,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "pid.h"
-#include "hftask.h"
+#include "pid.hpp"
+#include "task.hpp"
 
 class Scheduler {
 

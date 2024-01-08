@@ -20,22 +20,24 @@
 
 #include <math.h>
 
-#include "../pid.h"
+#include "../pid.hpp"
 
-// PT1 Low Pass filter
-class Pt1Filter {
+// PT2 Low Pass filter
+class Pt2Filter {
 
     private:
 
         float m_state;
+        float m_state1;
         float m_dt;
         float m_k;
 
     public:
 
-        Pt1Filter(const float f_cut, const float dt=PidController::DT)
+        Pt2Filter(const float f_cut, const float dt=PidController::DT)
         {
             m_state = 0.0;
+            m_state1 = 0.0;
             m_dt = dt;
 
             computeGain(f_cut);
@@ -43,14 +45,17 @@ class Pt1Filter {
 
         float apply(const float input)
         {
-            m_state = m_state + m_k * (input - m_state);
+            m_state1 = m_state1 + m_k * (input - m_state1);
+            m_state = m_state + m_k * (m_state1 - m_state);
             return m_state;
-        }
+         }
 
         void computeGain(const float f_cut)
         {
-            float rc = 1 / (2 * M_PI * f_cut);
+            const float order = 2.0f;
+            const float orderCutoffCorrection = 1 / sqrtf(powf(2, 1.0f / order) - 1);
+            float rc = 1 / (2 * orderCutoffCorrection * M_PI * f_cut);
             m_k = m_dt / (rc + m_dt);
-        }
+         }
 
-}; // class Pt1Filter
+}; // class Pt2Filter
