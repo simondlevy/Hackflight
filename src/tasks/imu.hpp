@@ -57,13 +57,35 @@ class ImuTask {
             return testStatus;
         }
 
+        bool areCalibrated() {
+            return gyroBiasFound;
+        }
+
         void waitDataReady(void) {
             xSemaphoreTake(dataReady, portMAX_DELAY);
         }
 
-        bool areCalibrated() {
-            return gyroBiasFound;
+        void acquire(sensorData_t *sensors)
+        {
+            xQueueReceive(gyroQueue, &sensors->gyro, 0);
+            xQueueReceive(accelQueue, &sensors->acc, 0);
+            xQueueReceive(magQueue, &sensors->mag, 0);
+            xQueueReceive(baroQueue, &sensors->baro, 0);
+
+            sensors->interruptTimestamp = data.interruptTimestamp;
         }
+
+        void dataAvailableCallback(void)
+        {
+            portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+            interruptTimestamp = micros();
+            xSemaphoreGiveFromISR(sensorsDataReady, &xHigherPriorityTaskWoken);
+
+            if (xHigherPriorityTaskWoken) {
+                portYIELD();
+            }
+        }
+
 
         void init(
                 EstimatorTask * estimatorTask, 
@@ -96,99 +118,6 @@ class ImuTask {
             taskInit();
 
             didInit = true;
-        }
-
-        static void runTask(void *param)
-        {
-            ((ImuTask *)param)->run();
-        }
-
-        void run(void)
-        {
-            systemWaitStart();
-
-            while (true) {
-
-                Axis3f gyroScaledIMU;
-                Axis3f accScaledIMU;
-                Axis3f accScaled;
-
-                if (pdTRUE == xSemaphoreTake(sensorsDataReady, portMAX_DELAY)) {
-
-                    data.interruptTimestamp = interruptTimestamp;
-
-                    /* get data from chosen sensors */
-                    readGyro(&gyroRaw);
-                    readAccel(&accelRaw);
-
-                    /* calibrate if necessary */
-                    gyroBiasFound = processGyroBias(xTaskGetTickCount(),
-                            gyroRaw.x, gyroRaw.y, gyroRaw.z, 
-                            &gyroBias);
-
-                    // Gyro
-                    gyroScaledIMU.x =  
-                        (gyroRaw.x - gyroBias.x) * DEG_PER_LSB;
-                    gyroScaledIMU.y =  
-                        (gyroRaw.y - gyroBias.y) * DEG_PER_LSB;
-                    gyroScaledIMU.z =  
-                        (gyroRaw.z - gyroBias.z) * DEG_PER_LSB;
-
-                    alignToAirframe(&gyroScaledIMU, &data.gyro);
-                    applyGyroLpf(&data.gyro);
-                    _estimatorTask->enqueueGyro(&data.gyro, hal_isInInterrupt());
-
-                    // Acelerometer
-                    accScaledIMU.x = accelRaw.x * G_PER_LSB / accScale;
-                    accScaledIMU.y = accelRaw.y * G_PER_LSB / accScale;
-                    accScaledIMU.z = accelRaw.z * G_PER_LSB / accScale;
-
-                    alignToAirframe(&accScaledIMU, &accScaled);
-                    accAlignToGravity(&accScaled, &data.acc);
-                    applyAccelLpf(&data.acc);
-                    _estimatorTask->enqueueAccel(&data.acc, hal_isInInterrupt());
-                }
-
-                if (isBarometerPresent) {
-                    static uint8_t baroMeasDelay = DELAY_BARO;
-                    if (--baroMeasDelay == 0) {
-
-                        readBaro();
-
-                        _estimatorTask->enqueueBaro(&data.baro, hal_isInInterrupt());
-
-                        baroMeasDelay = baroMeasDelayMin;
-                    }
-                }
-                xQueueOverwrite(accelQueue, &data.acc);
-                xQueueOverwrite(gyroQueue, &data.gyro);
-                if (isBarometerPresent) {
-                    xQueueOverwrite(baroQueue, &data.baro);
-                }
-
-                xSemaphoreGive(dataReady);
-            }
-        }
-
-        void acquire(sensorData_t *sensors)
-        {
-            xQueueReceive(gyroQueue, &sensors->gyro, 0);
-            xQueueReceive(accelQueue, &sensors->acc, 0);
-            xQueueReceive(magQueue, &sensors->mag, 0);
-            xQueueReceive(baroQueue, &sensors->baro, 0);
-
-            sensors->interruptTimestamp = data.interruptTimestamp;
-        }
-
-        void dataAvailableCallback(void)
-        {
-            portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-            interruptTimestamp = micros();
-            xSemaphoreGiveFromISR(sensorsDataReady, &xHigherPriorityTaskWoken);
-
-            if (xHigherPriorityTaskWoken) {
-                portYIELD();
-            }
         }
 
     private:
@@ -581,6 +510,79 @@ class ImuTask {
 
             return accScaleFound;
         }
+
+        static void runTask(void *param)
+        {
+            ((ImuTask *)param)->run();
+        }
+
+        void run(void)
+        {
+            systemWaitStart();
+
+            while (true) {
+
+                Axis3f gyroScaledIMU;
+                Axis3f accScaledIMU;
+                Axis3f accScaled;
+
+                if (pdTRUE == xSemaphoreTake(sensorsDataReady, portMAX_DELAY)) {
+
+                    data.interruptTimestamp = interruptTimestamp;
+
+                    /* get data from chosen sensors */
+                    readGyro(&gyroRaw);
+                    readAccel(&accelRaw);
+
+                    /* calibrate if necessary */
+                    gyroBiasFound = processGyroBias(xTaskGetTickCount(),
+                            gyroRaw.x, gyroRaw.y, gyroRaw.z, 
+                            &gyroBias);
+
+                    // Gyro
+                    gyroScaledIMU.x =  
+                        (gyroRaw.x - gyroBias.x) * DEG_PER_LSB;
+                    gyroScaledIMU.y =  
+                        (gyroRaw.y - gyroBias.y) * DEG_PER_LSB;
+                    gyroScaledIMU.z =  
+                        (gyroRaw.z - gyroBias.z) * DEG_PER_LSB;
+
+                    alignToAirframe(&gyroScaledIMU, &data.gyro);
+                    applyGyroLpf(&data.gyro);
+                    _estimatorTask->enqueueGyro(&data.gyro, hal_isInInterrupt());
+
+                    // Acelerometer
+                    accScaledIMU.x = accelRaw.x * G_PER_LSB / accScale;
+                    accScaledIMU.y = accelRaw.y * G_PER_LSB / accScale;
+                    accScaledIMU.z = accelRaw.z * G_PER_LSB / accScale;
+
+                    alignToAirframe(&accScaledIMU, &accScaled);
+                    accAlignToGravity(&accScaled, &data.acc);
+                    applyAccelLpf(&data.acc);
+                    _estimatorTask->enqueueAccel(&data.acc, hal_isInInterrupt());
+                }
+
+                if (isBarometerPresent) {
+                    static uint8_t baroMeasDelay = DELAY_BARO;
+                    if (--baroMeasDelay == 0) {
+
+                        readBaro();
+
+                        _estimatorTask->enqueueBaro(&data.baro, hal_isInInterrupt());
+
+                        baroMeasDelay = baroMeasDelayMin;
+                    }
+                }
+                xQueueOverwrite(accelQueue, &data.acc);
+                xQueueOverwrite(gyroQueue, &data.gyro);
+                if (isBarometerPresent) {
+                    xQueueOverwrite(baroQueue, &data.baro);
+                }
+
+                xSemaphoreGive(dataReady);
+            }
+        }
+
 
         // Hardware-dependent
         bool gyroSelfTest();
