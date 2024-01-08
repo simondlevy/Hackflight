@@ -29,7 +29,8 @@ class CoreTask {
                 OpenLoop * openLoop,
                 ImuTask * imuTask,
                 EstimatorTask * estimatorTask,
-                Safety * safety)
+                Safety * safety,
+                const mixfun_t mixfun)
         {
             if (_didInit) {
                 return;
@@ -41,6 +42,7 @@ class CoreTask {
             _safety = safety;
 
             _hackflight.init(
+                    mixfun,
                     PID_UPDATE_RATE,
                     THRUST_SCALE,
                     THRUST_BASE,

@@ -71,14 +71,8 @@ typedef struct {
 
 } demands_t;
 
-typedef enum {
-
-    STATUS_DISARMED,
-    STATUS_ARMED,
-    STATUS_TAKEOFF,
-    STATUS_FLYING
-
-} flightStatus_e;
+typedef void (*mixfun_t)(
+        const demands_t & demands, float motorvals[], uint8_t & count);
 
 
 // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 

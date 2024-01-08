@@ -18,6 +18,8 @@
 #include <crtp/crtp.h>
 #include <crtp/crtp_mem.hpp>
 
+#include <mixers/quadrotor.hpp>
+
 #include <platform/platform.h>
 
 #include <tasks/log.h>
@@ -36,7 +38,6 @@
 #include <console.h>
 #include <led.h>
 #include <mem.hpp>
-#include <mixer.hpp>
 #include <openloop.hpp>
 #include <params.h>
 #include <safety.hpp>
@@ -343,7 +344,12 @@ static void systemTask(void *arg)
             configBlock.getCalibRoll(), 
             configBlock.getCalibPitch());
 
-    coreTask.init(&openLoop, &imuTask, &estimatorTask, &safety);
+    coreTask.init(
+            &openLoop, 
+            &imuTask, 
+            &estimatorTask, 
+            &safety,
+            mixfun);
 
     systemRequestNRFVersion();
 
