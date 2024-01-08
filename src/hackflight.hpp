@@ -21,7 +21,6 @@
 #include <math.h>
 
 #include <clock.hpp>
-#include <console.h>
 #include <datatypes.h>
 #include <mixer.hpp>
 #include <num.hpp>

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include <console.h>
+#include <crossplatform.h>
 
 int consolePrintf(const char * fmt, ...)
 {
