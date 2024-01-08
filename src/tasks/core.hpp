@@ -22,7 +22,6 @@ class CoreTask {
     public:
 
         // Shared with logger
-        demands_t demands;
         vehicleState_t state;
 
         void init(
@@ -98,6 +97,8 @@ class CoreTask {
         StaticTask_t taskTaskBuffer;
 
         Hackflight _hackflight;
+
+        demands_t _demands;
 
         OpenLoop * _openLoop;
         EstimatorTask * _estimatorTask;
@@ -177,15 +178,15 @@ class CoreTask {
 
                     // Get open-loop demands in [-1,+1], as well as timestamp
                     // when they received, and whether hover mode is indicated
-                    _openLoop->getDemands(demands, timestamp, inHoverMode);
+                    _openLoop->getDemands(_demands, timestamp, inHoverMode);
 
                     // Use safety algorithm to modify demands based on sensor data
                     // and open-loop info
-                    _safety->update(sensorData, step, timestamp, demands);
+                    _safety->update(sensorData, step, timestamp, _demands);
 
                     // Run hackflight core algorithm to get motor spins from open
                     // loop demands via closed-loop control and mixer
-                    _hackflight.step(inHoverMode, state, demands, _motorvals);
+                    _hackflight.step(inHoverMode, state, _demands, _motorvals);
                 }
 
                 if (areMotorsAllowedToRun) {

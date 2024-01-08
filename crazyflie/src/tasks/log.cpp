@@ -1037,6 +1037,9 @@ bool logTest(void)
     return didInit;
 }
 
+static float unused;
+
+
 //////////////////////////////////////////////////////////////////////////////
 
 extern RadioLink radioLink;
@@ -1078,9 +1081,6 @@ LOG_GROUP_STOP(supervisor)
     extern CoreTask coreTask;
     extern bool didResetEstimation;
 
-    static float unused;
-
-
     LOG_GROUP_START(kalman)
     LOG_ADD(LOG_FLOAT, stateX, &unused)
     LOG_ADD(LOG_FLOAT, stateY, &unused)
@@ -1114,14 +1114,14 @@ LOG_GROUP_STOP(kalman)
 LOG_GROUP_STOP(kalman_pred)
 
     LOG_GROUP_START(stabilizer)
-    LOG_ADD(LOG_FLOAT, thrust, &coreTask.demands.thrust)
-    LOG_ADD(LOG_FLOAT, roll, &coreTask.state.phi)
-    LOG_ADD(LOG_FLOAT, pitch, &coreTask.state.theta)
-    LOG_ADD(LOG_FLOAT, yaw, &coreTask.state.psi)
+    LOG_ADD(LOG_FLOAT, thrust, &unused)
+    LOG_ADD(LOG_FLOAT, roll, &unused)
+    LOG_ADD(LOG_FLOAT, pitch, &unused)
+    LOG_ADD(LOG_FLOAT, yaw, &unused)
 LOG_GROUP_STOP(stabilizer)
 
     LOG_GROUP_START(controller)
-    LOG_ADD(LOG_INT16, ctr_yaw, &coreTask.demands.yaw)
+    LOG_ADD(LOG_INT16, ctr_yaw, &unused)
 LOG_GROUP_STOP(controller)
 
     LOG_GROUP_START(stateEstimate)
