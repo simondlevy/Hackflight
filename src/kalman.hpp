@@ -624,13 +624,6 @@ class KalmanFilter {
                         _kalmanData.q[3]*_kalmanData.q[3]);
         }
 
-        // Shared with logger
-        float _predictedNX;
-        float _predictedNY;
-        float _measuredNX;
-        float _measuredNY;
-        kalmanCoreData_t _kalmanData;
-
     private:
 
         static constexpr float DEGREES_TO_RADIANS = PI / 180.0f;
@@ -708,6 +701,8 @@ class KalmanFilter {
 
         params_t _params;
 
+        kalmanCoreData_t _kalmanData;
+
         Axis3f _accLatest;
         Axis3f _gyroLatest;
 
@@ -717,6 +712,12 @@ class KalmanFilter {
         OutlierFilterTdoa _outlierFilterTdoa;
 
         bool _didInit;
+
+        float _predictedNX;
+        float _predictedNY;
+
+        float _measuredNX;
+        float _measuredNY;
 
         static void axis3fSubSamplerInit(Axis3fSubSampler_t* subSampler, const
                 float conversionFactor) { memset(subSampler, 0,

@@ -15,13 +15,6 @@ class EstimatorTask {
 
     public:
 
-        // Shared with logger
-        KalmanFilter::kalmanCoreData_t kalmanData;        
-        float predictedNX;
-        float predictedNY;
-        float measuredNX;
-        float measuredNY;
-
         // Shared with params
         bool didResetEstimation;
 
@@ -74,15 +67,6 @@ class EstimatorTask {
             xSemaphoreGive(_dataMutex);
 
             xSemaphoreGive(_runTaskSemaphore);
-
-            memcpy(&kalmanData, &_kalmanFilter._kalmanData, 
-                    sizeof(KalmanFilter::kalmanCoreData_t));
-
-            predictedNX = _kalmanFilter._predictedNX;
-            predictedNY = _kalmanFilter._predictedNY;
-
-            measuredNX = _kalmanFilter._measuredNX;
-            measuredNY = _kalmanFilter._measuredNY;
         }
 
         void enqueueGyro(const Axis3f * gyro, const bool isInInterrupt)
