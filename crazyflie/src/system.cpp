@@ -313,8 +313,6 @@ static void systemTask(void *arg)
 
     crtpMemDidInit = true;
 
-    estimatorTask.init(&safety);
-
     // Enabling incoming syslink messages to be added to the queue.
     // This should probably be done later, but deckInit() takes a long time if
     // this is done later.
@@ -335,6 +333,9 @@ static void systemTask(void *arg)
         consolePrintf("ZRANGER: Z-down sensor [FAIL]\n");
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    estimatorTask.init(&safety);
+
     zrangerTask.init(&vl53l1, &estimatorTask);
 
     flowDeckTask.init(&estimatorTask);
@@ -350,6 +351,7 @@ static void systemTask(void *arg)
             &estimatorTask, 
             &safety,
             mixfun);
+    //////////////////////////////////////////////////////////////////////////
 
     systemRequestNRFVersion();
 
