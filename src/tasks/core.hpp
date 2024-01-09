@@ -161,13 +161,10 @@ class CoreTask {
             while(!_imuTask.areCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
             }
-            // Initialize step to something else than 0
-            uint32_t step = 1;
-
             consolePrintf("CORE: Starting loop\n");
             rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
 
-            while (true) {
+            for (uint32_t step=1; ; step++) {
 
                 // The IMU should unlock at 1kHz
                 _imuTask.waitDataReady();
@@ -210,8 +207,6 @@ class CoreTask {
                 } else {
                     motorsStop();
                 }
-
-                step++;
 
                 if (!rateSupervisor.validate(xTaskGetTickCount())) {
                     static bool rateWarningDisplayed;
