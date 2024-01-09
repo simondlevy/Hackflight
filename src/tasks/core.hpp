@@ -26,8 +26,9 @@ class CoreTask {
         Safety safety;
 
         void init(
+                const float rollCalibration,
+                const float pitchCalibration,
                 OpenLoop * openLoop,
-                ImuTask * imuTask,
                 EstimatorTask * estimatorTask,
                 const mixfun_t mixfun)
         {
@@ -37,8 +38,10 @@ class CoreTask {
 
             safety.init();
 
+            _imuTask.init(estimatorTask, rollCalibration, pitchCalibration);
+
+
             _openLoop = openLoop;
-            _imuTask = imuTask;
             _estimatorTask = estimatorTask;
 
             _hackflight.init(
@@ -69,7 +72,7 @@ class CoreTask {
         {
             auto pass = true;
 
-            pass &= _imuTask->test();
+            pass &= _imuTask.test();
             pass &= _estimatorTask->didInit();
             pass &= motorsTest();
 
@@ -83,7 +86,7 @@ class CoreTask {
 
         void handleImuDataAvailable(void)
         {
-            _imuTask->dataAvailableCallback();
+            _imuTask.dataAvailableCallback();
         }
 
     private:
@@ -108,7 +111,8 @@ class CoreTask {
 
         OpenLoop * _openLoop;
         EstimatorTask * _estimatorTask;
-        ImuTask * _imuTask;
+
+        ImuTask _imuTask;
 
         bool _didInit = false;
 
@@ -146,7 +150,7 @@ class CoreTask {
 
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
-            while(!_imuTask->areCalibrated()) {
+            while(!_imuTask.areCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
             }
             // Initialize step to something else than 0
@@ -159,9 +163,9 @@ class CoreTask {
             while (true) {
 
                 // The IMU should unlock at 1kHz
-                _imuTask->waitDataReady();
+                _imuTask.waitDataReady();
                 sensorData_t sensorData = {};
-                _imuTask->acquire(&sensorData);
+                _imuTask.acquire(&sensorData);
 
                 // Get state vector linear positions and velocities and
                 // angles from estimator

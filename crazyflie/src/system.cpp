@@ -53,25 +53,25 @@
 static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
 static const uint8_t VL53L1_NEW_ADDRESS     = 0x31;
 
-// XXX These are shared with other modules but should eventually be passed to
-// them
+// Globals -------------------------------------------------------------------
+
 EstimatorTask estimatorTask;
-Commander commander;
 CoreTask coreTask;
 FlowDeckTask flowDeckTask;
 ZRangerTask zrangerTask;
+
+Commander commander;
 PowerMonitorTask powerMonitorTask;
 Worker worker;
 
-// XXX Shared with crtp.cpp
 RadioLink radioLink;
 UsbLinkTask usbLinkTask;
 
-// XXX Shared with ../cf/src/bosch_sensors.cpp callback
 ImuTask imuTask;
 
-// Shared with power.hpp
 PowerMonitorTask::syslinkInfo_t pmSyslinkInfo;
+
+// ---------------------------------------------------------------------------
 
 static ConfigBlock configBlock;
 
@@ -336,14 +336,10 @@ static void systemTask(void *arg)
 
     flowDeckTask.init(&estimatorTask);
 
-    imuTask.init(
-            &estimatorTask,
-            configBlock.getCalibRoll(), 
-            configBlock.getCalibPitch());
-
     coreTask.init(
+            configBlock.getCalibRoll(), 
+            configBlock.getCalibPitch(),
             &openLoop, 
-            &imuTask, 
             &estimatorTask, 
             mixfun);
     //////////////////////////////////////////////////////////////////////////
