@@ -53,7 +53,6 @@ static const uint8_t VL53L1_NEW_ADDRESS     = 0x31;
 
 // Globals -------------------------------------------------------------------
 
-EstimatorTask estimatorTask;
 CoreTask coreTask;
 
 Commander commander;
@@ -325,17 +324,12 @@ static void systemTask(void *arg)
         consolePrintf("ZRANGER: Z-down sensor [FAIL]\n");
     }
 
-    //////////////////////////////////////////////////////////////////////////
-    estimatorTask.init(&coreTask.safety);
-
     coreTask.init(
             configBlock.getCalibRoll(), 
             configBlock.getCalibPitch(),
             &vl53l1,
             &openLoop, 
-            &estimatorTask, 
             mixfun);
-    //////////////////////////////////////////////////////////////////////////
 
     systemRequestNRFVersion();
 
@@ -364,11 +358,6 @@ static void systemTask(void *arg)
     if (!coreTask.test()) {
         pass = false;
         consolePrintf("SYSTEM: stabilizer [FAIL]\n");
-    }
-
-    if (!estimatorTask.didInit()) {
-        pass = false;
-        consolePrintf("SYSTEM: estimatorKalmanTask [FAIL]\n");
     }
 
     if (!crtpMemDidInit) {

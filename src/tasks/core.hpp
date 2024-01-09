@@ -28,6 +28,7 @@ class CoreTask {
         // Shared with logger or params
         vehicleState_t state;
         Safety safety;
+        EstimatorTask estimatorTask;
         FlowDeckTask flowDeckTask;
         ZRangerTask zrangerTask;
 
@@ -36,24 +37,24 @@ class CoreTask {
                 const float pitchCalibration,
                 VL53L1 * vl53l1,
                 OpenLoop * openLoop,
-                EstimatorTask * estimatorTask,
                 const mixfun_t mixfun)
         {
             if (_didInit) {
                 return;
             }
 
-            flowDeckTask.init(estimatorTask);
+            estimatorTask.init(&safety);
 
-            zrangerTask.init(vl53l1, estimatorTask);
+            flowDeckTask.init(&estimatorTask);
+
+            zrangerTask.init(vl53l1, &estimatorTask);
 
             safety.init();
 
-            _imuTask.init(estimatorTask, rollCalibration, pitchCalibration);
+            _imuTask.init(&estimatorTask, rollCalibration, pitchCalibration);
 
 
             _openLoop = openLoop;
-            _estimatorTask = estimatorTask;
 
             _hackflight.init(
                     mixfun,
@@ -84,7 +85,7 @@ class CoreTask {
             auto pass = true;
 
             pass &= _imuTask.test();
-            pass &= _estimatorTask->didInit();
+            pass &= estimatorTask.didInit();
             pass &= motorsTest();
 
             return pass;
@@ -121,7 +122,7 @@ class CoreTask {
         demands_t _demands;
 
         OpenLoop * _openLoop;
-        EstimatorTask * _estimatorTask;
+
 
         ImuTask _imuTask;
 
@@ -180,7 +181,7 @@ class CoreTask {
 
                 // Get state vector linear positions and velocities and
                 // angles from estimator
-                _estimatorTask->getVehicleState(&state);
+                estimatorTask.getVehicleState(&state);
 
                 // Get state vector angular velocities directly from gyro
                 state.dphi =    sensorData.gyro.x;     
