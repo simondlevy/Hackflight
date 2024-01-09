@@ -1,7 +1,5 @@
 #pragma once
 
-#include <math.h>
-
 #include <free_rtos.h>
 #include <task.h>
 
@@ -52,7 +50,6 @@ class CoreTask {
             safety.init();
 
             _imuTask.init(&estimatorTask, rollCalibration, pitchCalibration);
-
 
             _openLoop = openLoop;
 
@@ -122,7 +119,6 @@ class CoreTask {
         demands_t _demands;
 
         OpenLoop * _openLoop;
-
 
         ImuTask _imuTask;
 

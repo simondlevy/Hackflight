@@ -313,7 +313,7 @@ static void systemTask(void *arg)
 
     SPI.begin();
 
-    vl53l1.init(I2C1_DEV, 0x29);
+    vl53l1.init(I2C1_DEV, VL53L1_DEFAULT_ADDRESS);
 
     if (vl53l1.changeAddress(VL53L1_DEFAULT_ADDRESS, VL53L1_NEW_ADDRESS) && 
             vl53l1.begin()) {
