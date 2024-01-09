@@ -81,6 +81,11 @@ class CoreTask {
             _hackflight.resetControllers();
         }
 
+        void handleImuDataAvailable(void)
+        {
+            _imuTask->dataAvailableCallback();
+        }
+
     private:
 
         // approximate thrust needed when in perfect hover. More weight/older

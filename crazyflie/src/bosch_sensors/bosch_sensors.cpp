@@ -29,7 +29,7 @@
 
 #include <hal/i2cdev.h>
 
-#include <tasks/imu.hpp>
+#include <tasks/core.hpp>
 
 #include <bstdr_types.h>
 #include <bmi088.h>
@@ -70,9 +70,9 @@ extern "C" {
 
     void __attribute__((used)) EXTI14_Callback(void) 
     {
-        extern ImuTask imuTask;
+        extern CoreTask coreTask;
 
-        imuTask.dataAvailableCallback();
+        coreTask.handleImuDataAvailable();
     }
 }
 
