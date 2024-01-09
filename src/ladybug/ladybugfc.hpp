@@ -24,9 +24,9 @@
 #include "escs/brushed.hpp"
 #include "mixer.hpp"
 #include "scheduler.hpp"
-#include "tasks/estimator.h"
-#include "tasks/receiver.h"
-#include "tasks/visualizer.h"
+#include "tasks/estimator.hpp"
+#include "tasks/receiver.hpp"
+#include "tasks/visualizer.hpp"
 
 class LadybugFC {
 

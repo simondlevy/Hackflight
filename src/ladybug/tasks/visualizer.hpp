@@ -23,7 +23,7 @@
 
 #include "../mixer.hpp"
 #include "msp.hpp"
-#include "receiver.h"
+#include "receiver.hpp"
 #include "datatypes.h"
 
 class VisualizerTask : public LadybugTask {
