@@ -1,13 +1,5 @@
 /**
- *    ||          ____  _ __
- * +------+      / __ )(_) /_______________ _____  ___
- * | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
- * +------+    / /_/ / / /_/ /__/ /  / /_/ / / /_/  __/
- *  ||  ||    /_____/_/\__/\___/_/   \__,_/ /___/\___/
- *
- * Crazyflie control firmware
- *
- * Copyright (C) 2011-2018 Bitcraze AB
+ * Copyright (C) 2011-2018 Bitcraze AB, 2024 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +21,7 @@
 #include <free_rtos.h>
 #include <semphr.h>
 
-#include <tasks/estimator.hpp>
+#include <tasks/free_rtos/estimator.hpp>
 
 #include <crossplatform.h>
 #include <lpf.hpp>

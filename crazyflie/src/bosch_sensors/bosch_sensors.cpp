@@ -29,7 +29,7 @@
 
 #include <hal/i2cdev.h>
 
-#include <tasks/core.hpp>
+#include <tasks/free_rtos/core.hpp>
 
 #include <bstdr_types.h>
 #include <bmi088.h>

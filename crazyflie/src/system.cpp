@@ -27,9 +27,9 @@
 #include <tasks/syslink.hpp>
 #include <tasks/usblink.hpp>
 
-#include <tasks/estimator.hpp>
-#include <tasks/imu.hpp>
-#include <tasks/core.hpp>
+#include <tasks/free_rtos/estimator.hpp>
+#include <tasks/free_rtos/imu.hpp>
+#include <tasks/free_rtos/core.hpp>
 
 #include <commander.hpp>
 #include <config.h>

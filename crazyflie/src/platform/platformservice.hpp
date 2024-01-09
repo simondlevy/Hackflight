@@ -32,7 +32,8 @@
 #include <queue.h>
 #include <semphr.h>
 
-#include <tasks/core.hpp>
+#include <tasks/free_rtos/core.hpp>
+
 #include <tasks/syslink.hpp>
 
 #include <crtp/crtp.h>
