@@ -35,8 +35,6 @@ class VisualizerTask : public LadybugTask {
             return 1000 + 1000 * value;
         }
 
-        bool m_gotRebootRequest;
-
         void serializeShorts(
                 Msp & msp,
                 const uint8_t messageType,
@@ -59,10 +57,6 @@ class VisualizerTask : public LadybugTask {
                 Msp & msp,
                 const uint8_t byte)
         {
-            if (msp.isIdle() && byte == 'R') {
-                m_gotRebootRequest = true;
-            }
-
             switch (msp.parse(byte)) {
 
                 case 105: // RC
@@ -116,9 +110,5 @@ class VisualizerTask : public LadybugTask {
 
         float motors[Mixer::MAX_MOTORS];
 
-        bool gotRebootRequest(void)
-        {
-            return m_gotRebootRequest;
-        }
 
 }; // class VisualizerTask

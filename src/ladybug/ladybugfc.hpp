@@ -386,12 +386,6 @@ class LadybugFC {
             digitalWrite(LED_PIN, on);
         }
 
-        // STM32F boards have no auto-reset bootloader support, so we reboot on
-        // an external input
-        virtual void reboot(void)
-        {
-        }
-
         void runVisualizerTask(void)
         {
             const uint32_t anticipatedEndCycles = 
@@ -543,11 +537,6 @@ class LadybugFC {
         float * getVisualizerMotors(void)
         {
             return _visualizerTask.motors;
-        }
-
-        bool gotRebootRequest(void)
-        {
-            return _visualizerTask.gotRebootRequest();
         }
 
         void checkFailsafe(const uint32_t usec)
