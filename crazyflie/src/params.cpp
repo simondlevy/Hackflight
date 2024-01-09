@@ -32,6 +32,7 @@
 
 #include <crtp/crtp.h>
 
+#include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/power.hpp>
@@ -784,11 +785,11 @@ void runParamTask(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-extern Safety safety;
+extern CoreTask coreTask;
 extern uint8_t sysload_triggerDump;
 
     PARAM_GROUP_START(stabilizer)
-    PARAM_ADD_CORE(PARAM_UINT8, stop, &safety.paramEmergencyStop)
+    PARAM_ADD_CORE(PARAM_UINT8, stop, &coreTask.safety.paramEmergencyStop)
     PARAM_ADD_CORE(PARAM_UINT8, taskDump, &sysload_triggerDump)
 PARAM_GROUP_STOP(stabilizer)
 
@@ -813,8 +814,24 @@ static void doReformat(void)
     }
 }
 
+    //////////////////////////////////////////////////////////////////////////////
+
+    extern CoreTask coreTask;
+    extern EstimatorTask estimatorTask;
+    extern FlowDeckTask flowDeckTask;
+    extern ZRangerTask zrangerTask;
+
+    extern bool motorSetEnable;
+    extern uint16_t motorPowerSet[]; 
+    extern uint8_t memTesterWriteReset;
+    extern PowerMonitorTask powerMonitorTask;
+    extern uint8_t syslink_triggerDebugProbe;
+    extern uint16_t system_echoDelay;
+
+    //////////////////////////////////////////////////////////////////////////////
+
     PARAM_GROUP_START(system)
-    PARAM_ADD_CORE(PARAM_INT8, arm, &safety.deprecatedArmParam)
+    PARAM_ADD_CORE(PARAM_INT8, arm, &coreTask.safety.deprecatedArmParam)
     PARAM_ADD_WITH_CALLBACK(PARAM_UINT8, storageStats, &storageStats, printStats)
     PARAM_ADD_WITH_CALLBACK(PARAM_UINT8, storageReformat, &reformatValue, doReformat)
 PARAM_GROUP_STOP(system)
@@ -822,21 +839,16 @@ PARAM_GROUP_STOP(system)
 
 
     PARAM_GROUP_START(supervisor)
-    PARAM_ADD(PARAM_UINT8, infdmp, &safety.doinfodump)
+    PARAM_ADD(PARAM_UINT8, infdmp, &coreTask.safety.doinfodump)
 PARAM_GROUP_STOP(supervisor)
 
     //////////////////////////////////////////////////////////////////////////////
-
-    extern EstimatorTask estimatorTask;
 
     PARAM_GROUP_START(kalman)
     PARAM_ADD_CORE(PARAM_UINT8, resetEstimation, &estimatorTask.didResetEstimation)
 PARAM_GROUP_STOP(kalman)
 
     //////////////////////////////////////////////////////////////////////////////
-
-    extern bool motorSetEnable;
-    extern uint16_t motorPowerSet[]; 
 
     PARAM_GROUP_START(motorPowerSet)
     PARAM_ADD_CORE(PARAM_UINT8, enable, &motorSetEnable)
@@ -848,15 +860,11 @@ PARAM_GROUP_STOP(motorPowerSet)
 
     //////////////////////////////////////////////////////////////////////////////
 
-    extern uint8_t memTesterWriteReset;
-
     PARAM_GROUP_START(memTst)
     PARAM_ADD(PARAM_UINT8, resetW, &memTesterWriteReset)
 PARAM_GROUP_STOP(memTst)
 
     //////////////////////////////////////////////////////////////////////////////
-
-    extern PowerMonitorTask powerMonitorTask;
 
     PARAM_GROUP_START(pm)
     PARAM_ADD_CORE(PARAM_FLOAT | PARAM_PERSISTENT, lowVoltage, 
@@ -867,9 +875,6 @@ PARAM_GROUP_STOP(pm)
 
     //////////////////////////////////////////////////////////////////////////////
 
-    extern FlowDeckTask flowDeckTask;
-    extern ZRangerTask zrangerTask;
-
     PARAM_GROUP_START(deck)
     PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcFlow, &flowDeckTask.didInit)
     PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcFlow2, &flowDeckTask.didInit)
@@ -879,15 +884,11 @@ PARAM_GROUP_STOP(deck)
 
     //////////////////////////////////////////////////////////////////////////////
 
-    extern uint8_t syslink_triggerDebugProbe;
-
     PARAM_GROUP_START(syslink)
     PARAM_ADD(PARAM_UINT8, probe, &syslink_triggerDebugProbe)
 PARAM_GROUP_STOP(syslink)
 
     //////////////////////////////////////////////////////////////////////////////
-
-    extern uint16_t system_echoDelay;
 
     PARAM_GROUP_START(crtpsrv)
     PARAM_ADD(PARAM_UINT16, echoDelay, &system_echoDelay)

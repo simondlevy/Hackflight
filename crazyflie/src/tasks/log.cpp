@@ -1042,7 +1042,17 @@ static float unused;
 
 //////////////////////////////////////////////////////////////////////////////
 
+extern CoreTask coreTask;
+extern bool didResetEstimation;
+
 extern RadioLink radioLink;
+extern uint32_t motor_ratios[];
+extern uint32_t memTesterWriteErrorCount;
+extern PowerMonitorTask powerMonitorTask;
+extern PowerMonitorTask::syslinkInfo_t pmSyslinkInfo;
+extern crtpStats_t crtpStats;
+
+//////////////////////////////////////////////////////////////////////////////
 
     LOG_GROUP_START(radio)
     LOG_ADD_CORE(LOG_UINT8, rssi, &radioLink.rssi)
@@ -1050,8 +1060,6 @@ extern RadioLink radioLink;
 LOG_GROUP_STOP(radio)
 
     //////////////////////////////////////////////////////////////////////////////
-
-    extern uint32_t motor_ratios[];
 
     LOG_GROUP_START(motor)
     LOG_ADD_CORE(LOG_UINT32, m1, &motor_ratios[0])
@@ -1063,23 +1071,18 @@ LOG_GROUP_STOP(motor)
 
     //////////////////////////////////////////////////////////////////////////////
 
-    extern Safety safety;
-
     LOG_GROUP_START(sys)
-    LOG_ADD_CORE(LOG_UINT8, canfly, &safety.canFlyFlag)
-    LOG_ADD_CORE(LOG_UINT8, isFlying, &safety.isFlyingFlag)
-    LOG_ADD_CORE(LOG_UINT8, isTumbled, &safety.isTumbledFlag)
+    LOG_ADD_CORE(LOG_UINT8, canfly, &coreTask.safety.canFlyFlag)
+    LOG_ADD_CORE(LOG_UINT8, isFlying, &coreTask.safety.isFlyingFlag)
+    LOG_ADD_CORE(LOG_UINT8, isTumbled, &coreTask.safety.isTumbledFlag)
 LOG_GROUP_STOP(sys)
 
     LOG_GROUP_START(supervisor)
-    LOG_ADD(LOG_UINT16, info, &safety.infoBitfield)
+    LOG_ADD(LOG_UINT16, info, &coreTask.safety.infoBitfield)
 LOG_GROUP_STOP(supervisor)
 
 
     //////////////////////////////////////////////////////////////////////////////
-
-    extern CoreTask coreTask;
-    extern bool didResetEstimation;
 
     LOG_GROUP_START(kalman)
     LOG_ADD(LOG_FLOAT, stateX, &unused)
@@ -1138,17 +1141,11 @@ LOG_GROUP_STOP(stateEstimate)
 
     ///////////////////////////////////////////////////////////////////////////////
 
-    extern uint32_t memTesterWriteErrorCount;
-
     LOG_GROUP_START(memTst)
     LOG_ADD(LOG_UINT32, errCntW, &memTesterWriteErrorCount)
 LOG_GROUP_STOP(memTst)
 
     ///////////////////////////////////////////////////////////////////////////////
-
-    extern PowerMonitorTask powerMonitorTask;
-
-    extern PowerMonitorTask::syslinkInfo_t pmSyslinkInfo;
 
     LOG_GROUP_START(pm)
     LOG_ADD_CORE(LOG_FLOAT, vbat, &powerMonitorTask.batteryVoltage)
@@ -1165,8 +1162,6 @@ LOG_ADD(LOG_FLOAT, temp, &temp)
 LOG_GROUP_STOP(pm)
 
     ///////////////////////////////////////////////////////////////////////////////
-
-    extern crtpStats_t crtpStats;
 
     LOG_GROUP_START(crtp)
     LOG_ADD(LOG_UINT16, rxRate, &crtpStats.rxRate)

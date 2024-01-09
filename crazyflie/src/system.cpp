@@ -40,7 +40,6 @@
 #include <mem.hpp>
 #include <openloop.hpp>
 #include <params.h>
-#include <safety.hpp>
 #include <sysload.h>
 #include <system.h>
 #include <worker.hpp>
@@ -62,7 +61,6 @@ CoreTask coreTask;
 FlowDeckTask flowDeckTask;
 ZRangerTask zrangerTask;
 PowerMonitorTask powerMonitorTask;
-Safety safety;
 Worker worker;
 
 // XXX Shared with crtp.cpp
@@ -208,7 +206,7 @@ static void commInit(void)
 
     crtpServiceInit();
 
-    platformServiceInit(&safety);
+    platformServiceInit(&coreTask);
 
     logInit();
 
@@ -272,8 +270,6 @@ static void systemTask(void *arg)
     if(didInit)
         return;
 
-    safety.init();
-
     canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
     xSemaphoreTake(canStartMutex, portMAX_DELAY);
 
@@ -334,7 +330,7 @@ static void systemTask(void *arg)
     }
 
     //////////////////////////////////////////////////////////////////////////
-    estimatorTask.init(&safety);
+    estimatorTask.init(&coreTask.safety);
 
     zrangerTask.init(&vl53l1, &estimatorTask);
 
@@ -349,7 +345,6 @@ static void systemTask(void *arg)
             &openLoop, 
             &imuTask, 
             &estimatorTask, 
-            &safety,
             mixfun);
     //////////////////////////////////////////////////////////////////////////
 

@@ -21,24 +21,25 @@ class CoreTask {
 
     public:
 
-        // Shared with logger
+        // Shared with logger or params
         vehicleState_t state;
+        Safety safety;
 
         void init(
                 OpenLoop * openLoop,
                 ImuTask * imuTask,
                 EstimatorTask * estimatorTask,
-                Safety * safety,
                 const mixfun_t mixfun)
         {
             if (_didInit) {
                 return;
             }
 
+            safety.init();
+
             _openLoop = openLoop;
             _imuTask = imuTask;
             _estimatorTask = estimatorTask;
-            _safety = safety;
 
             _hackflight.init(
                     mixfun,
@@ -103,7 +104,6 @@ class CoreTask {
         OpenLoop * _openLoop;
         EstimatorTask * _estimatorTask;
         ImuTask * _imuTask;
-        Safety * _safety;
 
         bool _didInit = false;
 
@@ -167,7 +167,7 @@ class CoreTask {
                 state.dtheta = -sensorData.gyro.y; // (negate for ENU)
                 state.dpsi =    sensorData.gyro.z; 
 
-                const auto areMotorsAllowedToRun = _safety->areMotorsAllowedToRun();
+                const auto areMotorsAllowedToRun = safety.areMotorsAllowedToRun();
 
                 static float _motorvals[4];
 
@@ -182,7 +182,7 @@ class CoreTask {
 
                     // Use safety algorithm to modify demands based on sensor data
                     // and open-loop info
-                    _safety->update(sensorData, step, timestamp, _demands);
+                    safety.update(sensorData, step, timestamp, _demands);
 
                     // Run hackflight core algorithm to get motor spins from open
                     // loop demands via closed-loop control and mixer

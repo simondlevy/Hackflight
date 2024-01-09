@@ -32,6 +32,7 @@
 #include <queue.h>
 #include <semphr.h>
 
+#include <tasks/core.hpp>
 #include <tasks/syslink.hpp>
 
 #include <crtp/crtp.h>
@@ -43,10 +44,9 @@
 
 class PlatformService {
 
-
     public:
 
-        void task(Safety * safety)
+        void task(CoreTask * coreTask)
         {
             static crtpPacket_t p;
 
@@ -59,7 +59,7 @@ class PlatformService {
                 switch (p.channel) {
 
                     case platformCommand:
-                        platformCommandProcess(&p, safety);
+                        platformCommandProcess(&p, &coreTask->safety);
                         crtpSendPacketBlock(&p);
                         break;
                     case versionCommand:
