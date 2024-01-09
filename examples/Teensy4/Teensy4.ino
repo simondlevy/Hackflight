@@ -5,6 +5,7 @@
 
 #include <hfheader.h>
 #include <tasks/free_rtos/core.hpp>
+#include <tasks/free_rtos/visualizer.hpp>
 
 void setup() 
 {

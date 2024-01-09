@@ -49,7 +49,7 @@ class VisualizerTask {
 
                 case 105: // RC
                     {
-                        int16_t channels[6] = { };/*
+                        int16_t channels[6] = { /*
                             (int16_t)receiverTask.getRawThrottle(),
                             (int16_t)receiverTask.getRawRoll(),
                             (int16_t)receiverTask.getRawPitch(),
