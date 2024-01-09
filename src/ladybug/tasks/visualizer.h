@@ -22,7 +22,7 @@
 #include <stdint.h>
 
 #include "../mixer.hpp"
-#include "../msp.hpp"
+#include "msp.hpp"
 #include "receiver.h"
 #include "datatypes.h"
 
