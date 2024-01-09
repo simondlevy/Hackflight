@@ -3,8 +3,8 @@
 
 #include <vl53l1_arduino.h>
 
-#include "hfheader.h"
-#include "tasks/core.hpp"
+#include <hfheader.h>
+#include <tasks/free_rtos/core.hpp>
 
 void setup() 
 {

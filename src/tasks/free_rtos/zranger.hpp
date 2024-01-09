@@ -35,7 +35,6 @@ class ZRangerTask {
         // Shared with params
         bool didInit;
 
-
         void init(VL53L1 * vl53l1, EstimatorTask * estimatorTask)
         {
             if (didInit){
