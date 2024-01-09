@@ -1,8 +1,10 @@
 #include <FreeRTOS_TEENSY4.h>
+#include <task.h>
 
 #include <vl53l1_arduino.h>
 
-#include "tasks.h"
+#include "hfheader.h"
+#include "tasks/core.hpp"
 
 void setup() 
 {

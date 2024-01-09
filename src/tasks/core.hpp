@@ -17,7 +17,6 @@
 #include <openloop.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
-#include <system.h>
 
 class CoreTask {
 
