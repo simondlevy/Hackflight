@@ -5,9 +5,12 @@
 #include <free_rtos.h>
 #include <task.h>
 
+#include <vl53l1.hpp>
+
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
+#include <tasks/zranger.hpp>
 
 #include <crossplatform.h>
 #include <hackflight.hpp>
@@ -26,10 +29,12 @@ class CoreTask {
         vehicleState_t state;
         Safety safety;
         FlowDeckTask flowDeckTask;
+        ZRangerTask zrangerTask;
 
         void init(
                 const float rollCalibration,
                 const float pitchCalibration,
+                VL53L1 * vl53l1,
                 OpenLoop * openLoop,
                 EstimatorTask * estimatorTask,
                 const mixfun_t mixfun)
@@ -39,6 +44,8 @@ class CoreTask {
             }
 
             flowDeckTask.init(estimatorTask);
+
+            zrangerTask.init(vl53l1, estimatorTask);
 
             safety.init();
 

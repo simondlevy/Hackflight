@@ -30,7 +30,6 @@
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/core.hpp>
-#include <tasks/zranger.hpp>
 
 #include <commander.hpp>
 #include <config.h>
@@ -56,7 +55,6 @@ static const uint8_t VL53L1_NEW_ADDRESS     = 0x31;
 
 EstimatorTask estimatorTask;
 CoreTask coreTask;
-ZRangerTask zrangerTask;
 
 Commander commander;
 PowerMonitorTask powerMonitorTask;
@@ -330,11 +328,10 @@ static void systemTask(void *arg)
     //////////////////////////////////////////////////////////////////////////
     estimatorTask.init(&coreTask.safety);
 
-    zrangerTask.init(&vl53l1, &estimatorTask);
-
     coreTask.init(
             configBlock.getCalibRoll(), 
             configBlock.getCalibPitch(),
+            &vl53l1,
             &openLoop, 
             &estimatorTask, 
             mixfun);
