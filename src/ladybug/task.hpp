@@ -19,8 +19,9 @@
 
 #pragma once
 
-#include <stdbool.h>
 #include <stdint.h>
+
+#include <clock.hpp>
 
 class LadybugTask {
 
@@ -63,7 +64,7 @@ class LadybugTask {
         uint32_t m_lastExecutedAtUs;          
         uint32_t m_lastSignaledAtUs;         
 
-        LadybugTask(const id_e id, const uint32_t rate) 
+        LadybugTask(const id_e id, const Clock::rate_t rate) 
         {
             m_id = id;
             m_desiredPeriodUs = 1000000 / rate;

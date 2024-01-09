@@ -92,7 +92,7 @@ class ReceiverTask : public LadybugTask {
     public:
 
         ReceiverTask()
-            : LadybugTask(RECEIVER, 33) // Hz
+            : LadybugTask(RECEIVER, Clock::RATE_33_HZ)
         {
         }
 

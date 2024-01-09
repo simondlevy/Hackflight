@@ -104,7 +104,7 @@ class VisualizerTask : public LadybugTask {
         }
 
         VisualizerTask(void)
-            : LadybugTask(VISUALIZER, 100) // Hz
+            : LadybugTask(VISUALIZER, Clock::RATE_100_HZ) // Hz
         { 
         }
 

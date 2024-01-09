@@ -27,7 +27,7 @@ class EstimatorTask : public LadybugTask {
     public:
 
         EstimatorTask(void)
-            : LadybugTask(ESTIMATOR, 100) // Hz
+            : LadybugTask(ESTIMATOR, Clock::RATE_100_HZ)
         {
             _predictionUpdateIntervalMsec = 1000 / PREDICT_RATE;
         }
