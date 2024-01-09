@@ -29,7 +29,7 @@
 
 #include <datatypes.h>
 
-#include "../fixedpitch.hpp"
+#include <ladybug/mixers/fixedpitch.hpp>
 
 class QuadXbfMixer {
 

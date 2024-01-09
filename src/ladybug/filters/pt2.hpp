@@ -20,7 +20,7 @@
 
 #include <math.h>
 
-#include "../pid.hpp"
+#include <ladybug/pid.hpp>
 
 // PT2 Low Pass filter
 class Pt2Filter {

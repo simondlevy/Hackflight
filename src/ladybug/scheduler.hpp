@@ -23,8 +23,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "pid.hpp"
-#include "task.hpp"
+#include <ladybug/pid.hpp>
+#include <ladybug/task.hpp>
 
 class Scheduler {
 

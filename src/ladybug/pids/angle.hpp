@@ -21,12 +21,13 @@
 #include <string.h>
 #include <math.h>
 
-#include "datatypes.h"
-#include "../constrain.h"
-#include "../filters/pt1.hpp"
-#include "../filters/pt2.hpp"
-#include "../pid.hpp"
-#include "../utils.h"
+#include <datatypes.h>
+
+#include <ladybug/constrain.h>
+#include <ladybug/filters/pt1.hpp>
+#include <ladybug/filters/pt2.hpp>
+#include <ladybug/pid.hpp>
+#include <ladybug/utils.h>
 
 class AnglePidController : public PidController {
 

@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include "../esc.hpp"
+#include <ladybug/esc.hpp>
 
 class BrushedEsc : public Esc {
 

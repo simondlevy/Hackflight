@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "../task.hpp"
-#include "datatypes.h"
-#include "kalman.hpp"
+#include <datatypes.h>
+#include <kalman.hpp>
+#include <ladybug/task.hpp>
 
 class EstimatorTask : public LadybugTask {
 

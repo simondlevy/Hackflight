@@ -21,13 +21,13 @@
 
 #include <usfs.hpp>
 
-#include "escs/brushed.hpp"
-#include "hackflight.hpp"
-#include "mixer.hpp"
-#include "scheduler.hpp"
-#include "tasks/estimator.hpp"
-#include "tasks/receiver.hpp"
-#include "tasks/visualizer.hpp"
+#include <hackflight.hpp>
+#include <ladybug/escs/brushed.hpp>
+#include <ladybug/mixer.hpp>
+#include <ladybug/scheduler.hpp>
+#include <ladybug/tasks/estimator.hpp>
+#include <ladybug/tasks/receiver.hpp>
+#include <ladybug/tasks/visualizer.hpp>
 
 class LadybugFC {
 

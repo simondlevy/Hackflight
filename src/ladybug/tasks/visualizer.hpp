@@ -21,10 +21,10 @@
 
 #include <stdint.h>
 
-#include "datatypes.h"
-#include "hackflight.hpp"
-#include "msp.hpp"
-#include "receiver.hpp"
+#include <datatypes.h>
+#include <hackflight.hpp>
+#include <msp.hpp>
+#include <ladybug/tasks/receiver.hpp>
 
 class VisualizerTask : public LadybugTask {
 

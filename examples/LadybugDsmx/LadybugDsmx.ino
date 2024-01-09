@@ -17,14 +17,14 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <dsmrx.hpp>
+
 #include <closedloop.hpp>
 
 #include <ladybug/arduinostl.h>
 #include <ladybug/ladybugfc.hpp>
 #include <ladybug/mixers/fixedpitch/quadxbf.hpp>
-#include <ladybug/pids/angle.h>
-
-#include <dsmrx.hpp>
+#include <ladybug/pids/angle.hpp>
 
 static Mixer mixer = QuadXbfMixer::make();
 static AnglePidController anglePid;
