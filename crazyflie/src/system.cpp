@@ -38,6 +38,7 @@
 #include <mem.hpp>
 #include <openloop.hpp>
 #include <params.h>
+#include <pinmap.h>
 #include <sysload.h>
 #include <system.h>
 #include <worker.hpp>
@@ -327,6 +328,7 @@ static void systemTask(void *arg)
     coreTask.init(
             configBlock.getCalibRoll(), 
             configBlock.getCalibPitch(),
+            PIN_FLOWDECK_CS,
             &vl53l1,
             &openLoop, 
             mixfun);

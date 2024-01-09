@@ -1,7 +1,7 @@
 #pragma once
 
 #include <assert.h>
-#include <console.h>
+#include <crossplatform.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,7 +14,6 @@
 #include <clock.hpp>
 #include <motors.h>
 #include <safety.hpp>
-#include <system.h>
 #include <datatypes.h>
 
 class Safety {

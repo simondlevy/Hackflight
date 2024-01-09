@@ -14,8 +14,6 @@
 #include <tasks/estimator.hpp>
 
 #include <crossplatform.h>
-#include <pinmap.h>
-#include <system.h>
 
 void flowdeckInit(void);
 
@@ -26,7 +24,7 @@ class FlowDeckTask {
         // Shared with params
         bool didInit;
 
-        void init(EstimatorTask * estimatorTask)
+        void init(const uint8_t csPin, EstimatorTask * estimatorTask)
         {
             if (didInit) {
                 return;
@@ -35,7 +33,7 @@ class FlowDeckTask {
             _estimatorTask = estimatorTask;
 
 
-            if (_pmw3901.begin(PIN_FLOWDECK_CS)) {
+            if (_pmw3901.begin(csPin)) {
 
                 xTaskCreate(flowdeckTask, "FLOW", STACKSIZE, this, 3, NULL);
 

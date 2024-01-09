@@ -9,7 +9,6 @@
 
 #include <crossplatform.h>
 #include <safety.hpp>
-#include <system.h>
 
 class EstimatorTask {
 

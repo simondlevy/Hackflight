@@ -33,6 +33,7 @@ class CoreTask {
         void init(
                 const float rollCalibration,
                 const float pitchCalibration,
+                const uint8_t flowDeckCsPin,
                 VL53L1 * vl53l1,
                 OpenLoop * openLoop,
                 const mixfun_t mixfun)
@@ -43,7 +44,7 @@ class CoreTask {
 
             estimatorTask.init(&safety);
 
-            flowDeckTask.init(&estimatorTask);
+            flowDeckTask.init(flowDeckCsPin, &estimatorTask);
 
             zrangerTask.init(vl53l1, &estimatorTask);
 
