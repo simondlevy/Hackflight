@@ -21,10 +21,10 @@
 
 #include <stdint.h>
 
-#include "../mixer.hpp"
+#include "datatypes.h"
+#include "hackflight.hpp"
 #include "msp.hpp"
 #include "receiver.hpp"
-#include "datatypes.h"
 
 class VisualizerTask : public LadybugTask {
 
@@ -108,7 +108,7 @@ class VisualizerTask : public LadybugTask {
         { 
         }
 
-        float motors[Mixer::MAX_MOTORS];
+        float motors[Hackflight::MAX_MOTOR_COUNT];
 
 
 }; // class VisualizerTask

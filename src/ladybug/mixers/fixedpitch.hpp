@@ -23,6 +23,7 @@
 
 #include <datatypes.h>
 
+#include <hackflight.hpp>
 #include "../constrain.h"
 #include "../mixer.hpp"
 
@@ -36,7 +37,7 @@ class FixedPitchMixer : public Mixer {
                 const Axis3f spins[],
                 float motorvals[])
         {
-            float mix[MAX_MOTORS];
+            float mix[Hackflight::MAX_MOTOR_COUNT];
 
             float mixMax = 0, mixMin = 0;
 

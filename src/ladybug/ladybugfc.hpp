@@ -22,6 +22,7 @@
 #include <usfs.hpp>
 
 #include "escs/brushed.hpp"
+#include "hackflight.hpp"
 #include "mixer.hpp"
 #include "scheduler.hpp"
 #include "tasks/estimator.hpp"
@@ -126,7 +127,7 @@ class LadybugFC {
                     loopRemainingCycles = intcmp(nextTargetCycles, nowCycles);
                 }
 
-                float mixmotors[Mixer::MAX_MOTORS] = {};
+                float mixmotors[Hackflight::MAX_MOTOR_COUNT] = {};
 
                 if (_esc.isReady(usec)) {
 

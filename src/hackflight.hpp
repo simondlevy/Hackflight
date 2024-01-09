@@ -35,6 +35,8 @@ class Hackflight {
 
     public:
 
+        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
+
         void init(
                 const mixfun_t mixfun,
                 const Clock::rate_t pidUpdateRate,
@@ -160,8 +162,6 @@ class Hackflight {
         }
 
     private:
-
-        static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
         float _thrustScale;
         float _thrustBase;
