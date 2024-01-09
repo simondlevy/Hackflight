@@ -164,7 +164,6 @@ class CoreTask {
             // Initialize step to something else than 0
             uint32_t step = 1;
 
-            systemWaitStart();
             consolePrintf("CORE: Starting loop\n");
             rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
 
@@ -223,7 +222,7 @@ class CoreTask {
                     }
                 }
 
-                motorsCheckDshot();
+                // motorsCheckDshot();
             }
         }
 };
