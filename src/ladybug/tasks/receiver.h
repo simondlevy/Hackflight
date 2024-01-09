@@ -21,7 +21,7 @@
 #include "../task.hpp"
 #include "datatypes.h"
 
-class ReceiverTask : public Task {
+class ReceiverTask : public LadybugTask {
 
     private:
 
@@ -92,7 +92,7 @@ class ReceiverTask : public Task {
     public:
 
         ReceiverTask()
-            : Task(RECEIVER, 33) // Hz
+            : LadybugTask(RECEIVER, 33) // Hz
         {
         }
 

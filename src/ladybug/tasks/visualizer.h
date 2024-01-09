@@ -26,7 +26,7 @@
 #include "receiver.h"
 #include "datatypes.h"
 
-class VisualizerTask : public Task {
+class VisualizerTask : public LadybugTask {
 
     private:
 
@@ -110,7 +110,7 @@ class VisualizerTask : public Task {
         }
 
         VisualizerTask(void)
-            : Task(VISUALIZER, 100) // Hz
+            : LadybugTask(VISUALIZER, 100) // Hz
         { 
         }
 

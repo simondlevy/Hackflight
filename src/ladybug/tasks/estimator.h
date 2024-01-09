@@ -22,12 +22,12 @@
 #include "datatypes.h"
 #include "kalman.hpp"
 
-class EstimatorTask : public Task {
+class EstimatorTask : public LadybugTask {
 
     public:
 
         EstimatorTask(void)
-            : Task(ESTIMATOR, 100) // Hz
+            : LadybugTask(ESTIMATOR, 100) // Hz
         {
             _predictionUpdateIntervalMsec = 1000 / PREDICT_RATE;
         }

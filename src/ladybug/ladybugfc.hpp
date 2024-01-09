@@ -249,7 +249,7 @@ class LadybugFC {
         }
 
         void postRunTask(
-                Task::id_e id,
+                LadybugTask::id_e id,
                 const uint32_t usecStart,
                 const uint32_t usecEnd,
                 const uint32_t nowCycles,
@@ -259,15 +259,15 @@ class LadybugFC {
 
             switch (id) {
 
-                case Task::ESTIMATOR:
+                case LadybugTask::ESTIMATOR:
                     _estimatorTask.update(usecStart, usecTaken);
                     break;
 
-                case Task::VISUALIZER:
+                case LadybugTask::VISUALIZER:
                     _visualizerTask.update(usecStart, usecTaken);
                     break;
 
-                case Task::RECEIVER:
+                case LadybugTask::RECEIVER:
                     _receiverTask.update(usecStart, usecTaken);
                     break;
 
@@ -281,7 +281,7 @@ class LadybugFC {
 
         void runDynamicTasks(void)
         {
-            Task::prioritizer_t prioritizer = {Task::NONE, 0};
+            LadybugTask::prioritizer_t prioritizer = {LadybugTask::NONE, 0};
 
             const uint32_t usec = micros(); 
 
@@ -289,17 +289,17 @@ class LadybugFC {
 
             switch (prioritizer.id) {
 
-                case Task::ESTIMATOR:
+                case LadybugTask::ESTIMATOR:
                     runTask(prioritizer.id);
                     updateArmingStatus(usec);
                     updateLed();
                     break;
 
-                case Task::VISUALIZER:
+                case LadybugTask::VISUALIZER:
                     runVisualizerTask();
                     break;
 
-                case Task::RECEIVER:
+                case LadybugTask::RECEIVER:
                     updateArmingStatus(usec);
                     updateLed();
                     runTask(prioritizer.id);
@@ -310,7 +310,7 @@ class LadybugFC {
             }
         }
 
-        void runTask(Task::id_e id)
+        void runTask(LadybugTask::id_e id)
         {
             const uint32_t anticipatedEndCycles = getTaskAnticipatedEndCycles(id);
 
@@ -320,11 +320,11 @@ class LadybugFC {
 
                 switch (id) {
 
-                    case Task::ESTIMATOR:
+                    case LadybugTask::ESTIMATOR:
                         _estimatorTask.run(_quat, _state);
                         break;
 
-                    case Task::RECEIVER:
+                    case LadybugTask::RECEIVER:
                         _receiverTask.run();
                         break;
 
@@ -337,7 +337,7 @@ class LadybugFC {
         }
 
         void postRunTask(
-                Task::id_e id,
+                LadybugTask::id_e id,
                 const uint32_t usecStart,
                 const uint32_t anticipatedEndCycles)
         {
@@ -395,7 +395,7 @@ class LadybugFC {
         void runVisualizerTask(void)
         {
             const uint32_t anticipatedEndCycles = 
-                getTaskAnticipatedEndCycles(Task::VISUALIZER);
+                getTaskAnticipatedEndCycles(LadybugTask::VISUALIZER);
 
             if (anticipatedEndCycles > 0) {
 
@@ -410,11 +410,11 @@ class LadybugFC {
                     }
                 }
 
-                postRunTask(Task::VISUALIZER, usec, anticipatedEndCycles);
+                postRunTask(LadybugTask::VISUALIZER, usec, anticipatedEndCycles);
             }
         }
 
-        uint32_t getTaskAnticipatedEndCycles(Task::id_e id)
+        uint32_t getTaskAnticipatedEndCycles(LadybugTask::id_e id)
         {
             return getTaskAnticipatedEndCycles(id, getCycleCounter());
         }
@@ -435,23 +435,23 @@ class LadybugFC {
             DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
         }
 
-        uint32_t getTaskAnticipatedEndCycles(Task::id_e id, const uint32_t nowCycles)
+        uint32_t getTaskAnticipatedEndCycles(LadybugTask::id_e id, const uint32_t nowCycles)
         {
             uint32_t endCycles = 0;
 
             switch (id) {
 
-                case Task::ESTIMATOR:
+                case LadybugTask::ESTIMATOR:
                     endCycles = _scheduler.getAnticipatedEndCycles(
                             _estimatorTask, nowCycles);
                     break;
 
-                case Task::VISUALIZER:
+                case LadybugTask::VISUALIZER:
                     endCycles = _scheduler.getAnticipatedEndCycles(
                             _visualizerTask, nowCycles);
                     break;
 
-                case Task::RECEIVER:
+                case LadybugTask::RECEIVER:
                     endCycles = _scheduler.getAnticipatedEndCycles(
                             _receiverTask, nowCycles);
                     break;
@@ -518,7 +518,7 @@ class LadybugFC {
             }
         }
 
-        void prioritizeTasks(Task::prioritizer_t & prioritizer, const uint32_t usec)
+        void prioritizeTasks(LadybugTask::prioritizer_t & prioritizer, const uint32_t usec)
         {
             _receiverTask.prioritize(usec, prioritizer);
             _estimatorTask.prioritize(usec, prioritizer);

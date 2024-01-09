@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-class Task {
+class LadybugTask {
 
     public:
 
@@ -63,7 +63,7 @@ class Task {
         uint32_t m_lastExecutedAtUs;          
         uint32_t m_lastSignaledAtUs;         
 
-        Task(const id_e id, const uint32_t rate) 
+        LadybugTask(const id_e id, const uint32_t rate) 
         {
             m_id = id;
             m_desiredPeriodUs = 1000000 / rate;

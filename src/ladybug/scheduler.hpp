@@ -133,7 +133,7 @@ class Scheduler {
             lastTargetCycles = m_nextTargetCycles;
         }
 
-        uint32_t getAnticipatedEndCycles(Task & task, uint32_t nowCycles)
+        uint32_t getAnticipatedEndCycles(LadybugTask & task, uint32_t nowCycles)
         {
             const uint32_t taskRequiredCycles = 
                 task.checkReady(m_nextTargetCycles, nowCycles, m_taskGuardCycles);
