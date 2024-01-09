@@ -28,7 +28,6 @@
 #include <tasks/usblink.hpp>
 
 #include <tasks/estimator.hpp>
-#include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/core.hpp>
 #include <tasks/zranger.hpp>
@@ -57,7 +56,6 @@ static const uint8_t VL53L1_NEW_ADDRESS     = 0x31;
 
 EstimatorTask estimatorTask;
 CoreTask coreTask;
-FlowDeckTask flowDeckTask;
 ZRangerTask zrangerTask;
 
 Commander commander;
@@ -333,8 +331,6 @@ static void systemTask(void *arg)
     estimatorTask.init(&coreTask.safety);
 
     zrangerTask.init(&vl53l1, &estimatorTask);
-
-    flowDeckTask.init(&estimatorTask);
 
     coreTask.init(
             configBlock.getCalibRoll(), 

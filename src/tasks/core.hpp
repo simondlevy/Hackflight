@@ -6,6 +6,7 @@
 #include <task.h>
 
 #include <tasks/estimator.hpp>
+#include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 
 #include <crossplatform.h>
@@ -24,6 +25,7 @@ class CoreTask {
         // Shared with logger or params
         vehicleState_t state;
         Safety safety;
+        FlowDeckTask flowDeckTask;
 
         void init(
                 const float rollCalibration,
@@ -35,6 +37,8 @@ class CoreTask {
             if (_didInit) {
                 return;
             }
+
+            flowDeckTask.init(estimatorTask);
 
             safety.init();
 
