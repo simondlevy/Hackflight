@@ -339,7 +339,7 @@ class ImuTask : public FreeRTOSTask {
             baroQueue = makeQueue(
                     BARO_ITEM_SIZE, baroQueueStorage, &baroQueueBuffer);
 
-            FreeRTOSTask::init(runImuTask, "SENSORS", this, 4);
+            FreeRTOSTask::init(runImuTask, "IMU", this, 4);
         }
 
         static void scaleBaro(
