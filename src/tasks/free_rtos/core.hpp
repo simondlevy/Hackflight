@@ -81,14 +81,7 @@ class CoreTask : public FreeRTOSTask {
 
             motorsInit();
 
-            xTaskCreateStatic(
-                    runTask, 
-                    "CORE", 
-                    STACKSIZE,
-                    this, 
-                    5, 
-                    taskStackBuffer,
-                    &taskTaskBuffer);
+            FreeRTOSTask::init(runTask, "CORE", this, 5);
         }
 
 

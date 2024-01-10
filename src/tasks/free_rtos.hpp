@@ -47,6 +47,7 @@ class FreeRTOSTask {
         void init(
                 const taskfun_t fun,
                 const char * name,
+                void * obj,
                 const uint8_t priority
                 )
         {
@@ -54,7 +55,7 @@ class FreeRTOSTask {
                     fun, 
                     name, 
                     STACKSIZE, 
-                    this, 
+                    obj, 
                     priority, 
                     taskStackBuffer,
                     &taskTaskBuffer);
