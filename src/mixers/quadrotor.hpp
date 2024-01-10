@@ -18,7 +18,7 @@
 
 #include <datatypes.h>
 
-static void mixfun(const demands_t & demands, float motors[], uint8_t & count)
+static void mixQuadrotor(const demands_t & demands, float motors[], uint8_t & count)
 {
     auto t = demands.thrust;
     auto r = demands.roll;

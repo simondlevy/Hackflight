@@ -24,6 +24,13 @@
 
 #include <hfheader.h>
 #include <tasks/free_rtos/visualizer.hpp>
+#include <mixers/quadrotor.hpp>
+
+static void getOpenLoopDemands(
+        demands_t & demands, uint32_t & timestamp, bool & inHoverMode)
+{
+}
+
 
 void setup() 
 {
@@ -35,6 +42,8 @@ void setup()
     static VisualizerTask visualizerTask;
 
     visualizerTask.init(&coreTask);
+
+    coreTask.init(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor);
 
     //Wire.begin();
 

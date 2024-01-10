@@ -334,7 +334,7 @@ static void systemTask(void *arg)
             PIN_FLOWDECK_CS,
             &vl53l1,
             getOpenLoopDemands,
-            mixfun);
+            mixQuadrotor);
 
     systemRequestNRFVersion();
 
