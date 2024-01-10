@@ -1,21 +1,27 @@
 #pragma once
 
-class VisualizerTask {
+#include <tasks/free_rtos.hpp>
+
+class VisualizerTask : public FreeRTOSTask {
 
     public:
 
         void init(void)
         {
-            xTaskCreate(task1, "task1", 128, nullptr, 2, nullptr);
+            FreeRTOSTask::init(runVisualizerTask, "VISUALIZER", this, 2);
 
             pinMode(LED_BUILTIN, OUTPUT);
         }
 
     private:
 
-        static void task1(void*) 
+        static void runVisualizerTask(void * obj)
         {
+            ((VisualizerTask *)obj)->run();
+        }
 
+        void run(void)
+        {
             while (true) {
 
                 Serial.println("BADDA BOOM");

@@ -36,11 +36,9 @@ class FreeRTOSTask {
 
         static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
 
-        StackType_t  taskStackBuffer[STACKSIZE]; 
+        StackType_t  _taskStackBuffer[STACKSIZE]; 
 
-        StaticTask_t taskTaskBuffer;
-
-        bool _didInit;
+        StaticTask_t _taskTaskBuffer;
 
     protected:
 
@@ -57,7 +55,7 @@ class FreeRTOSTask {
                     STACKSIZE, 
                     obj, 
                     priority, 
-                    taskStackBuffer,
-                    &taskTaskBuffer);
+                    _taskStackBuffer,
+                    &_taskTaskBuffer);
         }
 };
