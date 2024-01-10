@@ -25,28 +25,30 @@
 #include <hackflight.hpp>
 #include <msp.hpp>
 #include <tasks/free_rtos.hpp>
-//#include <ladybug/tasks/receiver.hpp>
+#include <tasks/free_rtos/core.hpp>
 
 class VisualizerTask : public FreeRTOSTask {
 
     public:
 
-        void init(void)
+        void init(CoreTask * coreTask)
         {
             if (didInit) {
                 return;
             }
 
+            _coreTask= coreTask;
+
+            FreeRTOSTask::init(runVisualizerTask, "VISUALIZER", this, 1);
+
             didInit = true;
         }
 
         bool parse(
-                vehicleState_t & state,
                 //ReceiverTask & receiverTask,
-                Msp & msp,
                 const uint8_t byte)
         {
-            switch (msp.parse(byte)) {
+            switch (_msp.parse(byte)) {
 
                 case 105: // RC
                     {
@@ -59,29 +61,30 @@ class VisualizerTask : public FreeRTOSTask {
                             (int16_t)receiverTask.getRawAux2()*/
                         };
 
-                        serializeShorts(msp, 105, channels, 6);
+                        serializeShorts(105, channels, 6);
 
                     } 
                     return true;
 
                 case 108: // ESTIMATOR
                     {
+                        const auto vehicleState = _coreTask->vehicleState;
                         const int16_t angles[3] = {
-                            (int16_t)(10 * state.phi),
-                            (int16_t)(10 * state.theta),
-                            (int16_t)state.psi
+                            (int16_t)(10 * vehicleState.phi),
+                            (int16_t)(10 * vehicleState.theta),
+                            (int16_t)vehicleState.psi
                         };
 
-                        serializeShorts(msp, 108, angles, 3);
+                        serializeShorts(108, angles, 3);
                     } 
                     return true;
 
                 case 214: // SET_MOTORS
                     {
-                        readAndConvertMotor(msp, 0);
-                        readAndConvertMotor(msp, 1);
-                        readAndConvertMotor(msp, 2);
-                        readAndConvertMotor(msp, 3);
+                        readAndConvertMotor(0);
+                        readAndConvertMotor(1);
+                        readAndConvertMotor(2);
+                        readAndConvertMotor(3);
                     } 
                     break;
 
@@ -102,18 +105,36 @@ class VisualizerTask : public FreeRTOSTask {
             return 1000 + 1000 * value;
         }
 
+        static void runVisualizerTask(void* obj)
+        {
+            ((VisualizerTask *)obj)->run();
+        }
+
+        Msp _msp;
+
+        CoreTask * _coreTask;
+
+        void run(void)
+        {
+            while (true) {
+
+                while (Serial.available()) {
+
+                }
+            }
+        }
+
         void serializeShorts(
-                Msp & msp,
                 const uint8_t messageType,
                 const int16_t src[],
                 const uint8_t count)
         {
-            msp.serializeShorts(messageType, src, count);
+            _msp.serializeShorts(messageType, src, count);
         }
 
-        void  readAndConvertMotor(Msp & msp, const uint8_t index)
+        void  readAndConvertMotor(const uint8_t index)
         {
-            motors[index] = (msp.parseShort(index) - 1000) / 1000.;
+            motors[index] = (_msp.parseShort(index) - 1000) / 1000.;
         }
 
 };

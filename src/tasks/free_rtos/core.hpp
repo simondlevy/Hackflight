@@ -37,7 +37,7 @@ class CoreTask : public FreeRTOSTask {
     public:
 
         // Shared with logger or params
-        vehicleState_t state;
+        vehicleState_t vehicleState;
         Safety safety;
         EstimatorTask estimatorTask;
         FlowDeckTask flowDeckTask;
@@ -172,12 +172,12 @@ class CoreTask : public FreeRTOSTask {
 
                 // Get state vector linear positions and velocities and
                 // angles from estimator
-                estimatorTask.getVehicleState(&state);
+                estimatorTask.getVehicleState(&vehicleState);
 
                 // Get state vector angular velocities directly from gyro
-                state.dphi =    sensorData.gyro.x;     
-                state.dtheta = -sensorData.gyro.y; // (negate for ENU)
-                state.dpsi =    sensorData.gyro.z; 
+                vehicleState.dphi =    sensorData.gyro.x;     
+                vehicleState.dtheta = -sensorData.gyro.y; // (negate for ENU)
+                vehicleState.dpsi =    sensorData.gyro.z; 
 
                 const auto areMotorsAllowedToRun = safety.areMotorsAllowedToRun();
 
@@ -198,7 +198,7 @@ class CoreTask : public FreeRTOSTask {
 
                     // Run hackflight core algorithm to get motor spins from open
                     // loop demands via closed-loop control and mixer
-                    _hackflight.step(inHoverMode, state, _demands, _motorvals);
+                    _hackflight.step(inHoverMode, vehicleState, _demands, _motorvals);
                 }
 
                 if (areMotorsAllowedToRun) {
