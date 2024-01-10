@@ -28,7 +28,6 @@
 #include <hackflight.hpp>
 #include <kalman.hpp>
 #include <motors.h>
-#include <openloop.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
 
@@ -48,8 +47,8 @@ class CoreTask : public FreeRTOSTask {
                 const float pitchCalibration,
                 const uint8_t flowDeckCsPin,
                 VL53L1 * vl53l1,
-                OpenLoop * openLoop,
-                const mixfun_t mixfun)
+                const openLoopFun_t openLoopFun,
+                const mixFun_t mixFun)
         {
             if (didInit) {
                 return;
@@ -65,10 +64,10 @@ class CoreTask : public FreeRTOSTask {
 
             _imuTask.init(&estimatorTask, rollCalibration, pitchCalibration);
 
-            _openLoop = openLoop;
+            _openLoopFun = openLoopFun;
 
             _hackflight.init(
-                    mixfun,
+                    mixFun,
                     PID_UPDATE_RATE,
                     THRUST_SCALE,
                     THRUST_BASE,
@@ -80,7 +79,6 @@ class CoreTask : public FreeRTOSTask {
 
             FreeRTOSTask::init(runCoreTask, "CORE", this, 5);
         }
-
 
         bool test(void)
         {
@@ -105,7 +103,7 @@ class CoreTask : public FreeRTOSTask {
 
     private:
 
-        // approximate thrust needed when in perfect hover. More weight/older
+        // Approximate thrust needed when in perfect hover. More weight/older
         // battery can use a higher value
         static constexpr float THRUST_BASE  = 36000;
         static constexpr float THRUST_MIN   = 20000;
@@ -119,7 +117,7 @@ class CoreTask : public FreeRTOSTask {
 
         demands_t _demands;
 
-        OpenLoop * _openLoop;
+        openLoopFun_t _openLoopFun;
 
         ImuTask _imuTask;
 
@@ -190,7 +188,7 @@ class CoreTask : public FreeRTOSTask {
 
                     // Get open-loop demands in [-1,+1], as well as timestamp
                     // when they received, and whether hover mode is indicated
-                    _openLoop->getDemands(_demands, timestamp, inHoverMode);
+                    _openLoopFun(_demands, timestamp, inHoverMode);
 
                     // Use safety algorithm to modify demands based on sensor data
                     // and open-loop info

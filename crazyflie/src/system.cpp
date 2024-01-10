@@ -36,7 +36,6 @@
 #include <console.h>
 #include <led.h>
 #include <mem.hpp>
-#include <openloop.hpp>
 #include <params.h>
 #include <pinmap.h>
 #include <sysload.h>
@@ -70,8 +69,6 @@ PowerMonitorTask::syslinkInfo_t pmSyslinkInfo;
 // ---------------------------------------------------------------------------
 
 static ConfigBlock configBlock;
-
-static OpenLoop openLoop;
 
 typedef enum {
     linkEcho   = 0x00,
@@ -252,6 +249,12 @@ static const auto MEM_TASK_STACK_DEPTH = configMINIMAL_STACK_SIZE;
 StackType_t  memTaskStackBuffer[MEM_TASK_STACK_DEPTH]; 
 StaticTask_t memTaskTaskBuffer;
 
+static void getOpenLoopDemands(
+        demands_t & demands, uint32_t & timestamp, bool & inHoverMode)
+{
+    commander.getDemands(demands, timestamp, inHoverMode);
+}
+
 static void systemTask(void *arg)
 {
     bool pass = true;
@@ -330,7 +333,7 @@ static void systemTask(void *arg)
             configBlock.getCalibPitch(),
             PIN_FLOWDECK_CS,
             &vl53l1,
-            &openLoop, 
+            getOpenLoopDemands,
             mixfun);
 
     systemRequestNRFVersion();

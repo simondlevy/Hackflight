@@ -29,9 +29,8 @@
 
 class ImuTask : public FreeRTOSTask {
 
-    public:
+    public: // Are are called from CoreTask
 
-        // Called from CoreTask
         bool test(void)
         {
             bool testStatus = true;
@@ -48,17 +47,14 @@ class ImuTask : public FreeRTOSTask {
             return testStatus;
         }
 
-        // Called from CoreTask
         bool areCalibrated() {
             return gyroBiasFound;
         }
 
-        // Called from CoreTask
         void waitDataReady(void) {
             xSemaphoreTake(dataReady, portMAX_DELAY);
         }
 
-        // Called from CoreTask
         void acquire(sensorData_t *sensors)
         {
             xQueueReceive(gyroQueue, &sensors->gyro, 0);
@@ -69,7 +65,6 @@ class ImuTask : public FreeRTOSTask {
             sensors->interruptTimestamp = data.interruptTimestamp;
         }
 
-        // Called from interrupt handler
         void dataAvailableCallback(void)
         {
             portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;

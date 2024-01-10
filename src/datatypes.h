@@ -71,9 +71,12 @@ typedef struct {
 
 } demands_t;
 
-typedef void (*mixfun_t)(
+typedef void (*mixFun_t)(
         const demands_t & demands, float motorvals[], uint8_t & count);
 
+
+typedef void (*openLoopFun_t)(
+        demands_t & demands, uint32_t & timestamp, bool & inHoverMode);
 
 // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
 // We use ENU coordinates based on 

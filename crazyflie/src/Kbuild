@@ -14,7 +14,6 @@ obj-y += ledseq.o
 obj-y += main.o
 obj-y += mem.o
 obj-y += onewire.o
-obj-y += openloop.o
 obj-y += params.o
 obj-y += storage.o
 obj-y += sysload.o

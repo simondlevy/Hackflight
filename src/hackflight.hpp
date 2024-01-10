@@ -38,7 +38,7 @@ class Hackflight {
         static const uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
         void init(
-                const mixfun_t mixfun,
+                const mixFun_t mixFun,
                 const Clock::rate_t pidUpdateRate,
                 const float thrustScale,
                 const float thrustBase,
@@ -46,7 +46,7 @@ class Hackflight {
                 const float thrustMax)
         {
             init(
-                    mixfun,
+                    mixFun,
                     pidUpdateRate, 
                     thrustScale, 
                     thrustBase, 
@@ -57,7 +57,7 @@ class Hackflight {
          }
 
         void init(
-                const mixfun_t mixfun,
+                const mixFun_t mixFun,
                 const Clock::rate_t pidUpdateRate,
                 const float thrustScale,
                 const float thrustBase,
@@ -66,7 +66,7 @@ class Hackflight {
                 const float pitchRollScale,
                 const float yawScale)
         {
-            _mixfun = mixfun;
+            _mixFun = mixFun;
 
             _thrustScale = thrustScale;
             _thrustBase = thrustBase;
@@ -170,7 +170,7 @@ class Hackflight {
         float _pitchRollScale;
         float _yawScale;
 
-        mixfun_t _mixfun;
+        mixFun_t _mixFun;
 
         PitchRollAngleController _pitchRollAngleController;
         PitchRollRateController _pitchRollRateController;
@@ -195,7 +195,7 @@ class Hackflight {
 
             float uncapped[MAX_MOTOR_COUNT] = {};
             uint8_t count = 0;
-            _mixfun(demands, uncapped, count);
+            _mixFun(demands, uncapped, count);
 
             float highestThrustFound = 0;
             for (uint8_t k=0; k<count; k++) {

@@ -20,7 +20,7 @@
 #include <FreeRTOS_TEENSY4.h>
 #include <task.h>
 
-//#include <vl53l1_arduino.h>
+#include <vl53l1_arduino.h>
 
 #include <hfheader.h>
 #include <tasks/free_rtos/visualizer.hpp>
@@ -28,7 +28,7 @@
 void setup() 
 {
 
-    //static VL53L1_Arduino vl53l1;    
+    static VL53L1_Arduino vl53l1;    
 
     static CoreTask coreTask;
 
