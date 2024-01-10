@@ -83,7 +83,7 @@ class CoreTask {
             xTaskCreateStatic(
                     runTask, 
                     "CORE", 
-                    TASK_STACK_DEPTH,
+                    STACKSIZE,
                     this, 
                     5, 
                     taskStackBuffer,
@@ -126,8 +126,8 @@ class CoreTask {
 
         static const auto PID_UPDATE_RATE = Clock::RATE_500_HZ;
 
-        static const auto TASK_STACK_DEPTH = 3* configMINIMAL_STACK_SIZE;
-        StackType_t  taskStackBuffer[TASK_STACK_DEPTH]; 
+        static const auto STACKSIZE = 3* configMINIMAL_STACK_SIZE;
+        StackType_t  taskStackBuffer[STACKSIZE]; 
         StaticTask_t taskTaskBuffer;
 
         Hackflight _hackflight;

@@ -244,8 +244,8 @@ class ImuTask {
         StaticQueue_t magQueueBuffer;
         xQueueHandle magQueue;
 
-        static const auto TASK_STACK_DEPTH = 2 * configMINIMAL_STACK_SIZE;
-        StackType_t  taskStackBuffer[TASK_STACK_DEPTH]; 
+        static const auto STACKSIZE = 2 * configMINIMAL_STACK_SIZE;
+        StackType_t  taskStackBuffer[STACKSIZE]; 
         StaticTask_t taskTaskBuffer;
 
         bias_t gyroBiasRunning;

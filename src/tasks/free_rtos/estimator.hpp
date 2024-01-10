@@ -54,7 +54,7 @@ class EstimatorTask {
             xTaskCreateStatic(
                     estimatorTask, 
                     "ESTIMATOR",
-                    TASK_STACK_DEPTH,
+                    STACKSIZE,
                     this, 
                     2, 
                     taskStackBuffer,
@@ -132,8 +132,8 @@ class EstimatorTask {
         static const uint32_t PREDICT_RATE = Clock::RATE_100_HZ; 
         static const uint32_t PREDICTION_UPDATE_INTERVAL_MS = 1000 / PREDICT_RATE;
 
-        static const auto TASK_STACK_DEPTH = 3 * configMINIMAL_STACK_SIZE;
-        StackType_t  taskStackBuffer[TASK_STACK_DEPTH]; 
+        static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE;
+        StackType_t  taskStackBuffer[STACKSIZE]; 
         StaticTask_t taskTaskBuffer;
 
         static const size_t QUEUE_LENGTH = 20;

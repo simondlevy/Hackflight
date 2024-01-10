@@ -51,7 +51,14 @@ class FlowDeckTask {
 
             if (_pmw3901.begin(csPin)) {
 
-                xTaskCreate(flowdeckTask, "FLOW", STACKSIZE, this, 3, NULL);
+                xTaskCreateStatic(
+                        flowdeckTask, 
+                        "FLOW", 
+                        STACKSIZE, 
+                        this, 
+                        3, 
+                        taskStackBuffer,
+                        &taskTaskBuffer);
 
                 didInit = true;
             }
@@ -60,6 +67,8 @@ class FlowDeckTask {
     private:
 
         static const auto STACKSIZE = 2 * configMINIMAL_STACK_SIZE;
+        StackType_t  taskStackBuffer[STACKSIZE]; 
+        StaticTask_t taskTaskBuffer;
 
         static const int16_t OUTLIER_LIMIT = 100;
 

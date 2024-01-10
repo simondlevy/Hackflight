@@ -45,7 +45,14 @@ class ZRangerTask {
 
             _estimatorTask = estimatorTask;
 
-            xTaskCreate(zrangerTask, "ZRANGER2", STACKSIZE, this, 2, NULL);
+            xTaskCreateStatic(
+                    zrangerTask, 
+                    "ZRANGER2", 
+                    STACKSIZE, 
+                    this, 
+                    2, 
+                    taskStackBuffer,
+                    &taskTaskBuffer);
 
             // pre-compute constant in the measurement noise model for kalman
             _expCoeff = logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
@@ -56,6 +63,8 @@ class ZRangerTask {
     private:
 
         static const auto STACKSIZE = 2 * configMINIMAL_STACK_SIZE;
+        StackType_t  taskStackBuffer[STACKSIZE]; 
+        StaticTask_t taskTaskBuffer;
 
         static const uint8_t DEFAULT_ADDRESS = 0x29;
         static const uint8_t NEW_ADDRESS = 0x31;
