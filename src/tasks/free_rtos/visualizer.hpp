@@ -59,10 +59,10 @@ class VisualizerTask : public FreeRTOSTask {
         void run(void)
         {
             while (true) {
-
-                while (Serial.available()) {
-
-                    parse(Serial.read());
+                if (parse(Serial.read())) {
+                    while (_msp.available()) {
+                        Serial.write(_msp.read());
+                    }
                 }
             }
         }
@@ -74,12 +74,12 @@ class VisualizerTask : public FreeRTOSTask {
                 case 105: // RC
                     {
                         int16_t channels[6] = { /*
-                            (int16_t)receiverTask.getRawThrottle(),
-                            (int16_t)receiverTask.getRawRoll(),
-                            (int16_t)receiverTask.getRawPitch(),
-                            (int16_t)receiverTask.getRawYaw(),
-                            (int16_t)receiverTask.getRawAux1(),
-                            (int16_t)receiverTask.getRawAux2()*/
+                                                   (int16_t)receiverTask.getRawThrottle(),
+                                                   (int16_t)receiverTask.getRawRoll(),
+                                                   (int16_t)receiverTask.getRawPitch(),
+                                                   (int16_t)receiverTask.getRawYaw(),
+                                                   (int16_t)receiverTask.getRawAux1(),
+                                                   (int16_t)receiverTask.getRawAux2()*/
                         };
 
                         serializeShorts(105, channels, 6);
@@ -98,7 +98,7 @@ class VisualizerTask : public FreeRTOSTask {
                             (int16_t)vehicleState.psi
                         };
 
-                        //serializeShorts(108, angles, 3);
+                        serializeShorts(108, angles, 3);
                     } 
                     return true;
 
