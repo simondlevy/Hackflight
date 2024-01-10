@@ -24,19 +24,20 @@
 #include <datatypes.h>
 #include <hackflight.hpp>
 #include <msp.hpp>
+#include <tasks/free_rtos.hpp>
 //#include <ladybug/tasks/receiver.hpp>
 
-class VisualizerTask {
+class VisualizerTask : public FreeRTOSTask {
 
     public:
 
         void init(void)
         {
-            if (_didInit) {
+            if (didInit) {
                 return;
             }
 
-            _didInit = true;
+            didInit = true;
         }
 
         bool parse(
@@ -95,8 +96,6 @@ class VisualizerTask {
 
 
     private:
-
-        bool _didInit;
 
         static float scale(const float value)
         {

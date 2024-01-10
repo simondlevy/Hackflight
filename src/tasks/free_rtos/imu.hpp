@@ -21,6 +21,7 @@
 #include <free_rtos.h>
 #include <semphr.h>
 
+#include <tasks/free_rtos.hpp>
 #include <tasks/free_rtos/estimator.hpp>
 
 #include <crossplatform.h>
@@ -29,7 +30,7 @@
 #include <physicalConstants.h>
 #include <datatypes.h>
 
-class ImuTask {
+class ImuTask : public FreeRTOSTask {
 
     public:
 
@@ -394,7 +395,6 @@ class ImuTask {
         }
 
         bool gyroBiasFound;
-        bool didInit;
         sensorData_t data;
         Axis3i16 gyroRaw;
         Axis3i16 accelRaw;

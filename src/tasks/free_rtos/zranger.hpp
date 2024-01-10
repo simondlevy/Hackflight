@@ -21,19 +21,16 @@
 #include <free_rtos.h>
 #include <task.h>
 
-#include <linalg.h>
-
-#include <tasks/free_rtos/estimator.hpp>
-
 // Arduino class
 #include <vl53l1.hpp>
 
-class ZRangerTask {
+#include <linalg.h>
+#include <tasks/free_rtos.hpp>
+#include <tasks/free_rtos/estimator.hpp>
+
+class ZRangerTask : public FreeRTOSTask {
 
     public:
-
-        // Shared with params
-        bool didInit;
 
         void init(VL53L1 * vl53l1, EstimatorTask * estimatorTask)
         {

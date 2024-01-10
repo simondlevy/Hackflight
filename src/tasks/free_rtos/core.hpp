@@ -21,6 +21,7 @@
 
 #include <vl53l1.hpp>
 
+#include <tasks/free_rtos.hpp>
 #include <tasks/free_rtos/estimator.hpp>
 #include <tasks/free_rtos/flowdeck.hpp>
 #include <tasks/free_rtos/imu.hpp>
@@ -34,7 +35,7 @@
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
 
-class CoreTask {
+class CoreTask : public FreeRTOSTask {
 
     public:
 
@@ -53,7 +54,7 @@ class CoreTask {
                 OpenLoop * openLoop,
                 const mixfun_t mixfun)
         {
-            if (_didInit) {
+            if (didInit) {
                 return;
             }
 
@@ -88,8 +89,6 @@ class CoreTask {
                     5, 
                     taskStackBuffer,
                     &taskTaskBuffer);
-
-             _didInit = true;
         }
 
 
@@ -137,8 +136,6 @@ class CoreTask {
         OpenLoop * _openLoop;
 
         ImuTask _imuTask;
-
-        bool _didInit = false;
 
         void runMotors(const float motorvals[4]) 
         {

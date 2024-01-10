@@ -20,13 +20,13 @@
 #include <semphr.h>
 #include <task.h>
 
+#include <crossplatform.h>
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
-
-#include <crossplatform.h>
 #include <safety.hpp>
+#include <tasks/free_rtos.hpp>
 
-class EstimatorTask {
+class EstimatorTask : public FreeRTOSTask {
 
     public:
 

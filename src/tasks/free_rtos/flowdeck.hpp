@@ -27,18 +27,16 @@
 
 #include <datatypes.h>
 
+#include <tasks/free_rtos.hpp>
 #include <tasks/free_rtos/estimator.hpp>
 
 #include <crossplatform.h>
 
 void flowdeckInit(void);
 
-class FlowDeckTask {
+class FlowDeckTask : public FreeRTOSTask {
 
     public:
-
-        // Shared with params
-        bool didInit;
 
         void init(const uint8_t csPin, EstimatorTask * estimatorTask)
         {
@@ -59,7 +57,6 @@ class FlowDeckTask {
                         3, 
                         taskStackBuffer,
                         &taskTaskBuffer);
-
                 didInit = true;
             }
         }
