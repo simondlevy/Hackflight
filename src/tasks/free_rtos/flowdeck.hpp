@@ -45,7 +45,7 @@ class FlowDeckTask : public FreeRTOSTask {
 
             if (_pmw3901.begin(csPin)) {
 
-                FreeRTOSTask::init(flowdeckTask, "FLOW", this, 3);
+                FreeRTOSTask::init(runFlowdeckTask, "FLOW", this, 3);
 
                 didInit = true;
             }
@@ -61,9 +61,9 @@ class FlowDeckTask : public FreeRTOSTask {
         // Set standard deviation flow
         static constexpr float FLOW_STD_FIXED = 2.0;
 
-        static void flowdeckTask(void *param)
+        static void runFlowdeckTask(void *obj)
         {
-            ((FlowDeckTask *)param)->run();
+            ((FlowDeckTask *)obj)->run();
         }
 
         PMW3901 _pmw3901;

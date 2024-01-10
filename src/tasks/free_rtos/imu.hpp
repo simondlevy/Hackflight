@@ -339,7 +339,7 @@ class ImuTask : public FreeRTOSTask {
             baroQueue = makeQueue(
                     BARO_ITEM_SIZE, baroQueueStorage, &baroQueueBuffer);
 
-            FreeRTOSTask::init(runTask, "SENSORS", this, 4);
+            FreeRTOSTask::init(runImuTask, "SENSORS", this, 4);
         }
 
         static void scaleBaro(
@@ -493,9 +493,9 @@ class ImuTask : public FreeRTOSTask {
             return accScaleFound;
         }
 
-        static void runTask(void *param)
+        static void runImuTask(void *obj)
         {
-            ((ImuTask *)param)->run();
+            ((ImuTask *)obj)->run();
         }
 
         void run(void)

@@ -39,7 +39,7 @@ class ZRangerTask : public FreeRTOSTask {
 
             _estimatorTask = estimatorTask;
 
-            FreeRTOSTask::init(zrangerTask, "ZRANGER2", this, 2);
+            FreeRTOSTask::init(runZrangerTask, "ZRANGER2", this, 2);
 
             // pre-compute constant in the measurement noise model for kalman
             _expCoeff = logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
@@ -60,9 +60,9 @@ class ZRangerTask : public FreeRTOSTask {
         static constexpr float EXP_POINT_B = 4.0;
         static constexpr float EXP_STD_B = 0.2;   
 
-        static void zrangerTask(void * param)
+        static void runZrangerTask(void * obj)
         {
-            ((ZRangerTask *)param)->run();
+            ((ZRangerTask *)obj)->run();
         }
 
         VL53L1 * _vl53l1;

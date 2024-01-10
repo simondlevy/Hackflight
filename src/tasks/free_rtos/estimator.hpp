@@ -49,7 +49,7 @@ class EstimatorTask : public FreeRTOSTask {
                     measurementsQueueStorage,
                     &measurementsQueueBuffer);
 
-            FreeRTOSTask::init(estimatorTask, "ESTIMATOR", this, 2);
+            FreeRTOSTask::init(runEstimatorTask, "ESTIMATOR", this, 2);
 
             consolePrintf("ESTIMATOR: estimatorTaskStart\n");
 
@@ -212,15 +212,18 @@ class EstimatorTask : public FreeRTOSTask {
             return nextPredictionMs;
         }
 
-        static void estimatorTask(void * parameters) 
+        static void runEstimatorTask(void * obj) 
+        {
+            ((EstimatorTask *)obj)->run();
+        }
+
+        void run(void)
         {
             systemWaitStart();
 
-            auto task = (EstimatorTask *)parameters;
-
             auto nextPredictionMs = msec();
 
-            task->_rateSupervisor.init(
+            _rateSupervisor.init(
                     nextPredictionMs, 
                     1000, 
                     PREDICT_RATE - 1, 
@@ -230,7 +233,7 @@ class EstimatorTask : public FreeRTOSTask {
             while (true) {
 
                 // would be nice if this had a precision higher than 1ms...
-                nextPredictionMs = task->step(msec(), nextPredictionMs);
+                nextPredictionMs = step(msec(), nextPredictionMs);
             }
         }
 

@@ -78,7 +78,7 @@ class CoreTask : public FreeRTOSTask {
 
             motorsInit();
 
-            FreeRTOSTask::init(runTask, "CORE", this, 5);
+            FreeRTOSTask::init(runCoreTask, "CORE", this, 5);
         }
 
 
@@ -135,9 +135,9 @@ class CoreTask : public FreeRTOSTask {
             motorsSetRatios(motorsPwm);
         }
 
-        static void runTask(void* param)
+        static void runCoreTask(void* obj)
         {
-            ((CoreTask *)param)->run();
+            ((CoreTask *)obj)->run();
         }
 
         /* The core loop runs at 1kHz. It is the
