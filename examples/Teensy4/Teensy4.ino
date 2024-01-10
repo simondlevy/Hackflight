@@ -30,11 +30,11 @@ void setup()
 
     //static VL53L1_Arduino vl53l1;    
 
-    //static CoreTask coreTask;
+    static CoreTask coreTask;
 
     static VisualizerTask visualizerTask;
 
-    visualizerTask.init(/*&coreTask*/);
+    visualizerTask.init(&coreTask);
 
     //Wire.begin();
 
