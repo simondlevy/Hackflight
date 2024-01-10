@@ -18,9 +18,6 @@
 
 #include <math.h>
 
-#include <free_rtos.h>
-#include <semphr.h>
-
 #include <tasks/free_rtos.hpp>
 #include <tasks/free_rtos/estimator.hpp>
 
@@ -245,10 +242,6 @@ class ImuTask : public FreeRTOSTask {
         StaticQueue_t magQueueBuffer;
         xQueueHandle magQueue;
 
-        static const auto STACKSIZE = 2 * configMINIMAL_STACK_SIZE;
-        StackType_t  taskStackBuffer[STACKSIZE]; 
-        StaticTask_t taskTaskBuffer;
-
         bias_t gyroBiasRunning;
 
         EstimatorTask * _estimatorTask;
@@ -346,14 +339,7 @@ class ImuTask : public FreeRTOSTask {
             baroQueue = makeQueue(
                     BARO_ITEM_SIZE, baroQueueStorage, &baroQueueBuffer);
 
-            xTaskCreateStatic(
-                    runTask, 
-                    "SENSORS", 
-                    2 * configMINIMAL_STACK_SIZE, 
-                    this, 
-                    4, 
-                    taskStackBuffer,
-                    &taskTaskBuffer);
+            FreeRTOSTask::init(runTask, "SENSORS", this, 4);
         }
 
         static void scaleBaro(

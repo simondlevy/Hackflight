@@ -18,10 +18,6 @@
 
 #include <stdlib.h>
 
-#include <free_rtos.h>
-#include <task.h>
-
-
 // Arduino library
 #include <pmw3901.hpp>
 
@@ -49,23 +45,13 @@ class FlowDeckTask : public FreeRTOSTask {
 
             if (_pmw3901.begin(csPin)) {
 
-                xTaskCreateStatic(
-                        flowdeckTask, 
-                        "FLOW", 
-                        STACKSIZE, 
-                        this, 
-                        3, 
-                        taskStackBuffer,
-                        &taskTaskBuffer);
+                FreeRTOSTask::init(flowdeckTask, "FLOW", this, 3);
+
                 didInit = true;
             }
         }
 
     private:
-
-        static const auto STACKSIZE = 2 * configMINIMAL_STACK_SIZE;
-        StackType_t  taskStackBuffer[STACKSIZE]; 
-        StaticTask_t taskTaskBuffer;
 
         static const int16_t OUTLIER_LIMIT = 100;
 

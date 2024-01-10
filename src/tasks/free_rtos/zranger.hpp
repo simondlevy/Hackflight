@@ -18,9 +18,6 @@
 
 #include <stdint.h>
 
-#include <free_rtos.h>
-#include <task.h>
-
 // Arduino class
 #include <vl53l1.hpp>
 
@@ -42,14 +39,7 @@ class ZRangerTask : public FreeRTOSTask {
 
             _estimatorTask = estimatorTask;
 
-            xTaskCreateStatic(
-                    zrangerTask, 
-                    "ZRANGER2", 
-                    STACKSIZE, 
-                    this, 
-                    2, 
-                    taskStackBuffer,
-                    &taskTaskBuffer);
+            FreeRTOSTask::init(zrangerTask, "ZRANGER2", this, 2);
 
             // pre-compute constant in the measurement noise model for kalman
             _expCoeff = logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
@@ -58,10 +48,6 @@ class ZRangerTask : public FreeRTOSTask {
         }
 
     private:
-
-        static const auto STACKSIZE = 2 * configMINIMAL_STACK_SIZE;
-        StackType_t  taskStackBuffer[STACKSIZE]; 
-        StaticTask_t taskTaskBuffer;
 
         static const uint8_t DEFAULT_ADDRESS = 0x29;
         static const uint8_t NEW_ADDRESS = 0x31;
