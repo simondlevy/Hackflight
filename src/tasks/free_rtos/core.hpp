@@ -115,10 +115,6 @@ class CoreTask : public FreeRTOSTask {
 
         static const auto PID_UPDATE_RATE = Clock::RATE_500_HZ;
 
-        static const auto STACKSIZE = 3* configMINIMAL_STACK_SIZE;
-        StackType_t  taskStackBuffer[STACKSIZE]; 
-        StaticTask_t taskTaskBuffer;
-
         Hackflight _hackflight;
 
         demands_t _demands;

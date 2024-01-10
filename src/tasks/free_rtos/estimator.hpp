@@ -16,9 +16,7 @@
 
 #pragma once
 
-#include <free_rtos.h>
 #include <semphr.h>
-#include <task.h>
 
 #include <crossplatform.h>
 #include <kalman.hpp>
