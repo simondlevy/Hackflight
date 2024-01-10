@@ -16,9 +16,6 @@
 
 #pragma once
 
-#include <free_rtos.h>
-#include <task.h>
-
 #include <vl53l1.hpp>
 
 #include <tasks/free_rtos.hpp>

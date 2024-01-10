@@ -4,6 +4,7 @@
 #include "arduino/analog.h"
 #include "arduino/digital.h"
 #include "arduino/SPI.h"
+#include "arduino/time.h"
 
 #include <crossplatform.h>
 
