@@ -6,8 +6,6 @@
 #include "arduino/SPI.h"
 #include "arduino/time.h"
 
-#include <crossplatform.h>
-
 #if !defined(__main)
 extern
 #endif
