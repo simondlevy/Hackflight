@@ -1,6 +1,44 @@
-#include <stdint.h>
+#include <Wire.h>
+
+#include <usfs.hpp>
 
 #include <tasks/free_rtos/imu.hpp>
+
+static const uint8_t INTERRUPT_PIN = 12; 
+
+static const uint8_t ACCEL_BANDWIDTH = 3;
+static const uint8_t GYRO_BANDWIDTH  = 3;
+static const uint8_t QUAT_DIVISOR    = 1;
+static const uint8_t MAG_RATE        = 100;
+static const uint8_t ACCEL_RATE      = 20; // Multiply by 10 to get actual rate
+static const uint8_t GYRO_RATE       = 100; // Multiply by 10 to get actual rate
+static const uint8_t BARO_RATE       = 50;
+
+static const bool VERBOSE = false;
+
+static const uint8_t INTERRUPT_ENABLE = 
+Usfs::INTERRUPT_RESET_REQUIRED |
+Usfs::INTERRUPT_ERROR |
+Usfs::INTERRUPT_QUAT;
+
+static Usfs usfs;
+
+void ImuTask::deviceInit(void)
+{
+    usfs.loadFirmware(VERBOSE); 
+
+    usfs.begin(
+            ACCEL_BANDWIDTH,
+            GYRO_BANDWIDTH,
+            QUAT_DIVISOR,
+            MAG_RATE,
+            ACCEL_RATE,
+            GYRO_RATE,
+            BARO_RATE,
+            INTERRUPT_ENABLE,
+            VERBOSE); 
+
+}
 
 uint16_t ImuTask::readGyro(Axis3i16* dataOut)
 {
@@ -14,13 +52,5 @@ void ImuTask::readAccel(Axis3i16* dataOut)
 }
 
 void ImuTask::readBaro(void)
-{
-}
-        
-void ImuTask::deviceInit(void)
-{
-}
-
-void ImuTask::interruptInit(void)
 {
 }

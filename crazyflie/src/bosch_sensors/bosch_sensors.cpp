@@ -38,32 +38,6 @@
 #include <configblock.hpp>
 
 
-void ImuTask::interruptInit(void)
-{
-    GPIO_InitTypeDef GPIO_InitStructure;
-    EXTI_InitTypeDef EXTI_InitStructure;
-
-    sensorsDataReady = xSemaphoreCreateBinaryStatic(&sensorsDataReadyBuffer);
-    dataReady = xSemaphoreCreateBinaryStatic(&dataReadyBuffer);
-
-    // Enable the interrupt on PC14
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL; //GPIO_PuPd_DOWN;
-    GPIO_Init(GPIOC, &GPIO_InitStructure);
-
-    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource14);
-
-    EXTI_InitStructure.EXTI_Line = EXTI_Line14;
-    EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-    EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-    portDISABLE_INTERRUPTS();
-    EXTI_Init(&EXTI_InitStructure);
-    EXTI_ClearITPendingBit(EXTI_Line14);
-    portENABLE_INTERRUPTS();
-}
-
 extern "C" {
 
 #include "bmp3.h"
@@ -269,4 +243,27 @@ void ImuTask::deviceInit(void)
     }
 
     didInit = true;
+
+    GPIO_InitTypeDef GPIO_InitStructure;
+    EXTI_InitTypeDef EXTI_InitStructure;
+
+    sensorsDataReady = xSemaphoreCreateBinaryStatic(&sensorsDataReadyBuffer);
+    dataReady = xSemaphoreCreateBinaryStatic(&dataReadyBuffer);
+
+    // Enable the interrupt on PC14
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL; //GPIO_PuPd_DOWN;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource14);
+
+    EXTI_InitStructure.EXTI_Line = EXTI_Line14;
+    EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+    EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+    portDISABLE_INTERRUPTS();
+    EXTI_Init(&EXTI_InitStructure);
+    EXTI_ClearITPendingBit(EXTI_Line14);
+    portENABLE_INTERRUPTS();
 }
