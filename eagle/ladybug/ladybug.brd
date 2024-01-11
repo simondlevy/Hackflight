@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.1.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -185,6 +185,10 @@
 <text x="43.790046875" y="15.779615625" size="0.8128" layer="22" rot="MR0">SCK</text>
 <wire x1="21.6" y1="14.2" x2="21.2" y2="14.2" width="0.2" layer="21"/>
 <wire x1="21.6" y1="14.2" x2="21.2" y2="14.2" width="0.2" layer="22"/>
+<text x="35.190046875" y="13.679615625" size="0.8128" layer="21">SDA</text>
+<text x="37.090046875" y="13.629615625" size="0.8128" layer="22" rot="MR0">SDA</text>
+<text x="26.3" y="19.3" size="2.1844" layer="25">TOP</text>
+<text x="35.9" y="19.3" size="2.1844" layer="26" rot="MR0">BOTTOM</text>
 </plain>
 <libraries>
 <library name="headers(2mm)">
