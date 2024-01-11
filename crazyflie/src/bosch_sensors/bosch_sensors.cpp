@@ -85,8 +85,10 @@ void ImuTask::readBaro(void)
 bool ImuTask::gyroSelfTest()
 {
     auto testStatus = true;
-
-    auto readResult = readGyro(&gyroRaw);
+    
+    auto readResult = bmi088_get_gyro_data(
+            (struct bmi088_sensor_data*)&gyroRaw, 
+            &bmi088Dev);
 
     if ((readResult != BMI088_OK) || 
             (gyroRaw.x == 0 && gyroRaw.y == 0 && gyroRaw.z == 0)) {
@@ -110,9 +112,9 @@ bool ImuTask::gyroSelfTest()
 }
 
 
-uint16_t ImuTask::readGyro(Axis3i16* dataOut)
+void ImuTask::readGyro(Axis3i16* dataOut)
 {
-    return bmi088_get_gyro_data((struct bmi088_sensor_data*)dataOut, &bmi088Dev);
+    bmi088_get_gyro_data((struct bmi088_sensor_data*)dataOut, &bmi088Dev);
 }
 
 void ImuTask::readAccel(Axis3i16* dataOut)

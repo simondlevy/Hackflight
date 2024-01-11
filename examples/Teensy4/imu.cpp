@@ -23,6 +23,13 @@ Usfs::INTERRUPT_QUAT;
 
 static Usfs usfs;
 
+static volatile bool _gotNewData;
+
+static void interruptHandler()
+{
+    _gotNewData = true;
+}
+
 void ImuTask::deviceInit(void)
 {
     usfs.loadFirmware(VERBOSE); 
@@ -38,12 +45,20 @@ void ImuTask::deviceInit(void)
             INTERRUPT_ENABLE,
             VERBOSE); 
 
+        pinMode(INTERRUPT_PIN, INPUT);
+
+        attachInterrupt(INTERRUPT_PIN, interruptHandler, RISING);  
+
+    // Clear interrupts
+    Usfs::checkStatus();
 }
 
-uint16_t ImuTask::readGyro(Axis3i16* dataOut)
+void ImuTask::readGyro(Axis3i16* dataOut)
 {
-    (void)dataOut;
-    return 0;
+    if (Usfs::eventStatusIsGyrometer(Usfs::checkStatus())) {
+
+        usfs.readGyrometerRaw((int16_t *)dataOut);
+    }
 }
 
 void ImuTask::readAccel(Axis3i16* dataOut)

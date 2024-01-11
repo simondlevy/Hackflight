@@ -563,7 +563,7 @@ class ImuTask : public FreeRTOSTask {
         // Hardware-dependent
         bool gyroSelfTest();
         void deviceInit(void); 
-        uint16_t readGyro(Axis3i16* dataOut);
+        void readGyro(Axis3i16* dataOut);
         void readAccel(Axis3i16* dataOut);
         void readBaro(void);
 };
