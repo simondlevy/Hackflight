@@ -59,6 +59,7 @@ static std::map<std::string, joystickAxes_t> JOYSTICK_AXIS_MAP = {
     // Windows
     { "2In1 USB Joystick",                   joystickAxes_t {-1,  4, -3, 2, 5 } },
     { "Controller (XBOX 360 For Windows)",   joystickAxes_t {-1,  4, -3, 2, 5 } },
+    { "Controller (Gamepad F310)",           joystickAxes_t {-1,  4, -3, 2, 5 } },
     { "Logitech Extreme 3D",                 joystickAxes_t { 0,  2, -1, 3, 0 } },
     { "FrSky Simulator",                     joystickAxes_t { 6,  5,  4, 3, 0 } },
     { "SPEKTRUM RECEIVER",                   joystickAxes_t { 3,  2,  1, 4, 0 } },  

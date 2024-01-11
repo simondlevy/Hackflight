@@ -133,7 +133,7 @@ int main(int argc, char ** argv)
     static Hackflight hackflight;
 
     hackflight.init(
-            mixfun,
+            mixQuadrotor,
             PID_UPDATE_RATE,
             THRUST_SCALE,
             THRUST_BASE,
