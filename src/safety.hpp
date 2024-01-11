@@ -1,7 +1,7 @@
 #pragma once
 
 #include <assert.h>
-#include <crossplatform.h>
+#include <console.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>

@@ -23,7 +23,7 @@
  *
  */
 
-#include <crossplatform.h>
+#include <console.h>
 #include <mem.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,9 @@ static bool handleMemTesterWrite(const uint32_t memAddr, const uint8_t writeLen,
     if (actualData != expectedData) {
       // Log first error
       if (memTesterWriteErrorCount == 0) {
-        consolePrintf("MEM: Verification failed: expected: %d, actual: %d, addr: %lu\n", expectedData, actualData, addr);
+        consolePrintf(
+                "MEM: Verification failed: expected: %d, actual: %d, addr: %lu\n", 
+                expectedData, actualData, addr);
       }
 
       memTesterWriteErrorCount++;

@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-    int consolePrintf(const char * fmt, ...);
+    //int consolePrintf(const char * fmt, ...);
 
     bool hal_isInInterrupt(void);
 
