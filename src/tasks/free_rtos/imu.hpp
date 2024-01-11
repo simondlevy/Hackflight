@@ -60,7 +60,6 @@ class ImuTask : public FreeRTOSTask {
             xQueueReceive(gyroQueue, &sensors->gyro, 0);
             xQueueReceive(accelQueue, &sensors->acc, 0);
             xQueueReceive(magQueue, &sensors->mag, 0);
-            xQueueReceive(baroQueue, &sensors->baro, 0);
 
             sensors->interruptTimestamp = data.interruptTimestamp;
         }
@@ -90,9 +89,6 @@ class ImuTask : public FreeRTOSTask {
             accScale = 1;
             accScaleFound = false;
             accScaleSumCount = 0;
-            isBarometerPresent = false;
-            baroMeasDelayMin = DELAY_BARO;
-            isBarometerPresent = false;
 
             // Wait for sensors to startup
             vTaskDelay(M2T(STARTUP_TIME_MS));
@@ -215,11 +211,6 @@ class ImuTask : public FreeRTOSTask {
 
         static const uint8_t QUEUE_LENGTH = 1;
 
-        static const auto BARO_ITEM_SIZE = sizeof(baro_t);
-        uint8_t baroQueueStorage[QUEUE_LENGTH * BARO_ITEM_SIZE];
-        StaticQueue_t baroQueueBuffer;
-        xQueueHandle baroQueue;
-
         static const auto IMU_ITEM_SIZE = sizeof(Axis3f);
 
         static const auto IMU_QUEUE_LENGTH = QUEUE_LENGTH * IMU_ITEM_SIZE;
@@ -330,19 +321,7 @@ class ImuTask : public FreeRTOSTask {
 
             magQueue = makeImuQueue(magQueueStorage, &magQueueBuffer);
 
-            baroQueue = makeQueue(
-                    BARO_ITEM_SIZE, baroQueueStorage, &baroQueueBuffer);
-
             FreeRTOSTask::init(runImuTask, "IMU", this, 4);
-        }
-
-        static void scaleBaro(
-                baro_t* baroScaled, float pressure, float temperature)
-        {
-            baroScaled->pressure = pressure*0.01f;
-            baroScaled->temperature = temperature;
-            baroScaled->asl = ((powf((1015.7f / baroScaled->pressure), 0.1902630958f)
-                        - 1.0f) * (25.0f + 273.15f)) / 0.0065f;
         }
 
         static void alignToAirframe(Axis3f* in, Axis3f* out)
@@ -382,8 +361,6 @@ class ImuTask : public FreeRTOSTask {
         float accScale;
         bool accScaleFound;
         uint32_t accScaleSumCount;
-        bool isBarometerPresent;
-        uint8_t baroMeasDelayMin;
         volatile uint64_t interruptTimestamp;
 
         xSemaphoreHandle sensorsDataReady;
@@ -538,22 +515,8 @@ class ImuTask : public FreeRTOSTask {
                     _estimatorTask->enqueueAccel(&data.acc, hal_isInInterrupt());
                 }
 
-                if (isBarometerPresent) {
-                    static uint8_t baroMeasDelay = DELAY_BARO;
-                    if (--baroMeasDelay == 0) {
-
-                        readBaro();
-
-                        _estimatorTask->enqueueBaro(&data.baro, hal_isInInterrupt());
-
-                        baroMeasDelay = baroMeasDelayMin;
-                    }
-                }
                 xQueueOverwrite(accelQueue, &data.acc);
                 xQueueOverwrite(gyroQueue, &data.gyro);
-                if (isBarometerPresent) {
-                    xQueueOverwrite(baroQueue, &data.baro);
-                }
 
                 xSemaphoreGive(dataReady);
             }
@@ -565,5 +528,4 @@ class ImuTask : public FreeRTOSTask {
         void deviceInit(void); 
         void readGyro(Axis3i16* dataOut);
         void readAccel(Axis3i16* dataOut);
-        void readBaro(void);
 };

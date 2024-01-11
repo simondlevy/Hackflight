@@ -54,7 +54,6 @@ static const uint8_t SENSORS_BMI088_ACCEL_FS_CFG = BMI088_ACCEL_RANGE_24G;
 static const uint8_t SENSORS_BMI088_GYRO_FS_CFG = BMI088_GYRO_RANGE_2000_DPS;
 
 static struct bmi088_dev bmi088Dev;
-static struct bmp3_dev   bmp388Dev;
 
 bstdr_ret_t i2c_burst_read(
         uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len)
@@ -70,16 +69,6 @@ bstdr_ret_t i2c_burst_write(
     return i2cdevWriteReg8(I2C3_DEV, dev_id,reg_addr,(uint16_t) len, reg_data) ?
         BSTDR_OK :
         BSTDR_E_CON_ERROR;
-}
-
-
-void ImuTask::readBaro(void)
-{
-    uint8_t sensor_comp = BMP3_PRESS | BMP3_TEMP;
-    struct bmp3_data data;
-    baro_t* baro388 = &this->data.baro;
-    bmp3_get_sensor_data(sensor_comp, &data, &bmp388Dev);
-    scaleBaro(baro388, data.pressure, data.temperature);
 }
 
 bool ImuTask::gyroSelfTest()
@@ -198,50 +187,6 @@ void ImuTask::deviceInit(void)
     else {
         consolePrintf("IMU: BMI088 Accel connection [FAIL]\n");
         didInit = false;
-    }
-
-    bmp388Dev.dev_id = BMP3_I2C_ADDR_SEC;
-    bmp388Dev.intf = BMP3_I2C_INTF;
-    bmp388Dev.read = (bmp3_com_fptr_t)i2c_burst_read;
-    bmp388Dev.write = (bmp3_com_fptr_t)i2c_burst_write;
-    bmp388Dev.delay_ms = delay;
-
-    rslt = bmp3_init(&bmp388Dev);
-
-    if (rslt == BMP3_OK) {
-
-        isBarometerPresent = true;
-        consolePrintf("IMU: BMP388 I2C connection [OK]\n");
-        
-        bmp388Dev.settings.press_en = BMP3_ENABLE;
-        bmp388Dev.settings.temp_en = BMP3_ENABLE;
-        
-        bmp388Dev.settings.odr_filter.press_os = BMP3_OVERSAMPLING_8X;
-        bmp388Dev.settings.odr_filter.temp_os = BMP3_NO_OVERSAMPLING;
-        bmp388Dev.settings.odr_filter.odr = BMP3_ODR_50_HZ;
-        bmp388Dev.settings.odr_filter.iir_filter = BMP3_IIR_FILTER_COEFF_3;
-        
-        auto settings_sel = BMP3_PRESS_EN_SEL | BMP3_TEMP_EN_SEL | BMP3_PRESS_OS_SEL | 
-            BMP3_TEMP_OS_SEL | BMP3_ODR_SEL | BMP3_IIR_FILTER_SEL;
-        rslt = bmp3_set_sensor_settings(settings_sel, &bmp388Dev);
-
-        
-        bmp388Dev.settings.op_mode = BMP3_NORMAL_MODE;
-        rslt = bmp3_set_op_mode(&bmp388Dev);
-
-        delay(20); // wait before first read out
-        
-        struct bmp3_data data = {};
-
-        rslt = bmp3_get_sensor_data(BMP3_PRESS | BMP3_TEMP, &data, &bmp388Dev);
-
-        baroMeasDelayMin = DELAY_BARO;
-    }
-
-    else {
-        consolePrintf("IMU: BMP388 I2C connection [FAIL]\n");
-        didInit = false;
-        return;
     }
 
     didInit = true;

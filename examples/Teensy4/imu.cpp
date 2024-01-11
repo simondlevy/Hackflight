@@ -63,9 +63,8 @@ void ImuTask::readGyro(Axis3i16* dataOut)
 
 void ImuTask::readAccel(Axis3i16* dataOut)
 {
-    (void)dataOut;
-}
+    if (Usfs::eventStatusIsAccelerometer(Usfs::checkStatus())) {
 
-void ImuTask::readBaro(void)
-{
+        usfs.readAccelerometerRaw((int16_t *)dataOut);
+    }
 }
