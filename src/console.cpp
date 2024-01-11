@@ -1,6 +1,5 @@
 /**
- *
- * Copyright (C) 2011-2022 Bitcraze AB, 2024 Simon D. Levy
+ * Copyright (C) 2024 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,33 +14,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <stdarg.h>
+#include <stdio.h>
 
-enum {
-    MOTOR_M1,
-    MOTOR_M2,
-    MOTOR_M3,
-    MOTOR_M4,
-};
+#include <console.h>
 
-typedef enum {
-    BRUSHED,
-    BRUSHLESS,
-} motorsDrvType;
+int consolePrintf(const char * fmt, ...)
+{
+  va_list ap = {};
 
-void  motorsCheckDshot();
-int   motorsGetRatio(uint32_t id);
-void  motorsInit(void);
-bool  motorsTest(void);
-void  motorsSetRatios(const uint16_t ratios[]);
+  va_start(ap, fmt);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+  char buf[256] = {};
 
-    // can be called from nvic.c
-    void  motorsStop();
+  int len = vsprintf(buf, fmt, ap);
 
-#ifdef __cplusplus
+  va_end(ap);
+
+  return len;
 }
-#endif
