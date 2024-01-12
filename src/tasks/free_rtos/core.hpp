@@ -48,20 +48,23 @@ class CoreTask : public FreeRTOSTask {
                 const uint8_t flowDeckCsPin,
                 VL53L1 * vl53l1,
                 const openLoopFun_t openLoopFun,
-                const mixFun_t mixFun)
+                const mixFun_t mixFun,
+                const bool isTeensy=false)
         {
-            /*
             if (didInit) {
                 return;
             }
 
+            safety.init();
+
             estimatorTask.init(&safety);
 
-            flowDeckTask.init(flowDeckCsPin, &estimatorTask);
+            if (!isTeensy) {
 
-            zrangerTask.init(vl53l1, &estimatorTask);
+                flowDeckTask.init(flowDeckCsPin, &estimatorTask);
 
-            safety.init();
+                zrangerTask.init(vl53l1, &estimatorTask);
+            }
 
             _imuTask.init(&estimatorTask, rollCalibration, pitchCalibration);
 
@@ -79,7 +82,6 @@ class CoreTask : public FreeRTOSTask {
             motorsInit();
 
             FreeRTOSTask::init(runCoreTask, "CORE", this, 5);
-            */
         }
 
         bool test(void)

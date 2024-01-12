@@ -37,7 +37,7 @@ void setup()
 
     Wire.begin();
 
-    //static VL53L1_Arduino vl53l1;    
+    static VL53L1_Arduino vl53l1;    
 
     static CoreTask coreTask;
 
@@ -45,7 +45,7 @@ void setup()
 
     visualizerTask.init(&coreTask);
 
-    //coreTask.init(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor);
+    coreTask.init(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor, true);
 
     //vl53l1.begin();
 
