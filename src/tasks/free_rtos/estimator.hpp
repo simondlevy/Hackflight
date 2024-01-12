@@ -31,7 +31,7 @@ class EstimatorTask : public FreeRTOSTask {
         // Shared with params
         bool didResetEstimation;
 
-        void init(Safety * safety)
+        void begin(Safety * safety)
         {
             _safety = safety;
 

@@ -90,7 +90,7 @@ class PowerMonitorTask {
         float batteryCriticalLowVoltage = DEFAULT_BAT_CRITICAL_LOW_VOLTAGE;
         float batteryLowVoltage = DEFAULT_BAT_LOW_VOLTAGE;
 
-        void init(syslinkInfo_t & pmSyslinkInfo, Worker * worker)
+        void begin(syslinkInfo_t & pmSyslinkInfo, Worker * worker)
         {
             if(_didInit) {
                 return;

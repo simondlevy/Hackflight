@@ -52,7 +52,7 @@ class UsbLinkTask {
 
     public:
 
-        void init()
+        void begin(void)
         {
             if(didInit)
                 return;

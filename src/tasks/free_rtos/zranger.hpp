@@ -29,7 +29,7 @@ class ZRangerTask : public FreeRTOSTask {
 
     public:
 
-        void init(VL53L1 * vl53l1, EstimatorTask * estimatorTask)
+        void begin(VL53L1 * vl53l1, EstimatorTask * estimatorTask)
         {
             if (didInit){
                 return;

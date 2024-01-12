@@ -42,7 +42,7 @@ class CoreTask : public FreeRTOSTask {
         FlowDeckTask flowDeckTask;
         ZRangerTask zrangerTask;
 
-        void init(
+        void begin(
                 const float rollCalibration,
                 const float pitchCalibration,
                 const uint8_t flowDeckCsPin,
@@ -57,16 +57,16 @@ class CoreTask : public FreeRTOSTask {
 
             safety.init();
 
-            estimatorTask.init(&safety);
+            estimatorTask.begin(&safety);
 
             if (!isTeensy) {
 
-                flowDeckTask.init(flowDeckCsPin, &estimatorTask);
+                flowDeckTask.begin(flowDeckCsPin, &estimatorTask);
 
-                zrangerTask.init(vl53l1, &estimatorTask);
+                zrangerTask.begin(vl53l1, &estimatorTask);
             }
 
-            _imuTask.init(&estimatorTask, rollCalibration, pitchCalibration);
+            _imuTask.begin(&estimatorTask, rollCalibration, pitchCalibration);
 
             _openLoopFun = openLoopFun;
 

@@ -272,7 +272,7 @@ static void systemTask(void *arg)
     canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
     xSemaphoreTake(canStartMutex, portMAX_DELAY);
 
-    usbLinkTask.init();
+    usbLinkTask.begin();
     sysLoadInit();
 
     crtpInit();
@@ -289,7 +289,7 @@ static void systemTask(void *arg)
     storageInit();
     worker.init();
     ledseqInit();
-    powerMonitorTask.init(pmSyslinkInfo, &worker);
+    powerMonitorTask.begin(pmSyslinkInfo, &worker);
 
     didInit = true;
 
@@ -328,7 +328,7 @@ static void systemTask(void *arg)
         consolePrintf("ZRANGER: Z-down sensor [FAIL]\n");
     }
 
-    coreTask.init(
+    coreTask.begin(
             configBlock.getCalibRoll(), 
             configBlock.getCalibPitch(),
             PIN_FLOWDECK_CS,

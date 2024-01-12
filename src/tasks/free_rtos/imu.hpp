@@ -75,7 +75,7 @@ class ImuTask : public FreeRTOSTask {
             }
         }
 
-        void init(
+        void begin(
                 EstimatorTask * estimatorTask, 
                 const float calibRoll,
                 const float calibPitch)

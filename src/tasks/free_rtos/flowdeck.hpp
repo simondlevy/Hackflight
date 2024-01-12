@@ -34,7 +34,7 @@ class FlowDeckTask : public FreeRTOSTask {
 
     public:
 
-        void init(const uint8_t csPin, EstimatorTask * estimatorTask)
+        void begin(const uint8_t csPin, EstimatorTask * estimatorTask)
         {
             if (didInit) {
                 return;
