@@ -33,12 +33,12 @@ class CoreTask : public FreeRTOSTask {
                 const mixFun_t mixFun,
                 const bool isTeensy=false)
         {
-            FreeRTOSTask::begin(run, "CORE", this, 4);
+            FreeRTOSTask::begin(runCoreTask, "CORE", this, 5);
         }
 
     private:
 
-        static void run(void * obj)
+        static void runCoreTask(void * obj)
         {
             while (true) {
 
