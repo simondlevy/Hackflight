@@ -14,6 +14,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Arduino.h>
+
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -21,15 +23,17 @@
 
 int consolePrintf(const char * fmt, ...)
 {
-  va_list ap = {};
+    va_list ap = {};
 
-  va_start(ap, fmt);
+    va_start(ap, fmt);
 
-  char buf[256] = {};
+    char buf[256] = {};
 
-  int len = vsprintf(buf, fmt, ap);
+    int len = vsprintf(buf, fmt, ap);
 
-  va_end(ap);
+    Serial.print(buf);
 
-  return len;
+    va_end(ap);
+
+    return len;
 }

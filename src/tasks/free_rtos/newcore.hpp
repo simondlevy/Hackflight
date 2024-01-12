@@ -43,8 +43,46 @@ class CoreTask : public FreeRTOSTask {
             ((CoreTask *)obj)->run();
         }
 
+        // Approximate thrust needed when in perfect hover. More weight/older
+        // battery can use a higher value
+        static constexpr float THRUST_BASE  = 36000;
+        static constexpr float THRUST_MIN   = 20000;
+        static constexpr float THRUST_SCALE = 1000;
+
+        static constexpr float THRUST_MAX = UINT16_MAX;
+
+        static const auto PID_UPDATE_RATE = Clock::RATE_500_HZ;
+
+        Hackflight _hackflight;
+
+        demands_t _demands;
+
+        openLoopFun_t _openLoopFun;
+
+        ImuTask _imuTask;
+
+
         void run(void)
         {
+            static RateSupervisor rateSupervisor;
+
+            vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_CORE_ID_NBR);
+
+            // Wait for the system to be fully started to start core loop
+            systemWaitStart();
+
+            consolePrintf("CORE: Wait for sensor calibration...\n");
+
+            // Wait for sensors to be calibrated
+            auto lastWakeTime = xTaskGetTickCount();
+            while(!_imuTask.areCalibrated()) {
+                vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
+                break;
+            }
+            
+            consolePrintf("CORE: Starting loop\n");
+            rateSupervisor.init(xTaskGetTickCount(), M2T(1000), 997, 1003, 1);
+
             while (true) {
 
                 static uint32_t _prev;
