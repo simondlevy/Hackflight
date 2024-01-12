@@ -23,8 +23,25 @@
 #include <vl53l1_arduino.h>
 
 #include <hfheader.h>
-#include <tasks/free_rtos/visualizer.hpp>
+#include <visualizer.hpp>
 #include <mixers/quadrotor.hpp>
+#include <tasks/free_rtos.hpp>
+
+static Visualizer visualizer;
+
+void serialEvent(void)
+{
+    while (Serial.available()) {
+
+        if (visualizer.parse(Serial.read())) {
+
+            while (visualizer.available()) {
+
+                Serial.write(visualizer.read());
+            }
+        }
+    }
+}
 
 static void getOpenLoopDemands(
         demands_t & demands, uint32_t & timestamp, bool & inHoverMode)
@@ -32,25 +49,58 @@ static void getOpenLoopDemands(
 }
 
 
+class Task1 : public FreeRTOSTask {
+
+    public:
+
+        void init(void)
+        {
+            FreeRTOSTask::init(run, "task1", this, 4);
+        }
+
+    private:
+
+        static void run(void * obj)
+        {
+            while (true) {
+
+                static uint32_t _prev;
+                static uint8_t _on;
+
+                auto msec = millis();
+
+                if (msec - _prev > 500) {
+
+                    digitalWriteFast(LED_BUILTIN, _on);
+                    _on = !_on;
+                    _prev = msec;
+                }
+
+                delay(1);
+            }        
+        }
+
+};
+
 void setup() 
 {
+    Serial.begin(115200);
 
     Wire.begin();
 
+    pinMode(LED_BUILTIN, OUTPUT);
+
     static VL53L1_Arduino vl53l1;    
 
-    static CoreTask coreTask;
+    //static CoreTask coreTask;
 
-    static VisualizerTask visualizerTask;
-
-    visualizerTask.init(&coreTask);
-
-    coreTask.init(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor, true);
+    // coreTask.init(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor, true);
 
     //vl53l1.begin();
 
-    pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, HIGH);
+    static Task1 task1;
+
+    task1.init();
 
     vTaskStartScheduler();
 }

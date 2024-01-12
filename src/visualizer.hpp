@@ -21,51 +21,12 @@
 
 #include <hackflight.hpp>
 #include <msp.hpp>
-#include <tasks/free_rtos.hpp>
-#include <tasks/free_rtos/core.hpp>
 
-class VisualizerTask : public FreeRTOSTask {
+class Visualizer {
 
     public:
 
         float motors[Hackflight::MAX_MOTOR_COUNT];
-
-        void init(CoreTask * coreTask)
-        {
-            if (didInit) {
-                return;
-            }
-
-            _coreTask = coreTask;
-
-            FreeRTOSTask::init(runVisualizerTask, "VISUALIZER", this, 2);
-
-            pinMode(LED_BUILTIN, OUTPUT);
-
-            didInit = true;
-        }
-
-    private:
-
-        static void runVisualizerTask(void * obj)
-        {
-            ((VisualizerTask *)obj)->run();
-        }
-
-        CoreTask * _coreTask;
-
-        Msp _msp;
-
-        void run(void)
-        {
-            while (true) {
-                if (parse(Serial.read())) {
-                    while (_msp.available()) {
-                        Serial.write(_msp.read());
-                    }
-                }
-            }
-        }
 
         bool parse(const uint8_t byte)
         {
@@ -89,14 +50,18 @@ class VisualizerTask : public FreeRTOSTask {
 
                 case 108: // ESTIMATOR
                     {
-                        digitalWriteFast(LED_BUILTIN, HIGH);
+                        static int16_t phi;
+                        static int8_t dir;
 
-                        const auto vehicleState = _coreTask->vehicleState;
-                        const int16_t angles[3] = {
-                            (int16_t)(10 * (vehicleState.phi + 45)),
-                            (int16_t)(10 * vehicleState.theta),
-                            (int16_t)vehicleState.psi
-                        };
+                        dir = 
+                            dir == 0 ? +1 : 
+                            phi == +450 ? -1 :
+                            phi == -450 ? +1 :
+                            dir;
+
+                        phi += dir;
+
+                        const int16_t angles[3] = {phi, 0, 0};
 
                         serializeShorts(108, angles, 3);
                     } 
@@ -118,6 +83,18 @@ class VisualizerTask : public FreeRTOSTask {
             return false;
         }
 
+        bool available(void)
+        {
+            return _msp.available();
+        }
+
+        uint8_t read(void)
+        {
+            return _msp.read();
+        }
+
+    private:
+
         void serializeShorts(
                 const uint8_t messageType,
                 const int16_t src[],
@@ -130,4 +107,6 @@ class VisualizerTask : public FreeRTOSTask {
         {
             motors[index] = (_msp.parseShort(index) - 1000) / 1000.;
         }
+
+        Msp _msp;
 };
