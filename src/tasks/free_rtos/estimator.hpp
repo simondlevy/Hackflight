@@ -49,7 +49,7 @@ class EstimatorTask : public FreeRTOSTask {
                     measurementsQueueStorage,
                     &measurementsQueueBuffer);
 
-            FreeRTOSTask::init(runEstimatorTask, "ESTIMATOR", this, 2);
+            FreeRTOSTask::begin(runEstimatorTask, "ESTIMATOR", this, 2);
 
             consolePrintf("ESTIMATOR: estimatorTaskStart\n");
 

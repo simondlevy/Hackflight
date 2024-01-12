@@ -53,9 +53,9 @@ class Task1 : public FreeRTOSTask {
 
     public:
 
-        void init(void)
+        void begin(void)
         {
-            FreeRTOSTask::init(run, "task1", this, 4);
+            FreeRTOSTask::begin(run, "task1", this, 4);
         }
 
     private:
@@ -84,6 +84,9 @@ class Task1 : public FreeRTOSTask {
 
 void setup() 
 {
+    (void)getOpenLoopDemands;
+    (void)mixQuadrotor;
+
     Serial.begin(115200);
 
     Wire.begin();
@@ -94,13 +97,13 @@ void setup()
 
     //static CoreTask coreTask;
 
-    // coreTask.init(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor, true);
+    // coreTask.begin(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor, true);
 
     //vl53l1.begin();
 
     static Task1 task1;
 
-    task1.init();
+    task1.begin();
 
     vTaskStartScheduler();
 }

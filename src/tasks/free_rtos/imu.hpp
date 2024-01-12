@@ -321,7 +321,7 @@ class ImuTask : public FreeRTOSTask {
 
             magQueue = makeImuQueue(magQueueStorage, &magQueueBuffer);
 
-            FreeRTOSTask::init(runImuTask, "IMU", this, 4);
+            FreeRTOSTask::begin(runImuTask, "IMU", this, 4);
         }
 
         static void alignToAirframe(Axis3f* in, Axis3f* out)

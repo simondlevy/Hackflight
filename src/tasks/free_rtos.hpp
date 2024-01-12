@@ -42,7 +42,7 @@ class FreeRTOSTask {
 
     protected:
 
-        void init(
+        void begin(
                 const taskfun_t fun,
                 const char * name,
                 void * obj,
