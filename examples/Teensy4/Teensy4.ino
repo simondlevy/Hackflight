@@ -25,7 +25,7 @@
 #include <hfheader.h>
 #include <visualizer.hpp>
 #include <mixers/quadrotor.hpp>
-#include <tasks/free_rtos.hpp>
+#include <tasks/free_rtos/newcore.hpp>
 
 static Visualizer visualizer;
 
@@ -48,40 +48,6 @@ static void getOpenLoopDemands(
 {
 }
 
-
-class Task1 : public FreeRTOSTask {
-
-    public:
-
-        void begin(void)
-        {
-            FreeRTOSTask::begin(run, "task1", this, 4);
-        }
-
-    private:
-
-        static void run(void * obj)
-        {
-            while (true) {
-
-                static uint32_t _prev;
-                static uint8_t _on;
-
-                auto msec = millis();
-
-                if (msec - _prev > 500) {
-
-                    digitalWriteFast(LED_BUILTIN, _on);
-                    _on = !_on;
-                    _prev = msec;
-                }
-
-                delay(1);
-            }        
-        }
-
-};
-
 void setup() 
 {
     (void)getOpenLoopDemands;
@@ -95,15 +61,11 @@ void setup()
 
     static VL53L1_Arduino vl53l1;    
 
-    //static CoreTask coreTask;
+    static CoreTask coreTask;
 
-    // coreTask.begin(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor, true);
+    coreTask.begin();//0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor, true);
 
     //vl53l1.begin();
-
-    static Task1 task1;
-
-    task1.begin();
 
     vTaskStartScheduler();
 }
