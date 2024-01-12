@@ -37,6 +37,7 @@
 #include <console.h>
 #include <configblock.hpp>
 
+static ImuTask * _imuTask;
 
 extern "C" {
 
@@ -44,9 +45,7 @@ extern "C" {
 
     void __attribute__((used)) EXTI14_Callback(void) 
     {
-        extern CoreTask coreTask;
-
-        coreTask.handleImuDataAvailable();
+        _imuTask->dataAvailableCallback();
     }
 }
 
@@ -114,6 +113,8 @@ void ImuTask::readAccel(Axis3i16* dataOut)
 
 void ImuTask::deviceInit(void)
 {
+    _imuTask = this;
+
     bmi088Dev.accel_id = BMI088_ACCEL_I2C_ADDR_PRIMARY;
     bmi088Dev.delay_ms = delay;
 

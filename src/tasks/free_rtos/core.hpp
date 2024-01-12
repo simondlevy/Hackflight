@@ -96,11 +96,6 @@ class CoreTask : public FreeRTOSTask {
             _hackflight.resetControllers();
         }
 
-        void handleImuDataAvailable(void)
-        {
-            _imuTask.dataAvailableCallback();
-        }
-
     private:
 
         // Approximate thrust needed when in perfect hover. More weight/older

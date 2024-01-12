@@ -25,13 +25,19 @@ static Usfs usfs;
 
 static volatile bool _gotNewData;
 
+static ImuTask * _imuTask;
+
 static void interruptHandler()
 {
+    _imuTask->dataAvailableCallback();
+
     _gotNewData = true;
 }
 
 void ImuTask::deviceInit(void)
 {
+    _imuTask = this;
+
     usfs.loadFirmware(VERBOSE); 
 
     usfs.begin(

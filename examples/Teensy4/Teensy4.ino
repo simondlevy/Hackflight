@@ -45,7 +45,7 @@ void setup()
 
     coreTask.init(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor);
 
-    //Wire.begin();
+    Wire.begin();
 
     //vl53l1.begin();
 
