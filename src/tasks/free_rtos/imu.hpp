@@ -99,7 +99,13 @@ class ImuTask : public FreeRTOSTask {
 
             calibrate(calibRoll, calibPitch);
 
-            taskInit();
+            accelQueue = makeImuQueue(accelQueueStorage, &accelQueueBuffer);
+
+            gyroQueue = makeImuQueue(gyroQueueStorage, &gyroQueueBuffer);
+
+            magQueue = makeImuQueue(magQueueStorage, &magQueueBuffer);
+
+            FreeRTOSTask::begin(runImuTask, "IMU", this, 4);
 
             didInit = true;
         }
@@ -311,17 +317,6 @@ class ImuTask : public FreeRTOSTask {
         {
             return xQueueCreateStatic(QUEUE_LENGTH, itemSize, storage, buffer);
 
-        }
-
-        void taskInit(void)
-        {
-            accelQueue = makeImuQueue(accelQueueStorage, &accelQueueBuffer);
-
-            gyroQueue = makeImuQueue(gyroQueueStorage, &gyroQueueBuffer);
-
-            magQueue = makeImuQueue(magQueueStorage, &magQueueBuffer);
-
-            FreeRTOSTask::begin(runImuTask, "IMU", this, 4);
         }
 
         static void alignToAirframe(Axis3f* in, Axis3f* out)

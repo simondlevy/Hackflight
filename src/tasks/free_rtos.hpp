@@ -27,20 +27,33 @@ class FreeRTOSTask {
 
     public:
 
+        typedef void (*taskfun_t)(void * obj);
+
         // May be shared with logger/params
         bool didInit;
 
-    private:
-
-        typedef void (*taskfun_t)(void * obj);
+        static void new_begin(
+                const taskfun_t fun,
+                const char * name,
+                FreeRTOSTask * task,
+                const uint8_t priority
+                )
+        {
+            xTaskCreateStatic(
+                    fun, 
+                    name, 
+                    STACKSIZE, 
+                    task, 
+                    priority, 
+                    task->_taskStackBuffer,
+                    &task->_taskTaskBuffer);
+        }
 
         static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
 
         StackType_t  _taskStackBuffer[STACKSIZE]; 
 
         StaticTask_t _taskTaskBuffer;
-
-    protected:
 
         void begin(
                 const taskfun_t fun,
@@ -58,4 +71,5 @@ class FreeRTOSTask {
                     _taskStackBuffer,
                     &_taskTaskBuffer);
         }
+
 };

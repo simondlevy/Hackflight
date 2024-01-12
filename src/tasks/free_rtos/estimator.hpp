@@ -219,6 +219,8 @@ class EstimatorTask : public FreeRTOSTask {
 
         void run(void)
         {
+            consolePrintf("ESTIMATOR: running\n");
+
             systemWaitStart();
 
             auto nextPredictionMs = msec();
