@@ -38,7 +38,12 @@ class CoreTask : public FreeRTOSTask {
 
     private:
 
-        static void runCoreTask(void * obj)
+        static void runCoreTask(void* obj)
+        {
+            ((CoreTask *)obj)->run();
+        }
+
+        void run(void)
         {
             while (true) {
 
