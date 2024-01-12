@@ -93,7 +93,7 @@ class VisualizerTask : public FreeRTOSTask {
 
                         const auto vehicleState = _coreTask->vehicleState;
                         const int16_t angles[3] = {
-                            (int16_t)(10 * vehicleState.phi),
+                            (int16_t)(10 * (vehicleState.phi + 45)),
                             (int16_t)(10 * vehicleState.theta),
                             (int16_t)vehicleState.psi
                         };

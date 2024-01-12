@@ -51,9 +51,9 @@ void ImuTask::deviceInit(void)
             INTERRUPT_ENABLE,
             VERBOSE); 
 
-        pinMode(INTERRUPT_PIN, INPUT);
+    pinMode(INTERRUPT_PIN, INPUT);
 
-        attachInterrupt(INTERRUPT_PIN, interruptHandler, RISING);  
+    attachInterrupt(INTERRUPT_PIN, interruptHandler, RISING);  
 
     // Clear interrupts
     Usfs::checkStatus();

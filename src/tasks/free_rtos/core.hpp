@@ -50,6 +50,7 @@ class CoreTask : public FreeRTOSTask {
                 const openLoopFun_t openLoopFun,
                 const mixFun_t mixFun)
         {
+            /*
             if (didInit) {
                 return;
             }
@@ -78,6 +79,7 @@ class CoreTask : public FreeRTOSTask {
             motorsInit();
 
             FreeRTOSTask::init(runCoreTask, "CORE", this, 5);
+            */
         }
 
         bool test(void)

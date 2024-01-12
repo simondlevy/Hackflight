@@ -35,7 +35,9 @@ static void getOpenLoopDemands(
 void setup() 
 {
 
-    static VL53L1_Arduino vl53l1;    
+    Wire.begin();
+
+    //static VL53L1_Arduino vl53l1;    
 
     static CoreTask coreTask;
 
@@ -43,11 +45,12 @@ void setup()
 
     visualizerTask.init(&coreTask);
 
-    coreTask.init(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor);
-
-    Wire.begin();
+    //coreTask.init(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor);
 
     //vl53l1.begin();
+
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);
 
     vTaskStartScheduler();
 }
