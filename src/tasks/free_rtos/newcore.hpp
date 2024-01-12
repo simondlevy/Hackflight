@@ -1,13 +1,37 @@
-#include <FreeRTOS_TEENSY4.h>
-#include <task.h>
+#include <vl53l1.hpp>
 
 #include <tasks/free_rtos.hpp>
+#include <tasks/free_rtos/estimator.hpp>
+#include <tasks/free_rtos/flowdeck.hpp>
+#include <tasks/free_rtos/imu.hpp>
+#include <tasks/free_rtos/zranger.hpp>
+
+#include <crossplatform.h>
+#include <hackflight.hpp>
+#include <kalman.hpp>
+#include <motors.h>
+#include <rateSupervisor.hpp>
+#include <safety.hpp>
 
 class CoreTask : public FreeRTOSTask {
 
     public:
 
-        void begin(void)
+        // Shared with logger or params
+        vehicleState_t vehicleState;
+        Safety safety;
+        EstimatorTask estimatorTask;
+        FlowDeckTask flowDeckTask;
+        ZRangerTask zrangerTask;
+
+        void begin(
+                const float rollCalibration,
+                const float pitchCalibration,
+                const uint8_t flowDeckCsPin,
+                VL53L1 * vl53l1,
+                const openLoopFun_t openLoopFun,
+                const mixFun_t mixFun,
+                const bool isTeensy=false)
         {
             FreeRTOSTask::begin(run, "CORE", this, 4);
         }

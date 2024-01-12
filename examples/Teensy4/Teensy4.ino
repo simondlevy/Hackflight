@@ -63,7 +63,7 @@ void setup()
 
     static CoreTask coreTask;
 
-    coreTask.begin();//0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor, true);
+    coreTask.begin(0, 0, SS, &vl53l1, getOpenLoopDemands, mixQuadrotor, true);
 
     //vl53l1.begin();
 
