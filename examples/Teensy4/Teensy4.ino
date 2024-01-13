@@ -22,50 +22,12 @@
 
 #include <hfheader.h>
 #include <visualizer.hpp>
+#include <tasks/free_rtos/blinky.hpp>
+#include <tasks/free_rtos/visualizer.hpp>
 
-static void task1(void*) 
-{
+static BlinkyTask blinkyTask;
 
-    while (true) {
-
-        static uint32_t prev;
-        auto msec = millis();
-
-        if (msec - prev > 500) {
-
-            static bool flag;
-
-            digitalWriteFast(LED_BUILTIN, flag);
-        
-            flag = !flag;
-
-            prev = msec;
-        }
-
-        vTaskDelay(1);
-    }
-}
-
-static void task2(void*) 
-{
-    static Visualizer visualizer;
-
-    while (true) {
-
-        while (Serial.available()) {
-
-            if (visualizer.parse(Serial.read())) {
-
-                while (visualizer.available()) {
-
-                    Serial.write(visualizer.read());
-                }
-            }
-        }
-
-    }
-}
-
+static VisualizerTask visualizerTask;
 
 void setup() 
 {
@@ -73,9 +35,9 @@ void setup()
 
     pinMode(LED_BUILTIN, OUTPUT);
 
-    xTaskCreate(task1, "task1", 128, nullptr, 2, nullptr);
+    blinkyTask.begin();
 
-    xTaskCreate(task2, "task2", 128, nullptr, 2, nullptr);
+    visualizerTask.begin();
 
     vTaskStartScheduler();
 }
