@@ -8,7 +8,6 @@ class VisualizerTask : public FreeRTOSTask {
 
     public:
 
-
         void begin(void)
         {
             FreeRTOSTask::begin(run, "VISUALIZER", this, 2);

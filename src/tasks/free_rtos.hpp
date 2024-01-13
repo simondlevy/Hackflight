@@ -25,18 +25,17 @@
 
 class FreeRTOSTask {
 
-    public:
+    private:
 
         typedef void (*taskfun_t)(void * obj);
-
-        // May be shared with logger/params
-        bool didInit;
 
         static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
 
         StackType_t  _taskStackBuffer[STACKSIZE]; 
 
         StaticTask_t _taskTaskBuffer;
+
+    protected:
 
         void begin(
                 const taskfun_t fun,
@@ -54,5 +53,10 @@ class FreeRTOSTask {
                     _taskStackBuffer,
                     &_taskTaskBuffer);
         }
+
+    public:
+
+        // May be shared with logger/params
+        bool didInit;
 
 };
