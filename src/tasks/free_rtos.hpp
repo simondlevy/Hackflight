@@ -32,23 +32,6 @@ class FreeRTOSTask {
         // May be shared with logger/params
         bool didInit;
 
-        static void new_begin(
-                const taskfun_t fun,
-                const char * name,
-                FreeRTOSTask * task,
-                const uint8_t priority
-                )
-        {
-            xTaskCreateStatic(
-                    fun, 
-                    name, 
-                    STACKSIZE, 
-                    task, 
-                    priority, 
-                    task->_taskStackBuffer,
-                    &task->_taskTaskBuffer);
-        }
-
         static const auto STACKSIZE = 3 * configMINIMAL_STACK_SIZE; // arbitrary
 
         StackType_t  _taskStackBuffer[STACKSIZE]; 
