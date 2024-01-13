@@ -49,11 +49,11 @@ static void task1(void*)
 
         if (msec - prev > 500) {
 
-            static bool ledOn;
+            static bool flag;
 
-            digitalWriteFast(LED_BUILTIN, ledOn);
+            digitalWriteFast(LED_BUILTIN, flag);
         
-            ledOn = !ledOn;
+            flag = !flag;
 
             prev = msec;
         }
@@ -67,11 +67,22 @@ static void task2(void*)
 
     while (true) {
 
-        Serial.println("TICK");
-        vTaskDelay(pdMS_TO_TICKS(1'000));
+        static uint32_t prev;
+        auto msec = millis();
 
-        Serial.println("TOCK");
-        vTaskDelay(pdMS_TO_TICKS(1'000));
+        if (msec - prev > 1000) {
+
+            static bool flag;
+
+            Serial.println(flag ? "tick" : "tock");
+
+            flag = !flag;
+
+            prev = msec;
+        }
+
+
+        vTaskDelay(1);
     }
 }
 
