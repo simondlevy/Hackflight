@@ -3,7 +3,7 @@
 #include <console.h>
 #include <tasks/free_rtos.hpp>
 
-class BlinkyTask : public FreeRTOSTask {
+class ReceiverTask : public FreeRTOSTask {
 
     public:
 
@@ -12,19 +12,19 @@ class BlinkyTask : public FreeRTOSTask {
         {
             pinMode(LED_BUILTIN, OUTPUT);
 
-            FreeRTOSTask::begin(runBlinkyTask, "BlinkyTask", this, 2);
+            FreeRTOSTask::begin(run, "ReceiverTask", this, 2);
         }
 
     private:
 
-        static void runBlinkyTask(void * obj) 
+        static void run(void * obj) 
         {
-            ((BlinkyTask *)obj)->run();
+            ((ReceiverTask *)obj)->run();
         }
 
         void run(void)
         {
-            consolePrintf("BlinkyTask: running\n");
+            consolePrintf("ReceiverTask: running\n");
 
             while (true) {
 

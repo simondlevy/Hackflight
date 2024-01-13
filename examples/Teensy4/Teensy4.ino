@@ -22,20 +22,20 @@
 
 #include <hfheader.h>
 #include <visualizer.hpp>
-#include <tasks/free_rtos/blinky.hpp>
+#include <tasks/free_rtos/receiver.hpp>
 #include <tasks/free_rtos/visualizer.hpp>
-
-static BlinkyTask blinkyTask;
-
-static VisualizerTask visualizerTask;
 
 void setup() 
 {
+    static ReceiverTask receiverTask;
+
+    static VisualizerTask visualizerTask;
+
     Serial.begin(115200);
 
     pinMode(LED_BUILTIN, OUTPUT);
 
-    blinkyTask.begin();
+    receiverTask.begin();
 
     visualizerTask.begin();
 
