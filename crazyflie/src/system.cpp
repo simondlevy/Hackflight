@@ -72,11 +72,11 @@ Worker worker;
 RadioLink radioLink;
 UsbLinkTask usbLinkTask;
 
-ImuTask imuTask;
-
 PowerMonitorTask::syslinkInfo_t pmSyslinkInfo;
 
 // ---------------------------------------------------------------------------
+
+static ImuTask imuTask;
 
 static ConfigBlock configBlock;
 
@@ -344,12 +344,15 @@ static void systemTask(void *arg)
 
     zrangerTask.begin(&vl53l1, &estimatorTask);
 
-    coreTask.begin(
+    imuTask.begin(
+            &estimatorTask, 
             configBlock.getCalibRoll(), 
-            configBlock.getCalibPitch(),
-            &vl53l1,
+            configBlock.getCalibPitch());
+
+    coreTask.begin(
             &safety,
             &estimatorTask,
+            &imuTask,
             getOpenLoopDemands,
             mixQuadrotor);
 

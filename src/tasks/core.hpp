@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <vl53l1.hpp>
-
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
@@ -37,11 +35,9 @@ class CoreTask : public FreeRTOSTask {
         vehicleState_t vehicleState;
 
         void begin(
-                const float rollCalibration,
-                const float pitchCalibration,
-                VL53L1 * vl53l1,
                 Safety * safety,
                 EstimatorTask * estimatorTask,
+                ImuTask * imuTask,
                 const openLoopFun_t openLoopFun,
                 const mixFun_t mixFun)
         {
@@ -53,9 +49,9 @@ class CoreTask : public FreeRTOSTask {
 
             _estimatorTask = estimatorTask;
 
-            safety->init();
+            _imuTask = imuTask;
 
-            _imuTask.begin(estimatorTask, rollCalibration, pitchCalibration);
+            safety->init();
 
             _openLoopFun = openLoopFun;
 
@@ -77,7 +73,7 @@ class CoreTask : public FreeRTOSTask {
         {
             auto pass = true;
 
-            pass &= _imuTask.test();
+            pass &= _imuTask->test();
             pass &= _estimatorTask->didInit();
             pass &= motorsTest();
 
@@ -109,9 +105,9 @@ class CoreTask : public FreeRTOSTask {
 
         EstimatorTask * _estimatorTask;
 
-        Safety * _safety;
+        ImuTask * _imuTask;
 
-        ImuTask _imuTask;
+        Safety * _safety;
 
         void runMotors(const float motorvals[4]) 
         {
@@ -147,7 +143,7 @@ class CoreTask : public FreeRTOSTask {
 
             // Wait for sensors to be calibrated
             auto lastWakeTime = xTaskGetTickCount();
-            while(!_imuTask.areCalibrated()) {
+            while(!_imuTask->areCalibrated()) {
                 vTaskDelayUntil(&lastWakeTime, F2T(Clock::RATE_MAIN_LOOP));
             }
             consolePrintf("CORE: Starting loop\n");
@@ -156,9 +152,9 @@ class CoreTask : public FreeRTOSTask {
             for (uint32_t step=1; ; step++) {
 
                 // The IMU should unlock at 1kHz
-                _imuTask.waitDataReady();
+                _imuTask->waitDataReady();
                 sensorData_t sensorData = {};
-                _imuTask.acquire(&sensorData);
+                _imuTask->acquire(&sensorData);
 
                 // Get state vector linear positions and velocities and
                 // angles from estimator
