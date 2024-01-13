@@ -37,7 +37,6 @@ class CoreTask : public FreeRTOSTask {
 
         // Shared with logger or params
         vehicleState_t vehicleState;
-        Safety safety;
         EstimatorTask estimatorTask;
         FlowDeckTask flowDeckTask;
         ZRangerTask zrangerTask;
@@ -47,6 +46,7 @@ class CoreTask : public FreeRTOSTask {
                 const float pitchCalibration,
                 const uint8_t flowDeckCsPin,
                 VL53L1 * vl53l1,
+                Safety * safety,
                 const openLoopFun_t openLoopFun,
                 const mixFun_t mixFun,
                 const bool isTeensy=false)
@@ -55,9 +55,11 @@ class CoreTask : public FreeRTOSTask {
                 return;
             }
 
-            safety.init();
+            _safety = safety;
 
-            estimatorTask.begin(&safety);
+            safety->init();
+
+            estimatorTask.begin(safety);
 
             if (!isTeensy) {
 
@@ -118,6 +120,8 @@ class CoreTask : public FreeRTOSTask {
 
         openLoopFun_t _openLoopFun;
 
+        Safety * _safety;
+
         ImuTask _imuTask;
 
         void runMotors(const float motorvals[4]) 
@@ -176,7 +180,7 @@ class CoreTask : public FreeRTOSTask {
                 vehicleState.dtheta = -sensorData.gyro.y; // (negate for ENU)
                 vehicleState.dpsi =    sensorData.gyro.z; 
 
-                const auto areMotorsAllowedToRun = safety.areMotorsAllowedToRun();
+                const auto areMotorsAllowedToRun = _safety->areMotorsAllowedToRun();
 
                 static float _motorvals[4];
 
@@ -191,7 +195,7 @@ class CoreTask : public FreeRTOSTask {
 
                     // Use safety algorithm to modify demands based on sensor data
                     // and open-loop info
-                    safety.update(sensorData, step, timestamp, _demands);
+                    _safety->update(sensorData, step, timestamp, _demands);
 
                     // Run hackflight core algorithm to get motor spins from open
                     // loop demands via closed-loop control and mixer

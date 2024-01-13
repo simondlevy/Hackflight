@@ -22,11 +22,13 @@
 
 #include <platform/platform.h>
 
+// Crazyfle tasks
 #include <tasks/log.h>
 #include <tasks/power.hpp>
 #include <tasks/syslink.hpp>
 #include <tasks/usblink.hpp>
 
+// Cross-platform tasks
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/core.hpp>
@@ -38,6 +40,7 @@
 #include <mem.hpp>
 #include <params.h>
 #include <pinmap.h>
+#include <safety.hpp>
 #include <sysload.h>
 #include <system.h>
 #include <worker.hpp>
@@ -52,6 +55,8 @@ static const uint8_t VL53L1_DEFAULT_ADDRESS = 0x29;
 static const uint8_t VL53L1_NEW_ADDRESS     = 0x31;
 
 // Globals -------------------------------------------------------------------
+
+Safety safety;
 
 CoreTask coreTask;
 
@@ -199,7 +204,7 @@ static void commInit(void)
 
     crtpServiceInit();
 
-    platformServiceInit(&coreTask);
+    platformServiceInit(&safety);
 
     logInit();
 
@@ -333,6 +338,7 @@ static void systemTask(void *arg)
             configBlock.getCalibPitch(),
             PIN_FLOWDECK_CS,
             &vl53l1,
+            &safety,
             getOpenLoopDemands,
             mixQuadrotor);
 

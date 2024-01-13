@@ -1043,6 +1043,7 @@ static float unused;
 
 //////////////////////////////////////////////////////////////////////////////
 
+extern Safety safety;
 extern CoreTask coreTask;
 extern bool didResetEstimation;
 
@@ -1073,13 +1074,13 @@ LOG_GROUP_STOP(motor)
     //////////////////////////////////////////////////////////////////////////////
 
     LOG_GROUP_START(sys)
-    LOG_ADD_CORE(LOG_UINT8, canfly, &coreTask.safety.canFlyFlag)
-    LOG_ADD_CORE(LOG_UINT8, isFlying, &coreTask.safety.isFlyingFlag)
-    LOG_ADD_CORE(LOG_UINT8, isTumbled, &coreTask.safety.isTumbledFlag)
+    LOG_ADD_CORE(LOG_UINT8, canfly, &safety.canFlyFlag)
+    LOG_ADD_CORE(LOG_UINT8, isFlying, &safety.isFlyingFlag)
+    LOG_ADD_CORE(LOG_UINT8, isTumbled, &safety.isTumbledFlag)
 LOG_GROUP_STOP(sys)
 
     LOG_GROUP_START(supervisor)
-    LOG_ADD(LOG_UINT16, info, &coreTask.safety.infoBitfield)
+    LOG_ADD(LOG_UINT16, info, &safety.infoBitfield)
 LOG_GROUP_STOP(supervisor)
 
 

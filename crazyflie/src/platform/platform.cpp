@@ -38,11 +38,10 @@
 
 #include <hal/i2cdev.h>
 
-#include <tasks/core.hpp>
-
 #include <console.h>
 #include <led.h>
 #include <radiolink.hpp>
+#include <safety.hpp>
 
 #include "platform.h"
 #include "platformservice.hpp"
@@ -67,12 +66,12 @@ StaticTask_t platformTaskTaskBuffer;
 
 static PlatformService platformService;
 
-static void platformSrvTask(void* param)
+static void platformSrvTask(void * obj)
 {
-    platformService.task((CoreTask *)param);
+    platformService.task((Safety *)obj);
 }
 
-void platformServiceInit(void * param)
+void platformServiceInit(void * obj)
 {
     platformService.init();
 
@@ -80,7 +79,7 @@ void platformServiceInit(void * param)
             platformSrvTask,
             "PLATFORM-SRV", 
             PLATFORM_TASK_STACK_DEPTH,
-            param,
+            obj,
             0,
             platformTaskStackBuffer,
             &platformTaskTaskBuffer);

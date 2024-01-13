@@ -47,7 +47,7 @@ class PlatformService {
 
     public:
 
-        void task(CoreTask * coreTask)
+        void task(Safety * safety)
         {
             static crtpPacket_t p;
 
@@ -60,7 +60,7 @@ class PlatformService {
                 switch (p.channel) {
 
                     case platformCommand:
-                        platformCommandProcess(&p, &coreTask->safety);
+                        platformCommandProcess(&p, safety);
                         crtpSendPacketBlock(&p);
                         break;
                     case versionCommand:

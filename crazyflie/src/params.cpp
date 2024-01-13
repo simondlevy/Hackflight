@@ -787,10 +787,11 @@ void runParamTask(void)
 //////////////////////////////////////////////////////////////////////////////
 
 extern CoreTask coreTask;
+extern Safety safety;
 extern uint8_t sysload_triggerDump;
 
     PARAM_GROUP_START(stabilizer)
-    PARAM_ADD_CORE(PARAM_UINT8, stop, &coreTask.safety.paramEmergencyStop)
+    PARAM_ADD_CORE(PARAM_UINT8, stop, &safety.paramEmergencyStop)
     PARAM_ADD_CORE(PARAM_UINT8, taskDump, &sysload_triggerDump)
 PARAM_GROUP_STOP(stabilizer)
 
@@ -829,13 +830,13 @@ static void doReformat(void)
     //////////////////////////////////////////////////////////////////////////////
 
     PARAM_GROUP_START(system)
-    PARAM_ADD_CORE(PARAM_INT8, arm, &coreTask.safety.deprecatedArmParam)
+    PARAM_ADD_CORE(PARAM_INT8, arm, &safety.deprecatedArmParam)
     PARAM_ADD_WITH_CALLBACK(PARAM_UINT8, storageStats, &storageStats, printStats)
     PARAM_ADD_WITH_CALLBACK(PARAM_UINT8, storageReformat, &reformatValue, doReformat)
 PARAM_GROUP_STOP(system)
 
     PARAM_GROUP_START(supervisor)
-    PARAM_ADD(PARAM_UINT8, infdmp, &coreTask.safety.doinfodump)
+    PARAM_ADD(PARAM_UINT8, infdmp, &safety.doinfodump)
 PARAM_GROUP_STOP(supervisor)
 
     //////////////////////////////////////////////////////////////////////////////
