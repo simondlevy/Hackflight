@@ -21,7 +21,9 @@
 #include <task.h>
 
 #include <hfheader.h>
-#include <tasks/guestimator.hpp>
+#include <safety.hpp>
+
+#include <tasks/estimator.hpp>
 #include <tasks/receiver.hpp>
 #include <tasks/visualizer.hpp>
 
@@ -33,11 +35,15 @@ void setup()
 
     static VisualizerTask visualizerTask;
 
+    static Safety safety;
+
     Serial.begin(115200);
 
     pinMode(LED_BUILTIN, OUTPUT);
 
     receiverTask.begin();
+
+    estimatorTask.begin(&safety);
 
     visualizerTask.begin(&estimatorTask, &receiverTask);
 

@@ -54,7 +54,7 @@ class EstimatorTask : public FreeRTOSTask {
             consolePrintf("ESTIMATOR: estimatorTaskStart\n");
 
             _kalmanFilter.init(msec());
-            consolePrintf("ESTIMATOR: Using %s estimator\n", _kalmanFilter.getName());        }
+            consolePrintf("ESTIMATOR: Using %s estimator\n", _kalmanFilter.getName());              }
 
         bool didInit(void)
         {
@@ -113,6 +113,25 @@ class EstimatorTask : public FreeRTOSTask {
             m.type = KalmanFilter::MeasurementTypeTOF;
             m.data.tof = *tof;
             enqueue(&m, isInInterrupt);
+        }
+
+        // For VisualizerTask
+        void getEulerAngles(int16_t angles[3])
+        {
+            static int16_t phi;
+            static int8_t dir;
+
+            dir = 
+                dir == 0 ? +1 : 
+                phi == +450 ? -1 :
+                phi == -450 ? +1 :
+                dir;
+
+            phi += dir;
+
+            angles[0] = phi;
+            angles[1] = 0;
+            angles[2] = 0;
         }
 
     private:

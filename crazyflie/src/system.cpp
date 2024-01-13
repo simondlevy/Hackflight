@@ -338,6 +338,8 @@ static void systemTask(void *arg)
         consolePrintf("ZRANGER: Z-down sensor [FAIL]\n");
     }
 
+    // Launch the cross-platform tasks
+
     estimatorTask.begin(&safety);
 
     flowDeckTask.begin(PIN_FLOWDECK_CS, &estimatorTask);
