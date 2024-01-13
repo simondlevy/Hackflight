@@ -787,8 +787,20 @@ void runParamTask(void)
 //////////////////////////////////////////////////////////////////////////////
 
 extern CoreTask coreTask;
+extern EstimatorTask estimatorTask;
 extern Safety safety;
 extern uint8_t sysload_triggerDump;
+extern bool storageStats;
+extern bool reformatValue;
+extern CoreTask coreTask;
+extern bool motorSetEnable;
+extern uint16_t motorPowerSet[]; 
+extern uint8_t memTesterWriteReset;
+extern PowerMonitorTask powerMonitorTask;
+extern uint8_t syslink_triggerDebugProbe;
+extern uint16_t system_echoDelay;
+
+//////////////////////////////////////////////////////////////////////////////
 
     PARAM_GROUP_START(stabilizer)
     PARAM_ADD_CORE(PARAM_UINT8, stop, &safety.paramEmergencyStop)
@@ -796,9 +808,6 @@ extern uint8_t sysload_triggerDump;
 PARAM_GROUP_STOP(stabilizer)
 
     //////////////////////////////////////////////////////////////////////////////
-
-    extern bool storageStats;
-    extern bool reformatValue;
 
 static void printStats(void)
 {
@@ -816,18 +825,7 @@ static void doReformat(void)
     }
 }
 
-    //////////////////////////////////////////////////////////////////////////////
-
-    extern CoreTask coreTask;
-
-    extern bool motorSetEnable;
-    extern uint16_t motorPowerSet[]; 
-    extern uint8_t memTesterWriteReset;
-    extern PowerMonitorTask powerMonitorTask;
-    extern uint8_t syslink_triggerDebugProbe;
-    extern uint16_t system_echoDelay;
-
-    //////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
     PARAM_GROUP_START(system)
     PARAM_ADD_CORE(PARAM_INT8, arm, &safety.deprecatedArmParam)
@@ -842,8 +840,7 @@ PARAM_GROUP_STOP(supervisor)
     //////////////////////////////////////////////////////////////////////////////
 
     PARAM_GROUP_START(kalman)
-    PARAM_ADD_CORE(PARAM_UINT8, resetEstimation, 
-            &coreTask.estimatorTask.didResetEstimation)
+    PARAM_ADD_CORE(PARAM_UINT8, resetEstimation, &estimatorTask.didResetEstimation)
 PARAM_GROUP_STOP(kalman)
 
     //////////////////////////////////////////////////////////////////////////////
@@ -865,8 +862,8 @@ PARAM_GROUP_STOP(memTst)
     //////////////////////////////////////////////////////////////////////////////
 
     PARAM_GROUP_START(pm)
-    PARAM_ADD_CORE(PARAM_FLOAT | PARAM_PERSISTENT, lowVoltage, 
-            &powerMonitorTask.batteryLowVoltage)
+PARAM_ADD_CORE(PARAM_FLOAT | PARAM_PERSISTENT, lowVoltage, 
+        &powerMonitorTask.batteryLowVoltage)
 PARAM_ADD_CORE(PARAM_FLOAT | PARAM_PERSISTENT, criticalLowVoltage, 
         &powerMonitorTask.batteryCriticalLowVoltage)
 PARAM_GROUP_STOP(pm)

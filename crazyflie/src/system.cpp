@@ -59,6 +59,7 @@ static const uint8_t VL53L1_NEW_ADDRESS     = 0x31;
 Safety safety;
 
 CoreTask coreTask;
+EstimatorTask estimatorTask;
 
 Commander commander;
 PowerMonitorTask powerMonitorTask;
@@ -333,12 +334,15 @@ static void systemTask(void *arg)
         consolePrintf("ZRANGER: Z-down sensor [FAIL]\n");
     }
 
+    estimatorTask.begin(&safety);
+
     coreTask.begin(
             configBlock.getCalibRoll(), 
             configBlock.getCalibPitch(),
             PIN_FLOWDECK_CS,
             &vl53l1,
             &safety,
+            &estimatorTask,
             getOpenLoopDemands,
             mixQuadrotor);
 

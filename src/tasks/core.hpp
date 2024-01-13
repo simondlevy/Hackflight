@@ -37,7 +37,6 @@ class CoreTask : public FreeRTOSTask {
 
         // Shared with logger or params
         vehicleState_t vehicleState;
-        EstimatorTask estimatorTask;
         FlowDeckTask flowDeckTask;
         ZRangerTask zrangerTask;
 
@@ -47,9 +46,9 @@ class CoreTask : public FreeRTOSTask {
                 const uint8_t flowDeckCsPin,
                 VL53L1 * vl53l1,
                 Safety * safety,
+                EstimatorTask * estimatorTask,
                 const openLoopFun_t openLoopFun,
-                const mixFun_t mixFun,
-                const bool isTeensy=false)
+                const mixFun_t mixFun)
         {
             if (didInit) {
                 return;
@@ -57,18 +56,15 @@ class CoreTask : public FreeRTOSTask {
 
             _safety = safety;
 
+            _estimatorTask = estimatorTask;
+
             safety->init();
 
-            estimatorTask.begin(safety);
+            flowDeckTask.begin(flowDeckCsPin, estimatorTask);
 
-            if (!isTeensy) {
+            zrangerTask.begin(vl53l1, estimatorTask);
 
-                flowDeckTask.begin(flowDeckCsPin, &estimatorTask);
-
-                zrangerTask.begin(vl53l1, &estimatorTask);
-            }
-
-            _imuTask.begin(&estimatorTask, rollCalibration, pitchCalibration);
+            _imuTask.begin(estimatorTask, rollCalibration, pitchCalibration);
 
             _openLoopFun = openLoopFun;
 
@@ -91,7 +87,7 @@ class CoreTask : public FreeRTOSTask {
             auto pass = true;
 
             pass &= _imuTask.test();
-            pass &= estimatorTask.didInit();
+            pass &= _estimatorTask->didInit();
             pass &= motorsTest();
 
             return pass;
@@ -119,6 +115,8 @@ class CoreTask : public FreeRTOSTask {
         demands_t _demands;
 
         openLoopFun_t _openLoopFun;
+
+        EstimatorTask * _estimatorTask;
 
         Safety * _safety;
 
@@ -173,7 +171,7 @@ class CoreTask : public FreeRTOSTask {
 
                 // Get state vector linear positions and velocities and
                 // angles from estimator
-                estimatorTask.getVehicleState(&vehicleState);
+                _estimatorTask->getVehicleState(&vehicleState);
 
                 // Get state vector angular velocities directly from gyro
                 vehicleState.dphi =    sensorData.gyro.x;     
