@@ -23,22 +23,6 @@
 #include <hfheader.h>
 #include <visualizer.hpp>
 
-static Visualizer visualizer;
-
-void serialEvent(void)
-{
-    while (Serial.available()) {
-
-        if (visualizer.parse(Serial.read())) {
-
-            while (visualizer.available()) {
-
-                Serial.write(visualizer.read());
-            }
-        }
-    }
-}
-
 static void task1(void*) 
 {
 
@@ -64,23 +48,20 @@ static void task1(void*)
 
 static void task2(void*) 
 {
+    static Visualizer visualizer;
 
     while (true) {
 
-        static uint32_t prev;
-        auto msec = millis();
+        while (Serial.available()) {
 
-        if (msec - prev > 1000) {
+            if (visualizer.parse(Serial.read())) {
 
-            static bool flag;
+                while (visualizer.available()) {
 
-            Serial.println(flag ? "tick" : "tock");
-
-            flag = !flag;
-
-            prev = msec;
+                    Serial.write(visualizer.read());
+                }
+            }
         }
-
 
         vTaskDelay(1);
     }
