@@ -15,6 +15,16 @@ class ReceiverTask : public FreeRTOSTask {
             FreeRTOSTask::begin(run, "receiever", this, 2);
         }
 
+        void getRawChannelValues(int16_t chanvals[6])
+        {
+            chanvals[0] = 1000;
+            chanvals[1] = 1200;
+            chanvals[2] = 1400;
+            chanvals[3] = 1600;
+            chanvals[4] = 1800;
+            chanvals[5] = 2000;
+        }
+
     private:
 
         static void run(void * obj) 

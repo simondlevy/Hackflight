@@ -78,16 +78,9 @@ class VisualizerTask : public FreeRTOSTask {
 
                 case 105: // RC
                     {
-                        int16_t channels[6] = { /*
-                                                   (int16_t)receiverTask.getRawThrottle(),
-                                                   (int16_t)receiverTask.getRawRoll(),
-                                                   (int16_t)receiverTask.getRawPitch(),
-                                                   (int16_t)receiverTask.getRawYaw(),
-                                                   (int16_t)receiverTask.getRawAux1(),
-                                                   (int16_t)receiverTask.getRawAux2()*/
-                        };
-
-                        serializeShorts(105, channels, 6);
+                        int16_t chanvals[6] = {};
+                        _receiverTask->getRawChannelValues(chanvals);
+                        serializeShorts(105, chanvals, 6);
 
                     } 
                     return true;
