@@ -19,7 +19,9 @@
 
 #pragma once
 
-#include <FreeRTOS_TEENSY4.h>
+#include <stdint.h>
+
+#include <free_rtos.h>
 #include <task.h>
 
 class FreeRTOSTask {

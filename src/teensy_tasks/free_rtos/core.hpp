@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include <console.h>
+#include <crossplatform.h>
+#include <rateSupervisor.hpp>
 #include <teensy_tasks/free_rtos.hpp>
 
 class CoreTask : public FreeRTOSTask {
@@ -32,23 +35,39 @@ class CoreTask : public FreeRTOSTask {
 
         void run(void) {
 
+            static RateSupervisor rateSupervisor;
+
+            vTaskSetApplicationTaskTag(0, (TaskHookFunction_t)TASK_CORE_ID_NBR);
+
+            systemWaitStart();
+
+            consolePrintf("CORE: Wait for sensor calibration...\n");
+
             while (true) {
 
-                static uint32_t prev;
-                auto msec = millis();
-
-                if (msec - prev > 500) {
-
-                    static bool ledOn;
-
-                    digitalWriteFast(LED_BUILTIN, ledOn);
-
-                    ledOn = !ledOn;
-
-                    prev = msec;
-                }
+                blink();
 
                 vTaskDelay(1);
             }
         }
+
+    private:
+
+        static void blink(void)
+        {
+            static uint32_t prev;
+            auto msec = millis();
+
+            if (msec - prev > 500) {
+
+                static bool ledOn;
+
+                digitalWriteFast(LED_BUILTIN, ledOn);
+
+                ledOn = !ledOn;
+
+                prev = msec;
+            }
+        }
+
 };
