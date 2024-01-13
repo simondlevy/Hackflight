@@ -17,12 +17,23 @@ class ReceiverTask : public FreeRTOSTask {
 
         void getRawChannelValues(int16_t chanvals[6])
         {
-            chanvals[0] = 1000;
-            chanvals[1] = 1200;
-            chanvals[2] = 1400;
-            chanvals[3] = 1600;
-            chanvals[4] = 1800;
-            chanvals[5] = 2000;
+            static int16_t throttle;
+            static int8_t dir;
+
+            dir = 
+                dir == 0 ? +1 : 
+                throttle == 2000 ? -1 :
+                throttle == 1000 ? +1 :
+                dir;
+
+            throttle = throttle == 0 ? 1000 : throttle + dir;
+
+            chanvals[0] = throttle;
+            chanvals[1] = 1500;
+            chanvals[2] = 1500;
+            chanvals[3] = 1500;
+            chanvals[4] = 1500;
+            chanvals[5] = 1500;
         }
 
     private:
