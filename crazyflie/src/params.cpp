@@ -788,6 +788,7 @@ void runParamTask(void)
 
 extern CoreTask coreTask;
 extern EstimatorTask estimatorTask;
+extern FlowDeckTask flowDeckTask;
 extern Safety safety;
 extern uint8_t sysload_triggerDump;
 extern bool storageStats;
@@ -871,8 +872,8 @@ PARAM_GROUP_STOP(pm)
     //////////////////////////////////////////////////////////////////////////////
 
     PARAM_GROUP_START(deck)
-    PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcFlow, &coreTask.flowDeckTask.didInit)
-    PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcFlow2, &coreTask.flowDeckTask.didInit)
+    PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcFlow, &flowDeckTask.didInit)
+    PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcFlow2, &flowDeckTask.didInit)
     PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcZRanger, &coreTask.zrangerTask.didInit)  
     PARAM_ADD_CORE(PARAM_UINT8 | PARAM_RONLY, bcZRanger2, &coreTask.zrangerTask.didInit)
 PARAM_GROUP_STOP(deck)

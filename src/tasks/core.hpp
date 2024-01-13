@@ -20,7 +20,6 @@
 
 #include <task.hpp>
 #include <tasks/estimator.hpp>
-#include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/zranger.hpp>
 
@@ -37,13 +36,11 @@ class CoreTask : public FreeRTOSTask {
 
         // Shared with logger or params
         vehicleState_t vehicleState;
-        FlowDeckTask flowDeckTask;
         ZRangerTask zrangerTask;
 
         void begin(
                 const float rollCalibration,
                 const float pitchCalibration,
-                const uint8_t flowDeckCsPin,
                 VL53L1 * vl53l1,
                 Safety * safety,
                 EstimatorTask * estimatorTask,
@@ -59,8 +56,6 @@ class CoreTask : public FreeRTOSTask {
             _estimatorTask = estimatorTask;
 
             safety->init();
-
-            flowDeckTask.begin(flowDeckCsPin, estimatorTask);
 
             zrangerTask.begin(vl53l1, estimatorTask);
 

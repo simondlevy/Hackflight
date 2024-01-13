@@ -30,6 +30,7 @@
 
 // Cross-platform tasks
 #include <tasks/estimator.hpp>
+#include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/core.hpp>
 
@@ -60,6 +61,7 @@ Safety safety;
 
 CoreTask coreTask;
 EstimatorTask estimatorTask;
+FlowDeckTask flowDeckTask;
 
 Commander commander;
 PowerMonitorTask powerMonitorTask;
@@ -336,10 +338,11 @@ static void systemTask(void *arg)
 
     estimatorTask.begin(&safety);
 
+    flowDeckTask.begin(PIN_FLOWDECK_CS, &estimatorTask);
+
     coreTask.begin(
             configBlock.getCalibRoll(), 
             configBlock.getCalibPitch(),
-            PIN_FLOWDECK_CS,
             &vl53l1,
             &safety,
             &estimatorTask,
