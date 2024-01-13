@@ -22,8 +22,8 @@
 
 #include <hfheader.h>
 #include <visualizer.hpp>
-#include <tasks/free_rtos/receiver.hpp>
-#include <tasks/free_rtos/visualizer.hpp>
+#include <tasks/receiver.hpp>
+#include <tasks/visualizer.hpp>
 
 void setup() 
 {
@@ -37,7 +37,7 @@ void setup()
 
     receiverTask.begin();
 
-    visualizerTask.begin();
+    visualizerTask.begin(&receiverTask);
 
     vTaskStartScheduler();
 }

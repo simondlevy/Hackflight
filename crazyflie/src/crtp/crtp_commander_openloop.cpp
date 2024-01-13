@@ -29,7 +29,7 @@
 #include <num.hpp>
 #include <physicalConstants.h>
 
-#include <tasks/free_rtos/core.hpp>
+#include <tasks/core.hpp>
 
 #include <commander.hpp>
 

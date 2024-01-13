@@ -32,7 +32,7 @@
 #include <queue.h>
 #include <semphr.h>
 
-#include <tasks/free_rtos/core.hpp>
+#include <tasks/core.hpp>
 
 #include <tasks/syslink.hpp>
 

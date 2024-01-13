@@ -1,15 +1,18 @@
 #pragma once
 
 #include <console.h>
-#include <tasks/free_rtos.hpp>
+#include <task.hpp>
+#include <tasks/receiver.hpp>
 #include <visualizer.hpp>
 
 class VisualizerTask : public FreeRTOSTask {
 
     public:
 
-        void begin(void)
+        void begin(ReceiverTask * receiverTask)
         {
+            _receiverTask = receiverTask;
+
             FreeRTOSTask::begin(run, "VISUALIZER", this, 2);
         }
 
@@ -21,6 +24,8 @@ class VisualizerTask : public FreeRTOSTask {
         }
 
         Visualizer _visualizer;
+
+        ReceiverTask * _receiverTask;
 
         void run(void)
         {

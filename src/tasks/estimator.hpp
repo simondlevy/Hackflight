@@ -22,7 +22,7 @@
 #include <kalman.hpp>
 #include <rateSupervisor.hpp>
 #include <safety.hpp>
-#include <tasks/free_rtos.hpp>
+#include <task.hpp>
 
 class EstimatorTask : public FreeRTOSTask {
 

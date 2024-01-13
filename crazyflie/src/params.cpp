@@ -32,10 +32,10 @@
 
 #include <crtp/crtp.h>
 
-#include <tasks/free_rtos/estimator.hpp>
-#include <tasks/free_rtos/core.hpp>
-#include <tasks/free_rtos/flowdeck.hpp>
-#include <tasks/free_rtos/zranger.hpp>
+#include <tasks/estimator.hpp>
+#include <tasks/core.hpp>
+#include <tasks/flowdeck.hpp>
+#include <tasks/zranger.hpp>
 
 #include <tasks/power.hpp>
 

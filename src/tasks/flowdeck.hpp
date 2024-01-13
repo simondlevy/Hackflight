@@ -23,8 +23,8 @@
 
 #include <datatypes.h>
 
-#include <tasks/free_rtos.hpp>
-#include <tasks/free_rtos/estimator.hpp>
+#include <task.hpp>
+#include <tasks/estimator.hpp>
 
 #include <crossplatform.h>
 

@@ -2,7 +2,7 @@
 
 #include <usfs.hpp>
 
-#include <tasks/free_rtos/imu.hpp>
+#include <tasks/imu.hpp>
 
 static const uint8_t INTERRUPT_PIN = 12; 
 

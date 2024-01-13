@@ -18,11 +18,11 @@
 
 #include <vl53l1.hpp>
 
-#include <tasks/free_rtos.hpp>
-#include <tasks/free_rtos/estimator.hpp>
-#include <tasks/free_rtos/flowdeck.hpp>
-#include <tasks/free_rtos/imu.hpp>
-#include <tasks/free_rtos/zranger.hpp>
+#include <task.hpp>
+#include <tasks/estimator.hpp>
+#include <tasks/flowdeck.hpp>
+#include <tasks/imu.hpp>
+#include <tasks/zranger.hpp>
 
 #include <crossplatform.h>
 #include <hackflight.hpp>

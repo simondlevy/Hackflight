@@ -1,7 +1,7 @@
 #pragma once
 
 #include <console.h>
-#include <tasks/free_rtos.hpp>
+#include <task.hpp>
 
 class ReceiverTask : public FreeRTOSTask {
 

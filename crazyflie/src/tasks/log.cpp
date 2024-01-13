@@ -41,7 +41,7 @@
 
 #include <tasks/power.hpp>
 
-#include <tasks/free_rtos/core.hpp>
+#include <tasks/core.hpp>
 
 #include <console.h>
 #include <config.h>

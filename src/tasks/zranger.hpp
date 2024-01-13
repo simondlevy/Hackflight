@@ -22,8 +22,8 @@
 #include <vl53l1.hpp>
 
 #include <linalg.h>
-#include <tasks/free_rtos.hpp>
-#include <tasks/free_rtos/estimator.hpp>
+#include <task.hpp>
+#include <tasks/estimator.hpp>
 
 class ZRangerTask : public FreeRTOSTask {
 
