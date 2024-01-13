@@ -74,41 +74,29 @@ class Task1 : public FreeRTOSTask {
 };
 
 
-static void task1(void*) 
-{
+class Task2 : public FreeRTOSTask {
 
-    while (true) {
+    public:
 
-        static uint32_t prev;
-        auto msec = millis();
-
-        if (msec - prev > 500) {
-
-            static bool ledOn;
-
-            digitalWriteFast(LED_BUILTIN, ledOn);
-
-            ledOn = !ledOn;
-
-            prev = msec;
+        static void fun(void * obj)
+        {
+            ((Task2 *)obj)->run();
         }
 
-        vTaskDelay(1);
-    }
-}
+        void run(void) {
 
-static void task2(void*) 
-{
+            while (true) {
 
-    while (true) {
+                Serial.println("TICK");
+                vTaskDelay(pdMS_TO_TICKS(1'000));
 
-        Serial.println("TICK");
-        vTaskDelay(pdMS_TO_TICKS(1'000));
+                Serial.println("TOCK");
+                vTaskDelay(pdMS_TO_TICKS(1'000));
 
-        Serial.println("TOCK");
-        vTaskDelay(pdMS_TO_TICKS(1'000));
-    }
-}
+                vTaskDelay(1);
+            }
+        }
+};
 
 
 void setup() 
@@ -117,13 +105,11 @@ void setup()
 
     pinMode(LED_BUILTIN, OUTPUT);
 
-    (void)task1;
-    //xTaskCreate(task1, "task1", 128, nullptr, 2, nullptr);
-    xTaskCreate(task2, "task2", 128, nullptr, 2, nullptr);
-
     static Task1 task1obj;
-
     FreeRTOSTask::create(&task1obj, Task1::fun, "task1", 2);
+
+    static Task2 task2obj;
+    FreeRTOSTask::create(&task2obj, Task2::fun, "task2", 2);
 
     vTaskStartScheduler();
 }
