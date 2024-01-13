@@ -23,6 +23,8 @@
 #include <hfheader.h>
 #include <visualizer.hpp>
 
+#include "task.hpp"
+
 static Visualizer visualizer;
 
 void serialEvent(void)
@@ -39,6 +41,39 @@ void serialEvent(void)
     }
 }
 
+class Task1 : public FreeRTOSTask {
+
+    public:
+
+        static void fun(void * obj)
+        {
+            ((Task1 *)obj)->run();
+        }
+
+        void run(void) {
+
+            while (true) {
+
+                static uint32_t prev;
+                auto msec = millis();
+
+                if (msec - prev > 500) {
+
+                    static bool ledOn;
+
+                    digitalWriteFast(LED_BUILTIN, ledOn);
+
+                    ledOn = !ledOn;
+
+                    prev = msec;
+                }
+
+                vTaskDelay(1);
+            }
+        }
+};
+
+
 static void task1(void*) 
 {
 
@@ -52,7 +87,7 @@ static void task1(void*)
             static bool ledOn;
 
             digitalWriteFast(LED_BUILTIN, ledOn);
-        
+
             ledOn = !ledOn;
 
             prev = msec;
@@ -82,9 +117,13 @@ void setup()
 
     pinMode(LED_BUILTIN, OUTPUT);
 
-    xTaskCreate(task1, "task1", 128, nullptr, 2, nullptr);
-
+    (void)task1;
+    //xTaskCreate(task1, "task1", 128, nullptr, 2, nullptr);
     xTaskCreate(task2, "task2", 128, nullptr, 2, nullptr);
+
+    static Task1 task1obj;
+
+    FreeRTOSTask::create(&task1obj, Task1::fun, "task1", 2);
 
     vTaskStartScheduler();
 }
