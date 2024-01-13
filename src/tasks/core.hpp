@@ -21,7 +21,6 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/zranger.hpp>
 
 #include <crossplatform.h>
 #include <hackflight.hpp>
@@ -36,7 +35,6 @@ class CoreTask : public FreeRTOSTask {
 
         // Shared with logger or params
         vehicleState_t vehicleState;
-        ZRangerTask zrangerTask;
 
         void begin(
                 const float rollCalibration,
@@ -56,8 +54,6 @@ class CoreTask : public FreeRTOSTask {
             _estimatorTask = estimatorTask;
 
             safety->init();
-
-            zrangerTask.begin(vl53l1, estimatorTask);
 
             _imuTask.begin(estimatorTask, rollCalibration, pitchCalibration);
 

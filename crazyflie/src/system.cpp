@@ -29,10 +29,11 @@
 #include <tasks/usblink.hpp>
 
 // Cross-platform tasks
+#include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/flowdeck.hpp>
 #include <tasks/imu.hpp>
-#include <tasks/core.hpp>
+#include <tasks/zranger.hpp>
 
 #include <commander.hpp>
 #include <config.h>
@@ -62,6 +63,7 @@ Safety safety;
 CoreTask coreTask;
 EstimatorTask estimatorTask;
 FlowDeckTask flowDeckTask;
+ZRangerTask zrangerTask;
 
 Commander commander;
 PowerMonitorTask powerMonitorTask;
@@ -339,6 +341,8 @@ static void systemTask(void *arg)
     estimatorTask.begin(&safety);
 
     flowDeckTask.begin(PIN_FLOWDECK_CS, &estimatorTask);
+
+    zrangerTask.begin(&vl53l1, &estimatorTask);
 
     coreTask.begin(
             configBlock.getCalibRoll(), 
