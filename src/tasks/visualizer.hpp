@@ -87,19 +87,8 @@ class VisualizerTask : public FreeRTOSTask {
 
                 case 108: // ESTIMATOR
                     {
-                        static int16_t phi;
-                        static int8_t dir;
-
-                        dir = 
-                            dir == 0 ? +1 : 
-                            phi == +450 ? -1 :
-                            phi == -450 ? +1 :
-                            dir;
-
-                        phi += dir;
-
-                        const int16_t angles[3] = {phi, 0, 0};
-
+                       int16_t angles[3] = {};
+                       _estimatorTask->getEulerAngles(angles);
                         serializeShorts(108, angles, 3);
                     } 
                     return true;
