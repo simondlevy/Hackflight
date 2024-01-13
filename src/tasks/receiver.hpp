@@ -12,7 +12,7 @@ class ReceiverTask : public FreeRTOSTask {
         {
             pinMode(LED_BUILTIN, OUTPUT);
 
-            FreeRTOSTask::begin(run, "ReceiverTask", this, 2);
+            FreeRTOSTask::begin(run, "receiever", this, 2);
         }
 
     private:
@@ -24,7 +24,7 @@ class ReceiverTask : public FreeRTOSTask {
 
         void run(void)
         {
-            consolePrintf("ReceiverTask: running\n");
+            consolePrintf("RECEIVER: running\n");
 
             while (true) {
 

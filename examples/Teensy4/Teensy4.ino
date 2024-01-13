@@ -21,12 +21,14 @@
 #include <task.h>
 
 #include <hfheader.h>
-#include <visualizer.hpp>
+#include <tasks/guestimator.hpp>
 #include <tasks/receiver.hpp>
 #include <tasks/visualizer.hpp>
 
 void setup() 
 {
+    static EstimatorTask estimatorTask;
+
     static ReceiverTask receiverTask;
 
     static VisualizerTask visualizerTask;
@@ -37,7 +39,7 @@ void setup()
 
     receiverTask.begin();
 
-    visualizerTask.begin(&receiverTask);
+    visualizerTask.begin(&estimatorTask, &receiverTask);
 
     vTaskStartScheduler();
 }

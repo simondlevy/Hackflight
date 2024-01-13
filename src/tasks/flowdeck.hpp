@@ -45,7 +45,7 @@ class FlowDeckTask : public FreeRTOSTask {
 
             if (_pmw3901.begin(csPin)) {
 
-                FreeRTOSTask::begin(runFlowdeckTask, "FLOW", this, 3);
+                FreeRTOSTask::begin(runFlowdeckTask, "flow", this, 3);
 
                 didInit = true;
             }

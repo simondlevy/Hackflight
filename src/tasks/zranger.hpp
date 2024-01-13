@@ -39,7 +39,7 @@ class ZRangerTask : public FreeRTOSTask {
 
             _estimatorTask = estimatorTask;
 
-            FreeRTOSTask::begin(runZrangerTask, "ZRANGER2", this, 2);
+            FreeRTOSTask::begin(runZrangerTask, "zranger2", this, 2);
 
             // pre-compute constant in the measurement noise model for kalman
             _expCoeff = logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);

@@ -3,17 +3,19 @@
 #include <console.h>
 #include <task.hpp>
 #include <tasks/receiver.hpp>
+#include <tasks/guestimator.hpp>
 #include <visualizer.hpp>
 
 class VisualizerTask : public FreeRTOSTask {
 
     public:
 
-        void begin(ReceiverTask * receiverTask)
+        void begin(EstimatorTask * estimatorTask, ReceiverTask * receiverTask)
         {
             _receiverTask = receiverTask;
+            _estimatorTask = estimatorTask;
 
-            FreeRTOSTask::begin(run, "VISUALIZER", this, 2);
+            FreeRTOSTask::begin(run, "visualizer", this, 2);
         }
 
     private:
@@ -25,12 +27,12 @@ class VisualizerTask : public FreeRTOSTask {
 
         Visualizer _visualizer;
 
+        EstimatorTask * _estimatorTask;
+
         ReceiverTask * _receiverTask;
 
         void run(void)
         {
-            consolePrintf("CORE: Starting loop\n");
-
             while (true) {
 
                 while (Serial.available()) {

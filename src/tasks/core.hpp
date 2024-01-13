@@ -81,7 +81,7 @@ class CoreTask : public FreeRTOSTask {
 
             motorsInit();
 
-            FreeRTOSTask::begin(runCoreTask, "CORE", this, 5);
+            FreeRTOSTask::begin(runCoreTask, "core", this, 5);
         }
 
         bool test(void)

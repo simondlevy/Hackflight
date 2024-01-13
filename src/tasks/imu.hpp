@@ -105,7 +105,7 @@ class ImuTask : public FreeRTOSTask {
 
             magQueue = makeImuQueue(magQueueStorage, &magQueueBuffer);
 
-            FreeRTOSTask::begin(runImuTask, "IMU", this, 4);
+            FreeRTOSTask::begin(runImuTask, "imu", this, 4);
 
             didInit = true;
         }
