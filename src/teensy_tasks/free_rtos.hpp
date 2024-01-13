@@ -17,6 +17,8 @@
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <FreeRTOS_TEENSY4.h>
 #include <task.h>
 

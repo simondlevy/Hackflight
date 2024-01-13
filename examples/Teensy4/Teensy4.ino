@@ -23,9 +23,14 @@
 #include <hfheader.h>
 #include <visualizer.hpp>
 
-#include "task.hpp"
+#include <teensy_tasks/free_rtos/core.hpp>
+#include <teensy_tasks/free_rtos/estimator.hpp>
 
 static Visualizer visualizer;
+
+static CoreTask coreTask;
+
+static EstimatorTask estimatorTask;
 
 void serialEvent(void)
 {
@@ -41,75 +46,15 @@ void serialEvent(void)
     }
 }
 
-class Task1 : public FreeRTOSTask {
-
-    public:
-
-        static void fun(void * obj)
-        {
-            ((Task1 *)obj)->run();
-        }
-
-        void run(void) {
-
-            while (true) {
-
-                static uint32_t prev;
-                auto msec = millis();
-
-                if (msec - prev > 500) {
-
-                    static bool ledOn;
-
-                    digitalWriteFast(LED_BUILTIN, ledOn);
-
-                    ledOn = !ledOn;
-
-                    prev = msec;
-                }
-
-                vTaskDelay(1);
-            }
-        }
-};
-
-
-class Task2 : public FreeRTOSTask {
-
-    public:
-
-        static void fun(void * obj)
-        {
-            ((Task2 *)obj)->run();
-        }
-
-        void run(void) {
-
-            while (true) {
-
-                Serial.println("TICK");
-                vTaskDelay(pdMS_TO_TICKS(1'000));
-
-                Serial.println("TOCK");
-                vTaskDelay(pdMS_TO_TICKS(1'000));
-
-                vTaskDelay(1);
-            }
-        }
-};
-
-
 void setup() 
 {
     Serial.begin(115200);
 
     pinMode(LED_BUILTIN, OUTPUT);
 
-    static Task1 task1obj;
-    FreeRTOSTask::create(&task1obj, Task1::fun, "task1", 2);
+    FreeRTOSTask::create(&coreTask, CoreTask::fun, "CORE", 2);
 
-    static Task2 task2obj;
-    FreeRTOSTask::create(&task2obj, Task2::fun, "task2", 2);
+    FreeRTOSTask::create(&estimatorTask, EstimatorTask::fun, "ESTIMATOR", 2);
 
     vTaskStartScheduler();
 }
