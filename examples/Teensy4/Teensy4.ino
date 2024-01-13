@@ -23,14 +23,7 @@
 #include <hfheader.h>
 #include <visualizer.hpp>
 
-#include <teensy_tasks/free_rtos/core.hpp>
-#include <teensy_tasks/free_rtos/estimator.hpp>
-
 static Visualizer visualizer;
-
-static CoreTask coreTask;
-
-static EstimatorTask estimatorTask;
 
 void serialEvent(void)
 {
@@ -46,15 +39,52 @@ void serialEvent(void)
     }
 }
 
+static void task1(void*) 
+{
+
+    while (true) {
+
+        static uint32_t prev;
+        auto msec = millis();
+
+        if (msec - prev > 500) {
+
+            static bool ledOn;
+
+            digitalWriteFast(LED_BUILTIN, ledOn);
+        
+            ledOn = !ledOn;
+
+            prev = msec;
+        }
+
+        vTaskDelay(1);
+    }
+}
+
+static void task2(void*) 
+{
+
+    while (true) {
+
+        Serial.println("TICK");
+        vTaskDelay(pdMS_TO_TICKS(1'000));
+
+        Serial.println("TOCK");
+        vTaskDelay(pdMS_TO_TICKS(1'000));
+    }
+}
+
+
 void setup() 
 {
     Serial.begin(115200);
 
     pinMode(LED_BUILTIN, OUTPUT);
 
-    FreeRTOSTask::create(&coreTask, CoreTask::fun, "CORE", 2);
+    xTaskCreate(task1, "task1", 128, nullptr, 2, nullptr);
 
-    FreeRTOSTask::create(&estimatorTask, EstimatorTask::fun, "ESTIMATOR", 2);
+    xTaskCreate(task2, "task2", 128, nullptr, 2, nullptr);
 
     vTaskStartScheduler();
 }
