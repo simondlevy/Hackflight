@@ -63,7 +63,6 @@ static void task2(void*)
             }
         }
 
-        vTaskDelay(1);
     }
 }
 
