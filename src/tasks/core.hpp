@@ -34,7 +34,8 @@ class CoreTask : public FreeRTOSTask {
         // Shared with logger or params
         vehicleState_t vehicleState;
 
-        void begin(
+        // Called from main program; returns true on success, false on failure
+        bool begin(
                 Safety * safety,
                 EstimatorTask * estimatorTask,
                 ImuTask * imuTask,
@@ -42,7 +43,7 @@ class CoreTask : public FreeRTOSTask {
                 const mixFun_t mixFun)
         {
             if (didInit) {
-                return;
+                return true;
             }
 
             _safety = safety;
@@ -67,10 +68,7 @@ class CoreTask : public FreeRTOSTask {
             motorsInit();
 
             FreeRTOSTask::begin(runCoreTask, "core", this, 5);
-        }
-
-        bool test(void)
-        {
+        
             auto pass = true;
 
             pass &= _imuTask->test();
@@ -80,6 +78,7 @@ class CoreTask : public FreeRTOSTask {
             return pass;
         }
 
+        // Called from crtp_commander_openloop
         void resetControllers(void)
         {
             _hackflight.resetControllers();

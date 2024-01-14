@@ -351,7 +351,7 @@ static void systemTask(void *arg)
             configBlock.getCalibRoll(), 
             configBlock.getCalibPitch());
 
-    coreTask.begin(
+    auto coreTaskReady = coreTask.begin(
             &safety,
             &estimatorTask,
             &imuTask,
@@ -384,9 +384,10 @@ static void systemTask(void *arg)
         pass = false;
         consolePrintf("SYSTEM: commander [FAIL]\n");
     }
-    if (!coreTask.test()) {
+
+    if (!coreTaskReady) {
         pass = false;
-        consolePrintf("SYSTEM: stabilizer [FAIL]\n");
+        consolePrintf("SYSTEM: core task [FAIL]\n");
     }
 
     if (!crtpMemDidInit) {

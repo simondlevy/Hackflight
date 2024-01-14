@@ -31,6 +31,7 @@ class ImuTask : public FreeRTOSTask {
 
     public:
 
+        // Called from main program
         void begin(
                 EstimatorTask * estimatorTask, 
                 const float calibRoll,
@@ -66,6 +67,7 @@ class ImuTask : public FreeRTOSTask {
             didInit = true;
         }
 
+        // Called by platform-specific IMU interrupt
         void dataAvailableCallback(void)
         {
             portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
@@ -77,6 +79,7 @@ class ImuTask : public FreeRTOSTask {
             }
         }
 
+        // Called by core task
         bool test(void)
         {
             bool testStatus = true;
@@ -93,14 +96,17 @@ class ImuTask : public FreeRTOSTask {
             return testStatus;
         }
 
+        // Called by core task
         bool areCalibrated() {
             return gyroBiasFound;
         }
 
+        // Called by core task
         void waitDataReady(void) {
             xSemaphoreTake(dataReady, portMAX_DELAY);
         }
 
+        // Called by core task
         void acquire(sensorData_t *sensors)
         {
             xQueueReceive(gyroQueue, &sensors->gyro, 0);
@@ -461,14 +467,6 @@ class ImuTask : public FreeRTOSTask {
         }
 
 
-        // Hardware-dependent
-        bool gyroSelfTest();
-        void deviceInit(void); 
-        void readGyro(Axis3i16* dataOut);
-        void readAccel(Axis3i16* dataOut);
-
-        //////////////////////////////////////////////////////////////////////////
-
         static void runImuTask(void *obj)
         {
             ((ImuTask *)obj)->run();
@@ -528,4 +526,10 @@ class ImuTask : public FreeRTOSTask {
                 vTaskDelay(1);
             }
         }
+
+        // Hardware-dependent
+        bool gyroSelfTest();
+        void deviceInit(void); 
+        void readGyro(Axis3i16* dataOut);
+        void readAccel(Axis3i16* dataOut);
 };
