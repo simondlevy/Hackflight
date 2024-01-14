@@ -255,6 +255,9 @@ class EstimatorTask : public FreeRTOSTask {
 
                 // would be nice if this had a precision higher than 1ms...
                 nextPredictionMs = step(msec(), nextPredictionMs);
+
+                vTaskDelay(1);
+
             }
         }
 

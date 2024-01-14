@@ -47,7 +47,7 @@ void setup()
 
     receiverTask.begin();
 
-    // estimatorTask.begin(&safety);
+    estimatorTask.begin(&safety);
 
     //imuTask.begin(&estimatorTask, 0, 0);
 
