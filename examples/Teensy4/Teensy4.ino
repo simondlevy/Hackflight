@@ -20,6 +20,8 @@
 #include <FreeRTOS_TEENSY4.h>
 #include <task.h>
 
+#include <Wire.h>
+
 #include <hfheader.h>
 #include <safety.hpp>
 
@@ -40,6 +42,10 @@ void setup()
     static VisualizerTask visualizerTask;
 
     static Safety safety;
+
+    Wire.begin(); 
+    Wire.setClock(400000); 
+    delay(100);
 
     Serial.begin(115200);
 

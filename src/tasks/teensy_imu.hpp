@@ -46,6 +46,13 @@ class ImuTask : public FreeRTOSTask {
             accScaleFound = false;
             accScaleSumCount = 0;
 
+            // Wait for sensors to startup
+            vTaskDelay(M2T(STARTUP_TIME_MS));
+
+            initGyroBias();
+
+            deviceInit();
+
             FreeRTOSTask::begin(runImuTask, "imu", this, 3);
 
             didInit = true;
