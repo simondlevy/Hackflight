@@ -53,6 +53,14 @@ class ImuTask : public FreeRTOSTask {
 
             deviceInit();
 
+            calibrate(calibRoll, calibPitch);
+
+            accelQueue = makeImuQueue(accelQueueStorage, &accelQueueBuffer);
+
+            gyroQueue = makeImuQueue(gyroQueueStorage, &gyroQueueBuffer);
+
+            magQueue = makeImuQueue(magQueueStorage, &magQueueBuffer);
+
             FreeRTOSTask::begin(runImuTask, "imu", this, 3);
 
             didInit = true;
