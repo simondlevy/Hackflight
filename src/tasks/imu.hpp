@@ -237,6 +237,7 @@ class ImuTask : public FreeRTOSTask {
 
         EstimatorTask * _estimatorTask;
 
+
         /**
          * Checks if the variances is below the predefined thresholds.
          * The bias value should have been added before calling this.
@@ -459,6 +460,15 @@ class ImuTask : public FreeRTOSTask {
             return accScaleFound;
         }
 
+
+        // Hardware-dependent
+        bool gyroSelfTest();
+        void deviceInit(void); 
+        void readGyro(Axis3i16* dataOut);
+        void readAccel(Axis3i16* dataOut);
+
+        //////////////////////////////////////////////////////////////////////////
+
         static void runImuTask(void *obj)
         {
             ((ImuTask *)obj)->run();
@@ -517,10 +527,4 @@ class ImuTask : public FreeRTOSTask {
             }
         }
 
-
-        // Hardware-dependent
-        bool gyroSelfTest();
-        void deviceInit(void); 
-        void readGyro(Axis3i16* dataOut);
-        void readAccel(Axis3i16* dataOut);
 };
