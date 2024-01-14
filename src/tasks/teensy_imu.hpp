@@ -424,6 +424,8 @@ class ImuTask : public FreeRTOSTask {
 
         void run(void)
         {
+            systemWaitStart();
+
             while (true) {
 
                 Axis3f gyroScaledIMU;
@@ -443,6 +445,27 @@ class ImuTask : public FreeRTOSTask {
                             gyroRaw.x, gyroRaw.y, gyroRaw.z, 
                             &gyroBias);
 
+                    // Gyro
+                    gyroScaledIMU.x =  
+                        (gyroRaw.x - gyroBias.x) * DEG_PER_LSB;
+                    gyroScaledIMU.y =  
+                        (gyroRaw.y - gyroBias.y) * DEG_PER_LSB;
+                    gyroScaledIMU.z =  
+                        (gyroRaw.z - gyroBias.z) * DEG_PER_LSB;
+
+                    alignToAirframe(&gyroScaledIMU, &data.gyro);
+                    applyGyroLpf(&data.gyro);
+                    _estimatorTask->enqueueGyro(&data.gyro, hal_isInInterrupt());
+
+                    // Acelerometer
+                    accScaledIMU.x = accelRaw.x * G_PER_LSB / accScale;
+                    accScaledIMU.y = accelRaw.y * G_PER_LSB / accScale;
+                    accScaledIMU.z = accelRaw.z * G_PER_LSB / accScale;
+
+                    alignToAirframe(&accScaledIMU, &accScaled);
+                    accAlignToGravity(&accScaled, &data.acc);
+                    applyAccelLpf(&data.acc);
+                    _estimatorTask->enqueueAccel(&data.acc, hal_isInInterrupt());
                 }
 
                 xSemaphoreGive(dataReady);
