@@ -40,7 +40,7 @@ class ImuTask : public FreeRTOSTask {
                 return;
             }
 
-            FreeRTOSTask::begin(runImuTask, "imu", this, 4);
+            FreeRTOSTask::begin(runImuTask, "imu", this, 3);
 
             didInit = true;
         }
@@ -68,13 +68,16 @@ class ImuTask : public FreeRTOSTask {
         volatile uint64_t interruptTimestamp;
 
         xSemaphoreHandle sensorsDataReady;
+        xSemaphoreHandle dataReady;
  
         void run(void)
         {
             while (true) {
 
-                //if (pdTRUE == xSemaphoreTake(sensorsDataReady, portMAX_DELAY)) {
-                //}
+                if (pdTRUE == xSemaphoreTake(sensorsDataReady, portMAX_DELAY)) {
+                }
+
+                xSemaphoreGive(dataReady);
 
                 vTaskDelay(1);
 
