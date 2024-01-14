@@ -12,7 +12,7 @@ class ReceiverTask : public FreeRTOSTask {
         {
             pinMode(LED_BUILTIN, OUTPUT);
 
-            FreeRTOSTask::begin(run, "receiever", this, 5);
+            FreeRTOSTask::begin(run, "receiever", this, 4);
         }
 
         void getRawChannelValues(int16_t chanvals[6])

@@ -36,7 +36,7 @@ class VisualizerTask : public FreeRTOSTask {
 
             _estimatorTask = estimatorTask;
 
-            FreeRTOSTask::begin(run, "visualizer", this, 5);
+            FreeRTOSTask::begin(run, "visualizer", this, 4);
         }
 
     private:
