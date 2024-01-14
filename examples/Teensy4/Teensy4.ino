@@ -25,13 +25,23 @@
 #include <hfheader.h>
 #include <safety.hpp>
 
+#include <mixers/quadrotor.hpp>
+
+#include <tasks/core.hpp>
 #include <tasks/estimator.hpp>
 #include <tasks/imu.hpp>
 #include <tasks/receiver.hpp>
 #include <tasks/visualizer.hpp>
 
+static void getOpenLoopDemands(
+        demands_t & demands, uint32_t & timestamp, bool & inHoverMode)
+{
+}
+
 void setup() 
 {
+
+    static CoreTask coreTask;
 
     static EstimatorTask estimatorTask;
 
@@ -56,6 +66,13 @@ void setup()
     estimatorTask.begin(&safety);
 
     imuTask.begin(&estimatorTask, 0, 0);
+
+    coreTask.begin(
+            &safety,
+            &estimatorTask,
+            &imuTask,
+            getOpenLoopDemands,
+            mixQuadrotor);
 
     visualizerTask.begin(&estimatorTask, &receiverTask);
 

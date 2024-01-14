@@ -203,6 +203,8 @@ class CoreTask : public FreeRTOSTask {
                 }
 
                 // motorsCheckDshot();
+
+                vTaskDelay(1);
             }
         }
 };
