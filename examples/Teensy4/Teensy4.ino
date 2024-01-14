@@ -26,7 +26,7 @@
 #include <safety.hpp>
 
 #include <tasks/estimator.hpp>
-#include <tasks/teensy_imu.hpp>
+#include <tasks/imu.hpp>
 #include <tasks/receiver.hpp>
 #include <tasks/visualizer.hpp>
 

@@ -61,7 +61,7 @@ class ImuTask : public FreeRTOSTask {
 
             magQueue = makeImuQueue(magQueueStorage, &magQueueBuffer);
 
-            FreeRTOSTask::begin(runImuTask, "imu", this, 4);
+            FreeRTOSTask::begin(runImuTask, "imu", this, 3);
 
             didInit = true;
         }
@@ -524,7 +524,8 @@ class ImuTask : public FreeRTOSTask {
                 xQueueOverwrite(gyroQueue, &data.gyro);
 
                 xSemaphoreGive(dataReady);
+
+                vTaskDelay(1);
             }
         }
-
 };
