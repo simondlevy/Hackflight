@@ -1,3 +1,4 @@
+#if 0
 #include <Wire.h>
 
 #include <usfs.hpp>
@@ -77,3 +78,4 @@ void ImuTask::readAccel(Axis3i16* dataOut)
         usfs.readAccelerometerRaw((int16_t *)dataOut);
     }*/
 }
+#endif
