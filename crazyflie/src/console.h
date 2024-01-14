@@ -18,6 +18,8 @@
 
 #include <stdarg.h>
 
+int consolePrintf(const char * fmt, ...);
+
 void consoleInit(void);
 
 bool consoleTest(void);
