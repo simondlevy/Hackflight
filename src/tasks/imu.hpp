@@ -478,11 +478,11 @@ class ImuTask : public FreeRTOSTask {
 
                     data.interruptTimestamp = interruptTimestamp;
 
-                    /* get data from chosen sensors */
+                    // Get data from chosen sensors 
                     readGyro(&gyroRaw);
                     readAccel(&accelRaw);
 
-                    /* calibrate if necessary */
+                    // Calibrate if necessary */
                     gyroBiasFound = processGyroBias(xTaskGetTickCount(),
                             gyroRaw.x, gyroRaw.y, gyroRaw.z, 
                             &gyroBias);

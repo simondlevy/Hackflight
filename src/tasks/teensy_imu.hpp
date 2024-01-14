@@ -59,22 +59,43 @@ class ImuTask : public FreeRTOSTask {
 
     private:
 
-
         static void runImuTask(void *obj)
         {
             ((ImuTask *)obj)->run();
         }
 
+        bool gyroBiasFound;
+        sensorData_t data;
+        Axis3i16 gyroRaw;
+        Axis3i16 accelRaw;
+        Axis3f gyroBias;
+        float accScale;
+        bool accScaleFound;
+        uint32_t accScaleSumCount;
         volatile uint64_t interruptTimestamp;
 
         xSemaphoreHandle sensorsDataReady;
+        StaticSemaphore_t sensorsDataReadyBuffer;
         xSemaphoreHandle dataReady;
+        StaticSemaphore_t dataReadyBuffer;
+
  
         void run(void)
         {
             while (true) {
 
+                Axis3f gyroScaledIMU;
+                Axis3f accScaledIMU;
+                Axis3f accScaled;
+
                 if (pdTRUE == xSemaphoreTake(sensorsDataReady, portMAX_DELAY)) {
+
+                    data.interruptTimestamp = interruptTimestamp;
+
+                    // Get data from chosen sensors 
+                    readGyro(&gyroRaw);
+                    readAccel(&accelRaw);
+
                 }
 
                 xSemaphoreGive(dataReady);
