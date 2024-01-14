@@ -12,7 +12,7 @@ class ReceiverTask : public FreeRTOSTask {
         {
             pinMode(LED_BUILTIN, OUTPUT);
 
-            FreeRTOSTask::begin(run, "receiever", this, 2);
+            FreeRTOSTask::begin(run, "receiever", this, 5);
         }
 
         void getRawChannelValues(int16_t chanvals[6])
@@ -57,7 +57,7 @@ class ReceiverTask : public FreeRTOSTask {
 
                     static bool toggle;
 
-                    digitalWrite(LED_BUILTIN, toggle);
+                    digitalWriteFast(LED_BUILTIN, toggle);
 
                     toggle = !toggle;
 

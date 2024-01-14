@@ -24,12 +24,16 @@
 #include <safety.hpp>
 
 #include <tasks/estimator.hpp>
+#include <tasks/imu.hpp>
 #include <tasks/receiver.hpp>
 #include <tasks/visualizer.hpp>
 
 void setup() 
 {
+
     static EstimatorTask estimatorTask;
+
+    //static ImuTask imuTask;
 
     static ReceiverTask receiverTask;
 
@@ -43,7 +47,9 @@ void setup()
 
     receiverTask.begin();
 
-    estimatorTask.begin(&safety);
+    // estimatorTask.begin(&safety);
+
+    //imuTask.begin(&estimatorTask, 0, 0);
 
     visualizerTask.begin(&estimatorTask, &receiverTask);
 

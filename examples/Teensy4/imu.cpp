@@ -36,6 +36,7 @@ static void interruptHandler()
 
 void ImuTask::deviceInit(void)
 {
+    /*
     _imuTask = this;
 
     usfs.loadFirmware(VERBOSE); 
@@ -56,21 +57,23 @@ void ImuTask::deviceInit(void)
     attachInterrupt(INTERRUPT_PIN, interruptHandler, RISING);  
 
     // Clear interrupts
-    Usfs::checkStatus();
+    Usfs::checkStatus();*/
 }
 
 void ImuTask::readGyro(Axis3i16* dataOut)
 {
+    /*
     if (Usfs::eventStatusIsGyrometer(Usfs::checkStatus())) {
 
         usfs.readGyrometerRaw((int16_t *)dataOut);
-    }
+    }*/
 }
 
 void ImuTask::readAccel(Axis3i16* dataOut)
 {
+    /*
     if (Usfs::eventStatusIsAccelerometer(Usfs::checkStatus())) {
 
         usfs.readAccelerometerRaw((int16_t *)dataOut);
-    }
+    }*/
 }

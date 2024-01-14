@@ -338,7 +338,7 @@ static void systemTask(void *arg)
         consolePrintf("ZRANGER: Z-down sensor [FAIL]\n");
     }
 
-    // Launch the cross-platform tasks
+    // Launch the cross-platform tasks ---------------------------------------
 
     estimatorTask.begin(&safety);
 
@@ -357,6 +357,8 @@ static void systemTask(void *arg)
             &imuTask,
             getOpenLoopDemands,
             mixQuadrotor);
+
+    // -----------------------------------------------------------------------
 
     systemRequestNRFVersion();
 

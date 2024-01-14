@@ -36,7 +36,7 @@ class VisualizerTask : public FreeRTOSTask {
 
             _estimatorTask = estimatorTask;
 
-            FreeRTOSTask::begin(run, "visualizer", this, 2);
+            FreeRTOSTask::begin(run, "visualizer", this, 5);
         }
 
     private:
@@ -54,6 +54,8 @@ class VisualizerTask : public FreeRTOSTask {
 
         void run(void)
         {
+            consolePrintf("VISUALIZER: running\n");
+
             while (true) {
 
                 while (Serial.available()) {
@@ -66,7 +68,6 @@ class VisualizerTask : public FreeRTOSTask {
                         }
                     }
                 }
-
             }
         }
 
