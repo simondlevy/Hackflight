@@ -1,6 +1,6 @@
-SKETCH = Transmitter
+SKETCH = Receiver
 
-PORT = /dev/ttyUSB0
+PORT = /dev/ttyACM0
 
 LIB = $(HOME)/Documents/Arduino/libraries
 
