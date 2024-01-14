@@ -468,6 +468,9 @@ class ImuTask : public FreeRTOSTask {
                     _estimatorTask->enqueueAccel(&data.acc, hal_isInInterrupt());
                 }
 
+                xQueueOverwrite(accelQueue, &data.acc);
+                xQueueOverwrite(gyroQueue, &data.gyro);
+
                 xSemaphoreGive(dataReady);
 
                 vTaskDelay(1);
