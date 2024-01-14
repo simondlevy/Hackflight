@@ -22,7 +22,7 @@
 
 #include <Wire.h>
 
-#include <hfheader.h>
+#include <hackflight.hpp>
 #include <safety.hpp>
 
 #include <mixers/quadrotor.hpp>
