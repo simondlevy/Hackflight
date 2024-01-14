@@ -8,14 +8,25 @@ con = get_controller()
 
 while True:
 
-    con.update()
+    try:
 
-    chanvals = (int(500 * c + 1500) for c in 
-             (con.getThrottle(),
-             con.getRoll(),
-             con.getPitch(),
-             con.getYaw(),
-             con.getAux(),
-             0))
+        con.update()
 
-    print(list(chanvals))
+        chanvals = (int(500 * c + 1500) for c in 
+                 (con.getThrottle(),
+                 con.getRoll(),
+                 con.getPitch(),
+                 con.getYaw(),
+                 con.getAux(),
+                 0))
+
+        msg = MspParser.serialize_SET_RAW_RC(*chanvals)
+
+        print(msg)
+
+    except KeyboardInterrupt:
+
+        # XXX should send shutdown message
+
+        break
+
