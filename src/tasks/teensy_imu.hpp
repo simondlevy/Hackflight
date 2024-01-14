@@ -51,10 +51,9 @@ class ImuTask : public FreeRTOSTask {
             interruptTimestamp = micros();
             xSemaphoreGiveFromISR(sensorsDataReady, &xHigherPriorityTaskWoken);
 
-            /*
             if (xHigherPriorityTaskWoken) {
                 portYIELD();
-            }*/
+            }
         }
 
 
