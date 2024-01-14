@@ -2,20 +2,20 @@
 
 from pysticks import get_controller
 
+from mspparser import MspParser
+
 con = get_controller()
 
 while True:
 
     con.update()
 
-    print(('Throttle: %+2.2f   Roll: %+2.2f   Pitch: %+2.2f   ' +
-           'Yaw: %+2.2f   Aux: %+2.2f') %
-          (
-             con.getThrottle(),
+    chanvals = (int(500 * c + 1500) for c in 
+             (con.getThrottle(),
              con.getRoll(),
              con.getPitch(),
              con.getYaw(),
-             con.getAux()),
-          end='\r')
+             con.getAux(),
+             0))
 
-
+    print(list(chanvals))
