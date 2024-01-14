@@ -55,7 +55,6 @@ void ImuTask::deviceInit(void)
 
     attachInterrupt(INTERRUPT_PIN, interruptHandler, RISING);  
 
-    // Clear interrupts
     Usfs::checkStatus();
 }
 
@@ -73,4 +72,9 @@ void ImuTask::readAccel(Axis3i16* dataOut)
 
         usfs.readAccelerometerRaw((int16_t *)dataOut);
     }
+}
+
+bool ImuTask::gyroSelfTest(void)
+{
+    return true;
 }

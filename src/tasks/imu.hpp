@@ -21,6 +21,7 @@
 #include <task.hpp>
 #include <tasks/estimator.hpp>
 
+#include <console.h>
 #include <crossplatform.h>
 #include <lpf.hpp>
 #include <num.hpp>
@@ -475,6 +476,8 @@ class ImuTask : public FreeRTOSTask {
         void run(void)
         {
             systemWaitStart();
+
+            consolePrintf("IMU: starting loop\n");
 
             while (true) {
 
