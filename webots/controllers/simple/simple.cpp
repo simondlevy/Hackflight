@@ -89,17 +89,17 @@ static vehicleState_t getVehicleState(
     //   y: positive leftward
     //   z: positive upward
     //   phi, dphi: positive roll right
-    //   theta,dtheta: positive nose up
+    //   theta,dtheta: positive nose up (requires negating imu, gyro)
     //   psi,dpsi: positive nose left
     const float x = wb_gps_get_values(gps)[0];
     const float y = wb_gps_get_values(gps)[1];
     const float z = wb_gps_get_values(gps)[2];
-    const float phi =    rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[0]);
-    const float dphi =   rad2deg(wb_gyro_get_values(gyro)[0]);
-    const float theta = -rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[1]);
-    const float dtheta = -rad2deg(wb_gyro_get_values(gyro)[1]);
-    const float psi =    rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[2]);
-    const float dpsi =   rad2deg(wb_gyro_get_values(gyro)[2]);
+    const float phi =     rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[0]);
+    const float dphi =    rad2deg(wb_gyro_get_values(gyro)[0]);
+    const float theta =  -rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[1]);
+    const float dtheta = -rad2deg(wb_gyro_get_values(gyro)[1]); 
+    const float psi =     rad2deg(wb_inertial_unit_get_roll_pitch_yaw(imu)[2]);
+    const float dpsi =    rad2deg(wb_gyro_get_values(gyro)[2]);
 
     // Use temporal first difference to get world-cooredinate velocities
     const float dx = (x - xprev) / dt;

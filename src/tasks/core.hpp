@@ -160,9 +160,7 @@ class CoreTask : public FreeRTOSTask {
                 _estimatorTask->getVehicleState(&vehicleState);
 
                 // Get state vector angular velocities directly from gyro
-                vehicleState.dphi =    sensorData.gyro.x;     
-                vehicleState.dtheta = -sensorData.gyro.y; // (negate for ENU)
-                vehicleState.dpsi =    sensorData.gyro.z; 
+                Hackflight::gyroToVehicleState(sensorData.gyro, vehicleState);
 
                 const auto areMotorsAllowedToRun = _safety->areMotorsAllowedToRun();
 

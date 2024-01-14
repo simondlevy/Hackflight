@@ -161,6 +161,14 @@ class Hackflight {
             _positionController.resetFilters();
         }
 
+        static void gyroToVehicleState(
+                const Axis3f & gyro, vehicleState_t & vehicleState)
+        {
+            vehicleState.dphi =    gyro.x;     
+            vehicleState.dtheta = -gyro.y; // (negate for ENU)
+            vehicleState.dpsi =    gyro.z; 
+        }
+
     private:
 
         float _thrustScale;
@@ -216,7 +224,7 @@ class Hackflight {
                 float thrustCappedUpper = uncapped[k] - reduction;
                 motorvals[k] = capMinThrust(thrustCappedUpper);
             }
-         }
+        }
 
         static uint16_t capMinThrust(float thrust) 
         {

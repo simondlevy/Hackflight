@@ -525,8 +525,6 @@ class ImuTask : public FreeRTOSTask {
                 xQueueOverwrite(gyroQueue, &data.gyro);
 
                 xSemaphoreGive(dataReady);
-
-                vTaskDelay(1);
             }
         }
 
