@@ -86,9 +86,7 @@ class LadybugFC {
         void step(std::vector<PidController *> pids, Mixer & mixer)
         {
             // Get state vector angular velocities directly from gyro
-            _state.dphi =    _gyro.x;     
-            _state.dtheta = -_gyro.y; // (negate for ENU)
-            _state.dpsi =    _gyro.z; 
+            Hackflight::gyroToVehicleState(_gyro, _state);
 
             if (_gotNewImuData) { 
 
