@@ -29,51 +29,7 @@
 
 class ImuTask : public FreeRTOSTask {
 
-    public: // Are are called from CoreTask
-
-        bool test(void)
-        {
-            bool testStatus = true;
-
-            if (!didInit) {
-                consolePrintf("IMU: Uninitialized\n");
-                testStatus = false;
-            }
-
-            if (! gyroSelfTest()) {
-                testStatus = false;
-            }
-
-            return testStatus;
-        }
-
-        bool areCalibrated() {
-            return gyroBiasFound;
-        }
-
-        void waitDataReady(void) {
-            xSemaphoreTake(dataReady, portMAX_DELAY);
-        }
-
-        void acquire(sensorData_t *sensors)
-        {
-            xQueueReceive(gyroQueue, &sensors->gyro, 0);
-            xQueueReceive(accelQueue, &sensors->acc, 0);
-            xQueueReceive(magQueue, &sensors->mag, 0);
-
-            sensors->interruptTimestamp = data.interruptTimestamp;
-        }
-
-        void dataAvailableCallback(void)
-        {
-            portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-            interruptTimestamp = micros();
-            xSemaphoreGiveFromISR(sensorsDataReady, &xHigherPriorityTaskWoken);
-
-            if (xHigherPriorityTaskWoken) {
-                portYIELD();
-            }
-        }
+    public:
 
         void begin(
                 EstimatorTask * estimatorTask, 
@@ -108,6 +64,50 @@ class ImuTask : public FreeRTOSTask {
             FreeRTOSTask::begin(runImuTask, "imu", this, 4);
 
             didInit = true;
+        }
+
+        void dataAvailableCallback(void)
+        {
+            portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+            interruptTimestamp = micros();
+            xSemaphoreGiveFromISR(sensorsDataReady, &xHigherPriorityTaskWoken);
+
+            if (xHigherPriorityTaskWoken) {
+                portYIELD();
+            }
+        }
+
+        bool test(void)
+        {
+            bool testStatus = true;
+
+            if (!didInit) {
+                consolePrintf("IMU: Uninitialized\n");
+                testStatus = false;
+            }
+
+            if (! gyroSelfTest()) {
+                testStatus = false;
+            }
+
+            return testStatus;
+        }
+
+        bool areCalibrated() {
+            return gyroBiasFound;
+        }
+
+        void waitDataReady(void) {
+            xSemaphoreTake(dataReady, portMAX_DELAY);
+        }
+
+        void acquire(sensorData_t *sensors)
+        {
+            xQueueReceive(gyroQueue, &sensors->gyro, 0);
+            xQueueReceive(accelQueue, &sensors->acc, 0);
+            xQueueReceive(magQueue, &sensors->mag, 0);
+
+            sensors->interruptTimestamp = data.interruptTimestamp;
         }
 
     private:
