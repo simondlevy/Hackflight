@@ -40,6 +40,12 @@ class ImuTask : public FreeRTOSTask {
                 return;
             }
 
+            _estimatorTask = estimatorTask;
+
+            accScale = 1;
+            accScaleFound = false;
+            accScaleSumCount = 0;
+
             FreeRTOSTask::begin(runImuTask, "imu", this, 3);
 
             didInit = true;
