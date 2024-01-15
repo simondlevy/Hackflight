@@ -68,12 +68,3 @@ void loop(void)
 {
     board.step(pids, mixer);
 }
-
-namespace std {
-    void __throw_bad_alloc() {
-        while (true) {
-            Serial.println("Unable to allocate memory");
-            delay(500);
-        }
-    }
-}
