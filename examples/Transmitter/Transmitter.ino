@@ -43,11 +43,9 @@ void loop(void)
 {
     const auto avail = Serial.available();
 
-    static uint8_t buf[1024];
+    static uint8_t buf[256];
 
     Serial.readBytes(buf, avail);
 
     esp_now_send(broadcastAddress, buf, avail);
-
-    delay(1);
 }
