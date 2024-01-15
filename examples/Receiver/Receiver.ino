@@ -15,6 +15,9 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
     if (msgtype) {
         Serial.println(msgtype);
     }
+
+    //auto c = incomingData[0];
+    //Serial.printf("%c%02X", c==0x24 ? '\n' : ' ', c);
 }
 
 static void error(const char * message)
@@ -45,4 +48,5 @@ void setup()
 
 void loop() 
 {
+    delay(1);
 }

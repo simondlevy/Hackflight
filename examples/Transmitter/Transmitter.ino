@@ -6,14 +6,6 @@
 // REPLACE WITH YOUR RECEIVER MAC Address
 static uint8_t broadcastAddress[] = {0xD4, 0xD4, 0xDA, 0x84, 0xD5, 0x0C};
 
-void serialEvent(void)
-{
-    while (Serial.available()) {
-        const uint8_t c = Serial.read();
-        esp_now_send(broadcastAddress, &c, 1);
-    }
-}
-
 static void error(const char * message)
 {
     while (true) {
@@ -49,5 +41,16 @@ void setup(void)
 
 void loop(void) 
 {
-    // Everything happens in serialEvent()
+    if (Serial.available()) {
+        uint8_t c = Serial.read();
+        esp_now_send(broadcastAddress, &c, 1);
+    }
+
+    delay(1);
+
+    /*
+       while (Serial.available()) {
+       const uint8_t c = Serial.read();
+       esp_now_send(broadcastAddress, &c, 1);
+       }*/
 }
