@@ -44,13 +44,6 @@ void loop(void)
     if (Serial.available()) {
         uint8_t c = Serial.read();
         esp_now_send(broadcastAddress, &c, 1);
+        delay(1);
     }
-
-    delay(1);
-
-    /*
-       while (Serial.available()) {
-       const uint8_t c = Serial.read();
-       esp_now_send(broadcastAddress, &c, 1);
-       }*/
 }

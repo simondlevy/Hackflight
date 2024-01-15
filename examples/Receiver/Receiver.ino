@@ -15,15 +15,12 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
     static uint32_t count;
 
     if (msgtype) {
-        count ++;
-    }
-
-    const auto msec = millis();
-    static uint32_t prev;
-    if (msec - prev > 1000) {
-        Serial.println(count);
-        count = 0;
-        prev = msec;
+        Serial.printf("%04d %04d %04d %04d %04d\n",
+                msp.parseShort(0),
+                msp.parseShort(1),
+                msp.parseShort(2),
+                msp.parseShort(3),
+                msp.parseShort(4));
     }
 }
 
@@ -55,5 +52,4 @@ void setup()
 
 void loop() 
 {
-    delay(1);
 }

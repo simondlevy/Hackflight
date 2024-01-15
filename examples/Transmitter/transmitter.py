@@ -3,12 +3,16 @@
 from serial import Serial
 from pysticks import get_controller
 from mspparser import MspParser
+from time import time
 
 PORT = '/dev/ttyUSB0'
 
 port = Serial(PORT, 115200)
 
 con = get_controller()
+
+prev = 0
+count = 0
 
 while True:
 
@@ -25,8 +29,6 @@ while True:
                  0))
 
         msg = MspParser.serialize_SET_RAW_RC(*chanvals)
-
-        print(msg)
 
         port.write(msg)
 
