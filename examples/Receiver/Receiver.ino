@@ -3,10 +3,18 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+#include <msp.hpp>
+
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) 
 {
-    Serial.println(incomingData[0], HEX);
+    static Msp msp;
+
+    auto msgtype = msp.parse(incomingData[0]);
+
+    if (msgtype) {
+        Serial.println(msgtype);
+    }
 }
 
 static void error(const char * message)
