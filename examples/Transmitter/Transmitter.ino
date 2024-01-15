@@ -6,26 +6,6 @@
 // REPLACE WITH YOUR RECEIVER MAC Address
 static uint8_t broadcastAddress[] = {0xD4, 0xD4, 0xDA, 0x84, 0xD5, 0x0C};
 
-// Structure example to send data
-// Must match the receiver structure
-typedef struct struct_message {
-    char a[32];
-    int b;
-    float c;
-    bool d;
-} struct_message;
-
-// Create a struct_message called myData
-static struct_message myData;
-
-static esp_now_peer_info_t peerInfo;
-
-// callback when data is sent
-static void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-    Serial.print("\r\nLast Packet Send Status:\t");
-    Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-}
-
 void serialEvent(void)
 {
     while (Serial.available()) {
@@ -55,11 +35,8 @@ void setup(void)
         error("Error initializing ESP-NOW");
     }
 
-    // Once ESPNow is successfully Init, we will register for Send CB to
-    // get the status of Trasnmitted packet
-    esp_now_register_send_cb(OnDataSent);
-
     // Register peer
+    static esp_now_peer_info_t peerInfo;
     memcpy(peerInfo.peer_addr, broadcastAddress, 6);
     peerInfo.channel = 0;
     peerInfo.encrypt = false;
