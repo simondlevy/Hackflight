@@ -41,9 +41,13 @@ void setup(void)
 
 void loop(void) 
 {
-    if (Serial.available()) {
-        uint8_t c = Serial.read();
-        esp_now_send(broadcastAddress, &c, 1);
-        delay(1);
-    }
+    const auto avail = Serial.available();
+
+    static uint8_t buf[1024];
+
+    Serial.readBytes(buf, avail);
+
+    esp_now_send(broadcastAddress, buf, avail);
+
+    delay(1);
 }
