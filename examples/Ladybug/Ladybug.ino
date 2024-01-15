@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2023 Simon D. Levy
+   Copyright (c) 2024 Simon D. Levy
 
    This file is part of Hackflight.
 
@@ -20,6 +20,7 @@
 #include <dsmrx.hpp>
 
 #include <closedloop.hpp>
+#include <msp.hpp>
 
 #include <ladybug/arduinostl.h>
 #include <ladybug/ladybugfc.hpp>
@@ -29,8 +30,6 @@
 static Mixer mixer = QuadXbfMixer::make();
 static AnglePidController anglePid;
 static std::vector<PidController *> pids = {&anglePid};
-
-static Dsm2048 rx;
 
 static LadybugFC board;
 
@@ -42,17 +41,20 @@ static void handleImuInterrupt(void)
 // Receiver interrupt
 void serialEvent1(void)
 {
-    while (Serial1.available()) {
+    auto avail = Serial1.available();
 
-        const auto usec = micros();
+    static uint8_t buf[256];
 
-        rx.parse(Serial1.read(), usec);
+    Serial1.readBytes(buf, avail);
 
-        if (rx.gotNewFrame()) {
+    for (uint8_t k=0; k<avail; ++k) {
 
-            uint16_t values[8] = {};
-            rx.getChannelValues(values, 8);
-            board.setDsmxValues(values, micros(), rx.timedOut(usec));
+        static Msp msp;
+
+        auto msgtype = msp.parse(buf[k]);
+
+        if (msgtype == 200) {
+            Serial.println(msp.parseShort(0));
         }
     }
 }
@@ -67,4 +69,13 @@ void setup(void)
 void loop(void)
 {
     board.step(pids, mixer);
+}
+
+namespace std {
+    void __throw_bad_alloc() {
+        while (true) {
+            Serial.println("Unable to allocate memory");
+            delay(500);
+        }
+    }
 }

@@ -1,4 +1,4 @@
-SKETCH = LadybugDsmx
+SKETCH = Ladybug
 
 FQBN = arduino-STM32L4:stm32l4:Ladybug-L432KC-FC
 
