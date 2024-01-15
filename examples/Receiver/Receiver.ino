@@ -12,12 +12,19 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
 
     auto msgtype = msp.parse(incomingData[0]);
 
+    static uint32_t count;
+
     if (msgtype) {
-        Serial.println(msgtype);
+        count ++;
     }
 
-    //auto c = incomingData[0];
-    //Serial.printf("%c%02X", c==0x24 ? '\n' : ' ', c);
+    const auto msec = millis();
+    static uint32_t prev;
+    if (msec - prev > 1000) {
+        Serial.println(count);
+        count = 0;
+        prev = msec;
+    }
 }
 
 static void error(const char * message)
