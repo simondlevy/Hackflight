@@ -2,7 +2,7 @@ SKETCH = Ladybug
 
 FQBN = arduino-STM32L4:stm32l4:Ladybug-L432KC-FC
 
-PORT = /dev/ttyACM1
+PORT = /dev/ttyACM0
 
 DFU = obj/$(SKETCH).ino.dfu 
 
