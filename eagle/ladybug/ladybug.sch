@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.1.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -1962,16 +1962,8 @@ Part Number: HA-522</description>
 </net>
 <net name="RX" class="0">
 <segment>
-<pinref part="LADYBUG_L" gate="G$1" pin="5"/>
-<wire x1="-9.48" y1="70.54" x2="-9.48" y2="71.12" width="0.1524" layer="91"/>
-<wire x1="-9.48" y1="71.12" x2="-5.08" y2="71.12" width="0.1524" layer="91"/>
-<label x="-7.62" y="71.12" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="U$1" gate="G$1" pin="TX"/>
 <wire x1="86.106" y1="23.876" x2="86.36" y2="23.876" width="0.1524" layer="91"/>
-<wire x1="86.36" y1="23.876" x2="86.36" y2="17.78" width="0.1524" layer="91"/>
-<label x="86.36" y="17.78" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="LED" class="0">
@@ -2065,6 +2057,14 @@ Part Number: HA-522</description>
 <segment>
 <pinref part="LADYBUG_L" gate="G$1" pin="6"/>
 <wire x1="-9.48" y1="68" x2="-9.48" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="-9.48" y1="68.58" x2="-5.08" y2="68.58" width="0.1524" layer="91"/>
+<label x="-7.62" y="68.58" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="IO2"/>
+<wire x1="65.786" y1="67.056" x2="66.04" y2="67.056" width="0.1524" layer="91"/>
+<wire x1="66.04" y1="67.056" x2="66.04" y2="73.66" width="0.1524" layer="91"/>
+<label x="60.96" y="73.66" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="3V3" class="0">
@@ -2143,6 +2143,20 @@ Part Number: HA-522</description>
 <pinref part="NANO_FLASH" gate="J1" pin="4"/>
 <wire x1="50.8" y1="99.06" x2="55.88" y2="99.06" width="0.1524" layer="91"/>
 <label x="50.8" y="99.06" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="RX2" class="0">
+<segment>
+<pinref part="LADYBUG_L" gate="G$1" pin="5"/>
+<wire x1="-9.48" y1="70.54" x2="-9.48" y2="71.12" width="0.1524" layer="91"/>
+<wire x1="-9.48" y1="71.12" x2="-5.08" y2="71.12" width="0.1524" layer="91"/>
+<label x="-7.62" y="71.12" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="IO4"/>
+<wire x1="68.326" y1="67.056" x2="68.58" y2="67.056" width="0.1524" layer="91"/>
+<wire x1="68.58" y1="67.056" x2="68.58" y2="73.66" width="0.1524" layer="91"/>
+<label x="68.58" y="73.66" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
