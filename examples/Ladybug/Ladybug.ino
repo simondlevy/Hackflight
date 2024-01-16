@@ -38,14 +38,18 @@ static void handleImuInterrupt(void)
     board.handleImuInterrupt();
 }
 
+static uint32_t count;
+
 // Receiver interrupt
-void serialEvent1(void)
+void serialEvent2(void)
 {
-    auto avail = Serial1.available();
+    count++;
+
+    auto avail = Serial2.available();
 
     static uint8_t buf[256];
 
-    Serial1.readBytes(buf, avail);
+    Serial2.readBytes(buf, avail);
 
     for (uint8_t k=0; k<avail; ++k) {
 
@@ -61,9 +65,10 @@ void serialEvent1(void)
 
 void setup(void)
 {
-    Serial1.begin(115200);
+    Serial2.begin(115200);
 
     board.begin(handleImuInterrupt);
+
 }
 
 void loop(void)

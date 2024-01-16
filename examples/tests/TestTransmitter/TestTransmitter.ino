@@ -22,6 +22,8 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+#include <msp.hpp>
+
 // REPLACE WITH YOUR RECEIVER MAC Address
 static const uint8_t RECEIVER_ADDRESS[] = {0xD4, 0xD4, 0xDA, 0x83, 0xCF, 0x7C};
 
@@ -60,11 +62,21 @@ void setup(void)
 
 void loop(void) 
 {
-    const auto avail = Serial.available();
+    static Msp msp;
+
+    const int16_t chanvals[6] = {1000, 1200, 1400, 1600, 1800, 2000}; 
+
+    msp.serializeShorts(200, chanvals, 6);
 
     static uint8_t buf[256];
 
-    Serial.readBytes(buf, avail);
+    uint8_t avail = 0;
+
+    while (msp.available()) {
+        buf[avail++] = msp.read();
+    }
+
+    Serial.printf("Sending %d bytes\n", avail);
 
     esp_now_send(RECEIVER_ADDRESS, buf, avail);
 }

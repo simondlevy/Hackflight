@@ -22,12 +22,13 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-static const uint8_t RX1_PIN = 4; // unused;
-static const uint8_t TX1_PIN = 14; 
+static const uint8_t RX1_PIN = 2; // unused;
+static const uint8_t TX1_PIN = 4; 
 
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t * incomingData, int len) 
 {
+    Serial.printf("got %d bytes\n", len);
     Serial1.write(incomingData, len);
 }
 
