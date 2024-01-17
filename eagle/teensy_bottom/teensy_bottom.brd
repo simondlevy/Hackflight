@@ -204,10 +204,6 @@
 <text x="61.076828125" y="47.1886375" size="1.016" layer="26" rot="MR180">5V</text>
 <text x="63.19156875" y="48.6985" size="1.016" layer="26" rot="MR0">GND</text>
 <text x="59.949103125" y="55.662559375" size="1.016" layer="26" rot="MR180">VBAT</text>
-<hole x="16" y="46" drill="3.175"/>
-<hole x="52" y="46" drill="3.175"/>
-<hole x="52" y="10" drill="3.175"/>
-<hole x="16" y="10" drill="3.175"/>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
