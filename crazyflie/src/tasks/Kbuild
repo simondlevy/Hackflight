@@ -1,2 +1,0 @@
-obj-y += log.o
-obj-y += syslink.o
