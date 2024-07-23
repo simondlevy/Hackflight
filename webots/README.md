@@ -16,7 +16,7 @@ make cplusplus
 
 If you have a game controller or R/C transmitter with adapter dongle, you can
 use that to fly;  otherwise, the simulator will advise you that no such device
-was found 
+was found and instruct you on how to fly with the keyboard.
 ```
 
 
