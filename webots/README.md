@@ -4,8 +4,16 @@
 
 # Hackflight simulator instructions
 
-First install [Webots](https://cyberbotics.com/) on your computer.  Then from the hackflight main
-directory, do the following:
+1. [install Webots](https://cyberbotics.com/doc/guide/installation-procedure#installation-on-linux)
+on your computer.  
+
+2. Add the following line to your ```~/.bashrc``` file:
+
+```
+  export WEBOTS_HOME=/usr/local/webots
+```
+
+3. From the hackflight main directory, do the following:
 
 ```
 cd webots/controllers/cplusplus
