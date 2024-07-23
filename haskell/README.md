@@ -2,6 +2,8 @@
 <img src="../media/lambda.png" width=600>
 </p>
 
+# &ldquo;LambdaFlight&rdquo: Hackflight meets Haskell
+
 To experiment with using Hackflight for flight control in Haskell, you'll first
 need to install [Haskell](https://www.haskell.org/) and [NASA
 Copilot](https://copilot-language.github.io) (the &ldquo;secret sauce&rdquo;
@@ -11,6 +13,17 @@ flight controller.)  I was able to do this via:
 ```
 cabal install copilot
 cabal install copilot-c99
+```
+
+Now follow these [directions](../webots) for installing Webots and flying a simulated quadcopter.
+
+Finally, from the hackflight3. From the hackflight main directory, do the following:
+
+```
+cd webots/controllers/haskell
+make
+cd ../..
+make haskell
 ```
 
 
