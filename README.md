@@ -49,7 +49,7 @@ to get an idea of how this approach works.
 ## Simulator
 
 For flight simulation, Hackflight uses [Webots](https://cyberbotics.com/),
-a free, open-source robotics simulator. Click [webots](here) to get started.
+a free, open-source robotics simulator. Click [https://github.com/simondlevy/hackflight/webots](here) to get started.
 
 ## Haskell support
 
