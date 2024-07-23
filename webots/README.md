@@ -2,7 +2,7 @@
 <img src="../media/webots.png" width=450>
 </p>
 
-# Hackflight / Webots instructions
+# Hackflight simulator instructions
 
 First install [Webots](https://cyberbotics.com/) on your computer.  Then from the hackflight main
 directory, do the following:
