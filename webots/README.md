@@ -4,7 +4,7 @@
 
 # Hackflight simulator instructions
 
-1. [install Webots](https://cyberbotics.com/doc/guide/installation-procedure#installation-on-linux)
+1. [Install Webots](https://cyberbotics.com/doc/guide/installation-procedure#installation-on-linux)
 on your computer.  
 
 2. Add the following line to your ```~/.bashrc``` file:
