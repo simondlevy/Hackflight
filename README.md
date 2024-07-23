@@ -46,7 +46,7 @@ to get an idea of how this approach works.
 
 ## Haskell support
 
-[Why Haskell?](https://koerbitz.me/posts/Why-I-love-Haskell.html"><img src="media/lambdaflight2.png" align="center")
+[Why Haskell?](https://koerbitz.me/posts/Why-I-love-Haskell.html)
 
 To experiment with flight control in Haskell, you'll first need to install
 [Haskell](https://www.haskell.org/) and [NASA
