@@ -17,7 +17,9 @@ addition to big user communities and loads of great features, these platforms
 have safety mechanisms that Hackflight lacks, which will help avoid injury to
 you and damage to your vehicle.
 
+Hackflight is currently supported in Linux only.
 
+## Design principles
 
 Hackflight attempts to maintain a simple relationship between
 the code and the elements of the flight-control dataflow diagram shown below.
@@ -44,12 +46,17 @@ on the Board object, passing it the raw values from your IMU.  Look at this
 program](https://github.com/simondlevy/Hackflight/blob/master/examples/MambaF411Dsmx/MambaF411Dsmx.ino)
 to get an idea of how this approach works.
 
+## Simulator
+
+For flight simulation, Hackflight uses [Webots](https://cyberbotics.com/),
+a free, open-source robotics simulator. Click [webots](here) to get started.
+
 ## Haskell support
 
 [Why Haskell?](https://koerbitz.me/posts/Why-I-love-Haskell.html)
 
-To experiment with flight control in Haskell, you'll first need to install
-[Haskell](https://www.haskell.org/) and [NASA
+To experiment with using Hackflight for flight control in Haskell, you'll first
+need to install [Haskell](https://www.haskell.org/) and [NASA
 Copilot](https://copilot-language.github.io) (the &ldquo;secret sauce&rdquo;
 that allows you to compile Haskell code to a form suitable for running on a
 flight controller.)  I was able to do this via:
