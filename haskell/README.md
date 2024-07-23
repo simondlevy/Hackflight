@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="../media/lambda.png">
+<img src="../media/lambda.png" width=300>
 </p>
 
 To experiment with using Hackflight for flight control in Haskell, you'll first
