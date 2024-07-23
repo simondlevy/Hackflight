@@ -25,7 +25,6 @@ make cplusplus
 If you have a game controller or R/C transmitter with adapter dongle, you can
 use that to fly;  otherwise, the simulator will advise you that no such device
 was found and instruct you on how to fly with the keyboard.
-```
 
 If you prefer to program in Python, there is also support for that; simply type ```make python```
 instead of ```make cplusplus```.   You can now fly the vehicle with your keyboard (I don't currrently
