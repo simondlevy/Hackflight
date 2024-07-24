@@ -1,3 +1,21 @@
+'''
+  Hackflight flight simulator using Webots
+ 
+  Copyright (C) 2024 Simon D. Levy, Tiffany Guo, James Xia
+ 
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, in version 3.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http:--www.gnu.org/licenses/>.
+'''
+
 from time import time
 
 from controller import Robot, InertialUnit, Gyro, GPS
@@ -30,7 +48,7 @@ STATUS_LANDED = 0
 STATUS_TAKING_OFF = 1
 STATUS_FLYING = 2
 
-# We consider throttle inputs above this below this value to be
+# We consider throttle inprint above this below this value to be
 # positive for takeoff
 THROTTLE_ZERO = 0.05
 
@@ -57,6 +75,10 @@ def makeMotor(robot, name, direction):
 
 
 def main():
+
+    print('- Use W and S to go up and down\n');
+    print('- Use arrow keys to move in the horizontal plane\n');
+    print('- Use Q and E to rotate around yaw\n');
 
     logfile = open(LOGFILE, 'w')
 
@@ -86,13 +108,13 @@ def main():
 
     timestep = int(robot.getBasicTimeStep())
 
-    imu = InertialUnit("inertial_unit")
+    imu = InertialUnit('inertial_unit')
     imu.enable(timestep)
 
-    gyro = Gyro("gyro")
+    gyro = Gyro('gyro')
     gyro.enable(timestep)
 
-    gps = GPS("gps")
+    gps = GPS('gps')
     gps.enable(timestep)
 
     state = VehicleState()
