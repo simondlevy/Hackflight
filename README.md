@@ -26,7 +26,7 @@ Linux using the powerful, inexpensive [Teensy
 4.0](https://www.pjrc.com/store/teensy40.html) development board with Arduino
 libraries.  Similarly, having tried all the major robotics simulation packages
 available, and written my own multirotor
-[simulator](https://github.com/simondlevy/MulticopterSim), I have chosen the
+[simulator](https://github.com/simondlevy/MulticopterSim), I have switched to the
 powerful, easy-to-use [Webots](https://cyberbotics.com/) platform as the basis
 of the Hackflight flight simulator.
 
