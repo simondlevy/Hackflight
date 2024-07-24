@@ -3,7 +3,6 @@
 
     Copyright (C) 2024 Simon D. Levy
 
-    MIT License
 */
 
 #pragma once

@@ -24,7 +24,6 @@ Based on:
 
 Copyright (C) 2021 Simon D. Levy, Alex Sender
 
-MIT License
 */
 
 #pragma once
