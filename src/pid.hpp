@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <hackflight.h>
 #include <utils.hpp>
 
 class PID {

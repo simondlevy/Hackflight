@@ -21,7 +21,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <datatypes.h>
 #include <utils.hpp>
 
 #define EKF_CUSTOM

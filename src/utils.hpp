@@ -19,7 +19,7 @@
 #pragma once
 
 #include <math.h>
-#include <datatypes.h>
+#include <hackflight.h>
 
 #ifndef M_PI
 #define M_PI 3.1415928f

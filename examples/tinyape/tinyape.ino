@@ -27,10 +27,8 @@
 
 #include <hackflight.h>
 
-#include <datatypes.h>
 #include <mixers.hpp>
 #include <utils.hpp>
-
 
 #include <tasks/blink.hpp>
 #include <tasks/debug.hpp>

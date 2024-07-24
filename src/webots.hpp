@@ -26,7 +26,6 @@
 #include <map>
 #include <string>
 
-#include <datatypes.h>
 #include <utils.hpp>
 
 #include <webots/camera.h>

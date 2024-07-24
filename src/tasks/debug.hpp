@@ -1,7 +1,7 @@
 #pragma once
 
+#include <hackflight.h>
 #include <timer.hpp>
-#include <datatypes.h>
 
 class DebugTask {
 

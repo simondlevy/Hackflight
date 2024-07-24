@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <datatypes.h>
+#include <hackflight.h>
 #include <utils.hpp>
 
 class MadgwickFilter {
