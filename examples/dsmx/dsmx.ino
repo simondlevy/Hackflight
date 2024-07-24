@@ -43,14 +43,7 @@
 #include <pids/yaw_angle.hpp>
 #include <pids/yaw_rate.hpp>
 
-// Comment-out for DSMRX
-#define SBUS
-
-#ifdef SBUS
-#include <sbus.h>
-#else
 #include <dsmrx.hpp>
-#endif
 
 static const bool USE_EKF = false;
 
@@ -129,10 +122,6 @@ static MPU6050 _mpu6050;
 
 static const uint8_t RX_CHANNELS = 8;
 
-#ifdef SBUS
-bfs::SbusRx _rx(&Serial2);
-#else
-
 Dsm2048 _rx;
 
 void serialEvent2(void)
@@ -141,7 +130,6 @@ void serialEvent2(void)
         _rx.parse(Serial2.read(), micros());
     }
 }
-#endif
 
 // Closed-loop (PID) controllers ---------------------------------------------
 
@@ -262,42 +250,6 @@ static void scaleMotors(const quad_motors_t & motors)
     _m4_usec = scaleMotor(motors.m4);
 }
 
-#ifdef SBUS
-static void readReceiver(
-        const uint32_t usec_curr, 
-        channels_t & channels,
-        bool & gotFailsafe) 
-{
-    static uint32_t _usec_prev;
-
-    if (_rx.Read()) {
-
-        // This can happen if we lose radio contact
-        if (_rx.data().failsafe) {
-            gotFailsafe = true;
-        }
-
-        _usec_prev = usec_curr;
-
-        //sBus scaling below is for Taranis-Plus and X4R-SB
-        float scale = 0.615;  
-        float bias  = 895.0; 
-
-        channels.c1 = _rx.data().ch[0] * scale + bias;
-        channels.c2 = _rx.data().ch[1] * scale + bias;
-        channels.c3 = _rx.data().ch[2] * scale + bias;
-        channels.c4 = _rx.data().ch[3] * scale + bias;
-        channels.c5 = _rx.data().ch[4] * scale + bias;
-        channels.c6 = _rx.data().ch[5] * scale + bias; 
-    }
-
-    // This can happen if we start the vehicle with the radio turned off
-    if (usec_curr - _usec_prev > FAILSAFE_TIMEOUT_USEC) {
-
-        gotFailsafe = true;
-    }
-}
-#else
 static void readReceiver(
         const uint32_t usec_curr, 
         channels_t & channels,
@@ -321,8 +273,6 @@ static void readReceiver(
         channels.c6 = values[5];
     }
 }
-
-#endif
 
 static void runMotors(void) 
 {
@@ -434,11 +384,7 @@ void setup()
     pinMode(LED_BUILTIN, OUTPUT); 
 
     // Initialize radio communication
-#ifdef SBUS
-    _rx.Begin();
-#else
     Serial2.begin(115200);
-#endif
 
     // Initialize IMU communication
     initImu();

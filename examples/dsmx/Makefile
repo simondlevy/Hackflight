@@ -1,4 +1,4 @@
-SKETCH = tinyape
+SKETCH = dsmx
 
 BOARD = teensy:avr:teensy40
 
