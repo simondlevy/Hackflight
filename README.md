@@ -38,13 +38,7 @@ and leveraging existing Arduino libraries for
 [ESCs](https://github.com/simondlevy/DshotSTM32), and
 [IMUs](https://github.com/simondlevy/MPU6x00),
 Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-beckman-dont-fear-the-monad) 
-approach to taming the complexity of flight control: you instantiate a Board
-subclass, passing it your IMU settings, PID controllers, mixer, ESC type, and LED
-pin number.  In your ```loop``` function, you just call the ```step()``` method
-on the Board object, passing it the raw values from your IMU.  Look at this
-[example
-program](https://github.com/simondlevy/Hackflight/blob/master/examples/MambaF411Dsmx/MambaF411Dsmx.ino)
-to get an idea of how this approach works.
+approach to taming the complexity of flight control.
 
 ## Simulator
 
