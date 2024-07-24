@@ -17,7 +17,14 @@ addition to big user communities and loads of great features, these platforms
 have safety mechanisms that Hackflight lacks, which will help avoid injury to
 you and damage to your vehicle.
 
-Hackflight is currently supported in Linux only.
+My original goal with Hackflight was to support a variety of flight-control
+boards on any operating system.  Because of the proliferaton of flight-control
+boards in recent years, and the
+[advantages of Linux](https://www.reddit.com/r/linux/comments/vytkf/i_dont_get_why_programmers_love_linux_care_to/)
+for rapid software development, I decided to narrow my focus to developing on Linux
+using the powerful, inexpensive [Teensy
+4.0](https://www.pjrc.com/store/teensy40.html) development board with Arduino
+libraries.
 
 # Design principles
 
