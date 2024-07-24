@@ -51,7 +51,8 @@ and leveraging existing Arduino libraries for
 [ESCs](https://github.com/simondlevy/Teensy4OneShot125), and
 [IMUs](https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050),
 Hackflight supports a [composable](https://www.progress.com/blogs/what-composability-why-should-you-care) 
-approach to taming the complexity of flight control, in just a few thousand lines of code.
+approach to taming the complexity of flight control. The Hackflight codebase is
+just a few thousand lines of code.
 
 # Simulator
 
