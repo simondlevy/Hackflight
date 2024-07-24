@@ -51,7 +51,7 @@ and leveraging existing Arduino libraries for
 [ESCs](https://github.com/simondlevy/DshotSTM32), and
 [IMUs](https://github.com/simondlevy/MPU6x00),
 Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-beckman-dont-fear-the-monad) 
-approach to taming the complexity of flight control.
+approach to taming the complexity of flight control, in only a few thousand lines of code.
 
 # Simulator
 
