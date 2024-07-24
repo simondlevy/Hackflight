@@ -20,7 +20,7 @@ you and damage to your vehicle.
 My original goal with Hackflight was to support a variety of flight-control
 boards on any operating system.  Because of the [proliferaton](https://oscarliang.com/flight-controller/)
  of flight-control boards in recent years, and
-the [advantages] (https://www.reddit.com/r/linux/comments/vytkf/i_dont_get_why_programmers_love_linux_care_to/)
+the [advantages](https://www.reddit.com/r/linux/comments/vytkf/i_dont_get_why_programmers_love_linux_care_to/)
 of Linux for rapid software development, I decided to narrow my focus to developing on
 Linux using the powerful, inexpensive [Teensy
 4.0](https://www.pjrc.com/store/teensy40.html) development board with Arduino
