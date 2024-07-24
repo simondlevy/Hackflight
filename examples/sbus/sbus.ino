@@ -25,7 +25,7 @@
 #include <oneshot125.hpp>
 #include <vector>
 
-#include <hackflight.h>
+#include <hackflight.hpp>
 
 #include <mixers.hpp>
 #include <utils.hpp>

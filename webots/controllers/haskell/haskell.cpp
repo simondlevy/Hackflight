@@ -16,7 +16,7 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 */
 
-#include <hackflight.h>
+#include <hackflight.hpp>
 #include <webots.hpp>
 
 // ----------------------------------------------------------------------------

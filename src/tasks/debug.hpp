@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hackflight.h>
+#include <hackflight.hpp>
 #include <timer.hpp>
 
 class DebugTask {

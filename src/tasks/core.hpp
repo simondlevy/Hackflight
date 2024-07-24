@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hackflight.h>
+#include <hackflight.hpp>
 #include <mixers.hpp>
 #include <utils.hpp>
 
