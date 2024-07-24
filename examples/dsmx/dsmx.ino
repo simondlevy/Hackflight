@@ -492,7 +492,7 @@ void loop()
 
     // Run mixer to get motor values from closed-loop demands
     quad_motors_t motors = {};
-    Mixer::runCF(demands, motors);
+    Mixer::runBF(demands, motors);
 
     // Rescale motor values for OneShot125
     scaleMotors(motors);
