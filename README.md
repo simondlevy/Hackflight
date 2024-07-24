@@ -2,7 +2,7 @@
 <img src="media/logo.png" width=450>
 </p>
 
-## Intro
+# Intro
 
 Hackflight is a minimalist software toolkit for building multirotor flight
 controllers and simulators.  It is geared toward people like me who want to
@@ -19,7 +19,7 @@ you and damage to your vehicle.
 
 Hackflight is currently supported in Linux only.
 
-## Design principles
+# Design principles
 
 Hackflight attempts to maintain a simple relationship between
 the code and the elements of the flight-control dataflow diagram shown below.
@@ -40,17 +40,17 @@ and leveraging existing Arduino libraries for
 Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-beckman-dont-fear-the-monad) 
 approach to taming the complexity of flight control.
 
-## Simulator
+# Simulator
 
 For flight simulation, Hackflight uses [Webots](https://cyberbotics.com/),
 a free, open-source robotics simulator. Click [here](webots) to get started.
 
-## Haskell support
+# Haskell support
 
 If you [love Haskell](https://koerbitz.me/posts/Why-I-love-Haskell.html) as much
 as I do and want to see how it can be used for flight control, click [here](haskell).
 
-## Citing Hackflight
+# Citing Hackflight
 
 Please cite Hackflight as:
 
