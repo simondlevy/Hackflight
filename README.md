@@ -48,9 +48,9 @@ By using header-only C++ classes whenever possible, avoiding C-style macros and
 [null pointers](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/),
 and leveraging existing Arduino libraries for 
 [receivers](https://github.com/bolderflight/sbus),
-[ESCs](https://github.com/simondlevy/DshotSTM32), and
-[IMUs](https://github.com/simondlevy/MPU6x00),
-Hackflight supports a [composable](https://www.programmingtalks.org/talk/brian-beckman-dont-fear-the-monad) 
+[ESCs](https://github.com/simondlevy/Teensy4OneShot125), and
+[IMUs](https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050),
+Hackflight supports a [composable](https://www.progress.com/blogs/what-composability-why-should-you-care) 
 approach to taming the complexity of flight control, in just a few thousand lines of code.
 
 # Simulator
