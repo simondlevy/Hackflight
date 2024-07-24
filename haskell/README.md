@@ -2,7 +2,7 @@
 <img src="../media/lambda.png" width=600>
 </p>
 
-# &ldquo;LambdaFlight&rdquo; Hackflight meets Haskell
+# &ldquo;LambdaFlight&rdquo;: Hackflight meets Haskell
 
 To experiment with using Hackflight for flight control in Haskell, you'll first
 need to install [Haskell](https://www.haskell.org/) and [NASA
