@@ -17,6 +17,8 @@ addition to big user communities and loads of great features, these platforms
 have safety mechanisms that Hackflight lacks, which will help avoid injury to
 you and damage to your vehicle.
 
+# History
+
 My original goal with Hackflight was to support a variety of flight-control
 boards on any operating system.  Because of the [proliferaton](https://oscarliang.com/flight-controller/)
 of flight-control boards in recent years, and the 
