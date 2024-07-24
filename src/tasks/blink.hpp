@@ -1,37 +1,59 @@
+/*
+   Hackflight LED blinking task
+
+   Copyright (C) 2024 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include <timer.hpp>
 
-class BlinkTask {
+namespace hf {
 
-    public:
+    class BlinkTask {
 
-        void run(const uint32_t usec_curr, const float freq_hz)
-        {
-            static uint32_t _usec_prev;
+        public:
 
-            static uint32_t _delay;
+            void run(const uint32_t usec_curr, const float freq_hz)
+            {
+                static uint32_t _usec_prev;
 
-            if (usec_curr - _usec_prev > _delay) {
+                static uint32_t _delay;
 
-                static bool _alternate;
+                if (usec_curr - _usec_prev > _delay) {
 
-                _usec_prev = usec_curr;
+                    static bool _alternate;
 
-                digitalWrite(LED_BUILTIN, _alternate);
+                    _usec_prev = usec_curr;
 
-                if (_alternate) {
-                    _alternate = false;
-                    _delay = UPTIME_USEC;
-                }
-                else {
-                    _alternate = true;
-                    _delay = freq_hz * 1e6;
+                    digitalWrite(LED_BUILTIN, _alternate);
+
+                    if (_alternate) {
+                        _alternate = false;
+                        _delay = UPTIME_USEC;
+                    }
+                    else {
+                        _alternate = true;
+                        _delay = freq_hz * 1e6;
+                    }
                 }
             }
-        }
 
-    private:
+        private:
 
-        static const uint32_t UPTIME_USEC = 100'000;
-};
+            static const uint32_t UPTIME_USEC = 100'000;
+    };
+
+}

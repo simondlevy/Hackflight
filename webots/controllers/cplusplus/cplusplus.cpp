@@ -36,7 +36,7 @@ static constexpr float DT = .01;
 
 int main(int argc, char ** argv)
 {
-    CoreTask coreTask = {};
+    hf::CoreTask coreTask = {};
 
     coreTask.init(
             PITCH_ROLL_ANGLE_KP, 
@@ -48,17 +48,17 @@ int main(int argc, char ** argv)
             TMIN,
             DT);
 
-    Simulator sim = {};
+    hf::Simulator sim = {};
 
     sim.init();
 
-    state_t state = {};
+    hf::state_t state = {};
 
-    demands_t demands = {};
+    hf::demands_t demands = {};
 
     while (sim.step(demands, state)) {
 
-        quad_motors_t motors = {};
+        hf::quad_motors_t motors = {};
 
         coreTask.run(state, demands, motors);
 

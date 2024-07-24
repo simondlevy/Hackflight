@@ -19,16 +19,14 @@
 #include <hackflight.hpp>
 #include <webots.hpp>
 
-// ----------------------------------------------------------------------------
-
 // Webots simulator class
-static Simulator _sim;
+static hf::Simulator _sim;
 
 // Global data and routines shared with Haskell Copilot ----------------------
 
-demands_t stream_stickDemands;
+hf::demands_t stream_stickDemands;
 
-state_t stream_vehicleState;
+hf::state_t stream_vehicleState;
 
 void debug(float value)
 {

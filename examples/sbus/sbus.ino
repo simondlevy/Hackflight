@@ -47,7 +47,7 @@
 
 static const bool USE_EKF = false;
 
-static const auto DEBUG_TASK = DebugTask::NONE;
+static const auto DEBUG_TASK = hf::DebugTask::NONE;
 
 // PID Control constants -----------------------------------------------------
 
@@ -71,8 +71,8 @@ static const uint8_t GYRO_SCALE = MPU6050_GYRO_FS_2000;
 static const uint8_t ACCEL_SCALE = MPU6050_ACCEL_FS_8;
 
 // IMU biases obtained from calibration;
-static const axis3_t GYRO_BIAS = {0, 0, 0};
-static const axis3_t ACCEL_BIAS = {0, 0, 0};
+static const hf::axis3_t GYRO_BIAS = {0, 0, 0};
+static const hf::axis3_t ACCEL_BIAS = {0, 0, 0};
 
 // Do not exceed 2000Hz, all filter paras tuned to 2000Hz by default
 static const uint32_t INNER_LOOP_FREQ = 2000;
@@ -85,27 +85,26 @@ static const uint32_t FAILSAFE_TIMEOUT_USEC = 50000;
 static const float B_GYRO = 0.1;    
 static const float B_ACCEL = 0.14;   
 
-
 // Das Blinkenlights
-static const float    BLINK_RATE_HZ = 1.5;
-static BlinkTask _blinkTask;
+static const float BLINK_RATE_HZ = 1.5;
+static hf::BlinkTask _blinkTask;
 
 // Throttle stick tolerance
 static const uint32_t THROTTLE_DOWN = 1050;
 
 // Debugging
 static const float DEBUG_RATE_HZ = 100;
-static DebugTask _debugTask;
+static hf::DebugTask _debugTask;
 
 // We can use an EKF or Madgwick filter for state estimation -----------------
 
-static Ekf _ekf;
-static EkfPredictTask _ekfPredictTask;
-//static EkfUpdateTask _ekfUpdateTask;
+static hf::Ekf _ekf;
+static hf::EkfPredictTask _ekfPredictTask;
+//static hf::EkfUpdateTask _ekfUpdateTask;
 
-static MadgwickFilter _madgwick;
+static hf::MadgwickFilter _madgwick;
 
-// We use Crazyflie QuadX motor layout ----------------------------------------
+// We use Betaflight QuadX motor layout ----------------------------------------
 
 static const std::vector<uint8_t> MOTOR_PINS = { 1, 2, 3, 0 };
 
@@ -126,10 +125,10 @@ bfs::SbusRx _rx(&Serial2);
 
 // Closed-loop (PID) controllers ---------------------------------------------
 
-PitchRollAngleController _pitchRollAngleController;
-PitchRollRateController _pitchRollRateController;
-YawAngleController _yawAngleController;
-YawRateController _yawRateController;
+hf::PitchRollAngleController _pitchRollAngleController;
+hf::PitchRollRateController _pitchRollRateController;
+hf::YawAngleController _yawAngleController;
+hf::YawRateController _yawRateController;
 
 // Local helpers =============================================================
 
@@ -141,7 +140,7 @@ static void armMotor(uint8_t & m_usec)
 
 static uint8_t scaleMotor(const float mval)
 {
-    return Utils::u8constrain(mval*125 + 125, 125, 250);
+    return hf::Utils::u8constrain(mval*125 + 125, 125, 250);
 
 }
 
@@ -185,29 +184,29 @@ static void smootheImuSensor(
         const int16_t zraw, 
         const float scale_factor,
         const float b,
-        const axis3_t bias,
-        axis3_t & sensor,
-        axis3_t & sensor_prev)
+        const hf::axis3_t bias,
+        hf::axis3_t & sensor,
+        hf::axis3_t & sensor_prev)
 {
     smootheImuAxis(xraw, scale_factor, bias.x, b, sensor.x, sensor_prev.x);
     smootheImuAxis(yraw, scale_factor, bias.y, b, sensor.y, sensor_prev.y);
     smootheImuAxis(zraw, scale_factor, bias.z, b, sensor.z, sensor_prev.z);
 }
 
-static void readImu(axis3_t & gyro, axis3_t & accel)
+static void readImu(hf::axis3_t & gyro, hf::axis3_t & accel)
 {
     int16_t ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
 
     _mpu6050.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-    static axis3_t _gyro_prev;
+    static hf::axis3_t _gyro_prev;
 
     // Convert raw gyro to smoothed deg/sec
     smootheImuSensor(gx, gy, gz, 
             131.f / (1 << GYRO_SCALE),
             B_GYRO, GYRO_BIAS, gyro, _gyro_prev);
 
-    static axis3_t _accel_prev;
+    static hf::axis3_t _accel_prev;
 
     // Convert raw accel to smoothed gs
     smootheImuSensor(ax, ay, az, 
@@ -221,7 +220,8 @@ static float channelToDemand(
     return (chan - offset) / denom;
 }
 
-static void getOpenLoopDemands(const channels_t & channels, demands_t & demands)
+static void getOpenLoopDemands(
+        const hf::channels_t & channels, hf::demands_t & demands)
 {
     demands.thrust = channelToDemand(channels.c1, 1000, 1000);
     demands.roll = channelToDemand(channels.c2);
@@ -235,7 +235,7 @@ static void getOpenLoopDemands(const channels_t & channels, demands_t & demands)
     demands.yaw = constrain(demands.yaw, -1.0, 1.0);
 }
 
-static void scaleMotors(const quad_motors_t & motors)
+static void scaleMotors(const hf::quad_motors_t & motors)
 {
     _m1_usec = scaleMotor(motors.m1);
     _m2_usec = scaleMotor(motors.m2);
@@ -245,7 +245,7 @@ static void scaleMotors(const quad_motors_t & motors)
 
 static void readReceiver(
         const uint32_t usec_curr, 
-        channels_t & channels,
+        hf::channels_t & channels,
         bool & gotFailsafe) 
 {
     static uint32_t _usec_prev;
@@ -340,11 +340,11 @@ static void blinkOnStartup(void)
 static void getVehicleState(
         const uint32_t usec,
         const float dt,
-        const axis3_t & gyro,
-        const axis3_t & accel,
-        state_t & state)
+        const hf::axis3_t & gyro,
+        const hf::axis3_t & accel,
+        hf::state_t & state)
 {
-    static quat_t _quat;
+    static hf::quat_t _quat;
 
     if (USE_EKF) {
 
@@ -357,8 +357,8 @@ static void getVehicleState(
         //_ekf.update_with_flow();
         //_ekf.finalize();
 
-        axis3_t pos = {};
-        axis3_t dpos = {};
+        hf::axis3_t pos = {};
+        hf::axis3_t dpos = {};
 
         _ekf.get_vehicle_state(_quat, pos, dpos);
     }
@@ -368,7 +368,7 @@ static void getVehicleState(
         _madgwick.getQuat(dt, gyro, accel, _quat);
     }
 
-    Utils::quat2euler(_quat, state.phi, state.theta, state.psi);
+    hf::Utils::quat2euler(_quat, state.phi, state.theta, state.psi);
 
     // Get angular velocities directly from gyro.  We swap the X and Y axes and 
     // negate Y and Z for nose-down, nose-right positive.
@@ -411,15 +411,15 @@ void setup()
 static void damp(float & curr, const float prev)
 {            
     curr = LPF_L * curr;
-    curr = Utils::fconstrain(curr, -ANGLE_MAX, ANGLE_MAX);
+    curr = hf::Utils::fconstrain(curr, -ANGLE_MAX, ANGLE_MAX);
     curr = (1.0 - LPF_B) * prev + LPF_B * curr;
 }
 
 static void runClosedLoop(
-        const state_t & state,
+        const hf::state_t & state,
         const float dt,
         const bool reset,
-        demands_t & demands)
+        hf::demands_t & demands)
 {
     static float _roll_des_prev;
 
@@ -443,13 +443,14 @@ void loop()
 {
     // Receivers channels are sampled as available and so must persist between
     // loop calls
-    static channels_t _channels;
+    static hf::channels_t _channels;
 
     // Safety
     static bool _isArmed;
     static bool _gotFailsafe;
 
-    // Keep track of what time it is and how much time has elapsed since the last loop
+    // Keep track of what time it is and how much time has elapsed since the
+    // last loop
     static uint32_t usec_prev;
     const auto usec_curr = micros();      
     const auto dt = (usec_curr - usec_prev)/1e6;
@@ -475,17 +476,17 @@ void loop()
     }
 
     // Read IMU
-    axis3_t gyro = {};
-    axis3_t accel = {};
+    hf::axis3_t gyro = {};
+    hf::axis3_t accel = {};
     readImu(gyro, accel);
 
-    state_t state = {};
+    hf::state_t state = {};
 
     // Get vehiclestate from estimator
     getVehicleState(usec_curr, dt, gyro, accel, state);
 
     // Convert channel value to open-loop demands
-    demands_t demands;
+    hf::demands_t demands;
     getOpenLoopDemands(_channels, demands);
 
     // Reset PID controllers when throttle is down
@@ -495,8 +496,8 @@ void loop()
     runClosedLoop(state, dt, throttleIsDown, demands);
 
     // Run mixer to get motor values from closed-loop demands
-    quad_motors_t motors = {};
-    Mixer::runCF(demands, motors);
+    hf::quad_motors_t motors = {};
+    hf::Mixer::runCF(demands, motors);
 
     // Rescale motor values for OneShot125
     scaleMotors(motors);
