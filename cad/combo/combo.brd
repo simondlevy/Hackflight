@@ -161,28 +161,28 @@
 <text x="24.8" y="44.7806" size="1.016" layer="25">M4</text>
 <text x="37.4472" y="32.2052" size="1.016" layer="25">GD</text>
 <text x="41.6188" y="33.219" size="1.016" layer="25" rot="R180">5V</text>
-<text x="14.5414" y="8.4528" size="1.778" layer="25" rot="R90">REG</text>
-<text x="16.3086" y="24.8972" size="1.778" layer="25">IMU</text>
+<text x="25.1414" y="13.1528" size="1.778" layer="25" rot="R180">REG</text>
+<text x="23.2086" y="21.0972" size="1.778" layer="25">IMU</text>
 <text x="21.4666" y="33.2266" size="1.016" layer="25" rot="R180">DA</text>
 <text x="23.9706" y="33.2904" size="1.016" layer="25" rot="R180">CL</text>
 <text x="36.5738" y="33.2688" size="1.016" layer="25" rot="R180">3V</text>
 <text x="20.9874" y="7.6358" size="0.8128" layer="25">GD</text>
-<text x="22.1374" y="70.0858" size="0.8128" layer="25" rot="R270">M4</text>
-<text x="24.2374" y="70.1858" size="0.8128" layer="25" rot="R270">M3</text>
-<text x="26.2374" y="70.2858" size="0.8128" layer="25" rot="R270">M2</text>
-<text x="28.2374" y="70.2858" size="0.8128" layer="25" rot="R270">M1</text>
+<text x="24.4374" y="66.6858" size="0.8128" layer="25" rot="R270">M4</text>
+<text x="22.4374" y="66.7858" size="0.8128" layer="25" rot="R270">M3</text>
+<text x="20.4374" y="66.6858" size="0.8128" layer="25" rot="R270">M2</text>
+<text x="18.3374" y="66.5858" size="0.8128" layer="25" rot="R270">M1</text>
 <text x="11.4358" y="40.1188" size="1.016" layer="25" rot="R180">3V3</text>
 <text x="10.9572" y="37.5358" size="1.016" layer="25" rot="R180">GD</text>
 <text x="23.1834" y="7.6358" size="0.8128" layer="25">3V3</text>
 <text x="25.4374" y="7.6358" size="0.8128" layer="25">RX</text>
 <text x="25.0914" y="7.3528" size="1.778" layer="25" rot="R180">RX</text>
-<text x="18.0874" y="70.2858" size="0.8128" layer="25" rot="R270">GD</text>
-<text x="29.0874" y="70.2858" size="0.8128" layer="26" rot="MR270">M1</text>
-<text x="20.9874" y="69.8858" size="0.8128" layer="26" rot="MR270">VB</text>
-<text x="18.1626" y="70.2858" size="0.8128" layer="25" rot="R270">GD</text>
-<text x="22.9874" y="69.9858" size="0.8128" layer="26" rot="MR270">M4</text>
-<text x="25.0874" y="70.0858" size="0.8128" layer="26" rot="MR270">M3</text>
-<text x="27.0874" y="70.2858" size="0.8128" layer="26" rot="MR270">M2</text>
+<text x="28.3874" y="66.5858" size="0.8128" layer="25" rot="R270">GD</text>
+<text x="19.1874" y="66.7858" size="0.8128" layer="26" rot="MR270">M1</text>
+<text x="27.2874" y="66.6858" size="0.8128" layer="26" rot="MR270">VB</text>
+<text x="28.2626" y="66.5858" size="0.8128" layer="25" rot="R270">GD</text>
+<text x="25.2874" y="66.6858" size="0.8128" layer="26" rot="MR270">M4</text>
+<text x="23.2874" y="66.7858" size="0.8128" layer="26" rot="MR270">M3</text>
+<text x="21.2874" y="66.6858" size="0.8128" layer="26" rot="MR270">M2</text>
 <text x="22.6874" y="7.6358" size="0.8128" layer="26" rot="MR0">GD</text>
 <text x="24.9374" y="7.6358" size="0.8128" layer="26" rot="MR0">3V3</text>
 <text x="26.9374" y="7.6358" size="0.8128" layer="26" rot="MR0">RX</text>
@@ -202,7 +202,7 @@
 <vertex x="23.988509375" y="77.059315625"/>
 <vertex x="26.663303125" y="72.4"/>
 </polygon>
-<text x="26.2914" y="71.3528" size="1.778" layer="25" rot="R180">ESC</text>
+<text x="25.9914" y="70.4528" size="1.778" layer="25" rot="R180">ESC</text>
 <wire x1="6.3" y1="48.1" x2="6.2" y2="30" width="0.254" layer="20"/>
 <wire x1="42" y1="48" x2="41.9" y2="29.9" width="0.254" layer="20"/>
 <wire x1="6.25" y1="29.9" x2="15.55" y2="0.3" width="0.254" layer="20"/>
@@ -211,7 +211,7 @@
 <hole x="28.9" y="4" drill="2.5"/>
 <text x="19.3914" y="71.6528" size="1.778" layer="26" rot="MR180">VL53LL1</text>
 <text x="18.0914" y="60.2528" size="1.778" layer="26" rot="MR180">PMW3901</text>
-<text x="20.2874" y="70.0858" size="0.8128" layer="25" rot="R270">VB</text>
+<text x="26.4874" y="66.6858" size="0.8128" layer="25" rot="R270">VB</text>
 <text x="20.6626" y="61.7858" size="0.8128" layer="25">GD</text>
 <text x="23.0626" y="61.7858" size="0.8128" layer="25">3V3</text>
 <text x="32.5626" y="70.0858" size="0.8128" layer="25">SDA</text>
@@ -744,7 +744,7 @@ design rules under a new name.</description>
 <attribute name="PROD_ID" value="CONN-09696" x="16.1" y="6.4" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="18.132" y="5.13" size="0.6096" layer="27" font="vector" ratio="20" rot="R90"/>
 </element>
-<element name="U$2" library="headers(2mm)" package="1X6" value="1X6" x="23.7" y="67.75"/>
+<element name="U$2" library="headers(2mm)" package="1X6" value="1X6" x="23.7" y="67.75" rot="R180"/>
 <element name="U$5" library="headers(2mm)" package="1X3" value="1X3" x="24.05" y="9.4"/>
 <element name="VL1" library="SparkFun-Connectors" package="1X03_NO_SILK" value="" x="31.3" y="67.9" smashed="yes" rot="R90">
 <attribute name="VALUE" x="33.332" y="66.63" size="0.6096" layer="27" font="vector" ratio="20" rot="R90"/>
@@ -795,7 +795,7 @@ design rules under a new name.</description>
 </polygon>
 <contactref element="VL2" pad="2"/>
 <contactref element="PMW3" pad="2"/>
-<wire x1="40.71" y1="46.64" x2="18.7" y2="67.75" width="0" layer="19" extent="1-1"/>
+<wire x1="40.71" y1="46.64" x2="28.7" y2="67.75" width="0" layer="19" extent="1-1"/>
 <wire x1="38.17" y1="31.4" x2="40.71" y2="46.64" width="0" layer="19" extent="1-1"/>
 <wire x1="27.91" y1="27.8" x2="38.17" y2="31.4" width="0" layer="19" extent="1-1"/>
 <wire x1="22.05" y1="9.4" x2="27.91" y2="27.8" width="0" layer="19" extent="1-1"/>
@@ -841,27 +841,27 @@ design rules under a new name.</description>
 <signal name="M4">
 <contactref element="U$2" pad="3"/>
 <contactref element="U$1" pad="5"/>
-<wire x1="22.7" y1="67.75" x2="25.47" y2="46.64" width="0" layer="19" extent="1-1"/>
+<wire x1="24.7" y1="67.75" x2="25.47" y2="46.64" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M1">
 <contactref element="U$2" pad="6"/>
 <contactref element="U$1" pad="2"/>
-<wire x1="33.09" y1="46.64" x2="28.7" y2="67.75" width="0" layer="19" extent="1-1"/>
+<wire x1="33.09" y1="46.64" x2="18.7" y2="67.75" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M2">
 <contactref element="U$2" pad="5"/>
 <contactref element="U$1" pad="3/CANTX"/>
-<wire x1="26.7" y1="67.75" x2="30.55" y2="46.64" width="0" layer="19" extent="1-1"/>
+<wire x1="20.7" y1="67.75" x2="30.55" y2="46.64" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="M3">
 <contactref element="U$2" pad="4"/>
 <contactref element="U$1" pad="4/CANRX"/>
-<wire x1="24.7" y1="67.75" x2="28.01" y2="46.64" width="0" layer="19" extent="1-1"/>
+<wire x1="22.7" y1="67.75" x2="28.01" y2="46.64" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="VBAT">
 <contactref element="REG" pad="3"/>
 <contactref element="U$2" pad="2"/>
-<wire x1="20.7" y1="67.75" x2="16.1" y2="11.48" width="0" layer="19" extent="1-1"/>
+<wire x1="26.7" y1="67.75" x2="16.1" y2="11.48" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="INT">
 <contactref element="VL2" pad="3"/>
