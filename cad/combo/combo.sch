@@ -3842,6 +3842,12 @@ part number 2062-2P from STA</description>
 <pad name="2" x="0" y="0" drill="0.8" diameter="1.4224"/>
 <pad name="3" x="2" y="0" drill="0.8" diameter="1.4224"/>
 </package>
+<package name="1X2">
+<rectangle x1="-1.254" y1="-0.254" x2="-0.746" y2="0.254" layer="21"/>
+<rectangle x1="0.746" y1="-0.254" x2="1.254" y2="0.254" layer="21"/>
+<pad name="1" x="-1" y="0" drill="0.8" diameter="1.4224"/>
+<pad name="2" x="1" y="0" drill="0.8" diameter="1.4224"/>
+</package>
 </packages>
 <symbols>
 <symbol name="1X6_HEADER">
@@ -3896,6 +3902,22 @@ part number 2062-2P from STA</description>
 <wire x1="1.27" y1="0" x2="2.54" y2="0" width="0.254" layer="94"/>
 <wire x1="1.27" y1="-2.54" x2="2.54" y2="-2.54" width="0.254" layer="94"/>
 </symbol>
+<symbol name="1X2_HEADER">
+<wire x1="-2.54" y1="2.54" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="1.27" y1="0" x2="2.54" y2="0" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="2.54" x2="-2.54" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="-5.08" x2="2.54" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="2.54" y1="-5.08" x2="2.54" y2="-2.54" width="0.254" layer="94"/>
+<text x="0" y="0" size="1.016" layer="94" font="vector" rot="MR0" align="center">01</text>
+<text x="-2.54" y="3.175" size="1.27" layer="95" font="vector">&gt;NAME</text>
+<text x="-2.54" y="-6.985" size="1.27" layer="96" font="vector">&gt;VALUE</text>
+<pin name="1" x="2.54" y="0" visible="off" length="point" rot="R180"/>
+<wire x1="2.54" y1="-2.54" x2="2.54" y2="0" width="0.254" layer="94"/>
+<wire x1="2.54" y1="0" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="0" y="-2.54" size="1.016" layer="94" font="vector" rot="MR0" align="center">02</text>
+<pin name="2" x="2.54" y="-2.54" visible="off" length="point" rot="R180"/>
+<wire x1="1.27" y1="-2.54" x2="2.54" y2="-2.54" width="0.254" layer="94"/>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="1X6">
@@ -3935,6 +3957,22 @@ part number 2062-2P from STA</description>
 </device>
 </devices>
 </deviceset>
+<deviceset name="1X2">
+<gates>
+<gate name="G$1" symbol="1X2_HEADER" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="1X2">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
 </devicesets>
 </library>
 </libraries>
@@ -3957,6 +3995,7 @@ part number 2062-2P from STA</description>
 <part name="PMW1" library="SparkFun-Connectors" deviceset="CONN_04" device="1X04_NO_SILK"/>
 <part name="PMW2" library="SparkFun-Connectors" deviceset="CONN_04" device="1X04_NO_SILK"/>
 <part name="PMW3" library="SparkFun-Connectors" deviceset="CONN_02" device="1X02_NO_SILK"/>
+<part name="SPI2" library="headers(2mm)" deviceset="1X2" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -3976,6 +4015,9 @@ part number 2062-2P from STA</description>
 <instance part="PMW1" gate="J1" x="-58.42" y="33.02"/>
 <instance part="PMW2" gate="J1" x="-58.42" y="15.24"/>
 <instance part="PMW3" gate="G$1" x="-60.96" y="-2.54"/>
+<instance part="SPI2" gate="G$1" x="-60.96" y="-22.86" smashed="yes">
+<attribute name="NAME" x="-63.5" y="-19.685" size="1.27" layer="95" font="vector"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -4214,6 +4256,11 @@ part number 2062-2P from STA</description>
 <wire x1="-53.34" y1="15.24" x2="-48.26" y2="15.24" width="0.1524" layer="91"/>
 <label x="-53.34" y="15.24" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="SPI2" gate="G$1" pin="1"/>
+<wire x1="-58.42" y1="-22.86" x2="-53.34" y2="-22.86" width="0.1524" layer="91"/>
+<label x="-55.88" y="-22.86" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="LED" class="0">
 <segment>
@@ -4227,6 +4274,11 @@ part number 2062-2P from STA</description>
 <pinref part="PMW1" gate="J1" pin="1"/>
 <wire x1="-53.34" y1="30.48" x2="-48.26" y2="30.48" width="0.1524" layer="91"/>
 <label x="-53.34" y="30.48" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="SPI2" gate="G$1" pin="2"/>
+<wire x1="-58.42" y1="-25.4" x2="-53.34" y2="-25.4" width="0.1524" layer="91"/>
+<label x="-55.88" y="-25.4" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="EN" class="0">
