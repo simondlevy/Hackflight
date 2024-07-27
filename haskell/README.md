@@ -15,9 +15,9 @@ cabal install copilot
 cabal install copilot-c99
 ```
 
-Now follow these [directions](../webots) for installing Webots and flying a simulated quadcopter.
+Next, follow these [directions](../webots) for installing Webots and flying a simulated quadcopter.
 
-Finally, from the hackflight3. From the hackflight main directory, do the following:
+Finally, from the hackflight main directory, do the following:
 
 ```
 cd webots/controllers/haskell
