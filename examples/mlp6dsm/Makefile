@@ -1,4 +1,4 @@
-SKETCH = dsmx
+SKETCH = mlp6dsm
 
 BOARD = teensy:avr:teensy40
 

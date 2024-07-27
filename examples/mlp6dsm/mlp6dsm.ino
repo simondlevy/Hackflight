@@ -90,7 +90,7 @@ static const float    BLINK_RATE_HZ = 1.5;
 static hf::BlinkTask _blinkTask;
 
 // Throttle stick tolerance
-static const uint32_t THROTTLE_DOWN = 1050;
+static const uint32_t THROTTLE_DOWN = 1161;
 
 // Debugging
 static const float DEBUG_RATE_HZ = 100;
@@ -119,7 +119,7 @@ static MPU6050 _mpu6050;
 
 // Receiver -------------------------------------------------------------------
 
-static const uint8_t RX_CHANNELS = 8;
+static const uint8_t RX_CHANNELS = 5;
 
 Dsm2048 _rx;
 
@@ -221,19 +221,23 @@ static void readImu(hf::axis3_t & gyro, hf::axis3_t & accel)
             B_ACCEL, ACCEL_BIAS, accel, _accel_prev);
 }
 
-static float channelToDemand(
-        const float chan, const float offset=1500, const float denom=500)
+static float channelToDemand(const float chanval)
 {
-    return (chan - offset) / denom;
+    return (chanval - 1160) / (1840 - 1160);
+}
+
+static float rpyChannelToDemand(const float chanval, const int8_t sign)
+{
+    return sign * 2 * (channelToDemand(chanval) - 0.5);
 }
 
 static void getOpenLoopDemands(
         const hf::channels_t & channels, hf::demands_t & demands)
 {
-    demands.thrust = channelToDemand(channels.c1, 1000, 1000);
-    demands.roll = channelToDemand(channels.c2);
-    demands.pitch = channelToDemand(channels.c3);
-    demands.yaw = channelToDemand(channels.c4);
+    demands.thrust = channelToDemand(channels.c1);
+    demands.roll = rpyChannelToDemand(channels.c2, -1);
+    demands.pitch = rpyChannelToDemand(channels.c3, 1);
+    demands.yaw = rpyChannelToDemand(channels.c4, -1);
 
     // Constrain roll, pitch demand angles to 30 degrees
     demands.thrust = constrain(demands.thrust, 0.0, 1.0);
@@ -270,7 +274,6 @@ static void readReceiver(
         channels.c3 = values[2];
         channels.c4 = values[3];
         channels.c5 = values[4];
-        channels.c6 = values[5];
     }
 }
 
@@ -287,8 +290,11 @@ static void runMotors(void)
 static void cutMotors(
         const uint32_t c5, const bool gotFailsafe, bool & isArmed) 
 {
-    if (c5 < 1500 || !isArmed || gotFailsafe) {
+    if (c5 > 1800 || gotFailsafe) {
         isArmed = false;
+    }
+
+    if (!isArmed) {
         _m1_usec = 120;
         _m2_usec = 120;
         _m3_usec = 120;
@@ -467,7 +473,7 @@ void loop()
 
     // Check if the thrust cut is off and the thrust input is low to
     // prepare for flight.
-    if ((_channels.c5 > 1500) && (_channels.c1 < THROTTLE_DOWN)) {
+    if ((_channels.c5 < 1600) && (_channels.c1 < 1161)) {
         _isArmed = true;
     }
 
