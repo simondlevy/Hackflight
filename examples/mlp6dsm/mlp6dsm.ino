@@ -119,7 +119,7 @@ static MPU6050 _mpu6050;
 
 // Receiver -------------------------------------------------------------------
 
-static const uint8_t RX_CHANNELS = 8;
+static const uint8_t RX_CHANNELS = 5;
 
 Dsm2048 _rx;
 
@@ -221,25 +221,32 @@ static void readImu(hf::axis3_t & gyro, hf::axis3_t & accel)
             B_ACCEL, ACCEL_BIAS, accel, _accel_prev);
 }
 
+/*
 static float channelToDemand(
         const float chan, const float offset=1500, const float denom=500)
 {
     return (chan - offset) / denom;
-}
+}*/
 
 static void getOpenLoopDemands(
         const hf::channels_t & channels, hf::demands_t & demands)
 {
-    demands.thrust = channelToDemand(channels.c1, 1000, 1000);
-    demands.roll = channelToDemand(channels.c2);
-    demands.pitch = channelToDemand(channels.c3);
-    demands.yaw = channelToDemand(channels.c4);
+    demands.thrust = ((float)channels.c1 - 1160) / (1840 - 1160);
+
+    demands.roll = -2 * (((float)channels.c2 - 1160) / (1840 - 1160) - 0.5);
+
+    demands.pitch = 2 * (((float)channels.c3 - 1160) / (1840 - 1160) - 0.5);
+
+    demands.yaw = -2 * (((float)channels.c4 - 1160) / (1840 - 1160) - 0.5);
 
     // Constrain roll, pitch demand angles to 30 degrees
     demands.thrust = constrain(demands.thrust, 0.0, 1.0);
     demands.roll = constrain(demands.roll, -1.0, 1.0) * 30;
     demands.pitch = constrain(demands.pitch, -1.0, 1.0) * 30;
     demands.yaw = constrain(demands.yaw, -1.0, 1.0);
+
+    printf("t=%+3.3f  r=%+3.3f  p=%+3.3f  y=%+3.3f  \n", 
+            demands.thrust, demands.roll, demands.pitch, demands.yaw);
 }
 
 static void scaleMotors(const hf::quad_motors_t & motors)
@@ -270,7 +277,6 @@ static void readReceiver(
         channels.c3 = values[2];
         channels.c4 = values[3];
         channels.c5 = values[4];
-        channels.c6 = values[5];
     }
 }
 
