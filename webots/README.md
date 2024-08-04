@@ -31,7 +31,7 @@ are currently supported:
 * SHANWAN Android Gamepad
 * [Logitech Gamepad F310](https://www.amazon.com/gp/product/B003VAHYQY)
 * [Logitech Extreme 3D Pro](https://www.amazon.com/gp/product/B00009OY9U)
-* FrSky Simulator
+* [FrSky XSR-SIM USB Dongle(https://www.amazon.com/gp/product/B07GD6ZLW7)
 * Horizon Hobby SPEKTRUM RECEIVER
  
 If you prefer to program in Python, there is also support for that; simply type ```make python```
