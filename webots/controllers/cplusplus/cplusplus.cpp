@@ -144,13 +144,12 @@ int main(int argc, char ** argv)
 
         altitudeController.run(state, _altitude_target, demands);
 
+        climbRateController.run(state, TBASE, TSCALE, TMIN, !landed, demands);
+
         yawAngleController.run(state, _yaw_angle_target, demands);
 
         yawRateController.run(YAW_RATE_KP, state, demands);
 
-        climbRateController.run(state, TBASE, TSCALE, TMIN, !landed, demands);
-
-        // Run mixer to convert demands to motor spins
         hf::Mixer::runCF(demands, motors);
 
         sim.setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
