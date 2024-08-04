@@ -133,10 +133,9 @@ namespace hf {
 
             std::map<std::string, joystickAxes_t> JOYSTICK_AXIS_MAP = {
 
-                // Linux
-                { "MY-POWER CO.,LTD. 2In1 USB Joystick",
+                { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
                     joystickAxes_t {-2,  3, -4, 1} },
-                { "SHANWAN Android Gamepad",
+                { "SHANWAN Android Gamepad",             // PS3
                     joystickAxes_t {-2,  3, -4, 1} },
                 { "Logitech Gamepad F310",
                     joystickAxes_t {-2,  4, -5, 1} },
