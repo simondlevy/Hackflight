@@ -32,7 +32,7 @@ are currently supported:
 * [Logitech Gamepad F310](https://www.amazon.com/gp/product/B003VAHYQY)
 * [Logitech Extreme 3D Pro](https://www.amazon.com/gp/product/B00009OY9U)
 * [FrSky XSR-SIM USB Dongle](https://www.amazon.com/gp/product/B07GD6ZLW7)
-* Horizon Hobby SPEKTRUM RECEIVER
+* [Spektrum Ws2000 Wireless USB RC Flight Simulator Dongle](https://www.amazon.com/gp/product/B07ZK1R32H)
  
 If you prefer to program in Python, there is also support for that; simply type ```make python```
 instead of ```make cplusplus```.   You can now fly the vehicle with your keyboard (I don't currrently
