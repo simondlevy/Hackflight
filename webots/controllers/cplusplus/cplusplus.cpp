@@ -22,7 +22,7 @@
 static const float PITCH_ROLL_ANGLE_KP = 6e0;
 
 static const float PITCH_ROLL_RATE_KP = 1.25e-2;
-static const float PITCH_ROLL_RATE_KD = 1.25e-4;
+static const float PITCH_ROLL_RATE_KD = 0; //1.25e-4;
 
 static const float YAW_RATE_KP = 1.20e-2;
 
