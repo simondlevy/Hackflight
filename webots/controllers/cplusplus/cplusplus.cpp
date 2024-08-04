@@ -16,8 +16,9 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 */
 
-#include <tasks/core.hpp>
 #include <webots.hpp>
+
+#include "core.hpp"
 
 static const float PITCH_ROLL_ANGLE_KP = 6e0;
 
