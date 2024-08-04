@@ -28,7 +28,7 @@ was found and instruct you on how to fly with the keyboard.  The following devic
 are currently supported:
 
 * Nyko 83069 Playstation(R)3 Core Wired Controller
-* [MGEAR Wired Controller for PS3]https://www.officedepot.com/a/products/7123231/Gear-Wired-Controller-For-PS3-Black/)
+* [MGEAR Wired Controller for PS3](https://www.officedepot.com/a/products/7123231/Gear-Wired-Controller-For-PS3-Black/)
 * [Logitech Gamepad F310](https://www.amazon.com/gp/product/B003VAHYQY)
 * [Logitech Extreme 3D Pro](https://www.amazon.com/gp/product/B00009OY9U)
 * [FrSky XSR-SIM USB Dongle](https://www.amazon.com/gp/product/B07GD6ZLW7)
