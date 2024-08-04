@@ -140,6 +140,8 @@ namespace hf {
                     joystickAxes_t {-2,  3, -4, 1} },
                 { "Logitech Gamepad F310",
                     joystickAxes_t {-2,  4, -5, 1} },
+                { "Logitech Logitech Extreme 3D",
+                    joystickAxes_t {-4,  1, -2, 3}  },
                 { "FrSky FrSky Simulator",
                     joystickAxes_t { 1,  2,  3, 4} },
                 { "Horizon Hobby SPEKTRUM RECEIVER",
