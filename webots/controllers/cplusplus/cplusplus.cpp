@@ -22,13 +22,13 @@
 #include <mixers.hpp>
 #include <utils.hpp>
 
-#include <pids/altitude.hpp>
-#include <pids/climb_rate.hpp>
-#include <pids/pitch_roll_angle.hpp>
-#include <pids/pitch_roll_rate.hpp>
-#include <pids/position.hpp>
-#include <pids/yaw_angle.hpp>
-#include <pids/yaw_rate.hpp>
+#include <newpids/altitude.hpp>
+#include <newpids/climb_rate.hpp>
+#include <newpids/pitch_roll_angle.hpp>
+#include <newpids/pitch_roll_rate.hpp>
+#include <newpids/position.hpp>
+#include <newpids/yaw_angle.hpp>
+#include <newpids/yaw_rate.hpp>
 
 static const float PITCH_ROLL_ANGLE_KP = 6e0;
 
