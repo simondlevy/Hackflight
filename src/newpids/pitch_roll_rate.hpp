@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include <utils.hpp>
-#include <pid.hpp>
-
 namespace hf {
 
     class PitchRollRateController {
@@ -34,33 +31,22 @@ namespace hf {
 
             void run(
                     const float kp,
-                    const float kd,
                     const state_t & state, 
-                    const float dt, 
                     demands_t & demands)
             {
-                const auto nothrust = demands.thrust == 0;
+                run_axis(kp, demands.roll, state.dphi);
 
-                run_axis(kp, kd, _roll, demands.roll, dt, state.dphi, nothrust);
-
-                run_axis(kp, kd, _pitch, demands.pitch, dt, state.dtheta, nothrust);
+                run_axis(kp, demands.pitch, state.dtheta);
             }
 
         private:
 
-            PID _roll;
-            PID _pitch;
-
             static void run_axis(
                     const float kp,
-                    const float kd,
-                    PID & pid, 
                     float & demand, 
-                    const float dt, 
-                    const float actual, 
-                    const float reset)
+                    const float actual) 
             {
-                demand = pid.run_pd(kp, kd, dt, demand, actual, reset);
+                demand = kp * (demand - actual);
             }
     };
 
