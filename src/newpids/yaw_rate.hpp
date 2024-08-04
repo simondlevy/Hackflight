@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include <utils.hpp>
-#include <pid.hpp>
-
 namespace hf {
 
     class YawRateController {
@@ -35,16 +32,10 @@ namespace hf {
             void run(
                     const float kp,
                     const state_t & state, 
-                    const float dt, 
                     demands_t & demands)
             {
-                demands.yaw =
-                    _pid.run_p(kp, dt, demands.yaw, state.dpsi);
+                demands.yaw = kp * (demands.yaw - state.dpsi);
             }
-
-        private:
-
-            PID _pid;
     };
 
 }

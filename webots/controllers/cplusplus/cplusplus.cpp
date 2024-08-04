@@ -133,7 +133,7 @@ int main(int argc, char ** argv)
 
         yawAngleController.run(state, DT, demands);
 
-        yawRateController.run(YAW_RATE_KP, state, DT, demands);
+        yawRateController.run(YAW_RATE_KP, state, demands);
 
         climbRateController.run(state, TBASE, TSCALE, TMIN, !landed, demands);
 
