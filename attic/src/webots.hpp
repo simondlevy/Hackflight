@@ -133,17 +133,35 @@ namespace hf {
 
             std::map<std::string, joystickAxes_t> JOYSTICK_AXIS_MAP = {
 
+                // Negative throttle value indicates springy throttle
+
                 // Linux
                 { "MY-POWER CO.,LTD. 2In1 USB Joystick",
                     joystickAxes_t {-2,  3, -4, 1} },
                 { "SHANWAN Android Gamepad",
                     joystickAxes_t {-2,  3, -4, 1} },
+                { "Logitech Logitech Extreme 3D",
+                    joystickAxes_t {-4,  1, -2, 3}  },
                 { "Logitech Gamepad F310",
                     joystickAxes_t {-2,  4, -5, 1} },
                 { "FrSky FrSky Simulator",
                     joystickAxes_t { 1,  2,  3, 4} },
                 { "Horizon Hobby SPEKTRUM RECEIVER",
-                    joystickAxes_t { 2,  -3,  4, -1} }
+                    joystickAxes_t { 2,  3,  4, 1} },
+
+                // Windows
+                { "2In1 USB Joystick",
+                    joystickAxes_t {-1,  4, -3, 2} },
+                { "Controller (XBOX 360 For Windows)",
+                    joystickAxes_t {-1,  4, -3, 2} },
+                { "Controller (Gamepad F310)",
+                    joystickAxes_t {-1,  4, -3, 2} },
+                { "Logitech Extreme 3D",
+                    joystickAxes_t { 0,  2, -1, 3} },
+                { "FrSky Simulator",
+                    joystickAxes_t { 6,  5,  4, 3} },
+                { "SPEKTRUM RECEIVER",
+                    joystickAxes_t { 3,  2,  1, 4} },
             };
 
             static float scaleJoystickAxis(const int32_t rawval)
@@ -163,6 +181,42 @@ namespace hf {
                 return scaleJoystickAxis(readJoystickRaw(index));
             }
 
+            static float readThrottleNormal(joystickAxes_t axes)
+            {
+                return scaleJoystickAxis(readJoystickRaw(axes.throttle));
+            }
+
+            static float readThrottleExtremeWindows(void)
+            {
+                static bool _didWarn;
+
+                if (!_didWarn) {
+                    printf("Use trigger to climb, side-button to descend\n");
+                }
+
+                _didWarn = true;
+
+                auto button = wb_joystick_get_pressed_button();
+
+                return button == 0 ? + 0.5 : button == 1 ? -0.5 : 0;
+            }
+
+            // Special handling for throttle stick: 
+            //
+            // 1. Check for Logitech Extreme Pro 3D on Windows; have to use
+            // buttons for throttle.
+            //
+            // 2. Starting at low throttle (as we should) produces an initial
+            // stick value of zero.  So we check for this and adjust as needed.
+            //
+            static float readJoystickThrust(
+                    const char * name, const joystickAxes_t axes)
+            {
+                return !strcmp(name, "Logitech Extreme 3D") ? 
+                    readThrottleExtremeWindows() : 
+                    readThrottleNormal(axes);
+            }
+
             void readJoystick(
                     float & throttle, float & roll, float & pitch, float & yaw)
             {
@@ -170,7 +224,7 @@ namespace hf {
 
                 auto axes = JOYSTICK_AXIS_MAP[joyname];
 
-                throttle = scaleJoystickAxis(readJoystickRaw(axes.throttle));
+                throttle = readJoystickThrust(joyname, axes);
 
                 roll = readJoystickAxis(axes.roll);
                 pitch = readJoystickAxis(axes.pitch); 
