@@ -18,10 +18,6 @@
 
 #pragma once
 
-#include <utils.hpp>
-
-#include <pid.hpp>
-
 namespace hf {
 
     class YawAngleController {
@@ -42,7 +38,7 @@ namespace hf {
 
                 const auto target = cap (_target + ANGLE_MAX * demands.yaw * dt);
 
-                demands.yaw = _pid.run_pd(KP, KD, dt, target, state.psi);
+                demands.yaw = KP * (target - state.psi);
 
                 // Reset target on zero thrust
                 _target =  demands.thrust == 0 ? state.psi : target;
@@ -51,7 +47,6 @@ namespace hf {
         private:
 
             static constexpr float KP = 6;
-            static constexpr float KD = 0.25;
             static constexpr float ANGLE_MAX = 200;
 
             PID _pid;
