@@ -52,7 +52,7 @@ namespace hf {
             PID _pid;
 
             static constexpr float KP = 25;
-            static constexpr float KI = 15;
+            static constexpr float KI = 0;//15;
             static constexpr float ILIMIT = 5000;
     };
 
