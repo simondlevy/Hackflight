@@ -125,8 +125,7 @@ int main(int argc, char ** argv)
 
         positionController.run(state, DT, demands);
 
-        pitchRollAngleController.run(
-                PITCH_ROLL_ANGLE_KP, state, DT, demands);
+        pitchRollAngleController.run(PITCH_ROLL_ANGLE_KP, state, demands);
 
         pitchRollRateController.run(PITCH_ROLL_RATE_KP, state, demands);
 
