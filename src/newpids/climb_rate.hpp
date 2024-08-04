@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include <utils.hpp>
-#include <pid.hpp>
-
 namespace hf {
 
     class ClimbRateController {
@@ -34,26 +31,20 @@ namespace hf {
 
             void run(
                     const state_t & state, 
-                    const float dt,
                     const float tbase,
                     const float tscale,
                     const float tmin,
                     const bool flying,
                     demands_t & demands)
             {
-                const auto thrustpid = _pid.run_pi(
-                        KP, KI, ILIMIT, dt, demands.thrust, state.dz);
+                const auto thrustpid = KP * (demands.thrust - state.dz);
 
                 demands.thrust = flying ? thrustpid * tscale + tbase : tmin;
             }
 
         private:
 
-            PID _pid;
-
             static constexpr float KP = 25;
-            static constexpr float KI = 0;//15;
-            static constexpr float ILIMIT = 5000;
     };
 
 }

@@ -136,8 +136,7 @@ int main(int argc, char ** argv)
 
         yawRateController.run(YAW_RATE_KP, state, DT, demands);
 
-        climbRateController.run(state, DT, TBASE, TSCALE, TMIN,
-                !landed, demands);
+        climbRateController.run(state, TBASE, TSCALE, TMIN, !landed, demands);
 
         // Run mixer to convert demands to motor spins
         hf::Mixer::runCF(demands, motors);
