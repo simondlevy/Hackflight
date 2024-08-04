@@ -123,7 +123,7 @@ int main(int argc, char ** argv)
             stickDemands.yaw
         };
 
-        positionController.run(state, DT, demands);
+        positionController.run(state, demands);
 
         pitchRollAngleController.run(PITCH_ROLL_ANGLE_KP, state, demands);
 

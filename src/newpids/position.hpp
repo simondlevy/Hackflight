@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include <utils.hpp>
-#include <pid.hpp>
-
 namespace hf {
 
     class PositionController {
@@ -31,26 +28,20 @@ namespace hf {
 
         public:
 
-            void run(
-                    const state_t & state, const float dt, demands_t & demands) 
+            void run(const state_t & state, demands_t & demands)
             {
-                run_axis(_roll_pid, demands.roll, dt, state.dy);
+                run_axis(demands.roll, state.dy);
 
-                run_axis(_pitch_pid, demands.pitch, dt, state.dx);
+                run_axis(demands.pitch, state.dx);
             }
 
         private:
 
             static constexpr float KP = 25;
 
-            PID _roll_pid;
-
-            PID _pitch_pid;
-
-            static void run_axis(
-                    PID & pid, float & demand, const float dt, const float actual)
+            static void run_axis(float & demand, const float actual)
             {
-                demand = pid.run_p(KP, dt, demand, actual);
+                demand = KP * (demand - actual);
             }
     };
 

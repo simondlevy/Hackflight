@@ -49,8 +49,6 @@ namespace hf {
             static constexpr float KP = 6;
             static constexpr float ANGLE_MAX = 200;
 
-            PID _pid;
-
             static float cap(const float angle)
             {
                 const float angle1 = angle > 180 ? angle - 360 : angle;
