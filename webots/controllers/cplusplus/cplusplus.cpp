@@ -1,20 +1,20 @@
 /*
-  C++ flight simulator support for Hackflight
- 
-  Copyright (C) 2024 Simon D. Levy
- 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, in version 3.
- 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
- 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http:--www.gnu.org/licenses/>.
-*/
+   C++ flight simulator support for Hackflight
+
+   Copyright (C) 2024 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
 
 #include <webots.hpp>
 
@@ -36,6 +36,8 @@ static const float PITCH_ROLL_RATE_KP = 1.25e-2;
 
 static const float YAW_RATE_KP = 1.20e-2;
 
+static const float YAW_ANGLE_MAX = 200;
+
 // Motor thrust constants for climb-rate PID controller
 static const float TBASE = 56;
 static const float TSCALE = 0.25;
@@ -52,8 +54,7 @@ static constexpr float THROTTLE_SCALE = 0.005;
 // We consider altitudes below this value to be the ground
 static constexpr float ZGROUND = 0.05;
 
-// Arbitrary time constexprant
-static constexpr float DT = .01;
+static constexpr float YAW_DEMAND_SCALE = .01;
 
 typedef enum {
 
@@ -62,6 +63,13 @@ typedef enum {
     STATUS_FLYING
 
 } flyingStatus_e;
+
+static float cap_yaw_angle(const float angle)
+{
+    const float angle1 = angle > 180 ? angle - 360 : angle;
+
+    return angle1 < -180 ? angle1 + 360 : angle1;
+}
 
 int main(int argc, char ** argv)
 {
@@ -91,6 +99,8 @@ int main(int argc, char ** argv)
 
         static float _altitude_target;
 
+        static float _yaw_angle_target;
+
         hf::quad_motors_t motors = {};
 
         _altitude_target =
@@ -99,6 +109,9 @@ int main(int argc, char ** argv)
             _status == STATUS_LANDED ?
             INITIAL_ALTITUDE_TARGET :
             _altitude_target;
+
+        _yaw_angle_target = cap_yaw_angle(_yaw_angle_target + 
+                YAW_ANGLE_MAX * stickDemands.yaw * YAW_DEMAND_SCALE);
 
         _status = 
 
@@ -131,7 +144,7 @@ int main(int argc, char ** argv)
 
         altitudeController.run(state, _altitude_target, demands);
 
-        yawAngleController.run(state, DT, demands);
+        yawAngleController.run(state, _yaw_angle_target, demands);
 
         yawRateController.run(YAW_RATE_KP, state, demands);
 
