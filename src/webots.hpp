@@ -140,8 +140,6 @@ namespace hf {
                     joystickAxes_t {-2,  3, -4, 1} },
                 { "SHANWAN Android Gamepad",
                     joystickAxes_t {-2,  3, -4, 1} },
-                { "Logitech Logitech Extreme 3D",
-                    joystickAxes_t {-4,  1, -2, 3}  },
                 { "Logitech Gamepad F310",
                     joystickAxes_t {-2,  4, -5, 1} },
                 { "FrSky FrSky Simulator",
@@ -156,8 +154,6 @@ namespace hf {
                     joystickAxes_t {-1,  4, -3, 2} },
                 { "Controller (Gamepad F310)",
                     joystickAxes_t {-1,  4, -3, 2} },
-                { "Logitech Extreme 3D",
-                    joystickAxes_t { 0,  2, -1, 3} },
                 { "FrSky Simulator",
                     joystickAxes_t { 6,  5,  4, 3} },
                 { "SPEKTRUM RECEIVER",
@@ -181,11 +177,6 @@ namespace hf {
                 return scaleJoystickAxis(readJoystickRaw(index));
             }
 
-            static float readThrottleNormal(joystickAxes_t axes)
-            {
-                return scaleJoystickAxis(readJoystickRaw(axes.throttle));
-            }
-
             static float readThrottleExtremeWindows(void)
             {
                 static bool _didWarn;
@@ -201,22 +192,6 @@ namespace hf {
                 return button == 0 ? + 0.5 : button == 1 ? -0.5 : 0;
             }
 
-            // Special handling for throttle stick: 
-            //
-            // 1. Check for Logitech Extreme Pro 3D on Windows; have to use
-            // buttons for throttle.
-            //
-            // 2. Starting at low throttle (as we should) produces an initial
-            // stick value of zero.  So we check for this and adjust as needed.
-            //
-            static float readJoystickThrust(
-                    const char * name, const joystickAxes_t axes)
-            {
-                return !strcmp(name, "Logitech Extreme 3D") ? 
-                    readThrottleExtremeWindows() : 
-                    readThrottleNormal(axes);
-            }
-
             void readJoystick(
                     float & throttle, float & roll, float & pitch, float & yaw)
             {
@@ -224,7 +199,7 @@ namespace hf {
 
                 auto axes = JOYSTICK_AXIS_MAP[joyname];
 
-                throttle = readJoystickThrust(joyname, axes);
+                throttle = scaleJoystickAxis(readJoystickRaw(axes.throttle));
 
                 roll = readJoystickAxis(axes.roll);
                 pitch = readJoystickAxis(axes.pitch); 
