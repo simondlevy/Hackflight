@@ -130,7 +130,7 @@ int main(int argc, char ** argv)
 
         pitchRollRateController.run(PITCH_ROLL_RATE_KP, state, demands);
 
-        altitudeController.run(state, DT, _altitude_target, demands);
+        altitudeController.run(state, _altitude_target, demands);
 
         yawAngleController.run(state, DT, demands);
 
