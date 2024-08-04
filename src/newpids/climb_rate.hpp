@@ -23,23 +23,15 @@ namespace hf {
     class ClimbRateController {
 
         /*
-           Demand is input as climb rate in meters per second and output as positive
-           value scaled according to motor characteristics.
+           Demand is input as climb rate in meters per second and output as
+           positive value scaled according to motor characteristics.
          */
 
         public:
 
-            void run(
-                    const state_t & state, 
-                    const float tbase,
-                    const float tscale,
-                    const float tmin,
-                    const bool flying,
-                    demands_t & demands)
+            void run(const state_t & state, demands_t & demands)
             {
-                const auto thrustpid = KP * (demands.thrust - state.dz);
-
-                demands.thrust = flying ? thrustpid * tscale + tbase : tmin;
+                demands.thrust = KP * (demands.thrust - state.dz);
             }
 
         private:
