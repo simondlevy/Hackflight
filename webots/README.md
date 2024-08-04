@@ -29,7 +29,7 @@ are currently supported:
 
 * MY-POWER CO.,LTD. 2In1 USB Joystick
 * SHANWAN Android Gamepad
-* Logitech Gamepad F310
+* Logitech Gamepad F310 (https://www.amazon.com/Logitech-940-000110-Gamepad-F310)
 * [Logitech Extreme 3D Pro](https://www.amazon.com/gp/product/B00009OY9U)
 * FrSky Simulator
 * Horizon Hobby SPEKTRUM RECEIVER
