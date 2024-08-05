@@ -70,11 +70,6 @@ static float cap_yaw_angle(const float angle)
 
 int main(int argc, char ** argv)
 {
-    hf::PositionController positionController= {};
-    hf::PitchRollController pitchRollController= {};
-    hf::AltitudeController altitudeController= {};
-    hf::YawController yawController= {};
-
     hf::Simulator sim = {};
 
     sim.init();
@@ -130,14 +125,14 @@ int main(int argc, char ** argv)
             stickDemands.yaw
         };
 
-        positionController.run(state, demands);
+        hf::PositionController::run(state, demands);
 
-        pitchRollController.run(
+        hf::PitchRollController::run(
                 PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP, state, demands);
 
-        altitudeController.run(state, _altitude_target, demands);
+        hf::AltitudeController::run(state, _altitude_target, demands);
 
-        yawController.run(YAW_RATE_KP, state, _yaw_angle_target, demands);
+        hf::YawController::run(YAW_RATE_KP, state, _yaw_angle_target, demands);
 
         demands.thrust = landed ? TMIN : TBASE + TSCALE * demands.thrust;
         

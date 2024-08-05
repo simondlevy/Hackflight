@@ -30,7 +30,7 @@ namespace hf {
 
         public:
 
-            void run(const state_t & state,
+            static void run(const state_t & state,
                     const float target,
                     demands_t & demands)
             {

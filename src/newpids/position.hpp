@@ -28,7 +28,7 @@ namespace hf {
 
         public:
 
-            void run(const state_t & state, demands_t & demands)
+            static void run(const state_t & state, demands_t & demands)
             {
                 run_axis(demands.roll, state.dy);
 

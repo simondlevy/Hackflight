@@ -29,7 +29,7 @@ namespace hf {
 
         public:
 
-            void run(
+            static void run(
                     const float k2,
                     const state_t & state,
                     const float target,
