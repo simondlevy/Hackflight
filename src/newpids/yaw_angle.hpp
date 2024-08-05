@@ -32,13 +32,13 @@ namespace hf {
             void run(const state_t & state, const float target,
                     demands_t & demands)
             {
-                demands.yaw = KP * (target - state.psi);
+                demands.yaw = K1 * (target - state.psi);
 
             }
 
         private:
 
-            static constexpr float KP = 6;
+            static constexpr float K1 = 6;
 
     };
 

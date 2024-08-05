@@ -30,11 +30,11 @@ namespace hf {
         public:
 
             void run(
-                    const float kp,
+                    const float k2,
                     const state_t & state, 
                     demands_t & demands)
             {
-                demands.yaw = kp * (demands.yaw - state.dpsi);
+                demands.yaw = k2 * (demands.yaw - state.dpsi);
             }
     };
 
