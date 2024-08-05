@@ -16,6 +16,10 @@ cplusplus:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/cplusplus/cplusplus
 
+takeoff:
+	webots worlds/standard.wbt &
+	/usr/local/webots/webots-controller controllers/takeoff/takeoff
+
 haskell:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/haskell/haskell
