@@ -1,5 +1,5 @@
 /*
-   Yaw angle PID controller for Hackflight
+   Yaw controller for Hackflight
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -20,7 +20,7 @@
 
 namespace hf {
 
-    class YawAngleController {
+    class YawController {
 
         /*
            Demand is input as desired angle normalized to [-1,+1] and output
@@ -29,11 +29,14 @@ namespace hf {
 
         public:
 
-            void run(const state_t & state, const float target,
+            void run(
+                    const float k2,
+                    const state_t & state,
+                    const float target,
                     demands_t & demands)
             {
                 demands.yaw = K1 * (target - state.psi);
-
+                demands.yaw = k2 * (demands.yaw - state.dpsi);
             }
 
         private:

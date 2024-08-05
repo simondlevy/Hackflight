@@ -26,8 +26,7 @@
 #include <newpids/pitch_roll_angle.hpp>
 #include <newpids/pitch_roll_rate.hpp>
 #include <newpids/position.hpp>
-#include <newpids/yaw_angle.hpp>
-#include <newpids/yaw_rate.hpp>
+#include <newpids/yaw.hpp>
 
 static const float PITCH_ROLL_ANGLE_KP = 6e0;
 
@@ -76,8 +75,7 @@ int main(int argc, char ** argv)
     hf::PitchRollAngleController pitchRollAngleController= {};
     hf::PitchRollRateController pitchRollRateController= {};
     hf::AltitudeController altitudeController= {};
-    hf::YawAngleController yawAngleController= {};
-    hf::YawRateController yawRateController= {};
+    hf::YawController yawController= {};
 
     hf::Simulator sim = {};
 
@@ -142,9 +140,7 @@ int main(int argc, char ** argv)
 
         altitudeController.run(state, _altitude_target, demands);
 
-        yawAngleController.run(state, _yaw_angle_target, demands);
-
-        yawRateController.run(YAW_RATE_KP, state, demands);
+        yawController.run(YAW_RATE_KP, state, _yaw_angle_target, demands);
 
         demands.thrust = landed ? TMIN : TBASE + TSCALE * demands.thrust;
         
