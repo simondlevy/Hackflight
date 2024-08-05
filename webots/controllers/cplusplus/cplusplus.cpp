@@ -31,6 +31,7 @@ static const float PITCH_ROLL_ANGLE_KP = 6e0;
 
 static const float PITCH_ROLL_RATE_KP = 1.25e-2;
 
+static const float YAW_ANGLE_KP = 6;
 static const float YAW_RATE_KP = 1.20e-2;
 
 static const float YAW_ANGLE_MAX = 200;
@@ -138,8 +139,8 @@ int main(int argc, char ** argv)
                 PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP,
                 state.theta, state.dtheta, demands.pitch);
 
-        demands.yaw = hf::YawController::run(
-                YAW_RATE_KP, state.psi, state.dpsi, _yaw_angle_target);
+        demands.yaw = hf::YawController::run(YAW_ANGLE_KP, YAW_RATE_KP,
+                state.psi, state.dpsi, _yaw_angle_target);
 
         demands.thrust = landed ? TMIN : TBASE + TSCALE * demands.thrust;
         

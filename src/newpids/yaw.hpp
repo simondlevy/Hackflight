@@ -30,20 +30,16 @@ namespace hf {
         public:
 
             static float run(
+                    const float k1,
                     const float k2,
                     const float psi,
                     const float dpsi,
                     const float psi_target)
             {
-                const float dpsi_target = K1 * (psi_target - psi);
+                const float dpsi_target = k1 * (psi_target - psi);
 
                 return k2 * (dpsi_target - dpsi);
             }
-
-        private:
-
-            static constexpr float K1 = 6;
-
     };
 
 }
