@@ -1,5 +1,5 @@
 /*
-   Altitude PID controller for Hackflight
+   Altitude controller for Hackflight
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -30,18 +30,19 @@ namespace hf {
 
         public:
 
-            void run(
-                    const state_t & state, 
+            void run(const state_t & state,
                     const float target,
                     demands_t & demands)
             {
 
-                demands.thrust = KP * (target - state.z);
+                demands.thrust = K1 * (target - state.z);
+                demands.thrust = K2 * (demands.thrust - state.dz);
             }
 
         private:
 
-            static constexpr float KP = 2.0;
+            static constexpr float K1 = 2.0;
+            static constexpr float K2 = 25;
     };
 
 }

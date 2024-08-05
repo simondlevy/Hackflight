@@ -23,7 +23,6 @@
 #include <utils.hpp>
 
 #include <newpids/altitude.hpp>
-#include <newpids/climb_rate.hpp>
 #include <newpids/pitch_roll_angle.hpp>
 #include <newpids/pitch_roll_rate.hpp>
 #include <newpids/position.hpp>
@@ -38,7 +37,7 @@ static const float YAW_RATE_KP = 1.20e-2;
 
 static const float YAW_ANGLE_MAX = 200;
 
-// Motor thrust constants for climb-rate PID controller
+// Motor thrust constants
 static const float TBASE = 56;
 static const float TSCALE = 0.25;
 static const float TMIN = 0;
@@ -79,7 +78,6 @@ int main(int argc, char ** argv)
     hf::AltitudeController altitudeController= {};
     hf::YawAngleController yawAngleController= {};
     hf::YawRateController yawRateController= {};
-    hf::ClimbRateController climbRateController= {};
 
     hf::Simulator sim = {};
 
@@ -143,8 +141,6 @@ int main(int argc, char ** argv)
         pitchRollRateController.run(PITCH_ROLL_RATE_KP, state, demands);
 
         altitudeController.run(state, _altitude_target, demands);
-
-        climbRateController.run(state, demands);
 
         yawAngleController.run(state, _yaw_angle_target, demands);
 
