@@ -23,7 +23,6 @@
 #include <utils.hpp>
 
 #include <newpids/pitch_roll.hpp>
-#include <newpids/position.hpp>
 #include <newpids/yaw.hpp>
 
 static const float PITCH_ROLL_ANGLE_KP = 6e0;
@@ -36,6 +35,8 @@ static const float YAW_ANGLE_MAX = 200;
 
 static const float K_ALTITUDE = 2;
 static const float K_CLIMBRATE = 25;
+
+static const float K_POSITION = 25;
 
 // Motor thrust constants
 static const float TBASE = 56;
@@ -131,10 +132,11 @@ int main(int argc, char ** argv)
             stickDemands.yaw
         };
 
-        hf::PositionController::run(state, demands);
-
         const auto dz_target = control(K_ALTITUDE, _altitude_target, state.z);
         const auto thrust = control(K_CLIMBRATE,  dz_target, state.dz);
+
+        demands.roll = control(K_POSITION, demands.roll, state.dy);
+        demands.pitch = control(K_POSITION, demands.pitch, state.dx);
 
         demands.roll = hf::PitchRollController::run(
                 PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP,
