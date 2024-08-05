@@ -20,7 +20,7 @@
 #include <webots/robot.h>
 #include <webots/gps.h>
 
-#include <app_runner.hpp>
+#include <snn.hpp>
 
 static const bool USE_NETWORK = true;
 
@@ -64,12 +64,12 @@ int main(int argc, char ** argv)
     (void)argc;
     (void)argv;
 
-    App_Runner * ar = NULL;
+    SNN * snn = NULL;
 
     try {
-        ar = new App_Runner("networks/takeoff_risp_best.txt", "risp");
+        snn = new SNN("networks/takeoff_risp_best.txt", "risp");
     } catch (const SRE &e) {
-        fprintf(stderr, "Couldn't set up App_Runner:\n%s\n", e.what());
+        fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);
     }
 
@@ -102,7 +102,7 @@ int main(int argc, char ** argv)
         if (USE_NETWORK) {
             vector<double> o = {z, dz};
             vector <double> a;
-            ar->getActions(o, a);
+            snn->getActions(o, a);
             motor = a[0];
         }
 

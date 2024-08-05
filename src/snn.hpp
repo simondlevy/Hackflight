@@ -1,4 +1,6 @@
 /*
+   Spiking Neural Net support using TeNNLab framework
+
    Copyright (C) 2024 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
@@ -32,12 +34,11 @@ using std::ifstream;
 
 typedef std::runtime_error SRE;
 
-class App_Runner
+class SNN
 {
     public:
 
-        App_Runner(
-                const string network_filename, const string proc_name)
+        SNN(const string network_filename, const string proc_name)
         {
             ifstream fin;
             nlohmann::json j;
@@ -72,7 +73,7 @@ class App_Runner
             }
         }
 
-        ~App_Runner()
+        ~SNN()
         {
             delete proc;
 
