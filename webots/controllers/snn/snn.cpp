@@ -114,6 +114,8 @@ int main(int argc, char ** argv)
                motor = thrust + TBASE;
         }
 
+        printf("%3.3f\n", z);
+
         // Run the motors
         wb_motor_set_velocity(_motor1, +motor);
         wb_motor_set_velocity(_motor2, -motor);

@@ -1,3 +1,5 @@
+APP = snn
+
 FDIR = $(HOME)/Desktop/framework
 
 PDIR =  $(FDIR)/processors/risp
@@ -14,9 +16,9 @@ LIBRARIES = $(FDIR)/lib/libframework.a \
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-CXX_SOURCES = snn.cpp
+CXX_SOURCES = $(APP).cpp
 
-all: snn
+all: $(APP)
 
 # Use the Webots C API in your C++ controller program
 USE_C_API = true
@@ -24,7 +26,7 @@ USE_C_API = true
 VERBOSE = 1
 
 edit:
-	vim takeoff.cpp
+	vim $(APP).cpp
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
