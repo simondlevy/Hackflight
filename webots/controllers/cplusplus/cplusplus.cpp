@@ -37,7 +37,7 @@ static const float YAW_ANGLE_MAX = 200;
 
 // Motor thrust constants
 static const float TBASE = 56;
-static const float TSCALE = 0.25;
+static const float TSCALE = 25;
 static const float TMIN = 0;
 
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
@@ -130,7 +130,8 @@ int main(int argc, char ** argv)
         hf::PitchRollController::run(
                 PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP, state, demands);
 
-        hf::AltitudeController::run(state, _altitude_target, demands);
+        demands.thrust =
+            hf::AltitudeController::run(state.z, state.dz, _altitude_target);
 
         hf::YawController::run(YAW_RATE_KP, state, _yaw_angle_target, demands);
 

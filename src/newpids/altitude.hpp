@@ -30,19 +30,18 @@ namespace hf {
 
         public:
 
-            static void run(const state_t & state,
-                    const float target,
-                    demands_t & demands)
+            static float run(
+                    const float z, const float dz, const float z_target)
             {
+                const float dz_target = K * (z_target - z);
 
-                demands.thrust = K1 * (target - state.z);
-                demands.thrust = K2 * (demands.thrust - state.dz);
+                return dz_target - dz;
             }
 
         private:
 
-            static constexpr float K1 = 2.0;
-            static constexpr float K2 = 25;
+            static constexpr float K = 2.0;
     };
 
 }
+
