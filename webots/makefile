@@ -16,9 +16,9 @@ cplusplus:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/cplusplus/cplusplus
 
-takeoff:
+snn:
 	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/takeoff/takeoff
+	/usr/local/webots/webots-controller controllers/snn/snn
 
 haskell:
 	webots worlds/standard.wbt &

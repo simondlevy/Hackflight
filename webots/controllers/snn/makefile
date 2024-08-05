@@ -1,12 +1,6 @@
-# TeNNLab framework stuff ------------------------------------------
-
 FDIR = $(HOME)/Desktop/framework
 
-CFLAGS = -O3 -std=c++11 -Wall -Wextra
-
 PDIR =  $(FDIR)/processors/risp
-
-# -------------------------------------------------------------------
 
 CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
@@ -18,9 +12,11 @@ LIBRARIES = $(FDIR)/lib/libframework.a \
 		    $(PDIR)/lib/libproc1.a \
 		    $(PDIR)/lib/libproc2.a
 
-CXX_SOURCES = takeoff.cpp
+CFLAGS = -O3 -std=c++11 -Wall -Wextra
 
-all: takeoff
+CXX_SOURCES = snn.cpp
+
+all: snn
 
 # Use the Webots C API in your C++ controller program
 USE_C_API = true
