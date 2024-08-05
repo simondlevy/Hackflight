@@ -22,13 +22,11 @@
 #include <mixers.hpp>
 #include <utils.hpp>
 
-#include <newpids/pitch_roll.hpp>
-
-static const float PITCH_ROLL_ANGLE_KP = 6e0;
-static const float PITCH_ROLL_RATE_KP = 1.25e-2;
+static const float K_PITCH_ROLL_ANGLE = 6;
+static const float K_PITCH_ROLL_RATE = 0.0125;
 
 static const float K_YAW_ANGLE = 6;
-static const float K_YAW_RATE = 1.20e-2;
+static const float K_YAW_RATE = 0.012;
 
 static const float K_ALTITUDE = 2;
 static const float K_CLIMBRATE = 25;
@@ -132,21 +130,26 @@ int main(int argc, char ** argv)
         };
 
         const auto dz_target = control(K_ALTITUDE, _altitude_target, state.z);
+
         const auto thrust = control(K_CLIMBRATE,  dz_target, state.dz);
 
         demands.roll = control(K_POSITION, demands.roll, state.dy);
+
+        demands.roll = control(K_PITCH_ROLL_ANGLE, demands.roll, state.phi);
+
+        demands.roll = control(K_PITCH_ROLL_RATE, demands.roll, state.dphi);
+
         demands.pitch = control(K_POSITION, demands.pitch, state.dx);
 
+        demands.pitch = control(
+                K_PITCH_ROLL_ANGLE, demands.pitch, state.theta);
+
+        demands.pitch = control(
+                K_PITCH_ROLL_RATE, demands.pitch, state.dtheta);
+
         demands.yaw = control(K_YAW_ANGLE, _yaw_angle_target, state.psi);
+
         demands.yaw = control(K_YAW_RATE, demands.yaw, state.dpsi);
-
-        demands.roll = hf::PitchRollController::run(
-                PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP,
-                state.phi, state.dphi, demands.roll);
-
-        demands.pitch = hf::PitchRollController::run(
-                PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP,
-                state.theta, state.dtheta, demands.pitch);
 
         demands.thrust = landed ? TMIN : TBASE + thrust;
         
