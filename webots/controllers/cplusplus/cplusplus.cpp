@@ -130,10 +130,11 @@ int main(int argc, char ** argv)
         hf::PitchRollController::run(
                 PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP, state, demands);
 
-        demands.thrust =
-            hf::AltitudeController::run(state.z, state.dz, _altitude_target);
+        demands.thrust = hf::AltitudeController::run(
+                state.z, state.dz, _altitude_target);
 
-        hf::YawController::run(YAW_RATE_KP, state, _yaw_angle_target, demands);
+        demands.yaw = hf::YawController::run(
+                YAW_RATE_KP, state.psi, state.dpsi, _yaw_angle_target);
 
         demands.thrust = landed ? TMIN : TBASE + TSCALE * demands.thrust;
         

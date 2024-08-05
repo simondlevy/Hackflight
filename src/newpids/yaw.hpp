@@ -29,14 +29,15 @@ namespace hf {
 
         public:
 
-            static void run(
+            static float run(
                     const float k2,
-                    const state_t & state,
-                    const float target,
-                    demands_t & demands)
+                    const float psi,
+                    const float dpsi,
+                    const float psi_target)
             {
-                demands.yaw = K1 * (target - state.psi);
-                demands.yaw = k2 * (demands.yaw - state.dpsi);
+                const float dpsi_target = K1 * (psi_target - psi);
+
+                return k2 * (dpsi_target - dpsi);
             }
 
         private:
