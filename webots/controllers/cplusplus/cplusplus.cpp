@@ -23,8 +23,7 @@
 #include <utils.hpp>
 
 #include <newpids/altitude.hpp>
-#include <newpids/pitch_roll_angle.hpp>
-#include <newpids/pitch_roll_rate.hpp>
+#include <newpids/pitch_roll.hpp>
 #include <newpids/position.hpp>
 #include <newpids/yaw.hpp>
 
@@ -72,8 +71,7 @@ static float cap_yaw_angle(const float angle)
 int main(int argc, char ** argv)
 {
     hf::PositionController positionController= {};
-    hf::PitchRollAngleController pitchRollAngleController= {};
-    hf::PitchRollRateController pitchRollRateController= {};
+    hf::PitchRollController pitchRollController= {};
     hf::AltitudeController altitudeController= {};
     hf::YawController yawController= {};
 
@@ -134,9 +132,8 @@ int main(int argc, char ** argv)
 
         positionController.run(state, demands);
 
-        pitchRollAngleController.run(PITCH_ROLL_ANGLE_KP, state, demands);
-
-        pitchRollRateController.run(PITCH_ROLL_RATE_KP, state, demands);
+        pitchRollController.run(
+                PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP, state, demands);
 
         altitudeController.run(state, _altitude_target, demands);
 
