@@ -31,18 +31,16 @@ namespace hf {
         public:
 
             static float run(
+                    const float k1,
+                    const float k2,
                     const float z,
                     const float dz,
                     const float z_target)
             {
-                const float dz_target = K * (z_target - z);
+                const float dz_target = k1 * (z_target - z);
 
-                return dz_target - dz;
+                return k2 * (dz_target - dz);
             }
-
-        private:
-
-            static constexpr float K = 2.0;
     };
 
 }
