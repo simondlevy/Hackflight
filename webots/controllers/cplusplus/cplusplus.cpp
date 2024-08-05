@@ -22,7 +22,6 @@
 #include <mixers.hpp>
 #include <utils.hpp>
 
-#include <newpids/altitude.hpp>
 #include <newpids/pitch_roll.hpp>
 #include <newpids/position.hpp>
 #include <newpids/yaw.hpp>
@@ -33,10 +32,10 @@ static const float PITCH_ROLL_RATE_KP = 1.25e-2;
 static const float YAW_ANGLE_KP = 6;
 static const float YAW_RATE_KP = 1.20e-2;
 
-static const float ALTITUDE_KP = 2;
-static const float CLIMB_RATE_KP = 25;
-
 static const float YAW_ANGLE_MAX = 200;
+
+static const float K_ALTITUDE = 2;
+static const float K_CLIMBRATE = 25;
 
 // Motor thrust constants
 static const float TBASE = 56;
@@ -68,6 +67,11 @@ static float cap_yaw_angle(const float angle)
     const float angle1 = angle > 180 ? angle - 360 : angle;
 
     return angle1 < -180 ? angle1 + 360 : angle1;
+}
+
+static float control(const float k, const float target, const float actual)
+{
+    return k * (target - actual);
 }
 
 int main(int argc, char ** argv)
@@ -129,9 +133,8 @@ int main(int argc, char ** argv)
 
         hf::PositionController::run(state, demands);
 
-        demands.thrust = hf::AltitudeController::run(
-                ALTITUDE_KP, CLIMB_RATE_KP,
-                state.z, state.dz, _altitude_target);
+        const auto dz_target = control(K_ALTITUDE, _altitude_target, state.z);
+        const auto thrust = control(K_CLIMBRATE,  dz_target, state.dz);
 
         demands.roll = hf::PitchRollController::run(
                 PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP,
@@ -144,7 +147,7 @@ int main(int argc, char ** argv)
         demands.yaw = hf::YawController::run(YAW_ANGLE_KP, YAW_RATE_KP,
                 state.psi, state.dpsi, _yaw_angle_target);
 
-        demands.thrust = landed ? TMIN : TBASE + demands.thrust;
+        demands.thrust = landed ? TMIN : TBASE + thrust;
         
         hf::Mixer::runCF(demands, motors);
 
