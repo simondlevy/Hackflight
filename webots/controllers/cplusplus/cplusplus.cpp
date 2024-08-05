@@ -127,8 +127,13 @@ int main(int argc, char ** argv)
 
         hf::PositionController::run(state, demands);
 
-        hf::PitchRollController::run(
-                PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP, state, demands);
+        demands.roll = hf::PitchRollController::run(
+                PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP,
+                state.phi, state.dphi, demands.roll);
+
+        demands.pitch = hf::PitchRollController::run(
+                PITCH_ROLL_ANGLE_KP, PITCH_ROLL_RATE_KP,
+                state.theta, state.dtheta, demands.pitch);
 
         demands.thrust = hf::AltitudeController::run(
                 state.z, state.dz, _altitude_target);

@@ -30,29 +30,16 @@ namespace hf {
 
         public:
 
-            static void run(
+            static float run(
                     const float k1,
                     const float k2,
-                    const state_t & state, 
-                    demands_t & demands)
+                    const float angle,
+                    const float dangle,
+                    const float angle_target)
             {
-                // Angles => angular rates
-                run_axis(k1, demands.roll, state.phi);
-                run_axis(k1, demands.pitch, state.theta);
+                const float dangle_target = k1 * (angle_target - angle);
 
-                // Angular rates => units appropriate to our motors
-                run_axis(k2, demands.roll, state.dphi);
-                run_axis(k2, demands.pitch, state.dtheta);
-            }
-
-        private:
-
-            static void run_axis(
-                    const float k,
-                    float & demand, 
-                    const float actual)
-            {
-                demand = k * (demand - actual);
+                return k2 * (dangle_target - dangle);
             }
     };
 
