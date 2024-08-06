@@ -96,7 +96,7 @@ int main(int argc, char ** argv)
 
     uint32_t tick = 0;
 
-    float _altitude_target = INITIAL_ALTITUDE_TARGET;
+    float _ztarget = INITIAL_ALTITUDE_TARGET;
 
     while (true) {
 
@@ -108,7 +108,7 @@ int main(int argc, char ** argv)
             break;
         }
 
-        _altitude_target += THROTTLE_SCALE * stickDemands.thrust;
+        _ztarget += THROTTLE_SCALE * stickDemands.thrust;
 
         static bool _reached_altitude;
 
@@ -131,12 +131,17 @@ int main(int argc, char ** argv)
 
         else if (_reached_altitude) {
 
-            const auto dz_target = control(K_ALTITUDE, _altitude_target, z);
+            const auto dz_target = control(K_ALTITUDE, _ztarget, z);
             const auto thrust = control(K_CLIMBRATE,  dz_target, dz);
             motor = THRUST_BASE + thrust;
 
-            printf("%f %f %f %f %f\n", 
-                    tick * timestep / 1000., _altitude_target, z, dz, motor);
+            printf("%f %f %f %f %f %f\n", 
+                    tick * timestep / 1000., 
+                    _ztarget, 
+                    z, 
+                    dz_target,
+                    dz, 
+                    motor);
         }
 
         else {
