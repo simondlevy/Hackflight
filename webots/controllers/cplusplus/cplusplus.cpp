@@ -37,7 +37,6 @@ static const float YAW_ANGLE_MAX = 200;
 
 // Motor thrust constants
 static const float TBASE = 56;
-static const float TMIN = 0;
 
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
 
@@ -151,7 +150,7 @@ int main(int argc, char ** argv)
 
         demands.yaw = control(K_YAW_RATE, demands.yaw, state.dpsi);
 
-        demands.thrust = landed ? TMIN : TBASE + thrust;
+        demands.thrust = landed ? 0 : TBASE + thrust;
         
         hf::Mixer::runCF(demands, motors);
 

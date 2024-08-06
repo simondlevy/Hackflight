@@ -20,6 +20,7 @@
 #include <webots/robot.h>
 #include <webots/gps.h>
 
+#include <webots.hpp>
 #include <snn.hpp>
 
 static const bool USE_NETWORK = false;
@@ -27,9 +28,28 @@ static const bool USE_NETWORK = false;
 // Time constant for computing climb rate
 static const float DT = 0.01;
 
-// For training
-static const float ZTARGET = 0.2;
+static const float INITIAL_ALTITUDE_TARGET = 0.2;
+
+// We consider throttle inputs above this below this value to be
+// positive for takeoff
+static constexpr float THROTTLE_ZERO = 0.05;
+
+static constexpr float THROTTLE_SCALE = 0.005;
+
+// We consider altitudes below this value to be the ground
+static constexpr float ZGROUND = 0.05;
+
+
 static const float TBASE = 56;
+
+typedef enum {
+
+    STATUS_LANDED,
+    STATUS_TAKING_OFF,
+    STATUS_FLYING
+
+} flyingStatus_e;
+
 
 // Motors
 static WbDeviceTag _motor1;
@@ -64,6 +84,10 @@ int main(int argc, char ** argv)
     (void)argc;
     (void)argv;
 
+    hf::Simulator sim = {};
+
+    sim.init();
+
     SNN * snn = NULL;
 
     try {
@@ -82,19 +106,48 @@ int main(int argc, char ** argv)
 
     const int timestep = (int)wb_robot_get_basic_time_step();
 
-    auto gps = wb_robot_get_device("gps");
-    wb_gps_enable(gps, timestep);
-
-    float zprev = 0;
-
     uint32_t tick = 0;
 
-    while (wb_robot_step(timestep) != -1) {
+    while (true) {
+
+        hf::state_t state = {};
+
+        hf::demands_t stickDemands = {};
+
+        if (!sim.step(stickDemands, state)) {
+            break;
+        }
+
+        static flyingStatus_e _status;
+
+        static float _altitude_target;
+
+        _altitude_target =
+            _status == STATUS_FLYING ? 
+            _altitude_target + THROTTLE_SCALE * stickDemands.thrust :
+            _status == STATUS_LANDED ?
+            INITIAL_ALTITUDE_TARGET :
+            _altitude_target;
+
+        _status = 
+
+            _status == STATUS_TAKING_OFF  && state.z > ZGROUND ?  
+            STATUS_FLYING :
+
+            _status == STATUS_FLYING && state.z <= ZGROUND ?  
+            STATUS_LANDED :
+
+            _status == STATUS_LANDED && 
+            stickDemands.thrust > THROTTLE_ZERO ? 
+            STATUS_TAKING_OFF :
+
+            _status;
+
+        const auto landed = _status == STATUS_LANDED;
 
         // Get current altitude and climb rate observations
-        const auto z = wb_gps_get_values(gps)[2];
-        const auto dz = (z - zprev) / DT;
-        zprev = z;
+        const auto z = state.z;
+        const auto dz = state.dz;
 
         float motor = 0;
 
@@ -106,11 +159,13 @@ int main(int argc, char ** argv)
         }
 
         else {
-               const auto dz_target = control(K_ALTITUDE, ZTARGET, z); 
+               const auto dz_target = control(K_ALTITUDE, _altitude_target, z);
                const auto thrust = control(K_CLIMBRATE,  dz_target, dz);
-               motor = thrust + TBASE;
-               printf("%f %f %f\n", tick * timestep / 1000., dz, motor);
+               motor = landed ? 0 : TBASE + thrust;
         }
+
+        printf("%f %f %f %f %f\n", 
+                tick * timestep / 1000., _altitude_target, z, dz, motor);
 
         tick++;
 

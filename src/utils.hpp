@@ -48,12 +48,12 @@ namespace hf {
                         (q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z));
             }
 
-            static const float fmax(const float val, const float maxval)
+            static float fmax(const float val, const float maxval)
             {
                 return val > maxval ? maxval : val;
             }
 
-            static const float fmin(const float val, const float maxval)
+            static float fmin(const float val, const float maxval)
             {
                 return val < maxval ? maxval : val;
             }

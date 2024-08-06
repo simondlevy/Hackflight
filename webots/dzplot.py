@@ -4,36 +4,51 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-PLOT_AFTER_SECONDS = 6
+PLOT_AFTER_SECONDS = 10
 
 def main():
 
     times = []
-    motor = []
+    ztarget = []
+    z = []
     dz = []
+    motor = []
     fitness = 0
 
     while True:
 
-        line = input()
+        words = []
 
-        words = line.split()
+        try:
+            line = input()
+            words = input().split()
 
-        times.append(float(words[0]))
-
-        dz.append(float(words[1]))
-
-        motor.append(float(words[2]))
-
-        if times[-1] > PLOT_AFTER_SECONDS:
+        except:
             break
 
-    plt.subplot(2,1,1)
+        if len(words) == 5:
+
+            times.append(float(words[0]))
+            ztarget.append(float(words[1]))
+            z.append(float(words[2]))
+            dz.append(float(words[3]))
+            motor.append(float(words[4]))
+
+            #if times[-1] > PLOT_AFTER_SECONDS:
+            #   break
+
+    plt.subplot(3,1,1)
+    plt.plot(times, z)
+    plt.plot(times, ztarget, 'r')
+    plt.xticks([], [])
+    plt.ylabel('z (m)')
+
+    plt.subplot(3,1,2)
     plt.plot(times, dz)
     plt.xticks([], [])
     plt.ylabel('dz/dt (m/s)')
 
-    plt.subplot(2,1,2)
+    plt.subplot(3,1,3)
     plt.plot(times, motor)
     plt.xlabel('time (s)')
     plt.ylabel('motor (rad/s)')
