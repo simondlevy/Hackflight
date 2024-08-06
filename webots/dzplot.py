@@ -4,6 +4,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
+PLOT_AFTER_SECONDS = 6
 
 def main():
 
@@ -24,14 +25,18 @@ def main():
 
         thrust.append(float(words[2]))
 
-        if len(times) > 300:
+        if times[-1] > PLOT_AFTER_SECONDS:
             break
 
     plt.subplot(2,1,1)
     plt.plot(times, dz)
+    plt.xticks([], [])
+    plt.ylabel('dz/dt (m/s)')
 
     plt.subplot(2,1,2)
     plt.plot(times, thrust)
+    plt.xlabel('time (s)')
+    plt.ylabel('thrust (rad/s)')
 
     plt.show()
 
