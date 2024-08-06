@@ -4,7 +4,6 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-PLOT_AFTER_SECONDS = 10
 
 def main():
 
@@ -34,12 +33,10 @@ def main():
             dz.append(float(words[3]))
             motor.append(float(words[4]))
 
-            #if times[-1] > PLOT_AFTER_SECONDS:
-            #   break
-
     plt.subplot(3,1,1)
     plt.plot(times, z)
     plt.plot(times, ztarget, 'r')
+    plt.legend(['actual', 'target'])
     plt.xticks([], [])
     plt.ylabel('z (m)')
 
