@@ -22,7 +22,7 @@
 
 #include <snn.hpp>
 
-static const bool USE_NETWORK = true;
+static const bool USE_NETWORK = false;
 
 // Time constant for computing climb rate
 static const float DT = 0.01;
@@ -87,6 +87,8 @@ int main(int argc, char ** argv)
 
     float zprev = 0;
 
+    uint32_t tick = 0;
+
     while (wb_robot_step(timestep) != -1) {
 
         // Get current altitude and climb rate observations
@@ -106,8 +108,11 @@ int main(int argc, char ** argv)
         else {
                const auto dz_target = control(K_ALTITUDE, ZTARGET, z); 
                const auto thrust = control(K_CLIMBRATE,  dz_target, dz);
+               printf("%f %f %f\n", tick * timestep / 1000., dz, thrust);
                motor = thrust + TBASE;
         }
+
+        tick++;
 
         // Run the motors
         wb_motor_set_velocity(_motor1, +motor);
