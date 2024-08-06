@@ -87,9 +87,6 @@ int main(int argc, char ** argv)
 
     float zprev = 0;
 
-    FILE * logfp = fopen("altitude.csv", "w");
-    fprintf(logfp, "z, dz_target\n");
-
     while (wb_robot_step(timestep) != -1) {
 
         // Get current altitude and climb rate observations
@@ -108,13 +105,9 @@ int main(int argc, char ** argv)
 
         else {
                const auto dz_target = control(K_ALTITUDE, ZTARGET, z); 
-               fprintf(logfp, "%f,%f\n", z, dz_target);
-               fflush(logfp);
                const auto thrust = control(K_CLIMBRATE,  dz_target, dz);
                motor = thrust + TBASE;
         }
-
-        printf("%3.3f\n", z);
 
         // Run the motors
         wb_motor_set_velocity(_motor1, +motor);
@@ -124,8 +117,6 @@ int main(int argc, char ** argv)
     }
 
     wb_robot_cleanup();
-
-    fclose(logfp);
 
     return 0;
 }
