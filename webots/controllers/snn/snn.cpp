@@ -1,20 +1,20 @@
 /*
-  C++ flight simulator takeoff example for Hackflight
- 
-  Copyright (C) 2024 Simon D. Levy
- 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, in version 3.
- 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
- 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http:--www.gnu.org/licenses/>.
-*/
+   C++ flight simulator spiking-neural net controller for Hackflight
+
+   Copyright (C) 2024 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
 
 #include <webots/motor.h>
 #include <webots/robot.h>
@@ -26,30 +26,20 @@
 static const bool USE_NETWORK = false;
 
 // Time constant for computing climb rate
-static const float DT = 0.01;
-
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
 
 // We consider throttle inputs above this below this value to be
 // positive for takeoff
-static constexpr float THROTTLE_ZERO = 0.05;
+static const float THROTTLE_ZERO = 0.05;
 
-static constexpr float THROTTLE_SCALE = 0.005;
+static const float THROTTLE_SCALE = 0.005;
 
 // We consider altitudes below this value to be the ground
-static constexpr float ZGROUND = 0.05;
+static const float ZGROUND = 0.05;
 
+static const float THRUST_BASE = 56;
 
-static const float TBASE = 56;
-
-typedef enum {
-
-    STATUS_LANDED,
-    STATUS_TAKING_OFF,
-    STATUS_FLYING
-
-} flyingStatus_e;
-
+static const float THRUST_TAKEOFF = 56.5;
 
 // Motors
 static WbDeviceTag _motor1;
@@ -108,6 +98,8 @@ int main(int argc, char ** argv)
 
     uint32_t tick = 0;
 
+    float _altitude_target = INITIAL_ALTITUDE_TARGET;
+
     while (true) {
 
         hf::state_t state = {};
@@ -118,38 +110,19 @@ int main(int argc, char ** argv)
             break;
         }
 
-        static flyingStatus_e _status;
+        _altitude_target += THROTTLE_SCALE * stickDemands.thrust;
 
-        static float _altitude_target;
-
-        _altitude_target =
-            _status == STATUS_FLYING ? 
-            _altitude_target + THROTTLE_SCALE * stickDemands.thrust :
-            _status == STATUS_LANDED ?
-            INITIAL_ALTITUDE_TARGET :
-            _altitude_target;
-
-        _status = 
-
-            _status == STATUS_TAKING_OFF  && state.z > ZGROUND ?  
-            STATUS_FLYING :
-
-            _status == STATUS_FLYING && state.z <= ZGROUND ?  
-            STATUS_LANDED :
-
-            _status == STATUS_LANDED && 
-            stickDemands.thrust > THROTTLE_ZERO ? 
-            STATUS_TAKING_OFF :
-
-            _status;
-
-        const auto landed = _status == STATUS_LANDED;
+        static bool _reached_altitude;
 
         // Get current altitude and climb rate observations
         const auto z = state.z;
         const auto dz = state.dz;
 
         float motor = 0;
+
+        if (z > INITIAL_ALTITUDE_TARGET) {
+            _reached_altitude = true;
+        }
 
         if (USE_NETWORK) {
             vector<double> o = {z, dz};
@@ -158,14 +131,20 @@ int main(int argc, char ** argv)
             motor = a[0];
         }
 
-        else {
-               const auto dz_target = control(K_ALTITUDE, _altitude_target, z);
-               const auto thrust = control(K_CLIMBRATE,  dz_target, dz);
-               motor = landed ? 0 : TBASE + thrust;
+        else if (_reached_altitude) {
+
+            const auto dz_target = control(K_ALTITUDE, _altitude_target, z);
+            const auto thrust = control(K_CLIMBRATE,  dz_target, dz);
+            motor = THRUST_BASE + thrust;
+
+            printf("%f %f %f %f %f\n", 
+                    tick * timestep / 1000., _altitude_target, z, dz, motor);
         }
 
-        printf("%f %f %f %f %f\n", 
-                tick * timestep / 1000., _altitude_target, z, dz, motor);
+        else {
+            motor = THRUST_TAKEOFF;
+        }
+
 
         tick++;
 
