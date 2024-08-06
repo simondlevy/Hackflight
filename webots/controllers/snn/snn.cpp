@@ -108,8 +108,8 @@ int main(int argc, char ** argv)
         else {
                const auto dz_target = control(K_ALTITUDE, ZTARGET, z); 
                const auto thrust = control(K_CLIMBRATE,  dz_target, dz);
-               printf("%f %f %f\n", tick * timestep / 1000., dz, thrust);
                motor = thrust + TBASE;
+               printf("%f %f %f\n", tick * timestep / 1000., dz, motor);
         }
 
         tick++;

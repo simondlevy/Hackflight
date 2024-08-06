@@ -9,7 +9,7 @@ PLOT_AFTER_SECONDS = 6
 def main():
 
     times = []
-    thrust = []
+    motor = []
     dz = []
     fitness = 0
 
@@ -23,7 +23,7 @@ def main():
 
         dz.append(float(words[1]))
 
-        thrust.append(float(words[2]))
+        motor.append(float(words[2]))
 
         if times[-1] > PLOT_AFTER_SECONDS:
             break
@@ -34,9 +34,9 @@ def main():
     plt.ylabel('dz/dt (m/s)')
 
     plt.subplot(2,1,2)
-    plt.plot(times, thrust)
+    plt.plot(times, motor)
     plt.xlabel('time (s)')
-    plt.ylabel('thrust (rad/s)')
+    plt.ylabel('motor (rad/s)')
 
     plt.show()
 
