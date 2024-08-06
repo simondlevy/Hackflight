@@ -66,11 +66,6 @@ static float cap_yaw_angle(const float angle)
     return angle1 < -180 ? angle1 + 360 : angle1;
 }
 
-static float control(const float k, const float target, const float actual)
-{
-    return k * (target - actual);
-}
-
 int main(int argc, char ** argv)
 {
     hf::Simulator sim = {};
@@ -128,27 +123,27 @@ int main(int argc, char ** argv)
             stickDemands.yaw
         };
 
-        const auto dz_target = control(K_ALTITUDE, _altitude_target, state.z);
+        const auto dz_target = hf::Utils::pcontrol(K_ALTITUDE, _altitude_target, state.z);
 
-        const auto thrust = control(K_CLIMBRATE,  dz_target, state.dz);
+        const auto thrust = hf::Utils::pcontrol(K_CLIMBRATE,  dz_target, state.dz);
 
-        demands.roll = control(K_POSITION, demands.roll, state.dy);
+        demands.roll = hf::Utils::pcontrol(K_POSITION, demands.roll, state.dy);
 
-        demands.roll = control(K_PITCH_ROLL_ANGLE, demands.roll, state.phi);
+        demands.roll = hf::Utils::pcontrol(K_PITCH_ROLL_ANGLE, demands.roll, state.phi);
 
-        demands.roll = control(K_PITCH_ROLL_RATE, demands.roll, state.dphi);
+        demands.roll = hf::Utils::pcontrol(K_PITCH_ROLL_RATE, demands.roll, state.dphi);
 
-        demands.pitch = control(K_POSITION, demands.pitch, state.dx);
+        demands.pitch = hf::Utils::pcontrol(K_POSITION, demands.pitch, state.dx);
 
-        demands.pitch = control(
+        demands.pitch = hf::Utils::pcontrol(
                 K_PITCH_ROLL_ANGLE, demands.pitch, state.theta);
 
-        demands.pitch = control(
+        demands.pitch = hf::Utils::pcontrol(
                 K_PITCH_ROLL_RATE, demands.pitch, state.dtheta);
 
-        demands.yaw = control(K_YAW_ANGLE, _yaw_angle_target, state.psi);
+        demands.yaw = hf::Utils::pcontrol(K_YAW_ANGLE, _yaw_angle_target, state.psi);
 
-        demands.yaw = control(K_YAW_RATE, demands.yaw, state.dpsi);
+        demands.yaw = hf::Utils::pcontrol(K_YAW_RATE, demands.yaw, state.dpsi);
 
         demands.thrust = landed ? 0 : TBASE + thrust;
         

@@ -1,5 +1,5 @@
 /*
-   C++ flight simulator spiking-neural net controller for Hackflight
+   C++ flight simulator spiking-neural net control(ler for Hackflight
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -22,6 +22,7 @@
 
 #include <webots.hpp>
 #include <snn.hpp>
+#include <utils.hpp>
 
 static const bool USE_NETWORK = false;
 
@@ -55,17 +56,12 @@ static WbDeviceTag _makeMotor(const char * name, const float direction)
     return motor;
 }
 
-// Non-neuro controller ---------------
+// Non-neuro Utils::pcontrol(ler ---------------
 
 static const float K_ALTITUDE = 2;
 static const float K_CLIMBRATE = 25;
 
 // ------------------------------------
-
-static float control(const float k, const float target, const float actual)
-{
-    return k * (target - actual);
-}
 
 int main(int argc, char ** argv)
 {
@@ -131,8 +127,8 @@ int main(int argc, char ** argv)
 
         else if (_reached_altitude) {
 
-            const auto dz_target = control(K_ALTITUDE, _ztarget, z);
-            const auto thrust = control(K_CLIMBRATE,  dz_target, dz);
+            const auto dz_target = hf::Utils::pcontrol(K_ALTITUDE, _ztarget, z);
+            const auto thrust = hf::Utils::pcontrol(K_CLIMBRATE,  dz_target, dz);
             motor = THRUST_BASE + thrust;
 
             printf("%f %f %f %f %f %f\n", 
