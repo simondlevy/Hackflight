@@ -39,8 +39,6 @@ static const float ZGROUND = 0.05;
 
 static const float THRUST_BASE = 56;
 
-static const float THRUST_TAKEOFF = 56.5;
-
 // Motors
 static WbDeviceTag _motor1;
 static WbDeviceTag _motor2;
@@ -142,9 +140,8 @@ int main(int argc, char ** argv)
         }
 
         else {
-            motor = THRUST_TAKEOFF;
+            motor = THRUST_BASE;
         }
-
 
         tick++;
 
