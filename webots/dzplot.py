@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 def main():
 
     time = []
-    ztarget = []
+    zsetpoint = []
     z = []
-    dztarget = []
+    dzsetpoint = []
     dz = []
     motor = []
     fitness = 0
@@ -29,23 +29,23 @@ def main():
         if len(words) == 6:
 
             time.append(float(words[0]))
-            ztarget.append(float(words[1]))
+            zsetpoint.append(float(words[1]))
             z.append(float(words[2]))
-            dztarget.append(float(words[3]))
+            dzsetpoint.append(float(words[3]))
             dz.append(float(words[4]))
             motor.append(float(words[5]))
 
     plt.subplot(3,1,1)
     plt.plot(time, z)
-    plt.plot(time, ztarget, 'r')
-    plt.legend(['actual', 'target'])
+    plt.plot(time, zsetpoint, 'r')
+    plt.legend(['actual', 'setpoint'])
     plt.xticks([], [])
     plt.ylabel('z (m)')
 
     plt.subplot(3,1,2)
     plt.plot(time, dz)
-    plt.plot(time, dztarget, 'r')
-    plt.legend(['actual', 'target'])
+    plt.plot(time, dzsetpoint, 'r')
+    plt.legend(['actual', 'setpoint'])
     plt.xticks([], [])
     plt.ylabel('dz/dt (m/s)')
 
