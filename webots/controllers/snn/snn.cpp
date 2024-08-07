@@ -24,7 +24,7 @@
 #include <snn.hpp>
 #include <utils.hpp>
 
-static const bool USE_NETWORK = false;
+static const bool USE_NETWORK = true;
 
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
 
@@ -76,7 +76,7 @@ int main(int argc, char ** argv)
     SNN * snn = NULL;
 
     try {
-        snn = new SNN("networks/takeoff_risp_best.txt", "risp");
+        snn = new SNN("networks/hover_risp.txt", "risp");
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);
@@ -89,7 +89,7 @@ int main(int argc, char ** argv)
     _motor3 = _makeMotor("motor3", +1);
     _motor4 = _makeMotor("motor4", -1);
 
-    const int timestep = (int)wb_robot_get_basic_time_step();
+    //const int timestep = (int)wb_robot_get_basic_time_step();
 
     uint32_t tick = 0;
 
@@ -119,26 +119,28 @@ int main(int argc, char ** argv)
             _reached_altitude = true;
         }
 
-        if (USE_NETWORK) {
-            vector<double> o = {z, dz};
-            vector <double> a;
-            snn->getActions(o, a);
-            motor = a[0];
-        }
+        if (_reached_altitude) {
 
-        else if (_reached_altitude) {
+            if (USE_NETWORK) {
+                vector<double> o = {_ztarget, z, dz};
+                vector <double> a;
+                snn->getActions(o, a);
+                motor = a[0];
+            }
 
-            const auto dz_target = hf::Utils::pcontrol(K_ALTITUDE, _ztarget, z);
-            const auto thrust = hf::Utils::pcontrol(K_CLIMBRATE,  dz_target, dz);
-            motor = THRUST_BASE + thrust;
+            else {
 
-            printf("%f %f %f %f %f %f\n", 
-                    tick * timestep / 1000., 
-                    _ztarget, 
-                    z, 
-                    dz_target,
-                    dz, 
-                    motor);
+                motor = THRUST_BASE + K_CLIMBRATE *  (K_ALTITUDE * (_ztarget - z) - dz);
+
+                /*
+                   printf("%f %f %f %f %f %f\n", 
+                   tick * timestep / 1000., 
+                   _ztarget, 
+                   z, 
+                   dz_target,
+                   dz, 
+                   motor);*/
+            }
         }
 
         else {
