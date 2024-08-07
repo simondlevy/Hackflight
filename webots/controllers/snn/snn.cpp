@@ -26,18 +26,19 @@
 
 static const bool USE_NETWORK = false;
 
-// Time constant for computing climb rate
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
 
 // We consider throttle inputs above this below this value to be
 // positive for takeoff
 static const float THROTTLE_ZERO = 0.05;
 
+// Small scaling value relating climb-rate demand to throttle stick
 static const float THROTTLE_SCALE = 0.005;
 
 // We consider altitudes below this value to be the ground
 static const float ZGROUND = 0.05;
 
+// rad/sec value for achieving / maintining altitude
 static const float THRUST_BASE = 56;
 
 // Motors
