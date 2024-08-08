@@ -102,17 +102,6 @@ namespace hf {
 
         private:
 
-            typedef struct {
-
-                int8_t throttle;
-                int8_t roll;
-                int8_t pitch;
-                int8_t yaw;
-
-                int8_t button;
-
-            } joystick_t;
-
             typedef enum {
 
                 JOYSTICK_NONE,
@@ -136,20 +125,56 @@ namespace hf {
             // Handles bogus nonzero throttle stick values at startup
             bool ready;
 
+            static bool takeoff_stick(const uint8_t axis)
+            {
+                return wb_joystick_get_pressed_button() == axis;
+            }
+
+            static bool takeoff_stick_0()
+            {
+                return takeoff_stick(0);
+            }
+
+            static bool takeoff_stick_5()
+            {
+                return takeoff_stick(5);
+            }
+
+            static bool takeoff_frsky()
+            {
+                return readJoystickRaw(5) > 0;
+            }
+
+            static bool takeoff_spektrum()
+            {
+                return readJoystickRaw(5) < 0;
+            }
+
+            typedef struct {
+
+                int8_t throttle;
+                int8_t roll;
+                int8_t pitch;
+                int8_t yaw;
+
+                bool (* takeoff_fun)();
+
+            } joystick_t;
+
             std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
                 { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
-                    joystick_t {-2,  3, -4, 1, 5} },
+                    joystick_t {-2,  3, -4, 1, takeoff_stick_5} },
                 { "SHANWAN Android Gamepad",             // PS3
-                    joystick_t {-2,  3, -4, 1, 5} },
+                    joystick_t {-2,  3, -4, 1, takeoff_stick_5} },
                 { "Logitech Gamepad F310",
-                    joystick_t {-2,  4, -5, 1, 5} },
+                    joystick_t {-2,  4, -5, 1, takeoff_stick_5} },
                 { "Logitech Logitech Extreme 3D",
-                    joystick_t {-4,  1, -2, 3, 5}  },
+                    joystick_t {-4,  1, -2, 3, takeoff_stick_0}  },
                 { "FrSky FrSky Simulator",
-                    joystick_t { 1,  2,  3, 4} },
+                    joystick_t { 1,  2,  3, 4, takeoff_frsky } },
                 { "Horizon Hobby SPEKTRUM RECEIVER",
-                    joystick_t { 2,  -3,  4, -1, 5} }
+                    joystick_t { 2,  -3,  4, -1, takeoff_spektrum } }
             };
 
             static float scaleJoystickAxis(const int32_t rawval)
@@ -181,7 +206,7 @@ namespace hf {
                 demands.pitch = readJoystickAxis(axes.pitch); 
                 demands.yaw = readJoystickAxis(axes.yaw);
 
-                takeoff = wb_joystick_get_pressed_button() == axes.button;
+                takeoff = axes.takeoff_fun();
 
                 // Run throttle stick through deadband
                 demands.thrust = fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
