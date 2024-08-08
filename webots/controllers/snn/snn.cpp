@@ -38,6 +38,8 @@ static const float THRUST_TAKEOFF = 56;
 
 static const float THRUST_BASE = 55.385;
 
+static const float TAKEOFF_TIME = 2;
+
 // Motors
 static WbDeviceTag _motor1;
 static WbDeviceTag _motor2;
@@ -103,11 +105,12 @@ int main(int argc, char ** argv)
 
         const auto scaledThrottle = THROTTLE_SCALE * stickDemands.thrust;
 
-        // Get current altitude and climb rate observations
-        const auto z = state.z;
+        // Get current climb rate observation
         const auto dz = state.dz;
 
-        if (z > INITIAL_ALTITUDE_TARGET) {
+        const double time = tick * timestep / 1000;
+
+        if (time > TAKEOFF_TIME) {
             reached_altitude = true;
         }
 
@@ -126,18 +129,6 @@ int main(int argc, char ** argv)
         const auto motor_old = THRUST_BASE + thrust;
 
         const auto motor = reached_altitude  ? motor_old : THRUST_TAKEOFF;
-
-        const double time = tick * timestep / 1000;
-
-        if (time > 5) {
-
-            printf("%+f %3.3f\n", dz_target, z);
-
-            /*printf("%f %f %f %f %f\n", 
-                    time, _ztarget, z, motor_snn, motor_old);*/
-
-            //printf("%f %f %f\n", time, scaledThrottle, dz_target);
-        }
 
         tick++;
 
