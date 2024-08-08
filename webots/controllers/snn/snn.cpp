@@ -28,10 +28,6 @@ static const bool USE_NETWORK = true;
 
 static const float INITIAL_ALTITUDE_TARGET = 0.2;
 
-// We consider throttle inputs above this below this value to be
-// positive for takeoff
-static const float THROTTLE_ZERO = 0.05;
-
 // Small scaling value relating climb-rate demand to throttle stick
 static const float THROTTLE_SCALE = 0.2;
 
@@ -60,7 +56,6 @@ static WbDeviceTag _makeMotor(const char * name, const float direction)
 
 // Non-neuro Utils::pcontrol(ler ---------------
 
-static const float K_ALTITUDE = 2;
 static const float K_CLIMBRATE = 25;
 
 // ------------------------------------
@@ -94,8 +89,6 @@ int main(int argc, char ** argv)
 
     uint32_t tick = 0;
 
-    //float _ztarget = INITIAL_ALTITUDE_TARGET;
-
     bool reached_altitude = false;
 
     while (true) {
@@ -109,8 +102,6 @@ int main(int argc, char ** argv)
         }
 
         const auto scaledThrottle = THROTTLE_SCALE * stickDemands.thrust;
-
-        //_ztarget += scaledThrottle;
 
         // Get current altitude and climb rate observations
         const auto z = state.z;
@@ -128,7 +119,7 @@ int main(int argc, char ** argv)
         const auto motor_snn = a[0];
         (void)motor_snn;*/
 
-        const auto dz_target = scaledThrottle; // K_ALTITUDE *  (_ztarget - z);
+        const auto dz_target = scaledThrottle;
 
         const auto thrust = K_CLIMBRATE *  (dz_target - dz);
 
