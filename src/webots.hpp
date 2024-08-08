@@ -73,7 +73,7 @@ namespace hf {
                     return false;
                 }
 
-                _readSticks(stickDemands.thrust, stickDemands.roll, stickDemands.pitch, stickDemands.yaw);
+                _readSticks(stickDemands);
 
                 _getVehicleState(vehicleState);
 
@@ -106,7 +106,7 @@ namespace hf {
                 int8_t pitch;
                 int8_t yaw;
 
-            } joystickAxes_t;
+            } joystick_t;
 
             typedef enum {
 
@@ -131,20 +131,20 @@ namespace hf {
             // Handles bogus nonzero throttle stick values at startup
             bool ready;
 
-            std::map<std::string, joystickAxes_t> JOYSTICK_AXIS_MAP = {
+            std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
                 { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
-                    joystickAxes_t {-2,  3, -4, 1} },
+                    joystick_t {-2,  3, -4, 1} },
                 { "SHANWAN Android Gamepad",             // PS3
-                    joystickAxes_t {-2,  3, -4, 1} },
+                    joystick_t {-2,  3, -4, 1} },
                 { "Logitech Gamepad F310",
-                    joystickAxes_t {-2,  4, -5, 1} },
+                    joystick_t {-2,  4, -5, 1} },
                 { "Logitech Logitech Extreme 3D",
-                    joystickAxes_t {-4,  1, -2, 3}  },
+                    joystick_t {-4,  1, -2, 3}  },
                 { "FrSky FrSky Simulator",
-                    joystickAxes_t { 1,  2,  3, 4} },
+                    joystick_t { 1,  2,  3, 4} },
                 { "Horizon Hobby SPEKTRUM RECEIVER",
-                    joystickAxes_t { 2,  -3,  4, -1} }
+                    joystick_t { 2,  -3,  4, -1} }
             };
 
             static float scaleJoystickAxis(const int32_t rawval)
@@ -164,65 +164,63 @@ namespace hf {
                 return scaleJoystickAxis(readJoystickRaw(index));
             }
 
-            void readJoystick(
-                    float & throttle, float & roll, float & pitch, float & yaw)
+            void readJoystick(demands_t & demands)
             {
                 auto joyname = wb_joystick_get_model();
 
                 auto axes = JOYSTICK_AXIS_MAP[joyname];
 
-                throttle = scaleJoystickAxis(readJoystickRaw(axes.throttle));
+                demands.thrust = scaleJoystickAxis(readJoystickRaw(axes.throttle));
 
-                roll = readJoystickAxis(axes.roll);
-                pitch = readJoystickAxis(axes.pitch); 
-                yaw = readJoystickAxis(axes.yaw);
+                demands.roll = readJoystickAxis(axes.roll);
+                demands.pitch = readJoystickAxis(axes.pitch); 
+                demands.yaw = readJoystickAxis(axes.yaw);
 
                 // Run throttle stick through deadband
-                throttle = fabs(throttle) < 0.05 ? 0 : throttle;
+                demands.thrust = fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
 
-                // Handle bogus large throttle values on startup
-                if (!ready && throttle > -1.0) {
+                // Handle bogus large demands.thrust values on startup
+                if (!ready && demands.thrust > -1.0) {
                     ready = true;
                 }
 
-                throttle = ready ? throttle : 0;
+                demands.thrust = ready ? demands.thrust : 0;
             }
 
-            static void readKeyboard(
-                    float & throttle, float & roll, float & pitch, float & yaw) 
+            static void readKeyboard(demands_t & demands)
             {
                 switch (wb_keyboard_get_key()) {
 
                     case WB_KEYBOARD_UP:
-                        pitch = +0.5;
+                        demands.pitch = +0.5;
                         break;
 
                     case WB_KEYBOARD_DOWN:
-                        pitch = -0.5;
+                        demands.pitch = -0.5;
                         break;
 
                     case WB_KEYBOARD_RIGHT:
-                        roll = +0.5;
+                        demands.roll = +0.5;
                         break;
 
                     case WB_KEYBOARD_LEFT:
-                        roll = -0.5;
+                        demands.roll = -0.5;
                         break;
 
                     case 'Q':
-                        yaw = -0.5;
+                        demands.yaw = -0.5;
                         break;
 
                     case 'E':
-                        yaw = +0.5;
+                        demands.yaw = +0.5;
                         break;
 
                     case 'W':
-                        throttle = +0.5;
+                        demands.thrust = +0.5;
                         break;
 
                     case 'S':
-                        throttle = -0.5;
+                        demands.thrust = -0.5;
                         break;
                 }
             }
@@ -291,18 +289,17 @@ namespace hf {
                 return sensor;
             }
 
-            void _readSticks(
-                    float & throttle, float & roll, float & pitch, float & yaw)
+            void _readSticks(demands_t & demands)
             {
                 auto joystickStatus = haveJoystick();
 
-                throttle = 0;
-                roll = 0;
-                pitch = 0;
-                yaw = 0;
+                demands.thrust = 0;
+                demands.roll = 0;
+                demands.pitch = 0;
+                demands.yaw = 0;
 
                 if (joystickStatus == JOYSTICK_RECOGNIZED) {
-                    readJoystick(throttle, roll, pitch, yaw);
+                    readJoystick(demands);
                 }
 
                 else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
@@ -310,7 +307,7 @@ namespace hf {
                 }
 
                 else {
-                    readKeyboard(throttle, roll, pitch, yaw);
+                    readKeyboard(demands);
                 }
             }
 
