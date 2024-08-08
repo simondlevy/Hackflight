@@ -90,12 +90,6 @@ namespace hf {
             {
                 return fabs(val) < band;
             }
-
-            static float pcontrol(const float k, const float target, const float actual)
-            {
-                return k * (target - actual);
-            }
-
     };
 
 }
