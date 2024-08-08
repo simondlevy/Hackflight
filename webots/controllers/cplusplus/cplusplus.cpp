@@ -35,15 +35,11 @@ static const float K_POSITION = 25;
 
 static const float YAW_ANGLE_MAX = 200;
 
-static constexpr float YAW_DEMAND_SCALE = .01;
-
-static const float THROTTLE_SCALE = 0.2;
+static const float YAW_DEMAND_SCALE = .01;
 
 static const float THRUST_TAKEOFF = 56;
 
 static const float THRUST_BASE = 55.385;
-
-static const float TAKEOFF_TIME = 2;
 
 static float cap_yaw_angle(const float angle)
 {
@@ -58,31 +54,19 @@ int main(int argc, char ** argv)
 
     sim.init();
 
-    const int timestep = (int)wb_robot_get_basic_time_step();
-
-    uint32_t tick = 0;
-
-    bool reached_altitude = false;
-
-    bool button_was_hit = false;
-
     while (true) {
 
         hf::state_t state = {};
 
         hf::demands_t stickDemands = {};
 
-        bool button = false;
+        bool hitTakeoffButton = false;
 
-        if (!sim.step(stickDemands, button, state)) {
+        bool completedTakeoff = false;
+
+        if (!sim.step(stickDemands, state, hitTakeoffButton, completedTakeoff)) {
             break;
         }
-
-        if (button) {
-            button_was_hit = true;
-        }
-
-        const auto scaledThrottle = THROTTLE_SCALE * stickDemands.thrust;
 
         static float _yaw_angle_target;
 
@@ -91,7 +75,6 @@ int main(int argc, char ** argv)
         _yaw_angle_target = cap_yaw_angle(_yaw_angle_target + 
                 YAW_ANGLE_MAX * stickDemands.yaw * YAW_DEMAND_SCALE);
 
-
         hf::demands_t demands = { 
             stickDemands.thrust,
             stickDemands.roll,
@@ -99,16 +82,11 @@ int main(int argc, char ** argv)
             stickDemands.yaw
         };
 
-        const double time = button_was_hit ? tick++ * timestep / 1000 : 0;
-
-        if (time > TAKEOFF_TIME) {
-            reached_altitude = true;
-        }
-
-        const auto thrust = K_CLIMBRATE *  (scaledThrottle - state.dz);
-
-        demands.thrust = reached_altitude  ? THRUST_BASE + thrust : 
-            button_was_hit ? THRUST_TAKEOFF :
+        demands.thrust = 
+            completedTakeoff ? 
+            THRUST_BASE + K_CLIMBRATE *  (demands.thrust - state.dz) :
+            hitTakeoffButton ? 
+            THRUST_TAKEOFF :
             0;
 
         demands.roll = K_POSITION * (demands.roll - state.dy);

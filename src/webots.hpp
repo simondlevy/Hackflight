@@ -69,16 +69,35 @@ namespace hf {
 
             bool step(
                     demands_t & stickDemands,
-                    bool & button,
-                    state_t & vehicleState)
+                    state_t & vehicleState,
+                    bool & hitTakeoffButton,
+                    bool & completedTakeoff)
             {
                 if (wb_robot_step((int)_timestep) == -1) {
                     return false;
                 }
 
+                bool button = false;
+
                 _readSticks(stickDemands, button);
 
                 _getVehicleState(vehicleState);
+
+                static bool _button_was_hit;
+
+                if (button) {
+                    _button_was_hit = true;
+                }
+
+                hitTakeoffButton = _button_was_hit;
+                
+                stickDemands.thrust *= THROTTLE_SCALE; 
+
+                static uint32_t _tick;
+                
+                const double time = _button_was_hit ? _tick++ * _timestep / 1000 : 0;
+
+                completedTakeoff = time > TAKEOFF_TIME;
 
                 return true;
             }
@@ -101,6 +120,14 @@ namespace hf {
             }
 
         private:
+
+            static constexpr float THROTTLE_SCALE = 0.2;
+
+            static constexpr float THRUST_TAKEOFF = 56;
+
+            static constexpr float THRUST_BASE = 55.385;
+
+            static constexpr float TAKEOFF_TIME = 3;
 
             typedef enum {
 

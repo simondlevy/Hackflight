@@ -28,6 +28,10 @@ hf::demands_t stream_stickDemands;
 
 hf::state_t stream_vehicleState;
 
+bool stream_hitTakeoffButton;
+
+bool stream_completedTakeoff;
+
 void debug(float value)
 {
     printf("%+3.3f\n", value);
@@ -48,7 +52,11 @@ int main(int argc, char ** argv)
 
     bool button = false;
 
-    while (_sim.step(stream_stickDemands, button, stream_vehicleState)) {
+    while (_sim.step(
+                stream_stickDemands, 
+                stream_vehicleState,
+                stream_hitTakeoffButton, 
+                stream_completedTakeoff)) {
 
         copilot_step_core();
     }

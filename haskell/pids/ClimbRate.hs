@@ -37,7 +37,7 @@ import Utils
 
 --}
 
-climbRateController flying dt state demands = demands' where
+climbRateController dt state demands = demands' where
 
     kp = 25
     ki = 15
@@ -48,6 +48,6 @@ climbRateController flying dt state demands = demands' where
 
     integ' = [0] ++ integ
 
-    thrustout = if flying then thrustpid * tscale + tbase else tmin
+    thrustout = thrustpid * tscale + tbase
 
     demands' = Demands thrustout (roll demands) (pitch demands) (yaw demands)

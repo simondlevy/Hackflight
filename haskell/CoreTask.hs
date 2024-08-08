@@ -36,7 +36,6 @@ import Utils
 import Constants
 
 -- PID controllers
-import Altitude
 import ClimbRate
 import PitchRollAngle
 import PitchRollRate
@@ -46,14 +45,11 @@ import YawRate
 
 -- Constants
 
-status_landed =     0 :: SInt8
-status_taking_off = 1 :: SInt8
-status_flying =     2 :: SInt8
+k_climbrate = 25 :: SFloat
 
-altitude_target_initial = 0.2 :: SFloat
-throttle_zero           = 0.05 :: SFloat
-throttle_scale          = 0.005 :: SFloat
-zground                 = 0.05 :: SFloat
+thrust_takeoff = 56 :: SFloat
+
+thrust_base = 55.385 :: SFloat
 
 -- Streams from C++ ----------------------------------------------------------
 
@@ -63,49 +59,41 @@ demandsStruct = extern "stream_stickDemands" Nothing
 stateStruct :: Stream StateStruct
 stateStruct = extern "stream_vehicleState" Nothing
 
+hitTakeoffButton :: SBool
+hitTakeoffButton = extern "stream_hitTakeoffButton" Nothing
+
+completedTakeoff :: SBool
+completedTakeoff = extern "stream_completedTakeoff" Nothing
+
 step = motors where
 
   state = liftState stateStruct
 
   stickDemands = liftDemands demandsStruct
 
-  altitude_target = if status == status_flying 
-                    then altitude_target' + throttle_scale * (thrust stickDemands)
-                    else if status' == status_landed
-                    then altitude_target_initial
-                    else altitude_target'
-
-  altitude_target' = [0] ++ altitude_target
-
-  status = if status' == status_taking_off && (zz state) > zground
-           then status_flying
-           else if status' == status_flying && (zz state) <= zground
-           then status_landed
-           else if status' == status_landed && (thrust stickDemands) > throttle_zero
-           then status_taking_off
-           else status'
-
-  status' = [0] ++ status
-
-  landed = status == status_landed
+  thrust' = if completedTakeoff
+            then thrust_base + k_climbrate * ((thrust stickDemands) - (dz state))
+            else if hitTakeoffButton 
+            then thrust_takeoff
+            else 0
 
   dt = rateToPeriod clock_rate
 
   pids = [positionController dt,
           pitchRollAngleController dt,
           pitchRollRateController dt,
-          altitudeController altitude_target dt,
-          climbRateController (not landed) dt,
           yawAngleController dt,
           yawRateController dt]
 
-  demands = foldl (
-     \demand pid -> pid state demand) stickDemands pids
+  demands = Demands thrust' (roll stickDemands) (pitch stickDemands) (yaw stickDemands)
 
-  motors = runCF $ Demands (thrust demands)
-                           (roll demands) 
-                           (pitch demands)
-                           (yaw demands)
+  demands' = foldl (
+     \demand pid -> pid state demand) demands pids
+
+  motors = runCF $ Demands (thrust demands')
+                           (roll demands') 
+                           (pitch demands')
+                           (yaw demands')
 
 ------------------------------------------------------------------------------
  
