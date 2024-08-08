@@ -106,27 +106,19 @@ int main(int argc, char ** argv)
             reached_altitude = true;
         }
 
-        const auto dz_target = scaledThrottle;
-
-        const auto thrust = K_CLIMBRATE *  (dz_target - state.dz);
+        const auto thrust = K_CLIMBRATE *  (scaledThrottle - state.dz);
 
         demands.thrust = reached_altitude  ? THRUST_BASE + thrust : 
             button_was_hit ? THRUST_TAKEOFF :
             0;
 
-        demands.roll = hf::Utils::pcontrol(K_POSITION, demands.roll, state.dy);
+        demands.roll = K_POSITION * (demands.roll - state.dy);
+        demands.roll = K_PITCH_ROLL_ANGLE * (demands.roll - state.phi);
+        demands.roll = K_PITCH_ROLL_RATE * (demands.roll - state.dphi);
 
-        demands.roll = hf::Utils::pcontrol(K_PITCH_ROLL_ANGLE, demands.roll, state.phi);
-
-        demands.roll = hf::Utils::pcontrol(K_PITCH_ROLL_RATE, demands.roll, state.dphi);
-
-        demands.pitch = hf::Utils::pcontrol(K_POSITION, demands.pitch, state.dx);
-
-        demands.pitch = hf::Utils::pcontrol(
-                K_PITCH_ROLL_ANGLE, demands.pitch, state.theta);
-
-        demands.pitch = hf::Utils::pcontrol(
-                K_PITCH_ROLL_RATE, demands.pitch, state.dtheta);
+        demands.pitch = K_POSITION * (demands.pitch - state.dx);
+        demands.pitch = K_PITCH_ROLL_ANGLE * (demands.pitch - state.theta);
+        demands.pitch = K_PITCH_ROLL_RATE * (demands.pitch - state.dtheta);
 
         demands.yaw = hf::Utils::pcontrol(K_YAW_ANGLE, _yaw_angle_target, state.psi);
 
