@@ -50,8 +50,6 @@ int main(int argc, char ** argv)
 {
     _sim.init();
 
-    bool button = false;
-
     while (_sim.step(
                 stream_stickDemands, 
                 stream_vehicleState,

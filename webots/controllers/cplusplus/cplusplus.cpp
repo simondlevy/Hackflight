@@ -28,7 +28,6 @@ static const float K_PITCH_ROLL_RATE = 0.0125;
 static const float K_YAW_ANGLE = 6;
 static const float K_YAW_RATE = 0.012;
 
-static const float K_ALTITUDE = 2;
 static const float K_CLIMBRATE = 25;
 
 static const float K_POSITION = 25;
