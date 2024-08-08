@@ -26,8 +26,6 @@
 
 static const bool USE_NETWORK = true;
 
-static const float INITIAL_ALTITUDE_TARGET = 0.2;
-
 // Small scaling value relating climb-rate demand to throttle stick
 static const float THROTTLE_SCALE = 0.2;
 
