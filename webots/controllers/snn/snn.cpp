@@ -24,22 +24,11 @@
 #include <snn.hpp>
 #include <utils.hpp>
 
-static const bool USE_NETWORK = true;
-
-// Small scaling value relating climb-rate demand to throttle stick
-static const float THROTTLE_SCALE = 0.2;
-
 static const float THRUST_TAKEOFF = 56;
 
 static const float THRUST_BASE = 55.385;
 
-static const float TAKEOFF_TIME = 2;
-
-// Non-neuro Utils::pcontrol(ler ---------------
-
 static const float K_CLIMBRATE = 25;
-
-// ------------------------------------
 
 int main(int argc, char ** argv)
 {
@@ -59,39 +48,18 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    const int timestep = (int)wb_robot_get_basic_time_step();
-
-    uint32_t tick = 0;
-
-    bool reached_altitude = false;
-
-    bool button_was_hit = false;
-
     while (true) {
 
         hf::state_t state = {};
 
         hf::demands_t stickDemands = {};
 
-        bool button = false;
+        bool hitTakeoffButton = false;
 
-        if (!sim.step(stickDemands, button, state)) {
+        bool completedTakeoff = false;
+
+        if (!sim.step(stickDemands, state, hitTakeoffButton, completedTakeoff)) {
             break;
-        }
-
-        if (button) {
-            button_was_hit = true;
-        }
-
-        const auto scaledThrottle = THROTTLE_SCALE * stickDemands.thrust;
-
-        // Get current climb rate observation
-        const auto dz = state.dz;
-
-        const double time = button_was_hit ? tick++ * timestep / 1000 : 0;
-
-        if (time > TAKEOFF_TIME) {
-            reached_altitude = true;
         }
 
         (void)snn;
@@ -102,15 +70,14 @@ int main(int argc, char ** argv)
         const auto motor_snn = a[0];
         (void)motor_snn;*/
 
-        const auto dz_target = scaledThrottle;
-
-        const auto thrust = K_CLIMBRATE *  (dz_target - dz);
-
-        const auto motor = reached_altitude  ? THRUST_BASE + thrust : 
-            button_was_hit ? THRUST_TAKEOFF :
+        const auto thrust = 
+            completedTakeoff ? 
+            THRUST_BASE + K_CLIMBRATE *  (stickDemands.thrust - state.dz) :
+            hitTakeoffButton ? 
+            THRUST_TAKEOFF :
             0;
 
-        sim.setMotors(motor, motor, motor, motor);
+        sim.setMotors(thrust, thrust, thrust, thrust);
     }
 
     wb_robot_cleanup();
