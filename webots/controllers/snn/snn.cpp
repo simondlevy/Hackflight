@@ -33,13 +33,14 @@ static const float INITIAL_ALTITUDE_TARGET = 0.2;
 static const float THROTTLE_ZERO = 0.05;
 
 // Small scaling value relating climb-rate demand to throttle stick
-static const float THROTTLE_SCALE = 0.005;
+static const float THROTTLE_SCALE = 0.2;
 
 // We consider altitudes below this value to be the ground
 static const float ZGROUND = 0.05;
 
-// rad/sec value for achieving / maintining altitude
-static const float THRUST_BASE = 56;
+static const float THRUST_TAKEOFF = 56;
+
+static const float THRUST_BASE = 55.385;
 
 // Motors
 static WbDeviceTag _motor1;
@@ -93,7 +94,7 @@ int main(int argc, char ** argv)
 
     uint32_t tick = 0;
 
-    float _ztarget = INITIAL_ALTITUDE_TARGET;
+    //float _ztarget = INITIAL_ALTITUDE_TARGET;
 
     bool reached_altitude = false;
 
@@ -109,7 +110,7 @@ int main(int argc, char ** argv)
 
         const auto scaledThrottle = THROTTLE_SCALE * stickDemands.thrust;
 
-        _ztarget += scaledThrottle;
+        //_ztarget += scaledThrottle;
 
         // Get current altitude and climb rate observations
         const auto z = state.z;
@@ -119,28 +120,32 @@ int main(int argc, char ** argv)
             reached_altitude = true;
         }
 
+        (void)snn;
+        /*
         vector<double> o = {_ztarget, z, dz};
         vector <double> a;
         snn->getActions(o, a);
         const auto motor_snn = a[0];
-        (void)motor_snn;
+        (void)motor_snn;*/
 
-        const auto dz_target = K_ALTITUDE *  (_ztarget - z);
+        const auto dz_target = scaledThrottle; // K_ALTITUDE *  (_ztarget - z);
 
         const auto thrust = K_CLIMBRATE *  (dz_target - dz);
 
         const auto motor_old = THRUST_BASE + thrust;
 
-        const auto motor = reached_altitude  ? motor_old : THRUST_BASE;
+        const auto motor = reached_altitude  ? motor_old : THRUST_TAKEOFF;
 
         const double time = tick * timestep / 1000;
 
         if (time > 5) {
 
+            printf("%+f %3.3f\n", dz_target, z);
+
             /*printf("%f %f %f %f %f\n", 
                     time, _ztarget, z, motor_snn, motor_old);*/
 
-            printf("%f %f %f\n", time, scaledThrottle, dz_target);
+            //printf("%f %f %f\n", time, scaledThrottle, dz_target);
         }
 
         tick++;

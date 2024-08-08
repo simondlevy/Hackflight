@@ -22,9 +22,15 @@ def main():
         if len(words) == 3:
 
             time.append(float(words[0]))
-            throttle.append(float(words[1]))
+            throttle.append(40 * float(words[1]))
             dz_target.append(float(words[2]))
 
+    plt.plot(time, throttle)
+    plt.plot(time, dz_target, 'r')
+    plt.legend(['throttle', 'dz_target'])
+    plt.show()
+
+    '''
     plt.subplot(2, 1, 1)
     plt.plot(time, throttle)
     plt.xticks([], [])
@@ -34,6 +40,7 @@ def main():
     plt.plot(time, dz_target)
     plt.xlabel('time (s)')
     plt.ylabel('dz target (m/s)')
+    '''
 
     plt.show()
 
