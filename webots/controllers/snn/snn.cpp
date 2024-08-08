@@ -1,5 +1,5 @@
 /*
-   C++ flight simulator spiking-neural net control(ler for Hackflight
+   C++ flight simulator spiking-neural net controller for Hackflight
 
    Copyright (C) 2024 Simon D. Levy
 
@@ -107,7 +107,9 @@ int main(int argc, char ** argv)
             break;
         }
 
-        _ztarget += THROTTLE_SCALE * stickDemands.thrust;
+        const auto scaledThrottle = THROTTLE_SCALE * stickDemands.thrust;
+
+        _ztarget += scaledThrottle;
 
         // Get current altitude and climb rate observations
         const auto z = state.z;
@@ -121,21 +123,24 @@ int main(int argc, char ** argv)
         vector <double> a;
         snn->getActions(o, a);
         const auto motor_snn = a[0];
+        (void)motor_snn;
 
-        const auto motor_old =
-            THRUST_BASE + K_CLIMBRATE *  (K_ALTITUDE * (_ztarget - z) - dz);
+        const auto dz_target = K_ALTITUDE *  (_ztarget - z);
 
+        const auto thrust = K_CLIMBRATE *  (dz_target - dz);
 
-        const auto motor = reached_altitude  ? motor_snn : THRUST_BASE;
+        const auto motor_old = THRUST_BASE + thrust;
 
-        if (reached_altitude) {
+        const auto motor = reached_altitude  ? motor_old : THRUST_BASE;
 
-            printf("%f %f %f %f %f\n", 
-                    tick * timestep / 1000., 
-                    _ztarget, 
-                    z, 
-                    motor_snn,
-                    motor_old);
+        const double time = tick * timestep / 1000;
+
+        if (time > 5) {
+
+            /*printf("%f %f %f %f %f\n", 
+                    time, _ztarget, z, motor_snn, motor_old);*/
+
+            printf("%f %f %f\n", time, scaledThrottle, dz_target);
         }
 
         tick++;

@@ -18,7 +18,7 @@ cplusplus:
 
 snn:
 	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/snn/snn | ./hoverplot.py
+	/usr/local/webots/webots-controller controllers/snn/snn # | ./dzplot.py
 
 haskell:
 	webots worlds/standard.wbt &

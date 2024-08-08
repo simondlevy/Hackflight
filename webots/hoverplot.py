@@ -29,14 +29,14 @@ def main():
             motor_snn.append(float(words[3]))
             motor_target.append(float(words[4]))
 
-    plt.subplot(3, 1, 1)
+    plt.subplot(2, 1, 1)
     plt.plot(time, z)
     plt.plot(time, zsetpoint, 'r')
     plt.legend(['actual', 'setpoint'])
     plt.xticks([], [])
     plt.ylabel('z (m)')
 
-    plt.subplot(3, 1, 3)
+    plt.subplot(2, 1, 2)
     plt.plot(time, motor_snn)
     plt.plot(time, motor_target)
     plt.legend(['SNN', 'target'])
