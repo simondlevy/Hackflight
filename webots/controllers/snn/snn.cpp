@@ -29,9 +29,6 @@ static const bool USE_NETWORK = true;
 // Small scaling value relating climb-rate demand to throttle stick
 static const float THROTTLE_SCALE = 0.2;
 
-// We consider altitudes below this value to be the ground
-static const float ZGROUND = 0.05;
-
 static const float THRUST_TAKEOFF = 56;
 
 static const float THRUST_BASE = 55.385;

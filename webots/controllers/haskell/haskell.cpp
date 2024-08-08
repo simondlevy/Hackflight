@@ -46,7 +46,9 @@ int main(int argc, char ** argv)
 {
     _sim.init();
 
-    while (_sim.step(stream_stickDemands, stream_vehicleState)) {
+    bool button = false;
+
+    while (_sim.step(stream_stickDemands, button, stream_vehicleState)) {
 
         copilot_step_core();
     }
