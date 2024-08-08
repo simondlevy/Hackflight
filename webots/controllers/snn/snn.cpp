@@ -38,22 +38,6 @@ static const float THRUST_BASE = 55.385;
 
 static const float TAKEOFF_TIME = 2;
 
-// Motors
-static WbDeviceTag _motor1;
-static WbDeviceTag _motor2;
-static WbDeviceTag _motor3;
-static WbDeviceTag _motor4;
-
-static WbDeviceTag _makeMotor(const char * name, const float direction)
-{
-    auto motor = wb_robot_get_device(name);
-
-    wb_motor_set_position(motor, INFINITY);
-    wb_motor_set_velocity(motor, direction);
-
-    return motor;
-}
-
 // Non-neuro Utils::pcontrol(ler ---------------
 
 static const float K_CLIMBRATE = 25;
@@ -77,13 +61,6 @@ int main(int argc, char ** argv)
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);
     }
-
-    wb_robot_init();
-
-    _motor1 = _makeMotor("motor1", +1);
-    _motor2 = _makeMotor("motor2", -1);
-    _motor3 = _makeMotor("motor3", +1);
-    _motor4 = _makeMotor("motor4", -1);
 
     const int timestep = (int)wb_robot_get_basic_time_step();
 
@@ -136,11 +113,7 @@ int main(int argc, char ** argv)
             button_was_hit ? THRUST_TAKEOFF :
             0;
 
-        // Run the motors
-        wb_motor_set_velocity(_motor1, +motor);
-        wb_motor_set_velocity(_motor2, -motor);
-        wb_motor_set_velocity(_motor3, +motor);
-        wb_motor_set_velocity(_motor4, -motor);
+        sim.setMotors(motor, motor, motor, motor);
     }
 
     wb_robot_cleanup();
