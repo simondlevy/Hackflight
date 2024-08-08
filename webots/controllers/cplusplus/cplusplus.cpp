@@ -36,29 +36,15 @@ static const float K_POSITION = 25;
 
 static const float YAW_ANGLE_MAX = 200;
 
-// Motor thrust constants
-static const float TBASE = 56;
-
-static const float INITIAL_ALTITUDE_TARGET = 0.2;
-
-// We consider throttle inputs above this below this value to be
-// positive for takeoff
-static constexpr float THROTTLE_ZERO = 0.05;
-
-static constexpr float THROTTLE_SCALE = 0.005;
-
-// We consider altitudes below this value to be the ground
-static constexpr float ZGROUND = 0.05;
-
 static constexpr float YAW_DEMAND_SCALE = .01;
 
-typedef enum {
+static const float THROTTLE_SCALE = 0.2;
 
-    STATUS_LANDED,
-    STATUS_TAKING_OFF,
-    STATUS_FLYING
+static const float THRUST_TAKEOFF = 56;
 
-} flyingStatus_e;
+static const float THRUST_BASE = 55.385;
+
+static const float TAKEOFF_TIME = 2;
 
 static float cap_yaw_angle(const float angle)
 {
@@ -73,53 +59,39 @@ int main(int argc, char ** argv)
 
     sim.init();
 
+    const int timestep = (int)wb_robot_get_basic_time_step();
+
+    uint32_t tick = 0;
+
+    bool reached_altitude = false;
+
+    bool button_was_hit = false;
+
     while (true) {
 
         hf::state_t state = {};
 
         hf::demands_t stickDemands = {};
 
-        bool takeoff = false;
+        bool button = false;
 
-        if (!sim.step(stickDemands, takeoff, state)) {
+        if (!sim.step(stickDemands, button, state)) {
             break;
         }
 
-        printf("%d\n", takeoff);
+        if (button) {
+            button_was_hit = true;
+        }
 
-        static flyingStatus_e _status;
-
-        static float _altitude_target;
+        const auto scaledThrottle = THROTTLE_SCALE * stickDemands.thrust;
 
         static float _yaw_angle_target;
 
         hf::quad_motors_t motors = {};
 
-        _altitude_target =
-            _status == STATUS_FLYING ? 
-            _altitude_target + THROTTLE_SCALE * stickDemands.thrust :
-            _status == STATUS_LANDED ?
-            INITIAL_ALTITUDE_TARGET :
-            _altitude_target;
-
         _yaw_angle_target = cap_yaw_angle(_yaw_angle_target + 
                 YAW_ANGLE_MAX * stickDemands.yaw * YAW_DEMAND_SCALE);
 
-        _status = 
-
-            _status == STATUS_TAKING_OFF  && state.z > ZGROUND ?  
-            STATUS_FLYING :
-
-            _status == STATUS_FLYING && state.z <= ZGROUND ?  
-            STATUS_LANDED :
-
-            _status == STATUS_LANDED && 
-            stickDemands.thrust > THROTTLE_ZERO ? 
-            STATUS_TAKING_OFF :
-
-            _status;
-
-        const auto landed = _status == STATUS_LANDED;
 
         hf::demands_t demands = { 
             stickDemands.thrust,
@@ -128,9 +100,19 @@ int main(int argc, char ** argv)
             stickDemands.yaw
         };
 
-        const auto dz_target = hf::Utils::pcontrol(K_ALTITUDE, _altitude_target, state.z);
+        const double time = button_was_hit ? tick++ * timestep / 1000 : 0;
 
-        const auto thrust = hf::Utils::pcontrol(K_CLIMBRATE,  dz_target, state.dz);
+        if (time > TAKEOFF_TIME) {
+            reached_altitude = true;
+        }
+
+        const auto dz_target = scaledThrottle;
+
+        const auto thrust = K_CLIMBRATE *  (dz_target - state.dz);
+
+        demands.thrust = reached_altitude  ? THRUST_BASE + thrust : 
+            button_was_hit ? THRUST_TAKEOFF :
+            0;
 
         demands.roll = hf::Utils::pcontrol(K_POSITION, demands.roll, state.dy);
 
@@ -150,8 +132,6 @@ int main(int argc, char ** argv)
 
         demands.yaw = hf::Utils::pcontrol(K_YAW_RATE, demands.yaw, state.dpsi);
 
-        demands.thrust = landed ? 0 : TBASE + thrust;
-        
         hf::Mixer::runCF(demands, motors);
 
         sim.setMotors(motors.m1, motors.m2, motors.m3, motors.m4);
