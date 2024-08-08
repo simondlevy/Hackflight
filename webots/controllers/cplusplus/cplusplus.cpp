@@ -78,9 +78,13 @@ int main(int argc, char ** argv)
 
         hf::demands_t stickDemands = {};
 
-        if (!sim.step(stickDemands, state)) {
+        bool takeoff = false;
+
+        if (!sim.step(stickDemands, takeoff, state)) {
             break;
         }
+
+        printf("%d\n", takeoff);
 
         static flyingStatus_e _status;
 

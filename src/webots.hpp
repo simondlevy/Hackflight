@@ -67,13 +67,16 @@ namespace hf {
                 _motor4 = _makeMotor("motor4", -1);
             }
 
-            bool step(demands_t & stickDemands, state_t & vehicleState)
+            bool step(
+                    demands_t & stickDemands,
+                    bool & takeoff,
+                    state_t & vehicleState)
             {
                 if (wb_robot_step((int)_timestep) == -1) {
                     return false;
                 }
 
-                _readSticks(stickDemands);
+                _readSticks(stickDemands, takeoff);
 
                 _getVehicleState(vehicleState);
 
@@ -106,6 +109,8 @@ namespace hf {
                 int8_t pitch;
                 int8_t yaw;
 
+                int8_t button;
+
             } joystick_t;
 
             typedef enum {
@@ -134,17 +139,17 @@ namespace hf {
             std::map<std::string, joystick_t> JOYSTICK_AXIS_MAP = {
 
                 { "MY-POWER CO.,LTD. 2In1 USB Joystick", // PS3
-                    joystick_t {-2,  3, -4, 1} },
+                    joystick_t {-2,  3, -4, 1, 5} },
                 { "SHANWAN Android Gamepad",             // PS3
-                    joystick_t {-2,  3, -4, 1} },
+                    joystick_t {-2,  3, -4, 1, 5} },
                 { "Logitech Gamepad F310",
-                    joystick_t {-2,  4, -5, 1} },
+                    joystick_t {-2,  4, -5, 1, 5} },
                 { "Logitech Logitech Extreme 3D",
-                    joystick_t {-4,  1, -2, 3}  },
+                    joystick_t {-4,  1, -2, 3, 5}  },
                 { "FrSky FrSky Simulator",
                     joystick_t { 1,  2,  3, 4} },
                 { "Horizon Hobby SPEKTRUM RECEIVER",
-                    joystick_t { 2,  -3,  4, -1} }
+                    joystick_t { 2,  -3,  4, -1, 5} }
             };
 
             static float scaleJoystickAxis(const int32_t rawval)
@@ -164,7 +169,7 @@ namespace hf {
                 return scaleJoystickAxis(readJoystickRaw(index));
             }
 
-            void readJoystick(demands_t & demands)
+            void readJoystick(demands_t & demands, bool & takeoff)
             {
                 auto joyname = wb_joystick_get_model();
 
@@ -175,6 +180,8 @@ namespace hf {
                 demands.roll = readJoystickAxis(axes.roll);
                 demands.pitch = readJoystickAxis(axes.pitch); 
                 demands.yaw = readJoystickAxis(axes.yaw);
+
+                takeoff = wb_joystick_get_pressed_button() == axes.button;
 
                 // Run throttle stick through deadband
                 demands.thrust = fabs(demands.thrust) < 0.05 ? 0 : demands.thrust;
@@ -187,7 +194,7 @@ namespace hf {
                 demands.thrust = ready ? demands.thrust : 0;
             }
 
-            static void readKeyboard(demands_t & demands)
+            static void readKeyboard(demands_t & demands, bool & takeoff)
             {
                 switch (wb_keyboard_get_key()) {
 
@@ -289,7 +296,7 @@ namespace hf {
                 return sensor;
             }
 
-            void _readSticks(demands_t & demands)
+            void _readSticks(demands_t & demands, bool & takeoff)
             {
                 auto joystickStatus = haveJoystick();
 
@@ -298,8 +305,10 @@ namespace hf {
                 demands.pitch = 0;
                 demands.yaw = 0;
 
+                takeoff = false;
+
                 if (joystickStatus == JOYSTICK_RECOGNIZED) {
-                    readJoystick(demands);
+                    readJoystick(demands, takeoff);
                 }
 
                 else if (joystickStatus == JOYSTICK_UNRECOGNIZED) {
@@ -307,7 +316,7 @@ namespace hf {
                 }
 
                 else {
-                    readKeyboard(demands);
+                    readKeyboard(demands, takeoff);
                 }
             }
 
