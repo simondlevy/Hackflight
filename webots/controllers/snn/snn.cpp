@@ -91,16 +91,22 @@ int main(int argc, char ** argv)
 
     bool reached_altitude = false;
 
+    bool button_was_hit = false;
+
     while (true) {
 
         hf::state_t state = {};
 
         hf::demands_t stickDemands = {};
 
-        bool takeoff = false;
+        bool button = false;
 
-        if (!sim.step(stickDemands, takeoff, state)) {
+        if (!sim.step(stickDemands, button, state)) {
             break;
+        }
+
+        if (button) {
+            button_was_hit = true;
         }
 
         const auto scaledThrottle = THROTTLE_SCALE * stickDemands.thrust;
@@ -108,7 +114,7 @@ int main(int argc, char ** argv)
         // Get current climb rate observation
         const auto dz = state.dz;
 
-        const double time = tick * timestep / 1000;
+        const double time = button_was_hit ? tick++ * timestep / 1000 : 0;
 
         if (time > TAKEOFF_TIME) {
             reached_altitude = true;
@@ -126,11 +132,9 @@ int main(int argc, char ** argv)
 
         const auto thrust = K_CLIMBRATE *  (dz_target - dz);
 
-        const auto motor_old = THRUST_BASE + thrust;
-
-        const auto motor = reached_altitude  ? motor_old : THRUST_TAKEOFF;
-
-        tick++;
+        const auto motor = reached_altitude  ? THRUST_BASE + thrust : 
+            button_was_hit ? THRUST_TAKEOFF :
+            0;
 
         // Run the motors
         wb_motor_set_velocity(_motor1, +motor);
