@@ -71,24 +71,16 @@ step = motors where
 
   stickDemands = liftDemands demandsStruct
 
-  thrust' = if completedTakeoff
-            then thrust_base + k_climbrate * ((thrust stickDemands) - (dz state))
-            else if hitTakeoffButton 
-            then thrust_takeoff
-            else 0
-
   dt = rateToPeriod clock_rate
 
-  pids = [positionController dt,
+  pids = [climbRateController hitTakeoffButton completedTakeoff,
+          positionController dt,
           pitchRollAngleController dt,
           pitchRollRateController dt,
           yawAngleController dt,
           yawRateController dt]
 
-  demands = Demands thrust' (roll stickDemands) (pitch stickDemands) (yaw stickDemands)
-
-  demands' = foldl (
-     \demand pid -> pid state demand) demands pids
+  demands' = foldl (\demand pid -> pid state demand) stickDemands pids
 
   motors = runCF $ Demands (thrust demands')
                            (roll demands') 

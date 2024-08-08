@@ -37,17 +37,20 @@ import Utils
 
 --}
 
-climbRateController dt state demands = demands' where
+climbRateController hitTakeoffButton completedTakeoff state demands = demands'
+
+  where
 
     kp = 25
-    ki = 15
-    ilimit = 5000
 
-    (thrustpid, integ) =
-      piController kp ki dt ilimit (thrust demands) (dz state) integ'
+    thrust_takeoff = 56
 
-    integ' = [0] ++ integ
+    thrust_base = 55.385
 
-    thrustout = thrustpid * tscale + tbase
+    thrust' = if completedTakeoff
+              then thrust_base + kp * ((thrust demands) - (dz state))
+              else if hitTakeoffButton 
+              then thrust_takeoff
+              else 0
 
-    demands' = Demands thrustout (roll demands) (pitch demands) (yaw demands)
+    demands' = Demands thrust' (roll demands) (pitch demands) (yaw demands)
