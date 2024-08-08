@@ -229,6 +229,10 @@ namespace hf {
                     case 'S':
                         demands.thrust = -0.5;
                         break;
+
+                    case 32: // spacebar
+                        takeoff = true;
+                        break;
                 }
             }
 
