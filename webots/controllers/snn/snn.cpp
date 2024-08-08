@@ -95,6 +95,8 @@ int main(int argc, char ** argv)
 
     float _ztarget = INITIAL_ALTITUDE_TARGET;
 
+    bool reached_altitude = false;
+
     while (true) {
 
         hf::state_t state = {};
@@ -107,43 +109,33 @@ int main(int argc, char ** argv)
 
         _ztarget += THROTTLE_SCALE * stickDemands.thrust;
 
-        static bool _reached_altitude;
-
         // Get current altitude and climb rate observations
         const auto z = state.z;
         const auto dz = state.dz;
 
-        float motor = 0;
-
         if (z > INITIAL_ALTITUDE_TARGET) {
-            _reached_altitude = true;
+            reached_altitude = true;
         }
 
-        if (_reached_altitude) {
+        vector<double> o = {_ztarget, z, dz};
+        vector <double> a;
+        snn->getActions(o, a);
+        const auto motor_snn = a[0];
 
-            if (USE_NETWORK) {
-                vector<double> o = {_ztarget, z, dz};
-                vector <double> a;
-                snn->getActions(o, a);
-                motor = a[0];
-            }
+        const auto motor_old =
+            THRUST_BASE + K_CLIMBRATE *  (K_ALTITUDE * (_ztarget - z) - dz);
 
-            else {
 
-                motor = THRUST_BASE + K_CLIMBRATE *  (K_ALTITUDE * (_ztarget - z) - dz);
+        const auto motor = reached_altitude  ? motor_snn : THRUST_BASE;
 
-            }
+        if (reached_altitude) {
 
             printf("%f %f %f %f %f\n", 
                     tick * timestep / 1000., 
                     _ztarget, 
                     z, 
-                    dz, 
-                    motor);
-        }
-
-        else {
-            motor = THRUST_BASE;
+                    motor_snn,
+                    motor_old);
         }
 
         tick++;
