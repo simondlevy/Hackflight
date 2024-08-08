@@ -21,7 +21,6 @@
 
 #include <hackflight.hpp>
 #include <mixers.hpp>
-#include <utils.hpp>
 
 static const float K_PITCH_ROLL_ANGLE = 6;
 static const float K_PITCH_ROLL_RATE = 0.0125;
@@ -120,9 +119,8 @@ int main(int argc, char ** argv)
         demands.pitch = K_PITCH_ROLL_ANGLE * (demands.pitch - state.theta);
         demands.pitch = K_PITCH_ROLL_RATE * (demands.pitch - state.dtheta);
 
-        demands.yaw = hf::Utils::pcontrol(K_YAW_ANGLE, _yaw_angle_target, state.psi);
-
-        demands.yaw = hf::Utils::pcontrol(K_YAW_RATE, demands.yaw, state.dpsi);
+        demands.yaw = K_YAW_ANGLE * (_yaw_angle_target - state.psi);
+        demands.yaw = K_YAW_RATE *( demands.yaw - state.dpsi);
 
         hf::Mixer::runCF(demands, motors);
 
