@@ -89,7 +89,7 @@ int main(int argc, char ** argv)
     _motor3 = _makeMotor("motor3", +1);
     _motor4 = _makeMotor("motor4", -1);
 
-    //const int timestep = (int)wb_robot_get_basic_time_step();
+    const int timestep = (int)wb_robot_get_basic_time_step();
 
     uint32_t tick = 0;
 
@@ -132,15 +132,14 @@ int main(int argc, char ** argv)
 
                 motor = THRUST_BASE + K_CLIMBRATE *  (K_ALTITUDE * (_ztarget - z) - dz);
 
-                /*
-                   printf("%f %f %f %f %f %f\n", 
-                   tick * timestep / 1000., 
-                   _ztarget, 
-                   z, 
-                   dz_target,
-                   dz, 
-                   motor);*/
             }
+
+            printf("%f %f %f %f %f\n", 
+                    tick * timestep / 1000., 
+                    _ztarget, 
+                    z, 
+                    dz, 
+                    motor);
         }
 
         else {
