@@ -30,8 +30,13 @@ int main(int argc, char ** argv)
 
     SNN * snn = NULL;
 
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s RISP_NETWORK\n", argv[0]);
+        exit(1);
+    }
+
     try {
-        snn = new SNN("networks/takeoff_risp.txt", "risp");
+        snn = new SNN(argv[1], "risp");
     } catch (const SRE &e) {
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);

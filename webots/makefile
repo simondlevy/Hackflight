@@ -23,7 +23,7 @@ cplusplus:
 
 snn:
 	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/snn/snn
+	/usr/local/webots/webots-controller controllers/snn/snn $(NETWORK)
 
 sock:
 
