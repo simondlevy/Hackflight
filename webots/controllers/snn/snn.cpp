@@ -16,19 +16,28 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 */
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include <sim.hpp>
 #include <snn.hpp>
 
+#include "socket_server.hpp"
+
+static const int VIZ_PORT = 8100;
+
 int main(int argc, char ** argv)
 {
-    (void)argc;
-    (void)argv;
+    // Create a simulator object for Webots functionality 
 
     hf::Simulator sim = {};
 
     sim.init();
 
     SNN * snn = NULL;
+
+    // Load up the network specified in the command line
 
     if (argc < 2) {
         fprintf(stderr, "Usage: %s RISP_NETWORK\n", argv[0]);
@@ -41,6 +50,12 @@ int main(int argc, char ** argv)
         fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
         exit(1);
     }
+
+    // Serve up a socket for the visualizer
+    printf("Listening for viz client on port %d ...", VIZ_PORT);
+    fflush(stdout);
+
+    const auto viz_client = serve_socket(VIZ_PORT);
 
     while (true) {
 
