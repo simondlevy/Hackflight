@@ -57,6 +57,8 @@ int main(int argc, char ** argv)
 
     const auto viz_client = socket_serve(VIZ_PORT);
 
+    printf("\nClient connected\n");
+
     while (true) {
 
         hf::state_t state = {};
@@ -74,7 +76,8 @@ int main(int argc, char ** argv)
         char message[100];
 
         sprintf(message,
-            "{\"Event Counts\":[0,0,%d,0,0,0,0,0,0,0,0],\"Neuron Alias\":[0,1,2,5,6,9,10,15,18,53,66]}\n",
+            "{\"Event Counts\":[0,0,%d,0,0,0,0,0,0,0,0],"
+            "\"Neuron Alias\":[0,1,2,5,6,9,10,15,18,53,66]}\n",
             counts[0]);
 
         socket_write(viz_client, message);

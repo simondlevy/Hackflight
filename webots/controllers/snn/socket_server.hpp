@@ -41,9 +41,11 @@ int socket_serve(const int port)
     return accept(listenfd, (struct sockaddr*)NULL, NULL);
 }
 
-int socket_write(const int connfd, const char * msg)
+bool socket_write(const int connfd, const char * msg)
 {
-    return write(connfd, msg, strlen(msg));
+    const int len = strlen(msg);
+
+    return write(connfd, msg, len) == len;
 
 }
 
