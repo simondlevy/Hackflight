@@ -21,14 +21,11 @@
 #include <webots/gps.h>
 
 #include <webots.hpp>
-#include <snn.hpp>
 #include <utils.hpp>
 
 static const float THRUST_TAKEOFF = 56;
 
-static const float THRUST_BASE = 55.385;
-
-static const float K_CLIMBRATE = 25;
+static const float THRUST_BASE = 55.2;
 
 int main(int argc, char ** argv)
 {
@@ -38,15 +35,6 @@ int main(int argc, char ** argv)
     hf::Simulator sim = {};
 
     sim.init();
-
-    SNN * snn = NULL;
-
-    try {
-        snn = new SNN("networks/hover_risp.txt", "risp");
-    } catch (const SRE &e) {
-        fprintf(stderr, "Couldn't set up SNN:\n%s\n", e.what());
-        exit(1);
-    }
 
     while (true) {
 
@@ -59,15 +47,11 @@ int main(int argc, char ** argv)
             break;
         }
 
-        double thrust = 0;
+        float thrust = 0;
 
         if (completedTakeoff) {
-            vector<double> o = {stickDemands.thrust, state.dz};
-            vector <double> a;
-            snn->getActions(o, a);
-            printf("%+f %+f => %+f\n", o[0], o[1], a[0]);
-            thrust = THRUST_BASE + a[0];
 
+            thrust = THRUST_BASE - 25 * state.dz;
         }
 
         else if (hitTakeoffButton) {
