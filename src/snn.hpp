@@ -80,11 +80,14 @@ class SNN
             delete net;
         }
 
-        void step(vector <double>  &o, vector <double> &a, vector<int> & counts)
+        void step(
+                vector <double>  &observations,
+                vector <double> &actions,
+                vector<int> & counts)
         {
             proc->clear_activity();
 
-            auto spikes = encoder_array.get_spikes(o);
+            auto spikes = encoder_array.get_spikes(observations);
 
             proc->apply_spikes(spikes, 0);
 
@@ -93,7 +96,7 @@ class SNN
             vector <double> times;
             decoder_array.get_output_counts_and_times(counts, times, *(proc), 0);
 
-            a = decoder_array.get_data(counts, times);
+            actions = decoder_array.get_data(counts, times);
         }
 
     private:
