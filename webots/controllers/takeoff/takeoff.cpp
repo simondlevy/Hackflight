@@ -22,14 +22,8 @@
 
 #include <snn.hpp>
 
-static const bool USE_NETWORK = false;
-
 // Time constant for computing climb rate
 static const float DT = 0.01;
-
-// For training
-static const float ZTARGET = 0.2;
-static const float TBASE = 56;
 
 // Motors
 static WbDeviceTag _motor1;
@@ -45,18 +39,6 @@ static WbDeviceTag _makeMotor(const char * name, const float direction)
     wb_motor_set_velocity(motor, direction);
 
     return motor;
-}
-
-// Non-neuro controller ---------------
-
-static const float K_ALTITUDE = 2;
-static const float K_CLIMBRATE = 25;
-
-// ------------------------------------
-
-static float control(const float k, const float target, const float actual)
-{
-    return k * (target - actual);
 }
 
 int main(int argc, char ** argv)
@@ -87,9 +69,6 @@ int main(int argc, char ** argv)
 
     float zprev = 0;
 
-    FILE * logfp = fopen("altitude.csv", "w");
-    fprintf(logfp, "z, dz_target\n");
-
     while (wb_robot_step(timestep) != -1) {
 
         // Get current altitude and climb rate observations
@@ -97,22 +76,10 @@ int main(int argc, char ** argv)
         const auto dz = (z - zprev) / DT;
         zprev = z;
 
-        float motor = 0;
-
-        if (USE_NETWORK) {
-            vector<double> o = {z, dz};
-            vector <double> a;
-            snn->getActions(o, a);
-            motor = a[0];
-        }
-
-        else {
-               const auto dz_target = control(K_ALTITUDE, ZTARGET, z); 
-               fprintf(logfp, "%f,%f\n", z, dz_target);
-               fflush(logfp);
-               const auto thrust = control(K_CLIMBRATE,  dz_target, dz);
-               motor = thrust + TBASE;
-        }
+        vector<double> o = {z, dz};
+        vector <double> a;
+        snn->getActions(o, a);
+        const auto motor = a[0];
 
         // Run the motors
         wb_motor_set_velocity(_motor1, +motor);
@@ -122,8 +89,6 @@ int main(int argc, char ** argv)
     }
 
     wb_robot_cleanup();
-
-    fclose(logfp);
 
     return 0;
 }
