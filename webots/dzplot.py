@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 
 def main():
 
-    time = []
-    throttle = []
-    dz_target = []
+    demand = []
+    dz = []
+    output = []
 
     while True:
 
@@ -21,13 +21,18 @@ def main():
 
         if len(words) == 3:
 
-            time.append(float(words[0]))
-            throttle.append(40 * float(words[1]))
-            dz_target.append(float(words[2]))
+            demand.append(float(words[0]))
+            dz.append(float(words[1]))
+            output.append(float(words[2]))
 
-    plt.plot(time, throttle)
-    plt.plot(time, dz_target, 'r')
-    plt.legend(['throttle', 'dz_target'])
+    plt.subplot(2, 1, 1)
+    plt.plot(demand, 'r')
+    plt.plot(dz)
+    plt.legend(['demand', 'dz'])
+
+    plt.subplot(2, 1, 2)
+    plt.plot(output)
+
     plt.show()
 
     '''

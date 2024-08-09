@@ -52,6 +52,9 @@ int main(int argc, char ** argv)
     hf::Simulator sim = {};
 
     sim.init();
+    
+    auto logfp = fopen("log.csv", "w");
+    fprintf(logfp, "demand,dz,output\n");
 
     while (true) {
 
@@ -80,6 +83,14 @@ int main(int argc, char ** argv)
             stickDemands.pitch,
             stickDemands.yaw
         };
+
+        if (completedTakeoff) {
+            fprintf(logfp, "%f,%f,%f\n", 
+                    demands.thrust, 
+                    state.dz,
+                    K_CLIMBRATE *  (demands.thrust - state.dz));
+            fflush(logfp);
+        }
 
         demands.thrust = 
             completedTakeoff ? 
