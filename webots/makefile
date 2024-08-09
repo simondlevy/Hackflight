@@ -38,16 +38,6 @@ snn-takeoff:
 		--use_name_neuron '{"0":"z","1":"dz/dt","2":"motor"}' \
 		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null
 
-socktest:
-
-	$(FDIR)/cpp-apps/bin/polebalance_risp -a test -n $(OLD_NETWORK) \
-		--all_counts_stream '{"source":"serve","port":8100}' &
-
-	# cd $(FDIR)/viz; love . -i '{"source":"request","port":8100,"host":"localhost"}'  -n $(OLD_NETWORK) \
-    #	--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null
-
-	./vizproxy.py
-
 haskell:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/haskell/haskell
