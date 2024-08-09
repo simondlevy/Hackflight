@@ -35,7 +35,7 @@ sock:
 		--use_name_neuron '{"2":"xd","3":"xd","4":"theta_l","5":"theta_l","6":"thetad_l","7":"thetad_l","0":"x","1":"x","9":"left","8":"no action","10":"right"}' \
 		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null &
 
-	cd $(FDIR)/cpp-apps/applications/polebalance/viz; love . -v 8888 -s 1000; 
+	cd $(FDIR)/cpp-apps/applications/polebalance/newviz; love . -v 8888 -s 1000; 
 
 haskell:
 	webots worlds/standard.wbt &
