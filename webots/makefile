@@ -16,21 +16,9 @@ cplusplus:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller --stdout-redirect controllers/cplusplus/cplusplus
 
-dzplot:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controllers/cplusplus/cplusplus | ./dzplot.py
-
-sock:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/sock-snn/sock-snn
-
 snn:
 	webots worlds/standard.wbt &
 	/usr/local/webots/webots-controller controllers/snn/snn
-
-takeoff:
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/takeoff/takeoff
 
 haskell:
 	webots worlds/standard.wbt &
