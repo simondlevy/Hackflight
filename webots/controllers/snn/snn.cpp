@@ -16,10 +16,6 @@
   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 */
 
-#include <webots/motor.h>
-#include <webots/robot.h>
-#include <webots/gps.h>
-
 #include <sim.hpp>
 #include <snn.hpp>
 
@@ -44,11 +40,8 @@ int main(int argc, char ** argv)
     while (true) {
 
         hf::state_t state = {};
-        hf::demands_t stickDemands = {};
-        bool hitTakeoffButton = false;
-        bool completedTakeoff = false;
 
-        if (!sim.step(stickDemands, state, hitTakeoffButton, completedTakeoff)) {
+        if (!sim.step(state)) {
             break;
         }
 

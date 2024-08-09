@@ -102,6 +102,18 @@ namespace hf {
                 return true;
             }
 
+            // Minimalist version of above
+            bool step(state_t & vehicleState)
+            {
+                if (wb_robot_step((int)_timestep) == -1) {
+                    return false;
+                }
+
+                _getVehicleState(vehicleState);
+
+                return true;
+            }
+
             void setMotors(
                     const float m1, 
                     const float m2, 
