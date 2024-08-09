@@ -35,8 +35,10 @@ sock:
 	$(FDIR)/cpp-apps/bin/polebalance_risp -a test -n $(OLD_NETWORK) \
 		--all_counts_stream '{"source":"serve","port":8100}' &
 
-	cd $(FDIR)/viz; love . -i '{"source":"request","port":8100,"host":"localhost"}'  -n $(OLD_NETWORK) \
-		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null
+	# cd $(FDIR)/viz; love . -i '{"source":"request","port":8100,"host":"localhost"}'  -n $(OLD_NETWORK) \
+    #	--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null
+
+	./vizproxy.py
 
 pytakeoff:
 
