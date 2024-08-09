@@ -71,9 +71,11 @@ int main(int argc, char ** argv)
         snn->step(observations, actions, counts);
         const auto motor = actions[0];
 
-        printf("%ld\n", counts.size());
+        char message[100];
 
-        const auto message = "{\"Event Counts\":[0,2,2,0,1,1,0,2,0,1,0],\"Neuron Alias\":[0,6,15,10,53,66,2,9,1,5,18]}\n";
+        sprintf(message,
+            "{\"Event Counts\":[0,2,2,0,1,1,0,2,0,1,0],\"Neuron Alias\":[0,1,2,5,6,9,10,15,18,53,66]}\n");
+
         socket_write(viz_client, message);
 
         sim.setMotors(motor, motor, motor, motor);
