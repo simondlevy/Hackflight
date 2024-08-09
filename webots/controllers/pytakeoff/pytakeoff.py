@@ -17,7 +17,7 @@
 '''
 
 from time import time
-impot socket
+import socket
 import numpy as np
 import matplotlib.pyplot as plt
 

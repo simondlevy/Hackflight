@@ -23,29 +23,14 @@
 #include <sim.hpp>
 #include <snn.hpp>
 
-// Time constant for computing climb rate
-static const float DT = 0.01;
-
-// Motors
-static WbDeviceTag _motor1;
-static WbDeviceTag _motor2;
-static WbDeviceTag _motor3;
-static WbDeviceTag _motor4;
-
-static WbDeviceTag _makeMotor(const char * name, const float direction)
-{
-    auto motor = wb_robot_get_device(name);
-
-    wb_motor_set_position(motor, INFINITY);
-    wb_motor_set_velocity(motor, direction);
-
-    return motor;
-}
-
 int main(int argc, char ** argv)
 {
     (void)argc;
     (void)argv;
+
+    hf::Simulator sim = {};
+
+    sim.init();
 
     SNN * snn = NULL;
 
@@ -56,37 +41,23 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    wb_robot_init();
+    while (true) {
 
-    _motor1 = _makeMotor("motor1", +1);
-    _motor2 = _makeMotor("motor2", -1);
-    _motor3 = _makeMotor("motor3", +1);
-    _motor4 = _makeMotor("motor4", -1);
+        hf::state_t state = {};
+        hf::demands_t stickDemands = {};
+        bool hitTakeoffButton = false;
+        bool completedTakeoff = false;
 
-    const int timestep = (int)wb_robot_get_basic_time_step();
+        if (!sim.step(stickDemands, state, hitTakeoffButton, completedTakeoff)) {
+            break;
+        }
 
-    auto gps = wb_robot_get_device("gps");
-    wb_gps_enable(gps, timestep);
-
-    float zprev = 0;
-
-    while (wb_robot_step(timestep) != -1) {
-
-        // Get current altitude and climb rate observations
-        const auto z = wb_gps_get_values(gps)[2];
-        const auto dz = (z - zprev) / DT;
-        zprev = z;
-
-        vector<double> o = {z, dz};
+        vector<double> o = {state.z, state.dz};
         vector <double> a;
         snn->getActions(o, a);
         const auto motor = a[0];
 
-        // Run the motors
-        wb_motor_set_velocity(_motor1, +motor);
-        wb_motor_set_velocity(_motor2, -motor);
-        wb_motor_set_velocity(_motor3, +motor);
-        wb_motor_set_velocity(_motor4, -motor);
+        sim.setMotors(motor, motor, motor, motor);
     }
 
     wb_robot_cleanup();
