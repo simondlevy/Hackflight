@@ -17,10 +17,15 @@
 '''
 
 from time import time
+impot socket
 import numpy as np
 import matplotlib.pyplot as plt
 
 from controller import Supervisor, Robot, GPS
+
+# Socket comms
+VIZ_HOST = 'localhost'
+VIZ_PORT = 8100
 
 # Control constants
 K1 = 56
@@ -83,6 +88,9 @@ def plot(tic, z_history, dz_history, motor_history):
 
 
 def main():
+
+    viz_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    viz_socket.connect((VIZ_HOST, VIZ_PORT))
 
     robot = Robot()
     gps = GPS("gps")

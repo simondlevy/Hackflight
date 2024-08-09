@@ -20,6 +20,7 @@
 #include <webots/robot.h>
 #include <webots/gps.h>
 
+#include <sim.hpp>
 #include <snn.hpp>
 
 // Time constant for computing climb rate

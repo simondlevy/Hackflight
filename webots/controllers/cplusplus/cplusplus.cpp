@@ -1,8 +1,4 @@
-/*
-
-   C++ flight simulator support for Hackflight
-
-   Copyright (C) 2024 Simon D. Levy
+/* C++ flight simulator support for Hackflight Copyright (C) 2024 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +13,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <webots.hpp>
+#include <sim.hpp>
 
 #include <hackflight.hpp>
 #include <mixers.hpp>

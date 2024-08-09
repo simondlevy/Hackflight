@@ -17,7 +17,7 @@
 */
 
 #include <hackflight.hpp>
-#include <webots.hpp>
+#include <sim.hpp>
 
 // Webots simulator class
 static hf::Simulator _sim;
