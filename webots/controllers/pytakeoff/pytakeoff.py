@@ -98,7 +98,7 @@ def main():
         print('Socket servicie failed: ' + str(e))
         exit(1)
 
-    print('Waiting for viz client to connect ...')
+    print('\nWaiting for viz client to connect ...')
 
     viz_connection, _ = viz_socket.accept()
 

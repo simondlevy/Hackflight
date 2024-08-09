@@ -14,7 +14,12 @@
 
 FDIR = $(HOME)/Desktop/framework
 
-NETWORK = $(FDIR)/cpp-apps/networks/takeoff_risp.txt
+OLD_NETWORK = $(FDIR)/networks/polebalance_risp-1.txt
+
+NEW_NETWORK = $(FDIR)/cpp-apps/networks/takeoff_risp.txt
+
+VIZ_HOST = "localhost"
+VIZ_PORT = 8100
 
 
 cplusplus:
@@ -23,23 +28,22 @@ cplusplus:
 
 snn:
 	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller controllers/snn/snn $(NETWORK)
+	/usr/local/webots/webots-controller controllers/snn/snn $(NEW_NETWORK)
 
 sock:
 
-	$(FDIR)/cpp-apps/bin/polebalance_risp -a test -n $(NETWORK) \
+	$(FDIR)/cpp-apps/bin/polebalance_risp -a test -n $(OLD_NETWORK) \
 		--all_counts_stream '{"source":"serve","port":8100}' &
 
-	cd $(FDIR)/viz; love . -i '{"source":"request","port":8100,"host":"localhost"}'  -n $(NETWORK) \
-		--use_name_neuron '{"0":"z","1":"dz/dt","2":"motor"}' \
-		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null &
+	cd $(FDIR)/viz; love . -i '{"source":"request","port":8100,"host":"localhost"}'  -n $(OLD_NETWORK) \
+		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null
 
 pytakeoff:
 
-	webots worlds/standard.wbt &
-	/usr/local/webots/webots-controller --stdout-redirect controllers/pytakeoff/pytakeoff.py &
+	@webots worlds/standard.wbt &
+	@/usr/local/webots/webots-controller --stdout-redirect controllers/pytakeoff/pytakeoff.py &
 
-	cd $(FDIR)/viz; love . -i '{"source":"request","port":8100,"host":"localhost"}'  -n $(NETWORK) \
+	@cd $(FDIR)/viz; love . -i '{"source":"request","port":$(VIZ_PORT),"host":$(VIZ_HOST)}'  -n $(NEW_NETWORK) \
 		--use_name_neuron '{"0":"z","1":"dz/dt","2":"motor"}' \
 		--show_spike_count --remove_unnecessary_neuron --set_num_screen_shot 1000 > /dev/null &
 
